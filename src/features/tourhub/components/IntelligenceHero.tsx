@@ -12,7 +12,7 @@
  * spec is overridden — sentence headlines render in Geist 700 with tight
  * letter-spacing instead.
  *
- * Phase A (this revision):
+ * Phase A:
  *   - Cream LEAD_BG outer surface with hairline borders top + bottom
  *   - LeadSectionHeader (3×14 amber bar + Sparkles glyph + status pill)
  *   - CredibilityBand directly below the header, amber-tint stat strip
@@ -25,7 +25,14 @@
  *   - Single unified CTA: "All Intelligence picks"
  *   - Live-state pulse on hero pick position number
  *
- * Phase B / C deferred: framing-sentence + per-pick pulled-quote pipeline.
+ * Phase B: CredibilityBand + TrackRecordPanel wired to existing useMemo.
+ *
+ * Phase C — Editorial layer:
+ *   - `framingSentence` — per-tournament italic preface above the headline.
+ *     Sourced from `data.editorialFraming`. Renders null if the data layer
+ *     hasn't populated it. Daily editorial production is out of scope here.
+ *   - `pulledQuote` (per pick) — Hero pick's reasoning shown as italic
+ *     pulled-quote. Falls back to `pick.reasons[0]` if not populated.
  */
 
 import React, { memo, useEffect, useMemo, useState } from 'react';
@@ -324,13 +331,28 @@ export const IntelligenceHero = memo(function IntelligenceHero() {
       ) : (
         <>
           {state === 'live' && (
-            <LiveStateBlock data={data} tracker={tracker} pulse={pulse} />
+            <LiveStateBlock
+              data={data}
+              tracker={tracker}
+              pulse={pulse}
+              framingSentence={data?.editorialFraming ?? null}
+            />
           )}
           {state === 'results' && (
-            <ResultsStateBlock data={data} tracker={tracker} pulse={pulse} />
+            <ResultsStateBlock
+              data={data}
+              tracker={tracker}
+              pulse={pulse}
+              framingSentence={data?.editorialFraming ?? null}
+            />
           )}
           {state === 'upcoming' && (
-            <UpcomingStateBlock data={nextTournamentPredictions ?? data ?? null} />
+            <UpcomingStateBlock
+              data={nextTournamentPredictions ?? data ?? null}
+              framingSentence={
+                (nextTournamentPredictions ?? data)?.editorialFraming ?? null
+              }
+            />
           )}
         </>
       )}
@@ -530,6 +552,31 @@ function CredibilityBand({
 }
 
 // ─── Editorial headline + context line atoms ─────────────────────────────────
+
+/**
+ * Phase C — per-tournament italic framing sentence above the headline.
+ * Renders nothing when `text` is null, so the headline lands directly under
+ * the credibility band when no editorial copy is provided.
+ */
+function FramingSentence({ text }: { text: string | null | undefined }) {
+  if (!text) return null;
+  return (
+    <p
+      style={{
+        margin: '0 0 8px',
+        fontFamily: headlineFont,
+        fontStyle: 'italic',
+        fontSize: 14,
+        fontWeight: 500,
+        color: SLATE_600,
+        letterSpacing: '-0.005em',
+        lineHeight: 1.4,
+      }}
+    >
+      {text}
+    </p>
+  );
+}
 
 function EditorialHeadline({ children }: { children: React.ReactNode }) {
   return (
@@ -1235,10 +1282,12 @@ function LiveStateBlock({
   data,
   tracker,
   pulse,
+  framingSentence,
 }: {
   data: AIPredictionData | null | undefined;
   tracker: PredictionTrackerData | undefined;
   pulse: boolean;
+  framingSentence: string | null;
 }) {
   const picks = useMemo(() => {
     const raw = tracker?.predictions ?? [];
@@ -1310,6 +1359,7 @@ function LiveStateBlock({
 
   return (
     <div>
+      <FramingSentence text={framingSentence} />
       <EditorialHeadline>{headlineNode}</EditorialHeadline>
       <ContextLine>
         {`PRE-RANK #${topPickPreRank} → LIVE ${topPickLivePos} · ${numInTop5} IN T5 · ROUND ${currentRound} IN PROGRESS`}
@@ -1323,7 +1373,7 @@ function LiveStateBlock({
           initials={getInitials(heroPick.playerName)}
           name={heroPick.playerName}
           subtitle={`Pre-rank #${heroPick.predictedRank} → Live ${formatPosition(heroPick)} · Round ${heroPick.currentRound ?? currentRound}${heroPick.thru != null ? ` · Thru ${heroPick.thru}` : ''}`}
-          pulledQuote={heroPick.reasons[0] ?? null}
+          pulledQuote={heroPick.pulledQuote ?? heroPick.reasons[0] ?? null}
           position={formatPosition(heroPick)}
           positionLabel={formatScore(heroPick.score)}
           positionAccent={heroPick.actualPosition === 1 ? 'amber' : 'ink'}
@@ -1358,10 +1408,12 @@ function ResultsStateBlock({
   data,
   tracker,
   pulse,
+  framingSentence,
 }: {
   data: AIPredictionData | null | undefined;
   tracker: PredictionTrackerData | undefined;
   pulse: boolean;
+  framingSentence: string | null;
 }) {
   const picks = tracker?.predictions ?? [];
   const topPick = picks.find(p => p.predictedRank === 1) ?? picks[0] ?? null;
@@ -1397,6 +1449,7 @@ function ResultsStateBlock({
           color={GREEN_DEEP_INK}
           icon={<Check size={11} strokeWidth={3} />}
         />
+        <FramingSentence text={framingSentence} />
         <EditorialHeadline>
           <span style={{ color: AMBER_DEEP }}>{winnerFirstName}</span>{' '}
           {margin === 0 ? (
@@ -1424,7 +1477,7 @@ function ResultsStateBlock({
           initials={getInitials(topPick.playerName)}
           name={topPick.playerName}
           subtitle={`Final · 1st · Won by ${margin || 'playoff'}`}
-          pulledQuote={topPick.reasons[0] ?? null}
+          pulledQuote={topPick.pulledQuote ?? topPick.reasons[0] ?? null}
           position="1"
           positionLabel={formatScore(topPick.score)}
           positionAccent="amber"
@@ -1481,6 +1534,7 @@ function ResultsStateBlock({
   return (
     <div>
       <ResultsEyebrow text={tone.eyebrow} color={tone.eyebrowColor} />
+      <FramingSentence text={framingSentence} />
       <EditorialHeadline>
         {tone.headlineRender(winnerFirstName, headlinePickFirstName, headlinePickPos)}
       </EditorialHeadline>
@@ -1501,7 +1555,7 @@ function ResultsStateBlock({
           initials={getInitials(heroPickResolved.playerName)}
           name={heroPickResolved.playerName}
           subtitle={`Pre-rank #${heroPickResolved.predictedRank} → Final ${formatPosition(heroPickResolved)}`}
-          pulledQuote={heroPickResolved.reasons[0] ?? null}
+          pulledQuote={heroPickResolved.pulledQuote ?? heroPickResolved.reasons[0] ?? null}
           position={formatPosition(heroPickResolved)}
           positionLabel={formatScore(heroPickResolved.score)}
           positionAccent={heroAccent}
@@ -1531,7 +1585,13 @@ function ResultsStateBlock({
   );
 }
 
-function UpcomingStateBlock({ data }: { data: AIPredictionData | null }) {
+function UpcomingStateBlock({
+  data,
+  framingSentence,
+}: {
+  data: AIPredictionData | null;
+  framingSentence: string | null;
+}) {
   const tournament = data?.tournament;
   const venueName = tournament?.venueName ?? 'Venue TBC';
   const tournamentName = tournament?.name ?? 'Next Tournament';
@@ -1547,6 +1607,7 @@ function UpcomingStateBlock({ data }: { data: AIPredictionData | null }) {
 
   return (
     <div>
+      <FramingSentence text={framingSentence} />
       {topPickFirstName ? (
         <EditorialHeadline>
           <span style={{ color: AMBER_DEEP }}>{topPickFirstName}</span> is our pick to win.
@@ -1646,7 +1707,7 @@ function UpcomingStateBlock({ data }: { data: AIPredictionData | null }) {
           initials={getInitials(topContender.playerName)}
           name={topContender.playerName}
           subtitle={topContender.courseFitScore ? `Course Fit ${Math.round(topContender.courseFitScore)}` : null}
-          pulledQuote={topContender.reasons[0] ?? null}
+          pulledQuote={topContender.pulledQuote ?? topContender.reasons[0] ?? null}
           position="—"
           positionLabel="TO PLAY"
           positionAccent="amber"

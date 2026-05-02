@@ -104,6 +104,11 @@ export interface TrackedPrediction {
   positionDelta: number | null;
   performanceStatus: 'outperforming' | 'matching' | 'underperforming' | 'cut' | 'withdrawn' | 'not-started';
   country: string | null;
+  /**
+   * Phase C — Editorial layer: per-pick pulled-quote forwarded from
+   * `AITopContender.pulledQuote`. Component falls back to `reasons[0]`.
+   */
+  pulledQuote?: string | null;
 }
 
 export interface AccuracyMetrics {

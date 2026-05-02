@@ -31,6 +31,12 @@ export interface AITopContender {
   reasons: string[];
   concern: string;
   promoted?: boolean;
+  /**
+   * Phase C — Editorial layer: per-pick pulled-quote rendered as the HeroPick's
+   * featured reasoning. Falls back to `reasons[0]` when not populated by the
+   * editorial pipeline.
+   */
+  pulledQuote?: string | null;
 }
 
 export interface AIDarkHorse {
@@ -74,6 +80,12 @@ export interface AIPredictionData {
   isAIPowered: boolean;
   /** True when predictions are >24h old pre-tournament or flagged for regeneration */
   isStale: boolean;
+  /**
+   * Phase C — Editorial layer: per-tournament framing sentence rendered above
+   * the headline. Null until the editorial pipeline populates it; component
+   * gracefully omits the line in that case.
+   */
+  editorialFraming?: string | null;
 }
 
 export interface UseAIPredictionsResult {

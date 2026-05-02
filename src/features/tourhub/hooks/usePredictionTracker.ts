@@ -160,6 +160,7 @@ function buildTrackedPrediction(
     positionDelta,
     performanceStatus,
     country: (lb?.sr_players as any)?.country ?? null,
+    pulledQuote: player.pulledQuote ?? null,
   };
 }
 
