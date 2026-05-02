@@ -52,7 +52,7 @@ const PodiumSlotEl: React.FC<{
   }
 
   const isSelf = slot.kind === 'self';
-  const handicap = isSelf ? slot.handicap : slot.friend.friend_handicap_index;
+  const rankingValue = slot.rankingValue;
   const fullName = isSelf ? currentUserName : slot.friend.friend_name;
   const avatarUrl = isSelf ? null : slot.friend.friend_thumbnail_url;
 
@@ -142,7 +142,7 @@ const PodiumSlotEl: React.FC<{
             lineHeight: 1,
           }}
         >
-          {handicap !== null && handicap !== undefined ? handicap.toFixed(1) : '—'}
+          {rankingValue !== null && rankingValue !== undefined ? rankingValue.toFixed(1) : '—'}
         </p>
       </div>
     </div>

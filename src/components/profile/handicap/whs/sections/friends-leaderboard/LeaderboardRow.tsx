@@ -37,8 +37,6 @@ export const LeaderboardRow: React.FC<Props> = ({
   onClick,
 }) => {
   const isSelf = item.kind === 'self';
-  const handicap =
-    item.kind === 'self' ? item.handicap : item.friend.friend_handicap_index;
   const fullName = item.kind === 'self' ? item.name : item.friend.friend_name;
   const club = item.kind === 'self' ? null : item.friend.friend_home_club;
   const lastRound =
@@ -178,7 +176,7 @@ export const LeaderboardRow: React.FC<Props> = ({
           flexShrink: 0,
         }}
       >
-        {handicap !== null && handicap !== undefined ? handicap.toFixed(1) : '—'}
+        {item.rankingValue !== null && item.rankingValue !== undefined ? item.rankingValue.toFixed(1) : '—'}
       </span>
     </button>
   );

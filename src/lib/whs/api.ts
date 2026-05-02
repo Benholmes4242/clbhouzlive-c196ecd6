@@ -15,6 +15,7 @@ import type {
   WhsScoreHole,
   WhsFriendCourseBest,
   WhsFriendActivityWithImage,
+  WhsFriendWindowRanking,
 } from './types';
 
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL as string;
@@ -466,3 +467,15 @@ export async function fetchLastRoundDetail(
     holes,
   };
 }
+
+export async function fetchFriendWindowRankings(
+  ownerUserId: string,
+): Promise<WhsFriendWindowRanking[]> {
+  const { data, error } = await supabase
+    .from('whs_friend_window_rankings' as any)
+    .select('*')
+    .eq('owner_user_id', ownerUserId);
+  if (error) throw error;
+  return (data as unknown as WhsFriendWindowRanking[]) ?? [];
+}
+

@@ -71,6 +71,7 @@ export const HandicapDashboard: React.FC<Props> = ({ connection, userId }) => {
       queryClient.invalidateQueries({ queryKey: whsKeys.recent(connection.id) });
       queryClient.invalidateQueries({ queryKey: whsKeys.allScores(connection.id) });
       queryClient.invalidateQueries({ queryKey: whsKeys.friendsLeaderboard(userId) });
+      queryClient.invalidateQueries({ queryKey: whsKeys.friendWindowRankings(userId) });
       queryClient.invalidateQueries({ queryKey: whsKeys.friendsActivity(userId) });
       queryClient.invalidateQueries({ queryKey: whsKeys.friendCourseBests(userId) });
       if (data.handicap_changed && typeof data.handicap_index === 'number') {

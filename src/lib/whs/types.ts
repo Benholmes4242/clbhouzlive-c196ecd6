@@ -188,6 +188,19 @@ export interface WhsScoreHole {
   hole_alias: string | null;
 }
 
+// ─── Phase 2.1: Time-scoped friend leaderboards ─────────────────────────
+export interface WhsFriendWindowRanking {
+  owner_user_id: string;
+  friend_row_id: string;
+  friend_connection_id: string;
+  this_year_avg_diff: number | null;
+  this_year_rounds: number;
+  this_month_avg_diff: number | null;
+  this_month_rounds: number;
+  last_8_avg_diff: number | null;
+  last_8_rounds: number;
+}
+
 export interface WhsLastRoundDetail {
   id: string;
   play_date: string;
