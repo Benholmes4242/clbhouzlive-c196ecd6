@@ -1582,7 +1582,13 @@ function ResultsStateBlock({
   );
 }
 
-function UpcomingStateBlock({ data }: { data: AIPredictionData | null }) {
+function UpcomingStateBlock({
+  data,
+  framingSentence,
+}: {
+  data: AIPredictionData | null;
+  framingSentence: string | null;
+}) {
   const tournament = data?.tournament;
   const venueName = tournament?.venueName ?? 'Venue TBC';
   const tournamentName = tournament?.name ?? 'Next Tournament';
