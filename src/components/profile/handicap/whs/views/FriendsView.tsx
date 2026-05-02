@@ -5,6 +5,7 @@ import FriendsLeaderboard from '../sections/FriendsLeaderboard';
 import InvitesSection from '../sections/InvitesSection';
 import FriendsLeaderboardV2 from '../sections/friends-leaderboard/FriendsLeaderboardV2';
 import RecentlyPlayedFeed from '../sections/recently-played/RecentlyPlayedFeed';
+import InviteToClbhouzV2 from '../sections/invite-to-clbhouz/InviteToClbhouzV2';
 
 interface Props {
   userId: string;
@@ -12,8 +13,8 @@ interface Props {
 }
 
 export const FriendsView: React.FC<Props> = ({ userId, currentHandicap }) => {
-  // TEMP (Phase 2C/2D sandbox): ?v2=1 swaps in V2 components.
-  // Remove this toggle in the final swap-PR after Phase 2E.
+  // TEMP (Phase 2C/2D/2E sandbox): ?v2=1 swaps in V2 components.
+  // Remove this toggle in the final swap-PR.
   const [searchParams] = useSearchParams();
   const useV2 = searchParams.get('v2') === '1';
 
@@ -38,8 +39,11 @@ export const FriendsView: React.FC<Props> = ({ userId, currentHandicap }) => {
         <FriendsLeaderboard ownerUserId={userId} currentUserHandicap={currentHandicap} />
       )}
 
-      {/* Invites is still V1 — Phase 2E will V2 it. */}
-      <InvitesSection ownerUserId={userId} />
+      {useV2 ? (
+        <InviteToClbhouzV2 ownerUserId={userId} />
+      ) : (
+        <InvitesSection ownerUserId={userId} />
+      )}
     </div>
   );
 };
