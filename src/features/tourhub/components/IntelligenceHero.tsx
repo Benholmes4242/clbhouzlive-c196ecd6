@@ -1131,19 +1131,36 @@ function ResultsStateBlock({
 }
 
 function UpcomingStateBlock({ data }: { data: AIPredictionData | null }) {
-  const editorial = INTELLIGENCE_HERO_FALLBACK.upcoming;
   const tournament = data?.tournament;
   const venueName = tournament?.venueName ?? 'Venue TBC';
   const tournamentName = tournament?.name ?? 'Next Tournament';
-  const headline = buildUpcomingHeadline(tournamentName);
   const locationLine = tournament ? formatLocation(tournament) : '';
   const bullets = tournament ? getVenueBullets(tournament) : [];
 
+  // Top pick = first contender (predicted rank order).
+  const topContender = data?.topContenders?.[0] ?? null;
+  const topPickFirstName = topContender ? getFirstName(topContender.playerName) : '';
+  const numPicks = Math.min(3, data?.topContenders?.length ?? 0);
+
+  // Optional context segments — only render when defined (per brief).
+  const contextSegments: string[] = [];
+  if (numPicks > 0) contextSegments.push(`${numPicks} picks`);
+  if (tournamentName && tournamentName !== 'Next Tournament') {
+    contextSegments.push(tournamentName);
+  }
+
   return (
-    <div>
-      <Eyebrow color={AMBER_ACCENT}>{editorial.eyebrow}</Eyebrow>
-      <Headline>{headline}</Headline>
-      <Standfirst>{editorial.standfirst}</Standfirst>
+    <div style={{ paddingTop: 14 }}>
+      {topPickFirstName ? (
+        <EditorialHeadline>
+          <span style={{ color: AMBER_ACCENT }}>{topPickFirstName}</span> is our pick to win.
+        </EditorialHeadline>
+      ) : (
+        <EditorialHeadline>Our picks are locked in.</EditorialHeadline>
+      )}
+      {contextSegments.length > 0 && (
+        <ContextLine>{contextSegments.join(' · ')}</ContextLine>
+      )}
 
       {/* Venue card */}
       <div
