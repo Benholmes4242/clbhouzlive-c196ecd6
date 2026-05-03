@@ -33,6 +33,7 @@ export const OverviewView: React.FC<Props> = ({
         connectionCreatedAt={connectionCreatedAt}
       />
       <HeadToHeadCard ownerUserId={userId} currentUserHandicap={currentHandicap} />
+      <EchoInsightsCard connectionId={connectionId} />
     </div>
   );
 };
