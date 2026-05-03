@@ -514,7 +514,7 @@ function LeadSectionHeader({
                 flexShrink: 0,
               }}
             >
-              <Brain size={13} color={AMBER_DEEP} strokeWidth={2.4} />
+              <Brain size={13} color={AMBER_DEEP} strokeWidth={2.4} style={{ display: 'block' }} />
             </span>
           </span>
         </button>
