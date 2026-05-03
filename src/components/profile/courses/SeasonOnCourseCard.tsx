@@ -71,7 +71,7 @@ export const SeasonOnCourseCard: React.FC<SeasonOnCourseCardProps> = ({
           <Button
             variant="outline"
             size="sm"
-            onClick={() => navigate('/achievements')}
+            onClick={() => navigate('/profile')}
             className="text-sm"
           >
             View Season Hub
@@ -106,7 +106,7 @@ export const SeasonOnCourseCard: React.FC<SeasonOnCourseCardProps> = ({
           <Button
             variant="outline"
             size="sm"
-            onClick={() => navigate('/achievements')}
+            onClick={() => navigate('/profile')}
             className="w-full text-sm"
           >
             View Season Hub

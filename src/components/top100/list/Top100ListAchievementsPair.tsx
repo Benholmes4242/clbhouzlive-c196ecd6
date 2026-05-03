@@ -68,7 +68,7 @@ export const Top100ListAchievementsPair: React.FC<Top100ListAchievementsPairProp
     if (onViewAll) {
       onViewAll();
     } else {
-      navigate('/achievements');
+      navigate('/profile');
     }
   };
 

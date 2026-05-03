@@ -24,7 +24,7 @@ export const CourseMilestonesCard: React.FC<CourseMilestonesCardProps> = ({ cour
   if (!user || prompts.length === 0) return null;
 
   const handlePromptClick = () => {
-    navigate('/achievements');
+    navigate('/profile');
   };
 
   return (

@@ -85,7 +85,7 @@ export const Top100ListMilestoneRail: React.FC<Top100ListMilestoneRailProps> = (
     if (onViewAll) {
       onViewAll();
     } else {
-      navigate('/achievements');
+      navigate('/profile');
     }
   };
 

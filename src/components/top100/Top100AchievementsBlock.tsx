@@ -28,7 +28,7 @@ export const Top100AchievementsBlock: React.FC<Top100AchievementsBlockProps> = (
   if (!user || prompts.length === 0) return null;
 
   const handlePromptClick = () => {
-    navigate('/achievements');
+    navigate('/profile');
   };
 
   return (

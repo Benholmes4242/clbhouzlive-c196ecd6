@@ -169,7 +169,7 @@ export function LeaderboardYourStatus({
           <div className="mt-4">
             <div className="flex items-center justify-between text-xs mb-1.5">
               <button
-                onClick={() => navigate('/achievements')}
+                onClick={() => navigate('/profile')}
                 className="flex items-center gap-1 text-muted-foreground hover:text-foreground transition-colors group"
               >
                 <span>

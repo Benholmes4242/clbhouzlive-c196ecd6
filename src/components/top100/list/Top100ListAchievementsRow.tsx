@@ -107,7 +107,7 @@ export const Top100ListAchievementsRow: React.FC<Top100ListAchievementsRowProps>
       </div>
       <div className="flex items-baseline justify-between px-5">
         <button
-          onClick={() => navigate('/achievementshub')}
+          onClick={() => navigate('/profile')}
           className="text-xs text-primary hover:text-primary/80 font-medium"
         >
           View all milestones →

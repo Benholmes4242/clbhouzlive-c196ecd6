@@ -31,7 +31,7 @@ export const Top100ListProgressCard: React.FC<Top100ListProgressCardProps> = ({
   const theme = getRegionTheme(listSlug);
 
   const handleClick = () => {
-    navigate('/achievements');
+    navigate('/profile');
   };
 
   // Spacing: Progress bar → Next milestone = 20px - handled by mt-5

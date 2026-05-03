@@ -347,13 +347,13 @@ export function UnifiedAchievementSheet({
 
     if (isPeer) {
       primaryCtaLabel = 'View your own progress';
-      primaryCtaAction = () => { navigate('/achievements'); onClose(); };
+      primaryCtaAction = () => { navigate('/profile'); onClose(); };
     } else if (isCelebrate) {
       primaryCtaLabel = 'Continue';
       primaryCtaAction = () => { onClose(); };
     } else if (isUnlocked) {
       primaryCtaLabel = 'View all achievements';
-      primaryCtaAction = () => { navigate('/achievements'); onClose(); };
+      primaryCtaAction = () => { navigate('/profile'); onClose(); };
     } else {
       const remaining = Math.max(0, threshold - totalPlayed);
       primaryCtaLabel = remaining <= 3 ? 'Find your next course' : 'Browse Top 100';
@@ -372,7 +372,7 @@ export function UnifiedAchievementSheet({
 
     if (isPeer) {
       primaryCtaLabel = 'View your own progress';
-      primaryCtaAction = () => { navigate('/achievements'); onClose(); };
+      primaryCtaAction = () => { navigate('/profile'); onClose(); };
     } else if (isCelebrate) {
       primaryCtaLabel = 'Continue';
       primaryCtaAction = () => { onClose(); };
