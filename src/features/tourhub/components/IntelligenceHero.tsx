@@ -812,25 +812,15 @@ function HeroPick({
         }}
       >
         <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
-          <div
-            style={{
-              width: 56,
-              height: 56,
-              borderRadius: 14,
-              background: AMBER_TINT,
-              border: `1px solid ${AMBER_TINT_STRONG}`,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              fontFamily: '"SF Mono", monospace',
-              fontSize: 17,
-              fontWeight: 700,
-              color: AMBER_DEEP,
-              flexShrink: 0,
-            }}
-          >
-            {initials}
-          </div>
+          <PlayerHeadshot
+            name={name}
+            size={56}
+            radius={14}
+            bg={AMBER_TINT}
+            border={`1px solid ${AMBER_TINT_STRONG}`}
+            initialsColor={AMBER_DEEP}
+            initialsFontSize={17}
+          />
 
           <div style={{ flex: 1, minWidth: 0 }}>
             <div
