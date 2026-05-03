@@ -34,8 +34,8 @@ const PAD_TOP = 6;
 const PAD_BOTTOM = 6;
 
 // Number
-const NUMBER_SIZE = 68;
-const NUMBER_WEIGHT = 500;
+const NUMBER_SIZE = 64;
+const NUMBER_WEIGHT = 700;
 
 // ── Career-low badge — kept for analytics / future use ────────────────────
 function useCareerLowBadge(
