@@ -162,7 +162,7 @@ const GREEN_LIGHT = '#10B981';
 const headlineFont =
   '"Geist", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
 const monoLabel: React.CSSProperties = {
-  fontFamily: '"SF Mono", "JetBrains Mono", ui-monospace, monospace',
+  fontFamily: headlineFont,
   fontWeight: 700,
   textTransform: 'uppercase',
 };
