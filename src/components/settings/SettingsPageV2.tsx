@@ -82,6 +82,8 @@ export function SettingsPageV2() {
   const deleteAccount = useDeleteAccount(user?.id);
   const { sheets, open, close } = useSettingsSheets();
   const queryClient = useQueryClient();
+  const { data: whsConnection } = useWhsConnection(user?.id);
+  const [whsSheetOpen, setWhsSheetOpen] = useState(false);
 
   const handleSignOut = async () => {
     await supabase.auth.signOut();
