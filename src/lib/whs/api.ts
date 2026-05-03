@@ -12,6 +12,7 @@ import type {
   HandicapPoint,
   CourseForm,
   WhsLastRoundDetail,
+  WhsLastRound,
   WhsScoreHole,
   WhsFriendCourseBest,
   WhsFriendActivityWithImage,
@@ -78,20 +79,51 @@ export async function fetchHandicapTrend(connectionId: string): Promise<WhsHandi
 const SCORE_SELECT = `
   id, play_date, adjusted_gross, stableford_points,
   handicap_differential, course_rating, slope_rating, marker_name,
-  is_counter,
+  is_counter, handicap_index_at_time,
   course:whs_courses(name, country_name)
 `;
 
-export async function fetchLastRound(connectionId: string): Promise<WhsScore | null> {
+export async function fetchLastRound(connectionId: string): Promise<WhsLastRound | null> {
   const { data, error } = await supabase
     .from('whs_scores' as any)
     .select(SCORE_SELECT)
     .eq('connection_id', connectionId)
     .order('play_date', { ascending: false })
-    .limit(1)
-    .maybeSingle();
+    .limit(2);
   if (error) throw error;
-  return (data as unknown as WhsScore) ?? null;
+  if (!data || data.length === 0) return null;
+
+  const rows = data as unknown as Array<WhsScore & { handicap_index_at_time: number | null }>;
+  const latest = rows[0];
+  const previous = rows[1] ?? null;
+
+  let handicap_delta: number | null = null;
+  if (
+    previous &&
+    latest.handicap_index_at_time !== null &&
+    previous.handicap_index_at_time !== null
+  ) {
+    handicap_delta = Number(
+      (latest.handicap_index_at_time - previous.handicap_index_at_time).toFixed(1)
+    );
+  }
+
+  let course_thumbnail_image: string | null = null;
+  if (latest.course?.name) {
+    const { data: gc } = await supabase
+      .from('golf_courses')
+      .select('thumbnail_image')
+      .ilike('name', latest.course.name)
+      .maybeSingle();
+    course_thumbnail_image = (gc as any)?.thumbnail_image ?? null;
+  }
+
+  return {
+    ...latest,
+    course_thumbnail_image,
+    handicap_index_at_time: latest.handicap_index_at_time,
+    handicap_delta,
+  };
 }
 
 export async function fetchCounters(connectionId: string): Promise<WhsCounterScore[]> {

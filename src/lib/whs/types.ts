@@ -32,6 +32,18 @@ export interface WhsScore {
   course: WhsCourseRef | null;
 }
 
+export interface WhsLastRound extends WhsScore {
+  course_thumbnail_image: string | null;
+  /** Handicap index after this round was applied. */
+  handicap_index_at_time: number | null;
+  /**
+   * Difference between this round's index and the previous round's index.
+   * Negative = handicap dropped (improvement). Positive = went up.
+   * 0 = unchanged. null = no previous round.
+   */
+  handicap_delta: number | null;
+}
+
 export interface WhsCounterScore {
   id: string;
   play_date: string;
