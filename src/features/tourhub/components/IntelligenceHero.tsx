@@ -1078,25 +1078,15 @@ function CompactPick({
           gap: 12,
         }}
       >
-        <div
-          style={{
-            width: 38,
-            height: 38,
-            borderRadius: 10,
-            background: SLATE_100,
-            border: `1px solid ${SLATE_150}`,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            fontFamily: '"SF Mono", monospace',
-            fontSize: 12,
-            fontWeight: 700,
-            color: SLATE_700,
-            flexShrink: 0,
-          }}
-        >
-          {initials}
-        </div>
+        <PlayerHeadshot
+          name={name}
+          size={38}
+          radius={10}
+          bg={SLATE_100}
+          border={`1px solid ${SLATE_150}`}
+          initialsColor={SLATE_700}
+          initialsFontSize={12}
+        />
         <div style={{ flex: 1, minWidth: 0 }}>
           <div
             style={{
