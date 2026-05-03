@@ -514,7 +514,7 @@ function LeadSectionHeader({
                 flexShrink: 0,
               }}
             >
-              <Brain size={13} color={AMBER_DEEP} strokeWidth={2.4} />
+              <Brain size={13} color={AMBER_DEEP} strokeWidth={2.4} style={{ display: 'block' }} />
             </span>
           </span>
         </button>
@@ -844,7 +844,7 @@ function HeroPick({
                   flexShrink: 0,
                 }}
               >
-                <Brain size={8} color={AMBER_DEEP} strokeWidth={2.6} />
+                <Brain size={8} color={AMBER_DEEP} strokeWidth={2.6} style={{ display: 'block' }} />
               </span>
               TOP PICK
             </div>

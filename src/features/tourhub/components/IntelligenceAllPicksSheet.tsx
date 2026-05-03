@@ -129,15 +129,14 @@ export function IntelligenceAllPicksSheet({ open, onClose }: IntelligenceAllPick
                 width: 28,
                 height: 28,
                 borderRadius: '50%',
-                background: AMBER,
+                background: 'rgba(247,147,30,0.12)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                boxShadow: '0 2px 10px rgba(247,147,30,0.35)',
                 flexShrink: 0,
               }}
             >
-              <Brain size={15} color={AMBER_DEEP} strokeWidth={2.8} />
+              <Brain size={15} color={AMBER_DEEP} strokeWidth={2.8} style={{ display: 'block' }} />
             </div>
             <h2
               id="intelligence-all-picks-title"
@@ -468,14 +467,13 @@ function EmptyState({ onClose }: { onClose: () => void }) {
           width: 56,
           height: 56,
           borderRadius: '50%',
-          background: AMBER,
+          background: 'rgba(247,147,30,0.12)',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          boxShadow: '0 4px 18px rgba(247,147,30,0.35)',
         }}
       >
-        <Brain size={26} color={AMBER_DEEP} strokeWidth={2.8} />
+        <Brain size={26} color={AMBER_DEEP} strokeWidth={2.8} style={{ display: 'block' }} />
       </div>
       <h3
         style={{
