@@ -110,12 +110,7 @@ export async function fetchLastRound(connectionId: string): Promise<WhsLastRound
 
   let course_thumbnail_image: string | null = null;
   if (latest.course?.name) {
-    const { data: gc } = await supabase
-      .from('golf_courses')
-      .select('thumbnail_image')
-      .ilike('name', latest.course.name)
-      .maybeSingle();
-    course_thumbnail_image = (gc as any)?.thumbnail_image ?? null;
+    course_thumbnail_image = await lookupCourseThumbnail(latest.course.name);
   }
 
   return {
