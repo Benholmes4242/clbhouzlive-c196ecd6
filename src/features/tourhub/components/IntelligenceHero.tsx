@@ -44,6 +44,7 @@ import {
   Award,
   Trophy,
   Quote,
+  Brain,
 } from 'lucide-react';
 import type { IntelligenceOutcome } from '../utils/outcomeClassifier';
 import { useCountdown } from '@/hooks/useCountdown';
