@@ -310,6 +310,23 @@ export function SettingsPageV2() {
           />
         </SettingsSection>
 
+        {/* Connections */}
+        {whsConnection && (
+          <SettingsSection title="Connections">
+            <SettingsChevronRow
+              icon={<Link2 size={18} />}
+              title="England Golf"
+              subtitle={
+                whsConnection.last_synced_at
+                  ? `Last synced ${formatDistanceToNow(new Date(whsConnection.last_synced_at), { addSuffix: true })}`
+                  : 'Connected'
+              }
+              iconTheme="account"
+              onClick={() => setWhsSheetOpen(true)}
+            />
+          </SettingsSection>
+        )}
+
         {/* Support */}
         <SettingsSection title="Support">
           <SettingsChevronRow
