@@ -496,7 +496,7 @@ function LeadSectionHeader({
               fontFamily: headlineFont,
               fontSize: 24,
               fontWeight: 700,
-              color: AMBER_DEEP,
+              color: INK,
               letterSpacing: '-0.025em',
               lineHeight: 1.1,
               display: 'flex',
@@ -504,7 +504,7 @@ function LeadSectionHeader({
               gap: 6,
             }}
           >
-            Tournament <span style={{ color: INK }}>Intelligence</span>
+            Tournament <span style={{ color: AMBER_DEEP }}>Intelligence</span>
             <Sparkles
               size={18}
               color={INK}
