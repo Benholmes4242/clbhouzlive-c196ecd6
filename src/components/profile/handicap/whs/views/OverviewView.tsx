@@ -1,5 +1,4 @@
 import React from 'react';
-import HeadToHeadCard from '../sections/HeadToHeadCard';
 import AchievementsStrip from '../sections/AchievementsStrip';
 import LastRoundCard from '../sections/LastRoundCard';
 import RoundsThatCountCard from '../sections/RoundsThatCountCard';
@@ -27,7 +26,6 @@ export const OverviewView: React.FC<Props> = ({
       <LastRoundCard connectionId={connectionId} />
       <RoundsThatCountCard connectionId={connectionId} currentHandicap={currentHandicap} />
       <EchoInsightsCard connectionId={connectionId} />
-      <HeadToHeadCard ownerUserId={userId} currentUserHandicap={currentHandicap} />
       <AchievementsStrip
         connectionId={connectionId}
         connectionCreatedAt={connectionCreatedAt}
