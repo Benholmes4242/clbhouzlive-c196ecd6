@@ -4,6 +4,7 @@ import AchievementsStrip from '../sections/AchievementsStrip';
 import PredictionsCard from '../sections/PredictionsCard';
 import LastRoundCard from '../sections/LastRoundCard';
 import CountersStrip from '../sections/CountersStrip';
+import EchoInsightsCard from '../sections/EchoInsightsCard';
 
 interface Props {
   connectionId: string;
