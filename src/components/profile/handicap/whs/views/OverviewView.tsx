@@ -4,6 +4,7 @@ import AchievementsStrip from '../sections/AchievementsStrip';
 import PredictionsCard from '../sections/PredictionsCard';
 import LastRoundCard from '../sections/LastRoundCard';
 import CountersStrip from '../sections/CountersStrip';
+import EchoInsightsCard from '../sections/EchoInsightsCard';
 
 interface Props {
   connectionId: string;
@@ -32,6 +33,7 @@ export const OverviewView: React.FC<Props> = ({
         connectionCreatedAt={connectionCreatedAt}
       />
       <HeadToHeadCard ownerUserId={userId} currentUserHandicap={currentHandicap} />
+      <EchoInsightsCard connectionId={connectionId} />
     </div>
   );
 };
