@@ -157,12 +157,14 @@ Deno.serve(async (req) => {
     const suited = validate(parsed.suited_courses);
     const test = validate(parsed.test_courses);
     const scoringProfile = String(parsed.scoring_profile ?? "").slice(0, 800);
+    const roundsPattern = String(parsed.rounds_pattern ?? "").slice(0, 400);
 
     if (!scoringProfile) return json({ error: "Empty profile" }, 500);
 
     await admin.from("whs_ai_insights").upsert({
       connection_id,
       scoring_profile: scoringProfile,
+      rounds_pattern: roundsPattern,
       suited_courses: suited,
       test_courses: test,
       generated_from_score_id: latestScoreId,
@@ -197,6 +199,7 @@ Deno.serve(async (req) => {
 
     return json({
       scoring_profile: scoringProfile,
+      rounds_pattern: roundsPattern,
       suited_courses: shape(suited),
       test_courses: shape(test),
       generated_at: new Date().toISOString(),
