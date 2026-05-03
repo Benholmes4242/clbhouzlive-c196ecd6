@@ -504,11 +504,11 @@ function LeadSectionHeader({
               gap: 6,
             }}
           >
-            Tournament Intelligence
+            Tournament <span style={{ color: INK }}>Intelligence</span>
             <Sparkles
               size={18}
-              color={AMBER_DEEP}
-              fill={AMBER_DEEP}
+              color={INK}
+              fill={INK}
               strokeWidth={2}
               style={{ marginLeft: 1 }}
             />
@@ -933,14 +933,14 @@ function HeroPick({
               }}
             >
               {pulledQuote}
+              <Quote
+                size={14}
+                color={AMBER_ACCENT}
+                fill={AMBER_ACCENT}
+                strokeWidth={0}
+                style={{ display: 'inline-block', verticalAlign: 'baseline', marginLeft: 4, transform: 'translateY(2px)' }}
+              />
             </div>
-            <Quote
-              size={16}
-              color={AMBER_ACCENT}
-              fill={AMBER_ACCENT}
-              strokeWidth={0}
-              style={{ position: 'absolute', right: 0, bottom: 0 }}
-            />
           </div>
         )}
       </button>
@@ -975,14 +975,14 @@ function HeroPick({
                 }}
               >
                 {pulledQuote}
+                <Quote
+                  size={14}
+                  color={AMBER_ACCENT}
+                  fill={AMBER_ACCENT}
+                  strokeWidth={0}
+                  style={{ display: 'inline-block', verticalAlign: 'baseline', marginLeft: 4, transform: 'translateY(2px)' }}
+                />
               </div>
-              <Quote
-                size={16}
-                color={AMBER_ACCENT}
-                fill={AMBER_ACCENT}
-                strokeWidth={0}
-                style={{ position: 'absolute', right: 0, bottom: -4 }}
-              />
             </div>
           )}
 
