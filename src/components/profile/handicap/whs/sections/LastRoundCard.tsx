@@ -91,7 +91,7 @@ export const LastRoundCard: React.FC<Props> = ({ connectionId }) => {
     : { background: '#0F172A' };
 
   return (
-    <section className="px-3 mb-7">
+    <section style={{ padding: '0 16px', marginBottom: 28 }}>
       {/* Eyebrow — outside the image */}
       <div className="flex items-center justify-between mb-2">
         <p className="text-[11px] font-semibold uppercase tracking-[1.5px]" style={{ color: INK_55 }}>
