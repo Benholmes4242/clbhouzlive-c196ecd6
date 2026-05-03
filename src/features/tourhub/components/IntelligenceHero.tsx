@@ -1440,7 +1440,7 @@ function CTA({ onOpenSheet }: { onOpenSheet: () => void }) {
         border: `1px solid ${SLATE_150}`,
         borderRadius: 10,
         color: INK,
-        fontFamily: '"SF Mono", "JetBrains Mono", ui-monospace, monospace',
+        fontFamily: headlineFont,
         fontSize: 11,
         fontWeight: 700,
         letterSpacing: '0.18em',
