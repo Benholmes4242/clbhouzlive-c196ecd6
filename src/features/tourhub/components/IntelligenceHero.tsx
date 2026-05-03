@@ -1164,14 +1164,7 @@ function CompactPick({
         }}
       >
         <div style={{ padding: '0 12px 14px 11px' }}>
-          <div
-            style={{
-              background: '#fff',
-              borderRadius: 8,
-              borderLeft: `2px solid ${accent === 'transparent' ? SLATE_300 : accent}`,
-              padding: '10px 12px',
-            }}
-          >
+          <div>
             {visibleReasons.map((r, i) => (
               <div
                 key={i}
@@ -1187,7 +1180,7 @@ function CompactPick({
                     width: 4,
                     height: 4,
                     borderRadius: '50%',
-                    background: accent === 'transparent' ? SLATE_400 : accentInk,
+                    background: AMBER_DEEP,
                     marginTop: 6,
                     flexShrink: 0,
                   }}
