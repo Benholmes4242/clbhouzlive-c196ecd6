@@ -932,7 +932,7 @@ function HeroPick({
                 color={AMBER_ACCENT}
                 fill={AMBER_ACCENT}
                 strokeWidth={0}
-                style={{ display: 'inline-block', verticalAlign: 'baseline', marginRight: 4, transform: 'scaleX(-1) translateY(2px)' }}
+                style={{ display: 'inline-block', verticalAlign: 'baseline', marginRight: 0, transform: 'scaleX(-1) translateY(2px)' }}
               />
               {pulledQuote}
               <Quote
@@ -974,7 +974,7 @@ function HeroPick({
                   color={AMBER_ACCENT}
                   fill={AMBER_ACCENT}
                   strokeWidth={0}
-                  style={{ display: 'inline-block', verticalAlign: 'baseline', marginRight: 4, transform: 'scaleX(-1) translateY(2px)' }}
+                  style={{ display: 'inline-block', verticalAlign: 'baseline', marginRight: 0, transform: 'scaleX(-1) translateY(2px)' }}
                 />
                 {pulledQuote}
                 <Quote
