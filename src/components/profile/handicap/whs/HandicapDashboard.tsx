@@ -90,17 +90,20 @@ export const HandicapDashboard: React.FC<Props> = ({ connection, userId }) => {
     }
   };
 
-  // ── Stale state ─────────────────────────────────────────────────────────
+  // ── Sync state ──────────────────────────────────────────────────────────
   const lastSyncedAt = connection.last_synced_at ? new Date(connection.last_synced_at) : null;
-  const isStale =
-    lastSyncedAt &&
-    Date.now() - lastSyncedAt.getTime() > 24 * 3600_000 &&
-    connection.last_sync_status !== 'auth_failed';
+  const hoursSinceSync = lastSyncedAt
+    ? (Date.now() - lastSyncedAt.getTime()) / 3600_000
+    : Infinity;
+
+  // Banner priority: re-auth (only after 48h) > stale (after 24h) > nothing
+  const showReauthBanner = reauthRequired;
+  const showStaleBanner = !showReauthBanner && hoursSinceSync > 24;
 
   return (
     <div className="pb-10">
       {/* PERSISTENT — warnings (re-auth takes priority over stale) */}
-      {reauthRequired ? (
+      {showReauthBanner ? (
         <div
           className="mx-5 mt-5 mb-3 p-3 rounded-xl flex gap-2.5 text-[13px]"
           style={{ background: 'rgba(220,38,38,0.06)', color: '#B91C1C' }}
@@ -111,7 +114,7 @@ export const HandicapDashboard: React.FC<Props> = ({ connection, userId }) => {
             disconnect and reconnect.
           </p>
         </div>
-      ) : isStale && lastSyncedAt ? (
+      ) : showStaleBanner && lastSyncedAt ? (
         <div
           className="mx-5 mt-5 mb-3 p-3 rounded-xl flex gap-2.5 text-[13px]"
           style={{ background: 'rgba(247,147,30,0.08)', color: '#9A6116' }}
