@@ -185,6 +185,17 @@ export const HandicapDashboard: React.FC<Props> = ({ connection, userId }) => {
         </button>
       </div>
 
+      {lastSyncedAt && (
+        <p
+          className="text-center text-[11px] mx-5 mt-6 mb-2"
+          style={{ color: 'rgba(15,23,42,0.40)' }}
+        >
+          Handicap refreshes daily ·{' '}
+          {formatDistanceToNow(lastSyncedAt, { addSuffix: true })}
+        </p>
+      )}
+
+
       <style>{`
         @keyframes handicapViewFadeSlide {
           from { opacity: 0; transform: translateY(8px); }
