@@ -157,12 +157,14 @@ Deno.serve(async (req) => {
     const suited = validate(parsed.suited_courses);
     const test = validate(parsed.test_courses);
     const scoringProfile = String(parsed.scoring_profile ?? "").slice(0, 800);
+    const roundsPattern = String(parsed.rounds_pattern ?? "").slice(0, 400);
 
     if (!scoringProfile) return json({ error: "Empty profile" }, 500);
 
     await admin.from("whs_ai_insights").upsert({
       connection_id,
       scoring_profile: scoringProfile,
+      rounds_pattern: roundsPattern,
       suited_courses: suited,
       test_courses: test,
       generated_from_score_id: latestScoreId,
@@ -197,6 +199,7 @@ Deno.serve(async (req) => {
 
     return json({
       scoring_profile: scoringProfile,
+      rounds_pattern: roundsPattern,
       suited_courses: shape(suited),
       test_courses: shape(test),
       generated_at: new Date().toISOString(),
@@ -215,7 +218,7 @@ function json(body: unknown, status = 200) {
 }
 
 function buildPrompt(rounds: any[], candidates: any[]) {
-  return `Analyse this player's recent round history and generate insights about what kinds of courses suit their game.
+  return `Analyse this player's recent round history and generate insights about what kinds of courses suit their game and what their recent counter rounds reveal.
 
 PLAYER ROUND HISTORY (last ${rounds.length} rounds, newest first):
 ${JSON.stringify(rounds)}
@@ -226,6 +229,7 @@ ${JSON.stringify(candidates)}
 Produce a JSON response with this exact structure:
 {
   "scoring_profile": "<2-3 sentences (50-70 words) characterising what kinds of courses suit this player's game. Reference their best counter and a specific course where they shot it. Mention what kind of course produces higher differentials. Concrete, evidence-based.>",
+  "rounds_pattern": "<1-2 sentences (max 30 words) describing a concrete observation about the player's recent counter rounds. Reference specific numbers and wrap key values in **bold** markdown. Examples: average of last 3-5 vs the 8-round average, whether the most recent round was a new best/worst, or whether they're trending hotter or cooler. No speculation.>",
   "suited_courses": [ { "id": "<course id from candidates>", "rationale": "<one sentence, max 20 words, why this course matches their best scoring profile>" } ],
   "test_courses":   [ { "id": "<course id from candidates>", "rationale": "<one sentence, max 20 words, why this course will push their game (frame as growth)>" } ]
 }
@@ -234,5 +238,6 @@ Rules:
 - Exactly 3 items in each array (or fewer only if candidates < 6).
 - Only use IDs from CANDIDATE COURSES. Never invent IDs.
 - If sample < 15, prefix profile with "Early signal:" or similar.
+- rounds_pattern MUST wrap numeric values in **bold** markdown (e.g. **+0.6**, **+1.7**).
 - Return JSON only.`;
 }

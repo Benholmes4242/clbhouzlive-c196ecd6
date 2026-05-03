@@ -1,0 +1,1 @@
+ALTER TABLE public.whs_ai_insights ADD COLUMN IF NOT EXISTS rounds_pattern text NOT NULL DEFAULT '';
