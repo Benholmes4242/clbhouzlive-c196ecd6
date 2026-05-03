@@ -507,14 +507,14 @@ function LeadSectionHeader({
                 width: 22,
                 height: 22,
                 borderRadius: '50%',
-                background: AMBER_DEEP,
+                background: AMBER_TINT,
                 display: 'inline-flex',
                 alignItems: 'center',
                 justifyContent: 'center',
                 flexShrink: 0,
               }}
             >
-              <Brain size={13} color={INK} strokeWidth={2.4} />
+              <Brain size={13} color={AMBER_DEEP} strokeWidth={2.4} />
             </span>
           </span>
         </button>
