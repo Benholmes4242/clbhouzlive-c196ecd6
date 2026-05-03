@@ -206,3 +206,6 @@ verify_jwt = false
 
 [functions.daily-editorial-generation]
 verify_jwt = false
+
+[functions.generate-handicap-insights]
+verify_jwt = true
