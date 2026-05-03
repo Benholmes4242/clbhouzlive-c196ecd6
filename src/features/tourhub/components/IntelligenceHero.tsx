@@ -44,6 +44,7 @@ import {
   Award,
   Trophy,
   Quote,
+  Brain,
 } from 'lucide-react';
 import type { IntelligenceOutcome } from '../utils/outcomeClassifier';
 import { useCountdown } from '@/hooks/useCountdown';
@@ -500,13 +501,21 @@ function LeadSectionHeader({
             }}
           >
             Tournament <span style={{ color: AMBER_DEEP }}>Intelligence</span>
-            <Sparkles
-              size={18}
-              color={INK}
-              fill={INK}
-              strokeWidth={2}
-              style={{ marginLeft: 1 }}
-            />
+            <span
+              style={{
+                marginLeft: 4,
+                width: 22,
+                height: 22,
+                borderRadius: '50%',
+                background: AMBER_DEEP,
+                display: 'inline-flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                flexShrink: 0,
+              }}
+            >
+              <Brain size={13} color={INK} strokeWidth={2.4} />
+            </span>
           </span>
         </button>
         {state !== 'live' && (
@@ -783,7 +792,6 @@ function HeroPick({
     <div
       style={{
         borderTop: `1px solid ${SLATE_150}`,
-        borderBottom: `1px solid ${SLATE_150}`,
         marginBottom: 14,
       }}
     >
@@ -824,7 +832,20 @@ function HeroPick({
                 marginBottom: 5,
               }}
             >
-              <Sparkles size={9} color={AMBER_DEEP} fill={AMBER_DEEP} strokeWidth={2} />
+              <span
+                style={{
+                  width: 14,
+                  height: 14,
+                  borderRadius: '50%',
+                  background: AMBER_DEEP,
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  flexShrink: 0,
+                }}
+              >
+                <Brain size={8} color={INK} strokeWidth={2.6} />
+              </span>
               TOP PICK
             </div>
             <div
@@ -1055,7 +1076,6 @@ function CompactPick({
     <div
       style={{
         borderLeft: `3px solid ${accent}`,
-        borderBottom: `1px solid ${SLATE_150}`,
       }}
     >
       <button
@@ -1553,7 +1573,7 @@ function LiveStateBlock({
               />
               <span
                 style={{
-                  fontSize: 11,
+                  fontSize: 10,
                   fontWeight: 600,
                   color: GREEN_LIGHT,
                 }}
