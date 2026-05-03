@@ -58,6 +58,83 @@ import type { TrackedPrediction, PredictionTrackerData } from './tournament-insi
 import { getVenueRequirements } from '../utils/editorialFallbacks';
 import { IntelligenceAllPicksSheet } from './IntelligenceAllPicksSheet';
 import { IntelligenceAboutSheet } from './IntelligenceAboutSheet';
+import { getPlayerHeadshotUrl, PLAYER_SILHOUETTE_URL } from '@/utils/playerHeadshot';
+
+// ─── Headshot helper ─────────────────────────────────────────────────────────
+// All Tournament Intelligence states pull headshots from the same R2 source as
+// the Tour Overview hero. PGA-only per Sportradar coverage constraint.
+function PlayerHeadshot({
+  name,
+  size,
+  radius,
+  bg,
+  border,
+  initialsColor,
+  initialsFontSize,
+}: {
+  name: string;
+  size: number;
+  radius: number | string;
+  bg: string;
+  border: string;
+  initialsColor: string;
+  initialsFontSize: number;
+}) {
+  const initials = getInitials(name);
+  const src = getPlayerHeadshotUrl(name, 'pga');
+  const [failed, setFailed] = useState(false);
+  return (
+    <div
+      style={{
+        position: 'relative',
+        width: size,
+        height: size,
+        borderRadius: radius,
+        overflow: 'hidden',
+        background: bg,
+        border,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        flexShrink: 0,
+      }}
+    >
+      <span
+        style={{
+          fontFamily: '"SF Mono", monospace',
+          fontSize: initialsFontSize,
+          fontWeight: 700,
+          color: initialsColor,
+        }}
+      >
+        {initials}
+      </span>
+      {!failed && (
+        <img
+          src={src}
+          alt={name}
+          loading="lazy"
+          onError={(e) => {
+            const el = e.currentTarget;
+            if (el.src.endsWith(PLAYER_SILHOUETTE_URL)) {
+              setFailed(true);
+            } else {
+              el.src = PLAYER_SILHOUETTE_URL;
+            }
+          }}
+          style={{
+            position: 'absolute',
+            inset: 0,
+            width: '100%',
+            height: '100%',
+            objectFit: 'cover',
+            objectPosition: 'center 18%',
+          }}
+        />
+      )}
+    </div>
+  );
+}
 
 // ─── Tokens ──────────────────────────────────────────────────────────────────
 
@@ -735,25 +812,15 @@ function HeroPick({
         }}
       >
         <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
-          <div
-            style={{
-              width: 56,
-              height: 56,
-              borderRadius: 14,
-              background: AMBER_TINT,
-              border: `1px solid ${AMBER_TINT_STRONG}`,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              fontFamily: '"SF Mono", monospace',
-              fontSize: 17,
-              fontWeight: 700,
-              color: AMBER_DEEP,
-              flexShrink: 0,
-            }}
-          >
-            {initials}
-          </div>
+          <PlayerHeadshot
+            name={name}
+            size={56}
+            radius={14}
+            bg={AMBER_TINT}
+            border={`1px solid ${AMBER_TINT_STRONG}`}
+            initialsColor={AMBER_DEEP}
+            initialsFontSize={17}
+          />
 
           <div style={{ flex: 1, minWidth: 0 }}>
             <div
@@ -1011,25 +1078,15 @@ function CompactPick({
           gap: 12,
         }}
       >
-        <div
-          style={{
-            width: 38,
-            height: 38,
-            borderRadius: 10,
-            background: SLATE_100,
-            border: `1px solid ${SLATE_150}`,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            fontFamily: '"SF Mono", monospace',
-            fontSize: 12,
-            fontWeight: 700,
-            color: SLATE_700,
-            flexShrink: 0,
-          }}
-        >
-          {initials}
-        </div>
+        <PlayerHeadshot
+          name={name}
+          size={38}
+          radius={10}
+          bg={SLATE_100}
+          border={`1px solid ${SLATE_150}`}
+          initialsColor={SLATE_700}
+          initialsFontSize={12}
+        />
         <div style={{ flex: 1, minWidth: 0 }}>
           <div
             style={{
@@ -1196,25 +1253,15 @@ function TournamentWinnerCard({
         Tournament Winner
       </div>
       <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-        <div
-          style={{
-            width: 36,
-            height: 36,
-            borderRadius: 9,
-            background: SLATE_100,
-            border: `1px solid ${SLATE_150}`,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            fontFamily: '"SF Mono", monospace',
-            fontSize: 11,
-            fontWeight: 700,
-            color: SLATE_700,
-            flexShrink: 0,
-          }}
-        >
-          {initials}
-        </div>
+        <PlayerHeadshot
+          name={name}
+          size={36}
+          radius={9}
+          bg={SLATE_100}
+          border={`1px solid ${SLATE_150}`}
+          initialsColor={SLATE_700}
+          initialsFontSize={11}
+        />
         <div style={{ flex: 1, minWidth: 0 }}>
           <div
             style={{
