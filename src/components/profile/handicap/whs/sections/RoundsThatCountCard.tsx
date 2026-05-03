@@ -216,7 +216,7 @@ export const RoundsThatCountCard: React.FC<Props> = ({ connectionId, currentHand
                   fontVariantNumeric: 'tabular-nums',
                   textAlign: 'right', width: '100%',
                 }}>
-                  {t > 0 ? `+${t}` : t === 0 ? '0' : `\u2212${Math.abs(t)}`}
+                  {fmtAxis(t)}
                 </div>
               ))}
             </div>
