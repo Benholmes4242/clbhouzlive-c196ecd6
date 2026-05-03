@@ -25,7 +25,7 @@ export const OverviewView: React.FC<Props> = ({
       aria-labelledby="handicap-tab-overview"
     >
       <LastRoundCard connectionId={connectionId} />
-      <PredictionsCard connectionId={connectionId} />
+      <PredictionsCard connectionId={connectionId} currentHandicap={currentHandicap} />
       <CountersStrip connectionId={connectionId} />
       <AchievementsStrip
         connectionId={connectionId}
