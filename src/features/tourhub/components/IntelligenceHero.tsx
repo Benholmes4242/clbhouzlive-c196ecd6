@@ -392,11 +392,7 @@ export const IntelligenceHero = memo(function IntelligenceHero() {
         onInfoTap={handleOpenAbout}
       />
 
-      <CredibilityBand
-        wins={wins}
-        topFives={topFives}
-        topFiveRate={topFiveRate}
-      />
+      <div style={{ borderTop: `1px solid ${SLATE_150}`, marginBottom: 18 }} />
 
       {isLoading ? (
         <StateMessage label="Loading Intelligence…" />
@@ -1592,7 +1588,7 @@ function LiveStateBlock({
       {supporting.length > 0 && (
         <>
           <SupportingLabel />
-          <div style={{ borderTop: `1px solid ${SLATE_150}` }}>
+          <div>
             {supporting.map((p, i) => (
               <CompactPick
                 key={p.playerId}
@@ -1697,7 +1693,7 @@ function ResultsStateBlock({
         {supporting.length > 0 && (
           <>
             <SupportingLabel />
-            <div style={{ borderTop: `1px solid ${SLATE_150}` }}>
+            <div>
               {supporting.map((p, i) => (
                 <CompactPick
                   key={p.playerId}
@@ -1777,7 +1773,7 @@ function ResultsStateBlock({
       {supporting.length > 0 && (
         <>
           <SupportingLabel />
-          <div style={{ borderTop: `1px solid ${SLATE_150}` }}>
+          <div>
             {supporting.map((p, i) => (
               <CompactPick
                 key={p.playerId}
@@ -1931,7 +1927,7 @@ function UpcomingStateBlock({
       {supporting.length > 0 && (
         <>
           <SupportingLabel />
-          <div style={{ borderTop: `1px solid ${SLATE_150}` }}>
+          <div>
             {supporting.map((p, i) => (
               <CompactPick
                 key={p.playerId}
