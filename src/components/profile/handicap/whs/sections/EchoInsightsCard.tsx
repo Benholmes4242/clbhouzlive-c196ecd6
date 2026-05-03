@@ -7,7 +7,6 @@ import { useCounters } from '@/lib/whs/hooks';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 
 const INK = '#0F172A';
-const INK_70 = 'rgba(15,23,42,0.70)';
 const INK_55 = 'rgba(15,23,42,0.55)';
 const INK_40 = 'rgba(15,23,42,0.40)';
 const INK_10 = 'rgba(15,23,42,0.10)';
@@ -16,13 +15,15 @@ const AMBER = '#F7931E';
 const AMBER_DEEP = '#C97211';
 const AMBER_INK = '#9A6116';
 const GREEN = '#059669';
+const FONT_SERIF = 'Georgia, "Times New Roman", serif';
+const FONT_DISPLAY = 'SF Pro Display, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
 
 interface Props {
   connectionId: string;
 }
 
 const EchoWaveform = () => (
-  <svg width={14} height={14} viewBox="0 0 24 24" fill="none">
+  <svg width={20} height={20} viewBox="0 0 24 24" fill="none">
     <rect x="3" y="8" width="2" height="8" rx="1" fill="white" opacity="0.7" />
     <rect x="7" y="5" width="2" height="14" rx="1" fill="white" opacity="0.85" />
     <rect x="11" y="3" width="2" height="18" rx="1" fill="white" />
@@ -34,10 +35,11 @@ const EchoWaveform = () => (
 const Avatar = () => (
   <div
     style={{
-      width: 32,
-      height: 32,
-      borderRadius: 9,
+      width: 44,
+      height: 44,
+      borderRadius: '50%',
       background: `linear-gradient(135deg, ${AMBER} 0%, ${AMBER_DEEP} 100%)`,
+      boxShadow: '0 4px 16px rgba(247,147,30,0.35)',
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
@@ -49,7 +51,7 @@ const Avatar = () => (
 );
 
 const SectionHeader = () => (
-  <div style={{ padding: '0 12px', marginBottom: 10 }}>
+  <div style={{ marginBottom: 10 }}>
     <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
       <span
         style={{
@@ -63,24 +65,14 @@ const SectionHeader = () => (
       <span
         style={{
           fontSize: 10,
-          fontWeight: 700,
-          letterSpacing: 1,
+          fontWeight: 800,
+          letterSpacing: '0.22em',
           color: INK_55,
         }}
       >
-        ECHO INSIGHTS
+        ECHO · YOUR AI CADDIE
       </span>
     </div>
-    <p
-      style={{
-        margin: '4px 0 0',
-        fontSize: 12,
-        color: INK_55,
-        lineHeight: 1.4,
-      }}
-    >
-      Echo's read on your game, drawn from your round history.
-    </p>
   </div>
 );
 
@@ -93,23 +85,24 @@ const CourseCard: React.FC<{ course: SuitedCourse; stripe: string }> = ({
     style={{
       width: '100%',
       display: 'flex',
-      gap: 10,
+      alignItems: 'center',
+      gap: 12,
       background: '#fff',
       border: `0.5px solid ${INK_10}`,
-      borderRadius: 12,
-      padding: 0,
-      overflow: 'hidden',
+      borderLeft: `2px solid ${stripe}`,
+      borderRadius: 8,
+      padding: '10px 12px',
       textAlign: 'left',
       cursor: 'pointer',
     }}
   >
-    <div style={{ width: 3, alignSelf: 'stretch', background: stripe }} />
-    <div style={{ flex: 1, padding: '10px 11px 11px 8px', minWidth: 0 }}>
+    <div style={{ flex: 1, minWidth: 0 }}>
       <div
         style={{
-          fontSize: 14,
+          fontSize: 13,
           fontWeight: 700,
           color: INK,
+          lineHeight: 1.2,
           overflow: 'hidden',
           textOverflow: 'ellipsis',
           whiteSpace: 'nowrap',
@@ -117,104 +110,91 @@ const CourseCard: React.FC<{ course: SuitedCourse; stripe: string }> = ({
       >
         {course.name || '—'}
       </div>
-      {course.region && (
-        <div
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: 3,
-            marginTop: 2,
-            fontSize: 11,
-            color: INK_55,
-          }}
-        >
-          <MapPin size={10} />
-          <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-            {course.region}
-          </span>
-        </div>
-      )}
-      <div style={{ display: 'flex', gap: 4, marginTop: 7 }}>
-        <Chip label={`${course.yards || '—'} yds`} />
-        <Chip label={`Slope ${course.slope || '—'}`} />
-        <Chip label={`Par ${course.par || '—'}`} />
-      </div>
-      <p
+      <div
         style={{
-          margin: '7px 0 0',
-          fontSize: 11,
-          color: INK_70,
-          fontStyle: 'italic',
-          lineHeight: 1.4,
+          display: 'flex',
+          alignItems: 'center',
+          gap: 8,
+          marginTop: 3,
+          fontSize: 10,
+          color: INK_55,
         }}
       >
-        {course.rationale}
-      </p>
+        {course.region && (
+          <span style={{ display: 'inline-flex', alignItems: 'center', gap: 3 }}>
+            <MapPin size={9} strokeWidth={2.2} />
+            <span
+              style={{
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                whiteSpace: 'nowrap',
+                maxWidth: 120,
+              }}
+            >
+              {course.region}
+            </span>
+          </span>
+        )}
+        {course.yards > 0 && (
+          <span
+            style={{
+              fontFamily: FONT_DISPLAY,
+              fontVariantNumeric: 'tabular-nums lining-nums',
+            }}
+          >
+            {course.yards.toLocaleString()}y
+            {course.slope > 0 && ` · slope ${course.slope}`}
+          </span>
+        )}
+      </div>
     </div>
+    <ChevronRight size={13} strokeWidth={2.2} color={INK_40} />
   </button>
-);
-
-const Chip: React.FC<{ label: string }> = ({ label }) => (
-  <span
-    style={{
-      fontSize: 9,
-      fontWeight: 700,
-      color: INK_55,
-      background: INK_06,
-      padding: '3px 6px',
-      borderRadius: 999,
-      letterSpacing: 0.3,
-    }}
-  >
-    {label}
-  </span>
 );
 
 const BlockHeader: React.FC<{
   icon: React.ReactNode;
   title: string;
-  caption: string;
   color: string;
-}> = ({ icon, title, caption, color }) => (
-  <div style={{ padding: '0 12px', marginBottom: 8 }}>
+}> = ({ icon, title, color }) => (
+  <div style={{ marginBottom: 8 }}>
     <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
       <span style={{ color, display: 'flex' }}>{icon}</span>
       <span
         style={{
           fontSize: 10,
-          fontWeight: 700,
-          letterSpacing: 1,
-          color: INK_55,
+          fontWeight: 800,
+          letterSpacing: '0.18em',
+          color,
         }}
       >
         {title}
       </span>
     </div>
-    <p style={{ margin: '3px 0 0', fontSize: 11, color: INK_55, lineHeight: 1.35 }}>
-      {caption}
-    </p>
   </div>
 );
 
 const SkeletonBubble = () => (
-  <div style={{ padding: '0 12px' }}>
-    <div style={{ display: 'flex', gap: 10, alignItems: 'flex-start' }}>
+  <div>
+    <div style={{ display: 'flex', gap: 12, alignItems: 'flex-start' }}>
       <div
         style={{
-          width: 32,
-          height: 32,
-          borderRadius: 9,
+          width: 44,
+          height: 44,
+          borderRadius: '50%',
           background: `linear-gradient(135deg, ${AMBER}, ${AMBER_DEEP})`,
           opacity: 0.6,
+          boxShadow: '0 4px 16px rgba(247,147,30,0.35)',
           animation: 'echoInsightsPulse 1.6s ease-in-out infinite',
+          flexShrink: 0,
         }}
       />
       <div
         style={{
           flex: 1,
           background: INK_06,
-          borderRadius: '4px 14px 14px 14px',
-          height: 96,
+          borderRadius: '6px 16px 16px 16px',
+          height: 120,
           animation: 'echoInsightsPulse 1.6s ease-in-out infinite',
         }}
       />
@@ -225,9 +205,9 @@ const SkeletonBubble = () => (
 const SkeletonCard = () => (
   <div
     style={{
-      height: 92,
+      height: 56,
       background: INK_06,
-      borderRadius: 12,
+      borderRadius: 8,
       animation: 'echoInsightsPulse 1.6s ease-in-out infinite',
     }}
   />
@@ -239,7 +219,6 @@ export const EchoInsightsCard: React.FC<Props> = ({ connectionId }) => {
   const { data: insights, isLoading, error } = useHandicapInsights(connectionId);
 
   // Edge case: fewer than 8 rounds — render nothing.
-  // We use counters as a proxy: 8 counters means at least 8 rounds eligible.
   if (counters && counters.length < 8) return null;
 
   const handleBubbleTap = () => {
@@ -257,7 +236,15 @@ export const EchoInsightsCard: React.FC<Props> = ({ connectionId }) => {
   };
 
   return (
-    <section style={{ marginTop: 24, marginBottom: 24 }}>
+    <section
+      style={{
+        background:
+          'linear-gradient(180deg, rgba(247,147,30,0.06) 0%, rgba(247,147,30,0) 60%)',
+        borderTop: `0.5px solid ${INK_10}`,
+        padding: '32px 16px 40px',
+        marginTop: 8,
+      }}
+    >
       <style>{`
         @keyframes echoInsightsPulse {
           0%, 100% { opacity: 1; }
@@ -271,8 +258,8 @@ export const EchoInsightsCard: React.FC<Props> = ({ connectionId }) => {
       {isLoading || !insights ? (
         <SkeletonBubble />
       ) : (
-        <div style={{ padding: '0 12px' }}>
-          <div style={{ display: 'flex', gap: 10, alignItems: 'flex-start' }}>
+        <div>
+          <div style={{ display: 'flex', gap: 12, alignItems: 'flex-start' }}>
             <Avatar />
             <button
               type="button"
@@ -282,26 +269,31 @@ export const EchoInsightsCard: React.FC<Props> = ({ connectionId }) => {
                 textAlign: 'left',
                 background: '#fff',
                 border: `0.5px solid ${INK_10}`,
-                borderRadius: '4px 14px 14px 14px',
+                borderRadius: '6px 16px 16px 16px',
+                boxShadow: '0 1px 3px rgba(15,23,42,0.04)',
                 padding: '10px 12px 10px 12px',
                 cursor: 'pointer',
                 minWidth: 0,
               }}
               className="active:scale-[0.99] transition-transform"
             >
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                <div style={{ display: 'flex', alignItems: 'baseline', gap: 5 }}>
-                  <span style={{ fontSize: 11, fontWeight: 700, color: INK }}>Echo</span>
-                  <span style={{ fontSize: 10, color: INK_40 }}>· just now</span>
-                </div>
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                }}
+              >
+                <span style={{ fontSize: 12, fontWeight: 700, color: INK }}>Echo</span>
                 <ChevronRight size={14} color={INK_40} />
               </div>
               <p
                 style={{
-                  margin: '6px 0 8px',
-                  fontSize: 13,
-                  lineHeight: 1.5,
-                  color: INK_70,
+                  margin: '8px 0 12px',
+                  fontFamily: FONT_SERIF,
+                  fontSize: 15,
+                  lineHeight: 1.55,
+                  color: INK,
                 }}
               >
                 {insights.scoring_profile}
@@ -315,8 +307,15 @@ export const EchoInsightsCard: React.FC<Props> = ({ connectionId }) => {
                   borderTop: `0.5px solid ${INK_10}`,
                 }}
               >
-                <Sparkles size={11} color={AMBER} />
-                <span style={{ fontSize: 10, fontWeight: 700, color: AMBER_INK, letterSpacing: 0.3 }}>
+                <Sparkles size={11} color={AMBER_DEEP} strokeWidth={2.2} />
+                <span
+                  style={{
+                    fontSize: 11,
+                    fontWeight: 700,
+                    color: AMBER_INK,
+                    letterSpacing: '0.02em',
+                  }}
+                >
                   Tap to ask Echo a follow-up
                 </span>
               </div>
@@ -326,20 +325,19 @@ export const EchoInsightsCard: React.FC<Props> = ({ connectionId }) => {
       )}
 
       {error && (
-        <div style={{ padding: '12px', fontSize: 11, color: INK_55 }}>
+        <div style={{ paddingTop: 12, fontSize: 11, color: INK_55 }}>
           Couldn't generate insights right now.
         </div>
       )}
 
       {/* Suited */}
-      <div style={{ marginTop: 22 }}>
+      <div style={{ marginTop: 24 }}>
         <BlockHeader
-          icon={<TrendingDown size={12} />}
+          icon={<TrendingDown size={11} strokeWidth={2.5} />}
           title="SUITED TO YOUR GAME"
-          caption="Courses where Echo expects you to score well."
           color={GREEN}
         />
-        <div style={{ padding: '0 12px', display: 'flex', flexDirection: 'column', gap: 8 }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
           {isLoading || !insights ? (
             <>
               <SkeletonCard />
@@ -357,14 +355,13 @@ export const EchoInsightsCard: React.FC<Props> = ({ connectionId }) => {
       </div>
 
       {/* Test yourself */}
-      <div style={{ marginTop: 22 }}>
+      <div style={{ marginTop: 24 }}>
         <BlockHeader
-          icon={<Target size={12} />}
+          icon={<Target size={11} strokeWidth={2.5} />}
           title="TEST YOURSELF"
-          caption="Courses that will push your game and grow it."
           color={AMBER_DEEP}
         />
-        <div style={{ padding: '0 12px', display: 'flex', flexDirection: 'column', gap: 8 }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
           {isLoading || !insights ? (
             <>
               <SkeletonCard />
@@ -392,7 +389,7 @@ const EmptyBlock = () => (
       color: INK_55,
       background: '#fff',
       border: `0.5px dashed ${INK_10}`,
-      borderRadius: 12,
+      borderRadius: 8,
       textAlign: 'center',
     }}
   >
