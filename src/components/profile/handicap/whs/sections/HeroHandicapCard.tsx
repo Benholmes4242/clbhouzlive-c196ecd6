@@ -337,7 +337,7 @@ const HeroHandicapCard: React.FC<Props> = ({ connection }) => {
             <line
               x1={CX} y1={CY - R_INNER - STROKE_INNER / 2 - 1}
               x2={CX} y2={CY - R_INNER + STROKE_INNER / 2 + 1}
-              stroke={INK} strokeWidth={2}
+              stroke={INK_40} strokeWidth={1.5}
             />
           </svg>
 
