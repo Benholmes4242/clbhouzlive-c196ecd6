@@ -1096,17 +1096,6 @@ function CompactPick({
         <div style={{ flex: 1, minWidth: 0 }}>
           <div
             style={{
-              ...monoLabel,
-              fontSize: 8,
-              color: accentInk,
-              letterSpacing: '0.18em',
-              marginBottom: 2,
-            }}
-          >
-            {tierLabel}
-          </div>
-          <div
-            style={{
               fontFamily: headlineFont,
               fontSize: 14.5,
               fontWeight: 700,
