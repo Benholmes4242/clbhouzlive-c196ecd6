@@ -164,15 +164,20 @@ export async function callSyncWhsOne(): Promise<SyncWhsResponse> {
 
 export async function fetchHandicapHistory(
   connectionId: string,
-  daysBack: number,
+  daysBack: number | 'all',
 ): Promise<HandicapPoint[]> {
-  const since = new Date(Date.now() - daysBack * 86400_000).toISOString();
-  const { data, error } = await supabase
+  let query = supabase
     .from('whs_handicap_snapshots' as any)
     .select('observed_at, handicap_index')
     .eq('connection_id', connectionId)
-    .gte('observed_at', since)
     .order('observed_at', { ascending: true });
+
+  if (daysBack !== 'all') {
+    const since = new Date(Date.now() - daysBack * 86400_000).toISOString();
+    query = query.gte('observed_at', since);
+  }
+
+  const { data, error } = await query;
   if (error) throw error;
   return (data ?? []).map((d: any) => ({
     observed_at: d.observed_at,

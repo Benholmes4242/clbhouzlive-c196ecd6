@@ -25,7 +25,7 @@ export const whsKeys = {
   counters: (connectionId: string) => ['whs-counters', connectionId] as const,
   recent: (connectionId: string) => ['whs-recent-rounds', connectionId] as const,
   allScores: (connectionId: string) => ['whs-all-scores', connectionId] as const,
-  history: (connectionId: string, daysBack: number) =>
+  history: (connectionId: string, daysBack: number | 'all') =>
     ['whs-handicap-history', connectionId, daysBack] as const,
   friendsLeaderboard: (userId: string) => ['whs-friends-leaderboard', userId] as const,
   friendWindowRankings: (ownerUserId: string) =>
@@ -118,7 +118,10 @@ export function useAllScores(connectionId: string | undefined) {
   });
 }
 
-export function useHandicapHistory(connectionId: string | undefined, daysBack: number) {
+export function useHandicapHistory(
+  connectionId: string | undefined,
+  daysBack: number | 'all',
+) {
   return useQuery({
     queryKey: whsKeys.history(connectionId ?? '', daysBack),
     queryFn: () => fetchHandicapHistory(connectionId as string, daysBack),

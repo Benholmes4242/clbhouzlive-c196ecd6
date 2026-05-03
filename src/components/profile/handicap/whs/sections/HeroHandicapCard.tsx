@@ -7,7 +7,7 @@ interface Props {
   connection: WhsConnection;
 }
 
-type Range = 30 | 90 | 365;
+type Range = 90 | 365 | 'all';
 
 // ── Tokens ────────────────────────────────────────────────────────────────
 const AMBER = '#F7931E';
@@ -54,13 +54,13 @@ function useCareerLowBadge(
 // ── Scrub date label ──────────────────────────────────────────────────────
 function scrubDateLabel(point: HandicapPoint, range: Range): string {
   const d = new Date(point.observed_at);
-  if (range === 365) return `${MONTHS[d.getMonth()]} ${d.getFullYear()}`;
+  if (range === 365 || range === 'all') return `${MONTHS[d.getMonth()]} ${d.getFullYear()}`;
   return `${d.getDate()} ${MONTHS[d.getMonth()]}`;
 }
 
 // ── Component ─────────────────────────────────────────────────────────────
 const HeroHandicapCard: React.FC<Props> = ({ connection }) => {
-  const [range, setRange] = useState<Range>(90);
+  const [range, setRange] = useState<Range>('all');
   const [scrubIdx, setScrubIdx] = useState<number | null>(null);
   const [drawn, setDrawn] = useState(false);
   const [showHint, setShowHint] = useState(true);
@@ -68,7 +68,7 @@ const HeroHandicapCard: React.FC<Props> = ({ connection }) => {
 
   const { data: trend, isLoading: trendLoading } = useHandicapTrend(connection.id);
   const { data: history, isLoading: historyLoading } = useHandicapHistory(connection.id, range);
-  const { data: yearHistory } = useHandicapHistory(connection.id, 365);
+  const { data: yearHistory } = useHandicapHistory(connection.id, 'all');
 
   const current = trend?.current ?? null;
   const careerLowLabel = useCareerLowBadge(current, yearHistory);
@@ -224,11 +224,12 @@ const HeroHandicapCard: React.FC<Props> = ({ connection }) => {
           </span>
         </div>
         <div style={{ display: 'inline-flex', gap: 2, padding: 2, background: 'rgba(15,23,42,0.04)', borderRadius: 999 }}>
-          {([30, 90, 365] as Range[]).map(r => {
+          {([90, 365, 'all'] as Range[]).map(r => {
             const active = r === range;
+            const label = r === 'all' ? 'ALL' : r === 365 ? '1Y' : '90D';
             return (
               <button
-                key={r}
+                key={String(r)}
                 onClick={() => setRange(r)}
                 style={{
                   padding: '4px 10px', fontSize: 10, fontWeight: 800,
@@ -239,7 +240,7 @@ const HeroHandicapCard: React.FC<Props> = ({ connection }) => {
                   transition: 'background 150ms ease, color 150ms ease',
                 }}
               >
-                {r === 365 ? '1y' : `${r}d`}
+                {label}
               </button>
             );
           })}
