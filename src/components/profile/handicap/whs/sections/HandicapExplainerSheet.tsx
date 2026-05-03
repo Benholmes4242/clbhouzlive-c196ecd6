@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import { X } from 'lucide-react';
+import { fmtDiff } from '@/lib/whs/format';
 
 const INK = '#0F172A';
 const INK_70 = 'rgba(15,23,42,0.70)';
@@ -123,11 +124,11 @@ const HandicapExplainerSheet: React.FC<Props> = ({ open, onClose, maxDiff, avgDi
               <>
                 Shoot a differential lower than your{' '}
                 <strong style={{ color: GREEN, fontWeight: 700 }}>
-                  worst counter (+{maxDiff.toFixed(1)})
+                  worst counter ({fmtDiff(maxDiff, { plus: true })})
                 </strong>{' '}
                 and your handicap drops. Anything between your best and worst counters leaves it where it is. If your scoring drifts above your{' '}
                 <strong style={{ color: RED, fontWeight: 700 }}>
-                  counter average (+{avgDiff.toFixed(1)})
+                  counter average ({fmtDiff(avgDiff, { plus: true })})
                 </strong>{' '}
                 for a stretch, your handicap can creep up over time as good counters age out.
               </>

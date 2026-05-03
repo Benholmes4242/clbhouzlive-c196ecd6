@@ -2,7 +2,7 @@ import React, { useMemo, useState } from 'react';
 import { ChevronRight, ArrowDown, ArrowUp, HelpCircle } from 'lucide-react';
 import { useCounters } from '@/lib/whs/hooks';
 import { useHandicapInsights } from '@/lib/whs/insights/useHandicapInsights';
-import { fmtDiff } from '@/lib/whs/format';
+import { fmtDiff, fmtAxis } from '@/lib/whs/format';
 import HandicapExplainerSheet from './HandicapExplainerSheet';
 
 interface Props {
@@ -49,7 +49,7 @@ function renderBoldMarkdown(text: string): React.ReactNode {
     i % 2 === 1
       ? (
         <strong key={i} style={{
-          fontFamily: FONT_DISPLAY, fontWeight: 700, color: INK,
+          fontFamily: FONT_DISPLAY, fontWeight: 600, color: INK,
           fontVariantNumeric: 'tabular-nums',
         }}>
           {part}
@@ -216,7 +216,7 @@ export const RoundsThatCountCard: React.FC<Props> = ({ connectionId, currentHand
                   fontVariantNumeric: 'tabular-nums',
                   textAlign: 'right', width: '100%',
                 }}>
-                  {t > 0 ? `+${t}` : t === 0 ? '0' : `\u2212${Math.abs(t)}`}
+                  {fmtAxis(t)}
                 </div>
               ))}
             </div>
