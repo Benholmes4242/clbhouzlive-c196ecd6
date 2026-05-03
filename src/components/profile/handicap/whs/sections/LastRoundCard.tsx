@@ -113,7 +113,7 @@ export const LastRoundCard: React.FC<Props> = ({ connectionId }) => {
           cursor: 'pointer',
           position: 'relative',
           minHeight: 240,
-          borderRadius: 16,
+          borderRadius: 14,
           overflow: 'hidden',
           transition: 'opacity 150ms ease',
           ...cardBg,
@@ -143,7 +143,7 @@ export const LastRoundCard: React.FC<Props> = ({ connectionId }) => {
             position: 'absolute',
             inset: 0,
             background:
-              'linear-gradient(180deg, rgba(15,23,42,0.55) 0%, rgba(15,23,42,0.45) 40%, rgba(15,23,42,0.85) 100%)',
+              'linear-gradient(180deg, rgba(0,0,0,0.10) 0%, rgba(0,0,0,0.75) 100%)',
             zIndex: 1,
           }}
         />
