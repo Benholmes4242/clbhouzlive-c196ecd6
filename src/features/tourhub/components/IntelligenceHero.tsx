@@ -494,18 +494,19 @@ function LeadSectionHeader({
           <span
             style={{
               fontFamily: headlineFont,
-              fontSize: 13,
+              fontSize: 24,
               fontWeight: 700,
               color: AMBER_DEEP,
-              letterSpacing: '-0.005em',
+              letterSpacing: '-0.025em',
+              lineHeight: 1.1,
               display: 'flex',
               alignItems: 'center',
-              gap: 5,
+              gap: 6,
             }}
           >
             Tournament Intelligence
             <Sparkles
-              size={12}
+              size={18}
               color={AMBER_DEEP}
               fill={AMBER_DEEP}
               strokeWidth={2}
