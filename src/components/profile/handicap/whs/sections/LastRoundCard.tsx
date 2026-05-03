@@ -10,8 +10,10 @@ interface Props {
 
 const GREEN = '#34D399';
 const RED = '#FB7185';
+const GREEN_BANNER = 'rgba(5,150,105,0.22)';
+const RED_BANNER = 'rgba(159,29,29,0.22)';
 const INK_55 = 'rgba(15,23,42,0.55)';
-const FONT_SERIF = 'Georgia, serif';
+const FONT_SERIF = 'Georgia, "Times New Roman", serif';
 
 const fmtDiff = (n: number | null | undefined) => {
   if (n === null || n === undefined) return '—';
