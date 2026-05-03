@@ -164,6 +164,7 @@ export interface WhsFriendActivityWithImage {
   friend_name: string;
   friend_thumbnail_url: string | null;
   friend_user_id: string | null;
+  friend_connection_id: string | null;
   is_clbhouz_user: boolean;
   last_round_played_at: string | null;
   last_round_course_name: string | null;

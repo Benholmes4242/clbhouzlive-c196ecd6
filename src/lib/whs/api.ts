@@ -286,6 +286,7 @@ export async function fetchFriendsActivity(
       friend_name: f.friend_name,
       friend_thumbnail_url: f.friend_thumbnail_url,
       friend_user_id: f.friend_user_id,
+      friend_connection_id: f.friend_connection_id,
       is_clbhouz_user: !!f.is_clbhouz_user,
       last_round_played_at: f.last_round_played_at,
       last_round_course_name: f.last_round_course_name,
