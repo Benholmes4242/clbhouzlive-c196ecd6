@@ -25,13 +25,13 @@ export const OverviewView: React.FC<Props> = ({
       aria-labelledby="handicap-tab-overview"
     >
       <LastRoundCard connectionId={connectionId} />
-      <HeadToHeadCard ownerUserId={userId} currentUserHandicap={currentHandicap} />
+      <PredictionsCard connectionId={connectionId} />
+      <CountersStrip connectionId={connectionId} />
       <AchievementsStrip
         connectionId={connectionId}
         connectionCreatedAt={connectionCreatedAt}
       />
-      <CountersStrip connectionId={connectionId} />
-      <PredictionsCard connectionId={connectionId} />
+      <HeadToHeadCard ownerUserId={userId} currentUserHandicap={currentHandicap} />
     </div>
   );
 };
