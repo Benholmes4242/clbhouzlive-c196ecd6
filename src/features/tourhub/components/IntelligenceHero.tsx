@@ -837,14 +837,14 @@ function HeroPick({
                   width: 14,
                   height: 14,
                   borderRadius: '50%',
-                  background: AMBER_DEEP,
+                  background: AMBER_TINT,
                   display: 'inline-flex',
                   alignItems: 'center',
                   justifyContent: 'center',
                   flexShrink: 0,
                 }}
               >
-                <Brain size={8} color={INK} strokeWidth={2.6} />
+                <Brain size={8} color={AMBER_DEEP} strokeWidth={2.6} />
               </span>
               TOP PICK
             </div>
