@@ -783,7 +783,6 @@ function HeroPick({
     <div
       style={{
         borderTop: `1px solid ${SLATE_150}`,
-        borderBottom: `1px solid ${SLATE_150}`,
         marginBottom: 14,
       }}
     >
