@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { ArrowDown, ArrowUp } from 'lucide-react';
-import { useHandicapHistory, useHandicapTrend } from '@/lib/whs/hooks';
+import { useHandicapHistory, useHandicapTrend, useRecentRounds } from '@/lib/whs/hooks';
+import { whsDisplayedHcp, formatDisplayedHcp, fmtDiff } from '@/lib/whs/format';
 import type { WhsConnection, HandicapPoint } from '@/lib/whs/types';
 
 interface Props {
@@ -11,69 +12,69 @@ type Range = 90 | 365 | 'all';
 
 // ── Tokens ────────────────────────────────────────────────────────────────
 const AMBER = '#F7931E';
+const AMBER_DEEP = '#C97211';
 const INK = '#0F172A';
-const INK_MUTE = 'rgba(15,23,42,0.55)';
-const INK_MUTE_40 = 'rgba(15,23,42,0.40)';
-const INK_HAIR = 'rgba(15,23,42,0.10)';
+const INK_55 = 'rgba(15,23,42,0.55)';
+const INK_40 = 'rgba(15,23,42,0.40)';
+const INK_10 = 'rgba(15,23,42,0.10)';
 const INK_06 = 'rgba(15,23,42,0.06)';
+const INK_04 = 'rgba(15,23,42,0.04)';
 const GREEN = '#059669';
 const RED = '#9F1D1D';
 
 const MONTHS = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
+const FONT_DISPLAY = 'SF Pro Display, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
 
-// Ring
-const RING_SIZE = 200;
-const RING_R = 76;
-const RING_STROKE = 10;
-const RING_C = 2 * Math.PI * RING_R;
+// Ring composition
+const RING_SIZE = 240;
+const CX = RING_SIZE / 2;
+const CY = RING_SIZE / 2;
+const R_OUTER = 110;
+const STROKE_OUTER = 3;
+const C_OUTER = 2 * Math.PI * R_OUTER;
+const R_INNER = 100;
+const STROKE_INNER = 6;
+const C_INNER = 2 * Math.PI * R_INNER;
 
 // Sparkline
 const W = 340;
-const H = 64;
-const PAD_TOP = 6;
-const PAD_BOTTOM = 6;
+const H = 50;
+const PAD_TOP = 4;
+const PAD_BOTTOM = 4;
 
-// Number
-const NUMBER_SIZE = 64;
-const NUMBER_WEIGHT = 700;
-
-// ── Career-low badge — kept for analytics / future use ────────────────────
-function useCareerLowBadge(
-  currentValue: number | null | undefined,
-  yearHistory: HandicapPoint[] | undefined,
-): string | null {
-  return useMemo(() => {
-    if (currentValue === null || currentValue === undefined) return null;
-    if (!yearHistory || yearHistory.length === 0) return null;
-    const min = yearHistory.reduce(
-      (acc, p) =>
-        p.handicap_index < acc.value
-          ? { value: p.handicap_index, at: p.observed_at }
-          : acc,
-      { value: Infinity, at: '' },
-    );
-    if (min.value === Infinity) return null;
-    if (Math.abs(min.value - currentValue) > 0.05) return null;
-    const observed = new Date(min.at).getTime();
-    const now = Date.now();
-    const days = Math.floor((now - observed) / 86_400_000);
-    if (days < 0) return null;
-    if (days === 0) return 'TODAY';
-    if (days === 1) return 'YESTERDAY';
-    if (days <= 7) return `${days} DAYS AGO`;
-    const d = new Date(min.at);
-    return `${d.getDate()} ${MONTHS[d.getMonth()]}`;
-  }, [currentValue, yearHistory]);
+// ── Milestone progress ────────────────────────────────────────────────────
+function calcMilestoneProgress(h: number) {
+  const displayed = whsDisplayedHcp(h);
+  const windowTop = displayed + 0.4;
+  const windowBottom = displayed - 0.5;
+  const progress = (windowTop - h) / (windowTop - windowBottom);
+  return {
+    displayed,
+    windowTop,
+    windowBottom,
+    progress: Math.max(0, Math.min(1, progress)),
+  };
 }
 
-// ── Scrub date label ──────────────────────────────────────────────────────
-function scrubDateLabel(point: HandicapPoint, range: Range): string {
-  const d = new Date(point.observed_at);
-  if (range === 365 || range === 'all') return `${MONTHS[d.getMonth()]} ${d.getFullYear()}`;
-  return `${d.getDate()} ${MONTHS[d.getMonth()]}`;
+// ── Form calculation ──────────────────────────────────────────────────────
+function calcForm(hcp: number, last5Diffs: number[]) {
+  if (last5Diffs.length === 0) {
+    return { formStrokes: 0, fillFraction: 0, direction: 'neutral' as const };
+  }
+  const avg = last5Diffs.reduce((s, v) => s + v, 0) / last5Diffs.length;
+  const formStrokes = hcp - avg;
+  const capped = Math.max(-2, Math.min(2, formStrokes));
+  const fillFraction = Math.abs(capped) / 2;
+  return {
+    formStrokes,
+    fillFraction,
+    direction:
+      formStrokes > 0.05 ? ('positive' as const)
+      : formStrokes < -0.05 ? ('negative' as const)
+      : ('neutral' as const),
+  };
 }
 
-// ── Component ─────────────────────────────────────────────────────────────
 const HeroHandicapCard: React.FC<Props> = ({ connection }) => {
   const [range, setRange] = useState<Range>('all');
   const [scrubIdx, setScrubIdx] = useState<number | null>(null);
@@ -82,13 +83,18 @@ const HeroHandicapCard: React.FC<Props> = ({ connection }) => {
 
   const { data: trend, isLoading: trendLoading } = useHandicapTrend(connection.id);
   const { data: history, isLoading: historyLoading } = useHandicapHistory(connection.id, range);
-  const { data: yearHistory } = useHandicapHistory(connection.id, 'all');
+  const { data: recent } = useRecentRounds(connection.id);
 
   const current = trend?.current ?? null;
-  // Kept for analytics — not rendered in hero anymore
-  useCareerLowBadge(current, yearHistory);
-
   const points: HandicapPoint[] = history ?? [];
+
+  const last5Diffs = useMemo(() => {
+    if (!recent) return [];
+    return recent
+      .slice(0, 5)
+      .map((r: any) => r.handicap_differential)
+      .filter((d: any): d is number => typeof d === 'number');
+  }, [recent]);
 
   const coords = useMemo(() => {
     if (points.length === 0) return [] as { x: number; y: number; idx: number }[];
@@ -148,11 +154,11 @@ const HeroHandicapCard: React.FC<Props> = ({ connection }) => {
   if (trendLoading || historyLoading) {
     return (
       <section style={{ padding: '24px 12px 20px', marginBottom: 24 }}>
-        <div style={{ height: 12, width: 80, background: INK_HAIR, borderRadius: 2, marginBottom: 14 }} />
+        <div style={{ height: 12, width: 80, background: INK_10, borderRadius: 2, marginBottom: 14 }} />
         <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 14 }}>
-          <div style={{ height: RING_SIZE, width: RING_SIZE, background: INK_HAIR, borderRadius: '50%' }} />
+          <div style={{ height: RING_SIZE, width: RING_SIZE, background: INK_06, borderRadius: '50%' }} />
         </div>
-        <div style={{ height: 64, width: '100%', background: INK_HAIR, borderRadius: 4 }} />
+        <div style={{ height: 50, width: '100%', background: INK_06, borderRadius: 4 }} />
       </section>
     );
   }
@@ -168,12 +174,12 @@ const HeroHandicapCard: React.FC<Props> = ({ connection }) => {
               animation: 'liveDot 2s ease-in-out infinite',
             }}
           />
-          <span style={{ fontSize: 11, fontWeight: 800, color: INK, letterSpacing: '0.18em' }}>
-            YOUR INDEX
+          <span style={{ fontSize: 10, fontWeight: 800, color: INK_55, letterSpacing: '0.22em' }}>
+            HANDICAP INDEX
           </span>
         </div>
-        <p style={{ fontSize: 14, color: INK_MUTE, fontStyle: 'italic', lineHeight: 1.5, margin: 0, padding: '0 4px' }}>
-          We're waiting for your first handicap snapshot. Play a round and your index will appear here.
+        <p style={{ fontSize: 14, color: INK_55, fontStyle: 'italic', lineHeight: 1.5, margin: 0, padding: '0 4px' }}>
+          Your handicap will appear after your first 8 rounds.
         </p>
         <style>{keyframes}</style>
       </section>
@@ -184,35 +190,45 @@ const HeroHandicapCard: React.FC<Props> = ({ connection }) => {
   const scrubValue = scrubPoint?.handicap_index ?? current;
   const isScrubbing = scrubIdx !== null && scrubPoint !== null;
 
-  // Ring math — 0 = scratch (full ring), 28 = max (empty ring)
-  const ringPct = Math.max(0, Math.min(1, 1 - scrubValue / 28));
-  const ringDash = ringPct * RING_C;
+  // Milestone math — outer ring
+  const milestone = calcMilestoneProgress(scrubValue);
+  const outerDash = milestone.progress * C_OUTER;
 
-  // ── Trend pill ──────────────────────────────────────────────────────────
-  const trendNode =
-    trend && trend.delta !== null && trend.delta !== undefined && Math.abs(trend.delta) >= 0.05
-      ? (() => {
-          const isImprovement = trend.delta < 0;
-          const Arrow = isImprovement ? ArrowDown : ArrowUp;
-          const color = isImprovement ? GREEN : RED;
-          const bgColor = isImprovement ? 'rgba(5,150,105,0.10)' : 'rgba(159,29,29,0.10)';
-          const borderColor = isImprovement ? 'rgba(5,150,105,0.25)' : 'rgba(159,29,29,0.25)';
-          return (
-            <div
-              style={{
-                display: 'inline-flex', alignItems: 'center', gap: 6,
-                padding: '4px 10px', borderRadius: 999,
-                background: bgColor, border: `1px solid ${borderColor}`,
-                color, fontSize: 13, fontWeight: 700,
-                fontVariantNumeric: 'tabular-nums lining-nums',
-              }}
-            >
-              <Arrow size={14} strokeWidth={2.5} />
-              <span>{Math.abs(trend.delta).toFixed(1)} past 30d</span>
-            </div>
-          );
-        })()
-      : null;
+  // Form math — inner ring
+  const form = calcForm(current, last5Diffs);
+  const innerFillLength = (form.fillFraction * C_INNER) / 2; // half-circle max
+  const isPositiveForm = form.direction === 'positive';
+  const isNegativeForm = form.direction === 'negative';
+
+  // Form delta UI
+  const formNode = (() => {
+    if (last5Diffs.length < 5) {
+      return <span style={{ color: INK_40 }}>Steady form · last 5</span>;
+    }
+    if (form.direction === 'positive') {
+      return (
+        <span style={{ color: GREEN, display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+          <ArrowDown size={13} strokeWidth={2.5} />
+          <span style={{ fontVariantNumeric: 'tabular-nums' }}>
+            {fmtDiff(-Math.abs(form.formStrokes))} form
+          </span>
+          <span style={{ color: INK_40 }}>· last 5</span>
+        </span>
+      );
+    }
+    if (form.direction === 'negative') {
+      return (
+        <span style={{ color: RED, display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+          <ArrowUp size={13} strokeWidth={2.5} />
+          <span style={{ fontVariantNumeric: 'tabular-nums' }}>
+            +{Math.abs(form.formStrokes).toFixed(1)} form
+          </span>
+          <span style={{ color: INK_40 }}>· last 5</span>
+        </span>
+      );
+    }
+    return <span style={{ color: INK_40 }}>Steady form · last 5</span>;
+  })();
 
   return (
     <section style={{ padding: '24px 12px 20px', marginBottom: 24 }}>
@@ -225,11 +241,11 @@ const HeroHandicapCard: React.FC<Props> = ({ connection }) => {
               animation: 'liveDot 2s ease-in-out infinite',
             }}
           />
-          <span style={{ fontSize: 11, fontWeight: 800, color: INK, letterSpacing: '0.18em' }}>
-            YOUR INDEX
+          <span style={{ fontSize: 10, fontWeight: 800, color: INK_55, letterSpacing: '0.22em' }}>
+            HANDICAP INDEX
           </span>
         </div>
-        <div style={{ display: 'inline-flex', gap: 2, padding: 2, background: 'rgba(15,23,42,0.04)', borderRadius: 999 }}>
+        <div style={{ display: 'inline-flex', gap: 2, padding: 2, background: INK_04, borderRadius: 999 }}>
           {([90, 365, 'all'] as Range[]).map(r => {
             const active = r === range;
             const label = r === 'all' ? 'ALL' : r === 365 ? '1Y' : '90D';
@@ -241,7 +257,7 @@ const HeroHandicapCard: React.FC<Props> = ({ connection }) => {
                   padding: '4px 10px', fontSize: 10, fontWeight: 800,
                   border: 'none', borderRadius: 999, cursor: 'pointer',
                   background: active ? INK : 'transparent',
-                  color: active ? '#fff' : INK_MUTE,
+                  color: active ? '#fff' : INK_55,
                   letterSpacing: '0.02em',
                   transition: 'background 150ms ease, color 150ms ease',
                 }}
@@ -253,58 +269,115 @@ const HeroHandicapCard: React.FC<Props> = ({ connection }) => {
         </div>
       </div>
 
-      {/* Ring with handicap inside */}
-      <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 12 }}>
+      {/* Multi-stream Ring */}
+      <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 6, position: 'relative' }}>
         <div style={{ position: 'relative', width: RING_SIZE, height: RING_SIZE }}>
+          {/* Milestone labels around top of ring */}
+          <div style={{
+            position: 'absolute', top: 6, left: 16, fontSize: 9, fontWeight: 800,
+            color: INK_40, letterSpacing: '0.18em',
+          }}>
+            {formatDisplayedHcp(milestone.displayed)} HCP
+          </div>
+          <div style={{
+            position: 'absolute', top: 6, right: 16, fontSize: 9, fontWeight: 800,
+            color: AMBER_DEEP, letterSpacing: '0.18em',
+          }}>
+            {formatDisplayedHcp(milestone.displayed - 1)} HCP →
+          </div>
+
           <svg width={RING_SIZE} height={RING_SIZE} viewBox={`0 0 ${RING_SIZE} ${RING_SIZE}`}>
-            {/* Track */}
+            {/* Outer track */}
             <circle
-              cx={RING_SIZE / 2} cy={RING_SIZE / 2} r={RING_R}
-              fill="none" stroke={INK_06} strokeWidth={RING_STROKE}
+              cx={CX} cy={CY} r={R_OUTER}
+              fill="none" stroke={INK_06} strokeWidth={STROKE_OUTER}
             />
-            {/* Progress */}
+            {/* Outer milestone progress (amber) */}
             <circle
-              cx={RING_SIZE / 2} cy={RING_SIZE / 2} r={RING_R}
-              fill="none" stroke={AMBER} strokeWidth={RING_STROKE}
+              cx={CX} cy={CY} r={R_OUTER}
+              fill="none" stroke={AMBER} strokeWidth={STROKE_OUTER}
               strokeLinecap="round"
-              strokeDasharray={`${ringDash} ${RING_C}`}
-              transform={`rotate(-90 ${RING_SIZE / 2} ${RING_SIZE / 2})`}
+              strokeDasharray={`${outerDash} ${C_OUTER}`}
+              transform={`rotate(-90 ${CX} ${CY})`}
               style={{ transition: 'stroke-dasharray 320ms cubic-bezier(0.22, 0.61, 0.36, 1)' }}
             />
+
+            {/* Inner track */}
+            <circle
+              cx={CX} cy={CY} r={R_INNER}
+              fill="none" stroke={INK_04} strokeWidth={STROKE_INNER}
+            />
+
+            {/* Inner positive form (green, clockwise from 12) */}
+            {isPositiveForm && (
+              <circle
+                cx={CX} cy={CY} r={R_INNER} fill="none"
+                stroke={GREEN} strokeWidth={STROKE_INNER}
+                strokeDasharray={`${innerFillLength} ${C_INNER}`}
+                strokeLinecap="round"
+                transform={`rotate(-90 ${CX} ${CY})`}
+                style={{ transition: 'stroke-dasharray 320ms cubic-bezier(0.22, 0.61, 0.36, 1)' }}
+              />
+            )}
+            {/* Inner negative form (red, counter-clockwise from 12) */}
+            {isNegativeForm && (
+              <g transform={`scale(-1, 1) translate(-${RING_SIZE}, 0)`}>
+                <circle
+                  cx={CX} cy={CY} r={R_INNER} fill="none"
+                  stroke={RED} strokeWidth={STROKE_INNER}
+                  strokeDasharray={`${innerFillLength} ${C_INNER}`}
+                  strokeLinecap="round"
+                  transform={`rotate(-90 ${CX} ${CY})`}
+                  style={{ transition: 'stroke-dasharray 320ms cubic-bezier(0.22, 0.61, 0.36, 1)' }}
+                />
+              </g>
+            )}
+
+            {/* Neutral 12 o'clock tick */}
+            <line
+              x1={CX} y1={CY - R_INNER - STROKE_INNER / 2 - 1}
+              x2={CX} y2={CY - R_INNER + STROKE_INNER / 2 + 1}
+              stroke={INK} strokeWidth={2}
+            />
           </svg>
-          {/* Number centered in ring */}
+
+          {/* Center stack */}
           <div style={{
             position: 'absolute', inset: 0,
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            pointerEvents: 'none',
+            display: 'flex', flexDirection: 'column',
+            alignItems: 'center', justifyContent: 'center',
+            pointerEvents: 'none', gap: 8,
           }}>
             <span style={{
-              fontFamily: 'SF Pro Display, -apple-system, BlinkMacSystemFont, system-ui, sans-serif',
-              fontSize: NUMBER_SIZE, fontWeight: NUMBER_WEIGHT, lineHeight: 1,
+              fontSize: 9, fontWeight: 800, color: INK_55, letterSpacing: '0.22em',
+            }}>
+              YOUR INDEX
+            </span>
+            <span style={{
+              fontFamily: FONT_DISPLAY,
+              fontSize: 80, fontWeight: 400, lineHeight: 0.85,
+              letterSpacing: '-0.04em',
               color: INK,
-              letterSpacing: '-0.025em',
-              transition: 'color 200ms ease',
               fontVariantNumeric: 'proportional-nums lining-nums',
               textAlign: 'center',
               display: 'block',
             }}>
               {scrubValue.toFixed(1)}
             </span>
+            <span style={{
+              fontFamily: FONT_DISPLAY,
+              fontSize: 13, fontWeight: 500,
+              opacity: isScrubbing ? 0 : 1,
+              transition: 'opacity 200ms ease',
+            }}>
+              {formNode}
+            </span>
           </div>
         </div>
       </div>
 
-      {/* Delta row */}
-      <div style={{
-        display: 'flex', justifyContent: 'center', minHeight: 28, marginBottom: 14,
-        opacity: isScrubbing ? 0 : 1,
-        transition: 'opacity 200ms ease',
-      }}>
-        {trendNode}
-      </div>
-
       {/* Sparkline strip */}
-      <div style={{ padding: '0 4px' }}>
+      <div style={{ padding: '0 4px', marginTop: 8 }}>
         <svg
           ref={svgRef}
           width="100%"
@@ -334,6 +407,7 @@ const HeroHandicapCard: React.FC<Props> = ({ connection }) => {
                 strokeWidth={2}
                 strokeLinecap="round"
                 strokeLinejoin="round"
+                vectorEffect="non-scaling-stroke"
                 style={{
                   strokeDasharray: 2000,
                   strokeDashoffset: drawn ? 0 : 2000,
@@ -350,25 +424,13 @@ const HeroHandicapCard: React.FC<Props> = ({ connection }) => {
             />
           )}
 
-          {coords.length === 0 && (
-            <line
-              x1={0} y1={H / 2} x2={W} y2={H / 2}
-              stroke={INK} strokeWidth={1} opacity={0.3}
-            />
-          )}
-
-          {/* Endpoint dot — live mode (no pulse) */}
           {!isScrubbing && coords.length > 0 && (() => {
             const last = coords[coords.length - 1];
             return (
-              <circle
-                cx={last.x} cy={last.y} r={4}
-                fill={AMBER} stroke="#fff" strokeWidth={2}
-              />
+              <circle cx={last.x} cy={last.y} r={4} fill={AMBER} stroke="#fff" strokeWidth={2} />
             );
           })()}
 
-          {/* Scrub crosshair */}
           {isScrubbing && coords[scrubIdx!] && (
             <g>
               <line
@@ -388,20 +450,20 @@ const HeroHandicapCard: React.FC<Props> = ({ connection }) => {
         {/* Timeline */}
         <div style={{
           display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-          marginTop: 8, fontSize: 10, fontWeight: 700, color: INK_MUTE_40,
+          marginTop: 4, fontSize: 9, fontWeight: 700, color: INK_40,
           letterSpacing: '0.12em',
         }}>
           {isScrubbing && scrubPoint ? (
             <>
               <span />
-              <span style={{ color: INK_MUTE }}>{scrubDateLabel(scrubPoint, range)}</span>
+              <span style={{ color: INK_55 }}>{shortDate(scrubPoint)}</span>
               <span />
             </>
           ) : points.length >= 2 ? (
             <>
-              <span>{scrubDateLabel(points[0], range)}</span>
-              <span>{scrubDateLabel(points[Math.floor(points.length / 2)], range)}</span>
-              <span>{scrubDateLabel(points[points.length - 1], range)}</span>
+              <span>{shortMonth(points[0])}</span>
+              <span>{shortMonth(points[Math.floor(points.length / 2)])}</span>
+              <span>{shortMonth(points[points.length - 1])}</span>
             </>
           ) : null}
         </div>
@@ -411,6 +473,15 @@ const HeroHandicapCard: React.FC<Props> = ({ connection }) => {
     </section>
   );
 };
+
+function shortMonth(point: HandicapPoint): string {
+  const d = new Date(point.observed_at);
+  return MONTHS[d.getMonth()];
+}
+function shortDate(point: HandicapPoint): string {
+  const d = new Date(point.observed_at);
+  return `${d.getDate()} ${MONTHS[d.getMonth()]}`;
+}
 
 const keyframes = `
 @keyframes liveDot {
