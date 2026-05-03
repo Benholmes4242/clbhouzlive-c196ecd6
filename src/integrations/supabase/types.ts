@@ -14030,6 +14030,76 @@ export type Database = {
           },
         ]
       }
+      whs_ai_insights: {
+        Row: {
+          connection_id: string
+          generated_at: string
+          generated_from_score_id: string | null
+          scoring_profile: string
+          suited_courses: Json
+          test_courses: Json
+        }
+        Insert: {
+          connection_id: string
+          generated_at?: string
+          generated_from_score_id?: string | null
+          scoring_profile: string
+          suited_courses: Json
+          test_courses: Json
+        }
+        Update: {
+          connection_id?: string
+          generated_at?: string
+          generated_from_score_id?: string | null
+          scoring_profile?: string
+          suited_courses?: Json
+          test_courses?: Json
+        }
+        Relationships: [
+          {
+            foreignKeyName: "whs_ai_insights_connection_id_fkey"
+            columns: ["connection_id"]
+            isOneToOne: true
+            referencedRelation: "whs_connections"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "whs_ai_insights_connection_id_fkey"
+            columns: ["connection_id"]
+            isOneToOne: true
+            referencedRelation: "whs_friend_matches"
+            referencedColumns: ["friend_connection_id"]
+          },
+          {
+            foreignKeyName: "whs_ai_insights_connection_id_fkey"
+            columns: ["connection_id"]
+            isOneToOne: true
+            referencedRelation: "whs_friend_window_rankings"
+            referencedColumns: ["friend_connection_id"]
+          },
+          {
+            foreignKeyName: "whs_ai_insights_connection_id_fkey"
+            columns: ["connection_id"]
+            isOneToOne: true
+            referencedRelation: "whs_invite_status"
+            referencedColumns: ["redeemer_connection_id"]
+          },
+          {
+            foreignKeyName: "whs_ai_insights_generated_from_score_id_fkey"
+            columns: ["generated_from_score_id"]
+            isOneToOne: false
+            referencedRelation: "whs_friend_course_bests"
+            referencedColumns: ["best_score_id"]
+          },
+          {
+            foreignKeyName: "whs_ai_insights_generated_from_score_id_fkey"
+            columns: ["generated_from_score_id"]
+            isOneToOne: false
+            referencedRelation: "whs_scores"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       whs_connections: {
         Row: {
           consecutive_failures: number
