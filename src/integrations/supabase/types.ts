@@ -14035,6 +14035,7 @@ export type Database = {
           connection_id: string
           generated_at: string
           generated_from_score_id: string | null
+          rounds_pattern: string
           scoring_profile: string
           suited_courses: Json
           test_courses: Json
@@ -14043,6 +14044,7 @@ export type Database = {
           connection_id: string
           generated_at?: string
           generated_from_score_id?: string | null
+          rounds_pattern?: string
           scoring_profile: string
           suited_courses: Json
           test_courses: Json
@@ -14051,6 +14053,7 @@ export type Database = {
           connection_id?: string
           generated_at?: string
           generated_from_score_id?: string | null
+          rounds_pattern?: string
           scoring_profile?: string
           suited_courses?: Json
           test_courses?: Json
