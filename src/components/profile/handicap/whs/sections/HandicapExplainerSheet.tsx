@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import { X } from 'lucide-react';
+import { fmtDiff } from '@/lib/whs/format';
 
 const INK = '#0F172A';
 const INK_70 = 'rgba(15,23,42,0.70)';
