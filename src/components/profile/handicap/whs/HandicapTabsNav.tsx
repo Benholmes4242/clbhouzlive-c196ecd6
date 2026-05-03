@@ -15,11 +15,13 @@ const TABS = [
 
 export const HandicapTabsNav: React.FC<Props> = ({ active, onChange }) => {
   return (
-    <SegmentedControl
-      tabs={TABS}
-      activeTab={active}
-      onTabChange={(id) => onChange(id as HandicapSubtab)}
-    />
+    <div className="[&_[role=tablist]]:!border-b-0">
+      <SegmentedControl
+        tabs={TABS}
+        activeTab={active}
+        onTabChange={(id) => onChange(id as HandicapSubtab)}
+      />
+    </div>
   );
 };
 
