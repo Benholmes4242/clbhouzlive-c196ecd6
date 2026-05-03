@@ -101,7 +101,7 @@ function PlayerHeadshot({
     >
       <span
         style={{
-          fontFamily: '"SF Mono", monospace',
+          fontFamily: headlineFont,
           fontSize: initialsFontSize,
           fontWeight: 700,
           color: initialsColor,
