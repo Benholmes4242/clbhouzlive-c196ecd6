@@ -1050,8 +1050,8 @@ function CompactPick({
   positionLabel: string;
 }) {
   const [expanded, setExpanded] = useState(false);
-  const accent = tier === 'STRONG' ? GREEN_DEEP_INK : 'transparent';
-  const accentInk = tier === 'STRONG' ? GREEN_DEEP_INK : SLATE_500;
+  const accent = 'transparent';
+  const accentInk = SLATE_500;
   const tierLabel = tier === 'STRONG' ? 'STRONG CONTENDER' : 'IN CONTENTION';
   const visibleReasons = reasons.filter(Boolean).slice(0, 3);
 
@@ -1567,7 +1567,7 @@ function LiveStateBlock({
             </div>
           </div>
           {(data.tournament.venueName || formatLocation(data.tournament)) && (
-            <div style={{ fontSize: 11, color: SLATE_500, marginTop: 2 }}>
+            <div style={{ fontSize: 11, color: SLATE_500, marginTop: 2, marginBottom: 12 }}>
               {[data.tournament.venueName, formatLocation(data.tournament)].filter(Boolean).join(' · ')}
             </div>
           )}
@@ -1581,7 +1581,7 @@ function LiveStateBlock({
           subtitle={null}
           pulledQuote={heroPick.pulledQuote ?? heroPick.reasons[0] ?? null}
           reasons={heroPick.reasons}
-          defaultExpanded={true}
+          defaultExpanded={false}
           position={formatPosition(heroPick)}
           positionLabel={formatScore(heroPick.score)}
           positionAccent={heroPick.actualPosition === 1 ? 'amber' : 'ink'}
@@ -1687,7 +1687,7 @@ function ResultsStateBlock({
           subtitle={`Final · 1st · Won by ${margin || 'playoff'}`}
           pulledQuote={topPick.pulledQuote ?? topPick.reasons[0] ?? null}
           reasons={topPick.reasons}
-          defaultExpanded={true}
+          defaultExpanded={false}
           position="1"
           positionLabel={formatScore(topPick.score)}
           positionAccent="amber"
@@ -1767,7 +1767,7 @@ function ResultsStateBlock({
           subtitle={`Our #${heroPickResolved.predictedRank} pick · Final ${formatPosition(heroPickResolved)}`}
           pulledQuote={heroPickResolved.pulledQuote ?? heroPickResolved.reasons[0] ?? null}
           reasons={heroPickResolved.reasons}
-          defaultExpanded={true}
+          defaultExpanded={false}
           position={formatPosition(heroPickResolved)}
           positionLabel={formatScore(heroPickResolved.score)}
           positionAccent={heroAccent}
@@ -1921,7 +1921,7 @@ function UpcomingStateBlock({
           subtitle={topContender.courseFitScore ? `Course Fit ${Math.round(topContender.courseFitScore)}` : null}
           pulledQuote={topContender.pulledQuote ?? topContender.reasons[0] ?? null}
           reasons={topContender.reasons}
-          defaultExpanded={true}
+          defaultExpanded={false}
           position="—"
           positionLabel="TO PLAY"
           positionAccent="amber"
