@@ -513,37 +513,39 @@ function LeadSectionHeader({
             />
           </span>
         </button>
-        <div
-          style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: 6,
-            padding: '4px 8px',
-            background: 'transparent',
-            border: `1px solid ${SLATE_150}`,
-            borderRadius: 4,
-          }}
-        >
+        {state !== 'live' && (
           <div
             style={{
-              width: 6,
-              height: 6,
-              borderRadius: '50%',
-              background: dotColor,
-              animation: state === 'live' ? 'intel_liveDot 1.6s ease-in-out infinite' : 'none',
-            }}
-          />
-          <span
-            style={{
-              ...monoLabel,
-              fontSize: 9,
-              color: dotColor,
-              letterSpacing: '0.16em',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 6,
+              padding: '4px 8px',
+              background: 'transparent',
+              border: `1px solid ${SLATE_150}`,
+              borderRadius: 4,
             }}
           >
-            {statusLabel}
-          </span>
-        </div>
+            <div
+              style={{
+                width: 6,
+                height: 6,
+                borderRadius: '50%',
+                background: dotColor,
+                animation: 'none',
+              }}
+            />
+            <span
+              style={{
+                ...monoLabel,
+                fontSize: 9,
+                color: dotColor,
+                letterSpacing: '0.16em',
+              }}
+            >
+              {statusLabel}
+            </span>
+          </div>
+        )}
       </div>
 
       {/* Section title — Geist 700 (project memory: no serifs) */}
