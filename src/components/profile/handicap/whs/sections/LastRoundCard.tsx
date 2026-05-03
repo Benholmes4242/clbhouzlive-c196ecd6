@@ -156,11 +156,11 @@ export const LastRoundCard: React.FC<Props> = ({ connectionId }) => {
               style={{
                 fontFamily: FONT_SERIF,
                 fontSize: 19,
-                fontWeight: 700,
+                fontWeight: 400,
                 color: '#fff',
                 lineHeight: 1.15,
                 margin: 0,
-                textShadow: '0 1px 2px rgba(0,0,0,0.35)',
+                textShadow: '0 1px 6px rgba(0,0,0,0.5)',
               }}
             >
               {lastRound.course?.name ?? 'Unknown course'}
