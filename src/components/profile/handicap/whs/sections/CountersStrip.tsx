@@ -341,7 +341,7 @@ export const CountersStrip: React.FC<Props> = ({ connectionId }) => {
                 fontWeight: isSelected ? 800 : 700,
                 color: isSelected ? INK : INK_55,
                 letterSpacing: 0.2,
-                tabularNums: 'tabular-nums' as any,
+                fontVariantNumeric: 'tabular-nums',
               }}
             >
               {fmtShortDay(c.play_date)}
