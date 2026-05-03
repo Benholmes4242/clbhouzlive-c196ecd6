@@ -1551,7 +1551,7 @@ function LiveStateBlock({
               />
               <span
                 style={{
-                  fontSize: 11,
+                  fontSize: 10,
                   fontWeight: 600,
                   color: GREEN_LIGHT,
                 }}
