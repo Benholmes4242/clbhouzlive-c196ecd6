@@ -1342,7 +1342,7 @@ function TrackRecordPanel({
         }}
       >
         <Award size={10} strokeWidth={2.5} />
-        Why trust us
+        Backed by results
       </div>
       <div
         style={{
