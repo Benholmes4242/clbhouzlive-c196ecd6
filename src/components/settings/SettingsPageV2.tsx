@@ -401,6 +401,12 @@ export function SettingsPageV2() {
       <ReportProblemSheet open={sheets.report} onClose={() => close('report')} userId={user?.id} />
       <ContactSupportSheet open={sheets.contact} onClose={() => close('contact')} />
       <LegalSheet open={sheets.legal} onClose={() => close('legal')} />
+      <WhsConnectionSheet
+        open={whsSheetOpen}
+        onClose={() => setWhsSheetOpen(false)}
+        connection={whsConnection}
+        userId={user?.id}
+      />
 
       {/* Creator dialogs */}
       <AlertDialog open={creator.showEnableConfirm} onOpenChange={creator.setShowEnableConfirm}>
