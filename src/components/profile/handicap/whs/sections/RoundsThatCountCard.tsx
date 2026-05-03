@@ -2,7 +2,7 @@ import React, { useMemo, useState } from 'react';
 import { ChevronRight, ArrowDown, ArrowUp, HelpCircle } from 'lucide-react';
 import { useCounters } from '@/lib/whs/hooks';
 import { useHandicapInsights } from '@/lib/whs/insights/useHandicapInsights';
-import { fmtDiff } from '@/lib/whs/format';
+import { fmtDiff, fmtAxis } from '@/lib/whs/format';
 import HandicapExplainerSheet from './HandicapExplainerSheet';
 
 interface Props {
