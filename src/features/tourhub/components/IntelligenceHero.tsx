@@ -1253,25 +1253,15 @@ function TournamentWinnerCard({
         Tournament Winner
       </div>
       <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-        <div
-          style={{
-            width: 36,
-            height: 36,
-            borderRadius: 9,
-            background: SLATE_100,
-            border: `1px solid ${SLATE_150}`,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            fontFamily: '"SF Mono", monospace',
-            fontSize: 11,
-            fontWeight: 700,
-            color: SLATE_700,
-            flexShrink: 0,
-          }}
-        >
-          {initials}
-        </div>
+        <PlayerHeadshot
+          name={name}
+          size={36}
+          radius={9}
+          bg={SLATE_100}
+          border={`1px solid ${SLATE_150}`}
+          initialsColor={SLATE_700}
+          initialsFontSize={11}
+        />
         <div style={{ flex: 1, minWidth: 0 }}>
           <div
             style={{
