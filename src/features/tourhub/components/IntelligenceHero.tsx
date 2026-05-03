@@ -1588,7 +1588,7 @@ function LiveStateBlock({
       {supporting.length > 0 && (
         <>
           <SupportingLabel />
-          <div style={{ borderTop: `1px solid ${SLATE_150}` }}>
+          <div>
             {supporting.map((p, i) => (
               <CompactPick
                 key={p.playerId}
@@ -1693,7 +1693,7 @@ function ResultsStateBlock({
         {supporting.length > 0 && (
           <>
             <SupportingLabel />
-            <div style={{ borderTop: `1px solid ${SLATE_150}` }}>
+            <div>
               {supporting.map((p, i) => (
                 <CompactPick
                   key={p.playerId}
@@ -1773,7 +1773,7 @@ function ResultsStateBlock({
       {supporting.length > 0 && (
         <>
           <SupportingLabel />
-          <div style={{ borderTop: `1px solid ${SLATE_150}` }}>
+          <div>
             {supporting.map((p, i) => (
               <CompactPick
                 key={p.playerId}
@@ -1927,7 +1927,7 @@ function UpcomingStateBlock({
       {supporting.length > 0 && (
         <>
           <SupportingLabel />
-          <div style={{ borderTop: `1px solid ${SLATE_150}` }}>
+          <div>
             {supporting.map((p, i) => (
               <CompactPick
                 key={p.playerId}
