@@ -566,7 +566,7 @@ function LeadSectionHeader({
           marginBottom: 6,
         }}
       >
-        Tournament picks, signed and dated.
+        Tournament picks, backed by results.
       </h2>
 
       {/* Explainer line */}
