@@ -276,6 +276,7 @@ const HeroHandicapCard: React.FC<Props> = ({ connection }) => {
           <div style={{
             position: 'absolute', inset: 0,
             display: 'flex', alignItems: 'center', justifyContent: 'center',
+            pointerEvents: 'none',
           }}>
             <span style={{
               fontFamily: 'SF Pro Display, -apple-system, BlinkMacSystemFont, system-ui, sans-serif',
@@ -283,7 +284,9 @@ const HeroHandicapCard: React.FC<Props> = ({ connection }) => {
               color: isScrubbing ? INK : AMBER,
               letterSpacing: '-0.025em',
               transition: 'color 200ms ease',
-              fontVariantNumeric: 'tabular-nums lining-nums',
+              fontVariantNumeric: 'proportional-nums lining-nums',
+              textAlign: 'center',
+              display: 'block',
             }}>
               {scrubValue.toFixed(1)}
             </span>
