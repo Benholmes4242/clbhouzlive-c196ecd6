@@ -99,16 +99,18 @@ function PlayerHeadshot({
         flexShrink: 0,
       }}
     >
-      <span
-        style={{
-          fontFamily: headlineFont,
-          fontSize: initialsFontSize,
-          fontWeight: 700,
-          color: initialsColor,
-        }}
-      >
-        {initials}
-      </span>
+      {failed && (
+        <span
+          style={{
+            fontFamily: headlineFont,
+            fontSize: initialsFontSize,
+            fontWeight: 700,
+            color: initialsColor,
+          }}
+        >
+          {initials}
+        </span>
+      )}
       {!failed && (
         <img
           src={src}
