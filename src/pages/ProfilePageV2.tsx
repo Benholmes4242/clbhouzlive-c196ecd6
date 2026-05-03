@@ -206,7 +206,7 @@ const ProfilePageV2Content: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const initialTab = useMemo(() => {
     const tabParam = searchParams.get('tab');
-    const validTabs = ['activity', 'courses', 'top100', 'handicap', 'achievements', 'stats'];
+    const validTabs = ['activity', 'courses', 'top100', 'handicap', 'stats'];
     return tabParam && validTabs.includes(tabParam) ? tabParam : 'activity';
   }, []);
   
@@ -1106,15 +1106,7 @@ const ProfilePageV2Content: React.FC = () => {
           isSelf={isSelf}
         />
 
-        {/* Achievements Rail */}
-        {isPersonal && profile?.id && username && (
-          <ProfileAchievementsRail
-            userId={profile.id}
-            username={username}
-            isOwnProfile={isSelf}
-            className="mb-4"
-          />
-        )}
+        {/* Achievements Rail removed */}
 
         {/* Creator Section */}
         {isPersonal && profileUserId && (

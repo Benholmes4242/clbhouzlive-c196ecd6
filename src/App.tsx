@@ -316,7 +316,7 @@ function AppRoutes() {
         <Route path="/profile/handicap" element={<Suspense fallback={<ProfileSkeleton />}><ProfileHandicapView /></Suspense>} />
         <Route path="/profile/quest" element={<Suspense fallback={<ProfileSkeleton />}><ProfileQuestView /></Suspense>} />
         <Route path="/profile/quest/index" element={<Suspense fallback={<ProfileSkeleton />}><QuestIndexView /></Suspense>} />
-        <Route path="/profile/quest/replay" element={<Navigate to="/achievements" replace />} />
+        <Route path="/profile/quest/replay" element={<Navigate to="/profile" replace />} />
         <Route path="/edit-profile" element={<Suspense fallback={<ProfileSkeleton />}><EditProfilePage /></Suspense>} />
         <Route path="/quick-edit-profile" element={<Suspense fallback={<ProfileSkeleton />}><QuickEditProfilePage /></Suspense>} />
         
@@ -399,9 +399,9 @@ function AppRoutes() {
         <Route path="/top100/journey" element={<Suspense fallback={<CoursesListSkeleton />}><Top100JourneyPage /></Suspense>} />
         <Route path="/top100/network" element={<Suspense fallback={<CoursesListSkeleton />}><Top100NetworkPage /></Suspense>} />
         <Route path="/top100/:slug" element={<Suspense fallback={<CoursesListSkeleton />}><Top100List /></Suspense>} />
-        <Route path="/achievementshub" element={<Suspense fallback={<AchievementsSkeleton />}><AchievementsHubPage /></Suspense>} />
-        <Route path="/achievements" element={<Suspense fallback={<AchievementsSkeleton />}><AchievementsPage /></Suspense>} />
-        <Route path="/achievements/:userId" element={<Suspense fallback={<AchievementsSkeleton />}><AchievementsPage /></Suspense>} />
+        <Route path="/achievementshub" element={<Navigate to="/profile" replace />} />
+        <Route path="/achievements" element={<Navigate to="/profile" replace />} />
+        <Route path="/achievements/:userId" element={<Navigate to="/profile" replace />} />
         <Route path="/admin-setup" element={<Suspense fallback={<GenericPageSkeleton />}><AdminSetupPage /></Suspense>} />
         
         {/* Old /admin routes removed — redirected to admin-v2 */}
