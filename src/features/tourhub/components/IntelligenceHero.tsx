@@ -1557,10 +1557,6 @@ function LiveStateBlock({
                 display: 'inline-flex',
                 alignItems: 'center',
                 gap: 6,
-                padding: '4px 8px',
-                background: 'transparent',
-                border: `1px solid ${SLATE_150}`,
-                borderRadius: 4,
                 flexShrink: 0,
               }}
             >
@@ -1575,10 +1571,9 @@ function LiveStateBlock({
               />
               <span
                 style={{
-                  ...monoLabel,
-                  fontSize: 9,
+                  fontSize: 12,
+                  fontWeight: 600,
                   color: GREEN_LIGHT,
-                  letterSpacing: '0.16em',
                 }}
               >
                 {`LIVE · ROUND ${currentRound}`}
