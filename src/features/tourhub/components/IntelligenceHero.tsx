@@ -955,7 +955,7 @@ function HeroPick({
       >
         <div style={{ padding: '0 0 16px 0' }}>
           {pulledQuote && (
-            <div style={{ position: 'relative', paddingLeft: 24, marginBottom: 12 }}>
+            <div style={{ position: 'relative', paddingLeft: 24, paddingRight: 24, marginBottom: 12 }}>
               <Quote
                 size={16}
                 color={AMBER_ACCENT}
@@ -976,6 +976,13 @@ function HeroPick({
               >
                 {pulledQuote}
               </div>
+              <Quote
+                size={16}
+                color={AMBER_ACCENT}
+                fill={AMBER_ACCENT}
+                strokeWidth={0}
+                style={{ position: 'absolute', right: 0, bottom: -4 }}
+              />
             </div>
           )}
 
