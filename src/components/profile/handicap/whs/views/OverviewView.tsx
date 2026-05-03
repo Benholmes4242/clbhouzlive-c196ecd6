@@ -1,9 +1,8 @@
 import React from 'react';
 import HeadToHeadCard from '../sections/HeadToHeadCard';
 import AchievementsStrip from '../sections/AchievementsStrip';
-import PredictionsCard from '../sections/PredictionsCard';
 import LastRoundCard from '../sections/LastRoundCard';
-import CountersStrip from '../sections/CountersStrip';
+import RoundsThatCountCard from '../sections/RoundsThatCountCard';
 import EchoInsightsCard from '../sections/EchoInsightsCard';
 
 interface Props {
@@ -26,14 +25,13 @@ export const OverviewView: React.FC<Props> = ({
       aria-labelledby="handicap-tab-overview"
     >
       <LastRoundCard connectionId={connectionId} />
-      <PredictionsCard connectionId={connectionId} currentHandicap={currentHandicap} />
-      <CountersStrip connectionId={connectionId} />
+      <RoundsThatCountCard connectionId={connectionId} currentHandicap={currentHandicap} />
+      <EchoInsightsCard connectionId={connectionId} />
+      <HeadToHeadCard ownerUserId={userId} currentUserHandicap={currentHandicap} />
       <AchievementsStrip
         connectionId={connectionId}
         connectionCreatedAt={connectionCreatedAt}
       />
-      <HeadToHeadCard ownerUserId={userId} currentUserHandicap={currentHandicap} />
-      <EchoInsightsCard connectionId={connectionId} />
     </div>
   );
 };
