@@ -29,7 +29,7 @@ import {
   type IntelligenceOutcome,
 } from '../hooks/useIntelligenceHistoricalPicks';
 
-const GREEN_DEEP = '#073D2A';
+const AMBER_DEEP = '#B85F00';
 const GREEN_ACCENT = '#2DBB78';
 const AMBER = '#F7931E';
 const SLATE_900 = '#0F172A';
@@ -137,7 +137,7 @@ export function IntelligenceAllPicksSheet({ open, onClose }: IntelligenceAllPick
                 flexShrink: 0,
               }}
             >
-              <Brain size={15} color={GREEN_DEEP} strokeWidth={2.8} />
+              <Brain size={15} color={AMBER_DEEP} strokeWidth={2.8} />
             </div>
             <h2
               id="intelligence-all-picks-title"
@@ -204,9 +204,9 @@ export function IntelligenceAllPicksSheet({ open, onClose }: IntelligenceAllPick
                 style={{
                   padding: '6px 12px',
                   borderRadius: 999,
-                  border: active ? `1px solid ${GREEN_DEEP}` : `1px solid ${SLATE_200}`,
-                  background: active ? 'rgba(10, 90, 60, 0.08)' : '#ffffff',
-                  color: active ? GREEN_DEEP : SLATE_500,
+                  border: active ? `1px solid ${AMBER_DEEP}` : `1px solid ${SLATE_200}`,
+                  background: active ? 'rgba(184,95,0,0.08)' : '#ffffff',
+                  color: active ? AMBER_DEEP : SLATE_500,
                   fontSize: 12,
                   fontWeight: 700,
                   letterSpacing: '-0.05px',
@@ -475,7 +475,7 @@ function EmptyState({ onClose }: { onClose: () => void }) {
           boxShadow: '0 4px 18px rgba(247,147,30,0.35)',
         }}
       >
-        <Brain size={26} color={GREEN_DEEP} strokeWidth={2.8} />
+        <Brain size={26} color={AMBER_DEEP} strokeWidth={2.8} />
       </div>
       <h3
         style={{
