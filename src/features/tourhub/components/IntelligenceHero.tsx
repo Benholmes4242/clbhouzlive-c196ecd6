@@ -480,43 +480,35 @@ function LeadSectionHeader({
         <button
           type="button"
           onClick={onInfoTap}
-          aria-label="About clbhouz Intelligence"
+          aria-label="About Tournament Intelligence"
           style={{
             display: 'flex',
             alignItems: 'center',
-            gap: 10,
+            gap: 6,
             background: 'transparent',
             border: 'none',
             padding: 0,
             cursor: 'pointer',
           }}
         >
-          <div
-            style={{
-              width: 3,
-              height: 14,
-              background: AMBER_ACCENT,
-              borderRadius: 2,
-              flexShrink: 0,
-            }}
-          />
           <span
             style={{
-              fontSize: 11,
-              fontWeight: 900,
-              color: AMBER_ACCENT,
-              letterSpacing: '0.16em',
-              textTransform: 'uppercase',
+              fontFamily: headlineFont,
+              fontSize: 24,
+              fontWeight: 700,
+              color: AMBER_DEEP,
+              letterSpacing: '-0.025em',
+              lineHeight: 1.1,
               display: 'flex',
               alignItems: 'center',
-              gap: 5,
+              gap: 6,
             }}
           >
-            clbhouz Intelligence
+            Tournament Intelligence
             <Sparkles
-              size={11}
-              color={AMBER_ACCENT}
-              fill={AMBER_ACCENT}
+              size={18}
+              color={AMBER_DEEP}
+              fill={AMBER_DEEP}
               strokeWidth={2}
               style={{ marginLeft: 1 }}
             />
@@ -582,7 +574,7 @@ function LeadSectionHeader({
           maxWidth: 480,
         }}
       >
-        Our in-house AI picks three players each tournament — using form, course fit, weather, and news.
+        Our in-house AI picks three players each PGA tournament — using latest form & player statistics, course fit, weather, news and historical data.
       </p>
     </div>
   );
@@ -918,7 +910,7 @@ function HeroPick({
         </div>
 
         {!expanded && pulledQuote && (
-          <div style={{ position: 'relative', paddingLeft: 24, paddingTop: 14 }}>
+          <div style={{ position: 'relative', paddingLeft: 24, paddingRight: 24, paddingTop: 14 }}>
             <Quote
               size={16}
               color={AMBER_ACCENT}
@@ -942,6 +934,13 @@ function HeroPick({
             >
               {pulledQuote}
             </div>
+            <Quote
+              size={16}
+              color={AMBER_ACCENT}
+              fill={AMBER_ACCENT}
+              strokeWidth={0}
+              style={{ position: 'absolute', right: 0, bottom: 0 }}
+            />
           </div>
         )}
       </button>
@@ -956,7 +955,7 @@ function HeroPick({
       >
         <div style={{ padding: '0 0 16px 0' }}>
           {pulledQuote && (
-            <div style={{ position: 'relative', paddingLeft: 24, marginBottom: 12 }}>
+            <div style={{ position: 'relative', paddingLeft: 24, paddingRight: 24, marginBottom: 12 }}>
               <Quote
                 size={16}
                 color={AMBER_ACCENT}
@@ -977,6 +976,13 @@ function HeroPick({
               >
                 {pulledQuote}
               </div>
+              <Quote
+                size={16}
+                color={AMBER_ACCENT}
+                fill={AMBER_ACCENT}
+                strokeWidth={0}
+                style={{ position: 'absolute', right: 0, bottom: -4 }}
+              />
             </div>
           )}
 
@@ -1088,17 +1094,6 @@ function CompactPick({
           initialsFontSize={12}
         />
         <div style={{ flex: 1, minWidth: 0 }}>
-          <div
-            style={{
-              ...monoLabel,
-              fontSize: 8,
-              color: accentInk,
-              letterSpacing: '0.18em',
-              marginBottom: 2,
-            }}
-          >
-            {tierLabel}
-          </div>
           <div
             style={{
               fontFamily: headlineFont,
@@ -1347,7 +1342,7 @@ function TrackRecordPanel({
         }}
       >
         <Award size={10} strokeWidth={2.5} />
-        Why trust us
+        Backed by results
       </div>
       <div
         style={{
@@ -1543,18 +1538,22 @@ function LiveStateBlock({
     <div>
       <FramingSentence text={framingSentence} />
       <EditorialHeadline>{headlineNode}</EditorialHeadline>
-      <ContextLine>
-        {`OUR #${topPickPreRank} PICK · NOW ${topPickLivePos} · ${numInTop5} IN T5 · ROUND ${currentRound}`}
-      </ContextLine>
       {data?.tournament?.name && (
-        <TournamentLabel>{data.tournament.name}</TournamentLabel>
+        <TournamentLabel>
+          {data.tournament.name}
+          {(data.tournament.venueName || formatLocation(data.tournament)) && (
+            <div style={{ fontSize: 11, color: SLATE_500, marginTop: 2 }}>
+              {[data.tournament.venueName, formatLocation(data.tournament)].filter(Boolean).join(' · ')}
+            </div>
+          )}
+        </TournamentLabel>
       )}
 
       {heroPick && (
         <HeroPick
           initials={getInitials(heroPick.playerName)}
           name={heroPick.playerName}
-          subtitle={`Our #${heroPick.predictedRank} pick · Now ${formatPosition(heroPick)} · Round ${heroPick.currentRound ?? currentRound}${heroPick.thru != null ? ` · Thru ${heroPick.thru}` : ''}`}
+          subtitle={null}
           pulledQuote={heroPick.pulledQuote ?? heroPick.reasons[0] ?? null}
           reasons={heroPick.reasons}
           defaultExpanded={true}
