@@ -520,3 +520,21 @@ export async function fetchFriendWindowRankings(
   return (data as unknown as WhsFriendWindowRanking[]) ?? [];
 }
 
+export async function callDisconnectWhs(): Promise<{ ok: boolean; message?: string; error?: string }> {
+  const headers = await authHeaders();
+  const res = await fetch(`${SUPABASE_URL}/functions/v1/disconnect-whs`, {
+    method: 'POST',
+    headers,
+  });
+  try { return await res.json(); } catch { return { ok: false, error: 'Unexpected response' }; }
+}
+
+export async function callDeleteWhsData(): Promise<{ ok: boolean; message?: string; error?: string }> {
+  const headers = await authHeaders();
+  const res = await fetch(`${SUPABASE_URL}/functions/v1/delete-whs-data`, {
+    method: 'POST',
+    headers,
+  });
+  try { return await res.json(); } catch { return { ok: false, error: 'Unexpected response' }; }
+}
+
