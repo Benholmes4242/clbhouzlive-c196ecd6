@@ -49,7 +49,7 @@ function renderBoldMarkdown(text: string): React.ReactNode {
     i % 2 === 1
       ? (
         <strong key={i} style={{
-          fontFamily: FONT_DISPLAY, fontWeight: 700, color: INK,
+          fontFamily: FONT_DISPLAY, fontWeight: 600, color: INK,
           fontVariantNumeric: 'tabular-nums',
         }}>
           {part}
