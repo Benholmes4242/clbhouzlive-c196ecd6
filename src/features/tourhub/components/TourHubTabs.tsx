@@ -58,7 +58,7 @@ export function TourHubTabs({ activeTab, onTabChange, className }: TourHubTabsPr
                   right: 0,
                   height: 2.5,
                   borderRadius: 2,
-                  background: 'linear-gradient(90deg, #F59E0B, #F7931E)',
+                  background: 'linear-gradient(90deg, #D97706, #F7931E)',
                 }} />
               )}
             </button>
@@ -122,7 +122,7 @@ export function TournamentDetailTabs({ activeTab, onTabChange, className }: Tour
                   right: 0,
                   height: 2.5,
                   borderRadius: 2,
-                  background: 'linear-gradient(90deg, #F59E0B, #F7931E)',
+                  background: 'linear-gradient(90deg, #D97706, #F7931E)',
                 }} />
               )}
             </button>

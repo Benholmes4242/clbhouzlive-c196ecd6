@@ -31,7 +31,7 @@ export function getReasonIcon(reasonText: string): ReasonIconResult {
     return { icon: 'MapPin', color: '#16A34A' };
   }
   if (FORM_KEYWORDS.some(k => lower.includes(k))) {
-    return { icon: 'Flame', color: '#F59E0B' };
+    return { icon: 'Flame', color: '#D97706' };
   }
 
   return { icon: 'Sparkles', color: '#6B7280' };

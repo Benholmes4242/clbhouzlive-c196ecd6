@@ -625,7 +625,7 @@ export function ScheduleTab() {
             >
               <Search
                 className="w-[15px] h-[15px] transition-colors duration-150"
-                style={{ color: searchExpanded ? '#F59E0B' : undefined }}
+                style={{ color: searchExpanded ? '#D97706' : undefined }}
                 strokeWidth={2.5}
               />
             </button>
@@ -639,7 +639,7 @@ export function ScheduleTab() {
             >
               {activeTour !== 'all' && hasTourLogo(activeTour.toLowerCase())
                 ? <img src={getTourLogo(activeTour.toLowerCase())} alt={activeTour} className="shrink-0" style={{ width: 16, height: 16, objectFit: 'contain' }} />
-                : <Globe className="w-[12px] h-[12px] shrink-0" style={{ color: '#F59E0B' }} strokeWidth={2.5} />
+                : <Globe className="w-[12px] h-[12px] shrink-0" style={{ color: '#D97706' }} strokeWidth={2.5} />
               }
               <span className="text-[12px] font-semibold text-foreground">
                 {activeTour === 'all' ? 'All Tours' : (getTourMeta(activeTour)?.short ?? activeTour)}

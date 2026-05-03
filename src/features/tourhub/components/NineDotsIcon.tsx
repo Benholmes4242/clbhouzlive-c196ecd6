@@ -12,7 +12,7 @@ interface NineDotsIconProps {
 }
 
 // Clbhouz brand orange - matches CLBHOUZ_ORANGE constant
-const BRAND_ORANGE = '#F59E0B';
+const BRAND_ORANGE = '#D97706';
 
 export function NineDotsIcon({ className, size = 20 }: NineDotsIconProps) {
   const squircleSize = 4.2;

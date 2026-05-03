@@ -29,7 +29,7 @@ import {
   type IntelligenceOutcome,
 } from '../hooks/useIntelligenceHistoricalPicks';
 
-const AMBER_DEEP = '#B85F00';
+const AMBER_DEEP = '#D97706';
 const GREEN_ACCENT = '#2DBB78';
 const AMBER = '#F7931E';
 const SLATE_900 = '#0F172A';
