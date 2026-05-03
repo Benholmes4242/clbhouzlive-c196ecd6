@@ -19252,6 +19252,7 @@ export type Database = {
         Returns: string
       }
       vault_decrypt_secret: { Args: { secret_id: string }; Returns: string }
+      vault_delete_secret: { Args: { secret_id: string }; Returns: undefined }
       verify_domain_code: {
         Args: { p_code: string; p_verification_id: string }
         Returns: Json
