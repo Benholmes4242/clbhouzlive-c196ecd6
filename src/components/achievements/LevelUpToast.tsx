@@ -58,7 +58,7 @@ export const LevelUpToast: React.FC<LevelUpToastProps> = ({
   };
 
   const handleViewJourney = () => {
-    navigate('/achievements');
+    navigate('/profile');
     setIsVisible(false);
     setTimeout(onDismiss, 300);
   };

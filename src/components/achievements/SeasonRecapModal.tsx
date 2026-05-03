@@ -49,7 +49,7 @@ export const SeasonRecapModal: React.FC<SeasonRecapModalProps> = ({
 
   const handleViewTrophies = () => {
     onClose();
-    navigate('/achievements#trophies');
+    navigate('/profile');
   };
 
   return (

@@ -44,7 +44,7 @@ export const AchievementToast: React.FC<AchievementToastProps> = ({
 
   const handleViewAll = () => {
     onDismiss();
-    navigate('/achievements');
+    navigate('/profile');
   };
 
   const handleShare = () => {

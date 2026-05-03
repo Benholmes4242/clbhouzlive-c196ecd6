@@ -19,7 +19,7 @@ export const NewSeasonBanner: React.FC = () => {
   return (
     <button
       onClick={() => {
-        navigate('/achievements#season-pass');
+        navigate('/profile');
       }}
       className="w-full bg-gradient-to-r from-primary/10 via-primary/5 to-primary/10 border border-primary/20 rounded-xl p-4 mb-6 hover:from-primary/15 hover:via-primary/10 hover:to-primary/15 transition-all group"
     >

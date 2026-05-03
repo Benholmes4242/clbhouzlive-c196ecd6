@@ -47,7 +47,7 @@ export const SeasonStatusCard: React.FC<SeasonStatusCardProps> = ({ userId }) =>
       <Button
         variant="outline"
         size="sm"
-        onClick={() => navigate('/achievements')}
+        onClick={() => navigate('/profile')}
         className="w-full"
       >
         View Season Hub

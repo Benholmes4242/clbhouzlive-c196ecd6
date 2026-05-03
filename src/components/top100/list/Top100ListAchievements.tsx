@@ -28,7 +28,7 @@ export const Top100ListAchievements: React.FC<Top100ListAchievementsProps> = ({
           Achievements tied to this list
         </h2>
         <button
-          onClick={() => navigate('/achievements')}
+          onClick={() => navigate('/profile')}
           className="text-[12px] font-medium text-slate-700 hover:text-slate-900 transition-colors"
         >
           See all →
