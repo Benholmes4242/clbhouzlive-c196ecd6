@@ -1,9 +1,10 @@
-import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState } from 'react';
 import { useFriendsActivity } from '@/lib/whs/hooks';
 import SectionHeader from '../SectionHeader';
 import Paged8 from '../_shared/Paged8';
 import FriendRoundCard from './FriendRoundCard';
+import FriendRoundSheet from './FriendRoundSheet';
+import type { WhsFriendActivityWithImage } from '@/lib/whs/types';
 
 interface Props {
   ownerUserId: string;
@@ -12,8 +13,9 @@ interface Props {
 const INK_MUTE = 'rgba(15,23,42,0.55)';
 
 export const RecentlyPlayedFeed: React.FC<Props> = ({ ownerUserId }) => {
-  const navigate = useNavigate();
   const { data, isLoading } = useFriendsActivity(ownerUserId);
+  const [sheetActivity, setSheetActivity] =
+    useState<WhsFriendActivityWithImage | null>(null);
 
   // Each item must satisfy { id: string } for Paged8
   const items = (data ?? []).map((d) => ({
@@ -67,15 +69,17 @@ export const RecentlyPlayedFeed: React.FC<Props> = ({ ownerUserId }) => {
           renderItem={(item) => (
             <FriendRoundCard
               activity={item}
-              onClick={() => {
-                if (item.is_clbhouz_user && item.friend_user_id) {
-                  navigate(`/p/${item.friend_user_id}`);
-                }
-              }}
+              onClick={() => setSheetActivity(item)}
             />
           )}
         />
       )}
+
+      <FriendRoundSheet
+        activity={sheetActivity}
+        open={!!sheetActivity}
+        onClose={() => setSheetActivity(null)}
+      />
     </section>
   );
 };

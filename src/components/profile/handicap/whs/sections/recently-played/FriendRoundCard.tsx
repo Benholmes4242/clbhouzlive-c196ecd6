@@ -90,36 +90,28 @@ const Stat: React.FC<{
 );
 
 export const FriendRoundCard: React.FC<Props> = ({ activity, onClick }) => {
-  const isClickable = activity.is_clbhouz_user && !!activity.friend_user_id;
+  const isClickable = true;
   const diff = activity.last_round_differential;
 
   return (
     <div
-      onClick={isClickable ? onClick : undefined}
-      role={isClickable ? 'button' : undefined}
-      tabIndex={isClickable ? 0 : undefined}
-      aria-label={
-        isClickable
-          ? `View ${firstName(activity.friend_name)}'s profile — round at ${activity.last_round_course_name ?? 'a course'}`
-          : undefined
-      }
-      onKeyDown={
-        isClickable
-          ? (e) => {
-              if (e.key === 'Enter' || e.key === ' ') {
-                e.preventDefault();
-                onClick();
-              }
-            }
-          : undefined
-      }
+      onClick={onClick}
+      role="button"
+      tabIndex={0}
+      aria-label={`Open ${firstName(activity.friend_name)}'s round at ${activity.last_round_course_name ?? 'a course'}`}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          onClick();
+        }
+      }}
       style={{
         margin: '0 20px 12px',
         background: '#FFFFFF',
         border: `1px solid ${T.hairline}`,
         borderRadius: 16,
         overflow: 'hidden',
-        cursor: isClickable ? 'pointer' : 'default',
+        cursor: 'pointer',
         transition: 'transform 200ms ease, box-shadow 200ms ease',
       }}
     >

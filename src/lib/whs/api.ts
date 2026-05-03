@@ -286,6 +286,7 @@ export async function fetchFriendsActivity(
       friend_name: f.friend_name,
       friend_thumbnail_url: f.friend_thumbnail_url,
       friend_user_id: f.friend_user_id,
+      friend_connection_id: f.friend_connection_id,
       is_clbhouz_user: !!f.is_clbhouz_user,
       last_round_played_at: f.last_round_played_at,
       last_round_course_name: f.last_round_course_name,
@@ -465,6 +466,46 @@ export async function fetchLastRoundDetail(
     course_header_image: courseHeaderImage,
     course_thumbnail_image: courseThumbnailImage,
     holes,
+  };
+}
+
+// ─── Friend round detail (Phase 1.6) ──────────────────────────────────
+export async function fetchFriendRoundDetail(
+  scoreId: string,
+): Promise<{
+  hole_by_hole_fetched: boolean;
+  is_nine_hole: boolean;
+  holes: WhsScoreHole[];
+} | null> {
+  const { data: score, error } = await supabase
+    .from('whs_scores' as any)
+    .select('id, hole_by_hole_fetched, is_nine_hole')
+    .eq('id', scoreId)
+    .maybeSingle();
+  if (error) throw error;
+  if (!score) return null;
+  const s = score as any;
+
+  if (!s.hole_by_hole_fetched) {
+    return {
+      hole_by_hole_fetched: false,
+      is_nine_hole: !!s.is_nine_hole,
+      holes: [],
+    };
+  }
+
+  const { data: holes, error: holesErr } = await supabase
+    .from('whs_score_holes' as any)
+    .select(
+      'hole_no, par, actual_gross, adjusted_gross, distance_yards, stroke_index, played, hole_alias',
+    )
+    .eq('score_id', s.id)
+    .order('hole_no', { ascending: true });
+  if (holesErr) throw holesErr;
+  return {
+    hole_by_hole_fetched: true,
+    is_nine_hole: !!s.is_nine_hole,
+    holes: ((holes as any[]) ?? []) as WhsScoreHole[],
   };
 }
 
