@@ -130,7 +130,7 @@ export const HandicapDashboard: React.FC<Props> = ({ connection, userId }) => {
       {/* PERSISTENT — hero, always visible */}
       <HeroHandicapCard connection={connection} />
 
-      <div className="h-px mx-5 mb-5" style={{ background: 'rgba(15,23,42,0.08)' }} />
+      
 
       {/* PERSISTENT — sticky sub-tabs */}
       <HandicapTabsNav active={activeSubtab} onChange={handleSubtabChange} />
