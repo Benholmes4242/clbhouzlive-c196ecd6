@@ -988,14 +988,7 @@ function HeroPick({
           )}
 
           {visibleReasons.length > 0 && (
-            <div
-              style={{
-                background: '#FFFFFF',
-                borderRadius: 8,
-                borderLeft: `2px solid ${AMBER_ACCENT}`,
-                padding: '10px 12px',
-              }}
-            >
+            <div style={{ padding: '2px 0 0 0' }}>
               {visibleReasons.map((r, i, arr) => (
                 <div
                   key={i}
