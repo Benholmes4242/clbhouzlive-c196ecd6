@@ -436,21 +436,12 @@ export async function fetchLastRoundDetail(
 
   const r = round as any;
 
-  // Course image join — best-effort name match against golf_courses
+  // Course image join — robust name normalization
   let courseHeaderImage: string | null = null;
   let courseThumbnailImage: string | null = null;
   if (r.course?.name) {
-    const { data: gc } = await supabase
-      .from('golf_courses')
-      .select('thumbnail_image')
-      .ilike('name', r.course.name)
-      .limit(1)
-      .maybeSingle();
-    if (gc) {
-      // golf_courses currently exposes only thumbnail_image; reuse it as hero source
-      courseThumbnailImage = (gc as any).thumbnail_image ?? null;
-      courseHeaderImage = courseThumbnailImage;
-    }
+    courseThumbnailImage = await lookupCourseThumbnail(r.course.name);
+    courseHeaderImage = courseThumbnailImage;
   }
 
   let holes: WhsScoreHole[] | null = null;
