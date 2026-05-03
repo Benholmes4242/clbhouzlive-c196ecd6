@@ -216,8 +216,8 @@ export const LastRoundCard: React.FC<Props> = ({ connectionId }) => {
                 key={stat.label}
                 style={{
                   background: 'rgba(255,255,255,0.12)',
-                  backdropFilter: 'blur(12px) saturate(140%)',
-                  WebkitBackdropFilter: 'blur(12px) saturate(140%)',
+                  backdropFilter: 'blur(14px) saturate(140%)',
+                  WebkitBackdropFilter: 'blur(14px) saturate(140%)',
                   border: '1px solid rgba(255,255,255,0.14)',
                   borderRadius: 10,
                   padding: '8px 6px',
@@ -239,7 +239,7 @@ export const LastRoundCard: React.FC<Props> = ({ connectionId }) => {
                   style={{
                     fontSize: 20,
                     fontWeight: 700,
-                    color: '#fff',
+                    color: stat.label === 'DIFF' && isWorse ? RED : '#fff',
                     fontVariantNumeric: 'tabular-nums',
                     lineHeight: 1,
                   }}
