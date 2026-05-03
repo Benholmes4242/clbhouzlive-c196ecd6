@@ -910,7 +910,7 @@ function HeroPick({
         </div>
 
         {!expanded && pulledQuote && (
-          <div style={{ position: 'relative', paddingLeft: 24, paddingTop: 14 }}>
+          <div style={{ position: 'relative', paddingLeft: 24, paddingRight: 24, paddingTop: 14 }}>
             <Quote
               size={16}
               color={AMBER_ACCENT}
@@ -934,6 +934,13 @@ function HeroPick({
             >
               {pulledQuote}
             </div>
+            <Quote
+              size={16}
+              color={AMBER_ACCENT}
+              fill={AMBER_ACCENT}
+              strokeWidth={0}
+              style={{ position: 'absolute', right: 0, bottom: 0 }}
+            />
           </div>
         )}
       </button>
