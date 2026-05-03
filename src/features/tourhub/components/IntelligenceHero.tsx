@@ -1054,7 +1054,6 @@ function CompactPick({
     <div
       style={{
         borderLeft: `3px solid ${accent}`,
-        borderBottom: `1px solid ${SLATE_150}`,
       }}
     >
       <button
