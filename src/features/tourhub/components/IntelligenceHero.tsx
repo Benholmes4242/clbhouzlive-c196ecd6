@@ -1567,7 +1567,7 @@ function LiveStateBlock({
             </div>
           </div>
           {(data.tournament.venueName || formatLocation(data.tournament)) && (
-            <div style={{ fontSize: 11, color: SLATE_500, marginTop: 2 }}>
+            <div style={{ fontSize: 11, color: SLATE_500, marginTop: 2, marginBottom: 12 }}>
               {[data.tournament.venueName, formatLocation(data.tournament)].filter(Boolean).join(' · ')}
             </div>
           )}
