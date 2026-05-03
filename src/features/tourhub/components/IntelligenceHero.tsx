@@ -1050,8 +1050,8 @@ function CompactPick({
   positionLabel: string;
 }) {
   const [expanded, setExpanded] = useState(false);
-  const accent = tier === 'STRONG' ? GREEN_DEEP_INK : 'transparent';
-  const accentInk = tier === 'STRONG' ? GREEN_DEEP_INK : SLATE_500;
+  const accent = 'transparent';
+  const accentInk = SLATE_500;
   const tierLabel = tier === 'STRONG' ? 'STRONG CONTENDER' : 'IN CONTENTION';
   const visibleReasons = reasons.filter(Boolean).slice(0, 3);
 
