@@ -513,37 +513,39 @@ function LeadSectionHeader({
             />
           </span>
         </button>
-        <div
-          style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: 6,
-            padding: '4px 8px',
-            background: 'transparent',
-            border: `1px solid ${SLATE_150}`,
-            borderRadius: 4,
-          }}
-        >
+        {state !== 'live' && (
           <div
             style={{
-              width: 6,
-              height: 6,
-              borderRadius: '50%',
-              background: dotColor,
-              animation: state === 'live' ? 'intel_liveDot 1.6s ease-in-out infinite' : 'none',
-            }}
-          />
-          <span
-            style={{
-              ...monoLabel,
-              fontSize: 9,
-              color: dotColor,
-              letterSpacing: '0.16em',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 6,
+              padding: '4px 8px',
+              background: 'transparent',
+              border: `1px solid ${SLATE_150}`,
+              borderRadius: 4,
             }}
           >
-            {statusLabel}
-          </span>
-        </div>
+            <div
+              style={{
+                width: 6,
+                height: 6,
+                borderRadius: '50%',
+                background: dotColor,
+                animation: 'none',
+              }}
+            />
+            <span
+              style={{
+                ...monoLabel,
+                fontSize: 9,
+                color: dotColor,
+                letterSpacing: '0.16em',
+              }}
+            >
+              {statusLabel}
+            </span>
+          </div>
+        )}
       </div>
 
       {/* Section title — Geist 700 (project memory: no serifs) */}
@@ -1538,14 +1540,57 @@ function LiveStateBlock({
       <FramingSentence text={framingSentence} />
       <EditorialHeadline>{headlineNode}</EditorialHeadline>
       {data?.tournament?.name && (
-        <TournamentLabel>
-          {data.tournament.name}
+        <div style={{ marginTop: 10 }}>
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              gap: 8,
+            }}
+          >
+            <div style={{ fontSize: 12, color: SLATE_500, fontWeight: 600 }}>
+              {data.tournament.name}
+            </div>
+            <div
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 6,
+                padding: '4px 8px',
+                background: 'transparent',
+                border: `1px solid ${SLATE_150}`,
+                borderRadius: 4,
+                flexShrink: 0,
+              }}
+            >
+              <div
+                style={{
+                  width: 6,
+                  height: 6,
+                  borderRadius: '50%',
+                  background: GREEN_LIGHT,
+                  animation: 'intel_liveDot 1.6s ease-in-out infinite',
+                }}
+              />
+              <span
+                style={{
+                  ...monoLabel,
+                  fontSize: 9,
+                  color: GREEN_LIGHT,
+                  letterSpacing: '0.16em',
+                }}
+              >
+                {`LIVE · ROUND ${currentRound}`}
+              </span>
+            </div>
+          </div>
           {(data.tournament.venueName || formatLocation(data.tournament)) && (
             <div style={{ fontSize: 11, color: SLATE_500, marginTop: 2 }}>
               {[data.tournament.venueName, formatLocation(data.tournament)].filter(Boolean).join(' · ')}
             </div>
           )}
-        </TournamentLabel>
+        </div>
       )}
 
       {heroPick && (
