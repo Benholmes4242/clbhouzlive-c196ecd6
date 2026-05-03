@@ -155,7 +155,7 @@ const ProfileAchievementsRail: React.FC<ProfileAchievementsRailProps> = ({
 
   const handleViewAll = () => {
     logPoint('achievements.view_all.click', { source: 'button', isOwnProfile });
-    navigate(isOwnProfile ? '/achievements' : `/achievements/${userId}`);
+    navigate('/profile');
   };
 
   // Show nothing if loading or no achievements and no next badge
