@@ -281,7 +281,7 @@ const HeroHandicapCard: React.FC<Props> = ({ connection }) => {
             <span style={{
               fontFamily: 'SF Pro Display, -apple-system, BlinkMacSystemFont, system-ui, sans-serif',
               fontSize: NUMBER_SIZE, fontWeight: NUMBER_WEIGHT, lineHeight: 1,
-              color: isScrubbing ? INK : AMBER,
+              color: INK,
               letterSpacing: '-0.025em',
               transition: 'color 200ms ease',
               fontVariantNumeric: 'proportional-nums lining-nums',
