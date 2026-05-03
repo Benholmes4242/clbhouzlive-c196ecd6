@@ -1535,18 +1535,22 @@ function LiveStateBlock({
     <div>
       <FramingSentence text={framingSentence} />
       <EditorialHeadline>{headlineNode}</EditorialHeadline>
-      <ContextLine>
-        {`OUR #${topPickPreRank} PICK · NOW ${topPickLivePos} · ${numInTop5} IN T5 · ROUND ${currentRound}`}
-      </ContextLine>
       {data?.tournament?.name && (
-        <TournamentLabel>{data.tournament.name}</TournamentLabel>
+        <TournamentLabel>
+          {data.tournament.name}
+          {(data.tournament.venueName || formatLocation(data.tournament)) && (
+            <div style={{ fontSize: 11, color: SLATE_500, marginTop: 2 }}>
+              {[data.tournament.venueName, formatLocation(data.tournament)].filter(Boolean).join(' · ')}
+            </div>
+          )}
+        </TournamentLabel>
       )}
 
       {heroPick && (
         <HeroPick
           initials={getInitials(heroPick.playerName)}
           name={heroPick.playerName}
-          subtitle={`Our #${heroPick.predictedRank} pick · Now ${formatPosition(heroPick)} · Round ${heroPick.currentRound ?? currentRound}${heroPick.thru != null ? ` · Thru ${heroPick.thru}` : ''}`}
+          subtitle={null}
           pulledQuote={heroPick.pulledQuote ?? heroPick.reasons[0] ?? null}
           reasons={heroPick.reasons}
           defaultExpanded={true}
