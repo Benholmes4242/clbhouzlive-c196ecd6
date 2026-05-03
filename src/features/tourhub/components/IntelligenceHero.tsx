@@ -490,11 +490,11 @@ function LeadSectionHeader({
           <span
             style={{
               fontFamily: headlineFont,
-              fontSize: 24,
+              fontSize: 30,
               fontWeight: 700,
               color: INK,
-              letterSpacing: '-0.025em',
-              lineHeight: 1.1,
+              letterSpacing: '-0.030em',
+              lineHeight: 1.08,
               display: 'flex',
               alignItems: 'center',
               gap: 6,
@@ -504,8 +504,8 @@ function LeadSectionHeader({
             <span
               style={{
                 marginLeft: 4,
-                width: 22,
-                height: 22,
+                width: 28,
+                height: 28,
                 borderRadius: '50%',
                 background: AMBER_TINT,
                 display: 'inline-flex',
@@ -514,7 +514,7 @@ function LeadSectionHeader({
                 flexShrink: 0,
               }}
             >
-              <Brain size={13} color={AMBER_DEEP} strokeWidth={2.4} style={{ display: 'block' }} />
+              <Brain size={16} color={AMBER_DEEP} strokeWidth={2.4} style={{ display: 'block' }} />
             </span>
           </span>
         </button>
@@ -558,11 +558,11 @@ function LeadSectionHeader({
         style={{
           margin: 0,
           fontFamily: headlineFont,
-          fontSize: 24,
+          fontSize: 30,
           fontWeight: 700,
           color: INK,
-          letterSpacing: '-0.025em',
-          lineHeight: 1.1,
+          letterSpacing: '-0.030em',
+          lineHeight: 1.08,
           marginBottom: 6,
         }}
       >
@@ -688,11 +688,11 @@ function EditorialHeadline({ children }: { children: React.ReactNode }) {
       style={{
         margin: 0,
         fontFamily: headlineFont,
-        fontSize: 30,
+        fontSize: 24,
         fontWeight: 700,
         color: INK,
-        letterSpacing: '-0.030em',
-        lineHeight: 1.08,
+        letterSpacing: '-0.025em',
+        lineHeight: 1.1,
       }}
     >
       {children}
