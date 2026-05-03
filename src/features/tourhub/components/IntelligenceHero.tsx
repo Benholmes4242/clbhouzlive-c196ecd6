@@ -480,43 +480,34 @@ function LeadSectionHeader({
         <button
           type="button"
           onClick={onInfoTap}
-          aria-label="About clbhouz Intelligence"
+          aria-label="About Tournament Intelligence"
           style={{
             display: 'flex',
             alignItems: 'center',
-            gap: 10,
+            gap: 6,
             background: 'transparent',
             border: 'none',
             padding: 0,
             cursor: 'pointer',
           }}
         >
-          <div
-            style={{
-              width: 3,
-              height: 14,
-              background: AMBER_ACCENT,
-              borderRadius: 2,
-              flexShrink: 0,
-            }}
-          />
           <span
             style={{
-              fontSize: 11,
-              fontWeight: 900,
-              color: AMBER_ACCENT,
-              letterSpacing: '0.16em',
-              textTransform: 'uppercase',
+              fontFamily: headlineFont,
+              fontSize: 13,
+              fontWeight: 700,
+              color: AMBER_DEEP,
+              letterSpacing: '-0.005em',
               display: 'flex',
               alignItems: 'center',
               gap: 5,
             }}
           >
-            clbhouz Intelligence
+            Tournament Intelligence
             <Sparkles
-              size={11}
-              color={AMBER_ACCENT}
-              fill={AMBER_ACCENT}
+              size={12}
+              color={AMBER_DEEP}
+              fill={AMBER_DEEP}
               strokeWidth={2}
               style={{ marginLeft: 1 }}
             />
