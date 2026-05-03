@@ -504,11 +504,11 @@ function LeadSectionHeader({
               gap: 6,
             }}
           >
-            Tournament Intelligence
+            Tournament <span style={{ color: INK }}>Intelligence</span>
             <Sparkles
               size={18}
-              color={AMBER_DEEP}
-              fill={AMBER_DEEP}
+              color={INK}
+              fill={INK}
               strokeWidth={2}
               style={{ marginLeft: 1 }}
             />
