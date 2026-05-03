@@ -10,8 +10,10 @@ interface Props {
 
 const GREEN = '#34D399';
 const RED = '#FB7185';
+const GREEN_BANNER = 'rgba(5,150,105,0.22)';
+const RED_BANNER = 'rgba(159,29,29,0.22)';
 const INK_55 = 'rgba(15,23,42,0.55)';
-const FONT_SERIF = 'Georgia, serif';
+const FONT_SERIF = 'Georgia, "Times New Roman", serif';
 
 const fmtDiff = (n: number | null | undefined) => {
   if (n === null || n === undefined) return '—';
@@ -89,7 +91,7 @@ export const LastRoundCard: React.FC<Props> = ({ connectionId }) => {
     : { background: '#0F172A' };
 
   return (
-    <section className="px-3 mb-7">
+    <section style={{ padding: '0 16px', marginBottom: 28 }}>
       {/* Eyebrow — outside the image */}
       <div className="flex items-center justify-between mb-2">
         <p className="text-[11px] font-semibold uppercase tracking-[1.5px]" style={{ color: INK_55 }}>
@@ -111,7 +113,7 @@ export const LastRoundCard: React.FC<Props> = ({ connectionId }) => {
           cursor: 'pointer',
           position: 'relative',
           minHeight: 240,
-          borderRadius: 16,
+          borderRadius: 14,
           overflow: 'hidden',
           transition: 'opacity 150ms ease',
           ...cardBg,
@@ -141,7 +143,7 @@ export const LastRoundCard: React.FC<Props> = ({ connectionId }) => {
             position: 'absolute',
             inset: 0,
             background:
-              'linear-gradient(180deg, rgba(15,23,42,0.55) 0%, rgba(15,23,42,0.45) 40%, rgba(15,23,42,0.85) 100%)',
+              'linear-gradient(180deg, rgba(0,0,0,0.10) 0%, rgba(0,0,0,0.75) 100%)',
             zIndex: 1,
           }}
         />
@@ -154,11 +156,11 @@ export const LastRoundCard: React.FC<Props> = ({ connectionId }) => {
               style={{
                 fontFamily: FONT_SERIF,
                 fontSize: 19,
-                fontWeight: 700,
+                fontWeight: 400,
                 color: '#fff',
                 lineHeight: 1.15,
                 margin: 0,
-                textShadow: '0 1px 2px rgba(0,0,0,0.35)',
+                textShadow: '0 1px 6px rgba(0,0,0,0.5)',
               }}
             >
               {lastRound.course?.name ?? 'Unknown course'}
@@ -214,8 +216,8 @@ export const LastRoundCard: React.FC<Props> = ({ connectionId }) => {
                 key={stat.label}
                 style={{
                   background: 'rgba(255,255,255,0.12)',
-                  backdropFilter: 'blur(12px) saturate(140%)',
-                  WebkitBackdropFilter: 'blur(12px) saturate(140%)',
+                  backdropFilter: 'blur(14px) saturate(140%)',
+                  WebkitBackdropFilter: 'blur(14px) saturate(140%)',
                   border: '1px solid rgba(255,255,255,0.14)',
                   borderRadius: 10,
                   padding: '8px 6px',
@@ -237,7 +239,7 @@ export const LastRoundCard: React.FC<Props> = ({ connectionId }) => {
                   style={{
                     fontSize: 20,
                     fontWeight: 700,
-                    color: '#fff',
+                    color: stat.label === 'DIFF' && isWorse ? RED : '#fff',
                     fontVariantNumeric: 'tabular-nums',
                     lineHeight: 1,
                   }}
@@ -254,9 +256,9 @@ export const LastRoundCard: React.FC<Props> = ({ connectionId }) => {
               display: 'flex',
               alignItems: 'center',
               gap: 10,
-              background: 'rgba(255,255,255,0.10)',
-              backdropFilter: 'blur(12px) saturate(140%)',
-              WebkitBackdropFilter: 'blur(12px) saturate(140%)',
+              background: isImprovement ? GREEN_BANNER : isWorse ? RED_BANNER : 'rgba(255,255,255,0.10)',
+              backdropFilter: 'blur(14px) saturate(140%)',
+              WebkitBackdropFilter: 'blur(14px) saturate(140%)',
               border: '1px solid rgba(255,255,255,0.14)',
               borderRadius: 10,
               padding: '8px 12px',
