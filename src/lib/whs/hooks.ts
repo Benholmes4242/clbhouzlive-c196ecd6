@@ -14,6 +14,7 @@ import {
   fetchSentInvites,
   fetchCourseForm,
   fetchLastRoundDetail,
+  fetchFriendRoundDetail,
   fetchFriendWindowRankings,
 } from './api';
 
@@ -47,6 +48,18 @@ export function useLastRoundDetail(
     queryKey: whsKeys.lastRoundDetail(connectionId ?? ''),
     queryFn: () => fetchLastRoundDetail(connectionId as string),
     enabled: !!connectionId && enabled,
+    staleTime: 60_000,
+  });
+}
+
+export function useFriendRoundDetail(
+  scoreId: string | null | undefined,
+  enabled: boolean = true,
+) {
+  return useQuery({
+    queryKey: ['whs-friend-round-detail', scoreId ?? ''],
+    queryFn: () => fetchFriendRoundDetail(scoreId as string),
+    enabled: !!scoreId && enabled,
     staleTime: 60_000,
   });
 }
