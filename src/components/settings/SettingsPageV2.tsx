@@ -1,6 +1,9 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ChevronLeft, ChevronRight, User, Mail, Lock, Bell, Shield, EyeOff, UserX, HelpCircle, Flag, MessageSquare, FileText, Trash2, LogOut, Eye, BarChart2, Map, Star, Play } from 'lucide-react';
+import { formatDistanceToNow } from 'date-fns';
+import { ChevronLeft, ChevronRight, User, Mail, Lock, Bell, Shield, EyeOff, UserX, HelpCircle, Flag, MessageSquare, FileText, Trash2, LogOut, Eye, BarChart2, Map, Star, Play, Link2 } from 'lucide-react';
+import { useWhsConnection } from '@/lib/whs/hooks';
+import WhsConnectionSheet from './sheets/WhsConnectionSheet';
 import { formatHcp } from '@/lib/formatHcp';
 import { useProfileData } from '@/hooks/useProfileData';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
@@ -79,6 +82,8 @@ export function SettingsPageV2() {
   const deleteAccount = useDeleteAccount(user?.id);
   const { sheets, open, close } = useSettingsSheets();
   const queryClient = useQueryClient();
+  const { data: whsConnection } = useWhsConnection(user?.id);
+  const [whsSheetOpen, setWhsSheetOpen] = useState(false);
 
   const handleSignOut = async () => {
     await supabase.auth.signOut();
@@ -305,6 +310,23 @@ export function SettingsPageV2() {
           />
         </SettingsSection>
 
+        {/* Connections */}
+        {whsConnection && (
+          <SettingsSection title="Connections">
+            <SettingsChevronRow
+              icon={<Link2 size={18} />}
+              title="England Golf"
+              subtitle={
+                whsConnection.last_synced_at
+                  ? `Last synced ${formatDistanceToNow(new Date(whsConnection.last_synced_at), { addSuffix: true })}`
+                  : 'Connected'
+              }
+              iconTheme="account"
+              onClick={() => setWhsSheetOpen(true)}
+            />
+          </SettingsSection>
+        )}
+
         {/* Support */}
         <SettingsSection title="Support">
           <SettingsChevronRow
@@ -379,6 +401,12 @@ export function SettingsPageV2() {
       <ReportProblemSheet open={sheets.report} onClose={() => close('report')} userId={user?.id} />
       <ContactSupportSheet open={sheets.contact} onClose={() => close('contact')} />
       <LegalSheet open={sheets.legal} onClose={() => close('legal')} />
+      <WhsConnectionSheet
+        open={whsSheetOpen}
+        onClose={() => setWhsSheetOpen(false)}
+        connection={whsConnection}
+        userId={user?.id}
+      />
 
       {/* Creator dialogs */}
       <AlertDialog open={creator.showEnableConfirm} onOpenChange={creator.setShowEnableConfirm}>
