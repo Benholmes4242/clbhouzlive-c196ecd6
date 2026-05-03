@@ -110,12 +110,7 @@ export async function fetchLastRound(connectionId: string): Promise<WhsLastRound
 
   let course_thumbnail_image: string | null = null;
   if (latest.course?.name) {
-    const { data: gc } = await supabase
-      .from('golf_courses')
-      .select('thumbnail_image')
-      .ilike('name', latest.course.name)
-      .maybeSingle();
-    course_thumbnail_image = (gc as any)?.thumbnail_image ?? null;
+    course_thumbnail_image = await lookupCourseThumbnail(latest.course.name);
   }
 
   return {
@@ -575,3 +570,49 @@ export async function callDeleteWhsData(): Promise<{ ok: boolean; message?: stri
   try { return await res.json(); } catch { return { ok: false, error: 'Unexpected response' }; }
 }
 
+/**
+ * WHS course names sometimes differ from golf_courses canonical names.
+ *  e.g. WHS:    "Sundridge Park-West Course"
+ *       canon: "Sundridge Park (West Course)"
+ * Try a few permutations before giving up.
+ */
+async function lookupCourseThumbnail(whsName: string): Promise<string | null> {
+  const candidates = new Set<string>();
+  const trimmed = whsName.trim();
+  candidates.add(trimmed);
+
+  // Convert "Foo-Bar Course" -> "Foo (Bar Course)" / "Foo (Bar)"
+  const dashMatch = trimmed.match(/^(.+?)-(.+)$/);
+  if (dashMatch) {
+    const [, base, suffix] = dashMatch;
+    candidates.add(`${base.trim()} (${suffix.trim()})`);
+    const suffixNoCourse = suffix.replace(/\s*course\s*$/i, '').trim();
+    if (suffixNoCourse) candidates.add(`${base.trim()} (${suffixNoCourse})`);
+  }
+
+  // Try exact ilike on each candidate
+  for (const name of candidates) {
+    const { data } = await supabase
+      .from('golf_courses')
+      .select('thumbnail_image')
+      .ilike('name', name)
+      .maybeSingle();
+    const thumb = (data as any)?.thumbnail_image;
+    if (thumb) return thumb;
+  }
+
+  // Last resort: fuzzy match by base name + suffix substring
+  if (dashMatch) {
+    const [, base, suffix] = dashMatch;
+    const suffixCore = suffix.replace(/\s*course\s*$/i, '').trim();
+    const { data } = await supabase
+      .from('golf_courses')
+      .select('name, thumbnail_image')
+      .ilike('name', `${base.trim()}%${suffixCore}%`)
+      .limit(1);
+    const thumb = (data as any[])?.[0]?.thumbnail_image;
+    if (thumb) return thumb;
+  }
+
+  return null;
+}
