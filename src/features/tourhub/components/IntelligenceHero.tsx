@@ -910,14 +910,7 @@ function HeroPick({
         </div>
 
         {!expanded && pulledQuote && (
-          <div style={{ position: 'relative', paddingLeft: 24, paddingRight: 24, paddingTop: 14 }}>
-            <Quote
-              size={16}
-              color={AMBER_ACCENT}
-              fill={AMBER_ACCENT}
-              strokeWidth={0}
-              style={{ position: 'absolute', left: 0, top: 16, transform: 'scaleX(-1)' }}
-            />
+          <div style={{ paddingTop: 14 }}>
             <div
               style={{
                 fontFamily: headlineFont,
@@ -932,6 +925,13 @@ function HeroPick({
                 whiteSpace: 'nowrap',
               }}
             >
+              <Quote
+                size={14}
+                color={AMBER_ACCENT}
+                fill={AMBER_ACCENT}
+                strokeWidth={0}
+                style={{ display: 'inline-block', verticalAlign: 'baseline', marginRight: 4, transform: 'scaleX(-1) translateY(2px)' }}
+              />
               {pulledQuote}
               <Quote
                 size={14}
