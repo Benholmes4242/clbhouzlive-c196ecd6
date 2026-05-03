@@ -61,14 +61,14 @@ export const LastRoundCard: React.FC<Props> = ({ connectionId }) => {
     );
   }
 
-  const delta = lastRound.handicap_delta;
-  const hasMovement = delta !== null;
-  const isImprovement = hasMovement && delta < 0;
-  const isWorse = hasMovement && delta > 0;
+  const delta = lastRound.handicap_delta ?? null;
+  const hasMovement = delta !== null && delta !== undefined;
+  const isImprovement = hasMovement && delta! < 0;
+  const isWorse = hasMovement && delta! > 0;
   const stripeColor = isImprovement ? GREEN : isWorse ? RED : 'rgba(255,255,255,0.3)';
   const Arrow = isImprovement ? ArrowDown : isWorse ? ArrowUp : Minus;
   const arrowColor = isImprovement ? GREEN : isWorse ? RED : 'rgba(255,255,255,0.85)';
-  const hcpAfter = lastRound.handicap_index_at_time;
+  const hcpAfter = lastRound.handicap_index_at_time ?? null;
   const hcpBefore = hasMovement && hcpAfter !== null ? hcpAfter - delta! : null;
   const captionText =
     !hasMovement
