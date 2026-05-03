@@ -832,7 +832,20 @@ function HeroPick({
                 marginBottom: 5,
               }}
             >
-              <Sparkles size={9} color={AMBER_DEEP} fill={AMBER_DEEP} strokeWidth={2} />
+              <span
+                style={{
+                  width: 14,
+                  height: 14,
+                  borderRadius: '50%',
+                  background: AMBER_DEEP,
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  flexShrink: 0,
+                }}
+              >
+                <Brain size={8} color={INK} strokeWidth={2.6} />
+              </span>
               TOP PICK
             </div>
             <div
