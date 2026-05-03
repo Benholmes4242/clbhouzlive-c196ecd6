@@ -574,7 +574,7 @@ function LeadSectionHeader({
           maxWidth: 480,
         }}
       >
-        Our in-house AI picks three players each tournament — using form, course fit, weather, and news.
+        Our in-house AI picks three players each PGA tournament — using latest form & player statistics, course fit, weather, news and historical data.
       </p>
     </div>
   );
