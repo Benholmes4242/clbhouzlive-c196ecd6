@@ -155,7 +155,7 @@ const SLATE_150 = '#EDF1F5';
 const SLATE_100 = '#F1F5F9';
 
 const AMBER_ACCENT = '#F7931E';
-const AMBER_DEEP = '#B85F00';
+const AMBER_DEEP = '#D97706';
 const AMBER_TINT = 'rgba(247,147,30,0.08)';
 const AMBER_TINT_STRONG = 'rgba(247,147,30,0.14)';
 const GREEN_DEEP_INK = '#0A5A3C';
