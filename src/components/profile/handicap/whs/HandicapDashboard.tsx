@@ -25,8 +25,12 @@ export const HandicapDashboard: React.FC<Props> = ({ connection, userId }) => {
   const queryClient = useQueryClient();
   const [searchParams, setSearchParams] = useSearchParams();
   const [isSyncing, setIsSyncing] = useState(false);
+  const lastSyncedAtForInit = connection.last_synced_at ? new Date(connection.last_synced_at) : null;
+  const isOldEnoughForReauth =
+    !lastSyncedAtForInit ||
+    Date.now() - lastSyncedAtForInit.getTime() > 48 * 3600_000;
   const [reauthRequired, setReauthRequired] = useState(
-    connection.last_sync_status === 'auth_failed'
+    connection.last_sync_status === 'auth_failed' && isOldEnoughForReauth
   );
 
   // ── URL-state for the active subtab ─────────────────────────────────────
