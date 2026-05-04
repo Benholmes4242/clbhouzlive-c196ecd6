@@ -1526,9 +1526,6 @@ function LiveStateBlock({
   const numInTop5 = picks.filter(
     p => p.actualPosition !== null && p.actualPosition <= 5,
   ).length;
-  const numInTop5 = picks.filter(
-    p => p.actualPosition !== null && p.actualPosition <= 5,
-  ).length;
   const currentRound = picks[0]?.currentRound ?? 1;
 
   // Hero pick = the leading pick (best-performing). Falls back to top pick.
