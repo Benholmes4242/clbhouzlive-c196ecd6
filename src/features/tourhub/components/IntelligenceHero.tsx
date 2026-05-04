@@ -565,52 +565,54 @@ function UpcomingCard({ pick }: { pick: UpcomingPick }) {
           >
             {pick.name}
           </div>
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: 8,
-              marginTop: 4,
-            }}
-          >
-            <span
-              style={{
-                fontSize: 10,
-                color: 'rgba(255,255,255,0.65)',
-                fontWeight: 600,
-                letterSpacing: '0.06em',
-              }}
-            >
-              COURSE FIT
-            </span>
+          {pick.courseFit != null && (
             <div
               style={{
-                flex: 1,
-                height: 3,
-                background: 'rgba(255,255,255,0.15)',
-                borderRadius: 2,
-                overflow: 'hidden',
+                display: 'flex',
+                alignItems: 'center',
+                gap: 8,
+                marginTop: 4,
               }}
             >
+              <span
+                style={{
+                  fontSize: 10,
+                  color: 'rgba(255,255,255,0.65)',
+                  fontWeight: 600,
+                  letterSpacing: '0.06em',
+                }}
+              >
+                COURSE FIT
+              </span>
               <div
                 style={{
-                  width: `${Math.max(0, Math.min(100, pick.courseFit))}%`,
-                  height: '100%',
-                  background: amber,
+                  flex: 1,
+                  height: 3,
+                  background: 'rgba(255,255,255,0.15)',
+                  borderRadius: 2,
+                  overflow: 'hidden',
                 }}
-              />
+              >
+                <div
+                  style={{
+                    width: `${Math.max(0, Math.min(100, pick.courseFit))}%`,
+                    height: '100%',
+                    background: amber,
+                  }}
+                />
+              </div>
+              <span
+                style={{
+                  fontSize: 12,
+                  fontWeight: 800,
+                  color: amber,
+                  fontVariantNumeric: 'tabular-nums',
+                }}
+              >
+                {Math.round(pick.courseFit)}
+              </span>
             </div>
-            <span
-              style={{
-                fontSize: 12,
-                fontWeight: 800,
-                color: amber,
-                fontVariantNumeric: 'tabular-nums',
-              }}
-            >
-              {Math.round(pick.courseFit)}
-            </span>
-          </div>
+          )}
         </div>
       </CardHero>
       <CardMetaTray insight={pick.insight} reasons={pick.reasons} />
