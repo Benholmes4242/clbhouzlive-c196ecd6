@@ -824,7 +824,7 @@ function HeroPick({
           />
 
           <div style={{ flex: 1, minWidth: 0 }}>
-            {winProbability > 0 && (
+            {tierLabel && (
               <div
                 style={{
                   ...monoLabel,
@@ -838,7 +838,7 @@ function HeroPick({
                 }}
               >
                 <Sparkles size={9} color={AMBER_DEEP} fill={AMBER_DEEP} strokeWidth={2} />
-                {Math.round(winProbability * 100)}% WIN PROBABILITY
+                {tierLabel}
               </div>
             )}
             <div
