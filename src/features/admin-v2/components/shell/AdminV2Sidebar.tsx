@@ -244,6 +244,7 @@ export default function AdminV2Sidebar({ role, can, onNavigate }: SidebarProps) 
     items: [
       { to: '/admin-v2/tools/geocoding', label: 'Geocoding',  icon: Map },
       { to: '/admin-v2/tools/testlab',   label: 'Test Lab',   icon: FlaskConical },
+      { to: '/admin-v2/tools/whs-bridge', label: 'WHS Bridge', icon: Map },
     ],
   };
 
