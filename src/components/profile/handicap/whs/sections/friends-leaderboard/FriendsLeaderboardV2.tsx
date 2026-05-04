@@ -28,6 +28,12 @@ interface Props {
   currentUserHandicap: number | null | undefined;
   currentUserName?: string;
   connectionId: string;
+  /**
+   * When true, the leaderboard is being shown inside another user's
+   * /handicap/:userId page. Tap targets switch to /p/:id (their profile)
+   * and invite affordances are hidden.
+   */
+  readOnly?: boolean;
 }
 
 export type LeaderboardItem =
@@ -50,6 +56,7 @@ export const FriendsLeaderboardV2: React.FC<Props> = ({
   currentUserHandicap,
   currentUserName = 'You',
   connectionId,
+  readOnly = false,
 }) => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
