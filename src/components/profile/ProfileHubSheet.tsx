@@ -266,7 +266,6 @@ function ProfileHubSheet({
 
 
   const activeProfile = profiles.find(p => p.id === localActiveId) || currentActor;
-  const isPersonal = currentActor.type === 'personal';
 
   // Telemetry: sheet opened (single variant — v2 grid only)
   useEffect(() => {
