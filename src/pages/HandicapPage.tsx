@@ -70,6 +70,7 @@ const HandicapPage: React.FC = () => {
       </header>
 
       <main>
+        <MorningMoment userId={user.id} />
         <WhsHandicapTab userId={user.id} />
       </main>
     </PageRoot>
