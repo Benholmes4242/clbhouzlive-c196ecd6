@@ -30,6 +30,24 @@ export const FEATURE_FLAGS = {
   ENABLE_TOP100_MOCK_PLAYERS,
 } as const;
 
+/**
+ * Handicap promoted from a profile sub-tab to a top-level page.
+ * When ON: ProfileHubSheet renders the new 2×2 grid (Handicap/Echo/Messages/Notifications)
+ * and the Handicap tab is hidden from the user's own profile strip.
+ * Default: ON for internal accounts; OFF for everyone else until rollout.
+ */
+const HANDICAP_PROMOTED_INTERNAL_USER_IDS = new Set<string>([
+  '6a5bcbb9-c22c-4655-ad8e-088b2858ca3e', // Benjamin Holmes
+]);
+
+export const HANDICAP_PROMOTED_TO_PAGE_GLOBAL = false;
+
+export function isHandicapPromotedForUser(userId: string | null | undefined): boolean {
+  if (HANDICAP_PROMOTED_TO_PAGE_GLOBAL) return true;
+  if (!userId) return false;
+  return HANDICAP_PROMOTED_INTERNAL_USER_IDS.has(userId);
+}
+
 // Vertical aspect ratio band - expanded to catch encoder drift
 // 9:16 = 0.5625, but real-world videos vary. Range: 0.52-0.70
 export const VERTICAL_MIN_AR = 0.52;  // Generous lower bound for vertical
