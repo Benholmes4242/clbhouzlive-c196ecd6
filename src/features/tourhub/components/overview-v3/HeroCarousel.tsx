@@ -16,7 +16,8 @@ import type { PlayerInfo } from '@/components/tourhub/PlayerScorecardCard';
 import { Link, useNavigate } from 'react-router-dom';
 import { tournamentRoute } from '../../routes';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronDown, ChevronRight, Trophy } from 'lucide-react';
+import { ChevronDown, ChevronRight, Trophy, MapPin } from 'lucide-react';
+import { greenLive, inkFaint, inkSoft, hairlineDark, ink, SHIMMER_KEYFRAMES } from '@/features/tourhub/utils/heroAtmosphere';
 
 import { cn } from '@/lib/utils';
 import { 
