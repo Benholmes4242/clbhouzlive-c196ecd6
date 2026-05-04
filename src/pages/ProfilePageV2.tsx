@@ -239,6 +239,13 @@ const ProfilePageV2Content: React.FC = () => {
     [allTabs, isSelf, handicapPromoted]
   );
 
+  // Redirect own-profile Handicap deep links to the dedicated /handicap page when promoted.
+  useEffect(() => {
+    if (isSelf && handicapPromoted && activeSection === 'stats') {
+      navigate('/handicap', { replace: true });
+    }
+  }, [isSelf, handicapPromoted, activeSection, navigate]);
+
   const { data: socialCounts, isLoading: socialCountsLoading } = useSocialCounts(profileUserId);
   const followersCount = socialCounts?.followers ?? 0;
   const followingCount = socialCounts?.following ?? 0;
