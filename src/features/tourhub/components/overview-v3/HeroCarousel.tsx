@@ -51,6 +51,7 @@ import { useLeaderHoleScores } from '../../hooks/useLeaderHoleScores';
 import { HoleStripWithSparkline } from './HoleStripWithSparkline';
 import { RoundHistoryPills } from './RoundHistoryPills';
 import { EditorialLiveHero } from './EditorialLiveHero';
+import { EditorialResultsHero } from './EditorialResultsHero';
 import '@/styles/hero-glass.css';
 import { EchoContextualButton } from '@/components/echo/EchoContextualButton';
 
