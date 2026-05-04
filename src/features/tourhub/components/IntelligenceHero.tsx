@@ -1179,7 +1179,7 @@ function DotsRail({
           <span style={{ color: inkSoft, fontWeight: 600 }}> TOP-5s</span>
           <span style={{ color: inkFaint, margin: '0 4px' }}>·</span>
           <span style={{ color: accent, fontWeight: 800 }}>{stats.hitRatePct}%</span>
-          <span style={{ color: inkSoft, fontWeight: 600, marginLeft: 2 }}>T5</span>
+          <span style={{ color: inkSoft, fontWeight: 600, marginLeft: 2 }}>PLACED</span>
         </span>
       </div>
     </div>
