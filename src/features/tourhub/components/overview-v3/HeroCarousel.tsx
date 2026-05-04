@@ -1152,6 +1152,9 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
                           exit={{ opacity: 0, x: -40 }}
                           transition={{ type: 'spring', damping: 28, stiffness: 300 }}
                           style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column' }}
+                          onTouchStart={handleExpandedTouch}
+                          onTouchMove={handleExpandedTouch}
+                          onTouchEnd={handleExpandedTouch}
                         >
                           {isLoadingFull ? (
                             <ExpandedLeaderboardSkeleton />
@@ -1160,34 +1163,42 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
                           ) : fullLeaderboard.length === 0 ? (
                             <ExpandedLeaderboardEmpty />
                           ) : (
-                            <>
-                              {/* Leader hero strip — rotates through co-leaders every 5s */}
-                              {(() => {
-                                const leaderEntries = (fullLeaderboard as any[]).filter(e => e.position === 1);
-                                if (leaderEntries.length === 0) return null;
-                                const firstEntry = leaderEntries[0];
-                                const currentRound = [4,3,2,1].find(n => firstEntry[`round_${n}`] !== null) ?? 1;
-                                return (
-                                  <RotatingLeaderStrip
-                                    leaderEntries={leaderEntries}
-                                    tourSlug={tournament.tourSlug}
-                                    leaderStats={leaderStats}
-                                    tournamentId={tournament.id}
-                                    currentRound={currentRound}
-                                  />
-                                );
+                            <EditorialLiveHero
+                              tournament={{
+                                id: tournament.id,
+                                name: tournament.name,
+                                tourSlug: tournament.tourSlug,
+                                venueName: tournament.venueName,
+                                venueCity: tournament.venueCity,
+                                startDate: tournament.startDate,
+                              }}
+                              leaderboard={fullLeaderboard as any[]}
+                              currentRound={(() => {
+                                const first = (fullLeaderboard as any[])[0];
+                                if (!first) return 1;
+                                const last = [4, 3, 2, 1].find(n => first[`round_${n}`] !== null) ?? 0;
+                                return last === 0 ? 1 : Math.min(last + 1, 4);
                               })()}
-                              <ExpandedLeaderboardList
-                                entries={fullLeaderboard}
-                                tourCode={tournament.tourSlug}
-                                tournamentId={tournament.id}
-                                defendingChampion={tournament.defendingChampion}
-                                onTouchStart={handleExpandedTouch}
-                                onTouchMove={handleExpandedTouch}
-                                onTouchEnd={handleExpandedTouch}
-                                onPlayerTap={handleScorecardTap}
-                              />
-                            </>
+                              onPlayerTap={(entry) => {
+                                const player = entry.player;
+                                if (!player) return;
+                                const fullName = player.full_name || `${player.first_name || ''} ${player.last_name || ''}`.trim();
+                                const tourCode = player.tour_codes?.[0] ?? tournament.tourSlug ?? 'pga';
+                                handleScorecardTap({
+                                  id: player.id,
+                                  srId: player.sr_id || '',
+                                  name: fullName,
+                                  firstName: player.first_name,
+                                  lastName: player.last_name,
+                                  photoUrl: getPlayerHeadshotUrl(fullName, tourCode, player.headshot_override) || undefined,
+                                  countryCode: player.country || undefined,
+                                  position: entry.position,
+                                  totalScore: entry.score ?? 0,
+                                  thru: entry.thru === 18 ? 'F' : `${entry.thru ?? '—'}`,
+                                  currentRound: entry.thru === 18 ? Math.min((entry.last_completed_round ?? 0) + 1, 4) : 4,
+                                });
+                              }}
+                            />
                           )}
                         </motion.div>
                       )}
