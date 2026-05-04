@@ -207,35 +207,40 @@ function ProfileHubSheet({
 
   const activeProfile = profiles.find(p => p.id === localActiveId) || currentActor;
 
-  // ── Quick actions config ──
+  // ── Quick actions config (Echo / Messages / Notifications — Handicap is rendered separately) ──
   const quickActions = [
     {
-      Icon: User,
-      iconColor: '#3B82F6',
-      label: 'View Profile',
-      route: `/profile/${localActiveId}`,
+      key: 'echo' as const,
+      label: 'Echo',
+      sub: 'Ask anything',
+      route: '/echo',
       badge: 0,
       badgeColor: '',
     },
     {
+      key: 'messages' as const,
       Icon: MessageCircle,
       iconColor: '#10B981',
       label: 'Messages',
+      sub: unreadMessageCount > 0 ? `${unreadMessageCount} unread` : 'No new messages',
       route: '/messages',
       badge: unreadMessageCount,
       badgeColor: 'emerald',
     },
     {
+      key: 'notifications' as const,
       Icon: Bell,
-      iconColor: '#F7931E',
+      iconColor: '#0F172A',
       label: 'Notifications',
+      sub: unreadNotificationCount > 0 ? `${unreadNotificationCount} new` : 'No new notifications',
       route: '/notificationmessages',
       badge: unreadNotificationCount,
-      badgeColor: 'amber',
+      badgeColor: 'red',
     },
   ];
 
   const accountRows = [
+    { Icon: User, iconColor: '#3B82F6', label: 'View profile', route: `/profile/${localActiveId}` },
     { Icon: Pencil, iconColor: '#F7931E', label: 'Edit profile', route: editRoute },
     { Icon: Building2, iconColor: '#0A5A3C', label: 'Manage business profiles', route: '/businesses/manage' },
     { Icon: SettingsIcon, iconColor: '#64748B', label: 'Settings', route: '/settings' },
