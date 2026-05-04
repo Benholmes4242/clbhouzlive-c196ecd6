@@ -132,6 +132,65 @@ function ProfileHubSheetSkeleton() {
   );
 }
 
+// ── 2×2 grid generic tile (Messages / Notifications) ──
+function GridTile({
+  Icon, iconColor, iconBg, label, sub, badge, onClick,
+}: {
+  Icon: React.ComponentType<{ size?: number; color?: string; strokeWidth?: number }>;
+  iconColor: string;
+  iconBg: string;
+  label: string;
+  sub: string;
+  badge: number;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className="relative flex flex-col justify-between text-left active:scale-[0.97] transition-transform"
+      style={{
+        minHeight: 110,
+        padding: '14px 14px 16px',
+        borderRadius: 14,
+        background: '#ffffff',
+        border: '0.5px solid rgba(15,23,42,0.10)',
+        cursor: 'pointer',
+      }}
+      aria-label={label}
+    >
+      <div className="flex items-center justify-between w-full">
+        <div
+          className="flex items-center justify-center"
+          style={{ width: 36, height: 36, borderRadius: 10, background: iconBg }}
+        >
+          <Icon size={20} color={iconColor} strokeWidth={2.2} />
+        </div>
+        {badge > 0 && (
+          <span
+            className="flex items-center justify-center rounded-full"
+            style={{
+              padding: '2px 8px',
+              minWidth: 18,
+              background: '#EF4444',
+              color: '#fff',
+              fontSize: 10,
+              fontWeight: 700,
+              lineHeight: 1.2,
+            }}
+          >
+            {badge > 99 ? '99+' : badge}
+          </span>
+        )}
+      </div>
+      <div className="w-full">
+        <div style={{ fontSize: 15, fontWeight: 700, color: '#0f172a', lineHeight: 1.2 }}>{label}</div>
+        <div style={{ fontSize: 11, color: '#64748B', marginTop: 2 }}>{sub}</div>
+      </div>
+    </button>
+  );
+}
+
 // ── Component ──
 
 function ProfileHubSheet({
