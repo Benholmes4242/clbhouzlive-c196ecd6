@@ -208,8 +208,28 @@ function ProfileHubSheet({
 
 
   const activeProfile = profiles.find(p => p.id === localActiveId) || currentActor;
+  const isPersonal = currentActor.type === 'personal';
+  const handicapPromoted = isPersonal && isHandicapPromotedForUser(currentActor.id);
 
-  // ── Quick actions config ──
+  // Telemetry: track which sheet variant rendered when it opens
+  useEffect(() => {
+    if (!open) return;
+    analyticsEvents.track('profile_hub_sheet_opened', {
+      variant: handicapPromoted ? 'v2_grid' : 'v1_row',
+      actor_type: currentActor.type,
+    });
+  }, [open, handicapPromoted, currentActor.type]);
+
+  const handleViewProfile = useCallback(() => {
+    handleNav(`/profile/${localActiveId}`);
+  }, [handleNav, localActiveId]);
+
+  const handleHandicapTileTap = useCallback(() => {
+    analyticsEvents.track('handicap_tile_tapped', { source: 'profile_hub_sheet' });
+    handleNav('/handicap');
+  }, [handleNav]);
+
+  // ── Quick actions config (legacy 3-up) ──
   const quickActions = [
     {
       Icon: User,
@@ -238,6 +258,9 @@ function ProfileHubSheet({
   ];
 
   const accountRows = [
+    ...(handicapPromoted
+      ? [{ Icon: User, iconColor: '#3B82F6', label: 'View profile', route: `/profile/${localActiveId}` }]
+      : []),
     { Icon: Pencil, iconColor: '#F7931E', label: 'Edit profile', route: editRoute },
     { Icon: Building2, iconColor: '#0A5A3C', label: 'Manage business profiles', route: '/businesses/manage' },
     { Icon: SettingsIcon, iconColor: '#64748B', label: 'Settings', route: '/settings' },
