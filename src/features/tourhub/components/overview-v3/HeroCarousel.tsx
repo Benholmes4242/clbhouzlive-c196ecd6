@@ -1203,7 +1203,17 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
                             exit={{ opacity: 0 }}
                             transition={{ duration: 0.15 }}
                           >
-                            <LeaderboardSkeleton />
+                            <div className="leaderboard-container mt-3">
+                              {[1, 2, 3, 4, 5].map((i) => (
+                                <div key={i} className="leaderboard-row flex items-center justify-between">
+                                  <div className="flex items-center gap-2">
+                                    <div className="w-5 h-3 bg-white/10 rounded animate-pulse" />
+                                    <div className="w-24 h-3 bg-white/10 rounded animate-pulse" />
+                                  </div>
+                                  <div className="w-8 h-3 bg-white/10 rounded animate-pulse" />
+                                </div>
+                              ))}
+                            </div>
                           </motion.div>
                         ) : leaders.length > 0 ? (
                           <motion.div
