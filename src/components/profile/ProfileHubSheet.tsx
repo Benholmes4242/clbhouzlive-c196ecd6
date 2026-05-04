@@ -3,14 +3,14 @@
  * Full rebuild. Semantic tokens only. framer-motion animations.
  */
 
-import { memo, useState, useEffect, useCallback } from 'react';
+import React, { memo, useState, useEffect, useCallback } from 'react';
 import { AnimatedEchoWave } from '@/features/echo/components/ui/AnimatedEchoWave';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence, useMotionValue, animate } from 'framer-motion';
 import type { PanInfo } from 'framer-motion';
 import {
   ChevronRight, LogOut,
-  Shield, Plus, Check, X,
+  Shield, Plus, Check,
   User, MessageCircle, Bell,
   Pencil, Building2, Settings as SettingsIcon,
 } from 'lucide-react';
@@ -23,6 +23,9 @@ import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { useLogout } from '@/hooks/useLogout';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useEditProfileRoute } from '@/hooks/useEditProfileRoute';
+import HandicapTile from '@/components/handicap/HandicapTile';
+import { isHandicapPromotedForUser } from '@/config/featureFlags';
+import { analyticsEvents } from '@/utils/analyticsEvents';
 
 // ── Types ──
 
@@ -129,6 +132,65 @@ function ProfileHubSheetSkeleton() {
   );
 }
 
+// ── 2×2 grid generic tile (Messages / Notifications) ──
+function GridTile({
+  Icon, iconColor, iconBg, label, sub, badge, onClick,
+}: {
+  Icon: React.ComponentType<any>;
+  iconColor: string;
+  iconBg: string;
+  label: string;
+  sub: string;
+  badge: number;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className="relative flex flex-col justify-between text-left active:scale-[0.97] transition-transform"
+      style={{
+        minHeight: 110,
+        padding: '14px 14px 16px',
+        borderRadius: 14,
+        background: '#ffffff',
+        border: '0.5px solid rgba(15,23,42,0.10)',
+        cursor: 'pointer',
+      }}
+      aria-label={label}
+    >
+      <div className="flex items-center justify-between w-full">
+        <div
+          className="flex items-center justify-center"
+          style={{ width: 36, height: 36, borderRadius: 10, background: iconBg }}
+        >
+          <Icon size={20} color={iconColor} strokeWidth={2.2} />
+        </div>
+        {badge > 0 && (
+          <span
+            className="flex items-center justify-center rounded-full"
+            style={{
+              padding: '2px 8px',
+              minWidth: 18,
+              background: '#EF4444',
+              color: '#fff',
+              fontSize: 10,
+              fontWeight: 700,
+              lineHeight: 1.2,
+            }}
+          >
+            {badge > 99 ? '99+' : badge}
+          </span>
+        )}
+      </div>
+      <div className="w-full">
+        <div style={{ fontSize: 15, fontWeight: 700, color: '#0f172a', lineHeight: 1.2 }}>{label}</div>
+        <div style={{ fontSize: 11, color: '#64748B', marginTop: 2 }}>{sub}</div>
+      </div>
+    </button>
+  );
+}
+
 // ── Component ──
 
 function ProfileHubSheet({
@@ -205,8 +267,28 @@ function ProfileHubSheet({
 
 
   const activeProfile = profiles.find(p => p.id === localActiveId) || currentActor;
+  const isPersonal = currentActor.type === 'personal';
+  const handicapPromoted = isPersonal && isHandicapPromotedForUser(currentActor.id);
 
-  // ── Quick actions config ──
+  // Telemetry: track which sheet variant rendered when it opens
+  useEffect(() => {
+    if (!open) return;
+    analyticsEvents.track('profile_hub_sheet_opened', {
+      variant: handicapPromoted ? 'v2_grid' : 'v1_row',
+      actor_type: currentActor.type,
+    });
+  }, [open, handicapPromoted, currentActor.type]);
+
+  const handleViewProfile = useCallback(() => {
+    handleNav(`/profile/${localActiveId}`);
+  }, [handleNav, localActiveId]);
+
+  const handleHandicapTileTap = useCallback(() => {
+    analyticsEvents.track('handicap_tile_tapped', { source: 'profile_hub_sheet' });
+    handleNav('/handicap');
+  }, [handleNav]);
+
+  // ── Quick actions config (legacy 3-up) ──
   const quickActions = [
     {
       Icon: User,
@@ -235,6 +317,9 @@ function ProfileHubSheet({
   ];
 
   const accountRows = [
+    ...(handicapPromoted
+      ? [{ Icon: User, iconColor: '#3B82F6', label: 'View profile', route: `/profile/${localActiveId}` }]
+      : []),
     { Icon: Pencil, iconColor: '#F7931E', label: 'Edit profile', route: editRoute },
     { Icon: Building2, iconColor: '#0A5A3C', label: 'Manage business profiles', route: '/businesses/manage' },
     { Icon: SettingsIcon, iconColor: '#64748B', label: 'Settings', route: '/settings' },
@@ -322,37 +407,37 @@ function ProfileHubSheet({
                 </button>
               </div>
 
-              {/* ── Echo AI Assistant — Discover-style light card ── */}
-              <button
-                type="button"
-                onClick={() => handleNav('/echo')}
-                className="w-full flex items-center gap-3 active:scale-[0.98] transition-all duration-150 mb-3"
-                style={{
-                  padding: '11px 13px',
-                  borderRadius: 12,
-                  background: 'rgba(247,147,30,0.08)',
-                  border: '1px solid rgba(247,147,30,0.20)',
-                  cursor: 'pointer',
-                  textAlign: 'left',
-                }}
-              >
-                {/* Echo icon */}
-                <div style={{
-                  width: 32, height: 32, borderRadius: 9,
-                  background: 'linear-gradient(135deg, #F7931E, #E8920A)',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
-                }}>
-                  <AnimatedEchoWave size={16} color="#ffffff" active={true} />
-                </div>
-                {/* Text */}
-                <div className="flex-1 min-w-0">
-                  <div className="text-[13px] font-bold text-foreground truncate">Echo AI Assistant</div>
-                  <div className="text-[11px] text-muted-foreground truncate">Playing tips · course knowledge · advice</div>
-                </div>
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-muted-foreground flex-shrink-0">
-                  <path d="m9 18 6-6-6-6"/>
-                </svg>
-              </button>
+              {/* ── Echo AI Assistant — hidden when Handicap is promoted (Echo tile in 2×2 grid replaces it) ── */}
+              {!handicapPromoted && (
+                <button
+                  type="button"
+                  onClick={() => handleNav('/echo')}
+                  className="w-full flex items-center gap-3 active:scale-[0.98] transition-all duration-150 mb-3"
+                  style={{
+                    padding: '11px 13px',
+                    borderRadius: 12,
+                    background: 'rgba(247,147,30,0.08)',
+                    border: '1px solid rgba(247,147,30,0.20)',
+                    cursor: 'pointer',
+                    textAlign: 'left',
+                  }}
+                >
+                  <div style={{
+                    width: 32, height: 32, borderRadius: 9,
+                    background: 'linear-gradient(135deg, #F7931E, #E8920A)',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
+                  }}>
+                    <AnimatedEchoWave size={16} color="#ffffff" active={true} />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="text-[13px] font-bold text-foreground truncate">Echo AI Assistant</div>
+                    <div className="text-[11px] text-muted-foreground truncate">Playing tips · course knowledge · advice</div>
+                  </div>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-muted-foreground flex-shrink-0">
+                    <path d="m9 18 6-6-6-6"/>
+                  </svg>
+                </button>
+              )}
 
               {/* ── Switch profile ── */}
               <div>
@@ -425,76 +510,145 @@ function ProfileHubSheet({
               {/* ── Divider ── */}
               <div style={{ height: '0.5px', background: 'rgba(15,23,42,0.07)', margin: '0 -16px' }} />
 
-              {/* ── Quick actions — 3 column grid ── */}
-              <div className="grid grid-cols-3 gap-2 py-4">
-                {quickActions.map(({ Icon, iconColor, label, route, badge, badgeColor }) => (
-                    <button
-                      key={label}
-                      type="button"
-                      onClick={() => handleNav(route)}
-                      className="relative flex flex-col items-start justify-between p-3.5 rounded-2xl transition-colors duration-150 active:scale-[0.97]"
-                      style={{
-                        minHeight: 80,
-                        background: '#ffffff',
-                        border: '1px solid rgba(0,0,0,0.07)',
-                        boxShadow: '0 1px 4px rgba(0,0,0,0.05)',
-                      }}
-                    >
-                      {badge > 0 && (
-                        <span
-                          className="absolute top-2.5 right-2.5 flex items-center justify-center rounded-full text-white font-bold"
-                          style={{
-                            minWidth: badge > 9 ? 16 : 14,
-                            height: badge > 9 ? 16 : 14,
-                            padding: badge > 9 ? '0 4px' : '0',
-                            fontSize: 9,
-                            lineHeight: 1,
-                            background: badgeColor === 'emerald'
-                              ? '#10b981'
-                              : badgeColor === 'amber'
-                              ? '#F7931E'
-                              : '#10b981',
-                            boxShadow: badgeColor === 'emerald'
-                              ? '0 1px 4px rgba(16,185,129,0.4)'
-                              : '0 1px 4px rgba(247,147,30,0.4)',
-                          }}
-                        >
-                          <span style={{ lineHeight: 1 }}>
-                            {badge > 99 ? '99+' : badge}
-                          </span>
-                        </span>
-                      )}
+              {/* ── Quick actions grid ── */}
+              {handicapPromoted ? (
+                /* v2: 2×2 grid (Handicap / Echo / Messages / Notifications) */
+                <div className="grid grid-cols-2 gap-3 py-4">
+                  {/* Handicap (top-left, primary) */}
+                  <HandicapTile userId={currentActor.id} onClick={handleHandicapTileTap} />
 
+                  {/* Echo (top-right) */}
+                  <button
+                    type="button"
+                    onClick={() => handleNav('/echo')}
+                    className="relative flex flex-col justify-between text-left p-3.5 rounded-2xl active:scale-[0.97] transition-transform"
+                    style={{
+                      minHeight: 110,
+                      padding: '14px 14px 16px',
+                      borderRadius: 14,
+                      background: '#ffffff',
+                      border: '0.5px solid rgba(15,23,42,0.10)',
+                    }}
+                    aria-label="Echo"
+                  >
+                    <div className="flex items-center justify-between w-full">
                       <div
-                        className="flex items-center justify-center rounded-[10px]"
+                        className="flex items-center justify-center"
                         style={{
-                          width: 36,
-                          height: 36,
-                          background: badge > 0
-                            ? badgeColor === 'emerald'
-                              ? 'rgba(16,185,129,0.12)'
-                              : 'rgba(247,147,30,0.12)'
-                            : `${iconColor}14`,
-                          boxShadow: badge > 0
-                            ? badgeColor === 'emerald'
-                              ? '0 0 0 1px rgba(16,185,129,0.20)'
-                              : '0 0 0 1px rgba(247,147,30,0.20)'
-                            : 'none',
-                          transition: 'background 0.2s ease, box-shadow 0.2s ease',
+                          width: 36, height: 36, borderRadius: 10,
+                          background: 'transparent',
                         }}
                       >
-                        <Icon size={18} color={iconColor} strokeWidth={2.2} />
+                        <div style={{
+                          width: 28, height: 28, borderRadius: '50%',
+                          background: 'linear-gradient(135deg, #F7931E, #E8920A)',
+                          display: 'flex', alignItems: 'center', justifyContent: 'center',
+                          boxShadow: '0 2px 6px rgba(247,147,30,0.30)',
+                        }}>
+                          <AnimatedEchoWave size={14} color="#ffffff" active={true} />
+                        </div>
                       </div>
+                    </div>
+                    <div className="w-full">
+                      <div style={{ fontSize: 15, fontWeight: 700, color: '#0f172a', lineHeight: 1.2 }}>Echo</div>
+                      <div style={{ fontSize: 11, color: '#64748B', marginTop: 2 }}>Ask anything</div>
+                    </div>
+                  </button>
 
-                      <span
-                        className="text-[13px] font-bold leading-none w-full text-left"
-                        style={{ color: '#0f172a', letterSpacing: '-0.1px' }}
+                  {/* Messages (bottom-left) */}
+                  <GridTile
+                    Icon={MessageCircle}
+                    iconColor="#059669"
+                    iconBg="rgba(5,150,105,0.10)"
+                    label="Messages"
+                    sub={unreadMessageCount > 0 ? `${unreadMessageCount} unread` : 'No new messages'}
+                    badge={unreadMessageCount}
+                    onClick={() => handleNav('/messages')}
+                  />
+
+                  {/* Notifications (bottom-right) */}
+                  <GridTile
+                    Icon={Bell}
+                    iconColor="#0f172a"
+                    iconBg="rgba(15,23,42,0.06)"
+                    label="Notifications"
+                    sub={unreadNotificationCount > 0 ? `${unreadNotificationCount} new` : 'No new notifications'}
+                    badge={unreadNotificationCount}
+                    onClick={() => handleNav('/notificationmessages')}
+                  />
+                </div>
+              ) : (
+                /* v1: legacy 3-up row */
+                <div className="grid grid-cols-3 gap-2 py-4">
+                  {quickActions.map(({ Icon, iconColor, label, route, badge, badgeColor }) => (
+                      <button
+                        key={label}
+                        type="button"
+                        onClick={() => handleNav(route)}
+                        className="relative flex flex-col items-start justify-between p-3.5 rounded-2xl transition-colors duration-150 active:scale-[0.97]"
+                        style={{
+                          minHeight: 80,
+                          background: '#ffffff',
+                          border: '1px solid rgba(0,0,0,0.07)',
+                          boxShadow: '0 1px 4px rgba(0,0,0,0.05)',
+                        }}
                       >
-                        {label}
-                      </span>
-                    </button>
-                ))}
-              </div>
+                        {badge > 0 && (
+                          <span
+                            className="absolute top-2.5 right-2.5 flex items-center justify-center rounded-full text-white font-bold"
+                            style={{
+                              minWidth: badge > 9 ? 16 : 14,
+                              height: badge > 9 ? 16 : 14,
+                              padding: badge > 9 ? '0 4px' : '0',
+                              fontSize: 9,
+                              lineHeight: 1,
+                              background: badgeColor === 'emerald'
+                                ? '#10b981'
+                                : badgeColor === 'amber'
+                                ? '#F7931E'
+                                : '#10b981',
+                              boxShadow: badgeColor === 'emerald'
+                                ? '0 1px 4px rgba(16,185,129,0.4)'
+                                : '0 1px 4px rgba(247,147,30,0.4)',
+                            }}
+                          >
+                            <span style={{ lineHeight: 1 }}>
+                              {badge > 99 ? '99+' : badge}
+                            </span>
+                          </span>
+                        )}
+
+                        <div
+                          className="flex items-center justify-center rounded-[10px]"
+                          style={{
+                            width: 36,
+                            height: 36,
+                            background: badge > 0
+                              ? badgeColor === 'emerald'
+                                ? 'rgba(16,185,129,0.12)'
+                                : 'rgba(247,147,30,0.12)'
+                              : `${iconColor}14`,
+                            boxShadow: badge > 0
+                              ? badgeColor === 'emerald'
+                                ? '0 0 0 1px rgba(16,185,129,0.20)'
+                                : '0 0 0 1px rgba(247,147,30,0.20)'
+                              : 'none',
+                            transition: 'background 0.2s ease, box-shadow 0.2s ease',
+                          }}
+                        >
+                          <Icon size={18} color={iconColor} strokeWidth={2.2} />
+                        </div>
+
+                        <span
+                          className="text-[13px] font-bold leading-none w-full text-left"
+                          style={{ color: '#0f172a', letterSpacing: '-0.1px' }}
+                        >
+                          {label}
+                        </span>
+                      </button>
+                  ))}
+                </div>
+              )}
 
               {/* ── Divider ── */}
               <div style={{ height: '0.5px', background: 'rgba(15,23,42,0.07)', margin: '0 -16px' }} />
