@@ -1088,6 +1088,19 @@ function CompactPick({
           initialsFontSize={12}
         />
         <div style={{ flex: 1, minWidth: 0 }}>
+          {winProbability > 0 && (
+            <div
+              style={{
+                ...monoLabel,
+                fontSize: 8,
+                color: SLATE_500,
+                letterSpacing: '0.18em',
+                marginBottom: 2,
+              }}
+            >
+              {Math.round(winProbability * 100)}% WIN PROBABILITY
+            </div>
+          )}
           <div
             style={{
               fontFamily: headlineFont,
