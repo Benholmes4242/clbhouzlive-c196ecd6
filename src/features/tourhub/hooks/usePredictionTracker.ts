@@ -70,7 +70,7 @@ async function fetchTrackerData(
   const trackedPredictions: TrackedPrediction[] = predictions.topContenders.slice(0, 3).map((p, i) => {
     const lb = leaderboardMap.get(p.playerId)
       ?? leaderboardByName.get(p.playerName?.toLowerCase() ?? '');
-    return buildTrackedPrediction(p, i + 1, lb, false, fieldCompletionPct);
+    return buildTrackedPrediction(p, i + 1, lb, false, fieldCompletionPct, tournamentId);
   });
 
   // Backwards compat: if old data had dark horses but < 5 contenders, merge them in
