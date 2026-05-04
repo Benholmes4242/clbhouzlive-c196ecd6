@@ -14,6 +14,7 @@ import {
   User, MessageCircle, Bell,
   Pencil, Building2, Settings as SettingsIcon,
 } from 'lucide-react';
+import HandicapTile from '@/components/handicap/HandicapTile';
 import { cn } from '@/lib/utils';
 import { useUnreadNotifications } from '@/hooks/useUnreadNotifications';
 import GlobalSearchOverlay from '@/components/search/GlobalSearchOverlay';
