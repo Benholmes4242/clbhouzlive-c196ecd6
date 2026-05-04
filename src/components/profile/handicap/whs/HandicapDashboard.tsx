@@ -159,37 +159,44 @@ export const HandicapDashboard: React.FC<Props> = ({ connection, userId, readOnl
           />
         )}
         {activeSubtab === 'friends' && (
-          <FriendsView userId={userId} currentHandicap={currentHandicap} connectionId={connection.id} />
+          <FriendsView
+            userId={userId}
+            currentHandicap={currentHandicap}
+            connectionId={connection.id}
+            readOnly={readOnly}
+          />
         )}
       </div>
 
-      {/* PERSISTENT — footer */}
-      <div className="px-5 pt-2 flex flex-col items-center gap-3">
-        <p className="text-[12px] text-muted-foreground">
-          {lastSyncedAt
-            ? `Last refreshed ${formatDistanceToNow(lastSyncedAt, { addSuffix: true })}`
-            : 'Not yet synced'}
-        </p>
-        <button
-          onClick={handleSyncNow}
-          disabled={isSyncing}
-          className="inline-flex items-center gap-1.5 text-[14px] font-semibold disabled:opacity-50"
-          style={{ color: '#F7931E' }}
-        >
-          <RefreshCw className={`h-3.5 w-3.5 ${isSyncing ? 'animate-spin' : ''}`} />
-          {isSyncing ? 'Syncing...' : 'Sync now'}
-        </button>
-        <button
-          onClick={() =>
-            toast(
-              'Disconnect coming soon — get in touch via support if you need to disconnect now.'
-            )
-          }
-          className="text-[12px] text-muted-foreground mt-2"
-        >
-          Disconnect England Golf
-        </button>
-      </div>
+      {/* PERSISTENT — footer (hidden in read-only mode) */}
+      {!readOnly && (
+        <div className="px-5 pt-2 flex flex-col items-center gap-3">
+          <p className="text-[12px] text-muted-foreground">
+            {lastSyncedAt
+              ? `Last refreshed ${formatDistanceToNow(lastSyncedAt, { addSuffix: true })}`
+              : 'Not yet synced'}
+          </p>
+          <button
+            onClick={handleSyncNow}
+            disabled={isSyncing}
+            className="inline-flex items-center gap-1.5 text-[14px] font-semibold disabled:opacity-50"
+            style={{ color: '#F7931E' }}
+          >
+            <RefreshCw className={`h-3.5 w-3.5 ${isSyncing ? 'animate-spin' : ''}`} />
+            {isSyncing ? 'Syncing...' : 'Sync now'}
+          </button>
+          <button
+            onClick={() =>
+              toast(
+                'Disconnect coming soon — get in touch via support if you need to disconnect now.'
+              )
+            }
+            className="text-[12px] text-muted-foreground mt-2"
+          >
+            Disconnect England Golf
+          </button>
+        </div>
+      )}
 
       {lastSyncedAt && (
         <p
