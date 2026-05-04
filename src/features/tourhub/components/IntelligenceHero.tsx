@@ -551,8 +551,6 @@ function UpcomingCard({ pick }: { pick: UpcomingPick }) {
             color: '#FFFFFF',
             letterSpacing: '0.12em',
             textTransform: 'uppercase',
-            transform: 'rotate(-6deg)',
-            transformOrigin: 'top right',
             display: 'inline-flex',
             alignItems: 'center',
             gap: 5,
