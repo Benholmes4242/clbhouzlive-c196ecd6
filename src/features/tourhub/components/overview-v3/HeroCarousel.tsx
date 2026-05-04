@@ -16,7 +16,7 @@ import type { PlayerInfo } from '@/components/tourhub/PlayerScorecardCard';
 import { Link, useNavigate } from 'react-router-dom';
 import { tournamentRoute } from '../../routes';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronDown, ChevronRight, Trophy, MapPin } from 'lucide-react';
+import { ChevronDown, ChevronRight, Trophy, MapPin, ArrowUp, ArrowDown } from 'lucide-react';
 import { greenLive, gold, inkFaint, inkSoft, hairlineDark, ink, SHIMMER_KEYFRAMES } from '@/features/tourhub/utils/heroAtmosphere';
 
 import { cn } from '@/lib/utils';
@@ -515,10 +515,14 @@ function MiniLeaderboardRow({ leader, isFirst, index, isActive, isLeader, scoreF
         {leader.scoreDisplay}
       </span>
       {positionDelta > 0 && (
-        <span className="movement-up">▲{positionDelta}</span>
+        <span className="movement-pill movement-up" aria-label={`Up ${positionDelta}`}>
+          <ArrowUp /> {positionDelta}
+        </span>
       )}
       {positionDelta < 0 && (
-        <span className="movement-down">▼{Math.abs(positionDelta)}</span>
+        <span className="movement-pill movement-down" aria-label={`Down ${Math.abs(positionDelta)}`}>
+          <ArrowDown /> {Math.abs(positionDelta)}
+        </span>
       )}
     </motion.div>
   );
