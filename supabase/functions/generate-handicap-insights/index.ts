@@ -7,6 +7,14 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type",
 };
 
+const todayKey = () => {
+  const d = new Date();
+  const y = d.getUTCFullYear();
+  const m = String(d.getUTCMonth() + 1).padStart(2, "0");
+  const day = String(d.getUTCDate()).padStart(2, "0");
+  return `${y}-${m}-${day}`;
+};
+
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -43,7 +51,9 @@ Deno.serve(async (req) => {
       return json({ error: "Not found" }, 404);
     }
 
-    // Last 30 rounds
+    const dateKey = todayKey();
+
+    // Last 30 rounds (course_id here is a whs_courses.id)
     const { data: rounds, error: rErr } = await admin
       .from("whs_scores")
       .select(
@@ -58,47 +68,115 @@ Deno.serve(async (req) => {
       return json({ error: "Not enough rounds" }, 400);
     }
 
-    const courseIds = Array.from(
+    const whsCourseIds = Array.from(
       new Set(rounds.map((r: any) => r.course_id).filter(Boolean)),
     );
-    const { data: courses } = await admin
-      .from("golf_courses")
-      .select("id, name, region, country")
-      .in("id", courseIds.length ? courseIds : ["00000000-0000-0000-0000-000000000000"]);
-    const courseById = new Map((courses ?? []).map((c: any) => [c.id, c]));
 
-    // Determine common regions and recently-played
-    const regionCount = new Map<string, number>();
-    for (const r of rounds) {
-      const c = courseById.get(r.course_id);
-      if (c?.region) regionCount.set(c.region, (regionCount.get(c.region) || 0) + 1);
+    // Bridge WHS courses → golf_courses
+    const { data: bridge } = await admin
+      .from("whs_to_golf_course_map")
+      .select("whs_course_id, golf_course_id, match_confidence")
+      .in("whs_course_id", whsCourseIds.length ? whsCourseIds : ["00000000-0000-0000-0000-000000000000"]);
+
+    const whsToGolf = new Map<string, string>();
+    for (const b of bridge ?? []) {
+      if (b.golf_course_id) whsToGolf.set(b.whs_course_id, b.golf_course_id);
     }
-    const topRegions = [...regionCount.entries()]
-      .sort((a, b) => b[1] - a[1])
-      .slice(0, 3)
-      .map(([r]) => r);
-    const recentlyPlayed = new Set(
-      rounds.slice(0, 5).map((r: any) => r.course_id).filter(Boolean),
+
+    // Hydrate WHS courses (for names when bridge missing)
+    const { data: whsCourses } = await admin
+      .from("whs_courses")
+      .select("id, name, country_code, country_name")
+      .in("id", whsCourseIds.length ? whsCourseIds : ["00000000-0000-0000-0000-000000000000"]);
+    const whsById = new Map((whsCourses ?? []).map((c: any) => [c.id, c]));
+
+    // Hydrate mapped golf_courses
+    const playedGolfIds = Array.from(new Set([...whsToGolf.values()]));
+    const { data: playedGolfCourses } = playedGolfIds.length
+      ? await admin
+          .from("golf_courses")
+          .select("id, name, region, country, country_code")
+          .in("id", playedGolfIds)
+      : { data: [] as any[] };
+    const golfById = new Map((playedGolfCourses ?? []).map((c: any) => [c.id, c]));
+
+    // Determine common regions/countries
+    const regionCount = new Map<string, number>();
+    const countryCount = new Map<string, number>();
+    for (const r of rounds) {
+      const golfId = whsToGolf.get(r.course_id);
+      const gc = golfId ? golfById.get(golfId) : null;
+      if (gc?.region) regionCount.set(gc.region, (regionCount.get(gc.region) || 0) + 1);
+      const cc = gc?.country_code || whsById.get(r.course_id)?.country_code;
+      if (cc) countryCount.set(cc, (countryCount.get(cc) || 0) + 1);
+    }
+    const topRegions = [...regionCount.entries()].sort((a, b) => b[1] - a[1]).slice(0, 3).map(([r]) => r);
+    const topCountries = [...countryCount.entries()].sort((a, b) => b[1] - a[1]).slice(0, 2).map(([c]) => c);
+
+    // Recently recommended IDs (7-day window, exclude)
+    const sevenAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
+    const { data: recentRecs } = await admin
+      .from("whs_ai_recommendation_history")
+      .select("recommended_ids, date_key")
+      .eq("connection_id", connection_id)
+      .gte("date_key", sevenAgo);
+    const recentlyRecommended = new Set<string>();
+    for (const row of recentRecs ?? []) {
+      for (const id of (row.recommended_ids ?? []) as string[]) recentlyRecommended.add(id);
+    }
+    const recentlyPlayedGolfIds = new Set(
+      rounds.slice(0, 5).map((r: any) => whsToGolf.get(r.course_id)).filter(Boolean) as string[],
     );
 
-    // Candidate pool
+    // Candidate pool: prefer regions, then country fallback
     let candidates: any[] = [];
     if (topRegions.length) {
       const { data: cand } = await admin
         .from("golf_courses")
-        .select("id, name, region, country")
+        .select("id, name, region, country, country_code")
         .in("region", topRegions)
-        .limit(60);
-      candidates = (cand ?? []).filter((c: any) => !recentlyPlayed.has(c.id));
+        .limit(120);
+      candidates = (cand ?? []);
     }
-    candidates = candidates.slice(0, 50);
+    if (candidates.length < 20 && topCountries.length) {
+      const { data: cand } = await admin
+        .from("golf_courses")
+        .select("id, name, region, country, country_code")
+        .in("country_code", topCountries)
+        .limit(120);
+      const seen = new Set(candidates.map((c) => c.id));
+      for (const c of cand ?? []) if (!seen.has(c.id)) candidates.push(c);
+    }
+
+    candidates = candidates
+      .filter((c) => !recentlyPlayedGolfIds.has(c.id))
+      .filter((c) => !recentlyRecommended.has(c.id))
+      .slice(0, 60);
+
+    if (candidates.length < 6) {
+      // Top up ignoring recommendation history if we're starved
+      const needed = 6 - candidates.length;
+      const { data: cand } = await admin
+        .from("golf_courses")
+        .select("id, name, region, country, country_code")
+        .in("country_code", topCountries.length ? topCountries : ["GB", "US"])
+        .limit(60);
+      const seen = new Set(candidates.map((c) => c.id));
+      for (const c of cand ?? []) {
+        if (candidates.length >= 6 + needed) break;
+        if (!seen.has(c.id) && !recentlyPlayedGolfIds.has(c.id)) candidates.push(c);
+      }
+    }
 
     const roundsForPrompt = rounds.map((r: any) => {
-      const c = courseById.get(r.course_id);
+      const golfId = whsToGolf.get(r.course_id);
+      const gc = golfId ? golfById.get(golfId) : null;
+      const wc = whsById.get(r.course_id);
       return {
-        course_id: r.course_id,
-        course_name: c?.name ?? null,
-        region: c?.region ?? null,
+        course_id: golfId ?? r.course_id,
+        course_name: gc?.name ?? wc?.name ?? null,
+        region: gc?.region ?? null,
+        country: gc?.country ?? wc?.country_name ?? null,
         play_date: r.play_date,
         adjusted_gross: r.adjusted_gross,
         differential: r.handicap_differential,
@@ -110,7 +188,7 @@ Deno.serve(async (req) => {
 
     const latestScoreId = rounds[0].id as string;
 
-    const prompt = buildPrompt(roundsForPrompt, candidates);
+    const prompt = buildPrompt(roundsForPrompt, candidates, dateKey);
 
     const aiResp = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
@@ -121,7 +199,7 @@ Deno.serve(async (req) => {
       body: JSON.stringify({
         model: "google/gemini-3-flash-preview",
         messages: [
-          { role: "system", content: "You are Echo, the AI assistant for Clbhouz, a golf social platform. Reply with JSON only." },
+          { role: "system", content: "You are Echo, the AI golf insights engine for Clbhouz. You analyse a player's WHS round history and recommend courses from a provided candidate pool. Reply with JSON only. Vary your recommendations day-to-day when given the same inputs." },
           { role: "user", content: prompt },
         ],
         response_format: { type: "json_object" },
@@ -151,7 +229,7 @@ Deno.serve(async (req) => {
         ? arr
             .filter((x) => x && typeof x.id === "string" && candidateIds.has(x.id))
             .slice(0, 3)
-            .map((x) => ({ id: x.id, rationale: String(x.rationale ?? "").slice(0, 200) }))
+            .map((x) => ({ id: x.id, rationale: String(x.rationale ?? "").slice(0, 240) }))
         : [];
 
     const suited = validate(parsed.suited_courses);
@@ -169,15 +247,26 @@ Deno.serve(async (req) => {
       test_courses: test,
       generated_from_score_id: latestScoreId,
       generated_at: new Date().toISOString(),
+      date_key: dateKey,
     });
 
+    // Track recommendation history (7-day no-dup window)
+    const allRecIds = [...suited.map((s) => s.id), ...test.map((t) => t.id)];
+    if (allRecIds.length) {
+      await admin.from("whs_ai_recommendation_history").upsert({
+        connection_id,
+        date_key: dateKey,
+        recommended_ids: allRecIds,
+        generated_at: new Date().toISOString(),
+      }, { onConflict: "connection_id,date_key" });
+    }
+
     // Hydrate
-    const allIds = [...suited.map((s) => s.id), ...test.map((t) => t.id)];
-    const { data: hydrated } = allIds.length
+    const { data: hydrated } = allRecIds.length
       ? await admin
           .from("golf_courses")
           .select("id, name, region, country")
-          .in("id", allIds)
+          .in("id", allRecIds)
       : { data: [] as any[] };
     const hyMap = new Map((hydrated ?? []).map((c: any) => [c.id, c]));
 
@@ -217,27 +306,28 @@ function json(body: unknown, status = 200) {
   });
 }
 
-function buildPrompt(rounds: any[], candidates: any[]) {
-  return `Analyse this player's recent round history and generate insights about what kinds of courses suit their game and what their recent counter rounds reveal.
+function buildPrompt(rounds: any[], candidates: any[], dateKey: string) {
+  return `Today is ${dateKey}. Analyse this player's recent WHS round history and produce daily insights about what kinds of courses suit their game.
 
 PLAYER ROUND HISTORY (last ${rounds.length} rounds, newest first):
 ${JSON.stringify(rounds)}
 
-CANDIDATE COURSES (nearby courses they haven't played recently):
+CANDIDATE COURSES (${candidates.length} nearby courses they haven't played recently and haven't been recommended in the past 7 days):
 ${JSON.stringify(candidates)}
 
 Produce a JSON response with this exact structure:
 {
-  "scoring_profile": "<2-3 sentences (50-70 words) characterising what kinds of courses suit this player's game. Reference their best counter and a specific course where they shot it. Mention what kind of course produces higher differentials. Concrete, evidence-based.>",
-  "rounds_pattern": "<1-2 sentences (max 30 words) describing a concrete observation about the player's recent counter rounds. Reference specific numbers and wrap key values in **bold** markdown. Examples: average of last 3-5 vs the 8-round average, whether the most recent round was a new best/worst, or whether they're trending hotter or cooler. No speculation.>",
-  "suited_courses": [ { "id": "<course id from candidates>", "rationale": "<one sentence, max 20 words, why this course matches their best scoring profile>" } ],
-  "test_courses":   [ { "id": "<course id from candidates>", "rationale": "<one sentence, max 20 words, why this course will push their game (frame as growth)>" } ]
+  "scoring_profile": "<2-3 sentences (50-70 words) characterising what kinds of courses suit this player's game. Reference a concrete best round (course + differential) and what kind of setup tends to produce higher differentials. Evidence-based.>",
+  "rounds_pattern": "<1-2 sentences (max 30 words) describing a concrete observation about recent counter rounds. Reference specific numbers and wrap key values in **bold** markdown (e.g. **+0.6**, **+1.7**). No speculation.>",
+  "suited_courses": [ { "id": "<golf_courses.id from CANDIDATE COURSES>", "rationale": "<one sentence, max 22 words, why this course matches their best scoring profile>" } ],
+  "test_courses":   [ { "id": "<golf_courses.id from CANDIDATE COURSES>", "rationale": "<one sentence, max 22 words, why this course will push their game (frame as growth)>" } ]
 }
 
 Rules:
 - Exactly 3 items in each array (or fewer only if candidates < 6).
-- Only use IDs from CANDIDATE COURSES. Never invent IDs.
-- If sample < 15, prefix profile with "Early signal:" or similar.
-- rounds_pattern MUST wrap numeric values in **bold** markdown (e.g. **+0.6**, **+1.7**).
+- Only use IDs from CANDIDATE COURSES. Never invent IDs. Never reuse the same id across suited and test.
+- If round sample < 15, prefix scoring_profile with "Early signal: ".
+- rounds_pattern MUST wrap numeric values in **bold** markdown.
+- Vary picks day-to-day when reasonable (today's date_key is ${dateKey}).
 - Return JSON only.`;
 }
