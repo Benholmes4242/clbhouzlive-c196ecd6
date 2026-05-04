@@ -111,6 +111,7 @@ const AccountTypeOnboarding = lazy(() => import("./pages/onboarding/AccountTypeO
 const EditProfilePage = lazy(() => import("./pages/EditProfilePage"));
 const QuickEditProfilePage = lazy(() => import("./pages/QuickEditProfilePage"));
 const ProfileHandicapView = lazy(() => import("./pages/ProfileHandicapView"));
+const HandicapPage = lazy(() => import("./pages/HandicapPage"));
 const ProfileQuestView = lazy(() => import("./pages/ProfileQuestView"));
 const QuestIndexView = lazy(() => import("./pages/QuestIndexView"));
 const QuestReplayView = lazy(() => import("./pages/QuestReplayView"));
