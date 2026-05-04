@@ -344,6 +344,19 @@ export const EchoInsightsCard: React.FC<Props> = ({ connectionId }) => {
               </div>
             </button>
           </div>
+          {insights.rounds_pattern && (
+            <div
+              style={{
+                marginTop: 10,
+                paddingLeft: 56,
+                fontSize: 12,
+                lineHeight: 1.5,
+                color: INK_55,
+              }}
+            >
+              {renderBoldMarkdown(insights.rounds_pattern)}
+            </div>
+          )}
         </div>
       )}
 
