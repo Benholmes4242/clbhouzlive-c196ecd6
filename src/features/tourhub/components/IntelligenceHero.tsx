@@ -545,19 +545,19 @@ function UpcomingCard({ pick }: { pick: UpcomingPick }) {
             border: '1px solid rgba(255, 255, 255, 0.12)',
             boxShadow: '0 2px 8px rgba(0, 0, 0, 0.25)',
             borderRadius: 4,
-            padding: '4px 10px',
-            fontSize: 10,
+            padding: '3px 8px',
+            fontSize: 9,
             fontWeight: 800,
             color: '#FFFFFF',
             letterSpacing: '0.12em',
             textTransform: 'uppercase',
             display: 'inline-flex',
             alignItems: 'center',
-            gap: 5,
+            gap: 4,
             fontFamily: headlineFont,
           }}
         >
-          <Clock size={10} strokeWidth={3} /> Upcoming
+          <Clock size={9} strokeWidth={3} /> Upcoming
         </div>
         <div
           style={{
