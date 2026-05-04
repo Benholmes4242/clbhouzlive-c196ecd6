@@ -8,6 +8,13 @@ import { motion } from 'framer-motion';
 import { ChevronLeft, X, Trophy } from 'lucide-react';
 import { usePlayerScorecard, type RoundScorecard, type HoleScore } from '@/hooks/usePlayerScorecard';
 import { getScoreTextClass, getScoreBgClass, getScoreColorSet, SCORE_COLORS } from '@/features/tourhub/utils/scoreColors';
+import { HeroAtmosphere } from '@/features/tourhub/components/shared/HeroAtmosphere';
+import {
+  ink, inkSoft, inkFaint, inkGhost,
+  hairlineDark, hairlineMid,
+  gold, greenLive, danger, navyMid,
+  fmtScore, fmtScoreSign, PULSE_KEYFRAMES,
+} from '@/features/tourhub/utils/heroAtmosphere';
 
 // ── Types ──────────────────────────────────────────────────────────────────────
 
