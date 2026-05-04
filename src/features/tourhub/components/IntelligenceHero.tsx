@@ -1413,7 +1413,8 @@ export const IntelligenceHero = memo(function IntelligenceHero() {
   const headline =
     state === 'live'
       ? 'Tracking our 3 picks live.'
-      : 'Our 3 picks for the week.';
+      : 'Our 3 picks for';
+  const headlineTournamentName = state === 'live' ? undefined : meta.name && meta.name !== '—' ? meta.name : undefined;
 
   const hasWinner = state === 'results' && resultsPicks.some((p) => p.outcome === 'win');
 
