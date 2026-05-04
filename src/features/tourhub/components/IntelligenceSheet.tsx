@@ -101,17 +101,13 @@ function Header({ onClose }: { onClose: () => void }) {
       <div style={{ display: 'flex', alignItems: 'center', gap: 12, minWidth: 0, flex: 1 }}>
         <div
           style={{
-            width: 36,
-            height: 36,
-            borderRadius: '50%',
-            background: AMBER_SOFT,
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
             flexShrink: 0,
           }}
         >
-          <Brain size={18} color={AMBER} strokeWidth={2.5} />
+          <Brain size={22} color={AMBER} strokeWidth={2.5} />
         </div>
         <div style={{ minWidth: 0 }}>
           <h2
