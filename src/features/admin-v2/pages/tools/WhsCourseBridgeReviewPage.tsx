@@ -59,7 +59,7 @@ export default function WhsCourseBridgeReviewPage() {
 
     const { data, error } = await query;
     if (error) {
-      toast({ title: 'Failed to load', description: error.message, variant: 'destructive' });
+      toast.error('Failed to load', { description: error.message });
     } else {
       setRows((data ?? []) as unknown as BridgeRow[]);
     }
@@ -83,12 +83,12 @@ export default function WhsCourseBridgeReviewPage() {
   useEffect(() => { loadStats(); }, []);
 
   const runBackfill = async () => {
-    toast({ title: 'Running backfill…' });
+    toast('Running backfill…');
     const { data, error } = await supabase.functions.invoke('backfill-whs-course-mapping', {
       body: { mode: 'bulk' },
     });
-    if (error) toast({ title: 'Backfill failed', description: error.message, variant: 'destructive' });
-    else toast({ title: 'Backfill done', description: JSON.stringify(data).slice(0, 200) });
+    if (error) toast.error('Backfill failed', { description: error.message });
+    else toast('Backfill done', { description: JSON.stringify(data).slice(0, 200) });
     loadStats();
     load();
   };
@@ -114,8 +114,8 @@ export default function WhsCourseBridgeReviewPage() {
       .from('whs_to_golf_course_map')
       .update({ reviewed_at: new Date().toISOString(), reviewed_by: userId })
       .eq('whs_course_id', row.whs_course_id);
-    if (error) toast({ title: 'Failed', description: error.message, variant: 'destructive' });
-    else { toast({ title: 'Confirmed' }); load(); }
+    if (error) toast.error('Failed', { description: error.message });
+    else { toast('Confirmed'); load(); }
   };
 
   const overrideMatch = async (row: BridgeRow, golfCourseId: string) => {
@@ -131,8 +131,8 @@ export default function WhsCourseBridgeReviewPage() {
         reviewed_by: userId,
       })
       .eq('whs_course_id', row.whs_course_id);
-    if (error) toast({ title: 'Failed', description: error.message, variant: 'destructive' });
-    else { toast({ title: 'Overridden' }); load(); }
+    if (error) toast.error('Failed', { description: error.message });
+    else { toast('Overridden'); load(); }
   };
 
   const totalRows = useMemo(
