@@ -539,20 +539,27 @@ function UpcomingCard({ pick }: { pick: UpcomingPick }) {
             position: 'absolute',
             top: 12,
             right: 12,
-            background: amber,
-            padding: '5px 10px',
-            borderRadius: 8,
-            fontSize: 9.5,
-            fontWeight: 700,
-            letterSpacing: '0.08em',
-            color: '#fff',
-            display: 'flex',
+            background: 'rgba(0, 0, 0, 0.28)',
+            backdropFilter: 'blur(22px) saturate(180%)',
+            WebkitBackdropFilter: 'blur(22px) saturate(180%)',
+            border: '1px solid rgba(255, 255, 255, 0.12)',
+            boxShadow: '0 2px 8px rgba(0, 0, 0, 0.25)',
+            borderRadius: 4,
+            padding: '4px 10px',
+            fontSize: 10,
+            fontWeight: 800,
+            color: '#FFFFFF',
+            letterSpacing: '0.12em',
+            textTransform: 'uppercase',
+            transform: 'rotate(-6deg)',
+            transformOrigin: 'top right',
+            display: 'inline-flex',
             alignItems: 'center',
-            gap: 4,
+            gap: 5,
             fontFamily: headlineFont,
           }}
         >
-          <Clock size={10} strokeWidth={3} /> TO PLAY
+          <Clock size={10} strokeWidth={3} /> To Play
         </div>
         <div
           style={{
