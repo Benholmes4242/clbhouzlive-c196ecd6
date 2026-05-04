@@ -1356,18 +1356,33 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
                             animate={{ opacity: 1, y: 0 }}
                             exit={{ opacity: 0 }}
                             transition={{ duration: 0.22, ease: [0.19, 1, 0.22, 1] }}
+                            style={{
+                              position: 'relative',
+                              background: 'linear-gradient(180deg, rgba(255,184,0,0.12) 0%, rgba(255,184,0,0.04) 100%)',
+                              border: '1px solid rgba(255,184,0,0.25)',
+                              borderRadius: 18,
+                              padding: '14px 14px 12px',
+                              marginBottom: 14,
+                              overflow: 'hidden',
+                            }}
                           >
+                            {/* Trophy watermark */}
+                            <Trophy size={120} strokeWidth={1} style={{
+                              position: 'absolute', right: -20, top: -10,
+                              color: gold, opacity: 0.06, pointerEvents: 'none',
+                            }} />
+
                             {/* Champion eyebrow with country flag */}
-                            <div style={{ display: 'flex', alignItems: 'center', gap: 5, marginBottom: 10 }}>
-                              <span style={{ fontSize: 12 }}>🏆</span>
-                              <span style={{ fontSize: 11, fontWeight: 700, color: '#ffffff', letterSpacing: '0.12em', textTransform: 'uppercase' as const }}>Champion</span>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 12, position: 'relative', zIndex: 1 }}>
+                              <Trophy size={11} color={gold} strokeWidth={2.5} />
+                              <span style={{ fontSize: 9, fontWeight: 800, color: gold, letterSpacing: '0.18em', textTransform: 'uppercase' as const }}>Champion</span>
                               {podiumWinner.country && COUNTRY_TO_FLAG[podiumWinner.country.toUpperCase()] && (
-                                <span style={{ fontSize: 14 }}>{COUNTRY_TO_FLAG[podiumWinner.country.toUpperCase()]}</span>
+                                <span style={{ fontSize: 13 }}>{COUNTRY_TO_FLAG[podiumWinner.country.toUpperCase()]}</span>
                               )}
                             </div>
 
                             {/* Winner identity — avatar + name left, giant score right */}
-                            <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', marginBottom: 8 }}>
+                            <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', marginBottom: 10, position: 'relative', zIndex: 1 }}>
                               <div style={{ display: 'flex', alignItems: 'flex-end', gap: 12, minWidth: 0, flex: 1 }}>
                                 <button onClick={() => handleScorecardTap(finisherToPlayerInfo(podiumWinner))} className="transition-opacity active:opacity-70" style={{ flexShrink: 0 }}>
                                   <PlayerAvatar
@@ -1381,22 +1396,27 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
                                 </button>
                                 <div style={{ paddingBottom: 2, minWidth: 0 }}>
                                   <button onClick={() => handleScorecardTap(finisherToPlayerInfo(podiumWinner))} className="transition-opacity active:opacity-70" style={{ display: 'block', textAlign: 'left' as const }}>
-                                    <div style={{ fontSize: 'clamp(18px, 5.5vw, 22px)', fontWeight: 800, color: '#fff', letterSpacing: '-0.02em', lineHeight: 1.1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const }}>
+                                    <div style={{ fontSize: 'clamp(20px, 6vw, 24px)', fontWeight: 800, color: '#fff', letterSpacing: '-0.02em', lineHeight: 1.1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const }}>
                                       {podiumWinner.fullName || podiumWinner.displayName}
                                     </div>
                                   </button>
-                                  <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.4)', marginTop: 3 }}>
-                                    72 Holes
-                                  </div>
+                                  {winningMargin && (
+                                    <div style={{ fontSize: 12, color: gold, marginTop: 6, fontWeight: 700 }}>
+                                      {winningMargin}
+                                    </div>
+                                  )}
                                 </div>
                               </div>
-                              <span style={{ fontSize: 'clamp(38px, 13vw, 52px)', fontWeight: 900, color: '#ffffff', letterSpacing: '-0.04em', lineHeight: 1, fontVariantNumeric: 'tabular-nums', flexShrink: 0 }}>
+                              <span style={{
+                                fontSize: 'clamp(38px, 13vw, 52px)', fontWeight: 800, color: gold,
+                                letterSpacing: '-0.04em', lineHeight: 0.9, fontVariantNumeric: 'tabular-nums', flexShrink: 0,
+                              }}>
                                 {podiumWinner.displayScore}
                               </span>
                             </div>
 
-                            {/* Round history pills + winning margin chip */}
-                            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14 }}>
+                            {/* Round history pills */}
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 8, position: 'relative', zIndex: 1 }}>
                               <RoundHistoryPills
                                 round1={podiumWinner.round1}
                                 round2={podiumWinner.round2}
@@ -1405,18 +1425,6 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
                                 currentRound={5}
                                 highlightFinal
                               />
-                              {winningMargin && (
-                                <div style={{
-                                  padding: '4px 8px',
-                                  borderRadius: 7,
-                                  background: 'rgba(255,255,255,0.05)',
-                                  border: '1px solid rgba(255,255,255,0.08)',
-                                  fontSize: 11, fontWeight: 600, color: 'rgba(255,255,255,0.45)',
-                                  whiteSpace: 'nowrap' as const,
-                                }}>
-                                  {winningMargin.replace('Won by ', '').replace(' strokes', ' strokes').replace(' stroke', ' stroke')}
-                                </div>
-                              )}
                             </div>
                           </motion.div>
                         ) : winnerInfo?.winnerName ? (
