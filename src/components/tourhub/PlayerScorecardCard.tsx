@@ -8,6 +8,13 @@ import { motion } from 'framer-motion';
 import { ChevronLeft, X, Trophy } from 'lucide-react';
 import { usePlayerScorecard, type RoundScorecard, type HoleScore } from '@/hooks/usePlayerScorecard';
 import { getScoreTextClass, getScoreBgClass, getScoreColorSet, SCORE_COLORS } from '@/features/tourhub/utils/scoreColors';
+import { HeroAtmosphere } from '@/features/tourhub/components/shared/HeroAtmosphere';
+import {
+  ink, inkSoft, inkFaint, inkGhost,
+  hairlineDark, hairlineMid,
+  gold, greenLive, danger, navyMid,
+  fmtScore, fmtScoreSign, PULSE_KEYFRAMES,
+} from '@/features/tourhub/utils/heroAtmosphere';
 
 // ── Types ──────────────────────────────────────────────────────────────────────
 
@@ -236,21 +243,26 @@ function RoundTabs({
   const tabs = [1, 2, 3, 4];
 
   return (
-    <div style={{ display: 'flex', gap: 'clamp(3px, 1vw, 5px)', padding: '4px 16px 10px', width: 'fit-content', maxWidth: '100%' }}>
+    <div
+      style={{
+        display: 'flex', gap: 0,
+        padding: '8px 16px 12px',
+        borderBottom: `1px solid ${hairlineDark}`,
+        marginBottom: 12,
+      }}
+    >
       {tabs.map((roundNum) => {
         const hasScorecard = rounds.some(r => r.roundNumber === roundNum);
         const rs = roundScores.find(r => r.round === roundNum);
         const hasData = hasScorecard || (rs && rs.holesCompleted > 0);
         const isActive = roundNum === activeRound;
         const toPar = rs?.toPar ?? null;
-        const fmtScore = toPar === null ? null
-          : toPar === 0 ? 'E'
-          : toPar > 0 ? `+${toPar}`
-          : `${toPar}`;
-        const scoreColor = toPar === null ? 'rgba(255,255,255,0.20)'
-          : toPar < 0 ? '#ffffff'
-          : toPar > 0 ? '#f87171'
-          : 'rgba(255,255,255,0.55)';
+        const display = toPar === null ? '—' : fmtScore(toPar);
+        const scoreColor = toPar === null ? inkGhost
+          : isActive ? '#ffffff'
+          : toPar < 0 ? inkSoft
+          : toPar > 0 ? danger
+          : inkFaint;
 
         return (
           <button
@@ -258,30 +270,34 @@ function RoundTabs({
             onClick={() => hasData && onSelect(roundNum)}
             disabled={!hasData}
             style={{
-              display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2,
-              padding: '6px 14px',
-              borderRadius: 9,
-              background: isActive ? 'rgba(255,255,255,0.08)' : 'rgba(255,255,255,0.04)',
-              border: isActive
-                ? '1.5px solid rgba(255,255,255,0.25)'
-                : '1px solid rgba(255,255,255,0.07)',
+              flex: 1,
+              display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4,
+              padding: '6px 0 10px',
+              background: 'transparent',
+              border: 'none',
+              borderBottom: isActive ? `2px solid #ffffff` : '2px solid transparent',
               cursor: hasData ? 'pointer' : 'default',
-              transition: 'all 0.15s ease',
+              opacity: hasData ? 1 : 0.4,
+              transition: 'border-color 0.18s ease',
             }}
           >
-            <span style={{
-              fontSize: 9, fontWeight: 700,
-              color: isActive ? '#ffffff' : 'rgba(255,255,255,0.35)',
-              textTransform: 'uppercase', letterSpacing: '0.5px',
-            }}>
+            <span
+              style={{
+                fontSize: 9, fontWeight: 800,
+                color: isActive ? '#ffffff' : inkFaint,
+                letterSpacing: '0.14em',
+              }}
+            >
               R{roundNum}
             </span>
-            <span style={{
-              fontSize: 17, fontWeight: 800,
-              color: hasData ? scoreColor : 'rgba(255,255,255,0.18)',
-              fontVariantNumeric: 'tabular-nums',
-            }}>
-              {fmtScore ?? '—'}
+            <span
+              style={{
+                fontSize: 17, fontWeight: 800,
+                color: scoreColor,
+                fontVariantNumeric: 'tabular-nums',
+              }}
+            >
+              {display}
             </span>
           </button>
         );
@@ -426,229 +442,391 @@ export function PlayerScorecardCard({
 
   const currentRound = scorecard?.currentRound || player.currentRound || 1;
 
-  return (
-    <motion.div
-      initial={{ opacity: 0, x: 60 }}
-      animate={{ opacity: 1, x: 0 }}
-      exit={{ opacity: 0, x: 60 }}
-      transition={{ type: 'spring', damping: 28, stiffness: 300 }}
-      className="flex flex-col"
-      style={{ overflow: 'hidden', flex: 1, minHeight: 0 }}
-    >
+  // Inject pulse keyframes once for the live indicator.
+  useEffect(() => {
+    const id = 'hero-pulse-keyframes';
+    if (document.getElementById(id)) return;
+    const tag = document.createElement('style');
+    tag.id = id;
+    tag.textContent = PULSE_KEYFRAMES;
+    document.head.appendChild(tag);
+  }, []);
 
-      {/* ── TOP BAR — back + condensed live badge ── */}
-      <div className="scorecard-top-bar" style={{
-        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-        paddingLeft: 16, paddingRight: 16, paddingBottom: 8,
-        flexShrink: 0,
-      }}>
-        <button
-          onClick={onBack}
+  const flag = COUNTRY_TO_FLAG[(player.countryCode ?? '').toUpperCase()];
+  const positionLabel = typeof player.position === 'number'
+    ? `${player.position}`
+    : `${player.position}`;
+
+  return (
+    <HeroAtmosphere
+      style={{
+        height: '100%',
+        display: 'flex',
+        flexDirection: 'column',
+        overflow: 'hidden',
+      }}
+    >
+      <motion.div
+        initial={{ opacity: 0, x: 60 }}
+        animate={{ opacity: 1, x: 0 }}
+        exit={{ opacity: 0, x: 60 }}
+        transition={{ type: 'spring', damping: 28, stiffness: 300 }}
+        className="flex flex-col"
+        style={{
+          overflow: 'hidden',
+          flex: 1,
+          minHeight: 0,
+          paddingTop: 'calc(max(env(safe-area-inset-top, 0px), 44px) + 12px)',
+        }}
+      >
+        {/* ── 1. TOP BAR — back nav ── */}
+        <div
           style={{
-            display: 'flex', alignItems: 'center', gap: 4,
-            background: 'none', border: 'none', cursor: 'pointer',
+            display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+            padding: '0 20px 14px',
+            flexShrink: 0,
           }}
         >
-          <ChevronLeft style={{ width: 16, height: 16, color: 'rgba(255,255,255,0.55)' }} />
-          <span style={{ fontSize: 13, fontWeight: 400, color: 'rgba(255,255,255,0.55)' }}>
-            Leaderboard
-          </span>
-        </button>
-        <span style={{ fontSize: 13, fontWeight: 400, color: 'rgba(255,255,255,0.55)' }}>
-          {tournamentName && tournamentName.length < 20 ? tournamentName : 'PGA TOUR'}
-          {isCompleted ? ' · Final' : ` · R${currentRound}`}
-        </span>
-      </div>
+          <button
+            onClick={onBack}
+            style={{
+              display: 'flex', alignItems: 'center', gap: 4,
+              background: 'none', border: 'none', cursor: 'pointer', padding: 0,
+            }}
+          >
+            <ChevronLeft style={{ width: 16, height: 16, color: inkSoft }} />
+            <span style={{ fontSize: 13, fontWeight: 600, color: inkSoft, letterSpacing: '0.01em' }}>
+              Leaderboard
+            </span>
+          </button>
+          <button
+            onClick={onClose}
+            style={{
+              background: 'none', border: 'none', cursor: 'pointer', padding: 4,
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+            }}
+          >
+            <X style={{ width: 16, height: 16, color: inkFaint }} />
+          </button>
+        </div>
 
-      {/* ── PLAYER HERO — horizontal layout (matched to live state sizing) ── */}
-      <div style={{
-        display: 'flex', alignItems: 'flex-end',
-        justifyContent: 'space-between',
-        padding: '0 clamp(10px, 3vw, 16px) 12px',
-        flexShrink: 0,
-        gap: 8,
-        minWidth: 0,
-      }}>
-        {/* Left — avatar + name block */}
-        <div style={{ display: 'flex', alignItems: 'flex-end', gap: 12 }}>
-          {/* Avatar — matched to live state 60x62 */}
+        {/* ── 2. BROADCAST CAPTION STRIP ── */}
+        <div
+          style={{
+            display: 'flex', alignItems: 'center', gap: 8,
+            padding: '0 20px 14px',
+            flexShrink: 0,
+          }}
+        >
+          {isCompleted ? (
+            <span
+              style={{
+                padding: '3px 7px', borderRadius: 4,
+                background: 'rgba(255,184,0,0.14)', color: gold,
+                fontSize: 9, fontWeight: 800, letterSpacing: '0.12em',
+                border: `1px solid rgba(255,184,0,0.30)`,
+              }}
+            >
+              FINAL
+            </span>
+          ) : (
+            <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+              <span
+                style={{
+                  width: 6, height: 6, borderRadius: '50%', background: greenLive,
+                  animation: 'heroPulse 1.6s infinite',
+                }}
+              />
+              <span
+                style={{
+                  fontSize: 10, fontWeight: 800, letterSpacing: '0.12em',
+                  color: greenLive,
+                }}
+              >
+                LIVE
+              </span>
+            </div>
+          )}
+          <span style={{ fontSize: 10, color: inkFaint }}>·</span>
+          <span
+            style={{
+              fontSize: 10, fontWeight: 700, color: inkSoft, letterSpacing: '0.06em',
+              overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+              flex: 1, minWidth: 0,
+            }}
+          >
+            {tournamentName ? `${tournamentName.toUpperCase()} · ` : ''}
+            {isCompleted ? '72 HOLES COMPLETE' : `ROUND ${currentRound}`}
+          </span>
+        </div>
+
+        {/* ── 3. PLAYER HERO ── */}
+        <div
+          style={{
+            display: 'flex', alignItems: 'stretch', gap: 14,
+            padding: '0 20px 18px',
+            flexShrink: 0,
+          }}
+        >
           <button
             onClick={() => navigate(`/tourhub/player/${player.id}`)}
-            style={{ flexShrink: 0, position: 'relative', background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
+            style={{
+              flexShrink: 0, position: 'relative',
+              background: 'none', border: 'none', cursor: 'pointer', padding: 0,
+            }}
             className="active:scale-95 transition-transform"
           >
-            <div style={{
-              width: 60, height: 62, borderRadius: '30%',
-              border: '2px solid rgba(255,255,255,0.25)',
-              background: 'rgba(255,255,255,0.08)',
-              overflow: 'hidden',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-            }}>
+            <div
+              style={{
+                width: 72, height: 72, borderRadius: '50%',
+                border: `2px solid ${isCompleted ? gold : greenLive}`,
+                background: 'rgba(0,0,0,0.3)',
+                overflow: 'hidden',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+              }}
+            >
               {player.photoUrl ? (
-                <img src={player.photoUrl} alt={player.name} style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'top' }} />
+                <img
+                  src={player.photoUrl}
+                  alt={player.name}
+                  style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center 18%' }}
+                />
               ) : (
-                <span style={{ fontSize: 18, fontWeight: 700, color: 'rgba(255,255,255,0.4)' }}>
+                <span style={{ fontSize: 22, fontWeight: 800, color: inkFaint }}>
                   {player.firstName?.[0]}{player.lastName?.[0]}
                 </span>
               )}
             </div>
-            <div style={{
-              position: 'absolute', bottom: -2, right: -2,
-              background: 'white', borderRadius: '50%',
-              width: 18, height: 18,
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              fontSize: 9, fontWeight: 800, color: 'black',
-            }}>
-              {player.position}
+            <div
+              style={{
+                position: 'absolute', bottom: -2, right: -2,
+                width: 24, height: 24, borderRadius: '50%',
+                background: isCompleted ? gold : greenLive,
+                color: isCompleted ? ink : '#fff',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                border: `2px solid ${navyMid}`,
+                fontSize: 10, fontWeight: 800,
+                fontVariantNumeric: 'tabular-nums',
+              }}
+            >
+              {positionLabel}
             </div>
           </button>
 
-          {/* Name + status — matched to live 22px */}
-          <div style={{ paddingBottom: 2, minWidth: 0, flex: 1 }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 6, minWidth: 0 }}>
-              <span style={{
-                fontSize: 'clamp(18px, 5.5vw, 22px)', fontWeight: 700, color: '#fff',
-                letterSpacing: '-0.4px', lineHeight: 1.1,
-                overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
-              }}>
-                {player.name}
-              </span>
-              {COUNTRY_TO_FLAG[(player.countryCode ?? '').toUpperCase()] && (
-                <span style={{ fontSize: 15, flexShrink: 0 }}>
-                  {COUNTRY_TO_FLAG[(player.countryCode ?? '').toUpperCase()]}
-                </span>
-              )}
+          <div
+            style={{
+              flex: 1, minWidth: 0,
+              display: 'flex', flexDirection: 'column', justifyContent: 'center',
+            }}
+          >
+            <div
+              style={{
+                fontSize: 9, fontWeight: 800, letterSpacing: '0.14em',
+                color: isCompleted ? gold : inkFaint,
+                marginBottom: 4,
+              }}
+            >
+              {isCompleted ? 'FINAL POSITION' : 'PLAYER'}
+              {flag ? ` · ${flag}` : ''}
+              {player.countryCode ? ` ${player.countryCode.toUpperCase()}` : ''}
             </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 5, marginTop: 5 }}>
-              {!isCompleted && <span style={{ width: 5, height: 5, borderRadius: '50%', background: '#22C55E', display: 'inline-block', flexShrink: 0 }} />}
-              <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)' }}>
-                {isCompleted ? 'Final' : `Round ${currentRound}`}
-                {!isCompleted && player.thru && player.thru !== 'F' ? ` · Thru ${player.thru}` : ''}
-              </span>
+            <div
+              style={{
+                fontSize: 22, fontWeight: 800, letterSpacing: '-0.02em',
+                color: '#fff', lineHeight: 1.1,
+                whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
+              }}
+            >
+              {player.name}
             </div>
-          </div>
-        </div>
-
-        {/* Total score — matched to live state prominent sizing */}
-        <span style={{
-          fontSize: 'clamp(36px, 12vw, 48px)', fontWeight: 800, lineHeight: 1,
-          color: player.totalScore < 0 ? '#ffffff' : player.totalScore === 0 ? 'rgba(255,255,255,0.75)' : '#f87171',
-          fontVariantNumeric: 'tabular-nums', letterSpacing: '-2px',
-          flexShrink: 0,
-        }}>
-          {formatScoreToPar(player.totalScore)}
-        </span>
-      </div>
-
-
-      {/* Sparkline — above separator */}
-      {activeRoundData && activeRoundData.holesCompleted > 0 && (
-        <ScorecardSparkline holes={activeRoundData.holes} />
-      )}
-
-
-      {/* ── SCORECARD CONTENT — scrollable ── */}
-      {isLoading ? (
-        <ScorecardSkeleton />
-      ) : scorecard && scorecard.rounds.length > 0 ? (
-        <div style={{ flex: 1, overflowY: 'auto', WebkitOverflowScrolling: 'touch' as any }}>
-
-          {/* Round tabs */}
-          <RoundTabs
-            rounds={scorecard.rounds}
-            activeRound={activeRound}
-            currentRound={currentRound}
-            onSelect={setActiveRound}
-            roundScores={roundScores}
-          />
-
-          {/* Stat chips — Change 6: canonical colours */}
-          {activeRoundData && activeRoundData.holesCompleted > 0 && (
-            <div style={{ display: 'flex', gap: 'clamp(2px, 1vw, 4px)', padding: '0 clamp(8px, 3vw, 16px) 8px' }}>
-              {[
-                { v: activeRoundData.eagles,       label: 'Eagles',  color: '#ffffff', bg: 'rgba(255,255,255,0.06)' },
-                { v: activeRoundData.birdies,      label: 'Birdies', color: '#ffffff', bg: 'rgba(255,255,255,0.06)' },
-                { v: activeRoundData.pars,         label: 'Pars',    color: 'rgba(255,255,255,0.35)', bg: 'rgba(255,255,255,0.04)' },
-                { v: activeRoundData.bogeys,       label: 'Bogeys',  color: '#f87171', bg: 'rgba(248,113,113,0.08)' },
-                { v: activeRoundData.doubleBogeys, label: 'Doubles', color: '#f87171', bg: 'rgba(248,113,113,0.08)' },
-              ].map(stat => (
-                <div key={stat.label} style={{
-                  flex: 1, textAlign: 'center',
-                  padding: '5px 2px 4px',
-                  borderRadius: 7,
-                  background: stat.bg,
-                  border: '1px solid rgba(255,255,255,0.06)',
-                }}>
-                  <div style={{ fontSize: 16, fontWeight: 800, color: stat.color, lineHeight: 1 }}>{stat.v}</div>
-                  <div style={{ fontSize: 8, fontWeight: 700, color: 'rgba(255,255,255,0.32)', textTransform: 'uppercase', letterSpacing: '0.4px', marginTop: 2 }}>{stat.label}</div>
-                </div>
-              ))}
-            </div>
-          )}
-
-
-          {/* Front 9 */}
-          <div style={{ marginTop: 4 }}>
-            <NineHoleRow
-              label="Front 9"
-              holes={activeRoundData?.holes.filter(h => h.holeNumber <= 9) || []}
-              startHole={1}
-              completedHoles={completedHoles}
-              defaultPars={defaultPars}
-            />
-          </div>
-
-          {/* Back 9 */}
-          <div style={{ marginTop: 8 }}>
-            <NineHoleRow
-              label="Back 9"
-              holes={activeRoundData?.holes.filter(h => h.holeNumber > 9) || []}
-              startHole={10}
-              completedHoles={completedHoles}
-              defaultPars={defaultPars}
-            />
-          </div>
-
-          {/* Total row */}
-          {activeRoundData && activeRoundData.holesCompleted > 0 && (
-            <div style={{
-              display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-              padding: '10px 16px',
-              marginTop: 6,
-              borderTop: '1px solid rgba(255,255,255,0.08)',
-            }}>
-              <span style={{ fontSize: 12, fontWeight: 700, color: 'rgba(255,255,255,0.45)', textTransform: 'uppercase', letterSpacing: '1px' }}>
-                Total · {activeRoundData.holesCompleted} holes
-              </span>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                <span style={{ fontSize: 18, fontWeight: 700, color: 'rgba(255,255,255,0.70)' }}>
-                  {activeRoundData.totalStrokes}
-                </span>
-                <span style={{
-                  fontSize: 24, fontWeight: 800,
-                  color: activeRoundData.totalToPar < 0 ? '#ffffff'
-                       : activeRoundData.totalToPar > 0 ? '#f87171'
-                       : 'rgba(255,255,255,0.55)',
-                  fontVariantNumeric: 'tabular-nums',
-                }}>
-                  {formatScoreToPar(activeRoundData.totalToPar)}
-                </span>
+            {!isCompleted && player.thru && player.thru !== 'F' && (
+              <div
+                style={{
+                  fontSize: 11, color: greenLive, marginTop: 6, fontWeight: 600,
+                }}
+              >
+                Thru {player.thru} · R{currentRound}
               </div>
-            </div>
-          )}
-
-        </div>
-      ) : (
-        /* Empty state */
-        <div className="flex-1 flex flex-col items-center justify-center py-12">
-          <div className="w-14 h-14 rounded-full flex items-center justify-center mb-3"
-            style={{ background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.12)' }}>
-            <Trophy className="w-6 h-6 text-white/40" />
+            )}
+            {isCompleted && (
+              <div
+                style={{
+                  fontSize: 11, color: inkFaint, marginTop: 6, fontWeight: 600,
+                }}
+              >
+                72 holes · Final
+              </div>
+            )}
           </div>
-          <p className="text-sm text-white/40 text-center">Scorecard data updating...</p>
-          <p className="text-xs text-white/25 text-center mt-1">Hole-by-hole scores will appear as the round progresses</p>
+
+          <div
+            style={{
+              textAlign: 'right',
+              display: 'flex', flexDirection: 'column', justifyContent: 'center',
+            }}
+          >
+            <span
+              style={{
+                fontSize: 48, fontWeight: 800, letterSpacing: '-0.04em',
+                color: '#fff', lineHeight: 0.9,
+                fontVariantNumeric: 'tabular-nums',
+              }}
+            >
+              {fmtScore(player.totalScore)}
+            </span>
+          </div>
         </div>
-      )}
-    </motion.div>
+
+        {/* ── 4. SCORECARD CONTENT — scrollable ── */}
+        {isLoading ? (
+          <ScorecardSkeleton />
+        ) : scorecard && scorecard.rounds.length > 0 ? (
+          <div
+            style={{
+              flex: 1, overflowY: 'auto',
+              WebkitOverflowScrolling: 'touch' as any,
+              willChange: 'transform',
+            }}
+          >
+            {/* Round tabs — text-only, underline on active */}
+            <RoundTabs
+              rounds={scorecard.rounds}
+              activeRound={activeRound}
+              currentRound={currentRound}
+              onSelect={setActiveRound}
+              roundScores={roundScores}
+            />
+
+            {/* Sparkline — round momentum */}
+            {activeRoundData && activeRoundData.holesCompleted > 0 && (
+              <div style={{ marginBottom: 6 }}>
+                <ScorecardSparkline holes={activeRoundData.holes} />
+              </div>
+            )}
+
+            {/* Stat chips — flat editorial cells */}
+            {activeRoundData && activeRoundData.holesCompleted > 0 && (
+              <div
+                style={{
+                  display: 'flex', gap: 6,
+                  padding: '0 16px 14px',
+                }}
+              >
+                {[
+                  { v: activeRoundData.eagles,       label: 'Eagles',  color: gold },
+                  { v: activeRoundData.birdies,      label: 'Birdies', color: greenLive },
+                  { v: activeRoundData.pars,         label: 'Pars',    color: inkSoft },
+                  { v: activeRoundData.bogeys,       label: 'Bogeys',  color: danger },
+                  { v: activeRoundData.doubleBogeys, label: 'Doubles', color: danger },
+                ].map(stat => (
+                  <div
+                    key={stat.label}
+                    style={{
+                      flex: 1, textAlign: 'center',
+                      padding: '8px 4px',
+                      borderRadius: 10,
+                      background: 'rgba(255,255,255,0.025)',
+                      border: `1px solid ${hairlineDark}`,
+                      minWidth: 0,
+                    }}
+                  >
+                    <div style={{ fontSize: 16, fontWeight: 800, color: stat.color, lineHeight: 1, fontVariantNumeric: 'tabular-nums' }}>
+                      {stat.v}
+                    </div>
+                    <div
+                      style={{
+                        fontSize: 8, fontWeight: 700, color: inkGhost,
+                        textTransform: 'uppercase', letterSpacing: '0.08em', marginTop: 4,
+                      }}
+                    >
+                      {stat.label}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* Front 9 */}
+            <div style={{ marginTop: 4 }}>
+              <NineHoleRow
+                label="Front 9"
+                holes={activeRoundData?.holes.filter(h => h.holeNumber <= 9) || []}
+                startHole={1}
+                completedHoles={completedHoles}
+                defaultPars={defaultPars}
+              />
+            </div>
+
+            {/* Back 9 */}
+            <div style={{ marginTop: 12 }}>
+              <NineHoleRow
+                label="Back 9"
+                holes={activeRoundData?.holes.filter(h => h.holeNumber > 9) || []}
+                startHole={10}
+                completedHoles={completedHoles}
+                defaultPars={defaultPars}
+              />
+            </div>
+
+            {/* Total row */}
+            {activeRoundData && activeRoundData.holesCompleted > 0 && (
+              <div
+                style={{
+                  display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                  padding: '14px 16px 18px',
+                  marginTop: 10,
+                  borderTop: `1px solid ${hairlineDark}`,
+                }}
+              >
+                <span
+                  style={{
+                    fontSize: 9, fontWeight: 800, color: inkFaint,
+                    textTransform: 'uppercase', letterSpacing: '0.14em',
+                  }}
+                >
+                  Total · {activeRoundData.holesCompleted} holes
+                </span>
+                <div style={{ display: 'flex', alignItems: 'baseline', gap: 12 }}>
+                  <span
+                    style={{
+                      fontSize: 14, fontWeight: 600, color: inkSoft,
+                      fontVariantNumeric: 'tabular-nums',
+                    }}
+                  >
+                    {activeRoundData.totalStrokes}
+                  </span>
+                  <span
+                    style={{
+                      fontSize: 24, fontWeight: 800,
+                      color: activeRoundData.totalToPar < 0 ? '#ffffff'
+                           : activeRoundData.totalToPar > 0 ? danger
+                           : inkFaint,
+                      fontVariantNumeric: 'tabular-nums',
+                      letterSpacing: '-0.02em',
+                    }}
+                  >
+                    {fmtScore(activeRoundData.totalToPar)}
+                  </span>
+                </div>
+              </div>
+            )}
+          </div>
+        ) : (
+          /* Empty state */
+          <div className="flex-1 flex flex-col items-center justify-center py-12">
+            <div
+              className="w-14 h-14 rounded-full flex items-center justify-center mb-3"
+              style={{ background: 'rgba(255,255,255,0.04)', border: `1px solid ${hairlineDark}` }}
+            >
+              <Trophy className="w-6 h-6" style={{ color: inkFaint }} />
+            </div>
+            <p className="text-sm text-center" style={{ color: inkFaint }}>Scorecard data updating…</p>
+            <p className="text-xs text-center mt-1" style={{ color: inkGhost }}>
+              Hole-by-hole scores will appear as the round progresses
+            </p>
+          </div>
+        )}
+      </motion.div>
+    </HeroAtmosphere>
   );
 }
