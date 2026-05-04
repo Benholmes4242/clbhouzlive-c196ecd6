@@ -1043,7 +1043,7 @@ function HeroPick({
 function CompactPick({
   initials,
   name,
-  winProbability = 0,
+  tierLabel,
   reason,
   reasons,
   position,
@@ -1051,7 +1051,7 @@ function CompactPick({
 }: {
   initials: string;
   name: string;
-  winProbability?: number;
+  tierLabel?: string;
   reason?: string;
   reasons: string[];
   position: string;
