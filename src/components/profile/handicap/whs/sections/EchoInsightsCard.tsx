@@ -76,16 +76,18 @@ const SectionHeader = () => (
   </div>
 );
 
-const CourseCard: React.FC<{ course: SuitedCourse; stripe: string }> = ({
+const CourseCard: React.FC<{ course: SuitedCourse; stripe: string; onTap: (id: string) => void }> = ({
   course,
   stripe,
+  onTap,
 }) => (
   <button
     type="button"
+    onClick={() => onTap(course.id)}
     style={{
       width: '100%',
       display: 'flex',
-      alignItems: 'center',
+      alignItems: 'flex-start',
       gap: 12,
       background: '#fff',
       border: `0.5px solid ${INK_10}`,
@@ -95,6 +97,7 @@ const CourseCard: React.FC<{ course: SuitedCourse; stripe: string }> = ({
       textAlign: 'left',
       cursor: 'pointer',
     }}
+    className="active:scale-[0.99] transition-transform"
   >
     <div style={{ flex: 1, minWidth: 0 }}>
       <div
@@ -110,47 +113,62 @@ const CourseCard: React.FC<{ course: SuitedCourse; stripe: string }> = ({
       >
         {course.name || '—'}
       </div>
-      <div
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: 8,
-          marginTop: 3,
-          fontSize: 10,
-          color: INK_55,
-        }}
-      >
-        {course.region && (
-          <span style={{ display: 'inline-flex', alignItems: 'center', gap: 3 }}>
-            <MapPin size={9} strokeWidth={2.2} />
-            <span
-              style={{
-                overflow: 'hidden',
-                textOverflow: 'ellipsis',
-                whiteSpace: 'nowrap',
-                maxWidth: 120,
-              }}
-            >
-              {course.region}
-            </span>
-          </span>
-        )}
-        {course.yards > 0 && (
+      {course.region && (
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 3,
+            marginTop: 3,
+            fontSize: 10,
+            color: INK_55,
+          }}
+        >
+          <MapPin size={9} strokeWidth={2.2} />
           <span
             style={{
-              fontFamily: FONT_DISPLAY,
-              fontVariantNumeric: 'tabular-nums lining-nums',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              whiteSpace: 'nowrap',
+              maxWidth: 220,
             }}
           >
-            {course.yards.toLocaleString()}y
-            {course.slope > 0 && ` · slope ${course.slope}`}
+            {course.region}
           </span>
-        )}
-      </div>
+        </div>
+      )}
+      {course.rationale && (
+        <p
+          style={{
+            margin: '6px 0 0',
+            fontSize: 11.5,
+            lineHeight: 1.45,
+            color: INK_55,
+          }}
+        >
+          {course.rationale}
+        </p>
+      )}
     </div>
-    <ChevronRight size={13} strokeWidth={2.2} color={INK_40} />
+    <ChevronRight size={13} strokeWidth={2.2} color={INK_40} style={{ marginTop: 2, flexShrink: 0 }} />
   </button>
 );
+
+// Render **bold** markdown inline as bold spans
+const renderBoldMarkdown = (text: string): React.ReactNode => {
+  if (!text) return null;
+  const parts = text.split(/(\*\*[^*]+\*\*)/g);
+  return parts.map((p, i) => {
+    if (p.startsWith('**') && p.endsWith('**')) {
+      return (
+        <strong key={i} style={{ color: INK, fontWeight: 800, fontVariantNumeric: 'tabular-nums lining-nums' }}>
+          {p.slice(2, -2)}
+        </strong>
+      );
+    }
+    return <React.Fragment key={i}>{p}</React.Fragment>;
+  });
+};
 
 const BlockHeader: React.FC<{
   icon: React.ReactNode;
