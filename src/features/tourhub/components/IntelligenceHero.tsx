@@ -1040,12 +1040,10 @@ function HeroPick({
 
 // ─── Compact pick (ranks 2 + 3, chevron-expand) ──────────────────────────────
 
-type CompactTier = 'STRONG' | 'CONTENTION';
-
 function CompactPick({
   initials,
   name,
-  tier,
+  winProbability = 0,
   reason,
   reasons,
   position,
@@ -1053,24 +1051,17 @@ function CompactPick({
 }: {
   initials: string;
   name: string;
-  tier: CompactTier;
+  winProbability?: number;
   reason?: string;
   reasons: string[];
   position: string;
   positionLabel: string;
 }) {
   const [expanded, setExpanded] = useState(false);
-  const accent = 'transparent';
-  const accentInk = SLATE_500;
-  const tierLabel = tier === 'STRONG' ? 'STRONG CONTENDER' : 'IN CONTENTION';
   const visibleReasons = reasons.filter(Boolean).slice(0, 3);
 
   return (
-    <div
-      style={{
-        borderLeft: `3px solid ${accent}`,
-      }}
-    >
+    <div>
       <button
         type="button"
         onClick={() => setExpanded(v => !v)}
