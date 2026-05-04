@@ -17,11 +17,17 @@ import { isHandicapSubtab, type HandicapSubtab } from './types';
 interface Props {
   connection: WhsConnection;
   userId: string;
+  /**
+   * Read-only mode — when true, hides Sync now, Disconnect, the re-auth/stale
+   * banners, and the invite affordances on the Friends tab. Used when
+   * viewing a friend's handicap via /handicap/:userId.
+   */
+  readOnly?: boolean;
 }
 
 const DEFAULT_SUBTAB: HandicapSubtab = 'overview';
 
-export const HandicapDashboard: React.FC<Props> = ({ connection, userId }) => {
+export const HandicapDashboard: React.FC<Props> = ({ connection, userId, readOnly = false }) => {
   const queryClient = useQueryClient();
   const [searchParams, setSearchParams] = useSearchParams();
   const [isSyncing, setIsSyncing] = useState(false);
