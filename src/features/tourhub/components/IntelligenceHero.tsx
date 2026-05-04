@@ -1,182 +1,71 @@
 /**
- * IntelligenceHero — Tour Hub LEAD section
+ * IntelligenceHero — Tournament Intelligence section (carousel rebuild)
  *
- * Lead-section refresh per "Tournament Intelligence · Lead-Section Refresh
- * (Prototype A)" brief. The previous full-bleed dark-green sub-brand is
- * scrapped — Intelligence is now the LEAD section of the Tour Hub Overview,
- * presented on a quiet cream surface with sentence-based editorial headlines,
- * but every other token (amber 3px bar, hairline rows, ink-on-paper type)
- * matches the page's existing canon.
+ * Replaces the prior ~2k-line editorial layout with a horizontal carousel of
+ * three headshot-led pick cards plus a "receipts" tail card. The pattern is
+ * locked across all three lifecycle states (upcoming / live / results) — only
+ * the pill, meta strip, and tail-card framing adapt.
  *
- * Project memory rule: Geist font only, no serifs. The brief's serif headline
- * spec is overridden — sentence headlines render in Geist 700 with tight
- * letter-spacing instead.
+ * Source of truth for the visual design is the mock at
+ * `tournament-intelligence-final.jsx`. This file ports that mock to
+ * TypeScript and wires it to the existing data layer:
+ *   - useIntelligenceLifecycleState  → state + active payload
+ *   - usePredictionTracker            → live + results positional data
+ *   - useIntelligenceHistoricalPicks → "receipts" stats (wins / top-5s / hit rate)
+ *   - IntelligenceAboutSheet          → about bottom sheet (unchanged)
  *
- * Phase A:
- *   - Cream LEAD_BG outer surface with hairline borders top + bottom
- *   - LeadSectionHeader (3×14 amber bar + Sparkles glyph + status pill)
- *   - CredibilityBand directly below the header, amber-tint stat strip
- *   - Editorial sentence headlines per lifecycle state (live / results /
- *     upcoming) with three calibrated miss tones via getMissTone()
- *   - HeroPick (56px avatar + pulled-quote reasoning) for rank-1 pick
- *   - CompactPick (chevron-expand) for ranks 2 + 3
- *   - Tournament Winner card for non-win results outcomes
- *   - TrackRecordPanel ("Why Trust Us") between picks and CTA
- *   - Single unified CTA: "All Intelligence picks"
- *   - Live-state pulse on hero pick position number
- *
- * Phase B: CredibilityBand + TrackRecordPanel wired to existing useMemo.
- *
- * Phase C — Editorial layer:
- *   - `framingSentence` — per-tournament italic preface above the headline.
- *     Sourced from `data.editorialFraming`. Renders null if the data layer
- *     hasn't populated it. Daily editorial production is out of scope here.
- *   - `pulledQuote` (per pick) — Hero pick's reasoning shown as italic
- *     pulled-quote. Falls back to `pick.reasons[0]` if not populated.
+ * Movement indicator (live state) uses `moveDir` / `moveSpots` derived inside
+ * `usePredictionTracker` from a poll-to-poll position cache.
  */
 
-import React, { memo, useEffect, useMemo, useState } from 'react';
+import React, { memo, useEffect, useMemo, useRef, useState } from 'react';
 import {
-  Sparkles,
-  ChevronRight,
-  ChevronDown,
-  Check,
-  Award,
-  Trophy,
-  Quote,
   Brain,
+  ChevronRight,
+  ChevronUp,
+  Trophy,
+  Award,
+  Clock,
+  MapPin,
 } from 'lucide-react';
-import type { IntelligenceOutcome } from '../utils/outcomeClassifier';
-import { useCountdown } from '@/hooks/useCountdown';
 import {
   useIntelligenceLifecycleState,
   type IntelligenceLifecycleState,
 } from '../hooks/useIntelligenceLifecycleState';
-import { useIntelligenceHistoricalPicks } from '../hooks/useIntelligenceHistoricalPicks';
+import {
+  useIntelligenceHistoricalPicks,
+} from '../hooks/useIntelligenceHistoricalPicks';
 import { usePredictionTracker } from '../hooks/usePredictionTracker';
-import type { AIPredictionData, AITopContender } from '../hooks/useAIPredictions';
-import type { TrackedPrediction, PredictionTrackerData } from './tournament-insights/types';
-import { getVenueRequirements } from '../utils/editorialFallbacks';
-import { IntelligenceAllPicksSheet } from './IntelligenceAllPicksSheet';
+import type {
+  AIPredictionData,
+  AITopContender,
+} from '../hooks/useAIPredictions';
+import type { TrackedPrediction } from './tournament-insights/types';
 import { IntelligenceAboutSheet } from './IntelligenceAboutSheet';
-import { getPlayerHeadshotUrl, PLAYER_SILHOUETTE_URL } from '@/utils/playerHeadshot';
+import {
+  getPlayerHeadshotUrl,
+  PLAYER_SILHOUETTE_URL,
+} from '@/utils/playerHeadshot';
 
-// ─── Headshot helper ─────────────────────────────────────────────────────────
-// All Tournament Intelligence states pull headshots from the same R2 source as
-// the Tour Overview hero. PGA-only per Sportradar coverage constraint.
-function PlayerHeadshot({
-  name,
-  size,
-  radius,
-  bg,
-  border,
-  initialsColor,
-  initialsFontSize,
-}: {
-  name: string;
-  size: number;
-  radius: number | string;
-  bg: string;
-  border: string;
-  initialsColor: string;
-  initialsFontSize: number;
-}) {
-  const initials = getInitials(name);
-  const src = getPlayerHeadshotUrl(name, 'pga');
-  const [failed, setFailed] = useState(false);
-  return (
-    <div
-      style={{
-        position: 'relative',
-        width: size,
-        height: size,
-        borderRadius: radius,
-        overflow: 'hidden',
-        background: bg,
-        border,
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        flexShrink: 0,
-      }}
-    >
-      {failed && (
-        <span
-          style={{
-            fontFamily: headlineFont,
-            fontSize: initialsFontSize,
-            fontWeight: 700,
-            color: initialsColor,
-          }}
-        >
-          {initials}
-        </span>
-      )}
-      {!failed && (
-        <img
-          src={src}
-          alt={name}
-          loading="lazy"
-          onError={(e) => {
-            const el = e.currentTarget;
-            if (el.src.endsWith(PLAYER_SILHOUETTE_URL)) {
-              setFailed(true);
-            } else {
-              el.src = PLAYER_SILHOUETTE_URL;
-            }
-          }}
-          style={{
-            position: 'absolute',
-            inset: 0,
-            width: '100%',
-            height: '100%',
-            objectFit: 'cover',
-            objectPosition: 'center 18%',
-          }}
-        />
-      )}
-    </div>
-  );
-}
-
-// ─── Tokens ──────────────────────────────────────────────────────────────────
-
-const MONTHS_ABBR = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-
-// Page-canon ink + slates
-const INK = '#0F172A';
-const SLATE_700 = '#334155';
-const SLATE_600 = '#475569';
-const SLATE_500 = '#64748B';
-const SLATE_400 = '#94A3B8';
-const SLATE_300 = '#CBD5E1';
-const SLATE_200 = '#E2E8F0';
-const SLATE_150 = '#EDF1F5';
-const SLATE_100 = '#F1F5F9';
-
-const AMBER_ACCENT = '#F7931E';
-const AMBER_DEEP = '#D97706';
-const AMBER_TINT = 'rgba(247,147,30,0.08)';
-const AMBER_TINT_STRONG = 'rgba(247,147,30,0.14)';
-const GREEN_DEEP_INK = '#0A5A3C';
-const GREEN_LIGHT = '#10B981';
-
-// Geist-only headline / mono helpers (project memory: no serifs)
+// ─── Tokens (mirrors the mock) ──────────────────────────────────────────────
+const ink = '#0F172A';
+const inkSoft = '#475569';
+const inkFaint = '#94A3B8';
+const surface = '#FFFFFF';
+const amber = '#F7931E';
+const amberDeep = '#D97706';
+const amberSoft = '#FEF3E7';
+const seasonGreen = '#006747';
+const greenLight = '#10B981';
+const danger = '#DC2626';
+const gold = '#FFB800';
+const goldDeep = '#D97706';
+const hairline = '#E2E8F0';
+const hairlineSoft = '#EDF1F5';
 const headlineFont =
-  '"Geist", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
-const monoLabel: React.CSSProperties = {
-  fontFamily: headlineFont,
-  fontWeight: 700,
-  textTransform: 'uppercase',
-};
+  '"Geist", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
 
-// ─── Helpers (preserved from prior revision) ─────────────────────────────────
-
-function getFirstName(fullName: string): string {
-  const parts = (fullName ?? '').trim().split(/\s+/);
-  return parts[0] || fullName || '';
-}
-
+// ─── Helpers ────────────────────────────────────────────────────────────────
 function getInitials(fullName: string): string {
   const parts = (fullName ?? '').trim().split(/\s+/).filter(Boolean);
   if (!parts.length) return '?';
@@ -184,143 +73,1242 @@ function getInitials(fullName: string): string {
   return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
 }
 
-type MissToneArgs = {
-  winner: string;
-  closest?: string;
-  closestPos?: string;
-};
-
-type MissTone = {
-  eyebrow: string;
-  eyebrowColor: string;
-  headlineRender: (args: MissToneArgs) => React.ReactNode;
-  contextLine: (numInTop10: number, missedCuts: number) => string;
-};
-
-function getMissTone(outcome: IntelligenceOutcome): MissTone {
-  if (outcome === 'top5') {
-    return {
-      eyebrow: 'Closest call.',
-      eyebrowColor: AMBER_DEEP,
-      headlineRender: ({ winner, closest, closestPos }) => (
-        <>
-          {winner} won.{' '}
-          <span style={{ color: SLATE_500, fontWeight: 600 }}>
-            {closest ?? '—'} took {closestPos ?? '—'}.
-          </span>
-        </>
-      ),
-      contextLine: (top10, mc) =>
-        `${top10} of 3 in T10 · ${
-          mc === 0 ? 'No missed cuts' : `${mc} missed cut${mc > 1 ? 's' : ''}`
-        }`,
-    };
-  }
-  if (outcome === 'partial') {
-    return {
-      eyebrow: 'Solid week.',
-      eyebrowColor: SLATE_600,
-      headlineRender: ({ winner, closest, closestPos }) => (
-        <>
-          {winner} won.{' '}
-          <span style={{ color: SLATE_500, fontWeight: 600 }}>
-            {closest ?? '—'} finished {closestPos ?? '—'}.
-          </span>
-        </>
-      ),
-      contextLine: (top10, mc) =>
-        `${top10} of 3 in T10 · ${
-          mc === 0 ? 'No missed cuts' : `${mc} missed cut${mc > 1 ? 's' : ''}`
-        }`,
-    };
-  }
-  return {
-    eyebrow: 'Tough one.',
-    eyebrowColor: SLATE_600,
-    headlineRender: ({ winner }) => (
-      <>
-        {winner} won.{' '}
-        <span style={{ color: SLATE_500, fontWeight: 600 }}>
-          Our three calls fell short.
-        </span>
-      </>
-    ),
-    contextLine: (top10, mc) =>
-      `Winner outside our picks · ${top10} of 3 in T10 · ${
-        mc === 0 ? 'No missed cuts' : `${mc} missed cut${mc > 1 ? 's' : ''}`
-      }`,
-  };
+function formatScore(score: number | null | undefined): string {
+  if (score === null || score === undefined) return 'E';
+  if (score === 0) return 'E';
+  return score > 0 ? `+${score}` : `${score}`;
 }
 
-function formatPosition(p: TrackedPrediction): string {
+function formatPositionString(p: TrackedPrediction): string {
   if (p.performanceStatus === 'cut') return 'MC';
   if (p.performanceStatus === 'withdrawn') return 'WD';
   if (p.actualPosition === null) return '—';
   return `${p.actualPositionTied ? 'T' : ''}${p.actualPosition}`;
 }
 
-function formatScore(score: number | null): string {
-  if (score === null || score === undefined) return 'E';
-  if (score === 0) return 'E';
-  return score > 0 ? `+${score}` : `${score}`;
+function formatThru(thru: number | null | undefined, currentRound: number | null | undefined): string {
+  if (thru == null) return '—';
+  if (thru >= 18) return 'F';
+  return String(thru);
 }
 
-function formatDateRange(startIso: string, endIso: string): string {
-  const start = new Date(startIso);
-  const end = new Date(endIso);
-  return `${start.getDate()} ${MONTHS_ABBR[start.getMonth()]} – ${end.getDate()} ${MONTHS_ABBR[end.getMonth()]}`;
+interface TournamentMetaInfo {
+  name: string;
+  course: string;
+  location: string;
 }
 
-function formatLocation(t: AIPredictionData['tournament']): string {
-  const left: string[] = [];
-  if (t.venueCity) left.push(t.venueCity);
-  if (t.venueState) left.push(t.venueState);
-  const leftStr = left.join(', ');
-  if (t.venueCountry) {
-    return leftStr ? `${leftStr} · ${t.venueCountry}` : t.venueCountry;
-  }
-  return leftStr;
+function buildTournamentMeta(t: AIPredictionData['tournament'] | undefined | null): TournamentMetaInfo {
+  if (!t) return { name: '—', course: '—', location: '' };
+  const locParts: string[] = [];
+  if (t.venueCity) locParts.push(t.venueCity);
+  if (t.venueState) locParts.push(t.venueState);
+  if (!locParts.length && t.venueCountry) locParts.push(t.venueCountry);
+  return {
+    name: t.name || '—',
+    course: t.venueName || '—',
+    location: locParts.join(', '),
+  };
 }
 
-function getVenueBullets(t: AIPredictionData['tournament']): string[] {
-  const bullets: string[] = [];
-  if (t.par && t.yardage) {
-    bullets.push(`Par ${t.par} · ${t.yardage.toLocaleString()} yards`);
-  }
-  const fallback = getVenueRequirements(t.name);
-  if (fallback?.surface) bullets.push(fallback.surface);
-  if (fallback?.demands) bullets.push(fallback.demands);
-  return bullets;
+// ─── Headshot ───────────────────────────────────────────────────────────────
+function PlayerHeadshot({
+  name,
+  desaturate,
+}: {
+  name: string;
+  desaturate?: boolean;
+}) {
+  const src = getPlayerHeadshotUrl(name, 'pga');
+  const [failed, setFailed] = useState(false);
+  return (
+    <div
+      style={{
+        width: '100%',
+        height: '100%',
+        background: `linear-gradient(135deg, #1E293B, ${ink})`,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+      }}
+    >
+      {failed ? (
+        <span
+          style={{
+            fontFamily: headlineFont,
+            fontSize: 56,
+            fontWeight: 800,
+            color: 'rgba(255,255,255,0.35)',
+          }}
+        >
+          {getInitials(name)}
+        </span>
+      ) : (
+        <img
+          src={src}
+          alt={name}
+          loading="lazy"
+          onError={(e) => {
+            const el = e.currentTarget;
+            if (el.src.endsWith(PLAYER_SILHOUETTE_URL)) setFailed(true);
+            else el.src = PLAYER_SILHOUETTE_URL;
+          }}
+          style={{
+            width: '100%',
+            height: '100%',
+            objectFit: 'cover',
+            objectPosition: 'center 18%',
+            filter: desaturate ? 'saturate(0.7)' : 'none',
+          }}
+        />
+      )}
+    </div>
+  );
 }
 
-function formatStateLabel(
-  state: IntelligenceLifecycleState,
+// ─── Section header ─────────────────────────────────────────────────────────
+function SectionHeader({
+  meta,
+  headline,
+  onAboutClick,
+}: {
+  meta: TournamentMetaInfo;
+  headline: string;
+  onAboutClick: () => void;
+}) {
+  return (
+    <div style={{ padding: '0 16px', marginBottom: 14 }}>
+      <button
+        onClick={onAboutClick}
+        aria-label="About Tournament Intelligence"
+        style={{
+          background: 'transparent',
+          border: 'none',
+          padding: 0,
+          cursor: 'pointer',
+          fontFamily: headlineFont,
+          display: 'inline-flex',
+          alignItems: 'center',
+          gap: 6,
+          marginBottom: 8,
+        }}
+      >
+        <Brain size={13} color={amber} strokeWidth={2.5} />
+        <span
+          style={{
+            fontSize: 10.5,
+            fontWeight: 700,
+            letterSpacing: '0.14em',
+            color: amber,
+          }}
+        >
+          TOURNAMENT INTELLIGENCE
+        </span>
+        <ChevronRight
+          size={11}
+          color={amber}
+          strokeWidth={2.5}
+          style={{ marginTop: 1 }}
+        />
+      </button>
+
+      <div
+        style={{
+          fontFamily: headlineFont,
+          fontSize: 18,
+          fontWeight: 800,
+          color: ink,
+          letterSpacing: '-0.015em',
+          lineHeight: 1.2,
+        }}
+      >
+        {headline}
+      </div>
+      <div style={{ marginTop: 6, fontFamily: headlineFont }}>
+        <div
+          style={{
+            fontSize: 13,
+            fontWeight: 700,
+            color: ink,
+            lineHeight: 1.25,
+            letterSpacing: '-0.005em',
+          }}
+        >
+          {meta.name}
+        </div>
+        <div
+          style={{
+            fontSize: 11.5,
+            color: inkSoft,
+            marginTop: 2,
+            fontWeight: 500,
+            display: 'flex',
+            alignItems: 'center',
+            gap: 5,
+            flexWrap: 'wrap',
+          }}
+        >
+          <span>{meta.course}</span>
+          {meta.location && (
+            <>
+              <span style={{ color: inkFaint }}>·</span>
+              <MapPin size={10} color={inkFaint} strokeWidth={2} />
+              <span>{meta.location}</span>
+            </>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ─── Meta tray (expand-on-tap reasons) ──────────────────────────────────────
+function CardMetaTray({
+  insight,
+  reasons,
+}: {
+  insight: string;
+  reasons: string[];
+}) {
+  const [expanded, setExpanded] = useState(false);
+  return (
+    <>
+      <button
+        onClick={() => setExpanded((v) => !v)}
+        aria-expanded={expanded}
+        style={{
+          width: '100%',
+          padding: '12px 14px 13px',
+          background: 'transparent',
+          border: 'none',
+          textAlign: 'left',
+          display: 'flex',
+          alignItems: 'flex-start',
+          gap: 8,
+          cursor: 'pointer',
+          fontFamily: headlineFont,
+          minHeight: 60,
+        }}
+      >
+        <div
+          style={{
+            fontSize: 18,
+            color: amber,
+            fontWeight: 800,
+            lineHeight: 0.6,
+            marginTop: 4,
+          }}
+        >
+          “
+        </div>
+        <div
+          style={{
+            fontSize: 12,
+            color: inkSoft,
+            lineHeight: 1.45,
+            fontStyle: 'italic',
+            flex: 1,
+            minWidth: 0,
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            display: '-webkit-box',
+            WebkitLineClamp: expanded ? 99 : 2,
+            WebkitBoxOrient: 'vertical',
+          }}
+        >
+          {insight}
+        </div>
+        <ChevronUp
+          size={14}
+          color={inkFaint}
+          strokeWidth={2.5}
+          style={{
+            flexShrink: 0,
+            marginTop: 3,
+            transform: expanded ? 'rotate(0deg)' : 'rotate(180deg)',
+            transition: 'transform 200ms',
+          }}
+        />
+      </button>
+
+      <div
+        style={{
+          maxHeight: expanded ? 280 : 0,
+          overflow: 'hidden',
+          transition: 'max-height 280ms cubic-bezier(0.4, 0, 0.2, 1)',
+        }}
+      >
+        <div
+          style={{
+            padding: '0 14px 14px',
+            borderTop: `1px solid ${hairlineSoft}`,
+            marginTop: -1,
+          }}
+        >
+          <div
+            style={{
+              fontFamily: headlineFont,
+              fontSize: 9.5,
+              fontWeight: 700,
+              letterSpacing: '0.12em',
+              color: inkFaint,
+              padding: '10px 0 6px',
+            }}
+          >
+            WHY WE PICKED HIM
+          </div>
+          {reasons.slice(0, 3).map((r, i) => (
+            <div
+              key={i}
+              style={{
+                display: 'flex',
+                alignItems: 'flex-start',
+                gap: 8,
+                padding: '6px 0',
+                borderTop: i > 0 ? `1px solid ${hairlineSoft}` : 'none',
+              }}
+            >
+              <div
+                style={{
+                  flexShrink: 0,
+                  width: 18,
+                  height: 18,
+                  borderRadius: '50%',
+                  background: amberSoft,
+                  color: amberDeep,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontSize: 10,
+                  fontWeight: 800,
+                  fontFamily: headlineFont,
+                }}
+              >
+                {i + 1}
+              </div>
+              <div
+                style={{
+                  fontSize: 11.5,
+                  color: inkSoft,
+                  lineHeight: 1.45,
+                  flex: 1,
+                  fontFamily: headlineFont,
+                }}
+              >
+                {r}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </>
+  );
+}
+
+// ─── Card shell ─────────────────────────────────────────────────────────────
+function CardShell({
+  children,
+  isWinner,
+  isLive,
+}: {
+  children: React.ReactNode;
+  isWinner?: boolean;
+  isLive?: boolean;
+}) {
+  return (
+    <div
+      className={isWinner ? 'ti-trophy-glow' : ''}
+      style={{
+        flexShrink: 0,
+        width: 280,
+        scrollSnapAlign: 'start',
+        background: surface,
+        borderRadius: 18,
+        overflow: 'hidden',
+        border: isWinner ? `1.5px solid ${gold}` : `1px solid ${hairline}`,
+        boxShadow: isWinner ? undefined : '0 1px 3px rgba(15,23,42,0.04)',
+        position: 'relative',
+      }}
+    >
+      {isLive && (
+        <div
+          className="ti-live-stripe"
+          style={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            height: 2,
+            zIndex: 2,
+          }}
+        />
+      )}
+      {children}
+    </div>
+  );
+}
+
+function CardHero({
+  name,
+  desaturate,
+  isWinner,
+  children,
+}: {
+  name: string;
+  desaturate?: boolean;
+  isWinner?: boolean;
+  children: React.ReactNode;
+}) {
+  return (
+    <div style={{ position: 'relative', height: 220, background: ink }}>
+      <PlayerHeadshot name={name} desaturate={desaturate} />
+      <div
+        style={{
+          position: 'absolute',
+          inset: 0,
+          background:
+            'linear-gradient(to bottom, rgba(0,0,0,0.10) 0%, rgba(0,0,0,0) 35%, rgba(0,0,0,0.85) 100%)',
+        }}
+      />
+      {isWinner && (
+        <>
+          <div
+            style={{
+              position: 'absolute',
+              inset: 0,
+              overflow: 'hidden',
+              pointerEvents: 'none',
+            }}
+          >
+            <div
+              style={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                width: '40%',
+                height: '100%',
+                background:
+                  'linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent)',
+                animation: 'ti-goldShine 3.5s ease-in-out infinite',
+              }}
+            />
+          </div>
+          <div
+            style={{
+              position: 'absolute',
+              top: '50%',
+              right: -14,
+              transform: 'translateY(-55%)',
+              opacity: 0.18,
+              pointerEvents: 'none',
+            }}
+          >
+            <Trophy size={130} color={gold} strokeWidth={1.4} />
+          </div>
+        </>
+      )}
+      {children}
+    </div>
+  );
+}
+
+// ─── Pick cards (one per state) ─────────────────────────────────────────────
+interface UpcomingPick {
+  rank: number;
+  name: string;
+  insight: string;
+  reasons: string[];
+  courseFit: number;
+}
+
+function UpcomingCard({ pick }: { pick: UpcomingPick }) {
+  return (
+    <CardShell>
+      <CardHero name={pick.name}>
+        <div
+          style={{
+            position: 'absolute',
+            top: 12,
+            right: 12,
+            background: amber,
+            padding: '5px 10px',
+            borderRadius: 8,
+            fontSize: 9.5,
+            fontWeight: 700,
+            letterSpacing: '0.08em',
+            color: '#fff',
+            display: 'flex',
+            alignItems: 'center',
+            gap: 4,
+            fontFamily: headlineFont,
+          }}
+        >
+          <Clock size={10} strokeWidth={3} /> TO PLAY
+        </div>
+        <div
+          style={{
+            position: 'absolute',
+            bottom: 12,
+            left: 14,
+            right: 14,
+            color: '#fff',
+            fontFamily: headlineFont,
+          }}
+        >
+          <div
+            style={{
+              fontSize: 19,
+              fontWeight: 800,
+              lineHeight: 1.15,
+              letterSpacing: '-0.01em',
+            }}
+          >
+            {pick.name}
+          </div>
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 8,
+              marginTop: 4,
+            }}
+          >
+            <span
+              style={{
+                fontSize: 10,
+                color: 'rgba(255,255,255,0.65)',
+                fontWeight: 600,
+                letterSpacing: '0.06em',
+              }}
+            >
+              COURSE FIT
+            </span>
+            <div
+              style={{
+                flex: 1,
+                height: 3,
+                background: 'rgba(255,255,255,0.15)',
+                borderRadius: 2,
+                overflow: 'hidden',
+              }}
+            >
+              <div
+                style={{
+                  width: `${Math.max(0, Math.min(100, pick.courseFit))}%`,
+                  height: '100%',
+                  background: amber,
+                }}
+              />
+            </div>
+            <span
+              style={{
+                fontSize: 12,
+                fontWeight: 800,
+                color: amber,
+                fontVariantNumeric: 'tabular-nums',
+              }}
+            >
+              {Math.round(pick.courseFit)}
+            </span>
+          </div>
+        </div>
+      </CardHero>
+      <CardMetaTray insight={pick.insight} reasons={pick.reasons} />
+    </CardShell>
+  );
+}
+
+interface LivePick {
+  rank: number;
+  name: string;
+  insight: string;
+  reasons: string[];
+  position: string;
+  score: string;
+  thru: string;
+  moveDir: 'up' | 'down' | 'flat';
+  moveSpots: number;
+  finished: boolean;
+}
+
+function LiveCard({ pick }: { pick: LivePick }) {
+  const moveColor =
+    pick.moveDir === 'up'
+      ? greenLight
+      : pick.moveDir === 'down'
+      ? danger
+      : inkFaint;
+  const moveSymbol =
+    pick.moveDir === 'up' ? '▲' : pick.moveDir === 'down' ? '▼' : '—';
+
+  return (
+    <CardShell isLive={!pick.finished}>
+      <CardHero name={pick.name}>
+        <div
+          style={{
+            position: 'absolute',
+            top: 12,
+            right: 12,
+            background: pick.finished ? 'rgba(0,0,0,0.55)' : seasonGreen,
+            padding: '5px 10px',
+            borderRadius: 8,
+            fontSize: 9.5,
+            fontWeight: 700,
+            letterSpacing: '0.08em',
+            color: '#fff',
+            display: 'flex',
+            alignItems: 'center',
+            gap: 5,
+            fontFamily: headlineFont,
+          }}
+        >
+          {!pick.finished && (
+            <span
+              style={{
+                width: 5,
+                height: 5,
+                borderRadius: '50%',
+                background: '#fff',
+                animation: 'ti-pulse 1.4s ease-in-out infinite',
+              }}
+            />
+          )}
+          {pick.finished ? 'FINISHED' : 'LIVE'}
+        </div>
+
+        <div
+          style={{
+            position: 'absolute',
+            bottom: 12,
+            left: 14,
+            right: 14,
+            color: '#fff',
+            fontFamily: headlineFont,
+          }}
+        >
+          <div
+            style={{
+              fontSize: 18,
+              fontWeight: 800,
+              lineHeight: 1.15,
+              letterSpacing: '-0.01em',
+              marginBottom: 6,
+            }}
+          >
+            {pick.name}
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            <div>
+              <div
+                style={{
+                  fontSize: 9,
+                  fontWeight: 700,
+                  color: 'rgba(255,255,255,0.55)',
+                  letterSpacing: '0.1em',
+                  marginBottom: -2,
+                }}
+              >
+                POS
+              </div>
+              <div
+                style={{
+                  fontSize: 24,
+                  fontWeight: 800,
+                  color: '#fff',
+                  letterSpacing: '-0.02em',
+                  lineHeight: 1,
+                  fontVariantNumeric: 'tabular-nums',
+                }}
+              >
+                {pick.position}
+              </div>
+            </div>
+            <div
+              style={{
+                width: 1,
+                height: 32,
+                background: 'rgba(255,255,255,0.15)',
+              }}
+            />
+            <div>
+              <div
+                style={{
+                  fontSize: 9,
+                  fontWeight: 700,
+                  color: 'rgba(255,255,255,0.55)',
+                  letterSpacing: '0.1em',
+                  marginBottom: -2,
+                }}
+              >
+                SCORE
+              </div>
+              <div
+                style={{
+                  fontSize: 18,
+                  fontWeight: 800,
+                  color: amber,
+                  letterSpacing: '-0.01em',
+                  lineHeight: 1.1,
+                  fontVariantNumeric: 'tabular-nums',
+                }}
+              >
+                {pick.score}
+              </div>
+            </div>
+            <div
+              style={{
+                width: 1,
+                height: 32,
+                background: 'rgba(255,255,255,0.15)',
+              }}
+            />
+            <div>
+              <div
+                style={{
+                  fontSize: 9,
+                  fontWeight: 700,
+                  color: 'rgba(255,255,255,0.55)',
+                  letterSpacing: '0.1em',
+                  marginBottom: -2,
+                }}
+              >
+                THRU
+              </div>
+              <div
+                style={{
+                  fontSize: 14,
+                  fontWeight: 700,
+                  color: '#fff',
+                  lineHeight: 1.4,
+                  fontVariantNumeric: 'tabular-nums',
+                }}
+              >
+                {pick.thru}
+              </div>
+            </div>
+            {pick.moveSpots > 0 && (
+              <div
+                style={{
+                  marginLeft: 'auto',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 3,
+                  color: moveColor,
+                  fontSize: 13,
+                  fontWeight: 700,
+                  fontFamily: headlineFont,
+                  fontVariantNumeric: 'tabular-nums',
+                }}
+              >
+                <span style={{ fontSize: 10 }}>{moveSymbol}</span>
+                {pick.moveSpots}
+              </div>
+            )}
+          </div>
+        </div>
+      </CardHero>
+      <CardMetaTray insight={pick.insight} reasons={pick.reasons} />
+    </CardShell>
+  );
+}
+
+interface ResultsPick {
+  rank: number;
+  name: string;
+  insight: string;
+  reasons: string[];
+  finished: string; // formatted final position
+  score: string;
+  outcome: 'win' | 'top5' | 'top10' | 'miss';
+}
+
+function ResultsCard({ pick }: { pick: ResultsPick }) {
+  const isWinner = pick.outcome === 'win';
+  const outcomeConfig = {
+    win: {
+      bg: gold,
+      label: 'WE CALLED IT',
+      color: ink,
+      weight: 800 as const,
+    },
+    top5: {
+      bg: seasonGreen,
+      label: `✓ TOP 5 · ${pick.finished}`,
+      color: '#fff',
+      weight: 700 as const,
+    },
+    top10: {
+      bg: greenLight,
+      label: `TOP 10 · ${pick.finished}`,
+      color: '#fff',
+      weight: 700 as const,
+    },
+    miss: {
+      bg: 'rgba(0,0,0,0.55)',
+      label: `FINISHED ${pick.finished}`,
+      color: '#fff',
+      weight: 700 as const,
+    },
+  } as const;
+  const cfg = outcomeConfig[pick.outcome];
+
+  return (
+    <CardShell isWinner={isWinner}>
+      <CardHero
+        name={pick.name}
+        desaturate={pick.outcome === 'miss'}
+        isWinner={isWinner}
+      >
+        <div
+          className={isWinner ? 'ti-called-it' : ''}
+          style={{
+            position: 'absolute',
+            top: 12,
+            right: 12,
+            background: cfg.bg,
+            padding: '6px 11px',
+            borderRadius: 8,
+            fontSize: isWinner ? 10 : 9.5,
+            fontWeight: cfg.weight,
+            letterSpacing: isWinner ? '0.12em' : '0.08em',
+            color: cfg.color,
+            display: 'flex',
+            alignItems: 'center',
+            gap: 5,
+            boxShadow: isWinner
+              ? '0 4px 12px rgba(255,184,0,0.4)'
+              : undefined,
+            fontFamily: headlineFont,
+          }}
+        >
+          {isWinner && <Trophy size={11} strokeWidth={3} color={ink} />}
+          {cfg.label}
+        </div>
+
+        <div
+          style={{
+            position: 'absolute',
+            bottom: 12,
+            left: 14,
+            right: 14,
+            color: '#fff',
+            fontFamily: headlineFont,
+          }}
+        >
+          <div
+            style={{
+              fontSize: 19,
+              fontWeight: 800,
+              lineHeight: 1.15,
+              letterSpacing: '-0.01em',
+            }}
+          >
+            {pick.name}
+          </div>
+          <div
+            style={{
+              fontSize: 12,
+              color: 'rgba(255,255,255,0.7)',
+              marginTop: 3,
+              display: 'flex',
+              alignItems: 'center',
+              gap: 8,
+            }}
+          >
+            <span>
+              Final:{' '}
+              <strong style={{ color: isWinner ? gold : '#fff' }}>
+                {pick.finished}
+              </strong>
+            </span>
+            <span>·</span>
+            <span style={{ fontVariantNumeric: 'tabular-nums' }}>
+              {pick.score}
+            </span>
+          </div>
+        </div>
+      </CardHero>
+      <CardMetaTray insight={pick.insight} reasons={pick.reasons} />
+    </CardShell>
+  );
+}
+
+// ─── Receipts tail card + dots rail ─────────────────────────────────────────
+interface ReceiptsStats {
+  wins: number;
+  topFives: number;
+  hitRatePct: number;
+}
+
+function ReceiptsTailCard({
+  stats,
+  hasWinner,
+  onClick,
+}: {
+  stats: ReceiptsStats;
+  hasWinner: boolean;
+  onClick: () => void;
+}) {
+  const accent = hasWinner ? goldDeep : amberDeep;
+  return (
+    <button
+      onClick={onClick}
+      style={{
+        flexShrink: 0,
+        width: 220,
+        height: 296,
+        scrollSnapAlign: 'start',
+        borderRadius: 18,
+        overflow: 'hidden',
+        padding: 0,
+        cursor: 'pointer',
+        background: hasWinner
+          ? 'linear-gradient(160deg, rgba(255,184,0,0.18), rgba(247,147,30,0.08))'
+          : 'linear-gradient(160deg, rgba(247,147,30,0.10), rgba(247,147,30,0.02))',
+        border: hasWinner ? `1.5px solid ${gold}` : `1px solid ${amber}30`,
+        display: 'flex',
+        flexDirection: 'column',
+        textAlign: 'left',
+        fontFamily: headlineFont,
+        position: 'relative',
+      }}
+    >
+      <div
+        style={{
+          position: 'absolute',
+          right: -20,
+          bottom: -16,
+          opacity: hasWinner ? 0.18 : 0.1,
+          pointerEvents: 'none',
+        }}
+      >
+        {hasWinner ? (
+          <Trophy size={140} color={gold} strokeWidth={1.4} />
+        ) : (
+          <Award size={140} color={amber} strokeWidth={1.4} />
+        )}
+      </div>
+
+      <div
+        style={{
+          padding: '16px 16px 0',
+          display: 'flex',
+          alignItems: 'center',
+          gap: 6,
+        }}
+      >
+        {hasWinner ? (
+          <Trophy size={11} color={goldDeep} strokeWidth={2.5} />
+        ) : (
+          <Award size={11} color={amberDeep} strokeWidth={2.5} />
+        )}
+        <span
+          style={{
+            fontSize: 9.5,
+            fontWeight: 700,
+            letterSpacing: '0.14em',
+            color: hasWinner ? goldDeep : amberDeep,
+          }}
+        >
+          {hasWinner ? 'ANOTHER WINNER' : 'BACKED BY RESULTS'}
+        </span>
+      </div>
+
+      <div
+        style={{
+          padding: '10px 16px 0',
+          fontSize: 18,
+          fontWeight: 800,
+          color: ink,
+          lineHeight: 1.15,
+          letterSpacing: '-0.015em',
+          position: 'relative',
+          zIndex: 1,
+        }}
+      >
+        {stats.wins} winners.
+        <br />
+        <span style={{ color: accent }}>{stats.topFives} top-5s.</span>
+      </div>
+
+      <div
+        style={{
+          padding: '6px 16px 0',
+          fontSize: 11,
+          color: inkSoft,
+          fontWeight: 500,
+          position: 'relative',
+          zIndex: 1,
+        }}
+      >
+        On the PGA Tour this season.
+      </div>
+
+      <div
+        style={{
+          marginTop: 'auto',
+          padding: '0 16px 16px',
+          position: 'relative',
+          zIndex: 1,
+        }}
+      >
+        <div style={{ display: 'flex', alignItems: 'baseline', gap: 6 }}>
+          <div
+            style={{
+              fontSize: 36,
+              fontWeight: 800,
+              color: accent,
+              letterSpacing: '-0.03em',
+              lineHeight: 1,
+              fontVariantNumeric: 'tabular-nums',
+            }}
+          >
+            {stats.hitRatePct}%
+          </div>
+          <div
+            style={{
+              fontSize: 10,
+              fontWeight: 700,
+              letterSpacing: '0.1em',
+              color: inkSoft,
+            }}
+          >
+            TOP-5 HIT RATE
+          </div>
+        </div>
+        <div
+          style={{
+            marginTop: 8,
+            fontSize: 11,
+            fontWeight: 600,
+            color: accent,
+            display: 'flex',
+            alignItems: 'center',
+            gap: 3,
+          }}
+        >
+          See how we pick <ChevronRight size={11} strokeWidth={2.5} />
+        </div>
+      </div>
+    </button>
+  );
+}
+
+function DotsRail({
+  idx,
+  stats,
+  hasWinner,
+}: {
+  idx: number;
+  stats: ReceiptsStats;
+  hasWinner: boolean;
+}) {
+  const accent = hasWinner ? goldDeep : amberDeep;
+  return (
+    <div
+      style={{
+        marginTop: 14,
+        padding: '0 16px',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        gap: 10,
+      }}
+    >
+      <div style={{ display: 'flex', gap: 6, flexShrink: 0 }}>
+        {[0, 1, 2, 3].map((i) => (
+          <div
+            key={i}
+            style={{
+              width: i === idx ? 18 : 6,
+              height: 6,
+              borderRadius: 3,
+              background: i === idx ? ink : hairline,
+              transition: 'all 200ms',
+            }}
+          />
+        ))}
+      </div>
+
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: 7,
+          fontFamily: headlineFont,
+          minWidth: 0,
+          fontVariantNumeric: 'tabular-nums',
+        }}
+      >
+        {hasWinner && (
+          <Trophy
+            size={11}
+            color={goldDeep}
+            strokeWidth={2.5}
+            style={{ flexShrink: 0 }}
+          />
+        )}
+        <span
+          style={{
+            fontSize: 10.5,
+            fontWeight: 700,
+            letterSpacing: '0.02em',
+            whiteSpace: 'nowrap',
+          }}
+        >
+          <span style={{ color: accent, fontWeight: 800 }}>{stats.wins}</span>
+          <span style={{ color: inkSoft, fontWeight: 600 }}> WINS</span>
+          <span style={{ color: inkFaint, margin: '0 4px' }}>·</span>
+          <span style={{ color: accent, fontWeight: 800 }}>{stats.topFives}</span>
+          <span style={{ color: inkSoft, fontWeight: 600 }}> TOP-5s</span>
+          <span style={{ color: inkFaint, margin: '0 4px' }}>·</span>
+          <span style={{ color: accent, fontWeight: 800 }}>{stats.hitRatePct}%</span>
+          <span style={{ color: inkSoft, fontWeight: 600, marginLeft: 2 }}>T5</span>
+        </span>
+      </div>
+    </div>
+  );
+}
+
+// ─── Carousel ───────────────────────────────────────────────────────────────
+function Carousel({
+  children,
+  stats,
+  hasWinner,
+}: {
+  children: React.ReactNode;
+  stats: ReceiptsStats;
+  hasWinner: boolean;
+}) {
+  const [idx, setIdx] = useState(0);
+  const ref = useRef<HTMLDivElement>(null);
+  const onScroll = () => {
+    const el = ref.current;
+    if (!el) return;
+    // Cards (280) + 12 gap = 292; tail card (220) + 12 gap = 232. Use ~270 average
+    // — same heuristic as the mock; precision isn't critical for a dot indicator.
+    setIdx(Math.min(3, Math.max(0, Math.round(el.scrollLeft / 270))));
+  };
+
+  return (
+    <>
+      <div
+        ref={ref}
+        onScroll={onScroll}
+        className="ti-scroll"
+        style={{
+          display: 'flex',
+          overflowX: 'auto',
+          scrollSnapType: 'x mandatory',
+          gap: 12,
+          padding: '0 16px 4px',
+          WebkitOverflowScrolling: 'touch',
+          scrollbarWidth: 'none',
+        }}
+      >
+        {children}
+      </div>
+      <DotsRail idx={idx} stats={stats} hasWinner={hasWinner} />
+    </>
+  );
+}
+
+// ─── State adapters: turn raw data into card props ──────────────────────────
+function buildInsight(c: AITopContender): string {
+  const fromQuote = (c.pulledQuote ?? '').trim();
+  if (fromQuote) return fromQuote;
+  return (c.reasons?.[0] ?? '').trim();
+}
+
+function buildUpcomingPicks(data: AIPredictionData | null): UpcomingPick[] {
+  if (!data) return [];
+  return data.topContenders.slice(0, 3).map((c) => ({
+    rank: c.rank,
+    name: c.playerName,
+    insight: buildInsight(c),
+    reasons: c.reasons ?? [],
+    courseFit: c.courseFitScore ?? 0,
+  }));
+}
+
+function buildLivePicks(
   data: AIPredictionData | null | undefined,
-  nextTournamentPredictions: AIPredictionData | null,
-  tracker: PredictionTrackerData | undefined,
-): string {
-  if (state === 'live') {
-    const lead = tracker?.predictions[0];
-    const noScoresYet =
-      !!lead &&
-      (lead.thru === null || lead.thru === 0) &&
-      (lead.currentRound === null || lead.currentRound === 1);
-    if (noScoresYet) return 'TEES OFF SOON';
-    const round = lead?.currentRound ?? 1;
-    return `LIVE · ROUND ${round}`;
-  }
-  if (state === 'results' && data?.tournament?.startDate && data?.tournament?.endDate) {
-    return formatDateRange(data.tournament.startDate, data.tournament.endDate);
-  }
-  const t = nextTournamentPredictions?.tournament ?? data?.tournament;
-  if (t?.startDate && t?.endDate) {
-    return formatDateRange(t.startDate, t.endDate);
-  }
-  return 'UPCOMING';
+  tracker: { predictions: TrackedPrediction[] } | undefined,
+): LivePick[] {
+  if (!data || !tracker) return [];
+  const trackerByName = new Map(
+    tracker.predictions.map((t) => [t.playerName.toLowerCase(), t]),
+  );
+  return data.topContenders.slice(0, 3).map((c) => {
+    const t = trackerByName.get(c.playerName.toLowerCase());
+    const finished =
+      t?.thru != null && t.thru >= 18 ? true : t?.performanceStatus === 'cut' || t?.performanceStatus === 'withdrawn';
+    return {
+      rank: c.rank,
+      name: c.playerName,
+      insight: buildInsight(c),
+      reasons: c.reasons ?? [],
+      position: t ? formatPositionString(t) : '—',
+      score: formatScore(t?.score ?? null),
+      thru: formatThru(t?.thru ?? null, t?.currentRound ?? null),
+      moveDir: t?.moveDir ?? 'flat',
+      moveSpots: t?.moveSpots ?? 0,
+      finished,
+    };
+  });
+}
+
+function classifyPickOutcome(
+  position: number | null,
+): 'win' | 'top5' | 'top10' | 'miss' {
+  if (position === 1) return 'win';
+  if (position != null && position <= 5) return 'top5';
+  if (position != null && position <= 10) return 'top10';
+  return 'miss';
+}
+
+function buildResultsPicks(
+  data: AIPredictionData | null | undefined,
+  tracker: { predictions: TrackedPrediction[] } | undefined,
+): ResultsPick[] {
+  if (!data || !tracker) return [];
+  const trackerByName = new Map(
+    tracker.predictions.map((t) => [t.playerName.toLowerCase(), t]),
+  );
+  return data.topContenders.slice(0, 3).map((c) => {
+    const t = trackerByName.get(c.playerName.toLowerCase());
+    const finishedStr = t ? formatPositionString(t) : '—';
+    const outcome = classifyPickOutcome(t?.actualPosition ?? null);
+    return {
+      rank: c.rank,
+      name: c.playerName,
+      insight: buildInsight(c),
+      reasons: c.reasons ?? [],
+      finished: finishedStr,
+      score: formatScore(t?.score ?? null),
+      outcome,
+    };
+  });
+}
+
+// ─── Empty / loading states ────────────────────────────────────────────────
+function StateMessage({ label }: { label: string }) {
+  return (
+    <div
+      style={{
+        padding: '24px 16px',
+        fontFamily: headlineFont,
+        fontSize: 13,
+        color: inkSoft,
+        textAlign: 'center',
+      }}
+    >
+      {label}
+    </div>
+  );
 }
 
 // ─── Component ──────────────────────────────────────────────────────────────
-
 export const IntelligenceHero = memo(function IntelligenceHero() {
   const {
     state,
@@ -337,1755 +1325,144 @@ export const IntelligenceHero = memo(function IntelligenceHero() {
     trackerEnabled ? data : null,
   );
 
-  const { wins, topFives, topFiveRate } = useMemo(() => {
-    const w = tournaments.filter(t => t.outcome === 'win').length;
-    const t5 = tournaments.filter(t => t.outcome === 'win' || t.outcome === 'top5').length;
-    const total = tournaments.length || 1;
-    const rate = Math.round((t5 / total) * 100);
-    return { wins: w, topFives: t5, topFiveRate: rate };
+  // Receipts: hit rate counts a tournament as a "top-5 hit" if ANY of the
+  // three picks finished T5 or better — matches IntelligenceAboutSheet logic
+  // (win + top5 outcomes from classifyOutcome both indicate a top-5 hit).
+  const stats: ReceiptsStats = useMemo(() => {
+    const totalResolved = tournaments.length;
+    const wins = tournaments.filter((t) => t.outcome === 'win').length;
+    const topFives = tournaments.filter(
+      (t) => t.outcome === 'win' || t.outcome === 'top5',
+    ).length;
+    const hitRatePct =
+      totalResolved > 0 ? Math.round((topFives / totalResolved) * 100) : 0;
+    return { wins, topFives, hitRatePct };
   }, [tournaments]);
 
-  const stateLabel = useMemo(
-    () => formatStateLabel(state, data, nextTournamentPredictions, tracker),
-    [state, data, nextTournamentPredictions, tracker],
-  );
-
-  const [sheetOpen, setSheetOpen] = useState(false);
   const [aboutOpen, setAboutOpen] = useState(false);
-  const handleOpenSheet = () => setSheetOpen(true);
-  const handleCloseSheet = () => setSheetOpen(false);
   const handleOpenAbout = () => setAboutOpen(true);
   const handleCloseAbout = () => setAboutOpen(false);
 
-  // Live-state pulse for hero pick position number — every 6s.
-  const [pulse, setPulse] = useState(false);
-  useEffect(() => {
-    if (state !== 'live') return;
-    const id = setInterval(() => {
-      setPulse(true);
-      const timeout = setTimeout(() => setPulse(false), 800);
-      return () => clearTimeout(timeout);
-    }, 6000);
-    return () => clearInterval(id);
-  }, [state]);
+  // Choose payload + card-set for the active state.
+  const activeData =
+    state === 'upcoming' ? nextTournamentPredictions ?? data : data;
 
-  // Map lifecycle state → simplified UI state.
-  const uiState: 'upcoming' | 'live' | 'results' =
-    state === 'live' ? 'live' : state === 'results' ? 'results' : 'upcoming';
+  const meta = useMemo(
+    () => buildTournamentMeta(activeData?.tournament),
+    [activeData],
+  );
+
+  const upcomingPicks = useMemo(
+    () => (state === 'upcoming' ? buildUpcomingPicks(activeData ?? null) : []),
+    [state, activeData],
+  );
+  const livePicks = useMemo(
+    () =>
+      state === 'live'
+        ? buildLivePicks(activeData, tracker as any)
+        : [],
+    [state, activeData, tracker],
+  );
+  const resultsPicks = useMemo(
+    () =>
+      state === 'results'
+        ? buildResultsPicks(activeData, tracker as any)
+        : [],
+    [state, activeData, tracker],
+  );
+
+  const headline =
+    state === 'live'
+      ? 'Tracking our 3 picks live.'
+      : 'Our 3 picks for the week.';
+
+  const hasWinner = state === 'results' && resultsPicks.some((p) => p.outcome === 'win');
+
+  // Decide what to render in the carousel.
+  let cards: React.ReactNode = null;
+  let renderEmpty: React.ReactNode = null;
+  if (isLoading) {
+    renderEmpty = <StateMessage label="Loading Intelligence…" />;
+  } else if (state === 'upcoming') {
+    if (upcomingPicks.length === 0) {
+      renderEmpty = (
+        <StateMessage label="Picks for the next event drop soon." />
+      );
+    } else {
+      cards = upcomingPicks.map((p) => <UpcomingCard key={p.rank} pick={p} />);
+    }
+  } else if (state === 'live') {
+    if (livePicks.length === 0) {
+      renderEmpty = <StateMessage label="Tracking our picks live…" />;
+    } else {
+      cards = livePicks.map((p) => <LiveCard key={p.rank} pick={p} />);
+    }
+  } else if (state === 'results') {
+    if (resultsPicks.length === 0) {
+      renderEmpty = <StateMessage label="Final results coming in…" />;
+    } else {
+      cards = resultsPicks.map((p) => <ResultsCard key={p.rank} pick={p} />);
+    }
+  }
 
   return (
     <section
-      aria-label="clbhouz Intelligence"
-      style={{
-        // Sits directly on page slate-50 bg — matches sibling sections
-        // (ComingUpCalendar / WorldRankingsHero / StatOfTheWeek)
-        padding: '0 16px',
-      }}
+      aria-label="Tournament Intelligence"
+      style={{ padding: '0', fontFamily: headlineFont }}
     >
       <style>{`
-        @keyframes intel_liveDot {
+        @keyframes ti-pulse {
           0%, 100% { opacity: 1; transform: scale(1); }
           50% { opacity: 0.4; transform: scale(1.4); }
         }
+        @keyframes ti-goldGlow {
+          0%, 100% { box-shadow: 0 0 0 1px ${gold}, 0 8px 24px rgba(255,184,0,0.25); }
+          50% { box-shadow: 0 0 0 1px ${gold}, 0 12px 32px rgba(255,184,0,0.45); }
+        }
+        @keyframes ti-goldShine {
+          0% { transform: translateX(-100%) skewX(-20deg); }
+          100% { transform: translateX(200%) skewX(-20deg); }
+        }
+        @keyframes ti-calledItIn {
+          0% { transform: translateY(-8px); opacity: 0; }
+          100% { transform: translateY(0); opacity: 1; }
+        }
+        @keyframes ti-shimmer {
+          0% { background-position: -200% 0; }
+          100% { background-position: 200% 0; }
+        }
+        .ti-scroll::-webkit-scrollbar { display: none; }
+        .ti-trophy-glow { animation: ti-goldGlow 2.5s ease-in-out infinite; }
+        .ti-called-it { animation: ti-calledItIn 400ms cubic-bezier(0.4, 0, 0.2, 1); }
+        .ti-live-stripe {
+          background: linear-gradient(90deg, transparent, ${greenLight}, transparent);
+          background-size: 200% 100%;
+          animation: ti-shimmer 2s linear infinite;
+        }
       `}</style>
 
-      <LeadSectionHeader
-        statusLabel={stateLabel}
-        state={uiState}
-        onInfoTap={handleOpenAbout}
+      <SectionHeader
+        meta={meta}
+        headline={headline}
+        onAboutClick={handleOpenAbout}
       />
 
-      <div style={{ borderTop: `1px solid ${SLATE_150}`, marginBottom: 18 }} />
-
-      {isLoading ? (
-        <StateMessage label="Loading Intelligence…" />
-      ) : (
-        <>
-          {state === 'live' && (
-            <LiveStateBlock
-              data={data}
-              tracker={tracker}
-              pulse={pulse}
-              framingSentence={data?.editorialFraming ?? null}
-            />
-          )}
-          {state === 'results' && (
-            <ResultsStateBlock
-              data={data}
-              tracker={tracker}
-              pulse={pulse}
-              framingSentence={data?.editorialFraming ?? null}
-            />
-          )}
-          {state === 'upcoming' && (
-            <UpcomingStateBlock
-              data={nextTournamentPredictions ?? data ?? null}
-              framingSentence={
-                (nextTournamentPredictions ?? data)?.editorialFraming ?? null
-              }
-            />
-          )}
-        </>
+      {renderEmpty ?? (
+        <Carousel stats={stats} hasWinner={hasWinner}>
+          {cards}
+          <ReceiptsTailCard
+            stats={stats}
+            hasWinner={hasWinner}
+            onClick={handleOpenAbout}
+          />
+        </Carousel>
       )}
 
-      <TrackRecordPanel
-        wins={wins}
-        topFives={topFives}
-        topFiveRate={topFiveRate}
-        totalTournaments={tournaments.length}
-      />
-
-      <CTA onOpenSheet={handleOpenSheet} />
-
-      <IntelligenceAllPicksSheet open={sheetOpen} onClose={handleCloseSheet} />
       <IntelligenceAboutSheet
         open={aboutOpen}
         onClose={handleCloseAbout}
-        trackRecord={{ wins, topFives }}
+        trackRecord={{ wins: stats.wins, topFives: stats.topFives }}
       />
     </section>
   );
 });
-
-// ─── Lead-section header ─────────────────────────────────────────────────────
-
-function LeadSectionHeader({
-  statusLabel,
-  state,
-  onInfoTap,
-}: {
-  statusLabel: string;
-  state: 'upcoming' | 'live' | 'results';
-  onInfoTap: () => void;
-}) {
-  const dotColor =
-    state === 'live' ? GREEN_LIGHT
-    : state === 'upcoming' ? AMBER_ACCENT
-    : SLATE_500;
-
-  return (
-    <div style={{ marginBottom: 18 }}>
-      {/* Top row: eyebrow + status pill */}
-      <div
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          gap: 12,
-          marginBottom: 10,
-        }}
-      >
-        <button
-          type="button"
-          onClick={onInfoTap}
-          aria-label="About Tournament Intelligence"
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: 6,
-            background: 'transparent',
-            border: 'none',
-            padding: 0,
-            cursor: 'pointer',
-          }}
-        >
-          <span
-            style={{
-              fontFamily: headlineFont,
-              fontSize: 30,
-              fontWeight: 700,
-              color: INK,
-              letterSpacing: '-0.030em',
-              lineHeight: 1.08,
-              display: 'flex',
-              alignItems: 'center',
-              gap: 6,
-            }}
-          >
-            Tournament <span style={{ color: AMBER_DEEP }}>Intelligence</span>
-            <span
-              style={{
-                marginLeft: 4,
-                width: 28,
-                height: 28,
-                borderRadius: '50%',
-                background: AMBER_TINT,
-                display: 'inline-flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                flexShrink: 0,
-              }}
-            >
-              <Brain size={16} color={AMBER_DEEP} strokeWidth={2.4} style={{ display: 'block' }} />
-            </span>
-          </span>
-        </button>
-        {state !== 'live' && (
-          <div
-            style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: 6,
-              padding: '4px 8px',
-              background: 'transparent',
-              border: `1px solid ${SLATE_150}`,
-              borderRadius: 4,
-            }}
-          >
-            <div
-              style={{
-                width: 6,
-                height: 6,
-                borderRadius: '50%',
-                background: dotColor,
-                animation: 'none',
-              }}
-            />
-            <span
-              style={{
-                ...monoLabel,
-                fontSize: 9,
-                color: dotColor,
-                letterSpacing: '0.16em',
-              }}
-            >
-              {statusLabel}
-            </span>
-          </div>
-        )}
-      </div>
-
-      {/* Section title — Geist 700 (project memory: no serifs) */}
-      <h2
-        style={{
-          margin: 0,
-          fontFamily: headlineFont,
-          fontSize: 30,
-          fontWeight: 700,
-          color: INK,
-          letterSpacing: '-0.030em',
-          lineHeight: 1.08,
-          marginBottom: 6,
-        }}
-      >
-        Tournament picks, backed by results.
-      </h2>
-
-      {/* Explainer line */}
-      <p
-        style={{
-          margin: 0,
-          fontSize: 13,
-          fontWeight: 400,
-          color: SLATE_600,
-          lineHeight: 1.5,
-          maxWidth: 480,
-        }}
-      >
-        Our in-house AI picks three players each PGA tournament — using latest form & player statistics, course fit, weather, news and historical data.
-      </p>
-    </div>
-  );
-}
-
-// ─── Credibility band (always visible) ───────────────────────────────────────
-
-function CredibilityBand({
-  wins,
-  topFives,
-  topFiveRate,
-  season = '2026 SEASON',
-}: {
-  wins: number;
-  topFives: number;
-  topFiveRate: number;
-  season?: string;
-}) {
-  const stats = [
-    { val: `${wins}`, label: 'WINS' },
-    { val: `${topFives}`, label: 'TOP-5s' },
-    { val: `${topFiveRate}%`, label: 'HIT RATE' },
-  ];
-  return (
-    <div
-      style={{
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        padding: '10px 12px',
-        background: AMBER_TINT,
-        border: `1px solid ${AMBER_TINT_STRONG}`,
-        borderRadius: 8,
-        marginBottom: 18,
-        gap: 10,
-        flexWrap: 'wrap',
-      }}
-    >
-      <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-        <Award size={11} color={AMBER_DEEP} strokeWidth={2.5} />
-        <span style={{ ...monoLabel, fontSize: 9, color: AMBER_DEEP, letterSpacing: '0.20em' }}>
-          {season}
-        </span>
-      </div>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-        {stats.map((s, i) => (
-          <React.Fragment key={s.label}>
-            <div style={{ display: 'flex', alignItems: 'baseline', gap: 4 }}>
-              <span
-                style={{
-                  fontFamily: headlineFont,
-                  fontSize: 14,
-                  fontWeight: 800,
-                  color: INK,
-                  fontVariantNumeric: 'tabular-nums',
-                  letterSpacing: '-0.02em',
-                }}
-              >
-                {s.val}
-              </span>
-              <span style={{ ...monoLabel, fontSize: 8, color: SLATE_500, letterSpacing: '0.16em' }}>
-                {s.label}
-              </span>
-            </div>
-            {i < stats.length - 1 && (
-              <div style={{ width: 1, height: 10, background: AMBER_TINT_STRONG }} />
-            )}
-          </React.Fragment>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-// ─── Editorial headline + context line atoms ─────────────────────────────────
-
-/**
- * Phase C — per-tournament italic framing sentence above the headline.
- * Renders nothing when `text` is null, so the headline lands directly under
- * the credibility band when no editorial copy is provided.
- */
-function FramingSentence({ text }: { text: string | null | undefined }) {
-  if (!text) return null;
-  return (
-    <p
-      style={{
-        margin: '0 0 8px',
-        fontFamily: headlineFont,
-        fontStyle: 'italic',
-        fontSize: 14,
-        fontWeight: 500,
-        color: SLATE_600,
-        letterSpacing: '-0.005em',
-        lineHeight: 1.4,
-      }}
-    >
-      {text}
-    </p>
-  );
-}
-
-function EditorialHeadline({ children }: { children: React.ReactNode }) {
-  return (
-    <h1
-      style={{
-        margin: 0,
-        fontFamily: headlineFont,
-        fontSize: 24,
-        fontWeight: 700,
-        color: INK,
-        letterSpacing: '-0.025em',
-        lineHeight: 1.1,
-      }}
-    >
-      {children}
-    </h1>
-  );
-}
-
-function ContextLine({ children }: { children: React.ReactNode }) {
-  return (
-    <div
-      style={{
-        ...monoLabel,
-        fontWeight: 700,
-        fontSize: 10,
-        color: SLATE_500,
-        letterSpacing: '0.06em',
-        marginTop: 12,
-        marginBottom: 4,
-      }}
-    >
-      {children}
-    </div>
-  );
-}
-
-function TournamentLabel({ children }: { children: React.ReactNode }) {
-  return (
-    <div style={{ fontSize: 12, color: SLATE_500, marginBottom: 4 }}>
-      {children}
-    </div>
-  );
-}
-
-function ResultsEyebrow({
-  text,
-  color,
-  icon,
-}: {
-  text: string;
-  color: string;
-  icon?: React.ReactNode;
-}) {
-  return (
-    <div
-      style={{
-        ...monoLabel,
-        fontSize: 9,
-        color,
-        letterSpacing: '0.20em',
-        marginBottom: 8,
-        display: 'flex',
-        alignItems: 'center',
-        gap: 6,
-      }}
-    >
-      {icon}
-      {text}
-    </div>
-  );
-}
-
-// ─── Hero pick (rank-1, magazine lead treatment) ─────────────────────────────
-
-type PositionAccent = 'amber' | 'ink' | 'green';
-
-function HeroPick({
-  initials,
-  name,
-  subtitle,
-  pulledQuote,
-  reasons,
-  position,
-  positionLabel,
-  positionAccent = 'amber',
-  pulse = false,
-  defaultExpanded = false,
-  tierLabel,
-}: {
-  initials: string;
-  name: string;
-  subtitle?: string | null;
-  pulledQuote?: string | null;
-  reasons?: string[];
-  position: string;
-  positionLabel: string;
-  positionAccent?: PositionAccent;
-  pulse?: boolean;
-  defaultExpanded?: boolean;
-  tierLabel?: string;
-}) {
-  const [expanded, setExpanded] = useState(defaultExpanded);
-  const accent =
-    positionAccent === 'amber' ? AMBER_DEEP
-    : positionAccent === 'green' ? GREEN_LIGHT
-    : INK;
-  const visibleReasons = (reasons ?? []).filter(Boolean).slice(0, 3);
-
-  return (
-    <div
-      style={{
-        borderTop: `1px solid ${SLATE_150}`,
-        marginBottom: 14,
-      }}
-    >
-      <button
-        type="button"
-        onClick={() => setExpanded(v => !v)}
-        aria-expanded={expanded}
-        style={{
-          width: '100%',
-          padding: '20px 0 18px',
-          background: 'transparent',
-          border: 'none',
-          cursor: 'pointer',
-          textAlign: 'left',
-        }}
-      >
-        <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
-          <PlayerHeadshot
-            name={name}
-            size={56}
-            radius={14}
-            bg={AMBER_TINT}
-            border={`1px solid ${AMBER_TINT_STRONG}`}
-            initialsColor={AMBER_DEEP}
-            initialsFontSize={17}
-          />
-
-          <div style={{ flex: 1, minWidth: 0 }}>
-            {tierLabel && (
-              <div
-                style={{
-                  ...monoLabel,
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 5,
-                  fontSize: 8,
-                  color: AMBER_DEEP,
-                  letterSpacing: '0.18em',
-                  marginBottom: 5,
-                }}
-              >
-                <Sparkles size={9} color={AMBER_DEEP} fill={AMBER_DEEP} strokeWidth={2} />
-                {tierLabel}
-              </div>
-            )}
-            <div
-              style={{
-                fontFamily: headlineFont,
-                fontSize: 20,
-                fontWeight: 700,
-                color: INK,
-                letterSpacing: '-0.02em',
-                lineHeight: 1.15,
-                overflow: 'hidden',
-                textOverflow: 'ellipsis',
-                whiteSpace: 'nowrap',
-              }}
-            >
-              {name}
-            </div>
-            {subtitle && (
-              <div
-                style={{
-                  fontSize: 12,
-                  color: SLATE_500,
-                  marginTop: 4,
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis',
-                  whiteSpace: 'nowrap',
-                }}
-              >
-                {subtitle}
-              </div>
-            )}
-          </div>
-
-          <div
-            style={{
-              textAlign: 'right',
-              transform: pulse ? 'scale(1.06)' : 'scale(1)',
-              transition: 'transform 400ms cubic-bezier(0.34, 1.56, 0.64, 1)',
-              flexShrink: 0,
-            }}
-          >
-            <div
-              style={{
-                fontFamily: headlineFont,
-                fontSize: 30,
-                fontWeight: 700,
-                color: accent,
-                fontVariantNumeric: 'tabular-nums',
-                letterSpacing: '-0.025em',
-                lineHeight: 1,
-                textShadow: pulse ? `0 0 12px ${AMBER_TINT_STRONG}` : 'none',
-                transition: 'text-shadow 400ms ease',
-              }}
-            >
-              {position}
-            </div>
-            <div
-              style={{
-                ...monoLabel,
-                fontSize: 8,
-                color: SLATE_500,
-                letterSpacing: '0.16em',
-                marginTop: 4,
-              }}
-            >
-              {positionLabel}
-            </div>
-          </div>
-
-          <div
-            style={{
-              marginLeft: 4,
-              transform: expanded ? 'rotate(180deg)' : 'rotate(0deg)',
-              transition: 'transform 240ms ease',
-              flexShrink: 0,
-            }}
-          >
-            <ChevronDown size={18} color={SLATE_400} strokeWidth={2.5} />
-          </div>
-        </div>
-
-        {!expanded && pulledQuote && (
-          <div style={{ paddingTop: 14 }}>
-            <div
-              style={{
-                fontFamily: headlineFont,
-                fontSize: 14.5,
-                fontWeight: 500,
-                fontStyle: 'italic',
-                color: SLATE_700,
-                lineHeight: 1.45,
-                letterSpacing: '-0.005em',
-                overflow: 'hidden',
-                textOverflow: 'ellipsis',
-                whiteSpace: 'nowrap',
-              }}
-            >
-              <Quote
-                size={14}
-                color={AMBER_ACCENT}
-                fill={AMBER_ACCENT}
-                strokeWidth={0}
-                style={{ display: 'inline-block', verticalAlign: 'baseline', marginRight: 0, transform: 'scaleX(-1) translateY(2px)' }}
-              />
-              {pulledQuote}
-              <Quote
-                size={14}
-                color={AMBER_ACCENT}
-                fill={AMBER_ACCENT}
-                strokeWidth={0}
-                style={{ display: 'inline-block', verticalAlign: 'baseline', marginLeft: 4, transform: 'translateY(2px)' }}
-              />
-            </div>
-          </div>
-        )}
-      </button>
-
-      <div
-        style={{
-          maxHeight: expanded ? 240 : 0,
-          opacity: expanded ? 1 : 0,
-          overflow: 'hidden',
-          transition: 'max-height 320ms ease, opacity 240ms ease',
-        }}
-      >
-        <div style={{ padding: '0 0 16px 0' }}>
-          {pulledQuote && (
-            <div style={{ marginBottom: 12 }}>
-              <div
-                style={{
-                  fontFamily: headlineFont,
-                  fontSize: 14.5,
-                  fontWeight: 500,
-                  fontStyle: 'italic',
-                  color: SLATE_700,
-                  lineHeight: 1.45,
-                  letterSpacing: '-0.005em',
-                }}
-              >
-                <Quote
-                  size={14}
-                  color={AMBER_ACCENT}
-                  fill={AMBER_ACCENT}
-                  strokeWidth={0}
-                  style={{ display: 'inline-block', verticalAlign: 'baseline', marginRight: 0, transform: 'scaleX(-1) translateY(2px)' }}
-                />
-                {pulledQuote}
-                <Quote
-                  size={14}
-                  color={AMBER_ACCENT}
-                  fill={AMBER_ACCENT}
-                  strokeWidth={0}
-                  style={{ display: 'inline-block', verticalAlign: 'baseline', marginLeft: 4, transform: 'translateY(2px)' }}
-                />
-              </div>
-            </div>
-          )}
-
-          {visibleReasons.length > 0 && (
-            <div style={{ padding: '2px 0 0 0' }}>
-              {visibleReasons.map((r, i, arr) => (
-                <div
-                  key={i}
-                  style={{
-                    display: 'flex',
-                    alignItems: 'flex-start',
-                    gap: 8,
-                    marginBottom: i < arr.length - 1 ? 8 : 0,
-                  }}
-                >
-                  <div
-                    style={{
-                      width: 4,
-                      height: 4,
-                      borderRadius: '50%',
-                      background: AMBER_DEEP,
-                      marginTop: 6,
-                      flexShrink: 0,
-                    }}
-                  />
-                  <div
-                    style={{
-                      fontSize: 13,
-                      color: SLATE_700,
-                      lineHeight: 1.55,
-                    }}
-                  >
-                    {r}
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-      </div>
-    </div>
-  );
-}
-
-// ─── Compact pick (ranks 2 + 3, chevron-expand) ──────────────────────────────
-
-function CompactPick({
-  initials,
-  name,
-  tierLabel,
-  reason,
-  reasons,
-  position,
-  positionLabel,
-}: {
-  initials: string;
-  name: string;
-  tierLabel?: string;
-  reason?: string;
-  reasons: string[];
-  position: string;
-  positionLabel: string;
-}) {
-  const [expanded, setExpanded] = useState(false);
-  const visibleReasons = reasons.filter(Boolean).slice(0, 3);
-
-  return (
-    <div>
-      <button
-        type="button"
-        onClick={() => setExpanded(v => !v)}
-        aria-expanded={expanded}
-        style={{
-          width: '100%',
-          padding: '13px 12px 13px 11px',
-          background: 'transparent',
-          border: 'none',
-          cursor: 'pointer',
-          textAlign: 'left',
-          display: 'flex',
-          alignItems: 'center',
-          gap: 12,
-        }}
-      >
-        <PlayerHeadshot
-          name={name}
-          size={38}
-          radius={10}
-          bg={SLATE_100}
-          border={`1px solid ${SLATE_150}`}
-          initialsColor={SLATE_700}
-          initialsFontSize={12}
-        />
-        <div style={{ flex: 1, minWidth: 0 }}>
-          {tierLabel && (
-            <div
-              style={{
-                ...monoLabel,
-                fontSize: 8,
-                color: SLATE_500,
-                letterSpacing: '0.18em',
-                marginBottom: 2,
-              }}
-            >
-              {tierLabel}
-            </div>
-          )}
-          <div
-            style={{
-              fontFamily: headlineFont,
-              fontSize: 14.5,
-              fontWeight: 700,
-              color: INK,
-              letterSpacing: '-0.01em',
-              lineHeight: 1.2,
-              overflow: 'hidden',
-              textOverflow: 'ellipsis',
-              whiteSpace: 'nowrap',
-            }}
-          >
-            {name}
-          </div>
-          {!expanded && reason && (
-            <div
-              style={{
-                fontSize: 12,
-                color: SLATE_500,
-                marginTop: 3,
-                overflow: 'hidden',
-                textOverflow: 'ellipsis',
-                whiteSpace: 'nowrap',
-              }}
-            >
-              {reason}
-            </div>
-          )}
-        </div>
-        <div style={{ textAlign: 'right', flexShrink: 0 }}>
-          <div
-            style={{
-              fontFamily: headlineFont,
-              fontSize: 19,
-              fontWeight: 700,
-              color: INK,
-              fontVariantNumeric: 'tabular-nums',
-              letterSpacing: '-0.02em',
-              lineHeight: 1,
-            }}
-          >
-            {position}
-          </div>
-          <div
-            style={{
-              ...monoLabel,
-              fontSize: 8,
-              color: SLATE_500,
-              letterSpacing: '0.16em',
-              marginTop: 3,
-            }}
-          >
-            {positionLabel}
-          </div>
-        </div>
-        <div
-          style={{
-            marginLeft: 4,
-            transform: expanded ? 'rotate(180deg)' : 'rotate(0deg)',
-            transition: 'transform 240ms ease',
-            flexShrink: 0,
-          }}
-        >
-          <ChevronDown size={15} color={SLATE_400} strokeWidth={2.5} />
-        </div>
-      </button>
-      <div
-        style={{
-          maxHeight: expanded ? 240 : 0,
-          opacity: expanded ? 1 : 0,
-          overflow: 'hidden',
-          transition: 'max-height 320ms ease, opacity 240ms ease',
-        }}
-      >
-        <div style={{ padding: '0 12px 14px 11px' }}>
-          <div>
-            {visibleReasons.map((r, i) => (
-              <div
-                key={i}
-                style={{
-                  display: 'flex',
-                  alignItems: 'flex-start',
-                  gap: 8,
-                  marginBottom: i < visibleReasons.length - 1 ? 8 : 0,
-                }}
-              >
-                <div
-                  style={{
-                    width: 4,
-                    height: 4,
-                    borderRadius: '50%',
-                    background: AMBER_DEEP,
-                    marginTop: 6,
-                    flexShrink: 0,
-                  }}
-                />
-                <div style={{ fontSize: 12.5, color: SLATE_700, lineHeight: 1.55 }}>
-                  {r}
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-// ─── Tournament Winner card (results · non-win only) ─────────────────────────
-
-function TournamentWinnerCard({
-  name,
-  score,
-}: {
-  name: string;
-  score: number | null;
-}) {
-  const initials = getInitials(name);
-  const scoreNum = score ?? 0;
-  return (
-    <div
-      style={{
-        marginTop: 16,
-        marginBottom: 4,
-        padding: '12px 14px',
-        background: '#fff',
-        border: `1px solid ${SLATE_150}`,
-        borderRadius: 10,
-      }}
-    >
-      <div
-        style={{
-          ...monoLabel,
-          fontSize: 8,
-          color: SLATE_500,
-          letterSpacing: '0.20em',
-          marginBottom: 8,
-          display: 'flex',
-          alignItems: 'center',
-          gap: 4,
-        }}
-      >
-        <Trophy size={9} strokeWidth={2.5} />
-        Tournament Winner
-      </div>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-        <PlayerHeadshot
-          name={name}
-          size={36}
-          radius={9}
-          bg={SLATE_100}
-          border={`1px solid ${SLATE_150}`}
-          initialsColor={SLATE_700}
-          initialsFontSize={11}
-        />
-        <div style={{ flex: 1, minWidth: 0 }}>
-          <div
-            style={{
-              fontSize: 15,
-              fontWeight: 700,
-              color: INK,
-              letterSpacing: '-0.015em',
-              overflow: 'hidden',
-              textOverflow: 'ellipsis',
-              whiteSpace: 'nowrap',
-            }}
-          >
-            {name}
-          </div>
-          <div
-            style={{
-              ...monoLabel,
-              fontSize: 8,
-              color: SLATE_500,
-              marginTop: 3,
-              letterSpacing: '0.16em',
-            }}
-          >
-            Final score
-          </div>
-        </div>
-        <div
-          style={{
-            fontFamily: headlineFont,
-            fontSize: 24,
-            fontWeight: 600,
-            color: INK,
-            fontVariantNumeric: 'tabular-nums',
-            letterSpacing: '-0.02em',
-            lineHeight: 1,
-          }}
-        >
-          {scoreNum < 0 ? '\u2212' : ''}{Math.abs(scoreNum) || 'E'}
-        </div>
-      </div>
-    </div>
-  );
-}
-
-// ─── Track-record panel ──────────────────────────────────────────────────────
-
-function TrackRecordPanel({
-  wins,
-  topFives,
-  topFiveRate,
-  totalTournaments,
-}: {
-  wins: number;
-  topFives: number;
-  topFiveRate: number;
-  totalTournaments: number;
-}) {
-  const tiles = [
-    { val: `${wins}`, label: 'WINNERS\nCALLED' },
-    { val: `${topFives}`, label: 'TOP-5\nFINISHES' },
-    { val: `${topFiveRate}%`, label: 'TOP-5\nHIT RATE' },
-  ];
-  return (
-    <div
-      style={{
-        marginTop: 22,
-        padding: 16,
-        background: AMBER_TINT,
-        border: `1px solid ${AMBER_TINT_STRONG}`,
-        borderRadius: 10,
-      }}
-    >
-      <div
-        style={{
-          ...monoLabel,
-          fontSize: 9,
-          color: AMBER_DEEP,
-          letterSpacing: '0.24em',
-          marginBottom: 10,
-          display: 'flex',
-          alignItems: 'center',
-          gap: 6,
-        }}
-      >
-        <Award size={10} strokeWidth={2.5} />
-        Backed by results
-      </div>
-      <div
-        style={{
-          fontFamily: headlineFont,
-          fontSize: 17,
-          fontWeight: 700,
-          color: INK,
-          letterSpacing: '-0.015em',
-          lineHeight: 1.3,
-          marginBottom: 14,
-        }}
-      >
-        We've called{' '}
-        <span style={{ color: AMBER_DEEP }}>
-          {wins} winner{wins !== 1 ? 's' : ''}
-        </span>{' '}
-        and{' '}
-        <span style={{ color: AMBER_DEEP }}>
-          {topFives} top-5{topFives !== 1 ? 's' : ''}
-        </span>{' '}
-        this season.
-      </div>
-      <div
-        style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(3, 1fr)',
-          gap: 8,
-          marginBottom: 12,
-        }}
-      >
-        {tiles.map(t => (
-          <div
-            key={t.label}
-            style={{
-              padding: '10px 8px',
-              background: '#fff',
-              border: `1px solid ${SLATE_150}`,
-              borderRadius: 8,
-              textAlign: 'center',
-            }}
-          >
-            <div
-              style={{
-                fontFamily: headlineFont,
-                fontSize: 22,
-                fontWeight: 700,
-                color: AMBER_DEEP,
-                letterSpacing: '-0.02em',
-                lineHeight: 1,
-                marginBottom: 4,
-                fontVariantNumeric: 'tabular-nums',
-              }}
-            >
-              {t.val}
-            </div>
-            <div
-              style={{
-                ...monoLabel,
-                fontSize: 8,
-                color: SLATE_500,
-                letterSpacing: '0.14em',
-                whiteSpace: 'pre-line',
-                lineHeight: 1.3,
-              }}
-            >
-              {t.label}
-            </div>
-          </div>
-        ))}
-      </div>
-      <div style={{ fontSize: 12, color: SLATE_600, lineHeight: 1.5 }}>
-        Our model has called the winner in {wins} of the last {totalTournaments} PGA tournaments.
-      </div>
-    </div>
-  );
-}
-
-// ─── CTA ─────────────────────────────────────────────────────────────────────
-
-function CTA({ onOpenSheet }: { onOpenSheet: () => void }) {
-  return (
-    <button
-      type="button"
-      onClick={onOpenSheet}
-      style={{
-        width: '100%',
-        marginTop: 18,
-        padding: 14,
-        background: '#fff',
-        border: `1px solid ${SLATE_150}`,
-        borderRadius: 10,
-        color: INK,
-        fontFamily: headlineFont,
-        fontSize: 11,
-        fontWeight: 700,
-        letterSpacing: '0.18em',
-        textTransform: 'uppercase',
-        cursor: 'pointer',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        gap: 8,
-      }}
-    >
-      All Intelligence picks
-      <ChevronRight size={12} strokeWidth={2.5} />
-    </button>
-  );
-}
-
-// ─── State blocks ────────────────────────────────────────────────────────────
-
-function LiveStateBlock({
-  data,
-  tracker,
-  pulse,
-  framingSentence,
-}: {
-  data: AIPredictionData | null | undefined;
-  tracker: PredictionTrackerData | undefined;
-  pulse: boolean;
-  framingSentence: string | null;
-}) {
-  const picks = useMemo(() => {
-    const raw = tracker?.predictions ?? [];
-    return [...raw].sort((a, b) => {
-      const aOut = a.performanceStatus === 'cut' || a.performanceStatus === 'withdrawn';
-      const bOut = b.performanceStatus === 'cut' || b.performanceStatus === 'withdrawn';
-      if (aOut !== bOut) return aOut ? 1 : -1;
-      const aPos = a.actualPosition;
-      const bPos = b.actualPosition;
-      if (aPos === null && bPos === null) return a.predictedRank - b.predictedRank;
-      if (aPos === null) return 1;
-      if (bPos === null) return -1;
-      if (aPos !== bPos) return aPos - bPos;
-      return a.predictedRank - b.predictedRank;
-    });
-  }, [tracker?.predictions]);
-
-  const topPick = useMemo(
-    () => (tracker?.predictions ?? []).find(p => p.predictedRank === 1) ?? null,
-    [tracker?.predictions],
-  );
-  const bestPick = useMemo(() => {
-    const inPlay = picks.filter(
-      p => p.actualPosition !== null && p.performanceStatus !== 'cut' && p.performanceStatus !== 'withdrawn',
-    );
-    return inPlay[0] ?? null;
-  }, [picks]);
-
-  // Headline: top pick leading > best pick leading > generic.
-  const headlineNode = useMemo<React.ReactNode>(() => {
-    if (!topPick && !bestPick) return 'Our picks are in play.';
-    if (topPick && bestPick && topPick.playerId === bestPick.playerId) {
-      return (
-        <>
-          {getFirstName(topPick.playerName)} leads{' '}
-          <span style={{ color: AMBER_DEEP }}>our picks</span> at{' '}
-          <span style={{ fontVariantNumeric: 'tabular-nums', fontWeight: 800 }}>
-            {formatScore(topPick.score)}
-          </span>
-          .
-        </>
-      );
-    }
-    if (bestPick) {
-      return (
-        <>
-          {getFirstName(bestPick.playerName)} leads{' '}
-          <span style={{ color: AMBER_DEEP }}>our picks</span> at{' '}
-          <span style={{ fontVariantNumeric: 'tabular-nums', fontWeight: 800 }}>
-            {formatScore(bestPick.score)}
-          </span>
-          .
-        </>
-      );
-    }
-    return 'Our picks are in play.';
-  }, [topPick, bestPick]);
-
-  const numInTop5 = picks.filter(
-    p => p.actualPosition !== null && p.actualPosition <= 5,
-  ).length;
-  const currentRound = picks[0]?.currentRound ?? 1;
-
-  // Hero pick = the leading pick (best-performing). Falls back to top pick.
-  const heroPick = bestPick ?? topPick ?? picks[0] ?? null;
-  const supporting = picks.filter(p => heroPick && p.playerId !== heroPick.playerId).slice(0, 2);
-
-  return (
-    <div>
-      <FramingSentence text={framingSentence} />
-      <EditorialHeadline>{headlineNode}</EditorialHeadline>
-      {data?.tournament?.name && (
-        <div style={{ marginTop: 10 }}>
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              gap: 8,
-            }}
-          >
-            <div style={{ fontSize: 12, color: SLATE_500, fontWeight: 600 }}>
-              {data.tournament.name}
-            </div>
-            <div
-              style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: 6,
-                flexShrink: 0,
-              }}
-            >
-              <div
-                style={{
-                  width: 6,
-                  height: 6,
-                  borderRadius: '50%',
-                  background: GREEN_LIGHT,
-                  animation: 'intel_liveDot 1.6s ease-in-out infinite',
-                }}
-              />
-              <span
-                style={{
-                  fontSize: 10,
-                  fontWeight: 600,
-                  color: GREEN_LIGHT,
-                }}
-              >
-                {`LIVE · ROUND ${currentRound}`}
-              </span>
-            </div>
-          </div>
-          {(data.tournament.venueName || formatLocation(data.tournament)) && (
-            <div style={{ fontSize: 11, color: SLATE_500, marginTop: 2, marginBottom: 12 }}>
-              {[data.tournament.venueName, formatLocation(data.tournament)].filter(Boolean).join(' · ')}
-            </div>
-          )}
-        </div>
-      )}
-
-      {heroPick && (
-        <HeroPick
-          initials={getInitials(heroPick.playerName)}
-          name={heroPick.playerName}
-          subtitle={`Now ${formatPosition(heroPick)} · Round ${heroPick.currentRound ?? currentRound}${heroPick.thru != null ? ` · Thru ${heroPick.thru}` : ''}`}
-          pulledQuote={heroPick.pulledQuote ?? heroPick.reasons[0] ?? null}
-          reasons={heroPick.reasons}
-          defaultExpanded={false}
-          position={formatPosition(heroPick)}
-          positionLabel={formatScore(heroPick.score)}
-          positionAccent={heroPick.actualPosition === 1 ? 'amber' : 'ink'}
-          pulse={pulse}
-        />
-      )}
-
-      {supporting.length > 0 && (
-        <>
-          <SupportingLabel />
-          <div>
-            {supporting.map((p) => (
-              <CompactPick
-                key={p.playerId}
-                initials={getInitials(p.playerName)}
-                name={p.playerName}
-                reason={p.reasons[0]}
-                reasons={p.reasons}
-                position={formatPosition(p)}
-                positionLabel={formatScore(p.score)}
-              />
-            ))}
-          </div>
-        </>
-      )}
-    </div>
-  );
-}
-
-function ResultsStateBlock({
-  data,
-  tracker,
-  pulse,
-  framingSentence,
-}: {
-  data: AIPredictionData | null | undefined;
-  tracker: PredictionTrackerData | undefined;
-  pulse: boolean;
-  framingSentence: string | null;
-}) {
-  const picks = tracker?.predictions ?? [];
-  const topPick = picks.find(p => p.predictedRank === 1) ?? picks[0] ?? null;
-  const topPickWon = !!topPick && topPick.actualPosition === 1;
-
-  const winnerFromTracker = picks.find(p => p.actualPosition === 1) ?? null;
-  const winnerName =
-    winnerFromTracker?.playerName ?? (topPickWon ? topPick!.playerName : 'The winner');
-  const winnerFirstName = getFirstName(winnerName);
-
-  const numInTop10 = picks.filter(
-    p => p.actualPosition !== null && p.actualPosition <= 10,
-  ).length;
-  const missedCutCount = picks.filter(
-    p => p.performanceStatus === 'cut' || p.performanceStatus === 'withdrawn',
-  ).length;
-
-  // ── WIN branch: ANY of our 3 picks won ───────────────────────────────────
-  const winningPick = winnerFromTracker;
-  if (winningPick) {
-    const others = picks.filter(p => p.playerId !== winningPick.playerId);
-    const second = others
-      .filter(p => p.actualPosition !== null)
-      .sort((a, b) => a.actualPosition! - b.actualPosition!)[0];
-    const winnerScore = winningPick.score ?? 0;
-    const secondScore = second?.score ?? winnerScore;
-    const margin = Math.max(0, secondScore - winnerScore);
-    const supporting = others.slice(0, 2);
-
-    return (
-      <div>
-        <ResultsEyebrow
-          text="We called it."
-          color={GREEN_DEEP_INK}
-          icon={<Check size={11} strokeWidth={3} />}
-        />
-        <FramingSentence text={framingSentence} />
-        <EditorialHeadline>
-          <span style={{ color: AMBER_DEEP }}>{getFirstName(winningPick.playerName)}</span>{' '}
-          {margin === 0 ? (
-            <>won in a playoff.</>
-          ) : (
-            <>
-              won by{' '}
-              <span style={{ fontVariantNumeric: 'tabular-nums', fontWeight: 800 }}>
-                {margin}
-              </span>
-              .
-            </>
-          )}
-        </EditorialHeadline>
-        <ContextLine>
-          {`OUR PICK WON · ${Math.max(0, numInTop10 - 1)} OTHER PICKS T10 · ${
-            missedCutCount === 0 ? 'NO MISSED CUTS' : `${missedCutCount} MISSED CUT${missedCutCount > 1 ? 'S' : ''}`
-          }`}
-        </ContextLine>
-        {data?.tournament?.name && (
-          <TournamentLabel>{data.tournament.name}</TournamentLabel>
-        )}
-
-        <HeroPick
-          initials={getInitials(winningPick.playerName)}
-          name={winningPick.playerName}
-          subtitle={`Final · 1st · Won by ${margin || 'playoff'}`}
-          pulledQuote={winningPick.pulledQuote ?? winningPick.reasons[0] ?? null}
-          reasons={winningPick.reasons}
-          defaultExpanded={false}
-          position="1"
-          positionLabel={formatScore(winningPick.score)}
-          positionAccent="amber"
-          pulse={pulse}
-        />
-
-        {supporting.length > 0 && (
-          <>
-            <SupportingLabel />
-            <div>
-              {supporting.map((p) => (
-                <CompactPick
-                  key={p.playerId}
-                  initials={getInitials(p.playerName)}
-                  name={p.playerName}
-                  reason={p.reasons[0]}
-                  reasons={p.reasons}
-                  position={formatPosition(p)}
-                  positionLabel={formatScore(p.score)}
-                />
-              ))}
-            </div>
-          </>
-        )}
-      </div>
-    );
-  }
-
-  // ── MISS branches: top5 / partial / miss ──────────────────────────────────
-  const positions = picks
-    .map(p => p.actualPosition)
-    .filter((n): n is number => n !== null);
-  const bestPosition = positions.length ? Math.min(...positions) : null;
-  const outcome: IntelligenceOutcome =
-    bestPosition === null ? 'miss'
-    : bestPosition === 1 ? 'win'
-    : bestPosition <= 5 ? 'top5'
-    : bestPosition <= 15 ? 'partial'
-    : 'miss';
-
-  const bestPick = picks.find(p => p.actualPosition === bestPosition) ?? topPick;
-  const tone = getMissTone(outcome);
-
-  // Hero is always the closest-finishing pick (any rank). Falls back to topPick
-  // when no pick has finished (all CUT/WD).
-  const heroPickResolved = bestPick ?? topPick ?? null;
-  const supporting = picks.filter(p => heroPickResolved && p.playerId !== heroPickResolved.playerId).slice(0, 2);
-
-  const heroAccent: PositionAccent = outcome === 'miss' ? 'ink' : 'amber';
-  const closestFirstName = heroPickResolved ? getFirstName(heroPickResolved.playerName) : undefined;
-  const closestPos = heroPickResolved ? formatPosition(heroPickResolved) : undefined;
-
-  return (
-    <div>
-      <ResultsEyebrow text={tone.eyebrow} color={tone.eyebrowColor} />
-      <FramingSentence text={framingSentence} />
-      <EditorialHeadline>
-        {tone.headlineRender({ winner: winnerFirstName, closest: closestFirstName, closestPos })}
-      </EditorialHeadline>
-      <ContextLine>{tone.contextLine(numInTop10, missedCutCount).toUpperCase()}</ContextLine>
-      {data?.tournament?.name && (
-        <TournamentLabel>{data.tournament.name}</TournamentLabel>
-      )}
-
-      {winnerFromTracker && (
-        <TournamentWinnerCard
-          name={winnerFromTracker.playerName}
-          score={winnerFromTracker.score}
-        />
-      )}
-
-      {heroPickResolved && (
-        <HeroPick
-          initials={getInitials(heroPickResolved.playerName)}
-          name={heroPickResolved.playerName}
-          subtitle={`Final ${formatPosition(heroPickResolved)}`}
-          pulledQuote={heroPickResolved.pulledQuote ?? heroPickResolved.reasons[0] ?? null}
-          reasons={heroPickResolved.reasons}
-          defaultExpanded={false}
-          position={formatPosition(heroPickResolved)}
-          positionLabel={formatScore(heroPickResolved.score)}
-          positionAccent={heroAccent}
-        />
-      )}
-
-      {supporting.length > 0 && (
-        <>
-          <SupportingLabel />
-          <div>
-            {supporting.map((p) => (
-              <CompactPick
-                key={p.playerId}
-                initials={getInitials(p.playerName)}
-                name={p.playerName}
-                reason={p.reasons[0]}
-                reasons={p.reasons}
-                position={formatPosition(p)}
-                positionLabel={formatScore(p.score)}
-              />
-            ))}
-          </div>
-        </>
-      )}
-    </div>
-  );
-}
-
-function UpcomingStateBlock({
-  data,
-  framingSentence,
-}: {
-  data: AIPredictionData | null;
-  framingSentence: string | null;
-}) {
-  const tournament = data?.tournament;
-  const venueName = tournament?.venueName ?? 'Venue TBC';
-  const tournamentName = tournament?.name ?? 'Next Tournament';
-  const locationLine = tournament ? formatLocation(tournament) : '';
-  const bullets = tournament ? getVenueBullets(tournament) : [];
-
-  const contenders = data?.topContenders ?? [];
-  const topContender = contenders[0] ?? null;
-  const topPickFirstName = topContender ? getFirstName(topContender.playerName) : '';
-  const numPicks = Math.min(3, contenders.length);
-
-  const supporting = contenders.slice(1, 3);
-
-  return (
-    <div>
-      <FramingSentence text={framingSentence} />
-      {topPickFirstName ? (
-        <EditorialHeadline>
-          <span style={{ color: AMBER_DEEP }}>{topPickFirstName}</span> is our pick to win.
-        </EditorialHeadline>
-      ) : (
-        <EditorialHeadline>Our picks are locked in.</EditorialHeadline>
-      )}
-      <ContextLine>
-        {`${numPicks || '—'} PICK${numPicks !== 1 ? 'S' : ''}${tournamentName !== 'Next Tournament' ? ` · ${tournamentName.toUpperCase()}` : ''}`}
-      </ContextLine>
-
-      {/* Venue card — light treatment */}
-      {tournament && (
-        <div
-          style={{
-            marginTop: 12,
-            padding: '12px 14px',
-            borderRadius: 10,
-            background: '#fff',
-            border: `1px solid ${SLATE_150}`,
-          }}
-        >
-          <div
-            style={{
-              ...monoLabel,
-              fontSize: 9,
-              letterSpacing: '0.16em',
-              color: AMBER_DEEP,
-            }}
-          >
-            {tournamentName}
-          </div>
-          <div
-            style={{
-              marginTop: 4,
-              marginBottom: 4,
-              fontFamily: headlineFont,
-              fontSize: 16,
-              fontWeight: 700,
-              color: INK,
-              letterSpacing: '-0.015em',
-              lineHeight: 1.2,
-            }}
-          >
-            {venueName}
-          </div>
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'flex-start',
-              justifyContent: 'space-between',
-              gap: 12,
-            }}
-          >
-            <div style={{ flex: 1, minWidth: 0 }}>
-              {locationLine && (
-                <div style={{ fontSize: 11, color: SLATE_500 }}>{locationLine}</div>
-              )}
-              {bullets.length > 0 && (
-                <ul
-                  style={{
-                    margin: '8px 0 0',
-                    padding: 0,
-                    listStyle: 'none',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    gap: 4,
-                  }}
-                >
-                  {bullets.map((b, i) => (
-                    <li
-                      key={i}
-                      style={{
-                        fontSize: 11,
-                        color: SLATE_600,
-                        lineHeight: 1.4,
-                        display: 'flex',
-                        gap: 6,
-                      }}
-                    >
-                      <span style={{ color: AMBER_DEEP, flexShrink: 0 }}>·</span>
-                      <span>{b}</span>
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </div>
-            {tournament?.startDate && (
-              <VenueTileCountdown startDate={tournament.startDate} />
-            )}
-          </div>
-        </div>
-      )}
-
-      {topContender && (
-        <HeroPick
-          initials={getInitials(topContender.playerName)}
-          name={topContender.playerName}
-          subtitle={topContender.courseFitScore ? `Course Fit ${Math.round(topContender.courseFitScore)}` : null}
-          pulledQuote={topContender.pulledQuote ?? topContender.reasons[0] ?? null}
-          reasons={topContender.reasons}
-          defaultExpanded={false}
-          position="—"
-          positionLabel="TO PLAY"
-          positionAccent="amber"
-          tierLabel="TOP PICK"
-        />
-      )}
-
-      {supporting.length > 0 && (
-        <>
-          <SupportingLabel />
-          <div>
-            {supporting.map((p) => (
-              <CompactPick
-                key={p.playerId}
-                initials={getInitials(p.playerName)}
-                name={p.playerName}
-                reason={p.reasons[0]}
-                tierLabel="STRONG CONTENDER"
-                reasons={p.reasons}
-                position="—"
-                positionLabel="TO PLAY"
-              />
-            ))}
-          </div>
-        </>
-      )}
-
-    </div>
-  );
-}
-
-function SupportingLabel() {
-  return (
-    <div
-      style={{
-        ...monoLabel,
-        fontSize: 9,
-        color: SLATE_500,
-        letterSpacing: '0.16em',
-        marginBottom: 6,
-      }}
-    >
-      Also in our picks
-    </div>
-  );
-}
-
-// ─── Venue tile countdown ────────────────────────────────────────────────────
-
-const PAD2 = (n: number) => String(n).padStart(2, '0');
-
-const VenueTileCountdown = memo(function VenueTileCountdown({
-  startDate,
-}: {
-  startDate: string;
-}) {
-  const countdown = useCountdown(startDate);
-  if (!countdown) return null;
-  const showSeconds = countdown.totalMs < 24 * 60 * 60 * 1000;
-
-  return (
-    <div style={{ textAlign: 'right', flexShrink: 0 }}>
-      <div
-        style={{
-          ...monoLabel,
-          fontSize: 8,
-          color: AMBER_DEEP,
-          letterSpacing: '0.14em',
-          marginBottom: 4,
-        }}
-      >
-        Tees Off In
-      </div>
-      <div
-        style={{
-          display: 'flex',
-          alignItems: 'baseline',
-          gap: 8,
-          justifyContent: 'flex-end',
-        }}
-      >
-        {showSeconds ? (
-          <>
-            <CountdownUnit value={countdown.hours} label="H" />
-            <CountdownUnit value={countdown.minutes} label="M" />
-            <CountdownUnit value={countdown.seconds} label="S" highlight />
-          </>
-        ) : (
-          <>
-            <CountdownUnit value={countdown.days} label="D" />
-            <CountdownUnit value={countdown.hours} label="H" />
-            <CountdownUnit value={countdown.minutes} label="M" highlight />
-          </>
-        )}
-      </div>
-    </div>
-  );
-});
-
-function CountdownUnit({
-  value,
-  label,
-  highlight,
-}: {
-  value: number;
-  label: string;
-  highlight?: boolean;
-}) {
-  const color = highlight ? AMBER_DEEP : INK;
-  const labelColor = highlight ? AMBER_DEEP : SLATE_500;
-  return (
-    <div style={{ display: 'flex', alignItems: 'baseline', gap: 2 }}>
-      <span
-        style={{
-          fontFamily: headlineFont,
-          fontSize: 18,
-          fontWeight: 800,
-          color,
-          letterSpacing: '-0.02em',
-          fontVariantNumeric: 'tabular-nums',
-          lineHeight: 1,
-        }}
-      >
-        {PAD2(value)}
-      </span>
-      <span
-        style={{
-          ...monoLabel,
-          fontSize: 9,
-          color: labelColor,
-          letterSpacing: '0.04em',
-        }}
-      >
-        {label}
-      </span>
-    </div>
-  );
-}
-
-// ─── State message (loading) ─────────────────────────────────────────────────
-
-function StateMessage({ label }: { label: string }) {
-  return (
-    <div
-      style={{
-        padding: '14px 0',
-        fontSize: 13,
-        fontWeight: 600,
-        color: SLATE_500,
-      }}
-    >
-      {label}
-    </div>
-  );
-}
-
-// Re-export type to suppress unused-import warnings.
-export type { AITopContender };
