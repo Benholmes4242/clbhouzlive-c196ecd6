@@ -316,16 +316,7 @@ function CardMetaTray({
             WebkitBoxOrient: 'vertical',
           }}
         >
-          {insight}
-          <span style={{
-            color: amber,
-            fontWeight: 800,
-            fontStyle: 'normal',
-            fontSize: 16,
-            lineHeight: 0.6,
-            marginLeft: 3,
-            verticalAlign: 'baseline',
-          }}>”</span>
+          "{insight}"
         </div>
         <ChevronUp
           size={14}
