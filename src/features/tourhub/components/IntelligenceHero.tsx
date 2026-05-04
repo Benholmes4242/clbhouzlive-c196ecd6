@@ -124,12 +124,14 @@ function PlayerHeadshot({
   return (
     <div
       style={{
+        position: 'relative',
         width: '100%',
         height: '100%',
         background: `linear-gradient(135deg, #1E293B, ${ink})`,
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
+        overflow: 'hidden',
       }}
     >
       {failed ? (
@@ -144,23 +146,38 @@ function PlayerHeadshot({
           {getInitials(name)}
         </span>
       ) : (
-        <img
-          src={src}
-          alt={name}
-          loading="lazy"
-          onError={(e) => {
-            const el = e.currentTarget;
-            if (el.src.endsWith(PLAYER_SILHOUETTE_URL)) setFailed(true);
-            else el.src = PLAYER_SILHOUETTE_URL;
-          }}
-          style={{
-            width: '100%',
-            height: '100%',
-            objectFit: 'cover',
-            objectPosition: 'center 18%',
-            filter: desaturate ? 'saturate(0.7)' : 'none',
-          }}
-        />
+        <>
+          <img
+            src={src}
+            alt={name}
+            loading="lazy"
+            onError={(e) => {
+              const el = e.currentTarget;
+              if (el.src.endsWith(PLAYER_SILHOUETTE_URL)) setFailed(true);
+              else el.src = PLAYER_SILHOUETTE_URL;
+            }}
+            style={{
+              width: '110%',
+              height: '110%',
+              position: 'absolute',
+              top: '-5%',
+              left: '-5%',
+              objectFit: 'cover',
+              objectPosition: 'center 22%',
+              filter: desaturate ? 'saturate(0.7)' : 'none',
+            }}
+          />
+          <div
+            aria-hidden
+            style={{
+              position: 'absolute',
+              inset: 0,
+              background:
+                'radial-gradient(ellipse at center 30%, transparent 55%, rgba(0,0,0,0.28) 100%)',
+              pointerEvents: 'none',
+            }}
+          />
+        </>
       )}
     </div>
   );
