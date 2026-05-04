@@ -518,7 +518,7 @@ interface UpcomingPick {
   name: string;
   insight: string;
   reasons: string[];
-  courseFit: number;
+  courseFit: number | null;
 }
 
 function UpcomingCard({ pick }: { pick: UpcomingPick }) {
