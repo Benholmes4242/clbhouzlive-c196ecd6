@@ -532,9 +532,9 @@ function PicksHistoryBody({ onClose }: { onClose: () => void }) {
               style={{
                 padding: '6px 12px',
                 borderRadius: 999,
-                border: active ? `1px solid ${AMBER_DEEP}` : `1px solid ${SLATE_200}`,
-                background: active ? 'rgba(184,95,0,0.08)' : '#ffffff',
-                color: active ? AMBER_DEEP : SLATE_500,
+                border: active ? `1px solid ${AMBER}` : `1px solid ${SLATE_200}`,
+                background: active ? 'rgba(247,147,30,0.08)' : '#ffffff',
+                color: active ? AMBER : SLATE_500,
                 fontSize: 12,
                 fontWeight: 700,
                 letterSpacing: '-0.05px',
