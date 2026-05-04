@@ -12,7 +12,7 @@
  *   - useIntelligenceLifecycleState  → state + active payload
  *   - usePredictionTracker            → live + results positional data
  *   - useIntelligenceHistoricalPicks → "receipts" stats (wins / top-5s / hit rate)
- *   - IntelligenceAboutSheet          → about bottom sheet (unchanged)
+ *   - IntelligenceSheet                → about bottom sheet (unchanged)
  *
  * Movement indicator (live state) uses `moveDir` / `moveSpots` derived inside
  * `usePredictionTracker` from a poll-to-poll position cache.
@@ -1365,7 +1365,7 @@ export const IntelligenceHero = memo(function IntelligenceHero() {
   );
 
   // Receipts: hit rate counts a tournament as a "top-5 hit" if ANY of the
-  // three picks finished T5 or better — matches IntelligenceAboutSheet logic
+  // three picks finished T5 or better — matches IntelligenceSheet logic
   // (win + top5 outcomes from classifyOutcome both indicate a top-5 hit).
   const stats: ReceiptsStats = useMemo(() => {
     const totalResolved = tournaments.length;
