@@ -3,7 +3,7 @@
  * Full rebuild. Semantic tokens only. framer-motion animations.
  */
 
-import { memo, useState, useEffect, useCallback } from 'react';
+import React, { memo, useState, useEffect, useCallback } from 'react';
 import { AnimatedEchoWave } from '@/features/echo/components/ui/AnimatedEchoWave';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence, useMotionValue, animate } from 'framer-motion';
