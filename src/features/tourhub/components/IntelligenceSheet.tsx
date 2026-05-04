@@ -788,7 +788,7 @@ function EmptyState({ onClose }: { onClose: () => void }) {
           justifyContent: 'center',
         }}
       >
-        <Brain size={26} color={AMBER_DEEP} strokeWidth={2.8} style={{ display: 'block' }} />
+        <Brain size={26} color={AMBER} strokeWidth={2.8} style={{ display: 'block' }} />
       </div>
       <h3 style={{ margin: '16px 0 0', fontSize: 16, fontWeight: 800, color: SLATE_900, letterSpacing: '-0.2px' }}>
         No picks yet this season.
