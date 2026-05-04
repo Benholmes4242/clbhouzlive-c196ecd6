@@ -371,7 +371,7 @@ export const EchoInsightsCard: React.FC<Props> = ({ connectionId }) => {
             <EmptyBlock />
           ) : (
             insights.suited_courses.map((c) => (
-              <CourseCard key={c.id} course={c} stripe={GREEN} />
+              <CourseCard key={c.id} course={c} stripe={GREEN} onTap={handleCourseTap} />
             ))
           )}
         </div>
