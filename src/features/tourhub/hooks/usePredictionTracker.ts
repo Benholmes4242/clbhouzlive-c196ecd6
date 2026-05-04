@@ -31,6 +31,10 @@ export function usePredictionTracker(
   });
 }
 
+// Module-level cache of last seen positions per (tournamentId, playerId).
+// Used to derive poll-to-poll movement deltas. Single comparison, no smoothing.
+const previousPositions = new Map<string, number | null>();
+
 async function fetchTrackerData(
   tournamentId: string,
   predictions: AIPredictionData
