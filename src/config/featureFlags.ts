@@ -31,38 +31,13 @@ export const FEATURE_FLAGS = {
 } as const;
 
 /**
- * Handicap promoted from a profile sub-tab to a top-level page.
+ * Handicap "NEW" badge visibility.
  *
- * When ON for a user:
- *  - ProfileHubSheet renders the new 2×2 grid (Handicap/Echo/Messages/Notifications)
- *  - HandicapTile shows live index + 30-day trend, with a NEW badge for 60 days
- *  - Handicap tab is hidden from that user's own profile strip
- *  - /handicap route renders the dedicated page with MorningMoment + WhsHandicapTab
- *  - Legacy ?tab=stats deep links on own profile redirect to /handicap
- *
- * Rollout plan:
- *  1. Internal allow-list (current state) — verify telemetry + UX with team
- *  2. Flip HANDICAP_PROMOTED_TO_PAGE_GLOBAL = true for full rollout
- *  3. Rollback = flip back to false; no DB migration required
- *
- * Telemetry to watch (PostHog / analyticsEvents):
- *  - profile_hub_sheet_opened { variant: 'v2_grid' | 'v1_row' }
- *  - handicap_tile_tapped
- *  - handicap_page_viewed
- *  - morning_moment_viewed { hasHandicap, hasDelta }
- *  - handicap_legacy_redirect_fired
+ * The Handicap promotion shipped without a rollout flag (see HANDICAP_PROMOTION_FIX_BRIEF).
+ * This single boolean is the only remaining lever — flip to `false` once the team decides
+ * the NEW badge has done its job (target: 60–90 days post-launch).
  */
-const HANDICAP_PROMOTED_INTERNAL_USER_IDS = new Set<string>([
-  '6a5bcbb9-c22c-4655-ad8e-088b2858ca3e', // Benjamin Holmes
-]);
-
-export const HANDICAP_PROMOTED_TO_PAGE_GLOBAL = false;
-
-export function isHandicapPromotedForUser(userId: string | null | undefined): boolean {
-  if (HANDICAP_PROMOTED_TO_PAGE_GLOBAL) return true;
-  if (!userId) return false;
-  return HANDICAP_PROMOTED_INTERNAL_USER_IDS.has(userId);
-}
+export const SHOW_HANDICAP_NEW_BADGE = true;
 
 // Vertical aspect ratio band - expanded to catch encoder drift
 // 9:16 = 0.5625, but real-world videos vary. Range: 0.52-0.70
