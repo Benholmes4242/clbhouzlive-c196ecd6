@@ -50,6 +50,7 @@ import { useLeaderScorecardStats, type LeaderStats } from '../../hooks/useLeader
 import { useLeaderHoleScores } from '../../hooks/useLeaderHoleScores';
 import { HoleStripWithSparkline } from './HoleStripWithSparkline';
 import { RoundHistoryPills } from './RoundHistoryPills';
+import { EditorialLiveHero } from './EditorialLiveHero';
 import '@/styles/hero-glass.css';
 import { EchoContextualButton } from '@/components/echo/EchoContextualButton';
 
