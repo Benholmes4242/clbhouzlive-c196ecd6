@@ -680,7 +680,7 @@ function PickMiniRow({
 }) {
   const isWinner = pick.actualPosition === 1;
   const isMissedCut = pick.status?.toLowerCase() === 'cut';
-  const positionColor = isWinner ? GOLD_DEEP : isMissedCut ? SLATE_500 : SLATE_900;
+  const positionColor = isWinner ? GOLD : isMissedCut ? SLATE_500 : SLATE_900;
 
   return (
     <div
