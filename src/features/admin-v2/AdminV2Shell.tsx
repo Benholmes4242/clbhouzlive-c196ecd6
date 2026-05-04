@@ -43,6 +43,7 @@ const AnomalyAlertsPage    = lazy(() => import('./pages/AnomalyAlertsPage'));
 const LeaderboardsPage     = lazy(() => import('./pages/LeaderboardsPage'));
 const GeocodingPage        = lazy(() => import('./pages/tools/GeocodingPage'));
 const TestLabPage          = lazy(() => import('./pages/tools/TestLabPage'));
+const WhsBridgeReviewPage  = lazy(() => import('./pages/tools/WhsCourseBridgeReviewPage'));
 
 // Page-level loading skeleton
 const PageSkeleton = () => (
@@ -195,6 +196,7 @@ export default function AdminV2Shell() {
                 <Route path="settings" element={<SettingsPage />} />
                 <Route path="tools/geocoding" element={can.manageAdmins ? <GeocodingPage /> : <AdminV2AccessDenied role={role} />} />
                 <Route path="tools/testlab" element={can.manageAdmins ? <TestLabPage /> : <AdminV2AccessDenied role={role} />} />
+                <Route path="tools/whs-bridge" element={can.manageAdmins ? <WhsBridgeReviewPage /> : <AdminV2AccessDenied role={role} />} />
                 <Route path="*" element={<Navigate to="dashboard" replace />} />
               </Routes>
             </Suspense>
