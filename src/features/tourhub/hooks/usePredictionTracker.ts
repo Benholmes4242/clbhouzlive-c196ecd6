@@ -31,6 +31,10 @@ export function usePredictionTracker(
   });
 }
 
+// Module-level cache of last seen positions per (tournamentId, playerId).
+// Used to derive poll-to-poll movement deltas. Single comparison, no smoothing.
+const previousPositions = new Map<string, number | null>();
+
 async function fetchTrackerData(
   tournamentId: string,
   predictions: AIPredictionData
@@ -66,7 +70,7 @@ async function fetchTrackerData(
   const trackedPredictions: TrackedPrediction[] = predictions.topContenders.slice(0, 3).map((p, i) => {
     const lb = leaderboardMap.get(p.playerId)
       ?? leaderboardByName.get(p.playerName?.toLowerCase() ?? '');
-    return buildTrackedPrediction(p, i + 1, lb, false, fieldCompletionPct);
+    return buildTrackedPrediction(p, i + 1, lb, false, fieldCompletionPct, tournamentId);
   });
 
   // Backwards compat: if old data had dark horses but < 5 contenders, merge them in
@@ -80,7 +84,8 @@ async function fetchTrackerData(
         trackedPredictions.length + 1,
         lb,
         false,
-        fieldCompletionPct
+        fieldCompletionPct,
+        tournamentId
       ));
     });
   }
@@ -107,7 +112,8 @@ function buildTrackedPrediction(
   predictedRank: number,
   lb: any | undefined,
   isDarkHorse: boolean,
-  fieldCompletionPct: number = 0
+  fieldCompletionPct: number = 0,
+  tournamentId: string = ''
 ): TrackedPrediction {
   const actualPosition = lb?.position ?? null;
   const status = lb?.status ?? null;
@@ -120,20 +126,12 @@ function buildTrackedPrediction(
   } else if (status === 'wd') {
     performanceStatus = 'withdrawn';
   } else if (lb === undefined) {
-    // Player has NO leaderboard entry at all.
-    // If > 50% of the field has already posted scores, this player almost certainly
-    // withdrew before the tournament started (not just a late tee time).
     performanceStatus = fieldCompletionPct > 0.5 ? 'withdrawn' : 'not-started';
   } else if (actualPosition !== null) {
-    // OFF LEAD: how far from the leader (position 1)?
     positionDelta = actualPosition - 1;
-    if (actualPosition === 1) {
-      performanceStatus = 'outperforming'; // Leading
-    } else if (actualPosition <= 5) {
-      performanceStatus = 'matching'; // Close to lead
-    } else {
-      performanceStatus = 'underperforming'; // Behind
-    }
+    if (actualPosition === 1) performanceStatus = 'outperforming';
+    else if (actualPosition <= 5) performanceStatus = 'matching';
+    else performanceStatus = 'underperforming';
   }
 
   // Determine current round from which round fields are populated
@@ -142,6 +140,19 @@ function buildTrackedPrediction(
     const roundInfo = getCurrentRound(lb.round_1, lb.round_2, lb.round_3, lb.round_4);
     currentRound = roundInfo.number > 0 ? roundInfo.number : null;
   }
+
+  // Poll-to-poll movement: compare current actualPosition against the prior cached
+  // position. First poll → flat/0. Player not on board this poll → flat/0.
+  const cacheKey = `${tournamentId}:${player.playerId ?? player.playerName ?? ''}`;
+  const prior = previousPositions.get(cacheKey);
+  let moveDir: 'up' | 'down' | 'flat' = 'flat';
+  let moveSpots = 0;
+  if (prior != null && actualPosition != null && prior !== actualPosition) {
+    // Lower position number = better → "up" the leaderboard.
+    moveDir = actualPosition < prior ? 'up' : 'down';
+    moveSpots = Math.abs(actualPosition - prior);
+  }
+  if (actualPosition != null) previousPositions.set(cacheKey, actualPosition);
 
   return {
     playerName: player.playerName,
@@ -159,6 +170,8 @@ function buildTrackedPrediction(
     currentRound,
     positionDelta,
     performanceStatus,
+    moveDir,
+    moveSpots,
     country: (lb?.sr_players as any)?.country ?? null,
     pulledQuote: player.pulledQuote ?? null,
   };
