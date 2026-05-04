@@ -1936,6 +1936,7 @@ function UpcomingStateBlock({
           subtitle={topContender.courseFitScore ? `Course Fit ${Math.round(topContender.courseFitScore)}` : null}
           pulledQuote={topContender.pulledQuote ?? topContender.reasons[0] ?? null}
           reasons={topContender.reasons}
+          winProbability={topContender.winProbability}
           defaultExpanded={false}
           position="—"
           positionLabel="TO PLAY"
@@ -1947,12 +1948,12 @@ function UpcomingStateBlock({
         <>
           <SupportingLabel />
           <div>
-            {supporting.map((p, i) => (
+            {supporting.map((p) => (
               <CompactPick
                 key={p.playerId}
                 initials={getInitials(p.playerName)}
                 name={p.playerName}
-                tier={i === 0 ? 'STRONG' : 'CONTENTION'}
+                winProbability={p.winProbability}
                 reason={p.reasons[0]}
                 reasons={p.reasons}
                 position="—"
