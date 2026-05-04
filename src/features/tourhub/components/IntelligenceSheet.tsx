@@ -111,7 +111,7 @@ function Header({ onClose }: { onClose: () => void }) {
             flexShrink: 0,
           }}
         >
-          <Brain size={18} color={AMBER_DEEP} strokeWidth={2.5} />
+          <Brain size={18} color={AMBER} strokeWidth={2.5} />
         </div>
         <div style={{ minWidth: 0 }}>
           <h2
