@@ -474,12 +474,12 @@ function matchesFilter(outcome: IntelligenceOutcome, filter: FilterKey): boolean
   return true;
 }
 
-function outcomeChipStyle(outcome: IntelligenceOutcome): { bg: string; fg: string; label: string } {
+function outcomeChipStyle(outcome: IntelligenceOutcome): { bg: string; fg: string; label: string; icon?: boolean } {
   switch (outcome) {
-    case 'win':     return { bg: 'rgba(247,147,30,0.12)', fg: AMBER, label: 'WIN' };
-    case 'top5':    return { bg: 'rgba(15,23,42,0.06)', fg: SLATE_900, label: 'TOP-5' };
-    case 'partial': return { bg: 'rgba(15,23,42,0.04)', fg: SLATE_500, label: 'PARTIAL' };
-    case 'miss':    return { bg: 'rgba(15,23,42,0.04)', fg: SLATE_500, label: 'MISS' };
+    case 'win':     return { bg: AMBER, fg: SLATE_900, label: 'WIN', icon: true };
+    case 'top5':    return { bg: GREEN_ACCENT, fg: '#ffffff', label: 'TOP 5' };
+    case 'partial': return { bg: 'rgba(16,185,129,0.85)', fg: '#ffffff', label: 'TOP 10' };
+    case 'miss':    return { bg: 'rgba(15,23,42,0.55)', fg: '#ffffff', label: 'MISS' };
   }
 }
 
