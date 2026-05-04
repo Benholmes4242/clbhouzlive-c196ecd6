@@ -136,7 +136,7 @@ function ProfileHubSheetSkeleton() {
 function GridTile({
   Icon, iconColor, iconBg, label, sub, badge, onClick,
 }: {
-  Icon: React.ComponentType<{ size?: number; color?: string; strokeWidth?: number }>;
+  Icon: React.ComponentType<any>;
   iconColor: string;
   iconBg: string;
   label: string;
