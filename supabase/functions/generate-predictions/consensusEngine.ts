@@ -176,7 +176,7 @@ function parseModelResponse(rawResponse: string, modelName: string): { picks: Mo
         playerName: c.playerName || c.player_name || c.name || 'Unknown',
         rank: c.rank || i + 1,
         winProbability: c.winProbability || c.win_probability || 0,
-        courseFitScore: rawFit as unknown as number,
+        courseFitScore: rawFit,
         reasons: (c.reasons || []).slice(0, 3).map((r: any) =>
           typeof r === 'string' ? r : r.text || r.reason || ''
         ),
