@@ -1088,7 +1088,7 @@ function CompactPick({
           initialsFontSize={12}
         />
         <div style={{ flex: 1, minWidth: 0 }}>
-          {winProbability > 0 && (
+          {tierLabel && (
             <div
               style={{
                 ...monoLabel,
@@ -1098,7 +1098,7 @@ function CompactPick({
                 marginBottom: 2,
               }}
             >
-              {Math.round(winProbability * 100)}% WIN PROBABILITY
+              {tierLabel}
             </div>
           )}
           <div
