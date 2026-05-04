@@ -27,7 +27,7 @@ export interface AITopContender {
   worldRanking: number;
   earnings?: number | null;
   winProbability: number;
-  courseFitScore: number;
+  courseFitScore: number | null;
   reasons: string[];
   concern: string;
   promoted?: boolean;
