@@ -357,7 +357,7 @@ function CardMetaTray({
           >
             WHY WE PICKED HIM
           </div>
-          {reasons.slice(0, 3).map((r, i) => (
+          {reasons.filter((r) => r && r.trim().length > 0).slice(0, 3).map((r, i) => (
             <div
               key={i}
               style={{
