@@ -971,40 +971,51 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
             {/* ─── Tournament header — hidden when scorecard is open ─── */}
             {!selectedPlayer && (
               isCompleted ? (
+                /* ── Editorial broadcast header — gold FINAL pill, tournament title, venue ── */
                 <div style={{
                   flexShrink: 0,
                   paddingTop: 'calc(max(env(safe-area-inset-top, 0px), 44px) + 65px)',
                 }}>
-                  <div style={{
-                    display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-                    gap: 10, padding: '0 16px', height: 58,
-                  }}>
-                    <div style={{ flex: 1, minWidth: 0 }}>
-                      <Link {...(() => { const t = tournamentRoute(tournament.id, { kind: 'overview' }); return { to: t.to, state: t.state }; })()} className="block active:opacity-70 transition-opacity">
-                        <div style={{
-                          fontSize: 'clamp(18px, 5.5vw, 22px)', fontWeight: 800, color: '#fff',
-                          letterSpacing: '-0.02em', lineHeight: 1,
-                          overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const,
-                        }}>
-                          {tournament.name}
-                        </div>
-                      </Link>
+                  <div style={{ padding: '0 16px 14px' }}>
+                    {/* Broadcast caption strip */}
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12, flexWrap: 'wrap' }}>
+                      <span style={{
+                        padding: '3px 7px', borderRadius: 4, background: '#fff', color: ink,
+                        fontSize: 9, fontWeight: 800, letterSpacing: '0.08em',
+                      }}>{getTourDisplayName(tournament.tourSlug)}</span>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+                        <Trophy size={11} color={gold} strokeWidth={2.5} />
+                        <span style={{ fontSize: 10, fontWeight: 800, letterSpacing: '0.14em', color: gold }}>FINAL</span>
+                      </div>
+                    </div>
+
+                    {/* Tournament name + venue */}
+                    <Link {...(() => { const t = tournamentRoute(tournament.id, { kind: 'overview' }); return { to: t.to, state: t.state }; })()} className="block active:opacity-70 transition-opacity">
+                      <h1 style={{
+                        margin: 0, fontSize: 'clamp(24px, 7vw, 30px)', fontWeight: 800,
+                        letterSpacing: '-0.025em', lineHeight: 1.05, color: '#fff',
+                        overflow: 'hidden', textOverflow: 'ellipsis',
+                        display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' as const,
+                      }}>
+                        {tournament.name}
+                      </h1>
+                    </Link>
+                    {(tournament.venueName || tournament.venueCity) && (
                       <button
                         onClick={(e) => { e.stopPropagation(); navigate(`/tourhub/courses?q=${encodeURIComponent(tournament.venueName || '')}`); }}
                         className="active:opacity-70 transition-opacity cursor-pointer"
-                        style={{ fontSize: 13, fontWeight: 400, color: 'rgba(255,255,255,0.45)', marginTop: 3, background: 'none', border: 'none', padding: 0, textAlign: 'left' as const }}
+                        style={{
+                          marginTop: 8, fontSize: 12, color: inkFaint,
+                          display: 'flex', alignItems: 'center', gap: 5,
+                          background: 'none', border: 'none', padding: 0, textAlign: 'left' as const,
+                        }}
                       >
-                        {tournament.venueName}{tournament.venueCity ? ` · ${tournament.venueCity}` : ''}
-                      </button>
-                    </div>
-                    <div style={{ display: 'flex', flexDirection: 'column' as const, alignItems: 'center', gap: 1, flexShrink: 0 }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 3 }}>
-                        <span style={{ fontSize: 14 }}>🏆</span>
-                        <span style={{ fontSize: 14, fontWeight: 800, color: '#ffffff', letterSpacing: 1 }}>
-                          FINAL
+                        <MapPin size={11} strokeWidth={2.2} style={{ opacity: 0.8, flexShrink: 0 }} />
+                        <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                          {tournament.venueName}{tournament.venueName && tournament.venueCity ? ' · ' : ''}{tournament.venueCity}
                         </span>
-                      </div>
-                    </div>
+                      </button>
+                    )}
                   </div>
                 </div>
               ) : isLive ? (
