@@ -58,7 +58,10 @@ function formatDelta(d: number | null | undefined): {
   };
 }
 
-const MorningMoment: React.FC<Props> = ({ userId, connectionId }) => {
+const MorningMoment: React.FC<Props> = ({ userId, connectionId: connectionIdProp }) => {
+  const { data: connection } = useWhsConnection(connectionIdProp ? undefined : userId);
+  const connectionId = connectionIdProp ?? connection?.id;
+
   const { data: profile } = useQuery<{
     first_name: string | null;
     full_name: string | null;
