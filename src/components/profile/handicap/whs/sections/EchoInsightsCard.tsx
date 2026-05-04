@@ -253,6 +253,11 @@ export const EchoInsightsCard: React.FC<Props> = ({ connectionId }) => {
     );
   };
 
+  const handleCourseTap = (courseId: string) => {
+    analyticsEvents.track('echo_insights_course_tap', { course_id: courseId });
+    navigate(`/courses/${courseId}`);
+  };
+
   return (
     <section
       style={{
