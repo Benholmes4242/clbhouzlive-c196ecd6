@@ -59,16 +59,20 @@ function formatDelta(d: number | null | undefined): {
 }
 
 const MorningMoment: React.FC<Props> = ({ userId, connectionId }) => {
-  const { data: profile } = useQuery({
+  const { data: profile } = useQuery<{
+    first_name: string | null;
+    full_name: string | null;
+    username: string | null;
+  } | null>({
     queryKey: ['handicap-greeting-profile', userId],
     queryFn: async () => {
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('profiles')
         .select('first_name, full_name, username')
         .eq('id', userId)
         .maybeSingle();
       if (error) throw error;
-      return data;
+      return data ?? null;
     },
     staleTime: 5 * 60_000,
   });
