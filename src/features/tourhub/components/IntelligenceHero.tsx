@@ -1589,9 +1589,10 @@ function LiveStateBlock({
         <HeroPick
           initials={getInitials(heroPick.playerName)}
           name={heroPick.playerName}
-          subtitle={null}
+          subtitle={`Now ${formatPosition(heroPick)} · Round ${heroPick.currentRound ?? currentRound}${heroPick.thru != null ? ` · Thru ${heroPick.thru}` : ''}`}
           pulledQuote={heroPick.pulledQuote ?? heroPick.reasons[0] ?? null}
           reasons={heroPick.reasons}
+          winProbability={heroPick.winProbability}
           defaultExpanded={false}
           position={formatPosition(heroPick)}
           positionLabel={formatScore(heroPick.score)}
@@ -1604,12 +1605,12 @@ function LiveStateBlock({
         <>
           <SupportingLabel />
           <div>
-            {supporting.map((p, i) => (
+            {supporting.map((p) => (
               <CompactPick
                 key={p.playerId}
                 initials={getInitials(p.playerName)}
                 name={p.playerName}
-                tier={i === 0 ? 'STRONG' : 'CONTENTION'}
+                winProbability={p.winProbability}
                 reason={p.reasons[0]}
                 reasons={p.reasons}
                 position={formatPosition(p)}
