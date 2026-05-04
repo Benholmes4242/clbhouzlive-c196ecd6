@@ -1008,45 +1008,49 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
                   </div>
                 </div>
               ) : isLive ? (
-                /* ── Compact topbar — tournament name left, round + LIVE right ── */
+                /* ── Editorial broadcast header — caption strip + tournament title + venue ── */
                 <div style={{
                   flexShrink: 0,
                   paddingTop: 'calc(max(env(safe-area-inset-top, 0px), 44px) + 65px)',
                 }}>
-                  <div style={{
-                    display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-                    gap: 10, padding: '0 16px', height: 58,
-                  }}>
-
-                    {/* Left — tournament name + venue, full width */}
-                    <div style={{ flex: 1, minWidth: 0 }}>
-                      <div style={{
-                        fontSize: 'clamp(18px, 5.5vw, 22px)', fontWeight: 700, color: '#fff',
-                        letterSpacing: -0.3, lineHeight: 1,
-                        overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
-                      }}>
-                        {tournament.name}
-                      </div>
-                      <div style={{ fontSize: 13, fontWeight: 400, color: 'rgba(255,255,255,0.55)', marginTop: 3 }}>
-                        {tournament.venueName}{tournament.venueCity ? ` · ${tournament.venueCity}` : ''}
-                      </div>
-                    </div>
-
-                    {/* Right — round label stacked above LIVE pill */}
-                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 1, flexShrink: 0 }}>
+                  <style>{SHIMMER_KEYFRAMES}</style>
+                  <div style={{ padding: '0 16px 14px' }}>
+                    {/* Broadcast caption strip */}
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12, flexWrap: 'wrap' }}>
                       <span style={{
-                        fontSize: 12, fontWeight: 500, letterSpacing: '0.8px',
-                        color: 'rgba(255,255,255,0.5)',
-                      }}>
+                        padding: '3px 7px', borderRadius: 4, background: '#fff', color: ink,
+                        fontSize: 9, fontWeight: 800, letterSpacing: '0.08em',
+                      }}>{getTourDisplayName(tournament.tourSlug)}</span>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+                        <span style={{
+                          width: 6, height: 6, borderRadius: '50%', background: greenLive,
+                          animation: 'hero-pulse 1.6s infinite',
+                        }} />
+                        <span style={{ fontSize: 10, fontWeight: 800, letterSpacing: '0.12em', color: greenLive }}>LIVE</span>
+                      </div>
+                      <span style={{ fontSize: 10, color: inkFaint }}>·</span>
+                      <span style={{ fontSize: 10, fontWeight: 700, color: inkSoft, letterSpacing: '0.06em' }}>
                         {getCurrentRoundLabel(leaders, tournament.startDate)}
                       </span>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 3 }}>
-                        <span className="live-dot" style={{ width: 6, height: 6 }} />
-                        <span style={{ fontSize: 12, fontWeight: 700, color: '#22C55E', letterSpacing: 1 }}>
-                          LIVE
+                    </div>
+
+                    {/* Tournament name + venue — editorial peak */}
+                    <h1 style={{
+                      margin: 0, fontSize: 'clamp(24px, 7vw, 30px)', fontWeight: 800,
+                      letterSpacing: '-0.025em', lineHeight: 1.05, color: '#fff',
+                      overflow: 'hidden', textOverflow: 'ellipsis',
+                      display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' as const,
+                    }}>
+                      {tournament.name}
+                    </h1>
+                    {(tournament.venueName || tournament.venueCity) && (
+                      <div style={{ marginTop: 8, fontSize: 12, color: inkFaint, display: 'flex', alignItems: 'center', gap: 5 }}>
+                        <MapPin size={11} strokeWidth={2.2} style={{ opacity: 0.8, flexShrink: 0 }} />
+                        <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                          {tournament.venueName}{tournament.venueName && tournament.venueCity ? ' · ' : ''}{tournament.venueCity}
                         </span>
                       </div>
-                    </div>
+                    )}
                   </div>
                 </div>
               ) : isUpcoming ? (
