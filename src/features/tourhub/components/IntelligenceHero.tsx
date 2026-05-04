@@ -98,16 +98,24 @@ interface TournamentMetaInfo {
   location: string;
 }
 
-function buildTournamentMeta(t: AIPredictionData['tournament'] | undefined | null): TournamentMetaInfo {
-  if (!t) return { name: '—', course: '—', location: '' };
-  const locParts: string[] = [];
-  if (t.venueCity) locParts.push(t.venueCity);
-  if (t.venueState) locParts.push(t.venueState);
+interface TournamentMetaInfoExt extends TournamentMetaInfo {
+  address: string;
+  country: string;
+}
+
+function buildTournamentMeta(t: AIPredictionData['tournament'] | undefined | null): TournamentMetaInfoExt {
+  if (!t) return { name: '—', course: '—', location: '', address: '', country: '' };
+  const addrParts: string[] = [];
+  if (t.venueCity) addrParts.push(t.venueCity);
+  if (t.venueState) addrParts.push(t.venueState);
+  const locParts = [...addrParts];
   if (!locParts.length && t.venueCountry) locParts.push(t.venueCountry);
   return {
     name: t.name || '—',
     course: t.venueName || '—',
     location: locParts.join(', '),
+    address: addrParts.join(', '),
+    country: t.venueCountry || '',
   };
 }
 
@@ -170,10 +178,12 @@ function PlayerHeadshot({
 function SectionHeader({
   meta,
   headline,
+  tournamentName,
   onAboutClick,
 }: {
-  meta: TournamentMetaInfo;
+  meta: TournamentMetaInfoExt;
   headline: string;
+  tournamentName?: string;
   onAboutClick: () => void;
 }) {
   return (
@@ -223,6 +233,12 @@ function SectionHeader({
         }}
       >
         {headline}
+        {tournamentName && (
+          <>
+            {' '}
+            <span style={{ color: amber }}>{tournamentName}</span>
+          </>
+        )}
       </div>
       <div style={{ marginTop: 6, fontFamily: headlineFont }}>
         <div
@@ -234,29 +250,36 @@ function SectionHeader({
             letterSpacing: '-0.005em',
           }}
         >
-          {meta.name}
+          {meta.course}
         </div>
-        <div
-          style={{
-            fontSize: 11.5,
-            color: inkSoft,
-            marginTop: 2,
-            fontWeight: 500,
-            display: 'flex',
-            alignItems: 'center',
-            gap: 5,
-            flexWrap: 'wrap',
-          }}
-        >
-          <span>{meta.course}</span>
-          {meta.location && (
-            <>
-              <span style={{ color: inkFaint }}>·</span>
-              <MapPin size={10} color={inkFaint} strokeWidth={2} />
-              <span>{meta.location}</span>
-            </>
-          )}
-        </div>
+        {meta.address && (
+          <div
+            style={{
+              fontSize: 11.5,
+              color: inkSoft,
+              marginTop: 2,
+              fontWeight: 500,
+              display: 'flex',
+              alignItems: 'center',
+              gap: 5,
+            }}
+          >
+            <MapPin size={10} color={inkFaint} strokeWidth={2} />
+            <span>{meta.address}</span>
+          </div>
+        )}
+        {meta.country && (
+          <div
+            style={{
+              fontSize: 11.5,
+              color: inkSoft,
+              marginTop: 2,
+              fontWeight: 500,
+            }}
+          >
+            {meta.country}
+          </div>
+        )}
       </div>
     </div>
   );
@@ -1119,7 +1142,7 @@ function DotsRail({
   stats: ReceiptsStats;
   hasWinner: boolean;
 }) {
-  const accent = hasWinner ? goldDeep : amberDeep;
+  const accent = amber;
   return (
     <div
       style={{
@@ -1390,7 +1413,8 @@ export const IntelligenceHero = memo(function IntelligenceHero() {
   const headline =
     state === 'live'
       ? 'Tracking our 3 picks live.'
-      : 'Our 3 picks for the week.';
+      : 'Our 3 picks for';
+  const headlineTournamentName = state === 'live' ? undefined : meta.name && meta.name !== '—' ? meta.name : undefined;
 
   const hasWinner = state === 'results' && resultsPicks.some((p) => p.outcome === 'win');
 
@@ -1460,6 +1484,7 @@ export const IntelligenceHero = memo(function IntelligenceHero() {
       <SectionHeader
         meta={meta}
         headline={headline}
+        tournamentName={headlineTournamentName}
         onAboutClick={handleOpenAbout}
       />
 
