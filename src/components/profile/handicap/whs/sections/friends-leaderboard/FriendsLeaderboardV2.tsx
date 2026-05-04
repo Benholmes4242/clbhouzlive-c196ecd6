@@ -22,6 +22,7 @@ import LeaderboardScopeChips from './LeaderboardScopeChips';
 import LeaderboardRow from './LeaderboardRow';
 import PodiumStack from './PodiumStack';
 import EmptyScopeState from './EmptyScopeState';
+import { analyticsEvents } from '@/utils/analyticsEvents';
 
 interface Props {
   ownerUserId: string;
