@@ -692,7 +692,10 @@ export function PlayerScorecardCard({
             <span
               style={{
                 fontSize: 48, fontWeight: 800, letterSpacing: '-0.04em',
-                color: '#fff', lineHeight: 0.9,
+              style={{
+                fontSize: 48, fontWeight: 800, letterSpacing: '-0.04em',
+                color: (isCompleted && (player.position === 1 || String(player.position) === '1')) ? gold : '#fff',
+                lineHeight: 0.9,
                 fontVariantNumeric: 'tabular-nums',
               }}
             >
@@ -712,7 +715,10 @@ export function PlayerScorecardCard({
               willChange: 'transform',
             }}
           >
-            {/* Round tabs — text-only, underline on active */}
+            {/* Cross-round progression */}
+            <TournamentProgressionPanel rounds={roundScores} isCompleted={isCompleted} />
+
+            {/* Round tabs — pill buttons */}
             <RoundTabs
               rounds={scorecard.rounds}
               activeRound={activeRound}
@@ -728,45 +734,19 @@ export function PlayerScorecardCard({
               </div>
             )}
 
-            {/* Stat chips — flat editorial cells */}
+            {/* Stats — flat horizontal panel */}
             {activeRoundData && activeRoundData.holesCompleted > 0 && (
-              <div
-                style={{
-                  display: 'flex', gap: 6,
-                  padding: '0 16px 14px',
-                }}
-              >
-                {[
-                  { v: activeRoundData.eagles,       label: 'Eagles',  color: gold },
-                  { v: activeRoundData.birdies,      label: 'Birdies', color: greenLive },
-                  { v: activeRoundData.pars,         label: 'Pars',    color: inkSoft },
-                  { v: activeRoundData.bogeys,       label: 'Bogeys',  color: danger },
-                  { v: activeRoundData.doubleBogeys, label: 'Doubles', color: danger },
-                ].map(stat => (
-                  <div
-                    key={stat.label}
-                    style={{
-                      flex: 1, textAlign: 'center',
-                      padding: '8px 4px',
-                      borderRadius: 10,
-                      background: 'rgba(255,255,255,0.025)',
-                      border: `1px solid ${hairlineDark}`,
-                      minWidth: 0,
-                    }}
-                  >
-                    <div style={{ fontSize: 16, fontWeight: 800, color: stat.color, lineHeight: 1, fontVariantNumeric: 'tabular-nums' }}>
-                      {stat.v}
-                    </div>
-                    <div
-                      style={{
-                        fontSize: 8, fontWeight: 700, color: inkGhost,
-                        textTransform: 'uppercase', letterSpacing: '0.08em', marginTop: 4,
-                      }}
-                    >
-                      {stat.label}
-                    </div>
-                  </div>
-                ))}
+              <div style={{ padding: '0 16px' }}>
+                <StatsGrid
+                  stats={{
+                    eagles: activeRoundData.eagles,
+                    birdies: activeRoundData.birdies,
+                    pars: activeRoundData.pars,
+                    bogeys: activeRoundData.bogeys,
+                    doubleBogeys: activeRoundData.doubleBogeys,
+                  }}
+                  isLive={!isCompleted}
+                />
               </div>
             )}
 
