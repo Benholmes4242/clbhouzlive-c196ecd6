@@ -74,7 +74,7 @@ function HoleSparkline({
   totalHoles = 18,
   activeHole,
 }: {
-  holes: { hole: number; scoreToPar: number }[];
+  holes: { holeNumber: number; scoreToPar: number }[];
   totalHoles?: number;
   activeHole: number | null;
 }) {
