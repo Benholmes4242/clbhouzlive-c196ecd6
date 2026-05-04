@@ -66,7 +66,7 @@ import {
 import { ProfileCoursesTab } from '@/components/profile/ProfileCoursesTab';
 import Top100MyProgressPanel from '@/components/courses/Top100MyProgressPanel';
 import AchievementsPane from '@/components/profile/AchievementsPane';
-import HandicapSection from '@/components/profile/HandicapSection';
+import FriendHandicapHero from '@/components/handicap/FriendHandicapHero';
 
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import ClubsCard from '@/components/profile/clubs/ClubsCard';
@@ -493,14 +493,6 @@ const ProfilePageV2Content: React.FC = () => {
             userHandicap={profile?.eg_handicap_index}
             userProfilePhotoUrl={profile?.profile_photo_url}
             isCurrentUser={isSelf}
-          />
-        );
-      case 'stats':
-        return (
-          <HandicapSection 
-            userId={profile?.id || ''}
-            profile={profile}
-            isOwnProfile={isSelf}
           />
         );
       default:
@@ -1094,6 +1086,11 @@ const ProfilePageV2Content: React.FC = () => {
             </div>
           </section>
         ) : null}
+
+        {/* Friend handicap hero — shown on others' profiles only */}
+        {isPersonal && profile?.id && !isSelf && user?.id && (
+          <FriendHandicapHero userId={profile.id} viewerUserId={user.id} />
+        )}
 
         {/* Personal Top 10 Carousel */}
         {isPersonal && profile?.id && (
