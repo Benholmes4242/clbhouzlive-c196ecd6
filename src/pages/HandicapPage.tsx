@@ -15,7 +15,7 @@ import { PageRoot } from '@/components/layout/PageRoot';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { isHandicapPromotedForUser } from '@/config/featureFlags';
 import WhsHandicapTab from '@/components/profile/handicap/whs/WhsHandicapTab';
-import { analyticsEvents } from '@/lib/analytics/events';
+import { analyticsEvents } from '@/utils/analyticsEvents';
 
 const INK = '#0F172A';
 const BORDER = 'rgba(15,23,42,0.07)';
