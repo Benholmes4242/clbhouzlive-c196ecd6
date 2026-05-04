@@ -1,16 +1,18 @@
 /**
- * HandicapPage — Top-level Handicap route (the user's own handicap).
+ * HandicapPage — Top-level Handicap route.
  *
- * Wraps WhsHandicapTab in a sticky 3-row header (back / sync pill / more,
- * editorial title with greeting, segmented control). Subtab state is owned
- * here and threaded down to HandicapDashboard via props.
+ * Two modes:
+ * - Own handicap (route: /handicap) — full controls, greeting, sync pill.
+ * - Friend handicap (route: /handicap/:userId) — read-only. Shows the
+ *   friend's name in the title, hides the sync pill / more menu, and
+ *   threads `readOnly` into HandicapDashboard.
  *
- * Reached via /handicap from the ProfileHubSheet 2×2 grid. Public to any
- * authenticated user — feature flag was removed per the fix brief.
+ * Reached from the ProfileHubSheet 2×2 grid (own) or from a friend's row
+ * in the leaderboard / a legacy ?tab=stats redirect (friend).
  */
 
 import React, { useCallback, useEffect, useMemo } from 'react';
-import { useNavigate, Navigate, useSearchParams } from 'react-router-dom';
+import { useNavigate, Navigate, useSearchParams, useParams } from 'react-router-dom';
 import { ChevronLeft, MoreHorizontal } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -18,6 +20,7 @@ import { PageRoot } from '@/components/layout/PageRoot';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useWhsConnection } from '@/lib/whs/hooks';
 import WhsHandicapTab from '@/components/profile/handicap/whs/WhsHandicapTab';
+import HandicapDashboard from '@/components/profile/handicap/whs/HandicapDashboard';
 import MorningMoment from '@/components/handicap/MorningMoment';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { isHandicapSubtab, type HandicapSubtab } from '@/components/profile/handicap/whs/types';
@@ -25,7 +28,6 @@ import { isHandicapSubtab, type HandicapSubtab } from '@/components/profile/hand
 const INK = '#0F172A';
 const INK_55 = '#64748B';
 const BORDER = 'rgba(15,23,42,0.10)';
-const BORDER_SOFT = 'rgba(15,23,42,0.07)';
 const BG_SURFACE = '#F8FAFC';
 const AMBER = '#F7931E';
 const AMBER_INK = '#C97211';
@@ -42,19 +44,29 @@ function getGreeting(now: Date = new Date()): string {
 }
 
 interface HeaderProps {
-  userId: string;
-  firstName: string | null;
+  ownerUserId: string;
+  /** First name (own mode) OR full display name (friend mode). */
+  displayName: string | null;
+  /** When true, hides the sync pill + more menu. */
+  readOnly: boolean;
   activeTab: HandicapSubtab;
   onTabChange: (tab: HandicapSubtab) => void;
 }
 
-const HandicapPageHeader: React.FC<HeaderProps> = ({ userId, firstName, activeTab, onTabChange }) => {
+const HandicapPageHeader: React.FC<HeaderProps> = ({
+  ownerUserId,
+  displayName,
+  readOnly,
+  activeTab,
+  onTabChange,
+}) => {
   const navigate = useNavigate();
-  const { data: connection } = useWhsConnection(userId);
+  const { data: connection } = useWhsConnection(ownerUserId);
 
   const greeting = useMemo(() => getGreeting(), []);
 
   const syncStatus = useMemo(() => {
+    if (readOnly) return null;
     if (!connection) return null;
     const status = (connection as any).last_sync_status;
     const lastSync = connection.last_synced_at;
@@ -65,7 +77,7 @@ const HandicapPageHeader: React.FC<HeaderProps> = ({ userId, firstName, activeTa
       return { color: 'amber' as const, label: 'Sync pending' };
     }
     return { color: 'green' as const, label: 'England Golf · synced' };
-  }, [connection]);
+  }, [connection, readOnly]);
 
   const pillBg = syncStatus?.color === 'green'
     ? 'rgba(5,150,105,0.10)'
@@ -79,6 +91,12 @@ const HandicapPageHeader: React.FC<HeaderProps> = ({ userId, firstName, activeTa
     : 'rgba(159,29,29,0.20)';
   const pillDot = syncStatus?.color === 'green' ? GREEN : syncStatus?.color === 'amber' ? AMBER : RED;
   const pillText = syncStatus?.color === 'green' ? GREEN : syncStatus?.color === 'amber' ? AMBER_INK : RED;
+
+  // Title varies by mode
+  const eyebrow = readOnly ? 'HANDICAP' : 'HANDICAP';
+  const title = readOnly
+    ? (displayName ? `${displayName}'s handicap` : 'Handicap')
+    : (displayName ? `${greeting}, ${displayName}` : 'Welcome back');
 
   return (
     <header
@@ -124,22 +142,26 @@ const HandicapPageHeader: React.FC<HeaderProps> = ({ userId, firstName, activeTa
           </div>
         )}
 
-        {/* More menu — v1 stub, no-op */}
-        <button
-          aria-label="More options"
-          aria-disabled="true"
-          // TODO: wire menu (Refresh now / Disconnect / Privacy) in a follow-up brief.
-          onClick={() => { /* no-op */ }}
-          style={{
-            width: 36, height: 36, borderRadius: '50%',
-            background: '#fff',
-            border: `0.5px solid ${BORDER}`,
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            cursor: 'pointer',
-          }}
-        >
-          <MoreHorizontal size={18} strokeWidth={2.2} color={INK} />
-        </button>
+        {/* More menu — own only. v1 stub. */}
+        {!readOnly ? (
+          <button
+            aria-label="More options"
+            aria-disabled="true"
+            onClick={() => { /* no-op */ }}
+            style={{
+              width: 36, height: 36, borderRadius: '50%',
+              background: '#fff',
+              border: `0.5px solid ${BORDER}`,
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              cursor: 'pointer',
+            }}
+          >
+            <MoreHorizontal size={18} strokeWidth={2.2} color={INK} />
+          </button>
+        ) : (
+          // Spacer to keep layout balanced
+          <div style={{ width: 36, height: 36 }} aria-hidden="true" />
+        )}
       </div>
 
       {/* Row 2 — title */}
@@ -149,7 +171,7 @@ const HandicapPageHeader: React.FC<HeaderProps> = ({ userId, firstName, activeTa
           letterSpacing: '0.22em', marginBottom: 6,
           fontFamily: FONT_GEIST,
         }}>
-          HANDICAP
+          {eyebrow}
         </div>
         <h1 style={{
           fontFamily: FONT_GEIST,
@@ -157,7 +179,7 @@ const HandicapPageHeader: React.FC<HeaderProps> = ({ userId, firstName, activeTa
           lineHeight: 1.1, letterSpacing: '-0.02em',
           margin: 0,
         }}>
-          {firstName ? `${greeting}, ${firstName}` : 'Welcome back'}
+          {title}
         </h1>
       </div>
 
@@ -193,9 +215,46 @@ const HandicapPageHeader: React.FC<HeaderProps> = ({ userId, firstName, activeTa
   );
 };
 
+// ───────────────────────────────────────────────────────────────────────
+// Friend's handicap dashboard wrapper — read-only.
+// Pulls the friend's WHS connection and renders HandicapDashboard with
+// readOnly=true. If the friend has no connection, shows an empty state.
+// ───────────────────────────────────────────────────────────────────────
+const FriendHandicapDashboard: React.FC<{ userId: string }> = ({ userId }) => {
+  const { data: connection, isLoading } = useWhsConnection(userId);
+
+  if (isLoading) {
+    return (
+      <div className="px-5 pt-10 pb-6 animate-pulse">
+        <div className="h-3 w-44 bg-muted/60 rounded mb-5" />
+        <div className="h-16 w-28 bg-muted rounded mb-3" />
+        <div className="h-4 w-36 bg-muted/60 rounded" />
+      </div>
+    );
+  }
+
+  if (!connection) {
+    return (
+      <div className="px-6 py-16 text-center">
+        <p style={{ fontSize: 14, color: INK_55, fontFamily: FONT_GEIST }}>
+          This player hasn't connected their handicap yet.
+        </p>
+      </div>
+    );
+  }
+
+  return <HandicapDashboard connection={connection} userId={userId} readOnly />;
+};
+
 const HandicapPage: React.FC = () => {
   const { user, loading } = useSupabaseSession();
+  const params = useParams<{ userId?: string }>();
   const [searchParams, setSearchParams] = useSearchParams();
+
+  // Determine mode + the user whose handicap we're showing.
+  const friendId = params.userId ?? null;
+  const isFriendView = !!friendId && !!user?.id && friendId !== user.id;
+  const ownerUserId = isFriendView ? friendId! : user?.id ?? null;
 
   const rawSubtab = searchParams.get('subtab');
   const activeTab: HandicapSubtab = isHandicapSubtab(rawSubtab) ? rawSubtab : 'overview';
@@ -206,35 +265,47 @@ const HandicapPage: React.FC = () => {
     setSearchParams(params, { replace: true });
   }, [searchParams, setSearchParams]);
 
-  // Fetch first name for greeting
+  // Fetch profile for greeting/title.
   const { data: profile } = useQuery<{ first_name: string | null; full_name: string | null; username: string | null } | null>({
-    queryKey: ['handicap-page-greeting', user?.id],
-    enabled: !!user?.id,
+    queryKey: ['handicap-page-profile', ownerUserId],
+    enabled: !!ownerUserId,
     staleTime: 5 * 60_000,
     queryFn: async () => {
       const { data, error } = await (supabase as any)
         .from('user_profiles')
         .select('first_name, full_name, username')
-        .eq('id', user!.id)
+        .eq('id', ownerUserId!)
         .maybeSingle();
       if (error) throw error;
       return data ?? null;
     },
   });
 
-  const firstName = useMemo(() => {
+  const displayName = useMemo(() => {
+    if (isFriendView) {
+      // Friend mode: prefer full name, fall back to first or username.
+      const full = profile?.full_name?.trim();
+      if (full) return full;
+      const fn = (profile as any)?.first_name?.trim();
+      if (fn) return fn;
+      return profile?.username ?? null;
+    }
+    // Own mode: greeting uses first name only.
     const fn = (profile as any)?.first_name?.trim();
     if (fn) return fn;
     const full = profile?.full_name?.trim();
     if (full) return full.split(/\s+/)[0];
     return null;
-  }, [profile]);
+  }, [profile, isFriendView]);
 
   useEffect(() => {
-    if (user?.id) {
-      analyticsEvents.track?.('handicap_page_viewed', { source: 'route' });
+    if (ownerUserId) {
+      analyticsEvents.track?.('handicap_page_viewed', {
+        source: 'route',
+        mode: isFriendView ? 'friend' : 'own',
+      });
     }
-  }, [user?.id]);
+  }, [ownerUserId, isFriendView]);
 
   if (loading) {
     return <PageRoot><div /></PageRoot>;
@@ -244,21 +315,31 @@ const HandicapPage: React.FC = () => {
     return <Navigate to="/auth" replace />;
   }
 
+  // Friend route with own id → normalize to /handicap.
+  if (friendId && friendId === user.id) {
+    return <Navigate to="/handicap" replace />;
+  }
+
+  if (!ownerUserId) {
+    return <Navigate to="/auth" replace />;
+  }
+
   return (
     <PageRoot style={{ background: BG_SURFACE }}>
       <HandicapPageHeader
-        userId={user.id}
-        firstName={firstName}
+        ownerUserId={ownerUserId}
+        displayName={displayName}
+        readOnly={isFriendView}
         activeTab={activeTab}
         onTabChange={handleTabChange}
       />
       <main>
-        <MorningMoment userId={user.id} />
-        {/* TODO(fix-brief §3.4): lift subtab state into WhsHandicapTab via props.
-            For now, HandicapDashboard still owns the ?subtab= URL param, which
-            is read by the same useSearchParams hook the page header uses, so
-            both stay in sync via the URL. */}
-        <WhsHandicapTab userId={user.id} />
+        {!isFriendView && <MorningMoment userId={user.id} />}
+        {isFriendView ? (
+          <FriendHandicapDashboard userId={ownerUserId} />
+        ) : (
+          <WhsHandicapTab userId={ownerUserId} />
+        )}
       </main>
     </PageRoot>
   );

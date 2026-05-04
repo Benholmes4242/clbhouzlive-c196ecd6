@@ -17,11 +17,17 @@ import { isHandicapSubtab, type HandicapSubtab } from './types';
 interface Props {
   connection: WhsConnection;
   userId: string;
+  /**
+   * Read-only mode — when true, hides Sync now, Disconnect, the re-auth/stale
+   * banners, and the invite affordances on the Friends tab. Used when
+   * viewing a friend's handicap via /handicap/:userId.
+   */
+  readOnly?: boolean;
 }
 
 const DEFAULT_SUBTAB: HandicapSubtab = 'overview';
 
-export const HandicapDashboard: React.FC<Props> = ({ connection, userId }) => {
+export const HandicapDashboard: React.FC<Props> = ({ connection, userId, readOnly = false }) => {
   const queryClient = useQueryClient();
   const [searchParams, setSearchParams] = useSearchParams();
   const [isSyncing, setIsSyncing] = useState(false);
@@ -97,8 +103,8 @@ export const HandicapDashboard: React.FC<Props> = ({ connection, userId }) => {
     : Infinity;
 
   // Banner priority: re-auth (only after 48h) > stale (after 24h) > nothing
-  const showReauthBanner = reauthRequired;
-  const showStaleBanner = !showReauthBanner && hoursSinceSync > 24;
+  const showReauthBanner = !readOnly && reauthRequired;
+  const showStaleBanner = !readOnly && !showReauthBanner && hoursSinceSync > 24;
 
   return (
     <div className="pb-10">
@@ -153,37 +159,44 @@ export const HandicapDashboard: React.FC<Props> = ({ connection, userId }) => {
           />
         )}
         {activeSubtab === 'friends' && (
-          <FriendsView userId={userId} currentHandicap={currentHandicap} connectionId={connection.id} />
+          <FriendsView
+            userId={userId}
+            currentHandicap={currentHandicap}
+            connectionId={connection.id}
+            readOnly={readOnly}
+          />
         )}
       </div>
 
-      {/* PERSISTENT — footer */}
-      <div className="px-5 pt-2 flex flex-col items-center gap-3">
-        <p className="text-[12px] text-muted-foreground">
-          {lastSyncedAt
-            ? `Last refreshed ${formatDistanceToNow(lastSyncedAt, { addSuffix: true })}`
-            : 'Not yet synced'}
-        </p>
-        <button
-          onClick={handleSyncNow}
-          disabled={isSyncing}
-          className="inline-flex items-center gap-1.5 text-[14px] font-semibold disabled:opacity-50"
-          style={{ color: '#F7931E' }}
-        >
-          <RefreshCw className={`h-3.5 w-3.5 ${isSyncing ? 'animate-spin' : ''}`} />
-          {isSyncing ? 'Syncing...' : 'Sync now'}
-        </button>
-        <button
-          onClick={() =>
-            toast(
-              'Disconnect coming soon — get in touch via support if you need to disconnect now.'
-            )
-          }
-          className="text-[12px] text-muted-foreground mt-2"
-        >
-          Disconnect England Golf
-        </button>
-      </div>
+      {/* PERSISTENT — footer (hidden in read-only mode) */}
+      {!readOnly && (
+        <div className="px-5 pt-2 flex flex-col items-center gap-3">
+          <p className="text-[12px] text-muted-foreground">
+            {lastSyncedAt
+              ? `Last refreshed ${formatDistanceToNow(lastSyncedAt, { addSuffix: true })}`
+              : 'Not yet synced'}
+          </p>
+          <button
+            onClick={handleSyncNow}
+            disabled={isSyncing}
+            className="inline-flex items-center gap-1.5 text-[14px] font-semibold disabled:opacity-50"
+            style={{ color: '#F7931E' }}
+          >
+            <RefreshCw className={`h-3.5 w-3.5 ${isSyncing ? 'animate-spin' : ''}`} />
+            {isSyncing ? 'Syncing...' : 'Sync now'}
+          </button>
+          <button
+            onClick={() =>
+              toast(
+                'Disconnect coming soon — get in touch via support if you need to disconnect now.'
+              )
+            }
+            className="text-[12px] text-muted-foreground mt-2"
+          >
+            Disconnect England Golf
+          </button>
+        </div>
+      )}
 
       {lastSyncedAt && (
         <p

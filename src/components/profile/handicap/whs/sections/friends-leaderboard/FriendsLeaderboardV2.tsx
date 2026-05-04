@@ -28,6 +28,12 @@ interface Props {
   currentUserHandicap: number | null | undefined;
   currentUserName?: string;
   connectionId: string;
+  /**
+   * When true, the leaderboard is being shown inside another user's
+   * /handicap/:userId page. Tap targets switch to /p/:id (their profile)
+   * and invite affordances are hidden.
+   */
+  readOnly?: boolean;
 }
 
 export type LeaderboardItem =
@@ -50,6 +56,7 @@ export const FriendsLeaderboardV2: React.FC<Props> = ({
   currentUserHandicap,
   currentUserName = 'You',
   connectionId,
+  readOnly = false,
 }) => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
@@ -219,8 +226,13 @@ export const FriendsLeaderboardV2: React.FC<Props> = ({
           const onClick = () => {
             if (item.kind === 'self') return;
             if (item.friend.is_clbhouz_user && item.friend.friend_user_id) {
-              navigate(`/p/${item.friend.friend_user_id}`);
-            } else {
+              // From your own leaderboard → friend's handicap context.
+              // From a friend's leaderboard (readOnly) → their personal profile.
+              const target = readOnly
+                ? `/p/${item.friend.friend_user_id}`
+                : `/handicap/${item.friend.friend_user_id}`;
+              navigate(target);
+            } else if (!readOnly) {
               handleInvite(item.friend);
             }
           };
