@@ -243,21 +243,26 @@ function RoundTabs({
   const tabs = [1, 2, 3, 4];
 
   return (
-    <div style={{ display: 'flex', gap: 'clamp(3px, 1vw, 5px)', padding: '4px 16px 10px', width: 'fit-content', maxWidth: '100%' }}>
+    <div
+      style={{
+        display: 'flex', gap: 0,
+        padding: '8px 16px 12px',
+        borderBottom: `1px solid ${hairlineDark}`,
+        marginBottom: 12,
+      }}
+    >
       {tabs.map((roundNum) => {
         const hasScorecard = rounds.some(r => r.roundNumber === roundNum);
         const rs = roundScores.find(r => r.round === roundNum);
         const hasData = hasScorecard || (rs && rs.holesCompleted > 0);
         const isActive = roundNum === activeRound;
         const toPar = rs?.toPar ?? null;
-        const fmtScore = toPar === null ? null
-          : toPar === 0 ? 'E'
-          : toPar > 0 ? `+${toPar}`
-          : `${toPar}`;
-        const scoreColor = toPar === null ? 'rgba(255,255,255,0.20)'
-          : toPar < 0 ? '#ffffff'
-          : toPar > 0 ? '#f87171'
-          : 'rgba(255,255,255,0.55)';
+        const display = toPar === null ? '—' : fmtScore(toPar);
+        const scoreColor = toPar === null ? inkGhost
+          : isActive ? '#ffffff'
+          : toPar < 0 ? inkSoft
+          : toPar > 0 ? danger
+          : inkFaint;
 
         return (
           <button
@@ -265,30 +270,34 @@ function RoundTabs({
             onClick={() => hasData && onSelect(roundNum)}
             disabled={!hasData}
             style={{
-              display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2,
-              padding: '6px 14px',
-              borderRadius: 9,
-              background: isActive ? 'rgba(255,255,255,0.08)' : 'rgba(255,255,255,0.04)',
-              border: isActive
-                ? '1.5px solid rgba(255,255,255,0.25)'
-                : '1px solid rgba(255,255,255,0.07)',
+              flex: 1,
+              display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4,
+              padding: '6px 0 10px',
+              background: 'transparent',
+              border: 'none',
+              borderBottom: isActive ? `2px solid #ffffff` : '2px solid transparent',
               cursor: hasData ? 'pointer' : 'default',
-              transition: 'all 0.15s ease',
+              opacity: hasData ? 1 : 0.4,
+              transition: 'border-color 0.18s ease',
             }}
           >
-            <span style={{
-              fontSize: 9, fontWeight: 700,
-              color: isActive ? '#ffffff' : 'rgba(255,255,255,0.35)',
-              textTransform: 'uppercase', letterSpacing: '0.5px',
-            }}>
+            <span
+              style={{
+                fontSize: 9, fontWeight: 800,
+                color: isActive ? '#ffffff' : inkFaint,
+                letterSpacing: '0.14em',
+              }}
+            >
               R{roundNum}
             </span>
-            <span style={{
-              fontSize: 17, fontWeight: 800,
-              color: hasData ? scoreColor : 'rgba(255,255,255,0.18)',
-              fontVariantNumeric: 'tabular-nums',
-            }}>
-              {fmtScore ?? '—'}
+            <span
+              style={{
+                fontSize: 17, fontWeight: 800,
+                color: scoreColor,
+                fontVariantNumeric: 'tabular-nums',
+              }}
+            >
+              {display}
             </span>
           </button>
         );
