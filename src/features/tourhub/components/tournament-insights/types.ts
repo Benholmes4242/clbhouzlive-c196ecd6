@@ -103,6 +103,10 @@ export interface TrackedPrediction {
   currentRound: number | null;
   positionDelta: number | null;
   performanceStatus: 'outperforming' | 'matching' | 'underperforming' | 'cut' | 'withdrawn' | 'not-started';
+  /** Direction relative to previous poll. 'flat' on first poll or no change. */
+  moveDir: 'up' | 'down' | 'flat';
+  /** Absolute integer of position delta vs previous poll. 0 when flat. */
+  moveSpots: number;
   country: string | null;
   /**
    * Phase C — Editorial layer: per-pick pulled-quote forwarded from
