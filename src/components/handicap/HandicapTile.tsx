@@ -1,6 +1,10 @@
 /**
  * HandicapTile — primary tile in the ProfileHubSheet 2×2 grid.
  * Shows live current handicap, monthly delta, and a NEW badge.
+ *
+ * NEW badge: shown for 60 days after HANDICAP_PROMO_LAUNCHED_AT.
+ * Per Phase-5 brief: v1 uses static badge with automatic 60-day expiry
+ * (not dismiss-on-tap). Update HANDICAP_PROMO_LAUNCHED_AT at rollout.
  */
 import { memo, useMemo } from 'react';
 import { useWhsConnection, useHandicapTrend } from '@/lib/whs/hooks';
@@ -8,6 +12,10 @@ import { useWhsConnection, useHandicapTrend } from '@/lib/whs/hooks';
 const AMBER = '#F7931E';
 const INK = '#0f172a';
 const INK_55 = '#64748B';
+
+// Rollout date for the Handicap promotion. NEW badge auto-hides 60 days after.
+const HANDICAP_PROMO_LAUNCHED_AT = new Date('2026-05-04T00:00:00Z').getTime();
+const NEW_BADGE_DURATION_MS = 60 * 24 * 60 * 60 * 1000;
 
 interface HandicapTileProps {
   userId: string;
@@ -49,6 +57,11 @@ function HandicapTile({ userId, onClick }: HandicapTileProps) {
     return `${arrow} ${Math.abs(d).toFixed(1)} this month`;
   }, [connection, trend]);
 
+  const showNewBadge = useMemo(
+    () => Date.now() - HANDICAP_PROMO_LAUNCHED_AT < NEW_BADGE_DURATION_MS,
+    [],
+  );
+
   return (
     <button
       type="button"
@@ -65,25 +78,27 @@ function HandicapTile({ userId, onClick }: HandicapTileProps) {
       }}
       aria-label={`Handicap ${displayValue}`}
     >
-      {/* NEW badge */}
-      <span
-        style={{
-          position: 'absolute',
-          top: -6,
-          right: -6,
-          padding: '3px 8px',
-          borderRadius: 999,
-          background: AMBER,
-          color: '#fff',
-          fontSize: 9,
-          fontWeight: 800,
-          letterSpacing: '0.10em',
-          boxShadow: '0 2px 6px rgba(247,147,30,0.40)',
-          lineHeight: 1,
-        }}
-      >
-        NEW
-      </span>
+      {/* NEW badge — auto-hides 60 days after launch */}
+      {showNewBadge && (
+        <span
+          style={{
+            position: 'absolute',
+            top: -6,
+            right: -6,
+            padding: '3px 8px',
+            borderRadius: 999,
+            background: AMBER,
+            color: '#fff',
+            fontSize: 9,
+            fontWeight: 800,
+            letterSpacing: '0.10em',
+            boxShadow: '0 2px 6px rgba(247,147,30,0.40)',
+            lineHeight: 1,
+          }}
+        >
+          NEW
+        </span>
+      )}
 
       {/* Top row: icon + value */}
       <div className="flex items-center justify-between w-full">

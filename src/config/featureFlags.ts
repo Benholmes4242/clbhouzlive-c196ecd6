@@ -32,9 +32,25 @@ export const FEATURE_FLAGS = {
 
 /**
  * Handicap promoted from a profile sub-tab to a top-level page.
- * When ON: ProfileHubSheet renders the new 2×2 grid (Handicap/Echo/Messages/Notifications)
- * and the Handicap tab is hidden from the user's own profile strip.
- * Default: ON for internal accounts; OFF for everyone else until rollout.
+ *
+ * When ON for a user:
+ *  - ProfileHubSheet renders the new 2×2 grid (Handicap/Echo/Messages/Notifications)
+ *  - HandicapTile shows live index + 30-day trend, with a NEW badge for 60 days
+ *  - Handicap tab is hidden from that user's own profile strip
+ *  - /handicap route renders the dedicated page with MorningMoment + WhsHandicapTab
+ *  - Legacy ?tab=stats deep links on own profile redirect to /handicap
+ *
+ * Rollout plan:
+ *  1. Internal allow-list (current state) — verify telemetry + UX with team
+ *  2. Flip HANDICAP_PROMOTED_TO_PAGE_GLOBAL = true for full rollout
+ *  3. Rollback = flip back to false; no DB migration required
+ *
+ * Telemetry to watch (PostHog / analyticsEvents):
+ *  - profile_hub_sheet_opened { variant: 'v2_grid' | 'v1_row' }
+ *  - handicap_tile_tapped
+ *  - handicap_page_viewed
+ *  - morning_moment_viewed { hasHandicap, hasDelta }
+ *  - handicap_legacy_redirect_fired
  */
 const HANDICAP_PROMOTED_INTERNAL_USER_IDS = new Set<string>([
   '6a5bcbb9-c22c-4655-ad8e-088b2858ca3e', // Benjamin Holmes
