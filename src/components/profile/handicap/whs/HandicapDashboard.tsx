@@ -103,8 +103,8 @@ export const HandicapDashboard: React.FC<Props> = ({ connection, userId, readOnl
     : Infinity;
 
   // Banner priority: re-auth (only after 48h) > stale (after 24h) > nothing
-  const showReauthBanner = reauthRequired;
-  const showStaleBanner = !showReauthBanner && hoursSinceSync > 24;
+  const showReauthBanner = !readOnly && reauthRequired;
+  const showStaleBanner = !readOnly && !showReauthBanner && hoursSinceSync > 24;
 
   return (
     <div className="pb-10">
