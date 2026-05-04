@@ -209,3 +209,6 @@ verify_jwt = false
 
 [functions.generate-handicap-insights]
 verify_jwt = true
+
+[functions.geocode-club]
+verify_jwt = false
