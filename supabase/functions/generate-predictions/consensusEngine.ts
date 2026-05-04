@@ -234,6 +234,7 @@ export function aggregateConsensus(
     name: string;
     score: number;
     winProbabilities: number[];
+    courseFitScores: Map<string, number>;
     reasons: Map<string, string[]>;
     votes: ModelVote[];
     modelCount: number;
@@ -247,12 +248,16 @@ export function aggregateConsensus(
         name: pick.playerName,
         score: 0,
         winProbabilities: [],
+        courseFitScores: new Map<string, number>(),
         reasons: new Map(),
         votes: [],
         modelCount: 0,
       };
       existing.score += bordaPoints;
       existing.winProbabilities.push(pick.winProbability);
+      if (typeof pick.courseFitScore === 'number' && pick.courseFitScore > 0) {
+        existing.courseFitScores.set(result.model, pick.courseFitScore);
+      }
       existing.reasons.set(result.model, pick.reasons);
       existing.votes.push({ model: result.model, rank: pick.rank, winProbability: pick.winProbability });
       existing.modelCount += 1;
