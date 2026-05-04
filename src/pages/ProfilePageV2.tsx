@@ -67,7 +67,7 @@ import { ProfileCoursesTab } from '@/components/profile/ProfileCoursesTab';
 import Top100MyProgressPanel from '@/components/courses/Top100MyProgressPanel';
 import AchievementsPane from '@/components/profile/AchievementsPane';
 import HandicapSection from '@/components/profile/HandicapSection';
-import { isHandicapPromotedForUser } from '@/config/featureFlags';
+
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import ClubsCard from '@/components/profile/clubs/ClubsCard';
 import { useProfileClubs } from '@/components/profile/hooks/useProfileClubs';
@@ -231,22 +231,26 @@ const ProfilePageV2Content: React.FC = () => {
 
   const profileTypeInfo = getProfileType(profile?.user_type);
   const { isPersonal } = profileTypeInfo;
-  const handicapPromoted = isHandicapPromotedForUser(user?.id);
   const allTabs = getProfileTabs(profile?.user_type);
-  // When the Handicap promotion flag is on, hide the Handicap tab from the user's
-  // own profile strip — it's now reachable via the dedicated /handicap page.
+  // Per fix brief §5.1 — Handicap is now a top-level page for everyone,
+  // hidden from all profile tab strips (own and friend).
   const tabs = useMemo(
-    () => (isSelf && handicapPromoted ? allTabs.filter(t => t.id !== 'stats') : allTabs),
-    [allTabs, isSelf, handicapPromoted]
+    () => allTabs.filter(t => t.id !== 'stats'),
+    [allTabs]
   );
 
-  // Redirect own-profile Handicap deep links to the dedicated /handicap page when promoted.
+  // Per fix brief §5.2 — legacy ?tab=stats deep links redirect to the
+  // dedicated handicap route. Own profile → /handicap. Friend → /handicap/:id.
   useEffect(() => {
-    if (isSelf && handicapPromoted && activeSection === 'stats') {
+    if (activeSection !== 'stats') return;
+    if (isSelf) {
       analyticsEvents.track?.('handicap_legacy_redirect_fired', { source: 'profile_stats_tab' });
       navigate('/handicap', { replace: true });
+    } else if (profile?.id) {
+      analyticsEvents.track?.('handicap_legacy_redirect_fired', { source: 'friend_profile_stats_tab' });
+      navigate(`/handicap/${profile.id}`, { replace: true });
     }
-  }, [isSelf, handicapPromoted, activeSection, navigate]);
+  }, [activeSection, isSelf, profile?.id, navigate]);
 
   const { data: socialCounts, isLoading: socialCountsLoading } = useSocialCounts(profileUserId);
   const followersCount = socialCounts?.followers ?? 0;

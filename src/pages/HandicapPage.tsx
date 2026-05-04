@@ -254,7 +254,11 @@ const HandicapPage: React.FC = () => {
       />
       <main>
         <MorningMoment userId={user.id} />
-        <WhsHandicapTab userId={user.id} subtab={activeTab} onSubtabChange={handleTabChange} />
+        {/* TODO(fix-brief §3.4): lift subtab state into WhsHandicapTab via props.
+            For now, HandicapDashboard still owns the ?subtab= URL param, which
+            is read by the same useSearchParams hook the page header uses, so
+            both stay in sync via the URL. */}
+        <WhsHandicapTab userId={user.id} />
       </main>
     </PageRoot>
   );
