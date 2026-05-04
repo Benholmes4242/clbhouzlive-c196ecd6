@@ -438,7 +438,7 @@ function Footnote() {
         textAlign: 'center',
       }}
     >
-      Intelligence is for entertainment and editorial purposes. Not betting advice.
+      Picks are for entertainment and discussion. Past performance does not guarantee future results.
     </p>
   );
 }
