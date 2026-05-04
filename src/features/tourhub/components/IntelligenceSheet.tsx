@@ -101,17 +101,13 @@ function Header({ onClose }: { onClose: () => void }) {
       <div style={{ display: 'flex', alignItems: 'center', gap: 12, minWidth: 0, flex: 1 }}>
         <div
           style={{
-            width: 36,
-            height: 36,
-            borderRadius: '50%',
-            background: AMBER_SOFT,
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
             flexShrink: 0,
           }}
         >
-          <Brain size={18} color={AMBER} strokeWidth={2.5} />
+          <Brain size={22} color={AMBER} strokeWidth={2.5} />
         </div>
         <div style={{ minWidth: 0 }}>
           <h2
@@ -684,7 +680,7 @@ function PickMiniRow({
 }) {
   const isWinner = pick.actualPosition === 1;
   const isMissedCut = pick.status?.toLowerCase() === 'cut';
-  const positionColor = isWinner ? GOLD_DEEP : isMissedCut ? SLATE_500 : SLATE_900;
+  const positionColor = isWinner ? GOLD : isMissedCut ? SLATE_500 : SLATE_900;
 
   return (
     <div
@@ -718,7 +714,7 @@ function PickMiniRow({
         >
           {pick.playerName}
         </span>
-        {isWinner && <Trophy size={13} color={GOLD_DEEP} style={{ flexShrink: 0 }} />}
+        {isWinner && <Trophy size={13} color={GOLD} style={{ flexShrink: 0 }} />}
       </div>
       <span
         style={{
