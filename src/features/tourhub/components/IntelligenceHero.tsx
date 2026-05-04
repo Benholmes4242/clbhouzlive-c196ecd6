@@ -1142,7 +1142,7 @@ function DotsRail({
   stats: ReceiptsStats;
   hasWinner: boolean;
 }) {
-  const accent = hasWinner ? goldDeep : amberDeep;
+  const accent = amber;
   return (
     <div
       style={{
