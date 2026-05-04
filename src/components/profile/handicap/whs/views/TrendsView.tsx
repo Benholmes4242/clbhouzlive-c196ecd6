@@ -8,12 +8,18 @@ interface Props {
   connectionId: string;
   userId: string;
   currentHandicap: number | null;
+  /**
+   * API consistency — TrendsView is purely visual data with no actions
+   * today. Plumb the prop so future actions can be gated on !readOnly.
+   */
+  readOnly?: boolean;
 }
 
 export const TrendsView: React.FC<Props> = ({
   connectionId,
   userId,
   currentHandicap,
+  readOnly: _readOnly = false,
 }) => {
   return (
     <div
