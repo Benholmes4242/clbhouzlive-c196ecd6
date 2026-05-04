@@ -489,7 +489,9 @@ function MiniLeaderboardRow({ leader, isFirst, index, isActive, isLeader, scoreF
       transition={{ duration: 0.35, delay: index * 0.08, ease: [0.16, 1, 0.3, 1] }}
       className={cn(
         "leaderboard-row flex items-center justify-between",
-        isLeader && "leader-row-highlight"
+        isLeader && "leader-row-highlight",
+        positionDelta > 0 && "row-pulse-up",
+        positionDelta < 0 && "row-pulse-down"
       )}
     >
       <div className="flex items-center gap-2 min-w-0 flex-1">
