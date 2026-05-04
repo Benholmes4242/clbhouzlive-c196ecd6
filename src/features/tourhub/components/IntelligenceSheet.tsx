@@ -650,7 +650,7 @@ function TournamentCard({
               color: chip.fg,
             }}
           >
-            {chip.icon && <Trophy size={10} color={chip.fg} fill={chip.fg} />}
+            {chip.icon && <Trophy size={10} color={chip.fg} />}
             {chip.label}
           </span>
           <ChevronRight size={16} color={SLATE_400} strokeWidth={2.2} />
