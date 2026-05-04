@@ -46,7 +46,7 @@ export interface ConsensusPick {
   rank: number;
   consensusScore: number;
   winProbability: number;
-  courseFitScore: number;       // From calculated course fit, NOT AI-generated
+  courseFitScore: number | null;       // null when no DNA + no AI-returned fit
   reasons: string[];
   modelVotes: ModelVote[];
   isDarkHorse: boolean;
