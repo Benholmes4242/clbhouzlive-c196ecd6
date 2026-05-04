@@ -442,6 +442,21 @@ export function PlayerScorecardCard({
 
   const currentRound = scorecard?.currentRound || player.currentRound || 1;
 
+  // Inject pulse keyframes once for the live indicator.
+  useEffect(() => {
+    const id = 'hero-pulse-keyframes';
+    if (document.getElementById(id)) return;
+    const tag = document.createElement('style');
+    tag.id = id;
+    tag.textContent = PULSE_KEYFRAMES;
+    document.head.appendChild(tag);
+  }, []);
+
+  const flag = COUNTRY_TO_FLAG[(player.countryCode ?? '').toUpperCase()];
+  const positionLabel = typeof player.position === 'number'
+    ? `${player.position}`
+    : `${player.position}`;
+
   return (
     <motion.div
       initial={{ opacity: 0, x: 60 }}
