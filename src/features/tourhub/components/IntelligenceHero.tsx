@@ -1592,7 +1592,6 @@ function LiveStateBlock({
           subtitle={`Now ${formatPosition(heroPick)} · Round ${heroPick.currentRound ?? currentRound}${heroPick.thru != null ? ` · Thru ${heroPick.thru}` : ''}`}
           pulledQuote={heroPick.pulledQuote ?? heroPick.reasons[0] ?? null}
           reasons={heroPick.reasons}
-          winProbability={heroPick.winProbability}
           defaultExpanded={false}
           position={formatPosition(heroPick)}
           positionLabel={formatScore(heroPick.score)}
@@ -1610,7 +1609,6 @@ function LiveStateBlock({
                 key={p.playerId}
                 initials={getInitials(p.playerName)}
                 name={p.playerName}
-                winProbability={p.winProbability}
                 reason={p.reasons[0]}
                 reasons={p.reasons}
                 position={formatPosition(p)}
@@ -1700,7 +1698,6 @@ function ResultsStateBlock({
           subtitle={`Final · 1st · Won by ${margin || 'playoff'}`}
           pulledQuote={winningPick.pulledQuote ?? winningPick.reasons[0] ?? null}
           reasons={winningPick.reasons}
-          winProbability={winningPick.winProbability}
           defaultExpanded={false}
           position="1"
           positionLabel={formatScore(winningPick.score)}
@@ -1717,7 +1714,6 @@ function ResultsStateBlock({
                   key={p.playerId}
                   initials={getInitials(p.playerName)}
                   name={p.playerName}
-                  winProbability={p.winProbability}
                   reason={p.reasons[0]}
                   reasons={p.reasons}
                   position={formatPosition(p)}
@@ -1781,7 +1777,6 @@ function ResultsStateBlock({
           subtitle={`Final ${formatPosition(heroPickResolved)}`}
           pulledQuote={heroPickResolved.pulledQuote ?? heroPickResolved.reasons[0] ?? null}
           reasons={heroPickResolved.reasons}
-          winProbability={heroPickResolved.winProbability}
           defaultExpanded={false}
           position={formatPosition(heroPickResolved)}
           positionLabel={formatScore(heroPickResolved.score)}
@@ -1798,7 +1793,6 @@ function ResultsStateBlock({
                 key={p.playerId}
                 initials={getInitials(p.playerName)}
                 name={p.playerName}
-                winProbability={p.winProbability}
                 reason={p.reasons[0]}
                 reasons={p.reasons}
                 position={formatPosition(p)}
@@ -1936,7 +1930,6 @@ function UpcomingStateBlock({
           subtitle={topContender.courseFitScore ? `Course Fit ${Math.round(topContender.courseFitScore)}` : null}
           pulledQuote={topContender.pulledQuote ?? topContender.reasons[0] ?? null}
           reasons={topContender.reasons}
-          winProbability={topContender.winProbability}
           defaultExpanded={false}
           position="—"
           positionLabel="TO PLAY"
@@ -1953,7 +1946,6 @@ function UpcomingStateBlock({
                 key={p.playerId}
                 initials={getInitials(p.playerName)}
                 name={p.playerName}
-                winProbability={p.winProbability}
                 reason={p.reasons[0]}
                 reasons={p.reasons}
                 position="—"
