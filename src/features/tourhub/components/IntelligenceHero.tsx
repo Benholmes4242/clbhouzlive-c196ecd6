@@ -824,34 +824,23 @@ function HeroPick({
           />
 
           <div style={{ flex: 1, minWidth: 0 }}>
-            <div
-              style={{
-                ...monoLabel,
-                display: 'flex',
-                alignItems: 'center',
-                gap: 5,
-                fontSize: 8,
-                color: AMBER_DEEP,
-                letterSpacing: '0.18em',
-                marginBottom: 5,
-              }}
-            >
-              <span
+            {winProbability > 0 && (
+              <div
                 style={{
-                  width: 14,
-                  height: 14,
-                  borderRadius: '50%',
-                  background: AMBER_TINT,
-                  display: 'inline-flex',
+                  ...monoLabel,
+                  display: 'flex',
                   alignItems: 'center',
-                  justifyContent: 'center',
-                  flexShrink: 0,
+                  gap: 5,
+                  fontSize: 8,
+                  color: AMBER_DEEP,
+                  letterSpacing: '0.18em',
+                  marginBottom: 5,
                 }}
               >
-                <Brain size={8} color={AMBER_DEEP} strokeWidth={2.6} style={{ display: 'block' }} />
-              </span>
-              TOP PICK
-            </div>
+                <Sparkles size={9} color={AMBER_DEEP} fill={AMBER_DEEP} strokeWidth={2} />
+                {Math.round(winProbability * 100)}% WIN PROBABILITY
+              </div>
+            )}
             <div
               style={{
                 fontFamily: headlineFont,
