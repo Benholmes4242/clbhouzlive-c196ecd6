@@ -16,8 +16,9 @@ import { useNavigate } from 'react-router-dom';
 import { ChevronRight, MapPin, Trophy } from 'lucide-react';
 import { tournamentRoute } from '../../routes';
 import { HeroAtmosphere } from '../shared/HeroAtmosphere';
+import { Shimmer } from '../shared/Shimmer';
+import { AllToursTicker } from '../shared/AllToursTicker';
 import { useLeaderHoleScores } from '../../hooks/useLeaderHoleScores';
-import { useLiveRightNow } from '../../hooks/useOverviewModules';
 import { getPlayerHeadshotUrl } from '@/utils/playerHeadshot';
 import { PlayerSilhouette } from '@/components/ui/PlayerSilhouette';
 import {
