@@ -15,6 +15,7 @@ import { PageRoot } from '@/components/layout/PageRoot';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { isHandicapPromotedForUser } from '@/config/featureFlags';
 import WhsHandicapTab from '@/components/profile/handicap/whs/WhsHandicapTab';
+import MorningMoment from '@/components/handicap/MorningMoment';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 
 const INK = '#0F172A';
