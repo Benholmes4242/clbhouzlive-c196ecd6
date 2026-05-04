@@ -8,6 +8,7 @@ import { motion } from 'framer-motion';
 import { ChevronLeft, X, Trophy } from 'lucide-react';
 import { usePlayerScorecard, type RoundScorecard, type HoleScore } from '@/hooks/usePlayerScorecard';
 import { getScoreTextClass, getScoreBgClass, getScoreColorSet, SCORE_COLORS } from '@/features/tourhub/utils/scoreColors';
+import { Shimmer, SHIMMER_KEYFRAMES, inkSoft, inkFaint, inkGhost, hairlineDark, greenLive, danger } from '@/features/tourhub/utils/heroAtmosphere';
 
 // ── Types ──────────────────────────────────────────────────────────────────────
 
@@ -295,73 +296,60 @@ function RoundTabs({
 function ScorecardSkeleton() {
   return (
     <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+      <style>{SHIMMER_KEYFRAMES}</style>
 
       {/* Hero skeleton — horizontal */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '0 16px 10px' }}>
-        <div style={{ width: 52, height: 55, borderRadius: '34%', background: 'rgba(255,255,255,0.08)', flexShrink: 0, animation: 'clb-shimmer 1.8s ease-in-out infinite', backgroundSize: '200% 100%', backgroundImage: 'linear-gradient(90deg, rgba(255,255,255,0.04) 25%, rgba(255,255,255,0.10) 50%, rgba(255,255,255,0.04) 75%)' }} />
-        <div style={{ flex: 1 }}>
-          <div style={{ height: 14, width: '65%', borderRadius: 5, background: 'rgba(255,255,255,0.08)', marginBottom: 7, animation: 'clb-shimmer 1.8s ease-in-out infinite', backgroundSize: '200% 100%', backgroundImage: 'linear-gradient(90deg, rgba(255,255,255,0.04) 25%, rgba(255,255,255,0.10) 50%, rgba(255,255,255,0.04) 75%)' }} />
-          <div style={{ height: 9, width: '40%', borderRadius: 4, background: 'rgba(255,255,255,0.05)' }} />
+        <Shimmer width={52} height={55} radius="34%" style={{ flexShrink: 0 }} />
+        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 7 }}>
+          <Shimmer width="65%" height={14} />
+          <Shimmer width="40%" height={9} />
         </div>
-        <div style={{ width: 44, height: 26, borderRadius: 6, background: 'rgba(255,255,255,0.08)', flexShrink: 0 }} />
+        <Shimmer width="18%" height={26} style={{ maxWidth: 64, flexShrink: 0 }} />
       </div>
 
       {/* Round chips skeleton */}
       <div style={{ display: 'flex', gap: 5, padding: '0 16px 8px' }}>
         {[1,2,3,4].map(i => (
-          <div key={i} style={{ flex: 1, height: 46, borderRadius: 8, background: i === 1 ? 'rgba(255,255,255,0.08)' : 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.07)' }} />
+          <div key={i} style={{ flex: 1, height: 46, borderRadius: 8, background: 'rgba(255,255,255,0.04)', border: `1px solid ${hairlineDark}` }}>
+            <Shimmer height="100%" radius={8} />
+          </div>
         ))}
       </div>
 
-      <div style={{ height: 1, background: 'rgba(255,255,255,0.07)', margin: '0 16px 6px' }} />
-
-      {/* Round tabs skeleton */}
-      <div style={{ display: 'flex', justifyContent: 'center', gap: 6, padding: '4px 0 8px' }}>
-        {[1,2].map(i => (
-          <div key={i} style={{ width: 40, height: 26, borderRadius: 20, background: i === 1 ? 'rgba(255,255,255,0.15)' : 'rgba(255,255,255,0.07)' }} />
-        ))}
-      </div>
+      <div style={{ height: 1, background: hairlineDark, margin: '0 16px 6px' }} />
 
       {/* Stat chips skeleton */}
-      <div style={{ display: 'flex', gap: 4, padding: '0 16px 10px' }}>
+      <div style={{ display: 'flex', gap: 4, padding: '8px 16px 10px' }}>
         {[1,2,3,4,5].map(i => (
-          <div key={i} style={{ flex: 1, height: 38, borderRadius: 7, background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.06)', animation: 'clb-shimmer 1.8s ease-in-out infinite', backgroundSize: '200% 100%', backgroundImage: 'linear-gradient(90deg, rgba(255,255,255,0.03) 25%, rgba(255,255,255,0.07) 50%, rgba(255,255,255,0.03) 75%)' }} />
+          <div key={i} style={{ flex: 1, height: 38, borderRadius: 7, border: `1px solid ${hairlineDark}`, overflow: 'hidden' }}>
+            <Shimmer height="100%" radius={7} />
+          </div>
         ))}
       </div>
 
-      {/* Front 9 skeleton */}
-      <div style={{ padding: '0 12px 8px' }}>
-        <div style={{ height: 9, width: 60, borderRadius: 4, background: 'rgba(255,255,255,0.06)', marginBottom: 6 }} />
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(9, 1fr)', gap: 2 }}>
-          {Array.from({ length: 9 }, (_, i) => (
-            <div key={i} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
-              <div style={{ width: 14, height: 8, borderRadius: 2, background: 'rgba(255,255,255,0.06)' }} />
-              <div style={{ width: 26, height: 26, borderRadius: 6, background: 'rgba(255,255,255,0.05)', animation: 'clb-shimmer 1.8s ease-in-out infinite', backgroundSize: '200% 100%', backgroundImage: 'linear-gradient(90deg, rgba(255,255,255,0.03) 25%, rgba(255,255,255,0.07) 50%, rgba(255,255,255,0.03) 75%)' }} />
-            </div>
-          ))}
+      {/* Front 9 + Back 9 skeleton */}
+      {[0, 1].map(nine => (
+        <div key={nine} style={{ padding: '0 12px 8px' }}>
+          <Shimmer width="22%" height={9} radius={4} style={{ marginBottom: 6, maxWidth: 80 }} />
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(9, 1fr)', gap: 'clamp(1px, 0.5vw, 4px)' }}>
+            {Array.from({ length: 9 }, (_, i) => (
+              <div key={i} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
+                <Shimmer width="50%" height={8} radius={2} style={{ maxWidth: 14 }} />
+                <Shimmer height="clamp(28px, 8.5vw, 34px)" width="clamp(28px, 8.5vw, 34px)" radius={6} />
+              </div>
+            ))}
+          </div>
         </div>
-      </div>
-
-      {/* Back 9 skeleton */}
-      <div style={{ padding: '0 12px 8px' }}>
-        <div style={{ height: 9, width: 55, borderRadius: 4, background: 'rgba(255,255,255,0.06)', marginBottom: 6 }} />
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(9, 1fr)', gap: 2 }}>
-          {Array.from({ length: 9 }, (_, i) => (
-            <div key={i} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
-              <div style={{ width: 14, height: 8, borderRadius: 2, background: 'rgba(255,255,255,0.06)' }} />
-              <div style={{ width: 26, height: 26, borderRadius: 6, background: 'rgba(255,255,255,0.05)', animation: 'clb-shimmer 1.8s ease-in-out infinite', backgroundSize: '200% 100%', backgroundImage: 'linear-gradient(90deg, rgba(255,255,255,0.03) 25%, rgba(255,255,255,0.07) 50%, rgba(255,255,255,0.03) 75%)' }} />
-            </div>
-          ))}
-        </div>
-      </div>
+      ))}
 
       {/* Total row skeleton */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '8px 16px', borderTop: '1px solid rgba(255,255,255,0.07)', marginTop: 4 }}>
-        <div style={{ width: 40, height: 8, borderRadius: 3, background: 'rgba(255,255,255,0.06)' }} />
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '8px 16px', borderTop: `1px solid ${hairlineDark}`, marginTop: 4 }}>
+        <Shimmer width="30%" height={9} radius={3} style={{ maxWidth: 120 }} />
         <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
-          <div style={{ width: 50, height: 9, borderRadius: 3, background: 'rgba(255,255,255,0.05)' }} />
-          <div style={{ width: 30, height: 13, borderRadius: 4, background: 'rgba(255,255,255,0.08)' }} />
-          <div style={{ width: 24, height: 11, borderRadius: 4, background: 'rgba(74,222,128,0.15)' }} />
+          <Shimmer width={50} height={9} radius={3} />
+          <Shimmer width={30} height={13} radius={4} />
+          <Shimmer width={24} height={11} radius={4} />
         </div>
       </div>
     </div>
