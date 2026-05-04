@@ -9,6 +9,9 @@ import { ChevronLeft, X, Trophy } from 'lucide-react';
 import { usePlayerScorecard, type RoundScorecard, type HoleScore } from '@/hooks/usePlayerScorecard';
 import { getScoreTextClass, getScoreBgClass, getScoreColorSet, SCORE_COLORS } from '@/features/tourhub/utils/scoreColors';
 import { HeroAtmosphere } from '@/features/tourhub/components/shared/HeroAtmosphere';
+import { Shimmer } from '@/features/tourhub/components/shared/Shimmer';
+import { StatsGrid } from '@/features/tourhub/components/shared/StatsGrid';
+import { RoundSparkline } from '@/features/tourhub/components/shared/RoundSparkline';
 import {
   ink, inkSoft, inkFaint, inkGhost,
   hairlineDark, hairlineMid,
@@ -241,28 +244,15 @@ function RoundTabs({
   roundScores: { round: number; strokes: number; toPar: number; holesCompleted: number }[];
 }) {
   const tabs = [1, 2, 3, 4];
-
   return (
-    <div
-      style={{
-        display: 'flex', gap: 0,
-        padding: '8px 16px 12px',
-        borderBottom: `1px solid ${hairlineDark}`,
-        marginBottom: 12,
-      }}
-    >
+    <div style={{ padding: '0 16px 14px', display: 'flex', gap: 6 }}>
       {tabs.map((roundNum) => {
-        const hasScorecard = rounds.some(r => r.roundNumber === roundNum);
-        const rs = roundScores.find(r => r.round === roundNum);
+        const hasScorecard = rounds.some((r) => r.roundNumber === roundNum);
+        const rs = roundScores.find((r) => r.round === roundNum);
         const hasData = hasScorecard || (rs && rs.holesCompleted > 0);
         const isActive = roundNum === activeRound;
+        const isLive = roundNum === currentRound && (rs?.holesCompleted ?? 0) > 0 && (rs?.holesCompleted ?? 0) < 18;
         const toPar = rs?.toPar ?? null;
-        const display = toPar === null ? '—' : fmtScore(toPar);
-        const scoreColor = toPar === null ? inkGhost
-          : isActive ? '#ffffff'
-          : toPar < 0 ? inkSoft
-          : toPar > 0 ? danger
-          : inkFaint;
 
         return (
           <button
@@ -270,35 +260,32 @@ function RoundTabs({
             onClick={() => hasData && onSelect(roundNum)}
             disabled={!hasData}
             style={{
-              flex: 1,
-              display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4,
-              padding: '6px 0 10px',
-              background: 'transparent',
-              border: 'none',
-              borderBottom: isActive ? `2px solid #ffffff` : '2px solid transparent',
-              cursor: hasData ? 'pointer' : 'default',
+              flex: 1, padding: '10px 8px', borderRadius: 10,
+              border: isActive
+                ? `1.5px solid ${isLive ? greenLive : '#fff'}`
+                : `1px solid ${hairlineDark}`,
+              background: isActive ? 'rgba(255,255,255,0.04)' : 'transparent',
+              textAlign: 'center', cursor: hasData ? 'pointer' : 'default',
               opacity: hasData ? 1 : 0.4,
-              transition: 'border-color 0.18s ease',
             }}
           >
-            <span
+            <div
               style={{
-                fontSize: 9, fontWeight: 800,
-                color: isActive ? '#ffffff' : inkFaint,
-                letterSpacing: '0.14em',
+                fontSize: 9, fontWeight: 800, letterSpacing: '0.1em',
+                color: isActive ? (isLive ? greenLive : '#fff') : inkFaint,
               }}
             >
               R{roundNum}
-            </span>
-            <span
+            </div>
+            <div
               style={{
-                fontSize: 17, fontWeight: 800,
-                color: scoreColor,
+                fontSize: 16, fontWeight: 800, marginTop: 3,
+                color: isLive ? greenLive : '#fff',
                 fontVariantNumeric: 'tabular-nums',
               }}
             >
-              {display}
-            </span>
+              {isLive ? 'LIVE' : toPar != null ? fmtScore(toPar) : '—'}
+            </div>
           </button>
         );
       })}
