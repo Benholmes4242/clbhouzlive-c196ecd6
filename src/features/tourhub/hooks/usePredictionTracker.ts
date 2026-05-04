@@ -84,7 +84,8 @@ async function fetchTrackerData(
         trackedPredictions.length + 1,
         lb,
         false,
-        fieldCompletionPct
+        fieldCompletionPct,
+        tournamentId
       ));
     });
   }
