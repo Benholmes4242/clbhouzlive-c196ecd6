@@ -771,6 +771,7 @@ function HeroPick({
   positionAccent = 'amber',
   pulse = false,
   defaultExpanded = false,
+  winProbability = 0,
 }: {
   initials: string;
   name: string;
@@ -782,6 +783,7 @@ function HeroPick({
   positionAccent?: PositionAccent;
   pulse?: boolean;
   defaultExpanded?: boolean;
+  winProbability?: number;
 }) {
   const [expanded, setExpanded] = useState(defaultExpanded);
   const accent =
