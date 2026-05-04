@@ -230,7 +230,14 @@ const ProfilePageV2Content: React.FC = () => {
 
   const profileTypeInfo = getProfileType(profile?.user_type);
   const { isPersonal } = profileTypeInfo;
-  const tabs = getProfileTabs(profile?.user_type);
+  const handicapPromoted = isHandicapPromotedForUser(user?.id);
+  const allTabs = getProfileTabs(profile?.user_type);
+  // When the Handicap promotion flag is on, hide the Handicap tab from the user's
+  // own profile strip — it's now reachable via the dedicated /handicap page.
+  const tabs = useMemo(
+    () => (isSelf && handicapPromoted ? allTabs.filter(t => t.id !== 'stats') : allTabs),
+    [allTabs, isSelf, handicapPromoted]
+  );
 
   const { data: socialCounts, isLoading: socialCountsLoading } = useSocialCounts(profileUserId);
   const followersCount = socialCounts?.followers ?? 0;
