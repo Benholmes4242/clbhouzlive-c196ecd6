@@ -1650,13 +1650,14 @@ function ResultsStateBlock({
     p => p.performanceStatus === 'cut' || p.performanceStatus === 'withdrawn',
   ).length;
 
-  // ── WIN branch ────────────────────────────────────────────────────────────
-  if (topPickWon && topPick) {
-    const others = picks.filter(p => p.playerId !== topPick.playerId);
+  // ── WIN branch: ANY of our 3 picks won ───────────────────────────────────
+  const winningPick = winnerFromTracker;
+  if (winningPick) {
+    const others = picks.filter(p => p.playerId !== winningPick.playerId);
     const second = others
       .filter(p => p.actualPosition !== null)
       .sort((a, b) => a.actualPosition! - b.actualPosition!)[0];
-    const winnerScore = topPick.score ?? 0;
+    const winnerScore = winningPick.score ?? 0;
     const secondScore = second?.score ?? winnerScore;
     const margin = Math.max(0, secondScore - winnerScore);
     const supporting = others.slice(0, 2);
@@ -1670,7 +1671,7 @@ function ResultsStateBlock({
         />
         <FramingSentence text={framingSentence} />
         <EditorialHeadline>
-          <span style={{ color: AMBER_DEEP }}>{winnerFirstName}</span>{' '}
+          <span style={{ color: AMBER_DEEP }}>{getFirstName(winningPick.playerName)}</span>{' '}
           {margin === 0 ? (
             <>won in a playoff.</>
           ) : (
@@ -1684,7 +1685,7 @@ function ResultsStateBlock({
           )}
         </EditorialHeadline>
         <ContextLine>
-          {`TOP PICK WON · ${Math.max(0, numInTop10 - 1)} OTHER PICKS T10 · ${
+          {`OUR PICK WON · ${Math.max(0, numInTop10 - 1)} OTHER PICKS T10 · ${
             missedCutCount === 0 ? 'NO MISSED CUTS' : `${missedCutCount} MISSED CUT${missedCutCount > 1 ? 'S' : ''}`
           }`}
         </ContextLine>
@@ -1693,14 +1694,15 @@ function ResultsStateBlock({
         )}
 
         <HeroPick
-          initials={getInitials(topPick.playerName)}
-          name={topPick.playerName}
+          initials={getInitials(winningPick.playerName)}
+          name={winningPick.playerName}
           subtitle={`Final · 1st · Won by ${margin || 'playoff'}`}
-          pulledQuote={topPick.pulledQuote ?? topPick.reasons[0] ?? null}
-          reasons={topPick.reasons}
+          pulledQuote={winningPick.pulledQuote ?? winningPick.reasons[0] ?? null}
+          reasons={winningPick.reasons}
+          winProbability={winningPick.winProbability}
           defaultExpanded={false}
           position="1"
-          positionLabel={formatScore(topPick.score)}
+          positionLabel={formatScore(winningPick.score)}
           positionAccent="amber"
           pulse={pulse}
         />
@@ -1709,12 +1711,12 @@ function ResultsStateBlock({
           <>
             <SupportingLabel />
             <div>
-              {supporting.map((p, i) => (
+              {supporting.map((p) => (
                 <CompactPick
                   key={p.playerId}
                   initials={getInitials(p.playerName)}
                   name={p.playerName}
-                  tier={i === 0 ? 'STRONG' : 'CONTENTION'}
+                  winProbability={p.winProbability}
                   reason={p.reasons[0]}
                   reasons={p.reasons}
                   position={formatPosition(p)}
