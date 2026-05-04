@@ -1934,6 +1934,7 @@ function UpcomingStateBlock({
           position="—"
           positionLabel="TO PLAY"
           positionAccent="amber"
+          tierLabel="TOP PICK"
         />
       )}
 
@@ -1947,6 +1948,7 @@ function UpcomingStateBlock({
                 initials={getInitials(p.playerName)}
                 name={p.playerName}
                 reason={p.reasons[0]}
+                tierLabel="STRONG CONTENDER"
                 reasons={p.reasons}
                 position="—"
                 positionLabel="TO PLAY"
