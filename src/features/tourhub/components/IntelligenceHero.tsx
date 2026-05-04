@@ -184,14 +184,16 @@ function getInitials(fullName: string): string {
   return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
 }
 
+type MissToneArgs = {
+  winner: string;
+  closest?: string;
+  closestPos?: string;
+};
+
 type MissTone = {
   eyebrow: string;
   eyebrowColor: string;
-  headlineRender: (
-    winnerFirstName: string,
-    ourPickFirstName: string,
-    ourPickPosition: string,
-  ) => React.ReactNode;
+  headlineRender: (args: MissToneArgs) => React.ReactNode;
   contextLine: (numInTop10: number, missedCuts: number) => string;
 };
 
@@ -200,16 +202,16 @@ function getMissTone(outcome: IntelligenceOutcome): MissTone {
     return {
       eyebrow: 'Closest call.',
       eyebrowColor: AMBER_DEEP,
-      headlineRender: (winner, ourPick, ourPos) => (
+      headlineRender: ({ winner, closest, closestPos }) => (
         <>
           {winner} won.{' '}
           <span style={{ color: SLATE_500, fontWeight: 600 }}>
-            {ourPick} took {ourPos}.
+            {closest ?? '—'} took {closestPos ?? '—'}.
           </span>
         </>
       ),
       contextLine: (top10, mc) =>
-        `Strong contender finish · ${top10} pick${top10 !== 1 ? 's' : ''} in T10 · ${
+        `${top10} of 3 in T10 · ${
           mc === 0 ? 'No missed cuts' : `${mc} missed cut${mc > 1 ? 's' : ''}`
         }`,
     };
@@ -218,16 +220,16 @@ function getMissTone(outcome: IntelligenceOutcome): MissTone {
     return {
       eyebrow: 'Solid week.',
       eyebrowColor: SLATE_600,
-      headlineRender: (winner, ourPick, ourPos) => (
+      headlineRender: ({ winner, closest, closestPos }) => (
         <>
           {winner} won.{' '}
           <span style={{ color: SLATE_500, fontWeight: 600 }}>
-            {ourPick} finished {ourPos}.
+            {closest ?? '—'} finished {closestPos ?? '—'}.
           </span>
         </>
       ),
       contextLine: (top10, mc) =>
-        `Top pick in form · ${top10} pick${top10 !== 1 ? 's' : ''} in T10 · ${
+        `${top10} of 3 in T10 · ${
           mc === 0 ? 'No missed cuts' : `${mc} missed cut${mc > 1 ? 's' : ''}`
         }`,
     };
@@ -235,16 +237,16 @@ function getMissTone(outcome: IntelligenceOutcome): MissTone {
   return {
     eyebrow: 'Tough one.',
     eyebrowColor: SLATE_600,
-    headlineRender: (winner, ourPick, ourPos) => (
+    headlineRender: ({ winner }) => (
       <>
-        {winner} won —{' '}
+        {winner} won.{' '}
         <span style={{ color: SLATE_500, fontWeight: 600 }}>
-          we had {ourPick} at {ourPos}.
+          Our three calls fell short.
         </span>
       </>
     ),
     contextLine: (top10, mc) =>
-      `Winner not in top 3 · ${top10} pick${top10 !== 1 ? 's' : ''} in T10 · ${
+      `Winner outside our picks · ${top10} of 3 in T10 · ${
         mc === 0 ? 'No missed cuts' : `${mc} missed cut${mc > 1 ? 's' : ''}`
       }`,
   };
