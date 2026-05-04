@@ -5,15 +5,25 @@ import type { HandicapInsights, SuitedCourse } from './types';
 
 const insightsKey = (cid: string) => ['whs-ai-insights', cid] as const;
 
+const todayKey = () => {
+  const d = new Date();
+  const y = d.getUTCFullYear();
+  const m = String(d.getUTCMonth() + 1).padStart(2, '0');
+  const day = String(d.getUTCDate()).padStart(2, '0');
+  return `${y}-${m}-${day}`;
+};
+
 async function fetchCachedInsights(connectionId: string): Promise<{
   insights: HandicapInsights | null;
   cachedScoreId: string | null;
   latestScoreId: string | null;
+  cachedDateKey: string | null;
+  todayKey: string;
 }> {
   const [{ data: row }, { data: latest }] = await Promise.all([
     supabase
       .from('whs_ai_insights')
-      .select('scoring_profile, rounds_pattern, suited_courses, test_courses, generated_from_score_id, generated_at')
+      .select('scoring_profile, rounds_pattern, suited_courses, test_courses, generated_from_score_id, generated_at, date_key')
       .eq('connection_id', connectionId)
       .maybeSingle(),
     supabase
@@ -40,6 +50,8 @@ async function fetchCachedInsights(connectionId: string): Promise<{
     insights,
     cachedScoreId: (row?.generated_from_score_id as string) ?? null,
     latestScoreId: (latest?.id as string) ?? null,
+    cachedDateKey: ((row as any)?.date_key as string) ?? null,
+    todayKey: todayKey(),
   };
 }
 
@@ -57,10 +69,12 @@ export function useHandicapInsights(connectionId: string | undefined) {
 
   useEffect(() => {
     if (!connectionId || !query.data) return;
-    const { insights, cachedScoreId, latestScoreId } = query.data;
+    const { insights, cachedScoreId, latestScoreId, cachedDateKey, todayKey: today } = query.data;
     if (!latestScoreId) return; // no rounds
-    const cacheValid = insights && cachedScoreId === latestScoreId;
-    if (cacheValid || generating) return;
+    const scoreFresh = insights && cachedScoreId === latestScoreId;
+    const dateFresh = cachedDateKey === today;
+    if (scoreFresh && dateFresh) return;
+    if (generating) return;
 
     let cancelled = false;
     (async () => {
@@ -86,13 +100,14 @@ export function useHandicapInsights(connectionId: string | undefined) {
       cancelled = true;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [connectionId, query.data?.cachedScoreId, query.data?.latestScoreId]);
+  }, [connectionId, query.data?.cachedScoreId, query.data?.latestScoreId, query.data?.cachedDateKey]);
 
   const data = query.data?.insights ?? null;
   const cacheStale =
     !!query.data &&
     query.data.latestScoreId &&
-    query.data.cachedScoreId !== query.data.latestScoreId;
+    (query.data.cachedScoreId !== query.data.latestScoreId ||
+      query.data.cachedDateKey !== query.data.todayKey);
 
   return {
     data: cacheStale ? null : data,
