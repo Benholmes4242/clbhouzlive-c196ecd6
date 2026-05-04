@@ -557,7 +557,7 @@ function UpcomingCard({ pick }: { pick: UpcomingPick }) {
             fontFamily: headlineFont,
           }}
         >
-          <Clock size={10} strokeWidth={3} /> To Play
+          <Clock size={10} strokeWidth={3} /> Upcoming
         </div>
         <div
           style={{
