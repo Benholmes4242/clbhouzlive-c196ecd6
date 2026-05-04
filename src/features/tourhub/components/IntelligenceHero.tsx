@@ -1460,7 +1460,7 @@ export const IntelligenceHero = memo(function IntelligenceHero() {
         </Carousel>
       )}
 
-      <IntelligenceAboutSheet
+      <IntelligenceSheet
         open={aboutOpen}
         onClose={handleCloseAbout}
         trackRecord={{ wins: stats.wins, topFives: stats.topFives }}
