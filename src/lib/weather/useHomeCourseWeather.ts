@@ -3,7 +3,7 @@
  * home golf club. Falls back to the geocode-club edge function when the
  * club row is missing lat/lng.
  */
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import type { ClubLocation, WeatherData } from './types';
 import { WMO_WEATHER_CODES } from './types';
@@ -47,6 +47,8 @@ async function geocodeClubViaEdgeFunction(
 }
 
 export function useHomeCourseWeather(club: ClubLocation | null) {
+  const queryClient = useQueryClient();
+
   return useQuery<WeatherData | null>({
     queryKey: ['home-course-weather', club?.id],
     enabled: !!club?.id,
@@ -64,6 +66,10 @@ export function useHomeCourseWeather(club: ClubLocation | null) {
         if (!geocoded) return null;
         lat = geocoded.latitude;
         lng = geocoded.longitude;
+
+        // Invalidate the parent club query so freshly-geocoded coords are
+        // visible to any other consumer reading the same cache.
+        queryClient.invalidateQueries({ queryKey: ['morning-moment-club'] });
       }
 
       return fetchOpenMeteo(lat, lng);

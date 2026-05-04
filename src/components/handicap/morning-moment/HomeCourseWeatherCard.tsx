@@ -31,17 +31,27 @@ interface Props {
 const HomeCourseWeatherCard: React.FC<Props> = ({ club, userId }) => {
   const { data: weather, isLoading, isError } = useHomeCourseWeather(club);
 
-  // Telemetry: weather couldn't resolve
+  // Telemetry: weather couldn't resolve. Fire at most once per mount, only
+  // after the query has settled into an unresolvable state.
+  const hasFiredUnresolved = React.useRef(false);
+
   React.useEffect(() => {
-    if (!isLoading && (isError || !weather)) {
+    if (isLoading) return;
+    if (hasFiredUnresolved.current) return;
+
+    if (isError || (!weather && !isLoading)) {
+      hasFiredUnresolved.current = true;
       analyticsEvents.track('morning_moment_weather_unresolved', {
         user_id: userId,
         club_id: club.id,
-        reason: club.latitude === null || club.longitude === null ? 'geocode_failed' : 'no_match',
+        reason:
+          club.latitude === null || club.longitude === null
+            ? 'geocode_failed'
+            : 'no_match',
       });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isLoading, isError, !!weather]);
+  }, [isLoading, isError, weather, club.id]);
 
   if (!isLoading && (isError || !weather)) {
     return null;

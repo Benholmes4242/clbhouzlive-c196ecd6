@@ -4,6 +4,7 @@
  */
 import { useQuery } from '@tanstack/react-query';
 import { fetchFriendsActivity } from '@/lib/whs/api';
+// score field is non-null in the result because we filter null grosses out below.
 
 export interface FriendYesterday {
   user_id: string | null;
@@ -47,7 +48,16 @@ export function useFriendsYesterday(ownerUserId: string) {
 
       const playedYesterday = activity.filter((f) => {
         const playedDate = toLocalDateKey(f.last_round_played_at);
-        return playedDate === yesterday;
+        if (playedDate !== yesterday) return false;
+        // Filter out friends without a real gross score — they don't belong
+        // in the "shot X — best of the group" standout line.
+        if (
+          f.last_round_adjusted_gross === null ||
+          f.last_round_adjusted_gross === undefined
+        ) {
+          return false;
+        }
+        return true;
       });
 
       playedYesterday.sort((a, b) => {
