@@ -692,8 +692,6 @@ export function PlayerScorecardCard({
             <span
               style={{
                 fontSize: 48, fontWeight: 800, letterSpacing: '-0.04em',
-              style={{
-                fontSize: 48, fontWeight: 800, letterSpacing: '-0.04em',
                 color: (isCompleted && (player.position === 1 || String(player.position) === '1')) ? gold : '#fff',
                 lineHeight: 0.9,
                 fontVariantNumeric: 'tabular-nums',
