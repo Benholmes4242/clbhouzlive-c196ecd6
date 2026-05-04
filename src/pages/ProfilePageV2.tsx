@@ -68,6 +68,7 @@ import Top100MyProgressPanel from '@/components/courses/Top100MyProgressPanel';
 import AchievementsPane from '@/components/profile/AchievementsPane';
 import HandicapSection from '@/components/profile/HandicapSection';
 import { isHandicapPromotedForUser } from '@/config/featureFlags';
+import { analyticsEvents } from '@/utils/analyticsEvents';
 import ClubsCard from '@/components/profile/clubs/ClubsCard';
 import { useProfileClubs } from '@/components/profile/hooks/useProfileClubs';
 import { GolfJourneyProgress } from '@/components/profile/phase6';
@@ -242,6 +243,7 @@ const ProfilePageV2Content: React.FC = () => {
   // Redirect own-profile Handicap deep links to the dedicated /handicap page when promoted.
   useEffect(() => {
     if (isSelf && handicapPromoted && activeSection === 'stats') {
+      analyticsEvents.track?.('handicap_legacy_redirect_fired', { source: 'profile_stats_tab' });
       navigate('/handicap', { replace: true });
     }
   }, [isSelf, handicapPromoted, activeSection, navigate]);
