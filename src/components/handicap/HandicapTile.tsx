@@ -78,25 +78,27 @@ function HandicapTile({ userId, onClick }: HandicapTileProps) {
       }}
       aria-label={`Handicap ${displayValue}`}
     >
-      {/* NEW badge */}
-      <span
-        style={{
-          position: 'absolute',
-          top: -6,
-          right: -6,
-          padding: '3px 8px',
-          borderRadius: 999,
-          background: AMBER,
-          color: '#fff',
-          fontSize: 9,
-          fontWeight: 800,
-          letterSpacing: '0.10em',
-          boxShadow: '0 2px 6px rgba(247,147,30,0.40)',
-          lineHeight: 1,
-        }}
-      >
-        NEW
-      </span>
+      {/* NEW badge — auto-hides 60 days after launch */}
+      {showNewBadge && (
+        <span
+          style={{
+            position: 'absolute',
+            top: -6,
+            right: -6,
+            padding: '3px 8px',
+            borderRadius: 999,
+            background: AMBER,
+            color: '#fff',
+            fontSize: 9,
+            fontWeight: 800,
+            letterSpacing: '0.10em',
+            boxShadow: '0 2px 6px rgba(247,147,30,0.40)',
+            lineHeight: 1,
+          }}
+        >
+          NEW
+        </span>
+      )}
 
       {/* Top row: icon + value */}
       <div className="flex items-center justify-between w-full">
