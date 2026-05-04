@@ -353,7 +353,6 @@ function BackedByResultsCard({ wins, topFives }: { wins: number; topFives: numbe
   return (
     <div
       style={{
-        marginTop: 20,
         background: AMBER_SOFT,
         borderRadius: 16,
         padding: '16px 16px 14px',
