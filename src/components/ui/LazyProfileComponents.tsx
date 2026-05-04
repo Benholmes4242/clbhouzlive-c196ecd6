@@ -7,7 +7,7 @@ export const LazyProfileCoursesTab = lazy(() =>
   import('@/components/profile/ProfileCoursesTab').then(m => ({ default: m.ProfileCoursesTab }))
 );
 
-export const LazyHandicapSection = lazy(() => import('@/components/profile/HandicapSection'));
+// LazyHandicapSection removed — handicap is now a top-level page (/handicap).
 export const LazyProfileSectionCarousel = lazy(() => import('@/components/profile/ProfileSectionCarousel'));
 export const LazyLatestHighlights = lazy(() => import('@/components/courses/highlights/LatestHighlights'));
 // Temporarily disabled due to type conflicts during media system migration

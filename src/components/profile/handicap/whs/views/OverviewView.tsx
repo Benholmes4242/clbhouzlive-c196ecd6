@@ -9,6 +9,8 @@ interface Props {
   userId: string;
   currentHandicap: number | null;
   connectionCreatedAt: string;
+  /** When true, hides personal-only sections (Echo Insights, Head-to-Head). */
+  readOnly?: boolean;
 }
 
 export const OverviewView: React.FC<Props> = ({
@@ -16,6 +18,7 @@ export const OverviewView: React.FC<Props> = ({
   userId,
   currentHandicap,
   connectionCreatedAt,
+  readOnly = false,
 }) => {
   return (
     <div
@@ -25,7 +28,8 @@ export const OverviewView: React.FC<Props> = ({
     >
       <LastRoundCard connectionId={connectionId} />
       <RoundsThatCountCard connectionId={connectionId} currentHandicap={currentHandicap} />
-      <EchoInsightsCard connectionId={connectionId} />
+      {/* Echo Insights is an AI read of *your* game — hide on friend pages. */}
+      {!readOnly && <EchoInsightsCard connectionId={connectionId} />}
       <AchievementsStrip
         connectionId={connectionId}
         connectionCreatedAt={connectionCreatedAt}

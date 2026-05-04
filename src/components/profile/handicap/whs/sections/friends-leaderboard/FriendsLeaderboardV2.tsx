@@ -22,6 +22,7 @@ import LeaderboardScopeChips from './LeaderboardScopeChips';
 import LeaderboardRow from './LeaderboardRow';
 import PodiumStack from './PodiumStack';
 import EmptyScopeState from './EmptyScopeState';
+import { analyticsEvents } from '@/utils/analyticsEvents';
 
 interface Props {
   ownerUserId: string;
@@ -228,10 +229,16 @@ export const FriendsLeaderboardV2: React.FC<Props> = ({
             if (item.friend.is_clbhouz_user && item.friend.friend_user_id) {
               // From your own leaderboard → friend's handicap context.
               // From a friend's leaderboard (readOnly) → their personal profile.
-              const target = readOnly
-                ? `/p/${item.friend.friend_user_id}`
-                : `/handicap/${item.friend.friend_user_id}`;
-              navigate(target);
+              if (readOnly) {
+                navigate(`/p/${item.friend.friend_user_id}`);
+              } else {
+                analyticsEvents.track?.('friend_handicap_page_viewed', {
+                  viewer_id: ownerUserId,
+                  friend_id: item.friend.friend_user_id,
+                  source: 'friends_leaderboard',
+                });
+                navigate(`/handicap/${item.friend.friend_user_id}`);
+              }
             } else if (!readOnly) {
               handleInvite(item.friend);
             }

@@ -149,6 +149,7 @@ export const HandicapDashboard: React.FC<Props> = ({ connection, userId, readOnl
             userId={userId}
             currentHandicap={currentHandicap}
             connectionCreatedAt={connection.created_at}
+            readOnly={readOnly}
           />
         )}
         {activeSubtab === 'trends' && (
@@ -156,6 +157,7 @@ export const HandicapDashboard: React.FC<Props> = ({ connection, userId, readOnl
             connectionId={connection.id}
             userId={userId}
             currentHandicap={currentHandicap}
+            readOnly={readOnly}
           />
         )}
         {activeSubtab === 'friends' && (

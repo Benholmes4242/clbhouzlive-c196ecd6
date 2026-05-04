@@ -13,7 +13,7 @@
 
 import React, { useCallback, useEffect, useMemo } from 'react';
 import { useNavigate, Navigate, useSearchParams, useParams } from 'react-router-dom';
-import { ChevronLeft, MoreHorizontal } from 'lucide-react';
+import { ChevronLeft, ChevronRight, MoreHorizontal } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { PageRoot } from '@/components/layout/PageRoot';
@@ -51,7 +51,117 @@ interface HeaderProps {
   readOnly: boolean;
   activeTab: HandicapSubtab;
   onTabChange: (tab: HandicapSubtab) => void;
+  /** Friend mode: avatar URL for the tappable title row. */
+  friendAvatarUrl?: string | null;
+  /** Friend mode: username for /profile/:username navigation. */
+  friendUsername?: string | null;
+  /** Friend mode: viewer id for analytics. */
+  viewerUserId?: string;
 }
+
+// ───────────────────────────────────────────────────────────────────────
+// FriendTitleRow — tappable avatar + name + chevron acting as the
+// "Visit profile" CTA in friend mode (Option D).
+// ───────────────────────────────────────────────────────────────────────
+const FriendTitleRow: React.FC<{
+  displayName: string | null;
+  avatarUrl: string | null | undefined;
+  username: string | null | undefined;
+  friendId: string;
+  viewerUserId: string | undefined;
+}> = ({ displayName, avatarUrl, username, friendId, viewerUserId }) => {
+  const navigate = useNavigate();
+  const profileTarget = username ? `/profile/${username}` : `/profile/${friendId}`;
+  const initial = (displayName?.charAt(0) ?? '?').toUpperCase();
+
+  const handleTap = () => {
+    analyticsEvents.track?.('friend_handicap_profile_tap', {
+      viewer_id: viewerUserId,
+      friend_id: friendId,
+    });
+    navigate(profileTarget);
+  };
+
+  return (
+    <button
+      onClick={handleTap}
+      aria-label={`View ${displayName ?? 'player'}'s profile`}
+      style={{
+        display: 'flex',
+        alignItems: 'center',
+        gap: 12,
+        width: '100%',
+        padding: 0,
+        background: 'transparent',
+        border: 'none',
+        cursor: 'pointer',
+        textAlign: 'left',
+      }}
+    >
+      {avatarUrl ? (
+        <img
+          src={avatarUrl}
+          alt=""
+          style={{
+            width: 40, height: 40, borderRadius: '50%',
+            objectFit: 'cover',
+            flexShrink: 0,
+          }}
+        />
+      ) : (
+        <div
+          style={{
+            width: 40, height: 40, borderRadius: '50%',
+            background: `linear-gradient(135deg, ${AMBER}, ${AMBER_INK})`,
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            color: '#fff', fontWeight: 700, fontSize: 16,
+            fontFamily: FONT_GEIST,
+            flexShrink: 0,
+          }}
+        >
+          {initial}
+        </div>
+      )}
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <div
+          style={{
+            fontSize: 11, fontWeight: 800, color: INK_55,
+            letterSpacing: '0.22em', marginBottom: 2,
+            fontFamily: FONT_GEIST,
+          }}
+        >
+          HANDICAP
+        </div>
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 4,
+            minWidth: 0,
+          }}
+        >
+          <span
+            style={{
+              fontFamily: FONT_GEIST,
+              fontSize: 22,
+              fontWeight: 700,
+              color: INK,
+              lineHeight: 1.15,
+              letterSpacing: '-0.01em',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              whiteSpace: 'nowrap',
+              minWidth: 0,
+            }}
+          >
+            {displayName ?? 'Player'}
+          </span>
+          <ChevronRight size={18} strokeWidth={2.2} color={INK_55} style={{ flexShrink: 0 }} />
+        </div>
+      </div>
+    </button>
+  );
+};
 
 const HandicapPageHeader: React.FC<HeaderProps> = ({
   ownerUserId,
@@ -59,6 +169,9 @@ const HandicapPageHeader: React.FC<HeaderProps> = ({
   readOnly,
   activeTab,
   onTabChange,
+  friendAvatarUrl,
+  friendUsername,
+  viewerUserId,
 }) => {
   const navigate = useNavigate();
   const { data: connection } = useWhsConnection(ownerUserId);
@@ -165,23 +278,35 @@ const HandicapPageHeader: React.FC<HeaderProps> = ({
       </div>
 
       {/* Row 2 — title */}
-      <div style={{ padding: '14px 20px 18px' }}>
-        <div style={{
-          fontSize: 11, fontWeight: 800, color: INK_55,
-          letterSpacing: '0.22em', marginBottom: 6,
-          fontFamily: FONT_GEIST,
-        }}>
-          {eyebrow}
+      {readOnly ? (
+        <div style={{ padding: '12px 20px 16px' }}>
+          <FriendTitleRow
+            displayName={displayName}
+            avatarUrl={friendAvatarUrl}
+            username={friendUsername}
+            friendId={ownerUserId}
+            viewerUserId={viewerUserId}
+          />
         </div>
-        <h1 style={{
-          fontFamily: FONT_GEIST,
-          fontSize: 28, fontWeight: 700, color: INK,
-          lineHeight: 1.1, letterSpacing: '-0.02em',
-          margin: 0,
-        }}>
-          {title}
-        </h1>
-      </div>
+      ) : (
+        <div style={{ padding: '14px 20px 18px' }}>
+          <div style={{
+            fontSize: 11, fontWeight: 800, color: INK_55,
+            letterSpacing: '0.22em', marginBottom: 6,
+            fontFamily: FONT_GEIST,
+          }}>
+            {eyebrow}
+          </div>
+          <h1 style={{
+            fontFamily: FONT_GEIST,
+            fontSize: 28, fontWeight: 700, color: INK,
+            lineHeight: 1.1, letterSpacing: '-0.02em',
+            margin: 0,
+          }}>
+            {title}
+          </h1>
+        </div>
+      )}
 
       {/* Row 3 — segmented control */}
       <div style={{
@@ -266,14 +391,20 @@ const HandicapPage: React.FC = () => {
   }, [searchParams, setSearchParams]);
 
   // Fetch profile for greeting/title.
-  const { data: profile } = useQuery<{ first_name: string | null; full_name: string | null; username: string | null } | null>({
+  // Schema note: user_profiles has only `username` and `profile_photo_url`
+  // for our purposes — no first_name/full_name. Display name is derived
+  // from username (the existing handicap UI already does this elsewhere).
+  const { data: profile } = useQuery<{
+    username: string | null;
+    profile_photo_url: string | null;
+  } | null>({
     queryKey: ['handicap-page-profile', ownerUserId],
     enabled: !!ownerUserId,
     staleTime: 5 * 60_000,
     queryFn: async () => {
       const { data, error } = await (supabase as any)
         .from('user_profiles')
-        .select('first_name, full_name, username')
+        .select('username, profile_photo_url')
         .eq('id', ownerUserId!)
         .maybeSingle();
       if (error) throw error;
@@ -282,30 +413,26 @@ const HandicapPage: React.FC = () => {
   });
 
   const displayName = useMemo(() => {
-    if (isFriendView) {
-      // Friend mode: prefer full name, fall back to first or username.
-      const full = profile?.full_name?.trim();
-      if (full) return full;
-      const fn = (profile as any)?.first_name?.trim();
-      if (fn) return fn;
-      return profile?.username ?? null;
-    }
-    // Own mode: greeting uses first name only.
-    const fn = (profile as any)?.first_name?.trim();
-    if (fn) return fn;
-    const full = profile?.full_name?.trim();
-    if (full) return full.split(/\s+/)[0];
-    return null;
-  }, [profile, isFriendView]);
+    // Both modes: derive from username; in own mode we just use the
+    // username as the greeting "first name" since no first_name exists.
+    return profile?.username ?? null;
+  }, [profile]);
 
   useEffect(() => {
-    if (ownerUserId) {
+    if (!ownerUserId) return;
+    if (isFriendView) {
+      analyticsEvents.track?.('friend_handicap_page_viewed', {
+        viewer_id: user?.id,
+        friend_id: ownerUserId,
+        source: 'route',
+      });
+    } else {
       analyticsEvents.track?.('handicap_page_viewed', {
         source: 'route',
-        mode: isFriendView ? 'friend' : 'own',
+        mode: 'own',
       });
     }
-  }, [ownerUserId, isFriendView]);
+  }, [ownerUserId, isFriendView, user?.id]);
 
   if (loading) {
     return <PageRoot><div /></PageRoot>;
@@ -332,6 +459,9 @@ const HandicapPage: React.FC = () => {
         readOnly={isFriendView}
         activeTab={activeTab}
         onTabChange={handleTabChange}
+        friendAvatarUrl={isFriendView ? profile?.profile_photo_url : null}
+        friendUsername={isFriendView ? profile?.username : null}
+        viewerUserId={user.id}
       />
       <main>
         {!isFriendView && <MorningMoment userId={user.id} />}
