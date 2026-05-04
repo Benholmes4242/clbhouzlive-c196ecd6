@@ -164,16 +164,27 @@ function parseModelResponse(rawResponse: string, modelName: string): { picks: Mo
     const parsed = JSON.parse(json);
     const contenders = parsed.topContenders || parsed.top_contenders || parsed.picks || [];
 
-    const picks = contenders.slice(0, 8).map((c: any, i: number) => ({
-      playerId: c.playerId || c.player_id || '',
-      playerName: c.playerName || c.player_name || c.name || 'Unknown',
-      rank: c.rank || i + 1,
-      winProbability: c.winProbability || c.win_probability || 0,
-      courseFitScore: c.courseFitScore || c.course_fit_score || 50,
-      reasons: (c.reasons || []).slice(0, 3).map((r: any) =>
-        typeof r === 'string' ? r : r.text || r.reason || ''
-      ),
-    }));
+    const picks = contenders.slice(0, 8).map((c: any, i: number) => {
+      // TEMP — diagnostic logging for course-fit audit. Remove after one run.
+      console.log('[fit-debug]', JSON.stringify({
+        model: modelName,
+        player: c.playerName || c.player_name || c.name,
+        rank: c.rank ?? i + 1,
+        rawCfs: c.courseFitScore,
+        rawSnakeCase: c.course_fit_score,
+        type: typeof c.courseFitScore,
+      }));
+      return {
+        playerId: c.playerId || c.player_id || '',
+        playerName: c.playerName || c.player_name || c.name || 'Unknown',
+        rank: c.rank || i + 1,
+        winProbability: c.winProbability || c.win_probability || 0,
+        courseFitScore: c.courseFitScore || c.course_fit_score || 50,
+        reasons: (c.reasons || []).slice(0, 3).map((r: any) =>
+          typeof r === 'string' ? r : r.text || r.reason || ''
+        ),
+      };
+    });
 
     return {
       picks,
