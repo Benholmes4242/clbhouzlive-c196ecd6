@@ -650,7 +650,7 @@ function TournamentCard({
               color: chip.fg,
             }}
           >
-            {chip.icon && <Trophy size={10} color={chip.fg} fill={chip.fg} />}
+            {chip.icon && <Trophy size={10} color={chip.fg} />}
             {chip.label}
           </span>
           <ChevronRight size={16} color={SLATE_400} strokeWidth={2.2} />
@@ -718,7 +718,7 @@ function PickMiniRow({
         >
           {pick.playerName}
         </span>
-        {isWinner && <Trophy size={13} color={GOLD_DEEP} fill={GOLD} style={{ flexShrink: 0 }} />}
+        {isWinner && <Trophy size={13} color={GOLD_DEEP} style={{ flexShrink: 0 }} />}
       </div>
       <span
         style={{
