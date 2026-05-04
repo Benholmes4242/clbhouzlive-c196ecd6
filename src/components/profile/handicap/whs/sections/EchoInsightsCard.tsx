@@ -16,7 +16,6 @@ const AMBER_DEEP = '#C97211';
 const AMBER_INK = '#9A6116';
 const GREEN = '#059669';
 const FONT_SERIF = 'Georgia, "Times New Roman", serif';
-const FONT_DISPLAY = 'SF Pro Display, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
 
 interface Props {
   connectionId: string;
