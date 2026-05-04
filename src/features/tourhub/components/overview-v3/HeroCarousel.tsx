@@ -1315,7 +1315,19 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
                   transition={{ duration: 0.22, ease: [0.19, 1, 0.22, 1] }}
                   style={{ overflow: 'hidden', flex: 1, display: 'flex', flexDirection: 'column' as const, minHeight: 0 }}
                 >
-                {selectedPlayer ? (
+                {isExpanded && !selectedPlayer ? (
+                  <EditorialResultsHero
+                    tournament={{
+                      id: tournament.id,
+                      name: tournament.name,
+                      tourSlug: tournament.tourSlug,
+                      venueName: tournament.venueName,
+                      venueCity: tournament.venueCity,
+                    }}
+                    finishers={allFetchedData}
+                    onPlayerTap={handleScorecardTap}
+                  />
+                ) : selectedPlayer ? (
                   <motion.div
                     key="completed-scorecard"
                     initial={{ opacity: 0, x: 60 }}
