@@ -574,8 +574,8 @@ export function EditorialResultsHero({
 
   const nonWinners = finishers.filter((f) => f.position > (winner?.position ?? 1));
   const podium = nonWinners.filter((f) => f.position <= 3).slice(0, 2);
-  const podiumIds = new Set(podium.map((p) => p.playerId));
-  const chasers = nonWinners.filter((f) => !podiumIds.has(p_id(f))).slice(0, 8);
+  const podiumKeys = new Set(podium.map(p_id));
+  const chasers = nonWinners.filter((f) => !podiumKeys.has(p_id(f))).slice(0, 8);
 
   const handleFinisherTap = useCallback(
     (f: TournamentFinisher) => {
