@@ -1484,6 +1484,7 @@ export const IntelligenceHero = memo(function IntelligenceHero() {
       <SectionHeader
         meta={meta}
         headline={headline}
+        tournamentName={headlineTournamentName}
         onAboutClick={handleOpenAbout}
       />
 
