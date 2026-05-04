@@ -36,6 +36,8 @@ const GREEN_ACCENT = '#2DBB78';
 const AMBER = '#F7931E';
 const AMBER_DEEP = '#D97706';
 const AMBER_SOFT = '#FEF3E7';
+const GOLD = '#FFB800';
+const GOLD_DEEP = '#D97706';
 const SLATE_900 = '#0F172A';
 const SLATE_600 = '#475569';
 const SLATE_500 = '#64748B';
@@ -476,7 +478,7 @@ function matchesFilter(outcome: IntelligenceOutcome, filter: FilterKey): boolean
 
 function outcomeChipStyle(outcome: IntelligenceOutcome): { bg: string; fg: string; label: string; icon?: boolean } {
   switch (outcome) {
-    case 'win':     return { bg: AMBER, fg: SLATE_900, label: 'WIN', icon: true };
+    case 'win':     return { bg: GOLD, fg: SLATE_900, label: 'WIN', icon: true };
     case 'top5':    return { bg: GREEN_ACCENT, fg: '#ffffff', label: 'TOP 5' };
     case 'partial': return { bg: 'rgba(16,185,129,0.85)', fg: '#ffffff', label: 'TOP 10' };
     case 'miss':    return { bg: 'rgba(15,23,42,0.55)', fg: '#ffffff', label: 'MISS' };
@@ -588,12 +590,12 @@ function TournamentCard({
   const cardBorder = isMajorTournament
     ? '1.5px solid rgba(247,147,30,0.55)'
     : isWin
-      ? '1.5px solid rgba(247,147,30,0.3)'
+      ? `1.5px solid ${GOLD}`
       : `1px solid ${SLATE_200}`;
   const cardShadow = isMajorTournament
     ? '0 4px 14px -6px rgba(247,147,30,0.18)'
     : isWin
-      ? '0 4px 16px -4px rgba(247,147,30,0.15)'
+      ? '0 4px 16px -4px rgba(255,184,0,0.25)'
       : '0 2px 8px -2px rgba(15,23,42,0.04)';
 
   return (
@@ -682,7 +684,7 @@ function PickMiniRow({
 }) {
   const isWinner = pick.actualPosition === 1;
   const isMissedCut = pick.status?.toLowerCase() === 'cut';
-  const positionColor = isWinner ? AMBER : isMissedCut ? SLATE_500 : SLATE_900;
+  const positionColor = isWinner ? GOLD_DEEP : isMissedCut ? SLATE_500 : SLATE_900;
 
   return (
     <div
@@ -692,8 +694,8 @@ function PickMiniRow({
         gap: 10,
         padding: '6px 8px 6px 9px',
         borderRadius: 8,
-        background: isWinner ? 'rgba(247,147,30,0.05)' : 'transparent',
-        borderLeft: isWinner ? `3px solid ${AMBER}` : '3px solid transparent',
+        background: isWinner ? 'rgba(255,184,0,0.08)' : 'transparent',
+        borderLeft: isWinner ? `3px solid ${GOLD}` : '3px solid transparent',
       }}
     >
       <PlayerAvatar
@@ -716,7 +718,7 @@ function PickMiniRow({
         >
           {pick.playerName}
         </span>
-        {isWinner && <Trophy size={13} color={AMBER} fill={AMBER} style={{ flexShrink: 0 }} />}
+        {isWinner && <Trophy size={13} color={GOLD_DEEP} fill={GOLD} style={{ flexShrink: 0 }} />}
       </div>
       <span
         style={{
