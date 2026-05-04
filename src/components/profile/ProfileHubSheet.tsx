@@ -14,6 +14,7 @@ import {
   User, MessageCircle, Bell,
   Pencil, Building2, Settings as SettingsIcon,
 } from 'lucide-react';
+import HandicapTile from '@/components/handicap/HandicapTile';
 import { cn } from '@/lib/utils';
 import { useUnreadNotifications } from '@/hooks/useUnreadNotifications';
 import GlobalSearchOverlay from '@/components/search/GlobalSearchOverlay';
@@ -206,35 +207,40 @@ function ProfileHubSheet({
 
   const activeProfile = profiles.find(p => p.id === localActiveId) || currentActor;
 
-  // ── Quick actions config ──
+  // ── Quick actions config (Echo / Messages / Notifications — Handicap is rendered separately) ──
   const quickActions = [
     {
-      Icon: User,
-      iconColor: '#3B82F6',
-      label: 'View Profile',
-      route: `/profile/${localActiveId}`,
+      key: 'echo' as const,
+      label: 'Echo',
+      sub: 'Ask anything',
+      route: '/echo',
       badge: 0,
       badgeColor: '',
     },
     {
+      key: 'messages' as const,
       Icon: MessageCircle,
       iconColor: '#10B981',
       label: 'Messages',
+      sub: unreadMessageCount > 0 ? `${unreadMessageCount} unread` : 'No new messages',
       route: '/messages',
       badge: unreadMessageCount,
       badgeColor: 'emerald',
     },
     {
+      key: 'notifications' as const,
       Icon: Bell,
-      iconColor: '#F7931E',
+      iconColor: '#0F172A',
       label: 'Notifications',
+      sub: unreadNotificationCount > 0 ? `${unreadNotificationCount} new` : 'No new notifications',
       route: '/notificationmessages',
       badge: unreadNotificationCount,
-      badgeColor: 'amber',
+      badgeColor: 'red',
     },
   ];
 
   const accountRows = [
+    { Icon: User, iconColor: '#3B82F6', label: 'View profile', route: `/profile/${localActiveId}` },
     { Icon: Pencil, iconColor: '#F7931E', label: 'Edit profile', route: editRoute },
     { Icon: Building2, iconColor: '#0A5A3C', label: 'Manage business profiles', route: '/businesses/manage' },
     { Icon: SettingsIcon, iconColor: '#64748B', label: 'Settings', route: '/settings' },
@@ -322,37 +328,7 @@ function ProfileHubSheet({
                 </button>
               </div>
 
-              {/* ── Echo AI Assistant — Discover-style light card ── */}
-              <button
-                type="button"
-                onClick={() => handleNav('/echo')}
-                className="w-full flex items-center gap-3 active:scale-[0.98] transition-all duration-150 mb-3"
-                style={{
-                  padding: '11px 13px',
-                  borderRadius: 12,
-                  background: 'rgba(247,147,30,0.08)',
-                  border: '1px solid rgba(247,147,30,0.20)',
-                  cursor: 'pointer',
-                  textAlign: 'left',
-                }}
-              >
-                {/* Echo icon */}
-                <div style={{
-                  width: 32, height: 32, borderRadius: 9,
-                  background: 'linear-gradient(135deg, #F7931E, #E8920A)',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
-                }}>
-                  <AnimatedEchoWave size={16} color="#ffffff" active={true} />
-                </div>
-                {/* Text */}
-                <div className="flex-1 min-w-0">
-                  <div className="text-[13px] font-bold text-foreground truncate">Echo AI Assistant</div>
-                  <div className="text-[11px] text-muted-foreground truncate">Playing tips · course knowledge · advice</div>
-                </div>
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-muted-foreground flex-shrink-0">
-                  <path d="m9 18 6-6-6-6"/>
-                </svg>
-              </button>
+              {/* Echo banner removed — Echo now lives as a tile in the 2×2 grid below */}
 
               {/* ── Switch profile ── */}
               <div>
