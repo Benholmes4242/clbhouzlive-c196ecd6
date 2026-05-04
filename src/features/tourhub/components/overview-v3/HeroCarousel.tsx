@@ -16,8 +16,7 @@ import type { PlayerInfo } from '@/components/tourhub/PlayerScorecardCard';
 import { Link, useNavigate } from 'react-router-dom';
 import { tournamentRoute } from '../../routes';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronDown, ChevronRight, Trophy, MapPin, ArrowUp, ArrowDown } from 'lucide-react';
-import { greenLive, gold, inkFaint, inkSoft, hairlineDark, ink, SHIMMER_KEYFRAMES } from '@/features/tourhub/utils/heroAtmosphere';
+import { ChevronDown, ChevronRight, Trophy } from 'lucide-react';
 
 import { cn } from '@/lib/utils';
 import { 
@@ -489,9 +488,7 @@ function MiniLeaderboardRow({ leader, isFirst, index, isActive, isLeader, scoreF
       transition={{ duration: 0.35, delay: index * 0.08, ease: [0.16, 1, 0.3, 1] }}
       className={cn(
         "leaderboard-row flex items-center justify-between",
-        isLeader && "leader-row-highlight",
-        positionDelta > 0 && "row-pulse-up",
-        positionDelta < 0 && "row-pulse-down"
+        isLeader && "leader-row-highlight"
       )}
     >
       <div className="flex items-center gap-2 min-w-0 flex-1">
@@ -517,14 +514,10 @@ function MiniLeaderboardRow({ leader, isFirst, index, isActive, isLeader, scoreF
         {leader.scoreDisplay}
       </span>
       {positionDelta > 0 && (
-        <span className="movement-pill movement-up" aria-label={`Up ${positionDelta}`}>
-          <ArrowUp /> {positionDelta}
-        </span>
+        <span className="movement-up">▲{positionDelta}</span>
       )}
       {positionDelta < 0 && (
-        <span className="movement-pill movement-down" aria-label={`Down ${Math.abs(positionDelta)}`}>
-          <ArrowDown /> {Math.abs(positionDelta)}
-        </span>
+        <span className="movement-down">▼{Math.abs(positionDelta)}</span>
       )}
     </motion.div>
   );
@@ -977,97 +970,82 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
             {/* ─── Tournament header — hidden when scorecard is open ─── */}
             {!selectedPlayer && (
               isCompleted ? (
-                /* ── Editorial broadcast header — gold FINAL pill, tournament title, venue ── */
                 <div style={{
                   flexShrink: 0,
                   paddingTop: 'calc(max(env(safe-area-inset-top, 0px), 44px) + 65px)',
                 }}>
-                  <div style={{ padding: '0 16px 14px' }}>
-                    {/* Broadcast caption strip */}
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12, flexWrap: 'wrap' }}>
-                      <span style={{
-                        padding: '3px 7px', borderRadius: 4, background: '#fff', color: ink,
-                        fontSize: 9, fontWeight: 800, letterSpacing: '0.08em',
-                      }}>{getTourDisplayName(tournament.tourSlug)}</span>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
-                        <Trophy size={11} color={gold} strokeWidth={2.5} />
-                        <span style={{ fontSize: 10, fontWeight: 800, letterSpacing: '0.14em', color: gold }}>FINAL</span>
-                      </div>
-                    </div>
-
-                    {/* Tournament name + venue */}
-                    <Link {...(() => { const t = tournamentRoute(tournament.id, { kind: 'overview' }); return { to: t.to, state: t.state }; })()} className="block active:opacity-70 transition-opacity">
-                      <h1 style={{
-                        margin: 0, fontSize: 'clamp(24px, 7vw, 30px)', fontWeight: 800,
-                        letterSpacing: '-0.025em', lineHeight: 1.05, color: '#fff',
-                        overflow: 'hidden', textOverflow: 'ellipsis',
-                        display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' as const,
-                      }}>
-                        {tournament.name}
-                      </h1>
-                    </Link>
-                    {(tournament.venueName || tournament.venueCity) && (
+                  <div style={{
+                    display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                    gap: 10, padding: '0 16px', height: 58,
+                  }}>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <Link {...(() => { const t = tournamentRoute(tournament.id, { kind: 'overview' }); return { to: t.to, state: t.state }; })()} className="block active:opacity-70 transition-opacity">
+                        <div style={{
+                          fontSize: 'clamp(18px, 5.5vw, 22px)', fontWeight: 800, color: '#fff',
+                          letterSpacing: '-0.02em', lineHeight: 1,
+                          overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const,
+                        }}>
+                          {tournament.name}
+                        </div>
+                      </Link>
                       <button
                         onClick={(e) => { e.stopPropagation(); navigate(`/tourhub/courses?q=${encodeURIComponent(tournament.venueName || '')}`); }}
                         className="active:opacity-70 transition-opacity cursor-pointer"
-                        style={{
-                          marginTop: 8, fontSize: 12, color: inkFaint,
-                          display: 'flex', alignItems: 'center', gap: 5,
-                          background: 'none', border: 'none', padding: 0, textAlign: 'left' as const,
-                        }}
+                        style={{ fontSize: 13, fontWeight: 400, color: 'rgba(255,255,255,0.45)', marginTop: 3, background: 'none', border: 'none', padding: 0, textAlign: 'left' as const }}
                       >
-                        <MapPin size={11} strokeWidth={2.2} style={{ opacity: 0.8, flexShrink: 0 }} />
-                        <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                          {tournament.venueName}{tournament.venueName && tournament.venueCity ? ' · ' : ''}{tournament.venueCity}
-                        </span>
+                        {tournament.venueName}{tournament.venueCity ? ` · ${tournament.venueCity}` : ''}
                       </button>
-                    )}
+                    </div>
+                    <div style={{ display: 'flex', flexDirection: 'column' as const, alignItems: 'center', gap: 1, flexShrink: 0 }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 3 }}>
+                        <span style={{ fontSize: 14 }}>🏆</span>
+                        <span style={{ fontSize: 14, fontWeight: 800, color: '#ffffff', letterSpacing: 1 }}>
+                          FINAL
+                        </span>
+                      </div>
+                    </div>
                   </div>
                 </div>
               ) : isLive ? (
-                /* ── Editorial broadcast header — caption strip + tournament title + venue ── */
+                /* ── Compact topbar — tournament name left, round + LIVE right ── */
                 <div style={{
                   flexShrink: 0,
                   paddingTop: 'calc(max(env(safe-area-inset-top, 0px), 44px) + 65px)',
                 }}>
-                  <style>{SHIMMER_KEYFRAMES}</style>
-                  <div style={{ padding: '0 16px 14px' }}>
-                    {/* Broadcast caption strip */}
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12, flexWrap: 'wrap' }}>
-                      <span style={{
-                        padding: '3px 7px', borderRadius: 4, background: '#fff', color: ink,
-                        fontSize: 9, fontWeight: 800, letterSpacing: '0.08em',
-                      }}>{getTourDisplayName(tournament.tourSlug)}</span>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
-                        <span style={{
-                          width: 6, height: 6, borderRadius: '50%', background: greenLive,
-                          animation: 'hero-pulse 1.6s infinite',
-                        }} />
-                        <span style={{ fontSize: 10, fontWeight: 800, letterSpacing: '0.12em', color: greenLive }}>LIVE</span>
+                  <div style={{
+                    display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                    gap: 10, padding: '0 16px', height: 58,
+                  }}>
+
+                    {/* Left — tournament name + venue, full width */}
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{
+                        fontSize: 'clamp(18px, 5.5vw, 22px)', fontWeight: 700, color: '#fff',
+                        letterSpacing: -0.3, lineHeight: 1,
+                        overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+                      }}>
+                        {tournament.name}
                       </div>
-                      <span style={{ fontSize: 10, color: inkFaint }}>·</span>
-                      <span style={{ fontSize: 10, fontWeight: 700, color: inkSoft, letterSpacing: '0.06em' }}>
-                        {getCurrentRoundLabel(leaders, tournament.startDate)}
-                      </span>
+                      <div style={{ fontSize: 13, fontWeight: 400, color: 'rgba(255,255,255,0.55)', marginTop: 3 }}>
+                        {tournament.venueName}{tournament.venueCity ? ` · ${tournament.venueCity}` : ''}
+                      </div>
                     </div>
 
-                    {/* Tournament name + venue — editorial peak */}
-                    <h1 style={{
-                      margin: 0, fontSize: 'clamp(24px, 7vw, 30px)', fontWeight: 800,
-                      letterSpacing: '-0.025em', lineHeight: 1.05, color: '#fff',
-                      overflow: 'hidden', textOverflow: 'ellipsis',
-                      display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' as const,
-                    }}>
-                      {tournament.name}
-                    </h1>
-                    {(tournament.venueName || tournament.venueCity) && (
-                      <div style={{ marginTop: 8, fontSize: 12, color: inkFaint, display: 'flex', alignItems: 'center', gap: 5 }}>
-                        <MapPin size={11} strokeWidth={2.2} style={{ opacity: 0.8, flexShrink: 0 }} />
-                        <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                          {tournament.venueName}{tournament.venueName && tournament.venueCity ? ' · ' : ''}{tournament.venueCity}
+                    {/* Right — round label stacked above LIVE pill */}
+                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 1, flexShrink: 0 }}>
+                      <span style={{
+                        fontSize: 12, fontWeight: 500, letterSpacing: '0.8px',
+                        color: 'rgba(255,255,255,0.5)',
+                      }}>
+                        {getCurrentRoundLabel(leaders, tournament.startDate)}
+                      </span>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 3 }}>
+                        <span className="live-dot" style={{ width: 6, height: 6 }} />
+                        <span style={{ fontSize: 12, fontWeight: 700, color: '#22C55E', letterSpacing: 1 }}>
+                          LIVE
                         </span>
                       </div>
-                    )}
+                    </div>
                   </div>
                 </div>
               ) : isUpcoming ? (
@@ -1362,33 +1340,18 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
                             animate={{ opacity: 1, y: 0 }}
                             exit={{ opacity: 0 }}
                             transition={{ duration: 0.22, ease: [0.19, 1, 0.22, 1] }}
-                            style={{
-                              position: 'relative',
-                              background: 'linear-gradient(180deg, rgba(255,184,0,0.12) 0%, rgba(255,184,0,0.04) 100%)',
-                              border: '1px solid rgba(255,184,0,0.25)',
-                              borderRadius: 18,
-                              padding: '14px 14px 12px',
-                              marginBottom: 14,
-                              overflow: 'hidden',
-                            }}
                           >
-                            {/* Trophy watermark */}
-                            <Trophy size={120} strokeWidth={1} style={{
-                              position: 'absolute', right: -20, top: -10,
-                              color: gold, opacity: 0.06, pointerEvents: 'none',
-                            }} />
-
                             {/* Champion eyebrow with country flag */}
-                            <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 12, position: 'relative', zIndex: 1 }}>
-                              <Trophy size={11} color={gold} strokeWidth={2.5} />
-                              <span style={{ fontSize: 9, fontWeight: 800, color: gold, letterSpacing: '0.18em', textTransform: 'uppercase' as const }}>Champion</span>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 5, marginBottom: 10 }}>
+                              <span style={{ fontSize: 12 }}>🏆</span>
+                              <span style={{ fontSize: 11, fontWeight: 700, color: '#ffffff', letterSpacing: '0.12em', textTransform: 'uppercase' as const }}>Champion</span>
                               {podiumWinner.country && COUNTRY_TO_FLAG[podiumWinner.country.toUpperCase()] && (
-                                <span style={{ fontSize: 13 }}>{COUNTRY_TO_FLAG[podiumWinner.country.toUpperCase()]}</span>
+                                <span style={{ fontSize: 14 }}>{COUNTRY_TO_FLAG[podiumWinner.country.toUpperCase()]}</span>
                               )}
                             </div>
 
                             {/* Winner identity — avatar + name left, giant score right */}
-                            <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', marginBottom: 10, position: 'relative', zIndex: 1 }}>
+                            <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', marginBottom: 8 }}>
                               <div style={{ display: 'flex', alignItems: 'flex-end', gap: 12, minWidth: 0, flex: 1 }}>
                                 <button onClick={() => handleScorecardTap(finisherToPlayerInfo(podiumWinner))} className="transition-opacity active:opacity-70" style={{ flexShrink: 0 }}>
                                   <PlayerAvatar
@@ -1402,27 +1365,22 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
                                 </button>
                                 <div style={{ paddingBottom: 2, minWidth: 0 }}>
                                   <button onClick={() => handleScorecardTap(finisherToPlayerInfo(podiumWinner))} className="transition-opacity active:opacity-70" style={{ display: 'block', textAlign: 'left' as const }}>
-                                    <div style={{ fontSize: 'clamp(20px, 6vw, 24px)', fontWeight: 800, color: '#fff', letterSpacing: '-0.02em', lineHeight: 1.1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const }}>
+                                    <div style={{ fontSize: 'clamp(18px, 5.5vw, 22px)', fontWeight: 800, color: '#fff', letterSpacing: '-0.02em', lineHeight: 1.1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const }}>
                                       {podiumWinner.fullName || podiumWinner.displayName}
                                     </div>
                                   </button>
-                                  {winningMargin && (
-                                    <div style={{ fontSize: 12, color: gold, marginTop: 6, fontWeight: 700 }}>
-                                      {winningMargin}
-                                    </div>
-                                  )}
+                                  <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.4)', marginTop: 3 }}>
+                                    72 Holes
+                                  </div>
                                 </div>
                               </div>
-                              <span style={{
-                                fontSize: 'clamp(38px, 13vw, 52px)', fontWeight: 800, color: gold,
-                                letterSpacing: '-0.04em', lineHeight: 0.9, fontVariantNumeric: 'tabular-nums', flexShrink: 0,
-                              }}>
+                              <span style={{ fontSize: 'clamp(38px, 13vw, 52px)', fontWeight: 900, color: '#ffffff', letterSpacing: '-0.04em', lineHeight: 1, fontVariantNumeric: 'tabular-nums', flexShrink: 0 }}>
                                 {podiumWinner.displayScore}
                               </span>
                             </div>
 
-                            {/* Round history pills */}
-                            <div style={{ display: 'flex', alignItems: 'center', gap: 8, position: 'relative', zIndex: 1 }}>
+                            {/* Round history pills + winning margin chip */}
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14 }}>
                               <RoundHistoryPills
                                 round1={podiumWinner.round1}
                                 round2={podiumWinner.round2}
@@ -1431,6 +1389,18 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
                                 currentRound={5}
                                 highlightFinal
                               />
+                              {winningMargin && (
+                                <div style={{
+                                  padding: '4px 8px',
+                                  borderRadius: 7,
+                                  background: 'rgba(255,255,255,0.05)',
+                                  border: '1px solid rgba(255,255,255,0.08)',
+                                  fontSize: 11, fontWeight: 600, color: 'rgba(255,255,255,0.45)',
+                                  whiteSpace: 'nowrap' as const,
+                                }}>
+                                  {winningMargin.replace('Won by ', '').replace(' strokes', ' strokes').replace(' stroke', ' stroke')}
+                                </div>
+                              )}
                             </div>
                           </motion.div>
                         ) : winnerInfo?.winnerName ? (
