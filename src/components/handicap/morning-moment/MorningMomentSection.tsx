@@ -133,6 +133,7 @@ const MorningMomentSection: React.FC<Props> = ({ userId }) => {
         clubData?.club?.longitude !== null,
       has_friends_yesterday: hasFriendsData,
       friends_count: friendsData?.count ?? 0,
+      friends_absence_reason: friendsData?.absenceReason ?? 'no_whs_friends',
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [clubLoading, friendsLoading, userId]);

@@ -2,13 +2,25 @@
  * useHomeCourseWeather — Open-Meteo current-weather lookup for a user's
  * home golf club. Falls back to the geocode-club edge function when the
  * club row is missing lat/lng.
+ *
+ * Failure paths throw `WeatherUnresolvedError` with a typed reason so
+ * the consuming card can report granular telemetry.
  */
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import type { ClubLocation, WeatherData } from './types';
+import type { ClubLocation, WeatherData, WeatherUnresolvedReason } from './types';
 import { WMO_WEATHER_CODES } from './types';
 
 const OPEN_METEO_BASE = 'https://api.open-meteo.com/v1/forecast';
+
+export class WeatherUnresolvedError extends Error {
+  reason: WeatherUnresolvedReason;
+  constructor(reason: WeatherUnresolvedReason, message?: string) {
+    super(message ?? reason);
+    this.name = 'WeatherUnresolvedError';
+    this.reason = reason;
+  }
+}
 
 async function fetchOpenMeteo(lat: number, lng: number): Promise<WeatherData> {
   const url = new URL(OPEN_METEO_BASE);
@@ -18,9 +30,27 @@ async function fetchOpenMeteo(lat: number, lng: number): Promise<WeatherData> {
   url.searchParams.set('temperature_unit', 'celsius');
   url.searchParams.set('wind_speed_unit', 'mph');
 
-  const res = await fetch(url.toString());
-  if (!res.ok) throw new Error(`Open-Meteo ${res.status}`);
-  const json = await res.json();
+  let res: Response;
+  try {
+    res = await fetch(url.toString());
+  } catch {
+    throw new WeatherUnresolvedError('open_meteo_network_error');
+  }
+
+  if (!res.ok) {
+    throw new WeatherUnresolvedError('open_meteo_failure', `Open-Meteo ${res.status}`);
+  }
+
+  let json: any;
+  try {
+    json = await res.json();
+  } catch {
+    throw new WeatherUnresolvedError('open_meteo_malformed_response');
+  }
+
+  if (!json?.current || typeof json.current.temperature_2m !== 'number') {
+    throw new WeatherUnresolvedError('open_meteo_malformed_response');
+  }
 
   const code = Number(json.current?.weather_code ?? 0);
   return {
@@ -32,17 +62,38 @@ async function fetchOpenMeteo(lat: number, lng: number): Promise<WeatherData> {
   };
 }
 
+interface GeocodeFailure {
+  reason: Extract<
+    WeatherUnresolvedReason,
+    'geocode_404_no_match' | 'geocode_502_service_error' | 'geocode_network_error'
+  >;
+}
+
 async function geocodeClubViaEdgeFunction(
   clubId: string,
-): Promise<{ latitude: number; longitude: number } | null> {
+): Promise<{ latitude: number; longitude: number } | GeocodeFailure> {
   try {
     const { data, error } = await supabase.functions.invoke('geocode-club', {
       body: { club_id: clubId },
     });
-    if (error || !data?.latitude || !data?.longitude) return null;
+    if (error) {
+      // functions.invoke wraps HTTP status inconsistently; best-effort mapping.
+      const status =
+        (error as any)?.status ??
+        (error as any)?.context?.status ??
+        (error as any)?.context?.response?.status;
+      if (typeof status === 'number') {
+        if (status >= 500) return { reason: 'geocode_502_service_error' };
+        if (status === 404) return { reason: 'geocode_404_no_match' };
+      }
+      return { reason: 'geocode_network_error' };
+    }
+    if (!data?.latitude || !data?.longitude) {
+      return { reason: 'geocode_404_no_match' };
+    }
     return { latitude: Number(data.latitude), longitude: Number(data.longitude) };
   } catch {
-    return null;
+    return { reason: 'geocode_network_error' };
   }
 }
 
@@ -63,12 +114,12 @@ export function useHomeCourseWeather(club: ClubLocation | null) {
 
       if (lat === null || lng === null) {
         const geocoded = await geocodeClubViaEdgeFunction(club.id);
-        if (!geocoded) return null;
+        if ('reason' in geocoded) {
+          throw new WeatherUnresolvedError(geocoded.reason);
+        }
         lat = geocoded.latitude;
         lng = geocoded.longitude;
 
-        // Invalidate the parent club query so freshly-geocoded coords are
-        // visible to any other consumer reading the same cache.
         queryClient.invalidateQueries({ queryKey: ['morning-moment-club'] });
       }
 
