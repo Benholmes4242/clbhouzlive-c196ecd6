@@ -57,6 +57,11 @@ function HandicapTile({ userId, onClick }: HandicapTileProps) {
     return `${arrow} ${Math.abs(d).toFixed(1)} this month`;
   }, [connection, trend]);
 
+  const showNewBadge = useMemo(
+    () => Date.now() - HANDICAP_PROMO_LAUNCHED_AT < NEW_BADGE_DURATION_MS,
+    [],
+  );
+
   return (
     <button
       type="button"
