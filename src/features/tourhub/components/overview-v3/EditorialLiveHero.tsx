@@ -441,108 +441,69 @@ function LeaderboardRow({
   );
 }
 
-// ---------- All Tours ticker -----------------------------------------------
+// ---------- LiveHeroSkeleton ----------------------------------------------
 
-function AllToursTicker({
-  activeTournamentId,
-  onSelect,
-}: {
-  activeTournamentId: string;
-  onSelect: (id: string) => void;
-}) {
-  const { data: liveTournaments } = useLiveRightNow();
-  const tours = liveTournaments ?? [];
-  if (tours.length === 0) return null;
-
+export function LiveHeroSkeleton() {
   return (
-    <div>
+    <HeroAtmosphere style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
       <div
         style={{
-          marginTop: 26, padding: '12px 0 10px',
-          display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-          borderTop: `1px solid ${hairlineDark}`,
-          fontSize: 9, fontWeight: 800, color: inkFaint, letterSpacing: '0.14em',
+          paddingTop: 'calc(max(env(safe-area-inset-top, 0px), 44px) + 56px)',
+          padding: '0 20px',
+          paddingBottom: 24,
+          height: '100%',
+          overflow: 'hidden',
         }}
       >
-        <span>
-          <span
+        {/* Caption */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 18, paddingTop: 12 }}>
+          <Shimmer width={36} height={16} radius={4} />
+          <Shimmer width={48} height={14} radius={3} />
+          <Shimmer width="40%" height={12} radius={3} />
+        </div>
+        {/* Title */}
+        <div style={{ marginBottom: 28 }}>
+          <Shimmer width="85%" height={30} radius={6} style={{ marginBottom: 8 }} />
+          <Shimmer width="55%" height={14} radius={4} />
+        </div>
+        {/* Leader hero */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 22 }}>
+          <Shimmer width={86} height={86} radius="50%" />
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <Shimmer width="40%" height={11} radius={3} style={{ marginBottom: 8 }} />
+            <Shimmer width="70%" height={24} radius={5} style={{ marginBottom: 8 }} />
+            <Shimmer width="50%" height={12} radius={3} />
+          </div>
+          <div style={{ textAlign: 'right', flexShrink: 0 }}>
+            <Shimmer width={90} height={56} radius={6} style={{ marginBottom: 6 }} />
+            <Shimmer width={70} height={11} radius={3} style={{ marginLeft: 'auto' }} />
+          </div>
+        </div>
+        {/* Hole strip */}
+        <Shimmer width="100%" height={88} radius={14} style={{ marginBottom: 22 }} />
+        {/* Leaderboard rows */}
+        {Array.from({ length: 5 }).map((_, i) => (
+          <div
+            key={i}
             style={{
-              display: 'inline-block', width: 6, height: 6, borderRadius: '50%',
-              background: greenLive, marginRight: 6, verticalAlign: 'middle',
+              display: 'grid',
+              gridTemplateColumns: '26px 1fr 50px 50px 36px',
+              alignItems: 'center', padding: '11px 0', gap: 8,
+              borderTop: i > 0 ? `1px solid ${hairlineDark}` : 'none',
             }}
-          />
-          ALL TOURS LIVE
-        </span>
-        <span>{tours.length} HAPPENING NOW</span>
+          >
+            <Shimmer height={11} radius={3} />
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <Shimmer width={26} height={26} radius="50%" />
+              <Shimmer width="60%" height={14} radius={4} />
+            </div>
+            <Shimmer height={14} radius={4} />
+            <Shimmer height={12} radius={4} />
+            <Shimmer height={11} radius={3} />
+          </div>
+        ))}
       </div>
-      <div
-        className="[&::-webkit-scrollbar]:hidden"
-        style={{
-          display: 'flex', gap: 8, paddingBottom: 16,
-          overflowX: 'auto', scrollbarWidth: 'none' as any,
-          WebkitOverflowScrolling: 'touch' as any,
-          marginLeft: -20, paddingLeft: 20, marginRight: -20, paddingRight: 20,
-        }}
-      >
-        {tours.map(t => {
-          const active = t.id === activeTournamentId;
-          return (
-            <button
-              key={t.id}
-              type="button"
-              onClick={() => onSelect(t.id)}
-              style={{
-                flexShrink: 0, padding: '10px 12px', borderRadius: 10, minWidth: 140,
-                background: active ? 'rgba(16,185,129,0.08)' : 'rgba(255,255,255,0.025)',
-                border: `1px solid ${active ? 'rgba(16,185,129,0.30)' : hairlineDark}`,
-                textAlign: 'left',
-                cursor: 'pointer',
-                color: '#fff',
-              }}
-            >
-              <div
-                style={{
-                  fontSize: 9, fontWeight: 800,
-                  color: active ? greenLive : inkFaint,
-                  letterSpacing: '0.08em', marginBottom: 4,
-                }}
-              >
-                {getTourCode(t.tourSlug)}
-              </div>
-              <div
-                style={{
-                  fontSize: 12, color: '#fff', fontWeight: 600, marginBottom: 4,
-                  whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
-                }}
-              >
-                {getTourShort(t.tourSlug)}
-              </div>
-              <div
-                style={{
-                  display: 'flex', justifyContent: 'space-between', alignItems: 'baseline',
-                }}
-              >
-                <span
-                  style={{
-                    fontSize: 9, color: greenLive, fontWeight: 800, letterSpacing: '0.06em',
-                  }}
-                >
-                  LIVE
-                </span>
-                <span
-                  style={{
-                    fontSize: 14, fontWeight: 800, color: '#fff',
-                    fontVariantNumeric: 'tabular-nums',
-                  }}
-                >
-                  {t.leader ? fmtScore(t.leader.score) : '—'}
-                </span>
-              </div>
-            </button>
-          );
-        })}
-      </div>
-    </div>
+    </HeroAtmosphere>
   );
 }
 
