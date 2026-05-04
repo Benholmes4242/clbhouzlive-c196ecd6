@@ -226,8 +226,13 @@ export const FriendsLeaderboardV2: React.FC<Props> = ({
           const onClick = () => {
             if (item.kind === 'self') return;
             if (item.friend.is_clbhouz_user && item.friend.friend_user_id) {
-              navigate(`/p/${item.friend.friend_user_id}`);
-            } else {
+              // From your own leaderboard → friend's handicap context.
+              // From a friend's leaderboard (readOnly) → their personal profile.
+              const target = readOnly
+                ? `/p/${item.friend.friend_user_id}`
+                : `/handicap/${item.friend.friend_user_id}`;
+              navigate(target);
+            } else if (!readOnly) {
               handleInvite(item.friend);
             }
           };
