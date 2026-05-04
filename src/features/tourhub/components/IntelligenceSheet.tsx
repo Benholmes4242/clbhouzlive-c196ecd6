@@ -636,15 +636,19 @@ function TournamentCard({
         <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexShrink: 0 }}>
           <span
             style={{
-              fontSize: 10,
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 4,
+              fontSize: 9.5,
               fontWeight: 800,
               letterSpacing: '0.1em',
-              padding: '4px 8px',
+              padding: '4px 9px',
               borderRadius: 6,
               background: chip.bg,
               color: chip.fg,
             }}
           >
+            {chip.icon && <Trophy size={10} color={chip.fg} fill={chip.fg} />}
             {chip.label}
           </span>
           <ChevronRight size={16} color={SLATE_400} strokeWidth={2.2} />
