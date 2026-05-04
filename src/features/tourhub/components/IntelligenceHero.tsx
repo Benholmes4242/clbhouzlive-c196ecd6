@@ -958,7 +958,7 @@ function ReceiptsTailCard({
       style={{
         flexShrink: 0,
         width: 220,
-        height: 296,
+        minHeight: 240,
         scrollSnapAlign: 'start',
         borderRadius: 18,
         overflow: 'hidden',
