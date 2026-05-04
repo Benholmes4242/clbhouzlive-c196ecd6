@@ -1746,21 +1746,21 @@ function ResultsStateBlock({
   const bestPick = picks.find(p => p.actualPosition === bestPosition) ?? topPick;
   const tone = getMissTone(outcome);
 
-  // For top5: hero is the close-finishing pick. Otherwise hero stays as top pick.
-  const heroPickResolved =
-    outcome === 'top5' && bestPick ? bestPick : topPick;
+  // Hero is always the closest-finishing pick (any rank). Falls back to topPick
+  // when no pick has finished (all CUT/WD).
+  const heroPickResolved = bestPick ?? topPick ?? null;
   const supporting = picks.filter(p => heroPickResolved && p.playerId !== heroPickResolved.playerId).slice(0, 2);
 
   const heroAccent: PositionAccent = outcome === 'miss' ? 'ink' : 'amber';
-  const headlinePickFirstName = topPick ? getFirstName(topPick.playerName) : '—';
-  const headlinePickPos = topPick ? formatPosition(topPick) : '—';
+  const closestFirstName = heroPickResolved ? getFirstName(heroPickResolved.playerName) : undefined;
+  const closestPos = heroPickResolved ? formatPosition(heroPickResolved) : undefined;
 
   return (
     <div>
       <ResultsEyebrow text={tone.eyebrow} color={tone.eyebrowColor} />
       <FramingSentence text={framingSentence} />
       <EditorialHeadline>
-        {tone.headlineRender(winnerFirstName, headlinePickFirstName, headlinePickPos)}
+        {tone.headlineRender({ winner: winnerFirstName, closest: closestFirstName, closestPos })}
       </EditorialHeadline>
       <ContextLine>{tone.contextLine(numInTop10, missedCutCount).toUpperCase()}</ContextLine>
       {data?.tournament?.name && (
@@ -1778,9 +1778,10 @@ function ResultsStateBlock({
         <HeroPick
           initials={getInitials(heroPickResolved.playerName)}
           name={heroPickResolved.playerName}
-          subtitle={`Our #${heroPickResolved.predictedRank} pick · Final ${formatPosition(heroPickResolved)}`}
+          subtitle={`Final ${formatPosition(heroPickResolved)}`}
           pulledQuote={heroPickResolved.pulledQuote ?? heroPickResolved.reasons[0] ?? null}
           reasons={heroPickResolved.reasons}
+          winProbability={heroPickResolved.winProbability}
           defaultExpanded={false}
           position={formatPosition(heroPickResolved)}
           positionLabel={formatScore(heroPickResolved.score)}
@@ -1792,12 +1793,12 @@ function ResultsStateBlock({
         <>
           <SupportingLabel />
           <div>
-            {supporting.map((p, i) => (
+            {supporting.map((p) => (
               <CompactPick
                 key={p.playerId}
                 initials={getInitials(p.playerName)}
                 name={p.playerName}
-                tier={i === 0 ? 'STRONG' : 'CONTENTION'}
+                winProbability={p.winProbability}
                 reason={p.reasons[0]}
                 reasons={p.reasons}
                 position={formatPosition(p)}
