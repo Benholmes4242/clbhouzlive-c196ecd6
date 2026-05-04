@@ -595,7 +595,7 @@ export function EditorialLiveHero({
   const displayRound = holeScores.length > 0 ? derivedRound : lastCompleted;
 
   const activeHole = displayHoles.length > 0
-    ? displayHoles[displayHoles.length - 1].hole
+    ? displayHoles[displayHoles.length - 1].holeNumber
     : null;
   const remaining = activeHole ? Math.max(0, 18 - activeHole) : 18;
 
