@@ -16,7 +16,7 @@
 import React, { useEffect, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { useHandicapTrend } from '@/lib/whs/hooks';
+import { useHandicapTrend, useWhsConnection } from '@/lib/whs/hooks';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 
 const INK = '#0F172A';
