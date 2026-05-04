@@ -14033,6 +14033,7 @@ export type Database = {
       whs_ai_insights: {
         Row: {
           connection_id: string
+          date_key: string | null
           generated_at: string
           generated_from_score_id: string | null
           rounds_pattern: string
@@ -14042,6 +14043,7 @@ export type Database = {
         }
         Insert: {
           connection_id: string
+          date_key?: string | null
           generated_at?: string
           generated_from_score_id?: string | null
           rounds_pattern?: string
@@ -14051,6 +14053,7 @@ export type Database = {
         }
         Update: {
           connection_id?: string
+          date_key?: string | null
           generated_at?: string
           generated_from_score_id?: string | null
           rounds_pattern?: string
@@ -14100,6 +14103,56 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "whs_scores"
             referencedColumns: ["id"]
+          },
+        ]
+      }
+      whs_ai_recommendation_history: {
+        Row: {
+          connection_id: string
+          date_key: string
+          generated_at: string
+          recommended_ids: string[]
+        }
+        Insert: {
+          connection_id: string
+          date_key: string
+          generated_at?: string
+          recommended_ids?: string[]
+        }
+        Update: {
+          connection_id?: string
+          date_key?: string
+          generated_at?: string
+          recommended_ids?: string[]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "whs_ai_recommendation_history_connection_id_fkey"
+            columns: ["connection_id"]
+            isOneToOne: false
+            referencedRelation: "whs_connections"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "whs_ai_recommendation_history_connection_id_fkey"
+            columns: ["connection_id"]
+            isOneToOne: false
+            referencedRelation: "whs_friend_matches"
+            referencedColumns: ["friend_connection_id"]
+          },
+          {
+            foreignKeyName: "whs_ai_recommendation_history_connection_id_fkey"
+            columns: ["connection_id"]
+            isOneToOne: false
+            referencedRelation: "whs_friend_window_rankings"
+            referencedColumns: ["friend_connection_id"]
+          },
+          {
+            foreignKeyName: "whs_ai_recommendation_history_connection_id_fkey"
+            columns: ["connection_id"]
+            isOneToOne: false
+            referencedRelation: "whs_invite_status"
+            referencedColumns: ["redeemer_connection_id"]
           },
         ]
       }
@@ -14635,6 +14688,75 @@ export type Database = {
             foreignKeyName: "whs_scores_course_id_fkey"
             columns: ["course_id"]
             isOneToOne: false
+            referencedRelation: "whs_courses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      whs_to_golf_course_map: {
+        Row: {
+          golf_course_id: string | null
+          match_confidence: number
+          match_method: string
+          matched_at: string
+          notes: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
+          whs_course_id: string
+        }
+        Insert: {
+          golf_course_id?: string | null
+          match_confidence?: number
+          match_method?: string
+          matched_at?: string
+          notes?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          whs_course_id: string
+        }
+        Update: {
+          golf_course_id?: string | null
+          match_confidence?: number
+          match_method?: string
+          matched_at?: string
+          notes?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          whs_course_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "whs_to_golf_course_map_golf_course_id_fkey"
+            columns: ["golf_course_id"]
+            isOneToOne: false
+            referencedRelation: "golf_courses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "whs_to_golf_course_map_reviewed_by_fkey"
+            columns: ["reviewed_by"]
+            isOneToOne: false
+            referencedRelation: "public_golfer_blurbs"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "whs_to_golf_course_map_reviewed_by_fkey"
+            columns: ["reviewed_by"]
+            isOneToOne: false
+            referencedRelation: "public_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "whs_to_golf_course_map_reviewed_by_fkey"
+            columns: ["reviewed_by"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "whs_to_golf_course_map_whs_course_id_fkey"
+            columns: ["whs_course_id"]
+            isOneToOne: true
             referencedRelation: "whs_courses"
             referencedColumns: ["id"]
           },
@@ -16374,6 +16496,14 @@ export type Database = {
           post_tags: Json
           shares_count: number
           user_id: string
+        }[]
+      }
+      find_best_trigram_match: {
+        Args: { country_filter?: string; input_name: string }
+        Returns: {
+          id: string
+          name: string
+          similarity: number
         }[]
       }
       game_request_decide: {
