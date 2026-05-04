@@ -4,6 +4,7 @@
  */
 import React from 'react';
 import { Users, ChevronRight } from 'lucide-react';
+import { useSearchParams } from 'react-router-dom';
 import type { FriendsYesterdayResult } from '@/lib/handicap/useFriendsYesterday';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 
@@ -20,6 +21,7 @@ interface Props {
 
 const FriendsYesterdayCard: React.FC<Props> = ({ data, userId }) => {
   const { friends, count, best } = data;
+  const [searchParams, setSearchParams] = useSearchParams();
 
   const standoutLine = (() => {
     if (!best) return '';
@@ -34,10 +36,9 @@ const FriendsYesterdayCard: React.FC<Props> = ({ data, userId }) => {
       user_id: userId,
       friends_count: count,
     });
-    const url = new URL(window.location.href);
-    url.searchParams.set('subtab', 'friends');
-    window.history.pushState({}, '', url.toString());
-    window.dispatchEvent(new PopStateEvent('popstate'));
+    const params = new URLSearchParams(searchParams);
+    params.set('subtab', 'friends');
+    setSearchParams(params, { replace: false });
   };
 
   return (

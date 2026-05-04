@@ -19,8 +19,42 @@ import { useFriendsYesterday } from '@/lib/handicap/useFriendsYesterday';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 
 const INK_55 = '#64748B';
+const INK_10 = 'rgba(15,23,42,0.10)';
+const SKELETON_FILL = 'rgba(15,23,42,0.06)';
 const AMBER = '#F7931E';
 const FONT_GEIST = 'Geist, system-ui, -apple-system, BlinkMacSystemFont, sans-serif';
+
+const SkeletonCard: React.FC = () => (
+  <div
+    style={{
+      display: 'flex',
+      alignItems: 'center',
+      gap: 12,
+      width: '100%',
+      background: '#fff',
+      border: `0.5px solid ${INK_10}`,
+      borderRadius: 12,
+      padding: '12px 14px',
+      marginBottom: 8,
+    }}
+    aria-hidden="true"
+  >
+    <div
+      style={{
+        width: 44,
+        height: 44,
+        borderRadius: 11,
+        background: SKELETON_FILL,
+        flexShrink: 0,
+      }}
+    />
+    <div style={{ flex: 1, minWidth: 0 }}>
+      <div style={{ width: 70, height: 9, background: SKELETON_FILL, borderRadius: 4, marginBottom: 6 }} />
+      <div style={{ width: 140, height: 14, background: SKELETON_FILL, borderRadius: 4, marginBottom: 5 }} />
+      <div style={{ width: 100, height: 10, background: SKELETON_FILL, borderRadius: 4 }} />
+    </div>
+  </div>
+);
 
 interface Props {
   userId: string;
@@ -95,17 +129,36 @@ const MorningMomentSection: React.FC<Props> = ({ userId }) => {
       has_home_club: hasClubSet,
       has_weather:
         hasClubSet &&
-        (clubData?.club?.latitude !== null || clubData?.club?.longitude !== null),
+        clubData?.club?.latitude !== null &&
+        clubData?.club?.longitude !== null,
       has_friends_yesterday: hasFriendsData,
       friends_count: friendsData?.count ?? 0,
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [clubLoading, friendsLoading, userId]);
 
-  // While data is loading, render nothing — the Hero Ring below should still
-  // appear immediately. Cards manage their own internal skeletons once mounted.
+  // During initial load, mount the section with eyebrow + skeleton card placeholder.
+  // Avoids pop-in — eyebrow visible immediately, content fills as queries resolve.
   if (isLoading) {
-    return null;
+    return (
+      <section aria-label="Today" style={{ padding: '20px 16px 8px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
+          <div style={{ width: 5, height: 5, borderRadius: '50%', background: AMBER }} />
+          <span
+            style={{
+              fontSize: 10,
+              fontWeight: 800,
+              color: INK_55,
+              letterSpacing: '0.22em',
+              fontFamily: FONT_GEIST,
+            }}
+          >
+            TODAY · {todayLabel}
+          </span>
+        </div>
+        <SkeletonCard />
+      </section>
+    );
   }
 
   // Standalone CTA: no club AND no friend data. The section IS the CTA.
