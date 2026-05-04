@@ -10,7 +10,7 @@ import { motion, AnimatePresence, useMotionValue, animate } from 'framer-motion'
 import type { PanInfo } from 'framer-motion';
 import {
   ChevronRight, LogOut,
-  Shield, Plus, Check, X,
+  Shield, Plus, Check,
   User, MessageCircle, Bell,
   Pencil, Building2, Settings as SettingsIcon,
 } from 'lucide-react';
@@ -23,6 +23,9 @@ import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { useLogout } from '@/hooks/useLogout';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useEditProfileRoute } from '@/hooks/useEditProfileRoute';
+import HandicapTile from '@/components/handicap/HandicapTile';
+import { isHandicapPromotedForUser } from '@/config/featureFlags';
+import { analyticsEvents } from '@/utils/analyticsEvents';
 
 // ── Types ──
 
