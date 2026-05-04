@@ -9,6 +9,9 @@ import { ChevronLeft, X, Trophy } from 'lucide-react';
 import { usePlayerScorecard, type RoundScorecard, type HoleScore } from '@/hooks/usePlayerScorecard';
 import { getScoreTextClass, getScoreBgClass, getScoreColorSet, SCORE_COLORS } from '@/features/tourhub/utils/scoreColors';
 import { HeroAtmosphere } from '@/features/tourhub/components/shared/HeroAtmosphere';
+import { Shimmer } from '@/features/tourhub/components/shared/Shimmer';
+import { StatsGrid } from '@/features/tourhub/components/shared/StatsGrid';
+import { RoundSparkline } from '@/features/tourhub/components/shared/RoundSparkline';
 import {
   ink, inkSoft, inkFaint, inkGhost,
   hairlineDark, hairlineMid,
@@ -241,28 +244,15 @@ function RoundTabs({
   roundScores: { round: number; strokes: number; toPar: number; holesCompleted: number }[];
 }) {
   const tabs = [1, 2, 3, 4];
-
   return (
-    <div
-      style={{
-        display: 'flex', gap: 0,
-        padding: '8px 16px 12px',
-        borderBottom: `1px solid ${hairlineDark}`,
-        marginBottom: 12,
-      }}
-    >
+    <div style={{ padding: '0 16px 14px', display: 'flex', gap: 6 }}>
       {tabs.map((roundNum) => {
-        const hasScorecard = rounds.some(r => r.roundNumber === roundNum);
-        const rs = roundScores.find(r => r.round === roundNum);
+        const hasScorecard = rounds.some((r) => r.roundNumber === roundNum);
+        const rs = roundScores.find((r) => r.round === roundNum);
         const hasData = hasScorecard || (rs && rs.holesCompleted > 0);
         const isActive = roundNum === activeRound;
+        const isLive = roundNum === currentRound && (rs?.holesCompleted ?? 0) > 0 && (rs?.holesCompleted ?? 0) < 18;
         const toPar = rs?.toPar ?? null;
-        const display = toPar === null ? '—' : fmtScore(toPar);
-        const scoreColor = toPar === null ? inkGhost
-          : isActive ? '#ffffff'
-          : toPar < 0 ? inkSoft
-          : toPar > 0 ? danger
-          : inkFaint;
 
         return (
           <button
@@ -270,35 +260,32 @@ function RoundTabs({
             onClick={() => hasData && onSelect(roundNum)}
             disabled={!hasData}
             style={{
-              flex: 1,
-              display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4,
-              padding: '6px 0 10px',
-              background: 'transparent',
-              border: 'none',
-              borderBottom: isActive ? `2px solid #ffffff` : '2px solid transparent',
-              cursor: hasData ? 'pointer' : 'default',
+              flex: 1, padding: '10px 8px', borderRadius: 10,
+              border: isActive
+                ? `1.5px solid ${isLive ? greenLive : '#fff'}`
+                : `1px solid ${hairlineDark}`,
+              background: isActive ? 'rgba(255,255,255,0.04)' : 'transparent',
+              textAlign: 'center', cursor: hasData ? 'pointer' : 'default',
               opacity: hasData ? 1 : 0.4,
-              transition: 'border-color 0.18s ease',
             }}
           >
-            <span
+            <div
               style={{
-                fontSize: 9, fontWeight: 800,
-                color: isActive ? '#ffffff' : inkFaint,
-                letterSpacing: '0.14em',
+                fontSize: 9, fontWeight: 800, letterSpacing: '0.1em',
+                color: isActive ? (isLive ? greenLive : '#fff') : inkFaint,
               }}
             >
               R{roundNum}
-            </span>
-            <span
+            </div>
+            <div
               style={{
-                fontSize: 17, fontWeight: 800,
-                color: scoreColor,
+                fontSize: 16, fontWeight: 800, marginTop: 3,
+                color: isLive ? greenLive : '#fff',
                 fontVariantNumeric: 'tabular-nums',
               }}
             >
-              {display}
-            </span>
+              {isLive ? 'LIVE' : toPar != null ? fmtScore(toPar) : '—'}
+            </div>
           </button>
         );
       })}
@@ -310,76 +297,113 @@ function RoundTabs({
 
 function ScorecardSkeleton() {
   return (
-    <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
-
-      {/* Hero skeleton — horizontal */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '0 16px 10px' }}>
-        <div style={{ width: 52, height: 55, borderRadius: '34%', background: 'rgba(255,255,255,0.08)', flexShrink: 0, animation: 'clb-shimmer 1.8s ease-in-out infinite', backgroundSize: '200% 100%', backgroundImage: 'linear-gradient(90deg, rgba(255,255,255,0.04) 25%, rgba(255,255,255,0.10) 50%, rgba(255,255,255,0.04) 75%)' }} />
-        <div style={{ flex: 1 }}>
-          <div style={{ height: 14, width: '65%', borderRadius: 5, background: 'rgba(255,255,255,0.08)', marginBottom: 7, animation: 'clb-shimmer 1.8s ease-in-out infinite', backgroundSize: '200% 100%', backgroundImage: 'linear-gradient(90deg, rgba(255,255,255,0.04) 25%, rgba(255,255,255,0.10) 50%, rgba(255,255,255,0.04) 75%)' }} />
-          <div style={{ height: 9, width: '40%', borderRadius: 4, background: 'rgba(255,255,255,0.05)' }} />
+    <>
+      <div style={{ padding: '0 20px 14px', display: 'flex', justifyContent: 'space-between' }}>
+        <Shimmer width="28%" height={20} radius={4} />
+        <Shimmer width="20%" height={20} radius={4} />
+      </div>
+      <div style={{ padding: '0 20px 14px' }}>
+        <Shimmer width="80%" height={14} radius={3} />
+      </div>
+      <div style={{ padding: '0 20px 18px', display: 'flex', alignItems: 'center', gap: 14 }}>
+        <Shimmer width={72} height={72} radius="50%" />
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <Shimmer width="40%" height={11} radius={3} style={{ marginBottom: 8 }} />
+          <Shimmer width="70%" height={22} radius={5} style={{ marginBottom: 8 }} />
+          <Shimmer width="50%" height={11} radius={3} />
         </div>
-        <div style={{ width: 44, height: 26, borderRadius: 6, background: 'rgba(255,255,255,0.08)', flexShrink: 0 }} />
+        <Shimmer width="20%" height={48} radius={6} />
       </div>
-
-      {/* Round chips skeleton */}
-      <div style={{ display: 'flex', gap: 5, padding: '0 16px 8px' }}>
-        {[1,2,3,4].map(i => (
-          <div key={i} style={{ flex: 1, height: 46, borderRadius: 8, background: i === 1 ? 'rgba(255,255,255,0.08)' : 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.07)' }} />
+      <div style={{ padding: '0 16px 14px' }}>
+        <Shimmer width="100%" height={94} radius={14} />
+      </div>
+      <div style={{ padding: '0 16px 14px', display: 'flex', gap: 6 }}>
+        {Array.from({ length: 4 }).map((_, i) => (
+          <Shimmer key={i} height={50} radius={10} style={{ flex: 1 }} />
         ))}
       </div>
-
-      <div style={{ height: 1, background: 'rgba(255,255,255,0.07)', margin: '0 16px 6px' }} />
-
-      {/* Round tabs skeleton */}
-      <div style={{ display: 'flex', justifyContent: 'center', gap: 6, padding: '4px 0 8px' }}>
-        {[1,2].map(i => (
-          <div key={i} style={{ width: 40, height: 26, borderRadius: 20, background: i === 1 ? 'rgba(255,255,255,0.15)' : 'rgba(255,255,255,0.07)' }} />
-        ))}
+      <div style={{ padding: '0 16px 14px' }}>
+        <Shimmer width="100%" height={70} radius={14} />
       </div>
-
-      {/* Stat chips skeleton */}
-      <div style={{ display: 'flex', gap: 4, padding: '0 16px 10px' }}>
-        {[1,2,3,4,5].map(i => (
-          <div key={i} style={{ flex: 1, height: 38, borderRadius: 7, background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.06)', animation: 'clb-shimmer 1.8s ease-in-out infinite', backgroundSize: '200% 100%', backgroundImage: 'linear-gradient(90deg, rgba(255,255,255,0.03) 25%, rgba(255,255,255,0.07) 50%, rgba(255,255,255,0.03) 75%)' }} />
-        ))}
-      </div>
-
-      {/* Front 9 skeleton */}
-      <div style={{ padding: '0 12px 8px' }}>
-        <div style={{ height: 9, width: 60, borderRadius: 4, background: 'rgba(255,255,255,0.06)', marginBottom: 6 }} />
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(9, 1fr)', gap: 2 }}>
-          {Array.from({ length: 9 }, (_, i) => (
-            <div key={i} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
-              <div style={{ width: 14, height: 8, borderRadius: 2, background: 'rgba(255,255,255,0.06)' }} />
-              <div style={{ width: 26, height: 26, borderRadius: 6, background: 'rgba(255,255,255,0.05)', animation: 'clb-shimmer 1.8s ease-in-out infinite', backgroundSize: '200% 100%', backgroundImage: 'linear-gradient(90deg, rgba(255,255,255,0.03) 25%, rgba(255,255,255,0.07) 50%, rgba(255,255,255,0.03) 75%)' }} />
-            </div>
+      <div style={{ padding: '0 12px 14px' }}>
+        <Shimmer width="40%" height={9} radius={3} style={{ marginBottom: 12 }} />
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(9, 1fr)', gap: 4 }}>
+          {Array.from({ length: 9 }).map((_, i) => (
+            <Shimmer key={i} height={60} radius={6} />
           ))}
         </div>
       </div>
-
-      {/* Back 9 skeleton */}
-      <div style={{ padding: '0 12px 8px' }}>
-        <div style={{ height: 9, width: 55, borderRadius: 4, background: 'rgba(255,255,255,0.06)', marginBottom: 6 }} />
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(9, 1fr)', gap: 2 }}>
-          {Array.from({ length: 9 }, (_, i) => (
-            <div key={i} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
-              <div style={{ width: 14, height: 8, borderRadius: 2, background: 'rgba(255,255,255,0.06)' }} />
-              <div style={{ width: 26, height: 26, borderRadius: 6, background: 'rgba(255,255,255,0.05)', animation: 'clb-shimmer 1.8s ease-in-out infinite', backgroundSize: '200% 100%', backgroundImage: 'linear-gradient(90deg, rgba(255,255,255,0.03) 25%, rgba(255,255,255,0.07) 50%, rgba(255,255,255,0.03) 75%)' }} />
-            </div>
+      <div style={{ padding: '0 12px 14px' }}>
+        <Shimmer width="40%" height={9} radius={3} style={{ marginBottom: 12 }} />
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(9, 1fr)', gap: 4 }}>
+          {Array.from({ length: 9 }).map((_, i) => (
+            <Shimmer key={i} height={60} radius={6} />
           ))}
         </div>
       </div>
-
-      {/* Total row skeleton */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '8px 16px', borderTop: '1px solid rgba(255,255,255,0.07)', marginTop: 4 }}>
-        <div style={{ width: 40, height: 8, borderRadius: 3, background: 'rgba(255,255,255,0.06)' }} />
-        <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
-          <div style={{ width: 50, height: 9, borderRadius: 3, background: 'rgba(255,255,255,0.05)' }} />
-          <div style={{ width: 30, height: 13, borderRadius: 4, background: 'rgba(255,255,255,0.08)' }} />
-          <div style={{ width: 24, height: 11, borderRadius: 4, background: 'rgba(74,222,128,0.15)' }} />
-        </div>
+      <div style={{ padding: '0 16px 18px' }}>
+        <Shimmer width="100%" height={50} radius={14} />
       </div>
+    </>
+  );
+}
+
+function TournamentProgressionPanel({
+  rounds,
+  isCompleted,
+}: {
+  rounds: { round: number; toPar: number | null }[];
+  isCompleted: boolean;
+}) {
+  const completed = rounds.filter((r) => r.toPar != null) as { round: number; toPar: number }[];
+  if (completed.length < 2) {
+    return (
+      <div
+        style={{
+          margin: '0 16px 14px',
+          background: 'rgba(255,255,255,0.02)',
+          borderRadius: 14,
+          border: `1px solid ${hairlineDark}`,
+          padding: '18px 14px',
+          textAlign: 'center',
+          color: inkFaint, fontSize: 11,
+        }}
+      >
+        Score progression appears once you've finished R2.
+      </div>
+    );
+  }
+  const accent = isCompleted ? gold : greenLive;
+  const cumulative = completed.reduce<number[]>((acc, r) => {
+    acc.push((acc[acc.length - 1] ?? 0) + r.toPar);
+    return acc;
+  }, []);
+  const final = cumulative[cumulative.length - 1];
+
+  return (
+    <div
+      style={{
+        margin: '0 16px 14px',
+        background: 'rgba(255,255,255,0.025)',
+        borderRadius: 14,
+        border: `1px solid ${hairlineDark}`,
+        padding: '12px 14px 10px',
+      }}
+    >
+      <div
+        style={{
+          display: 'flex', justifyContent: 'space-between', alignItems: 'baseline',
+          marginBottom: 8,
+        }}
+      >
+        <span style={{ fontSize: 9, fontWeight: 800, letterSpacing: '0.14em', color: inkFaint }}>
+          TOURNAMENT · SCORE PROGRESSION
+        </span>
+        <span style={{ fontSize: 10, color: accent, fontWeight: 700 }}>
+          {fmtScore(final)} thru R{completed.length}
+        </span>
+      </div>
+      <RoundSparkline rounds={cumulative} accent={accent} cumulative />
     </div>
   );
 }
@@ -668,7 +692,10 @@ export function PlayerScorecardCard({
             <span
               style={{
                 fontSize: 48, fontWeight: 800, letterSpacing: '-0.04em',
-                color: '#fff', lineHeight: 0.9,
+              style={{
+                fontSize: 48, fontWeight: 800, letterSpacing: '-0.04em',
+                color: (isCompleted && (player.position === 1 || String(player.position) === '1')) ? gold : '#fff',
+                lineHeight: 0.9,
                 fontVariantNumeric: 'tabular-nums',
               }}
             >
@@ -688,7 +715,10 @@ export function PlayerScorecardCard({
               willChange: 'transform',
             }}
           >
-            {/* Round tabs — text-only, underline on active */}
+            {/* Cross-round progression */}
+            <TournamentProgressionPanel rounds={roundScores} isCompleted={isCompleted} />
+
+            {/* Round tabs — pill buttons */}
             <RoundTabs
               rounds={scorecard.rounds}
               activeRound={activeRound}
@@ -704,45 +734,19 @@ export function PlayerScorecardCard({
               </div>
             )}
 
-            {/* Stat chips — flat editorial cells */}
+            {/* Stats — flat horizontal panel */}
             {activeRoundData && activeRoundData.holesCompleted > 0 && (
-              <div
-                style={{
-                  display: 'flex', gap: 6,
-                  padding: '0 16px 14px',
-                }}
-              >
-                {[
-                  { v: activeRoundData.eagles,       label: 'Eagles',  color: gold },
-                  { v: activeRoundData.birdies,      label: 'Birdies', color: greenLive },
-                  { v: activeRoundData.pars,         label: 'Pars',    color: inkSoft },
-                  { v: activeRoundData.bogeys,       label: 'Bogeys',  color: danger },
-                  { v: activeRoundData.doubleBogeys, label: 'Doubles', color: danger },
-                ].map(stat => (
-                  <div
-                    key={stat.label}
-                    style={{
-                      flex: 1, textAlign: 'center',
-                      padding: '8px 4px',
-                      borderRadius: 10,
-                      background: 'rgba(255,255,255,0.025)',
-                      border: `1px solid ${hairlineDark}`,
-                      minWidth: 0,
-                    }}
-                  >
-                    <div style={{ fontSize: 16, fontWeight: 800, color: stat.color, lineHeight: 1, fontVariantNumeric: 'tabular-nums' }}>
-                      {stat.v}
-                    </div>
-                    <div
-                      style={{
-                        fontSize: 8, fontWeight: 700, color: inkGhost,
-                        textTransform: 'uppercase', letterSpacing: '0.08em', marginTop: 4,
-                      }}
-                    >
-                      {stat.label}
-                    </div>
-                  </div>
-                ))}
+              <div style={{ padding: '0 16px' }}>
+                <StatsGrid
+                  stats={{
+                    eagles: activeRoundData.eagles,
+                    birdies: activeRoundData.birdies,
+                    pars: activeRoundData.pars,
+                    bogeys: activeRoundData.bogeys,
+                    doubleBogeys: activeRoundData.doubleBogeys,
+                  }}
+                  isLive={!isCompleted}
+                />
               </div>
             )}
 
