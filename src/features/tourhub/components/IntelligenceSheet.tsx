@@ -718,7 +718,7 @@ function PickMiniRow({
         >
           {pick.playerName}
         </span>
-        {isWinner && <Trophy size={13} color={GOLD_DEEP} fill={GOLD} style={{ flexShrink: 0 }} />}
+        {isWinner && <Trophy size={13} color={GOLD_DEEP} style={{ flexShrink: 0 }} />}
       </div>
       <span
         style={{
