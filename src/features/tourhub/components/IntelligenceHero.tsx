@@ -321,9 +321,9 @@ function CardMetaTray({
             color: amber,
             fontWeight: 800,
             fontStyle: 'normal',
-            fontSize: 16,
+            fontSize: 18,
             lineHeight: 0.6,
-            marginLeft: 3,
+            marginLeft: 8,
             verticalAlign: 'baseline',
           }}>”</span>
         </div>
