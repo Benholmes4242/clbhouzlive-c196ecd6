@@ -5,15 +5,25 @@ import type { HandicapInsights, SuitedCourse } from './types';
 
 const insightsKey = (cid: string) => ['whs-ai-insights', cid] as const;
 
+const todayKey = () => {
+  const d = new Date();
+  const y = d.getUTCFullYear();
+  const m = String(d.getUTCMonth() + 1).padStart(2, '0');
+  const day = String(d.getUTCDate()).padStart(2, '0');
+  return `${y}-${m}-${day}`;
+};
+
 async function fetchCachedInsights(connectionId: string): Promise<{
   insights: HandicapInsights | null;
   cachedScoreId: string | null;
   latestScoreId: string | null;
+  cachedDateKey: string | null;
+  todayKey: string;
 }> {
   const [{ data: row }, { data: latest }] = await Promise.all([
     supabase
       .from('whs_ai_insights')
-      .select('scoring_profile, rounds_pattern, suited_courses, test_courses, generated_from_score_id, generated_at')
+      .select('scoring_profile, rounds_pattern, suited_courses, test_courses, generated_from_score_id, generated_at, date_key')
       .eq('connection_id', connectionId)
       .maybeSingle(),
     supabase
