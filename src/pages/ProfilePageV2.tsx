@@ -67,6 +67,7 @@ import { ProfileCoursesTab } from '@/components/profile/ProfileCoursesTab';
 import Top100MyProgressPanel from '@/components/courses/Top100MyProgressPanel';
 import AchievementsPane from '@/components/profile/AchievementsPane';
 import HandicapSection from '@/components/profile/HandicapSection';
+import { isHandicapPromotedForUser } from '@/config/featureFlags';
 import ClubsCard from '@/components/profile/clubs/ClubsCard';
 import { useProfileClubs } from '@/components/profile/hooks/useProfileClubs';
 import { GolfJourneyProgress } from '@/components/profile/phase6';
@@ -229,7 +230,21 @@ const ProfilePageV2Content: React.FC = () => {
 
   const profileTypeInfo = getProfileType(profile?.user_type);
   const { isPersonal } = profileTypeInfo;
-  const tabs = getProfileTabs(profile?.user_type);
+  const handicapPromoted = isHandicapPromotedForUser(user?.id);
+  const allTabs = getProfileTabs(profile?.user_type);
+  // When the Handicap promotion flag is on, hide the Handicap tab from the user's
+  // own profile strip — it's now reachable via the dedicated /handicap page.
+  const tabs = useMemo(
+    () => (isSelf && handicapPromoted ? allTabs.filter(t => t.id !== 'stats') : allTabs),
+    [allTabs, isSelf, handicapPromoted]
+  );
+
+  // Redirect own-profile Handicap deep links to the dedicated /handicap page when promoted.
+  useEffect(() => {
+    if (isSelf && handicapPromoted && activeSection === 'stats') {
+      navigate('/handicap', { replace: true });
+    }
+  }, [isSelf, handicapPromoted, activeSection, navigate]);
 
   const { data: socialCounts, isLoading: socialCountsLoading } = useSocialCounts(profileUserId);
   const followersCount = socialCounts?.followers ?? 0;
