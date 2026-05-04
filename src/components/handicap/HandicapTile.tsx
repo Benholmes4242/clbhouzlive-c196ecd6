@@ -1,21 +1,17 @@
 /**
  * HandicapTile — primary tile in the ProfileHubSheet 2×2 grid.
- * Shows live current handicap, monthly delta, and a NEW badge.
+ * Shows live current handicap and a monthly delta.
  *
- * NEW badge: shown for 60 days after HANDICAP_PROMO_LAUNCHED_AT.
- * Per Phase-5 brief: v1 uses static badge with automatic 60-day expiry
- * (not dismiss-on-tap). Update HANDICAP_PROMO_LAUNCHED_AT at rollout.
+ * NEW badge: gated by SHOW_HANDICAP_NEW_BADGE in featureFlags.ts. The badge
+ * has no automatic time-based expiry — flip the flag to false to retire it.
  */
 import { memo, useMemo } from 'react';
 import { useWhsConnection, useHandicapTrend } from '@/lib/whs/hooks';
+import { SHOW_HANDICAP_NEW_BADGE } from '@/config/featureFlags';
 
 const AMBER = '#F7931E';
 const INK = '#0f172a';
 const INK_55 = '#64748B';
-
-// Rollout date for the Handicap promotion. NEW badge auto-hides 60 days after.
-const HANDICAP_PROMO_LAUNCHED_AT = new Date('2026-05-04T00:00:00Z').getTime();
-const NEW_BADGE_DURATION_MS = 60 * 24 * 60 * 60 * 1000;
 
 interface HandicapTileProps {
   userId: string;
@@ -57,10 +53,8 @@ function HandicapTile({ userId, onClick }: HandicapTileProps) {
     return `${arrow} ${Math.abs(d).toFixed(1)} this month`;
   }, [connection, trend]);
 
-  const showNewBadge = useMemo(
-    () => Date.now() - HANDICAP_PROMO_LAUNCHED_AT < NEW_BADGE_DURATION_MS,
-    [],
-  );
+  // NEW badge — gated by a single flag (no automatic expiry).
+  const showNewBadge = SHOW_HANDICAP_NEW_BADGE;
 
   return (
     <button

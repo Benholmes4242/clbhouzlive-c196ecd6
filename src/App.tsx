@@ -110,7 +110,7 @@ const AccountTypeOnboarding = lazy(() => import("./pages/onboarding/AccountTypeO
 
 const EditProfilePage = lazy(() => import("./pages/EditProfilePage"));
 const QuickEditProfilePage = lazy(() => import("./pages/QuickEditProfilePage"));
-const ProfileHandicapView = lazy(() => import("./pages/ProfileHandicapView"));
+// ProfileHandicapView removed — /profile/handicap now redirects to /handicap (fix brief §2.1)
 const HandicapPage = lazy(() => import("./pages/HandicapPage"));
 const ProfileQuestView = lazy(() => import("./pages/ProfileQuestView"));
 const QuestIndexView = lazy(() => import("./pages/QuestIndexView"));
@@ -314,7 +314,7 @@ function AppRoutes() {
         <Route path="/onboarding/account-type" element={<Suspense fallback={<GenericPageSkeleton />}><AccountTypeOnboarding /></Suspense>} />
         <Route path="/create-profile" element={<CreateProfileRedirect />} />
         <Route path="/profile" element={<ProfileWrapped />} />
-        <Route path="/profile/handicap" element={<Suspense fallback={<ProfileSkeleton />}><ProfileHandicapView /></Suspense>} />
+        <Route path="/profile/handicap" element={<Navigate to="/handicap" replace />} />
         <Route path="/handicap" element={<Suspense fallback={<ProfileSkeleton />}><HandicapPage /></Suspense>} />
         <Route path="/profile/quest" element={<Suspense fallback={<ProfileSkeleton />}><ProfileQuestView /></Suspense>} />
         <Route path="/profile/quest/index" element={<Suspense fallback={<ProfileSkeleton />}><QuestIndexView /></Suspense>} />
