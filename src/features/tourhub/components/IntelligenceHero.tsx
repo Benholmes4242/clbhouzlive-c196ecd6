@@ -316,7 +316,7 @@ function CardMetaTray({
             WebkitBoxOrient: 'vertical',
           }}
         >
-          {insight}
+          "{insight}"
         </div>
         <ChevronUp
           size={14}
