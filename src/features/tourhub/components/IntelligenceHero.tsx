@@ -287,7 +287,7 @@ function CardMetaTray({
           gap: 8,
           cursor: 'pointer',
           fontFamily: headlineFont,
-          minHeight: 60,
+          // (size to content; 2-line clamp keeps cards consistent)
         }}
       >
         <div
