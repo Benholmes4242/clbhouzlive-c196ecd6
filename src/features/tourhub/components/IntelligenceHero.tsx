@@ -41,7 +41,7 @@ import type {
   AITopContender,
 } from '../hooks/useAIPredictions';
 import type { TrackedPrediction } from './tournament-insights/types';
-import { IntelligenceAboutSheet } from './IntelligenceAboutSheet';
+import { IntelligenceSheet } from './IntelligenceSheet';
 import {
   getPlayerHeadshotUrl,
   PLAYER_SILHOUETTE_URL,
