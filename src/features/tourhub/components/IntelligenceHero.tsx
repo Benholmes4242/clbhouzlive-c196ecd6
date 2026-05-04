@@ -184,14 +184,16 @@ function getInitials(fullName: string): string {
   return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
 }
 
+type MissToneArgs = {
+  winner: string;
+  closest?: string;
+  closestPos?: string;
+};
+
 type MissTone = {
   eyebrow: string;
   eyebrowColor: string;
-  headlineRender: (
-    winnerFirstName: string,
-    ourPickFirstName: string,
-    ourPickPosition: string,
-  ) => React.ReactNode;
+  headlineRender: (args: MissToneArgs) => React.ReactNode;
   contextLine: (numInTop10: number, missedCuts: number) => string;
 };
 
@@ -200,16 +202,16 @@ function getMissTone(outcome: IntelligenceOutcome): MissTone {
     return {
       eyebrow: 'Closest call.',
       eyebrowColor: AMBER_DEEP,
-      headlineRender: (winner, ourPick, ourPos) => (
+      headlineRender: ({ winner, closest, closestPos }) => (
         <>
           {winner} won.{' '}
           <span style={{ color: SLATE_500, fontWeight: 600 }}>
-            {ourPick} took {ourPos}.
+            {closest ?? '—'} took {closestPos ?? '—'}.
           </span>
         </>
       ),
       contextLine: (top10, mc) =>
-        `Strong contender finish · ${top10} pick${top10 !== 1 ? 's' : ''} in T10 · ${
+        `${top10} of 3 in T10 · ${
           mc === 0 ? 'No missed cuts' : `${mc} missed cut${mc > 1 ? 's' : ''}`
         }`,
     };
@@ -218,16 +220,16 @@ function getMissTone(outcome: IntelligenceOutcome): MissTone {
     return {
       eyebrow: 'Solid week.',
       eyebrowColor: SLATE_600,
-      headlineRender: (winner, ourPick, ourPos) => (
+      headlineRender: ({ winner, closest, closestPos }) => (
         <>
           {winner} won.{' '}
           <span style={{ color: SLATE_500, fontWeight: 600 }}>
-            {ourPick} finished {ourPos}.
+            {closest ?? '—'} finished {closestPos ?? '—'}.
           </span>
         </>
       ),
       contextLine: (top10, mc) =>
-        `Top pick in form · ${top10} pick${top10 !== 1 ? 's' : ''} in T10 · ${
+        `${top10} of 3 in T10 · ${
           mc === 0 ? 'No missed cuts' : `${mc} missed cut${mc > 1 ? 's' : ''}`
         }`,
     };
@@ -235,16 +237,16 @@ function getMissTone(outcome: IntelligenceOutcome): MissTone {
   return {
     eyebrow: 'Tough one.',
     eyebrowColor: SLATE_600,
-    headlineRender: (winner, ourPick, ourPos) => (
+    headlineRender: ({ winner }) => (
       <>
-        {winner} won —{' '}
+        {winner} won.{' '}
         <span style={{ color: SLATE_500, fontWeight: 600 }}>
-          we had {ourPick} at {ourPos}.
+          Our three calls fell short.
         </span>
       </>
     ),
     contextLine: (top10, mc) =>
-      `Winner not in top 3 · ${top10} pick${top10 !== 1 ? 's' : ''} in T10 · ${
+      `Winner outside our picks · ${top10} of 3 in T10 · ${
         mc === 0 ? 'No missed cuts' : `${mc} missed cut${mc > 1 ? 's' : ''}`
       }`,
   };
@@ -769,6 +771,7 @@ function HeroPick({
   positionAccent = 'amber',
   pulse = false,
   defaultExpanded = false,
+  winProbability = 0,
 }: {
   initials: string;
   name: string;
@@ -780,6 +783,7 @@ function HeroPick({
   positionAccent?: PositionAccent;
   pulse?: boolean;
   defaultExpanded?: boolean;
+  winProbability?: number;
 }) {
   const [expanded, setExpanded] = useState(defaultExpanded);
   const accent =
@@ -820,34 +824,23 @@ function HeroPick({
           />
 
           <div style={{ flex: 1, minWidth: 0 }}>
-            <div
-              style={{
-                ...monoLabel,
-                display: 'flex',
-                alignItems: 'center',
-                gap: 5,
-                fontSize: 8,
-                color: AMBER_DEEP,
-                letterSpacing: '0.18em',
-                marginBottom: 5,
-              }}
-            >
-              <span
+            {winProbability > 0 && (
+              <div
                 style={{
-                  width: 14,
-                  height: 14,
-                  borderRadius: '50%',
-                  background: AMBER_TINT,
-                  display: 'inline-flex',
+                  ...monoLabel,
+                  display: 'flex',
                   alignItems: 'center',
-                  justifyContent: 'center',
-                  flexShrink: 0,
+                  gap: 5,
+                  fontSize: 8,
+                  color: AMBER_DEEP,
+                  letterSpacing: '0.18em',
+                  marginBottom: 5,
                 }}
               >
-                <Brain size={8} color={AMBER_DEEP} strokeWidth={2.6} style={{ display: 'block' }} />
-              </span>
-              TOP PICK
-            </div>
+                <Sparkles size={9} color={AMBER_DEEP} fill={AMBER_DEEP} strokeWidth={2} />
+                {Math.round(winProbability * 100)}% WIN PROBABILITY
+              </div>
+            )}
             <div
               style={{
                 fontFamily: headlineFont,
@@ -1047,12 +1040,10 @@ function HeroPick({
 
 // ─── Compact pick (ranks 2 + 3, chevron-expand) ──────────────────────────────
 
-type CompactTier = 'STRONG' | 'CONTENTION';
-
 function CompactPick({
   initials,
   name,
-  tier,
+  winProbability = 0,
   reason,
   reasons,
   position,
@@ -1060,24 +1051,17 @@ function CompactPick({
 }: {
   initials: string;
   name: string;
-  tier: CompactTier;
+  winProbability?: number;
   reason?: string;
   reasons: string[];
   position: string;
   positionLabel: string;
 }) {
   const [expanded, setExpanded] = useState(false);
-  const accent = 'transparent';
-  const accentInk = SLATE_500;
-  const tierLabel = tier === 'STRONG' ? 'STRONG CONTENDER' : 'IN CONTENTION';
   const visibleReasons = reasons.filter(Boolean).slice(0, 3);
 
   return (
-    <div
-      style={{
-        borderLeft: `3px solid ${accent}`,
-      }}
-    >
+    <div>
       <button
         type="button"
         onClick={() => setExpanded(v => !v)}
@@ -1104,6 +1088,19 @@ function CompactPick({
           initialsFontSize={12}
         />
         <div style={{ flex: 1, minWidth: 0 }}>
+          {winProbability > 0 && (
+            <div
+              style={{
+                ...monoLabel,
+                fontSize: 8,
+                color: SLATE_500,
+                letterSpacing: '0.18em',
+                marginBottom: 2,
+              }}
+            >
+              {Math.round(winProbability * 100)}% WIN PROBABILITY
+            </div>
+          )}
           <div
             style={{
               fontFamily: headlineFont,
@@ -1530,8 +1527,6 @@ function LiveStateBlock({
     p => p.actualPosition !== null && p.actualPosition <= 5,
   ).length;
   const currentRound = picks[0]?.currentRound ?? 1;
-  const topPickPreRank = topPick?.predictedRank ?? 1;
-  const topPickLivePos = topPick ? formatPosition(topPick) : '—';
 
   // Hero pick = the leading pick (best-performing). Falls back to top pick.
   const heroPick = bestPick ?? topPick ?? picks[0] ?? null;
@@ -1594,9 +1589,10 @@ function LiveStateBlock({
         <HeroPick
           initials={getInitials(heroPick.playerName)}
           name={heroPick.playerName}
-          subtitle={null}
+          subtitle={`Now ${formatPosition(heroPick)} · Round ${heroPick.currentRound ?? currentRound}${heroPick.thru != null ? ` · Thru ${heroPick.thru}` : ''}`}
           pulledQuote={heroPick.pulledQuote ?? heroPick.reasons[0] ?? null}
           reasons={heroPick.reasons}
+          winProbability={heroPick.winProbability}
           defaultExpanded={false}
           position={formatPosition(heroPick)}
           positionLabel={formatScore(heroPick.score)}
@@ -1609,12 +1605,12 @@ function LiveStateBlock({
         <>
           <SupportingLabel />
           <div>
-            {supporting.map((p, i) => (
+            {supporting.map((p) => (
               <CompactPick
                 key={p.playerId}
                 initials={getInitials(p.playerName)}
                 name={p.playerName}
-                tier={i === 0 ? 'STRONG' : 'CONTENTION'}
+                winProbability={p.winProbability}
                 reason={p.reasons[0]}
                 reasons={p.reasons}
                 position={formatPosition(p)}
@@ -1655,13 +1651,14 @@ function ResultsStateBlock({
     p => p.performanceStatus === 'cut' || p.performanceStatus === 'withdrawn',
   ).length;
 
-  // ── WIN branch ────────────────────────────────────────────────────────────
-  if (topPickWon && topPick) {
-    const others = picks.filter(p => p.playerId !== topPick.playerId);
+  // ── WIN branch: ANY of our 3 picks won ───────────────────────────────────
+  const winningPick = winnerFromTracker;
+  if (winningPick) {
+    const others = picks.filter(p => p.playerId !== winningPick.playerId);
     const second = others
       .filter(p => p.actualPosition !== null)
       .sort((a, b) => a.actualPosition! - b.actualPosition!)[0];
-    const winnerScore = topPick.score ?? 0;
+    const winnerScore = winningPick.score ?? 0;
     const secondScore = second?.score ?? winnerScore;
     const margin = Math.max(0, secondScore - winnerScore);
     const supporting = others.slice(0, 2);
@@ -1675,7 +1672,7 @@ function ResultsStateBlock({
         />
         <FramingSentence text={framingSentence} />
         <EditorialHeadline>
-          <span style={{ color: AMBER_DEEP }}>{winnerFirstName}</span>{' '}
+          <span style={{ color: AMBER_DEEP }}>{getFirstName(winningPick.playerName)}</span>{' '}
           {margin === 0 ? (
             <>won in a playoff.</>
           ) : (
@@ -1689,7 +1686,7 @@ function ResultsStateBlock({
           )}
         </EditorialHeadline>
         <ContextLine>
-          {`TOP PICK WON · ${Math.max(0, numInTop10 - 1)} OTHER PICKS T10 · ${
+          {`OUR PICK WON · ${Math.max(0, numInTop10 - 1)} OTHER PICKS T10 · ${
             missedCutCount === 0 ? 'NO MISSED CUTS' : `${missedCutCount} MISSED CUT${missedCutCount > 1 ? 'S' : ''}`
           }`}
         </ContextLine>
@@ -1698,14 +1695,15 @@ function ResultsStateBlock({
         )}
 
         <HeroPick
-          initials={getInitials(topPick.playerName)}
-          name={topPick.playerName}
+          initials={getInitials(winningPick.playerName)}
+          name={winningPick.playerName}
           subtitle={`Final · 1st · Won by ${margin || 'playoff'}`}
-          pulledQuote={topPick.pulledQuote ?? topPick.reasons[0] ?? null}
-          reasons={topPick.reasons}
+          pulledQuote={winningPick.pulledQuote ?? winningPick.reasons[0] ?? null}
+          reasons={winningPick.reasons}
+          winProbability={winningPick.winProbability}
           defaultExpanded={false}
           position="1"
-          positionLabel={formatScore(topPick.score)}
+          positionLabel={formatScore(winningPick.score)}
           positionAccent="amber"
           pulse={pulse}
         />
@@ -1714,12 +1712,12 @@ function ResultsStateBlock({
           <>
             <SupportingLabel />
             <div>
-              {supporting.map((p, i) => (
+              {supporting.map((p) => (
                 <CompactPick
                   key={p.playerId}
                   initials={getInitials(p.playerName)}
                   name={p.playerName}
-                  tier={i === 0 ? 'STRONG' : 'CONTENTION'}
+                  winProbability={p.winProbability}
                   reason={p.reasons[0]}
                   reasons={p.reasons}
                   position={formatPosition(p)}
@@ -1748,21 +1746,21 @@ function ResultsStateBlock({
   const bestPick = picks.find(p => p.actualPosition === bestPosition) ?? topPick;
   const tone = getMissTone(outcome);
 
-  // For top5: hero is the close-finishing pick. Otherwise hero stays as top pick.
-  const heroPickResolved =
-    outcome === 'top5' && bestPick ? bestPick : topPick;
+  // Hero is always the closest-finishing pick (any rank). Falls back to topPick
+  // when no pick has finished (all CUT/WD).
+  const heroPickResolved = bestPick ?? topPick ?? null;
   const supporting = picks.filter(p => heroPickResolved && p.playerId !== heroPickResolved.playerId).slice(0, 2);
 
   const heroAccent: PositionAccent = outcome === 'miss' ? 'ink' : 'amber';
-  const headlinePickFirstName = topPick ? getFirstName(topPick.playerName) : '—';
-  const headlinePickPos = topPick ? formatPosition(topPick) : '—';
+  const closestFirstName = heroPickResolved ? getFirstName(heroPickResolved.playerName) : undefined;
+  const closestPos = heroPickResolved ? formatPosition(heroPickResolved) : undefined;
 
   return (
     <div>
       <ResultsEyebrow text={tone.eyebrow} color={tone.eyebrowColor} />
       <FramingSentence text={framingSentence} />
       <EditorialHeadline>
-        {tone.headlineRender(winnerFirstName, headlinePickFirstName, headlinePickPos)}
+        {tone.headlineRender({ winner: winnerFirstName, closest: closestFirstName, closestPos })}
       </EditorialHeadline>
       <ContextLine>{tone.contextLine(numInTop10, missedCutCount).toUpperCase()}</ContextLine>
       {data?.tournament?.name && (
@@ -1780,9 +1778,10 @@ function ResultsStateBlock({
         <HeroPick
           initials={getInitials(heroPickResolved.playerName)}
           name={heroPickResolved.playerName}
-          subtitle={`Our #${heroPickResolved.predictedRank} pick · Final ${formatPosition(heroPickResolved)}`}
+          subtitle={`Final ${formatPosition(heroPickResolved)}`}
           pulledQuote={heroPickResolved.pulledQuote ?? heroPickResolved.reasons[0] ?? null}
           reasons={heroPickResolved.reasons}
+          winProbability={heroPickResolved.winProbability}
           defaultExpanded={false}
           position={formatPosition(heroPickResolved)}
           positionLabel={formatScore(heroPickResolved.score)}
@@ -1794,12 +1793,12 @@ function ResultsStateBlock({
         <>
           <SupportingLabel />
           <div>
-            {supporting.map((p, i) => (
+            {supporting.map((p) => (
               <CompactPick
                 key={p.playerId}
                 initials={getInitials(p.playerName)}
                 name={p.playerName}
-                tier={i === 0 ? 'STRONG' : 'CONTENTION'}
+                winProbability={p.winProbability}
                 reason={p.reasons[0]}
                 reasons={p.reasons}
                 position={formatPosition(p)}
@@ -1937,6 +1936,7 @@ function UpcomingStateBlock({
           subtitle={topContender.courseFitScore ? `Course Fit ${Math.round(topContender.courseFitScore)}` : null}
           pulledQuote={topContender.pulledQuote ?? topContender.reasons[0] ?? null}
           reasons={topContender.reasons}
+          winProbability={topContender.winProbability}
           defaultExpanded={false}
           position="—"
           positionLabel="TO PLAY"
@@ -1948,12 +1948,12 @@ function UpcomingStateBlock({
         <>
           <SupportingLabel />
           <div>
-            {supporting.map((p, i) => (
+            {supporting.map((p) => (
               <CompactPick
                 key={p.playerId}
                 initials={getInitials(p.playerName)}
                 name={p.playerName}
-                tier={i === 0 ? 'STRONG' : 'CONTENTION'}
+                winProbability={p.winProbability}
                 reason={p.reasons[0]}
                 reasons={p.reasons}
                 position="—"
