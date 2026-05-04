@@ -21,6 +21,16 @@ export interface ClubLocation {
   sub_country: string | null;
 }
 
+export type WeatherUnresolvedReason =
+  | 'no_club_coords_no_geocode'
+  | 'geocode_404_no_match'
+  | 'geocode_502_service_error'
+  | 'geocode_network_error'
+  | 'open_meteo_failure'
+  | 'open_meteo_network_error'
+  | 'open_meteo_malformed_response'
+  | 'unknown';
+
 export const WMO_WEATHER_CODES: Record<number, string> = {
   0: 'clear',
   1: 'mostly clear',

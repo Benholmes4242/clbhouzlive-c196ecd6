@@ -4,7 +4,8 @@
  */
 import React from 'react';
 import { Cloud, ChevronRight } from 'lucide-react';
-import { useHomeCourseWeather } from '@/lib/weather/useHomeCourseWeather';
+import { useHomeCourseWeather, WeatherUnresolvedError } from '@/lib/weather/useHomeCourseWeather';
+import type { WeatherUnresolvedReason } from '@/lib/weather/types';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 
 const INK = '#0F172A';
@@ -29,7 +30,7 @@ interface Props {
 }
 
 const HomeCourseWeatherCard: React.FC<Props> = ({ club, userId }) => {
-  const { data: weather, isLoading, isError } = useHomeCourseWeather(club);
+  const { data: weather, isLoading, isError, error } = useHomeCourseWeather(club);
 
   // Telemetry: weather couldn't resolve. Fire at most once per mount, only
   // after the query has settled into an unresolvable state.
@@ -41,17 +42,24 @@ const HomeCourseWeatherCard: React.FC<Props> = ({ club, userId }) => {
 
     if (isError || (!weather && !isLoading)) {
       hasFiredUnresolved.current = true;
+
+      let reason: WeatherUnresolvedReason;
+      if (error instanceof WeatherUnresolvedError) {
+        reason = error.reason;
+      } else if (club.latitude === null || club.longitude === null) {
+        reason = 'no_club_coords_no_geocode';
+      } else {
+        reason = 'unknown';
+      }
+
       analyticsEvents.track('morning_moment_weather_unresolved', {
         user_id: userId,
         club_id: club.id,
-        reason:
-          club.latitude === null || club.longitude === null
-            ? 'geocode_failed'
-            : 'no_match',
+        reason,
       });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isLoading, isError, weather, club.id]);
+  }, [isLoading, isError, weather, error, club.id]);
 
   if (!isLoading && (isError || !weather)) {
     return null;

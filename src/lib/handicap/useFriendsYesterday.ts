@@ -3,8 +3,8 @@
  * with play_date == yesterday (in the user's local timezone).
  */
 import { useQuery } from '@tanstack/react-query';
+import { format, parseISO, subDays, isValid } from 'date-fns';
 import { fetchFriendsActivity } from '@/lib/whs/api';
-// score field is non-null in the result because we filter null grosses out below.
 
 export interface FriendYesterday {
   user_id: string | null;
@@ -15,26 +15,55 @@ export interface FriendYesterday {
   course_name: string;
 }
 
+export type FriendsYesterdayAbsenceReason =
+  | 'no_whs_friends'
+  | 'no_friends_played'
+  | 'all_filtered_null_gross'
+  | null;
+
 export interface FriendsYesterdayResult {
   friends: FriendYesterday[];
   count: number;
   best: FriendYesterday | null;
+  absenceReason: FriendsYesterdayAbsenceReason;
 }
 
-function toLocalDateKey(d: Date | string | null): string | null {
+/**
+ * Convert a date input to a yyyy-MM-dd local-date key.
+ *
+ * Handles three input shapes:
+ *  - null → null
+ *  - ISO datetime string → parsed as UTC, converted to local
+ *  - Date-only string ("2026-05-03") → parsed as local-midnight that calendar day
+ *
+ * @internal — exported for testing. Not part of the hook's public surface.
+ */
+export function toLocalDateKey(d: Date | string | null): string | null {
   if (!d) return null;
-  const date = new Date(d);
-  if (Number.isNaN(date.getTime())) return null;
-  const y = date.getFullYear();
-  const m = String(date.getMonth() + 1).padStart(2, '0');
-  const day = String(date.getDate()).padStart(2, '0');
-  return `${y}-${m}-${day}`;
+  if (d instanceof Date) {
+    if (!isValid(d)) return null;
+    return format(d, 'yyyy-MM-dd');
+  }
+  const dateOnlyMatch = /^\d{4}-\d{2}-\d{2}$/.test(d);
+  let parsed: Date;
+  if (dateOnlyMatch) {
+    const [y, m, day] = d.split('-').map(Number);
+    parsed = new Date(y, m - 1, day);
+  } else {
+    parsed = parseISO(d);
+  }
+  if (!isValid(parsed)) return null;
+  return format(parsed, 'yyyy-MM-dd');
 }
 
-function getYesterdayKey(): string {
-  const d = new Date();
-  d.setDate(d.getDate() - 1);
-  return toLocalDateKey(d)!;
+/**
+ * Yesterday's date key in the user's local timezone.
+ * date-fns subDays handles DST transitions correctly.
+ *
+ * @internal — exported for testing.
+ */
+export function getYesterdayKey(): string {
+  return format(subDays(new Date(), 1), 'yyyy-MM-dd');
 }
 
 export function useFriendsYesterday(ownerUserId: string) {
@@ -46,19 +75,46 @@ export function useFriendsYesterday(ownerUserId: string) {
       const activity = await fetchFriendsActivity(ownerUserId, 50);
       const yesterday = getYesterdayKey();
 
-      const playedYesterday = activity.filter((f) => {
+      // Cause 1 — no WHS friends at all
+      if (activity.length === 0) {
+        return {
+          friends: [],
+          count: 0,
+          best: null,
+          absenceReason: 'no_whs_friends' as const,
+        };
+      }
+
+      const playedYesterdayRaw = activity.filter((f) => {
         const playedDate = toLocalDateKey(f.last_round_played_at);
-        if (playedDate !== yesterday) return false;
-        // Filter out friends without a real gross score — they don't belong
-        // in the "shot X — best of the group" standout line.
-        if (
-          f.last_round_adjusted_gross === null ||
-          f.last_round_adjusted_gross === undefined
-        ) {
-          return false;
-        }
-        return true;
+        return playedDate === yesterday;
       });
+
+      // Cause 2 — friends exist, none played yesterday
+      if (playedYesterdayRaw.length === 0) {
+        return {
+          friends: [],
+          count: 0,
+          best: null,
+          absenceReason: 'no_friends_played' as const,
+        };
+      }
+
+      const playedYesterday = playedYesterdayRaw.filter(
+        (f) =>
+          f.last_round_adjusted_gross !== null &&
+          f.last_round_adjusted_gross !== undefined,
+      );
+
+      // Cause 3 — friends played but all had null gross
+      if (playedYesterday.length === 0) {
+        return {
+          friends: [],
+          count: 0,
+          best: null,
+          absenceReason: 'all_filtered_null_gross' as const,
+        };
+      }
 
       playedYesterday.sort((a, b) => {
         const ga = a.last_round_adjusted_gross ?? Number.MAX_SAFE_INTEGER;
@@ -79,6 +135,7 @@ export function useFriendsYesterday(ownerUserId: string) {
         friends,
         count: friends.length,
         best: friends[0] ?? null,
+        absenceReason: null,
       };
     },
   });
