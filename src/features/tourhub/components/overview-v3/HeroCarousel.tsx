@@ -515,10 +515,14 @@ function MiniLeaderboardRow({ leader, isFirst, index, isActive, isLeader, scoreF
         {leader.scoreDisplay}
       </span>
       {positionDelta > 0 && (
-        <span className="movement-up">▲{positionDelta}</span>
+        <span className="movement-pill movement-up" aria-label={`Up ${positionDelta}`}>
+          <ArrowUp /> {positionDelta}
+        </span>
       )}
       {positionDelta < 0 && (
-        <span className="movement-down">▼{Math.abs(positionDelta)}</span>
+        <span className="movement-pill movement-down" aria-label={`Down ${Math.abs(positionDelta)}`}>
+          <ArrowDown /> {Math.abs(positionDelta)}
+        </span>
       )}
     </motion.div>
   );
