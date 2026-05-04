@@ -50,6 +50,8 @@ async function fetchCachedInsights(connectionId: string): Promise<{
     insights,
     cachedScoreId: (row?.generated_from_score_id as string) ?? null,
     latestScoreId: (latest?.id as string) ?? null,
+    cachedDateKey: ((row as any)?.date_key as string) ?? null,
+    todayKey: todayKey(),
   };
 }
 
@@ -67,10 +69,12 @@ export function useHandicapInsights(connectionId: string | undefined) {
 
   useEffect(() => {
     if (!connectionId || !query.data) return;
-    const { insights, cachedScoreId, latestScoreId } = query.data;
+    const { insights, cachedScoreId, latestScoreId, cachedDateKey, todayKey: today } = query.data;
     if (!latestScoreId) return; // no rounds
-    const cacheValid = insights && cachedScoreId === latestScoreId;
-    if (cacheValid || generating) return;
+    const scoreFresh = insights && cachedScoreId === latestScoreId;
+    const dateFresh = cachedDateKey === today;
+    if (scoreFresh && dateFresh) return;
+    if (generating) return;
 
     let cancelled = false;
     (async () => {
@@ -96,13 +100,14 @@ export function useHandicapInsights(connectionId: string | undefined) {
       cancelled = true;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [connectionId, query.data?.cachedScoreId, query.data?.latestScoreId]);
+  }, [connectionId, query.data?.cachedScoreId, query.data?.latestScoreId, query.data?.cachedDateKey]);
 
   const data = query.data?.insights ?? null;
   const cacheStale =
     !!query.data &&
     query.data.latestScoreId &&
-    query.data.cachedScoreId !== query.data.latestScoreId;
+    (query.data.cachedScoreId !== query.data.latestScoreId ||
+      query.data.cachedDateKey !== query.data.todayKey);
 
   return {
     data: cacheStale ? null : data,
