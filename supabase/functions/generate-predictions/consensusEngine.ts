@@ -16,7 +16,7 @@ export interface ModelPick {
   playerName: string;
   rank: number;
   winProbability: number;
-  courseFitScore: number;
+  courseFitScore: number | null;
   reasons: string[];
 }
 
