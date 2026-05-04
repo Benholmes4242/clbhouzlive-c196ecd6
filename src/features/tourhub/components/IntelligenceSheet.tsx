@@ -111,7 +111,7 @@ function Header({ onClose }: { onClose: () => void }) {
             flexShrink: 0,
           }}
         >
-          <Brain size={18} color={AMBER_DEEP} strokeWidth={2.5} />
+          <Brain size={18} color={AMBER} strokeWidth={2.5} />
         </div>
         <div style={{ minWidth: 0 }}>
           <h2
@@ -532,9 +532,9 @@ function PicksHistoryBody({ onClose }: { onClose: () => void }) {
               style={{
                 padding: '6px 12px',
                 borderRadius: 999,
-                border: active ? `1px solid ${AMBER_DEEP}` : `1px solid ${SLATE_200}`,
-                background: active ? 'rgba(184,95,0,0.08)' : '#ffffff',
-                color: active ? AMBER_DEEP : SLATE_500,
+                border: active ? `1px solid ${AMBER}` : `1px solid ${SLATE_200}`,
+                background: active ? 'rgba(247,147,30,0.08)' : '#ffffff',
+                color: active ? AMBER : SLATE_500,
                 fontSize: 12,
                 fontWeight: 700,
                 letterSpacing: '-0.05px',
@@ -788,7 +788,7 @@ function EmptyState({ onClose }: { onClose: () => void }) {
           justifyContent: 'center',
         }}
       >
-        <Brain size={26} color={AMBER_DEEP} strokeWidth={2.8} style={{ display: 'block' }} />
+        <Brain size={26} color={AMBER} strokeWidth={2.8} style={{ display: 'block' }} />
       </div>
       <h3 style={{ margin: '16px 0 0', fontSize: 16, fontWeight: 800, color: SLATE_900, letterSpacing: '-0.2px' }}>
         No picks yet this season.
