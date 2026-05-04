@@ -3,7 +3,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 
 interface BridgeRow {
   whs_course_id: string;
@@ -36,7 +36,7 @@ const METHOD_FILTERS = [
 ];
 
 export default function WhsCourseBridgeReviewPage() {
-  const { toast } = useToast();
+  // toast imported from sonner
   const [filter, setFilter] = useState('unreviewed');
   const [rows, setRows] = useState<BridgeRow[]>([]);
   const [loading, setLoading] = useState(false);
