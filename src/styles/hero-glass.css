@@ -229,6 +229,29 @@
 
 .leaderboard-row {
   padding: 5px 0;
+  position: relative;
+  border-radius: 8px;
+  transition: background-color 0.4s ease;
+}
+
+.leaderboard-row.row-pulse-up {
+  animation: rowPulseUp 1.6s ease-out 1;
+}
+
+.leaderboard-row.row-pulse-down {
+  animation: rowPulseDown 1.6s ease-out 1;
+}
+
+@keyframes rowPulseUp {
+  0% { background-color: rgba(74, 222, 128, 0); }
+  20% { background-color: rgba(74, 222, 128, 0.10); }
+  100% { background-color: rgba(74, 222, 128, 0); }
+}
+
+@keyframes rowPulseDown {
+  0% { background-color: rgba(248, 113, 113, 0); }
+  20% { background-color: rgba(248, 113, 113, 0.10); }
+  100% { background-color: rgba(248, 113, 113, 0); }
 }
 
 /* Chaser styling — dimmed relative to leader */
