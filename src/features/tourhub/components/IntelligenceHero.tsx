@@ -98,16 +98,24 @@ interface TournamentMetaInfo {
   location: string;
 }
 
-function buildTournamentMeta(t: AIPredictionData['tournament'] | undefined | null): TournamentMetaInfo {
-  if (!t) return { name: '—', course: '—', location: '' };
-  const locParts: string[] = [];
-  if (t.venueCity) locParts.push(t.venueCity);
-  if (t.venueState) locParts.push(t.venueState);
+interface TournamentMetaInfoExt extends TournamentMetaInfo {
+  address: string;
+  country: string;
+}
+
+function buildTournamentMeta(t: AIPredictionData['tournament'] | undefined | null): TournamentMetaInfoExt {
+  if (!t) return { name: '—', course: '—', location: '', address: '', country: '' };
+  const addrParts: string[] = [];
+  if (t.venueCity) addrParts.push(t.venueCity);
+  if (t.venueState) addrParts.push(t.venueState);
+  const locParts = [...addrParts];
   if (!locParts.length && t.venueCountry) locParts.push(t.venueCountry);
   return {
     name: t.name || '—',
     course: t.venueName || '—',
     location: locParts.join(', '),
+    address: addrParts.join(', '),
+    country: t.venueCountry || '',
   };
 }
 
