@@ -178,10 +178,12 @@ function PlayerHeadshot({
 function SectionHeader({
   meta,
   headline,
+  tournamentName,
   onAboutClick,
 }: {
-  meta: TournamentMetaInfo;
+  meta: TournamentMetaInfoExt;
   headline: string;
+  tournamentName?: string;
   onAboutClick: () => void;
 }) {
   return (
@@ -231,6 +233,12 @@ function SectionHeader({
         }}
       >
         {headline}
+        {tournamentName && (
+          <>
+            {' '}
+            <span style={{ color: amber }}>{tournamentName}</span>
+          </>
+        )}
       </div>
       <div style={{ marginTop: 6, fontFamily: headlineFont }}>
         <div
@@ -242,29 +250,36 @@ function SectionHeader({
             letterSpacing: '-0.005em',
           }}
         >
-          {meta.name}
+          {meta.course}
         </div>
-        <div
-          style={{
-            fontSize: 11.5,
-            color: inkSoft,
-            marginTop: 2,
-            fontWeight: 500,
-            display: 'flex',
-            alignItems: 'center',
-            gap: 5,
-            flexWrap: 'wrap',
-          }}
-        >
-          <span>{meta.course}</span>
-          {meta.location && (
-            <>
-              <span style={{ color: inkFaint }}>·</span>
-              <MapPin size={10} color={inkFaint} strokeWidth={2} />
-              <span>{meta.location}</span>
-            </>
-          )}
-        </div>
+        {meta.address && (
+          <div
+            style={{
+              fontSize: 11.5,
+              color: inkSoft,
+              marginTop: 2,
+              fontWeight: 500,
+              display: 'flex',
+              alignItems: 'center',
+              gap: 5,
+            }}
+          >
+            <MapPin size={10} color={inkFaint} strokeWidth={2} />
+            <span>{meta.address}</span>
+          </div>
+        )}
+        {meta.country && (
+          <div
+            style={{
+              fontSize: 11.5,
+              color: inkSoft,
+              marginTop: 2,
+              fontWeight: 500,
+            }}
+          >
+            {meta.country}
+          </div>
+        )}
       </div>
     </div>
   );
