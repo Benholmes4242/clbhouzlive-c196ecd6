@@ -27,7 +27,7 @@ const NEGATIVE = '#DC2626';
 
 interface Props {
   userId: string;
-  connectionId: string | undefined;
+  connectionId?: string | undefined;
 }
 
 function getGreeting(now = new Date()): string {
