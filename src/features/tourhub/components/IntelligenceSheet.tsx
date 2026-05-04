@@ -102,15 +102,14 @@ function Header({ onClose }: { onClose: () => void }) {
             width: 36,
             height: 36,
             borderRadius: '50%',
-            background: AMBER,
+            background: AMBER_SOFT,
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            boxShadow: '0 2px 10px rgba(247,147,30,0.35)',
             flexShrink: 0,
           }}
         >
-          <Brain size={18} color={GREEN_DEEP} strokeWidth={2.8} />
+          <Brain size={18} color={AMBER_DEEP} strokeWidth={2.5} />
         </div>
         <div style={{ minWidth: 0 }}>
           <h2
@@ -228,26 +227,12 @@ interface AnalyseRow {
 }
 
 const ANALYSE_ROWS: AnalyseRow[] = [
-  { icon: TrendingUp, iconColor: GREEN_ACCENT, iconBg: 'rgba(45, 187, 120, 0.12)', title: 'Player form', body: 'Last 12 starts weighted by recency, finish quality, and field strength.' },
-  { icon: Database, iconColor: AMBER, iconBg: 'rgba(247, 147, 30, 0.10)', title: 'Course history', body: 'Past results at this venue and at courses with comparable profiles.' },
-  { icon: Award, iconColor: GREEN_ACCENT, iconBg: 'rgba(45, 187, 120, 0.12)', title: 'Statistical fit', body: 'Strokes-gained categories matched to what the course actually rewards.' },
-  { icon: Cpu, iconColor: AMBER, iconBg: 'rgba(247, 147, 30, 0.10)', title: 'World ranking trajectory', body: 'Ranking direction over the past 12 weeks, not just the snapshot.' },
-  { icon: Newspaper, iconColor: '#EF4444', iconBg: 'rgba(239, 68, 68, 0.10)', title: 'News and injuries', body: 'Late withdrawals, equipment changes, and reported injury status.' },
-  { icon: Cloud, iconColor: '#3B82F6', iconBg: 'rgba(59, 130, 246, 0.10)', title: 'Weather projections', body: 'Wind and rain forecasts that historically reshape the leaderboard.' },
-];
-
-interface TierRow {
-  label: string;
-  tint: string;
-  border: string;
-  text: string;
-  body: string;
-}
-
-const TIER_ROWS: TierRow[] = [
-  { label: 'TOP PICK', tint: 'rgba(247, 147, 30, 0.12)', border: 'rgba(247, 147, 30, 0.35)', text: AMBER, body: 'Highest conviction. Strongest combined signal across form, fit, and venue history.' },
-  { label: 'STRONG', tint: 'rgba(45, 187, 120, 0.12)', border: 'rgba(45, 187, 120, 0.30)', text: GREEN_ACCENT, body: 'Solid case across multiple signals. A realistic alternative to the Top Pick.' },
-  { label: 'CONTENTION', tint: 'rgba(15, 23, 42, 0.06)', border: 'rgba(15, 23, 42, 0.10)', text: SLATE_500, body: 'In the conversation. Right profile for the venue with at least one strong signal.' },
+  { icon: TrendingUp, iconColor: AMBER, iconBg: AMBER_SOFT, title: 'Player form', body: 'Last 12 starts weighted by recency, finish quality, and field strength.' },
+  { icon: Database, iconColor: GREEN_ACCENT, iconBg: 'rgba(16,185,129,0.10)', title: 'Course history', body: 'Past results at this venue and at courses with comparable profiles.' },
+  { icon: Award, iconColor: AMBER, iconBg: AMBER_SOFT, title: 'Statistical fit', body: 'Strokes-gained categories matched to what the course actually rewards.' },
+  { icon: Cpu, iconColor: GREEN_ACCENT, iconBg: 'rgba(16,185,129,0.10)', title: 'World ranking trajectory', body: 'Ranking direction over the past 12 weeks, not just the snapshot.' },
+  { icon: Newspaper, iconColor: AMBER, iconBg: AMBER_SOFT, title: 'Real-time research', body: 'Late withdrawals, equipment changes, and reported injury status.' },
+  { icon: Cloud, iconColor: GREEN_ACCENT, iconBg: 'rgba(16,185,129,0.10)', title: 'Course conditions', body: 'Wind, rain, and turf conditions that historically reshape the leaderboard.' },
 ];
 
 function HowWePickBody({ trackRecord }: { trackRecord: { wins: number; topFives: number } }) {
@@ -262,12 +247,6 @@ function HowWePickBody({ trackRecord }: { trackRecord: { wins: number; topFives:
     >
       <LeadCard />
       <SectionLabel>What we analyse</SectionLabel>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-        {ANALYSE_ROWS.map((row) => (
-          <AnalyseCard key={row.title} row={row} />
-        ))}
-      </div>
-      <SectionLabel>How picks are tiered</SectionLabel>
       <div
         style={{
           background: '#ffffff',
@@ -276,10 +255,11 @@ function HowWePickBody({ trackRecord }: { trackRecord: { wins: number; topFives:
           overflow: 'hidden',
         }}
       >
-        {TIER_ROWS.map((tier, i) => (
-          <TierCard key={tier.label} tier={tier} isLast={i === TIER_ROWS.length - 1} />
+        {ANALYSE_ROWS.map((row, i) => (
+          <AnalyseRowItem key={row.title} row={row} isLast={i === ANALYSE_ROWS.length - 1} />
         ))}
       </div>
+      <SectionLabel>Receipts</SectionLabel>
       <BackedByResultsCard wins={trackRecord.wins} topFives={trackRecord.topFives} />
       <Footnote />
     </div>
@@ -290,22 +270,22 @@ function LeadCard() {
   return (
     <div
       style={{
-        background: '#ffffff',
+        background: SLATE_50,
         borderRadius: 14,
+        padding: 14,
         border: `1px solid ${HAIRLINE}`,
-        padding: '16px 16px',
       }}
     >
-      <p style={{ margin: 0, fontSize: 14, lineHeight: 1.55, color: SLATE_900, letterSpacing: '-0.1px' }}>
-        clbhouz Intelligence analyses over 12,000 data points per tournament to
-        identify the players most likely to win — and the players most likely
-        to play well even if they don't.
-      </p>
-      <p style={{ margin: '12px 0 0', fontSize: 13, lineHeight: 1.55, color: SLATE_600, letterSpacing: '-0.05px' }}>
-        Picks come from our in-house artificial intelligence model, purpose-built
-        to weight current form, course history, statistical fit, and live data
-        signals into a single confidence-ranked shortlist for every PGA TOUR event.
-      </p>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8 }}>
+        <span style={{ width: 6, height: 6, background: AMBER, borderRadius: '50%' }} />
+        <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.14em', color: AMBER }}>
+          HOW IT WORKS
+        </span>
+      </div>
+      <div style={{ fontSize: 13, color: SLATE_600, lineHeight: 1.55 }}>
+        Each tournament we run a multi-model AI consensus across the field. The models
+        weigh six independent factors, debate, and converge on three picks for the week.
+      </div>
     </div>
   );
 }
@@ -315,11 +295,11 @@ function SectionLabel({ children }: { children: React.ReactNode }) {
     <div
       style={{
         margin: '20px 0 10px',
-        fontSize: 11,
-        fontWeight: 800,
-        letterSpacing: '0.16em',
+        fontSize: 10,
+        fontWeight: 700,
+        letterSpacing: '0.14em',
         textTransform: 'uppercase',
-        color: GREEN_DEEP,
+        color: SLATE_400,
       }}
     >
       {children}
@@ -327,7 +307,7 @@ function SectionLabel({ children }: { children: React.ReactNode }) {
   );
 }
 
-function AnalyseCard({ row }: { row: AnalyseRow }) {
+function AnalyseRowItem({ row, isLast }: { row: AnalyseRow; isLast: boolean }) {
   const Icon = row.icon;
   return (
     <div
@@ -335,17 +315,15 @@ function AnalyseCard({ row }: { row: AnalyseRow }) {
         display: 'flex',
         gap: 12,
         alignItems: 'flex-start',
-        background: '#ffffff',
-        borderRadius: 12,
-        border: `1px solid ${HAIRLINE}`,
         padding: '12px 14px',
+        borderBottom: isLast ? 'none' : `1px solid ${HAIRLINE}`,
       }}
     >
       <div
         style={{
           width: 32,
           height: 32,
-          borderRadius: 10,
+          borderRadius: 8,
           background: row.iconBg,
           display: 'flex',
           alignItems: 'center',
@@ -353,51 +331,15 @@ function AnalyseCard({ row }: { row: AnalyseRow }) {
           flexShrink: 0,
         }}
       >
-        <Icon size={16} color={row.iconColor} strokeWidth={2.4} />
+        <Icon size={15} color={row.iconColor} strokeWidth={2.2} />
       </div>
       <div style={{ minWidth: 0, flex: 1 }}>
-        <div style={{ fontSize: 13, fontWeight: 700, color: SLATE_900, letterSpacing: '-0.1px' }}>
+        <div style={{ fontSize: 12.5, fontWeight: 700, color: SLATE_900, letterSpacing: '-0.1px' }}>
           {row.title}
         </div>
-        <div style={{ marginTop: 2, fontSize: 12, lineHeight: 1.45, color: SLATE_600, letterSpacing: '-0.05px' }}>
+        <div style={{ marginTop: 2, fontSize: 11.5, lineHeight: 1.45, color: SLATE_600 }}>
           {row.body}
         </div>
-      </div>
-    </div>
-  );
-}
-
-function TierCard({ tier, isLast }: { tier: TierRow; isLast: boolean }) {
-  return (
-    <div
-      style={{
-        display: 'flex',
-        gap: 12,
-        alignItems: 'flex-start',
-        padding: '14px 14px',
-        borderBottom: isLast ? 'none' : `1px solid ${HAIRLINE}`,
-      }}
-    >
-      <span
-        style={{
-          flexShrink: 0,
-          minWidth: 88,
-          textAlign: 'center',
-          fontSize: 9,
-          fontWeight: 800,
-          letterSpacing: '0.14em',
-          textTransform: 'uppercase',
-          color: tier.text,
-          background: tier.tint,
-          border: `1px solid ${tier.border}`,
-          borderRadius: 999,
-          padding: '5px 10px',
-        }}
-      >
-        {tier.label}
-      </span>
-      <div style={{ fontSize: 12.5, lineHeight: 1.5, color: SLATE_900, letterSpacing: '-0.05px', flex: 1 }}>
-        {tier.body}
       </div>
     </div>
   );
@@ -411,7 +353,6 @@ function BackedByResultsCard({ wins, topFives }: { wins: number; topFives: numbe
   return (
     <div
       style={{
-        marginTop: 20,
         background: AMBER_SOFT,
         borderRadius: 16,
         padding: '16px 16px 14px',
@@ -497,7 +438,7 @@ function Footnote() {
         textAlign: 'center',
       }}
     >
-      Intelligence is for entertainment and editorial purposes. Not betting advice.
+      Picks are for entertainment and discussion. Past performance does not guarantee future results.
     </p>
   );
 }
@@ -533,12 +474,12 @@ function matchesFilter(outcome: IntelligenceOutcome, filter: FilterKey): boolean
   return true;
 }
 
-function outcomeChipStyle(outcome: IntelligenceOutcome): { bg: string; fg: string; label: string } {
+function outcomeChipStyle(outcome: IntelligenceOutcome): { bg: string; fg: string; label: string; icon?: boolean } {
   switch (outcome) {
-    case 'win':     return { bg: 'rgba(247,147,30,0.12)', fg: AMBER, label: 'WIN' };
-    case 'top5':    return { bg: 'rgba(15,23,42,0.06)', fg: SLATE_900, label: 'TOP-5' };
-    case 'partial': return { bg: 'rgba(15,23,42,0.04)', fg: SLATE_500, label: 'PARTIAL' };
-    case 'miss':    return { bg: 'rgba(15,23,42,0.04)', fg: SLATE_500, label: 'MISS' };
+    case 'win':     return { bg: AMBER, fg: SLATE_900, label: 'WIN', icon: true };
+    case 'top5':    return { bg: GREEN_ACCENT, fg: '#ffffff', label: 'TOP 5' };
+    case 'partial': return { bg: 'rgba(16,185,129,0.85)', fg: '#ffffff', label: 'TOP 10' };
+    case 'miss':    return { bg: 'rgba(15,23,42,0.55)', fg: '#ffffff', label: 'MISS' };
   }
 }
 
@@ -695,15 +636,19 @@ function TournamentCard({
         <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexShrink: 0 }}>
           <span
             style={{
-              fontSize: 10,
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 4,
+              fontSize: 9.5,
               fontWeight: 800,
               letterSpacing: '0.1em',
-              padding: '4px 8px',
+              padding: '4px 9px',
               borderRadius: 6,
               background: chip.bg,
               color: chip.fg,
             }}
           >
+            {chip.icon && <Trophy size={10} color={chip.fg} fill={chip.fg} />}
             {chip.label}
           </span>
           <ChevronRight size={16} color={SLATE_400} strokeWidth={2.2} />

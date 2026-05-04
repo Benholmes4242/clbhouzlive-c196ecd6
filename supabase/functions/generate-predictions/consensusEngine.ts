@@ -16,7 +16,7 @@ export interface ModelPick {
   playerName: string;
   rank: number;
   winProbability: number;
-  courseFitScore: number;
+  courseFitScore: number | null;
   reasons: string[];
 }
 
@@ -165,21 +165,18 @@ function parseModelResponse(rawResponse: string, modelName: string): { picks: Mo
     const contenders = parsed.topContenders || parsed.top_contenders || parsed.picks || [];
 
     const picks = contenders.slice(0, 8).map((c: any, i: number) => {
-      // TEMP — diagnostic logging for course-fit audit. Remove after one run.
-      console.log('[fit-debug]', JSON.stringify({
-        model: modelName,
-        player: c.playerName || c.player_name || c.name,
-        rank: c.rank ?? i + 1,
-        rawCfs: c.courseFitScore,
-        rawSnakeCase: c.course_fit_score,
-        type: typeof c.courseFitScore,
-      }));
+      const rawFit =
+        typeof c.courseFitScore === 'number'
+          ? c.courseFitScore
+          : typeof c.course_fit_score === 'number'
+          ? c.course_fit_score
+          : null;
       return {
         playerId: c.playerId || c.player_id || '',
         playerName: c.playerName || c.player_name || c.name || 'Unknown',
         rank: c.rank || i + 1,
         winProbability: c.winProbability || c.win_probability || 0,
-        courseFitScore: c.courseFitScore || c.course_fit_score || 50,
+        courseFitScore: rawFit,
         reasons: (c.reasons || []).slice(0, 3).map((r: any) =>
           typeof r === 'string' ? r : r.text || r.reason || ''
         ),
