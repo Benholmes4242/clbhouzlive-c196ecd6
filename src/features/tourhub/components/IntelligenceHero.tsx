@@ -1229,7 +1229,7 @@ function buildUpcomingPicks(data: AIPredictionData | null): UpcomingPick[] {
     name: c.playerName,
     insight: buildInsight(c),
     reasons: c.reasons ?? [],
-    courseFit: c.courseFitScore ?? 0,
+    courseFit: c.courseFitScore,
   }));
 }
 
