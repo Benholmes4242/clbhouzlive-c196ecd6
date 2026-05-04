@@ -46,7 +46,7 @@ export interface ConsensusPick {
   rank: number;
   consensusScore: number;
   winProbability: number;
-  courseFitScore: number;       // From calculated course fit, NOT AI-generated
+  courseFitScore: number | null;       // null when no DNA + no AI-returned fit
   reasons: string[];
   modelVotes: ModelVote[];
   isDarkHorse: boolean;
@@ -208,7 +208,7 @@ export function aggregateConsensus(
         ...p,
         rank: i + 1,
         consensusScore: 100 - i * 10,
-        courseFitScore: calculatedFitScores?.get(p.playerId) || p.courseFitScore,
+        courseFitScore: calculatedFitScores?.get(p.playerId) ?? (typeof p.courseFitScore === 'number' && p.courseFitScore > 0 ? p.courseFitScore : null),
         modelVotes: [{ model: model.model, rank: p.rank, winProbability: p.winProbability }],
         isDarkHorse: false,
       })),
@@ -234,6 +234,7 @@ export function aggregateConsensus(
     name: string;
     score: number;
     winProbabilities: number[];
+    courseFitScores: Map<string, number>;
     reasons: Map<string, string[]>;
     votes: ModelVote[];
     modelCount: number;
@@ -247,12 +248,16 @@ export function aggregateConsensus(
         name: pick.playerName,
         score: 0,
         winProbabilities: [],
+        courseFitScores: new Map<string, number>(),
         reasons: new Map(),
         votes: [],
         modelCount: 0,
       };
       existing.score += bordaPoints;
       existing.winProbabilities.push(pick.winProbability);
+      if (typeof pick.courseFitScore === 'number' && pick.courseFitScore > 0) {
+        existing.courseFitScores.set(result.model, pick.courseFitScore);
+      }
       existing.reasons.set(result.model, pick.reasons);
       existing.votes.push({ model: result.model, rank: pick.rank, winProbability: pick.winProbability });
       existing.modelCount += 1;
@@ -283,9 +288,36 @@ export function aggregateConsensus(
     const bestVote = data.votes.reduce((best, v) =>
       (v.rank !== null && (!best || v.rank < best.rank!)) ? v : best
     );
-    const bestReasons = data.reasons.get(bestVote.model) || ['Strong overall profile'];
+
+    // Reasons fallback: walk models in confidence-weight order, take first non-empty.
+    const modelsByWeight = Object.entries(normalizedWeights)
+      .sort(([, a], [, b]) => b - a)
+      .map(([model]) => model);
+    let bestReasons: string[] = [];
+    for (const model of modelsByWeight) {
+      const candidate = data.reasons.get(model);
+      if (candidate && candidate.length >= 1) {
+        bestReasons = candidate;
+        break;
+      }
+    }
+    if (bestReasons.length === 0) {
+      bestReasons = ['Strong overall profile'];
+    }
+
     const avgWinProb = data.winProbabilities.length > 0
       ? data.winProbabilities.reduce((a, b) => a + b, 0) / data.winProbabilities.length : 0;
+
+    // Course-fit fallback chain:
+    //   1. Calculated score from courseFitCalculator
+    //   2. Average of model-returned scores
+    //   3. Null — UI hides the bar gracefully
+    const calculatedFit = calculatedFitScores?.get(playerId);
+    const modelFitValues = [...data.courseFitScores.values()];
+    const avgModelFit = modelFitValues.length > 0
+      ? Math.round(modelFitValues.reduce((a, b) => a + b, 0) / modelFitValues.length)
+      : null;
+    const finalFit = calculatedFit ?? avgModelFit ?? null;
 
     return {
       playerId,
@@ -293,7 +325,7 @@ export function aggregateConsensus(
       rank: index + 1,
       consensusScore: Math.round(data.score * 100),
       winProbability: Math.round(avgWinProb * 10) / 10,
-      courseFitScore: calculatedFitScores?.get(playerId) || 50,
+      courseFitScore: finalFit,
       reasons: bestReasons,
       modelVotes: data.votes,
       isDarkHorse: data.modelCount === 1 && data.votes[0]?.rank !== null && data.votes[0].rank <= 3,

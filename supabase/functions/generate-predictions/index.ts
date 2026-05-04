@@ -645,7 +645,7 @@ ${researchResults[3]?.trim() || 'No weather forecast available.'}
         worldRanking: player?.world_rank || 999,
         winProbability: tc.winProbability,
         // CRITICAL: Use CALCULATED fit score, not AI-guessed
-        courseFitScore: fitScoreMap.get(player?.player_id || tc.playerId) || tc.courseFitScore,
+        courseFitScore: fitScoreMap.get(player?.player_id || tc.playerId) ?? tc.courseFitScore ?? null,
         reasons: tc.reasons,
         concern: '',
         isDarkHorse: tc.isDarkHorse,

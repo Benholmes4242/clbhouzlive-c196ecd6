@@ -41,7 +41,7 @@ import type {
   AITopContender,
 } from '../hooks/useAIPredictions';
 import type { TrackedPrediction } from './tournament-insights/types';
-import { IntelligenceAboutSheet } from './IntelligenceAboutSheet';
+import { IntelligenceSheet } from './IntelligenceSheet';
 import {
   getPlayerHeadshotUrl,
   PLAYER_SILHOUETTE_URL,
@@ -287,7 +287,7 @@ function CardMetaTray({
           gap: 8,
           cursor: 'pointer',
           fontFamily: headlineFont,
-          minHeight: 60,
+          // (size to content; 2-line clamp keeps cards consistent)
         }}
       >
         <div
@@ -518,7 +518,7 @@ interface UpcomingPick {
   name: string;
   insight: string;
   reasons: string[];
-  courseFit: number;
+  courseFit: number | null;
 }
 
 function UpcomingCard({ pick }: { pick: UpcomingPick }) {
@@ -565,52 +565,54 @@ function UpcomingCard({ pick }: { pick: UpcomingPick }) {
           >
             {pick.name}
           </div>
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: 8,
-              marginTop: 4,
-            }}
-          >
-            <span
-              style={{
-                fontSize: 10,
-                color: 'rgba(255,255,255,0.65)',
-                fontWeight: 600,
-                letterSpacing: '0.06em',
-              }}
-            >
-              COURSE FIT
-            </span>
+          {pick.courseFit != null && (
             <div
               style={{
-                flex: 1,
-                height: 3,
-                background: 'rgba(255,255,255,0.15)',
-                borderRadius: 2,
-                overflow: 'hidden',
+                display: 'flex',
+                alignItems: 'center',
+                gap: 8,
+                marginTop: 4,
               }}
             >
+              <span
+                style={{
+                  fontSize: 10,
+                  color: 'rgba(255,255,255,0.65)',
+                  fontWeight: 600,
+                  letterSpacing: '0.06em',
+                }}
+              >
+                COURSE FIT
+              </span>
               <div
                 style={{
-                  width: `${Math.max(0, Math.min(100, pick.courseFit))}%`,
-                  height: '100%',
-                  background: amber,
+                  flex: 1,
+                  height: 3,
+                  background: 'rgba(255,255,255,0.15)',
+                  borderRadius: 2,
+                  overflow: 'hidden',
                 }}
-              />
+              >
+                <div
+                  style={{
+                    width: `${Math.max(0, Math.min(100, pick.courseFit))}%`,
+                    height: '100%',
+                    background: amber,
+                  }}
+                />
+              </div>
+              <span
+                style={{
+                  fontSize: 12,
+                  fontWeight: 800,
+                  color: amber,
+                  fontVariantNumeric: 'tabular-nums',
+                }}
+              >
+                {Math.round(pick.courseFit)}
+              </span>
             </div>
-            <span
-              style={{
-                fontSize: 12,
-                fontWeight: 800,
-                color: amber,
-                fontVariantNumeric: 'tabular-nums',
-              }}
-            >
-              {Math.round(pick.courseFit)}
-            </span>
-          </div>
+          )}
         </div>
       </CardHero>
       <CardMetaTray insight={pick.insight} reasons={pick.reasons} />
@@ -956,7 +958,7 @@ function ReceiptsTailCard({
       style={{
         flexShrink: 0,
         width: 220,
-        height: 296,
+        minHeight: 240,
         scrollSnapAlign: 'start',
         borderRadius: 18,
         overflow: 'hidden',
@@ -1227,7 +1229,7 @@ function buildUpcomingPicks(data: AIPredictionData | null): UpcomingPick[] {
     name: c.playerName,
     insight: buildInsight(c),
     reasons: c.reasons ?? [],
-    courseFit: c.courseFitScore ?? 0,
+    courseFit: c.courseFitScore,
   }));
 }
 
@@ -1458,7 +1460,7 @@ export const IntelligenceHero = memo(function IntelligenceHero() {
         </Carousel>
       )}
 
-      <IntelligenceAboutSheet
+      <IntelligenceSheet
         open={aboutOpen}
         onClose={handleCloseAbout}
         trackRecord={{ wins: stats.wins, topFives: stats.topFives }}
