@@ -122,28 +122,9 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
   const isCompleted = type === 'completed';
   const isUpcoming = type === 'upcoming';
   
-  // Podium data for completed slides — position-based rows
+  // Podium data for completed slides — finisher list passed to EditorialResultsHero
   const podiumData = isCompleted ? leadersWinnersMap?.get(tournament.id) : undefined;
   const allFetchedData = podiumData?.allFetched ?? podiumData?.topFinishers ?? [];
-  const podiumRows = buildPodiumRows(allFetchedData);
-  const winnerRow = podiumRows[0];
-  const runnerRows = podiumRows.slice(1);
-  const podiumWinner = winnerRow?.players[0];
-
-  const winningMargin = (() => {
-    if (!winnerRow || podiumRows.length < 2) return null;
-    if (winnerRow.isTied) return 'Co-winners';
-    const row2 = podiumRows[1];
-    if (winnerRow.sharedScore === null || row2.sharedScore === null) return null;
-    const margin = row2.sharedScore - winnerRow.sharedScore;
-    if (margin === 0) return 'Won in Playoff';
-    return `Won by ${margin} stroke${margin === 1 ? '' : 's'}`;
-  })();
-
-  const handlePlayerTapNav = (playerId: string | null | undefined) => (e: React.MouseEvent) => {
-    e.stopPropagation();
-    if (playerId) navigate(`/tourhub/player/${playerId}`);
-  };
 
   // Scorecard state — player tapped in expanded leaderboard
   const [selectedPlayer, setSelectedPlayer] = useState<PlayerInfo | null>(null);
@@ -156,42 +137,15 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
     onScorecardClose?.();
   }, [onScorecardClose]);
 
-  // Convert a TournamentFinisher to PlayerInfo for scorecard
-  const finisherToPlayerInfo = useCallback((f: TournamentFinisher): PlayerInfo => {
-    const effectiveTourCode = f.tourCode ?? tournament.tourSlug ?? 'pga';
-    return {
-      id: f.playerId || '',
-      srId: f.pgaTourId || '',
-      name: f.fullName || f.displayName,
-      firstName: f.firstName,
-      lastName: f.lastName,
-      photoUrl: getPlayerHeadshotUrl(
-        f.fullName || `${f.firstName} ${f.lastName}`.trim(),
-        effectiveTourCode,
-        f.headshotOverride ?? undefined,
-      ) || undefined,
-      countryCode: f.country || undefined,
-      position: f.position,
-      totalScore: f.score ?? 0,
-      thru: 'F',
-      currentRound: 4,
-    };
-  }, [tournament.tourSlug]);
-
-  // Fetch top 5 leaders for live tournaments only
-  const { data: leaders = [], isLoading: leadersLoading } = useTournamentTopLeaders(
-    isLive ? tournament.id : null
-  );
-
-  // Full leaderboard — only fetched when expanded
+  // Full leaderboard — drives EditorialLiveHero
   const { data: fullLeaderboard = [], isLoading: isLoadingFull, isError: isFullError, refetch: refetchFull } = useTourLeaderboard(
     isLive ? tournament.id : ''
   );
-  
-  // Realtime updates — always subscribe when live so collapsed hero stays fresh
+
+  // Realtime updates — keep editorial live hero fresh
   useLeaderboardRealtime(isLive ? tournament.id : null);
 
-  // Body scroll lock when expanded
+  // Body scroll lock when expanded (upcoming-only modal pattern)
   useEffect(() => {
     if (isExpanded) {
       document.body.style.overflow = 'hidden';
@@ -217,46 +171,6 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
     if (!isExpanded) setSelectedPlayer(null);
   }, [isExpanded]);
 
-  // Touch isolation for expanded scroll area
-  const handleExpandedTouch = useCallback((e: React.TouchEvent) => {
-    e.stopPropagation();
-    onInteraction();
-  }, [onInteraction]);
-
-  // Phase 3+4: Track previous leaders for score change & movement animations
-  const prevLeadersRef = useRef<LeaderEntry[]>([]);
-  const [scoreFlashes, setScoreFlashes] = useState<Record<string, 'birdie' | 'bogey'>>({});
-  const [positionDeltas, setPositionDeltas] = useState<Record<string, number>>({});
-
-  useEffect(() => {
-    if (leaders.length === 0) return;
-    const prev = prevLeadersRef.current;
-    if (prev.length > 0) {
-      const newFlashes: Record<string, 'birdie' | 'bogey'> = {};
-      const newDeltas: Record<string, number> = {};
-      for (const leader of leaders) {
-        const prevEntry = prev.find(p => p.player.id === leader.player.id);
-        if (prevEntry) {
-          if (leader.scoreToPar < prevEntry.scoreToPar) newFlashes[leader.player.id] = 'birdie';
-          else if (leader.scoreToPar > prevEntry.scoreToPar) newFlashes[leader.player.id] = 'bogey';
-          const delta = prevEntry.position - leader.position;
-          if (delta !== 0) {
-            newDeltas[leader.player.id] = delta;
-          }
-        }
-      }
-      if (Object.keys(newFlashes).length > 0) {
-        setScoreFlashes(newFlashes);
-        setTimeout(() => setScoreFlashes({}), 600);
-      }
-      if (Object.keys(newDeltas).length > 0) {
-        setPositionDeltas(newDeltas);
-        setTimeout(() => setPositionDeltas({}), 8000);
-      }
-    }
-    prevLeadersRef.current = leaders;
-  }, [leaders, tournament.id]);
-
   // Venue-specific hero image overrides (upcoming + live)
   const venueOverride = (isUpcoming || isLive) ? (
     tournament.tourSlug === 'liv' ? livUpcomingHero
@@ -279,27 +193,6 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
     pgad: 'from-emerald-900 via-green-800 to-teal-900',
   };
   const bgGradient = tourFallbacks[tournament.tourSlug] || 'from-emerald-800 via-green-700 to-emerald-900';
-
-  // Winner info for completed tournaments
-  const winnerInfo = isCompleted && tournament.winnerName ? tournament : null;
-
-  // Winner scorecard + season stats — only fetched for completed slides
-  const { data: winnerStats } = useWinnerScorecardStats(
-    isCompleted ? tournament.id : undefined,
-    isCompleted ? podiumWinner?.playerId : undefined
-  );
-  const { data: winnerSeasonStats } = useWinnerSeasonStats(
-    isCompleted ? podiumWinner?.playerId : undefined
-  );
-
-  // Leader scorecard stats — for the sticky leader strip in expanded live state
-  const leaderId = isLive && fullLeaderboard.length > 0
-    ? (fullLeaderboard[0] as any)?.player_id ?? null
-    : null;
-  const { data: leaderStats } = useLeaderScorecardStats(
-    isLive ? tournament.id : null,
-    leaderId
-  );
 
   return (
     <motion.div
