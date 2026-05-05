@@ -771,3 +771,76 @@ export async function deleteUserRivalOverride(
     .eq('slot_index', slotIndex);
   if (error) throw error;
 }
+
+// ───────────────────────────────────────────────────────────────────────
+// Shared rounds (H2H) — used by FriendProfileSheet
+// ───────────────────────────────────────────────────────────────────────
+
+export interface SharedRoundResult {
+  play_date: string;
+  course_id: string;
+  course_name: string;
+  user_stableford: number;
+  rival_stableford: number;
+  user_gross: number;
+  rival_gross: number;
+  stableford_outcome: 'W' | 'L' | 'T';
+  gross_outcome: 'W' | 'L' | 'T';
+}
+
+export interface SharedRoundsResult {
+  shared_rounds_count: number;
+  shared_rounds_last_90d: number;
+  stableford_record: { wins: number; losses: number; ties: number };
+  gross_record: { wins: number; losses: number; ties: number };
+  shared_round_results: SharedRoundResult[];
+}
+
+const EMPTY_SHARED_ROUNDS: SharedRoundsResult = {
+  shared_rounds_count: 0,
+  shared_rounds_last_90d: 0,
+  stableford_record: { wins: 0, losses: 0, ties: 0 },
+  gross_record: { wins: 0, losses: 0, ties: 0 },
+  shared_round_results: [],
+};
+
+/**
+ * Fetch H2H shared rounds between the user and a target friend.
+ * Returns empty result for non-Clbhouz friends (no whs_scores rows).
+ */
+export async function fetchSharedRounds(
+  userId: string,
+  rivalUserId: string | null,
+): Promise<SharedRoundsResult> {
+  if (!rivalUserId) return EMPTY_SHARED_ROUNDS;
+
+  const { data, error } = await supabase.rpc('detect_shared_rounds' as any, {
+    p_user_id: userId,
+    p_rival_user_id: rivalUserId,
+  });
+  if (error) throw error;
+
+  const rounds = ((data as any[]) ?? []) as SharedRoundResult[];
+  const stableford = { wins: 0, losses: 0, ties: 0 };
+  const gross = { wins: 0, losses: 0, ties: 0 };
+  const ninetyDaysAgo = Date.now() - 90 * 24 * 60 * 60 * 1000;
+  let recentCount = 0;
+
+  for (const r of rounds) {
+    if (r.stableford_outcome === 'W') stableford.wins++;
+    else if (r.stableford_outcome === 'L') stableford.losses++;
+    else stableford.ties++;
+    if (r.gross_outcome === 'W') gross.wins++;
+    else if (r.gross_outcome === 'L') gross.losses++;
+    else gross.ties++;
+    if (Date.parse(r.play_date) >= ninetyDaysAgo) recentCount++;
+  }
+
+  return {
+    shared_rounds_count: rounds.length,
+    shared_rounds_last_90d: recentCount,
+    stableford_record: stableford,
+    gross_record: gross,
+    shared_round_results: rounds,
+  };
+}

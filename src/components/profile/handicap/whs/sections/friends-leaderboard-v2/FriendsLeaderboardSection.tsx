@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import SectionHeader from '../SectionHeader';
 import LeaderboardRow from './LeaderboardRow';
+import FriendProfileSheet from '../friend-profile-sheet/FriendProfileSheet';
 import { useFriendLeaderboard } from '@/lib/whs/hooks';
 import { ChevronRight } from 'lucide-react';
 import type { FriendLeaderboardEntry } from '@/lib/whs/types';
@@ -23,6 +24,7 @@ const HEADER_LABEL: React.CSSProperties = {
 export const FriendsLeaderboardSection: React.FC<Props> = ({ userId }) => {
   const { data, isLoading } = useFriendLeaderboard(userId);
   const [showAll, setShowAll] = useState(false);
+  const [profileSheet, setProfileSheet] = useState<{ index: number } | null>(null);
 
   const sorted = (data ?? [])
     .slice()
@@ -127,6 +129,14 @@ export const FriendsLeaderboardSection: React.FC<Props> = ({ userId }) => {
               rank={realRank}
               isFirst={i === 0}
               isLast={i === visible.length - 1}
+              onClick={
+                entry.is_self
+                  ? undefined
+                  : () => {
+                      const realIdx = sorted.findIndex((e) => e === entry);
+                      if (realIdx >= 0) setProfileSheet({ index: realIdx });
+                    }
+              }
             />
           );
         })
@@ -158,6 +168,14 @@ export const FriendsLeaderboardSection: React.FC<Props> = ({ userId }) => {
           <ChevronRight size={14} />
         </button>
       )}
+
+      <FriendProfileSheet
+        friends={sorted}
+        startIndex={profileSheet?.index ?? 0}
+        ownerUserId={userId}
+        open={!!profileSheet}
+        onClose={() => setProfileSheet(null)}
+      />
     </section>
   );
 };

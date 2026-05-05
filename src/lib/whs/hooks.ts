@@ -21,6 +21,7 @@ import {
   fetchUserRivalOverrides,
   upsertUserRivalOverride,
   deleteUserRivalOverride,
+  fetchSharedRounds,
 } from './api';
 
 export const whsKeys = {
@@ -296,5 +297,17 @@ export function useDeleteRivalOverride() {
       queryClient.invalidateQueries({ queryKey: whsKeys.userRivalOverrides(params.userId) });
       queryClient.invalidateQueries({ queryKey: whsKeys.friendRivalries(params.userId) });
     },
+  });
+}
+
+export function useSharedRounds(
+  userId: string | undefined,
+  rivalUserId: string | null,
+) {
+  return useQuery({
+    queryKey: ['whs-shared-rounds', userId ?? '', rivalUserId ?? ''],
+    queryFn: () => fetchSharedRounds(userId as string, rivalUserId),
+    enabled: !!userId,
+    staleTime: 60_000,
   });
 }

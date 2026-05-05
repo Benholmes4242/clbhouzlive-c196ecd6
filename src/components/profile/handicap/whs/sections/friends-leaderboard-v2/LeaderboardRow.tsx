@@ -10,6 +10,7 @@ interface Props {
   rank: number;
   isFirst: boolean;
   isLast: boolean;
+  onClick?: () => void;
 }
 
 const T = {
@@ -25,13 +26,16 @@ const T = {
 
 const fmtRel = (iso: string | null) => fmtRelative(iso, { compact: true });
 
-export const LeaderboardRow: React.FC<Props> = ({ entry, rank, isFirst, isLast }) => {
+export const LeaderboardRow: React.FC<Props> = ({ entry, rank, isFirst, isLast, onClick }) => {
   const isYou = entry.is_self;
   const displayName = isYou ? 'You' : reformatFriendName(entry.friend_name);
+  const Tag: any = onClick ? 'button' : 'div';
 
   return (
-    <div
-      role="listitem"
+    <Tag
+      type={onClick ? 'button' : undefined}
+      onClick={onClick}
+      role={onClick ? undefined : 'listitem'}
       aria-label={`${displayName}, ranked ${rank}, handicap ${fmtHcp(entry.friend_handicap_index)}`}
       style={{
         display: 'flex',
@@ -42,7 +46,12 @@ export const LeaderboardRow: React.FC<Props> = ({ entry, rank, isFirst, isLast }
         padding: '10px 0',
         borderTop: isFirst ? `1px solid ${T.hairline}` : 'none',
         borderBottom: `1px solid ${isLast ? T.hairline : T.hairlineSoft}`,
+        borderLeft: 'none',
+        borderRight: 'none',
         background: isYou ? T.amberTint : 'transparent',
+        cursor: onClick ? 'pointer' : 'default',
+        font: 'inherit',
+        color: 'inherit',
       }}
     >
       {/* Rank */}
@@ -177,7 +186,7 @@ export const LeaderboardRow: React.FC<Props> = ({ entry, rank, isFirst, isLast }
       >
         {fmtHcp(entry.friend_handicap_index)}
       </div>
-    </div>
+    </Tag>
   );
 };
 

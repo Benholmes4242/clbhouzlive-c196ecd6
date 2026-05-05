@@ -2,6 +2,7 @@ import React, { useMemo, useState } from 'react';
 import { useFriendLeaderboard } from '@/lib/whs/hooks';
 import SectionHeader from '../SectionHeader';
 import RecentlyActiveItem from './RecentlyActiveItem';
+import FriendProfileSheet from '../friend-profile-sheet/FriendProfileSheet';
 
 interface Props {
   userId: string;
@@ -13,6 +14,7 @@ const VISIBLE_LIMIT = 10;
 export const RecentlyActiveRail: React.FC<Props> = ({ userId }) => {
   const { data, isLoading } = useFriendLeaderboard(userId);
   const [showAll, setShowAll] = useState(false);
+  const [profileSheet, setProfileSheet] = useState<{ index: number } | null>(null);
 
   const { sorted, activeCount } = useMemo(() => {
     const rows = (data ?? []).filter((e) => !e.is_self && e.last_round_played_at);
@@ -91,10 +93,21 @@ export const RecentlyActiveRail: React.FC<Props> = ({ userId }) => {
                 !!entry.last_round_played_at &&
                 Date.parse(entry.last_round_played_at) >= cutoff
               }
+              onClick={() => {
+                const realIdx = sorted.findIndex((e) => e === entry);
+                if (realIdx >= 0) setProfileSheet({ index: realIdx });
+              }}
             />
           </div>
         ))}
       </div>
+      <FriendProfileSheet
+        friends={sorted}
+        startIndex={profileSheet?.index ?? 0}
+        ownerUserId={userId}
+        open={!!profileSheet}
+        onClose={() => setProfileSheet(null)}
+      />
     </section>
   );
 };
