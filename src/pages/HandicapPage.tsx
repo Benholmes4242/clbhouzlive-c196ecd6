@@ -31,8 +31,6 @@ const BORDER = 'rgba(15,23,42,0.10)';
 const BG_SURFACE = '#F8FAFC';
 const AMBER = '#F7931E';
 const AMBER_INK = '#C97211';
-const GREEN = '#059669';
-const RED = '#9F1D1D';
 
 const FONT_GEIST = 'Geist, system-ui, -apple-system, BlinkMacSystemFont, sans-serif';
 
