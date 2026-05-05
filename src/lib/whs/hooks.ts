@@ -98,14 +98,7 @@ export function useCounters(connectionId: string | undefined) {
   });
 }
 
-export function useRecentRounds(connectionId: string | undefined) {
-  return useQuery({
-    queryKey: whsKeys.recent(connectionId ?? ''),
-    queryFn: () => fetchRecentRounds(connectionId as string),
-    enabled: !!connectionId,
-    staleTime: 60_000,
-  });
-}
+
 
 export function useAllScores(connectionId: string | undefined) {
   return useQuery({
