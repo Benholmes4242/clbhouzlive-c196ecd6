@@ -1,4 +1,5 @@
 import React, { useState, useMemo } from 'react';
+import { Pencil } from 'lucide-react';
 import SectionHeader from '../SectionHeader';
 import RivalryCard from './RivalryCard';
 import RivalryAddCard from './RivalryAddCard';
@@ -11,31 +12,59 @@ interface Props {
   userId: string;
 }
 
-const SLOT_COUNT = 4;
-
 export const RivalriesSection: React.FC<Props> = ({ userId }) => {
   const { data, isLoading } = useFriendRivalries(userId);
 
   const [infoTarget, setInfoTarget] = useState<FriendRivalryHydrated | null>(null);
   const [editTarget, setEditTarget] = useState<{ rivalry: FriendRivalryHydrated | null; slotIndex: number } | null>(null);
 
-  // Build slot-indexed array of size SLOT_COUNT (auto slots) + 1 add card for pinned overflow
-  const slots = useMemo(() => {
-    const arr: Array<FriendRivalryHydrated | null> = Array(SLOT_COUNT).fill(null);
-    (data ?? []).forEach((r) => {
-      if (r.slot_index >= 0 && r.slot_index < SLOT_COUNT) {
-        arr[r.slot_index] = r;
-      }
-    });
-    return arr;
+  const filledRivalries = useMemo(() => {
+    return (data ?? []).slice().sort((a, b) => a.slot_index - b.slot_index);
   }, [data]);
+
+  const nextAvailableSlot = useMemo(() => {
+    const used = new Set(filledRivalries.map((r) => r.slot_index));
+    for (let i = 0; i < 10; i++) {
+      if (!used.has(i)) return i;
+    }
+    return null;
+  }, [filledRivalries]);
+
+  const hasFilled = filledRivalries.length > 0;
 
   return (
     <section style={{ padding: '20px 0 24px' }}>
       <SectionHeader
         eyebrow="RIVALRIES"
-        title="Your friendly enemies"
+        title="Your rivals"
         sub={isLoading ? 'Loading…' : 'Auto-picked from your circle. Pin to lock a slot.'}
+        right={
+          hasFilled ? (
+            <button
+              onClick={() => {
+                const first = filledRivalries[0];
+                setEditTarget({ rivalry: first, slotIndex: first.slot_index });
+              }}
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 4,
+                padding: '4px 10px',
+                background: 'transparent',
+                border: '1px solid rgba(15,23,42,0.12)',
+                borderRadius: 999,
+                cursor: 'pointer',
+                color: 'rgba(15,23,42,0.78)',
+                fontSize: 10,
+                fontWeight: 800,
+                letterSpacing: '0.14em',
+              }}
+            >
+              <Pencil size={11} strokeWidth={2.4} />
+              EDIT
+            </button>
+          ) : null
+        }
       />
 
       <div
@@ -50,44 +79,38 @@ export const RivalriesSection: React.FC<Props> = ({ userId }) => {
           scrollbarWidth: 'none',
         }}
       >
-        {isLoading
-          ? Array.from({ length: 2 }).map((_, i) => (
-              <div
-                key={i}
-                className="animate-pulse"
-                style={{
-                  flex: '0 0 auto',
-                  width: 264,
-                  height: 290,
-                  borderRadius: 18,
-                  background: 'rgba(15,23,42,0.06)',
-                }}
+        {isLoading ? (
+          Array.from({ length: 2 }).map((_, i) => (
+            <div
+              key={i}
+              className="animate-pulse"
+              style={{
+                flex: '0 0 auto',
+                width: 264,
+                height: 220,
+                borderRadius: 18,
+                background: 'rgba(15,23,42,0.06)',
+              }}
+            />
+          ))
+        ) : (
+          <>
+            {filledRivalries.map((rivalry) => (
+              <RivalryCard
+                key={`slot-${rivalry.slot_index}`}
+                rivalry={rivalry}
+                onInfo={() => setInfoTarget(rivalry)}
+                onTap={() => setInfoTarget(rivalry)}
               />
-            ))
-          : slots.map((rivalry, i) =>
-              rivalry ? (
-                <RivalryCard
-                  key={`slot-${i}`}
-                  rivalry={rivalry}
-                  onInfo={() => setInfoTarget(rivalry)}
-                  onEdit={() => setEditTarget({ rivalry, slotIndex: i })}
-                  onTap={() => setInfoTarget(rivalry)}
-                />
-              ) : (
-                <RivalryAddCard
-                  key={`slot-${i}`}
-                  slotIndex={i}
-                  label="Pin a rival"
-                  onClick={() => setEditTarget({ rivalry: null, slotIndex: i })}
-                />
-              ),
+            ))}
+            {nextAvailableSlot !== null && (
+              <RivalryAddCard
+                slotIndex={nextAvailableSlot}
+                label="Add a rival"
+                onClick={() => setEditTarget({ rivalry: null, slotIndex: nextAvailableSlot })}
+              />
             )}
-        {!isLoading && (
-          <RivalryAddCard
-            slotIndex={SLOT_COUNT}
-            label="Add a pinned rival"
-            onClick={() => setEditTarget({ rivalry: null, slotIndex: SLOT_COUNT })}
-          />
+          </>
         )}
       </div>
 
