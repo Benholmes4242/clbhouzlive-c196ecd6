@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import { useFriendLeaderboard } from '@/lib/whs/hooks';
 import SectionHeader from '../SectionHeader';
 import RecentlyActiveItem from './RecentlyActiveItem';
@@ -12,6 +12,7 @@ const VISIBLE_LIMIT = 10;
 
 export const RecentlyActiveRail: React.FC<Props> = ({ userId }) => {
   const { data, isLoading } = useFriendLeaderboard(userId);
+  const [showAll, setShowAll] = useState(false);
 
   const { sorted, activeCount } = useMemo(() => {
     const rows = (data ?? []).filter((e) => !e.is_self && e.last_round_played_at);
@@ -35,8 +36,8 @@ export const RecentlyActiveRail: React.FC<Props> = ({ userId }) => {
     return null;
   }
 
-  const visible = sorted.slice(0, VISIBLE_LIMIT);
-  const overflow = sorted.length - visible.length;
+  const visible = showAll ? sorted : sorted.slice(0, VISIBLE_LIMIT);
+  const overflow = sorted.length - Math.min(VISIBLE_LIMIT, sorted.length);
   const cutoff = Date.now() - SEVEN_DAYS_MS;
 
   return (
@@ -49,6 +50,7 @@ export const RecentlyActiveRail: React.FC<Props> = ({ userId }) => {
           overflow > 0 ? (
             <button
               type="button"
+              onClick={() => setShowAll((v) => !v)}
               style={{
                 background: 'transparent',
                 border: 'none',
@@ -61,7 +63,7 @@ export const RecentlyActiveRail: React.FC<Props> = ({ userId }) => {
                 cursor: 'pointer',
               }}
             >
-              See all ({sorted.length})
+              {showAll ? 'Show less' : `See all (${sorted.length})`}
             </button>
           ) : null
         }
