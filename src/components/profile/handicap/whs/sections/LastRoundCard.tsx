@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { ChevronRight, ArrowDown, ArrowUp, Minus, CheckCircle2 } from 'lucide-react';
 import { format } from 'date-fns';
 import { useLastRound } from '@/lib/whs/hooks';
-import LastRoundSheet from './last-round/LastRoundSheet';
+import RoundDetailSheet from './round-detail/RoundDetailSheet';
 
 interface Props {
   connectionId: string;
