@@ -47,7 +47,6 @@ export default function WhsConnectionSheet({ open, onClose, connection, userId }
     queryClient.invalidateQueries({ queryKey: whsKeys.lastRound(connection.id) });
     queryClient.invalidateQueries({ queryKey: ['whs-round-detail'] });
     queryClient.invalidateQueries({ queryKey: whsKeys.counters(connection.id) });
-    queryClient.invalidateQueries({ queryKey: whsKeys.recent(connection.id) });
     queryClient.invalidateQueries({ queryKey: whsKeys.allScores(connection.id) });
   };
 

@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { ArrowDown, ArrowUp } from 'lucide-react';
-import { useHandicapHistory, useHandicapTrend, useRecentRounds } from '@/lib/whs/hooks';
+import { useHandicapHistory, useHandicapTrend, useAllScores } from '@/lib/whs/hooks';
 import { whsDisplayedHcp, formatDisplayedHcp, fmtDiff } from '@/lib/whs/format';
 import type { WhsConnection, HandicapPoint } from '@/lib/whs/types';
 
@@ -83,7 +83,7 @@ const HeroHandicapCard: React.FC<Props> = ({ connection }) => {
 
   const { data: trend, isLoading: trendLoading } = useHandicapTrend(connection.id);
   const { data: history, isLoading: historyLoading } = useHandicapHistory(connection.id, range);
-  const { data: recent } = useRecentRounds(connection.id);
+  const { data: recent } = useAllScores(connection.id);
 
   const current = trend?.current ?? null;
   const points: HandicapPoint[] = history ?? [];

@@ -5,7 +5,6 @@ import {
   fetchHandicapTrend,
   fetchLastRound,
   fetchCounters,
-  fetchRecentRounds,
   fetchAllScores,
   fetchHandicapHistory,
   fetchFriendsLeaderboard,
@@ -23,7 +22,6 @@ export const whsKeys = {
   trend: (connectionId: string) => ['whs-handicap-trend', connectionId] as const,
   lastRound: (connectionId: string) => ['whs-last-round', connectionId] as const,
   counters: (connectionId: string) => ['whs-counters', connectionId] as const,
-  recent: (connectionId: string) => ['whs-recent-rounds', connectionId] as const,
   allScores: (connectionId: string) => ['whs-all-scores', connectionId] as const,
   history: (connectionId: string, daysBack: number | 'all') =>
     ['whs-handicap-history', connectionId, daysBack] as const,
@@ -100,14 +98,7 @@ export function useCounters(connectionId: string | undefined) {
   });
 }
 
-export function useRecentRounds(connectionId: string | undefined) {
-  return useQuery({
-    queryKey: whsKeys.recent(connectionId ?? ''),
-    queryFn: () => fetchRecentRounds(connectionId as string),
-    enabled: !!connectionId,
-    staleTime: 60_000,
-  });
-}
+
 
 export function useAllScores(connectionId: string | undefined) {
   return useQuery({

@@ -214,10 +214,13 @@ export interface WhsFriendWindowRanking {
   last_8_rounds: number;
 }
 
-export interface WhsRecentRound extends WhsScore {
+export interface WhsScoreWithIndex extends WhsScore {
   /** Handicap index after this round was applied. Null if not yet computed. */
   handicap_index_at_time: number | null;
 }
+
+/** @deprecated Use WhsScoreWithIndex */
+export type WhsRecentRound = WhsScoreWithIndex;
 
 /** @deprecated Use WhsRoundDetail */
 export type WhsLastRoundDetail = WhsRoundDetail;
