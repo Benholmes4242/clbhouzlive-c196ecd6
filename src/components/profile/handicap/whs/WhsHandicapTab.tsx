@@ -1,4 +1,5 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useWhsConnection } from '@/lib/whs/hooks';
 import WhsConnectScreen from './WhsConnectScreen';
 import HandicapDashboard from './HandicapDashboard';
@@ -21,12 +22,18 @@ const SkeletonView = () => (
 );
 
 export const WhsHandicapTab: React.FC<Props> = ({ userId }) => {
+  const navigate = useNavigate();
   const { data: connection, isLoading, refetch } = useWhsConnection(userId);
 
   if (isLoading) return <SkeletonView />;
 
   if (!connection) {
-    return <WhsConnectScreen onConnected={() => refetch()} />;
+    return (
+      <WhsConnectScreen
+        onConnected={() => refetch()}
+        onSkip={() => navigate(-1)}
+      />
+    );
   }
 
   return <HandicapDashboard connection={connection} userId={userId} />;

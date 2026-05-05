@@ -127,7 +127,7 @@ export const WhsConnectScreen: React.FC<Props> = ({ onConnected, onSkip }) => {
         </p>
       </div>
 
-      {/* Hero illustration (simple fallback) */}
+      {/* Hero illustration — static */}
       <div className="flex items-center justify-center gap-3 mb-7" aria-hidden>
         <div
           className="px-3 py-1.5 rounded-md text-[13px] font-bold lowercase tracking-tight"
@@ -135,19 +135,7 @@ export const WhsConnectScreen: React.FC<Props> = ({ onConnected, onSkip }) => {
         >
           clbhouz
         </div>
-        <div className="relative w-12 h-px" style={{ background: 'rgba(15,23,42,0.18)' }}>
-          <div
-            className="absolute -top-[3px] left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full animate-pulse"
-            style={{ background: '#F7931E' }}
-          />
-        </div>
         <Link2 className="h-4 w-4" style={{ color: 'rgba(15,23,42,0.45)' }} />
-        <div className="relative w-12 h-px" style={{ background: 'rgba(15,23,42,0.18)' }}>
-          <div
-            className="absolute -top-[3px] left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full animate-pulse"
-            style={{ background: '#F7931E', animationDelay: '0.5s' }}
-          />
-        </div>
         <div
           className="px-3 py-1.5 rounded-md text-[13px] font-semibold tracking-tight border"
           style={{ borderColor: 'rgba(15,23,42,0.18)', color: '#0F172A' }}
@@ -268,7 +256,11 @@ export const WhsConnectScreen: React.FC<Props> = ({ onConnected, onSkip }) => {
               type="submit"
               disabled={!isValid || submitting}
               className="w-full inline-flex items-center justify-center gap-2 px-5 py-3.5 text-sm font-semibold rounded-full transition-transform active:scale-[0.98] disabled:opacity-50 disabled:active:scale-100"
-              style={{ background: '#0F172A', color: '#ffffff' }}
+              style={{
+                background: '#F7931E',
+                color: '#ffffff',
+                boxShadow: '0 2px 10px rgba(247,147,30,0.28)',
+              }}
             >
               Connect England Golf
             </button>
