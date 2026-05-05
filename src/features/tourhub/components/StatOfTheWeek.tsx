@@ -1,14 +1,12 @@
 /**
- * StatOfTheWeek — Gamified leaderboard with title bible.
+ * StatOfTheWeek — Editorial Stat Watch.
  *
- * 13 categories accessible via a bottom-sheet picker.
- * Active category randomized per session (fresh on remount).
- * AI standfirsts cached in stat_of_week_copy (Anthropic Claude Sonnet 4.5,
- * weekly cron). Falls back to deterministic template when cache empty.
+ * Side-by-side hero block: gold-ringed leader portrait + category label +
+ * giant hero number + leader name with country flag.
  *
- * PGA-only by data limitation. When the page tour selector is non-PGA,
- * a "PGA TOUR LEADERS" sub-label is shown beneath the gamified title to
- * make the data scope explicit.
+ * 13 categories accessible via a bottom-sheet picker (unchanged).
+ * AI standfirsts cached in stat_of_week_copy with deterministic fallback.
+ * PGA-only by data limitation; non-PGA tours just hide the "· PGA" suffix.
  */
 
 import { memo, useMemo, useState } from 'react';
@@ -20,14 +18,18 @@ import { useTourSelection } from '../hooks/useTourSelection';
 import { LEADER_CATEGORIES, type LeaderCategory } from './leaders/constants';
 import { BottomSheet } from '@/components/ui/BottomSheet';
 import { PlayerAvatar } from './PlayerAvatar';
-import { SectionHeader } from './shared/SectionHeader';
+import { Shimmer } from './shared/Shimmer';
+import CountryFlag from '@/components/ui/country-flag';
 
 const AMBER = '#F7931E';
+const AMBER_SOFT = 'rgba(247,147,30,0.10)';
 const INK = '#0F172A';
+const GOLD = '#FFB800';
 const SLATE_400 = '#94A3B8';
 const SLATE_500 = '#64748B';
 const SLATE_600 = '#475569';
 const SLATE_200 = 'rgba(15,23,42,0.10)';
+const SLATE_150 = '#EDF1F5';
 
 // ── Random per-session default ──
 function pickRandomCategoryKey(): string {
@@ -43,7 +45,6 @@ interface SplitDisplay {
 function splitDisplay(display: string): SplitDisplay {
   const dot = display.indexOf('.');
   if (dot === -1) {
-    // Try to split off a unit suffix like "32 events" or "12 cuts"
     const spaceIdx = display.indexOf(' ');
     if (spaceIdx !== -1) {
       return { whole: display.slice(0, spaceIdx), rest: display.slice(spaceIdx) };
@@ -61,7 +62,6 @@ function buildSubDetail(
   isLargestMargin: boolean,
   tiedCount: number,
 ): string | null {
-  // Tied with the leader (gap to #2 is exactly 0)
   if (marginValue !== null && marginValue === 0) {
     if (tiedCount === 0) return `${surname} sets the pace.`;
     return `Tied with ${tiedCount} ${tiedCount === 1 ? 'other' : 'others'}.`;
@@ -82,6 +82,77 @@ const GROUP_LABELS: Record<LeaderCategory['group'], string> = {
 };
 const GROUP_ORDER: LeaderCategory['group'][] = ['general', 'ball_striking', 'short_game'];
 
+function StatWatchSkeleton({ scopeLabel }: { scopeLabel: string }) {
+  return (
+    <section className="px-4" aria-label="Stat of the Week">
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'baseline',
+          justifyContent: 'space-between',
+          marginBottom: 14,
+        }}
+      >
+        <Shimmer width="35%" height={24} radius={5} />
+        <span
+          style={{
+            fontSize: 10,
+            fontWeight: 700,
+            color: SLATE_400,
+            letterSpacing: '0.1em',
+            textTransform: 'uppercase',
+          }}
+        >
+          {scopeLabel}
+        </span>
+      </div>
+      <div
+        style={{
+          background: '#fff',
+          borderRadius: 16,
+          border: `1px solid ${SLATE_200}`,
+          padding: '16px 18px 18px',
+        }}
+      >
+        <Shimmer width={170} height={32} radius={10} style={{ marginBottom: 18 }} />
+        <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 16 }}>
+          <Shimmer width={88} height={88} radius="50%" />
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <Shimmer width="55%" height={10} radius={3} style={{ marginBottom: 6 }} />
+            <Shimmer width="80%" height={48} radius={6} style={{ marginBottom: 6 }} />
+            <Shimmer width="60%" height={14} radius={3} />
+          </div>
+        </div>
+        <div style={{ paddingTop: 14, borderTop: `1px solid ${SLATE_150}` }}>
+          <Shimmer width="92%" height={18} radius={4} style={{ marginBottom: 8 }} />
+          <Shimmer width="55%" height={13} radius={3} style={{ marginBottom: 16 }} />
+        </div>
+        <Shimmer width={60} height={10} radius={3} style={{ marginBottom: 8 }} />
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 8 }}>
+          {[0, 1, 2].map((i) => (
+            <div
+              key={i}
+              style={{
+                background: '#fff',
+                border: `1px solid ${SLATE_200}`,
+                borderRadius: 10,
+                padding: 10,
+              }}
+            >
+              <Shimmer width="40%" height={9} radius={2} style={{ marginBottom: 4 }} />
+              <Shimmer width="80%" height={13} radius={3} style={{ marginBottom: 4 }} />
+              <Shimmer width="60%" height={12} radius={3} />
+            </div>
+          ))}
+        </div>
+        <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 14 }}>
+          <Shimmer width={130} height={12} radius={3} />
+        </div>
+      </div>
+    </section>
+  );
+}
+
 export const StatOfTheWeek = memo(function StatOfTheWeek() {
   const navigate = useNavigate();
   const { entries, isLoading } = useGamifiedLeaderboards();
@@ -92,13 +163,13 @@ export const StatOfTheWeek = memo(function StatOfTheWeek() {
   const [sheetOpen, setSheetOpen] = useState(false);
 
   const isPga = (selectedTour ?? 'pga').toLowerCase() === 'pga';
+  const currentYear = new Date().getFullYear();
+  const scopeLabel = `${currentYear} Season${isPga ? ' · PGA' : ''}`;
 
-  // Resolve the active category + entry; fall back to first available if active has no data
   const { category, entry, marginRank } = useMemo(() => {
     const activeCat = LEADER_CATEGORIES.find((c) => c.key === activeKey) ?? LEADER_CATEGORIES[0];
     let resolvedEntry = entries.get(activeCat.key);
 
-    // If active has no data yet, pick the first category with data
     if (!resolvedEntry || resolvedEntry.players.length === 0) {
       for (const c of LEADER_CATEGORIES) {
         const e = entries.get(c.key);
@@ -109,12 +180,9 @@ export const StatOfTheWeek = memo(function StatOfTheWeek() {
       return { category: activeCat, entry: undefined, marginRank: 0 };
     }
 
-    // Compute whether this entry has the largest margin across all categories
-    // (so we can claim "widest gap of any 2026 statistical category")
     let widestMargin = 0;
     let widestKey = '';
     entries.forEach((e, key) => {
-      // Only stat categories with comparable margins (skip world_rank, events, cuts, top10 — non-uniform units)
       if (e.marginValue !== null && e.marginValue > widestMargin && e.category.section === 'stats') {
         widestMargin = e.marginValue;
         widestKey = key;
@@ -127,25 +195,8 @@ export const StatOfTheWeek = memo(function StatOfTheWeek() {
     };
   }, [activeKey, entries]);
 
-  // ── Loading state ──
   if (isLoading && entries.size === 0) {
-    return (
-      <section className="px-4" aria-label="Stat of the Week">
-        <div
-          style={{
-            background: 'linear-gradient(180deg, rgba(247,147,30,0.05) 0%, transparent 75%)',
-            borderRadius: 20,
-            padding: '20px 18px 18px',
-            minHeight: 360,
-          }}
-        >
-          <div className="h-3 w-32 rounded bg-muted/40 animate-pulse mb-4" />
-          <div className="h-16 w-44 rounded bg-muted/40 animate-pulse mb-4" />
-          <div className="h-8 w-full rounded bg-muted/40 animate-pulse mb-3" />
-          <div className="h-3 w-3/4 rounded bg-muted/40 animate-pulse" />
-        </div>
-      </section>
-    );
+    return <StatWatchSkeleton scopeLabel={scopeLabel} />;
   }
 
   if (!entry || entry.players.length === 0) return null;
@@ -154,14 +205,10 @@ export const StatOfTheWeek = memo(function StatOfTheWeek() {
   const split = splitDisplay(leader.display);
   const Icon = category.icon;
 
-  // Tied count: entries (excluding leader) sharing the leader's value.
   const tiedCount = entry.players
     .slice(1)
     .filter((p) => p.value === leader.value).length;
 
-  // ── Standfirst: AI-cached or fallback template ──
-  // Fallback weaves the metric label in as the unit ("5 Top 10 Finishes",
-  // "78.6% Driving Accuracy") rather than repeating the brand name.
   const metricUnit = category.unit === '%' ? '%' : '';
   const cachedStandfirst = standfirstMap?.get(category.key);
   const standfirst =
@@ -181,169 +228,259 @@ export const StatOfTheWeek = memo(function StatOfTheWeek() {
   return (
     <>
       <section className="px-4" aria-label="Stat of the Week">
-        <SectionHeader
-          eyebrow="Stat Watch"
-          title="Stat Watch"
-          subtitle="Who's leading the performance stats this year on tour"
-        />
+        {/* ── Single-line section header ── */}
         <div
           style={{
-            position: 'relative',
-            background:
-              'linear-gradient(180deg, rgba(247,147,30,0.05) 0%, transparent 75%)',
-            borderRadius: 20,
-            padding: '20px 18px 18px',
-            border: '1px solid rgba(15,23,42,0.05)',
+            display: 'flex',
+            alignItems: 'baseline',
+            justifyContent: 'space-between',
+            marginBottom: 14,
           }}
         >
-          {/* ── Title eyebrow row (tappable) ── */}
+          <h2
+            style={{
+              fontSize: 24,
+              fontWeight: 800,
+              letterSpacing: '-0.025em',
+              color: INK,
+              margin: 0,
+            }}
+          >
+            Stat Watch
+          </h2>
+          <span
+            style={{
+              fontSize: 10,
+              fontWeight: 700,
+              color: SLATE_400,
+              letterSpacing: '0.1em',
+              textTransform: 'uppercase',
+            }}
+          >
+            {scopeLabel}
+          </span>
+        </div>
+
+        <div
+          style={{
+            background: '#fff',
+            borderRadius: 16,
+            border: `1px solid ${SLATE_200}`,
+            boxShadow: '0 1px 0 rgba(0,0,0,0.02)',
+            padding: '16px 18px 18px',
+          }}
+        >
+          {/* ── Category dropdown trigger ── */}
           <button
             type="button"
             onClick={() => setSheetOpen(true)}
+            aria-label={`Change category. Current: ${category.gamifiedTitle}`}
             style={{
-              width: '100%',
-              display: 'flex',
+              display: 'inline-flex',
               alignItems: 'center',
               gap: 8,
-              background: 'transparent',
-              border: 'none',
-              padding: 0,
+              padding: '7px 12px',
+              background: AMBER_SOFT,
+              border: `1px solid ${AMBER}33`,
+              borderRadius: 10,
               cursor: 'pointer',
-              textAlign: 'left',
-              marginBottom: 0,
+              marginBottom: 18,
             }}
-            aria-label={`Change category. Current: ${category.gamifiedTitle}`}
           >
-            <div
+            <span
               style={{
-                width: 22,
-                height: 22,
-                borderRadius: 6,
-                background: 'rgba(247,147,30,0.15)',
+                width: 18,
+                height: 18,
+                borderRadius: 4,
+                background: AMBER,
+                color: '#fff',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                flexShrink: 0,
               }}
             >
-              <Icon size={13} color={AMBER} strokeWidth={2.5} />
-            </div>
+              <Icon size={11} color="#fff" strokeWidth={2.5} />
+            </span>
             <span
               style={{
                 fontSize: 11,
                 fontWeight: 900,
                 color: AMBER,
                 letterSpacing: '0.14em',
-                whiteSpace: 'nowrap',
               }}
             >
               {category.gamifiedTitle}
             </span>
-            <ChevronDown size={12} color={AMBER} strokeWidth={2.5} />
-            <div
-              style={{
-                flex: 1,
-                height: 1,
-                background: 'linear-gradient(90deg, rgba(247,147,30,0.3), transparent)',
-              }}
-            />
-            <span
-              style={{
-                fontSize: 9,
-                fontWeight: 900,
-                color: SLATE_400,
-                letterSpacing: '0.12em',
-              }}
-            >
-              CHANGE
-            </span>
+            <ChevronDown size={13} color={AMBER} strokeWidth={2.5} />
           </button>
 
-          {/* ── Subtitle: what the category measures ── */}
-          {category.label && (
-            <div
-              style={{
-                fontSize: 12,
-                fontWeight: 600,
-                color: SLATE_500,
-                letterSpacing: '0.01em',
-                marginTop: 2,
-                marginLeft: 30, // icon (22) + gap (8) — aligns with eyebrow text
-                marginBottom: isPga ? 12 : 4,
-              }}
-            >
-              {category.label}
-            </div>
-          )}
-
-          {/* ── PGA TOUR LEADERS sub-label (non-PGA only) ── */}
-          {!isPga && (
-            <div
-              style={{
-                fontSize: 10,
-                fontWeight: 800,
-                color: SLATE_500,
-                letterSpacing: '0.12em',
-                marginBottom: 14,
-                marginLeft: 30,
-              }}
-            >
-              PGA TOUR LEADERS
-            </div>
-          )}
-
-          {/* ── Hero number ── */}
+          {/* ── Side-by-side hero block ── */}
           <div
             style={{
               display: 'flex',
-              alignItems: 'flex-end',
-              gap: 0,
-              marginBottom: 10,
-              fontVariantNumeric: 'tabular-nums',
+              alignItems: 'center',
+              gap: 14,
+              marginBottom: 16,
             }}
           >
-            <span
+            <button
+              type="button"
+              onClick={() => navigate(`/tourhub/player/${leader.playerId}`)}
               style={{
-                fontSize: 62,
-                fontWeight: 900,
-                color: INK,
-                letterSpacing: '-0.04em',
-                lineHeight: 0.95,
+                position: 'relative',
+                flexShrink: 0,
+                background: 'transparent',
+                border: 'none',
+                padding: 0,
+                cursor: 'pointer',
+                borderRadius: '50%',
               }}
+              aria-label={`View ${leader.fullName}`}
             >
-              {split.whole}
-            </span>
-            {split.rest && (
-              <span
+              <div
                 style={{
-                  fontSize: 38,
-                  fontWeight: 900,
-                  color: AMBER,
-                  letterSpacing: '-0.025em',
-                  lineHeight: 1,
-                  paddingBottom: 4,
+                  width: 88,
+                  height: 88,
+                  borderRadius: '50%',
+                  border: `2px solid ${GOLD}`,
+                  boxShadow: '0 0 18px rgba(255,184,0,0.20)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  overflow: 'hidden',
                 }}
               >
-                {split.rest}
-              </span>
-            )}
+                <PlayerAvatar
+                  playerId={leader.playerId}
+                  playerName={leader.fullName}
+                  tourCode="pga"
+                  size="xl"
+                />
+              </div>
+              <div
+                style={{
+                  position: 'absolute',
+                  bottom: -2,
+                  right: -2,
+                  width: 26,
+                  height: 26,
+                  borderRadius: '50%',
+                  background: GOLD,
+                  color: INK,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  border: '2px solid #fff',
+                  fontSize: 11,
+                  fontWeight: 900,
+                }}
+              >
+                1
+              </div>
+            </button>
+
+            <div style={{ flex: 1, minWidth: 0 }}>
+              {category.label && (
+                <div
+                  style={{
+                    fontSize: 10,
+                    fontWeight: 700,
+                    color: SLATE_500,
+                    letterSpacing: '0.12em',
+                    textTransform: 'uppercase',
+                    marginBottom: 4,
+                    whiteSpace: 'nowrap',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                  }}
+                >
+                  {category.label}
+                </div>
+              )}
+
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'flex-end',
+                  gap: 0,
+                  fontVariantNumeric: 'tabular-nums',
+                  marginBottom: 6,
+                }}
+              >
+                <span
+                  style={{
+                    fontSize: 52,
+                    fontWeight: 900,
+                    color: INK,
+                    letterSpacing: '-0.04em',
+                    lineHeight: 0.9,
+                  }}
+                >
+                  {split.whole}
+                </span>
+                {split.rest && (
+                  <span
+                    style={{
+                      fontSize: 30,
+                      fontWeight: 900,
+                      color: AMBER,
+                      letterSpacing: '-0.025em',
+                      lineHeight: 1,
+                      paddingBottom: 3,
+                    }}
+                  >
+                    {split.rest}
+                  </span>
+                )}
+              </div>
+
+              <div
+                style={{
+                  fontSize: 14,
+                  fontWeight: 800,
+                  color: INK,
+                  letterSpacing: '-0.015em',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 6,
+                  whiteSpace: 'nowrap',
+                  overflow: 'hidden',
+                }}
+              >
+                <span
+                  style={{
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    whiteSpace: 'nowrap',
+                  }}
+                >
+                  {leader.fullName}
+                </span>
+                {leader.countryCode && (
+                  <span style={{ flexShrink: 0, display: 'inline-flex' }}>
+                    <CountryFlag country={leader.countryCode} size="sm" />
+                  </span>
+                )}
+              </div>
+            </div>
           </div>
 
-          {/* ── Standfirst (AI) ── */}
+          {/* ── Standfirst ── */}
           <div
             style={{
-              fontSize: 22,
-              fontWeight: 900,
+              fontSize: 18,
+              fontWeight: 800,
               color: INK,
               letterSpacing: '-0.02em',
-              lineHeight: 1.15,
-              marginBottom: 8,
+              lineHeight: 1.2,
+              marginBottom: 6,
+              paddingTop: 14,
+              borderTop: `1px solid ${SLATE_150}`,
             }}
           >
             {standfirst}
           </div>
 
-          {/* ── Sub-detail (template-driven) ── */}
           {subDetail && (
             <div
               style={{
@@ -358,130 +495,97 @@ export const StatOfTheWeek = memo(function StatOfTheWeek() {
             </div>
           )}
 
-          {/* ── Player row (top + bottom border) ── */}
-          <button
-            type="button"
-            onClick={() => navigate(`/tourhub/player/${leader.playerId}`)}
-            style={{
-              width: '100%',
-              display: 'flex',
-              alignItems: 'center',
-              gap: 12,
-              borderTop: `1px solid ${SLATE_200}`,
-              borderBottom: `1px solid ${SLATE_200}`,
-              padding: '12px 0',
-              background: 'transparent',
-              cursor: 'pointer',
-              textAlign: 'left',
-              marginBottom: 14,
-            }}
-          >
-            <PlayerAvatar
-              playerId={leader.playerId}
-              playerName={leader.fullName}
-              tourCode="pga"
-              size="md"
-            />
-            <div style={{ flex: 1, minWidth: 0 }}>
+          {/* ── Chasers ── */}
+          {chasers.length > 0 && (
+            <>
               <div
                 style={{
-                  fontSize: 15,
-                  fontWeight: 900,
-                  color: INK,
-                  letterSpacing: '-0.01em',
-                  whiteSpace: 'nowrap',
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis',
+                  fontSize: 9,
+                  fontWeight: 800,
+                  color: SLATE_500,
+                  letterSpacing: '0.16em',
+                  marginBottom: 8,
                 }}
               >
-                {leader.fullName}
+                CHASING
               </div>
-            </div>
-          </button>
-
-          {/* ── Chasers grid ── */}
-          {chasers.length > 0 && (
-            <div
-              style={{
-                display: 'grid',
-                gridTemplateColumns: 'repeat(3, 1fr)',
-                gap: 8,
-              }}
-            >
-              {chasers.map((p, idx) => (
-                <div
-                  key={`${p.playerId}-${idx}`}
-                  style={{
-                    background: '#ffffff',
-                    border: `1px solid ${SLATE_200}`,
-                    borderRadius: 10,
-                    padding: 10,
-                  }}
-                >
+              <div
+                style={{
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(3, 1fr)',
+                  gap: 8,
+                }}
+              >
+                {chasers.map((p, idx) => (
                   <div
+                    key={`${p.playerId}-${idx}`}
                     style={{
-                      fontSize: 9,
-                      fontWeight: 900,
-                      color: SLATE_400,
-                      letterSpacing: '0.08em',
-                      marginBottom: 2,
+                      background: '#fff',
+                      border: `1px solid ${SLATE_200}`,
+                      borderRadius: 10,
+                      padding: 10,
                     }}
                   >
-                    #{idx + 2}
+                    <div
+                      style={{
+                        fontSize: 9,
+                        fontWeight: 900,
+                        color: SLATE_400,
+                        letterSpacing: '0.08em',
+                        marginBottom: 3,
+                      }}
+                    >
+                      #{idx + 2}
+                    </div>
+                    <div
+                      style={{
+                        fontSize: 13,
+                        fontWeight: 800,
+                        color: INK,
+                        whiteSpace: 'nowrap',
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                        marginBottom: 3,
+                      }}
+                    >
+                      {p.lastName}
+                    </div>
+                    <div
+                      style={{
+                        fontSize: 12,
+                        fontWeight: 700,
+                        color: SLATE_600,
+                        fontVariantNumeric: 'tabular-nums',
+                      }}
+                    >
+                      {p.display}
+                    </div>
                   </div>
-                  <div
-                    style={{
-                      fontSize: 12,
-                      fontWeight: 800,
-                      color: INK,
-                      whiteSpace: 'nowrap',
-                      overflow: 'hidden',
-                      textOverflow: 'ellipsis',
-                      marginBottom: 2,
-                    }}
-                  >
-                    {p.lastName}
-                  </div>
-                  <div
-                    style={{
-                      fontSize: 13,
-                      fontWeight: 800,
-                      color: SLATE_600,
-                      fontVariantNumeric: 'tabular-nums',
-                    }}
-                  >
-                    {p.display}
-                  </div>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            </>
           )}
 
-          {/* ── CTA to Leaders page ── */}
+          {/* ── CTA: discreet text-link ── */}
           <button
             type="button"
             onClick={() => navigate(`/tourhub?tab=leaderboards&category=${category.key}`)}
             style={{
               marginTop: 14,
-              width: '100%',
-              padding: 12,
-              borderRadius: 12,
-              border: 'none',
-              cursor: 'pointer',
-              background: AMBER,
-              color: INK,
-              fontSize: 13,
-              fontWeight: 900,
-              letterSpacing: '-0.1px',
               display: 'flex',
               alignItems: 'center',
-              justifyContent: 'center',
-              gap: 6,
-              boxShadow: '0 2px 12px rgba(247,147,30,0.25)',
+              gap: 4,
+              background: 'transparent',
+              border: 'none',
+              padding: 0,
+              color: AMBER,
+              fontSize: 12,
+              fontWeight: 700,
+              cursor: 'pointer',
+              marginLeft: 'auto',
             }}
           >
-            <span>See all</span>
-            <ChevronRight size={14} strokeWidth={3} />
+            See full leaderboard <ChevronRight size={13} />
           </button>
         </div>
       </section>
