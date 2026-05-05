@@ -32,10 +32,10 @@ export const InviteToClbhouzV2: React.FC<Props> = ({ ownerUserId }) => {
   const sentCount = invites?.length ?? 0;
 
   return (
-    <div style={{ marginTop: 24 }}>
+    <section id="invite-to-clbhouz-section" style={{ marginTop: 24 }}>
       <SectionHeader
-        eyebrow="Bring Your Friends"
-        title="Invite to clbhouz"
+        eyebrow="BUILD YOUR CIRCLE"
+        title="Invite to Clbhouz"
         sub={
           friendsLoading
             ? 'Loading…'
