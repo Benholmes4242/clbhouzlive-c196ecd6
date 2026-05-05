@@ -242,7 +242,7 @@ export const RivalryCard: React.FC<Props> = ({ rivalry, onInfo, onTap }) => {
         <div style={{ display: 'flex', gap: 3 }}>
           {Array.from({ length: 8 }).map((_, i) => {
             const r = lastEight[i];
-            let bg = 'rgba(255,255,255,0.08)';
+            let bg = 'rgba(255,255,255,0.12)';
             if (r) {
               if (r.stableford_outcome === 'W') bg = T.green;
               else if (r.stableford_outcome === 'L') bg = T.red;

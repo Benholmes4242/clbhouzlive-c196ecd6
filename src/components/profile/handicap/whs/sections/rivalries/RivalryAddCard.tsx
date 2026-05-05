@@ -23,7 +23,7 @@ export const RivalryAddCard: React.FC<Props> = ({ slotIndex, label, onClick }) =
       style={{
         flex: '0 0 auto',
         width: 264,
-        minHeight: 290,
+      minHeight: 220,
         scrollSnapAlign: 'start',
         background: `linear-gradient(160deg, ${T.bgFrom}, ${T.bgTo})`,
         borderRadius: 18,
@@ -69,22 +69,13 @@ export const RivalryAddCard: React.FC<Props> = ({ slotIndex, label, onClick }) =
       </div>
       <div>
         <p style={{
-          margin: 0,
-          fontSize: 9,
-          fontWeight: 900,
-          letterSpacing: '0.18em',
-          color: T.amber,
-        }}>
-          SLOT {slotIndex + 1}
-        </p>
-        <p style={{
           margin: '4px 0 0',
           fontSize: 14,
           fontWeight: 800,
           color: '#fff',
           letterSpacing: '-0.01em',
         }}>
-          {label ?? 'Pin a rival'}
+          {label ?? 'Add a rival'}
         </p>
         <p style={{
           margin: '4px 12px 0',
@@ -92,7 +83,7 @@ export const RivalryAddCard: React.FC<Props> = ({ slotIndex, label, onClick }) =
           color: T.whiteMute,
           lineHeight: 1.4,
         }}>
-          Tap to choose someone from your circle
+          Up to 10 total
         </p>
       </div>
     </button>
