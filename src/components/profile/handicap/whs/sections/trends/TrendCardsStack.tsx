@@ -3,12 +3,14 @@ import { useAllScores } from '@/lib/whs/hooks';
 import SectionHeader from '../SectionHeader';
 import HandicapProjectionCard from './HandicapProjectionCard';
 import StablefordCard from './StablefordCard';
+import CourseFormCard from './CourseFormCard';
 
 interface Props {
   connectionId: string;
+  currentHandicap: number | null | undefined;
 }
 
-export const TrendCardsStack: React.FC<Props> = ({ connectionId }) => {
+export const TrendCardsStack: React.FC<Props> = ({ connectionId, currentHandicap }) => {
   const { data: scores, isLoading } = useAllScores(connectionId);
 
   return (
@@ -16,15 +18,15 @@ export const TrendCardsStack: React.FC<Props> = ({ connectionId }) => {
       <SectionHeader
         eyebrow="Your Form"
         title="The numbers behind your handicap"
-        sub="Two signals that explain your trajectory"
+        sub="Three signals that explain your trajectory"
       />
       {isLoading ? (
-        Array.from({ length: 2 }).map((_, i) => (
+        [420, 320, 360].map((h, i) => (
           <div
             key={i}
             className="animate-pulse"
             style={{
-              height: i === 0 ? 420 : 320,
+              height: h,
               background: 'rgba(15,23,42,0.04)',
               borderRadius: 16,
               marginBottom: 14,
@@ -35,6 +37,7 @@ export const TrendCardsStack: React.FC<Props> = ({ connectionId }) => {
         <>
           <HandicapProjectionCard scores={scores ?? []} />
           <StablefordCard scores={scores ?? []} />
+          <CourseFormCard connectionId={connectionId} currentHandicap={currentHandicap} />
         </>
       )}
     </section>
