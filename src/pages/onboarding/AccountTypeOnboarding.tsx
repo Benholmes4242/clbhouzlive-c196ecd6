@@ -10,9 +10,10 @@ import { toast } from 'sonner';
 import { PageRoot } from '@/components/layout/PageRoot';
 import CollegeSearchDropdown from '@/components/profile/CollegeSearchDropdown';
 import { CollegeMediaResult } from '@/hooks/useCollegeMediaSearch';
+import WhsConnectScreen from '@/components/profile/handicap/whs/WhsConnectScreen';
 
 type AccountType = 'individual' | 'club' | 'brand' | 'creator';
-type OnboardingStep = 'account-type' | 'college';
+type OnboardingStep = 'account-type' | 'college' | 'england-golf';
 
 interface AccountOption {
   type: AccountType;
@@ -61,13 +62,11 @@ const AccountTypeOnboarding: React.FC = () => {
 
   const handleAccountTypeContinue = () => {
     if (!selectedType) return;
-    
-    // For individual accounts, show college step
+
     if (selectedType === 'individual') {
       setStep('college');
     } else {
-      // For other account types, complete onboarding directly
-      handleFinalSubmit();
+      setStep('england-golf');
     }
   };
 
@@ -123,6 +122,8 @@ const AccountTypeOnboarding: React.FC = () => {
   const handleBack = () => {
     if (step === 'college') {
       setStep('account-type');
+    } else if (step === 'england-golf') {
+      setStep(selectedType === 'individual' ? 'college' : 'account-type');
     }
   };
 
