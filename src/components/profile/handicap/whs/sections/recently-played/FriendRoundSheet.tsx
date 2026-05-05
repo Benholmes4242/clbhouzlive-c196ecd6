@@ -39,17 +39,6 @@ const relativeDay = (iso: string): string => {
   return format(d, 'd MMM yyyy').toUpperCase();
 };
 
-const fmtRelative = (iso: string | null) => {
-  if (!iso) return '';
-  const ms = Date.now() - new Date(iso).getTime();
-  const days = Math.floor(ms / 86_400_000);
-  if (days <= 0) return 'today';
-  if (days === 1) return 'yesterday';
-  if (days < 7) return `${days} days ago`;
-  if (days < 30) return `${Math.floor(days / 7)} weeks ago`;
-  return `${Math.floor(days / 30)} months ago`;
-};
-
 const SheetSkeleton: React.FC = () => (
   <div className="animate-pulse" style={{ padding: 20 }}>
     <div style={{ height: 200, background: 'rgba(15,23,42,0.04)', borderRadius: 8 }} />
