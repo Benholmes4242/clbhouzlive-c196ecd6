@@ -142,7 +142,7 @@ export const LeaderboardRow: React.FC<Props> = ({ entry, rank, isFirst, isLast }
       >
         {fmtHcp(entry.friend_handicap_index)}
       </div>
-    </button>
+    </div>
   );
 };
 
