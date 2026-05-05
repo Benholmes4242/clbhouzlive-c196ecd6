@@ -17,6 +17,9 @@ export const HEADER_HEIGHT = 55;
 export const HERO_HEIGHT = '70dvh';
 export const HERO_MIN_HEIGHT = 0;
 
+/** Editorial hero height — fits live/results layout without internal clipping */
+export const HERO_HEIGHT_EDITORIAL = 'min(92dvh, 820px)';
+
 /** For pages WITH a header (hero bleeds behind header + safe area) */
 export const HERO_BLEED_MARGIN_WITH_HEADER = `calc(-${HEADER_HEIGHT}px - env(safe-area-inset-top, 0px))`;
 
@@ -34,6 +37,12 @@ export const HERO_STYLES = {
   containerNoHeader: {
     marginTop: HERO_BLEED_MARGIN_NO_HEADER,
     height: `calc(${HERO_HEIGHT} + env(safe-area-inset-top, 0px))`,
+    minHeight: `calc(${HERO_MIN_HEIGHT}px + env(safe-area-inset-top, 0px))`,
+  },
+  /** Hero container - editorial (live/results), taller to fit full layout */
+  containerEditorial: {
+    marginTop: HERO_BLEED_MARGIN_NO_HEADER,
+    height: `calc(${HERO_HEIGHT_EDITORIAL} + env(safe-area-inset-top, 0px))`,
     minHeight: `calc(${HERO_MIN_HEIGHT}px + env(safe-area-inset-top, 0px))`,
   },
   /** Content inside hero should use this to stay below notch */

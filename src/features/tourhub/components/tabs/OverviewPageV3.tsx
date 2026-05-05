@@ -30,7 +30,7 @@ import { StatOfTheWeek } from '../StatOfTheWeek';
 import { useMedianStatusBar } from '@/hooks/useMedianStatusBar';
 import { usePreventOverscroll } from '@/hooks/usePreventOverscroll';
 import { useNetworkStatus } from '@/hooks/useNetworkStatus';
-import { HERO_STYLES, HERO_BLEED_MARGIN_NO_HEADER } from '../../constants/heroStyles';
+import { HERO_STYLES } from '../../constants/heroStyles';
 import { WifiOff } from 'lucide-react';
 import ScrollToTopGlass from '@/components/common/ScrollToTopGlass';
 
@@ -75,9 +75,9 @@ export function OverviewPageV3() {
       : tickerData?.upcoming.find(c => c.id === activeTournamentId) ? 'upcoming'
       : null)
     : null;
-  const heroContainerStyle = activeStatus === 'upcoming' || activeStatus === null
-    ? HERO_STYLES.containerNoHeader
-    : { marginTop: HERO_BLEED_MARGIN_NO_HEADER };
+  const heroContainerStyle = activeStatus === 'live' || activeStatus === 'completed'
+    ? HERO_STYLES.containerEditorial
+    : HERO_STYLES.containerNoHeader;
 
 
   return (
