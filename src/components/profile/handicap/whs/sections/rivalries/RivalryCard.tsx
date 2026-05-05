@@ -1,13 +1,12 @@
 import React from 'react';
-import { Info, Swords, Pencil } from 'lucide-react';
-import { initials, firstName } from '@/lib/whs/utils/initials';
+import { Info, Swords } from 'lucide-react';
+import { initials } from '@/lib/whs/utils/initials';
 import { fmtHcp } from '@/lib/whs/format';
 import type { FriendRivalryHydrated } from '@/lib/whs/types';
 
 interface Props {
   rivalry: FriendRivalryHydrated;
   onInfo: () => void;
-  onEdit: () => void;
   onTap: () => void;
 }
 
@@ -26,34 +25,24 @@ const T = {
 };
 const FONT_DISPLAY = 'SF Pro Display, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
 
-const slotLabel = (kind: string): string => {
-  switch (kind) {
-    case 'chasing': return 'CHASING';
-    case 'chased_by': return 'CHASED BY';
-    case 'pinned': return 'PINNED RIVAL';
-    default: return 'RIVAL';
-  }
-};
-
-export const RivalryCard: React.FC<Props> = ({ rivalry, onInfo, onEdit, onTap }) => {
+export const RivalryCard: React.FC<Props> = ({ rivalry, onInfo, onTap }) => {
   const name = rivalry.rival_name ?? 'Unknown';
   const sf = rivalry.stableford_record ?? { wins: 0, losses: 0, ties: 0 };
   const gross = rivalry.gross_record ?? { wins: 0, losses: 0, ties: 0 };
   const results = rivalry.shared_round_results ?? [];
   const lastEight = results.slice(0, 8);
-  const totalGames = sf.wins + sf.losses + sf.ties;
 
   const hasH2H = rivalry.shared_rounds_count > 0;
 
   // Verdict
-  let verdict = 'EVEN MATCH';
-  let verdictColor = T.whiteMute;
+  let verdict = 'EVEN';
+  let verdictColor: string = 'rgba(255,255,255,0.55)';
   if (hasH2H) {
     if (sf.wins > sf.losses) {
-      verdict = 'YOU LEAD';
+      verdict = 'AHEAD';
       verdictColor = T.green;
     } else if (sf.losses > sf.wins) {
-      verdict = 'THEY LEAD';
+      verdict = 'BEHIND';
       verdictColor = T.red;
     }
   }
@@ -77,15 +66,17 @@ export const RivalryCard: React.FC<Props> = ({ rivalry, onInfo, onEdit, onTap })
       tabIndex={0}
       style={{
         flex: '0 0 auto',
-        width: 264,
+        width: 'calc(88vw - 16px)',
+        maxWidth: 320,
+        minHeight: 220,
         scrollSnapAlign: 'start',
-        background: `linear-gradient(160deg, ${T.bgFrom}, ${T.bgTo})`,
         borderRadius: 18,
         overflow: 'hidden',
+        background: `linear-gradient(160deg, ${T.bgFrom}, ${T.bgTo})`,
         position: 'relative',
         cursor: 'pointer',
         fontFamily: FONT_DISPLAY,
-        boxShadow: '0 1px 2px rgba(15,23,42,0.06), 0 8px 24px -8px rgba(15,23,42,0.18)',
+        boxShadow: '0 8px 24px -10px rgba(0,0,0,0.50), 0 0 0 1px rgba(255,255,255,0.06) inset',
       }}
     >
       {/* Amber stripe top */}
@@ -97,25 +88,25 @@ export const RivalryCard: React.FC<Props> = ({ rivalry, onInfo, onEdit, onTap })
         }}
       />
 
-      {/* Header row: eyebrow + (i) + edit */}
+      {/* Header row: eyebrow + (i) */}
       <div
         style={{
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
-          padding: '12px 14px 8px',
+          padding: '10px 12px 8px',
         }}
       >
         <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
           <span
             style={{
-              fontSize: 9,
+              fontSize: 10,
               fontWeight: 900,
-              letterSpacing: '0.16em',
+              letterSpacing: '0.18em',
               color: T.amber,
             }}
           >
-            {slotLabel(rivalry.slot_kind)}
+            RIVAL
           </span>
           <button
             onClick={(e) => { e.stopPropagation(); onInfo(); }}
@@ -137,34 +128,15 @@ export const RivalryCard: React.FC<Props> = ({ rivalry, onInfo, onEdit, onTap })
             <Info size={13} strokeWidth={2} />
           </button>
         </div>
-        <button
-          onClick={(e) => { e.stopPropagation(); onEdit(); }}
-          aria-label="Edit rival"
-          style={{
-            width: 24,
-            height: 24,
-            padding: 0,
-            borderRadius: 6,
-            background: 'rgba(255,255,255,0.06)',
-            border: `1px solid ${T.hairline}`,
-            cursor: 'pointer',
-            color: T.whiteMute,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-          }}
-        >
-          <Pencil size={11} strokeWidth={2} />
-        </button>
       </div>
 
       {/* Avatar + Name + HCP */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '0 14px 12px' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '0 12px 10px' }}>
         <div
           style={{
-            width: 48,
-            height: 48,
-            borderRadius: '50%',
+            width: 44,
+            height: 44,
+            borderRadius: '34%',
             overflow: 'hidden',
             background: 'rgba(255,255,255,0.10)',
             border: `1px solid ${T.hairline}`,
@@ -222,13 +194,14 @@ export const RivalryCard: React.FC<Props> = ({ rivalry, onInfo, onEdit, onTap })
         </div>
       </div>
 
-      {/* W / L / T block */}
+      {/* W / L / T block — compact horizontal */}
       <div
         style={{
-          display: 'grid',
-          gridTemplateColumns: '1fr 1fr 1fr',
-          margin: '0 14px',
-          padding: '10px 0',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          margin: '0 12px',
+          padding: '8px 0',
           borderTop: `1px solid ${T.hairline}`,
           borderBottom: `1px solid ${T.hairline}`,
         }}
@@ -239,42 +212,33 @@ export const RivalryCard: React.FC<Props> = ({ rivalry, onInfo, onEdit, onTap })
           { label: 'T', value: sf.ties, color: T.grey },
         ].map((s, i) => (
           <div key={s.label} style={{
-            textAlign: 'center',
+            display: 'flex',
+            alignItems: 'baseline',
+            gap: 6,
+            flex: 1,
+            justifyContent: 'center',
             borderLeft: i > 0 ? `1px solid ${T.hairline}` : 'none',
           }}>
-            <p style={{
-              margin: 0,
+            <span style={{
               fontSize: 9,
               fontWeight: 900,
               letterSpacing: '0.18em',
               color: T.whiteSoft,
-              marginBottom: 2,
-            }}>{s.label}</p>
-            <p style={{
-              margin: 0,
-              fontSize: 22,
-              fontWeight: 900,
+            }}>{s.label}</span>
+            <span style={{
+              fontSize: 18,
+              fontWeight: 800,
               color: hasH2H ? s.color : T.whiteSoft,
               fontVariantNumeric: 'tabular-nums',
               letterSpacing: '-0.03em',
               lineHeight: 1,
-            }}>{s.value}</p>
+            }}>{s.value}</span>
           </div>
         ))}
       </div>
 
-      {/* Form bar — last 8 outcomes */}
-      <div style={{ padding: '12px 14px 10px' }}>
-        <p style={{
-          margin: 0,
-          fontSize: 8,
-          fontWeight: 900,
-          letterSpacing: '0.18em',
-          color: T.whiteSoft,
-          marginBottom: 6,
-        }}>
-          FORM · LAST 8
-        </p>
+      {/* Form bar — last 8 outcomes (no label) */}
+      <div style={{ padding: '10px 12px' }}>
         <div style={{ display: 'flex', gap: 3 }}>
           {Array.from({ length: 8 }).map((_, i) => {
             const r = lastEight[i];
@@ -319,25 +283,35 @@ export const RivalryCard: React.FC<Props> = ({ rivalry, onInfo, onEdit, onTap })
           </p>
         ) : (
           <>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-              <Swords size={12} strokeWidth={2.2} color={verdictColor} />
+            <div style={{ display: 'flex', alignItems: 'center', gap: 6, flex: 1, minWidth: 0 }}>
+              <Swords size={13} strokeWidth={2.4} color={verdictColor} />
               <span style={{
-                fontSize: 10,
-                fontWeight: 900,
-                letterSpacing: '0.14em',
-                color: verdictColor,
+                fontSize: 11,
+                fontWeight: 700,
+                color: '#fff',
+                fontVariantNumeric: 'tabular-nums',
+                whiteSpace: 'nowrap',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                letterSpacing: '-0.005em',
               }}>
-                {verdict}
+                You {sf.wins}{'\u2013'}{sf.losses} them{' \u00b7 '}
+                <span style={{ color: verdictColor, fontWeight: 800, letterSpacing: '0.06em' }}>
+                  {verdict}
+                </span>
               </span>
             </div>
             <span style={{
-              fontSize: 10,
+              fontSize: 9,
               fontWeight: 700,
-              color: T.whiteMute,
+              color: 'rgba(255,255,255,0.55)',
               fontVariantNumeric: 'tabular-nums',
-              letterSpacing: '0.02em',
+              letterSpacing: '0.06em',
+              whiteSpace: 'nowrap',
+              marginLeft: 8,
+              flexShrink: 0,
             }}>
-              GROSS {gross.wins}-{gross.losses}-{gross.ties}
+              GROSS {gross.wins}{'\u2013'}{gross.losses}
             </span>
           </>
         )}
