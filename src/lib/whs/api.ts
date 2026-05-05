@@ -6,7 +6,7 @@ import type {
   WhsCounterScore,
   ConnectWhsResponse,
   SyncWhsResponse,
-  WhsFriendMatch,
+  
   WhsInviteStatus,
   CreateInviteResponse,
   HandicapPoint,
