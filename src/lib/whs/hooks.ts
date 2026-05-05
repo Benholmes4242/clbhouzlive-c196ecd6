@@ -13,7 +13,7 @@ import {
   fetchFriendCourseBests,
   fetchSentInvites,
   fetchCourseForm,
-  fetchLastRoundDetail,
+  fetchRoundDetail,
   fetchFriendRoundDetail,
   fetchFriendWindowRankings,
 } from './api';
