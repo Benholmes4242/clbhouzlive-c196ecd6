@@ -194,7 +194,7 @@ export const RivalryEditSheet: React.FC<Props> = ({ userId, rivalry, slotIndex, 
               </div>
             ) : (
               candidates.map((c) => {
-                const rowId = (c as any).friend_row_id as string | undefined;
+                const rowId = c.friend_row_id ?? undefined;
                 const isCurrent = rivalry?.rival_friend_row_id && rowId === rivalry.rival_friend_row_id;
                 return (
                   <button
