@@ -238,3 +238,72 @@ export function useTryNextCourses(
     staleTime: 5 * 60_000,
   });
 }
+// ─── Phase 0 (Friends Tab Redesign): hooks ──────────────────────────────
+
+export function useFriendFeaturedRound(userId: string | undefined) {
+  return useQuery({
+    queryKey: whsKeys.friendFeaturedRound(userId ?? ''),
+    queryFn: () => fetchFriendFeaturedRound(userId as string),
+    enabled: !!userId,
+    staleTime: 60_000,
+  });
+}
+
+export function useFriendRivalries(userId: string | undefined) {
+  return useQuery({
+    queryKey: whsKeys.friendRivalries(userId ?? ''),
+    queryFn: () => fetchFriendRivalries(userId as string),
+    enabled: !!userId,
+    staleTime: 60_000,
+  });
+}
+
+export function useFriendLeaderboard(userId: string | undefined) {
+  return useQuery({
+    queryKey: whsKeys.friendLeaderboard(userId ?? ''),
+    queryFn: () => fetchFriendLeaderboard(userId as string),
+    enabled: !!userId,
+    staleTime: 30_000,
+  });
+}
+
+export function useUserRivalOverrides(userId: string | undefined) {
+  return useQuery({
+    queryKey: whsKeys.userRivalOverrides(userId ?? ''),
+    queryFn: () => fetchUserRivalOverrides(userId as string),
+    enabled: !!userId,
+    staleTime: 0,
+  });
+}
+
+export function useUpsertRivalOverride() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (params: {
+      userId: string;
+      slotIndex: number;
+      rival_user_id?: string;
+      rival_friend_row_id?: string;
+    }) =>
+      upsertUserRivalOverride(params.userId, params.slotIndex, {
+        rival_user_id: params.rival_user_id,
+        rival_friend_row_id: params.rival_friend_row_id,
+      }),
+    onSuccess: (_, params) => {
+      queryClient.invalidateQueries({ queryKey: whsKeys.userRivalOverrides(params.userId) });
+      queryClient.invalidateQueries({ queryKey: whsKeys.friendRivalries(params.userId) });
+    },
+  });
+}
+
+export function useDeleteRivalOverride() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (params: { userId: string; slotIndex: number }) =>
+      deleteUserRivalOverride(params.userId, params.slotIndex),
+    onSuccess: (_, params) => {
+      queryClient.invalidateQueries({ queryKey: whsKeys.userRivalOverrides(params.userId) });
+      queryClient.invalidateQueries({ queryKey: whsKeys.friendRivalries(params.userId) });
+    },
+  });
+}
