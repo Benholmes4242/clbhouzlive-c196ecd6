@@ -62,11 +62,101 @@ function abbreviateName(name: string): string {
 // SKELETON
 // ============================================================================
 function CollegeRivalrySkeleton() {
+  const currentYear = new Date().getFullYear();
   return (
-    <section aria-label="College rivalry" style={{ padding: '0 16px' }}>
-      <div style={{ height: 14, width: 240, background: '#F8FAFC', borderRadius: 6, marginBottom: 16 }} />
-      <div style={{ height: 280, background: '#fff', border: `1px solid ${SLATE_ALPHA}`, borderRadius: 18, marginBottom: 20 }} />
-      <div style={{ height: 220 }} />
+    <section aria-label="College rivalry">
+      {/* Section header */}
+      <div style={{
+        display: 'flex', alignItems: 'baseline', justifyContent: 'space-between',
+        padding: '0 16px', marginBottom: 14,
+      }}>
+        <Shimmer width="65%" height={24} radius={5} />
+        <Shimmer width="22%" height={11} radius={3} />
+      </div>
+
+      {/* Matchup card */}
+      <div style={{ padding: '0 16px' }}>
+        <div style={{
+          background: '#fff',
+          border: `1px solid ${SLATE_ALPHA}`,
+          borderRadius: 18,
+          overflow: 'hidden',
+        }}>
+          <div style={{ padding: '20px 18px 14px' }}>
+            <Shimmer width="55%" height={11} radius={3} style={{ marginBottom: 12 }} />
+            <Shimmer width="60%" height={22} radius={4} style={{ marginBottom: 6 }} />
+            <Shimmer width="78%" height={22} radius={4} />
+          </div>
+
+          <div style={{
+            padding: '8px 18px 22px',
+            display: 'grid', gridTemplateColumns: '1fr auto 1fr',
+            alignItems: 'center', gap: 8,
+          }}>
+            {[0, 1].map((side, idx) => (
+              <div key={side} style={{
+                display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8,
+                gridColumn: idx === 0 ? 1 : 3,
+              }}>
+                <Shimmer width={64} height={64} radius="50%" />
+                <Shimmer width="50%" height={13} radius={3} />
+                <Shimmer width="60%" height={20} radius={4} />
+                <Shimmer width="70%" height={9} radius={3} />
+              </div>
+            ))}
+            <div style={{ gridColumn: 2, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6 }}>
+              <Shimmer width={20} height={11} radius={3} />
+              <Shimmer width={48} height={20} radius={999} />
+            </div>
+          </div>
+
+          <div style={{
+            borderTop: `1px solid ${SLATE_150}`,
+            padding: '12px 18px',
+            display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12,
+          }}>
+            {[0, 1].map(i => (
+              <div key={i} style={{
+                display: 'flex', alignItems: 'center', gap: 10,
+                flex: 1, minWidth: 0,
+                flexDirection: i === 1 ? 'row-reverse' : 'row',
+              }}>
+                <Shimmer width={38} height={38} radius={9} />
+                <div style={{ flex: 1, minWidth: 0, textAlign: i === 1 ? 'right' : 'left' }}>
+                  <Shimmer width="65%" height={9} radius={3} style={{ marginBottom: 4, marginLeft: i === 1 ? 'auto' : 0 }} />
+                  <Shimmer width="55%" height={13} radius={3} style={{ marginBottom: 3, marginLeft: i === 1 ? 'auto' : 0 }} />
+                  <Shimmer width="40%" height={10} radius={3} style={{ marginLeft: i === 1 ? 'auto' : 0 }} />
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      <div style={{ padding: '0 16px', marginTop: 24 }}>
+        <div style={{
+          display: 'flex', justifyContent: 'space-between', alignItems: 'baseline',
+          marginBottom: 10, padding: '0 4px',
+        }}>
+          <Shimmer width={70} height={10} radius={3} />
+          <Shimmer width={140} height={10} radius={3} />
+        </div>
+        {Array.from({ length: 5 }).map((_, i) => (
+          <div key={i} style={{
+            display: 'flex', alignItems: 'center', gap: 12,
+            padding: '13px 12px 13px 11px',
+            borderLeft: `3px solid ${i === 0 ? AMBER : 'transparent'}`,
+            borderBottom: i < 4 ? `1px solid ${SLATE_150}` : 'none',
+          }}>
+            <Shimmer width={24} height={16} radius={3} />
+            <Shimmer width={28} height={28} radius={6} />
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <Shimmer width="55%" height={15} radius={3} />
+            </div>
+            <Shimmer width={56} height={14} radius={3} />
+          </div>
+        ))}
+      </div>
     </section>
   );
 }
