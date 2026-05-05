@@ -14390,6 +14390,27 @@ export type Database = {
         }
         Relationships: []
       }
+      whs_friend_handicap_snapshots: {
+        Row: {
+          created_at: string
+          friend_passport_id: number
+          handicap_index: number | null
+          snapshot_date: string
+        }
+        Insert: {
+          created_at?: string
+          friend_passport_id: number
+          handicap_index?: number | null
+          snapshot_date: string
+        }
+        Update: {
+          created_at?: string
+          friend_passport_id?: number
+          handicap_index?: number | null
+          snapshot_date?: string
+        }
+        Relationships: []
+      }
       whs_friends: {
         Row: {
           connection_id: string
@@ -17280,6 +17301,8 @@ export type Database = {
           friend_passport_id: number
           friend_thumbnail_url: string
           friend_user_id: string
+          handicap_30d_ago: number
+          handicap_30d_delta: number
           is_clbhouz_user: boolean
           is_self: boolean
           last_round_course_name: string

@@ -71,6 +71,9 @@ export const FriendsLeaderboardSection: React.FC<Props> = ({ userId }) => {
         <div style={{ flex: 1, minWidth: 0, paddingLeft: 16 }}>
           <p style={HEADER_LABEL}>PLAYER</p>
         </div>
+        <div style={{ width: 56, textAlign: 'right', flexShrink: 0, paddingRight: 8 }}>
+          <p style={HEADER_LABEL}>30D</p>
+        </div>
         <div style={{ width: 50, textAlign: 'right', flexShrink: 0 }}>
           <p style={HEADER_LABEL}>HCP</p>
         </div>

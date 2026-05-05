@@ -1,4 +1,5 @@
 import React from 'react';
+import { ArrowDown, ArrowUp, Minus } from 'lucide-react';
 import { initials } from '@/lib/whs/utils/initials';
 import { reformatFriendName, fmtRelative } from '@/lib/whs/utils/nameFormat';
 import { fmtHcp } from '@/lib/whs/format';
@@ -125,6 +126,40 @@ export const LeaderboardRow: React.FC<Props> = ({ entry, rank, isFirst, isLast }
             {fmtRel(entry.last_round_played_at)}
           </p>
         </div>
+      </div>
+
+      {/* 30D trend column */}
+      <div
+        style={{
+          width: 56,
+          textAlign: 'right',
+          flexShrink: 0,
+          fontSize: 11,
+          fontWeight: 700,
+          fontVariantNumeric: 'tabular-nums',
+          letterSpacing: '-0.01em',
+          paddingRight: 8,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'flex-end',
+          gap: 3,
+        }}
+      >
+        {entry.handicap_30d_delta == null ? (
+          <span style={{ color: T.inkFaded }}>—</span>
+        ) : Math.abs(entry.handicap_30d_delta) < 0.05 ? (
+          <Minus size={11} strokeWidth={2.4} color={T.inkFaded} />
+        ) : entry.handicap_30d_delta < 0 ? (
+          <span style={{ color: '#059669', display: 'inline-flex', alignItems: 'center', gap: 2 }}>
+            <ArrowDown size={11} strokeWidth={2.6} />
+            {Math.abs(entry.handicap_30d_delta).toFixed(1)}
+          </span>
+        ) : (
+          <span style={{ color: '#DC2626', display: 'inline-flex', alignItems: 'center', gap: 2 }}>
+            <ArrowUp size={11} strokeWidth={2.6} />
+            {entry.handicap_30d_delta.toFixed(1)}
+          </span>
+        )}
       </div>
 
       {/* HCP */}
