@@ -21,6 +21,7 @@ import {
 } from '../components/ui';
 import { AdminBarChart } from '../components/shared/AdminBarChart';
 import { AdminStatRow } from '../components/shared/AdminStatRow';
+import EgSyncHealthCard from '../components/EgSyncHealthCard';
 
 // ─── Action colour pill for audit log ────────────────────────────────────────
 
