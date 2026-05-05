@@ -42,6 +42,10 @@ export const whsKeys = {
     ['whs-course-form', connectionId, currentHandicap] as const,
   roundDetail: (scoreId: string) =>
     ['whs-round-detail', scoreId] as const,
+  friendFeaturedRound: (userId: string) => ['whs-friend-featured-round', userId] as const,
+  friendRivalries: (userId: string) => ['whs-friend-rivalries', userId] as const,
+  friendLeaderboard: (userId: string) => ['whs-friend-leaderboard', userId] as const,
+  userRivalOverrides: (userId: string) => ['whs-user-rival-overrides', userId] as const,
 };
 
 export function useRoundDetail(
