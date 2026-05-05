@@ -182,15 +182,15 @@ const AccountTypeOnboarding: React.FC = () => {
             {/* Action buttons */}
             <div className="pt-6 space-y-3">
               <Button
-                onClick={handleFinalSubmit}
+                onClick={() => setStep('england-golf')}
                 disabled={submitting}
                 className="w-full"
                 variant="gradient-primary"
                 size="lg"
               >
-                {submitting ? 'Setting up...' : selectedCollege ? 'Continue' : 'Skip for now'}
+                {selectedCollege ? 'Continue' : 'Skip for now'}
               </Button>
-              
+
               {!selectedCollege && (
                 <p className="text-xs text-muted-foreground text-center">
                   You can add this later in Edit Profile.
