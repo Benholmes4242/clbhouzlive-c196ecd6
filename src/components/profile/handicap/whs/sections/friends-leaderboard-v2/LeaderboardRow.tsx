@@ -10,6 +10,7 @@ interface Props {
   rank: number;
   isFirst: boolean;
   isLast: boolean;
+  onClick?: () => void;
 }
 
 const T = {
