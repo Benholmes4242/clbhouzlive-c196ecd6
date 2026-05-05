@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import SectionHeader from '../SectionHeader';
 import LeaderboardRow from './LeaderboardRow';
+import FriendProfileSheet from '../friend-profile-sheet/FriendProfileSheet';
 import { useFriendLeaderboard } from '@/lib/whs/hooks';
 import { ChevronRight } from 'lucide-react';
 import type { FriendLeaderboardEntry } from '@/lib/whs/types';
