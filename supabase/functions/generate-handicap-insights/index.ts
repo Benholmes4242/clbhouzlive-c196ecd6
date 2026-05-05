@@ -15,6 +15,19 @@ const todayKey = () => {
   return `${y}-${m}-${day}`;
 };
 
+const SYSTEM_PROMPT = `You are Echo, the AI caddie inside Clbhouz, a golf social platform.
+
+Voice rules — these are absolute:
+- Speak directly to the user (the golfer whose data you're analysing) in second person — "you", "your", "you've".
+- Never refer to the user in third person ("this player", "they", "their").
+- Never expose internal IDs, UUIDs, or technical references in your prose. Only use human-readable course names.
+
+Output rules:
+- Reply with JSON only. No prose around the JSON.
+- Be concrete and evidence-based. Reference specific scores, courses, and dates from the round history.
+- When you cite a course in prose, use its name from the round history. Never write "course <uuid>" or any other identifier.
+- Vary your recommendations day-to-day when given the same inputs.`;
+
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -52,6 +65,17 @@ Deno.serve(async (req) => {
     }
 
     const dateKey = todayKey();
+
+    // Same-day cache check — return cached insights without invoking AI.
+    const { data: cached } = await admin
+      .from("whs_ai_insights")
+      .select("*")
+      .eq("connection_id", connection_id)
+      .maybeSingle();
+
+    if (cached && (cached as any).date_key === dateKey) {
+      return json(await shapeResponseFromCache(admin, cached));
+    }
 
     // Last 30 rounds (course_id here is a whs_courses.id)
     const { data: rounds, error: rErr } = await admin
@@ -100,19 +124,6 @@ Deno.serve(async (req) => {
       : { data: [] as any[] };
     const golfById = new Map((playedGolfCourses ?? []).map((c: any) => [c.id, c]));
 
-    // Determine common regions/countries
-    const regionCount = new Map<string, number>();
-    const countryCount = new Map<string, number>();
-    for (const r of rounds) {
-      const golfId = whsToGolf.get(r.course_id);
-      const gc = golfId ? golfById.get(golfId) : null;
-      if (gc?.region) regionCount.set(gc.region, (regionCount.get(gc.region) || 0) + 1);
-      const cc = gc?.country_code || whsById.get(r.course_id)?.country_code;
-      if (cc) countryCount.set(cc, (countryCount.get(cc) || 0) + 1);
-    }
-    const topRegions = [...regionCount.entries()].sort((a, b) => b[1] - a[1]).slice(0, 3).map(([r]) => r);
-    const topCountries = [...countryCount.entries()].sort((a, b) => b[1] - a[1]).slice(0, 2).map(([c]) => c);
-
     // Recently recommended IDs (7-day window, exclude)
     const sevenAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
     const { data: recentRecs } = await admin
@@ -128,52 +139,34 @@ Deno.serve(async (req) => {
       rounds.slice(0, 5).map((r: any) => whsToGolf.get(r.course_id)).filter(Boolean) as string[],
     );
 
-    // Candidate pool: prefer regions, then country fallback
-    let candidates: any[] = [];
-    if (topRegions.length) {
-      const { data: cand } = await admin
-        .from("golf_courses")
-        .select("id, name, region, country, country_code")
-        .in("region", topRegions)
-        .limit(120);
-      candidates = (cand ?? []);
-    }
-    if (candidates.length < 20 && topCountries.length) {
-      const { data: cand } = await admin
-        .from("golf_courses")
-        .select("id, name, region, country, country_code")
-        .in("country_code", topCountries)
-        .limit(120);
-      const seen = new Set(candidates.map((c) => c.id));
-      for (const c of cand ?? []) if (!seen.has(c.id)) candidates.push(c);
+    // GB&I candidate pool — full country, daily-rotated, no geographic narrowing.
+    const GBI_COUNTRY = "Britain & Ireland";
+    const ROTATION_POOL_SIZE = 50;
+
+    const { data: allGbiCourses } = await admin
+      .from("golf_courses")
+      .select("id, name, region, country")
+      .eq("country", GBI_COUNTRY);
+
+    let pool = (allGbiCourses ?? []).filter((c: any) =>
+      !recentlyPlayedGolfIds.has(c.id) && !recentlyRecommended.has(c.id)
+    );
+
+    // Edge case: pool exhausted. Fall back to ignoring the played filter only —
+    // recommendations may overlap with played courses but stay within GB&I.
+    if (pool.length === 0) {
+      pool = (allGbiCourses ?? []).filter((c: any) => !recentlyRecommended.has(c.id));
     }
 
-    candidates = candidates
-      .filter((c) => !recentlyPlayedGolfIds.has(c.id))
-      .filter((c) => !recentlyRecommended.has(c.id))
-      .slice(0, 60);
-
-    if (candidates.length < 6) {
-      // Top up ignoring recommendation history if we're starved
-      const needed = 6 - candidates.length;
-      const { data: cand } = await admin
-        .from("golf_courses")
-        .select("id, name, region, country, country_code")
-        .in("country_code", topCountries.length ? topCountries : ["GB", "US"])
-        .limit(60);
-      const seen = new Set(candidates.map((c) => c.id));
-      for (const c of cand ?? []) {
-        if (candidates.length >= 6 + needed) break;
-        if (!seen.has(c.id) && !recentlyPlayedGolfIds.has(c.id)) candidates.push(c);
-      }
-    }
+    // Deterministic shuffle seeded on (userId, dateKey).
+    const seed = stringToSeed(`${userId}:${dateKey}`);
+    const candidates = seededShuffle(pool, seed).slice(0, ROTATION_POOL_SIZE);
 
     const roundsForPrompt = rounds.map((r: any) => {
       const golfId = whsToGolf.get(r.course_id);
       const gc = golfId ? golfById.get(golfId) : null;
       const wc = whsById.get(r.course_id);
       return {
-        course_id: golfId ?? r.course_id,
         course_name: gc?.name ?? wc?.name ?? null,
         region: gc?.region ?? null,
         country: gc?.country ?? wc?.country_name ?? null,
@@ -199,7 +192,7 @@ Deno.serve(async (req) => {
       body: JSON.stringify({
         model: "google/gemini-3-flash-preview",
         messages: [
-          { role: "system", content: "You are Echo, the AI golf insights engine for Clbhouz. You analyse a player's WHS round history and recommend courses from a provided candidate pool. Reply with JSON only. Vary your recommendations day-to-day when given the same inputs." },
+          { role: "system", content: SYSTEM_PROMPT },
           { role: "user", content: prompt },
         ],
         response_format: { type: "json_object" },
@@ -223,7 +216,7 @@ Deno.serve(async (req) => {
       return json({ error: "Invalid AI output" }, 500);
     }
 
-    const candidateIds = new Set(candidates.map((c) => c.id));
+    const candidateIds = new Set(candidates.map((c: any) => c.id));
     const validate = (arr: any[]) =>
       Array.isArray(arr)
         ? arr
@@ -272,16 +265,11 @@ Deno.serve(async (req) => {
 
     const shape = (arr: { id: string; rationale: string }[]) =>
       arr.map((r) => {
-        const c = hyMap.get(r.id) || {};
+        const c: any = hyMap.get(r.id) || {};
         return {
           id: r.id,
           name: c.name ?? "",
           region: c.region ?? c.country ?? "",
-          par: 72,
-          holes: 18,
-          slope: 0,
-          rating: 0,
-          yards: 0,
           rationale: r.rationale,
         };
       });
@@ -307,27 +295,88 @@ function json(body: unknown, status = 200) {
 }
 
 function buildPrompt(rounds: any[], candidates: any[], dateKey: string) {
-  return `Today is ${dateKey}. Analyse this player's recent WHS round history and produce daily insights about what kinds of courses suit their game.
+  return `Today is ${dateKey}. Analyse the user's recent WHS round history and recommend courses from a provided candidate pool.
 
-PLAYER ROUND HISTORY (last ${rounds.length} rounds, newest first):
+USER'S ROUND HISTORY (last ${rounds.length} rounds, newest first):
 ${JSON.stringify(rounds)}
 
-CANDIDATE COURSES (${candidates.length} nearby courses they haven't played recently and haven't been recommended in the past 7 days):
+CANDIDATE COURSES (${candidates.length} courses across Britain & Ireland — daily-rotated; you haven't played any of these recently and they haven't been recommended to you in the past 7 days):
 ${JSON.stringify(candidates)}
 
 Produce a JSON response with this exact structure:
 {
-  "scoring_profile": "<2-3 sentences (50-70 words) characterising what kinds of courses suit this player's game. Reference a concrete best round (course + differential) and what kind of setup tends to produce higher differentials. Evidence-based.>",
-  "rounds_pattern": "<1-2 sentences (max 30 words) describing a concrete observation about recent counter rounds. Reference specific numbers and wrap key values in **bold** markdown (e.g. **+0.6**, **+1.7**). No speculation.>",
-  "suited_courses": [ { "id": "<golf_courses.id from CANDIDATE COURSES>", "rationale": "<one sentence, max 22 words, why this course matches their best scoring profile>" } ],
-  "test_courses":   [ { "id": "<golf_courses.id from CANDIDATE COURSES>", "rationale": "<one sentence, max 22 words, why this course will push their game (frame as growth)>" } ]
+  "scoring_profile": "<2-3 sentences (50-70 words) characterising what kinds of courses suit your game. Reference your best counter and the specific course (by name) where you shot it. Mention what kind of course produces higher differentials. Use 'you' and 'your', never 'this player' or 'they'.>",
+  "rounds_pattern": "<1-2 sentences (max 30 words) about your recent counter rounds. Reference specific numbers and wrap key values in **bold** markdown (e.g. **+0.6**, **+1.7**). Use 'you' and 'your'. No speculation.>",
+  "suited_courses": [ { "id": "<golf_courses.id from CANDIDATE COURSES>", "rationale": "<one sentence, max 22 words, why this course matches your best scoring profile. Reference the course by name in your rationale.>" } ],
+  "test_courses": [ { "id": "<golf_courses.id from CANDIDATE COURSES>", "rationale": "<one sentence, max 22 words, why this course will push your game (frame as growth). Reference the course by name.>" } ]
 }
 
 Rules:
 - Exactly 3 items in each array (or fewer only if candidates < 6).
 - Only use IDs from CANDIDATE COURSES. Never invent IDs. Never reuse the same id across suited and test.
+- IDs go in the "id" field only — never write a UUID in any prose ("scoring_profile", "rounds_pattern", "rationale"). Use the course name instead.
 - If round sample < 15, prefix scoring_profile with "Early signal: ".
 - rounds_pattern MUST wrap numeric values in **bold** markdown.
+- Use second-person voice throughout. "you", "your", "you've". Never "this player", "they", "their".
 - Vary picks day-to-day when reasonable (today's date_key is ${dateKey}).
 - Return JSON only.`;
+}
+
+async function shapeResponseFromCache(admin: any, cached: any) {
+  const suited = (cached.suited_courses ?? []) as Array<{ id: string; rationale: string }>;
+  const test = (cached.test_courses ?? []) as Array<{ id: string; rationale: string }>;
+  const allRecIds = [...suited.map((s) => s.id), ...test.map((t) => t.id)];
+
+  const { data: hydrated } = allRecIds.length
+    ? await admin
+        .from("golf_courses")
+        .select("id, name, region, country")
+        .in("id", allRecIds)
+    : { data: [] as any[] };
+  const hyMap = new Map((hydrated ?? []).map((c: any) => [c.id, c]));
+
+  const shape = (arr: { id: string; rationale: string }[]) =>
+    arr.map((r) => {
+      const c: any = hyMap.get(r.id) || {};
+      return {
+        id: r.id,
+        name: c.name ?? "",
+        region: c.region ?? c.country ?? "",
+        rationale: r.rationale,
+      };
+    });
+
+  return {
+    scoring_profile: cached.scoring_profile,
+    rounds_pattern: cached.rounds_pattern,
+    suited_courses: shape(suited),
+    test_courses: shape(test),
+    generated_at: cached.generated_at,
+    cached: true,
+  };
+}
+
+// FNV-1a 32-bit string hash — used to seed the per-user-per-day shuffle.
+function stringToSeed(s: string): number {
+  let h = 0x811c9dc5;
+  for (let i = 0; i < s.length; i++) {
+    h ^= s.charCodeAt(i);
+    h = (h * 0x01000193) >>> 0;
+  }
+  return h >>> 0;
+}
+
+// xorshift32-seeded Fisher-Yates shuffle. Same seed → same output order.
+function seededShuffle<T>(arr: T[], seed: number): T[] {
+  const out = arr.slice();
+  let s = seed || 1;
+  for (let i = out.length - 1; i > 0; i--) {
+    s ^= s << 13;
+    s ^= s >>> 17;
+    s ^= s << 5;
+    s = s >>> 0;
+    const j = s % (i + 1);
+    [out[i], out[j]] = [out[j], out[i]];
+  }
+  return out;
 }
