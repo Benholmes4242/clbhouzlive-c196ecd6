@@ -324,7 +324,7 @@ export interface FriendLeaderboardEntry {
   is_self: boolean;
   friend_user_id: string | null;
   friend_connection_id: string | null;
-  /** Passport ID for invite system. NULL for self row. */
+  /** Passport ID. Now ALWAYS populated, including for the self row. */
   friend_passport_id: number | null;
   friend_name: string;
   friend_thumbnail_url: string | null;
@@ -335,4 +335,8 @@ export interface FriendLeaderboardEntry {
   last_round_played_at: string | null;
   last_round_course_name: string | null;
   is_clbhouz_user: boolean;
+  /** Handicap 30 days ago. NULL when no snapshot from 30+ days ago exists. */
+  handicap_30d_ago: number | null;
+  /** Current minus 30d_ago. Negative = improvement. NULL if either side is NULL. */
+  handicap_30d_delta: number | null;
 }
