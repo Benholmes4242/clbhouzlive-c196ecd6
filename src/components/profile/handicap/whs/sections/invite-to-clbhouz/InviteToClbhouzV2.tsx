@@ -73,7 +73,7 @@ export const InviteToClbhouzV2: React.FC<Props> = ({ ownerUserId }) => {
         />
       )}
       <SentInvitesSheet open={sheetOpen} onClose={() => setSheetOpen(false)} />
-    </div>
+    </section>
   );
 };
 
