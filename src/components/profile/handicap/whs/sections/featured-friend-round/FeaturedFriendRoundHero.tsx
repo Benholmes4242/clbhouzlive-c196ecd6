@@ -1,6 +1,7 @@
 import React from 'react';
 import { useFriendFeaturedRound } from '@/lib/whs/hooks';
 import { fmtHcp, fmtDiff } from '@/lib/whs/format';
+import { reformatFriendName } from '@/lib/whs/utils/nameFormat';
 import SectionHeader from '../SectionHeader';
 import BuildYourCircleCTA from './BuildYourCircleCTA';
 
@@ -15,10 +16,6 @@ function getFreshnessVariant(days: number): { eyebrow: string; titleVerb: string
   return { eyebrow: 'FROM YOUR CIRCLE', titleVerb: 'shot' };
 }
 
-function formatFriendName(name: string): string {
-  return name.includes(',') ? name.split(',').reverse().join(' ').trim() : name.trim();
-}
-
 export const FeaturedFriendRoundHero: React.FC<Props> = ({ userId }) => {
   const { data, isLoading } = useFriendFeaturedRound(userId);
 
@@ -31,7 +28,7 @@ export const FeaturedFriendRoundHero: React.FC<Props> = ({ userId }) => {
   }
 
   const variant = getFreshnessVariant(data.freshness_window_days);
-  const friendDisplay = formatFriendName(data.friend_name);
+  const friendDisplay = reformatFriendName(data.friend_name);
   const initials = friendDisplay.split(' ').map((p) => p[0]).join('').slice(0, 2).toUpperCase();
   const courseImage = data.course_thumbnail_image;
   const courseName = data.course_name ?? 'Unknown course';
