@@ -14,6 +14,7 @@ const VISIBLE_LIMIT = 10;
 export const RecentlyActiveRail: React.FC<Props> = ({ userId }) => {
   const { data, isLoading } = useFriendLeaderboard(userId);
   const [showAll, setShowAll] = useState(false);
+  const [profileSheet, setProfileSheet] = useState<{ index: number } | null>(null);
 
   const { sorted, activeCount } = useMemo(() => {
     const rows = (data ?? []).filter((e) => !e.is_self && e.last_round_played_at);
