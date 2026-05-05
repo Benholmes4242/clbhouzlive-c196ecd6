@@ -39,6 +39,12 @@ export const HERO_STYLES = {
     height: `calc(${HERO_HEIGHT} + env(safe-area-inset-top, 0px))`,
     minHeight: `calc(${HERO_MIN_HEIGHT}px + env(safe-area-inset-top, 0px))`,
   },
+  /** Hero container - editorial (live/results), taller to fit full layout */
+  containerEditorial: {
+    marginTop: HERO_BLEED_MARGIN_NO_HEADER,
+    height: `calc(${HERO_HEIGHT_EDITORIAL} + env(safe-area-inset-top, 0px))`,
+    minHeight: `calc(${HERO_MIN_HEIGHT}px + env(safe-area-inset-top, 0px))`,
+  },
   /** Content inside hero should use this to stay below notch */
   content: {
     paddingTop: 'env(safe-area-inset-top)',
