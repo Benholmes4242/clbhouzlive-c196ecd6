@@ -93,10 +93,21 @@ export const RecentlyActiveRail: React.FC<Props> = ({ userId }) => {
                 !!entry.last_round_played_at &&
                 Date.parse(entry.last_round_played_at) >= cutoff
               }
+              onClick={() => {
+                const realIdx = sorted.findIndex((e) => e === entry);
+                if (realIdx >= 0) setProfileSheet({ index: realIdx });
+              }}
             />
           </div>
         ))}
       </div>
+      <FriendProfileSheet
+        friends={sorted}
+        startIndex={profileSheet?.index ?? 0}
+        ownerUserId={userId}
+        open={!!profileSheet}
+        onClose={() => setProfileSheet(null)}
+      />
     </section>
   );
 };
