@@ -75,9 +75,9 @@ export function OverviewPageV3() {
       : tickerData?.upcoming.find(c => c.id === activeTournamentId) ? 'upcoming'
       : null)
     : null;
-  const heroContainerStyle = activeStatus === 'upcoming' || activeStatus === null
-    ? HERO_STYLES.containerNoHeader
-    : { marginTop: HERO_BLEED_MARGIN_NO_HEADER };
+  const heroContainerStyle = activeStatus === 'live' || activeStatus === 'completed'
+    ? HERO_STYLES.containerEditorial
+    : HERO_STYLES.containerNoHeader;
 
 
   return (
