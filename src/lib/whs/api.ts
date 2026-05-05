@@ -727,6 +727,8 @@ export async function fetchFriendLeaderboard(
     last_round_played_at: row.last_round_played_at ?? null,
     last_round_course_name: row.last_round_course_name ?? null,
     is_clbhouz_user: !!row.is_clbhouz_user,
+    handicap_30d_ago: row.handicap_30d_ago != null ? Number(row.handicap_30d_ago) : null,
+    handicap_30d_delta: row.handicap_30d_delta != null ? Number(row.handicap_30d_delta) : null,
   }));
 }
 
