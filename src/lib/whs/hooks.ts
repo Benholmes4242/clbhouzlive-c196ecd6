@@ -21,6 +21,7 @@ import {
   fetchUserRivalOverrides,
   upsertUserRivalOverride,
   deleteUserRivalOverride,
+  fetchSharedRounds,
 } from './api';
 
 export const whsKeys = {
