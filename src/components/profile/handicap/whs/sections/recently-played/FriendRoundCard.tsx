@@ -1,5 +1,5 @@
 import React from 'react';
-import { Trophy, Flame } from 'lucide-react';
+import { Trophy, Flame, ChevronRight, ArrowDown, ArrowUp } from 'lucide-react';
 import { initials, firstName } from '@/lib/whs/utils/initials';
 import type { WhsFriendActivityWithImage } from '@/lib/whs/types';
 
@@ -16,8 +16,10 @@ const T = {
   amber: '#F7931E',
   amberDeep: '#C97211',
   amberTint: 'rgba(247,147,30,0.10)',
-  green: '#059669',
-  greenTint: 'rgba(5,150,105,0.10)',
+  greenInk: '#065F46',
+  greenTint: 'rgba(6,95,70,0.10)',
+  redInk: '#7F1D1D',
+  redTint: 'rgba(127,29,29,0.08)',
 };
 const FONT_SERIF = 'Georgia, "Iowan Old Style", "Apple Garamond", serif';
 const FONT_DISPLAY = 'SF Pro Display, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
@@ -48,7 +50,24 @@ const fmtDiff = (n: number | null | undefined) => {
 export const FriendRoundCard: React.FC<Props> = ({ activity, onClick }) => {
   const diff = activity.last_round_differential;
   const diffStr = fmtDiff(diff);
-  const isFire = diff !== null && diff !== undefined && diff < 0;
+
+  // HCP impact pill
+  const impactDelta =
+    activity.is_counter &&
+    activity.handicap_index_at_time !== null &&
+    activity.friend_handicap_index !== null
+      ? activity.friend_handicap_index - activity.handicap_index_at_time
+      : null;
+  const showImpact = impactDelta !== null && impactDelta !== 0;
+  const impactIsImprovement = (impactDelta ?? 0) < 0;
+
+  // Multi-fire magnitude
+  const beatBy =
+    activity.last_round_differential !== null && activity.friend_handicap_index !== null
+      ? activity.friend_handicap_index - activity.last_round_differential
+      : null;
+  const fireCount =
+    beatBy === null || beatBy < 0 ? 0 : beatBy < 2 ? 1 : beatBy < 4 ? 2 : 3;
 
   // Bottom-left status tag
   let statusTag: { label: string; tone: 'invite' | 'sync' } | null = null;
@@ -79,15 +98,8 @@ export const FriendRoundCard: React.FC<Props> = ({ activity, onClick }) => {
         cursor: 'pointer',
       }}
     >
-      {/* Header — avatar + first name + relative time + course-best */}
-      <div
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: 10,
-          padding: '12px 14px 10px',
-        }}
-      >
+      {/* Header */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '12px 14px 10px' }}>
         <div
           style={{
             width: 36,
@@ -180,12 +192,7 @@ export const FriendRoundCard: React.FC<Props> = ({ activity, onClick }) => {
           <img
             src={activity.course_thumbnail_image}
             alt={activity.last_round_course_name ?? ''}
-            style={{
-              width: '100%',
-              height: '100%',
-              objectFit: 'cover',
-              display: 'block',
-            }}
+            style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
           />
         )}
         <div
@@ -197,7 +204,6 @@ export const FriendRoundCard: React.FC<Props> = ({ activity, onClick }) => {
           }}
         />
 
-        {/* Big gross score, top-right */}
         {activity.last_round_adjusted_gross !== null && (
           <div
             style={{
@@ -207,8 +213,8 @@ export const FriendRoundCard: React.FC<Props> = ({ activity, onClick }) => {
               display: 'flex',
               alignItems: 'baseline',
               gap: 6,
-              padding: '4px 10px 5px',
-              borderRadius: 10,
+              padding: '6px 12px 7px',
+              borderRadius: 12,
               background: 'rgba(15,23,42,0.55)',
               backdropFilter: 'blur(6px)',
               WebkitBackdropFilter: 'blur(6px)',
@@ -226,7 +232,7 @@ export const FriendRoundCard: React.FC<Props> = ({ activity, onClick }) => {
             </span>
             <span
               style={{
-                fontSize: 22,
+                fontSize: 32,
                 fontWeight: 900,
                 color: '#fff',
                 fontFamily: FONT_DISPLAY,
@@ -240,7 +246,6 @@ export const FriendRoundCard: React.FC<Props> = ({ activity, onClick }) => {
           </div>
         )}
 
-        {/* Course name, bottom */}
         <p
           style={{
             position: 'absolute',
@@ -251,6 +256,7 @@ export const FriendRoundCard: React.FC<Props> = ({ activity, onClick }) => {
             color: '#fff',
             fontSize: 15,
             fontWeight: 800,
+            fontStyle: 'italic',
             fontFamily: FONT_SERIF,
             letterSpacing: '-0.01em',
             textShadow: '0 1px 2px rgba(0,0,0,0.5)',
@@ -263,17 +269,17 @@ export const FriendRoundCard: React.FC<Props> = ({ activity, onClick }) => {
         </p>
       </div>
 
-      {/* Footer strip — status tag + diff */}
+      {/* Footer strip */}
       <div
         style={{
           display: 'flex',
           alignItems: 'center',
-          justifyContent: 'space-between',
-          gap: 10,
+          gap: 8,
           padding: '10px 14px 12px',
-          minHeight: 38,
+          minHeight: 40,
         }}
       >
+        {/* LEFT: status tag */}
         {statusTag ? (
           <span
             style={{
@@ -289,14 +295,44 @@ export const FriendRoundCard: React.FC<Props> = ({ activity, onClick }) => {
                 statusTag.tone === 'invite'
                   ? `1px solid rgba(247,147,30,0.20)`
                   : `1px solid ${T.hairline}`,
+              flexShrink: 0,
             }}
           >
             {statusTag.label}
           </span>
-        ) : (
-          <span />
+        ) : null}
+
+        <div style={{ flex: 1 }} />
+
+        {/* HCP impact pill */}
+        {showImpact && (
+          <span
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 3,
+              padding: '4px 8px',
+              borderRadius: 999,
+              fontSize: 11,
+              fontWeight: 800,
+              fontVariantNumeric: 'tabular-nums',
+              letterSpacing: '-0.01em',
+              color: impactIsImprovement ? T.greenInk : T.redInk,
+              background: impactIsImprovement ? T.greenTint : T.redTint,
+              border: `1px solid ${impactIsImprovement ? 'rgba(6,95,70,0.18)' : 'rgba(127,29,29,0.18)'}`,
+              flexShrink: 0,
+            }}
+          >
+            {impactIsImprovement ? (
+              <ArrowDown size={11} strokeWidth={2.5} />
+            ) : (
+              <ArrowUp size={11} strokeWidth={2.5} />
+            )}
+            {Math.abs(impactDelta!).toFixed(1)} hcp
+          </span>
         )}
 
+        {/* DIFF + fires */}
         {diffStr !== null && (
           <span
             style={{
@@ -305,18 +341,61 @@ export const FriendRoundCard: React.FC<Props> = ({ activity, onClick }) => {
               gap: 4,
               fontSize: 12,
               fontWeight: 800,
-              color: isFire ? T.green : T.ink,
+              color: T.ink,
               fontVariantNumeric: 'tabular-nums',
               letterSpacing: '-0.01em',
+              flexShrink: 0,
             }}
           >
-            {isFire && <Flame size={12} strokeWidth={2.5} color={T.green} />}
-            <span style={{ color: T.inkSoft, fontSize: 9, fontWeight: 900, letterSpacing: '0.14em', marginRight: 2 }}>
+            <span
+              style={{
+                color: T.inkSoft,
+                fontSize: 9,
+                fontWeight: 900,
+                letterSpacing: '0.14em',
+                marginRight: 2,
+              }}
+            >
               DIFF
             </span>
             {diffStr}
+            {fireCount > 0 && (
+              <span style={{ display: 'inline-flex', alignItems: 'center', marginLeft: 2 }}>
+                {Array.from({ length: fireCount }).map((_, i) => (
+                  <Flame
+                    key={i}
+                    size={12}
+                    strokeWidth={2.5}
+                    color={T.amber}
+                    fill={T.amber}
+                    style={{ marginLeft: i === 0 ? 0 : -3 }}
+                  />
+                ))}
+              </span>
+            )}
           </span>
         )}
+
+        {/* Scorecard CTA */}
+        <span
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: 2,
+            padding: '4px 6px 4px 9px',
+            borderRadius: 999,
+            fontSize: 11,
+            fontWeight: 800,
+            color: T.ink,
+            background: 'rgba(15,23,42,0.05)',
+            border: `1px solid ${T.hairline}`,
+            letterSpacing: '-0.01em',
+            flexShrink: 0,
+          }}
+        >
+          Scorecard
+          <ChevronRight size={13} strokeWidth={2.5} />
+        </span>
       </div>
     </div>
   );

@@ -187,6 +187,12 @@ export interface WhsFriendActivityWithImage {
   course_thumbnail_image: string | null;
   /** True when last_round equals the friend's 90-day best for that course. */
   is_course_best: boolean;
+  /** Friend's current handicap index (from whs_friend_matches). */
+  friend_handicap_index: number | null;
+  /** Whether the round counts toward the friend's handicap. */
+  is_counter: boolean;
+  /** Friend's handicap index at the time the round was posted. */
+  handicap_index_at_time: number | null;
 }
 
 // ─── Hole-level detail ──────────────────────────────────────────────────
