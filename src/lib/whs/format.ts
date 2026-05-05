@@ -38,7 +38,8 @@ export function formatDisplayedHcp(displayed: number): string {
  * plus-player handicaps. This is different from differential formatting (fmtDiff)
  * which uses Unicode minus for negative values.
  */
-export function fmtHcp(h: number): string {
+export function fmtHcp(h: number | null | undefined): string {
+  if (h === null || h === undefined || Number.isNaN(h)) return '—';
   if (h < 0) return `+${Math.abs(h).toFixed(1)}`;
   if (h === 0) return '0.0';
   return h.toFixed(1);
