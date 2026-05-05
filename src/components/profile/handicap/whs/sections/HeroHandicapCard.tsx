@@ -83,7 +83,7 @@ const HeroHandicapCard: React.FC<Props> = ({ connection }) => {
 
   const { data: trend, isLoading: trendLoading } = useHandicapTrend(connection.id);
   const { data: history, isLoading: historyLoading } = useHandicapHistory(connection.id, range);
-  const { data: recent } = useRecentRounds(connection.id);
+  const { data: recent } = useAllScores(connection.id);
 
   const current = trend?.current ?? null;
   const points: HandicapPoint[] = history ?? [];
