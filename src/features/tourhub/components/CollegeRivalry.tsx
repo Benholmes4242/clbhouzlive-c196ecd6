@@ -29,7 +29,7 @@ import { getCollegeLogoUrl } from '@/utils/collegeLogo';
 import { getPlayerHeadshotUrl, PLAYER_SILHOUETTE_URL } from '@/utils/playerHeadshot';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { COLLEGE_RIVALRY_FALLBACK } from '../utils/editorialFallbacks';
-import { SectionHeader } from './shared/SectionHeader';
+import { Shimmer } from './shared/Shimmer';
 
 const AMBER = '#F7931E';
 const AMBER_INK = '#D97706';
@@ -62,11 +62,101 @@ function abbreviateName(name: string): string {
 // SKELETON
 // ============================================================================
 function CollegeRivalrySkeleton() {
+  const currentYear = new Date().getFullYear();
   return (
-    <section aria-label="College rivalry" style={{ padding: '0 16px' }}>
-      <div style={{ height: 14, width: 240, background: '#F8FAFC', borderRadius: 6, marginBottom: 16 }} />
-      <div style={{ height: 280, background: '#fff', border: `1px solid ${SLATE_ALPHA}`, borderRadius: 18, marginBottom: 20 }} />
-      <div style={{ height: 220 }} />
+    <section aria-label="College rivalry">
+      {/* Section header */}
+      <div style={{
+        display: 'flex', alignItems: 'baseline', justifyContent: 'space-between',
+        padding: '0 16px', marginBottom: 14,
+      }}>
+        <Shimmer width="65%" height={24} radius={5} />
+        <Shimmer width="22%" height={11} radius={3} />
+      </div>
+
+      {/* Matchup card */}
+      <div style={{ padding: '0 16px' }}>
+        <div style={{
+          background: '#fff',
+          border: `1px solid ${SLATE_ALPHA}`,
+          borderRadius: 18,
+          overflow: 'hidden',
+        }}>
+          <div style={{ padding: '20px 18px 14px' }}>
+            <Shimmer width="55%" height={11} radius={3} style={{ marginBottom: 12 }} />
+            <Shimmer width="60%" height={22} radius={4} style={{ marginBottom: 6 }} />
+            <Shimmer width="78%" height={22} radius={4} />
+          </div>
+
+          <div style={{
+            padding: '8px 18px 22px',
+            display: 'grid', gridTemplateColumns: '1fr auto 1fr',
+            alignItems: 'center', gap: 8,
+          }}>
+            {[0, 1].map((side, idx) => (
+              <div key={side} style={{
+                display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8,
+                gridColumn: idx === 0 ? 1 : 3,
+              }}>
+                <Shimmer width={64} height={64} radius="50%" />
+                <Shimmer width="50%" height={13} radius={3} />
+                <Shimmer width="60%" height={20} radius={4} />
+                <Shimmer width="70%" height={9} radius={3} />
+              </div>
+            ))}
+            <div style={{ gridColumn: 2, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6 }}>
+              <Shimmer width={20} height={11} radius={3} />
+              <Shimmer width={48} height={20} radius={999} />
+            </div>
+          </div>
+
+          <div style={{
+            borderTop: `1px solid ${SLATE_150}`,
+            padding: '12px 18px',
+            display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12,
+          }}>
+            {[0, 1].map(i => (
+              <div key={i} style={{
+                display: 'flex', alignItems: 'center', gap: 10,
+                flex: 1, minWidth: 0,
+                flexDirection: i === 1 ? 'row-reverse' : 'row',
+              }}>
+                <Shimmer width={38} height={38} radius={9} />
+                <div style={{ flex: 1, minWidth: 0, textAlign: i === 1 ? 'right' : 'left' }}>
+                  <Shimmer width="65%" height={9} radius={3} style={{ marginBottom: 4, marginLeft: i === 1 ? 'auto' : 0 }} />
+                  <Shimmer width="55%" height={13} radius={3} style={{ marginBottom: 3, marginLeft: i === 1 ? 'auto' : 0 }} />
+                  <Shimmer width="40%" height={10} radius={3} style={{ marginLeft: i === 1 ? 'auto' : 0 }} />
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      <div style={{ padding: '0 16px', marginTop: 24 }}>
+        <div style={{
+          display: 'flex', justifyContent: 'space-between', alignItems: 'baseline',
+          marginBottom: 10, padding: '0 4px',
+        }}>
+          <Shimmer width={70} height={10} radius={3} />
+          <Shimmer width={140} height={10} radius={3} />
+        </div>
+        {Array.from({ length: 5 }).map((_, i) => (
+          <div key={i} style={{
+            display: 'flex', alignItems: 'center', gap: 12,
+            padding: '13px 12px 13px 11px',
+            borderLeft: `3px solid ${i === 0 ? AMBER : 'transparent'}`,
+            borderBottom: i < 4 ? `1px solid ${SLATE_150}` : 'none',
+          }}>
+            <Shimmer width={24} height={16} radius={3} />
+            <Shimmer width={28} height={28} radius={6} />
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <Shimmer width="55%" height={15} radius={3} />
+            </div>
+            <Shimmer width={56} height={14} radius={3} />
+          </div>
+        ))}
+      </div>
     </section>
   );
 }
@@ -157,13 +247,19 @@ export function CollegeRivalry() {
 
   return (
     <section aria-label="This week's college rivalry">
-      {/* Section header — shared SectionHeader component */}
-      <div style={{ padding: '0 16px' }}>
-        <SectionHeader
-          eyebrow="College Rivalry"
-          title="College Franchise Battle"
-          subtitle={`Where college legacies compete on tour · ${currentYear} Season`}
-        />
+      {/* Section header — single line */}
+      <div style={{
+        display: 'flex', alignItems: 'baseline', justifyContent: 'space-between',
+        padding: '0 16px', marginBottom: 14,
+      }}>
+        <h2 style={{
+          fontSize: 24, fontWeight: 800, letterSpacing: '-0.025em',
+          color: INK, margin: 0,
+        }}>College Franchise Battle</h2>
+        <span style={{
+          fontSize: 10, fontWeight: 700, color: SLATE,
+          letterSpacing: '0.1em', textTransform: 'uppercase',
+        }}>{currentYear} Season</span>
       </div>
 
       {/* Rivalry hero card — matchup row sits DIRECTLY on the outer card (no inner card) */}
@@ -184,7 +280,7 @@ export function CollegeRivalry() {
               letterSpacing: '0.12em', textTransform: 'uppercase',
               marginBottom: 12,
             }}>
-              🥊 {eyebrow}
+              {eyebrow}
             </div>
             <h2 style={{
               fontSize: 22, fontWeight: 900, lineHeight: 1.15,
@@ -203,7 +299,7 @@ export function CollegeRivalry() {
           {/* Matchup row — NO inner card, sits directly on the outer white card */}
           <div
             style={{
-              padding: '4px 18px 18px',
+              padding: '8px 18px 22px',
               marginBottom: 0,
               display: 'grid',
               gridTemplateColumns: '1fr auto 1fr',
@@ -216,7 +312,7 @@ export function CollegeRivalry() {
               onClick={() => navigate(`/tourhub/college-golf/${leader.normalized_name}`)}
               style={{
                 background: 'transparent', border: 'none', padding: 0,
-                display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6,
+                display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8,
                 cursor: 'pointer',
               }}
             >
@@ -224,14 +320,14 @@ export function CollegeRivalry() {
                 <img
                   src={leaderLogo}
                   alt={leaderShort}
-                  style={{ width: 56, height: 56, objectFit: 'contain', filter: 'drop-shadow(0 2px 6px rgba(0,0,0,0.14))' }}
+                  style={{ width: 64, height: 64, objectFit: 'contain', filter: 'drop-shadow(0 3px 8px rgba(0,0,0,0.14))' }}
                   onError={(e) => { e.currentTarget.style.display = 'none'; }}
                 />
               )}
               <div style={{ fontSize: 13, fontWeight: 800, color: INK, letterSpacing: '-0.2px' }}>
                 {leaderShort}
               </div>
-              <div style={{ fontSize: 18, fontWeight: 900, color: AMBER_INK, fontVariantNumeric: 'tabular-nums', letterSpacing: '-0.4px' }}>
+              <div style={{ fontSize: 20, fontWeight: 900, color: AMBER_INK, fontVariantNumeric: 'tabular-nums', letterSpacing: '-0.4px' }}>
                 {formatCurrency(leader.earnings_total)}
               </div>
               <div style={{ fontSize: 9, fontWeight: 800, color: SLATE, letterSpacing: '0.1em', textTransform: 'uppercase' }}>
@@ -267,7 +363,7 @@ export function CollegeRivalry() {
                 onClick={() => navigate(`/tourhub/college-golf/${chaser.normalized_name}`)}
                 style={{
                   background: 'transparent', border: 'none', padding: 0,
-                  display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6,
+                  display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8,
                   cursor: 'pointer',
                 }}
               >
@@ -275,14 +371,14 @@ export function CollegeRivalry() {
                   <img
                     src={chaserLogo}
                     alt={chaserShort}
-                    style={{ width: 56, height: 56, objectFit: 'contain', filter: 'drop-shadow(0 2px 6px rgba(0,0,0,0.14))' }}
+                    style={{ width: 64, height: 64, objectFit: 'contain', filter: 'drop-shadow(0 3px 8px rgba(0,0,0,0.14))' }}
                     onError={(e) => { e.currentTarget.style.display = 'none'; }}
                   />
                 )}
                 <div style={{ fontSize: 13, fontWeight: 800, color: INK, letterSpacing: '-0.2px' }}>
                   {chaserShort}
                 </div>
-                <div style={{ fontSize: 18, fontWeight: 900, color: INK, fontVariantNumeric: 'tabular-nums', letterSpacing: '-0.4px' }}>
+                <div style={{ fontSize: 20, fontWeight: 900, color: INK, fontVariantNumeric: 'tabular-nums', letterSpacing: '-0.4px' }}>
                   {formatCurrency(chaser.earnings_total)}
                 </div>
                 <div style={{ fontSize: 9, fontWeight: 800, color: SLATE, letterSpacing: '0.1em', textTransform: 'uppercase' }}>
@@ -299,11 +395,11 @@ export function CollegeRivalry() {
             <div
               style={{
                 borderTop: `1px solid ${SLATE_150}`,
-                padding: '14px 14px',
-                display: 'grid',
-                gridTemplateColumns: '1fr 1px 1fr',
-                gap: 12,
+                padding: '12px 18px',
+                display: 'flex',
                 alignItems: 'center',
+                justifyContent: 'space-between',
+                gap: 12,
               }}
             >
               {/* Leader captain — tappable */}
@@ -311,27 +407,20 @@ export function CollegeRivalry() {
                 onClick={() => leaderCaptain && navigate(`/tourhub/player/${leaderCaptain.playerId}`)}
                 disabled={!leaderCaptain}
                 style={{
-                  background: 'transparent',
-                  border: 'none',
-                  padding: '6px 8px',
-                  borderRadius: 8,
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 10,
+                  background: 'transparent', border: 'none', padding: '4px',
+                  display: 'flex', alignItems: 'center', gap: 10,
                   cursor: leaderCaptain ? 'pointer' : 'default',
-                  textAlign: 'left',
-                  width: '100%',
-                  minWidth: 0,
+                  textAlign: 'left', minWidth: 0, flex: 1,
                 }}
               >
                 <SquircleAvatar
-                  size={32}
+                  size={38}
                   src={leaderCaptain ? getPlayerHeadshotUrl(leaderCaptain.fullName, leaderCaptain.tourCode) : PLAYER_SILHOUETTE_URL}
                   alt={leaderCaptain?.fullName ?? '—'}
                   hideRing
                   fallback={leaderCaptain?.fullName.split(' ').map(n => n[0]).join('').slice(0, 2) ?? '—'}
                 />
-                <div style={{ minWidth: 0, flex: 1 }}>
+                <div style={{ minWidth: 0 }}>
                   <div style={{
                     fontSize: 9, fontWeight: 800, color: SLATE_500,
                     letterSpacing: '0.08em', textTransform: 'uppercase',
@@ -347,39 +436,37 @@ export function CollegeRivalry() {
                   </div>
                   {leaderCaptain && (
                     <div style={{
-                      fontSize: 10, fontWeight: 600, color: SLATE_500, lineHeight: 1.3,
+                      fontSize: 10, fontWeight: 600, color: SLATE_500,
+                      fontVariantNumeric: 'tabular-nums',
                       overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
                       marginTop: 2,
                     }}>
-                      Top earner · {formatCurrency(leaderCaptain.earnings)}
+                      {formatCurrency(leaderCaptain.earnings)}
                     </div>
                   )}
                 </div>
               </button>
 
-              {/* Vertical divider */}
-              <div style={{ background: SLATE_150, height: 44, width: 1 }} />
-
-              {/* Chaser captain — tappable */}
+              {/* Chaser captain — mirrored */}
               <button
                 onClick={() => chaserCaptain && navigate(`/tourhub/player/${chaserCaptain.playerId}`)}
                 disabled={!chaserCaptain}
                 style={{
-                  background: 'transparent',
-                  border: 'none',
-                  padding: '6px 8px',
-                  borderRadius: 8,
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 10,
+                  background: 'transparent', border: 'none', padding: '4px',
+                  display: 'flex', alignItems: 'center', gap: 10,
                   cursor: chaserCaptain ? 'pointer' : 'default',
-                  textAlign: 'right',
-                  width: '100%',
-                  minWidth: 0,
-                  justifyContent: 'flex-end',
+                  textAlign: 'right', minWidth: 0, flex: 1,
+                  flexDirection: 'row-reverse',
                 }}
               >
-                <div style={{ minWidth: 0, flex: 1, textAlign: 'right' }}>
+                <SquircleAvatar
+                  size={38}
+                  src={chaserCaptain ? getPlayerHeadshotUrl(chaserCaptain.fullName, chaserCaptain.tourCode) : PLAYER_SILHOUETTE_URL}
+                  alt={chaserCaptain?.fullName ?? '—'}
+                  hideRing
+                  fallback={chaserCaptain?.fullName.split(' ').map(n => n[0]).join('').slice(0, 2) ?? '—'}
+                />
+                <div style={{ minWidth: 0, textAlign: 'right' }}>
                   <div style={{
                     fontSize: 9, fontWeight: 800, color: SLATE_500,
                     letterSpacing: '0.08em', textTransform: 'uppercase',
@@ -395,21 +482,15 @@ export function CollegeRivalry() {
                   </div>
                   {chaserCaptain && (
                     <div style={{
-                      fontSize: 10, fontWeight: 600, color: SLATE_500, lineHeight: 1.3,
+                      fontSize: 10, fontWeight: 600, color: SLATE_500,
+                      fontVariantNumeric: 'tabular-nums',
                       overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
                       marginTop: 2,
                     }}>
-                      Top earner · {formatCurrency(chaserCaptain.earnings)}
+                      {formatCurrency(chaserCaptain.earnings)}
                     </div>
                   )}
                 </div>
-                <SquircleAvatar
-                  size={32}
-                  src={chaserCaptain ? getPlayerHeadshotUrl(chaserCaptain.fullName, chaserCaptain.tourCode) : PLAYER_SILHOUETTE_URL}
-                  alt={chaserCaptain?.fullName ?? '—'}
-                  hideRing
-                  fallback={chaserCaptain?.fullName.split(' ').map(n => n[0]).join('').slice(0, 2) ?? '—'}
-                />
               </button>
             </div>
           )}
