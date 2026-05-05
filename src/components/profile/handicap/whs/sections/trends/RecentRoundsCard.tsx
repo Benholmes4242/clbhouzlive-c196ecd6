@@ -1,7 +1,7 @@
 import React, { useMemo, useState } from 'react';
-import { ArrowDown, ArrowUp } from 'lucide-react';
+import { ArrowDown, ArrowUp, ChevronLeft, ChevronRight } from 'lucide-react';
 import { format } from 'date-fns';
-import { useRecentRounds } from '@/lib/whs/hooks';
+import { useAllScores } from '@/lib/whs/hooks';
 import { computeRoundDeltas, type RoundWithDelta } from './computeRoundDeltas';
 import RoundDetailSheet from '../round-detail/RoundDetailSheet';
 
@@ -12,11 +12,15 @@ interface Props {
 const T = {
   ink: '#0F172A',
   inkMute: 'rgba(15,23,42,0.55)',
+  inkSoft: 'rgba(15,23,42,0.78)',
+  inkFaded: 'rgba(15,23,42,0.40)',
   hairline: 'rgba(15,23,42,0.08)',
   cardBg: '#FFFFFF',
   greenInk: '#065F46',
 };
 const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
+
+const PAGE_SIZE = 15;
 
 const fmtDiff = (d: number | null | undefined): string => {
   if (d === null || d === undefined) return '—';
@@ -34,13 +38,35 @@ const fmtDate = (iso: string): string => {
 };
 
 export const RecentRoundsCard: React.FC<Props> = ({ connectionId }) => {
-  const { data: recent, isLoading } = useRecentRounds(connectionId);
+  const { data: allRounds, isLoading } = useAllScores(connectionId);
   const [openScoreId, setOpenScoreId] = useState<string | null>(null);
+  const [pageIndex, setPageIndex] = useState(0);
+  const [direction, setDirection] = useState<-1 | 0 | 1>(0);
 
   const rounds = useMemo(
-    () => (recent ? computeRoundDeltas(recent) : []),
-    [recent],
+    () => (allRounds ? computeRoundDeltas(allRounds) : []),
+    [allRounds],
   );
+
+  const totalPages = Math.max(1, Math.ceil(rounds.length / PAGE_SIZE));
+  const safePageIndex = Math.min(pageIndex, totalPages - 1);
+  const start = safePageIndex * PAGE_SIZE;
+  const end = Math.min(start + PAGE_SIZE, rounds.length);
+  const visibleRounds = rounds.slice(start, end);
+
+  const canGoOlder = safePageIndex < totalPages - 1;
+  const canGoNewer = safePageIndex > 0;
+
+  const goOlder = () => {
+    if (!canGoOlder) return;
+    setDirection(-1);
+    setPageIndex((p) => p + 1);
+  };
+  const goNewer = () => {
+    if (!canGoNewer) return;
+    setDirection(1);
+    setPageIndex((p) => p - 1);
+  };
 
   const openDelta = openScoreId
     ? rounds.find((r) => r.id === openScoreId)?.handicap_delta ?? null
@@ -48,20 +74,49 @@ export const RecentRoundsCard: React.FC<Props> = ({ connectionId }) => {
 
   return (
     <section style={{ padding: '0 20px', marginBottom: 28, fontFamily: FONT }}>
-      <SectionHeader count={rounds.length} />
+      <SectionHeader
+        rangeStart={start + 1}
+        rangeEnd={end}
+        total={rounds.length}
+        pageIndex={safePageIndex}
+        totalPages={totalPages}
+        canGoOlder={canGoOlder}
+        canGoNewer={canGoNewer}
+        onOlder={goOlder}
+        onNewer={goNewer}
+        showControls={!isLoading && rounds.length > PAGE_SIZE}
+      />
 
       {isLoading ? (
         <SkeletonStack />
       ) : rounds.length === 0 ? (
         <EmptyState />
       ) : (
-        rounds.map((round) => (
-          <RoundTile
-            key={round.id}
-            round={round}
-            onTap={() => setOpenScoreId(round.id)}
-          />
-        ))
+        <div style={{ position: 'relative', overflow: 'hidden' }}>
+          <div
+            key={safePageIndex}
+            style={{
+              animation:
+                direction === -1
+                  ? 'recent-rounds-slide-from-right 280ms cubic-bezier(0.32, 0.72, 0, 1)'
+                  : direction === 1
+                    ? 'recent-rounds-slide-from-left 280ms cubic-bezier(0.32, 0.72, 0, 1)'
+                    : undefined,
+            }}
+          >
+            {visibleRounds.map((round) => (
+              <RoundTile
+                key={round.id}
+                round={round}
+                onTap={() => setOpenScoreId(round.id)}
+              />
+            ))}
+          </div>
+        </div>
+      )}
+
+      {!isLoading && totalPages > 1 && totalPages <= 10 && (
+        <FooterDots pageIndex={safePageIndex} totalPages={totalPages} />
       )}
 
       <RoundDetailSheet
@@ -70,13 +125,55 @@ export const RecentRoundsCard: React.FC<Props> = ({ connectionId }) => {
         onClose={() => setOpenScoreId(null)}
         handicapDelta={openDelta}
       />
+
+      <style>{`
+        @keyframes recent-rounds-slide-from-right {
+          from { transform: translateX(28px); opacity: 0.4; }
+          to   { transform: translateX(0);    opacity: 1; }
+        }
+        @keyframes recent-rounds-slide-from-left {
+          from { transform: translateX(-28px); opacity: 0.4; }
+          to   { transform: translateX(0);     opacity: 1; }
+        }
+      `}</style>
     </section>
   );
 };
 
-const SectionHeader: React.FC<{ count: number }> = ({ count }) => (
+interface SectionHeaderProps {
+  rangeStart: number;
+  rangeEnd: number;
+  total: number;
+  pageIndex: number;
+  totalPages: number;
+  canGoOlder: boolean;
+  canGoNewer: boolean;
+  onOlder: () => void;
+  onNewer: () => void;
+  showControls: boolean;
+}
+
+const SectionHeader: React.FC<SectionHeaderProps> = ({
+  rangeStart,
+  rangeEnd,
+  total,
+  pageIndex,
+  totalPages,
+  canGoOlder,
+  canGoNewer,
+  onOlder,
+  onNewer,
+  showControls,
+}) => (
   <div style={{ padding: '0 4px 12px' }}>
-    <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between' }}>
+    <div
+      style={{
+        display: 'flex',
+        alignItems: 'baseline',
+        justifyContent: 'space-between',
+        marginBottom: showControls ? 8 : 0,
+      }}
+    >
       <h3
         style={{
           margin: 0,
@@ -97,11 +194,88 @@ const SectionHeader: React.FC<{ count: number }> = ({ count }) => (
           letterSpacing: '0.06em',
           textTransform: 'uppercase',
           fontFamily: FONT,
+          fontVariantNumeric: 'tabular-nums',
         }}
       >
-        Last {count}
+        {total === 0 ? 'No rounds' : `${rangeStart}\u2013${rangeEnd} of ${total}`}
       </span>
     </div>
+
+    {showControls && (
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
+        <NavChip label="Newer" icon="left" disabled={!canGoNewer} onClick={onNewer} />
+        <span
+          style={{
+            fontSize: 10,
+            fontWeight: 700,
+            color: T.inkMute,
+            letterSpacing: '0.10em',
+            textTransform: 'uppercase',
+            fontFamily: FONT,
+            fontVariantNumeric: 'tabular-nums',
+          }}
+        >
+          Page {pageIndex + 1} of {totalPages}
+        </span>
+        <NavChip label="Older" icon="right" disabled={!canGoOlder} onClick={onOlder} />
+      </div>
+    )}
+  </div>
+);
+
+interface NavChipProps {
+  label: 'Newer' | 'Older';
+  icon: 'left' | 'right';
+  disabled: boolean;
+  onClick: () => void;
+}
+
+const NavChip: React.FC<NavChipProps> = ({ label, icon, disabled, onClick }) => (
+  <button
+    type="button"
+    onClick={onClick}
+    disabled={disabled}
+    aria-label={label === 'Newer' ? 'Newer rounds' : 'Older rounds'}
+    style={{
+      display: 'flex',
+      alignItems: 'center',
+      gap: 4,
+      padding: icon === 'left' ? '6px 10px 6px 8px' : '6px 8px 6px 10px',
+      borderRadius: 999,
+      border: `1px solid ${T.hairline}`,
+      background: disabled ? 'transparent' : T.cardBg,
+      color: disabled ? T.inkFaded : T.inkSoft,
+      fontSize: 11,
+      fontWeight: 700,
+      cursor: disabled ? 'default' : 'pointer',
+      fontFamily: FONT,
+      letterSpacing: '0.02em',
+      opacity: disabled ? 0.4 : 1,
+    }}
+  >
+    {icon === 'left' && <ChevronLeft size={13} strokeWidth={2.4} />}
+    {label}
+    {icon === 'right' && <ChevronRight size={13} strokeWidth={2.4} />}
+  </button>
+);
+
+const FooterDots: React.FC<{ pageIndex: number; totalPages: number }> = ({
+  pageIndex,
+  totalPages,
+}) => (
+  <div style={{ display: 'flex', justifyContent: 'center', gap: 5, marginTop: 14 }}>
+    {Array.from({ length: totalPages }).map((_, i) => (
+      <span
+        key={i}
+        style={{
+          width: i === pageIndex ? 16 : 5,
+          height: 5,
+          borderRadius: 3,
+          background: i === pageIndex ? T.ink : 'rgba(15,23,42,0.20)',
+          transition: 'all 200ms ease',
+        }}
+      />
+    ))}
   </div>
 );
 
