@@ -280,7 +280,7 @@ export function CollegeRivalry() {
               letterSpacing: '0.12em', textTransform: 'uppercase',
               marginBottom: 12,
             }}>
-              🥊 {eyebrow}
+              {eyebrow}
             </div>
             <h2 style={{
               fontSize: 22, fontWeight: 900, lineHeight: 1.15,
@@ -299,7 +299,7 @@ export function CollegeRivalry() {
           {/* Matchup row — NO inner card, sits directly on the outer white card */}
           <div
             style={{
-              padding: '4px 18px 18px',
+              padding: '8px 18px 22px',
               marginBottom: 0,
               display: 'grid',
               gridTemplateColumns: '1fr auto 1fr',
@@ -312,7 +312,7 @@ export function CollegeRivalry() {
               onClick={() => navigate(`/tourhub/college-golf/${leader.normalized_name}`)}
               style={{
                 background: 'transparent', border: 'none', padding: 0,
-                display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6,
+                display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8,
                 cursor: 'pointer',
               }}
             >
@@ -320,14 +320,14 @@ export function CollegeRivalry() {
                 <img
                   src={leaderLogo}
                   alt={leaderShort}
-                  style={{ width: 56, height: 56, objectFit: 'contain', filter: 'drop-shadow(0 2px 6px rgba(0,0,0,0.14))' }}
+                  style={{ width: 64, height: 64, objectFit: 'contain', filter: 'drop-shadow(0 3px 8px rgba(0,0,0,0.14))' }}
                   onError={(e) => { e.currentTarget.style.display = 'none'; }}
                 />
               )}
               <div style={{ fontSize: 13, fontWeight: 800, color: INK, letterSpacing: '-0.2px' }}>
                 {leaderShort}
               </div>
-              <div style={{ fontSize: 18, fontWeight: 900, color: AMBER_INK, fontVariantNumeric: 'tabular-nums', letterSpacing: '-0.4px' }}>
+              <div style={{ fontSize: 20, fontWeight: 900, color: AMBER_INK, fontVariantNumeric: 'tabular-nums', letterSpacing: '-0.4px' }}>
                 {formatCurrency(leader.earnings_total)}
               </div>
               <div style={{ fontSize: 9, fontWeight: 800, color: SLATE, letterSpacing: '0.1em', textTransform: 'uppercase' }}>
@@ -363,7 +363,7 @@ export function CollegeRivalry() {
                 onClick={() => navigate(`/tourhub/college-golf/${chaser.normalized_name}`)}
                 style={{
                   background: 'transparent', border: 'none', padding: 0,
-                  display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6,
+                  display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8,
                   cursor: 'pointer',
                 }}
               >
@@ -371,14 +371,14 @@ export function CollegeRivalry() {
                   <img
                     src={chaserLogo}
                     alt={chaserShort}
-                    style={{ width: 56, height: 56, objectFit: 'contain', filter: 'drop-shadow(0 2px 6px rgba(0,0,0,0.14))' }}
+                    style={{ width: 64, height: 64, objectFit: 'contain', filter: 'drop-shadow(0 3px 8px rgba(0,0,0,0.14))' }}
                     onError={(e) => { e.currentTarget.style.display = 'none'; }}
                   />
                 )}
                 <div style={{ fontSize: 13, fontWeight: 800, color: INK, letterSpacing: '-0.2px' }}>
                   {chaserShort}
                 </div>
-                <div style={{ fontSize: 18, fontWeight: 900, color: INK, fontVariantNumeric: 'tabular-nums', letterSpacing: '-0.4px' }}>
+                <div style={{ fontSize: 20, fontWeight: 900, color: INK, fontVariantNumeric: 'tabular-nums', letterSpacing: '-0.4px' }}>
                   {formatCurrency(chaser.earnings_total)}
                 </div>
                 <div style={{ fontSize: 9, fontWeight: 800, color: SLATE, letterSpacing: '0.1em', textTransform: 'uppercase' }}>
@@ -395,11 +395,11 @@ export function CollegeRivalry() {
             <div
               style={{
                 borderTop: `1px solid ${SLATE_150}`,
-                padding: '14px 14px',
-                display: 'grid',
-                gridTemplateColumns: '1fr 1px 1fr',
-                gap: 12,
+                padding: '12px 18px',
+                display: 'flex',
                 alignItems: 'center',
+                justifyContent: 'space-between',
+                gap: 12,
               }}
             >
               {/* Leader captain — tappable */}
@@ -407,27 +407,20 @@ export function CollegeRivalry() {
                 onClick={() => leaderCaptain && navigate(`/tourhub/player/${leaderCaptain.playerId}`)}
                 disabled={!leaderCaptain}
                 style={{
-                  background: 'transparent',
-                  border: 'none',
-                  padding: '6px 8px',
-                  borderRadius: 8,
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 10,
+                  background: 'transparent', border: 'none', padding: '4px',
+                  display: 'flex', alignItems: 'center', gap: 10,
                   cursor: leaderCaptain ? 'pointer' : 'default',
-                  textAlign: 'left',
-                  width: '100%',
-                  minWidth: 0,
+                  textAlign: 'left', minWidth: 0, flex: 1,
                 }}
               >
                 <SquircleAvatar
-                  size={32}
+                  size={38}
                   src={leaderCaptain ? getPlayerHeadshotUrl(leaderCaptain.fullName, leaderCaptain.tourCode) : PLAYER_SILHOUETTE_URL}
                   alt={leaderCaptain?.fullName ?? '—'}
                   hideRing
                   fallback={leaderCaptain?.fullName.split(' ').map(n => n[0]).join('').slice(0, 2) ?? '—'}
                 />
-                <div style={{ minWidth: 0, flex: 1 }}>
+                <div style={{ minWidth: 0 }}>
                   <div style={{
                     fontSize: 9, fontWeight: 800, color: SLATE_500,
                     letterSpacing: '0.08em', textTransform: 'uppercase',
@@ -443,39 +436,37 @@ export function CollegeRivalry() {
                   </div>
                   {leaderCaptain && (
                     <div style={{
-                      fontSize: 10, fontWeight: 600, color: SLATE_500, lineHeight: 1.3,
+                      fontSize: 10, fontWeight: 600, color: SLATE_500,
+                      fontVariantNumeric: 'tabular-nums',
                       overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
                       marginTop: 2,
                     }}>
-                      Top earner · {formatCurrency(leaderCaptain.earnings)}
+                      {formatCurrency(leaderCaptain.earnings)}
                     </div>
                   )}
                 </div>
               </button>
 
-              {/* Vertical divider */}
-              <div style={{ background: SLATE_150, height: 44, width: 1 }} />
-
-              {/* Chaser captain — tappable */}
+              {/* Chaser captain — mirrored */}
               <button
                 onClick={() => chaserCaptain && navigate(`/tourhub/player/${chaserCaptain.playerId}`)}
                 disabled={!chaserCaptain}
                 style={{
-                  background: 'transparent',
-                  border: 'none',
-                  padding: '6px 8px',
-                  borderRadius: 8,
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 10,
+                  background: 'transparent', border: 'none', padding: '4px',
+                  display: 'flex', alignItems: 'center', gap: 10,
                   cursor: chaserCaptain ? 'pointer' : 'default',
-                  textAlign: 'right',
-                  width: '100%',
-                  minWidth: 0,
-                  justifyContent: 'flex-end',
+                  textAlign: 'right', minWidth: 0, flex: 1,
+                  flexDirection: 'row-reverse',
                 }}
               >
-                <div style={{ minWidth: 0, flex: 1, textAlign: 'right' }}>
+                <SquircleAvatar
+                  size={38}
+                  src={chaserCaptain ? getPlayerHeadshotUrl(chaserCaptain.fullName, chaserCaptain.tourCode) : PLAYER_SILHOUETTE_URL}
+                  alt={chaserCaptain?.fullName ?? '—'}
+                  hideRing
+                  fallback={chaserCaptain?.fullName.split(' ').map(n => n[0]).join('').slice(0, 2) ?? '—'}
+                />
+                <div style={{ minWidth: 0, textAlign: 'right' }}>
                   <div style={{
                     fontSize: 9, fontWeight: 800, color: SLATE_500,
                     letterSpacing: '0.08em', textTransform: 'uppercase',
@@ -491,21 +482,15 @@ export function CollegeRivalry() {
                   </div>
                   {chaserCaptain && (
                     <div style={{
-                      fontSize: 10, fontWeight: 600, color: SLATE_500, lineHeight: 1.3,
+                      fontSize: 10, fontWeight: 600, color: SLATE_500,
+                      fontVariantNumeric: 'tabular-nums',
                       overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
                       marginTop: 2,
                     }}>
-                      Top earner · {formatCurrency(chaserCaptain.earnings)}
+                      {formatCurrency(chaserCaptain.earnings)}
                     </div>
                   )}
                 </div>
-                <SquircleAvatar
-                  size={32}
-                  src={chaserCaptain ? getPlayerHeadshotUrl(chaserCaptain.fullName, chaserCaptain.tourCode) : PLAYER_SILHOUETTE_URL}
-                  alt={chaserCaptain?.fullName ?? '—'}
-                  hideRing
-                  fallback={chaserCaptain?.fullName.split(' ').map(n => n[0]).join('').slice(0, 2) ?? '—'}
-                />
               </button>
             </div>
           )}
