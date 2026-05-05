@@ -129,6 +129,14 @@ export const FriendsLeaderboardSection: React.FC<Props> = ({ userId }) => {
               rank={realRank}
               isFirst={i === 0}
               isLast={i === visible.length - 1}
+              onClick={
+                entry.is_self
+                  ? undefined
+                  : () => {
+                      const realIdx = sorted.findIndex((e) => e === entry);
+                      if (realIdx >= 0) setProfileSheet({ index: realIdx });
+                    }
+              }
             />
           );
         })
@@ -160,6 +168,14 @@ export const FriendsLeaderboardSection: React.FC<Props> = ({ userId }) => {
           <ChevronRight size={14} />
         </button>
       )}
+
+      <FriendProfileSheet
+        friends={sorted}
+        startIndex={profileSheet?.index ?? 0}
+        ownerUserId={userId}
+        open={!!profileSheet}
+        onClose={() => setProfileSheet(null)}
+      />
     </section>
   );
 };
