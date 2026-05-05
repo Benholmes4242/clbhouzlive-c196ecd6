@@ -13,7 +13,7 @@
 
 import React, { useCallback, useEffect, useMemo } from 'react';
 import { useNavigate, Navigate, useSearchParams, useParams } from 'react-router-dom';
-import { ChevronLeft, ChevronRight, MoreHorizontal } from 'lucide-react';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { PageRoot } from '@/components/layout/PageRoot';
@@ -174,36 +174,8 @@ const HandicapPageHeader: React.FC<HeaderProps> = ({
   viewerUserId,
 }) => {
   const navigate = useNavigate();
-  const { data: connection } = useWhsConnection(ownerUserId);
 
   const greeting = useMemo(() => getGreeting(), []);
-
-  const syncStatus = useMemo(() => {
-    if (readOnly) return null;
-    if (!connection) return null;
-    const status = (connection as any).last_sync_status;
-    const lastSync = connection.last_synced_at;
-    if (status === 'auth_failed') {
-      return { color: 'red' as const, label: 'Sync needs reauth' };
-    }
-    if (!lastSync || (Date.now() - new Date(lastSync).getTime()) > 24 * 3600_000) {
-      return { color: 'amber' as const, label: 'Sync pending' };
-    }
-    return { color: 'green' as const, label: 'England Golf · synced' };
-  }, [connection, readOnly]);
-
-  const pillBg = syncStatus?.color === 'green'
-    ? 'rgba(5,150,105,0.10)'
-    : syncStatus?.color === 'amber'
-    ? 'rgba(247,147,30,0.10)'
-    : 'rgba(159,29,29,0.10)';
-  const pillBorder = syncStatus?.color === 'green'
-    ? 'rgba(5,150,105,0.20)'
-    : syncStatus?.color === 'amber'
-    ? 'rgba(247,147,30,0.20)'
-    : 'rgba(159,29,29,0.20)';
-  const pillDot = syncStatus?.color === 'green' ? GREEN : syncStatus?.color === 'amber' ? AMBER : RED;
-  const pillText = syncStatus?.color === 'green' ? GREEN : syncStatus?.color === 'amber' ? AMBER_INK : RED;
 
   // Title varies by mode
   const eyebrow = readOnly ? 'HANDICAP' : 'HANDICAP';
@@ -220,7 +192,7 @@ const HandicapPageHeader: React.FC<HeaderProps> = ({
       }}
     >
       {/* Row 1 — top bar */}
-      <div className="flex items-center justify-between px-4" style={{ height: 44 }}>
+      <div className="flex items-center px-4" style={{ height: 44 }}>
         <button
           onClick={() => navigate(-1)}
           aria-label="Back"
@@ -234,47 +206,6 @@ const HandicapPageHeader: React.FC<HeaderProps> = ({
         >
           <ChevronLeft size={20} strokeWidth={2.2} color={INK} />
         </button>
-
-        {syncStatus && (
-          <div
-            style={{
-              display: 'flex', alignItems: 'center', gap: 8,
-              padding: '6px 12px',
-              background: pillBg,
-              border: `0.5px solid ${pillBorder}`,
-              borderRadius: 999,
-            }}
-          >
-            <span style={{ width: 6, height: 6, borderRadius: '50%', background: pillDot }} />
-            <span style={{
-              fontSize: 11, fontWeight: 700, color: pillText,
-              fontFamily: FONT_GEIST,
-            }}>
-              {syncStatus.label}
-            </span>
-          </div>
-        )}
-
-        {/* More menu — own only. v1 stub. */}
-        {!readOnly ? (
-          <button
-            aria-label="More options"
-            aria-disabled="true"
-            onClick={() => { /* no-op */ }}
-            style={{
-              width: 36, height: 36, borderRadius: '50%',
-              background: '#fff',
-              border: `0.5px solid ${BORDER}`,
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              cursor: 'pointer',
-            }}
-          >
-            <MoreHorizontal size={18} strokeWidth={2.2} color={INK} />
-          </button>
-        ) : (
-          // Spacer to keep layout balanced
-          <div style={{ width: 36, height: 36 }} aria-hidden="true" />
-        )}
       </div>
 
       {/* Row 2 — title */}
@@ -391,11 +322,10 @@ const HandicapPage: React.FC = () => {
   }, [searchParams, setSearchParams]);
 
   // Fetch profile for greeting/title.
-  // Schema note: user_profiles has only `username` and `profile_photo_url`
-  // for our purposes — no first_name/full_name. Display name is derived
-  // from username (the existing handicap UI already does this elsewhere).
+  // Uses display_name when available (extracts first name), falls back to username.
   const { data: profile } = useQuery<{
     username: string | null;
+    display_name: string | null;
     profile_photo_url: string | null;
   } | null>({
     queryKey: ['handicap-page-profile', ownerUserId],
@@ -404,7 +334,7 @@ const HandicapPage: React.FC = () => {
     queryFn: async () => {
       const { data, error } = await (supabase as any)
         .from('user_profiles')
-        .select('username, profile_photo_url')
+        .select('username, display_name, profile_photo_url')
         .eq('id', ownerUserId!)
         .maybeSingle();
       if (error) throw error;
@@ -413,8 +343,14 @@ const HandicapPage: React.FC = () => {
   });
 
   const displayName = useMemo(() => {
-    // Both modes: derive from username; in own mode we just use the
-    // username as the greeting "first name" since no first_name exists.
+    if (profile?.display_name) {
+      const name = profile.display_name.trim();
+      if (name.includes(',')) {
+        const afterComma = name.split(',')[1]?.trim();
+        if (afterComma) return afterComma.split(' ')[0];
+      }
+      return name.split(' ')[0];
+    }
     return profile?.username ?? null;
   }, [profile]);
 
