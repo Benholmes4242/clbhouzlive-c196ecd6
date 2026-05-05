@@ -1,5 +1,5 @@
 import React from 'react';
-import { Trophy } from 'lucide-react';
+import { Trophy, Flame } from 'lucide-react';
 import { initials, firstName } from '@/lib/whs/utils/initials';
 import type { WhsFriendActivityWithImage } from '@/lib/whs/types';
 
@@ -11,11 +11,13 @@ interface Props {
 const T = {
   ink: '#0F172A',
   inkMute: 'rgba(15,23,42,0.55)',
+  inkSoft: 'rgba(15,23,42,0.35)',
   hairline: 'rgba(15,23,42,0.08)',
   amber: '#F7931E',
   amberDeep: '#C97211',
   amberTint: 'rgba(247,147,30,0.10)',
   green: '#059669',
+  greenTint: 'rgba(5,150,105,0.10)',
 };
 const FONT_SERIF = 'Georgia, "Iowan Old Style", "Apple Garamond", serif';
 const FONT_DISPLAY = 'SF Pro Display, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
@@ -37,61 +39,24 @@ const fmtRel = (iso: string | null) => {
 };
 
 const fmtDiff = (n: number | null | undefined) => {
-  if (n === null || n === undefined) return '—';
+  if (n === null || n === undefined) return null;
   if (n > 0) return `+${n.toFixed(1)}`;
   if (n < 0) return `\u2212${Math.abs(n).toFixed(1)}`;
   return '0.0';
 };
 
-const Stat: React.FC<{
-  label: string;
-  value: string | number;
-  color?: string;
-  divider?: boolean;
-}> = ({ label, value, color = T.ink, divider = false }) => (
-  <div
-    style={{
-      textAlign: 'center',
-      ...(divider
-        ? {
-            borderLeft: `1px solid ${T.hairline}`,
-            borderRight: `1px solid ${T.hairline}`,
-          }
-        : {}),
-    }}
-  >
-    <p
-      style={{
-        margin: 0,
-        fontSize: 9,
-        fontWeight: 800,
-        color: T.inkMute,
-        letterSpacing: '0.14em',
-        marginBottom: 2,
-      }}
-    >
-      {label}
-    </p>
-    <p
-      style={{
-        margin: 0,
-        fontSize: 22,
-        fontWeight: 800,
-        color,
-        fontFamily: FONT_DISPLAY,
-        fontVariantNumeric: 'tabular-nums',
-        letterSpacing: '-0.02em',
-        lineHeight: 1,
-      }}
-    >
-      {value}
-    </p>
-  </div>
-);
-
 export const FriendRoundCard: React.FC<Props> = ({ activity, onClick }) => {
-  const isClickable = true;
   const diff = activity.last_round_differential;
+  const diffStr = fmtDiff(diff);
+  const isFire = diff !== null && diff !== undefined && diff < 0;
+
+  // Bottom-left status tag
+  let statusTag: { label: string; tone: 'invite' | 'sync' } | null = null;
+  if (!activity.is_clbhouz_user) {
+    statusTag = { label: 'INVITE TO UNLOCK MORE', tone: 'invite' };
+  } else if (!activity.friend_connection_id) {
+    statusTag = { label: 'ASK TO SYNC', tone: 'sync' };
+  }
 
   return (
     <div
@@ -112,23 +77,22 @@ export const FriendRoundCard: React.FC<Props> = ({ activity, onClick }) => {
         borderRadius: 16,
         overflow: 'hidden',
         cursor: 'pointer',
-        transition: 'transform 200ms ease, box-shadow 200ms ease',
       }}
     >
-      {/* Header — avatar + first name + relative time + course-best rosette */}
+      {/* Header — avatar + first name + relative time + course-best */}
       <div
         style={{
           display: 'flex',
           alignItems: 'center',
           gap: 10,
-          padding: '12px 14px',
+          padding: '12px 14px 10px',
         }}
       >
         <div
           style={{
-            width: 32,
-            height: 32,
-            borderRadius: 10,
+            width: 36,
+            height: 36,
+            borderRadius: '34%',
             overflow: 'hidden',
             background: 'rgba(15,23,42,0.06)',
             flexShrink: 0,
@@ -144,13 +108,7 @@ export const FriendRoundCard: React.FC<Props> = ({ activity, onClick }) => {
               style={{ width: '100%', height: '100%', objectFit: 'cover' }}
             />
           ) : (
-            <span
-              style={{
-                fontSize: 10,
-                fontWeight: 800,
-                color: '#64748B',
-              }}
-            >
+            <span style={{ fontSize: 11, fontWeight: 800, color: '#64748B' }}>
               {initials(activity.friend_name)}
             </span>
           )}
@@ -160,13 +118,14 @@ export const FriendRoundCard: React.FC<Props> = ({ activity, onClick }) => {
           <p
             style={{
               margin: 0,
-              fontSize: 13,
+              fontSize: 14,
               fontWeight: 800,
               color: T.ink,
               lineHeight: 1.2,
               whiteSpace: 'nowrap',
               overflow: 'hidden',
               textOverflow: 'ellipsis',
+              letterSpacing: '-0.01em',
             }}
           >
             {firstName(activity.friend_name)}
@@ -177,6 +136,8 @@ export const FriendRoundCard: React.FC<Props> = ({ activity, onClick }) => {
               fontSize: 11,
               color: T.inkMute,
               marginTop: 1,
+              fontWeight: 500,
+              letterSpacing: '0.02em',
             }}
           >
             {fmtRel(activity.last_round_played_at)}
@@ -206,12 +167,12 @@ export const FriendRoundCard: React.FC<Props> = ({ activity, onClick }) => {
         )}
       </div>
 
-      {/* Course image banner */}
+      {/* Course image banner with overlaid score */}
       <div
         style={{
           position: 'relative',
           width: '100%',
-          aspectRatio: '16 / 8',
+          aspectRatio: '16 / 9',
           background: 'linear-gradient(135deg, #1e293b, #0f172a)',
         }}
       >
@@ -232,9 +193,54 @@ export const FriendRoundCard: React.FC<Props> = ({ activity, onClick }) => {
             position: 'absolute',
             inset: 0,
             background:
-              'linear-gradient(180deg, rgba(15,23,42,0) 50%, rgba(15,23,42,0.85) 100%)',
+              'linear-gradient(180deg, rgba(15,23,42,0) 35%, rgba(15,23,42,0.88) 100%)',
           }}
         />
+
+        {/* Big gross score, top-right */}
+        {activity.last_round_adjusted_gross !== null && (
+          <div
+            style={{
+              position: 'absolute',
+              top: 10,
+              right: 12,
+              display: 'flex',
+              alignItems: 'baseline',
+              gap: 6,
+              padding: '4px 10px 5px',
+              borderRadius: 10,
+              background: 'rgba(15,23,42,0.55)',
+              backdropFilter: 'blur(6px)',
+              WebkitBackdropFilter: 'blur(6px)',
+            }}
+          >
+            <span
+              style={{
+                fontSize: 9,
+                fontWeight: 900,
+                color: 'rgba(255,255,255,0.7)',
+                letterSpacing: '0.16em',
+              }}
+            >
+              GROSS
+            </span>
+            <span
+              style={{
+                fontSize: 22,
+                fontWeight: 900,
+                color: '#fff',
+                fontFamily: FONT_DISPLAY,
+                fontVariantNumeric: 'tabular-nums',
+                letterSpacing: '-0.03em',
+                lineHeight: 1,
+              }}
+            >
+              {activity.last_round_adjusted_gross}
+            </span>
+          </div>
+        )}
+
+        {/* Course name, bottom */}
         <p
           style={{
             position: 'absolute',
@@ -243,7 +249,7 @@ export const FriendRoundCard: React.FC<Props> = ({ activity, onClick }) => {
             bottom: 10,
             margin: 0,
             color: '#fff',
-            fontSize: 14,
+            fontSize: 15,
             fontWeight: 800,
             fontFamily: FONT_SERIF,
             letterSpacing: '-0.01em',
@@ -257,28 +263,60 @@ export const FriendRoundCard: React.FC<Props> = ({ activity, onClick }) => {
         </p>
       </div>
 
-      {/* Stat strip */}
+      {/* Footer strip — status tag + diff */}
       <div
         style={{
-          display: 'grid',
-          gridTemplateColumns: '1fr 1fr 1fr',
-          padding: '12px 4px',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          gap: 10,
+          padding: '10px 14px 12px',
+          minHeight: 38,
         }}
       >
-        <Stat
-          label="GROSS"
-          value={activity.last_round_adjusted_gross ?? '—'}
-        />
-        <Stat
-          label="STABLEFORD"
-          value={activity.last_round_stableford ?? '—'}
-          divider
-        />
-        <Stat
-          label="DIFF"
-          value={fmtDiff(diff)}
-          color={diff !== null && diff !== undefined && diff < 0 ? T.green : T.ink}
-        />
+        {statusTag ? (
+          <span
+            style={{
+              fontSize: 9,
+              fontWeight: 900,
+              letterSpacing: '0.14em',
+              color: statusTag.tone === 'invite' ? T.amberDeep : T.inkMute,
+              padding: '4px 8px',
+              borderRadius: 6,
+              background:
+                statusTag.tone === 'invite' ? T.amberTint : 'rgba(15,23,42,0.05)',
+              border:
+                statusTag.tone === 'invite'
+                  ? `1px solid rgba(247,147,30,0.20)`
+                  : `1px solid ${T.hairline}`,
+            }}
+          >
+            {statusTag.label}
+          </span>
+        ) : (
+          <span />
+        )}
+
+        {diffStr !== null && (
+          <span
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 4,
+              fontSize: 12,
+              fontWeight: 800,
+              color: isFire ? T.green : T.ink,
+              fontVariantNumeric: 'tabular-nums',
+              letterSpacing: '-0.01em',
+            }}
+          >
+            {isFire && <Flame size={12} strokeWidth={2.5} color={T.green} />}
+            <span style={{ color: T.inkSoft, fontSize: 9, fontWeight: 900, letterSpacing: '0.14em', marginRight: 2 }}>
+              DIFF
+            </span>
+            {diffStr}
+          </span>
+        )}
       </div>
     </div>
   );
