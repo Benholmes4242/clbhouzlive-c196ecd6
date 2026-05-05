@@ -365,6 +365,18 @@ export default function DashboardPage() {
         </div>
       </section>
 
+      {/* ── Integrations Health ─────────────────────────────────────────────── */}
+      <section className="space-y-3">
+        <AdminSectionHeader title="Integrations Health" />
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <EgSyncHealthCard
+            data={egSyncHealth.data}
+            isLoading={egSyncHealth.isLoading}
+            isError={egSyncHealth.isError}
+          />
+        </div>
+      </section>
+
       {/* ── Section 2: Action Queues ─────────────────────────────────────────── */}
       <section className="space-y-3">
         <AdminSectionHeader title="Action Queue" description="Items requiring your attention" />
