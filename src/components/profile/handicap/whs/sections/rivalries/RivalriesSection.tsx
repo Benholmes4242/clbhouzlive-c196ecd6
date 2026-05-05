@@ -100,7 +100,6 @@ export const RivalriesSection: React.FC<Props> = ({ userId }) => {
                 key={`slot-${rivalry.slot_index}`}
                 rivalry={rivalry}
                 onInfo={() => setInfoTarget(rivalry)}
-                onTap={() => setInfoTarget(rivalry)}
               />
             ))}
             {nextAvailableSlot !== null && (

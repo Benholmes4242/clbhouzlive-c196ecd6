@@ -1,6 +1,8 @@
 import React from 'react';
 import { Trophy, Flame, ChevronRight, ArrowDown, ArrowUp } from 'lucide-react';
 import { initials, firstName } from '@/lib/whs/utils/initials';
+import { fmtRelative } from '@/lib/whs/utils/nameFormat';
+import { fmtDiff } from '@/lib/whs/format';
 import type { WhsFriendActivityWithImage } from '@/lib/whs/types';
 
 interface Props {
@@ -24,32 +26,14 @@ const T = {
 const FONT_SERIF = 'Georgia, "Iowan Old Style", "Apple Garamond", serif';
 const FONT_DISPLAY = 'SF Pro Display, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
 
-const fmtRel = (iso: string | null) => {
-  if (!iso) return '';
-  const d = new Date(iso);
-  const ms = Date.now() - d.getTime();
-  const days = Math.floor(ms / 86_400_000);
-  if (days <= 0) {
-    const hours = Math.floor(ms / 3_600_000);
-    if (hours < 1) return 'just now';
-    return `${hours}h ago`;
-  }
-  if (days === 1) return 'Yesterday';
-  if (days < 7) return `${days}d ago`;
-  if (days < 30) return `${Math.floor(days / 7)}w ago`;
-  return `${Math.floor(days / 30)}mo ago`;
-};
+const fmtRel = (iso: string | null) => fmtRelative(iso, { compact: false });
 
-const fmtDiff = (n: number | null | undefined) => {
-  if (n === null || n === undefined) return null;
-  if (n > 0) return `+${n.toFixed(1)}`;
-  if (n < 0) return `\u2212${Math.abs(n).toFixed(1)}`;
-  return '0.0';
-};
+const fmtDiffNullable = (n: number | null | undefined) =>
+  n === null || n === undefined ? null : fmtDiff(n, { plus: true });
 
 export const FriendRoundCard: React.FC<Props> = ({ activity, onClick }) => {
   const diff = activity.last_round_differential;
-  const diffStr = fmtDiff(diff);
+  const diffStr = fmtDiffNullable(diff);
 
   // HCP impact pill
   const impactDelta =

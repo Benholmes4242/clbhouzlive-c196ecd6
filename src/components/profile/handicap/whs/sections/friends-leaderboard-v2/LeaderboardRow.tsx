@@ -1,5 +1,6 @@
 import React from 'react';
 import { initials } from '@/lib/whs/utils/initials';
+import { reformatFriendName, fmtRelative } from '@/lib/whs/utils/nameFormat';
 import { fmtHcp } from '@/lib/whs/format';
 import type { FriendLeaderboardEntry } from '@/lib/whs/types';
 
@@ -21,34 +22,15 @@ const T = {
   amberTint: 'rgba(247,147,30,0.10)',
 };
 
-function fmtRel(iso: string | null): string {
-  if (!iso) return '';
-  const ms = Date.now() - new Date(iso).getTime();
-  const days = Math.floor(ms / 86_400_000);
-  if (days <= 0) return 'Today';
-  if (days === 1) return 'Yesterday';
-  if (days < 7) return `${days}d ago`;
-  if (days < 14) return '1w ago';
-  return `${Math.floor(days / 7)}w ago`;
-}
-
-function reformatName(name: string): string {
-  if (!name) return 'Unknown';
-  if (name.includes(',')) {
-    const [last, first] = name.split(',').map((s) => s.trim());
-    return `${first} ${last}`;
-  }
-  return name;
-}
+const fmtRel = (iso: string | null) => fmtRelative(iso, { compact: true });
 
 export const LeaderboardRow: React.FC<Props> = ({ entry, rank, isFirst, isLast }) => {
   const isYou = entry.is_self;
-  const displayName = isYou ? 'You' : reformatName(entry.friend_name);
+  const displayName = isYou ? 'You' : reformatFriendName(entry.friend_name);
 
   return (
-    <button
-      type="button"
-      onClick={() => {}}
+    <div
+      role="listitem"
       aria-label={`${displayName}, ranked ${rank}, handicap ${fmtHcp(entry.friend_handicap_index)}`}
       style={{
         display: 'flex',
@@ -59,10 +41,7 @@ export const LeaderboardRow: React.FC<Props> = ({ entry, rank, isFirst, isLast }
         padding: '10px 0',
         borderTop: isFirst ? `1px solid ${T.hairline}` : 'none',
         borderBottom: `1px solid ${isLast ? T.hairline : T.hairlineSoft}`,
-        borderLeft: 'none',
-        borderRight: 'none',
         background: isYou ? T.amberTint : 'transparent',
-        cursor: 'pointer',
       }}
     >
       {/* Rank */}
@@ -163,7 +142,7 @@ export const LeaderboardRow: React.FC<Props> = ({ entry, rank, isFirst, isLast }
       >
         {fmtHcp(entry.friend_handicap_index)}
       </div>
-    </button>
+    </div>
   );
 };
 

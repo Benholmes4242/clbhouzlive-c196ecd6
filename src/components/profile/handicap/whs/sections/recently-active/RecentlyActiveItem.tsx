@@ -1,4 +1,5 @@
 import React from 'react';
+import { initials, firstName } from '@/lib/whs/utils/initials';
 import { fmtHcp } from '@/lib/whs/format';
 import type { FriendLeaderboardEntry } from '@/lib/whs/types';
 
@@ -8,33 +9,12 @@ interface Props {
   onClick?: () => void;
 }
 
-function firstName(name: string): string {
-  if (!name) return '';
-  if (name.includes(',')) {
-    const parts = name.split(',');
-    return (parts[1] ?? '').trim().split(' ')[0] || parts[0].trim();
-  }
-  return name.trim().split(' ')[0];
-}
-
-function initials(name: string): string {
-  const display = name.includes(',')
-    ? name.split(',').reverse().join(' ').trim()
-    : name.trim();
-  return display
-    .split(' ')
-    .map((p) => p[0])
-    .filter(Boolean)
-    .slice(0, 2)
-    .join('')
-    .toUpperCase();
-}
-
 export const RecentlyActiveItem: React.FC<Props> = ({ entry, isActive, onClick }) => {
   const display = firstName(entry.friend_name);
+  const Tag: any = onClick ? 'button' : 'div';
 
   return (
-    <button
+    <Tag
       onClick={onClick}
       style={{
         flex: '0 0 auto',
@@ -127,7 +107,7 @@ export const RecentlyActiveItem: React.FC<Props> = ({ entry, isActive, onClick }
       >
         {fmtHcp(entry.friend_handicap_index)}
       </p>
-    </button>
+    </Tag>
   );
 };
 

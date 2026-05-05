@@ -1,5 +1,5 @@
 import React from 'react';
-import { Plus, UserPlus } from 'lucide-react';
+import { Plus } from 'lucide-react';
 
 interface Props {
   slotIndex: number;
@@ -12,18 +12,18 @@ const T = {
   bgTo: '#060c16',
   amber: '#F7931E',
   whiteMute: 'rgba(255,255,255,0.55)',
-  whiteSoft: 'rgba(255,255,255,0.35)',
   hairline: 'rgba(255,255,255,0.10)',
 };
 
-export const RivalryAddCard: React.FC<Props> = ({ slotIndex, label, onClick }) => {
+export const RivalryAddCard: React.FC<Props> = ({ slotIndex: _slotIndex, label, onClick }) => {
   return (
     <button
       onClick={onClick}
       style={{
         flex: '0 0 auto',
-        width: 264,
-      minHeight: 220,
+        width: 'calc(88vw - 16px)',
+        maxWidth: 320,
+        minHeight: 220,
         scrollSnapAlign: 'start',
         background: `linear-gradient(160deg, ${T.bgFrom}, ${T.bgTo})`,
         borderRadius: 18,
@@ -56,7 +56,7 @@ export const RivalryAddCard: React.FC<Props> = ({ slotIndex, label, onClick }) =
         style={{
           width: 56,
           height: 56,
-          borderRadius: '50%',
+          borderRadius: '34%',
           background: 'rgba(247,147,30,0.10)',
           border: `1px solid rgba(247,147,30,0.30)`,
           display: 'flex',
@@ -65,7 +65,7 @@ export const RivalryAddCard: React.FC<Props> = ({ slotIndex, label, onClick }) =
           color: T.amber,
         }}
       >
-        {slotIndex >= 4 ? <UserPlus size={22} strokeWidth={2} /> : <Plus size={22} strokeWidth={2} />}
+        <Plus size={22} strokeWidth={2} />
       </div>
       <div>
         <p style={{
