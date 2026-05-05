@@ -74,7 +74,7 @@ Deno.serve(async (req) => {
       .maybeSingle();
 
     if (cached && (cached as any).date_key === dateKey) {
-      return json(await shapeResponseFromCache(admin, cached));
+      return json(shapeResponseFromCache(cached));
     }
 
     // Last 30 rounds (course_id here is a whs_courses.id)
@@ -232,38 +232,21 @@ Deno.serve(async (req) => {
 
     if (!scoringProfile) return json({ error: "Empty profile" }, 500);
 
-    await admin.from("whs_ai_insights").upsert({
-      connection_id,
-      scoring_profile: scoringProfile,
-      rounds_pattern: roundsPattern,
-      suited_courses: suited,
-      test_courses: test,
-      generated_from_score_id: latestScoreId,
-      generated_at: new Date().toISOString(),
-      date_key: dateKey,
-    });
-
-    // Track recommendation history (7-day no-dup window)
+    // Hydrate recommended IDs to enriched courses BEFORE persistence so the
+    // JSONB row is self-contained — the hook can read it directly with no
+    // second query, and the same-day cache path needs no re-hydration.
     const allRecIds = [...suited.map((s) => s.id), ...test.map((t) => t.id)];
-    if (allRecIds.length) {
-      await admin.from("whs_ai_recommendation_history").upsert({
-        connection_id,
-        date_key: dateKey,
-        recommended_ids: allRecIds,
-        generated_at: new Date().toISOString(),
-      }, { onConflict: "connection_id,date_key" });
+
+    let hyMap = new Map<string, any>();
+    if (allRecIds.length > 0) {
+      const { data: hydrated } = await admin
+        .from("golf_courses")
+        .select("id, name, region, country")
+        .in("id", allRecIds);
+      hyMap = new Map((hydrated ?? []).map((c: any) => [c.id, c]));
     }
 
-    // Hydrate
-    const { data: hydrated } = allRecIds.length
-      ? await admin
-          .from("golf_courses")
-          .select("id, name, region, country")
-          .in("id", allRecIds)
-      : { data: [] as any[] };
-    const hyMap = new Map((hydrated ?? []).map((c: any) => [c.id, c]));
-
-    const shape = (arr: { id: string; rationale: string }[]) =>
+    const enrich = (arr: { id: string; rationale: string }[]) =>
       arr.map((r) => {
         const c: any = hyMap.get(r.id) || {};
         return {
@@ -274,11 +257,35 @@ Deno.serve(async (req) => {
         };
       });
 
+    const enrichedSuited = enrich(suited);
+    const enrichedTest = enrich(test);
+
+    await admin.from("whs_ai_insights").upsert({
+      connection_id,
+      scoring_profile: scoringProfile,
+      rounds_pattern: roundsPattern,
+      suited_courses: enrichedSuited,
+      test_courses: enrichedTest,
+      generated_from_score_id: latestScoreId,
+      generated_at: new Date().toISOString(),
+      date_key: dateKey,
+    });
+
+    // Track recommendation history (7-day no-dup window)
+    if (allRecIds.length) {
+      await admin.from("whs_ai_recommendation_history").upsert({
+        connection_id,
+        date_key: dateKey,
+        recommended_ids: allRecIds,
+        generated_at: new Date().toISOString(),
+      }, { onConflict: "connection_id,date_key" });
+    }
+
     return json({
       scoring_profile: scoringProfile,
       rounds_pattern: roundsPattern,
-      suited_courses: shape(suited),
-      test_courses: shape(test),
+      suited_courses: enrichedSuited,
+      test_courses: enrichedTest,
       generated_at: new Date().toISOString(),
     });
   } catch (e) {
@@ -322,35 +329,15 @@ Rules:
 - Return JSON only.`;
 }
 
-async function shapeResponseFromCache(admin: any, cached: any) {
-  const suited = (cached.suited_courses ?? []) as Array<{ id: string; rationale: string }>;
-  const test = (cached.test_courses ?? []) as Array<{ id: string; rationale: string }>;
-  const allRecIds = [...suited.map((s) => s.id), ...test.map((t) => t.id)];
-
-  const { data: hydrated } = allRecIds.length
-    ? await admin
-        .from("golf_courses")
-        .select("id, name, region, country")
-        .in("id", allRecIds)
-    : { data: [] as any[] };
-  const hyMap = new Map((hydrated ?? []).map((c: any) => [c.id, c]));
-
-  const shape = (arr: { id: string; rationale: string }[]) =>
-    arr.map((r) => {
-      const c: any = hyMap.get(r.id) || {};
-      return {
-        id: r.id,
-        name: c.name ?? "",
-        region: c.region ?? c.country ?? "",
-        rationale: r.rationale,
-      };
-    });
-
+function shapeResponseFromCache(cached: any) {
+  // Cached rows now contain enriched courses ({id, name, region, rationale})
+  // by virtue of the write-side hydration in the fresh-generation path.
+  // No re-hydration needed.
   return {
     scoring_profile: cached.scoring_profile,
     rounds_pattern: cached.rounds_pattern,
-    suited_courses: shape(suited),
-    test_courses: shape(test),
+    suited_courses: cached.suited_courses ?? [],
+    test_courses: cached.test_courses ?? [],
     generated_at: cached.generated_at,
     cached: true,
   };
