@@ -26,7 +26,7 @@ export const RecentlyPlayedFeed: React.FC<Props> = ({ ownerUserId }) => {
   return (
     <section style={{ padding: '20px 0 24px' }}>
       <SectionHeader
-        eyebrow="RECENTLY PLAYED"
+        eyebrow="ACTIVITY"
         title="Your friends' rounds"
         sub={
           isLoading
