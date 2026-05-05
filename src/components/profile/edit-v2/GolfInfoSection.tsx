@@ -11,7 +11,6 @@ import { InviteClubModal } from './InviteClubModal';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { VisibilityDropdown, VisibilityValue } from './VisibilityDropdown';
-import HandicapSyncInlineNotice from './HandicapSyncInlineNotice';
 import { HandicapInput } from './HandicapInput';
 import { useCollegeMediaSearch, useCollegeMediaByName, CollegeMediaResult } from '@/hooks/useCollegeMediaSearch';
 import { SectionHeader } from './SectionHeader';
@@ -30,7 +29,7 @@ interface GolfInfoSectionProps {
   userId?: string;
   homeClubVisibility: VisibilityValue;
   additionalClubsVisibility: VisibilityValue;
-  handicapSyncInterest?: boolean;
+  
   onChange: (field: string, value: string | null) => void;
   onVisibilityChange: (field: 'homeClubVisibility' | 'additionalClubsVisibility', value: VisibilityValue) => void;
   // Deferred club operations (optional — if not provided, falls back to immediate save)
@@ -60,7 +59,7 @@ export const GolfInfoSection: React.FC<GolfInfoSectionProps> = ({
   userId,
   homeClubVisibility,
   additionalClubsVisibility,
-  handicapSyncInterest = false,
+  
   onChange,
   onVisibilityChange,
   deferredAddedClubs,
@@ -771,13 +770,6 @@ export const GolfInfoSection: React.FC<GolfInfoSectionProps> = ({
             onChange={(v) => onChange('handicap', v)}
           />
           
-          {/* Handicap Sync Interest Notice */}
-          {userId && (
-            <HandicapSyncInlineNotice
-              userId={userId}
-              hasRegisteredInterest={handicapSyncInterest}
-            />
-          )}
         </div>
       </div>
 

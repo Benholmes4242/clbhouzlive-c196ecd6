@@ -10,9 +10,10 @@ import { toast } from 'sonner';
 import { PageRoot } from '@/components/layout/PageRoot';
 import CollegeSearchDropdown from '@/components/profile/CollegeSearchDropdown';
 import { CollegeMediaResult } from '@/hooks/useCollegeMediaSearch';
+import WhsConnectScreen from '@/components/profile/handicap/whs/WhsConnectScreen';
 
 type AccountType = 'individual' | 'club' | 'brand' | 'creator';
-type OnboardingStep = 'account-type' | 'college';
+type OnboardingStep = 'account-type' | 'college' | 'england-golf';
 
 interface AccountOption {
   type: AccountType;
@@ -61,13 +62,11 @@ const AccountTypeOnboarding: React.FC = () => {
 
   const handleAccountTypeContinue = () => {
     if (!selectedType) return;
-    
-    // For individual accounts, show college step
+
     if (selectedType === 'individual') {
       setStep('college');
     } else {
-      // For other account types, complete onboarding directly
-      handleFinalSubmit();
+      setStep('england-golf');
     }
   };
 
@@ -123,6 +122,8 @@ const AccountTypeOnboarding: React.FC = () => {
   const handleBack = () => {
     if (step === 'college') {
       setStep('account-type');
+    } else if (step === 'england-golf') {
+      setStep(selectedType === 'individual' ? 'college' : 'account-type');
     }
   };
 
@@ -181,15 +182,15 @@ const AccountTypeOnboarding: React.FC = () => {
             {/* Action buttons */}
             <div className="pt-6 space-y-3">
               <Button
-                onClick={handleFinalSubmit}
+                onClick={() => setStep('england-golf')}
                 disabled={submitting}
                 className="w-full"
                 variant="gradient-primary"
                 size="lg"
               >
-                {submitting ? 'Setting up...' : selectedCollege ? 'Continue' : 'Skip for now'}
+                {selectedCollege ? 'Continue' : 'Skip for now'}
               </Button>
-              
+
               {!selectedCollege && (
                 <p className="text-xs text-muted-foreground text-center">
                   You can add this later in Edit Profile.
@@ -197,6 +198,41 @@ const AccountTypeOnboarding: React.FC = () => {
               )}
             </div>
           </div>
+        </main>
+      </PageRoot>
+    );
+  }
+
+  // England Golf connection step (all account types)
+  if (step === 'england-golf') {
+    return (
+      <PageRoot className="min-h-screen bg-background flex flex-col">
+        <header className="border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+          <div className="px-4 md:container md:mx-auto">
+            <div className="flex items-center justify-center h-16">
+              <img
+                src="/lovable-uploads/b3fc8551-2b91-49af-b2ef-1dd493276207.png"
+                alt="clbhouz Logo"
+                className="h-10 w-auto object-contain"
+              />
+            </div>
+          </div>
+        </header>
+
+        <main className="flex-1 px-4 md:container md:mx-auto py-4 max-w-lg">
+          <button
+            onClick={handleBack}
+            disabled={submitting}
+            className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground transition-colors mb-2"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            Back
+          </button>
+
+          <WhsConnectScreen
+            onConnected={() => handleFinalSubmit()}
+            onSkip={() => handleFinalSubmit()}
+          />
         </main>
       </PageRoot>
     );
