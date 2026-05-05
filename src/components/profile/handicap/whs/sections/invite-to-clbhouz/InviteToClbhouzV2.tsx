@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import { ChevronRight } from 'lucide-react';
-import { useFriendsLeaderboard, useSentInvites } from '@/lib/whs/hooks';
+import { useFriendLeaderboard, useSentInvites } from '@/lib/whs/hooks';
 import SectionHeader from '../SectionHeader';
 import Paged8 from '../_shared/Paged8';
 import InviteRow from './InviteRow';
@@ -13,19 +13,19 @@ interface Props {
 const AMBER = '#F7931E';
 
 export const InviteToClbhouzV2: React.FC<Props> = ({ ownerUserId }) => {
-  const { data: friends, isLoading: friendsLoading } = useFriendsLeaderboard(ownerUserId);
+  const { data: friends, isLoading: friendsLoading } = useFriendLeaderboard(ownerUserId);
   const { data: invites } = useSentInvites();
   const [sheetOpen, setSheetOpen] = useState(false);
 
   const invitable = useMemo(() => {
     return (friends ?? [])
-      .filter((f) => !f.is_clbhouz_user)
+      .filter((f) => !f.is_clbhouz_user && f.friend_passport_id != null)
       .sort((a, b) => (a.friend_handicap_index ?? 99) - (b.friend_handicap_index ?? 99));
   }, [friends]);
 
   // Map to id-having items for Paged8
   const items = useMemo(
-    () => invitable.map((f) => ({ ...f, id: f.friend_row_id })),
+    () => invitable.map((f) => ({ ...f, id: String(f.friend_passport_id) })),
     [invitable],
   );
 

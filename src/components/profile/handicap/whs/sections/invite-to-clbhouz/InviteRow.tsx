@@ -6,10 +6,11 @@ import { callCreateInvite } from '@/lib/whs/api';
 import { shareInvite } from '@/lib/whs/share';
 import { firstName, initials } from '@/lib/whs/utils/initials';
 import { whsKeys } from '@/lib/whs/hooks';
-import type { WhsFriendMatch } from '@/lib/whs/types';
+import type { FriendLeaderboardEntry } from '@/lib/whs/types';
+import { fmtHcp } from '@/lib/whs/format';
 
 interface Props {
-  friend: WhsFriendMatch;
+  friend: FriendLeaderboardEntry;
 }
 
 const HAIRLINE = '1px solid rgba(15,23,42,0.08)';
@@ -21,6 +22,10 @@ export const InviteRow: React.FC<Props> = ({ friend }) => {
   const queryClient = useQueryClient();
 
   const handleInvite = async () => {
+    if (friend.friend_passport_id == null) {
+      toast.error('Cannot invite this friend (missing ID)');
+      return;
+    }
     const res = await callCreateInvite(friend.friend_passport_id, 'copy_link');
     if (!res.ok || !res.share_url) {
       toast.error(res.message ?? `Couldn't create invite`);
@@ -106,7 +111,7 @@ export const InviteRow: React.FC<Props> = ({ friend }) => {
             <>
               {' · '}
               <span style={{ fontVariantNumeric: 'tabular-nums' }}>
-                {friend.friend_handicap_index.toFixed(1)}
+                {fmtHcp(friend.friend_handicap_index)}
               </span>
             </>
           )}
