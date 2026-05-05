@@ -394,7 +394,7 @@ export const FriendRoundSheet: React.FC<Props> = ({ activity, open, onClose }) =
                             color: 'rgba(15,23,42,0.45)',
                           }}
                         >
-                          Originally sent {fmtRelative(pendingInvite.sent_at)}
+                          Originally sent {fmtRelative(pendingInvite.sent_at, { compact: false })}
                         </p>
                       </>
                     ) : (
