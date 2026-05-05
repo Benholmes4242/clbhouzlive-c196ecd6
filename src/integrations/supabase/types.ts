@@ -17150,6 +17150,7 @@ export type Database = {
           threshold: number
         }[]
       }
+      get_eg_sync_health: { Args: never; Returns: Json }
       get_exploration_leaderboard: {
         Args: {
           p_club_id?: string
