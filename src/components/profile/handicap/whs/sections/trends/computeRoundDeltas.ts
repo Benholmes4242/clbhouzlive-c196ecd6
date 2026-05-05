@@ -1,6 +1,6 @@
-import type { WhsRecentRound } from '@/lib/whs/types';
+import type { WhsScoreWithIndex } from '@/lib/whs/types';
 
-export interface RoundWithDelta extends WhsRecentRound {
+export interface RoundWithDelta extends WhsScoreWithIndex {
   /**
    * Handicap movement caused by this round, in strokes.
    * Negative = handicap dropped (improvement).
@@ -12,11 +12,13 @@ export interface RoundWithDelta extends WhsRecentRound {
 }
 
 /**
- * Walks a list of WhsRecentRound (newest-first) and assigns each round its delta.
- * Delta is `(thisRound.index − previousRound.index)` in time order.
- * Non-counter rounds get null.
+ * Walks a list of WhsScoreWithIndex (newest-first) and assigns each round its delta.
+ * Delta is computed as `(thisRound.index − previousRound.index)` where
+ * "previousRound" means the round immediately before this one in time.
+ *
+ * For non-counter rounds the delta is set to null.
  */
-export function computeRoundDeltas(rounds: WhsRecentRound[]): RoundWithDelta[] {
+export function computeRoundDeltas(rounds: WhsScoreWithIndex[]): RoundWithDelta[] {
   const ascending = [...rounds].sort(
     (a, b) => new Date(a.play_date).getTime() - new Date(b.play_date).getTime(),
   );
