@@ -3,6 +3,7 @@ import { Drawer as DrawerPrimitive } from 'vaul';
 import { X } from 'lucide-react';
 import type { FriendRivalryHydrated } from '@/lib/whs/types';
 import { firstName } from '@/lib/whs/utils/initials';
+import { fmtHcp } from '@/lib/whs/format';
 
 interface Props {
   rivalry: FriendRivalryHydrated | null;
@@ -19,22 +20,23 @@ const slotExplanation = (kind: string): { title: string; body: string } => {
   switch (kind) {
     case 'chasing':
       return {
-        title: 'You\'re chasing them',
+        title: 'Chasing them',
         body: 'This rival is just ahead of you — within striking distance on the leaderboard. Beat them in your next round and the gap closes.',
       };
     case 'chased_by':
       return {
-        title: 'They\'re chasing you',
+        title: 'Chased by them',
         body: 'This rival is just behind you on the leaderboard. Hold them off — every round counts.',
       };
     case 'pinned':
       return {
-        title: 'Pinned rival',
+        title: 'Pinned by you',
         body: 'You chose this person manually. They stay in your rivalries no matter what the leaderboard says.',
       };
+    case 'regular':
     default:
       return {
-        title: 'Auto-picked rival',
+        title: 'Your regular',
         body: 'Selected from your circle based on recent head-to-head activity.',
       };
   }
@@ -135,11 +137,35 @@ export const RivalryInfoSheet: React.FC<Props> = ({ rivalry, open, onClose }) =>
                   <li>Shared rounds: <strong style={{ fontVariantNumeric: 'tabular-nums' }}>{rivalry.shared_rounds_count}</strong></li>
                   <li>Last 90 days: <strong style={{ fontVariantNumeric: 'tabular-nums' }}>{rivalry.shared_rounds_last_90d}</strong></li>
                   {rivalry.rival_handicap !== null && (
-                    <li>Their HCP: <strong style={{ fontVariantNumeric: 'tabular-nums' }}>{rivalry.rival_handicap.toFixed(1)}</strong></li>
+                    <li>Their HCP: <strong style={{ fontVariantNumeric: 'tabular-nums' }}>{fmtHcp(rivalry.rival_handicap)}</strong></li>
                   )}
                 </ul>
               </div>
             )}
+
+            {/* How rival slots work — reference block */}
+            <div style={{
+              marginTop: 16,
+              padding: 14,
+              borderRadius: 12,
+              border: `1px solid ${HAIRLINE}`,
+            }}>
+              <p style={{ margin: 0, fontSize: 11, color: INK_MUTE, fontWeight: 700, letterSpacing: '0.04em' }}>
+                HOW RIVAL SLOTS WORK
+              </p>
+              <ul style={{
+                margin: '8px 0 0',
+                paddingLeft: 18,
+                fontSize: 12,
+                color: INK,
+                lineHeight: 1.6,
+              }}>
+                <li>Slots 1–2: your most-played-with friends in the last 90 days</li>
+                <li>Slot 3: the friend just ahead of you on the leaderboard</li>
+                <li>Slot 4: the friend just behind you on the leaderboard</li>
+                <li>You can pin up to 10 rivals — tap edit at the top of the section</li>
+              </ul>
+            </div>
           </div>
         </DrawerPrimitive.Content>
       </DrawerPrimitive.Portal>
