@@ -1,41 +1,31 @@
 /**
- * ComingUpCalendar — Bare-background scannable list of upcoming tournaments.
+ * ComingUpCalendar — Editorial "this week" calendar.
  *
- * Lives directly on the page background (no card wrapper). Events grouped by
- * week-of-Monday (THIS WEEK badge on the current period). Tier accents on the
- * left edge: amber for Majors, green-deep for Signature Events, transparent
- * for regulars. Date column repeats on every row for fast scan.
+ * Single headline event card + compact rows for the remaining events of the
+ * current week (Mon–Sun UTC). Events outside this week route to ScheduleTab
+ * via the "Full Schedule" CTA.
  */
 
 import { useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ChevronRight, Star } from 'lucide-react';
+import { ChevronRight, Star, MapPin, Calendar } from 'lucide-react';
 import { useUpcomingTournaments } from '../hooks/useUpcomingTournaments';
-import { Skeleton } from '@/components/ui/skeleton';
+import { useVenueImage } from '../hooks/useVenueImage';
 import { SectionErrorState } from './SectionErrorState';
-import { SectionHeader } from './shared/SectionHeader';
-import { formatPurse } from './shared/TourHeroHelpers';
-import { getContextLabel } from '../utils/tournamentClassification';
+import { Shimmer } from './shared/Shimmer';
+import { getContextLabel, TOUR_NAME_TO_SLUG } from '../utils/tournamentClassification';
+import { TOUR_MAP, type TourCode } from '../constants/tourMap';
 import type { SeasonTournament } from '../hooks/useSeasonTournaments';
 
 // ── Tokens ──────────────────────────────────────────────────────────────────
 const INK = '#0F172A';
 const SLATE_500 = '#64748B';
 const SLATE_400 = '#94A3B8';
-const SLATE_300 = '#CBD5E1';
 const SLATE_200 = '#E2E8F0';
 const SLATE_150 = '#EDF1F5';
 const AMBER = '#F7931E';
-const GREEN_DEEP = '#0A5A3C';
-const MAJOR_TINT = 'rgba(247,147,30,0.08)';
-
-// Compact tour labels — strip trailing " TOUR" suffix.
-// "PGA TOUR" → "PGA", "CHAMPIONS TOUR" → "CHAMPIONS",
-// "DP WORLD TOUR" → "DP WORLD", "LPGA TOUR" → "LPGA",
-// "KORN FERRY TOUR" → "KORN FERRY", "LIV GOLF" → "LIV GOLF" (unchanged).
-function compactTourLabel(tourName: string): string {
-  return tourName.toUpperCase().replace(/ TOUR$/, '');
-}
+const GOLD = '#FFB800';
+const NAVY_HIGH = '#15203A';
 
 // ── Date helpers ────────────────────────────────────────────────────────────
 function parseUTC(dateStr: string): Date {
@@ -51,22 +41,13 @@ function getDayNum(d: Date): string {
   return new Intl.DateTimeFormat('en-US', { day: 'numeric', timeZone: 'UTC' }).format(d);
 }
 
-/** Returns the Monday of the ISO week containing `date` (UTC-based). */
 function getMondayOfWeek(date: Date): Date {
   const d = new Date(date);
-  const day = d.getUTCDay(); // 0 = Sun … 6 = Sat
-  const diff = day === 0 ? -6 : 1 - day; // shift back to Monday
+  const day = d.getUTCDay();
+  const diff = day === 0 ? -6 : 1 - day;
   d.setUTCDate(d.getUTCDate() + diff);
   d.setUTCHours(0, 0, 0, 0);
   return d;
-}
-
-function weekKey(monday: Date): string {
-  return monday.toISOString().slice(0, 10);
-}
-
-function formatWeekLabel(monday: Date): string {
-  return `WEEK OF ${getMonthAbbr(monday)} ${getDayNum(monday)}`;
 }
 
 function formatWeekRange(monday: Date): string {
@@ -76,13 +57,22 @@ function formatWeekRange(monday: Date): string {
   const endMonth = getMonthAbbr(sunday);
   const startDay = getDayNum(monday);
   const endDay = getDayNum(sunday);
-  if (startMonth === endMonth) {
-    return `${startMonth} ${startDay} – ${endDay}`;
-  }
+  if (startMonth === endMonth) return `${startMonth} ${startDay} – ${endDay}`;
   return `${startMonth} ${startDay} – ${endMonth} ${endDay}`;
 }
 
-// ── Tier classification ─────────────────────────────────────────────────────
+function formatDateRange(startStr: string, endStr: string): string {
+  const start = parseUTC(startStr);
+  const end = parseUTC(endStr);
+  const sm = getMonthAbbr(start);
+  const em = getMonthAbbr(end);
+  const sd = getDayNum(start);
+  const ed = getDayNum(end);
+  if (sm === em) return `${sm} ${sd}–${ed}`;
+  return `${sm} ${sd} – ${em} ${ed}`;
+}
+
+// ── Tier ────────────────────────────────────────────────────────────────────
 type Tier = 'major' | 'signature' | 'regular';
 
 function classifyTier(t: SeasonTournament): Tier {
@@ -92,132 +82,279 @@ function classifyTier(t: SeasonTournament): Tier {
   return 'regular';
 }
 
-// Sort within a week: signature first, then majors, then regulars.
-// Defer to natural startDate ordering inside each tier bucket.
-const TIER_ORDER: Record<Tier, number> = { signature: 0, major: 1, regular: 2 };
+// ── Tour brand resolver ─────────────────────────────────────────────────────
+function getTourBrand(tourName: string | null | undefined): {
+  bg: string; fg: string; label: string; stripe: string;
+} {
+  const fallback = { bg: '#475569', fg: '#FFFFFF', label: 'TOUR', stripe: '#475569' };
+  if (!tourName) return fallback;
 
-// ── Row ─────────────────────────────────────────────────────────────────────
-interface RowProps {
-  tournament: SeasonTournament;
-  tier: Tier;
+  const slug = TOUR_NAME_TO_SLUG[tourName];
+  if (!slug) return fallback;
+
+  const key = (slug === 'pga' ? 'pga' : slug.toUpperCase()) as TourCode;
+  const meta = TOUR_MAP[key];
+  if (!meta) return fallback;
+
+  const compact: Record<string, string> = {
+    pga: 'PGA',
+    LPGA: 'LPGA',
+    EURO: 'DPWT',
+    LIV: 'LIV',
+    CHAMP: 'CHAMP',
+    PGAD: 'KFT',
+  };
+  return {
+    bg: meta.bg,
+    fg: meta.fg,
+    label: compact[key] ?? meta.short.toUpperCase(),
+    stripe: meta.bg,
+  };
 }
 
-function ComingUpEventRow({ tournament, tier }: RowProps) {
+// ── Headline selection ──────────────────────────────────────────────────────
+function pickHeadlineEvent(events: SeasonTournament[]): SeasonTournament | null {
+  if (events.length === 0) return null;
+
+  const byPurseDescThenDate = (a: SeasonTournament, b: SeasonTournament) => {
+    const purseDiff = (b.purse ?? 0) - (a.purse ?? 0);
+    if (purseDiff !== 0) return purseDiff;
+    return a.startDate.localeCompare(b.startDate);
+  };
+
+  const majors = events.filter(e => classifyTier(e) === 'major');
+  if (majors.length > 0) return [...majors].sort(byPurseDescThenDate)[0];
+
+  const sigs = events.filter(e => classifyTier(e) === 'signature');
+  if (sigs.length > 0) return [...sigs].sort(byPurseDescThenDate)[0];
+
+  return [...events].sort(byPurseDescThenDate)[0];
+}
+
+// ── Headline card ───────────────────────────────────────────────────────────
+function HeadlineCard({ tournament }: { tournament: SeasonTournament }) {
   const navigate = useNavigate();
-  const startDate = parseUTC(tournament.startDate);
-  const tourLabel = compactTourLabel(tournament.tourName);
-  const purseStr = tournament.purse ? formatPurse(tournament.purse) : null;
-  const venue = [tournament.venueName, tournament.venueCity].filter(Boolean).join(' · ');
+  const { data: venueImage } = useVenueImage(tournament.venueName, tournament.venueCity);
 
+  const tier = classifyTier(tournament);
   const isMajor = tier === 'major';
-  const isSignature = tier === 'signature';
-
-  const leftBorderColor =
-    isMajor ? AMBER : isSignature ? GREEN_DEEP : 'transparent';
-
-  // Major tier prefix uses amber; signature uses green-deep; regular = slate-500.
-  const metaColor = isMajor ? AMBER : isSignature ? GREEN_DEEP : SLATE_500;
-  // Purse is always slate-500 regardless of tier.
-  const purseColor = SLATE_500;
+  const isSig = tier === 'signature';
+  const accent = isMajor ? GOLD : isSig ? AMBER : SLATE_500;
+  const tour = getTourBrand(tournament.tourName);
 
   return (
-    <div
+    <button
       onClick={() => navigate(`/tourhub/tournament/${tournament.id}`)}
-      role="button"
-      tabIndex={0}
       style={{
-        display: 'flex',
-        alignItems: 'flex-start',
-        gap: 12,
-        padding: isMajor ? '13px 12px 13px 0' : '13px 12px 13px 11px',
-        background: isMajor ? MAJOR_TINT : 'transparent',
-        borderLeft: `3px solid ${leftBorderColor}`,
-        borderRadius: isMajor ? '0 6px 6px 0' : 0,
-        borderBottom: `1px solid ${SLATE_150}`,
-        cursor: 'pointer',
+        display: 'block', width: 'calc(100% - 32px)', margin: '0 16px 12px',
+        padding: 0, background: INK, borderRadius: 16, overflow: 'hidden',
+        border: isMajor ? `1px solid ${GOLD}55` : `1px solid ${SLATE_200}`,
+        boxShadow: isMajor
+          ? '0 0 28px rgba(255,184,0,0.15)'
+          : '0 1px 0 rgba(0,0,0,0.02)',
+        textAlign: 'left', cursor: 'pointer',
       }}
-      className="active:bg-black/[0.02] transition-colors"
     >
-      {/* Date column (36px) */}
-      <div style={{ width: 36, flexShrink: 0, paddingLeft: isMajor ? 11 : 0 }}>
-        <p style={{
-          fontSize: 10, fontWeight: 800, color: SLATE_500,
-          letterSpacing: '0.06em', textTransform: 'uppercase',
-          lineHeight: 1, margin: 0,
-        }}>
-          {getMonthAbbr(startDate)}
-        </p>
-        <p style={{
-          fontSize: 22, fontWeight: 900, color: INK,
-          letterSpacing: '-0.03em', lineHeight: 1.05,
-          margin: '2px 0 0',
-        }}>
-          {getDayNum(startDate)}
-        </p>
-      </div>
-
-      {/* Content */}
-      <div style={{ flex: 1, minWidth: 0 }}>
-        {/* Meta line — tier · tour · purse */}
+      <div style={{
+        position: 'relative', width: '100%', aspectRatio: '16 / 9',
+        background: venueImage?.imageUrl
+          ? `url(${venueImage.imageUrl}) center/cover`
+          : `linear-gradient(135deg, ${tour.stripe}, ${NAVY_HIGH})`,
+      }}>
         <div style={{
-          display: 'flex', alignItems: 'center', gap: 4,
-          margin: '0 0 3px',
-          fontSize: 10, fontWeight: 900,
-          letterSpacing: '0.1em', textTransform: 'uppercase',
-          lineHeight: 1,
+          position: 'absolute', inset: 0,
+          background: 'linear-gradient(180deg, rgba(0,0,0,0) 30%, rgba(0,0,0,0.85) 100%)',
+        }} />
+
+        <div style={{
+          position: 'absolute', top: 12, left: 12, right: 12,
+          display: 'flex', alignItems: 'center', gap: 6,
         }}>
           {isMajor && (
-            <Star
-              size={10}
-              fill={AMBER}
-              stroke={AMBER}
-              strokeWidth={1.5}
-              style={{ marginRight: 2, flexShrink: 0 }}
-            />
+            <span style={{
+              padding: '3px 7px', borderRadius: 4,
+              background: 'rgba(255,184,0,0.22)', color: GOLD,
+              fontSize: 9, fontWeight: 800, letterSpacing: '0.14em',
+              border: `1px solid rgba(255,184,0,0.45)`,
+              display: 'flex', alignItems: 'center', gap: 4,
+            }}>
+              <Star size={9} fill={GOLD} stroke={GOLD} />MAJOR
+            </span>
           )}
-          {isMajor && <span style={{ color: metaColor }}>MAJOR</span>}
-          {isSignature && <span style={{ color: metaColor }}>SIGNATURE</span>}
-          {(isMajor || isSignature) && <span style={{ color: SLATE_300 }}>·</span>}
-          <span style={{ color: metaColor }}>{tourLabel}</span>
-          {purseStr && (
-            <>
-              <span style={{ color: SLATE_300 }}>·</span>
-              <span style={{ color: purseColor, fontVariantNumeric: 'tabular-nums' }}>
-                {purseStr}
-              </span>
-            </>
+          {isSig && (
+            <span style={{
+              padding: '3px 7px', borderRadius: 4,
+              background: 'rgba(247,147,30,0.20)', color: AMBER,
+              fontSize: 9, fontWeight: 800, letterSpacing: '0.14em',
+              border: `1px solid rgba(247,147,30,0.40)`,
+            }}>SIGNATURE</span>
           )}
+          <span style={{
+            padding: '3px 7px', borderRadius: 4,
+            background: tour.bg, color: tour.fg,
+            fontSize: 9, fontWeight: 900, letterSpacing: '0.10em',
+          }}>{tour.label}</span>
         </div>
 
-        {/* Tournament name */}
-        <p style={{
-          fontSize: 15, fontWeight: 800, color: INK,
-          letterSpacing: '-0.25px', lineHeight: 1.2,
-          margin: '0 0 2px',
-          overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+        <div style={{
+          position: 'absolute', bottom: 12, right: 12,
+          padding: '4px 9px', borderRadius: 6,
+          background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(8px)',
+          color: '#fff', fontSize: 10, fontWeight: 700,
+          letterSpacing: '0.06em',
         }}>
-          {tournament.name}
-        </p>
-
-        {/* Venue */}
-        {venue && (
-          <p style={{
-            fontSize: 12, fontWeight: 500, color: SLATE_500,
-            margin: 0,
-            overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
-          }}>
-            {venue}
-          </p>
-        )}
+          {formatDateRange(tournament.startDate, tournament.endDate).toUpperCase()}
+        </div>
       </div>
 
-      {/* Chevron */}
-      <ChevronRight
-        style={{
-          width: 16, height: 16, color: SLATE_400, strokeWidth: 2.4,
-          marginTop: 4, flexShrink: 0,
-        }}
-      />
+      <div style={{ padding: '14px 16px 16px' }}>
+        <div style={{
+          fontSize: 19, fontWeight: 800, letterSpacing: '-0.025em',
+          color: '#fff', lineHeight: 1.15, marginBottom: 5,
+        }}>{tournament.name}</div>
+
+        {tournament.venueName && (
+          <div style={{
+            fontSize: 12, color: 'rgba(255,255,255,0.65)',
+            display: 'flex', alignItems: 'center', gap: 4,
+            marginBottom: tournament.defendingChampion ? 12 : 0,
+            minWidth: 0,
+          }}>
+            <MapPin size={11} strokeWidth={2.2} style={{ opacity: 0.85, flexShrink: 0 }} />
+            <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+              {tournament.venueName}{tournament.venueCity ? `, ${tournament.venueCity}` : ''}
+            </span>
+          </div>
+        )}
+
+        {tournament.defendingChampion && (
+          <div style={{
+            fontSize: 11, color: 'rgba(255,255,255,0.55)',
+            paddingTop: 11, borderTop: '1px solid rgba(255,255,255,0.10)',
+            display: 'flex', alignItems: 'center', gap: 6,
+          }}>
+            <span style={{
+              color: accent, fontWeight: 800,
+              letterSpacing: '0.12em', textTransform: 'uppercase',
+            }}>Defending</span>
+            <span style={{ color: '#fff', fontWeight: 600 }}>{tournament.defendingChampion}</span>
+          </div>
+        )}
+      </div>
+    </button>
+  );
+}
+
+// ── Compact row ─────────────────────────────────────────────────────────────
+function CompactRow({ tournament }: { tournament: SeasonTournament }) {
+  const navigate = useNavigate();
+  const tier = classifyTier(tournament);
+  const isSig = tier === 'signature';
+  const tour = getTourBrand(tournament.tourName);
+
+  const startDay = parseUTC(tournament.startDate).getUTCDay();
+  const showDate = startDay !== 4;
+
+  return (
+    <button
+      onClick={() => navigate(`/tourhub/tournament/${tournament.id}`)}
+      style={{
+        display: 'flex', alignItems: 'center', gap: 12,
+        width: 'calc(100% - 32px)', margin: '0 16px',
+        padding: '12px 12px 12px 11px',
+        background: 'transparent',
+        borderLeft: `3px solid ${tour.stripe}`,
+        borderBottom: `1px solid ${SLATE_150}`,
+        textAlign: 'left', cursor: 'pointer',
+      }}
+    >
+      {showDate && (
+        <div style={{ width: 30, flexShrink: 0 }}>
+          <div style={{
+            fontSize: 9, fontWeight: 800, color: SLATE_500,
+            letterSpacing: '0.06em', lineHeight: 1,
+          }}>{getMonthAbbr(parseUTC(tournament.startDate))}</div>
+          <div style={{
+            fontSize: 18, fontWeight: 900, color: INK,
+            letterSpacing: '-0.025em', lineHeight: 1.05, marginTop: 2,
+          }}>{getDayNum(parseUTC(tournament.startDate))}</div>
+        </div>
+      )}
+
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 4 }}>
+          <span style={{
+            padding: '2px 6px', borderRadius: 3,
+            background: tour.bg, color: tour.fg,
+            fontSize: 9, fontWeight: 900, letterSpacing: '0.08em', lineHeight: 1.2,
+          }}>{tour.label}</span>
+          {isSig && (
+            <span style={{
+              fontSize: 9, fontWeight: 800, color: AMBER,
+              letterSpacing: '0.12em', textTransform: 'uppercase',
+            }}>Signature</span>
+          )}
+        </div>
+        <div style={{
+          fontSize: 14, fontWeight: 700, color: INK,
+          letterSpacing: '-0.015em', lineHeight: 1.2, marginBottom: 2,
+          overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+        }}>{tournament.name}</div>
+        <div style={{
+          fontSize: 11, color: SLATE_500, fontWeight: 500,
+          overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+        }}>{tournament.venueName}{tournament.venueCity ? ` · ${tournament.venueCity}` : ''}</div>
+      </div>
+
+      <ChevronRight size={14} color={SLATE_400} strokeWidth={2.4} style={{ flexShrink: 0 }} />
+    </button>
+  );
+}
+
+// ── Skeleton ────────────────────────────────────────────────────────────────
+function CalendarSkeleton() {
+  return (
+    <div style={{ padding: '0 16px' }}>
+      <div style={{
+        display: 'flex', alignItems: 'baseline', justifyContent: 'space-between',
+        marginBottom: 18,
+      }}>
+        <Shimmer width="55%" height={24} radius={5} />
+        <Shimmer width="25%" height={14} radius={3} />
+      </div>
+
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14 }}>
+        <Shimmer width={70} height={11} radius={3} />
+        <Shimmer width={50} height={11} radius={3} />
+      </div>
+
+      <div style={{
+        margin: '0 0 12px',
+        background: INK,
+        borderRadius: 16, overflow: 'hidden',
+      }}>
+        <div style={{ aspectRatio: '16 / 9', background: 'rgba(255,255,255,0.04)' }} />
+        <div style={{ padding: '14px 16px 16px' }}>
+          <Shimmer width="75%" height={19} radius={4} style={{ marginBottom: 7 }} />
+          <Shimmer width="55%" height={12} radius={3} />
+        </div>
+      </div>
+
+      {Array.from({ length: 4 }).map((_, i) => (
+        <div key={i} style={{
+          display: 'flex', alignItems: 'center', gap: 12,
+          padding: '12px 12px 12px 11px',
+          borderLeft: `3px solid ${SLATE_200}`,
+          borderBottom: `1px solid ${SLATE_150}`,
+        }}>
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <Shimmer width={48} height={11} radius={3} style={{ marginBottom: 6 }} />
+            <Shimmer width="80%" height={14} radius={3} style={{ marginBottom: 4 }} />
+            <Shimmer width="60%" height={11} radius={3} />
+          </div>
+          <Shimmer width={14} height={14} radius={3} />
+        </div>
+      ))}
     </div>
   );
 }
@@ -225,53 +362,33 @@ function ComingUpEventRow({ tournament, tier }: RowProps) {
 // ── Component ───────────────────────────────────────────────────────────────
 export function ComingUpCalendar() {
   const navigate = useNavigate();
-  const { data: tournaments, isLoading, error, refetch } = useUpcomingTournaments(8);
+  const { data: tournaments, isLoading, error, refetch } = useUpcomingTournaments(20);
 
-  const weekGroups = useMemo(() => {
-    if (!tournaments?.length) return [];
-    const todayMonday = getMondayOfWeek(new Date());
-    const todayMondayKey = weekKey(todayMonday);
+  const { monday, sunday } = useMemo(() => {
+    const m = getMondayOfWeek(new Date());
+    const s = new Date(m);
+    s.setUTCDate(s.getUTCDate() + 6);
+    s.setUTCHours(23, 59, 59, 999);
+    return { monday: m, sunday: s };
+  }, []);
 
-    const buckets = new Map<string, { monday: Date; events: SeasonTournament[] }>();
-    for (const t of tournaments) {
-      const monday = getMondayOfWeek(parseUTC(t.startDate));
-      const key = weekKey(monday);
-      if (!buckets.has(key)) buckets.set(key, { monday, events: [] });
-      buckets.get(key)!.events.push(t);
-    }
+  const thisWeekEvents = useMemo(() => {
+    if (!tournaments) return [];
+    return tournaments.filter(t => {
+      const start = parseUTC(t.startDate);
+      return start >= monday && start <= sunday;
+    });
+  }, [tournaments, monday, sunday]);
 
-    // Convert to ordered array, sort events within each week by tier then date.
-    return Array.from(buckets.entries())
-      .sort(([a], [b]) => a.localeCompare(b))
-      .map(([key, bucket]) => {
-        const sorted = [...bucket.events].sort((a, b) => {
-          const ta = TIER_ORDER[classifyTier(a)];
-          const tb = TIER_ORDER[classifyTier(b)];
-          if (ta !== tb) return ta - tb;
-          return a.startDate.localeCompare(b.startDate);
-        });
-        return {
-          key,
-          monday: bucket.monday,
-          events: sorted,
-          isThisWeek: key === todayMondayKey,
-        };
-      });
-  }, [tournaments]);
+  const headline = useMemo(() => pickHeadlineEvent(thisWeekEvents), [thisWeekEvents]);
+  const remaining = useMemo(() => {
+    if (!headline) return [];
+    return thisWeekEvents
+      .filter(e => e.id !== headline.id)
+      .sort((a, b) => a.startDate.localeCompare(b.startDate));
+  }, [thisWeekEvents, headline]);
 
-  if (isLoading) {
-    return (
-      <div style={{ padding: '0 16px' }}>
-        <Skeleton className="h-5 w-40 mb-3" />
-        {[1, 2, 3, 4].map((i) => (
-          <div key={i} style={{ marginBottom: 12 }}>
-            <Skeleton className="h-4 w-3/4 mb-1" />
-            <Skeleton className="h-3 w-1/2" />
-          </div>
-        ))}
-      </div>
-    );
-  }
+  if (isLoading) return <CalendarSkeleton />;
 
   if (error) {
     return (
@@ -281,79 +398,68 @@ export function ComingUpCalendar() {
     );
   }
 
-  if (!tournaments?.length) return null;
-
   return (
-    <div style={{ padding: '0 16px' }}>
-      {/* Section header — shared SectionHeader component */}
-      <SectionHeader
-        eyebrow="Coming Up"
-        title="Tournament Calendar"
-        action={
-          <button
-            onClick={() => navigate('/tourhub?tab=schedule')}
-            className="flex items-center gap-0.5 transition-all active:scale-95 text-muted-foreground"
-            style={{ fontSize: 12, fontWeight: 600, minHeight: 44 }}
-            aria-label="View full tournament schedule"
-          >
-            View All
-            <ChevronRight style={{ width: 13, height: 13 }} />
-          </button>
-        }
-      />
+    <div>
+      {/* Section header */}
+      <div style={{
+        display: 'flex', alignItems: 'baseline', justifyContent: 'space-between',
+        padding: '0 16px', marginBottom: 18,
+      }}>
+        <h2 style={{
+          fontSize: 24, fontWeight: 800, letterSpacing: '-0.025em',
+          color: INK, margin: 0,
+        }}>Tournament Calendar</h2>
+        <button
+          onClick={() => navigate('/tourhub?tab=schedule')}
+          style={{
+            fontSize: 12, fontWeight: 700, color: AMBER,
+            background: 'transparent', border: 'none', padding: 0,
+            display: 'flex', alignItems: 'center', gap: 2, cursor: 'pointer',
+          }}
+        >
+          Full Schedule <ChevronRight size={13} />
+        </button>
+      </div>
 
-      {/* Week groups — directly on page background (no card wrapper) */}
-      {weekGroups.map((group) => (
-        <div key={group.key}>
-          {/* Week-of header */}
-          <div style={{
-            display: 'flex', alignItems: 'center', gap: 8,
-            padding: '8px 0 12px',
-          }}>
-            {group.isThisWeek && (
-              <span style={{
-                display: 'inline-flex', alignItems: 'center',
-                padding: '3px 6px',
-                background: AMBER,
-                borderRadius: 3,
-                fontSize: 9, fontWeight: 900, color: '#FFFFFF',
-                letterSpacing: '0.08em', textTransform: 'uppercase',
-                flexShrink: 0,
-              }}>
-                This Week
-              </span>
-            )}
-            <span style={{
-              fontSize: 12, fontWeight: 900, color: INK,
-              letterSpacing: '0.06em', textTransform: 'uppercase',
-              flexShrink: 0,
-            }}>
-              {formatWeekLabel(group.monday)}
-            </span>
-            <span style={{
-              fontSize: 11, fontWeight: 600, color: SLATE_500,
-              flexShrink: 0,
-            }}>
-              · {formatWeekRange(group.monday)}
-            </span>
-            <div style={{
-              flex: 1,
-              height: 1,
-              background: `linear-gradient(90deg, ${SLATE_200}, transparent)`,
-              marginLeft: 4,
-            }} />
+      {/* Week separator */}
+      <div style={{
+        display: 'flex', alignItems: 'center', gap: 8,
+        padding: '0 16px', marginBottom: 14,
+      }}>
+        <span style={{
+          fontSize: 11, fontWeight: 800, color: AMBER,
+          letterSpacing: '0.14em', textTransform: 'uppercase',
+        }}>This week</span>
+        <span style={{ fontSize: 11, fontWeight: 600, color: SLATE_400 }}>
+          · {formatWeekRange(monday)}
+        </span>
+        <span style={{
+          fontSize: 11, fontWeight: 600, color: SLATE_400, marginLeft: 'auto',
+        }}>
+          {thisWeekEvents.length} {thisWeekEvents.length === 1 ? 'event' : 'events'}
+        </span>
+      </div>
+
+      {/* Empty state */}
+      {thisWeekEvents.length === 0 && (
+        <div style={{
+          margin: '0 16px', padding: '24px 16px',
+          background: '#fff', borderRadius: 14, border: `1px solid ${SLATE_200}`,
+          textAlign: 'center',
+        }}>
+          <Calendar size={20} color={SLATE_400} style={{ marginBottom: 8 }} />
+          <div style={{ fontSize: 13, fontWeight: 700, color: INK, marginBottom: 4 }}>
+            Off week
           </div>
-
-          {/* Event rows */}
-          {group.events.map((t) => (
-            <ComingUpEventRow
-              key={t.id}
-              tournament={t}
-              tier={classifyTier(t)}
-            />
-          ))}
+          <div style={{ fontSize: 12, color: SLATE_500 }}>
+            No tournaments scheduled this week.
+          </div>
         </div>
-      ))}
+      )}
+
+      {/* Headline + compact rows */}
+      {headline && <HeadlineCard tournament={headline} />}
+      {remaining.map(t => <CompactRow key={t.id} tournament={t} />)}
     </div>
   );
 }
