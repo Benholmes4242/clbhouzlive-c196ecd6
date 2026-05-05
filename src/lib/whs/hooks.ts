@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import {
   fetchWhsConnection,
@@ -15,6 +15,12 @@ import {
   fetchRoundDetail,
   fetchFriendRoundDetail,
   fetchFriendWindowRankings,
+  fetchFriendFeaturedRound,
+  fetchFriendRivalries,
+  fetchFriendLeaderboard,
+  fetchUserRivalOverrides,
+  upsertUserRivalOverride,
+  deleteUserRivalOverride,
 } from './api';
 
 export const whsKeys = {
