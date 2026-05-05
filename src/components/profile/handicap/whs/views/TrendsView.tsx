@@ -28,7 +28,7 @@ export const TrendsView: React.FC<Props> = ({
     >
       <TrendCardsStack connectionId={connectionId} currentHandicap={currentHandicap} />
       <TryNextCourses userId={userId} />
-      <RecentRoundsCard connectionId={connectionId} />)
+      <RecentRoundsCard connectionId={connectionId} />
     </div>
   );
 };
