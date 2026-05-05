@@ -196,7 +196,7 @@ function HealthIndicator({ label, status, value }: { label: string; status: 'goo
 // ─── Main page ────────────────────────────────────────────────────────────────
 
 export default function DashboardPage() {
-  const { kpis, queue, trend, audit, glance, isAnyLoading, refetchAll } = useAdminV2Dashboard();
+  const { kpis, queue, trend, audit, glance, egSyncHealth, isAnyLoading, refetchAll } = useAdminV2Dashboard();
   const navigate = useNavigate();
   const [seriesVisible, setSeriesVisible] = useState({
     users: true, posts: true, reviews: true,
