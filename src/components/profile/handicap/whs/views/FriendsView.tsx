@@ -1,5 +1,6 @@
 import React from 'react';
 import FeaturedFriendRoundHero from '../sections/featured-friend-round/FeaturedFriendRoundHero';
+import RecentlyActiveRail from '../sections/recently-active/RecentlyActiveRail';
 import FriendsLeaderboardV2 from '../sections/friends-leaderboard/FriendsLeaderboardV2';
 import RecentlyPlayedFeed from '../sections/recently-played/RecentlyPlayedFeed';
 import InviteToClbhouzV2 from '../sections/invite-to-clbhouz/InviteToClbhouzV2';
