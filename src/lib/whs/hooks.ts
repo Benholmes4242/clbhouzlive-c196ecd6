@@ -13,7 +13,7 @@ import {
   fetchFriendCourseBests,
   fetchSentInvites,
   fetchCourseForm,
-  fetchLastRoundDetail,
+  fetchRoundDetail,
   fetchFriendRoundDetail,
   fetchFriendWindowRankings,
 } from './api';
@@ -36,18 +36,18 @@ export const whsKeys = {
   sentInvites: () => ['whs-sent-invites'] as const,
   courseForm: (connectionId: string, currentHandicap: number) =>
     ['whs-course-form', connectionId, currentHandicap] as const,
-  lastRoundDetail: (connectionId: string) =>
-    ['whs-last-round-detail', connectionId] as const,
+  roundDetail: (scoreId: string) =>
+    ['whs-round-detail', scoreId] as const,
 };
 
-export function useLastRoundDetail(
-  connectionId: string | undefined,
+export function useRoundDetail(
+  scoreId: string | null | undefined,
   enabled: boolean = true,
 ) {
   return useQuery({
-    queryKey: whsKeys.lastRoundDetail(connectionId ?? ''),
-    queryFn: () => fetchLastRoundDetail(connectionId as string),
-    enabled: !!connectionId && enabled,
+    queryKey: whsKeys.roundDetail(scoreId ?? ''),
+    queryFn: () => fetchRoundDetail(scoreId as string),
+    enabled: !!scoreId && enabled,
     staleTime: 60_000,
   });
 }

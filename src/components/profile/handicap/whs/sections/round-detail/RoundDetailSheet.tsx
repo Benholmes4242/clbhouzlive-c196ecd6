@@ -1,16 +1,23 @@
 import React from 'react';
 import { Drawer as DrawerPrimitive } from 'vaul';
-import { X, ExternalLink, Sparkles, CheckCircle2 } from 'lucide-react';
+import { X, ExternalLink, Sparkles, CheckCircle2, ArrowDown, ArrowUp } from 'lucide-react';
 import { format } from 'date-fns';
-import { useLastRoundDetail } from '@/lib/whs/hooks';
+import { useRoundDetail } from '@/lib/whs/hooks';
 import RoundStatStrip from './RoundStatStrip';
 import RoundScorecard from './RoundScorecard';
 import RoundBreakdown from './RoundBreakdown';
 
 interface Props {
-  connectionId: string;
+  /** ID of the round to display. When null, the sheet renders nothing (closed state). */
+  scoreId: string | null;
   open: boolean;
   onClose: () => void;
+  /**
+   * Optional handicap movement caused by this round.
+   * Negative = improvement, positive = went up, null = unknown / not a counter.
+   * When non-null and non-zero, a small movement banner renders below the chips.
+   */
+  handicapDelta?: number | null;
 }
 
 const PAGE_BG = '#F8FAFC';
@@ -96,9 +103,11 @@ const SheetEmpty: React.FC<{ onClose: () => void }> = ({ onClose }) => (
   </div>
 );
 
-export const LastRoundSheet: React.FC<Props> = ({ connectionId, open, onClose }) => {
-  // Lazy fetch — only when sheet is opened, but cache persists after close
-  const { data, isLoading } = useLastRoundDetail(connectionId, open);
+export const RoundDetailSheet: React.FC<Props> = ({ scoreId, open, onClose, handicapDelta }) => {
+  const { data, isLoading } = useRoundDetail(scoreId, open);
+
+  const showBanner =
+    handicapDelta !== null && handicapDelta !== undefined && handicapDelta !== 0;
 
   return (
     <DrawerPrimitive.Root
@@ -114,7 +123,7 @@ export const LastRoundSheet: React.FC<Props> = ({ connectionId, open, onClose })
           style={{ background: 'rgba(15,23,42,0.40)' }}
         />
         <DrawerPrimitive.Content
-          aria-labelledby="last-round-sheet-title"
+          aria-labelledby="round-detail-sheet-title"
           className="fixed inset-x-0 bottom-0 z-[10002] flex flex-col rounded-t-[20px] outline-none"
           style={{
             background: PAGE_BG,
@@ -124,7 +133,7 @@ export const LastRoundSheet: React.FC<Props> = ({ connectionId, open, onClose })
           }}
         >
           <DrawerPrimitive.Title className="sr-only">
-            {data?.course?.name ?? 'Last round detail'}
+            {data?.course?.name ?? 'Round detail'}
           </DrawerPrimitive.Title>
 
           {isLoading ? (
@@ -164,7 +173,6 @@ export const LastRoundSheet: React.FC<Props> = ({ connectionId, open, onClose })
                   }}
                 />
 
-                {/* Drag handle */}
                 <div
                   aria-hidden
                   style={{
@@ -179,7 +187,6 @@ export const LastRoundSheet: React.FC<Props> = ({ connectionId, open, onClose })
                   }}
                 />
 
-                {/* Close */}
                 <button
                   onClick={onClose}
                   aria-label="Close"
@@ -201,7 +208,6 @@ export const LastRoundSheet: React.FC<Props> = ({ connectionId, open, onClose })
                   <X size={16} color={INK} strokeWidth={2.5} />
                 </button>
 
-                {/* Title block */}
                 <div
                   style={{
                     position: 'absolute',
@@ -226,7 +232,7 @@ export const LastRoundSheet: React.FC<Props> = ({ connectionId, open, onClose })
                     {data.is_nine_hole && ' · 9 HOLES'}
                   </p>
                   <h2
-                    id="last-round-sheet-title"
+                    id="round-detail-sheet-title"
                     style={{
                       margin: 0,
                       fontSize: 22,
@@ -284,6 +290,65 @@ export const LastRoundSheet: React.FC<Props> = ({ connectionId, open, onClose })
                     <Chip icon={null} label={`PCC ${data.pcc > 0 ? '+' : ''}${data.pcc}`} />
                   )}
                 </div>
+
+                {showBanner && (
+                  <div
+                    style={{
+                      margin: '4px 20px 16px',
+                      padding: '10px 14px',
+                      background: handicapDelta! < 0 ? 'rgba(5,150,105,0.10)' : 'rgba(220,38,38,0.10)',
+                      border: `1px solid ${handicapDelta! < 0 ? 'rgba(5,150,105,0.20)' : 'rgba(220,38,38,0.20)'}`,
+                      borderRadius: 10,
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 10,
+                    }}
+                  >
+                    <div
+                      style={{
+                        width: 28,
+                        height: 28,
+                        borderRadius: 999,
+                        background: handicapDelta! < 0 ? 'rgba(5,150,105,0.18)' : 'rgba(220,38,38,0.18)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        flexShrink: 0,
+                      }}
+                    >
+                      {handicapDelta! < 0 ? (
+                        <ArrowDown size={14} color="#065F46" strokeWidth={2.6} />
+                      ) : (
+                        <ArrowUp size={14} color="#7F1D1D" strokeWidth={2.6} />
+                      )}
+                    </div>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <p
+                        style={{
+                          margin: 0,
+                          fontSize: 13,
+                          fontWeight: 700,
+                          color: handicapDelta! < 0 ? '#065F46' : '#7F1D1D',
+                          fontFamily: FONT_DISPLAY,
+                        }}
+                      >
+                        {handicapDelta! < 0
+                          ? `Dropped your handicap ${Math.abs(handicapDelta!).toFixed(1)}`
+                          : `Raised your handicap ${handicapDelta!.toFixed(1)}`}
+                      </p>
+                      <p
+                        style={{
+                          margin: '2px 0 0',
+                          fontSize: 11,
+                          color: handicapDelta! < 0 ? 'rgba(6,95,70,0.80)' : 'rgba(127,29,29,0.80)',
+                          fontFamily: FONT_DISPLAY,
+                        }}
+                      >
+                        This round counted toward your handicap calculation
+                      </p>
+                    </div>
+                  </div>
+                )}
 
                 {data.holes && data.holes.length > 0 && (
                   <RoundScorecard holes={data.holes} isNineHole={data.is_nine_hole} />
@@ -405,4 +470,4 @@ export const LastRoundSheet: React.FC<Props> = ({ connectionId, open, onClose })
   );
 };
 
-export default LastRoundSheet;
+export default RoundDetailSheet;

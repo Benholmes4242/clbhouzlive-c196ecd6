@@ -11,7 +11,8 @@ import type {
   CreateInviteResponse,
   HandicapPoint,
   CourseForm,
-  WhsLastRoundDetail,
+  WhsRoundDetail,
+  WhsRecentRound,
   WhsLastRound,
   WhsScoreHole,
   WhsFriendCourseBest,
@@ -133,19 +134,19 @@ export async function fetchCounters(connectionId: string): Promise<WhsCounterSco
   return (data as unknown as WhsCounterScore[]) ?? [];
 }
 
-export async function fetchRecentRounds(connectionId: string): Promise<WhsScore[]> {
+export async function fetchRecentRounds(connectionId: string): Promise<WhsRecentRound[]> {
   const { data, error } = await supabase
     .from('whs_scores' as any)
     .select(`
       id, play_date, adjusted_gross, stableford_points,
-      handicap_differential, is_counter,
-      course:whs_courses(name)
+      handicap_differential, is_counter, handicap_index_at_time,
+      course:whs_courses(name, country_name)
     `)
     .eq('connection_id', connectionId)
     .order('play_date', { ascending: false })
     .limit(20);
   if (error) throw error;
-  return (data as unknown as WhsScore[]) ?? [];
+  return (data as unknown as WhsRecentRound[]) ?? [];
 }
 
 /** All scores (used for achievements + course form). */
@@ -399,10 +400,10 @@ export async function fetchCourseForm(
   return result.sort((a, b) => a.delta - b.delta);
 }
 
-// ─── Last round detail (Phase 1.5 sheet) ──────────────────────────────
-export async function fetchLastRoundDetail(
-  connectionId: string,
-): Promise<WhsLastRoundDetail | null> {
+// ─── Round detail (any score by id) ───────────────────────────────────
+export async function fetchRoundDetail(
+  scoreId: string,
+): Promise<WhsRoundDetail | null> {
   const { data: round, error: roundErr } = await supabase
     .from('whs_scores' as any)
     .select(`
@@ -426,9 +427,7 @@ export async function fetchLastRoundDetail(
       permalink_url,
       course:whs_courses(name, country_name)
     `)
-    .eq('connection_id', connectionId)
-    .order('play_date', { ascending: false })
-    .limit(1)
+    .eq('id', scoreId)
     .maybeSingle();
 
   if (roundErr) throw roundErr;

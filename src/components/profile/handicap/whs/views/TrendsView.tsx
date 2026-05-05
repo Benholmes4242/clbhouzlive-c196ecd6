@@ -1,6 +1,6 @@
 import React from 'react';
 import TryNextCourses from '../sections/TryNextCourses';
-import RecentRoundsList from '../sections/RecentRoundsList';
+import RecentRoundsCard from '../sections/trends/RecentRoundsCard';
 import TrendCardsStack from '../sections/trends/TrendCardsStack';
 
 interface Props {
@@ -28,7 +28,7 @@ export const TrendsView: React.FC<Props> = ({
     >
       <TrendCardsStack connectionId={connectionId} currentHandicap={currentHandicap} />
       <TryNextCourses userId={userId} />
-      <RecentRoundsList connectionId={connectionId} />
+      <RecentRoundsCard connectionId={connectionId} />
     </div>
   );
 };
