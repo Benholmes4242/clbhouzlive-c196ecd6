@@ -24,6 +24,7 @@ const HEADER_LABEL: React.CSSProperties = {
 export const FriendsLeaderboardSection: React.FC<Props> = ({ userId }) => {
   const { data, isLoading } = useFriendLeaderboard(userId);
   const [showAll, setShowAll] = useState(false);
+  const [profileSheet, setProfileSheet] = useState<{ index: number } | null>(null);
 
   const sorted = (data ?? [])
     .slice()
