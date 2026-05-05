@@ -12,6 +12,7 @@ import { useFriendRoundDetail, useSentInvites, whsKeys } from '@/lib/whs/hooks';
 import { callCreateInvite } from '@/lib/whs/api';
 import { shareInvite, firstName } from '@/lib/whs/share';
 import type { WhsFriendActivityWithImage } from '@/lib/whs/types';
+import { fmtRelative } from '@/lib/whs/utils/nameFormat';
 
 interface Props {
   activity: WhsFriendActivityWithImage | null;
@@ -36,17 +37,6 @@ const relativeDay = (iso: string): string => {
   if (days === 1) return 'YESTERDAY';
   if (days < 7) return `${days} DAYS AGO`;
   return format(d, 'd MMM yyyy').toUpperCase();
-};
-
-const fmtRelative = (iso: string | null) => {
-  if (!iso) return '';
-  const ms = Date.now() - new Date(iso).getTime();
-  const days = Math.floor(ms / 86_400_000);
-  if (days <= 0) return 'today';
-  if (days === 1) return 'yesterday';
-  if (days < 7) return `${days} days ago`;
-  if (days < 30) return `${Math.floor(days / 7)} weeks ago`;
-  return `${Math.floor(days / 30)} months ago`;
 };
 
 const SheetSkeleton: React.FC = () => (
@@ -404,7 +394,7 @@ export const FriendRoundSheet: React.FC<Props> = ({ activity, open, onClose }) =
                             color: 'rgba(15,23,42,0.45)',
                           }}
                         >
-                          Originally sent {fmtRelative(pendingInvite.sent_at)}
+                          Originally sent {fmtRelative(pendingInvite.sent_at, { compact: false })}
                         </p>
                       </>
                     ) : (

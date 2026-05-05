@@ -79,24 +79,6 @@ export interface SyncWhsResponse {
 
 // ─── Phase 6b additions ────────────────────────────────────────────────
 
-export interface WhsFriendMatch {
-  friend_row_id: string;
-  owner_connection_id: string;
-  owner_user_id: string;
-  friend_passport_id: number;
-  friend_name: string;
-  friend_home_club: string | null;
-  friend_handicap_index: number | null;
-  friend_thumbnail_url: string | null;
-  friend_privacy_mode: string | null;
-  last_round_played_at: string | null;
-  last_round_course_name: string | null;
-  last_round_adjusted_gross: number | null;
-  friend_user_id: string | null;
-  friend_connection_id: string | null;
-  is_clbhouz_user: boolean;
-}
-
 export interface WhsInviteStatus {
   id: string;
   inviter_user_id: string;
@@ -342,9 +324,14 @@ export interface FriendLeaderboardEntry {
   is_self: boolean;
   friend_user_id: string | null;
   friend_connection_id: string | null;
+  /** Passport ID for invite system. NULL for self row. */
+  friend_passport_id: number | null;
   friend_name: string;
   friend_thumbnail_url: string | null;
-  friend_handicap_index: number;
+  /** Now nullable — friends without a posted handicap get NULL. */
+  friend_handicap_index: number | null;
+  /** England Golf home club name. NULL for self row. */
+  friend_home_club: string | null;
   last_round_played_at: string | null;
   last_round_course_name: string | null;
   is_clbhouz_user: boolean;

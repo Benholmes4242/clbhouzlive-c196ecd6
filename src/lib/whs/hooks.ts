@@ -7,7 +7,7 @@ import {
   fetchCounters,
   fetchAllScores,
   fetchHandicapHistory,
-  fetchFriendsLeaderboard,
+  
   fetchFriendsActivity,
   fetchFriendCourseBests,
   fetchSentInvites,
@@ -31,7 +31,7 @@ export const whsKeys = {
   allScores: (connectionId: string) => ['whs-all-scores', connectionId] as const,
   history: (connectionId: string, daysBack: number | 'all') =>
     ['whs-handicap-history', connectionId, daysBack] as const,
-  friendsLeaderboard: (userId: string) => ['whs-friends-leaderboard', userId] as const,
+  
   friendWindowRankings: (ownerUserId: string) =>
     ['whs-friend-window-rankings', ownerUserId] as const,
   friendsActivity: (userId: string) => ['whs-friends-activity', userId] as const,
@@ -128,15 +128,6 @@ export function useHandicapHistory(
     queryFn: () => fetchHandicapHistory(connectionId as string, daysBack),
     enabled: !!connectionId,
     staleTime: 60_000,
-  });
-}
-
-export function useFriendsLeaderboard(ownerUserId: string | undefined) {
-  return useQuery({
-    queryKey: whsKeys.friendsLeaderboard(ownerUserId ?? ''),
-    queryFn: () => fetchFriendsLeaderboard(ownerUserId as string),
-    enabled: !!ownerUserId,
-    staleTime: 30_000,
   });
 }
 

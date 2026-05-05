@@ -17275,7 +17275,9 @@ export type Database = {
         Returns: {
           friend_connection_id: string
           friend_handicap_index: number
+          friend_home_club: string
           friend_name: string
+          friend_passport_id: number
           friend_thumbnail_url: string
           friend_user_id: string
           is_clbhouz_user: boolean
