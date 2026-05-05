@@ -287,15 +287,13 @@ export async function fetchFriendsActivity(
     if (f.last_round_course_name) courseNames.add(f.last_round_course_name);
   });
   const thumbsByName: Record<string, string | null> = {};
-  if (courseNames.size > 0) {
-    const { data: gcRows } = await supabase
-      .from('golf_courses')
-      .select('name, thumbnail_image')
-      .in('name', Array.from(courseNames));
-    for (const r of ((gcRows as any[]) ?? [])) {
-      thumbsByName[r.name.toLowerCase()] = r.thumbnail_image ?? null;
-    }
-  }
+  // Use the same lookup as the Overview's LastRoundCard, which handles WHS
+  // name variants (e.g. "Sundridge Park-East Course" → "Sundridge Park (East Course)").
+  await Promise.all(
+    Array.from(courseNames).map(async (name) => {
+      thumbsByName[name.toLowerCase()] = await lookupCourseThumbnail(name);
+    }),
+  );
 
   const bests = await fetchFriendCourseBests(ownerUserId);
   const bestKeyed = new Set(
@@ -305,6 +303,7 @@ export async function fetchFriendsActivity(
   return friends.map((f): WhsFriendActivityWithImage => {
     const score = scoresByConn[f.friend_connection_id];
     const courseNameKey = (f.last_round_course_name ?? '').toLowerCase();
+    const scoreCourseKey = (score?.course?.name ?? '').toLowerCase();
     return {
       friend_row_id: f.friend_row_id,
       friend_passport_id: f.friend_passport_id,
@@ -319,7 +318,8 @@ export async function fetchFriendsActivity(
       last_round_stableford: score?.stableford_points ?? null,
       last_round_differential: score?.handicap_differential ?? null,
       last_round_score_id: score?.id ?? null,
-      course_thumbnail_image: thumbsByName[courseNameKey] ?? null,
+      course_thumbnail_image:
+        thumbsByName[courseNameKey] ?? thumbsByName[scoreCourseKey] ?? null,
       is_course_best: score
         ? bestKeyed.has(`${f.friend_connection_id}:${score.id}`)
         : false,
