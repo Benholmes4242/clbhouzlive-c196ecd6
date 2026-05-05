@@ -203,6 +203,41 @@ const AccountTypeOnboarding: React.FC = () => {
     );
   }
 
+  // England Golf connection step (all account types)
+  if (step === 'england-golf') {
+    return (
+      <PageRoot className="min-h-screen bg-background flex flex-col">
+        <header className="border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+          <div className="px-4 md:container md:mx-auto">
+            <div className="flex items-center justify-center h-16">
+              <img
+                src="/lovable-uploads/b3fc8551-2b91-49af-b2ef-1dd493276207.png"
+                alt="clbhouz Logo"
+                className="h-10 w-auto object-contain"
+              />
+            </div>
+          </div>
+        </header>
+
+        <main className="flex-1 px-4 md:container md:mx-auto py-4 max-w-lg">
+          <button
+            onClick={handleBack}
+            disabled={submitting}
+            className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground transition-colors mb-2"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            Back
+          </button>
+
+          <WhsConnectScreen
+            onConnected={() => handleFinalSubmit()}
+            onSkip={() => handleFinalSubmit()}
+          />
+        </main>
+      </PageRoot>
+    );
+  }
+
   // Account type selection step
   return (
     <PageRoot className="min-h-screen bg-background flex flex-col">
