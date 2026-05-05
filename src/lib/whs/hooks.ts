@@ -299,3 +299,15 @@ export function useDeleteRivalOverride() {
     },
   });
 }
+
+export function useSharedRounds(
+  userId: string | undefined,
+  rivalUserId: string | null,
+) {
+  return useQuery({
+    queryKey: ['whs-shared-rounds', userId ?? '', rivalUserId ?? ''],
+    queryFn: () => fetchSharedRounds(userId as string, rivalUserId),
+    enabled: !!userId,
+    staleTime: 60_000,
+  });
+}
