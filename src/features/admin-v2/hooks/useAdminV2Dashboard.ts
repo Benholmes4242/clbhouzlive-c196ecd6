@@ -338,10 +338,16 @@ export function useAdminV2Dashboard() {
         staleTime: 2 * 60_000,
         refetchInterval: 5 * 60_000,
       },
+      {
+        queryKey: ['admin-v2', 'dashboard', 'eg-sync-health'],
+        queryFn:  fetchEgSyncHealth,
+        staleTime: 60_000,
+        refetchInterval: 120_000,
+      },
     ],
   });
 
-  const [kpisQ, queueQ, trendQ, auditQ, glanceQ] = results;
+  const [kpisQ, queueQ, trendQ, auditQ, glanceQ, egSyncQ] = results;
 
   return {
     kpis:        { data: kpisQ.data,  isLoading: kpisQ.isLoading  },
@@ -349,6 +355,11 @@ export function useAdminV2Dashboard() {
     trend:       { data: trendQ.data, isLoading: trendQ.isLoading },
     audit:       { data: auditQ.data, isLoading: auditQ.isLoading },
     glance:      { data: glanceQ.data, isLoading: glanceQ.isLoading },
+    egSyncHealth: {
+      data: egSyncQ.data as EgSyncHealth | undefined,
+      isLoading: egSyncQ.isLoading,
+      isError: egSyncQ.isError,
+    },
     isAnyLoading: results.some(r => r.isLoading),
     refetchAll:  () => results.forEach(r => r.refetch()),
   };
