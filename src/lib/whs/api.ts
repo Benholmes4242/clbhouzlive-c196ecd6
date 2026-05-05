@@ -263,6 +263,8 @@ export async function fetchFriendsActivity(
         adjusted_gross,
         stableford_points,
         handicap_differential,
+        is_counter,
+        handicap_index_at_time,
         course_id,
         course:whs_courses(name)
       `)
@@ -316,6 +318,9 @@ export async function fetchFriendsActivity(
       is_course_best: score
         ? bestKeyed.has(`${f.friend_connection_id}:${score.id}`)
         : false,
+      friend_handicap_index: f.friend_handicap_index ?? null,
+      is_counter: !!score?.is_counter,
+      handicap_index_at_time: score?.handicap_index_at_time ?? null,
     };
   });
 }
