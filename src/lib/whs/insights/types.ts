@@ -2,11 +2,6 @@ export type SuitedCourse = {
   id: string;
   name: string;
   region: string;
-  par: number;
-  holes: number;
-  slope: number;
-  rating: number;
-  yards: number;
   rationale: string;
 };
 
