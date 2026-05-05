@@ -33,7 +33,7 @@ const fmtDiffNullable = (n: number | null | undefined) =>
 
 export const FriendRoundCard: React.FC<Props> = ({ activity, onClick }) => {
   const diff = activity.last_round_differential;
-  const diffStr = fmtDiff(diff);
+  const diffStr = fmtDiffNullable(diff);
 
   // HCP impact pill
   const impactDelta =
