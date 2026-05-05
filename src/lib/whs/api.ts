@@ -134,19 +134,19 @@ export async function fetchCounters(connectionId: string): Promise<WhsCounterSco
   return (data as unknown as WhsCounterScore[]) ?? [];
 }
 
-export async function fetchRecentRounds(connectionId: string): Promise<WhsScore[]> {
+export async function fetchRecentRounds(connectionId: string): Promise<WhsRecentRound[]> {
   const { data, error } = await supabase
     .from('whs_scores' as any)
     .select(`
       id, play_date, adjusted_gross, stableford_points,
-      handicap_differential, is_counter,
-      course:whs_courses(name)
+      handicap_differential, is_counter, handicap_index_at_time,
+      course:whs_courses(name, country_name)
     `)
     .eq('connection_id', connectionId)
     .order('play_date', { ascending: false })
     .limit(20);
   if (error) throw error;
-  return (data as unknown as WhsScore[]) ?? [];
+  return (data as unknown as WhsRecentRound[]) ?? [];
 }
 
 /** All scores (used for achievements + course form). */
