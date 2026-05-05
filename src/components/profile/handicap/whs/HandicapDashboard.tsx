@@ -76,7 +76,7 @@ export const HandicapDashboard: React.FC<Props> = ({ connection, userId, readOnl
       queryClient.invalidateQueries({ queryKey: whsKeys.connection(userId) });
       queryClient.invalidateQueries({ queryKey: whsKeys.trend(connection.id) });
       queryClient.invalidateQueries({ queryKey: whsKeys.lastRound(connection.id) });
-      queryClient.invalidateQueries({ queryKey: whsKeys.lastRoundDetail(connection.id) });
+      queryClient.invalidateQueries({ queryKey: ['whs-round-detail'] });
       queryClient.invalidateQueries({ queryKey: whsKeys.counters(connection.id) });
       queryClient.invalidateQueries({ queryKey: whsKeys.recent(connection.id) });
       queryClient.invalidateQueries({ queryKey: whsKeys.allScores(connection.id) });
