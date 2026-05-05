@@ -278,6 +278,12 @@ async function fetchTodayGlance(): Promise<TodayGlance> {
   return { postsByHour, topActiveUsers };
 }
 
+async function fetchEgSyncHealth(): Promise<EgSyncHealth> {
+  const { data, error } = await supabase.rpc('get_eg_sync_health' as any);
+  if (error) throw error;
+  return data as EgSyncHealth;
+}
+
 async function fetchRecentAudit(): Promise<RecentAuditEntry[]> {
   const { data, error } = await supabase
     .from('admin_audit_log')
