@@ -38,7 +38,7 @@ export default function WhsConnectionSheet({ open, onClose, connection, userId }
   const invalidateAll = () => {
     if (userId) {
       queryClient.invalidateQueries({ queryKey: whsKeys.connection(userId) });
-      queryClient.invalidateQueries({ queryKey: whsKeys.friendsLeaderboard(userId) });
+      queryClient.invalidateQueries({ queryKey: whsKeys.friendLeaderboard(userId) });
       queryClient.invalidateQueries({ queryKey: whsKeys.friendWindowRankings(userId) });
       queryClient.invalidateQueries({ queryKey: whsKeys.friendsActivity(userId) });
       queryClient.invalidateQueries({ queryKey: whsKeys.friendCourseBests(userId) });

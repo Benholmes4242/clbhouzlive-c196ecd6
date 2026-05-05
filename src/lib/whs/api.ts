@@ -198,16 +198,6 @@ export async function fetchHandicapHistory(
   }));
 }
 
-export async function fetchFriendsLeaderboard(ownerUserId: string): Promise<WhsFriendMatch[]> {
-  const { data, error } = await supabase
-    .from('whs_friend_matches' as any)
-    .select('*')
-    .eq('owner_user_id', ownerUserId)
-    .order('friend_handicap_index', { ascending: true, nullsFirst: false });
-  if (error) throw error;
-  return (data ?? []) as unknown as WhsFriendMatch[];
-}
-
 export async function fetchFriendCourseBests(
   ownerUserId: string,
 ): Promise<WhsFriendCourseBest[]> {
