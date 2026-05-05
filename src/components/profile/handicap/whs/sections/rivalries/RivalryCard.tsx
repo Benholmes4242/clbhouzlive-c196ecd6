@@ -199,7 +199,14 @@ export const RivalryCard: React.FC<Props> = ({ rivalry, onInfo, onEdit, onTap })
               textOverflow: 'ellipsis',
             }}
           >
-            {firstName(name)} {(name.includes(',') ? name.split(',')[0].trim() : (name.split(' ')[1] ?? '')).slice(0, 1) && (name.includes(',') ? name.split(',')[0].trim() : (name.split(' ').slice(1).join(' ')))}
+            {(() => {
+              if (!name) return 'Unknown';
+              if (name.includes(',')) {
+                const [last, first] = name.split(',').map((s) => s.trim());
+                return `${first} ${last}`;
+              }
+              return name;
+            })()}
           </p>
           <p
             style={{
