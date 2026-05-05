@@ -11,24 +11,21 @@
  * Slide order: LIVE (by tour priority) > COMPLETED (by end_date DESC) > UPCOMING (by start_date ASC)
  */
 
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import type { PlayerInfo } from '@/components/tourhub/PlayerScorecardCard';
 import { Link, useNavigate } from 'react-router-dom';
 import { tournamentRoute } from '../../routes';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronDown, ChevronRight, Trophy } from 'lucide-react';
+import { ChevronRight } from 'lucide-react';
 
-import { cn } from '@/lib/utils';
-import { 
+import {
   useHeroCarouselData,
   type HeroSlide as CarouselSlide,
-  type HeroTournament,
 } from '../../hooks/useHeroCarouselData';
-import { useTournamentTopLeaders, type LeaderEntry } from '../../hooks/useOverviewData';
-import { useTournamentLeadersWinners, type TournamentFinisher } from '../../hooks/useTournamentLeadersWinners';
+import { useTournamentLeadersWinners } from '../../hooks/useTournamentLeadersWinners';
 import { useTourLeaderboard } from '../../hooks/useTourHubData';
 import { useLeaderboardRealtime } from '../../hooks/useLeaderboardRealtime';
-import { ExpandedLeaderboardList, ExpandedLeaderboardSkeleton, ExpandedLeaderboardError, ExpandedLeaderboardEmpty } from './ExpandedLeaderboard';
+import { ExpandedLeaderboardError, ExpandedLeaderboardEmpty } from './ExpandedLeaderboard';
 import { PlayerScorecardCard } from '@/components/tourhub/PlayerScorecardCard';
 
 import { useVenueImage, getFallbackCourseImage } from '../../hooks/useVenueImage';
@@ -37,21 +34,12 @@ import tpcSanAntonioUpcoming from '@/assets/tpc-san-antonio-upcoming.webp';
 import shadowCreekUpcoming from '@/assets/shadow-creek-upcoming.jpg';
 import lakewoodNationalUpcoming from '@/assets/lakewood-national-upcoming.jpg';
 import volvoChinaOpenUpcoming from '@/assets/tours/volvo-china-open-upcoming.jpg';
-import { getTourLogo } from '../../utils/tourLogos';
 import { getPlayerHeadshotUrl } from '@/utils/playerHeadshot';
-import { PlayerSilhouette } from '@/components/ui/PlayerSilhouette';
-import { LeaderEntityAvatar } from '../shared/LeaderEntityAvatar';
-import { formatThruDisplay } from '../../utils/formatThruDisplay';
 import { format, differenceInDays, isToday, isTomorrow } from 'date-fns';
-import { getScoreColor, getFinishedScoreColor, formatPurse, PlayerAvatar, PodiumRunnerRow, buildPodiumRows, WinnerStatsPanel, getCurrentRoundLabel as getCurrentRoundLabelShared, UpcomingCountdown } from '../shared/TourHeroHelpers';
-import { useWinnerScorecardStats } from '../../hooks/useWinnerScorecardStats';
-import { useWinnerSeasonStats } from '../../hooks/useWinnerSeasonStats';
-import { useLeaderScorecardStats, type LeaderStats } from '../../hooks/useLeaderScorecardStats';
-import { useLeaderHoleScores } from '../../hooks/useLeaderHoleScores';
-import { HoleStripWithSparkline } from './HoleStripWithSparkline';
-import { RoundHistoryPills } from './RoundHistoryPills';
+import { formatPurse, PlayerAvatar, UpcomingCountdown } from '../shared/TourHeroHelpers';
 import { EditorialLiveHero, LiveHeroSkeleton } from './EditorialLiveHero';
-import { EditorialResultsHero, ResultsHeroSkeleton } from './EditorialResultsHero';
+import { EditorialResultsHero } from './EditorialResultsHero';
+import { cn } from '@/lib/utils';
 import '@/styles/hero-glass.css';
 import { EchoContextualButton } from '@/components/echo/EchoContextualButton';
 
