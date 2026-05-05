@@ -12,7 +12,7 @@ import type {
   HandicapPoint,
   CourseForm,
   WhsRoundDetail,
-  WhsRecentRound,
+  WhsScoreWithIndex,
   WhsLastRound,
   WhsScoreHole,
   WhsFriendCourseBest,
