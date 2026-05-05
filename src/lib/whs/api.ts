@@ -134,23 +134,8 @@ export async function fetchCounters(connectionId: string): Promise<WhsCounterSco
   return (data as unknown as WhsCounterScore[]) ?? [];
 }
 
-export async function fetchRecentRounds(connectionId: string): Promise<WhsRecentRound[]> {
-  const { data, error } = await supabase
-    .from('whs_scores' as any)
-    .select(`
-      id, play_date, adjusted_gross, stableford_points,
-      handicap_differential, is_counter, handicap_index_at_time,
-      course:whs_courses(name, country_name)
-    `)
-    .eq('connection_id', connectionId)
-    .order('play_date', { ascending: false })
-    .limit(20);
-  if (error) throw error;
-  return (data as unknown as WhsRecentRound[]) ?? [];
-}
-
-/** All scores (used for achievements + course form). */
-export async function fetchAllScores(connectionId: string): Promise<WhsScore[]> {
+/** All scores (used for achievements + course form + recent rounds). */
+export async function fetchAllScores(connectionId: string): Promise<WhsScoreWithIndex[]> {
   const { data, error } = await supabase
     .from('whs_scores' as any)
     .select(SCORE_SELECT)
@@ -158,7 +143,7 @@ export async function fetchAllScores(connectionId: string): Promise<WhsScore[]> 
     .order('play_date', { ascending: false })
     .limit(1000);
   if (error) throw error;
-  return (data as unknown as WhsScore[]) ?? [];
+  return (data as unknown as WhsScoreWithIndex[]) ?? [];
 }
 
 export async function callConnectWhs(membership_number: string, password: string): Promise<ConnectWhsResponse> {
