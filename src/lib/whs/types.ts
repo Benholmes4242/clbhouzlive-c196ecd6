@@ -326,6 +326,8 @@ export interface FriendLeaderboardEntry {
   friend_connection_id: string | null;
   /** Passport ID. Now ALWAYS populated, including for the self row. */
   friend_passport_id: number | null;
+  /** Friend match row ID. Used as the rival identifier for non-Clbhouz friends. NULL for self row. */
+  friend_row_id: string | null;
   friend_name: string;
   friend_thumbnail_url: string | null;
   /** Now nullable — friends without a posted handicap get NULL. */
