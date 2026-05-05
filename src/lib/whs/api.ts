@@ -725,7 +725,19 @@ export async function fetchFriendLeaderboard(
     p_user_id: userId,
   });
   if (error) throw error;
-  return ((data as any[]) ?? []) as FriendLeaderboardEntry[];
+  return ((data as any[]) ?? []).map((row): FriendLeaderboardEntry => ({
+    is_self: !!row.is_self,
+    friend_user_id: row.friend_user_id ?? null,
+    friend_connection_id: row.friend_connection_id ?? null,
+    friend_passport_id: row.friend_passport_id != null ? Number(row.friend_passport_id) : null,
+    friend_name: row.friend_name ?? 'Unknown',
+    friend_thumbnail_url: row.friend_thumbnail_url ?? null,
+    friend_handicap_index: row.friend_handicap_index != null ? Number(row.friend_handicap_index) : null,
+    friend_home_club: row.friend_home_club ?? null,
+    last_round_played_at: row.last_round_played_at ?? null,
+    last_round_course_name: row.last_round_course_name ?? null,
+    is_clbhouz_user: !!row.is_clbhouz_user,
+  }));
 }
 
 export async function fetchUserRivalOverrides(

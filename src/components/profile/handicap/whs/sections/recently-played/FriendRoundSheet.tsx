@@ -12,6 +12,7 @@ import { useFriendRoundDetail, useSentInvites, whsKeys } from '@/lib/whs/hooks';
 import { callCreateInvite } from '@/lib/whs/api';
 import { shareInvite, firstName } from '@/lib/whs/share';
 import type { WhsFriendActivityWithImage } from '@/lib/whs/types';
+import { fmtRelative } from '@/lib/whs/utils/nameFormat';
 
 interface Props {
   activity: WhsFriendActivityWithImage | null;
