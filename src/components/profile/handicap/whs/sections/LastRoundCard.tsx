@@ -323,8 +323,8 @@ export const LastRoundCard: React.FC<Props> = ({ connectionId }) => {
         />
       </button>
 
-      <LastRoundSheet
-        connectionId={connectionId}
+      <RoundDetailSheet
+        scoreId={lastRound.id}
         open={sheetOpen}
         onClose={() => setSheetOpen(false)}
       />
