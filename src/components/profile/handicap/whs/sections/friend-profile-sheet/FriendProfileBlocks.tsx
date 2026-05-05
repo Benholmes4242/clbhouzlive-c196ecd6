@@ -301,7 +301,7 @@ export const PinFooter: React.FC<{
           userId: ownerUserId,
           slotIndex: 4,
           rival_user_id: friend.friend_user_id ?? undefined,
-          rival_friend_row_id: (friend as any).friend_row_id ?? undefined,
+          rival_friend_row_id: friend.friend_row_id ?? undefined,
         });
         toast.success('Pinned as rival');
       }
