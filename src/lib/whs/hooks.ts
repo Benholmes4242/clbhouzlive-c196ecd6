@@ -5,7 +5,6 @@ import {
   fetchHandicapTrend,
   fetchLastRound,
   fetchCounters,
-  fetchRecentRounds,
   fetchAllScores,
   fetchHandicapHistory,
   fetchFriendsLeaderboard,
