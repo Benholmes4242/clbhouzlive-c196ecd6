@@ -28,7 +28,7 @@ export const FriendProfileContent: React.FC<Props> = ({ friend, ownerUserId, pre
     r.slot_kind === 'pinned' &&
     (
       (friend.friend_user_id && r.rival_user_id === friend.friend_user_id) ||
-      ((friend as any).friend_row_id && r.rival_friend_row_id === (friend as any).friend_row_id)
+      (friend.friend_row_id && r.rival_friend_row_id === friend.friend_row_id)
     )
   );
 

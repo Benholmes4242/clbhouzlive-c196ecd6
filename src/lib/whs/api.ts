@@ -720,6 +720,7 @@ export async function fetchFriendLeaderboard(
     friend_user_id: row.friend_user_id ?? null,
     friend_connection_id: row.friend_connection_id ?? null,
     friend_passport_id: row.friend_passport_id != null ? Number(row.friend_passport_id) : null,
+    friend_row_id: row.friend_row_id ?? null,
     friend_name: row.friend_name ?? 'Unknown',
     friend_thumbnail_url: row.friend_thumbnail_url ?? null,
     friend_handicap_index: row.friend_handicap_index != null ? Number(row.friend_handicap_index) : null,
