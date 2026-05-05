@@ -3,7 +3,7 @@
  * Hides silently if weather can't be resolved.
  */
 import React from 'react';
-import { Cloud, ChevronRight } from 'lucide-react';
+import { Cloud } from 'lucide-react';
 import { useHomeCourseWeather, WeatherUnresolvedError } from '@/lib/weather/useHomeCourseWeather';
 import type { WeatherUnresolvedReason } from '@/lib/weather/types';
 import { analyticsEvents } from '@/utils/analyticsEvents';
@@ -66,14 +66,7 @@ const HomeCourseWeatherCard: React.FC<Props> = ({ club, userId }) => {
   }
 
   return (
-    <button
-      type="button"
-      onClick={() => {
-        analyticsEvents.track('morning_moment_weather_tapped', {
-          user_id: userId,
-          club_id: club.id,
-        });
-      }}
+    <div
       style={{
         display: 'flex',
         alignItems: 'center',
@@ -84,8 +77,6 @@ const HomeCourseWeatherCard: React.FC<Props> = ({ club, userId }) => {
         borderRadius: 12,
         padding: '12px 14px',
         marginBottom: 8,
-        cursor: 'pointer',
-        textAlign: 'left',
         fontFamily: FONT_GEIST,
       }}
     >
@@ -164,8 +155,7 @@ const HomeCourseWeatherCard: React.FC<Props> = ({ club, userId }) => {
         )}
       </div>
 
-      <ChevronRight size={16} color={INK_55} />
-    </button>
+    </div>
   );
 };
 

@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, { useState } from 'react';
 import { formatDistanceToNow } from 'date-fns';
 import { useQueryClient } from '@tanstack/react-query';
 import { useSearchParams } from 'react-router-dom';
@@ -8,7 +8,6 @@ import { callSyncWhsOne } from '@/lib/whs/api';
 import { useHandicapTrend, whsKeys } from '@/lib/whs/hooks';
 import type { WhsConnection } from '@/lib/whs/types';
 import HeroHandicapCard from './sections/HeroHandicapCard';
-import HandicapTabsNav from './HandicapTabsNav';
 import OverviewView from './views/OverviewView';
 import TrendsView from './views/TrendsView';
 import FriendsView from './views/FriendsView';
@@ -29,7 +28,7 @@ const DEFAULT_SUBTAB: HandicapSubtab = 'overview';
 
 export const HandicapDashboard: React.FC<Props> = ({ connection, userId, readOnly = false }) => {
   const queryClient = useQueryClient();
-  const [searchParams, setSearchParams] = useSearchParams();
+  const [searchParams] = useSearchParams();
   const [isSyncing, setIsSyncing] = useState(false);
   const lastSyncedAtForInit = connection.last_synced_at ? new Date(connection.last_synced_at) : null;
   const isOldEnoughForReauth =
@@ -44,15 +43,6 @@ export const HandicapDashboard: React.FC<Props> = ({ connection, userId, readOnl
   const activeSubtab: HandicapSubtab = isHandicapSubtab(rawSubtab)
     ? rawSubtab
     : DEFAULT_SUBTAB;
-
-  const handleSubtabChange = useCallback(
-    (next: HandicapSubtab) => {
-      const params = new URLSearchParams(searchParams);
-      params.set('subtab', next);
-      setSearchParams(params, { replace: true });
-    },
-    [searchParams, setSearchParams]
-  );
 
   // ── Trend (used by hero + passed to views as currentHandicap) ───────────
   const { data: trend } = useHandicapTrend(connection.id);
@@ -134,11 +124,6 @@ export const HandicapDashboard: React.FC<Props> = ({ connection, userId, readOnl
 
       {/* PERSISTENT — hero, always visible */}
       <HeroHandicapCard connection={connection} />
-
-      
-
-      {/* PERSISTENT — sticky sub-tabs */}
-      <HandicapTabsNav active={activeSubtab} onChange={handleSubtabChange} />
 
       {/* SWAPPABLE — active view */}
       <div key={activeSubtab} className="anim-fadeSlide pt-5">
