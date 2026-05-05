@@ -13,5 +13,5 @@ export { LocationSection } from './LocationSection';
 export { PrivacySection } from './PrivacySection';
 export { ImageCropperModal } from './ImageCropperModal';
 export { VisibilityDropdown } from './VisibilityDropdown';
-export { default as HandicapSyncInlineNotice } from './HandicapSyncInlineNotice';
+
 export { InviteClubModal } from './InviteClubModal';

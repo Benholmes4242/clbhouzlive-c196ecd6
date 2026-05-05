@@ -4,19 +4,17 @@ import { HomeClubCard } from '@/components/profile/edit-v2/HomeClubCard';
 import { AdditionalClubsList } from '@/components/profile/edit-v2/AdditionalClubsList';
 import { CollegeSelector } from '@/components/profile/edit-v2/CollegeSelector';
 import { HandicapInput } from '@/components/profile/edit-v2/HandicapInput';
-import HandicapSyncInlineNotice from '@/components/profile/edit-v2/HandicapSyncInlineNotice';
 import { SectionCard } from '@/components/profile/edit-v2/SectionCard';
 
 interface Props {
   form: ProfileFormData;
   userId?: string;
-  hasRegisteredInterest?: boolean;
   onFieldChange: <K extends keyof ProfileFormData>(field: K, value: ProfileFormData[K]) => void;
   onAddClub: (club: Omit<ClubEntry, 'id'>) => void;
   onRemoveClub: (id: string) => void;
 }
 
-export function GolfInfoStep({ form, userId, hasRegisteredInterest, onFieldChange, onAddClub, onRemoveClub }: Props) {
+export function GolfInfoStep({ form, userId: _userId, onFieldChange, onAddClub, onRemoveClub }: Props) {
   return (
     <div className="space-y-4 px-4 pb-4">
       <SectionCard>
@@ -53,9 +51,6 @@ export function GolfInfoStep({ form, userId, hasRegisteredInterest, onFieldChang
           value={form.handicapIndex}
           onChange={(v) => onFieldChange('handicapIndex', v)}
         />
-        <div className="mt-3">
-          {userId && <HandicapSyncInlineNotice userId={userId} hasRegisteredInterest={hasRegisteredInterest ?? false} />}
-        </div>
       </SectionCard>
 
       <SectionCard>
