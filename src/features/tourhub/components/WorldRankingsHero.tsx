@@ -561,7 +561,7 @@ function MoverRow({ mover, direction, isLast }: MoverRowProps) {
             gap: 4,
           }}
         >
-          <CountryFlag country={mover.country ?? ''} size="xs" />
+          <CountryFlag country={mover.country ?? ''} size="sm" />
           <span>now #{mover.rank}</span>
         </div>
       </div>
