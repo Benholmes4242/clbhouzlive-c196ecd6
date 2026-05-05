@@ -1,13 +1,13 @@
 import React from 'react';
 import { Info, Swords } from 'lucide-react';
 import { initials } from '@/lib/whs/utils/initials';
+import { reformatFriendName } from '@/lib/whs/utils/nameFormat';
 import { fmtHcp } from '@/lib/whs/format';
 import type { FriendRivalryHydrated } from '@/lib/whs/types';
 
 interface Props {
   rivalry: FriendRivalryHydrated;
   onInfo: () => void;
-  onTap: () => void;
 }
 
 const T = {
@@ -25,7 +25,7 @@ const T = {
 };
 const FONT_DISPLAY = 'SF Pro Display, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
 
-export const RivalryCard: React.FC<Props> = ({ rivalry, onInfo, onTap }) => {
+export const RivalryCard: React.FC<Props> = ({ rivalry, onInfo }) => {
   const name = rivalry.rival_name ?? 'Unknown';
   const sf = rivalry.stableford_record ?? { wins: 0, losses: 0, ties: 0 };
   const gross = rivalry.gross_record ?? { wins: 0, losses: 0, ties: 0 };
@@ -61,9 +61,6 @@ export const RivalryCard: React.FC<Props> = ({ rivalry, onInfo, onTap }) => {
 
   return (
     <div
-      onClick={onTap}
-      role="button"
-      tabIndex={0}
       style={{
         flex: '0 0 auto',
         width: 'calc(88vw - 16px)',
@@ -74,7 +71,6 @@ export const RivalryCard: React.FC<Props> = ({ rivalry, onInfo, onTap }) => {
         overflow: 'hidden',
         background: `linear-gradient(160deg, ${T.bgFrom}, ${T.bgTo})`,
         position: 'relative',
-        cursor: 'pointer',
         fontFamily: FONT_DISPLAY,
         boxShadow: '0 8px 24px -10px rgba(0,0,0,0.50), 0 0 0 1px rgba(255,255,255,0.06) inset',
       }}
@@ -109,7 +105,7 @@ export const RivalryCard: React.FC<Props> = ({ rivalry, onInfo, onTap }) => {
             RIVAL
           </span>
           <button
-            onClick={(e) => { e.stopPropagation(); onInfo(); }}
+            onClick={onInfo}
             aria-label="Why this rival?"
             style={{
               width: 18,
@@ -171,14 +167,7 @@ export const RivalryCard: React.FC<Props> = ({ rivalry, onInfo, onTap }) => {
               textOverflow: 'ellipsis',
             }}
           >
-            {(() => {
-              if (!name) return 'Unknown';
-              if (name.includes(',')) {
-                const [last, first] = name.split(',').map((s) => s.trim());
-                return `${first} ${last}`;
-              }
-              return name;
-            })()}
+            {reformatFriendName(name)}
           </p>
           <p
             style={{
