@@ -247,13 +247,19 @@ export function CollegeRivalry() {
 
   return (
     <section aria-label="This week's college rivalry">
-      {/* Section header — shared SectionHeader component */}
-      <div style={{ padding: '0 16px' }}>
-        <SectionHeader
-          eyebrow="College Rivalry"
-          title="College Franchise Battle"
-          subtitle={`Where college legacies compete on tour · ${currentYear} Season`}
-        />
+      {/* Section header — single line */}
+      <div style={{
+        display: 'flex', alignItems: 'baseline', justifyContent: 'space-between',
+        padding: '0 16px', marginBottom: 14,
+      }}>
+        <h2 style={{
+          fontSize: 24, fontWeight: 800, letterSpacing: '-0.025em',
+          color: INK, margin: 0,
+        }}>College Franchise Battle</h2>
+        <span style={{
+          fontSize: 10, fontWeight: 700, color: SLATE,
+          letterSpacing: '0.1em', textTransform: 'uppercase',
+        }}>{currentYear} Season</span>
       </div>
 
       {/* Rivalry hero card — matchup row sits DIRECTLY on the outer card (no inner card) */}
