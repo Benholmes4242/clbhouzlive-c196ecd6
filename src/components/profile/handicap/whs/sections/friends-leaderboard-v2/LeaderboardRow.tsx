@@ -1,4 +1,5 @@
 import React from 'react';
+import { ArrowDown, ArrowUp, Minus } from 'lucide-react';
 import { initials } from '@/lib/whs/utils/initials';
 import { reformatFriendName, fmtRelative } from '@/lib/whs/utils/nameFormat';
 import { fmtHcp } from '@/lib/whs/format';
