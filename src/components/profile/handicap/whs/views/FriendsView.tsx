@@ -16,6 +16,7 @@ export const FriendsView: React.FC<Props> = ({ userId, currentHandicap, connecti
   return (
     <div role="tabpanel" id="handicap-panel-friends" aria-labelledby="handicap-tab-friends">
       <FeaturedFriendRoundHero userId={userId} />
+      <RecentlyActiveRail userId={userId} />
       <FriendsLeaderboardV2 ownerUserId={userId} currentUserHandicap={currentHandicap} connectionId={connectionId} readOnly={readOnly} />
       <RecentlyPlayedFeed ownerUserId={userId} />
       {!readOnly && <InviteToClbhouzV2 ownerUserId={userId} />}
