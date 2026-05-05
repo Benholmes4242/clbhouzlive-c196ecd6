@@ -33,6 +33,22 @@ export interface RecentAuditEntry {
   details:     Record<string, unknown> | null;
 }
 
+export type EgSyncStatus = 'green' | 'amber' | 'red' | 'idle';
+
+export interface EgSyncHealth {
+  status: EgSyncStatus;
+  total_connected: number;
+  status_ok_count: number;
+  auth_failed: number;
+  eg_unavailable: number;
+  consecutive_failures_total: number;
+  last_attempt_at: string | null;
+  cron_last_run_at: string | null;
+  cron_last_status: string | null;
+  cron_hours_ago: number | null;
+  computed_at: string;
+}
+
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
 function toDateKey(iso: string): string {
