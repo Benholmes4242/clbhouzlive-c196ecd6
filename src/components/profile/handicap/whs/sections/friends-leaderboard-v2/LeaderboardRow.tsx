@@ -169,7 +169,7 @@ export const LeaderboardRow: React.FC<Props> = ({ entry, rank, isFirst, isLast, 
             {entry.handicap_30d_delta.toFixed(1)}
           </span>
         )}
-      </div>
+    </Tag>
 
       {/* HCP */}
       <div
