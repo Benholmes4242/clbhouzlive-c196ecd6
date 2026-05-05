@@ -3,7 +3,7 @@ import FeaturedFriendRoundHero from '../sections/featured-friend-round/FeaturedF
 import RecentlyActiveRail from '../sections/recently-active/RecentlyActiveRail';
 import RecentlyPlayedFeed from '../sections/recently-played/RecentlyPlayedFeed';
 import RivalriesSection from '../sections/rivalries/RivalriesSection';
-import FriendsLeaderboardV2 from '../sections/friends-leaderboard/FriendsLeaderboardV2';
+import FriendsLeaderboardSection from '../sections/friends-leaderboard-v2/FriendsLeaderboardSection';
 import InviteToClbhouzV2 from '../sections/invite-to-clbhouz/InviteToClbhouzV2';
 
 interface Props {
@@ -20,7 +20,7 @@ export const FriendsView: React.FC<Props> = ({ userId, currentHandicap, connecti
       <RecentlyActiveRail userId={userId} />
       <RecentlyPlayedFeed ownerUserId={userId} />
       <RivalriesSection userId={userId} />
-      <FriendsLeaderboardV2 ownerUserId={userId} currentUserHandicap={currentHandicap} connectionId={connectionId} readOnly={readOnly} />
+      <FriendsLeaderboardSection userId={userId} />
       {!readOnly && <InviteToClbhouzV2 ownerUserId={userId} />}
     </div>
   );
