@@ -2,6 +2,7 @@ import React, { useMemo, useState } from 'react';
 import { useAllScores } from '@/lib/whs/hooks';
 import SectionHeader from '../SectionHeader';
 import TrendCard from './TrendCard';
+import HandicapProjectionCard from './HandicapProjectionCard';
 import { computeMetric } from './computeTrends';
 import type { TrendRange } from './types';
 
@@ -10,13 +11,11 @@ interface Props {
 }
 
 interface RangesState {
-  diff: TrendRange;
   stableford: TrendRange;
   counter_rate: TrendRange;
 }
 
 const DEFAULT_RANGES: RangesState = {
-  diff: '1m',
   stableford: '1m',
   counter_rate: '6m',
 };
@@ -28,7 +27,6 @@ export const TrendCardsStack: React.FC<Props> = ({ connectionId }) => {
   const metrics = useMemo(() => {
     if (!scores) return null;
     return {
-      diff: computeMetric('diff', ranges.diff, scores),
       stableford: computeMetric('stableford', ranges.stableford, scores),
       counter_rate: computeMetric('counter_rate', ranges.counter_rate, scores),
     };
@@ -47,7 +45,7 @@ export const TrendCardsStack: React.FC<Props> = ({ connectionId }) => {
             key={i}
             className="animate-pulse"
             style={{
-              height: 220,
+              height: i === 0 ? 420 : 220,
               background: 'rgba(15,23,42,0.04)',
               borderRadius: 16,
               marginBottom: 14,
@@ -56,11 +54,7 @@ export const TrendCardsStack: React.FC<Props> = ({ connectionId }) => {
         ))
       ) : (
         <>
-          <TrendCard
-            metric={metrics.diff}
-            range={ranges.diff}
-            onRangeChange={(r) => setRanges((s) => ({ ...s, diff: r }))}
-          />
+          <HandicapProjectionCard scores={scores ?? []} />
           <TrendCard
             metric={metrics.stableford}
             range={ranges.stableford}
