@@ -23,13 +23,14 @@ import { ComingUpCalendar } from '../ComingUpCalendar';
 import { CollegeRivalry } from '../CollegeRivalry';
 import { LazySection } from '../overview-v3/LazySection';
 import { AllToursTicker } from '../AllToursTicker';
+import { useAllToursTickerData } from '../../hooks/useOverviewModules';
 import { IntelligenceHero } from '../IntelligenceHero';
 import { WorldRankingsHero } from '../WorldRankingsHero';
 import { StatOfTheWeek } from '../StatOfTheWeek';
 import { useMedianStatusBar } from '@/hooks/useMedianStatusBar';
 import { usePreventOverscroll } from '@/hooks/usePreventOverscroll';
 import { useNetworkStatus } from '@/hooks/useNetworkStatus';
-import { HERO_STYLES } from '../../constants/heroStyles';
+import { HERO_STYLES, HERO_BLEED_MARGIN_NO_HEADER } from '../../constants/heroStyles';
 import { WifiOff } from 'lucide-react';
 import ScrollToTopGlass from '@/components/common/ScrollToTopGlass';
 
@@ -67,6 +68,17 @@ export function OverviewPageV3() {
     setActiveTournamentId(tournamentId);
   }, []);
 
+  const { data: tickerData } = useAllToursTickerData();
+  const activeStatus = activeTournamentId
+    ? (tickerData?.live.find(c => c.id === activeTournamentId) ? 'live'
+      : tickerData?.completed.find(c => c.id === activeTournamentId) ? 'completed'
+      : tickerData?.upcoming.find(c => c.id === activeTournamentId) ? 'upcoming'
+      : null)
+    : null;
+  const heroContainerStyle = activeStatus === 'upcoming' || activeStatus === null
+    ? HERO_STYLES.containerNoHeader
+    : { marginTop: HERO_BLEED_MARGIN_NO_HEADER };
+
 
   return (
     <>
@@ -99,7 +111,7 @@ export function OverviewPageV3() {
         {/* 1. Hero Carousel — capped at 960px on wide screens, full-bleed on mobile */}
         <motion.div 
           className="relative w-full z-0 mx-auto"
-          style={{ ...HERO_STYLES.containerNoHeader, maxWidth: 960, opacity: heroOpacity, scale: heroScale }}
+          style={{ ...heroContainerStyle, maxWidth: 960, opacity: heroOpacity, scale: heroScale }}
         >
           <HeroCarousel
             hasHeader={false}

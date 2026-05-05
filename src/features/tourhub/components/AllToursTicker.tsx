@@ -32,6 +32,7 @@ const SLATE_300 = '#CBD5E1';
 const SLATE_500 = '#64748B';
 const SLATE_700 = '#334155';
 const AMBER = '#F7931E';
+const GOLD = '#FFB800';
 
 type RailState = 'all-live' | 'mixed' | 'all-results' | 'deep-empty';
 
@@ -148,6 +149,15 @@ const TickerCell: React.FC<TickerCellProps> = ({ cell, isLast, isActive, onSelec
   const isCompleted = cell.status === 'completed';
   const isUpcoming = cell.status === 'upcoming';
 
+  const activeBorderColor = isLive ? GREEN
+    : isCompleted ? GOLD
+    : isUpcoming ? AMBER
+    : '#FFFFFF';
+  const activeBackground = isLive ? 'rgba(16,185,129,0.08)'
+    : isCompleted ? 'rgba(255,184,0,0.08)'
+    : isUpcoming ? 'rgba(247,147,30,0.08)'
+    : 'rgba(255,255,255,0.08)';
+
   return (
     <button
       type="button"
@@ -159,8 +169,8 @@ const TickerCell: React.FC<TickerCellProps> = ({ cell, isLast, isActive, onSelec
         padding: '7px 18px',
         borderRight: isLast ? 'none' : '1px solid rgba(255,255,255,0.06)',
         textAlign: 'left',
-        background: isActive ? 'rgba(255,255,255,0.08)' : 'transparent',
-        border: isActive ? '1.5px solid #FFFFFF' : '1.5px solid transparent',
+        background: isActive ? activeBackground : 'transparent',
+        border: isActive ? `1.5px solid ${activeBorderColor}` : '1.5px solid transparent',
         borderRadius: 12,
         color: 'inherit',
         cursor: 'pointer',
