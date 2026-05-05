@@ -5026,6 +5026,120 @@ export type Database = {
         }
         Relationships: []
       }
+      featured_rounds_history: {
+        Row: {
+          featured_at: string
+          score_id: string
+          user_id: string
+        }
+        Insert: {
+          featured_at?: string
+          score_id: string
+          user_id: string
+        }
+        Update: {
+          featured_at?: string
+          score_id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      friend_featured_round: {
+        Row: {
+          algorithm_version: string
+          computed_at: string
+          expires_at: string
+          freshness_window_days: number
+          is_personal_best: boolean
+          score_id: string | null
+          scoring_breakdown: Json | null
+          user_id: string
+        }
+        Insert: {
+          algorithm_version?: string
+          computed_at?: string
+          expires_at?: string
+          freshness_window_days?: number
+          is_personal_best?: boolean
+          score_id?: string | null
+          scoring_breakdown?: Json | null
+          user_id: string
+        }
+        Update: {
+          algorithm_version?: string
+          computed_at?: string
+          expires_at?: string
+          freshness_window_days?: number
+          is_personal_best?: boolean
+          score_id?: string | null
+          scoring_breakdown?: Json | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "friend_featured_round_score_id_fkey"
+            columns: ["score_id"]
+            isOneToOne: false
+            referencedRelation: "whs_friend_course_bests"
+            referencedColumns: ["best_score_id"]
+          },
+          {
+            foreignKeyName: "friend_featured_round_score_id_fkey"
+            columns: ["score_id"]
+            isOneToOne: false
+            referencedRelation: "whs_scores"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      friend_rivalry: {
+        Row: {
+          computed_at: string
+          gross_record: Json
+          rival_friend_row_id: string | null
+          rival_handicap: number | null
+          rival_trend_delta: number | null
+          rival_user_id: string | null
+          shared_round_results: Json
+          shared_rounds_count: number
+          shared_rounds_last_90d: number
+          slot_index: number
+          slot_kind: string
+          stableford_record: Json
+          user_id: string
+        }
+        Insert: {
+          computed_at?: string
+          gross_record?: Json
+          rival_friend_row_id?: string | null
+          rival_handicap?: number | null
+          rival_trend_delta?: number | null
+          rival_user_id?: string | null
+          shared_round_results?: Json
+          shared_rounds_count?: number
+          shared_rounds_last_90d?: number
+          slot_index: number
+          slot_kind: string
+          stableford_record?: Json
+          user_id: string
+        }
+        Update: {
+          computed_at?: string
+          gross_record?: Json
+          rival_friend_row_id?: string | null
+          rival_handicap?: number | null
+          rival_trend_delta?: number | null
+          rival_user_id?: string | null
+          shared_round_results?: Json
+          shared_rounds_count?: number
+          shared_rounds_last_90d?: number
+          slot_index?: number
+          slot_kind?: string
+          stableford_record?: Json
+          user_id?: string
+        }
+        Relationships: []
+      }
       game_join_requests: {
         Row: {
           created_at: string
@@ -13277,6 +13391,30 @@ export type Database = {
         }
         Relationships: []
       }
+      user_rival_overrides: {
+        Row: {
+          pinned_at: string
+          rival_friend_row_id: string | null
+          rival_user_id: string | null
+          slot_index: number
+          user_id: string
+        }
+        Insert: {
+          pinned_at?: string
+          rival_friend_row_id?: string | null
+          rival_user_id?: string | null
+          slot_index: number
+          user_id: string
+        }
+        Update: {
+          pinned_at?: string
+          rival_friend_row_id?: string | null
+          rival_user_id?: string | null
+          slot_index?: number
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_rivals: {
         Row: {
           created_at: string | null
@@ -16017,6 +16155,16 @@ export type Database = {
         Returns: number
       }
       club_key_v2: { Args: { p_name: string }; Returns: string }
+      compute_all_friend_featured_rounds: { Args: never; Returns: number }
+      compute_all_friend_rivalries: { Args: never; Returns: number }
+      compute_friend_featured_round: {
+        Args: { p_user_id: string }
+        Returns: undefined
+      }
+      compute_friend_rivalries: {
+        Args: { p_user_id: string }
+        Returns: undefined
+      }
       compute_player_ratings: { Args: never; Returns: undefined }
       count_orphan_posts: { Args: never; Returns: number }
       create_business_account: {
@@ -16506,6 +16654,13 @@ export type Database = {
           similarity: number
         }[]
       }
+      find_users_featuring_poster: {
+        Args: { p_connection_id: string }
+        Returns: {
+          user_id: string
+        }[]
+      }
+      friend_content_nightly: { Args: never; Returns: Json }
       game_request_decide: {
         Args: { p_decision: string; p_request_id: string }
         Returns: Json
@@ -17113,6 +17268,20 @@ export type Database = {
           self_has_reviewed: boolean
           top_friend_avatars: string[]
           top_friend_names: string[]
+        }[]
+      }
+      get_friend_leaderboard: {
+        Args: { p_user_id: string }
+        Returns: {
+          friend_connection_id: string
+          friend_handicap_index: number
+          friend_name: string
+          friend_thumbnail_url: string
+          friend_user_id: string
+          is_clbhouz_user: boolean
+          is_self: boolean
+          last_round_course_name: string
+          last_round_played_at: string
         }[]
       }
       get_friend_played_recommendations: {
@@ -18413,6 +18582,7 @@ export type Database = {
       }
       postgis_version: { Args: never; Returns: string }
       postgis_wagyu_version: { Args: never; Returns: string }
+      prune_featured_rounds_history: { Args: never; Returns: number }
       prune_leaderboard_snapshots: { Args: never; Returns: undefined }
       publish_scheduled_posts: { Args: never; Returns: undefined }
       queue_push_notification: {

@@ -591,3 +591,169 @@ async function lookupCourseThumbnail(whsName: string): Promise<string | null> {
 
   return null;
 }
+
+// ─── Phase 0 (Friends Tab Redesign): Featured round + rivalries fetchers ──
+import type {
+  FriendFeaturedRoundHydrated,
+  FriendRivalryHydrated,
+  UserRivalOverride,
+  FriendLeaderboardEntry,
+} from './types';
+
+export async function fetchFriendFeaturedRound(
+  userId: string,
+): Promise<FriendFeaturedRoundHydrated | null> {
+  const { data: featured, error: featuredErr } = await supabase
+    .from('friend_featured_round' as any)
+    .select('*')
+    .eq('user_id', userId)
+    .maybeSingle();
+
+  if (featuredErr) throw featuredErr;
+  if (!featured) return null;
+
+  const { data: score } = await supabase
+    .from('whs_scores')
+    .select(`
+      id, play_date, adjusted_gross, handicap_differential, stableford_points,
+      is_counter, handicap_index_at_time, course_id, connection_id,
+      course:whs_courses(name)
+    `)
+    .eq('id', (featured as any).score_id)
+    .maybeSingle();
+
+  if (!score) return null;
+
+  const { data: friendMatch } = await supabase
+    .from('whs_friend_matches' as any)
+    .select(
+      'friend_name, friend_thumbnail_url, friend_handicap_index, friend_user_id, friend_connection_id, is_clbhouz_user',
+    )
+    .eq('owner_user_id', userId)
+    .eq('friend_connection_id', (score as any).connection_id)
+    .maybeSingle();
+
+  if (!friendMatch) return null;
+
+  const courseName = (score as any).course?.name ?? null;
+  let courseThumbnail: string | null = null;
+  if (courseName) {
+    const { data: gc } = await supabase
+      .from('golf_courses')
+      .select('thumbnail_image')
+      .eq('name', courseName)
+      .maybeSingle();
+    courseThumbnail = (gc as any)?.thumbnail_image ?? null;
+  }
+
+  return {
+    ...(featured as any),
+    friend_name: (friendMatch as any).friend_name,
+    friend_thumbnail_url: (friendMatch as any).friend_thumbnail_url,
+    friend_handicap_index: (friendMatch as any).friend_handicap_index,
+    friend_user_id: (friendMatch as any).friend_user_id,
+    friend_connection_id: (friendMatch as any).friend_connection_id,
+    is_clbhouz_user: !!(friendMatch as any).is_clbhouz_user,
+    play_date: (score as any).play_date,
+    course_id: (score as any).course_id,
+    course_name: courseName,
+    course_thumbnail_image: courseThumbnail,
+    adjusted_gross: (score as any).adjusted_gross,
+    handicap_differential: (score as any).handicap_differential,
+    stableford_points: (score as any).stableford_points,
+    is_counter: (score as any).is_counter,
+    handicap_index_at_time: (score as any).handicap_index_at_time,
+  } as FriendFeaturedRoundHydrated;
+}
+
+export async function fetchFriendRivalries(
+  userId: string,
+): Promise<FriendRivalryHydrated[]> {
+  const { data: rivalries, error } = await supabase
+    .from('friend_rivalry' as any)
+    .select('*')
+    .eq('user_id', userId)
+    .order('slot_index', { ascending: true });
+
+  if (error) throw error;
+  const rows = (rivalries as any[]) ?? [];
+  if (rows.length === 0) return [];
+
+  const friendRowIds = rows.map((r) => r.rival_friend_row_id).filter(Boolean);
+
+  const matchesByRowId: Record<string, any> = {};
+  if (friendRowIds.length > 0) {
+    const { data: matches } = await supabase
+      .from('whs_friend_matches' as any)
+      .select(
+        'friend_row_id, friend_name, friend_thumbnail_url, friend_user_id, friend_connection_id, is_clbhouz_user',
+      )
+      .eq('owner_user_id', userId)
+      .in('friend_row_id', friendRowIds);
+
+    for (const m of (matches as any[]) ?? []) {
+      matchesByRowId[m.friend_row_id] = m;
+    }
+  }
+
+  return rows.map((r): FriendRivalryHydrated => {
+    const match = r.rival_friend_row_id ? matchesByRowId[r.rival_friend_row_id] : null;
+    return {
+      ...r,
+      rival_name: match?.friend_name ?? null,
+      rival_thumbnail_url: match?.friend_thumbnail_url ?? null,
+      rival_is_clbhouz_user: !!match?.is_clbhouz_user,
+      rival_friend_connection_id: match?.friend_connection_id ?? null,
+    };
+  });
+}
+
+export async function fetchFriendLeaderboard(
+  userId: string,
+): Promise<FriendLeaderboardEntry[]> {
+  const { data, error } = await supabase.rpc('get_friend_leaderboard' as any, {
+    p_user_id: userId,
+  });
+  if (error) throw error;
+  return ((data as any[]) ?? []) as FriendLeaderboardEntry[];
+}
+
+export async function fetchUserRivalOverrides(
+  userId: string,
+): Promise<UserRivalOverride[]> {
+  const { data, error } = await supabase
+    .from('user_rival_overrides' as any)
+    .select('*')
+    .eq('user_id', userId)
+    .order('slot_index');
+  if (error) throw error;
+  return ((data as any[]) ?? []) as UserRivalOverride[];
+}
+
+export async function upsertUserRivalOverride(
+  userId: string,
+  slotIndex: number,
+  identifier: { rival_user_id?: string; rival_friend_row_id?: string },
+): Promise<void> {
+  const { error } = await supabase
+    .from('user_rival_overrides' as any)
+    .upsert({
+      user_id: userId,
+      slot_index: slotIndex,
+      rival_user_id: identifier.rival_user_id ?? null,
+      rival_friend_row_id: identifier.rival_friend_row_id ?? null,
+    });
+  if (error) throw error;
+}
+
+export async function deleteUserRivalOverride(
+  userId: string,
+  slotIndex: number,
+): Promise<void> {
+  const { error } = await supabase
+    .from('user_rival_overrides' as any)
+    .delete()
+    .eq('user_id', userId)
+    .eq('slot_index', slotIndex);
+  if (error) throw error;
+}

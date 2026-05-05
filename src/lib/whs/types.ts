@@ -249,3 +249,97 @@ export interface WhsRoundDetail {
   course_thumbnail_image: string | null;
   holes: WhsScoreHole[] | null;
 }
+
+// ─── Phase 0 (Friends Tab Redesign): Featured friend round + rivalries ──
+
+export interface FriendFeaturedRound {
+  user_id: string;
+  score_id: string;
+  computed_at: string;
+  algorithm_version: string;
+  scoring_breakdown: {
+    recency: number;
+    rivalry: number;
+    quality: number;
+    novelty: number;
+    is_pb: boolean;
+    total: number;
+    window_days: number;
+  } | null;
+  is_personal_best: boolean;
+  freshness_window_days: number;
+  expires_at: string;
+}
+
+export interface FriendFeaturedRoundHydrated extends FriendFeaturedRound {
+  friend_name: string;
+  friend_thumbnail_url: string | null;
+  friend_handicap_index: number | null;
+  friend_user_id: string | null;
+  friend_connection_id: string | null;
+  is_clbhouz_user: boolean;
+  play_date: string;
+  course_id: string | null;
+  course_name: string | null;
+  course_thumbnail_image: string | null;
+  adjusted_gross: number;
+  handicap_differential: number | null;
+  stableford_points: number | null;
+  is_counter: boolean;
+  handicap_index_at_time: number | null;
+}
+
+export type RivalrySlotKind = 'regular' | 'chasing' | 'chased_by' | 'pinned';
+
+export interface FriendRivalry {
+  user_id: string;
+  slot_index: number;
+  slot_kind: RivalrySlotKind;
+  rival_user_id: string | null;
+  rival_friend_row_id: string | null;
+  rival_handicap: number | null;
+  rival_trend_delta: number | null;
+  shared_rounds_count: number;
+  shared_rounds_last_90d: number;
+  stableford_record: { wins: number; losses: number; ties: number };
+  gross_record: { wins: number; losses: number; ties: number };
+  shared_round_results: Array<{
+    play_date: string;
+    course_id: string;
+    course_name: string;
+    user_stableford: number;
+    rival_stableford: number;
+    user_gross: number;
+    rival_gross: number;
+    stableford_outcome: 'W' | 'L' | 'T';
+    gross_outcome: 'W' | 'L' | 'T';
+  }>;
+  computed_at: string;
+}
+
+export interface FriendRivalryHydrated extends FriendRivalry {
+  rival_name: string | null;
+  rival_thumbnail_url: string | null;
+  rival_is_clbhouz_user: boolean;
+  rival_friend_connection_id: string | null;
+}
+
+export interface UserRivalOverride {
+  user_id: string;
+  slot_index: number;
+  rival_user_id: string | null;
+  rival_friend_row_id: string | null;
+  pinned_at: string;
+}
+
+export interface FriendLeaderboardEntry {
+  is_self: boolean;
+  friend_user_id: string | null;
+  friend_connection_id: string | null;
+  friend_name: string;
+  friend_thumbnail_url: string | null;
+  friend_handicap_index: number;
+  last_round_played_at: string | null;
+  last_round_course_name: string | null;
+  is_clbhouz_user: boolean;
+}
