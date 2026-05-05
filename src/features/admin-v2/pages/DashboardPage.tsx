@@ -21,6 +21,7 @@ import {
 } from '../components/ui';
 import { AdminBarChart } from '../components/shared/AdminBarChart';
 import { AdminStatRow } from '../components/shared/AdminStatRow';
+import EgSyncHealthCard from '../components/EgSyncHealthCard';
 
 // ─── Action colour pill for audit log ────────────────────────────────────────
 
@@ -195,7 +196,7 @@ function HealthIndicator({ label, status, value }: { label: string; status: 'goo
 // ─── Main page ────────────────────────────────────────────────────────────────
 
 export default function DashboardPage() {
-  const { kpis, queue, trend, audit, glance, isAnyLoading, refetchAll } = useAdminV2Dashboard();
+  const { kpis, queue, trend, audit, glance, egSyncHealth, isAnyLoading, refetchAll } = useAdminV2Dashboard();
   const navigate = useNavigate();
   const [seriesVisible, setSeriesVisible] = useState({
     users: true, posts: true, reviews: true,
@@ -361,6 +362,18 @@ export default function DashboardPage() {
               </div>
             )}
           </div>
+        </div>
+      </section>
+
+      {/* ── Integrations Health ─────────────────────────────────────────────── */}
+      <section className="space-y-3">
+        <AdminSectionHeader title="Integrations Health" />
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <EgSyncHealthCard
+            data={egSyncHealth.data}
+            isLoading={egSyncHealth.isLoading}
+            isError={egSyncHealth.isError}
+          />
         </div>
       </section>
 
