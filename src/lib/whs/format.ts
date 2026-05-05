@@ -25,3 +25,21 @@ export function formatDisplayedHcp(displayed: number): string {
   if (displayed < 0) return `+${Math.abs(displayed)}`;
   return `${displayed}`;
 }
+
+/**
+ * Format a handicap index using WHS convention.
+ *
+ * Plus players (h<0): display with `+` prefix (e.g. `+2.4`)
+ * Scratch (h=0): display as `0.0`
+ * Bogey players (h>0): display as the number, no prefix (e.g. `5.2`)
+ *
+ * NOTE: Plus players' handicaps are conventionally written with `+` because they
+ * GIVE strokes to the course (better than scratch). Never use a minus sign for
+ * plus-player handicaps. This is different from differential formatting (fmtDiff)
+ * which uses Unicode minus for negative values.
+ */
+export function fmtHcp(h: number): string {
+  if (h < 0) return `+${Math.abs(h).toFixed(1)}`;
+  if (h === 0) return '0.0';
+  return h.toFixed(1);
+}
