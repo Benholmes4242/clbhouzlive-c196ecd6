@@ -311,21 +311,27 @@ export function SettingsPageV2() {
         </SettingsSection>
 
         {/* Connections */}
-        {whsConnection && (
-          <SettingsSection title="Connections">
-            <SettingsChevronRow
-              icon={<Link2 size={18} />}
-              title="England Golf"
-              subtitle={
-                whsConnection.last_synced_at
+        <SettingsSection title="Connections">
+          <SettingsChevronRow
+            icon={<Link2 size={18} />}
+            title="England Golf"
+            subtitle={
+              whsConnection
+                ? whsConnection.last_synced_at
                   ? `Last synced ${formatDistanceToNow(new Date(whsConnection.last_synced_at), { addSuffix: true })}`
                   : 'Connected'
+                : 'Tap to connect'
+            }
+            iconTheme="account"
+            onClick={() => {
+              if (whsConnection) {
+                setWhsSheetOpen(true);
+              } else {
+                navigate('/handicap');
               }
-              iconTheme="account"
-              onClick={() => setWhsSheetOpen(true)}
-            />
-          </SettingsSection>
-        )}
+            }}
+          />
+        </SettingsSection>
 
         {/* Support */}
         <SettingsSection title="Support">
