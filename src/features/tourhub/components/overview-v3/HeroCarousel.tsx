@@ -348,149 +348,68 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
             exit={{ opacity: 0, y: 20 }}
           >
 
-            {/* ─── Tournament header — hidden when scorecard is open ─── */}
-            {!selectedPlayer && (
-              isCompleted ? (
+            {/* ─── Tournament header — UPCOMING only. Live + Completed render their own caption strip inside the editorial hero. ─── */}
+            {!selectedPlayer && isUpcoming && (
+              <>
                 <div style={{
                   flexShrink: 0,
-                  paddingTop: 'calc(max(env(safe-area-inset-top, 0px), 44px) + 65px)',
+                  // Header sits below status bar + global header. Tighter on short screens.
+                  paddingTop: 'calc(max(env(safe-area-inset-top, 0px), 44px) + clamp(36px, 8vh, 65px))',
                 }}>
-                  <div style={{
-                    display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-                    gap: 10, padding: '0 16px', height: 58,
-                  }}>
-                    <div style={{ flex: 1, minWidth: 0 }}>
-                      <Link {...(() => { const t = tournamentRoute(tournament.id, { kind: 'overview' }); return { to: t.to, state: t.state }; })()} className="block active:opacity-70 transition-opacity">
-                        <div style={{
-                          fontSize: 'clamp(18px, 5.5vw, 22px)', fontWeight: 800, color: '#fff',
-                          letterSpacing: '-0.02em', lineHeight: 1,
-                          overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const,
-                        }}>
-                          {tournament.name}
-                        </div>
-                      </Link>
-                      <button
-                        onClick={(e) => { e.stopPropagation(); navigate(`/tourhub/courses?q=${encodeURIComponent(tournament.venueName || '')}`); }}
-                        className="active:opacity-70 transition-opacity cursor-pointer"
-                        style={{ fontSize: 13, fontWeight: 400, color: 'rgba(255,255,255,0.45)', marginTop: 3, background: 'none', border: 'none', padding: 0, textAlign: 'left' as const }}
-                      >
-                        {tournament.venueName}{tournament.venueCity ? ` · ${tournament.venueCity}` : ''}
-                      </button>
-                    </div>
-                    <div style={{ display: 'flex', flexDirection: 'column' as const, alignItems: 'center', gap: 1, flexShrink: 0 }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 3 }}>
-                        <span style={{ fontSize: 14 }}>🏆</span>
-                        <span style={{ fontSize: 14, fontWeight: 800, color: '#ffffff', letterSpacing: 1 }}>
-                          FINAL
+                  <div style={{ padding: '0 16px' }}>
+                    {/* ZONE A — Tour + Dates row */}
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingBottom: 'clamp(6px, 1.2vh, 10px)', borderBottom: '1px solid rgba(255,255,255,0.18)', marginBottom: 'clamp(8px, 1.6vh, 12px)' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                        <span style={{ background: '#fff', borderRadius: 4, padding: '2px 7px', fontSize: 9, fontWeight: 900, color: '#000', letterSpacing: '0.1em', textTransform: 'uppercase' as const }}>
+                          {getTourDisplayName(tournament.tourSlug)}
+                        </span>
+                        <span style={{ fontSize: 11, fontWeight: 600, color: 'rgba(255,255,255,0.75)', letterSpacing: '0.08em', textTransform: 'uppercase' as const }}>
+                          Upcoming
                         </span>
                       </div>
+                      {tournament.startDate && tournament.endDate && (
+                        <div style={{ textAlign: 'right' as const }}>
+                          <div style={{ fontSize: 12, fontWeight: 700, color: '#fff' }}>
+                            {new Date(tournament.startDate + 'T12:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                            {' – '}
+                            {new Date(tournament.endDate + 'T12:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                          </div>
+                          <div style={{ fontSize: 10, fontWeight: 600, color: '#F7931E', marginTop: 1 }}>
+                            {getStartLabel(tournament.startDate)}
+                          </div>
+                        </div>
+                      )}
                     </div>
-                  </div>
-                </div>
-              ) : isLive ? (
-                /* ── Compact topbar — tournament name left, round + LIVE right ── */
-                <div style={{
-                  flexShrink: 0,
-                  paddingTop: 'calc(max(env(safe-area-inset-top, 0px), 44px) + 65px)',
-                }}>
-                  <div style={{
-                    display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-                    gap: 10, padding: '0 16px', height: 58,
-                  }}>
 
-                    {/* Left — tournament name + venue, full width */}
-                    <div style={{ flex: 1, minWidth: 0 }}>
-                      <div style={{
-                        fontSize: 'clamp(18px, 5.5vw, 22px)', fontWeight: 700, color: '#fff',
-                        letterSpacing: -0.3, lineHeight: 1,
-                        overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+                    {/* ZONE B — Tournament name + venue (fluid by viewport height) */}
+                    <Link {...(() => { const t = tournamentRoute(tournament.id, { kind: 'overview' }); return { to: t.to, state: t.state }; })()} className="block active:opacity-70 transition-opacity">
+                      <h2 style={{
+                        fontSize: 'clamp(26px, 4.8vh, 40px)', fontWeight: 900, color: '#fff',
+                        letterSpacing: '-0.03em', lineHeight: 0.95, margin: 0, marginBottom: 'clamp(6px, 1.2vh, 10px)',
+                        display: '-webkit-box',
+                        WebkitLineClamp: 2,
+                        WebkitBoxOrient: 'vertical' as const,
+                        overflow: 'hidden',
                       }}>
                         {tournament.name}
-                      </div>
-                      <div style={{ fontSize: 13, fontWeight: 400, color: 'rgba(255,255,255,0.55)', marginTop: 3 }}>
-                        {tournament.venueName}{tournament.venueCity ? ` · ${tournament.venueCity}` : ''}
-                      </div>
-                    </div>
-
-                    {/* Right — round label stacked above LIVE pill */}
-                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 1, flexShrink: 0 }}>
-                      <span style={{
-                        fontSize: 12, fontWeight: 500, letterSpacing: '0.8px',
-                        color: 'rgba(255,255,255,0.5)',
-                      }}>
-                        {getCurrentRoundLabel(leaders, tournament.startDate)}
-                      </span>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 3 }}>
-                        <span className="live-dot" style={{ width: 6, height: 6 }} />
-                        <span style={{ fontSize: 12, fontWeight: 700, color: '#22C55E', letterSpacing: 1 }}>
-                          LIVE
-                        </span>
-                      </div>
-                    </div>
+                      </h2>
+                    </Link>
+                    <button
+                      onClick={(e) => { e.stopPropagation(); navigate(`/tourhub/courses?q=${encodeURIComponent(tournament.venueName || '')}`); }}
+                      className="active:opacity-70 transition-opacity cursor-pointer"
+                      style={{ fontSize: 'clamp(13px, 1.8vh, 15px)', fontWeight: 600, color: '#fff', background: 'none', border: 'none', padding: 0, textAlign: 'left' }}
+                    >
+                      {tournament.venueName}{tournament.venueCity ? ` · ${tournament.venueCity}` : ''}
+                    </button>
                   </div>
                 </div>
-              ) : isUpcoming ? (
-                <>
-                  <div style={{
-                    flexShrink: 0,
-                    // Header sits below status bar + global header. Tighter on short screens.
-                    paddingTop: 'calc(max(env(safe-area-inset-top, 0px), 44px) + clamp(36px, 8vh, 65px))',
-                  }}>
-                    <div style={{ padding: '0 16px' }}>
-                      {/* ZONE A — Tour + Dates row */}
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingBottom: 'clamp(6px, 1.2vh, 10px)', borderBottom: '1px solid rgba(255,255,255,0.18)', marginBottom: 'clamp(8px, 1.6vh, 12px)' }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                          <span style={{ background: '#fff', borderRadius: 4, padding: '2px 7px', fontSize: 9, fontWeight: 900, color: '#000', letterSpacing: '0.1em', textTransform: 'uppercase' as const }}>
-                            {getTourDisplayName(tournament.tourSlug)}
-                          </span>
-                          <span style={{ fontSize: 11, fontWeight: 600, color: 'rgba(255,255,255,0.75)', letterSpacing: '0.08em', textTransform: 'uppercase' as const }}>
-                            Upcoming
-                          </span>
-                        </div>
-                        {tournament.startDate && tournament.endDate && (
-                          <div style={{ textAlign: 'right' as const }}>
-                            <div style={{ fontSize: 12, fontWeight: 700, color: '#fff' }}>
-                              {new Date(tournament.startDate + 'T12:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
-                              {' – '}
-                              {new Date(tournament.endDate + 'T12:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
-                            </div>
-                            <div style={{ fontSize: 10, fontWeight: 600, color: '#F7931E', marginTop: 1 }}>
-                              {getStartLabel(tournament.startDate)}
-                            </div>
-                          </div>
-                        )}
-                      </div>
-
-                      {/* ZONE B — Tournament name + venue (fluid by viewport height) */}
-                      <Link {...(() => { const t = tournamentRoute(tournament.id, { kind: 'overview' }); return { to: t.to, state: t.state }; })()} className="block active:opacity-70 transition-opacity">
-                        <h2 style={{
-                          fontSize: 'clamp(26px, 4.8vh, 40px)', fontWeight: 900, color: '#fff',
-                          letterSpacing: '-0.03em', lineHeight: 0.95, margin: 0, marginBottom: 'clamp(6px, 1.2vh, 10px)',
-                          display: '-webkit-box',
-                          WebkitLineClamp: 2,
-                          WebkitBoxOrient: 'vertical' as const,
-                          overflow: 'hidden',
-                        }}>
-                          {tournament.name}
-                        </h2>
-                      </Link>
-                      <button
-                        onClick={(e) => { e.stopPropagation(); navigate(`/tourhub/courses?q=${encodeURIComponent(tournament.venueName || '')}`); }}
-                        className="active:opacity-70 transition-opacity cursor-pointer"
-                        style={{ fontSize: 'clamp(13px, 1.8vh, 15px)', fontWeight: 600, color: '#fff', background: 'none', border: 'none', padding: 0, textAlign: 'left' }}
-                      >
-                        {tournament.venueName}{tournament.venueCity ? ` · ${tournament.venueCity}` : ''}
-                      </button>
-                    </div>
-                  </div>
-                </>
-              ) : null
+              </>
             )}
 
             {/* ─── State-specific content — each section uses Capsule spring easing ─── */}
             <AnimatePresence mode="popLayout">
 
-              {/* LIVE LAYOUT */}
+              {/* LIVE LAYOUT — EditorialLiveHero is the only render. No collapsed fork. */}
               {isLive && (
                 <motion.div
                   key="live-content"
@@ -498,199 +417,83 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
                   animate={{ height: 'auto', opacity: 1 }}
                   exit={{ height: 0, opacity: 0 }}
                   transition={{ duration: 0.22, ease: [0.19, 1, 0.22, 1] }}
-                  style={{ overflow: isExpanded ? 'visible' : 'hidden', flex: isExpanded ? 1 : undefined, minHeight: isExpanded ? 0 : undefined, display: isExpanded ? 'flex' : undefined, flexDirection: isExpanded ? 'column' as const : undefined }}
+                  style={{ overflow: 'visible', flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column' as const }}
                 >
-
-                  {/* Expanded: Full Leaderboard or Scorecard */}
-                  {isExpanded ? (
-                    <AnimatePresence mode="wait">
-                      {selectedPlayer ? (
-                        <motion.div
-                          key="scorecard"
-                          initial={{ opacity: 0, x: 60 }}
-                          animate={{ opacity: 1, x: 0 }}
-                          exit={{ opacity: 0, x: 60 }}
-                          transition={{ type: 'spring', damping: 28, stiffness: 300 }}
-                          style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column' }}
-                        >
-                          <PlayerScorecardCard
-                            player={selectedPlayer}
-                            tournamentId={tournament.id}
-                            tournamentName={tournament.name}
-                            courseName={tournament.venueName || ''}
-                            onBack={handleBackToLeaderboard}
-                            onClose={() => {
-                              setSelectedPlayer(null);
-                              onToggleExpand();
+                  <AnimatePresence mode="wait">
+                    {selectedPlayer ? (
+                      <motion.div
+                        key="scorecard"
+                        initial={{ opacity: 0, x: 60 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        exit={{ opacity: 0, x: 60 }}
+                        transition={{ type: 'spring', damping: 28, stiffness: 300 }}
+                        style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column' }}
+                      >
+                        <PlayerScorecardCard
+                          player={selectedPlayer}
+                          tournamentId={tournament.id}
+                          tournamentName={tournament.name}
+                          courseName={tournament.venueName || ''}
+                          onBack={handleBackToLeaderboard}
+                          onClose={handleBackToLeaderboard}
+                        />
+                      </motion.div>
+                    ) : (
+                      <motion.div
+                        key="leaderboard"
+                        initial={{ opacity: 1 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0, x: -40 }}
+                        transition={{ type: 'spring', damping: 28, stiffness: 300 }}
+                        style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column' }}
+                      >
+                        {isLoadingFull ? (
+                          <LiveHeroSkeleton />
+                        ) : isFullError ? (
+                          <ExpandedLeaderboardError onRetry={() => refetchFull()} />
+                        ) : fullLeaderboard.length === 0 ? (
+                          <ExpandedLeaderboardEmpty />
+                        ) : (
+                          <EditorialLiveHero
+                            tournament={{
+                              id: tournament.id,
+                              name: tournament.name,
+                              tourSlug: tournament.tourSlug,
+                              venueName: tournament.venueName,
+                              venueCity: tournament.venueCity,
+                              startDate: tournament.startDate,
+                            }}
+                            leaderboard={fullLeaderboard as any[]}
+                            currentRound={(() => {
+                              const first = (fullLeaderboard as any[])[0];
+                              if (!first) return 1;
+                              const last = [4, 3, 2, 1].find(n => first[`round_${n}`] !== null) ?? 0;
+                              return last === 0 ? 1 : Math.min(last + 1, 4);
+                            })()}
+                            onPlayerTap={(entry) => {
+                              const player = entry.player;
+                              if (!player) return;
+                              const fullName = player.full_name || `${player.first_name || ''} ${player.last_name || ''}`.trim();
+                              const tourCode = player.tour_codes?.[0] ?? tournament.tourSlug ?? 'pga';
+                              handleScorecardTap({
+                                id: player.id,
+                                srId: player.sr_id || '',
+                                name: fullName,
+                                firstName: player.first_name,
+                                lastName: player.last_name,
+                                photoUrl: getPlayerHeadshotUrl(fullName, tourCode, player.headshot_override) || undefined,
+                                countryCode: player.country || undefined,
+                                position: entry.position,
+                                totalScore: entry.score ?? 0,
+                                thru: entry.thru === 18 ? 'F' : `${entry.thru ?? '—'}`,
+                                currentRound: entry.thru === 18 ? Math.min((entry.last_completed_round ?? 0) + 1, 4) : 4,
+                              });
                             }}
                           />
-                        </motion.div>
-                      ) : (
-                        <motion.div
-                          key="leaderboard"
-                          initial={{ opacity: 1 }}
-                          animate={{ opacity: 1 }}
-                          exit={{ opacity: 0, x: -40 }}
-                          transition={{ type: 'spring', damping: 28, stiffness: 300 }}
-                          style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column' }}
-                          onTouchStart={handleExpandedTouch}
-                          onTouchMove={handleExpandedTouch}
-                          onTouchEnd={handleExpandedTouch}
-                        >
-                          {isLoadingFull ? (
-                            <LiveHeroSkeleton />
-                          ) : isFullError ? (
-                            <ExpandedLeaderboardError onRetry={() => refetchFull()} />
-                          ) : fullLeaderboard.length === 0 ? (
-                            <ExpandedLeaderboardEmpty />
-                          ) : (
-                            <EditorialLiveHero
-                              tournament={{
-                                id: tournament.id,
-                                name: tournament.name,
-                                tourSlug: tournament.tourSlug,
-                                venueName: tournament.venueName,
-                                venueCity: tournament.venueCity,
-                                startDate: tournament.startDate,
-                              }}
-                              leaderboard={fullLeaderboard as any[]}
-                              currentRound={(() => {
-                                const first = (fullLeaderboard as any[])[0];
-                                if (!first) return 1;
-                                const last = [4, 3, 2, 1].find(n => first[`round_${n}`] !== null) ?? 0;
-                                return last === 0 ? 1 : Math.min(last + 1, 4);
-                              })()}
-                              onPlayerTap={(entry) => {
-                                const player = entry.player;
-                                if (!player) return;
-                                const fullName = player.full_name || `${player.first_name || ''} ${player.last_name || ''}`.trim();
-                                const tourCode = player.tour_codes?.[0] ?? tournament.tourSlug ?? 'pga';
-                                handleScorecardTap({
-                                  id: player.id,
-                                  srId: player.sr_id || '',
-                                  name: fullName,
-                                  firstName: player.first_name,
-                                  lastName: player.last_name,
-                                  photoUrl: getPlayerHeadshotUrl(fullName, tourCode, player.headshot_override) || undefined,
-                                  countryCode: player.country || undefined,
-                                  position: entry.position,
-                                  totalScore: entry.score ?? 0,
-                                  thru: entry.thru === 18 ? 'F' : `${entry.thru ?? '—'}`,
-                                  currentRound: entry.thru === 18 ? Math.min((entry.last_completed_round ?? 0) + 1, 4) : 4,
-                                });
-                              }}
-                            />
-                          )}
-                        </motion.div>
-                      )}
-                    </AnimatePresence>
-                  ) : (
-                    <>
-                      {/* Mini Leaderboard */}
-                      <AnimatePresence mode="wait">
-                        {leadersLoading ? (
-                          <motion.div
-                            key="skeleton"
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            exit={{ opacity: 0 }}
-                            transition={{ duration: 0.15 }}
-                          >
-                            <div className="leaderboard-container mt-3">
-                              {[1, 2, 3, 4, 5].map((i) => (
-                                <div key={i} className="leaderboard-row flex items-center justify-between">
-                                  <div className="flex items-center gap-2">
-                                    <div className="w-5 h-3 bg-white/10 rounded animate-pulse" />
-                                    <div className="w-24 h-3 bg-white/10 rounded animate-pulse" />
-                                  </div>
-                                  <div className="w-8 h-3 bg-white/10 rounded animate-pulse" />
-                                </div>
-                              ))}
-                            </div>
-                          </motion.div>
-                        ) : leaders.length > 0 ? (
-                          <motion.div
-                            key="leaders"
-                            initial={{ opacity: 0, y: 8 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            exit={{ opacity: 0, y: -8 }}
-                            transition={{ duration: 0.22, ease: [0.19, 1, 0.22, 1] }}
-                            className="leaderboard-container"
-                          >
-                            {(() => {
-                              const rows = buildLiveLeaderboardRows(leaders, 4);
-                              let rowIndex = 0;
-                              return rows.map((row, rIdx) => {
-                                const isFirst = rIdx === 0;
-
-                                // Tied at #1 — show each individually with leader highlight
-                                if (row.isTied && isFirst) {
-                                  return row.players.slice(0, 2).map((player, i) => {
-                                    const idx = rowIndex++;
-                                    return (
-                                      <MiniLeaderboardRow
-                                        key={`row-${player.position}-${player.player.id}`}
-                                        leader={player}
-                                        isFirst={idx === 0}
-                                        index={idx}
-                                        isActive={isActive}
-                                        isLeader={true}
-                                        scoreFlash={scoreFlashes[player.player.id] || null}
-                                        positionDelta={positionDeltas[player.player.id] || 0}
-                                        tournamentTourSlug={tournament.tourSlug}
-                                      />
-                                    );
-                                  });
-                                }
-
-                                // Tied chasers — condensed row
-                                if (row.isTied && !isFirst) {
-                                  const idx = rowIndex++;
-                                  return <CondensedTieRow key={`tie-${row.position}`} row={row} index={idx} isActive={isActive} tournamentTourSlug={tournament.tourSlug} />;
-                                }
-
-                                // Single player row
-                                const idx = rowIndex++;
-                                return (
-                                  <MiniLeaderboardRow
-                                    key={`row-${row.players[0].position}-${row.players[0].player.id}`}
-                                    leader={row.players[0]}
-                                    isFirst={idx === 0}
-                                    index={idx}
-                                    isActive={isActive}
-                                    isLeader={row.players[0].position === 1}
-                                    scoreFlash={scoreFlashes[row.players[0].player.id] || null}
-                                    positionDelta={positionDeltas[row.players[0].player.id] || 0}
-                                    tournamentTourSlug={tournament.tourSlug}
-                                  />
-                                );
-                              });
-                            })()}
-                          </motion.div>
-                        ) : (
-                          <motion.div
-                            key="starting-soon"
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            exit={{ opacity: 0 }}
-                            transition={{ duration: 0.15 }}
-                            style={{ marginBottom: '4px' }}
-                          >
-                            <span style={{ fontSize: '14px', fontWeight: 600, color: 'rgba(255,255,255,0.7)' }}>
-                              Starting Soon
-                            </span>
-                          </motion.div>
                         )}
-                      </AnimatePresence>
-
-                      {!isExpanded && (
-                        <Link {...(() => { const t = tournamentRoute(tournament.id, { kind: 'overview' }); return { to: t.to, state: t.state }; })()} className="hero-text-cta">
-                          <span>See All</span>
-                          <ChevronRight className="w-4 h-4 cta-chevron" />
-                        </Link>
-                      )}
-                    </>
-                  )}
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
                 </motion.div>
               )}
 
