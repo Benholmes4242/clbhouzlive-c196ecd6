@@ -281,6 +281,11 @@ export async function fetchFriendsActivity(
   Object.values(scoresByConn).forEach((s: any) => {
     if (s.course?.name) courseNames.add(s.course.name);
   });
+  // Also include course names from friend match rows so non-Clbhouz friends
+  // (no joined score) still get a course thumbnail.
+  friends.forEach((f: any) => {
+    if (f.last_round_course_name) courseNames.add(f.last_round_course_name);
+  });
   const thumbsByName: Record<string, string | null> = {};
   if (courseNames.size > 0) {
     const { data: gcRows } = await supabase
