@@ -338,6 +338,7 @@ export const AchievementsStrip: React.FC<Props> = ({
 
   const earnedCount = earnedAchievements.length;
   const isLoading = sLoading || hLoading;
+  const [showAll, setShowAll] = useState(false);
 
   if (!isLoading && displayList.length === 0) return null;
 
