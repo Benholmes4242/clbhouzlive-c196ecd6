@@ -687,21 +687,7 @@ export function PlayerScorecardCard({
             />
 
 
-            {/* Stats — flat horizontal panel */}
-            {activeRoundData && activeRoundData.holesCompleted > 0 && (
-              <div style={{ padding: '0 16px' }}>
-                <StatsGrid
-                  stats={{
-                    eagles: activeRoundData.eagles,
-                    birdies: activeRoundData.birdies,
-                    pars: activeRoundData.pars,
-                    bogeys: activeRoundData.bogeys,
-                    doubleBogeys: activeRoundData.doubleBogeys,
-                  }}
-                />
 
-              </div>
-            )}
 
             {/* Front 9 */}
             <div style={{ marginTop: 4 }}>
