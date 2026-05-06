@@ -87,6 +87,16 @@ function formatUpdatedSuffix(rankingDate: string | null | undefined): string {
   return `UPDATED ${rankingDate.toUpperCase()}`;
 }
 
+function formatUpdatedSentence(rankingDate: string | null | undefined): string {
+  if (!rankingDate) return '';
+  const d = new Date(rankingDate + 'T00:00:00');
+  const diffDays = Math.floor((Date.now() - d.getTime()) / 86_400_000);
+  if (diffDays <= 0) return 'Updated today';
+  if (diffDays === 1) return 'Updated yesterday';
+  if (diffDays <= 7) return `Updated ${diffDays} days ago`;
+  return `Updated ${Math.floor(diffDays / 7)} weeks ago`;
+}
+
 /**
  * Tolerant weeks-at-#1 count — walks newest → oldest, missing weeks tolerated.
  */
