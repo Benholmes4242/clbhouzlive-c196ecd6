@@ -1131,7 +1131,9 @@ function DotsRail({
     <div
       style={{
         marginTop: 14,
-        padding: '0 16px',
+        paddingLeft: 16,
+        paddingRight: 16,
+        boxSizing: 'border-box',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
