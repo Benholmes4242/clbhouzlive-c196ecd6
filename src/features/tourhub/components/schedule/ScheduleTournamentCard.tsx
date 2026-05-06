@@ -12,6 +12,7 @@
  */
 
 import { useNavigate } from 'react-router-dom';
+import { MapPin } from 'lucide-react';
 import { tournamentRoute } from '../../routes';
 import type { TourTournament } from '../../hooks/useTourHubData';
 import type { SeasonTournament } from '../../hooks/useSeasonTournaments';
@@ -329,7 +330,7 @@ export function ScheduleTournamentCard({
               margin: 0,
             }}
           >
-            <span style={{ fontSize: 11, lineHeight: 1, flexShrink: 0 }}>📍</span>
+            <MapPin size={11} strokeWidth={2.2} style={{ opacity: 0.85, flexShrink: 0 }} />
             <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{venue}</span>
           </p>
         )}
