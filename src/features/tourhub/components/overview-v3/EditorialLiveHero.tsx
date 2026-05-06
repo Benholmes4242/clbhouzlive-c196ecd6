@@ -17,7 +17,7 @@ import { ChevronRight, MapPin, Trophy } from 'lucide-react';
 import { tournamentRoute } from '../../routes';
 import { HeroAtmosphere } from '../shared/HeroAtmosphere';
 import { Shimmer } from '../shared/Shimmer';
-import { AllToursTicker } from '../shared/AllToursTicker';
+
 import { useLeaderHoleScores } from '../../hooks/useLeaderHoleScores';
 import { getPlayerHeadshotUrl } from '@/utils/playerHeadshot';
 import { PlayerSilhouette } from '@/components/ui/PlayerSilhouette';
@@ -563,13 +563,6 @@ export function EditorialLiveHero({
 
   const top5 = leaderboard.slice(0, 5);
 
-  // Tour ticker — reuse navigate so tapping switches the focused tournament.
-  const handleTickerSelect = (id: string) => {
-    if (id === tournament.id) return;
-    const t = tournamentRoute(id, { kind: 'overview' });
-    navigate(t.to, { state: t.state });
-  };
-
   // Inject pulse keyframes once per mount — scoped via a simple <style> tag.
   useEffect(() => {
     const id = 'hero-pulse-keyframes';
@@ -753,11 +746,6 @@ export function EditorialLiveHero({
           <ChevronRight size={14} />
         </button>
 
-        {/* 7. All Tours ticker --------------------------------------------- */}
-        <AllToursTicker
-          activeTournamentId={tournament.id}
-          onSelect={handleTickerSelect}
-        />
       </div>
     </HeroAtmosphere>
   );
