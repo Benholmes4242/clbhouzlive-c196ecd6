@@ -475,14 +475,13 @@ export const WhereYouStandSection: React.FC<Props> = ({ userId }) => {
         entries.forEach((e) => {
           if (e.isIntersecting && !fired.current) {
             fired.current = true;
+            const d: any = data;
             analyticsEvents.track('where_you_stand_viewed', {
               user_id: userId,
-              available: data.available,
-              reason: data.available ? null : data.reason,
-              percentile_top: data.available ? data.percentile_top : null,
-              cohort_size: data.available
-                ? data.cohort_size
-                : data.cohort_size ?? null,
+              available: d.available,
+              reason: d.available ? null : d.reason,
+              percentile_top: d.available ? d.percentile_top : null,
+              cohort_size: d.cohort_size ?? null,
             });
           }
         });
