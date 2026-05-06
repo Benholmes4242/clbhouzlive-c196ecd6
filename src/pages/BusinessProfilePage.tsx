@@ -566,13 +566,15 @@ const BusinessProfilePage: React.FC = () => {
 
           <div className="w-px h-6 self-center" style={{ background: 'rgba(15,23,42,0.08)' }} />
 
-          {/* Following — TODO: wire up business following count */}
-          <div
-            className="flex items-center gap-1.5 min-h-[44px] pl-6 cursor-default"
+          {/* Following — opens combined list defaulting to Following tab */}
+          <button
+            type="button"
+            onClick={() => navigate(`/business/${business.slug || business.id}/followers?tab=following`)}
+            className="flex items-center gap-1.5 min-h-[44px] cursor-pointer active:opacity-70 transition-opacity pl-6"
           >
             <span className="text-sm text-muted-foreground">Following</span>
-            <span className="text-base font-semibold text-foreground">0</span>
-          </div>
+            <span className="text-base font-semibold text-foreground">{followingCount}</span>
+          </button>
         </div>
       </div>
 
