@@ -677,82 +677,81 @@ export function PlayerScorecardCard({
             {/* Cross-round progression */}
             <TournamentProgressionPanel rounds={roundScores} isCompleted={isCompleted} />
 
-            {/* Round tabs — pill buttons */}
-            <RoundTabs
-              rounds={scorecard.rounds}
-              activeRound={activeRound}
-              currentRound={currentRound}
-              onSelect={setActiveRound}
-              roundScores={roundScores}
-            />
-
-
-
-
-            {/* Front 9 */}
-            <div style={{ marginTop: 4 }}>
-              <NineHoleRow
-                label="Front 9"
-                holes={activeRoundData?.holes.filter(h => h.holeNumber <= 9) || []}
-                startHole={1}
-                completedHoles={completedHoles}
-                defaultPars={defaultPars}
+            <div style={{ zoom: 0.9 }}>
+              {/* Round tabs — pill buttons */}
+              <RoundTabs
+                rounds={scorecard.rounds}
+                activeRound={activeRound}
+                currentRound={currentRound}
+                onSelect={setActiveRound}
+                roundScores={roundScores}
               />
-            </div>
 
-            {/* Back 9 */}
-            <div style={{ marginTop: 12 }}>
-              <NineHoleRow
-                label="Back 9"
-                holes={activeRoundData?.holes.filter(h => h.holeNumber > 9) || []}
-                startHole={10}
-                completedHoles={completedHoles}
-                defaultPars={defaultPars}
-              />
-            </div>
+              {/* Front 9 */}
+              <div style={{ marginTop: 4 }}>
+                <NineHoleRow
+                  label="Front 9"
+                  holes={activeRoundData?.holes.filter(h => h.holeNumber <= 9) || []}
+                  startHole={1}
+                  completedHoles={completedHoles}
+                  defaultPars={defaultPars}
+                />
+              </div>
 
-            {/* Total row */}
-            {activeRoundData && activeRoundData.holesCompleted > 0 && (
-              <div
-                style={{
-                  display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-                  padding: '14px 16px 18px',
-                  marginTop: 10,
-                  borderTop: `1px solid ${hairlineDark}`,
-                }}
-              >
-                <span
+              {/* Back 9 */}
+              <div style={{ marginTop: 12 }}>
+                <NineHoleRow
+                  label="Back 9"
+                  holes={activeRoundData?.holes.filter(h => h.holeNumber > 9) || []}
+                  startHole={10}
+                  completedHoles={completedHoles}
+                  defaultPars={defaultPars}
+                />
+              </div>
+
+              {/* Total row */}
+              {activeRoundData && activeRoundData.holesCompleted > 0 && (
+                <div
                   style={{
-                    fontSize: 9, fontWeight: 800, color: inkFaint,
-                    textTransform: 'uppercase', letterSpacing: '0.14em',
+                    display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                    padding: '14px 16px 18px',
+                    marginTop: 10,
+                    borderTop: `1px solid ${hairlineDark}`,
                   }}
                 >
-                  Total · {activeRoundData.holesCompleted} holes
-                </span>
-                <div style={{ display: 'flex', alignItems: 'baseline', gap: 12 }}>
                   <span
                     style={{
-                      fontSize: 14, fontWeight: 600, color: inkSoft,
-                      fontVariantNumeric: 'tabular-nums',
+                      fontSize: 9, fontWeight: 800, color: inkFaint,
+                      textTransform: 'uppercase', letterSpacing: '0.14em',
                     }}
                   >
-                    {activeRoundData.totalStrokes}
+                    Total · {activeRoundData.holesCompleted} holes
                   </span>
-                  <span
-                    style={{
-                      fontSize: 24, fontWeight: 800,
-                      color: activeRoundData.totalToPar < 0 ? '#ffffff'
-                           : activeRoundData.totalToPar > 0 ? danger
-                           : inkFaint,
-                      fontVariantNumeric: 'tabular-nums',
-                      letterSpacing: '-0.02em',
-                    }}
-                  >
-                    {fmtScore(activeRoundData.totalToPar)}
-                  </span>
+                  <div style={{ display: 'flex', alignItems: 'baseline', gap: 12 }}>
+                    <span
+                      style={{
+                        fontSize: 14, fontWeight: 600, color: inkSoft,
+                        fontVariantNumeric: 'tabular-nums',
+                      }}
+                    >
+                      {activeRoundData.totalStrokes}
+                    </span>
+                    <span
+                      style={{
+                        fontSize: 24, fontWeight: 800,
+                        color: activeRoundData.totalToPar < 0 ? '#ffffff'
+                             : activeRoundData.totalToPar > 0 ? danger
+                             : inkFaint,
+                        fontVariantNumeric: 'tabular-nums',
+                        letterSpacing: '-0.02em',
+                      }}
+                    >
+                      {fmtScore(activeRoundData.totalToPar)}
+                    </span>
+                  </div>
                 </div>
-              </div>
-            )}
+              )}
+            </div>
           </div>
         ) : (
           /* Empty state */
