@@ -269,15 +269,26 @@ function HeadlineCard({ tournament }: { tournament: SeasonTournament }) {
                   color: 'rgba(255,255,255,0.55)',
                   flex: 1, minWidth: 0,
                 }}>
-                  <span style={{
-                    color: accent, fontWeight: 800,
-                    letterSpacing: '0.12em', textTransform: 'uppercase',
-                    flexShrink: 0,
-                  }}>Defending</span>
-                  <span style={{
-                    color: '#fff', fontWeight: 600,
-                    overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
-                  }}>{tournament.defendingChampion}</span>
+                  {(() => {
+                    const startYear = tournament.startDate ? new Date(tournament.startDate).getUTCFullYear() : null;
+                    const prevYear = startYear ? startYear - 1 : null;
+                    return (
+                      <>
+                        {prevYear && (
+                          <span style={{
+                            color: accent, fontWeight: 800,
+                            letterSpacing: '0.12em',
+                            flexShrink: 0,
+                            fontVariantNumeric: 'tabular-nums',
+                          }}>{prevYear}</span>
+                        )}
+                        <span style={{
+                          color: '#fff', fontWeight: 600,
+                          overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+                        }}>{tournament.defendingChampion}</span>
+                      </>
+                    );
+                  })()}
                 </div>
               )}
               {hasStats && (
