@@ -77,6 +77,7 @@ export function SettingsPageV2() {
     !!(profile as any)?.show_handicap,
     (profile as any)?.show_in_handicap_leaderboards ?? true,
     (profile as any)?.show_in_exploration_leaderboards ?? true,
+    (profile as any)?.peer_comparison_visible ?? true,
   );
 
   const deleteAccount = useDeleteAccount(user?.id);
