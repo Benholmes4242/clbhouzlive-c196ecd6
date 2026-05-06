@@ -9,6 +9,8 @@ import LastRoundCard from '../sections/LastRoundCard';
 import RoundsThatCountCard from '../sections/RoundsThatCountCard';
 import EchoInsightsCard from '../sections/EchoInsightsCard';
 import StreaksSection from '../sections/StreaksSection';
+import WhereYouStandSection from '../sections/WhereYouStandSection';
+import { useUserProfile } from '@/hooks/useUserProfile';
 
 interface Props {
   connection: WhsConnection;
