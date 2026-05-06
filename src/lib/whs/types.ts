@@ -388,3 +388,44 @@ export interface FriendLeaderboardEntry {
   /** Current minus 30d_ago. Negative = improvement. NULL if either side is NULL. */
   handicap_30d_delta: number | null;
 }
+
+// ─── Phase 2B: Where You Stand peer comparison ────────────────────────────
+
+export type HandicapBucket =
+  | 'sub_zero' | '0_4' | '5_9' | '10_14' | '15_19' | '20_24' | 'over_25';
+
+export interface HandicapPercentileBucket {
+  bucket: HandicapBucket;
+  /** Percentage of the cohort in this bucket. Decimal with 1 fractional digit. */
+  pct: number;
+  /** True for the bucket that contains the calling user's handicap. */
+  is_user_bucket: boolean;
+}
+
+export type HandicapPercentileUnavailableReason =
+  | 'unauthenticated'
+  | 'missing_country'
+  | 'missing_gender'
+  | 'missing_handicap'
+  | 'cohort_too_small';
+
+export type HandicapPercentileResult =
+  | {
+      available: false;
+      reason: HandicapPercentileUnavailableReason;
+      /** Only present when reason === 'cohort_too_small'. */
+      cohort_size?: number;
+    }
+  | {
+      available: true;
+      /** Top X% — rounded to nearest 5 (5, 10, 15, …, 95). */
+      percentile_top: number;
+      user_bucket: HandicapBucket;
+      user_handicap: number;
+      /** Country may be 'United Kingdom' (UK home nations are collapsed). */
+      country: string;
+      gender: 'male' | 'female';
+      cohort_size: number;
+      buckets: HandicapPercentileBucket[];
+    };
+
