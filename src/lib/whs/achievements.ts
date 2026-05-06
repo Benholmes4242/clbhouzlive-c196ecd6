@@ -741,21 +741,21 @@ export function computeAchievements(ctx: AchievementContext): Achievement[] {
       let progressLabel: string;
 
       if (bestRank == null) {
-        progressLabel = 'Rate a Top 100 course';
+        progressLabel = 'Top — / 100';
       } else if (bestRank <= 10) {
         tier = 3;
         currentLabel = 'Top 10';
-        progressLabel = `Best: #${bestRank} — max tier`;
+        progressLabel = `Top 10 / 10`;
       } else if (bestRank <= 50) {
         tier = 2;
         currentLabel = 'Top 50';
-        progressLabel = `Best: #${bestRank} · need top 10`;
+        progressLabel = `Top ${bestRank} / 10`;
       } else if (bestRank <= 100) {
         tier = 1;
         currentLabel = 'Top 100';
-        progressLabel = `Best: #${bestRank} · need top 50`;
+        progressLabel = `Top ${bestRank} / 50`;
       } else {
-        progressLabel = `Best: #${bestRank} · need top 100`;
+        progressLabel = `Top ${bestRank} / 100`;
       }
 
       const earned = tier > 0;
