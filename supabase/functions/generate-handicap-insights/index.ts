@@ -275,13 +275,21 @@ Deno.serve(async (req) => {
       return json({ error: "Invalid AI output" }, 500);
     }
 
-    const candidateIds = new Set(candidates.map((c: any) => c.id));
+    const candidateIds = new Set(candidatesWithExpected.map((c: any) => c.id));
+    const candidateExpectedById = new Map<string, number | null>(
+      candidatesWithExpected.map((c: any) => [c.id, c.expected_differential ?? null]),
+    );
     const validate = (arr: any[]) =>
       Array.isArray(arr)
         ? arr
             .filter((x) => x && typeof x.id === "string" && candidateIds.has(x.id))
             .slice(0, 3)
-            .map((x) => ({ id: x.id, rationale: String(x.rationale ?? "").slice(0, 240) }))
+            .map((x) => ({
+              id: x.id,
+              rationale: String(x.rationale ?? "").slice(0, 240),
+              // Always use precomputed value — never trust LLM numerics.
+              expected_differential: candidateExpectedById.get(x.id) ?? null,
+            }))
         : [];
 
     const suited = validate(parsed.suited_courses);
@@ -305,7 +313,9 @@ Deno.serve(async (req) => {
       hyMap = new Map((hydrated ?? []).map((c: any) => [c.id, c]));
     }
 
-    const enrich = (arr: { id: string; rationale: string }[]) =>
+    const enrich = (
+      arr: { id: string; rationale: string; expected_differential: number | null }[],
+    ) =>
       arr.map((r) => {
         const c: any = hyMap.get(r.id) || {};
         return {
@@ -313,6 +323,7 @@ Deno.serve(async (req) => {
           name: c.name ?? "",
           region: c.region ?? c.country ?? "",
           rationale: r.rationale,
+          expected_differential: r.expected_differential,
         };
       });
 
