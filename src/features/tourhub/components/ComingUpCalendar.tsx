@@ -8,10 +8,11 @@
 
 import { useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ChevronRight, Star, MapPin, Calendar } from 'lucide-react';
+import { ChevronRight, Star, MapPin, Calendar, Clock } from 'lucide-react';
 import { useUpcomingTournaments } from '../hooks/useUpcomingTournaments';
 import { useVenueImage } from '../hooks/useVenueImage';
 import { SectionErrorState } from './SectionErrorState';
+import { ScheduleTournamentCard } from './schedule/ScheduleTournamentCard';
 import { Shimmer } from './shared/Shimmer';
 import { getContextLabel, TOUR_NAME_TO_SLUG } from '../utils/tournamentClassification';
 import { TOUR_MAP, type TourCode } from '../constants/tourMap';
