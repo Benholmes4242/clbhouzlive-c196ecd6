@@ -470,13 +470,12 @@ const HeroHandicapCard: React.FC<Props> = ({ connection }) => {
       </div>
 
       {/* Sparkline strip */}
-      <div style={{ padding: '0 4px', marginTop: 8 }}>
+      <div style={{ padding: '0 4px', marginTop: 24 }}>
         <svg
           ref={svgRef}
           width="100%"
-          height={H}
+          height="auto"
           viewBox={`0 0 ${W} ${H}`}
-          preserveAspectRatio="none"
           style={{ display: 'block', touchAction: 'none', cursor: 'crosshair' }}
           onPointerMove={handlePointerMove}
           onPointerDown={handlePointerDown}
@@ -550,7 +549,7 @@ const HeroHandicapCard: React.FC<Props> = ({ connection }) => {
               />
               <text
                 x={bestPoint.coord.x}
-                y={bestPoint.coord.y - 8}
+                y={bestPoint.coord.y < 16 ? bestPoint.coord.y + 16 : bestPoint.coord.y - 8}
                 fontSize={9}
                 fontWeight={700}
                 fill={GREEN}
@@ -573,7 +572,7 @@ const HeroHandicapCard: React.FC<Props> = ({ connection }) => {
               />
               <text
                 x={worstPoint.coord.x}
-                y={worstPoint.coord.y - 8}
+                y={worstPoint.coord.y < 16 ? worstPoint.coord.y + 16 : worstPoint.coord.y - 8}
                 fontSize={9}
                 fontWeight={700}
                 fill={RED}
