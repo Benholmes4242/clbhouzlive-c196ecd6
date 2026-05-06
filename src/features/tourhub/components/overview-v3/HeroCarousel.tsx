@@ -413,11 +413,11 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
               {isLive && (
                 <motion.div
                   key="live-content"
-                  initial={{ height: 0, opacity: 0 }}
-                  animate={{ height: 'auto', opacity: 1 }}
-                  exit={{ height: 0, opacity: 0 }}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
                   transition={{ duration: 0.22, ease: [0.19, 1, 0.22, 1] }}
-                  style={{ overflow: 'visible', flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column' as const }}
+                  style={{ overflow: 'hidden', flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column' as const }}
                 >
                   <AnimatePresence mode="wait">
                     {selectedPlayer ? (
