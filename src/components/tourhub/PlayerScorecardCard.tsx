@@ -577,7 +577,7 @@ export function PlayerScorecardCard({
                   style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center 18%' }}
                 />
               ) : (
-                <span style={{ fontSize: 22, fontWeight: 800, color: inkFaint }}>
+                <span style={{ fontSize: 18, fontWeight: 800, color: inkFaint }}>
                   {player.firstName?.[0]}{player.lastName?.[0]}
                 </span>
               )}
