@@ -370,10 +370,11 @@ export const RoundsThatCountCard: React.FC<Props> = ({ connectionId, currentHand
           {/* Date labels */}
           <div style={{
             display: 'flex', marginTop: 6, marginLeft: Y_AXIS_W,
+            paddingBottom: 14,
           }}>
             {enriched.rounds.map((r, i) => {
               const d = new Date(r.play_date);
-              const isSel = r.id === selectedRound.id;
+              const isLatest = i === enriched.rounds.length - 1;
               return (
                 <button
                   key={r.id}
@@ -382,20 +383,23 @@ export const RoundsThatCountCard: React.FC<Props> = ({ connectionId, currentHand
                     flex: 1, textAlign: 'center',
                     background: 'transparent', border: 'none',
                     padding: '4px 0', cursor: 'pointer',
+                    transform: 'rotate(-30deg)',
+                    transformOrigin: 'top center',
                   }}
                 >
                   <div style={{
-                    fontSize: 9, fontWeight: 700,
-                    color: isSel ? INK : INK_55,
-                    letterSpacing: 0,
+                    fontSize: 9.5, fontWeight: 600,
+                    color: isLatest ? INK : INK_40,
+                    letterSpacing: '0.04em',
                   }}>
                     {WEEKDAY[d.getDay()]}
                   </div>
                   <div style={{
-                    fontSize: 11, fontWeight: 700,
-                    color: isSel ? INK : INK_40,
+                    fontSize: 9.5, fontWeight: isLatest ? 700 : 600,
+                    color: isLatest ? INK : INK_40,
                     fontFamily: FONT_DISPLAY,
                     fontVariantNumeric: 'tabular-nums',
+                    letterSpacing: '0.04em',
                     marginTop: 1,
                   }}>
                     {d.getDate()}
