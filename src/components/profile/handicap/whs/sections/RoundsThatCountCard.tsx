@@ -598,39 +598,39 @@ const SafeState: React.FC<{ cutTarget: number; settleAt: number }> = ({
     </div>
 
     <div style={{
-      background: 'rgba(15,23,42,0.04)',
-      border: '1px solid rgba(15,23,42,0.10)',
-      borderRadius: 10,
-      padding: 12,
+      display: 'flex',
+      background: '#fff',
+      border: `0.5px solid ${INK_10}`,
+      borderRadius: 12,
+      overflow: 'hidden',
     }}>
-      <div style={{
-        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-        marginBottom: 4,
-      }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-          <Minus size={13} strokeWidth={2.4} color={INK_55} />
+      <div style={{ width: 3, background: INK_10, flexShrink: 0 }} />
+      <div style={{ flex: 1, padding: '14px 14px 14px 12px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <Minus size={16} strokeWidth={2.2} color={INK_55} />
+            <span style={{
+              fontSize: 11, fontWeight: 800, color: INK_55,
+              letterSpacing: '0.14em', textTransform: 'uppercase',
+            }}>OTHERWISE</span>
+          </div>
           <span style={{
-            fontSize: 10, fontWeight: 800, color: INK_55, letterSpacing: '0.14em',
+            fontSize: 22, fontWeight: 700, color: INK,
+            letterSpacing: '-0.02em', fontVariantNumeric: 'tabular-nums',
+            fontFamily: FONT_DISPLAY,
           }}>
-            OTHERWISE
+            {fmtDiff(settleAt, { plus: true })}
           </span>
         </div>
-        <div style={{
-          fontSize: 22, fontWeight: 700, color: INK,
-          fontVariantNumeric: 'tabular-nums', lineHeight: 1,
-          fontFamily: FONT_DISPLAY,
-        }}>
-          {fmtDiff(settleAt, { plus: true })}
+        <div style={{ fontSize: 12.5, color: INK_55, marginTop: 6, lineHeight: 1.4 }}>
+          Anything else and your handicap settles at{' '}
+          <strong style={{
+            fontWeight: 700, color: INK, fontVariantNumeric: 'tabular-nums',
+          }}>
+            {fmtDiff(settleAt, { plus: true })}
+          </strong>{' '}
+          — no risk of going up this round.
         </div>
-      </div>
-      <div style={{ fontSize: 11, color: INK_55, lineHeight: 1.4 }}>
-        Anything else and your handicap settles at{' '}
-        <strong style={{
-          fontWeight: 700, color: INK, fontVariantNumeric: 'tabular-nums',
-        }}>
-          {fmtDiff(settleAt, { plus: true })}
-        </strong>{' '}
-        — no risk of going up this round.
       </div>
     </div>
   </>
@@ -638,33 +638,33 @@ const SafeState: React.FC<{ cutTarget: number; settleAt: number }> = ({
 
 const CutTargetCard: React.FC<{ cutTarget: number }> = ({ cutTarget }) => (
   <div style={{
-    background: 'rgba(5,150,105,0.05)',
-    border: '1px solid rgba(5,150,105,0.18)',
-    borderRadius: 10,
-    padding: 12,
+    display: 'flex',
+    background: '#fff',
+    border: `0.5px solid rgba(5,150,105,0.14)`,
+    borderRadius: 12,
+    overflow: 'hidden',
   }}>
-    <div style={{
-      display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-      marginBottom: 4,
-    }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-        <TrendingDown size={13} strokeWidth={2.4} color={GREEN} />
+    <div style={{ width: 3, background: GREEN, flexShrink: 0 }} />
+    <div style={{ flex: 1, padding: '14px 14px 14px 12px' }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <TrendingDown size={16} strokeWidth={2.2} color={GREEN} />
+          <span style={{
+            fontSize: 11, fontWeight: 800, color: GREEN,
+            letterSpacing: '0.14em', textTransform: 'uppercase',
+          }}>FOR A CUT</span>
+        </div>
         <span style={{
-          fontSize: 10, fontWeight: 800, color: GREEN, letterSpacing: '0.14em',
+          fontSize: 22, fontWeight: 700, color: GREEN,
+          letterSpacing: '-0.02em', fontVariantNumeric: 'tabular-nums',
+          fontFamily: FONT_DISPLAY,
         }}>
-          FOR A CUT
+          {fmtDiff(cutTarget, { plus: true })}
         </span>
       </div>
-      <div style={{
-        fontSize: 22, fontWeight: 700, color: GREEN,
-        fontVariantNumeric: 'tabular-nums', lineHeight: 1,
-        fontFamily: FONT_DISPLAY,
-      }}>
-        {fmtDiff(cutTarget, { plus: true })}
+      <div style={{ fontSize: 12.5, color: INK_55, marginTop: 6, lineHeight: 1.4 }}>
+        Beat this differential and your handicap drops.
       </div>
-    </div>
-    <div style={{ fontSize: 11, color: INK_55, lineHeight: 1.4 }}>
-      Beat this differential and your handicap drops.
     </div>
   </div>
 );
