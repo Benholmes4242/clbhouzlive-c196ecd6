@@ -212,7 +212,7 @@ function LeaderHero({
       <div style={{ position: 'relative', flexShrink: 0 }}>
         <div
           style={{
-            width: 86, height: 86, borderRadius: '50%',
+            width: 50, height: 50, borderRadius: '50%',
             border: `2px solid ${greenLive}`,
             background: 'rgba(0,0,0,0.3)',
             overflow: 'hidden',
