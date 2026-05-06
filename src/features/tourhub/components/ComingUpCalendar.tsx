@@ -148,7 +148,7 @@ function HeadlineCard({ tournament }: { tournament: SeasonTournament }) {
     <button
       onClick={() => navigate(`/tourhub/tournament/${tournament.id}`)}
       style={{
-        display: 'block', width: '100%', margin: '0 0 12px',
+        display: 'block', width: 'calc(100% - 32px)', margin: '0 16px 12px',
         padding: 0, background: INK, borderRadius: '0 0 16px 16px', overflow: 'hidden',
         border: 'none',
         outline: 'none',
