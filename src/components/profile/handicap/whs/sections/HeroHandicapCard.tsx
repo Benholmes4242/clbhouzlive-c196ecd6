@@ -323,6 +323,73 @@ const HeroHandicapCard: React.FC<Props> = ({ connection }) => {
     return <span style={{ color: INK_40 }}>Steady form · last 5</span>;
   })();
 
+  // ── Status word (driven by 8-round form direction) ───────────────────────
+  const statusWord =
+    fallbackForm.direction === 'negative' && Math.abs(fallbackForm.formStrokes) > 0.5 ? 'EXCELLENT FORM'
+    : fallbackForm.direction === 'negative' ? 'TRENDING DOWN'
+    : fallbackForm.direction === 'positive' && Math.abs(fallbackForm.formStrokes) > 0.5 ? 'DRIFTING UP'
+    : fallbackForm.direction === 'positive' ? 'STEADY'
+    : 'STEADY';
+  const statusColor =
+    fallbackForm.direction === 'negative' ? GREEN
+    : fallbackForm.direction === 'positive' && Math.abs(fallbackForm.formStrokes) > 0.5 ? '#9F1239'
+    : INK_55;
+
+  // ── Combined delta inline ────────────────────────────────────────────────
+  const deltaInline = (() => {
+    const d = trend?.delta;
+    if (d == null || Math.abs(d) < 0.05) {
+      return <span style={{ color: INK_55, fontWeight: 600 }}>Steady</span>;
+    }
+    const isDown = d < 0;
+    return (
+      <span style={{
+        color: isDown ? GREEN : RED, fontWeight: 600,
+        display: 'inline-flex', alignItems: 'center', gap: 3,
+      }}>
+        {isDown ? <ArrowDown size={13} strokeWidth={2.5} /> : <ArrowUp size={13} strokeWidth={2.5} />}
+        <span style={{ fontVariantNumeric: 'tabular-nums' }}>{Math.abs(d).toFixed(1)}</span>
+      </span>
+    );
+  })();
+
+  // ── 6-point sparkline from history points ────────────────────────────────
+  const sparkPolyline = (() => {
+    if (points.length < 2) return null;
+    let samples: HandicapPoint[];
+    if (points.length <= 6) {
+      samples = points;
+    } else {
+      const out: HandicapPoint[] = [];
+      const n = 6;
+      for (let i = 0; i < n; i++) {
+        const idx = Math.round((i / (n - 1)) * (points.length - 1));
+        out.push(points[idx]);
+      }
+      samples = out;
+    }
+    const values = samples.map(p => p.handicap_index);
+    const min = Math.min(...values);
+    const max = Math.max(...values);
+    const range = (max - min) || 1;
+    const headroom = range * 0.08;
+    const yMin = min - headroom;
+    const yMax = max + headroom;
+    const yRange = yMax - yMin || 1;
+    const w = 48;
+    const h = 14;
+    const coordsLocal = samples.map((p, i) => {
+      const x = (i / (samples.length - 1)) * w;
+      const y = ((yMax - p.handicap_index) / yRange) * h;
+      return { x, y };
+    });
+    return {
+      points: coordsLocal.map(c => `${c.x.toFixed(2)},${c.y.toFixed(2)}`).join(' '),
+      lastX: coordsLocal[coordsLocal.length - 1].x,
+      lastY: coordsLocal[coordsLocal.length - 1].y,
+    };
+  })();
+
   return (
     <section style={{ padding: '24px 12px 20px', marginBottom: 24 }}>
       {/* Eyebrow row */}
