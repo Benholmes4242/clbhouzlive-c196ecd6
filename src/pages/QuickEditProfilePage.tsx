@@ -3,7 +3,7 @@
  * Reuses wizard step components but renders all sections stacked.
  * No wizard chrome, no slide animation, sticky save bar at the bottom.
  */
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
 import { ChevronLeft, Loader2 } from 'lucide-react';
