@@ -100,6 +100,7 @@ interface TournamentMetaInfo {
 interface TournamentMetaInfoExt extends TournamentMetaInfo {
   address: string;
   country: string;
+  cityCountry: string;
 }
 
 function stripLeadingThe(name: string): string {
@@ -107,18 +108,22 @@ function stripLeadingThe(name: string): string {
 }
 
 function buildTournamentMeta(t: AIPredictionData['tournament'] | undefined | null): TournamentMetaInfoExt {
-  if (!t) return { name: '—', course: '—', location: '', address: '', country: '' };
+  if (!t) return { name: '—', course: '—', location: '', address: '', country: '', cityCountry: '' };
   const addrParts: string[] = [];
   if (t.venueCity) addrParts.push(t.venueCity);
   if (t.venueState) addrParts.push(t.venueState);
   const locParts = [...addrParts];
   if (!locParts.length && t.venueCountry) locParts.push(t.venueCountry);
+  const cityCountryParts: string[] = [];
+  if (t.venueCity) cityCountryParts.push(t.venueCity);
+  if (t.venueCountry) cityCountryParts.push(t.venueCountry);
   return {
     name: stripLeadingThe(t.name || '—'),
     course: t.venueName || '—',
     location: locParts.join(', '),
     address: addrParts.join(', '),
     country: t.venueCountry || '',
+    cityCountry: cityCountryParts.join(', '),
   };
 }
 
