@@ -13,6 +13,7 @@ import { useUpcomingTournaments } from '../hooks/useUpcomingTournaments';
 import { useVenueImage } from '../hooks/useVenueImage';
 import { SectionErrorState } from './SectionErrorState';
 import { ScheduleTournamentCard } from './schedule/ScheduleTournamentCard';
+import { formatPurse } from '@/features/tourhub/components/shared/TourHeroHelpers';
 import { Shimmer } from './shared/Shimmer';
 import { getContextLabel, TOUR_NAME_TO_SLUG } from '../utils/tournamentClassification';
 import { TOUR_MAP, type TourCode } from '../constants/tourMap';
