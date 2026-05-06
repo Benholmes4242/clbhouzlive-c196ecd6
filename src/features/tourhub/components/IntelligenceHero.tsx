@@ -1224,12 +1224,17 @@ function Carousel({
           overflowX: 'auto',
           scrollSnapType: 'x mandatory',
           gap: 12,
-          padding: '0 16px 4px 50px',
+          paddingBottom: 4,
           WebkitOverflowScrolling: 'touch',
           scrollbarWidth: 'none',
         }}
       >
+        {/* Leading spacer — container padding-left is unreliable on horizontally
+            scrolling flex containers with snap. Use a spacer flex child instead. */}
+        <div aria-hidden style={{ flex: '0 0 16px', width: 16, alignSelf: 'stretch' }} />
         {children}
+        {/* Trailing spacer — same reason for right gutter. */}
+        <div aria-hidden style={{ flex: '0 0 16px', width: 16, alignSelf: 'stretch' }} />
       </div>
       <DotsRail idx={idx} stats={stats} hasWinner={hasWinner} />
     </>
