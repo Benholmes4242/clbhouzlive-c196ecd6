@@ -88,7 +88,7 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
   const isTop100Route = isTop100HubPage || isTop100SubPage;
   
   // Routes that should show back arrow instead of logo
-  const isBackArrowRoute = isDiscoverSubPage || isTop100Route || isEditProfileRoute || isFriendsActivityRoute || isAchievementsRoute || isMessagesRoute || isHandicapRoute;
+  const isBackArrowRoute = isDiscoverSubPage || isTop100Route || isEditProfileRoute || isFriendsActivityRoute || isAchievementsRoute || isMessagesRoute || isHandicapRoute || isWatchSubpageRoute;
   
   // Search overlay always uses light mode app-wide
   const useLightTheme = true;
