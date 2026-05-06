@@ -414,19 +414,20 @@ export const RoundsThatCountCard: React.FC<Props> = ({ connectionId, currentHand
         <div style={{
           display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)',
           borderTop: `0.5px solid ${INK_10}`,
-          marginTop: 6,
+          margin: '0 -14px',
         }}>
           <StatCell
-            label="BEST" value={enriched.minDiff} color={GREEN}
+            label="BEST" value={enriched.minDiff} dotColor={GREEN} valueColor={GREEN}
             active={selectedRound.id === bestRound.id}
             onClick={() => setSelectedId(bestRound.id)}
+            withRightBorder
           />
           <StatCell
-            label="AVG" value={enriched.avgDiff} color={INK_40}
-            disabled
+            label="AVG" value={enriched.avgDiff} dotColor={INK_40} valueColor={INK}
+            disabled withRightBorder
           />
           <StatCell
-            label="WORST" value={enriched.maxDiff} color={RED}
+            label="WORST" value={enriched.maxDiff} dotColor={RED} valueColor={RED}
             active={selectedRound.id === worstRound.id}
             onClick={() => setSelectedId(worstRound.id)}
           />
