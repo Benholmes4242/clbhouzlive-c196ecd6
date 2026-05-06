@@ -13,7 +13,7 @@
 
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate, Navigate, useSearchParams, useParams } from 'react-router-dom';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { ChevronRight } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { PageRoot } from '@/components/layout/PageRoot';
@@ -211,23 +211,6 @@ const HandicapPageHeader: React.FC<HeaderProps> = ({
           transition: 'padding-top 200ms ease',
         }}
       >
-      {/* Row 1 — top bar */}
-      <div className="flex items-center px-4" style={{ height: 44 }}>
-        <button
-          onClick={() => navigate(-1)}
-          aria-label="Back"
-          style={{
-            width: 36, height: 36, borderRadius: '50%',
-            background: '#fff',
-            border: `0.5px solid ${BORDER}`,
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            cursor: 'pointer',
-          }}
-        >
-          <ChevronLeft size={20} strokeWidth={2.2} color={INK} />
-        </button>
-      </div>
-
       {/* Row 2 — title */}
       {readOnly ? (
         <div style={{ padding: '12px 20px 16px' }}>
