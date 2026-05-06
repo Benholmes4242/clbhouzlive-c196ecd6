@@ -383,7 +383,7 @@ export const AchievementsStrip: React.FC<Props> = ({
         style={{
           display: 'flex',
           gap: 10,
-          padding: '0 20px 8px',
+          paddingBottom: 8,
           overflowX: 'auto',
           scrollSnapType: 'x mandatory',
           WebkitOverflowScrolling: 'touch',
@@ -391,6 +391,9 @@ export const AchievementsStrip: React.FC<Props> = ({
         }}
         className="hide-scrollbar"
       >
+        {/* Leading spacer — container padding-left is unreliable on horizontally
+            scrolling flex containers with snap. Use a spacer flex child instead. */}
+        <div aria-hidden style={{ flex: '0 0 20px', width: 20, alignSelf: 'stretch' }} />
         {isLoading
           ? Array.from({ length: 4 }).map((_, i) => <SkeletonTile key={i} />)
           : (
@@ -404,6 +407,8 @@ export const AchievementsStrip: React.FC<Props> = ({
               )}
             </>
           )}
+        {/* Trailing spacer — same reason for right gutter. */}
+        <div aria-hidden style={{ flex: '0 0 20px', width: 20, alignSelf: 'stretch' }} />
       </div>
 
       <AllTrophiesSheet
