@@ -18,7 +18,7 @@ import { tournamentRoute } from '../../routes';
 import { HeroAtmosphere } from '../shared/HeroAtmosphere';
 import { Shimmer } from '../shared/Shimmer';
 
-import { useLeaderHoleScores } from '../../hooks/useLeaderHoleScores';
+
 import { getPlayerHeadshotUrl } from '@/utils/playerHeadshot';
 import { PlayerSilhouette } from '@/components/ui/PlayerSilhouette';
 import {
