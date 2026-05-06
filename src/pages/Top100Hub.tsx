@@ -15,6 +15,7 @@ import ScrollToTopGlass from '@/components/common/ScrollToTopGlass';
 import { cn } from '@/lib/utils';
 import { PageRoot } from '@/components/layout/PageRoot';
 import { getProgressInsightsForLists } from '@/lib/utils/progressInsightCopy';
+import { useStickyHeaderSafeArea } from '@/hooks/useStickyHeaderSafeArea';
 
 const Top100Hub = () => {
   const navigate = useNavigate();
