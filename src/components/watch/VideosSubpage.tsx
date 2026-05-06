@@ -1,5 +1,6 @@
-import { useNavigate, useNavigationType } from 'react-router-dom';
-import { ChevronLeft, Search } from 'lucide-react';
+import { useNavigationType } from 'react-router-dom';
+import { Search } from 'lucide-react';
+import { useStickyHeaderSafeArea } from '@/hooks/useStickyHeaderSafeArea';
 import { useState, useEffect } from 'react';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import PageRoot from '@/components/layout/PageRoot';
@@ -36,12 +37,12 @@ const CREAM = '#F8FAFC';
  *   VideosFullFeed (vertical YouTube-style cards, mood-independent)
  */
 export default function VideosSubpage() {
-  const navigate = useNavigate();
   const navigationType = useNavigationType();
   const { session } = useSupabaseSession();
   const userId = session?.user?.id;
   const { mood, setMood } = useVideosMood();
   const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const { sentinelRef, paddingTop } = useStickyHeaderSafeArea();
 
   // Force scroll to top on mount for forward navigation.
   // Lazy-loaded subpages mount after global ScrollToTop fires against the
@@ -59,6 +60,12 @@ export default function VideosSubpage() {
   return (
     <WatchActionsProvider>
       <PageRoot className="min-h-screen" hasBottomNav={true} style={{ background: CREAM }}>
+        {/* Sentinel for sticky-header safe-area detection */}
+        <div
+          ref={sentinelRef}
+          aria-hidden
+          style={{ height: 1, width: '100%', pointerEvents: 'none' }}
+        />
         {/* ── Editorial header + search bar (combined sticky chrome) ── */}
         <div
           className="sticky"
@@ -67,61 +74,35 @@ export default function VideosSubpage() {
             zIndex: 20,
             background: CREAM,
             borderBottom: '1px solid hsl(var(--border) / 0.12)',
+            paddingTop,
+            transition: 'padding-top 200ms ease',
           }}
         >
           {/* Editorial header */}
-          <div
-            style={{
-              padding: '14px 16px 0',
-              display: 'flex',
-              alignItems: 'flex-start',
-              gap: 12,
-            }}
-          >
-            <button
-              onClick={() => navigate(-1)}
-              className="active:scale-[0.97] transition-transform"
+          <div style={{ padding: '14px 16px 0' }}>
+            <Kicker color="amber">Long-form</Kicker>
+            <h1
               style={{
-                width: 36,
-                height: 36,
-                borderRadius: '50%',
-                background: 'rgba(15,23,42,0.06)',
-                border: 'none',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                flexShrink: 0,
-                marginTop: 2,
+                fontSize: 22,
+                fontWeight: 900,
+                letterSpacing: '-0.02em',
+                color: '#0F172A',
+                lineHeight: 1.05,
+                margin: 0,
               }}
-              aria-label="Back"
             >
-              <ChevronLeft size={20} color="#0F172A" />
-            </button>
-            <div style={{ flex: 1, minWidth: 0 }}>
-              <Kicker color="amber">Long-form</Kicker>
-              <h1
-                style={{
-                  fontSize: 22,
-                  fontWeight: 900,
-                  letterSpacing: '-0.02em',
-                  color: '#0F172A',
-                  lineHeight: 1.05,
-                  margin: 0,
-                }}
-              >
-                Videos
-              </h1>
-              <p
-                style={{
-                  fontSize: 12,
-                  color: 'rgba(15,23,42,0.55)',
-                  margin: '4px 0 0',
-                  fontWeight: 500,
-                }}
-              >
-                Course vlogs, coaching, tournament recaps
-              </p>
-            </div>
+              Videos
+            </h1>
+            <p
+              style={{
+                fontSize: 12,
+                color: 'rgba(15,23,42,0.55)',
+                margin: '4px 0 0',
+                fontWeight: 500,
+              }}
+            >
+              Course vlogs, coaching, tournament recaps
+            </p>
           </div>
 
           {/* Search bar */}

@@ -66,6 +66,7 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
   const isMessagesRoute = location.pathname.startsWith('/messages');
   const isMessagesConversationRoute = location.pathname.startsWith('/messages/');
   const isHandicapRoute = location.pathname === '/handicap' || location.pathname.startsWith('/handicap/');
+  const isWatchSubpageRoute = location.pathname === '/watch/videos' || location.pathname === '/watch/clips';
 
 
   // Discover sub-page detection:
@@ -87,7 +88,7 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
   const isTop100Route = isTop100HubPage || isTop100SubPage;
   
   // Routes that should show back arrow instead of logo
-  const isBackArrowRoute = isDiscoverSubPage || isTop100Route || isEditProfileRoute || isFriendsActivityRoute || isAchievementsRoute || isMessagesRoute || isHandicapRoute;
+  const isBackArrowRoute = isDiscoverSubPage || isTop100Route || isEditProfileRoute || isFriendsActivityRoute || isAchievementsRoute || isMessagesRoute || isHandicapRoute || isWatchSubpageRoute;
   
   // Search overlay always uses light mode app-wide
   const useLightTheme = true;
@@ -110,6 +111,8 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
       } else if (isMessagesRoute) {
         navigate(-1);
       } else if (isHandicapRoute) {
+        navigate(-1);
+      } else if (isWatchSubpageRoute) {
         navigate(-1);
       }
     } else if (isTourRoute) {

@@ -21,6 +21,7 @@ import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useWhsConnection } from '@/lib/whs/hooks';
 import WhsHandicapTab from '@/components/profile/handicap/whs/WhsHandicapTab';
 import HandicapDashboard from '@/components/profile/handicap/whs/HandicapDashboard';
+import { useStickyHeaderSafeArea } from '@/hooks/useStickyHeaderSafeArea';
 
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { isHandicapSubtab, type HandicapSubtab } from '@/components/profile/handicap/whs/types';
@@ -183,18 +184,7 @@ const HandicapPageHeader: React.FC<HeaderProps> = ({
 
   // Sentinel-based detection: suppress safe-area padding while CompactHeader
   // is visible at top to avoid doubled inset gap.
-  const [isAtTop, setIsAtTop] = useState(true);
-  const sentinelRef = useRef<HTMLDivElement>(null);
-  useEffect(() => {
-    const sentinel = sentinelRef.current;
-    if (!sentinel) return;
-    const observer = new IntersectionObserver(
-      ([entry]) => setIsAtTop(entry.isIntersecting),
-      { threshold: 0 }
-    );
-    observer.observe(sentinel);
-    return () => observer.disconnect();
-  }, []);
+  const { sentinelRef, paddingTop } = useStickyHeaderSafeArea();
 
   return (
     <>
@@ -207,7 +197,7 @@ const HandicapPageHeader: React.FC<HeaderProps> = ({
         className="sticky top-0 z-30"
         style={{
           background: BG_SURFACE,
-          paddingTop: isAtTop ? 0 : 'max(env(safe-area-inset-top, 0px), 47px)',
+          paddingTop,
           transition: 'padding-top 200ms ease',
         }}
       >

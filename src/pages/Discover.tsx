@@ -9,6 +9,7 @@ import SegmentedControl from '@/components/discover/SegmentedControl';
 import SlidingPanels from '@/components/ui/SlidingPanels';
 import { useDiscoverQuery } from '@/utils/useDiscoverQuery';
 import { useNavigate } from 'react-router-dom';
+import { useStickyHeaderSafeArea } from '@/hooks/useStickyHeaderSafeArea';
 
 
 // Lazy load heavy/inactive components for better initial bundle size
@@ -26,6 +27,7 @@ const Discover = () => {
   const { isRehydrating } = useRehydrationSafe();
 
   const { main, setMain } = useDiscoverQuery();
+  const { sentinelRef, paddingTop } = useStickyHeaderSafeArea();
 
   // Timing instrumentation - log page mount/unmount
   useEffect(() => {
@@ -50,8 +52,24 @@ const Discover = () => {
     <PageRoot className="min-h-screen text-foreground bg-background">
       <FadeInContent>
         <main className="pb-20 bg-background">
+            {/* Sentinel for sticky-header safe-area detection */}
+            <div
+              ref={sentinelRef}
+              aria-hidden
+              style={{ height: 1, width: '100%', pointerEvents: 'none' }}
+            />
             {/* Tabs - sit directly on page canvas, no intermediate blocks */}
-            <div className="px-1" style={{ position: 'sticky', top: '0px', zIndex: 19, background: 'hsl(var(--background))' }}>
+            <div
+              className="px-1"
+              style={{
+                position: 'sticky',
+                top: 0,
+                zIndex: 19,
+                background: 'hsl(var(--background))',
+                paddingTop,
+                transition: 'padding-top 200ms ease',
+              }}
+            >
               <SegmentedControl
                 tabs={[
                   { id: 'watch', label: 'Watch' },
