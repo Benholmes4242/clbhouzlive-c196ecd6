@@ -18123,6 +18123,10 @@ export type Database = {
           short_label: string
         }[]
       }
+      get_trophy_aggregates: {
+        Args: { p_connection_id: string; p_user_id: string }
+        Returns: Json
+      }
       get_unread_count: { Args: { p_conversation_id: string }; Returns: number }
       get_user_business_ids: {
         Args: { p_user_profile_id: string }
@@ -18565,6 +18569,7 @@ export type Database = {
       }
       normalize_club_key: { Args: { p_name: string }; Returns: string }
       normalize_college_name: { Args: { name: string }; Returns: string }
+      normalize_course_name: { Args: { name: string }; Returns: string }
       normalize_key: { Args: { p_text: string }; Returns: string }
       notifications_minute_bucket: { Args: { ts: string }; Returns: string }
       populate_geometry_columns:
