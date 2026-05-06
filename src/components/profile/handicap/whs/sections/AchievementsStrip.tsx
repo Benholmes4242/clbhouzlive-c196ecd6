@@ -198,6 +198,70 @@ const TrophyTile: React.FC<{ a: Achievement }> = ({ a }) => {
   );
 };
 
+const ViewAllTile: React.FC<{ totalCount: number; onClick: () => void }> = ({
+  totalCount,
+  onClick,
+}) => {
+  return (
+    <button
+      onClick={onClick}
+      style={{
+        flex: `0 0 ${TROPHY_TILE_WIDTH}px`,
+        padding: '14px 12px',
+        borderRadius: 12,
+        background:
+          'linear-gradient(135deg, rgba(247,147,30,0.08) 0%, rgba(247,147,30,0.02) 100%)',
+        border: `1.5px dashed rgba(247,147,30,0.55)`,
+        scrollSnapAlign: 'start',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'flex-start',
+        justifyContent: 'space-between',
+        cursor: 'pointer',
+        textAlign: 'left',
+      }}
+    >
+      <div
+        style={{
+          width: 32,
+          height: 32,
+          borderRadius: 16,
+          background: 'rgba(247,147,30,0.14)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}
+      >
+        <ChevronRight size={18} color={AMBER} strokeWidth={2.5} />
+      </div>
+      <div style={{ marginTop: 12 }}>
+        <div
+          style={{
+            fontSize: 13,
+            fontWeight: 800,
+            color: '#0F172A',
+            letterSpacing: '-0.01em',
+            lineHeight: 1.2,
+          }}
+        >
+          View all
+        </div>
+        <div
+          style={{
+            fontSize: 11,
+            fontWeight: 600,
+            color: '#C97211',
+            marginTop: 4,
+            fontVariantNumeric: 'tabular-nums',
+          }}
+        >
+          {totalCount} trophies
+        </div>
+      </div>
+    </button>
+  );
+};
+
 const SkeletonTile: React.FC = () => (
   <div
     style={{
