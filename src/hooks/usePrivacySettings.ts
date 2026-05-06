@@ -9,6 +9,7 @@ export function usePrivacySettings(
   initialShowHandicap: boolean,
   initialShowInHandicapLeaderboards: boolean,
   initialShowInExplorationLeaderboards: boolean,
+  initialPeerComparisonVisible: boolean = true,
 ) {
   const queryClient = useQueryClient();
 
@@ -16,15 +17,18 @@ export function usePrivacySettings(
   const [showHandicap, setShowHandicap] = useState(initialShowHandicap);
   const [showInHandicapLeaderboards, setShowInHandicapLeaderboards] = useState(initialShowInHandicapLeaderboards);
   const [showInExplorationLeaderboards, setShowInExplorationLeaderboards] = useState(initialShowInExplorationLeaderboards);
+  const [peerComparisonVisible, setPeerComparisonVisible] = useState(initialPeerComparisonVisible);
   const [isUpdatingPrivacy, setIsUpdatingPrivacy] = useState(false);
   const [isUpdatingHandicap, setIsUpdatingHandicap] = useState(false);
   const [isUpdatingHandicapLb, setIsUpdatingHandicapLb] = useState(false);
   const [isUpdatingExplorationLb, setIsUpdatingExplorationLb] = useState(false);
+  const [isUpdatingPeerComparison, setIsUpdatingPeerComparison] = useState(false);
 
   useEffect(() => { setIsPublic(initialIsPublic); }, [initialIsPublic]);
   useEffect(() => { setShowHandicap(initialShowHandicap); }, [initialShowHandicap]);
   useEffect(() => { setShowInHandicapLeaderboards(initialShowInHandicapLeaderboards); }, [initialShowInHandicapLeaderboards]);
   useEffect(() => { setShowInExplorationLeaderboards(initialShowInExplorationLeaderboards); }, [initialShowInExplorationLeaderboards]);
+  useEffect(() => { setPeerComparisonVisible(initialPeerComparisonVisible); }, [initialPeerComparisonVisible]);
 
   const invalidate = () => {
     queryClient.invalidateQueries({ queryKey: ['profile'] });
