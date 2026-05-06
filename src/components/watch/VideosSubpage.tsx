@@ -43,6 +43,7 @@ export default function VideosSubpage() {
   const userId = session?.user?.id;
   const { mood, setMood } = useVideosMood();
   const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const { sentinelRef, paddingTop } = useStickyHeaderSafeArea();
 
   // Force scroll to top on mount for forward navigation.
   // Lazy-loaded subpages mount after global ScrollToTop fires against the
