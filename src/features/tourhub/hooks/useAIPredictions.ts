@@ -573,12 +573,17 @@ function formatPredictions(
   researchContext?: any
 ): AIPredictionData {
   // All 5 display picks come directly from Claude (no legacy padding needed)
-  const rawContenders = (predictions.topContenders || predictions || []).map((p: any, index: number) => ({
-    ...p,
-    rank: p.rank || index + 1,
-    photoUrl: p.photoUrl || null,
-    reasons: ensureThreeReasons(p.reasons),
-  }));
+  const rawContenders = (predictions.topContenders || predictions || []).map((p: any, index: number) => {
+    const padded = ensureThreeReasons(p.reasons);
+    // eslint-disable-next-line no-console
+    console.log('[ti-audit] rank', p.rank ?? index + 1, p.playerName, 'raw reasons:', JSON.parse(JSON.stringify(p.reasons ?? null)), 'padded:', padded, 'pulledQuote:', p.pulledQuote);
+    return {
+      ...p,
+      rank: p.rank || index + 1,
+      photoUrl: p.photoUrl || null,
+      reasons: padded,
+    };
+  });
 
   const topContenders = rawContenders.slice(0, 3);
 
