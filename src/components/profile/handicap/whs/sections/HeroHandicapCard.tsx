@@ -1,13 +1,11 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { ArrowDown, ArrowUp } from 'lucide-react';
-import { useHandicapHistory, useHandicapTrend, useAllScores, useFriendLeaderboard } from '@/lib/whs/hooks';
+import { useHandicapHistory, useHandicapTrend, useAllScores } from '@/lib/whs/hooks';
 import { whsDisplayedHcp, formatDisplayedHcp, fmtDiff } from '@/lib/whs/format';
 import type { WhsConnection, HandicapPoint } from '@/lib/whs/types';
 
 interface Props {
   connection: WhsConnection;
-  /** Owner of the connection — used to fetch the 30D delta from the leaderboard self-row. */
-  userId?: string;
 }
 
 type Range = 90 | 365 | 'all';
@@ -77,7 +75,24 @@ function calcForm(hcp: number, last5Diffs: number[]) {
   };
 }
 
-const HeroHandicapCard: React.FC<Props> = ({ connection, userId }) => {
+// ── Monthly movement calculation (replaces form for inner ring) ─────────
+function calcMonthlyMovement(delta: number | null) {
+  if (delta == null) {
+    return { delta: null, fillFraction: 0, direction: 'neutral' as const };
+  }
+  const capped = Math.max(-1, Math.min(1, delta));
+  const fillFraction = Math.abs(capped);
+  return {
+    delta,
+    fillFraction,
+    direction:
+      delta < -0.05 ? ('cut' as const)
+      : delta > 0.05 ? ('up' as const)
+      : ('neutral' as const),
+  };
+}
+
+const HeroHandicapCard: React.FC<Props> = ({ connection }) => {
   const [range, setRange] = useState<Range>('all');
   const [scrubIdx, setScrubIdx] = useState<number | null>(null);
   const [drawn, setDrawn] = useState(false);
@@ -87,11 +102,6 @@ const HeroHandicapCard: React.FC<Props> = ({ connection, userId }) => {
   const { data: history, isLoading: historyLoading } = useHandicapHistory(connection.id, range);
   const { data: recent } = useAllScores(connection.id);
 
-  // Fetch self-row from leaderboard for 30D delta — same metric as profile sheet handicap tile
-  const { data: leaderboardEntries } = useFriendLeaderboard(userId);
-  const selfDelta30d = useMemo(() => {
-    return leaderboardEntries?.find((e: any) => e.is_self)?.handicap_30d_delta ?? null;
-  }, [leaderboardEntries]);
 
   const current = trend?.current ?? null;
   const points: HandicapPoint[] = history ?? [];
@@ -202,23 +212,33 @@ const HeroHandicapCard: React.FC<Props> = ({ connection, userId }) => {
   const milestone = calcMilestoneProgress(scrubValue);
   const outerDash = milestone.progress * C_OUTER;
 
-  // Form math — inner ring
-  const form = calcForm(current, last5Diffs);
-  const innerFillLength = (form.fillFraction * C_INNER) / 2; // half-circle max
-  const isPositiveForm = form.direction === 'positive';
-  const isNegativeForm = form.direction === 'negative';
+  // Monthly movement math — inner ring (replaces form)
+  const monthly = calcMonthlyMovement(trend?.delta ?? null);
+  const useMonthlyRing = monthly.delta != null;
+  const fallbackForm = calcForm(current, last5Diffs);
+
+  const innerFillLength = useMonthlyRing
+    ? (monthly.fillFraction * C_INNER) / 2
+    : (fallbackForm.fillFraction * C_INNER) / 2;
+
+  const showGreenArc = useMonthlyRing
+    ? monthly.direction === 'cut'
+    : fallbackForm.direction === 'positive';
+
+  const showRedArc = useMonthlyRing
+    ? monthly.direction === 'up'
+    : fallbackForm.direction === 'negative';
 
   // Form delta UI
   const formNode = (() => {
-    // 30D delta is the primary metric — matches profile sheet handicap tile.
-    // Fall back to form-last-5 only when 30D snapshot data isn't available yet.
-    if (selfDelta30d != null) {
+    if (trend?.delta != null) {
       const STEADY_THRESHOLD = 0.05;
-      const absDelta = Math.abs(selfDelta30d);
+      const delta = trend.delta;
+      const absDelta = Math.abs(delta);
       if (absDelta < STEADY_THRESHOLD) {
         return <span style={{ color: INK_40 }}>Steady · last month</span>;
       }
-      if (selfDelta30d < 0) {
+      if (delta < 0) {
         return (
           <span style={{ color: GREEN, display: 'inline-flex', alignItems: 'center', gap: 4 }}>
             <ArrowDown size={13} strokeWidth={2.5} />
@@ -238,27 +258,27 @@ const HeroHandicapCard: React.FC<Props> = ({ connection, userId }) => {
       );
     }
 
-    // FALLBACK — form-last-5 (preserved logic for new users without 30-day history)
+    // FALLBACK — form-last-5
     if (last5Diffs.length < 5) {
       return <span style={{ color: INK_40 }}>Steady form · last 5</span>;
     }
-    if (form.direction === 'positive') {
+    if (fallbackForm.direction === 'positive') {
       return (
         <span style={{ color: GREEN, display: 'inline-flex', alignItems: 'center', gap: 4 }}>
           <ArrowDown size={13} strokeWidth={2.5} />
           <span style={{ fontVariantNumeric: 'tabular-nums' }}>
-            {fmtDiff(-Math.abs(form.formStrokes))} form
+            {fmtDiff(-Math.abs(fallbackForm.formStrokes))} form
           </span>
           <span style={{ color: INK_40 }}>· last 5</span>
         </span>
       );
     }
-    if (form.direction === 'negative') {
+    if (fallbackForm.direction === 'negative') {
       return (
         <span style={{ color: RED, display: 'inline-flex', alignItems: 'center', gap: 4 }}>
           <ArrowUp size={13} strokeWidth={2.5} />
           <span style={{ fontVariantNumeric: 'tabular-nums' }}>
-            +{Math.abs(form.formStrokes).toFixed(1)} form
+            +{Math.abs(fallbackForm.formStrokes).toFixed(1)} form
           </span>
           <span style={{ color: INK_40 }}>· last 5</span>
         </span>
@@ -346,7 +366,7 @@ const HeroHandicapCard: React.FC<Props> = ({ connection, userId }) => {
             />
 
             {/* Inner positive form (green, clockwise from 12) */}
-            {isPositiveForm && (
+            {showGreenArc && (
               <circle
                 cx={CX} cy={CY} r={R_INNER} fill="none"
                 stroke={GREEN} strokeWidth={STROKE_INNER}
@@ -357,7 +377,7 @@ const HeroHandicapCard: React.FC<Props> = ({ connection, userId }) => {
               />
             )}
             {/* Inner negative form (red, counter-clockwise from 12) */}
-            {isNegativeForm && (
+            {showRedArc && (
               <g transform={`scale(-1, 1) translate(-${RING_SIZE}, 0)`}>
                 <circle
                   cx={CX} cy={CY} r={R_INNER} fill="none"

@@ -45,7 +45,7 @@ export const OverviewView: React.FC<Props> = ({
       aria-labelledby="handicap-tab-overview"
     >
       {/* Today section — viewer's daily context, hidden on friend pages */}
-      {!readOnly && <MorningMoment userId={userId} />}
+      {!readOnly && <MorningMoment />}
 
       {/* Sync state banners (re-auth takes priority over stale) */}
       {showReauthBanner ? (
@@ -73,7 +73,7 @@ export const OverviewView: React.FC<Props> = ({
       ) : null}
 
       {/* Hero handicap ring + line chart */}
-      <HeroHandicapCard connection={connection} userId={userId} />
+      <HeroHandicapCard connection={connection} />
 
       {/* Existing overview cards */}
       <LastRoundCard connectionId={connectionId} />

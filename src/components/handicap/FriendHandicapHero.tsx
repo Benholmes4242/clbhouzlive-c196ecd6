@@ -95,7 +95,7 @@ const FriendHandicapHero: React.FC<Props> = ({ userId, viewerUserId }) => {
       {/* HeroHandicapCard does not yet accept readOnly. The range chip is
           harmless on a friend page; revisit if a true readOnly variant is
           built. TODO(handicap): plumb readOnly into HeroHandicapCard. */}
-      <HeroHandicapCard connection={connection} userId={userId} />
+      <HeroHandicapCard connection={connection} />
     </section>
   );
 };
