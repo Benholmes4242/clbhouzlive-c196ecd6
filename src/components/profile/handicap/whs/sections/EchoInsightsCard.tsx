@@ -318,7 +318,7 @@ export const EchoInsightsCard: React.FC<Props> = ({ connectionId }) => {
                   color: INK,
                 }}
               >
-                {insights.scoring_profile}
+                {renderBoldMarkdown(insights.scoring_profile)}
               </p>
               <div
                 style={{
