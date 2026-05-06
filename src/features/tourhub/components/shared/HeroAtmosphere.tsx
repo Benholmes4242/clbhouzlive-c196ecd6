@@ -44,7 +44,19 @@ export function HeroAtmosphere({
           backgroundImage: GRAIN_BG_IMAGE,
         }}
       />
-      <div style={{ position: 'relative', zIndex: 2 }}>{children}</div>
+      <div
+        style={{
+          position: 'relative',
+          zIndex: 2,
+          flex: 1,
+          minHeight: 0,
+          width: '100%',
+          display: 'flex',
+          flexDirection: 'column',
+        }}
+      >
+        {children}
+      </div>
     </div>
   );
 }
