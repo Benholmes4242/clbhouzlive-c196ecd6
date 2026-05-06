@@ -366,7 +366,7 @@ const HeroHandicapCard: React.FC<Props> = ({ connection }) => {
             />
 
             {/* Inner positive form (green, clockwise from 12) */}
-            {isPositiveForm && (
+            {showGreenArc && (
               <circle
                 cx={CX} cy={CY} r={R_INNER} fill="none"
                 stroke={GREEN} strokeWidth={STROKE_INNER}
@@ -377,7 +377,7 @@ const HeroHandicapCard: React.FC<Props> = ({ connection }) => {
               />
             )}
             {/* Inner negative form (red, counter-clockwise from 12) */}
-            {isNegativeForm && (
+            {showRedArc && (
               <g transform={`scale(-1, 1) translate(-${RING_SIZE}, 0)`}>
                 <circle
                   cx={CX} cy={CY} r={R_INNER} fill="none"
