@@ -77,7 +77,24 @@ function calcForm(hcp: number, last5Diffs: number[]) {
   };
 }
 
-const HeroHandicapCard: React.FC<Props> = ({ connection, userId }) => {
+// ── Monthly movement calculation (replaces form for inner ring) ─────────
+function calcMonthlyMovement(delta: number | null) {
+  if (delta == null) {
+    return { delta: null, fillFraction: 0, direction: 'neutral' as const };
+  }
+  const capped = Math.max(-1, Math.min(1, delta));
+  const fillFraction = Math.abs(capped);
+  return {
+    delta,
+    fillFraction,
+    direction:
+      delta < -0.05 ? ('cut' as const)
+      : delta > 0.05 ? ('up' as const)
+      : ('neutral' as const),
+  };
+}
+
+const HeroHandicapCard: React.FC<Props> = ({ connection }) => {
   const [range, setRange] = useState<Range>('all');
   const [scrubIdx, setScrubIdx] = useState<number | null>(null);
   const [drawn, setDrawn] = useState(false);
@@ -87,11 +104,6 @@ const HeroHandicapCard: React.FC<Props> = ({ connection, userId }) => {
   const { data: history, isLoading: historyLoading } = useHandicapHistory(connection.id, range);
   const { data: recent } = useAllScores(connection.id);
 
-  // Fetch self-row from leaderboard for 30D delta — same metric as profile sheet handicap tile
-  const { data: leaderboardEntries } = useFriendLeaderboard(userId);
-  const selfDelta30d = useMemo(() => {
-    return leaderboardEntries?.find((e: any) => e.is_self)?.handicap_30d_delta ?? null;
-  }, [leaderboardEntries]);
 
   const current = trend?.current ?? null;
   const points: HandicapPoint[] = history ?? [];
