@@ -20,6 +20,7 @@
 
 import { useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { ChevronRight, GraduationCap } from 'lucide-react';
 import { useCollegeSeasonStats, type CollegeSeasonStats } from '../hooks/useCollegeStats';
 import { useCollegeMediaMap, type CollegeMedia } from '../hooks/useCollegeMedia';
 import { useFranchiseCaptains } from '../hooks/useFranchiseCaptains';
@@ -248,18 +249,46 @@ export function CollegeRivalry() {
   return (
     <section aria-label="This week's college rivalry">
       {/* Section header — single line */}
-      <div style={{
-        display: 'flex', alignItems: 'baseline', justifyContent: 'space-between',
-        padding: '0 16px', marginBottom: 14,
-      }}>
-        <h2 style={{
-          fontSize: 24, fontWeight: 800, letterSpacing: '-0.025em',
-          color: INK, margin: 0,
-        }}>College Franchise Battle</h2>
-        <span style={{
-          fontSize: 10, fontWeight: 700, color: SLATE,
-          letterSpacing: '0.1em', textTransform: 'uppercase',
-        }}>{currentYear} Season</span>
+      <div style={{ padding: '0 16px', marginBottom: 14 }}>
+        <button
+          onClick={() => navigate('/tourhub?tab=college')}
+          aria-label="Open college franchise rankings"
+          style={{
+            background: 'transparent',
+            border: 'none',
+            padding: 0,
+            cursor: 'pointer',
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: 6,
+            marginBottom: 6,
+          }}
+        >
+          <GraduationCap size={13} color={AMBER} strokeWidth={2.5} />
+          <span style={{
+            fontSize: 10.5,
+            fontWeight: 700,
+            letterSpacing: '0.14em',
+            color: AMBER,
+          }}>
+            COLLEGE FRANCHISE BATTLE
+          </span>
+          <ChevronRight
+            size={11}
+            color={AMBER}
+            strokeWidth={2.5}
+            style={{ marginTop: 1 }}
+          />
+        </button>
+        <div style={{
+          fontSize: 13,
+          fontWeight: 700,
+          color: INK,
+          letterSpacing: '-0.005em',
+          lineHeight: 1.25,
+        }}>
+          {currentYear} Season
+        </div>
       </div>
 
       {/* Rivalry hero card — matchup row sits DIRECTLY on the outer card (no inner card) */}

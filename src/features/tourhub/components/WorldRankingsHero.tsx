@@ -290,8 +290,8 @@ function NumberOneCard({
             <div
               style={{
                 width: 80,
-                height: 80,
-                borderRadius: '50%',
+                aspectRatio: '1 / 1.05',
+                borderRadius: '34%',
                 padding: 2,
                 background: GOLD,
                 boxShadow: '0 0 16px rgba(255,184,0,0.20)',
@@ -301,7 +301,7 @@ function NumberOneCard({
                 style={{
                   width: '100%',
                   height: '100%',
-                  borderRadius: '50%',
+                  borderRadius: '34%',
                   overflow: 'hidden',
                   background: '#fff',
                 }}
@@ -311,7 +311,7 @@ function NumberOneCard({
                   playerName={playerName}
                   tourCode={tourCode}
                   size="xl"
-                  className="!w-full !h-full !rounded-full"
+                  className="!w-full !h-full !rounded-[34%]"
                 />
               </div>
             </div>
