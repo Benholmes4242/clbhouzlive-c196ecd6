@@ -278,6 +278,9 @@ function CardMetaTray({
   reasons: string[];
 }) {
   const [expanded, setExpanded] = useState(false);
+  const filtered = reasons.filter((r) => r && r.trim().length > 0).slice(0, 3);
+  // eslint-disable-next-line no-console
+  console.log('[ti-audit CardMetaTray]', { insight, reasonsLen: reasons?.length, reasons, filteredLen: filtered.length, filtered, expanded });
   return (
     <>
       <button
