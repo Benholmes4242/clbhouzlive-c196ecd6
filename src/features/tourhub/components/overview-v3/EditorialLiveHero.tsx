@@ -282,7 +282,7 @@ function LeaderHero({
       >
         <div
           style={{
-            fontSize: 56, fontWeight: 800, letterSpacing: '-0.04em',
+            fontSize: 28, fontWeight: 800, letterSpacing: '-0.04em',
             color: '#fff', lineHeight: 0.9,
             fontVariantNumeric: 'tabular-nums',
           }}
