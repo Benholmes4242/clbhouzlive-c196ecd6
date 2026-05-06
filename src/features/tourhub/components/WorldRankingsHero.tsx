@@ -715,6 +715,7 @@ function WorldRankingsSkeleton() {
 
 // ─── Main ───────────────────────────────────────────────────────────────────
 export const WorldRankingsHero = memo(function WorldRankingsHero() {
+  const navigate = useNavigate();
   const [activeTour, setActiveTour] = useState('pga');
   const [sheetOpen, setSheetOpen] = useState(false);
 
