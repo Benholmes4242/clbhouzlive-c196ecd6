@@ -26,7 +26,6 @@ import {
   Trophy,
   Award,
   Clock,
-  MapPin,
 } from 'lucide-react';
 import {
   useIntelligenceLifecycleState,
@@ -103,6 +102,10 @@ interface TournamentMetaInfoExt extends TournamentMetaInfo {
   country: string;
 }
 
+function stripLeadingThe(name: string): string {
+  return name.replace(/^The\s+/i, '').trim();
+}
+
 function buildTournamentMeta(t: AIPredictionData['tournament'] | undefined | null): TournamentMetaInfoExt {
   if (!t) return { name: '—', course: '—', location: '', address: '', country: '' };
   const addrParts: string[] = [];
@@ -111,7 +114,7 @@ function buildTournamentMeta(t: AIPredictionData['tournament'] | undefined | nul
   const locParts = [...addrParts];
   if (!locParts.length && t.venueCountry) locParts.push(t.venueCountry);
   return {
-    name: t.name || '—',
+    name: stripLeadingThe(t.name || '—'),
     course: t.venueName || '—',
     location: locParts.join(', '),
     address: addrParts.join(', '),
@@ -179,11 +182,13 @@ function SectionHeader({
   meta,
   headline,
   tournamentName,
+  courseName,
   onAboutClick,
 }: {
   meta: TournamentMetaInfoExt;
   headline: string;
   tournamentName?: string;
+  courseName?: string;
   onAboutClick: () => void;
 }) {
   return (
@@ -239,10 +244,17 @@ function SectionHeader({
             <span style={{ color: amber }}>{tournamentName}</span>
           </>
         )}
+        {courseName && (
+          <>
+            {' '}at {courseName}
+          </>
+        )}
       </div>
-      <div style={{ marginTop: 6, fontFamily: headlineFont }}>
+      {(meta.address || meta.country) && (
         <div
           style={{
+            marginTop: 6,
+            fontFamily: headlineFont,
             fontSize: 13,
             fontWeight: 700,
             color: ink,
@@ -250,37 +262,9 @@ function SectionHeader({
             letterSpacing: '-0.005em',
           }}
         >
-          {meta.course}
+          {[meta.address, meta.country].filter(Boolean).join(', ')}
         </div>
-        {meta.address && (
-          <div
-            style={{
-              fontSize: 11.5,
-              color: inkSoft,
-              marginTop: 2,
-              fontWeight: 500,
-              display: 'flex',
-              alignItems: 'center',
-              gap: 5,
-            }}
-          >
-            <MapPin size={10} color={inkFaint} strokeWidth={2} />
-            <span>{meta.address}</span>
-          </div>
-        )}
-        {meta.country && (
-          <div
-            style={{
-              fontSize: 11.5,
-              color: inkSoft,
-              marginTop: 2,
-              fontWeight: 500,
-            }}
-          >
-            {meta.country}
-          </div>
-        )}
-      </div>
+      )}
     </div>
   );
 }
@@ -1240,7 +1224,7 @@ function Carousel({
           overflowX: 'auto',
           scrollSnapType: 'x mandatory',
           gap: 12,
-          padding: '0 16px 4px',
+          padding: '0 16px 4px 20px',
           WebkitOverflowScrolling: 'touch',
           scrollbarWidth: 'none',
         }}
@@ -1413,8 +1397,9 @@ export const IntelligenceHero = memo(function IntelligenceHero() {
   const headline =
     state === 'live'
       ? 'Tracking our 3 picks live.'
-      : 'Our 3 picks for';
+      : 'Our picks for';
   const headlineTournamentName = state === 'live' ? undefined : meta.name && meta.name !== '—' ? meta.name : undefined;
+  const headlineCourseName = state === 'live' ? undefined : meta.course && meta.course !== '—' ? meta.course : undefined;
 
   const hasWinner = state === 'results' && resultsPicks.some((p) => p.outcome === 'win');
 
@@ -1485,6 +1470,7 @@ export const IntelligenceHero = memo(function IntelligenceHero() {
         meta={meta}
         headline={headline}
         tournamentName={headlineTournamentName}
+        courseName={headlineCourseName}
         onAboutClick={handleOpenAbout}
       />
 
