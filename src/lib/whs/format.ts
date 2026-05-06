@@ -11,6 +11,7 @@ export function fmtDiff(v: number, opts: { plus?: boolean } = {}): string {
 
 /** Same idea but for axis labels — no '+' prefix on positive values. */
 export function fmtAxis(v: number): string {
+  if (Number.isInteger(v)) return v.toFixed(0);
   if (v < 0) return `\u2212${Math.abs(v).toFixed(1)}`;
   return v.toFixed(1);
 }
