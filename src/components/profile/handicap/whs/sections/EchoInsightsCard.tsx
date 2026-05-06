@@ -160,7 +160,7 @@ const renderBoldMarkdown = (text: string): React.ReactNode => {
   return parts.map((p, i) => {
     if (p.startsWith('**') && p.endsWith('**')) {
       return (
-        <strong key={i} style={{ color: INK, fontWeight: 800, fontVariantNumeric: 'tabular-nums lining-nums' }}>
+        <strong key={i} style={{ color: INK, fontWeight: 800, fontFamily: 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif', fontVariantNumeric: 'tabular-nums lining-nums' }}>
           {p.slice(2, -2)}
         </strong>
       );
@@ -348,6 +348,7 @@ export const EchoInsightsCard: React.FC<Props> = ({ connectionId }) => {
               style={{
                 marginTop: 10,
                 paddingLeft: 56,
+                fontFamily: 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif',
                 fontSize: 12,
                 lineHeight: 1.5,
                 color: INK_55,
