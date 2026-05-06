@@ -636,7 +636,7 @@ export function PlayerScorecardCard({
             {isCompleted && (
               <div
                 style={{
-                  fontSize: 11, color: inkFaint, marginTop: 6, fontWeight: 600,
+                  fontSize: 10, color: inkFaint, marginTop: 4, fontWeight: 600,
                 }}
               >
                 72 holes · Final
