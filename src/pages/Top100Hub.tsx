@@ -36,6 +36,7 @@ const Top100Hub = () => {
     : 'courses';
   
   const [activeTab, setActiveTab] = useState<ValidTab>(safeTab);
+  const { sentinelRef, paddingTop: stickyPaddingTop } = useStickyHeaderSafeArea();
   
   // Scroll to top on tab switch
   const handleTabChange = (tab: ValidTab) => {
