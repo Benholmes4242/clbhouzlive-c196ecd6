@@ -363,7 +363,7 @@ const HeroHandicapCard: React.FC<Props> = ({ connection }) => {
       </div>
 
       {/* Multi-stream Ring */}
-      <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 6, position: 'relative' }}>
+      <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 6, paddingBottom: 56, position: 'relative' }}>
         <div style={{ position: 'relative', width: RING_SIZE, height: RING_SIZE }}>
           {/* Milestone labels around top of ring */}
           <div style={{
@@ -398,7 +398,7 @@ const HeroHandicapCard: React.FC<Props> = ({ connection }) => {
             {/* Inner track */}
             <circle
               cx={CX} cy={CY} r={R_INNER}
-              fill="none" stroke={INK_04} strokeWidth={STROKE_INNER}
+              fill="none" stroke={INK_06} strokeWidth={STROKE_INNER}
             />
 
             {/* Inner positive form (green, clockwise from 12) */}
@@ -439,31 +439,64 @@ const HeroHandicapCard: React.FC<Props> = ({ connection }) => {
             position: 'absolute', inset: 0,
             display: 'flex', flexDirection: 'column',
             alignItems: 'center', justifyContent: 'center',
-            pointerEvents: 'none', gap: 8,
+            pointerEvents: 'none', gap: 0,
           }}>
             <span style={{
-              fontSize: 9, fontWeight: 800, color: INK_55, letterSpacing: '0.22em',
+              fontSize: 9.5, fontWeight: 800, color: statusColor,
+              letterSpacing: '0.18em', marginBottom: 4, textTransform: 'uppercase',
             }}>
-              YOUR INDEX
+              {statusWord}
             </span>
             <span style={{
-              fontFamily: FONT_DISPLAY,
-              fontSize: 80, fontWeight: 400, lineHeight: 0.85,
-              letterSpacing: '-0.04em',
-              color: INK,
-              fontVariantNumeric: 'proportional-nums lining-nums',
-              textAlign: 'center',
-              display: 'block',
+              fontSize: 76, fontWeight: 700, color: INK,
+              letterSpacing: '-0.04em', lineHeight: 1,
+              fontVariantNumeric: 'tabular-nums',
+              textAlign: 'center', display: 'block',
             }}>
               {scrubValue.toFixed(1)}
             </span>
-            <span style={{
-              fontFamily: FONT_DISPLAY,
-              fontSize: 13, fontWeight: 500,
+            <div style={{
+              marginTop: 10,
+              display: 'flex', alignItems: 'center', gap: 10,
+              fontSize: 13, fontVariantNumeric: 'tabular-nums',
               opacity: isScrubbing ? 0 : 1,
               transition: 'opacity 200ms ease',
             }}>
-              {formNode}
+              {deltaInline}
+              {sparkPolyline && (
+                <>
+                  <span style={{ width: 1, height: 12, background: INK_10, display: 'inline-block' }} />
+                  <svg width={48} height={14} viewBox="0 0 48 14" style={{ display: 'block' }}>
+                    <polyline
+                      points={sparkPolyline.points}
+                      fill="none"
+                      stroke={AMBER}
+                      strokeWidth={1.5}
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      vectorEffect="non-scaling-stroke"
+                    />
+                    <circle cx={sparkPolyline.lastX} cy={sparkPolyline.lastY} r={2} fill={AMBER} />
+                  </svg>
+                  <span style={{ fontSize: 11, color: INK_55, fontWeight: 500 }}>vs last 30d</span>
+                </>
+              )}
+            </div>
+          </div>
+
+          {/* Legend */}
+          <div style={{
+            position: 'absolute', bottom: -38, left: 0, right: 0,
+            display: 'flex', justifyContent: 'center', gap: 18,
+            fontSize: 10.5, fontWeight: 600, color: INK_55, letterSpacing: '0.06em',
+          }}>
+            <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+              <span style={{ width: 8, height: 8, borderRadius: '50%', background: AMBER }} />
+              INDEX TRAJECTORY
+            </span>
+            <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+              <span style={{ width: 8, height: 8, borderRadius: '50%', background: GREEN }} />
+              8-ROUND FORM
             </span>
           </div>
         </div>
