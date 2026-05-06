@@ -509,18 +509,19 @@ export const WhereYouStandSection: React.FC<Props> = ({ userId }) => {
   }
 
   if (!data) return null;
-  if (!data.available && (data.reason === 'missing_handicap' || data.reason === 'unauthenticated')) {
+  const d = data as HandicapPercentileResult;
+  if (!d.available && (d.reason === 'missing_handicap' || d.reason === 'unauthenticated')) {
     return null;
   }
 
   return (
     <section ref={sectionRef} style={{ marginTop: 28 }}>
       <Eyebrow>WHERE YOU STAND</Eyebrow>
-      {data.available ? (
-        <AvailableCard data={data} />
+      {d.available ? (
+        <AvailableCard data={d} />
       ) : (
         <UnavailableCard
-          reason={data.reason as 'missing_country' | 'missing_gender' | 'cohort_too_small'}
+          reason={d.reason as 'missing_country' | 'missing_gender' | 'cohort_too_small'}
         />
       )}
     </section>
