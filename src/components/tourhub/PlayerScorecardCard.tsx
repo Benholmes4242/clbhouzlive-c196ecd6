@@ -563,7 +563,7 @@ export function PlayerScorecardCard({
           >
             <div
               style={{
-                width: 72, height: 72, borderRadius: '50%',
+                width: 50, height: 50, borderRadius: '50%',
                 border: `2px solid ${isCompleted ? gold : greenLive}`,
                 background: 'rgba(0,0,0,0.3)',
                 overflow: 'hidden',
