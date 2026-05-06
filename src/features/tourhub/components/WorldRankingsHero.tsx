@@ -393,7 +393,7 @@ function NumberOneCard({
                 letterSpacing: '-0.02em',
               }}
             >
-              {entry.avg_points != null ? entry.avg_points.toFixed(2) : '—'}
+              {entry.total_points != null ? entry.total_points.toFixed(2) : '—'}
             </div>
             <div
               style={{
@@ -404,7 +404,7 @@ function NumberOneCard({
                 marginTop: 4,
               }}
             >
-              PTS AVG
+              TOTAL POINTS
             </div>
           </div>
         </div>
