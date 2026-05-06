@@ -109,7 +109,7 @@ function LeaderHero({
       <div style={{ position: 'relative', flexShrink: 0 }}>
         <div
           style={{
-            width: 50, height: 50, borderRadius: '50%',
+            width: 50, borderRadius: '34%', aspectRatio: '1 / 1.05',
             border: `2px solid ${greenLive}`,
             background: 'rgba(0,0,0,0.3)',
             overflow: 'hidden',
@@ -281,7 +281,7 @@ function LeaderboardRow({
             alt=""
             onError={() => setImgErr(true)}
             style={{
-              width: 26, height: 26, borderRadius: '50%',
+              width: 26, borderRadius: '34%', aspectRatio: '1 / 1.05',
               objectFit: 'cover', objectPosition: 'center 18%',
               flexShrink: 0,
             }}
@@ -289,7 +289,7 @@ function LeaderboardRow({
         ) : (
           <div
             style={{
-              width: 26, height: 26, borderRadius: '50%',
+              width: 26, borderRadius: '34%', aspectRatio: '1 / 1.05',
               background: 'rgba(255,255,255,0.06)',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               fontSize: 10, color: inkFaint, fontWeight: 700, flexShrink: 0,
