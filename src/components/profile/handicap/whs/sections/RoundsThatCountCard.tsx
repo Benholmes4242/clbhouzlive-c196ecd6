@@ -1,9 +1,12 @@
 import React, { useMemo, useState } from 'react';
-import { ChevronRight, ArrowDown, ArrowUp, HelpCircle } from 'lucide-react';
-import { useCounters } from '@/lib/whs/hooks';
+import { ChevronRight, HelpCircle, TrendingDown, AlertTriangle, Minus } from 'lucide-react';
+import { useCounters, useAllScores } from '@/lib/whs/hooks';
 import { useHandicapInsights } from '@/lib/whs/insights/useHandicapInsights';
 import { fmtDiff, fmtAxis } from '@/lib/whs/format';
+import { projectNextRound } from '@/lib/whs/handicapMath';
 import HandicapExplainerSheet from './HandicapExplainerSheet';
+
+const fmtDiffPlus = (n: number) => fmtDiff(n, { plus: true });
 
 interface Props {
   connectionId: string;
