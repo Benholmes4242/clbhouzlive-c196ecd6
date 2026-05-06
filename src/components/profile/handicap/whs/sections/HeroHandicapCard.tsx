@@ -6,6 +6,8 @@ import type { WhsConnection, HandicapPoint } from '@/lib/whs/types';
 
 interface Props {
   connection: WhsConnection;
+  /** Owner of the connection — used to fetch the 30D delta from the leaderboard self-row. */
+  userId?: string;
 }
 
 type Range = 90 | 365 | 'all';
@@ -75,7 +77,7 @@ function calcForm(hcp: number, last5Diffs: number[]) {
   };
 }
 
-const HeroHandicapCard: React.FC<Props> = ({ connection }) => {
+const HeroHandicapCard: React.FC<Props> = ({ connection, userId }) => {
   const [range, setRange] = useState<Range>('all');
   const [scrubIdx, setScrubIdx] = useState<number | null>(null);
   const [drawn, setDrawn] = useState(false);
@@ -86,7 +88,7 @@ const HeroHandicapCard: React.FC<Props> = ({ connection }) => {
   const { data: recent } = useAllScores(connection.id);
 
   // Fetch self-row from leaderboard for 30D delta — same metric as profile sheet handicap tile
-  const { data: leaderboardEntries } = useFriendLeaderboard(connection.user_id);
+  const { data: leaderboardEntries } = useFriendLeaderboard(userId);
   const selfDelta30d = useMemo(() => {
     return leaderboardEntries?.find((e: any) => e.is_self)?.handicap_30d_delta ?? null;
   }, [leaderboardEntries]);

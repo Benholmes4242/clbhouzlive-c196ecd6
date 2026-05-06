@@ -73,7 +73,7 @@ export const OverviewView: React.FC<Props> = ({
       ) : null}
 
       {/* Hero handicap ring + line chart */}
-      <HeroHandicapCard connection={connection} />
+      <HeroHandicapCard connection={connection} userId={userId} />
 
       {/* Existing overview cards */}
       <LastRoundCard connectionId={connectionId} />
