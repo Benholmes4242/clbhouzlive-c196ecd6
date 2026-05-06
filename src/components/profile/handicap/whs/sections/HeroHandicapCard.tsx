@@ -26,14 +26,14 @@ const MONTHS = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV
 const FONT_DISPLAY = 'SF Pro Display, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
 
 // Ring composition
-const RING_SIZE = 240;
+const RING_SIZE = 280;
 const CX = RING_SIZE / 2;
 const CY = RING_SIZE / 2;
-const R_OUTER = 110;
-const STROKE_OUTER = 3;
+const R_OUTER = 124;
+const STROKE_OUTER = 14;
 const C_OUTER = 2 * Math.PI * R_OUTER;
-const R_INNER = 100;
-const STROKE_INNER = 6;
+const R_INNER = 102;
+const STROKE_INNER = 8;
 const C_INNER = 2 * Math.PI * R_INNER;
 
 // Sparkline
@@ -162,6 +162,23 @@ const HeroHandicapCard: React.FC<Props> = ({ connection }) => {
     if (0 < min - r * 0.1 || 0 > max + r * 0.1) return null;
     return PAD_TOP + ((max - 0) / r) * (H - PAD_TOP - PAD_BOTTOM);
   }, [points]);
+
+  // Scratch zone band (y=0 to y=1.5). Always render, even if user's min > 1.5
+  // — band acts as goal target.
+  const scratchBand = useMemo(() => {
+    if (points.length === 0) return null;
+    const values = points.map(p => p.handicap_index);
+    const min = Math.min(...values);
+    const max = Math.max(...values);
+    const r = max - min || 1;
+    const project = (v: number) =>
+      PAD_TOP + ((max - v) / r) * (H - PAD_TOP - PAD_BOTTOM);
+    const yTop = Math.max(0, Math.min(H, project(1.5)));
+    const yBottom = Math.max(0, Math.min(H, project(0)));
+    if (yBottom <= yTop) return null;
+    return { yTop, height: yBottom - yTop };
+  }, [points]);
+
 
   const pathD = useMemo(() => {
     if (coords.length === 0) return '';
@@ -323,6 +340,73 @@ const HeroHandicapCard: React.FC<Props> = ({ connection }) => {
     return <span style={{ color: INK_40 }}>Steady form · last 5</span>;
   })();
 
+  // ── Status word (driven by 8-round form direction) ───────────────────────
+  const statusWord =
+    fallbackForm.direction === 'negative' && Math.abs(fallbackForm.formStrokes) > 0.5 ? 'EXCELLENT FORM'
+    : fallbackForm.direction === 'negative' ? 'TRENDING DOWN'
+    : fallbackForm.direction === 'positive' && Math.abs(fallbackForm.formStrokes) > 0.5 ? 'DRIFTING UP'
+    : fallbackForm.direction === 'positive' ? 'STEADY'
+    : 'STEADY';
+  const statusColor =
+    fallbackForm.direction === 'negative' ? GREEN
+    : fallbackForm.direction === 'positive' && Math.abs(fallbackForm.formStrokes) > 0.5 ? '#9F1239'
+    : INK_55;
+
+  // ── Combined delta inline ────────────────────────────────────────────────
+  const deltaInline = (() => {
+    const d = trend?.delta;
+    if (d == null || Math.abs(d) < 0.05) {
+      return <span style={{ color: INK_55, fontWeight: 600 }}>Steady</span>;
+    }
+    const isDown = d < 0;
+    return (
+      <span style={{
+        color: isDown ? GREEN : RED, fontWeight: 600,
+        display: 'inline-flex', alignItems: 'center', gap: 3,
+      }}>
+        {isDown ? <ArrowDown size={13} strokeWidth={2.5} /> : <ArrowUp size={13} strokeWidth={2.5} />}
+        <span style={{ fontVariantNumeric: 'tabular-nums' }}>{Math.abs(d).toFixed(1)}</span>
+      </span>
+    );
+  })();
+
+  // ── 6-point sparkline from history points ────────────────────────────────
+  const sparkPolyline = (() => {
+    if (points.length < 2) return null;
+    let samples: HandicapPoint[];
+    if (points.length <= 6) {
+      samples = points;
+    } else {
+      const out: HandicapPoint[] = [];
+      const n = 6;
+      for (let i = 0; i < n; i++) {
+        const idx = Math.round((i / (n - 1)) * (points.length - 1));
+        out.push(points[idx]);
+      }
+      samples = out;
+    }
+    const values = samples.map(p => p.handicap_index);
+    const min = Math.min(...values);
+    const max = Math.max(...values);
+    const range = (max - min) || 1;
+    const headroom = range * 0.08;
+    const yMin = min - headroom;
+    const yMax = max + headroom;
+    const yRange = yMax - yMin || 1;
+    const w = 48;
+    const h = 14;
+    const coordsLocal = samples.map((p, i) => {
+      const x = (i / (samples.length - 1)) * w;
+      const y = ((yMax - p.handicap_index) / yRange) * h;
+      return { x, y };
+    });
+    return {
+      points: coordsLocal.map(c => `${c.x.toFixed(2)},${c.y.toFixed(2)}`).join(' '),
+      lastX: coordsLocal[coordsLocal.length - 1].x,
+      lastY: coordsLocal[coordsLocal.length - 1].y,
+    };
+  })();
+
   return (
     <section style={{ padding: '24px 12px 20px', marginBottom: 24 }}>
       {/* Eyebrow row */}
@@ -363,18 +447,18 @@ const HeroHandicapCard: React.FC<Props> = ({ connection }) => {
       </div>
 
       {/* Multi-stream Ring */}
-      <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 6, position: 'relative' }}>
+      <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 6, paddingBottom: 56, position: 'relative' }}>
         <div style={{ position: 'relative', width: RING_SIZE, height: RING_SIZE }}>
           {/* Milestone labels around top of ring */}
           <div style={{
-            position: 'absolute', top: 6, left: 16, fontSize: 9, fontWeight: 800,
-            color: INK_40, letterSpacing: '0.18em',
+            position: 'absolute', top: -4, left: 16, fontSize: 10.5, fontWeight: 700,
+            color: INK_40, letterSpacing: '0.14em',
           }}>
             {formatDisplayedHcp(milestone.displayed)} HCP
           </div>
           <div style={{
-            position: 'absolute', top: 6, right: 16, fontSize: 9, fontWeight: 800,
-            color: AMBER_DEEP, letterSpacing: '0.18em',
+            position: 'absolute', top: -4, right: 16, fontSize: 10.5, fontWeight: 700,
+            color: AMBER_DEEP, letterSpacing: '0.14em',
           }}>
             {formatDisplayedHcp(milestone.displayed - 1)} HCP →
           </div>
@@ -398,7 +482,7 @@ const HeroHandicapCard: React.FC<Props> = ({ connection }) => {
             {/* Inner track */}
             <circle
               cx={CX} cy={CY} r={R_INNER}
-              fill="none" stroke={INK_04} strokeWidth={STROKE_INNER}
+              fill="none" stroke={INK_06} strokeWidth={STROKE_INNER}
             />
 
             {/* Inner positive form (green, clockwise from 12) */}
@@ -439,31 +523,64 @@ const HeroHandicapCard: React.FC<Props> = ({ connection }) => {
             position: 'absolute', inset: 0,
             display: 'flex', flexDirection: 'column',
             alignItems: 'center', justifyContent: 'center',
-            pointerEvents: 'none', gap: 8,
+            pointerEvents: 'none', gap: 0,
           }}>
             <span style={{
-              fontSize: 9, fontWeight: 800, color: INK_55, letterSpacing: '0.22em',
+              fontSize: 9.5, fontWeight: 800, color: statusColor,
+              letterSpacing: '0.18em', marginBottom: 4, textTransform: 'uppercase',
             }}>
-              YOUR INDEX
+              {statusWord}
             </span>
             <span style={{
-              fontFamily: FONT_DISPLAY,
-              fontSize: 80, fontWeight: 400, lineHeight: 0.85,
-              letterSpacing: '-0.04em',
-              color: INK,
-              fontVariantNumeric: 'proportional-nums lining-nums',
-              textAlign: 'center',
-              display: 'block',
+              fontSize: 76, fontWeight: 700, color: INK,
+              letterSpacing: '-0.04em', lineHeight: 1,
+              fontVariantNumeric: 'tabular-nums',
+              textAlign: 'center', display: 'block',
             }}>
               {scrubValue.toFixed(1)}
             </span>
-            <span style={{
-              fontFamily: FONT_DISPLAY,
-              fontSize: 13, fontWeight: 500,
+            <div style={{
+              marginTop: 10,
+              display: 'flex', alignItems: 'center', gap: 10,
+              fontSize: 13, fontVariantNumeric: 'tabular-nums',
               opacity: isScrubbing ? 0 : 1,
               transition: 'opacity 200ms ease',
             }}>
-              {formNode}
+              {deltaInline}
+              {sparkPolyline && (
+                <>
+                  <span style={{ width: 1, height: 12, background: INK_10, display: 'inline-block' }} />
+                  <svg width={48} height={14} viewBox="0 0 48 14" style={{ display: 'block' }}>
+                    <polyline
+                      points={sparkPolyline.points}
+                      fill="none"
+                      stroke={AMBER}
+                      strokeWidth={1.5}
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      vectorEffect="non-scaling-stroke"
+                    />
+                    <circle cx={sparkPolyline.lastX} cy={sparkPolyline.lastY} r={2} fill={AMBER} />
+                  </svg>
+                  <span style={{ fontSize: 11, color: INK_55, fontWeight: 500 }}>vs last 30d</span>
+                </>
+              )}
+            </div>
+          </div>
+
+          {/* Legend */}
+          <div style={{
+            position: 'absolute', bottom: -38, left: 0, right: 0,
+            display: 'flex', justifyContent: 'center', gap: 18,
+            fontSize: 10.5, fontWeight: 600, color: INK_55, letterSpacing: '0.06em',
+          }}>
+            <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+              <span style={{ width: 8, height: 8, borderRadius: '50%', background: AMBER }} />
+              INDEX TRAJECTORY
+            </span>
+            <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+              <span style={{ width: 8, height: 8, borderRadius: '50%', background: GREEN }} />
+              8-ROUND FORM
             </span>
           </div>
         </div>
@@ -488,6 +605,30 @@ const HeroHandicapCard: React.FC<Props> = ({ connection }) => {
               <stop offset="100%" stopColor={AMBER} stopOpacity={0} />
             </linearGradient>
           </defs>
+
+          {scratchBand && (
+            <g>
+              <rect
+                x={0}
+                y={scratchBand.yTop}
+                width={W}
+                height={scratchBand.height}
+                fill={GREEN}
+                opacity={0.05}
+              />
+              <text
+                x={6}
+                y={scratchBand.yTop + scratchBand.height - 4}
+                fontSize={9}
+                fontWeight={700}
+                fill={GREEN}
+                opacity={0.7}
+                letterSpacing={1.3}
+              >
+                SCRATCH ZONE
+              </text>
+            </g>
+          )}
 
           {coords.length >= 2 && (
             <>
@@ -623,7 +764,7 @@ const HeroHandicapCard: React.FC<Props> = ({ connection }) => {
         {/* Timeline */}
         <div style={{
           display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-          marginTop: 4, fontSize: 9, fontWeight: 700, color: INK_40,
+          marginTop: 8, fontSize: 10.5, fontWeight: 700, color: INK_40,
           letterSpacing: '0.12em',
         }}>
           {isScrubbing && scrubPoint ? (

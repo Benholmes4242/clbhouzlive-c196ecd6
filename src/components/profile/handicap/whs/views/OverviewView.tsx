@@ -1,7 +1,6 @@
 import React from 'react';
 import { formatDistanceToNow } from 'date-fns';
 import { AlertTriangle, RefreshCw } from 'lucide-react';
-import { toast } from 'sonner';
 import type { WhsConnection } from '@/lib/whs/types';
 import MorningMoment from '@/components/handicap/MorningMoment';
 import HeroHandicapCard from '../sections/HeroHandicapCard';
@@ -86,45 +85,48 @@ export const OverviewView: React.FC<Props> = ({
         userId={userId}
       />
 
-      {/* Sync footer — hidden in read-only mode */}
+      {/* Sync footer — single line, hidden in read-only mode */}
       {!readOnly && (
-        <div className="px-5 pt-2 flex flex-col items-center gap-3">
-          <p className="text-[12px] text-muted-foreground">
+        <div
+          style={{
+            padding: '40px 20px 0',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: 8,
+            fontSize: 12.5,
+            color: 'rgba(15,23,42,0.55)',
+            fontFamily: 'Geist, system-ui, -apple-system, BlinkMacSystemFont, sans-serif',
+          }}
+        >
+          <RefreshCw
+            size={13}
+            color="rgba(15,23,42,0.55)"
+            className={isSyncing ? 'animate-spin' : ''}
+          />
+          <span>
             {lastSyncedAt
-              ? `Last refreshed ${formatDistanceToNow(lastSyncedAt, { addSuffix: true })}`
+              ? `Synced ${formatDistanceToNow(lastSyncedAt, { addSuffix: false })} ago`
               : 'Not yet synced'}
-          </p>
+          </span>
+          <span style={{ color: 'rgba(15,23,42,0.40)' }}>·</span>
           <button
             onClick={onSyncNow}
             disabled={isSyncing}
-            className="inline-flex items-center gap-1.5 text-[14px] font-semibold disabled:opacity-50"
-            style={{ color: '#F7931E' }}
+            style={{
+              background: 'none',
+              border: 'none',
+              color: '#F7931E',
+              fontWeight: 700,
+              fontSize: 12.5,
+              padding: 0,
+              cursor: isSyncing ? 'not-allowed' : 'pointer',
+              opacity: isSyncing ? 0.5 : 1,
+            }}
           >
-            <RefreshCw className={`h-3.5 w-3.5 ${isSyncing ? 'animate-spin' : ''}`} />
             {isSyncing ? 'Syncing...' : 'Sync now'}
           </button>
-          <button
-            onClick={() =>
-              toast(
-                'Disconnect coming soon — get in touch via support if you need to disconnect now.'
-              )
-            }
-            className="text-[12px] text-muted-foreground mt-2"
-          >
-            Disconnect England Golf
-          </button>
         </div>
-      )}
-
-      {/* Refresh frequency caption */}
-      {!readOnly && lastSyncedAt && (
-        <p
-          className="text-center text-[11px] mx-5 mt-6 mb-2"
-          style={{ color: 'rgba(15,23,42,0.40)' }}
-        >
-          Handicap refreshes daily ·{' '}
-          {formatDistanceToNow(lastSyncedAt, { addSuffix: true })}
-        </p>
       )}
     </div>
   );

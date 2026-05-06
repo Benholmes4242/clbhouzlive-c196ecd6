@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ChevronRight, MapPin, Sparkles, Target, TrendingDown } from 'lucide-react';
+import { ChevronDown, ChevronRight, MapPin, Sparkles, Target, TrendingDown } from 'lucide-react';
 import { useHandicapInsights } from '@/lib/whs/insights/useHandicapInsights';
 import type { SuitedCourse } from '@/lib/whs/insights/types';
 import { useCounters } from '@/lib/whs/hooks';
@@ -14,7 +14,9 @@ const INK_06 = 'rgba(15,23,42,0.06)';
 const AMBER = '#F7931E';
 const AMBER_DEEP = '#C97211';
 const AMBER_INK = '#9A6116';
+const AMBER_14 = 'rgba(247,147,30,0.14)';
 const GREEN = '#059669';
+const FONT_GEIST = 'Geist, system-ui, -apple-system, BlinkMacSystemFont, sans-serif';
 const FONT_SERIF = 'Georgia, "Times New Roman", serif';
 
 interface Props {
@@ -234,11 +236,12 @@ export const EchoInsightsCard: React.FC<Props> = ({ connectionId }) => {
   const navigate = useNavigate();
   const { data: counters } = useCounters(connectionId);
   const { data: insights, isLoading, error } = useHandicapInsights(connectionId);
+  const [expanded, setExpanded] = useState(false);
 
   // Edge case: fewer than 8 rounds — render nothing.
   if (counters && counters.length < 8) return null;
 
-  const handleBubbleTap = () => {
+  const handleAskFollowup = () => {
     if (!insights) return;
     const seedPrompt = `Here's your read on my game:\n\n"${insights.scoring_profile}"\n\nI'd like to ask you a follow-up about this.`;
     analyticsEvents.track('echo_contextual_tap', {
@@ -276,16 +279,23 @@ export const EchoInsightsCard: React.FC<Props> = ({ connectionId }) => {
 
       <SectionHeader />
 
-      {/* Bubble */}
+      {/* Bubble + CTA stack */}
       {isLoading || !insights ? (
         <SkeletonBubble />
       ) : (
-        <div>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
           <div style={{ display: 'flex', gap: 12, alignItems: 'flex-start' }}>
             <Avatar />
-            <button
-              type="button"
-              onClick={handleBubbleTap}
+            <div
+              role="button"
+              tabIndex={0}
+              onClick={() => setExpanded((v) => !v)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault();
+                  setExpanded((v) => !v);
+                }
+              }}
               style={{
                 flex: 1,
                 textAlign: 'left',
@@ -293,7 +303,7 @@ export const EchoInsightsCard: React.FC<Props> = ({ connectionId }) => {
                 border: `0.5px solid ${INK_10}`,
                 borderRadius: '6px 16px 16px 16px',
                 boxShadow: '0 1px 3px rgba(15,23,42,0.04)',
-                padding: '10px 12px 10px 12px',
+                padding: '10px 12px',
                 cursor: 'pointer',
                 minWidth: 0,
               }}
@@ -302,61 +312,68 @@ export const EchoInsightsCard: React.FC<Props> = ({ connectionId }) => {
               <div
                 style={{
                   display: 'flex',
-                  alignItems: 'center',
+                  alignItems: 'flex-start',
                   justifyContent: 'space-between',
+                  gap: 8,
                 }}
               >
                 <span style={{ fontSize: 12, fontWeight: 700, color: INK }}>Echo</span>
-                <ChevronRight size={14} color={INK_40} />
+                <ChevronDown
+                  size={16}
+                  color={INK_40}
+                  style={{
+                    marginTop: 4,
+                    flexShrink: 0,
+                    transform: expanded ? 'rotate(180deg)' : 'none',
+                    transition: 'transform 0.2s',
+                  }}
+                />
               </div>
               <p
                 style={{
-                  margin: '8px 0 12px',
-                  fontFamily: 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif',
+                  margin: '8px 0 0',
+                  fontFamily: FONT_GEIST,
                   fontSize: 15,
                   lineHeight: 1.55,
                   color: INK,
+                  ...(expanded
+                    ? {}
+                    : {
+                        display: '-webkit-box',
+                        WebkitLineClamp: 3,
+                        WebkitBoxOrient: 'vertical' as const,
+                        overflow: 'hidden',
+                      }),
                 }}
               >
                 {renderBoldMarkdown(insights.scoring_profile)}
               </p>
-              <div
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 5,
-                  paddingTop: 7,
-                  borderTop: `0.5px solid ${INK_10}`,
-                }}
-              >
-                <Sparkles size={11} color={AMBER_DEEP} strokeWidth={2.2} />
-                <span
-                  style={{
-                    fontSize: 11,
-                    fontWeight: 700,
-                    color: AMBER_INK,
-                    letterSpacing: '0.02em',
-                  }}
-                >
-                  Tap to ask Echo a follow-up
-                </span>
-              </div>
-            </button>
-          </div>
-          {insights.rounds_pattern && (
-            <div
-              style={{
-                marginTop: 10,
-                paddingLeft: 56,
-                fontFamily: 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif',
-                fontSize: 12,
-                lineHeight: 1.5,
-                color: INK_55,
-              }}
-            >
-              {renderBoldMarkdown(insights.rounds_pattern)}
             </div>
-          )}
+          </div>
+
+          <button
+            type="button"
+            onClick={handleAskFollowup}
+            style={{
+              alignSelf: 'flex-start',
+              marginLeft: 56,
+              background: AMBER_14,
+              border: 'none',
+              borderRadius: 999,
+              padding: '8px 14px',
+              display: 'flex',
+              alignItems: 'center',
+              gap: 6,
+              fontFamily: FONT_GEIST,
+              fontSize: 12.5,
+              fontWeight: 700,
+              color: AMBER,
+              cursor: 'pointer',
+            }}
+          >
+            <Sparkles size={13} strokeWidth={2.2} />
+            Ask Echo a follow-up
+          </button>
         </div>
       )}
 
