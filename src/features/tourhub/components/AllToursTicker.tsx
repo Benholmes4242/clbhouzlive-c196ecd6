@@ -360,7 +360,7 @@ export function AllToursTicker({ activeId, onSelect }: AllToursTickerProps = {})
         borderBottom: `1px solid ${SLATE_200}`,
       }}
     >
-      <Masthead config={config} />
+
 
       {isLoading && cells.length === 0 ? (
         <div style={{ display: 'flex', gap: 12, padding: '0 20px', overflowX: 'hidden' }}>
