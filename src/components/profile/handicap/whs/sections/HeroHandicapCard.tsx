@@ -38,9 +38,9 @@ const C_INNER = 2 * Math.PI * R_INNER;
 
 // Sparkline
 const W = 340;
-const H = 50;
-const PAD_TOP = 4;
-const PAD_BOTTOM = 4;
+const H = 110;
+const PAD_TOP = 22;
+const PAD_BOTTOM = 22;
 
 // ── Milestone progress ────────────────────────────────────────────────────
 function calcMilestoneProgress(h: number) {
@@ -125,6 +125,42 @@ const HeroHandicapCard: React.FC<Props> = ({ connection }) => {
       const y = PAD_TOP + ((max - p.handicap_index) / r) * (H - PAD_TOP - PAD_BOTTOM);
       return { x, y, idx: i };
     });
+  }, [points]);
+
+  const bestPoint = useMemo(() => {
+    if (coords.length === 0) return null;
+    let bestIdx = 0;
+    let bestVal = points[0].handicap_index;
+    for (let i = 1; i < points.length; i++) {
+      if (points[i].handicap_index < bestVal) {
+        bestVal = points[i].handicap_index;
+        bestIdx = i;
+      }
+    }
+    return { coord: coords[bestIdx], value: bestVal };
+  }, [coords, points]);
+
+  const worstPoint = useMemo(() => {
+    if (coords.length === 0) return null;
+    let worstIdx = 0;
+    let worstVal = points[0].handicap_index;
+    for (let i = 1; i < points.length; i++) {
+      if (points[i].handicap_index > worstVal) {
+        worstVal = points[i].handicap_index;
+        worstIdx = i;
+      }
+    }
+    return { coord: coords[worstIdx], value: worstVal };
+  }, [coords, points]);
+
+  const zeroLineY = useMemo(() => {
+    if (points.length === 0) return null;
+    const values = points.map(p => p.handicap_index);
+    const min = Math.min(...values);
+    const max = Math.max(...values);
+    const r = max - min || 1;
+    if (0 < min - r * 0.1 || 0 > max + r * 0.1) return null;
+    return PAD_TOP + ((max - 0) / r) * (H - PAD_TOP - PAD_BOTTOM);
   }, [points]);
 
   const pathD = useMemo(() => {
@@ -481,10 +517,90 @@ const HeroHandicapCard: React.FC<Props> = ({ connection }) => {
             />
           )}
 
+          {!isScrubbing && zeroLineY !== null && (
+            <g>
+              <line
+                x1={0} y1={zeroLineY} x2={W} y2={zeroLineY}
+                stroke={INK_40}
+                strokeWidth={0.5}
+                strokeDasharray="3 3"
+                opacity={0.4}
+              />
+              <text
+                x={W - 4} y={zeroLineY - 3}
+                fontSize={9}
+                fontWeight={500}
+                fill={INK_40}
+                textAnchor="end"
+              >
+                0
+              </text>
+            </g>
+          )}
+
+          {!isScrubbing && bestPoint && coords.length > 1 && bestPoint.coord !== coords[coords.length - 1] && (
+            <g>
+              <circle
+                cx={bestPoint.coord.x}
+                cy={bestPoint.coord.y}
+                r={3.5}
+                fill={GREEN}
+                stroke="#fff"
+                strokeWidth={1.5}
+              />
+              <text
+                x={bestPoint.coord.x}
+                y={bestPoint.coord.y - 8}
+                fontSize={9}
+                fontWeight={700}
+                fill={GREEN}
+                textAnchor="middle"
+              >
+                {formatDisplayedHcp(bestPoint.value)}
+              </text>
+            </g>
+          )}
+
+          {!isScrubbing && worstPoint && coords.length > 1 && worstPoint.coord !== coords[coords.length - 1] && worstPoint.coord !== bestPoint?.coord && (
+            <g>
+              <circle
+                cx={worstPoint.coord.x}
+                cy={worstPoint.coord.y}
+                r={3.5}
+                fill={RED}
+                stroke="#fff"
+                strokeWidth={1.5}
+              />
+              <text
+                x={worstPoint.coord.x}
+                y={worstPoint.coord.y - 8}
+                fontSize={9}
+                fontWeight={700}
+                fill={RED}
+                textAnchor="middle"
+              >
+                {formatDisplayedHcp(worstPoint.value)}
+              </text>
+            </g>
+          )}
+
           {!isScrubbing && coords.length > 0 && (() => {
             const last = coords[coords.length - 1];
+            const lastValue = points[points.length - 1].handicap_index;
             return (
-              <circle cx={last.x} cy={last.y} r={4} fill={AMBER} stroke="#fff" strokeWidth={2} />
+              <g>
+                <circle cx={last.x} cy={last.y} r={5} fill={AMBER} stroke="#fff" strokeWidth={2} />
+                <text
+                  x={last.x - 8}
+                  y={last.y + 14}
+                  fontSize={11}
+                  fontWeight={700}
+                  fill={INK}
+                  textAnchor="end"
+                >
+                  {formatDisplayedHcp(lastValue)}
+                </text>
+              </g>
             );
           })()}
 

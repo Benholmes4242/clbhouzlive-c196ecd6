@@ -67,6 +67,16 @@ export const LastRoundCard: React.FC<Props> = ({ connectionId }) => {
   const hasMovement = delta !== null && delta !== undefined;
   const isImprovement = hasMovement && delta! < 0;
   const isWorse = hasMovement && delta! > 0;
+
+  // DIFF vs handicap-at-time signal for the DIFF tile color
+  const diff = lastRound.handicap_differential;
+  const handicapAtTime = lastRound.handicap_index_at_time;
+  const DIFF_THRESHOLD = 0.05;
+  const diffVsHcp =
+    diff != null && handicapAtTime != null ? diff - handicapAtTime : null;
+  const diffWasBetter = diffVsHcp != null && diffVsHcp < -DIFF_THRESHOLD;
+  const diffWasWorse = diffVsHcp != null && diffVsHcp > DIFF_THRESHOLD;
+
   const stripeColor = isImprovement ? GREEN : isWorse ? RED : 'rgba(255,255,255,0.3)';
   const Arrow = isImprovement ? ArrowDown : isWorse ? ArrowUp : Minus;
   const arrowColor = isImprovement ? GREEN : isWorse ? RED : 'rgba(255,255,255,0.85)';
@@ -226,7 +236,12 @@ export const LastRoundCard: React.FC<Props> = ({ connectionId }) => {
                   style={{
                     fontSize: 20,
                     fontWeight: 700,
-                    color: stat.label === 'DIFF' && isWorse ? RED : '#fff',
+                    color:
+                      stat.label === 'DIFF' && diffWasBetter
+                        ? GREEN
+                        : stat.label === 'DIFF' && diffWasWorse
+                        ? RED
+                        : '#fff',
                     fontVariantNumeric: 'tabular-nums',
                     lineHeight: 1,
                   }}
