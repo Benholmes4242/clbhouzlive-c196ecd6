@@ -158,13 +158,15 @@ function HeadlineCard({ tournament }: { tournament: SeasonTournament }) {
     >
       <div style={{
         position: 'relative', width: '100%', height: 220,
+        borderRadius: '16px 16px 0 0',
+        overflow: 'hidden',
         background: venueImage?.imageUrl
           ? `url(${venueImage.imageUrl}) center/cover`
           : `linear-gradient(135deg, ${tour.stripe}, ${NAVY_HIGH})`,
       }}>
         <div style={{
           position: 'absolute', inset: 0,
-          background: 'linear-gradient(180deg, rgba(0,0,0,0) 30%, rgba(0,0,0,0.85) 100%)',
+          background: 'linear-gradient(180deg, rgba(0,0,0,0) 50%, rgba(0,0,0,0.65) 100%)',
         }} />
 
         <div style={{
