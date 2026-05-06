@@ -288,6 +288,7 @@ const HandicapPageHeader: React.FC<HeaderProps> = ({
         ))}
       </div>
     </header>
+    </>
   );
 };
 
