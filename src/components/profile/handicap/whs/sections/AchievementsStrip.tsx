@@ -383,19 +383,15 @@ export const AchievementsStrip: React.FC<Props> = ({
         style={{
           display: 'flex',
           gap: 10,
-          paddingBottom: 8,
+          padding: '0 20px 8px',
           overflowX: 'auto',
-          scrollSnapType: 'x mandatory',
+          scrollPaddingLeft: 20,
+          scrollPaddingRight: 20,
           WebkitOverflowScrolling: 'touch',
           scrollbarWidth: 'none',
         }}
         className="hide-scrollbar"
       >
-        {/* Leading spacer — explicit minWidth + flexShrink to prevent collapse. */}
-        <div
-          aria-hidden
-          style={{ width: 50, minWidth: 50, flex: '0 0 50px', flexShrink: 0, alignSelf: 'stretch' }}
-        />
         {isLoading
           ? Array.from({ length: 4 }).map((_, i) => <SkeletonTile key={i} />)
           : (
@@ -409,11 +405,6 @@ export const AchievementsStrip: React.FC<Props> = ({
               )}
             </>
           )}
-        {/* Trailing spacer */}
-        <div
-          aria-hidden
-          style={{ width: 50, minWidth: 50, flex: '0 0 50px', flexShrink: 0, alignSelf: 'stretch' }}
-        />
       </div>
 
       <AllTrophiesSheet
