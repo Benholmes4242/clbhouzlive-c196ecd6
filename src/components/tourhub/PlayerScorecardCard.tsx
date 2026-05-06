@@ -585,12 +585,12 @@ export function PlayerScorecardCard({
             <div
               style={{
                 position: 'absolute', bottom: -2, right: -2,
-                width: 24, height: 24, borderRadius: '50%',
+                width: 20, height: 20, borderRadius: '50%',
                 background: isCompleted ? gold : greenLive,
                 color: isCompleted ? ink : '#fff',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
                 border: `2px solid ${navyMid}`,
-                fontSize: 10, fontWeight: 800,
+                fontSize: 9, fontWeight: 800,
                 fontVariantNumeric: 'tabular-nums',
               }}
             >
