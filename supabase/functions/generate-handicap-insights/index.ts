@@ -377,15 +377,15 @@ function buildPrompt(rounds: any[], candidates: any[], dateKey: string) {
 USER'S ROUND HISTORY (last ${rounds.length} rounds, newest first):
 ${JSON.stringify(rounds)}
 
-CANDIDATE COURSES (${candidates.length} courses across Britain & Ireland — daily-rotated; you haven't played any of these recently and they haven't been recommended to you in the past 7 days):
+CANDIDATE COURSES (${candidates.length} courses across Britain & Ireland — daily-rotated; you haven't played any of these recently and they haven't been recommended to you in the past 7 days). Each candidate includes an "expected_differential" — the differential you would likely shoot there based on your recent form and the course's slope (may be null when slope is unknown):
 ${JSON.stringify(candidates)}
 
 Produce a JSON response with this exact structure:
 {
   "scoring_profile": "<2-3 sentences (50-70 words) characterising what kinds of courses suit your game. Reference your best counter and the specific course (by name) where you shot it. Mention what kind of course produces higher differentials. Use 'you' and 'your', never 'this player' or 'they'.>",
   "rounds_pattern": "<1-2 sentences (max 30 words) about your recent counter rounds. Reference specific numbers and wrap key values in **bold** markdown (e.g. **+0.6**, **+1.7**). Use 'you' and 'your'. No speculation.>",
-  "suited_courses": [ { "id": "<golf_courses.id from CANDIDATE COURSES>", "rationale": "<one sentence, max 22 words, why this course matches your best scoring profile. Reference the course by name in your rationale.>" } ],
-  "test_courses": [ { "id": "<golf_courses.id from CANDIDATE COURSES>", "rationale": "<one sentence, max 22 words, why this course will push your game (frame as growth). Reference the course by name.>" } ]
+  "suited_courses": [ { "id": "<golf_courses.id from CANDIDATE COURSES>", "expected_differential": <copy the expected_differential value from the matching candidate>, "rationale": "<one sentence, max 22 words, why this course matches your best scoring profile. Reference the course by name in your rationale.>" } ],
+  "test_courses": [ { "id": "<golf_courses.id from CANDIDATE COURSES>", "expected_differential": <copy the expected_differential value from the matching candidate>, "rationale": "<one sentence, max 22 words, why this course will push your game (frame as growth). Reference the course by name.>" } ]
 }
 
 Rules:
