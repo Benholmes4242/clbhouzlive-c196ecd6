@@ -413,24 +413,36 @@ export function ComingUpCalendar() {
 
   return (
     <div>
-      {/* Section header */}
-      <div style={{
-        display: 'flex', alignItems: 'baseline', justifyContent: 'space-between',
-        padding: '0 16px', marginBottom: 18,
-      }}>
-        <h2 style={{
-          fontSize: 24, fontWeight: 800, letterSpacing: '-0.025em',
-          color: INK, margin: 0,
-        }}>Tournament Calendar</h2>
+      {/* Section header — mirrors Tournament Intelligence eyebrow */}
+      <div style={{ padding: '0 16px', marginBottom: 14 }}>
         <button
           onClick={() => navigate('/tourhub?tab=schedule')}
+          aria-label="Open full schedule"
           style={{
-            fontSize: 12, fontWeight: 700, color: AMBER,
-            background: 'transparent', border: 'none', padding: 0,
-            display: 'flex', alignItems: 'center', gap: 2, cursor: 'pointer',
+            background: 'transparent',
+            border: 'none',
+            padding: 0,
+            cursor: 'pointer',
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: 6,
           }}
         >
-          Full Schedule <ChevronRight size={13} />
+          <Calendar size={13} color={AMBER} strokeWidth={2.5} />
+          <span style={{
+            fontSize: 10.5,
+            fontWeight: 700,
+            letterSpacing: '0.14em',
+            color: AMBER,
+          }}>
+            UPCOMING EVENTS
+          </span>
+          <ChevronRight
+            size={11}
+            color={AMBER}
+            strokeWidth={2.5}
+            style={{ marginTop: 1 }}
+          />
         </button>
       </div>
 
