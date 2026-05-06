@@ -1,5 +1,6 @@
 import { useNavigate, useNavigationType } from 'react-router-dom';
-import { ChevronLeft, Search } from 'lucide-react';
+import { Search } from 'lucide-react';
+import { useStickyHeaderSafeArea } from '@/hooks/useStickyHeaderSafeArea';
 import { useState, useEffect } from 'react';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import PageRoot from '@/components/layout/PageRoot';
