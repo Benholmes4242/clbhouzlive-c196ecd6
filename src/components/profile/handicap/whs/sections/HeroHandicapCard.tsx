@@ -6,8 +6,6 @@ import type { WhsConnection, HandicapPoint } from '@/lib/whs/types';
 
 interface Props {
   connection: WhsConnection;
-  /** Owner of the connection — used to fetch the 30D delta from the leaderboard self-row. */
-  userId?: string;
 }
 
 type Range = 90 | 365 | 'all';
