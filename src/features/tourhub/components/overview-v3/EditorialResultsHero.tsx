@@ -459,7 +459,7 @@ export function ResultsHeroSkeleton() {
       <div
         style={{
           paddingTop: 'calc(max(env(safe-area-inset-top, 0px), 47px) + 56px)',
-          padding: '0 20px',
+          paddingInline: 20,
           paddingBottom: 24,
           height: '100%',
           overflow: 'hidden',
@@ -624,7 +624,7 @@ export function EditorialResultsHero({
       <div
         style={{
           paddingTop: 'calc(max(env(safe-area-inset-top, 0px), 47px) + 56px)',
-          padding: '0 20px',
+          paddingInline: 20,
           paddingBottom: 24,
           overflowY: 'auto',
           height: '100%',
