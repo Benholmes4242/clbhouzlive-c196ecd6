@@ -45,7 +45,7 @@ export const OverviewView: React.FC<Props> = ({
       aria-labelledby="handicap-tab-overview"
     >
       {/* Today section — viewer's daily context, hidden on friend pages */}
-      {!readOnly && <MorningMoment />}
+      {!readOnly && <MorningMoment userId={userId} />}
 
       {/* Sync state banners (re-auth takes priority over stale) */}
       {showReauthBanner ? (
