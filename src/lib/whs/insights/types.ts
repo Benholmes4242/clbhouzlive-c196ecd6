@@ -3,6 +3,9 @@ export type SuitedCourse = {
   name: string;
   region: string;
   rationale: string;
+  /** Predicted differential at this course based on user's recent form +
+   *  course slope. Null if either input was unavailable at generation time. */
+  expected_differential: number | null;
 };
 
 export type HandicapInsights = {
