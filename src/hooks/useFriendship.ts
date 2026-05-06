@@ -209,17 +209,17 @@ export function useFriendship(targetUserId: string | undefined) {
     },
   });
 
-  // Decline friend request
+  // Decline friend request — hard delete so the requester can re-send later
   const declineRequestMutation = useMutation({
     mutationFn: async () => {
       if (!currentUserId || !relationshipId) throw new Error('Missing data');
-      
+
       const { error } = await supabase
         .from('user_friends')
-        .update({ status: 'declined' })
+        .delete()
         .eq('id', relationshipId)
-        .eq('friend_id', currentUserId); // Only decline if I'm the receiver
-      
+        .eq('friend_id', currentUserId); // Only the receiver can decline
+
       if (error) throw error;
     },
     onSuccess: () => {
