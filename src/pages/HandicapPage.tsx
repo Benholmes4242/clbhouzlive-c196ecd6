@@ -21,6 +21,7 @@ import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useWhsConnection } from '@/lib/whs/hooks';
 import WhsHandicapTab from '@/components/profile/handicap/whs/WhsHandicapTab';
 import HandicapDashboard from '@/components/profile/handicap/whs/HandicapDashboard';
+import { useStickyHeaderSafeArea } from '@/hooks/useStickyHeaderSafeArea';
 
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { isHandicapSubtab, type HandicapSubtab } from '@/components/profile/handicap/whs/types';
