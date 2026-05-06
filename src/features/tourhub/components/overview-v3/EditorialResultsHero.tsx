@@ -689,7 +689,7 @@ export function EditorialResultsHero({
         />
 
         {/* 4. Stats grid (single panel, hairline dividers, gold for birdies) */}
-        {winnerStats && <StatsGrid stats={winnerStats as any} isLive={false} />}
+        {winnerStats && <StatsGrid stats={winnerStats as any} />}
 
         {/* 5. Also on the podium */}
         {podium.length > 0 && (
