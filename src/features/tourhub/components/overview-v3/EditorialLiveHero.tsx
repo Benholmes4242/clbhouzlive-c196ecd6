@@ -208,7 +208,7 @@ function LeaderHero({
   const today = (thru != null && thru >= 1 && thru < 18) ? score - completedTotal : null;
 
   return (
-    <div style={{ display: 'flex', alignItems: 'stretch', gap: 14, marginBottom: 22 }}>
+    <div style={{ display: 'flex', alignItems: 'stretch', gap: 10, marginBottom: 14 }}>
       <div style={{ position: 'relative', flexShrink: 0 }}>
         <div
           style={{
