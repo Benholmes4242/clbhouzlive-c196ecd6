@@ -764,7 +764,7 @@ const HeroHandicapCard: React.FC<Props> = ({ connection }) => {
         {/* Timeline */}
         <div style={{
           display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-          marginTop: 4, fontSize: 9, fontWeight: 700, color: INK_40,
+          marginTop: 8, fontSize: 10.5, fontWeight: 700, color: INK_40,
           letterSpacing: '0.12em',
         }}>
           {isScrubbing && scrubPoint ? (
