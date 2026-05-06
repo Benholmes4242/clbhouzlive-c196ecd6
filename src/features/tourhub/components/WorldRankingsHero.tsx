@@ -500,6 +500,18 @@ function ChaserRow({
         </div>
       </div>
 
+      {entry.total_points != null && (
+        <span style={{
+          fontSize: 13,
+          fontWeight: 700,
+          color: INK,
+          fontVariantNumeric: 'tabular-nums',
+          letterSpacing: '-0.01em',
+          flexShrink: 0,
+        }}>
+          {entry.total_points.toFixed(2)}
+        </span>
+      )}
       <MovementChip change={entry.rank_change} />
     </button>
   );
