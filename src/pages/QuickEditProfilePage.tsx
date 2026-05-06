@@ -3,7 +3,7 @@
  * Reuses wizard step components but renders all sections stacked.
  * No wizard chrome, no slide animation, sticky save bar at the bottom.
  */
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
 import { ChevronLeft, Loader2 } from 'lucide-react';
@@ -65,14 +65,35 @@ export default function QuickEditProfilePage() {
 
   const isDisabled = !isValid || !isDirty || isSaving;
 
+  // Sentinel-based detection: suppress safe-area padding while CompactHeader
+  // is visible at top to avoid doubled inset gap (mirrors HandicapPage).
+  const [isAtTop, setIsAtTop] = useState(true);
+  const sentinelRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const sentinel = sentinelRef.current;
+    if (!sentinel) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => setIsAtTop(entry.isIntersecting),
+      { threshold: 0 }
+    );
+    observer.observe(sentinel);
+    return () => observer.disconnect();
+  }, []);
+
   return (
     <div className="min-h-screen bg-[#F8FAFC] flex flex-col">
-      {/* Header */}
       <div
-        className="flex items-center justify-between px-4 bg-background border-b border-border"
+        ref={sentinelRef}
+        aria-hidden
+        style={{ height: 1, width: '100%', pointerEvents: 'none' }}
+      />
+      {/* Header */}
+      <header
+        className="sticky top-0 z-30 flex items-center justify-between px-4 bg-background border-b border-border"
         style={{
-          paddingTop: 'max(env(safe-area-inset-top, 0px), 47px)',
-          height: 'calc(max(env(safe-area-inset-top, 0px), 47px) + 56px)',
+          paddingTop: isAtTop ? 0 : 'max(env(safe-area-inset-top, 0px), 47px)',
+          height: isAtTop ? 56 : 'calc(max(env(safe-area-inset-top, 0px), 47px) + 56px)',
+          transition: 'padding-top 200ms ease, height 200ms ease',
         }}
       >
         <button
@@ -95,9 +116,9 @@ export default function QuickEditProfilePage() {
           </p>
         </div>
 
-
         <div className="w-9 h-9 flex-shrink-0" />
-      </div>
+      </header>
+
 
       {/* Stacked sections */}
       <div
