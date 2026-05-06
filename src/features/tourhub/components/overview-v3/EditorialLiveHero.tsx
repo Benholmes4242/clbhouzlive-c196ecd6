@@ -639,11 +639,11 @@ export function EditorialLiveHero({
         </div>
 
         {/* 2. Tournament name + venue --------------------------------------- */}
-        <div style={{ marginBottom: 28 }}>
+        <div style={{ marginBottom: 14 }}>
           <h1
             style={{
-              margin: 0, fontSize: 30, fontWeight: 800,
-              letterSpacing: '-0.025em', lineHeight: 1.05, color: '#fff',
+              margin: 0, fontSize: 20, fontWeight: 800,
+              letterSpacing: '-0.025em', lineHeight: 1.1, color: '#fff',
             }}
           >
             {tournament.name}
@@ -651,7 +651,7 @@ export function EditorialLiveHero({
           {(tournament.venueName || tournament.venueCity) && (
             <div
               style={{
-                marginTop: 8, fontSize: 12, color: inkFaint,
+                marginTop: 6, fontSize: 11, color: inkFaint,
                 display: 'flex', alignItems: 'center', gap: 5,
               }}
             >
@@ -666,51 +666,6 @@ export function EditorialLiveHero({
         {/* 3. Leader hero --------------------------------------------------- */}
         {leaderEntry && (
           <LeaderHero leaderEntry={leaderEntry} tourSlug={tournament.tourSlug} />
-        )}
-
-        {/* 4. Hole-by-hole strip -------------------------------------------- */}
-        {leaderId && (
-          <div
-            style={{
-              background: 'rgba(255,255,255,0.025)',
-              borderRadius: 14,
-              border: `1px solid ${hairlineDark}`,
-              padding: '14px 14px 12px',
-              marginBottom: 22,
-            }}
-          >
-            <div
-              style={{
-                display: 'flex', justifyContent: 'space-between', alignItems: 'baseline',
-                marginBottom: 10,
-              }}
-            >
-              <span
-                style={{
-                  fontSize: 9, fontWeight: 800, letterSpacing: '0.12em', color: inkFaint,
-                }}
-              >
-                R{displayRound || derivedRound} · LEADER HOLE BY HOLE
-              </span>
-              {activeHole != null && holeScores.length > 0 && (
-                <span style={{ fontSize: 10, color: greenLive, fontWeight: 700 }}>
-                  HOLE {activeHole} · {remaining} TO PLAY
-                </span>
-              )}
-            </div>
-            {displayHoles.length > 0 ? (
-              <HoleSparkline holes={displayHoles} activeHole={activeHole} />
-            ) : (
-              <div
-                style={{
-                  textAlign: 'center', color: inkFaint, fontSize: 11,
-                  padding: '14px 0',
-                }}
-              >
-                Round about to start
-              </div>
-            )}
-          </div>
         )}
 
         {/* 5. Leaderboard --------------------------------------------------- */}
