@@ -1,11 +1,13 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { ArrowDown, ArrowUp } from 'lucide-react';
-import { useHandicapHistory, useHandicapTrend, useAllScores } from '@/lib/whs/hooks';
+import { useHandicapHistory, useHandicapTrend, useAllScores, useFriendLeaderboard } from '@/lib/whs/hooks';
 import { whsDisplayedHcp, formatDisplayedHcp, fmtDiff } from '@/lib/whs/format';
 import type { WhsConnection, HandicapPoint } from '@/lib/whs/types';
 
 interface Props {
   connection: WhsConnection;
+  /** Owner of the connection — used to fetch the 30D delta from the leaderboard self-row. */
+  userId?: string;
 }
 
 type Range = 90 | 365 | 'all';
@@ -75,7 +77,7 @@ function calcForm(hcp: number, last5Diffs: number[]) {
   };
 }
 
-const HeroHandicapCard: React.FC<Props> = ({ connection }) => {
+const HeroHandicapCard: React.FC<Props> = ({ connection, userId }) => {
   const [range, setRange] = useState<Range>('all');
   const [scrubIdx, setScrubIdx] = useState<number | null>(null);
   const [drawn, setDrawn] = useState(false);
@@ -84,6 +86,12 @@ const HeroHandicapCard: React.FC<Props> = ({ connection }) => {
   const { data: trend, isLoading: trendLoading } = useHandicapTrend(connection.id);
   const { data: history, isLoading: historyLoading } = useHandicapHistory(connection.id, range);
   const { data: recent } = useAllScores(connection.id);
+
+  // Fetch self-row from leaderboard for 30D delta — same metric as profile sheet handicap tile
+  const { data: leaderboardEntries } = useFriendLeaderboard(userId);
+  const selfDelta30d = useMemo(() => {
+    return leaderboardEntries?.find((e: any) => e.is_self)?.handicap_30d_delta ?? null;
+  }, [leaderboardEntries]);
 
   const current = trend?.current ?? null;
   const points: HandicapPoint[] = history ?? [];
@@ -202,6 +210,35 @@ const HeroHandicapCard: React.FC<Props> = ({ connection }) => {
 
   // Form delta UI
   const formNode = (() => {
+    // 30D delta is the primary metric — matches profile sheet handicap tile.
+    // Fall back to form-last-5 only when 30D snapshot data isn't available yet.
+    if (selfDelta30d != null) {
+      const STEADY_THRESHOLD = 0.05;
+      const absDelta = Math.abs(selfDelta30d);
+      if (absDelta < STEADY_THRESHOLD) {
+        return <span style={{ color: INK_40 }}>Steady · last month</span>;
+      }
+      if (selfDelta30d < 0) {
+        return (
+          <span style={{ color: GREEN, display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+            <ArrowDown size={13} strokeWidth={2.5} />
+            <span style={{ fontVariantNumeric: 'tabular-nums' }}>
+              {absDelta.toFixed(1)} last month
+            </span>
+          </span>
+        );
+      }
+      return (
+        <span style={{ color: RED, display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+          <ArrowUp size={13} strokeWidth={2.5} />
+          <span style={{ fontVariantNumeric: 'tabular-nums' }}>
+            {absDelta.toFixed(1)} last month
+          </span>
+        </span>
+      );
+    }
+
+    // FALLBACK — form-last-5 (preserved logic for new users without 30-day history)
     if (last5Diffs.length < 5) {
       return <span style={{ color: INK_40 }}>Steady form · last 5</span>;
     }
