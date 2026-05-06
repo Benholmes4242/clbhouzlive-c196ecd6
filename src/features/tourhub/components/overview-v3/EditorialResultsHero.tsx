@@ -647,7 +647,21 @@ export function EditorialResultsHero({
   const nonWinners = finishers.filter((f) => f.position > (winner?.position ?? 1));
   const podium = nonWinners.filter((f) => f.position <= 3).slice(0, 2);
   const podiumKeys = new Set(podium.map(p_id));
-  const chasers = nonWinners.filter((f) => !podiumKeys.has(p_id(f))).slice(0, 8);
+  // "Best Round of the Week" — the single lowest individual round across all finishers
+  const bestRound = React.useMemo(() => {
+    const flat: Array<{ finisher: TournamentFinisher; round: number; score: number }> = [];
+    finishers.forEach((f) => {
+      [1, 2, 3, 4].forEach((r) => {
+        const v = (f as any)[`round${r}`] as number | null | undefined;
+        if (v !== null && v !== undefined) {
+          flat.push({ finisher: f, round: r, score: v });
+        }
+      });
+    });
+    if (flat.length === 0) return null;
+    flat.sort((a, b) => a.score - b.score);
+    return flat[0];
+  }, [finishers]);
 
   const handleFinisherTap = useCallback(
     (f: TournamentFinisher) => {
