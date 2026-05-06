@@ -507,34 +507,37 @@ export const RoundsThatCountCard: React.FC<Props> = ({ connectionId, currentHand
 const StatCell: React.FC<{
   label: string;
   value: number;
-  color: string;
+  dotColor: string;
+  valueColor: string;
   active?: boolean;
   disabled?: boolean;
+  withRightBorder?: boolean;
   onClick?: () => void;
-}> = ({ label, value, color, active, disabled, onClick }) => {
-  const valueColor = label === 'WORST' ? RED : label === 'BEST' ? GREEN : INK;
+}> = ({ label, value, dotColor, valueColor, active, disabled, withRightBorder, onClick }) => {
   return (
     <button
       onClick={disabled ? undefined : onClick}
       disabled={disabled}
       style={{
         display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4,
-        padding: '12px 6px',
+        padding: '14px 8px',
         background: active ? AMBER_TINT_06 : 'transparent',
         border: 'none',
-        borderRight: label !== 'WORST' ? `0.5px solid ${INK_10}` : 'none',
+        borderRight: withRightBorder ? `0.5px solid ${INK_10}` : 'none',
         cursor: disabled ? 'default' : 'pointer',
+        textAlign: 'center',
       }}
     >
-      <span style={{ width: 6, height: 6, borderRadius: '50%', background: color }} />
+      <span style={{ width: 6, height: 6, borderRadius: '50%', background: dotColor, marginBottom: 2 }} />
       <span style={{
-        fontSize: 9, fontWeight: 800, color: INK_55, letterSpacing: '0.22em',
+        fontSize: 9, fontWeight: 800, color: INK_55, letterSpacing: '0.16em',
       }}>
         {label}
       </span>
       <span style={{
-        fontSize: 22, fontWeight: 600, color: valueColor,
+        fontSize: 22, fontWeight: 700, color: valueColor,
         fontFamily: FONT_DISPLAY, fontVariantNumeric: 'tabular-nums',
+        letterSpacing: '-0.02em',
         lineHeight: 1,
       }}>
         {fmtDiff(value, { plus: true })}
