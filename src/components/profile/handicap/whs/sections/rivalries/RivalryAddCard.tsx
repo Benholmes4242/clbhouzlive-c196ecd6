@@ -1,5 +1,5 @@
 import React from 'react';
-import { Plus } from 'lucide-react';
+import { Swords } from 'lucide-react';
 
 interface Props {
   slotIndex: number;
@@ -8,83 +8,138 @@ interface Props {
 }
 
 const T = {
-  bgFrom: '#0a1628',
-  bgTo: '#060c16',
+  bgFrom: '#0F172A',
+  bgTo: '#1e293b',
   amber: '#F7931E',
-  whiteMute: 'rgba(255,255,255,0.55)',
-  hairline: 'rgba(255,255,255,0.10)',
+  amberLight: '#F59E0B',
+  amberRingOuter: 'rgba(247,147,30,0.15)',
+  amberRingInner: 'rgba(247,147,30,0.10)',
+  white: '#FFFFFF',
+  slate: '#94A3B8',
 };
 
-export const RivalryAddCard: React.FC<Props> = ({ slotIndex: _slotIndex, label, onClick }) => {
+const FONT_DISPLAY = 'SF Pro Display, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
+
+export const RivalryAddCard: React.FC<Props> = ({ slotIndex: _slotIndex, label: _label, onClick }) => {
   return (
     <button
       onClick={onClick}
+      aria-label="Add a rival"
       style={{
         flex: '0 0 auto',
         width: 'calc(88vw - 16px)',
         maxWidth: 320,
-        minHeight: 220,
+        minHeight: 240,
         scrollSnapAlign: 'start',
-        background: `linear-gradient(160deg, ${T.bgFrom}, ${T.bgTo})`,
-        borderRadius: 18,
+        background: `linear-gradient(135deg, ${T.bgFrom} 0%, ${T.bgTo} 100%)`,
+        borderRadius: 16,
         overflow: 'hidden',
         position: 'relative',
         cursor: 'pointer',
-        fontFamily: 'SF Pro Display, system-ui, sans-serif',
-        border: `1px dashed ${T.hairline}`,
-        padding: 0,
+        fontFamily: FONT_DISPLAY,
+        border: 'none',
+        padding: '32px 20px',
         textAlign: 'center',
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
         justifyContent: 'center',
-        gap: 12,
+        gap: 0,
+        boxShadow: '0 8px 24px -10px rgba(0,0,0,0.50), 0 0 0 1px rgba(255,255,255,0.06) inset',
       }}
     >
       <div
         aria-hidden
         style={{
           position: 'absolute',
-          top: 0,
-          left: 0,
-          right: 0,
-          height: 3,
-          background: `linear-gradient(90deg, ${T.amber} 0%, rgba(247,147,30,0.4) 100%)`,
+          right: -40,
+          top: -40,
+          width: 160,
+          height: 160,
+          borderRadius: '50%',
+          border: `1px solid ${T.amberRingOuter}`,
+          pointerEvents: 'none',
         }}
       />
       <div
+        aria-hidden
+        style={{
+          position: 'absolute',
+          right: -20,
+          top: -20,
+          width: 120,
+          height: 120,
+          borderRadius: '50%',
+          border: `1px solid ${T.amberRingInner}`,
+          pointerEvents: 'none',
+        }}
+      />
+
+      <div
+        aria-hidden
         style={{
           width: 56,
           height: 56,
-          borderRadius: '34%',
-          background: 'rgba(247,147,30,0.10)',
-          border: `1px solid rgba(247,147,30,0.30)`,
+          borderRadius: '50%',
+          background: `linear-gradient(135deg, ${T.amberLight}, ${T.amber})`,
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          color: T.amber,
+          boxShadow: '0 4px 12px rgba(247,147,30,0.35)',
+          marginBottom: 14,
+          position: 'relative',
         }}
       >
-        <Plus size={22} strokeWidth={2} />
+        <Swords size={24} strokeWidth={2.2} color="#fff" />
       </div>
-      <div>
-        <p style={{
-          margin: '4px 0 0',
-          fontSize: 14,
+
+      <h3
+        style={{
+          margin: 0,
+          marginBottom: 6,
+          fontSize: 16,
           fontWeight: 800,
-          color: '#fff',
+          color: T.white,
           letterSpacing: '-0.01em',
-        }}>
-          {label ?? 'Add a rival'}
-        </p>
-        <p style={{
-          margin: '4px 12px 0',
-          fontSize: 11,
-          color: T.whiteMute,
-          lineHeight: 1.4,
-        }}>
-          Up to 10 total
-        </p>
+          position: 'relative',
+        }}
+      >
+        Build your rival list
+      </h3>
+
+      <p
+        style={{
+          margin: 0,
+          marginBottom: 16,
+          fontSize: 12,
+          color: T.slate,
+          lineHeight: 1.45,
+          maxWidth: 240,
+          position: 'relative',
+        }}
+      >
+        Pick someone to track head-to-head. Stats update with every round you both play.
+      </p>
+
+      <div
+        style={{
+          background: `linear-gradient(135deg, ${T.amberLight}, ${T.amber})`,
+          border: 'none',
+          borderRadius: 10,
+          padding: '9px 18px',
+          color: '#fff',
+          fontSize: 12,
+          fontWeight: 700,
+          boxShadow: '0 2px 10px rgba(247,147,30,0.30)',
+          display: 'inline-flex',
+          alignItems: 'center',
+          gap: 6,
+          position: 'relative',
+          letterSpacing: '0.01em',
+        }}
+      >
+        <span style={{ fontSize: 14, lineHeight: 1, fontWeight: 800 }}>+</span>
+        Pick a rival
       </div>
     </button>
   );
