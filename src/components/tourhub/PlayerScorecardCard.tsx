@@ -678,6 +678,15 @@ export function PlayerScorecardCard({
             <TournamentProgressionPanel rounds={roundScores} isCompleted={isCompleted} />
 
             <div style={{ zoom: 0.9 }}>
+              {/* Round tabs — pill buttons */}
+              <RoundTabs
+                rounds={scorecard.rounds}
+                activeRound={activeRound}
+                currentRound={currentRound}
+                onSelect={setActiveRound}
+                roundScores={roundScores}
+              />
+
               {/* Front 9 */}
               <div style={{ marginTop: 4 }}>
                 <NineHoleRow
@@ -699,6 +708,49 @@ export function PlayerScorecardCard({
                   defaultPars={defaultPars}
                 />
               </div>
+
+              {/* Total row */}
+              {activeRoundData && activeRoundData.holesCompleted > 0 && (
+                <div
+                  style={{
+                    display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                    padding: '14px 16px 18px',
+                    marginTop: 10,
+                    borderTop: `1px solid ${hairlineDark}`,
+                  }}
+                >
+                  <span
+                    style={{
+                      fontSize: 9, fontWeight: 800, color: inkFaint,
+                      textTransform: 'uppercase', letterSpacing: '0.14em',
+                    }}
+                  >
+                    Total · {activeRoundData.holesCompleted} holes
+                  </span>
+                  <div style={{ display: 'flex', alignItems: 'baseline', gap: 12 }}>
+                    <span
+                      style={{
+                        fontSize: 14, fontWeight: 600, color: inkSoft,
+                        fontVariantNumeric: 'tabular-nums',
+                      }}
+                    >
+                      {activeRoundData.totalStrokes}
+                    </span>
+                    <span
+                      style={{
+                        fontSize: 24, fontWeight: 800,
+                        color: activeRoundData.totalToPar < 0 ? '#ffffff'
+                             : activeRoundData.totalToPar > 0 ? danger
+                             : inkFaint,
+                        fontVariantNumeric: 'tabular-nums',
+                        letterSpacing: '-0.02em',
+                      }}
+                    >
+                      {fmtScore(activeRoundData.totalToPar)}
+                    </span>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         ) : (
