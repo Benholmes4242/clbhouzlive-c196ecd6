@@ -451,7 +451,79 @@ function PodiumRow({
   );
 }
 
-// ---------- Skeleton ------------------------------------------------------
+// ---------- Best Round of the Week ----------------------------------------
+
+function BestRoundRow({
+  finisher,
+  roundNumber,
+  roundScore,
+  tourSlug,
+  onTap,
+}: {
+  finisher: TournamentFinisher;
+  roundNumber: number;
+  roundScore: number;
+  tourSlug: string;
+  onTap?: (f: TournamentFinisher) => void;
+}) {
+  const [imgErr, setImgErr] = React.useState(false);
+  const fullName = finisher.fullName || finisher.displayName;
+  const tourCode = finisher.tourCode ?? tourSlug;
+  const photoUrl = getPlayerHeadshotUrl(fullName, tourCode, finisher.headshotOverride ?? undefined);
+
+  return (
+    <button
+      type="button"
+      onClick={() => onTap?.(finisher)}
+      className="active:opacity-70 transition-opacity"
+      style={{
+        display: 'grid',
+        gridTemplateColumns: '20px 32px 1fr 56px 44px',
+        alignItems: 'center', gap: 10,
+        width: '100%',
+        padding: '8px 0',
+        background: 'transparent', border: 'none',
+        cursor: onTap ? 'pointer' : 'default',
+        textAlign: 'left',
+      }}
+    >
+      <span style={{
+        fontSize: 11, fontWeight: 900, color: gold,
+        fontVariantNumeric: 'tabular-nums', textAlign: 'center',
+      }}>1</span>
+      <div style={{
+        width: 32, height: 32, borderRadius: '50%',
+        border: `1.5px solid rgba(255,255,255,0.15)`,
+        overflow: 'hidden', background: 'rgba(0,0,0,0.3)',
+      }}>
+        {photoUrl && !imgErr ? (
+          <img src={photoUrl} alt="" onError={() => setImgErr(true)}
+            style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center 18%' }} />
+        ) : (
+          <PlayerSilhouette size={16} />
+        )}
+      </div>
+      <span style={{
+        fontSize: 13, fontWeight: 700, color: '#fff',
+        whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', textAlign: 'left',
+      }}>
+        {finisher.displayName}
+      </span>
+      <span style={{
+        fontSize: 13, fontWeight: 800, color: '#fff',
+        fontVariantNumeric: 'tabular-nums', textAlign: 'right',
+      }}>
+        {finisher.displayScore}
+      </span>
+      <span style={{
+        fontSize: 11, fontWeight: 700, color: greenLive,
+        fontVariantNumeric: 'tabular-nums', textAlign: 'right',
+      }}>
+        R{roundNumber} {roundScore < 0 ? roundScore : `+${roundScore}`}
+      </span>
+    </button>
+  );
+}
 
 export function ResultsHeroSkeleton() {
   return (
