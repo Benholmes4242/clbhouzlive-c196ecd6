@@ -87,6 +87,7 @@ export const OverviewView: React.FC<Props> = ({
       <RoundsThatCountCard connectionId={connectionId} currentHandicap={currentHandicap} />
       {/* Echo Insights is an AI read of *your* game — hide on friend pages. */}
       {!readOnly && <EchoInsightsCard connectionId={connectionId} />}
+      {!readOnly && peerComparisonVisible && <WhereYouStandSection userId={userId} />}
       <AchievementsStrip
         connectionId={connectionId}
         connectionCreatedAt={connectionCreatedAt}
