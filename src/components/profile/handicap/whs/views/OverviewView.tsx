@@ -3,6 +3,7 @@ import AchievementsStrip from '../sections/AchievementsStrip';
 import LastRoundCard from '../sections/LastRoundCard';
 import RoundsThatCountCard from '../sections/RoundsThatCountCard';
 import EchoInsightsCard from '../sections/EchoInsightsCard';
+import MorningMoment from '@/components/handicap/MorningMoment';
 
 interface Props {
   connectionId: string;
@@ -26,6 +27,7 @@ export const OverviewView: React.FC<Props> = ({
       id="handicap-panel-overview"
       aria-labelledby="handicap-tab-overview"
     >
+      {!readOnly && <MorningMoment userId={userId} />}
       <LastRoundCard connectionId={connectionId} />
       <RoundsThatCountCard connectionId={connectionId} currentHandicap={currentHandicap} />
       {/* Echo Insights is an AI read of *your* game — hide on friend pages. */}

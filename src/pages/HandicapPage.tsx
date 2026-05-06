@@ -21,7 +21,7 @@ import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useWhsConnection } from '@/lib/whs/hooks';
 import WhsHandicapTab from '@/components/profile/handicap/whs/WhsHandicapTab';
 import HandicapDashboard from '@/components/profile/handicap/whs/HandicapDashboard';
-import MorningMoment from '@/components/handicap/MorningMoment';
+
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { isHandicapSubtab, type HandicapSubtab } from '@/components/profile/handicap/whs/types';
 
@@ -398,7 +398,6 @@ const HandicapPage: React.FC = () => {
         viewerUserId={user.id}
       />
       <main>
-        {!isFriendView && <MorningMoment userId={user.id} />}
         {isFriendView ? (
           <FriendHandicapDashboard userId={ownerUserId} />
         ) : (
