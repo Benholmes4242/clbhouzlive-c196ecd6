@@ -698,8 +698,8 @@ export function PlayerScorecardCard({
                     bogeys: activeRoundData.bogeys,
                     doubleBogeys: activeRoundData.doubleBogeys,
                   }}
-                  isLive={!isCompleted}
                 />
+
               </div>
             )}
 
