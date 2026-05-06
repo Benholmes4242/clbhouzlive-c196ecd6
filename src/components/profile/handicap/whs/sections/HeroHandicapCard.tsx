@@ -26,14 +26,14 @@ const MONTHS = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV
 const FONT_DISPLAY = 'SF Pro Display, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
 
 // Ring composition
-const RING_SIZE = 240;
+const RING_SIZE = 280;
 const CX = RING_SIZE / 2;
 const CY = RING_SIZE / 2;
-const R_OUTER = 110;
-const STROKE_OUTER = 3;
+const R_OUTER = 124;
+const STROKE_OUTER = 14;
 const C_OUTER = 2 * Math.PI * R_OUTER;
-const R_INNER = 100;
-const STROKE_INNER = 6;
+const R_INNER = 102;
+const STROKE_INNER = 8;
 const C_INNER = 2 * Math.PI * R_INNER;
 
 // Sparkline
