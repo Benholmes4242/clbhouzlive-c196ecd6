@@ -59,7 +59,7 @@ export const IntelligenceSheet = memo(function IntelligenceSheet({
   open,
   onClose,
   trackRecord,
-  initialTab = 'how',
+  initialTab = 'history',
 }: IntelligenceSheetProps) {
   const [tab, setTab] = useState<Tab>(initialTab);
   useEffect(() => {
@@ -181,8 +181,8 @@ function TabStrip({ tab, onChange }: { tab: Tab; onChange: (t: Tab) => void }) {
       >
         {(
           [
-            { key: 'how', label: 'How we pick' },
             { key: 'history', label: 'Picks history' },
+            { key: 'how', label: 'How we pick' },
           ] as Array<{ key: Tab; label: string }>
         ).map((t) => {
           const active = tab === t.key;
