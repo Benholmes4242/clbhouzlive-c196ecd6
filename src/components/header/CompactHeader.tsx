@@ -66,6 +66,7 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
   const isMessagesRoute = location.pathname.startsWith('/messages');
   const isMessagesConversationRoute = location.pathname.startsWith('/messages/');
   const isHandicapRoute = location.pathname === '/handicap' || location.pathname.startsWith('/handicap/');
+  const isWatchSubpageRoute = location.pathname === '/watch/videos' || location.pathname === '/watch/clips';
 
 
   // Discover sub-page detection:
