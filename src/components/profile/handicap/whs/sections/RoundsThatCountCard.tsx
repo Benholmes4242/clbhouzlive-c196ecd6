@@ -423,60 +423,13 @@ export const RoundsThatCountCard: React.FC<Props> = ({ connectionId, currentHand
         </div>
       </div>
 
-      {/* Selected detail card */}
-      <button
-        onClick={() => { /* no-op v1 */ }}
-        style={{
-          marginTop: 12, width: '100%',
-          display: 'flex', alignItems: 'center', gap: 12,
-          background: '#fff', border: `0.5px solid ${INK_10}`,
-          borderRadius: 12, padding: '10px 12px',
-          textAlign: 'left', cursor: 'pointer',
-        }}
-      >
-        <div style={{
-          flexShrink: 0,
-          minWidth: 56, padding: '6px 10px', borderRadius: 8,
-          background:
-            selectedRound.is_best ? 'rgba(5,150,105,0.10)'
-            : selectedRound.is_worst ? 'rgba(159,29,29,0.10)'
-            : INK_06,
-          color:
-            selectedRound.is_best ? GREEN
-            : selectedRound.is_worst ? RED
-            : INK,
-          textAlign: 'center',
-          fontSize: 15, fontWeight: 700, fontFamily: FONT_DISPLAY,
-          fontVariantNumeric: 'tabular-nums',
-        }}>
-          {selectedRound.handicap_differential != null
-            ? fmtDiff(selectedRound.handicap_differential, { plus: true })
-            : '—'}
-        </div>
-        <div style={{ flex: 1, minWidth: 0 }}>
-          <div style={{
-            fontSize: 13, fontWeight: 600, color: INK,
-            overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
-          }}>
-            {selectedRound.course?.name ?? 'Unknown course'}
-          </div>
-          <div style={{ fontSize: 11, color: INK_55, marginTop: 1 }}>
-            {(() => {
-              const d = new Date(selectedRound.play_date);
-              const dateStr = `${d.getDate()} ${MONTHS_LONG[d.getMonth()]} ${d.getFullYear()}`;
-              const gross = selectedRound.adjusted_gross != null ? ` · ${selectedRound.adjusted_gross}` : '';
-              return `${dateStr}${gross}`;
-            })()}
-          </div>
-        </div>
-        <ChevronRight size={16} color={INK_40} />
-      </button>
-
       <HandicapExplainerSheet
         open={showExplainer}
         onClose={() => setShowExplainer(false)}
-        maxDiff={enriched.maxDiff}
-        avgDiff={enriched.avgDiff}
+        currentHandicap={currentHandicap}
+        cutTarget={projection?.cutTarget ?? null}
+        settleAt={projection?.settleAt ?? null}
+        isAtRisk={projection?.isAtRisk ?? false}
       />
     </section>
   );
