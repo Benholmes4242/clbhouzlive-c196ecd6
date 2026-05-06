@@ -4,6 +4,7 @@ import { ChevronDown, ChevronRight, MapPin, Sparkles, Target, TrendingDown } fro
 import { useHandicapInsights } from '@/lib/whs/insights/useHandicapInsights';
 import type { SuitedCourse } from '@/lib/whs/insights/types';
 import { useCounters } from '@/lib/whs/hooks';
+import { fmtDiff } from '@/lib/whs/format';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 
 const INK = '#0F172A';
@@ -16,6 +17,8 @@ const AMBER_DEEP = '#C97211';
 const AMBER_INK = '#9A6116';
 const AMBER_14 = 'rgba(247,147,30,0.14)';
 const GREEN = '#059669';
+const GREEN_06 = 'rgba(5,150,105,0.06)';
+const AMBER_06 = 'rgba(247,147,30,0.06)';
 const FONT_GEIST = 'Geist, system-ui, -apple-system, BlinkMacSystemFont, sans-serif';
 const FONT_SERIF = 'Georgia, "Times New Roman", serif';
 
@@ -145,6 +148,40 @@ const CourseCard: React.FC<{ course: SuitedCourse; stripe: string; onTap: (id: s
             </div>
           )}
         </div>
+        {course.expected_differential != null && (
+          <div
+            style={{
+              background: stripe === GREEN ? GREEN_06 : AMBER_06,
+              borderRadius: 8,
+              padding: '6px 10px',
+              textAlign: 'center',
+              flexShrink: 0,
+            }}
+          >
+            <div
+              style={{
+                fontSize: 8,
+                fontWeight: 800,
+                color: stripe,
+                letterSpacing: '0.14em',
+                marginBottom: 1,
+              }}
+            >
+              EXPECTED
+            </div>
+            <div
+              style={{
+                fontSize: 14,
+                fontWeight: 700,
+                color: stripe,
+                letterSpacing: '-0.01em',
+                fontVariantNumeric: 'tabular-nums',
+              }}
+            >
+              {fmtDiff(course.expected_differential, { plus: true })}
+            </div>
+          </div>
+        )}
         <ChevronRight size={16} color={INK_40} style={{ flexShrink: 0, marginTop: 4 }} />
       </div>
       {course.rationale && (

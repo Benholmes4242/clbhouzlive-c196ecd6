@@ -179,9 +179,68 @@ Deno.serve(async (req) => {
       };
     });
 
+    // Compute deterministic expected_differential per candidate.
+    // user_recent_avg_diff = mean differential of the latest up-to-8 rounds.
+    const recentDiffs = rounds
+      .slice(0, 8)
+      .map((r: any) => (typeof r.handicap_differential === "number" ? r.handicap_differential : null))
+      .filter((v: number | null): v is number => v != null);
+    const userRecentAvgDiff = recentDiffs.length
+      ? recentDiffs.reduce((a: number, b: number) => a + b, 0) / recentDiffs.length
+      : null;
+
+    // user_home_slope = slope of the most-played course in the rounds set.
+    const slopeCounts = new Map<number, number>();
+    for (const r of rounds as any[]) {
+      const s = typeof r.slope_rating === "number" ? r.slope_rating : null;
+      if (s == null) continue;
+      slopeCounts.set(s, (slopeCounts.get(s) ?? 0) + 1);
+    }
+    let userHomeSlope: number | null = null;
+    let bestCount = 0;
+    for (const [s, c] of slopeCounts) {
+      if (c > bestCount) {
+        bestCount = c;
+        userHomeSlope = s;
+      }
+    }
+
+    // Pull slope_rating for candidate courses from whs_courses where mappable.
+    // golf_courses doesn't carry slope, so we infer via whs_to_golf_course_map reverse lookup.
+    const candidateGolfIds = candidates.map((c: any) => c.id);
+    const { data: candidateBridge } = candidateGolfIds.length
+      ? await admin
+          .from("whs_to_golf_course_map")
+          .select("golf_course_id, whs_course_id")
+          .in("golf_course_id", candidateGolfIds)
+      : { data: [] as any[] };
+    const golfToWhs = new Map<string, string>();
+    for (const b of candidateBridge ?? []) {
+      if (!golfToWhs.has(b.golf_course_id)) golfToWhs.set(b.golf_course_id, b.whs_course_id);
+    }
+    const candWhsIds = Array.from(new Set([...golfToWhs.values()]));
+    const { data: candWhs } = candWhsIds.length
+      ? await admin
+          .from("whs_courses")
+          .select("id, last_seen_slope_rating")
+          .in("id", candWhsIds)
+      : { data: [] as any[] };
+    const whsSlopeById = new Map((candWhs ?? []).map((c: any) => [c.id, c.last_seen_slope_rating]));
+
+    const candidatesWithExpected = candidates.map((c: any) => {
+      const whsId = golfToWhs.get(c.id);
+      const candidateSlope = whsId ? (whsSlopeById.get(whsId) ?? null) : null;
+      let expectedDiff: number | null = null;
+      if (userRecentAvgDiff != null && userHomeSlope != null && candidateSlope != null) {
+        const adj = (Number(candidateSlope) - userHomeSlope) * 0.04;
+        expectedDiff = +(userRecentAvgDiff + adj).toFixed(1);
+      }
+      return { ...c, slope_rating: candidateSlope, expected_differential: expectedDiff };
+    });
+
     const latestScoreId = rounds[0].id as string;
 
-    const prompt = buildPrompt(roundsForPrompt, candidates, dateKey);
+    const prompt = buildPrompt(roundsForPrompt, candidatesWithExpected, dateKey);
 
     const aiResp = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
@@ -216,13 +275,21 @@ Deno.serve(async (req) => {
       return json({ error: "Invalid AI output" }, 500);
     }
 
-    const candidateIds = new Set(candidates.map((c: any) => c.id));
+    const candidateIds = new Set(candidatesWithExpected.map((c: any) => c.id));
+    const candidateExpectedById = new Map<string, number | null>(
+      candidatesWithExpected.map((c: any) => [c.id, c.expected_differential ?? null]),
+    );
     const validate = (arr: any[]) =>
       Array.isArray(arr)
         ? arr
             .filter((x) => x && typeof x.id === "string" && candidateIds.has(x.id))
             .slice(0, 3)
-            .map((x) => ({ id: x.id, rationale: String(x.rationale ?? "").slice(0, 240) }))
+            .map((x) => ({
+              id: x.id,
+              rationale: String(x.rationale ?? "").slice(0, 240),
+              // Always use precomputed value — never trust LLM numerics.
+              expected_differential: candidateExpectedById.get(x.id) ?? null,
+            }))
         : [];
 
     const suited = validate(parsed.suited_courses);
@@ -246,7 +313,9 @@ Deno.serve(async (req) => {
       hyMap = new Map((hydrated ?? []).map((c: any) => [c.id, c]));
     }
 
-    const enrich = (arr: { id: string; rationale: string }[]) =>
+    const enrich = (
+      arr: { id: string; rationale: string; expected_differential: number | null }[],
+    ) =>
       arr.map((r) => {
         const c: any = hyMap.get(r.id) || {};
         return {
@@ -254,6 +323,7 @@ Deno.serve(async (req) => {
           name: c.name ?? "",
           region: c.region ?? c.country ?? "",
           rationale: r.rationale,
+          expected_differential: r.expected_differential,
         };
       });
 
@@ -307,15 +377,15 @@ function buildPrompt(rounds: any[], candidates: any[], dateKey: string) {
 USER'S ROUND HISTORY (last ${rounds.length} rounds, newest first):
 ${JSON.stringify(rounds)}
 
-CANDIDATE COURSES (${candidates.length} courses across Britain & Ireland — daily-rotated; you haven't played any of these recently and they haven't been recommended to you in the past 7 days):
+CANDIDATE COURSES (${candidates.length} courses across Britain & Ireland — daily-rotated; you haven't played any of these recently and they haven't been recommended to you in the past 7 days). Each candidate includes an "expected_differential" — the differential you would likely shoot there based on your recent form and the course's slope (may be null when slope is unknown):
 ${JSON.stringify(candidates)}
 
 Produce a JSON response with this exact structure:
 {
   "scoring_profile": "<2-3 sentences (50-70 words) characterising what kinds of courses suit your game. Reference your best counter and the specific course (by name) where you shot it. Mention what kind of course produces higher differentials. Use 'you' and 'your', never 'this player' or 'they'.>",
   "rounds_pattern": "<1-2 sentences (max 30 words) about your recent counter rounds. Reference specific numbers and wrap key values in **bold** markdown (e.g. **+0.6**, **+1.7**). Use 'you' and 'your'. No speculation.>",
-  "suited_courses": [ { "id": "<golf_courses.id from CANDIDATE COURSES>", "rationale": "<one sentence, max 22 words, why this course matches your best scoring profile. Reference the course by name in your rationale.>" } ],
-  "test_courses": [ { "id": "<golf_courses.id from CANDIDATE COURSES>", "rationale": "<one sentence, max 22 words, why this course will push your game (frame as growth). Reference the course by name.>" } ]
+  "suited_courses": [ { "id": "<golf_courses.id from CANDIDATE COURSES>", "expected_differential": <copy the expected_differential value from the matching candidate>, "rationale": "<one sentence, max 22 words, why this course matches your best scoring profile. Reference the course by name in your rationale.>" } ],
+  "test_courses": [ { "id": "<golf_courses.id from CANDIDATE COURSES>", "expected_differential": <copy the expected_differential value from the matching candidate>, "rationale": "<one sentence, max 22 words, why this course will push your game (frame as growth). Reference the course by name.>" } ]
 }
 
 Rules:

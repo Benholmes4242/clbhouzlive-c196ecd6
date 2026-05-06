@@ -8,6 +8,7 @@ import AchievementsStrip from '../sections/AchievementsStrip';
 import LastRoundCard from '../sections/LastRoundCard';
 import RoundsThatCountCard from '../sections/RoundsThatCountCard';
 import EchoInsightsCard from '../sections/EchoInsightsCard';
+import StreaksSection from '../sections/StreaksSection';
 
 interface Props {
   connection: WhsConnection;
@@ -73,6 +74,9 @@ export const OverviewView: React.FC<Props> = ({
 
       {/* Hero handicap ring + line chart */}
       <HeroHandicapCard connection={connection} />
+
+      {/* Streaks — personal, hidden on friend pages */}
+      {!readOnly && <StreaksSection connectionId={connectionId} userId={userId} />}
 
       {/* Existing overview cards */}
       <LastRoundCard connectionId={connectionId} />
