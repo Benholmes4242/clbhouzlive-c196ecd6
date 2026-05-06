@@ -171,22 +171,7 @@ function TourDropdownTrigger({ activeTour, onClick }: {
 
 // ─── Movement chip (compact, inline) ────────────────────────────────────────
 function MovementChip({ change }: { change: number | null | undefined }) {
-  if (!change) {
-    return (
-      <span
-        style={{
-          fontSize: 11,
-          fontWeight: 700,
-          color: SLATE_400,
-          fontVariantNumeric: 'tabular-nums',
-          minWidth: 24,
-          textAlign: 'right',
-        }}
-      >
-        —
-      </span>
-    );
-  }
+  if (!change) return null;
   const isUp = change > 0;
   return (
     <span
