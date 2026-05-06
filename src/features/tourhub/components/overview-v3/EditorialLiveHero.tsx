@@ -292,7 +292,7 @@ function LeaderHero({
         {today != null && (
           <div
             style={{
-              fontSize: 10, color: inkFaint, marginTop: 4, letterSpacing: '0.06em',
+              fontSize: 9, color: inkFaint, marginTop: 4, letterSpacing: '0.06em',
             }}
           >
             TODAY {fmtScoreSign(today)}
