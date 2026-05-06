@@ -17,6 +17,8 @@ const AMBER_DEEP = '#C97211';
 const AMBER_INK = '#9A6116';
 const AMBER_14 = 'rgba(247,147,30,0.14)';
 const GREEN = '#059669';
+const GREEN_06 = 'rgba(5,150,105,0.06)';
+const AMBER_06 = 'rgba(247,147,30,0.06)';
 const FONT_GEIST = 'Geist, system-ui, -apple-system, BlinkMacSystemFont, sans-serif';
 const FONT_SERIF = 'Georgia, "Times New Roman", serif';
 
