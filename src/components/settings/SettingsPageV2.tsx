@@ -247,6 +247,15 @@ export function SettingsPageV2() {
             disabled={privacy.isUpdatingExplorationLb}
             onCheckedChange={privacy.toggleExplorationLeaderboards}
           />
+          <SettingsToggleRow
+            icon={<Users size={18} />}
+            title="Peer Comparison"
+            subtitle="Show how you compare to other golfers in your country and gender"
+            iconTheme="privacy"
+            checked={privacy.peerComparisonVisible}
+            disabled={privacy.isUpdatingPeerComparison}
+            onCheckedChange={privacy.togglePeerComparison}
+          />
           {/* Top 10 Comments Privacy */}
           <div className="flex items-center gap-3 px-4 py-3">
             <div style={{ width: 36, height: 36, borderRadius: 10, background: 'rgba(247,147,30,0.10)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
