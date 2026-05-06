@@ -149,7 +149,7 @@ function HeadlineCard({ tournament }: { tournament: SeasonTournament }) {
       style={{
         display: 'block', width: 'calc(100% - 32px)', margin: '0 16px 12px',
         padding: 0, background: INK, borderRadius: 16, overflow: 'hidden',
-        border: isMajor ? `1px solid ${GOLD}55` : `1px solid ${SLATE_200}`,
+        border: 'none',
         boxShadow: isMajor
           ? '0 0 28px rgba(255,184,0,0.15)'
           : '0 1px 0 rgba(0,0,0,0.02)',
@@ -157,7 +157,7 @@ function HeadlineCard({ tournament }: { tournament: SeasonTournament }) {
       }}
     >
       <div style={{
-        position: 'relative', width: '100%', aspectRatio: '16 / 9',
+        position: 'relative', width: '100%', height: 220,
         background: venueImage?.imageUrl
           ? `url(${venueImage.imageUrl}) center/cover`
           : `linear-gradient(135deg, ${tour.stripe}, ${NAVY_HIGH})`,
@@ -198,12 +198,24 @@ function HeadlineCard({ tournament }: { tournament: SeasonTournament }) {
         </div>
 
         <div style={{
-          position: 'absolute', bottom: 12, right: 12,
-          padding: '4px 9px', borderRadius: 6,
-          background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(8px)',
-          color: '#fff', fontSize: 10, fontWeight: 700,
-          letterSpacing: '0.06em',
+          position: 'absolute', top: 12, right: 12,
+          background: 'rgba(0, 0, 0, 0.28)',
+          backdropFilter: 'blur(22px) saturate(180%)',
+          WebkitBackdropFilter: 'blur(22px) saturate(180%)',
+          border: '1px solid rgba(255, 255, 255, 0.12)',
+          boxShadow: '0 2px 8px rgba(0, 0, 0, 0.25)',
+          borderRadius: 4,
+          padding: '3px 8px',
+          fontSize: 9,
+          fontWeight: 800,
+          color: '#FFFFFF',
+          letterSpacing: '0.12em',
+          textTransform: 'uppercase',
+          display: 'inline-flex',
+          alignItems: 'center',
+          gap: 4,
         }}>
+          <Clock size={9} strokeWidth={3} />
           {formatDateRange(tournament.startDate, tournament.endDate).toUpperCase()}
         </div>
       </div>
