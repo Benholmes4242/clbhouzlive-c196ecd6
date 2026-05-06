@@ -2,6 +2,21 @@ import React from 'react';
 import { ArrowRight, Users } from 'lucide-react';
 import SectionHeader from '../SectionHeader';
 
+const T = {
+  bgFrom: '#0F172A',
+  bgTo: '#1e293b',
+  amber: '#F7931E',
+  amberDeep: '#FFB459',
+  amberRingOuter: 'rgba(247,147,30,0.15)',
+  amberRingInner: 'rgba(247,147,30,0.10)',
+  white: '#FFFFFF',
+  whiteMute: 'rgba(148,163,184,1)',
+  whiteSoft: 'rgba(255,255,255,0.35)',
+  hairline: 'rgba(247,147,30,0.18)',
+};
+
+const FONT = '"Geist", system-ui, -apple-system, BlinkMacSystemFont, sans-serif';
+
 export const BuildYourCircleCTA: React.FC = () => {
   const handleInviteClick = () => {
     document.getElementById('invite-to-clbhouz-section')?.scrollIntoView({ behavior: 'smooth' });
@@ -19,78 +34,124 @@ export const BuildYourCircleCTA: React.FC = () => {
           style={{
             position: 'relative',
             width: '100%',
-            minHeight: 280,
+            minHeight: 240,
             border: 'none',
             cursor: 'pointer',
-            borderRadius: 18,
+            borderRadius: 16,
             overflow: 'hidden',
-            background: 'linear-gradient(160deg, #0a1628, #060c16)',
-            color: '#fff',
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'space-between',
-            padding: '16px 18px',
-            fontFamily: '"Geist", system-ui, sans-serif',
+            background: `linear-gradient(135deg, ${T.bgFrom} 0%, ${T.bgTo} 100%)`,
+            color: T.white,
+            padding: 16,
+            fontFamily: FONT,
             textAlign: 'left',
+            boxShadow: '0 8px 24px -10px rgba(0,0,0,0.50), 0 0 0 1px rgba(255,255,255,0.06) inset',
           }}
         >
-          <div style={{
-            position: 'absolute',
-            top: 0, left: 0, right: 0,
-            height: 2.5,
-            background: 'linear-gradient(90deg, rgba(245,158,11,0.8), transparent)',
-          }} />
+          {/* decorative amber rings (match RivalryCard) */}
+          <div
+            aria-hidden
+            style={{
+              position: 'absolute',
+              right: -40,
+              top: -40,
+              width: 160,
+              height: 160,
+              borderRadius: '50%',
+              border: `1px solid ${T.amberRingOuter}`,
+              pointerEvents: 'none',
+            }}
+          />
+          <div
+            aria-hidden
+            style={{
+              position: 'absolute',
+              right: -20,
+              top: -20,
+              width: 120,
+              height: 120,
+              borderRadius: '50%',
+              border: `1px solid ${T.amberRingInner}`,
+              pointerEvents: 'none',
+            }}
+          />
 
-          <div style={{
-            position: 'absolute',
-            inset: 0,
-            background: 'radial-gradient(circle at 80% 0%, rgba(247,147,30,0.18) 0%, transparent 60%)',
-            pointerEvents: 'none',
-          }} />
-
-          <div style={{ position: 'relative', display: 'flex', alignItems: 'center', gap: 10 }}>
-            <Users size={18} color="#F59E0B" strokeWidth={2.4} />
-            <p style={{ margin: 0, fontSize: 11, fontWeight: 800, letterSpacing: '0.18em', color: '#F59E0B' }}>
+          {/* eyebrow */}
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 8,
+              marginBottom: 14,
+              position: 'relative',
+            }}
+          >
+            <Users size={13} color={T.amber} strokeWidth={2.4} />
+            <span
+              style={{
+                fontSize: 10,
+                fontWeight: 900,
+                letterSpacing: '0.18em',
+                color: T.amber,
+                fontFamily: FONT,
+              }}
+            >
               UNLOCK THE FULL TAB
+            </span>
+          </div>
+
+          {/* body */}
+          <div style={{ position: 'relative' }}>
+            <h3
+              style={{
+                fontFamily: FONT,
+                fontSize: 20,
+                fontWeight: 800,
+                letterSpacing: '-0.02em',
+                lineHeight: 1.2,
+                margin: 0,
+                color: T.white,
+              }}
+            >
+              Featured rounds, head-to-head records, fires, and PBs all live here.
+            </h3>
+            <p
+              style={{
+                margin: '10px 0 0',
+                fontSize: 12,
+                fontWeight: 500,
+                color: T.whiteMute,
+                lineHeight: 1.5,
+                fontFamily: FONT,
+              }}
+            >
+              Get your friends on Clbhouz to unlock the full Friends tab — your circle's rounds, head-to-head rivalries, leaderboards, and more.
             </p>
           </div>
 
-          <div style={{ position: 'relative' }}>
-            <h3 style={{
-              fontFamily: 'Georgia, serif',
-              fontSize: 26,
-              fontWeight: 900,
-              letterSpacing: '-0.03em',
-              lineHeight: 1.15,
-              margin: 0,
-              color: '#fff',
-            }}>
-              Featured rounds, head-to-head records, fires, and PBs all live here.
-            </h3>
-            <p style={{
-              margin: '14px 0 0',
-              fontSize: 13,
-              fontWeight: 500,
-              color: 'rgba(255,255,255,0.75)',
-              lineHeight: 1.5,
-            }}>
-              Get your friends on Clbhouz to unlock the full Friends tab — your circle's rounds, head-to-head rivalries, leaderboards, and more.
-            </p>
-            <div style={{
-              marginTop: 16,
-              display: 'inline-flex',
+          {/* footer with hairline divider matching RivalryCard */}
+          <div
+            style={{
+              display: 'flex',
               alignItems: 'center',
-              gap: 6,
-              padding: '10px 14px',
-              background: '#F7931E',
-              color: '#fff',
-              borderRadius: 12,
-              fontSize: 13,
-              fontWeight: 800,
-              letterSpacing: '0.02em',
-            }}>
-              Invite friends <ArrowRight size={15} strokeWidth={2.6} />
-            </div>
+              justifyContent: 'space-between',
+              marginTop: 16,
+              paddingTop: 10,
+              borderTop: `0.5px solid ${T.hairline}`,
+              position: 'relative',
+            }}
+          >
+            <span
+              style={{
+                fontSize: 11,
+                fontWeight: 800,
+                color: T.amberDeep,
+                letterSpacing: '0.06em',
+                fontFamily: FONT,
+              }}
+            >
+              INVITE FRIENDS
+            </span>
+            <ArrowRight size={14} strokeWidth={2.6} color={T.amber} />
           </div>
         </button>
       </div>
