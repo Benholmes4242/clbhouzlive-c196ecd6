@@ -85,8 +85,8 @@ function ChampionHero({ winner, tourSlug, marginLabel, onTap }: ChampionHeroProp
         background: 'linear-gradient(180deg, rgba(255,184,0,0.12) 0%, rgba(255,184,0,0.04) 100%)',
         border: '1px solid rgba(255,184,0,0.25)',
         borderRadius: 18,
-        padding: '18px 18px 16px',
-        marginBottom: 22,
+        padding: '14px 14px 12px',
+        marginBottom: 12,
         overflow: 'hidden',
       }}
     >
@@ -103,7 +103,7 @@ function ChampionHero({ winner, tourSlug, marginLabel, onTap }: ChampionHeroProp
       {/* CHAMPION eyebrow */}
       <div
         style={{
-          display: 'flex', alignItems: 'center', gap: 6, marginBottom: 14,
+          display: 'flex', alignItems: 'center', gap: 6, marginBottom: 10,
           position: 'relative', zIndex: 1,
         }}
       >
@@ -120,7 +120,7 @@ function ChampionHero({ winner, tourSlug, marginLabel, onTap }: ChampionHeroProp
       </div>
 
       {/* Headshot + name + score */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 14, position: 'relative', zIndex: 1 }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 12, position: 'relative', zIndex: 1 }}>
         <button
           type="button"
           onClick={onTap}
@@ -133,11 +133,11 @@ function ChampionHero({ winner, tourSlug, marginLabel, onTap }: ChampionHeroProp
         >
           <div
             style={{
-              width: 92, height: 92, borderRadius: '50%',
+              width: 64, height: 64, borderRadius: '50%',
               border: `2px solid ${gold}`,
               background: 'rgba(0,0,0,0.3)',
               overflow: 'hidden',
-              boxShadow: '0 0 24px rgba(255,184,0,0.18)',
+              boxShadow: '0 0 18px rgba(255,184,0,0.18)',
             }}
           >
             {photoUrl && !imgErr ? (
@@ -151,19 +151,19 @@ function ChampionHero({ winner, tourSlug, marginLabel, onTap }: ChampionHeroProp
                 }}
               />
             ) : (
-              <PlayerSilhouette size={44} />
+              <PlayerSilhouette size={32} />
             )}
           </div>
           <div
             style={{
               position: 'absolute', bottom: -2, right: -2,
-              width: 28, height: 28, borderRadius: '50%',
+              width: 22, height: 22, borderRadius: '50%',
               background: gold, color: ink,
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               border: `2px solid ${navyMid}`,
             }}
           >
-            <Trophy size={13} strokeWidth={2.5} />
+            <Trophy size={10} strokeWidth={2.5} />
           </div>
         </button>
 
@@ -179,7 +179,7 @@ function ChampionHero({ winner, tourSlug, marginLabel, onTap }: ChampionHeroProp
           >
             <div
               style={{
-                fontSize: 28, fontWeight: 800, letterSpacing: '-0.025em',
+                fontSize: 22, fontWeight: 800, letterSpacing: '-0.025em',
                 color: '#fff', lineHeight: 1.05,
                 whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
               }}
@@ -190,7 +190,7 @@ function ChampionHero({ winner, tourSlug, marginLabel, onTap }: ChampionHeroProp
           {marginLabel && (
             <div
               style={{
-                fontSize: 12, color: gold, marginTop: 6, fontWeight: 700,
+                fontSize: 11, color: gold, marginTop: 4, fontWeight: 700,
               }}
             >
               {marginLabel}
@@ -201,14 +201,14 @@ function ChampionHero({ winner, tourSlug, marginLabel, onTap }: ChampionHeroProp
         <div style={{ textAlign: 'right' }}>
           <div
             style={{
-              fontSize: 56, fontWeight: 800, letterSpacing: '-0.04em',
+              fontSize: 38, fontWeight: 800, letterSpacing: '-0.04em',
               color: gold, lineHeight: 0.9,
               fontVariantNumeric: 'tabular-nums',
             }}
           >
             {fmtScore(winner.score)}
           </div>
-          <div style={{ fontSize: 10, color: inkFaint, marginTop: 4, letterSpacing: '0.06em' }}>
+          <div style={{ fontSize: 9, color: inkFaint, marginTop: 4, letterSpacing: '0.06em' }}>
             FINAL
           </div>
         </div>
@@ -451,7 +451,79 @@ function PodiumRow({
   );
 }
 
-// ---------- Skeleton ------------------------------------------------------
+// ---------- Best Round of the Week ----------------------------------------
+
+function BestRoundRow({
+  finisher,
+  roundNumber,
+  roundScore,
+  tourSlug,
+  onTap,
+}: {
+  finisher: TournamentFinisher;
+  roundNumber: number;
+  roundScore: number;
+  tourSlug: string;
+  onTap?: (f: TournamentFinisher) => void;
+}) {
+  const [imgErr, setImgErr] = React.useState(false);
+  const fullName = finisher.fullName || finisher.displayName;
+  const tourCode = finisher.tourCode ?? tourSlug;
+  const photoUrl = getPlayerHeadshotUrl(fullName, tourCode, finisher.headshotOverride ?? undefined);
+
+  return (
+    <button
+      type="button"
+      onClick={() => onTap?.(finisher)}
+      className="active:opacity-70 transition-opacity"
+      style={{
+        display: 'grid',
+        gridTemplateColumns: '20px 32px 1fr 56px 44px',
+        alignItems: 'center', gap: 10,
+        width: '100%',
+        padding: '8px 0',
+        background: 'transparent', border: 'none',
+        cursor: onTap ? 'pointer' : 'default',
+        textAlign: 'left',
+      }}
+    >
+      <span style={{
+        fontSize: 11, fontWeight: 900, color: gold,
+        fontVariantNumeric: 'tabular-nums', textAlign: 'center',
+      }}>1</span>
+      <div style={{
+        width: 32, height: 32, borderRadius: '50%',
+        border: `1.5px solid rgba(255,255,255,0.15)`,
+        overflow: 'hidden', background: 'rgba(0,0,0,0.3)',
+      }}>
+        {photoUrl && !imgErr ? (
+          <img src={photoUrl} alt="" onError={() => setImgErr(true)}
+            style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center 18%' }} />
+        ) : (
+          <PlayerSilhouette size={16} />
+        )}
+      </div>
+      <span style={{
+        fontSize: 13, fontWeight: 700, color: '#fff',
+        whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', textAlign: 'left',
+      }}>
+        {finisher.displayName}
+      </span>
+      <span style={{
+        fontSize: 13, fontWeight: 800, color: '#fff',
+        fontVariantNumeric: 'tabular-nums', textAlign: 'right',
+      }}>
+        {finisher.displayScore}
+      </span>
+      <span style={{
+        fontSize: 11, fontWeight: 700, color: greenLive,
+        fontVariantNumeric: 'tabular-nums', textAlign: 'right',
+      }}>
+        R{roundNumber} {roundScore < 0 ? roundScore : `+${roundScore}`}
+      </span>
+    </button>
+  );
+}
 
 export function ResultsHeroSkeleton() {
   return (
@@ -575,7 +647,21 @@ export function EditorialResultsHero({
   const nonWinners = finishers.filter((f) => f.position > (winner?.position ?? 1));
   const podium = nonWinners.filter((f) => f.position <= 3).slice(0, 2);
   const podiumKeys = new Set(podium.map(p_id));
-  const chasers = nonWinners.filter((f) => !podiumKeys.has(p_id(f))).slice(0, 8);
+  // "Best Round of the Week" — the single lowest individual round across all finishers
+  const bestRound = React.useMemo(() => {
+    const flat: Array<{ finisher: TournamentFinisher; round: number; score: number }> = [];
+    finishers.forEach((f) => {
+      [1, 2, 3, 4].forEach((r) => {
+        const v = (f as any)[`round${r}`] as number | null | undefined;
+        if (v !== null && v !== undefined) {
+          flat.push({ finisher: f, round: r, score: v });
+        }
+      });
+    });
+    if (flat.length === 0) return null;
+    flat.sort((a, b) => a.score - b.score);
+    return flat[0];
+  }, [finishers]);
 
   const handleFinisherTap = useCallback(
     (f: TournamentFinisher) => {
@@ -658,11 +744,11 @@ export function EditorialResultsHero({
         </div>
 
         {/* 2. Tournament name + venue */}
-        <div style={{ marginBottom: 28 }}>
+        <div style={{ marginBottom: 14 }}>
           <h1
             style={{
-              margin: 0, fontSize: 30, fontWeight: 800,
-              letterSpacing: '-0.025em', lineHeight: 1.05, color: '#fff',
+              margin: 0, fontSize: 20, fontWeight: 800,
+              letterSpacing: '-0.025em', lineHeight: 1.1, color: '#fff',
             }}
           >
             {tournament.name}
@@ -670,7 +756,7 @@ export function EditorialResultsHero({
           {(tournament.venueName || tournament.venueCity) && (
             <div
               style={{
-                marginTop: 8, fontSize: 12, color: inkFaint,
+                marginTop: 6, fontSize: 11, color: inkFaint,
                 display: 'flex', alignItems: 'center', gap: 5,
               }}
             >
@@ -689,7 +775,7 @@ export function EditorialResultsHero({
         />
 
         {/* 4. Stats grid (single panel, hairline dividers, gold for birdies) */}
-        {winnerStats && <StatsGrid stats={winnerStats as any} isLive={false} />}
+        {winnerStats && <StatsGrid stats={winnerStats as any} />}
 
         {/* 5. Also on the podium */}
         {podium.length > 0 && (
@@ -713,39 +799,26 @@ export function EditorialResultsHero({
           </div>
         )}
 
-        {/* 6. Final leaderboard column header + rows */}
-        <div
-          style={{
-            display: 'grid',
-            gridTemplateColumns: '32px 1fr 56px 44px',
-            alignItems: 'center',
-            padding: '4px 0 6px',
-            fontSize: 9, fontWeight: 800, color: inkGhost,
-            letterSpacing: '0.12em', textTransform: 'uppercase' as const,
-          }}
-        >
-          <span></span>
-          <span>Player</span>
-          <span style={{ textAlign: 'right' }}>Total</span>
-          <span style={{ textAlign: 'right' }}>R4</span>
-        </div>
-        <FinalLeaderboardRow
-          finisher={winner}
-          isWinner
-          isTied={winnerIsTied}
-          tourSlug={tournament.tourSlug}
-          onTap={handleFinisherTap}
-        />
-        {chasers.map((f) => (
-          <FinalLeaderboardRow
-            key={f.playerId ?? `${f.position}-${f.fullName}`}
-            finisher={f}
-            isWinner={false}
-            isTied={(positionCounts.get(f.position) || 1) > 1}
-            tourSlug={tournament.tourSlug}
-            onTap={handleFinisherTap}
-          />
-        ))}
+        {/* 6. Best Round of the Week */}
+        {bestRound && (
+          <div style={{ marginBottom: 14 }}>
+            <div
+              style={{
+                fontSize: 9, fontWeight: 800, letterSpacing: '0.14em',
+                color: inkFaint, marginBottom: 8, textTransform: 'uppercase',
+              }}
+            >
+              BEST ROUND OF THE WEEK
+            </div>
+            <BestRoundRow
+              finisher={bestRound.finisher}
+              roundNumber={bestRound.round}
+              roundScore={bestRound.score}
+              tourSlug={tournament.tourSlug}
+              onTap={handleFinisherTap}
+            />
+          </div>
+        )}
 
         {/* 7. Final Leaderboard CTA */}
         <button

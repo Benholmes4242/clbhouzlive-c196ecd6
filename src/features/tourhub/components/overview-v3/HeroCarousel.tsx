@@ -417,7 +417,7 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
                   transition={{ duration: 0.22, ease: [0.19, 1, 0.22, 1] }}
-                  style={{ overflow: 'hidden', flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column' as const }}
+                  style={{ overflow: 'hidden', flex: 1, height: '100%', minHeight: 0, display: 'flex', flexDirection: 'column' as const }}
                 >
                   <AnimatePresence mode="wait">
                     {selectedPlayer ? (
@@ -505,7 +505,7 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
                   transition={{ duration: 0.22, ease: [0.19, 1, 0.22, 1] }}
-                  style={{ overflow: 'hidden', flex: 1, display: 'flex', flexDirection: 'column' as const, minHeight: 0 }}
+                  style={{ overflow: 'hidden', flex: 1, height: '100%', display: 'flex', flexDirection: 'column' as const, minHeight: 0 }}
                 >
                 {selectedPlayer ? (
                   <motion.div

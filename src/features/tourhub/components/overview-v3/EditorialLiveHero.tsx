@@ -18,7 +18,7 @@ import { tournamentRoute } from '../../routes';
 import { HeroAtmosphere } from '../shared/HeroAtmosphere';
 import { Shimmer } from '../shared/Shimmer';
 
-import { useLeaderHoleScores } from '../../hooks/useLeaderHoleScores';
+
 import { getPlayerHeadshotUrl } from '@/utils/playerHeadshot';
 import { PlayerSilhouette } from '@/components/ui/PlayerSilhouette';
 import {
@@ -68,109 +68,6 @@ function getTourShort(slug: string): string {
   return map[slug] ?? slug.toUpperCase();
 }
 
-// ---------- Hole sparkline -------------------------------------------------
-
-function HoleSparkline({
-  holes,
-  totalHoles = 18,
-  activeHole,
-}: {
-  holes: { holeNumber: number; scoreToPar: number }[];
-  totalHoles?: number;
-  activeHole: number | null;
-}) {
-  const SPARK_W = 320;
-  const SPARK_H = 60;
-  const INSET = 6;
-
-  // Cumulative score per played hole.
-  const running = holes.reduce<number[]>((acc, h, i) => {
-    acc.push((acc[i - 1] ?? 0) + (h.scoreToPar ?? 0));
-    return acc;
-  }, []);
-  const min = Math.min(0, ...running);
-  const max = Math.max(0, ...running);
-  const range = max - min || 1;
-  const stepX = SPARK_W / Math.max(1, totalHoles - 1);
-
-  const xy = (i: number, v: number) => {
-    const x = i * stepX;
-    const y = SPARK_H - INSET - ((v - min) / range) * (SPARK_H - INSET * 2);
-    return [x, y] as const;
-  };
-
-  const playedPts = running.map((v, i) => xy(i, v));
-  const lastPlayedIdx = playedPts.length - 1;
-  const lastPt = playedPts[lastPlayedIdx];
-
-  const playedPath = playedPts
-    .map(([x, y], i) => `${i === 0 ? 'M' : 'L'}${x.toFixed(1)},${y.toFixed(1)}`)
-    .join(' ');
-
-  const upcomingPath = lastPt
-    ? `M${lastPt[0].toFixed(1)},${lastPt[1].toFixed(1)} L${(SPARK_W).toFixed(1)},${lastPt[1].toFixed(1)}`
-    : '';
-
-  const areaPath = playedPts.length
-    ? `${playedPath} L${lastPt![0].toFixed(1)},${SPARK_H} L0,${SPARK_H} Z`
-    : '';
-
-  return (
-    <div style={{ width: '100%' }}>
-      <svg
-        viewBox={`0 0 ${SPARK_W} ${SPARK_H}`}
-        preserveAspectRatio="none"
-        style={{ width: '100%', height: SPARK_H, display: 'block', overflow: 'visible' }}
-      >
-        <defs>
-          <linearGradient id="liveSparkArea" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="rgba(16,185,129,0.18)" />
-            <stop offset="100%" stopColor="rgba(16,185,129,0)" />
-          </linearGradient>
-        </defs>
-
-        {areaPath && <path d={areaPath} fill="url(#liveSparkArea)" />}
-        {upcomingPath && (
-          <path
-            d={upcomingPath}
-            stroke="rgba(255,255,255,0.35)"
-            strokeWidth={1.2}
-            strokeDasharray="3 3"
-            fill="none"
-          />
-        )}
-        {playedPath && (
-          <path d={playedPath} stroke={greenLive} strokeWidth={1.8} fill="none" />
-        )}
-        {lastPt && (
-          <circle
-            cx={lastPt[0]}
-            cy={lastPt[1]}
-            r={5}
-            fill={greenLive}
-            stroke={navyMid}
-            strokeWidth={2}
-          />
-        )}
-      </svg>
-      <div
-        style={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          marginTop: 6,
-          fontSize: 9,
-          fontWeight: 700,
-          color: inkGhost,
-          letterSpacing: '0.06em',
-        }}
-      >
-        <span>HOLE 1</span>
-        <span>{activeHole ? `HOLE ${activeHole}` : ''}</span>
-        <span>HOLE {totalHoles}</span>
-      </div>
-    </div>
-  );
-}
 
 // ---------- Leader hero ----------------------------------------------------
 
@@ -208,11 +105,11 @@ function LeaderHero({
   const today = (thru != null && thru >= 1 && thru < 18) ? score - completedTotal : null;
 
   return (
-    <div style={{ display: 'flex', alignItems: 'stretch', gap: 14, marginBottom: 22 }}>
+    <div style={{ display: 'flex', alignItems: 'stretch', gap: 10, marginBottom: 14 }}>
       <div style={{ position: 'relative', flexShrink: 0 }}>
         <div
           style={{
-            width: 86, height: 86, borderRadius: '50%',
+            width: 50, height: 50, borderRadius: '50%',
             border: `2px solid ${greenLive}`,
             background: 'rgba(0,0,0,0.3)',
             overflow: 'hidden',
@@ -229,17 +126,17 @@ function LeaderHero({
               }}
             />
           ) : (
-            <PlayerSilhouette size={42} />
+            <PlayerSilhouette size={26} />
           )}
         </div>
         <div
           style={{
             position: 'absolute', bottom: -2, right: -2,
-            width: 26, height: 26, borderRadius: '50%',
+            width: 20, height: 20, borderRadius: '50%',
             background: greenLive, color: '#fff',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
             border: `2px solid ${navyMid}`,
-            fontSize: 11, fontWeight: 800,
+            fontSize: 9, fontWeight: 800,
           }}
         >
           1
@@ -257,7 +154,7 @@ function LeaderHero({
         </div>
         <div
           style={{
-            fontSize: 24, fontWeight: 800, letterSpacing: '-0.02em',
+            fontSize: 17, fontWeight: 800, letterSpacing: '-0.02em',
             color: '#fff', lineHeight: 1,
             whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
           }}
@@ -267,7 +164,7 @@ function LeaderHero({
         {thru != null && thru >= 1 && thru < 18 && (
           <div
             style={{
-              fontSize: 11, color: greenLive, marginTop: 6, fontWeight: 600,
+              fontSize: 10, color: greenLive, marginTop: 4, fontWeight: 600,
             }}
           >
             Thru {thru} · R{derivedRound}
@@ -282,7 +179,7 @@ function LeaderHero({
       >
         <div
           style={{
-            fontSize: 56, fontWeight: 800, letterSpacing: '-0.04em',
+            fontSize: 28, fontWeight: 800, letterSpacing: '-0.04em',
             color: '#fff', lineHeight: 0.9,
             fontVariantNumeric: 'tabular-nums',
           }}
@@ -292,7 +189,7 @@ function LeaderHero({
         {today != null && (
           <div
             style={{
-              fontSize: 10, color: inkFaint, marginTop: 4, letterSpacing: '0.06em',
+              fontSize: 9, color: inkFaint, marginTop: 4, letterSpacing: '0.06em',
             }}
           >
             TODAY {fmtScoreSign(today)}
@@ -543,24 +440,6 @@ export function EditorialLiveHero({
     : 0;
   const derivedRound = lastCompleted === 0 ? currentRound : Math.min(lastCompleted + 1, 4);
 
-  const { data: holeScores = [] } = useLeaderHoleScores(
-    tournament.id,
-    leaderId,
-    leaderId ? derivedRound : null,
-  );
-  const { data: prevRoundScores = [] } = useLeaderHoleScores(
-    tournament.id,
-    leaderId,
-    leaderId && lastCompleted > 0 ? lastCompleted : null,
-  );
-  const displayHoles = holeScores.length > 0 ? holeScores : prevRoundScores;
-  const displayRound = holeScores.length > 0 ? derivedRound : lastCompleted;
-
-  const activeHole = displayHoles.length > 0
-    ? displayHoles[displayHoles.length - 1].holeNumber
-    : null;
-  const remaining = activeHole ? Math.max(0, 18 - activeHole) : 18;
-
   const top5 = leaderboard.slice(0, 5);
 
   // Inject pulse keyframes once per mount — scoped via a simple <style> tag.
@@ -639,11 +518,11 @@ export function EditorialLiveHero({
         </div>
 
         {/* 2. Tournament name + venue --------------------------------------- */}
-        <div style={{ marginBottom: 28 }}>
+        <div style={{ marginBottom: 14 }}>
           <h1
             style={{
-              margin: 0, fontSize: 30, fontWeight: 800,
-              letterSpacing: '-0.025em', lineHeight: 1.05, color: '#fff',
+              margin: 0, fontSize: 20, fontWeight: 800,
+              letterSpacing: '-0.025em', lineHeight: 1.1, color: '#fff',
             }}
           >
             {tournament.name}
@@ -651,7 +530,7 @@ export function EditorialLiveHero({
           {(tournament.venueName || tournament.venueCity) && (
             <div
               style={{
-                marginTop: 8, fontSize: 12, color: inkFaint,
+                marginTop: 6, fontSize: 11, color: inkFaint,
                 display: 'flex', alignItems: 'center', gap: 5,
               }}
             >
@@ -666,51 +545,6 @@ export function EditorialLiveHero({
         {/* 3. Leader hero --------------------------------------------------- */}
         {leaderEntry && (
           <LeaderHero leaderEntry={leaderEntry} tourSlug={tournament.tourSlug} />
-        )}
-
-        {/* 4. Hole-by-hole strip -------------------------------------------- */}
-        {leaderId && (
-          <div
-            style={{
-              background: 'rgba(255,255,255,0.025)',
-              borderRadius: 14,
-              border: `1px solid ${hairlineDark}`,
-              padding: '14px 14px 12px',
-              marginBottom: 22,
-            }}
-          >
-            <div
-              style={{
-                display: 'flex', justifyContent: 'space-between', alignItems: 'baseline',
-                marginBottom: 10,
-              }}
-            >
-              <span
-                style={{
-                  fontSize: 9, fontWeight: 800, letterSpacing: '0.12em', color: inkFaint,
-                }}
-              >
-                R{displayRound || derivedRound} · LEADER HOLE BY HOLE
-              </span>
-              {activeHole != null && holeScores.length > 0 && (
-                <span style={{ fontSize: 10, color: greenLive, fontWeight: 700 }}>
-                  HOLE {activeHole} · {remaining} TO PLAY
-                </span>
-              )}
-            </div>
-            {displayHoles.length > 0 ? (
-              <HoleSparkline holes={displayHoles} activeHole={activeHole} />
-            ) : (
-              <div
-                style={{
-                  textAlign: 'center', color: inkFaint, fontSize: 11,
-                  padding: '14px 0',
-                }}
-              >
-                Round about to start
-              </div>
-            )}
-          </div>
         )}
 
         {/* 5. Leaderboard --------------------------------------------------- */}

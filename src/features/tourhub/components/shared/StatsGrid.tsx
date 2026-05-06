@@ -20,8 +20,8 @@ export interface StatsShape {
  *   - `greenLive` for live rounds
  * EAGLES/BOGEYS/DOUBLES ghost to `inkGhost` when the value is 0.
  */
-export function StatsGrid({ stats, isLive = false }: { stats: StatsShape; isLive?: boolean }) {
-  const positiveColor = isLive ? greenLive : gold;
+export function StatsGrid({ stats }: { stats: StatsShape }) {
+  const positiveColor = gold; // Birdies are always gold across all states
 
   const items = [
     { v: stats.eagles, label: 'EAGLES', color: stats.eagles > 0 ? '#fff' : inkGhost },
@@ -35,11 +35,11 @@ export function StatsGrid({ stats, isLive = false }: { stats: StatsShape; isLive
     <div
       style={{
         display: 'flex',
-        background: 'rgba(255,255,255,0.025)',
-        border: `1px solid ${hairlineDark}`,
-        borderRadius: 14,
-        padding: '12px 0',
-        marginBottom: 22,
+        background: 'transparent',
+        borderTop: `1px solid ${hairlineDark}`,
+        borderBottom: `1px solid ${hairlineDark}`,
+        padding: '10px 0',
+        marginBottom: 14,
       }}
     >
       {items.map((s, i) => (

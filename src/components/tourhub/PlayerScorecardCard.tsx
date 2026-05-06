@@ -563,7 +563,7 @@ export function PlayerScorecardCard({
           >
             <div
               style={{
-                width: 72, height: 72, borderRadius: '50%',
+                width: 50, height: 50, borderRadius: '50%',
                 border: `2px solid ${isCompleted ? gold : greenLive}`,
                 background: 'rgba(0,0,0,0.3)',
                 overflow: 'hidden',
@@ -577,7 +577,7 @@ export function PlayerScorecardCard({
                   style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center 18%' }}
                 />
               ) : (
-                <span style={{ fontSize: 22, fontWeight: 800, color: inkFaint }}>
+                <span style={{ fontSize: 18, fontWeight: 800, color: inkFaint }}>
                   {player.firstName?.[0]}{player.lastName?.[0]}
                 </span>
               )}
@@ -585,12 +585,12 @@ export function PlayerScorecardCard({
             <div
               style={{
                 position: 'absolute', bottom: -2, right: -2,
-                width: 24, height: 24, borderRadius: '50%',
+                width: 20, height: 20, borderRadius: '50%',
                 background: isCompleted ? gold : greenLive,
                 color: isCompleted ? ink : '#fff',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
                 border: `2px solid ${navyMid}`,
-                fontSize: 10, fontWeight: 800,
+                fontSize: 9, fontWeight: 800,
                 fontVariantNumeric: 'tabular-nums',
               }}
             >
@@ -617,7 +617,7 @@ export function PlayerScorecardCard({
             </div>
             <div
               style={{
-                fontSize: 22, fontWeight: 800, letterSpacing: '-0.02em',
+                fontSize: 18, fontWeight: 800, letterSpacing: '-0.02em',
                 color: '#fff', lineHeight: 1.1,
                 whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
               }}
@@ -627,7 +627,7 @@ export function PlayerScorecardCard({
             {!isCompleted && player.thru && player.thru !== 'F' && (
               <div
                 style={{
-                  fontSize: 11, color: greenLive, marginTop: 6, fontWeight: 600,
+                  fontSize: 10, color: greenLive, marginTop: 4, fontWeight: 600,
                 }}
               >
                 Thru {player.thru} · R{currentRound}
@@ -636,7 +636,7 @@ export function PlayerScorecardCard({
             {isCompleted && (
               <div
                 style={{
-                  fontSize: 11, color: inkFaint, marginTop: 6, fontWeight: 600,
+                  fontSize: 10, color: inkFaint, marginTop: 4, fontWeight: 600,
                 }}
               >
                 72 holes · Final
@@ -652,7 +652,7 @@ export function PlayerScorecardCard({
           >
             <span
               style={{
-                fontSize: 48, fontWeight: 800, letterSpacing: '-0.04em',
+                fontSize: 36, fontWeight: 800, letterSpacing: '-0.04em',
                 color: (isCompleted && (player.position === 1 || String(player.position) === '1')) ? gold : '#fff',
                 lineHeight: 0.9,
                 fontVariantNumeric: 'tabular-nums',
@@ -698,8 +698,8 @@ export function PlayerScorecardCard({
                     bogeys: activeRoundData.bogeys,
                     doubleBogeys: activeRoundData.doubleBogeys,
                   }}
-                  isLive={!isCompleted}
                 />
+
               </div>
             )}
 
