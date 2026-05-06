@@ -159,6 +159,7 @@ function HeadlineCard({ tournament }: { tournament: SeasonTournament }) {
     >
       <div style={{
         position: 'relative', width: '100%', height: 187,
+        borderRadius: '16px 16px 0 0',
         overflow: 'hidden',
         background: venueImage?.imageUrl
           ? `url(${venueImage.imageUrl}) center/cover`
