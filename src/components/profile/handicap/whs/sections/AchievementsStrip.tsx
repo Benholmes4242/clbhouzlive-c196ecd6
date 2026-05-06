@@ -62,8 +62,15 @@ const ICONS: Record<string, React.ComponentType<any>> = {
 
 const TROPHY_TILE_WIDTH = 130;
 const HAIRLINE = 'rgba(15,23,42,0.08)';
+const INK = '#0F172A';
+const INK_55 = 'rgba(15,23,42,0.55)';
+const INK_10 = 'rgba(15,23,42,0.10)';
+const INK_06 = 'rgba(15,23,42,0.06)';
+const INK_70 = '#475569';
 const GOLD = '#D97706';
 const AMBER = '#F7931E';
+const AMBER_14 = 'rgba(247,147,30,0.14)';
+const FONT_GEIST = 'Geist, system-ui, -apple-system, BlinkMacSystemFont, sans-serif';
 
 const TrophyTile: React.FC<{ a: Achievement }> = ({ a }) => {
   const Icon = ICONS[a.icon_name] ?? Star;
@@ -78,23 +85,31 @@ const TrophyTile: React.FC<{ a: Achievement }> = ({ a }) => {
         position: 'relative',
         padding: '14px 12px',
         borderRadius: 12,
-        background: isHighlight
-          ? 'linear-gradient(135deg, rgba(247,147,30,0.10) 0%, rgba(247,147,30,0.02) 100%)'
-          : isLocked
-          ? 'rgba(15,23,42,0.025)'
-          : '#FAFAF7',
-        border: isHighlight
-          ? `1.5px solid rgba(247,147,30,0.45)`
-          : isLocked
+        background: isLocked ? 'rgba(15,23,42,0.025)' : '#fff',
+        border: isLocked
           ? `1px dashed rgba(15,23,42,0.18)`
-          : `1px solid ${HAIRLINE}`,
+          : `0.5px solid ${INK_10}`,
         scrollSnapAlign: 'start',
         opacity: isLocked ? 0.85 : 1,
       }}
     >
       {isHighlight && (
-        <div style={{ position: 'absolute', top: 8, right: 8 }}>
-          <Crown size={12} color={GOLD} fill={GOLD} strokeWidth={2} />
+        <div
+          style={{
+            position: 'absolute',
+            top: 8,
+            right: 8,
+            background: AMBER_14,
+            borderRadius: 999,
+            padding: '3px 8px',
+            fontSize: 8.5,
+            fontWeight: 800,
+            color: AMBER,
+            letterSpacing: '0.14em',
+            fontFamily: FONT_GEIST,
+          }}
+        >
+          MAX TIER
         </div>
       )}
 
@@ -106,8 +121,8 @@ const TrophyTile: React.FC<{ a: Achievement }> = ({ a }) => {
             right: 8,
             fontSize: 8,
             fontWeight: 800,
-            color: '#C97211',
-            background: 'rgba(247,147,30,0.10)',
+            color: INK_55,
+            background: INK_06,
             padding: '2px 6px',
             borderRadius: 4,
             letterSpacing: '0.06em',
@@ -158,13 +173,13 @@ const TrophyTile: React.FC<{ a: Achievement }> = ({ a }) => {
         {a.subtitle}
       </div>
 
-      {(isTiered || isLocked) && a.progress != null && (
+      {isTiered && !isLocked && a.progress != null && (
         <>
           <div
             style={{
-              height: 4,
-              borderRadius: 2,
-              background: 'rgba(15,23,42,0.08)',
+              height: 3,
+              borderRadius: 999,
+              background: INK_06,
               overflow: 'hidden',
               marginBottom: 6,
             }}
@@ -173,8 +188,8 @@ const TrophyTile: React.FC<{ a: Achievement }> = ({ a }) => {
               style={{
                 height: '100%',
                 width: `${Math.round(a.progress * 100)}%`,
-                background: isLocked ? 'rgba(247,147,30,0.55)' : AMBER,
-                borderRadius: 2,
+                background: isHighlight ? AMBER : INK_70,
+                borderRadius: 999,
               }}
             />
           </div>
@@ -183,7 +198,7 @@ const TrophyTile: React.FC<{ a: Achievement }> = ({ a }) => {
               style={{
                 fontSize: 10,
                 fontWeight: 600,
-                color: isLocked ? 'rgba(15,23,42,0.45)' : '#64748B',
+                color: '#64748B',
                 fontVariantNumeric: 'tabular-nums',
               }}
             >
@@ -191,6 +206,19 @@ const TrophyTile: React.FC<{ a: Achievement }> = ({ a }) => {
             </div>
           )}
         </>
+      )}
+
+      {isLocked && a.progressLabel && (
+        <div
+          style={{
+            fontSize: 10,
+            fontWeight: 600,
+            color: 'rgba(15,23,42,0.45)',
+            fontVariantNumeric: 'tabular-nums',
+          }}
+        >
+          {a.progressLabel}
+        </div>
       )}
 
       {a.earned && !isTiered && a.achieved_at && (
