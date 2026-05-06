@@ -238,8 +238,7 @@ const HandicapPageHeader: React.FC<HeaderProps> = ({
       {/* Row 3 — segmented control */}
       <div style={{
         display: 'flex',
-        borderBottom: `0.5px solid ${BORDER}`,
-        paddingLeft: 20,
+        justifyContent: 'center',
       }}>
         {(['overview', 'trends', 'friends'] as const).map(tab => (
           <button
