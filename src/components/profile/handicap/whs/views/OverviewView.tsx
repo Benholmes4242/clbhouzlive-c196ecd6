@@ -8,6 +8,7 @@ import AchievementsStrip from '../sections/AchievementsStrip';
 import LastRoundCard from '../sections/LastRoundCard';
 import RoundsThatCountCard from '../sections/RoundsThatCountCard';
 import EchoInsightsCard from '../sections/EchoInsightsCard';
+import StreaksSection from '../sections/StreaksSection';
 
 interface Props {
   connection: WhsConnection;
