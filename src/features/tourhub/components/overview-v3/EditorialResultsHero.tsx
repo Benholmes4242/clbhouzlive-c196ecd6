@@ -133,7 +133,7 @@ function ChampionHero({ winner, tourSlug, marginLabel, onTap }: ChampionHeroProp
         >
           <div
             style={{
-              width: 64, height: 64, borderRadius: '50%',
+              width: 64, borderRadius: '34%', aspectRatio: '1 / 1.05',
               border: `2px solid ${gold}`,
               background: 'rgba(0,0,0,0.3)',
               overflow: 'hidden',
@@ -316,7 +316,7 @@ function FinalLeaderboardRow({
             alt=""
             onError={() => setImgErr(true)}
             style={{
-              width: 26, height: 26, borderRadius: '50%',
+              width: 26, borderRadius: '34%', aspectRatio: '1 / 1.05',
               objectFit: 'cover', objectPosition: 'center 18%',
               flexShrink: 0,
             }}
@@ -324,7 +324,7 @@ function FinalLeaderboardRow({
         ) : (
           <div
             style={{
-              width: 26, height: 26, borderRadius: '50%',
+              width: 26, borderRadius: '34%', aspectRatio: '1 / 1.05',
               background: 'rgba(255,255,255,0.06)',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               fontSize: 10, color: inkFaint, fontWeight: 700, flexShrink: 0,
@@ -406,14 +406,14 @@ function PodiumRow({
           alt=""
           onError={() => setImgErr(true)}
           style={{
-            width: 32, height: 32, borderRadius: '50%',
+            width: 32, borderRadius: '34%', aspectRatio: '1 / 1.05',
             objectFit: 'cover', objectPosition: 'center 18%',
           }}
         />
       ) : (
         <div
           style={{
-            width: 32, height: 32, borderRadius: '50%',
+            width: 32, borderRadius: '34%', aspectRatio: '1 / 1.05',
             background: 'rgba(255,255,255,0.06)',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
             fontSize: 11, color: inkFaint, fontWeight: 700,
@@ -492,7 +492,7 @@ function BestRoundRow({
         fontVariantNumeric: 'tabular-nums', textAlign: 'center',
       }}>1</span>
       <div style={{
-        width: 32, height: 32, borderRadius: '50%',
+        width: 32, borderRadius: '34%', aspectRatio: '1 / 1.05',
         border: `1.5px solid rgba(255,255,255,0.15)`,
         overflow: 'hidden', background: 'rgba(0,0,0,0.3)',
       }}>
