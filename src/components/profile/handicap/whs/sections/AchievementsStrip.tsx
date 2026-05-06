@@ -1,4 +1,6 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
+import { ChevronRight } from 'lucide-react';
+import AllTrophiesSheet from './AllTrophiesSheet';
 import { format } from 'date-fns';
 import {
   Trophy,
