@@ -141,9 +141,16 @@ const Top100Hub = () => {
 
           {/* Tabs: Courses | My Progress */}
           <Tabs value={activeTab} onValueChange={(v) => handleTabChange(v as ValidTab)} className="w-full">
+            <div ref={sentinelRef} aria-hidden style={{ height: 1 }} />
             <div
               className="sticky bg-background"
-              style={{ top: 0, zIndex: 20, paddingTop: 8, paddingBottom: 8 }}
+              style={{
+                top: 0,
+                zIndex: 20,
+                paddingTop: stickyPaddingTop === 0 ? 8 : `calc(${stickyPaddingTop} + 8px)`,
+                paddingBottom: 8,
+                transition: 'padding-top 200ms ease',
+              }}
             >
             <TabsList className="flex gap-1 rounded-xl p-1 mb-0 border-0" style={{ background: 'rgba(15,23,42,0.05)' }}>
               <TabsTrigger 
