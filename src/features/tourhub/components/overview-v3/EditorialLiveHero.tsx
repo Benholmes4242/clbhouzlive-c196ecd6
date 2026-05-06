@@ -586,8 +586,14 @@ export function EditorialLiveHero({
           paddingTop: 'calc(max(env(safe-area-inset-top, 0px), 47px) + 56px)',
           paddingInline: 20,
           paddingBottom: 24,
+          boxSizing: 'border-box',
+          flex: 1,
+          minHeight: 0,
           overflowY: 'auto',
-          height: '100%',
+          height: 'auto',
+          overscrollBehaviorY: 'contain',
+          touchAction: 'pan-y',
+          willChange: 'transform',
           WebkitOverflowScrolling: 'touch' as any,
         }}
       >
