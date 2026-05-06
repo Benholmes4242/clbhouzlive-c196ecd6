@@ -75,6 +75,7 @@ const BusinessProfilePage: React.FC = () => {
   const { data: membership } = useBusinessMembership(business?.id);
   const { data: postsCount = 0 } = useBusinessPostsCount(business?.id);
   const { data: followersCount = 0 } = useBusinessFollowersCount(business?.id);
+  const { data: followingCount = 0 } = useBusinessFollowingCount(business?.id);
   // Slice 3: canonical follow state + mutation (5-element key)
   const { isFollowing: cachedFollowing } = useFollowState({
     targetActorType: 'business',
