@@ -1136,7 +1136,7 @@ function DotsRail({
         boxSizing: 'border-box',
         display: 'flex',
         alignItems: 'center',
-        justifyContent: 'space-between',
+        justifyContent: 'flex-start',
         gap: 10,
       }}
     >
