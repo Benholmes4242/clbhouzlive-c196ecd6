@@ -247,42 +247,60 @@ function HeadlineCard({ tournament }: { tournament: SeasonTournament }) {
           );
         })()}
 
-        {(tournament.purse || tournament.venuePar || tournament.venueYardage) && (
-          <div style={{
-            display: 'flex', alignItems: 'center', flexWrap: 'wrap',
-            fontSize: 12, fontWeight: 600, color: 'rgba(255,255,255,0.85)',
-            marginBottom: tournament.defendingChampion ? 12 : 0,
-          }}>
-            {(() => {
-              const chips: string[] = [];
-              if (tournament.purse) chips.push(formatPurse(tournament.purse));
-              if (tournament.venuePar) chips.push(`Par ${tournament.venuePar}`);
-              if (tournament.venueYardage) chips.push(`${tournament.venueYardage.toLocaleString()} yds`);
-              return chips.map((c, i) => (
-                <span key={i} style={{ display: 'inline-flex', alignItems: 'center' }}>
-                  {i > 0 && (
-                    <span style={{ margin: '0 8px', color: 'rgba(255,255,255,0.30)' }}>·</span>
-                  )}
-                  {c}
-                </span>
-              ));
-            })()}
-          </div>
-        )}
+        {(() => {
+          const hasStats = !!(tournament.purse || tournament.venuePar || tournament.venueYardage);
+          const hasDefending = !!tournament.defendingChampion;
+          if (!hasStats && !hasDefending) return null;
 
-        {tournament.defendingChampion && (
-          <div style={{
-            fontSize: 11, color: 'rgba(255,255,255,0.55)',
-            paddingTop: 11, borderTop: '1px solid rgba(255,255,255,0.10)',
-            display: 'flex', alignItems: 'center', gap: 6,
-          }}>
-            <span style={{
-              color: accent, fontWeight: 800,
-              letterSpacing: '0.12em', textTransform: 'uppercase',
-            }}>Defending</span>
-            <span style={{ color: '#fff', fontWeight: 600 }}>{tournament.defendingChampion}</span>
-          </div>
-        )}
+          const chips: string[] = [];
+          if (tournament.purse) chips.push(formatPurse(tournament.purse));
+          if (tournament.venuePar) chips.push(`Par ${tournament.venuePar}`);
+          if (tournament.venueYardage) chips.push(`${tournament.venueYardage.toLocaleString()} yds`);
+
+          return (
+            <div style={{
+              paddingTop: 11, borderTop: '1px solid rgba(255,255,255,0.10)',
+              display: 'flex', alignItems: 'center', gap: 12,
+              fontSize: 11,
+            }}>
+              {hasDefending && (
+                <div style={{
+                  display: 'flex', alignItems: 'center', gap: 6,
+                  color: 'rgba(255,255,255,0.55)',
+                  flex: 1, minWidth: 0,
+                }}>
+                  <span style={{
+                    color: accent, fontWeight: 800,
+                    letterSpacing: '0.12em', textTransform: 'uppercase',
+                    flexShrink: 0,
+                  }}>Defending</span>
+                  <span style={{
+                    color: '#fff', fontWeight: 600,
+                    overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+                  }}>{tournament.defendingChampion}</span>
+                </div>
+              )}
+              {hasStats && (
+                <div style={{
+                  display: 'flex', alignItems: 'center',
+                  fontSize: 11, fontWeight: 600,
+                  color: 'rgba(255,255,255,0.78)',
+                  marginLeft: hasDefending ? 'auto' : 0,
+                  flexShrink: 0,
+                }}>
+                  {chips.map((c, i) => (
+                    <span key={i} style={{ display: 'inline-flex', alignItems: 'center' }}>
+                      {i > 0 && (
+                        <span style={{ margin: '0 6px', color: 'rgba(255,255,255,0.30)' }}>·</span>
+                      )}
+                      {c}
+                    </span>
+                  ))}
+                </div>
+              )}
+            </div>
+          );
+        })()}
       </div>
     </button>
   );
