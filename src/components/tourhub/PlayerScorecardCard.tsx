@@ -730,7 +730,7 @@ export function PlayerScorecardCard({
                   <div style={{ display: 'flex', alignItems: 'baseline', gap: 12 }}>
                     <span
                       style={{
-                        fontSize: 14, fontWeight: 600, color: inkSoft,
+                        fontSize: 13, fontWeight: 600, color: inkSoft,
                         fontVariantNumeric: 'tabular-nums',
                       }}
                     >
@@ -738,7 +738,7 @@ export function PlayerScorecardCard({
                     </span>
                     <span
                       style={{
-                        fontSize: 24, fontWeight: 800,
+                        fontSize: 22, fontWeight: 800,
                         color: activeRoundData.totalToPar < 0 ? '#ffffff'
                              : activeRoundData.totalToPar > 0 ? danger
                              : inkFaint,
