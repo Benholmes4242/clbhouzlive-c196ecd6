@@ -40,6 +40,8 @@ export const OverviewView: React.FC<Props> = ({
   isSyncing = false,
   onSyncNow,
 }) => {
+  const { data: profile } = useUserProfile(readOnly ? undefined : userId);
+  const peerComparisonVisible = (profile as any)?.peer_comparison_visible ?? true;
   return (
     <div
       role="tabpanel"
