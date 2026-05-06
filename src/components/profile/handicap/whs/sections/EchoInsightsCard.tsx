@@ -88,62 +88,71 @@ const CourseCard: React.FC<{ course: SuitedCourse; stripe: string; onTap: (id: s
     style={{
       width: '100%',
       display: 'flex',
-      alignItems: 'flex-start',
-      gap: 12,
       background: '#fff',
       border: `0.5px solid ${INK_10}`,
-      borderLeft: `2px solid ${stripe}`,
-      borderRadius: 8,
-      padding: '10px 12px',
-      textAlign: 'left',
+      borderRadius: 14,
+      overflow: 'hidden',
       cursor: 'pointer',
+      fontFamily: FONT_GEIST,
+      textAlign: 'left',
+      padding: 0,
     }}
     className="active:scale-[0.99] transition-transform"
   >
-    <div style={{ flex: 1, minWidth: 0 }}>
+    <div style={{ width: 3, background: stripe, flexShrink: 0 }} />
+    <div style={{ flex: 1, padding: 14, minWidth: 0 }}>
       <div
         style={{
-          fontSize: 13,
-          fontWeight: 700,
-          color: INK,
-          lineHeight: 1.2,
-          overflow: 'hidden',
-          textOverflow: 'ellipsis',
-          whiteSpace: 'nowrap',
+          display: 'flex',
+          alignItems: 'flex-start',
+          justifyContent: 'space-between',
+          gap: 10,
         }}
       >
-        {course.name || '—'}
-      </div>
-      {course.region && (
-        <div
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: 3,
-            marginTop: 3,
-            fontSize: 10,
-            color: INK_55,
-          }}
-        >
-          <MapPin size={9} strokeWidth={2.2} />
-          <span
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <div
             style={{
-              overflow: 'hidden',
-              textOverflow: 'ellipsis',
-              whiteSpace: 'nowrap',
-              maxWidth: 220,
+              fontSize: 16,
+              fontWeight: 700,
+              color: INK,
+              letterSpacing: '-0.01em',
+              lineHeight: 1.2,
             }}
           >
-            {course.region}
-          </span>
+            {course.name || '—'}
+          </div>
+          {course.region && (
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 4,
+                marginTop: 4,
+                fontSize: 12,
+                color: INK_55,
+              }}
+            >
+              <MapPin size={11} color={INK_40} strokeWidth={2} />
+              <span
+                style={{
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                {course.region}
+              </span>
+            </div>
+          )}
         </div>
-      )}
+        <ChevronRight size={16} color={INK_40} style={{ flexShrink: 0, marginTop: 4 }} />
+      </div>
       {course.rationale && (
         <p
           style={{
-            margin: '6px 0 0',
-            fontSize: 11.5,
-            lineHeight: 1.45,
+            margin: '10px 0 0',
+            fontSize: 13,
+            lineHeight: 1.5,
             color: INK_55,
           }}
         >
@@ -151,7 +160,6 @@ const CourseCard: React.FC<{ course: SuitedCourse; stripe: string; onTap: (id: s
         </p>
       )}
     </div>
-    <ChevronRight size={13} strokeWidth={2.2} color={INK_40} style={{ marginTop: 2, flexShrink: 0 }} />
   </button>
 );
 

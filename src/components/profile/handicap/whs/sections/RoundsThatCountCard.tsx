@@ -203,12 +203,34 @@ export const RoundsThatCountCard: React.FC<Props> = ({ connectionId, currentHand
       }}>
         {/* Chart */}
         <div style={{ padding: '14px 14px 0' }}>
-          {/* Y-axis unit label */}
+          {/* Y-axis unit label + LATEST legend */}
           <div style={{
-            fontSize: 10, fontWeight: 700, color: AMBER_DEEP,
-            letterSpacing: '0.04em', marginBottom: 4, paddingLeft: 4,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            marginBottom: 8,
+            paddingLeft: 4,
           }}>
-            differential
+            <span style={{
+              fontSize: 9,
+              fontWeight: 800,
+              color: INK_55,
+              letterSpacing: '0.16em',
+              textTransform: 'uppercase',
+            }}>DIFFERENTIAL</span>
+            <span style={{
+              fontSize: 9,
+              fontWeight: 700,
+              color: AMBER,
+              letterSpacing: '0.16em',
+              textTransform: 'uppercase',
+              display: 'flex',
+              alignItems: 'center',
+              gap: 4,
+            }}>
+              <span style={{ width: 6, height: 6, borderRadius: '50%', background: AMBER }} />
+              LATEST
+            </span>
           </div>
 
           <div style={{
@@ -235,6 +257,27 @@ export const RoundsThatCountCard: React.FC<Props> = ({ connectionId, currentHand
             <div style={{
               flex: 1, position: 'relative', height: CHART_H,
             }}>
+              {/* Permanent latest emphasis band */}
+              {(() => {
+                const latestIdx = enriched.rounds.length - 1;
+                if (latestIdx < 0) return null;
+                const colWidth = 100 / enriched.rounds.length;
+                return (
+                  <div style={{
+                    position: 'absolute',
+                    top: 0,
+                    bottom: 0,
+                    left: `${(latestIdx + 0.05) * colWidth}%`,
+                    width: `${colWidth * 0.9}%`,
+                    background: AMBER,
+                    opacity: 0.08,
+                    borderRadius: 6,
+                    pointerEvents: 'none',
+                    zIndex: 0,
+                  }} />
+                );
+              })()}
+
               {/* Selected highlight column */}
               {selectedIdx >= 0 && (
                 <div style={{
@@ -246,6 +289,7 @@ export const RoundsThatCountCard: React.FC<Props> = ({ connectionId, currentHand
                   borderLeft: `0.5px solid ${AMBER_BORDER}`,
                   borderRight: `0.5px solid ${AMBER_BORDER}`,
                   pointerEvents: 'none',
+                  zIndex: 1,
                 }} />
               )}
 
@@ -277,8 +321,27 @@ export const RoundsThatCountCard: React.FC<Props> = ({ connectionId, currentHand
               {enriched.rounds.map((r, i) => {
                 const d = r.handicap_differential ?? 0;
                 const isSel = r.id === selectedRound.id;
-                const stroke = r.is_best ? GREEN : r.is_worst ? RED : AMBER;
-                const dotSize = isSel ? 14 : 10;
+                const isLatest = i === enriched.rounds.length - 1;
+                let dotSize: number;
+                let background: string;
+                let borderStyle: string;
+                if (r.is_best) {
+                  dotSize = 12;
+                  background = '#fff';
+                  borderStyle = `2.5px solid ${GREEN}`;
+                } else if (r.is_worst) {
+                  dotSize = 12;
+                  background = '#fff';
+                  borderStyle = `2.5px solid ${RED}`;
+                } else if (isLatest) {
+                  dotSize = 14;
+                  background = AMBER;
+                  borderStyle = `2px solid ${INK}`;
+                } else {
+                  dotSize = 9;
+                  background = '#fff';
+                  borderStyle = `2px solid ${AMBER}`;
+                }
                 return (
                   <button
                     key={r.id}
@@ -291,8 +354,8 @@ export const RoundsThatCountCard: React.FC<Props> = ({ connectionId, currentHand
                       width: dotSize, height: dotSize,
                       marginLeft: -dotSize / 2, marginTop: -dotSize / 2,
                       borderRadius: '50%',
-                      background: '#fff',
-                      border: `2.5px solid ${stroke}`,
+                      background,
+                      border: borderStyle,
                       boxShadow: isSel ? `0 0 0 2px ${INK}` : 'none',
                       cursor: 'pointer',
                       padding: 0,
@@ -307,10 +370,11 @@ export const RoundsThatCountCard: React.FC<Props> = ({ connectionId, currentHand
           {/* Date labels */}
           <div style={{
             display: 'flex', marginTop: 6, marginLeft: Y_AXIS_W,
+            paddingBottom: 14,
           }}>
             {enriched.rounds.map((r, i) => {
               const d = new Date(r.play_date);
-              const isSel = r.id === selectedRound.id;
+              const isLatest = i === enriched.rounds.length - 1;
               return (
                 <button
                   key={r.id}
@@ -319,20 +383,23 @@ export const RoundsThatCountCard: React.FC<Props> = ({ connectionId, currentHand
                     flex: 1, textAlign: 'center',
                     background: 'transparent', border: 'none',
                     padding: '4px 0', cursor: 'pointer',
+                    transform: 'rotate(-30deg)',
+                    transformOrigin: 'top center',
                   }}
                 >
                   <div style={{
-                    fontSize: 9, fontWeight: 700,
-                    color: isSel ? INK : INK_55,
-                    letterSpacing: 0,
+                    fontSize: 9.5, fontWeight: 600,
+                    color: isLatest ? INK : INK_40,
+                    letterSpacing: '0.04em',
                   }}>
                     {WEEKDAY[d.getDay()]}
                   </div>
                   <div style={{
-                    fontSize: 11, fontWeight: 700,
-                    color: isSel ? INK : INK_40,
+                    fontSize: 9.5, fontWeight: isLatest ? 700 : 600,
+                    color: isLatest ? INK : INK_40,
                     fontFamily: FONT_DISPLAY,
                     fontVariantNumeric: 'tabular-nums',
+                    letterSpacing: '0.04em',
                     marginTop: 1,
                   }}>
                     {d.getDate()}
@@ -347,19 +414,20 @@ export const RoundsThatCountCard: React.FC<Props> = ({ connectionId, currentHand
         <div style={{
           display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)',
           borderTop: `0.5px solid ${INK_10}`,
-          marginTop: 6,
+          margin: '0 -14px',
         }}>
           <StatCell
-            label="BEST" value={enriched.minDiff} color={GREEN}
+            label="BEST" value={enriched.minDiff} dotColor={GREEN} valueColor={GREEN}
             active={selectedRound.id === bestRound.id}
             onClick={() => setSelectedId(bestRound.id)}
+            withRightBorder
           />
           <StatCell
-            label="AVG" value={enriched.avgDiff} color={INK_40}
-            disabled
+            label="AVG" value={enriched.avgDiff} dotColor={INK_40} valueColor={INK}
+            disabled withRightBorder
           />
           <StatCell
-            label="WORST" value={enriched.maxDiff} color={RED}
+            label="WORST" value={enriched.maxDiff} dotColor={RED} valueColor={RED}
             active={selectedRound.id === worstRound.id}
             onClick={() => setSelectedId(worstRound.id)}
           />
@@ -439,34 +507,37 @@ export const RoundsThatCountCard: React.FC<Props> = ({ connectionId, currentHand
 const StatCell: React.FC<{
   label: string;
   value: number;
-  color: string;
+  dotColor: string;
+  valueColor: string;
   active?: boolean;
   disabled?: boolean;
+  withRightBorder?: boolean;
   onClick?: () => void;
-}> = ({ label, value, color, active, disabled, onClick }) => {
-  const valueColor = label === 'WORST' ? RED : label === 'BEST' ? GREEN : INK;
+}> = ({ label, value, dotColor, valueColor, active, disabled, withRightBorder, onClick }) => {
   return (
     <button
       onClick={disabled ? undefined : onClick}
       disabled={disabled}
       style={{
         display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4,
-        padding: '12px 6px',
+        padding: '14px 8px',
         background: active ? AMBER_TINT_06 : 'transparent',
         border: 'none',
-        borderRight: label !== 'WORST' ? `0.5px solid ${INK_10}` : 'none',
+        borderRight: withRightBorder ? `0.5px solid ${INK_10}` : 'none',
         cursor: disabled ? 'default' : 'pointer',
+        textAlign: 'center',
       }}
     >
-      <span style={{ width: 6, height: 6, borderRadius: '50%', background: color }} />
+      <span style={{ width: 6, height: 6, borderRadius: '50%', background: dotColor, marginBottom: 2 }} />
       <span style={{
-        fontSize: 9, fontWeight: 800, color: INK_55, letterSpacing: '0.22em',
+        fontSize: 9, fontWeight: 800, color: INK_55, letterSpacing: '0.16em',
       }}>
         {label}
       </span>
       <span style={{
-        fontSize: 22, fontWeight: 600, color: valueColor,
+        fontSize: 22, fontWeight: 700, color: valueColor,
         fontFamily: FONT_DISPLAY, fontVariantNumeric: 'tabular-nums',
+        letterSpacing: '-0.02em',
         lineHeight: 1,
       }}>
         {fmtDiff(value, { plus: true })}
@@ -527,39 +598,39 @@ const SafeState: React.FC<{ cutTarget: number; settleAt: number }> = ({
     </div>
 
     <div style={{
-      background: 'rgba(15,23,42,0.04)',
-      border: '1px solid rgba(15,23,42,0.10)',
-      borderRadius: 10,
-      padding: 12,
+      display: 'flex',
+      background: '#fff',
+      border: `0.5px solid ${INK_10}`,
+      borderRadius: 12,
+      overflow: 'hidden',
     }}>
-      <div style={{
-        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-        marginBottom: 4,
-      }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-          <Minus size={13} strokeWidth={2.4} color={INK_55} />
+      <div style={{ width: 3, background: INK_10, flexShrink: 0 }} />
+      <div style={{ flex: 1, padding: '14px 14px 14px 12px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <Minus size={16} strokeWidth={2.2} color={INK_55} />
+            <span style={{
+              fontSize: 11, fontWeight: 800, color: INK_55,
+              letterSpacing: '0.14em', textTransform: 'uppercase',
+            }}>OTHERWISE</span>
+          </div>
           <span style={{
-            fontSize: 10, fontWeight: 800, color: INK_55, letterSpacing: '0.14em',
+            fontSize: 22, fontWeight: 700, color: INK,
+            letterSpacing: '-0.02em', fontVariantNumeric: 'tabular-nums',
+            fontFamily: FONT_DISPLAY,
           }}>
-            OTHERWISE
+            {fmtDiff(settleAt, { plus: true })}
           </span>
         </div>
-        <div style={{
-          fontSize: 22, fontWeight: 700, color: INK,
-          fontVariantNumeric: 'tabular-nums', lineHeight: 1,
-          fontFamily: FONT_DISPLAY,
-        }}>
-          {fmtDiff(settleAt, { plus: true })}
+        <div style={{ fontSize: 12.5, color: INK_55, marginTop: 6, lineHeight: 1.4 }}>
+          Anything else and your handicap settles at{' '}
+          <strong style={{
+            fontWeight: 700, color: INK, fontVariantNumeric: 'tabular-nums',
+          }}>
+            {fmtDiff(settleAt, { plus: true })}
+          </strong>{' '}
+          — no risk of going up this round.
         </div>
-      </div>
-      <div style={{ fontSize: 11, color: INK_55, lineHeight: 1.4 }}>
-        Anything else and your handicap settles at{' '}
-        <strong style={{
-          fontWeight: 700, color: INK, fontVariantNumeric: 'tabular-nums',
-        }}>
-          {fmtDiff(settleAt, { plus: true })}
-        </strong>{' '}
-        — no risk of going up this round.
       </div>
     </div>
   </>
@@ -567,33 +638,33 @@ const SafeState: React.FC<{ cutTarget: number; settleAt: number }> = ({
 
 const CutTargetCard: React.FC<{ cutTarget: number }> = ({ cutTarget }) => (
   <div style={{
-    background: 'rgba(5,150,105,0.05)',
-    border: '1px solid rgba(5,150,105,0.18)',
-    borderRadius: 10,
-    padding: 12,
+    display: 'flex',
+    background: '#fff',
+    border: `0.5px solid rgba(5,150,105,0.14)`,
+    borderRadius: 12,
+    overflow: 'hidden',
   }}>
-    <div style={{
-      display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-      marginBottom: 4,
-    }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-        <TrendingDown size={13} strokeWidth={2.4} color={GREEN} />
+    <div style={{ width: 3, background: GREEN, flexShrink: 0 }} />
+    <div style={{ flex: 1, padding: '14px 14px 14px 12px' }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <TrendingDown size={16} strokeWidth={2.2} color={GREEN} />
+          <span style={{
+            fontSize: 11, fontWeight: 800, color: GREEN,
+            letterSpacing: '0.14em', textTransform: 'uppercase',
+          }}>FOR A CUT</span>
+        </div>
         <span style={{
-          fontSize: 10, fontWeight: 800, color: GREEN, letterSpacing: '0.14em',
+          fontSize: 22, fontWeight: 700, color: GREEN,
+          letterSpacing: '-0.02em', fontVariantNumeric: 'tabular-nums',
+          fontFamily: FONT_DISPLAY,
         }}>
-          FOR A CUT
+          {fmtDiff(cutTarget, { plus: true })}
         </span>
       </div>
-      <div style={{
-        fontSize: 22, fontWeight: 700, color: GREEN,
-        fontVariantNumeric: 'tabular-nums', lineHeight: 1,
-        fontFamily: FONT_DISPLAY,
-      }}>
-        {fmtDiff(cutTarget, { plus: true })}
+      <div style={{ fontSize: 12.5, color: INK_55, marginTop: 6, lineHeight: 1.4 }}>
+        Beat this differential and your handicap drops.
       </div>
-    </div>
-    <div style={{ fontSize: 11, color: INK_55, lineHeight: 1.4 }}>
-      Beat this differential and your handicap drops.
     </div>
   </div>
 );
