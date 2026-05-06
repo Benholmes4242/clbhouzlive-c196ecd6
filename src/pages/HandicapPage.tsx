@@ -224,13 +224,6 @@ const HandicapPageHeader: React.FC<HeaderProps> = ({
         </div>
       ) : (
         <div style={{ padding: '14px 20px 18px' }}>
-          <div style={{
-            fontSize: 11, fontWeight: 800, color: INK_55,
-            letterSpacing: '0.22em', marginBottom: 6,
-            fontFamily: FONT_GEIST,
-          }}>
-            {eyebrow}
-          </div>
           <h1 style={{
             fontFamily: FONT_GEIST,
             fontSize: 28, fontWeight: 700, color: INK,
