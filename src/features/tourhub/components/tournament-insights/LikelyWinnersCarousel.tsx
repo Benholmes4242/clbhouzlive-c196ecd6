@@ -104,7 +104,7 @@ export const LikelyWinnersCarousel = memo(function LikelyWinnersCarousel({
       {/* Carousel */}
       <div
         ref={scrollRef}
-        className="flex gap-4 overflow-x-auto snap-x snap-mandatory scrollbar-hide px-4 items-stretch"
+        className="flex gap-4 overflow-x-auto scrollbar-hide px-4 items-stretch"
         style={{
           scrollbarWidth: 'none',
           msOverflowStyle: 'none',
