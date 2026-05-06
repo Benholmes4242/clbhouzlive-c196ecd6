@@ -102,7 +102,10 @@ export default function QuickEditProfilePage() {
       {/* Stacked sections */}
       <div
         className="flex-1 overflow-y-auto pt-4"
-        style={{ paddingBottom: 'calc(var(--sab) + 96px)' }}
+        style={{
+          paddingBottom:
+            'calc(var(--bottom-nav-height, 88px) + var(--sab) + 96px)',
+        }}
       >
         <div ref={photosRef}>
           <PhotosIdentityStep
@@ -134,8 +137,11 @@ export default function QuickEditProfilePage() {
 
       {/* Sticky save bar */}
       <div
-        className="fixed bottom-0 inset-x-0 px-4 pt-3 bg-background border-t border-border"
-        style={{ paddingBottom: 'calc(var(--sab) + 16px)' }}
+        className="fixed inset-x-0 px-4 pt-3 bg-background border-t border-border"
+        style={{
+          bottom: 'var(--bottom-nav-height, 88px)',
+          paddingBottom: 'calc(var(--sab) + 16px)',
+        }}
       >
         <Button
           onClick={handleSave}

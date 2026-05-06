@@ -37,45 +37,43 @@ export function AboutStep({
         />
       </SectionCard>
 
+      <SectionCard>
+        <LocationSection
+          country={form.country}
+          city={form.city}
+          onCountryChange={(v) => onFieldChange('country', v)}
+          onCityChange={(v) => onFieldChange('city', v)}
+        />
+      </SectionCard>
+
+      <SectionCard>
+        <PrivacySection
+          isPublic={form.isPublic}
+          onChange={(v) => onFieldChange('isPublic', v)}
+        />
+      </SectionCard>
+
       <button
         onClick={() => setShowExtra(v => !v)}
         className="w-full flex items-center justify-center gap-1.5 py-2.5 text-[13px] font-semibold text-muted-foreground/40 bg-transparent border-0 cursor-pointer"
       >
         {showExtra ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
-        {showExtra ? 'Less details' : 'Add social links & location'}
+        {showExtra ? 'Hide social links' : 'Add social links'}
       </button>
 
       {showExtra && (
-        <>
-          <SectionCard>
-            <SocialLinksSection
-              instagram={form.instagramHandle}
-              twitter={form.twitterHandle}
-              tiktok={form.tiktokHandle}
-              youtube={form.youtubeHandle}
-              onInstagramChange={(v) => onFieldChange('instagramHandle', v)}
-              onTwitterChange={(v) => onFieldChange('twitterHandle', v)}
-              onTiktokChange={(v) => onFieldChange('tiktokHandle', v)}
-              onYoutubeChange={(v) => onFieldChange('youtubeHandle', v)}
-            />
-          </SectionCard>
-
-          <SectionCard>
-            <LocationSection
-              country={form.country}
-              city={form.city}
-              onCountryChange={(v) => onFieldChange('country', v)}
-              onCityChange={(v) => onFieldChange('city', v)}
-            />
-          </SectionCard>
-
-          <SectionCard>
-            <PrivacySection
-              isPublic={form.isPublic}
-              onChange={(v) => onFieldChange('isPublic', v)}
-            />
-          </SectionCard>
-        </>
+        <SectionCard>
+          <SocialLinksSection
+            instagram={form.instagramHandle}
+            twitter={form.twitterHandle}
+            tiktok={form.tiktokHandle}
+            youtube={form.youtubeHandle}
+            onInstagramChange={(v) => onFieldChange('instagramHandle', v)}
+            onTwitterChange={(v) => onFieldChange('twitterHandle', v)}
+            onTiktokChange={(v) => onFieldChange('tiktokHandle', v)}
+            onYoutubeChange={(v) => onFieldChange('youtubeHandle', v)}
+          />
+        </SectionCard>
       )}
     </div>
   );
