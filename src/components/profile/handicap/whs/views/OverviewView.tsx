@@ -9,6 +9,8 @@ import LastRoundCard from '../sections/LastRoundCard';
 import RoundsThatCountCard from '../sections/RoundsThatCountCard';
 import EchoInsightsCard from '../sections/EchoInsightsCard';
 import StreaksSection from '../sections/StreaksSection';
+import WhereYouStandSection from '../sections/WhereYouStandSection';
+import { useUserProfile } from '@/hooks/useUserProfile';
 
 interface Props {
   connection: WhsConnection;
@@ -38,6 +40,8 @@ export const OverviewView: React.FC<Props> = ({
   isSyncing = false,
   onSyncNow,
 }) => {
+  const { data: profile } = useUserProfile(readOnly ? undefined : userId);
+  const peerComparisonVisible = (profile as any)?.peer_comparison_visible ?? true;
   return (
     <div
       role="tabpanel"
@@ -83,6 +87,7 @@ export const OverviewView: React.FC<Props> = ({
       <RoundsThatCountCard connectionId={connectionId} currentHandicap={currentHandicap} />
       {/* Echo Insights is an AI read of *your* game — hide on friend pages. */}
       {!readOnly && <EchoInsightsCard connectionId={connectionId} />}
+      {!readOnly && peerComparisonVisible && <WhereYouStandSection userId={userId} />}
       <AchievementsStrip
         connectionId={connectionId}
         connectionCreatedAt={connectionCreatedAt}

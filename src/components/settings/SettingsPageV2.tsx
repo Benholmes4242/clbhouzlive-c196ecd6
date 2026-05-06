@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { formatDistanceToNow } from 'date-fns';
-import { ChevronLeft, ChevronRight, User, Mail, Lock, Bell, Shield, EyeOff, UserX, HelpCircle, Flag, MessageSquare, FileText, Trash2, LogOut, Eye, BarChart2, Map, Star, Play, Link2 } from 'lucide-react';
+import { ChevronLeft, ChevronRight, User, Mail, Lock, Bell, Shield, EyeOff, UserX, HelpCircle, Flag, MessageSquare, FileText, Trash2, LogOut, Eye, BarChart2, Map, Star, Play, Link2, Users } from 'lucide-react';
 import { useWhsConnection } from '@/lib/whs/hooks';
 import WhsConnectionSheet from './sheets/WhsConnectionSheet';
 import { formatHcp } from '@/lib/formatHcp';
@@ -77,6 +77,7 @@ export function SettingsPageV2() {
     !!(profile as any)?.show_handicap,
     (profile as any)?.show_in_handicap_leaderboards ?? true,
     (profile as any)?.show_in_exploration_leaderboards ?? true,
+    (profile as any)?.peer_comparison_visible ?? true,
   );
 
   const deleteAccount = useDeleteAccount(user?.id);
@@ -245,6 +246,15 @@ export function SettingsPageV2() {
             checked={privacy.showInExplorationLeaderboards}
             disabled={privacy.isUpdatingExplorationLb}
             onCheckedChange={privacy.toggleExplorationLeaderboards}
+          />
+          <SettingsToggleRow
+            icon={<Users size={18} />}
+            title="Peer Comparison"
+            subtitle="Show how you compare to other golfers in your country and gender"
+            iconTheme="privacy"
+            checked={privacy.peerComparisonVisible}
+            disabled={privacy.isUpdatingPeerComparison}
+            onCheckedChange={privacy.togglePeerComparison}
           />
           {/* Top 10 Comments Privacy */}
           <div className="flex items-center gap-3 px-4 py-3">

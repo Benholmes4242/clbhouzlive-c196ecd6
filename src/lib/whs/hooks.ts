@@ -48,6 +48,7 @@ export const whsKeys = {
   friendRivalries: (userId: string) => ['whs-friend-rivalries', userId] as const,
   friendLeaderboard: (userId: string) => ['whs-friend-leaderboard', userId] as const,
   userRivalOverrides: (userId: string) => ['whs-user-rival-overrides', userId] as const,
+  percentile: (userId: string) => ['whs', 'percentile', userId] as const,
 };
 
 export function useRoundDetail(

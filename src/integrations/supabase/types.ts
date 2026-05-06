@@ -12955,6 +12955,7 @@ export type Database = {
           mobile_crop_x: number | null
           mobile_crop_y: number | null
           notification_preferences: Json | null
+          peer_comparison_visible: boolean
           pending_email: string | null
           phone: string | null
           pinned_achievement_ids: string[] | null
@@ -13071,6 +13072,7 @@ export type Database = {
           mobile_crop_x?: number | null
           mobile_crop_y?: number | null
           notification_preferences?: Json | null
+          peer_comparison_visible?: boolean
           pending_email?: string | null
           phone?: string | null
           pinned_achievement_ids?: string[] | null
@@ -13187,6 +13189,7 @@ export type Database = {
           mobile_crop_x?: number | null
           mobile_crop_y?: number | null
           notification_preferences?: Json | null
+          peer_comparison_visible?: boolean
           pending_email?: string | null
           phone?: string | null
           pinned_achievement_ids?: string[] | null
@@ -15869,6 +15872,16 @@ export type Database = {
         }
         Relationships: []
       }
+      whs_handicap_distribution: {
+        Row: {
+          bucket: string | null
+          bucket_lower: number | null
+          country: string | null
+          gender: string | null
+          user_count: number | null
+        }
+        Relationships: []
+      }
       whs_invite_status: {
         Row: {
           id: string | null
@@ -17577,6 +17590,7 @@ export type Database = {
           user_id: string
         }[]
       }
+      get_my_handicap_percentile: { Args: never; Returns: Json }
       get_nearby_courses: {
         Args: {
           p_limit?: number
@@ -18694,6 +18708,7 @@ export type Database = {
       refresh_college_season_stats_auto: { Args: never; Returns: undefined }
       refresh_college_weekly_movers: { Args: never; Returns: undefined }
       refresh_expired_course_mood_blurbs: { Args: never; Returns: number }
+      refresh_whs_handicap_distribution: { Args: never; Returns: undefined }
       register_push_token: {
         Args: { p_platform: string; p_token: string }
         Returns: string
