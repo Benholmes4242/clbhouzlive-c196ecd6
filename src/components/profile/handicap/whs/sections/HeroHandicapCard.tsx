@@ -212,23 +212,33 @@ const HeroHandicapCard: React.FC<Props> = ({ connection }) => {
   const milestone = calcMilestoneProgress(scrubValue);
   const outerDash = milestone.progress * C_OUTER;
 
-  // Form math — inner ring
-  const form = calcForm(current, last5Diffs);
-  const innerFillLength = (form.fillFraction * C_INNER) / 2; // half-circle max
-  const isPositiveForm = form.direction === 'positive';
-  const isNegativeForm = form.direction === 'negative';
+  // Monthly movement math — inner ring (replaces form)
+  const monthly = calcMonthlyMovement(trend?.delta ?? null);
+  const useMonthlyRing = monthly.delta != null;
+  const fallbackForm = calcForm(current, last5Diffs);
+
+  const innerFillLength = useMonthlyRing
+    ? (monthly.fillFraction * C_INNER) / 2
+    : (fallbackForm.fillFraction * C_INNER) / 2;
+
+  const showGreenArc = useMonthlyRing
+    ? monthly.direction === 'cut'
+    : fallbackForm.direction === 'positive';
+
+  const showRedArc = useMonthlyRing
+    ? monthly.direction === 'up'
+    : fallbackForm.direction === 'negative';
 
   // Form delta UI
   const formNode = (() => {
-    // 30D delta is the primary metric — matches profile sheet handicap tile.
-    // Fall back to form-last-5 only when 30D snapshot data isn't available yet.
-    if (selfDelta30d != null) {
+    if (trend?.delta != null) {
       const STEADY_THRESHOLD = 0.05;
-      const absDelta = Math.abs(selfDelta30d);
+      const delta = trend.delta;
+      const absDelta = Math.abs(delta);
       if (absDelta < STEADY_THRESHOLD) {
         return <span style={{ color: INK_40 }}>Steady · last month</span>;
       }
-      if (selfDelta30d < 0) {
+      if (delta < 0) {
         return (
           <span style={{ color: GREEN, display: 'inline-flex', alignItems: 'center', gap: 4 }}>
             <ArrowDown size={13} strokeWidth={2.5} />
@@ -248,27 +258,27 @@ const HeroHandicapCard: React.FC<Props> = ({ connection }) => {
       );
     }
 
-    // FALLBACK — form-last-5 (preserved logic for new users without 30-day history)
+    // FALLBACK — form-last-5
     if (last5Diffs.length < 5) {
       return <span style={{ color: INK_40 }}>Steady form · last 5</span>;
     }
-    if (form.direction === 'positive') {
+    if (fallbackForm.direction === 'positive') {
       return (
         <span style={{ color: GREEN, display: 'inline-flex', alignItems: 'center', gap: 4 }}>
           <ArrowDown size={13} strokeWidth={2.5} />
           <span style={{ fontVariantNumeric: 'tabular-nums' }}>
-            {fmtDiff(-Math.abs(form.formStrokes))} form
+            {fmtDiff(-Math.abs(fallbackForm.formStrokes))} form
           </span>
           <span style={{ color: INK_40 }}>· last 5</span>
         </span>
       );
     }
-    if (form.direction === 'negative') {
+    if (fallbackForm.direction === 'negative') {
       return (
         <span style={{ color: RED, display: 'inline-flex', alignItems: 'center', gap: 4 }}>
           <ArrowUp size={13} strokeWidth={2.5} />
           <span style={{ fontVariantNumeric: 'tabular-nums' }}>
-            +{Math.abs(form.formStrokes).toFixed(1)} form
+            +{Math.abs(fallbackForm.formStrokes).toFixed(1)} form
           </span>
           <span style={{ color: INK_40 }}>· last 5</span>
         </span>
