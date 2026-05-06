@@ -85,8 +85,8 @@ function ChampionHero({ winner, tourSlug, marginLabel, onTap }: ChampionHeroProp
         background: 'linear-gradient(180deg, rgba(255,184,0,0.12) 0%, rgba(255,184,0,0.04) 100%)',
         border: '1px solid rgba(255,184,0,0.25)',
         borderRadius: 18,
-        padding: '18px 18px 16px',
-        marginBottom: 22,
+        padding: '14px 14px 12px',
+        marginBottom: 12,
         overflow: 'hidden',
       }}
     >
@@ -103,7 +103,7 @@ function ChampionHero({ winner, tourSlug, marginLabel, onTap }: ChampionHeroProp
       {/* CHAMPION eyebrow */}
       <div
         style={{
-          display: 'flex', alignItems: 'center', gap: 6, marginBottom: 14,
+          display: 'flex', alignItems: 'center', gap: 6, marginBottom: 10,
           position: 'relative', zIndex: 1,
         }}
       >
@@ -120,7 +120,7 @@ function ChampionHero({ winner, tourSlug, marginLabel, onTap }: ChampionHeroProp
       </div>
 
       {/* Headshot + name + score */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 14, position: 'relative', zIndex: 1 }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 12, position: 'relative', zIndex: 1 }}>
         <button
           type="button"
           onClick={onTap}
@@ -133,11 +133,11 @@ function ChampionHero({ winner, tourSlug, marginLabel, onTap }: ChampionHeroProp
         >
           <div
             style={{
-              width: 92, height: 92, borderRadius: '50%',
+              width: 64, height: 64, borderRadius: '50%',
               border: `2px solid ${gold}`,
               background: 'rgba(0,0,0,0.3)',
               overflow: 'hidden',
-              boxShadow: '0 0 24px rgba(255,184,0,0.18)',
+              boxShadow: '0 0 18px rgba(255,184,0,0.18)',
             }}
           >
             {photoUrl && !imgErr ? (
@@ -151,19 +151,19 @@ function ChampionHero({ winner, tourSlug, marginLabel, onTap }: ChampionHeroProp
                 }}
               />
             ) : (
-              <PlayerSilhouette size={44} />
+              <PlayerSilhouette size={32} />
             )}
           </div>
           <div
             style={{
               position: 'absolute', bottom: -2, right: -2,
-              width: 28, height: 28, borderRadius: '50%',
+              width: 22, height: 22, borderRadius: '50%',
               background: gold, color: ink,
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               border: `2px solid ${navyMid}`,
             }}
           >
-            <Trophy size={13} strokeWidth={2.5} />
+            <Trophy size={10} strokeWidth={2.5} />
           </div>
         </button>
 
@@ -179,7 +179,7 @@ function ChampionHero({ winner, tourSlug, marginLabel, onTap }: ChampionHeroProp
           >
             <div
               style={{
-                fontSize: 28, fontWeight: 800, letterSpacing: '-0.025em',
+                fontSize: 22, fontWeight: 800, letterSpacing: '-0.025em',
                 color: '#fff', lineHeight: 1.05,
                 whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
               }}
@@ -190,7 +190,7 @@ function ChampionHero({ winner, tourSlug, marginLabel, onTap }: ChampionHeroProp
           {marginLabel && (
             <div
               style={{
-                fontSize: 12, color: gold, marginTop: 6, fontWeight: 700,
+                fontSize: 11, color: gold, marginTop: 4, fontWeight: 700,
               }}
             >
               {marginLabel}
@@ -201,14 +201,14 @@ function ChampionHero({ winner, tourSlug, marginLabel, onTap }: ChampionHeroProp
         <div style={{ textAlign: 'right' }}>
           <div
             style={{
-              fontSize: 56, fontWeight: 800, letterSpacing: '-0.04em',
+              fontSize: 38, fontWeight: 800, letterSpacing: '-0.04em',
               color: gold, lineHeight: 0.9,
               fontVariantNumeric: 'tabular-nums',
             }}
           >
             {fmtScore(winner.score)}
           </div>
-          <div style={{ fontSize: 10, color: inkFaint, marginTop: 4, letterSpacing: '0.06em' }}>
+          <div style={{ fontSize: 9, color: inkFaint, marginTop: 4, letterSpacing: '0.06em' }}>
             FINAL
           </div>
         </div>
