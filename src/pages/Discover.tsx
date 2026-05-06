@@ -9,6 +9,7 @@ import SegmentedControl from '@/components/discover/SegmentedControl';
 import SlidingPanels from '@/components/ui/SlidingPanels';
 import { useDiscoverQuery } from '@/utils/useDiscoverQuery';
 import { useNavigate } from 'react-router-dom';
+import { useStickyHeaderSafeArea } from '@/hooks/useStickyHeaderSafeArea';
 
 
 // Lazy load heavy/inactive components for better initial bundle size
