@@ -55,7 +55,7 @@ export const SectionHeader: React.FC<SectionHeaderProps> = ({
         style={{
           fontSize: 22,
           fontWeight: 900,
-          fontFamily: 'Georgia, serif',
+          fontFamily: 'inherit',
           letterSpacing: '-0.03em',
           lineHeight: 1.1,
           color: '#0F172A',
