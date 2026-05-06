@@ -38,12 +38,12 @@ const CREAM = '#F8FAFC';
  * editorial sections only.
  */
 export default function ClipsSubpage() {
-  const navigate = useNavigate();
   const navigationType = useNavigationType();
   const { session } = useSupabaseSession();
   const userId = session?.user?.id;
   const { mood, setMood } = useClipsMood();
   const gridRef = useRef<HTMLDivElement>(null);
+  const { sentinelRef, paddingTop } = useStickyHeaderSafeArea();
 
   // Force scroll to top on mount for forward navigation.
   // Lazy-loaded subpages mount after global ScrollToTop fires against the
