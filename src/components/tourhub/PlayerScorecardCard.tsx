@@ -627,7 +627,7 @@ export function PlayerScorecardCard({
             {!isCompleted && player.thru && player.thru !== 'F' && (
               <div
                 style={{
-                  fontSize: 11, color: greenLive, marginTop: 6, fontWeight: 600,
+                  fontSize: 10, color: greenLive, marginTop: 4, fontWeight: 600,
                 }}
               >
                 Thru {player.thru} · R{currentRound}
