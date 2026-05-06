@@ -112,6 +112,8 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
         navigate(-1);
       } else if (isHandicapRoute) {
         navigate(-1);
+      } else if (isWatchSubpageRoute) {
+        navigate(-1);
       }
     } else if (isTourRoute) {
       haptic('light');
