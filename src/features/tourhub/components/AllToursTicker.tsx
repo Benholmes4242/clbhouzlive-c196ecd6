@@ -7,15 +7,6 @@
  *   2. MIXED           eyebrow "LIVE & RESULTS · ALL TOURS", green pulsing dot
  *   3. ALL RESULTS     eyebrow "RESULTS · ALL TOURS",        static slate dot
  *   4. DEEP OFF-SEASON eyebrow "UP NEXT · ALL TOURS",        muted amber dot
- *
- * Cells:
- *   - live      → tour pill + name + flag + leader + green score + pulse dot
- *   - completed → tour pill + name + flag + winner + slate score + "FINAL" tag
- *   - upcoming  → tour pill + name + flag + start date + "{N}d" until start
- *
- * Tap on any cell calls onSelect(tournamentId) → parent swaps Hero slide.
- * HeroCarousel already supports live / completed / upcoming slide types so
- * all three cell variants drive the Hero correctly.
  */
 
 import React from 'react';
@@ -25,12 +16,14 @@ import {
   type TickerCellStatus,
 } from '../hooks/useOverviewModules';
 import CountryFlag from '@/components/ui/country-flag';
+import { TOUR_MAP } from '../constants/tourMap';
 
-const TICKER_GRADIENT = 'linear-gradient(135deg, #0a1628 0%, #1e293b 100%)';
 const GREEN = '#10B981';
-const SLATE_300 = '#CBD5E1';
+const INK = '#0F172A';
+const SLATE_400 = '#94A3B8';
 const SLATE_500 = '#64748B';
-const SLATE_700 = '#334155';
+const SLATE_200 = '#E2E8F0';
+const PAGE_BG = '#F8FAFC';
 const AMBER = '#F7931E';
 const GOLD = '#FFB800';
 
@@ -50,29 +43,13 @@ function resolveMasthead(
 ): MastheadConfig {
   switch (state) {
     case 'all-live':
-      return {
-        eyebrow: 'Live · All Tours',
-        hint: `${liveCount} Live Now · Tap to Switch`,
-        dot: 'live',
-      };
+      return { eyebrow: 'Live · All Tours', hint: `${liveCount} Live Now · Tap to Switch`, dot: 'live' };
     case 'mixed':
-      return {
-        eyebrow: 'Live & Results · All Tours',
-        hint: `${liveCount} Live · ${resultsCount} Final · Tap to Switch`,
-        dot: 'live',
-      };
+      return { eyebrow: 'Live & Results · All Tours', hint: `${liveCount} Live · ${resultsCount} Final · Tap to Switch`, dot: 'live' };
     case 'all-results':
-      return {
-        eyebrow: 'Results · All Tours',
-        hint: `${resultsCount} Final · Tap to Switch`,
-        dot: 'static-slate',
-      };
+      return { eyebrow: 'Results · All Tours', hint: `${resultsCount} Final · Tap to Switch`, dot: 'static-slate' };
     case 'deep-empty':
-      return {
-        eyebrow: 'Up Next · All Tours',
-        hint: `${upcomingCount} Events Upcoming · Tap to Preview`,
-        dot: 'muted-amber',
-      };
+      return { eyebrow: 'Up Next · All Tours', hint: `${upcomingCount} Events Upcoming · Tap to Preview`, dot: 'muted-amber' };
   }
 }
 
@@ -94,6 +71,13 @@ function tourPillLabel(slug?: string | null): string {
   }
 }
 
+function tourPillBrand(slug?: string | null): { bg: string; fg: string } {
+  const s = (slug ?? '').toLowerCase();
+  const key = s === 'pga' ? 'pga' : s.toUpperCase();
+  const meta = (TOUR_MAP as any)[key];
+  return meta ? { bg: meta.bg, fg: meta.fg } : { bg: '#475569', fg: '#FFFFFF' };
+}
+
 function formatStartDate(iso: string): string {
   const d = new Date(iso + 'T12:00:00Z');
   const month = new Intl.DateTimeFormat('en-US', { month: 'short', timeZone: 'UTC' }).format(d).toUpperCase();
@@ -101,42 +85,20 @@ function formatStartDate(iso: string): string {
   return `${month} ${day}`;
 }
 
-// ── Dot ─────────────────────────────────────────────────────────────────────
 const MastheadDot: React.FC<{ kind: MastheadConfig['dot'] }> = ({ kind }) => {
   if (kind === 'live') {
     return <span className="th-live-dot" aria-hidden />;
   }
   if (kind === 'muted-amber') {
     return (
-      <span
-        aria-hidden
-        style={{
-          width: 6,
-          height: 6,
-          borderRadius: '50%',
-          background: AMBER,
-          opacity: 0.6,
-          display: 'inline-block',
-        }}
-      />
+      <span aria-hidden style={{ width: 6, height: 6, borderRadius: '50%', background: AMBER, opacity: 0.6, display: 'inline-block' }} />
     );
   }
-  // static-slate
   return (
-    <span
-      aria-hidden
-      style={{
-        width: 6,
-        height: 6,
-        borderRadius: '50%',
-        background: SLATE_500,
-        display: 'inline-block',
-      }}
-    />
+    <span aria-hidden style={{ width: 6, height: 6, borderRadius: '50%', background: SLATE_500, display: 'inline-block' }} />
   );
 };
 
-// ── Cell ────────────────────────────────────────────────────────────────────
 interface TickerCellProps {
   cell: TickerCellData;
   isLast: boolean;
@@ -144,7 +106,7 @@ interface TickerCellProps {
   onSelect: (id: string) => void;
 }
 
-const TickerCell: React.FC<TickerCellProps> = ({ cell, isLast, isActive, onSelect }) => {
+const TickerCell: React.FC<TickerCellProps> = ({ cell, isActive, onSelect }) => {
   const isLive = cell.status === 'live';
   const isCompleted = cell.status === 'completed';
   const isUpcoming = cell.status === 'upcoming';
@@ -152,11 +114,13 @@ const TickerCell: React.FC<TickerCellProps> = ({ cell, isLast, isActive, onSelec
   const activeBorderColor = isLive ? GREEN
     : isCompleted ? GOLD
     : isUpcoming ? AMBER
-    : '#FFFFFF';
-  const activeBackground = isLive ? 'rgba(16,185,129,0.08)'
-    : isCompleted ? 'rgba(255,184,0,0.08)'
-    : isUpcoming ? 'rgba(247,147,30,0.08)'
-    : 'rgba(255,255,255,0.08)';
+    : INK;
+  const activeBackground = isLive ? 'rgba(16,185,129,0.10)'
+    : isCompleted ? 'rgba(255,184,0,0.10)'
+    : isUpcoming ? 'rgba(247,147,30,0.10)'
+    : 'rgba(15,23,42,0.04)';
+
+  const brand = tourPillBrand(cell.tourSlug);
 
   return (
     <button
@@ -166,16 +130,17 @@ const TickerCell: React.FC<TickerCellProps> = ({ cell, isLast, isActive, onSelec
       style={{
         flexShrink: 0,
         minWidth: 220,
-        padding: '7px 18px',
-        borderRight: isLast ? 'none' : '1px solid rgba(255,255,255,0.06)',
+        padding: '7px 14px',
+        borderRight: 'none',
         textAlign: 'left',
-        background: isActive ? activeBackground : 'transparent',
-        border: isActive ? `1.5px solid ${activeBorderColor}` : '1.5px solid transparent',
+        background: isActive ? activeBackground : '#FFFFFF',
+        border: isActive ? `1.5px solid ${activeBorderColor}` : `1px solid ${SLATE_200}`,
         borderRadius: 12,
         color: 'inherit',
         cursor: 'pointer',
         transition: 'background 0.25s ease, border-color 0.25s ease',
         position: 'relative',
+        marginRight: 8,
       }}
       aria-pressed={isActive}
     >
@@ -185,12 +150,12 @@ const TickerCell: React.FC<TickerCellProps> = ({ cell, isLast, isActive, onSelec
           style={{
             display: 'inline-block',
             padding: '2px 7px',
-            background: '#fff',
+            background: brand.bg,
             borderRadius: 4,
             fontSize: 9,
             fontWeight: 900,
             letterSpacing: '0.1em',
-            color: '#000',
+            color: brand.fg,
             textTransform: 'uppercase',
             lineHeight: 1.2,
           }}
@@ -201,7 +166,7 @@ const TickerCell: React.FC<TickerCellProps> = ({ cell, isLast, isActive, onSelec
           style={{
             fontSize: 12,
             fontWeight: 700,
-            color: isActive ? 'white' : 'rgba(255,255,255,0.85)',
+            color: INK,
             letterSpacing: '-0.01em',
             overflow: 'hidden',
             textOverflow: 'ellipsis',
@@ -221,7 +186,7 @@ const TickerCell: React.FC<TickerCellProps> = ({ cell, isLast, isActive, onSelec
             style={{
               fontSize: 12,
               fontWeight: 600,
-              color: 'rgba(255,255,255,0.78)',
+              color: SLATE_500,
               letterSpacing: '-0.005em',
               overflow: 'hidden',
               textOverflow: 'ellipsis',
@@ -236,7 +201,7 @@ const TickerCell: React.FC<TickerCellProps> = ({ cell, isLast, isActive, onSelec
               style={{
                 fontSize: 13,
                 fontWeight: 900,
-                color: isLive ? GREEN : SLATE_300,
+                color: isLive ? GREEN : INK,
                 letterSpacing: '-0.02em',
                 fontVariantNumeric: 'tabular-nums',
                 fontFeatureSettings: '"kern" 1, "liga" 1',
@@ -258,7 +223,7 @@ const TickerCell: React.FC<TickerCellProps> = ({ cell, isLast, isActive, onSelec
                 marginLeft: 2,
                 padding: '2px 5px',
                 borderRadius: 3,
-                background: 'rgba(255,255,255,0.06)',
+                background: 'rgba(15,23,42,0.06)',
               }}
             >
               Final
@@ -268,7 +233,7 @@ const TickerCell: React.FC<TickerCellProps> = ({ cell, isLast, isActive, onSelec
       )}
 
       {(isLive || isCompleted) && !cell.personName && (
-        <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)' }}>
+        <div style={{ fontSize: 11, color: SLATE_400 }}>
           {isLive ? 'Starting soon' : 'Final'}
         </div>
       )}
@@ -280,7 +245,7 @@ const TickerCell: React.FC<TickerCellProps> = ({ cell, isLast, isActive, onSelec
             style={{
               fontSize: 12,
               fontWeight: 600,
-              color: 'rgba(255,255,255,0.78)',
+              color: SLATE_500,
               letterSpacing: '-0.005em',
               whiteSpace: 'nowrap',
             }}
@@ -306,14 +271,11 @@ const TickerCell: React.FC<TickerCellProps> = ({ cell, isLast, isActive, onSelec
   );
 };
 
-// ── Masthead (always renders) ───────────────────────────────────────────────
 const Masthead: React.FC<{ config: MastheadConfig }> = ({ config }) => {
   const eyebrowColor =
-    config.dot === 'live'
-      ? GREEN
-      : config.dot === 'muted-amber'
-      ? AMBER
-      : SLATE_300;
+    config.dot === 'live' ? GREEN
+    : config.dot === 'muted-amber' ? AMBER
+    : SLATE_500;
 
   return (
     <div
@@ -343,7 +305,7 @@ const Masthead: React.FC<{ config: MastheadConfig }> = ({ config }) => {
         style={{
           fontSize: 9,
           fontWeight: 700,
-          color: 'rgba(255,255,255,0.4)',
+          color: SLATE_400,
           letterSpacing: '0.16em',
           textTransform: 'uppercase',
           fontVariantNumeric: 'tabular-nums',
@@ -356,9 +318,7 @@ const Masthead: React.FC<{ config: MastheadConfig }> = ({ config }) => {
 };
 
 interface AllToursTickerProps {
-  /** Currently-active tournament id (drives "NOW SHOWING" highlight). Optional — falls back to no highlight. */
   activeId?: string | null;
-  /** Called when user taps a ticker cell. Optional — falls back to no-op (legacy / standalone). */
   onSelect?: (tournamentId: string) => void;
 }
 
@@ -370,12 +330,11 @@ export function AllToursTicker({ activeId, onSelect }: AllToursTickerProps = {})
   const completed = data?.completed ?? [];
   const upcoming = data?.upcoming ?? [];
 
-  // Resolve cells + state
   let cells: TickerCellData[];
   let state: RailState;
   if (live.length > 0 && completed.length > 0) {
     state = 'mixed';
-    cells = [...live, ...completed]; // live first, then results
+    cells = [...live, ...completed];
   } else if (live.length > 0) {
     state = 'all-live';
     cells = live;
@@ -393,16 +352,16 @@ export function AllToursTicker({ activeId, onSelect }: AllToursTickerProps = {})
     <section
       aria-label="Tournaments across all tours"
       style={{
-        background: TICKER_GRADIENT,
+        background: PAGE_BG,
         position: 'relative',
         paddingTop: 10,
         paddingBottom: 10,
-        borderTop: '1px solid rgba(255,255,255,0.04)',
+        borderTop: `1px solid ${SLATE_200}`,
+        borderBottom: `1px solid ${SLATE_200}`,
       }}
     >
       <Masthead config={config} />
 
-      {/* Cell strip — skeletons during initial load, otherwise the resolved cells */}
       {isLoading && cells.length === 0 ? (
         <div style={{ display: 'flex', gap: 12, padding: '0 20px', overflowX: 'hidden' }}>
           {[0, 1, 2].map((i) => (
@@ -413,18 +372,17 @@ export function AllToursTicker({ activeId, onSelect }: AllToursTickerProps = {})
                 width: 220,
                 height: 56,
                 borderRadius: 8,
-                background: 'rgba(255,255,255,0.04)',
+                background: 'rgba(15,23,42,0.04)',
               }}
             />
           ))}
         </div>
       ) : cells.length === 0 ? (
-        // Truly empty (no live, no recent, no upcoming) — show a quiet placeholder
         <div
           style={{
             padding: '14px 20px',
             fontSize: 11,
-            color: 'rgba(255,255,255,0.4)',
+            color: SLATE_400,
             letterSpacing: '0.04em',
           }}
         >
@@ -439,6 +397,7 @@ export function AllToursTicker({ activeId, onSelect }: AllToursTickerProps = {})
             scrollbarWidth: 'none',
             WebkitOverflowScrolling: 'touch' as any,
             willChange: 'transform',
+            padding: '0 16px',
           }}
         >
           {cells.map((c, i) => (
@@ -453,7 +412,6 @@ export function AllToursTicker({ activeId, onSelect }: AllToursTickerProps = {})
         </div>
       )}
 
-      {/* Bottom amber shimmer line — only show when live action is present */}
       {(state === 'all-live' || state === 'mixed') && (
         <div className="th-shimmer-line" style={{ position: 'absolute', left: 0, right: 0, bottom: 0 }} aria-hidden />
       )}
@@ -461,10 +419,8 @@ export function AllToursTicker({ activeId, onSelect }: AllToursTickerProps = {})
   );
 }
 
-// Re-export for backward compatibility (any old import path expecting LiveTournamentWithLeader)
 export type { TickerCellData, TickerCellStatus } from '../hooks/useOverviewModules';
 
 export default AllToursTicker;
 
-// Suppress unused-type warnings — referenced via re-export above
 export type _UnusedStatus = TickerCellStatus;
