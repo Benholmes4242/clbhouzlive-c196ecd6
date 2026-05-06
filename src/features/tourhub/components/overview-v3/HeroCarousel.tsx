@@ -354,7 +354,7 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
                 <div style={{
                   flexShrink: 0,
                   // Header sits below status bar + global header. Tighter on short screens.
-                  paddingTop: 'calc(max(env(safe-area-inset-top, 0px), 44px) + clamp(36px, 8vh, 65px))',
+                  paddingTop: 'calc(max(env(safe-area-inset-top, 0px), 47px) + clamp(36px, 8vh, 65px))',
                 }}>
                   <div style={{ padding: '0 16px' }}>
                     {/* ZONE A — Tour + Dates row */}

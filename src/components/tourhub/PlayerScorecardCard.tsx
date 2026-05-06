@@ -500,7 +500,7 @@ export function PlayerScorecardCard({
           overflow: 'hidden',
           flex: 1,
           minHeight: 0,
-          paddingTop: 'calc(max(env(safe-area-inset-top, 0px), 44px) + 12px)',
+          paddingTop: 'calc(max(env(safe-area-inset-top, 0px), 47px) + 12px)',
         }}
       >
         {/* ── 1. TOP BAR — back nav ── */}

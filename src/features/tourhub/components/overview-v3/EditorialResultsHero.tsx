@@ -14,7 +14,7 @@ import { tournamentRoute } from '../../routes';
 import { HeroAtmosphere } from '../shared/HeroAtmosphere';
 import { Shimmer } from '../shared/Shimmer';
 import { RoundSparkline } from '../shared/RoundSparkline';
-import { AllToursTicker } from '../shared/AllToursTicker';
+
 import { useWinnerScorecardStats } from '../../hooks/useWinnerScorecardStats';
 import type { TournamentFinisher } from '../../hooks/useTournamentLeadersWinners';
 import type { PlayerInfo } from '@/components/tourhub/PlayerScorecardCard';
@@ -458,8 +458,8 @@ export function ResultsHeroSkeleton() {
     <HeroAtmosphere style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
       <div
         style={{
-          paddingTop: 'calc(max(env(safe-area-inset-top, 0px), 44px) + 56px)',
-          padding: '0 20px',
+          paddingTop: 'calc(max(env(safe-area-inset-top, 0px), 47px) + 56px)',
+          paddingInline: 20,
           paddingBottom: 24,
           height: '100%',
           overflow: 'hidden',
@@ -599,12 +599,6 @@ export function EditorialResultsHero({
     [onPlayerTap, tournament.tourSlug],
   );
 
-  const handleTickerSelect = (id: string) => {
-    if (id === tournament.id) return;
-    const t = tournamentRoute(id, { kind: 'overview' });
-    navigate(t.to, { state: t.state });
-  };
-
   if (!winner) {
     return (
       <HeroAtmosphere
@@ -623,8 +617,8 @@ export function EditorialResultsHero({
     <HeroAtmosphere style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
       <div
         style={{
-          paddingTop: 'calc(max(env(safe-area-inset-top, 0px), 44px) + 56px)',
-          padding: '0 20px',
+          paddingTop: 'calc(max(env(safe-area-inset-top, 0px), 47px) + 56px)',
+          paddingInline: 20,
           paddingBottom: 24,
           overflowY: 'auto',
           height: '100%',
@@ -770,12 +764,6 @@ export function EditorialResultsHero({
           <ChevronRight size={14} />
         </button>
 
-        {/* 8. All Tours ticker (gold accent) */}
-        <AllToursTicker
-          activeTournamentId={tournament.id}
-          onSelect={handleTickerSelect}
-          variant="results"
-        />
       </div>
     </HeroAtmosphere>
   );
