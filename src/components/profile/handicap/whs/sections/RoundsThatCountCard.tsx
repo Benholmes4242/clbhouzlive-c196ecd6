@@ -79,8 +79,15 @@ const Skeleton: React.FC = () => (
 export const RoundsThatCountCard: React.FC<Props> = ({ connectionId, currentHandicap }) => {
   const { data: counters, isLoading: loadingCounters } = useCounters(connectionId);
   const { data: insights } = useHandicapInsights(connectionId);
+  const { data: allScores } = useAllScores(connectionId);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [showExplainer, setShowExplainer] = useState(false);
+
+  const projection = useMemo(() => {
+    if (!allScores || allScores.length < 8 || currentHandicap == null) return null;
+    const last20 = allScores.slice(0, 20);
+    return projectNextRound(last20, currentHandicap);
+  }, [allScores, currentHandicap]);
 
   const enriched = useMemo(() => {
     if (!counters || counters.length < 8) return null;
@@ -358,48 +365,39 @@ export const RoundsThatCountCard: React.FC<Props> = ({ connectionId, currentHand
           />
         </div>
 
-        {/* Next-round targets */}
-        <div style={{
-          background: 'rgba(15,23,42,0.015)',
-          borderTop: `0.5px solid ${INK_10}`,
-          padding: '14px 14px 16px',
-        }}>
+        {/* Next-round targets — dynamic based on projection */}
+        {projection?.hasData && (
           <div style={{
-            textAlign: 'center', fontSize: 9, fontWeight: 800,
-            color: INK_55, letterSpacing: '0.22em', marginBottom: 10,
+            background: 'rgba(15,23,42,0.015)',
+            borderTop: `0.5px solid ${INK_10}`,
+            padding: '14px 14px 16px',
           }}>
-            NEXT ROUND
-          </div>
-          <div style={{
-            display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8,
-          }}>
-            <TargetCard
-              direction="cut"
-              eyebrow="FOR A CUT"
-              preposition="Beat"
-              value={enriched.maxDiff}
-              description="Shoot a lower differential to drop your handicap"
-            />
-            <TargetCard
-              direction="hold"
-              eyebrow="TO HOLD"
-              preposition="Keep under"
-              value={enriched.avgDiff}
-              description="Stay below your average to hold your position"
-            />
-          </div>
-          <div style={{
-            textAlign: 'center', fontSize: 10, color: INK_55, marginTop: 10,
-          }}>
-            Your current index is{' '}
-            <strong style={{
-              color: INK, fontWeight: 700, fontFamily: FONT_DISPLAY,
-              fontVariantNumeric: 'tabular-nums',
+            <div style={{
+              textAlign: 'center', fontSize: 9, fontWeight: 800,
+              color: INK_55, letterSpacing: '0.22em', marginBottom: 12,
             }}>
-              {currentHandicap.toFixed(1)}
-            </strong>.
+              NEXT ROUND
+            </div>
+
+            {projection.isAtRisk ? (
+              <AtRiskState cutTarget={projection.cutTarget} settleAt={projection.settleAt} />
+            ) : (
+              <SafeState cutTarget={projection.cutTarget} settleAt={projection.settleAt} />
+            )}
+
+            <div style={{
+              textAlign: 'center', fontSize: 10, color: INK_55, marginTop: 12,
+            }}>
+              Your current index is{' '}
+              <strong style={{
+                color: INK, fontWeight: 700, fontFamily: FONT_DISPLAY,
+                fontVariantNumeric: 'tabular-nums',
+              }}>
+                {currentHandicap.toFixed(1)}
+              </strong>.
+            </div>
           </div>
-        </div>
+        )}
 
         {/* Footer */}
         <div style={{
