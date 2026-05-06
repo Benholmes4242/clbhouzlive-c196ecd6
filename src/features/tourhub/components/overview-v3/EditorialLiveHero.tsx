@@ -229,17 +229,17 @@ function LeaderHero({
               }}
             />
           ) : (
-            <PlayerSilhouette size={42} />
+            <PlayerSilhouette size={26} />
           )}
         </div>
         <div
           style={{
             position: 'absolute', bottom: -2, right: -2,
-            width: 26, height: 26, borderRadius: '50%',
+            width: 20, height: 20, borderRadius: '50%',
             background: greenLive, color: '#fff',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
             border: `2px solid ${navyMid}`,
-            fontSize: 11, fontWeight: 800,
+            fontSize: 9, fontWeight: 800,
           }}
         >
           1
