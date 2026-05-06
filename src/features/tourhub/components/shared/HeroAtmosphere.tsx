@@ -53,6 +53,8 @@ export function HeroAtmosphere({
           width: '100%',
           display: 'flex',
           flexDirection: 'column',
+          alignItems: 'inherit',
+          justifyContent: 'inherit',
         }}
       >
         {children}
