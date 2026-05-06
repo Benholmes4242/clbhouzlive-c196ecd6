@@ -52,8 +52,24 @@ const Discover = () => {
     <PageRoot className="min-h-screen text-foreground bg-background">
       <FadeInContent>
         <main className="pb-20 bg-background">
+            {/* Sentinel for sticky-header safe-area detection */}
+            <div
+              ref={sentinelRef}
+              aria-hidden
+              style={{ height: 1, width: '100%', pointerEvents: 'none' }}
+            />
             {/* Tabs - sit directly on page canvas, no intermediate blocks */}
-            <div className="px-1" style={{ position: 'sticky', top: '0px', zIndex: 19, background: 'hsl(var(--background))' }}>
+            <div
+              className="px-1"
+              style={{
+                position: 'sticky',
+                top: 0,
+                zIndex: 19,
+                background: 'hsl(var(--background))',
+                paddingTop,
+                transition: 'padding-top 200ms ease',
+              }}
+            >
               <SegmentedControl
                 tabs={[
                   { id: 'watch', label: 'Watch' },
