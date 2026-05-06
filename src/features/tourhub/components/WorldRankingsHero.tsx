@@ -13,6 +13,7 @@ import { memo, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   ChevronDown,
+  ChevronRight,
   Crown,
   TrendingUp,
   TrendingDown,
