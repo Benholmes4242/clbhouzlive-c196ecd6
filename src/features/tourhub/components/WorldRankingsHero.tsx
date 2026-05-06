@@ -783,36 +783,46 @@ export const WorldRankingsHero = memo(function WorldRankingsHero() {
   return (
     <section className="px-4" aria-label="World Golf Rankings">
       {/* ─── Header ─────────────────────────────────────────────────────── */}
-      <div
-        style={{
-          display: 'flex',
-          alignItems: 'baseline',
-          justifyContent: 'space-between',
-          marginBottom: 14,
-        }}
-      >
-        <h2
+      <div style={{ marginBottom: 14 }}>
+        <button
+          onClick={() => navigate('/tourhub?tab=leaderboards')}
+          aria-label="Open all leaders"
           style={{
-            fontSize: 24,
-            fontWeight: 800,
-            letterSpacing: '-0.025em',
-            color: INK,
-            margin: 0,
+            background: 'transparent',
+            border: 'none',
+            padding: 0,
+            cursor: 'pointer',
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: 6,
+            marginBottom: 6,
           }}
         >
-          World Rankings
-        </h2>
-        <span
-          style={{
-            fontSize: 10,
+          <TrendingUp size={13} color={AMBER} strokeWidth={2.5} />
+          <span style={{
+            fontSize: 10.5,
             fontWeight: 700,
-            color: SLATE_400,
-            letterSpacing: '0.1em',
-            textTransform: 'uppercase',
-          }}
-        >
-          {updatedSuffix}
-        </span>
+            letterSpacing: '0.14em',
+            color: AMBER,
+          }}>
+            WORLD RANKINGS
+          </span>
+          <ChevronRight
+            size={11}
+            color={AMBER}
+            strokeWidth={2.5}
+            style={{ marginTop: 1 }}
+          />
+        </button>
+        <div style={{
+          fontSize: 13,
+          fontWeight: 700,
+          color: INK,
+          letterSpacing: '-0.005em',
+          lineHeight: 1.25,
+        }}>
+          {formatUpdatedSentence(rankingDate)}
+        </div>
       </div>
 
       {/* ─── Tour dropdown ──────────────────────────────────────────────── */}
