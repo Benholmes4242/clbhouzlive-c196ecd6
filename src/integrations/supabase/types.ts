@@ -14345,6 +14345,41 @@ export type Database = {
         }
         Relationships: []
       }
+      whs_course_aliases: {
+        Row: {
+          course_id: string
+          id: string
+          match_method: string
+          resolved_at: string
+          whs_name: string
+          whs_name_norm: string
+        }
+        Insert: {
+          course_id: string
+          id?: string
+          match_method: string
+          resolved_at?: string
+          whs_name: string
+          whs_name_norm: string
+        }
+        Update: {
+          course_id?: string
+          id?: string
+          match_method?: string
+          resolved_at?: string
+          whs_name?: string
+          whs_name_norm?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "whs_course_aliases_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "golf_courses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       whs_courses: {
         Row: {
           country_code: string | null
@@ -19632,6 +19667,15 @@ export type Database = {
             }
             Returns: string
           }
+      upsert_whs_course_alias: {
+        Args: {
+          p_course_id: string
+          p_match_method: string
+          p_whs_name: string
+          p_whs_name_norm: string
+        }
+        Returns: undefined
+      }
       user_can_see_game: {
         Args: { _game_id: string; _user_id: string }
         Returns: boolean

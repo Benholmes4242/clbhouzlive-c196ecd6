@@ -169,15 +169,37 @@ export const FriendRoundCard: React.FC<Props> = ({ activity, onClick }) => {
           position: 'relative',
           width: '100%',
           aspectRatio: '16 / 9',
-          background: 'linear-gradient(135deg, #1e293b, #0f172a)',
+          background: activity.course_thumbnail_image
+            ? 'linear-gradient(135deg, #1e293b, #0f172a)'
+            : 'linear-gradient(135deg, #1a3c2a 0%, #0f172a 100%)',
         }}
       >
-        {activity.course_thumbnail_image && (
+        {activity.course_thumbnail_image ? (
           <img
             src={activity.course_thumbnail_image}
             alt={activity.last_round_course_name ?? ''}
             style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
           />
+        ) : (
+          <svg
+            viewBox="0 0 100 100"
+            preserveAspectRatio="xMidYMid meet"
+            style={{
+              position: 'absolute',
+              inset: 0,
+              width: '100%',
+              height: '100%',
+              opacity: 0.08,
+              color: '#ffffff',
+            }}
+            aria-hidden="true"
+          >
+            <g fill="currentColor" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round">
+              <line x1="32" y1="20" x2="32" y2="82" />
+              <path d="M32 22 L70 32 L32 42 Z" />
+              <circle cx="34" cy="84" r="3" />
+            </g>
+          </svg>
         )}
         <div
           style={{
