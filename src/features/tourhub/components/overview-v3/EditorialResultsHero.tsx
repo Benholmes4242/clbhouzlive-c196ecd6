@@ -799,39 +799,26 @@ export function EditorialResultsHero({
           </div>
         )}
 
-        {/* 6. Final leaderboard column header + rows */}
-        <div
-          style={{
-            display: 'grid',
-            gridTemplateColumns: '32px 1fr 56px 44px',
-            alignItems: 'center',
-            padding: '4px 0 6px',
-            fontSize: 9, fontWeight: 800, color: inkGhost,
-            letterSpacing: '0.12em', textTransform: 'uppercase' as const,
-          }}
-        >
-          <span></span>
-          <span>Player</span>
-          <span style={{ textAlign: 'right' }}>Total</span>
-          <span style={{ textAlign: 'right' }}>R4</span>
-        </div>
-        <FinalLeaderboardRow
-          finisher={winner}
-          isWinner
-          isTied={winnerIsTied}
-          tourSlug={tournament.tourSlug}
-          onTap={handleFinisherTap}
-        />
-        {chasers.map((f) => (
-          <FinalLeaderboardRow
-            key={f.playerId ?? `${f.position}-${f.fullName}`}
-            finisher={f}
-            isWinner={false}
-            isTied={(positionCounts.get(f.position) || 1) > 1}
-            tourSlug={tournament.tourSlug}
-            onTap={handleFinisherTap}
-          />
-        ))}
+        {/* 6. Best Round of the Week */}
+        {bestRound && (
+          <div style={{ marginBottom: 14 }}>
+            <div
+              style={{
+                fontSize: 9, fontWeight: 800, letterSpacing: '0.14em',
+                color: inkFaint, marginBottom: 8, textTransform: 'uppercase',
+              }}
+            >
+              BEST ROUND OF THE WEEK
+            </div>
+            <BestRoundRow
+              finisher={bestRound.finisher}
+              roundNumber={bestRound.round}
+              roundScore={bestRound.score}
+              tourSlug={tournament.tourSlug}
+              onTap={handleFinisherTap}
+            />
+          </div>
+        )}
 
         {/* 7. Final Leaderboard CTA */}
         <button
