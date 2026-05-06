@@ -22,6 +22,7 @@ import {
   upsertUserRivalOverride,
   deleteUserRivalOverride,
   fetchSharedRounds,
+  fetchTrophyAggregates,
 } from './api';
 
 export const whsKeys = {
