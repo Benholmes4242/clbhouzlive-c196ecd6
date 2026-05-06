@@ -446,23 +446,32 @@ export function ComingUpCalendar() {
         </button>
       </div>
 
-      {/* Week separator */}
-      <div style={{
-        display: 'flex', alignItems: 'center', gap: 8,
-        padding: '0 16px', marginBottom: 14,
-      }}>
-        <span style={{
-          fontSize: 11, fontWeight: 800, color: AMBER,
-          letterSpacing: '0.14em', textTransform: 'uppercase',
-        }}>This week</span>
-        <span style={{ fontSize: 11, fontWeight: 600, color: SLATE_400 }}>
-          · {formatWeekRange(monday)}
-        </span>
-        <span style={{
-          fontSize: 11, fontWeight: 600, color: SLATE_400, marginLeft: 'auto',
+      {/* "This week" headline + sublabel — matches Intelligence h1 styling */}
+      <div style={{ padding: '0 16px', marginBottom: 14 }}>
+        <h2 style={{
+          fontSize: 18,
+          fontWeight: 800,
+          color: INK,
+          letterSpacing: '-0.015em',
+          lineHeight: 1.2,
+          margin: 0,
         }}>
-          {thisWeekEvents.length} {thisWeekEvents.length === 1 ? 'event' : 'events'}
-        </span>
+          This week
+        </h2>
+        <div style={{
+          display: 'flex', alignItems: 'baseline', justifyContent: 'space-between',
+          marginTop: 4,
+        }}>
+          <span style={{
+            fontSize: 13, fontWeight: 700, color: INK,
+            letterSpacing: '-0.005em', lineHeight: 1.25,
+          }}>
+            {formatWeekRange(monday)}
+          </span>
+          <span style={{ fontSize: 11, fontWeight: 600, color: SLATE_400 }}>
+            {thisWeekEvents.length} {thisWeekEvents.length === 1 ? 'event' : 'events'}
+          </span>
+        </div>
       </div>
 
       {/* Empty state */}
