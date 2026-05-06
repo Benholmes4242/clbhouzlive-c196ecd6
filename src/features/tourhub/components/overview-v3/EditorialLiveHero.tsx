@@ -267,7 +267,7 @@ function LeaderHero({
         {thru != null && thru >= 1 && thru < 18 && (
           <div
             style={{
-              fontSize: 11, color: greenLive, marginTop: 6, fontWeight: 600,
+              fontSize: 10, color: greenLive, marginTop: 4, fontWeight: 600,
             }}
           >
             Thru {thru} · R{derivedRound}
