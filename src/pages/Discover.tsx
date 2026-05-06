@@ -27,6 +27,7 @@ const Discover = () => {
   const { isRehydrating } = useRehydrationSafe();
 
   const { main, setMain } = useDiscoverQuery();
+  const { sentinelRef, paddingTop } = useStickyHeaderSafeArea();
 
   // Timing instrumentation - log page mount/unmount
   useEffect(() => {
