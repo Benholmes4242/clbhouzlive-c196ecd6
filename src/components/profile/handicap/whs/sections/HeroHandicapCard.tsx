@@ -367,14 +367,14 @@ const HeroHandicapCard: React.FC<Props> = ({ connection }) => {
         <div style={{ position: 'relative', width: RING_SIZE, height: RING_SIZE }}>
           {/* Milestone labels around top of ring */}
           <div style={{
-            position: 'absolute', top: 6, left: 16, fontSize: 9, fontWeight: 800,
-            color: INK_40, letterSpacing: '0.18em',
+            position: 'absolute', top: -4, left: 16, fontSize: 10.5, fontWeight: 700,
+            color: INK_40, letterSpacing: '0.14em',
           }}>
             {formatDisplayedHcp(milestone.displayed)} HCP
           </div>
           <div style={{
-            position: 'absolute', top: 6, right: 16, fontSize: 9, fontWeight: 800,
-            color: AMBER_DEEP, letterSpacing: '0.18em',
+            position: 'absolute', top: -4, right: 16, fontSize: 10.5, fontWeight: 700,
+            color: AMBER_DEEP, letterSpacing: '0.14em',
           }}>
             {formatDisplayedHcp(milestone.displayed - 1)} HCP →
           </div>
