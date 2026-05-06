@@ -475,49 +475,127 @@ const StatCell: React.FC<{
   );
 };
 
-// ── Target card ───────────────────────────────────────────────────────────
-const TargetCard: React.FC<{
-  direction: 'cut' | 'hold';
-  eyebrow: string;
-  preposition: string;
-  value: number;
-  description: string;
-}> = ({ direction, eyebrow, preposition, value, description }) => {
-  const accent = direction === 'cut' ? GREEN : RED;
-  const Arrow = direction === 'cut' ? ArrowDown : ArrowUp;
-  return (
+// ── Next-round state cards ────────────────────────────────────────────────
+const AtRiskState: React.FC<{ cutTarget: number; settleAt: number }> = ({
+  cutTarget,
+  settleAt,
+}) => (
+  <>
     <div style={{
-      background: '#fff',
-      borderTop: `2px solid ${accent}`,
-      borderRight: `0.5px solid ${INK_10}`,
-      borderBottom: `0.5px solid ${INK_10}`,
-      borderLeft: `0.5px solid ${INK_10}`,
+      background: 'rgba(159,29,29,0.05)',
+      border: '1px solid rgba(159,29,29,0.18)',
+      borderRadius: 10,
+      padding: 12,
+      marginBottom: 8,
+    }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
+        <div style={{
+          width: 18, height: 18, borderRadius: '50%',
+          background: 'rgba(159,29,29,0.12)',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+        }}>
+          <AlertTriangle size={11} strokeWidth={2.4} color={RED} />
+        </div>
+        <span style={{
+          fontSize: 10, fontWeight: 800, color: RED, letterSpacing: '0.14em',
+        }}>
+          HEADS UP
+        </span>
+      </div>
+      <div style={{ fontSize: 13, color: INK, lineHeight: 1.45 }}>
+        A good counter is dropping off. Your handicap rises to{' '}
+        <strong style={{
+          fontWeight: 700, color: RED, fontVariantNumeric: 'tabular-nums',
+        }}>
+          {fmtDiff(settleAt, { plus: true })}
+        </strong>{' '}
+        next round unless you beat your cut target.
+      </div>
+    </div>
+
+    <CutTargetCard cutTarget={cutTarget} />
+  </>
+);
+
+const SafeState: React.FC<{ cutTarget: number; settleAt: number }> = ({
+  cutTarget,
+  settleAt,
+}) => (
+  <>
+    <div style={{ marginBottom: 8 }}>
+      <CutTargetCard cutTarget={cutTarget} />
+    </div>
+
+    <div style={{
+      background: 'rgba(15,23,42,0.04)',
+      border: '1px solid rgba(15,23,42,0.10)',
       borderRadius: 10,
       padding: 12,
     }}>
       <div style={{
-        display: 'inline-flex', alignItems: 'center', gap: 4,
-        fontSize: 9, fontWeight: 800, color: accent,
-        letterSpacing: '0.22em', marginBottom: 6,
+        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+        marginBottom: 4,
       }}>
-        <Arrow size={10} strokeWidth={2.5} />
-        {eyebrow}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+          <Minus size={13} strokeWidth={2.4} color={INK_55} />
+          <span style={{
+            fontSize: 10, fontWeight: 800, color: INK_55, letterSpacing: '0.14em',
+          }}>
+            OTHERWISE
+          </span>
+        </div>
+        <div style={{
+          fontSize: 22, fontWeight: 700, color: INK,
+          fontVariantNumeric: 'tabular-nums', lineHeight: 1,
+          fontFamily: FONT_DISPLAY,
+        }}>
+          {fmtDiff(settleAt, { plus: true })}
+        </div>
       </div>
-      <div style={{ fontSize: 11, color: INK_55, marginBottom: 2 }}>
-        {preposition}
-      </div>
-      <div style={{
-        fontSize: 26, fontWeight: 600, color: INK,
-        fontFamily: FONT_DISPLAY, fontVariantNumeric: 'tabular-nums',
-        lineHeight: 1, marginBottom: 8,
-      }}>
-        {fmtDiff(value, { plus: true })}
-      </div>
-      <div style={{ fontSize: 10, color: INK_55, lineHeight: 1.4 }}>
-        {description}
+      <div style={{ fontSize: 11, color: INK_55, lineHeight: 1.4 }}>
+        Anything else and your handicap settles at{' '}
+        <strong style={{
+          fontWeight: 700, color: INK, fontVariantNumeric: 'tabular-nums',
+        }}>
+          {fmtDiff(settleAt, { plus: true })}
+        </strong>{' '}
+        — no risk of going up this round.
       </div>
     </div>
-  );
-};
+  </>
+);
+
+const CutTargetCard: React.FC<{ cutTarget: number }> = ({ cutTarget }) => (
+  <div style={{
+    background: 'rgba(5,150,105,0.05)',
+    border: '1px solid rgba(5,150,105,0.18)',
+    borderRadius: 10,
+    padding: 12,
+  }}>
+    <div style={{
+      display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+      marginBottom: 4,
+    }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+        <TrendingDown size={13} strokeWidth={2.4} color={GREEN} />
+        <span style={{
+          fontSize: 10, fontWeight: 800, color: GREEN, letterSpacing: '0.14em',
+        }}>
+          FOR A CUT
+        </span>
+      </div>
+      <div style={{
+        fontSize: 22, fontWeight: 700, color: GREEN,
+        fontVariantNumeric: 'tabular-nums', lineHeight: 1,
+        fontFamily: FONT_DISPLAY,
+      }}>
+        {fmtDiff(cutTarget, { plus: true })}
+      </div>
+    </div>
+    <div style={{ fontSize: 11, color: INK_55, lineHeight: 1.4 }}>
+      Beat this differential and your handicap drops.
+    </div>
+  </div>
+);
 
 export default RoundsThatCountCard;
