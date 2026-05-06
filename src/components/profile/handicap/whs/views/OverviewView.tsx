@@ -83,6 +83,7 @@ export const OverviewView: React.FC<Props> = ({
       <AchievementsStrip
         connectionId={connectionId}
         connectionCreatedAt={connectionCreatedAt}
+        userId={userId}
       />
 
       {/* Sync footer — hidden in read-only mode */}
