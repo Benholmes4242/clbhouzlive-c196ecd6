@@ -1,4 +1,4 @@
-import { useNavigate, useNavigationType } from 'react-router-dom';
+import { useNavigationType } from 'react-router-dom';
 import { Search } from 'lucide-react';
 import { useStickyHeaderSafeArea } from '@/hooks/useStickyHeaderSafeArea';
 import { useState, useEffect } from 'react';
