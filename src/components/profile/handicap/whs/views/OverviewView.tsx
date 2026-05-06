@@ -1,7 +1,6 @@
 import React from 'react';
 import { formatDistanceToNow } from 'date-fns';
 import { AlertTriangle, RefreshCw } from 'lucide-react';
-import { toast } from 'sonner';
 import type { WhsConnection } from '@/lib/whs/types';
 import MorningMoment from '@/components/handicap/MorningMoment';
 import HeroHandicapCard from '../sections/HeroHandicapCard';
