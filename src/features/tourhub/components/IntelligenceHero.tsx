@@ -1237,13 +1237,19 @@ function buildInsight(c: AITopContender): string {
 
 function buildUpcomingPicks(data: AIPredictionData | null): UpcomingPick[] {
   if (!data) return [];
-  return data.topContenders.slice(0, 3).map((c) => ({
-    rank: c.rank,
-    name: c.playerName,
-    insight: buildInsight(c),
-    reasons: c.reasons ?? [],
-    courseFit: c.courseFitScore,
-  }));
+  return data.topContenders.slice(0, 3).map((c) => {
+    const insight = buildInsight(c);
+    const reasons = c.reasons ?? [];
+    // eslint-disable-next-line no-console
+    console.log('[ti-audit upcoming] rank', c.rank, c.playerName, { insight, reasons, c_pulledQuote: (c as any).pulledQuote, c_reasons: c.reasons });
+    return {
+      rank: c.rank,
+      name: c.playerName,
+      insight,
+      reasons,
+      courseFit: c.courseFitScore,
+    };
+  });
 }
 
 function buildLivePicks(
