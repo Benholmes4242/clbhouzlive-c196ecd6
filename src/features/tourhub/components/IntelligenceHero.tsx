@@ -1224,7 +1224,7 @@ function Carousel({
           overflowX: 'auto',
           scrollSnapType: 'x mandatory',
           gap: 12,
-          padding: '0 16px 4px 20px',
+          padding: '0 16px 4px 16px',
           WebkitOverflowScrolling: 'touch',
           scrollbarWidth: 'none',
         }}
