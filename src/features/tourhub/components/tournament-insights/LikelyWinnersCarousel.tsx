@@ -117,7 +117,7 @@ export const LikelyWinnersCarousel = memo(function LikelyWinnersCarousel({
           return (
             <div
               key={pick.id}
-              className="flex-shrink-0 snap-center"
+              className="flex-shrink-0"
               style={{
                 width: 227,
                 borderRadius: 16,
