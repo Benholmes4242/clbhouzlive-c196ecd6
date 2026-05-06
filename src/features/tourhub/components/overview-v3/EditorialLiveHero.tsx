@@ -257,7 +257,7 @@ function LeaderHero({
         </div>
         <div
           style={{
-            fontSize: 24, fontWeight: 800, letterSpacing: '-0.02em',
+            fontSize: 17, fontWeight: 800, letterSpacing: '-0.02em',
             color: '#fff', lineHeight: 1,
             whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
           }}
