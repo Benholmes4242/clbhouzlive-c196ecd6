@@ -312,3 +312,16 @@ export function useSharedRounds(
     staleTime: 60_000,
   });
 }
+
+// ─── Trophy aggregates (Sprint 3) ───────────────────────────────────────
+export function useTrophyAggregates(
+  userId: string | undefined,
+  connectionId: string | undefined,
+) {
+  return useQuery({
+    queryKey: ['trophy-aggregates', userId, connectionId],
+    enabled: !!userId && !!connectionId,
+    queryFn: () => fetchTrophyAggregates(userId!, connectionId!),
+    staleTime: 5 * 60 * 1000,
+  });
+}

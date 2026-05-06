@@ -3,6 +3,7 @@ import type {
   HandicapPoint,
   Achievement,
 } from './types';
+import type { TrophyAggregates } from './api';
 
 interface AchievementContext {
   scores: WhsScoreWithIndex[];
@@ -10,6 +11,7 @@ interface AchievementContext {
   connectionCreatedAt: string | null;
   primaryClubId: string | null;
   primaryClubName: string | null;
+  aggregates?: TrophyAggregates | null;
 }
 
 interface TierDef {
@@ -61,6 +63,27 @@ const HANDICAP_MILESTONE_TIERS: TierDef[] = [
   { threshold: 5, label: 'Single digits' },
   { threshold: 0, label: 'Scratch golfer' },
   { threshold: -2, label: 'Plus 2' },
+];
+
+const EAGLES_TIERS: TierDef[] = [
+  { threshold: 1, label: '1 eagle' },
+  { threshold: 3, label: '3 eagles' },
+  { threshold: 5, label: '5 eagles' },
+  { threshold: 10, label: '10 eagles' },
+];
+
+const TRAVEL_TIERS: TierDef[] = [
+  { threshold: 1, label: '1 country' },
+  { threshold: 2, label: '2 countries' },
+  { threshold: 5, label: '5 countries' },
+  { threshold: 10, label: '10 countries' },
+];
+
+const TROPHY_HUNTER_TIERS: TierDef[] = [
+  { threshold: 5, label: '5 trophies' },
+  { threshold: 10, label: '10 trophies' },
+  { threshold: 25, label: '25 trophies' },
+  { threshold: 50, label: '50 trophies' },
 ];
 
 // ── Helpers ───────────────────────────────────────────────────────────────
