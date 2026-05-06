@@ -184,10 +184,10 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
         </div>
       </div>
 
-      {/* Tabs — sticky below hero */}
+      {/* Tabs — sticky below hero. Unconditional safe-area padding because page is immersive (no CompactHeader to coordinate with). */}
       <div
         className="sticky bg-background"
-        style={{ top: 0, zIndex: 20 }}
+        style={{ top: 0, zIndex: 20, paddingTop: 'env(safe-area-inset-top, 0px)' }}
       >
         <CourseTabs activeTab={activeTab as any} onChange={handleTabChange as any} />
       </div>
