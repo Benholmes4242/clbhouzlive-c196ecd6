@@ -229,17 +229,44 @@ function HeadlineCard({ tournament }: { tournament: SeasonTournament }) {
           color: '#fff', lineHeight: 1.15, marginBottom: 5,
         }}>{tournament.name}</div>
 
-        {tournament.venueName && (
+        {tournament.venueName && (() => {
+          const hasStats = !!(tournament.purse || tournament.venuePar || tournament.venueYardage);
+          const hasMore = hasStats || !!tournament.defendingChampion;
+          return (
+            <div style={{
+              fontSize: 12, color: 'rgba(255,255,255,0.65)',
+              display: 'flex', alignItems: 'center', gap: 4,
+              marginBottom: hasMore ? 10 : 0,
+              minWidth: 0,
+            }}>
+              <MapPin size={11} strokeWidth={2.2} style={{ opacity: 0.85, flexShrink: 0 }} />
+              <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                {tournament.venueName}{tournament.venueCity ? `, ${tournament.venueCity}` : ''}
+              </span>
+            </div>
+          );
+        })()}
+
+        {(tournament.purse || tournament.venuePar || tournament.venueYardage) && (
           <div style={{
-            fontSize: 12, color: 'rgba(255,255,255,0.65)',
-            display: 'flex', alignItems: 'center', gap: 4,
+            display: 'flex', alignItems: 'center', flexWrap: 'wrap',
+            fontSize: 12, fontWeight: 600, color: 'rgba(255,255,255,0.85)',
             marginBottom: tournament.defendingChampion ? 12 : 0,
-            minWidth: 0,
           }}>
-            <MapPin size={11} strokeWidth={2.2} style={{ opacity: 0.85, flexShrink: 0 }} />
-            <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-              {tournament.venueName}{tournament.venueCity ? `, ${tournament.venueCity}` : ''}
-            </span>
+            {(() => {
+              const chips: string[] = [];
+              if (tournament.purse) chips.push(formatPurse(tournament.purse));
+              if (tournament.venuePar) chips.push(`Par ${tournament.venuePar}`);
+              if (tournament.venueYardage) chips.push(`${tournament.venueYardage.toLocaleString()} yds`);
+              return chips.map((c, i) => (
+                <span key={i} style={{ display: 'inline-flex', alignItems: 'center' }}>
+                  {i > 0 && (
+                    <span style={{ margin: '0 8px', color: 'rgba(255,255,255,0.30)' }}>·</span>
+                  )}
+                  {c}
+                </span>
+              ));
+            })()}
           </div>
         )}
 
