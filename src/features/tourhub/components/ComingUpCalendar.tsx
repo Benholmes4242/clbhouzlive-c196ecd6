@@ -150,9 +150,9 @@ function HeadlineCard({ tournament }: { tournament: SeasonTournament }) {
         display: 'block', width: 'calc(100% - 32px)', margin: '0 16px 12px',
         padding: 0, background: INK, borderRadius: 16, overflow: 'hidden',
         border: 'none',
-        boxShadow: isMajor
-          ? '0 0 28px rgba(255,184,0,0.15)'
-          : '0 1px 0 rgba(0,0,0,0.02)',
+        outline: 'none',
+        boxShadow: 'none',
+        WebkitTapHighlightColor: 'transparent',
         textAlign: 'left', cursor: 'pointer',
       }}
     >
