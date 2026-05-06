@@ -744,11 +744,11 @@ export function EditorialResultsHero({
         </div>
 
         {/* 2. Tournament name + venue */}
-        <div style={{ marginBottom: 28 }}>
+        <div style={{ marginBottom: 14 }}>
           <h1
             style={{
-              margin: 0, fontSize: 30, fontWeight: 800,
-              letterSpacing: '-0.025em', lineHeight: 1.05, color: '#fff',
+              margin: 0, fontSize: 20, fontWeight: 800,
+              letterSpacing: '-0.025em', lineHeight: 1.1, color: '#fff',
             }}
           >
             {tournament.name}
@@ -756,7 +756,7 @@ export function EditorialResultsHero({
           {(tournament.venueName || tournament.venueCity) && (
             <div
               style={{
-                marginTop: 8, fontSize: 12, color: inkFaint,
+                marginTop: 6, fontSize: 11, color: inkFaint,
                 display: 'flex', alignItems: 'center', gap: 5,
               }}
             >
