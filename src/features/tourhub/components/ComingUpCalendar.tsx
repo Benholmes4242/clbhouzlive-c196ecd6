@@ -149,7 +149,7 @@ function HeadlineCard({ tournament }: { tournament: SeasonTournament }) {
       onClick={() => navigate(`/tourhub/tournament/${tournament.id}`)}
       style={{
         display: 'block', width: 'calc(100% - 32px)', margin: '0 16px 12px',
-        padding: 0, background: INK, borderRadius: '0 0 16px 16px', overflow: 'hidden',
+        padding: 0, background: INK, borderRadius: 16, overflow: 'hidden',
         border: 'none',
         outline: 'none',
         boxShadow: 'none',
@@ -159,6 +159,7 @@ function HeadlineCard({ tournament }: { tournament: SeasonTournament }) {
     >
       <div style={{
         position: 'relative', width: '100%', height: 187,
+        borderRadius: '16px 16px 0 0',
         overflow: 'hidden',
         background: venueImage?.imageUrl
           ? `url(${venueImage.imageUrl}) center/cover`
