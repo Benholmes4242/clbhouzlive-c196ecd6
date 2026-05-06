@@ -4,6 +4,7 @@ import { ChevronDown, ChevronRight, MapPin, Sparkles, Target, TrendingDown } fro
 import { useHandicapInsights } from '@/lib/whs/insights/useHandicapInsights';
 import type { SuitedCourse } from '@/lib/whs/insights/types';
 import { useCounters } from '@/lib/whs/hooks';
+import { fmtDiff } from '@/lib/whs/format';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 
 const INK = '#0F172A';
