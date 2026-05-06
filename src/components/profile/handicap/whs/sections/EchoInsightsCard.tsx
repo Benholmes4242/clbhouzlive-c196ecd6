@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ChevronRight, MapPin, Sparkles, Target, TrendingDown } from 'lucide-react';
+import { ChevronDown, ChevronRight, MapPin, Sparkles, Target, TrendingDown } from 'lucide-react';
 import { useHandicapInsights } from '@/lib/whs/insights/useHandicapInsights';
 import type { SuitedCourse } from '@/lib/whs/insights/types';
 import { useCounters } from '@/lib/whs/hooks';
