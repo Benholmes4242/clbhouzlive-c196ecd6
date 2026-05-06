@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useStickyHeaderSafeArea } from '@/hooks/useStickyHeaderSafeArea';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import CourseExplorer from './CourseExplorer';
 import MyCourses from './MyCourses';
@@ -162,6 +163,7 @@ const CoursesContent: React.FC<CoursesContentProps> = ({ username, displayName }
   const [rateSheetOpen, setRateSheetOpen] = useState(false);
   const [searchParams, setSearchParams] = useSearchParams();
   const location = useLocation();
+  const { sentinelRef, paddingTop } = useStickyHeaderSafeArea();
   
   // Default to 'explore' since we're removing my-courses tab
   const [activeTab, setActiveTab] = useState(() => {
@@ -299,12 +301,16 @@ const CoursesContent: React.FC<CoursesContentProps> = ({ username, displayName }
       ) : (
         /* Main courses page - show Explore, Global Top 100, and Friends' Courses */
         <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
+          {/* Sentinel for sticky-header safe-area detection */}
+          <div ref={sentinelRef} aria-hidden style={{ height: 1 }} />
           <div
             className="sticky bg-background"
             style={{
               top: 0,
               zIndex: 20,
               borderBottom: '1px solid hsl(var(--border) / 0.12)',
+              paddingTop,
+              transition: 'padding-top 200ms ease',
             }}
           >
             <SegmentedControl
