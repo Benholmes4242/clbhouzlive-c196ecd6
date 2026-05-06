@@ -18,9 +18,14 @@ import {
   BarChart3,
   CheckCircle2,
   Activity,
+  Zap,
+  Users,
+  UserCheck,
+  Swords,
+  Plane,
 } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
-import { useAllScores, useHandicapHistory } from '@/lib/whs/hooks';
+import { useAllScores, useHandicapHistory, useTrophyAggregates } from '@/lib/whs/hooks';
 import { computeAchievements, pickNextUpTrophies } from '@/lib/whs/achievements';
 import type { Achievement } from '@/lib/whs/types';
 import { supabase } from '@/integrations/supabase/client';
@@ -47,6 +52,12 @@ const ICONS: Record<string, React.ComponentType<any>> = {
   BarChart3,
   CheckCircle2,
   Activity,
+  Zap,
+  Users,
+  UserCheck,
+  Swords,
+  Plane,
+  Crown,
 };
 
 const TROPHY_TILE_WIDTH = 130;
@@ -282,6 +293,7 @@ export const AchievementsStrip: React.FC<Props> = ({
 }) => {
   const { data: scores, isLoading: sLoading } = useAllScores(connectionId);
   const { data: history, isLoading: hLoading } = useHandicapHistory(connectionId, 365);
+  const { data: aggregates } = useTrophyAggregates(userId, connectionId);
 
   // Fetch primary club for "Home club master" trophy
   const { data: primaryClub } = useQuery({
@@ -318,8 +330,9 @@ export const AchievementsStrip: React.FC<Props> = ({
       connectionCreatedAt,
       primaryClubId: primaryClub?.primary_club_id ?? null,
       primaryClubName: primaryClub?.primary_club_name ?? null,
+      aggregates: aggregates ?? null,
     });
-  }, [scores, history, connectionCreatedAt, primaryClub]);
+  }, [scores, history, connectionCreatedAt, primaryClub, aggregates]);
 
   const earnedAchievements = useMemo(
     () => allAchievements.filter((a) => a.earned),

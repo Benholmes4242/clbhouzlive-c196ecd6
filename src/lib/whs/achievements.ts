@@ -585,6 +585,227 @@ export function computeAchievements(ctx: AchievementContext): Achievement[] {
     }
   }
 
+  // ─── Sprint 3 trophies (require aggregates) ─────────────────────────────
+  if (ctx.aggregates) {
+    const agg = ctx.aggregates;
+
+    // 18. Hole-in-one
+    if (agg.hole_stats.aces_count > 0) {
+      out.push({
+        id: 'hole_in_one',
+        type: 'hole_in_one',
+        title: 'Hole-in-one',
+        subtitle: agg.hole_stats.aces_count === 1
+          ? 'A perfect strike'
+          : `${agg.hole_stats.aces_count} aces`,
+        achieved_at: null,
+        icon_name: 'Zap',
+        highlight: true,
+        earned: true,
+        category: 'round_quality',
+      });
+    }
+
+    // 19. Eagles (TIERED)
+    {
+      const t = tierProgress(agg.hole_stats.eagles_count, EAGLES_TIERS);
+      const earned = t.tier > 0;
+      const totalEagles = agg.hole_stats.eagles_count;
+      out.push({
+        id: 'eagles',
+        type: 'eagles',
+        title: 'Eagle eye',
+        subtitle: earned ? t.currentLabel : 'Locked',
+        achieved_at: null,
+        icon_name: 'Award',
+        highlight: t.tier >= 3,
+        earned,
+        tier: t.tier,
+        totalTiers: t.totalTiers,
+        progress: t.progress,
+        progressLabel: t.nextLabel
+          ? `${totalEagles} / ${EAGLES_TIERS[t.tier]?.threshold ?? '?'} eagles`
+          : `${totalEagles} eagles — max tier`,
+        category: 'round_quality',
+      });
+    }
+
+    // 20. Sub-par round
+    if (agg.hole_stats.sub_par_rounds_count > 0) {
+      out.push({
+        id: 'sub_par_round',
+        type: 'sub_par_round',
+        title: 'Sub-par round',
+        subtitle: agg.hole_stats.sub_par_rounds_count === 1
+          ? 'Beat the course'
+          : `${agg.hole_stats.sub_par_rounds_count} sub-par rounds`,
+        achieved_at: null,
+        icon_name: 'Star',
+        highlight: false,
+        earned: true,
+        category: 'round_quality',
+      });
+    }
+
+    // 21. First friend
+    if (agg.social_stats.first_friend_at) {
+      out.push({
+        id: 'first_friend',
+        type: 'first_friend',
+        title: 'First friend',
+        subtitle: 'Connected on Clbhouz',
+        achieved_at: agg.social_stats.first_friend_at,
+        icon_name: 'Users',
+        highlight: false,
+        earned: true,
+        category: 'social',
+      });
+    }
+
+    // 22. Played with friend
+    if (agg.social_stats.first_round_with_friend_at) {
+      out.push({
+        id: 'played_with_friend',
+        type: 'played_with_friend',
+        title: 'Played with friend',
+        subtitle: 'Shared a round',
+        achieved_at: agg.social_stats.first_round_with_friend_at,
+        icon_name: 'UserCheck',
+        highlight: false,
+        earned: true,
+        category: 'social',
+      });
+    }
+
+    // 23. Out-played friend
+    if (agg.social_stats.out_played_friend_first_at) {
+      out.push({
+        id: 'out_played_friend',
+        type: 'out_played_friend',
+        title: 'Beat a friend',
+        subtitle: 'Won a head-to-head',
+        achieved_at: agg.social_stats.out_played_friend_first_at,
+        icon_name: 'Swords',
+        highlight: false,
+        earned: true,
+        category: 'social',
+      });
+    }
+
+    // 24. Rivalry winner
+    if (agg.social_stats.rivalry_wins_count > 0) {
+      out.push({
+        id: 'rivalry_winner',
+        type: 'rivalry_winner',
+        title: 'Rivalry winner',
+        subtitle: agg.social_stats.rivalry_wins_count === 1
+          ? 'Won a rivalry'
+          : `${agg.social_stats.rivalry_wins_count} rivalries won`,
+        achieved_at: null,
+        icon_name: 'Trophy',
+        highlight: agg.social_stats.rivalry_wins_count >= 3,
+        earned: true,
+        category: 'social',
+      });
+    }
+
+    // 25. Travel golfer (TIERED)
+    {
+      const total = agg.course_stats.countries_played.length;
+      const t = tierProgress(total, TRAVEL_TIERS);
+      const earned = t.tier > 0;
+      out.push({
+        id: 'travel_golfer',
+        type: 'travel_golfer',
+        title: 'Travel golfer',
+        subtitle: earned ? t.currentLabel : 'Locked',
+        achieved_at: null,
+        icon_name: 'Plane',
+        highlight: t.tier >= 3,
+        earned,
+        tier: t.tier,
+        totalTiers: t.totalTiers,
+        progress: t.progress,
+        progressLabel: t.nextLabel
+          ? `${total} / ${TRAVEL_TIERS[t.tier]?.threshold ?? '?'} countries`
+          : `${total} countries — max tier`,
+        category: 'social',
+      });
+    }
+
+    // 26. Top 100 conqueror (TIERED)
+    {
+      const bestRank = agg.course_stats.best_top100_global_rank;
+      let tier = 0;
+      let currentLabel = 'Locked';
+      let progressLabel: string;
+
+      if (bestRank == null) {
+        progressLabel = 'Rate a Top 100 course';
+      } else if (bestRank <= 10) {
+        tier = 3;
+        currentLabel = 'Top 10';
+        progressLabel = `Best: #${bestRank} — max tier`;
+      } else if (bestRank <= 50) {
+        tier = 2;
+        currentLabel = 'Top 50';
+        progressLabel = `Best: #${bestRank} · need top 10`;
+      } else if (bestRank <= 100) {
+        tier = 1;
+        currentLabel = 'Top 100';
+        progressLabel = `Best: #${bestRank} · need top 50`;
+      } else {
+        progressLabel = `Best: #${bestRank} · need top 100`;
+      }
+
+      const earned = tier > 0;
+      out.push({
+        id: 'top_100_conqueror',
+        type: 'top_100_conqueror',
+        title: 'Top 100 conqueror',
+        subtitle: earned ? currentLabel : 'Locked',
+        achieved_at: null,
+        icon_name: 'Crown',
+        highlight: tier >= 2,
+        earned,
+        tier,
+        totalTiers: 3,
+        progress:
+          bestRank == null
+            ? 0
+            : tier === 3
+            ? 1
+            : Math.max(0, Math.min(1, 1 - bestRank / 200)),
+        progressLabel,
+        category: 'course',
+      });
+    }
+  }
+
+  // 27. Trophy hunter (META — must be last)
+  {
+    const earnedCount = out.filter((a) => a.earned).length;
+    const t = tierProgress(earnedCount, TROPHY_HUNTER_TIERS);
+    const earned = t.tier > 0;
+    out.push({
+      id: 'trophy_hunter',
+      type: 'trophy_hunter',
+      title: 'Trophy hunter',
+      subtitle: earned ? t.currentLabel : 'Locked',
+      achieved_at: null,
+      icon_name: 'Trophy',
+      highlight: t.tier >= 3,
+      earned,
+      tier: t.tier,
+      totalTiers: t.totalTiers,
+      progress: t.progress,
+      progressLabel: t.nextLabel
+        ? `${earnedCount} / ${TROPHY_HUNTER_TIERS[t.tier]?.threshold ?? '?'} earned`
+        : `${earnedCount} earned — max tier`,
+      category: 'milestone',
+    });
+  }
+
   return sortAchievements(out);
 }
 
