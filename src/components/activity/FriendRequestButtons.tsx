@@ -112,14 +112,14 @@ export const FriendRequestButtons: React.FC<FriendRequestButtonsProps> = ({
       if (!user) throw new Error('Not authenticated');
       const actualRequestId = await findFriendRequestId(user.id);
       if (!actualRequestId) {
-        const { error: updateError } = await supabase
-          .from('user_friends').update({ status: 'declined' })
+        const { error: deleteError } = await supabase
+          .from('user_friends').delete()
           .eq('user_id', requesterId).eq('friend_id', user.id).eq('status', 'pending');
-        if (updateError) throw updateError;
+        if (deleteError) throw deleteError;
       } else {
-        const { error: updateError } = await supabase
-          .from('user_friends').update({ status: 'declined' }).eq('id', actualRequestId);
-        if (updateError) throw updateError;
+        const { error: deleteError } = await supabase
+          .from('user_friends').delete().eq('id', actualRequestId);
+        if (deleteError) throw deleteError;
       }
       if (notificationId) {
         await supabase.from('notifications').update({
