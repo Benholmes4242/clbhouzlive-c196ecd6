@@ -76,11 +76,16 @@ export const RecentlyActiveRail: React.FC<Props> = ({ userId }) => {
           display: 'flex',
           gap: 14,
           padding: '4px 20px 6px',
+          scrollPaddingLeft: 20,
+          scrollPaddingRight: 20,
           overflowX: 'auto',
           scrollSnapType: 'x proximity',
           WebkitOverflowScrolling: 'touch',
           willChange: 'transform',
+          scrollbarWidth: 'none',
+          boxSizing: 'border-box',
         }}
+        className="hide-scrollbar"
       >
         {visible.map((entry) => (
           <div
