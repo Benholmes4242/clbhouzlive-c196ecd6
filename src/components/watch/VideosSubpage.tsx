@@ -37,7 +37,6 @@ const CREAM = '#F8FAFC';
  *   VideosFullFeed (vertical YouTube-style cards, mood-independent)
  */
 export default function VideosSubpage() {
-  const navigate = useNavigate();
   const navigationType = useNavigationType();
   const { session } = useSupabaseSession();
   const userId = session?.user?.id;
