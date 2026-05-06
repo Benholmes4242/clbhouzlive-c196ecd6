@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react';
-import { ChevronRight, HelpCircle, TrendingDown, AlertTriangle, Minus } from 'lucide-react';
+import { HelpCircle, TrendingDown, AlertTriangle, Minus } from 'lucide-react';
 import { useCounters, useAllScores } from '@/lib/whs/hooks';
 import { useHandicapInsights } from '@/lib/whs/insights/useHandicapInsights';
 import { fmtDiff, fmtAxis } from '@/lib/whs/format';
@@ -31,7 +31,7 @@ const RED = '#9F1D1D';
 const FONT_DISPLAY = 'SF Pro Display, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
 
 const WEEKDAY = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-const MONTHS_LONG = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+
 
 // Chart geometry
 const CHART_H = 220;
