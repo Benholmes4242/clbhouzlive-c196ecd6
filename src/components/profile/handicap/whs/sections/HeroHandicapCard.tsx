@@ -586,12 +586,13 @@ const HeroHandicapCard: React.FC<Props> = ({ connection }) => {
           {!isScrubbing && coords.length > 0 && (() => {
             const last = coords[coords.length - 1];
             const lastValue = points[points.length - 1].handicap_index;
+            const labelAbove = last.y > 18;
             return (
               <g>
                 <circle cx={last.x} cy={last.y} r={5} fill={AMBER} stroke="#fff" strokeWidth={2} />
                 <text
-                  x={last.x - 8}
-                  y={last.y + 14}
+                  x={last.x - 10}
+                  y={labelAbove ? last.y - 8 : last.y + 16}
                   fontSize={11}
                   fontWeight={700}
                   fill={INK}
