@@ -133,7 +133,21 @@ export type AchievementType =
   | 'played_to_handicap'
   // Deprecated, retained for back-compat:
   | 'first_sub_n'
-  | 'anniversary';
+  | 'anniversary'
+  // Sprint 3 — hole-by-hole:
+  | 'hole_in_one'
+  | 'eagles'
+  | 'sub_par_round'
+  // Sprint 3 — social:
+  | 'first_friend'
+  | 'played_with_friend'
+  | 'out_played_friend'
+  | 'rivalry_winner'
+  | 'travel_golfer'
+  // Sprint 3 — course tiered:
+  | 'top_100_conqueror'
+  // Sprint 3 — meta:
+  | 'trophy_hunter';
 
 export interface Achievement {
   id: string;
