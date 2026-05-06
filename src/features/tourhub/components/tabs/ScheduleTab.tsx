@@ -32,6 +32,7 @@ import { EventTag, type EventTagKind } from '../shared/EventTag';
 import { CompactNextUp } from '../shared/CompactNextUp';
 import { ThisWeekAnchor } from '../shared/ThisWeekAnchor';
 import { getContextLabel } from '../../utils/tournamentClassification';
+import { useStickyHeaderSafeArea } from '@/hooks/useStickyHeaderSafeArea';
 
 import {
   ScheduleFilterPills,
@@ -83,8 +84,7 @@ export function ScheduleTab() {
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
   const [searchInput, setSearchInput] = useState('');
-  const [isTabsSticky, setIsTabsSticky] = useState(false);
-  const stickysentinelRef = useRef<HTMLDivElement>(null);
+  const { sentinelRef: stickysentinelRef, paddingTop: stickyPaddingTop } = useStickyHeaderSafeArea();
   const thisWeekAnchorRef = useRef<HTMLDivElement>(null);
   const [isThisWeekVisible, setIsThisWeekVisible] = useState(true);
   const hasAutoScrolledAllTab = useRef(false);
@@ -534,7 +534,7 @@ export function ScheduleTab() {
       {/* Content below hero */}
       <div
         className="sticky top-0 z-30 bg-background/95 backdrop-blur-xl border-b border-border/10"
-        style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}
+        style={{ paddingTop: stickyPaddingTop, transition: 'padding-top 200ms ease' }}
       >
         {/* ── ROW 1: Filter underline tabs ── */}
         <div style={{ padding: '0' }}>

@@ -25,6 +25,7 @@ import { getTourLogo, hasTourLogo } from '../../utils/tourLogos';
 import { getPlayerHeadshotUrl, PLAYER_SILHOUETTE_URL } from '@/utils/playerHeadshot';
 import { titleCaseCountry } from '../../utils/countryFlags';
 import CountryFlag from '@/components/ui/country-flag';
+import { useStickyHeaderSafeArea } from '@/hooks/useStickyHeaderSafeArea';
 
 // Inline sort label resolver
 function getSortShortLabel(sort: PlayerSortType, activeTour: string): string {
@@ -226,6 +227,7 @@ export function PlayersTab() {
   const isPulling = useRef(false);
   const sentinelRef = useRef<HTMLDivElement>(null);
   const isFetchingRef = useRef(false);
+  const { sentinelRef: stickyHeaderSentinelRef, paddingTop: stickyPaddingTop } = useStickyHeaderSafeArea();
 
   const handleRefresh = useCallback(async () => {
     setIsRefreshing(true);
@@ -759,13 +761,17 @@ export function PlayersTab() {
         );
       })()}
 
+      {/* Sentinel for sticky-header safe-area detection */}
+      <div ref={stickyHeaderSentinelRef} aria-hidden style={{ height: 1 }} />
+
       {/* ══════════════════════════════════════════════
           STICKY HEADER — back link · sort · search
           ══════════════════════════════════════════════ */}
       <div
         className="sticky top-0 z-20"
         style={{
-          paddingTop: 'env(safe-area-inset-top, 0px)',
+          paddingTop: stickyPaddingTop,
+          transition: 'padding-top 200ms ease',
           background: 'rgba(248,250,252,0.97)',
           backdropFilter: 'blur(20px)',
           WebkitBackdropFilter: 'blur(20px)',
