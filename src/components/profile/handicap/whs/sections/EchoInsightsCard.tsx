@@ -312,7 +312,7 @@ export const EchoInsightsCard: React.FC<Props> = ({ connectionId }) => {
               <p
                 style={{
                   margin: '8px 0 12px',
-                  fontFamily: FONT_SERIF,
+                  fontFamily: 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif',
                   fontSize: 15,
                   lineHeight: 1.55,
                   color: INK,
