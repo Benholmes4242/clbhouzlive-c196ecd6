@@ -255,7 +255,7 @@ function SectionHeader({
           </>
         )}
       </div>
-      {(meta.address || meta.country) && (
+      {meta.cityCountry && (
         <div
           style={{
             marginTop: 6,
@@ -267,7 +267,7 @@ function SectionHeader({
             letterSpacing: '-0.005em',
           }}
         >
-          {[meta.address, meta.country].filter(Boolean).join(', ')}
+          {meta.cityCountry}
         </div>
       )}
     </div>
