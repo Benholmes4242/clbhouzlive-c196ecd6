@@ -1140,21 +1140,6 @@ function DotsRail({
         gap: 10,
       }}
     >
-      <div style={{ display: 'flex', gap: 6, flexShrink: 0 }}>
-        {[0, 1, 2, 3].map((i) => (
-          <div
-            key={i}
-            style={{
-              width: i === idx ? 18 : 6,
-              height: 6,
-              borderRadius: 3,
-              background: i === idx ? ink : hairline,
-              transition: 'all 200ms',
-            }}
-          />
-        ))}
-      </div>
-
       <div
         style={{
           display: 'flex',
