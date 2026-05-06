@@ -14,8 +14,10 @@ const RED = '#9F1D1D';
 interface Props {
   open: boolean;
   onClose: () => void;
-  maxDiff: number;
-  avgDiff: number;
+  currentHandicap: number;
+  cutTarget: number | null;
+  settleAt: number | null;
+  isAtRisk: boolean;
 }
 
 interface BlockProps {
@@ -42,7 +44,14 @@ const ExplainerBlock: React.FC<BlockProps> = ({ eyebrow, eyebrowColor, title, bo
   </div>
 );
 
-const HandicapExplainerSheet: React.FC<Props> = ({ open, onClose, maxDiff, avgDiff }) => {
+const HandicapExplainerSheet: React.FC<Props> = ({
+  open,
+  onClose,
+  currentHandicap,
+  cutTarget,
+  settleAt,
+  isAtRisk,
+}) => {
   useEffect(() => {
     if (!open) return;
     const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
@@ -81,13 +90,11 @@ const HandicapExplainerSheet: React.FC<Props> = ({ open, onClose, maxDiff, avgDi
           maxHeight: '90vh', overflowY: 'auto',
         }}
       >
-        {/* Drag handle */}
         <div style={{
           width: 36, height: 4, background: INK_10, borderRadius: 2,
           margin: '0 auto 16px',
         }} />
 
-        {/* Close */}
         <button
           onClick={onClose}
           aria-label="Close"
@@ -101,38 +108,86 @@ const HandicapExplainerSheet: React.FC<Props> = ({ open, onClose, maxDiff, avgDi
           <X size={14} color={INK} strokeWidth={2.4} />
         </button>
 
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 18, paddingTop: 4 }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 22, paddingTop: 4 }}>
+          <div>
+            <h2 style={{
+              fontSize: 19, fontWeight: 700, color: INK,
+              margin: 0, marginBottom: 4, letterSpacing: '-0.01em',
+            }}>
+              How your handicap moves
+            </h2>
+            <p style={{ fontSize: 13, color: INK_55, margin: 0 }}>
+              The system is more forgiving than people think — here's why.
+            </p>
+          </div>
+
           <ExplainerBlock
-            eyebrow="DIFFERENTIAL"
+            eyebrow="STEP 1"
             eyebrowColor={AMBER_DEEP}
-            title="What each round contributes"
-            body="A differential is the score you'd have shot on a course of standard difficulty. A lower differential is a better round. It accounts for slope and rating so a 78 at a hard course can be worth more than a 78 at an easy one."
+            title="Your last 20 rounds"
+            body="Every time you play a counted round, the system keeps the most recent 20. The oldest round drops off automatically."
           />
 
           <ExplainerBlock
-            eyebrow="ROUNDS THAT COUNT"
-            eyebrowColor={GREEN}
-            title="Why these 8?"
-            body="The handicap system looks at your last 20 rounds, picks the 8 lowest differentials, and uses those to calculate your index. Your worst rounds don't drag you down — only your best 8 matter."
+            eyebrow="STEP 2"
+            eyebrowColor={AMBER_DEEP}
+            title="Best 8 of those 20"
+            body="From those 20 rounds, only the 8 lowest differentials count toward your index. Your worst 12 are ignored — bad rounds genuinely don't hurt you."
           />
 
           <ExplainerBlock
-            eyebrow="HOW IT MOVES"
-            eyebrowColor={INK}
-            title="Cuts, holds, and rises"
+            eyebrow="STEP 3"
+            eyebrowColor={AMBER_DEEP}
+            title="Average those 8"
             body={
               <>
-                Shoot a differential lower than your{' '}
-                <strong style={{ color: GREEN, fontWeight: 700 }}>
-                  worst counter ({fmtDiff(maxDiff, { plus: true })})
-                </strong>{' '}
-                and your handicap drops. Anything between your best and worst counters leaves it where it is. If your scoring drifts above your{' '}
-                <strong style={{ color: RED, fontWeight: 700 }}>
-                  counter average ({fmtDiff(avgDiff, { plus: true })})
-                </strong>{' '}
-                for a stretch, your handicap can creep up over time as good counters age out.
+                Your handicap index is the average of those 8 lowest differentials. Right now that's{' '}
+                <strong style={{ color: INK, fontWeight: 700 }}>
+                  {currentHandicap.toFixed(1)}
+                </strong>.
               </>
             }
+          />
+
+          {cutTarget != null && settleAt != null && (
+            <ExplainerBlock
+              eyebrow="STEP 4"
+              eyebrowColor={GREEN}
+              title="What happens next round"
+              body={
+                isAtRisk ? (
+                  <>
+                    One of your good counters is rolling out next round. That means even an average score would push your handicap up to{' '}
+                    <strong style={{ color: RED, fontWeight: 700 }}>
+                      {fmtDiff(settleAt, { plus: true })}
+                    </strong>. To prevent that, beat a differential of{' '}
+                    <strong style={{ color: GREEN, fontWeight: 700 }}>
+                      {fmtDiff(cutTarget, { plus: true })}
+                    </strong>{' '}
+                    — that score replaces your current worst counter and pulls the average back down.
+                  </>
+                ) : (
+                  <>
+                    Beat a differential of{' '}
+                    <strong style={{ color: GREEN, fontWeight: 700 }}>
+                      {fmtDiff(cutTarget, { plus: true })}
+                    </strong>{' '}
+                    and your handicap drops. If you don't, it settles at{' '}
+                    <strong style={{ color: INK, fontWeight: 700 }}>
+                      {fmtDiff(settleAt, { plus: true })}
+                    </strong>{' '}
+                    — close to where it is now. No risk of going up this round.
+                  </>
+                )
+              }
+            />
+          )}
+
+          <ExplainerBlock
+            eyebrow="WHY IT FEELS WEIRD"
+            eyebrowColor={INK}
+            title="Bad rounds rarely hurt you"
+            body="Most bad rounds simply don't enter the top 8, so they're discarded. Your handicap usually only goes up when one of your good rounds rolls out of the 20-window and there's nothing better to replace it. That's what 'a counter is rolling out' means."
           />
         </div>
 
