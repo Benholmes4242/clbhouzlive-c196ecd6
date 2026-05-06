@@ -148,6 +148,40 @@ const CourseCard: React.FC<{ course: SuitedCourse; stripe: string; onTap: (id: s
             </div>
           )}
         </div>
+        {course.expected_differential != null && (
+          <div
+            style={{
+              background: stripe === GREEN ? GREEN_06 : AMBER_06,
+              borderRadius: 8,
+              padding: '6px 10px',
+              textAlign: 'center',
+              flexShrink: 0,
+            }}
+          >
+            <div
+              style={{
+                fontSize: 8,
+                fontWeight: 800,
+                color: stripe,
+                letterSpacing: '0.14em',
+                marginBottom: 1,
+              }}
+            >
+              EXPECTED
+            </div>
+            <div
+              style={{
+                fontSize: 14,
+                fontWeight: 700,
+                color: stripe,
+                letterSpacing: '-0.01em',
+                fontVariantNumeric: 'tabular-nums',
+              }}
+            >
+              {fmtDiff(course.expected_differential, { plus: true })}
+            </div>
+          </div>
+        )}
         <ChevronRight size={16} color={INK_40} style={{ flexShrink: 0, marginTop: 4 }} />
       </div>
       {course.rationale && (
