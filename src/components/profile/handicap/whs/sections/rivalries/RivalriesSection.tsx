@@ -71,12 +71,18 @@ export const RivalriesSection: React.FC<Props> = ({ userId }) => {
         style={{
           display: 'flex',
           gap: 12,
-          padding: '4px 20px 8px',
+          paddingTop: 4,
+          paddingBottom: 8,
+          paddingLeft: 16,
+          paddingRight: 16,
+          scrollPaddingLeft: 16,
+          scrollPaddingRight: 16,
           overflowX: 'auto',
           scrollSnapType: 'x mandatory',
           WebkitOverflowScrolling: 'touch',
           willChange: 'transform',
           scrollbarWidth: 'none',
+          boxSizing: 'border-box',
         }}
       >
         {isLoading ? (
