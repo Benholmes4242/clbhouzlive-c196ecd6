@@ -124,19 +124,6 @@ export const LastRoundCard: React.FC<Props> = ({ connectionId }) => {
         onTouchStart={(e) => (e.currentTarget.style.opacity = '0.85')}
         onTouchEnd={(e) => (e.currentTarget.style.opacity = '1')}
       >
-        {/* Top color stripe */}
-        <div
-          style={{
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            right: 0,
-            height: 3,
-            background: stripeColor,
-            zIndex: 3,
-          }}
-        />
-
         {/* Slate gradient scrim */}
         <div
           style={{
