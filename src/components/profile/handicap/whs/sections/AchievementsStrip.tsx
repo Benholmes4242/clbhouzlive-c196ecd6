@@ -380,8 +380,24 @@ export const AchievementsStrip: React.FC<Props> = ({
       >
         {isLoading
           ? Array.from({ length: 4 }).map((_, i) => <SkeletonTile key={i} />)
-          : displayList.map((a) => <TrophyTile key={a.id} a={a} />)}
+          : (
+            <>
+              {displayList.map((a) => <TrophyTile key={a.id} a={a} />)}
+              {allAchievements.length > 0 && (
+                <ViewAllTile
+                  totalCount={allAchievements.length}
+                  onClick={() => setShowAll(true)}
+                />
+              )}
+            </>
+          )}
       </div>
+
+      <AllTrophiesSheet
+        open={showAll}
+        onClose={() => setShowAll(false)}
+        achievements={allAchievements}
+      />
     </section>
   );
 };
