@@ -9,15 +9,25 @@ import {
   Calendar,
   Star,
   Crown,
+  Flag,
+  Link2,
+  Target,
+  MapPin,
+  BarChart3,
+  CheckCircle2,
+  Activity,
 } from 'lucide-react';
+import { useQuery } from '@tanstack/react-query';
 import { useAllScores, useHandicapHistory } from '@/lib/whs/hooks';
-import { computeAchievements } from '@/lib/whs/achievements';
+import { computeAchievements, pickNextUpTrophies } from '@/lib/whs/achievements';
 import type { Achievement } from '@/lib/whs/types';
+import { supabase } from '@/integrations/supabase/client';
 import { SectionHeader } from './SectionHeader';
 
 interface Props {
   connectionId: string;
   connectionCreatedAt: string | null;
+  userId?: string;
 }
 
 const ICONS: Record<string, React.ComponentType<any>> = {
@@ -27,6 +37,14 @@ const ICONS: Record<string, React.ComponentType<any>> = {
   Award,
   Map: MapIcon,
   Calendar,
+  Star,
+  Flag,
+  Link2,
+  Target,
+  MapPin,
+  BarChart3,
+  CheckCircle2,
+  Activity,
 };
 
 const TROPHY_TILE_WIDTH = 130;
@@ -36,7 +54,9 @@ const AMBER = '#F7931E';
 
 const TrophyTile: React.FC<{ a: Achievement }> = ({ a }) => {
   const Icon = ICONS[a.icon_name] ?? Star;
-  const isHighlight = a.highlight;
+  const isHighlight = a.highlight && a.earned;
+  const isLocked = !a.earned;
+  const isTiered = a.tier != null && a.totalTiers != null && a.totalTiers > 1;
 
   return (
     <div
@@ -47,39 +67,55 @@ const TrophyTile: React.FC<{ a: Achievement }> = ({ a }) => {
         borderRadius: 12,
         background: isHighlight
           ? 'linear-gradient(135deg, rgba(247,147,30,0.10) 0%, rgba(247,147,30,0.02) 100%)'
+          : isLocked
+          ? 'rgba(15,23,42,0.025)'
           : '#FAFAF7',
         border: isHighlight
           ? `1.5px solid rgba(247,147,30,0.45)`
+          : isLocked
+          ? `1px dashed rgba(15,23,42,0.18)`
           : `1px solid ${HAIRLINE}`,
         scrollSnapAlign: 'start',
+        opacity: isLocked ? 0.85 : 1,
       }}
     >
       {isHighlight && (
+        <div style={{ position: 'absolute', top: 8, right: 8 }}>
+          <Crown size={12} color={GOLD} fill={GOLD} strokeWidth={2} />
+        </div>
+      )}
+
+      {!isHighlight && isTiered && a.earned && (
         <div
           style={{
             position: 'absolute',
             top: 8,
             right: 8,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
+            fontSize: 8,
+            fontWeight: 800,
+            color: '#C97211',
+            background: 'rgba(247,147,30,0.10)',
+            padding: '2px 6px',
+            borderRadius: 4,
+            letterSpacing: '0.06em',
           }}
         >
-          <Crown size={12} color={GOLD} fill={GOLD} strokeWidth={2} />
+          TIER {a.tier} / {a.totalTiers}
         </div>
       )}
 
       <Icon
         size={20}
-        color={isHighlight ? AMBER : '#64748B'}
+        color={isHighlight ? AMBER : isLocked ? '#94A3B8' : '#64748B'}
         strokeWidth={2}
+        style={{ opacity: isLocked ? 0.55 : 1 }}
       />
 
       <div
         style={{
           fontSize: 13,
           fontWeight: 800,
-          color: '#0F172A',
+          color: isLocked ? 'rgba(15,23,42,0.55)' : '#0F172A',
           letterSpacing: '-0.01em',
           lineHeight: 1.2,
           marginTop: 10,
@@ -97,7 +133,7 @@ const TrophyTile: React.FC<{ a: Achievement }> = ({ a }) => {
         style={{
           fontSize: 11,
           fontWeight: 500,
-          color: '#64748B',
+          color: isLocked ? 'rgba(15,23,42,0.40)' : '#64748B',
           lineHeight: 1.3,
           marginBottom: 8,
           display: '-webkit-box',
@@ -109,16 +145,53 @@ const TrophyTile: React.FC<{ a: Achievement }> = ({ a }) => {
         {a.subtitle}
       </div>
 
-      <div
-        style={{
-          fontSize: 10,
-          fontWeight: 600,
-          color: '#94A3B8',
-          letterSpacing: '0.02em',
-        }}
-      >
-        {format(new Date(a.achieved_at), 'd MMM yyyy')}
-      </div>
+      {(isTiered || isLocked) && a.progress != null && (
+        <>
+          <div
+            style={{
+              height: 4,
+              borderRadius: 2,
+              background: 'rgba(15,23,42,0.08)',
+              overflow: 'hidden',
+              marginBottom: 6,
+            }}
+          >
+            <div
+              style={{
+                height: '100%',
+                width: `${Math.round(a.progress * 100)}%`,
+                background: isLocked ? 'rgba(247,147,30,0.55)' : AMBER,
+                borderRadius: 2,
+              }}
+            />
+          </div>
+          {a.progressLabel && (
+            <div
+              style={{
+                fontSize: 10,
+                fontWeight: 600,
+                color: isLocked ? 'rgba(15,23,42,0.45)' : '#64748B',
+                fontVariantNumeric: 'tabular-nums',
+              }}
+            >
+              {a.progressLabel}
+            </div>
+          )}
+        </>
+      )}
+
+      {a.earned && !isTiered && a.achieved_at && (
+        <div
+          style={{
+            fontSize: 10,
+            fontWeight: 600,
+            color: '#94A3B8',
+            letterSpacing: '0.02em',
+          }}
+        >
+          {format(new Date(a.achieved_at), 'd MMM yyyy').toUpperCase()}
+        </div>
+      )}
     </div>
   );
 };
@@ -139,25 +212,71 @@ const SkeletonTile: React.FC = () => (
 export const AchievementsStrip: React.FC<Props> = ({
   connectionId,
   connectionCreatedAt,
+  userId,
 }) => {
   const { data: scores, isLoading: sLoading } = useAllScores(connectionId);
   const { data: history, isLoading: hLoading } = useHandicapHistory(connectionId, 365);
 
-  const achievements = useMemo<Achievement[]>(() => {
+  // Fetch primary club for "Home club master" trophy
+  const { data: primaryClub } = useQuery({
+    queryKey: ['user-primary-club', userId],
+    enabled: !!userId,
+    queryFn: async () => {
+      const { data: profileRow } = await supabase
+        .from('user_profiles')
+        .select('primary_club_id')
+        .eq('id', userId!)
+        .maybeSingle();
+      const primaryClubId = (profileRow as any)?.primary_club_id ?? null;
+      if (!primaryClubId) {
+        return { primary_club_id: null as string | null, primary_club_name: null as string | null };
+      }
+      const { data: club } = await supabase
+        .from('golf_clubs')
+        .select('id, name')
+        .eq('id', primaryClubId)
+        .maybeSingle();
+      return {
+        primary_club_id: primaryClubId as string,
+        primary_club_name: ((club as any)?.name ?? null) as string | null,
+      };
+    },
+    staleTime: 5 * 60_000,
+  });
+
+  const allAchievements = useMemo<Achievement[]>(() => {
     if (!scores || !history) return [];
     return computeAchievements({
       scores,
       history,
       connectionCreatedAt,
+      primaryClubId: primaryClub?.primary_club_id ?? null,
+      primaryClubName: primaryClub?.primary_club_name ?? null,
     });
-  }, [scores, history, connectionCreatedAt]);
+  }, [scores, history, connectionCreatedAt, primaryClub]);
 
+  const earnedAchievements = useMemo(
+    () => allAchievements.filter((a) => a.earned),
+    [allAchievements],
+  );
+
+  const nextUpTrophies = useMemo(
+    () => pickNextUpTrophies(allAchievements, 2),
+    [allAchievements],
+  );
+
+  const displayList = useMemo(
+    () => [...earnedAchievements, ...nextUpTrophies],
+    [earnedAchievements, nextUpTrophies],
+  );
+
+  const earnedCount = earnedAchievements.length;
   const isLoading = sLoading || hLoading;
 
-  if (!isLoading && achievements.length === 0) return null;
+  if (!isLoading && displayList.length === 0) return null;
 
   const countBadge =
-    !isLoading && achievements.length > 0 ? (
+    !isLoading && earnedCount > 0 ? (
       <span
         style={{
           fontSize: 9,
@@ -167,7 +286,7 @@ export const AchievementsStrip: React.FC<Props> = ({
           textTransform: 'uppercase',
         }}
       >
-        {achievements.length} Earned
+        {earnedCount} Earned
       </span>
     ) : null;
 
@@ -194,7 +313,7 @@ export const AchievementsStrip: React.FC<Props> = ({
       >
         {isLoading
           ? Array.from({ length: 4 }).map((_, i) => <SkeletonTile key={i} />)
-          : achievements.map((a) => <TrophyTile key={a.id} a={a} />)}
+          : displayList.map((a) => <TrophyTile key={a.id} a={a} />)}
       </div>
     </section>
   );
