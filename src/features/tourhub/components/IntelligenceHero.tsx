@@ -18,7 +18,7 @@
  * `usePredictionTracker` from a poll-to-poll position cache.
  */
 
-import React, { memo, useEffect, useMemo, useRef, useState } from 'react';
+import React, { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   Brain,
   ChevronRight,
@@ -273,15 +273,18 @@ function SectionHeader({
 function CardMetaTray({
   insight,
   reasons,
+  expanded,
+  onToggle,
 }: {
   insight: string;
   reasons: string[];
+  expanded: boolean;
+  onToggle: () => void;
 }) {
-  const [expanded, setExpanded] = useState(false);
   return (
     <>
       <button
-        onClick={() => setExpanded((v) => !v)}
+        onClick={onToggle}
         aria-expanded={expanded}
         style={{
           width: '100%',
@@ -537,7 +540,15 @@ interface UpcomingPick {
   courseFit: number | null;
 }
 
-function UpcomingCard({ pick }: { pick: UpcomingPick }) {
+function UpcomingCard({
+  pick,
+  expanded,
+  onToggle,
+}: {
+  pick: UpcomingPick;
+  expanded: boolean;
+  onToggle: () => void;
+}) {
   return (
     <CardShell>
       <CardHero name={pick.name}>
@@ -636,7 +647,7 @@ function UpcomingCard({ pick }: { pick: UpcomingPick }) {
           )}
         </div>
       </CardHero>
-      <CardMetaTray insight={pick.insight} reasons={pick.reasons} />
+      <CardMetaTray insight={pick.insight} reasons={pick.reasons} expanded={expanded} onToggle={onToggle} />
     </CardShell>
   );
 }
@@ -654,7 +665,15 @@ interface LivePick {
   finished: boolean;
 }
 
-function LiveCard({ pick }: { pick: LivePick }) {
+function LiveCard({
+  pick,
+  expanded,
+  onToggle,
+}: {
+  pick: LivePick;
+  expanded: boolean;
+  onToggle: () => void;
+}) {
   const moveColor =
     pick.moveDir === 'up'
       ? greenLight
@@ -830,7 +849,7 @@ function LiveCard({ pick }: { pick: LivePick }) {
           </div>
         </div>
       </CardHero>
-      <CardMetaTray insight={pick.insight} reasons={pick.reasons} />
+      <CardMetaTray insight={pick.insight} reasons={pick.reasons} expanded={expanded} onToggle={onToggle} />
     </CardShell>
   );
 }
@@ -845,7 +864,15 @@ interface ResultsPick {
   outcome: 'win' | 'top5' | 'top10' | 'miss';
 }
 
-function ResultsCard({ pick }: { pick: ResultsPick }) {
+function ResultsCard({
+  pick,
+  expanded,
+  onToggle,
+}: {
+  pick: ResultsPick;
+  expanded: boolean;
+  onToggle: () => void;
+}) {
   const isWinner = pick.outcome === 'win';
   const outcomeConfig = {
     win: {
@@ -951,7 +978,7 @@ function ResultsCard({ pick }: { pick: ResultsPick }) {
           </div>
         </div>
       </CardHero>
-      <CardMetaTray insight={pick.insight} reasons={pick.reasons} />
+      <CardMetaTray insight={pick.insight} reasons={pick.reasons} expanded={expanded} onToggle={onToggle} />
     </CardShell>
   );
 }
@@ -1343,6 +1370,11 @@ export const IntelligenceHero = memo(function IntelligenceHero() {
   // Receipts: hit rate counts a tournament as a "top-5 hit" if ANY of the
   // three picks finished T5 or better — matches IntelligenceSheet logic
   // (win + top5 outcomes from classifyOutcome both indicate a top-5 hit).
+  // Shared "expand reasons" state — tapping any card's chevron expands/collapses
+  // all three together so users see consistent state when swiping the carousel.
+  const [reasonsExpanded, setReasonsExpanded] = useState(false);
+  const toggleReasons = useCallback(() => setReasonsExpanded((v) => !v), []);
+
   const stats: ReceiptsStats = useMemo(() => {
     const totalResolved = tournaments.length;
     const wins = tournaments.filter((t) => t.outcome === 'win').length;
@@ -1406,19 +1438,19 @@ export const IntelligenceHero = memo(function IntelligenceHero() {
         <StateMessage label="Picks for the next event drop soon." />
       );
     } else {
-      cards = upcomingPicks.map((p) => <UpcomingCard key={p.rank} pick={p} />);
+      cards = upcomingPicks.map((p) => <UpcomingCard key={p.rank} pick={p} expanded={reasonsExpanded} onToggle={toggleReasons} />);
     }
   } else if (state === 'live') {
     if (livePicks.length === 0) {
       renderEmpty = <StateMessage label="Tracking our picks live…" />;
     } else {
-      cards = livePicks.map((p) => <LiveCard key={p.rank} pick={p} />);
+      cards = livePicks.map((p) => <LiveCard key={p.rank} pick={p} expanded={reasonsExpanded} onToggle={toggleReasons} />);
     }
   } else if (state === 'results') {
     if (resultsPicks.length === 0) {
       renderEmpty = <StateMessage label="Final results coming in…" />;
     } else {
-      cards = resultsPicks.map((p) => <ResultsCard key={p.rank} pick={p} />);
+      cards = resultsPicks.map((p) => <ResultsCard key={p.rank} pick={p} expanded={reasonsExpanded} onToggle={toggleReasons} />);
     }
   }
 
