@@ -424,10 +424,13 @@ interface CurveCoords {
 
 function curveFor(direction: 'down' | 'up' | 'flat'): CurveCoords {
   switch (direction) {
+    // SVG y-axis is inverted (y=0 at top). Chart shows handicap VALUE, so:
+    // - 'down' (handicap dropping = good) must slope downward on screen → larger y values
+    // - 'up'   (handicap rising  = bad)  must slope upward   on screen → smaller y values
     case 'down':
-      return { pastY1: 70, pastY2: 60, pastY3: 55, futureY2: 42, futureY3: 32 };
-    case 'up':
       return { pastY1: 42, pastY2: 50, pastY3: 55, futureY2: 65, futureY3: 78 };
+    case 'up':
+      return { pastY1: 70, pastY2: 60, pastY3: 55, futureY2: 42, futureY3: 32 };
     case 'flat':
     default:
       return { pastY1: 58, pastY2: 56, pastY3: 55, futureY2: 55, futureY3: 56 };
