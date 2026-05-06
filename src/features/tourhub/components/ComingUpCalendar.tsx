@@ -472,7 +472,11 @@ export function ComingUpCalendar() {
 
       {/* Headline + compact rows */}
       {headline && <HeadlineCard tournament={headline} />}
-      {remaining.map(t => <CompactRow key={t.id} tournament={t} />)}
+      {remaining.map(t => (
+        <div key={t.id} style={{ borderBottom: `1px solid ${SLATE_150}` }}>
+          <ScheduleTournamentCard tournament={t} />
+        </div>
+      ))}
     </div>
   );
 }
