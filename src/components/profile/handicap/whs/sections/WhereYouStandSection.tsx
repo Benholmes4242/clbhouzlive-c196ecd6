@@ -482,9 +482,7 @@ export const WhereYouStandSection: React.FC<Props> = ({ userId }) => {
               percentile_top: data.available ? data.percentile_top : null,
               cohort_size: data.available
                 ? data.cohort_size
-                : 'cohort_size' in data
-                ? data.cohort_size
-                : null,
+                : data.cohort_size ?? null,
             });
           }
         });
