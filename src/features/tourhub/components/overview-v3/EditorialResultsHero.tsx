@@ -458,7 +458,7 @@ export function ResultsHeroSkeleton() {
     <HeroAtmosphere style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
       <div
         style={{
-          paddingTop: 'calc(max(env(safe-area-inset-top, 0px), 44px) + 56px)',
+          paddingTop: 'calc(max(env(safe-area-inset-top, 0px), 47px) + 56px)',
           padding: '0 20px',
           paddingBottom: 24,
           height: '100%',
@@ -623,7 +623,7 @@ export function EditorialResultsHero({
     <HeroAtmosphere style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
       <div
         style={{
-          paddingTop: 'calc(max(env(safe-area-inset-top, 0px), 44px) + 56px)',
+          paddingTop: 'calc(max(env(safe-area-inset-top, 0px), 47px) + 56px)',
           padding: '0 20px',
           paddingBottom: 24,
           overflowY: 'auto',
