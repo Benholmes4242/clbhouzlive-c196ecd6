@@ -90,16 +90,11 @@ export default function QuickEditProfilePage() {
         </button>
 
         <div className="text-center">
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, marginBottom: 4 }}>
-            <div style={{ width: 3, height: 8, background: '#F7931E', borderRadius: 1, flexShrink: 0 }} />
-            <span style={{ fontSize: 9, fontWeight: 900, color: '#F7931E', letterSpacing: '0.16em', textTransform: 'uppercase' }}>
-              Profile
-            </span>
-          </div>
           <p style={{ fontSize: 16, fontWeight: 900, color: '#0F172A', letterSpacing: '-0.02em', margin: 0 }}>
-            Edit
+            Edit Profile
           </p>
         </div>
+
 
         <div className="w-9 h-9 flex-shrink-0" />
       </div>
