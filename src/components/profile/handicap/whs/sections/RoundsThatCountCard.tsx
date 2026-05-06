@@ -203,12 +203,34 @@ export const RoundsThatCountCard: React.FC<Props> = ({ connectionId, currentHand
       }}>
         {/* Chart */}
         <div style={{ padding: '14px 14px 0' }}>
-          {/* Y-axis unit label */}
+          {/* Y-axis unit label + LATEST legend */}
           <div style={{
-            fontSize: 10, fontWeight: 700, color: AMBER_DEEP,
-            letterSpacing: '0.04em', marginBottom: 4, paddingLeft: 4,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            marginBottom: 8,
+            paddingLeft: 4,
           }}>
-            differential
+            <span style={{
+              fontSize: 9,
+              fontWeight: 800,
+              color: INK_55,
+              letterSpacing: '0.16em',
+              textTransform: 'uppercase',
+            }}>DIFFERENTIAL</span>
+            <span style={{
+              fontSize: 9,
+              fontWeight: 700,
+              color: AMBER,
+              letterSpacing: '0.16em',
+              textTransform: 'uppercase',
+              display: 'flex',
+              alignItems: 'center',
+              gap: 4,
+            }}>
+              <span style={{ width: 6, height: 6, borderRadius: '50%', background: AMBER }} />
+              LATEST
+            </span>
           </div>
 
           <div style={{
