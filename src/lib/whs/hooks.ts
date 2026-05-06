@@ -22,6 +22,7 @@ import {
   upsertUserRivalOverride,
   deleteUserRivalOverride,
   fetchSharedRounds,
+  fetchTrophyAggregates,
 } from './api';
 
 export const whsKeys = {
@@ -309,5 +310,18 @@ export function useSharedRounds(
     queryFn: () => fetchSharedRounds(userId as string, rivalUserId),
     enabled: !!userId,
     staleTime: 60_000,
+  });
+}
+
+// ─── Trophy aggregates (Sprint 3) ───────────────────────────────────────
+export function useTrophyAggregates(
+  userId: string | undefined,
+  connectionId: string | undefined,
+) {
+  return useQuery({
+    queryKey: ['trophy-aggregates', userId, connectionId],
+    enabled: !!userId && !!connectionId,
+    queryFn: () => fetchTrophyAggregates(userId!, connectionId!),
+    staleTime: 5 * 60 * 1000,
   });
 }

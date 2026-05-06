@@ -845,3 +845,40 @@ export async function fetchSharedRounds(
     shared_round_results: rounds,
   };
 }
+
+// ─── Trophy aggregates RPC (Sprint 3) ─────────────────────────────────────
+export interface TrophyAggregates {
+  hole_stats: {
+    aces_count: number;
+    eagles_count: number;
+    sub_par_rounds_count: number;
+    rounds_with_holes_count: number;
+    total_rounds_count: number;
+  };
+  course_stats: {
+    countries_played: string[];
+    best_top100_global_rank: number | null;
+    best_top100_country_rank: number | null;
+  };
+  social_stats: {
+    first_friend_at: string | null;
+    first_round_with_friend_at: string | null;
+    out_played_friend_first_at: string | null;
+    rivalry_wins_count: number;
+  };
+}
+
+export async function fetchTrophyAggregates(
+  userId: string,
+  connectionId: string,
+): Promise<TrophyAggregates | null> {
+  const { data, error } = await supabase.rpc('get_trophy_aggregates' as any, {
+    p_user_id: userId,
+    p_connection_id: connectionId,
+  });
+  if (error) {
+    console.error('[fetchTrophyAggregates] failed:', error);
+    return null;
+  }
+  return (data as unknown) as TrophyAggregates;
+}

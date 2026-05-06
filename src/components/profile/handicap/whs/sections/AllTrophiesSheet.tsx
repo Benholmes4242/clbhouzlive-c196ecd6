@@ -3,6 +3,7 @@ import { format } from 'date-fns';
 import {
   X, Trophy, Flame, TrendingDown, Award, Map as MapIcon, Calendar, Star, Crown,
   Flag, Link2, Target, MapPin, BarChart3, CheckCircle2, Activity, Lock,
+  Zap, Users, UserCheck, Swords, Plane,
 } from 'lucide-react';
 import type { Achievement } from '@/lib/whs/types';
 
@@ -18,6 +19,7 @@ const GOLD = '#D97706';
 const ICONS: Record<string, React.ComponentType<any>> = {
   Trophy, Flame, TrendingDown, Award, Map: MapIcon, Calendar, Star,
   Flag, Link2, Target, MapPin, BarChart3, CheckCircle2, Activity,
+  Zap, Users, UserCheck, Swords, Plane, Crown,
 };
 
 const CATEGORY_ORDER: Array<{
@@ -28,6 +30,7 @@ const CATEGORY_ORDER: Array<{
   { key: 'volume', label: 'Volume' },
   { key: 'improvement', label: 'Improvement' },
   { key: 'course', label: 'Course' },
+  { key: 'social', label: 'Social' },
   { key: 'milestone', label: 'Milestone' },
 ];
 
