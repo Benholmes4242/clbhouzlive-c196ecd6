@@ -75,6 +75,9 @@ export const OverviewView: React.FC<Props> = ({
       {/* Hero handicap ring + line chart */}
       <HeroHandicapCard connection={connection} />
 
+      {/* Streaks — personal, hidden on friend pages */}
+      {!readOnly && <StreaksSection connectionId={connectionId} userId={userId} />}
+
       {/* Existing overview cards */}
       <LastRoundCard connectionId={connectionId} />
       <RoundsThatCountCard connectionId={connectionId} currentHandicap={currentHandicap} />
