@@ -257,6 +257,27 @@ export const RoundsThatCountCard: React.FC<Props> = ({ connectionId, currentHand
             <div style={{
               flex: 1, position: 'relative', height: CHART_H,
             }}>
+              {/* Permanent latest emphasis band */}
+              {(() => {
+                const latestIdx = enriched.rounds.length - 1;
+                if (latestIdx < 0) return null;
+                const colWidth = 100 / enriched.rounds.length;
+                return (
+                  <div style={{
+                    position: 'absolute',
+                    top: 0,
+                    bottom: 0,
+                    left: `${(latestIdx + 0.05) * colWidth}%`,
+                    width: `${colWidth * 0.9}%`,
+                    background: AMBER,
+                    opacity: 0.08,
+                    borderRadius: 6,
+                    pointerEvents: 'none',
+                    zIndex: 0,
+                  }} />
+                );
+              })()}
+
               {/* Selected highlight column */}
               {selectedIdx >= 0 && (
                 <div style={{
@@ -268,6 +289,7 @@ export const RoundsThatCountCard: React.FC<Props> = ({ connectionId, currentHand
                   borderLeft: `0.5px solid ${AMBER_BORDER}`,
                   borderRight: `0.5px solid ${AMBER_BORDER}`,
                   pointerEvents: 'none',
+                  zIndex: 1,
                 }} />
               )}
 
@@ -299,8 +321,27 @@ export const RoundsThatCountCard: React.FC<Props> = ({ connectionId, currentHand
               {enriched.rounds.map((r, i) => {
                 const d = r.handicap_differential ?? 0;
                 const isSel = r.id === selectedRound.id;
-                const stroke = r.is_best ? GREEN : r.is_worst ? RED : AMBER;
-                const dotSize = isSel ? 14 : 10;
+                const isLatest = i === enriched.rounds.length - 1;
+                let dotSize: number;
+                let background: string;
+                let borderStyle: string;
+                if (r.is_best) {
+                  dotSize = 12;
+                  background = '#fff';
+                  borderStyle = `2.5px solid ${GREEN}`;
+                } else if (r.is_worst) {
+                  dotSize = 12;
+                  background = '#fff';
+                  borderStyle = `2.5px solid ${RED}`;
+                } else if (isLatest) {
+                  dotSize = 14;
+                  background = AMBER;
+                  borderStyle = `2px solid ${INK}`;
+                } else {
+                  dotSize = 9;
+                  background = '#fff';
+                  borderStyle = `2px solid ${AMBER}`;
+                }
                 return (
                   <button
                     key={r.id}
@@ -313,8 +354,8 @@ export const RoundsThatCountCard: React.FC<Props> = ({ connectionId, currentHand
                       width: dotSize, height: dotSize,
                       marginLeft: -dotSize / 2, marginTop: -dotSize / 2,
                       borderRadius: '50%',
-                      background: '#fff',
-                      border: `2.5px solid ${stroke}`,
+                      background,
+                      border: borderStyle,
                       boxShadow: isSel ? `0 0 0 2px ${INK}` : 'none',
                       cursor: 'pointer',
                       padding: 0,
