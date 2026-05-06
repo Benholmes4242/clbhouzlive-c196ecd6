@@ -69,45 +69,6 @@ function formatScoreToPar(score: number): string {
   return `${score}`;
 }
 
-// ── Sparkline Component ────────────────────────────────────────────────────────
-
-function ScorecardSparkline({ holes }: { holes: HoleScore[] }) {
-  if (holes.length < 2) return null;
-  const running = holes.reduce<number[]>((acc, h, i) => {
-    acc.push((acc[i - 1] ?? 0) + h.scoreToPar);
-    return acc;
-  }, []);
-  const min = Math.min(...running, 0);
-  const max = Math.max(...running, 0);
-  const range = max - min || 1;
-  const W = 300, H = 28;
-  const pts = running.map((v, i) => {
-    const x = i === running.length - 1
-      ? W - 4
-      : (i / (running.length - 1)) * (W - 4);
-    const y = H - ((v - min) / range) * (H - 4) - 2;
-    return `${x},${y}`;
-  }).join(' ');
-  const lastV = running[running.length - 1];
-  const lastY = H - ((lastV - min) / range) * (H - 4) - 2;
-  return (
-    <div style={{ padding: '0 16px 6px' }}>
-      <svg viewBox={`0 0 ${W} ${H}`} width="100%" height={H} preserveAspectRatio="none" style={{ display: 'block', overflow: 'visible' }}>
-        <defs>
-          <linearGradient id="sparkFill" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="#ffffff" stopOpacity={0.18} />
-            <stop offset="100%" stopColor="#ffffff" stopOpacity={0} />
-          </linearGradient>
-        </defs>
-        <polyline points={pts} fill="none" stroke="#ffffff" strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round" opacity={0.6} />
-        <polygon points={`0,${H} ${pts} ${W},${H}`} fill="url(#sparkFill)" />
-        <line x1={0} y1={H - ((0 - min) / range) * (H - 4) - 2} x2={W} y2={H - ((0 - min) / range) * (H - 4) - 2} stroke="rgba(255,255,255,0.10)" strokeWidth={0.5} strokeDasharray="3,3" />
-        <circle cx={W - 4} cy={lastY} r={3} fill="#ffffff" opacity={0.9} />
-      </svg>
-    </div>
-  );
-}
-
 // ── Hole Cell Component ────────────────────────────────────────────────────────
 
 function HoleCell({ hole }: { hole: HoleScore }) {
@@ -725,12 +686,6 @@ export function PlayerScorecardCard({
               roundScores={roundScores}
             />
 
-            {/* Sparkline — round momentum */}
-            {activeRoundData && activeRoundData.holesCompleted > 0 && (
-              <div style={{ marginBottom: 6 }}>
-                <ScorecardSparkline holes={activeRoundData.holes} />
-              </div>
-            )}
 
             {/* Stats — flat horizontal panel */}
             {activeRoundData && activeRoundData.holesCompleted > 0 && (
