@@ -715,6 +715,7 @@ export function EditorialResultsHero({
           touchAction: 'pan-y',
           willChange: 'transform',
           WebkitOverflowScrolling: 'touch' as any,
+          zoom: 0.9,
         }}
       >
         {/* 1. Broadcast caption strip */}
