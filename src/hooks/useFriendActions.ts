@@ -197,7 +197,7 @@ export const useFriendActions = ({ currentUserId }: UseFriendActionsProps) => {
     try {
       const { error } = await supabase
         .from('user_friends')
-        .update({ status: 'declined' })
+        .delete()
         .eq('user_id', requesterId)
         .eq('friend_id', currentUserId)
         .eq('status', 'pending');
