@@ -77,27 +77,66 @@ export function useFriendship(targetUserId: string | undefined) {
   const friendshipStatus = data?.status ?? 'none';
   const relationshipId = data?.relationshipId;
 
-  // Send friend request
+  // Send friend request — defensive UPSERT to handle any stale declined rows
+  // from before decline became a hard delete. Surfaces clear messages for
+  // genuine collisions (already pending / already friends / blocked).
   const sendRequestMutation = useMutation({
     mutationFn: async () => {
       if (!currentUserId || !targetUserId) throw new Error('Missing user IDs');
-      
-      const { error } = await supabase
+
+      // First attempt: plain insert (the common path going forward)
+      const { error: insertError } = await supabase
         .from('user_friends')
         .insert({
           user_id: currentUserId,
           friend_id: targetUserId,
           status: 'pending',
         });
-      
-      if (error) {
-        // Check if it's a duplicate constraint error
-        if (error.code === '23505') {
-          throw new Error('Friend request already exists');
-        }
-        throw error;
+
+      if (!insertError) return;
+
+      // Anything other than a unique-violation: bubble up
+      if (insertError.code !== '23505') throw insertError;
+
+      // Unique-violation: a row already exists for this (user_id, friend_id) pair.
+      // Check what's actually there in either direction so we can surface
+      // the right message or recover.
+      const { data: existing, error: fetchError } = await supabase
+        .from('user_friends')
+        .select('id, user_id, friend_id, status')
+        .or(
+          `and(user_id.eq.${currentUserId},friend_id.eq.${targetUserId}),` +
+          `and(user_id.eq.${targetUserId},friend_id.eq.${currentUserId})`
+        )
+        .maybeSingle();
+
+      if (fetchError) throw fetchError;
+      if (!existing) {
+        throw new Error('Friend request already exists');
       }
-      // Notification is created by database trigger - no frontend insert needed
+
+      if (existing.status === 'accepted') {
+        throw new Error("You're already friends");
+      }
+      if (existing.status === 'pending') {
+        throw new Error('Friend request already pending');
+      }
+      if (existing.status === 'blocked') {
+        throw new Error("You can't send a friend request to this user");
+      }
+
+      // Stale declined row from old decline-via-UPDATE behaviour.
+      // Resurrect it as a pending request from the current user.
+      const { error: updateError } = await supabase
+        .from('user_friends')
+        .update({
+          user_id: currentUserId,
+          friend_id: targetUserId,
+          status: 'pending',
+        })
+        .eq('id', existing.id);
+
+      if (updateError) throw updateError;
     },
     onSuccess: () => {
       toast.success('Friend request sent');
