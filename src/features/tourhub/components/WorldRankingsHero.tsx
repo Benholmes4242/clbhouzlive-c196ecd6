@@ -761,7 +761,8 @@ export const WorldRankingsHero = memo(function WorldRankingsHero() {
   );
   const hasMovers = topRisers.length > 0 || topFallers.length > 0;
 
-  const updatedSuffix = formatUpdatedSuffix(rankings?.[0]?.ranking_date);
+  const rankingDate = rankings?.[0]?.ranking_date;
+  const updatedSuffix = formatUpdatedSuffix(rankingDate);
 
   if (isLoading) return <WorldRankingsSkeleton />;
 
