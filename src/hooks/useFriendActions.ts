@@ -68,7 +68,7 @@ export const useFriendActions = ({ currentUserId }: UseFriendActionsProps) => {
 
     setLoading(true);
     try {
-      const { error } = await supabase
+      const { error: insertError } = await supabase
         .from('user_friends')
         .insert({
           user_id: currentUserId,
@@ -76,13 +76,51 @@ export const useFriendActions = ({ currentUserId }: UseFriendActionsProps) => {
           status: 'pending'
         });
 
-      if (error) {
-        // Check for duplicate constraint error
-        if (error.code === '23505') {
+      if (insertError && insertError.code !== '23505') {
+        throw insertError;
+      }
+
+      if (insertError) {
+        // Unique-violation: check what's actually there
+        const { data: existing, error: fetchError } = await supabase
+          .from('user_friends')
+          .select('id, user_id, friend_id, status')
+          .or(
+            `and(user_id.eq.${currentUserId},friend_id.eq.${targetUserId}),` +
+            `and(user_id.eq.${targetUserId},friend_id.eq.${currentUserId})`
+          )
+          .maybeSingle();
+
+        if (fetchError) throw fetchError;
+
+        if (!existing) {
           toast.error('Friend request already exists');
           return false;
         }
-        throw error;
+        if (existing.status === 'accepted') {
+          toast.info("You're already friends");
+          return false;
+        }
+        if (existing.status === 'pending') {
+          toast.info('Friend request already pending');
+          return false;
+        }
+        if (existing.status === 'blocked') {
+          toast.error("You can't send a friend request to this user");
+          return false;
+        }
+
+        // Stale declined row — resurrect as pending from current user
+        const { error: updateError } = await supabase
+          .from('user_friends')
+          .update({
+            user_id: currentUserId,
+            friend_id: targetUserId,
+            status: 'pending',
+          })
+          .eq('id', existing.id);
+
+        if (updateError) throw updateError;
       }
 
       // Note: Notification is now created automatically by database trigger
@@ -159,7 +197,7 @@ export const useFriendActions = ({ currentUserId }: UseFriendActionsProps) => {
     try {
       const { error } = await supabase
         .from('user_friends')
-        .update({ status: 'declined' })
+        .delete()
         .eq('user_id', requesterId)
         .eq('friend_id', currentUserId)
         .eq('status', 'pending');
