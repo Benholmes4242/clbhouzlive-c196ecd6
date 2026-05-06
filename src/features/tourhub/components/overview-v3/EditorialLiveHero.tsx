@@ -543,24 +543,6 @@ export function EditorialLiveHero({
     : 0;
   const derivedRound = lastCompleted === 0 ? currentRound : Math.min(lastCompleted + 1, 4);
 
-  const { data: holeScores = [] } = useLeaderHoleScores(
-    tournament.id,
-    leaderId,
-    leaderId ? derivedRound : null,
-  );
-  const { data: prevRoundScores = [] } = useLeaderHoleScores(
-    tournament.id,
-    leaderId,
-    leaderId && lastCompleted > 0 ? lastCompleted : null,
-  );
-  const displayHoles = holeScores.length > 0 ? holeScores : prevRoundScores;
-  const displayRound = holeScores.length > 0 ? derivedRound : lastCompleted;
-
-  const activeHole = displayHoles.length > 0
-    ? displayHoles[displayHoles.length - 1].holeNumber
-    : null;
-  const remaining = activeHole ? Math.max(0, 18 - activeHole) : 18;
-
   const top5 = leaderboard.slice(0, 5);
 
   // Inject pulse keyframes once per mount — scoped via a simple <style> tag.
