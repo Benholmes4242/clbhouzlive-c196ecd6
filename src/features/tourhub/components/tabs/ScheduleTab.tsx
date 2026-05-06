@@ -107,17 +107,7 @@ export function ScheduleTab() {
     });
   }, []);
 
-  // Detect when tabs become sticky
-  useEffect(() => {
-    const sentinel = stickysentinelRef.current;
-    if (!sentinel) return;
-    const observer = new IntersectionObserver(
-      ([entry]) => setIsTabsSticky(!entry.isIntersecting),
-      { threshold: 0 }
-    );
-    observer.observe(sentinel);
-    return () => observer.disconnect();
-  }, []);
+
 
   // Track THIS WEEK anchor visibility for sticky Today pill
   useEffect(() => {
