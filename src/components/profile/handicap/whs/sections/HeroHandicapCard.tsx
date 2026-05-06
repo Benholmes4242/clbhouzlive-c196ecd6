@@ -163,6 +163,23 @@ const HeroHandicapCard: React.FC<Props> = ({ connection }) => {
     return PAD_TOP + ((max - 0) / r) * (H - PAD_TOP - PAD_BOTTOM);
   }, [points]);
 
+  // Scratch zone band (y=0 to y=1.5). Always render, even if user's min > 1.5
+  // — band acts as goal target.
+  const scratchBand = useMemo(() => {
+    if (points.length === 0) return null;
+    const values = points.map(p => p.handicap_index);
+    const min = Math.min(...values);
+    const max = Math.max(...values);
+    const r = max - min || 1;
+    const project = (v: number) =>
+      PAD_TOP + ((max - v) / r) * (H - PAD_TOP - PAD_BOTTOM);
+    const yTop = Math.max(0, Math.min(H, project(1.5)));
+    const yBottom = Math.max(0, Math.min(H, project(0)));
+    if (yBottom <= yTop) return null;
+    return { yTop, height: yBottom - yTop };
+  }, [points]);
+
+
   const pathD = useMemo(() => {
     if (coords.length === 0) return '';
     return coords.reduce(
