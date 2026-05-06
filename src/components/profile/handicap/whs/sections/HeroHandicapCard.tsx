@@ -606,6 +606,30 @@ const HeroHandicapCard: React.FC<Props> = ({ connection }) => {
             </linearGradient>
           </defs>
 
+          {scratchBand && (
+            <g>
+              <rect
+                x={0}
+                y={scratchBand.yTop}
+                width={W}
+                height={scratchBand.height}
+                fill={GREEN}
+                opacity={0.05}
+              />
+              <text
+                x={6}
+                y={scratchBand.yTop + scratchBand.height - 4}
+                fontSize={9}
+                fontWeight={700}
+                fill={GREEN}
+                opacity={0.7}
+                letterSpacing={1.3}
+              >
+                SCRATCH ZONE
+              </text>
+            </g>
+          )}
+
           {coords.length >= 2 && (
             <>
               <path d={areaD} fill="url(#heroSparkFill)" />
