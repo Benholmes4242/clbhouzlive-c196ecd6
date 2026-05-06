@@ -13,6 +13,7 @@ import { memo, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   ChevronDown,
+  ChevronRight,
   Crown,
   TrendingUp,
   TrendingDown,
@@ -84,6 +85,16 @@ function formatUpdatedSuffix(rankingDate: string | null | undefined): string {
   if (diffDays === 1) return 'UPDATED YESTERDAY';
   if (diffDays <= 7) return `UPDATED ${diffDays}D AGO`;
   return `UPDATED ${rankingDate.toUpperCase()}`;
+}
+
+function formatUpdatedSentence(rankingDate: string | null | undefined): string {
+  if (!rankingDate) return '';
+  const d = new Date(rankingDate + 'T00:00:00');
+  const diffDays = Math.floor((Date.now() - d.getTime()) / 86_400_000);
+  if (diffDays <= 0) return 'Updated today';
+  if (diffDays === 1) return 'Updated yesterday';
+  if (diffDays <= 7) return `Updated ${diffDays} days ago`;
+  return `Updated ${Math.floor(diffDays / 7)} weeks ago`;
 }
 
 /**
@@ -382,7 +393,7 @@ function NumberOneCard({
                 letterSpacing: '-0.02em',
               }}
             >
-              {entry.avg_points != null ? entry.avg_points.toFixed(2) : '—'}
+              {entry.total_points != null ? entry.total_points.toFixed(2) : '—'}
             </div>
             <div
               style={{
@@ -393,7 +404,7 @@ function NumberOneCard({
                 marginTop: 4,
               }}
             >
-              PTS AVG
+              TOTAL POINTS
             </div>
           </div>
         </div>
@@ -489,6 +500,18 @@ function ChaserRow({
         </div>
       </div>
 
+      {entry.total_points != null && (
+        <span style={{
+          fontSize: 13,
+          fontWeight: 700,
+          color: INK,
+          fontVariantNumeric: 'tabular-nums',
+          letterSpacing: '-0.01em',
+          flexShrink: 0,
+        }}>
+          {entry.total_points.toFixed(2)}
+        </span>
+      )}
       <MovementChip change={entry.rank_change} />
     </button>
   );
@@ -704,6 +727,7 @@ function WorldRankingsSkeleton() {
 
 // ─── Main ───────────────────────────────────────────────────────────────────
 export const WorldRankingsHero = memo(function WorldRankingsHero() {
+  const navigate = useNavigate();
   const [activeTour, setActiveTour] = useState('pga');
   const [sheetOpen, setSheetOpen] = useState(false);
 
@@ -749,7 +773,8 @@ export const WorldRankingsHero = memo(function WorldRankingsHero() {
   );
   const hasMovers = topRisers.length > 0 || topFallers.length > 0;
 
-  const updatedSuffix = formatUpdatedSuffix(rankings?.[0]?.ranking_date);
+  const rankingDate = rankings?.[0]?.ranking_date;
+  const updatedSuffix = formatUpdatedSuffix(rankingDate);
 
   if (isLoading) return <WorldRankingsSkeleton />;
 
@@ -770,36 +795,46 @@ export const WorldRankingsHero = memo(function WorldRankingsHero() {
   return (
     <section className="px-4" aria-label="World Golf Rankings">
       {/* ─── Header ─────────────────────────────────────────────────────── */}
-      <div
-        style={{
-          display: 'flex',
-          alignItems: 'baseline',
-          justifyContent: 'space-between',
-          marginBottom: 14,
-        }}
-      >
-        <h2
+      <div style={{ marginBottom: 14 }}>
+        <button
+          onClick={() => navigate('/tourhub?tab=leaderboards')}
+          aria-label="Open all leaders"
           style={{
-            fontSize: 24,
-            fontWeight: 800,
-            letterSpacing: '-0.025em',
-            color: INK,
-            margin: 0,
+            background: 'transparent',
+            border: 'none',
+            padding: 0,
+            cursor: 'pointer',
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: 6,
+            marginBottom: 6,
           }}
         >
-          World Rankings
-        </h2>
-        <span
-          style={{
-            fontSize: 10,
+          <TrendingUp size={13} color={AMBER} strokeWidth={2.5} />
+          <span style={{
+            fontSize: 10.5,
             fontWeight: 700,
-            color: SLATE_400,
-            letterSpacing: '0.1em',
-            textTransform: 'uppercase',
-          }}
-        >
-          {updatedSuffix}
-        </span>
+            letterSpacing: '0.14em',
+            color: AMBER,
+          }}>
+            WORLD RANKINGS
+          </span>
+          <ChevronRight
+            size={11}
+            color={AMBER}
+            strokeWidth={2.5}
+            style={{ marginTop: 1 }}
+          />
+        </button>
+        <div style={{
+          fontSize: 13,
+          fontWeight: 700,
+          color: INK,
+          letterSpacing: '-0.005em',
+          lineHeight: 1.25,
+        }}>
+          {formatUpdatedSentence(rankingDate)}
+        </div>
       </div>
 
       {/* ─── Tour dropdown ──────────────────────────────────────────────── */}
