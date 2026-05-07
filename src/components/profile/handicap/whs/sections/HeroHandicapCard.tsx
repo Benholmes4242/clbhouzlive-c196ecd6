@@ -470,6 +470,10 @@ const HeroHandicapCard: React.FC<Props> = ({ connection }) => {
                 <stop offset="0%" stopColor="#F7931E" />
                 <stop offset="100%" stopColor="#FBBC2E" />
               </linearGradient>
+              <linearGradient id="heroInnerGreenTeal" x1="0" y1="0" x2="1" y2="0">
+                <stop offset="0%" stopColor="#059669" />
+                <stop offset="100%" stopColor="#14B8A6" />
+              </linearGradient>
             </defs>
             {/* Outer track */}
             <circle
@@ -496,7 +500,7 @@ const HeroHandicapCard: React.FC<Props> = ({ connection }) => {
             {showGreenArc && (
               <circle
                 cx={CX} cy={CY} r={R_INNER} fill="none"
-                stroke={GREEN} strokeWidth={STROKE_INNER}
+                stroke="url(#heroInnerGreenTeal)" strokeWidth={STROKE_INNER}
                 strokeDasharray={`${innerFillLength} ${C_INNER}`}
                 strokeLinecap="round"
                 transform={`rotate(-90 ${CX} ${CY})`}
@@ -923,7 +927,6 @@ interface MetricRingsRowProps {
 
 const MetricRingsRow: React.FC<MetricRingsRowProps> = ({ currentHcp, last20, history, delta30d }) => {
   const SLATE = '#475569';
-  const LILAC = '#A78BFA';
   const counterDiffs = (last20 ?? [])
     .filter((r: any) => r?.is_counter && typeof r?.handicap_differential === 'number')
     .slice(0, 8)
@@ -945,7 +948,7 @@ const MetricRingsRow: React.FC<MetricRingsRowProps> = ({ currentHcp, last20, his
     volatility = {
       label: 'VOLATILITY', sub: 'typical round-to-round',
       centre: `\u00B1${meanAbsDev.toFixed(1)}`,
-      fraction, color: LILAC, available: true,
+      fraction, color: 'url(#metricVolatility)', available: true,
     };
   }
 
@@ -958,7 +961,10 @@ const MetricRingsRow: React.FC<MetricRingsRowProps> = ({ currentHcp, last20, his
     };
   } else {
     const fraction = Math.min(1, Math.abs(delta30d) * 0.5);
-    const color = delta30d < -0.05 ? GREEN : delta30d > 0.05 ? RED : SLATE;
+    const color =
+      delta30d < -0.05 ? 'url(#metricMomentumGreen)' :
+      delta30d > 0.05 ? RED :
+      SLATE;
     const centre = delta30d < 0
       ? `\u2212${Math.abs(delta30d).toFixed(1)}`
       : delta30d > 0
@@ -985,16 +991,16 @@ const MetricRingsRow: React.FC<MetricRingsRowProps> = ({ currentHcp, last20, his
     if (range < 0.05) {
       trajectory = {
         label: 'TRAJECTORY', sub: 'in your 1y range', centre: 'BEST',
-        fraction: 1, color: GREEN, available: true,
+        fraction: 1, color: 'url(#metricTrajectory)', available: true,
       };
     } else {
       const positionPct = ((currentHcp - minH) / range) * 100; // 0=best
       const fraction = Math.max(0, Math.min(1, (100 - positionPct) / 100));
       let centre: string;
-      let color: string;
-      if (positionPct <= 20) { centre = 'BEST'; color = GREEN; }
-      else if (positionPct <= 60) { centre = 'MID'; color = SLATE; }
-      else { centre = 'FAR'; color = RED; }
+      if (positionPct <= 20) centre = 'BEST';
+      else if (positionPct <= 60) centre = 'MID';
+      else centre = 'FAR';
+      const color = 'url(#metricTrajectory)';
       trajectory = {
         label: 'TRAJECTORY', sub: 'in your 1y range', centre,
         fraction, color, available: true,
@@ -1013,6 +1019,23 @@ const MetricRingsRow: React.FC<MetricRingsRowProps> = ({ currentHcp, last20, his
       alignItems: 'stretch',
       position: 'relative',
     }}>
+      {/* Shared gradient defs for the three small rings */}
+      <svg width="0" height="0" style={{ position: 'absolute' }} aria-hidden="true">
+        <defs>
+          <linearGradient id="metricVolatility" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0%" stopColor="#7C3AED" />
+            <stop offset="100%" stopColor="#A78BFA" />
+          </linearGradient>
+          <linearGradient id="metricMomentumGreen" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0%" stopColor="#059669" />
+            <stop offset="100%" stopColor="#14B8A6" />
+          </linearGradient>
+          <linearGradient id="metricTrajectory" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0%" stopColor="#1E40AF" />
+            <stop offset="100%" stopColor="#0EA5E9" />
+          </linearGradient>
+        </defs>
+      </svg>
       <MetricRing spec={volatility} />
       <div style={{
         width: '0.5px', alignSelf: 'center', height: '60%',
