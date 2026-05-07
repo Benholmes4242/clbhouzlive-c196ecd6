@@ -36,7 +36,7 @@ import lakewoodNationalUpcoming from '@/assets/lakewood-national-upcoming.jpg';
 import volvoChinaOpenUpcoming from '@/assets/tours/volvo-china-open-upcoming.jpg';
 import { getPlayerHeadshotUrl } from '@/utils/playerHeadshot';
 import { format, differenceInDays, isToday, isTomorrow } from 'date-fns';
-import { formatPurse, PlayerAvatar, UpcomingCountdown } from '../shared/TourHeroHelpers';
+// formatPurse/PlayerAvatar/UpcomingCountdown no longer used here — moved into EditorialUpcomingHero
 import { EditorialLiveHero, LiveHeroSkeleton } from './EditorialLiveHero';
 import { EditorialResultsHero } from './EditorialResultsHero';
 import { EditorialUpcomingHero } from './EditorialUpcomingHero';
