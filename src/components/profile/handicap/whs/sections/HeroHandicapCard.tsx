@@ -20,7 +20,7 @@ const INK_40 = 'rgba(15,23,42,0.40)';
 const INK_10 = 'rgba(15,23,42,0.10)';
 const INK_06 = 'rgba(15,23,42,0.06)';
 const INK_04 = 'rgba(15,23,42,0.04)';
-const GREEN = '#059669';
+const GREEN = '#2DD4BF';
 const RED = '#9F1D1D';
 
 const MONTHS = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
@@ -471,8 +471,8 @@ const HeroHandicapCard: React.FC<Props> = ({ connection }) => {
                 <stop offset="100%" stopColor="#FBBC2E" />
               </linearGradient>
               <linearGradient id="heroInnerGreenTeal" x1="0" y1="0" x2="1" y2="0">
-                <stop offset="0%" stopColor="#059669" />
-                <stop offset="100%" stopColor="#14B8A6" />
+                <stop offset="0%" stopColor="#047857" />
+                <stop offset="100%" stopColor="#2DD4BF" />
               </linearGradient>
             </defs>
             {/* Outer track */}
@@ -1023,15 +1023,15 @@ const MetricRingsRow: React.FC<MetricRingsRowProps> = ({ currentHcp, last20, his
       <svg width="0" height="0" style={{ position: 'absolute' }} aria-hidden="true">
         <defs>
           <linearGradient id="metricVolatility" x1="0" y1="0" x2="1" y2="0">
-            <stop offset="0%" stopColor="#7C3AED" />
-            <stop offset="100%" stopColor="#A78BFA" />
+            <stop offset="0%" stopColor="#5B21B6" />
+            <stop offset="100%" stopColor="#C4B5FD" />
           </linearGradient>
           <linearGradient id="metricMomentumGreen" x1="0" y1="0" x2="1" y2="0">
-            <stop offset="0%" stopColor="#059669" />
-            <stop offset="100%" stopColor="#14B8A6" />
+            <stop offset="0%" stopColor="#047857" />
+            <stop offset="100%" stopColor="#2DD4BF" />
           </linearGradient>
           <linearGradient id="metricTrajectory" x1="0" y1="0" x2="1" y2="0">
-            <stop offset="0%" stopColor="#1E40AF" />
+            <stop offset="0%" stopColor="#1E3A8A" />
             <stop offset="100%" stopColor="#0EA5E9" />
           </linearGradient>
         </defs>
