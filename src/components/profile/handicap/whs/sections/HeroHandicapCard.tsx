@@ -894,11 +894,11 @@ const MetricRing: React.FC<{ spec: MetricCellSpec }> = ({ spec }) => {
           pointerEvents: 'none',
         }}>
           {spec.centreIcon === 'flame' ? (
-            <Flame size={20} color="#FB923C" strokeWidth={2.4} fill="#FB923C" />
+            <Flame size={20} color="#DC2626" strokeWidth={2.4} fill="#DC2626" />
           ) : spec.centreIcon === 'minus' ? (
             <Minus size={22} color="#475569" strokeWidth={3} />
           ) : spec.centreIcon === 'snowflake' ? (
-            <Snowflake size={20} color="#38BDF8" strokeWidth={2.4} />
+            <Snowflake size={20} color="#0EA5E9" strokeWidth={2.4} />
           ) : (
             <span style={{
               fontSize: isShortText ? 13 : 11,
@@ -938,6 +938,10 @@ interface MetricRingsRowProps {
 
 const MetricRingsRow: React.FC<MetricRingsRowProps> = ({ currentHcp, last20, history, delta30d }) => {
   const SLATE = '#475569';
+  const HOT_RED = '#DC2626';
+  const COLD_BLUE = '#0EA5E9';
+  const MOM_GREEN = '#22C55E';
+  const SCORE_BLUE = '#3B82F6';
 
   // FORM — direct port of the predictHandicap verdict from Trends.
   let form: MetricCellSpec;
@@ -959,9 +963,9 @@ const MetricRingsRow: React.FC<MetricRingsRowProps> = ({ currentHcp, last20, his
     else state = 'cold';
 
     const stateMap = {
-      hot:    { fraction: 1.00, color: 'url(#metricFormHot)',  centre: 'Hot',    icon: 'flame' as const,     sub: 'Hot over last 5' },
-      steady: { fraction: 0.50, color: SLATE,                  centre: 'Steady', icon: 'minus' as const,     sub: 'Steady over last 5' },
-      cold:   { fraction: 0.10, color: 'url(#metricFormCold)', centre: 'Cold',   icon: 'snowflake' as const, sub: 'Cold over last 5' },
+      hot:    { fraction: 1.00, color: HOT_RED,   centre: 'Hot',    icon: 'flame' as const,     sub: 'Hot over last 5' },
+      steady: { fraction: 0.50, color: SLATE,     centre: 'Steady', icon: 'minus' as const,     sub: 'Steady over last 5' },
+      cold:   { fraction: 0.10, color: COLD_BLUE, centre: 'Cold',   icon: 'snowflake' as const, sub: 'Cold over last 5' },
     };
     const meta = stateMap[state];
     form = {
@@ -982,7 +986,7 @@ const MetricRingsRow: React.FC<MetricRingsRowProps> = ({ currentHcp, last20, his
   } else {
     const fraction = Math.min(1, Math.abs(delta30d) * 0.5);
     const color =
-      delta30d < -0.05 ? 'url(#metricMomentumGreen)' :
+      delta30d < -0.05 ? MOM_GREEN :
       delta30d > 0.05 ? RED :
       SLATE;
     const centre = delta30d < 0
@@ -1022,7 +1026,7 @@ const MetricRingsRow: React.FC<MetricRingsRowProps> = ({ currentHcp, last20, his
     scoringAvg = {
       label: 'SCORING AVG', sub: `Over last ${last5.length}`,
       centre: avg.toFixed(1),
-      fraction, color: 'url(#metricScoringAvg)', available: true,
+      fraction, color: SCORE_BLUE, available: true,
     };
   }
 
@@ -1037,27 +1041,6 @@ const MetricRingsRow: React.FC<MetricRingsRowProps> = ({ currentHcp, last20, his
       alignItems: 'stretch',
       position: 'relative',
     }}>
-      {/* Shared gradient defs for the three small rings */}
-      <svg width="0" height="0" style={{ position: 'absolute' }} aria-hidden="true">
-        <defs>
-          <linearGradient id="metricFormHot" x1="0" y1="0" x2="1" y2="0">
-            <stop offset="0%" stopColor="#B91C1C" />
-            <stop offset="100%" stopColor="#FB923C" />
-          </linearGradient>
-          <linearGradient id="metricFormCold" x1="0" y1="0" x2="1" y2="0">
-            <stop offset="0%" stopColor="#1E3A8A" />
-            <stop offset="100%" stopColor="#38BDF8" />
-          </linearGradient>
-          <linearGradient id="metricMomentumGreen" x1="0" y1="0" x2="1" y2="0">
-            <stop offset="0%" stopColor="#15803D" />
-            <stop offset="100%" stopColor="#4ADE80" />
-          </linearGradient>
-          <linearGradient id="metricScoringAvg" x1="0" y1="0" x2="1" y2="0">
-            <stop offset="0%" stopColor="#1E40AF" />
-            <stop offset="100%" stopColor="#93C5FD" />
-          </linearGradient>
-        </defs>
-      </svg>
       <MetricRing spec={form} />
       <div style={{
         width: '0.5px', alignSelf: 'center', height: '60%',
