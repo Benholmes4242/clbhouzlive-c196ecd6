@@ -1,10 +1,10 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { ArrowDown, ArrowUp } from 'lucide-react';
+import { ArrowDown, ArrowUp, Flame, Minus, Snowflake } from 'lucide-react';
 import { useHandicapHistory, useHandicapTrend, useAllScores } from '@/lib/whs/hooks';
 import { whsDisplayedHcp, formatDisplayedHcp, fmtDiff } from '@/lib/whs/format';
 import type { WhsConnection, HandicapPoint } from '@/lib/whs/types';
 import { openTrophiesSheet } from '../trophiesSheetEvents';
-import { predictHandicap, type FormVerdict } from './trends/predictHandicap';
+import { predictHandicap } from './trends/predictHandicap';
 
 interface Props {
   connection: WhsConnection;
@@ -855,6 +855,7 @@ interface MetricCellSpec {
   label: string;
   sub: string;
   centre: string;
+  centreIcon?: 'flame' | 'minus' | 'snowflake' | null;
   fraction: number; // 0..1
   color: string;
   available: boolean;
@@ -891,15 +892,23 @@ const MetricRing: React.FC<{ spec: MetricCellSpec }> = ({ spec }) => {
           display: 'flex', alignItems: 'center', justifyContent: 'center',
           pointerEvents: 'none',
         }}>
-          <span style={{
-            fontSize: isShortText ? 13 : 11,
-            fontWeight: 700,
-            color: spec.available ? INK : INK_40,
-            fontVariantNumeric: 'tabular-nums',
-            lineHeight: 1,
-          }}>
-            {spec.centre}
-          </span>
+          {spec.centreIcon === 'flame' ? (
+            <Flame size={20} color="#FB923C" strokeWidth={2.4} fill="#FB923C" />
+          ) : spec.centreIcon === 'minus' ? (
+            <Minus size={22} color="#475569" strokeWidth={3} />
+          ) : spec.centreIcon === 'snowflake' ? (
+            <Snowflake size={20} color="#38BDF8" strokeWidth={2.4} />
+          ) : (
+            <span style={{
+              fontSize: isShortText ? 13 : 11,
+              fontWeight: 700,
+              color: spec.available ? INK : INK_40,
+              fontVariantNumeric: 'tabular-nums',
+              lineHeight: 1,
+            }}>
+              {spec.centre}
+            </span>
+          )}
         </div>
       </div>
       <div style={{
@@ -939,19 +948,25 @@ const MetricRingsRow: React.FC<MetricRingsRowProps> = ({ currentHcp, last20, his
       fraction: 0, color: INK_40, available: false,
     };
   } else {
-    const verdictMap: Record<Exclude<FormVerdict, 'unknown'>, {
-      fraction: number; color: string; centre: string;
-    }> = {
-      in_form:  { fraction: 1.00, color: 'url(#metricFormGreen)', centre: 'In form' },
-      building: { fraction: 0.75, color: 'url(#metricFormGreen)', centre: 'Building' },
-      steady:   { fraction: 0.50, color: SLATE,                   centre: 'Steady' },
-      slipping: { fraction: 0.25, color: 'url(#metricFormRed)',   centre: 'Slipping' },
-      cold:     { fraction: 0.10, color: 'url(#metricFormRed)',   centre: 'Cold' },
+    // Collapse 5 verdicts into 3 simpler states:
+    //   in_form, building → HOT
+    //   steady           → STEADY
+    //   slipping, cold   → COLD
+    let state: 'hot' | 'steady' | 'cold';
+    if (verdict === 'in_form' || verdict === 'building') state = 'hot';
+    else if (verdict === 'steady') state = 'steady';
+    else state = 'cold';
+
+    const stateMap = {
+      hot:    { fraction: 1.00, color: 'url(#metricFormHot)',  centre: 'Hot',    icon: 'flame' as const },
+      steady: { fraction: 0.50, color: SLATE,                  centre: 'Steady', icon: 'minus' as const },
+      cold:   { fraction: 0.10, color: 'url(#metricFormCold)', centre: 'Cold',   icon: 'snowflake' as const },
     };
-    const meta = verdictMap[verdict];
+    const meta = stateMap[state];
     form = {
       label: 'FORM', sub: 'last 5 vs counters',
       centre: meta.centre,
+      centreIcon: meta.icon,
       fraction: meta.fraction, color: meta.color, available: true,
     };
   }
@@ -1024,13 +1039,13 @@ const MetricRingsRow: React.FC<MetricRingsRowProps> = ({ currentHcp, last20, his
       {/* Shared gradient defs for the three small rings */}
       <svg width="0" height="0" style={{ position: 'absolute' }} aria-hidden="true">
         <defs>
-          <linearGradient id="metricFormGreen" x1="0" y1="0" x2="1" y2="0">
-            <stop offset="0%" stopColor="#047857" />
-            <stop offset="100%" stopColor="#2DD4BF" />
-          </linearGradient>
-          <linearGradient id="metricFormRed" x1="0" y1="0" x2="1" y2="0">
+          <linearGradient id="metricFormHot" x1="0" y1="0" x2="1" y2="0">
             <stop offset="0%" stopColor="#B91C1C" />
             <stop offset="100%" stopColor="#FB923C" />
+          </linearGradient>
+          <linearGradient id="metricFormCold" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0%" stopColor="#1E3A8A" />
+            <stop offset="100%" stopColor="#38BDF8" />
           </linearGradient>
           <linearGradient id="metricMomentumGreen" x1="0" y1="0" x2="1" y2="0">
             <stop offset="0%" stopColor="#047857" />
