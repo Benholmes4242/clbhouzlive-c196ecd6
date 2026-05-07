@@ -229,16 +229,16 @@ const CourseRows: React.FC<{ courses: CourseForm[] }> = ({ courses }) => {
   return (
     <div style={{ padding: '14px 16px 8px' }}>
       {courses.map((c, i) => {
-        const widthPct = (Math.abs(c.delta) / maxAbsDelta) * 50;
+        const widthPct = Math.max(4, (Math.abs(c.delta) / maxAbsDelta) * 100);
         const isLast = i === courses.length - 1;
         return (
-          <div key={c.course_id} style={{ marginBottom: isLast ? 0 : 18 }}>
+          <div key={c.course_id} style={{ marginBottom: isLast ? 0 : 16 }}>
             <div
               style={{
                 display: 'flex',
                 alignItems: 'baseline',
                 justifyContent: 'space-between',
-                marginBottom: 8,
+                marginBottom: 6,
                 gap: 12,
               }}
             >
@@ -293,52 +293,40 @@ const CourseRows: React.FC<{ courses: CourseForm[] }> = ({ courses }) => {
                 </span>
               </p>
             </div>
-            <div
-              style={{
-                position: 'relative',
-                height: 8,
-                background: 'rgba(15,23,42,0.04)',
-                borderRadius: 4,
-                overflow: 'visible',
-              }}
-            >
+            <div style={{ paddingLeft: 28 }}>
               <div
                 style={{
-                  position: 'absolute',
-                  left: '50%',
-                  top: -2,
-                  bottom: -2,
-                  width: 1,
-                  background: 'rgba(15,23,42,0.30)',
-                }}
-              />
-              <div
-                style={{
-                  position: 'absolute',
-                  top: 0,
-                  bottom: 0,
-                  background: deltaColor(c.delta),
-                  width: `${widthPct}%`,
-                  ...(c.delta < 0 ? { right: '50%' } : { left: '50%' }),
-                  borderRadius: 4,
-                }}
-              />
-            </div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 4 }}>
-              <span style={{ fontSize: 9, color: T.inkMute, fontFamily: FONT, fontWeight: 600 }}>
-                {c.rounds_played} rounds
-              </span>
-              <span
-                style={{
-                  fontSize: 9,
-                  color: T.inkMute,
-                  letterSpacing: '0.04em',
-                  fontFamily: FONT,
-                  fontWeight: 600,
+                  position: 'relative',
+                  height: 4,
+                  background: 'rgba(15,23,42,0.06)',
+                  borderRadius: 2,
+                  overflow: 'hidden',
                 }}
               >
-                {meaningLabel(c.delta)}
-              </span>
+                <div
+                  style={{
+                    position: 'absolute',
+                    top: 0,
+                    bottom: 0,
+                    left: 0,
+                    background: deltaColor(c.delta),
+                    width: `${widthPct}%`,
+                    borderRadius: 2,
+                  }}
+                />
+              </div>
+              <p
+                style={{
+                  margin: '6px 0 0',
+                  fontSize: 10,
+                  color: T.inkMute,
+                  fontFamily: FONT,
+                  fontWeight: 600,
+                  fontVariantNumeric: 'tabular-nums',
+                }}
+              >
+                {c.rounds_played} {c.rounds_played === 1 ? 'round' : 'rounds'}
+              </p>
             </div>
           </div>
         );
