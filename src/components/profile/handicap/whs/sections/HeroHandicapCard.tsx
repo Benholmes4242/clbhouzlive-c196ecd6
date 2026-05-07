@@ -834,5 +834,189 @@ const keyframes = `
 }
 `;
 
+// ── Metric rings row (CONSISTENCY / MOMENTUM / TRAJECTORY) ───────────────
+const MR_SIZE = 52;
+const MR_R = 23.5;
+const MR_STROKE = 5;
+const MR_C = 2 * Math.PI * MR_R;
+
+interface MetricCellSpec {
+  label: string;
+  sub: string;
+  centre: string;
+  fraction: number; // 0..1
+  color: string;
+  available: boolean;
+}
+
+const MetricRing: React.FC<{ spec: MetricCellSpec }> = ({ spec }) => {
+  const dash = spec.available ? spec.fraction * MR_C : 0;
+  const isShortText = spec.centre.length <= 3;
+  return (
+    <div style={{
+      flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center',
+      padding: '0 6px',
+    }}>
+      <div style={{ position: 'relative', width: MR_SIZE, height: MR_SIZE }}>
+        <svg width={MR_SIZE} height={MR_SIZE} viewBox={`0 0 ${MR_SIZE} ${MR_SIZE}`}>
+          <circle
+            cx={MR_SIZE / 2} cy={MR_SIZE / 2} r={MR_R}
+            fill="none" stroke={INK_06} strokeWidth={MR_STROKE}
+            vectorEffect="non-scaling-stroke"
+          />
+          {dash > 0 && (
+            <circle
+              cx={MR_SIZE / 2} cy={MR_SIZE / 2} r={MR_R}
+              fill="none" stroke={spec.color} strokeWidth={MR_STROKE}
+              strokeLinecap="round"
+              strokeDasharray={`${dash} ${MR_C}`}
+              transform={`rotate(-90 ${MR_SIZE / 2} ${MR_SIZE / 2})`}
+              vectorEffect="non-scaling-stroke"
+            />
+          )}
+        </svg>
+        <div style={{
+          position: 'absolute', inset: 0,
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          pointerEvents: 'none',
+        }}>
+          <span style={{
+            fontSize: isShortText ? 13 : 11,
+            fontWeight: 700,
+            color: spec.available ? INK : INK_40,
+            fontVariantNumeric: 'tabular-nums',
+            lineHeight: 1,
+          }}>
+            {spec.centre}
+          </span>
+        </div>
+      </div>
+      <div style={{
+        marginTop: 8,
+        fontSize: 9.5, fontWeight: 700, color: INK_55,
+        letterSpacing: '0.10em', textTransform: 'uppercase',
+        textAlign: 'center', whiteSpace: 'nowrap',
+      }}>
+        {spec.label}
+      </div>
+      <div style={{
+        marginTop: 2, fontSize: 10.5, color: INK_40, textAlign: 'center',
+      }}>
+        {spec.sub}
+      </div>
+    </div>
+  );
+};
+
+interface MetricRingsRowProps {
+  currentHcp: number;
+  last20: any[];
+  history: HandicapPoint[];
+  delta30d: number | null;
+}
+
+const MetricRingsRow: React.FC<MetricRingsRowProps> = ({ currentHcp, last20, history, delta30d }) => {
+  const counterDiffs = (last20 ?? [])
+    .filter((r: any) => r?.is_counter && typeof r?.handicap_differential === 'number')
+    .slice(0, 8)
+    .map((r: any) => r.handicap_differential as number);
+
+  // CONSISTENCY
+  let consistency: MetricCellSpec;
+  if (counterDiffs.length < 8) {
+    consistency = {
+      label: 'CONSISTENCY', sub: 'Awaiting data', centre: '—',
+      fraction: 0, color: INK_40, available: false,
+    };
+  } else {
+    const mean = counterDiffs.reduce((s, v) => s + v, 0) / counterDiffs.length;
+    const inBand = counterDiffs.filter((d) => Math.abs(d - mean) <= 0.5).length;
+    const pct = (inBand / counterDiffs.length) * 100;
+    const color = pct >= 70 ? GREEN : pct >= 40 ? AMBER : RED;
+    consistency = {
+      label: 'CONSISTENCY', sub: '% in band', centre: `${Math.round(pct)}`,
+      fraction: pct / 100, color, available: true,
+    };
+  }
+
+  // MOMENTUM
+  let momentum: MetricCellSpec;
+  if (delta30d == null) {
+    momentum = {
+      label: 'MOMENTUM', sub: 'Awaiting data', centre: '—',
+      fraction: 0, color: INK_40, available: false,
+    };
+  } else {
+    const fraction = Math.min(1, Math.abs(delta30d) * 0.5);
+    const color = delta30d <= -0.1 ? GREEN : delta30d >= 0.1 ? RED : AMBER;
+    const centre = delta30d < 0
+      ? `\u2212${Math.abs(delta30d).toFixed(1)}`
+      : delta30d > 0
+        ? `+${delta30d.toFixed(1)}`
+        : '0.0';
+    momentum = {
+      label: 'MOMENTUM', sub: '30d', centre,
+      fraction, color, available: true,
+    };
+  }
+
+  // TRAJECTORY
+  let trajectory: MetricCellSpec;
+  if (history.length < 4) {
+    trajectory = {
+      label: 'TRAJECTORY', sub: 'Awaiting data', centre: '—',
+      fraction: 0, color: INK_40, available: false,
+    };
+  } else {
+    const vals = history.map((p) => p.handicap_index);
+    const minH = Math.min(...vals);
+    const maxH = Math.max(...vals);
+    const range = maxH - minH;
+    if (range < 0.05) {
+      trajectory = {
+        label: 'TRAJECTORY', sub: 'of 1y range', centre: 'BEST',
+        fraction: 1, color: GREEN, available: true,
+      };
+    } else {
+      const positionPct = ((currentHcp - minH) / range) * 100; // 0=best
+      const fraction = Math.max(0, Math.min(1, (100 - positionPct) / 100));
+      let centre: string;
+      let color: string;
+      if (positionPct <= 20) { centre = 'BEST'; color = GREEN; }
+      else if (positionPct <= 60) { centre = 'MID'; color = AMBER; }
+      else { centre = 'FAR'; color = RED; }
+      trajectory = {
+        label: 'TRAJECTORY', sub: 'of 1y range', centre,
+        fraction, color, available: true,
+      };
+    }
+  }
+
+  return (
+    <div style={{
+      margin: '16px 0 12px',
+      background: '#fff',
+      border: `0.5px solid ${'rgba(15,23,42,0.08)'}`,
+      borderRadius: 14,
+      padding: '16px 8px',
+      display: 'flex',
+      alignItems: 'stretch',
+      position: 'relative',
+    }}>
+      <MetricRing spec={consistency} />
+      <div style={{
+        width: '0.5px', alignSelf: 'center', height: '60%',
+        background: 'rgba(15,23,42,0.08)',
+      }} />
+      <MetricRing spec={momentum} />
+      <div style={{
+        width: '0.5px', alignSelf: 'center', height: '60%',
+        background: 'rgba(15,23,42,0.08)',
+      }} />
+      <MetricRing spec={trajectory} />
+    </div>
+  );
+};
+
 export default HeroHandicapCard;
 export { HeroHandicapCard };
