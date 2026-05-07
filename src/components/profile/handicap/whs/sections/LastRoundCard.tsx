@@ -89,7 +89,7 @@ export const LastRoundCard: React.FC<Props> = ({ connectionId }) => {
       };
 
   return (
-    <section style={{ padding: '0 16px', marginBottom: 28, fontFamily: FONT_GEIST }}>
+    <section style={{ padding: '0 16px', marginTop: 24, marginBottom: 28, fontFamily: FONT_GEIST }}>
       {/* Eyebrow */}
       <div className="flex items-center justify-between mb-2">
         <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
