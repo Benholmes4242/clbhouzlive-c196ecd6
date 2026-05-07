@@ -240,7 +240,9 @@ Deno.serve(async (req) => {
 
     const latestScoreId = rounds[0].id as string;
 
-    const prompt = buildPrompt(roundsForPrompt, candidatesWithExpected, dateKey);
+    const trendSignals = computeTrendSignals(rounds as any[], roundsForPrompt);
+
+    const prompt = buildPrompt(roundsForPrompt, candidatesWithExpected, dateKey, trendSignals);
 
     const aiResp = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
@@ -296,6 +298,7 @@ Deno.serve(async (req) => {
     const test = validate(parsed.test_courses);
     const scoringProfile = String(parsed.scoring_profile ?? "").slice(0, 800);
     const roundsPattern = String(parsed.rounds_pattern ?? "").slice(0, 400);
+    const trendNarrative = String(parsed.trend_narrative ?? "").slice(0, 320);
 
     if (!scoringProfile) return json({ error: "Empty profile" }, 500);
 
@@ -334,6 +337,7 @@ Deno.serve(async (req) => {
       connection_id,
       scoring_profile: scoringProfile,
       rounds_pattern: roundsPattern,
+      trend_narrative: trendNarrative,
       suited_courses: enrichedSuited,
       test_courses: enrichedTest,
       generated_from_score_id: latestScoreId,
@@ -354,6 +358,7 @@ Deno.serve(async (req) => {
     return json({
       scoring_profile: scoringProfile,
       rounds_pattern: roundsPattern,
+      trend_narrative: trendNarrative,
       suited_courses: enrichedSuited,
       test_courses: enrichedTest,
       generated_at: new Date().toISOString(),
