@@ -975,7 +975,7 @@ const MetricRingsRow: React.FC<MetricRingsRowProps> = ({ currentHcp, last20, his
     const range = maxH - minH;
     if (range < 0.05) {
       trajectory = {
-        label: 'TRAJECTORY', sub: 'of 1y range', centre: 'BEST',
+        label: 'TRAJECTORY', sub: 'in your 1y range', centre: 'BEST',
         fraction: 1, color: GREEN, available: true,
       };
     } else {
@@ -984,10 +984,10 @@ const MetricRingsRow: React.FC<MetricRingsRowProps> = ({ currentHcp, last20, his
       let centre: string;
       let color: string;
       if (positionPct <= 20) { centre = 'BEST'; color = GREEN; }
-      else if (positionPct <= 60) { centre = 'MID'; color = AMBER; }
+      else if (positionPct <= 60) { centre = 'MID'; color = SLATE; }
       else { centre = 'FAR'; color = RED; }
       trajectory = {
-        label: 'TRAJECTORY', sub: 'of 1y range', centre,
+        label: 'TRAJECTORY', sub: 'in your 1y range', centre,
         fraction, color, available: true,
       };
     }
