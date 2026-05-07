@@ -247,7 +247,131 @@ function RoundTabs({
   );
 }
 
-// ── Skeleton ──────────────────────────────────────────────────────────────────
+// ── Hole Progression Sparkline (per-hole, light theme) ──────────────────────
+
+function HoleProgressionSparkline({
+  holes, accent, holesCompleted,
+}: {
+  holes: HoleScore[];
+  accent: string;
+  holesCompleted: number;
+}) {
+  const points: Array<{ x: number; y: number }> = [];
+  let running = 0;
+  holes.forEach((h, i) => {
+    if (h.scoreToPar == null) return;
+    running += h.scoreToPar;
+    points.push({ x: i, y: running });
+  });
+  if (points.length < 2) return null;
+  const W = 320, H = 50, PAD = 6;
+  const ys = points.map(p => p.y);
+  const yMin = Math.min(0, ...ys, -1);
+  const yMax = Math.max(0, ...ys, 1);
+  const sx = (i: number) => PAD + (i / 17) * (W - PAD * 2);
+  const sy = (y: number) => PAD + ((yMax - y) / (yMax - yMin)) * (H - PAD * 2);
+  const path = points.map((p, i) => `${i === 0 ? 'M' : 'L'} ${sx(p.x)} ${sy(p.y)}`).join(' ');
+  const last = points[points.length - 1];
+  const areaPath = `${path} L ${sx(last.x)} ${sy(yMin)} L ${sx(0)} ${sy(yMin)} Z`;
+  const totalToPar = last.y;
+
+  return (
+    <div style={{ flexShrink: 0, marginTop: 12 }}>
+      <div style={{
+        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+        marginBottom: 6,
+      }}>
+        <span style={{
+          fontSize: 9, fontWeight: 800, letterSpacing: '0.16em', color: slate400,
+        }}>
+          ROUND PROGRESSION
+        </span>
+        <span style={{
+          fontSize: 10, fontWeight: 700, color: accent,
+          fontVariantNumeric: 'tabular-nums',
+        }}>
+          {fmtScore(totalToPar)} thru {holesCompleted}
+        </span>
+      </div>
+      <svg viewBox={`0 0 ${W} ${H}`} width="100%" height={H} style={{ display: 'block' }}>
+        <defs>
+          <linearGradient id="hpsg" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor={accent} stopOpacity="0.18" />
+            <stop offset="100%" stopColor={accent} stopOpacity="0" />
+          </linearGradient>
+        </defs>
+        <line
+          x1={PAD} x2={W - PAD} y1={sy(0)} y2={sy(0)}
+          stroke={slate200} strokeWidth="1" strokeDasharray="2 3"
+        />
+        <path d={areaPath} fill="url(#hpsg)" />
+        <path
+          d={path} fill="none" stroke={accent}
+          strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
+          vectorEffect="non-scaling-stroke"
+        />
+        <circle
+          cx={sx(last.x)} cy={sy(last.y)} r="3.5"
+          fill={accent} stroke="#fff" strokeWidth="2"
+          vectorEffect="non-scaling-stroke"
+        />
+      </svg>
+    </div>
+  );
+}
+
+// ── Scorecard Round Stats (light theme) ─────────────────────────────────────
+
+function ScorecardRoundStats({
+  holes, accent,
+}: {
+  holes: HoleScore[];
+  accent: string;
+}) {
+  const played = holes.filter(h => h.scoreToPar != null);
+  if (played.length === 0) return null;
+  const birdies = played.filter(h => h.scoreToPar! <= -1).length;
+  const pars    = played.filter(h => h.scoreToPar === 0).length;
+  const bogeys  = played.filter(h => h.scoreToPar! >= 1).length;
+  const holesPlayed = played.length;
+  const cells: Array<{ v: string | number; label: string; color: string }> = [
+    { v: birdies,     label: 'BIRDIES', color: birdies > 0 ? accent : slate400 },
+    { v: pars,        label: 'PARS',    color: ink },
+    { v: bogeys,      label: 'BOGEYS',  color: bogeys > 0 ? danger : slate400 },
+    { v: holesPlayed, label: 'HOLES',   color: ink },
+  ];
+  return (
+    <div style={{
+      flexShrink: 0,
+      marginTop: 12,
+      display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)',
+      borderTop: `1px solid ${slate200}`,
+      borderBottom: `1px solid ${slate200}`,
+      padding: '10px 0',
+    }}>
+      {cells.map((c, i) => (
+        <div key={c.label} style={{
+          textAlign: 'center', minWidth: 0,
+          borderLeft: i > 0 ? `1px solid ${slate200}` : 'none',
+          padding: '0 4px',
+        }}>
+          <div style={{
+            fontSize: 22, fontWeight: 900, color: c.color, lineHeight: 1,
+            fontVariantNumeric: 'tabular-nums', letterSpacing: '-0.02em',
+          }}>
+            {c.v}
+          </div>
+          <div style={{
+            fontSize: 8, fontWeight: 800, color: slate400,
+            letterSpacing: '0.12em', marginTop: 5,
+          }}>
+            {c.label}
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
 
 function ScorecardSkeleton() {
   return (
