@@ -132,7 +132,7 @@ const Timeline: React.FC<{ timeline: StreaksData['timeline'] }> = ({ timeline })
             marginLeft: 'auto',
             width: `${fillPct}%`,
             height: 1,
-            background: `linear-gradient(90deg, transparent, ${AMBER})`,
+            background: `linear-gradient(90deg, transparent, ${AMBER}, ${GOLD})`,
           }}
         />
       </div>
