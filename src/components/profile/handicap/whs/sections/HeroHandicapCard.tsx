@@ -341,7 +341,7 @@ const HeroHandicapCard: React.FC<Props> = ({ connection }) => {
     return <span style={{ color: INK_40 }}>Steady form · last 5</span>;
   })();
 
-  // ── Status word (driven by 8-round form direction) ───────────────────────
+  // ── Status word (driven by 30-day form direction) ───────────────────────
   const statusWord =
     fallbackForm.direction === 'negative' && Math.abs(fallbackForm.formStrokes) > 0.5 ? 'EXCELLENT FORM'
     : fallbackForm.direction === 'negative' ? 'TRENDING DOWN'
