@@ -41,7 +41,7 @@ export const InviteToClbhouzV2: React.FC<Props> = ({ ownerUserId }) => {
             ? 'Loading…'
             : invitable.length === 0
               ? "Everyone's already on clbhouz 🎉"
-              : `${invitable.length} of your England Golf friends still missing`
+              : `Invite ${invitable.length} more golfers from your network`
         }
         right={
           <button

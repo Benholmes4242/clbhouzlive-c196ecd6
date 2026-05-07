@@ -54,10 +54,8 @@ export const FriendRoundCard: React.FC<Props> = ({ activity, onClick }) => {
     beatBy === null || beatBy < 0 ? 0 : beatBy < 2 ? 1 : beatBy < 4 ? 2 : 3;
 
   // Bottom-left status tag
-  let statusTag: { label: string; tone: 'invite' | 'sync' } | null = null;
-  if (!activity.is_clbhouz_user) {
-    statusTag = { label: 'INVITE TO UNLOCK MORE', tone: 'invite' };
-  } else if (!activity.friend_connection_id) {
+  let statusTag: { label: string; tone: 'sync' } | null = null;
+  if (activity.is_clbhouz_user && !activity.friend_connection_id) {
     statusTag = { label: 'ASK TO SYNC', tone: 'sync' };
   }
 
@@ -292,15 +290,11 @@ export const FriendRoundCard: React.FC<Props> = ({ activity, onClick }) => {
               fontSize: 9,
               fontWeight: 900,
               letterSpacing: '0.14em',
-              color: statusTag.tone === 'invite' ? T.amberDeep : T.inkMute,
+              color: T.inkMute,
               padding: '4px 8px',
               borderRadius: 6,
-              background:
-                statusTag.tone === 'invite' ? T.amberTint : 'rgba(15,23,42,0.05)',
-              border:
-                statusTag.tone === 'invite'
-                  ? `1px solid rgba(247,147,30,0.20)`
-                  : `1px solid ${T.hairline}`,
+              background: 'rgba(15,23,42,0.05)',
+              border: `1px solid ${T.hairline}`,
               flexShrink: 0,
             }}
           >

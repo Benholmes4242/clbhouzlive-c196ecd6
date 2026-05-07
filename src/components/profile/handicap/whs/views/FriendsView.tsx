@@ -1,5 +1,5 @@
 import React from 'react';
-import FeaturedFriendRoundHero from '../sections/featured-friend-round/FeaturedFriendRoundHero';
+import FriendsHeaderSection from '../sections/friends-header/FriendsHeaderSection';
 import RecentlyActiveRail from '../sections/recently-active/RecentlyActiveRail';
 import RecentlyPlayedFeed from '../sections/recently-played/RecentlyPlayedFeed';
 import RivalriesSection from '../sections/rivalries/RivalriesSection';
@@ -16,7 +16,7 @@ interface Props {
 export const FriendsView: React.FC<Props> = ({ userId, currentHandicap, connectionId, readOnly = false }) => {
   return (
     <div role="tabpanel" id="handicap-panel-friends" aria-labelledby="handicap-tab-friends">
-      <FeaturedFriendRoundHero userId={userId} />
+      <FriendsHeaderSection userId={userId} />
       <RecentlyActiveRail userId={userId} />
       <RecentlyPlayedFeed ownerUserId={userId} />
       <RivalriesSection userId={userId} />
