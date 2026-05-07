@@ -986,7 +986,7 @@ const MetricRingsRow: React.FC<MetricRingsRowProps> = ({ currentHcp, last20, his
   } else {
     const fraction = Math.min(1, Math.abs(delta30d) * 0.5);
     const color =
-      delta30d < -0.05 ? 'url(#metricMomentumGreen)' :
+      delta30d < -0.05 ? MOM_GREEN :
       delta30d > 0.05 ? RED :
       SLATE;
     const centre = delta30d < 0
