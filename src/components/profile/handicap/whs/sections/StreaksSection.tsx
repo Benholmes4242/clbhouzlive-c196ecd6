@@ -7,6 +7,8 @@ import { analyticsEvents } from '@/utils/analyticsEvents';
 
 const AMBER = '#F7931E';
 const AMBER_14 = 'rgba(247,147,30,0.14)';
+const GOLD = '#FBBC2E';
+const AMBER_GOLD_GRADIENT = `linear-gradient(90deg, ${AMBER} 0%, ${GOLD} 100%)`;
 const INK = '#0F172A';
 const INK_70 = '#475569';
 const INK_55 = 'rgba(15,23,42,0.55)';
