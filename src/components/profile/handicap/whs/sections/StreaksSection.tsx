@@ -405,39 +405,6 @@ export const StreaksSection: React.FC<Props> = ({ connectionId, userId }) => {
         <Timeline timeline={streaks.timeline} />
       </div>
 
-      {/* Demoted secondaries — single inline pill row */}
-      <div
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          background: '#fff',
-          border: `0.5px solid ${INK_10}`,
-          borderRadius: 12,
-          padding: '12px 16px',
-          marginBottom: 10,
-          fontFamily: FONT_GEIST,
-        }}
-      >
-        <SecondaryInline
-          label="CUTTING"
-          value={streaks.cutting.current}
-          bestText={formatBest(streaks.cutting)}
-        />
-        <div
-          style={{
-            width: '0.5px',
-            height: 30,
-            background: INK_10,
-            margin: '0 14px',
-            alignSelf: 'center',
-          }}
-        />
-        <SecondaryInline
-          label="COUNTER"
-          value={streaks.counter.current}
-          bestText={formatBest(streaks.counter)}
-        />
-      </div>
 
       {/* All-time records */}
       <button
