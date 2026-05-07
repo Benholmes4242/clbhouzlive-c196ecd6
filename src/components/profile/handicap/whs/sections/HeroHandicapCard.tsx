@@ -563,7 +563,7 @@ const HeroHandicapCard: React.FC<Props> = ({ connection }) => {
                     />
                     <circle cx={sparkPolyline.lastX} cy={sparkPolyline.lastY} r={2} fill={GREEN} />
                   </svg>
-                  <span style={{ fontSize: 9, color: INK_55, fontWeight: 500 }}>vs last 30d</span>
+                  
                 </>
               )}
             </div>
