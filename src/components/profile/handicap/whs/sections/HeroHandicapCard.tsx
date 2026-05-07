@@ -892,15 +892,23 @@ const MetricRing: React.FC<{ spec: MetricCellSpec }> = ({ spec }) => {
           display: 'flex', alignItems: 'center', justifyContent: 'center',
           pointerEvents: 'none',
         }}>
-          <span style={{
-            fontSize: isShortText ? 13 : 11,
-            fontWeight: 700,
-            color: spec.available ? INK : INK_40,
-            fontVariantNumeric: 'tabular-nums',
-            lineHeight: 1,
-          }}>
-            {spec.centre}
-          </span>
+          {spec.centreIcon === 'flame' ? (
+            <Flame size={20} color="#FB923C" strokeWidth={2.4} fill="#FB923C" />
+          ) : spec.centreIcon === 'minus' ? (
+            <Minus size={22} color="#475569" strokeWidth={3} />
+          ) : spec.centreIcon === 'snowflake' ? (
+            <Snowflake size={20} color="#38BDF8" strokeWidth={2.4} />
+          ) : (
+            <span style={{
+              fontSize: isShortText ? 13 : 11,
+              fontWeight: 700,
+              color: spec.available ? INK : INK_40,
+              fontVariantNumeric: 'tabular-nums',
+              lineHeight: 1,
+            }}>
+              {spec.centre}
+            </span>
+          )}
         </div>
       </div>
       <div style={{
