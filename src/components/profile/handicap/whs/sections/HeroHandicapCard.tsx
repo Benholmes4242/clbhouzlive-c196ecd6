@@ -4,6 +4,7 @@ import { useHandicapHistory, useHandicapTrend, useAllScores } from '@/lib/whs/ho
 import { whsDisplayedHcp, formatDisplayedHcp, fmtDiff } from '@/lib/whs/format';
 import type { WhsConnection, HandicapPoint } from '@/lib/whs/types';
 import { openTrophiesSheet } from '../trophiesSheetEvents';
+import { predictHandicap, type FormVerdict } from './trends/predictHandicap';
 
 interface Props {
   connection: WhsConnection;
@@ -927,28 +928,31 @@ interface MetricRingsRowProps {
 
 const MetricRingsRow: React.FC<MetricRingsRowProps> = ({ currentHcp, last20, history, delta30d }) => {
   const SLATE = '#475569';
-  const counterDiffs = (last20 ?? [])
-    .filter((r: any) => r?.is_counter && typeof r?.handicap_differential === 'number')
-    .slice(0, 8)
-    .map((r: any) => r.handicap_differential as number);
 
-  // VOLATILITY — concrete strokes-based measure of round-to-round spread.
-  // Always lilac (identity colour), regardless of value.
-  let volatility: MetricCellSpec;
-  if (counterDiffs.length < 8) {
-    volatility = {
-      label: 'VOLATILITY', sub: 'Awaiting data', centre: '—',
+  // FORM — direct port of the predictHandicap verdict from Trends.
+  let form: MetricCellSpec;
+  const formPrediction = predictHandicap(last20 ?? []);
+  const verdict = formPrediction.verdict;
+  if (verdict === 'unknown') {
+    form = {
+      label: 'FORM', sub: 'Awaiting data', centre: '—',
       fraction: 0, color: INK_40, available: false,
     };
   } else {
-    const mean = counterDiffs.reduce((s, v) => s + v, 0) / counterDiffs.length;
-    const meanAbsDev = counterDiffs.reduce((s, v) => s + Math.abs(v - mean), 0) / counterDiffs.length;
-    // Lower volatility is better. 0 strokes = full ring, 2.0+ = empty.
-    const fraction = Math.max(0, Math.min(1, 1 - (meanAbsDev / 2)));
-    volatility = {
-      label: 'VOLATILITY', sub: 'typical round-to-round',
-      centre: `\u00B1${meanAbsDev.toFixed(1)}`,
-      fraction, color: 'url(#metricVolatility)', available: true,
+    const verdictMap: Record<Exclude<FormVerdict, 'unknown'>, {
+      fraction: number; color: string; centre: string;
+    }> = {
+      in_form:  { fraction: 1.00, color: 'url(#metricFormGreen)', centre: 'In form' },
+      building: { fraction: 0.75, color: 'url(#metricFormGreen)', centre: 'Building' },
+      steady:   { fraction: 0.50, color: SLATE,                   centre: 'Steady' },
+      slipping: { fraction: 0.25, color: 'url(#metricFormRed)',   centre: 'Slipping' },
+      cold:     { fraction: 0.10, color: 'url(#metricFormRed)',   centre: 'Cold' },
+    };
+    const meta = verdictMap[verdict];
+    form = {
+      label: 'FORM', sub: 'last 5 vs counters',
+      centre: meta.centre,
+      fraction: meta.fraction, color: meta.color, available: true,
     };
   }
 
@@ -976,36 +980,34 @@ const MetricRingsRow: React.FC<MetricRingsRowProps> = ({ currentHcp, last20, his
     };
   }
 
-  // TRAJECTORY
-  let trajectory: MetricCellSpec;
-  if (history.length < 4) {
-    trajectory = {
-      label: 'TRAJECTORY', sub: 'Awaiting data', centre: '—',
+  // SCORING AVG — average adjusted_gross over last 10 rounds.
+  let scoringAvg: MetricCellSpec;
+  const grossList = (last20 ?? [])
+    .map((r: any) => (typeof r?.adjusted_gross === 'number' ? r.adjusted_gross : null))
+    .filter((v: number | null): v is number => v != null);
+
+  if (grossList.length < 5) {
+    scoringAvg = {
+      label: 'SCORING AVG', sub: 'Awaiting data', centre: '—',
       fraction: 0, color: INK_40, available: false,
     };
   } else {
-    const vals = history.map((p) => p.handicap_index);
-    const minH = Math.min(...vals);
-    const maxH = Math.max(...vals);
-    const range = maxH - minH;
-    if (range < 0.05) {
-      trajectory = {
-        label: 'TRAJECTORY', sub: 'in your 1y range', centre: 'BEST',
-        fraction: 1, color: 'url(#metricTrajectory)', available: true,
-      };
+    const last10 = grossList.slice(0, 10);
+    const avg = last10.reduce((s, v) => s + v, 0) / last10.length;
+    const last50 = grossList.slice(0, 50);
+    const best = Math.min(...last50);
+    const worst = Math.max(...last50);
+    let fraction: number;
+    if (worst === best) {
+      fraction = 0.5;
     } else {
-      const positionPct = ((currentHcp - minH) / range) * 100; // 0=best
-      const fraction = Math.max(0, Math.min(1, (100 - positionPct) / 100));
-      let centre: string;
-      if (positionPct <= 20) centre = 'BEST';
-      else if (positionPct <= 60) centre = 'MID';
-      else centre = 'FAR';
-      const color = 'url(#metricTrajectory)';
-      trajectory = {
-        label: 'TRAJECTORY', sub: 'in your 1y range', centre,
-        fraction, color, available: true,
-      };
+      fraction = Math.max(0, Math.min(1, (worst - avg) / (worst - best)));
     }
+    scoringAvg = {
+      label: 'SCORING AVG', sub: `last ${last10.length} of ${last50.length}`,
+      centre: avg.toFixed(1),
+      fraction, color: 'url(#metricScoringAvg)', available: true,
+    };
   }
 
   return (
@@ -1022,21 +1024,25 @@ const MetricRingsRow: React.FC<MetricRingsRowProps> = ({ currentHcp, last20, his
       {/* Shared gradient defs for the three small rings */}
       <svg width="0" height="0" style={{ position: 'absolute' }} aria-hidden="true">
         <defs>
-          <linearGradient id="metricVolatility" x1="0" y1="0" x2="1" y2="0">
-            <stop offset="0%" stopColor="#5B21B6" />
-            <stop offset="100%" stopColor="#C4B5FD" />
+          <linearGradient id="metricFormGreen" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0%" stopColor="#047857" />
+            <stop offset="100%" stopColor="#2DD4BF" />
+          </linearGradient>
+          <linearGradient id="metricFormRed" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0%" stopColor="#B91C1C" />
+            <stop offset="100%" stopColor="#FB923C" />
           </linearGradient>
           <linearGradient id="metricMomentumGreen" x1="0" y1="0" x2="1" y2="0">
             <stop offset="0%" stopColor="#047857" />
             <stop offset="100%" stopColor="#2DD4BF" />
           </linearGradient>
-          <linearGradient id="metricTrajectory" x1="0" y1="0" x2="1" y2="0">
-            <stop offset="0%" stopColor="#1E3A8A" />
-            <stop offset="100%" stopColor="#0EA5E9" />
+          <linearGradient id="metricScoringAvg" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0%" stopColor="#1E40AF" />
+            <stop offset="100%" stopColor="#38BDF8" />
           </linearGradient>
         </defs>
       </svg>
-      <MetricRing spec={volatility} />
+      <MetricRing spec={form} />
       <div style={{
         width: '0.5px', alignSelf: 'center', height: '60%',
         background: 'rgba(15,23,42,0.08)',
@@ -1046,7 +1052,7 @@ const MetricRingsRow: React.FC<MetricRingsRowProps> = ({ currentHcp, last20, his
         width: '0.5px', alignSelf: 'center', height: '60%',
         background: 'rgba(15,23,42,0.08)',
       }} />
-      <MetricRing spec={trajectory} />
+      <MetricRing spec={scoringAvg} />
     </div>
   );
 };
