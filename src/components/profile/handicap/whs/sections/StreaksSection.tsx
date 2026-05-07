@@ -76,13 +76,15 @@ const Timeline: React.FC<{ timeline: StreaksData['timeline'] }> = ({ timeline })
     ...Array(Math.max(0, 12 - timeline.length)).fill(null),
     ...timeline,
   ];
+  const activeCount = slots.filter((s) => s != null && !s.isUp).length;
+  const fillPct = (activeCount / 12) * 100;
   return (
     <div>
       <div
         style={{
           display: 'flex',
           gap: 3,
-          height: 22,
+          height: 36,
           alignItems: 'flex-end',
         }}
       >
@@ -102,20 +104,37 @@ const Timeline: React.FC<{ timeline: StreaksData['timeline'] }> = ({ timeline })
             );
           }
           const isUp = slot.isUp;
+          const activeBg = isFaded ? 'rgba(247,147,30,0.18)' : AMBER;
           return (
             <div
               key={slot.id}
               style={{
                 flex: 1,
                 height: isUp ? '40%' : '100%',
-                background: isUp ? INK_10 : AMBER,
+                background: isUp ? INK_10 : activeBg,
                 borderRadius: 3,
-                opacity: isFaded ? 0.4 : 1,
+                boxShadow:
+                  !isUp && !isFaded
+                    ? `inset 0 0 0 1px rgba(247,147,30,0.4), 0 0 8px rgba(247,147,30,0.30)`
+                    : 'none',
               }}
             />
           );
         })}
       </div>
+
+      {/* Continuation gradient line under the bar */}
+      <div style={{ marginTop: 6, width: '100%', display: 'flex' }}>
+        <div
+          style={{
+            marginLeft: 'auto',
+            width: `${fillPct}%`,
+            height: 1,
+            background: `linear-gradient(90deg, transparent, ${AMBER})`,
+          }}
+        />
+      </div>
+
       <div
         style={{
           display: 'flex',
