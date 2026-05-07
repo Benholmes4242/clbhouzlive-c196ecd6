@@ -39,6 +39,7 @@ import { format, differenceInDays, isToday, isTomorrow } from 'date-fns';
 import { formatPurse, PlayerAvatar, UpcomingCountdown } from '../shared/TourHeroHelpers';
 import { EditorialLiveHero, LiveHeroSkeleton } from './EditorialLiveHero';
 import { EditorialResultsHero } from './EditorialResultsHero';
+import { EditorialUpcomingHero } from './EditorialUpcomingHero';
 import { cn } from '@/lib/utils';
 import '@/styles/hero-glass.css';
 import { EchoContextualButton } from '@/components/echo/EchoContextualButton';
