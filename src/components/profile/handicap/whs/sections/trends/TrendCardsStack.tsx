@@ -15,8 +15,8 @@ interface Props {
 const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
 const INK = '#0F172A';
 const INK_55 = 'rgba(15,23,42,0.55)';
-const GREEN = '#059669';
-const RED = '#9F1239';
+const HOT_RED = '#DC2626';
+const COLD_BLUE = '#0EA5E9';
 const SLATE = '#475569';
 
 export const TrendCardsStack: React.FC<Props> = ({ connectionId, currentHandicap }) => {
@@ -25,11 +25,11 @@ export const TrendCardsStack: React.FC<Props> = ({ connectionId, currentHandicap
   const meta = VERDICT_META[prediction.verdict];
 
   const accent =
-    meta.theme === 'positive' ? GREEN : meta.theme === 'negative' ? RED : SLATE;
+    meta.theme === 'positive' ? HOT_RED : meta.theme === 'negative' ? COLD_BLUE : SLATE;
 
   const deltaStr =
     prediction.delta && prediction.delta !== 0
-      ? `${prediction.direction === 'up' ? '+' : '\u2212'}${Math.abs(prediction.delta).toFixed(1)} in ~5 rounds`
+      ? `${prediction.direction === 'up' ? '+' : '\u2212'}${Math.abs(prediction.delta).toFixed(1)} in 5 rounds`
       : null;
 
   const showHero = !prediction.insufficientData && !isLoading;

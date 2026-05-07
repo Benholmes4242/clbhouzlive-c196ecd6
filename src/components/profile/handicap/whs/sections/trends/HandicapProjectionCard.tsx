@@ -26,6 +26,12 @@ const T = {
   slateInk: '#334155',
   slateTint: 'rgba(15,23,42,0.04)',
   neutralTint: 'rgba(15,23,42,0.04)',
+  hotRed: '#DC2626',
+  hotRedInk: '#991B1B',
+  hotRedTint: 'rgba(220,38,38,0.10)',
+  coldBlue: '#0EA5E9',
+  coldBlueInk: '#0369A1',
+  coldBlueTint: 'rgba(14,165,233,0.10)',
 };
 const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
 
@@ -39,11 +45,11 @@ interface Theme {
 
 const THEMES: Record<'positive' | 'neutral' | 'negative', Theme> = {
   positive: {
-    headerBg: T.greenTint,
-    headerBorder: 'rgba(5,150,105,0.20)',
-    headerInk: T.greenInk,
-    accent: T.green,
-    accentInk: T.greenInk,
+    headerBg: T.hotRedTint,
+    headerBorder: 'rgba(220,38,38,0.20)',
+    headerInk: T.hotRedInk,
+    accent: T.hotRed,
+    accentInk: T.hotRedInk,
   },
   neutral: {
     headerBg: T.slateTint,
@@ -53,11 +59,11 @@ const THEMES: Record<'positive' | 'neutral' | 'negative', Theme> = {
     accentInk: T.slateInk,
   },
   negative: {
-    headerBg: T.redTint,
-    headerBorder: 'rgba(159,29,29,0.20)',
-    headerInk: T.redInk,
-    accent: T.red,
-    accentInk: T.redInk,
+    headerBg: T.coldBlueTint,
+    headerBorder: 'rgba(14,165,233,0.20)',
+    headerInk: T.coldBlueInk,
+    accent: T.coldBlue,
+    accentInk: T.coldBlueInk,
   },
 };
 
@@ -227,7 +233,7 @@ export const HandicapProjectionCard: React.FC<Props> = ({ scores }) => {
             textAnchor="end"
             style={{ fontSize: 10, fontWeight: 700, fill: theme.accentInk, fontFamily: FONT }}
           >
-            ~5 rounds out
+            5 rounds out
           </text>
         </svg>
       </div>
