@@ -55,7 +55,7 @@ function getPercentileCopy(percentile_top: number): CopyBand {
   if (percentile_top <= 50) {
     return {
       display: `Above the median`,
-      caption: `Better than half of Clbhouz members`,
+      caption: `Better than half of clbhouz members`,
       emphasis: 'soft',
     };
   }
@@ -68,7 +68,7 @@ function getPercentileCopy(percentile_top: number): CopyBand {
   }
   return {
     display: `Where you sit`,
-    caption: `Among Clbhouz members`,
+    caption: `Among clbhouz members`,
     emphasis: 'distribution_only',
   };
 }
@@ -283,7 +283,7 @@ const AvailableCard: React.FC<{
                   color: INK_70,
                 }}
               >
-                of Clbhouz members
+                of clbhouz members
               </span>
             </div>
           </>
@@ -300,7 +300,7 @@ const AvailableCard: React.FC<{
               lineHeight: 1.4,
             }}
           >
-            You're better than {100 - data.percentile_top}% of Clbhouz members.
+            You're better than {100 - data.percentile_top}% of clbhouz members.
           </p>
         )}
 
@@ -328,7 +328,7 @@ const AvailableCard: React.FC<{
               color: INK_70,
             }}
           >
-            All Clbhouz members
+            All clbhouz members
           </span>
           <span
             style={{
