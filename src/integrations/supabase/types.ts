@@ -14175,6 +14175,7 @@ export type Database = {
         Row: {
           connection_id: string
           date_key: string | null
+          friend_narrative: string
           generated_at: string
           generated_from_score_id: string | null
           rounds_pattern: string
@@ -14186,6 +14187,7 @@ export type Database = {
         Insert: {
           connection_id: string
           date_key?: string | null
+          friend_narrative?: string
           generated_at?: string
           generated_from_score_id?: string | null
           rounds_pattern?: string
@@ -14197,6 +14199,7 @@ export type Database = {
         Update: {
           connection_id?: string
           date_key?: string | null
+          friend_narrative?: string
           generated_at?: string
           generated_from_score_id?: string | null
           rounds_pattern?: string
