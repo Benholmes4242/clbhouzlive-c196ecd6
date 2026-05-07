@@ -1007,8 +1007,8 @@ const MetricRingsRow: React.FC<MetricRingsRowProps> = ({ currentHcp, last20, his
       fraction: 0, color: INK_40, available: false,
     };
   } else {
-    const last10 = grossList.slice(0, 10);
-    const avg = last10.reduce((s, v) => s + v, 0) / last10.length;
+    const last5 = grossList.slice(0, 5);
+    const avg = last5.reduce((s, v) => s + v, 0) / last5.length;
     const last50 = grossList.slice(0, 50);
     const best = Math.min(...last50);
     const worst = Math.max(...last50);
@@ -1019,7 +1019,7 @@ const MetricRingsRow: React.FC<MetricRingsRowProps> = ({ currentHcp, last20, his
       fraction = Math.max(0, Math.min(1, (worst - avg) / (worst - best)));
     }
     scoringAvg = {
-      label: 'SCORING AVG', sub: `last ${last10.length} of ${last50.length}`,
+      label: 'SCORING AVG', sub: `Over last ${last5.length}`,
       centre: avg.toFixed(1),
       fraction, color: 'url(#metricScoringAvg)', available: true,
     };
