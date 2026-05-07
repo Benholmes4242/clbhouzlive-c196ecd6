@@ -493,9 +493,9 @@ export function PlayerScorecardCard({
       {/* ─── ELASTIC HEADER: nav + caption + player block ─── */}
       <ElasticZone minH={120} maxH={240}>
         {(t) => {
-          const avatarSize = 44 + t * 14;
-          const nameSize = 18 + t * 8;
-          const scoreSize = 32 + t * 14;
+          const avatarSize = 50 + t * 18;   // 50 → 68
+          const nameSize   = 22 + t * 16;   // 22 → 38
+          const scoreSize  = 30 + t * 14;   // 30 → 44
           const accent = isCompleted ? gold : greenLive;
           const captionGap = 8 + t * 4;
 
@@ -765,7 +765,7 @@ export function PlayerScorecardCard({
       </div>
 
       {/* ─── CTA ─── */}
-      <div style={{ flex: 1, minHeight: 8 }} />
+      
       <HeroCTA
         label="View Full Player Profile"
         onClick={handleViewProfile}
