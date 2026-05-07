@@ -62,7 +62,7 @@ export const StablefordCard: React.FC<Props> = ({ scores }) => {
       <CardHeader onOpenSheet={() => setSheetOpen(true)} />
 
       <div style={{ display: 'flex', justifyContent: 'center', padding: '20px 16px 4px' }}>
-        <TriRing dist={dist} size={168} stroke={12} />
+        <TriRing dist={dist} size={320} stroke={22} />
       </div>
 
       <div style={{ display: 'flex', alignItems: 'stretch', padding: '0 4px 8px' }}>
