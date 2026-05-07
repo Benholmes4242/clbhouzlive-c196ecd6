@@ -81,7 +81,7 @@ Deno.serve(async (req) => {
     const { data: rounds, error: rErr } = await admin
       .from("whs_scores")
       .select(
-        "id, adjusted_gross, handicap_differential, play_date, course_id, course_rating, slope_rating, total_holes",
+        "id, adjusted_gross, handicap_differential, play_date, course_id, course_rating, slope_rating, total_holes, stableford_points",
       )
       .eq("connection_id", connection_id)
       .order("play_date", { ascending: false })
