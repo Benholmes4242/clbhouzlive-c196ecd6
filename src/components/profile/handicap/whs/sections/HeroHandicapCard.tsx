@@ -916,6 +916,7 @@ interface MetricRingsRowProps {
 }
 
 const MetricRingsRow: React.FC<MetricRingsRowProps> = ({ currentHcp, last20, history, delta30d }) => {
+  const SLATE = '#475569';
   const counterDiffs = (last20 ?? [])
     .filter((r: any) => r?.is_counter && typeof r?.handicap_differential === 'number')
     .slice(0, 8)
