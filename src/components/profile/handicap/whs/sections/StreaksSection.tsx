@@ -446,6 +446,6 @@ export const StreaksSection: React.FC<Props> = ({ connectionId, userId }) => {
       </button>
     </section>
   );
-
+};
 
 export default StreaksSection;
