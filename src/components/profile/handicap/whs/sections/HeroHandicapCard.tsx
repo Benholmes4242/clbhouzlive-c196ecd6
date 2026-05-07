@@ -938,6 +938,10 @@ interface MetricRingsRowProps {
 
 const MetricRingsRow: React.FC<MetricRingsRowProps> = ({ currentHcp, last20, history, delta30d }) => {
   const SLATE = '#475569';
+  const HOT_RED = '#DC2626';
+  const COLD_BLUE = '#0EA5E9';
+  const MOM_GREEN = '#22C55E';
+  const SCORE_BLUE = '#3B82F6';
 
   // FORM — direct port of the predictHandicap verdict from Trends.
   let form: MetricCellSpec;
