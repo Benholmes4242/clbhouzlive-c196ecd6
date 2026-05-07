@@ -348,63 +348,7 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
             exit={{ opacity: 0, y: 20 }}
           >
 
-            {/* ─── Tournament header — UPCOMING only. Live + Completed render their own caption strip inside the editorial hero. ─── */}
-            {!selectedPlayer && isUpcoming && (
-              <>
-                <div style={{
-                  flexShrink: 0,
-                  // Header sits below status bar + global header. Tighter on short screens.
-                  paddingTop: 'calc(max(env(safe-area-inset-top, 0px), 47px) + clamp(36px, 8vh, 65px))',
-                }}>
-                  <div style={{ padding: '0 16px' }}>
-                    {/* ZONE A — Tour + Dates row */}
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingBottom: 'clamp(6px, 1.2vh, 10px)', borderBottom: '1px solid rgba(255,255,255,0.18)', marginBottom: 'clamp(8px, 1.6vh, 12px)' }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                        <span style={{ background: '#fff', borderRadius: 4, padding: '2px 7px', fontSize: 9, fontWeight: 900, color: '#000', letterSpacing: '0.1em', textTransform: 'uppercase' as const }}>
-                          {getTourDisplayName(tournament.tourSlug)}
-                        </span>
-                        <span style={{ fontSize: 11, fontWeight: 600, color: 'rgba(255,255,255,0.75)', letterSpacing: '0.08em', textTransform: 'uppercase' as const }}>
-                          Upcoming
-                        </span>
-                      </div>
-                      {tournament.startDate && tournament.endDate && (
-                        <div style={{ textAlign: 'right' as const }}>
-                          <div style={{ fontSize: 12, fontWeight: 700, color: '#fff' }}>
-                            {new Date(tournament.startDate + 'T12:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
-                            {' – '}
-                            {new Date(tournament.endDate + 'T12:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
-                          </div>
-                          <div style={{ fontSize: 10, fontWeight: 600, color: '#F7931E', marginTop: 1 }}>
-                            {getStartLabel(tournament.startDate)}
-                          </div>
-                        </div>
-                      )}
-                    </div>
-
-                    {/* ZONE B — Tournament name + venue (fluid by viewport height) */}
-                    <Link {...(() => { const t = tournamentRoute(tournament.id, { kind: 'overview' }); return { to: t.to, state: t.state }; })()} className="block active:opacity-70 transition-opacity">
-                      <h2 style={{
-                        fontSize: 'clamp(26px, 4.8vh, 40px)', fontWeight: 900, color: '#fff',
-                        letterSpacing: '-0.03em', lineHeight: 0.95, margin: 0, marginBottom: 'clamp(6px, 1.2vh, 10px)',
-                        display: '-webkit-box',
-                        WebkitLineClamp: 2,
-                        WebkitBoxOrient: 'vertical' as const,
-                        overflow: 'hidden',
-                      }}>
-                        {tournament.name}
-                      </h2>
-                    </Link>
-                    <button
-                      onClick={(e) => { e.stopPropagation(); navigate(`/tourhub/courses?q=${encodeURIComponent(tournament.venueName || '')}`); }}
-                      className="active:opacity-70 transition-opacity cursor-pointer"
-                      style={{ fontSize: 'clamp(13px, 1.8vh, 15px)', fontWeight: 600, color: '#fff', background: 'none', border: 'none', padding: 0, textAlign: 'left' }}
-                    >
-                      {tournament.venueName}{tournament.venueCity ? ` · ${tournament.venueCity}` : ''}
-                    </button>
-                  </div>
-                </div>
-              </>
-            )}
+            {/* ─── Upcoming renders its own editorial hero (no chrome). ─── */}
 
             {/* ─── State-specific content — each section uses Capsule spring easing ─── */}
             <AnimatePresence mode="popLayout">
