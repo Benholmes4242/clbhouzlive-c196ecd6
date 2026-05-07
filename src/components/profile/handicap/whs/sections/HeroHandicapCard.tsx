@@ -4,6 +4,7 @@ import { useHandicapHistory, useHandicapTrend, useAllScores } from '@/lib/whs/ho
 import { whsDisplayedHcp, formatDisplayedHcp, fmtDiff } from '@/lib/whs/format';
 import type { WhsConnection, HandicapPoint } from '@/lib/whs/types';
 import { openTrophiesSheet } from '../trophiesSheetEvents';
+import { predictHandicap, type FormVerdict } from './trends/predictHandicap';
 
 interface Props {
   connection: WhsConnection;
