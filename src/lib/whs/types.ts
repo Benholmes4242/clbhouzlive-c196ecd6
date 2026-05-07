@@ -389,6 +389,26 @@ export interface FriendLeaderboardEntry {
   handicap_30d_delta: number | null;
 }
 
+// ─── Phase 7: Friend rounds since last Today visit ────────────────────────
+
+export interface FriendRoundSinceLastVisit {
+  friend_user_id: string | null;
+  friend_name: string;
+  friend_thumbnail_url: string | null;
+  friend_handicap_index: number | null;
+  last_round_played_at: string;
+  last_round_course_name: string | null;
+  is_clbhouz_user: boolean;
+}
+
+export interface FriendRoundsSinceLastVisitResult {
+  available: boolean;
+  is_first_visit?: boolean;
+  window_start?: string;
+  rounds?: FriendRoundSinceLastVisit[];
+  reason?: 'unauthenticated';
+}
+
 // ─── Phase 2B: Where You Stand peer comparison ────────────────────────────
 
 export type HandicapBucket =

@@ -18,6 +18,7 @@ import type {
   WhsFriendCourseBest,
   WhsFriendActivityWithImage,
   WhsFriendWindowRanking,
+  FriendRoundsSinceLastVisitResult,
 } from './types';
 
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL as string;
