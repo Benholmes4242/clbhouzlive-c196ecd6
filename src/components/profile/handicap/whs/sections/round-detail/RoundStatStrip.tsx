@@ -24,14 +24,14 @@ const Cell: React.FC<{
   label: string;
   value: string | number;
   color?: string;
-  divider?: boolean;
-}> = ({ label, value, color = INK, divider = false }) => (
+  border?: boolean;
+  sub?: string | null;
+}> = ({ label, value, color = INK, border = false, sub = null }) => (
   <div
     style={{
-      textAlign: 'center',
-      ...(divider
-        ? { borderLeft: `1px solid ${HAIRLINE}`, borderRight: `1px solid ${HAIRLINE}` }
-        : {}),
+      paddingLeft: border ? 14 : 0,
+      borderLeft: border ? `0.5px solid ${HAIRLINE}` : 'none',
+      textAlign: 'left',
     }}
   >
     <p
@@ -41,7 +41,7 @@ const Cell: React.FC<{
         fontWeight: 800,
         color: INK_MUTE,
         letterSpacing: '0.14em',
-        marginBottom: 4,
+        marginBottom: 5,
       }}
     >
       {label}
@@ -49,17 +49,29 @@ const Cell: React.FC<{
     <p
       style={{
         margin: 0,
-        fontSize: 28,
+        fontSize: 32,
         fontWeight: 800,
         color,
         fontVariantNumeric: 'tabular-nums',
         lineHeight: 1,
         fontFamily: FONT_DISPLAY,
-        letterSpacing: '-0.02em',
+        letterSpacing: '-0.04em',
       }}
     >
       {value}
     </p>
+    {sub && (
+      <p
+        style={{
+          margin: '4px 0 0',
+          fontSize: 10.5,
+          color: 'rgba(15,23,42,0.40)',
+          fontWeight: 500,
+        }}
+      >
+        {sub}
+      </p>
+    )}
   </div>
 );
 
@@ -67,16 +79,25 @@ export const RoundStatStrip: React.FC<Props> = ({ gross, stableford, differentia
   return (
     <div
       style={{
+        margin: '-44px 16px 0',
+        position: 'relative',
+        zIndex: 2,
+        background: '#fff',
+        borderRadius: 18,
+        padding: '20px 18px',
+        boxShadow:
+          '0 8px 32px rgba(15,23,42,0.12), 0 1px 2px rgba(15,23,42,0.04)',
         display: 'grid',
         gridTemplateColumns: '1fr 1fr 1fr',
-        padding: '16px 4px',
       }}
     >
-      <Cell label="GROSS" value={gross ?? '—'} />
-      <Cell label="STABLEFORD" value={stableford ?? '—'} divider />
+      <Cell label="GROSS" value={gross ?? '—'} sub={null} />
+      <Cell label="STABLEFORD" value={stableford ?? '—'} sub="points" border />
       <Cell
-        label="DIFF"
+        label="DIFFERENTIAL"
         value={fmtDiff(differential)}
+        sub="vs course"
+        border
         color={differential !== null && differential < 0 ? GREEN : INK}
       />
     </div>
