@@ -278,10 +278,7 @@ export const StreaksSection: React.FC<Props> = ({ connectionId, userId }) => {
 
   if (!streaks) return null;
 
-  const allZero =
-    streaks.noUp.current === 0 &&
-    streaks.cutting.current === 0 &&
-    streaks.counter.current === 0;
+  const allZero = streaks.noUp.current === 0;
   if (allZero && totalRounds < 3) return null;
 
   const handleRecordsTap = () => {
