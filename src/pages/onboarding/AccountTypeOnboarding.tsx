@@ -200,12 +200,125 @@ const AccountTypeOnboarding: React.FC = () => {
   };
 
   const handleBack = () => {
-    if (step === 'college') {
+    if (step === 'demographics') {
       setStep('account-type');
+    } else if (step === 'college') {
+      setStep('demographics');
     } else if (step === 'england-golf') {
-      setStep(selectedType === 'individual' ? 'college' : 'account-type');
+      setStep(selectedType === 'individual' ? 'college' : 'demographics');
     }
   };
+
+  // Demographics step (all account types)
+  if (step === 'demographics') {
+    return (
+      <PageRoot className="min-h-screen bg-background flex flex-col">
+        <header className="border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+          <div className="px-4 md:container md:mx-auto">
+            <div className="flex items-center justify-center h-16">
+              <img
+                src="/lovable-uploads/b3fc8551-2b91-49af-b2ef-1dd493276207.png"
+                alt="clbhouz Logo"
+                className="h-10 w-auto object-contain"
+              />
+            </div>
+          </div>
+        </header>
+
+        <main className="flex-1 px-4 md:container md:mx-auto py-8 max-w-lg">
+          <div className="space-y-6">
+            <button
+              onClick={handleBack}
+              disabled={submitting}
+              className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground transition-colors"
+            >
+              <ArrowLeft className="h-4 w-4" />
+              Back
+            </button>
+
+            <div className="text-center space-y-2">
+              <h1 className="text-2xl font-semibold tracking-tight">
+                Tell us a bit about yourself
+              </h1>
+              <p className="text-muted-foreground">
+                We use this for fair peer comparisons and country leaderboards. You can change it later in Settings.
+              </p>
+            </div>
+
+            {/* Gender */}
+            <div className="space-y-2">
+              <Label className="text-sm font-medium text-foreground">Gender *</Label>
+              <RadioGroup
+                value={gender ?? ''}
+                onValueChange={(v) => setGender(v as Gender)}
+                className="grid grid-cols-1 gap-2"
+              >
+                {[
+                  { value: 'male', label: 'Male' },
+                  { value: 'female', label: 'Female' },
+                  { value: 'prefer_not_to_say', label: 'Prefer not to say' },
+                ].map((opt) => (
+                  <label
+                    key={opt.value}
+                    htmlFor={`gender-${opt.value}`}
+                    className={`flex items-center gap-3 p-3 rounded-sq-md border-2 cursor-pointer transition-colors ${
+                      gender === opt.value
+                        ? 'border-primary bg-primary/5'
+                        : 'border-border hover:bg-muted/30'
+                    }`}
+                  >
+                    <RadioGroupItem id={`gender-${opt.value}`} value={opt.value} />
+                    <span className="text-sm text-foreground">{opt.label}</span>
+                  </label>
+                ))}
+              </RadioGroup>
+              <p className="text-xs text-muted-foreground">
+                Selecting "Prefer not to say" will exclude you from the peer comparison feature.
+              </p>
+            </div>
+
+            {/* Country */}
+            <div className="space-y-2">
+              <Label className="text-sm font-medium text-foreground">Country *</Label>
+              <Select value={country ?? ''} onValueChange={(v) => setCountry(v || null)}>
+                <SelectTrigger className="w-full h-12">
+                  <SelectValue placeholder="Select your country" />
+                </SelectTrigger>
+                <SelectContent>
+                  {ONBOARDING_COUNTRIES.map((c) =>
+                    c === '──────────' ? (
+                      <div
+                        key="sep"
+                        className="my-1 h-px bg-border mx-2"
+                        aria-hidden="true"
+                      />
+                    ) : (
+                      <SelectItem key={c} value={c}>
+                        {c}
+                      </SelectItem>
+                    )
+                  )}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="pt-2">
+              <Button
+                onClick={handleDemographicsContinue}
+                disabled={!gender || !country || submitting}
+                className="w-full"
+                variant="gradient-primary"
+                size="lg"
+              >
+                Continue
+              </Button>
+            </div>
+          </div>
+        </main>
+      </PageRoot>
+    );
+  }
+
 
   // College selection step (for individual accounts)
   if (step === 'college') {
