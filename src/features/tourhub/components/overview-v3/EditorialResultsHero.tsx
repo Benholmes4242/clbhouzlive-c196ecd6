@@ -1,19 +1,24 @@
 /**
  * EditorialResultsHero — expanded-state Tour Hero "Results" surface.
  *
- * Source of truth: TOUR_HERO_AND_SCORECARD_BRIEF (Phase 3) + R1 follow-up.
- * Mirrors EditorialLiveHero's editorial language but tuned for the post-event
- * narrative: Champion celebration card, score progression, scoring stats grid,
- * "Also on the podium" block, final leaderboard, ticker.
+ * C2 Editorial · Elastic redesign:
+ * - Light theme on #F8FAFC, 70dvh hard cap, no internal scroll
+ * - ElasticZone: eyebrow + status + title + venue (above CHAMPION divider)
+ * - Below: CHAMPION block + Runner-up strip + 5-col By-the-Numbers + CTA
  */
 
-import React, { useEffect, useCallback } from 'react';
+import React, { useCallback, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ChevronRight, MapPin, Trophy } from 'lucide-react';
+import { Trophy } from 'lucide-react';
 import { tournamentRoute } from '../../routes';
-import { HeroAtmosphere } from '../shared/HeroAtmosphere';
 import { Shimmer } from '../shared/Shimmer';
-import { RoundSparkline } from '../shared/RoundSparkline';
+import { ElasticZone } from '../shared/ElasticZone';
+import {
+  TournamentTitleBlock,
+  TourBadge,
+  StatusBadge,
+} from '../shared/TournamentTitleBlock';
+import { HeroCTA } from '../shared/HeroCTA';
 
 import { useWinnerScorecardStats } from '../../hooks/useWinnerScorecardStats';
 import type { TournamentFinisher } from '../../hooks/useTournamentLeadersWinners';
@@ -21,13 +26,10 @@ import type { PlayerInfo } from '@/components/tourhub/PlayerScorecardCard';
 import { getPlayerHeadshotUrl } from '@/utils/playerHeadshot';
 import { PlayerSilhouette } from '@/components/ui/PlayerSilhouette';
 import {
-  navy, navyMid, ink,
-  inkSoft, inkFaint, inkGhost,
-  hairlineDark, hairlineMid,
-  amber, gold, greenLive, danger,
-  fmtScore, fmtScoreSign,
+  ink, gold, amber,
+  lightBg, slate100, slate200, slate300, slate400, slate500,
+  fmtScore,
 } from '../../utils/heroAtmosphere';
-import { StatsGrid } from '../shared/StatsGrid';
 
 const COUNTRY_TO_FLAG: Record<string, string> = {
   'UNITED STATES': '🇺🇸', 'USA': '🇺🇸',
@@ -39,19 +41,16 @@ const COUNTRY_TO_FLAG: Record<string, string> = {
   'THAILAND': '🇹🇭', 'NEW ZEALAND': '🇳🇿', 'ARGENTINA': '🇦🇷',
   'COLOMBIA': '🇨🇴', 'CHILE': '🇨🇱', 'ITALY': '🇮🇹', 'BELGIUM': '🇧🇪',
 };
-
 function flagFor(country: string | null | undefined): string {
   if (!country) return '';
   return COUNTRY_TO_FLAG[country.toUpperCase()] ?? '';
 }
-
 function getInitials(name: string | null | undefined): string {
   if (!name) return '';
   const parts = name.trim().split(/\s+/);
   if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
   return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
 }
-
 function getTourCode(slug: string): string {
   const map: Record<string, string> = {
     pga: 'PGA', euro: 'DPW', lpga: 'LPGA', liv: 'LIV',
@@ -60,543 +59,300 @@ function getTourCode(slug: string): string {
   return map[slug] ?? slug.toUpperCase();
 }
 
-// ---------- Champion celebration card -------------------------------------
+// ---------- CHAMPION block --------------------------------------------------
 
-interface ChampionHeroProps {
-  winner: TournamentFinisher;
-  tourSlug: string;
-  marginLabel: string | null;
-  onTap?: () => void;
-}
-
-function ChampionHero({ winner, tourSlug, marginLabel, onTap }: ChampionHeroProps) {
-  const [imgErr, setImgErr] = React.useState(false);
+function ChampionBlock({
+  winner, tourSlug, marginLabel, onTap,
+}: {
+  winner: TournamentFinisher; tourSlug: string;
+  marginLabel: string | null; onTap?: () => void;
+}) {
+  const [imgErr, setImgErr] = useState(false);
   const fullName = winner.fullName || winner.displayName;
   const flag = flagFor(winner.country);
   const tourCode = winner.tourCode ?? tourSlug;
   const photoUrl = getPlayerHeadshotUrl(fullName, tourCode, winner.headshotOverride ?? undefined);
 
-  const winnerRounds: (number | null)[] = [winner.round1, winner.round2, winner.round3, winner.round4];
-
   return (
     <div
       style={{
         position: 'relative',
-        background: 'linear-gradient(180deg, rgba(255,184,0,0.12) 0%, rgba(255,184,0,0.04) 100%)',
-        border: '1px solid rgba(255,184,0,0.25)',
-        borderRadius: 18,
-        padding: '14px 14px 12px',
-        marginBottom: 12,
+        flexShrink: 0,
+        borderTop: `1px solid ${slate200}`,
+        borderBottom: `1px solid ${slate200}`,
+        padding: '14px 0',
         overflow: 'hidden',
       }}
     >
-      {/* Trophy watermark */}
       <Trophy
-        size={120}
+        size={90}
         strokeWidth={1}
+        aria-hidden="true"
         style={{
-          position: 'absolute', right: -20, top: -10,
-          color: gold, opacity: 0.05, pointerEvents: 'none',
+          position: 'absolute', right: -8, top: -10,
+          color: gold, opacity: 0.06, pointerEvents: 'none',
         }}
       />
 
-      {/* CHAMPION eyebrow */}
-      <div
-        style={{
-          display: 'flex', alignItems: 'center', gap: 6, marginBottom: 10,
-          position: 'relative', zIndex: 1,
-        }}
-      >
+      <div style={{
+        position: 'relative', zIndex: 1,
+        display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8,
+      }}>
         <Trophy size={11} color={gold} strokeWidth={2.5} />
         <span style={{ fontSize: 9, fontWeight: 800, letterSpacing: '0.18em', color: gold }}>
           CHAMPION
         </span>
-        {flag && <span style={{ fontSize: 12 }}>{flag}</span>}
-        {winner.country && (
-          <span style={{ fontSize: 9, fontWeight: 700, letterSpacing: '0.12em', color: inkFaint }}>
-            {winner.country.toUpperCase()}
-          </span>
+        {marginLabel && (
+          <>
+            <span style={{ fontSize: 10, color: slate300 }}>·</span>
+            <span style={{ fontSize: 10, fontWeight: 600, color: slate500 }}>
+              {marginLabel}
+            </span>
+          </>
         )}
       </div>
 
-      {/* Headshot + name + score */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 12, position: 'relative', zIndex: 1 }}>
+      <div style={{
+        position: 'relative', zIndex: 1,
+        display: 'flex', alignItems: 'center', gap: 12,
+      }}>
         <button
           type="button"
           onClick={onTap}
-          className="active:opacity-70 transition-opacity"
           style={{
-            position: 'relative', flexShrink: 0,
             background: 'transparent', border: 'none', padding: 0,
-            cursor: onTap ? 'pointer' : 'default',
+            cursor: onTap ? 'pointer' : 'default', flexShrink: 0,
           }}
         >
-          <div
-            style={{
-              width: 64, borderRadius: '34%', aspectRatio: '1 / 1.05',
-              border: `2px solid ${gold}`,
-              background: 'rgba(0,0,0,0.3)',
-              overflow: 'hidden',
-              boxShadow: '0 0 18px rgba(255,184,0,0.18)',
-            }}
-          >
+          <div style={{
+            width: 46, aspectRatio: '1 / 1.05', borderRadius: '34%',
+            border: `2px solid ${gold}`, background: slate100,
+            overflow: 'hidden',
+          }}>
             {photoUrl && !imgErr ? (
               <img
-                src={photoUrl}
-                alt=""
-                onError={() => setImgErr(true)}
+                src={photoUrl} alt="" onError={() => setImgErr(true)}
                 style={{
                   width: '100%', height: '100%',
                   objectFit: 'cover', objectPosition: 'center 18%',
                 }}
               />
             ) : (
-              <PlayerSilhouette size={32} />
+              <div style={{
+                width: '100%', height: '100%',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+              }}>
+                <PlayerSilhouette size={26} />
+              </div>
             )}
-          </div>
-          <div
-            style={{
-              position: 'absolute', bottom: -2, right: -2,
-              width: 22, height: 22, borderRadius: '50%',
-              background: gold, color: ink,
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              border: `2px solid ${navyMid}`,
-            }}
-          >
-            <Trophy size={10} strokeWidth={2.5} />
           </div>
         </button>
 
         <div style={{ flex: 1, minWidth: 0 }}>
-          <button
-            type="button"
-            onClick={onTap}
-            className="active:opacity-70 transition-opacity"
-            style={{
-              background: 'transparent', border: 'none', padding: 0, textAlign: 'left',
-              cursor: onTap ? 'pointer' : 'default', display: 'block', width: '100%',
-            }}
-          >
-            <div
-              style={{
-                fontSize: 22, fontWeight: 800, letterSpacing: '-0.025em',
-                color: '#fff', lineHeight: 1.05,
-                whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
-              }}
-            >
-              {fullName}
-            </div>
-          </button>
-          {marginLabel && (
-            <div
-              style={{
-                fontSize: 11, color: gold, marginTop: 4, fontWeight: 700,
-              }}
-            >
-              {marginLabel}
+          <div style={{
+            fontSize: 16, fontWeight: 800, color: ink,
+            letterSpacing: '-0.02em', lineHeight: 1.05,
+            whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
+          }}>
+            {fullName}
+          </div>
+          {(flag || winner.country) && (
+            <div style={{
+              marginTop: 3, display: 'flex', alignItems: 'center', gap: 5,
+              fontSize: 10.5, color: slate500, fontWeight: 600,
+            }}>
+              {flag && <span aria-hidden="true">{flag}</span>}
+              {winner.country && (
+                <span style={{ letterSpacing: '0.06em' }}>
+                  {winner.country.toUpperCase()}
+                </span>
+              )}
             </div>
           )}
         </div>
 
-        <div style={{ textAlign: 'right' }}>
-          <div
-            style={{
-              fontSize: 38, fontWeight: 800, letterSpacing: '-0.04em',
-              color: gold, lineHeight: 0.9,
-              fontVariantNumeric: 'tabular-nums',
-            }}
-          >
-            {fmtScore(winner.score)}
+        <div style={{ textAlign: 'right', flexShrink: 0 }}>
+          <div style={{
+            fontSize: 32, fontWeight: 900, letterSpacing: '-0.04em',
+            color: ink, lineHeight: 0.9,
+            fontVariantNumeric: 'tabular-nums',
+          }}>
+            {winner.displayScore || fmtScore(winner.score)}
           </div>
-          <div style={{ fontSize: 9, color: inkFaint, marginTop: 4, letterSpacing: '0.06em' }}>
-            FINAL
+          <div style={{
+            marginTop: 4, fontSize: 8, fontWeight: 800, letterSpacing: '0.14em',
+            color: slate400,
+          }}>
+            TO PAR
           </div>
         </div>
       </div>
-
-      {/* Round-by-round inline strip */}
-      {winnerRounds.some((r) => r != null) && (
-        <div
-          style={{
-            marginTop: 14, paddingTop: 14,
-            borderTop: '1px solid rgba(255,184,0,0.15)',
-            display: 'flex', position: 'relative', zIndex: 1,
-          }}
-        >
-          {winnerRounds.map((r, i) =>
-            r == null ? null : (
-              <div
-                key={i}
-                style={{
-                  flex: 1, padding: '0 4px',
-                  borderLeft: i > 0 ? '1px solid rgba(255,184,0,0.15)' : 'none',
-                  textAlign: 'center',
-                }}
-              >
-                <div
-                  style={{
-                    fontSize: 9, fontWeight: 700, letterSpacing: '0.1em',
-                    color: inkFaint, marginBottom: 3,
-                  }}
-                >
-                  R{i + 1}
-                </div>
-                <div
-                  style={{
-                    fontSize: 14, fontWeight: 800, color: '#fff',
-                    fontVariantNumeric: 'tabular-nums',
-                  }}
-                >
-                  {fmtScore(r)}
-                </div>
-              </div>
-            ),
-          )}
-        </div>
-      )}
     </div>
   );
 }
 
-// ---------- Final leaderboard row -----------------------------------------
+// ---------- Runner-up strip -------------------------------------------------
 
-function FinalLeaderboardRow({
-  finisher,
-  isWinner,
-  isTied,
-  tourSlug,
-  onTap,
+function RunnerUpStrip({
+  finisher, tourSlug, onTap,
 }: {
-  finisher: TournamentFinisher;
-  isWinner: boolean;
-  isTied: boolean;
-  tourSlug: string;
+  finisher: TournamentFinisher; tourSlug: string;
   onTap?: (f: TournamentFinisher) => void;
 }) {
-  const [imgErr, setImgErr] = React.useState(false);
+  const [imgErr, setImgErr] = useState(false);
   const fullName = finisher.fullName || finisher.displayName;
   const tourCode = finisher.tourCode ?? tourSlug;
   const photoUrl = getPlayerHeadshotUrl(fullName, tourCode, finisher.headshotOverride ?? undefined);
-  const r4 = finisher.round4;
+  const flag = flagFor(finisher.country);
 
   return (
     <button
       type="button"
       onClick={() => onTap?.(finisher)}
       style={{
-        display: 'grid',
-        gridTemplateColumns: '32px 1fr 56px 44px',
-        alignItems: 'center',
-        padding: '11px 0',
-        borderTop: `1px solid ${hairlineDark}`,
-        background: 'transparent',
-        border: 'none',
-        borderBottom: 'none',
-        borderLeft: 'none',
-        borderRight: 'none',
-        width: '100%',
-        textAlign: 'left',
-        cursor: onTap ? 'pointer' : 'default',
-        color: '#fff',
-      }}
-    >
-      <span
-        style={{
-          fontSize: 11, color: isWinner ? gold : inkFaint,
-          fontWeight: isWinner ? 800 : 600,
-          fontVariantNumeric: 'tabular-nums',
-        }}
-      >
-        {isTied ? `T${finisher.position}` : finisher.position}
-      </span>
-      <span style={{ display: 'flex', alignItems: 'center', gap: 8, minWidth: 0 }}>
-        {photoUrl && !imgErr ? (
-          <img
-            src={photoUrl}
-            alt=""
-            onError={() => setImgErr(true)}
-            style={{
-              width: 26, borderRadius: '34%', aspectRatio: '1 / 1.05',
-              objectFit: 'cover', objectPosition: 'center 18%',
-              flexShrink: 0,
-            }}
-          />
-        ) : (
-          <div
-            style={{
-              width: 26, borderRadius: '34%', aspectRatio: '1 / 1.05',
-              background: 'rgba(255,255,255,0.06)',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              fontSize: 10, color: inkFaint, fontWeight: 700, flexShrink: 0,
-            }}
-          >
-            {getInitials(fullName)}
-          </div>
-        )}
-        <span
-          style={{
-            fontSize: 14,
-            fontWeight: isWinner ? 800 : 600,
-            color: '#fff',
-            whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
-          }}
-        >
-          {finisher.displayName}
-        </span>
-      </span>
-      <span
-        style={{
-          textAlign: 'right', fontSize: 14, fontWeight: 800, color: '#fff',
-          fontVariantNumeric: 'tabular-nums',
-        }}
-      >
-        {finisher.displayScore || fmtScore(finisher.score)}
-      </span>
-      <span
-        style={{
-          textAlign: 'right', fontSize: 12, fontWeight: 700,
-          color: r4 == null ? inkGhost : r4 < 0 ? greenLive : r4 > 0 ? danger : inkFaint,
-          fontVariantNumeric: 'tabular-nums',
-        }}
-      >
-        {r4 == null ? '—' : r4 === 0 ? 'E' : fmtScoreSign(r4)}
-      </span>
-    </button>
-  );
-}
-
-// ---------- Also On The Podium row ----------------------------------------
-
-function PodiumRow({
-  finisher,
-  tourSlug,
-  onTap,
-}: {
-  finisher: TournamentFinisher;
-  tourSlug: string;
-  onTap?: (f: TournamentFinisher) => void;
-}) {
-  const [imgErr, setImgErr] = React.useState(false);
-  const fullName = finisher.fullName || finisher.displayName;
-  const tourCode = finisher.tourCode ?? tourSlug;
-  const photoUrl = getPlayerHeadshotUrl(fullName, tourCode, finisher.headshotOverride ?? undefined);
-  const r4 = finisher.round4;
-
-  return (
-    <button
-      type="button"
-      onClick={() => onTap?.(finisher)}
-      style={{
-        display: 'grid',
-        gridTemplateColumns: '20px 32px 1fr 56px 44px',
-        alignItems: 'center',
-        gap: 8,
-        padding: '12px 0',
-        borderTop: `1px solid ${hairlineDark}`,
-        background: 'transparent', border: 'none', width: '100%', textAlign: 'left',
+        flexShrink: 0,
+        marginTop: 10,
+        padding: 10,
+        borderRadius: 10,
+        background: 'rgba(241,245,249,0.8)',
+        border: `1px solid ${slate200}`,
+        display: 'flex', alignItems: 'center', gap: 10,
+        width: '100%', textAlign: 'left',
         cursor: onTap ? 'pointer' : 'default',
       }}
     >
-      <span style={{ fontSize: 11, color: inkFaint, fontWeight: 700, fontVariantNumeric: 'tabular-nums' }}>
-        {finisher.position}
+      <span style={{
+        width: 22, height: 22, borderRadius: '50%',
+        background: '#E5E4E2', color: ink,
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        fontSize: 11, fontWeight: 800, flexShrink: 0,
+      }}>
+        2
       </span>
       {photoUrl && !imgErr ? (
         <img
-          src={photoUrl}
-          alt=""
-          onError={() => setImgErr(true)}
+          src={photoUrl} alt="" onError={() => setImgErr(true)}
           style={{
-            width: 32, borderRadius: '34%', aspectRatio: '1 / 1.05',
-            objectFit: 'cover', objectPosition: 'center 18%',
+            width: 28, aspectRatio: '1 / 1.05', borderRadius: '34%',
+            objectFit: 'cover', objectPosition: 'center 18%', flexShrink: 0,
           }}
         />
       ) : (
-        <div
-          style={{
-            width: 32, borderRadius: '34%', aspectRatio: '1 / 1.05',
-            background: 'rgba(255,255,255,0.06)',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            fontSize: 11, color: inkFaint, fontWeight: 700,
-          }}
-        >
+        <div style={{
+          width: 28, aspectRatio: '1 / 1.05', borderRadius: '34%',
+          background: slate100,
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          fontSize: 10, color: slate500, fontWeight: 700, flexShrink: 0,
+        }}>
           {getInitials(fullName)}
         </div>
       )}
-      <span
-        style={{
-          fontSize: 14, fontWeight: 700, color: '#fff',
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <div style={{
+          fontSize: 8.5, fontWeight: 800, letterSpacing: '0.14em',
+          color: slate400, marginBottom: 2,
+        }}>
+          RUNNER-UP
+        </div>
+        <div style={{
+          fontSize: 13, fontWeight: 700, color: ink,
+          display: 'flex', alignItems: 'center', gap: 6,
           whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
-        }}
-      >
-        {finisher.displayName}
-      </span>
-      <span
-        style={{
-          textAlign: 'right', fontSize: 14, fontWeight: 800, color: '#fff',
-          fontVariantNumeric: 'tabular-nums',
-        }}
-      >
-        {finisher.displayScore || fmtScore(finisher.score)}
-      </span>
-      <span
-        style={{
-          textAlign: 'right', fontSize: 12, fontWeight: 700,
-          color: r4 == null ? inkGhost : r4 < 0 ? greenLive : r4 > 0 ? danger : inkFaint,
-          fontVariantNumeric: 'tabular-nums',
-        }}
-      >
-        {r4 == null ? '—' : r4 === 0 ? 'E' : fmtScoreSign(r4)}
-      </span>
-    </button>
-  );
-}
-
-// ---------- Best Round of the Week ----------------------------------------
-
-function BestRoundRow({
-  finisher,
-  roundNumber,
-  roundScore,
-  tourSlug,
-  onTap,
-}: {
-  finisher: TournamentFinisher;
-  roundNumber: number;
-  roundScore: number;
-  tourSlug: string;
-  onTap?: (f: TournamentFinisher) => void;
-}) {
-  const [imgErr, setImgErr] = React.useState(false);
-  const fullName = finisher.fullName || finisher.displayName;
-  const tourCode = finisher.tourCode ?? tourSlug;
-  const photoUrl = getPlayerHeadshotUrl(fullName, tourCode, finisher.headshotOverride ?? undefined);
-
-  return (
-    <button
-      type="button"
-      onClick={() => onTap?.(finisher)}
-      className="active:opacity-70 transition-opacity"
-      style={{
-        display: 'grid',
-        gridTemplateColumns: '20px 32px 1fr 56px 44px',
-        alignItems: 'center', gap: 10,
-        width: '100%',
-        padding: '8px 0',
-        background: 'transparent', border: 'none',
-        cursor: onTap ? 'pointer' : 'default',
-        textAlign: 'left',
-      }}
-    >
-      <span style={{
-        fontSize: 11, fontWeight: 900, color: gold,
-        fontVariantNumeric: 'tabular-nums', textAlign: 'center',
-      }}>1</span>
-      <div style={{
-        width: 32, borderRadius: '34%', aspectRatio: '1 / 1.05',
-        border: `1.5px solid rgba(255,255,255,0.15)`,
-        overflow: 'hidden', background: 'rgba(0,0,0,0.3)',
-      }}>
-        {photoUrl && !imgErr ? (
-          <img src={photoUrl} alt="" onError={() => setImgErr(true)}
-            style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center 18%' }} />
-        ) : (
-          <PlayerSilhouette size={16} />
-        )}
+        }}>
+          <span style={{
+            overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+          }}>{finisher.displayName}</span>
+          {flag && <span aria-hidden="true" style={{ flexShrink: 0 }}>{flag}</span>}
+        </div>
       </div>
       <span style={{
-        fontSize: 13, fontWeight: 700, color: '#fff',
-        whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', textAlign: 'left',
+        fontSize: 16, fontWeight: 800, color: ink,
+        fontVariantNumeric: 'tabular-nums', flexShrink: 0,
       }}>
-        {finisher.displayName}
-      </span>
-      <span style={{
-        fontSize: 13, fontWeight: 800, color: '#fff',
-        fontVariantNumeric: 'tabular-nums', textAlign: 'right',
-      }}>
-        {finisher.displayScore}
-      </span>
-      <span style={{
-        fontSize: 11, fontWeight: 700, color: greenLive,
-        fontVariantNumeric: 'tabular-nums', textAlign: 'right',
-      }}>
-        R{roundNumber} {roundScore < 0 ? roundScore : `+${roundScore}`}
+        {finisher.displayScore || fmtScore(finisher.score)}
       </span>
     </button>
   );
 }
+
+// ---------- By-the-Numbers grid (5 col, low round merged) -----------------
+
+function ByNumbersGrid({
+  birdies, eagles, pars, bogeys, lowRound,
+}: {
+  birdies: number; eagles: number; pars: number; bogeys: number;
+  lowRound: number | null;
+}) {
+  const cells: Array<{ v: string; label: string; color: string }> = [
+    { v: `${birdies}`, label: 'BIRDIES', color: gold },
+    { v: `${eagles}`,  label: 'EAGLES',  color: gold },
+    { v: `${pars}`,    label: 'PARS',    color: ink  },
+    { v: `${bogeys}`,  label: 'BOGEYS',  color: ink  },
+    { v: lowRound != null ? fmtScore(lowRound) : '—', label: 'LOW R', color: gold },
+  ];
+  return (
+    <div style={{
+      flexShrink: 0,
+      marginTop: 10,
+      display: 'grid',
+      gridTemplateColumns: 'repeat(5, 1fr)',
+      borderTop: `1px solid ${slate200}`,
+      borderBottom: `1px solid ${slate200}`,
+      padding: '10px 0',
+    }}>
+      {cells.map((c, i) => (
+        <div
+          key={c.label}
+          style={{
+            textAlign: 'center',
+            borderLeft: i > 0 ? `1px solid ${slate200}` : 'none',
+            padding: '0 4px',
+          }}
+        >
+          <div style={{
+            fontSize: 22, fontWeight: 900, color: c.color, lineHeight: 1,
+            fontVariantNumeric: 'tabular-nums', letterSpacing: '-0.02em',
+          }}>
+            {c.v}
+          </div>
+          <div style={{
+            marginTop: 4, fontSize: 8, fontWeight: 700, letterSpacing: '0.12em',
+            color: slate400,
+          }}>
+            {c.label}
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+// ---------- Skeleton --------------------------------------------------------
 
 export function ResultsHeroSkeleton() {
   return (
-    <HeroAtmosphere style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
-      <div
-        style={{
-          paddingTop: 'calc(max(env(safe-area-inset-top, 0px), 47px) + 56px)',
-          paddingInline: 20,
-          paddingBottom: 24,
-          height: '100%',
-          overflow: 'hidden',
-        }}
-      >
-        {/* Caption strip */}
-        <div style={{ display: 'flex', gap: 8, marginBottom: 18, paddingTop: 12 }}>
-          <Shimmer width={36} height={16} radius={4} />
-          <Shimmer width={48} height={14} radius={3} />
-          <Shimmer width="40%" height={12} radius={3} />
-        </div>
-        {/* Tournament name */}
-        <div style={{ marginBottom: 28 }}>
-          <Shimmer width="85%" height={30} radius={6} style={{ marginBottom: 8 }} />
-          <Shimmer width="55%" height={14} radius={4} />
-        </div>
-        {/* Champion celebration card */}
-        <Shimmer width="100%" height={188} radius={18} style={{ marginBottom: 22 }} />
-        {/* Stats strip */}
-        <Shimmer width="100%" height={70} radius={14} style={{ marginBottom: 22 }} />
-        {/* Podium */}
-        <Shimmer width="40%" height={11} radius={3} style={{ marginBottom: 8 }} />
-        {Array.from({ length: 2 }).map((_, i) => (
-          <div
-            key={i}
-            style={{
-              display: 'grid',
-              gridTemplateColumns: '20px 32px 1fr 56px 44px',
-              gap: 8, alignItems: 'center', padding: '12px 0',
-              borderTop: `1px solid ${hairlineDark}`,
-            }}
-          >
-            <Shimmer height={11} radius={3} />
-            <Shimmer width={32} height={32} radius="50%" />
-            <Shimmer width="60%" height={14} radius={4} />
-            <Shimmer height={14} radius={4} />
-            <Shimmer height={12} radius={4} />
-          </div>
-        ))}
-        {/* Leaderboard rows */}
-        {Array.from({ length: 4 }).map((_, i) => (
-          <div
-            key={i}
-            style={{
-              display: 'grid',
-              gridTemplateColumns: '32px 1fr 56px 44px',
-              alignItems: 'center', padding: '11px 0',
-              borderTop: `1px solid ${hairlineDark}`,
-            }}
-          >
-            <Shimmer height={11} radius={3} />
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-              <Shimmer width={26} height={26} radius="50%" />
-              <Shimmer width="60%" height={14} radius={4} />
-            </div>
-            <Shimmer height={14} radius={4} />
-            <Shimmer height={12} radius={4} />
-          </div>
-        ))}
+    <div style={{
+      height: '100%', background: lightBg,
+      paddingTop: 'calc(env(safe-area-inset-top, 0px) + 28px)',
+      paddingInline: 20, paddingBottom: 16,
+      boxSizing: 'border-box', overflow: 'hidden',
+      display: 'flex', flexDirection: 'column',
+    }}>
+      <div style={{ flex: 1, minHeight: 0 }}>
+        <Shimmer width="50%" height={11} radius={3} style={{ marginBottom: 12 }} />
+        <Shimmer width="30%" height={12} radius={3} style={{ marginBottom: 14 }} />
+        <Shimmer width="85%" height={36} radius={6} style={{ marginBottom: 8 }} />
+        <Shimmer width="60%" height={36} radius={6} style={{ marginBottom: 12 }} />
       </div>
-    </HeroAtmosphere>
+      <Shimmer width="100%" height={86} radius={6} style={{ marginBottom: 6 }} />
+      <Shimmer width="100%" height={56} radius={10} style={{ marginBottom: 6 }} />
+      <Shimmer width="100%" height={64} radius={6} style={{ marginBottom: 12 }} />
+      <Shimmer width="100%" height={42} radius={14} />
+    </div>
   );
 }
 
-// ---------- Main component ------------------------------------------------
+// ---------- Main ------------------------------------------------------------
 
 export interface EditorialResultsHeroProps {
   tournament: {
@@ -612,27 +368,18 @@ export interface EditorialResultsHeroProps {
 }
 
 export function EditorialResultsHero({
-  tournament,
-  finishers,
-  onPlayerTap,
-  onLeaderboardCta,
+  tournament, finishers, onPlayerTap, onLeaderboardCta,
 }: EditorialResultsHeroProps) {
   const navigate = useNavigate();
 
-  const positionCounts = React.useMemo(() => {
-    const m = new Map<number, number>();
-    finishers.forEach((f) => m.set(f.position, (m.get(f.position) || 0) + 1));
-    return m;
-  }, [finishers]);
-
-  const winnerRow = finishers.filter((f) => f.position === (finishers[0]?.position ?? 1));
+  const winnerRow = finishers.filter(f => f.position === (finishers[0]?.position ?? 1));
   const winner = winnerRow[0] ?? null;
   const winnerIsTied = winnerRow.length > 1;
 
   const marginLabel = (() => {
     if (!winner) return null;
     if (winnerIsTied) return 'Co-winners';
-    const next = finishers.find((f) => f.position > winner.position);
+    const next = finishers.find(f => f.position > winner.position);
     if (!next || next.score == null || winner.score == null) return null;
     const margin = next.score - winner.score;
     if (margin <= 0) return 'Won in playoff';
@@ -644,23 +391,18 @@ export function EditorialResultsHero({
     winner?.playerId ?? undefined,
   );
 
-  const nonWinners = finishers.filter((f) => f.position > (winner?.position ?? 1));
-  const podium = nonWinners.filter((f) => f.position <= 3).slice(0, 2);
-  const podiumKeys = new Set(podium.map(p_id));
-  // "Best Round of the Week" — the single lowest individual round across all finishers
-  const bestRound = React.useMemo(() => {
-    const flat: Array<{ finisher: TournamentFinisher; round: number; score: number }> = [];
-    finishers.forEach((f) => {
-      [1, 2, 3, 4].forEach((r) => {
+  const runnerUp = finishers.find(f => f.position > (winner?.position ?? 1)) ?? null;
+
+  // Lowest single round across all finishers
+  const lowRound = React.useMemo(() => {
+    let best: number | null = null;
+    finishers.forEach(f => {
+      [1, 2, 3, 4].forEach(r => {
         const v = (f as any)[`round${r}`] as number | null | undefined;
-        if (v !== null && v !== undefined) {
-          flat.push({ finisher: f, round: r, score: v });
-        }
+        if (v != null && (best == null || v < best)) best = v;
       });
     });
-    if (flat.length === 0) return null;
-    flat.sort((a, b) => a.score - b.score);
-    return flat[0];
+    return best;
   }, [finishers]);
 
   const handleFinisherTap = useCallback(
@@ -687,169 +429,90 @@ export function EditorialResultsHero({
 
   if (!winner) {
     return (
-      <HeroAtmosphere
-        style={{
-          height: '100%', display: 'flex', flexDirection: 'column',
-          alignItems: 'center', justifyContent: 'center',
-          color: inkFaint, fontSize: 12,
-        }}
-      >
+      <div style={{
+        height: '100%', background: lightBg,
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        color: slate500, fontSize: 12,
+      }}>
         Final results loading…
-      </HeroAtmosphere>
+      </div>
     );
   }
 
+  const handleCta = () => {
+    if (onLeaderboardCta) {
+      onLeaderboardCta();
+    } else {
+      const t = tournamentRoute(tournament.id, { kind: 'overview' });
+      navigate(t.to, { state: t.state });
+    }
+  };
+
   return (
-    <HeroAtmosphere style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
-      <div
-        style={{
-          paddingTop: 'calc(max(env(safe-area-inset-top, 0px), 47px) + 56px)',
-          paddingInline: 20,
-          paddingBottom: 24,
-          boxSizing: 'border-box',
-          flex: 1,
-          minHeight: 0,
-          overflowY: 'auto',
-          height: 'auto',
-          overscrollBehaviorY: 'contain',
-          touchAction: 'pan-y',
-          willChange: 'transform',
-          WebkitOverflowScrolling: 'touch' as any,
-          zoom: 0.9,
-        }}
-      >
-        {/* 1. Broadcast caption strip */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 18, paddingTop: 12 }}>
-          <span
-            style={{
-              padding: '3px 7px', borderRadius: 4, background: '#fff', color: ink,
-              fontSize: 9, fontWeight: 800, letterSpacing: '0.08em',
-            }}
-          >
-            {getTourCode(tournament.tourSlug)}
-          </span>
-          <span
-            style={{
-              padding: '3px 7px', borderRadius: 4,
-              background: 'rgba(255,184,0,0.14)', color: gold,
-              fontSize: 9, fontWeight: 800, letterSpacing: '0.12em',
-              border: `1px solid rgba(255,184,0,0.30)`,
-            }}
-          >
-            FINAL
-          </span>
-          <span style={{ fontSize: 10, color: inkFaint }}>·</span>
-          <span style={{ fontSize: 10, fontWeight: 700, color: inkSoft, letterSpacing: '0.06em' }}>
-            72 Holes Complete
-          </span>
-        </div>
-
-        {/* 2. Tournament name + venue */}
-        <div style={{ marginBottom: 14 }}>
-          <h1
-            style={{
-              margin: 0, fontSize: 20, fontWeight: 800,
-              letterSpacing: '-0.025em', lineHeight: 1.1, color: '#fff',
-            }}
-          >
-            {tournament.name}
-          </h1>
-          {(tournament.venueName || tournament.venueCity) && (
-            <div
-              style={{
-                marginTop: 6, fontSize: 11, color: inkFaint,
-                display: 'flex', alignItems: 'center', gap: 5,
-              }}
-            >
-              <MapPin size={11} strokeWidth={2.2} style={{ opacity: 0.8 }} />
-              <span>{[tournament.venueName, tournament.venueCity].filter(Boolean).join(' · ')}</span>
-            </div>
-          )}
-        </div>
-
-        {/* 3. Champion celebration card (round-by-round inline strip lives inside) */}
-        <ChampionHero
-          winner={winner}
-          tourSlug={tournament.tourSlug}
-          marginLabel={marginLabel}
-          onTap={() => handleFinisherTap(winner)}
-        />
-
-        {/* 4. Stats grid (single panel, hairline dividers, gold for birdies) */}
-        {winnerStats && <StatsGrid stats={winnerStats as any} />}
-
-        {/* 5. Also on the podium */}
-        {podium.length > 0 && (
-          <div style={{ marginBottom: 14 }}>
-            <div
-              style={{
-                fontSize: 9, fontWeight: 800, letterSpacing: '0.14em',
-                color: inkFaint, marginBottom: 8,
-              }}
-            >
-              ALSO ON THE PODIUM
-            </div>
-            {podium.map((f) => (
-              <PodiumRow
-                key={f.playerId ?? `${f.position}-${f.fullName}`}
-                finisher={f}
-                tourSlug={tournament.tourSlug}
-                onTap={handleFinisherTap}
-              />
-            ))}
-          </div>
-        )}
-
-        {/* 6. Best Round of the Week */}
-        {bestRound && (
-          <div style={{ marginBottom: 14 }}>
-            <div
-              style={{
-                fontSize: 9, fontWeight: 800, letterSpacing: '0.14em',
-                color: inkFaint, marginBottom: 8, textTransform: 'uppercase',
-              }}
-            >
-              BEST ROUND OF THE WEEK
-            </div>
-            <BestRoundRow
-              finisher={bestRound.finisher}
-              roundNumber={bestRound.round}
-              roundScore={bestRound.score}
-              tourSlug={tournament.tourSlug}
-              onTap={handleFinisherTap}
-            />
-          </div>
-        )}
-
-        {/* 7. Final Leaderboard CTA */}
-        <button
-          type="button"
-          onClick={() => {
-            if (onLeaderboardCta) {
-              onLeaderboardCta();
-            } else {
-              const t = tournamentRoute(tournament.id, { kind: 'overview' });
-              navigate(t.to, { state: t.state });
+    <div style={{
+      height: '100%',
+      display: 'flex',
+      flexDirection: 'column',
+      background: lightBg,
+      paddingTop: 'calc(env(safe-area-inset-top, 0px) + 28px)',
+      paddingInline: 20,
+      paddingBottom: 16,
+      boxSizing: 'border-box',
+      overflow: 'hidden',
+    }}>
+      <ElasticZone minH={120} maxH={260}>
+        {(t) => (
+          <TournamentTitleBlock
+            t={t}
+            eyebrowLabel="THE WEEK IN REVIEW"
+            eyebrowRight="72 HOLES"
+            statusRow={
+              <>
+                <TourBadge code={getTourCode(tournament.tourSlug)} />
+                <StatusBadge
+                  label="FINAL"
+                  color="#FFB800"
+                  bg="rgba(255,184,0,0.094)"
+                />
+              </>
             }
-          }}
-          style={{
-            width: '100%', marginTop: 16, padding: '12px',
-            background: 'transparent', border: `1px solid ${hairlineMid}`,
-            borderRadius: 12, color: '#fff', fontSize: 13, fontWeight: 700,
-            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 5,
-            cursor: 'pointer',
-          }}
-        >
-          Final Leaderboard
-          <ChevronRight size={14} />
-        </button>
+            title={tournament.name}
+            venueName={tournament.venueName}
+            venueCity={tournament.venueCity}
+          />
+        )}
+      </ElasticZone>
 
-      </div>
-    </HeroAtmosphere>
+      <ChampionBlock
+        winner={winner}
+        tourSlug={tournament.tourSlug}
+        marginLabel={marginLabel}
+        onTap={() => handleFinisherTap(winner)}
+      />
+
+      {runnerUp && (
+        <RunnerUpStrip
+          finisher={runnerUp}
+          tourSlug={tournament.tourSlug}
+          onTap={handleFinisherTap}
+        />
+      )}
+
+      {winnerStats && (
+        <ByNumbersGrid
+          birdies={(winnerStats as any).birdies ?? 0}
+          eagles={(winnerStats as any).eagles ?? 0}
+          pars={(winnerStats as any).pars ?? 0}
+          bogeys={(winnerStats as any).bogeys ?? 0}
+          lowRound={lowRound}
+        />
+      )}
+
+      <HeroCTA
+        label="Final Leaderboard"
+        onClick={handleCta}
+        style={{ marginTop: 12 }}
+      />
+    </div>
   );
-}
-
-// stable key helper (ensures podium dedupe even when playerId is missing)
-function p_id(f: TournamentFinisher): string {
-  return f.playerId ?? `${f.position}:${f.fullName}`;
 }
