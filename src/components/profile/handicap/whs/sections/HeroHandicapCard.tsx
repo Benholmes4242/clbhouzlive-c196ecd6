@@ -933,9 +933,9 @@ const MetricRingsRow: React.FC<MetricRingsRowProps> = ({ currentHcp, last20, his
     const mean = counterDiffs.reduce((s, v) => s + v, 0) / counterDiffs.length;
     const inBand = counterDiffs.filter((d) => Math.abs(d - mean) <= 0.5).length;
     const pct = (inBand / counterDiffs.length) * 100;
-    const color = pct >= 70 ? GREEN : pct >= 40 ? AMBER : RED;
+    const color = pct >= 70 ? GREEN : pct >= 40 ? SLATE : RED;
     consistency = {
-      label: 'CONSISTENCY', sub: '% in band', centre: `${Math.round(pct)}`,
+      label: 'CONSISTENCY', sub: 'within ±0.5 of avg', centre: `${Math.round(pct)}`,
       fraction: pct / 100, color, available: true,
     };
   }
