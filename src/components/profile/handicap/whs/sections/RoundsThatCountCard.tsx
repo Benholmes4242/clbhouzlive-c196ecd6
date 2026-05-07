@@ -34,7 +34,7 @@ const WEEKDAY = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
 
 // Chart geometry
-const CHART_H = 220;
+const CHART_H = 340;
 const Y_AXIS_W = 30;
 const CHART_TOP = 14;
 const CHART_BOTTOM = 14;
@@ -194,15 +194,16 @@ export const RoundsThatCountCard: React.FC<Props> = ({ connectionId, currentHand
         </p>
       </div>
 
-      {/* Parent card */}
-      <div style={{
-        background: '#fff',
-        border: `0.5px solid ${INK_10}`,
-        borderRadius: 14,
-        overflow: 'hidden',
-      }}>
-        {/* Chart */}
-        <div style={{ padding: '14px 14px 0' }}>
+      {/* Chart — full-bleed on page background, no card wrapper */}
+      <div style={{ padding: '4px 0 12px' }}>
+        <style>{`
+          @keyframes pulseHeartbeat {
+            0%, 100% { opacity: 0.20; }
+            50% { opacity: 0.45; }
+          }
+          .latestHalo { animation: pulseHeartbeat 2.4s ease-in-out infinite; transform-origin: center; }
+        `}</style>
+        <div style={{ padding: '0 4px' }}>
           {/* Y-axis unit label + LATEST legend */}
           <div style={{
             display: 'flex',
@@ -242,9 +243,9 @@ export const RoundsThatCountCard: React.FC<Props> = ({ connectionId, currentHand
             }}>
               {ticks.map(t => (
                 <div key={t} style={{
-                  position: 'absolute', top: yFor(t) - 6,
-                  right: 6, fontSize: 10, fontWeight: 700,
-                  color: INK_40, fontFamily: FONT_DISPLAY,
+                  position: 'absolute', top: yFor(t) - 7,
+                  right: 6, fontSize: 11.5, fontWeight: 700,
+                  color: INK_55, fontFamily: FONT_DISPLAY,
                   fontVariantNumeric: 'tabular-nums',
                   textAlign: 'right', width: '100%',
                 }}>
@@ -269,8 +270,8 @@ export const RoundsThatCountCard: React.FC<Props> = ({ connectionId, currentHand
                     bottom: 0,
                     left: `${(latestIdx + 0.05) * colWidth}%`,
                     width: `${colWidth * 0.9}%`,
-                    background: AMBER,
-                    opacity: 0.08,
+                    background: 'rgba(247,147,30,0.08)',
+                    opacity: 1,
                     borderRadius: 6,
                     pointerEvents: 'none',
                     zIndex: 0,
@@ -301,6 +302,8 @@ export const RoundsThatCountCard: React.FC<Props> = ({ connectionId, currentHand
                   <line key={t}
                     x1="0" y1={yFor(t)} x2="100%" y2={yFor(t)}
                     stroke={INK_06} strokeWidth={1}
+                    strokeDasharray="2 4"
+                    opacity={0.6}
                     vectorEffect="non-scaling-stroke"
                   />
                 ))}
@@ -364,6 +367,29 @@ export const RoundsThatCountCard: React.FC<Props> = ({ connectionId, currentHand
                   />
                 );
               })}
+
+              {/* Pulsing halo behind the latest dot */}
+              {(() => {
+                const last = enriched.rounds[enriched.rounds.length - 1];
+                if (!last) return null;
+                return (
+                  <div
+                    aria-hidden
+                    className="latestHalo"
+                    style={{
+                      position: 'absolute',
+                      left: `${xFor(enriched.rounds.length - 1)}%`,
+                      top: yFor(last.handicap_differential ?? 0),
+                      width: 28, height: 28,
+                      marginLeft: -14, marginTop: -14,
+                      borderRadius: '50%',
+                      background: 'rgba(247,147,30,0.20)',
+                      pointerEvents: 'none',
+                      zIndex: 1,
+                    }}
+                  />
+                );
+              })()}
             </div>
           </div>
 
@@ -409,12 +435,34 @@ export const RoundsThatCountCard: React.FC<Props> = ({ connectionId, currentHand
             })}
           </div>
         </div>
+      </div>
 
+      {/* Connector lines from chart bottom to chips top */}
+      <div style={{
+        display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)',
+        marginBottom: -1, padding: '0 1px',
+      }}>
+        <div style={{ display: 'flex', justifyContent: 'center' }}>
+          <div style={{ width: 1, height: 12, background: GREEN }} />
+        </div>
+        <div style={{ display: 'flex', justifyContent: 'center' }}>
+          <div style={{ width: 1, height: 12, background: INK_40 }} />
+        </div>
+        <div style={{ display: 'flex', justifyContent: 'center' }}>
+          <div style={{ width: 1, height: 12, background: RED }} />
+        </div>
+      </div>
+
+      {/* Chips + next-round + footer card */}
+      <div style={{
+        background: '#fff',
+        border: `0.5px solid ${INK_10}`,
+        borderRadius: 14,
+        overflow: 'hidden',
+      }}>
         {/* 3-up stat row */}
         <div style={{
           display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)',
-          borderTop: `0.5px solid ${INK_10}`,
-          margin: '0 -14px',
         }}>
           <StatCell
             label="BEST" value={enriched.minDiff} dotColor={GREEN} valueColor={GREEN}

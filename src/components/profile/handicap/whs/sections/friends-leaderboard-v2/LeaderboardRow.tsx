@@ -137,44 +137,52 @@ export const LeaderboardRow: React.FC<Props> = ({ entry, rank, isFirst, isLast, 
         </div>
       </div>
 
-      {/* 30D trend column */}
+      {/* Inline sparkline (last 5 differentials).
+          TODO: widen get_friend_leaderboard to return last_5_differentials per friend.
+          Until then, render a flat placeholder line for friends; "You" will get a
+          real sparkline once wired through from the page-level whs hooks. */}
       <div
         style={{
-          width: 56,
-          textAlign: 'right',
+          width: 60,
           flexShrink: 0,
-          fontSize: 11,
-          fontWeight: 700,
-          fontVariantNumeric: 'tabular-nums',
-          letterSpacing: '-0.01em',
-          paddingRight: 8,
           display: 'flex',
           alignItems: 'center',
-          justifyContent: 'flex-end',
-          gap: 3,
+          justifyContent: 'center',
+          paddingRight: 6,
         }}
       >
-        {entry.handicap_30d_delta == null ? (
-          <span style={{ color: T.inkFaded }}>—</span>
-        ) : Math.abs(entry.handicap_30d_delta) < 0.05 ? (
-          <Minus size={11} strokeWidth={2.4} color={T.inkFaded} />
-        ) : entry.handicap_30d_delta < 0 ? (
-          <span style={{ color: '#059669', display: 'inline-flex', alignItems: 'center', gap: 2 }}>
-            <ArrowDown size={11} strokeWidth={2.6} />
-            {Math.abs(entry.handicap_30d_delta).toFixed(1)}
-          </span>
-        ) : (
-          <span style={{ color: '#DC2626', display: 'inline-flex', alignItems: 'center', gap: 2 }}>
-            <ArrowUp size={11} strokeWidth={2.6} />
-            {entry.handicap_30d_delta.toFixed(1)}
-          </span>
-        )}
+        {(() => {
+          // Determine stroke colour from 30d delta direction (best signal we have).
+          const d = entry.handicap_30d_delta;
+          const stroke =
+            d == null || Math.abs(d) < 0.1
+              ? T.inkMute
+              : d < 0
+                ? '#059669'
+                : '#9F1339';
+          // 5 evenly-spaced flat points (placeholder until RPC widens).
+          const points = '0,9 15,9 30,9 45,9 60,9';
+          return (
+            <svg width={60} height={18} viewBox="0 0 60 18" style={{ display: 'block' }}>
+              <polyline
+                points={points}
+                fill="none"
+                stroke={stroke}
+                strokeWidth={1.5}
+                strokeLinejoin="round"
+                strokeLinecap="round"
+                vectorEffect="non-scaling-stroke"
+              />
+              <circle cx={60} cy={9} r={2} fill={stroke} />
+            </svg>
+          );
+        })()}
       </div>
 
-      {/* HCP */}
+      {/* HCP with up/down arrow */}
       <div
         style={{
-          width: 50,
+          width: 60,
           textAlign: 'right',
           flexShrink: 0,
           fontSize: 15,
@@ -182,8 +190,19 @@ export const LeaderboardRow: React.FC<Props> = ({ entry, rank, isFirst, isLast, 
           color: T.ink,
           fontVariantNumeric: 'tabular-nums',
           letterSpacing: '-0.01em',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'flex-end',
+          gap: 4,
         }}
       >
+        {entry.handicap_30d_delta != null && Math.abs(entry.handicap_30d_delta) >= 0.1 && (
+          entry.handicap_30d_delta < 0 ? (
+            <ArrowDown size={10} strokeWidth={2.6} color="#059669" />
+          ) : (
+            <ArrowUp size={10} strokeWidth={2.6} color="#9F1339" />
+          )
+        )}
         {fmtHcp(entry.friend_handicap_index)}
       </div>
     </Tag>

@@ -76,13 +76,15 @@ const Timeline: React.FC<{ timeline: StreaksData['timeline'] }> = ({ timeline })
     ...Array(Math.max(0, 12 - timeline.length)).fill(null),
     ...timeline,
   ];
+  const activeCount = slots.filter((s) => s != null && !s.isUp).length;
+  const fillPct = (activeCount / 12) * 100;
   return (
     <div>
       <div
         style={{
           display: 'flex',
           gap: 3,
-          height: 22,
+          height: 36,
           alignItems: 'flex-end',
         }}
       >
@@ -102,20 +104,37 @@ const Timeline: React.FC<{ timeline: StreaksData['timeline'] }> = ({ timeline })
             );
           }
           const isUp = slot.isUp;
+          const activeBg = isFaded ? 'rgba(247,147,30,0.18)' : AMBER;
           return (
             <div
               key={slot.id}
               style={{
                 flex: 1,
                 height: isUp ? '40%' : '100%',
-                background: isUp ? INK_10 : AMBER,
+                background: isUp ? INK_10 : activeBg,
                 borderRadius: 3,
-                opacity: isFaded ? 0.4 : 1,
+                boxShadow:
+                  !isUp && !isFaded
+                    ? `inset 0 0 0 1px rgba(247,147,30,0.4), 0 0 8px rgba(247,147,30,0.30)`
+                    : 'none',
               }}
             />
           );
         })}
       </div>
+
+      {/* Continuation gradient line under the bar */}
+      <div style={{ marginTop: 6, width: '100%', display: 'flex' }}>
+        <div
+          style={{
+            marginLeft: 'auto',
+            width: `${fillPct}%`,
+            height: 1,
+            background: `linear-gradient(90deg, transparent, ${AMBER})`,
+          }}
+        />
+      </div>
+
       <div
         style={{
           display: 'flex',
@@ -386,21 +405,37 @@ export const StreaksSection: React.FC<Props> = ({ connectionId, userId }) => {
         <Timeline timeline={streaks.timeline} />
       </div>
 
-      {/* Two secondaries */}
-      <div style={{ display: 'flex', gap: 10, marginBottom: 10 }}>
-        <SecondaryStreakTile
-          Icon={TrendingDown}
-          label="CUTTING STREAK"
+      {/* Demoted secondaries — single inline pill row */}
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          background: '#fff',
+          border: `0.5px solid ${INK_10}`,
+          borderRadius: 12,
+          padding: '12px 16px',
+          marginBottom: 10,
+          fontFamily: FONT_GEIST,
+        }}
+      >
+        <SecondaryInline
+          label="CUTTING"
           value={streaks.cutting.current}
           bestText={formatBest(streaks.cutting)}
-          accent={GREEN}
         />
-        <SecondaryStreakTile
-          Icon={Shield}
-          label="COUNTER STREAK"
+        <div
+          style={{
+            width: '0.5px',
+            height: 30,
+            background: INK_10,
+            margin: '0 14px',
+            alignSelf: 'center',
+          }}
+        />
+        <SecondaryInline
+          label="COUNTER"
           value={streaks.counter.current}
           bestText={formatBest(streaks.counter)}
-          accent={INK_70}
         />
       </div>
 
@@ -448,5 +483,51 @@ export const StreaksSection: React.FC<Props> = ({ connectionId, userId }) => {
     </section>
   );
 };
+
+const SecondaryInline: React.FC<{ label: string; value: number; bestText: string }> = ({
+  label,
+  value,
+  bestText,
+}) => (
+  <div style={{ flex: 1, minWidth: 0 }}>
+    <div
+      style={{
+        fontSize: 9.5,
+        fontWeight: 800,
+        color: AMBER,
+        letterSpacing: '0.12em',
+        textTransform: 'uppercase',
+        marginBottom: 4,
+      }}
+    >
+      {label}
+    </div>
+    <div style={{ display: 'flex', alignItems: 'baseline', gap: 6 }}>
+      <span
+        style={{
+          fontSize: 16,
+          fontWeight: 800,
+          color: INK,
+          fontVariantNumeric: 'tabular-nums',
+          lineHeight: 1,
+        }}
+      >
+        {value}
+      </span>
+      <span
+        style={{
+          fontSize: 10,
+          color: INK_55,
+          fontWeight: 500,
+          whiteSpace: 'nowrap',
+          overflow: 'hidden',
+          textOverflow: 'ellipsis',
+        }}
+      >
+        {bestText}
+      </span>
+    </div>
+  </div>
+);
 
 export default StreaksSection;

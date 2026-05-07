@@ -96,6 +96,9 @@ export const RecentRoundsCard: React.FC<Props> = ({ connectionId }) => {
           <div
             key={safePageIndex}
             style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(2, 1fr)',
+              gap: 8,
               animation:
                 direction === -1
                   ? 'recent-rounds-slide-from-right 280ms cubic-bezier(0.32, 0.72, 0, 1)'
@@ -287,8 +290,8 @@ interface TileProps {
 const RoundTile: React.FC<TileProps> = ({ round, onTap }) => {
   const isCounter = round.is_counter;
   const courseName = round.course?.name ?? 'Unknown course';
-  const showImpactPill =
-    isCounter && round.handicap_delta !== null && round.handicap_delta !== 0;
+  const hasDelta = round.handicap_delta !== null && round.handicap_delta !== 0;
+  const deltaPositive = hasDelta && round.handicap_delta! > 0;
 
   return (
     <button
@@ -296,155 +299,113 @@ const RoundTile: React.FC<TileProps> = ({ round, onTap }) => {
       onClick={onTap}
       aria-label={`View detail for ${courseName} on ${fmtDate(round.play_date)}`}
       style={{
-        display: 'block',
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'space-between',
         width: '100%',
+        height: 96,
         textAlign: 'left',
         border: `1px solid ${T.hairline}`,
+        borderLeft: isCounter ? `3px solid #F7931E` : `1px solid ${T.hairline}`,
         background: T.cardBg,
         borderRadius: 12,
-        marginBottom: 8,
-        overflow: 'hidden',
-        position: 'relative',
-        padding: '12px 14px 12px 16px',
+        padding: 12,
         cursor: 'pointer',
-        transition: 'opacity 150ms ease',
+        fontFamily: FONT,
       }}
-      onMouseDown={(e) => (e.currentTarget.style.opacity = '0.85')}
-      onMouseUp={(e) => (e.currentTarget.style.opacity = '1')}
-      onMouseLeave={(e) => (e.currentTarget.style.opacity = '1')}
-      onTouchStart={(e) => (e.currentTarget.style.opacity = '0.85')}
-      onTouchEnd={(e) => (e.currentTarget.style.opacity = '1')}
     >
-      {isCounter && (
+      <p
+        style={{
+          margin: 0,
+          fontSize: 11.5,
+          fontWeight: 700,
+          color: T.ink,
+          lineHeight: 1.2,
+          letterSpacing: '-0.01em',
+          display: '-webkit-box',
+          WebkitLineClamp: 2,
+          WebkitBoxOrient: 'vertical',
+          overflow: 'hidden',
+        }}
+      >
+        {courseName}
+      </p>
+
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'baseline',
+          justifyContent: 'space-between',
+          gap: 8,
+        }}
+      >
         <span
-          aria-hidden
           style={{
-            position: 'absolute',
-            left: 0,
-            top: 0,
-            bottom: 0,
-            width: 3,
-            background: T.greenInk,
+            fontSize: 32,
+            fontWeight: 800,
+            color: T.ink,
+            fontVariantNumeric: 'tabular-nums',
+            lineHeight: 1,
+            letterSpacing: '-0.02em',
           }}
-        />
-      )}
+        >
+          {round.adjusted_gross ?? '—'}
+        </span>
 
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
-        <div style={{ minWidth: 0, flex: 1 }}>
-          <p
-            style={{
-              margin: 0,
-              fontSize: 14,
-              fontWeight: 700,
-              color: T.ink,
-              fontFamily: FONT,
-              whiteSpace: 'nowrap',
-              overflow: 'hidden',
-              textOverflow: 'ellipsis',
-              letterSpacing: '-0.01em',
-              marginBottom: 5,
-            }}
-          >
-            {courseName}
-          </p>
-
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: 6,
-              flexWrap: 'wrap',
-            }}
-          >
+        <div
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'flex-end',
+            gap: 2,
+          }}
+        >
+          {isCounter && (
             <span
               style={{
-                fontSize: 10,
-                fontWeight: 700,
-                color: T.inkMute,
-                letterSpacing: '0.06em',
-                textTransform: 'uppercase',
+                background: 'rgba(5,150,105,0.10)',
+                color: '#059669',
+                fontSize: 9,
+                fontWeight: 800,
+                letterSpacing: '0.08em',
+                padding: '2px 6px',
+                borderRadius: 6,
                 fontFamily: FONT,
               }}
             >
-              {fmtDate(round.play_date)}
+              COUNTER
             </span>
-
-            <span style={{ color: T.hairline }}>·</span>
-
+          )}
+          {hasDelta ? (
             <span
               style={{
-                fontSize: 11,
+                fontSize: 10.5,
                 fontWeight: 700,
-                color: T.inkMute,
-                fontFamily: FONT,
                 fontVariantNumeric: 'tabular-nums',
+                color: deltaPositive ? '#9F1339' : '#059669',
+                fontFamily: FONT,
               }}
             >
-              {fmtDiff(round.handicap_differential)} vs hcp
+              {deltaPositive
+                ? `+${round.handicap_delta!.toFixed(1)}`
+                : `\u2212${Math.abs(round.handicap_delta!).toFixed(1)}`}
             </span>
-
-            {isCounter && (
+          ) : (
+            round.handicap_differential != null && (
               <span
                 style={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  background: 'rgba(5,150,105,0.12)',
-                  color: T.greenInk,
-                  padding: '2px 6px',
-                  borderRadius: 4,
-                  fontSize: 9,
-                  fontWeight: 800,
-                  letterSpacing: '0.08em',
-                  fontFamily: FONT,
-                }}
-              >
-                COUNTER
-              </span>
-            )}
-
-            {showImpactPill && (
-              <span
-                style={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: 2,
-                  background: round.handicap_delta! < 0 ? 'rgba(5,150,105,0.12)' : 'rgba(159,18,57,0.12)',
-                  color: round.handicap_delta! < 0 ? T.greenInk : '#9F1239',
-                  padding: '2px 6px 2px 4px',
-                  borderRadius: 4,
-                  fontSize: 10,
+                  fontSize: 10.5,
                   fontWeight: 700,
-                  fontFamily: FONT,
+                  color: T.inkMute,
                   fontVariantNumeric: 'tabular-nums',
+                  fontFamily: FONT,
                 }}
               >
-                {round.handicap_delta! < 0 ? (
-                  <ArrowDown size={10} strokeWidth={2.6} />
-                ) : (
-                  <ArrowUp size={10} strokeWidth={2.6} />
-                )}
-                {Math.abs(round.handicap_delta!).toFixed(1)} hcp
+                {fmtDiff(round.handicap_differential)}
               </span>
-            )}
-          </div>
+            )
+          )}
         </div>
-
-        {round.adjusted_gross !== null && (
-          <span
-            style={{
-              fontSize: 24,
-              fontWeight: 600,
-              color: T.ink,
-              fontFamily: FONT,
-              fontVariantNumeric: 'tabular-nums',
-              letterSpacing: '-0.02em',
-              flexShrink: 0,
-              lineHeight: 1,
-            }}
-          >
-            {round.adjusted_gross}
-          </span>
-        )}
       </div>
     </button>
   );
