@@ -232,6 +232,34 @@ export const HandicapProjectionCard: React.FC<Props> = ({ scores }) => {
         </svg>
       </div>
 
+      <div style={{ padding: '4px 16px 14px' }}>
+        <p
+          style={{
+            margin: 0,
+            fontSize: 12,
+            lineHeight: 1.55,
+            color: T.inkMute,
+            fontFamily: FONT,
+          }}
+        >
+          <span style={{ fontWeight: 700, letterSpacing: '0.02em' }}>
+            {prediction.direction === 'flat' ? 'If your form holds' : 'If your form continues'}
+          </span>{' '}
+          <span style={{ color: T.ink, fontWeight: 600, fontVariantNumeric: 'tabular-nums' }}>
+            {prediction.current !== null ? prediction.current.toFixed(1) : '—'}
+          </span>{' '}
+          <span style={{ color: T.inkMute }}>{'\u2192'}</span>{' '}
+          <span style={{ color: theme.accentInk, fontWeight: 700, fontVariantNumeric: 'tabular-nums' }}>
+            {prediction.projected !== null ? prediction.projected.toFixed(1) : '—'}
+          </span>
+          {prediction.delta > 0 && (
+            <span style={{ color: theme.accent, fontWeight: 700, fontVariantNumeric: 'tabular-nums', marginLeft: 8 }}>
+              {arrow} {prediction.delta.toFixed(1)}
+            </span>
+          )}
+        </p>
+      </div>
+
       <div
         style={{
           padding: '12px 16px 14px',
