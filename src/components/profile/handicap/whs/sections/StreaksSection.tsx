@@ -7,6 +7,8 @@ import { analyticsEvents } from '@/utils/analyticsEvents';
 
 const AMBER = '#F7931E';
 const AMBER_14 = 'rgba(247,147,30,0.14)';
+const GOLD = '#FBBC2E';
+const AMBER_GOLD_GRADIENT = `linear-gradient(90deg, ${AMBER} 0%, ${GOLD} 100%)`;
 const INK = '#0F172A';
 const INK_70 = '#475569';
 const INK_55 = 'rgba(15,23,42,0.55)';
@@ -104,7 +106,7 @@ const Timeline: React.FC<{ timeline: StreaksData['timeline'] }> = ({ timeline })
             );
           }
           const isUp = slot.isUp;
-          const activeBg = isFaded ? 'rgba(247,147,30,0.18)' : AMBER;
+          const activeBg = isFaded ? 'rgba(247,147,30,0.18)' : AMBER_GOLD_GRADIENT;
           return (
             <div
               key={slot.id}
@@ -130,7 +132,7 @@ const Timeline: React.FC<{ timeline: StreaksData['timeline'] }> = ({ timeline })
             marginLeft: 'auto',
             width: `${fillPct}%`,
             height: 1,
-            background: `linear-gradient(90deg, transparent, ${AMBER})`,
+            background: `linear-gradient(90deg, transparent, ${AMBER}, ${GOLD})`,
           }}
         />
       </div>
