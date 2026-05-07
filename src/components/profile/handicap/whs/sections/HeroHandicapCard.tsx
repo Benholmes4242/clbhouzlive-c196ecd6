@@ -21,7 +21,7 @@ const INK_40 = 'rgba(15,23,42,0.40)';
 const INK_10 = 'rgba(15,23,42,0.10)';
 const INK_06 = 'rgba(15,23,42,0.06)';
 const INK_04 = 'rgba(15,23,42,0.04)';
-const GREEN = '#2DD4BF';
+const GREEN = '#4ADE80';
 const RED = '#9F1D1D';
 const RED_FORM_HOT = '#B91C1C';
 
@@ -474,8 +474,8 @@ const HeroHandicapCard: React.FC<Props> = ({ connection }) => {
                 <stop offset="100%" stopColor="#FBBC2E" />
               </linearGradient>
               <linearGradient id="heroInnerGreenTeal" x1="0" y1="0" x2="1" y2="0">
-                <stop offset="0%" stopColor="#047857" />
-                <stop offset="100%" stopColor="#2DD4BF" />
+                <stop offset="0%" stopColor="#15803D" />
+                <stop offset="100%" stopColor="#4ADE80" />
               </linearGradient>
             </defs>
             {/* Outer track */}
