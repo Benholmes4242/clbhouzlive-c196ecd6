@@ -394,8 +394,8 @@ const HeroHandicapCard: React.FC<Props> = ({ connection }) => {
     const yMin = min - headroom;
     const yMax = max + headroom;
     const yRange = yMax - yMin || 1;
-    const w = 48;
-    const h = 14;
+    const w = 40;
+    const h = 12;
     const coordsLocal = samples.map((p, i) => {
       const x = (i / (samples.length - 1)) * w;
       const y = ((yMax - p.handicap_index) / yRange) * h;
