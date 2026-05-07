@@ -23,6 +23,8 @@ import {
   deleteUserRivalOverride,
   fetchSharedRounds,
   fetchTrophyAggregates,
+  fetchFriendRoundsSinceLastVisit,
+  callMarkTodayVisited,
 } from './api';
 
 export const whsKeys = {
@@ -49,6 +51,7 @@ export const whsKeys = {
   friendLeaderboard: (userId: string) => ['whs-friend-leaderboard', userId] as const,
   userRivalOverrides: (userId: string) => ['whs-user-rival-overrides', userId] as const,
   percentile: (userId: string) => ['whs', 'percentile', userId] as const,
+  friendRoundsSinceLastVisit: () => ['whs', 'friend-rounds-since-last-visit'] as const,
 };
 
 export function useRoundDetail(
