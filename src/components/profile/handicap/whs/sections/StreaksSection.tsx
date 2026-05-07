@@ -106,7 +106,7 @@ const Timeline: React.FC<{ timeline: StreaksData['timeline'] }> = ({ timeline })
             );
           }
           const isUp = slot.isUp;
-          const activeBg = isFaded ? 'rgba(247,147,30,0.18)' : AMBER;
+          const activeBg = isFaded ? 'rgba(247,147,30,0.18)' : AMBER_GOLD_GRADIENT;
           return (
             <div
               key={slot.id}
