@@ -73,11 +73,6 @@ function deltaColor(d: number): string {
   return T.inkMute;
 }
 
-function meaningLabel(d: number): string {
-  if (d < 0) return 'BETTER THAN HCP';
-  if (d > 0) return 'OVER HCP';
-  return 'AT HCP';
-}
 
 const CARD_STYLE: React.CSSProperties = {
   background: T.cardBg,
