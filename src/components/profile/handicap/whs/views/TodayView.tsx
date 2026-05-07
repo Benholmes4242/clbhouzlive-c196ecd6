@@ -4,12 +4,10 @@ import { AlertTriangle, RefreshCw } from 'lucide-react';
 import type { WhsConnection } from '@/lib/whs/types';
 import MorningMoment from '@/components/handicap/MorningMoment';
 import HeroHandicapCard from '../sections/HeroHandicapCard';
-import AchievementsStrip from '../sections/AchievementsStrip';
 import LastRoundCard from '../sections/LastRoundCard';
-import RoundsThatCountCard from '../sections/RoundsThatCountCard';
-import EchoInsightsCard from '../sections/EchoInsightsCard';
 import StreaksSection from '../sections/StreaksSection';
 import WhereYouStandSection from '../sections/WhereYouStandSection';
+import SinceLastVisitRail from '../sections/since-last-visit/SinceLastVisitRail';
 import { useUserProfile } from '@/hooks/useUserProfile';
 
 interface Props {
@@ -18,7 +16,7 @@ interface Props {
   userId: string;
   currentHandicap: number | null;
   connectionCreatedAt: string;
-  /** When true, hides personal-only sections (Echo Insights, Today, footer, banners). */
+  /** When true, hides personal-only sections (Streaks, Where You Stand, Since Last Visit, Echo Insights, footer, banners). */
   readOnly?: boolean;
   showReauthBanner?: boolean;
   showStaleBanner?: boolean;
@@ -27,12 +25,12 @@ interface Props {
   onSyncNow?: () => void;
 }
 
-export const OverviewView: React.FC<Props> = ({
+export const TodayView: React.FC<Props> = ({
   connection,
   connectionId,
   userId,
-  currentHandicap,
-  connectionCreatedAt,
+  currentHandicap: _currentHandicap,
+  connectionCreatedAt: _connectionCreatedAt,
   readOnly = false,
   showReauthBanner = false,
   showStaleBanner = false,
@@ -45,13 +43,11 @@ export const OverviewView: React.FC<Props> = ({
   return (
     <div
       role="tabpanel"
-      id="handicap-panel-overview"
-      aria-labelledby="handicap-tab-overview"
+      id="handicap-panel-today"
+      aria-labelledby="handicap-tab-today"
     >
-      {/* Today section — viewer's daily context, hidden on friend pages */}
       {!readOnly && <MorningMoment userId={userId} />}
 
-      {/* Sync state banners (re-auth takes priority over stale) */}
       {showReauthBanner ? (
         <div
           className="mx-5 mt-5 mb-3 p-3 rounded-xl flex gap-2.5 text-[13px]"
@@ -76,25 +72,15 @@ export const OverviewView: React.FC<Props> = ({
         </div>
       ) : null}
 
-      {/* Hero handicap ring + line chart */}
       <HeroHandicapCard connection={connection} />
 
-      {/* Streaks — personal, hidden on friend pages */}
       {!readOnly && <StreaksSection connectionId={connectionId} userId={userId} />}
 
-      {/* Existing overview cards */}
       <LastRoundCard connectionId={connectionId} />
-      <RoundsThatCountCard connectionId={connectionId} currentHandicap={currentHandicap} />
-      {/* Echo Insights is an AI read of *your* game — hide on friend pages. */}
-      {!readOnly && <EchoInsightsCard connectionId={connectionId} />}
-      {!readOnly && peerComparisonVisible && <WhereYouStandSection userId={userId} />}
-      <AchievementsStrip
-        connectionId={connectionId}
-        connectionCreatedAt={connectionCreatedAt}
-        userId={userId}
-      />
 
-      {/* Sync footer — single line, hidden in read-only mode */}
+      {!readOnly && peerComparisonVisible && <WhereYouStandSection userId={userId} />}
+      {!readOnly && <SinceLastVisitRail userId={userId} />}
+
       {!readOnly && (
         <div
           style={{
@@ -141,4 +127,4 @@ export const OverviewView: React.FC<Props> = ({
   );
 };
 
-export default OverviewView;
+export default TodayView;
