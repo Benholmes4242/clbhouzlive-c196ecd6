@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from 'react';
-import { format, parseISO } from 'date-fns';
+
 import { ChevronRight, Flame, Shield, Trophy, TrendingDown } from 'lucide-react';
 import { toast } from 'sonner';
 import { useStreaks, type StreakResult, type StreaksData } from '@/lib/whs/useStreaks';
@@ -222,14 +222,6 @@ const SecondaryStreakTile: React.FC<{
   );
 };
 
-const formatBest = (s: StreakResult): string => {
-  if (s.best === 0) return 'No streak yet';
-  const dateBit = s.bestEndedAt
-    ? ` · ${format(parseISO(s.bestEndedAt), 'MMM yyyy')}`
-    : '';
-  return `Best: ${s.best}${dateBit}`;
-};
-
 export const StreaksSection: React.FC<Props> = ({ connectionId, userId }) => {
   const { data: streaks, isLoading, totalRounds } = useStreaks(connectionId);
   const sectionRef = useRef<HTMLElement | null>(null);
@@ -278,10 +270,7 @@ export const StreaksSection: React.FC<Props> = ({ connectionId, userId }) => {
 
   if (!streaks) return null;
 
-  const allZero =
-    streaks.noUp.current === 0 &&
-    streaks.cutting.current === 0 &&
-    streaks.counter.current === 0;
+  const allZero = streaks.noUp.current === 0;
   if (allZero && totalRounds < 3) return null;
 
   const handleRecordsTap = () => {
@@ -405,39 +394,6 @@ export const StreaksSection: React.FC<Props> = ({ connectionId, userId }) => {
         <Timeline timeline={streaks.timeline} />
       </div>
 
-      {/* Demoted secondaries — single inline pill row */}
-      <div
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          background: '#fff',
-          border: `0.5px solid ${INK_10}`,
-          borderRadius: 12,
-          padding: '12px 16px',
-          marginBottom: 10,
-          fontFamily: FONT_GEIST,
-        }}
-      >
-        <SecondaryInline
-          label="CUTTING"
-          value={streaks.cutting.current}
-          bestText={formatBest(streaks.cutting)}
-        />
-        <div
-          style={{
-            width: '0.5px',
-            height: 30,
-            background: INK_10,
-            margin: '0 14px',
-            alignSelf: 'center',
-          }}
-        />
-        <SecondaryInline
-          label="COUNTER"
-          value={streaks.counter.current}
-          bestText={formatBest(streaks.counter)}
-        />
-      </div>
 
       {/* All-time records */}
       <button
@@ -483,51 +439,5 @@ export const StreaksSection: React.FC<Props> = ({ connectionId, userId }) => {
     </section>
   );
 };
-
-const SecondaryInline: React.FC<{ label: string; value: number; bestText: string }> = ({
-  label,
-  value,
-  bestText,
-}) => (
-  <div style={{ flex: 1, minWidth: 0 }}>
-    <div
-      style={{
-        fontSize: 9.5,
-        fontWeight: 800,
-        color: AMBER,
-        letterSpacing: '0.12em',
-        textTransform: 'uppercase',
-        marginBottom: 4,
-      }}
-    >
-      {label}
-    </div>
-    <div style={{ display: 'flex', alignItems: 'baseline', gap: 6 }}>
-      <span
-        style={{
-          fontSize: 16,
-          fontWeight: 800,
-          color: INK,
-          fontVariantNumeric: 'tabular-nums',
-          lineHeight: 1,
-        }}
-      >
-        {value}
-      </span>
-      <span
-        style={{
-          fontSize: 10,
-          color: INK_55,
-          fontWeight: 500,
-          whiteSpace: 'nowrap',
-          overflow: 'hidden',
-          textOverflow: 'ellipsis',
-        }}
-      >
-        {bestText}
-      </span>
-    </div>
-  </div>
-);
 
 export default StreaksSection;
