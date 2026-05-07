@@ -341,7 +341,7 @@ const HeroHandicapCard: React.FC<Props> = ({ connection }) => {
     return <span style={{ color: INK_40 }}>Steady form · last 5</span>;
   })();
 
-  // ── Status word (driven by 8-round form direction) ───────────────────────
+  // ── Status word (driven by 30-day form direction) ───────────────────────
   const statusWord =
     fallbackForm.direction === 'negative' && Math.abs(fallbackForm.formStrokes) > 0.5 ? 'EXCELLENT FORM'
     : fallbackForm.direction === 'negative' ? 'TRENDING DOWN'
@@ -365,7 +365,7 @@ const HeroHandicapCard: React.FC<Props> = ({ connection }) => {
         color: isDown ? GREEN : RED, fontWeight: 600,
         display: 'inline-flex', alignItems: 'center', gap: 3,
       }}>
-        {isDown ? <ArrowDown size={13} strokeWidth={2.5} /> : <ArrowUp size={13} strokeWidth={2.5} />}
+        {isDown ? <ArrowDown size={11} strokeWidth={2.5} /> : <ArrowUp size={11} strokeWidth={2.5} />}
         <span style={{ fontVariantNumeric: 'tabular-nums' }}>{Math.abs(d).toFixed(1)}</span>
       </span>
     );
@@ -394,8 +394,8 @@ const HeroHandicapCard: React.FC<Props> = ({ connection }) => {
     const yMin = min - headroom;
     const yMax = max + headroom;
     const yRange = yMax - yMin || 1;
-    const w = 48;
-    const h = 14;
+    const w = 40;
+    const h = 12;
     const coordsLocal = samples.map((p, i) => {
       const x = (i / (samples.length - 1)) * w;
       const y = ((yMax - p.handicap_index) / yRange) * h;
@@ -541,17 +541,17 @@ const HeroHandicapCard: React.FC<Props> = ({ connection }) => {
               {scrubValue.toFixed(1)}
             </span>
             <div style={{
-              marginTop: 10,
-              display: 'flex', alignItems: 'center', gap: 10,
-              fontSize: 13, fontVariantNumeric: 'tabular-nums',
+              marginTop: 8,
+              display: 'flex', alignItems: 'center', gap: 8,
+              fontSize: 11, fontVariantNumeric: 'tabular-nums',
               opacity: isScrubbing ? 0 : 1,
               transition: 'opacity 200ms ease',
             }}>
               {deltaInline}
               {sparkPolyline && (
                 <>
-                  <span style={{ width: 1, height: 12, background: INK_10, display: 'inline-block' }} />
-                  <svg width={48} height={14} viewBox="0 0 48 14" style={{ display: 'block' }}>
+                  <span style={{ width: 1, height: 10, background: INK_10, display: 'inline-block' }} />
+                  <svg width={40} height={12} viewBox="0 0 40 12" style={{ display: 'block' }}>
                     <polyline
                       points={sparkPolyline.points}
                       fill="none"
@@ -563,7 +563,7 @@ const HeroHandicapCard: React.FC<Props> = ({ connection }) => {
                     />
                     <circle cx={sparkPolyline.lastX} cy={sparkPolyline.lastY} r={2} fill={AMBER} />
                   </svg>
-                  <span style={{ fontSize: 11, color: INK_55, fontWeight: 500 }}>vs last 30d</span>
+                  <span style={{ fontSize: 10, color: INK_55, fontWeight: 500 }}>vs last 30d</span>
                 </>
               )}
             </div>
@@ -581,7 +581,7 @@ const HeroHandicapCard: React.FC<Props> = ({ connection }) => {
             </span>
             <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
               <span style={{ width: 8, height: 8, borderRadius: '50%', background: GREEN }} />
-              8-ROUND FORM
+              30-DAY FORM
             </span>
           </div>
         </div>
@@ -916,6 +916,7 @@ interface MetricRingsRowProps {
 }
 
 const MetricRingsRow: React.FC<MetricRingsRowProps> = ({ currentHcp, last20, history, delta30d }) => {
+  const SLATE = '#475569';
   const counterDiffs = (last20 ?? [])
     .filter((r: any) => r?.is_counter && typeof r?.handicap_differential === 'number')
     .slice(0, 8)
@@ -932,9 +933,9 @@ const MetricRingsRow: React.FC<MetricRingsRowProps> = ({ currentHcp, last20, his
     const mean = counterDiffs.reduce((s, v) => s + v, 0) / counterDiffs.length;
     const inBand = counterDiffs.filter((d) => Math.abs(d - mean) <= 0.5).length;
     const pct = (inBand / counterDiffs.length) * 100;
-    const color = pct >= 70 ? GREEN : pct >= 40 ? AMBER : RED;
+    const color = pct >= 70 ? GREEN : pct >= 40 ? SLATE : RED;
     consistency = {
-      label: 'CONSISTENCY', sub: '% in band', centre: `${Math.round(pct)}`,
+      label: 'CONSISTENCY', sub: 'within ±0.5 of avg', centre: `${Math.round(pct)}`,
       fraction: pct / 100, color, available: true,
     };
   }
@@ -948,7 +949,7 @@ const MetricRingsRow: React.FC<MetricRingsRowProps> = ({ currentHcp, last20, his
     };
   } else {
     const fraction = Math.min(1, Math.abs(delta30d) * 0.5);
-    const color = delta30d <= -0.1 ? GREEN : delta30d >= 0.1 ? RED : AMBER;
+    const color = delta30d <= -0.1 ? GREEN : delta30d >= 0.1 ? RED : SLATE;
     const centre = delta30d < 0
       ? `\u2212${Math.abs(delta30d).toFixed(1)}`
       : delta30d > 0
@@ -974,7 +975,7 @@ const MetricRingsRow: React.FC<MetricRingsRowProps> = ({ currentHcp, last20, his
     const range = maxH - minH;
     if (range < 0.05) {
       trajectory = {
-        label: 'TRAJECTORY', sub: 'of 1y range', centre: 'BEST',
+        label: 'TRAJECTORY', sub: 'in your 1y range', centre: 'BEST',
         fraction: 1, color: GREEN, available: true,
       };
     } else {
@@ -983,10 +984,10 @@ const MetricRingsRow: React.FC<MetricRingsRowProps> = ({ currentHcp, last20, his
       let centre: string;
       let color: string;
       if (positionPct <= 20) { centre = 'BEST'; color = GREEN; }
-      else if (positionPct <= 60) { centre = 'MID'; color = AMBER; }
+      else if (positionPct <= 60) { centre = 'MID'; color = SLATE; }
       else { centre = 'FAR'; color = RED; }
       trajectory = {
-        label: 'TRAJECTORY', sub: 'of 1y range', centre,
+        label: 'TRAJECTORY', sub: 'in your 1y range', centre,
         fraction, color, available: true,
       };
     }

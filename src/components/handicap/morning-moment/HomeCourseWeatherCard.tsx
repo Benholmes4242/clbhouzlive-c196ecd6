@@ -6,7 +6,18 @@
  * temperature + condition, and the club name.
  */
 import React from 'react';
-import { ChevronRight } from 'lucide-react';
+import {
+  ChevronRight,
+  Sun,
+  CloudSun,
+  Cloud,
+  CloudRain,
+  CloudLightning,
+  CloudSnow,
+  CloudFog,
+  Wind,
+  type LucideIcon,
+} from 'lucide-react';
 import { useHomeCourseWeather, WeatherUnresolvedError } from '@/lib/weather/useHomeCourseWeather';
 import type { WeatherUnresolvedReason } from '@/lib/weather/types';
 import { analyticsEvents } from '@/utils/analyticsEvents';
@@ -34,24 +45,19 @@ interface Props {
   userId: string;
 }
 
-/**
- * Course readiness — encoded as the arc length of the mini-ring.
- *  - calm + warm:    90% (playable)
- *  - moderate:       60% (manageable)
- *  - tough:          30%
- *  - no data:         0%
- */
-function readinessFraction(temp: number | null, wind: number | null): number {
-  if (temp == null || wind == null) return 0;
-  if (wind <= 8 && temp >= 8) return 0.9;
-  if (wind <= 15 && temp >= 4) return 0.6;
-  return 0.3;
+function pickWeatherIcon(description: string | undefined): LucideIcon {
+  const d = (description ?? '').toLowerCase();
+  if (d.includes('thunder') || d.includes('storm')) return CloudLightning;
+  if (d.includes('snow') || d.includes('sleet')) return CloudSnow;
+  if (d.includes('rain') || d.includes('shower') || d.includes('drizzle')) return CloudRain;
+  if (d.includes('fog') || d.includes('mist') || d.includes('haze')) return CloudFog;
+  if (d.includes('partly') || d.includes('few clouds') || d.includes('mostly clear')) return CloudSun;
+  if (d.includes('clear') || d.includes('sunny')) return Sun;
+  if (d.includes('cloud') || d.includes('overcast')) return Cloud;
+  return Cloud;
 }
 
-const RING_SIZE = 56;
-const RING_R = 24;
-const RING_STROKE = 4;
-const RING_C = 2 * Math.PI * RING_R;
+const ICON_BOX = 56;
 
 const HomeCourseWeatherCard: React.FC<Props> = ({ club, userId }) => {
   const { data: weather, isLoading, isError, error } = useHomeCourseWeather(club);
@@ -79,8 +85,7 @@ const HomeCourseWeatherCard: React.FC<Props> = ({ club, userId }) => {
 
   const wind = weather ? Math.round(weather.windSpeed) : null;
   const temp = weather ? Math.round(weather.temperature) : null;
-  const fraction = readinessFraction(temp, wind);
-  const dash = fraction * RING_C;
+  const WeatherIcon = pickWeatherIcon(weather?.description);
 
   return (
     <div
@@ -97,74 +102,24 @@ const HomeCourseWeatherCard: React.FC<Props> = ({ club, userId }) => {
         fontFamily: FONT_GEIST,
       }}
     >
-      {/* Mini-ring with wind speed inside */}
-      <div style={{ position: 'relative', width: RING_SIZE, height: RING_SIZE, flexShrink: 0 }}>
-        <svg width={RING_SIZE} height={RING_SIZE} viewBox={`0 0 ${RING_SIZE} ${RING_SIZE}`}>
-          <circle
-            cx={RING_SIZE / 2}
-            cy={RING_SIZE / 2}
-            r={RING_R}
-            fill="none"
-            stroke={INK_06}
-            strokeWidth={RING_STROKE}
-            vectorEffect="non-scaling-stroke"
-          />
-          {dash > 0 && (
-            <circle
-              cx={RING_SIZE / 2}
-              cy={RING_SIZE / 2}
-              r={RING_R}
-              fill="none"
-              stroke={AMBER}
-              strokeWidth={RING_STROKE}
-              strokeLinecap="round"
-              strokeDasharray={`${dash} ${RING_C}`}
-              transform={`rotate(-90 ${RING_SIZE / 2} ${RING_SIZE / 2})`}
-              vectorEffect="non-scaling-stroke"
-              style={{ transition: 'stroke-dasharray 320ms cubic-bezier(0.22,0.61,0.36,1)' }}
-            />
-          )}
-        </svg>
-        <div
-          style={{
-            position: 'absolute',
-            inset: 0,
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            justifyContent: 'center',
-            pointerEvents: 'none',
-          }}
-        >
-          {isLoading ? (
-            <div style={{ width: 18, height: 10, background: INK_06, borderRadius: 3 }} />
-          ) : (
-            <>
-              <span
-                style={{
-                  fontSize: 13,
-                  fontWeight: 700,
-                  color: INK,
-                  lineHeight: 1,
-                  fontVariantNumeric: 'tabular-nums',
-                }}
-              >
-                {wind}
-              </span>
-              <span
-                style={{
-                  fontSize: 7.5,
-                  fontWeight: 700,
-                  color: INK_40,
-                  letterSpacing: '0.08em',
-                  marginTop: 2,
-                }}
-              >
-                MPH
-              </span>
-            </>
-          )}
-        </div>
+      {/* Weather glyph */}
+      <div
+        style={{
+          width: ICON_BOX,
+          height: ICON_BOX,
+          borderRadius: 14,
+          background: INK_06,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          flexShrink: 0,
+        }}
+      >
+        {isLoading ? (
+          <div style={{ width: 24, height: 24, background: INK_08, borderRadius: 6 }} />
+        ) : (
+          <WeatherIcon size={28} strokeWidth={2} color={INK} />
+        )}
       </div>
 
       {/* Centre column */}
@@ -189,7 +144,7 @@ const HomeCourseWeatherCard: React.FC<Props> = ({ club, userId }) => {
           </>
         ) : (
           <>
-            <div style={{ display: 'flex', alignItems: 'baseline', gap: 6, flexWrap: 'wrap' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
               <span
                 style={{
                   fontSize: 22,
@@ -209,8 +164,24 @@ const HomeCourseWeatherCard: React.FC<Props> = ({ club, userId }) => {
                   fontWeight: 500,
                 }}
               >
-                {weather!.description} · {(wind ?? 0) <= 8 ? 'low wind' : (wind ?? 0) <= 15 ? 'moderate wind' : 'strong wind'}
+                {weather!.description}
               </span>
+              {wind != null && (
+                <span
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: 3,
+                    fontSize: 12,
+                    color: INK_55,
+                    fontWeight: 500,
+                  }}
+                >
+                  <span style={{ color: INK_40 }}>·</span>
+                  <Wind size={11} strokeWidth={2.4} color={INK_40} />
+                  <span style={{ fontVariantNumeric: 'tabular-nums' }}>{wind}mph</span>
+                </span>
+              )}
             </div>
             <div
               style={{
