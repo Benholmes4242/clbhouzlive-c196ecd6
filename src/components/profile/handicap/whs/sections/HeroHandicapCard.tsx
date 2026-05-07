@@ -23,6 +23,7 @@ const INK_06 = 'rgba(15,23,42,0.06)';
 const INK_04 = 'rgba(15,23,42,0.04)';
 const GREEN = '#2DD4BF';
 const RED = '#9F1D1D';
+const RED_FORM_HOT = '#B91C1C';
 
 const MONTHS = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
 const FONT_DISPLAY = 'SF Pro Display, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
@@ -43,6 +44,7 @@ const W = 340;
 const H = 110;
 const PAD_TOP = 22;
 const PAD_BOTTOM = 22;
+const PAD_RIGHT = 8;
 
 // ── Milestone progress ────────────────────────────────────────────────────
 function calcMilestoneProgress(h: number) {
@@ -123,7 +125,7 @@ const HeroHandicapCard: React.FC<Props> = ({ connection }) => {
     const max = Math.max(...values);
     const r = max - min || 1;
     return points.map((p, i) => {
-      const x = points.length === 1 ? W / 2 : (i / (points.length - 1)) * W;
+      const x = points.length === 1 ? W / 2 : (i / (points.length - 1)) * (W - PAD_RIGHT);
       const y = PAD_TOP + ((max - p.handicap_index) / r) * (H - PAD_TOP - PAD_BOTTOM);
       return { x, y, idx: i };
     });
@@ -635,9 +637,14 @@ const HeroHandicapCard: React.FC<Props> = ({ connection }) => {
           onPointerCancel={clearScrub}
         >
           <defs>
+            <linearGradient id="heroSparkStroke" x1="0" y1="0" x2="1" y2="0">
+              <stop offset="0%" stopColor="#F7931E" />
+              <stop offset="100%" stopColor="#FBBC2E" />
+            </linearGradient>
             <linearGradient id="heroSparkFill" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor={AMBER} stopOpacity={0.28} />
-              <stop offset="100%" stopColor={AMBER} stopOpacity={0} />
+              <stop offset="0%" stopColor="#FBBC2E" stopOpacity={0.32} />
+              <stop offset="60%" stopColor="#F7931E" stopOpacity={0.12} />
+              <stop offset="100%" stopColor="#F7931E" stopOpacity={0} />
             </linearGradient>
           </defs>
 
@@ -671,7 +678,7 @@ const HeroHandicapCard: React.FC<Props> = ({ connection }) => {
               <path
                 d={pathD}
                 fill="none"
-                stroke={AMBER}
+                stroke="url(#heroSparkStroke)"
                 strokeWidth={2}
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -688,7 +695,7 @@ const HeroHandicapCard: React.FC<Props> = ({ connection }) => {
           {coords.length === 1 && (
             <line
               x1={0} y1={coords[0].y} x2={W} y2={coords[0].y}
-              stroke={AMBER} strokeWidth={2} strokeLinecap="round" opacity={0.7}
+              stroke="url(#heroSparkStroke)" strokeWidth={2} strokeLinecap="round" opacity={0.7}
             />
           )}
 
@@ -742,7 +749,7 @@ const HeroHandicapCard: React.FC<Props> = ({ connection }) => {
                 cx={worstPoint.coord.x}
                 cy={worstPoint.coord.y}
                 r={3.5}
-                fill={RED}
+                fill={RED_FORM_HOT}
                 stroke="#fff"
                 strokeWidth={1.5}
               />
@@ -751,7 +758,7 @@ const HeroHandicapCard: React.FC<Props> = ({ connection }) => {
                 y={worstPoint.coord.y < 16 ? worstPoint.coord.y + 16 : worstPoint.coord.y - 8}
                 fontSize={9}
                 fontWeight={700}
-                fill={RED}
+                fill={RED_FORM_HOT}
                 textAnchor="middle"
               >
                 {formatDisplayedHcp(worstPoint.value)}
