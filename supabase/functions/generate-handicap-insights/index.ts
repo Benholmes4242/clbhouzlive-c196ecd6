@@ -242,7 +242,18 @@ Deno.serve(async (req) => {
 
     const trendSignals = computeTrendSignals(rounds as any[], roundsForPrompt);
 
-    const prompt = buildPrompt(roundsForPrompt, candidatesWithExpected, dateKey, trendSignals);
+    // Friend leaderboard — for Friends Echo signals
+    const { data: friendsRaw } = await admin.rpc('get_friend_leaderboard' as any, {
+      p_user_id: userId,
+    });
+    const friends = (friendsRaw ?? []) as Array<any>;
+    const friendSignals = computeFriendSignals(
+      friends,
+      rounds as any[],
+      trendSignals.current_index,
+    );
+
+    const prompt = buildPrompt(roundsForPrompt, candidatesWithExpected, dateKey, trendSignals, friendSignals);
 
     const aiResp = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
