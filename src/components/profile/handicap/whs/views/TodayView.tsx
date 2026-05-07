@@ -74,9 +74,9 @@ export const TodayView: React.FC<Props> = ({
 
       <HeroHandicapCard connection={connection} />
 
-      {!readOnly && <StreaksSection connectionId={connectionId} userId={userId} />}
-
       <LastRoundCard connectionId={connectionId} />
+
+      {!readOnly && <StreaksSection connectionId={connectionId} userId={userId} />}
 
       {!readOnly && peerComparisonVisible && <WhereYouStandSection userId={userId} />}
       {!readOnly && <SinceLastVisitRail userId={userId} />}
