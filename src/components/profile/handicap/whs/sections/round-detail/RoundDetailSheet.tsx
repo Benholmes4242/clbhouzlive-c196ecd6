@@ -147,7 +147,7 @@ export const RoundDetailSheet: React.FC<Props> = ({ scoreId, open, onClose, hand
                 style={{
                   position: 'relative',
                   width: '100%',
-                  aspectRatio: '16 / 8',
+                  height: 380,
                   flexShrink: 0,
                   background: 'linear-gradient(135deg, #1e293b 0%, #0f172a 100%)',
                 }}
@@ -169,7 +169,7 @@ export const RoundDetailSheet: React.FC<Props> = ({ scoreId, open, onClose, hand
                     position: 'absolute',
                     inset: 0,
                     background:
-                      'linear-gradient(180deg, rgba(15,23,42,0.05) 0%, rgba(15,23,42,0.85) 100%)',
+                      'linear-gradient(180deg, rgba(15,23,42,0.10) 0%, rgba(15,23,42,0.30) 50%, rgba(15,23,42,0.85) 100%)',
                   }}
                 />
 
@@ -213,7 +213,7 @@ export const RoundDetailSheet: React.FC<Props> = ({ scoreId, open, onClose, hand
                     position: 'absolute',
                     left: 20,
                     right: 20,
-                    bottom: 16,
+                    bottom: 64,
                     color: '#fff',
                   }}
                 >
@@ -224,7 +224,7 @@ export const RoundDetailSheet: React.FC<Props> = ({ scoreId, open, onClose, hand
                       fontWeight: 800,
                       letterSpacing: '0.14em',
                       opacity: 0.85,
-                      marginBottom: 4,
+                      marginBottom: 6,
                     }}
                   >
                     {relativeDay(data.play_date)}
@@ -235,16 +235,35 @@ export const RoundDetailSheet: React.FC<Props> = ({ scoreId, open, onClose, hand
                     id="round-detail-sheet-title"
                     style={{
                       margin: 0,
-                      fontSize: 22,
+                      fontSize: 30,
                       fontWeight: 900,
                       fontFamily: FONT_SERIF,
-                      letterSpacing: '-0.02em',
-                      lineHeight: 1.15,
-                      textShadow: '0 1px 2px rgba(0,0,0,0.4)',
+                      letterSpacing: '-0.025em',
+                      lineHeight: 1.05,
+                      textShadow: '0 2px 12px rgba(0,0,0,0.45)',
                     }}
                   >
                     {data.course?.name ?? 'Unknown course'}
                   </h2>
+                  {(data.marker_name || data.course_rating) && (
+                    <p
+                      style={{
+                        margin: '8px 0 0',
+                        fontSize: 11.5,
+                        fontWeight: 500,
+                        color: 'rgba(255,255,255,0.72)',
+                        letterSpacing: '0.01em',
+                      }}
+                    >
+                      {[
+                        format(new Date(data.play_date), 'd MMM yyyy'),
+                        data.marker_name && `${data.marker_name}`,
+                        data.course_rating !== null && data.slope_rating !== null
+                          ? `${data.course_rating.toFixed(1)} / ${data.slope_rating}`
+                          : null,
+                      ].filter(Boolean).join(' · ')}
+                    </p>
+                  )}
                 </div>
               </div>
 
@@ -264,7 +283,7 @@ export const RoundDetailSheet: React.FC<Props> = ({ scoreId, open, onClose, hand
 
                 <div
                   style={{
-                    padding: '0 20px',
+                    padding: '20px 20px 0',
                     display: 'flex',
                     gap: 8,
                     flexWrap: 'wrap',

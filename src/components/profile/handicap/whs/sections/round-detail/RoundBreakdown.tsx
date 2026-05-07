@@ -17,51 +17,25 @@ interface Bucket {
   count: number;
 }
 
-const Stat: React.FC<{ label: string; count: number }> = ({ label, count }) => {
-  const has = count > 0;
-  return (
-    <div style={{ textAlign: 'center' }}>
-      <p
-        style={{
-          margin: 0,
-          fontSize: 22,
-          fontWeight: 800,
-          color: has ? INK : INK_FAINT,
-          fontFamily: FONT_DISPLAY,
-          fontVariantNumeric: 'tabular-nums',
-          letterSpacing: '-0.02em',
-          lineHeight: 1,
-          marginBottom: 4,
-        }}
-      >
-        {count}
-      </p>
-      <p
-        style={{
-          margin: 0,
-          fontSize: 9,
-          fontWeight: 800,
-          color: INK_MUTE,
-          letterSpacing: '0.12em',
-        }}
-      >
-        {label.toUpperCase()}
-      </p>
-    </div>
-  );
+const SCORE_COLORS: Record<string, string> = {
+  Eagle: '#FBBC2E',
+  Birdie: '#F7931E',
+  Par: 'rgba(15,23,42,0.40)',
+  Bogey: '#DC2626',
+  'Dbl+': '#991B1B',
 };
 
 export const RoundBreakdown: React.FC<Props> = ({ holes }) => {
   const buckets = useMemo<Bucket[]>(() => {
-    const played = holes.filter((h) => h.played);
     let eagles = 0;
     let birdies = 0;
     let pars = 0;
     let bogeys = 0;
     let dblPlus = 0;
-    for (const h of played) {
+    for (const h of holes) {
+      if (!h.played) continue;
       const strokes = h.adjusted_gross ?? h.actual_gross;
-      if (strokes === null || strokes === undefined) continue;
+      if (strokes === null || strokes === undefined || h.par == null) continue;
       const stp = strokes - h.par;
       if (stp <= -2) eagles++;
       else if (stp === -1) birdies++;
@@ -79,36 +53,79 @@ export const RoundBreakdown: React.FC<Props> = ({ holes }) => {
   }, [holes]);
 
   return (
-    <div
-      style={{
-        margin: '20px 20px 0',
-        padding: '16px',
-        background: '#FFFFFF',
-        border: `1px solid ${HAIRLINE}`,
-        borderRadius: 12,
-      }}
-    >
-      <h3
+    <div style={{ padding: '20px 16px 0' }}>
+      <p
         style={{
-          margin: '0 0 12px',
+          margin: '0 0 10px',
+          padding: '0 4px',
           fontSize: 11,
           fontWeight: 800,
+          letterSpacing: '0.14em',
           color: INK_MUTE,
-          letterSpacing: '0.18em',
+          textTransform: 'uppercase',
+          fontFamily: FONT_DISPLAY,
         }}
       >
-        SCORE BREAKDOWN
-      </h3>
-      <div
-        style={{
-          display: 'grid',
-          gridTemplateColumns: '1fr 1fr 1fr 1fr 1fr',
-          gap: 8,
-        }}
-      >
-        {buckets.map((b) => (
-          <Stat key={b.label} label={b.label} count={b.count} />
-        ))}
+        Score breakdown
+      </p>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 6 }}>
+        {buckets.map((b) => {
+          const has = b.count > 0;
+          const color = SCORE_COLORS[b.label];
+          return (
+            <div
+              key={b.label}
+              style={{
+                position: 'relative',
+                background: '#fff',
+                border: `1px solid ${HAIRLINE}`,
+                borderRadius: 10,
+                padding: '14px 6px 10px',
+                textAlign: 'center',
+                overflow: 'hidden',
+              }}
+            >
+              <div
+                style={{
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  height: 3,
+                  background: color,
+                  opacity: has ? 1 : 0.25,
+                }}
+              />
+              <p
+                style={{
+                  margin: 0,
+                  fontSize: 24,
+                  fontWeight: 800,
+                  color: has ? INK : INK_FAINT,
+                  fontFamily: FONT_DISPLAY,
+                  fontVariantNumeric: 'tabular-nums',
+                  letterSpacing: '-0.03em',
+                  lineHeight: 1,
+                }}
+              >
+                {b.count}
+              </p>
+              <p
+                style={{
+                  margin: '6px 0 0',
+                  fontSize: 8.5,
+                  fontWeight: 800,
+                  letterSpacing: '0.12em',
+                  color: INK_MUTE,
+                  textTransform: 'uppercase',
+                  fontFamily: FONT_DISPLAY,
+                }}
+              >
+                {b.label}
+              </p>
+            </div>
+          );
+        })}
       </div>
     </div>
   );
