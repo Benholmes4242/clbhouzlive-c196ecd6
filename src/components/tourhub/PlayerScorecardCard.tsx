@@ -1,22 +1,24 @@
 /**
- * PlayerScorecardCard — Scorecard content rendered inside the expanded glass card.
- * No own background — the parent HeroSlide glass card provides blur/overlay.
+ * PlayerScorecardCard — Editorial light-theme scorecard hero (C2 Editorial · Elastic).
+ *
+ * - Light theme on #F8FAFC, hard-cap to parent 70dvh, no internal scroll.
+ * - ElasticZone header (back nav + caption + player block) absorbs slack.
+ * - Below first divider: round tabs, Front 9 / Back 9 strips, total row.
+ * - Bottom CTA: "View Full Player Profile" → playerRoute(id, { kind: 'tournament', tournamentName }).
  */
 import { useState, useMemo, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ChevronLeft, X, Trophy } from 'lucide-react';
 import { usePlayerScorecard, type RoundScorecard, type HoleScore } from '@/hooks/usePlayerScorecard';
-import { getScoreTextClass, getScoreBgClass, getScoreColorSet, SCORE_COLORS } from '@/features/tourhub/utils/scoreColors';
-import { HeroAtmosphere } from '@/features/tourhub/components/shared/HeroAtmosphere';
 import { Shimmer } from '@/features/tourhub/components/shared/Shimmer';
-import { StatsGrid } from '@/features/tourhub/components/shared/StatsGrid';
-import { RoundSparkline } from '@/features/tourhub/components/shared/RoundSparkline';
+import { ElasticZone } from '@/features/tourhub/components/shared/ElasticZone';
+import { HeroCTA } from '@/features/tourhub/components/shared/HeroCTA';
+import { playerRoute } from '@/features/tourhub/routes';
 import {
-  ink, inkSoft, inkFaint, inkGhost,
-  hairlineDark, hairlineMid,
-  gold, greenLive, danger, navyMid,
-  fmtScore, fmtScoreSign, PULSE_KEYFRAMES,
+  ink, gold, greenLive, danger,
+  lightBg, slate100, slate200, slate300, slate400, slate500,
+  fmtScore, PULSE_KEYFRAMES,
 } from '@/features/tourhub/utils/heroAtmosphere';
 
 // ── Types ──────────────────────────────────────────────────────────────────────
@@ -46,8 +48,6 @@ interface PlayerScorecardCardProps {
   onClose: () => void;
 }
 
-// Score color helpers now imported from @/features/tourhub/utils/scoreColors
-
 const COUNTRY_TO_FLAG: Record<string, string> = {
   'UNITED STATES': '🇺🇸', 'ENGLAND': '🏴󠁧󠁢󠁥󠁮󠁧󠁿',
   'NORTHERN IRELAND': '🇮🇪', 'SCOTLAND': '🏴󠁧󠁢󠁳󠁣󠁴󠁿',
@@ -63,64 +63,65 @@ const COUNTRY_TO_FLAG: Record<string, string> = {
   'FIJI': '🇫🇯', 'THAILAND': '🇹🇭', 'PHILIPPINES': '🇵🇭',
 };
 
-function formatScoreToPar(score: number): string {
-  if (score === 0) return 'E';
-  if (score > 0) return `+${score}`;
-  return `${score}`;
+// ── Light-theme score colors ──────────────────────────────────────────────────
+
+function lightScoreColors(scoreToPar: number) {
+  // eagle/birdie = ink filled circle, white text
+  if (scoreToPar <= -1) {
+    return { text: '#FFFFFF', bg: ink, ring: ink, kind: 'circle' as const };
+  }
+  // par = neutral dashed
+  if (scoreToPar === 0) {
+    return { text: slate500, bg: 'transparent', ring: slate300, kind: 'square' as const };
+  }
+  // bogey = red outline
+  if (scoreToPar === 1) {
+    return { text: danger, bg: 'rgba(248,113,113,0.08)', ring: danger, kind: 'square' as const };
+  }
+  // double+
+  return { text: danger, bg: 'rgba(248,113,113,0.12)', ring: danger, kind: 'square' as const };
 }
 
-// ── Hole Cell Component ────────────────────────────────────────────────────────
+// ── Hole Cell ─────────────────────────────────────────────────────────────────
 
 function HoleCell({ hole }: { hole: HoleScore }) {
-  const c = getScoreColorSet(hole.scoreToPar);
-  const isEagleOrBetter = hole.scoreToPar <= -2;
-  const isBirdie = hole.scoreToPar === -1;
+  const c = lightScoreColors(hole.scoreToPar);
+  const isCircle = c.kind === 'circle';
+  const borderRadius = isCircle ? '50%' : 4;
   const isPar = hole.scoreToPar === 0;
-  const isBogey = hole.scoreToPar === 1;
   const isDoublePlus = hole.scoreToPar >= 2;
 
-  // Shape: birdie/eagle = circle, par/bogey/double = square
-  const isCircle = hole.scoreToPar <= -1;
-  const borderRadius = isCircle ? '50%' : 5;
-
-  // Double outline for eagle and double bogey+
-  const outlineStyle = (isEagleOrBetter || isDoublePlus) ? {
+  const outlineStyle = isDoublePlus ? {
     outline: `1px solid ${c.ring}`,
     outlineOffset: '1px',
   } : {};
 
-  // Par uses dashed border
-  const borderStyle = isPar ? `1.5px dashed ${c.ring}` : `1.5px solid ${c.ring}`;
+  const borderStyle = isPar ? `1px dashed ${c.ring}` : `1px solid ${c.ring}`;
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2, minWidth: 0 }}>
-      <span style={{ fontSize: 'clamp(9px, 2.8vw, 11px)', fontWeight: 600, color: 'rgba(255,255,255,0.45)', letterSpacing: '0.5px' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 1, minWidth: 0 }}>
+      <span style={{ fontSize: 8.5, fontWeight: 700, color: slate400, letterSpacing: '0.04em' }}>
         {hole.holeNumber}
       </span>
-      <span style={{ fontSize: 'clamp(8px, 2.5vw, 10px)', color: 'rgba(255,255,255,0.30)' }}>
+      <span style={{ fontSize: 8, color: slate300, fontWeight: 600 }}>
         {hole.par}
       </span>
       <div style={{
-        width: 'clamp(28px, 8.5vw, 34px)', height: 'clamp(28px, 8.5vw, 34px)',
+        width: 'clamp(22px, 6.6vw, 28px)', height: 'clamp(22px, 6.6vw, 28px)',
         borderRadius,
         border: borderStyle,
-        background: isPar ? 'transparent' : c.bg,
-        display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
-        gap: 0,
+        background: c.bg,
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
         ...outlineStyle,
       } as React.CSSProperties}>
         <span style={{
-          fontSize: 'clamp(11px, 3.3vw, 13px)', fontWeight: 800,
+          fontSize: 11, fontWeight: 800,
           color: c.text,
           lineHeight: 1,
+          fontVariantNumeric: 'tabular-nums',
         }}>
           {hole.strokes}
         </span>
-        {!isPar && (
-          <span style={{ fontSize: 'clamp(6px, 1.8vw, 7px)', fontWeight: 700, color: c.text, opacity: 0.75, lineHeight: 1, marginTop: 1 }}>
-            {hole.scoreToPar < 0 ? `${hole.scoreToPar}` : `+${hole.scoreToPar}`}
-          </span>
-        )}
       </div>
     </div>
   );
@@ -128,35 +129,31 @@ function HoleCell({ hole }: { hole: HoleScore }) {
 
 function EmptyHoleCell({ holeNumber, par }: { holeNumber: number; par: number }) {
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2, minWidth: 0 }}>
-      <span style={{ fontSize: 'clamp(8px, 2.5vw, 10px)', fontWeight: 500, color: 'rgba(255,255,255,0.40)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 1, minWidth: 0 }}>
+      <span style={{ fontSize: 8.5, fontWeight: 700, color: slate300, letterSpacing: '0.04em' }}>
         {holeNumber}
       </span>
-      <span style={{ fontSize: 'clamp(8px, 2.5vw, 10px)', color: 'rgba(255,255,255,0.30)' }}>
+      <span style={{ fontSize: 8, color: slate300, fontWeight: 600 }}>
         {par}
       </span>
       <div style={{
-        width: 'clamp(26px, 8vw, 32px)', height: 'clamp(26px, 8vw, 32px)',
-        borderRadius: '50%',
-        border: '1.5px dashed rgba(255,255,255,0.10)',
+        width: 'clamp(22px, 6.6vw, 28px)', height: 'clamp(22px, 6.6vw, 28px)',
+        borderRadius: 4,
+        border: `1px dashed ${slate200}`,
         display: 'flex', alignItems: 'center', justifyContent: 'center',
       }}>
-        <span style={{ fontSize: 'clamp(8px, 2.5vw, 10px)', fontWeight: 600, color: 'rgba(255,255,255,0.20)' }}>—</span>
+        <span style={{ fontSize: 9, fontWeight: 600, color: slate300 }}>—</span>
       </div>
     </div>
   );
 }
 
-// ── Nine-Hole Row ──────────────────────────────────────────────────────────────
+// ── Nine-Hole Row ─────────────────────────────────────────────────────────────
 
 function NineHoleRow({
-  label,
-  startHole,
-  completedHoles,
-  defaultPars,
+  label, startHole, completedHoles, defaultPars,
 }: {
   label: string;
-  holes: HoleScore[];
   startHole: number;
   completedHoles: Map<number, HoleScore>;
   defaultPars: Record<number, number>;
@@ -167,17 +164,21 @@ function NineHoleRow({
   const hasAnyScore = nineHoles.some((h) => h !== undefined);
 
   return (
-    <div style={{ padding: '0 clamp(8px, 2vw, 12px)' }}>
-      <div className="flex items-center justify-between mb-2">
-        <span className="text-[12px] font-semibold text-white/45 uppercase tracking-[1.5px]">{label}</span>
+    <div style={{ padding: '0 4px' }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 4 }}>
+        <span style={{ fontSize: 9, fontWeight: 800, color: slate400, letterSpacing: '0.14em', textTransform: 'uppercase' }}>
+          {label}
+        </span>
         {hasAnyScore && (
-          <div className="flex items-center gap-2">
-            <span className="text-[11px] text-white/30">Par {outPar}</span>
-            <span className="text-sm font-bold text-white/80">{outScore || '—'}</span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+            <span style={{ fontSize: 9, color: slate400, fontWeight: 600 }}>Par {outPar}</span>
+            <span style={{ fontSize: 12, fontWeight: 800, color: ink, fontVariantNumeric: 'tabular-nums' }}>
+              {outScore || '—'}
+            </span>
           </div>
         )}
       </div>
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(9, 1fr)', gap: 'clamp(1px, 0.5vw, 4px)' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(9, 1fr)', gap: 3 }}>
         {Array.from({ length: 9 }, (_, i) => {
           const holeNum = startHole + i;
           const hole = completedHoles.get(holeNum);
@@ -189,14 +190,10 @@ function NineHoleRow({
   );
 }
 
-// ── Round Tab Selector ─────────────────────────────────────────────────────────
+// ── Round Tabs ────────────────────────────────────────────────────────────────
 
 function RoundTabs({
-  rounds,
-  activeRound,
-  currentRound,
-  onSelect,
-  roundScores,
+  rounds, activeRound, currentRound, onSelect, roundScores,
 }: {
   rounds: RoundScorecard[];
   activeRound: number;
@@ -206,7 +203,7 @@ function RoundTabs({
 }) {
   const tabs = [1, 2, 3, 4];
   return (
-    <div style={{ padding: '0 16px 14px', display: 'flex', gap: 6 }}>
+    <div style={{ display: 'flex', gap: 5, marginBottom: 8 }}>
       {tabs.map((roundNum) => {
         const hasScorecard = rounds.some((r) => r.roundNumber === roundNum);
         const rs = roundScores.find((r) => r.round === roundNum);
@@ -221,30 +218,26 @@ function RoundTabs({
             onClick={() => hasData && onSelect(roundNum)}
             disabled={!hasData}
             style={{
-              flex: 1, padding: '10px 8px', borderRadius: 10,
+              flex: 1, padding: '7px 6px', borderRadius: 8,
               border: isActive
-                ? `1.5px solid ${isLive ? greenLive : '#fff'}`
-                : `1px solid ${hairlineDark}`,
-              background: isActive ? 'rgba(255,255,255,0.04)' : 'transparent',
+                ? `1.5px solid ${isLive ? greenLive : ink}`
+                : `1px solid ${slate200}`,
+              background: isActive ? '#FFFFFF' : 'transparent',
               textAlign: 'center', cursor: hasData ? 'pointer' : 'default',
-              opacity: hasData ? 1 : 0.4,
+              opacity: hasData ? 1 : 0.45,
             }}
           >
-            <div
-              style={{
-                fontSize: 9, fontWeight: 800, letterSpacing: '0.1em',
-                color: isActive ? (isLive ? greenLive : '#fff') : inkFaint,
-              }}
-            >
+            <div style={{
+              fontSize: 8.5, fontWeight: 800, letterSpacing: '0.1em',
+              color: isActive ? (isLive ? greenLive : ink) : slate400,
+            }}>
               R{roundNum}
             </div>
-            <div
-              style={{
-                fontSize: 16, fontWeight: 800, marginTop: 3,
-                color: isLive ? greenLive : '#fff',
-                fontVariantNumeric: 'tabular-nums',
-              }}
-            >
+            <div style={{
+              fontSize: 13, fontWeight: 800, marginTop: 2,
+              color: isLive ? greenLive : ink,
+              fontVariantNumeric: 'tabular-nums',
+            }}>
               {isLive ? 'LIVE' : toPar != null ? fmtScore(toPar) : '—'}
             </div>
           </button>
@@ -254,122 +247,29 @@ function RoundTabs({
   );
 }
 
-// ── Scorecard Skeleton ─────────────────────────────────────────────────────────
+// ── Skeleton ──────────────────────────────────────────────────────────────────
 
 function ScorecardSkeleton() {
   return (
-    <>
-      <div style={{ padding: '0 20px 14px', display: 'flex', justifyContent: 'space-between' }}>
-        <Shimmer width="28%" height={20} radius={4} />
-        <Shimmer width="20%" height={20} radius={4} />
-      </div>
-      <div style={{ padding: '0 20px 14px' }}>
-        <Shimmer width="80%" height={14} radius={3} />
-      </div>
-      <div style={{ padding: '0 20px 18px', display: 'flex', alignItems: 'center', gap: 14 }}>
-        <Shimmer width={72} height={72} radius="50%" />
-        <div style={{ flex: 1, minWidth: 0 }}>
-          <Shimmer width="40%" height={11} radius={3} style={{ marginBottom: 8 }} />
-          <Shimmer width="70%" height={22} radius={5} style={{ marginBottom: 8 }} />
-          <Shimmer width="50%" height={11} radius={3} />
-        </div>
-        <Shimmer width="20%" height={48} radius={6} />
-      </div>
-      <div style={{ padding: '0 16px 14px' }}>
-        <Shimmer width="100%" height={94} radius={14} />
-      </div>
-      <div style={{ padding: '0 16px 14px', display: 'flex', gap: 6 }}>
+    <div style={{ padding: '0 4px' }}>
+      <div style={{ display: 'flex', gap: 5, marginBottom: 10 }}>
         {Array.from({ length: 4 }).map((_, i) => (
-          <Shimmer key={i} height={50} radius={10} style={{ flex: 1 }} />
+          <Shimmer key={i} height={42} radius={8} style={{ flex: 1 }} />
         ))}
       </div>
-      <div style={{ padding: '0 16px 14px' }}>
-        <Shimmer width="100%" height={70} radius={14} />
+      <Shimmer width="40%" height={9} radius={3} style={{ marginBottom: 8 }} />
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(9, 1fr)', gap: 3, marginBottom: 12 }}>
+        {Array.from({ length: 9 }).map((_, i) => <Shimmer key={i} height={52} radius={4} />)}
       </div>
-      <div style={{ padding: '0 12px 14px' }}>
-        <Shimmer width="40%" height={9} radius={3} style={{ marginBottom: 12 }} />
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(9, 1fr)', gap: 4 }}>
-          {Array.from({ length: 9 }).map((_, i) => (
-            <Shimmer key={i} height={60} radius={6} />
-          ))}
-        </div>
+      <Shimmer width="40%" height={9} radius={3} style={{ marginBottom: 8 }} />
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(9, 1fr)', gap: 3 }}>
+        {Array.from({ length: 9 }).map((_, i) => <Shimmer key={i} height={52} radius={4} />)}
       </div>
-      <div style={{ padding: '0 12px 14px' }}>
-        <Shimmer width="40%" height={9} radius={3} style={{ marginBottom: 12 }} />
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(9, 1fr)', gap: 4 }}>
-          {Array.from({ length: 9 }).map((_, i) => (
-            <Shimmer key={i} height={60} radius={6} />
-          ))}
-        </div>
-      </div>
-      <div style={{ padding: '0 16px 18px' }}>
-        <Shimmer width="100%" height={50} radius={14} />
-      </div>
-    </>
-  );
-}
-
-function TournamentProgressionPanel({
-  rounds,
-  isCompleted,
-}: {
-  rounds: { round: number; toPar: number | null }[];
-  isCompleted: boolean;
-}) {
-  const completed = rounds.filter((r) => r.toPar != null) as { round: number; toPar: number }[];
-  if (completed.length < 2) {
-    return (
-      <div
-        style={{
-          margin: '0 16px 14px',
-          background: 'rgba(255,255,255,0.02)',
-          borderRadius: 14,
-          border: `1px solid ${hairlineDark}`,
-          padding: '18px 14px',
-          textAlign: 'center',
-          color: inkFaint, fontSize: 11,
-        }}
-      >
-        Score progression appears once you've finished R2.
-      </div>
-    );
-  }
-  const accent = isCompleted ? gold : greenLive;
-  const cumulative = completed.reduce<number[]>((acc, r) => {
-    acc.push((acc[acc.length - 1] ?? 0) + r.toPar);
-    return acc;
-  }, []);
-  const final = cumulative[cumulative.length - 1];
-
-  return (
-    <div
-      style={{
-        margin: '0 16px 14px',
-        background: 'rgba(255,255,255,0.025)',
-        borderRadius: 14,
-        border: `1px solid ${hairlineDark}`,
-        padding: '12px 14px 10px',
-      }}
-    >
-      <div
-        style={{
-          display: 'flex', justifyContent: 'space-between', alignItems: 'baseline',
-          marginBottom: 8,
-        }}
-      >
-        <span style={{ fontSize: 9, fontWeight: 800, letterSpacing: '0.14em', color: inkFaint }}>
-          TOURNAMENT · SCORE PROGRESSION
-        </span>
-        <span style={{ fontSize: 10, color: accent, fontWeight: 700 }}>
-          {fmtScore(final)} thru R{completed.length}
-        </span>
-      </div>
-      <RoundSparkline rounds={cumulative} accent={accent} cumulative />
     </div>
   );
 }
 
-// ── Main Component ─────────────────────────────────────────────────────────────
+// ── Main Component ────────────────────────────────────────────────────────────
 
 export function PlayerScorecardCard({
   player,
@@ -381,9 +281,7 @@ export function PlayerScorecardCard({
 }: PlayerScorecardCardProps) {
   const navigate = useNavigate();
   const { data: scorecard, isLoading } = usePlayerScorecard(tournamentId, player.id);
-  const [activeRound, setActiveRound] = useState<number>(
-    player.currentRound || 1
-  );
+  const [activeRound, setActiveRound] = useState<number>(player.currentRound || 1);
   const hasInitialisedRound = useRef(false);
 
   useEffect(() => {
@@ -442,333 +340,312 @@ export function PlayerScorecardCard({
     ? `${player.position}`
     : `${player.position}`;
 
+  const handleViewProfile = () => {
+    const target = playerRoute(player.id, {
+      kind: 'tournament',
+      tournamentName: tournamentName || 'Tournament',
+    });
+    navigate(target.to, { state: target.state });
+  };
+
   return (
-    <HeroAtmosphere
+    <motion.div
+      initial={{ opacity: 0, x: 60 }}
+      animate={{ opacity: 1, x: 0 }}
+      exit={{ opacity: 0, x: 60 }}
+      transition={{ type: 'spring', damping: 28, stiffness: 300 }}
       style={{
         height: '100%',
+        background: lightBg,
         display: 'flex',
         flexDirection: 'column',
         overflow: 'hidden',
+        paddingTop: 'calc(env(safe-area-inset-top, 0px) + 28px)',
+        paddingInline: 20,
+        paddingBottom: 16,
+        boxSizing: 'border-box',
       }}
     >
-      <motion.div
-        initial={{ opacity: 0, x: 60 }}
-        animate={{ opacity: 1, x: 0 }}
-        exit={{ opacity: 0, x: 60 }}
-        transition={{ type: 'spring', damping: 28, stiffness: 300 }}
-        className="flex flex-col"
-        style={{
-          overflow: 'hidden',
-          flex: 1,
-          minHeight: 0,
-          paddingTop: 'calc(max(env(safe-area-inset-top, 0px), 47px) + 12px)',
+      {/* ─── ELASTIC HEADER: nav + caption + player block ─── */}
+      <ElasticZone minH={120} maxH={240}>
+        {(t) => {
+          const avatarSize = 44 + t * 14;
+          const nameSize = 18 + t * 8;
+          const scoreSize = 32 + t * 14;
+          const accent = isCompleted ? gold : greenLive;
+          const captionGap = 8 + t * 4;
+
+          return (
+            <div style={{ display: 'flex', flexDirection: 'column' }}>
+              {/* Top nav */}
+              <div style={{
+                display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                marginBottom: captionGap,
+              }}>
+                <button
+                  onClick={onBack}
+                  style={{
+                    display: 'flex', alignItems: 'center', gap: 4,
+                    background: 'none', border: 'none', cursor: 'pointer', padding: 0,
+                  }}
+                >
+                  <ChevronLeft style={{ width: 16, height: 16, color: slate500 }} />
+                  <span style={{ fontSize: 13, fontWeight: 600, color: slate500, letterSpacing: '0.01em' }}>
+                    Leaderboard
+                  </span>
+                </button>
+                <button
+                  onClick={onClose}
+                  style={{
+                    background: 'none', border: 'none', cursor: 'pointer', padding: 4,
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  }}
+                >
+                  <X style={{ width: 16, height: 16, color: slate400 }} />
+                </button>
+              </div>
+
+              {/* Caption strip — eyebrow style */}
+              <div style={{
+                display: 'flex', alignItems: 'center', gap: 8, marginBottom: captionGap + 2,
+              }}>
+                <span aria-hidden style={{ width: 18, height: 1.5, background: isCompleted ? gold : greenLive, flexShrink: 0 }} />
+                {isCompleted ? (
+                  <span style={{
+                    fontSize: 10, fontWeight: 800, letterSpacing: '0.18em', color: gold,
+                  }}>
+                    FINAL · 72 HOLES
+                  </span>
+                ) : (
+                  <>
+                    <span style={{
+                      width: 6, height: 6, borderRadius: '50%', background: greenLive,
+                      animation: 'heroPulse 1.6s infinite',
+                    }} />
+                    <span style={{
+                      fontSize: 10, fontWeight: 800, letterSpacing: '0.18em', color: greenLive,
+                    }}>
+                      LIVE · ROUND {currentRound}
+                    </span>
+                  </>
+                )}
+                <span style={{ flex: 1, height: 1, background: slate200 }} />
+                {tournamentName && (
+                  <span style={{
+                    fontSize: 9.5, fontWeight: 700, letterSpacing: '0.08em',
+                    color: slate500, textTransform: 'uppercase',
+                    overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+                    maxWidth: '50%',
+                  }}>
+                    {tournamentName}
+                  </span>
+                )}
+              </div>
+
+              {/* Player block */}
+              <div style={{
+                display: 'flex', alignItems: 'center', gap: 14,
+              }}>
+                <button
+                  onClick={handleViewProfile}
+                  style={{
+                    flexShrink: 0, position: 'relative',
+                    background: 'none', border: 'none', cursor: 'pointer', padding: 0,
+                  }}
+                  className="active:scale-95 transition-transform"
+                >
+                  <div style={{
+                    width: avatarSize, aspectRatio: '1 / 1.05', borderRadius: '34%',
+                    border: `2px solid ${accent}`,
+                    background: slate100,
+                    overflow: 'hidden',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  }}>
+                    {player.photoUrl ? (
+                      <img
+                        src={player.photoUrl}
+                        alt={player.name}
+                        style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center 18%' }}
+                      />
+                    ) : (
+                      <span style={{ fontSize: 16, fontWeight: 800, color: slate400 }}>
+                        {player.firstName?.[0]}{player.lastName?.[0]}
+                      </span>
+                    )}
+                  </div>
+                  <div style={{
+                    position: 'absolute', bottom: -2, right: -2,
+                    minWidth: 22, height: 22, padding: '0 5px', borderRadius: 11,
+                    background: accent,
+                    color: isCompleted ? ink : '#FFFFFF',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    border: `2px solid ${lightBg}`,
+                    fontSize: 9.5, fontWeight: 800,
+                    fontVariantNumeric: 'tabular-nums',
+                  }}>
+                    {positionLabel}
+                  </div>
+                </button>
+
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{
+                    fontSize: 9, fontWeight: 800, letterSpacing: '0.14em',
+                    color: isCompleted ? gold : slate400,
+                    marginBottom: 4, textTransform: 'uppercase',
+                  }}>
+                    {isCompleted ? 'FINAL POSITION' : 'PLAYER'}
+                    {flag ? ` · ${flag}` : ''}
+                    {player.countryCode ? ` ${player.countryCode.toUpperCase()}` : ''}
+                  </div>
+                  <div style={{
+                    fontSize: nameSize, fontWeight: 900, letterSpacing: '-0.02em',
+                    color: ink, lineHeight: 1.05,
+                    whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
+                  }}>
+                    {player.name}
+                  </div>
+                  {!isCompleted && player.thru && player.thru !== 'F' && (
+                    <div style={{
+                      fontSize: 10.5, color: greenLive, marginTop: 4, fontWeight: 700,
+                      letterSpacing: '0.04em',
+                    }}>
+                      Thru {player.thru} · R{currentRound}
+                    </div>
+                  )}
+                  {isCompleted && (
+                    <div style={{
+                      fontSize: 10.5, color: slate500, marginTop: 4, fontWeight: 600,
+                    }}>
+                      72 holes · Final
+                    </div>
+                  )}
+                </div>
+
+                <div style={{ textAlign: 'right' }}>
+                  <span style={{
+                    fontSize: scoreSize, fontWeight: 900, letterSpacing: '-0.04em',
+                    color: (isCompleted && (player.position === 1 || String(player.position) === '1')) ? gold : ink,
+                    lineHeight: 0.9,
+                    fontVariantNumeric: 'tabular-nums',
+                  }}>
+                    {fmtScore(player.totalScore)}
+                  </span>
+                  <div style={{
+                    marginTop: 4, fontSize: 8, fontWeight: 800, letterSpacing: '0.14em',
+                    color: slate400,
+                  }}>
+                    TO PAR
+                  </div>
+                </div>
+              </div>
+            </div>
+          );
         }}
-      >
-        {/* ── 1. TOP BAR — back nav ── */}
-        <div
-          style={{
-            display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-            padding: '0 20px 14px',
-            flexShrink: 0,
-          }}
-        >
-          <button
-            onClick={onBack}
-            style={{
-              display: 'flex', alignItems: 'center', gap: 4,
-              background: 'none', border: 'none', cursor: 'pointer', padding: 0,
-            }}
-          >
-            <ChevronLeft style={{ width: 16, height: 16, color: inkSoft }} />
-            <span style={{ fontSize: 13, fontWeight: 600, color: inkSoft, letterSpacing: '0.01em' }}>
-              Leaderboard
-            </span>
-          </button>
-          <button
-            onClick={onClose}
-            style={{
-              background: 'none', border: 'none', cursor: 'pointer', padding: 4,
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-            }}
-          >
-            <X style={{ width: 16, height: 16, color: inkFaint }} />
-          </button>
-        </div>
+      </ElasticZone>
 
-        {/* ── 2. BROADCAST CAPTION STRIP ── */}
-        <div
-          style={{
-            display: 'flex', alignItems: 'center', gap: 8,
-            padding: '0 20px 14px',
-            flexShrink: 0,
-          }}
-        >
-          {isCompleted ? (
-            <span
-              style={{
-                padding: '3px 7px', borderRadius: 4,
-                background: 'rgba(255,184,0,0.14)', color: gold,
-                fontSize: 9, fontWeight: 800, letterSpacing: '0.12em',
-                border: `1px solid rgba(255,184,0,0.30)`,
-              }}
-            >
-              FINAL
-            </span>
-          ) : (
-            <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
-              <span
-                style={{
-                  width: 6, height: 6, borderRadius: '50%', background: greenLive,
-                  animation: 'heroPulse 1.6s infinite',
-                }}
-              />
-              <span
-                style={{
-                  fontSize: 10, fontWeight: 800, letterSpacing: '0.12em',
-                  color: greenLive,
-                }}
-              >
-                LIVE
-              </span>
-            </div>
-          )}
-          <span style={{ fontSize: 10, color: inkFaint }}>·</span>
-          <span
-            style={{
-              fontSize: 10, fontWeight: 700, color: inkSoft, letterSpacing: '0.06em',
-              overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
-              flex: 1, minWidth: 0,
-            }}
-          >
-            {tournamentName ? `${tournamentName.toUpperCase()} · ` : ''}
-            {isCompleted ? '72 HOLES COMPLETE' : `ROUND ${currentRound}`}
-          </span>
-        </div>
+      {/* ─── DIVIDER ─── */}
+      <div style={{
+        flexShrink: 0,
+        height: 1, background: slate200,
+        margin: '12px 0 10px',
+      }} />
 
-        {/* ── 3. PLAYER HERO ── */}
-        <div
-          style={{
-            display: 'flex', alignItems: 'stretch', gap: 14,
-            padding: '0 20px 18px',
-            flexShrink: 0,
-          }}
-        >
-          <button
-            onClick={() => navigate(`/tourhub/player/${player.id}`)}
-            style={{
-              flexShrink: 0, position: 'relative',
-              background: 'none', border: 'none', cursor: 'pointer', padding: 0,
-            }}
-            className="active:scale-95 transition-transform"
-          >
-            <div
-              style={{
-                width: 50, borderRadius: '34%', aspectRatio: '1 / 1.05',
-                border: `2px solid ${isCompleted ? gold : greenLive}`,
-                background: 'rgba(0,0,0,0.3)',
-                overflow: 'hidden',
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-              }}
-            >
-              {player.photoUrl ? (
-                <img
-                  src={player.photoUrl}
-                  alt={player.name}
-                  style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center 18%' }}
-                />
-              ) : (
-                <span style={{ fontSize: 18, fontWeight: 800, color: inkFaint }}>
-                  {player.firstName?.[0]}{player.lastName?.[0]}
-                </span>
-              )}
-            </div>
-            <div
-              style={{
-                position: 'absolute', bottom: -2, right: -2,
-                width: 20, height: 20, borderRadius: '50%',
-                background: isCompleted ? gold : greenLive,
-                color: isCompleted ? ink : '#fff',
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                border: `2px solid ${navyMid}`,
-                fontSize: 9, fontWeight: 800,
-                fontVariantNumeric: 'tabular-nums',
-              }}
-            >
-              {positionLabel}
-            </div>
-          </button>
-
-          <div
-            style={{
-              flex: 1, minWidth: 0,
-              display: 'flex', flexDirection: 'column', justifyContent: 'center',
-            }}
-          >
-            <div
-              style={{
-                fontSize: 9, fontWeight: 800, letterSpacing: '0.14em',
-                color: isCompleted ? gold : inkFaint,
-                marginBottom: 4,
-              }}
-            >
-              {isCompleted ? 'FINAL POSITION' : 'PLAYER'}
-              {flag ? ` · ${flag}` : ''}
-              {player.countryCode ? ` ${player.countryCode.toUpperCase()}` : ''}
-            </div>
-            <div
-              style={{
-                fontSize: 18, fontWeight: 800, letterSpacing: '-0.02em',
-                color: '#fff', lineHeight: 1.1,
-                whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
-              }}
-            >
-              {player.name}
-            </div>
-            {!isCompleted && player.thru && player.thru !== 'F' && (
-              <div
-                style={{
-                  fontSize: 10, color: greenLive, marginTop: 4, fontWeight: 600,
-                }}
-              >
-                Thru {player.thru} · R{currentRound}
-              </div>
-            )}
-            {isCompleted && (
-              <div
-                style={{
-                  fontSize: 10, color: inkFaint, marginTop: 4, fontWeight: 600,
-                }}
-              >
-                72 holes · Final
-              </div>
-            )}
-          </div>
-
-          <div
-            style={{
-              textAlign: 'right',
-              display: 'flex', flexDirection: 'column', justifyContent: 'center',
-            }}
-          >
-            <span
-              style={{
-                fontSize: 36, fontWeight: 800, letterSpacing: '-0.04em',
-                color: (isCompleted && (player.position === 1 || String(player.position) === '1')) ? gold : '#fff',
-                lineHeight: 0.9,
-                fontVariantNumeric: 'tabular-nums',
-              }}
-            >
-              {fmtScore(player.totalScore)}
-            </span>
-          </div>
-        </div>
-
-        {/* ── 4. SCORECARD CONTENT — scrollable ── */}
+      {/* ─── SCORECARD CONTENT ─── */}
+      <div style={{ flexShrink: 0 }}>
         {isLoading ? (
           <ScorecardSkeleton />
         ) : scorecard && scorecard.rounds.length > 0 ? (
-          <div
-            style={{
-              flex: 1, overflowY: 'auto',
-              WebkitOverflowScrolling: 'touch' as any,
-              willChange: 'transform',
-            }}
-          >
-            {/* Cross-round progression */}
-            <TournamentProgressionPanel rounds={roundScores} isCompleted={isCompleted} />
+          <>
+            <RoundTabs
+              rounds={scorecard.rounds}
+              activeRound={activeRound}
+              currentRound={currentRound}
+              onSelect={setActiveRound}
+              roundScores={roundScores}
+            />
 
-            <div style={{ zoom: 0.9 }}>
-              {/* Round tabs — pill buttons */}
-              <RoundTabs
-                rounds={scorecard.rounds}
-                activeRound={activeRound}
-                currentRound={currentRound}
-                onSelect={setActiveRound}
-                roundScores={roundScores}
+            <div style={{ marginTop: 4 }}>
+              <NineHoleRow
+                label="Front 9"
+                startHole={1}
+                completedHoles={completedHoles}
+                defaultPars={defaultPars}
               />
+            </div>
 
-              {/* Front 9 */}
-              <div style={{ marginTop: 4 }}>
-                <NineHoleRow
-                  label="Front 9"
-                  holes={activeRoundData?.holes.filter(h => h.holeNumber <= 9) || []}
-                  startHole={1}
-                  completedHoles={completedHoles}
-                  defaultPars={defaultPars}
-                />
-              </div>
+            <div style={{ marginTop: 8 }}>
+              <NineHoleRow
+                label="Back 9"
+                startHole={10}
+                completedHoles={completedHoles}
+                defaultPars={defaultPars}
+              />
+            </div>
 
-              {/* Back 9 */}
-              <div style={{ marginTop: 12 }}>
-                <NineHoleRow
-                  label="Back 9"
-                  holes={activeRoundData?.holes.filter(h => h.holeNumber > 9) || []}
-                  startHole={10}
-                  completedHoles={completedHoles}
-                  defaultPars={defaultPars}
-                />
-              </div>
-
-              {/* Total row */}
-              {activeRoundData && activeRoundData.holesCompleted > 0 && (
-                <div
-                  style={{
-                    display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-                    padding: '14px 16px 18px',
-                    marginTop: 10,
-                    borderTop: `1px solid ${hairlineDark}`,
-                  }}
-                >
-                  <span
-                    style={{
-                      fontSize: 9, fontWeight: 800, color: inkFaint,
-                      textTransform: 'uppercase', letterSpacing: '0.14em',
-                    }}
-                  >
-                    Total · {activeRoundData.holesCompleted} holes
+            {activeRoundData && activeRoundData.holesCompleted > 0 && (
+              <div style={{
+                display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                padding: '10px 4px 0',
+                marginTop: 8,
+                borderTop: `1px solid ${slate200}`,
+              }}>
+                <span style={{
+                  fontSize: 9, fontWeight: 800, color: slate400,
+                  textTransform: 'uppercase', letterSpacing: '0.14em',
+                }}>
+                  Total · {activeRoundData.holesCompleted} holes
+                </span>
+                <div style={{ display: 'flex', alignItems: 'baseline', gap: 12 }}>
+                  <span style={{
+                    fontSize: 12, fontWeight: 600, color: slate500,
+                    fontVariantNumeric: 'tabular-nums',
+                  }}>
+                    {activeRoundData.totalStrokes}
                   </span>
-                  <div style={{ display: 'flex', alignItems: 'baseline', gap: 12 }}>
-                    <span
-                      style={{
-                        fontSize: 13, fontWeight: 600, color: inkSoft,
-                        fontVariantNumeric: 'tabular-nums',
-                      }}
-                    >
-                      {activeRoundData.totalStrokes}
-                    </span>
-                    <span
-                      style={{
-                        fontSize: 22, fontWeight: 800,
-                        color: activeRoundData.totalToPar < 0 ? '#ffffff'
-                             : activeRoundData.totalToPar > 0 ? danger
-                             : inkFaint,
-                        fontVariantNumeric: 'tabular-nums',
-                        letterSpacing: '-0.02em',
-                      }}
-                    >
-                      {fmtScore(activeRoundData.totalToPar)}
-                    </span>
-                  </div>
+                  <span style={{
+                    fontSize: 18, fontWeight: 900,
+                    color: activeRoundData.totalToPar < 0 ? ink
+                         : activeRoundData.totalToPar > 0 ? danger
+                         : slate500,
+                    fontVariantNumeric: 'tabular-nums',
+                    letterSpacing: '-0.02em',
+                  }}>
+                    {fmtScore(activeRoundData.totalToPar)}
+                  </span>
                 </div>
-              )}
-            </div>
-          </div>
+              </div>
+            )}
+          </>
         ) : (
-          /* Empty state */
-          <div className="flex-1 flex flex-col items-center justify-center py-12">
-            <div
-              className="w-14 h-14 rounded-full flex items-center justify-center mb-3"
-              style={{ background: 'rgba(255,255,255,0.04)', border: `1px solid ${hairlineDark}` }}
-            >
-              <Trophy className="w-6 h-6" style={{ color: inkFaint }} />
+          <div style={{
+            display: 'flex', flexDirection: 'column',
+            alignItems: 'center', justifyContent: 'center',
+            padding: '24px 0',
+          }}>
+            <div style={{
+              width: 48, height: 48, borderRadius: '50%',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              background: slate100, border: `1px solid ${slate200}`,
+              marginBottom: 10,
+            }}>
+              <Trophy style={{ width: 22, height: 22, color: slate400 }} />
             </div>
-            <p className="text-sm text-center" style={{ color: inkFaint }}>Scorecard data updating…</p>
-            <p className="text-xs text-center mt-1" style={{ color: inkGhost }}>
+            <p style={{ fontSize: 12.5, color: slate500, fontWeight: 600, textAlign: 'center' }}>
+              Scorecard data updating…
+            </p>
+            <p style={{ fontSize: 10.5, color: slate400, marginTop: 4, textAlign: 'center' }}>
               Hole-by-hole scores will appear as the round progresses
             </p>
           </div>
         )}
-      </motion.div>
-    </HeroAtmosphere>
+      </div>
+
+      {/* ─── CTA ─── */}
+      <div style={{ flex: 1, minHeight: 8 }} />
+      <HeroCTA
+        label="View Full Player Profile"
+        onClick={handleViewProfile}
+      />
+    </motion.div>
   );
 }
