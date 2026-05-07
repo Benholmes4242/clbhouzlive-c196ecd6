@@ -507,9 +507,9 @@ export function EditorialResultsHero({
         <ByNumbersGrid
           birdies={(winnerStats as any).birdies ?? 0}
           eagles={(winnerStats as any).eagles ?? 0}
-          pars={(winnerStats as any).pars ?? 0}
           bogeys={(winnerStats as any).bogeys ?? 0}
           lowRound={lowRound}
+          rounds={[winner.round1, winner.round2, winner.round3, winner.round4]}
         />
       )}
 
