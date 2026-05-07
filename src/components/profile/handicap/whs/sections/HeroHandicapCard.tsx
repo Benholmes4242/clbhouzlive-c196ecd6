@@ -948,19 +948,25 @@ const MetricRingsRow: React.FC<MetricRingsRowProps> = ({ currentHcp, last20, his
       fraction: 0, color: INK_40, available: false,
     };
   } else {
-    const verdictMap: Record<Exclude<FormVerdict, 'unknown'>, {
-      fraction: number; color: string; centre: string;
-    }> = {
-      in_form:  { fraction: 1.00, color: 'url(#metricFormGreen)', centre: 'In form' },
-      building: { fraction: 0.75, color: 'url(#metricFormGreen)', centre: 'Building' },
-      steady:   { fraction: 0.50, color: SLATE,                   centre: 'Steady' },
-      slipping: { fraction: 0.25, color: 'url(#metricFormRed)',   centre: 'Slipping' },
-      cold:     { fraction: 0.10, color: 'url(#metricFormRed)',   centre: 'Cold' },
+    // Collapse 5 verdicts into 3 simpler states:
+    //   in_form, building → HOT
+    //   steady           → STEADY
+    //   slipping, cold   → COLD
+    let state: 'hot' | 'steady' | 'cold';
+    if (verdict === 'in_form' || verdict === 'building') state = 'hot';
+    else if (verdict === 'steady') state = 'steady';
+    else state = 'cold';
+
+    const stateMap = {
+      hot:    { fraction: 1.00, color: 'url(#metricFormHot)',  centre: 'Hot',    icon: 'flame' as const },
+      steady: { fraction: 0.50, color: SLATE,                  centre: 'Steady', icon: 'minus' as const },
+      cold:   { fraction: 0.10, color: 'url(#metricFormCold)', centre: 'Cold',   icon: 'snowflake' as const },
     };
-    const meta = verdictMap[verdict];
+    const meta = stateMap[state];
     form = {
       label: 'FORM', sub: 'last 5 vs counters',
       centre: meta.centre,
+      centreIcon: meta.icon,
       fraction: meta.fraction, color: meta.color, available: true,
     };
   }
