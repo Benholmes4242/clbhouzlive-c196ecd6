@@ -7,11 +7,17 @@ interface Props {
   entry: FriendLeaderboardEntry;
   isActive: boolean;
   onClick?: () => void;
+  /** Optional handler when an off-app user's INVITE pill is tapped */
+  onInviteClick?: () => void;
 }
 
-export const RecentlyActiveItem: React.FC<Props> = ({ entry, isActive, onClick }) => {
+export const RecentlyActiveItem: React.FC<Props> = ({ entry, isActive, onClick, onInviteClick }) => {
   const display = firstName(entry.friend_name);
   const Tag: any = onClick ? 'button' : 'div';
+
+  const isOnApp = entry.is_clbhouz_user;
+  const showGreenDot = isOnApp && isActive;
+  const showInvitePill = !isOnApp;
 
   return (
     <Tag
@@ -42,6 +48,7 @@ export const RecentlyActiveItem: React.FC<Props> = ({ entry, isActive, onClick }
               objectFit: 'cover',
               border: '1px solid rgba(15,23,42,0.08)',
               background: '#F1F5F9',
+              opacity: isOnApp ? 1 : 0.55,
             }}
           />
         ) : (
@@ -58,12 +65,13 @@ export const RecentlyActiveItem: React.FC<Props> = ({ entry, isActive, onClick }
               fontSize: 18,
               fontWeight: 800,
               border: '1px solid rgba(15,23,42,0.08)',
+              opacity: isOnApp ? 1 : 0.55,
             }}
           >
             {initials(entry.friend_name)}
           </div>
         )}
-        {isActive && (
+        {showGreenDot && (
           <span
             aria-label="Active in last 7 days"
             style={{
@@ -77,6 +85,33 @@ export const RecentlyActiveItem: React.FC<Props> = ({ entry, isActive, onClick }
               border: '2px solid #F8FAFC',
             }}
           />
+        )}
+        {showInvitePill && (
+          <span
+            role={onInviteClick ? 'button' : undefined}
+            onClick={(e) => {
+              e.stopPropagation();
+              onInviteClick?.();
+            }}
+            aria-label={`Invite ${firstName(entry.friend_name)}`}
+            style={{
+              position: 'absolute',
+              bottom: -2,
+              right: -2,
+              background: 'rgba(247,147,30,0.14)',
+              color: '#B45309',
+              fontSize: 8,
+              fontWeight: 800,
+              letterSpacing: '0.08em',
+              borderRadius: 999,
+              padding: '2px 5px',
+              border: '2px solid #F8FAFC',
+              cursor: onInviteClick ? 'pointer' : 'default',
+              fontFamily: '"Geist", system-ui, sans-serif',
+            }}
+          >
+            INVITE
+          </span>
         )}
       </div>
       <p

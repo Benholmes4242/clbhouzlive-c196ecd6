@@ -152,19 +152,21 @@ export const FriendsLeaderboardSection: React.FC<Props> = ({ userId }) => {
             alignItems: 'center',
             justifyContent: 'center',
             gap: 4,
-            width: '100%',
-            marginTop: 12,
-            padding: '8px',
-            background: 'transparent',
-            border: 'none',
-            color: 'rgba(15,23,42,0.78)',
+            width: 'calc(100% - 40px)',
+            margin: '12px 20px 0',
+            padding: '10px 16px',
+            background: '#fff',
+            border: '0.5px solid rgba(15,23,42,0.10)',
+            borderRadius: 12,
+            color: '#F7931E',
             fontSize: 12,
             fontWeight: 700,
             letterSpacing: '0.04em',
             cursor: 'pointer',
+            fontFamily: '"Geist", system-ui, sans-serif',
           }}
         >
-          See all {sorted.length}
+          See full leaderboard ({sorted.length})
           <ChevronRight size={14} />
         </button>
       )}

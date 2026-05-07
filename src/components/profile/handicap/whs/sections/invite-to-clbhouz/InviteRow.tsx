@@ -106,14 +106,12 @@ export const InviteRow: React.FC<Props> = ({ friend }) => {
             textOverflow: 'ellipsis',
           }}
         >
-          {friend.friend_home_club ?? '—'}
-          {friend.friend_handicap_index != null && (
-            <>
-              {' · '}
-              <span style={{ fontVariantNumeric: 'tabular-nums' }}>
-                {fmtHcp(friend.friend_handicap_index)}
-              </span>
-            </>
+          {friend.friend_handicap_index != null ? (
+            <span style={{ fontVariantNumeric: 'tabular-nums' }}>
+              {`HCP ${fmtHcp(friend.friend_handicap_index)}`}
+            </span>
+          ) : (
+            'No handicap yet'
           )}
         </p>
       </div>
