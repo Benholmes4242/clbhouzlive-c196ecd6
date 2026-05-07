@@ -1049,12 +1049,12 @@ const MetricRingsRow: React.FC<MetricRingsRowProps> = ({ currentHcp, last20, his
             <stop offset="100%" stopColor="#38BDF8" />
           </linearGradient>
           <linearGradient id="metricMomentumGreen" x1="0" y1="0" x2="1" y2="0">
-            <stop offset="0%" stopColor="#047857" />
-            <stop offset="100%" stopColor="#2DD4BF" />
+            <stop offset="0%" stopColor="#15803D" />
+            <stop offset="100%" stopColor="#4ADE80" />
           </linearGradient>
           <linearGradient id="metricScoringAvg" x1="0" y1="0" x2="1" y2="0">
-            <stop offset="0%" stopColor="#4338CA" />
-            <stop offset="100%" stopColor="#A78BFA" />
+            <stop offset="0%" stopColor="#1E40AF" />
+            <stop offset="100%" stopColor="#93C5FD" />
           </linearGradient>
         </defs>
       </svg>
