@@ -587,6 +587,14 @@ const HeroHandicapCard: React.FC<Props> = ({ connection }) => {
         </div>
       </div>
 
+      {/* Metric rings row: CONSISTENCY / MOMENTUM / TRAJECTORY */}
+      <MetricRingsRow
+        currentHcp={current}
+        last20={recent ?? []}
+        history={points}
+        delta30d={trend?.delta ?? null}
+      />
+
       {/* Trophies entry-point — opens the AllTrophiesSheet via global event. */}
       <div style={{ display: 'flex', justifyContent: 'center', marginTop: 4 }}>
         <button
