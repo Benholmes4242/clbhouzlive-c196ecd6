@@ -14181,6 +14181,7 @@ export type Database = {
           scoring_profile: string
           suited_courses: Json
           test_courses: Json
+          trend_narrative: string
         }
         Insert: {
           connection_id: string
@@ -14191,6 +14192,7 @@ export type Database = {
           scoring_profile: string
           suited_courses: Json
           test_courses: Json
+          trend_narrative?: string
         }
         Update: {
           connection_id?: string
@@ -14201,6 +14203,7 @@ export type Database = {
           scoring_profile?: string
           suited_courses?: Json
           test_courses?: Json
+          trend_narrative?: string
         }
         Relationships: [
           {
