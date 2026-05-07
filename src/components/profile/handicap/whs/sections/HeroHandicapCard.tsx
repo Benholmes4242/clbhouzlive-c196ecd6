@@ -1026,7 +1026,7 @@ const MetricRingsRow: React.FC<MetricRingsRowProps> = ({ currentHcp, last20, his
     scoringAvg = {
       label: 'SCORING AVG', sub: `Over last ${last5.length}`,
       centre: avg.toFixed(1),
-      fraction, color: 'url(#metricScoringAvg)', available: true,
+      fraction, color: SCORE_BLUE, available: true,
     };
   }
 
