@@ -396,7 +396,36 @@ export const CourseFormCard: React.FC<Props> = ({ connectionId, currentHandicap 
       <CardHeader sublabel={view.sublabel} />
       <ViewToggle activeView={activeView} onChange={setActiveView} />
       <CourseRows courses={courses} />
-      <div style={{ height: 8 }} />
+      {courses.length > 0 && (() => {
+        const top = courses[0];
+        const sign = top.delta < 0 ? 'under' : 'over';
+        const deltaAbs = Math.abs(top.delta).toFixed(1);
+        const role =
+          activeView === 'toughest'
+            ? 'toughest test'
+            : activeView === 'best'
+              ? 'home advantage'
+              : 'home course';
+        return (
+          <div
+            style={{
+              margin: '4px 16px 16px',
+              padding: '10px 12px',
+              background: T.slateTint,
+              borderRadius: 10,
+            }}
+          >
+            <p style={{ margin: 0, fontSize: 12.5, lineHeight: 1.55, color: T.inkSoft, fontFamily: FONT }}>
+              <span style={{ fontWeight: 700, color: T.ink }}>{top.course_name}</span>{' '}
+              is your {role}.{' '}
+              <span style={{ fontVariantNumeric: 'tabular-nums' }}>
+                {sign === 'over' ? '+' : '\u2212'}{deltaAbs}
+              </span>{' '}
+              vs hcp across {top.rounds_played} {top.rounds_played === 1 ? 'round' : 'rounds'}.
+            </p>
+          </div>
+        );
+      })()}
     </div>
   );
 };
