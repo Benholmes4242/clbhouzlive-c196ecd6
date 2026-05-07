@@ -230,7 +230,7 @@ const HandicapPageHeader: React.FC<HeaderProps> = ({
         display: 'flex',
         justifyContent: 'center',
       }}>
-        {(['overview', 'trends', 'friends'] as const).map(tab => (
+        {(['today', 'trends', 'friends'] as const).map(tab => (
           <button
             key={tab}
             onClick={() => onTabChange(tab)}
@@ -299,7 +299,9 @@ const HandicapPage: React.FC = () => {
   const ownerUserId = isFriendView ? friendId! : user?.id ?? null;
 
   const rawSubtab = searchParams.get('subtab');
-  const activeTab: HandicapSubtab = isHandicapSubtab(rawSubtab) ? rawSubtab : 'overview';
+  // Graceful redirect: legacy ?subtab=overview bookmarks resolve to 'today'.
+  const normalisedSubtab = rawSubtab === 'overview' ? 'today' : rawSubtab;
+  const activeTab: HandicapSubtab = isHandicapSubtab(normalisedSubtab) ? normalisedSubtab : 'today';
 
   const handleTabChange = useCallback((next: HandicapSubtab) => {
     const params = new URLSearchParams(searchParams);
