@@ -18,19 +18,137 @@ interface HandicapTileProps {
   onClick: () => void;
 }
 
-function MiniRing() {
+interface MiniHeroRingProps {
+  /** Current handicap index. Null shows a dimmed empty ring. */
+  current: number | null;
+  /** 30-day delta. Null means no inner arc rendered. */
+  delta: number | null;
+}
+
+function MiniHeroRing({ current, delta }: MiniHeroRingProps) {
+  const SIZE = 64;
+  const CX = SIZE / 2;
+  const CY = SIZE / 2;
+  const R_OUTER = 28;
+  const STROKE_OUTER = 4;
+  const C_OUTER = 2 * Math.PI * R_OUTER;
+  const R_INNER = 21;
+  const STROKE_INNER = 2.5;
+  const C_INNER = 2 * Math.PI * R_INNER;
+
+  const outerFraction =
+    current == null
+      ? 0
+      : Math.max(0, Math.min(1, current % 1 === 0 ? 1 : 1 - (current % 1)));
+  const outerDash = outerFraction * C_OUTER;
+
+  const showGreen = delta != null && delta < -0.05;
+  const showRed = delta != null && delta > 0.05;
+  const innerStrength = delta == null ? 0 : Math.min(1, Math.abs(delta) * 2);
+  const innerFillLength = innerStrength * C_INNER;
+
+  const displayValue =
+    current == null
+      ? '—'
+      : current < 0
+        ? `+${Math.abs(current).toFixed(1)}`
+        : current.toFixed(1);
+
   return (
-    <svg width={20} height={20} viewBox="0 0 24 24" fill="none" aria-hidden>
-      <circle cx="12" cy="12" r="10" stroke={`${AMBER}30`} strokeWidth="2.5" fill="none" />
-      <path
-        d="M 12 2 A 10 10 0 0 1 21.5 8.5"
-        stroke={AMBER}
-        strokeWidth="2.5"
-        fill="none"
-        strokeLinecap="round"
-      />
-      <circle cx="12" cy="12" r="3" fill={AMBER} />
-    </svg>
+    <div style={{ position: 'relative', width: SIZE, height: SIZE }}>
+      <svg width={SIZE} height={SIZE} viewBox={`0 0 ${SIZE} ${SIZE}`} aria-hidden>
+        <defs>
+          <linearGradient id="handicapTileAmberGold" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0%" stopColor="#F7931E" />
+            <stop offset="100%" stopColor="#FBBC2E" />
+          </linearGradient>
+        </defs>
+        <circle
+          cx={CX}
+          cy={CY}
+          r={R_OUTER}
+          fill="none"
+          stroke="rgba(15,23,42,0.06)"
+          strokeWidth={STROKE_OUTER}
+          vectorEffect="non-scaling-stroke"
+        />
+        {current != null && (
+          <circle
+            cx={CX}
+            cy={CY}
+            r={R_OUTER}
+            fill="none"
+            stroke="url(#handicapTileAmberGold)"
+            strokeWidth={STROKE_OUTER}
+            strokeLinecap="round"
+            strokeDasharray={`${outerDash} ${C_OUTER}`}
+            transform={`rotate(-90 ${CX} ${CY})`}
+            vectorEffect="non-scaling-stroke"
+          />
+        )}
+        <circle
+          cx={CX}
+          cy={CY}
+          r={R_INNER}
+          fill="none"
+          stroke="rgba(15,23,42,0.06)"
+          strokeWidth={STROKE_INNER}
+          vectorEffect="non-scaling-stroke"
+        />
+        {showGreen && (
+          <circle
+            cx={CX}
+            cy={CY}
+            r={R_INNER}
+            fill="none"
+            stroke="#22C55E"
+            strokeWidth={STROKE_INNER}
+            strokeLinecap="round"
+            strokeDasharray={`${innerFillLength} ${C_INNER}`}
+            transform={`rotate(-90 ${CX} ${CY})`}
+            vectorEffect="non-scaling-stroke"
+          />
+        )}
+        {showRed && (
+          <g transform={`scale(-1, 1) translate(-${SIZE}, 0)`}>
+            <circle
+              cx={CX}
+              cy={CY}
+              r={R_INNER}
+              fill="none"
+              stroke="#DC2626"
+              strokeWidth={STROKE_INNER}
+              strokeLinecap="round"
+              strokeDasharray={`${innerFillLength} ${C_INNER}`}
+              transform={`rotate(-90 ${CX} ${CY})`}
+              vectorEffect="non-scaling-stroke"
+            />
+          </g>
+        )}
+      </svg>
+      <div
+        style={{
+          position: 'absolute',
+          inset: 0,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}
+      >
+        <span
+          style={{
+            fontSize: 17,
+            fontWeight: 700,
+            color: INK,
+            letterSpacing: '-0.04em',
+            lineHeight: 1,
+            fontVariantNumeric: 'tabular-nums',
+          }}
+        >
+          {displayValue}
+        </span>
+      </div>
+    </div>
   );
 }
 
@@ -53,14 +171,13 @@ function HandicapTile({ userId, onClick }: HandicapTileProps) {
     return `${arrow} ${Math.abs(d).toFixed(1)} this month`;
   }, [connection, trend]);
 
-  // NEW badge — gated by a single flag (no automatic expiry).
   const showNewBadge = SHOW_HANDICAP_NEW_BADGE;
 
   return (
     <button
       type="button"
       onClick={onClick}
-      className="relative flex flex-col justify-between text-left active:scale-[0.97] transition-transform"
+      className="relative flex flex-col items-center justify-center text-center active:scale-[0.97] transition-transform"
       style={{
         minHeight: 110,
         padding: '14px 14px 16px',
@@ -72,7 +189,6 @@ function HandicapTile({ userId, onClick }: HandicapTileProps) {
       }}
       aria-label={`Handicap ${displayValue}`}
     >
-      {/* NEW badge — auto-hides 60 days after launch */}
       {showNewBadge && (
         <span
           style={{
@@ -94,37 +210,12 @@ function HandicapTile({ userId, onClick }: HandicapTileProps) {
         </span>
       )}
 
-      {/* Top row: icon + value */}
-      <div className="flex items-center justify-between w-full">
-        <div
-          className="flex items-center justify-center"
-          style={{
-            width: 36,
-            height: 36,
-            borderRadius: 10,
-            background: '#ffffff',
-            boxShadow: '0 1px 4px rgba(247,147,30,0.20)',
-          }}
-        >
-          <MiniRing />
-        </div>
-        <span
-          style={{
-            fontSize: 22,
-            fontWeight: 600,
-            letterSpacing: '-0.02em',
-            color: INK,
-            fontVariantNumeric: 'tabular-nums lining-nums',
-            fontFeatureSettings: '"kern" 1, "liga" 1',
-            lineHeight: 1,
-          }}
-        >
-          {displayValue}
-        </span>
-      </div>
+      <MiniHeroRing
+        current={trend?.current ?? null}
+        delta={trend?.delta ?? null}
+      />
 
-      {/* Bottom: label + sub */}
-      <div className="w-full">
+      <div className="w-full" style={{ marginTop: 8 }}>
         <div style={{ fontSize: 15, fontWeight: 700, color: INK, lineHeight: 1.2 }}>
           Handicap
         </div>
