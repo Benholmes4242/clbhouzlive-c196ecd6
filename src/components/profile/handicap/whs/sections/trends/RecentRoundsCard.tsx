@@ -299,13 +299,13 @@ const RoundTile: React.FC<TileProps> = ({ round, onTap }) => {
         display: 'block',
         width: '100%',
         textAlign: 'left',
-        border: isCounter ? 'none' : `1px solid ${T.hairline}`,
-        background: isCounter ? T.greenInk : T.cardBg,
+        border: `1px solid ${T.hairline}`,
+        background: T.cardBg,
         borderRadius: 12,
         marginBottom: 8,
         overflow: 'hidden',
         position: 'relative',
-        padding: '10px 14px',
+        padding: '12px 14px 12px 16px',
         cursor: 'pointer',
         transition: 'opacity 150ms ease',
       }}
@@ -315,108 +315,136 @@ const RoundTile: React.FC<TileProps> = ({ round, onTap }) => {
       onTouchStart={(e) => (e.currentTarget.style.opacity = '0.85')}
       onTouchEnd={(e) => (e.currentTarget.style.opacity = '1')}
     >
-      {round.adjusted_gross !== null && (
+      {isCounter && (
         <span
           aria-hidden
           style={{
             position: 'absolute',
-            right: 12,
-            top: -2,
-            margin: 0,
-            fontSize: 56,
-            fontWeight: 200,
-            color: isCounter ? 'rgba(255,255,255,0.18)' : 'rgba(15,23,42,0.06)',
-            fontFamily: FONT,
-            fontVariantNumeric: 'tabular-nums',
-            letterSpacing: '-0.06em',
-            lineHeight: 1,
-            pointerEvents: 'none',
+            left: 0,
+            top: 0,
+            bottom: 0,
+            width: 3,
+            background: T.greenInk,
           }}
-        >
-          {round.adjusted_gross}
-        </span>
+        />
       )}
 
-      <div style={{ position: 'relative' }}>
-        <p
-          style={{
-            margin: 0,
-            fontSize: 14,
-            fontWeight: 700,
-            color: isCounter ? '#fff' : T.ink,
-            fontFamily: FONT,
-            whiteSpace: 'nowrap',
-            overflow: 'hidden',
-            textOverflow: 'ellipsis',
-            letterSpacing: '-0.01em',
-            maxWidth: '72%',
-            marginBottom: 5,
-          }}
-        >
-          {courseName}
-        </p>
-
-        <div
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: 6,
-            flexWrap: 'wrap',
-            maxWidth: '78%',
-          }}
-        >
-          <span
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
+        <div style={{ minWidth: 0, flex: 1 }}>
+          <p
             style={{
-              fontSize: 10,
+              margin: 0,
+              fontSize: 14,
               fontWeight: 700,
-              color: isCounter ? 'rgba(255,255,255,0.70)' : T.inkMute,
-              letterSpacing: '0.06em',
-              textTransform: 'uppercase',
+              color: T.ink,
               fontFamily: FONT,
+              whiteSpace: 'nowrap',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              letterSpacing: '-0.01em',
+              marginBottom: 5,
             }}
           >
-            {fmtDate(round.play_date)}
-          </span>
+            {courseName}
+          </p>
 
-          <span style={{ color: isCounter ? 'rgba(255,255,255,0.30)' : T.hairline }}>·</span>
-
-          <span
+          <div
             style={{
-              fontSize: 11,
-              fontWeight: 700,
-              color: isCounter ? 'rgba(255,255,255,0.85)' : T.inkMute,
-              fontFamily: FONT,
-              fontVariantNumeric: 'tabular-nums',
+              display: 'flex',
+              alignItems: 'center',
+              gap: 6,
+              flexWrap: 'wrap',
             }}
           >
-            {fmtDiff(round.handicap_differential)} vs hcp
-          </span>
-
-          {showImpactPill && (
             <span
               style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: 2,
-                background: 'rgba(255,255,255,0.18)',
-                color: '#fff',
-                padding: '2px 6px 2px 4px',
-                borderRadius: 4,
                 fontSize: 10,
                 fontWeight: 700,
+                color: T.inkMute,
+                letterSpacing: '0.06em',
+                textTransform: 'uppercase',
+                fontFamily: FONT,
+              }}
+            >
+              {fmtDate(round.play_date)}
+            </span>
+
+            <span style={{ color: T.hairline }}>·</span>
+
+            <span
+              style={{
+                fontSize: 11,
+                fontWeight: 700,
+                color: T.inkMute,
                 fontFamily: FONT,
                 fontVariantNumeric: 'tabular-nums',
               }}
             >
-              {round.handicap_delta! < 0 ? (
-                <ArrowDown size={10} strokeWidth={2.6} />
-              ) : (
-                <ArrowUp size={10} strokeWidth={2.6} />
-              )}
-              {Math.abs(round.handicap_delta!).toFixed(1)} hcp
+              {fmtDiff(round.handicap_differential)} vs hcp
             </span>
-          )}
+
+            {isCounter && (
+              <span
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  background: 'rgba(5,150,105,0.12)',
+                  color: T.greenInk,
+                  padding: '2px 6px',
+                  borderRadius: 4,
+                  fontSize: 9,
+                  fontWeight: 800,
+                  letterSpacing: '0.08em',
+                  fontFamily: FONT,
+                }}
+              >
+                COUNTER
+              </span>
+            )}
+
+            {showImpactPill && (
+              <span
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 2,
+                  background: round.handicap_delta! < 0 ? 'rgba(5,150,105,0.12)' : 'rgba(159,18,57,0.12)',
+                  color: round.handicap_delta! < 0 ? T.greenInk : '#9F1239',
+                  padding: '2px 6px 2px 4px',
+                  borderRadius: 4,
+                  fontSize: 10,
+                  fontWeight: 700,
+                  fontFamily: FONT,
+                  fontVariantNumeric: 'tabular-nums',
+                }}
+              >
+                {round.handicap_delta! < 0 ? (
+                  <ArrowDown size={10} strokeWidth={2.6} />
+                ) : (
+                  <ArrowUp size={10} strokeWidth={2.6} />
+                )}
+                {Math.abs(round.handicap_delta!).toFixed(1)} hcp
+              </span>
+            )}
+          </div>
         </div>
+
+        {round.adjusted_gross !== null && (
+          <span
+            style={{
+              fontSize: 24,
+              fontWeight: 600,
+              color: T.ink,
+              fontFamily: FONT,
+              fontVariantNumeric: 'tabular-nums',
+              letterSpacing: '-0.02em',
+              flexShrink: 0,
+              lineHeight: 1,
+            }}
+          >
+            {round.adjusted_gross}
+          </span>
+        )}
       </div>
     </button>
   );

@@ -92,18 +92,22 @@ export const HandicapProjectionCard: React.FC<Props> = ({ scores }) => {
   const curve = curveFor(prediction.direction);
 
   return (
-    <div style={CARD_STYLE}>
+    <div style={{ ...CARD_STYLE, position: 'relative' }}>
+      <div
+        aria-hidden
+        style={{
+          position: 'absolute',
+          left: 0,
+          top: 0,
+          bottom: 0,
+          width: 3,
+          background: theme.accent,
+        }}
+      />
       <CardHeader showInfo={showInfo} onToggleInfo={() => setShowInfo((v) => !v)} />
       {showInfo && <InfoPanel />}
 
-      <div
-        style={{
-          padding: '18px 16px 16px',
-          textAlign: 'center',
-          background: theme.headerBg,
-          borderBottom: `1px solid ${theme.headerBorder}`,
-        }}
-      >
+      <div style={{ padding: '16px 16px 6px' }}>
         <p
           style={{
             margin: 0,
@@ -111,21 +115,20 @@ export const HandicapProjectionCard: React.FC<Props> = ({ scores }) => {
             fontWeight: 800,
             letterSpacing: '0.16em',
             textTransform: 'uppercase',
-            color: theme.headerInk,
-            opacity: 0.7,
+            color: T.inkMute,
             fontFamily: FONT,
           }}
         >
-          YOU&apos;RE
+          FORM SIGNAL
         </p>
         <p
           style={{
             margin: '6px 0 0',
-            fontSize: 36,
+            fontSize: 28,
             fontWeight: 600,
             letterSpacing: '-0.03em',
-            color: theme.headerInk,
-            lineHeight: 1,
+            color: theme.accentInk,
+            lineHeight: 1.05,
             fontFamily: FONT,
           }}
         >
@@ -133,69 +136,14 @@ export const HandicapProjectionCard: React.FC<Props> = ({ scores }) => {
         </p>
         <p
           style={{
-            margin: '10px 0 0',
-            fontSize: 13,
+            margin: '8px 0 0',
+            fontSize: 12.5,
             lineHeight: 1.5,
-            color: theme.headerInk,
-            opacity: 0.85,
+            color: T.inkSoft,
             fontFamily: FONT,
           }}
         >
           {meta.description}
-        </p>
-      </div>
-
-      <div style={{ padding: '24px 16px 14px', textAlign: 'center' }}>
-        <p
-          style={{
-            margin: 0,
-            fontSize: 10,
-            fontWeight: 800,
-            letterSpacing: '0.18em',
-            textTransform: 'uppercase',
-            color: T.inkMute,
-            fontFamily: FONT,
-          }}
-        >
-          {continuesLabel}
-        </p>
-        <p
-          style={{
-            margin: '12px 0 0',
-            fontSize: 64,
-            fontWeight: 200,
-            letterSpacing: '-0.05em',
-            lineHeight: 1,
-            color: theme.accentInk,
-            fontFamily: FONT,
-            fontVariantNumeric: 'tabular-nums',
-          }}
-        >
-          {prediction.projected !== null ? prediction.projected.toFixed(1) : '—'}
-        </p>
-        <p style={{ margin: '10px 0 0', fontSize: 13, color: T.inkMute, fontFamily: FONT }}>
-          from{' '}
-          <span style={{ color: T.ink, fontWeight: 600 }}>
-            {prediction.current !== null ? prediction.current.toFixed(1) : '—'}
-          </span>{' '}
-          today
-          {prediction.delta > 0 ? (
-            <>
-              {' '}
-              &nbsp;
-              <span style={{ color: theme.accent, fontWeight: 700 }}>
-                {arrow} {prediction.delta.toFixed(1)}
-              </span>
-            </>
-          ) : (
-            <>
-              {' '}
-              &nbsp;
-              <span style={{ color: T.inkMute, fontWeight: 600 }}>
-                {'\u2192'} no change
-              </span>
-            </>
-          )}
         </p>
       </div>
 
@@ -282,6 +230,34 @@ export const HandicapProjectionCard: React.FC<Props> = ({ scores }) => {
             ~5 rounds out
           </text>
         </svg>
+      </div>
+
+      <div style={{ padding: '4px 16px 14px' }}>
+        <p
+          style={{
+            margin: 0,
+            fontSize: 12,
+            lineHeight: 1.55,
+            color: T.inkMute,
+            fontFamily: FONT,
+          }}
+        >
+          <span style={{ fontWeight: 700, letterSpacing: '0.02em' }}>
+            {prediction.direction === 'flat' ? 'If your form holds' : 'If your form continues'}
+          </span>{' '}
+          <span style={{ color: T.ink, fontWeight: 600, fontVariantNumeric: 'tabular-nums' }}>
+            {prediction.current !== null ? prediction.current.toFixed(1) : '—'}
+          </span>{' '}
+          <span style={{ color: T.inkMute }}>{'\u2192'}</span>{' '}
+          <span style={{ color: theme.accentInk, fontWeight: 700, fontVariantNumeric: 'tabular-nums' }}>
+            {prediction.projected !== null ? prediction.projected.toFixed(1) : '—'}
+          </span>
+          {prediction.delta > 0 && (
+            <span style={{ color: theme.accent, fontWeight: 700, fontVariantNumeric: 'tabular-nums', marginLeft: 8 }}>
+              {arrow} {prediction.delta.toFixed(1)}
+            </span>
+          )}
+        </p>
       </div>
 
       <div

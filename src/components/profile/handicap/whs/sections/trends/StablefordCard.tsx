@@ -94,6 +94,44 @@ export const StablefordCard: React.FC<Props> = ({ scores }) => {
         />
       </div>
 
+      {(() => {
+        const total = dist.inZoneCount + dist.solidCount + dist.offDayCount;
+        if (total < 5) return null;
+        const zonePct = (dist.inZoneCount / total) * 100;
+        const solidPct = (dist.solidCount / total) * 100;
+        const offPct = (dist.offDayCount / total) * 100;
+
+        let headline = '';
+        let body = '';
+        if (offPct >= 40) {
+          headline = 'Your floor needs work.';
+          body = `${Math.round(offPct)}% off-day rounds is dragging your average — fewer disasters lifts your handicap faster than more peaks.`;
+        } else if (zonePct >= 40) {
+          headline = 'You score well consistently.';
+          body = `${Math.round(zonePct)}% zone rounds — when you play, you tend to deliver. Your handicap reflects your strong games.`;
+        } else if (solidPct >= 40) {
+          headline = 'Solid is your default.';
+          body = `${Math.round(solidPct)}% solid rounds — your typical game is reliable. Pushing into the zone more often will start to lower your handicap.`;
+        } else {
+          headline = 'Your scoring is variable.';
+          body = 'Your rounds are spread across all three brackets — consistency is the next step toward lowering your handicap.';
+        }
+        return (
+          <div
+            style={{
+              margin: '4px 16px 16px',
+              padding: '10px 12px',
+              background: T.neutralTint,
+              borderRadius: 10,
+            }}
+          >
+            <p style={{ margin: 0, fontSize: 12.5, lineHeight: 1.55, color: T.inkSoft, fontFamily: FONT }}>
+              <span style={{ fontWeight: 700, color: T.ink }}>{headline}</span> {body}
+            </p>
+          </div>
+        );
+      })()}
+
       <StablefordDetailSheet open={sheetOpen} onClose={() => setSheetOpen(false)} dist={dist} />
     </div>
   );

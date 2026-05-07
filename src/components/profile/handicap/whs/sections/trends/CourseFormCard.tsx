@@ -36,11 +36,6 @@ interface ViewMeta {
 }
 
 const VIEWS: Record<ViewKey, ViewMeta> = {
-  most_played: {
-    label: 'Most played',
-    sublabel: 'Your three most played courses, ranked by form',
-    select: (all) => [...all].sort((a, b) => b.rounds_played - a.rounds_played).slice(0, TOP_N),
-  },
   best: {
     label: 'Best form',
     sublabel: `Your three best courses (${MIN_ROUNDS_FOR_RANKINGS}+ rounds)`,
@@ -49,6 +44,11 @@ const VIEWS: Record<ViewKey, ViewMeta> = {
         .filter((c) => c.rounds_played >= MIN_ROUNDS_FOR_RANKINGS)
         .sort((a, b) => a.delta - b.delta)
         .slice(0, TOP_N),
+  },
+  most_played: {
+    label: 'Most played',
+    sublabel: 'Your three most played courses, ranked by form',
+    select: (all) => [...all].sort((a, b) => b.rounds_played - a.rounds_played).slice(0, TOP_N),
   },
   toughest: {
     label: 'Toughest',
@@ -73,11 +73,6 @@ function deltaColor(d: number): string {
   return T.inkMute;
 }
 
-function meaningLabel(d: number): string {
-  if (d < 0) return 'BETTER THAN HCP';
-  if (d > 0) return 'OVER HCP';
-  return 'AT HCP';
-}
 
 const CARD_STYLE: React.CSSProperties = {
   background: T.cardBg,
@@ -229,16 +224,16 @@ const CourseRows: React.FC<{ courses: CourseForm[] }> = ({ courses }) => {
   return (
     <div style={{ padding: '14px 16px 8px' }}>
       {courses.map((c, i) => {
-        const widthPct = (Math.abs(c.delta) / maxAbsDelta) * 50;
+        const widthPct = Math.max(4, (Math.abs(c.delta) / maxAbsDelta) * 100);
         const isLast = i === courses.length - 1;
         return (
-          <div key={c.course_id} style={{ marginBottom: isLast ? 0 : 18 }}>
+          <div key={c.course_id} style={{ marginBottom: isLast ? 0 : 16 }}>
             <div
               style={{
                 display: 'flex',
                 alignItems: 'baseline',
                 justifyContent: 'space-between',
-                marginBottom: 8,
+                marginBottom: 6,
                 gap: 12,
               }}
             >
@@ -293,52 +288,40 @@ const CourseRows: React.FC<{ courses: CourseForm[] }> = ({ courses }) => {
                 </span>
               </p>
             </div>
-            <div
-              style={{
-                position: 'relative',
-                height: 8,
-                background: 'rgba(15,23,42,0.04)',
-                borderRadius: 4,
-                overflow: 'visible',
-              }}
-            >
+            <div style={{ paddingLeft: 28 }}>
               <div
                 style={{
-                  position: 'absolute',
-                  left: '50%',
-                  top: -2,
-                  bottom: -2,
-                  width: 1,
-                  background: 'rgba(15,23,42,0.30)',
-                }}
-              />
-              <div
-                style={{
-                  position: 'absolute',
-                  top: 0,
-                  bottom: 0,
-                  background: deltaColor(c.delta),
-                  width: `${widthPct}%`,
-                  ...(c.delta < 0 ? { right: '50%' } : { left: '50%' }),
-                  borderRadius: 4,
-                }}
-              />
-            </div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 4 }}>
-              <span style={{ fontSize: 9, color: T.inkMute, fontFamily: FONT, fontWeight: 600 }}>
-                {c.rounds_played} rounds
-              </span>
-              <span
-                style={{
-                  fontSize: 9,
-                  color: T.inkMute,
-                  letterSpacing: '0.04em',
-                  fontFamily: FONT,
-                  fontWeight: 600,
+                  position: 'relative',
+                  height: 4,
+                  background: 'rgba(15,23,42,0.06)',
+                  borderRadius: 2,
+                  overflow: 'hidden',
                 }}
               >
-                {meaningLabel(c.delta)}
-              </span>
+                <div
+                  style={{
+                    position: 'absolute',
+                    top: 0,
+                    bottom: 0,
+                    left: 0,
+                    background: deltaColor(c.delta),
+                    width: `${widthPct}%`,
+                    borderRadius: 2,
+                  }}
+                />
+              </div>
+              <p
+                style={{
+                  margin: '6px 0 0',
+                  fontSize: 10,
+                  color: T.inkMute,
+                  fontFamily: FONT,
+                  fontWeight: 600,
+                  fontVariantNumeric: 'tabular-nums',
+                }}
+              >
+                {c.rounds_played} {c.rounds_played === 1 ? 'round' : 'rounds'}
+              </p>
             </div>
           </div>
         );
@@ -349,7 +332,7 @@ const CourseRows: React.FC<{ courses: CourseForm[] }> = ({ courses }) => {
 
 export const CourseFormCard: React.FC<Props> = ({ connectionId, currentHandicap }) => {
   const { data, isLoading } = useCourseForm(connectionId, currentHandicap);
-  const [activeView, setActiveView] = useState<ViewKey>('most_played');
+  const [activeView, setActiveView] = useState<ViewKey>('best');
 
   const view = VIEWS[activeView];
   const courses = useMemo(() => (data ? view.select(data) : []), [data, view]);
@@ -408,7 +391,36 @@ export const CourseFormCard: React.FC<Props> = ({ connectionId, currentHandicap 
       <CardHeader sublabel={view.sublabel} />
       <ViewToggle activeView={activeView} onChange={setActiveView} />
       <CourseRows courses={courses} />
-      <div style={{ height: 8 }} />
+      {courses.length > 0 && (() => {
+        const top = courses[0];
+        const sign = top.delta < 0 ? 'under' : 'over';
+        const deltaAbs = Math.abs(top.delta).toFixed(1);
+        const role =
+          activeView === 'toughest'
+            ? 'toughest test'
+            : activeView === 'best'
+              ? 'home advantage'
+              : 'home course';
+        return (
+          <div
+            style={{
+              margin: '4px 16px 16px',
+              padding: '10px 12px',
+              background: T.slateTint,
+              borderRadius: 10,
+            }}
+          >
+            <p style={{ margin: 0, fontSize: 12.5, lineHeight: 1.55, color: T.inkSoft, fontFamily: FONT }}>
+              <span style={{ fontWeight: 700, color: T.ink }}>{top.course_name}</span>{' '}
+              is your {role}.{' '}
+              <span style={{ fontVariantNumeric: 'tabular-nums' }}>
+                {sign === 'over' ? '+' : '\u2212'}{deltaAbs}
+              </span>{' '}
+              vs hcp across {top.rounds_played} {top.rounds_played === 1 ? 'round' : 'rounds'}.
+            </p>
+          </div>
+        );
+      })()}
     </div>
   );
 };
