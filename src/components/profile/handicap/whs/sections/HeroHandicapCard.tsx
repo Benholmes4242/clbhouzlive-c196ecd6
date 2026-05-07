@@ -581,7 +581,7 @@ const HeroHandicapCard: React.FC<Props> = ({ connection }) => {
             </span>
             <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
               <span style={{ width: 8, height: 8, borderRadius: '50%', background: GREEN }} />
-              8-ROUND FORM
+              30-DAY FORM
             </span>
           </div>
         </div>
