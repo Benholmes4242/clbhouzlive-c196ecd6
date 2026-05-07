@@ -278,17 +278,22 @@ function RunnerUpStrip({
 // ---------- By-the-Numbers grid (5 col, low round merged) -----------------
 
 function ByNumbersGrid({
-  birdies, eagles, pars, bogeys, lowRound,
+  birdies, eagles, bogeys, lowRound, rounds,
 }: {
-  birdies: number; eagles: number; pars: number; bogeys: number;
+  birdies: number; eagles: number; bogeys: number;
   lowRound: number | null;
+  rounds: Array<number | null>;
 }) {
+  const playedRounds = rounds.filter((r): r is number => r != null);
+  const avg = playedRounds.length > 0
+    ? (playedRounds.reduce((a, b) => a + b, 0) / playedRounds.length)
+    : null;
   const cells: Array<{ v: string; label: string; color: string }> = [
-    { v: `${birdies}`, label: 'BIRDIES', color: gold },
-    { v: `${eagles}`,  label: 'EAGLES',  color: gold },
-    { v: `${pars}`,    label: 'PARS',    color: ink  },
-    { v: `${bogeys}`,  label: 'BOGEYS',  color: ink  },
-    { v: lowRound != null ? fmtScore(lowRound) : '—', label: 'LOW R', color: gold },
+    { v: `${birdies}`,                                label: 'BIRDIES', color: gold },
+    { v: `${eagles}`,                                 label: 'EAGLES',  color: gold },
+    { v: avg != null ? avg.toFixed(1) : '—',          label: 'AVG',     color: ink  },
+    { v: `${bogeys}`,                                 label: 'BOGEYS',  color: ink  },
+    { v: lowRound != null ? fmtScore(lowRound) : '—', label: 'LOW R',   color: gold },
   ];
   return (
     <div style={{
