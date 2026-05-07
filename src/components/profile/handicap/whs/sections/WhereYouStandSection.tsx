@@ -1,6 +1,4 @@
 import React, { useEffect, useRef } from 'react';
-import { Users, ArrowRight } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
 import { useHandicapPercentile } from '@/lib/whs/usePercentile';
 import type {
   HandicapPercentileResult,
@@ -10,7 +8,6 @@ import type {
 import { analyticsEvents } from '@/utils/analyticsEvents';
 
 const AMBER     = '#F7931E';
-const AMBER_06  = 'rgba(247,147,30,0.06)';
 const AMBER_14  = 'rgba(247,147,30,0.14)';
 const INK       = '#0F172A';
 const INK_70    = '#475569';
@@ -19,6 +16,10 @@ const INK_40    = 'rgba(15,23,42,0.40)';
 const INK_10    = 'rgba(15,23,42,0.10)';
 const INK_06    = 'rgba(15,23,42,0.06)';
 const FONT_GEIST = 'Geist, system-ui, -apple-system, BlinkMacSystemFont, sans-serif';
+
+const BUCKET_ORDER: HandicapBucket[] = [
+  'sub_zero', '0_4', '5_9', '10_14', '15_19', '20_24', 'over_25',
+];
 
 const BUCKET_LABEL: Record<HandicapBucket, string> = {
   sub_zero: '<0',
@@ -36,41 +37,38 @@ type CopyBand = {
   emphasis: 'celebrate' | 'standard' | 'soft' | 'distribution_only';
 };
 
-function getPercentileCopy(percentile_top: number, country: string, gender: 'male' | 'female'): CopyBand {
-  const countryLabel = country === 'United Kingdom' ? 'the UK' : country;
-  const cohortLabel = `${gender} golfers`;
-
+function getPercentileCopy(percentile_top: number): CopyBand {
   if (percentile_top <= 5) {
     return {
       display: `Top ${percentile_top}%`,
-      caption: `Among the very best ${cohortLabel} in ${countryLabel}`,
+      caption: `Among the very best on Clbhouz`,
       emphasis: 'celebrate',
     };
   }
   if (percentile_top <= 25) {
     return {
       display: `Top ${percentile_top}%`,
-      caption: `In the top tier of ${cohortLabel} in ${countryLabel}`,
+      caption: `In the top tier on Clbhouz`,
       emphasis: 'standard',
     };
   }
   if (percentile_top <= 50) {
     return {
       display: `Above the median`,
-      caption: `Better than half of ${cohortLabel} in ${countryLabel}`,
+      caption: `Better than half of Clbhouz members`,
       emphasis: 'soft',
     };
   }
   if (percentile_top <= 75) {
     return {
       display: `Middle of the pack`,
-      caption: `See where you sit among ${cohortLabel} in ${countryLabel}`,
+      caption: `See where you sit on Clbhouz`,
       emphasis: 'distribution_only',
     };
   }
   return {
     display: `Where you sit`,
-    caption: `Among ${cohortLabel} in ${countryLabel}`,
+    caption: `Among Clbhouz members`,
     emphasis: 'distribution_only',
   };
 }
@@ -102,7 +100,15 @@ const DistributionChart: React.FC<{
   userBucket: HandicapBucket;
   userHandicap: number;
 }> = ({ buckets, userHandicap }) => {
-  const maxPct = Math.max(...buckets.map((b) => b.pct), 1);
+  // Build a lookup so missing buckets render at 0% rather than collapsing.
+  const byBucket = new Map<HandicapBucket, HandicapPercentileBucket>();
+  buckets.forEach((b) => byBucket.set(b.bucket, b));
+
+  const orderedBuckets: HandicapPercentileBucket[] = BUCKET_ORDER.map((key) =>
+    byBucket.get(key) ?? { bucket: key, pct: 0, is_user_bucket: false },
+  );
+
+  const maxPct = Math.max(...orderedBuckets.map((b) => b.pct), 1);
   const handicapStr = userHandicap.toFixed(1).replace('-', '\u2212');
 
   return (
@@ -116,9 +122,10 @@ const DistributionChart: React.FC<{
           paddingTop: 22,
         }}
       >
-        {buckets.map((b) => {
+        {orderedBuckets.map((b) => {
           const isUser = b.is_user_bucket;
           const heightPct = (b.pct / (maxPct * 1.1)) * 100;
+          const isEmpty = b.pct === 0;
           return (
             <div
               key={b.bucket}
@@ -167,8 +174,9 @@ const DistributionChart: React.FC<{
               <div
                 style={{
                   width: '100%',
-                  height: `${Math.max(heightPct, 3)}%`,
+                  height: isEmpty ? '3%' : `${Math.max(heightPct, 3)}%`,
                   background: isUser ? AMBER : INK_10,
+                  opacity: isEmpty && !isUser ? 0.5 : 1,
                   borderRadius: 4,
                 }}
               />
@@ -177,7 +185,7 @@ const DistributionChart: React.FC<{
         })}
       </div>
       <div style={{ display: 'flex', gap: 6, marginTop: 6 }}>
-        {buckets.map((b) => (
+        {orderedBuckets.map((b) => (
           <div
             key={b.bucket}
             style={{
@@ -201,12 +209,7 @@ const DistributionChart: React.FC<{
 const AvailableCard: React.FC<{
   data: Extract<HandicapPercentileResult, { available: true }>;
 }> = ({ data }) => {
-  const copy = getPercentileCopy(data.percentile_top, data.country, data.gender);
-  const cohortLabel =
-    data.country === 'United Kingdom'
-      ? `UK ${data.gender}`
-      : `${data.country} ${data.gender}`;
-
+  const copy = getPercentileCopy(data.percentile_top);
   const showBigPct = copy.emphasis === 'celebrate' || copy.emphasis === 'standard';
 
   return (
@@ -280,7 +283,7 @@ const AvailableCard: React.FC<{
                   color: INK_70,
                 }}
               >
-                of {cohortLabel} golfers
+                of Clbhouz members
               </span>
             </div>
           </>
@@ -297,7 +300,7 @@ const AvailableCard: React.FC<{
               lineHeight: 1.4,
             }}
           >
-            You're better than {100 - data.percentile_top}% of {cohortLabel} golfers.
+            You're better than {100 - data.percentile_top}% of Clbhouz members.
           </p>
         )}
 
@@ -325,7 +328,7 @@ const AvailableCard: React.FC<{
               color: INK_70,
             }}
           >
-            {cohortLabel}
+            All Clbhouz members
           </span>
           <span
             style={{
@@ -359,107 +362,27 @@ const AvailableCard: React.FC<{
   );
 };
 
-const UnavailableCard: React.FC<{
-  reason: 'missing_country' | 'missing_gender' | 'cohort_too_small';
-}> = ({ reason }) => {
-  const navigate = useNavigate();
-
-  const config = {
-    missing_country: {
-      title: 'Add your country',
-      message: 'Set your country in Settings to see how you compare against other golfers.',
-      cta: 'Go to Settings' as string | null,
-      action: () => navigate('/settings'),
-    },
-    missing_gender: {
-      title: 'Add your gender',
-      message: 'Set your gender in Settings to unlock peer comparison.',
-      cta: 'Go to Settings' as string | null,
-      action: () => navigate('/settings'),
-    },
-    cohort_too_small: {
-      title: 'Not enough data yet',
-      message:
-        'There aren\u2019t enough golfers in your country and gender cohort to show a meaningful comparison. We\u2019ll surface this once the cohort grows.',
-      cta: null as string | null,
-      action: null as null | (() => void),
-    },
-  }[reason];
-
-  return (
-    <div
-      style={{
-        margin: '0 20px',
-        background: '#FFFFFF',
-        border: `0.5px solid ${INK_10}`,
-        borderRadius: 14,
-        padding: 14,
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'flex-start',
-        gap: 10,
-      }}
-    >
-      <div
-        style={{
-          width: 36,
-          height: 36,
-          borderRadius: 10,
-          background: AMBER_06,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-        }}
-      >
-        <Users size={18} color={AMBER} />
-      </div>
-      <div>
-        <div
-          style={{
-            fontFamily: FONT_GEIST,
-            fontSize: 15,
-            fontWeight: 700,
-            color: INK,
-          }}
-        >
-          {config.title}
-        </div>
-        <p
-          style={{
-            fontFamily: FONT_GEIST,
-            fontSize: 13,
-            color: INK_70,
-            margin: '4px 0 0',
-            lineHeight: 1.4,
-          }}
-        >
-          {config.message}
-        </p>
-      </div>
-      {config.cta && config.action && (
-        <button
-          onClick={config.action}
-          style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: 6,
-            background: 'none',
-            border: 'none',
-            padding: 0,
-            color: AMBER,
-            fontFamily: FONT_GEIST,
-            fontSize: 13,
-            fontWeight: 700,
-            cursor: 'pointer',
-          }}
-        >
-          {config.cta}
-          <ArrowRight size={14} />
-        </button>
-      )}
-    </div>
-  );
-};
+const UnavailableCard: React.FC<{ reason: 'cohort_unavailable' }> = () => (
+  <div
+    style={{
+      margin: '0 20px',
+      padding: '20px',
+      borderRadius: 14,
+      background: 'rgba(15,23,42,0.04)',
+      border: '0.5px solid rgba(15,23,42,0.10)',
+      fontFamily: FONT_GEIST,
+      textAlign: 'center',
+    }}
+  >
+    <p style={{
+      margin: 0,
+      fontSize: 13,
+      color: 'rgba(15,23,42,0.55)',
+    }}>
+      Comparison data is being prepared. Check back soon.
+    </p>
+  </div>
+);
 
 export const WhereYouStandSection: React.FC<Props> = ({ userId }) => {
   const { data, isLoading } = useHandicapPercentile(userId);
@@ -510,7 +433,7 @@ export const WhereYouStandSection: React.FC<Props> = ({ userId }) => {
 
   if (!data) return null;
   const d: HandicapPercentileResult = data;
-  if (d.available === false && (d.reason === 'missing_handicap' || d.reason === 'unauthenticated')) {
+  if (d.available === false && d.reason !== 'cohort_unavailable') {
     return null;
   }
 
@@ -520,9 +443,7 @@ export const WhereYouStandSection: React.FC<Props> = ({ userId }) => {
       {d.available === true ? (
         <AvailableCard data={d} />
       ) : (
-        <UnavailableCard
-          reason={d.reason as 'missing_country' | 'missing_gender' | 'cohort_too_small'}
-        />
+        <UnavailableCard reason="cohort_unavailable" />
       )}
     </section>
   );
