@@ -18,10 +18,10 @@ const T = {
   amberDeep: '#C97211',
   amberTint: 'rgba(247,147,30,0.10)',
   amberInk: '#854F0B',
-  green: '#059669',
-  greenInk: '#065F46',
-  red: '#9F1D1D',
-  redInk: '#7F1D1D',
+  green: '#22C55E',
+  greenInk: '#15803D',
+  red: '#DC2626',
+  redInk: '#991B1B',
   ringTrack: 'rgba(15,23,42,0.06)',
   neutralTint: 'rgba(15,23,42,0.04)',
 };
@@ -62,7 +62,7 @@ export const StablefordCard: React.FC<Props> = ({ scores }) => {
       <CardHeader onOpenSheet={() => setSheetOpen(true)} />
 
       <div style={{ display: 'flex', justifyContent: 'center', padding: '20px 16px 4px' }}>
-        <TriRing dist={dist} size={240} stroke={18} />
+        <TriRing dist={dist} size={200} stroke={14} />
       </div>
 
       <div style={{ display: 'flex', alignItems: 'stretch', padding: '0 4px 8px' }}>
