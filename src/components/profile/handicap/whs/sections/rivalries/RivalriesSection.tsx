@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { Pencil } from 'lucide-react';
+import { Pencil, Swords } from 'lucide-react';
 import SectionHeader from '../SectionHeader';
 import RivalryCard from './RivalryCard';
 import RivalryAddCard from './RivalryAddCard';
@@ -32,14 +32,28 @@ export const RivalriesSection: React.FC<Props> = ({ userId }) => {
 
   const hasFilled = filledRivalries.length > 0;
 
+  const hasAnyH2HData = useMemo(() => {
+    return filledRivalries.some((r) => {
+      const sf = r.stableford_record ?? { wins: 0, losses: 0, ties: 0 };
+      const gross = r.gross_record ?? { wins: 0, losses: 0, ties: 0 };
+      return sf.wins + sf.losses + sf.ties + gross.wins + gross.losses + gross.ties > 0;
+    });
+  }, [filledRivalries]);
+
   return (
     <section style={{ padding: '20px 0 24px' }}>
       <SectionHeader
         eyebrow="RIVALRIES"
         title="Your rivals"
-        sub={isLoading ? 'Loading…' : 'Auto-picked from your circle. Pin to lock a slot.'}
+        sub={
+          isLoading
+            ? 'Loading…'
+            : !hasAnyH2HData
+              ? 'Pick golfers to track head-to-head.'
+              : 'Auto-picked from your circle. Pin to lock a slot.'
+        }
         right={
-          hasFilled ? (
+          hasFilled && hasAnyH2HData ? (
             <button
               onClick={() => {
                 const first = filledRivalries[0];
@@ -99,6 +113,10 @@ export const RivalriesSection: React.FC<Props> = ({ userId }) => {
               }}
             />
           ))
+        ) : !hasAnyH2HData ? (
+          <RivalryEmptyCard
+            onPickRival={() => setEditTarget({ rivalry: null, slotIndex: 0 })}
+          />
         ) : (
           <>
             {filledRivalries.map((rivalry) => (
