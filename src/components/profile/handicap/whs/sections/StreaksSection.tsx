@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from 'react';
-import { format, parseISO } from 'date-fns';
+
 import { ChevronRight, Flame, Shield, Trophy, TrendingDown } from 'lucide-react';
 import { toast } from 'sonner';
 import { useStreaks, type StreakResult, type StreaksData } from '@/lib/whs/useStreaks';
