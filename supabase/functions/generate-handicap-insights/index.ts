@@ -351,7 +351,6 @@ Deno.serve(async (req) => {
       rounds_pattern: roundsPattern,
       trend_narrative: trendNarrative,
       friend_narrative: friendNarrative,
-      friend_narrative: friendNarrative,
       suited_courses: enrichedSuited,
       test_courses: enrichedTest,
       generated_from_score_id: latestScoreId,
