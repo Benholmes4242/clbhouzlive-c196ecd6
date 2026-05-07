@@ -949,7 +949,7 @@ const MetricRingsRow: React.FC<MetricRingsRowProps> = ({ currentHcp, last20, his
     };
   } else {
     const fraction = Math.min(1, Math.abs(delta30d) * 0.5);
-    const color = delta30d <= -0.1 ? GREEN : delta30d >= 0.1 ? RED : AMBER;
+    const color = delta30d <= -0.1 ? GREEN : delta30d >= 0.1 ? RED : SLATE;
     const centre = delta30d < 0
       ? `\u2212${Math.abs(delta30d).toFixed(1)}`
       : delta30d > 0
