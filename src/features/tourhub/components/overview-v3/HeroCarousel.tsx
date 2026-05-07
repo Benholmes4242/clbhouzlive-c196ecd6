@@ -489,121 +489,30 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
                 </motion.div>
               )}
 
-              {/* UPCOMING LAYOUT */}
+              {/* UPCOMING LAYOUT — EditorialUpcomingHero (light, elastic) */}
               {isUpcoming && (
                 <motion.div
                   key="upcoming-content"
-                  initial={{ height: 0, opacity: 0 }}
-                  animate={{ height: 'auto', opacity: 1 }}
-                  exit={{ height: 0, opacity: 0 }}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
                   transition={{ duration: 0.22, ease: [0.19, 1, 0.22, 1] }}
-                  style={{ overflow: 'hidden', flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column' as const }}
+                  style={{ overflow: 'hidden', flex: 1, height: '100%', minHeight: 0, display: 'flex', flexDirection: 'column' as const }}
                 >
-                  {/* Main content — grows to fill, scales fluidly with viewport height */}
-                  <div style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column' as const, justifyContent: 'flex-end', padding: '0 18px', gap: 'clamp(6px, 1.2vh, 10px)' }}>
-                  {/* ── COURSE FACT CHIPS ── */}
-                  <div style={{ display: 'flex', gap: 6, marginTop: 'clamp(4px, 0.8vh, 6px)' }}>
-                    {[
-                      tournament.purse      && { value: formatPurse(tournament.purse),                          label: 'Purse'  },
-                      tournament.venuePar   && { value: `Par ${tournament.venuePar}`,                           label: 'Course' },
-                      tournament.venueYardage && { value: `${tournament.venueYardage.toLocaleString()}y`,        label: 'Yards'  },
-                    ].filter(Boolean).map((chip: any) => (
-                      <div key={chip.label} style={{
-                        flex: 1, textAlign: 'center',
-                        padding: 'clamp(5px, 1vh, 8px) 4px clamp(4px, 0.8vh, 6px)',
-                        borderRadius: 10,
-                        background: 'rgba(255,255,255,0.06)',
-                        border: '1px solid rgba(255,255,255,0.08)',
-                      }}>
-                        <div style={{ fontSize: 'clamp(12px, 1.7vh, 14px)', fontWeight: 700, color: '#FFFFFF', lineHeight: 1 }}>
-                          {chip.value}
-                        </div>
-                        <div style={{ fontSize: 8, fontWeight: 700, color: 'rgba(255,255,255,0.35)', textTransform: 'uppercase', letterSpacing: '0.5px', marginTop: 4 }}>
-                          {chip.label}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-
-                  {/* ── LIVE COUNTDOWN ── */}
-                  <div>
-                    <UpcomingCountdown startDate={tournament.startDate} />
-                  </div>
-
-                  {/* ── DEFENDING CHAMPION PANEL ── */}
-                  {tournament.defendingChampion && (
-                    <motion.div
-                      initial={{ opacity: 0, y: 6 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ duration: 0.22, ease: [0.19, 1, 0.22, 1], delay: 0.05 }}
-                      style={{
-                        display: 'flex', alignItems: 'center', gap: 10,
-                        background: 'rgba(255,255,255,0.06)',
-                        border: '1px solid rgba(255,255,255,0.09)',
-                        borderRadius: 12,
-                        padding: 'clamp(7px, 1.2vh, 10px) 12px',
-                      }}
-                    >
-                      {/* Avatar */}
-                      <PlayerAvatar displayName={tournament.defendingChampion} photoUrl={tournament.defendingChampionPhotoUrl} tourCode={tournament.tourSlug} size={40} frosted />
-                      {/* Text */}
-                      <div style={{ flex: 1, minWidth: 0 }}>
-                        <span style={{ fontSize: 8, fontWeight: 700, letterSpacing: '0.8px', textTransform: 'uppercase', color: 'rgba(250,204,21,0.65)', display: 'block' }}>
-                          🏆 Defending Champion
-                        </span>
-                        <span style={{ fontSize: 14, fontWeight: 700, color: '#FFFFFF', display: 'block', marginTop: 1 }}>
-                          {tournament.defendingChampion}
-                        </span>
-                        <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.35)', display: 'block', marginTop: 1 }}>
-                          {tournament.championNarrative || getDefendingChampionSubtext(tournament)}
-                        </span>
-                      </div>
-                    </motion.div>
-                  )}
-
-                  {/* Echo — tour hub contextual */}
-                  <div style={{ paddingBottom: 'clamp(2px, 0.6vh, 8px)' }}>
-                    <EchoContextualButton
-                      prompt={
-                        isLive
-                          ? `It's ${new Date().getFullYear()} and ${tournament.name} is live right now at ${tournament.venueName || 'the course'}${tournament.venueCity ? ` in ${tournament.venueCity}` : ''}. Search for the latest live leaderboard and tell me who is leading, who is making a move, and what the key storylines are today.`
-                          : isCompleted
-                          ? `Search for the ${new Date().getFullYear()} ${tournament.name} result${tournament.venueName ? ` at ${tournament.venueName}` : ''}${tournament.winnerName ? `. The winner was ${tournament.winnerName}${tournament.winnerScore ? ` with a score of ${tournament.winnerScore}` : ''}` : ''}. Tell me what happened, how the winner played, what the key moments were, and what this result means for their season.`
-                          : `Preview the ${new Date().getFullYear()} ${tournament.name}${tournament.venueName ? ` at ${tournament.venueName}` : ''}${tournament.venueCity ? ` in ${tournament.venueCity}` : ''}${tournament.purse ? `. Purse is $${((tournament.purse) / 1_000_000).toFixed(1)}M` : ''}${tournament.venuePar ? `. Par ${tournament.venuePar}` : ''}${tournament.defendingChampion ? `. Defending champion is ${tournament.defendingChampion}` : ''}. Search for the latest news, tell me who the favourites are, what type of player wins here, and what to watch this week.`
-                      }
-                      label={
-                        isLive ? 'Ask Echo for live intel'
-                        : isCompleted ? 'Ask Echo about the result'
-                        : 'Ask Echo to preview this event'
-                      }
-                      sublabel={
-                        isLive ? 'Leaderboard insight · who to watch'
-                        : isCompleted ? 'Winner story · key moments'
-                        : 'Favourites · course intel · storylines'
-                      }
-                      source={`tour_hub_${isLive ? 'live' : isCompleted ? 'completed' : 'upcoming'}`}
-                    />
-                  </div>
-
-                  </div>
-                  {/* ── FOOTER — View Tournament pill only, right-aligned. paddingBottom reserves space for absolute pill rail (~80px) ── */}
-                  <div style={{ display: 'flex', justifyContent: 'flex-end', padding: '6px 18px 90px' }}>
-                    <Link
-                      {...(() => { const t = tournamentRoute(tournament.id, { kind: 'overview' }); return { to: t.to, state: t.state }; })()}
-                      style={{
-                        display: 'flex', alignItems: 'center', gap: 4,
-                        background: 'rgba(255,255,255,0.09)',
-                        border: '1px solid rgba(255,255,255,0.14)',
-                        borderRadius: 20, padding: '7px 14px',
-                        fontSize: 12, fontWeight: 700, color: '#fff',
-                        textDecoration: 'none',
-                      }}
-                      className="active:opacity-70 transition-opacity"
-                    >
-                      View Tournament
-                      <ChevronRight style={{ width: 12, height: 12, color: 'rgba(255,255,255,0.6)' }} />
-                    </Link>
-                  </div>
+                  <EditorialUpcomingHero
+                    tournament={{
+                      id: tournament.id,
+                      name: tournament.name,
+                      tourSlug: tournament.tourSlug,
+                      venueName: tournament.venueName,
+                      venueCity: tournament.venueCity,
+                      startDate: tournament.startDate,
+                      purse: tournament.purse,
+                      venuePar: tournament.venuePar,
+                      venueYardage: tournament.venueYardage,
+                      defendingChampion: tournament.defendingChampion,
+                    }}
+                  />
                 </motion.div>
               )}
 
