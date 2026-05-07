@@ -917,26 +917,29 @@ interface MetricRingsRowProps {
 
 const MetricRingsRow: React.FC<MetricRingsRowProps> = ({ currentHcp, last20, history, delta30d }) => {
   const SLATE = '#475569';
+  const LILAC = '#A78BFA';
   const counterDiffs = (last20 ?? [])
     .filter((r: any) => r?.is_counter && typeof r?.handicap_differential === 'number')
     .slice(0, 8)
     .map((r: any) => r.handicap_differential as number);
 
-  // CONSISTENCY
-  let consistency: MetricCellSpec;
+  // VOLATILITY — concrete strokes-based measure of round-to-round spread.
+  // Always lilac (identity colour), regardless of value.
+  let volatility: MetricCellSpec;
   if (counterDiffs.length < 8) {
-    consistency = {
-      label: 'CONSISTENCY', sub: 'Awaiting data', centre: '—',
+    volatility = {
+      label: 'VOLATILITY', sub: 'Awaiting data', centre: '—',
       fraction: 0, color: INK_40, available: false,
     };
   } else {
     const mean = counterDiffs.reduce((s, v) => s + v, 0) / counterDiffs.length;
-    const inBand = counterDiffs.filter((d) => Math.abs(d - mean) <= 0.5).length;
-    const pct = (inBand / counterDiffs.length) * 100;
-    const color = pct >= 70 ? GREEN : pct >= 40 ? SLATE : RED;
-    consistency = {
-      label: 'CONSISTENCY', sub: 'within ±0.5 of avg', centre: `${Math.round(pct)}`,
-      fraction: pct / 100, color, available: true,
+    const meanAbsDev = counterDiffs.reduce((s, v) => s + Math.abs(v - mean), 0) / counterDiffs.length;
+    // Lower volatility is better. 0 strokes = full ring, 2.0+ = empty.
+    const fraction = Math.max(0, Math.min(1, 1 - (meanAbsDev / 2)));
+    volatility = {
+      label: 'VOLATILITY', sub: 'typical round-to-round',
+      centre: `\u00B1${meanAbsDev.toFixed(1)}`,
+      fraction, color: LILAC, available: true,
     };
   }
 
@@ -1004,7 +1007,7 @@ const MetricRingsRow: React.FC<MetricRingsRowProps> = ({ currentHcp, last20, his
       alignItems: 'stretch',
       position: 'relative',
     }}>
-      <MetricRing spec={consistency} />
+      <MetricRing spec={volatility} />
       <div style={{
         width: '0.5px', alignSelf: 'center', height: '60%',
         background: 'rgba(15,23,42,0.08)',
