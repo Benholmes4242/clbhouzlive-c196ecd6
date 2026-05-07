@@ -337,7 +337,7 @@ const CourseRows: React.FC<{ courses: CourseForm[] }> = ({ courses }) => {
 
 export const CourseFormCard: React.FC<Props> = ({ connectionId, currentHandicap }) => {
   const { data, isLoading } = useCourseForm(connectionId, currentHandicap);
-  const [activeView, setActiveView] = useState<ViewKey>('most_played');
+  const [activeView, setActiveView] = useState<ViewKey>('best');
 
   const view = VIEWS[activeView];
   const courses = useMemo(() => (data ? view.select(data) : []), [data, view]);
