@@ -253,18 +253,18 @@ const TriRing: React.FC<TriRingProps> = ({ dist, size, stroke }) => {
       ))}
       <text
         x={cx}
-        y={cy - 10}
+        y={cy - 18}
         textAnchor="middle"
-        style={{ fontSize: 9, fontWeight: 800, fill: T.inkMute, letterSpacing: '0.16em', fontFamily: FONT }}
+        style={{ fontSize: 11, fontWeight: 700, fill: T.inkMute, letterSpacing: '0.14em', fontFamily: FONT }}
       >
         AVG
       </text>
       <text
         x={cx}
-        y={cy + 18}
+        y={cy + 20}
         textAnchor="middle"
         style={{
-          fontSize: 36,
+          fontSize: 56,
           fontWeight: 300,
           fill: T.ink,
           letterSpacing: '-0.04em',
@@ -276,9 +276,9 @@ const TriRing: React.FC<TriRingProps> = ({ dist, size, stroke }) => {
       </text>
       <text
         x={cx}
-        y={cy + 34}
+        y={cy + 44}
         textAnchor="middle"
-        style={{ fontSize: 10, fontWeight: 600, fill: T.inkMute, letterSpacing: '0.04em', fontFamily: FONT }}
+        style={{ fontSize: 12, fontWeight: 500, fill: T.inkMute, letterSpacing: '0.04em', fontFamily: FONT }}
       >
         pts
       </text>
@@ -296,24 +296,39 @@ interface StatColumnProps {
 }
 
 const StatColumn: React.FC<StatColumnProps> = ({ color, ink, label, count, pctText, range }) => (
-  <div style={{ flex: 1, textAlign: 'center', padding: '10px 4px' }}>
-    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, marginBottom: 6 }}>
-      <span style={{ width: 8, height: 8, borderRadius: 2, background: color, display: 'inline-block' }} />
-      <p
-        style={{
-          margin: 0,
-          fontSize: 9,
-          fontWeight: 800,
-          letterSpacing: '0.08em',
-          textTransform: 'uppercase',
-          color: ink,
-          fontFamily: FONT,
-          whiteSpace: 'nowrap',
-        }}
-      >
-        {label}
-      </p>
-    </div>
+  <div
+    style={{
+      flex: 1,
+      textAlign: 'center',
+      padding: '14px 12px 14px 18px',
+      position: 'relative',
+    }}
+  >
+    <span
+      style={{
+        position: 'absolute',
+        left: 6,
+        top: 12,
+        bottom: 12,
+        width: 4,
+        borderRadius: 2,
+        background: color,
+      }}
+    />
+    <p
+      style={{
+        margin: '0 0 6px',
+        fontSize: 9.5,
+        fontWeight: 800,
+        letterSpacing: '0.12em',
+        textTransform: 'uppercase',
+        color: T.inkMute,
+        fontFamily: FONT,
+        whiteSpace: 'nowrap',
+      }}
+    >
+      {label}
+    </p>
     <p
       style={{
         margin: 0,
