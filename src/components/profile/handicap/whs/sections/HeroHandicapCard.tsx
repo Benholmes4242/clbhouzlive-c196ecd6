@@ -855,6 +855,7 @@ interface MetricCellSpec {
   label: string;
   sub: string;
   centre: string;
+  centreIcon?: 'flame' | 'minus' | 'snowflake' | null;
   fraction: number; // 0..1
   color: string;
   available: boolean;
