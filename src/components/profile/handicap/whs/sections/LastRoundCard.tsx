@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
-import { ChevronRight } from 'lucide-react';
 import { format } from 'date-fns';
-import { useLastRound } from '@/lib/whs/hooks';
+import { useLastRound, useRoundDetail } from '@/lib/whs/hooks';
 import RoundDetailSheet from './round-detail/RoundDetailSheet';
 
 interface Props {
@@ -9,13 +8,13 @@ interface Props {
 }
 
 const AMBER = '#F7931E';
+const GOLD = '#FBBC2E';
 const INK = '#0F172A';
 const INK_55 = 'rgba(15,23,42,0.55)';
 const INK_40 = 'rgba(15,23,42,0.40)';
 const INK_10 = 'rgba(15,23,42,0.10)';
-const INK_06 = 'rgba(15,23,42,0.06)';
-const BG = '#F8FAFC';
-const GREEN = '#059669';
+const GREEN = '#15803D';
+const RED = '#DC2626';
 const FONT_GEIST = 'Geist, system-ui, -apple-system, BlinkMacSystemFont, sans-serif';
 
 const fmtDiff = (n: number | null | undefined) => {
@@ -37,7 +36,23 @@ const relativeDay = (iso: string) => {
 
 export const LastRoundCard: React.FC<Props> = ({ connectionId }) => {
   const { data: lastRound, isLoading } = useLastRound(connectionId);
+  const { data: roundDetail } = useRoundDetail(lastRound?.id, !!lastRound?.id);
   const [sheetOpen, setSheetOpen] = useState(false);
+
+  const breakdown = React.useMemo(() => {
+    if (!roundDetail?.holes || !roundDetail.hole_by_hole_fetched) return null;
+    const counts = { eagle: 0, birdie: 0, par: 0, bogey: 0, doublePlus: 0 };
+    for (const h of roundDetail.holes) {
+      if (!h.played || h.actual_gross == null || h.par == null) continue;
+      const diff = h.actual_gross - h.par;
+      if (diff <= -2) counts.eagle++;
+      else if (diff === -1) counts.birdie++;
+      else if (diff === 0) counts.par++;
+      else if (diff === 1) counts.bogey++;
+      else counts.doublePlus++;
+    }
+    return counts;
+  }, [roundDetail]);
 
   if (isLoading) {
     return (
@@ -75,18 +90,62 @@ export const LastRoundCard: React.FC<Props> = ({ connectionId }) => {
     ? 'dropped'
     : 'rose';
 
-  const arrowColor = isImprovement ? GREEN : INK;
+  const statusColor = !hasMovement || delta === 0 ? INK_55 : isImprovement ? GREEN : RED;
+  const statusBg = !hasMovement || delta === 0
+    ? 'rgba(15,23,42,0.06)'
+    : isImprovement
+    ? 'rgba(21,128,61,0.10)'
+    : 'rgba(220,38,38,0.10)';
 
   const imageUrl = lastRound.course_thumbnail_image;
-  const thumbStyle: React.CSSProperties = imageUrl
-    ? {
-        backgroundImage: `url(${imageUrl})`,
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-      }
-    : {
-        background: 'linear-gradient(135deg, #6b7c5e, #2d3a26)',
-      };
+  const stripBg: React.CSSProperties = imageUrl
+    ? { backgroundImage: `url(${imageUrl})`, backgroundSize: 'cover', backgroundPosition: 'center' }
+    : { background: `linear-gradient(135deg, ${AMBER}, ${GOLD})` };
+
+  const totalPar = roundDetail?.holes
+    ? roundDetail.holes.filter((h: any) => h.played).reduce((s: number, h: any) => s + (h.par ?? 0), 0)
+    : 0;
+
+  const grossSub = (() => {
+    if (lastRound.adjusted_gross == null || !totalPar) return '\u00A0';
+    const dpar = lastRound.adjusted_gross - totalPar;
+    return dpar === 0 ? 'level par' : dpar > 0 ? `+${dpar} to par` : `${dpar} to par`;
+  })();
+
+  const segments = breakdown
+    ? [
+        { count: breakdown.eagle + breakdown.birdie, color: GOLD },
+        { count: breakdown.par, color: INK_40 },
+        { count: breakdown.bogey, color: AMBER },
+        { count: breakdown.doublePlus, color: RED },
+      ].filter((s) => s.count > 0)
+    : [];
+  const segTotal = segments.reduce((s, x) => s + x.count, 0);
+
+  const eyebrowLabel: React.CSSProperties = {
+    fontSize: 9,
+    fontWeight: 800,
+    color: INK_55,
+    letterSpacing: '0.16em',
+    textTransform: 'uppercase',
+  };
+
+  const heroNum: React.CSSProperties = {
+    fontSize: 30,
+    fontWeight: 700,
+    color: INK,
+    letterSpacing: '-0.02em',
+    fontVariantNumeric: 'tabular-nums',
+    lineHeight: 1,
+    marginTop: 4,
+  };
+
+  const heroSub: React.CSSProperties = {
+    fontSize: 11,
+    color: INK_55,
+    marginTop: 4,
+    minHeight: 14,
+  };
 
   return (
     <section style={{ padding: '0 16px', marginTop: 24, marginBottom: 28, fontFamily: FONT_GEIST }}>
@@ -94,56 +153,46 @@ export const LastRoundCard: React.FC<Props> = ({ connectionId }) => {
       <div className="flex items-center justify-between mb-2">
         <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
           <span style={{ width: 6, height: 6, borderRadius: '50%', background: AMBER }} />
-          <span
-            style={{
-              fontSize: 10,
-              fontWeight: 800,
-              color: INK_55,
-              letterSpacing: '0.14em',
-              textTransform: 'uppercase',
-            }}
-          >
-            Last round
-          </span>
+          <span style={{ ...eyebrowLabel, letterSpacing: '0.14em' }}>Last round</span>
         </div>
         <span style={{ fontSize: 12, color: INK_55 }}>{relativeDay(lastRound.play_date)}</span>
       </div>
 
+      {/* Card */}
       <button
         type="button"
         onClick={() => setSheetOpen(true)}
         aria-label={`View detail for ${lastRound.course?.name ?? 'last round'}`}
         style={{
+          display: 'block',
           width: '100%',
-          background: '#fff',
-          border: `0.5px solid ${INK_10}`,
-          borderRadius: 14,
-          padding: 14,
-          display: 'flex',
-          flexDirection: 'column',
-          gap: 12,
-          fontFamily: FONT_GEIST,
           textAlign: 'left',
+          background: '#fff',
+          borderRadius: 20,
+          overflow: 'hidden',
+          border: 'none',
+          padding: 0,
           cursor: 'pointer',
+          boxShadow: '0 1px 2px rgba(15,23,42,0.04), 0 4px 16px rgba(15,23,42,0.06)',
+          fontFamily: FONT_GEIST,
         }}
       >
-        {/* Header row */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+        {/* Course image strip 16:5 */}
+        <div style={{ position: 'relative', width: '100%', aspectRatio: '16 / 5', ...stripBg }}>
           <div
             style={{
-              width: 64,
-              height: 64,
-              borderRadius: 14,
-              flexShrink: 0,
-              ...thumbStyle,
+              position: 'absolute',
+              inset: 0,
+              background:
+                'linear-gradient(to top, rgba(0,0,0,0.65) 0%, rgba(0,0,0,0.25) 55%, rgba(0,0,0,0) 100%)',
             }}
           />
-          <div style={{ flex: 1, minWidth: 0 }}>
+          <div style={{ position: 'absolute', left: 16, right: 16, bottom: 12 }}>
             <div
               style={{
                 fontSize: 16,
                 fontWeight: 700,
-                color: INK,
+                color: '#fff',
                 letterSpacing: '-0.01em',
                 lineHeight: 1.2,
                 overflow: 'hidden',
@@ -151,122 +200,156 @@ export const LastRoundCard: React.FC<Props> = ({ connectionId }) => {
                 whiteSpace: 'nowrap',
               }}
             >
-              {lastRound.course?.name ?? 'Unknown course'}
+              {lastRound.course?.name ?? 'Round'}
             </div>
             <div
               style={{
-                fontSize: 12,
-                color: INK_55,
-                marginTop: 3,
+                fontSize: 11,
+                color: 'rgba(255,255,255,0.85)',
+                marginTop: 2,
                 overflow: 'hidden',
                 textOverflow: 'ellipsis',
                 whiteSpace: 'nowrap',
               }}
             >
-              {lastRound.marker_name ?? 'Tee'} · {lastRound.course_rating ?? '—'}/
-              {lastRound.slope_rating ?? '—'} · {relativeDay(lastRound.play_date)}
+              {[
+                lastRound.marker_name,
+                lastRound.course_rating && lastRound.slope_rating
+                  ? `${lastRound.course_rating}/${lastRound.slope_rating}`
+                  : null,
+                format(new Date(lastRound.play_date), 'd MMM yyyy'),
+              ]
+                .filter(Boolean)
+                .join(' · ')}
             </div>
           </div>
-          <ChevronRight size={16} color={INK_40} style={{ flexShrink: 0 }} />
         </div>
 
-        {/* Stat tiles */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 8 }}>
-          {[
-            {
-              label: 'GROSS',
-              value:
-                lastRound.adjusted_gross !== null && lastRound.adjusted_gross !== undefined
-                  ? String(lastRound.adjusted_gross)
-                  : '—',
-            },
-            {
-              label: 'STABLEFORD',
-              value:
-                lastRound.stableford_points !== null && lastRound.stableford_points !== undefined
-                  ? String(lastRound.stableford_points)
-                  : '—',
-            },
-            { label: 'DIFF', value: fmtDiff(lastRound.handicap_differential) },
-          ].map((stat) => (
-            <div
-              key={stat.label}
-              style={{
-                background: BG,
-                borderRadius: 10,
-                padding: '10px 8px',
-                textAlign: 'center',
-              }}
-            >
+        {/* Body */}
+        <div style={{ padding: 16, display: 'flex', flexDirection: 'column', gap: 16 }}>
+          {/* Hero row */}
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', alignItems: 'start' }}>
+            <div style={{ paddingRight: 12 }}>
+              <div style={eyebrowLabel}>GROSS</div>
+              <div style={heroNum}>{lastRound.adjusted_gross ?? '—'}</div>
+              <div style={heroSub}>{grossSub}</div>
+            </div>
+            <div style={{ padding: '0 12px', borderLeft: `0.5px solid ${INK_10}`, borderRight: `0.5px solid ${INK_10}` }}>
+              <div style={eyebrowLabel}>STABLEFORD</div>
+              <div style={heroNum}>{lastRound.stableford_points ?? '—'}</div>
+              <div style={heroSub}>points</div>
+            </div>
+            <div style={{ paddingLeft: 12 }}>
+              <div style={eyebrowLabel}>DIFFERENTIAL</div>
+              <div style={heroNum}>{fmtDiff(lastRound.handicap_differential)}</div>
+              <div style={heroSub}>vs course</div>
+            </div>
+          </div>
+
+          {/* Round breakdown */}
+          {breakdown && segTotal > 0 ? (
+            <div>
+              <div style={{ ...eyebrowLabel, marginBottom: 8 }}>ROUND BREAKDOWN</div>
               <div
                 style={{
-                  fontSize: 9,
-                  fontWeight: 800,
-                  color: INK_55,
-                  letterSpacing: '0.14em',
-                  marginBottom: 4,
-                  textTransform: 'uppercase',
+                  display: 'flex',
+                  width: '100%',
+                  height: 8,
+                  borderRadius: 4,
+                  overflow: 'hidden',
+                  background: 'rgba(15,23,42,0.04)',
                 }}
               >
-                {stat.label}
+                {segments.map((s, i) => (
+                  <div
+                    key={i}
+                    style={{ flex: s.count, background: s.color, height: '100%' }}
+                  />
+                ))}
               </div>
               <div
                 style={{
-                  fontSize: 22,
-                  fontWeight: 700,
-                  color: INK,
-                  letterSpacing: '-0.02em',
-                  fontVariantNumeric: 'tabular-nums',
-                  lineHeight: 1,
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(4, 1fr)',
+                  gap: 8,
+                  marginTop: 10,
                 }}
               >
-                {stat.value}
+                {[
+                  { label: 'Birdie+', count: breakdown.eagle + breakdown.birdie, color: GOLD },
+                  { label: 'Par', count: breakdown.par, color: INK_40 },
+                  { label: 'Bogey', count: breakdown.bogey, color: AMBER },
+                  { label: 'Double+', count: breakdown.doublePlus, color: RED },
+                ].map((s) => (
+                  <div key={s.label} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                    <span
+                      style={{
+                        width: 6,
+                        height: 6,
+                        borderRadius: '50%',
+                        background: s.color,
+                        flexShrink: 0,
+                      }}
+                    />
+                    <span style={{ fontSize: 11, color: INK_55 }}>
+                      <span style={{ color: INK, fontWeight: 700, fontVariantNumeric: 'tabular-nums' }}>
+                        {s.count}
+                      </span>{' '}
+                      {s.label}
+                    </span>
+                  </div>
+                ))}
               </div>
             </div>
-          ))}
-        </div>
+          ) : (
+            <div style={{ fontSize: 12, color: INK_55, fontStyle: 'italic' }}>
+              Hole-by-hole breakdown not yet synced for this round
+            </div>
+          )}
 
-        {/* Index footer chip */}
-        <div
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: 8,
-            background: INK_06,
-            borderRadius: 10,
-            padding: '8px 12px',
-          }}
-        >
-          <span style={{ fontSize: 13, color: INK_55, fontWeight: 500 }}>Index</span>
-          {hasMovement && hcpBefore !== null && hcpAfter !== null ? (
-            <span
+          {/* Index footer */}
+          {hcpAfter !== null && (
+            <div
               style={{
-                fontSize: 13,
-                color: INK,
-                fontWeight: 700,
-                fontVariantNumeric: 'tabular-nums',
-                display: 'inline-flex',
+                display: 'flex',
                 alignItems: 'center',
-                gap: 4,
+                justifyContent: 'space-between',
+                paddingTop: 12,
+                borderTop: `0.5px solid ${INK_10}`,
               }}
             >
-              {hcpBefore.toFixed(1)}{' '}
-              <span style={{ color: arrowColor }}>{'\u2192'}</span> {hcpAfter.toFixed(1)}
-            </span>
-          ) : hcpAfter !== null ? (
-            <span
-              style={{
-                fontSize: 13,
-                color: INK,
-                fontWeight: 700,
-                fontVariantNumeric: 'tabular-nums',
-              }}
-            >
-              {hcpAfter.toFixed(1)}
-            </span>
-          ) : null}
-          <span style={{ flex: 1 }} />
-          <span style={{ fontSize: 11, color: INK_55 }}>{statusWord}</span>
+              <span style={{ fontSize: 12, color: INK_55 }}>Handicap index</span>
+              <span
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 8,
+                  fontSize: 13,
+                  fontWeight: 700,
+                  color: INK,
+                  fontVariantNumeric: 'tabular-nums',
+                }}
+              >
+                {hcpBefore != null
+                  ? `${hcpBefore.toFixed(1)} → ${hcpAfter.toFixed(1)}`
+                  : hcpAfter.toFixed(1)}
+                <span
+                  style={{
+                    fontSize: 10,
+                    fontWeight: 800,
+                    letterSpacing: '0.12em',
+                    textTransform: 'uppercase',
+                    color: statusColor,
+                    background: statusBg,
+                    padding: '3px 8px',
+                    borderRadius: 999,
+                  }}
+                >
+                  {statusWord}
+                </span>
+              </span>
+            </div>
+          )}
         </div>
       </button>
 
