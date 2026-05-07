@@ -1007,7 +1007,7 @@ const MetricRingsRow: React.FC<MetricRingsRowProps> = ({ currentHcp, last20, his
       alignItems: 'stretch',
       position: 'relative',
     }}>
-      <MetricRing spec={consistency} />
+      <MetricRing spec={volatility} />
       <div style={{
         width: '0.5px', alignSelf: 'center', height: '60%',
         background: 'rgba(15,23,42,0.08)',
