@@ -1039,13 +1039,13 @@ const MetricRingsRow: React.FC<MetricRingsRowProps> = ({ currentHcp, last20, his
       {/* Shared gradient defs for the three small rings */}
       <svg width="0" height="0" style={{ position: 'absolute' }} aria-hidden="true">
         <defs>
-          <linearGradient id="metricFormGreen" x1="0" y1="0" x2="1" y2="0">
-            <stop offset="0%" stopColor="#047857" />
-            <stop offset="100%" stopColor="#2DD4BF" />
-          </linearGradient>
-          <linearGradient id="metricFormRed" x1="0" y1="0" x2="1" y2="0">
+          <linearGradient id="metricFormHot" x1="0" y1="0" x2="1" y2="0">
             <stop offset="0%" stopColor="#B91C1C" />
             <stop offset="100%" stopColor="#FB923C" />
+          </linearGradient>
+          <linearGradient id="metricFormCold" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0%" stopColor="#1E3A8A" />
+            <stop offset="100%" stopColor="#38BDF8" />
           </linearGradient>
           <linearGradient id="metricMomentumGreen" x1="0" y1="0" x2="1" y2="0">
             <stop offset="0%" stopColor="#047857" />
