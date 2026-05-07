@@ -484,4 +484,50 @@ export const StreaksSection: React.FC<Props> = ({ connectionId, userId }) => {
   );
 };
 
+const SecondaryInline: React.FC<{ label: string; value: number; bestText: string }> = ({
+  label,
+  value,
+  bestText,
+}) => (
+  <div style={{ flex: 1, minWidth: 0 }}>
+    <div
+      style={{
+        fontSize: 9.5,
+        fontWeight: 800,
+        color: AMBER,
+        letterSpacing: '0.12em',
+        textTransform: 'uppercase',
+        marginBottom: 4,
+      }}
+    >
+      {label}
+    </div>
+    <div style={{ display: 'flex', alignItems: 'baseline', gap: 6 }}>
+      <span
+        style={{
+          fontSize: 16,
+          fontWeight: 800,
+          color: INK,
+          fontVariantNumeric: 'tabular-nums',
+          lineHeight: 1,
+        }}
+      >
+        {value}
+      </span>
+      <span
+        style={{
+          fontSize: 10,
+          color: INK_55,
+          fontWeight: 500,
+          whiteSpace: 'nowrap',
+          overflow: 'hidden',
+          textOverflow: 'ellipsis',
+        }}
+      >
+        {bestText}
+      </span>
+    </div>
+  </div>
+);
+
 export default StreaksSection;
