@@ -1,6 +1,7 @@
 import React from 'react';
 import FriendsHeaderSection from '../sections/friends-header/FriendsHeaderSection';
 import RecentlyActiveRail from '../sections/recently-active/RecentlyActiveRail';
+import FriendsEchoSection from '../sections/friends/FriendsEchoSection';
 import RecentlyPlayedFeed from '../sections/recently-played/RecentlyPlayedFeed';
 import RivalriesSection from '../sections/rivalries/RivalriesSection';
 import FriendsLeaderboardSection from '../sections/friends-leaderboard-v2/FriendsLeaderboardSection';
@@ -18,6 +19,7 @@ export const FriendsView: React.FC<Props> = ({ userId, currentHandicap, connecti
     <div role="tabpanel" id="handicap-panel-friends" aria-labelledby="handicap-tab-friends">
       <FriendsHeaderSection userId={userId} />
       <RecentlyActiveRail userId={userId} />
+      {!readOnly && <FriendsEchoSection connectionId={connectionId} />}
       <RecentlyPlayedFeed ownerUserId={userId} />
       <RivalriesSection userId={userId} />
       <FriendsLeaderboardSection userId={userId} />
@@ -27,3 +29,4 @@ export const FriendsView: React.FC<Props> = ({ userId, currentHandicap, connecti
 };
 
 export default FriendsView;
+
