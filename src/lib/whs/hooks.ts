@@ -23,6 +23,8 @@ import {
   deleteUserRivalOverride,
   fetchSharedRounds,
   fetchTrophyAggregates,
+  fetchFriendRoundsSinceLastVisit,
+  callMarkTodayVisited,
 } from './api';
 
 export const whsKeys = {
@@ -49,6 +51,7 @@ export const whsKeys = {
   friendLeaderboard: (userId: string) => ['whs-friend-leaderboard', userId] as const,
   userRivalOverrides: (userId: string) => ['whs-user-rival-overrides', userId] as const,
   percentile: (userId: string) => ['whs', 'percentile', userId] as const,
+  friendRoundsSinceLastVisit: () => ['whs', 'friend-rounds-since-last-visit'] as const,
 };
 
 export function useRoundDetail(
@@ -324,5 +327,21 @@ export function useTrophyAggregates(
     enabled: !!userId && !!connectionId,
     queryFn: () => fetchTrophyAggregates(userId!, connectionId!),
     staleTime: 5 * 60 * 1000,
+  });
+}
+
+// ─── Phase 7: Friend rounds since last Today visit ───────────────────────
+export function useFriendRoundsSinceLastVisit(enabled: boolean) {
+  return useQuery({
+    queryKey: whsKeys.friendRoundsSinceLastVisit(),
+    enabled,
+    staleTime: 60_000,
+    queryFn: fetchFriendRoundsSinceLastVisit,
+  });
+}
+
+export function useMarkTodayVisited() {
+  return useMutation({
+    mutationFn: callMarkTodayVisited,
   });
 }

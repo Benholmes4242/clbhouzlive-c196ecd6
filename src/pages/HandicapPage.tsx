@@ -13,7 +13,8 @@
 
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate, Navigate, useSearchParams, useParams } from 'react-router-dom';
-import { ChevronRight } from 'lucide-react';
+import { ChevronRight, Trophy } from 'lucide-react';
+import { openTrophiesSheet } from '@/components/profile/handicap/whs/trophiesSheetEvents';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { PageRoot } from '@/components/layout/PageRoot';
@@ -213,15 +214,29 @@ const HandicapPageHeader: React.FC<HeaderProps> = ({
           />
         </div>
       ) : (
-        <div style={{ padding: '14px 20px 18px' }}>
+        <div style={{ padding: '14px 20px 18px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
           <h1 style={{
             fontFamily: FONT_GEIST,
             fontSize: 28, fontWeight: 700, color: INK,
             lineHeight: 1.1, letterSpacing: '-0.02em',
-            margin: 0,
+            margin: 0, flex: 1, minWidth: 0,
           }}>
             {title}
           </h1>
+          <button
+            onClick={() => openTrophiesSheet()}
+            aria-label="View all trophies"
+            style={{
+              background: 'transparent',
+              border: 'none',
+              padding: 6,
+              cursor: 'pointer',
+              color: 'rgba(15,23,42,0.40)',
+              flexShrink: 0,
+            }}
+          >
+            <Trophy size={20} strokeWidth={2} />
+          </button>
         </div>
       )}
 
@@ -230,7 +245,7 @@ const HandicapPageHeader: React.FC<HeaderProps> = ({
         display: 'flex',
         justifyContent: 'center',
       }}>
-        {(['overview', 'trends', 'friends'] as const).map(tab => (
+        {(['today', 'trends', 'friends'] as const).map(tab => (
           <button
             key={tab}
             onClick={() => onTabChange(tab)}
@@ -299,7 +314,9 @@ const HandicapPage: React.FC = () => {
   const ownerUserId = isFriendView ? friendId! : user?.id ?? null;
 
   const rawSubtab = searchParams.get('subtab');
-  const activeTab: HandicapSubtab = isHandicapSubtab(rawSubtab) ? rawSubtab : 'overview';
+  // Graceful redirect: legacy ?subtab=overview bookmarks resolve to 'today'.
+  const normalisedSubtab = rawSubtab === 'overview' ? 'today' : rawSubtab;
+  const activeTab: HandicapSubtab = isHandicapSubtab(normalisedSubtab) ? normalisedSubtab : 'today';
 
   const handleTabChange = useCallback((next: HandicapSubtab) => {
     const params = new URLSearchParams(searchParams);

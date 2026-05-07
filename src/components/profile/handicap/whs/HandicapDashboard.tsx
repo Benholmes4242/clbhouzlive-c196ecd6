@@ -5,9 +5,10 @@ import { toast } from 'sonner';
 import { callSyncWhsOne } from '@/lib/whs/api';
 import { useHandicapTrend, whsKeys } from '@/lib/whs/hooks';
 import type { WhsConnection } from '@/lib/whs/types';
-import OverviewView from './views/OverviewView';
+import TodayView from './views/TodayView';
 import TrendsView from './views/TrendsView';
 import FriendsView from './views/FriendsView';
+import TrophiesSheetMount from './sections/TrophiesSheetMount';
 import { isHandicapSubtab, type HandicapSubtab } from './types';
 
 interface Props {
@@ -21,7 +22,7 @@ interface Props {
   readOnly?: boolean;
 }
 
-const DEFAULT_SUBTAB: HandicapSubtab = 'overview';
+const DEFAULT_SUBTAB: HandicapSubtab = 'today';
 
 export const HandicapDashboard: React.FC<Props> = ({ connection, userId, readOnly = false }) => {
   const queryClient = useQueryClient();
@@ -96,8 +97,8 @@ export const HandicapDashboard: React.FC<Props> = ({ connection, userId, readOnl
     <div className="pb-10">
       {/* SWAPPABLE — active view */}
       <div key={activeSubtab} className="anim-fadeSlide pt-5">
-        {activeSubtab === 'overview' && (
-          <OverviewView
+        {activeSubtab === 'today' && (
+          <TodayView
             connection={connection}
             connectionId={connection.id}
             userId={userId}
@@ -128,6 +129,14 @@ export const HandicapDashboard: React.FC<Props> = ({ connection, userId, readOnl
           />
         )}
       </div>
+
+      {!readOnly && (
+        <TrophiesSheetMount
+          connectionId={connection.id}
+          connectionCreatedAt={connection.created_at}
+          userId={userId}
+        />
+      )}
 
       <style>{`
         @keyframes handicapViewFadeSlide {
