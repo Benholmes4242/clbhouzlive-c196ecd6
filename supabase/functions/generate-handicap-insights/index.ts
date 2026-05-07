@@ -518,13 +518,163 @@ function computeTrendSignals(rounds: any[], roundsForPrompt: any[]): TrendSignal
   };
 }
 
-function buildPrompt(rounds: any[], candidates: any[], dateKey: string, signals: TrendSignals) {
+type FriendFraming = 'competitive' | 'social' | 'nudge';
+
+interface FriendSignals {
+  framing: FriendFraming;
+  closest_rival_name?: string;
+  closest_rival_gap?: number;
+  closest_rival_last_course?: string | null;
+  closest_rival_last_played_at?: string | null;
+  hot_streak_friend_name?: string;
+  hot_streak_delta?: number;
+  hot_streak_round_count?: number;
+  hot_streak_last_course?: string | null;
+  user_last_played_at?: string | null;
+  user_days_since?: number;
+  active_friend_count?: number;
+  notable_friend_name?: string;
+  notable_friend_round_score?: number | null;
+  notable_friend_course?: string | null;
+}
+
+function firstName(fullName: string): string {
+  return (fullName ?? '').trim().split(/\s+/)[0] ?? 'A friend';
+}
+
+function computeFriendSignals(
+  friends: Array<any>,
+  userRounds: any[],
+  userCurrentIndex: number | null,
+): FriendSignals | null {
+  if (!friends || friends.length === 0) return null;
+  const self = friends.find((f) => f.is_self);
+  const others = friends.filter((f) => !f.is_self);
+  if (others.length === 0) return null;
+
+  const userHcp = userCurrentIndex
+    ?? (self?.friend_handicap_index != null ? Number(self.friend_handicap_index) : null);
+  const userLastPlayedAt = self?.last_round_played_at
+    ?? (userRounds.length > 0 ? userRounds[0].play_date : null);
+  const now = Date.now();
+  const sevenDaysAgo = now - 7 * 86_400_000;
+  const thirtyDaysAgo = now - 30 * 86_400_000;
+
+  if (userHcp != null) {
+    const aheadOfUser = others
+      .filter((f) =>
+        f.friend_handicap_index != null
+        && Number(f.friend_handicap_index) < userHcp
+        && (userHcp - Number(f.friend_handicap_index)) <= 1.0
+      )
+      .map((f) => ({ ...f, gap: userHcp - Number(f.friend_handicap_index) }))
+      .sort((a, b) => a.gap - b.gap);
+    if (aheadOfUser.length > 0) {
+      const r = aheadOfUser[0];
+      return {
+        framing: 'competitive',
+        closest_rival_name: firstName(r.friend_name),
+        closest_rival_gap: +r.gap.toFixed(1),
+        closest_rival_last_course: r.last_round_course_name ?? null,
+        closest_rival_last_played_at: r.last_round_played_at ?? null,
+      };
+    }
+  }
+
+  const hotStreaks = others
+    .filter((f) =>
+      f.handicap_30d_delta != null
+      && Number(f.handicap_30d_delta) <= -0.5
+      && f.last_round_played_at
+      && new Date(f.last_round_played_at).getTime() >= thirtyDaysAgo
+    )
+    .sort((a, b) => Number(a.handicap_30d_delta) - Number(b.handicap_30d_delta));
+  if (hotStreaks.length > 0) {
+    const f = hotStreaks[0];
+    return {
+      framing: 'social',
+      hot_streak_friend_name: firstName(f.friend_name),
+      hot_streak_delta: +Number(f.handicap_30d_delta).toFixed(1),
+      hot_streak_round_count: undefined,
+      hot_streak_last_course: f.last_round_course_name ?? null,
+    };
+  }
+
+  if (userLastPlayedAt) {
+    const userDaysSince = Math.floor(
+      (now - new Date(userLastPlayedAt).getTime()) / 86_400_000
+    );
+    if (userDaysSince >= 7) {
+      const recentlyActive = others.filter((f) =>
+        f.last_round_played_at
+        && new Date(f.last_round_played_at).getTime() >= sevenDaysAgo
+      );
+      if (recentlyActive.length >= 3) {
+        const notable = recentlyActive
+          .filter((f) => f.last_round_course_name)
+          .sort((a, b) =>
+            new Date(b.last_round_played_at!).getTime()
+            - new Date(a.last_round_played_at!).getTime()
+          )[0];
+        return {
+          framing: 'nudge',
+          user_last_played_at: userLastPlayedAt,
+          user_days_since: userDaysSince,
+          active_friend_count: recentlyActive.length,
+          notable_friend_name: notable ? firstName(notable.friend_name) : undefined,
+          notable_friend_round_score: null,
+          notable_friend_course: notable?.last_round_course_name ?? null,
+        };
+      }
+    }
+  }
+
+  return null;
+}
+
+function buildPrompt(
+  rounds: any[],
+  candidates: any[],
+  dateKey: string,
+  signals: TrendSignals,
+  friendSignals: FriendSignals | null,
+) {
   const sfLine = signals.zone_pct != null
     ? `- Stableford split: ${signals.zone_pct}% zone (36+), ${signals.solid_pct}% solid (33-35), ${signals.off_day_pct}% off-day (<33)`
     : '- Stableford split: insufficient data';
   const courseLine = signals.top_played_course_name
     ? `- Most-played course in last 20 rounds: ${signals.top_played_course_name} (${signals.top_played_course_round_count} rounds, ${signals.top_played_course_delta != null ? (signals.top_played_course_delta >= 0 ? '+' : '\u2212') + Math.abs(signals.top_played_course_delta).toFixed(1) + ' vs handicap' : 'delta unknown'})`
     : '';
+
+  let friendContextLine = '';
+  let friendNarrativeSchemaLine = `"friend_narrative": ""`;
+  let friendNarrativeRule = `- friend_narrative MUST be an empty string when no FRIEND CONTEXT is provided.`;
+
+  if (friendSignals) {
+    if (friendSignals.framing === 'competitive') {
+      friendContextLine = `FRIEND CONTEXT (framing: COMPETITIVE — friend within striking distance):
+- Closest rival: ${friendSignals.closest_rival_name}
+- Gap to rival: ${friendSignals.closest_rival_gap?.toFixed(1)} strokes ahead of you
+- Their last round at: ${friendSignals.closest_rival_last_course ?? 'unknown course'}
+- Date: ${friendSignals.closest_rival_last_played_at ?? 'unknown'}`;
+      friendNarrativeSchemaLine = `"friend_narrative": "<EXACTLY 2 sentences, max 50 words. Sentence 1 names the rivalry tension in plain language using the rival's first name (e.g. 'You're closing on Kieran'). Sentence 2 grounds it in the gap and the course. Wrap key numerics in **bold** markdown. Use 'you' / 'your', never 'this player'. NO bullets, NO third sentence.>"`;
+      friendNarrativeRule = `- friend_narrative MUST use the COMPETITIVE framing only. Lead with rivalry tension. Mirror the gap from FRIEND CONTEXT. Wrap at least one numeric in **bold**.`;
+    } else if (friendSignals.framing === 'social') {
+      friendContextLine = `FRIEND CONTEXT (framing: SOCIAL — friend on hot streak):
+- Friend on form: ${friendSignals.hot_streak_friend_name}
+- Their 30-day handicap improvement: ${Math.abs(friendSignals.hot_streak_delta ?? 0).toFixed(1)} strokes
+- Their last round at: ${friendSignals.hot_streak_last_course ?? 'unknown course'}`;
+      friendNarrativeSchemaLine = `"friend_narrative": "<EXACTLY 2 sentences, max 50 words. Sentence 1 names the friend's hot streak in plain language with their first name (e.g. 'Andrew is on a hot streak'). Sentence 2 grounds it in the improvement number and course. Wrap key numerics in **bold** markdown. Use 'you' / 'your' for any reference to the user. NO bullets, NO third sentence.>"`;
+      friendNarrativeRule = `- friend_narrative MUST use the SOCIAL framing only. Lead with the friend's improvement. Mirror the delta from FRIEND CONTEXT. Wrap at least one numeric in **bold**.`;
+    } else if (friendSignals.framing === 'nudge') {
+      friendContextLine = `FRIEND CONTEXT (framing: NUDGE — you haven't played recently):
+- Your last round: ${friendSignals.user_days_since} days ago
+- Friends who played in last 7d: ${friendSignals.active_friend_count}
+- Notable recent friend: ${friendSignals.notable_friend_name ?? 'a friend'} at ${friendSignals.notable_friend_course ?? 'unknown course'}`;
+      friendNarrativeSchemaLine = `"friend_narrative": "<EXACTLY 2 sentences, max 50 words. Sentence 1 acknowledges your gap since last playing in plain language (e.g. 'You haven\\'t posted in over a week'). Sentence 2 surfaces what your friends have been up to with at least one specific name and course. Wrap key numerics in **bold** markdown. NO bullets, NO third sentence, NO guilt-tripping.>"`;
+      friendNarrativeRule = `- friend_narrative MUST use the NUDGE framing only. Lead with your absence. Mirror days_since and friend_count from FRIEND CONTEXT. Wrap at least one numeric in **bold**. Tone is gentle, not guilt-inducing.`;
+    }
+  }
 
   return `Today is ${dateKey}. Analyse the user's recent WHS round history and recommend courses from a provided candidate pool.
 
@@ -544,11 +694,14 @@ TREND CONTEXT (computed deterministically — write about these signals in trend
 ${sfLine}
 ${courseLine}
 
+${friendContextLine}
+
 Produce a JSON response with this exact structure:
 {
   "scoring_profile": "<2-3 sentences (50-70 words) characterising what kinds of courses suit your game. Reference your best counter and the specific course (by name) where you shot it. Mention what kind of course produces higher differentials. Use 'you' and 'your', never 'this player' or 'they'.>",
   "rounds_pattern": "<1-2 sentences (max 30 words) about your recent counter rounds. Reference specific numbers and wrap key values in **bold** markdown (e.g. **+0.6**, **+1.7**). Use 'you' and 'your'. No speculation.>",
-  "trend_narrative": "<EXACTLY 2 sentences, max 50 words total. Sentence 1 names the dominant signal driving your handicap trend in plain language (e.g. 'Your handicap is rising because off-day rounds dominate your recent form'). Sentence 2 grounds the claim in a specific number or course name from TREND CONTEXT (e.g. 'Six of your last 20 rounds were under 33 points — most at Sundridge Park where you're +1.9 vs handicap'). Use 'you' / 'your', never 'this player'. Wrap key numerics in **bold** markdown. NO bullets, NO lists, NO third sentence.>",
+  "trend_narrative": "<EXACTLY 2 sentences, max 50 words total. Sentence 1 names the dominant signal driving your handicap trend in plain language. Sentence 2 grounds the claim in a specific number or course name from TREND CONTEXT. Use 'you' / 'your', never 'this player'. Wrap key numerics in **bold** markdown. NO bullets, NO lists, NO third sentence.>",
+  ${friendNarrativeSchemaLine},
   "suited_courses": [ { "id": "<golf_courses.id from CANDIDATE COURSES>", "expected_differential": <copy the expected_differential value from the matching candidate>, "rationale": "<one sentence, max 22 words, why this course matches your best scoring profile. Reference the course by name in your rationale.>" } ],
   "test_courses": [ { "id": "<golf_courses.id from CANDIDATE COURSES>", "expected_differential": <copy the expected_differential value from the matching candidate>, "rationale": "<one sentence, max 22 words, why this course will push your game (frame as growth). Reference the course by name.>" } ]
 }
@@ -560,6 +713,7 @@ Rules:
 - If round sample < 15, prefix scoring_profile with "Early signal: ".
 - rounds_pattern MUST wrap numeric values in **bold** markdown.
 - trend_narrative MUST be exactly 2 sentences, must mirror numerics from TREND CONTEXT (do not invent), and must wrap at least one numeric in **bold**.
+${friendNarrativeRule}
 - Use second-person voice throughout. Never "this player", "they", "their".
 - Vary picks day-to-day when reasonable (today's date_key is ${dateKey}).
 - Return JSON only.`;
@@ -570,6 +724,7 @@ function shapeResponseFromCache(cached: any) {
     scoring_profile: cached.scoring_profile,
     rounds_pattern: cached.rounds_pattern,
     trend_narrative: cached.trend_narrative ?? '',
+    friend_narrative: cached.friend_narrative ?? '',
     suited_courses: cached.suited_courses ?? [],
     test_courses: cached.test_courses ?? [],
     generated_at: cached.generated_at,
