@@ -680,6 +680,14 @@ export function PlayerScorecardCard({
           <ScorecardSkeleton />
         ) : scorecard && scorecard.rounds.length > 0 ? (
           <>
+            {activeRoundData && activeRoundData.holesCompleted > 0 && (
+              <HoleProgressionSparkline
+                holes={activeRoundData.holes}
+                accent={isCompleted ? gold : greenLive}
+                holesCompleted={activeRoundData.holesCompleted}
+              />
+            )}
+
             <RoundTabs
               rounds={scorecard.rounds}
               activeRound={activeRound}
@@ -705,6 +713,13 @@ export function PlayerScorecardCard({
                 defaultPars={defaultPars}
               />
             </div>
+
+            {activeRoundData && (
+              <ScorecardRoundStats
+                holes={activeRoundData.holes}
+                accent={isCompleted ? gold : greenLive}
+              />
+            )}
 
             {activeRoundData && activeRoundData.holesCompleted > 0 && (
               <div style={{
