@@ -344,20 +344,6 @@ const AvailableCard: React.FC<{
         </div>
       </div>
 
-      <p
-        style={{
-          fontFamily: FONT_GEIST,
-          fontSize: 11.5,
-          color: INK_40,
-          padding: '8px 20px 0',
-          margin: 0,
-          lineHeight: 1.45,
-          fontVariantNumeric: 'tabular-nums',
-        }}
-      >
-        Comparison among {data.cohort_size.toLocaleString()} active WHS indexes
-        refreshed nightly. Bucketed for privacy — exact ranks are never shown.
-      </p>
     </>
   );
 };
