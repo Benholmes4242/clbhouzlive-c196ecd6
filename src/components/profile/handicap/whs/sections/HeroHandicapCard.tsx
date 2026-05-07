@@ -958,13 +958,13 @@ const MetricRingsRow: React.FC<MetricRingsRowProps> = ({ currentHcp, last20, his
     else state = 'cold';
 
     const stateMap = {
-      hot:    { fraction: 1.00, color: 'url(#metricFormHot)',  centre: 'Hot',    icon: 'flame' as const },
-      steady: { fraction: 0.50, color: SLATE,                  centre: 'Steady', icon: 'minus' as const },
-      cold:   { fraction: 0.10, color: 'url(#metricFormCold)', centre: 'Cold',   icon: 'snowflake' as const },
+      hot:    { fraction: 1.00, color: 'url(#metricFormHot)',  centre: 'Hot',    icon: 'flame' as const,     sub: 'Hot over last 5' },
+      steady: { fraction: 0.50, color: SLATE,                  centre: 'Steady', icon: 'minus' as const,     sub: 'Steady over last 5' },
+      cold:   { fraction: 0.10, color: 'url(#metricFormCold)', centre: 'Cold',   icon: 'snowflake' as const, sub: 'Cold over last 5' },
     };
     const meta = stateMap[state];
     form = {
-      label: 'FORM', sub: 'last 5 vs counters',
+      label: 'FORM', sub: meta.sub,
       centre: meta.centre,
       centreIcon: meta.icon,
       fraction: meta.fraction, color: meta.color, available: true,
@@ -1007,8 +1007,8 @@ const MetricRingsRow: React.FC<MetricRingsRowProps> = ({ currentHcp, last20, his
       fraction: 0, color: INK_40, available: false,
     };
   } else {
-    const last10 = grossList.slice(0, 10);
-    const avg = last10.reduce((s, v) => s + v, 0) / last10.length;
+    const last5 = grossList.slice(0, 5);
+    const avg = last5.reduce((s, v) => s + v, 0) / last5.length;
     const last50 = grossList.slice(0, 50);
     const best = Math.min(...last50);
     const worst = Math.max(...last50);
@@ -1019,7 +1019,7 @@ const MetricRingsRow: React.FC<MetricRingsRowProps> = ({ currentHcp, last20, his
       fraction = Math.max(0, Math.min(1, (worst - avg) / (worst - best)));
     }
     scoringAvg = {
-      label: 'SCORING AVG', sub: `last ${last10.length} of ${last50.length}`,
+      label: 'SCORING AVG', sub: `Over last ${last5.length}`,
       centre: avg.toFixed(1),
       fraction, color: 'url(#metricScoringAvg)', available: true,
     };
@@ -1052,8 +1052,8 @@ const MetricRingsRow: React.FC<MetricRingsRowProps> = ({ currentHcp, last20, his
             <stop offset="100%" stopColor="#2DD4BF" />
           </linearGradient>
           <linearGradient id="metricScoringAvg" x1="0" y1="0" x2="1" y2="0">
-            <stop offset="0%" stopColor="#1E40AF" />
-            <stop offset="100%" stopColor="#38BDF8" />
+            <stop offset="0%" stopColor="#4338CA" />
+            <stop offset="100%" stopColor="#A78BFA" />
           </linearGradient>
         </defs>
       </svg>
