@@ -958,13 +958,13 @@ const MetricRingsRow: React.FC<MetricRingsRowProps> = ({ currentHcp, last20, his
     else state = 'cold';
 
     const stateMap = {
-      hot:    { fraction: 1.00, color: 'url(#metricFormHot)',  centre: 'Hot',    icon: 'flame' as const },
-      steady: { fraction: 0.50, color: SLATE,                  centre: 'Steady', icon: 'minus' as const },
-      cold:   { fraction: 0.10, color: 'url(#metricFormCold)', centre: 'Cold',   icon: 'snowflake' as const },
+      hot:    { fraction: 1.00, color: 'url(#metricFormHot)',  centre: 'Hot',    icon: 'flame' as const,     sub: 'Hot over last 5' },
+      steady: { fraction: 0.50, color: SLATE,                  centre: 'Steady', icon: 'minus' as const,     sub: 'Steady over last 5' },
+      cold:   { fraction: 0.10, color: 'url(#metricFormCold)', centre: 'Cold',   icon: 'snowflake' as const, sub: 'Cold over last 5' },
     };
     const meta = stateMap[state];
     form = {
-      label: 'FORM', sub: 'last 5 vs counters',
+      label: 'FORM', sub: meta.sub,
       centre: meta.centre,
       centreIcon: meta.icon,
       fraction: meta.fraction, color: meta.color, available: true,
