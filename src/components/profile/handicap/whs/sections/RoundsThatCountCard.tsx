@@ -243,9 +243,9 @@ export const RoundsThatCountCard: React.FC<Props> = ({ connectionId, currentHand
             }}>
               {ticks.map(t => (
                 <div key={t} style={{
-                  position: 'absolute', top: yFor(t) - 6,
-                  right: 6, fontSize: 10, fontWeight: 700,
-                  color: INK_40, fontFamily: FONT_DISPLAY,
+                  position: 'absolute', top: yFor(t) - 7,
+                  right: 6, fontSize: 11.5, fontWeight: 700,
+                  color: INK_55, fontFamily: FONT_DISPLAY,
                   fontVariantNumeric: 'tabular-nums',
                   textAlign: 'right', width: '100%',
                 }}>
@@ -270,8 +270,8 @@ export const RoundsThatCountCard: React.FC<Props> = ({ connectionId, currentHand
                     bottom: 0,
                     left: `${(latestIdx + 0.05) * colWidth}%`,
                     width: `${colWidth * 0.9}%`,
-                    background: AMBER,
-                    opacity: 0.08,
+                    background: 'rgba(247,147,30,0.08)',
+                    opacity: 1,
                     borderRadius: 6,
                     pointerEvents: 'none',
                     zIndex: 0,
@@ -302,6 +302,8 @@ export const RoundsThatCountCard: React.FC<Props> = ({ connectionId, currentHand
                   <line key={t}
                     x1="0" y1={yFor(t)} x2="100%" y2={yFor(t)}
                     stroke={INK_06} strokeWidth={1}
+                    strokeDasharray="2 4"
+                    opacity={0.6}
                     vectorEffect="non-scaling-stroke"
                   />
                 ))}
