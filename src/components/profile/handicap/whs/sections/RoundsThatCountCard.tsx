@@ -194,15 +194,16 @@ export const RoundsThatCountCard: React.FC<Props> = ({ connectionId, currentHand
         </p>
       </div>
 
-      {/* Parent card */}
-      <div style={{
-        background: '#fff',
-        border: `0.5px solid ${INK_10}`,
-        borderRadius: 14,
-        overflow: 'hidden',
-      }}>
-        {/* Chart */}
-        <div style={{ padding: '14px 14px 0' }}>
+      {/* Chart — full-bleed on page background, no card wrapper */}
+      <div style={{ padding: '4px 0 12px' }}>
+        <style>{`
+          @keyframes pulseHeartbeat {
+            0%, 100% { opacity: 0.20; }
+            50% { opacity: 0.45; }
+          }
+          .latestHalo { animation: pulseHeartbeat 2.4s ease-in-out infinite; transform-origin: center; }
+        `}</style>
+        <div style={{ padding: '0 4px' }}>
           {/* Y-axis unit label + LATEST legend */}
           <div style={{
             display: 'flex',
