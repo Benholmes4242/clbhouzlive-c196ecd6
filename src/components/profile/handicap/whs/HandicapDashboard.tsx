@@ -130,6 +130,14 @@ export const HandicapDashboard: React.FC<Props> = ({ connection, userId, readOnl
         )}
       </div>
 
+      {!readOnly && (
+        <TrophiesSheetMount
+          connectionId={connection.id}
+          connectionCreatedAt={connection.created_at}
+          userId={userId}
+        />
+      )}
+
       <style>{`
         @keyframes handicapViewFadeSlide {
           from { opacity: 0; transform: translateY(8px); }
