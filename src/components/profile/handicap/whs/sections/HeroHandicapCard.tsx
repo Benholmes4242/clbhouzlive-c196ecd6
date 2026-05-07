@@ -365,7 +365,7 @@ const HeroHandicapCard: React.FC<Props> = ({ connection }) => {
         color: isDown ? GREEN : RED, fontWeight: 600,
         display: 'inline-flex', alignItems: 'center', gap: 3,
       }}>
-        {isDown ? <ArrowDown size={11} strokeWidth={2.5} /> : <ArrowUp size={11} strokeWidth={2.5} />}
+        {isDown ? <ArrowDown size={10} strokeWidth={2.5} /> : <ArrowUp size={10} strokeWidth={2.5} />}
         <span style={{ fontVariantNumeric: 'tabular-nums' }}>{Math.abs(d).toFixed(1)}</span>
       </span>
     );
@@ -394,8 +394,8 @@ const HeroHandicapCard: React.FC<Props> = ({ connection }) => {
     const yMin = min - headroom;
     const yMax = max + headroom;
     const yRange = yMax - yMin || 1;
-    const w = 40;
-    const h = 12;
+    const w = 32;
+    const h = 10;
     const coordsLocal = samples.map((p, i) => {
       const x = (i / (samples.length - 1)) * w;
       const y = ((yMax - p.handicap_index) / yRange) * h;
@@ -533,7 +533,7 @@ const HeroHandicapCard: React.FC<Props> = ({ connection }) => {
               {statusWord}
             </span>
             <span style={{
-              fontSize: 76, fontWeight: 700, color: INK,
+              fontSize: 58, fontWeight: 700, color: INK,
               letterSpacing: '-0.04em', lineHeight: 1,
               fontVariantNumeric: 'tabular-nums',
               textAlign: 'center', display: 'block',
@@ -541,29 +541,29 @@ const HeroHandicapCard: React.FC<Props> = ({ connection }) => {
               {scrubValue.toFixed(1)}
             </span>
             <div style={{
-              marginTop: 8,
-              display: 'flex', alignItems: 'center', gap: 8,
-              fontSize: 11, fontVariantNumeric: 'tabular-nums',
+              marginTop: 6,
+              display: 'flex', alignItems: 'center', gap: 6,
+              fontSize: 10, fontVariantNumeric: 'tabular-nums',
               opacity: isScrubbing ? 0 : 1,
               transition: 'opacity 200ms ease',
             }}>
               {deltaInline}
               {sparkPolyline && (
                 <>
-                  <span style={{ width: 1, height: 10, background: INK_10, display: 'inline-block' }} />
-                  <svg width={40} height={12} viewBox="0 0 40 12" style={{ display: 'block' }}>
+                  <span style={{ width: 1, height: 8, background: INK_10, display: 'inline-block' }} />
+                  <svg width={32} height={10} viewBox="0 0 32 10" style={{ display: 'block' }}>
                     <polyline
                       points={sparkPolyline.points}
                       fill="none"
-                      stroke={AMBER}
+                      stroke={GREEN}
                       strokeWidth={1.5}
                       strokeLinecap="round"
                       strokeLinejoin="round"
                       vectorEffect="non-scaling-stroke"
                     />
-                    <circle cx={sparkPolyline.lastX} cy={sparkPolyline.lastY} r={2} fill={AMBER} />
+                    <circle cx={sparkPolyline.lastX} cy={sparkPolyline.lastY} r={2} fill={GREEN} />
                   </svg>
-                  <span style={{ fontSize: 10, color: INK_55, fontWeight: 500 }}>vs last 30d</span>
+                  <span style={{ fontSize: 9, color: INK_55, fontWeight: 500 }}>vs last 30d</span>
                 </>
               )}
             </div>
@@ -949,7 +949,7 @@ const MetricRingsRow: React.FC<MetricRingsRowProps> = ({ currentHcp, last20, his
     };
   } else {
     const fraction = Math.min(1, Math.abs(delta30d) * 0.5);
-    const color = delta30d <= -0.1 ? GREEN : delta30d >= 0.1 ? RED : SLATE;
+    const color = delta30d < -0.05 ? GREEN : delta30d > 0.05 ? RED : SLATE;
     const centre = delta30d < 0
       ? `\u2212${Math.abs(delta30d).toFixed(1)}`
       : delta30d > 0
