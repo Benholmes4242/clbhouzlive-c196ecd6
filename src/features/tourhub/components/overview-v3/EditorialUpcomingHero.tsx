@@ -194,6 +194,51 @@ function DefendingStrip({ name, country }: { name: string; country?: string | nu
   );
 }
 
+// ---------- Favourites list -----------------------------------------------
+
+function FavouritesList({
+  players,
+}: {
+  players: Array<{ name: string; flag: string; odds: string | null; }>;
+}) {
+  if (players.length === 0) return null;
+  return (
+    <div style={{ flexShrink: 0, marginTop: 10 }}>
+      <div style={{
+        fontSize: 9, fontWeight: 800, letterSpacing: '0.16em',
+        color: slate400, marginBottom: 4,
+      }}>
+        FAVOURITES
+      </div>
+      {players.slice(0, 2).map((p, i) => (
+        <div key={`${p.name}-${i}`} style={{
+          display: 'flex', alignItems: 'center', gap: 10,
+          padding: '9px 0',
+          borderBottom: i < players.length - 1 && i < 1
+            ? `1px solid ${slate100}` : 'none',
+        }}>
+          <span aria-hidden style={{ fontSize: 13 }}>{p.flag}</span>
+          <span style={{
+            flex: 1, fontSize: 13, fontWeight: 600, color: ink,
+            letterSpacing: '-0.01em',
+            whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
+          }}>
+            {p.name}
+          </span>
+          {p.odds && (
+            <span style={{
+              fontSize: 11, fontWeight: 800, color: amber,
+              fontVariantNumeric: 'tabular-nums', letterSpacing: '0.02em',
+            }}>
+              {p.odds}
+            </span>
+          )}
+        </div>
+      ))}
+    </div>
+  );
+}
+
 // ---------- Main ----------------------------------------------------------
 
 export interface EditorialUpcomingHeroProps {
@@ -210,11 +255,13 @@ export interface EditorialUpcomingHeroProps {
     defendingChampion: string | null;
     defendingChampionCountry?: string | null;
   };
+  // TODO: wire to odds source
+  favourites?: Array<{ name: string; flag: string; odds: string | null; }>;
   onCta?: () => void;
 }
 
 export function EditorialUpcomingHero({
-  tournament, onCta,
+  tournament, favourites, onCta,
 }: EditorialUpcomingHeroProps) {
   const navigate = useNavigate();
 
@@ -274,6 +321,10 @@ export function EditorialUpcomingHero({
           name={tournament.defendingChampion}
           country={tournament.defendingChampionCountry}
         />
+      )}
+
+      {favourites && favourites.length > 0 && (
+        <FavouritesList players={favourites} />
       )}
 
       <HeroCTA

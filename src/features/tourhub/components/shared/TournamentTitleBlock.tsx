@@ -57,7 +57,7 @@ export function TournamentTitleBlock({
         <span
           style={{
             fontSize: 10.5, fontWeight: 800, letterSpacing: '0.18em',
-            color: ink, textTransform: 'uppercase',
+            color: ruleColor, textTransform: 'uppercase',
           }}
         >
           {eyebrowLabel}
