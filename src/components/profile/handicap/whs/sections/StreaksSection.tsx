@@ -222,14 +222,6 @@ const SecondaryStreakTile: React.FC<{
   );
 };
 
-const formatBest = (s: StreakResult): string => {
-  if (s.best === 0) return 'No streak yet';
-  const dateBit = s.bestEndedAt
-    ? ` · ${format(parseISO(s.bestEndedAt), 'MMM yyyy')}`
-    : '';
-  return `Best: ${s.best}${dateBit}`;
-};
-
 export const StreaksSection: React.FC<Props> = ({ connectionId, userId }) => {
   const { data: streaks, isLoading, totalRounds } = useStreaks(connectionId);
   const sectionRef = useRef<HTMLElement | null>(null);
