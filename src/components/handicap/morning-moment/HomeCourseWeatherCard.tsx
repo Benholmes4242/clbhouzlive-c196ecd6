@@ -45,24 +45,19 @@ interface Props {
   userId: string;
 }
 
-/**
- * Course readiness — encoded as the arc length of the mini-ring.
- *  - calm + warm:    90% (playable)
- *  - moderate:       60% (manageable)
- *  - tough:          30%
- *  - no data:         0%
- */
-function readinessFraction(temp: number | null, wind: number | null): number {
-  if (temp == null || wind == null) return 0;
-  if (wind <= 8 && temp >= 8) return 0.9;
-  if (wind <= 15 && temp >= 4) return 0.6;
-  return 0.3;
+function pickWeatherIcon(description: string | undefined): LucideIcon {
+  const d = (description ?? '').toLowerCase();
+  if (d.includes('thunder') || d.includes('storm')) return CloudLightning;
+  if (d.includes('snow') || d.includes('sleet')) return CloudSnow;
+  if (d.includes('rain') || d.includes('shower') || d.includes('drizzle')) return CloudRain;
+  if (d.includes('fog') || d.includes('mist') || d.includes('haze')) return CloudFog;
+  if (d.includes('partly') || d.includes('few clouds') || d.includes('mostly clear')) return CloudSun;
+  if (d.includes('clear') || d.includes('sunny')) return Sun;
+  if (d.includes('cloud') || d.includes('overcast')) return Cloud;
+  return Cloud;
 }
 
-const RING_SIZE = 56;
-const RING_R = 24;
-const RING_STROKE = 4;
-const RING_C = 2 * Math.PI * RING_R;
+const ICON_BOX = 56;
 
 const HomeCourseWeatherCard: React.FC<Props> = ({ club, userId }) => {
   const { data: weather, isLoading, isError, error } = useHomeCourseWeather(club);
