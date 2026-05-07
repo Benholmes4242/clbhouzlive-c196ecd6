@@ -124,6 +124,8 @@ const AccountTypeOnboarding: React.FC = () => {
   const [step, setStep] = useState<OnboardingStep>('account-type');
   const [selectedType, setSelectedType] = useState<AccountType | null>(null);
   const [selectedCollege, setSelectedCollege] = useState<CollegeMediaResult | null>(null);
+  const [gender, setGender] = useState<Gender | null>(null);
+  const [country, setCountry] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const { user } = useSupabaseSession();
   const navigate = useNavigate();
@@ -133,7 +135,11 @@ const AccountTypeOnboarding: React.FC = () => {
 
   const handleAccountTypeContinue = () => {
     if (!selectedType) return;
+    setStep('demographics');
+  };
 
+  const handleDemographicsContinue = () => {
+    if (!gender || !country) return;
     if (selectedType === 'individual') {
       setStep('college');
     } else {
@@ -150,6 +156,9 @@ const AccountTypeOnboarding: React.FC = () => {
         user_type: selectedType,
         has_completed_onboarding: true,
       };
+
+      if (gender) updateData.gender = gender;
+      if (country) updateData.country = country;
 
       // Add college if selected (only for individual accounts)
       if (selectedType === 'individual' && selectedCollege) {
