@@ -214,15 +214,29 @@ const HandicapPageHeader: React.FC<HeaderProps> = ({
           />
         </div>
       ) : (
-        <div style={{ padding: '14px 20px 18px' }}>
+        <div style={{ padding: '14px 20px 18px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
           <h1 style={{
             fontFamily: FONT_GEIST,
             fontSize: 28, fontWeight: 700, color: INK,
             lineHeight: 1.1, letterSpacing: '-0.02em',
-            margin: 0,
+            margin: 0, flex: 1, minWidth: 0,
           }}>
             {title}
           </h1>
+          <button
+            onClick={() => openTrophiesSheet()}
+            aria-label="View all trophies"
+            style={{
+              background: 'transparent',
+              border: 'none',
+              padding: 6,
+              cursor: 'pointer',
+              color: 'rgba(15,23,42,0.40)',
+              flexShrink: 0,
+            }}
+          >
+            <Trophy size={20} strokeWidth={2} />
+          </button>
         </div>
       )}
 
