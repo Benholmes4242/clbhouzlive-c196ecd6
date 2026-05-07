@@ -465,15 +465,21 @@ const HeroHandicapCard: React.FC<Props> = ({ connection }) => {
           </div>
 
           <svg width={RING_SIZE} height={RING_SIZE} viewBox={`0 0 ${RING_SIZE} ${RING_SIZE}`}>
+            <defs>
+              <linearGradient id="heroOuterAmberGold" x1="0" y1="0" x2="1" y2="0">
+                <stop offset="0%" stopColor="#F7931E" />
+                <stop offset="100%" stopColor="#FBBC2E" />
+              </linearGradient>
+            </defs>
             {/* Outer track */}
             <circle
               cx={CX} cy={CY} r={R_OUTER}
               fill="none" stroke={INK_06} strokeWidth={STROKE_OUTER}
             />
-            {/* Outer milestone progress (amber) */}
+            {/* Outer milestone progress (amber → gold) */}
             <circle
               cx={CX} cy={CY} r={R_OUTER}
-              fill="none" stroke={AMBER} strokeWidth={STROKE_OUTER}
+              fill="none" stroke="url(#heroOuterAmberGold)" strokeWidth={STROKE_OUTER}
               strokeLinecap="round"
               strokeDasharray={`${outerDash} ${C_OUTER}`}
               transform={`rotate(-90 ${CX} ${CY})`}
