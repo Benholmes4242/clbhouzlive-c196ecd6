@@ -23,7 +23,7 @@ async function fetchCachedInsights(connectionId: string): Promise<{
   const [{ data: row }, { data: latest }] = await Promise.all([
     supabase
       .from('whs_ai_insights')
-      .select('scoring_profile, rounds_pattern, trend_narrative, suited_courses, test_courses, generated_from_score_id, generated_at, date_key')
+      .select('scoring_profile, rounds_pattern, trend_narrative, friend_narrative, suited_courses, test_courses, generated_from_score_id, generated_at, date_key')
       .eq('connection_id', connectionId)
       .maybeSingle(),
     supabase
