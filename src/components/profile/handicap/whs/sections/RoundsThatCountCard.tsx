@@ -412,12 +412,34 @@ export const RoundsThatCountCard: React.FC<Props> = ({ connectionId, currentHand
             })}
           </div>
         </div>
+      </div>
 
+      {/* Connector lines from chart bottom to chips top */}
+      <div style={{
+        display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)',
+        marginBottom: -1, padding: '0 1px',
+      }}>
+        <div style={{ display: 'flex', justifyContent: 'center' }}>
+          <div style={{ width: 1, height: 12, background: GREEN }} />
+        </div>
+        <div style={{ display: 'flex', justifyContent: 'center' }}>
+          <div style={{ width: 1, height: 12, background: INK_40 }} />
+        </div>
+        <div style={{ display: 'flex', justifyContent: 'center' }}>
+          <div style={{ width: 1, height: 12, background: RED }} />
+        </div>
+      </div>
+
+      {/* Chips + next-round + footer card */}
+      <div style={{
+        background: '#fff',
+        border: `0.5px solid ${INK_10}`,
+        borderRadius: 14,
+        overflow: 'hidden',
+      }}>
         {/* 3-up stat row */}
         <div style={{
           display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)',
-          borderTop: `0.5px solid ${INK_10}`,
-          margin: '0 -14px',
         }}>
           <StatCell
             label="BEST" value={enriched.minDiff} dotColor={GREEN} valueColor={GREEN}
