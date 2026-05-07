@@ -36,11 +36,6 @@ interface ViewMeta {
 }
 
 const VIEWS: Record<ViewKey, ViewMeta> = {
-  most_played: {
-    label: 'Most played',
-    sublabel: 'Your three most played courses, ranked by form',
-    select: (all) => [...all].sort((a, b) => b.rounds_played - a.rounds_played).slice(0, TOP_N),
-  },
   best: {
     label: 'Best form',
     sublabel: `Your three best courses (${MIN_ROUNDS_FOR_RANKINGS}+ rounds)`,
@@ -49,6 +44,11 @@ const VIEWS: Record<ViewKey, ViewMeta> = {
         .filter((c) => c.rounds_played >= MIN_ROUNDS_FOR_RANKINGS)
         .sort((a, b) => a.delta - b.delta)
         .slice(0, TOP_N),
+  },
+  most_played: {
+    label: 'Most played',
+    sublabel: 'Your three most played courses, ranked by form',
+    select: (all) => [...all].sort((a, b) => b.rounds_played - a.rounds_played).slice(0, TOP_N),
   },
   toughest: {
     label: 'Toughest',
