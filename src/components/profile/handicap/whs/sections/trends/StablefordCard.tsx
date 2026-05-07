@@ -264,7 +264,7 @@ const TriRing: React.FC<TriRingProps> = ({ dist, size, stroke }) => {
         y={cy + 20}
         textAnchor="middle"
         style={{
-          fontSize: 44,
+          fontSize: 36,
           fontWeight: 300,
           fill: T.ink,
           letterSpacing: '-0.04em',
