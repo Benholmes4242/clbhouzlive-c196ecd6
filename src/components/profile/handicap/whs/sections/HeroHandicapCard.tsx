@@ -894,11 +894,11 @@ const MetricRing: React.FC<{ spec: MetricCellSpec }> = ({ spec }) => {
           pointerEvents: 'none',
         }}>
           {spec.centreIcon === 'flame' ? (
-            <Flame size={20} color="#FB923C" strokeWidth={2.4} fill="#FB923C" />
+            <Flame size={20} color="#DC2626" strokeWidth={2.4} fill="#DC2626" />
           ) : spec.centreIcon === 'minus' ? (
             <Minus size={22} color="#475569" strokeWidth={3} />
           ) : spec.centreIcon === 'snowflake' ? (
-            <Snowflake size={20} color="#38BDF8" strokeWidth={2.4} />
+            <Snowflake size={20} color="#0EA5E9" strokeWidth={2.4} />
           ) : (
             <span style={{
               fontSize: isShortText ? 13 : 11,
