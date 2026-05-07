@@ -41,6 +41,7 @@ async function fetchCachedInsights(connectionId: string): Promise<{
       scoring_profile: row.scoring_profile,
       rounds_pattern: (row as any).rounds_pattern ?? '',
       trend_narrative: (row as any).trend_narrative ?? '',
+      friend_narrative: (row as any).friend_narrative ?? '',
       suited_courses: (row.suited_courses as SuitedCourse[]) ?? [],
       test_courses: (row.test_courses as SuitedCourse[]) ?? [],
       generated_at: row.generated_at,
