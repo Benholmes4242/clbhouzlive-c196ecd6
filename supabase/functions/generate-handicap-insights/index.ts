@@ -310,6 +310,7 @@ Deno.serve(async (req) => {
     const scoringProfile = String(parsed.scoring_profile ?? "").slice(0, 800);
     const roundsPattern = String(parsed.rounds_pattern ?? "").slice(0, 400);
     const trendNarrative = String(parsed.trend_narrative ?? "").slice(0, 320);
+    const friendNarrative = String(parsed.friend_narrative ?? "").slice(0, 320);
 
     if (!scoringProfile) return json({ error: "Empty profile" }, 500);
 
