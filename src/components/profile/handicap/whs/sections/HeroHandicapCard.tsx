@@ -541,17 +541,17 @@ const HeroHandicapCard: React.FC<Props> = ({ connection }) => {
               {scrubValue.toFixed(1)}
             </span>
             <div style={{
-              marginTop: 10,
-              display: 'flex', alignItems: 'center', gap: 10,
-              fontSize: 13, fontVariantNumeric: 'tabular-nums',
+              marginTop: 8,
+              display: 'flex', alignItems: 'center', gap: 8,
+              fontSize: 11, fontVariantNumeric: 'tabular-nums',
               opacity: isScrubbing ? 0 : 1,
               transition: 'opacity 200ms ease',
             }}>
               {deltaInline}
               {sparkPolyline && (
                 <>
-                  <span style={{ width: 1, height: 12, background: INK_10, display: 'inline-block' }} />
-                  <svg width={48} height={14} viewBox="0 0 48 14" style={{ display: 'block' }}>
+                  <span style={{ width: 1, height: 10, background: INK_10, display: 'inline-block' }} />
+                  <svg width={40} height={12} viewBox="0 0 40 12" style={{ display: 'block' }}>
                     <polyline
                       points={sparkPolyline.points}
                       fill="none"
@@ -563,7 +563,7 @@ const HeroHandicapCard: React.FC<Props> = ({ connection }) => {
                     />
                     <circle cx={sparkPolyline.lastX} cy={sparkPolyline.lastY} r={2} fill={AMBER} />
                   </svg>
-                  <span style={{ fontSize: 11, color: INK_55, fontWeight: 500 }}>vs last 30d</span>
+                  <span style={{ fontSize: 10, color: INK_55, fontWeight: 500 }}>vs last 30d</span>
                 </>
               )}
             </div>
