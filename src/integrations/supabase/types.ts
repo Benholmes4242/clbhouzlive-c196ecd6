@@ -15881,9 +15881,7 @@ export type Database = {
       whs_handicap_distribution: {
         Row: {
           bucket: string | null
-          bucket_lower: number | null
-          country: string | null
-          gender: string | null
+          total_count: number | null
           user_count: number | null
         }
         Relationships: []
