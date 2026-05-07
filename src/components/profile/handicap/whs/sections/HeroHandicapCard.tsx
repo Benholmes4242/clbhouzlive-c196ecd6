@@ -365,7 +365,7 @@ const HeroHandicapCard: React.FC<Props> = ({ connection }) => {
         color: isDown ? GREEN : RED, fontWeight: 600,
         display: 'inline-flex', alignItems: 'center', gap: 3,
       }}>
-        {isDown ? <ArrowDown size={13} strokeWidth={2.5} /> : <ArrowUp size={13} strokeWidth={2.5} />}
+        {isDown ? <ArrowDown size={11} strokeWidth={2.5} /> : <ArrowUp size={11} strokeWidth={2.5} />}
         <span style={{ fontVariantNumeric: 'tabular-nums' }}>{Math.abs(d).toFixed(1)}</span>
       </span>
     );
