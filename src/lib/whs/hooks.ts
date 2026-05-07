@@ -329,3 +329,19 @@ export function useTrophyAggregates(
     staleTime: 5 * 60 * 1000,
   });
 }
+
+// ─── Phase 7: Friend rounds since last Today visit ───────────────────────
+export function useFriendRoundsSinceLastVisit(enabled: boolean) {
+  return useQuery({
+    queryKey: whsKeys.friendRoundsSinceLastVisit(),
+    enabled,
+    staleTime: 60_000,
+    queryFn: fetchFriendRoundsSinceLastVisit,
+  });
+}
+
+export function useMarkTodayVisited() {
+  return useMutation({
+    mutationFn: callMarkTodayVisited,
+  });
+}
