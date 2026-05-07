@@ -11,9 +11,80 @@ import { PageRoot } from '@/components/layout/PageRoot';
 import CollegeSearchDropdown from '@/components/profile/CollegeSearchDropdown';
 import { CollegeMediaResult } from '@/hooks/useCollegeMediaSearch';
 import WhsConnectScreen from '@/components/profile/handicap/whs/WhsConnectScreen';
+import { Label } from '@/components/ui/label';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 
 type AccountType = 'individual' | 'club' | 'brand' | 'creator';
-type OnboardingStep = 'account-type' | 'college' | 'england-golf';
+type Gender = 'male' | 'female' | 'prefer_not_to_say';
+type OnboardingStep = 'account-type' | 'demographics' | 'college' | 'england-golf';
+
+const ONBOARDING_COUNTRIES = [
+  'England',
+  'Scotland',
+  'Wales',
+  'Northern Ireland',
+  'Ireland',
+  'United States',
+  'Canada',
+  'Australia',
+  'New Zealand',
+  '──────────',
+  'Argentina',
+  'Austria',
+  'Belgium',
+  'Brazil',
+  'Chile',
+  'China',
+  'Cyprus',
+  'Czech Republic',
+  'Denmark',
+  'Estonia',
+  'Finland',
+  'France',
+  'Germany',
+  'Greece',
+  'Hong Kong',
+  'Hungary',
+  'Iceland',
+  'India',
+  'Indonesia',
+  'Italy',
+  'Japan',
+  'Latvia',
+  'Lithuania',
+  'Luxembourg',
+  'Malaysia',
+  'Malta',
+  'Mexico',
+  'Netherlands',
+  'Norway',
+  'Philippines',
+  'Poland',
+  'Portugal',
+  'Romania',
+  'Saudi Arabia',
+  'Singapore',
+  'Slovakia',
+  'Slovenia',
+  'South Africa',
+  'South Korea',
+  'Spain',
+  'Sweden',
+  'Switzerland',
+  'Taiwan',
+  'Thailand',
+  'Turkey',
+  'United Arab Emirates',
+  'Vietnam',
+  'Other',
+] as const;
 
 interface AccountOption {
   type: AccountType;
