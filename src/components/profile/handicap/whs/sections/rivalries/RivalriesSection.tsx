@@ -153,4 +153,65 @@ export const RivalriesSection: React.FC<Props> = ({ userId }) => {
   );
 };
 
+const RivalryEmptyCard: React.FC<{ onPickRival: () => void }> = ({ onPickRival }) => (
+  <div
+    style={{
+      flex: '0 0 auto',
+      width: 'calc(100vw - 32px)',
+      maxWidth: 360,
+      background: '#FFFFFF',
+      border: '1px solid rgba(15,23,42,0.08)',
+      borderRadius: 14,
+      padding: 20,
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center',
+      textAlign: 'center',
+      gap: 10,
+      fontFamily: '"Geist", system-ui, sans-serif',
+    }}
+  >
+    <div
+      style={{
+        width: 44,
+        height: 44,
+        borderRadius: '50%',
+        background: 'rgba(247,147,30,0.14)',
+        color: '#B45309',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+      }}
+    >
+      <Swords size={22} strokeWidth={2.2} />
+    </div>
+    <p style={{ margin: 0, fontSize: 15, fontWeight: 800, color: '#0F172A', letterSpacing: '-0.01em' }}>
+      Build your rival list
+    </p>
+    <p style={{ margin: 0, fontSize: 12, color: 'rgba(15,23,42,0.55)', lineHeight: 1.4 }}>
+      Pick someone to track head-to-head. Stats update with every round you both play.
+    </p>
+    <button
+      type="button"
+      onClick={onPickRival}
+      style={{
+        marginTop: 4,
+        padding: '8px 16px',
+        borderRadius: 999,
+        background: '#F7931E',
+        color: '#fff',
+        fontSize: 12,
+        fontWeight: 800,
+        letterSpacing: '0.02em',
+        border: 'none',
+        cursor: 'pointer',
+        fontFamily: '"Geist", system-ui, sans-serif',
+      }}
+    >
+      Pick a rival
+    </button>
+  </div>
+);
+
 export default RivalriesSection;
+
