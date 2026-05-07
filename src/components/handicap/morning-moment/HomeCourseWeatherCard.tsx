@@ -85,8 +85,7 @@ const HomeCourseWeatherCard: React.FC<Props> = ({ club, userId }) => {
 
   const wind = weather ? Math.round(weather.windSpeed) : null;
   const temp = weather ? Math.round(weather.temperature) : null;
-  const fraction = readinessFraction(temp, wind);
-  const dash = fraction * RING_C;
+  const WeatherIcon = pickWeatherIcon(weather?.description);
 
   return (
     <div
@@ -103,74 +102,24 @@ const HomeCourseWeatherCard: React.FC<Props> = ({ club, userId }) => {
         fontFamily: FONT_GEIST,
       }}
     >
-      {/* Mini-ring with wind speed inside */}
-      <div style={{ position: 'relative', width: RING_SIZE, height: RING_SIZE, flexShrink: 0 }}>
-        <svg width={RING_SIZE} height={RING_SIZE} viewBox={`0 0 ${RING_SIZE} ${RING_SIZE}`}>
-          <circle
-            cx={RING_SIZE / 2}
-            cy={RING_SIZE / 2}
-            r={RING_R}
-            fill="none"
-            stroke={INK_06}
-            strokeWidth={RING_STROKE}
-            vectorEffect="non-scaling-stroke"
-          />
-          {dash > 0 && (
-            <circle
-              cx={RING_SIZE / 2}
-              cy={RING_SIZE / 2}
-              r={RING_R}
-              fill="none"
-              stroke={AMBER}
-              strokeWidth={RING_STROKE}
-              strokeLinecap="round"
-              strokeDasharray={`${dash} ${RING_C}`}
-              transform={`rotate(-90 ${RING_SIZE / 2} ${RING_SIZE / 2})`}
-              vectorEffect="non-scaling-stroke"
-              style={{ transition: 'stroke-dasharray 320ms cubic-bezier(0.22,0.61,0.36,1)' }}
-            />
-          )}
-        </svg>
-        <div
-          style={{
-            position: 'absolute',
-            inset: 0,
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            justifyContent: 'center',
-            pointerEvents: 'none',
-          }}
-        >
-          {isLoading ? (
-            <div style={{ width: 18, height: 10, background: INK_06, borderRadius: 3 }} />
-          ) : (
-            <>
-              <span
-                style={{
-                  fontSize: 13,
-                  fontWeight: 700,
-                  color: INK,
-                  lineHeight: 1,
-                  fontVariantNumeric: 'tabular-nums',
-                }}
-              >
-                {wind}
-              </span>
-              <span
-                style={{
-                  fontSize: 7.5,
-                  fontWeight: 700,
-                  color: INK_40,
-                  letterSpacing: '0.08em',
-                  marginTop: 2,
-                }}
-              >
-                MPH
-              </span>
-            </>
-          )}
-        </div>
+      {/* Weather glyph */}
+      <div
+        style={{
+          width: ICON_BOX,
+          height: ICON_BOX,
+          borderRadius: 14,
+          background: INK_06,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          flexShrink: 0,
+        }}
+      >
+        {isLoading ? (
+          <div style={{ width: 24, height: 24, background: INK_08, borderRadius: 6 }} />
+        ) : (
+          <WeatherIcon size={28} strokeWidth={2} color={INK} />
+        )}
       </div>
 
       {/* Centre column */}
@@ -195,7 +144,7 @@ const HomeCourseWeatherCard: React.FC<Props> = ({ club, userId }) => {
           </>
         ) : (
           <>
-            <div style={{ display: 'flex', alignItems: 'baseline', gap: 6, flexWrap: 'wrap' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
               <span
                 style={{
                   fontSize: 22,
@@ -215,8 +164,24 @@ const HomeCourseWeatherCard: React.FC<Props> = ({ club, userId }) => {
                   fontWeight: 500,
                 }}
               >
-                {weather!.description} · {(wind ?? 0) <= 8 ? 'low wind' : (wind ?? 0) <= 15 ? 'moderate wind' : 'strong wind'}
+                {weather!.description}
               </span>
+              {wind != null && (
+                <span
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: 3,
+                    fontSize: 12,
+                    color: INK_55,
+                    fontWeight: 500,
+                  }}
+                >
+                  <span style={{ color: INK_40 }}>·</span>
+                  <Wind size={11} strokeWidth={2.4} color={INK_40} />
+                  <span style={{ fontVariantNumeric: 'tabular-nums' }}>{wind}mph</span>
+                </span>
+              )}
             </div>
             <div
               style={{
