@@ -126,6 +126,9 @@ const DistributionChart: React.FC<{
           const isUser = b.is_user_bucket;
           const heightPct = (b.pct / (maxPct * 1.1)) * 100;
           const isEmpty = b.pct === 0;
+          const barBg = isUser
+            ? `linear-gradient(180deg, ${AMBER}, rgba(247,147,30,0.55))`
+            : `linear-gradient(180deg, rgba(15,23,42,0.10), rgba(15,23,42,0.04))`;
           return (
             <div
               key={b.bucket}
@@ -144,40 +147,37 @@ const DistributionChart: React.FC<{
                   style={{
                     position: 'absolute',
                     top: -22,
-                    fontFamily: FONT_GEIST,
-                    fontSize: 10.5,
-                    fontWeight: 700,
-                    color: INK,
-                    background: AMBER_14,
-                    padding: '2px 6px',
-                    borderRadius: 6,
-                    whiteSpace: 'nowrap',
-                    fontVariantNumeric: 'tabular-nums',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
                   }}
                 >
-                  You · {handicapStr}
-                  <span
+                  <div
                     style={{
-                      position: 'absolute',
-                      left: '50%',
-                      bottom: -4,
-                      transform: 'translateX(-50%)',
-                      width: 0,
-                      height: 0,
-                      borderLeft: '4px solid transparent',
-                      borderRight: '4px solid transparent',
-                      borderTop: `4px solid ${AMBER_14}`,
+                      fontFamily: FONT_GEIST,
+                      fontSize: 10.5,
+                      fontWeight: 700,
+                      color: INK,
+                      background: AMBER_14,
+                      padding: '2px 6px',
+                      borderRadius: 6,
+                      whiteSpace: 'nowrap',
+                      fontVariantNumeric: 'tabular-nums',
                     }}
-                  />
+                  >
+                    You · {handicapStr}
+                  </div>
+                  <div style={{ width: 2, height: 6, background: AMBER }} />
                 </div>
               )}
               <div
                 style={{
                   width: '100%',
                   height: isEmpty ? '3%' : `${Math.max(heightPct, 3)}%`,
-                  background: isUser ? AMBER : INK_10,
+                  background: barBg,
                   opacity: isEmpty && !isUser ? 0.5 : 1,
-                  borderRadius: 4,
+                  borderRadius: '6px 6px 0 0',
+                  boxShadow: isUser ? '0 0 16px rgba(247,147,30,0.30)' : 'none',
                 }}
               />
             </div>
@@ -193,8 +193,8 @@ const DistributionChart: React.FC<{
               textAlign: 'center',
               fontFamily: FONT_GEIST,
               fontSize: 10.5,
-              fontWeight: 600,
-              color: b.is_user_bucket ? INK : INK_40,
+              fontWeight: b.is_user_bucket ? 700 : 500,
+              color: b.is_user_bucket ? INK : INK_55,
               fontVariantNumeric: 'tabular-nums',
             }}
           >
