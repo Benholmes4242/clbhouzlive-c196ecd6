@@ -200,21 +200,7 @@ const CourseCard: React.FC<{ course: SuitedCourse; stripe: string; onTap: (id: s
   </button>
 );
 
-// Render **bold** markdown inline as bold spans
-const renderBoldMarkdown = (text: string): React.ReactNode => {
-  if (!text) return null;
-  const parts = text.split(/(\*\*[^*]+\*\*)/g);
-  return parts.map((p, i) => {
-    if (p.startsWith('**') && p.endsWith('**')) {
-      return (
-        <strong key={i} style={{ color: INK, fontWeight: 800, fontFamily: 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif', fontVariantNumeric: 'tabular-nums lining-nums' }}>
-          {p.slice(2, -2)}
-        </strong>
-      );
-    }
-    return <React.Fragment key={i}>{p}</React.Fragment>;
-  });
-};
+import { renderBoldMarkdown } from '@/lib/whs/insights/renderBoldMarkdown';
 
 const BlockHeader: React.FC<{
   icon: React.ReactNode;

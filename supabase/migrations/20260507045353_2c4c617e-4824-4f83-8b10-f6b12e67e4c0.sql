@@ -1,0 +1,1 @@
+ALTER TABLE public.whs_ai_insights ADD COLUMN IF NOT EXISTS trend_narrative text NOT NULL DEFAULT '';

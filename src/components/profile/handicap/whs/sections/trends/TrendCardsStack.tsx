@@ -5,6 +5,7 @@ import HandicapProjectionCard from './HandicapProjectionCard';
 import StablefordCard from './StablefordCard';
 import CourseFormCard from './CourseFormCard';
 import { predictHandicap, VERDICT_META } from './predictHandicap';
+import TrendNarrativeSection from './TrendNarrativeSection';
 
 interface Props {
   connectionId: string;
@@ -128,6 +129,7 @@ export const TrendCardsStack: React.FC<Props> = ({ connectionId, currentHandicap
         <>
           <HandicapProjectionCard scores={scores ?? []} />
           <StablefordCard scores={scores ?? []} />
+          <TrendNarrativeSection connectionId={connectionId} />
           <CourseFormCard connectionId={connectionId} currentHandicap={currentHandicap} />
         </>
       )}

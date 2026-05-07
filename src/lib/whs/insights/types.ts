@@ -11,6 +11,8 @@ export type SuitedCourse = {
 export type HandicapInsights = {
   scoring_profile: string;
   rounds_pattern: string;
+  /** Trends-tab cross-card narrative. Empty string when not yet generated. */
+  trend_narrative: string;
   suited_courses: SuitedCourse[];
   test_courses: SuitedCourse[];
   generated_at: string;

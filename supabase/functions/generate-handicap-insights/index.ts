@@ -81,7 +81,7 @@ Deno.serve(async (req) => {
     const { data: rounds, error: rErr } = await admin
       .from("whs_scores")
       .select(
-        "id, adjusted_gross, handicap_differential, play_date, course_id, course_rating, slope_rating, total_holes",
+        "id, adjusted_gross, handicap_differential, play_date, course_id, course_rating, slope_rating, total_holes, stableford_points",
       )
       .eq("connection_id", connection_id)
       .order("play_date", { ascending: false })
@@ -240,7 +240,9 @@ Deno.serve(async (req) => {
 
     const latestScoreId = rounds[0].id as string;
 
-    const prompt = buildPrompt(roundsForPrompt, candidatesWithExpected, dateKey);
+    const trendSignals = computeTrendSignals(rounds as any[], roundsForPrompt);
+
+    const prompt = buildPrompt(roundsForPrompt, candidatesWithExpected, dateKey, trendSignals);
 
     const aiResp = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
@@ -296,6 +298,7 @@ Deno.serve(async (req) => {
     const test = validate(parsed.test_courses);
     const scoringProfile = String(parsed.scoring_profile ?? "").slice(0, 800);
     const roundsPattern = String(parsed.rounds_pattern ?? "").slice(0, 400);
+    const trendNarrative = String(parsed.trend_narrative ?? "").slice(0, 320);
 
     if (!scoringProfile) return json({ error: "Empty profile" }, 500);
 
@@ -334,6 +337,7 @@ Deno.serve(async (req) => {
       connection_id,
       scoring_profile: scoringProfile,
       rounds_pattern: roundsPattern,
+      trend_narrative: trendNarrative,
       suited_courses: enrichedSuited,
       test_courses: enrichedTest,
       generated_from_score_id: latestScoreId,
@@ -354,6 +358,7 @@ Deno.serve(async (req) => {
     return json({
       scoring_profile: scoringProfile,
       rounds_pattern: roundsPattern,
+      trend_narrative: trendNarrative,
       suited_courses: enrichedSuited,
       test_courses: enrichedTest,
       generated_at: new Date().toISOString(),
@@ -371,7 +376,142 @@ function json(body: unknown, status = 200) {
   });
 }
 
-function buildPrompt(rounds: any[], candidates: any[], dateKey: string) {
+interface TrendSignals {
+  verdict: string;
+  current_index: number | null;
+  projected_index: number | null;
+  delta: number;
+  direction: 'up' | 'down' | 'flat';
+  recent_form_avg: number | null;
+  counters_avg: number | null;
+  zone_pct: number | null;
+  solid_pct: number | null;
+  off_day_pct: number | null;
+  top_played_course_name: string | null;
+  top_played_course_delta: number | null;
+  top_played_course_round_count: number | null;
+}
+
+function computeTrendSignals(rounds: any[], roundsForPrompt: any[]): TrendSignals {
+  const COUNTERS = 8;
+  const WINDOW = 20;
+  const RECENT = 5;
+  const PROJECT = 5;
+
+  const validDiffs = rounds
+    .filter((r) => typeof r.handicap_differential === 'number')
+    .map((r) => r.handicap_differential as number);
+
+  const handicapFromWindow = (diffs: number[]): number | null => {
+    if (diffs.length < COUNTERS) return null;
+    const sorted = [...diffs].sort((a, b) => a - b);
+    return sorted.slice(0, COUNTERS).reduce((a, b) => a + b, 0) / COUNTERS;
+  };
+
+  let current: number | null = null;
+  let projected: number | null = null;
+  let recentFormAvg: number | null = null;
+  let direction: 'up' | 'down' | 'flat' = 'flat';
+  let delta = 0;
+  let verdict = 'unknown';
+
+  if (validDiffs.length >= COUNTERS) {
+    const windowSize = Math.min(WINDOW, validDiffs.length);
+    const windowDiffs = validDiffs.slice(0, windowSize);
+    current = handicapFromWindow(windowDiffs);
+    const recentN = Math.min(RECENT, windowDiffs.length);
+    recentFormAvg = windowDiffs.slice(0, recentN).reduce((a, b) => a + b, 0) / recentN;
+    const newestKeep = windowDiffs.slice(0, Math.max(0, windowSize - PROJECT));
+    const futureWindow = [...newestKeep, ...Array(PROJECT).fill(recentFormAvg)];
+    projected = handicapFromWindow(futureWindow);
+
+    if (current !== null && projected !== null) {
+      const raw = projected - current;
+      delta = Math.abs(raw);
+      if (delta < 0.2) {
+        direction = 'flat';
+      } else {
+        direction = raw < 0 ? 'down' : 'up';
+      }
+      const gap = (recentFormAvg as number) - current;
+      if (direction === 'down') verdict = gap < -1.0 ? 'in_form' : 'building';
+      else if (direction === 'up') verdict = gap > 2.0 ? 'cold' : 'slipping';
+      else verdict = gap < -0.5 ? 'building' : 'steady';
+    }
+  }
+
+  // Stableford distribution from last 20 rounds with stableford_points
+  const sfWindow = rounds
+    .filter((r) => typeof r.stableford_points === 'number')
+    .slice(0, 20);
+  let zonePct: number | null = null;
+  let solidPct: number | null = null;
+  let offDayPct: number | null = null;
+  if (sfWindow.length >= 3) {
+    let zone = 0, solid = 0, off = 0;
+    for (const r of sfWindow) {
+      const p = r.stableford_points as number;
+      if (p >= 36) zone++;
+      else if (p >= 33) solid++;
+      else off++;
+    }
+    const t = sfWindow.length;
+    zonePct = Math.round((zone / t) * 100);
+    solidPct = Math.round((solid / t) * 100);
+    offDayPct = 100 - zonePct - solidPct;
+  }
+
+  // Course skew — most-played course in last 20 rounds (from roundsForPrompt
+  // which already has resolved names + differentials)
+  const last20 = roundsForPrompt.slice(0, 20);
+  const byName = new Map<string, { count: number; diffs: number[] }>();
+  for (const r of last20) {
+    const name = r.course_name as string | null;
+    if (!name) continue;
+    const entry = byName.get(name) ?? { count: 0, diffs: [] };
+    entry.count++;
+    if (typeof r.differential === 'number') entry.diffs.push(r.differential);
+    byName.set(name, entry);
+  }
+  let topName: string | null = null;
+  let topCount = 0;
+  let topDelta: number | null = null;
+  for (const [name, entry] of byName) {
+    if (entry.count > topCount && entry.count >= 2) {
+      topCount = entry.count;
+      topName = name;
+      if (entry.diffs.length && current !== null) {
+        const avg = entry.diffs.reduce((a, b) => a + b, 0) / entry.diffs.length;
+        topDelta = +(avg - current).toFixed(1);
+      }
+    }
+  }
+
+  return {
+    verdict,
+    current_index: current !== null ? +current.toFixed(1) : null,
+    projected_index: projected !== null ? +projected.toFixed(1) : null,
+    delta: +delta.toFixed(1),
+    direction,
+    recent_form_avg: recentFormAvg !== null ? +recentFormAvg.toFixed(1) : null,
+    counters_avg: current !== null ? +current.toFixed(1) : null,
+    zone_pct: zonePct,
+    solid_pct: solidPct,
+    off_day_pct: offDayPct,
+    top_played_course_name: topName,
+    top_played_course_delta: topDelta,
+    top_played_course_round_count: topCount > 0 ? topCount : null,
+  };
+}
+
+function buildPrompt(rounds: any[], candidates: any[], dateKey: string, signals: TrendSignals) {
+  const sfLine = signals.zone_pct != null
+    ? `- Stableford split: ${signals.zone_pct}% zone (36+), ${signals.solid_pct}% solid (33-35), ${signals.off_day_pct}% off-day (<33)`
+    : '- Stableford split: insufficient data';
+  const courseLine = signals.top_played_course_name
+    ? `- Most-played course in last 20 rounds: ${signals.top_played_course_name} (${signals.top_played_course_round_count} rounds, ${signals.top_played_course_delta != null ? (signals.top_played_course_delta >= 0 ? '+' : '\u2212') + Math.abs(signals.top_played_course_delta).toFixed(1) + ' vs handicap' : 'delta unknown'})`
+    : '';
+
   return `Today is ${dateKey}. Analyse the user's recent WHS round history and recommend courses from a provided candidate pool.
 
 USER'S ROUND HISTORY (last ${rounds.length} rounds, newest first):
@@ -380,10 +520,21 @@ ${JSON.stringify(rounds)}
 CANDIDATE COURSES (${candidates.length} courses across Britain & Ireland — daily-rotated; you haven't played any of these recently and they haven't been recommended to you in the past 7 days). Each candidate includes an "expected_differential" — the differential you would likely shoot there based on your recent form and the course's slope (may be null when slope is unknown):
 ${JSON.stringify(candidates)}
 
+TREND CONTEXT (computed deterministically — write about these signals in trend_narrative):
+- Form verdict: ${signals.verdict.replace('_', ' ')}
+- Current index: ${signals.current_index ?? 'unknown'}
+- Projected index: ${signals.projected_index ?? 'unknown'}
+- Direction: ${signals.direction} by ${signals.delta.toFixed(1)}
+- Recent 5-round avg differential: ${signals.recent_form_avg ?? 'unknown'}
+- Counter avg: ${signals.counters_avg ?? 'unknown'}
+${sfLine}
+${courseLine}
+
 Produce a JSON response with this exact structure:
 {
   "scoring_profile": "<2-3 sentences (50-70 words) characterising what kinds of courses suit your game. Reference your best counter and the specific course (by name) where you shot it. Mention what kind of course produces higher differentials. Use 'you' and 'your', never 'this player' or 'they'.>",
   "rounds_pattern": "<1-2 sentences (max 30 words) about your recent counter rounds. Reference specific numbers and wrap key values in **bold** markdown (e.g. **+0.6**, **+1.7**). Use 'you' and 'your'. No speculation.>",
+  "trend_narrative": "<EXACTLY 2 sentences, max 50 words total. Sentence 1 names the dominant signal driving your handicap trend in plain language (e.g. 'Your handicap is rising because off-day rounds dominate your recent form'). Sentence 2 grounds the claim in a specific number or course name from TREND CONTEXT (e.g. 'Six of your last 20 rounds were under 33 points — most at Sundridge Park where you're +1.9 vs handicap'). Use 'you' / 'your', never 'this player'. Wrap key numerics in **bold** markdown. NO bullets, NO lists, NO third sentence.>",
   "suited_courses": [ { "id": "<golf_courses.id from CANDIDATE COURSES>", "expected_differential": <copy the expected_differential value from the matching candidate>, "rationale": "<one sentence, max 22 words, why this course matches your best scoring profile. Reference the course by name in your rationale.>" } ],
   "test_courses": [ { "id": "<golf_courses.id from CANDIDATE COURSES>", "expected_differential": <copy the expected_differential value from the matching candidate>, "rationale": "<one sentence, max 22 words, why this course will push your game (frame as growth). Reference the course by name.>" } ]
 }
@@ -391,21 +542,20 @@ Produce a JSON response with this exact structure:
 Rules:
 - Exactly 3 items in each array (or fewer only if candidates < 6).
 - Only use IDs from CANDIDATE COURSES. Never invent IDs. Never reuse the same id across suited and test.
-- IDs go in the "id" field only — never write a UUID in any prose ("scoring_profile", "rounds_pattern", "rationale"). Use the course name instead.
+- IDs go in the "id" field only — never write a UUID in any prose. Use the course name instead.
 - If round sample < 15, prefix scoring_profile with "Early signal: ".
 - rounds_pattern MUST wrap numeric values in **bold** markdown.
-- Use second-person voice throughout. "you", "your", "you've". Never "this player", "they", "their".
+- trend_narrative MUST be exactly 2 sentences, must mirror numerics from TREND CONTEXT (do not invent), and must wrap at least one numeric in **bold**.
+- Use second-person voice throughout. Never "this player", "they", "their".
 - Vary picks day-to-day when reasonable (today's date_key is ${dateKey}).
 - Return JSON only.`;
 }
 
 function shapeResponseFromCache(cached: any) {
-  // Cached rows now contain enriched courses ({id, name, region, rationale})
-  // by virtue of the write-side hydration in the fresh-generation path.
-  // No re-hydration needed.
   return {
     scoring_profile: cached.scoring_profile,
     rounds_pattern: cached.rounds_pattern,
+    trend_narrative: cached.trend_narrative ?? '',
     suited_courses: cached.suited_courses ?? [],
     test_courses: cached.test_courses ?? [],
     generated_at: cached.generated_at,
