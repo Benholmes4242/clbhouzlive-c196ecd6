@@ -69,3 +69,16 @@ export function fmtScoreSign(n: number | null | undefined): string {
   if (n === 0) return 'E';
   return n > 0 ? `+${n}` : `${n}`;
 }
+
+// --- Light theme tokens — for editorial hero on F8FAFC --------------------
+// (Existing dark tokens above remain in use elsewhere; do not remove.)
+export const lightBg      = '#F8FAFC';
+export const lightSurface = '#FFFFFF';
+export const slate100     = '#F1F5F9';
+export const slate200     = '#E2E8F0';
+export const slate300     = '#CBD5E1';
+export const slate400     = '#94A3B8';
+export const slate500     = '#64748B';
+export const slate700     = '#334155';
+export const blue         = '#3B82F6';
+
