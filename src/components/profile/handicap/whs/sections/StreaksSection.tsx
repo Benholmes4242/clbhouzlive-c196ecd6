@@ -405,21 +405,37 @@ export const StreaksSection: React.FC<Props> = ({ connectionId, userId }) => {
         <Timeline timeline={streaks.timeline} />
       </div>
 
-      {/* Two secondaries */}
-      <div style={{ display: 'flex', gap: 10, marginBottom: 10 }}>
-        <SecondaryStreakTile
-          Icon={TrendingDown}
-          label="CUTTING STREAK"
+      {/* Demoted secondaries — single inline pill row */}
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          background: '#fff',
+          border: `0.5px solid ${INK_10}`,
+          borderRadius: 12,
+          padding: '12px 16px',
+          marginBottom: 10,
+          fontFamily: FONT_GEIST,
+        }}
+      >
+        <SecondaryInline
+          label="CUTTING"
           value={streaks.cutting.current}
           bestText={formatBest(streaks.cutting)}
-          accent={GREEN}
         />
-        <SecondaryStreakTile
-          Icon={Shield}
-          label="COUNTER STREAK"
+        <div
+          style={{
+            width: '0.5px',
+            height: 30,
+            background: INK_10,
+            margin: '0 14px',
+            alignSelf: 'center',
+          }}
+        />
+        <SecondaryInline
+          label="COUNTER"
           value={streaks.counter.current}
           bestText={formatBest(streaks.counter)}
-          accent={INK_70}
         />
       </div>
 
