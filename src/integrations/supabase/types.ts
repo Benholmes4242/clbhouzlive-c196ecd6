@@ -12944,6 +12944,7 @@ export type Database = {
           last_notifications_seen_at: string | null
           last_rating_at: string | null
           last_seen_post_id: string | null
+          last_today_view_at: string | null
           location: string | null
           logo_url: string | null
           mini_card_crop_height: number | null
@@ -13061,6 +13062,7 @@ export type Database = {
           last_notifications_seen_at?: string | null
           last_rating_at?: string | null
           last_seen_post_id?: string | null
+          last_today_view_at?: string | null
           location?: string | null
           logo_url?: string | null
           mini_card_crop_height?: number | null
@@ -13178,6 +13180,7 @@ export type Database = {
           last_notifications_seen_at?: string | null
           last_rating_at?: string | null
           last_seen_post_id?: string | null
+          last_today_view_at?: string | null
           location?: string | null
           logo_url?: string | null
           mini_card_crop_height?: number | null
@@ -17378,6 +17381,10 @@ export type Database = {
           top_friend_names: string[]
         }[]
       }
+      get_friend_rounds_since_last_visit: {
+        Args: { p_limit?: number }
+        Returns: Json
+      }
       get_friends_feed: {
         Args: {
           p_cursor?: string
@@ -18595,6 +18602,7 @@ export type Database = {
         Args: { p_conversation_id: string }
         Returns: undefined
       }
+      mark_today_visited: { Args: never; Returns: undefined }
       match_tour_rankings_players: { Args: never; Returns: undefined }
       nearby_golfers: {
         Args: {
