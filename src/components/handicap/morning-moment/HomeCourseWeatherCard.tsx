@@ -6,7 +6,18 @@
  * temperature + condition, and the club name.
  */
 import React from 'react';
-import { ChevronRight } from 'lucide-react';
+import {
+  ChevronRight,
+  Sun,
+  CloudSun,
+  Cloud,
+  CloudRain,
+  CloudLightning,
+  CloudSnow,
+  CloudFog,
+  Wind,
+  type LucideIcon,
+} from 'lucide-react';
 import { useHomeCourseWeather, WeatherUnresolvedError } from '@/lib/weather/useHomeCourseWeather';
 import type { WeatherUnresolvedReason } from '@/lib/weather/types';
 import { analyticsEvents } from '@/utils/analyticsEvents';
