@@ -521,105 +521,54 @@ export const StreaksSection: React.FC<Props> = ({ connectionId, userId }) => {
           margin: '0 0 4px',
         }}
       >
-        Your runs
+        Three runs to beat
       </h2>
       <div style={{ fontSize: 13, color: INK_55, marginBottom: 14 }}>
-        Pulled from every counted round, updated daily
+        Each one tracks a different chapter of your form.
       </div>
 
-      {/* Hero — No-up streak */}
+      <style>{`
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+      `}</style>
+      {/* Streak gallery — horizontal scroll */}
       <div
         style={{
-          background: '#fff',
-          border: `0.5px solid ${INK_10}`,
-          borderRadius: 14,
-          padding: 16,
-          marginBottom: 10,
+          display: 'flex',
+          gap: 12,
+          overflowX: 'auto',
+          margin: '0 -20px',
+          padding: '4px 20px 12px',
+          scrollbarWidth: 'none',
+          WebkitOverflowScrolling: 'touch',
         }}
+        className="hide-scrollbar"
       >
-        <div
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            marginBottom: 10,
-          }}
-        >
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-            <div
-              style={{
-                width: 38,
-                height: 38,
-                borderRadius: 11,
-                background: AMBER_14,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-              }}
-            >
-              <Flame size={20} color={AMBER} strokeWidth={2.2} />
-            </div>
-            <div>
-              <div
-                style={{
-                  fontSize: 9,
-                  fontWeight: 800,
-                  color: INK_55,
-                  letterSpacing: '0.16em',
-                  marginBottom: 2,
-                }}
-              >
-                NO-UP STREAK
-              </div>
-              <div style={{ fontSize: 11.5, color: INK_70 }}>
-                Rounds without your handicap going up
-              </div>
-            </div>
-          </div>
-          {streaks.noUp.isActive && (
-            <div
-              style={{
-                background: AMBER_14,
-                borderRadius: 999,
-                padding: '4px 10px',
-                fontSize: 9,
-                fontWeight: 800,
-                color: AMBER,
-                letterSpacing: '0.14em',
-              }}
-            >
-              ACTIVE
-            </div>
-          )}
-        </div>
-
-        <div
-          style={{
-            display: 'flex',
-            alignItems: 'baseline',
-            gap: 8,
-            marginBottom: 12,
-          }}
-        >
-          <span
-            style={{
-              fontSize: 64,
-              fontWeight: 700,
-              color: INK,
-              letterSpacing: '-0.04em',
-              fontVariantNumeric: 'tabular-nums',
-              lineHeight: 1,
-            }}
-          >
-            {streaks.noUp.current}
-          </span>
-          <span style={{ fontSize: 16, color: INK_55, fontWeight: 500 }}>rounds</span>
-          <span style={{ flex: 1 }} />
-          <BestCaption streak={streaks.noUp} />
-        </div>
-
-        <Timeline timeline={streaks.timeline} />
+        <StreakCard
+          streak={streaks.noUp}
+          label="NO-UP STREAK"
+          sub="Rounds without your handicap going up"
+          color={AMBER}
+          colorTint={AMBER_14}
+          icon="flame"
+        />
+        <StreakCard
+          streak={streaks.cutting}
+          label="CUTTING STREAK"
+          sub="Consecutive rounds dropping handicap"
+          color="#22C55E"
+          colorTint="rgba(34,197,94,0.12)"
+          icon="trending-down"
+        />
+        <StreakCard
+          streak={streaks.counter}
+          label="COUNTER STREAK"
+          sub="Consecutive rounds being counted"
+          color="#7C3AED"
+          colorTint="rgba(124,58,237,0.12)"
+          icon="shield"
+        />
       </div>
+      <div style={{ height: 12 }} />
 
 
       {/* All-time records */}
