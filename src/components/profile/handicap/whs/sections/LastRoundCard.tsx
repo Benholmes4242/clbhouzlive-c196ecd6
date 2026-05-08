@@ -226,7 +226,7 @@ export const LastRoundCard: React.FC<Props> = ({ connectionId }) => {
         </div>
 
         {/* Body */}
-        <div style={{ padding: 16, display: 'flex', flexDirection: 'column', gap: 16 }}>
+        <div style={{ padding: '14px 16px', display: 'flex', flexDirection: 'column', gap: 12 }}>
           {/* Hero row */}
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', alignItems: 'start' }}>
             <div style={{ paddingRight: 12 }}>
@@ -249,7 +249,50 @@ export const LastRoundCard: React.FC<Props> = ({ connectionId }) => {
           {/* Round breakdown */}
           {breakdown && segTotal > 0 ? (
             <div>
-              <div style={{ ...eyebrowLabel, marginBottom: 8 }}>ROUND BREAKDOWN</div>
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  marginBottom: 6,
+                }}
+              >
+                <div style={eyebrowLabel}>ROUND BREAKDOWN</div>
+                <div
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 10,
+                    fontSize: 11,
+                    color: INK_55,
+                    fontVariantNumeric: 'tabular-nums',
+                  }}
+                >
+                  {[
+                    { label: 'Birdie+', count: breakdown.eagle + breakdown.birdie, color: GOLD },
+                    { label: 'Par', count: breakdown.par, color: INK_40 },
+                    { label: 'Bogey', count: breakdown.bogey, color: AMBER },
+                    { label: 'Double+', count: breakdown.doublePlus, color: RED },
+                  ].map((s) => (
+                    <span
+                      key={s.label}
+                      style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}
+                      aria-label={`${s.count} ${s.label}`}
+                    >
+                      <span
+                        style={{
+                          width: 5,
+                          height: 5,
+                          borderRadius: '50%',
+                          background: s.color,
+                          flexShrink: 0,
+                        }}
+                      />
+                      <span style={{ color: INK, fontWeight: 700 }}>{s.count}</span>
+                    </span>
+                  ))}
+                </div>
+              </div>
               <div
                 style={{
                   display: 'flex',
@@ -267,39 +310,6 @@ export const LastRoundCard: React.FC<Props> = ({ connectionId }) => {
                   />
                 ))}
               </div>
-              <div
-                style={{
-                  display: 'grid',
-                  gridTemplateColumns: 'repeat(4, 1fr)',
-                  gap: 8,
-                  marginTop: 10,
-                }}
-              >
-                {[
-                  { label: 'Birdie+', count: breakdown.eagle + breakdown.birdie, color: GOLD },
-                  { label: 'Par', count: breakdown.par, color: INK_40 },
-                  { label: 'Bogey', count: breakdown.bogey, color: AMBER },
-                  { label: 'Double+', count: breakdown.doublePlus, color: RED },
-                ].map((s) => (
-                  <div key={s.label} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                    <span
-                      style={{
-                        width: 6,
-                        height: 6,
-                        borderRadius: '50%',
-                        background: s.color,
-                        flexShrink: 0,
-                      }}
-                    />
-                    <span style={{ fontSize: 11, color: INK_55 }}>
-                      <span style={{ color: INK, fontWeight: 700, fontVariantNumeric: 'tabular-nums' }}>
-                        {s.count}
-                      </span>{' '}
-                      {s.label}
-                    </span>
-                  </div>
-                ))}
-              </div>
             </div>
           ) : (
             <div style={{ fontSize: 12, color: INK_55, fontStyle: 'italic' }}>
@@ -314,17 +324,17 @@ export const LastRoundCard: React.FC<Props> = ({ connectionId }) => {
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'space-between',
-                paddingTop: 12,
+                paddingTop: 10,
                 borderTop: `0.5px solid ${INK_10}`,
               }}
             >
-              <span style={{ fontSize: 12, color: INK_55 }}>Handicap index</span>
+              <span style={{ fontSize: 11.5, color: INK_55 }}>Handicap index</span>
               <span
                 style={{
                   display: 'inline-flex',
                   alignItems: 'center',
                   gap: 8,
-                  fontSize: 13,
+                  fontSize: 12.5,
                   fontWeight: 700,
                   color: INK,
                   fontVariantNumeric: 'tabular-nums',
@@ -335,13 +345,13 @@ export const LastRoundCard: React.FC<Props> = ({ connectionId }) => {
                   : hcpAfter.toFixed(1)}
                 <span
                   style={{
-                    fontSize: 10,
+                    fontSize: 9.5,
                     fontWeight: 800,
-                    letterSpacing: '0.12em',
+                    letterSpacing: '0.10em',
                     textTransform: 'uppercase',
                     color: statusColor,
                     background: statusBg,
-                    padding: '3px 8px',
+                    padding: '2px 7px',
                     borderRadius: 999,
                   }}
                 >
