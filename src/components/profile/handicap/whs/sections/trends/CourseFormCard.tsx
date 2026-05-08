@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { MapPin, Info } from 'lucide-react';
+import { MapPin, Info, Trophy } from 'lucide-react';
 import { useCourseForm } from '@/lib/whs/hooks';
 import type { CourseForm } from '@/lib/whs/types';
 
@@ -21,6 +21,12 @@ const T = {
   greenInk: '#065F46',
   redInk: '#991B1B',
   slateTint: 'rgba(15,23,42,0.04)',
+  gold: '#FBBC2E',
+  silver: '#94A3B8',
+  bronze: '#B45309',
+  ink04: 'rgba(15,23,42,0.04)',
+  ink08: 'rgba(15,23,42,0.08)',
+  ink40: 'rgba(15,23,42,0.40)',
 };
 const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
 
@@ -208,7 +214,134 @@ const ViewToggle: React.FC<{
   </div>
 );
 
-const CourseRows: React.FC<{ courses: CourseForm[] }> = ({ courses }) => {
+interface RankAccent {
+  color: string;
+  textColor: string;
+  label: string;
+  showTrophy: boolean;
+}
+
+function getRankAccent(rank: number): RankAccent {
+  if (rank === 1) return { color: T.gold, textColor: T.ink, label: '1ST', showTrophy: true };
+  if (rank === 2) return { color: T.silver, textColor: '#fff', label: '2ND', showTrophy: false };
+  return { color: T.bronze, textColor: '#fff', label: '3RD', showTrophy: false };
+}
+
+const PodiumCard: React.FC<{ course: CourseForm; rank: number }> = ({ course, rank }) => {
+  const accent = getRankAccent(rank);
+  const valueColor = deltaColor(course.delta);
+  const isFirst = rank === 1;
+
+  return (
+    <div
+      style={{
+        background: T.cardBg,
+        borderRadius: 14,
+        border: `1px solid ${isFirst ? 'rgba(247,147,30,0.25)' : T.hairline}`,
+        overflow: 'hidden',
+        padding: '12px 14px',
+        boxShadow: isFirst
+          ? '0 2px 4px rgba(15,23,42,0.04), 0 6px 16px rgba(247,147,30,0.10)'
+          : '0 1px 2px rgba(15,23,42,0.04)',
+        marginBottom: 8,
+        fontFamily: FONT,
+      }}
+    >
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'flex-start',
+          justifyContent: 'space-between',
+          gap: 10,
+        }}
+      >
+        <div style={{ display: 'flex', alignItems: 'flex-start', gap: 10, flex: 1, minWidth: 0 }}>
+          <span
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 3,
+              padding: '3px 8px',
+              borderRadius: 99,
+              background: accent.color,
+              color: accent.textColor,
+              fontSize: 9,
+              fontWeight: 800,
+              letterSpacing: '0.08em',
+              flexShrink: 0,
+              boxShadow: '0 1px 2px rgba(0,0,0,0.10)',
+              fontFamily: FONT,
+              marginTop: 1,
+            }}
+          >
+            {accent.showTrophy && <Trophy size={9} strokeWidth={2.6} fill={accent.textColor} />}
+            {accent.label}
+          </span>
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <div
+              style={{
+                fontSize: 13.5,
+                fontWeight: 800,
+                color: T.ink,
+                letterSpacing: '-0.01em',
+                lineHeight: 1.25,
+                fontFamily: FONT,
+                whiteSpace: 'nowrap',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+              }}
+            >
+              {course.course_name}
+            </div>
+            <div
+              style={{
+                fontSize: 10.5,
+                color: T.inkMute,
+                marginTop: 4,
+                fontWeight: 600,
+                fontFamily: FONT,
+              }}
+            >
+              <strong style={{ color: T.ink, fontWeight: 800, fontVariantNumeric: 'tabular-nums' }}>
+                {course.rounds_played}
+              </strong>{' '}
+              {course.rounds_played === 1 ? 'round' : 'rounds'}
+            </div>
+          </div>
+        </div>
+        <div style={{ textAlign: 'right', flexShrink: 0 }}>
+          <div
+            style={{
+              fontSize: 22,
+              fontWeight: 800,
+              color: valueColor,
+              lineHeight: 1,
+              letterSpacing: '-0.03em',
+              fontVariantNumeric: 'tabular-nums',
+              fontFamily: FONT,
+            }}
+          >
+            {fmtDelta(course.delta)}
+          </div>
+          <div
+            style={{
+              fontSize: 9,
+              color: T.inkMute,
+              fontWeight: 700,
+              letterSpacing: '0.10em',
+              marginTop: 3,
+              fontFamily: FONT,
+            }}
+          >
+            VS HCP
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const PodiumCards: React.FC<{ courses: CourseForm[] }> = ({ courses }) => {
   if (courses.length === 0) {
     return (
       <div style={{ padding: '24px 16px 28px', textAlign: 'center' }}>
@@ -219,113 +352,11 @@ const CourseRows: React.FC<{ courses: CourseForm[] }> = ({ courses }) => {
     );
   }
 
-  const maxAbsDelta = Math.max(...courses.map((c) => Math.abs(c.delta))) + 0.5;
-
   return (
-    <div style={{ padding: '14px 16px 8px' }}>
-      {courses.map((c, i) => {
-        const widthPct = Math.max(4, (Math.abs(c.delta) / maxAbsDelta) * 100);
-        const isLast = i === courses.length - 1;
-        return (
-          <div key={c.course_id} style={{ marginBottom: isLast ? 0 : 16 }}>
-            <div
-              style={{
-                display: 'flex',
-                alignItems: 'baseline',
-                justifyContent: 'space-between',
-                marginBottom: 6,
-                gap: 12,
-              }}
-            >
-              <div style={{ display: 'flex', alignItems: 'center', gap: 8, minWidth: 0, flex: 1 }}>
-                <div
-                  style={{
-                    width: 20,
-                    height: 20,
-                    borderRadius: 999,
-                    background: i === 0 ? T.amberTint : T.slateTint,
-                    color: i === 0 ? T.amberInk : T.inkMute,
-                    fontSize: 10,
-                    fontWeight: 800,
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    fontFamily: FONT,
-                    flexShrink: 0,
-                  }}
-                >
-                  {i + 1}
-                </div>
-                <p
-                  style={{
-                    margin: 0,
-                    fontSize: 13,
-                    fontWeight: 600,
-                    color: T.ink,
-                    fontFamily: FONT,
-                    whiteSpace: 'nowrap',
-                    overflow: 'hidden',
-                    textOverflow: 'ellipsis',
-                  }}
-                >
-                  {c.course_name}
-                </p>
-              </div>
-              <p
-                style={{
-                  margin: 0,
-                  fontSize: 15,
-                  fontWeight: 600,
-                  color: deltaColor(c.delta),
-                  fontFamily: FONT,
-                  fontVariantNumeric: 'tabular-nums',
-                  flexShrink: 0,
-                }}
-              >
-                {fmtDelta(c.delta)}
-                <span style={{ fontSize: 10, color: T.inkMute, fontWeight: 600, marginLeft: 4 }}>
-                  vs hcp
-                </span>
-              </p>
-            </div>
-            <div style={{ paddingLeft: 28 }}>
-              <div
-                style={{
-                  position: 'relative',
-                  height: 4,
-                  background: 'rgba(15,23,42,0.06)',
-                  borderRadius: 2,
-                  overflow: 'hidden',
-                }}
-              >
-                <div
-                  style={{
-                    position: 'absolute',
-                    top: 0,
-                    bottom: 0,
-                    left: 0,
-                    background: deltaColor(c.delta),
-                    width: `${widthPct}%`,
-                    borderRadius: 2,
-                  }}
-                />
-              </div>
-              <p
-                style={{
-                  margin: '6px 0 0',
-                  fontSize: 10,
-                  color: T.inkMute,
-                  fontFamily: FONT,
-                  fontWeight: 600,
-                  fontVariantNumeric: 'tabular-nums',
-                }}
-              >
-                {c.rounds_played} {c.rounds_played === 1 ? 'round' : 'rounds'}
-              </p>
-            </div>
-          </div>
-        );
-      })}
+    <div style={{ padding: '12px 16px 8px' }}>
+      {courses.map((c, i) => (
+        <PodiumCard key={c.course_id} course={c} rank={i + 1} />
+      ))}
     </div>
   );
 };
@@ -390,7 +421,7 @@ export const CourseFormCard: React.FC<Props> = ({ connectionId, currentHandicap 
     <div style={CARD_STYLE}>
       <CardHeader sublabel={view.sublabel} />
       <ViewToggle activeView={activeView} onChange={setActiveView} />
-      <CourseRows courses={courses} />
+      <PodiumCards courses={courses} />
       {courses.length > 0 && (() => {
         const top = courses[0];
         const sign = top.delta < 0 ? 'under' : 'over';
