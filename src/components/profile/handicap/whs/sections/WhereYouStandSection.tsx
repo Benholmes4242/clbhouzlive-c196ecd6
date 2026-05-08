@@ -224,34 +224,69 @@ const AvailableCard: React.FC<{
   data: Extract<HandicapPercentileResult, { available: true }>;
 }> = ({ data }) => {
   const copy = getPercentileCopy(data.percentile_top);
-  const showBigPct = copy.emphasis === 'celebrate' || copy.emphasis === 'standard';
 
   return (
     <>
-      <h3
+      {/* Hero: number + tone pill on one row */}
+      <div
         style={{
-          fontFamily: FONT_GEIST,
-          fontSize: 22,
-          fontWeight: 700,
-          color: INK,
           padding: '0 20px',
-          margin: 0,
-          letterSpacing: '-0.01em',
+          display: 'flex',
+          alignItems: 'baseline',
+          flexWrap: 'wrap',
+          gap: 12,
         }}
       >
-        {copy.display}
-      </h3>
+        <h3
+          style={{
+            fontFamily: FONT_GEIST,
+            margin: 0,
+            fontSize: 44,
+            fontWeight: 800,
+            color: INK,
+            letterSpacing: '-0.04em',
+            lineHeight: 1,
+            fontVariantNumeric: 'tabular-nums',
+          }}
+        >
+          {copy.headline}
+        </h3>
+        <span
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: 5,
+            padding: '5px 11px',
+            borderRadius: 999,
+            background:
+              copy.pillTone === 'positive' ? 'rgba(34,197,94,0.12)'
+              : copy.pillTone === 'neutral' ? AMBER_14
+              : 'rgba(15,23,42,0.06)',
+            color:
+              copy.pillTone === 'positive' ? '#15803D'
+              : copy.pillTone === 'neutral' ? '#854F0B'
+              : INK_70,
+            fontSize: 11.5,
+            fontWeight: 800,
+            letterSpacing: '0.04em',
+            fontFamily: FONT_GEIST,
+          }}
+        >
+          {copy.pillLabel}
+        </span>
+      </div>
+
       <p
         style={{
           fontFamily: FONT_GEIST,
           fontSize: 13,
           color: INK_55,
-          padding: '4px 20px 0',
+          padding: '6px 20px 0',
           margin: 0,
-          lineHeight: 1.4,
+          lineHeight: 1.5,
         }}
       >
-        {copy.caption}
+        {copy.subline}
       </p>
 
       <div
@@ -263,61 +298,6 @@ const AvailableCard: React.FC<{
           padding: 14,
         }}
       >
-        {showBigPct && (
-          <>
-            <div
-              style={{
-                fontFamily: FONT_GEIST,
-                fontSize: 10.5,
-                fontWeight: 700,
-                letterSpacing: '0.14em',
-                color: INK_55,
-                textTransform: 'uppercase',
-              }}
-            >
-              YOU RANK
-            </div>
-            <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, marginTop: 4 }}>
-              <span
-                style={{
-                  fontFamily: FONT_GEIST,
-                  fontSize: 40,
-                  fontWeight: 800,
-                  color: AMBER,
-                  letterSpacing: '-0.02em',
-                  fontVariantNumeric: 'tabular-nums',
-                }}
-              >
-                {data.percentile_top}%
-              </span>
-              <span
-                style={{
-                  fontFamily: FONT_GEIST,
-                  fontSize: 13,
-                  color: INK_70,
-                }}
-              >
-                of clbhouz members
-              </span>
-            </div>
-          </>
-        )}
-
-        {copy.emphasis === 'soft' && (
-          <p
-            style={{
-              fontFamily: FONT_GEIST,
-              fontSize: 14,
-              fontWeight: 600,
-              color: INK,
-              margin: 0,
-              lineHeight: 1.4,
-            }}
-          >
-            You're better than {100 - data.percentile_top}% of clbhouz members.
-          </p>
-        )}
-
         <DistributionChart
           buckets={data.buckets}
           userBucket={data.user_bucket}
@@ -332,32 +312,37 @@ const AvailableCard: React.FC<{
             marginTop: 14,
             paddingTop: 12,
             borderTop: `0.5px solid ${INK_06}`,
+            fontFamily: FONT_GEIST,
+            fontSize: 10.5,
+            fontWeight: 600,
+            color: INK_55,
           }}
         >
-          <span
-            style={{
-              fontFamily: FONT_GEIST,
-              fontSize: 12,
-              fontWeight: 600,
-              color: INK_70,
-            }}
-          >
-            All clbhouz members
+          <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5 }}>
+            <span
+              style={{
+                width: 8,
+                height: 8,
+                borderRadius: 2,
+                background: 'rgba(34,197,94,0.12)',
+                border: `1px solid #22C55E`,
+              }}
+            />
+            <span>Scratch territory</span>
           </span>
-          <span
-            style={{
-              fontFamily: FONT_GEIST,
-              fontSize: 12,
-              fontWeight: 700,
-              color: INK,
-              fontVariantNumeric: 'tabular-nums',
-            }}
-          >
-            {showBigPct ? `Top ${data.percentile_top}%` : copy.display}
+          <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5 }}>
+            <span
+              style={{
+                width: 10,
+                height: 3,
+                background: 'rgba(15,23,42,0.25)',
+                borderRadius: 1,
+              }}
+            />
+            <span>Median bucket</span>
           </span>
         </div>
       </div>
-
     </>
   );
 };
