@@ -21,6 +21,12 @@ const T = {
   greenInk: '#065F46',
   redInk: '#991B1B',
   slateTint: 'rgba(15,23,42,0.04)',
+  gold: '#FBBC2E',
+  silver: '#94A3B8',
+  bronze: '#B45309',
+  ink04: 'rgba(15,23,42,0.04)',
+  ink08: 'rgba(15,23,42,0.08)',
+  ink40: 'rgba(15,23,42,0.40)',
 };
 const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
 
