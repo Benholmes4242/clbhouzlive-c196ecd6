@@ -350,7 +350,7 @@ const HeroHandicapCard: React.FC<Props> = ({ connection }) => {
 
   // ── Status word (driven by 30-day form direction) ───────────────────────
   const statusWord =
-    fallbackForm.direction === 'negative' && Math.abs(fallbackForm.formStrokes) > 0.5 ? 'EXCELLENT FORM'
+    fallbackForm.direction === 'negative' && Math.abs(fallbackForm.formStrokes) > 0.5 ? 'EXCELLENT'
     : fallbackForm.direction === 'negative' ? 'TRENDING DOWN'
     : fallbackForm.direction === 'positive' && Math.abs(fallbackForm.formStrokes) > 0.5 ? 'DRIFTING UP'
     : fallbackForm.direction === 'positive' ? 'STEADY'
@@ -588,8 +588,8 @@ const HeroHandicapCard: React.FC<Props> = ({ connection }) => {
             pointerEvents: 'none',
           }}>
             <span style={{
-              fontSize: 6.5, fontWeight: 800, color: statusColor,
-              letterSpacing: '0.12em', marginBottom: 5,
+              fontSize: 7.5, fontWeight: 800, color: statusColor,
+              letterSpacing: '0.14em', marginBottom: 5,
               textTransform: 'uppercase', textAlign: 'center',
             }}>
               {statusWord}
