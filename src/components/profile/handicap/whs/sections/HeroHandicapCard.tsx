@@ -536,7 +536,7 @@ const HeroHandicapCard: React.FC<Props> = ({ connection }) => {
             <circle
               cx={CX} cy={CY} r={R_OUTER}
               fill="none" stroke="url(#heroOuterAmberGold)" strokeWidth={STROKE_OUTER}
-              strokeLinecap="round"
+              strokeLinecap="butt"
               strokeDasharray={`${outerDash} ${C_OUTER}`}
               transform={`rotate(-90 ${CX} ${CY})`}
               vectorEffect="non-scaling-stroke"
@@ -575,7 +575,7 @@ const HeroHandicapCard: React.FC<Props> = ({ connection }) => {
                 cx={CX} cy={CY} r={R_INNER} fill="none"
                 stroke="url(#heroInnerGreenTeal)" strokeWidth={STROKE_INNER}
                 strokeDasharray={`${innerFillLength} ${C_INNER}`}
-                strokeLinecap="round"
+                strokeLinecap="butt"
                 transform={`rotate(-90 ${CX} ${CY})`}
                 vectorEffect="non-scaling-stroke"
                 style={{ transition: 'stroke-dasharray 320ms cubic-bezier(0.22, 0.61, 0.36, 1)' }}
@@ -588,7 +588,7 @@ const HeroHandicapCard: React.FC<Props> = ({ connection }) => {
                   cx={CX} cy={CY} r={R_INNER} fill="none"
                   stroke={RED} strokeWidth={STROKE_INNER}
                   strokeDasharray={`${innerFillLength} ${C_INNER}`}
-                  strokeLinecap="round"
+                  strokeLinecap="butt"
                   transform={`rotate(-90 ${CX} ${CY})`}
                   vectorEffect="non-scaling-stroke"
                   style={{ transition: 'stroke-dasharray 320ms cubic-bezier(0.22, 0.61, 0.36, 1)' }}
@@ -605,8 +605,8 @@ const HeroHandicapCard: React.FC<Props> = ({ connection }) => {
             pointerEvents: 'none',
           }}>
             <span style={{
-              fontSize: 'clamp(8px, 2.4vw, 8.5px)', fontWeight: 800, color: statusColor,
-              letterSpacing: '0.20em', marginBottom: 'clamp(3px, 1.2vw, 5px)',
+              fontSize: 8, fontWeight: 800, color: statusColor,
+              letterSpacing: '0.16em', marginBottom: 4,
               textTransform: 'uppercase', textAlign: 'center',
             }}>
               {statusWord}
@@ -647,27 +647,6 @@ const HeroHandicapCard: React.FC<Props> = ({ connection }) => {
             30-DAY FORM (inner ring)
           </strong>
         </span>
-      </div>
-
-      {/* Trophies entry-point — opens the AllTrophiesSheet via global event. */}
-      <div style={{ display: 'flex', justifyContent: 'center', marginTop: 4 }}>
-        <button
-          type="button"
-          onClick={() => openTrophiesSheet()}
-          style={{
-            background: 'none',
-            border: 'none',
-            padding: '4px 6px',
-            fontSize: 11.5,
-            fontWeight: 700,
-            color: AMBER,
-            cursor: 'pointer',
-            fontFamily: 'inherit',
-            letterSpacing: '0.02em',
-          }}
-        >
-          View all trophies →
-        </button>
       </div>
 
       {/* Sparkline strip */}
