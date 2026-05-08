@@ -224,6 +224,231 @@ const SecondaryStreakTile: React.FC<{
   );
 };
 
+interface StreakCardProps {
+  streak: StreakResult;
+  label: string;
+  sub: string;
+  color: string;
+  colorTint: string;
+  icon: 'flame' | 'trending-down' | 'shield';
+}
+
+const StreakCard: React.FC<StreakCardProps> = ({
+  streak, label, sub, color, colorTint, icon,
+}) => {
+  const isPb = streak.current > 0 && streak.current === streak.best;
+  const remaining = Math.max(0, streak.best - streak.current);
+  const fillPct = streak.best > 0
+    ? Math.min(100, (streak.current / streak.best) * 100)
+    : 0;
+  const isActive = streak.isActive;
+
+  const renderIcon = () => {
+    const iconColor = isActive ? color : INK_40;
+    const fill = isActive && icon === 'flame' ? color : 'none';
+    if (icon === 'flame') {
+      return <Flame size={16} color={iconColor} strokeWidth={2.4} fill={fill} />;
+    }
+    if (icon === 'trending-down') {
+      return <TrendingDown size={16} color={iconColor} strokeWidth={2.4} />;
+    }
+    return <Shield size={16} color={iconColor} strokeWidth={2.4} />;
+  };
+
+  return (
+    <div
+      style={{
+        flexShrink: 0,
+        width: 240,
+        background: '#fff',
+        borderRadius: 18,
+        border: `0.5px solid ${INK_10}`,
+        padding: '16px 14px 14px',
+        boxShadow: '0 1px 2px rgba(15,23,42,0.04)',
+        fontFamily: FONT_GEIST,
+        display: 'flex',
+        flexDirection: 'column',
+      }}
+    >
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'flex-start',
+          justifyContent: 'space-between',
+          marginBottom: 12,
+        }}
+      >
+        <div
+          style={{
+            width: 36,
+            height: 36,
+            borderRadius: 10,
+            background: isActive ? colorTint : INK_06,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+        >
+          {renderIcon()}
+        </div>
+        <span
+          style={{
+            padding: '3px 9px',
+            borderRadius: 99,
+            background: isActive ? color : INK_10,
+            color: isActive ? '#fff' : INK_55,
+            fontSize: 9,
+            fontWeight: 800,
+            letterSpacing: '0.10em',
+          }}
+        >
+          {isActive ? 'ACTIVE' : 'DORMANT'}
+        </span>
+      </div>
+      <div
+        style={{
+          fontSize: 10,
+          fontWeight: 800,
+          letterSpacing: '0.12em',
+          color: INK_55,
+          textTransform: 'uppercase',
+          marginBottom: 4,
+        }}
+      >
+        {label}
+      </div>
+      <div
+        style={{
+          fontSize: 11,
+          color: INK_40,
+          fontWeight: 500,
+          lineHeight: 1.35,
+          marginBottom: 16,
+          minHeight: 30,
+        }}
+      >
+        {sub}
+      </div>
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'baseline',
+          gap: 5,
+          marginBottom: 10,
+        }}
+      >
+        <span
+          style={{
+            fontSize: 40,
+            fontWeight: 800,
+            color: INK,
+            lineHeight: 1,
+            letterSpacing: '-0.04em',
+            fontVariantNumeric: 'tabular-nums',
+          }}
+        >
+          {streak.current}
+        </span>
+        <span style={{ fontSize: 14, color: INK_55, fontWeight: 600 }}>
+          rounds
+        </span>
+      </div>
+      <div style={{ marginBottom: 10 }}>
+        <div
+          style={{
+            height: 6,
+            background: INK_06,
+            borderRadius: 3,
+            overflow: 'hidden',
+            position: 'relative',
+          }}
+        >
+          <div
+            style={{
+              position: 'absolute',
+              top: 0,
+              bottom: 0,
+              left: 0,
+              width: `${fillPct}%`,
+              background: color,
+              borderRadius: 3,
+              transition: 'width 320ms ease',
+            }}
+          />
+        </div>
+        <div
+          style={{
+            marginTop: 6,
+            display: 'flex',
+            justifyContent: 'space-between',
+            fontSize: 10,
+            fontWeight: 700,
+            color: INK_40,
+            fontVariantNumeric: 'tabular-nums',
+            letterSpacing: '0.04em',
+          }}
+        >
+          <span>{streak.current}</span>
+          <span style={{ color: isPb ? AMBER : INK_55 }}>
+            {isPb ? 'NEW PB!' : streak.best > 0 ? `PB · ${streak.best}` : 'NO PB YET'}
+          </span>
+        </div>
+      </div>
+      {!isPb && remaining > 0 && (
+        <div
+          style={{
+            marginTop: 'auto',
+            padding: '6px 10px',
+            background: isActive ? colorTint : INK_06,
+            borderRadius: 8,
+            fontSize: 11,
+            fontWeight: 700,
+            color: isActive ? color : INK_55,
+            textAlign: 'center',
+          }}
+        >
+          {isActive
+            ? `${remaining} more to beat PB`
+            : `Last PB ${streak.best} rounds`}
+        </div>
+      )}
+      {isPb && (
+        <div
+          style={{
+            marginTop: 'auto',
+            padding: '6px 10px',
+            background: AMBER_14,
+            borderRadius: 8,
+            fontSize: 11,
+            fontWeight: 700,
+            color: AMBER,
+            textAlign: 'center',
+            letterSpacing: '0.04em',
+          }}
+        >
+          🏆 NEW PERSONAL BEST
+        </div>
+      )}
+      {streak.best === 0 && (
+        <div
+          style={{
+            marginTop: 'auto',
+            padding: '6px 10px',
+            background: INK_06,
+            borderRadius: 8,
+            fontSize: 11,
+            fontWeight: 700,
+            color: INK_55,
+            textAlign: 'center',
+          }}
+        >
+          Start your first run
+        </div>
+      )}
+    </div>
+  );
+};
+
 export const StreaksSection: React.FC<Props> = ({ connectionId, userId }) => {
   const { data: streaks, isLoading, totalRounds } = useStreaks(connectionId);
   const sectionRef = useRef<HTMLElement | null>(null);
