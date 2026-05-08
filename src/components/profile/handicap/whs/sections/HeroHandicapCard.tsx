@@ -543,24 +543,7 @@ const HeroHandicapCard: React.FC<Props> = ({ connection }) => {
               style={{ transition: 'stroke-dasharray 320ms cubic-bezier(0.22, 0.61, 0.36, 1)' }}
             />
 
-            {/* Tick marks — 8 ticks at 45° intervals around outer track */}
-            {Array.from({ length: 8 }).map((_, i) => {
-              const angle = (i * 45 - 90) * (Math.PI / 180);
-              const tickInner = R_OUTER - STROKE_OUTER / 2 - 1;
-              const tickOuter = R_OUTER + STROKE_OUTER / 2 + 1;
-              const x1 = CX + Math.cos(angle) * tickInner;
-              const y1 = CY + Math.sin(angle) * tickInner;
-              const x2 = CX + Math.cos(angle) * tickOuter;
-              const y2 = CY + Math.sin(angle) * tickOuter;
-              return (
-                <line
-                  key={i}
-                  x1={x1} y1={y1} x2={x2} y2={y2}
-                  stroke={INK_10} strokeWidth={1}
-                  vectorEffect="non-scaling-stroke"
-                />
-              );
-            })}
+
 
             {/* Inner track */}
             <circle
@@ -969,7 +952,7 @@ const FlankRing: React.FC<FlankRingProps> = ({ metric, state, value, fraction })
           {frac > 0 && (
             <circle cx={FCX} cy={FCY} r={FR} fill="none"
               stroke={color} strokeWidth={FSTROKE}
-              strokeLinecap="round"
+              strokeLinecap="butt"
               strokeDasharray={`${frac * FC} ${FC}`}
               transform={`rotate(-90 ${FCX} ${FCY})`}
               vectorEffect="non-scaling-stroke" />
