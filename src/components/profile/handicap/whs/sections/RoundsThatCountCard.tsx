@@ -609,6 +609,53 @@ export const RoundsThatCountCard: React.FC<Props> = ({ connectionId, currentHand
         settleAt={projection?.settleAt ?? null}
         isAtRisk={projection?.isAtRisk ?? false}
       />
+
+      {/* Vulnerability callout — which round drops off next */}
+      {(() => {
+        const oldest = enriched.rounds[0];
+        if (!oldest || oldest.handicap_differential == null) return null;
+        const oldestDate = new Date(oldest.play_date);
+        const dateLabel = `${WEEKDAY[oldestDate.getDay()]} ${oldestDate.getDate()} ${
+          oldestDate.toLocaleDateString('en-GB', { month: 'short' })
+        }`;
+        const diffStr = fmtDiffPlus(oldest.handicap_differential);
+        const willDropCounter = oldest.is_counter;
+        return (
+          <div style={{
+            marginTop: 12,
+            padding: '11px 12px',
+            background: willDropCounter ? AMBER_TINT_06 : INK_06,
+            border: `0.5px solid ${willDropCounter ? AMBER_BORDER : INK_10}`,
+            borderRadius: 10,
+            borderLeft: `3px solid ${willDropCounter ? AMBER : INK_40}`,
+            display: 'flex', alignItems: 'flex-start', gap: 9,
+          }}>
+            {willDropCounter ? (
+              <AlertTriangle size={14} color={AMBER_DEEP} strokeWidth={2.4}
+                style={{ flexShrink: 0, marginTop: 1 }} />
+            ) : (
+              <Minus size={14} color={INK_40} strokeWidth={2.4}
+                style={{ flexShrink: 0, marginTop: 1 }} />
+            )}
+            <p style={{
+              margin: 0, fontSize: 11.5, color: INK_70, lineHeight: 1.5,
+              fontFamily: FONT_DISPLAY,
+            }}>
+              {willDropCounter ? (
+                <>
+                  Your <strong style={{ color: INK, fontWeight: 700 }}>{diffStr} from {dateLabel}</strong>
+                  {' '}is currently a counter. When it drops off the 20-round window, your handicap could shift.
+                </>
+              ) : (
+                <>
+                  Your oldest round (<strong style={{ color: INK, fontWeight: 700 }}>{diffStr} from {dateLabel}</strong>)
+                  {' '}isn't a counter — its drop-off won't change your handicap.
+                </>
+              )}
+            </p>
+          </div>
+        );
+      })()}
     </section>
   );
 };
