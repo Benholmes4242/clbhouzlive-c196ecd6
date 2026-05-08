@@ -128,6 +128,9 @@ export const RivalriesSection: React.FC<Props> = ({ userId }) => {
               <RivalryCard
                 key={`slot-${rivalry.slot_index}`}
                 rivalry={rivalry}
+                userName={selfRow?.friend_name ?? null}
+                userThumbnailUrl={selfRow?.friend_thumbnail_url ?? null}
+                userHandicap={selfRow?.friend_handicap_index ?? null}
                 onInfo={() => setInfoTarget(rivalry)}
               />
             ))}
