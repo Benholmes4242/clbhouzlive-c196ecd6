@@ -28,16 +28,20 @@ const RED_FORM_HOT = '#B91C1C';
 const MONTHS = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
 const FONT_DISPLAY = 'SF Pro Display, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
 
-// Ring composition
-const RING_SIZE = 220;
-const CX = RING_SIZE / 2;
-const CY = RING_SIZE / 2;
-const R_OUTER = 97;
+// Hero ring (responsive — viewBox is fixed coordinate space, rendered size is clamp())
+const HERO_VIEWBOX = 200;
+const CX = HERO_VIEWBOX / 2;
+const CY = HERO_VIEWBOX / 2;
+const R_OUTER = 88;
 const STROKE_OUTER = 11;
 const C_OUTER = 2 * Math.PI * R_OUTER;
-const R_INNER = 80;
-const STROKE_INNER = 6;
+const R_INNER = 70;
+const STROKE_INNER = 5;
 const C_INNER = 2 * Math.PI * R_INNER;
+// Legacy constant kept only for the loading skeleton placeholder
+const RING_SIZE = 200;
+const INK_25 = 'rgba(15,23,42,0.25)';
+const INK_70 = 'rgba(15,23,42,0.70)';
 
 // Sparkline
 const W = 340;
