@@ -588,8 +588,8 @@ const HeroHandicapCard: React.FC<Props> = ({ connection }) => {
             pointerEvents: 'none',
           }}>
             <span style={{
-              fontSize: 8, fontWeight: 800, color: statusColor,
-              letterSpacing: '0.16em', marginBottom: 4,
+              fontSize: 7, fontWeight: 800, color: statusColor,
+              letterSpacing: '0.14em', marginBottom: 6,
               textTransform: 'uppercase', textAlign: 'center',
             }}>
               {statusWord}
