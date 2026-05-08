@@ -342,6 +342,42 @@ export const RoundsThatCountCard: React.FC<Props> = ({ connectionId, currentHand
                   vectorEffect="non-scaling-stroke" />
               </svg>
 
+              {/* Cut target horizontal line */}
+              {projection && projection.hasData &&
+                projection.cutTarget >= yMin && projection.cutTarget <= yMax && (
+                <>
+                  <svg width="100%" height={CHART_H}
+                    viewBox={`0 0 100 ${CHART_H}`} preserveAspectRatio="none"
+                    style={{ position: 'absolute', inset: 0, pointerEvents: 'none' }}
+                  >
+                    <line
+                      x1="0" y1={yFor(projection.cutTarget)}
+                      x2="100" y2={yFor(projection.cutTarget)}
+                      stroke={GREEN} strokeWidth={1.5}
+                      strokeDasharray="4 3"
+                      vectorEffect="non-scaling-stroke"
+                    />
+                  </svg>
+                  <div style={{
+                    position: 'absolute',
+                    top: yFor(projection.cutTarget) - 9,
+                    right: 4,
+                    padding: '2px 7px',
+                    borderRadius: 4,
+                    background: GREEN,
+                    color: '#fff',
+                    fontSize: 8.5, fontWeight: 800,
+                    letterSpacing: '0.06em',
+                    fontFamily: FONT_DISPLAY,
+                    pointerEvents: 'none',
+                    zIndex: 3,
+                    whiteSpace: 'nowrap',
+                  }}>
+                    CUT IF BELOW
+                  </div>
+                </>
+              )}
+
               {/* Dots — separate so we can use HTML for sizing */}
               {enriched.rounds.map((r, i) => {
                 const d = r.handicap_differential ?? 0;
@@ -360,18 +396,22 @@ export const RoundsThatCountCard: React.FC<Props> = ({ connectionId, currentHand
                   borderStyle = `2.5px solid ${RED}`;
                 } else if (isLatest) {
                   dotSize = 14;
-                  background = AMBER;
+                  background = r.is_counter ? AMBER : '#fff';
                   borderStyle = `2px solid ${INK}`;
-                } else {
+                } else if (r.is_counter) {
                   dotSize = 9;
-                  background = '#fff';
+                  background = AMBER;
                   borderStyle = `2px solid ${AMBER}`;
+                } else {
+                  dotSize = 8;
+                  background = '#fff';
+                  borderStyle = `1.5px solid ${AMBER}`;
                 }
                 return (
                   <button
                     key={r.id}
                     onClick={() => setSelectedId(r.id)}
-                    aria-label={`Round at ${r.course?.name ?? 'course'}`}
+                    aria-label={`Round at ${r.course?.name ?? 'course'} (${r.is_counter ? 'counter' : 'non-counter'})`}
                     style={{
                       position: 'absolute',
                       left: `${xFor(i)}%`,
