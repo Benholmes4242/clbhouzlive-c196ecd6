@@ -277,7 +277,7 @@ export const RivalryCard: React.FC<Props> = ({
           name={rivalDisplayName}
           label={null}
           thumbnail={rivalry.rival_thumbnail_url ?? null}
-          handicap={rivalry.rival_handicap_index ?? null}
+          handicap={rivalry.rival_handicap ?? null}
           ringColor={themRing}
           ringGlow={themGlow}
         />
