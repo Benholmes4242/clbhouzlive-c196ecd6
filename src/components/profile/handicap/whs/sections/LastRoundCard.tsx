@@ -178,7 +178,7 @@ export const LastRoundCard: React.FC<Props> = ({ connectionId }) => {
         }}
       >
         {/* Course image strip 16:5 */}
-        <div style={{ position: 'relative', width: '100%', aspectRatio: '16 / 5', ...stripBg }}>
+        <div style={{ position: 'relative', width: '100%', aspectRatio: '16 / 4', ...stripBg }}>
           <div
             style={{
               position: 'absolute',
