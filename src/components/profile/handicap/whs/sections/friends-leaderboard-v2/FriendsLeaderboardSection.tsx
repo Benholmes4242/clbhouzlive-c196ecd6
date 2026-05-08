@@ -1,17 +1,14 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import SectionHeader from '../SectionHeader';
 import LeaderboardRow from './LeaderboardRow';
 import FriendProfileSheet from '../friend-profile-sheet/FriendProfileSheet';
 import { useFriendLeaderboard } from '@/lib/whs/hooks';
-import { ChevronRight } from 'lucide-react';
+import { ChevronDown } from 'lucide-react';
 import type { FriendLeaderboardEntry } from '@/lib/whs/types';
 
 interface Props {
   userId: string;
 }
-
-type GapRow = { isGap: true };
-type VisibleRow = FriendLeaderboardEntry | GapRow;
 
 const HEADER_LABEL: React.CSSProperties = {
   margin: 0,
@@ -21,42 +18,73 @@ const HEADER_LABEL: React.CSSProperties = {
   letterSpacing: '0.16em',
 };
 
+const STALE_THRESHOLD_DAYS = 90;
+
+const isStale = (lastPlayed: string | null): boolean => {
+  if (!lastPlayed) return true;
+  const days = (Date.now() - new Date(lastPlayed).getTime()) / (1000 * 60 * 60 * 24);
+  return days > STALE_THRESHOLD_DAYS;
+};
+
 export const FriendsLeaderboardSection: React.FC<Props> = ({ userId }) => {
   const { data, isLoading } = useFriendLeaderboard(userId);
-  const [showAll, setShowAll] = useState(false);
+  const [showInactive, setShowInactive] = useState(false);
   const [profileSheet, setProfileSheet] = useState<{ index: number } | null>(null);
 
-  const sorted = (data ?? [])
-    .slice()
-    .sort((a, b) => (a.friend_handicap_index ?? 99) - (b.friend_handicap_index ?? 99));
+  // Sort by handicap (low → high). NULL handicaps sink to the bottom.
+  const sorted = useMemo(
+    () =>
+      (data ?? [])
+        .slice()
+        .sort(
+          (a, b) =>
+            (a.friend_handicap_index ?? 99) - (b.friend_handicap_index ?? 99),
+        ),
+    [data],
+  );
 
-  const yourIdx = sorted.findIndex((e) => e.is_self);
-  const yourRank = yourIdx + 1;
-  const total = sorted.length;
-
-  const DEFAULT_LIMIT = 10;
-
-  let visible: VisibleRow[] = [];
-  if (showAll || sorted.length <= DEFAULT_LIMIT) {
-    visible = sorted;
-  } else {
-    const head = sorted.slice(0, DEFAULT_LIMIT);
-    if (head.find((e) => e.is_self)) {
-      visible = head;
-    } else {
-      const headTrim = sorted.slice(0, DEFAULT_LIMIT - 3);
-      const start = Math.max(0, yourIdx - 1);
-      const end = Math.min(sorted.length, yourIdx + 2);
-      visible = [...headTrim, { isGap: true } as GapRow, ...sorted.slice(start, end)];
+  // Split into active vs inactive. The "self" row is always treated as active
+  // even if its last round is old — we should never hide the user from
+  // their own leaderboard.
+  const { activeRows, inactiveRows } = useMemo(() => {
+    const active: FriendLeaderboardEntry[] = [];
+    const inactive: FriendLeaderboardEntry[] = [];
+    for (const e of sorted) {
+      if (e.is_self || !isStale(e.last_round_played_at)) {
+        active.push(e);
+      } else {
+        inactive.push(e);
+      }
     }
-  }
+    return { activeRows: active, inactiveRows: inactive };
+  }, [sorted]);
+
+  const yourActiveRank = useMemo(
+    () => activeRows.findIndex((e) => e.is_self) + 1,
+    [activeRows],
+  );
+  const totalActive = activeRows.length;
+  const inactiveCount = inactiveRows.length;
+
+  const visible = showInactive ? [...activeRows, ...inactiveRows] : activeRows;
+
+  const yourActiveIdx = activeRows.findIndex((e) => e.is_self);
+  const yourHcp = activeRows[yourActiveIdx]?.friend_handicap_index ?? null;
 
   return (
     <section style={{ padding: '24px 0 8px' }}>
       <SectionHeader
         eyebrow="LEADERBOARD"
-        title={isLoading || total === 0 ? 'Loading…' : `You're ranked ${yourRank} of ${total}`}
-        sub="Your circle, ranked by current handicap"
+        title={
+          isLoading || totalActive === 0
+            ? 'Loading…'
+            : `You're ${yourActiveRank} of ${totalActive} active`
+        }
+        sub={
+          inactiveCount > 0
+            ? `Active = round in last 90 days · ${inactiveCount} inactive`
+            : 'Your circle, ranked by current handicap'
+        }
       />
 
       {/* Column headers */}
@@ -74,7 +102,7 @@ export const FriendsLeaderboardSection: React.FC<Props> = ({ userId }) => {
           <p style={HEADER_LABEL}>PLAYER</p>
         </div>
         <div style={{ width: 60, textAlign: 'center', flexShrink: 0, paddingRight: 6 }}>
-          <p style={HEADER_LABEL}>TREND</p>
+          <p style={HEADER_LABEL}>30D</p>
         </div>
         <div style={{ width: 60, textAlign: 'right', flexShrink: 0 }}>
           <p style={HEADER_LABEL}>HCP</p>
@@ -97,31 +125,26 @@ export const FriendsLeaderboardSection: React.FC<Props> = ({ userId }) => {
         ))
       ) : (
         visible.map((entry, i) => {
-          if ('isGap' in entry) {
-            return (
-              <div
-                key={`gap-${i}`}
-                style={{
-                  margin: '0 20px',
-                  padding: '10px 0',
-                  fontSize: 11,
-                  fontWeight: 700,
-                  color: 'rgba(15,23,42,0.40)',
-                  letterSpacing: '0.10em',
-                  textAlign: 'center',
-                  borderBottom: '1px solid rgba(15,23,42,0.06)',
-                }}
-              >
-                · · ·
-              </div>
-            );
-          }
           const realRank =
             sorted.findIndex((e) =>
               entry.is_self
                 ? e.is_self
-                : e.friend_user_id === entry.friend_user_id && e.friend_name === entry.friend_name,
+                : e.friend_user_id === entry.friend_user_id &&
+                  e.friend_name === entry.friend_name,
             ) + 1;
+
+          const activeIdx = activeRows.findIndex((e) => e === entry);
+          const isActiveAdjacent =
+            !entry.is_self &&
+            activeIdx >= 0 &&
+            (activeIdx === yourActiveIdx - 1 || activeIdx === yourActiveIdx + 1);
+          const gapFromYou =
+            isActiveAdjacent && yourHcp != null && entry.friend_handicap_index != null
+              ? entry.friend_handicap_index - yourHcp
+              : null;
+
+          const staleRow = !entry.is_self && isStale(entry.last_round_played_at);
+
           return (
             <LeaderboardRow
               key={entry.is_self ? 'self' : `${entry.friend_user_id ?? ''}-${entry.friend_name}`}
@@ -129,6 +152,8 @@ export const FriendsLeaderboardSection: React.FC<Props> = ({ userId }) => {
               rank={realRank}
               isFirst={i === 0}
               isLast={i === visible.length - 1}
+              isStaleRow={staleRow}
+              gapFromYou={gapFromYou}
               onClick={
                 entry.is_self
                   ? undefined
@@ -142,32 +167,32 @@ export const FriendsLeaderboardSection: React.FC<Props> = ({ userId }) => {
         })
       )}
 
-      {/* See all */}
-      {!showAll && !isLoading && sorted.length > DEFAULT_LIMIT && (
+      {/* Show inactive toggle */}
+      {!showInactive && !isLoading && inactiveCount > 0 && (
         <button
           type="button"
-          onClick={() => setShowAll(true)}
+          onClick={() => setShowInactive(true)}
           style={{
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            gap: 4,
+            gap: 5,
             width: 'calc(100% - 40px)',
             margin: '12px 20px 0',
             padding: '10px 16px',
             background: '#fff',
             border: '0.5px solid rgba(15,23,42,0.10)',
             borderRadius: 12,
-            color: '#F7931E',
+            color: 'rgba(15,23,42,0.78)',
             fontSize: 12,
             fontWeight: 700,
-            letterSpacing: '0.04em',
+            letterSpacing: '0.02em',
             cursor: 'pointer',
             fontFamily: '"Geist", system-ui, sans-serif',
           }}
         >
-          See full leaderboard ({sorted.length})
-          <ChevronRight size={14} />
+          Show {inactiveCount} inactive friend{inactiveCount === 1 ? '' : 's'}
+          <ChevronDown size={14} />
         </button>
       )}
 
