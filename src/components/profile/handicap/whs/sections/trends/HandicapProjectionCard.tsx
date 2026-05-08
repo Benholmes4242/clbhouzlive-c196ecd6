@@ -90,8 +90,6 @@ export const HandicapProjectionCard: React.FC<Props> = ({ scores }) => {
     );
   }
 
-  const continuesLabel =
-    prediction.direction === 'flat' ? 'IF YOUR FORM HOLDS' : 'IF YOUR FORM CONTINUES';
   const arrow =
     prediction.direction === 'down' ? '↓' : prediction.direction === 'up' ? '↑' : '→';
 
@@ -113,69 +111,153 @@ export const HandicapProjectionCard: React.FC<Props> = ({ scores }) => {
       <CardHeader showInfo={showInfo} onToggleInfo={() => setShowInfo((v) => !v)} />
       {showInfo && <InfoPanel />}
 
-      <div style={{ padding: '16px 16px 6px' }}>
-        <p
-          style={{
+      {/* DUAL-PANEL: Where you are / Heading to */}
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr' }}>
+        {/* LEFT — WHERE YOU ARE */}
+        <div style={{ padding: '18px 16px 14px', position: 'relative' }}>
+          <p style={{
             margin: 0,
-            fontSize: 10,
+            fontSize: 9.5,
             fontWeight: 800,
             letterSpacing: '0.16em',
             textTransform: 'uppercase',
             color: T.inkMute,
             fontFamily: FONT,
-          }}
-        >
-          FORM SIGNAL
-        </p>
-        <p
-          style={{
-            margin: '6px 0 0',
-            fontSize: 28,
-            fontWeight: 600,
-            letterSpacing: '-0.03em',
+          }}>
+            Where you are
+          </p>
+          <p style={{
+            margin: '10px 0 0',
+            fontSize: 11,
+            fontWeight: 800,
+            letterSpacing: '0.10em',
             color: theme.accentInk,
-            lineHeight: 1.05,
+            textTransform: 'uppercase',
             fontFamily: FONT,
-          }}
-        >
-          {meta.label}
-        </p>
-        <p
-          style={{
-            margin: '8px 0 0',
-            fontSize: 12.5,
-            lineHeight: 1.5,
-            color: T.inkSoft,
+          }}>
+            {meta.label}
+          </p>
+          <p style={{
+            margin: '4px 0 0',
+            fontSize: 32,
+            fontWeight: 800,
+            color: T.ink,
+            lineHeight: 1,
+            letterSpacing: '-0.04em',
+            fontVariantNumeric: 'tabular-nums',
             fontFamily: FONT,
-          }}
-        >
-          {meta.description}
-        </p>
+          }}>
+            {prediction.current !== null ? prediction.current.toFixed(1) : '—'}
+          </p>
+          <p style={{
+            margin: '6px 0 0',
+            fontSize: 11,
+            color: T.inkMute,
+            fontWeight: 500,
+            fontFamily: FONT,
+          }}>
+            Today's index
+          </p>
+          <div
+            aria-hidden
+            style={{
+              position: 'absolute',
+              top: 14, bottom: 14, right: 0,
+              width: 0.5,
+              background: T.hairline,
+            }}
+          />
+        </div>
+
+        {/* RIGHT — HEADING TO */}
+        <div style={{ padding: '18px 16px 14px' }}>
+          <p style={{
+            margin: 0,
+            fontSize: 9.5,
+            fontWeight: 800,
+            letterSpacing: '0.16em',
+            textTransform: 'uppercase',
+            color: theme.accentInk,
+            fontFamily: FONT,
+          }}>
+            Heading to
+          </p>
+          <div style={{
+            marginTop: 10,
+            display: 'flex',
+            alignItems: 'baseline',
+            gap: 8,
+          }}>
+            <span style={{
+              fontSize: 32,
+              fontWeight: 800,
+              color: theme.accentInk,
+              lineHeight: 1,
+              letterSpacing: '-0.04em',
+              fontVariantNumeric: 'tabular-nums',
+              fontFamily: FONT,
+            }}>
+              {prediction.projected !== null ? prediction.projected.toFixed(1) : '—'}
+            </span>
+            {prediction.delta > 0 && (
+              <span
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 3,
+                  padding: '3px 8px',
+                  background: theme.headerBg,
+                  borderRadius: 99,
+                  fontSize: 10.5,
+                  fontWeight: 800,
+                  color: theme.accentInk,
+                  fontVariantNumeric: 'tabular-nums',
+                  letterSpacing: '0.02em',
+                  fontFamily: FONT,
+                }}
+              >
+                {arrow} {prediction.delta.toFixed(1)}
+              </span>
+            )}
+          </div>
+          <p style={{
+            margin: '6px 0 0',
+            fontSize: 11,
+            color: T.inkMute,
+            fontWeight: 500,
+            fontFamily: FONT,
+          }}>
+            {prediction.direction === 'flat' ? 'If form holds · 5 rounds' : 'If form continues · 5 rounds'}
+          </p>
+        </div>
       </div>
 
-      <div style={{ padding: '0 16px 14px' }}>
+      {/* SHARED CONVERGENCE CHART */}
+      <div
+        style={{
+          padding: '6px 16px 14px',
+          borderTop: `0.5px solid ${T.hairline}`,
+          background: 'rgba(247,250,252,0.5)',
+        }}
+      >
         <svg
-          viewBox="0 0 320 130"
+          viewBox="0 0 320 110"
           width="100%"
-          height={130}
+          height={110}
           preserveAspectRatio="none"
           style={{ display: 'block', overflow: 'visible' }}
           role="img"
           aria-label={`Handicap timeline showing past trajectory and projected ${prediction.direction} movement`}
         >
           <line
-            x1="160"
-            x2="160"
-            y1="14"
-            y2="100"
+            x1="160" x2="160" y1="14" y2="84"
             stroke="rgba(15,23,42,0.15)"
             strokeWidth={1}
             strokeDasharray="2 4"
             vectorEffect="non-scaling-stroke"
           />
           <text
-            x="160"
-            y="10"
+            x="160" y="10"
             textAnchor="middle"
             style={{
               fontSize: 9,
@@ -187,7 +269,6 @@ export const HandicapProjectionCard: React.FC<Props> = ({ scores }) => {
           >
             TODAY
           </text>
-
           <path
             d={`M 12 ${curve.pastY1} Q 50 ${(curve.pastY1 + curve.pastY2) / 2}, 80 ${curve.pastY2} T 160 ${curve.pastY3}`}
             fill="none"
@@ -204,66 +285,26 @@ export const HandicapProjectionCard: React.FC<Props> = ({ scores }) => {
             strokeLinecap="round"
             vectorEffect="non-scaling-stroke"
           />
-
           <circle cx="12" cy={curve.pastY1} r="3" fill={T.inkMute} />
           <circle cx="80" cy={curve.pastY2} r="3" fill={T.inkMute} />
           <circle cx="160" cy={curve.pastY3} r="5" fill="#FFFFFF" stroke={T.ink} strokeWidth={2} />
           <circle cx="240" cy={curve.futureY2} r="3" fill={theme.accent} />
           <circle cx="308" cy={curve.futureY3} r="6" fill={theme.accent} stroke="#FFFFFF" strokeWidth={2} />
-
           <text
-            x="12"
-            y="118"
+            x="12" y="102"
             textAnchor="start"
             style={{ fontSize: 10, fontWeight: 600, fill: T.inkMute, fontFamily: FONT }}
           >
             90 days ago
           </text>
           <text
-            x="160"
-            y="118"
-            textAnchor="middle"
-            style={{ fontSize: 10, fontWeight: 700, fill: T.ink, fontFamily: FONT }}
-          >
-            {prediction.current !== null ? prediction.current.toFixed(1) : '—'}
-          </text>
-          <text
-            x="308"
-            y="118"
+            x="308" y="102"
             textAnchor="end"
             style={{ fontSize: 10, fontWeight: 700, fill: theme.accentInk, fontFamily: FONT }}
           >
             5 rounds out
           </text>
         </svg>
-      </div>
-
-      <div style={{ padding: '4px 16px 14px' }}>
-        <p
-          style={{
-            margin: 0,
-            fontSize: 12,
-            lineHeight: 1.55,
-            color: T.inkMute,
-            fontFamily: FONT,
-          }}
-        >
-          <span style={{ fontWeight: 700, letterSpacing: '0.02em' }}>
-            {prediction.direction === 'flat' ? 'If your form holds' : 'If your form continues'}
-          </span>{' '}
-          <span style={{ color: T.ink, fontWeight: 600, fontVariantNumeric: 'tabular-nums' }}>
-            {prediction.current !== null ? prediction.current.toFixed(1) : '—'}
-          </span>{' '}
-          <span style={{ color: T.inkMute }}>{'\u2192'}</span>{' '}
-          <span style={{ color: theme.accentInk, fontWeight: 700, fontVariantNumeric: 'tabular-nums' }}>
-            {prediction.projected !== null ? prediction.projected.toFixed(1) : '—'}
-          </span>
-          {prediction.delta > 0 && (
-            <span style={{ color: theme.accent, fontWeight: 700, fontVariantNumeric: 'tabular-nums', marginLeft: 8 }}>
-              {arrow} {prediction.delta.toFixed(1)}
-            </span>
-          )}
-        </p>
       </div>
 
       <div
