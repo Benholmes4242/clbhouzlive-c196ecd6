@@ -13,6 +13,21 @@ export interface FriendYesterday {
   initial: string;
   score: number;
   course_name: string;
+  // ── New fields (already returned by fetchFriendsActivity) ──
+  course_thumbnail_image: string | null;
+  stableford: number | null;
+  differential: number | null;
+  is_counter: boolean;
+  handicap_index_at_time: number | null;
+  friend_handicap_index: number | null;
+  played_at: string | null;
+  // ── New fields, not yet wired (future backend phase) ──
+  eagle_plus: number | null;
+  birdie: number | null;
+  par_count: number | null;
+  bogey: number | null;
+  double_plus: number | null;
+  hole_in_one: boolean;
 }
 
 export type FriendsYesterdayAbsenceReason =
