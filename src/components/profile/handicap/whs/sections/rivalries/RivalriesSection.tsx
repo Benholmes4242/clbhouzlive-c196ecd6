@@ -14,6 +14,11 @@ interface Props {
 
 export const RivalriesSection: React.FC<Props> = ({ userId }) => {
   const { data, isLoading } = useFriendRivalries(userId);
+  const { data: leaderboard } = useFriendLeaderboard(userId);
+  const selfRow = useMemo(
+    () => leaderboard?.find((e) => e.is_self) ?? null,
+    [leaderboard],
+  );
 
   const [infoTarget, setInfoTarget] = useState<FriendRivalryHydrated | null>(null);
   const [editTarget, setEditTarget] = useState<{ rivalry: FriendRivalryHydrated | null; slotIndex: number } | null>(null);
