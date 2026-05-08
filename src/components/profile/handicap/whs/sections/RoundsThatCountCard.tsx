@@ -90,26 +90,31 @@ export const RoundsThatCountCard: React.FC<Props> = ({ connectionId, currentHand
   }, [allScores, currentHandicap]);
 
   const enriched = useMemo(() => {
-    if (!counters || counters.length < 8) return null;
-    const sorted = [...counters].sort(
+    if (!allScores || allScores.length < 8) return null;
+    if (!counters || counters.length === 0) return null;
+    const counterIds = new Set(counters.map(c => c.id));
+    const last20 = [...allScores].slice(0, 20);
+    const sorted = [...last20].sort(
       (a, b) => new Date(a.play_date).getTime() - new Date(b.play_date).getTime(),
     );
-    const validDiffs = sorted
+    const counterDiffs = sorted
+      .filter(r => counterIds.has(r.id))
       .map(c => c.handicap_differential)
       .filter((d): d is number => d != null);
-    if (validDiffs.length === 0) return null;
-    const minDiff = Math.min(...validDiffs);
-    const maxDiff = Math.max(...validDiffs);
-    const avgDiff = validDiffs.reduce((s, d) => s + d, 0) / validDiffs.length;
+    if (counterDiffs.length === 0) return null;
+    const minDiff = Math.min(...counterDiffs);
+    const maxDiff = Math.max(...counterDiffs);
+    const avgDiff = counterDiffs.reduce((s, d) => s + d, 0) / counterDiffs.length;
     return {
       rounds: sorted.map(c => ({
         ...c,
-        is_best: c.handicap_differential === minDiff,
-        is_worst: c.handicap_differential === maxDiff,
+        is_counter: counterIds.has(c.id),
+        is_best: counterIds.has(c.id) && c.handicap_differential === minDiff,
+        is_worst: counterIds.has(c.id) && c.handicap_differential === maxDiff,
       })),
       minDiff, maxDiff, avgDiff,
     };
-  }, [counters]);
+  }, [allScores, counters]);
 
   if (loadingCounters) return <Skeleton />;
   if (!enriched || currentHandicap == null) return null;
