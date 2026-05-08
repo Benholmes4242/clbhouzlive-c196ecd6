@@ -5,7 +5,7 @@ import RivalryCard from './RivalryCard';
 import RivalryAddCard from './RivalryAddCard';
 import RivalryInfoSheet from './RivalryInfoSheet';
 import RivalryEditSheet from './RivalryEditSheet';
-import { useFriendRivalries } from '@/lib/whs/hooks';
+import { useFriendRivalries, useFriendLeaderboard } from '@/lib/whs/hooks';
 import type { FriendRivalryHydrated } from '@/lib/whs/types';
 
 interface Props {
