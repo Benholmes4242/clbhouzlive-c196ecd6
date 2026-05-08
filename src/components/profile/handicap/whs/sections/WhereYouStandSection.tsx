@@ -32,45 +32,29 @@ const BUCKET_LABEL: Record<HandicapBucket, string> = {
 };
 
 type CopyBand = {
-  display: string;
-  caption: string;
+  headline: string;
+  pillLabel: string;
+  pillTone: 'positive' | 'neutral' | 'soft';
+  subline: string;
   emphasis: 'celebrate' | 'standard' | 'soft' | 'distribution_only';
 };
 
 function getPercentileCopy(percentile_top: number): CopyBand {
+  const headline = `Top ${percentile_top}%`;
+  const subline = 'Out of all active golfers on clbhouz this season.';
   if (percentile_top <= 5) {
-    return {
-      display: `Top ${percentile_top}%`,
-      caption: `Among the very best on Clbhouz`,
-      emphasis: 'celebrate',
-    };
+    return { headline, pillLabel: 'TOP TIER', pillTone: 'positive', subline, emphasis: 'celebrate' };
   }
   if (percentile_top <= 25) {
-    return {
-      display: `Top ${percentile_top}%`,
-      caption: `In the top tier on Clbhouz`,
-      emphasis: 'standard',
-    };
+    return { headline, pillLabel: 'ABOVE MEDIAN', pillTone: 'positive', subline, emphasis: 'standard' };
   }
   if (percentile_top <= 50) {
-    return {
-      display: `Above the median`,
-      caption: `Better than half of clbhouz members`,
-      emphasis: 'soft',
-    };
+    return { headline, pillLabel: 'ABOVE MEDIAN', pillTone: 'positive', subline, emphasis: 'soft' };
   }
   if (percentile_top <= 75) {
-    return {
-      display: `Middle of the pack`,
-      caption: `See where you sit on Clbhouz`,
-      emphasis: 'distribution_only',
-    };
+    return { headline, pillLabel: 'MID-PACK', pillTone: 'neutral', subline, emphasis: 'distribution_only' };
   }
-  return {
-    display: `Where you sit`,
-    caption: `Among clbhouz members`,
-    emphasis: 'distribution_only',
-  };
+  return { headline, pillLabel: 'BUILDING', pillTone: 'soft', subline, emphasis: 'distribution_only' };
 }
 
 interface Props {
