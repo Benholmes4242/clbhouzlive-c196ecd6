@@ -952,7 +952,7 @@ const FlankRing: React.FC<FlankRingProps> = ({ metric, state, value, fraction })
           {frac > 0 && (
             <circle cx={FCX} cy={FCY} r={FR} fill="none"
               stroke={color} strokeWidth={FSTROKE}
-              strokeLinecap="round"
+              strokeLinecap="butt"
               strokeDasharray={`${frac * FC} ${FC}`}
               transform={`rotate(-90 ${FCX} ${FCY})`}
               vectorEffect="non-scaling-stroke" />
