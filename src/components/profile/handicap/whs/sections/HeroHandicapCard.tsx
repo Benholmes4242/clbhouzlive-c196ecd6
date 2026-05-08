@@ -893,6 +893,132 @@ const keyframes = `
 }
 `;
 
+// ── FlankRing (FORM / SCORING AVG) ──────────────────────────────────────
+interface FlankRingProps {
+  metric: 'form' | 'scoring';
+  state?: 'hot' | 'steady' | 'cold' | 'unknown';
+  value?: string;
+  fraction?: number;
+}
+
+const FlankRing: React.FC<FlankRingProps> = ({ metric, state, value, fraction }) => {
+  const VIEWBOX = 100;
+  const FCX = 50;
+  const FCY = 50;
+  const FR = 42;
+  const FSTROKE = 6;
+  const FC = 2 * Math.PI * FR;
+
+  let color: string;
+  let frac: number;
+  let centre: React.ReactNode;
+  let label: string;
+  let sub: string;
+
+  if (metric === 'form') {
+    if (state === 'hot') {
+      color = '#DC2626';
+      frac = 1.0;
+      centre = (
+        <div style={{ width: 'clamp(18px, 5vw, 24px)', height: 'clamp(18px, 5vw, 24px)' }}>
+          <Flame size="100%" color="#DC2626" strokeWidth={2.4} fill="#DC2626" />
+        </div>
+      );
+      label = 'FORM';
+      sub = 'Hot over last 5';
+    } else if (state === 'cold') {
+      color = '#0EA5E9';
+      frac = 0.10;
+      centre = (
+        <div style={{ width: 'clamp(18px, 5vw, 24px)', height: 'clamp(18px, 5vw, 24px)' }}>
+          <Snowflake size="100%" color="#0EA5E9" strokeWidth={2.4} />
+        </div>
+      );
+      label = 'FORM';
+      sub = 'Cold over last 5';
+    } else if (state === 'steady') {
+      color = '#475569';
+      frac = 0.50;
+      centre = (
+        <div style={{ width: 'clamp(20px, 5.4vw, 26px)', height: 'clamp(20px, 5.4vw, 26px)' }}>
+          <Minus size="100%" color="#475569" strokeWidth={3} />
+        </div>
+      );
+      label = 'FORM';
+      sub = 'Steady over last 5';
+    } else {
+      color = INK_25;
+      frac = 0;
+      centre = (
+        <span style={{ fontSize: 'clamp(16px, 4.6vw, 22px)', color: INK_40, fontWeight: 800 }}>—</span>
+      );
+      label = 'FORM';
+      sub = 'Awaiting data';
+    }
+  } else {
+    color = '#3B82F6';
+    frac = fraction ?? 0;
+    centre = (
+      <span style={{
+        fontSize: value && value.length > 4 ? 'clamp(13px, 3.8vw, 16px)' : 'clamp(14px, 4.4vw, 18px)',
+        fontWeight: 700, color: INK, lineHeight: 1,
+        letterSpacing: '-0.03em', fontVariantNumeric: 'tabular-nums',
+      }}>{value ?? '—'}</span>
+    );
+    label = 'SCORING AVG';
+    sub = 'Over last 5';
+  }
+
+  return (
+    <div style={{
+      display: 'flex', flexDirection: 'column', alignItems: 'center',
+      paddingBottom: 2, paddingTop: 14,
+    }}>
+      <div style={{
+        position: 'relative',
+        width: 'clamp(72px, 22vw, 100px)',
+        aspectRatio: '1 / 1',
+      }}>
+        <svg
+          width="100%" height="100%"
+          viewBox={`0 0 ${VIEWBOX} ${VIEWBOX}`}
+          preserveAspectRatio="xMidYMid meet"
+        >
+          <circle cx={FCX} cy={FCY} r={FR} fill="none"
+            stroke={INK_06} strokeWidth={FSTROKE}
+            vectorEffect="non-scaling-stroke" />
+          {frac > 0 && (
+            <circle cx={FCX} cy={FCY} r={FR} fill="none"
+              stroke={color} strokeWidth={FSTROKE}
+              strokeLinecap="round"
+              strokeDasharray={`${frac * FC} ${FC}`}
+              transform={`rotate(-90 ${FCX} ${FCY})`}
+              vectorEffect="non-scaling-stroke" />
+          )}
+        </svg>
+        <div style={{
+          position: 'absolute', inset: 0,
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+        }}>
+          {centre}
+        </div>
+      </div>
+      <div style={{ marginTop: 8, textAlign: 'center', maxWidth: '120%' }}>
+        <div style={{
+          fontSize: 'clamp(10px, 2.8vw, 10.5px)',
+          fontWeight: 800, color: INK,
+          letterSpacing: '0.06em', textTransform: 'uppercase',
+        }}>{label}</div>
+        <div style={{
+          fontSize: 'clamp(9px, 2.6vw, 10px)',
+          color: INK_40, marginTop: 2, fontWeight: 500,
+          whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
+        }}>{sub}</div>
+      </div>
+    </div>
+  );
+};
+
 // ── Metric rings row (CONSISTENCY / MOMENTUM / TRAJECTORY) ───────────────
 const MR_SIZE = 52;
 const MR_R = 23.5;
