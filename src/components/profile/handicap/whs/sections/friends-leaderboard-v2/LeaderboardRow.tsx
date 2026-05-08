@@ -1,5 +1,5 @@
 import React from 'react';
-import { ArrowDown, ArrowUp, Minus } from 'lucide-react';
+import { Minus } from 'lucide-react';
 import { initials } from '@/lib/whs/utils/initials';
 import { reformatFriendName, fmtRelative } from '@/lib/whs/utils/nameFormat';
 import { fmtHcp } from '@/lib/whs/format';
@@ -10,6 +10,12 @@ interface Props {
   rank: number;
   isFirst: boolean;
   isLast: boolean;
+  /** True when this friend hasn't played in the last 90 days. Always
+   *  false for the self row. */
+  isStaleRow: boolean;
+  /** Gap to your own handicap, in strokes. Negative = friend is ahead.
+   *  Only populated for the rows immediately above and below "You". */
+  gapFromYou: number | null;
   onClick?: () => void;
 }
 
@@ -18,25 +24,59 @@ const T = {
   inkMute: 'rgba(15,23,42,0.55)',
   inkSoft: 'rgba(15,23,42,0.78)',
   inkFaded: 'rgba(15,23,42,0.40)',
+  ink25: 'rgba(15,23,42,0.25)',
   hairline: 'rgba(15,23,42,0.08)',
   hairlineSoft: 'rgba(15,23,42,0.06)',
+  amber: '#F7931E',
   amberDeep: '#C97211',
+  amberInk: '#854F0B',
   amberTint: 'rgba(247,147,30,0.10)',
+  amberSoft: 'rgba(247,147,30,0.14)',
+  green: '#059669',
+  greenDeep: '#15803D',
+  red: '#9F1339',
+  redDeep: '#991B1B',
 };
 
 const fmtRel = (iso: string | null) => fmtRelative(iso, { compact: true });
 
-export const LeaderboardRow: React.FC<Props> = ({ entry, rank, isFirst, isLast, onClick }) => {
+interface TrendPillInfo {
+  sign: string;
+  value: string;
+  color: string;
+}
+
+function buildTrendPill(delta: number | null | undefined): TrendPillInfo | null {
+  if (delta == null || Math.abs(delta) < 0.05) return null;
+  if (delta < 0) {
+    return { sign: '↓', value: Math.abs(delta).toFixed(1), color: T.green };
+  }
+  return { sign: '↑', value: delta.toFixed(1), color: T.red };
+}
+
+export const LeaderboardRow: React.FC<Props> = ({
+  entry,
+  rank,
+  isFirst,
+  isLast,
+  isStaleRow,
+  gapFromYou,
+  onClick,
+}) => {
   const isYou = entry.is_self;
   const displayName = isYou ? 'You' : reformatFriendName(entry.friend_name);
   const Tag: any = onClick ? 'button' : 'div';
+
+  const hcp = entry.friend_handicap_index;
+  const isPlusHandicap = hcp != null && hcp < 0;
+  const trend = buildTrendPill(entry.handicap_30d_delta);
 
   return (
     <Tag
       type={onClick ? 'button' : undefined}
       onClick={onClick}
       role={onClick ? undefined : 'listitem'}
-      aria-label={`${displayName}, ranked ${rank}, handicap ${fmtHcp(entry.friend_handicap_index)}`}
+      aria-label={`${displayName}, ranked ${rank}, handicap ${fmtHcp(hcp)}${isStaleRow ? ', stale' : ''}`}
       style={{
         display: 'flex',
         alignItems: 'center',
@@ -49,6 +89,7 @@ export const LeaderboardRow: React.FC<Props> = ({ entry, rank, isFirst, isLast, 
         borderLeft: 'none',
         borderRight: 'none',
         background: isYou ? T.amberTint : 'transparent',
+        opacity: isStaleRow ? 0.6 : 1,
         cursor: onClick ? 'pointer' : 'default',
         font: 'inherit',
         color: 'inherit',
@@ -69,7 +110,7 @@ export const LeaderboardRow: React.FC<Props> = ({ entry, rank, isFirst, isLast, 
         {rank}
       </div>
 
-      {/* Avatar + name */}
+      {/* Avatar + name + meta */}
       <div
         style={{
           display: 'flex',
@@ -86,11 +127,11 @@ export const LeaderboardRow: React.FC<Props> = ({ entry, rank, isFirst, isLast, 
             height: 33,
             borderRadius: '34%',
             overflow: 'hidden',
-            background: isYou ? T.ink : 'rgba(15,23,42,0.06)',
+            background: 'rgba(15,23,42,0.06)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            color: isYou ? '#fff' : T.inkSoft,
+            color: T.inkSoft,
             flexShrink: 0,
             fontSize: 12,
             fontWeight: 800,
@@ -128,19 +169,34 @@ export const LeaderboardRow: React.FC<Props> = ({ entry, rank, isFirst, isLast, 
               margin: '2px 0 0',
               fontSize: 10,
               fontWeight: 600,
-              color: T.inkMute,
+              color: isStaleRow ? T.amberInk : T.inkMute,
               letterSpacing: '0.02em',
+              display: 'flex',
+              alignItems: 'center',
+              gap: 5,
             }}
           >
+            {isStaleRow && (
+              <span
+                style={{
+                  background: T.amberSoft,
+                  color: T.amberInk,
+                  padding: '1px 5px',
+                  borderRadius: 4,
+                  fontSize: 8.5,
+                  fontWeight: 800,
+                  letterSpacing: '0.06em',
+                }}
+              >
+                STALE
+              </span>
+            )}
             {fmtRel(entry.last_round_played_at)}
           </p>
         </div>
       </div>
 
-      {/* Inline sparkline (last 5 differentials).
-          TODO: widen get_friend_leaderboard to return last_5_differentials per friend.
-          Until then, render a flat placeholder line for friends; "You" will get a
-          real sparkline once wired through from the page-level whs hooks. */}
+      {/* Trend pill (30d delta) */}
       <div
         style={{
           width: 60,
@@ -151,59 +207,65 @@ export const LeaderboardRow: React.FC<Props> = ({ entry, rank, isFirst, isLast, 
           paddingRight: 6,
         }}
       >
-        {(() => {
-          // Determine stroke colour from 30d delta direction (best signal we have).
-          const d = entry.handicap_30d_delta;
-          const stroke =
-            d == null || Math.abs(d) < 0.1
-              ? T.inkMute
-              : d < 0
-                ? '#059669'
-                : '#9F1339';
-          // 5 evenly-spaced flat points (placeholder until RPC widens).
-          const points = '0,9 15,9 30,9 45,9 60,9';
-          return (
-            <svg width={60} height={18} viewBox="0 0 60 18" style={{ display: 'block' }}>
-              <polyline
-                points={points}
-                fill="none"
-                stroke={stroke}
-                strokeWidth={1.5}
-                strokeLinejoin="round"
-                strokeLinecap="round"
-                vectorEffect="non-scaling-stroke"
-              />
-              <circle cx={60} cy={9} r={2} fill={stroke} />
-            </svg>
-          );
-        })()}
+        {trend ? (
+          <span
+            style={{
+              display: 'inline-flex',
+              alignItems: 'baseline',
+              gap: 1,
+              fontSize: 11,
+              fontWeight: 800,
+              color: trend.color,
+              fontVariantNumeric: 'tabular-nums',
+              letterSpacing: '-0.01em',
+            }}
+          >
+            <span style={{ fontSize: 10 }}>{trend.sign}</span>
+            {trend.value}
+          </span>
+        ) : (
+          <Minus size={12} color={T.ink25} strokeWidth={2.4} />
+        )}
       </div>
 
-      {/* HCP with up/down arrow */}
+      {/* HCP + adjacent gap */}
       <div
         style={{
           width: 60,
           textAlign: 'right',
           flexShrink: 0,
-          fontSize: 15,
-          fontWeight: 700,
-          color: T.ink,
-          fontVariantNumeric: 'tabular-nums',
-          letterSpacing: '-0.01em',
           display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'flex-end',
-          gap: 4,
+          flexDirection: 'column',
+          alignItems: 'flex-end',
+          gap: 1,
         }}
       >
-        {entry.handicap_30d_delta != null && Math.abs(entry.handicap_30d_delta) >= 0.1 && (
-          entry.handicap_30d_delta < 0 ? (
-            <ArrowDown size={10} strokeWidth={2.6} color="#059669" />
-          ) : (
-            <ArrowUp size={10} strokeWidth={2.6} color="#9F1339" />
-          )
+        <span
+          style={{
+            fontSize: 15,
+            fontWeight: 700,
+            color: isPlusHandicap ? T.amberInk : T.ink,
+            fontVariantNumeric: 'tabular-nums',
+            letterSpacing: '-0.01em',
+          }}
+        >
+          {fmtHcp(hcp)}
+        </span>
+        {gapFromYou != null && (
+          <span
+            style={{
+              fontSize: 9.5,
+              fontWeight: 700,
+              color: gapFromYou < 0 ? T.greenDeep : T.redDeep,
+              fontVariantNumeric: 'tabular-nums',
+              letterSpacing: '-0.01em',
+            }}
+          >
+            {gapFromYou < 0
+              ? `${gapFromYou.toFixed(1)} from you`
+              : `+${gapFromYou.toFixed(1)} from you`}
+          </span>
         )}
-        {fmtHcp(entry.friend_handicap_index)}
       </div>
     </Tag>
   );
