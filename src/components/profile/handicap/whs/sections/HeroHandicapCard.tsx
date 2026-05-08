@@ -39,7 +39,7 @@ const R_INNER = 70;
 const STROKE_INNER = 5;
 const C_INNER = 2 * Math.PI * R_INNER;
 // Legacy constant kept only for the loading skeleton placeholder
-const RING_SIZE = 200;
+const RING_SIZE = 180;
 const INK_25 = 'rgba(15,23,42,0.25)';
 const INK_70 = 'rgba(15,23,42,0.70)';
 
@@ -505,7 +505,7 @@ const HeroHandicapCard: React.FC<Props> = ({ connection }) => {
 
         {/* CENTRE — Hero ring */}
         <div style={{
-          width: 'clamp(160px, 48vw, 200px)',
+          width: 'clamp(144px, 43vw, 180px)',
           aspectRatio: '1 / 1',
           position: 'relative',
           justifySelf: 'center',
@@ -595,7 +595,7 @@ const HeroHandicapCard: React.FC<Props> = ({ connection }) => {
               {statusWord}
             </span>
             <span style={{
-              fontSize: 'clamp(38px, 13vw, 56px)', fontWeight: 700, color: INK,
+              fontSize: 'clamp(34px, 11.7vw, 50px)', fontWeight: 700, color: INK,
               letterSpacing: '-0.05em', lineHeight: 1,
               fontVariantNumeric: 'tabular-nums',
             }}>
