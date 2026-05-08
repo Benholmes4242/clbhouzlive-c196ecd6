@@ -649,27 +649,6 @@ const HeroHandicapCard: React.FC<Props> = ({ connection }) => {
         </span>
       </div>
 
-      {/* Trophies entry-point — opens the AllTrophiesSheet via global event. */}
-      <div style={{ display: 'flex', justifyContent: 'center', marginTop: 4 }}>
-        <button
-          type="button"
-          onClick={() => openTrophiesSheet()}
-          style={{
-            background: 'none',
-            border: 'none',
-            padding: '4px 6px',
-            fontSize: 11.5,
-            fontWeight: 700,
-            color: AMBER,
-            cursor: 'pointer',
-            fontFamily: 'inherit',
-            letterSpacing: '0.02em',
-          }}
-        >
-          View all trophies →
-        </button>
-      </div>
-
       {/* Sparkline strip */}
       <div style={{ padding: '0 4px', marginTop: 24 }}>
         <svg
