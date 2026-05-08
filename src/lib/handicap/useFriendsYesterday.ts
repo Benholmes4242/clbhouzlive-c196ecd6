@@ -13,6 +13,21 @@ export interface FriendYesterday {
   initial: string;
   score: number;
   course_name: string;
+  // ── New fields (already returned by fetchFriendsActivity) ──
+  course_thumbnail_image: string | null;
+  stableford: number | null;
+  differential: number | null;
+  is_counter: boolean;
+  handicap_index_at_time: number | null;
+  friend_handicap_index: number | null;
+  played_at: string | null;
+  // ── New fields, not yet wired (future backend phase) ──
+  eagle_plus: number | null;
+  birdie: number | null;
+  par_count: number | null;
+  bogey: number | null;
+  double_plus: number | null;
+  hole_in_one: boolean;
 }
 
 export type FriendsYesterdayAbsenceReason =
@@ -129,6 +144,19 @@ export function useFriendsYesterday(ownerUserId: string) {
         initial: ((f.friend_name?.charAt(0) ?? '?').toUpperCase()),
         score: f.last_round_adjusted_gross ?? 0,
         course_name: f.last_round_course_name ?? '',
+        course_thumbnail_image: f.course_thumbnail_image ?? null,
+        stableford: f.last_round_stableford ?? null,
+        differential: f.last_round_differential ?? null,
+        is_counter: f.is_counter ?? false,
+        handicap_index_at_time: f.handicap_index_at_time ?? null,
+        friend_handicap_index: f.friend_handicap_index ?? null,
+        played_at: f.last_round_played_at ?? null,
+        eagle_plus: null,
+        birdie: null,
+        par_count: null,
+        bogey: null,
+        double_plus: null,
+        hole_in_one: false,
       }));
 
       return {
