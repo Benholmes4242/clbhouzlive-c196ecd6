@@ -131,20 +131,20 @@ export const LastRoundCard: React.FC<Props> = ({ connectionId }) => {
   };
 
   const heroNum: React.CSSProperties = {
-    fontSize: 30,
+    fontSize: 26,
     fontWeight: 700,
     color: INK,
     letterSpacing: '-0.02em',
     fontVariantNumeric: 'tabular-nums',
     lineHeight: 1,
-    marginTop: 4,
+    marginTop: 3,
   };
 
   const heroSub: React.CSSProperties = {
-    fontSize: 11,
+    fontSize: 10.5,
     color: INK_55,
-    marginTop: 4,
-    minHeight: 14,
+    marginTop: 3,
+    minHeight: 13,
   };
 
   return (
