@@ -144,6 +144,19 @@ export function useFriendsYesterday(ownerUserId: string) {
         initial: ((f.friend_name?.charAt(0) ?? '?').toUpperCase()),
         score: f.last_round_adjusted_gross ?? 0,
         course_name: f.last_round_course_name ?? '',
+        course_thumbnail_image: f.course_thumbnail_image ?? null,
+        stableford: f.last_round_stableford ?? null,
+        differential: f.last_round_differential ?? null,
+        is_counter: f.is_counter ?? false,
+        handicap_index_at_time: f.handicap_index_at_time ?? null,
+        friend_handicap_index: f.friend_handicap_index ?? null,
+        played_at: f.last_round_played_at ?? null,
+        eagle_plus: null,
+        birdie: null,
+        par_count: null,
+        bogey: null,
+        double_plus: null,
+        hole_in_one: false,
       }));
 
       return {
