@@ -421,7 +421,7 @@ export const CourseFormCard: React.FC<Props> = ({ connectionId, currentHandicap 
     <div style={CARD_STYLE}>
       <CardHeader sublabel={view.sublabel} />
       <ViewToggle activeView={activeView} onChange={setActiveView} />
-      <CourseRows courses={courses} />
+      <PodiumCards courses={courses} />
       {courses.length > 0 && (() => {
         const top = courses[0];
         const sign = top.delta < 0 ? 'under' : 'over';
