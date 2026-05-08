@@ -32,45 +32,29 @@ const BUCKET_LABEL: Record<HandicapBucket, string> = {
 };
 
 type CopyBand = {
-  display: string;
-  caption: string;
+  headline: string;
+  pillLabel: string;
+  pillTone: 'positive' | 'neutral' | 'soft';
+  subline: string;
   emphasis: 'celebrate' | 'standard' | 'soft' | 'distribution_only';
 };
 
 function getPercentileCopy(percentile_top: number): CopyBand {
+  const headline = `Top ${percentile_top}%`;
+  const subline = 'Out of all active golfers on clbhouz this season.';
   if (percentile_top <= 5) {
-    return {
-      display: `Top ${percentile_top}%`,
-      caption: `Among the very best on Clbhouz`,
-      emphasis: 'celebrate',
-    };
+    return { headline, pillLabel: 'TOP TIER', pillTone: 'positive', subline, emphasis: 'celebrate' };
   }
   if (percentile_top <= 25) {
-    return {
-      display: `Top ${percentile_top}%`,
-      caption: `In the top tier on Clbhouz`,
-      emphasis: 'standard',
-    };
+    return { headline, pillLabel: 'ABOVE MEDIAN', pillTone: 'positive', subline, emphasis: 'standard' };
   }
   if (percentile_top <= 50) {
-    return {
-      display: `Above the median`,
-      caption: `Better than half of clbhouz members`,
-      emphasis: 'soft',
-    };
+    return { headline, pillLabel: 'ABOVE MEDIAN', pillTone: 'positive', subline, emphasis: 'soft' };
   }
   if (percentile_top <= 75) {
-    return {
-      display: `Middle of the pack`,
-      caption: `See where you sit on Clbhouz`,
-      emphasis: 'distribution_only',
-    };
+    return { headline, pillLabel: 'MID-PACK', pillTone: 'neutral', subline, emphasis: 'distribution_only' };
   }
-  return {
-    display: `Where you sit`,
-    caption: `Among clbhouz members`,
-    emphasis: 'distribution_only',
-  };
+  return { headline, pillLabel: 'BUILDING', pillTone: 'soft', subline, emphasis: 'distribution_only' };
 }
 
 interface Props {
@@ -112,7 +96,22 @@ const DistributionChart: React.FC<{
   const handicapStr = userHandicap.toFixed(1).replace('-', '\u2212');
 
   return (
-    <div style={{ marginTop: 18 }}>
+    <div style={{ marginTop: 18, position: 'relative' }}>
+      {/* Scratch-zone tint background — covers buckets 0 (<0) and 1 (0-4) */}
+      <div
+        aria-hidden
+        style={{
+          position: 'absolute',
+          top: 22,
+          bottom: 28,
+          left: 0,
+          width: `calc(${(2 / 7) * 100}% - 6px)`,
+          background: 'rgba(34,197,94,0.10)',
+          borderRadius: 6,
+          pointerEvents: 'none',
+          zIndex: 0,
+        }}
+      />
       <div
         style={{
           display: 'flex',
@@ -120,69 +119,84 @@ const DistributionChart: React.FC<{
           gap: 6,
           height: 110,
           paddingTop: 22,
+          position: 'relative',
+          zIndex: 1,
         }}
       >
-        {orderedBuckets.map((b) => {
-          const isUser = b.is_user_bucket;
-          const heightPct = (b.pct / (maxPct * 1.1)) * 100;
-          const isEmpty = b.pct === 0;
-          const barBg = isUser
-            ? `linear-gradient(180deg, ${AMBER}, rgba(247,147,30,0.55))`
-            : `linear-gradient(180deg, rgba(15,23,42,0.10), rgba(15,23,42,0.04))`;
-          return (
-            <div
-              key={b.bucket}
-              style={{
-                flex: 1,
-                display: 'flex',
-                flexDirection: 'column',
-                justifyContent: 'flex-end',
-                alignItems: 'center',
-                position: 'relative',
-                height: '100%',
-              }}
-            >
-              {isUser && (
-                <div
-                  style={{
-                    position: 'absolute',
-                    top: -22,
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'center',
-                  }}
-                >
+        {(() => {
+          let cum = 0;
+          let medianBucketIdx = -1;
+          for (let i = 0; i < orderedBuckets.length; i++) {
+            cum += orderedBuckets[i].pct;
+            if (cum >= 50 && medianBucketIdx === -1) {
+              medianBucketIdx = i;
+            }
+          }
+          return orderedBuckets.map((b, i) => {
+            const isUser = b.is_user_bucket;
+            const isMedian = i === medianBucketIdx && !isUser;
+            const heightPct = (b.pct / (maxPct * 1.1)) * 100;
+            const isEmpty = b.pct === 0;
+            const barBg = isUser
+              ? `linear-gradient(180deg, ${AMBER}, rgba(247,147,30,0.55))`
+              : isMedian
+                ? `linear-gradient(180deg, rgba(15,23,42,0.25), rgba(15,23,42,0.10))`
+                : `linear-gradient(180deg, rgba(15,23,42,0.10), rgba(15,23,42,0.04))`;
+            return (
+              <div
+                key={b.bucket}
+                style={{
+                  flex: 1,
+                  display: 'flex',
+                  flexDirection: 'column',
+                  justifyContent: 'flex-end',
+                  alignItems: 'center',
+                  position: 'relative',
+                  height: '100%',
+                }}
+              >
+                {isUser && (
                   <div
                     style={{
-                      fontFamily: FONT_GEIST,
-                      fontSize: 10.5,
-                      fontWeight: 700,
-                      color: INK,
-                      background: AMBER_14,
-                      padding: '2px 6px',
-                      borderRadius: 6,
-                      whiteSpace: 'nowrap',
-                      fontVariantNumeric: 'tabular-nums',
+                      position: 'absolute',
+                      top: -22,
+                      display: 'flex',
+                      flexDirection: 'column',
+                      alignItems: 'center',
                     }}
                   >
-                    You · {handicapStr}
+                    <div
+                      style={{
+                        fontFamily: FONT_GEIST,
+                        fontSize: 10.5,
+                        fontWeight: 700,
+                        color: INK,
+                        background: AMBER_14,
+                        padding: '2px 6px',
+                        borderRadius: 6,
+                        whiteSpace: 'nowrap',
+                        fontVariantNumeric: 'tabular-nums',
+                      }}
+                    >
+                      You · {handicapStr}
+                    </div>
+                    <div style={{ width: 2, height: 6, background: AMBER }} />
                   </div>
-                  <div style={{ width: 2, height: 6, background: AMBER }} />
-                </div>
-              )}
-              <div
-                style={{
-                  width: '100%',
-                  height: isEmpty ? '3%' : `${Math.max(heightPct, 3)}%`,
-                  background: barBg,
-                  opacity: isEmpty && !isUser ? 0.5 : 1,
-                  borderRadius: '6px 6px 0 0',
-                  boxShadow: isUser ? '0 0 16px rgba(247,147,30,0.30)' : 'none',
-                }}
-              />
-            </div>
-          );
-        })}
+                )}
+                <div
+                  style={{
+                    width: '100%',
+                    height: isEmpty ? '3%' : `${Math.max(heightPct, 3)}%`,
+                    background: barBg,
+                    opacity: isEmpty && !isUser ? 0.5 : 1,
+                    borderRadius: '6px 6px 0 0',
+                    boxShadow: isUser ? '0 0 16px rgba(247,147,30,0.30)' : 'none',
+                  }}
+                />
+              </div>
+            );
+          });
+        })()}
       </div>
       <div style={{ display: 'flex', gap: 6, marginTop: 6 }}>
         {orderedBuckets.map((b) => (
@@ -210,34 +224,69 @@ const AvailableCard: React.FC<{
   data: Extract<HandicapPercentileResult, { available: true }>;
 }> = ({ data }) => {
   const copy = getPercentileCopy(data.percentile_top);
-  const showBigPct = copy.emphasis === 'celebrate' || copy.emphasis === 'standard';
 
   return (
     <>
-      <h3
+      {/* Hero: number + tone pill on one row */}
+      <div
         style={{
-          fontFamily: FONT_GEIST,
-          fontSize: 22,
-          fontWeight: 700,
-          color: INK,
           padding: '0 20px',
-          margin: 0,
-          letterSpacing: '-0.01em',
+          display: 'flex',
+          alignItems: 'baseline',
+          flexWrap: 'wrap',
+          gap: 12,
         }}
       >
-        {copy.display}
-      </h3>
+        <h3
+          style={{
+            fontFamily: FONT_GEIST,
+            margin: 0,
+            fontSize: 44,
+            fontWeight: 800,
+            color: INK,
+            letterSpacing: '-0.04em',
+            lineHeight: 1,
+            fontVariantNumeric: 'tabular-nums',
+          }}
+        >
+          {copy.headline}
+        </h3>
+        <span
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: 5,
+            padding: '5px 11px',
+            borderRadius: 999,
+            background:
+              copy.pillTone === 'positive' ? 'rgba(34,197,94,0.12)'
+              : copy.pillTone === 'neutral' ? AMBER_14
+              : 'rgba(15,23,42,0.06)',
+            color:
+              copy.pillTone === 'positive' ? '#15803D'
+              : copy.pillTone === 'neutral' ? '#854F0B'
+              : INK_70,
+            fontSize: 11.5,
+            fontWeight: 800,
+            letterSpacing: '0.04em',
+            fontFamily: FONT_GEIST,
+          }}
+        >
+          {copy.pillLabel}
+        </span>
+      </div>
+
       <p
         style={{
           fontFamily: FONT_GEIST,
           fontSize: 13,
           color: INK_55,
-          padding: '4px 20px 0',
+          padding: '6px 20px 0',
           margin: 0,
-          lineHeight: 1.4,
+          lineHeight: 1.5,
         }}
       >
-        {copy.caption}
+        {copy.subline}
       </p>
 
       <div
@@ -249,61 +298,6 @@ const AvailableCard: React.FC<{
           padding: 14,
         }}
       >
-        {showBigPct && (
-          <>
-            <div
-              style={{
-                fontFamily: FONT_GEIST,
-                fontSize: 10.5,
-                fontWeight: 700,
-                letterSpacing: '0.14em',
-                color: INK_55,
-                textTransform: 'uppercase',
-              }}
-            >
-              YOU RANK
-            </div>
-            <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, marginTop: 4 }}>
-              <span
-                style={{
-                  fontFamily: FONT_GEIST,
-                  fontSize: 40,
-                  fontWeight: 800,
-                  color: AMBER,
-                  letterSpacing: '-0.02em',
-                  fontVariantNumeric: 'tabular-nums',
-                }}
-              >
-                {data.percentile_top}%
-              </span>
-              <span
-                style={{
-                  fontFamily: FONT_GEIST,
-                  fontSize: 13,
-                  color: INK_70,
-                }}
-              >
-                of clbhouz members
-              </span>
-            </div>
-          </>
-        )}
-
-        {copy.emphasis === 'soft' && (
-          <p
-            style={{
-              fontFamily: FONT_GEIST,
-              fontSize: 14,
-              fontWeight: 600,
-              color: INK,
-              margin: 0,
-              lineHeight: 1.4,
-            }}
-          >
-            You're better than {100 - data.percentile_top}% of clbhouz members.
-          </p>
-        )}
-
         <DistributionChart
           buckets={data.buckets}
           userBucket={data.user_bucket}
@@ -318,32 +312,37 @@ const AvailableCard: React.FC<{
             marginTop: 14,
             paddingTop: 12,
             borderTop: `0.5px solid ${INK_06}`,
+            fontFamily: FONT_GEIST,
+            fontSize: 10.5,
+            fontWeight: 600,
+            color: INK_55,
           }}
         >
-          <span
-            style={{
-              fontFamily: FONT_GEIST,
-              fontSize: 12,
-              fontWeight: 600,
-              color: INK_70,
-            }}
-          >
-            All clbhouz members
+          <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5 }}>
+            <span
+              style={{
+                width: 8,
+                height: 8,
+                borderRadius: 2,
+                background: 'rgba(34,197,94,0.12)',
+                border: `1px solid #22C55E`,
+              }}
+            />
+            <span>Scratch territory</span>
           </span>
-          <span
-            style={{
-              fontFamily: FONT_GEIST,
-              fontSize: 12,
-              fontWeight: 700,
-              color: INK,
-              fontVariantNumeric: 'tabular-nums',
-            }}
-          >
-            {showBigPct ? `Top ${data.percentile_top}%` : copy.display}
+          <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5 }}>
+            <span
+              style={{
+                width: 10,
+                height: 3,
+                background: 'rgba(15,23,42,0.25)',
+                borderRadius: 1,
+              }}
+            />
+            <span>Median bucket</span>
           </span>
         </div>
       </div>
-
     </>
   );
 };
