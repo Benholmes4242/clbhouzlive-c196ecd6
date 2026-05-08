@@ -19,7 +19,7 @@ const T = {
   amberTint: 'rgba(247,147,30,0.10)',
   amberInk: '#854F0B',
   greenInk: '#065F46',
-  redInk: '#7F1D1D',
+  redInk: '#991B1B',
   slateTint: 'rgba(15,23,42,0.04)',
 };
 const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
