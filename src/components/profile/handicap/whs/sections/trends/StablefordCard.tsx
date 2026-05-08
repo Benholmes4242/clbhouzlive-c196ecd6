@@ -1,7 +1,10 @@
-import React, { useState } from 'react';
-import { Target, Info } from 'lucide-react';
+import React, { useState, useMemo } from 'react';
+import { Target, Info, ArrowUp, ArrowDown } from 'lucide-react';
 import type { WhsScore } from '@/lib/whs/types';
-import { computeStablefordDistribution, type StablefordDistribution } from './computeStablefordDistribution';
+import {
+  computeStablefordDistribution,
+  type StablefordScope,
+} from './computeStablefordDistribution';
 import StablefordDetailSheet from './StablefordDetailSheet';
 
 interface Props {
@@ -10,9 +13,12 @@ interface Props {
 
 const T = {
   ink: '#0F172A',
+  ink70: '#475569',
   inkMute: 'rgba(15,23,42,0.55)',
   inkSoft: 'rgba(15,23,42,0.78)',
+  ink40: 'rgba(15,23,42,0.40)',
   hairline: 'rgba(15,23,42,0.08)',
+  ink04: 'rgba(15,23,42,0.04)',
   cardBg: '#FFFFFF',
   amber: '#F7931E',
   amberDeep: '#C97211',
@@ -20,8 +26,10 @@ const T = {
   amberInk: '#854F0B',
   green: '#22C55E',
   greenInk: '#15803D',
+  greenSoft: 'rgba(34,197,94,0.12)',
   red: '#DC2626',
   redInk: '#991B1B',
+  redSoft: 'rgba(220,38,38,0.10)',
   ringTrack: 'rgba(15,23,42,0.06)',
   neutralTint: 'rgba(15,23,42,0.04)',
 };
@@ -36,20 +44,38 @@ const CARD_STYLE: React.CSSProperties = {
   fontFamily: FONT,
 };
 
+const SCOPE_BTN_LABEL: Record<StablefordScope, string> = {
+  '30d': '30D',
+  '90d': '90D',
+  all: 'ALL',
+};
+
+const SCOPE_LABEL_LONG: Record<StablefordScope, string> = {
+  '30d': 'LAST 30 DAYS',
+  '90d': 'LAST 90 DAYS',
+  all: 'ALL TIME',
+};
+
 export const StablefordCard: React.FC<Props> = ({ scores }) => {
   const [sheetOpen, setSheetOpen] = useState(false);
-  const dist = computeStablefordDistribution(scores);
+  const [scope, setScope] = useState<StablefordScope>('90d');
+
+  const dist = useMemo(
+    () => computeStablefordDistribution(scores, scope),
+    [scores, scope],
+  );
 
   if (dist.insufficientData) {
     return (
       <div style={CARD_STYLE}>
-        <CardHeader onOpenSheet={() => setSheetOpen(true)} />
+        <CardHeader scope={scope} setScope={setScope} onOpenSheet={() => setSheetOpen(true)} />
         <div style={{ padding: '24px 16px 28px', textAlign: 'center' }}>
           <p style={{ margin: 0, fontSize: 14, fontWeight: 700, color: T.ink, fontFamily: FONT }}>
             Add a few more rounds
           </p>
           <p style={{ margin: '6px 0 0', fontSize: 12, color: T.inkMute, lineHeight: 1.5, fontFamily: FONT }}>
-            We need at least 3 rounds with Stableford to show your distribution. You have {dist.total} so far.
+            We need at least 3 rounds with Stableford
+            {scope !== 'all' ? ` in ${SCOPE_LABEL_LONG[scope].toLowerCase()}` : ''} to show your distribution. You have {dist.total} so far.
           </p>
         </div>
         <StablefordDetailSheet open={sheetOpen} onClose={() => setSheetOpen(false)} dist={dist} />
@@ -57,43 +83,139 @@ export const StablefordCard: React.FC<Props> = ({ scores }) => {
     );
   }
 
+  const avg = dist.avg ?? 0;
+  const delta = dist.deltaVsPrev;
+  const showDelta = delta !== null && Math.abs(delta) >= 0.05;
+
+  const segs = [
+    { count: dist.inZoneCount, color: T.green },
+    { count: dist.solidCount, color: T.amber },
+    { count: dist.offDayCount, color: T.red },
+  ].filter((s) => s.count > 0);
+
   return (
     <div style={CARD_STYLE}>
-      <CardHeader onOpenSheet={() => setSheetOpen(true)} />
+      <CardHeader scope={scope} setScope={setScope} onOpenSheet={() => setSheetOpen(true)} />
 
-      <div style={{ display: 'flex', justifyContent: 'center', padding: '20px 16px 4px' }}>
-        <TriRing dist={dist} size={200} stroke={14} />
+      {/* Hero: AVG number + delta pill */}
+      <div style={{ padding: '16px 16px 12px' }}>
+        <p
+          style={{
+            margin: 0,
+            fontSize: 10,
+            fontWeight: 800,
+            letterSpacing: '0.12em',
+            color: T.inkMute,
+            fontFamily: FONT,
+          }}
+        >
+          AVG · {SCOPE_LABEL_LONG[scope]} · {dist.total} ROUNDS
+        </p>
+        <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, marginTop: 4, flexWrap: 'wrap' }}>
+          <span
+            style={{
+              fontSize: 56,
+              fontWeight: 200,
+              color: T.ink,
+              letterSpacing: '-0.04em',
+              lineHeight: 1,
+              fontFamily: FONT,
+              fontVariantNumeric: 'tabular-nums',
+            }}
+          >
+            {avg.toFixed(1)}
+          </span>
+          <span style={{ fontSize: 12, color: T.inkMute, fontFamily: FONT }}>pts avg</span>
+          {showDelta && delta !== null && (
+            <span
+              style={{
+                marginLeft: 'auto',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 3,
+                padding: '3px 8px',
+                borderRadius: 999,
+                background: delta > 0 ? T.greenSoft : T.redSoft,
+                color: delta > 0 ? T.greenInk : T.redInk,
+                fontSize: 11,
+                fontWeight: 800,
+                letterSpacing: '0.02em',
+                fontVariantNumeric: 'tabular-nums',
+                fontFamily: FONT,
+              }}
+            >
+              {delta > 0 ? <ArrowUp size={11} strokeWidth={2.6} /> : <ArrowDown size={11} strokeWidth={2.6} />}
+              {Math.abs(delta).toFixed(1)} vs prev
+            </span>
+          )}
+        </div>
       </div>
 
-      <div style={{ display: 'flex', alignItems: 'stretch', padding: '0 4px 8px' }}>
-        <StatColumn
-          color={T.green}
-          ink={T.greenInk}
-          label="IN THE ZONE"
-          count={dist.inZoneCount}
-          pctText={`${dist.inZonePct}% of rounds`}
-          range="36+ pts"
-        />
-        <StatDivider />
-        <StatColumn
-          color={T.amber}
-          ink={T.amberInk}
-          label="SOLID ROUND"
-          count={dist.solidCount}
-          pctText={`${dist.solidPct}% of rounds`}
-          range="33-35 pts"
-        />
-        <StatDivider />
-        <StatColumn
-          color={T.red}
-          ink={T.redInk}
-          label="OFF DAY"
-          count={dist.offDayCount}
-          pctText={`${dist.offDayPct}% of rounds`}
-          range="< 33 pts"
-        />
+      {/* Horizontal segmented bar */}
+      <div style={{ padding: '0 16px 10px' }}>
+        <div
+          style={{
+            display: 'flex',
+            height: 36,
+            borderRadius: 8,
+            overflow: 'hidden',
+            background: T.ink04,
+          }}
+          role="img"
+          aria-label={`Distribution: ${dist.inZoneCount} in zone, ${dist.solidCount} solid, ${dist.offDayCount} off`}
+        >
+          {segs.map((s, i) => (
+            <div
+              key={i}
+              style={{
+                flex: s.count,
+                background: s.color,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: '#fff',
+                fontSize: 12,
+                fontWeight: 800,
+                fontFamily: FONT,
+                fontVariantNumeric: 'tabular-nums',
+              }}
+            >
+              {s.count > dist.total * 0.1 ? `${s.count}` : ''}
+            </div>
+          ))}
+        </div>
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            marginTop: 6,
+            fontSize: 10,
+            color: T.ink40,
+            fontFamily: FONT,
+            letterSpacing: '0.04em',
+          }}
+        >
+          <span>36+ · zone</span>
+          <span>33–35 · solid</span>
+          <span>&lt;33 · off</span>
+        </div>
       </div>
 
+      {/* 3-cell summary row */}
+      <div
+        style={{
+          display: 'grid',
+          gridTemplateColumns: '1fr 1fr 1fr',
+          gap: 8,
+          padding: '4px 16px 14px',
+        }}
+      >
+        <SummaryCell color={T.green} label="IN THE ZONE" count={dist.inZoneCount} pct={dist.inZonePct} range="36+" />
+        <SummaryCell color={T.amber} label="SOLID" count={dist.solidCount} pct={dist.solidPct} range="33–35" />
+        <SummaryCell color={T.red} label="OFF DAY" count={dist.offDayCount} pct={dist.offDayPct} range="<33" />
+      </div>
+
+      {/* Narrative footer (preserved) */}
       {(() => {
         const total = dist.inZoneCount + dist.solidCount + dist.offDayCount;
         if (total < 5) return null;
@@ -119,7 +241,7 @@ export const StablefordCard: React.FC<Props> = ({ scores }) => {
         return (
           <div
             style={{
-              margin: '4px 16px 16px',
+              margin: '0 16px 16px',
               padding: '10px 12px',
               background: T.neutralTint,
               borderRadius: 10,
@@ -138,41 +260,74 @@ export const StablefordCard: React.FC<Props> = ({ scores }) => {
 };
 
 interface CardHeaderProps {
+  scope: StablefordScope;
+  setScope: (s: StablefordScope) => void;
   onOpenSheet: () => void;
 }
 
-const CardHeader: React.FC<CardHeaderProps> = ({ onOpenSheet }) => (
+const CardHeader: React.FC<CardHeaderProps> = ({ scope, setScope, onOpenSheet }) => (
   <div
     style={{
       display: 'flex',
       alignItems: 'center',
-      justifyContent: 'space-between',
-      padding: '14px 16px',
+      gap: 10,
+      padding: '12px 14px',
       borderBottom: `1px solid ${T.hairline}`,
     }}
   >
-    <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-      <div
-        style={{
-          width: 30,
-          height: 30,
-          borderRadius: 9,
-          background: T.amberTint,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-        }}
-      >
-        <Target size={15} color={T.amberDeep} strokeWidth={2.2} />
-      </div>
-      <div>
-        <p style={{ margin: 0, fontSize: 13, fontWeight: 700, color: T.ink, letterSpacing: '-0.01em', fontFamily: FONT }}>
-          Stableford Points
-        </p>
-        <p style={{ margin: 0, fontSize: 10, color: T.inkMute, marginTop: 1, fontFamily: FONT }}>
-          How you&apos;re scoring on points over your last 20 rounds
-        </p>
-      </div>
+    <div
+      style={{
+        width: 30,
+        height: 30,
+        borderRadius: 9,
+        background: T.amberTint,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        flexShrink: 0,
+      }}
+    >
+      <Target size={15} color={T.amberDeep} strokeWidth={2.2} />
+    </div>
+    <div style={{ flex: 1, minWidth: 0 }}>
+      <p style={{ margin: 0, fontSize: 13, fontWeight: 700, color: T.ink, letterSpacing: '-0.01em', fontFamily: FONT }}>
+        Stableford Points
+      </p>
+      <p style={{ margin: 0, fontSize: 10, color: T.inkMute, marginTop: 1, fontFamily: FONT }}>
+        How you&apos;re scoring on points
+      </p>
+    </div>
+    {/* Toggle */}
+    <div
+      style={{
+        display: 'inline-flex',
+        background: T.ink04,
+        borderRadius: 99,
+        padding: 2,
+        gap: 2,
+      }}
+    >
+      {(['30d', '90d', 'all'] as StablefordScope[]).map((s) => (
+        <button
+          key={s}
+          onClick={() => setScope(s)}
+          aria-pressed={scope === s}
+          style={{
+            padding: '4px 9px',
+            borderRadius: 99,
+            background: scope === s ? T.ink : 'transparent',
+            color: scope === s ? '#fff' : T.ink70,
+            border: 'none',
+            cursor: 'pointer',
+            fontFamily: FONT,
+            fontSize: 10,
+            fontWeight: 800,
+            letterSpacing: '0.06em',
+          }}
+        >
+          {SCOPE_BTN_LABEL[s]}
+        </button>
+      ))}
     </div>
     <button
       onClick={onOpenSheet}
@@ -189,6 +344,7 @@ const CardHeader: React.FC<CardHeaderProps> = ({ onOpenSheet }) => (
         alignItems: 'center',
         justifyContent: 'center',
         padding: 0,
+        flexShrink: 0,
       }}
     >
       <Info size={13} strokeWidth={2.2} />
@@ -196,131 +352,31 @@ const CardHeader: React.FC<CardHeaderProps> = ({ onOpenSheet }) => (
   </div>
 );
 
-interface TriRingProps {
-  dist: StablefordDistribution;
-  size: number;
-  stroke: number;
-}
-
-const TriRing: React.FC<TriRingProps> = ({ dist, size, stroke }) => {
-  const r = (size - stroke) / 2;
-  const cx = size / 2;
-  const cy = size / 2;
-  const circumference = 2 * Math.PI * r;
-
-  const inZoneLen = (dist.inZoneCount / dist.total) * circumference;
-  const solidLen = (dist.solidCount / dist.total) * circumference;
-  const offDayLen = (dist.offDayCount / dist.total) * circumference;
-
-  let cursor = 0;
-  const segments: { color: string; length: number; offset: number }[] = [];
-  if (dist.inZoneCount > 0) {
-    segments.push({ color: T.green, length: inZoneLen, offset: cursor });
-    cursor += inZoneLen;
-  }
-  if (dist.solidCount > 0) {
-    segments.push({ color: T.amber, length: solidLen, offset: cursor });
-    cursor += solidLen;
-  }
-  if (dist.offDayCount > 0) {
-    segments.push({ color: T.red, length: offDayLen, offset: cursor });
-    cursor += offDayLen;
-  }
-
-  return (
-    <svg
-      width={size}
-      height={size}
-      viewBox={`0 0 ${size} ${size}`}
-      role="img"
-      aria-label={`Stableford distribution ring: ${dist.inZoneCount} in the zone, ${dist.solidCount} solid, ${dist.offDayCount} off days`}
-    >
-      <circle cx={cx} cy={cy} r={r} fill="none" stroke={T.ringTrack} strokeWidth={stroke} />
-      {segments.map((seg, i) => (
-        <circle
-          key={i}
-          cx={cx}
-          cy={cy}
-          r={r}
-          fill="none"
-          stroke={seg.color}
-          strokeWidth={stroke}
-          strokeLinecap="butt"
-          strokeDasharray={`${seg.length} ${circumference - seg.length}`}
-          strokeDashoffset={-seg.offset}
-          transform={`rotate(-90 ${cx} ${cy})`}
-        />
-      ))}
-      <text
-        x={cx}
-        y={cy - 18}
-        textAnchor="middle"
-        style={{ fontSize: 11, fontWeight: 700, fill: T.inkMute, letterSpacing: '0.14em', fontFamily: FONT }}
-      >
-        AVG
-      </text>
-      <text
-        x={cx}
-        y={cy + 20}
-        textAnchor="middle"
-        style={{
-          fontSize: 36,
-          fontWeight: 300,
-          fill: T.ink,
-          letterSpacing: '-0.04em',
-          fontFamily: FONT,
-          fontVariantNumeric: 'tabular-nums',
-        }}
-      >
-        {dist.avg !== null ? dist.avg.toFixed(1) : '—'}
-      </text>
-      <text
-        x={cx}
-        y={cy + 44}
-        textAnchor="middle"
-        style={{ fontSize: 12, fontWeight: 500, fill: T.inkMute, letterSpacing: '0.04em', fontFamily: FONT }}
-      >
-        pts
-      </text>
-    </svg>
-  );
-};
-
-interface StatColumnProps {
+interface SummaryCellProps {
   color: string;
-  ink: string;
   label: string;
   count: number;
-  pctText: string;
+  pct: number;
   range: string;
 }
 
-const StatColumn: React.FC<StatColumnProps> = ({ color, ink, label, count, pctText, range }) => (
+const SummaryCell: React.FC<SummaryCellProps> = ({ color, label, count, pct, range }) => (
   <div
     style={{
-      flex: 1,
-      textAlign: 'center',
-      padding: '14px 12px 14px 18px',
+      borderRadius: 10,
+      background: T.ink04,
+      padding: '10px 10px 10px',
       position: 'relative',
+      overflow: 'hidden',
     }}
   >
-    <span
-      style={{
-        position: 'absolute',
-        left: 6,
-        top: 12,
-        bottom: 12,
-        width: 4,
-        borderRadius: 2,
-        background: color,
-      }}
-    />
+    <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 3, background: color }} />
     <p
       style={{
-        margin: '0 0 6px',
-        fontSize: 9.5,
+        margin: '4px 0 6px',
+        fontSize: 9,
         fontWeight: 800,
-        letterSpacing: '0.12em',
+        letterSpacing: '0.10em',
         textTransform: 'uppercase',
         color: T.inkMute,
         fontFamily: FONT,
@@ -343,23 +399,18 @@ const StatColumn: React.FC<StatColumnProps> = ({ color, ink, label, count, pctTe
     >
       {count}
     </p>
-    <p style={{ margin: '6px 0 0', fontSize: 10, color: T.inkMute, fontFamily: FONT }}>{pctText}</p>
-    <p style={{ margin: '2px 0 0', fontSize: 10, color: T.inkMute, fontFamily: FONT, fontVariantNumeric: 'tabular-nums' }}>
-      {range}
+    <p
+      style={{
+        margin: '4px 0 0',
+        fontSize: 10,
+        color: T.inkMute,
+        fontFamily: FONT,
+        fontVariantNumeric: 'tabular-nums',
+      }}
+    >
+      {pct}% · {range}
     </p>
   </div>
-);
-
-const StatDivider: React.FC = () => (
-  <div
-    style={{
-      width: 1,
-      background: T.hairline,
-      alignSelf: 'stretch',
-      marginTop: 12,
-      marginBottom: 12,
-    }}
-  />
 );
 
 export default StablefordCard;
