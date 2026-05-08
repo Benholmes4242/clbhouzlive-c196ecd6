@@ -96,7 +96,22 @@ const DistributionChart: React.FC<{
   const handicapStr = userHandicap.toFixed(1).replace('-', '\u2212');
 
   return (
-    <div style={{ marginTop: 18 }}>
+    <div style={{ marginTop: 18, position: 'relative' }}>
+      {/* Scratch-zone tint background — covers buckets 0 (<0) and 1 (0-4) */}
+      <div
+        aria-hidden
+        style={{
+          position: 'absolute',
+          top: 22,
+          bottom: 28,
+          left: 0,
+          width: `calc(${(2 / 7) * 100}% - 6px)`,
+          background: 'rgba(34,197,94,0.10)',
+          borderRadius: 6,
+          pointerEvents: 'none',
+          zIndex: 0,
+        }}
+      />
       <div
         style={{
           display: 'flex',
@@ -104,69 +119,84 @@ const DistributionChart: React.FC<{
           gap: 6,
           height: 110,
           paddingTop: 22,
+          position: 'relative',
+          zIndex: 1,
         }}
       >
-        {orderedBuckets.map((b) => {
-          const isUser = b.is_user_bucket;
-          const heightPct = (b.pct / (maxPct * 1.1)) * 100;
-          const isEmpty = b.pct === 0;
-          const barBg = isUser
-            ? `linear-gradient(180deg, ${AMBER}, rgba(247,147,30,0.55))`
-            : `linear-gradient(180deg, rgba(15,23,42,0.10), rgba(15,23,42,0.04))`;
-          return (
-            <div
-              key={b.bucket}
-              style={{
-                flex: 1,
-                display: 'flex',
-                flexDirection: 'column',
-                justifyContent: 'flex-end',
-                alignItems: 'center',
-                position: 'relative',
-                height: '100%',
-              }}
-            >
-              {isUser && (
-                <div
-                  style={{
-                    position: 'absolute',
-                    top: -22,
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'center',
-                  }}
-                >
+        {(() => {
+          let cum = 0;
+          let medianBucketIdx = -1;
+          for (let i = 0; i < orderedBuckets.length; i++) {
+            cum += orderedBuckets[i].pct;
+            if (cum >= 50 && medianBucketIdx === -1) {
+              medianBucketIdx = i;
+            }
+          }
+          return orderedBuckets.map((b, i) => {
+            const isUser = b.is_user_bucket;
+            const isMedian = i === medianBucketIdx && !isUser;
+            const heightPct = (b.pct / (maxPct * 1.1)) * 100;
+            const isEmpty = b.pct === 0;
+            const barBg = isUser
+              ? `linear-gradient(180deg, ${AMBER}, rgba(247,147,30,0.55))`
+              : isMedian
+                ? `linear-gradient(180deg, rgba(15,23,42,0.25), rgba(15,23,42,0.10))`
+                : `linear-gradient(180deg, rgba(15,23,42,0.10), rgba(15,23,42,0.04))`;
+            return (
+              <div
+                key={b.bucket}
+                style={{
+                  flex: 1,
+                  display: 'flex',
+                  flexDirection: 'column',
+                  justifyContent: 'flex-end',
+                  alignItems: 'center',
+                  position: 'relative',
+                  height: '100%',
+                }}
+              >
+                {isUser && (
                   <div
                     style={{
-                      fontFamily: FONT_GEIST,
-                      fontSize: 10.5,
-                      fontWeight: 700,
-                      color: INK,
-                      background: AMBER_14,
-                      padding: '2px 6px',
-                      borderRadius: 6,
-                      whiteSpace: 'nowrap',
-                      fontVariantNumeric: 'tabular-nums',
+                      position: 'absolute',
+                      top: -22,
+                      display: 'flex',
+                      flexDirection: 'column',
+                      alignItems: 'center',
                     }}
                   >
-                    You · {handicapStr}
+                    <div
+                      style={{
+                        fontFamily: FONT_GEIST,
+                        fontSize: 10.5,
+                        fontWeight: 700,
+                        color: INK,
+                        background: AMBER_14,
+                        padding: '2px 6px',
+                        borderRadius: 6,
+                        whiteSpace: 'nowrap',
+                        fontVariantNumeric: 'tabular-nums',
+                      }}
+                    >
+                      You · {handicapStr}
+                    </div>
+                    <div style={{ width: 2, height: 6, background: AMBER }} />
                   </div>
-                  <div style={{ width: 2, height: 6, background: AMBER }} />
-                </div>
-              )}
-              <div
-                style={{
-                  width: '100%',
-                  height: isEmpty ? '3%' : `${Math.max(heightPct, 3)}%`,
-                  background: barBg,
-                  opacity: isEmpty && !isUser ? 0.5 : 1,
-                  borderRadius: '6px 6px 0 0',
-                  boxShadow: isUser ? '0 0 16px rgba(247,147,30,0.30)' : 'none',
-                }}
-              />
-            </div>
-          );
-        })}
+                )}
+                <div
+                  style={{
+                    width: '100%',
+                    height: isEmpty ? '3%' : `${Math.max(heightPct, 3)}%`,
+                    background: barBg,
+                    opacity: isEmpty && !isUser ? 0.5 : 1,
+                    borderRadius: '6px 6px 0 0',
+                    boxShadow: isUser ? '0 0 16px rgba(247,147,30,0.30)' : 'none',
+                  }}
+                />
+              </div>
+            );
+          });
+        })()}
       </div>
       <div style={{ display: 'flex', gap: 6, marginTop: 6 }}>
         {orderedBuckets.map((b) => (
