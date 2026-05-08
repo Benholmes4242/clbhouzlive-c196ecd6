@@ -216,6 +216,7 @@ export const RoundsThatCountCard: React.FC<Props> = ({ connectionId, currentHand
             justifyContent: 'space-between',
             marginBottom: 8,
             paddingLeft: 4,
+            gap: 8,
           }}>
             <span style={{
               fontSize: 9,
@@ -224,19 +225,35 @@ export const RoundsThatCountCard: React.FC<Props> = ({ connectionId, currentHand
               letterSpacing: '0.16em',
               textTransform: 'uppercase',
             }}>DIFFERENTIAL</span>
-            <span style={{
-              fontSize: 9,
-              fontWeight: 700,
-              color: AMBER,
-              letterSpacing: '0.16em',
-              textTransform: 'uppercase',
-              display: 'flex',
-              alignItems: 'center',
-              gap: 4,
+            <div style={{
+              display: 'flex', alignItems: 'center', gap: 10,
+              fontSize: 9, fontWeight: 700, color: INK_55,
+              letterSpacing: '0.04em',
             }}>
-              <span style={{ width: 6, height: 6, borderRadius: '50%', background: AMBER }} />
-              LATEST
-            </span>
+              <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+                <span style={{
+                  width: 8, height: 8, borderRadius: '50%',
+                  background: AMBER, border: `1.5px solid ${AMBER}`,
+                }} />
+                COUNTER
+              </span>
+              <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+                <span style={{
+                  width: 8, height: 8, borderRadius: '50%',
+                  background: '#fff', border: `1.5px solid ${AMBER}`,
+                }} />
+                NON
+              </span>
+              <span style={{
+                display: 'inline-flex', alignItems: 'center', gap: 4,
+                color: GREEN, fontWeight: 800,
+              }}>
+                <span style={{
+                  width: 10, height: 2, background: GREEN, borderRadius: 1,
+                }} />
+                CUT
+              </span>
+            </div>
           </div>
 
           <div style={{
