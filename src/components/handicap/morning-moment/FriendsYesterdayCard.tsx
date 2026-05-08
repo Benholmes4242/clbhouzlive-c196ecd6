@@ -451,7 +451,7 @@ const MiniCard: React.FC<{ data: FriendYesterday; onClick: () => void }> = ({ da
       <span style={{
         fontSize: 10, fontWeight: 700, color: T.ink55, letterSpacing: '0.08em',
       }}>
-        Hcp
+        HCP
       </span>
       <HcpRowMini data={data} />
     </div>
