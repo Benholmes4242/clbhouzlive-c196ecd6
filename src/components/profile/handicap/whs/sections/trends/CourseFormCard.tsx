@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { MapPin, Info } from 'lucide-react';
+import { MapPin, Info, Trophy } from 'lucide-react';
 import { useCourseForm } from '@/lib/whs/hooks';
 import type { CourseForm } from '@/lib/whs/types';
 
