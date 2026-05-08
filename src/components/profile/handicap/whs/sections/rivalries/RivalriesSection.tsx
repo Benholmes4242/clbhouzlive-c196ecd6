@@ -5,7 +5,7 @@ import RivalryCard from './RivalryCard';
 import RivalryAddCard from './RivalryAddCard';
 import RivalryInfoSheet from './RivalryInfoSheet';
 import RivalryEditSheet from './RivalryEditSheet';
-import { useFriendRivalries } from '@/lib/whs/hooks';
+import { useFriendRivalries, useFriendLeaderboard } from '@/lib/whs/hooks';
 import type { FriendRivalryHydrated } from '@/lib/whs/types';
 
 interface Props {
@@ -14,6 +14,11 @@ interface Props {
 
 export const RivalriesSection: React.FC<Props> = ({ userId }) => {
   const { data, isLoading } = useFriendRivalries(userId);
+  const { data: leaderboard } = useFriendLeaderboard(userId);
+  const selfRow = useMemo(
+    () => leaderboard?.find((e) => e.is_self) ?? null,
+    [leaderboard],
+  );
 
   const [infoTarget, setInfoTarget] = useState<FriendRivalryHydrated | null>(null);
   const [editTarget, setEditTarget] = useState<{ rivalry: FriendRivalryHydrated | null; slotIndex: number } | null>(null);
@@ -123,6 +128,9 @@ export const RivalriesSection: React.FC<Props> = ({ userId }) => {
               <RivalryCard
                 key={`slot-${rivalry.slot_index}`}
                 rivalry={rivalry}
+                userName={selfRow?.friend_name ?? null}
+                userThumbnailUrl={selfRow?.friend_thumbnail_url ?? null}
+                userHandicap={selfRow?.friend_handicap_index ?? null}
                 onInfo={() => setInfoTarget(rivalry)}
               />
             ))}
