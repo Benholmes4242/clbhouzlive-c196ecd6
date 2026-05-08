@@ -28,16 +28,20 @@ const RED_FORM_HOT = '#B91C1C';
 const MONTHS = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
 const FONT_DISPLAY = 'SF Pro Display, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
 
-// Ring composition
-const RING_SIZE = 220;
-const CX = RING_SIZE / 2;
-const CY = RING_SIZE / 2;
-const R_OUTER = 97;
+// Hero ring (responsive — viewBox is fixed coordinate space, rendered size is clamp())
+const HERO_VIEWBOX = 200;
+const CX = HERO_VIEWBOX / 2;
+const CY = HERO_VIEWBOX / 2;
+const R_OUTER = 88;
 const STROKE_OUTER = 11;
 const C_OUTER = 2 * Math.PI * R_OUTER;
-const R_INNER = 80;
-const STROKE_INNER = 6;
+const R_INNER = 70;
+const STROKE_INNER = 5;
 const C_INNER = 2 * Math.PI * R_INNER;
+// Legacy constant kept only for the loading skeleton placeholder
+const RING_SIZE = 200;
+const INK_25 = 'rgba(15,23,42,0.25)';
+const INK_70 = 'rgba(15,23,42,0.70)';
 
 // Sparkline
 const W = 340;
@@ -411,10 +415,33 @@ const HeroHandicapCard: React.FC<Props> = ({ connection }) => {
     };
   })();
 
+  // ── FORM state from predictHandicap ────────────────────────────────────
+  const formPrediction = predictHandicap((recent ?? []) as any);
+  const formState: 'hot' | 'steady' | 'cold' | 'unknown' =
+    formPrediction.verdict === 'unknown' ? 'unknown'
+    : formPrediction.verdict === 'in_form' || formPrediction.verdict === 'building' ? 'hot'
+    : formPrediction.verdict === 'steady' ? 'steady'
+    : 'cold';
+
+  // ── SCORING AVG (last 5 adjusted_gross) ────────────────────────────────
+  const grossList = ((recent ?? []) as any[])
+    .map(r => (typeof r?.adjusted_gross === 'number' ? r.adjusted_gross : null))
+    .filter((v): v is number => v != null);
+  const last5Gross = grossList.slice(0, 5);
+  const scoringAvgStr = last5Gross.length >= 3
+    ? (last5Gross.reduce((s, v) => s + v, 0) / last5Gross.length).toFixed(1)
+    : null;
+  const last50Gross = grossList.slice(0, 50);
+  const grossBest = last50Gross.length ? Math.min(...last50Gross) : null;
+  const grossWorst = last50Gross.length ? Math.max(...last50Gross) : null;
+  const scoringFraction = (scoringAvgStr !== null && grossBest !== null && grossWorst !== null && grossWorst !== grossBest)
+    ? Math.max(0, Math.min(1, (grossWorst - parseFloat(scoringAvgStr)) / (grossWorst - grossBest)))
+    : 0.5;
+
   return (
-    <section style={{ padding: '24px 12px 20px', marginBottom: 24 }}>
+    <section style={{ margin: '0 0 24px', padding: '0 16px', fontFamily: FONT_DISPLAY }}>
       {/* Eyebrow row */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14, padding: '0 4px' }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8, padding: '0 4px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
           <span
             style={{
@@ -450,24 +477,44 @@ const HeroHandicapCard: React.FC<Props> = ({ connection }) => {
         </div>
       </div>
 
-      {/* Multi-stream Ring */}
-      <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 6, paddingBottom: 56, position: 'relative' }}>
-        <div style={{ position: 'relative', width: RING_SIZE, height: RING_SIZE }}>
-          {/* Milestone labels around top of ring */}
-          <div style={{
-            position: 'absolute', top: -4, left: 16, fontSize: 10.5, fontWeight: 700,
-            color: INK_40, letterSpacing: '0.14em',
-          }}>
-            {formatDisplayedHcp(milestone.displayed)} HCP
-          </div>
-          <div style={{
-            position: 'absolute', top: -4, right: 16, fontSize: 10.5, fontWeight: 700,
-            color: AMBER_DEEP, letterSpacing: '0.14em',
-          }}>
-            {formatDisplayedHcp(milestone.displayed - 1)} HCP →
-          </div>
+      {/* Milestone labels above hero */}
+      <div style={{
+        display: 'flex', justifyContent: 'space-between',
+        padding: '0 calc(50% - clamp(80px, 24vw, 100px))',
+        marginTop: 12, marginBottom: -4,
+        fontSize: 'clamp(9px, 2.6vw, 10px)',
+        fontWeight: 700, color: INK_40,
+        letterSpacing: '0.12em',
+      }}>
+        <span>{formatDisplayedHcp(milestone.displayed)} HCP</span>
+        <span style={{ color: AMBER_DEEP, fontWeight: 800 }}>
+          {formatDisplayedHcp(milestone.displayed - 1)} HCP →
+        </span>
+      </div>
 
-          <svg width={RING_SIZE} height={RING_SIZE} viewBox={`0 0 ${RING_SIZE} ${RING_SIZE}`}>
+      {/* Three-ring row */}
+      <div style={{
+        display: 'grid',
+        gridTemplateColumns: '1fr auto 1fr',
+        alignItems: 'center',
+        gap: 4,
+        padding: '6px 0 4px',
+      }}>
+        {/* LEFT — FORM */}
+        <FlankRing metric="form" state={formState} />
+
+        {/* CENTRE — Hero ring */}
+        <div style={{
+          width: 'clamp(160px, 48vw, 200px)',
+          aspectRatio: '1 / 1',
+          position: 'relative',
+          justifySelf: 'center',
+        }}>
+          <svg
+            width="100%" height="100%"
+            viewBox={`0 0 ${HERO_VIEWBOX} ${HERO_VIEWBOX}`}
+            preserveAspectRatio="xMidYMid meet"
+          >
             <defs>
               <linearGradient id="heroOuterAmberGold" x1="0" y1="0" x2="1" y2="0">
                 <stop offset="0%" stopColor="#F7931E" />
@@ -478,28 +525,51 @@ const HeroHandicapCard: React.FC<Props> = ({ connection }) => {
                 <stop offset="100%" stopColor="#4ADE80" />
               </linearGradient>
             </defs>
+
             {/* Outer track */}
             <circle
               cx={CX} cy={CY} r={R_OUTER}
               fill="none" stroke={INK_06} strokeWidth={STROKE_OUTER}
+              vectorEffect="non-scaling-stroke"
             />
-            {/* Outer milestone progress (amber → gold) */}
+            {/* Outer milestone progress */}
             <circle
               cx={CX} cy={CY} r={R_OUTER}
               fill="none" stroke="url(#heroOuterAmberGold)" strokeWidth={STROKE_OUTER}
               strokeLinecap="round"
               strokeDasharray={`${outerDash} ${C_OUTER}`}
               transform={`rotate(-90 ${CX} ${CY})`}
+              vectorEffect="non-scaling-stroke"
               style={{ transition: 'stroke-dasharray 320ms cubic-bezier(0.22, 0.61, 0.36, 1)' }}
             />
+
+            {/* Tick marks — 8 ticks at 45° intervals around outer track */}
+            {Array.from({ length: 8 }).map((_, i) => {
+              const angle = (i * 45 - 90) * (Math.PI / 180);
+              const tickInner = R_OUTER - STROKE_OUTER / 2 - 1;
+              const tickOuter = R_OUTER + STROKE_OUTER / 2 + 1;
+              const x1 = CX + Math.cos(angle) * tickInner;
+              const y1 = CY + Math.sin(angle) * tickInner;
+              const x2 = CX + Math.cos(angle) * tickOuter;
+              const y2 = CY + Math.sin(angle) * tickOuter;
+              return (
+                <line
+                  key={i}
+                  x1={x1} y1={y1} x2={x2} y2={y2}
+                  stroke={INK_10} strokeWidth={1}
+                  vectorEffect="non-scaling-stroke"
+                />
+              );
+            })}
 
             {/* Inner track */}
             <circle
               cx={CX} cy={CY} r={R_INNER}
               fill="none" stroke={INK_06} strokeWidth={STROKE_INNER}
+              vectorEffect="non-scaling-stroke"
             />
 
-            {/* Inner positive form (green, clockwise from 12) */}
+            {/* Inner positive form */}
             {showGreenArc && (
               <circle
                 cx={CX} cy={CY} r={R_INNER} fill="none"
@@ -507,23 +577,24 @@ const HeroHandicapCard: React.FC<Props> = ({ connection }) => {
                 strokeDasharray={`${innerFillLength} ${C_INNER}`}
                 strokeLinecap="round"
                 transform={`rotate(-90 ${CX} ${CY})`}
+                vectorEffect="non-scaling-stroke"
                 style={{ transition: 'stroke-dasharray 320ms cubic-bezier(0.22, 0.61, 0.36, 1)' }}
               />
             )}
-            {/* Inner negative form (red, counter-clockwise from 12) */}
+            {/* Inner negative form */}
             {showRedArc && (
-              <g transform={`scale(-1, 1) translate(-${RING_SIZE}, 0)`}>
+              <g transform={`scale(-1, 1) translate(-${HERO_VIEWBOX}, 0)`}>
                 <circle
                   cx={CX} cy={CY} r={R_INNER} fill="none"
                   stroke={RED} strokeWidth={STROKE_INNER}
                   strokeDasharray={`${innerFillLength} ${C_INNER}`}
                   strokeLinecap="round"
                   transform={`rotate(-90 ${CX} ${CY})`}
+                  vectorEffect="non-scaling-stroke"
                   style={{ transition: 'stroke-dasharray 320ms cubic-bezier(0.22, 0.61, 0.36, 1)' }}
                 />
               </g>
             )}
-
           </svg>
 
           {/* Center stack */}
@@ -531,76 +602,52 @@ const HeroHandicapCard: React.FC<Props> = ({ connection }) => {
             position: 'absolute', inset: 0,
             display: 'flex', flexDirection: 'column',
             alignItems: 'center', justifyContent: 'center',
-            pointerEvents: 'none', gap: 0,
+            pointerEvents: 'none',
           }}>
             <span style={{
-              fontSize: 9.5, fontWeight: 800, color: statusColor,
-              letterSpacing: '0.18em', marginBottom: 4, textTransform: 'uppercase',
+              fontSize: 'clamp(8px, 2.4vw, 8.5px)', fontWeight: 800, color: statusColor,
+              letterSpacing: '0.20em', marginBottom: 'clamp(3px, 1.2vw, 5px)',
+              textTransform: 'uppercase', textAlign: 'center',
             }}>
               {statusWord}
             </span>
             <span style={{
-              fontSize: 58, fontWeight: 700, color: INK,
-              letterSpacing: '-0.04em', lineHeight: 1,
+              fontSize: 'clamp(38px, 13vw, 56px)', fontWeight: 700, color: INK,
+              letterSpacing: '-0.05em', lineHeight: 1,
               fontVariantNumeric: 'tabular-nums',
-              textAlign: 'center', display: 'block',
             }}>
               {scrubValue.toFixed(1)}
             </span>
             <div style={{
-              marginTop: 6,
-              display: 'flex', alignItems: 'center', gap: 6,
-              fontSize: 10, fontVariantNumeric: 'tabular-nums',
+              marginTop: 'clamp(5px, 1.8vw, 8px)',
+              display: 'flex', alignItems: 'center', gap: 4,
+              fontSize: 'clamp(9px, 2.6vw, 10px)',
+              fontVariantNumeric: 'tabular-nums',
               opacity: isScrubbing ? 0 : 1,
               transition: 'opacity 200ms ease',
             }}>
               {deltaInline}
-              {sparkPolyline && (
-                <>
-                  <span style={{ width: 1, height: 8, background: INK_10, display: 'inline-block' }} />
-                  <svg width={32} height={10} viewBox="0 0 32 10" style={{ display: 'block' }}>
-                    <polyline
-                      points={sparkPolyline.points}
-                      fill="none"
-                      stroke={GREEN}
-                      strokeWidth={1.5}
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      vectorEffect="non-scaling-stroke"
-                    />
-                    <circle cx={sparkPolyline.lastX} cy={sparkPolyline.lastY} r={2} fill={GREEN} />
-                  </svg>
-                  
-                </>
-              )}
             </div>
           </div>
-
-          {/* Legend */}
-          <div style={{
-            position: 'absolute', bottom: -38, left: 0, right: 0,
-            display: 'flex', justifyContent: 'center', gap: 18,
-            fontSize: 10.5, fontWeight: 600, color: INK_55, letterSpacing: '0.06em',
-          }}>
-            <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
-              <span style={{ width: 8, height: 8, borderRadius: '50%', background: AMBER }} />
-              INDEX TRAJECTORY
-            </span>
-            <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
-              <span style={{ width: 8, height: 8, borderRadius: '50%', background: GREEN }} />
-              30-DAY FORM
-            </span>
-          </div>
         </div>
+
+        {/* RIGHT — SCORING AVG */}
+        <FlankRing metric="scoring" value={scoringAvgStr ?? '—'} fraction={scoringFraction} />
       </div>
 
-      {/* Metric rings row: CONSISTENCY / MOMENTUM / TRAJECTORY */}
-      <MetricRingsRow
-        currentHcp={current}
-        last20={recent ?? []}
-        history={points}
-        delta30d={trend?.delta ?? null}
-      />
+      {/* Inner ring legend */}
+      <div style={{
+        display: 'flex', justifyContent: 'center', gap: 5,
+        marginTop: 10,
+        fontSize: 'clamp(9px, 2.6vw, 10px)', color: INK_55,
+      }}>
+        <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5 }}>
+          <span style={{ width: 7, height: 7, borderRadius: 4, background: GREEN }} />
+          <strong style={{ color: INK_70, fontWeight: 700, letterSpacing: '0.04em' }}>
+            30-DAY FORM (inner ring)
+          </strong>
+        </span>
+      </div>
 
       {/* Trophies entry-point — opens the AllTrophiesSheet via global event. */}
       <div style={{ display: 'flex', justifyContent: 'center', marginTop: 4 }}>
@@ -845,6 +892,132 @@ const keyframes = `
   50% { opacity: 0.5; transform: scale(1.3); }
 }
 `;
+
+// ── FlankRing (FORM / SCORING AVG) ──────────────────────────────────────
+interface FlankRingProps {
+  metric: 'form' | 'scoring';
+  state?: 'hot' | 'steady' | 'cold' | 'unknown';
+  value?: string;
+  fraction?: number;
+}
+
+const FlankRing: React.FC<FlankRingProps> = ({ metric, state, value, fraction }) => {
+  const VIEWBOX = 100;
+  const FCX = 50;
+  const FCY = 50;
+  const FR = 42;
+  const FSTROKE = 6;
+  const FC = 2 * Math.PI * FR;
+
+  let color: string;
+  let frac: number;
+  let centre: React.ReactNode;
+  let label: string;
+  let sub: string;
+
+  if (metric === 'form') {
+    if (state === 'hot') {
+      color = '#DC2626';
+      frac = 1.0;
+      centre = (
+        <div style={{ width: 'clamp(18px, 5vw, 24px)', height: 'clamp(18px, 5vw, 24px)' }}>
+          <Flame size="100%" color="#DC2626" strokeWidth={2.4} fill="#DC2626" />
+        </div>
+      );
+      label = 'FORM';
+      sub = 'Hot over last 5';
+    } else if (state === 'cold') {
+      color = '#0EA5E9';
+      frac = 0.10;
+      centre = (
+        <div style={{ width: 'clamp(18px, 5vw, 24px)', height: 'clamp(18px, 5vw, 24px)' }}>
+          <Snowflake size="100%" color="#0EA5E9" strokeWidth={2.4} />
+        </div>
+      );
+      label = 'FORM';
+      sub = 'Cold over last 5';
+    } else if (state === 'steady') {
+      color = '#475569';
+      frac = 0.50;
+      centre = (
+        <div style={{ width: 'clamp(20px, 5.4vw, 26px)', height: 'clamp(20px, 5.4vw, 26px)' }}>
+          <Minus size="100%" color="#475569" strokeWidth={3} />
+        </div>
+      );
+      label = 'FORM';
+      sub = 'Steady over last 5';
+    } else {
+      color = INK_25;
+      frac = 0;
+      centre = (
+        <span style={{ fontSize: 'clamp(16px, 4.6vw, 22px)', color: INK_40, fontWeight: 800 }}>—</span>
+      );
+      label = 'FORM';
+      sub = 'Awaiting data';
+    }
+  } else {
+    color = '#3B82F6';
+    frac = fraction ?? 0;
+    centre = (
+      <span style={{
+        fontSize: value && value.length > 4 ? 'clamp(13px, 3.8vw, 16px)' : 'clamp(14px, 4.4vw, 18px)',
+        fontWeight: 700, color: INK, lineHeight: 1,
+        letterSpacing: '-0.03em', fontVariantNumeric: 'tabular-nums',
+      }}>{value ?? '—'}</span>
+    );
+    label = 'SCORING AVG';
+    sub = 'Over last 5';
+  }
+
+  return (
+    <div style={{
+      display: 'flex', flexDirection: 'column', alignItems: 'center',
+      paddingBottom: 2, paddingTop: 14,
+    }}>
+      <div style={{
+        position: 'relative',
+        width: 'clamp(72px, 22vw, 100px)',
+        aspectRatio: '1 / 1',
+      }}>
+        <svg
+          width="100%" height="100%"
+          viewBox={`0 0 ${VIEWBOX} ${VIEWBOX}`}
+          preserveAspectRatio="xMidYMid meet"
+        >
+          <circle cx={FCX} cy={FCY} r={FR} fill="none"
+            stroke={INK_06} strokeWidth={FSTROKE}
+            vectorEffect="non-scaling-stroke" />
+          {frac > 0 && (
+            <circle cx={FCX} cy={FCY} r={FR} fill="none"
+              stroke={color} strokeWidth={FSTROKE}
+              strokeLinecap="round"
+              strokeDasharray={`${frac * FC} ${FC}`}
+              transform={`rotate(-90 ${FCX} ${FCY})`}
+              vectorEffect="non-scaling-stroke" />
+          )}
+        </svg>
+        <div style={{
+          position: 'absolute', inset: 0,
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+        }}>
+          {centre}
+        </div>
+      </div>
+      <div style={{ marginTop: 8, textAlign: 'center', maxWidth: '120%' }}>
+        <div style={{
+          fontSize: 'clamp(10px, 2.8vw, 10.5px)',
+          fontWeight: 800, color: INK,
+          letterSpacing: '0.06em', textTransform: 'uppercase',
+        }}>{label}</div>
+        <div style={{
+          fontSize: 'clamp(9px, 2.6vw, 10px)',
+          color: INK_40, marginTop: 2, fontWeight: 500,
+          whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
+        }}>{sub}</div>
+      </div>
+    </div>
+  );
+};
 
 // ── Metric rings row (CONSISTENCY / MOMENTUM / TRAJECTORY) ───────────────
 const MR_SIZE = 52;
