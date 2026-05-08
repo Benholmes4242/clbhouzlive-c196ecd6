@@ -90,8 +90,6 @@ export const HandicapProjectionCard: React.FC<Props> = ({ scores }) => {
     );
   }
 
-  const continuesLabel =
-    prediction.direction === 'flat' ? 'IF YOUR FORM HOLDS' : 'IF YOUR FORM CONTINUES';
   const arrow =
     prediction.direction === 'down' ? '↓' : prediction.direction === 'up' ? '↑' : '→';
 
