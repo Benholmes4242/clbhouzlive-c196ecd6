@@ -62,23 +62,8 @@ interface Props {
   userId: string;
 }
 
-const Eyebrow: React.FC<{ children: React.ReactNode }> = ({ children }) => (
-  <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '0 20px', marginBottom: 10 }}>
-    <span style={{ width: 6, height: 6, borderRadius: 3, background: AMBER }} />
-    <span
-      style={{
-        fontFamily: FONT_GEIST,
-        fontSize: 11,
-        fontWeight: 700,
-        letterSpacing: '0.14em',
-        color: INK_55,
-        textTransform: 'uppercase',
-      }}
-    >
-      {children}
-    </span>
-  </div>
-);
+interface Props_unused {}
+
 
 const DistributionChart: React.FC<{
   buckets: HandicapPercentileBucket[];
