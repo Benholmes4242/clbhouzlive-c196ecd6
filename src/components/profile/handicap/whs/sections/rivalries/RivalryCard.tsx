@@ -388,7 +388,7 @@ const Portrait: React.FC<PortraitProps> = ({
         height: 60,
         borderRadius: '50%',
         background: thumbnail ? `url(${thumbnail}) center/cover no-repeat` : 'rgba(255,255,255,0.10)',
-        border: `3px solid ${ringColor}`,
+        border: `2px solid ${ringColor}`,
         boxShadow: ringGlow ? `0 0 12px ${ringColor}` : 'none',
         display: 'flex',
         alignItems: 'center',
