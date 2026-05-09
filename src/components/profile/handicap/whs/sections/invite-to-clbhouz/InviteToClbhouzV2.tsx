@@ -306,6 +306,7 @@ export const InviteToClbhouzV2: React.FC<Props> = ({ ownerUserId }) => {
                       overflow: 'hidden',
                       background: 'rgba(15,23,42,0.06)',
                       border: '3px solid #fff',
+                      boxShadow: '0 1px 2px rgba(15,23,42,0.10)',
                       marginLeft: i === 0 ? 0 : -12,
                       display: 'flex',
                       alignItems: 'center',
