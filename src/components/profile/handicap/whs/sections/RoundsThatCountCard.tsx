@@ -76,6 +76,7 @@ const Skeleton: React.FC = () => (
       <div style={{ height: 60, background: INK_06, borderTop: `0.5px solid ${INK_10}` }} />
       <div style={{ height: 110, background: INK_06, borderTop: `0.5px solid ${INK_10}` }} />
     </div>
+    </div>
   </section>
 );
 
