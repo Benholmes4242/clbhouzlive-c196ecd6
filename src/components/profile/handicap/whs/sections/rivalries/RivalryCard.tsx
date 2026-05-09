@@ -231,7 +231,7 @@ export const RivalryCard: React.FC<Props> = ({
                 }}
               >
                 <span style={{ color: youScoreColor }}>{sf.wins}</span>
-                <span style={{ color: T.whiteSofter, fontSize: 24 }}>{'\u2014'}</span>
+                <span style={{ color: T.whiteSofter, fontSize: 38 }}>{'\u2014'}</span>
                 <span style={{ color: themScoreColor }}>{sf.losses}</span>
               </div>
               <div
