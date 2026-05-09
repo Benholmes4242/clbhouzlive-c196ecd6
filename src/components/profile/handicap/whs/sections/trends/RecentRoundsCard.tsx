@@ -240,86 +240,40 @@ export const RecentRoundsCard: React.FC<Props> = ({ connectionId }) => {
   );
 };
 
-// ─── Section header ─────────────────────────────────────────────────
-const SectionHeader: React.FC<{ total: number; counterCount: number }> = ({
-  total,
-  counterCount,
-}) => (
-  <div
-    style={{
-      display: 'flex',
-      alignItems: 'flex-end',
-      justifyContent: 'space-between',
-      gap: 12,
-    }}
-  >
-    <div style={{ minWidth: 0 }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 6 }}>
-        <span
-          style={{
-            width: 6,
-            height: 6,
-            borderRadius: 999,
-            background: T.amber,
-          }}
-        />
-        <span
-          style={{
-            fontSize: 9,
-            fontWeight: 800,
-            letterSpacing: '0.16em',
-            color: T.inkMute,
-          }}
-        >
-          RECENT ROUNDS
-        </span>
-      </div>
-      <div
-        style={{
-          fontSize: 20,
-          fontWeight: 800,
-          color: T.ink,
-          letterSpacing: '-0.01em',
-        }}
-      >
-        {total} {total === 1 ? 'round' : 'rounds'} tracked
-      </div>
+// ─── Counter badge (right slot) ─────────────────────────────────────
+const CounterBadge: React.FC<{ count: number }> = ({ count }) => (
+  <div style={{ textAlign: 'right' }}>
+    <div
+      style={{
+        fontSize: 9,
+        fontWeight: 700,
+        letterSpacing: '0.14em',
+        color: T.inkFaded,
+        marginBottom: 4,
+      }}
+    >
+      OF WHICH
     </div>
-    {counterCount > 0 && (
-      <div style={{ textAlign: 'right' }}>
-        <div
-          style={{
-            fontSize: 9,
-            fontWeight: 700,
-            letterSpacing: '0.14em',
-            color: T.inkFaded,
-            marginBottom: 4,
-          }}
-        >
-          OF WHICH
-        </div>
-        <div
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: 4,
-            fontSize: 13,
-            fontWeight: 700,
-            color: T.ink,
-          }}
-        >
-          <span
-            style={{
-              width: 5,
-              height: 5,
-              borderRadius: 999,
-              background: T.amber,
-            }}
-          />
-          {counterCount} {counterCount === 1 ? 'counter' : 'counters'}
-        </div>
-      </div>
-    )}
+    <div
+      style={{
+        display: 'flex',
+        alignItems: 'center',
+        gap: 4,
+        fontSize: 13,
+        fontWeight: 700,
+        color: T.ink,
+      }}
+    >
+      <span
+        style={{
+          width: 5,
+          height: 5,
+          borderRadius: 999,
+          background: T.amber,
+        }}
+      />
+      {count} {count === 1 ? 'counter' : 'counters'}
+    </div>
   </div>
 );
 
