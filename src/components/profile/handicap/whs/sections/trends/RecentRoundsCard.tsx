@@ -421,9 +421,10 @@ interface DateTileProps {
   dateString: string;
   isBest: boolean;
   isCounter: boolean;
+  thumbnailUrl: string | null;
 }
 
-const DateTile: React.FC<DateTileProps> = ({ dateString, isBest, isCounter }) => {
+const DateTile: React.FC<DateTileProps> = ({ dateString, isBest, isCounter, thumbnailUrl }) => {
   const d = new Date(dateString);
   const dayOfMonth = d.getDate();
   const weekday = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'][d.getDay()];
