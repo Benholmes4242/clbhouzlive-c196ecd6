@@ -144,7 +144,29 @@ export async function fetchAllScores(connectionId: string): Promise<WhsScoreWith
     .order('play_date', { ascending: false })
     .limit(1000);
   if (error) throw error;
-  return (data as unknown as WhsScoreWithIndex[]) ?? [];
+
+  type RawScore = Omit<WhsScoreWithIndex, 'course_thumbnail_image'>;
+  const rawRows = (data as unknown as RawScore[]) ?? [];
+  if (rawRows.length === 0) return [];
+
+  const courseNames = new Set<string>();
+  for (const r of rawRows) {
+    if (r.course?.name) courseNames.add(r.course.name);
+  }
+
+  const thumbsByName: Record<string, string | null> = {};
+  await Promise.all(
+    Array.from(courseNames).map(async (name) => {
+      thumbsByName[name.toLowerCase()] = await lookupCourseThumbnail(name);
+    }),
+  );
+
+  return rawRows.map((r) => ({
+    ...r,
+    course_thumbnail_image: r.course?.name
+      ? thumbsByName[r.course.name.toLowerCase()] ?? null
+      : null,
+  }));
 }
 
 export async function callConnectWhs(membership_number: string, password: string): Promise<ConnectWhsResponse> {
