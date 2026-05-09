@@ -4,6 +4,7 @@ import { format } from 'date-fns';
 import { useAllScores } from '@/lib/whs/hooks';
 import { computeRoundDeltas, type RoundWithDelta } from './computeRoundDeltas';
 import RoundDetailSheet from '../round-detail/RoundDetailSheet';
+import SectionHeader from '../SectionHeader';
 
 interface Props {
   connectionId: string;
