@@ -268,7 +268,7 @@ export const InviteToClbhouzV2: React.FC<Props> = ({ ownerUserId }) => {
       : `Invite ${invitable.length} more golfers from your network`;
 
   return (
-    <section id="invite-to-clbhouz-section" style={{ marginTop: 24 }}>
+    <section id="invite-to-clbhouz-section" style={{ marginTop: 28 }}>
       <SectionHeader
         eyebrow="BUILD YOUR CIRCLE"
         title={picks.length > 0 ? 'Top friends to invite' : 'Invite to Clbhouz'}
