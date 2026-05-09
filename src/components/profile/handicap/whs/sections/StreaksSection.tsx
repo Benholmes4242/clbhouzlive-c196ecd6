@@ -24,19 +24,6 @@ interface Props {
   userId: string;
 }
 
-const Eyebrow: React.FC<{ children: React.ReactNode }> = ({ children }) => (
-  <div
-    style={{
-      fontSize: 10,
-      fontWeight: 800,
-      color: INK_55,
-      letterSpacing: '0.22em',
-      marginBottom: 6,
-    }}
-  >
-    {children}
-  </div>
-);
 
 const BestCaption: React.FC<{ streak: StreakResult }> = ({ streak }) => {
   if (streak.bestEndedAt == null && streak.isActive && streak.best > 0) {
