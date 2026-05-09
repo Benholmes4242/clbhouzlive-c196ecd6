@@ -101,6 +101,9 @@ export const RoundsThatCountCard: React.FC<Props> = ({ connectionId, currentHand
     const sorted = [...last20].sort(
       (a, b) => new Date(a.play_date).getTime() - new Date(b.play_date).getTime(),
     );
+    const allDiffs = sorted
+      .map(r => r.handicap_differential)
+      .filter((d): d is number => d != null);
     const counterDiffs = sorted
       .filter(r => counterIds.has(r.id))
       .map(c => c.handicap_differential)
@@ -109,6 +112,8 @@ export const RoundsThatCountCard: React.FC<Props> = ({ connectionId, currentHand
     const minDiff = Math.min(...counterDiffs);
     const maxDiff = Math.max(...counterDiffs);
     const avgDiff = counterDiffs.reduce((s, d) => s + d, 0) / counterDiffs.length;
+    const allDiffsMin = Math.min(...allDiffs);
+    const allDiffsMax = Math.max(...allDiffs);
     return {
       rounds: sorted.map(c => ({
         ...c,
@@ -117,6 +122,7 @@ export const RoundsThatCountCard: React.FC<Props> = ({ connectionId, currentHand
         is_worst: counterIds.has(c.id) && c.handicap_differential === maxDiff,
       })),
       minDiff, maxDiff, avgDiff,
+      allDiffsMin, allDiffsMax,
     };
   }, [allScores, counters]);
 
@@ -130,9 +136,17 @@ export const RoundsThatCountCard: React.FC<Props> = ({ connectionId, currentHand
   const bestRound = enriched.rounds.find(r => r.is_best)!;
   const worstRound = enriched.rounds.find(r => r.is_worst)!;
 
-  // Y-axis range
-  const yMin = Math.min(-1, Math.floor(enriched.minDiff - 0.5));
-  const yMax = Math.max(4, Math.ceil(enriched.maxDiff + 0.5));
+  // Y-axis range — driven by ALL rounds, not just counters, so non-counter
+  // dots stay inside the plot area.
+  const cutTarget = projection?.hasData ? projection.cutTarget : null;
+  const dataMin = Math.min(enriched.allDiffsMin, enriched.minDiff);
+  const dataMax = Math.max(
+    enriched.allDiffsMax,
+    enriched.maxDiff,
+    cutTarget ?? -Infinity,
+  );
+  const yMin = Math.min(-1, Math.floor(dataMin - 0.5));
+  const yMax = Math.max(4, Math.ceil(dataMax + 0.5));
   const ticks = generateTicks(yMin, yMax);
   const ySpan = yMax - yMin;
   const innerH = CHART_H - CHART_TOP - CHART_BOTTOM;
@@ -275,18 +289,20 @@ export const RoundsThatCountCard: React.FC<Props> = ({ connectionId, currentHand
             <div style={{
               flex: 1, position: 'relative', height: CHART_H,
             }}>
-              {/* Permanent latest emphasis band */}
+              {/* Permanent latest emphasis band — centered on the last dot */}
               {(() => {
                 const latestIdx = enriched.rounds.length - 1;
                 if (latestIdx < 0) return null;
                 const colWidth = 100 / enriched.rounds.length;
+                const bandWidth = colWidth * 0.9;
+                const centerPct = xFor(latestIdx);
                 return (
                   <div style={{
                     position: 'absolute',
                     top: 0,
                     bottom: 0,
-                    left: `${(latestIdx + 0.05) * colWidth}%`,
-                    width: `${colWidth * 0.9}%`,
+                    left: `${centerPct - bandWidth / 2}%`,
+                    width: `${bandWidth}%`,
                     background: 'rgba(247,147,30,0.08)',
                     opacity: 1,
                     borderRadius: 6,
@@ -450,46 +466,56 @@ export const RoundsThatCountCard: React.FC<Props> = ({ connectionId, currentHand
             </div>
           </div>
 
-          {/* Date labels */}
+          {/* Date labels — thinned. Every column keeps its slot for click-targets,
+              but only N labels render text to prevent rotated overlap. */}
           <div style={{
             display: 'flex', marginTop: 6, marginLeft: Y_AXIS_W,
             paddingBottom: 14,
           }}>
-            {enriched.rounds.map((r, i) => {
-              const d = new Date(r.play_date);
-              const isLatest = i === enriched.rounds.length - 1;
-              return (
-                <button
-                  key={r.id}
-                  onClick={() => setSelectedId(r.id)}
-                  style={{
-                    flex: 1, textAlign: 'center',
-                    background: 'transparent', border: 'none',
-                    padding: '4px 0', cursor: 'pointer',
-                    transform: 'rotate(-30deg)',
-                    transformOrigin: 'top center',
-                  }}
-                >
-                  <div style={{
-                    fontSize: 9.5, fontWeight: 600,
-                    color: isLatest ? INK : INK_40,
-                    letterSpacing: '0.04em',
-                  }}>
-                    {WEEKDAY[d.getDay()]}
-                  </div>
-                  <div style={{
-                    fontSize: 9.5, fontWeight: isLatest ? 700 : 600,
-                    color: isLatest ? INK : INK_40,
-                    fontFamily: FONT_DISPLAY,
-                    fontVariantNumeric: 'tabular-nums',
-                    letterSpacing: '0.04em',
-                    marginTop: 1,
-                  }}>
-                    {d.getDate()}
-                  </div>
-                </button>
-              );
-            })}
+            {(() => {
+              const total = enriched.rounds.length;
+              const targetCount = 5;
+              const stride = Math.max(1, Math.floor(total / targetCount));
+              const visibleIdx = new Set<number>();
+              for (let i = 0; i < total; i += stride) visibleIdx.add(i);
+              visibleIdx.add(total - 1);
+              return enriched.rounds.map((r, i) => {
+                const d = new Date(r.play_date);
+                const isLatest = i === total - 1;
+                const showLabel = visibleIdx.has(i);
+                return (
+                  <button
+                    key={r.id}
+                    onClick={() => setSelectedId(r.id)}
+                    aria-label={`Round on ${d.toLocaleDateString()}`}
+                    style={{
+                      flex: 1, textAlign: 'center',
+                      background: 'transparent', border: 'none',
+                      padding: '4px 0', cursor: 'pointer',
+                      visibility: showLabel ? 'visible' : 'hidden',
+                    }}
+                  >
+                    <div style={{
+                      fontSize: 9.5, fontWeight: 600,
+                      color: isLatest ? INK : INK_40,
+                      letterSpacing: '0.04em',
+                    }}>
+                      {WEEKDAY[d.getDay()]}
+                    </div>
+                    <div style={{
+                      fontSize: 9.5, fontWeight: isLatest ? 700 : 600,
+                      color: isLatest ? INK : INK_40,
+                      fontFamily: FONT_DISPLAY,
+                      fontVariantNumeric: 'tabular-nums',
+                      letterSpacing: '0.04em',
+                      marginTop: 1,
+                    }}>
+                      {d.getDate()}
+                    </div>
+                  </button>
+                );
+              });
+            })()}
           </div>
         </div>
       </div>
