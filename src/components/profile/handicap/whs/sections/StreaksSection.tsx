@@ -2,6 +2,7 @@ import React, { useEffect, useRef } from 'react';
 
 import { ChevronRight, Flame, Shield, Trophy, TrendingDown } from 'lucide-react';
 import { toast } from 'sonner';
+import SectionHeader from './SectionHeader';
 import { useStreaks, type StreakResult, type StreaksData } from '@/lib/whs/useStreaks';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 
