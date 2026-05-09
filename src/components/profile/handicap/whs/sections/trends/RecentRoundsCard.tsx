@@ -586,6 +586,7 @@ const FeedCard: React.FC<FeedCardProps> = ({ round, isBest, onTap }) => {
         dateString={round.play_date}
         isBest={isBest}
         isCounter={!!round.is_counter}
+        thumbnailUrl={round.course_thumbnail_image ?? null}
       />
       <div
         style={{
