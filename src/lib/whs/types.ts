@@ -251,6 +251,12 @@ export interface WhsFriendWindowRanking {
 export interface WhsScoreWithIndex extends WhsScore {
   /** Handicap index after this round was applied. Null if not yet computed. */
   handicap_index_at_time: number | null;
+  /**
+   * Resolved thumbnail from `golf_courses.thumbnail_image` (matched via the
+   * WHS course-name resolver). Null when the WHS name doesn't match any
+   * known course or the matched course has no thumbnail set.
+   */
+  course_thumbnail_image: string | null;
 }
 
 /** @deprecated Use WhsScoreWithIndex */
