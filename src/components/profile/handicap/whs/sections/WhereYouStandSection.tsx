@@ -87,10 +87,11 @@ const DistributionChart: React.FC<{
         style={{
           position: 'absolute',
           top: 22,
-          bottom: 28,
+          bottom: 0,
           left: 0,
-          width: `calc(${(2 / 7) * 100}% - 6px)`,
+          width: 'calc(2 * ((100% - 36px) / 7) + 6px)',
           background: 'rgba(34,197,94,0.10)',
+          border: '1px solid #22C55E',
           borderRadius: 6,
           pointerEvents: 'none',
           zIndex: 0,
