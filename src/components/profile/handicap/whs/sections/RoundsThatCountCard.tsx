@@ -157,18 +157,9 @@ export const RoundsThatCountCard: React.FC<Props> = ({ connectionId, currentHand
     || 'Your handicap is built from these 8 rounds.';
 
   return (
-    <section style={{ padding: '0 16px', marginBottom: 28 }}>
-      {/* Eyebrow */}
-      <div style={{
-        display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10, padding: '0 2px',
-      }}>
-        <span style={{ width: 4, height: 4, borderRadius: '50%', background: INK_40 }} />
-        <span style={{
-          fontSize: 10, fontWeight: 800, color: INK_55, letterSpacing: '0.22em',
-        }}>
-          ROUNDS THAT COUNT
-        </span>
-      </div>
+    <section style={{ marginTop: 28 }}>
+      <SectionHeader eyebrow="ROUNDS THAT COUNT" title="The 8 best of your last 20" />
+      <div style={{ padding: '0 20px' }}>
 
       {/* Echo insight banner */}
       <div style={{
