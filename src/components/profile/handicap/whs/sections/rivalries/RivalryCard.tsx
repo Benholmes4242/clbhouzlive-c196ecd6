@@ -1,6 +1,7 @@
 import React, { useMemo } from 'react';
 import { Info, Flame, Sparkles } from 'lucide-react';
 import { initials } from '@/lib/whs/utils/initials';
+import { reformatFriendName } from '@/lib/whs/utils/nameFormat';
 import { fmtHcp } from '@/lib/whs/format';
 import type { FriendRivalryHydrated } from '@/lib/whs/types';
 
