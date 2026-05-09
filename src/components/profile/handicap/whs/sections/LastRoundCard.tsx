@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { format } from 'date-fns';
 import { useLastRound, useRoundDetail } from '@/lib/whs/hooks';
 import RoundDetailSheet from './round-detail/RoundDetailSheet';
+import SectionHeader from './SectionHeader';
 
 interface Props {
   connectionId: string;
