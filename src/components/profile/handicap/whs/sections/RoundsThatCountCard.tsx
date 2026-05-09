@@ -101,6 +101,9 @@ export const RoundsThatCountCard: React.FC<Props> = ({ connectionId, currentHand
     const sorted = [...last20].sort(
       (a, b) => new Date(a.play_date).getTime() - new Date(b.play_date).getTime(),
     );
+    const allDiffs = sorted
+      .map(r => r.handicap_differential)
+      .filter((d): d is number => d != null);
     const counterDiffs = sorted
       .filter(r => counterIds.has(r.id))
       .map(c => c.handicap_differential)
@@ -109,6 +112,8 @@ export const RoundsThatCountCard: React.FC<Props> = ({ connectionId, currentHand
     const minDiff = Math.min(...counterDiffs);
     const maxDiff = Math.max(...counterDiffs);
     const avgDiff = counterDiffs.reduce((s, d) => s + d, 0) / counterDiffs.length;
+    const allDiffsMin = Math.min(...allDiffs);
+    const allDiffsMax = Math.max(...allDiffs);
     return {
       rounds: sorted.map(c => ({
         ...c,
@@ -117,6 +122,7 @@ export const RoundsThatCountCard: React.FC<Props> = ({ connectionId, currentHand
         is_worst: counterIds.has(c.id) && c.handicap_differential === maxDiff,
       })),
       minDiff, maxDiff, avgDiff,
+      allDiffsMin, allDiffsMax,
     };
   }, [allScores, counters]);
 
