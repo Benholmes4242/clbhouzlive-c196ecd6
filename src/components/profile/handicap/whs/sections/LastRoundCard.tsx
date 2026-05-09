@@ -154,15 +154,13 @@ export const LastRoundCard: React.FC<Props> = ({ connectionId }) => {
   };
 
   return (
-    <section style={{ padding: '0 16px', marginTop: 24, marginBottom: 28, fontFamily: FONT_GEIST }}>
-      {/* Eyebrow */}
-      <div className="flex items-center justify-between mb-2">
-        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-          <span style={{ width: 6, height: 6, borderRadius: '50%', background: AMBER }} />
-          <span style={{ ...eyebrowLabel, letterSpacing: '0.14em' }}>Last round</span>
-        </div>
-        <span style={{ fontSize: 12, color: INK_55 }}>{relativeDay(lastRound.play_date)}</span>
-      </div>
+    <section style={{ marginTop: 28, fontFamily: FONT_GEIST }}>
+      <SectionHeader
+        eyebrow="LAST ROUND"
+        title={lastRound.course?.name ?? 'Last round'}
+        right={<span style={{ fontSize: 12, color: INK_55 }}>{relativeDay(lastRound.play_date)}</span>}
+      />
+      <div style={{ padding: '0 20px' }}>
 
       {/* Card */}
       <button
