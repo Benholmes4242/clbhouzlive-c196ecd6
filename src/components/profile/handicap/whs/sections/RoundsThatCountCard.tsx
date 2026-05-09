@@ -5,6 +5,7 @@ import { useHandicapInsights } from '@/lib/whs/insights/useHandicapInsights';
 import { fmtDiff, fmtAxis } from '@/lib/whs/format';
 import { projectNextRound } from '@/lib/whs/handicapMath';
 import HandicapExplainerSheet from './HandicapExplainerSheet';
+import SectionHeader from './SectionHeader';
 
 const fmtDiffPlus = (n: number) => fmtDiff(n, { plus: true });
 
