@@ -64,7 +64,9 @@ function renderBoldMarkdown(text: string): React.ReactNode {
 }
 
 const Skeleton: React.FC = () => (
-  <section style={{ padding: '0 16px', marginBottom: 28 }}>
+  <section style={{ marginTop: 28 }}>
+    <SectionHeader eyebrow="ROUNDS THAT COUNT" title="The 8 best of your last 20" />
+    <div style={{ padding: '0 20px' }}>
     <div style={{ height: 12, width: 140, background: INK_06, borderRadius: 2, marginBottom: 10 }} />
     <div style={{ height: 56, background: INK_06, borderRadius: 12, marginBottom: 12 }} />
     <div style={{
