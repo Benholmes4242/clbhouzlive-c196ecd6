@@ -75,7 +75,7 @@ export const RivalryCard: React.FC<Props> = ({
   userHandicap,
   onInfo,
 }) => {
-  const rivalDisplayName = rivalry.rival_name ?? 'Unknown';
+  const rivalDisplayName = reformatFriendName(rivalry.rival_name ?? 'Unknown');
   const userDisplayName = userName ?? 'You';
   const sf = rivalry.stableford_record ?? { wins: 0, losses: 0, ties: 0 };
   const results = rivalry.shared_round_results ?? [];
