@@ -226,6 +226,7 @@ export const RecentRoundsCard: React.FC<Props> = ({ connectionId }) => {
           )}
         </>
       )}
+      </div>
 
       <RoundDetailSheet
         scoreId={openScoreId}
