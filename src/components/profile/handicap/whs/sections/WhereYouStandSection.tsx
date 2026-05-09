@@ -389,7 +389,7 @@ export const WhereYouStandSection: React.FC<Props> = ({ userId }) => {
   if (isLoading) {
     return (
       <section style={{ marginTop: 28 }}>
-        <Eyebrow>WHERE YOU STAND</Eyebrow>
+        <SectionHeader eyebrow="WHERE YOU STAND" title="Among active golfers" />
         <div
           style={{
             margin: '0 20px',
@@ -410,7 +410,7 @@ export const WhereYouStandSection: React.FC<Props> = ({ userId }) => {
 
   return (
     <section ref={sectionRef} style={{ marginTop: 28 }}>
-      <Eyebrow>WHERE YOU STAND</Eyebrow>
+      <SectionHeader eyebrow="WHERE YOU STAND" title="Among active golfers" />
       {d.available === true ? (
         <AvailableCard data={d} />
       ) : (
