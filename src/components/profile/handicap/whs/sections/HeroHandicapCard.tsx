@@ -33,7 +33,7 @@ const HERO_VIEWBOX = 200;
 const CX = HERO_VIEWBOX / 2;
 const CY = HERO_VIEWBOX / 2;
 const R_OUTER = 88;
-const STROKE_OUTER = 11;
+const STROKE_OUTER = 9;
 const C_OUTER = 2 * Math.PI * R_OUTER;
 const R_INNER = 70;
 const STROKE_INNER = 5;
@@ -480,7 +480,7 @@ const HeroHandicapCard: React.FC<Props> = ({ connection }) => {
       {/* Milestone labels above hero */}
       <div style={{
         display: 'flex', justifyContent: 'space-between',
-        padding: '0 calc(50% - clamp(80px, 24vw, 100px))',
+        padding: '0 calc(50% - clamp(72px, 22vw, 92px))',
         marginTop: 12, marginBottom: -4,
         fontSize: 'clamp(9px, 2.6vw, 10px)',
         fontWeight: 700, color: INK_40,
@@ -505,7 +505,7 @@ const HeroHandicapCard: React.FC<Props> = ({ connection }) => {
 
         {/* CENTRE — Hero ring */}
         <div style={{
-          width: 'clamp(130px, 38.7vw, 162px)',
+          width: 'clamp(118px, 35vw, 148px)',
           aspectRatio: '1 / 1',
           position: 'relative',
           justifySelf: 'center',
@@ -588,14 +588,7 @@ const HeroHandicapCard: React.FC<Props> = ({ connection }) => {
             pointerEvents: 'none',
           }}>
             <span style={{
-              fontSize: 7.5, fontWeight: 800, color: statusColor,
-              letterSpacing: '0.14em', marginBottom: 5,
-              textTransform: 'uppercase', textAlign: 'center',
-            }}>
-              {statusWord}
-            </span>
-            <span style={{
-              fontSize: 'clamp(31px, 10.5vw, 45px)', fontWeight: 700, color: INK,
+              fontSize: 'clamp(28px, 9.5vw, 40px)', fontWeight: 700, color: INK,
               letterSpacing: '-0.05em', lineHeight: 1,
               fontVariantNumeric: 'tabular-nums',
             }}>
