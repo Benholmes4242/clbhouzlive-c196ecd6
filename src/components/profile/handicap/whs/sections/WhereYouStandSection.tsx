@@ -1,4 +1,5 @@
 import React, { useEffect, useRef } from 'react';
+import SectionHeader from './SectionHeader';
 import { useHandicapPercentile } from '@/lib/whs/usePercentile';
 import type {
   HandicapPercentileResult,
