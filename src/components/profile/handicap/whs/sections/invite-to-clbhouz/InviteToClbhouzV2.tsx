@@ -350,7 +350,7 @@ export const InviteToClbhouzV2: React.FC<Props> = ({ ownerUserId }) => {
                     margin: '2px 0 0',
                     fontFamily: FONT,
                     fontSize: 11.5,
-                    color: T.amberInk,
+                    color: T.inkMute,
                     fontWeight: 600,
                     whiteSpace: 'nowrap',
                     overflow: 'hidden',
