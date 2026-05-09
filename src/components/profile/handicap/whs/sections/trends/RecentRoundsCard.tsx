@@ -421,9 +421,10 @@ interface DateTileProps {
   dateString: string;
   isBest: boolean;
   isCounter: boolean;
+  thumbnailUrl: string | null;
 }
 
-const DateTile: React.FC<DateTileProps> = ({ dateString, isBest, isCounter }) => {
+const DateTile: React.FC<DateTileProps> = ({ dateString, isBest, isCounter, thumbnailUrl }) => {
   const d = new Date(dateString);
   const dayOfMonth = d.getDate();
   const weekday = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'][d.getDay()];
@@ -443,6 +444,35 @@ const DateTile: React.FC<DateTileProps> = ({ dateString, isBest, isCounter }) =>
         overflow: 'hidden',
       }}
     >
+      {thumbnailUrl && (
+        <>
+          <img
+            src={thumbnailUrl}
+            alt=""
+            aria-hidden
+            loading="lazy"
+            style={{
+              position: 'absolute',
+              inset: 0,
+              width: '100%',
+              height: '100%',
+              objectFit: 'cover',
+              opacity: 1,
+              pointerEvents: 'none',
+            }}
+          />
+          <span
+            aria-hidden
+            style={{
+              position: 'absolute',
+              inset: 0,
+              background:
+                'linear-gradient(150deg, rgba(15,77,46,0.78), rgba(16,62,37,0.86))',
+              pointerEvents: 'none',
+            }}
+          />
+        </>
+      )}
       <span
         style={{
           position: 'absolute',
@@ -556,6 +586,7 @@ const FeedCard: React.FC<FeedCardProps> = ({ round, isBest, onTap }) => {
         dateString={round.play_date}
         isBest={isBest}
         isCounter={!!round.is_counter}
+        thumbnailUrl={round.course_thumbnail_image ?? null}
       />
       <div
         style={{
