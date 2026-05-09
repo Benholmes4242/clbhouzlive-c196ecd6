@@ -163,51 +163,6 @@ const CourseCarouselCard: React.FC<{
   </button>
 );
 
-const BlockHeader: React.FC<{
-  icon: React.ReactNode;
-  eyebrow: string;
-  color: string;
-  title: string;
-  subtitle: string;
-}> = ({ icon, eyebrow, color, title, subtitle }) => (
-  <div style={{ padding: '0 16px 10px' }}>
-    <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 6 }}>
-      <span style={{ color, display: 'flex' }}>{icon}</span>
-      <span
-        style={{
-          fontSize: 10,
-          fontWeight: 800,
-          letterSpacing: '0.18em',
-          color,
-          textTransform: 'uppercase',
-        }}
-      >
-        {eyebrow}
-      </span>
-    </div>
-    <div
-      style={{
-        fontSize: 17,
-        fontWeight: 800,
-        color: INK,
-        letterSpacing: '-0.02em',
-        lineHeight: 1.25,
-      }}
-    >
-      {title}
-    </div>
-    <div
-      style={{
-        marginTop: 2,
-        fontSize: 12,
-        color: INK_55,
-        lineHeight: 1.4,
-      }}
-    >
-      {subtitle}
-    </div>
-  </div>
-);
 
 const SkeletonCard = () => (
   <div
