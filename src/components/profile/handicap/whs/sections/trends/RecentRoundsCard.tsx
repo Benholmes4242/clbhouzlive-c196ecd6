@@ -444,6 +444,35 @@ const DateTile: React.FC<DateTileProps> = ({ dateString, isBest, isCounter, thum
         overflow: 'hidden',
       }}
     >
+      {thumbnailUrl && (
+        <>
+          <img
+            src={thumbnailUrl}
+            alt=""
+            aria-hidden
+            loading="lazy"
+            style={{
+              position: 'absolute',
+              inset: 0,
+              width: '100%',
+              height: '100%',
+              objectFit: 'cover',
+              opacity: 1,
+              pointerEvents: 'none',
+            }}
+          />
+          <span
+            aria-hidden
+            style={{
+              position: 'absolute',
+              inset: 0,
+              background:
+                'linear-gradient(150deg, rgba(15,77,46,0.78), rgba(16,62,37,0.86))',
+              pointerEvents: 'none',
+            }}
+          />
+        </>
+      )}
       <span
         style={{
           position: 'absolute',
