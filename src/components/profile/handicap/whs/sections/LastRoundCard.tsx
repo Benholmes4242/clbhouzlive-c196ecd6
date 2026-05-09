@@ -372,6 +372,7 @@ export const LastRoundCard: React.FC<Props> = ({ connectionId }) => {
         open={sheetOpen}
         onClose={() => setSheetOpen(false)}
       />
+      </div>
     </section>
   );
 };
