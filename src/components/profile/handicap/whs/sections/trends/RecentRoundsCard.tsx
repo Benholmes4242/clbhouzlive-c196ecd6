@@ -489,7 +489,7 @@ const DateTile: React.FC<DateTileProps> = ({ dateString, isBest, isCounter }) =>
             padding: '2px 5px 2px 4px',
             background: T.gold,
             color: '#3F2A05',
-            borderRadius: 4,
+            borderRadius: 99,
             fontSize: 8.5,
             fontWeight: 800,
             letterSpacing: '0.08em',
