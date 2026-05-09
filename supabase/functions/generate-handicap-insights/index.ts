@@ -323,7 +323,7 @@ Deno.serve(async (req) => {
     if (allRecIds.length > 0) {
       const { data: hydrated } = await admin
         .from("golf_courses")
-        .select("id, name, region, country")
+        .select("id, name, region, country, thumbnail_image")
         .in("id", allRecIds);
       hyMap = new Map((hydrated ?? []).map((c: any) => [c.id, c]));
     }
@@ -339,6 +339,7 @@ Deno.serve(async (req) => {
           region: c.region ?? c.country ?? "",
           rationale: r.rationale,
           expected_differential: r.expected_differential,
+          thumbnail_image: c.thumbnail_image ?? null,
         };
       });
 
