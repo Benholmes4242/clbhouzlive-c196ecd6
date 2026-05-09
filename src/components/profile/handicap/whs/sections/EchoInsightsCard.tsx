@@ -60,9 +60,26 @@ const CourseCarouselCard: React.FC<{
         alignItems: 'center',
         justifyContent: 'center',
         borderBottom: `0.5px solid ${INK_10}`,
+        overflow: 'hidden',
       }}
     >
-      <MapPin size={28} color={accent} strokeWidth={1.8} />
+      {course.thumbnail_image ? (
+        <img
+          src={course.thumbnail_image}
+          alt=""
+          aria-hidden
+          loading="lazy"
+          style={{
+            position: 'absolute',
+            inset: 0,
+            width: '100%',
+            height: '100%',
+            objectFit: 'cover',
+          }}
+        />
+      ) : (
+        <MapPin size={28} color={accent} strokeWidth={1.8} />
+      )}
       {course.expected_differential != null && (
         <div
           style={{
@@ -77,6 +94,7 @@ const CourseCarouselCard: React.FC<{
             alignItems: 'baseline',
             gap: 4,
             boxShadow: '0 1px 2px rgba(15,23,42,0.06)',
+            zIndex: 1,
           }}
         >
           <span

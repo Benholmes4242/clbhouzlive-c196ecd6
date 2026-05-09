@@ -37,13 +37,37 @@ async function fetchCachedInsights(connectionId: string): Promise<{
 
   let insights: HandicapInsights | null = null;
   if (row) {
+    const rawSuited = (row.suited_courses as SuitedCourse[]) ?? [];
+    const rawTest = (row.test_courses as SuitedCourse[]) ?? [];
+
+    const missingThumbIds = new Set<string>();
+    for (const c of [...rawSuited, ...rawTest]) {
+      if (!c.thumbnail_image && c.id) missingThumbIds.add(c.id);
+    }
+
+    let thumbsById: Record<string, string | null> = {};
+    if (missingThumbIds.size > 0) {
+      const { data: thumbsRows } = await supabase
+        .from('golf_courses')
+        .select('id, thumbnail_image')
+        .in('id', Array.from(missingThumbIds));
+      thumbsById = Object.fromEntries(
+        (thumbsRows ?? []).map((r: any) => [r.id as string, (r.thumbnail_image as string | null) ?? null]),
+      );
+    }
+
+    const fillThumb = (c: SuitedCourse): SuitedCourse =>
+      c.thumbnail_image
+        ? c
+        : { ...c, thumbnail_image: thumbsById[c.id] ?? null };
+
     insights = {
       scoring_profile: row.scoring_profile,
       rounds_pattern: (row as any).rounds_pattern ?? '',
       trend_narrative: (row as any).trend_narrative ?? '',
       friend_narrative: (row as any).friend_narrative ?? '',
-      suited_courses: (row.suited_courses as SuitedCourse[]) ?? [],
-      test_courses: (row.test_courses as SuitedCourse[]) ?? [],
+      suited_courses: rawSuited.map(fillThumb),
+      test_courses: rawTest.map(fillThumb),
       generated_at: row.generated_at,
     };
   }

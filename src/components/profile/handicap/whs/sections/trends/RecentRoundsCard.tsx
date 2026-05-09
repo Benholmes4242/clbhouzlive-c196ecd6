@@ -419,12 +419,10 @@ const MonthDivider: React.FC<{ month: string; count: number }> = ({
 // ─── Date tile ──────────────────────────────────────────────────────
 interface DateTileProps {
   dateString: string;
-  isBest: boolean;
-  isCounter: boolean;
   thumbnailUrl: string | null;
 }
 
-const DateTile: React.FC<DateTileProps> = ({ dateString, isBest, isCounter, thumbnailUrl }) => {
+const DateTile: React.FC<DateTileProps> = ({ dateString, thumbnailUrl }) => {
   const d = new Date(dateString);
   const dayOfMonth = d.getDate();
   const weekday = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'][d.getDay()];
@@ -507,46 +505,6 @@ const DateTile: React.FC<DateTileProps> = ({ dateString, isBest, isCounter, thum
         {dayOfMonth}
       </span>
 
-      {isBest && (
-        <div
-          style={{
-            position: 'absolute',
-            top: 6,
-            left: 6,
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: 3,
-            padding: '2px 5px 2px 4px',
-            background: T.gold,
-            color: '#3F2A05',
-            borderRadius: 99,
-            fontSize: 8.5,
-            fontWeight: 800,
-            letterSpacing: '0.08em',
-          }}
-        >
-          <Trophy size={9} strokeWidth={2.5} />
-          BEST
-        </div>
-      )}
-      {isCounter && !isBest && (
-        <div
-          style={{
-            position: 'absolute',
-            top: 6,
-            left: 6,
-            padding: '2px 5px',
-            background: T.amber,
-            color: '#FFFFFF',
-            borderRadius: 99,
-            fontSize: 8.5,
-            fontWeight: 800,
-            letterSpacing: '0.08em',
-          }}
-        >
-          COUNTER
-        </div>
-      )}
     </div>
   );
 };
@@ -584,8 +542,6 @@ const FeedCard: React.FC<FeedCardProps> = ({ round, isBest, onTap }) => {
     >
       <DateTile
         dateString={round.play_date}
-        isBest={isBest}
-        isCounter={!!round.is_counter}
         thumbnailUrl={round.course_thumbnail_image ?? null}
       />
       <div
@@ -621,10 +577,44 @@ const FeedCard: React.FC<FeedCardProps> = ({ round, isBest, onTap }) => {
               color: T.inkMute,
               display: 'flex',
               alignItems: 'center',
-              gap: 5,
+              gap: 6,
               flexWrap: 'wrap',
             }}
           >
+            {isBest && (
+              <span
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 3,
+                  padding: '2px 6px 2px 5px',
+                  background: T.gold,
+                  color: '#3F2A05',
+                  borderRadius: 99,
+                  fontSize: 9,
+                  fontWeight: 800,
+                  letterSpacing: '0.08em',
+                }}
+              >
+                <Trophy size={9} strokeWidth={2.5} />
+                BEST
+              </span>
+            )}
+            {!isBest && round.is_counter && (
+              <span
+                style={{
+                  padding: '2px 6px',
+                  background: T.amber,
+                  color: '#FFFFFF',
+                  borderRadius: 99,
+                  fontSize: 9,
+                  fontWeight: 800,
+                  letterSpacing: '0.08em',
+                }}
+              >
+                COUNTER
+              </span>
+            )}
             <span>{fmtRelativeDate(round.play_date)}</span>
             {deltaInfo && (
               <>
