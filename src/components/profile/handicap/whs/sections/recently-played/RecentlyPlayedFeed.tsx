@@ -70,6 +70,11 @@ export const RecentlyPlayedFeed: React.FC<Props> = ({ ownerUserId }) => {
             <FriendRoundCard
               activity={item}
               onClick={() => setSheetActivity(item)}
+              onInviteClick={() => {
+                document
+                  .getElementById('invite-to-clbhouz-section')
+                  ?.scrollIntoView({ behavior: 'smooth' });
+              }}
             />
           )}
         />
