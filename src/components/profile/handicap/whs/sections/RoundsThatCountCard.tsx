@@ -136,9 +136,17 @@ export const RoundsThatCountCard: React.FC<Props> = ({ connectionId, currentHand
   const bestRound = enriched.rounds.find(r => r.is_best)!;
   const worstRound = enriched.rounds.find(r => r.is_worst)!;
 
-  // Y-axis range
-  const yMin = Math.min(-1, Math.floor(enriched.minDiff - 0.5));
-  const yMax = Math.max(4, Math.ceil(enriched.maxDiff + 0.5));
+  // Y-axis range — driven by ALL rounds, not just counters, so non-counter
+  // dots stay inside the plot area.
+  const cutTarget = projection?.hasData ? projection.cutTarget : null;
+  const dataMin = Math.min(enriched.allDiffsMin, enriched.minDiff);
+  const dataMax = Math.max(
+    enriched.allDiffsMax,
+    enriched.maxDiff,
+    cutTarget ?? -Infinity,
+  );
+  const yMin = Math.min(-1, Math.floor(dataMin - 0.5));
+  const yMax = Math.max(4, Math.ceil(dataMax + 0.5));
   const ticks = generateTicks(yMin, yMax);
   const ySpan = yMax - yMin;
   const innerH = CHART_H - CHART_TOP - CHART_BOTTOM;
