@@ -62,8 +62,6 @@ interface Props {
   userId: string;
 }
 
-interface Props_unused {}
-
 
 const DistributionChart: React.FC<{
   buckets: HandicapPercentileBucket[];
