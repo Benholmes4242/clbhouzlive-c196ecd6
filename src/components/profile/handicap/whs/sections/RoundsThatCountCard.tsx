@@ -466,46 +466,56 @@ export const RoundsThatCountCard: React.FC<Props> = ({ connectionId, currentHand
             </div>
           </div>
 
-          {/* Date labels */}
+          {/* Date labels — thinned. Every column keeps its slot for click-targets,
+              but only N labels render text to prevent rotated overlap. */}
           <div style={{
             display: 'flex', marginTop: 6, marginLeft: Y_AXIS_W,
             paddingBottom: 14,
           }}>
-            {enriched.rounds.map((r, i) => {
-              const d = new Date(r.play_date);
-              const isLatest = i === enriched.rounds.length - 1;
-              return (
-                <button
-                  key={r.id}
-                  onClick={() => setSelectedId(r.id)}
-                  style={{
-                    flex: 1, textAlign: 'center',
-                    background: 'transparent', border: 'none',
-                    padding: '4px 0', cursor: 'pointer',
-                    transform: 'rotate(-30deg)',
-                    transformOrigin: 'top center',
-                  }}
-                >
-                  <div style={{
-                    fontSize: 9.5, fontWeight: 600,
-                    color: isLatest ? INK : INK_40,
-                    letterSpacing: '0.04em',
-                  }}>
-                    {WEEKDAY[d.getDay()]}
-                  </div>
-                  <div style={{
-                    fontSize: 9.5, fontWeight: isLatest ? 700 : 600,
-                    color: isLatest ? INK : INK_40,
-                    fontFamily: FONT_DISPLAY,
-                    fontVariantNumeric: 'tabular-nums',
-                    letterSpacing: '0.04em',
-                    marginTop: 1,
-                  }}>
-                    {d.getDate()}
-                  </div>
-                </button>
-              );
-            })}
+            {(() => {
+              const total = enriched.rounds.length;
+              const targetCount = 5;
+              const stride = Math.max(1, Math.floor(total / targetCount));
+              const visibleIdx = new Set<number>();
+              for (let i = 0; i < total; i += stride) visibleIdx.add(i);
+              visibleIdx.add(total - 1);
+              return enriched.rounds.map((r, i) => {
+                const d = new Date(r.play_date);
+                const isLatest = i === total - 1;
+                const showLabel = visibleIdx.has(i);
+                return (
+                  <button
+                    key={r.id}
+                    onClick={() => setSelectedId(r.id)}
+                    aria-label={`Round on ${d.toLocaleDateString()}`}
+                    style={{
+                      flex: 1, textAlign: 'center',
+                      background: 'transparent', border: 'none',
+                      padding: '4px 0', cursor: 'pointer',
+                      visibility: showLabel ? 'visible' : 'hidden',
+                    }}
+                  >
+                    <div style={{
+                      fontSize: 9.5, fontWeight: 600,
+                      color: isLatest ? INK : INK_40,
+                      letterSpacing: '0.04em',
+                    }}>
+                      {WEEKDAY[d.getDay()]}
+                    </div>
+                    <div style={{
+                      fontSize: 9.5, fontWeight: isLatest ? 700 : 600,
+                      color: isLatest ? INK : INK_40,
+                      fontFamily: FONT_DISPLAY,
+                      fontVariantNumeric: 'tabular-nums',
+                      letterSpacing: '0.04em',
+                      marginTop: 1,
+                    }}>
+                      {d.getDate()}
+                    </div>
+                  </button>
+                );
+              });
+            })()}
           </div>
         </div>
       </div>
