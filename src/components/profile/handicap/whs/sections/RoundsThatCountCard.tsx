@@ -289,18 +289,20 @@ export const RoundsThatCountCard: React.FC<Props> = ({ connectionId, currentHand
             <div style={{
               flex: 1, position: 'relative', height: CHART_H,
             }}>
-              {/* Permanent latest emphasis band */}
+              {/* Permanent latest emphasis band — centered on the last dot */}
               {(() => {
                 const latestIdx = enriched.rounds.length - 1;
                 if (latestIdx < 0) return null;
                 const colWidth = 100 / enriched.rounds.length;
+                const bandWidth = colWidth * 0.9;
+                const centerPct = xFor(latestIdx);
                 return (
                   <div style={{
                     position: 'absolute',
                     top: 0,
                     bottom: 0,
-                    left: `${(latestIdx + 0.05) * colWidth}%`,
-                    width: `${colWidth * 0.9}%`,
+                    left: `${centerPct - bandWidth / 2}%`,
+                    width: `${bandWidth}%`,
                     background: 'rgba(247,147,30,0.08)',
                     opacity: 1,
                     borderRadius: 6,
