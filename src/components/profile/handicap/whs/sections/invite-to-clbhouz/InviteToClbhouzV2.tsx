@@ -285,15 +285,15 @@ export const InviteToClbhouzV2: React.FC<Props> = ({ ownerUserId }) => {
       {!friendsLoading && picks.length > 0 && (
         <div
           style={{
-            margin: '0 16px',
-            background: `linear-gradient(135deg, ${T.amberSoftA}, ${T.amberSoftB})`,
+            margin: '0 20px',
+            background: T.cardBg,
             border: `1px solid ${T.hairline}`,
             borderRadius: 14,
             overflow: 'hidden',
           }}
         >
-          {/* Top — stacked avatars + names + reason + bulk CTA */}
-          <div style={{ padding: '16px 16px 14px' }}>
+          {/* Top — gradient strip with avatars + names + reason + bulk CTA */}
+          <div style={{ background: `linear-gradient(135deg, ${T.amberSoftA}, ${T.amberSoftB})`, padding: '16px 16px 14px', borderBottom: `0.5px solid ${T.hairline}` }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
               <div style={{ display: 'flex', flexShrink: 0 }}>
                 {picks.map((p, i) => (
