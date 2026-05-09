@@ -651,6 +651,7 @@ export const RoundsThatCountCard: React.FC<Props> = ({ connectionId, currentHand
           </div>
         );
       })()}
+      </div>
     </section>
   );
 };
