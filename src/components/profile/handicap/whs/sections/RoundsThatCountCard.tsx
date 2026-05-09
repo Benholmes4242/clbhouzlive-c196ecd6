@@ -5,6 +5,7 @@ import { useHandicapInsights } from '@/lib/whs/insights/useHandicapInsights';
 import { fmtDiff, fmtAxis } from '@/lib/whs/format';
 import { projectNextRound } from '@/lib/whs/handicapMath';
 import HandicapExplainerSheet from './HandicapExplainerSheet';
+import SectionHeader from './SectionHeader';
 
 const fmtDiffPlus = (n: number) => fmtDiff(n, { plus: true });
 
@@ -63,7 +64,9 @@ function renderBoldMarkdown(text: string): React.ReactNode {
 }
 
 const Skeleton: React.FC = () => (
-  <section style={{ padding: '0 16px', marginBottom: 28 }}>
+  <section style={{ marginTop: 28 }}>
+    <SectionHeader eyebrow="ROUNDS THAT COUNT" title="The 8 best of your last 20" />
+    <div style={{ padding: '0 20px' }}>
     <div style={{ height: 12, width: 140, background: INK_06, borderRadius: 2, marginBottom: 10 }} />
     <div style={{ height: 56, background: INK_06, borderRadius: 12, marginBottom: 12 }} />
     <div style={{
@@ -72,6 +75,7 @@ const Skeleton: React.FC = () => (
       <div style={{ height: 220, background: INK_06 }} />
       <div style={{ height: 60, background: INK_06, borderTop: `0.5px solid ${INK_10}` }} />
       <div style={{ height: 110, background: INK_06, borderTop: `0.5px solid ${INK_10}` }} />
+    </div>
     </div>
   </section>
 );
@@ -153,18 +157,9 @@ export const RoundsThatCountCard: React.FC<Props> = ({ connectionId, currentHand
     || 'Your handicap is built from these 8 rounds.';
 
   return (
-    <section style={{ padding: '0 16px', marginBottom: 28 }}>
-      {/* Eyebrow */}
-      <div style={{
-        display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10, padding: '0 2px',
-      }}>
-        <span style={{ width: 4, height: 4, borderRadius: '50%', background: INK_40 }} />
-        <span style={{
-          fontSize: 10, fontWeight: 800, color: INK_55, letterSpacing: '0.22em',
-        }}>
-          ROUNDS THAT COUNT
-        </span>
-      </div>
+    <section style={{ marginTop: 28 }}>
+      <SectionHeader eyebrow="ROUNDS THAT COUNT" title="The 8 best of your last 20" />
+      <div style={{ padding: '0 20px' }}>
 
       {/* Echo insight banner */}
       <div style={{
@@ -656,6 +651,7 @@ export const RoundsThatCountCard: React.FC<Props> = ({ connectionId, currentHand
           </div>
         );
       })()}
+      </div>
     </section>
   );
 };

@@ -1,4 +1,5 @@
 import React, { useEffect, useRef } from 'react';
+import SectionHeader from './SectionHeader';
 import { useHandicapPercentile } from '@/lib/whs/usePercentile';
 import type {
   HandicapPercentileResult,
@@ -61,23 +62,6 @@ interface Props {
   userId: string;
 }
 
-const Eyebrow: React.FC<{ children: React.ReactNode }> = ({ children }) => (
-  <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '0 20px', marginBottom: 10 }}>
-    <span style={{ width: 6, height: 6, borderRadius: 3, background: AMBER }} />
-    <span
-      style={{
-        fontFamily: FONT_GEIST,
-        fontSize: 11,
-        fontWeight: 700,
-        letterSpacing: '0.14em',
-        color: INK_55,
-        textTransform: 'uppercase',
-      }}
-    >
-      {children}
-    </span>
-  </div>
-);
 
 const DistributionChart: React.FC<{
   buckets: HandicapPercentileBucket[];
@@ -403,7 +387,7 @@ export const WhereYouStandSection: React.FC<Props> = ({ userId }) => {
   if (isLoading) {
     return (
       <section style={{ marginTop: 28 }}>
-        <Eyebrow>WHERE YOU STAND</Eyebrow>
+        <SectionHeader eyebrow="WHERE YOU STAND" title="Among active golfers" />
         <div
           style={{
             margin: '0 20px',
@@ -424,7 +408,7 @@ export const WhereYouStandSection: React.FC<Props> = ({ userId }) => {
 
   return (
     <section ref={sectionRef} style={{ marginTop: 28 }}>
-      <Eyebrow>WHERE YOU STAND</Eyebrow>
+      <SectionHeader eyebrow="WHERE YOU STAND" title="Among active golfers" />
       {d.available === true ? (
         <AvailableCard data={d} />
       ) : (

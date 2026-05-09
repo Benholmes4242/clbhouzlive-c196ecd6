@@ -1,6 +1,7 @@
 import React, { useMemo } from 'react';
 import { Info, Flame, Sparkles } from 'lucide-react';
 import { initials } from '@/lib/whs/utils/initials';
+import { reformatFriendName } from '@/lib/whs/utils/nameFormat';
 import { fmtHcp } from '@/lib/whs/format';
 import type { FriendRivalryHydrated } from '@/lib/whs/types';
 
@@ -74,7 +75,7 @@ export const RivalryCard: React.FC<Props> = ({
   userHandicap,
   onInfo,
 }) => {
-  const rivalDisplayName = rivalry.rival_name ?? 'Unknown';
+  const rivalDisplayName = reformatFriendName(rivalry.rival_name ?? 'Unknown');
   const userDisplayName = userName ?? 'You';
   const sf = rivalry.stableford_record ?? { wins: 0, losses: 0, ties: 0 };
   const results = rivalry.shared_round_results ?? [];
@@ -230,7 +231,7 @@ export const RivalryCard: React.FC<Props> = ({
                 }}
               >
                 <span style={{ color: youScoreColor }}>{sf.wins}</span>
-                <span style={{ color: T.whiteSofter, fontSize: 24 }}>{'\u2014'}</span>
+                <span style={{ color: T.whiteSofter, fontSize: 38 }}>{'\u2014'}</span>
                 <span style={{ color: themScoreColor }}>{sf.losses}</span>
               </div>
               <div
@@ -387,7 +388,7 @@ const Portrait: React.FC<PortraitProps> = ({
         height: 60,
         borderRadius: '50%',
         background: thumbnail ? `url(${thumbnail}) center/cover no-repeat` : 'rgba(255,255,255,0.10)',
-        border: `3px solid ${ringColor}`,
+        border: `2px solid ${ringColor}`,
         boxShadow: ringGlow ? `0 0 12px ${ringColor}` : 'none',
         display: 'flex',
         alignItems: 'center',

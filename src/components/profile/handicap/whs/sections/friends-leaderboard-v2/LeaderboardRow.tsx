@@ -203,8 +203,7 @@ export const LeaderboardRow: React.FC<Props> = ({
           flexShrink: 0,
           display: 'flex',
           alignItems: 'center',
-          justifyContent: 'center',
-          paddingRight: 6,
+          justifyContent: 'flex-end',
         }}
       >
         {trend ? (

@@ -1,11 +1,12 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { MapPin, Target, TrendingDown } from 'lucide-react';
+import { MapPin } from 'lucide-react';
 import { useHandicapInsights } from '@/lib/whs/insights/useHandicapInsights';
 import type { SuitedCourse } from '@/lib/whs/insights/types';
 import { useCounters } from '@/lib/whs/hooks';
 import { fmtDiff } from '@/lib/whs/format';
 import { analyticsEvents } from '@/utils/analyticsEvents';
+import SectionHeader from './SectionHeader';
 
 const INK = '#0F172A';
 const INK_55 = 'rgba(15,23,42,0.55)';
@@ -162,51 +163,6 @@ const CourseCarouselCard: React.FC<{
   </button>
 );
 
-const BlockHeader: React.FC<{
-  icon: React.ReactNode;
-  eyebrow: string;
-  color: string;
-  title: string;
-  subtitle: string;
-}> = ({ icon, eyebrow, color, title, subtitle }) => (
-  <div style={{ padding: '0 16px 10px' }}>
-    <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 6 }}>
-      <span style={{ color, display: 'flex' }}>{icon}</span>
-      <span
-        style={{
-          fontSize: 10,
-          fontWeight: 800,
-          letterSpacing: '0.18em',
-          color,
-          textTransform: 'uppercase',
-        }}
-      >
-        {eyebrow}
-      </span>
-    </div>
-    <div
-      style={{
-        fontSize: 17,
-        fontWeight: 800,
-        color: INK,
-        letterSpacing: '-0.02em',
-        lineHeight: 1.25,
-      }}
-    >
-      {title}
-    </div>
-    <div
-      style={{
-        marginTop: 2,
-        fontSize: 12,
-        color: INK_55,
-        lineHeight: 1.4,
-      }}
-    >
-      {subtitle}
-    </div>
-  </div>
-);
 
 const SkeletonCard = () => (
   <div
@@ -271,7 +227,7 @@ export const EchoInsightsCard: React.FC<Props> = ({ connectionId }) => {
           display: flex;
           gap: 10px;
           overflow-x: auto;
-          padding: 4px 16px 12px;
+          padding: 4px 20px 12px;
           scrollbar-width: none;
           -webkit-overflow-scrolling: touch;
         }
@@ -279,19 +235,17 @@ export const EchoInsightsCard: React.FC<Props> = ({ connectionId }) => {
       `}</style>
 
       {error && (
-        <div style={{ padding: '0 16px 12px', fontSize: 11, color: INK_55 }}>
+        <div style={{ padding: '0 20px 12px', fontSize: 11, color: INK_55 }}>
           Couldn't generate insights right now.
         </div>
       )}
 
       {/* Suited */}
       <div>
-        <BlockHeader
-          icon={<TrendingDown size={11} strokeWidth={2.5} />}
-          eyebrow="Suited to your game"
-          color={GREEN}
+        <SectionHeader
+          eyebrow="SUITED TO YOUR GAME"
           title="Three courses for posting low scores"
-          subtitle="Layouts that match your strengths."
+          sub="Layouts that match your strengths."
         />
         <div className="insightsCarousel">
           {isLoading || !insights ? (
@@ -318,12 +272,10 @@ export const EchoInsightsCard: React.FC<Props> = ({ connectionId }) => {
 
       {/* Test yourself */}
       <div style={{ marginTop: 16 }}>
-        <BlockHeader
-          icon={<Target size={11} strokeWidth={2.5} />}
-          eyebrow="Test yourself"
-          color={AMBER_DEEP}
+        <SectionHeader
+          eyebrow="TEST YOURSELF"
           title="Three courses to grow your game"
-          subtitle="Layouts that stretch what you don't usually face."
+          sub="Layouts that stretch what you don't usually face."
         />
         <div className="insightsCarousel">
           {isLoading || !insights ? (

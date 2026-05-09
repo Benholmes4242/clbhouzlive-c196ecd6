@@ -2,6 +2,7 @@ import React, { useEffect, useRef } from 'react';
 
 import { ChevronRight, Flame, Shield, Trophy, TrendingDown } from 'lucide-react';
 import { toast } from 'sonner';
+import SectionHeader from './SectionHeader';
 import { useStreaks, type StreakResult, type StreaksData } from '@/lib/whs/useStreaks';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 
@@ -23,19 +24,6 @@ interface Props {
   userId: string;
 }
 
-const Eyebrow: React.FC<{ children: React.ReactNode }> = ({ children }) => (
-  <div
-    style={{
-      fontSize: 10,
-      fontWeight: 800,
-      color: INK_55,
-      letterSpacing: '0.22em',
-      marginBottom: 6,
-    }}
-  >
-    {children}
-  </div>
-);
 
 const BestCaption: React.FC<{ streak: StreakResult }> = ({ streak }) => {
   if (streak.bestEndedAt == null && streak.isActive && streak.best > 0) {
@@ -481,10 +469,11 @@ export const StreaksSection: React.FC<Props> = ({ connectionId, userId }) => {
 
   if (isLoading) {
     return (
-      <section style={{ padding: '0 20px', marginTop: 32 }}>
-        <Eyebrow>STREAKS</Eyebrow>
+      <section style={{ marginTop: 28 }}>
+        <SectionHeader eyebrow="STREAKS" title="Three runs to beat" />
         <div
           style={{
+            margin: '0 20px',
             height: 168,
             background: INK_06,
             borderRadius: 14,
@@ -508,24 +497,13 @@ export const StreaksSection: React.FC<Props> = ({ connectionId, userId }) => {
   return (
     <section
       ref={sectionRef}
-      style={{ padding: '0 20px', marginTop: 32, fontFamily: FONT_GEIST }}
+      style={{ marginTop: 28, fontFamily: FONT_GEIST }}
     >
-      <Eyebrow>STREAKS</Eyebrow>
-      <h2
-        style={{
-          fontSize: 26,
-          fontWeight: 800,
-          color: INK,
-          letterSpacing: '-0.02em',
-          lineHeight: 1.15,
-          margin: '0 0 4px',
-        }}
-      >
-        Three runs to beat
-      </h2>
-      <div style={{ fontSize: 13, color: INK_55, marginBottom: 14 }}>
-        Each one tracks a different chapter of your form.
-      </div>
+      <SectionHeader
+        eyebrow="STREAKS"
+        title="Three runs to beat"
+        sub="Each one tracks a different chapter of your form."
+      />
 
       <style>{`
         .hide-scrollbar::-webkit-scrollbar { display: none; }
@@ -536,7 +514,6 @@ export const StreaksSection: React.FC<Props> = ({ connectionId, userId }) => {
           display: 'flex',
           gap: 12,
           overflowX: 'auto',
-          margin: '0 -20px',
           padding: '4px 20px 12px',
           scrollbarWidth: 'none',
           WebkitOverflowScrolling: 'touch',
@@ -572,46 +549,48 @@ export const StreaksSection: React.FC<Props> = ({ connectionId, userId }) => {
 
 
       {/* All-time records */}
-      <button
-        type="button"
-        onClick={handleRecordsTap}
-        style={{
-          width: '100%',
-          textAlign: 'left',
-          background: '#fff',
-          border: `0.5px solid ${INK_10}`,
-          borderRadius: 14,
-          padding: 14,
-          fontFamily: FONT_GEIST,
-          cursor: 'pointer',
-          display: 'flex',
-          alignItems: 'center',
-          gap: 12,
-        }}
-      >
-        <div
+      <div style={{ padding: '0 20px' }}>
+        <button
+          type="button"
+          onClick={handleRecordsTap}
           style={{
-            width: 32,
-            height: 32,
-            borderRadius: 10,
-            background: INK_06,
+            width: '100%',
+            textAlign: 'left',
+            background: '#fff',
+            border: `0.5px solid ${INK_10}`,
+            borderRadius: 14,
+            padding: 14,
+            fontFamily: FONT_GEIST,
+            cursor: 'pointer',
             display: 'flex',
             alignItems: 'center',
-            justifyContent: 'center',
+            gap: 12,
           }}
         >
-          <Trophy size={16} color={INK_70} strokeWidth={2.2} />
-        </div>
-        <div style={{ flex: 1 }}>
-          <div style={{ fontSize: 13.5, fontWeight: 700, color: INK }}>
-            All-time records
+          <div
+            style={{
+              width: 32,
+              height: 32,
+              borderRadius: 10,
+              background: INK_06,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+          >
+            <Trophy size={16} color={INK_70} strokeWidth={2.2} />
           </div>
-          <div style={{ fontSize: 11.5, color: INK_55, marginTop: 2 }}>
-            Lowest round, biggest cut, longest run
+          <div style={{ flex: 1 }}>
+            <div style={{ fontSize: 13.5, fontWeight: 700, color: INK }}>
+              All-time records
+            </div>
+            <div style={{ fontSize: 11.5, color: INK_55, marginTop: 2 }}>
+              Lowest round, biggest cut, longest run
+            </div>
           </div>
-        </div>
-        <ChevronRight size={16} color={INK_40} />
-      </button>
+          <ChevronRight size={16} color={INK_40} />
+        </button>
+      </div>
     </section>
   );
 };

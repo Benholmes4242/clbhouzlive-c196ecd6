@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { format } from 'date-fns';
 import { useLastRound, useRoundDetail } from '@/lib/whs/hooks';
 import RoundDetailSheet from './round-detail/RoundDetailSheet';
+import SectionHeader from './SectionHeader';
 
 interface Props {
   connectionId: string;
@@ -56,10 +57,12 @@ export const LastRoundCard: React.FC<Props> = ({ connectionId }) => {
 
   if (isLoading) {
     return (
-      <section style={{ padding: '0 16px', marginBottom: 28 }}>
-        <div className="space-y-2 animate-pulse">
-          <div className="h-3 w-24 bg-muted/60 rounded mb-2" />
-          <div className="h-[160px] w-full bg-muted rounded-2xl" />
+      <section style={{ marginTop: 28 }}>
+        <SectionHeader eyebrow="LAST ROUND" title="Loading…" />
+        <div style={{ padding: '0 20px' }}>
+          <div className="space-y-2 animate-pulse">
+            <div className="h-[160px] w-full bg-muted rounded-2xl" />
+          </div>
         </div>
       </section>
     );
@@ -67,10 +70,13 @@ export const LastRoundCard: React.FC<Props> = ({ connectionId }) => {
 
   if (!lastRound) {
     return (
-      <section style={{ padding: '0 16px', marginBottom: 28 }}>
-        <p className="text-[14px] text-muted-foreground">
-          Your rounds will appear here as soon as you start posting scores in MyEG.
-        </p>
+      <section style={{ marginTop: 28 }}>
+        <SectionHeader eyebrow="LAST ROUND" title="No rounds yet" />
+        <div style={{ padding: '0 20px' }}>
+          <p className="text-[14px] text-muted-foreground">
+            Your rounds will appear here as soon as you start posting scores in MyEG.
+          </p>
+        </div>
       </section>
     );
   }
@@ -148,15 +154,13 @@ export const LastRoundCard: React.FC<Props> = ({ connectionId }) => {
   };
 
   return (
-    <section style={{ padding: '0 16px', marginTop: 24, marginBottom: 28, fontFamily: FONT_GEIST }}>
-      {/* Eyebrow */}
-      <div className="flex items-center justify-between mb-2">
-        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-          <span style={{ width: 6, height: 6, borderRadius: '50%', background: AMBER }} />
-          <span style={{ ...eyebrowLabel, letterSpacing: '0.14em' }}>Last round</span>
-        </div>
-        <span style={{ fontSize: 12, color: INK_55 }}>{relativeDay(lastRound.play_date)}</span>
-      </div>
+    <section style={{ marginTop: 28, fontFamily: FONT_GEIST }}>
+      <SectionHeader
+        eyebrow="LAST ROUND"
+        title={lastRound.course?.name ?? 'Last round'}
+        right={<span style={{ fontSize: 12, color: INK_55 }}>{relativeDay(lastRound.play_date)}</span>}
+      />
+      <div style={{ padding: '0 20px' }}>
 
       {/* Card */}
       <button
@@ -368,6 +372,7 @@ export const LastRoundCard: React.FC<Props> = ({ connectionId }) => {
         open={sheetOpen}
         onClose={() => setSheetOpen(false)}
       />
+      </div>
     </section>
   );
 };
