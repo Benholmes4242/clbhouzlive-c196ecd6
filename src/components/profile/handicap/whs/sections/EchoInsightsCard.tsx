@@ -1,11 +1,12 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { MapPin, Target, TrendingDown } from 'lucide-react';
+import { MapPin } from 'lucide-react';
 import { useHandicapInsights } from '@/lib/whs/insights/useHandicapInsights';
 import type { SuitedCourse } from '@/lib/whs/insights/types';
 import { useCounters } from '@/lib/whs/hooks';
 import { fmtDiff } from '@/lib/whs/format';
 import { analyticsEvents } from '@/utils/analyticsEvents';
+import SectionHeader from './SectionHeader';
 
 const INK = '#0F172A';
 const INK_55 = 'rgba(15,23,42,0.55)';
