@@ -57,10 +57,12 @@ export const LastRoundCard: React.FC<Props> = ({ connectionId }) => {
 
   if (isLoading) {
     return (
-      <section style={{ padding: '0 16px', marginBottom: 28 }}>
-        <div className="space-y-2 animate-pulse">
-          <div className="h-3 w-24 bg-muted/60 rounded mb-2" />
-          <div className="h-[160px] w-full bg-muted rounded-2xl" />
+      <section style={{ marginTop: 28 }}>
+        <SectionHeader eyebrow="LAST ROUND" title="Loading…" />
+        <div style={{ padding: '0 20px' }}>
+          <div className="space-y-2 animate-pulse">
+            <div className="h-[160px] w-full bg-muted rounded-2xl" />
+          </div>
         </div>
       </section>
     );
@@ -68,10 +70,13 @@ export const LastRoundCard: React.FC<Props> = ({ connectionId }) => {
 
   if (!lastRound) {
     return (
-      <section style={{ padding: '0 16px', marginBottom: 28 }}>
-        <p className="text-[14px] text-muted-foreground">
-          Your rounds will appear here as soon as you start posting scores in MyEG.
-        </p>
+      <section style={{ marginTop: 28 }}>
+        <SectionHeader eyebrow="LAST ROUND" title="No rounds yet" />
+        <div style={{ padding: '0 20px' }}>
+          <p className="text-[14px] text-muted-foreground">
+            Your rounds will appear here as soon as you start posting scores in MyEG.
+          </p>
+        </div>
       </section>
     );
   }
