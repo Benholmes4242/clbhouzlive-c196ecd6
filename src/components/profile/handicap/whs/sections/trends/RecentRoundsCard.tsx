@@ -155,18 +155,15 @@ export const RecentRoundsCard: React.FC<Props> = ({ connectionId }) => {
   };
 
   return (
-    <section
-      style={{
-        marginTop: 16,
-        padding: '16px 16px 24px',
-        background: T.cardBg,
-        borderRadius: 16,
-        border: `1px solid ${T.hairline}`,
-        fontFamily: FONT,
-      }}
-    >
-      <SectionHeader total={rounds.length} counterCount={counterCount} />
+    <section style={{ marginTop: 28, fontFamily: FONT }}>
+      <SectionHeader
+        eyebrow="RECENT ROUNDS"
+        title={`${rounds.length} ${rounds.length === 1 ? 'round' : 'rounds'} tracked`}
+        sub="Your full posted history."
+        right={counterCount > 0 ? <CounterBadge count={counterCount} /> : undefined}
+      />
 
+      <div style={{ padding: '0 20px' }}>
       {!isLoading && rounds.length > 0 && (
         <FilterChips
           filter={filter}
