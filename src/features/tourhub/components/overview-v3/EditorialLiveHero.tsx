@@ -413,8 +413,12 @@ export function EditorialLiveHero({
     }
   };
 
+  const rootRef = useRef<HTMLDivElement>(null);
+  const heroT = useElasticT(rootRef, 520, 820);
+
   return (
     <div
+      ref={rootRef}
       style={{
         height: '100%',
         display: 'flex',
@@ -465,7 +469,7 @@ export function EditorialLiveHero({
 
       {/* LEADER (also serves as the first divider) -------------------------- */}
       {leaderEntry && (
-        <LeaderBlock entry={leaderEntry} tourSlug={tournament.tourSlug} />
+        <LeaderBlock entry={leaderEntry} tourSlug={tournament.tourSlug} t={heroT} />
       )}
 
       {/* Chasers — T2/T3/T4 fixed ------------------------------------------ */}
@@ -479,6 +483,7 @@ export function EditorialLiveHero({
               tourSlug={tournament.tourSlug}
               isFirst={i === 0}
               onTap={onPlayerTap}
+              t={heroT}
             />
           ))}
         </div>
@@ -488,7 +493,7 @@ export function EditorialLiveHero({
       <HeroCTA
         label="Open Live Leaderboard"
         onClick={handleCta}
-        style={{ marginTop: 12 }}
+        style={{ marginTop: lerp(10, 18, heroT) }}
       />
     </div>
   );
