@@ -1171,12 +1171,12 @@ export const PGACard: React.FC<PGACardProps> = ({
   return (
     <div className="h-full w-full flex flex-col overflow-hidden" style={{ background: '#080a0e', color: '#fff' }}>
 
-      {/* ── ZONE 1: CINEMATIC HERO — 58% ── */}
+      {/* ── ZONE 1: CINEMATIC HERO — flexes to fill ── */}
       <div style={{
         position: 'relative',
-        flex: '0 0 clamp(46%, 58%, 62%)',
+        flex: '1 1 0',
+        minHeight: 'clamp(280px, 46%, 62%)',
         overflow: 'hidden',
-        minHeight: 0,
       }}>
         {/* Background: course image or gradient fallback */}
         {cd.courseImageUrl ? (
