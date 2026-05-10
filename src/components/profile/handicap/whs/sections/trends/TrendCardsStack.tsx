@@ -41,28 +41,51 @@ export const TrendCardsStack: React.FC<Props> = ({ connectionId, currentHandicap
     <section style={{ padding: '0 20px', marginBottom: 28, fontFamily: FONT }}>
       {showHero ? (
         <div style={{ padding: '0 4px 16px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
-            <span
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, marginBottom: 10 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <span
+                style={{
+                  width: 6,
+                  height: 6,
+                  borderRadius: 999,
+                  background: accent,
+                  display: 'inline-block',
+                }}
+              />
+              <span
+                style={{
+                  fontSize: 11,
+                  fontWeight: 800,
+                  color: INK_55,
+                  letterSpacing: '0.14em',
+                  textTransform: 'uppercase',
+                  fontFamily: FONT,
+                }}
+              >
+                Your Form
+              </span>
+            </div>
+            <button
+              type="button"
+              onClick={() => setShowInfo((v) => !v)}
+              aria-label={showInfo ? 'Hide info' : 'Show info'}
+              aria-expanded={showInfo}
               style={{
-                width: 6,
-                height: 6,
-                borderRadius: 999,
-                background: accent,
-                display: 'inline-block',
-              }}
-            />
-            <span
-              style={{
-                fontSize: 11,
-                fontWeight: 800,
-                color: INK_55,
-                letterSpacing: '0.14em',
-                textTransform: 'uppercase',
-                fontFamily: FONT,
+                width: 24,
+                height: 24,
+                borderRadius: '50%',
+                background: showInfo ? INK : 'transparent',
+                border: `1px solid ${showInfo ? INK : 'rgba(15,23,42,0.12)'}`,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                cursor: 'pointer',
+                flexShrink: 0,
+                padding: 0,
               }}
             >
-              Your Form
-            </span>
+              <Info size={12} color={showInfo ? '#FFFFFF' : SLATE} strokeWidth={2.25} />
+            </button>
           </div>
 
           <div style={{ display: 'flex', alignItems: 'baseline', flexWrap: 'wrap', gap: 10 }}>
