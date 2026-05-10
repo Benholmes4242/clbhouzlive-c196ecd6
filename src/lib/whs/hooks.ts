@@ -345,3 +345,59 @@ export function useMarkTodayVisited() {
     mutationFn: callMarkTodayVisited,
   });
 }
+
+// ─── Phase 11: Round reactions ──────────────────────────────────────────
+import type { WhsFriendActivityWithImage } from './types';
+
+/**
+ * Optimistically toggles a heart on a friend's round.
+ * Calls the `toggle_whs_round_reaction` RPC, which returns the canonical
+ * viewer state + total. Optimistic update flips the local cache immediately;
+ * onError rolls back.
+ */
+export function useToggleRoundReaction() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ scoreId }: { scoreId: string }) => {
+      const { data, error } = await supabase.rpc(
+        'toggle_whs_round_reaction' as any,
+        { p_score_id: scoreId, p_reaction_type: 'heart' } as any,
+      );
+      if (error) throw error;
+      const row = Array.isArray(data) ? data[0] : data;
+      return {
+        reacted: !!(row as any)?.reacted,
+        total: Number((row as any)?.total ?? 0),
+      };
+    },
+    onMutate: async ({ scoreId }) => {
+      await qc.cancelQueries({ queryKey: ['whs-friends-activity'] });
+      const snapshots = qc.getQueriesData<WhsFriendActivityWithImage[] | undefined>({
+        queryKey: ['whs-friends-activity'],
+      });
+      qc.setQueriesData<WhsFriendActivityWithImage[] | undefined>(
+        { queryKey: ['whs-friends-activity'] },
+        (old) =>
+          old?.map((a) => {
+            if (a.last_round_score_id !== scoreId) return a;
+            const wasReacted = a.viewer_has_reacted;
+            return {
+              ...a,
+              viewer_has_reacted: !wasReacted,
+              reaction_count: Math.max(
+                0,
+                a.reaction_count + (wasReacted ? -1 : 1),
+              ),
+            };
+          }),
+      );
+      return { snapshots };
+    },
+    onError: (_e, _v, ctx) => {
+      if (!ctx?.snapshots) return;
+      for (const [key, data] of ctx.snapshots) {
+        qc.setQueryData(key, data);
+      }
+    },
+  });
+}
