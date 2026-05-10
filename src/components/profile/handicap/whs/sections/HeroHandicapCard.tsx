@@ -22,8 +22,14 @@ const INK_10 = 'rgba(15,23,42,0.10)';
 const INK_06 = 'rgba(15,23,42,0.06)';
 const INK_04 = 'rgba(15,23,42,0.04)';
 const GREEN = '#4ADE80';
-const RED = '#9F1D1D';
-const RED_FORM_HOT = '#B91C1C';
+const RED = '#B91C1C';                     // ember red — slightly deeper/more luminous than #9F1D1D
+const RED_FORM_HOT = '#B91C1C';            // unchanged
+const RING_TRACK = 'rgba(15,23,42,0.10)';  // deeper than INK_06 — track reads as a real ring
+const COLD_BLUE = '#0284C7';               // deep cyan — replaces #0EA5E9
+const SCORING_BLUE = '#3B82F6';            // kept as the gradient end stop (start is darker)
+const SCORING_BLUE_DEEP = '#1D4ED8';       // royal blue gradient start
+const MOMENTUM_GREEN_DEEP = '#047857';     // forest gradient start (was #15803D)
+const MOMENTUM_GREEN_BRIGHT = '#10B981';   // forest gradient end (was #4ADE80)
 
 const MONTHS = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
 const FONT_DISPLAY = 'SF Pro Display, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
@@ -531,14 +537,21 @@ const HeroHandicapCard: React.FC<Props> = ({ connection }) => {
             >
               <defs>
                 <linearGradient id="heroMomentumGreen" x1="0" y1="0" x2="1" y2="0">
-                  <stop offset="0%" stopColor="#15803D" />
-                  <stop offset="100%" stopColor="#4ADE80" />
+                  <stop offset="0%" stopColor={MOMENTUM_GREEN_DEEP} />
+                  <stop offset="100%" stopColor={MOMENTUM_GREEN_BRIGHT} />
                 </linearGradient>
+                {/* Subtle drop-shadow filter for filled arc lift */}
+                <filter id="heroArcLift" x="-20%" y="-20%" width="140%" height="140%">
+                  <feGaussianBlur in="SourceAlpha" stdDeviation="0.6" />
+                  <feOffset dx="0" dy="0.4" result="offsetblur" />
+                  <feComponentTransfer><feFuncA type="linear" slope="0.3" /></feComponentTransfer>
+                  <feMerge><feMergeNode /><feMergeNode in="SourceGraphic" /></feMerge>
+                </filter>
               </defs>
               {/* Track */}
               <circle
                 cx={50} cy={50} r={42}
-                fill="none" stroke={INK_06} strokeWidth={6}
+                fill="none" stroke={RING_TRACK} strokeWidth={6}
                 vectorEffect="non-scaling-stroke"
               />
               {/* Momentum arc — green for improving, red for worsening */}
@@ -547,9 +560,10 @@ const HeroHandicapCard: React.FC<Props> = ({ connection }) => {
                   cx={50} cy={50} r={42} fill="none"
                   stroke="url(#heroMomentumGreen)" strokeWidth={6}
                   strokeDasharray={`${(innerFillLength / C_INNER) * (2 * Math.PI * 42)} ${2 * Math.PI * 42}`}
-                  strokeLinecap="butt"
+                  strokeLinecap="round"
                   transform={`rotate(-90 50 50)`}
                   vectorEffect="non-scaling-stroke"
+                  filter="url(#heroArcLift)"
                   style={{ transition: 'stroke-dasharray 320ms cubic-bezier(0.22, 0.61, 0.36, 1)' }}
                 />
               )}
@@ -559,9 +573,10 @@ const HeroHandicapCard: React.FC<Props> = ({ connection }) => {
                     cx={50} cy={50} r={42} fill="none"
                     stroke={RED} strokeWidth={6}
                     strokeDasharray={`${(innerFillLength / C_INNER) * (2 * Math.PI * 42)} ${2 * Math.PI * 42}`}
-                    strokeLinecap="butt"
+                    strokeLinecap="round"
                     transform={`rotate(-90 50 50)`}
                     vectorEffect="non-scaling-stroke"
+                    filter="url(#heroArcLift)"
                     style={{ transition: 'stroke-dasharray 320ms cubic-bezier(0.22, 0.61, 0.36, 1)' }}
                   />
                 </g>
@@ -872,21 +887,21 @@ const FlankRing: React.FC<FlankRingProps> = ({ metric, state, value, fraction })
 
   if (metric === 'form') {
     if (state === 'hot') {
-      color = '#DC2626';
+      color = RED_FORM_HOT;
       frac = 1.0;
       centre = (
         <div style={{ width: 'clamp(18px, 5vw, 24px)', height: 'clamp(18px, 5vw, 24px)' }}>
-          <Flame size="100%" color="#DC2626" strokeWidth={2.4} fill="#DC2626" />
+          <Flame size="100%" color={RED_FORM_HOT} strokeWidth={2.4} fill={RED_FORM_HOT} />
         </div>
       );
       label = 'FORM';
       sub = 'Hot over last 5';
     } else if (state === 'cold') {
-      color = '#0EA5E9';
+      color = COLD_BLUE;
       frac = 0.10;
       centre = (
         <div style={{ width: 'clamp(18px, 5vw, 24px)', height: 'clamp(18px, 5vw, 24px)' }}>
-          <Snowflake size="100%" color="#0EA5E9" strokeWidth={2.4} />
+          <Snowflake size="100%" color={COLD_BLUE} strokeWidth={2.4} />
         </div>
       );
       label = 'FORM';
@@ -911,7 +926,8 @@ const FlankRing: React.FC<FlankRingProps> = ({ metric, state, value, fraction })
       sub = 'Awaiting data';
     }
   } else {
-    color = '#3B82F6';
+    // Scoring avg uses a royal-blue gradient (rendered via SVG <defs> in the ring below)
+    color = 'url(#flankScoringGradient)';
     frac = fraction ?? 0;
     centre = (
       <span style={{
@@ -939,16 +955,31 @@ const FlankRing: React.FC<FlankRingProps> = ({ metric, state, value, fraction })
           viewBox={`0 0 ${VIEWBOX} ${VIEWBOX}`}
           preserveAspectRatio="xMidYMid meet"
         >
+          <defs>
+            {/* Royal blue gradient — only used by the SCORING AVG ring, but defined per-instance for safety */}
+            <linearGradient id="flankScoringGradient" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%" stopColor={SCORING_BLUE_DEEP} />
+              <stop offset="100%" stopColor={SCORING_BLUE} />
+            </linearGradient>
+            {/* Subtle drop-shadow filter for filled arc lift */}
+            <filter id="flankArcLift" x="-20%" y="-20%" width="140%" height="140%">
+              <feGaussianBlur in="SourceAlpha" stdDeviation="0.6" />
+              <feOffset dx="0" dy="0.4" result="offsetblur" />
+              <feComponentTransfer><feFuncA type="linear" slope="0.3" /></feComponentTransfer>
+              <feMerge><feMergeNode /><feMergeNode in="SourceGraphic" /></feMerge>
+            </filter>
+          </defs>
           <circle cx={FCX} cy={FCY} r={FR} fill="none"
-            stroke={INK_06} strokeWidth={FSTROKE}
+            stroke={RING_TRACK} strokeWidth={FSTROKE}
             vectorEffect="non-scaling-stroke" />
           {frac > 0 && (
             <circle cx={FCX} cy={FCY} r={FR} fill="none"
               stroke={color} strokeWidth={FSTROKE}
-              strokeLinecap="butt"
+              strokeLinecap="round"
               strokeDasharray={`${frac * FC} ${FC}`}
               transform={`rotate(-90 ${FCX} ${FCY})`}
-              vectorEffect="non-scaling-stroke" />
+              vectorEffect="non-scaling-stroke"
+              filter="url(#flankArcLift)" />
           )}
         </svg>
         <div style={{
