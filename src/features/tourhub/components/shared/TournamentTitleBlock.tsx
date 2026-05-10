@@ -111,7 +111,8 @@ export function TournamentTitleBlock({
       {venue && (
         <div
           style={{
-            marginTop: headerGapBetween,
+            marginTop: 'auto',
+            paddingTop: Math.max(headerGapBetween, 10),
             display: 'flex', alignItems: 'center', gap: 5,
             fontSize: venueSize, color: slate500, fontWeight: 600,
           }}
