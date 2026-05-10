@@ -35,7 +35,7 @@ const WEEKDAY = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
 
 // Chart geometry
-const CHART_H = 340;
+const CHART_H = 240;
 const Y_AXIS_W = 30;
 const CHART_TOP = 14;
 const CHART_BOTTOM = 14;
@@ -136,17 +136,17 @@ export const RoundsThatCountCard: React.FC<Props> = ({ connectionId, currentHand
   const bestRound = enriched.rounds.find(r => r.is_best)!;
   const worstRound = enriched.rounds.find(r => r.is_worst)!;
 
-  // Y-axis range — driven by ALL rounds, not just counters, so non-counter
-  // dots stay inside the plot area.
+  // Y-axis range — driven by COUNTERS + cut target only. Non-counters that
+  // exceed yMax are visually clipped to the top of the chart (see dot render).
+  // This keeps the meaningful data (counters, cut line) prominent, instead
+  // of letting one bad round stretch the whole axis.
   const cutTarget = projection?.hasData ? projection.cutTarget : null;
-  const dataMin = Math.min(enriched.allDiffsMin, enriched.minDiff);
-  const dataMax = Math.max(
-    enriched.allDiffsMax,
-    enriched.maxDiff,
-    cutTarget ?? -Infinity,
-  );
+  const dataMin = enriched.minDiff;
+  const dataMax = Math.max(enriched.maxDiff, cutTarget ?? -Infinity);
   const yMin = Math.min(-1, Math.floor(dataMin - 0.5));
-  const yMax = Math.max(4, Math.ceil(dataMax + 0.5));
+  // Cap yMax at 1 unit above the worst counter or cut target. Non-counters
+  // above this cap render clipped to the top with a small indicator chevron.
+  const yMax = Math.max(4, Math.ceil(dataMax + 1));
   const ticks = generateTicks(yMin, yMax);
   const ySpan = yMax - yMin;
   const innerH = CHART_H - CHART_TOP - CHART_BOTTOM;
@@ -418,15 +418,21 @@ export const RoundsThatCountCard: React.FC<Props> = ({ connectionId, currentHand
                   background = '#fff';
                   borderStyle = `1.5px solid ${AMBER}`;
                 }
+                const isOffChart = !r.is_counter && d > yMax;
+                const yPos = isOffChart ? CHART_TOP : yFor(d);
                 return (
                   <button
                     key={r.id}
                     onClick={() => setSelectedId(r.id)}
-                    aria-label={`Round at ${r.course?.name ?? 'course'} (${r.is_counter ? 'counter' : 'non-counter'})`}
+                    aria-label={
+                      isOffChart
+                        ? `Round at ${r.course?.name ?? 'course'} (non-counter, differential ${d.toFixed(1)} — above chart range)`
+                        : `Round at ${r.course?.name ?? 'course'} (${r.is_counter ? 'counter' : 'non-counter'})`
+                    }
                     style={{
                       position: 'absolute',
                       left: `${xFor(i)}%`,
-                      top: yFor(d),
+                      top: yPos,
                       width: dotSize, height: dotSize,
                       marginLeft: -dotSize / 2, marginTop: -dotSize / 2,
                       borderRadius: '50%',
@@ -437,7 +443,25 @@ export const RoundsThatCountCard: React.FC<Props> = ({ connectionId, currentHand
                       padding: 0,
                       zIndex: 2,
                     }}
-                  />
+                  >
+                    {isOffChart && (
+                      <span
+                        aria-hidden
+                        style={{
+                          position: 'absolute',
+                          top: -10,
+                          left: '50%',
+                          transform: 'translateX(-50%)',
+                          fontSize: 10,
+                          lineHeight: 1,
+                          color: AMBER,
+                          fontWeight: 800,
+                        }}
+                      >
+                        ▲
+                      </span>
+                    )}
+                  </button>
                 );
               })}
 
