@@ -73,6 +73,13 @@ function ChampionBlock({
   const tourCode = winner.tourCode ?? tourSlug;
   const photoUrl = getPlayerHeadshotUrl(fullName, tourCode, winner.headshotOverride ?? undefined);
 
+  const avatarSize = lerp(44, 64, t);
+  const padY = lerp(12, 22, t);
+  const gap = lerp(12, 16, t);
+  const nameSize = lerp(15, 20, t);
+  const scoreSize = lerp(30, 42, t);
+  const trophyDecor = lerp(80, 120, t);
+
   return (
     <div
       style={{
@@ -80,7 +87,7 @@ function ChampionBlock({
         flexShrink: 0,
         borderTop: `1px solid ${slate200}`,
         borderBottom: `1px solid ${slate200}`,
-        padding: '14px 0',
+        padding: `${padY}px 0`,
         overflow: 'hidden',
       }}
     >
