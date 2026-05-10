@@ -14707,6 +14707,45 @@ export type Database = {
           },
         ]
       }
+      whs_round_reactions: {
+        Row: {
+          created_at: string
+          id: string
+          reaction_type: string
+          score_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          reaction_type?: string
+          score_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          reaction_type?: string
+          score_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "whs_round_reactions_score_id_fkey"
+            columns: ["score_id"]
+            isOneToOne: false
+            referencedRelation: "whs_friend_course_bests"
+            referencedColumns: ["best_score_id"]
+          },
+          {
+            foreignKeyName: "whs_round_reactions_score_id_fkey"
+            columns: ["score_id"]
+            isOneToOne: false
+            referencedRelation: "whs_scores"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       whs_score_holes: {
         Row: {
           actual_gross: number | null
@@ -19599,6 +19638,13 @@ export type Database = {
         Returns: undefined
       }
       toggle_saved_message: { Args: { p_message_id: string }; Returns: boolean }
+      toggle_whs_round_reaction: {
+        Args: { p_reaction_type?: string; p_score_id: string }
+        Returns: {
+          reacted: boolean
+          total: number
+        }[]
+      }
       track_profile_analytics_event: {
         Args: {
           p_action_type?: string
