@@ -375,6 +375,19 @@ const HeroHandicapCard: React.FC<Props> = ({ connection }) => {
     );
   })();
 
+  // ── Delta sub text + direction (for centre ring label-stack) ─────────────
+  const deltaTodayDir: 'up' | 'down' | 'flat' = (() => {
+    const d = trend?.delta;
+    if (d == null || Math.abs(d) < 0.05) return 'flat';
+    return d < 0 ? 'down' : 'up';
+  })();
+  const deltaSubText = (() => {
+    const d = trend?.delta;
+    if (d == null) return 'Awaiting data';
+    if (Math.abs(d) < 0.05) return 'Steady today';
+    return `${d < 0 ? '↓' : '↑'} ${Math.abs(d).toFixed(1)} today`;
+  })();
+
   // ── 6-point sparkline from history points ────────────────────────────────
   const sparkPolyline = (() => {
     if (points.length < 2) return null;
@@ -500,81 +513,93 @@ const HeroHandicapCard: React.FC<Props> = ({ connection }) => {
         {/* LEFT — FORM */}
         <FlankRing metric="form" state={formState} />
 
-        {/* CENTRE — Hero ring (matches flank dimensions) */}
+        {/* CENTRE — Hero ring (matches flank dimensions and structure) */}
         <div style={{
-          width: 'clamp(72px, 22vw, 100px)',
-          aspectRatio: '1 / 1',
-          position: 'relative',
+          display: 'flex', flexDirection: 'column', alignItems: 'center',
+          paddingBottom: 2, paddingTop: 14,
           justifySelf: 'center',
         }}>
-          <svg
-            width="100%" height="100%"
-            viewBox={`0 0 100 100`}
-            preserveAspectRatio="xMidYMid meet"
-          >
-            <defs>
-              <linearGradient id="heroMomentumGreen" x1="0" y1="0" x2="1" y2="0">
-                <stop offset="0%" stopColor="#15803D" />
-                <stop offset="100%" stopColor="#4ADE80" />
-              </linearGradient>
-            </defs>
-            {/* Track */}
-            <circle
-              cx={50} cy={50} r={42}
-              fill="none" stroke={INK_06} strokeWidth={6}
-              vectorEffect="non-scaling-stroke"
-            />
-            {/* Momentum arc — green for improving, red for worsening */}
-            {showGreenArc && (
+          <div style={{
+            position: 'relative',
+            width: 'clamp(72px, 22vw, 100px)',
+            aspectRatio: '1 / 1',
+          }}>
+            <svg
+              width="100%" height="100%"
+              viewBox={`0 0 100 100`}
+              preserveAspectRatio="xMidYMid meet"
+            >
+              <defs>
+                <linearGradient id="heroMomentumGreen" x1="0" y1="0" x2="1" y2="0">
+                  <stop offset="0%" stopColor="#15803D" />
+                  <stop offset="100%" stopColor="#4ADE80" />
+                </linearGradient>
+              </defs>
+              {/* Track */}
               <circle
-                cx={50} cy={50} r={42} fill="none"
-                stroke="url(#heroMomentumGreen)" strokeWidth={6}
-                strokeDasharray={`${(innerFillLength / C_INNER) * (2 * Math.PI * 42)} ${2 * Math.PI * 42}`}
-                strokeLinecap="round"
-                transform={`rotate(-90 50 50)`}
+                cx={50} cy={50} r={42}
+                fill="none" stroke={INK_06} strokeWidth={6}
                 vectorEffect="non-scaling-stroke"
-                style={{ transition: 'stroke-dasharray 320ms cubic-bezier(0.22, 0.61, 0.36, 1)' }}
               />
-            )}
-            {showRedArc && (
-              <g transform={`scale(-1, 1) translate(-100, 0)`}>
+              {/* Momentum arc — green for improving, red for worsening */}
+              {showGreenArc && (
                 <circle
                   cx={50} cy={50} r={42} fill="none"
-                  stroke={RED} strokeWidth={6}
+                  stroke="url(#heroMomentumGreen)" strokeWidth={6}
                   strokeDasharray={`${(innerFillLength / C_INNER) * (2 * Math.PI * 42)} ${2 * Math.PI * 42}`}
-                  strokeLinecap="round"
+                  strokeLinecap="butt"
                   transform={`rotate(-90 50 50)`}
                   vectorEffect="non-scaling-stroke"
                   style={{ transition: 'stroke-dasharray 320ms cubic-bezier(0.22, 0.61, 0.36, 1)' }}
                 />
-              </g>
-            )}
-          </svg>
+              )}
+              {showRedArc && (
+                <g transform={`scale(-1, 1) translate(-100, 0)`}>
+                  <circle
+                    cx={50} cy={50} r={42} fill="none"
+                    stroke={RED} strokeWidth={6}
+                    strokeDasharray={`${(innerFillLength / C_INNER) * (2 * Math.PI * 42)} ${2 * Math.PI * 42}`}
+                    strokeLinecap="butt"
+                    transform={`rotate(-90 50 50)`}
+                    vectorEffect="non-scaling-stroke"
+                    style={{ transition: 'stroke-dasharray 320ms cubic-bezier(0.22, 0.61, 0.36, 1)' }}
+                  />
+                </g>
+              )}
+            </svg>
 
-          {/* Center stack */}
-          <div style={{
-            position: 'absolute', inset: 0,
-            display: 'flex', flexDirection: 'column',
-            alignItems: 'center', justifyContent: 'center',
-            pointerEvents: 'none',
-          }}>
-            <span style={{
-              fontSize: 'clamp(20px, 6vw, 26px)', fontWeight: 700, color: INK,
-              letterSpacing: '-0.03em', lineHeight: 1,
-              fontVariantNumeric: 'tabular-nums',
-            }}>
-              {scrubValue.toFixed(1)}
-            </span>
+            {/* Number inside the ring */}
             <div style={{
-              marginTop: 'clamp(2px, 1vw, 4px)',
-              display: 'flex', alignItems: 'center', gap: 3,
-              fontSize: 'clamp(8.5px, 2.4vw, 9.5px)',
+              position: 'absolute', inset: 0,
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              pointerEvents: 'none',
+            }}>
+              <span style={{
+                fontSize: 'clamp(16px, 4.6vw, 19px)', fontWeight: 700, color: INK,
+                letterSpacing: '-0.03em', lineHeight: 1,
+                fontVariantNumeric: 'tabular-nums',
+              }}>
+                {scrubValue.toFixed(1)}
+              </span>
+            </div>
+          </div>
+
+          {/* Label stack BELOW the ring — matches FlankRing structure */}
+          <div style={{ marginTop: 8, textAlign: 'center', maxWidth: '120%' }}>
+            <div style={{
+              fontSize: 'clamp(10px, 2.8vw, 10.5px)',
+              fontWeight: 800, color: INK,
+              letterSpacing: '0.06em', textTransform: 'uppercase',
+            }}>HANDICAP</div>
+            <div style={{
+              fontSize: 'clamp(9px, 2.6vw, 10px)',
+              color: deltaTodayDir === 'down' ? '#15803D' : deltaTodayDir === 'up' ? RED : INK_40,
+              marginTop: 2, fontWeight: deltaTodayDir === 'flat' ? 500 : 700,
+              whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
               fontVariantNumeric: 'tabular-nums',
               opacity: isScrubbing ? 0 : 1,
               transition: 'opacity 200ms ease',
-            }}>
-              {deltaInline}
-            </div>
+            }}>{deltaSubText}</div>
           </div>
         </div>
 
@@ -582,8 +607,26 @@ const HeroHandicapCard: React.FC<Props> = ({ connection }) => {
         <FlankRing metric="scoring" value={scoringAvgStr ?? '—'} fraction={scoringFraction} />
       </div>
 
+      {/* Sparkline section header */}
+      <div style={{
+        marginTop: 28,
+        padding: '0 4px',
+        display: 'flex', alignItems: 'center', gap: 8,
+      }}>
+        <span aria-hidden style={{
+          display: 'inline-block',
+          width: 3, height: 11, background: AMBER, borderRadius: 1,
+        }} />
+        <span style={{
+          fontSize: 9, fontWeight: 800, color: AMBER,
+          letterSpacing: '0.16em', textTransform: 'uppercase',
+        }}>
+          Index over time
+        </span>
+      </div>
+
       {/* Sparkline strip */}
-      <div style={{ padding: '0 4px', marginTop: 24 }}>
+      <div style={{ padding: '0 4px', marginTop: 8 }}>
         <svg
           ref={svgRef}
           width="100%"
