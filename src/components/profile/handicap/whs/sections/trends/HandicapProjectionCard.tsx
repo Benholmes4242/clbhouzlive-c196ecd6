@@ -220,93 +220,83 @@ export const HandicapProjectionCard: React.FC<Props> = ({ scores }) => {
         </div>
       </div>
 
-      {/* SHARED CONVERGENCE CHART */}
-      <div
-        style={{
-          padding: '6px 16px 14px',
-          borderTop: `0.5px solid ${T.hairline}`,
-          background: 'rgba(247,250,252,0.5)',
-        }}
-      >
-        <svg
-          viewBox="0 0 320 110"
-          width="100%"
-          height={110}
-          preserveAspectRatio="none"
-          style={{ display: 'block', overflow: 'visible' }}
-          role="img"
-          aria-label={`Handicap timeline showing past trajectory and projected ${prediction.direction} movement`}
-        >
-          <line
-            x1="160" x2="160" y1="14" y2="84"
-            stroke="rgba(15,23,42,0.15)"
-            strokeWidth={1}
-            strokeDasharray="2 4"
-            vectorEffect="non-scaling-stroke"
-          />
-          <text
-            x="160" y="10"
-            textAnchor="middle"
-            style={{
-              fontSize: 9,
-              fontWeight: 800,
-              fill: T.inkMute,
-              letterSpacing: '0.10em',
-              fontFamily: FONT,
-            }}
+      <div style={{ padding: '0 20px' }}>
+        {/* SHARED CONVERGENCE CHART */}
+        <div style={{ padding: '14px 0' }}>
+          <svg
+            viewBox="0 0 320 110"
+            width="100%"
+            height={110}
+            preserveAspectRatio="none"
+            style={{ display: 'block', overflow: 'visible' }}
+            role="img"
+            aria-label={`Handicap timeline showing past trajectory and projected ${prediction.direction} movement`}
           >
-            TODAY
-          </text>
-          <path
-            d={`M 12 ${curve.pastY1} Q 50 ${(curve.pastY1 + curve.pastY2) / 2}, 80 ${curve.pastY2} T 160 ${curve.pastY3}`}
-            fill="none"
-            stroke={T.inkMute}
-            strokeWidth={2}
-            strokeLinecap="round"
-            vectorEffect="non-scaling-stroke"
-          />
-          <path
-            d={`M 160 ${curve.pastY3} Q 200 ${(curve.pastY3 + curve.futureY2) / 2}, 240 ${curve.futureY2} T 308 ${curve.futureY3}`}
-            fill="none"
-            stroke={theme.accent}
-            strokeWidth={2.4}
-            strokeLinecap="round"
-            vectorEffect="non-scaling-stroke"
-          />
-          <circle cx="12" cy={curve.pastY1} r="3" fill={T.inkMute} />
-          <circle cx="80" cy={curve.pastY2} r="3" fill={T.inkMute} />
-          <circle cx="160" cy={curve.pastY3} r="5" fill="#FFFFFF" stroke={T.ink} strokeWidth={2} />
-          <circle cx="240" cy={curve.futureY2} r="3" fill={theme.accent} />
-          <circle cx="308" cy={curve.futureY3} r="6" fill={theme.accent} stroke="#FFFFFF" strokeWidth={2} />
-          <text
-            x="12" y="102"
-            textAnchor="start"
-            style={{ fontSize: 10, fontWeight: 600, fill: T.inkMute, fontFamily: FONT }}
-          >
-            90 days ago
-          </text>
-          <text
-            x="308" y="102"
-            textAnchor="end"
-            style={{ fontSize: 10, fontWeight: 700, fill: theme.accentInk, fontFamily: FONT }}
-          >
-            5 rounds out
-          </text>
-        </svg>
-      </div>
+            <line
+              x1="160" x2="160" y1="14" y2="84"
+              stroke="rgba(15,23,42,0.15)"
+              strokeWidth={1}
+              strokeDasharray="2 4"
+              vectorEffect="non-scaling-stroke"
+            />
+            <text
+              x="160" y="10"
+              textAnchor="middle"
+              style={{
+                fontSize: 9,
+                fontWeight: 800,
+                fill: T.inkMute,
+                letterSpacing: '0.10em',
+                fontFamily: FONT,
+              }}
+            >
+              TODAY
+            </text>
+            <path
+              d={`M 12 ${curve.pastY1} Q 50 ${(curve.pastY1 + curve.pastY2) / 2}, 80 ${curve.pastY2} T 160 ${curve.pastY3}`}
+              fill="none"
+              stroke={T.inkMute}
+              strokeWidth={2}
+              strokeLinecap="round"
+              vectorEffect="non-scaling-stroke"
+            />
+            <path
+              d={`M 160 ${curve.pastY3} Q 200 ${(curve.pastY3 + curve.futureY2) / 2}, 240 ${curve.futureY2} T 308 ${curve.futureY3}`}
+              fill="none"
+              stroke={theme.accent}
+              strokeWidth={2.4}
+              strokeLinecap="round"
+              vectorEffect="non-scaling-stroke"
+            />
+            <circle cx="12" cy={curve.pastY1} r="3" fill={T.inkMute} />
+            <circle cx="80" cy={curve.pastY2} r="3" fill={T.inkMute} />
+            <circle cx="160" cy={curve.pastY3} r="5" fill="#FFFFFF" stroke={T.ink} strokeWidth={2} />
+            <circle cx="240" cy={curve.futureY2} r="3" fill={theme.accent} />
+            <circle cx="308" cy={curve.futureY3} r="6" fill={theme.accent} stroke="#FFFFFF" strokeWidth={2} />
+            <text
+              x="12" y="102"
+              textAnchor="start"
+              style={{ fontSize: 10, fontWeight: 600, fill: T.inkMute, fontFamily: FONT }}
+            >
+              90 days ago
+            </text>
+            <text
+              x="308" y="102"
+              textAnchor="end"
+              style={{ fontSize: 10, fontWeight: 700, fill: theme.accentInk, fontFamily: FONT }}
+            >
+              5 rounds out
+            </text>
+          </svg>
+        </div>
 
-      <div
-        style={{
-          padding: '12px 16px 14px',
-          borderTop: `1px solid ${T.hairline}`,
-          background: 'rgba(15,23,42,0.02)',
-        }}
-      >
-        <p style={{ margin: 0, fontSize: 12, lineHeight: 1.55, color: T.ink, fontFamily: FONT }}>
-          {prediction.recentFormAvg !== null && prediction.countersAvg !== null
-            ? meta.why(prediction.recentFormAvg, prediction.countersAvg)
-            : ''}
-        </p>
+        <div style={{ padding: '12px 0 0', borderTop: `1px solid ${T.hairline}` }}>
+          <p style={{ margin: 0, fontSize: 12, lineHeight: 1.55, color: T.ink, fontFamily: FONT }}>
+            {prediction.recentFormAvg !== null && prediction.countersAvg !== null
+              ? meta.why(prediction.recentFormAvg, prediction.countersAvg)
+              : ''}
+          </p>
+        </div>
       </div>
     </div>
   );
