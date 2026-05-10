@@ -47,7 +47,10 @@ export function TournamentTitleBlock({
   const venue = [venueName, venueCity].filter(Boolean).join(' · ');
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column' }}>
+    <div style={{
+      flex: 1, minHeight: 0,
+      display: 'flex', flexDirection: 'column',
+    }}>
       {/* Eyebrow row */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: headerGapTop }}>
         <span
