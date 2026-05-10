@@ -7,17 +7,19 @@ interface Props {
   entry: FriendLeaderboardEntry;
   isActive: boolean;
   onClick?: () => void;
-  /** Optional handler when an off-app user's INVITE pill is tapped */
-  onInviteClick?: () => void;
 }
 
-export const RecentlyActiveItem: React.FC<Props> = ({ entry, isActive, onClick, onInviteClick }) => {
+export const RecentlyActiveItem: React.FC<Props> = ({ entry, isActive, onClick }) => {
   const display = firstName(entry.friend_name);
   const Tag: any = onClick ? 'button' : 'div';
 
   const isOnApp = entry.is_clbhouz_user;
-  const showGreenDot = isOnApp && isActive;
-  const showInvitePill = !isOnApp;
+  // Active dot: green for on-app, amber for EG-only. No dot if inactive.
+  const dotColor: string | null = isActive
+    ? isOnApp
+      ? '#22C55E'
+      : '#F7931E'
+    : null;
 
   return (
     <Tag
