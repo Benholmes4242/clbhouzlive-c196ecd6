@@ -18,6 +18,9 @@ const GREEN = '#15803D';
 const RED = '#DC2626';
 const FONT_GEIST = 'Geist, system-ui, -apple-system, BlinkMacSystemFont, sans-serif';
 
+const pluralize = (n: number, singular: string, plural: string) =>
+  n === 1 ? singular : plural;
+
 const fmtDiff = (n: number | null | undefined) => {
   if (n === null || n === undefined) return '—';
   if (n > 0) return `+${n.toFixed(1)}`;
