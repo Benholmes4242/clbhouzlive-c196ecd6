@@ -67,7 +67,7 @@ const DistributionChart: React.FC<{
   buckets: HandicapPercentileBucket[];
   userBucket: HandicapBucket;
   userHandicap: number;
-}> = ({ buckets, userHandicap }) => {
+}> = ({ buckets, userHandicap: _userHandicap }) => {
   // Build a lookup so missing buckets render at 0% rather than collapsing.
   const byBucket = new Map<HandicapBucket, HandicapPercentileBucket>();
   buckets.forEach((b) => byBucket.set(b.bucket, b));
@@ -77,7 +77,6 @@ const DistributionChart: React.FC<{
   );
 
   const maxPct = Math.max(...orderedBuckets.map((b) => b.pct), 1);
-  const handicapStr = userHandicap.toFixed(1).replace('-', '\u2212');
 
   return (
     <div style={{ marginTop: 18, position: 'relative' }}>
@@ -171,34 +170,7 @@ const DistributionChart: React.FC<{
                   height: '100%',
                 }}
               >
-                {isUser && (
-                  <div
-                    style={{
-                      position: 'absolute',
-                      top: -22,
-                      display: 'flex',
-                      flexDirection: 'column',
-                      alignItems: 'center',
-                    }}
-                  >
-                    <div
-                      style={{
-                        fontFamily: FONT_GEIST,
-                        fontSize: 10.5,
-                        fontWeight: 700,
-                        color: INK,
-                        background: AMBER_14,
-                        padding: '2px 6px',
-                        borderRadius: 6,
-                        whiteSpace: 'nowrap',
-                        fontVariantNumeric: 'tabular-nums',
-                      }}
-                    >
-                      You · {handicapStr}
-                    </div>
-                    <div style={{ width: 2, height: 6, background: AMBER }} />
-                  </div>
-                )}
+                {/* User-bucket identity carried entirely by amber gradient + glow shadow below */}
                 <div
                   style={{
                     width: '100%',
