@@ -220,10 +220,10 @@ function LeaderBlock({ entry, tourSlug, t = 0 }: { entry: any; tourSlug: string;
 // ---------- Chaser row ------------------------------------------------------
 
 function ChaserRow({
-  entry, rank, tourSlug, isFirst, onTap,
+  entry, rank, tourSlug, isFirst, onTap, t = 0,
 }: {
   entry: any; rank: number; tourSlug: string; isFirst: boolean;
-  onTap?: (e: any) => void;
+  onTap?: (e: any) => void; t?: number;
 }) {
   const [imgErr, setImgErr] = useState(false);
   const p = entry.player;
@@ -244,6 +244,12 @@ function ChaserRow({
     : thru == null || thru === 0 ? '—'
     : `${thru}`;
 
+  const avatar = lerp(22, 30, t);
+  const padY = lerp(9, 14, t);
+  const nameSize = lerp(13, 15, t);
+  const scoreSize = lerp(13, 16, t);
+  const posSize = lerp(11, 13, t);
+
   return (
     <button
       type="button"
@@ -253,7 +259,7 @@ function ChaserRow({
         gridTemplateColumns: '24px 1fr 56px 36px',
         alignItems: 'center',
         gap: 8,
-        padding: '10px 0',
+        padding: `${padY}px 0`,
         borderTop: isFirst ? 'none' : `1px solid ${slate200}`,
         background: 'transparent',
         border: 'none',
@@ -265,7 +271,7 @@ function ChaserRow({
       }}
     >
       <span style={{
-        fontSize: 11, color: slate500, fontWeight: 700,
+        fontSize: posSize, color: slate500, fontWeight: 700,
         fontVariantNumeric: 'tabular-nums',
       }}>
         {entry.position ?? rank}
@@ -277,13 +283,13 @@ function ChaserRow({
             alt=""
             onError={() => setImgErr(true)}
             style={{
-              width: 22, aspectRatio: '1 / 1.05', borderRadius: '34%',
+              width: avatar, aspectRatio: '1 / 1.05', borderRadius: '34%',
               objectFit: 'cover', objectPosition: 'center 18%', flexShrink: 0,
             }}
           />
         ) : (
           <div style={{
-            width: 22, aspectRatio: '1 / 1.05', borderRadius: '34%',
+            width: avatar, aspectRatio: '1 / 1.05', borderRadius: '34%',
             background: slate100,
             display: 'flex', alignItems: 'center', justifyContent: 'center',
             fontSize: 9, color: slate500, fontWeight: 700, flexShrink: 0,
@@ -292,14 +298,14 @@ function ChaserRow({
           </div>
         )}
         <span style={{
-          fontSize: 13, fontWeight: 700, color: ink,
+          fontSize: nameSize, fontWeight: 700, color: ink,
           whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
         }}>
           {fullName}
         </span>
       </span>
       <span style={{
-        textAlign: 'right', fontSize: 13, fontWeight: 800, color: ink,
+        textAlign: 'right', fontSize: scoreSize, fontWeight: 800, color: ink,
         fontVariantNumeric: 'tabular-nums',
       }}>
         {fmtScore(score)}
