@@ -67,7 +67,17 @@ export const FriendsLeaderboardSection: React.FC<Props> = ({ userId }) => {
   const totalActive = activeRows.length;
   const inactiveCount = inactiveRows.length;
 
-  const visible = showInactive ? [...activeRows, ...inactiveRows] : activeRows;
+  // Cap active rows at the top 10 — but always include the user's own row.
+  const ACTIVE_CAP_DEFAULT = 10;
+  const activeCap = Math.max(ACTIVE_CAP_DEFAULT, yourActiveRank);
+  const activeRowsCapped = showAllActive
+    ? activeRows
+    : activeRows.slice(0, activeCap);
+  const hiddenActiveCount = activeRows.length - activeRowsCapped.length;
+
+  const visible = showInactive
+    ? [...activeRowsCapped, ...inactiveRows]
+    : activeRowsCapped;
 
   const yourActiveIdx = activeRows.findIndex((e) => e.is_self);
   const yourHcp = activeRows[yourActiveIdx]?.friend_handicap_index ?? null;
