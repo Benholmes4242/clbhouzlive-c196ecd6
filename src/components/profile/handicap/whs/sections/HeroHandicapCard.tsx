@@ -926,7 +926,8 @@ const FlankRing: React.FC<FlankRingProps> = ({ metric, state, value, fraction })
       sub = 'Awaiting data';
     }
   } else {
-    color = '#3B82F6';
+    // Scoring avg uses a royal-blue gradient (rendered via SVG <defs> in the ring below)
+    color = 'url(#flankScoringGradient)';
     frac = fraction ?? 0;
     centre = (
       <span style={{
