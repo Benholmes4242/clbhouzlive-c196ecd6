@@ -129,6 +129,40 @@ export const TrendCardsStack: React.FC<Props> = ({ connectionId, currentHandicap
           >
             Three signals explaining your trajectory.
           </p>
+
+          {showInfo && (
+            <div
+              style={{
+                marginTop: 12,
+                padding: '12px 14px',
+                background: 'rgba(15,23,42,0.04)',
+                border: '1px solid rgba(15,23,42,0.08)',
+                borderRadius: 10,
+              }}
+            >
+              <p
+                style={{
+                  margin: 0,
+                  fontSize: 11,
+                  fontWeight: 800,
+                  color: INK,
+                  letterSpacing: '0.08em',
+                  textTransform: 'uppercase',
+                  marginBottom: 6,
+                  fontFamily: FONT,
+                }}
+              >
+                How this works
+              </p>
+              <p style={{ margin: 0, fontSize: 12, lineHeight: 1.55, color: 'rgba(15,23,42,0.78)', fontFamily: FONT }}>
+                Your <strong>differential</strong> is each round&apos;s score adjusted for course difficulty.
+                Lower is better. Your <strong>handicap</strong> is the average of your best 8 differentials
+                from your last 20 rounds — those are your <strong>counters</strong>. The{' '}
+                <strong>projection</strong> simulates 5 more rounds at your recent average and recomputes
+                your handicap.
+              </p>
+            </div>
+          )}
         </div>
       ) : (
         <SectionHeader
