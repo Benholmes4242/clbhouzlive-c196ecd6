@@ -32,9 +32,6 @@ const FONT_DISPLAY = 'SF Pro Display, -apple-system, BlinkMacSystemFont, system-
 const HERO_VIEWBOX = 200;
 const CX = HERO_VIEWBOX / 2;
 const CY = HERO_VIEWBOX / 2;
-const R_OUTER = 88;
-const STROKE_OUTER = 9;
-const C_OUTER = 2 * Math.PI * R_OUTER;
 const R_INNER = 70;
 const STROKE_INNER = 5;
 const C_INNER = 2 * Math.PI * R_INNER;
@@ -271,7 +268,7 @@ const HeroHandicapCard: React.FC<Props> = ({ connection }) => {
 
   // Milestone math — outer ring
   const milestone = calcMilestoneProgress(scrubValue);
-  const outerDash = milestone.progress * C_OUTER;
+  
 
   // Monthly movement math — inner ring (replaces form)
   const monthly = calcMonthlyMovement(trend?.delta ?? null);
@@ -503,76 +500,50 @@ const HeroHandicapCard: React.FC<Props> = ({ connection }) => {
         {/* LEFT — FORM */}
         <FlankRing metric="form" state={formState} />
 
-        {/* CENTRE — Hero ring */}
+        {/* CENTRE — Hero ring (matches flank dimensions) */}
         <div style={{
-          width: 'clamp(118px, 35vw, 148px)',
+          width: 'clamp(72px, 22vw, 100px)',
           aspectRatio: '1 / 1',
           position: 'relative',
           justifySelf: 'center',
         }}>
           <svg
             width="100%" height="100%"
-            viewBox={`0 0 ${HERO_VIEWBOX} ${HERO_VIEWBOX}`}
+            viewBox={`0 0 100 100`}
             preserveAspectRatio="xMidYMid meet"
           >
             <defs>
-              <linearGradient id="heroOuterAmberGold" x1="0" y1="0" x2="1" y2="0">
-                <stop offset="0%" stopColor="#F7931E" />
-                <stop offset="100%" stopColor="#FBBC2E" />
-              </linearGradient>
-              <linearGradient id="heroInnerGreenTeal" x1="0" y1="0" x2="1" y2="0">
+              <linearGradient id="heroMomentumGreen" x1="0" y1="0" x2="1" y2="0">
                 <stop offset="0%" stopColor="#15803D" />
                 <stop offset="100%" stopColor="#4ADE80" />
               </linearGradient>
             </defs>
-
-            {/* Outer track */}
+            {/* Track */}
             <circle
-              cx={CX} cy={CY} r={R_OUTER}
-              fill="none" stroke={INK_06} strokeWidth={STROKE_OUTER}
+              cx={50} cy={50} r={42}
+              fill="none" stroke={INK_06} strokeWidth={6}
               vectorEffect="non-scaling-stroke"
             />
-            {/* Outer milestone progress */}
-            <circle
-              cx={CX} cy={CY} r={R_OUTER}
-              fill="none" stroke="url(#heroOuterAmberGold)" strokeWidth={STROKE_OUTER}
-              strokeLinecap="butt"
-              strokeDasharray={`${outerDash} ${C_OUTER}`}
-              transform={`rotate(-90 ${CX} ${CY})`}
-              vectorEffect="non-scaling-stroke"
-              style={{ transition: 'stroke-dasharray 320ms cubic-bezier(0.22, 0.61, 0.36, 1)' }}
-            />
-
-
-
-            {/* Inner track */}
-            <circle
-              cx={CX} cy={CY} r={R_INNER}
-              fill="none" stroke={INK_06} strokeWidth={STROKE_INNER}
-              vectorEffect="non-scaling-stroke"
-            />
-
-            {/* Inner positive form */}
+            {/* Momentum arc — green for improving, red for worsening */}
             {showGreenArc && (
               <circle
-                cx={CX} cy={CY} r={R_INNER} fill="none"
-                stroke="url(#heroInnerGreenTeal)" strokeWidth={STROKE_INNER}
-                strokeDasharray={`${innerFillLength} ${C_INNER}`}
-                strokeLinecap="butt"
-                transform={`rotate(-90 ${CX} ${CY})`}
+                cx={50} cy={50} r={42} fill="none"
+                stroke="url(#heroMomentumGreen)" strokeWidth={6}
+                strokeDasharray={`${(innerFillLength / C_INNER) * (2 * Math.PI * 42)} ${2 * Math.PI * 42}`}
+                strokeLinecap="round"
+                transform={`rotate(-90 50 50)`}
                 vectorEffect="non-scaling-stroke"
                 style={{ transition: 'stroke-dasharray 320ms cubic-bezier(0.22, 0.61, 0.36, 1)' }}
               />
             )}
-            {/* Inner negative form */}
             {showRedArc && (
-              <g transform={`scale(-1, 1) translate(-${HERO_VIEWBOX}, 0)`}>
+              <g transform={`scale(-1, 1) translate(-100, 0)`}>
                 <circle
-                  cx={CX} cy={CY} r={R_INNER} fill="none"
-                  stroke={RED} strokeWidth={STROKE_INNER}
-                  strokeDasharray={`${innerFillLength} ${C_INNER}`}
-                  strokeLinecap="butt"
-                  transform={`rotate(-90 ${CX} ${CY})`}
+                  cx={50} cy={50} r={42} fill="none"
+                  stroke={RED} strokeWidth={6}
+                  strokeDasharray={`${(innerFillLength / C_INNER) * (2 * Math.PI * 42)} ${2 * Math.PI * 42}`}
+                  strokeLinecap="round"
+                  transform={`rotate(-90 50 50)`}
                   vectorEffect="non-scaling-stroke"
                   style={{ transition: 'stroke-dasharray 320ms cubic-bezier(0.22, 0.61, 0.36, 1)' }}
                 />
@@ -588,16 +559,16 @@ const HeroHandicapCard: React.FC<Props> = ({ connection }) => {
             pointerEvents: 'none',
           }}>
             <span style={{
-              fontSize: 'clamp(28px, 9.5vw, 40px)', fontWeight: 700, color: INK,
-              letterSpacing: '-0.05em', lineHeight: 1,
+              fontSize: 'clamp(20px, 6vw, 26px)', fontWeight: 700, color: INK,
+              letterSpacing: '-0.03em', lineHeight: 1,
               fontVariantNumeric: 'tabular-nums',
             }}>
               {scrubValue.toFixed(1)}
             </span>
             <div style={{
-              marginTop: 'clamp(5px, 1.8vw, 8px)',
-              display: 'flex', alignItems: 'center', gap: 4,
-              fontSize: 'clamp(9px, 2.6vw, 10px)',
+              marginTop: 'clamp(2px, 1vw, 4px)',
+              display: 'flex', alignItems: 'center', gap: 3,
+              fontSize: 'clamp(8.5px, 2.4vw, 9.5px)',
               fontVariantNumeric: 'tabular-nums',
               opacity: isScrubbing ? 0 : 1,
               transition: 'opacity 200ms ease',
@@ -609,20 +580,6 @@ const HeroHandicapCard: React.FC<Props> = ({ connection }) => {
 
         {/* RIGHT — SCORING AVG */}
         <FlankRing metric="scoring" value={scoringAvgStr ?? '—'} fraction={scoringFraction} />
-      </div>
-
-      {/* Inner ring legend */}
-      <div style={{
-        display: 'flex', justifyContent: 'center', gap: 5,
-        marginTop: 10,
-        fontSize: 'clamp(9px, 2.6vw, 10px)', color: INK_55,
-      }}>
-        <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5 }}>
-          <span style={{ width: 7, height: 7, borderRadius: 4, background: GREEN }} />
-          <strong style={{ color: INK_70, fontWeight: 700, letterSpacing: '0.04em' }}>
-            30-DAY FORM (inner ring)
-          </strong>
-        </span>
       </div>
 
       {/* Sparkline strip */}
