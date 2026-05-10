@@ -81,7 +81,8 @@ const DistributionChart: React.FC<{
 
   return (
     <div style={{ marginTop: 18, position: 'relative' }}>
-      {/* Scratch-zone tint background — covers buckets 0 (<0) and 1 (0-4) */}
+      {/* Scratch-zone marker — soft tint + dashed top edge (no full frame) */}
+      {/* Tint */}
       <div
         aria-hidden
         style={{
@@ -90,13 +91,43 @@ const DistributionChart: React.FC<{
           bottom: 0,
           left: 0,
           width: 'calc(2 * ((100% - 36px) / 7) + 6px)',
-          background: 'rgba(34,197,94,0.10)',
-          border: '1px solid #22C55E',
+          background: 'rgba(34,197,94,0.06)',
           borderRadius: 6,
           pointerEvents: 'none',
           zIndex: 0,
         }}
       />
+      {/* Dashed top edge — sits at the top of the chart plot area, above the bars */}
+      <div
+        aria-hidden
+        style={{
+          position: 'absolute',
+          top: 14,
+          left: 0,
+          width: 'calc(2 * ((100% - 36px) / 7) + 6px)',
+          height: 0,
+          borderTop: '1px dashed #22C55E',
+          pointerEvents: 'none',
+          zIndex: 2,
+        }}
+      />
+      {/* Tiny "SCRATCH" caps text above the dashed line */}
+      <div
+        aria-hidden
+        style={{
+          position: 'absolute',
+          top: 0,
+          left: 4,
+          fontSize: 8.5,
+          fontWeight: 800,
+          color: '#15803D',
+          letterSpacing: '0.16em',
+          pointerEvents: 'none',
+          zIndex: 2,
+        }}
+      >
+        SCRATCH
+      </div>
       <div
         style={{
           display: 'flex',
