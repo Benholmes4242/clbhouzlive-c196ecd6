@@ -75,10 +75,10 @@ export const HandicapProjectionCard: React.FC<Props> = ({ scores }) => {
 
   if (prediction.insufficientData) {
     return (
-      <div style={CARD_STYLE}>
+      <div style={SECTION_STYLE}>
         <CardHeader showInfo={showInfo} onToggleInfo={() => setShowInfo((v) => !v)} />
         {showInfo && <InfoPanel />}
-        <div style={{ padding: '24px 16px 28px', textAlign: 'center' }}>
+        <div style={{ padding: '24px 20px 28px', textAlign: 'center' }}>
           <p style={{ margin: 0, fontSize: 14, fontWeight: 700, color: T.ink, fontFamily: FONT }}>
             Add a few more rounds
           </p>
@@ -96,18 +96,7 @@ export const HandicapProjectionCard: React.FC<Props> = ({ scores }) => {
   const curve = curveFor(prediction.direction);
 
   return (
-    <div style={{ ...CARD_STYLE, position: 'relative' }}>
-      <div
-        aria-hidden
-        style={{
-          position: 'absolute',
-          left: 0,
-          top: 0,
-          bottom: 0,
-          width: 3,
-          background: theme.accent,
-        }}
-      />
+    <div style={SECTION_STYLE}>
       <CardHeader showInfo={showInfo} onToggleInfo={() => setShowInfo((v) => !v)} />
       {showInfo && <InfoPanel />}
 
