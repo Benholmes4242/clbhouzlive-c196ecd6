@@ -17403,6 +17403,7 @@ export type Database = {
           is_self: boolean
           last_round_course_name: string
           last_round_played_at: string
+          rounds_last_30d: number
         }[]
       }
       get_friend_played_recommendations: {
