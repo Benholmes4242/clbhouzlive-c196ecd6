@@ -111,7 +111,7 @@ export const HandicapProjectionCard: React.FC<Props> = ({ scores }) => {
         }}
       >
         {/* LEFT — WHERE YOU ARE */}
-        <div style={{ padding: '18px 16px 14px', position: 'relative', borderRight: `1px solid ${T.hairline}` }}>
+        <div style={{ padding: '18px 14px 14px 0', position: 'relative', borderRight: `1px solid ${T.hairline}` }}>
           <p style={{
             margin: 0,
             fontSize: 9.5,
@@ -158,7 +158,7 @@ export const HandicapProjectionCard: React.FC<Props> = ({ scores }) => {
         </div>
 
         {/* RIGHT — HEADING TO */}
-        <div style={{ padding: '18px 16px 14px' }}>
+        <div style={{ padding: '18px 0 14px 14px' }}>
           <p style={{
             margin: 0,
             fontSize: 9.5,
