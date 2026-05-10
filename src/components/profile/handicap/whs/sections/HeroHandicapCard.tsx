@@ -375,6 +375,19 @@ const HeroHandicapCard: React.FC<Props> = ({ connection }) => {
     );
   })();
 
+  // ── Delta sub text + direction (for centre ring label-stack) ─────────────
+  const deltaTodayDir: 'up' | 'down' | 'flat' = (() => {
+    const d = trend?.delta;
+    if (d == null || Math.abs(d) < 0.05) return 'flat';
+    return d < 0 ? 'down' : 'up';
+  })();
+  const deltaSubText = (() => {
+    const d = trend?.delta;
+    if (d == null) return 'Awaiting data';
+    if (Math.abs(d) < 0.05) return 'Steady today';
+    return `${d < 0 ? '↓' : '↑'} ${Math.abs(d).toFixed(1)} today`;
+  })();
+
   // ── 6-point sparkline from history points ────────────────────────────────
   const sparkPolyline = (() => {
     if (points.length < 2) return null;
