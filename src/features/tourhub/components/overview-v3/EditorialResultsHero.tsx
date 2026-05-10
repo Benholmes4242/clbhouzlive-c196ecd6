@@ -201,10 +201,10 @@ function ChampionBlock({
 // ---------- Runner-up strip -------------------------------------------------
 
 function RunnerUpStrip({
-  finisher, tourSlug, onTap,
+  finisher, tourSlug, onTap, t = 0,
 }: {
   finisher: TournamentFinisher; tourSlug: string;
-  onTap?: (f: TournamentFinisher) => void;
+  onTap?: (f: TournamentFinisher) => void; t?: number;
 }) {
   const [imgErr, setImgErr] = useState(false);
   const fullName = finisher.fullName || finisher.displayName;
@@ -212,14 +212,21 @@ function RunnerUpStrip({
   const photoUrl = getPlayerHeadshotUrl(fullName, tourCode, finisher.headshotOverride ?? undefined);
   const flag = flagFor(finisher.country);
 
+  const avatar = lerp(28, 38, t);
+  const pad = lerp(10, 14, t);
+  const marginTop = lerp(8, 14, t);
+  const nameSize = lerp(13, 15, t);
+  const scoreSize = lerp(16, 19, t);
+  const badge = lerp(22, 28, t);
+
   return (
     <button
       type="button"
       onClick={() => onTap?.(finisher)}
       style={{
         flexShrink: 0,
-        marginTop: 10,
-        padding: 10,
+        marginTop,
+        padding: pad,
         borderRadius: 10,
         background: 'rgba(241,245,249,0.8)',
         border: `1px solid ${slate200}`,
@@ -229,7 +236,7 @@ function RunnerUpStrip({
       }}
     >
       <span style={{
-        width: 22, height: 22, borderRadius: '50%',
+        width: badge, height: badge, borderRadius: '50%',
         background: '#E5E4E2', color: ink,
         display: 'flex', alignItems: 'center', justifyContent: 'center',
         fontSize: 11, fontWeight: 800, flexShrink: 0,
@@ -240,13 +247,13 @@ function RunnerUpStrip({
         <img
           src={photoUrl} alt="" onError={() => setImgErr(true)}
           style={{
-            width: 28, aspectRatio: '1 / 1.05', borderRadius: '34%',
+            width: avatar, aspectRatio: '1 / 1.05', borderRadius: '34%',
             objectFit: 'cover', objectPosition: 'center 18%', flexShrink: 0,
           }}
         />
       ) : (
         <div style={{
-          width: 28, aspectRatio: '1 / 1.05', borderRadius: '34%',
+          width: avatar, aspectRatio: '1 / 1.05', borderRadius: '34%',
           background: slate100,
           display: 'flex', alignItems: 'center', justifyContent: 'center',
           fontSize: 10, color: slate500, fontWeight: 700, flexShrink: 0,
@@ -262,7 +269,7 @@ function RunnerUpStrip({
           RUNNER-UP
         </div>
         <div style={{
-          fontSize: 13, fontWeight: 700, color: ink,
+          fontSize: nameSize, fontWeight: 700, color: ink,
           display: 'flex', alignItems: 'center', gap: 6,
           whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
         }}>
@@ -273,7 +280,7 @@ function RunnerUpStrip({
         </div>
       </div>
       <span style={{
-        fontSize: 16, fontWeight: 800, color: ink,
+        fontSize: scoreSize, fontWeight: 800, color: ink,
         fontVariantNumeric: 'tabular-nums', flexShrink: 0,
       }}>
         {finisher.displayScore || fmtScore(finisher.score)}
@@ -285,11 +292,12 @@ function RunnerUpStrip({
 // ---------- By-the-Numbers grid (5 col, low round merged) -----------------
 
 function ByNumbersGrid({
-  birdies, eagles, bogeys, lowRound, rounds,
+  birdies, eagles, bogeys, lowRound, rounds, t = 0,
 }: {
   birdies: number; eagles: number; bogeys: number;
   lowRound: number | null;
   rounds: Array<number | null>;
+  t?: number;
 }) {
   const playedRounds = rounds.filter((r): r is number => r != null);
   const avg = playedRounds.length > 0
@@ -302,15 +310,18 @@ function ByNumbersGrid({
     { v: `${bogeys}`,                                 label: 'BOGEYS',  color: ink  },
     { v: lowRound != null ? fmtScore(lowRound) : '—', label: 'LOW R',   color: gold },
   ];
+  const numSize = lerp(20, 28, t);
+  const padY = lerp(10, 16, t);
+  const marginTop = lerp(8, 14, t);
   return (
     <div style={{
       flexShrink: 0,
-      marginTop: 10,
+      marginTop,
       display: 'grid',
       gridTemplateColumns: 'repeat(5, 1fr)',
       borderTop: `1px solid ${slate200}`,
       borderBottom: `1px solid ${slate200}`,
-      padding: '10px 0',
+      padding: `${padY}px 0`,
     }}>
       {cells.map((c, i) => (
         <div
@@ -322,7 +333,7 @@ function ByNumbersGrid({
           }}
         >
           <div style={{
-            fontSize: 22, fontWeight: 900, color: c.color, lineHeight: 1,
+            fontSize: numSize, fontWeight: 900, color: c.color, lineHeight: 1,
             fontVariantNumeric: 'tabular-nums', letterSpacing: '-0.02em',
           }}>
             {c.v}
