@@ -29,6 +29,7 @@ const isStale = (lastPlayed: string | null): boolean => {
 export const FriendsLeaderboardSection: React.FC<Props> = ({ userId }) => {
   const { data, isLoading } = useFriendLeaderboard(userId);
   const [showInactive, setShowInactive] = useState(false);
+  const [showAllActive, setShowAllActive] = useState(false);
   const [profileSheet, setProfileSheet] = useState<{ index: number } | null>(null);
 
   // Sort by handicap (low → high). NULL handicaps sink to the bottom.
