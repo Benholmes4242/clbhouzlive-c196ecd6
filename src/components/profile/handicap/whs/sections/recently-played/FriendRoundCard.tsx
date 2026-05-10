@@ -455,6 +455,8 @@ const OnAppCard: React.FC<{ activity: WhsFriendActivityWithImage; onClick: () =>
             flexShrink: 0,
           }}
         >
+          Scorecard
+          <ChevronRight size={13} strokeWidth={2.5} />
         </span>
       </div>
 
