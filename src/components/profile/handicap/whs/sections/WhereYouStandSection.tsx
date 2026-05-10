@@ -337,11 +337,10 @@ const AvailableCard: React.FC<{
           <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5 }}>
             <span
               style={{
-                width: 8,
-                height: 8,
-                borderRadius: 2,
-                background: 'rgba(34,197,94,0.12)',
-                border: `1px solid #22C55E`,
+                display: 'inline-block',
+                width: 12,
+                height: 0,
+                borderTop: '1px dashed #22C55E',
               }}
             />
             <span>Scratch territory</span>
