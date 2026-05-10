@@ -1,8 +1,9 @@
 import React from 'react';
-import { Trophy, Flame, ChevronRight, ArrowDown, ArrowUp } from 'lucide-react';
+import { Trophy, Flame, ChevronRight, ArrowDown, ArrowUp, Heart, BadgeCheck } from 'lucide-react';
 import { initials, firstName } from '@/lib/whs/utils/initials';
 import { fmtRelative } from '@/lib/whs/utils/nameFormat';
 import { fmtDiff } from '@/lib/whs/format';
+import { useToggleRoundReaction } from '@/lib/whs/hooks';
 import type { WhsFriendActivityWithImage } from '@/lib/whs/types';
 
 interface Props {
@@ -68,6 +69,8 @@ const OnAppCard: React.FC<{ activity: WhsFriendActivityWithImage; onClick: () =>
     statusTag = { label: 'ASK TO SYNC', tone: 'sync' };
   }
 
+  const isSynced = activity.is_clbhouz_user && !!activity.friend_connection_id;
+
   return (
     <div
       onClick={onClick}
@@ -118,21 +121,71 @@ const OnAppCard: React.FC<{ activity: WhsFriendActivityWithImage; onClick: () =>
         </div>
 
         <div style={{ flex: 1, minWidth: 0 }}>
-          <p
-            style={{
-              margin: 0,
-              fontSize: 14,
-              fontWeight: 800,
-              color: T.ink,
-              lineHeight: 1.2,
-              whiteSpace: 'nowrap',
-              overflow: 'hidden',
-              textOverflow: 'ellipsis',
-              letterSpacing: '-0.01em',
-            }}
-          >
-            {firstName(activity.friend_name)}
-          </p>
+          {isSynced && (
+            <div
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 5,
+                marginBottom: 3,
+              }}
+            >
+              <span
+                style={{
+                  width: 5,
+                  height: 5,
+                  borderRadius: '50%',
+                  background: '#006747',
+                  display: 'inline-block',
+                }}
+              />
+              <span
+                style={{
+                  fontSize: 9,
+                  fontWeight: 900,
+                  letterSpacing: '0.14em',
+                  color: '#006747',
+                }}
+              >
+                POSTED · CLBHOUZ
+              </span>
+            </div>
+          )}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6, minWidth: 0 }}>
+            <p
+              style={{
+                margin: 0,
+                fontSize: 14,
+                fontWeight: 800,
+                color: T.ink,
+                lineHeight: 1.2,
+                whiteSpace: 'nowrap',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                letterSpacing: '-0.01em',
+              }}
+            >
+              {firstName(activity.friend_name)}
+            </p>
+            {isSynced && (
+              <span
+                aria-label="Verified Clbhouz user"
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  flexShrink: 0,
+                }}
+              >
+                <BadgeCheck
+                  size={14}
+                  strokeWidth={2.5}
+                  color="#FFFFFF"
+                  fill="#006747"
+                />
+              </span>
+            )}
+          </div>
           <p
             style={{
               margin: 0,
@@ -402,10 +455,73 @@ const OnAppCard: React.FC<{ activity: WhsFriendActivityWithImage; onClick: () =>
             flexShrink: 0,
           }}
         >
-          Scorecard
-          <ChevronRight size={13} strokeWidth={2.5} />
         </span>
       </div>
+
+      {isSynced && activity.last_round_score_id && (
+        <ReactionStrip activity={activity} />
+      )}
+    </div>
+  );
+};
+
+const ReactionStrip: React.FC<{ activity: WhsFriendActivityWithImage }> = ({
+  activity,
+}) => {
+  const toggle = useToggleRoundReaction();
+  const reacted = activity.viewer_has_reacted;
+  const count = activity.reaction_count;
+
+  const handleClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (!activity.last_round_score_id || toggle.isPending) return;
+    toggle.mutate({ scoreId: activity.last_round_score_id });
+  };
+
+  return (
+    <div
+      style={{
+        display: 'flex',
+        alignItems: 'stretch',
+        borderTop: `1px solid ${T.hairline}`,
+      }}
+    >
+      <button
+        type="button"
+        onClick={handleClick}
+        disabled={toggle.isPending}
+        aria-pressed={reacted}
+        aria-label={
+          count > 0
+            ? `${count} reaction${count === 1 ? '' : 's'}. ${reacted ? 'You reacted.' : 'Tap to react.'}`
+            : 'Tap to react with a heart'
+        }
+        style={{
+          flex: 1,
+          padding: '9px 0',
+          display: 'inline-flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          gap: 5,
+          background: 'transparent',
+          border: 'none',
+          cursor: toggle.isPending ? 'wait' : 'pointer',
+          fontSize: 11,
+          fontWeight: 700,
+          color: reacted ? T.redInk : T.inkMute,
+          letterSpacing: '-0.005em',
+          fontFamily: 'inherit',
+          transition: 'color 150ms ease',
+        }}
+      >
+        <Heart
+          size={14}
+          strokeWidth={2.2}
+          color={reacted ? T.redInk : T.inkMute}
+          fill={reacted ? T.redInk : 'none'}
+        />
+        {count > 0 ? count : 'React'}
+      </button>
     </div>
   );
 };
