@@ -143,10 +143,15 @@ export const RoundsThatCountCard: React.FC<Props> = ({ connectionId, currentHand
   const cutTarget = projection?.hasData ? projection.cutTarget : null;
   const dataMin = enriched.minDiff;
   const dataMax = Math.max(enriched.maxDiff, cutTarget ?? -Infinity);
-  const yMin = Math.min(-1, Math.floor(dataMin - 0.5));
-  // Cap yMax at 1 unit above the worst counter or cut target. Non-counters
-  // above this cap render clipped to the top with a small indicator chevron.
-  const yMax = Math.max(4, Math.ceil(dataMax + 1));
+  // yMin: floor the actual minimum data point, no hardcoded floor and no
+  // extra padding below. If the lowest counter is +2.3, the chart starts at
+  // +2 — not −1. If the lowest counter is −0.7, the chart starts at −1.
+  const yMin = Math.floor(dataMin);
+  // yMax: ceiling the maximum data point with half a unit of padding above.
+  // The hardcoded floor of 4 stays so the chart always shows a meaningful
+  // range even when all counters cluster tightly. Non-counters that exceed
+  // yMax still render clipped to the top with a chevron (see dot render).
+  const yMax = Math.max(4, Math.ceil(dataMax + 0.5));
   const ticks = generateTicks(yMin, yMax);
   const ySpan = yMax - yMin;
   const innerH = CHART_H - CHART_TOP - CHART_BOTTOM;
