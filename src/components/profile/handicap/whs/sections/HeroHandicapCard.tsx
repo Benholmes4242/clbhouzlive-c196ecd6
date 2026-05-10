@@ -955,16 +955,31 @@ const FlankRing: React.FC<FlankRingProps> = ({ metric, state, value, fraction })
           viewBox={`0 0 ${VIEWBOX} ${VIEWBOX}`}
           preserveAspectRatio="xMidYMid meet"
         >
+          <defs>
+            {/* Royal blue gradient — only used by the SCORING AVG ring, but defined per-instance for safety */}
+            <linearGradient id="flankScoringGradient" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%" stopColor={SCORING_BLUE_DEEP} />
+              <stop offset="100%" stopColor={SCORING_BLUE} />
+            </linearGradient>
+            {/* Subtle drop-shadow filter for filled arc lift */}
+            <filter id="flankArcLift" x="-20%" y="-20%" width="140%" height="140%">
+              <feGaussianBlur in="SourceAlpha" stdDeviation="0.6" />
+              <feOffset dx="0" dy="0.4" result="offsetblur" />
+              <feComponentTransfer><feFuncA type="linear" slope="0.3" /></feComponentTransfer>
+              <feMerge><feMergeNode /><feMergeNode in="SourceGraphic" /></feMerge>
+            </filter>
+          </defs>
           <circle cx={FCX} cy={FCY} r={FR} fill="none"
-            stroke={INK_06} strokeWidth={FSTROKE}
+            stroke={RING_TRACK} strokeWidth={FSTROKE}
             vectorEffect="non-scaling-stroke" />
           {frac > 0 && (
             <circle cx={FCX} cy={FCY} r={FR} fill="none"
               stroke={color} strokeWidth={FSTROKE}
-              strokeLinecap="butt"
+              strokeLinecap="round"
               strokeDasharray={`${frac * FC} ${FC}`}
               transform={`rotate(-90 ${FCX} ${FCY})`}
-              vectorEffect="non-scaling-stroke" />
+              vectorEffect="non-scaling-stroke"
+              filter="url(#flankArcLift)" />
           )}
         </svg>
         <div style={{
