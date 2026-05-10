@@ -1,5 +1,4 @@
-import React, { useState } from 'react';
-import { Info } from 'lucide-react';
+import React from 'react';
 import type { WhsScore } from '@/lib/whs/types';
 import { predictHandicap, VERDICT_META } from './predictHandicap';
 
@@ -68,7 +67,6 @@ const THEMES: Record<'positive' | 'neutral' | 'negative', Theme> = {
 };
 
 export const HandicapProjectionCard: React.FC<Props> = ({ scores }) => {
-  const [showInfo, setShowInfo] = useState(false);
   const prediction = predictHandicap(scores);
   const meta = VERDICT_META[prediction.verdict];
   const theme = THEMES[meta.theme];
@@ -76,8 +74,6 @@ export const HandicapProjectionCard: React.FC<Props> = ({ scores }) => {
   if (prediction.insufficientData) {
     return (
       <div style={SECTION_STYLE}>
-        <CardHeader showInfo={showInfo} onToggleInfo={() => setShowInfo((v) => !v)} />
-        {showInfo && <InfoPanel />}
         <div style={{ padding: '24px 20px 28px', textAlign: 'center' }}>
           <p style={{ margin: 0, fontSize: 14, fontWeight: 700, color: T.ink, fontFamily: FONT }}>
             Add a few more rounds
@@ -97,9 +93,6 @@ export const HandicapProjectionCard: React.FC<Props> = ({ scores }) => {
 
   return (
     <div style={SECTION_STYLE}>
-      <CardHeader showInfo={showInfo} onToggleInfo={() => setShowInfo((v) => !v)} />
-      {showInfo && <InfoPanel />}
-
       {/* DUAL-PANEL: Where you are / Heading to */}
       <div
         style={{
