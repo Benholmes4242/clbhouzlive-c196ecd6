@@ -35,6 +35,8 @@ export const TrendCardsStack: React.FC<Props> = ({ connectionId, currentHandicap
 
   const showHero = !prediction.insufficientData && !isLoading;
 
+  const [showInfo, setShowInfo] = useState(false);
+
   return (
     <section style={{ padding: '0 20px', marginBottom: 28, fontFamily: FONT }}>
       {showHero ? (
