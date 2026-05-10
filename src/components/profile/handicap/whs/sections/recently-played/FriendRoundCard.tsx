@@ -455,10 +455,73 @@ const OnAppCard: React.FC<{ activity: WhsFriendActivityWithImage; onClick: () =>
             flexShrink: 0,
           }}
         >
-          Scorecard
-          <ChevronRight size={13} strokeWidth={2.5} />
         </span>
       </div>
+
+      {isSynced && activity.last_round_score_id && (
+        <ReactionStrip activity={activity} />
+      )}
+    </div>
+  );
+};
+
+const ReactionStrip: React.FC<{ activity: WhsFriendActivityWithImage }> = ({
+  activity,
+}) => {
+  const toggle = useToggleRoundReaction();
+  const reacted = activity.viewer_has_reacted;
+  const count = activity.reaction_count;
+
+  const handleClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (!activity.last_round_score_id || toggle.isPending) return;
+    toggle.mutate({ scoreId: activity.last_round_score_id });
+  };
+
+  return (
+    <div
+      style={{
+        display: 'flex',
+        alignItems: 'stretch',
+        borderTop: `1px solid ${T.hairline}`,
+      }}
+    >
+      <button
+        type="button"
+        onClick={handleClick}
+        disabled={toggle.isPending}
+        aria-pressed={reacted}
+        aria-label={
+          count > 0
+            ? `${count} reaction${count === 1 ? '' : 's'}. ${reacted ? 'You reacted.' : 'Tap to react.'}`
+            : 'Tap to react with a heart'
+        }
+        style={{
+          flex: 1,
+          padding: '9px 0',
+          display: 'inline-flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          gap: 5,
+          background: 'transparent',
+          border: 'none',
+          cursor: toggle.isPending ? 'wait' : 'pointer',
+          fontSize: 11,
+          fontWeight: 700,
+          color: reacted ? T.redInk : T.inkMute,
+          letterSpacing: '-0.005em',
+          fontFamily: 'inherit',
+          transition: 'color 150ms ease',
+        }}
+      >
+        <Heart
+          size={14}
+          strokeWidth={2.2}
+          color={reacted ? T.redInk : T.inkMute}
+          fill={reacted ? T.redInk : 'none'}
+        />
+        {count > 0 ? count : 'React'}
+      </button>
     </div>
   );
 };
