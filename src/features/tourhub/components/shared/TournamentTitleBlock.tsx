@@ -47,10 +47,7 @@ export function TournamentTitleBlock({
   const venue = [venueName, venueCity].filter(Boolean).join(' · ');
 
   return (
-    <div style={{
-      flex: 1, minHeight: 0,
-      display: 'flex', flexDirection: 'column',
-    }}>
+    <div style={{ display: 'flex', flexDirection: 'column' }}>
       {/* Eyebrow row */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: headerGapTop }}>
         <span
@@ -79,12 +76,10 @@ export function TournamentTitleBlock({
         )}
       </div>
 
-      {/* Status row — pushed to bottom group via marginTop:auto so the
-          title block hugs the LEADER divider with no dead space below. */}
+      {/* Status row */}
       {statusRow && (
         <div
           style={{
-            marginTop: 'auto',
             display: 'flex', alignItems: 'center', gap: 8,
             marginBottom: headerGapBetween,
           }}
@@ -97,7 +92,6 @@ export function TournamentTitleBlock({
       <h1
         style={{
           margin: 0,
-          marginTop: statusRow ? 0 : 'auto',
           fontFamily: '"Geist", -apple-system, BlinkMacSystemFont, sans-serif',
           fontSize: titleSize,
           fontWeight: 900,
