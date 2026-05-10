@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Activity, Info } from 'lucide-react';
+import { Info } from 'lucide-react';
 import type { WhsScore } from '@/lib/whs/types';
 import { predictHandicap, VERDICT_META } from './predictHandicap';
 
