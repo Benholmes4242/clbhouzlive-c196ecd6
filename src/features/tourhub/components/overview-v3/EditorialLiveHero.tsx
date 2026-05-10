@@ -10,11 +10,11 @@
  * Pro Max and tighten on mini, with no empty band below the CTA on tall devices.
  */
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { tournamentRoute } from '../../routes';
 import { Shimmer } from '../shared/Shimmer';
-import { ElasticZone } from '../shared/ElasticZone';
+import { ElasticZone, useElasticT, lerp } from '../shared/ElasticZone';
 import {
   TournamentTitleBlock,
   TourBadge,
