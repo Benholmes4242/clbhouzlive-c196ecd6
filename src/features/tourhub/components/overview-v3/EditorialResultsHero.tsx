@@ -62,10 +62,10 @@ function getTourCode(slug: string): string {
 // ---------- CHAMPION block --------------------------------------------------
 
 function ChampionBlock({
-  winner, tourSlug, marginLabel, onTap,
+  winner, tourSlug, marginLabel, onTap, t = 0,
 }: {
   winner: TournamentFinisher; tourSlug: string;
-  marginLabel: string | null; onTap?: () => void;
+  marginLabel: string | null; onTap?: () => void; t?: number;
 }) {
   const [imgErr, setImgErr] = useState(false);
   const fullName = winner.fullName || winner.displayName;
