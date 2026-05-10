@@ -471,18 +471,23 @@ export function EditorialResultsHero({
     }
   };
 
+  const rootRef = useRef<HTMLDivElement>(null);
+  const heroT = useElasticT(rootRef, 520, 820);
+
   return (
-    <div style={{
-      height: '100%',
-      display: 'flex',
-      flexDirection: 'column',
-      background: lightBg,
-      paddingTop: 'calc(env(safe-area-inset-top, 0px) + 28px)',
-      paddingInline: 20,
-      paddingBottom: 16,
-      boxSizing: 'border-box',
-      overflow: 'hidden',
-    }}>
+    <div
+      ref={rootRef}
+      style={{
+        height: '100%',
+        display: 'flex',
+        flexDirection: 'column',
+        background: lightBg,
+        paddingTop: 'calc(env(safe-area-inset-top, 0px) + 28px)',
+        paddingInline: 20,
+        paddingBottom: 16,
+        boxSizing: 'border-box',
+        overflow: 'hidden',
+      }}>
       <ElasticZone minH={120} maxH={260}>
         {(t) => (
           <TournamentTitleBlock
@@ -511,6 +516,7 @@ export function EditorialResultsHero({
         tourSlug={tournament.tourSlug}
         marginLabel={marginLabel}
         onTap={() => handleFinisherTap(winner)}
+        t={heroT}
       />
 
       {runnerUp && (
@@ -518,6 +524,7 @@ export function EditorialResultsHero({
           finisher={runnerUp}
           tourSlug={tournament.tourSlug}
           onTap={handleFinisherTap}
+          t={heroT}
         />
       )}
 
@@ -528,13 +535,14 @@ export function EditorialResultsHero({
           bogeys={(winnerStats as any).bogeys ?? 0}
           lowRound={lowRound}
           rounds={[winner.round1, winner.round2, winner.round3, winner.round4]}
+          t={heroT}
         />
       )}
 
       <HeroCTA
         label="Final Leaderboard"
         onClick={handleCta}
-        style={{ marginTop: 12 }}
+        style={{ marginTop: lerp(10, 18, heroT) }}
       />
     </div>
   );
