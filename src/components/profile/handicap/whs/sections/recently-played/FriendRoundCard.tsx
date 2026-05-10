@@ -121,21 +121,71 @@ const OnAppCard: React.FC<{ activity: WhsFriendActivityWithImage; onClick: () =>
         </div>
 
         <div style={{ flex: 1, minWidth: 0 }}>
-          <p
-            style={{
-              margin: 0,
-              fontSize: 14,
-              fontWeight: 800,
-              color: T.ink,
-              lineHeight: 1.2,
-              whiteSpace: 'nowrap',
-              overflow: 'hidden',
-              textOverflow: 'ellipsis',
-              letterSpacing: '-0.01em',
-            }}
-          >
-            {firstName(activity.friend_name)}
-          </p>
+          {isSynced && (
+            <div
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 5,
+                marginBottom: 3,
+              }}
+            >
+              <span
+                style={{
+                  width: 5,
+                  height: 5,
+                  borderRadius: '50%',
+                  background: '#006747',
+                  display: 'inline-block',
+                }}
+              />
+              <span
+                style={{
+                  fontSize: 9,
+                  fontWeight: 900,
+                  letterSpacing: '0.14em',
+                  color: '#006747',
+                }}
+              >
+                POSTED · CLBHOUZ
+              </span>
+            </div>
+          )}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6, minWidth: 0 }}>
+            <p
+              style={{
+                margin: 0,
+                fontSize: 14,
+                fontWeight: 800,
+                color: T.ink,
+                lineHeight: 1.2,
+                whiteSpace: 'nowrap',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                letterSpacing: '-0.01em',
+              }}
+            >
+              {firstName(activity.friend_name)}
+            </p>
+            {isSynced && (
+              <span
+                aria-label="Verified Clbhouz user"
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  flexShrink: 0,
+                }}
+              >
+                <BadgeCheck
+                  size={14}
+                  strokeWidth={2.5}
+                  color="#FFFFFF"
+                  fill="#006747"
+                />
+              </span>
+            )}
+          </div>
           <p
             style={{
               margin: 0,
