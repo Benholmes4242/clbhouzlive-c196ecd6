@@ -104,11 +104,14 @@ function ProfileHubSheetSkeleton() {
       {/* Divider */}
       <div style={{ height: '0.5px', background: 'rgba(15,23,42,0.07)', margin: '0 -16px' }} />
 
-      {/* ── Quick action tiles skeleton — 3 columns ── */}
-      <div className="grid grid-cols-3 gap-2 py-4">
-        {[0, 1, 2].map(i => (
-          <Skeleton key={i} className="h-[80px] rounded-2xl" />
-        ))}
+      {/* ── Quick action tiles skeleton — full-width Handicap + 3-tile row ── */}
+      <div className="py-4 flex flex-col gap-3">
+        <div style={{ height: 110, borderRadius: 14, background: 'rgba(15,23,42,0.04)' }} />
+        <div className="grid grid-cols-3 gap-3">
+          {[0, 1, 2].map(i => (
+            <div key={i} style={{ height: 110, borderRadius: 14, background: 'rgba(15,23,42,0.04)' }} />
+          ))}
+        </div>
       </div>
 
       {/* Divider */}
@@ -442,70 +445,70 @@ function ProfileHubSheet({
               {/* ── Divider ── */}
               <div style={{ height: '0.5px', background: 'rgba(15,23,42,0.07)', margin: '0 -16px' }} />
 
-              {/* ── Quick actions 2×2 grid (Handicap / Echo / Messages / Notifications) ── */}
-              <div className="grid grid-cols-2 gap-3 py-4">
-                {/* Handicap (top-left, primary) */}
+              {/* ── Quick actions: full-width Handicap + 3-tile action row ── */}
+              <div className="py-4 flex flex-col gap-3">
+                {/* Handicap (full width, primary) */}
                 <HandicapTile userId={currentActor.id} onClick={handleHandicapTileTap} />
 
-                {/* Echo (top-right) */}
-                <button
-                  type="button"
-                  onClick={() => handleNav('/echo')}
-                  className="relative flex flex-col justify-between text-left p-3.5 rounded-2xl active:scale-[0.97] transition-transform"
-                  style={{
-                    minHeight: 110,
-                    padding: '14px 14px 16px',
-                    borderRadius: 14,
-                    background: '#ffffff',
-                    border: '0.5px solid rgba(15,23,42,0.10)',
-                  }}
-                  aria-label="Echo"
-                >
-                  <div className="flex items-center justify-between w-full">
-                    <div
-                      className="flex items-center justify-center"
-                      style={{
-                        width: 36, height: 36, borderRadius: 10,
-                        background: 'transparent',
-                      }}
-                    >
-                      <div style={{
-                        width: 28, height: 28, borderRadius: '50%',
-                        background: 'linear-gradient(135deg, #F7931E, #E8920A)',
-                        display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        boxShadow: '0 2px 6px rgba(247,147,30,0.30)',
-                      }}>
-                        <AnimatedEchoWave size={14} color="#ffffff" active={true} />
+                {/* Action row: Echo / Messages / Notifications */}
+                <div className="grid grid-cols-3 gap-3">
+                  {/* Echo */}
+                  <button
+                    type="button"
+                    onClick={() => handleNav('/echo')}
+                    className="relative flex flex-col justify-between text-left active:scale-[0.97] transition-transform"
+                    style={{
+                      minHeight: 110,
+                      padding: '14px 14px 16px',
+                      borderRadius: 14,
+                      background: '#ffffff',
+                      border: '0.5px solid rgba(15,23,42,0.10)',
+                    }}
+                    aria-label="Echo"
+                  >
+                    <div className="flex items-center justify-between w-full">
+                      <div
+                        className="flex items-center justify-center"
+                        style={{ width: 36, height: 36, borderRadius: 10, background: 'transparent' }}
+                      >
+                        <div style={{
+                          width: 28, height: 28, borderRadius: '50%',
+                          background: 'linear-gradient(135deg, #F7931E, #E8920A)',
+                          display: 'flex', alignItems: 'center', justifyContent: 'center',
+                          boxShadow: '0 2px 6px rgba(247,147,30,0.30)',
+                        }}>
+                          <AnimatedEchoWave size={14} color="#ffffff" active={true} />
+                        </div>
                       </div>
                     </div>
-                  </div>
-                  <div className="w-full">
-                    <div style={{ fontSize: 15, fontWeight: 700, color: '#0f172a', lineHeight: 1.2 }}>Echo</div>
-                    <div style={{ fontSize: 11, color: '#64748B', marginTop: 2 }}>Ask anything</div>
-                  </div>
-                </button>
+                    <div className="w-full">
+                      <div style={{ fontSize: 15, fontWeight: 700, color: '#0f172a', lineHeight: 1.2 }}>Echo</div>
+                      <div style={{ fontSize: 11, color: '#64748B', marginTop: 2 }}>Ask anything</div>
+                    </div>
+                  </button>
 
-                {/* Messages (bottom-left) */}
-                <GridTile
-                  Icon={MessageCircle}
-                  iconColor="#059669"
-                  iconBg="rgba(5,150,105,0.10)"
-                  label="Messages"
-                  sub={unreadMessageCount > 0 ? `${unreadMessageCount} unread` : 'No new messages'}
-                  badge={unreadMessageCount}
-                  onClick={() => handleNav('/messages')}
-                />
+                  {/* Messages */}
+                  <GridTile
+                    Icon={MessageCircle}
+                    iconColor="#059669"
+                    iconBg="rgba(5,150,105,0.10)"
+                    label="Messages"
+                    sub={unreadMessageCount > 0 ? `${unreadMessageCount} unread` : 'No new'}
+                    badge={unreadMessageCount}
+                    onClick={() => handleNav('/messages')}
+                  />
 
-                {/* Notifications (bottom-right) */}
-                <GridTile
-                  Icon={Bell}
-                  iconColor="#0f172a"
-                  iconBg="rgba(15,23,42,0.06)"
-                  label="Notifications"
-                  sub={unreadNotificationCount > 0 ? `${unreadNotificationCount} new` : 'No new notifications'}
-                  badge={unreadNotificationCount}
-                  onClick={() => handleNav('/notificationmessages')}
-                />
+                  {/* Notifications */}
+                  <GridTile
+                    Icon={Bell}
+                    iconColor="#0f172a"
+                    iconBg="rgba(15,23,42,0.06)"
+                    label="Notifications"
+                    sub={unreadNotificationCount > 0 ? `${unreadNotificationCount} new` : 'No new'}
+                    badge={unreadNotificationCount}
+                    onClick={() => handleNav('/notificationmessages')}
+                  />
+                </div>
               </div>
 
               {/* ── Divider ── */}
