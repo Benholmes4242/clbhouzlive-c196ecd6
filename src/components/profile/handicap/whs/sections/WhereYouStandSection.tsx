@@ -170,34 +170,7 @@ const DistributionChart: React.FC<{
                   height: '100%',
                 }}
               >
-                {isUser && (
-                  <div
-                    style={{
-                      position: 'absolute',
-                      top: -22,
-                      display: 'flex',
-                      flexDirection: 'column',
-                      alignItems: 'center',
-                    }}
-                  >
-                    <div
-                      style={{
-                        fontFamily: FONT_GEIST,
-                        fontSize: 10.5,
-                        fontWeight: 700,
-                        color: INK,
-                        background: AMBER_14,
-                        padding: '2px 6px',
-                        borderRadius: 6,
-                        whiteSpace: 'nowrap',
-                        fontVariantNumeric: 'tabular-nums',
-                      }}
-                    >
-                      You · {handicapStr}
-                    </div>
-                    <div style={{ width: 2, height: 6, background: AMBER }} />
-                  </div>
-                )}
+                {/* User-bucket identity carried entirely by amber gradient + glow shadow below */}
                 <div
                   style={{
                     width: '100%',
