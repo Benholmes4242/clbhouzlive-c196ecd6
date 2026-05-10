@@ -102,11 +102,6 @@ export const RecentlyActiveRail: React.FC<Props> = ({ userId }) => {
                 const realIdx = sorted.findIndex((e) => e === entry);
                 if (realIdx >= 0) setProfileSheet({ index: realIdx });
               }}
-              onInviteClick={() => {
-                document
-                  .getElementById('invite-to-clbhouz-section')
-                  ?.scrollIntoView({ behavior: 'smooth' });
-              }}
             />
           </div>
         ))}
