@@ -22,8 +22,14 @@ const INK_10 = 'rgba(15,23,42,0.10)';
 const INK_06 = 'rgba(15,23,42,0.06)';
 const INK_04 = 'rgba(15,23,42,0.04)';
 const GREEN = '#4ADE80';
-const RED = '#9F1D1D';
-const RED_FORM_HOT = '#B91C1C';
+const RED = '#B91C1C';                     // ember red — slightly deeper/more luminous than #9F1D1D
+const RED_FORM_HOT = '#B91C1C';            // unchanged
+const RING_TRACK = 'rgba(15,23,42,0.10)';  // deeper than INK_06 — track reads as a real ring
+const COLD_BLUE = '#0284C7';               // deep cyan — replaces #0EA5E9
+const SCORING_BLUE = '#3B82F6';            // kept as the gradient end stop (start is darker)
+const SCORING_BLUE_DEEP = '#1D4ED8';       // royal blue gradient start
+const MOMENTUM_GREEN_DEEP = '#047857';     // forest gradient start (was #15803D)
+const MOMENTUM_GREEN_BRIGHT = '#10B981';   // forest gradient end (was #4ADE80)
 
 const MONTHS = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
 const FONT_DISPLAY = 'SF Pro Display, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
