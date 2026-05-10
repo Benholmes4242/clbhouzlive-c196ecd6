@@ -313,10 +313,41 @@ export async function fetchFriendsActivity(
     bests.map((b) => `${b.friend_connection_id}:${b.best_score_id}`),
   );
 
+  // Reaction enrichment — only for rounds with a score_id (synced friends).
+  const scoreIdsForReactions = Object.values(scoresByConn)
+    .map((s: any) => s?.id)
+    .filter((id: any): id is string => !!id);
+
+  let viewerReactedSet = new Set<string>();
+  const reactionCounts: Record<string, number> = {};
+
+  if (scoreIdsForReactions.length > 0) {
+    const userResp = await supabase.auth.getUser();
+    const viewerId = userResp.data.user?.id;
+    if (viewerId) {
+      const { data: vRows } = await supabase
+        .from('whs_round_reactions' as any)
+        .select('score_id')
+        .eq('user_id', viewerId)
+        .in('score_id', scoreIdsForReactions);
+      viewerReactedSet = new Set(((vRows as any[]) ?? []).map((r) => r.score_id as string));
+    }
+
+    const { data: countRows } = await supabase
+      .from('whs_round_reactions' as any)
+      .select('score_id')
+      .in('score_id', scoreIdsForReactions);
+    for (const row of ((countRows as any[]) ?? [])) {
+      const sid = row.score_id as string;
+      reactionCounts[sid] = (reactionCounts[sid] ?? 0) + 1;
+    }
+  }
+
   return friends.map((f): WhsFriendActivityWithImage => {
     const score = scoresByConn[f.friend_connection_id];
     const courseNameKey = (f.last_round_course_name ?? '').toLowerCase();
     const scoreCourseKey = (score?.course?.name ?? '').toLowerCase();
+    const scoreId: string | null = score?.id ?? null;
     return {
       friend_row_id: f.friend_row_id,
       friend_passport_id: f.friend_passport_id,
@@ -330,7 +361,7 @@ export async function fetchFriendsActivity(
       last_round_adjusted_gross: f.last_round_adjusted_gross,
       last_round_stableford: score?.stableford_points ?? null,
       last_round_differential: score?.handicap_differential ?? null,
-      last_round_score_id: score?.id ?? null,
+      last_round_score_id: scoreId,
       course_thumbnail_image:
         thumbsByName[courseNameKey] ?? thumbsByName[scoreCourseKey] ?? null,
       is_course_best: score
@@ -339,6 +370,8 @@ export async function fetchFriendsActivity(
       friend_handicap_index: f.friend_handicap_index ?? null,
       is_counter: !!score?.is_counter,
       handicap_index_at_time: score?.handicap_index_at_time ?? null,
+      viewer_has_reacted: scoreId ? viewerReactedSet.has(scoreId) : false,
+      reaction_count: scoreId ? reactionCounts[scoreId] ?? 0 : 0,
     };
   });
 }
