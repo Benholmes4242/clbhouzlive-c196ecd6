@@ -887,21 +887,21 @@ const FlankRing: React.FC<FlankRingProps> = ({ metric, state, value, fraction })
 
   if (metric === 'form') {
     if (state === 'hot') {
-      color = '#DC2626';
+      color = RED_FORM_HOT;
       frac = 1.0;
       centre = (
         <div style={{ width: 'clamp(18px, 5vw, 24px)', height: 'clamp(18px, 5vw, 24px)' }}>
-          <Flame size="100%" color="#DC2626" strokeWidth={2.4} fill="#DC2626" />
+          <Flame size="100%" color={RED_FORM_HOT} strokeWidth={2.4} fill={RED_FORM_HOT} />
         </div>
       );
       label = 'FORM';
       sub = 'Hot over last 5';
     } else if (state === 'cold') {
-      color = '#0EA5E9';
+      color = COLD_BLUE;
       frac = 0.10;
       centre = (
         <div style={{ width: 'clamp(18px, 5vw, 24px)', height: 'clamp(18px, 5vw, 24px)' }}>
-          <Snowflake size="100%" color="#0EA5E9" strokeWidth={2.4} />
+          <Snowflake size="100%" color={COLD_BLUE} strokeWidth={2.4} />
         </div>
       );
       label = 'FORM';
