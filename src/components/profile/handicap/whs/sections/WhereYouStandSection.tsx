@@ -67,7 +67,7 @@ const DistributionChart: React.FC<{
   buckets: HandicapPercentileBucket[];
   userBucket: HandicapBucket;
   userHandicap: number;
-}> = ({ buckets, userHandicap }) => {
+}> = ({ buckets, userHandicap: _userHandicap }) => {
   // Build a lookup so missing buckets render at 0% rather than collapsing.
   const byBucket = new Map<HandicapBucket, HandicapPercentileBucket>();
   buckets.forEach((b) => byBucket.set(b.bucket, b));
