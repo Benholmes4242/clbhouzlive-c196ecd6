@@ -422,6 +422,8 @@ export interface FriendLeaderboardEntry {
   handicap_30d_ago: number | null;
   /** Current minus 30d_ago. Negative = improvement. NULL if either side is NULL. */
   handicap_30d_delta: number | null;
+  /** Number of rounds this friend has posted in the last 30 days. Always present (0 if none). */
+  rounds_last_30d: number;
 }
 
 // ─── Phase 7: Friend rounds since last Today visit ────────────────────────

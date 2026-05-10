@@ -11,6 +11,8 @@ import { fmtHcp } from '@/lib/whs/format';
 
 interface Props {
   friend: FriendLeaderboardEntry;
+  /** The maximum rounds_last_30d across the section's visible list — used to scale the activity bar's fill. */
+  maxRounds: number;
 }
 
 const HAIRLINE = '1px solid rgba(15,23,42,0.08)';
@@ -18,7 +20,7 @@ const INK = '#0F172A';
 const INK_MUTE = 'rgba(15,23,42,0.55)';
 const AMBER = '#F7931E';
 
-export const InviteRow: React.FC<Props> = ({ friend }) => {
+export const InviteRow: React.FC<Props> = ({ friend, maxRounds }) => {
   const queryClient = useQueryClient();
 
   const handleInvite = async () => {
@@ -38,6 +40,10 @@ export const InviteRow: React.FC<Props> = ({ friend }) => {
       invitee_name: res.invitee_name ?? friend.friend_name,
     });
   };
+
+  const fillPct = friend.rounds_last_30d > 0 && maxRounds > 0
+    ? (friend.rounds_last_30d / maxRounds) * 100
+    : 0;
 
   return (
     <div
@@ -70,50 +76,81 @@ export const InviteRow: React.FC<Props> = ({ friend }) => {
             style={{ width: '100%', height: '100%', objectFit: 'cover' }}
           />
         ) : (
-          <span
-            style={{
-              fontSize: 10,
-              fontWeight: 800,
-              color: '#64748B',
-            }}
-          >
+          <span style={{ fontSize: 10, fontWeight: 800, color: '#64748B' }}>
             {initials(friend.friend_name)}
           </span>
         )}
       </div>
 
       <div style={{ flex: 1, minWidth: 0 }}>
-        <p
+        <div
           style={{
-            margin: 0,
-            fontSize: 14,
+            fontSize: 13.5,
             fontWeight: 700,
             color: INK,
+            letterSpacing: '-0.01em',
             whiteSpace: 'nowrap',
             overflow: 'hidden',
             textOverflow: 'ellipsis',
           }}
         >
           {firstName(friend.friend_name)}
-        </p>
-        <p
+        </div>
+        <div
           style={{
-            margin: '1px 0 0',
-            fontSize: 11,
+            fontSize: 10.5,
             color: INK_MUTE,
+            marginTop: 1,
+            fontWeight: 500,
             whiteSpace: 'nowrap',
             overflow: 'hidden',
             textOverflow: 'ellipsis',
           }}
         >
-          {friend.friend_handicap_index != null ? (
-            <span style={{ fontVariantNumeric: 'tabular-nums' }}>
-              {`HCP ${fmtHcp(friend.friend_handicap_index)}`}
-            </span>
-          ) : (
-            'No handicap yet'
-          )}
-        </p>
+          HCP {fmtHcp(friend.friend_handicap_index)}
+          {friend.friend_home_club && ` · ${friend.friend_home_club}`}
+        </div>
+        {/* Activity bar */}
+        <div
+          style={{
+            marginTop: 5,
+            display: 'flex',
+            alignItems: 'center',
+            gap: 6,
+          }}
+        >
+          <div
+            style={{
+              flex: 1,
+              height: 4,
+              borderRadius: 2,
+              background: 'rgba(15,23,42,0.06)',
+              overflow: 'hidden',
+            }}
+          >
+            {fillPct > 0 && (
+              <div
+                style={{
+                  width: `${fillPct}%`,
+                  height: '100%',
+                  background: `linear-gradient(90deg, ${AMBER}, #C97211)`,
+                  borderRadius: 2,
+                }}
+              />
+            )}
+          </div>
+          <span
+            style={{
+              fontSize: 10,
+              color: INK_MUTE,
+              fontWeight: 700,
+              fontVariantNumeric: 'tabular-nums',
+              flexShrink: 0,
+            }}
+          >
+            {friend.rounds_last_30d} {friend.rounds_last_30d === 1 ? 'round' : 'rounds'} · 30d
+          </span>
+        </div>
       </div>
 
       <button

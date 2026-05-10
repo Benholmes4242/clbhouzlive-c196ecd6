@@ -770,6 +770,7 @@ export async function fetchFriendLeaderboard(
     is_clbhouz_user: !!row.is_clbhouz_user,
     handicap_30d_ago: row.handicap_30d_ago != null ? Number(row.handicap_30d_ago) : null,
     handicap_30d_delta: row.handicap_30d_delta != null ? Number(row.handicap_30d_delta) : null,
+    rounds_last_30d: row.rounds_last_30d != null ? Number(row.rounds_last_30d) : 0,
   }));
 }
 
