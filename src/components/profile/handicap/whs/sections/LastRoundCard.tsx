@@ -184,14 +184,14 @@ export const LastRoundCard: React.FC<Props> = ({ connectionId }) => {
           fontFamily: FONT_GEIST,
         }}
       >
-        {/* Course image strip 16:5 */}
-        <div style={{ position: 'relative', width: '100%', aspectRatio: '16 / 4', ...stripBg }}>
+        {/* Course image strip — compact, with overlaid inline stats */}
+        <div style={{ position: 'relative', width: '100%', aspectRatio: '16 / 5', ...stripBg }}>
           <div
             style={{
               position: 'absolute',
               inset: 0,
               background:
-                'linear-gradient(to top, rgba(0,0,0,0.65) 0%, rgba(0,0,0,0.25) 55%, rgba(0,0,0,0) 100%)',
+                'linear-gradient(to top, rgba(0,0,0,0.78) 0%, rgba(0,0,0,0.30) 55%, rgba(0,0,0,0) 100%)',
             }}
           />
           <div style={{ position: 'absolute', left: 16, right: 16, bottom: 12 }}>
@@ -229,109 +229,155 @@ export const LastRoundCard: React.FC<Props> = ({ connectionId }) => {
                 .filter(Boolean)
                 .join(' · ')}
             </div>
+            {/* Inline stats strip — always visible, supporting facts row */}
+            <div
+              style={{
+                marginTop: 8,
+                display: 'flex',
+                alignItems: 'center',
+                gap: 10,
+                fontSize: 11,
+                color: 'rgba(255,255,255,0.92)',
+                fontWeight: 700,
+                fontVariantNumeric: 'tabular-nums',
+                whiteSpace: 'nowrap',
+                overflow: 'hidden',
+              }}
+            >
+              {lastRound.adjusted_gross != null && (
+                <span style={{ display: 'inline-flex', alignItems: 'baseline', gap: 3 }}>
+                  <span style={{ fontSize: 13, fontWeight: 800 }}>{lastRound.adjusted_gross}</span>
+                  <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.70)', fontWeight: 600 }}>gross</span>
+                </span>
+              )}
+              {lastRound.stableford_points != null && (
+                <>
+                  <span style={{ width: 1, height: 10, background: 'rgba(255,255,255,0.30)' }} />
+                  <span style={{ display: 'inline-flex', alignItems: 'baseline', gap: 3 }}>
+                    <span style={{ fontSize: 13, fontWeight: 800 }}>{lastRound.stableford_points}</span>
+                    <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.70)', fontWeight: 600 }}>pts</span>
+                  </span>
+                </>
+              )}
+              {lastRound.handicap_differential != null && (
+                <>
+                  <span style={{ width: 1, height: 10, background: 'rgba(255,255,255,0.30)' }} />
+                  <span style={{ display: 'inline-flex', alignItems: 'baseline', gap: 3 }}>
+                    <span style={{ fontSize: 13, fontWeight: 800 }}>{fmtDiff(lastRound.handicap_differential)}</span>
+                    <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.70)', fontWeight: 600 }}>diff</span>
+                  </span>
+                </>
+              )}
+              {totalPar > 0 && lastRound.adjusted_gross != null && (
+                <>
+                  <span style={{ width: 1, height: 10, background: 'rgba(255,255,255,0.30)' }} />
+                  <span style={{ fontSize: 11, fontWeight: 600, color: 'rgba(255,255,255,0.78)' }}>
+                    {grossSub.replace('\u00A0', '').trim() || `${lastRound.adjusted_gross - totalPar > 0 ? '+' : ''}${lastRound.adjusted_gross - totalPar} to par`}
+                  </span>
+                </>
+              )}
+            </div>
           </div>
         </div>
 
         {/* Body */}
-        <div style={{ padding: '14px 16px', display: 'flex', flexDirection: 'column', gap: 12 }}>
-          {/* Hero row */}
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', alignItems: 'start' }}>
-            <div style={{ paddingRight: 12 }}>
-              <div style={eyebrowLabel}>GROSS</div>
-              <div style={heroNum}>{lastRound.adjusted_gross ?? '—'}</div>
-              <div style={heroSub}>{grossSub}</div>
-            </div>
-            <div style={{ padding: '0 12px', borderLeft: `0.5px solid ${INK_10}`, borderRight: `0.5px solid ${INK_10}` }}>
-              <div style={eyebrowLabel}>STABLEFORD</div>
-              <div style={heroNum}>{lastRound.stableford_points ?? '—'}</div>
-              <div style={heroSub}>points</div>
-            </div>
-            <div style={{ paddingLeft: 12 }}>
-              <div style={eyebrowLabel}>DIFFERENTIAL</div>
-              <div style={heroNum}>{fmtDiff(lastRound.handicap_differential)}</div>
-              <div style={heroSub}>vs course</div>
-            </div>
-          </div>
-
-          {/* Round breakdown */}
-          {breakdown && segTotal > 0 ? (
-            <div>
-              <div
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                  marginBottom: 6,
-                }}
-              >
-                <div style={eyebrowLabel}>ROUND BREAKDOWN</div>
+        <div style={{ display: 'flex', flexDirection: 'column' }}>
+          {/* Breakdown — the protagonist of the body */}
+          <div style={{ padding: '16px 16px 14px' }}>
+            {breakdown && segTotal > 0 ? (
+              <>
+                <div style={{ ...eyebrowLabel, marginBottom: 10 }}>
+                  How it went · {segTotal} {segTotal === 1 ? 'hole' : 'holes'}
+                </div>
+                {/* Sentence — coloured dots + bold counts + soft labels */}
                 <div
                   style={{
                     display: 'flex',
-                    alignItems: 'center',
-                    gap: 10,
-                    fontSize: 11,
-                    color: INK_55,
-                    fontVariantNumeric: 'tabular-nums',
+                    flexWrap: 'wrap',
+                    alignItems: 'baseline',
+                    rowGap: 6,
+                    columnGap: 4,
+                    marginBottom: 12,
                   }}
                 >
                   {[
-                    { label: 'Birdie+', count: breakdown.eagle + breakdown.birdie, color: GOLD },
-                    { label: 'Par', count: breakdown.par, color: INK_40 },
-                    { label: 'Bogey', count: breakdown.bogey, color: AMBER },
-                    { label: 'Double+', count: breakdown.doublePlus, color: RED },
-                  ].map((s) => (
-                    <span
-                      key={s.label}
-                      style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}
-                      aria-label={`${s.count} ${s.label}`}
-                    >
-                      <span
-                        style={{
-                          width: 5,
-                          height: 5,
-                          borderRadius: '50%',
-                          background: s.color,
-                          flexShrink: 0,
-                        }}
-                      />
-                      <span style={{ color: INK, fontWeight: 700 }}>{s.count}</span>
-                    </span>
+                    { count: breakdown.eagle + breakdown.birdie, label: pluralize(breakdown.eagle + breakdown.birdie, 'birdie', 'birdies'), color: GOLD },
+                    { count: breakdown.par, label: pluralize(breakdown.par, 'par', 'pars'), color: INK_40 },
+                    { count: breakdown.bogey, label: pluralize(breakdown.bogey, 'bogey', 'bogeys'), color: AMBER },
+                    { count: breakdown.doublePlus, label: 'doubles+', color: RED },
+                  ]
+                    .filter((c) => c.count > 0)
+                    .map((c, i, arr) => (
+                      <React.Fragment key={c.label}>
+                        <span style={{ display: 'inline-flex', alignItems: 'baseline', gap: 5 }} aria-label={`${c.count} ${c.label}`}>
+                          <span
+                            style={{
+                              width: 7,
+                              height: 7,
+                              borderRadius: '50%',
+                              background: c.color,
+                              alignSelf: 'center',
+                              flexShrink: 0,
+                            }}
+                          />
+                          <span style={{
+                            fontSize: 18,
+                            fontWeight: 800,
+                            color: INK,
+                            letterSpacing: '-0.02em',
+                            fontVariantNumeric: 'tabular-nums',
+                          }}>
+                            {c.count}
+                          </span>
+                          <span style={{
+                            fontSize: 12,
+                            color: INK_55,
+                            fontWeight: 600,
+                          }}>
+                            {c.label}
+                          </span>
+                        </span>
+                        {i < arr.length - 1 && (
+                          <span style={{ color: INK_40, fontSize: 13, fontWeight: 500, padding: '0 1px' }} aria-hidden>·</span>
+                        )}
+                      </React.Fragment>
+                    ))}
+                </div>
+                {/* Bar — taller (10px) and pill-rounded */}
+                <div
+                  style={{
+                    display: 'flex',
+                    width: '100%',
+                    height: 10,
+                    borderRadius: 5,
+                    overflow: 'hidden',
+                    background: 'rgba(15,23,42,0.06)',
+                  }}
+                >
+                  {segments.map((s, i) => (
+                    <div
+                      key={i}
+                      style={{ flex: s.count, background: s.color, height: '100%' }}
+                    />
                   ))}
                 </div>
+              </>
+            ) : (
+              <div style={{ fontSize: 12, color: INK_55, fontStyle: 'italic' }}>
+                Hole-by-hole breakdown not yet synced for this round
               </div>
-              <div
-                style={{
-                  display: 'flex',
-                  width: '100%',
-                  height: 8,
-                  borderRadius: 4,
-                  overflow: 'hidden',
-                  background: 'rgba(15,23,42,0.04)',
-                }}
-              >
-                {segments.map((s, i) => (
-                  <div
-                    key={i}
-                    style={{ flex: s.count, background: s.color, height: '100%' }}
-                  />
-                ))}
-              </div>
-            </div>
-          ) : (
-            <div style={{ fontSize: 12, color: INK_55, fontStyle: 'italic' }}>
-              Hole-by-hole breakdown not yet synced for this round
-            </div>
-          )}
+            )}
+          </div>
 
-          {/* Index footer */}
+          {/* Index footer — moves into its own tinted strip */}
           {hcpAfter !== null && (
             <div
               style={{
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'space-between',
-                paddingTop: 10,
+                padding: '10px 16px',
+                background: 'rgba(15,23,42,0.025)',
                 borderTop: `0.5px solid ${INK_10}`,
               }}
             >
