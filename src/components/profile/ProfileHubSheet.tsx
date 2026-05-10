@@ -104,11 +104,14 @@ function ProfileHubSheetSkeleton() {
       {/* Divider */}
       <div style={{ height: '0.5px', background: 'rgba(15,23,42,0.07)', margin: '0 -16px' }} />
 
-      {/* ── Quick action tiles skeleton — 3 columns ── */}
-      <div className="grid grid-cols-3 gap-2 py-4">
-        {[0, 1, 2].map(i => (
-          <Skeleton key={i} className="h-[80px] rounded-2xl" />
-        ))}
+      {/* ── Quick action tiles skeleton — full-width Handicap + 3-tile row ── */}
+      <div className="py-4 flex flex-col gap-3">
+        <div style={{ height: 110, borderRadius: 14, background: 'rgba(15,23,42,0.04)' }} />
+        <div className="grid grid-cols-3 gap-3">
+          {[0, 1, 2].map(i => (
+            <div key={i} style={{ height: 110, borderRadius: 14, background: 'rgba(15,23,42,0.04)' }} />
+          ))}
+        </div>
       </div>
 
       {/* Divider */}
