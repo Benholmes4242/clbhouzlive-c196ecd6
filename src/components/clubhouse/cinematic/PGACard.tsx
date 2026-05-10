@@ -1325,13 +1325,13 @@ export const PGACard: React.FC<PGACardProps> = ({
         <div style={{ flex: '1 1 auto', overflow: 'hidden', padding: 'clamp(3px, 1vw, 6px) clamp(14px, 3.5vw, 18px) clamp(3px, 1vw, 6px)', display: 'flex', flexDirection: 'column', gap: 'clamp(3px, 1vw, 6px)', justifyContent: 'space-evenly' }}>
           {chaserGroups && chaserGroups.length > 0 ? (
             <>
-              {chaserGroups.slice(0, 3).map((group, gi) => {
+              {chaserGroups.slice(0, 2).map((group, gi) => {
                 const isTied = group.isTied && group.chasers.length > 1;
                 const primary = group.chasers[0];
                 const stackedAvatars = group.chasers.slice(0, 3);
 
                 return (
-                  <div key={`${group.position}-${gi}`} style={{ display: 'flex', alignItems: 'center', gap: 'clamp(8px, 2vw, 12px)', padding: 'clamp(6px, 2vw, 10px) 8px', borderRadius: 9, animation: 'trc-slideIn 0.5s ease-out both', animationDelay: `${0.3 + gi * 0.07}s` }}>
+                  <div key={`${group.position}-${gi}`} style={{ flex: '1 1 0', minHeight: 'clamp(32px, 5vh, 46px)', display: 'flex', alignItems: 'center', gap: 'clamp(8px, 2vw, 12px)', padding: 'clamp(6px, 2vw, 10px) 8px', borderRadius: 9, animation: 'trc-slideIn 0.5s ease-out both', animationDelay: `${0.3 + gi * 0.07}s` }}>
                     <span style={{ width: 'clamp(20px, 4.5vw, 26px)', textAlign: 'center', fontSize: 'clamp(11px, 2.8vw, 13px)', fontWeight: 600, color: 'rgba(255,255,255,0.4)' }}>
                       {group.isTied ? `T${group.position}` : group.position}
                     </span>
