@@ -30,8 +30,8 @@ const T = {
 };
 const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
 
-const MIN_ROUNDS_FOR_RANKINGS = 3;
 const TOP_N = 3;
+const MIN_ROUNDS_FOR_TOUGHEST = 2;
 
 type ViewKey = 'most_played' | 'best' | 'toughest';
 
@@ -44,24 +44,26 @@ interface ViewMeta {
 const VIEWS: Record<ViewKey, ViewMeta> = {
   best: {
     label: 'Best form',
-    sublabel: `Your three best courses (${MIN_ROUNDS_FOR_RANKINGS}+ rounds)`,
+    sublabel: 'Your courses ranked by form',
     select: (all) =>
       [...all]
-        .filter((c) => c.rounds_played >= MIN_ROUNDS_FOR_RANKINGS)
         .sort((a, b) => a.delta - b.delta)
         .slice(0, TOP_N),
   },
   most_played: {
     label: 'Most played',
-    sublabel: 'Your three most played courses, ranked by form',
-    select: (all) => [...all].sort((a, b) => b.rounds_played - a.rounds_played).slice(0, TOP_N),
+    sublabel: 'Your courses ranked by play count',
+    select: (all) =>
+      [...all]
+        .sort((a, b) => b.rounds_played - a.rounds_played)
+        .slice(0, TOP_N),
   },
   toughest: {
     label: 'Toughest',
-    sublabel: `Your three toughest courses (${MIN_ROUNDS_FOR_RANKINGS}+ rounds)`,
+    sublabel: `Highest avg differential (${MIN_ROUNDS_FOR_TOUGHEST}+ rounds)`,
     select: (all) =>
       [...all]
-        .filter((c) => c.rounds_played >= MIN_ROUNDS_FOR_RANKINGS)
+        .filter((c) => c.rounds_played >= MIN_ROUNDS_FOR_TOUGHEST)
         .sort((a, b) => b.delta - a.delta)
         .slice(0, TOP_N),
   },
@@ -214,114 +216,171 @@ const ViewToggle: React.FC<{
   </div>
 );
 
-interface RankAccent {
-  color: string;
-  textColor: string;
-  label: string;
-  showTrophy: boolean;
-}
+const Pill: React.FC<{ label: string; color: string; bg: string; bold?: boolean }> = ({
+  label,
+  color,
+  bg,
+  bold,
+}) => (
+  <span
+    style={{
+      padding: '3px 8px',
+      borderRadius: 999,
+      background: bg,
+      fontSize: 10,
+      fontWeight: bold ? 800 : 700,
+      color,
+      letterSpacing: '-0.005em',
+      fontVariantNumeric: 'tabular-nums',
+      fontFamily: FONT,
+    }}
+  >
+    {label}
+  </span>
+);
 
-function getRankAccent(rank: number): RankAccent {
-  if (rank === 1) return { color: T.gold, textColor: T.ink, label: '1ST', showTrophy: true };
-  if (rank === 2) return { color: T.silver, textColor: '#fff', label: '2ND', showTrophy: false };
-  return { color: T.bronze, textColor: '#fff', label: '3RD', showTrophy: false };
-}
-
-const PodiumCard: React.FC<{ course: CourseForm; rank: number }> = ({ course, rank }) => {
-  const accent = getRankAccent(rank);
+const CourseRow: React.FC<{
+  course: CourseForm;
+  rank: number;
+  expanded: boolean;
+  view: ViewKey;
+}> = ({ course, rank, expanded, view }) => {
   const valueColor = deltaColor(course.delta);
   const isFirst = rank === 1;
+
+  const headline = (() => {
+    if (view === 'most_played') {
+      return {
+        value: String(course.rounds_played),
+        label: course.rounds_played === 1 ? 'ROUND' : 'ROUNDS',
+        color: T.ink,
+      };
+    }
+    return {
+      value: fmtDelta(course.delta),
+      label: 'VS HCP',
+      color: valueColor,
+    };
+  })();
 
   return (
     <div
       style={{
+        display: 'flex',
+        gap: 10,
+        padding: 10,
         background: T.cardBg,
-        borderRadius: 14,
         border: `1px solid ${isFirst ? 'rgba(247,147,30,0.25)' : T.hairline}`,
-        overflow: 'hidden',
-        padding: '12px 14px',
+        borderRadius: 12,
+        marginBottom: 8,
+        alignItems: 'center',
         boxShadow: isFirst
           ? '0 2px 4px rgba(15,23,42,0.04), 0 6px 16px rgba(247,147,30,0.10)'
           : '0 1px 2px rgba(15,23,42,0.04)',
-        marginBottom: 8,
         fontFamily: FONT,
       }}
     >
       <div
         style={{
-          display: 'flex',
-          alignItems: 'flex-start',
-          justifyContent: 'space-between',
-          gap: 10,
+          width: expanded ? 80 : 56,
+          height: expanded ? 80 : 56,
+          borderRadius: 8,
+          flexShrink: 0,
+          background: course.course_thumbnail_image
+            ? `url(${course.course_thumbnail_image})`
+            : `linear-gradient(135deg, ${T.amberTint}, rgba(15,23,42,0.04))`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
         }}
-      >
-        <div style={{ display: 'flex', alignItems: 'flex-start', gap: 10, flex: 1, minWidth: 0 }}>
+        aria-hidden
+      />
+
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 5,
+            marginBottom: 2,
+          }}
+        >
+          {isFirst && (
+            <Trophy size={11} color={T.amberDeep} fill={T.amberTint} strokeWidth={2.4} />
+          )}
           <span
             style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: 3,
-              padding: '3px 8px',
-              borderRadius: 99,
-              background: accent.color,
-              color: accent.textColor,
               fontSize: 9,
               fontWeight: 800,
-              letterSpacing: '0.08em',
-              flexShrink: 0,
-              boxShadow: '0 1px 2px rgba(0,0,0,0.10)',
-              fontFamily: FONT,
-              marginTop: 1,
+              color: isFirst ? T.amberDeep : T.inkMute,
+              letterSpacing: '0.14em',
             }}
           >
-            {accent.showTrophy && <Trophy size={9} strokeWidth={2.6} fill={accent.textColor} />}
-            {accent.label}
+            {rank === 1 ? '1ST' : rank === 2 ? '2ND' : '3RD'}
           </span>
-          <div style={{ flex: 1, minWidth: 0 }}>
-            <div
-              style={{
-                fontSize: 13.5,
-                fontWeight: 800,
-                color: T.ink,
-                letterSpacing: '-0.01em',
-                lineHeight: 1.25,
-                fontFamily: FONT,
-                whiteSpace: 'nowrap',
-                overflow: 'hidden',
-                textOverflow: 'ellipsis',
-              }}
-            >
-              {course.course_name}
-            </div>
-            <div
-              style={{
-                fontSize: 10.5,
-                color: T.inkMute,
-                marginTop: 4,
-                fontWeight: 600,
-                fontFamily: FONT,
-              }}
-            >
-              <strong style={{ color: T.ink, fontWeight: 800, fontVariantNumeric: 'tabular-nums' }}>
-                {course.rounds_played}
-              </strong>{' '}
-              {course.rounds_played === 1 ? 'round' : 'rounds'}
-            </div>
-          </div>
         </div>
+        <div
+          style={{
+            fontSize: 13,
+            fontWeight: 800,
+            color: T.ink,
+            letterSpacing: '-0.01em',
+            lineHeight: 1.2,
+            whiteSpace: 'nowrap',
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+          }}
+        >
+          {course.course_name}
+        </div>
+        {expanded ? (
+          <div style={{ display: 'flex', gap: 6, marginTop: 6, flexWrap: 'wrap' }}>
+            <Pill
+              label={`${course.rounds_played} ${course.rounds_played === 1 ? 'round' : 'rounds'}`}
+              color={T.ink}
+              bg={T.ink04}
+              bold
+            />
+            <Pill
+              label={`Best ${fmtDelta(course.best_differential - course.expected_differential)}`}
+              color={T.greenInk}
+              bg="rgba(34,197,94,0.10)"
+            />
+            <Pill
+              label={`Worst ${fmtDelta(course.worst_differential - course.expected_differential)}`}
+              color={T.redInk}
+              bg="rgba(220,38,38,0.10)"
+            />
+          </div>
+        ) : (
+          <div
+            style={{
+              fontSize: 10.5,
+              color: T.inkMute,
+              marginTop: 2,
+              fontWeight: 600,
+            }}
+          >
+            <strong style={{ color: T.ink, fontWeight: 800, fontVariantNumeric: 'tabular-nums' }}>
+              {course.rounds_played}
+            </strong>{' '}
+            {course.rounds_played === 1 ? 'round' : 'rounds'}
+          </div>
+        )}
+      </div>
+
+      {!expanded && (
         <div style={{ textAlign: 'right', flexShrink: 0 }}>
           <div
             style={{
               fontSize: 22,
               fontWeight: 800,
-              color: valueColor,
+              color: headline.color,
               lineHeight: 1,
               letterSpacing: '-0.03em',
               fontVariantNumeric: 'tabular-nums',
-              fontFamily: FONT,
             }}
           >
-            {fmtDelta(course.delta)}
+            {headline.value}
           </div>
           <div
             style={{
@@ -330,32 +389,37 @@ const PodiumCard: React.FC<{ course: CourseForm; rank: number }> = ({ course, ra
               fontWeight: 700,
               letterSpacing: '0.10em',
               marginTop: 3,
-              fontFamily: FONT,
             }}
           >
-            VS HCP
+            {headline.label}
           </div>
         </div>
-      </div>
+      )}
     </div>
   );
 };
 
-const PodiumCards: React.FC<{ courses: CourseForm[] }> = ({ courses }) => {
+const CourseList: React.FC<{ courses: CourseForm[]; view: ViewKey }> = ({ courses, view }) => {
   if (courses.length === 0) {
+    const emptyCopy =
+      view === 'toughest'
+        ? `Need at least ${MIN_ROUNDS_FOR_TOUGHEST} rounds at a course to identify your toughest. Play a few more.`
+        : 'Add a few rounds to see this view.';
     return (
       <div style={{ padding: '24px 16px 28px', textAlign: 'center' }}>
         <p style={{ margin: 0, fontSize: 12, color: T.inkMute, lineHeight: 1.55, fontFamily: FONT }}>
-          Need at least {MIN_ROUNDS_FOR_RANKINGS} rounds at a course before it appears here. Play a few more rounds to unlock this view.
+          {emptyCopy}
         </p>
       </div>
     );
   }
 
+  const expanded = courses.length === 1;
+
   return (
     <div style={{ padding: '12px 16px 8px' }}>
       {courses.map((c, i) => (
-        <PodiumCard key={c.course_id} course={c} rank={i + 1} />
+        <CourseRow key={c.course_id} course={c} rank={i + 1} expanded={expanded} view={view} />
       ))}
     </div>
   );
@@ -421,7 +485,7 @@ export const CourseFormCard: React.FC<Props> = ({ connectionId, currentHandicap 
     <div style={CARD_STYLE}>
       <CardHeader sublabel={view.sublabel} />
       <ViewToggle activeView={activeView} onChange={setActiveView} />
-      <PodiumCards courses={courses} />
+      <CourseList courses={courses} view={activeView} />
       {courses.length > 0 && (() => {
         const top = courses[0];
         const sign = top.delta < 0 ? 'under' : 'over';
