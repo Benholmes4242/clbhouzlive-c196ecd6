@@ -101,9 +101,17 @@ export const HandicapProjectionCard: React.FC<Props> = ({ scores }) => {
       {showInfo && <InfoPanel />}
 
       {/* DUAL-PANEL: Where you are / Heading to */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr' }}>
+      <div
+        style={{
+          display: 'grid',
+          gridTemplateColumns: '1fr 1fr',
+          margin: '0 20px',
+          borderTop: `1px solid ${T.hairline}`,
+          borderBottom: `1px solid ${T.hairline}`,
+        }}
+      >
         {/* LEFT — WHERE YOU ARE */}
-        <div style={{ padding: '18px 16px 14px', position: 'relative' }}>
+        <div style={{ padding: '18px 16px 14px', position: 'relative', borderRight: `1px solid ${T.hairline}` }}>
           <p style={{
             margin: 0,
             fontSize: 9.5,
