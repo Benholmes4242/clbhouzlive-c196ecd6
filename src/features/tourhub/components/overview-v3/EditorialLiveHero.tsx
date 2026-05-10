@@ -93,7 +93,7 @@ function deriveTodayThru(entry: any) {
 
 // ---------- LEADER block ----------------------------------------------------
 
-function LeaderBlock({ entry, tourSlug }: { entry: any; tourSlug: string }) {
+function LeaderBlock({ entry, tourSlug, t = 0 }: { entry: any; tourSlug: string; t?: number }) {
   const [imgErr, setImgErr] = useState(false);
   const p = entry?.player;
   const team = entry?.team;
@@ -113,21 +113,29 @@ function LeaderBlock({ entry, tourSlug }: { entry: any; tourSlug: string }) {
 
   const { score, thru, today } = deriveTodayThru(entry);
 
+  // Elastic scaling
+  const avatarSize = lerp(44, 64, t);
+  const padY = lerp(12, 22, t);
+  const gap = lerp(12, 16, t);
+  const nameSize = lerp(15, 20, t);
+  const scoreSize = lerp(30, 42, t);
+  const metaSize = lerp(10, 12, t);
+
   return (
     <div
       style={{
         flexShrink: 0,
         borderTop: `1px solid ${slate200}`,
         borderBottom: `1px solid ${slate200}`,
-        padding: '14px 0',
+        padding: `${padY}px 0`,
         display: 'flex',
         alignItems: 'center',
-        gap: 12,
+        gap,
       }}
     >
       <div
         style={{
-          width: 46, aspectRatio: '1 / 1.05', borderRadius: '34%',
+          width: avatarSize, aspectRatio: '1 / 1.05', borderRadius: '34%',
           border: `2px solid ${greenLive}`,
           background: slate100,
           overflow: 'hidden', flexShrink: 0,
@@ -148,7 +156,7 @@ function LeaderBlock({ entry, tourSlug }: { entry: any; tourSlug: string }) {
             width: '100%', height: '100%',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
           }}>
-            <PlayerSilhouette size={26} />
+            <PlayerSilhouette size={Math.round(avatarSize * 0.56)} />
           </div>
         )}
       </div>
@@ -161,7 +169,7 @@ function LeaderBlock({ entry, tourSlug }: { entry: any; tourSlug: string }) {
           LEADER
         </div>
         <div style={{
-          fontSize: 16, fontWeight: 800, color: ink,
+          fontSize: nameSize, fontWeight: 800, color: ink,
           letterSpacing: '-0.02em', lineHeight: 1.05,
           whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
         }}>
@@ -169,7 +177,7 @@ function LeaderBlock({ entry, tourSlug }: { entry: any; tourSlug: string }) {
         </div>
         <div style={{
           marginTop: 3, display: 'flex', alignItems: 'center', gap: 6,
-          fontSize: 10.5, color: slate500, fontWeight: 600,
+          fontSize: metaSize, color: slate500, fontWeight: 600,
         }}>
           {flag && <span aria-hidden="true">{flag}</span>}
           {ccode && <span style={{ letterSpacing: '0.06em' }}>{ccode}</span>}
@@ -192,7 +200,7 @@ function LeaderBlock({ entry, tourSlug }: { entry: any; tourSlug: string }) {
 
       <div style={{ textAlign: 'right', flexShrink: 0 }}>
         <div style={{
-          fontSize: 32, fontWeight: 900, letterSpacing: '-0.04em',
+          fontSize: scoreSize, fontWeight: 900, letterSpacing: '-0.04em',
           color: ink, lineHeight: 0.9,
           fontVariantNumeric: 'tabular-nums',
         }}>
