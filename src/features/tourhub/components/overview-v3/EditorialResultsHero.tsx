@@ -92,7 +92,7 @@ function ChampionBlock({
       }}
     >
       <Trophy
-        size={90}
+        size={trophyDecor}
         strokeWidth={1}
         aria-hidden="true"
         style={{
@@ -121,7 +121,7 @@ function ChampionBlock({
 
       <div style={{
         position: 'relative', zIndex: 1,
-        display: 'flex', alignItems: 'center', gap: 12,
+        display: 'flex', alignItems: 'center', gap,
       }}>
         <button
           type="button"
@@ -132,7 +132,7 @@ function ChampionBlock({
           }}
         >
           <div style={{
-            width: 46, aspectRatio: '1 / 1.05', borderRadius: '34%',
+            width: avatarSize, aspectRatio: '1 / 1.05', borderRadius: '34%',
             border: `2px solid ${gold}`, background: slate100,
             overflow: 'hidden',
           }}>
@@ -149,7 +149,7 @@ function ChampionBlock({
                 width: '100%', height: '100%',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
               }}>
-                <PlayerSilhouette size={26} />
+                <PlayerSilhouette size={Math.round(avatarSize * 0.56)} />
               </div>
             )}
           </div>
@@ -157,7 +157,7 @@ function ChampionBlock({
 
         <div style={{ flex: 1, minWidth: 0 }}>
           <div style={{
-            fontSize: 16, fontWeight: 800, color: ink,
+            fontSize: nameSize, fontWeight: 800, color: ink,
             letterSpacing: '-0.02em', lineHeight: 1.05,
             whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
           }}>
@@ -180,7 +180,7 @@ function ChampionBlock({
 
         <div style={{ textAlign: 'right', flexShrink: 0 }}>
           <div style={{
-            fontSize: 32, fontWeight: 900, letterSpacing: '-0.04em',
+            fontSize: scoreSize, fontWeight: 900, letterSpacing: '-0.04em',
             color: ink, lineHeight: 0.9,
             fontVariantNumeric: 'tabular-nums',
           }}>
