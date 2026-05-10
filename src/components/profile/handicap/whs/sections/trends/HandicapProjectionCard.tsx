@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Activity, Info } from 'lucide-react';
+import { Info } from 'lucide-react';
 import type { WhsScore } from '@/lib/whs/types';
 import { predictHandicap, VERDICT_META } from './predictHandicap';
 
@@ -75,10 +75,10 @@ export const HandicapProjectionCard: React.FC<Props> = ({ scores }) => {
 
   if (prediction.insufficientData) {
     return (
-      <div style={CARD_STYLE}>
+      <div style={SECTION_STYLE}>
         <CardHeader showInfo={showInfo} onToggleInfo={() => setShowInfo((v) => !v)} />
         {showInfo && <InfoPanel />}
-        <div style={{ padding: '24px 16px 28px', textAlign: 'center' }}>
+        <div style={{ padding: '24px 20px 28px', textAlign: 'center' }}>
           <p style={{ margin: 0, fontSize: 14, fontWeight: 700, color: T.ink, fontFamily: FONT }}>
             Add a few more rounds
           </p>
@@ -96,25 +96,22 @@ export const HandicapProjectionCard: React.FC<Props> = ({ scores }) => {
   const curve = curveFor(prediction.direction);
 
   return (
-    <div style={{ ...CARD_STYLE, position: 'relative' }}>
-      <div
-        aria-hidden
-        style={{
-          position: 'absolute',
-          left: 0,
-          top: 0,
-          bottom: 0,
-          width: 3,
-          background: theme.accent,
-        }}
-      />
+    <div style={SECTION_STYLE}>
       <CardHeader showInfo={showInfo} onToggleInfo={() => setShowInfo((v) => !v)} />
       {showInfo && <InfoPanel />}
 
       {/* DUAL-PANEL: Where you are / Heading to */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr' }}>
+      <div
+        style={{
+          display: 'grid',
+          gridTemplateColumns: '1fr 1fr',
+          margin: '0 20px',
+          borderTop: `1px solid ${T.hairline}`,
+          borderBottom: `1px solid ${T.hairline}`,
+        }}
+      >
         {/* LEFT — WHERE YOU ARE */}
-        <div style={{ padding: '18px 16px 14px', position: 'relative' }}>
+        <div style={{ padding: '18px 16px 14px', position: 'relative', borderRight: `1px solid ${T.hairline}` }}>
           <p style={{
             margin: 0,
             fontSize: 9.5,
@@ -158,15 +155,6 @@ export const HandicapProjectionCard: React.FC<Props> = ({ scores }) => {
           }}>
             Today's index
           </p>
-          <div
-            aria-hidden
-            style={{
-              position: 'absolute',
-              top: 14, bottom: 14, right: 0,
-              width: 0.5,
-              background: T.hairline,
-            }}
-          />
         </div>
 
         {/* RIGHT — HEADING TO */}
@@ -232,104 +220,90 @@ export const HandicapProjectionCard: React.FC<Props> = ({ scores }) => {
         </div>
       </div>
 
-      {/* SHARED CONVERGENCE CHART */}
-      <div
-        style={{
-          padding: '6px 16px 14px',
-          borderTop: `0.5px solid ${T.hairline}`,
-          background: 'rgba(247,250,252,0.5)',
-        }}
-      >
-        <svg
-          viewBox="0 0 320 110"
-          width="100%"
-          height={110}
-          preserveAspectRatio="none"
-          style={{ display: 'block', overflow: 'visible' }}
-          role="img"
-          aria-label={`Handicap timeline showing past trajectory and projected ${prediction.direction} movement`}
-        >
-          <line
-            x1="160" x2="160" y1="14" y2="84"
-            stroke="rgba(15,23,42,0.15)"
-            strokeWidth={1}
-            strokeDasharray="2 4"
-            vectorEffect="non-scaling-stroke"
-          />
-          <text
-            x="160" y="10"
-            textAnchor="middle"
-            style={{
-              fontSize: 9,
-              fontWeight: 800,
-              fill: T.inkMute,
-              letterSpacing: '0.10em',
-              fontFamily: FONT,
-            }}
+      <div style={{ padding: '0 20px' }}>
+        {/* SHARED CONVERGENCE CHART */}
+        <div style={{ padding: '14px 0' }}>
+          <svg
+            viewBox="0 0 320 110"
+            width="100%"
+            height={110}
+            preserveAspectRatio="none"
+            style={{ display: 'block', overflow: 'visible' }}
+            role="img"
+            aria-label={`Handicap timeline showing past trajectory and projected ${prediction.direction} movement`}
           >
-            TODAY
-          </text>
-          <path
-            d={`M 12 ${curve.pastY1} Q 50 ${(curve.pastY1 + curve.pastY2) / 2}, 80 ${curve.pastY2} T 160 ${curve.pastY3}`}
-            fill="none"
-            stroke={T.inkMute}
-            strokeWidth={2}
-            strokeLinecap="round"
-            vectorEffect="non-scaling-stroke"
-          />
-          <path
-            d={`M 160 ${curve.pastY3} Q 200 ${(curve.pastY3 + curve.futureY2) / 2}, 240 ${curve.futureY2} T 308 ${curve.futureY3}`}
-            fill="none"
-            stroke={theme.accent}
-            strokeWidth={2.4}
-            strokeLinecap="round"
-            vectorEffect="non-scaling-stroke"
-          />
-          <circle cx="12" cy={curve.pastY1} r="3" fill={T.inkMute} />
-          <circle cx="80" cy={curve.pastY2} r="3" fill={T.inkMute} />
-          <circle cx="160" cy={curve.pastY3} r="5" fill="#FFFFFF" stroke={T.ink} strokeWidth={2} />
-          <circle cx="240" cy={curve.futureY2} r="3" fill={theme.accent} />
-          <circle cx="308" cy={curve.futureY3} r="6" fill={theme.accent} stroke="#FFFFFF" strokeWidth={2} />
-          <text
-            x="12" y="102"
-            textAnchor="start"
-            style={{ fontSize: 10, fontWeight: 600, fill: T.inkMute, fontFamily: FONT }}
-          >
-            90 days ago
-          </text>
-          <text
-            x="308" y="102"
-            textAnchor="end"
-            style={{ fontSize: 10, fontWeight: 700, fill: theme.accentInk, fontFamily: FONT }}
-          >
-            5 rounds out
-          </text>
-        </svg>
-      </div>
+            <line
+              x1="160" x2="160" y1="14" y2="84"
+              stroke="rgba(15,23,42,0.15)"
+              strokeWidth={1}
+              strokeDasharray="2 4"
+              vectorEffect="non-scaling-stroke"
+            />
+            <text
+              x="160" y="10"
+              textAnchor="middle"
+              style={{
+                fontSize: 9,
+                fontWeight: 800,
+                fill: T.inkMute,
+                letterSpacing: '0.10em',
+                fontFamily: FONT,
+              }}
+            >
+              TODAY
+            </text>
+            <path
+              d={`M 12 ${curve.pastY1} Q 50 ${(curve.pastY1 + curve.pastY2) / 2}, 80 ${curve.pastY2} T 160 ${curve.pastY3}`}
+              fill="none"
+              stroke={T.inkMute}
+              strokeWidth={2}
+              strokeLinecap="round"
+              vectorEffect="non-scaling-stroke"
+            />
+            <path
+              d={`M 160 ${curve.pastY3} Q 200 ${(curve.pastY3 + curve.futureY2) / 2}, 240 ${curve.futureY2} T 308 ${curve.futureY3}`}
+              fill="none"
+              stroke={theme.accent}
+              strokeWidth={2.4}
+              strokeLinecap="round"
+              vectorEffect="non-scaling-stroke"
+            />
+            <circle cx="12" cy={curve.pastY1} r="3" fill={T.inkMute} />
+            <circle cx="80" cy={curve.pastY2} r="3" fill={T.inkMute} />
+            <circle cx="160" cy={curve.pastY3} r="5" fill="#FFFFFF" stroke={T.ink} strokeWidth={2} />
+            <circle cx="240" cy={curve.futureY2} r="3" fill={theme.accent} />
+            <circle cx="308" cy={curve.futureY3} r="6" fill={theme.accent} stroke="#FFFFFF" strokeWidth={2} />
+            <text
+              x="12" y="102"
+              textAnchor="start"
+              style={{ fontSize: 10, fontWeight: 600, fill: T.inkMute, fontFamily: FONT }}
+            >
+              90 days ago
+            </text>
+            <text
+              x="308" y="102"
+              textAnchor="end"
+              style={{ fontSize: 10, fontWeight: 700, fill: theme.accentInk, fontFamily: FONT }}
+            >
+              5 rounds out
+            </text>
+          </svg>
+        </div>
 
-      <div
-        style={{
-          padding: '12px 16px 14px',
-          borderTop: `1px solid ${T.hairline}`,
-          background: 'rgba(15,23,42,0.02)',
-        }}
-      >
-        <p style={{ margin: 0, fontSize: 12, lineHeight: 1.55, color: T.ink, fontFamily: FONT }}>
-          {prediction.recentFormAvg !== null && prediction.countersAvg !== null
-            ? meta.why(prediction.recentFormAvg, prediction.countersAvg)
-            : ''}
-        </p>
+        <div style={{ padding: '12px 0 0', borderTop: `1px solid ${T.hairline}` }}>
+          <p style={{ margin: 0, fontSize: 12, lineHeight: 1.55, color: T.ink, fontFamily: FONT }}>
+            {prediction.recentFormAvg !== null && prediction.countersAvg !== null
+              ? meta.why(prediction.recentFormAvg, prediction.countersAvg)
+              : ''}
+          </p>
+        </div>
       </div>
     </div>
   );
 };
 
-const CARD_STYLE: React.CSSProperties = {
-  background: T.cardBg,
-  borderRadius: 16,
-  border: `1px solid ${T.hairline}`,
-  marginBottom: 14,
-  overflow: 'hidden',
+const SECTION_STYLE: React.CSSProperties = {
+  marginBottom: 28,
   fontFamily: FONT,
 };
 
@@ -342,63 +316,72 @@ const CardHeader: React.FC<CardHeaderProps> = ({ showInfo, onToggleInfo }) => (
   <div
     style={{
       display: 'flex',
-      alignItems: 'center',
+      alignItems: 'flex-start',
       justifyContent: 'space-between',
-      padding: '14px 16px',
-      borderBottom: `1px solid ${T.hairline}`,
+      gap: 12,
+      padding: '0 20px 14px',
     }}
   >
-    <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-      <div
-        style={{
-          width: 30,
-          height: 30,
-          borderRadius: 9,
-          background: T.amberTint,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-        }}
-      >
-        <Activity size={15} color={T.amberDeep} strokeWidth={2.2} />
-      </div>
-      <div>
-        <p
+    <div style={{ flex: 1, minWidth: 0 }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
+        <span
+          aria-hidden
           style={{
-            margin: 0,
-            fontSize: 13,
-            fontWeight: 700,
-            color: T.ink,
-            letterSpacing: '-0.01em',
+            display: 'inline-block',
+            width: 3,
+            height: 13,
+            background: T.amber,
+            borderRadius: 1,
+          }}
+        />
+        <span
+          style={{
+            fontSize: 9,
+            fontWeight: 800,
+            color: T.amber,
+            letterSpacing: '0.16em',
+            textTransform: 'uppercase',
             fontFamily: FONT,
           }}
         >
           Handicap Projection
-        </p>
-        <p style={{ margin: 0, fontSize: 10, color: T.inkMute, marginTop: 1, fontFamily: FONT }}>
-          Based on your last 5 rounds
-        </p>
+        </span>
       </div>
+      <h2
+        style={{
+          margin: 0,
+          fontSize: 22,
+          fontWeight: 900,
+          letterSpacing: '-0.03em',
+          color: T.ink,
+          lineHeight: 1.15,
+          fontFamily: FONT,
+        }}
+      >
+        Based on your last 5 rounds
+      </h2>
     </div>
     <button
+      type="button"
       onClick={onToggleInfo}
       aria-label={showInfo ? 'Hide info' : 'Show info'}
       aria-expanded={showInfo}
       style={{
-        width: 26,
-        height: 26,
-        borderRadius: 999,
-        border: `1px solid ${showInfo ? T.ink : T.hairline}`,
+        width: 28,
+        height: 28,
+        borderRadius: '50%',
         background: showInfo ? T.ink : 'transparent',
-        color: showInfo ? '#fff' : T.inkMute,
-        cursor: 'pointer',
+        border: `1px solid ${showInfo ? T.ink : T.hairline}`,
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
+        cursor: 'pointer',
+        flexShrink: 0,
+        marginTop: 2,
         padding: 0,
       }}
     >
-      <Info size={13} strokeWidth={2.2} />
+      <Info size={14} color={showInfo ? '#FFFFFF' : T.slate} strokeWidth={2.25} />
     </button>
   </div>
 );
