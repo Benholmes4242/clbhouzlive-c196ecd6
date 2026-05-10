@@ -221,6 +221,17 @@ export interface WhsFriendActivityWithImage {
   is_counter: boolean;
   /** Friend's handicap index at the time the round was posted. */
   handicap_index_at_time: number | null;
+  /**
+   * Did the current viewer (auth.uid()) heart this round?
+   * False for EG-only or on-app-not-synced rounds (no score_id to react to,
+   * or no React button rendered).
+   */
+  viewer_has_reacted: boolean;
+  /**
+   * Total hearts on this round across all viewers.
+   * Always 0 for rounds with no score_id (EG-only matches without a synced score).
+   */
+  reaction_count: number;
 }
 
 // ─── Hole-level detail ──────────────────────────────────────────────────
