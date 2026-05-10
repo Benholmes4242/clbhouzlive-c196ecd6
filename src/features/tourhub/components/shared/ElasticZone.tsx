@@ -1,6 +1,38 @@
 import React, { useLayoutEffect, useRef, useState } from 'react';
 
 /**
+ * useElasticT — measures a referenced element's rendered height and returns
+ * a normalized 0..1 scale parameter based on min/max bounds. Useful for
+ * scaling siblings of an ElasticZone (e.g. LEADER/CHAMPION blocks) so the
+ * entire hero — header AND lower content — grows on tall devices and tightens
+ * on short ones, with no dead space.
+ */
+export function useElasticT(
+  ref: React.RefObject<HTMLElement>,
+  minH: number,
+  maxH: number,
+): number {
+  const [t, setT] = useState(0);
+  useLayoutEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const measure = () => {
+      const h = el.getBoundingClientRect().height;
+      const next = Math.max(0, Math.min(1, (h - minH) / Math.max(1, maxH - minH)));
+      setT(prev => (Math.abs(prev - next) > 0.01 ? next : prev));
+    };
+    measure();
+    const ro = new ResizeObserver(measure);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, [ref, minH, maxH]);
+  return t;
+}
+
+/** Linear interpolation helper for elastic scaling. */
+export const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
+
+/**
  * <ElasticZone> — flex:1 wrapper that measures its own rendered height and
  * computes a normalized scale parameter `t` (0..1) based on min/max bounds.
  *

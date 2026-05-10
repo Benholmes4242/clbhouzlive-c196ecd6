@@ -7,12 +7,12 @@
  * - Below: CHAMPION block + Runner-up strip + 5-col By-the-Numbers + CTA
  */
 
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Trophy } from 'lucide-react';
 import { tournamentRoute } from '../../routes';
 import { Shimmer } from '../shared/Shimmer';
-import { ElasticZone } from '../shared/ElasticZone';
+import { ElasticZone, useElasticT, lerp } from '../shared/ElasticZone';
 import {
   TournamentTitleBlock,
   TourBadge,
@@ -62,16 +62,23 @@ function getTourCode(slug: string): string {
 // ---------- CHAMPION block --------------------------------------------------
 
 function ChampionBlock({
-  winner, tourSlug, marginLabel, onTap,
+  winner, tourSlug, marginLabel, onTap, t = 0,
 }: {
   winner: TournamentFinisher; tourSlug: string;
-  marginLabel: string | null; onTap?: () => void;
+  marginLabel: string | null; onTap?: () => void; t?: number;
 }) {
   const [imgErr, setImgErr] = useState(false);
   const fullName = winner.fullName || winner.displayName;
   const flag = flagFor(winner.country);
   const tourCode = winner.tourCode ?? tourSlug;
   const photoUrl = getPlayerHeadshotUrl(fullName, tourCode, winner.headshotOverride ?? undefined);
+
+  const avatarSize = lerp(44, 64, t);
+  const padY = lerp(12, 22, t);
+  const gap = lerp(12, 16, t);
+  const nameSize = lerp(15, 20, t);
+  const scoreSize = lerp(30, 42, t);
+  const trophyDecor = lerp(80, 120, t);
 
   return (
     <div
@@ -80,12 +87,12 @@ function ChampionBlock({
         flexShrink: 0,
         borderTop: `1px solid ${slate200}`,
         borderBottom: `1px solid ${slate200}`,
-        padding: '14px 0',
+        padding: `${padY}px 0`,
         overflow: 'hidden',
       }}
     >
       <Trophy
-        size={90}
+        size={trophyDecor}
         strokeWidth={1}
         aria-hidden="true"
         style={{
@@ -114,7 +121,7 @@ function ChampionBlock({
 
       <div style={{
         position: 'relative', zIndex: 1,
-        display: 'flex', alignItems: 'center', gap: 12,
+        display: 'flex', alignItems: 'center', gap,
       }}>
         <button
           type="button"
@@ -125,7 +132,7 @@ function ChampionBlock({
           }}
         >
           <div style={{
-            width: 46, aspectRatio: '1 / 1.05', borderRadius: '34%',
+            width: avatarSize, aspectRatio: '1 / 1.05', borderRadius: '34%',
             border: `2px solid ${gold}`, background: slate100,
             overflow: 'hidden',
           }}>
@@ -142,7 +149,7 @@ function ChampionBlock({
                 width: '100%', height: '100%',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
               }}>
-                <PlayerSilhouette size={26} />
+                <PlayerSilhouette size={Math.round(avatarSize * 0.56)} />
               </div>
             )}
           </div>
@@ -150,7 +157,7 @@ function ChampionBlock({
 
         <div style={{ flex: 1, minWidth: 0 }}>
           <div style={{
-            fontSize: 16, fontWeight: 800, color: ink,
+            fontSize: nameSize, fontWeight: 800, color: ink,
             letterSpacing: '-0.02em', lineHeight: 1.05,
             whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
           }}>
@@ -173,7 +180,7 @@ function ChampionBlock({
 
         <div style={{ textAlign: 'right', flexShrink: 0 }}>
           <div style={{
-            fontSize: 32, fontWeight: 900, letterSpacing: '-0.04em',
+            fontSize: scoreSize, fontWeight: 900, letterSpacing: '-0.04em',
             color: ink, lineHeight: 0.9,
             fontVariantNumeric: 'tabular-nums',
           }}>
@@ -194,10 +201,10 @@ function ChampionBlock({
 // ---------- Runner-up strip -------------------------------------------------
 
 function RunnerUpStrip({
-  finisher, tourSlug, onTap,
+  finisher, tourSlug, onTap, t = 0,
 }: {
   finisher: TournamentFinisher; tourSlug: string;
-  onTap?: (f: TournamentFinisher) => void;
+  onTap?: (f: TournamentFinisher) => void; t?: number;
 }) {
   const [imgErr, setImgErr] = useState(false);
   const fullName = finisher.fullName || finisher.displayName;
@@ -205,14 +212,21 @@ function RunnerUpStrip({
   const photoUrl = getPlayerHeadshotUrl(fullName, tourCode, finisher.headshotOverride ?? undefined);
   const flag = flagFor(finisher.country);
 
+  const avatar = lerp(28, 38, t);
+  const pad = lerp(10, 14, t);
+  const marginTop = lerp(8, 14, t);
+  const nameSize = lerp(13, 15, t);
+  const scoreSize = lerp(16, 19, t);
+  const badge = lerp(22, 28, t);
+
   return (
     <button
       type="button"
       onClick={() => onTap?.(finisher)}
       style={{
         flexShrink: 0,
-        marginTop: 10,
-        padding: 10,
+        marginTop,
+        padding: pad,
         borderRadius: 10,
         background: 'rgba(241,245,249,0.8)',
         border: `1px solid ${slate200}`,
@@ -222,7 +236,7 @@ function RunnerUpStrip({
       }}
     >
       <span style={{
-        width: 22, height: 22, borderRadius: '50%',
+        width: badge, height: badge, borderRadius: '50%',
         background: '#E5E4E2', color: ink,
         display: 'flex', alignItems: 'center', justifyContent: 'center',
         fontSize: 11, fontWeight: 800, flexShrink: 0,
@@ -233,13 +247,13 @@ function RunnerUpStrip({
         <img
           src={photoUrl} alt="" onError={() => setImgErr(true)}
           style={{
-            width: 28, aspectRatio: '1 / 1.05', borderRadius: '34%',
+            width: avatar, aspectRatio: '1 / 1.05', borderRadius: '34%',
             objectFit: 'cover', objectPosition: 'center 18%', flexShrink: 0,
           }}
         />
       ) : (
         <div style={{
-          width: 28, aspectRatio: '1 / 1.05', borderRadius: '34%',
+          width: avatar, aspectRatio: '1 / 1.05', borderRadius: '34%',
           background: slate100,
           display: 'flex', alignItems: 'center', justifyContent: 'center',
           fontSize: 10, color: slate500, fontWeight: 700, flexShrink: 0,
@@ -255,7 +269,7 @@ function RunnerUpStrip({
           RUNNER-UP
         </div>
         <div style={{
-          fontSize: 13, fontWeight: 700, color: ink,
+          fontSize: nameSize, fontWeight: 700, color: ink,
           display: 'flex', alignItems: 'center', gap: 6,
           whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
         }}>
@@ -266,7 +280,7 @@ function RunnerUpStrip({
         </div>
       </div>
       <span style={{
-        fontSize: 16, fontWeight: 800, color: ink,
+        fontSize: scoreSize, fontWeight: 800, color: ink,
         fontVariantNumeric: 'tabular-nums', flexShrink: 0,
       }}>
         {finisher.displayScore || fmtScore(finisher.score)}
@@ -278,11 +292,12 @@ function RunnerUpStrip({
 // ---------- By-the-Numbers grid (5 col, low round merged) -----------------
 
 function ByNumbersGrid({
-  birdies, eagles, bogeys, lowRound, rounds,
+  birdies, eagles, bogeys, lowRound, rounds, t = 0,
 }: {
   birdies: number; eagles: number; bogeys: number;
   lowRound: number | null;
   rounds: Array<number | null>;
+  t?: number;
 }) {
   const playedRounds = rounds.filter((r): r is number => r != null);
   const avg = playedRounds.length > 0
@@ -295,15 +310,18 @@ function ByNumbersGrid({
     { v: `${bogeys}`,                                 label: 'BOGEYS',  color: ink  },
     { v: lowRound != null ? fmtScore(lowRound) : '—', label: 'LOW R',   color: gold },
   ];
+  const numSize = lerp(20, 28, t);
+  const padY = lerp(10, 16, t);
+  const marginTop = lerp(8, 14, t);
   return (
     <div style={{
       flexShrink: 0,
-      marginTop: 10,
+      marginTop,
       display: 'grid',
       gridTemplateColumns: 'repeat(5, 1fr)',
       borderTop: `1px solid ${slate200}`,
       borderBottom: `1px solid ${slate200}`,
-      padding: '10px 0',
+      padding: `${padY}px 0`,
     }}>
       {cells.map((c, i) => (
         <div
@@ -315,7 +333,7 @@ function ByNumbersGrid({
           }}
         >
           <div style={{
-            fontSize: 22, fontWeight: 900, color: c.color, lineHeight: 1,
+            fontSize: numSize, fontWeight: 900, color: c.color, lineHeight: 1,
             fontVariantNumeric: 'tabular-nums', letterSpacing: '-0.02em',
           }}>
             {c.v}
@@ -453,18 +471,23 @@ export function EditorialResultsHero({
     }
   };
 
+  const rootRef = useRef<HTMLDivElement>(null);
+  const heroT = useElasticT(rootRef, 520, 820);
+
   return (
-    <div style={{
-      height: '100%',
-      display: 'flex',
-      flexDirection: 'column',
-      background: lightBg,
-      paddingTop: 'calc(env(safe-area-inset-top, 0px) + 28px)',
-      paddingInline: 20,
-      paddingBottom: 16,
-      boxSizing: 'border-box',
-      overflow: 'hidden',
-    }}>
+    <div
+      ref={rootRef}
+      style={{
+        height: '100%',
+        display: 'flex',
+        flexDirection: 'column',
+        background: lightBg,
+        paddingTop: 'calc(env(safe-area-inset-top, 0px) + 28px)',
+        paddingInline: 20,
+        paddingBottom: 16,
+        boxSizing: 'border-box',
+        overflow: 'hidden',
+      }}>
       <ElasticZone minH={120} maxH={260}>
         {(t) => (
           <TournamentTitleBlock
@@ -493,6 +516,7 @@ export function EditorialResultsHero({
         tourSlug={tournament.tourSlug}
         marginLabel={marginLabel}
         onTap={() => handleFinisherTap(winner)}
+        t={heroT}
       />
 
       {runnerUp && (
@@ -500,6 +524,7 @@ export function EditorialResultsHero({
           finisher={runnerUp}
           tourSlug={tournament.tourSlug}
           onTap={handleFinisherTap}
+          t={heroT}
         />
       )}
 
@@ -510,13 +535,14 @@ export function EditorialResultsHero({
           bogeys={(winnerStats as any).bogeys ?? 0}
           lowRound={lowRound}
           rounds={[winner.round1, winner.round2, winner.round3, winner.round4]}
+          t={heroT}
         />
       )}
 
       <HeroCTA
         label="Final Leaderboard"
         onClick={handleCta}
-        style={{ marginTop: 12 }}
+        style={{ marginTop: lerp(10, 18, heroT) }}
       />
     </div>
   );

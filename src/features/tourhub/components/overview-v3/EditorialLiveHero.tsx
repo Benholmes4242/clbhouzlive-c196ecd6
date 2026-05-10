@@ -10,11 +10,11 @@
  * Pro Max and tighten on mini, with no empty band below the CTA on tall devices.
  */
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { tournamentRoute } from '../../routes';
 import { Shimmer } from '../shared/Shimmer';
-import { ElasticZone } from '../shared/ElasticZone';
+import { ElasticZone, useElasticT, lerp } from '../shared/ElasticZone';
 import {
   TournamentTitleBlock,
   TourBadge,
@@ -93,7 +93,7 @@ function deriveTodayThru(entry: any) {
 
 // ---------- LEADER block ----------------------------------------------------
 
-function LeaderBlock({ entry, tourSlug }: { entry: any; tourSlug: string }) {
+function LeaderBlock({ entry, tourSlug, t = 0 }: { entry: any; tourSlug: string; t?: number }) {
   const [imgErr, setImgErr] = useState(false);
   const p = entry?.player;
   const team = entry?.team;
@@ -113,21 +113,29 @@ function LeaderBlock({ entry, tourSlug }: { entry: any; tourSlug: string }) {
 
   const { score, thru, today } = deriveTodayThru(entry);
 
+  // Elastic scaling
+  const avatarSize = lerp(44, 64, t);
+  const padY = lerp(12, 22, t);
+  const gap = lerp(12, 16, t);
+  const nameSize = lerp(15, 20, t);
+  const scoreSize = lerp(30, 42, t);
+  const metaSize = lerp(10, 12, t);
+
   return (
     <div
       style={{
         flexShrink: 0,
         borderTop: `1px solid ${slate200}`,
         borderBottom: `1px solid ${slate200}`,
-        padding: '14px 0',
+        padding: `${padY}px 0`,
         display: 'flex',
         alignItems: 'center',
-        gap: 12,
+        gap,
       }}
     >
       <div
         style={{
-          width: 46, aspectRatio: '1 / 1.05', borderRadius: '34%',
+          width: avatarSize, aspectRatio: '1 / 1.05', borderRadius: '34%',
           border: `2px solid ${greenLive}`,
           background: slate100,
           overflow: 'hidden', flexShrink: 0,
@@ -148,7 +156,7 @@ function LeaderBlock({ entry, tourSlug }: { entry: any; tourSlug: string }) {
             width: '100%', height: '100%',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
           }}>
-            <PlayerSilhouette size={26} />
+            <PlayerSilhouette size={Math.round(avatarSize * 0.56)} />
           </div>
         )}
       </div>
@@ -161,7 +169,7 @@ function LeaderBlock({ entry, tourSlug }: { entry: any; tourSlug: string }) {
           LEADER
         </div>
         <div style={{
-          fontSize: 16, fontWeight: 800, color: ink,
+          fontSize: nameSize, fontWeight: 800, color: ink,
           letterSpacing: '-0.02em', lineHeight: 1.05,
           whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
         }}>
@@ -169,7 +177,7 @@ function LeaderBlock({ entry, tourSlug }: { entry: any; tourSlug: string }) {
         </div>
         <div style={{
           marginTop: 3, display: 'flex', alignItems: 'center', gap: 6,
-          fontSize: 10.5, color: slate500, fontWeight: 600,
+          fontSize: metaSize, color: slate500, fontWeight: 600,
         }}>
           {flag && <span aria-hidden="true">{flag}</span>}
           {ccode && <span style={{ letterSpacing: '0.06em' }}>{ccode}</span>}
@@ -192,7 +200,7 @@ function LeaderBlock({ entry, tourSlug }: { entry: any; tourSlug: string }) {
 
       <div style={{ textAlign: 'right', flexShrink: 0 }}>
         <div style={{
-          fontSize: 32, fontWeight: 900, letterSpacing: '-0.04em',
+          fontSize: scoreSize, fontWeight: 900, letterSpacing: '-0.04em',
           color: ink, lineHeight: 0.9,
           fontVariantNumeric: 'tabular-nums',
         }}>
@@ -212,10 +220,10 @@ function LeaderBlock({ entry, tourSlug }: { entry: any; tourSlug: string }) {
 // ---------- Chaser row ------------------------------------------------------
 
 function ChaserRow({
-  entry, rank, tourSlug, isFirst, onTap,
+  entry, rank, tourSlug, isFirst, onTap, t = 0,
 }: {
   entry: any; rank: number; tourSlug: string; isFirst: boolean;
-  onTap?: (e: any) => void;
+  onTap?: (e: any) => void; t?: number;
 }) {
   const [imgErr, setImgErr] = useState(false);
   const p = entry.player;
@@ -236,6 +244,12 @@ function ChaserRow({
     : thru == null || thru === 0 ? '—'
     : `${thru}`;
 
+  const avatar = lerp(22, 30, t);
+  const padY = lerp(9, 14, t);
+  const nameSize = lerp(13, 15, t);
+  const scoreSize = lerp(13, 16, t);
+  const posSize = lerp(11, 13, t);
+
   return (
     <button
       type="button"
@@ -245,7 +259,7 @@ function ChaserRow({
         gridTemplateColumns: '24px 1fr 56px 36px',
         alignItems: 'center',
         gap: 8,
-        padding: '10px 0',
+        padding: `${padY}px 0`,
         borderTop: isFirst ? 'none' : `1px solid ${slate200}`,
         background: 'transparent',
         border: 'none',
@@ -257,7 +271,7 @@ function ChaserRow({
       }}
     >
       <span style={{
-        fontSize: 11, color: slate500, fontWeight: 700,
+        fontSize: posSize, color: slate500, fontWeight: 700,
         fontVariantNumeric: 'tabular-nums',
       }}>
         {entry.position ?? rank}
@@ -269,13 +283,13 @@ function ChaserRow({
             alt=""
             onError={() => setImgErr(true)}
             style={{
-              width: 22, aspectRatio: '1 / 1.05', borderRadius: '34%',
+              width: avatar, aspectRatio: '1 / 1.05', borderRadius: '34%',
               objectFit: 'cover', objectPosition: 'center 18%', flexShrink: 0,
             }}
           />
         ) : (
           <div style={{
-            width: 22, aspectRatio: '1 / 1.05', borderRadius: '34%',
+            width: avatar, aspectRatio: '1 / 1.05', borderRadius: '34%',
             background: slate100,
             display: 'flex', alignItems: 'center', justifyContent: 'center',
             fontSize: 9, color: slate500, fontWeight: 700, flexShrink: 0,
@@ -284,14 +298,14 @@ function ChaserRow({
           </div>
         )}
         <span style={{
-          fontSize: 13, fontWeight: 700, color: ink,
+          fontSize: nameSize, fontWeight: 700, color: ink,
           whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
         }}>
           {fullName}
         </span>
       </span>
       <span style={{
-        textAlign: 'right', fontSize: 13, fontWeight: 800, color: ink,
+        textAlign: 'right', fontSize: scoreSize, fontWeight: 800, color: ink,
         fontVariantNumeric: 'tabular-nums',
       }}>
         {fmtScore(score)}
@@ -399,8 +413,12 @@ export function EditorialLiveHero({
     }
   };
 
+  const rootRef = useRef<HTMLDivElement>(null);
+  const heroT = useElasticT(rootRef, 520, 820);
+
   return (
     <div
+      ref={rootRef}
       style={{
         height: '100%',
         display: 'flex',
@@ -451,7 +469,7 @@ export function EditorialLiveHero({
 
       {/* LEADER (also serves as the first divider) -------------------------- */}
       {leaderEntry && (
-        <LeaderBlock entry={leaderEntry} tourSlug={tournament.tourSlug} />
+        <LeaderBlock entry={leaderEntry} tourSlug={tournament.tourSlug} t={heroT} />
       )}
 
       {/* Chasers — T2/T3/T4 fixed ------------------------------------------ */}
@@ -465,6 +483,7 @@ export function EditorialLiveHero({
               tourSlug={tournament.tourSlug}
               isFirst={i === 0}
               onTap={onPlayerTap}
+              t={heroT}
             />
           ))}
         </div>
@@ -474,7 +493,7 @@ export function EditorialLiveHero({
       <HeroCTA
         label="Open Live Leaderboard"
         onClick={handleCta}
-        style={{ marginTop: 12 }}
+        style={{ marginTop: lerp(10, 18, heroT) }}
       />
     </div>
   );
