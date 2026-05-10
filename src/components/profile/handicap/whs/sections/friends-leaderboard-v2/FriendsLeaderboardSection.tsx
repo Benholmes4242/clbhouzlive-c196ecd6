@@ -29,6 +29,7 @@ const isStale = (lastPlayed: string | null): boolean => {
 export const FriendsLeaderboardSection: React.FC<Props> = ({ userId }) => {
   const { data, isLoading } = useFriendLeaderboard(userId);
   const [showInactive, setShowInactive] = useState(false);
+  const [showAllActive, setShowAllActive] = useState(false);
   const [profileSheet, setProfileSheet] = useState<{ index: number } | null>(null);
 
   // Sort by handicap (low → high). NULL handicaps sink to the bottom.
@@ -66,7 +67,17 @@ export const FriendsLeaderboardSection: React.FC<Props> = ({ userId }) => {
   const totalActive = activeRows.length;
   const inactiveCount = inactiveRows.length;
 
-  const visible = showInactive ? [...activeRows, ...inactiveRows] : activeRows;
+  // Cap active rows at the top 10 — but always include the user's own row.
+  const ACTIVE_CAP_DEFAULT = 10;
+  const activeCap = Math.max(ACTIVE_CAP_DEFAULT, yourActiveRank);
+  const activeRowsCapped = showAllActive
+    ? activeRows
+    : activeRows.slice(0, activeCap);
+  const hiddenActiveCount = activeRows.length - activeRowsCapped.length;
+
+  const visible = showInactive
+    ? [...activeRowsCapped, ...inactiveRows]
+    : activeRowsCapped;
 
   const yourActiveIdx = activeRows.findIndex((e) => e.is_self);
   const yourHcp = activeRows[yourActiveIdx]?.friend_handicap_index ?? null;
@@ -165,6 +176,35 @@ export const FriendsLeaderboardSection: React.FC<Props> = ({ userId }) => {
             />
           );
         })
+      )}
+
+      {/* Show more active friends */}
+      {!showAllActive && !isLoading && hiddenActiveCount > 0 && (
+        <button
+          type="button"
+          onClick={() => setShowAllActive(true)}
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: 5,
+            width: 'calc(100% - 40px)',
+            margin: '12px 20px 0',
+            padding: '10px 16px',
+            background: '#fff',
+            border: '0.5px solid rgba(15,23,42,0.10)',
+            borderRadius: 12,
+            color: 'rgba(15,23,42,0.78)',
+            fontSize: 12,
+            fontWeight: 700,
+            letterSpacing: '0.02em',
+            cursor: 'pointer',
+            fontFamily: '"Geist", system-ui, sans-serif',
+          }}
+        >
+          Show {hiddenActiveCount} more
+          <ChevronDown size={14} />
+        </button>
       )}
 
       {/* Show inactive toggle */}
