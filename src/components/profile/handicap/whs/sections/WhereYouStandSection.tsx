@@ -77,7 +77,6 @@ const DistributionChart: React.FC<{
   );
 
   const maxPct = Math.max(...orderedBuckets.map((b) => b.pct), 1);
-  const handicapStr = userHandicap.toFixed(1).replace('-', '\u2212');
 
   return (
     <div style={{ marginTop: 18, position: 'relative' }}>
