@@ -155,15 +155,6 @@ export const HandicapProjectionCard: React.FC<Props> = ({ scores }) => {
           }}>
             Today's index
           </p>
-          <div
-            aria-hidden
-            style={{
-              position: 'absolute',
-              top: 14, bottom: 14, right: 0,
-              width: 0.5,
-              background: T.hairline,
-            }}
-          />
         </div>
 
         {/* RIGHT — HEADING TO */}
