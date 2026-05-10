@@ -178,6 +178,35 @@ export const FriendsLeaderboardSection: React.FC<Props> = ({ userId }) => {
         })
       )}
 
+      {/* Show more active friends */}
+      {!showAllActive && !isLoading && hiddenActiveCount > 0 && (
+        <button
+          type="button"
+          onClick={() => setShowAllActive(true)}
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: 5,
+            width: 'calc(100% - 40px)',
+            margin: '12px 20px 0',
+            padding: '10px 16px',
+            background: '#fff',
+            border: '0.5px solid rgba(15,23,42,0.10)',
+            borderRadius: 12,
+            color: 'rgba(15,23,42,0.78)',
+            fontSize: 12,
+            fontWeight: 700,
+            letterSpacing: '0.02em',
+            cursor: 'pointer',
+            fontFamily: '"Geist", system-ui, sans-serif',
+          }}
+        >
+          Show {hiddenActiveCount} more
+          <ChevronDown size={14} />
+        </button>
+      )}
+
       {/* Show inactive toggle */}
       {!showInactive && !isLoading && inactiveCount > 0 && (
         <button
