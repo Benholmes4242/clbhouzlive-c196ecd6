@@ -425,19 +425,39 @@ export async function fetchCourseForm(
     grouped.set(courseId, existing);
   }
 
-  const result: CourseForm[] = [];
+  // First pass: build the base CourseForm rows including best/worst diffs.
+  const baseRows: Omit<CourseForm, 'course_thumbnail_image'>[] = [];
   for (const [course_id, info] of grouped) {
     if (info.diffs.length < minRounds) continue;
     const avg = info.diffs.reduce((a, b) => a + b, 0) / info.diffs.length;
-    result.push({
+    const best = Math.min(...info.diffs);
+    const worst = Math.max(...info.diffs);
+    baseRows.push({
       course_id,
       course_name: info.name,
       rounds_played: info.diffs.length,
       avg_differential: avg,
       expected_differential: currentHandicap,
       delta: avg - currentHandicap,
+      best_differential: best,
+      worst_differential: worst,
     });
   }
+
+  // Second pass: enrich with course thumbnails. Same parallel-fan-out
+  // pattern used by fetchAllScores / fetchFriendsActivity.
+  const uniqueNames = Array.from(new Set(baseRows.map((r) => r.course_name)));
+  const thumbsByName: Record<string, string | null> = {};
+  await Promise.all(
+    uniqueNames.map(async (name) => {
+      thumbsByName[name.toLowerCase()] = await lookupCourseThumbnail(name);
+    }),
+  );
+
+  const result: CourseForm[] = baseRows.map((r) => ({
+    ...r,
+    course_thumbnail_image: thumbsByName[r.course_name.toLowerCase()] ?? null,
+  }));
   return result.sort((a, b) => a.delta - b.delta);
 }
 
