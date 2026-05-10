@@ -1,5 +1,4 @@
-import React, { useState } from 'react';
-import { Info } from 'lucide-react';
+import React from 'react';
 import type { WhsScore } from '@/lib/whs/types';
 import { predictHandicap, VERDICT_META } from './predictHandicap';
 
@@ -68,7 +67,6 @@ const THEMES: Record<'positive' | 'neutral' | 'negative', Theme> = {
 };
 
 export const HandicapProjectionCard: React.FC<Props> = ({ scores }) => {
-  const [showInfo, setShowInfo] = useState(false);
   const prediction = predictHandicap(scores);
   const meta = VERDICT_META[prediction.verdict];
   const theme = THEMES[meta.theme];
@@ -76,8 +74,6 @@ export const HandicapProjectionCard: React.FC<Props> = ({ scores }) => {
   if (prediction.insufficientData) {
     return (
       <div style={SECTION_STYLE}>
-        <CardHeader showInfo={showInfo} onToggleInfo={() => setShowInfo((v) => !v)} />
-        {showInfo && <InfoPanel />}
         <div style={{ padding: '24px 20px 28px', textAlign: 'center' }}>
           <p style={{ margin: 0, fontSize: 14, fontWeight: 700, color: T.ink, fontFamily: FONT }}>
             Add a few more rounds
@@ -97,9 +93,6 @@ export const HandicapProjectionCard: React.FC<Props> = ({ scores }) => {
 
   return (
     <div style={SECTION_STYLE}>
-      <CardHeader showInfo={showInfo} onToggleInfo={() => setShowInfo((v) => !v)} />
-      {showInfo && <InfoPanel />}
-
       {/* DUAL-PANEL: Where you are / Heading to */}
       <div
         style={{
@@ -306,77 +299,6 @@ const SECTION_STYLE: React.CSSProperties = {
   marginBottom: 28,
   fontFamily: FONT,
 };
-
-interface CardHeaderProps {
-  showInfo: boolean;
-  onToggleInfo: () => void;
-}
-
-const CardHeader: React.FC<CardHeaderProps> = ({ showInfo, onToggleInfo }) => (
-  <div
-    style={{
-      display: 'flex',
-      justifyContent: 'flex-end',
-      padding: '0 20px 10px',
-    }}
-  >
-    <button
-      type="button"
-      onClick={onToggleInfo}
-      aria-label={showInfo ? 'Hide info' : 'Show info'}
-      aria-expanded={showInfo}
-      style={{
-        width: 28,
-        height: 28,
-        borderRadius: '50%',
-        background: showInfo ? T.ink : 'transparent',
-        border: `1px solid ${showInfo ? T.ink : T.hairline}`,
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        cursor: 'pointer',
-        flexShrink: 0,
-        padding: 0,
-      }}
-    >
-      <Info size={14} color={showInfo ? '#FFFFFF' : T.slate} strokeWidth={2.25} />
-    </button>
-  </div>
-);
-
-const InfoPanel: React.FC = () => (
-  <div
-    style={{
-      margin: '14px 16px 0',
-      padding: '12px 14px',
-      background: T.neutralTint,
-      border: `1px solid ${T.hairline}`,
-      borderRadius: 10,
-    }}
-  >
-    <p
-      style={{
-        margin: 0,
-        fontSize: 11,
-        fontWeight: 800,
-        color: T.ink,
-        letterSpacing: '0.08em',
-        textTransform: 'uppercase',
-        marginBottom: 6,
-        fontFamily: FONT,
-      }}
-    >
-      How this works
-    </p>
-    <p style={{ margin: 0, fontSize: 12, lineHeight: 1.55, color: T.inkSoft, fontFamily: FONT }}>
-      Your <strong>differential</strong> is each round's score adjusted for course difficulty.
-      Lower is better. Your <strong>handicap</strong> is the average of your best 8 differentials
-      from your last 20 rounds — those are your <strong>counters</strong>. The{' '}
-      <strong>projection</strong> simulates 5 more rounds at your recent average and recomputes
-      your handicap.
-    </p>
-  </div>
-);
 
 interface CurveCoords {
   pastY1: number;

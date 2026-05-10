@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useState } from 'react';
+import { Info } from 'lucide-react';
 import { useAllScores } from '@/lib/whs/hooks';
 import SectionHeader from '../SectionHeader';
 import HandicapProjectionCard from './HandicapProjectionCard';
@@ -34,32 +35,57 @@ export const TrendCardsStack: React.FC<Props> = ({ connectionId, currentHandicap
 
   const showHero = !prediction.insufficientData && !isLoading;
 
+  const [showInfo, setShowInfo] = useState(false);
+
   return (
     <section style={{ padding: '0 20px', marginBottom: 28, fontFamily: FONT }}>
       {showHero ? (
         <div style={{ padding: '0 4px 16px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
-            <span
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, marginBottom: 10 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <span
+                style={{
+                  width: 6,
+                  height: 6,
+                  borderRadius: 999,
+                  background: accent,
+                  display: 'inline-block',
+                }}
+              />
+              <span
+                style={{
+                  fontSize: 11,
+                  fontWeight: 800,
+                  color: INK_55,
+                  letterSpacing: '0.14em',
+                  textTransform: 'uppercase',
+                  fontFamily: FONT,
+                }}
+              >
+                Your Form
+              </span>
+            </div>
+            <button
+              type="button"
+              onClick={() => setShowInfo((v) => !v)}
+              aria-label={showInfo ? 'Hide info' : 'Show info'}
+              aria-expanded={showInfo}
               style={{
-                width: 6,
-                height: 6,
-                borderRadius: 999,
-                background: accent,
-                display: 'inline-block',
-              }}
-            />
-            <span
-              style={{
-                fontSize: 11,
-                fontWeight: 800,
-                color: INK_55,
-                letterSpacing: '0.14em',
-                textTransform: 'uppercase',
-                fontFamily: FONT,
+                width: 24,
+                height: 24,
+                borderRadius: '50%',
+                background: showInfo ? INK : 'transparent',
+                border: `1px solid ${showInfo ? INK : 'rgba(15,23,42,0.12)'}`,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                cursor: 'pointer',
+                flexShrink: 0,
+                padding: 0,
               }}
             >
-              Your Form
-            </span>
+              <Info size={12} color={showInfo ? '#FFFFFF' : SLATE} strokeWidth={2.25} />
+            </button>
           </div>
 
           <div style={{ display: 'flex', alignItems: 'baseline', flexWrap: 'wrap', gap: 10 }}>
@@ -103,6 +129,40 @@ export const TrendCardsStack: React.FC<Props> = ({ connectionId, currentHandicap
           >
             Three signals explaining your trajectory.
           </p>
+
+          {showInfo && (
+            <div
+              style={{
+                marginTop: 12,
+                padding: '12px 14px',
+                background: 'rgba(15,23,42,0.04)',
+                border: '1px solid rgba(15,23,42,0.08)',
+                borderRadius: 10,
+              }}
+            >
+              <p
+                style={{
+                  margin: 0,
+                  fontSize: 11,
+                  fontWeight: 800,
+                  color: INK,
+                  letterSpacing: '0.08em',
+                  textTransform: 'uppercase',
+                  marginBottom: 6,
+                  fontFamily: FONT,
+                }}
+              >
+                How this works
+              </p>
+              <p style={{ margin: 0, fontSize: 12, lineHeight: 1.55, color: 'rgba(15,23,42,0.78)', fontFamily: FONT }}>
+                Your <strong>differential</strong> is each round&apos;s score adjusted for course difficulty.
+                Lower is better. Your <strong>handicap</strong> is the average of your best 8 differentials
+                from your last 20 rounds — those are your <strong>counters</strong>. The{' '}
+                <strong>projection</strong> simulates 5 more rounds at your recent average and recomputes
+                your handicap.
+              </p>
+            </div>
+          )}
         </div>
       ) : (
         <SectionHeader
