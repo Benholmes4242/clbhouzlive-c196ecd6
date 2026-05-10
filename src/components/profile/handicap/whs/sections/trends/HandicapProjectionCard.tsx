@@ -316,51 +316,10 @@ const CardHeader: React.FC<CardHeaderProps> = ({ showInfo, onToggleInfo }) => (
   <div
     style={{
       display: 'flex',
-      alignItems: 'flex-start',
-      justifyContent: 'space-between',
-      gap: 12,
-      padding: '0 20px 14px',
+      justifyContent: 'flex-end',
+      padding: '0 20px 10px',
     }}
   >
-    <div style={{ flex: 1, minWidth: 0 }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
-        <span
-          aria-hidden
-          style={{
-            display: 'inline-block',
-            width: 3,
-            height: 13,
-            background: T.amber,
-            borderRadius: 1,
-          }}
-        />
-        <span
-          style={{
-            fontSize: 9,
-            fontWeight: 800,
-            color: T.amber,
-            letterSpacing: '0.16em',
-            textTransform: 'uppercase',
-            fontFamily: FONT,
-          }}
-        >
-          Handicap Projection
-        </span>
-      </div>
-      <h2
-        style={{
-          margin: 0,
-          fontSize: 22,
-          fontWeight: 900,
-          letterSpacing: '-0.03em',
-          color: T.ink,
-          lineHeight: 1.15,
-          fontFamily: FONT,
-        }}
-      >
-        Based on your last 5 rounds
-      </h2>
-    </div>
     <button
       type="button"
       onClick={onToggleInfo}
@@ -377,7 +336,6 @@ const CardHeader: React.FC<CardHeaderProps> = ({ showInfo, onToggleInfo }) => (
         justifyContent: 'center',
         cursor: 'pointer',
         flexShrink: 0,
-        marginTop: 2,
         padding: 0,
       }}
     >
