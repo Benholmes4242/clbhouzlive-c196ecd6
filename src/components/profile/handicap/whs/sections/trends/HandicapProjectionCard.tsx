@@ -302,12 +302,8 @@ export const HandicapProjectionCard: React.FC<Props> = ({ scores }) => {
   );
 };
 
-const CARD_STYLE: React.CSSProperties = {
-  background: T.cardBg,
-  borderRadius: 16,
-  border: `1px solid ${T.hairline}`,
-  marginBottom: 14,
-  overflow: 'hidden',
+const SECTION_STYLE: React.CSSProperties = {
+  marginBottom: 28,
   fontFamily: FONT,
 };
 
@@ -320,63 +316,72 @@ const CardHeader: React.FC<CardHeaderProps> = ({ showInfo, onToggleInfo }) => (
   <div
     style={{
       display: 'flex',
-      alignItems: 'center',
+      alignItems: 'flex-start',
       justifyContent: 'space-between',
-      padding: '14px 16px',
-      borderBottom: `1px solid ${T.hairline}`,
+      gap: 12,
+      padding: '0 20px 14px',
     }}
   >
-    <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-      <div
-        style={{
-          width: 30,
-          height: 30,
-          borderRadius: 9,
-          background: T.amberTint,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-        }}
-      >
-        <Activity size={15} color={T.amberDeep} strokeWidth={2.2} />
-      </div>
-      <div>
-        <p
+    <div style={{ flex: 1, minWidth: 0 }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
+        <span
+          aria-hidden
           style={{
-            margin: 0,
-            fontSize: 13,
-            fontWeight: 700,
-            color: T.ink,
-            letterSpacing: '-0.01em',
+            display: 'inline-block',
+            width: 3,
+            height: 13,
+            background: T.amber,
+            borderRadius: 1,
+          }}
+        />
+        <span
+          style={{
+            fontSize: 9,
+            fontWeight: 800,
+            color: T.amber,
+            letterSpacing: '0.16em',
+            textTransform: 'uppercase',
             fontFamily: FONT,
           }}
         >
           Handicap Projection
-        </p>
-        <p style={{ margin: 0, fontSize: 10, color: T.inkMute, marginTop: 1, fontFamily: FONT }}>
-          Based on your last 5 rounds
-        </p>
+        </span>
       </div>
+      <h2
+        style={{
+          margin: 0,
+          fontSize: 22,
+          fontWeight: 900,
+          letterSpacing: '-0.03em',
+          color: T.ink,
+          lineHeight: 1.15,
+          fontFamily: FONT,
+        }}
+      >
+        Based on your last 5 rounds
+      </h2>
     </div>
     <button
+      type="button"
       onClick={onToggleInfo}
       aria-label={showInfo ? 'Hide info' : 'Show info'}
       aria-expanded={showInfo}
       style={{
-        width: 26,
-        height: 26,
-        borderRadius: 999,
-        border: `1px solid ${showInfo ? T.ink : T.hairline}`,
+        width: 28,
+        height: 28,
+        borderRadius: '50%',
         background: showInfo ? T.ink : 'transparent',
-        color: showInfo ? '#fff' : T.inkMute,
-        cursor: 'pointer',
+        border: `1px solid ${showInfo ? T.ink : T.hairline}`,
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
+        cursor: 'pointer',
+        flexShrink: 0,
+        marginTop: 2,
         padding: 0,
       }}
     >
-      <Info size={13} strokeWidth={2.2} />
+      <Info size={14} color={showInfo ? '#FFFFFF' : T.slate} strokeWidth={2.25} />
     </button>
   </div>
 );
