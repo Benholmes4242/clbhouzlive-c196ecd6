@@ -537,14 +537,21 @@ const HeroHandicapCard: React.FC<Props> = ({ connection }) => {
             >
               <defs>
                 <linearGradient id="heroMomentumGreen" x1="0" y1="0" x2="1" y2="0">
-                  <stop offset="0%" stopColor="#15803D" />
-                  <stop offset="100%" stopColor="#4ADE80" />
+                  <stop offset="0%" stopColor={MOMENTUM_GREEN_DEEP} />
+                  <stop offset="100%" stopColor={MOMENTUM_GREEN_BRIGHT} />
                 </linearGradient>
+                {/* Subtle drop-shadow filter for filled arc lift */}
+                <filter id="heroArcLift" x="-20%" y="-20%" width="140%" height="140%">
+                  <feGaussianBlur in="SourceAlpha" stdDeviation="0.6" />
+                  <feOffset dx="0" dy="0.4" result="offsetblur" />
+                  <feComponentTransfer><feFuncA type="linear" slope="0.3" /></feComponentTransfer>
+                  <feMerge><feMergeNode /><feMergeNode in="SourceGraphic" /></feMerge>
+                </filter>
               </defs>
               {/* Track */}
               <circle
                 cx={50} cy={50} r={42}
-                fill="none" stroke={INK_06} strokeWidth={6}
+                fill="none" stroke={RING_TRACK} strokeWidth={6}
                 vectorEffect="non-scaling-stroke"
               />
               {/* Momentum arc — green for improving, red for worsening */}
@@ -553,9 +560,10 @@ const HeroHandicapCard: React.FC<Props> = ({ connection }) => {
                   cx={50} cy={50} r={42} fill="none"
                   stroke="url(#heroMomentumGreen)" strokeWidth={6}
                   strokeDasharray={`${(innerFillLength / C_INNER) * (2 * Math.PI * 42)} ${2 * Math.PI * 42}`}
-                  strokeLinecap="butt"
+                  strokeLinecap="round"
                   transform={`rotate(-90 50 50)`}
                   vectorEffect="non-scaling-stroke"
+                  filter="url(#heroArcLift)"
                   style={{ transition: 'stroke-dasharray 320ms cubic-bezier(0.22, 0.61, 0.36, 1)' }}
                 />
               )}
@@ -565,9 +573,10 @@ const HeroHandicapCard: React.FC<Props> = ({ connection }) => {
                     cx={50} cy={50} r={42} fill="none"
                     stroke={RED} strokeWidth={6}
                     strokeDasharray={`${(innerFillLength / C_INNER) * (2 * Math.PI * 42)} ${2 * Math.PI * 42}`}
-                    strokeLinecap="butt"
+                    strokeLinecap="round"
                     transform={`rotate(-90 50 50)`}
                     vectorEffect="non-scaling-stroke"
+                    filter="url(#heroArcLift)"
                     style={{ transition: 'stroke-dasharray 320ms cubic-bezier(0.22, 0.61, 0.36, 1)' }}
                   />
                 </g>
