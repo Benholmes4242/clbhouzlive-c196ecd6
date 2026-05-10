@@ -69,6 +69,8 @@ const OnAppCard: React.FC<{ activity: WhsFriendActivityWithImage; onClick: () =>
     statusTag = { label: 'ASK TO SYNC', tone: 'sync' };
   }
 
+  const isSynced = activity.is_clbhouz_user && !!activity.friend_connection_id;
+
   return (
     <div
       onClick={onClick}
