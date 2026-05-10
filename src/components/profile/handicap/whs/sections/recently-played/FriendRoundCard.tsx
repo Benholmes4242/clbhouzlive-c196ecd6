@@ -1,8 +1,9 @@
 import React from 'react';
-import { Trophy, Flame, ChevronRight, ArrowDown, ArrowUp } from 'lucide-react';
+import { Trophy, Flame, ChevronRight, ArrowDown, ArrowUp, Heart, BadgeCheck } from 'lucide-react';
 import { initials, firstName } from '@/lib/whs/utils/initials';
 import { fmtRelative } from '@/lib/whs/utils/nameFormat';
 import { fmtDiff } from '@/lib/whs/format';
+import { useToggleRoundReaction } from '@/lib/whs/hooks';
 import type { WhsFriendActivityWithImage } from '@/lib/whs/types';
 
 interface Props {
