@@ -7,12 +7,12 @@
  * - Below: CHAMPION block + Runner-up strip + 5-col By-the-Numbers + CTA
  */
 
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Trophy } from 'lucide-react';
 import { tournamentRoute } from '../../routes';
 import { Shimmer } from '../shared/Shimmer';
-import { ElasticZone } from '../shared/ElasticZone';
+import { ElasticZone, useElasticT, lerp } from '../shared/ElasticZone';
 import {
   TournamentTitleBlock,
   TourBadge,
