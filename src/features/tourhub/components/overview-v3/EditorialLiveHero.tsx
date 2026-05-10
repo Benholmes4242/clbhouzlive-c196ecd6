@@ -367,7 +367,7 @@ export function EditorialLiveHero({
   const navigate = useNavigate();
 
   const leaderEntry = leaderboard[0] ?? null;
-  const chasers = leaderboard.slice(1, 4); // T2/T3/T4
+  const chasers = leaderboard.slice(1, 3); // T2/T3 (top 3 total incl. leader)
 
   const lastCompleted = leaderEntry
     ? [4, 3, 2, 1].find(n => leaderEntry[`round_${n}`] != null) ?? 0

@@ -45,7 +45,7 @@ export function ElasticZone({ minH, maxH, children, style }: ElasticZoneProps) {
         minHeight: 0,
         display: 'flex',
         flexDirection: 'column',
-        justifyContent: 'flex-end',
+        justifyContent: 'flex-start',
         ...style,
       }}
     >
