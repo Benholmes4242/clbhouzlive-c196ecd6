@@ -7,11 +7,9 @@ interface Props {
 }
 
 const INK = '#0F172A';
-const INK_MUTE = 'rgba(15,23,42,0.55)';
+const INK_55 = 'rgba(15,23,42,0.55)';
 const HAIRLINE = 'rgba(15,23,42,0.08)';
-const GREEN = '#059669';
-const FONT_DISPLAY =
-  'SF Pro Display, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
+const AMBER_DEEP = '#C97211';
 
 const fmtDiff = (n: number | null) => {
   if (n === null) return '—';
@@ -20,88 +18,55 @@ const fmtDiff = (n: number | null) => {
   return '0.0';
 };
 
-const Cell: React.FC<{
-  label: string;
-  value: string | number;
-  color?: string;
-  border?: boolean;
-  sub?: string | null;
-}> = ({ label, value, color = INK, border = false, sub = null }) => (
-  <div
-    style={{
-      paddingLeft: border ? 14 : 0,
-      borderLeft: border ? `0.5px solid ${HAIRLINE}` : 'none',
-      textAlign: 'left',
-    }}
-  >
-    <p
+const Metric: React.FC<{ label: string; value: string; accent: string }> = ({
+  label,
+  value,
+  accent,
+}) => (
+  <div style={{ textAlign: 'center' }}>
+    <div
       style={{
-        margin: 0,
         fontSize: 9,
         fontWeight: 800,
-        color: INK_MUTE,
-        letterSpacing: '0.14em',
-        marginBottom: 5,
+        color: INK_55,
+        letterSpacing: '0.16em',
+        marginBottom: 4,
       }}
     >
       {label}
-    </p>
-    <p
+    </div>
+    <div
       style={{
-        margin: 0,
-        fontSize: 32,
+        fontSize: 24,
         fontWeight: 800,
-        color,
-        fontVariantNumeric: 'tabular-nums',
+        color: accent,
+        letterSpacing: '-0.03em',
         lineHeight: 1,
-        fontFamily: FONT_DISPLAY,
-        letterSpacing: '-0.04em',
+        fontVariantNumeric: 'tabular-nums',
       }}
     >
       {value}
-    </p>
-    {sub && (
-      <p
-        style={{
-          margin: '4px 0 0',
-          fontSize: 10.5,
-          color: 'rgba(15,23,42,0.40)',
-          fontWeight: 500,
-        }}
-      >
-        {sub}
-      </p>
-    )}
+    </div>
   </div>
 );
 
-export const RoundStatStrip: React.FC<Props> = ({ gross, stableford, differential }) => {
-  return (
-    <div
-      style={{
-        margin: '-44px 16px 0',
-        position: 'relative',
-        zIndex: 2,
-        background: '#fff',
-        borderRadius: 18,
-        padding: '20px 18px',
-        boxShadow:
-          '0 8px 32px rgba(15,23,42,0.12), 0 1px 2px rgba(15,23,42,0.04)',
-        display: 'grid',
-        gridTemplateColumns: '1fr 1fr 1fr',
-      }}
-    >
-      <Cell label="GROSS" value={gross ?? '—'} sub={null} />
-      <Cell label="STABLEFORD" value={stableford ?? '—'} sub="points" border />
-      <Cell
-        label="DIFFERENTIAL"
-        value={fmtDiff(differential)}
-        sub="vs course"
-        border
-        color={differential !== null && differential < 0 ? GREEN : INK}
-      />
-    </div>
-  );
-};
+export const RoundStatStrip: React.FC<Props> = ({
+  gross,
+  stableford,
+  differential,
+}) => (
+  <div
+    style={{
+      display: 'grid',
+      gridTemplateColumns: 'repeat(3, 1fr)',
+      padding: '14px 16px',
+      borderBottom: `1px solid ${HAIRLINE}`,
+    }}
+  >
+    <Metric label="GROSS" value={String(gross ?? '—')} accent={INK} />
+    <Metric label="POINTS" value={String(stableford ?? '—')} accent={INK} />
+    <Metric label="DIFF" value={fmtDiff(differential)} accent={AMBER_DEEP} />
+  </div>
+);
 
 export default RoundStatStrip;
