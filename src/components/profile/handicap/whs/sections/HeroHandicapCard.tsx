@@ -107,6 +107,26 @@ function calcMonthlyMovement(delta: number | null) {
   };
 }
 
+/**
+ * Maps form strokes to a 5-tier state label. Same ladder across all
+ * ranges — the user's "FORM" is always one of these five words.
+ */
+function formStateLabel(formStrokes: number): { title: string; sub: string } {
+  if (formStrokes > 1.0) {
+    return { title: 'ON FIRE', sub: `+${formStrokes.toFixed(1)} vs handicap` };
+  }
+  if (formStrokes > 0.1) {
+    return { title: 'WARM', sub: `+${formStrokes.toFixed(1)} vs handicap` };
+  }
+  if (formStrokes < -1.0) {
+    return { title: 'ICE COLD', sub: `${fmtDiff(formStrokes)} vs handicap` };
+  }
+  if (formStrokes < -0.1) {
+    return { title: 'COLD', sub: `${fmtDiff(formStrokes)} vs handicap` };
+  }
+  return { title: 'STEADY', sub: 'On handicap' };
+}
+
 const HeroHandicapCard: React.FC<Props> = ({ connection }) => {
   const [range, setRange] = useState<Range>(30);
   const [scrubIdx, setScrubIdx] = useState<number | null>(null);
