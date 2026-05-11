@@ -19,6 +19,8 @@ export interface ConditionState {
   hairlineOnBg: string;
   accent: string;
   pattern: WeatherPattern;
+  /** Which lucide icon to render in the icon tile. */
+  iconType: 'sun' | 'cloud' | 'drizzle' | 'rain' | 'snow' | 'storm' | 'fog' | 'wind' | 'moon';
 }
 
 const SUNNY: ConditionState = {
@@ -26,6 +28,7 @@ const SUNNY: ConditionState = {
   textOnBg: '#1F2937', textMutedOnBg: 'rgba(31,41,55,0.70)',
   hairlineOnBg: 'rgba(31,41,55,0.18)', accent: '#F59E0B',
   pattern: 'none',
+  iconType: 'sun',
 };
 
 const COOL_MORNING: ConditionState = {
@@ -33,6 +36,7 @@ const COOL_MORNING: ConditionState = {
   textOnBg: '#0F172A', textMutedOnBg: 'rgba(15,23,42,0.65)',
   hairlineOnBg: 'rgba(15,23,42,0.15)', accent: '#F97316',
   pattern: 'none',
+  iconType: 'sun',
 };
 
 const CLOUDY: ConditionState = {
@@ -40,6 +44,7 @@ const CLOUDY: ConditionState = {
   textOnBg: '#0F172A', textMutedOnBg: 'rgba(15,23,42,0.60)',
   hairlineOnBg: 'rgba(15,23,42,0.18)', accent: '#64748B',
   pattern: 'none',
+  iconType: 'cloud',
 };
 
 const RAINY: ConditionState = {
@@ -47,6 +52,7 @@ const RAINY: ConditionState = {
   textOnBg: '#F8FAFC', textMutedOnBg: 'rgba(248,250,252,0.78)',
   hairlineOnBg: 'rgba(248,250,252,0.18)', accent: '#38BDF8',
   pattern: 'rain',
+  iconType: 'rain',
 };
 
 const WINDY: ConditionState = {
@@ -54,6 +60,7 @@ const WINDY: ConditionState = {
   textOnBg: '#1F2937', textMutedOnBg: 'rgba(31,41,55,0.65)',
   hairlineOnBg: 'rgba(31,41,55,0.18)', accent: '#C2410C',
   pattern: 'wind',
+  iconType: 'wind',
 };
 
 const STORM: ConditionState = {
@@ -61,6 +68,7 @@ const STORM: ConditionState = {
   textOnBg: '#F8FAFC', textMutedOnBg: 'rgba(248,250,252,0.65)',
   hairlineOnBg: 'rgba(248,250,252,0.18)', accent: '#A78BFA',
   pattern: 'none',
+  iconType: 'storm',
 };
 
 const NIGHT: ConditionState = {
@@ -68,6 +76,7 @@ const NIGHT: ConditionState = {
   textOnBg: '#F8FAFC', textMutedOnBg: 'rgba(248,250,252,0.65)',
   hairlineOnBg: 'rgba(248,250,252,0.18)', accent: '#60A5FA',
   pattern: 'none',
+  iconType: 'moon',
 };
 
 /** Priority-ordered picker. */
