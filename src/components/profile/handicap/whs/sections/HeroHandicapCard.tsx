@@ -174,7 +174,7 @@ const HeroHandicapCard: React.FC<Props> = ({ connection }) => {
     const max = Math.max(...values);
     const r = max - min || 1;
     return points.map((p, i) => {
-      const x = points.length === 1 ? W / 2 : (i / (points.length - 1)) * (W - PAD_RIGHT);
+      const x = points.length === 1 ? W / 2 : PAD_LEFT + (i / (points.length - 1)) * (W - PAD_LEFT - PAD_RIGHT);
       const y = PAD_TOP + ((max - p.handicap_index) / r) * (H - PAD_TOP - PAD_BOTTOM);
       return { x, y, idx: i };
     });
