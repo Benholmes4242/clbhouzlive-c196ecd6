@@ -8,6 +8,7 @@ interface Props {
 
 const INK = '#0F172A';
 const INK_55 = 'rgba(15,23,42,0.55)';
+const INK_40 = 'rgba(15,23,42,0.40)';
 const PAR_FILL_LIGHT = 'rgba(15,23,42,0.06)';
 
 const HOLE_GOLD = '#D4A82A';
@@ -36,11 +37,12 @@ const fillFor = (score: number, par: number): string => {
   return 'rgba(159,18,57,0.12)';
 };
 
-export const RoundHoleCell: React.FC<Props> = ({ hole, size = 32 }) => {
+export const RoundHoleCell: React.FC<Props> = ({ hole, size = 44 }) => {
   const strokes = hole.played
     ? (hole.adjusted_gross ?? hole.actual_gross ?? null)
     : null;
   const par = hole.par;
+  const holeNumber = hole.hole_no;
 
   if (strokes === null || strokes === undefined) {
     return (
@@ -48,11 +50,40 @@ export const RoundHoleCell: React.FC<Props> = ({ hole, size = 32 }) => {
         style={{
           width: '100%',
           height: size,
-          borderRadius: 8,
+          borderRadius: 10,
           border: '1.5px dashed rgba(15,23,42,0.12)',
           opacity: 0.5,
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+          gap: 2,
+          padding: '4px 0 5px',
         }}
-      />
+      >
+        <span
+          style={{
+            fontSize: 7,
+            fontWeight: 800,
+            color: INK_40,
+            letterSpacing: '0.04em',
+            fontVariantNumeric: 'tabular-nums',
+            lineHeight: 1,
+          }}
+        >
+          {holeNumber}\u00B7{par ?? '\u2014'}
+        </span>
+        <span
+          style={{
+            fontSize: 14,
+            fontWeight: 800,
+            color: INK_40,
+            lineHeight: 1,
+          }}
+        >
+          {'\u2014'}
+        </span>
+      </div>
     );
   }
 
@@ -70,20 +101,37 @@ export const RoundHoleCell: React.FC<Props> = ({ hole, size = 32 }) => {
         position: 'relative',
         width: '100%',
         height: size,
-        borderRadius: 8,
+        borderRadius: 10,
         background: fill,
         border: isPar ? '1.5px solid transparent' : `1.5px solid ${colour}`,
         display: 'flex',
+        flexDirection: 'column',
         alignItems: 'center',
         justifyContent: 'center',
+        padding: '4px 0 5px',
       }}
     >
       <span
         style={{
-          fontSize: 14,
+          fontSize: 7,
+          fontWeight: 800,
+          color: isPar ? INK_40 : colour,
+          letterSpacing: '0.04em',
+          fontVariantNumeric: 'tabular-nums',
+          lineHeight: 1,
+          opacity: 0.85,
+        }}
+      >
+        {holeNumber}\u00B7{par}
+      </span>
+      <span
+        style={{
+          fontSize: 17,
           fontWeight: 800,
           color: isPar ? INK : colour,
           lineHeight: 1,
+          marginTop: 4,
+          letterSpacing: '-0.03em',
           fontVariantNumeric: 'tabular-nums',
         }}
       >
@@ -94,10 +142,10 @@ export const RoundHoleCell: React.FC<Props> = ({ hole, size = 32 }) => {
           aria-hidden
           style={{
             position: 'absolute',
-            top: -2,
-            right: -2,
-            width: 6,
-            height: 6,
+            top: -3,
+            right: -3,
+            width: 8,
+            height: 8,
             borderRadius: '50%',
             background: isAce ? HOLE_GOLD : EAGLE_GREEN,
             border: '1.5px solid #fff',
