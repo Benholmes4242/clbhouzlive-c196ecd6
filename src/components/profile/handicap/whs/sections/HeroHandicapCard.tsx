@@ -935,12 +935,24 @@ const keyframes = `
 // ── FlankRing (FORM / SCORING AVG) ──────────────────────────────────────
 interface FlankRingProps {
   metric: 'form' | 'scoring';
-  state?: 'hot' | 'steady' | 'cold' | 'unknown';
+  // scoring
   value?: string;
   fraction?: number;
+  sub?: string;
+  // form (bidirectional, range-aware)
+  formHasData?: boolean;
+  formIsHot?: boolean;
+  formIsCold?: boolean;
+  formMagnitude?: number;
+  formArcColor?: string;
+  formTitle?: string;
+  formSub?: string;
 }
 
-const FlankRing: React.FC<FlankRingProps> = ({ metric, state, value, fraction }) => {
+const FlankRing: React.FC<FlankRingProps> = ({
+  metric, value, fraction, sub,
+  formHasData, formIsHot, formIsCold, formMagnitude, formArcColor, formTitle, formSub,
+}) => {
   const VIEWBOX = 100;
   const FCX = 50;
   const FCY = 50;
@@ -948,66 +960,35 @@ const FlankRing: React.FC<FlankRingProps> = ({ metric, state, value, fraction })
   const FSTROKE = 6;
   const FC = 2 * Math.PI * FR;
 
-  let color: string;
-  let frac: number;
-  let centre: React.ReactNode;
-  let label: string;
-  let sub: string;
+  const isForm = metric === 'form';
 
-  if (metric === 'form') {
-    if (state === 'hot') {
-      color = RED_FORM_HOT;
-      frac = 1.0;
-      centre = (
-        <div style={{ width: 'clamp(18px, 5vw, 24px)', height: 'clamp(18px, 5vw, 24px)' }}>
-          <Flame size="100%" color={RED_FORM_HOT} strokeWidth={2.4} fill={RED_FORM_HOT} />
-        </div>
-      );
-      label = 'FORM';
-      sub = 'Hot over last 5';
-    } else if (state === 'cold') {
-      color = COLD_BLUE;
-      frac = 0.10;
-      centre = (
-        <div style={{ width: 'clamp(18px, 5vw, 24px)', height: 'clamp(18px, 5vw, 24px)' }}>
-          <Snowflake size="100%" color={COLD_BLUE} strokeWidth={2.4} />
-        </div>
-      );
-      label = 'FORM';
-      sub = 'Cold over last 5';
-    } else if (state === 'steady') {
-      color = '#475569';
-      frac = 0.50;
-      centre = (
-        <div style={{ width: 'clamp(20px, 5.4vw, 26px)', height: 'clamp(20px, 5.4vw, 26px)' }}>
-          <Minus size="100%" color="#475569" strokeWidth={3} />
-        </div>
-      );
-      label = 'FORM';
-      sub = 'Steady over last 5';
-    } else {
-      color = INK_25;
-      frac = 0;
-      centre = (
-        <span style={{ fontSize: 'clamp(16px, 4.6vw, 22px)', color: INK_40, fontWeight: 800 }}>—</span>
-      );
-      label = 'FORM';
-      sub = 'Awaiting data';
-    }
-  } else {
-    // Scoring avg uses a royal-blue gradient (rendered via SVG <defs> in the ring below)
-    color = 'url(#flankScoringGradient)';
-    frac = fraction ?? 0;
-    centre = (
-      <span style={{
-        fontSize: value && value.length > 4 ? 'clamp(13px, 3.8vw, 16px)' : 'clamp(14px, 4.4vw, 18px)',
-        fontWeight: 700, color: INK, lineHeight: 1,
-        letterSpacing: '-0.03em', fontVariantNumeric: 'tabular-nums',
-      }}>{value ?? '—'}</span>
-    );
-    label = 'SCORING AVG';
-    sub = 'Over last 5';
-  }
+  // Resolved label / sub
+  const label = isForm ? 'FORM' : 'SCORING AVG';
+  const subText = isForm
+    ? (formHasData ? (formSub ?? '') : 'Awaiting data')
+    : (sub ?? 'Over last 5');
+
+  // Centre node
+  const centre: React.ReactNode = isForm ? (
+    formHasData ? (
+      <Activity size={26} strokeWidth={2.5} color={formArcColor ?? INK_40} />
+    ) : (
+      <span style={{ fontSize: 'clamp(16px, 4.6vw, 22px)', color: INK_40, fontWeight: 800 }}>—</span>
+    )
+  ) : (
+    <span style={{
+      fontSize: value && value.length > 4 ? 'clamp(13px, 3.8vw, 16px)' : 'clamp(14px, 4.4vw, 18px)',
+      fontWeight: 700, color: INK, lineHeight: 1,
+      letterSpacing: '-0.03em', fontVariantNumeric: 'tabular-nums',
+    }}>{value ?? '—'}</span>
+  );
+
+  // Scoring single-direction frac
+  const scoringFrac = !isForm ? (fraction ?? 0) : 0;
+  const scoringColor = 'url(#flankScoringGradient)';
+
+  // FORM bidirectional dasharray length — half the circumference scaled by magnitude
+  const formArcLen = ((formMagnitude ?? 0) * FC) / 2;
 
   return (
     <div style={{
@@ -1025,12 +1006,10 @@ const FlankRing: React.FC<FlankRingProps> = ({ metric, state, value, fraction })
           preserveAspectRatio="xMidYMid meet"
         >
           <defs>
-            {/* Royal blue gradient — only used by the SCORING AVG ring, but defined per-instance for safety */}
             <linearGradient id="flankScoringGradient" x1="0" y1="0" x2="1" y2="1">
               <stop offset="0%" stopColor={SCORING_BLUE_DEEP} />
               <stop offset="100%" stopColor={SCORING_BLUE} />
             </linearGradient>
-            {/* Subtle drop-shadow filter for filled arc lift */}
             <filter id="flankArcLift" x="-20%" y="-20%" width="140%" height="140%">
               <feGaussianBlur in="SourceAlpha" stdDeviation="0.6" />
               <feOffset dx="0" dy="0.4" result="offsetblur" />
@@ -1041,12 +1020,36 @@ const FlankRing: React.FC<FlankRingProps> = ({ metric, state, value, fraction })
           <circle cx={FCX} cy={FCY} r={FR} fill="none"
             stroke={RING_TRACK} strokeWidth={FSTROKE}
             vectorEffect="non-scaling-stroke" />
-          {frac > 0 && (
+
+          {/* Scoring single arc (clockwise from top) */}
+          {!isForm && scoringFrac > 0 && (
             <circle cx={FCX} cy={FCY} r={FR} fill="none"
-              stroke={color} strokeWidth={FSTROKE}
+              stroke={scoringColor} strokeWidth={FSTROKE}
               strokeLinecap="round"
-              strokeDasharray={`${frac * FC} ${FC}`}
+              strokeDasharray={`${scoringFrac * FC} ${FC}`}
               transform={`rotate(-90 ${FCX} ${FCY})`}
+              vectorEffect="non-scaling-stroke"
+              filter="url(#flankArcLift)" />
+          )}
+
+          {/* FORM hot arc — right side, clockwise from top */}
+          {isForm && formIsHot && formArcLen > 0 && (
+            <circle cx={FCX} cy={FCY} r={FR} fill="none"
+              stroke={FORM_HOT} strokeWidth={FSTROKE}
+              strokeLinecap="round"
+              strokeDasharray={`${formArcLen} ${FC}`}
+              transform={`rotate(-90 ${FCX} ${FCY})`}
+              vectorEffect="non-scaling-stroke"
+              filter="url(#flankArcLift)" />
+          )}
+
+          {/* FORM cold arc — left side, mirrored */}
+          {isForm && formIsCold && formArcLen > 0 && (
+            <circle cx={FCX} cy={FCY} r={FR} fill="none"
+              stroke={FORM_COLD} strokeWidth={FSTROKE}
+              strokeLinecap="round"
+              strokeDasharray={`${formArcLen} ${FC}`}
+              transform={`rotate(-90 ${FCX} ${FCY}) scale(-1, 1) translate(${-VIEWBOX}, 0)`}
               vectorEffect="non-scaling-stroke"
               filter="url(#flankArcLift)" />
           )}
@@ -1061,14 +1064,15 @@ const FlankRing: React.FC<FlankRingProps> = ({ metric, state, value, fraction })
       <div style={{ marginTop: 8, textAlign: 'center', maxWidth: '120%' }}>
         <div style={{
           fontSize: 'clamp(10px, 2.8vw, 10.5px)',
-          fontWeight: 800, color: INK,
+          fontWeight: 800, color: isForm && formHasData ? (formArcColor ?? INK) : INK,
           letterSpacing: '0.06em', textTransform: 'uppercase',
-        }}>{label}</div>
+        }}>{isForm ? (formHasData ? (formTitle ?? 'FORM') : 'FORM') : label}</div>
         <div style={{
           fontSize: 'clamp(9px, 2.6vw, 10px)',
-          color: INK_40, marginTop: 2, fontWeight: 500,
+          color: isForm && formHasData ? (formArcColor ?? INK_40) : INK_40,
+          marginTop: 2, fontWeight: 500,
           whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
-        }}>{sub}</div>
+        }}>{subText}</div>
       </div>
     </div>
   );
