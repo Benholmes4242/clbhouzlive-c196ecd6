@@ -581,51 +581,66 @@ const FeedCard: React.FC<FeedCardProps> = ({ round, isBest, onTap }) => {
               flexWrap: 'wrap',
             }}
           >
-            {isBest && (
-              <span
-                style={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: 3,
-                  padding: '2px 6px 2px 5px',
-                  background: T.gold,
-                  color: '#3F2A05',
-                  borderRadius: 99,
-                  fontSize: 9,
-                  fontWeight: 800,
-                  letterSpacing: '0.08em',
-                }}
-              >
-                <Trophy size={9} strokeWidth={2.5} />
-                BEST
-              </span>
-            )}
-            {!isBest && round.is_counter && (
-              <span
-                style={{
-                  padding: '2px 6px',
-                  background: T.amber,
-                  color: '#FFFFFF',
-                  borderRadius: 99,
-                  fontSize: 9,
-                  fontWeight: 800,
-                  letterSpacing: '0.08em',
-                }}
-              >
-                COUNTER
-              </span>
-            )}
             <span>{fmtRelativeDate(round.play_date)}</span>
             {deltaInfo && (
               <>
                 <span style={{ color: T.ink25 }}>·</span>
-                <span style={{ color: deltaInfo.color, fontWeight: 700 }}>
-                  Hcp {deltaInfo.sign}
-                  {deltaInfo.value}
+                <span style={{
+                  color: deltaInfo.color,
+                  fontWeight: 700,
+                  letterSpacing: '0.02em',
+                }}>
+                  HCP {deltaInfo.sign} {deltaInfo.value}
                 </span>
               </>
             )}
           </div>
+
+          {/* Row 2: tag pill (BEST or COUNTER) — only when present */}
+          {(isBest || round.is_counter) && (
+            <div
+              style={{
+                marginTop: 6,
+                display: 'flex',
+                alignItems: 'center',
+                gap: 6,
+              }}
+            >
+              {isBest ? (
+                <span
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: 3,
+                    padding: '2px 6px 2px 5px',
+                    background: T.gold,
+                    color: '#3F2A05',
+                    borderRadius: 99,
+                    fontSize: 9,
+                    fontWeight: 800,
+                    letterSpacing: '0.08em',
+                  }}
+                >
+                  <Trophy size={9} strokeWidth={2.5} />
+                  BEST
+                </span>
+              ) : round.is_counter ? (
+                <span
+                  style={{
+                    padding: '2px 6px',
+                    background: T.amber,
+                    color: '#FFFFFF',
+                    borderRadius: 99,
+                    fontSize: 9,
+                    fontWeight: 800,
+                    letterSpacing: '0.08em',
+                  }}
+                >
+                  COUNTER
+                </span>
+              ) : null}
+            </div>
+          )}
         </div>
         <div style={{ textAlign: 'right', flexShrink: 0 }}>
           <div
