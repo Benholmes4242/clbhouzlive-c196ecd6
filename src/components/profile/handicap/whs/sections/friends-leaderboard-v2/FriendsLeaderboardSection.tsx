@@ -136,15 +136,14 @@ export const FriendsLeaderboardSection: React.FC<Props> = ({ userId }) => {
         ))
       ) : (
         visible.map((entry, i) => {
-          const realRank =
-            sorted.findIndex((e) =>
-              entry.is_self
-                ? e.is_self
-                : e.friend_user_id === entry.friend_user_id &&
-                  e.friend_name === entry.friend_name,
-            ) + 1;
-
+          // Find the entry's index in the active cohort. Returns -1 for inactive
+          // rows (which are only visible when showInactive is true).
           const activeIdx = activeRows.findIndex((e) => e === entry);
+
+          // Rank within the active cohort. Inactive entries get a null rank — they
+          // aren't competing in the displayed leaderboard.
+          const activeRank: number | null = activeIdx >= 0 ? activeIdx + 1 : null;
+
           const isActiveAdjacent =
             !entry.is_self &&
             activeIdx >= 0 &&
