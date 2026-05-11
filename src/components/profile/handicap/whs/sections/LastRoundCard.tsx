@@ -429,13 +429,15 @@ const ToParDiffStrip: React.FC<{
 const HoleStrip: React.FC<{ holes: HoleRow[] }> = ({ holes }) => (
   <div style={{ display: 'flex', gap: 2, width: '100%' }}>
     {holes.map((h, i) => {
-      let color = WHITE_18;
+      let color: string = PAR_GREY;
       if (h.played && h.actual_gross != null && h.par != null) {
         const diff = h.actual_gross - h.par;
-        if (diff < 0) color = GREEN_BRIGHT;
-        else if (diff === 0) color = WHITE_18;
-        else if (diff === 1) color = AMBER;
-        else color = RED_BRIGHT;
+        if (h.actual_gross === 1) color = HOLE_GOLD;
+        else if (diff <= -2) color = EAGLE_GREEN;
+        else if (diff === -1) color = BIRDIE_GREEN;
+        else if (diff === 0) color = PAR_GREY;
+        else if (diff === 1) color = BOGEY_RED;
+        else color = DOUBLE_RED;
       }
       return (
         <div
