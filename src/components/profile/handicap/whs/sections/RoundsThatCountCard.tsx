@@ -399,11 +399,30 @@ export const RoundsThatCountCard: React.FC<Props> = ({ connectionId, currentHand
                 </>
               )}
 
+              {/* Scrub guide line */}
+              {scrubIdx !== null && (
+                <div
+                  aria-hidden
+                  style={{
+                    position: 'absolute',
+                    left: `${xFor(scrubIdx)}%`,
+                    top: CHART_TOP,
+                    bottom: CHART_BOTTOM,
+                    width: 1,
+                    background: AMBER,
+                    opacity: 0.35,
+                    pointerEvents: 'none',
+                    transform: 'translateX(-0.5px)',
+                  }}
+                />
+              )}
+
               {/* Dots — separate so we can use HTML for sizing */}
               {enriched.rounds.map((r, i) => {
                 const d = r.handicap_differential ?? 0;
                 const isSel = r.id === selectedRound.id;
                 const isLatest = i === enriched.rounds.length - 1;
+                const isActiveScrub = scrubIdx === i;
                 let dotSize: number;
                 let background: string;
                 let borderStyle: string;
@@ -428,50 +447,30 @@ export const RoundsThatCountCard: React.FC<Props> = ({ connectionId, currentHand
                   background = '#fff';
                   borderStyle = `1.5px solid ${AMBER}`;
                 }
-                const isOffChart = !r.is_counter && d > yMax;
-                const yPos = isOffChart ? CHART_TOP : yFor(d);
+                if (isActiveScrub) {
+                  dotSize = Math.max(dotSize, 12);
+                }
                 return (
-                  <button
+                  <div
                     key={r.id}
-                    onClick={() => setSelectedId(r.id)}
-                    aria-label={
-                      isOffChart
-                        ? `Round at ${r.course?.name ?? 'course'} (non-counter, differential ${d.toFixed(1)} — above chart range)`
-                        : `Round at ${r.course?.name ?? 'course'} (${r.is_counter ? 'counter' : 'non-counter'})`
-                    }
+                    aria-label={`Round at ${r.course?.name ?? 'course'} (${r.is_counter ? 'counter' : 'non-counter'})`}
                     style={{
                       position: 'absolute',
                       left: `${xFor(i)}%`,
-                      top: yPos,
+                      top: yFor(d),
                       width: dotSize, height: dotSize,
                       marginLeft: -dotSize / 2, marginTop: -dotSize / 2,
                       borderRadius: '50%',
                       background,
                       border: borderStyle,
-                      boxShadow: isSel ? `0 0 0 2px ${INK}` : 'none',
-                      cursor: 'pointer',
+                      boxShadow: isActiveScrub
+                        ? `0 0 0 3px rgba(247,147,30,0.18)`
+                        : isSel ? `0 0 0 2px ${INK}` : 'none',
                       padding: 0,
+                      pointerEvents: 'none',
                       zIndex: 2,
                     }}
-                  >
-                    {isOffChart && (
-                      <span
-                        aria-hidden
-                        style={{
-                          position: 'absolute',
-                          top: -10,
-                          left: '50%',
-                          transform: 'translateX(-50%)',
-                          fontSize: 10,
-                          lineHeight: 1,
-                          color: AMBER,
-                          fontWeight: 800,
-                        }}
-                      >
-                        ▲
-                      </span>
-                    )}
-                  </button>
+                  />
                 );
               })}
 
@@ -495,6 +494,97 @@ export const RoundsThatCountCard: React.FC<Props> = ({ connectionId, currentHand
                       zIndex: 1,
                     }}
                   />
+                );
+              })()}
+
+              {/* Scrub tooltip */}
+              {scrubIdx !== null && (() => {
+                const round = enriched.rounds[scrubIdx];
+                if (!round) return null;
+                const d = round.handicap_differential ?? 0;
+                const x = xFor(scrubIdx);
+                const y = yFor(d);
+                const flipBelow = y < CHART_TOP + innerH * 0.3;
+
+                let transform: string;
+                if (x < 18) {
+                  transform = flipBelow ? 'translate(0, 12px)' : 'translate(0, calc(-100% - 12px))';
+                } else if (x > 82) {
+                  transform = flipBelow ? 'translate(-100%, 12px)' : 'translate(-100%, calc(-100% - 12px))';
+                } else {
+                  transform = flipBelow ? 'translate(-50%, 12px)' : 'translate(-50%, calc(-100% - 12px))';
+                }
+
+                const courseName = round.course?.name ?? 'Unknown course';
+                const playedAt = round.play_date
+                  ? new Date(round.play_date).toLocaleDateString('en-GB', { day: '2-digit', month: 'short' })
+                  : '';
+
+                return (
+                  <div
+                    aria-hidden
+                    style={{
+                      position: 'absolute',
+                      left: `${x}%`,
+                      top: y,
+                      transform,
+                      pointerEvents: 'none',
+                      zIndex: 5,
+                    }}
+                  >
+                    <div style={{
+                      background: INK,
+                      color: '#fff',
+                      borderRadius: 10,
+                      padding: '8px 12px',
+                      boxShadow: '0 8px 24px rgba(15,23,42,0.20)',
+                      minWidth: 140,
+                      fontFamily: FONT_DISPLAY,
+                    }}>
+                      <div style={{
+                        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                        gap: 8, marginBottom: 3,
+                      }}>
+                        <span style={{
+                          fontSize: 9, fontWeight: 800,
+                          color: 'rgba(255,255,255,0.55)', letterSpacing: '0.12em',
+                        }}>
+                          ROUND {scrubIdx + 1}/{enriched.rounds.length}
+                        </span>
+                        <span style={{
+                          fontSize: 8.5, fontWeight: 800,
+                          color: round.is_counter ? AMBER : 'rgba(255,255,255,0.55)',
+                          letterSpacing: '0.10em',
+                        }}>
+                          {round.is_counter ? 'COUNTER' : 'DISCARDED'}
+                        </span>
+                      </div>
+                      <div style={{
+                        fontSize: 12, fontWeight: 700, color: '#fff',
+                        letterSpacing: '-0.01em', marginBottom: 1,
+                        whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
+                        maxWidth: 200,
+                      }}>
+                        {courseName}
+                      </div>
+                      <div style={{
+                        display: 'flex', alignItems: 'baseline',
+                        justifyContent: 'space-between', gap: 8, marginTop: 2,
+                      }}>
+                        <span style={{
+                          fontSize: 11, color: 'rgba(255,255,255,0.70)', fontWeight: 600,
+                        }}>
+                          {playedAt}
+                        </span>
+                        <span style={{
+                          fontSize: 14, fontWeight: 800, color: '#fff',
+                          fontVariantNumeric: 'tabular-nums', letterSpacing: '-0.02em',
+                        }}>
+                          {fmtDiff(d, { plus: true })}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
                 );
               })()}
             </div>
