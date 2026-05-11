@@ -194,7 +194,7 @@ const HomeCourseWeatherCard: React.FC<Props> = ({ club, userId }) => {
           <div
             style={{
               fontSize: 12,
-              fontWeight: 500,
+              fontWeight: 700,
               color: state.textMutedOnBg,
               marginTop: 4,
               fontVariantNumeric: 'tabular-nums',
@@ -213,8 +213,8 @@ const HomeCourseWeatherCard: React.FC<Props> = ({ club, userId }) => {
         >
           <div
             style={{
-              fontSize: 64,
-              fontWeight: 200,
+              fontSize: 48,
+              fontWeight: 800,
               lineHeight: 1,
               letterSpacing: '-0.055em',
               color: state.textOnBg,
