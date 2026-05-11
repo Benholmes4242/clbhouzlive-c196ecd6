@@ -146,23 +146,15 @@ export const RoundsThatCountCard: React.FC<Props> = ({ connectionId, currentHand
   const bestRound = enriched.rounds.find(r => r.is_best)!;
   const worstRound = enriched.rounds.find(r => r.is_worst)!;
 
-  // Y-axis range — driven by COUNTERS + cut target only. Non-counters that
-  // exceed yMax are visually clipped to the top of the chart (see dot render).
-  // This keeps the meaningful data (counters, cut line) prominent, instead
-  // of letting one bad round stretch the whole axis.
+  // Option A: honest axis. Include ALL rounds, not just counters.
+  // Non-counters with big differentials no longer get clipped — the
+  // chart range expands to fit them, so the line stays inside.
   const cutTarget = projection?.hasData ? projection.cutTarget : null;
-  const dataMin = enriched.minDiff;
-  const dataMax = Math.max(enriched.maxDiff, cutTarget ?? -Infinity);
-  // yMin: floor the actual minimum data point, no hardcoded floor and no
-  // extra padding below. If the lowest counter is +2.3, the chart starts at
-  // +2 — not −1. If the lowest counter is −0.7, the chart starts at −1.
-  const yMin = Math.floor(dataMin);
-  // yMax: ceiling the maximum data point with half a unit of padding above.
-  // The hardcoded floor of 4 stays so the chart always shows a meaningful
-  // range even when all counters cluster tightly. Non-counters that exceed
-  // yMax still render clipped to the top with a chevron (see dot render).
-  const yMax = Math.max(4, Math.ceil(dataMax + 0.5));
-  const ticks = generateTicks(yMin, yMax);
+  const allDiffs = enriched.rounds.map(r => r.handicap_differential ?? 0);
+  const dataMin = Math.min(...allDiffs);
+  const dataMax = Math.max(...allDiffs, cutTarget ?? -Infinity);
+
+  const { yMin, yMax, ticks } = computeAxis(dataMin, dataMax);
   const ySpan = yMax - yMin;
   const innerH = CHART_H - CHART_TOP - CHART_BOTTOM;
   const yFor = (diff: number) => CHART_TOP + ((yMax - diff) / ySpan) * innerH;
@@ -170,6 +162,23 @@ export const RoundsThatCountCard: React.FC<Props> = ({ connectionId, currentHand
   // X positions
   const colCount = enriched.rounds.length;
   const xFor = (idx: number) => ((idx + 0.5) / colCount) * 100; // % within plot area
+
+  const idxFromX = useCallback((clientX: number): number => {
+    const plot = plotRef.current;
+    if (!plot) return 0;
+    const rect = plot.getBoundingClientRect();
+    const xPct = ((clientX - rect.left) / rect.width) * 100;
+    let bestIdx = 0;
+    let bestDist = Infinity;
+    for (let i = 0; i < colCount; i++) {
+      const dist = Math.abs(((i + 0.5) / colCount) * 100 - xPct);
+      if (dist < bestDist) {
+        bestDist = dist;
+        bestIdx = i;
+      }
+    }
+    return bestIdx;
+  }, [colCount]);
 
   // SVG path
   const linePath = enriched.rounds
