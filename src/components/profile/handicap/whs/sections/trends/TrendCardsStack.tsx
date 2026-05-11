@@ -38,7 +38,7 @@ export const TrendCardsStack: React.FC<Props> = ({ connectionId, currentHandicap
   const [showInfo, setShowInfo] = useState(false);
 
   return (
-    <section style={{ padding: '0 20px', marginBottom: 28, fontFamily: FONT }}>
+    <section style={{ padding: '10px 20px 0', marginBottom: 28, fontFamily: FONT }}>
       {showHero ? (
         <div style={{ padding: '0 4px 16px' }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, marginBottom: 10 }}>
