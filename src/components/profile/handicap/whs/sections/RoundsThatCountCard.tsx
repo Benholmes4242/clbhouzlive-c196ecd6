@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { HelpCircle, TrendingDown, AlertTriangle, Minus } from 'lucide-react';
 import { useCounters, useAllScores } from '@/lib/whs/hooks';
 import { fmtDiff, fmtAxis } from '@/lib/whs/format';
@@ -96,6 +96,19 @@ export const RoundsThatCountCard: React.FC<Props> = ({ connectionId, currentHand
   const [scrubIdx, setScrubIdx] = useState<number | null>(null);
   const [isScrubbing, setIsScrubbing] = useState(false);
   const plotRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (scrubIdx === null) return;
+    const handlePointerDown = (e: PointerEvent) => {
+      const plot = plotRef.current;
+      if (!plot) return;
+      if (plot.contains(e.target as Node)) return;
+      setScrubIdx(null);
+      setSelectedId(null);
+    };
+    document.addEventListener('pointerdown', handlePointerDown);
+    return () => document.removeEventListener('pointerdown', handlePointerDown);
+  }, [scrubIdx]);
 
   const projection = useMemo(() => {
     if (!allScores || allScores.length < 8 || currentHandicap == null) return null;
@@ -672,7 +685,7 @@ export const RoundsThatCountCard: React.FC<Props> = ({ connectionId, currentHand
           display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)',
         }}>
           <StatCell
-            label="BEST" value={enriched.minDiff} dotColor={GREEN} valueColor={GREEN}
+            label="BEST COUNTER" value={enriched.minDiff} dotColor={GREEN} valueColor={GREEN}
             active={selectedRound.id === bestRound.id}
             onClick={() => setSelectedId(bestRound.id)}
             withRightBorder
@@ -682,7 +695,7 @@ export const RoundsThatCountCard: React.FC<Props> = ({ connectionId, currentHand
             disabled withRightBorder
           />
           <StatCell
-            label="WORST" value={enriched.maxDiff} dotColor={RED} valueColor={RED}
+            label="WORST COUNTER" value={enriched.maxDiff} dotColor={RED} valueColor={RED}
             active={selectedRound.id === worstRound.id}
             onClick={() => setSelectedId(worstRound.id)}
           />
