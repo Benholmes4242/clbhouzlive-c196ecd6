@@ -255,6 +255,7 @@ export const RoundDetailSheet: React.FC<Props> = ({ scoreId, open, onClose }) =>
                 gross={data.adjusted_gross}
                 stableford={data.stableford_points}
                 differential={data.handicap_differential}
+                handicapDelta={handicapDelta ?? null}
               />
 
               {/* SCORECARD */}
