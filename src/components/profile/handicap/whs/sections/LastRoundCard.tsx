@@ -166,8 +166,8 @@ export const LastRoundCard: React.FC<Props> = ({ connectionId }) => {
                 zIndex: 1,
                 display: 'flex',
                 flexDirection: 'column',
-                gap: 16,
-                padding: '16px 18px 14px',
+                gap: 12,
+                padding: '14px 18px 12px',
                 color: '#fff',
               }}
             >
@@ -207,7 +207,7 @@ export const LastRoundCard: React.FC<Props> = ({ connectionId }) => {
                         fontWeight: 700,
                         color: WHITE_55,
                         letterSpacing: '0.06em',
-                        marginTop: 4,
+                        marginTop: 3,
                         fontVariantNumeric: 'tabular-nums',
                       }}
                     >
@@ -228,7 +228,7 @@ export const LastRoundCard: React.FC<Props> = ({ connectionId }) => {
                       color: WHITE_45,
                       letterSpacing: '0.16em',
                       textTransform: 'uppercase',
-                      marginBottom: 4,
+                      marginBottom: 2,
                     }}
                   >
                     GROSS
@@ -287,8 +287,8 @@ export const LastRoundCard: React.FC<Props> = ({ connectionId }) => {
                 <div
                   style={{
                     borderTop: '1px solid rgba(255,255,255,0.14)',
-                    paddingTop: 12,
-                    marginTop: 4,
+                    paddingTop: 10,
+                    marginTop: 0,
                   }}
                 >
                   <div
@@ -298,7 +298,7 @@ export const LastRoundCard: React.FC<Props> = ({ connectionId }) => {
                       color: WHITE_45,
                       letterSpacing: '0.16em',
                       textTransform: 'uppercase',
-                      marginBottom: 8,
+                      marginBottom: 6,
                     }}
                   >
                     HOLE BY HOLE
@@ -328,7 +328,7 @@ const HcpImpactPill: React.FC<{ delta: number | null }> = ({ delta }) => {
   const Icon = isUnchanged ? Minus : isCut ? TrendingDown : TrendingUp;
   const iconColor = isUnchanged ? WHITE_65 : isCut ? GREEN_BRIGHT : RED_BRIGHT;
   const label = isUnchanged
-    ? 'HCP UNCHANGED'
+    ? 'FLAT'
     : isCut
     ? `↓ ${Math.abs(delta).toFixed(1)}`
     : `↑ ${Math.abs(delta).toFixed(1)}`;
@@ -337,21 +337,21 @@ const HcpImpactPill: React.FC<{ delta: number | null }> = ({ delta }) => {
       style={{
         display: 'inline-flex',
         alignItems: 'center',
-        gap: 5,
-        padding: '5px 9px',
+        gap: 4,
+        padding: '4px 7px',
         borderRadius: 999,
         background: 'rgba(255,255,255,0.10)',
         border: '0.5px solid rgba(255,255,255,0.18)',
         flexShrink: 0,
       }}
     >
-      <Icon size={11} color={iconColor} strokeWidth={2.5} />
+      <Icon size={10} color={iconColor} strokeWidth={2.5} />
       <span
         style={{
           fontSize: 9,
           fontWeight: 800,
           color: WHITE_85,
-          letterSpacing: '0.10em',
+          letterSpacing: '0.06em',
           textTransform: 'uppercase',
           fontVariantNumeric: 'tabular-nums',
         }}
