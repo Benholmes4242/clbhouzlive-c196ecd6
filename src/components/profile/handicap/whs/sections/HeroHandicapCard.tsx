@@ -571,7 +571,7 @@ const HeroHandicapCard: React.FC<Props> = ({ connection }) => {
       {/* Three-ring row */}
       <div style={{
         display: 'grid',
-        gridTemplateColumns: 'auto 1fr 1fr',
+        gridTemplateColumns: '1fr 1fr 1fr',
         alignItems: 'center',
         gap: 4,
         padding: '6px 0 4px',
