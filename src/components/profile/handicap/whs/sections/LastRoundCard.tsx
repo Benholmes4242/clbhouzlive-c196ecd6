@@ -85,7 +85,6 @@ export const LastRoundCard: React.FC<Props> = ({ connectionId }) => {
     );
   }
 
-  const delta = lastRound.handicap_delta ?? null;
   const par = (lastRound.course as any)?.par ?? null;
 
   return (
