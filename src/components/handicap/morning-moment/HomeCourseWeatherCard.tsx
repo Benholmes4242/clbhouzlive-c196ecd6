@@ -2,18 +2,29 @@
  * HomeCourseWeatherCard — scene-as-backdrop morning weather card.
  *
  * The condition is the visual identity: a gradient sky fills the entire
- * card surface, with optional pattern overlays (rain streaks, wind lines).
- * Data floats on top — eyebrow, hero condition + temp, and a 3-cell data
- * strip (wind, rain%, sunset).
+ * card surface, optionally overlaid with seamlessly-animated rain or wind
+ * patterns. Data floats on top — eyebrow (club + location + updated),
+ * hero condition + temp + trend arrow, and a 3-cell data strip
+ * (wind / rain% / time-aware temporal cell).
  *
  * Failure paths silently hide the card (Phase 27 will add explicit UI).
  */
-import React from 'react';
-import { Wind, Droplets, Sunset } from 'lucide-react';
+import React, { useMemo } from 'react';
+import { Wind, Droplets, Sunset, Sunrise, ArrowUp, ArrowDown } from 'lucide-react';
 import { useHomeCourseWeather, WeatherUnresolvedError } from '@/lib/weather/useHomeCourseWeather';
-import { pickConditionState, type WeatherPattern } from '@/lib/weather/conditionPalette';
+import {
+  pickConditionState,
+  warpGradient,
+  buildBackgroundCss,
+  pickTemporalMode,
+  pickTemperatureTrend,
+  formatUpdatedAt,
+  shouldShowTrajectory,
+} from '@/lib/weather/conditionPalette';
 import type { ClubLocation, WeatherUnresolvedReason } from '@/lib/weather/types';
 import { analyticsEvents } from '@/utils/analyticsEvents';
+import RainPattern from './weather-patterns/RainPattern';
+import WindPattern from './weather-patterns/WindPattern';
 
 interface Props {
   club: ClubLocation;
@@ -27,16 +38,18 @@ const compass = (deg: number): string => {
   return dirs[Math.round((((deg % 360) + 360) % 360) / 45) % 8];
 };
 
-const formatClubLine = (clubName: string, fetchedAt: number): string => {
-  const d = new Date(fetchedAt);
-  const month = d.toLocaleDateString('en-GB', { month: 'short' }).toUpperCase();
-  const day = d.toLocaleDateString('en-GB', { weekday: 'short' }).toUpperCase();
-  return `${clubName.toUpperCase()} · ${day} ${d.getDate()} ${month}`;
+const buildLocationLabel = (club: ClubLocation): string => {
+  const parts: string[] = [];
+  if (club.region) parts.push(club.region);
+  if (club.sub_country) parts.push(club.sub_country);
+  else if (club.country && parts.length === 0) parts.push(club.country);
+  return parts.join(', ');
 };
 
 const HomeCourseWeatherCard: React.FC<Props> = ({ club, userId }) => {
   const { data: weather, isLoading, isError, error } = useHomeCourseWeather(club);
 
+  // Preserve existing telemetry on unresolved.
   const hasFiredUnresolved = React.useRef(false);
   React.useEffect(() => {
     if (isLoading) return;
@@ -56,10 +69,25 @@ const HomeCourseWeatherCard: React.FC<Props> = ({ club, userId }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isLoading, isError, weather, error, club.id]);
 
+  const updatedLabel = useMemo(
+    () => (weather ? formatUpdatedAt(weather.fetchedAt) : ''),
+    [weather?.fetchedAt],
+  );
+
   if (isLoading) return <Skeleton />;
   if (isError || !weather) return null;
 
   const state = pickConditionState(weather);
+  const warped = warpGradient(state, weather.dayProgress);
+  const background = buildBackgroundCss(warped);
+  const temporal = pickTemporalMode(weather);
+  const trend = pickTemperatureTrend(weather);
+  const showTraj = shouldShowTrajectory(weather);
+  const locationLabel = buildLocationLabel(club);
+
+  const subLine = showTraj
+    ? `feels like ${Math.round(weather.apparentTemperature)}° · peak ${Math.round(weather.peakTempToday)}° at ${weather.peakTempTimeLabel}`
+    : `feels like ${Math.round(weather.apparentTemperature)}°`;
 
   return (
     <div
@@ -70,7 +98,7 @@ const HomeCourseWeatherCard: React.FC<Props> = ({ club, userId }) => {
         width: '100%',
         borderRadius: 18,
         overflow: 'hidden',
-        background: `linear-gradient(180deg, ${state.skyTop} 0%, ${state.skyBottom} 100%)`,
+        background,
         padding: '14px 16px 14px',
         marginBottom: 8,
         fontFamily: FONT,
@@ -80,25 +108,61 @@ const HomeCourseWeatherCard: React.FC<Props> = ({ club, userId }) => {
         flexDirection: 'column',
       }}
     >
-      {state.pattern !== 'none' && (
-        <PatternLayer pattern={state.pattern} accent={state.accent} />
-      )}
+      {state.pattern === 'rain' && <RainPattern accent={state.accent} />}
+      {state.pattern === 'wind' && <WindPattern accent={state.accent} />}
 
-      {/* Eyebrow */}
-      <div style={{ position: 'relative', zIndex: 1 }}>
+      {/* Eyebrow row */}
+      <div
+        style={{
+          position: 'relative',
+          zIndex: 2,
+          display: 'flex',
+          alignItems: 'flex-start',
+          justifyContent: 'space-between',
+          gap: 8,
+        }}
+      >
+        <div style={{ minWidth: 0, flex: 1 }}>
+          <div
+            style={{
+              fontSize: 11,
+              fontWeight: 700,
+              color: state.textMutedOnBg,
+              letterSpacing: '0.02em',
+              whiteSpace: 'nowrap',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+            }}
+          >
+            {club.name}
+          </div>
+          {locationLabel && (
+            <div
+              style={{
+                fontSize: 11,
+                fontWeight: 500,
+                color: state.textMutedOnBg,
+                marginTop: 1,
+                whiteSpace: 'nowrap',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+              }}
+            >
+              {locationLabel}
+            </div>
+          )}
+        </div>
         <div
           style={{
-            fontSize: 9,
-            fontWeight: 600,
-            letterSpacing: '0.16em',
-            textTransform: 'uppercase',
+            fontSize: 10,
+            fontWeight: 500,
             color: state.textMutedOnBg,
             whiteSpace: 'nowrap',
-            overflow: 'hidden',
-            textOverflow: 'ellipsis',
+            flexShrink: 0,
+            paddingTop: 1,
           }}
         >
-          {formatClubLine(club.name, weather.fetchedAt)}
+          updated {updatedLabel}
         </div>
       </div>
 
@@ -106,12 +170,12 @@ const HomeCourseWeatherCard: React.FC<Props> = ({ club, userId }) => {
       <div
         style={{
           position: 'relative',
-          zIndex: 1,
+          zIndex: 2,
           display: 'flex',
           alignItems: 'flex-end',
           justifyContent: 'space-between',
           gap: 12,
-          marginTop: 18,
+          marginTop: 14,
           flex: 1,
         }}
       >
@@ -119,11 +183,10 @@ const HomeCourseWeatherCard: React.FC<Props> = ({ club, userId }) => {
           <div
             style={{
               fontSize: 22,
-              fontWeight: 500,
+              fontWeight: 800,
               lineHeight: 1.1,
               letterSpacing: '-0.01em',
               color: state.textOnBg,
-              textTransform: 'capitalize',
             }}
           >
             {weather.description}
@@ -137,21 +200,46 @@ const HomeCourseWeatherCard: React.FC<Props> = ({ club, userId }) => {
               fontVariantNumeric: 'tabular-nums',
             }}
           >
-            feels like {Math.round(weather.apparentTemperature)}°
+            {subLine}
           </div>
         </div>
         <div
           style={{
-            fontSize: 64,
-            fontWeight: 200,
-            lineHeight: 1,
-            letterSpacing: '-0.055em',
-            color: state.textOnBg,
-            fontVariantNumeric: 'tabular-nums',
+            display: 'flex',
+            alignItems: 'flex-start',
+            gap: 2,
             flexShrink: 0,
           }}
         >
-          {Math.round(weather.temperature)}°
+          <div
+            style={{
+              fontSize: 64,
+              fontWeight: 200,
+              lineHeight: 1,
+              letterSpacing: '-0.055em',
+              color: state.textOnBg,
+              fontVariantNumeric: 'tabular-nums',
+            }}
+          >
+            {Math.round(weather.temperature)}°
+          </div>
+          {trend !== 'steady' && (
+            <span
+              aria-label={trend === 'rising' ? 'temperature rising' : 'temperature falling'}
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                marginTop: 6,
+                color: state.textMutedOnBg,
+              }}
+            >
+              {trend === 'rising' ? (
+                <ArrowUp size={14} strokeWidth={2.25} />
+              ) : (
+                <ArrowDown size={14} strokeWidth={2.25} />
+              )}
+            </span>
+          )}
         </div>
       </div>
 
@@ -159,7 +247,7 @@ const HomeCourseWeatherCard: React.FC<Props> = ({ club, userId }) => {
       <div
         style={{
           position: 'relative',
-          zIndex: 1,
+          zIndex: 2,
           display: 'flex',
           marginTop: 14,
           paddingTop: 12,
@@ -170,7 +258,7 @@ const HomeCourseWeatherCard: React.FC<Props> = ({ club, userId }) => {
           icon={<Wind size={11} strokeWidth={2} color={state.textMutedOnBg} />}
           value={String(Math.round(weather.windSpeed))}
           unit="mph"
-          sub={`${compass(weather.windDirection)} · g${Math.round(weather.windGust)}`}
+          sub={`${compass(weather.windDirection)} · gust ${Math.round(weather.windGust)}`}
           textOnBg={state.textOnBg}
           textMutedOnBg={state.textMutedOnBg}
         />
@@ -184,10 +272,16 @@ const HomeCourseWeatherCard: React.FC<Props> = ({ club, userId }) => {
           dividerLeft={state.hairlineOnBg}
         />
         <DataCell
-          icon={<Sunset size={11} strokeWidth={2} color={state.textMutedOnBg} />}
-          value={weather.sunsetTime}
+          icon={
+            temporal.iconType === 'sunrise' ? (
+              <Sunrise size={11} strokeWidth={2} color={state.textMutedOnBg} />
+            ) : (
+              <Sunset size={11} strokeWidth={2} color={state.textMutedOnBg} />
+            )
+          }
+          value={temporal.value}
           unit=""
-          sub="sunset"
+          sub={temporal.sub}
           textOnBg={state.textOnBg}
           textMutedOnBg={state.textMutedOnBg}
           dividerLeft={state.hairlineOnBg}
@@ -196,8 +290,6 @@ const HomeCourseWeatherCard: React.FC<Props> = ({ club, userId }) => {
     </div>
   );
 };
-
-// ── Sub-components ──────────────────────────────────────────────────
 
 const DataCell: React.FC<{
   icon: React.ReactNode;
@@ -263,85 +355,6 @@ const DataCell: React.FC<{
     </div>
   </div>
 );
-
-const PatternLayer: React.FC<{ pattern: WeatherPattern; accent: string }> = ({
-  pattern,
-  accent,
-}) => {
-  if (pattern === 'rain') {
-    return (
-      <svg
-        aria-hidden
-        style={{
-          position: 'absolute',
-          inset: 0,
-          width: '100%',
-          height: '100%',
-          pointerEvents: 'none',
-          zIndex: 0,
-        }}
-        preserveAspectRatio="none"
-        viewBox="0 0 420 200"
-      >
-        {Array.from({ length: 32 }).map((_, i) => {
-          const x = (i * 41 + 20) % 420;
-          const yStart = ((i * 27) % 70) - 20;
-          return (
-            <line
-              key={i}
-              x1={x}
-              y1={yStart}
-              x2={x - 14}
-              y2={yStart + 28}
-              stroke={accent}
-              strokeWidth={1}
-              strokeLinecap="round"
-              opacity={0.32}
-            />
-          );
-        })}
-      </svg>
-    );
-  }
-  if (pattern === 'wind') {
-    return (
-      <svg
-        aria-hidden
-        style={{
-          position: 'absolute',
-          inset: 0,
-          width: '100%',
-          height: '100%',
-          pointerEvents: 'none',
-          zIndex: 0,
-        }}
-        preserveAspectRatio="none"
-        viewBox="0 0 420 200"
-      >
-        {[
-          { y: 25, opacity: 0.22, len: 220, x: 60 },
-          { y: 55, opacity: 0.28, len: 280, x: 100 },
-          { y: 95, opacity: 0.2, len: 200, x: 40 },
-          { y: 135, opacity: 0.24, len: 260, x: 80 },
-          { y: 170, opacity: 0.18, len: 180, x: 140 },
-        ].map((line, i) => (
-          <line
-            key={i}
-            x1={line.x}
-            y1={line.y}
-            x2={line.x + line.len}
-            y2={line.y}
-            stroke={accent}
-            strokeWidth={1.25}
-            strokeLinecap="round"
-            opacity={line.opacity}
-          />
-        ))}
-      </svg>
-    );
-  }
-  return null;
-};
 
 const Skeleton: React.FC = () => (
   <div
