@@ -243,7 +243,7 @@ export const FriendRoundSheet: React.FC<Props> = ({ activity, open, onClose }) =
                   gross={activity.last_round_adjusted_gross}
                   stableford={activity.last_round_stableford}
                   differential={activity.last_round_differential}
-                  handicapDelta={null}
+                  
                 />
 
                 {isClbhouz ? (

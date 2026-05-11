@@ -255,7 +255,6 @@ export const RoundDetailSheet: React.FC<Props> = ({ scoreId, open, onClose, hand
                 gross={data.adjusted_gross}
                 stableford={data.stableford_points}
                 differential={data.handicap_differential}
-                handicapDelta={handicapDelta ?? null}
               />
 
               {/* SCORECARD */}
@@ -326,7 +325,7 @@ export const RoundDetailSheet: React.FC<Props> = ({ scoreId, open, onClose, hand
                     style={{
                       display: 'inline-flex',
                       alignItems: 'baseline',
-                      gap: 6,
+                      gap: 8,
                       fontVariantNumeric: 'tabular-nums',
                     }}
                   >
@@ -345,17 +344,34 @@ export const RoundDetailSheet: React.FC<Props> = ({ scoreId, open, onClose, hand
                     {handicapDelta != null &&
                       Math.abs(handicapDelta) >= 0.05 &&
                       data.handicap_index_at_time != null && (
-                        <span
-                          style={{
-                            fontSize: 11,
-                            fontWeight: 700,
-                            color: 'rgba(15,23,42,0.40)',
-                            textDecoration: 'line-through',
-                            textDecorationColor: 'rgba(15,23,42,0.30)',
-                          }}
-                        >
-                          {(data.handicap_index_at_time - handicapDelta).toFixed(1)}
-                        </span>
+                        <>
+                          <span
+                            style={{
+                              fontSize: 11,
+                              fontWeight: 700,
+                              color: 'rgba(15,23,42,0.40)',
+                              textDecoration: 'line-through',
+                              textDecorationColor: 'rgba(15,23,42,0.30)',
+                            }}
+                          >
+                            {(data.handicap_index_at_time - handicapDelta).toFixed(1)}
+                          </span>
+                          <span
+                            style={{
+                              fontSize: 12,
+                              fontWeight: 800,
+                              color: handicapDelta < 0 ? '#10B981' : '#E11D48',
+                              letterSpacing: '0.02em',
+                              display: 'inline-flex',
+                              alignItems: 'baseline',
+                              gap: 2,
+                            }}
+                          >
+                            {handicapDelta < 0 ? '\u2193' : '\u2191'}
+                            {' '}
+                            {Math.abs(handicapDelta).toFixed(1)}
+                          </span>
+                        </>
                       )}
                   </span>
                 </div>
