@@ -737,15 +737,15 @@ const HeroHandicapCard: React.FC<Props> = ({ connection }) => {
           {scratchBand && (
             <g>
               <rect
-                x={0}
+                x={PAD_LEFT}
                 y={scratchBand.yTop}
-                width={W}
+                width={W - PAD_LEFT - PAD_RIGHT}
                 height={scratchBand.height}
                 fill={GREEN}
                 opacity={0.05}
               />
               <text
-                x={6}
+                x={PAD_LEFT + 6}
                 y={scratchBand.yTop + scratchBand.height - 4}
                 fontSize={9}
                 fontWeight={700}
