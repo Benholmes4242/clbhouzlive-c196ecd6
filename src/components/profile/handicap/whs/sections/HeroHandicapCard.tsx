@@ -705,7 +705,7 @@ const HeroHandicapCard: React.FC<Props> = ({ connection }) => {
           fontSize: 9, fontWeight: 800, color: AMBER,
           letterSpacing: '0.16em', textTransform: 'uppercase',
         }}>
-          Index over time
+          {range === 30 ? '30-day index' : range === 365 ? '1-year index' : 'Lifetime index'}
         </span>
       </div>
 
