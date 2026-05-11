@@ -55,7 +55,8 @@ const W = 340;
 const H = 110;
 const PAD_TOP = 22;
 const PAD_BOTTOM = 22;
-const PAD_RIGHT = 8;
+const PAD_LEFT = 14;
+const PAD_RIGHT = 14;
 
 // ── Milestone progress ────────────────────────────────────────────────────
 function calcMilestoneProgress(h: number) {
@@ -112,18 +113,17 @@ function calcMonthlyMovement(delta: number | null) {
  * ranges — the user's "FORM" is always one of these five words.
  */
 function formStateLabel(formStrokes: number): { title: string; sub: string } {
-  if (formStrokes > 1.0) {
-    return { title: 'ON FIRE', sub: `+${formStrokes.toFixed(1)} vs handicap` };
-  }
-  if (formStrokes > 0.1) {
-    return { title: 'WARM', sub: `+${formStrokes.toFixed(1)} vs handicap` };
-  }
-  if (formStrokes < -1.0) {
-    return { title: 'ICE COLD', sub: `${fmtDiff(formStrokes)} vs handicap` };
-  }
-  if (formStrokes < -0.1) {
-    return { title: 'COLD', sub: `${fmtDiff(formStrokes)} vs handicap` };
-  }
+  // Display sign convention: negative = below handicap (good), positive
+  // = above handicap (bad). Internal formStrokes uses the opposite sign
+  // (positive = hot) for ring-fill math, so negate for display only.
+  const display = -formStrokes;
+  const sign = display >= 0 ? '+' : '\u2212';
+  const subStr = `${sign}${Math.abs(display).toFixed(1)} vs handicap`;
+
+  if (formStrokes > 1.0) return { title: 'ON FIRE', sub: subStr };
+  if (formStrokes > 0.1) return { title: 'WARM', sub: subStr };
+  if (formStrokes < -1.0) return { title: 'ICE COLD', sub: subStr };
+  if (formStrokes < -0.1) return { title: 'COLD', sub: subStr };
   return { title: 'STEADY', sub: 'On handicap' };
 }
 
@@ -174,7 +174,7 @@ const HeroHandicapCard: React.FC<Props> = ({ connection }) => {
     const max = Math.max(...values);
     const r = max - min || 1;
     return points.map((p, i) => {
-      const x = points.length === 1 ? W / 2 : (i / (points.length - 1)) * (W - PAD_RIGHT);
+      const x = points.length === 1 ? W / 2 : PAD_LEFT + (i / (points.length - 1)) * (W - PAD_LEFT - PAD_RIGHT);
       const y = PAD_TOP + ((max - p.handicap_index) / r) * (H - PAD_TOP - PAD_BOTTOM);
       return { x, y, idx: i };
     });
