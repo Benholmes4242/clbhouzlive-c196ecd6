@@ -864,7 +864,7 @@ const HeroHandicapCard: React.FC<Props> = ({ connection }) => {
                   y={labelAbove ? last.y - 8 : last.y + 16}
                   fontSize={11}
                   fontWeight={700}
-                  fill={INK}
+                  fill={AMBER}
                   textAnchor="end"
                 >
                   {formatDisplayedHcp(lastValue)}
