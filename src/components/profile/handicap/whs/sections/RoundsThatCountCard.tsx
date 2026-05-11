@@ -1,7 +1,6 @@
-import React, { useMemo, useState } from 'react';
+import React, { useCallback, useMemo, useRef, useState } from 'react';
 import { HelpCircle, TrendingDown, AlertTriangle, Minus } from 'lucide-react';
 import { useCounters, useAllScores } from '@/lib/whs/hooks';
-import { useHandicapInsights } from '@/lib/whs/insights/useHandicapInsights';
 import { fmtDiff, fmtAxis } from '@/lib/whs/format';
 import { projectNextRound } from '@/lib/whs/handicapMath';
 import HandicapExplainerSheet from './HandicapExplainerSheet';
@@ -40,27 +39,36 @@ const Y_AXIS_W = 30;
 const CHART_TOP = 14;
 const CHART_BOTTOM = 14;
 
-function generateTicks(yMin: number, yMax: number): number[] {
-  const ticks: number[] = [];
-  for (let v = yMax; v >= yMin; v--) ticks.push(v);
-  return ticks;
-}
+/**
+ * Compute clean axis bounds and ticks for a differential chart.
+ * - Both bounds snap to step multiples so ticks land cleanly
+ *   on both top and bottom edges (no orphan ticks).
+ * - Step picked based on data span: 1 (≤4), 2 (≤10), 5 (≤25), 10 (larger).
+ * - No padding above or below the data range.
+ */
+function computeAxis(dataMin: number, dataMax: number): {
+  yMin: number;
+  yMax: number;
+  ticks: number[];
+  step: number;
+} {
+  const rawMin = Math.floor(dataMin);
+  const rawMax = Math.ceil(dataMax);
+  const rawSpan = Math.max(rawMax - rawMin, 1);
 
-function renderBoldMarkdown(text: string): React.ReactNode {
-  if (!text) return null;
-  const parts = text.split(/\*\*(.*?)\*\*/g);
-  return parts.map((part, i) =>
-    i % 2 === 1
-      ? (
-        <strong key={i} style={{
-          fontFamily: FONT_DISPLAY, fontWeight: 600, color: INK,
-          fontVariantNumeric: 'tabular-nums',
-        }}>
-          {part}
-        </strong>
-      )
-      : <span key={i}>{part}</span>
-  );
+  let step: number;
+  if (rawSpan <= 4) step = 1;
+  else if (rawSpan <= 10) step = 2;
+  else if (rawSpan <= 25) step = 5;
+  else step = 10;
+
+  const yMin = Math.floor(rawMin / step) * step;
+  const yMax = Math.ceil(rawMax / step) * step;
+
+  const ticks: number[] = [];
+  for (let v = yMax; v >= yMin; v -= step) ticks.push(v);
+
+  return { yMin, yMax, ticks, step };
 }
 
 const Skeleton: React.FC = () => (
@@ -82,10 +90,12 @@ const Skeleton: React.FC = () => (
 
 export const RoundsThatCountCard: React.FC<Props> = ({ connectionId, currentHandicap }) => {
   const { data: counters, isLoading: loadingCounters } = useCounters(connectionId);
-  const { data: insights } = useHandicapInsights(connectionId);
   const { data: allScores } = useAllScores(connectionId);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [showExplainer, setShowExplainer] = useState(false);
+  const [scrubIdx, setScrubIdx] = useState<number | null>(null);
+  const [isScrubbing, setIsScrubbing] = useState(false);
+  const plotRef = useRef<HTMLDivElement>(null);
 
   const projection = useMemo(() => {
     if (!allScores || allScores.length < 8 || currentHandicap == null) return null;
@@ -136,23 +146,15 @@ export const RoundsThatCountCard: React.FC<Props> = ({ connectionId, currentHand
   const bestRound = enriched.rounds.find(r => r.is_best)!;
   const worstRound = enriched.rounds.find(r => r.is_worst)!;
 
-  // Y-axis range — driven by COUNTERS + cut target only. Non-counters that
-  // exceed yMax are visually clipped to the top of the chart (see dot render).
-  // This keeps the meaningful data (counters, cut line) prominent, instead
-  // of letting one bad round stretch the whole axis.
+  // Option A: honest axis. Include ALL rounds, not just counters.
+  // Non-counters with big differentials no longer get clipped — the
+  // chart range expands to fit them, so the line stays inside.
   const cutTarget = projection?.hasData ? projection.cutTarget : null;
-  const dataMin = enriched.minDiff;
-  const dataMax = Math.max(enriched.maxDiff, cutTarget ?? -Infinity);
-  // yMin: floor the actual minimum data point, no hardcoded floor and no
-  // extra padding below. If the lowest counter is +2.3, the chart starts at
-  // +2 — not −1. If the lowest counter is −0.7, the chart starts at −1.
-  const yMin = Math.floor(dataMin);
-  // yMax: ceiling the maximum data point with half a unit of padding above.
-  // The hardcoded floor of 4 stays so the chart always shows a meaningful
-  // range even when all counters cluster tightly. Non-counters that exceed
-  // yMax still render clipped to the top with a chevron (see dot render).
-  const yMax = Math.max(4, Math.ceil(dataMax + 0.5));
-  const ticks = generateTicks(yMin, yMax);
+  const allDiffs = enriched.rounds.map(r => r.handicap_differential ?? 0);
+  const dataMin = Math.min(...allDiffs);
+  const dataMax = Math.max(...allDiffs, cutTarget ?? -Infinity);
+
+  const { yMin, yMax, ticks } = computeAxis(dataMin, dataMax);
   const ySpan = yMax - yMin;
   const innerH = CHART_H - CHART_TOP - CHART_BOTTOM;
   const yFor = (diff: number) => CHART_TOP + ((yMax - diff) / ySpan) * innerH;
@@ -160,6 +162,23 @@ export const RoundsThatCountCard: React.FC<Props> = ({ connectionId, currentHand
   // X positions
   const colCount = enriched.rounds.length;
   const xFor = (idx: number) => ((idx + 0.5) / colCount) * 100; // % within plot area
+
+  const idxFromX = useCallback((clientX: number): number => {
+    const plot = plotRef.current;
+    if (!plot) return 0;
+    const rect = plot.getBoundingClientRect();
+    const xPct = ((clientX - rect.left) / rect.width) * 100;
+    let bestIdx = 0;
+    let bestDist = Infinity;
+    for (let i = 0; i < colCount; i++) {
+      const dist = Math.abs(((i + 0.5) / colCount) * 100 - xPct);
+      if (dist < bestDist) {
+        bestDist = dist;
+        bestIdx = i;
+      }
+    }
+    return bestIdx;
+  }, [colCount]);
 
   // SVG path
   const linePath = enriched.rounds
@@ -171,47 +190,10 @@ export const RoundsThatCountCard: React.FC<Props> = ({ connectionId, currentHand
     })
     .join(' ');
 
-  // Banner content
-  const bannerText = insights?.rounds_pattern
-    || 'Your handicap is built from these 8 rounds.';
-
   return (
     <section style={{ marginTop: 28 }}>
       <SectionHeader eyebrow="ROUNDS THAT COUNT" title="The 8 best of your last 20" />
       <div style={{ padding: '0 20px' }}>
-
-      {/* Echo insight banner */}
-      <div style={{
-        display: 'flex', alignItems: 'flex-start', gap: 10,
-        background: AMBER_TINT_06,
-        border: `0.5px solid ${AMBER_BORDER}`,
-        borderRadius: 12,
-        padding: '10px 12px',
-        marginBottom: 12,
-      }}>
-        <div style={{
-          width: 22, height: 22, borderRadius: '50%', flexShrink: 0,
-          background: `linear-gradient(135deg, ${AMBER}, ${AMBER_DEEP})`,
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          boxShadow: '0 2px 8px rgba(247,147,30,0.30)',
-        }}>
-          <svg width="11" height="11" viewBox="0 0 11 11" fill="none">
-            {[1, 3, 5, 7, 9].map((x, i) => {
-              const heights = [3, 6, 9, 6, 3];
-              const h = heights[i];
-              return (
-                <rect key={x} x={x - 0.5} y={(11 - h) / 2} width="1.4" height={h}
-                  rx="0.7" fill="#fff" />
-              );
-            })}
-          </svg>
-        </div>
-        <p style={{
-          margin: 0, fontSize: 12, color: INK_70, lineHeight: 1.45,
-        }}>
-          {renderBoldMarkdown(bannerText)}
-        </p>
-      </div>
 
       {/* Chart — full-bleed on page background, no card wrapper */}
       <div style={{ padding: '4px 0 12px' }}>
@@ -291,9 +273,32 @@ export const RoundsThatCountCard: React.FC<Props> = ({ connectionId, currentHand
             </div>
 
             {/* Plot area */}
-            <div style={{
-              flex: 1, position: 'relative', height: CHART_H,
-            }}>
+            <div
+              ref={plotRef}
+              onPointerDown={(e) => {
+                e.currentTarget.setPointerCapture(e.pointerId);
+                setIsScrubbing(true);
+                const idx = idxFromX(e.clientX);
+                setScrubIdx(idx);
+                setSelectedId(enriched.rounds[idx].id);
+              }}
+              onPointerMove={(e) => {
+                if (!isScrubbing) return;
+                const idx = idxFromX(e.clientX);
+                setScrubIdx(idx);
+                setSelectedId(enriched.rounds[idx].id);
+              }}
+              onPointerUp={() => setIsScrubbing(false)}
+              onPointerCancel={() => setIsScrubbing(false)}
+              style={{
+                flex: 1,
+                position: 'relative',
+                height: CHART_H,
+                touchAction: 'pan-y',
+                cursor: isScrubbing ? 'grabbing' : 'crosshair',
+                userSelect: 'none',
+              }}
+            >
               {/* Permanent latest emphasis band — centered on the last dot */}
               {(() => {
                 const latestIdx = enriched.rounds.length - 1;
@@ -394,11 +399,30 @@ export const RoundsThatCountCard: React.FC<Props> = ({ connectionId, currentHand
                 </>
               )}
 
+              {/* Scrub guide line */}
+              {scrubIdx !== null && (
+                <div
+                  aria-hidden
+                  style={{
+                    position: 'absolute',
+                    left: `${xFor(scrubIdx)}%`,
+                    top: CHART_TOP,
+                    bottom: CHART_BOTTOM,
+                    width: 1,
+                    background: AMBER,
+                    opacity: 0.35,
+                    pointerEvents: 'none',
+                    transform: 'translateX(-0.5px)',
+                  }}
+                />
+              )}
+
               {/* Dots — separate so we can use HTML for sizing */}
               {enriched.rounds.map((r, i) => {
                 const d = r.handicap_differential ?? 0;
                 const isSel = r.id === selectedRound.id;
                 const isLatest = i === enriched.rounds.length - 1;
+                const isActiveScrub = scrubIdx === i;
                 let dotSize: number;
                 let background: string;
                 let borderStyle: string;
@@ -423,50 +447,30 @@ export const RoundsThatCountCard: React.FC<Props> = ({ connectionId, currentHand
                   background = '#fff';
                   borderStyle = `1.5px solid ${AMBER}`;
                 }
-                const isOffChart = !r.is_counter && d > yMax;
-                const yPos = isOffChart ? CHART_TOP : yFor(d);
+                if (isActiveScrub) {
+                  dotSize = Math.max(dotSize, 12);
+                }
                 return (
-                  <button
+                  <div
                     key={r.id}
-                    onClick={() => setSelectedId(r.id)}
-                    aria-label={
-                      isOffChart
-                        ? `Round at ${r.course?.name ?? 'course'} (non-counter, differential ${d.toFixed(1)} — above chart range)`
-                        : `Round at ${r.course?.name ?? 'course'} (${r.is_counter ? 'counter' : 'non-counter'})`
-                    }
+                    aria-label={`Round at ${r.course?.name ?? 'course'} (${r.is_counter ? 'counter' : 'non-counter'})`}
                     style={{
                       position: 'absolute',
                       left: `${xFor(i)}%`,
-                      top: yPos,
+                      top: yFor(d),
                       width: dotSize, height: dotSize,
                       marginLeft: -dotSize / 2, marginTop: -dotSize / 2,
                       borderRadius: '50%',
                       background,
                       border: borderStyle,
-                      boxShadow: isSel ? `0 0 0 2px ${INK}` : 'none',
-                      cursor: 'pointer',
+                      boxShadow: isActiveScrub
+                        ? `0 0 0 3px rgba(247,147,30,0.18)`
+                        : isSel ? `0 0 0 2px ${INK}` : 'none',
                       padding: 0,
+                      pointerEvents: 'none',
                       zIndex: 2,
                     }}
-                  >
-                    {isOffChart && (
-                      <span
-                        aria-hidden
-                        style={{
-                          position: 'absolute',
-                          top: -10,
-                          left: '50%',
-                          transform: 'translateX(-50%)',
-                          fontSize: 10,
-                          lineHeight: 1,
-                          color: AMBER,
-                          fontWeight: 800,
-                        }}
-                      >
-                        ▲
-                      </span>
-                    )}
-                  </button>
+                  />
                 );
               })}
 
@@ -490,6 +494,97 @@ export const RoundsThatCountCard: React.FC<Props> = ({ connectionId, currentHand
                       zIndex: 1,
                     }}
                   />
+                );
+              })()}
+
+              {/* Scrub tooltip */}
+              {scrubIdx !== null && (() => {
+                const round = enriched.rounds[scrubIdx];
+                if (!round) return null;
+                const d = round.handicap_differential ?? 0;
+                const x = xFor(scrubIdx);
+                const y = yFor(d);
+                const flipBelow = y < CHART_TOP + innerH * 0.3;
+
+                let transform: string;
+                if (x < 18) {
+                  transform = flipBelow ? 'translate(0, 12px)' : 'translate(0, calc(-100% - 12px))';
+                } else if (x > 82) {
+                  transform = flipBelow ? 'translate(-100%, 12px)' : 'translate(-100%, calc(-100% - 12px))';
+                } else {
+                  transform = flipBelow ? 'translate(-50%, 12px)' : 'translate(-50%, calc(-100% - 12px))';
+                }
+
+                const courseName = round.course?.name ?? 'Unknown course';
+                const playedAt = round.play_date
+                  ? new Date(round.play_date).toLocaleDateString('en-GB', { day: '2-digit', month: 'short' })
+                  : '';
+
+                return (
+                  <div
+                    aria-hidden
+                    style={{
+                      position: 'absolute',
+                      left: `${x}%`,
+                      top: y,
+                      transform,
+                      pointerEvents: 'none',
+                      zIndex: 5,
+                    }}
+                  >
+                    <div style={{
+                      background: INK,
+                      color: '#fff',
+                      borderRadius: 10,
+                      padding: '8px 12px',
+                      boxShadow: '0 8px 24px rgba(15,23,42,0.20)',
+                      minWidth: 140,
+                      fontFamily: FONT_DISPLAY,
+                    }}>
+                      <div style={{
+                        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                        gap: 8, marginBottom: 3,
+                      }}>
+                        <span style={{
+                          fontSize: 9, fontWeight: 800,
+                          color: 'rgba(255,255,255,0.55)', letterSpacing: '0.12em',
+                        }}>
+                          ROUND {scrubIdx + 1}/{enriched.rounds.length}
+                        </span>
+                        <span style={{
+                          fontSize: 8.5, fontWeight: 800,
+                          color: round.is_counter ? AMBER : 'rgba(255,255,255,0.55)',
+                          letterSpacing: '0.10em',
+                        }}>
+                          {round.is_counter ? 'COUNTER' : 'DISCARDED'}
+                        </span>
+                      </div>
+                      <div style={{
+                        fontSize: 12, fontWeight: 700, color: '#fff',
+                        letterSpacing: '-0.01em', marginBottom: 1,
+                        whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
+                        maxWidth: 200,
+                      }}>
+                        {courseName}
+                      </div>
+                      <div style={{
+                        display: 'flex', alignItems: 'baseline',
+                        justifyContent: 'space-between', gap: 8, marginTop: 2,
+                      }}>
+                        <span style={{
+                          fontSize: 11, color: 'rgba(255,255,255,0.70)', fontWeight: 600,
+                        }}>
+                          {playedAt}
+                        </span>
+                        <span style={{
+                          fontSize: 14, fontWeight: 800, color: '#fff',
+                          fontVariantNumeric: 'tabular-nums', letterSpacing: '-0.02em',
+                        }}>
+                          {fmtDiff(d, { plus: true })}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
                 );
               })()}
             </div>
