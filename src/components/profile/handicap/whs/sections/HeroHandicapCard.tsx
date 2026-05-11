@@ -55,8 +55,8 @@ const W = 340;
 const H = 110;
 const PAD_TOP = 22;
 const PAD_BOTTOM = 22;
-const PAD_LEFT = 14;
-const PAD_RIGHT = 14;
+const PAD_LEFT = 0;
+const PAD_RIGHT = 0;
 
 // ── Milestone progress ────────────────────────────────────────────────────
 function calcMilestoneProgress(h: number) {
@@ -737,15 +737,15 @@ const HeroHandicapCard: React.FC<Props> = ({ connection }) => {
           {scratchBand && (
             <g>
               <rect
-                x={PAD_LEFT}
+                x={0}
                 y={scratchBand.yTop}
-                width={W - PAD_LEFT - PAD_RIGHT}
+                width={W}
                 height={scratchBand.height}
                 fill={GREEN}
                 opacity={0.05}
               />
               <text
-                x={PAD_LEFT + 6}
+                x={6}
                 y={scratchBand.yTop + scratchBand.height - 4}
                 fontSize={9}
                 fontWeight={700}
