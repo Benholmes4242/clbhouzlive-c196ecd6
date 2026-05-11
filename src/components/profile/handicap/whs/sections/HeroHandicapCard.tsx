@@ -120,10 +120,10 @@ function formStateLabel(formStrokes: number): { title: string; sub: string } {
   const sign = display >= 0 ? '+' : '\u2212';
   const subStr = `${sign}${Math.abs(display).toFixed(1)} vs handicap`;
 
-  if (formStrokes > 1.0) return { title: 'ON FIRE', sub: subStr };
-  if (formStrokes > 0.1) return { title: 'WARM', sub: subStr };
-  if (formStrokes < -1.0) return { title: 'ICE COLD', sub: subStr };
-  if (formStrokes < -0.1) return { title: 'COLD', sub: subStr };
+  if (formStrokes > 1.0) return { title: 'ON FIRE FORM', sub: subStr };
+  if (formStrokes > 0.1) return { title: 'WARM FORM', sub: subStr };
+  if (formStrokes < -1.0) return { title: 'ICE COLD FORM', sub: subStr };
+  if (formStrokes < -0.1) return { title: 'COLD FORM', sub: subStr };
   return { title: 'STEADY', sub: 'On handicap' };
 }
 
@@ -571,24 +571,12 @@ const HeroHandicapCard: React.FC<Props> = ({ connection }) => {
       {/* Three-ring row */}
       <div style={{
         display: 'grid',
-        gridTemplateColumns: '1fr auto 1fr',
+        gridTemplateColumns: 'auto 1fr 1fr',
         alignItems: 'center',
         gap: 4,
         padding: '6px 0 4px',
       }}>
-        {/* LEFT — FORM */}
-        <FlankRing
-          metric="form"
-          formHasData={formHasData}
-          formIsHot={formIsHot}
-          formIsCold={formIsCold}
-          formMagnitude={formMagnitude}
-          formArcColor={formArcColor}
-          formTitle={formLabel.title}
-          formSub={formLabel.sub}
-        />
-
-        {/* CENTRE — Hero ring (matches flank dimensions and structure) */}
+        {/* LEFT — HANDICAP (hero ring) */}
         <div style={{
           display: 'flex', flexDirection: 'column', alignItems: 'center',
           paddingBottom: 2, paddingTop: 14,
@@ -687,8 +675,20 @@ const HeroHandicapCard: React.FC<Props> = ({ connection }) => {
           </div>
         </div>
 
-        {/* RIGHT — SCORING AVG */}
+        {/* CENTRE — SCORING AVG */}
         <FlankRing metric="scoring" value={scoringAvgStr ?? '—'} fraction={scoringFraction} sub={scoringSub} />
+
+        {/* RIGHT — FORM */}
+        <FlankRing
+          metric="form"
+          formHasData={formHasData}
+          formIsHot={formIsHot}
+          formIsCold={formIsCold}
+          formMagnitude={formMagnitude}
+          formArcColor={formArcColor}
+          formTitle={formLabel.title}
+          formSub={formLabel.sub}
+        />
       </div>
 
       {/* Sparkline section header */}
