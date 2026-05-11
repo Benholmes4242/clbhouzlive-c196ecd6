@@ -571,24 +571,12 @@ const HeroHandicapCard: React.FC<Props> = ({ connection }) => {
       {/* Three-ring row */}
       <div style={{
         display: 'grid',
-        gridTemplateColumns: '1fr auto 1fr',
+        gridTemplateColumns: 'auto 1fr 1fr',
         alignItems: 'center',
         gap: 4,
         padding: '6px 0 4px',
       }}>
-        {/* LEFT — FORM */}
-        <FlankRing
-          metric="form"
-          formHasData={formHasData}
-          formIsHot={formIsHot}
-          formIsCold={formIsCold}
-          formMagnitude={formMagnitude}
-          formArcColor={formArcColor}
-          formTitle={formLabel.title}
-          formSub={formLabel.sub}
-        />
-
-        {/* CENTRE — Hero ring (matches flank dimensions and structure) */}
+        {/* LEFT — HANDICAP (hero ring) */}
         <div style={{
           display: 'flex', flexDirection: 'column', alignItems: 'center',
           paddingBottom: 2, paddingTop: 14,
@@ -687,8 +675,20 @@ const HeroHandicapCard: React.FC<Props> = ({ connection }) => {
           </div>
         </div>
 
-        {/* RIGHT — SCORING AVG */}
+        {/* CENTRE — SCORING AVG */}
         <FlankRing metric="scoring" value={scoringAvgStr ?? '—'} fraction={scoringFraction} sub={scoringSub} />
+
+        {/* RIGHT — FORM */}
+        <FlankRing
+          metric="form"
+          formHasData={formHasData}
+          formIsHot={formIsHot}
+          formIsCold={formIsCold}
+          formMagnitude={formMagnitude}
+          formArcColor={formArcColor}
+          formTitle={formLabel.title}
+          formSub={formLabel.sub}
+        />
       </div>
 
       {/* Sparkline section header */}
