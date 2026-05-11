@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { format } from 'date-fns';
+import { Minus, TrendingDown, TrendingUp } from 'lucide-react';
 import { useLastRound, useRoundDetail } from '@/lib/whs/hooks';
 import RoundDetailSheet from './round-detail/RoundDetailSheet';
 import SectionHeader from './SectionHeader';
@@ -9,17 +10,14 @@ interface Props {
 }
 
 const AMBER = '#F7931E';
-const GOLD = '#FBBC2E';
-const INK = '#0F172A';
-const INK_55 = 'rgba(15,23,42,0.55)';
-const INK_40 = 'rgba(15,23,42,0.40)';
-const INK_10 = 'rgba(15,23,42,0.10)';
-const GREEN = '#15803D';
-const RED = '#DC2626';
+const GREEN_BRIGHT = '#10B981';
+const RED_BRIGHT = '#E11D48';
+const WHITE_45 = 'rgba(255,255,255,0.45)';
+const WHITE_55 = 'rgba(255,255,255,0.55)';
+const WHITE_65 = 'rgba(255,255,255,0.65)';
+const WHITE_85 = 'rgba(255,255,255,0.85)';
+const WHITE_18 = 'rgba(255,255,255,0.18)';
 const FONT_GEIST = 'Geist, system-ui, -apple-system, BlinkMacSystemFont, sans-serif';
-
-const pluralize = (n: number, singular: string, plural: string) =>
-  n === 1 ? singular : plural;
 
 const fmtDiff = (n: number | null | undefined) => {
   if (n === null || n === undefined) return '—';
@@ -37,6 +35,9 @@ const relativeDay = (iso: string) => {
   if (days < 7) return `${days} days ago`;
   return format(d, 'd MMM');
 };
+
+type RoundDetailData = NonNullable<ReturnType<typeof useRoundDetail>['data']>;
+type HoleRow = RoundDetailData['holes'][number];
 
 export const LastRoundCard: React.FC<Props> = ({ connectionId }) => {
   const { data: lastRound, isLoading } = useLastRound(connectionId);
@@ -64,7 +65,7 @@ export const LastRoundCard: React.FC<Props> = ({ connectionId }) => {
         <SectionHeader eyebrow="LAST ROUND" title="Loading…" />
         <div style={{ padding: '0 20px' }}>
           <div className="space-y-2 animate-pulse">
-            <div className="h-[160px] w-full bg-muted rounded-2xl" />
+            <div className="h-[240px] w-full bg-muted rounded-2xl" />
           </div>
         </div>
       </section>
@@ -85,344 +86,382 @@ export const LastRoundCard: React.FC<Props> = ({ connectionId }) => {
   }
 
   const delta = lastRound.handicap_delta ?? null;
-  const hasMovement = delta !== null && delta !== undefined;
-  const isImprovement = hasMovement && delta! < 0;
-  const isWorse = hasMovement && delta! > 0;
-  const hcpAfter = lastRound.handicap_index_at_time ?? null;
-  const hcpBefore = hasMovement && hcpAfter !== null ? hcpAfter - delta! : null;
-
-  const statusWord = !hasMovement
-    ? 'first counted round'
-    : delta === 0
-    ? 'unchanged'
-    : isImprovement
-    ? 'dropped'
-    : 'rose';
-
-  const statusColor = !hasMovement || delta === 0 ? INK_55 : isImprovement ? GREEN : RED;
-  const statusBg = !hasMovement || delta === 0
-    ? 'rgba(15,23,42,0.06)'
-    : isImprovement
-    ? 'rgba(21,128,61,0.10)'
-    : 'rgba(220,38,38,0.10)';
-
-  const imageUrl = lastRound.course_thumbnail_image;
-  const stripBg: React.CSSProperties = imageUrl
-    ? { backgroundImage: `url(${imageUrl})`, backgroundSize: 'cover', backgroundPosition: 'center' }
-    : { background: `linear-gradient(135deg, ${AMBER}, ${GOLD})` };
-
-  const totalPar = roundDetail?.holes
-    ? roundDetail.holes.filter((h: any) => h.played).reduce((s: number, h: any) => s + (h.par ?? 0), 0)
-    : 0;
-
-  const grossSub = (() => {
-    if (lastRound.adjusted_gross == null || !totalPar) return '\u00A0';
-    const dpar = lastRound.adjusted_gross - totalPar;
-    return dpar === 0 ? 'level par' : dpar > 0 ? `+${dpar} to par` : `${dpar} to par`;
-  })();
-
-  const segments = breakdown
-    ? [
-        { count: breakdown.eagle + breakdown.birdie, color: GOLD },
-        { count: breakdown.par, color: INK_40 },
-        { count: breakdown.bogey, color: AMBER },
-        { count: breakdown.doublePlus, color: RED },
-      ].filter((s) => s.count > 0)
-    : [];
-  const segTotal = segments.reduce((s, x) => s + x.count, 0);
-
-  const eyebrowLabel: React.CSSProperties = {
-    fontSize: 9,
-    fontWeight: 800,
-    color: INK_55,
-    letterSpacing: '0.16em',
-    textTransform: 'uppercase',
-  };
-
-  const heroNum: React.CSSProperties = {
-    fontSize: 26,
-    fontWeight: 700,
-    color: INK,
-    letterSpacing: '-0.02em',
-    fontVariantNumeric: 'tabular-nums',
-    lineHeight: 1,
-    marginTop: 3,
-  };
-
-  const heroSub: React.CSSProperties = {
-    fontSize: 10.5,
-    color: INK_55,
-    marginTop: 3,
-    minHeight: 13,
-  };
+  const par = (lastRound.course as any)?.par ?? null;
 
   return (
-    <section style={{ marginTop: 28, fontFamily: FONT_GEIST }}>
-      <SectionHeader
-        eyebrow="LAST ROUND"
-        title={lastRound.course?.name ?? 'Last round'}
-        right={<span style={{ fontSize: 12, color: INK_55 }}>{relativeDay(lastRound.play_date)}</span>}
-      />
-      <div style={{ padding: '0 20px' }}>
-
-      {/* Card */}
-      <button
-        type="button"
-        onClick={() => setSheetOpen(true)}
-        aria-label={`View detail for ${lastRound.course?.name ?? 'last round'}`}
-        style={{
-          display: 'block',
-          width: '100%',
-          textAlign: 'left',
-          background: '#fff',
-          borderRadius: 20,
-          overflow: 'hidden',
-          border: 'none',
-          padding: 0,
-          cursor: 'pointer',
-          boxShadow: '0 1px 2px rgba(15,23,42,0.04), 0 4px 16px rgba(15,23,42,0.06)',
-          fontFamily: FONT_GEIST,
-        }}
-      >
-        {/* Course image strip — compact, with overlaid inline stats */}
-        <div style={{ position: 'relative', width: '100%', aspectRatio: '16 / 5', ...stripBg }}>
-          <div
+    <>
+      <section style={{ marginTop: 28, fontFamily: FONT_GEIST }}>
+        <div style={{ padding: '0 20px' }}>
+          <button
+            type="button"
+            onClick={() => setSheetOpen(true)}
+            aria-label={`Last round at ${lastRound.course?.name ?? 'course'}, gross ${lastRound.adjusted_gross ?? '—'} — open detail`}
             style={{
-              position: 'absolute',
-              inset: 0,
-              background:
-                'linear-gradient(to top, rgba(0,0,0,0.78) 0%, rgba(0,0,0,0.30) 55%, rgba(0,0,0,0) 100%)',
+              display: 'block',
+              width: '100%',
+              margin: 0,
+              padding: 0,
+              border: 'none',
+              borderRadius: 18,
+              overflow: 'hidden',
+              cursor: 'pointer',
+              position: 'relative',
+              background: 'linear-gradient(135deg, #0d4a30 0%, #103e25 100%)',
+              minHeight: 240,
+              textAlign: 'left',
+              fontFamily: FONT_GEIST,
             }}
-          />
-          <div style={{ position: 'absolute', left: 16, right: 16, bottom: 12 }}>
-            <div
-              style={{
-                fontSize: 16,
-                fontWeight: 700,
-                color: '#fff',
-                letterSpacing: '-0.01em',
-                lineHeight: 1.2,
-                overflow: 'hidden',
-                textOverflow: 'ellipsis',
-                whiteSpace: 'nowrap',
-              }}
-            >
-              {lastRound.course?.name ?? 'Round'}
-            </div>
-            <div
-              style={{
-                fontSize: 11,
-                color: 'rgba(255,255,255,0.85)',
-                marginTop: 2,
-                overflow: 'hidden',
-                textOverflow: 'ellipsis',
-                whiteSpace: 'nowrap',
-              }}
-            >
-              {[
-                lastRound.marker_name,
-                lastRound.course_rating && lastRound.slope_rating
-                  ? `${lastRound.course_rating}/${lastRound.slope_rating}`
-                  : null,
-                format(new Date(lastRound.play_date), 'd MMM yyyy'),
-              ]
-                .filter(Boolean)
-                .join(' · ')}
-            </div>
-            {/* Inline stats strip — always visible, supporting facts row */}
-            <div
-              style={{
-                marginTop: 8,
-                display: 'flex',
-                alignItems: 'center',
-                gap: 10,
-                fontSize: 11,
-                color: 'rgba(255,255,255,0.92)',
-                fontWeight: 700,
-                fontVariantNumeric: 'tabular-nums',
-                whiteSpace: 'nowrap',
-                overflow: 'hidden',
-              }}
-            >
-              {lastRound.adjusted_gross != null && (
-                <span style={{ display: 'inline-flex', alignItems: 'baseline', gap: 3 }}>
-                  <span style={{ fontSize: 13, fontWeight: 800 }}>{lastRound.adjusted_gross}</span>
-                  <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.70)', fontWeight: 600 }}>gross</span>
-                </span>
-              )}
-              {lastRound.stableford_points != null && (
-                <>
-                  <span style={{ width: 1, height: 10, background: 'rgba(255,255,255,0.30)' }} />
-                  <span style={{ display: 'inline-flex', alignItems: 'baseline', gap: 3 }}>
-                    <span style={{ fontSize: 13, fontWeight: 800 }}>{lastRound.stableford_points}</span>
-                    <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.70)', fontWeight: 600 }}>pts</span>
-                  </span>
-                </>
-              )}
-              {lastRound.handicap_differential != null && (
-                <>
-                  <span style={{ width: 1, height: 10, background: 'rgba(255,255,255,0.30)' }} />
-                  <span style={{ display: 'inline-flex', alignItems: 'baseline', gap: 3 }}>
-                    <span style={{ fontSize: 13, fontWeight: 800 }}>{fmtDiff(lastRound.handicap_differential)}</span>
-                    <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.70)', fontWeight: 600 }}>diff</span>
-                  </span>
-                </>
-              )}
-              {totalPar > 0 && lastRound.adjusted_gross != null && (
-                <>
-                  <span style={{ width: 1, height: 10, background: 'rgba(255,255,255,0.30)' }} />
-                  <span style={{ fontSize: 11, fontWeight: 600, color: 'rgba(255,255,255,0.78)' }}>
-                    {grossSub.replace('\u00A0', '').trim() || `${lastRound.adjusted_gross - totalPar > 0 ? '+' : ''}${lastRound.adjusted_gross - totalPar} to par`}
-                  </span>
-                </>
-              )}
-            </div>
-          </div>
-        </div>
-
-        {/* Body */}
-        <div style={{ display: 'flex', flexDirection: 'column' }}>
-          {/* Breakdown — the protagonist of the body */}
-          <div style={{ padding: '16px 16px 14px' }}>
-            {breakdown && segTotal > 0 ? (
-              <>
-                <div style={{ ...eyebrowLabel, marginBottom: 10 }}>
-                  How it went · {segTotal} {segTotal === 1 ? 'hole' : 'holes'}
-                </div>
-                {/* Sentence — coloured dots + bold counts + soft labels */}
-                <div
-                  style={{
-                    display: 'flex',
-                    flexWrap: 'wrap',
-                    alignItems: 'baseline',
-                    rowGap: 6,
-                    columnGap: 4,
-                    marginBottom: 12,
-                  }}
-                >
-                  {[
-                    { count: breakdown.eagle + breakdown.birdie, label: pluralize(breakdown.eagle + breakdown.birdie, 'birdie', 'birdies'), color: GOLD },
-                    { count: breakdown.par, label: pluralize(breakdown.par, 'par', 'pars'), color: INK_40 },
-                    { count: breakdown.bogey, label: pluralize(breakdown.bogey, 'bogey', 'bogeys'), color: AMBER },
-                    { count: breakdown.doublePlus, label: 'doubles+', color: RED },
-                  ]
-                    .filter((c) => c.count > 0)
-                    .map((c, i, arr) => (
-                      <React.Fragment key={c.label}>
-                        <span style={{ display: 'inline-flex', alignItems: 'baseline', gap: 5 }} aria-label={`${c.count} ${c.label}`}>
-                          <span
-                            style={{
-                              width: 7,
-                              height: 7,
-                              borderRadius: '50%',
-                              background: c.color,
-                              alignSelf: 'center',
-                              flexShrink: 0,
-                            }}
-                          />
-                          <span style={{
-                            fontSize: 18,
-                            fontWeight: 800,
-                            color: INK,
-                            letterSpacing: '-0.02em',
-                            fontVariantNumeric: 'tabular-nums',
-                          }}>
-                            {c.count}
-                          </span>
-                          <span style={{
-                            fontSize: 12,
-                            color: INK_55,
-                            fontWeight: 600,
-                          }}>
-                            {c.label}
-                          </span>
-                        </span>
-                        {i < arr.length - 1 && (
-                          <span style={{ color: INK_40, fontSize: 13, fontWeight: 500, padding: '0 1px' }} aria-hidden>·</span>
-                        )}
-                      </React.Fragment>
-                    ))}
-                </div>
-                {/* Bar — taller (10px) and pill-rounded */}
-                <div
-                  style={{
-                    display: 'flex',
-                    width: '100%',
-                    height: 10,
-                    borderRadius: 5,
-                    overflow: 'hidden',
-                    background: 'rgba(15,23,42,0.06)',
-                  }}
-                >
-                  {segments.map((s, i) => (
-                    <div
-                      key={i}
-                      style={{ flex: s.count, background: s.color, height: '100%' }}
-                    />
-                  ))}
-                </div>
-              </>
-            ) : (
-              <div style={{ fontSize: 12, color: INK_55, fontStyle: 'italic' }}>
-                Hole-by-hole breakdown not yet synced for this round
-              </div>
-            )}
-          </div>
-
-          {/* Index footer — moves into its own tinted strip */}
-          {hcpAfter !== null && (
-            <div
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                padding: '10px 16px',
-                background: 'rgba(15,23,42,0.025)',
-                borderTop: `0.5px solid ${INK_10}`,
-              }}
-            >
-              <span style={{ fontSize: 11.5, color: INK_55 }}>Handicap index</span>
-              <span
+          >
+            {/* Layer 0 — course image */}
+            {lastRound.course_thumbnail_image ? (
+              <img
+                src={lastRound.course_thumbnail_image}
+                alt=""
+                loading="lazy"
                 style={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: 8,
-                  fontSize: 12.5,
-                  fontWeight: 700,
-                  color: INK,
-                  fontVariantNumeric: 'tabular-nums',
+                  position: 'absolute',
+                  inset: 0,
+                  width: '100%',
+                  height: '100%',
+                  objectFit: 'cover',
+                  display: 'block',
                 }}
-              >
-                {hcpBefore != null
-                  ? `${hcpBefore.toFixed(1)} → ${hcpAfter.toFixed(1)}`
-                  : hcpAfter.toFixed(1)}
-                <span
+              />
+            ) : null}
+
+            {/* Layer 1 — forest-green diagonal */}
+            <div
+              style={{
+                position: 'absolute',
+                inset: 0,
+                background:
+                  'linear-gradient(150deg, rgba(15,77,46,0.78), rgba(16,62,37,0.86))',
+              }}
+            />
+
+            {/* Layer 2 — top-left highlight */}
+            <div
+              style={{
+                position: 'absolute',
+                inset: 0,
+                background:
+                  'radial-gradient(circle at 30% 25%, rgba(255,255,255,0.14), transparent 60%)',
+              }}
+            />
+
+            {/* Layer 3 — bottom-darkening */}
+            <div
+              style={{
+                position: 'absolute',
+                inset: 0,
+                background:
+                  'linear-gradient(180deg, transparent 30%, rgba(0,0,0,0.45) 100%)',
+              }}
+            />
+
+            {/* Layer 4 — content */}
+            <div
+              style={{
+                position: 'relative',
+                zIndex: 1,
+                display: 'flex',
+                flexDirection: 'column',
+                gap: 16,
+                padding: '16px 18px 14px',
+                color: '#fff',
+              }}
+            >
+              {/* TOP ROW */}
+              <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 12 }}>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div
+                    style={{
+                      fontSize: 9,
+                      fontWeight: 900,
+                      color: AMBER,
+                      letterSpacing: '0.16em',
+                      textTransform: 'uppercase',
+                      marginBottom: 6,
+                    }}
+                  >
+                    · {relativeDay(lastRound.play_date).toUpperCase()} · LAST ROUND
+                  </div>
+                  <div
+                    style={{
+                      fontSize: 22,
+                      fontWeight: 800,
+                      color: '#fff',
+                      letterSpacing: '-0.02em',
+                      lineHeight: 1.1,
+                      whiteSpace: 'nowrap',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                    }}
+                  >
+                    {lastRound.course?.name ?? 'Unknown course'}
+                  </div>
+                  {(lastRound.course_rating || lastRound.slope_rating) && (
+                    <div
+                      style={{
+                        fontSize: 10,
+                        fontWeight: 700,
+                        color: WHITE_55,
+                        letterSpacing: '0.06em',
+                        marginTop: 4,
+                        fontVariantNumeric: 'tabular-nums',
+                      }}
+                    >
+                      {lastRound.course_rating?.toFixed(1) ?? '—'}/{lastRound.slope_rating ?? '—'}
+                    </div>
+                  )}
+                </div>
+                <HcpImpactPill delta={delta} />
+              </div>
+
+              {/* HERO */}
+              <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', gap: 12 }}>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div
+                    style={{
+                      fontSize: 9,
+                      fontWeight: 900,
+                      color: WHITE_45,
+                      letterSpacing: '0.16em',
+                      textTransform: 'uppercase',
+                      marginBottom: 4,
+                    }}
+                  >
+                    GROSS
+                  </div>
+                  <div
+                    style={{
+                      fontSize: 88,
+                      fontWeight: 200,
+                      color: '#fff',
+                      letterSpacing: '-0.055em',
+                      lineHeight: 0.85,
+                      fontVariantNumeric: 'tabular-nums',
+                    }}
+                  >
+                    {lastRound.adjusted_gross ?? '—'}
+                  </div>
+                  <ToParDiffStrip
+                    adjustedGross={lastRound.adjusted_gross ?? null}
+                    par={par}
+                    differential={lastRound.handicap_differential ?? null}
+                  />
+                </div>
+
+                {lastRound.stableford_points != null && (
+                  <div style={{ textAlign: 'right' }}>
+                    <div
+                      style={{
+                        fontSize: 9,
+                        fontWeight: 900,
+                        color: WHITE_45,
+                        letterSpacing: '0.16em',
+                        textTransform: 'uppercase',
+                        marginBottom: 4,
+                      }}
+                    >
+                      STABLEFORD
+                    </div>
+                    <div
+                      style={{
+                        fontSize: 32,
+                        fontWeight: 800,
+                        color: WHITE_85,
+                        letterSpacing: '-0.02em',
+                        lineHeight: 1,
+                        fontVariantNumeric: 'tabular-nums',
+                      }}
+                    >
+                      {lastRound.stableford_points}
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* BOTTOM */}
+              {roundDetail?.holes && roundDetail.hole_by_hole_fetched && breakdown && (
+                <div
                   style={{
-                    fontSize: 9.5,
-                    fontWeight: 800,
-                    letterSpacing: '0.10em',
-                    textTransform: 'uppercase',
-                    color: statusColor,
-                    background: statusBg,
-                    padding: '2px 7px',
-                    borderRadius: 999,
+                    borderTop: '1px solid rgba(255,255,255,0.14)',
+                    paddingTop: 12,
+                    marginTop: 4,
                   }}
                 >
-                  {statusWord}
-                </span>
-              </span>
+                  <div
+                    style={{
+                      fontSize: 8.5,
+                      fontWeight: 800,
+                      color: WHITE_45,
+                      letterSpacing: '0.16em',
+                      textTransform: 'uppercase',
+                      marginBottom: 8,
+                    }}
+                  >
+                    HOLE BY HOLE
+                  </div>
+                  <HoleStrip holes={roundDetail.holes} />
+                  <BreakdownLine breakdown={breakdown} />
+                </div>
+              )}
             </div>
-          )}
+          </button>
         </div>
-      </button>
+      </section>
 
       <RoundDetailSheet
         scoreId={lastRound.id}
         open={sheetOpen}
         onClose={() => setSheetOpen(false)}
       />
-      </div>
-    </section>
+    </>
+  );
+};
+
+const HcpImpactPill: React.FC<{ delta: number | null }> = ({ delta }) => {
+  if (delta == null) return null;
+  const isUnchanged = Math.abs(delta) < 0.05;
+  const isCut = delta < -0.05;
+  const Icon = isUnchanged ? Minus : isCut ? TrendingDown : TrendingUp;
+  const iconColor = isUnchanged ? WHITE_65 : isCut ? GREEN_BRIGHT : RED_BRIGHT;
+  const label = isUnchanged
+    ? 'HCP UNCHANGED'
+    : isCut
+    ? `↓ ${Math.abs(delta).toFixed(1)}`
+    : `↑ ${Math.abs(delta).toFixed(1)}`;
+  return (
+    <div
+      style={{
+        display: 'inline-flex',
+        alignItems: 'center',
+        gap: 5,
+        padding: '5px 9px',
+        borderRadius: 999,
+        background: 'rgba(255,255,255,0.10)',
+        border: '0.5px solid rgba(255,255,255,0.18)',
+        flexShrink: 0,
+      }}
+    >
+      <Icon size={11} color={iconColor} strokeWidth={2.5} />
+      <span
+        style={{
+          fontSize: 9,
+          fontWeight: 800,
+          color: WHITE_85,
+          letterSpacing: '0.10em',
+          textTransform: 'uppercase',
+          fontVariantNumeric: 'tabular-nums',
+        }}
+      >
+        {label}
+      </span>
+    </div>
+  );
+};
+
+const ToParDiffStrip: React.FC<{
+  adjustedGross: number | null;
+  par: number | null;
+  differential: number | null;
+}> = ({ adjustedGross, par, differential }) => {
+  const parts: string[] = [];
+  if (adjustedGross != null && par != null) {
+    const dp = adjustedGross - par;
+    parts.push(`${dp > 0 ? '+' : ''}${dp} TO PAR`);
+  }
+  if (differential != null) {
+    parts.push(`${fmtDiff(differential)} DIFF`);
+  }
+  if (parts.length === 0) return null;
+  return (
+    <div
+      style={{
+        marginTop: 6,
+        fontSize: 11,
+        fontWeight: 700,
+        color: AMBER,
+        letterSpacing: '0.08em',
+        textTransform: 'uppercase',
+        fontVariantNumeric: 'tabular-nums',
+      }}
+    >
+      {parts.join(' · ')}
+    </div>
+  );
+};
+
+const HoleStrip: React.FC<{ holes: HoleRow[] }> = ({ holes }) => (
+  <div style={{ display: 'flex', gap: 2, width: '100%' }}>
+    {holes.map((h, i) => {
+      let color = WHITE_18;
+      if (h.played && h.actual_gross != null && h.par != null) {
+        const diff = h.actual_gross - h.par;
+        if (diff < 0) color = GREEN_BRIGHT;
+        else if (diff === 0) color = WHITE_18;
+        else if (diff === 1) color = AMBER;
+        else color = RED_BRIGHT;
+      }
+      return (
+        <div
+          key={i}
+          style={{
+            flex: 1,
+            height: 5,
+            borderRadius: 1,
+            background: color,
+          }}
+        />
+      );
+    })}
+  </div>
+);
+
+const BreakdownLine: React.FC<{
+  breakdown: { eagle: number; birdie: number; par: number; bogey: number; doublePlus: number };
+}> = ({ breakdown }) => {
+  const birdieTotal = breakdown.eagle + breakdown.birdie;
+  const itemStyle = (color: string): React.CSSProperties => ({
+    fontSize: 10,
+    fontWeight: 800,
+    color,
+    letterSpacing: '0.10em',
+    textTransform: 'uppercase',
+    fontVariantNumeric: 'tabular-nums',
+  });
+  const sep: React.CSSProperties = {
+    color: WHITE_45,
+    fontSize: 10,
+    fontWeight: 700,
+  };
+  return (
+    <div
+      style={{
+        display: 'flex',
+        alignItems: 'baseline',
+        flexWrap: 'wrap',
+        gap: 6,
+        marginTop: 10,
+      }}
+    >
+      <span style={itemStyle(GREEN_BRIGHT)}>
+        {birdieTotal} {birdieTotal === 1 ? 'BIRDIE' : 'BIRDIES'}
+      </span>
+      <span style={sep}>·</span>
+      <span style={itemStyle(WHITE_85)}>
+        {breakdown.par} {breakdown.par === 1 ? 'PAR' : 'PARS'}
+      </span>
+      <span style={sep}>·</span>
+      <span style={itemStyle(AMBER)}>
+        {breakdown.bogey} {breakdown.bogey === 1 ? 'BOG' : 'BOGS'}
+      </span>
+      <span style={sep}>·</span>
+      <span style={itemStyle(RED_BRIGHT)}>
+        {breakdown.doublePlus} DBL+
+      </span>
+    </div>
   );
 };
 
