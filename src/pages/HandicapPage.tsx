@@ -179,9 +179,11 @@ const HandicapPageHeader: React.FC<HeaderProps> = ({
 
   // Title varies by mode
   const eyebrow = readOnly ? 'HANDICAP' : 'HANDICAP';
-  const title = readOnly
-    ? (displayName ? `${displayName}'s handicap` : 'Handicap')
-    : (displayName ? `${greeting}, ${displayName}` : 'Welcome back');
+  const title: { line1: string; line2?: string } = readOnly
+    ? { line1: displayName ? `${displayName}'s handicap` : 'Handicap' }
+    : displayName
+      ? { line1: `${greeting},`, line2: displayName }
+      : { line1: 'Welcome back' };
 
   // Sentinel-based detection: suppress safe-area padding while CompactHeader
   // is visible at top to avoid doubled inset gap.
