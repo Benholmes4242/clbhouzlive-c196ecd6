@@ -113,18 +113,17 @@ function calcMonthlyMovement(delta: number | null) {
  * ranges — the user's "FORM" is always one of these five words.
  */
 function formStateLabel(formStrokes: number): { title: string; sub: string } {
-  if (formStrokes > 1.0) {
-    return { title: 'ON FIRE', sub: `+${formStrokes.toFixed(1)} vs handicap` };
-  }
-  if (formStrokes > 0.1) {
-    return { title: 'WARM', sub: `+${formStrokes.toFixed(1)} vs handicap` };
-  }
-  if (formStrokes < -1.0) {
-    return { title: 'ICE COLD', sub: `${fmtDiff(formStrokes)} vs handicap` };
-  }
-  if (formStrokes < -0.1) {
-    return { title: 'COLD', sub: `${fmtDiff(formStrokes)} vs handicap` };
-  }
+  // Display sign convention: negative = below handicap (good), positive
+  // = above handicap (bad). Internal formStrokes uses the opposite sign
+  // (positive = hot) for ring-fill math, so negate for display only.
+  const display = -formStrokes;
+  const sign = display >= 0 ? '+' : '\u2212';
+  const subStr = `${sign}${Math.abs(display).toFixed(1)} vs handicap`;
+
+  if (formStrokes > 1.0) return { title: 'ON FIRE', sub: subStr };
+  if (formStrokes > 0.1) return { title: 'WARM', sub: subStr };
+  if (formStrokes < -1.0) return { title: 'ICE COLD', sub: subStr };
+  if (formStrokes < -0.1) return { title: 'COLD', sub: subStr };
   return { title: 'STEADY', sub: 'On handicap' };
 }
 
