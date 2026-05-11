@@ -688,7 +688,7 @@ const HeroHandicapCard: React.FC<Props> = ({ connection }) => {
         </div>
 
         {/* RIGHT — SCORING AVG */}
-        <FlankRing metric="scoring" value={scoringAvgStr ?? '—'} fraction={scoringFraction} />
+        <FlankRing metric="scoring" value={scoringAvgStr ?? '—'} fraction={scoringFraction} sub={scoringSub} />
       </div>
 
       {/* Sparkline section header */}
