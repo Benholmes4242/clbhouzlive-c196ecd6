@@ -8,49 +8,105 @@ interface Props {
 }
 
 const INK = '#0F172A';
-const INK_MUTE = 'rgba(15,23,42,0.55)';
+const INK_55 = 'rgba(15,23,42,0.55)';
+const AMBER_DEEP = '#C97211';
 
-const fmtToPar = (n: number) => (n === 0 ? 'E' : n > 0 ? `+${n}` : `${n}`);
-
-const RowHeader: React.FC<{ label: string; strokes: number; par: number }> = ({
-  label,
-  strokes,
-  par,
-}) => {
-  const toPar = strokes - par;
+const NineGrid: React.FC<{
+  label: string;
+  holes: WhsScoreHole[];
+}> = ({ label, holes }) => {
+  const total = holes.reduce(
+    (s, h) =>
+      s +
+      (h.played ? (h.adjusted_gross ?? h.actual_gross ?? 0) : 0),
+    0,
+  );
+  const par = holes.reduce((s, h) => s + (h.par ?? 0), 0);
+  const toPar = total - par;
   return (
-    <div
-      style={{
-        display: 'flex',
-        alignItems: 'baseline',
-        justifyContent: 'space-between',
-        marginBottom: 10,
-        padding: '0 20px',
-      }}
-    >
-      <h3
+    <div style={{ marginBottom: 14 }}>
+      <div
         style={{
-          margin: 0,
-          fontSize: 11,
-          fontWeight: 800,
-          color: INK_MUTE,
-          letterSpacing: '0.18em',
+          display: 'flex',
+          alignItems: 'baseline',
+          justifyContent: 'space-between',
+          marginBottom: 8,
+          padding: '0 2px',
         }}
       >
-        {label}
-      </h3>
-      <p
+        <span
+          style={{
+            fontSize: 10,
+            fontWeight: 800,
+            color: INK_55,
+            letterSpacing: '0.16em',
+            textTransform: 'uppercase',
+          }}
+        >
+          {label}
+        </span>
+        <span
+          style={{
+            fontSize: 12,
+            fontWeight: 800,
+            color: INK,
+            fontVariantNumeric: 'tabular-nums',
+          }}
+        >
+          {total}{' '}
+          <span
+            style={{
+              fontSize: 10,
+              fontWeight: 700,
+              color: AMBER_DEEP,
+            }}
+          >
+            ({toPar > 0 ? '+' : toPar === 0 ? 'E' : ''}
+            {toPar !== 0 ? toPar : ''})
+          </span>
+        </span>
+      </div>
+
+      <div
         style={{
-          margin: 0,
-          fontSize: 13,
-          fontWeight: 800,
-          color: INK,
-          fontVariantNumeric: 'tabular-nums',
+          display: 'grid',
+          gridTemplateColumns: 'repeat(9, 1fr)',
+          gap: 4,
         }}
       >
-        {strokes}{' '}
-        <span style={{ color: INK_MUTE, fontWeight: 600 }}>({fmtToPar(toPar)})</span>
-      </p>
+        {holes.map((h) => (
+          <div
+            key={`n-${h.hole_no}`}
+            style={{
+              fontSize: 9,
+              fontWeight: 800,
+              color: INK_55,
+              textAlign: 'center',
+              fontVariantNumeric: 'tabular-nums',
+            }}
+          >
+            {h.hole_no}
+          </div>
+        ))}
+        {holes.map((h) => (
+          <div
+            key={`p-${h.hole_no}`}
+            style={{
+              fontSize: 9,
+              fontWeight: 600,
+              color: INK_55,
+              textAlign: 'center',
+              fontVariantNumeric: 'tabular-nums',
+              paddingBottom: 2,
+            }}
+          >
+            {h.par ?? '—'}
+          </div>
+        ))}
+        {holes.map((h) => (
+          <RoundHoleCell key={`s-${h.hole_no}`} hole={h} />
+        ))}
+      </div>
     </div>
   );
 };
@@ -64,57 +120,11 @@ export const RoundScorecard: React.FC<Props> = ({ holes, isNineHole }) => {
   const front9 = sorted.filter((h) => h.hole_no <= 9);
   const back9 = isNineHole ? [] : sorted.filter((h) => h.hole_no > 9);
 
-  const sumStrokes = (rows: WhsScoreHole[]) =>
-    rows.reduce((acc, h) => {
-      const strokes = h.adjusted_gross ?? h.actual_gross ?? 0;
-      return acc + (h.played ? strokes : 0);
-    }, 0);
-  const sumPar = (rows: WhsScoreHole[]) => rows.reduce((acc, h) => acc + h.par, 0);
-
-  const front9Strokes = sumStrokes(front9);
-  const front9Par = sumPar(front9);
-  const back9Strokes = sumStrokes(back9);
-  const back9Par = sumPar(back9);
-
-  const rowStyles: React.CSSProperties = {
-    display: 'flex',
-    gap: 6,
-    overflowX: 'auto',
-    paddingBottom: 4,
-    paddingLeft: 20,
-    paddingRight: 20,
-    scrollbarWidth: 'none',
-    WebkitOverflowScrolling: 'touch',
-  };
-
   return (
-    <div style={{ marginTop: 8 }}>
-      <RowHeader label="FRONT 9" strokes={front9Strokes} par={front9Par} />
-      <div style={rowStyles}>
-        {front9.map((h) => (
-          <RoundHoleCell
-            key={h.hole_no}
-            holeNo={h.hole_no}
-            par={h.par}
-            strokes={h.played ? (h.adjusted_gross ?? h.actual_gross ?? null) : null}
-          />
-        ))}
-      </div>
-
+    <div style={{ padding: '14px 16px 0' }}>
+      <NineGrid label="Front 9" holes={front9} />
       {!isNineHole && back9.length > 0 && (
-        <div style={{ marginTop: 18 }}>
-          <RowHeader label="BACK 9" strokes={back9Strokes} par={back9Par} />
-          <div style={rowStyles}>
-            {back9.map((h) => (
-              <RoundHoleCell
-                key={h.hole_no}
-                holeNo={h.hole_no}
-                par={h.par}
-                strokes={h.played ? (h.adjusted_gross ?? h.actual_gross ?? null) : null}
-              />
-            ))}
-          </div>
-        </div>
+        <NineGrid label="Back 9" holes={back9} />
       )}
     </div>
   );
