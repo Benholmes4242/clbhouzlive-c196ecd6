@@ -528,9 +528,9 @@ const HeroHandicapCard: React.FC<Props> = ({ connection }) => {
           </span>
         </div>
         <div style={{ display: 'inline-flex', gap: 2, padding: 2, background: INK_04, borderRadius: 999 }}>
-          {([90, 365, 'all'] as Range[]).map(r => {
+          {([30, 365, 'all'] as Range[]).map(r => {
             const active = r === range;
-            const label = r === 'all' ? 'ALL' : r === 365 ? '1Y' : '90D';
+            const label = r === 'all' ? 'ALL' : r === 365 ? '1Y' : '30D';
             return (
               <button
                 key={String(r)}
@@ -551,19 +551,21 @@ const HeroHandicapCard: React.FC<Props> = ({ connection }) => {
         </div>
       </div>
 
-      {/* Milestone labels above hero */}
+      {/* Range-aware subtext */}
       <div style={{
-        display: 'flex', justifyContent: 'space-between',
-        padding: '0 calc(50% - clamp(72px, 22vw, 92px))',
-        marginTop: 12, marginBottom: -4,
-        fontSize: 'clamp(9px, 2.6vw, 10px)',
-        fontWeight: 700, color: INK_40,
-        letterSpacing: '0.12em',
+        fontSize: 12,
+        fontWeight: 500,
+        color: INK_55,
+        marginTop: 4,
+        marginBottom: 12,
+        lineHeight: 1.4,
+        padding: '0 4px',
       }}>
-        <span>{formatDisplayedHcp(milestone.displayed)} HCP</span>
-        <span style={{ color: AMBER_DEEP, fontWeight: 800 }}>
-          {formatDisplayedHcp(milestone.displayed - 1)} HCP →
-        </span>
+        {range === 30
+          ? 'Your performance in the past 30 days'
+          : range === 365
+            ? 'Your performance over the past year'
+            : 'Your career performance to date'}
       </div>
 
       {/* Three-ring row */}
@@ -575,7 +577,16 @@ const HeroHandicapCard: React.FC<Props> = ({ connection }) => {
         padding: '6px 0 4px',
       }}>
         {/* LEFT — FORM */}
-        <FlankRing metric="form" state={formState} />
+        <FlankRing
+          metric="form"
+          formHasData={formHasData}
+          formIsHot={formIsHot}
+          formIsCold={formIsCold}
+          formMagnitude={formMagnitude}
+          formArcColor={formArcColor}
+          formTitle={formLabel.title}
+          formSub={formLabel.sub}
+        />
 
         {/* CENTRE — Hero ring (matches flank dimensions and structure) */}
         <div style={{
