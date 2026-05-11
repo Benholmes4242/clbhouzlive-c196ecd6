@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { ArrowDown, ArrowUp, Flame, Minus, Snowflake } from 'lucide-react';
+import { Activity, ArrowDown, ArrowUp, Flame, Minus, Snowflake } from 'lucide-react';
 import { useHandicapHistory, useHandicapTrend, useAllScores } from '@/lib/whs/hooks';
 import { whsDisplayedHcp, formatDisplayedHcp, fmtDiff } from '@/lib/whs/format';
 import type { WhsConnection, HandicapPoint } from '@/lib/whs/types';
@@ -10,7 +10,11 @@ interface Props {
   connection: WhsConnection;
 }
 
-type Range = 90 | 365 | 'all';
+type Range = 30 | 365 | 'all';
+
+// FORM ring temperature colours — only used by the FORM ring
+const FORM_HOT = '#E11D48';   // crimson, reads as red-hot
+const FORM_COLD = '#38BDF8';  // ice blue
 
 // ── Tokens ────────────────────────────────────────────────────────────────
 const AMBER = '#F7931E';
@@ -103,8 +107,28 @@ function calcMonthlyMovement(delta: number | null) {
   };
 }
 
+/**
+ * Maps form strokes to a 5-tier state label. Same ladder across all
+ * ranges — the user's "FORM" is always one of these five words.
+ */
+function formStateLabel(formStrokes: number): { title: string; sub: string } {
+  if (formStrokes > 1.0) {
+    return { title: 'ON FIRE', sub: `+${formStrokes.toFixed(1)} vs handicap` };
+  }
+  if (formStrokes > 0.1) {
+    return { title: 'WARM', sub: `+${formStrokes.toFixed(1)} vs handicap` };
+  }
+  if (formStrokes < -1.0) {
+    return { title: 'ICE COLD', sub: `${fmtDiff(formStrokes)} vs handicap` };
+  }
+  if (formStrokes < -0.1) {
+    return { title: 'COLD', sub: `${fmtDiff(formStrokes)} vs handicap` };
+  }
+  return { title: 'STEADY', sub: 'On handicap' };
+}
+
 const HeroHandicapCard: React.FC<Props> = ({ connection }) => {
-  const [range, setRange] = useState<Range>('all');
+  const [range, setRange] = useState<Range>(30);
   const [scrubIdx, setScrubIdx] = useState<number | null>(null);
   const [drawn, setDrawn] = useState(false);
   const svgRef = useRef<SVGSVGElement | null>(null);
@@ -117,13 +141,31 @@ const HeroHandicapCard: React.FC<Props> = ({ connection }) => {
   const current = trend?.current ?? null;
   const points: HandicapPoint[] = history ?? [];
 
+  // Date-windowed slice of all rounds for the active range. Drives FORM,
+  // SCORING AVG, and the round counts in sub-labels.
+  const rangeFilteredScores = useMemo(() => {
+    if (!recent) return [] as any[];
+    if (range === 'all') return recent as any[];
+    const cutoff = Date.now() - range * 24 * 60 * 60 * 1000;
+    return (recent as any[]).filter((r: any) => {
+      if (!r?.play_date) return false;
+      const ts = new Date(r.play_date).getTime();
+      return Number.isFinite(ts) && ts >= cutoff;
+    });
+  }, [recent, range]);
+
+  // Differentials within active range — drives FORM. Falls back to last-5
+  // if active range has fewer than 3 rounds, so the ring isn't empty.
   const last5Diffs = useMemo(() => {
-    if (!recent) return [];
-    return recent
+    const inRange = rangeFilteredScores
+      .map((r: any) => r.handicap_differential)
+      .filter((d: any): d is number => typeof d === 'number');
+    if (inRange.length >= 3) return inRange;
+    return ((recent ?? []) as any[])
       .slice(0, 5)
       .map((r: any) => r.handicap_differential)
       .filter((d: any): d is number => typeof d === 'number');
-  }, [recent]);
+  }, [rangeFilteredScores, recent]);
 
   const coords = useMemo(() => {
     if (points.length === 0) return [] as { x: number; y: number; idx: number }[];
@@ -390,8 +432,8 @@ const HeroHandicapCard: React.FC<Props> = ({ connection }) => {
   const deltaSubText = (() => {
     const d = trend?.delta;
     if (d == null) return 'Awaiting data';
-    if (Math.abs(d) < 0.05) return 'Steady today';
-    return `${d < 0 ? '↓' : '↑'} ${Math.abs(d).toFixed(1)} today`;
+    if (Math.abs(d) < 0.05) return 'Steady';
+    return `${d < 0 ? '↓' : '↑'} ${Math.abs(d).toFixed(1)}`;
   })();
 
   // ── 6-point sparkline from history points ────────────────────────────────
@@ -431,28 +473,44 @@ const HeroHandicapCard: React.FC<Props> = ({ connection }) => {
     };
   })();
 
-  // ── FORM state from predictHandicap ────────────────────────────────────
-  const formPrediction = predictHandicap((recent ?? []) as any);
-  const formState: 'hot' | 'steady' | 'cold' | 'unknown' =
-    formPrediction.verdict === 'unknown' ? 'unknown'
-    : formPrediction.verdict === 'in_form' || formPrediction.verdict === 'building' ? 'hot'
-    : formPrediction.verdict === 'steady' ? 'steady'
-    : 'cold';
+  // ── FORM (range-aware) ────────────────────────────────────────────────
+  // formStrokes from fallbackForm (computed above using rangeDiffs).
+  const formStrokesValue = fallbackForm.formStrokes;
+  const formLabel = formStateLabel(formStrokesValue);
+  const formCap = range === 'all' ? 3 : 2;
+  const formClamped = Math.max(-formCap, Math.min(formCap, formStrokesValue));
+  const formMagnitude = Math.abs(formClamped) / formCap; // 0–1
+  const formIsHot = formClamped > 0.05;
+  const formIsCold = formClamped < -0.05;
+  const formArcColor = formIsHot ? FORM_HOT : formIsCold ? FORM_COLD : INK_40;
+  const formHasData = last5Diffs.length > 0;
 
-  // ── SCORING AVG (last 5 adjusted_gross) ────────────────────────────────
-  const grossList = ((recent ?? []) as any[])
-    .map(r => (typeof r?.adjusted_gross === 'number' ? r.adjusted_gross : null))
-    .filter((v): v is number => v != null);
-  const last5Gross = grossList.slice(0, 5);
-  const scoringAvgStr = last5Gross.length >= 3
-    ? (last5Gross.reduce((s, v) => s + v, 0) / last5Gross.length).toFixed(1)
+  // ── SCORING AVG within active range ───────────────────────────────────
+  const rangeGrossList = rangeFilteredScores
+    .map((r: any) => (typeof r?.adjusted_gross === 'number' ? r.adjusted_gross : null))
+    .filter((v: any): v is number => v != null);
+  const scoringAvgStr = rangeGrossList.length >= 3
+    ? (rangeGrossList.reduce((s, v) => s + v, 0) / rangeGrossList.length).toFixed(1)
     : null;
-  const last50Gross = grossList.slice(0, 50);
+  const scoringRoundCount = rangeGrossList.length;
+
+  // Ring fill scale uses last-50 best/worst across all rounds — independent
+  // of the active range so the visual position is stable.
+  const allGrossList = ((recent ?? []) as any[])
+    .map((r: any) => (typeof r?.adjusted_gross === 'number' ? r.adjusted_gross : null))
+    .filter((v: any): v is number => v != null);
+  const last50Gross = allGrossList.slice(0, 50);
   const grossBest = last50Gross.length ? Math.min(...last50Gross) : null;
   const grossWorst = last50Gross.length ? Math.max(...last50Gross) : null;
   const scoringFraction = (scoringAvgStr !== null && grossBest !== null && grossWorst !== null && grossWorst !== grossBest)
     ? Math.max(0, Math.min(1, (grossWorst - parseFloat(scoringAvgStr)) / (grossWorst - grossBest)))
     : 0.5;
+
+  const scoringSub = range === 30
+    ? `Over 30 days · ${scoringRoundCount} ${scoringRoundCount === 1 ? 'round' : 'rounds'}`
+    : range === 365
+      ? `Over 1 year · ${scoringRoundCount} ${scoringRoundCount === 1 ? 'round' : 'rounds'}`
+      : `Career · ${scoringRoundCount} ${scoringRoundCount === 1 ? 'round' : 'rounds'}`;
 
   return (
     <section style={{ margin: '0 0 24px', padding: '0 20px', fontFamily: FONT_DISPLAY }}>
@@ -470,9 +528,9 @@ const HeroHandicapCard: React.FC<Props> = ({ connection }) => {
           </span>
         </div>
         <div style={{ display: 'inline-flex', gap: 2, padding: 2, background: INK_04, borderRadius: 999 }}>
-          {([90, 365, 'all'] as Range[]).map(r => {
+          {([30, 365, 'all'] as Range[]).map(r => {
             const active = r === range;
-            const label = r === 'all' ? 'ALL' : r === 365 ? '1Y' : '90D';
+            const label = r === 'all' ? 'ALL' : r === 365 ? '1Y' : '30D';
             return (
               <button
                 key={String(r)}
@@ -493,19 +551,21 @@ const HeroHandicapCard: React.FC<Props> = ({ connection }) => {
         </div>
       </div>
 
-      {/* Milestone labels above hero */}
+      {/* Range-aware subtext */}
       <div style={{
-        display: 'flex', justifyContent: 'space-between',
-        padding: '0 calc(50% - clamp(72px, 22vw, 92px))',
-        marginTop: 12, marginBottom: -4,
-        fontSize: 'clamp(9px, 2.6vw, 10px)',
-        fontWeight: 700, color: INK_40,
-        letterSpacing: '0.12em',
+        fontSize: 12,
+        fontWeight: 500,
+        color: INK_55,
+        marginTop: 4,
+        marginBottom: 12,
+        lineHeight: 1.4,
+        padding: '0 4px',
       }}>
-        <span>{formatDisplayedHcp(milestone.displayed)} HCP</span>
-        <span style={{ color: AMBER_DEEP, fontWeight: 800 }}>
-          {formatDisplayedHcp(milestone.displayed - 1)} HCP →
-        </span>
+        {range === 30
+          ? 'Your performance in the past 30 days'
+          : range === 365
+            ? 'Your performance over the past year'
+            : 'Your career performance to date'}
       </div>
 
       {/* Three-ring row */}
@@ -517,7 +577,16 @@ const HeroHandicapCard: React.FC<Props> = ({ connection }) => {
         padding: '6px 0 4px',
       }}>
         {/* LEFT — FORM */}
-        <FlankRing metric="form" state={formState} />
+        <FlankRing
+          metric="form"
+          formHasData={formHasData}
+          formIsHot={formIsHot}
+          formIsCold={formIsCold}
+          formMagnitude={formMagnitude}
+          formArcColor={formArcColor}
+          formTitle={formLabel.title}
+          formSub={formLabel.sub}
+        />
 
         {/* CENTRE — Hero ring (matches flank dimensions and structure) */}
         <div style={{
@@ -619,7 +688,7 @@ const HeroHandicapCard: React.FC<Props> = ({ connection }) => {
         </div>
 
         {/* RIGHT — SCORING AVG */}
-        <FlankRing metric="scoring" value={scoringAvgStr ?? '—'} fraction={scoringFraction} />
+        <FlankRing metric="scoring" value={scoringAvgStr ?? '—'} fraction={scoringFraction} sub={scoringSub} />
       </div>
 
       {/* Sparkline section header */}
@@ -866,12 +935,24 @@ const keyframes = `
 // ── FlankRing (FORM / SCORING AVG) ──────────────────────────────────────
 interface FlankRingProps {
   metric: 'form' | 'scoring';
-  state?: 'hot' | 'steady' | 'cold' | 'unknown';
+  // scoring
   value?: string;
   fraction?: number;
+  sub?: string;
+  // form (bidirectional, range-aware)
+  formHasData?: boolean;
+  formIsHot?: boolean;
+  formIsCold?: boolean;
+  formMagnitude?: number;
+  formArcColor?: string;
+  formTitle?: string;
+  formSub?: string;
 }
 
-const FlankRing: React.FC<FlankRingProps> = ({ metric, state, value, fraction }) => {
+const FlankRing: React.FC<FlankRingProps> = ({
+  metric, value, fraction, sub,
+  formHasData, formIsHot, formIsCold, formMagnitude, formArcColor, formTitle, formSub,
+}) => {
   const VIEWBOX = 100;
   const FCX = 50;
   const FCY = 50;
@@ -879,66 +960,35 @@ const FlankRing: React.FC<FlankRingProps> = ({ metric, state, value, fraction })
   const FSTROKE = 6;
   const FC = 2 * Math.PI * FR;
 
-  let color: string;
-  let frac: number;
-  let centre: React.ReactNode;
-  let label: string;
-  let sub: string;
+  const isForm = metric === 'form';
 
-  if (metric === 'form') {
-    if (state === 'hot') {
-      color = RED_FORM_HOT;
-      frac = 1.0;
-      centre = (
-        <div style={{ width: 'clamp(18px, 5vw, 24px)', height: 'clamp(18px, 5vw, 24px)' }}>
-          <Flame size="100%" color={RED_FORM_HOT} strokeWidth={2.4} fill={RED_FORM_HOT} />
-        </div>
-      );
-      label = 'FORM';
-      sub = 'Hot over last 5';
-    } else if (state === 'cold') {
-      color = COLD_BLUE;
-      frac = 0.10;
-      centre = (
-        <div style={{ width: 'clamp(18px, 5vw, 24px)', height: 'clamp(18px, 5vw, 24px)' }}>
-          <Snowflake size="100%" color={COLD_BLUE} strokeWidth={2.4} />
-        </div>
-      );
-      label = 'FORM';
-      sub = 'Cold over last 5';
-    } else if (state === 'steady') {
-      color = '#475569';
-      frac = 0.50;
-      centre = (
-        <div style={{ width: 'clamp(20px, 5.4vw, 26px)', height: 'clamp(20px, 5.4vw, 26px)' }}>
-          <Minus size="100%" color="#475569" strokeWidth={3} />
-        </div>
-      );
-      label = 'FORM';
-      sub = 'Steady over last 5';
-    } else {
-      color = INK_25;
-      frac = 0;
-      centre = (
-        <span style={{ fontSize: 'clamp(16px, 4.6vw, 22px)', color: INK_40, fontWeight: 800 }}>—</span>
-      );
-      label = 'FORM';
-      sub = 'Awaiting data';
-    }
-  } else {
-    // Scoring avg uses a royal-blue gradient (rendered via SVG <defs> in the ring below)
-    color = 'url(#flankScoringGradient)';
-    frac = fraction ?? 0;
-    centre = (
-      <span style={{
-        fontSize: value && value.length > 4 ? 'clamp(13px, 3.8vw, 16px)' : 'clamp(14px, 4.4vw, 18px)',
-        fontWeight: 700, color: INK, lineHeight: 1,
-        letterSpacing: '-0.03em', fontVariantNumeric: 'tabular-nums',
-      }}>{value ?? '—'}</span>
-    );
-    label = 'SCORING AVG';
-    sub = 'Over last 5';
-  }
+  // Resolved label / sub
+  const label = isForm ? 'FORM' : 'SCORING AVG';
+  const subText = isForm
+    ? (formHasData ? (formSub ?? '') : 'Awaiting data')
+    : (sub ?? 'Over last 5');
+
+  // Centre node
+  const centre: React.ReactNode = isForm ? (
+    formHasData ? (
+      <Activity size={26} strokeWidth={2.5} color={formArcColor ?? INK_40} />
+    ) : (
+      <span style={{ fontSize: 'clamp(16px, 4.6vw, 22px)', color: INK_40, fontWeight: 800 }}>—</span>
+    )
+  ) : (
+    <span style={{
+      fontSize: value && value.length > 4 ? 'clamp(13px, 3.8vw, 16px)' : 'clamp(14px, 4.4vw, 18px)',
+      fontWeight: 700, color: INK, lineHeight: 1,
+      letterSpacing: '-0.03em', fontVariantNumeric: 'tabular-nums',
+    }}>{value ?? '—'}</span>
+  );
+
+  // Scoring single-direction frac
+  const scoringFrac = !isForm ? (fraction ?? 0) : 0;
+  const scoringColor = 'url(#flankScoringGradient)';
+
+  // FORM bidirectional dasharray length — half the circumference scaled by magnitude
+  const formArcLen = ((formMagnitude ?? 0) * FC) / 2;
 
   return (
     <div style={{
@@ -956,12 +1006,10 @@ const FlankRing: React.FC<FlankRingProps> = ({ metric, state, value, fraction })
           preserveAspectRatio="xMidYMid meet"
         >
           <defs>
-            {/* Royal blue gradient — only used by the SCORING AVG ring, but defined per-instance for safety */}
             <linearGradient id="flankScoringGradient" x1="0" y1="0" x2="1" y2="1">
               <stop offset="0%" stopColor={SCORING_BLUE_DEEP} />
               <stop offset="100%" stopColor={SCORING_BLUE} />
             </linearGradient>
-            {/* Subtle drop-shadow filter for filled arc lift */}
             <filter id="flankArcLift" x="-20%" y="-20%" width="140%" height="140%">
               <feGaussianBlur in="SourceAlpha" stdDeviation="0.6" />
               <feOffset dx="0" dy="0.4" result="offsetblur" />
@@ -972,12 +1020,36 @@ const FlankRing: React.FC<FlankRingProps> = ({ metric, state, value, fraction })
           <circle cx={FCX} cy={FCY} r={FR} fill="none"
             stroke={RING_TRACK} strokeWidth={FSTROKE}
             vectorEffect="non-scaling-stroke" />
-          {frac > 0 && (
+
+          {/* Scoring single arc (clockwise from top) */}
+          {!isForm && scoringFrac > 0 && (
             <circle cx={FCX} cy={FCY} r={FR} fill="none"
-              stroke={color} strokeWidth={FSTROKE}
+              stroke={scoringColor} strokeWidth={FSTROKE}
               strokeLinecap="round"
-              strokeDasharray={`${frac * FC} ${FC}`}
+              strokeDasharray={`${scoringFrac * FC} ${FC}`}
               transform={`rotate(-90 ${FCX} ${FCY})`}
+              vectorEffect="non-scaling-stroke"
+              filter="url(#flankArcLift)" />
+          )}
+
+          {/* FORM hot arc — right side, clockwise from top */}
+          {isForm && formIsHot && formArcLen > 0 && (
+            <circle cx={FCX} cy={FCY} r={FR} fill="none"
+              stroke={FORM_HOT} strokeWidth={FSTROKE}
+              strokeLinecap="round"
+              strokeDasharray={`${formArcLen} ${FC}`}
+              transform={`rotate(-90 ${FCX} ${FCY})`}
+              vectorEffect="non-scaling-stroke"
+              filter="url(#flankArcLift)" />
+          )}
+
+          {/* FORM cold arc — left side, mirrored */}
+          {isForm && formIsCold && formArcLen > 0 && (
+            <circle cx={FCX} cy={FCY} r={FR} fill="none"
+              stroke={FORM_COLD} strokeWidth={FSTROKE}
+              strokeLinecap="round"
+              strokeDasharray={`${formArcLen} ${FC}`}
+              transform={`rotate(-90 ${FCX} ${FCY}) scale(-1, 1) translate(${-VIEWBOX}, 0)`}
               vectorEffect="non-scaling-stroke"
               filter="url(#flankArcLift)" />
           )}
@@ -992,14 +1064,15 @@ const FlankRing: React.FC<FlankRingProps> = ({ metric, state, value, fraction })
       <div style={{ marginTop: 8, textAlign: 'center', maxWidth: '120%' }}>
         <div style={{
           fontSize: 'clamp(10px, 2.8vw, 10.5px)',
-          fontWeight: 800, color: INK,
+          fontWeight: 800, color: isForm && formHasData ? (formArcColor ?? INK) : INK,
           letterSpacing: '0.06em', textTransform: 'uppercase',
-        }}>{label}</div>
+        }}>{isForm ? (formHasData ? (formTitle ?? 'FORM') : 'FORM') : label}</div>
         <div style={{
           fontSize: 'clamp(9px, 2.6vw, 10px)',
-          color: INK_40, marginTop: 2, fontWeight: 500,
+          color: isForm && formHasData ? (formArcColor ?? INK_40) : INK_40,
+          marginTop: 2, fontWeight: 500,
           whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
-        }}>{sub}</div>
+        }}>{subText}</div>
       </div>
     </div>
   );
