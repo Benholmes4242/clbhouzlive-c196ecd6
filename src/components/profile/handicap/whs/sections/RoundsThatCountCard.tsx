@@ -192,25 +192,7 @@ export const RoundsThatCountCard: React.FC<Props> = ({ connectionId, currentHand
   const yFor = (diff: number) => CHART_TOP + ((yMax - diff) / ySpan) * innerH;
 
   // X positions
-  const colCount = enriched.rounds.length;
   const xFor = (idx: number) => ((idx + 0.5) / colCount) * 100; // % within plot area
-
-  const idxFromX = useCallback((clientX: number): number => {
-    const plot = plotRef.current;
-    if (!plot) return 0;
-    const rect = plot.getBoundingClientRect();
-    const xPct = ((clientX - rect.left) / rect.width) * 100;
-    let bestIdx = 0;
-    let bestDist = Infinity;
-    for (let i = 0; i < colCount; i++) {
-      const dist = Math.abs(((i + 0.5) / colCount) * 100 - xPct);
-      if (dist < bestDist) {
-        bestDist = dist;
-        bestIdx = i;
-      }
-    }
-    return bestIdx;
-  }, [colCount]);
 
   // SVG path
   const linePath = enriched.rounds
