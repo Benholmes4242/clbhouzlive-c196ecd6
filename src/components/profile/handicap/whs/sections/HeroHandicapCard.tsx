@@ -55,8 +55,8 @@ const W = 340;
 const H = 110;
 const PAD_TOP = 22;
 const PAD_BOTTOM = 22;
-const PAD_LEFT = 14;
-const PAD_RIGHT = 14;
+const PAD_LEFT = 0;
+const PAD_RIGHT = 0;
 
 // ── Milestone progress ────────────────────────────────────────────────────
 function calcMilestoneProgress(h: number) {
