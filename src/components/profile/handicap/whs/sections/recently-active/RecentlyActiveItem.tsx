@@ -50,7 +50,6 @@ export const RecentlyActiveItem: React.FC<Props> = ({ entry, isActive, onClick }
               objectFit: 'cover',
               border: '1px solid rgba(15,23,42,0.08)',
               background: '#F1F5F9',
-              opacity: isOnApp ? 1 : 0.55,
             }}
           />
         ) : (
@@ -67,7 +66,6 @@ export const RecentlyActiveItem: React.FC<Props> = ({ entry, isActive, onClick }
               fontSize: 18,
               fontWeight: 800,
               border: '1px solid rgba(15,23,42,0.08)',
-              opacity: isOnApp ? 1 : 0.55,
             }}
           >
             {initials(entry.friend_name)}
