@@ -159,7 +159,7 @@ export const FriendsLeaderboardSection: React.FC<Props> = ({ userId }) => {
             <LeaderboardRow
               key={entry.is_self ? 'self' : `${entry.friend_user_id ?? ''}-${entry.friend_name}`}
               entry={entry}
-              rank={realRank}
+              rank={activeRank}
               isFirst={i === 0}
               isLast={i === visible.length - 1}
               isStaleRow={staleRow}

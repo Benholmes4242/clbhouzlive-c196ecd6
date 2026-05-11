@@ -7,7 +7,7 @@ import type { FriendLeaderboardEntry } from '@/lib/whs/types';
 
 interface Props {
   entry: FriendLeaderboardEntry;
-  rank: number;
+  rank: number | null;
   isFirst: boolean;
   isLast: boolean;
   /** True when this friend hasn't played in the last 90 days. Always
