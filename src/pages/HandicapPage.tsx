@@ -223,7 +223,10 @@ const HandicapPageHeader: React.FC<HeaderProps> = ({
             lineHeight: 1.1, letterSpacing: '-0.02em',
             margin: 0, flex: 1, minWidth: 0,
           }}>
-            {title}
+            <span style={{ display: 'block' }}>{title.line1}</span>
+            {title.line2 && (
+              <span style={{ display: 'block' }}>{title.line2}</span>
+            )}
           </h1>
           <button
             onClick={() => openTrophiesSheet()}
