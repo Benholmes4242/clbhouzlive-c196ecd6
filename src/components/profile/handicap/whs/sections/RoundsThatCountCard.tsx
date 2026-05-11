@@ -90,10 +90,12 @@ const Skeleton: React.FC = () => (
 
 export const RoundsThatCountCard: React.FC<Props> = ({ connectionId, currentHandicap }) => {
   const { data: counters, isLoading: loadingCounters } = useCounters(connectionId);
-  const { data: insights } = useHandicapInsights(connectionId);
   const { data: allScores } = useAllScores(connectionId);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [showExplainer, setShowExplainer] = useState(false);
+  const [scrubIdx, setScrubIdx] = useState<number | null>(null);
+  const [isScrubbing, setIsScrubbing] = useState(false);
+  const plotRef = useRef<HTMLDivElement>(null);
 
   const projection = useMemo(() => {
     if (!allScores || allScores.length < 8 || currentHandicap == null) return null;
