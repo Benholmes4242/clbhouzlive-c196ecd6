@@ -97,6 +97,19 @@ export const RoundsThatCountCard: React.FC<Props> = ({ connectionId, currentHand
   const [isScrubbing, setIsScrubbing] = useState(false);
   const plotRef = useRef<HTMLDivElement>(null);
 
+  useEffect(() => {
+    if (scrubIdx === null) return;
+    const handlePointerDown = (e: PointerEvent) => {
+      const plot = plotRef.current;
+      if (!plot) return;
+      if (plot.contains(e.target as Node)) return;
+      setScrubIdx(null);
+      setSelectedId(null);
+    };
+    document.addEventListener('pointerdown', handlePointerDown);
+    return () => document.removeEventListener('pointerdown', handlePointerDown);
+  }, [scrubIdx]);
+
   const projection = useMemo(() => {
     if (!allScores || allScores.length < 8 || currentHandicap == null) return null;
     const last20 = allScores.slice(0, 20);
