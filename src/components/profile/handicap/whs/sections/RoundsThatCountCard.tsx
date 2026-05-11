@@ -39,27 +39,36 @@ const Y_AXIS_W = 30;
 const CHART_TOP = 14;
 const CHART_BOTTOM = 14;
 
-function generateTicks(yMin: number, yMax: number): number[] {
-  const ticks: number[] = [];
-  for (let v = yMax; v >= yMin; v--) ticks.push(v);
-  return ticks;
-}
+/**
+ * Compute clean axis bounds and ticks for a differential chart.
+ * - Both bounds snap to step multiples so ticks land cleanly
+ *   on both top and bottom edges (no orphan ticks).
+ * - Step picked based on data span: 1 (≤4), 2 (≤10), 5 (≤25), 10 (larger).
+ * - No padding above or below the data range.
+ */
+function computeAxis(dataMin: number, dataMax: number): {
+  yMin: number;
+  yMax: number;
+  ticks: number[];
+  step: number;
+} {
+  const rawMin = Math.floor(dataMin);
+  const rawMax = Math.ceil(dataMax);
+  const rawSpan = Math.max(rawMax - rawMin, 1);
 
-function renderBoldMarkdown(text: string): React.ReactNode {
-  if (!text) return null;
-  const parts = text.split(/\*\*(.*?)\*\*/g);
-  return parts.map((part, i) =>
-    i % 2 === 1
-      ? (
-        <strong key={i} style={{
-          fontFamily: FONT_DISPLAY, fontWeight: 600, color: INK,
-          fontVariantNumeric: 'tabular-nums',
-        }}>
-          {part}
-        </strong>
-      )
-      : <span key={i}>{part}</span>
-  );
+  let step: number;
+  if (rawSpan <= 4) step = 1;
+  else if (rawSpan <= 10) step = 2;
+  else if (rawSpan <= 25) step = 5;
+  else step = 10;
+
+  const yMin = Math.floor(rawMin / step) * step;
+  const yMax = Math.ceil(rawMax / step) * step;
+
+  const ticks: number[] = [];
+  for (let v = yMax; v >= yMin; v -= step) ticks.push(v);
+
+  return { yMin, yMax, ticks, step };
 }
 
 const Skeleton: React.FC = () => (
