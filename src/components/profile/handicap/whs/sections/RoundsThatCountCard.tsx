@@ -273,9 +273,32 @@ export const RoundsThatCountCard: React.FC<Props> = ({ connectionId, currentHand
             </div>
 
             {/* Plot area */}
-            <div style={{
-              flex: 1, position: 'relative', height: CHART_H,
-            }}>
+            <div
+              ref={plotRef}
+              onPointerDown={(e) => {
+                e.currentTarget.setPointerCapture(e.pointerId);
+                setIsScrubbing(true);
+                const idx = idxFromX(e.clientX);
+                setScrubIdx(idx);
+                setSelectedId(enriched.rounds[idx].id);
+              }}
+              onPointerMove={(e) => {
+                if (!isScrubbing) return;
+                const idx = idxFromX(e.clientX);
+                setScrubIdx(idx);
+                setSelectedId(enriched.rounds[idx].id);
+              }}
+              onPointerUp={() => setIsScrubbing(false)}
+              onPointerCancel={() => setIsScrubbing(false)}
+              style={{
+                flex: 1,
+                position: 'relative',
+                height: CHART_H,
+                touchAction: 'pan-y',
+                cursor: isScrubbing ? 'grabbing' : 'crosshair',
+                userSelect: 'none',
+              }}
+            >
               {/* Permanent latest emphasis band — centered on the last dot */}
               {(() => {
                 const latestIdx = enriched.rounds.length - 1;
