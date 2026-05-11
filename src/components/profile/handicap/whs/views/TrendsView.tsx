@@ -1,6 +1,4 @@
 import React from 'react';
-import TryNextCourses from '../sections/TryNextCourses';
-import RecentRoundsCard from '../sections/trends/RecentRoundsCard';
 import TrendCardsStack from '../sections/trends/TrendCardsStack';
 import RoundsThatCountCard from '../sections/RoundsThatCountCard';
 import EchoInsightsCard from '../sections/EchoInsightsCard';
@@ -15,7 +13,7 @@ interface Props {
 
 export const TrendsView: React.FC<Props> = ({
   connectionId,
-  userId,
+  userId: _userId,
   currentHandicap,
   readOnly = false,
 }) => {
@@ -25,11 +23,10 @@ export const TrendsView: React.FC<Props> = ({
       id="handicap-panel-trends"
       aria-labelledby="handicap-tab-trends"
     >
-      <TrendCardsStack connectionId={connectionId} currentHandicap={currentHandicap} />
+      <TrendCardsStack connectionId={connectionId} currentHandicap={currentHandicap} splitAt="hero-only" />
       <RoundsThatCountCard connectionId={connectionId} currentHandicap={currentHandicap} />
+      <TrendCardsStack connectionId={connectionId} currentHandicap={currentHandicap} splitAt="rest" />
       {!readOnly && <EchoInsightsCard connectionId={connectionId} />}
-      <TryNextCourses userId={userId} />
-      <RecentRoundsCard connectionId={connectionId} />
     </div>
   );
 };

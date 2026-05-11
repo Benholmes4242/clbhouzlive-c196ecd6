@@ -11,6 +11,11 @@ import TrendNarrativeSection from './TrendNarrativeSection';
 interface Props {
   connectionId: string;
   currentHandicap: number | null | undefined;
+  /** Optional. Controls which subset of the stack renders.
+   * 'hero-only' = form hero + HandicapProjectionCard.
+   * 'rest' = StablefordCard + TrendNarrativeSection + CourseFormCard.
+   * undefined (default) = whole stack (backwards-compatible). */
+  splitAt?: 'hero-only' | 'rest';
 }
 
 const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
@@ -20,7 +25,7 @@ const HOT_RED = '#DC2626';
 const COLD_BLUE = '#0EA5E9';
 const SLATE = '#475569';
 
-export const TrendCardsStack: React.FC<Props> = ({ connectionId, currentHandicap }) => {
+export const TrendCardsStack: React.FC<Props> = ({ connectionId, currentHandicap, splitAt }) => {
   const { data: scores, isLoading } = useAllScores(connectionId);
   const prediction = predictHandicap(scores ?? []);
   const meta = VERDICT_META[prediction.verdict];
@@ -39,7 +44,7 @@ export const TrendCardsStack: React.FC<Props> = ({ connectionId, currentHandicap
 
   return (
     <section style={{ padding: '10px 20px 0', marginBottom: 28, fontFamily: FONT }}>
-      {showHero ? (
+      {splitAt !== 'rest' && (showHero ? (
         <div style={{ padding: '0 4px 16px' }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, marginBottom: 10 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
@@ -170,7 +175,7 @@ export const TrendCardsStack: React.FC<Props> = ({ connectionId, currentHandicap
           title="The numbers behind your handicap"
           sub="Three signals that explain your trajectory"
         />
-      )}
+      ))}
 
       {isLoading ? (
         [420, 320, 360].map((h, i) => (
@@ -187,10 +192,14 @@ export const TrendCardsStack: React.FC<Props> = ({ connectionId, currentHandicap
         ))
       ) : (
         <>
-          <HandicapProjectionCard scores={scores ?? []} />
-          <StablefordCard scores={scores ?? []} />
-          <TrendNarrativeSection connectionId={connectionId} />
-          <CourseFormCard connectionId={connectionId} currentHandicap={currentHandicap} />
+          {splitAt !== 'rest' && <HandicapProjectionCard scores={scores ?? []} />}
+          {splitAt !== 'hero-only' && (
+            <>
+              <StablefordCard scores={scores ?? []} />
+              <TrendNarrativeSection connectionId={connectionId} />
+              <CourseFormCard connectionId={connectionId} currentHandicap={currentHandicap} />
+            </>
+          )}
         </>
       )}
     </section>
