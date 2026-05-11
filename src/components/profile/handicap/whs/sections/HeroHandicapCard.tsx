@@ -120,9 +120,9 @@ function formStateLabel(formStrokes: number): { title: string; sub: string } {
   const sign = display >= 0 ? '+' : '\u2212';
   const subStr = `${sign}${Math.abs(display).toFixed(1)} vs handicap`;
 
-  if (formStrokes > 1.0) return { title: 'ON FIRE FORM', sub: subStr };
+  if (formStrokes > 1.0) return { title: 'RED HOT FORM', sub: subStr };
   if (formStrokes > 0.1) return { title: 'WARM FORM', sub: subStr };
-  if (formStrokes < -1.0) return { title: 'ICE COLD FORM', sub: subStr };
+  if (formStrokes < -1.0) return { title: 'OUT OF FORM', sub: subStr };
   if (formStrokes < -0.1) return { title: 'COLD FORM', sub: subStr };
   return { title: 'STEADY', sub: 'On handicap' };
 }
