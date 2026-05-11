@@ -356,6 +356,7 @@ export const LastRoundCard: React.FC<Props> = ({ connectionId }) => {
         scoreId={lastRound.id}
         open={sheetOpen}
         onClose={() => setSheetOpen(false)}
+        handicapDelta={lastRound.handicap_delta ?? null}
       />
     </>
   );
