@@ -473,7 +473,7 @@ const BreakdownLine: React.FC<{
       </span>
       <span style={sep}>·</span>
       <span style={itemStyle(AMBER)}>
-        {breakdown.bogey} {breakdown.bogey === 1 ? 'BOG' : 'BOGS'}
+        {breakdown.bogey} {breakdown.bogey === 1 ? 'BGY' : 'BGYS'}
       </span>
       <span style={sep}>·</span>
       <span style={itemStyle(RED_BRIGHT)}>
