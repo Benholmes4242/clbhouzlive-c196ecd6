@@ -7,6 +7,7 @@ import { useHandicapTrend, whsKeys } from '@/lib/whs/hooks';
 import type { WhsConnection } from '@/lib/whs/types';
 import TodayView from './views/TodayView';
 import TrendsView from './views/TrendsView';
+import RecordsView from './views/RecordsView';
 import FriendsView from './views/FriendsView';
 import TrophiesSheetMount from './sections/TrophiesSheetMount';
 import { isHandicapSubtab, type HandicapSubtab } from './types';
@@ -114,6 +115,14 @@ export const HandicapDashboard: React.FC<Props> = ({ connection, userId, readOnl
         )}
         {activeSubtab === 'trends' && (
           <TrendsView
+            connectionId={connection.id}
+            userId={userId}
+            currentHandicap={currentHandicap}
+            readOnly={readOnly}
+          />
+        )}
+        {activeSubtab === 'records' && (
+          <RecordsView
             connectionId={connection.id}
             userId={userId}
             currentHandicap={currentHandicap}

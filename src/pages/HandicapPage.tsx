@@ -250,12 +250,12 @@ const HandicapPageHeader: React.FC<HeaderProps> = ({
         display: 'flex',
         justifyContent: 'center',
       }}>
-        {(['today', 'trends', 'friends'] as const).map(tab => (
+        {(['today', 'trends', 'records', 'friends'] as const).map(tab => (
           <button
             key={tab}
             onClick={() => onTabChange(tab)}
             style={{
-              padding: '10px 16px',
+              padding: '10px 14px',
               background: 'transparent',
               border: 'none',
               borderBottom: activeTab === tab ? `2px solid ${AMBER}` : '2px solid transparent',

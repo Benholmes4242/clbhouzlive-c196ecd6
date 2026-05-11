@@ -6,9 +6,7 @@ import MorningMoment from '@/components/handicap/MorningMoment';
 import HeroHandicapCard from '../sections/HeroHandicapCard';
 import LastRoundCard from '../sections/LastRoundCard';
 import StreaksSection from '../sections/StreaksSection';
-import WhereYouStandSection from '../sections/WhereYouStandSection';
 import SinceLastVisitRail from '../sections/since-last-visit/SinceLastVisitRail';
-import { useUserProfile } from '@/hooks/useUserProfile';
 
 interface Props {
   connection: WhsConnection;
@@ -38,8 +36,6 @@ export const TodayView: React.FC<Props> = ({
   isSyncing = false,
   onSyncNow,
 }) => {
-  const { data: profile } = useUserProfile(readOnly ? undefined : userId);
-  const peerComparisonVisible = (profile as any)?.peer_comparison_visible ?? true;
   return (
     <div
       role="tabpanel"
@@ -78,7 +74,6 @@ export const TodayView: React.FC<Props> = ({
 
       {!readOnly && <StreaksSection connectionId={connectionId} userId={userId} />}
 
-      {!readOnly && peerComparisonVisible && <WhereYouStandSection userId={userId} />}
       {!readOnly && <SinceLastVisitRail userId={userId} />}
 
       {!readOnly && (
