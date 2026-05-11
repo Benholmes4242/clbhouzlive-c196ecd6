@@ -1,10 +1,10 @@
 /**
  * Weather types for Morning Moment.
- * Open-Meteo current weather payload, normalized to our shape.
+ * Open-Meteo current + hourly + daily payload, normalised to our shape.
  */
 
 export interface WeatherData {
-  /** Current temperature in °C, as returned by Open-Meteo. Not rounded at the data layer. */
+  /** Current temperature in °C. Not rounded at the data layer. */
   temperature: number;
   /** Apparent temperature ("feels like") in °C. */
   apparentTemperature: number;
@@ -16,15 +16,25 @@ export interface WeatherData {
   windDirection: number;
   /** WMO weather code for current conditions. */
   weatherCode: number;
-  /** Human-readable description derived from WMO code. */
+  /** Display-ready description derived from WMO code. Sentence case. */
   description: string;
   /** Maximum precipitation probability (%) across the next 4 hours. */
   precipProbabilityMax4h: number;
-  /** Today's sunset time as a "HH:MM" string in the location's local time. */
+  /** Today's peak temperature in °C, for trajectory copy. */
+  peakTempToday: number;
+  /** Time today's peak hits, formatted "1pm" / "11am" / "3pm". Empty if unparseable. */
+  peakTempTimeLabel: string;
+  /** Next-hour temperature in °C. Drives the trend arrow. */
+  nextHourTemp: number;
+  /** Today's sunset time as "HH:MM" string in the location's local time. */
   sunsetTime: string;
-  /** Daylight duration today in minutes. */
-  daylightMinutes: number;
-  /** 1 if currently daylight, 0 if night — drives day/night palette branching. */
+  /** Tomorrow's sunrise time as "HH:MM" in the location's local time. */
+  sunriseTomorrowTime: string;
+  /** Hours of daylight remaining today; null after sunset. */
+  daylightHoursRemaining: number | null;
+  /** Day progress: 0 at sunrise, 1 at sunset, -1 after sunset. Drives gradient warping. */
+  dayProgress: number;
+  /** 1 if currently daylight, 0 if night. */
   isDay: 0 | 1;
   /** Unix ms when this payload was fetched. */
   fetchedAt: number;
@@ -51,32 +61,32 @@ export type WeatherUnresolvedReason =
   | 'unknown';
 
 export const WMO_WEATHER_CODES: Record<number, string> = {
-  0: 'clear',
-  1: 'mostly clear',
-  2: 'partly cloudy',
-  3: 'overcast',
-  45: 'foggy',
-  48: 'foggy',
-  51: 'light drizzle',
-  53: 'drizzle',
-  55: 'heavy drizzle',
-  56: 'freezing drizzle',
-  57: 'freezing drizzle',
-  61: 'light rain',
-  63: 'rain',
-  65: 'heavy rain',
-  66: 'freezing rain',
-  67: 'freezing rain',
-  71: 'light snow',
-  73: 'snow',
-  75: 'heavy snow',
-  77: 'snow grains',
-  80: 'light showers',
-  81: 'showers',
-  82: 'heavy showers',
-  85: 'snow showers',
-  86: 'heavy snow showers',
-  95: 'thunderstorm',
-  96: 'thunderstorm',
-  99: 'thunderstorm',
+  0: 'Clear',
+  1: 'Mostly clear',
+  2: 'Partly cloudy',
+  3: 'Overcast',
+  45: 'Foggy',
+  48: 'Foggy',
+  51: 'Light drizzle',
+  53: 'Drizzle',
+  55: 'Heavy drizzle',
+  56: 'Freezing drizzle',
+  57: 'Freezing drizzle',
+  61: 'Light rain',
+  63: 'Steady rain',
+  65: 'Heavy rain',
+  66: 'Freezing rain',
+  67: 'Freezing rain',
+  71: 'Light snow',
+  73: 'Snow',
+  75: 'Heavy snow',
+  77: 'Snow grains',
+  80: 'Light showers',
+  81: 'Showers',
+  82: 'Heavy showers',
+  85: 'Snow showers',
+  86: 'Heavy snow showers',
+  95: 'Thunderstorm',
+  96: 'Thunderstorm',
+  99: 'Thunderstorm',
 };
