@@ -141,13 +141,31 @@ const HeroHandicapCard: React.FC<Props> = ({ connection }) => {
   const current = trend?.current ?? null;
   const points: HandicapPoint[] = history ?? [];
 
+  // Date-windowed slice of all rounds for the active range. Drives FORM,
+  // SCORING AVG, and the round counts in sub-labels.
+  const rangeFilteredScores = useMemo(() => {
+    if (!recent) return [] as any[];
+    if (range === 'all') return recent as any[];
+    const cutoff = Date.now() - range * 24 * 60 * 60 * 1000;
+    return (recent as any[]).filter((r: any) => {
+      if (!r?.play_date) return false;
+      const ts = new Date(r.play_date).getTime();
+      return Number.isFinite(ts) && ts >= cutoff;
+    });
+  }, [recent, range]);
+
+  // Differentials within active range — drives FORM. Falls back to last-5
+  // if active range has fewer than 3 rounds, so the ring isn't empty.
   const last5Diffs = useMemo(() => {
-    if (!recent) return [];
-    return recent
+    const inRange = rangeFilteredScores
+      .map((r: any) => r.handicap_differential)
+      .filter((d: any): d is number => typeof d === 'number');
+    if (inRange.length >= 3) return inRange;
+    return ((recent ?? []) as any[])
       .slice(0, 5)
       .map((r: any) => r.handicap_differential)
       .filter((d: any): d is number => typeof d === 'number');
-  }, [recent]);
+  }, [rangeFilteredScores, recent]);
 
   const coords = useMemo(() => {
     if (points.length === 0) return [] as { x: number; y: number; idx: number }[];
