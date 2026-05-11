@@ -473,28 +473,44 @@ const HeroHandicapCard: React.FC<Props> = ({ connection }) => {
     };
   })();
 
-  // ── FORM state from predictHandicap ────────────────────────────────────
-  const formPrediction = predictHandicap((recent ?? []) as any);
-  const formState: 'hot' | 'steady' | 'cold' | 'unknown' =
-    formPrediction.verdict === 'unknown' ? 'unknown'
-    : formPrediction.verdict === 'in_form' || formPrediction.verdict === 'building' ? 'hot'
-    : formPrediction.verdict === 'steady' ? 'steady'
-    : 'cold';
+  // ── FORM (range-aware) ────────────────────────────────────────────────
+  // formStrokes from fallbackForm (computed above using rangeDiffs).
+  const formStrokesValue = fallbackForm.formStrokes;
+  const formLabel = formStateLabel(formStrokesValue);
+  const formCap = range === 'all' ? 3 : 2;
+  const formClamped = Math.max(-formCap, Math.min(formCap, formStrokesValue));
+  const formMagnitude = Math.abs(formClamped) / formCap; // 0–1
+  const formIsHot = formClamped > 0.05;
+  const formIsCold = formClamped < -0.05;
+  const formArcColor = formIsHot ? FORM_HOT : formIsCold ? FORM_COLD : INK_40;
+  const formHasData = last5Diffs.length > 0;
 
-  // ── SCORING AVG (last 5 adjusted_gross) ────────────────────────────────
-  const grossList = ((recent ?? []) as any[])
-    .map(r => (typeof r?.adjusted_gross === 'number' ? r.adjusted_gross : null))
-    .filter((v): v is number => v != null);
-  const last5Gross = grossList.slice(0, 5);
-  const scoringAvgStr = last5Gross.length >= 3
-    ? (last5Gross.reduce((s, v) => s + v, 0) / last5Gross.length).toFixed(1)
+  // ── SCORING AVG within active range ───────────────────────────────────
+  const rangeGrossList = rangeFilteredScores
+    .map((r: any) => (typeof r?.adjusted_gross === 'number' ? r.adjusted_gross : null))
+    .filter((v: any): v is number => v != null);
+  const scoringAvgStr = rangeGrossList.length >= 3
+    ? (rangeGrossList.reduce((s, v) => s + v, 0) / rangeGrossList.length).toFixed(1)
     : null;
-  const last50Gross = grossList.slice(0, 50);
+  const scoringRoundCount = rangeGrossList.length;
+
+  // Ring fill scale uses last-50 best/worst across all rounds — independent
+  // of the active range so the visual position is stable.
+  const allGrossList = ((recent ?? []) as any[])
+    .map((r: any) => (typeof r?.adjusted_gross === 'number' ? r.adjusted_gross : null))
+    .filter((v: any): v is number => v != null);
+  const last50Gross = allGrossList.slice(0, 50);
   const grossBest = last50Gross.length ? Math.min(...last50Gross) : null;
   const grossWorst = last50Gross.length ? Math.max(...last50Gross) : null;
   const scoringFraction = (scoringAvgStr !== null && grossBest !== null && grossWorst !== null && grossWorst !== grossBest)
     ? Math.max(0, Math.min(1, (grossWorst - parseFloat(scoringAvgStr)) / (grossWorst - grossBest)))
     : 0.5;
+
+  const scoringSub = range === 30
+    ? `Over 30 days · ${scoringRoundCount} ${scoringRoundCount === 1 ? 'round' : 'rounds'}`
+    : range === 365
+      ? `Over 1 year · ${scoringRoundCount} ${scoringRoundCount === 1 ? 'round' : 'rounds'}`
+      : `Career · ${scoringRoundCount} ${scoringRoundCount === 1 ? 'round' : 'rounds'}`;
 
   return (
     <section style={{ margin: '0 0 24px', padding: '0 20px', fontFamily: FONT_DISPLAY }}>
