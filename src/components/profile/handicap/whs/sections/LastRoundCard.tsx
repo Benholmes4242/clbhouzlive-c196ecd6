@@ -344,52 +344,12 @@ export const LastRoundCard: React.FC<Props> = ({ connectionId }) => {
   );
 };
 
-const HcpImpactPill: React.FC<{ delta: number | null }> = ({ delta }) => {
-  if (delta == null) return null;
-  const isUnchanged = Math.abs(delta) < 0.05;
-  const isCut = delta < -0.05;
-  const Icon = isUnchanged ? Minus : isCut ? TrendingDown : TrendingUp;
-  const iconColor = isUnchanged ? WHITE_65 : isCut ? GREEN_BRIGHT : RED_BRIGHT;
-  const label = isUnchanged
-    ? 'FLAT'
-    : isCut
-    ? `↓ ${Math.abs(delta).toFixed(1)}`
-    : `↑ ${Math.abs(delta).toFixed(1)}`;
-  return (
-    <div
-      style={{
-        display: 'inline-flex',
-        alignItems: 'center',
-        gap: 4,
-        padding: '4px 7px',
-        borderRadius: 999,
-        background: 'rgba(255,255,255,0.10)',
-        border: '0.5px solid rgba(255,255,255,0.18)',
-        flexShrink: 0,
-      }}
-    >
-      <Icon size={10} color={iconColor} strokeWidth={2.5} />
-      <span
-        style={{
-          fontSize: 9,
-          fontWeight: 800,
-          color: WHITE_85,
-          letterSpacing: '0.06em',
-          textTransform: 'uppercase',
-          fontVariantNumeric: 'tabular-nums',
-        }}
-      >
-        {label}
-      </span>
-    </div>
-  );
-};
-
 const ToParDiffStrip: React.FC<{
   adjustedGross: number | null;
   par: number | null;
   differential: number | null;
-}> = ({ adjustedGross, par, differential }) => {
+  handicapDelta: number | null;
+}> = ({ adjustedGross, par, differential, handicapDelta }) => {
   const parts: string[] = [];
   if (adjustedGross != null && par != null) {
     const dp = adjustedGross - par;
@@ -398,20 +358,55 @@ const ToParDiffStrip: React.FC<{
   if (differential != null) {
     parts.push(`${fmtDiff(differential)} DIFF`);
   }
-  if (parts.length === 0) return null;
+  if (parts.length === 0 && handicapDelta == null) return null;
+
+  const showHcp = handicapDelta != null && Math.abs(handicapDelta) >= 0.05;
+  const hcpIsCut = showHcp && handicapDelta! < 0;
+  const hcpColor = hcpIsCut ? GREEN_BRIGHT : RED_BRIGHT;
+  const hcpMag = showHcp ? Math.abs(handicapDelta!).toFixed(1) : null;
+
   return (
     <div
       style={{
         marginTop: 6,
-        fontSize: 11,
-        fontWeight: 700,
-        color: AMBER,
-        letterSpacing: '0.08em',
-        textTransform: 'uppercase',
-        fontVariantNumeric: 'tabular-nums',
+        display: 'flex',
+        alignItems: 'center',
+        gap: 8,
       }}
     >
-      {parts.join(' · ')}
+      <span
+        style={{
+          fontSize: 11,
+          fontWeight: 700,
+          color: AMBER,
+          letterSpacing: '0.08em',
+          textTransform: 'uppercase',
+          fontVariantNumeric: 'tabular-nums',
+        }}
+      >
+        {parts.join(' · ')}
+      </span>
+      {showHcp && (
+        <span
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: 2,
+            fontSize: 11,
+            fontWeight: 800,
+            color: hcpColor,
+            letterSpacing: '0.04em',
+            fontVariantNumeric: 'tabular-nums',
+          }}
+        >
+          {hcpIsCut ? (
+            <TrendingDown size={11} color={hcpColor} strokeWidth={2.5} />
+          ) : (
+            <TrendingUp size={11} color={hcpColor} strokeWidth={2.5} />
+          )}
+          {hcpMag}
+        </span>
+      )}
     </div>
   );
 };
