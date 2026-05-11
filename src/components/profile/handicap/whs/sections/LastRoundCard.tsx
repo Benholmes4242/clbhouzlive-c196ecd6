@@ -202,51 +202,42 @@ export const LastRoundCard: React.FC<Props> = ({ connectionId }) => {
                 color: '#fff',
               }}
             >
-              {/* TOP ROW */}
-              <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 12 }}>
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <div
-                    style={{
-                      fontSize: 9,
-                      fontWeight: 900,
-                      color: AMBER,
-                      letterSpacing: '0.16em',
-                      textTransform: 'uppercase',
-                      marginBottom: 6,
-                    }}
-                  >
-                    · {relativeDay(lastRound.play_date).toUpperCase()} · LAST ROUND
-                  </div>
-                  <div
-                    style={{
-                      fontSize: 22,
-                      fontWeight: 800,
-                      color: '#fff',
-                      letterSpacing: '-0.02em',
-                      lineHeight: 1.1,
-                      whiteSpace: 'nowrap',
-                      overflow: 'hidden',
-                      textOverflow: 'ellipsis',
-                    }}
-                  >
-                    {lastRound.course?.name ?? 'Unknown course'}
-                  </div>
-                  {(lastRound.course_rating || lastRound.slope_rating) && (
-                    <div
-                      style={{
-                        fontSize: 10,
-                        fontWeight: 700,
-                        color: WHITE_55,
-                        letterSpacing: '0.06em',
-                        marginTop: 3,
-                        fontVariantNumeric: 'tabular-nums',
-                      }}
-                    >
-                      {lastRound.course_rating?.toFixed(1) ?? '—'}/{lastRound.slope_rating ?? '—'}
-                    </div>
-                  )}
+              {/* TOP — course name + sub-line */}
+              <div style={{ minWidth: 0 }}>
+                <div
+                  style={{
+                    fontSize: 22,
+                    fontWeight: 800,
+                    color: '#fff',
+                    letterSpacing: '-0.02em',
+                    lineHeight: 1.1,
+                    whiteSpace: 'nowrap',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                  }}
+                >
+                  {lastRound.course?.name ?? 'Unknown course'}
                 </div>
-                <HcpImpactPill delta={delta} />
+                <div
+                  style={{
+                    fontSize: 10,
+                    fontWeight: 700,
+                    color: WHITE_55,
+                    letterSpacing: '0.06em',
+                    marginTop: 3,
+                    fontVariantNumeric: 'tabular-nums',
+                    textTransform: 'uppercase',
+                  }}
+                >
+                  {[
+                    relativeDay(lastRound.play_date).toUpperCase(),
+                    lastRound.course_rating && lastRound.slope_rating
+                      ? `${lastRound.course_rating.toFixed(1)}/${lastRound.slope_rating}`
+                      : null,
+                  ]
+                    .filter(Boolean)
+                    .join(' · ')}
+                </div>
               </div>
 
               {/* HERO */}
@@ -280,6 +271,7 @@ export const LastRoundCard: React.FC<Props> = ({ connectionId }) => {
                     adjustedGross={lastRound.adjusted_gross ?? null}
                     par={par}
                     differential={lastRound.handicap_differential ?? null}
+                    handicapDelta={lastRound.handicap_delta ?? null}
                   />
                 </div>
 
