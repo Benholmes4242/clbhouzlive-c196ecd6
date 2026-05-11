@@ -394,33 +394,7 @@ const OnAppCard: React.FC<{ activity: WhsFriendActivityWithImage; onClick: () =>
 
         <div style={{ flex: 1 }} />
 
-        {/* HCP impact pill */}
-        {showImpact && (
-          <span
-            style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: 3,
-              padding: '4px 8px',
-              borderRadius: 999,
-              fontSize: 11,
-              fontWeight: 800,
-              fontVariantNumeric: 'tabular-nums',
-              letterSpacing: '-0.01em',
-              color: impactIsImprovement ? T.greenInk : T.redInk,
-              background: impactIsImprovement ? T.greenTint : T.redTint,
-              border: `1px solid ${impactIsImprovement ? 'rgba(6,95,70,0.18)' : 'rgba(127,29,29,0.18)'}`,
-              flexShrink: 0,
-            }}
-          >
-            {impactIsImprovement ? (
-              <ArrowDown size={11} strokeWidth={2.5} />
-            ) : (
-              <ArrowUp size={11} strokeWidth={2.5} />
-            )}
-            {Math.abs(impactDelta!).toFixed(1)} hcp
-          </span>
-        )}
+        {/* HCP impact pill moved to header (under the date) */}
 
         {/* DIFF + fires */}
         {diffStr !== null && (
