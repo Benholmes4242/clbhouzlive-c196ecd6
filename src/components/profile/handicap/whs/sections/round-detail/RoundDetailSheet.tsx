@@ -288,40 +288,75 @@ export const RoundDetailSheet: React.FC<Props> = ({ scoreId, open, onClose, hand
               {/* FOOTER */}
               <div
                 style={{
+                  position: 'relative',
                   marginTop: 'auto',
-                  padding: '12px 16px',
-                  paddingBottom: 'calc(12px + env(safe-area-inset-bottom, 0px))',
-                  background: AMBER_TINT,
-                  borderTop: `1px solid rgba(247,147,30,0.18)`,
+                  padding: '14px 16px',
+                  paddingBottom: 'calc(14px + env(safe-area-inset-bottom, 0px))',
+                  background: '#FFFBF5',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'space-between',
                   gap: 12,
                 }}
               >
-                <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, minWidth: 0 }}>
+                <div
+                  aria-hidden
+                  style={{
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    height: 2,
+                    background:
+                      'linear-gradient(90deg, transparent, #F7931E, transparent)',
+                  }}
+                />
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 3, minWidth: 0 }}>
                   <span
                     style={{
                       fontSize: 9,
-                      fontWeight: 800,
-                      letterSpacing: '0.16em',
+                      fontWeight: 900,
+                      letterSpacing: '0.20em',
                       color: AMBER_DEEP,
                     }}
                   >
-                    INDEX AT TIME
+                    HANDICAP AT TIME
                   </span>
                   <span
                     style={{
-                      fontSize: 16,
-                      fontWeight: 800,
-                      color: INK,
-                      fontFamily: FONT_DISPLAY,
+                      display: 'inline-flex',
+                      alignItems: 'baseline',
+                      gap: 6,
                       fontVariantNumeric: 'tabular-nums',
-                      letterSpacing: '-0.02em',
-                      lineHeight: 1,
                     }}
                   >
-                    {data.handicap_index_at_time?.toFixed(1) ?? '—'}
+                    <span
+                      style={{
+                        fontSize: 22,
+                        fontWeight: 800,
+                        color: INK,
+                        fontFamily: FONT_DISPLAY,
+                        letterSpacing: '-0.03em',
+                        lineHeight: 1,
+                      }}
+                    >
+                      {data.handicap_index_at_time?.toFixed(1) ?? '\u2014'}
+                    </span>
+                    {handicapDelta != null &&
+                      Math.abs(handicapDelta) >= 0.05 &&
+                      data.handicap_index_at_time != null && (
+                        <span
+                          style={{
+                            fontSize: 11,
+                            fontWeight: 700,
+                            color: 'rgba(15,23,42,0.40)',
+                            textDecoration: 'line-through',
+                            textDecorationColor: 'rgba(15,23,42,0.30)',
+                          }}
+                        >
+                          {(data.handicap_index_at_time - handicapDelta).toFixed(1)}
+                        </span>
+                      )}
                   </span>
                 </div>
                 {data.permalink_url && (
@@ -332,21 +367,23 @@ export const RoundDetailSheet: React.FC<Props> = ({ scoreId, open, onClose, hand
                     style={{
                       display: 'inline-flex',
                       alignItems: 'center',
-                      gap: 4,
-                      padding: '7px 12px',
+                      gap: 5,
+                      padding: '9px 14px',
                       borderRadius: 999,
-                      background: '#fff',
-                      color: AMBER_INK,
+                      background: INK,
+                      color: '#fff',
                       fontSize: 11,
                       fontWeight: 800,
                       textDecoration: 'none',
-                      border: `1px solid rgba(247,147,30,0.20)`,
-                      letterSpacing: '0.02em',
+                      border: 'none',
+                      letterSpacing: '0.04em',
                       flexShrink: 0,
+                      boxShadow:
+                        '0 1px 0 rgba(247,147,30,0.40), 0 4px 10px -2px rgba(15,23,42,0.20)',
                     }}
                   >
                     Open in MyEG
-                    <ExternalLink size={11} strokeWidth={2.4} />
+                    <ExternalLink size={11} strokeWidth={2.5} />
                   </a>
                 )}
               </div>
