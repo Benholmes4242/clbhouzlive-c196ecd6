@@ -457,7 +457,6 @@ const HoleStrip: React.FC<{ holes: HoleRow[] }> = ({ holes }) => (
 const BreakdownLine: React.FC<{
   breakdown: { eagle: number; birdie: number; par: number; bogey: number; doublePlus: number };
 }> = ({ breakdown }) => {
-  const birdieTotal = breakdown.eagle + breakdown.birdie;
   const itemStyle = (color: string): React.CSSProperties => ({
     fontSize: 10,
     fontWeight: 800,
@@ -471,6 +470,45 @@ const BreakdownLine: React.FC<{
     fontSize: 10,
     fontWeight: 700,
   };
+
+  const chips: Array<{ key: string; color: string; value: number; label: string }> = [];
+  if (breakdown.eagle > 0) {
+    chips.push({
+      key: 'eagle',
+      color: EAGLE_GREEN,
+      value: breakdown.eagle,
+      label: breakdown.eagle === 1 ? 'EAGLE' : 'EAGLES',
+    });
+  }
+  if (breakdown.birdie > 0) {
+    chips.push({
+      key: 'birdie',
+      color: BIRDIE_GREEN,
+      value: breakdown.birdie,
+      label: breakdown.birdie === 1 ? 'BIRDIE' : 'BIRDIES',
+    });
+  }
+  chips.push({
+    key: 'par',
+    color: WHITE_85,
+    value: breakdown.par,
+    label: breakdown.par === 1 ? 'PAR' : 'PARS',
+  });
+  chips.push({
+    key: 'bogey',
+    color: BOGEY_RED,
+    value: breakdown.bogey,
+    label: breakdown.bogey === 1 ? 'BGY' : 'BGYS',
+  });
+  if (breakdown.doublePlus > 0) {
+    chips.push({
+      key: 'doublePlus',
+      color: DOUBLE_RED,
+      value: breakdown.doublePlus,
+      label: 'DBL+',
+    });
+  }
+
   return (
     <div
       style={{
@@ -481,21 +519,14 @@ const BreakdownLine: React.FC<{
         marginTop: 10,
       }}
     >
-      <span style={itemStyle(GREEN_BRIGHT)}>
-        {birdieTotal} {birdieTotal === 1 ? 'BIRDIE' : 'BIRDIES'}
-      </span>
-      <span style={sep}>·</span>
-      <span style={itemStyle(WHITE_85)}>
-        {breakdown.par} {breakdown.par === 1 ? 'PAR' : 'PARS'}
-      </span>
-      <span style={sep}>·</span>
-      <span style={itemStyle(AMBER)}>
-        {breakdown.bogey} {breakdown.bogey === 1 ? 'BGY' : 'BGYS'}
-      </span>
-      <span style={sep}>·</span>
-      <span style={itemStyle(RED_BRIGHT)}>
-        {breakdown.doublePlus} DBL+
-      </span>
+      {chips.map((chip, i) => (
+        <React.Fragment key={chip.key}>
+          {i > 0 && <span style={sep}>·</span>}
+          <span style={itemStyle(chip.color)}>
+            {chip.value} {chip.label}
+          </span>
+        </React.Fragment>
+      ))}
     </div>
   );
 };
