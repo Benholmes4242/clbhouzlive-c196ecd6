@@ -710,13 +710,13 @@ const HeroHandicapCard: React.FC<Props> = ({ connection }) => {
       </div>
 
       {/* Sparkline strip */}
-      <div style={{ padding: '0 4px', marginTop: 8 }}>
+      <div style={{ padding: '0 10px', marginTop: 8 }}>
         <svg
           ref={svgRef}
           width="100%"
           height="auto"
           viewBox={`0 0 ${W} ${H}`}
-          style={{ display: 'block', touchAction: 'none', cursor: 'crosshair' }}
+          style={{ display: 'block', touchAction: 'none', cursor: 'crosshair', overflow: 'visible' }}
           onPointerMove={handlePointerMove}
           onPointerDown={handlePointerDown}
           onPointerLeave={clearScrub}
