@@ -695,7 +695,7 @@ export const RoundsThatCountCard: React.FC<Props> = ({ connectionId, currentHand
             disabled withRightBorder
           />
           <StatCell
-            label="WORST" value={enriched.maxDiff} dotColor={RED} valueColor={RED}
+            label="WORST COUNTER" value={enriched.maxDiff} dotColor={RED} valueColor={RED}
             active={selectedRound.id === worstRound.id}
             onClick={() => setSelectedId(worstRound.id)}
           />
