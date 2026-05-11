@@ -71,7 +71,7 @@ export const RoundHoleCell: React.FC<Props> = ({ hole, size = 44 }) => {
             lineHeight: 1,
           }}
         >
-          {`${holeNumber}\u00B7${par ?? '\u2014'}`}
+          {holeNumber}
         </span>
         <span
           style={{
@@ -122,7 +122,7 @@ export const RoundHoleCell: React.FC<Props> = ({ hole, size = 44 }) => {
           opacity: 0.85,
         }}
       >
-        {`${holeNumber}\u00B7${par}`}
+        {holeNumber}
       </span>
       <span
         style={{
