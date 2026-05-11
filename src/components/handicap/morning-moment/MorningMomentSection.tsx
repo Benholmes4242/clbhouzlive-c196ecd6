@@ -142,7 +142,7 @@ const MorningMomentSection: React.FC<Props> = ({ userId }) => {
   // Avoids pop-in — eyebrow visible immediately, content fills as queries resolve.
   if (isLoading) {
     return (
-      <section aria-label="Today" style={{ padding: '20px 16px 8px' }}>
+      <section aria-label="Today" style={{ padding: '12px 16px 8px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
           <div style={{ width: 5, height: 5, borderRadius: '50%', background: AMBER }} />
           <span
@@ -168,7 +168,7 @@ const MorningMomentSection: React.FC<Props> = ({ userId }) => {
   }
 
   return (
-    <section aria-label="Today" style={{ padding: '20px 16px 8px' }}>
+    <section aria-label="Today" style={{ padding: '12px 16px 8px' }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
         <div style={{ width: 5, height: 5, borderRadius: '50%', background: AMBER }} />
         <span
