@@ -54,13 +54,29 @@ const HandicapExplainerSheet: React.FC<Props> = ({
 }) => {
   useEffect(() => {
     if (!open) return;
+
     const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
     document.addEventListener('keydown', onKey);
-    const prevOverflow = document.body.style.overflow;
+
+    // Position-fixed scroll lock — works correctly on iOS Safari and
+    // Android WebView. Captures the scroll position before locking,
+    // restores it after closing. Pattern matches src/components/courses/
+    // review-wizard/ReviewWizard.tsx.
+    const scrollY = window.scrollY;
+    document.body.style.position = 'fixed';
+    document.body.style.top = `-${scrollY}px`;
+    document.body.style.left = '0';
+    document.body.style.right = '0';
     document.body.style.overflow = 'hidden';
+
     return () => {
       document.removeEventListener('keydown', onKey);
-      document.body.style.overflow = prevOverflow;
+      document.body.style.position = '';
+      document.body.style.top = '';
+      document.body.style.left = '';
+      document.body.style.right = '';
+      document.body.style.overflow = '';
+      window.scrollTo(0, scrollY);
     };
   }, [open, onClose]);
 
