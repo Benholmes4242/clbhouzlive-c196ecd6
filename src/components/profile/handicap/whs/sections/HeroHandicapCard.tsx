@@ -108,7 +108,7 @@ function calcMonthlyMovement(delta: number | null) {
 }
 
 const HeroHandicapCard: React.FC<Props> = ({ connection }) => {
-  const [range, setRange] = useState<Range>('all');
+  const [range, setRange] = useState<Range>(30);
   const [scrubIdx, setScrubIdx] = useState<number | null>(null);
   const [drawn, setDrawn] = useState(false);
   const svgRef = useRef<SVGSVGElement | null>(null);
