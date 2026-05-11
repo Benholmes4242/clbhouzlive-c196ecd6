@@ -7,7 +7,7 @@ import type { FriendLeaderboardEntry } from '@/lib/whs/types';
 
 interface Props {
   entry: FriendLeaderboardEntry;
-  rank: number;
+  rank: number | null;
   isFirst: boolean;
   isLast: boolean;
   /** True when this friend hasn't played in the last 90 days. Always
@@ -76,7 +76,7 @@ export const LeaderboardRow: React.FC<Props> = ({
       type={onClick ? 'button' : undefined}
       onClick={onClick}
       role={onClick ? undefined : 'listitem'}
-      aria-label={`${displayName}, ranked ${rank}, handicap ${fmtHcp(hcp)}${isStaleRow ? ', stale' : ''}`}
+      aria-label={`${displayName}${rank != null ? `, ranked ${rank}` : ''}, handicap ${fmtHcp(hcp)}${isStaleRow ? ', stale' : ''}`}
       style={{
         display: 'flex',
         alignItems: 'center',
@@ -103,11 +103,11 @@ export const LeaderboardRow: React.FC<Props> = ({
           flexShrink: 0,
           fontSize: 12,
           fontWeight: 700,
-          color: rank <= 3 ? T.amberDeep : T.inkMute,
+          color: rank != null && rank <= 3 ? T.amberDeep : T.inkMute,
           fontVariantNumeric: 'tabular-nums',
         }}
       >
-        {rank}
+        {rank ?? '\u2014'}
       </div>
 
       {/* Avatar + name + meta */}
