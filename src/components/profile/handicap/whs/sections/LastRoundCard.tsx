@@ -16,7 +16,13 @@ const WHITE_45 = 'rgba(255,255,255,0.45)';
 const WHITE_55 = 'rgba(255,255,255,0.55)';
 const WHITE_65 = 'rgba(255,255,255,0.65)';
 const WHITE_85 = 'rgba(255,255,255,0.85)';
-const WHITE_18 = 'rgba(255,255,255,0.18)';
+// Hole-score palette — six tiers
+const HOLE_GOLD = '#D4A82A';
+const EAGLE_GREEN = '#0E9F6E';
+const BIRDIE_GREEN = '#10B981';
+const PAR_GREY = 'rgba(255,255,255,0.40)';
+const BOGEY_RED = '#E11D48';
+const DOUBLE_RED = '#9F1239';
 const FONT_GEIST = 'Geist, system-ui, -apple-system, BlinkMacSystemFont, sans-serif';
 
 const fmtDiff = (n: number | null | undefined) => {
@@ -423,13 +429,15 @@ const ToParDiffStrip: React.FC<{
 const HoleStrip: React.FC<{ holes: HoleRow[] }> = ({ holes }) => (
   <div style={{ display: 'flex', gap: 2, width: '100%' }}>
     {holes.map((h, i) => {
-      let color = WHITE_18;
+      let color: string = PAR_GREY;
       if (h.played && h.actual_gross != null && h.par != null) {
         const diff = h.actual_gross - h.par;
-        if (diff < 0) color = GREEN_BRIGHT;
-        else if (diff === 0) color = WHITE_18;
-        else if (diff === 1) color = AMBER;
-        else color = RED_BRIGHT;
+        if (h.actual_gross === 1) color = HOLE_GOLD;
+        else if (diff <= -2) color = EAGLE_GREEN;
+        else if (diff === -1) color = BIRDIE_GREEN;
+        else if (diff === 0) color = PAR_GREY;
+        else if (diff === 1) color = BOGEY_RED;
+        else color = DOUBLE_RED;
       }
       return (
         <div
@@ -449,7 +457,6 @@ const HoleStrip: React.FC<{ holes: HoleRow[] }> = ({ holes }) => (
 const BreakdownLine: React.FC<{
   breakdown: { eagle: number; birdie: number; par: number; bogey: number; doublePlus: number };
 }> = ({ breakdown }) => {
-  const birdieTotal = breakdown.eagle + breakdown.birdie;
   const itemStyle = (color: string): React.CSSProperties => ({
     fontSize: 10,
     fontWeight: 800,
@@ -463,6 +470,45 @@ const BreakdownLine: React.FC<{
     fontSize: 10,
     fontWeight: 700,
   };
+
+  const chips: Array<{ key: string; color: string; value: number; label: string }> = [];
+  if (breakdown.eagle > 0) {
+    chips.push({
+      key: 'eagle',
+      color: EAGLE_GREEN,
+      value: breakdown.eagle,
+      label: breakdown.eagle === 1 ? 'EAGLE' : 'EAGLES',
+    });
+  }
+  if (breakdown.birdie > 0) {
+    chips.push({
+      key: 'birdie',
+      color: BIRDIE_GREEN,
+      value: breakdown.birdie,
+      label: breakdown.birdie === 1 ? 'BIRDIE' : 'BIRDIES',
+    });
+  }
+  chips.push({
+    key: 'par',
+    color: WHITE_85,
+    value: breakdown.par,
+    label: breakdown.par === 1 ? 'PAR' : 'PARS',
+  });
+  chips.push({
+    key: 'bogey',
+    color: BOGEY_RED,
+    value: breakdown.bogey,
+    label: breakdown.bogey === 1 ? 'BGY' : 'BGYS',
+  });
+  if (breakdown.doublePlus > 0) {
+    chips.push({
+      key: 'doublePlus',
+      color: DOUBLE_RED,
+      value: breakdown.doublePlus,
+      label: 'DBL+',
+    });
+  }
+
   return (
     <div
       style={{
@@ -473,21 +519,14 @@ const BreakdownLine: React.FC<{
         marginTop: 10,
       }}
     >
-      <span style={itemStyle(GREEN_BRIGHT)}>
-        {birdieTotal} {birdieTotal === 1 ? 'BIRDIE' : 'BIRDIES'}
-      </span>
-      <span style={sep}>·</span>
-      <span style={itemStyle(WHITE_85)}>
-        {breakdown.par} {breakdown.par === 1 ? 'PAR' : 'PARS'}
-      </span>
-      <span style={sep}>·</span>
-      <span style={itemStyle(AMBER)}>
-        {breakdown.bogey} {breakdown.bogey === 1 ? 'BGY' : 'BGYS'}
-      </span>
-      <span style={sep}>·</span>
-      <span style={itemStyle(RED_BRIGHT)}>
-        {breakdown.doublePlus} DBL+
-      </span>
+      {chips.map((chip, i) => (
+        <React.Fragment key={chip.key}>
+          {i > 0 && <span style={sep}>·</span>}
+          <span style={itemStyle(chip.color)}>
+            {chip.value} {chip.label}
+          </span>
+        </React.Fragment>
+      ))}
     </div>
   );
 };
