@@ -16,7 +16,13 @@ const WHITE_45 = 'rgba(255,255,255,0.45)';
 const WHITE_55 = 'rgba(255,255,255,0.55)';
 const WHITE_65 = 'rgba(255,255,255,0.65)';
 const WHITE_85 = 'rgba(255,255,255,0.85)';
-const WHITE_18 = 'rgba(255,255,255,0.18)';
+// Hole-score palette — six tiers
+const HOLE_GOLD = '#D4A82A';
+const EAGLE_GREEN = '#0E9F6E';
+const BIRDIE_GREEN = '#10B981';
+const PAR_GREY = 'rgba(255,255,255,0.40)';
+const BOGEY_RED = '#E11D48';
+const DOUBLE_RED = '#9F1239';
 const FONT_GEIST = 'Geist, system-ui, -apple-system, BlinkMacSystemFont, sans-serif';
 
 const fmtDiff = (n: number | null | undefined) => {
