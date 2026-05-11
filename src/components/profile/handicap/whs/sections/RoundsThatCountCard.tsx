@@ -1,7 +1,6 @@
-import React, { useMemo, useState } from 'react';
+import React, { useCallback, useMemo, useRef, useState } from 'react';
 import { HelpCircle, TrendingDown, AlertTriangle, Minus } from 'lucide-react';
 import { useCounters, useAllScores } from '@/lib/whs/hooks';
-import { useHandicapInsights } from '@/lib/whs/insights/useHandicapInsights';
 import { fmtDiff, fmtAxis } from '@/lib/whs/format';
 import { projectNextRound } from '@/lib/whs/handicapMath';
 import HandicapExplainerSheet from './HandicapExplainerSheet';
