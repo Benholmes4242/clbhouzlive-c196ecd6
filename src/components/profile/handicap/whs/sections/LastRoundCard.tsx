@@ -230,9 +230,8 @@ export const LastRoundCard: React.FC<Props> = ({ connectionId }) => {
                 >
                   {[
                     relativeDay(lastRound.play_date).toUpperCase(),
-                    lastRound.course_rating && lastRound.slope_rating
-                      ? `${lastRound.course_rating.toFixed(1)}/${lastRound.slope_rating}`
-                      : null,
+                    par != null ? `PAR ${par}` : null,
+                    lastRound.slope_rating != null ? `SL ${lastRound.slope_rating}` : null,
                   ]
                     .filter(Boolean)
                     .join(' · ')}
