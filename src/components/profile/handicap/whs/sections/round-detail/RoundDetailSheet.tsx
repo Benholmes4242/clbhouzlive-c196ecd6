@@ -61,7 +61,7 @@ const SheetEmpty: React.FC<{ onClose: () => void }> = ({ onClose }) => (
   </div>
 );
 
-export const RoundDetailSheet: React.FC<Props> = ({ scoreId, open, onClose }) => {
+export const RoundDetailSheet: React.FC<Props> = ({ scoreId, open, onClose, handicapDelta }) => {
   const { data, isLoading } = useRoundDetail(scoreId, open);
 
   const parTotal = useMemo(() => {
@@ -255,6 +255,7 @@ export const RoundDetailSheet: React.FC<Props> = ({ scoreId, open, onClose }) =>
                 gross={data.adjusted_gross}
                 stableford={data.stableford_points}
                 differential={data.handicap_differential}
+                handicapDelta={handicapDelta ?? null}
               />
 
               {/* SCORECARD */}
