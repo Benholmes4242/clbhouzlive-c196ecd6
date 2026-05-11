@@ -7,7 +7,6 @@ interface Props {
 
 const INK = '#0F172A';
 const INK_55 = 'rgba(15,23,42,0.55)';
-const HAIRLINE = 'rgba(15,23,42,0.18)';
 
 const HOLE_GOLD = '#D4A82A';
 const EAGLE_GREEN = '#0E9F6E';
