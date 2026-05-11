@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { format } from 'date-fns';
-import { Minus, TrendingDown, TrendingUp } from 'lucide-react';
+import { TrendingDown, TrendingUp } from 'lucide-react';
 import { useLastRound, useRoundDetail } from '@/lib/whs/hooks';
 import RoundDetailSheet from './round-detail/RoundDetailSheet';
 import SectionHeader from './SectionHeader';
