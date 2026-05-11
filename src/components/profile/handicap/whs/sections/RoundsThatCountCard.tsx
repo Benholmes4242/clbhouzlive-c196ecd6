@@ -190,47 +190,10 @@ export const RoundsThatCountCard: React.FC<Props> = ({ connectionId, currentHand
     })
     .join(' ');
 
-  // Banner content
-  const bannerText = insights?.rounds_pattern
-    || 'Your handicap is built from these 8 rounds.';
-
   return (
     <section style={{ marginTop: 28 }}>
       <SectionHeader eyebrow="ROUNDS THAT COUNT" title="The 8 best of your last 20" />
       <div style={{ padding: '0 20px' }}>
-
-      {/* Echo insight banner */}
-      <div style={{
-        display: 'flex', alignItems: 'flex-start', gap: 10,
-        background: AMBER_TINT_06,
-        border: `0.5px solid ${AMBER_BORDER}`,
-        borderRadius: 12,
-        padding: '10px 12px',
-        marginBottom: 12,
-      }}>
-        <div style={{
-          width: 22, height: 22, borderRadius: '50%', flexShrink: 0,
-          background: `linear-gradient(135deg, ${AMBER}, ${AMBER_DEEP})`,
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          boxShadow: '0 2px 8px rgba(247,147,30,0.30)',
-        }}>
-          <svg width="11" height="11" viewBox="0 0 11 11" fill="none">
-            {[1, 3, 5, 7, 9].map((x, i) => {
-              const heights = [3, 6, 9, 6, 3];
-              const h = heights[i];
-              return (
-                <rect key={x} x={x - 0.5} y={(11 - h) / 2} width="1.4" height={h}
-                  rx="0.7" fill="#fff" />
-              );
-            })}
-          </svg>
-        </div>
-        <p style={{
-          margin: 0, fontSize: 12, color: INK_70, lineHeight: 1.45,
-        }}>
-          {renderBoldMarkdown(bannerText)}
-        </p>
-      </div>
 
       {/* Chart — full-bleed on page background, no card wrapper */}
       <div style={{ padding: '4px 0 12px' }}>
