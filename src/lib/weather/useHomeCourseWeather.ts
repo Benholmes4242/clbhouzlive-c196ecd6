@@ -26,9 +26,25 @@ async function fetchOpenMeteo(lat: number, lng: number): Promise<WeatherData> {
   const url = new URL(OPEN_METEO_BASE);
   url.searchParams.set('latitude', String(lat));
   url.searchParams.set('longitude', String(lng));
-  url.searchParams.set('current', 'temperature_2m,wind_speed_10m,weather_code');
+  url.searchParams.set(
+    'current',
+    [
+      'temperature_2m',
+      'apparent_temperature',
+      'wind_speed_10m',
+      'wind_gusts_10m',
+      'wind_direction_10m',
+      'weather_code',
+      'is_day',
+    ].join(','),
+  );
+  url.searchParams.set('hourly', 'precipitation_probability');
+  url.searchParams.set('daily', 'sunset,daylight_duration');
+  url.searchParams.set('forecast_hours', '4');
+  url.searchParams.set('forecast_days', '1');
   url.searchParams.set('temperature_unit', 'celsius');
   url.searchParams.set('wind_speed_unit', 'mph');
+  url.searchParams.set('timezone', 'auto');
 
   let res: Response;
   try {
@@ -48,16 +64,48 @@ async function fetchOpenMeteo(lat: number, lng: number): Promise<WeatherData> {
     throw new WeatherUnresolvedError('open_meteo_malformed_response');
   }
 
-  if (!json?.current || typeof json.current.temperature_2m !== 'number') {
+  const current = json?.current;
+  if (
+    !current ||
+    typeof current.temperature_2m !== 'number' ||
+    current.weather_code == null
+  ) {
     throw new WeatherUnresolvedError('open_meteo_malformed_response');
   }
 
-  const code = Number(json.current?.weather_code ?? 0);
+  const hourly = json?.hourly;
+  const daily = json?.daily;
+
+  const precipProbs: number[] = Array.isArray(hourly?.precipitation_probability)
+    ? hourly.precipitation_probability.filter((v: unknown) => typeof v === 'number')
+    : [];
+  const precipProbabilityMax4h = precipProbs.length > 0 ? Math.max(...precipProbs) : 0;
+
+  const sunsetIso: string | undefined = daily?.sunset?.[0];
+  const sunsetTime = sunsetIso
+    ? new Date(sunsetIso).toLocaleTimeString([], {
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: false,
+      })
+    : '—';
+
+  const daylightSeconds: number = Number(daily?.daylight_duration?.[0] ?? 0);
+  const daylightMinutes = Math.round(daylightSeconds / 60);
+
+  const code = Number(current.weather_code);
   return {
-    temperature: Number(json.current?.temperature_2m ?? 0),
-    windSpeed: Number(json.current?.wind_speed_10m ?? 0),
+    temperature: Number(current.temperature_2m),
+    apparentTemperature: Number(current.apparent_temperature ?? current.temperature_2m),
+    windSpeed: Number(current.wind_speed_10m ?? 0),
+    windGust: Number(current.wind_gusts_10m ?? 0),
+    windDirection: Number(current.wind_direction_10m ?? 0),
     weatherCode: code,
     description: WMO_WEATHER_CODES[code] ?? 'unknown',
+    precipProbabilityMax4h,
+    sunsetTime,
+    daylightMinutes,
+    isDay: current.is_day === 1 ? 1 : 0,
     fetchedAt: Date.now(),
   };
 }

@@ -4,11 +4,30 @@
  */
 
 export interface WeatherData {
-  temperature: number; // °C
-  windSpeed: number;   // mph
-  weatherCode: number; // WMO weather code
-  description: string; // human-readable
-  fetchedAt: number;   // unix ms
+  /** Current temperature in °C, as returned by Open-Meteo. Not rounded at the data layer. */
+  temperature: number;
+  /** Apparent temperature ("feels like") in °C. */
+  apparentTemperature: number;
+  /** Sustained wind speed in mph at 10m. */
+  windSpeed: number;
+  /** Wind gust speed in mph at 10m. */
+  windGust: number;
+  /** Wind direction in degrees, 0–360. */
+  windDirection: number;
+  /** WMO weather code for current conditions. */
+  weatherCode: number;
+  /** Human-readable description derived from WMO code. */
+  description: string;
+  /** Maximum precipitation probability (%) across the next 4 hours. */
+  precipProbabilityMax4h: number;
+  /** Today's sunset time as a "HH:MM" string in the location's local time. */
+  sunsetTime: string;
+  /** Daylight duration today in minutes. */
+  daylightMinutes: number;
+  /** 1 if currently daylight, 0 if night — drives day/night palette branching. */
+  isDay: 0 | 1;
+  /** Unix ms when this payload was fetched. */
+  fetchedAt: number;
 }
 
 export interface ClubLocation {
