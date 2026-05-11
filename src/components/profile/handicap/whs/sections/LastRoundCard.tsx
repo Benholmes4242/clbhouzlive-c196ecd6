@@ -91,6 +91,37 @@ export const LastRoundCard: React.FC<Props> = ({ connectionId }) => {
   return (
     <>
       <section style={{ marginTop: 28, fontFamily: FONT_GEIST }}>
+        {/* External eyebrow — matches SectionHeader pattern */}
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 8,
+            padding: '0 20px 8px',
+          }}
+        >
+          <span
+            aria-hidden
+            style={{
+              display: 'inline-block',
+              width: 3,
+              height: 8,
+              borderRadius: 1,
+              background: AMBER,
+            }}
+          />
+          <span
+            style={{
+              fontSize: 9,
+              fontWeight: 900,
+              color: AMBER,
+              letterSpacing: '0.16em',
+              textTransform: 'uppercase',
+            }}
+          >
+            LAST ROUND
+          </span>
+        </div>
         <div style={{ padding: '0 20px' }}>
           <button
             type="button"
