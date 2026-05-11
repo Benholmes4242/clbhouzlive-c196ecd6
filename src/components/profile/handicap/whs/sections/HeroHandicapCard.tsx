@@ -432,8 +432,8 @@ const HeroHandicapCard: React.FC<Props> = ({ connection }) => {
   const deltaSubText = (() => {
     const d = trend?.delta;
     if (d == null) return 'Awaiting data';
-    if (Math.abs(d) < 0.05) return 'Steady today';
-    return `${d < 0 ? '↓' : '↑'} ${Math.abs(d).toFixed(1)} today`;
+    if (Math.abs(d) < 0.05) return 'Steady';
+    return `${d < 0 ? '↓' : '↑'} ${Math.abs(d).toFixed(1)}`;
   })();
 
   // ── 6-point sparkline from history points ────────────────────────────────
