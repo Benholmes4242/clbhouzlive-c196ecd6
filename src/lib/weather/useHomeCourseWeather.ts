@@ -1,10 +1,8 @@
 /**
- * useHomeCourseWeather — Open-Meteo current-weather lookup for a user's
- * home golf club. Falls back to the geocode-club edge function when the
- * club row is missing lat/lng.
- *
- * Failure paths throw `WeatherUnresolvedError` with a typed reason so
- * the consuming card can report granular telemetry.
+ * useHomeCourseWeather — Open-Meteo lookup for a user's home golf club.
+ * Falls back to the geocode-club edge function when the club row is
+ * missing lat/lng. Failure paths throw `WeatherUnresolvedError` with a
+ * typed reason for granular telemetry.
  */
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -20,6 +18,23 @@ export class WeatherUnresolvedError extends Error {
     this.name = 'WeatherUnresolvedError';
     this.reason = reason;
   }
+}
+
+function formatHM(iso?: string): string {
+  if (!iso) return '—';
+  return new Date(iso).toLocaleTimeString([], {
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: false,
+  });
+}
+
+function formatHourLabel(iso?: string): string {
+  if (!iso) return '';
+  return new Date(iso)
+    .toLocaleTimeString([], { hour: 'numeric', hour12: true })
+    .toLowerCase()
+    .replace(/\s/g, '');
 }
 
 async function fetchOpenMeteo(lat: number, lng: number): Promise<WeatherData> {
@@ -38,10 +53,16 @@ async function fetchOpenMeteo(lat: number, lng: number): Promise<WeatherData> {
       'is_day',
     ].join(','),
   );
-  url.searchParams.set('hourly', 'precipitation_probability');
-  url.searchParams.set('daily', 'sunset,daylight_duration');
-  url.searchParams.set('forecast_hours', '4');
-  url.searchParams.set('forecast_days', '1');
+  url.searchParams.set(
+    'hourly',
+    ['temperature_2m', 'precipitation_probability'].join(','),
+  );
+  url.searchParams.set(
+    'daily',
+    ['temperature_2m_max', 'sunrise', 'sunset', 'daylight_duration'].join(','),
+  );
+  url.searchParams.set('forecast_hours', '24');
+  url.searchParams.set('forecast_days', '2');
   url.searchParams.set('temperature_unit', 'celsius');
   url.searchParams.set('wind_speed_unit', 'mph');
   url.searchParams.set('timezone', 'auto');
@@ -76,22 +97,62 @@ async function fetchOpenMeteo(lat: number, lng: number): Promise<WeatherData> {
   const hourly = json?.hourly;
   const daily = json?.daily;
 
-  const precipProbs: number[] = Array.isArray(hourly?.precipitation_probability)
-    ? hourly.precipitation_probability.filter((v: unknown) => typeof v === 'number')
+  const hourlyTemps: number[] = Array.isArray(hourly?.temperature_2m)
+    ? hourly.temperature_2m.filter((v: unknown): v is number => typeof v === 'number')
     : [];
-  const precipProbabilityMax4h = precipProbs.length > 0 ? Math.max(...precipProbs) : 0;
+  const hourlyPrecip: number[] = Array.isArray(hourly?.precipitation_probability)
+    ? hourly.precipitation_probability.filter(
+        (v: unknown): v is number => typeof v === 'number',
+      )
+    : [];
+  const hourlyTimes: string[] = Array.isArray(hourly?.time) ? hourly.time : [];
 
+  const precipProbabilityMax4h =
+    hourlyPrecip.length > 0 ? Math.max(...hourlyPrecip.slice(0, 4)) : 0;
+
+  // hourly[0] is the current hour, [1] is the next hour
+  const nextHourTemp =
+    typeof hourlyTemps[1] === 'number' ? hourlyTemps[1] : Number(current.temperature_2m);
+
+  const peakTempToday: number =
+    typeof daily?.temperature_2m_max?.[0] === 'number'
+      ? daily.temperature_2m_max[0]
+      : Number(current.temperature_2m);
+
+  // Find peak time within today's hourly slice (~24 entries)
+  const todaySlice = hourlyTemps.slice(0, 24);
+  let peakIdx = -1;
+  if (todaySlice.length > 0) {
+    const maxVal = Math.max(...todaySlice);
+    peakIdx = todaySlice.indexOf(maxVal);
+  }
+  const peakTimeIso = peakIdx >= 0 ? hourlyTimes[peakIdx] : undefined;
+  const peakTempTimeLabel = formatHourLabel(peakTimeIso);
+
+  const sunriseTodayIso: string | undefined = daily?.sunrise?.[0];
   const sunsetIso: string | undefined = daily?.sunset?.[0];
-  const sunsetTime = sunsetIso
-    ? new Date(sunsetIso).toLocaleTimeString([], {
-        hour: '2-digit',
-        minute: '2-digit',
-        hour12: false,
-      })
-    : '—';
+  const sunriseTomorrowIso: string | undefined = daily?.sunrise?.[1];
 
-  const daylightSeconds: number = Number(daily?.daylight_duration?.[0] ?? 0);
-  const daylightMinutes = Math.round(daylightSeconds / 60);
+  const sunsetTime = formatHM(sunsetIso);
+  const sunriseTomorrowTime = formatHM(sunriseTomorrowIso);
+
+  const isDay: 0 | 1 = current.is_day === 1 ? 1 : 0;
+
+  let daylightHoursRemaining: number | null = null;
+  if (isDay === 1 && sunsetIso) {
+    const ms = new Date(sunsetIso).getTime() - Date.now();
+    daylightHoursRemaining = Math.max(0, ms / 3_600_000);
+  }
+
+  let dayProgress = -1;
+  if (isDay === 1 && sunriseTodayIso && sunsetIso) {
+    const sr = new Date(sunriseTodayIso).getTime();
+    const ss = new Date(sunsetIso).getTime();
+    const total = ss - sr;
+    if (total > 0) {
+      dayProgress = Math.max(0, Math.min(1, (Date.now() - sr) / total));
+    }
+  }
 
   const code = Number(current.weather_code);
   return {
@@ -101,11 +162,16 @@ async function fetchOpenMeteo(lat: number, lng: number): Promise<WeatherData> {
     windGust: Number(current.wind_gusts_10m ?? 0),
     windDirection: Number(current.wind_direction_10m ?? 0),
     weatherCode: code,
-    description: WMO_WEATHER_CODES[code] ?? 'unknown',
+    description: WMO_WEATHER_CODES[code] ?? 'Unknown',
     precipProbabilityMax4h,
+    peakTempToday,
+    peakTempTimeLabel,
+    nextHourTemp,
     sunsetTime,
-    daylightMinutes,
-    isDay: current.is_day === 1 ? 1 : 0,
+    sunriseTomorrowTime,
+    daylightHoursRemaining,
+    dayProgress,
+    isDay,
     fetchedAt: Date.now(),
   };
 }
@@ -125,7 +191,6 @@ async function geocodeClubViaEdgeFunction(
       body: { club_id: clubId },
     });
     if (error) {
-      // functions.invoke wraps HTTP status inconsistently; best-effort mapping.
       const status =
         (error as any)?.status ??
         (error as any)?.context?.status ??
