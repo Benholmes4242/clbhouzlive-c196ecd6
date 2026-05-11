@@ -33,7 +33,7 @@ export const FriendsHeaderSection: React.FC<Props> = ({ userId }) => {
 
   if (isLoading || !stats) {
     return (
-      <section style={{ padding: '20px 20px 8px', fontFamily: FONT }}>
+      <section style={{ padding: '10px 20px 8px', fontFamily: FONT }}>
         <div
           className="animate-pulse"
           style={{ height: 64, borderRadius: 12, background: 'rgba(15,23,42,0.06)' }}
@@ -43,7 +43,7 @@ export const FriendsHeaderSection: React.FC<Props> = ({ userId }) => {
   }
 
   return (
-    <section style={{ padding: '20px 20px 8px', fontFamily: FONT }}>
+    <section style={{ padding: '10px 20px 8px', fontFamily: FONT }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8 }}>
         <span style={{ width: 6, height: 6, borderRadius: '50%', background: AMBER }} />
         <span
