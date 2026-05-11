@@ -67,23 +67,13 @@ export const RoundBreakdown: React.FC<Props> = ({ holes }) => {
       style={{
         display: 'flex',
         alignItems: 'center',
+        justifyContent: 'center',
         flexWrap: 'wrap',
-        gap: 10,
+        gap: 14,
         padding: '14px 16px 12px',
         borderTop: `1px solid rgba(15,23,42,0.08)`,
       }}
     >
-      <span
-        style={{
-          fontSize: 9,
-          fontWeight: 900,
-          color: INK_55,
-          letterSpacing: '0.22em',
-          marginRight: 4,
-        }}
-      >
-        BREAKDOWN
-      </span>
       {chips.map((c, i) => (
         <span
           key={`c-${i}-${c.label}`}
