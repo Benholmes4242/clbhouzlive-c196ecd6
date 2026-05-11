@@ -10,6 +10,7 @@ interface Props {
 const INK = '#0F172A';
 const INK_55 = 'rgba(15,23,42,0.55)';
 const HAIRLINE = 'rgba(15,23,42,0.08)';
+const AMBER = '#F7931E';
 const AMBER_DEEP = '#C97211';
 const GREEN_BRIGHT = '#10B981';
 const RED_BRIGHT = '#E11D48';
@@ -22,25 +23,26 @@ const fmtDiff = (n: number | null) => {
 };
 
 const fmtHcp = (delta: number | null): { value: string; accent: string } => {
-  if (delta === null) return { value: '—', accent: INK };
-  if (Math.abs(delta) < 0.05) return { value: 'FLAT', accent: INK_55 };
+  if (delta === null) return { value: '\u2014', accent: INK_55 };
+  if (Math.abs(delta) < 0.05) return { value: '\u2014', accent: INK_55 };
   if (delta < 0) return { value: `\u2193 ${Math.abs(delta).toFixed(1)}`, accent: GREEN_BRIGHT };
   return { value: `\u2191 ${delta.toFixed(1)}`, accent: RED_BRIGHT };
 };
 
-const Metric: React.FC<{ label: string; value: string; accent: string }> = ({
-  label,
-  value,
-  accent,
-}) => (
-  <div style={{ textAlign: 'center' }}>
+const Metric: React.FC<{
+  label: string;
+  value: string;
+  accent: string;
+  highlight?: boolean;
+}> = ({ label, value, accent, highlight }) => (
+  <div style={{ textAlign: 'center', position: 'relative' }}>
     <div
       style={{
         fontSize: 9,
-        fontWeight: 800,
+        fontWeight: 900,
         color: INK_55,
-        letterSpacing: '0.16em',
-        marginBottom: 4,
+        letterSpacing: '0.18em',
+        marginBottom: 6,
       }}
     >
       {label}
@@ -57,6 +59,20 @@ const Metric: React.FC<{ label: string; value: string; accent: string }> = ({
     >
       {value}
     </div>
+    {highlight && (
+      <div
+        aria-hidden
+        style={{
+          position: 'absolute',
+          bottom: -18,
+          left: '30%',
+          right: '30%',
+          height: 2,
+          background: AMBER,
+          borderRadius: 1,
+        }}
+      />
+    )}
   </div>
 );
 
@@ -72,13 +88,13 @@ export const RoundStatStrip: React.FC<Props> = ({
       style={{
         display: 'grid',
         gridTemplateColumns: 'repeat(4, 1fr)',
-        padding: '14px 12px',
+        padding: '16px 14px 22px',
         borderBottom: `1px solid ${HAIRLINE}`,
       }}
     >
       <Metric label="GROSS" value={String(gross ?? '—')} accent={INK} />
       <Metric label="POINTS" value={String(stableford ?? '—')} accent={INK} />
-      <Metric label="DIFF" value={fmtDiff(differential)} accent={AMBER_DEEP} />
+      <Metric label="DIFF" value={fmtDiff(differential)} accent={AMBER_DEEP} highlight />
       <Metric label="HCP" value={hcp.value} accent={hcp.accent} />
     </div>
   );

@@ -28,18 +28,18 @@ const NineGrid: React.FC<{
       <div
         style={{
           display: 'flex',
-          alignItems: 'baseline',
+          alignItems: 'center',
           justifyContent: 'space-between',
-          marginBottom: 8,
+          marginBottom: 10,
           padding: '0 2px',
         }}
       >
         <span
           style={{
             fontSize: 10,
-            fontWeight: 800,
-            color: INK_55,
-            letterSpacing: '0.16em',
+            fontWeight: 900,
+            color: INK,
+            letterSpacing: '0.22em',
             textTransform: 'uppercase',
           }}
         >
@@ -47,22 +47,34 @@ const NineGrid: React.FC<{
         </span>
         <span
           style={{
-            fontSize: 12,
-            fontWeight: 800,
-            color: INK,
+            display: 'inline-flex',
+            alignItems: 'baseline',
+            gap: 6,
+            padding: '4px 10px',
+            background: 'rgba(15,23,42,0.04)',
+            borderRadius: 999,
             fontVariantNumeric: 'tabular-nums',
           }}
         >
-          {total}{' '}
+          <span
+            style={{
+              fontSize: 13,
+              fontWeight: 800,
+              color: INK,
+              letterSpacing: '-0.02em',
+            }}
+          >
+            {total}
+          </span>
           <span
             style={{
               fontSize: 10,
               fontWeight: 700,
-              color: AMBER_DEEP,
+              color: toPar > 0 ? AMBER_DEEP : toPar < 0 ? '#10B981' : INK_55,
+              letterSpacing: '-0.01em',
             }}
           >
-            ({toPar > 0 ? '+' : toPar === 0 ? 'E' : ''}
-            {toPar !== 0 ? toPar : ''})
+            {toPar === 0 ? 'E' : `${toPar > 0 ? '+' : ''}${toPar}`}
           </span>
         </span>
       </div>
@@ -74,35 +86,6 @@ const NineGrid: React.FC<{
           gap: 4,
         }}
       >
-        {holes.map((h) => (
-          <div
-            key={`n-${h.hole_no}`}
-            style={{
-              fontSize: 9,
-              fontWeight: 800,
-              color: INK_55,
-              textAlign: 'center',
-              fontVariantNumeric: 'tabular-nums',
-            }}
-          >
-            {h.hole_no}
-          </div>
-        ))}
-        {holes.map((h) => (
-          <div
-            key={`p-${h.hole_no}`}
-            style={{
-              fontSize: 9,
-              fontWeight: 600,
-              color: INK_55,
-              textAlign: 'center',
-              fontVariantNumeric: 'tabular-nums',
-              paddingBottom: 2,
-            }}
-          >
-            {h.par ?? '—'}
-          </div>
-        ))}
         {holes.map((h) => (
           <RoundHoleCell key={`s-${h.hole_no}`} hole={h} />
         ))}

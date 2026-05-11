@@ -7,7 +7,6 @@ interface Props {
 
 const INK = '#0F172A';
 const INK_55 = 'rgba(15,23,42,0.55)';
-const HAIRLINE = 'rgba(15,23,42,0.18)';
 
 const HOLE_GOLD = '#D4A82A';
 const EAGLE_GREEN = '#0E9F6E';
@@ -63,69 +62,68 @@ export const RoundBreakdown: React.FC<Props> = ({ holes }) => {
   if (counts.doublePlus > 0)
     chips.push({ color: DOUBLE_RED, value: counts.doublePlus, label: 'DBL+' });
 
-  const els: React.ReactNode[] = [];
-  chips.forEach((c, i) => {
-    if (i > 0) {
-      els.push(
-        <span key={`sep-${i}`} style={{ color: HAIRLINE, fontSize: 11 }}>
-          ·
-        </span>,
-      );
-    }
-    els.push(
-      <span
-        key={`c-${i}-${c.label}`}
-        style={{
-          display: 'inline-flex',
-          alignItems: 'baseline',
-          gap: 4,
-        }}
-      >
-        <span
-          style={{
-            width: 6,
-            height: 6,
-            borderRadius: '50%',
-            background: c.color,
-            alignSelf: 'center',
-          }}
-        />
-        <span
-          style={{
-            fontSize: 12,
-            fontWeight: 800,
-            color: INK,
-            fontVariantNumeric: 'tabular-nums',
-          }}
-        >
-          {c.value}
-        </span>
-        <span
-          style={{
-            fontSize: 10,
-            fontWeight: 700,
-            color: INK_55,
-            letterSpacing: '0.08em',
-          }}
-        >
-          {c.label}
-        </span>
-      </span>,
-    );
-  });
-
   return (
     <div
       style={{
         display: 'flex',
         alignItems: 'center',
         flexWrap: 'wrap',
-        gap: 8,
-        padding: '12px 16px',
+        gap: 10,
+        padding: '14px 16px 12px',
         borderTop: `1px solid rgba(15,23,42,0.08)`,
       }}
     >
-      {els}
+      <span
+        style={{
+          fontSize: 9,
+          fontWeight: 900,
+          color: INK_55,
+          letterSpacing: '0.22em',
+          marginRight: 4,
+        }}
+      >
+        BREAKDOWN
+      </span>
+      {chips.map((c, i) => (
+        <span
+          key={`c-${i}-${c.label}`}
+          style={{
+            display: 'inline-flex',
+            alignItems: 'baseline',
+            gap: 4,
+          }}
+        >
+          <span
+            style={{
+              width: 6,
+              height: 6,
+              borderRadius: '50%',
+              background: c.color,
+              alignSelf: 'center',
+            }}
+          />
+          <span
+            style={{
+              fontSize: 12,
+              fontWeight: 800,
+              color: INK,
+              fontVariantNumeric: 'tabular-nums',
+            }}
+          >
+            {c.value}
+          </span>
+          <span
+            style={{
+              fontSize: 10,
+              fontWeight: 700,
+              color: INK_55,
+              letterSpacing: '0.10em',
+            }}
+          >
+            {c.label}
+          </span>
+        </span>
+      ))}
     </div>
   );
 };
