@@ -10,7 +10,11 @@ interface Props {
   connection: WhsConnection;
 }
 
-type Range = 90 | 365 | 'all';
+type Range = 30 | 365 | 'all';
+
+// FORM ring temperature colours — only used by the FORM ring
+const FORM_HOT = '#E11D48';   // crimson, reads as red-hot
+const FORM_COLD = '#38BDF8';  // ice blue
 
 // ── Tokens ────────────────────────────────────────────────────────────────
 const AMBER = '#F7931E';
