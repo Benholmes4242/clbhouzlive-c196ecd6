@@ -149,6 +149,25 @@ export const RoundsThatCountCard: React.FC<Props> = ({ connectionId, currentHand
     };
   }, [allScores, counters]);
 
+  const colCount = enriched?.rounds.length ?? 0;
+
+  const idxFromX = useCallback((clientX: number): number => {
+    const plot = plotRef.current;
+    if (!plot) return 0;
+    const rect = plot.getBoundingClientRect();
+    const xPct = ((clientX - rect.left) / rect.width) * 100;
+    let bestIdx = 0;
+    let bestDist = Infinity;
+    for (let i = 0; i < colCount; i++) {
+      const dist = Math.abs(((i + 0.5) / colCount) * 100 - xPct);
+      if (dist < bestDist) {
+        bestDist = dist;
+        bestIdx = i;
+      }
+    }
+    return bestIdx;
+  }, [colCount]);
+
   if (loadingCounters) return <Skeleton />;
   if (!enriched || currentHandicap == null) return null;
 
