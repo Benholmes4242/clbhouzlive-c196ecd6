@@ -714,9 +714,8 @@ const HeroHandicapCard: React.FC<Props> = ({ connection }) => {
         <svg
           ref={svgRef}
           width="100%"
-          height="auto"
           viewBox={`0 0 ${W} ${H}`}
-          style={{ display: 'block', touchAction: 'none', cursor: 'crosshair', overflow: 'visible' }}
+          style={{ display: 'block', touchAction: 'none', cursor: 'crosshair', overflow: 'visible', height: 'auto' }}
           onPointerMove={handlePointerMove}
           onPointerDown={handlePointerDown}
           onPointerLeave={clearScrub}

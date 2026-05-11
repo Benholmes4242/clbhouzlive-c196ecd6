@@ -511,6 +511,20 @@ const BreakdownLine: React.FC<{
     });
   }
 
+  const elements: React.ReactNode[] = [];
+  chips.forEach((chip, i) => {
+    if (i > 0) {
+      elements.push(
+        <span key={`${chip.key}-sep`} style={sep}>·</span>
+      );
+    }
+    elements.push(
+      <span key={chip.key} style={itemStyle(chip.color)}>
+        {chip.value} {chip.label}
+      </span>
+    );
+  });
+
   return (
     <div
       style={{
@@ -521,14 +535,7 @@ const BreakdownLine: React.FC<{
         marginTop: 10,
       }}
     >
-      {chips.map((chip, i) => (
-        <React.Fragment key={chip.key}>
-          {i > 0 && <span style={sep}>·</span>}
-          <span style={itemStyle(chip.color)}>
-            {chip.value} {chip.label}
-          </span>
-        </React.Fragment>
-      ))}
+      {elements}
     </div>
   );
 };
