@@ -65,6 +65,19 @@ export const LastRoundCard: React.FC<Props> = ({ connectionId }) => {
     return counts;
   }, [roundDetail]);
 
+  const par = React.useMemo<number | null>(() => {
+    if (!roundDetail?.holes || !roundDetail.hole_by_hole_fetched) return null;
+    let total = 0;
+    let any = false;
+    for (const h of roundDetail.holes) {
+      if (h.par != null) {
+        total += h.par;
+        any = true;
+      }
+    }
+    return any ? total : null;
+  }, [roundDetail]);
+
   if (isLoading) {
     return (
       <section style={{ marginTop: 28 }}>
