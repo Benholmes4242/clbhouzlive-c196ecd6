@@ -507,10 +507,10 @@ const HeroHandicapCard: React.FC<Props> = ({ connection }) => {
     : 0.5;
 
   const scoringSub = range === 30
-    ? `Over 30 days · ${scoringRoundCount} ${scoringRoundCount === 1 ? 'round' : 'rounds'}`
+    ? 'Over 30 days'
     : range === 365
-      ? `Over 1 year · ${scoringRoundCount} ${scoringRoundCount === 1 ? 'round' : 'rounds'}`
-      : `Career · ${scoringRoundCount} ${scoringRoundCount === 1 ? 'round' : 'rounds'}`;
+      ? 'Over 1 year'
+      : 'Career';
 
   return (
     <section style={{ margin: '0 0 24px', padding: '0 20px', fontFamily: FONT_DISPLAY }}>
