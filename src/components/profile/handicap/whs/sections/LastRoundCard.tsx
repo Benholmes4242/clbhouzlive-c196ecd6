@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { format } from 'date-fns';
-import { Minus, TrendingDown, TrendingUp } from 'lucide-react';
+import { TrendingDown, TrendingUp } from 'lucide-react';
 import { useLastRound, useRoundDetail } from '@/lib/whs/hooks';
 import RoundDetailSheet from './round-detail/RoundDetailSheet';
 import SectionHeader from './SectionHeader';
@@ -85,12 +85,42 @@ export const LastRoundCard: React.FC<Props> = ({ connectionId }) => {
     );
   }
 
-  const delta = lastRound.handicap_delta ?? null;
   const par = (lastRound.course as any)?.par ?? null;
 
   return (
     <>
       <section style={{ marginTop: 28, fontFamily: FONT_GEIST }}>
+        {/* External eyebrow — matches SectionHeader pattern */}
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 8,
+            padding: '0 20px 8px',
+          }}
+        >
+          <span
+            aria-hidden
+            style={{
+              display: 'inline-block',
+              width: 3,
+              height: 8,
+              borderRadius: 1,
+              background: AMBER,
+            }}
+          />
+          <span
+            style={{
+              fontSize: 9,
+              fontWeight: 900,
+              color: AMBER,
+              letterSpacing: '0.16em',
+              textTransform: 'uppercase',
+            }}
+          >
+            LAST ROUND
+          </span>
+        </div>
         <div style={{ padding: '0 20px' }}>
           <button
             type="button"
@@ -171,51 +201,42 @@ export const LastRoundCard: React.FC<Props> = ({ connectionId }) => {
                 color: '#fff',
               }}
             >
-              {/* TOP ROW */}
-              <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 12 }}>
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <div
-                    style={{
-                      fontSize: 9,
-                      fontWeight: 900,
-                      color: AMBER,
-                      letterSpacing: '0.16em',
-                      textTransform: 'uppercase',
-                      marginBottom: 6,
-                    }}
-                  >
-                    · {relativeDay(lastRound.play_date).toUpperCase()} · LAST ROUND
-                  </div>
-                  <div
-                    style={{
-                      fontSize: 22,
-                      fontWeight: 800,
-                      color: '#fff',
-                      letterSpacing: '-0.02em',
-                      lineHeight: 1.1,
-                      whiteSpace: 'nowrap',
-                      overflow: 'hidden',
-                      textOverflow: 'ellipsis',
-                    }}
-                  >
-                    {lastRound.course?.name ?? 'Unknown course'}
-                  </div>
-                  {(lastRound.course_rating || lastRound.slope_rating) && (
-                    <div
-                      style={{
-                        fontSize: 10,
-                        fontWeight: 700,
-                        color: WHITE_55,
-                        letterSpacing: '0.06em',
-                        marginTop: 3,
-                        fontVariantNumeric: 'tabular-nums',
-                      }}
-                    >
-                      {lastRound.course_rating?.toFixed(1) ?? '—'}/{lastRound.slope_rating ?? '—'}
-                    </div>
-                  )}
+              {/* TOP — course name + sub-line */}
+              <div style={{ minWidth: 0 }}>
+                <div
+                  style={{
+                    fontSize: 22,
+                    fontWeight: 800,
+                    color: '#fff',
+                    letterSpacing: '-0.02em',
+                    lineHeight: 1.1,
+                    whiteSpace: 'nowrap',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                  }}
+                >
+                  {lastRound.course?.name ?? 'Unknown course'}
                 </div>
-                <HcpImpactPill delta={delta} />
+                <div
+                  style={{
+                    fontSize: 10,
+                    fontWeight: 700,
+                    color: WHITE_55,
+                    letterSpacing: '0.06em',
+                    marginTop: 3,
+                    fontVariantNumeric: 'tabular-nums',
+                    textTransform: 'uppercase',
+                  }}
+                >
+                  {[
+                    relativeDay(lastRound.play_date).toUpperCase(),
+                    lastRound.course_rating && lastRound.slope_rating
+                      ? `${lastRound.course_rating.toFixed(1)}/${lastRound.slope_rating}`
+                      : null,
+                  ]
+                    .filter(Boolean)
+                    .join(' · ')}
+                </div>
               </div>
 
               {/* HERO */}
@@ -249,6 +270,7 @@ export const LastRoundCard: React.FC<Props> = ({ connectionId }) => {
                     adjustedGross={lastRound.adjusted_gross ?? null}
                     par={par}
                     differential={lastRound.handicap_differential ?? null}
+                    handicapDelta={lastRound.handicap_delta ?? null}
                   />
                 </div>
 
@@ -321,52 +343,12 @@ export const LastRoundCard: React.FC<Props> = ({ connectionId }) => {
   );
 };
 
-const HcpImpactPill: React.FC<{ delta: number | null }> = ({ delta }) => {
-  if (delta == null) return null;
-  const isUnchanged = Math.abs(delta) < 0.05;
-  const isCut = delta < -0.05;
-  const Icon = isUnchanged ? Minus : isCut ? TrendingDown : TrendingUp;
-  const iconColor = isUnchanged ? WHITE_65 : isCut ? GREEN_BRIGHT : RED_BRIGHT;
-  const label = isUnchanged
-    ? 'FLAT'
-    : isCut
-    ? `↓ ${Math.abs(delta).toFixed(1)}`
-    : `↑ ${Math.abs(delta).toFixed(1)}`;
-  return (
-    <div
-      style={{
-        display: 'inline-flex',
-        alignItems: 'center',
-        gap: 4,
-        padding: '4px 7px',
-        borderRadius: 999,
-        background: 'rgba(255,255,255,0.10)',
-        border: '0.5px solid rgba(255,255,255,0.18)',
-        flexShrink: 0,
-      }}
-    >
-      <Icon size={10} color={iconColor} strokeWidth={2.5} />
-      <span
-        style={{
-          fontSize: 9,
-          fontWeight: 800,
-          color: WHITE_85,
-          letterSpacing: '0.06em',
-          textTransform: 'uppercase',
-          fontVariantNumeric: 'tabular-nums',
-        }}
-      >
-        {label}
-      </span>
-    </div>
-  );
-};
-
 const ToParDiffStrip: React.FC<{
   adjustedGross: number | null;
   par: number | null;
   differential: number | null;
-}> = ({ adjustedGross, par, differential }) => {
+  handicapDelta: number | null;
+}> = ({ adjustedGross, par, differential, handicapDelta }) => {
   const parts: string[] = [];
   if (adjustedGross != null && par != null) {
     const dp = adjustedGross - par;
@@ -375,20 +357,55 @@ const ToParDiffStrip: React.FC<{
   if (differential != null) {
     parts.push(`${fmtDiff(differential)} DIFF`);
   }
-  if (parts.length === 0) return null;
+  if (parts.length === 0 && handicapDelta == null) return null;
+
+  const showHcp = handicapDelta != null && Math.abs(handicapDelta) >= 0.05;
+  const hcpIsCut = showHcp && handicapDelta! < 0;
+  const hcpColor = hcpIsCut ? GREEN_BRIGHT : RED_BRIGHT;
+  const hcpMag = showHcp ? Math.abs(handicapDelta!).toFixed(1) : null;
+
   return (
     <div
       style={{
         marginTop: 6,
-        fontSize: 11,
-        fontWeight: 700,
-        color: AMBER,
-        letterSpacing: '0.08em',
-        textTransform: 'uppercase',
-        fontVariantNumeric: 'tabular-nums',
+        display: 'flex',
+        alignItems: 'center',
+        gap: 8,
       }}
     >
-      {parts.join(' · ')}
+      <span
+        style={{
+          fontSize: 11,
+          fontWeight: 700,
+          color: AMBER,
+          letterSpacing: '0.08em',
+          textTransform: 'uppercase',
+          fontVariantNumeric: 'tabular-nums',
+        }}
+      >
+        {parts.join(' · ')}
+      </span>
+      {showHcp && (
+        <span
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: 2,
+            fontSize: 11,
+            fontWeight: 800,
+            color: hcpColor,
+            letterSpacing: '0.04em',
+            fontVariantNumeric: 'tabular-nums',
+          }}
+        >
+          {hcpIsCut ? (
+            <TrendingDown size={11} color={hcpColor} strokeWidth={2.5} />
+          ) : (
+            <TrendingUp size={11} color={hcpColor} strokeWidth={2.5} />
+          )}
+          {hcpMag}
+        </span>
+      )}
     </div>
   );
 };
@@ -455,7 +472,7 @@ const BreakdownLine: React.FC<{
       </span>
       <span style={sep}>·</span>
       <span style={itemStyle(AMBER)}>
-        {breakdown.bogey} {breakdown.bogey === 1 ? 'BOG' : 'BOGS'}
+        {breakdown.bogey} {breakdown.bogey === 1 ? 'BGY' : 'BGYS'}
       </span>
       <span style={sep}>·</span>
       <span style={itemStyle(RED_BRIGHT)}>
