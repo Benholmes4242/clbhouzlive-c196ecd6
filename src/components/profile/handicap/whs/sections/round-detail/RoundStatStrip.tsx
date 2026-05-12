@@ -81,7 +81,7 @@ export const RoundStatStrip: React.FC<Props> = ({
   >
     <Metric label="GROSS" value={String(gross ?? '—')} accent={INK} />
     <Metric label="POINTS" value={String(stableford ?? '—')} accent={INK} />
-    <Metric label="DIFF" value={fmtDiff(differential)} accent={AMBER_DEEP} highlight />
+    <Metric label="DIFF" value={fmtDiff(differential)} accent={AMBER_DEEP} />
   </div>
 );
 
