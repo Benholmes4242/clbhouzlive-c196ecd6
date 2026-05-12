@@ -111,66 +111,58 @@ export interface HandicapPoint {
 }
 
 export type AchievementType =
-  // Existing (some refined to use tiered progression):
-  | 'career_low'
-  | 'sub_handicap_streak'
-  | 'counter_streak'
-  | 'milestone'              // handicap thresholds: 10, 5, 0, -2
-  // New tiered:
-  | 'round_milestones'       // 10/25/50/100/250/500
-  | 'counter_milestones'     // 10/25/50/100
-  | 'years_active'           // 1y/2y/5y/10y (replaces anniversary)
-  | 'big_drop'               // 0.5/1.0/2.0 stroke cut, 30 days
-  | 'course_conquered'       // 5/10/25/50/100 courses (now tiered)
-  // New one-shot:
-  | 'first_counted_round'
-  | 'first_counter'
-  | 'connected_eg'
-  | 'personal_best_round'
-  | 'home_club_master'
-  | 'course_beater'
-  | 'steady_performer'
-  | 'played_to_handicap'
-  // Deprecated, retained for back-compat:
-  | 'first_sub_n'
-  | 'anniversary'
-  // Sprint 3 — hole-by-hole:
-  | 'hole_in_one'
-  | 'eagles'
-  | 'sub_par_round'
-  // Sprint 3 — social:
-  | 'first_friend'
-  | 'played_with_friend'
-  | 'out_played_friend'
-  | 'rivalry_winner'
-  | 'travel_golfer'
-  // Sprint 3 — course tiered:
-  | 'top_100_conqueror'
-  // Sprint 3 — meta:
-  | 'trophy_hunter';
+  // Handicap (binary)
+  | 'plus_player'
+  | 'scratch'
+  | 'single_figures'
+  | 'under_20'
+  | 'connected'
+  // Scoring & shots
+  | 'hole_in_one'          // counter
+  | 'albatross'            // counter
+  | 'eagles'               // counter
+  | 'beat_par'             // binary
+  | 'beat_80'              // binary
+  | 'beat_90'              // binary
+  | 'beat_100'             // binary
+  | 'birdies'              // counter
+  // Courses & travel
+  | 'top100_global'        // list
+  | 'top100_usa'           // list
+  | 'top100_europe'        // list
+  | 'top100_gb_i'          // list
+  | 'travel_golfer'        // counter
+  | 'courses_conquered'    // counter
+  // Community
+  | 'beat_a_friend'        // binary
+  | 'rounds_played'        // counter
+  | 'first_round';         // binary
+
+export type AchievementCategory = 'handicap' | 'scoring' | 'courses' | 'community';
+
+export type AchievementKind = 'binary' | 'counter' | 'list';
 
 export interface Achievement {
   id: string;
   type: AchievementType;
   title: string;
-  subtitle: string;
-  /** ISO date when achieved. Null for locked trophies. */
-  achieved_at: string | null;
+  /** Always-visible description (11.5px, below title). Same voice in every state. */
+  description: string;
   icon_name: string;
-  /** True for highlight visual treatment (gradient + crown). */
-  highlight: boolean;
-  /** True if user has earned this. False = locked. */
-  earned: boolean;
-  /** For tiered trophies — current tier reached (1-indexed). 0 if not yet earned. */
-  tier?: number;
-  /** Total tiers possible for this trophy. */
-  totalTiers?: number;
-  /** Progress toward next tier or first earn. 0-1. */
-  progress?: number;
-  /** Subtitle text for progress display (e.g. "50 / 100 rounds"). */
-  progressLabel?: string;
-  /** Category for grouping in the bottom sheet. */
-  category: 'round_quality' | 'volume' | 'improvement' | 'course' | 'social' | 'milestone';
+  category: AchievementCategory;
+  kind: AchievementKind;
+
+  // Binary
+  earned?: boolean;
+  achieved_at?: string | null;
+
+  // Counter
+  count?: number;
+  count_label?: string;
+
+  // List
+  list_played?: number;
+  list_total?: number;
 }
 
 export interface CourseForm {
