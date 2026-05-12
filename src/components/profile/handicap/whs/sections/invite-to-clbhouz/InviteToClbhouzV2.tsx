@@ -120,8 +120,8 @@ export const InviteToClbhouzV2: React.FC<Props> = ({ ownerUserId }) => {
     <section id="invite-to-clbhouz-section" style={{ marginTop: 28 }}>
       <SectionHeader
         eyebrow="MAKE YOUR FEED LOUDER"
-        title="Your most active friends"
-        sub="They post the most rounds — invite them to see it all"
+        title="Friends on England Golf"
+        sub="Not on Clbhouz yet — invite them to share rounds."
         right={
           sentCount > 0 ? (
             <SentBadge count={sentCount} onClick={() => setSheetOpen(true)} />
@@ -135,23 +135,21 @@ export const InviteToClbhouzV2: React.FC<Props> = ({ ownerUserId }) => {
         <div style={{ margin: '0 20px' }}>
           <div
             style={{
-              background: T.cardBg,
-              border: `1px solid ${T.hairline}`,
-              borderRadius: 14,
-              overflow: 'hidden',
+              display: 'grid',
+              gridTemplateColumns: '1fr 1fr',
+              gap: 8,
             }}
           >
             {(showAll ? invitable : invitable.slice(0, 4)).map((f) => (
-              <InviteRow
+              <InviteCard
                 key={String(f.friend_passport_id)}
                 friend={f}
-                maxRounds={maxRounds}
               />
             ))}
           </div>
-          {!showAll && invitable.length > 4 && (
+          {invitable.length > 4 && (
             <button
-              onClick={() => setShowAll(true)}
+              onClick={() => setShowAll(!showAll)}
               style={{
                 width: '100%',
                 padding: '10px 14px',
@@ -170,8 +168,17 @@ export const InviteToClbhouzV2: React.FC<Props> = ({ ownerUserId }) => {
                 gap: 4,
               }}
             >
-              See all {invitable.length} invitable
-              <ChevronDown size={14} />
+              {showAll ? (
+                <>
+                  Show less
+                  <ChevronDown size={14} style={{ transform: 'rotate(180deg)' }} />
+                </>
+              ) : (
+                <>
+                  See all {invitable.length} invitable
+                  <ChevronDown size={14} />
+                </>
+              )}
             </button>
           )}
         </div>
