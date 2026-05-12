@@ -33,6 +33,8 @@ const BORDER = 'rgba(15,23,42,0.10)';
 const BG_SURFACE = '#F8FAFC';
 const AMBER = '#F7931E';
 const AMBER_INK = '#C97211';
+const AMBER_SOFT = 'rgba(247,147,30,0.06)';
+const AMBER_BORDER = 'rgba(247,147,30,0.28)';
 
 const FONT_GEIST = 'Geist, system-ui, -apple-system, BlinkMacSystemFont, sans-serif';
 
@@ -232,15 +234,25 @@ const HandicapPageHeader: React.FC<HeaderProps> = ({
             onClick={() => openTrophiesSheet()}
             aria-label="View all trophies"
             style={{
-              background: 'transparent',
-              border: 'none',
-              padding: 6,
+              display: 'flex',
+              alignItems: 'center',
+              gap: 2,
+              padding: '6px 8px 6px 10px',
+              background: AMBER_SOFT,
+              border: `1px solid ${AMBER_BORDER}`,
+              borderRadius: 12,
               cursor: 'pointer',
-              color: 'rgba(15,23,42,0.40)',
               flexShrink: 0,
+              fontFamily: FONT_GEIST,
             }}
           >
-            <Trophy size={20} strokeWidth={2} />
+            <Trophy
+              size={20}
+              color={AMBER}
+              strokeWidth={2.3}
+              fill="rgba(247,147,30,0.10)"
+            />
+            <ChevronRight size={14} color={AMBER_INK} strokeWidth={2.5} />
           </button>
         </div>
       )}
