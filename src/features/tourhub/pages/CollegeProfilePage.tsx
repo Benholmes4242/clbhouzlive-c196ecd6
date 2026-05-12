@@ -118,52 +118,39 @@ export function CollegeProfilePage() {
     return r && r > 0 ? r : null;
   }, [captain, alumni]);
 
-  // Narrative pills (Phase 1: earnings-primary tab is the only stat shown
-  // in the hero). Pills omitted when data unavailable — never stubbed.
-  const heroPills = useMemo<MastheadPill[]>(() => {
-    const out: MastheadPill[] = [];
-
-    if (showCaptainPill && captain) {
-      const last = captainShortName(captain.fullName);
-      const parts = [last];
-      if (captainOwgr) parts.push(`#${captainOwgr} OWGR`);
-      else parts.push('Top earner');
-      out.push({ variant: 'highlight', value: parts.join(' · ') });
-    }
-
-    const weekDelta = thisWeekMovers?.[0]?.earnings_delta ?? 0;
-    if (weekDelta > 0) {
-      const formatted = weekDelta >= 1_000_000
-        ? `+$${(weekDelta / 1_000_000).toFixed(1)}M`
-        : weekDelta >= 1_000
-          ? `+$${Math.round(weekDelta / 1_000)}K`
-          : `+$${weekDelta}`;
-      out.push({ variant: 'normal', value: `${formatted} this week` });
-    }
-
-    const alumniCashing = alumni?.filter(a => (a.earnings ?? 0) > 0).length ?? 0;
-    if (alumniCashing >= 1) {
-      out.push({ variant: 'normal', value: `${alumniCashing} alumni cashing` });
-    }
-
-    return out.slice(0, 3);
-  }, [showCaptainPill, captain, captainOwgr, thisWeekMovers, alumni]);
-
   const subtitleText = stats ? buildAlumniSubtitle(stats.player_count, alumni) : null;
 
-  // Captain context line (renders below alumni count when dominates)
-  const captainContextLine = useMemo(() => {
-    if (!showCaptainPill || !captain) return null;
-    const parts: string[] = [];
-    if ((captain as any).wins !== undefined && (captain as any).wins > 0) {
-      const w = (captain as any).wins;
-      parts.push(`${w} ${w === 1 ? 'win' : 'wins'}`);
+  // Primary stat split (amber decimal-tail pattern).
+  const primaryValueText = stats ? formatCurrency(stats.earnings_total) : '—';
+  const { integer: primaryInteger, decimal: primaryDecimal, suffix: primarySuffix } = splitStatValue(primaryValueText);
+
+  // Caption metadata composition (Q3 decision).
+  // Priority order: #N EARNINGS → CAPTAIN → SEASON NARRATIVE. Cap at 3 items.
+  const captionMetadata: string[] = useMemo(() => {
+    const items: string[] = [];
+
+    if (collegeRank) {
+      items.push(`#${collegeRank} EARNINGS`);
     }
-    if (captainOwgr) parts.push(`#${captainOwgr} OWGR`);
-    if (captainEarningsPct !== null) parts.push(`${captainEarningsPct}% of season earnings`);
-    if (parts.length === 0) return null;
-    return parts.join(' · ');
-  }, [showCaptainPill, captain, captainOwgr, captainEarningsPct]);
+
+    if (captain && showCaptainPill) {
+      const captainName = captainShortName(captain.fullName).toUpperCase();
+      items.push(
+        captainOwgr
+          ? `${captainName} · #${captainOwgr} OWGR`
+          : captainName
+      );
+    }
+
+    if (stats?.wins_total && stats.wins_total > 0) {
+      items.push(`${stats.wins_total} WIN${stats.wins_total === 1 ? '' : 'S'} THIS SEASON`);
+    } else if (stats?.top10_total && stats.top10_total > 0) {
+      items.push(`${stats.top10_total} TOP 10S THIS SEASON`);
+    }
+
+    return items.slice(0, 3);
+  }, [collegeRank, captain, showCaptainPill, captainOwgr, stats]);
+
 
   /* ── Pull-to-refresh ── */
   const handleTouchStart = useCallback((e: React.TouchEvent) => {
