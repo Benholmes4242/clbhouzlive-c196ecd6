@@ -438,7 +438,7 @@ export const AllTrophiesSheet: React.FC<Props> = ({ open, onClose, achievements 
               fontVariantNumeric: 'tabular-nums',
             }}>{earnedCount}</span>
             <span style={{ fontSize: 16, color: INK_55, fontWeight: 500 }}>
-              of {totalCount} earned
+              of {earnableCount} earned
             </span>
             <span style={{ flex: 1 }} />
             <span style={{
