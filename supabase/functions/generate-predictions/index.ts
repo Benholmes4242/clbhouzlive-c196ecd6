@@ -751,6 +751,25 @@ ${researchResults[3]?.trim() || 'No weather forecast available.'}
 // =============================================
 
 function isPredictionStale(prediction: any): boolean {
+  if (!prediction?.generated_at) return true;
+
+  // 1. Age — predictions older than 6 hours are stale.
+  //    Tournaments evolve, field changes, stats refresh.
+  const ageMs = Date.now() - new Date(prediction.generated_at).getTime();
+  const sixHoursMs = 6 * 60 * 60 * 1000;
+  if (ageMs > sixHoursMs) return true;
+
+  // 2. Calculation failure — if course fit was never calculated server-side,
+  //    the prediction is fundamentally incomplete and should be regenerated
+  //    as soon as DNA becomes available.
+  const enrichmentStats = prediction?.consensus_data?.enrichmentStats;
+  if (enrichmentStats?.courseFitCalculated === 0) return true;
+
+  // 3. DNA backfill — if a Course DNA profile was added AFTER this prediction
+  //    was generated, we should regenerate to pick up real fit data.
+  //    (Skipped here — requires extra DNA query per cache check.
+  //     Checks 1+2 cover the immediate Aronimink case; revisit as a follow-up.)
+
   return false;
 }
 
