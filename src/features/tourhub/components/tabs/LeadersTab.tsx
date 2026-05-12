@@ -358,7 +358,7 @@ export function LeadersTab() {
             to="/tourhub?tab=overview"
             replace
             className="flex items-center gap-0.5 active:opacity-50 transition-opacity shrink-0"
-            style={{ fontSize: '12px', fontWeight: 500, color: 'rgba(15,23,42,0.5)', textDecoration: 'none', marginLeft: '-4px' }}
+            style={{ fontSize: '12px', fontWeight: 500, color: '#64748B', textDecoration: 'none', marginLeft: '-4px' }}
           >
             <ChevronLeft size={13} strokeWidth={2.5} />
             Tour Overview
@@ -372,7 +372,7 @@ export function LeadersTab() {
               style={{
                 display: 'flex', alignItems: 'center', gap: 5,
                 padding: '6px 10px', borderRadius: 8,
-                background: 'rgba(15,23,42,0.04)',
+                background: '#EDF1F5',
                 border: 'none', cursor: 'pointer',
               }}
               aria-label="Search players"
@@ -384,7 +384,7 @@ export function LeadersTab() {
         </div>
 
         {/* Group underline tabs */}
-        <div style={{ display: 'flex', borderBottom: '0.5px solid rgba(15,23,42,0.07)', marginTop: '6px' }}>
+        <div style={{ display: 'flex', borderBottom: '1px solid rgba(15,23,42,0.10)', marginTop: '6px' }}>
           {Object.keys(GROUP_KEYS).map((groupLabel) => {
             const isActive = groupLabel === activeGroup;
             const firstKey = GROUP_KEYS[groupLabel]?.[0];
@@ -394,9 +394,9 @@ export function LeadersTab() {
                 onClick={() => { if (firstKey) setCategory(firstKey); }}
                 className="active:opacity-70 transition-opacity"
                 style={{
-                  flex: 1, padding: '10px 4px 9px',
-                  fontSize: '13px',
-                  fontWeight: isActive ? 800 : 500,
+                  flex: 1, padding: '12px 0',
+                  fontSize: '12px',
+                  fontWeight: isActive ? 800 : 600,
                   color: isActive ? '#0F172A' : '#94A3B8',
                   background: 'transparent', border: 'none',
                   borderBottom: isActive ? '2px solid #F7931E' : '2px solid transparent',
@@ -410,8 +410,8 @@ export function LeadersTab() {
           })}
         </div>
 
-        {/* Category chips — amber language family (Phase 1 fix.1.6) */}
-        <div style={{ display: 'flex', gap: '8px', padding: '14px 18px 12px', overflowX: 'auto', scrollbarWidth: 'none' }}>
+        {/* Category chips — canonical filter-pill treatment */}
+        <div style={{ display: 'flex', gap: '8px', padding: '14px 20px 12px', overflowX: 'auto', scrollbarWidth: 'none' }}>
           {activeGroupCats.map(cat => {
             const on = cat.key === categoryKey;
             return (
@@ -422,9 +422,9 @@ export function LeadersTab() {
                 style={{
                   padding: '6px 12px', borderRadius: '8px',
                   fontSize: '11px', fontWeight: on ? 800 : 700,
-                  color: on ? '#c97a10' : '#334155',
-                  background: on ? 'rgba(247,147,30,0.08)' : '#ffffff',
-                  border: `1px solid ${on ? 'rgba(247,147,30,0.30)' : '#E2E8F0'}`,
+                  color: '#0F172A',
+                  background: on ? '#FEF3E7' : '#ffffff',
+                  border: `1.5px solid ${on ? '#F7931E' : '#E2E8F0'}`,
                   cursor: 'pointer', whiteSpace: 'nowrap' as const,
                   transition: 'background 0.15s, border-color 0.15s',
                 }}
@@ -435,13 +435,14 @@ export function LeadersTab() {
           })}
         </div>
 
-        {/* Count bar OR search input — mutually exclusive (Phase 1 fix.1.7) */}
+        {/* Count bar OR search input — mutually exclusive */}
         {!searchExpanded ? (
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '6px 16px 8px', gap: 8 }}>
-            <span style={{ fontSize: 11, fontWeight: 600, color: '#64748B' }}>
-              {listPlayers.length.toLocaleString()} {listPlayers.length === 1 ? 'player' : 'players'}
-              <span style={{ color: '#CBD5E1' }}> · ranked by </span>
-              <span style={{ color: '#0F172A', fontWeight: 700 }}>{category.shortLabel}</span>
+          <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, padding: '6px 16px 8px' }}>
+            <span style={{ fontSize: 9, fontWeight: 800, color: '#0F172A', letterSpacing: '0.14em', textTransform: 'uppercase' as const, fontVariantNumeric: 'tabular-nums' }}>
+              {listPlayers.length.toLocaleString()} {listPlayers.length === 1 ? 'PLAYER' : 'PLAYERS'}
+            </span>
+            <span style={{ fontSize: 9, fontWeight: 800, color: '#64748B', letterSpacing: '0.14em', textTransform: 'uppercase' as const }}>
+              RANKED BY <span style={{ color: '#0F172A' }}>{category.shortLabel.toUpperCase()}</span>
             </span>
           </div>
         ) : (
