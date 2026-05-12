@@ -592,7 +592,7 @@ export const RoundsThatCountCard: React.FC<Props> = ({ connectionId, currentHand
               but only N labels render text to prevent rotated overlap. */}
           <div style={{
             display: 'flex', marginTop: 6, marginLeft: Y_AXIS_W,
-            paddingBottom: 14,
+            paddingBottom: 2,
           }}>
             {(() => {
               const total = enriched.rounds.length;
