@@ -545,52 +545,6 @@ export const StreaksSection: React.FC<Props> = ({ connectionId, userId }) => {
           icon="shield"
         />
       </div>
-      <div style={{ height: 12 }} />
-
-
-      {/* All-time records */}
-      <div style={{ padding: '0 20px' }}>
-        <button
-          type="button"
-          onClick={handleRecordsTap}
-          style={{
-            width: '100%',
-            textAlign: 'left',
-            background: '#fff',
-            border: `0.5px solid ${INK_10}`,
-            borderRadius: 14,
-            padding: 14,
-            fontFamily: FONT_GEIST,
-            cursor: 'pointer',
-            display: 'flex',
-            alignItems: 'center',
-            gap: 12,
-          }}
-        >
-          <div
-            style={{
-              width: 32,
-              height: 32,
-              borderRadius: 10,
-              background: INK_06,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-            }}
-          >
-            <Trophy size={16} color={INK_70} strokeWidth={2.2} />
-          </div>
-          <div style={{ flex: 1 }}>
-            <div style={{ fontSize: 13.5, fontWeight: 700, color: INK }}>
-              All-time records
-            </div>
-            <div style={{ fontSize: 11.5, color: INK_55, marginTop: 2 }}>
-              Lowest round, biggest cut, longest run
-            </div>
-          </div>
-          <ChevronRight size={16} color={INK_40} />
-        </button>
-      </div>
     </section>
   );
 };
