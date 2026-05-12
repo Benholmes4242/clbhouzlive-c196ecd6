@@ -1,68 +1,29 @@
 /**
- * LeadersMasthead — Dispatch editorial header for Stat Watch.
- * Slate background, category name as headline, No.1 cover story,
- * narrative pills row (Margin / Streak / Recent Form / vs Avg).
- *
- * The 2-3 runners strip was removed in the Stat Watch polish (Phase 1) —
- * hero owns rank #1, list starts at #2.
+ * LeadersMasthead — Canonical light editorial header for Stat Watch.
+ * Mirrors Schedule + Players mastheads (§2/§9 of CLBHOUZ design system).
+ * Stat Watch-specific: amber decimal-tail on the leader's big stat value.
  */
 
 import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Flame, Trophy } from 'lucide-react';
+import { Activity, ChevronRight, Crown, Flame, Trophy } from 'lucide-react';
 import { getPlayerHeadshotUrl, PLAYER_SILHOUETTE_URL } from '@/utils/playerHeadshot';
 import { titleCaseCountry } from '../../utils/countryFlags';
 import CountryFlag from '@/components/ui/country-flag';
 import { playerRoute } from '../../routes';
 import type { LeaderCategory } from './constants';
 
+// ─────────────────────────────────────────────────────────────────────────────
+// MastheadPill / PillView — kept for cross-surface compatibility.
+// Used by TournamentHero, PlayerHero, CollegeMasthead, CollegeProfilePage.
+// LeadersMasthead itself no longer renders pills (folded into caption row).
+// ─────────────────────────────────────────────────────────────────────────────
 export interface MastheadPill {
-  /**
-   * Render variant:
-   *   - 'highlight' — amber wash for dominance moments (Stat Watch + Tournament hero)
-   *   - 'normal'    — slate wash for context (Stat Watch masthead)
-   *   - 'live'      — amber wash + amber border for in-progress signal (Tournament hero)
-   *
-   * Note: 'normal' is designed for the dark slate masthead background. On the
-   * Tournament hero the bottom of the gradient is dark enough that 'normal'
-   * still reads — pills should render in the upper-mid overlay, not at the bottom.
-   */
   variant: 'highlight' | 'normal' | 'live';
-  /** Optional small label rendered before the value (e.g. "Margin:"). */
   label?: string;
-  /** Main pill value (e.g. "+1.7 yds", "tied with #2", "5-week leader"). */
   value: string;
-  /** Optional leading icon component (Stat Watch enum). */
   icon?: 'flame' | 'trophy';
-  /**
-   * Optional custom React node rendered before the label/value (e.g. <LivePulse />).
-   * Used by the Tournament hero to inject a pulsing dot into the live pill.
-   * Takes precedence over the icon enum if both are set.
-   */
   prefix?: React.ReactNode;
-}
-
-interface LeadersMastheadProps {
-  leader: {
-    player: {
-      id: string;
-      full_name: string;
-      country: string | null;
-      country_code: string | null;
-      photo_url: string | null;
-      pga_tour_id: string | null;
-      tour_codes?: string[] | null;
-    };
-    playerId: string;
-    value: number;
-    rank: number;
-  } | null;
-  category: LeaderCategory;
-  formatOverride?: (v: number) => string;
-  unitOverride?: string;
-  leaderValue?: string;
-  /** Narrative pills computed by parent — Margin / Streak / Recent Form / vs Avg. */
-  pills?: MastheadPill[];
 }
 
 export function PillView({ pill }: { pill: MastheadPill }) {
@@ -107,24 +68,72 @@ export function PillView({ pill }: { pill: MastheadPill }) {
   );
 }
 
+// ─────────────────────────────────────────────────────────────────────────────
+
+interface LeadersMastheadProps {
+  leader: {
+    player: {
+      id: string;
+      full_name: string;
+      country: string | null;
+      country_code: string | null;
+      photo_url: string | null;
+      pga_tour_id: string | null;
+      tour_codes?: string[] | null;
+    };
+    playerId: string;
+    value: number;
+    rank: number;
+  } | null;
+  category: LeaderCategory;
+  formatOverride?: (v: number) => string;
+  unitOverride?: string;
+  /** Optional caption metadata e.g. "11 CONSECUTIVE WEEKS". */
+  streakLabel?: string | null;
+  /** Optional caption metadata e.g. "MARGIN +243 PTS". */
+  marginLabel?: string | null;
+  /** Season year — composes the subhead context line. */
+  seasonYear?: number | null;
+  /** Tour identifier for subhead — defaults to PGA. */
+  tourLabel?: string;
+  /** Tap on eyebrow → navigate back to Tour Overview. */
+  onEyebrowTap?: () => void;
+}
+
+/**
+ * Splits a formatted stat value into integer + decimal-tail parts.
+ * The decimal tail renders in amber per Stat Watch exemplar (IMG_6047).
+ */
+function splitStatValue(formatted: string): { integer: string; decimal: string; suffix: string } {
+  const match = formatted.match(/^([^\d-]*-?\d+)(\.\d+)?(.*)$/);
+  if (!match) return { integer: formatted, decimal: '', suffix: '' };
+  return { integer: match[1], decimal: match[2] ?? '', suffix: match[3] ?? '' };
+}
+
 export function LeadersMasthead({
   leader,
   category,
   formatOverride,
   unitOverride,
-  leaderValue,
-  pills,
+  streakLabel,
+  marginLabel,
+  seasonYear,
+  tourLabel = 'PGA',
+  onEyebrowTap,
 }: LeadersMastheadProps) {
   if (!leader) return null;
 
   const fmt = formatOverride ?? category.format;
   const unit = unitOverride ?? category.unit;
   const formattedValue = `${fmt(leader.value)}${unit ? ` ${unit}` : ''}`;
+  const { integer, decimal, suffix } = splitStatValue(formattedValue);
   const countryName = titleCaseCountry(leader.player.country);
   const photoUrl = getPlayerHeadshotUrl(
     leader.player.full_name,
     leader.player.tour_codes?.[0] ?? 'pga'
   );
+  const year = seasonYear ?? new Date().getFullYear();
+  const showTourAvg = !!category.tourAverage && category.tourAverage !== '—';
 
   return (
     <AnimatePresence mode="wait">
@@ -134,102 +143,281 @@ export function LeadersMasthead({
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
         transition={{ duration: 0.3 }}
-        style={{ background: '#0F172A', padding: 'calc(16px + env(safe-area-inset-top, 0px)) 16px 14px' }}
+        style={{
+          background: '#F8FAFC',
+          padding: 'calc(16px + max(env(safe-area-inset-top, 0px), 47px)) 16px 14px',
+        }}
       >
-        {/* Amber eyebrow */}
-        <div style={{ fontSize: '15px', fontWeight: 900, color: '#F7931E', letterSpacing: '0.16em', textTransform: 'uppercase' as const, marginBottom: '10px' }}>
-          ⚡ CLBHOUZ · STAT WATCH
-        </div>
+        {/* ── Section header (canonical §2) ── */}
+        <div style={{ marginBottom: 14 }}>
+          <button
+            type="button"
+            onClick={onEyebrowTap}
+            disabled={!onEyebrowTap}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 6,
+              background: 'transparent',
+              border: 'none',
+              padding: 0,
+              marginBottom: 6,
+              cursor: onEyebrowTap ? 'pointer' : 'default',
+            }}
+          >
+            <Activity size={13} strokeWidth={2.5} style={{ color: '#F7931E' }} />
+            <span
+              style={{
+                fontSize: 10.5,
+                fontWeight: 700,
+                color: '#F7931E',
+                letterSpacing: '0.14em',
+                textTransform: 'uppercase',
+              }}
+            >
+              STAT WATCH
+            </span>
+            {onEyebrowTap && (
+              <ChevronRight
+                size={11}
+                strokeWidth={2.5}
+                style={{ color: '#F7931E', marginTop: 1 }}
+              />
+            )}
+          </button>
 
-        {/* Masthead double-rule band */}
-        <div style={{ borderTop: '2px solid rgba(255,255,255,0.15)', borderBottom: '0.5px solid rgba(255,255,255,0.08)', padding: '10px 0', marginBottom: '14px' }}>
-          <div>
-            <h1 style={{ fontSize: '24px', fontWeight: 900, color: '#ffffff', letterSpacing: '-0.04em', margin: 0, lineHeight: 1 }}>
-              {category.label}
-            </h1>
+          <h1
+            style={{
+              fontSize: 18,
+              fontWeight: 800,
+              color: '#0F172A',
+              letterSpacing: '-0.015em',
+              lineHeight: 1.2,
+              margin: 0,
+            }}
+          >
+            {category.label}
+          </h1>
+
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'baseline',
+              justifyContent: 'space-between',
+              gap: 8,
+              marginTop: 4,
+            }}
+          >
+            <span style={{ fontSize: 13, fontWeight: 500, color: '#64748B' }}>
+              {year} Season · {tourLabel}
+            </span>
+            {showTourAvg && (
+              <span style={{ fontSize: 13, fontWeight: 500, color: '#64748B' }}>
+                Tour avg{' '}
+                <span
+                  style={{
+                    color: '#0F172A',
+                    fontWeight: 700,
+                    fontVariantNumeric: 'tabular-nums',
+                  }}
+                >
+                  {category.tourAverage}
+                </span>
+              </span>
+            )}
           </div>
-
-          {/* Stat context inline — tour avg + leader value */}
-          {(category.tourAverage || leaderValue) && (
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '6px' }}>
-              {category.tourAverage && category.tourAverage !== '—' && (
-                <>
-                  <span style={{ fontSize: '11px', color: 'rgba(255,255,255,0.3)' }}>Tour avg</span>
-                  <span style={{ fontSize: '11px', fontWeight: 800, color: 'rgba(255,255,255,0.6)', fontVariantNumeric: 'tabular-nums' }}>
-                    {category.tourAverage}
-                  </span>
-                  <span style={{ fontSize: '11px', color: 'rgba(255,255,255,0.15)' }}>·</span>
-                </>
-              )}
-              {leaderValue && (
-                <>
-                  <span style={{ fontSize: '11px', color: 'rgba(255,255,255,0.3)' }}>Leader</span>
-                  <span style={{ fontSize: '11px', fontWeight: 800, color: '#F7931E', fontVariantNumeric: 'tabular-nums' }}>
-                    {leaderValue}
-                  </span>
-                </>
-              )}
-            </div>
-          )}
         </div>
 
-        {/* No.1 Cover Story */}
+        {/* ── Leader champion card ── */}
         <Link
           {...playerRoute(leader.player.id, { kind: 'stat-watch' })}
-          style={{ display: 'flex', alignItems: 'flex-end', gap: '12px', textDecoration: 'none', marginBottom: 0 }}
-          className="active:opacity-80 transition-opacity"
+          style={{ textDecoration: 'none', display: 'block' }}
+          className="active:opacity-90 transition-opacity"
         >
-          {/* Left — faded rank + identity + value */}
-          <div style={{ flex: 1, minWidth: 0, paddingBottom: '4px' }}>
-            {/* Large ghost rank number */}
-            <div style={{ fontSize: '72px', fontWeight: 900, color: 'rgba(247,147,30,0.12)', lineHeight: 0.85, letterSpacing: '-0.05em', marginBottom: '2px' }}>
-              1
+          <div
+            style={{
+              background: 'linear-gradient(135deg, rgba(255,184,0,0.10) 0%, rgba(255,184,0,0.04) 100%)',
+              border: '1px solid rgba(255,184,0,0.32)',
+              borderRadius: 14,
+              padding: 14,
+            }}
+          >
+            {/* Caption row */}
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 6,
+                marginBottom: 10,
+                flexWrap: 'wrap',
+              }}
+            >
+              <Crown size={13} strokeWidth={2.5} fill="#FFB800" style={{ color: '#FFB800' }} />
+              <span
+                style={{
+                  fontSize: 10.5,
+                  fontWeight: 800,
+                  color: '#0F172A',
+                  letterSpacing: '0.14em',
+                  textTransform: 'uppercase',
+                }}
+              >
+                SEASON LEADER
+              </span>
+              {streakLabel && (
+                <>
+                  <span style={{ fontSize: 10.5, fontWeight: 800, color: '#94A3B8' }}>·</span>
+                  <span
+                    style={{
+                      fontSize: 10.5,
+                      fontWeight: 800,
+                      color: '#64748B',
+                      letterSpacing: '0.14em',
+                      textTransform: 'uppercase',
+                    }}
+                  >
+                    {streakLabel}
+                  </span>
+                </>
+              )}
+              {marginLabel && (
+                <>
+                  <span style={{ fontSize: 10.5, fontWeight: 800, color: '#94A3B8' }}>·</span>
+                  <span
+                    style={{
+                      fontSize: 10.5,
+                      fontWeight: 800,
+                      color: '#64748B',
+                      letterSpacing: '0.14em',
+                      textTransform: 'uppercase',
+                    }}
+                  >
+                    {marginLabel}
+                  </span>
+                </>
+              )}
             </div>
-            {/* SEASON LEADER eyebrow + country */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
-              <div>
-                <div style={{ fontSize: '10px', fontWeight: 900, color: '#F7931E', letterSpacing: '0.12em' }}>SEASON LEADER</div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '5px', marginTop: '2px' }}>
-                  <CountryFlag country={leader.player.country_code || leader.player.country} size="sm" />
-                  {countryName && (
-                    <span style={{ fontSize: '11px', color: 'rgba(255,255,255,0.35)' }}>{countryName}</span>
-                  )}
+
+            {/* Body row */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+              {/* Photo + "1" badge */}
+              <div style={{ position: 'relative', flexShrink: 0 }}>
+                <div
+                  style={{
+                    width: 80,
+                    height: 80,
+                    borderRadius: '34%',
+                    overflow: 'hidden',
+                    background: '#EDF1F5',
+                    border: '2.5px solid #FFB800',
+                  }}
+                >
+                  <img
+                    src={photoUrl}
+                    alt={leader.player.full_name}
+                    style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center 5%' }}
+                    onError={(e) => {
+                      (e.target as HTMLImageElement).src = PLAYER_SILHOUETTE_URL;
+                    }}
+                  />
+                </div>
+                <div
+                  style={{
+                    position: 'absolute',
+                    bottom: -4,
+                    right: -4,
+                    width: 24,
+                    height: 24,
+                    borderRadius: '50%',
+                    background: '#FFB800',
+                    border: '2.5px solid #ffffff',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontSize: 11,
+                    fontWeight: 900,
+                    color: '#0F172A',
+                  }}
+                >
+                  1
+                </div>
+              </div>
+
+              {/* Info: name + country left, big stat right */}
+              <div
+                style={{
+                  flex: 1,
+                  minWidth: 0,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  gap: 10,
+                }}
+              >
+                <div style={{ minWidth: 0, flex: 1 }}>
+                  <div
+                    style={{
+                      fontSize: 22,
+                      fontWeight: 800,
+                      color: '#0F172A',
+                      letterSpacing: '-0.025em',
+                      lineHeight: 1.1,
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      whiteSpace: 'nowrap',
+                    }}
+                  >
+                    {leader.player.full_name}
+                  </div>
+                  <div
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 5,
+                      marginTop: 4,
+                    }}
+                  >
+                    <CountryFlag country={leader.player.country_code || leader.player.country} size="sm" />
+                    {countryName && (
+                      <span style={{ fontSize: 11, fontWeight: 600, color: '#64748B' }}>
+                        {countryName}
+                      </span>
+                    )}
+                  </div>
+                </div>
+
+                <div style={{ flexShrink: 0, textAlign: 'right' }}>
+                  <div
+                    style={{
+                      fontSize: 22,
+                      fontWeight: 800,
+                      color: '#0F172A',
+                      letterSpacing: '-0.025em',
+                      lineHeight: 1.1,
+                      fontVariantNumeric: 'tabular-nums',
+                    }}
+                  >
+                    {integer}
+                    {decimal && <span style={{ color: '#F7931E' }}>{decimal}</span>}
+                    {suffix && <span style={{ color: '#0F172A' }}>{suffix}</span>}
+                  </div>
+                  <div
+                    style={{
+                      fontSize: 9,
+                      fontWeight: 800,
+                      color: '#64748B',
+                      letterSpacing: '0.16em',
+                      textTransform: 'uppercase',
+                      marginTop: 4,
+                    }}
+                  >
+                    {category.label}
+                  </div>
                 </div>
               </div>
             </div>
-
-            {/* Player name */}
-            <div style={{ fontSize: '24px', fontWeight: 900, color: '#ffffff', letterSpacing: '-0.04em', lineHeight: 1.05, marginBottom: '8px' }}>
-              {leader.player.full_name}
-            </div>
-
-            {/* Stat value in amber */}
-            <span style={{ fontSize: '20px', fontWeight: 900, color: '#F7931E', letterSpacing: '-0.02em' }}>
-              {formattedValue}
-            </span>
-          </div>
-
-          {/* Right — contained headshot, bottom-anchored */}
-          <div style={{ flexShrink: 0, width: '100px', alignSelf: 'flex-end' }}>
-            <div style={{ width: '100px', height: '120px', borderRadius: '12px 12px 0 0', overflow: 'hidden', background: 'rgba(255,255,255,0.06)' }}>
-              <img
-                src={photoUrl}
-                alt={leader.player.full_name}
-                style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center 5%' }}
-                onError={e => { (e.target as HTMLImageElement).src = PLAYER_SILHOUETTE_URL; }}
-              />
-            </div>
           </div>
         </Link>
-
-        {/* Narrative pills row — Margin / Streak / Recent Form / vs Avg */}
-        {pills && pills.length > 0 && (
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginTop: 12 }}>
-            {pills.map((p, i) => (
-              <PillView key={`${p.label ?? ''}-${p.value}-${i}`} pill={p} />
-            ))}
-          </div>
-        )}
       </motion.div>
     </AnimatePresence>
   );
