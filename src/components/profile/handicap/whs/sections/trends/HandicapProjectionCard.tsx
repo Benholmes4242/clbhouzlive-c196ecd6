@@ -104,7 +104,7 @@ export const HandicapProjectionCard: React.FC<Props> = ({ scores }) => {
         }}
       >
         {/* LEFT — WHERE YOU ARE */}
-        <div style={{ padding: '18px 14px 14px 0', position: 'relative', borderRight: `1px solid ${T.hairline}` }}>
+        <div style={{ padding: '12px 14px 12px 0', position: 'relative', borderRight: `1px solid ${T.hairline}` }}>
           <p style={{
             margin: 0,
             fontSize: 9.5,
@@ -117,8 +117,8 @@ export const HandicapProjectionCard: React.FC<Props> = ({ scores }) => {
             Where you are
           </p>
           <p style={{
-            margin: '10px 0 0',
-            fontSize: 32,
+            margin: '8px 0 0',
+            fontSize: 30,
             fontWeight: 800,
             color: T.ink,
             lineHeight: 1,
@@ -128,19 +128,10 @@ export const HandicapProjectionCard: React.FC<Props> = ({ scores }) => {
           }}>
             {prediction.current !== null ? prediction.current.toFixed(1) : '—'}
           </p>
-          <p style={{
-            margin: '6px 0 0',
-            fontSize: 11,
-            color: T.inkMute,
-            fontWeight: 500,
-            fontFamily: FONT,
-          }}>
-            Today's index
-          </p>
         </div>
 
         {/* RIGHT — HEADING TO */}
-        <div style={{ padding: '18px 0 14px 14px' }}>
+        <div style={{ padding: '12px 0 12px 14px' }}>
           <p style={{
             margin: 0,
             fontSize: 9.5,
@@ -153,13 +144,13 @@ export const HandicapProjectionCard: React.FC<Props> = ({ scores }) => {
             Heading to
           </p>
           <div style={{
-            marginTop: 10,
+            marginTop: 8,
             display: 'flex',
             alignItems: 'baseline',
             gap: 8,
           }}>
             <span style={{
-              fontSize: 32,
+              fontSize: 30,
               fontWeight: 800,
               color: theme.accentInk,
               lineHeight: 1,
@@ -190,15 +181,6 @@ export const HandicapProjectionCard: React.FC<Props> = ({ scores }) => {
               </span>
             )}
           </div>
-          <p style={{
-            margin: '6px 0 0',
-            fontSize: 11,
-            color: T.inkMute,
-            fontWeight: 500,
-            fontFamily: FONT,
-          }}>
-            {prediction.direction === 'flat' ? 'If form holds · 5 rounds' : 'If form continues · 5 rounds'}
-          </p>
         </div>
       </div>
 
