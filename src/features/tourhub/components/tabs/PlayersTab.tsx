@@ -209,10 +209,10 @@ function HeroChampion({ champion, runnerUp, champStats, champPhotoUrl, sort, act
 
           {primary && (
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', flexShrink: 0 }}>
-              <div style={{ fontSize: 22, fontWeight: 800, color: '#0F172A', letterSpacing: '-0.02em', lineHeight: 1, fontVariantNumeric: 'tabular-nums' }}>
+              <div style={{ fontSize: 22, fontWeight: 800, color: '#0F172A', letterSpacing: '-0.025em', lineHeight: 1, fontVariantNumeric: 'tabular-nums' }}>
                 {primary.value}
               </div>
-              <div style={{ fontSize: 9, fontWeight: 800, letterSpacing: '0.12em', color: '#64748B', marginTop: 4 }}>
+              <div style={{ fontSize: 9, fontWeight: 800, letterSpacing: '0.16em', color: '#64748B', marginTop: 4, textTransform: 'uppercase' as const }}>
                 {primary.label}
               </div>
             </div>
