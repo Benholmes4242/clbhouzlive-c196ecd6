@@ -7,6 +7,8 @@ import { fmtHcp } from '@/lib/whs/format';
 import { toast } from 'sonner';
 import type { FriendRivalryHydrated } from '@/lib/whs/types';
 
+const FONT_GEIST = 'Geist, system-ui, -apple-system, BlinkMacSystemFont, sans-serif';
+
 interface Props {
   userId: string;
   rivalry: FriendRivalryHydrated | null;
@@ -85,7 +87,7 @@ export const RivalryEditSheet: React.FC<Props> = ({ userId, rivalry, slotIndex, 
             display: 'flex',
             flexDirection: 'column',
             overflow: 'hidden',
-            fontFamily: 'SF Pro Display, system-ui, sans-serif',
+            fontFamily: FONT_GEIST,
           }}
         >
           <DrawerPrimitive.Title className="sr-only">Edit rival</DrawerPrimitive.Title>
@@ -118,7 +120,7 @@ export const RivalryEditSheet: React.FC<Props> = ({ userId, rivalry, slotIndex, 
               margin: 0,
               fontSize: 22,
               fontWeight: 900,
-              fontFamily: 'Georgia, serif',
+              fontFamily: FONT_GEIST,
               letterSpacing: '-0.02em',
               color: INK,
               lineHeight: 1.15,
