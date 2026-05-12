@@ -141,6 +141,16 @@ const HeroHandicapCard: React.FC<Props> = ({ connection }) => {
   const current = trend?.current ?? null;
   const points: HandicapPoint[] = history ?? [];
 
+  // Range-aware handicap delta. Uses the same snapshots feeding the sparkline,
+  // so the arc and label below the HANDICAP ring reflect the active range
+  // rather than the hardcoded 30-day delta from useHandicapTrend.
+  const rangeDelta = useMemo<number | null>(() => {
+    if (!history || history.length < 2) return null;
+    const oldest = history[0].handicap_index;
+    const latest = history[history.length - 1].handicap_index;
+    return latest - oldest;
+  }, [history]);
+
   // Date-windowed slice of all rounds for the active range. Drives FORM,
   // SCORING AVG, and the round counts in sub-labels.
   const rangeFilteredScores = useMemo(() => {
