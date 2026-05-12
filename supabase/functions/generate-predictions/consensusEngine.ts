@@ -266,7 +266,8 @@ export function aggregateConsensus(
       };
       existing.score += bordaPoints;
       existing.winProbabilities.push(pick.winProbability);
-      if (typeof pick.courseFitScore === 'number' && pick.courseFitScore > 0) {
+      // Only collect model values if we have real DNA to back them up
+      if (dnaAvailable && typeof pick.courseFitScore === 'number' && pick.courseFitScore > 0) {
         existing.courseFitScores.set(result.model, pick.courseFitScore);
       }
       existing.reasons.set(result.model, pick.reasons);
