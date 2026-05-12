@@ -132,7 +132,7 @@ export const TrendCardsStack: React.FC<Props> = ({ connectionId, currentHandicap
               lineHeight: 1.5,
             }}
           >
-            Three signals explaining your trajectory.
+            Your last 5 rounds suggest where your handicap is heading.
           </p>
 
           {showInfo && (
