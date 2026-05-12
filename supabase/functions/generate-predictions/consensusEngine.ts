@@ -103,7 +103,7 @@ async function callGPT4(
       'Authorization': `Bearer ${Deno.env.get('OPENAI_API_KEY')}`,
     },
     body: JSON.stringify({
-      model: 'gpt-4-turbo-preview',
+      model: 'gpt-5-mini',
       max_tokens: 4096,
       messages: [
         { role: 'system', content: systemPrompt },
@@ -132,7 +132,7 @@ async function callGemini(
         contents: [{ parts: [{ text: `${systemPrompt}\n\n${userPrompt}` }] }],
         generationConfig: {
           temperature: 0.7,
-          maxOutputTokens: 8192,
+          maxOutputTokens: 16384,
           responseMimeType: 'application/json',
         },
       }),
