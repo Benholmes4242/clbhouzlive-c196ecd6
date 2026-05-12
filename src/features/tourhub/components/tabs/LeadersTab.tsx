@@ -535,7 +535,7 @@ export function LeadersTab() {
         categories={LEADER_CATEGORIES}
         activeKey={category.key}
         onCategoryChange={setCategory}
-        leaderValue={leaderValue}
+        leaderValue={leader ? `${(worldFormatOverride ?? category.format)(leader.value)}${(worldUnitOverride ?? category.unit) ? ` ${worldUnitOverride ?? category.unit}` : ''}` : undefined}
         categoryLeaderValues={categoryLeaderValues}
         externalOpen={categorySheetOpen}
         onExternalClose={() => setCategorySheetOpen(false)}
