@@ -28,8 +28,6 @@ const T = {
   redTint: 'rgba(127,29,29,0.08)',
   slate: '#475569',
 };
-const FONT_SERIF = 'Georgia, "Iowan Old Style", "Apple Garamond", serif';
-const FONT_DISPLAY = 'SF Pro Display, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
 const FONT_GEIST = 'Geist, system-ui, -apple-system, BlinkMacSystemFont, sans-serif';
 
 const fmtRel = (iso: string | null) => fmtRelative(iso, { compact: false });
@@ -329,7 +327,7 @@ const OnAppCard: React.FC<{ activity: WhsFriendActivityWithImage; onClick: () =>
                 fontSize: 32,
                 fontWeight: 900,
                 color: '#fff',
-                fontFamily: FONT_DISPLAY,
+                fontFamily: FONT_GEIST,
                 fontVariantNumeric: 'tabular-nums',
                 letterSpacing: '-0.03em',
                 lineHeight: 1,
@@ -351,7 +349,7 @@ const OnAppCard: React.FC<{ activity: WhsFriendActivityWithImage; onClick: () =>
             fontSize: 15,
             fontWeight: 800,
             fontStyle: 'italic',
-            fontFamily: FONT_SERIF,
+            fontFamily: FONT_GEIST,
             letterSpacing: '-0.01em',
             textShadow: '0 1px 2px rgba(0,0,0,0.5)',
             whiteSpace: 'nowrap',
@@ -644,7 +642,7 @@ const ReportageCard: React.FC<{
                 fontSize: 22,
                 fontWeight: 900,
                 color: '#fff',
-                fontFamily: FONT_DISPLAY,
+                fontFamily: FONT_GEIST,
                 fontVariantNumeric: 'tabular-nums',
                 letterSpacing: '-0.03em',
                 lineHeight: 1,
@@ -729,7 +727,7 @@ const ReportageCard: React.FC<{
             fontSize: 12,
             fontWeight: 600,
             fontStyle: 'italic',
-            fontFamily: FONT_SERIF,
+            fontFamily: FONT_GEIST,
             color: T.inkMute,
             lineHeight: 1.25,
             whiteSpace: 'nowrap',

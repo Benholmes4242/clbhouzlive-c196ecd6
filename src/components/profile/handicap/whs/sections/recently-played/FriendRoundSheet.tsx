@@ -27,7 +27,7 @@ const HAIRLINE = 'rgba(15,23,42,0.08)';
 const AMBER_TINT = 'rgba(247,147,30,0.10)';
 const AMBER_DEEP = '#C97211';
 const AMBER_INK = '#9A6116';
-const FONT_SERIF = 'Georgia, "Iowan Old Style", "Apple Garamond", serif';
+const FONT_GEIST = 'Geist, system-ui, -apple-system, BlinkMacSystemFont, sans-serif';
 
 const relativeDay = (iso: string): string => {
   const d = new Date(iso);
@@ -210,7 +210,7 @@ export const FriendRoundSheet: React.FC<Props> = ({ activity, open, onClose }) =
                       margin: 0,
                       fontSize: 22,
                       fontWeight: 900,
-                      fontFamily: FONT_SERIF,
+                      fontFamily: FONT_GEIST,
                       letterSpacing: '-0.02em',
                       lineHeight: 1.15,
                       textShadow: '0 1px 2px rgba(0,0,0,0.4)',
@@ -349,7 +349,7 @@ export const FriendRoundSheet: React.FC<Props> = ({ activity, open, onClose }) =
                         fontSize: 18,
                         fontWeight: 800,
                         color: INK,
-                        fontFamily: FONT_SERIF,
+                        fontFamily: FONT_GEIST,
                       }}
                     >
                       See {firstName(activity.friend_name)}'s hole by hole

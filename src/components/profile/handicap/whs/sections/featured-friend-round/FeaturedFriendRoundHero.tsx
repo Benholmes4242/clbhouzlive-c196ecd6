@@ -60,7 +60,7 @@ export const FeaturedFriendRoundHero: React.FC<Props> = ({ userId }) => {
           flexDirection: 'column',
           justifyContent: 'flex-end',
           color: '#fff',
-          fontFamily: '"Geist", system-ui, sans-serif',
+          fontFamily: FONT_GEIST,
         }}>
           <div style={{
             position: 'absolute',

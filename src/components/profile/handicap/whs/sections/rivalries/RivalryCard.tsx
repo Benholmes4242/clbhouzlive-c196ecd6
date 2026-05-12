@@ -31,7 +31,7 @@ const T = {
   hairline: 'rgba(255,255,255,0.10)',
   ink: '#0F172A',
 };
-const FONT_DISPLAY = 'SF Pro Display, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
+const FONT_GEIST = 'Geist, system-ui, -apple-system, BlinkMacSystemFont, sans-serif';
 
 interface StreakInfo {
   who: 'you' | 'them';
@@ -111,7 +111,7 @@ export const RivalryCard: React.FC<Props> = ({
         borderRadius: 18,
         overflow: 'hidden',
         background: `linear-gradient(160deg, ${T.bgFrom} 0%, ${T.bgTo} 100%)`,
-        fontFamily: '"Geist", system-ui, sans-serif',
+        fontFamily: FONT_GEIST,
         color: T.white,
         boxShadow: '0 6px 18px rgba(15,23,42,0.18)',
       }}
@@ -223,7 +223,7 @@ export const RivalryCard: React.FC<Props> = ({
                   display: 'flex',
                   alignItems: 'baseline',
                   gap: 4,
-                  fontFamily: FONT_DISPLAY,
+                  fontFamily: FONT_GEIST,
                   fontWeight: 800,
                   fontSize: 38,
                   lineHeight: 1,
@@ -262,7 +262,7 @@ export const RivalryCard: React.FC<Props> = ({
           ) : (
             <div
               style={{
-                fontFamily: FONT_DISPLAY,
+                fontFamily: FONT_GEIST,
                 fontSize: 24,
                 fontWeight: 800,
                 letterSpacing: '0.22em',
