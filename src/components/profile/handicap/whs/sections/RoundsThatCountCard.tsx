@@ -257,11 +257,12 @@ export const RoundsThatCountCard: React.FC<Props> = ({ connectionId, currentHand
               <span style={{
                 display: 'inline-flex', alignItems: 'center', gap: 4,
                 color: GREEN, fontWeight: 800,
+                fontVariantNumeric: 'tabular-nums',
               }}>
                 <span style={{
                   width: 10, height: 2, background: GREEN, borderRadius: 1,
                 }} />
-                CUT
+                CUT {projection && projection.hasData ? `<${fmtDiffPlus(projection.cutTarget)}` : ''}
               </span>
             </div>
           </div>
