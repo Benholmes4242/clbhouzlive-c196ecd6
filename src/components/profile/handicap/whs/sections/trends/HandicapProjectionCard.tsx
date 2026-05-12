@@ -118,17 +118,6 @@ export const HandicapProjectionCard: React.FC<Props> = ({ scores }) => {
           </p>
           <p style={{
             margin: '10px 0 0',
-            fontSize: 11,
-            fontWeight: 800,
-            letterSpacing: '0.10em',
-            color: theme.accentInk,
-            textTransform: 'uppercase',
-            fontFamily: FONT,
-          }}>
-            {meta.label}
-          </p>
-          <p style={{
-            margin: '4px 0 0',
             fontSize: 32,
             fontWeight: 800,
             color: T.ink,
