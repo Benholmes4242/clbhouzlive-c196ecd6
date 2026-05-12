@@ -642,141 +642,126 @@ export const RoundsThatCountCard: React.FC<Props> = ({ connectionId, currentHand
         </div>
       </div>
 
-      {/* Connector lines from chart bottom to chips top */}
+      {/* Tick connectors — slim, anchor stat row to chart */}
       <div style={{
         display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)',
-        marginBottom: -1, padding: '0 1px',
+        padding: '0 1px', marginTop: 2,
       }}>
         <div style={{ display: 'flex', justifyContent: 'center' }}>
-          <div style={{ width: 1, height: 12, background: GREEN }} />
+          <div style={{ width: 1, height: 8, background: GREEN, opacity: 0.55 }} />
         </div>
         <div style={{ display: 'flex', justifyContent: 'center' }}>
-          <div style={{ width: 1, height: 12, background: INK_40 }} />
+          <div style={{ width: 1, height: 8, background: INK_40 }} />
         </div>
         <div style={{ display: 'flex', justifyContent: 'center' }}>
-          <div style={{ width: 1, height: 12, background: RED }} />
+          <div style={{ width: 1, height: 8, background: RED, opacity: 0.55 }} />
         </div>
       </div>
 
-      {/* Chips + next-round + footer card */}
+      {/* 3-up stat row — chromeless, hairline-divided */}
       <div style={{
-        background: '#fff',
-        border: `0.5px solid ${INK_10}`,
-        borderRadius: 14,
-        overflow: 'hidden',
+        display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)',
+        borderTop: `0.5px solid ${INK_10}`,
+        borderBottom: `0.5px solid ${INK_10}`,
       }}>
-        {/* 3-up stat row */}
-        <div style={{
-          display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)',
-        }}>
-          <StatCell
-            label="BEST" value={enriched.minDiff} dotColor={GREEN} valueColor={GREEN}
-            active={selectedRound.id === bestRound.id}
-            onClick={() => setSelectedId(bestRound.id)}
-            withRightBorder
-          />
-          <StatCell
-            label="AVG" value={enriched.avgDiff} dotColor={INK_40} valueColor={INK}
-            disabled withRightBorder
-          />
-          <StatCell
-            label="WORST" value={enriched.maxDiff} dotColor={RED} valueColor={RED}
-            active={selectedRound.id === worstRound.id}
-            onClick={() => setSelectedId(worstRound.id)}
-          />
-        </div>
+        <StatCell
+          label="BEST" value={enriched.minDiff} dotColor={GREEN} valueColor={GREEN}
+          active={selectedRound.id === bestRound.id}
+          onClick={() => setSelectedId(bestRound.id)}
+          withRightBorder
+        />
+        <StatCell
+          label="AVG" value={enriched.avgDiff} dotColor={INK_40} valueColor={INK}
+          disabled withRightBorder
+        />
+        <StatCell
+          label="WORST" value={enriched.maxDiff} dotColor={RED} valueColor={RED}
+          active={selectedRound.id === worstRound.id}
+          onClick={() => setSelectedId(worstRound.id)}
+        />
+      </div>
 
-        {/* Next-round targets — dynamic based on projection */}
-        {projection?.hasData && (
+      {/* Next-round targets — flat, two-column, eyebrow on left */}
+      {projection?.hasData && (
+        <div style={{ padding: '14px 0 4px' }}>
           <div style={{
-            background: 'rgba(15,23,42,0.015)',
-            borderTop: `0.5px solid ${INK_10}`,
-            padding: '14px 14px 16px',
+            display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+            marginBottom: 10,
           }}>
-            <div style={{
-              textAlign: 'center', fontSize: 9, fontWeight: 800,
-              color: INK_55, letterSpacing: '0.22em', marginBottom: 12,
+            <span style={{
+              fontSize: 9, fontWeight: 800, color: INK_55, letterSpacing: '0.22em',
             }}>
               NEXT ROUND
-            </div>
-
-            {projection.isAtRisk ? (
-              <AtRiskState cutTarget={projection.cutTarget} settleAt={projection.settleAt} />
-            ) : (
-              <SafeState cutTarget={projection.cutTarget} settleAt={projection.settleAt} />
-            )}
-
+            </span>
+            <button
+              onClick={() => setShowExplainer(true)}
+              style={{
+                background: 'transparent', border: 'none', padding: 0,
+                display: 'inline-flex', alignItems: 'center', gap: 4,
+                fontSize: 10, fontWeight: 700, color: AMBER_DEEP, cursor: 'pointer',
+              }}
+            >
+              <HelpCircle size={11} strokeWidth={2.4} />
+              How does this work?
+            </button>
           </div>
-        )}
 
-        {/* Footer */}
-        <div style={{
-          display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-          padding: '10px 14px',
-          borderTop: `0.5px solid ${INK_10}`,
-        }}>
-          <span style={{ fontSize: 10, color: INK_40 }}>
-            New rounds enter tomorrow
-          </span>
-          <button
-            onClick={() => setShowExplainer(true)}
-            style={{
-              background: 'transparent', border: 'none', padding: 0,
-              display: 'inline-flex', alignItems: 'center', gap: 4,
-              fontSize: 10, fontWeight: 700, color: AMBER_DEEP,
-              cursor: 'pointer',
-            }}
-          >
-            <HelpCircle size={11} strokeWidth={2.4} />
-            How does this work?
-          </button>
+          {projection.isAtRisk ? (
+            <AtRiskState cutTarget={projection.cutTarget} settleAt={projection.settleAt} />
+          ) : (
+            <SafeState cutTarget={projection.cutTarget} settleAt={projection.settleAt} />
+          )}
         </div>
+      )}
 
-        {/* Drop-off callout — final card band */}
-        {(() => {
-          const oldest = enriched.rounds[0];
-          if (!oldest || oldest.handicap_differential == null) return null;
-          const oldestDate = new Date(oldest.play_date);
-          const dateLabel = `${WEEKDAY[oldestDate.getDay()]} ${oldestDate.getDate()} ${
-            oldestDate.toLocaleDateString('en-GB', { month: 'short' })
-          }`;
-          const diffStr = fmtDiff(oldest.handicap_differential);
-          const willDropCounter = oldest.is_counter;
-          return (
+      {/* Utility bar — oldest round + refresh note, single condensed row */}
+      {(() => {
+        const oldest = enriched.rounds[0];
+        if (!oldest || oldest.handicap_differential == null) return null;
+        const oldestDate = new Date(oldest.play_date);
+        const dateLabel = `${oldestDate.getDate()} ${
+          oldestDate.toLocaleDateString('en-GB', { month: 'short' })
+        }`;
+        const diffStr = fmtDiff(oldest.handicap_differential);
+        const willDropCounter = oldest.is_counter;
+        const accent = willDropCounter ? AMBER : INK_40;
+        return (
+          <div style={{
+            display: 'flex', alignItems: 'center', gap: 10,
+            padding: '10px 0 0',
+            marginTop: 12,
+            borderTop: `0.5px solid ${INK_10}`,
+          }}>
             <div style={{
-              display: 'flex', alignItems: 'flex-start', gap: 8,
-              padding: '10px 14px',
-              background: willDropCounter ? AMBER_TINT_06 : INK_06,
-              borderTop: `0.5px solid ${INK_10}`,
-              borderLeft: willDropCounter ? `3px solid ${AMBER}` : `3px solid ${INK_40}`,
+              width: 6, height: 6, borderRadius: '50%',
+              background: accent, flexShrink: 0,
+            }} />
+            <p style={{
+              margin: 0, flex: 1, fontSize: 11, color: INK_70, lineHeight: 1.4,
+              fontFamily: FONT_GEIST,
             }}>
               {willDropCounter ? (
-                <AlertTriangle size={13} color={AMBER_DEEP} strokeWidth={2.4}
-                  style={{ flexShrink: 0, marginTop: 1 }} />
+                <>
+                  <strong style={{ color: INK, fontWeight: 700 }}>{diffStr}</strong>
+                  {' '}from {dateLabel} is a counter — handicap may shift when it drops off.
+                </>
               ) : (
-                <Minus size={13} color={INK_40} strokeWidth={2.4}
-                  style={{ flexShrink: 0, marginTop: 1 }} />
+                <>
+                  Oldest <strong style={{ color: INK, fontWeight: 700 }}>{diffStr}</strong>
+                  {' '}({dateLabel}) isn't a counter — its drop-off won't change your handicap.
+                </>
               )}
-              <p style={{
-                margin: 0, fontSize: 11, color: INK_70, lineHeight: 1.45,
-                fontFamily: FONT_GEIST,
-              }}>
-                {willDropCounter ? (
-                  <>
-                    Your <strong style={{ color: INK, fontWeight: 700 }}>{diffStr} from {dateLabel}</strong>
-                    {' '}is currently a counter. When it drops off the 20-round window, your handicap could shift.
-                  </>
-                ) : (
-                  <>
-                    Your oldest round (<strong style={{ color: INK, fontWeight: 700 }}>{diffStr} from {dateLabel}</strong>)
-                    {' '}isn't a counter — its drop-off won't change your handicap.
-                  </>
-                )}
-              </p>
-            </div>
-          );
-        })()}
-      </div>
+            </p>
+            <span style={{
+              fontSize: 9.5, fontWeight: 700, color: INK_40,
+              letterSpacing: '0.10em', textTransform: 'uppercase',
+              whiteSpace: 'nowrap',
+            }}>
+              Updates daily
+            </span>
+          </div>
+        );
+      })()}
 
       <HandicapExplainerSheet
         open={showExplainer}
@@ -809,7 +794,7 @@ const StatCell: React.FC<{
       disabled={disabled}
       style={{
         display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2,
-        padding: '10px 8px 12px',
+        padding: '8px 8px 10px',
         background: active ? AMBER_TINT_06 : 'transparent',
         border: 'none',
         borderRight: withRightBorder ? `0.5px solid ${INK_10}` : 'none',
@@ -819,7 +804,7 @@ const StatCell: React.FC<{
     >
       <span style={{
         display: 'inline-flex', alignItems: 'center', gap: 5,
-        marginBottom: 4,
+        marginBottom: 3,
       }}>
         <span style={{ width: 5, height: 5, borderRadius: '50%', background: dotColor }} />
         <span style={{
