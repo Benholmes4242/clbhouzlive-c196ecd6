@@ -195,13 +195,12 @@ export function FormSection({ playerId }: FormSectionProps) {
           padding: '14px 16px 16px',
         }}
       >
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14 }}>
-          <div style={{ width: 3, height: 14, background: '#F7931E', borderRadius: 1, flexShrink: 0 }} />
+        <div style={{ marginBottom: 14 }}>
           <span
             style={{
               fontSize: 9,
-              fontWeight: 900,
-              color: '#F7931E',
+              fontWeight: 800,
+              color: '#64748B',
               letterSpacing: '0.16em',
               textTransform: 'uppercase' as const,
             }}
