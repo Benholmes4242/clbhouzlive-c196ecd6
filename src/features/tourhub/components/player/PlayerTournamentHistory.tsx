@@ -47,10 +47,10 @@ export function PlayerTournamentHistory({ playerId, playerName }: PlayerTourname
         <>
           {/* Column headers */}
           <div style={{ display: 'flex', alignItems: 'center', padding: '6px 16px', borderBottom: '0.5px solid rgba(15,23,42,0.07)', borderTop: '0.5px solid rgba(15,23,42,0.07)', background: 'rgba(15,23,42,0.02)' }}>
-            <span style={{ fontSize: '8.5px', fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.12em', width: '44px', flexShrink: 0 }}>POS</span>
-            <span style={{ flex: 1, fontSize: '8.5px', fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.12em' }}>TOURNAMENT</span>
-            <span style={{ fontSize: '8.5px', fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.12em', width: '40px', textAlign: 'right' as const, flexShrink: 0 }}>DATE</span>
-            <span style={{ fontSize: '8.5px', fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.12em', width: '36px', textAlign: 'right' as const, flexShrink: 0 }}>SCORE</span>
+            <span style={{ fontSize: 9, fontWeight: 800, color: '#94A3B8', letterSpacing: '0.14em', width: '44px', flexShrink: 0 }}>POS</span>
+            <span style={{ flex: 1, fontSize: 9, fontWeight: 800, color: '#94A3B8', letterSpacing: '0.14em' }}>TOURNAMENT</span>
+            <span style={{ fontSize: 9, fontWeight: 800, color: '#94A3B8', letterSpacing: '0.14em', width: '40px', textAlign: 'right' as const, flexShrink: 0 }}>DATE</span>
+            <span style={{ fontSize: 9, fontWeight: 800, color: '#94A3B8', letterSpacing: '0.14em', width: '36px', textAlign: 'right' as const, flexShrink: 0 }}>SCORE</span>
           </div>
 
           <div>
