@@ -413,15 +413,16 @@ export function CollegeProfilePage() {
 
         {/* Alumni on Tour header */}
         {stats && (
-          <div style={{ background: '#fff', borderTop: '1px solid rgba(15,23,42,0.07)', borderBottom: '1px solid rgba(15,23,42,0.07)', marginTop: 16, padding: '14px 20px 10px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
-              <div style={{ width: 3, height: 14, background: '#0F172A', borderRadius: 1, flexShrink: 0 }} />
-              <span style={{ fontSize: 11, fontWeight: 800, color: '#0F172A', letterSpacing: '1.4px', textTransform: 'uppercase' as const, flex: 1 }}>
+          <div style={{ background: '#fff', borderTop: '1px solid rgba(15,23,42,0.07)', borderBottom: '1px solid rgba(15,23,42,0.07)', marginTop: 16, padding: '14px 16px 10px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, marginBottom: 4 }}>
+              <span style={{ fontSize: 9, fontWeight: 800, color: '#64748B', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>
                 Alumni on Tour
               </span>
-              <span style={{ fontSize: 10, color: '#94A3B8' }}>{stats.player_count} players</span>
+              <span style={{ fontSize: 9, fontWeight: 800, color: '#94A3B8', letterSpacing: '0.14em', textTransform: 'uppercase' as const }}>
+                <span style={{ color: '#0F172A' }}>{stats.player_count}</span> PLAYERS
+              </span>
             </div>
-            <div style={{ fontSize: 11, color: '#94A3B8' }}>Every pro from this program</div>
+            <div style={{ fontSize: 13, fontWeight: 500, color: '#64748B' }}>Every pro from this program</div>
           </div>
         )}
 
