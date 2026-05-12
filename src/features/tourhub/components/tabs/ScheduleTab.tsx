@@ -580,9 +580,21 @@ export function ScheduleTab() {
           <button
             type="button"
             onClick={() => navigate('/tourhub?tab=overview', { replace: true })}
-            className="flex items-center gap-0.5 text-[12px] font-medium text-muted-foreground/70 active:opacity-50 transition-opacity"
+            className="active:opacity-50 transition-opacity"
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 2,
+              fontSize: 12,
+              fontWeight: 600,
+              color: '#64748B',
+              background: 'none',
+              border: 'none',
+              padding: 0,
+              cursor: 'pointer',
+            }}
           >
-            <ChevronLeft size={13} strokeWidth={2.5} />
+            <ChevronLeft size={13} strokeWidth={2.5} color="#64748B" />
             Tour Overview
           </button>
           <div className="flex items-center gap-2">
@@ -599,9 +611,8 @@ export function ScheduleTab() {
                   color: '#FFFFFF',
                   borderRadius: 8,
                   fontSize: 12,
-                  fontWeight: 900,
+                  fontWeight: 800,
                   border: 'none',
-                  boxShadow: '0 2px 8px rgba(247,147,30,0.3)',
                   cursor: 'pointer',
                 }}
                 className="active:scale-[0.97] transition-transform"
@@ -626,20 +637,29 @@ export function ScheduleTab() {
             </button>
             <button
               onClick={() => setTourSheetOpen(true)}
-              className={cn(
-                'flex items-center gap-1.5 px-3 py-1.5 rounded-[10px] transition-all duration-150 active:scale-[0.97]',
-                'bg-card border border-border/50 shadow-sm',
-                activeTour !== 'all' ? 'border-amber-400/40 bg-amber-50/60' : ''
-              )}
+              className="active:scale-[0.97] transition-all duration-150"
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 6,
+                padding: '6px 11px',
+                background: activeTour !== 'all' ? '#FEF3E7' : '#FFFFFF',
+                border: `1.5px solid ${activeTour !== 'all' ? '#F7931E' : '#E2E8F0'}`,
+                borderRadius: 10,
+                fontSize: 12,
+                fontWeight: 600,
+                color: '#0F172A',
+                cursor: 'pointer',
+              }}
             >
               {activeTour !== 'all' && hasTourLogo(activeTour.toLowerCase())
                 ? <img src={getTourLogo(activeTour.toLowerCase())} alt={activeTour} className="shrink-0" style={{ width: 16, height: 16, objectFit: 'contain' }} />
-                : <Globe className="w-[12px] h-[12px] shrink-0" style={{ color: '#D97706' }} strokeWidth={2.5} />
+                : <Globe size={12} strokeWidth={2.5} color="#D97706" />
               }
-              <span className="text-[12px] font-semibold text-foreground">
+              <span>
                 {activeTour === 'all' ? 'All Tours' : (getTourMeta(activeTour)?.short ?? activeTour)}
               </span>
-              <ChevronDown className="w-[11px] h-[11px] text-muted-foreground/60" strokeWidth={2.5} />
+              <ChevronDown size={11} strokeWidth={2.5} color="#94A3B8" />
             </button>
           </div>
         </div>
