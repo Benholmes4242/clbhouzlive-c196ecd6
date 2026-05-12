@@ -12,6 +12,7 @@ import { titleCaseCountry } from '../../utils/countryFlags';
 import CountryFlag from '@/components/ui/country-flag';
 import { playerRoute } from '../../routes';
 import type { LeaderCategory } from './constants';
+import { splitStatValue } from '../../utils/splitStatValue';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // MastheadPill / PillView — kept for cross-surface compatibility.
