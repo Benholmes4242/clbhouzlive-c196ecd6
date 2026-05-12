@@ -257,11 +257,12 @@ export const RoundsThatCountCard: React.FC<Props> = ({ connectionId, currentHand
               <span style={{
                 display: 'inline-flex', alignItems: 'center', gap: 4,
                 color: GREEN, fontWeight: 800,
+                fontVariantNumeric: 'tabular-nums',
               }}>
                 <span style={{
                   width: 10, height: 2, background: GREEN, borderRadius: 1,
                 }} />
-                CUT
+                CUT {projection && projection.hasData ? `<${fmtDiffPlus(projection.cutTarget)}` : ''}
               </span>
             </div>
           </div>
@@ -393,23 +394,6 @@ export const RoundsThatCountCard: React.FC<Props> = ({ connectionId, currentHand
                       vectorEffect="non-scaling-stroke"
                     />
                   </svg>
-                  <div style={{
-                    position: 'absolute',
-                    top: yFor(projection.cutTarget) - 9,
-                    right: 4,
-                    padding: '2px 7px',
-                    borderRadius: 4,
-                    background: GREEN,
-                    color: '#fff',
-                    fontSize: 8.5, fontWeight: 800,
-                    letterSpacing: '0.06em',
-                    fontFamily: FONT_GEIST,
-                    pointerEvents: 'none',
-                    zIndex: 3,
-                    whiteSpace: 'nowrap',
-                  }}>
-                    CUT IF BELOW
-                  </div>
                 </>
               )}
 
@@ -686,7 +670,7 @@ export const RoundsThatCountCard: React.FC<Props> = ({ connectionId, currentHand
           display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)',
         }}>
           <StatCell
-            label="BEST COUNTER" value={enriched.minDiff} dotColor={GREEN} valueColor={GREEN}
+            label="BEST" value={enriched.minDiff} dotColor={GREEN} valueColor={GREEN}
             active={selectedRound.id === bestRound.id}
             onClick={() => setSelectedId(bestRound.id)}
             withRightBorder
@@ -696,7 +680,7 @@ export const RoundsThatCountCard: React.FC<Props> = ({ connectionId, currentHand
             disabled withRightBorder
           />
           <StatCell
-            label="WORST COUNTER" value={enriched.maxDiff} dotColor={RED} valueColor={RED}
+            label="WORST" value={enriched.maxDiff} dotColor={RED} valueColor={RED}
             active={selectedRound.id === worstRound.id}
             onClick={() => setSelectedId(worstRound.id)}
           />
@@ -722,17 +706,6 @@ export const RoundsThatCountCard: React.FC<Props> = ({ connectionId, currentHand
               <SafeState cutTarget={projection.cutTarget} settleAt={projection.settleAt} />
             )}
 
-            <div style={{
-              textAlign: 'center', fontSize: 10, color: INK_55, marginTop: 12,
-            }}>
-              Your current index is{' '}
-              <strong style={{
-                color: INK, fontWeight: 700, fontFamily: FONT_GEIST,
-                fontVariantNumeric: 'tabular-nums',
-              }}>
-                {currentHandicap.toFixed(1)}
-              </strong>.
-            </div>
           </div>
         )}
 
@@ -743,7 +716,7 @@ export const RoundsThatCountCard: React.FC<Props> = ({ connectionId, currentHand
           borderTop: `0.5px solid ${INK_10}`,
         }}>
           <span style={{ fontSize: 10, color: INK_40 }}>
-            New rounds enter the calculation tomorrow
+            New rounds enter tomorrow
           </span>
           <button
             onClick={() => setShowExplainer(true)}
@@ -758,6 +731,51 @@ export const RoundsThatCountCard: React.FC<Props> = ({ connectionId, currentHand
             How does this work?
           </button>
         </div>
+
+        {/* Drop-off callout — final card band */}
+        {(() => {
+          const oldest = enriched.rounds[0];
+          if (!oldest || oldest.handicap_differential == null) return null;
+          const oldestDate = new Date(oldest.play_date);
+          const dateLabel = `${WEEKDAY[oldestDate.getDay()]} ${oldestDate.getDate()} ${
+            oldestDate.toLocaleDateString('en-GB', { month: 'short' })
+          }`;
+          const diffStr = fmtDiffPlus(oldest.handicap_differential);
+          const willDropCounter = oldest.is_counter;
+          return (
+            <div style={{
+              display: 'flex', alignItems: 'flex-start', gap: 8,
+              padding: '10px 14px',
+              background: willDropCounter ? AMBER_TINT_06 : INK_06,
+              borderTop: `0.5px solid ${INK_10}`,
+              borderLeft: willDropCounter ? `3px solid ${AMBER}` : `3px solid ${INK_40}`,
+            }}>
+              {willDropCounter ? (
+                <AlertTriangle size={13} color={AMBER_DEEP} strokeWidth={2.4}
+                  style={{ flexShrink: 0, marginTop: 1 }} />
+              ) : (
+                <Minus size={13} color={INK_40} strokeWidth={2.4}
+                  style={{ flexShrink: 0, marginTop: 1 }} />
+              )}
+              <p style={{
+                margin: 0, fontSize: 11, color: INK_70, lineHeight: 1.45,
+                fontFamily: FONT_GEIST,
+              }}>
+                {willDropCounter ? (
+                  <>
+                    Your <strong style={{ color: INK, fontWeight: 700 }}>{diffStr} from {dateLabel}</strong>
+                    {' '}is currently a counter. When it drops off the 20-round window, your handicap could shift.
+                  </>
+                ) : (
+                  <>
+                    Your oldest round (<strong style={{ color: INK, fontWeight: 700 }}>{diffStr} from {dateLabel}</strong>)
+                    {' '}isn't a counter — its drop-off won't change your handicap.
+                  </>
+                )}
+              </p>
+            </div>
+          );
+        })()}
       </div>
 
       <HandicapExplainerSheet
@@ -769,52 +787,6 @@ export const RoundsThatCountCard: React.FC<Props> = ({ connectionId, currentHand
         isAtRisk={projection?.isAtRisk ?? false}
       />
 
-      {/* Vulnerability callout — which round drops off next */}
-      {(() => {
-        const oldest = enriched.rounds[0];
-        if (!oldest || oldest.handicap_differential == null) return null;
-        const oldestDate = new Date(oldest.play_date);
-        const dateLabel = `${WEEKDAY[oldestDate.getDay()]} ${oldestDate.getDate()} ${
-          oldestDate.toLocaleDateString('en-GB', { month: 'short' })
-        }`;
-        const diffStr = fmtDiffPlus(oldest.handicap_differential);
-        const willDropCounter = oldest.is_counter;
-        return (
-          <div style={{
-            marginTop: 12,
-            padding: '11px 12px',
-            background: willDropCounter ? AMBER_TINT_06 : INK_06,
-            border: `0.5px solid ${willDropCounter ? AMBER_BORDER : INK_10}`,
-            borderRadius: 10,
-            borderLeft: `3px solid ${willDropCounter ? AMBER : INK_40}`,
-            display: 'flex', alignItems: 'flex-start', gap: 9,
-          }}>
-            {willDropCounter ? (
-              <AlertTriangle size={14} color={AMBER_DEEP} strokeWidth={2.4}
-                style={{ flexShrink: 0, marginTop: 1 }} />
-            ) : (
-              <Minus size={14} color={INK_40} strokeWidth={2.4}
-                style={{ flexShrink: 0, marginTop: 1 }} />
-            )}
-            <p style={{
-              margin: 0, fontSize: 11.5, color: INK_70, lineHeight: 1.5,
-              fontFamily: FONT_GEIST,
-            }}>
-              {willDropCounter ? (
-                <>
-                  Your <strong style={{ color: INK, fontWeight: 700 }}>{diffStr} from {dateLabel}</strong>
-                  {' '}is currently a counter. When it drops off the 20-round window, your handicap could shift.
-                </>
-              ) : (
-                <>
-                  Your oldest round (<strong style={{ color: INK, fontWeight: 700 }}>{diffStr} from {dateLabel}</strong>)
-                  {' '}isn't a counter — its drop-off won't change your handicap.
-                </>
-              )}
-            </p>
-          </div>
-        );
-      })()}
       </div>
     </section>
   );
@@ -836,8 +808,8 @@ const StatCell: React.FC<{
       onClick={disabled ? undefined : onClick}
       disabled={disabled}
       style={{
-        display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4,
-        padding: '14px 8px',
+        display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2,
+        padding: '10px 8px 12px',
         background: active ? AMBER_TINT_06 : 'transparent',
         border: 'none',
         borderRight: withRightBorder ? `0.5px solid ${INK_10}` : 'none',
@@ -845,14 +817,20 @@ const StatCell: React.FC<{
         textAlign: 'center',
       }}
     >
-      <span style={{ width: 6, height: 6, borderRadius: '50%', background: dotColor, marginBottom: 2 }} />
       <span style={{
-        fontSize: 9, fontWeight: 800, color: INK_55, letterSpacing: '0.16em',
+        display: 'inline-flex', alignItems: 'center', gap: 5,
+        marginBottom: 4,
       }}>
-        {label}
+        <span style={{ width: 5, height: 5, borderRadius: '50%', background: dotColor }} />
+        <span style={{
+          fontSize: 9, fontWeight: 800, color: INK_55, letterSpacing: '0.14em',
+          whiteSpace: 'nowrap',
+        }}>
+          {label}
+        </span>
       </span>
       <span style={{
-        fontSize: 22, fontWeight: 700, color: valueColor,
+        fontSize: 20, fontWeight: 700, color: valueColor,
         fontFamily: FONT_GEIST, fontVariantNumeric: 'tabular-nums',
         letterSpacing: '-0.02em',
         lineHeight: 1,
@@ -909,48 +887,74 @@ const SafeState: React.FC<{ cutTarget: number; settleAt: number }> = ({
   cutTarget,
   settleAt,
 }) => (
-  <>
-    <div style={{ marginBottom: 8 }}>
-      <CutTargetCard cutTarget={cutTarget} />
-    </div>
-
+  <div style={{
+    display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8,
+  }}>
+    {/* FOR A CUT */}
     <div style={{
-      display: 'flex',
+      background: '#fff',
+      border: `0.5px solid rgba(5,150,105,0.18)`,
+      borderLeft: `3px solid ${GREEN}`,
+      borderRadius: 10,
+      padding: '10px 11px',
+    }}>
+      <div style={{
+        display: 'flex', alignItems: 'center', gap: 5, marginBottom: 4,
+      }}>
+        <TrendingDown size={11} strokeWidth={2.4} color={GREEN} />
+        <span style={{
+          fontSize: 9.5, fontWeight: 800, color: GREEN,
+          letterSpacing: '0.12em',
+        }}>FOR A CUT</span>
+      </div>
+      <div style={{
+        fontSize: 22, fontWeight: 700, color: GREEN,
+        fontVariantNumeric: 'tabular-nums',
+        letterSpacing: '-0.02em', lineHeight: 1,
+        fontFamily: FONT_GEIST,
+      }}>
+        {fmtDiff(cutTarget, { plus: true })}
+      </div>
+      <p style={{
+        margin: '6px 0 0', fontSize: 11, color: INK_55,
+        lineHeight: 1.4,
+      }}>
+        Beat this and your handicap drops.
+      </p>
+    </div>
+    {/* OTHERWISE */}
+    <div style={{
       background: '#fff',
       border: `0.5px solid ${INK_10}`,
-      borderRadius: 12,
-      overflow: 'hidden',
+      borderLeft: `3px solid ${INK_10}`,
+      borderRadius: 10,
+      padding: '10px 11px',
     }}>
-      <div style={{ width: 3, background: INK_10, flexShrink: 0 }} />
-      <div style={{ flex: 1, padding: '14px 14px 14px 12px' }}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            <Minus size={16} strokeWidth={2.2} color={INK_55} />
-            <span style={{
-              fontSize: 11, fontWeight: 800, color: INK_55,
-              letterSpacing: '0.14em', textTransform: 'uppercase',
-            }}>OTHERWISE</span>
-          </div>
-          <span style={{
-            fontSize: 22, fontWeight: 700, color: INK,
-            letterSpacing: '-0.02em', fontVariantNumeric: 'tabular-nums',
-            fontFamily: FONT_GEIST,
-          }}>
-            {fmtDiff(settleAt, { plus: true })}
-          </span>
-        </div>
-        <div style={{ fontSize: 12.5, color: INK_55, marginTop: 6, lineHeight: 1.4 }}>
-          Anything else and your handicap settles at{' '}
-          <strong style={{
-            fontWeight: 700, color: INK, fontVariantNumeric: 'tabular-nums',
-          }}>
-            {fmtDiff(settleAt, { plus: true })}
-          </strong>{' '}
-          — no risk of going up this round.
-        </div>
+      <div style={{
+        display: 'flex', alignItems: 'center', gap: 5, marginBottom: 4,
+      }}>
+        <Minus size={11} strokeWidth={2.4} color={INK_55} />
+        <span style={{
+          fontSize: 9.5, fontWeight: 800, color: INK_55,
+          letterSpacing: '0.12em',
+        }}>OTHERWISE</span>
       </div>
+      <div style={{
+        fontSize: 22, fontWeight: 700, color: INK,
+        fontVariantNumeric: 'tabular-nums',
+        letterSpacing: '-0.02em', lineHeight: 1,
+        fontFamily: FONT_GEIST,
+      }}>
+        {fmtDiff(settleAt, { plus: true })}
+      </div>
+      <p style={{
+        margin: '6px 0 0', fontSize: 11, color: INK_55,
+        lineHeight: 1.4,
+      }}>
+        Settles here · no risk of going up.
+      </p>
     </div>
-  </>
+  </div>
 );
 
 const CutTargetCard: React.FC<{ cutTarget: number }> = ({ cutTarget }) => (
