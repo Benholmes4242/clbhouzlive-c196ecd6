@@ -1,8 +1,8 @@
 /**
- * ScheduleMonthHeader - Dispatch rule marker style
- * 9px/900 uppercase with vertical bar accent.
+ * ScheduleMonthHeader — slate sub-section eyebrow pattern (§6).
  *
- * Per Schedule polish brief — current month gets amber rule + "THIS MONTH" tag.
+ * Single amber accent: optional THIS MONTH pill on the current month row.
+ * No vertical rules, no bg tint.
  */
 
 import { getTourMeta } from '../../constants/tourMap';
@@ -28,56 +28,56 @@ export function ScheduleMonthHeader({
         .map(([code, count]) => `${count} ${getTourMeta(code)?.short ?? code}`)
     : [];
 
-  const accentColor = isCurrentMonth ? '#F7931E' : '#0F172A';
-
   return (
     <div
       style={{
-        padding: '12px 16px 8px',
+        padding: '14px 16px 8px',
         borderBottom: '0.5px solid rgba(15,23,42,0.07)',
-        background: isCurrentMonth ? 'rgba(247,147,30,0.04)' : 'rgba(15,23,42,0.02)',
+        background: 'transparent',
       }}
     >
       <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-        <div style={{ width: 3, height: 12, background: accentColor, borderRadius: 1, flexShrink: 0 }} />
-        <h3 style={{
+        <span style={{
           fontSize: 9,
-          fontWeight: 900,
-          color: '#0F172A',
+          fontWeight: 800,
+          color: '#64748B',
           letterSpacing: '0.16em',
           textTransform: 'uppercase' as const,
-          margin: 0,
         }}>
           {monthLabel}
-        </h3>
+        </span>
         {isCurrentMonth && (
-          <span
-            style={{
-              padding: '2px 6px',
-              background: 'rgba(247,147,30,0.10)',
-              border: '1px solid rgba(247,147,30,0.30)',
-              borderRadius: 3,
-              fontSize: 9,
-              fontWeight: 900,
-              color: '#F7931E',
-              letterSpacing: '0.1em',
-              lineHeight: 1,
-            }}
-          >
+          <span style={{
+            padding: '2px 6px',
+            background: '#FEF3E7',
+            border: '1px solid rgba(247,147,30,0.32)',
+            borderRadius: 3,
+            fontSize: 9,
+            fontWeight: 800,
+            color: '#F7931E',
+            letterSpacing: '0.10em',
+            lineHeight: 1,
+          }}>
             THIS MONTH
           </span>
         )}
-        <span style={{ marginLeft: 'auto', fontSize: 10, fontWeight: 700, color: '#F7931E' }}>
+        <span style={{
+          marginLeft: 'auto',
+          fontSize: 13,
+          fontWeight: 700,
+          color: '#0F172A',
+          letterSpacing: '-0.005em',
+        }}>
           {eventCount} event{eventCount !== 1 ? 's' : ''}
         </span>
       </div>
       {breakdownParts.length > 0 && (
         <p style={{
-          fontSize: 11,
-          color: '#94A3B8',
+          fontSize: 12,
+          fontWeight: 500,
+          color: '#64748B',
           margin: '4px 0 0',
           lineHeight: 1.4,
-          paddingLeft: 11,
         }}>
           {breakdownParts.join(' · ')}
         </p>

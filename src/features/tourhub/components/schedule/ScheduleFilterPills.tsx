@@ -53,14 +53,14 @@ export function ScheduleFilterPills({
             onClick={() => onFilterChange(option.value)}
             style={{
               flex: 1,
-              padding: '11px 0',
+              padding: '12px 0',
               fontSize: '12px',
-              fontWeight: isActive ? 800 : 500,
+              fontWeight: isActive ? 800 : 600,
               color: isActive ? '#0F172A' : '#94A3B8',
               background: 'transparent',
               border: 'none',
               borderBottom: isActive
-                ? `2px solid ${isLive ? '#22C55E' : '#F7931E'}`
+                ? `2px solid ${isLive ? '#10B981' : '#F7931E'}`
                 : '2px solid transparent',
               cursor: 'pointer',
               display: 'flex',
@@ -72,11 +72,11 @@ export function ScheduleFilterPills({
             className="active:scale-[0.97] transition-transform"
           >
             {option.hasLiveIndicator && counts.live > 0 && (
-              <span style={{ width: 5, height: 5, borderRadius: '50%', background: isActive ? '#22C55E' : '#94A3B8', display: 'inline-block', flexShrink: 0 }} />
+              <span style={{ width: 5, height: 5, borderRadius: '50%', background: isActive ? '#10B981' : '#94A3B8', display: 'inline-block', flexShrink: 0 }} />
             )}
             {option.label}
             {option.hasLiveIndicator && counts.live > 0 && (
-              <span style={{ fontSize: '10px', color: isActive ? '#22C55E' : '#94A3B8', fontWeight: 700 }}>
+              <span style={{ fontSize: '10px', color: isActive ? '#047857' : '#94A3B8', fontWeight: 700 }}>
                 {counts.live}
               </span>
             )}

@@ -39,7 +39,7 @@ export function CompactNextUp({ tournamentId, tourCode, name, daysUntil }: Compa
       <span
         style={{
           fontSize: 9,
-          fontWeight: 900,
+          fontWeight: 800,
           color: '#F7931E',
           letterSpacing: '0.16em',
           flexShrink: 0,

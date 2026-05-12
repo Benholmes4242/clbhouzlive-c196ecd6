@@ -18,7 +18,7 @@ import type { TourTournament } from '../../hooks/useTourHubData';
 import type { SeasonTournament } from '../../hooks/useSeasonTournaments';
 import type { TournamentLeaderWinner } from '../../hooks/useTournamentLeadersWinners';
 import { getContextLabel, TOUR_NAME_TO_SLUG } from '../../utils/tournamentClassification';
-import { TOUR_COLORS } from '../../constants/colors';
+
 import { getCurrentRound } from '../../utils/formatThruDisplay';
 import { formatPurse } from '../shared/TourHeroHelpers';
 import { TourPill } from '../shared/TourPill';
@@ -64,8 +64,8 @@ function getDayNum(dateStr: string): string {
 
 function getScoreColor(score: number | null): string {
   if (score === null || score === undefined) return '#94A3B8';
-  if (score < 0) return '#F7931E';
-  if (score > 0) return '#EF4444';
+  if (score < 0) return '#0F172A';
+  if (score > 0) return '#F87171';
   return '#94A3B8';
 }
 
@@ -107,7 +107,7 @@ export function ScheduleTournamentCard({
   const contextLabel = getContextLabel({ name: tournament.name, tourName: tourName ?? undefined });
   const eventTag = resolveEventTag(contextLabel);
   const isMajor = eventTag === 'major';
-  const isSignatureTier = eventTag === 'signature' || eventTag === 'rolex';
+  // (Signature/Rolex tier no longer signalled by left-rail; EventTag carries it.)
 
   const venue = [venueName, venueCity].filter(Boolean).join(' · ');
 
@@ -131,16 +131,8 @@ export function ScheduleTournamentCard({
     if (playerId) navigate(`/tourhub/player/${playerId}`);
   };
 
-  // Tier accent — left border + optional bg tint
-  const leftBorderColor = isLive
-    ? TOUR_COLORS.liveGreen
-    : isMajor
-    ? '#F7931E'
-    : isSignatureTier
-    ? '#16A34A'
-    : 'transparent';
-
-  const rowBg = isMajor ? 'rgba(247,147,30,0.06)' : 'transparent';
+  // Major rows get amber-soft bg tint; tier signalling otherwise via EventTag/TourPill.
+  const rowBg = isMajor ? '#FEF3E7' : 'transparent';
 
   const ariaLabel = [
     tournament.name,
@@ -154,19 +146,16 @@ export function ScheduleTournamentCard({
     <div
       onClick={() => { const t = tournamentRoute(tournament.id, { kind: 'schedule' }); navigate(t.to, { state: t.state }); }}
       className={`w-full flex items-start gap-0 cursor-pointer active:bg-black/[0.02] transition-colors ${className || ''}`}
-      style={{
-        borderLeft: `3px solid ${leftBorderColor}`,
-        background: rowBg,
-      }}
+      style={{ background: rowBg }}
       role="button"
       aria-label={ariaLabel}
     >
-      {/* Date block — 42px column, slate-500 month, 22px day */}
+      {/* Date block — 52px column, slate-500 month, 20px day */}
       <div
         style={{
           flexShrink: 0,
-          width: 42,
-          padding: '14px 0 14px 8px',
+          width: 52,
+          padding: '14px 0 14px 10px',
           textAlign: 'center',
         }}
       >
@@ -175,7 +164,7 @@ export function ScheduleTournamentCard({
             fontSize: 9,
             fontWeight: 800,
             color: '#64748B',
-            letterSpacing: '0.1em',
+            letterSpacing: '0.10em',
             textTransform: 'uppercase',
             lineHeight: 1,
             margin: 0,
@@ -185,11 +174,11 @@ export function ScheduleTournamentCard({
         </p>
         <p
           style={{
-            fontSize: 22,
-            fontWeight: 900,
+            fontSize: 20,
+            fontWeight: 800,
             color: '#0F172A',
             lineHeight: 1,
-            letterSpacing: '-0.04em',
+            letterSpacing: '-0.025em',
             margin: '4px 0 0',
             fontVariantNumeric: 'tabular-nums',
           }}
@@ -199,7 +188,7 @@ export function ScheduleTournamentCard({
       </div>
 
       {/* Content */}
-      <div style={{ flex: 1, minWidth: 0, padding: '12px 16px 12px 10px' }}>
+      <div style={{ flex: 1, minWidth: 0, padding: '14px 16px 14px 8px' }}>
         {/* Tour pill + event tag row */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap', marginBottom: 6 }}>
           <TourPill tourCode={tourCode} />
@@ -212,16 +201,16 @@ export function ScheduleTournamentCard({
                 gap: 3,
                 padding: '3px 6px',
                 borderRadius: 4,
-                background: 'rgba(34,197,94,0.10)',
-                border: '1px solid rgba(34,197,94,0.30)',
-                color: '#16A34A',
+                background: 'rgba(16,185,129,0.10)',
+                border: '1px solid rgba(16,185,129,0.32)',
+                color: '#047857',
                 fontSize: 9,
                 fontWeight: 900,
                 letterSpacing: 0.6,
                 lineHeight: 1,
               }}
             >
-              <span style={{ width: 5, height: 5, borderRadius: '50%', background: '#16A34A' }} />
+              <span style={{ width: 5, height: 5, borderRadius: '50%', background: '#10B981' }} />
               LIVE
               {leaderWinner?.round1 !== undefined && (() => {
                 const roundInfo = getCurrentRound(
@@ -241,12 +230,12 @@ export function ScheduleTournamentCard({
         {/* Tournament name — visual anchor */}
         <p
           style={{
-            fontSize: 15,
-            fontWeight: 900,
+            fontSize: 16,
+            fontWeight: 800,
             color: '#0F172A',
-            letterSpacing: '-0.3px',
+            letterSpacing: '-0.015em',
             lineHeight: 1.2,
-            margin: '0 0 4px',
+            margin: '0 0 5px',
           }}
         >
           {tournament.name}
@@ -262,7 +251,7 @@ export function ScheduleTournamentCard({
               display: 'flex',
               alignItems: 'center',
               gap: 4,
-              color: TOUR_COLORS.liveGreen,
+              color: '#047857',
             }}
           >
             Leader:{' '}
