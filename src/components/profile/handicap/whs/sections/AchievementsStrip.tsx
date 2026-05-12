@@ -322,7 +322,11 @@ export const AchievementsStrip: React.FC<Props> = ({
   }, [scores, history, connectionCreatedAt, primaryClub, aggregates]);
 
   const earnedAchievements = useMemo(
-    () => allAchievements.filter((a) => a.earned),
+    () => allAchievements.filter((a) =>
+      (a.kind === 'binary' && a.earned === true) ||
+      (a.kind === 'list' && (a.list_played ?? 0) >= (a.list_total ?? 100)) ||
+      a.kind === 'counter'
+    ),
     [allAchievements],
   );
 
@@ -336,7 +340,13 @@ export const AchievementsStrip: React.FC<Props> = ({
     [earnedAchievements, nextUpTrophies],
   );
 
-  const earnedCount = earnedAchievements.length;
+  const earnedCount = useMemo(
+    () => allAchievements.filter((a) =>
+      (a.kind === 'binary' && a.earned === true) ||
+      (a.kind === 'list' && (a.list_played ?? 0) >= (a.list_total ?? 100))
+    ).length,
+    [allAchievements],
+  );
   const isLoading = sLoading || hLoading;
   const [showAll, setShowAll] = useState(false);
 
