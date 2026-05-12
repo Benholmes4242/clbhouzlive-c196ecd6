@@ -485,6 +485,13 @@ export function LeadersTab() {
             >
               {listPlayers.length > 0 ? (
                 <>
+                  {!search && (
+                    <div style={{ padding: '12px 16px 6px' }}>
+                      <span style={{ fontSize: 9, fontWeight: 800, color: '#64748B', letterSpacing: '0.14em', textTransform: 'uppercase' as const }}>
+                        CHASING
+                      </span>
+                    </div>
+                  )}
                   {listPlayers.map((item, idx) => {
                     const fmt = worldFormatOverride ?? category.format;
                     const unit = worldUnitOverride ?? category.unit;
