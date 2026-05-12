@@ -1,11 +1,12 @@
 import { useState } from 'react';
 import { useSearchParams, useNavigate, Link } from 'react-router-dom';
-import { ChevronLeft, Search, X } from 'lucide-react';
+import { ArrowLeftRight, ChevronLeft, ChevronRight, Search, X } from 'lucide-react';
 import { TourHubShell } from '../components';
 import { CollegeCompareHero } from '../components/college/CollegeCompareHero';
 import { useCollegeCompare } from '../hooks/useCollegeCompare';
 import { useCollegeSearch } from '../hooks/useCollegeStats';
 import { useCollegeMediaMap } from '../hooks/useCollegeMedia';
+import { useTourSeason } from '../hooks/useTourHubData';
 import { useDebouncedValue } from '@/hooks/useDebouncedValue';
 import { getCollegeLogoUrl } from '@/utils/collegeLogo';
 import { formatCurrency } from '@/lib/utils/formatCurrency';
