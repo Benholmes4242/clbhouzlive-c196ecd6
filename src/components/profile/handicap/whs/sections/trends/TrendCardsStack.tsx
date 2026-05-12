@@ -105,7 +105,7 @@ export const TrendCardsStack: React.FC<Props> = ({ connectionId, currentHandicap
                 fontFamily: FONT,
               }}
             >
-              You&apos;re {meta.label.toLowerCase()}
+              You&apos;re <span style={{ color: accent }}>{meta.label.toLowerCase()}</span>
             </h2>
             {deltaStr && (
               <span
