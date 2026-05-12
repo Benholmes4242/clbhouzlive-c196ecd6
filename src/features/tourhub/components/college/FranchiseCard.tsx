@@ -236,10 +236,7 @@ export function FranchiseCard({
               {deltas.earnings_rank_change !== null && deltas.earnings_rank_change !== 0 && (
                 <div style={{
                   fontSize: 12, fontWeight: 800, fontVariantNumeric: 'tabular-nums',
-                  // Data layer: negative earnings_rank_change = rank worsened.
-                  // For movers-row text colour we keep the existing semantic:
-                  // positive raw = improved (green), negative raw = worsened (red).
-                  color: deltas.earnings_rank_change > 0 ? '#16A34A' : '#DC2626',
+                  color: deltas.earnings_rank_change > 0 ? '#047857' : '#DC2626',
                   marginBottom: 2,
                 }}>
                   {deltas.earnings_rank_change > 0 ? `+${deltas.earnings_rank_change}` : String(deltas.earnings_rank_change)}
@@ -247,19 +244,28 @@ export function FranchiseCard({
               )}
               <div style={{
                 fontSize: 15, fontWeight: 800, fontVariantNumeric: 'tabular-nums',
-                color: deltas.earnings_delta >= 0 ? '#16A34A' : '#DC2626',
+                color: deltas.earnings_delta >= 0 ? '#047857' : '#DC2626',
               }}>
                 {formatDeltaValue(deltas.earnings_delta)}
               </div>
             </>
-          ) : (
-            <span style={{
-              fontSize: 17, fontWeight: 900, color: primaryValueColor,
-              fontVariantNumeric: 'tabular-nums', letterSpacing: '-0.4px',
-            }}>
-              {primaryValueText}
-            </span>
-          )}
+          ) : (() => {
+            // Primary value with amber decimal tail (Stat Watch pattern).
+            const { integer: rowInteger, decimal: rowDecimal, suffix: rowSuffix } = splitStatValue(primaryValueText);
+            return (
+              <span style={{
+                fontSize: 14,
+                fontWeight: 800,
+                color: primaryValueColor,
+                fontVariantNumeric: 'tabular-nums',
+                letterSpacing: '-0.005em',
+              }}>
+                {rowInteger}
+                {rowDecimal && <span style={{ color: '#F7931E' }}>{rowDecimal}</span>}
+                {rowSuffix}
+              </span>
+            );
+          })()}
         </div>
       </Link>
     </motion.div>
