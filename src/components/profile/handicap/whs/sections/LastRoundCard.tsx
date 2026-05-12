@@ -506,7 +506,7 @@ const MiniHoleCell: React.FC<{
   }
 
   const showInnermostRing = false;
-  const showTripleDot = depth >= 3 && shape !== 'empty' && shape !== 'none';
+  const showTripleDot = depth >= 3 && shape !== 'empty';
 
   const showNumeral = score != null && score < 10;
   const showOverflowMarker = score != null && score >= 10;
@@ -522,7 +522,7 @@ const MiniHoleCell: React.FC<{
         justifyContent: 'center',
       }}
     >
-      {shape !== 'none' && shape !== 'empty' && (
+      {shape !== 'empty' && (
         <svg
           viewBox={`0 0 ${size} ${size}`}
           width={size}
