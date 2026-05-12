@@ -32,12 +32,12 @@ export function PillView({ pill }: { pill: MastheadPill }) {
   const isLive = pill.variant === 'live';
   const isAmberToned = isHighlight || isLive;
 
-  const bg = isAmberToned ? 'rgba(247,147,30,0.12)' : 'rgba(255,255,255,0.06)';
+  const bg = isAmberToned ? 'rgba(247,147,30,0.12)' : 'rgba(255,255,255,0.10)';
   const border = isLive
     ? 'rgba(247,147,30,0.55)'
     : isHighlight
       ? 'rgba(247,147,30,0.30)'
-      : 'rgba(255,255,255,0.10)';
+      : 'rgba(255,255,255,0.18)';
   const valueColor = isAmberToned ? '#F7931E' : '#ffffff';
   const labelColor = isAmberToned ? 'rgba(247,147,30,0.75)' : 'rgba(255,255,255,0.45)';
   const Icon = pill.icon === 'flame' ? Flame : pill.icon === 'trophy' ? Trophy : null;
