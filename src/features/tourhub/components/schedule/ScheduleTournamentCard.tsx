@@ -18,7 +18,7 @@ import type { TourTournament } from '../../hooks/useTourHubData';
 import type { SeasonTournament } from '../../hooks/useSeasonTournaments';
 import type { TournamentLeaderWinner } from '../../hooks/useTournamentLeadersWinners';
 import { getContextLabel, TOUR_NAME_TO_SLUG } from '../../utils/tournamentClassification';
-import { TOUR_COLORS } from '../../constants/colors';
+
 import { getCurrentRound } from '../../utils/formatThruDisplay';
 import { formatPurse } from '../shared/TourHeroHelpers';
 import { TourPill } from '../shared/TourPill';
@@ -107,7 +107,7 @@ export function ScheduleTournamentCard({
   const contextLabel = getContextLabel({ name: tournament.name, tourName: tourName ?? undefined });
   const eventTag = resolveEventTag(contextLabel);
   const isMajor = eventTag === 'major';
-  const isSignatureTier = eventTag === 'signature' || eventTag === 'rolex';
+  // (Signature/Rolex tier no longer signalled by left-rail; EventTag carries it.)
 
   const venue = [venueName, venueCity].filter(Boolean).join(' · ');
 
