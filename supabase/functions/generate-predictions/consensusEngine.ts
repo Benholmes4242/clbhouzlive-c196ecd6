@@ -434,7 +434,7 @@ export async function runConsensus(
     console.log(`[Consensus] ${r.model}: ${r.success ? `${r.picks.length} picks in ${r.latencyMs}ms` : `FAILED — ${r.error}`}`);
   }
 
-  const consensus = aggregateConsensus(modelResults, modelWeights || DEFAULT_MODEL_WEIGHTS, calculatedFitScores);
+  const consensus = aggregateConsensus(modelResults, modelWeights || DEFAULT_MODEL_WEIGHTS, calculatedFitScores, dnaAvailable);
   
   console.log(`[Consensus] Top 5: ${consensus.topContenders.slice(0, 5).map((p) => p.playerName).join(', ')}`);
   console.log(`[Consensus] Agreement: ${consensus.agreementScore}%, Method: ${consensus.consensusMethod}`);
