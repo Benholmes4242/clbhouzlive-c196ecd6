@@ -200,6 +200,7 @@ export function aggregateConsensus(
   modelResults: ModelResult[],
   modelWeights: Record<string, number> = DEFAULT_MODEL_WEIGHTS,
   calculatedFitScores?: Map<string, number>,
+  dnaAvailable: boolean = false,
 ): ConsensusResult {
   
   const successfulModels = modelResults.filter((r) => r.success);
