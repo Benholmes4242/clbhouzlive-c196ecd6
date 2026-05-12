@@ -175,7 +175,7 @@ export function FranchiseLeaderboard({
                     );
                   })}
                   <div style={{ padding: '12px 16px', borderTop: '0.5px solid rgba(15,23,42,0.07)' }}>
-                    <p style={{ fontSize: 10, fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.12em', textTransform: 'uppercase' as const, textAlign: 'center' as const, margin: 0 }}>
+                    <p style={{ fontSize: 9, fontWeight: 800, color: '#94A3B8', letterSpacing: '0.14em', textTransform: 'uppercase' as const, textAlign: 'center' as const, margin: 0 }}>
                       COLLEGE FRANCHISE RANKINGS · 2025–26 SEASON
                     </p>
                   </div>
