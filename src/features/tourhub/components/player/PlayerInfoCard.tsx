@@ -105,10 +105,9 @@ export function PlayerInfoCard({ player }: PlayerInfoCardProps) {
 
   return (
     <div style={{ background: '#ffffff', borderBottom: '1px solid rgba(15,23,42,0.07)', marginTop: '8px', padding: '14px 16px 16px' }}>
-      {/* Section header */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '16px' }}>
-        <div style={{ width: 3, height: 14, background: '#0F172A', borderRadius: 1, flexShrink: 0 }} />
-        <span style={{ fontSize: '9px', fontWeight: 900, color: '#0F172A', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>
+      {/* Section eyebrow — canonical §6 slate-caps */}
+      <div style={{ marginBottom: '16px' }}>
+        <span style={{ fontSize: '9px', fontWeight: 800, color: '#64748B', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>
           Player Info
         </span>
       </div>
