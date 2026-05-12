@@ -6,7 +6,7 @@ import { projectNextRound } from '@/lib/whs/handicapMath';
 import HandicapExplainerSheet from './HandicapExplainerSheet';
 import { SectionHeader } from './_shared/atoms';
 
-const fmtDiffPlus = (n: number) => fmtDiff(n, { plus: true });
+
 
 interface Props {
   connectionId: string;
@@ -262,7 +262,7 @@ export const RoundsThatCountCard: React.FC<Props> = ({ connectionId, currentHand
                 <span style={{
                   width: 10, height: 2, background: GREEN, borderRadius: 1,
                 }} />
-                CUT {projection && projection.hasData ? `<${fmtDiffPlus(projection.cutTarget)}` : ''}
+                CUT {projection && projection.hasData ? `<${fmtDiff(projection.cutTarget)}` : ''}
               </span>
             </div>
           </div>
@@ -578,7 +578,7 @@ export const RoundsThatCountCard: React.FC<Props> = ({ connectionId, currentHand
                           fontSize: 14, fontWeight: 800, color: '#fff',
                           fontVariantNumeric: 'tabular-nums', letterSpacing: '-0.02em',
                         }}>
-                          {fmtDiff(d, { plus: true })}
+                          {fmtDiff(d)}
                         </span>
                       </div>
                     </div>
@@ -740,7 +740,7 @@ export const RoundsThatCountCard: React.FC<Props> = ({ connectionId, currentHand
           const dateLabel = `${WEEKDAY[oldestDate.getDay()]} ${oldestDate.getDate()} ${
             oldestDate.toLocaleDateString('en-GB', { month: 'short' })
           }`;
-          const diffStr = fmtDiffPlus(oldest.handicap_differential);
+          const diffStr = fmtDiff(oldest.handicap_differential);
           const willDropCounter = oldest.is_counter;
           return (
             <div style={{
@@ -835,7 +835,7 @@ const StatCell: React.FC<{
         letterSpacing: '-0.02em',
         lineHeight: 1,
       }}>
-        {fmtDiff(value, { plus: true })}
+        {fmtDiff(value)}
       </span>
     </button>
   );
@@ -873,7 +873,7 @@ const AtRiskState: React.FC<{ cutTarget: number; settleAt: number }> = ({
         <strong style={{
           fontWeight: 700, color: RED, fontVariantNumeric: 'tabular-nums',
         }}>
-          {fmtDiff(settleAt, { plus: true })}
+          {fmtDiff(settleAt)}
         </strong>{' '}
         next round unless you beat your cut target.
       </div>
@@ -913,7 +913,7 @@ const SafeState: React.FC<{ cutTarget: number; settleAt: number }> = ({
         letterSpacing: '-0.02em', lineHeight: 1,
         fontFamily: FONT_GEIST,
       }}>
-        {fmtDiff(cutTarget, { plus: true })}
+        {fmtDiff(cutTarget)}
       </div>
       <p style={{
         margin: '6px 0 0', fontSize: 11, color: INK_55,
@@ -945,7 +945,7 @@ const SafeState: React.FC<{ cutTarget: number; settleAt: number }> = ({
         letterSpacing: '-0.02em', lineHeight: 1,
         fontFamily: FONT_GEIST,
       }}>
-        {fmtDiff(settleAt, { plus: true })}
+        {fmtDiff(settleAt)}
       </div>
       <p style={{
         margin: '6px 0 0', fontSize: 11, color: INK_55,
@@ -980,7 +980,7 @@ const CutTargetCard: React.FC<{ cutTarget: number }> = ({ cutTarget }) => (
           letterSpacing: '-0.02em', fontVariantNumeric: 'tabular-nums',
           fontFamily: FONT_GEIST,
         }}>
-          {fmtDiff(cutTarget, { plus: true })}
+          {fmtDiff(cutTarget)}
         </span>
       </div>
       <div style={{ fontSize: 12.5, color: INK_55, marginTop: 6, lineHeight: 1.4 }}>
