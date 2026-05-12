@@ -724,7 +724,6 @@ export const RoundsThatCountCard: React.FC<Props> = ({ connectionId, currentHand
         }`;
         const diffStr = fmtDiff(oldest.handicap_differential);
         const willDropCounter = oldest.is_counter;
-        const accent = willDropCounter ? AMBER : INK_40;
         return (
           <div style={{
             display: 'flex', alignItems: 'center', gap: 10,
