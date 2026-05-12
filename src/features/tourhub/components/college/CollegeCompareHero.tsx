@@ -335,57 +335,92 @@ export function CollegeCompareHero({ data, className }: CollegeCompareHeroProps)
     <div className={className}>
       {/* ── SEASON VERDICT ── */}
       <div style={{ background: '#ffffff', borderTop: '1px solid rgba(15,23,42,0.07)', borderBottom: '1px solid rgba(15,23,42,0.07)', marginTop: '8px' }}>
-        <div style={{ padding: '14px 20px 0' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '10px' }}>
-            <div style={{ width: 3, height: 14, background: '#F7931E', borderRadius: 1, flexShrink: 0 }} />
-            <span style={{ fontSize: '13px', fontWeight: 900, color: '#F7931E', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>
-              Season Verdict · {seasonYear}
-            </span>
-          </div>
+        {/* Section eyebrow — canonical §6 slate-caps */}
+        <div style={{ padding: '14px 16px 10px' }}>
+          <span style={{ fontSize: '9px', fontWeight: 800, color: '#64748B', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>
+            Season Verdict · {seasonYear}
+          </span>
         </div>
 
-        {/* Three-column verdict */}
-        <div style={{ display: 'flex', alignItems: 'center', padding: '12px 20px 16px', borderTop: '0.5px solid rgba(15,23,42,0.07)' }}>
+        {/* Three-column verdict — Path B: absorbs earnings + alumni count from old VS band */}
+        <div style={{ display: 'flex', alignItems: 'flex-start', padding: '12px 16px 18px', borderTop: '0.5px solid rgba(15,23,42,0.07)' }}>
           {/* College 1 */}
           <div style={{ flex: 1, display: 'flex', flexDirection: 'column' as const, alignItems: 'center', gap: '4px' }}>
-            <div style={{ width: '36px', height: '36px', borderRadius: '9px', overflow: 'hidden', background: 'rgba(15,23,42,0.04)', border: '1px solid rgba(15,23,42,0.08)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <div style={{ width: 44, height: 44, borderRadius: 11, overflow: 'hidden', background: 'rgba(15,23,42,0.04)', border: '1px solid rgba(15,23,42,0.08)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
               {logo1 ? (
-                <img src={logo1} alt={name1} style={{ width: '26px', height: '26px', objectFit: 'contain' }} onError={e => { e.currentTarget.style.display = 'none'; }} />
+                <img src={logo1} alt={name1} style={{ width: 32, height: 32, objectFit: 'contain' }} onError={e => { e.currentTarget.style.display = 'none'; }} />
               ) : (
-                <span style={{ fontSize: '15px', fontWeight: 900, color: 'rgba(15,23,42,0.3)' }}>{name1.charAt(0)}</span>
+                <span style={{ fontSize: 17, fontWeight: 900, color: 'rgba(15,23,42,0.3)' }}>{name1.charAt(0)}</span>
               )}
             </div>
-            <div style={{ fontSize: '13px', fontWeight: 700, color: '#0F172A' }}>{name1}</div>
-            <div style={{ fontSize: '28px', fontWeight: 900, color: c1Wins > c2Wins ? '#F7931E' : '#94A3B8', letterSpacing: '-0.04em', lineHeight: 1 }}>
+            <div style={{ fontSize: 13, fontWeight: 700, color: '#0F172A', textAlign: 'center' as const, maxWidth: 110, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const }}>{name1}</div>
+            <div style={{
+              fontSize: 18, fontWeight: 800,
+              color: c1Wins >= c2Wins ? '#0F172A' : '#94A3B8',
+              letterSpacing: '-0.02em', lineHeight: 1,
+              fontVariantNumeric: 'tabular-nums', marginTop: 2,
+            }}>
+              {formatEarnings(s1?.earnings_total || 0)}
+            </div>
+            <div style={{ fontSize: 11, color: '#94A3B8', fontWeight: 500 }}>
+              {s1?.player_count || 0} alumni
+            </div>
+            <div style={{
+              fontSize: 28, fontWeight: 900,
+              color: c1Wins > c2Wins ? '#F7931E' : '#94A3B8',
+              letterSpacing: '-0.04em', lineHeight: 1, marginTop: 6,
+              fontVariantNumeric: 'tabular-nums',
+            }}>
               {c1Wins}
             </div>
-            <div style={{ fontSize: '13px', color: '#94A3B8' }}>categories led</div>
+            <div style={{ fontSize: 11, color: '#94A3B8', fontWeight: 500 }}>categories led</div>
           </div>
 
           {/* Centre — verdict chip */}
-          <div style={{ flexShrink: 0, display: 'flex', flexDirection: 'column' as const, alignItems: 'center', gap: '6px' }}>
-            <div style={{ fontSize: '13px', fontWeight: 900, color: 'rgba(15,23,42,0.1)' }}>—</div>
-            <div style={{ padding: '4px 10px', borderRadius: '6px', background: c1Wins === c2Wins ? 'rgba(15,23,42,0.05)' : 'rgba(247,147,30,0.08)', border: `1px solid ${c1Wins === c2Wins ? 'rgba(15,23,42,0.08)' : '#F7931E33'}` }}>
-              <span style={{ fontSize: '13px', fontWeight: 900, color: c1Wins === c2Wins ? '#94A3B8' : '#F7931E', letterSpacing: '0.1em', textTransform: 'uppercase' as const }}>
-                {c1Wins === c2Wins ? 'TIED' : c1Wins > c2Wins ? `${name1.split(' ')[0].toUpperCase()} WINS` : `${name2.split(' ')[0].toUpperCase()} WINS`}
+          {/* paddingTop: 70 manually aligns the chip with the categories-led row. If logo
+              tile size or row spacing changes, recalculate. */}
+          <div style={{ flexShrink: 0, display: 'flex', flexDirection: 'column' as const, alignItems: 'center', paddingTop: 70 }}>
+            <div style={{ padding: '4px 10px', borderRadius: 6, background: c1Wins === c2Wins ? 'rgba(15,23,42,0.05)' : 'rgba(247,147,30,0.08)', border: `1px solid ${c1Wins === c2Wins ? 'rgba(15,23,42,0.08)' : 'rgba(247,147,30,0.32)'}` }}>
+              <span style={{ fontSize: 11, fontWeight: 800, color: c1Wins === c2Wins ? '#94A3B8' : '#F7931E', letterSpacing: '0.14em', textTransform: 'uppercase' as const, whiteSpace: 'nowrap' as const }}>
+                {c1Wins === c2Wins
+                  ? 'TIED'
+                  : c1Wins > c2Wins
+                    ? `${name1.split(' ')[0].toUpperCase()} WINS`
+                    : `${name2.split(' ')[0].toUpperCase()} WINS`}
               </span>
             </div>
           </div>
 
           {/* College 2 */}
           <div style={{ flex: 1, display: 'flex', flexDirection: 'column' as const, alignItems: 'center', gap: '4px' }}>
-            <div style={{ width: '36px', height: '36px', borderRadius: '9px', overflow: 'hidden', background: 'rgba(15,23,42,0.04)', border: '1px solid rgba(15,23,42,0.08)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <div style={{ width: 44, height: 44, borderRadius: 11, overflow: 'hidden', background: 'rgba(15,23,42,0.04)', border: '1px solid rgba(15,23,42,0.08)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
               {logo2 ? (
-                <img src={logo2} alt={name2} style={{ width: '26px', height: '26px', objectFit: 'contain' }} onError={e => { e.currentTarget.style.display = 'none'; }} />
+                <img src={logo2} alt={name2} style={{ width: 32, height: 32, objectFit: 'contain' }} onError={e => { e.currentTarget.style.display = 'none'; }} />
               ) : (
-                <span style={{ fontSize: '15px', fontWeight: 900, color: 'rgba(15,23,42,0.3)' }}>{name2.charAt(0)}</span>
+                <span style={{ fontSize: 17, fontWeight: 900, color: 'rgba(15,23,42,0.3)' }}>{name2.charAt(0)}</span>
               )}
             </div>
-            <div style={{ fontSize: '13px', fontWeight: 700, color: '#0F172A' }}>{name2}</div>
-            <div style={{ fontSize: '28px', fontWeight: 900, color: c2Wins > c1Wins ? '#F7931E' : '#94A3B8', letterSpacing: '-0.04em', lineHeight: 1 }}>
+            <div style={{ fontSize: 13, fontWeight: 700, color: '#0F172A', textAlign: 'center' as const, maxWidth: 110, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const }}>{name2}</div>
+            <div style={{
+              fontSize: 18, fontWeight: 800,
+              color: c2Wins >= c1Wins ? '#0F172A' : '#94A3B8',
+              letterSpacing: '-0.02em', lineHeight: 1,
+              fontVariantNumeric: 'tabular-nums', marginTop: 2,
+            }}>
+              {formatEarnings(s2?.earnings_total || 0)}
+            </div>
+            <div style={{ fontSize: 11, color: '#94A3B8', fontWeight: 500 }}>
+              {s2?.player_count || 0} alumni
+            </div>
+            <div style={{
+              fontSize: 28, fontWeight: 900,
+              color: c2Wins > c1Wins ? '#F7931E' : '#94A3B8',
+              letterSpacing: '-0.04em', lineHeight: 1, marginTop: 6,
+              fontVariantNumeric: 'tabular-nums',
+            }}>
               {c2Wins}
             </div>
-            <div style={{ fontSize: '13px', color: '#94A3B8' }}>categories led</div>
+            <div style={{ fontSize: 11, color: '#94A3B8', fontWeight: 500 }}>categories led</div>
           </div>
         </div>
       </div>
