@@ -603,6 +603,7 @@ ${researchResults[3]?.trim() || 'No weather forecast available.'}
       '', // system prompt is embedded in the user prompt
       prompt,
       fitScoreMap,
+      courseDNA !== null, // dnaAvailable — gate AI fit-score collection
     );
 
     console.log(`[generate-predictions] Consensus complete: ${consensus.consensusMethod}, ${consensus.topContenders.length} contenders`);
