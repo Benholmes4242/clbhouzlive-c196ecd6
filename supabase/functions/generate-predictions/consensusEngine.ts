@@ -200,7 +200,6 @@ export function aggregateConsensus(
   modelResults: ModelResult[],
   modelWeights: Record<string, number> = DEFAULT_MODEL_WEIGHTS,
   calculatedFitScores?: Map<string, number>,
-  dnaAvailable: boolean = false,
 ): ConsensusResult {
   
   const successfulModels = modelResults.filter((r) => r.success);
@@ -217,9 +216,7 @@ export function aggregateConsensus(
         ...p,
         rank: i + 1,
         consensusScore: 100 - i * 10,
-        courseFitScore: dnaAvailable
-          ? (calculatedFitScores?.get(p.playerId) ?? (typeof p.courseFitScore === 'number' && p.courseFitScore > 0 ? p.courseFitScore : null))
-          : null,
+        courseFitScore: calculatedFitScores?.get(p.playerId) ?? (typeof p.courseFitScore === 'number' && p.courseFitScore > 0 ? p.courseFitScore : null),
         modelVotes: [{ model: model.model, rank: p.rank, winProbability: p.winProbability }],
         isDarkHorse: false,
       })),
@@ -266,8 +263,7 @@ export function aggregateConsensus(
       };
       existing.score += bordaPoints;
       existing.winProbabilities.push(pick.winProbability);
-      // Only collect model values if we have real DNA to back them up
-      if (dnaAvailable && typeof pick.courseFitScore === 'number' && pick.courseFitScore > 0) {
+      if (typeof pick.courseFitScore === 'number' && pick.courseFitScore > 0) {
         existing.courseFitScores.set(result.model, pick.courseFitScore);
       }
       existing.reasons.set(result.model, pick.reasons);
@@ -321,9 +317,8 @@ export function aggregateConsensus(
       ? data.winProbabilities.reduce((a, b) => a + b, 0) / data.winProbabilities.length : 0;
 
     // Course-fit fallback chain:
-    //   1. Calculated score from courseFitCalculator (real statistical fit)
-    //   2. Average of model-returned scores — ONLY when DNA was available
-    //      (without DNA, model values are hallucinations and were not collected)
+    //   1. Calculated score from courseFitCalculator
+    //   2. Average of model-returned scores
     //   3. Null — UI hides the bar gracefully
     const calculatedFit = calculatedFitScores?.get(playerId);
     const modelFitValues = [...data.courseFitScores.values()];
@@ -367,7 +362,6 @@ export async function runConsensus(
   systemPrompt: string,
   userPrompt: string,
   calculatedFitScores?: Map<string, number>,
-  dnaAvailable: boolean = false,
   modelWeights?: Record<string, number>,
 ): Promise<ConsensusResult> {
   
@@ -434,7 +428,7 @@ export async function runConsensus(
     console.log(`[Consensus] ${r.model}: ${r.success ? `${r.picks.length} picks in ${r.latencyMs}ms` : `FAILED — ${r.error}`}`);
   }
 
-  const consensus = aggregateConsensus(modelResults, modelWeights || DEFAULT_MODEL_WEIGHTS, calculatedFitScores, dnaAvailable);
+  const consensus = aggregateConsensus(modelResults, modelWeights || DEFAULT_MODEL_WEIGHTS, calculatedFitScores);
   
   console.log(`[Consensus] Top 5: ${consensus.topContenders.slice(0, 5).map((p) => p.playerName).join(', ')}`);
   console.log(`[Consensus] Agreement: ${consensus.agreementScore}%, Method: ${consensus.consensusMethod}`);
