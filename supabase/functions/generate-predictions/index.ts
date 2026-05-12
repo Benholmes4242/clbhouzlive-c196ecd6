@@ -658,7 +658,7 @@ ${researchResults[3]?.trim() || 'No weather forecast available.'}
     // STEP 7: Store Predictions with Consensus Data
     // =============================================
 
-    const displayPicks = enrichedContenders.slice(0, 5);
+    const displayPicks = enrichedContenders.slice(0, 3);
     const alternates = enrichedContenders.slice(5, 8);
 
     const { error: upsertError } = await supabase
