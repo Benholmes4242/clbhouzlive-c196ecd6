@@ -12,7 +12,7 @@
 import { useState, useMemo, useEffect, useCallback, useRef } from 'react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useSearchParams, useNavigate } from 'react-router-dom';
-import { Search, X, AlertCircle, RefreshCw, ChevronLeft, ChevronDown, Globe, Clock } from 'lucide-react';
+import { Search, X, AlertCircle, RefreshCw, ChevronLeft, ChevronDown, ChevronRight, Globe, Clock, Calendar } from 'lucide-react';
 import { useQueryClient } from '@tanstack/react-query';
 import { useTourSeason, useTourTournaments, type TourTournament } from '../../hooks/useTourHubData';
 import { useTournamentLeadersWinners } from '../../hooks/useTournamentLeadersWinners';
@@ -440,83 +440,88 @@ export function ScheduleTab() {
         )}
       </AnimatePresence>
       
-      {/* ── SCHEDULE MASTHEAD — All tab only ── */}
-      {!search && filter === 'all' && (
-        <div style={{ padding: '16px 16px 0', background: '#F8FAFC' }}>
+      {/* ── SCHEDULE MASTHEAD — canonical section header on all tabs ── */}
+      {!search && (() => {
+        const tourCount = new Set(
+          (tournaments ?? []).map(t => t.tour_code).filter(Boolean) as string[]
+        ).size;
+        const seasonLabel = season?.name ?? (season?.year ? `${season.year} Season` : 'Season');
+        return (
+          <div style={{ padding: '16px 16px 0', background: '#F8FAFC' }}>
+            <button
+              onClick={() => navigate('/tourhub?tab=overview', { replace: true })}
+              aria-label="Schedule — open Tour Overview"
+              style={{
+                background: 'transparent',
+                border: 'none',
+                padding: 0,
+                cursor: 'pointer',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 6,
+                marginBottom: 6,
+              }}
+            >
+              <Calendar size={13} color="#F7931E" strokeWidth={2.5} />
+              <span style={{
+                fontSize: 10.5,
+                fontWeight: 700,
+                letterSpacing: '0.14em',
+                color: '#F7931E',
+                textTransform: 'uppercase' as const,
+              }}>
+                SCHEDULE
+              </span>
+              <ChevronRight size={11} color="#F7931E" strokeWidth={2.5} style={{ marginTop: 1 }} />
+            </button>
 
-          {/* Eyebrow */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 4, paddingTop: 8 }}>
-            <span style={{ fontSize: 9, fontWeight: 900, color: '#F7931E', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>
-              ⚡ Clbhouz · Tour Hub
-            </span>
-          </div>
-
-          {/* Title + Live badge */}
-          <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', marginBottom: 16 }}>
-            <h1 style={{ fontSize: 26, fontWeight: 900, color: '#0F172A', margin: 0, letterSpacing: '-0.04em' }}>
-              Schedule
+            <h1 style={{
+              fontSize: 18,
+              fontWeight: 800,
+              color: '#0F172A',
+              letterSpacing: '-0.015em',
+              lineHeight: 1.2,
+              margin: 0,
+            }}>
+              Tour schedule
             </h1>
-            {filterStats.live > 0 && (
-              <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
-                <div style={{ width: 6, height: 6, borderRadius: '50%', background: '#22C55E' }} />
-                <span style={{ fontSize: 11, fontWeight: 800, color: '#16A34A' }}>
-                  {filterStats.live} Live Now
-                </span>
-              </div>
-            )}
-          </div>
 
-          {/* Next Up — full header */}
-          {nextUpTournament && daysUntilNext !== null && (
-            <div style={{ marginBottom: 16 }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8 }}>
-                <div style={{ width: 3, height: 10, background: '#F7931E', borderRadius: 1 }} />
-                <span style={{ fontSize: 9, fontWeight: 900, color: '#F7931E', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>
-                  Next Up
-                </span>
-              </div>
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 4 }}>
-                    <TourPill tourCode={nextUpTournament.tour_code} />
-                  </div>
-                  <div style={{ fontSize: 15, fontWeight: 800, color: '#0F172A', letterSpacing: '-0.02em', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const }}>
-                    {nextUpTournament.name}
-                  </div>
-                  {nextUpTournament.purse && (
-                    <div style={{ fontSize: 10, color: '#94A3B8', marginTop: 2 }}>
-                      {nextUpTournament.start_date ? new Date(nextUpTournament.start_date).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }) : ''} · ${(nextUpTournament.purse / 1_000_000).toFixed(1)}M
-                    </div>
-                  )}
-                </div>
-                <div style={{ textAlign: 'right' as const, flexShrink: 0, marginLeft: 16 }}>
-                  <span style={{ fontSize: 28, fontWeight: 900, color: '#F7931E', letterSpacing: '-0.04em' }}>
-                    {daysUntilNext}
-                  </span>
-                  <span style={{ fontSize: 11, fontWeight: 600, color: '#94A3B8', marginLeft: 3 }}>
-                    {daysUntilNext === 1 ? 'day' : 'days'}
-                  </span>
-                </div>
-              </div>
+            <div style={{
+              display: 'flex',
+              alignItems: 'baseline',
+              justifyContent: 'space-between',
+              fontSize: 13,
+              fontWeight: 700,
+              color: '#0F172A',
+              letterSpacing: '-0.005em',
+              lineHeight: 1.25,
+              margin: '6px 0 0',
+              paddingBottom: 12,
+            }}>
+              <span>{seasonLabel}</span>
+              <span style={{ fontWeight: 600, color: '#64748B' }}>
+                {(tournaments ?? []).length} events across {tourCount} tour{tourCount !== 1 ? 's' : ''}
+              </span>
             </div>
-          )}
-
-          {/* Live Now — All tab only */}
-          <div style={{ paddingBottom: 12 }}>
-            <LiveRightNow />
           </div>
+        );
+      })()}
 
-        </div>
-      )}
-
-      {/* Compact Next Up — filtered tabs */}
-      {!search && filter !== 'all' && nextUpTournament && daysUntilNext !== null && (
+      {/* Compact Next Up — rendered on every tab when an upcoming event exists */}
+      {!search && nextUpTournament && daysUntilNext !== null && (
         <CompactNextUp
           tournamentId={nextUpTournament.id}
           tourCode={nextUpTournament.tour_code}
           name={nextUpTournament.name}
           daysUntil={daysUntilNext}
         />
+      )}
+
+      {/* Live Now — All tab only, below Next Up */}
+      {!search && filter === 'all' && (
+        <div style={{ padding: '0 16px 12px' }}>
+          <LiveRightNow />
+        </div>
       )}
       {/* Sentinel for sticky detection */}
       <div ref={stickysentinelRef} style={{ height: 1, marginTop: -1 }} />
