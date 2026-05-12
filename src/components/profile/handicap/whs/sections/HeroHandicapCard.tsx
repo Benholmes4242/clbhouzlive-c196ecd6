@@ -155,7 +155,6 @@ const HeroHandicapCard: React.FC<Props> = ({ connection }) => {
   // SCORING AVG, and the round counts in sub-labels.
   const rangeFilteredScores = useMemo(() => {
     if (!recent) return [] as any[];
-    if (range === 'all') return recent as any[];
     const cutoff = Date.now() - range * 24 * 60 * 60 * 1000;
     return (recent as any[]).filter((r: any) => {
       if (!r?.play_date) return false;
@@ -488,7 +487,7 @@ const HeroHandicapCard: React.FC<Props> = ({ connection }) => {
   // formStrokes from fallbackForm (computed above using rangeDiffs).
   const formStrokesValue = fallbackForm.formStrokes;
   const formLabel = formStateLabel(formStrokesValue);
-  const formCap = range === 'all' ? 3 : 2;
+  const formCap = range === 365 ? 3 : 2;
   const formClamped = Math.max(-formCap, Math.min(formCap, formStrokesValue));
   const formMagnitude = Math.abs(formClamped) / formCap; // 0–1
   const formIsHot = formClamped > 0.05;
