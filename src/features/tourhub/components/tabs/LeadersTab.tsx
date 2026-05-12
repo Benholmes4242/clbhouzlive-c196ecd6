@@ -334,8 +334,11 @@ export function LeadersTab() {
         category={category}
         formatOverride={worldFormatOverride}
         unitOverride={worldUnitOverride}
-        leaderValue={leaderValue}
-        pills={heroPills}
+        streakLabel={streakLabel}
+        marginLabel={marginLabel}
+        seasonYear={season?.year ?? null}
+        tourLabel="PGA"
+        onEyebrowTap={() => navigate('/tourhub?tab=overview', { replace: true })}
       />
 
       {/* Sticky header — back link + group tabs + chip rail + count/search */}
