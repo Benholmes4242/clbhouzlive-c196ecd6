@@ -794,7 +794,7 @@ const StatCell: React.FC<{
       disabled={disabled}
       style={{
         display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2,
-        padding: '10px 8px 12px',
+        padding: '8px 8px 10px',
         background: active ? AMBER_TINT_06 : 'transparent',
         border: 'none',
         borderRight: withRightBorder ? `0.5px solid ${INK_10}` : 'none',
@@ -804,7 +804,7 @@ const StatCell: React.FC<{
     >
       <span style={{
         display: 'inline-flex', alignItems: 'center', gap: 5,
-        marginBottom: 4,
+        marginBottom: 3,
       }}>
         <span style={{ width: 5, height: 5, borderRadius: '50%', background: dotColor }} />
         <span style={{
