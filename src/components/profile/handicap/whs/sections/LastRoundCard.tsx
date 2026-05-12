@@ -525,14 +525,15 @@ const MiniHoleCell: React.FC<{
       {shape !== 'empty' && (
         <svg
           viewBox={`0 0 ${size} ${size}`}
-          width={size}
-          height={size}
+          width="100%"
+          height="100%"
+          preserveAspectRatio="xMidYMid meet"
           style={{ position: 'absolute', inset: 0, pointerEvents: 'none' }}
           aria-hidden
         >
           <MiniShapePath kind={shape} inset={0.5} stroke={stroke} size={size} />
           {depth >= 2 && (
-            <MiniShapePath kind={shape} inset={size * 0.26} stroke={stroke} size={size} />
+            <MiniShapePath kind={shape} inset={2.5} stroke={stroke} size={size} />
           )}
           {showInnermostRing && (
             <MiniShapePath kind={shape} inset={size * 0.42} stroke={stroke} size={size} />
