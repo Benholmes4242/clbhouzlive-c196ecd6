@@ -49,9 +49,9 @@ export function RecentResultPill({ position, tied }: RecentResultPillProps) {
     border = 'rgba(247,147,30,0.45)';
     color = '#B45309';
   } else if (position === 2) {
-    bg = 'rgba(16,163,74,0.10)';
-    border = 'rgba(16,163,74,0.30)';
-    color = '#15803D';
+    bg = 'rgba(16,185,129,0.10)';
+    border = 'rgba(16,185,129,0.32)';
+    color = '#047857';
   } else {
     bg = '#F1F5F9'; // slate-100
     border = '#E2E8F0'; // slate-200
