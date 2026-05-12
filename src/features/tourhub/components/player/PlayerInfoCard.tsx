@@ -131,7 +131,7 @@ export function PlayerInfoCard({ player }: PlayerInfoCardProps) {
 
       {careerFields.length > 0 && (
         <div>
-          <p style={{ fontSize: '8.5px', fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.14em', textTransform: 'uppercase' as const, margin: '14px 0 10px' }}>
+          <p style={{ fontSize: 9, fontWeight: 800, color: '#94A3B8', letterSpacing: '0.14em', textTransform: 'uppercase' as const, margin: '14px 0 10px' }}>
             Golf Career
           </p>
           <div className="grid grid-cols-2" style={{ gap: '16px' }}>
