@@ -22,6 +22,7 @@ import type { CollegeMomentum } from '../../hooks/useCollegeStatus';
 import type { AlumniFace } from '../../hooks/useBatchCollegeAlumni';
 import type { FranchiseCaptain } from '../../hooks/useFranchiseCaptains';
 import { MovementIndicator } from '../shared/MovementIndicator';
+import { splitStatValue } from '../../utils/splitStatValue';
 import {
   captainDominates,
   formatCaptainEarnings,
@@ -115,11 +116,10 @@ export function FranchiseCard({
 
   // Tier-driven row metrics
   const logoSize = isTopThree ? 38 : 34;
-  const nameWeight = isTopThree ? 900 : 700;
+  const nameWeight = isTopThree ? 800 : 700;
   const primaryValueColor = isTopThree ? '#F7931E' : '#0F172A';
   const rowPaddingY = isTopThree ? 12 : 11;
-  const rankNumberColor = isTopThree ? '#c97a10' : 'rgba(15,23,42,0.12)';
-  const rankNumberWeight = isTopThree ? 900 : 800;
+  const rankNumberColor = isTopThree ? '#D97706' : 'rgba(15,23,42,0.10)';
 
   // Data layer and component conventions agree: positive earnings_rank_change
   // = rank improved (e.g. #8 → #5 = +3), MovementIndicator positive = improved.
@@ -142,17 +142,12 @@ export function FranchiseCard({
           borderBottom: '0.5px solid rgba(15,23,42,0.07)',
           textDecoration: 'none',
           ...(isDelta && deltas ? {
-            borderLeft: deltas.earnings_delta >= 0
-              ? '3px solid #16A34A'
-              : '3px solid #DC2626',
             background: deltas.earnings_delta >= 0
-              ? 'rgba(22,163,74,0.025)'
+              ? 'rgba(16,185,129,0.04)'
               : 'rgba(220,38,38,0.02)',
           } : isTopThree ? {
-            borderLeft: '3px solid #F7931E',
-            background: 'rgba(247,147,30,0.05)',
+            background: '#FEF3E7',
           } : {
-            borderLeft: '3px solid transparent',
             background: 'transparent',
           }),
         }}
@@ -162,8 +157,8 @@ export function FranchiseCard({
         {rank !== undefined && !isDelta && (
           <div style={{ width: '32px', flexShrink: 0, textAlign: 'center' as const }}>
             <span style={{
-              fontSize: isTopThree ? '17px' : '16px',
-              fontWeight: rankNumberWeight,
+              fontSize: isTopThree ? '16px' : '18px',
+              fontWeight: 900,
               color: rankNumberColor,
               fontVariantNumeric: 'tabular-nums',
               letterSpacing: '-0.02em',
@@ -199,8 +194,11 @@ export function FranchiseCard({
           <div style={{ minWidth: 0, flex: 1 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 6, minWidth: 0 }}>
               <p style={{
-                fontSize: 15, fontWeight: nameWeight, color: '#0F172A',
-                margin: 0, letterSpacing: '-0.3px',
+                fontSize: 14,
+                fontWeight: nameWeight,
+                color: '#0F172A',
+                margin: 0,
+                letterSpacing: isTopThree ? '-0.01em' : 0,
                 overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const,
               }}>
                 {displayName}
@@ -238,10 +236,7 @@ export function FranchiseCard({
               {deltas.earnings_rank_change !== null && deltas.earnings_rank_change !== 0 && (
                 <div style={{
                   fontSize: 12, fontWeight: 800, fontVariantNumeric: 'tabular-nums',
-                  // Data layer: negative earnings_rank_change = rank worsened.
-                  // For movers-row text colour we keep the existing semantic:
-                  // positive raw = improved (green), negative raw = worsened (red).
-                  color: deltas.earnings_rank_change > 0 ? '#16A34A' : '#DC2626',
+                  color: deltas.earnings_rank_change > 0 ? '#047857' : '#DC2626',
                   marginBottom: 2,
                 }}>
                   {deltas.earnings_rank_change > 0 ? `+${deltas.earnings_rank_change}` : String(deltas.earnings_rank_change)}
@@ -249,19 +244,28 @@ export function FranchiseCard({
               )}
               <div style={{
                 fontSize: 15, fontWeight: 800, fontVariantNumeric: 'tabular-nums',
-                color: deltas.earnings_delta >= 0 ? '#16A34A' : '#DC2626',
+                color: deltas.earnings_delta >= 0 ? '#047857' : '#DC2626',
               }}>
                 {formatDeltaValue(deltas.earnings_delta)}
               </div>
             </>
-          ) : (
-            <span style={{
-              fontSize: 17, fontWeight: 900, color: primaryValueColor,
-              fontVariantNumeric: 'tabular-nums', letterSpacing: '-0.4px',
-            }}>
-              {primaryValueText}
-            </span>
-          )}
+          ) : (() => {
+            // Primary value with amber decimal tail (Stat Watch pattern).
+            const { integer: rowInteger, decimal: rowDecimal, suffix: rowSuffix } = splitStatValue(primaryValueText);
+            return (
+              <span style={{
+                fontSize: 14,
+                fontWeight: 800,
+                color: primaryValueColor,
+                fontVariantNumeric: 'tabular-nums',
+                letterSpacing: '-0.005em',
+              }}>
+                {rowInteger}
+                {rowDecimal && <span style={{ color: '#F7931E' }}>{rowDecimal}</span>}
+                {rowSuffix}
+              </span>
+            );
+          })()}
         </div>
       </Link>
     </motion.div>

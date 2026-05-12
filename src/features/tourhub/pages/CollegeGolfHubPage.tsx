@@ -264,8 +264,16 @@ export function CollegeGolfHubPage() {
             <Link
               to="/tourhub?tab=overview"
               replace
-              className="flex items-center gap-0.5 active:opacity-50 transition-opacity"
-              style={{ fontSize: '12px', fontWeight: 500, color: 'rgba(15,23,42,0.5)', textDecoration: 'none' }}
+              className="active:opacity-50 transition-opacity"
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 2,
+                fontSize: 12,
+                fontWeight: 600,
+                color: '#64748B',
+                textDecoration: 'none',
+              }}
             >
               <ChevronLeft size={13} strokeWidth={2.5} />
               Tour Overview
@@ -276,18 +284,18 @@ export function CollegeGolfHubPage() {
               style={{
                 width: '32px', height: '32px', borderRadius: '8px',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
-                background: searchExpanded ? 'rgba(247,147,30,0.08)' : 'transparent',
+                background: searchExpanded ? '#FEF3E7' : '#EDF1F5',
                 border: 'none', cursor: 'pointer',
               }}
+              aria-label="Search franchises"
             >
-              <Search className="w-4 h-4" style={{ color: searchExpanded ? '#F7931E' : '#94A3B8' }} strokeWidth={2.5} />
+              <Search className="w-4 h-4" style={{ color: searchExpanded ? '#F7931E' : '#0F172A' }} strokeWidth={2.5} />
             </button>
           </div>
 
-          {/* Underline metric tabs — College Franchise spec: active 800/13px, inactive 600/13px.
-              Intentionally diverges from PlayersTab (500/11px) per locked decision #2.
-              PlayersTab tab styling re-alignment logged as a follow-up. */}
-          <div style={{ display: 'flex', marginTop: '4px' }}>
+          {/* Underline metric tabs — canonical 12px / 800 active, 12px / 600 inactive.
+              Aligned across Schedule, Players, Leaders, College Franchise. */}
+          <div style={{ display: 'flex', marginTop: '4px', borderBottom: '1px solid rgba(15,23,42,0.10)' }}>
             {METRIC_TABS.map(tab => {
               const isActive = activeMetric === tab.value;
               return (
@@ -297,10 +305,9 @@ export function CollegeGolfHubPage() {
                   className="flex-shrink-0 active:scale-[0.97] transition-transform"
                   style={{
                     flex: 1,
-                    padding: '10px 0',
-                    fontSize: '13px',
+                    padding: '12px 0',
+                    fontSize: '12px',
                     fontWeight: isActive ? 800 : 600,
-                    letterSpacing: '-0.1px',
                     color: isActive ? '#0F172A' : '#94A3B8',
                     background: 'transparent', border: 'none',
                     borderBottom: `2px solid ${isActive ? '#F7931E' : 'transparent'}`,
