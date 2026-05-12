@@ -908,8 +908,8 @@ export function PlayersTab() {
                   key={tab.value}
                   onClick={() => { setSort(tab.value); setVisibleCount(PAGE_SIZE); }}
                   style={{
-                    flex: 1, padding: '8px 0',
-                    fontSize: '11px', fontWeight: isActive ? 800 : 500,
+                    flex: 1, padding: '12px 0',
+                    fontSize: '12px', fontWeight: isActive ? 800 : 600,
                     color: isActive ? '#0F172A' : '#94A3B8',
                     background: 'transparent', border: 'none',
                     borderBottom: `2px solid ${isActive ? '#F7931E' : 'transparent'}`,
