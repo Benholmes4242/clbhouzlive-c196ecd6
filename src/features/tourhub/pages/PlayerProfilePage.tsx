@@ -106,28 +106,20 @@ export function PlayerProfilePage() {
 
   if (playerLoading) {
     return (
-      <PageRoot className="min-h-screen w-full" hasBottomNav immersive immersiveStatusBar>
-        <div style={{ background: '#0F172A', padding: 'calc(16px + env(safe-area-inset-top, 0px)) 16px 0' }}>
-          <Skeleton className="h-3 w-32 mb-3" style={{ background: 'rgba(255,255,255,0.1)' }} />
-          <div style={{ display: 'flex', gap: 12 }}>
-            <div style={{ flex: 1 }}>
-              <Skeleton className="h-6 w-48 mb-2" style={{ background: 'rgba(255,255,255,0.1)' }} />
-              <Skeleton className="h-4 w-32" style={{ background: 'rgba(255,255,255,0.1)' }} />
-            </div>
-            <Skeleton className="w-[110px] h-[130px] rounded-t-[14px]" style={{ background: 'rgba(255,255,255,0.06)' }} />
-          </div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', borderTop: '0.5px solid rgba(255,255,255,0.08)', marginTop: 8 }}>
-            {Array.from({ length: 4 }).map((_, i) => (
-              <div key={i} style={{ padding: '10px 0 12px', textAlign: 'center' }}>
-                <Skeleton className="h-2 w-8 mx-auto mb-2" style={{ background: 'rgba(255,255,255,0.1)' }} />
-                <Skeleton className="h-4 w-10 mx-auto" style={{ background: 'rgba(255,255,255,0.1)' }} />
-              </div>
-            ))}
-          </div>
+      <PageRoot className="min-h-screen w-full" hasBottomNav immersive immersiveStatusBar style={{ background: '#F8FAFC' }}>
+        <div style={{ background: '#F8FAFC', padding: 'max(env(safe-area-inset-top, 0px), 47px) 16px 14px' }}>
+          {/* Eyebrow */}
+          <Skeleton className="h-2.5 w-20 mb-2" style={{ background: 'rgba(15,23,42,0.06)' }} />
+          {/* h1 */}
+          <Skeleton className="h-5 w-40 mb-2" style={{ background: 'rgba(15,23,42,0.06)' }} />
+          {/* Subhead */}
+          <Skeleton className="h-3 w-56 mb-4" style={{ background: 'rgba(15,23,42,0.06)' }} />
+          {/* Champion card placeholder */}
+          <Skeleton className="h-24 w-full rounded-xl" style={{ background: 'rgba(255,184,0,0.10)' }} />
         </div>
         <div style={{ padding: '16px', marginTop: 8 }}>
-          <Skeleton className="h-48 rounded-lg" />
-          <Skeleton className="h-64 rounded-lg mt-4" />
+          <Skeleton className="h-48 rounded-lg" style={{ background: 'rgba(15,23,42,0.06)' }} />
+          <Skeleton className="h-64 rounded-lg mt-4" style={{ background: 'rgba(15,23,42,0.06)' }} />
         </div>
       </PageRoot>
     );
@@ -213,10 +205,10 @@ export function PlayerProfilePage() {
           }}
         >
           {/* Back link */}
-          <div style={{ display: 'flex', alignItems: 'center', padding: '8px 20px 0' }}>
+          <div style={{ display: 'flex', alignItems: 'center', padding: '8px 16px 0' }}>
             <button
               onClick={handleBack}
-              style={{ display: 'flex', alignItems: 'center', gap: '2px', fontSize: '13px', fontWeight: 500, color: 'rgba(15,23,42,0.5)', background: 'transparent', border: 'none', padding: 0, cursor: 'pointer' }}
+              style={{ display: 'flex', alignItems: 'center', gap: '2px', fontSize: '12px', fontWeight: 600, color: '#64748B', background: 'transparent', border: 'none', padding: 0, cursor: 'pointer' }}
               className="active:opacity-50 transition-opacity"
             >
               <ChevronLeft size={13} strokeWidth={2.5} />

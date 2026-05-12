@@ -125,7 +125,7 @@ function SGBar({ label, value }: SGBarProps) {
 function SubSectionLabel({ label, style }: { label: string; style?: React.CSSProperties }) {
   return (
     <p style={{
-      fontSize: '8.5px', fontWeight: 900, color: '#CBD5E1',
+      fontSize: 9, fontWeight: 800, color: '#94A3B8',
       letterSpacing: '0.14em', textTransform: 'uppercase' as const,
       padding: '14px 0 6px', margin: 0,
       ...style,
@@ -151,9 +151,8 @@ export function PlayerSeasonStats({ playerStats }: PlayerSeasonStatsProps) {
     <div style={{ background: '#ffffff', borderBottom: '1px solid rgba(15,23,42,0.07)' }}>
       {/* Dispatch section header */}
       <div style={{ padding: '14px 16px 0' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
-          <div style={{ width: 3, height: 14, background: '#F7931E', borderRadius: 1, flexShrink: 0 }} />
-          <span style={{ fontSize: '9px', fontWeight: 900, color: '#F7931E', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>
+        <div style={{ marginBottom: '12px' }}>
+          <span style={{ fontSize: '9px', fontWeight: 800, color: '#64748B', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>
             STATS · {activeTab}
           </span>
         </div>
@@ -184,8 +183,8 @@ export function PlayerSeasonStats({ playerStats }: PlayerSeasonStatsProps) {
                   flex: 1,
                   padding: '7px 4px',
                   fontSize: 12,
-                  fontWeight: isActive ? 700 : 500,
-                  color: isActive ? '#0F172A' : '#64748B',
+                  fontWeight: isActive ? 800 : 600,
+                  color: isActive ? '#0F172A' : '#94A3B8',
                   background: isActive ? '#FFFFFF' : 'transparent',
                   border: 'none',
                   borderRadius: 7,
