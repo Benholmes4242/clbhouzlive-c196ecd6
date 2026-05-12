@@ -614,7 +614,7 @@ ${researchResults[3]?.trim() || 'No weather forecast available.'}
       tournament, players, researchContext, hasConfirmedField,
       courseHistoryData, recentFormData,
       courseFitSection, venueHistorySection, detailedStatsSection,
-      courseDNA?.course_type || null,
+      (courseDNA?.course_type || courseDNA?.courseType) || null,
     );
 
     console.log('[generate-predictions] Running consensus engine...');
