@@ -423,7 +423,7 @@ export function TournamentDetailPage() {
 
           {/* Underline tab bar — flex:1 equal-width */}
           <div
-            style={{ display: 'flex', borderBottom: '0.5px solid rgba(15,23,42,0.07)', marginTop: '6px' }}
+            style={{ display: 'flex', borderBottom: '1px solid rgba(15,23,42,0.10)', marginTop: '6px' }}
             role="tablist"
             aria-label="Tournament Sections"
           >
