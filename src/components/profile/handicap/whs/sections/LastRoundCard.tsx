@@ -610,16 +610,14 @@ const NineRow: React.FC<{
   label: string;
   holes: HoleRow[];
 }> = ({ label, holes }) => {
-  let total = 0;
-  let parTotal = 0;
-  let anyPlayed = false;
-  for (const h of holes) {
-    if (h.played && h.actual_gross != null && h.par != null) {
-      total += h.actual_gross;
-      parTotal += h.par;
-      anyPlayed = true;
-    }
-  }
+  const total = holes.reduce(
+    (s, h) => s + (h.played ? (h.adjusted_gross ?? h.actual_gross ?? 0) : 0),
+    0,
+  );
+  const parTotal = holes.reduce((s, h) => s + (h.par ?? 0), 0);
+  const anyPlayed = holes.some(
+    (h) => h.played && (h.adjusted_gross != null || h.actual_gross != null),
+  );
   const delta = anyPlayed ? total - parTotal : 0;
   const deltaStr = anyPlayed
     ? delta === 0
