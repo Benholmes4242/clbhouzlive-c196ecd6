@@ -451,9 +451,9 @@ export function TournamentDetailPage() {
                   className="active:opacity-70 transition-opacity"
                   style={{
                     flex: 1,
-                    padding: '10px 4px 9px',
-                    fontSize: '13px',
-                    fontWeight: isActive ? 800 : 500,
+                    padding: '12px 0',
+                    fontSize: '12px',
+                    fontWeight: isActive ? 800 : 600,
                     color: isActive ? '#0F172A' : '#94A3B8',
                     background: 'transparent',
                     border: 'none',
