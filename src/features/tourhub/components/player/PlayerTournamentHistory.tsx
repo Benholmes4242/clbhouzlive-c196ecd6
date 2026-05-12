@@ -30,14 +30,11 @@ export function PlayerTournamentHistory({ playerId, playerName }: PlayerTourname
 
   return (
     <div style={{ background: '#ffffff', borderBottom: '1px solid rgba(15,23,42,0.07)', marginTop: '8px' }}>
-      {/* Section header */}
+      {/* Section eyebrow — canonical §6 slate-caps */}
       <div style={{ padding: '14px 16px 8px' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <div style={{ width: 3, height: 14, background: '#F7931E', borderRadius: 1, flexShrink: 0 }} />
-          <span style={{ fontSize: '9px', fontWeight: 900, color: '#F7931E', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>
-            Recent Tournaments
-          </span>
-        </div>
+        <span style={{ fontSize: '9px', fontWeight: 800, color: '#64748B', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>
+          Recent Tournaments
+        </span>
       </div>
 
       {isLoading ? (
