@@ -419,7 +419,7 @@ export const AllTrophiesSheet: React.FC<Props> = ({ open, onClose, achievements 
               fontSize: 10.5, fontWeight: 700, color: INK_70,
               letterSpacing: '0.14em', textTransform: 'uppercase',
             }}>
-              Trophy Cabinet
+              Achievements
             </span>
           </div>
           <h2 style={{
@@ -427,7 +427,7 @@ export const AllTrophiesSheet: React.FC<Props> = ({ open, onClose, achievements 
             fontSize: 32, fontWeight: 800, color: INK,
             letterSpacing: '-0.025em', lineHeight: 1.1,
           }}>
-            All trophies
+            All achievements
           </h2>
           <div style={{
             display: 'flex', alignItems: 'baseline', gap: 8, marginBottom: 12,
