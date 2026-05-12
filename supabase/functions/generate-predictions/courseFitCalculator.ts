@@ -180,7 +180,7 @@ export function calculateCourseFitScores(
     }
 
     const fitScore = totalWeight > 0
-      ? Math.round((totalWeightedScore / totalWeight) * 100) / 100
+      ? (totalWeightedScore / totalWeight)
       : 50;
 
     breakdown.sort((a, b) => b.contribution - a.contribution);
