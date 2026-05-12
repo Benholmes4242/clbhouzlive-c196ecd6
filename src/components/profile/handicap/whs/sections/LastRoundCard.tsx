@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { format } from 'date-fns';
-import { TrendingDown, TrendingUp } from 'lucide-react';
+import { ChevronRight, TrendingDown, TrendingUp } from 'lucide-react';
 import { useLastRound, useRoundDetail } from '@/lib/whs/hooks';
 import RoundDetailSheet from './round-detail/RoundDetailSheet';
 import SectionHeader from './SectionHeader';
@@ -16,13 +16,6 @@ const WHITE_45 = 'rgba(255,255,255,0.45)';
 const WHITE_55 = 'rgba(255,255,255,0.55)';
 const WHITE_65 = 'rgba(255,255,255,0.65)';
 const WHITE_85 = 'rgba(255,255,255,0.85)';
-// Hole-score palette — six tiers
-const HOLE_GOLD = '#D4A82A';
-const EAGLE_GREEN = '#0E9F6E';
-const BIRDIE_GREEN = '#10B981';
-const PAR_GREY = 'rgba(255,255,255,0.40)';
-const BOGEY_RED = '#E11D48';
-const DOUBLE_RED = '#9F1239';
 const FONT_GEIST = 'Geist, system-ui, -apple-system, BlinkMacSystemFont, sans-serif';
 
 const fmtDiff = (n: number | null | undefined) => {
@@ -49,21 +42,6 @@ export const LastRoundCard: React.FC<Props> = ({ connectionId }) => {
   const { data: lastRound, isLoading } = useLastRound(connectionId);
   const { data: roundDetail } = useRoundDetail(lastRound?.id, !!lastRound?.id);
   const [sheetOpen, setSheetOpen] = useState(false);
-
-  const breakdown = React.useMemo(() => {
-    if (!roundDetail?.holes || !roundDetail.hole_by_hole_fetched) return null;
-    const counts = { eagle: 0, birdie: 0, par: 0, bogey: 0, doublePlus: 0 };
-    for (const h of roundDetail.holes) {
-      if (!h.played || h.actual_gross == null || h.par == null) continue;
-      const diff = h.actual_gross - h.par;
-      if (diff <= -2) counts.eagle++;
-      else if (diff === -1) counts.birdie++;
-      else if (diff === 0) counts.par++;
-      else if (diff === 1) counts.bogey++;
-      else counts.doublePlus++;
-    }
-    return counts;
-  }, [roundDetail]);
 
   const par = React.useMemo<number | null>(() => {
     if (!roundDetail?.holes || !roundDetail.hole_by_hole_fetched) return null;
@@ -274,7 +252,7 @@ export const LastRoundCard: React.FC<Props> = ({ connectionId }) => {
                   </div>
                   <div
                     style={{
-                      fontSize: 88,
+                      fontSize: 76,
                       fontWeight: 200,
                       color: '#fff',
                       letterSpacing: '-0.055em',
@@ -285,8 +263,6 @@ export const LastRoundCard: React.FC<Props> = ({ connectionId }) => {
                     {lastRound.adjusted_gross ?? '—'}
                   </div>
                   <ToParDiffStrip
-                    adjustedGross={lastRound.adjusted_gross ?? null}
-                    par={par}
                     differential={lastRound.handicap_differential ?? null}
                     handicapDelta={lastRound.handicap_delta ?? null}
                   />
@@ -308,7 +284,7 @@ export const LastRoundCard: React.FC<Props> = ({ connectionId }) => {
                     </div>
                     <div
                       style={{
-                        fontSize: 32,
+                        fontSize: 28,
                         fontWeight: 800,
                         color: WHITE_85,
                         letterSpacing: '-0.02em',
@@ -323,7 +299,7 @@ export const LastRoundCard: React.FC<Props> = ({ connectionId }) => {
               </div>
 
               {/* BOTTOM */}
-              {roundDetail?.holes && roundDetail.hole_by_hole_fetched && breakdown && (
+              {roundDetail?.holes && roundDetail.hole_by_hole_fetched && (
                 <div
                   style={{
                     borderTop: '1px solid rgba(255,255,255,0.14)',
@@ -333,18 +309,48 @@ export const LastRoundCard: React.FC<Props> = ({ connectionId }) => {
                 >
                   <div
                     style={{
-                      fontSize: 8.5,
-                      fontWeight: 800,
-                      color: WHITE_45,
-                      letterSpacing: '0.16em',
-                      textTransform: 'uppercase',
-                      marginBottom: 6,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      gap: 12,
+                      marginBottom: 10,
                     }}
                   >
-                    HOLE BY HOLE
+                    <span
+                      style={{
+                        fontSize: 8.5,
+                        fontWeight: 800,
+                        color: WHITE_45,
+                        letterSpacing: '0.16em',
+                        textTransform: 'uppercase',
+                      }}
+                    >
+                      HOLE BY HOLE
+                    </span>
+                    <span
+                      aria-hidden
+                      style={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: 3,
+                        padding: '4px 8px 4px 12px',
+                        borderRadius: 999,
+                        background: 'rgba(255,255,255,0.14)',
+                        border: '1px solid rgba(255,255,255,0.18)',
+                        fontSize: 10,
+                        fontWeight: 800,
+                        color: '#fff',
+                        letterSpacing: '0.06em',
+                        textTransform: 'uppercase',
+                        backdropFilter: 'blur(4px)',
+                        WebkitBackdropFilter: 'blur(4px)',
+                      }}
+                    >
+                      View scorecard
+                      <ChevronRight size={11} strokeWidth={2.6} />
+                    </span>
                   </div>
-                  <HoleStrip holes={roundDetail.holes} />
-                  <BreakdownLine breakdown={breakdown} />
+                  <HoleStripTwoLine holes={roundDetail.holes} />
                 </div>
               )}
             </div>
@@ -363,16 +369,10 @@ export const LastRoundCard: React.FC<Props> = ({ connectionId }) => {
 };
 
 const ToParDiffStrip: React.FC<{
-  adjustedGross: number | null;
-  par: number | null;
   differential: number | null;
   handicapDelta: number | null;
-}> = ({ adjustedGross, par, differential, handicapDelta }) => {
+}> = ({ differential, handicapDelta }) => {
   const parts: string[] = [];
-  if (adjustedGross != null && par != null) {
-    const dp = adjustedGross - par;
-    parts.push(`${dp > 0 ? '+' : ''}${dp} TO PAR`);
-  }
   if (differential != null) {
     parts.push(`${fmtDiff(differential)} DIFF`);
   }
@@ -429,114 +429,278 @@ const ToParDiffStrip: React.FC<{
   );
 };
 
-const HoleStrip: React.FC<{ holes: HoleRow[] }> = ({ holes }) => (
-  <div style={{ display: 'flex', gap: 2, width: '100%' }}>
-    {holes.map((h, i) => {
-      let color: string = PAR_GREY;
-      if (h.played && h.actual_gross != null && h.par != null) {
-        const diff = h.actual_gross - h.par;
-        if (h.actual_gross === 1) color = HOLE_GOLD;
-        else if (diff <= -2) color = EAGLE_GREEN;
-        else if (diff === -1) color = BIRDIE_GREEN;
-        else if (diff === 0) color = PAR_GREY;
-        else if (diff === 1) color = BOGEY_RED;
-        else color = DOUBLE_RED;
-      }
-      return (
-        <div
-          key={i}
-          style={{
-            flex: 1,
-            height: 5,
-            borderRadius: 1,
-            background: color,
-          }}
-        />
-      );
-    })}
-  </div>
-);
+// ─── MiniHoleCell — strip-scale version of the bottom-sheet HoleCell ─────
+// Verdict shape + score numeral. Same grammar as RoundHoleCell, smaller.
+// Numerals always white at this scale (dark card context).
+const STRIP_STROKE = 1.25;
 
-const BreakdownLine: React.FC<{
-  breakdown: { eagle: number; birdie: number; par: number; bogey: number; doublePlus: number };
-}> = ({ breakdown }) => {
-  const itemStyle = (color: string): React.CSSProperties => ({
-    fontSize: 10,
-    fontWeight: 800,
-    color,
-    letterSpacing: '0.10em',
-    textTransform: 'uppercase',
-    fontVariantNumeric: 'tabular-nums',
-  });
-  const sep: React.CSSProperties = {
-    color: WHITE_45,
-    fontSize: 10,
-    fontWeight: 700,
-  };
-
-  const chips: Array<{ key: string; color: string; value: number; label: string }> = [];
-  if (breakdown.eagle > 0) {
-    chips.push({
-      key: 'eagle',
-      color: EAGLE_GREEN,
-      value: breakdown.eagle,
-      label: breakdown.eagle === 1 ? 'EAGLE' : 'EAGLES',
-    });
-  }
-  if (breakdown.birdie > 0) {
-    chips.push({
-      key: 'birdie',
-      color: BIRDIE_GREEN,
-      value: breakdown.birdie,
-      label: breakdown.birdie === 1 ? 'BIRDIE' : 'BIRDIES',
-    });
-  }
-  chips.push({
-    key: 'par',
-    color: WHITE_85,
-    value: breakdown.par,
-    label: breakdown.par === 1 ? 'PAR' : 'PARS',
-  });
-  chips.push({
-    key: 'bogey',
-    color: BOGEY_RED,
-    value: breakdown.bogey,
-    label: breakdown.bogey === 1 ? 'BGY' : 'BGYS',
-  });
-  if (breakdown.doublePlus > 0) {
-    chips.push({
-      key: 'doublePlus',
-      color: DOUBLE_RED,
-      value: breakdown.doublePlus,
-      label: 'DBL+',
-    });
-  }
-
-  const elements: React.ReactNode[] = [];
-  chips.forEach((chip, i) => {
-    if (i > 0) {
-      elements.push(
-        <span key={`${chip.key}-sep`} style={sep}>·</span>
-      );
-    }
-    elements.push(
-      <span key={chip.key} style={itemStyle(chip.color)}>
-        {chip.value} {chip.label}
-      </span>
+const MiniShapePath: React.FC<{
+  kind: 'circle' | 'square';
+  inset: number;
+  stroke: string;
+  size: number;
+}> = ({ kind, inset, stroke, size }) => {
+  if (kind === 'circle') {
+    const r = size / 2 - inset - STRIP_STROKE / 2;
+    if (r <= 0) return null;
+    return (
+      <circle
+        cx={size / 2}
+        cy={size / 2}
+        r={r}
+        fill="none"
+        stroke={stroke}
+        strokeWidth={STRIP_STROKE}
+        vectorEffect="non-scaling-stroke"
+      />
     );
-  });
+  }
+  const dim = size - 2 * inset - STRIP_STROKE;
+  if (dim <= 0) return null;
+  return (
+    <rect
+      x={inset + STRIP_STROKE / 2}
+      y={inset + STRIP_STROKE / 2}
+      width={dim}
+      height={dim}
+      rx={2}
+      ry={2}
+      fill="none"
+      stroke={stroke}
+      strokeWidth={STRIP_STROKE}
+      vectorEffect="non-scaling-stroke"
+    />
+  );
+};
+
+const MiniHoleCell: React.FC<{
+  score: number | null;
+  par: number;
+  size?: number;
+}> = ({ score, par, size = 18 }) => {
+  let shape: 'circle' | 'square' | 'none' | 'empty' = 'none';
+  let depth: 1 | 2 | 3 = 1;
+  let stroke = WHITE_45;
+
+  if (score == null) {
+    shape = 'empty';
+  } else {
+    const diff = score - par;
+    if (score === 1) {
+      shape = 'circle'; depth = 3; stroke = AMBER;
+    } else if (diff <= -3) {
+      shape = 'circle'; depth = 3; stroke = AMBER;
+    } else if (diff === -2) {
+      shape = 'circle'; depth = 2; stroke = AMBER;
+    } else if (diff === -1) {
+      shape = 'circle'; depth = 1; stroke = AMBER;
+    } else if (diff === 0) {
+      shape = 'square'; depth = 1; stroke = WHITE_45;
+    } else if (diff === 1) {
+      shape = 'square'; depth = 1; stroke = WHITE_85;
+    } else if (diff === 2) {
+      shape = 'square'; depth = 2; stroke = WHITE_85;
+    } else {
+      shape = 'square'; depth = 3; stroke = WHITE_85;
+    }
+  }
+
+  const showInnermostRing = false;
+  const showTripleDot = depth >= 3 && shape !== 'empty' && shape !== 'none';
+
+  const showNumeral = score != null && score < 10;
+  const showOverflowMarker = score != null && score >= 10;
 
   return (
     <div
       style={{
+        position: 'relative',
+        width: '100%',
+        height: size,
         display: 'flex',
-        alignItems: 'baseline',
-        flexWrap: 'wrap',
-        gap: 6,
-        marginTop: 10,
+        alignItems: 'center',
+        justifyContent: 'center',
       }}
     >
-      {elements}
+      {shape !== 'none' && shape !== 'empty' && (
+        <svg
+          viewBox={`0 0 ${size} ${size}`}
+          width={size}
+          height={size}
+          style={{ position: 'absolute', inset: 0, pointerEvents: 'none' }}
+          aria-hidden
+        >
+          <MiniShapePath kind={shape} inset={0.5} stroke={stroke} size={size} />
+          {depth >= 2 && (
+            <MiniShapePath kind={shape} inset={size * 0.26} stroke={stroke} size={size} />
+          )}
+          {showInnermostRing && (
+            <MiniShapePath kind={shape} inset={size * 0.42} stroke={stroke} size={size} />
+          )}
+        </svg>
+      )}
+
+      {showTripleDot && (
+        <div
+          aria-hidden
+          style={{
+            position: 'absolute',
+            top: -3,
+            left: '50%',
+            transform: 'translateX(-50%)',
+            width: 3,
+            height: 3,
+            borderRadius: '50%',
+            background: stroke,
+          }}
+        />
+      )}
+
+      {shape === 'empty' && (
+        <div
+          aria-hidden
+          style={{
+            width: '60%',
+            height: 1,
+            background: 'rgba(255,255,255,0.35)',
+          }}
+        />
+      )}
+
+      {showNumeral && (
+        <span
+          style={{
+            position: 'relative',
+            fontSize: 9,
+            fontWeight: 800,
+            color: '#fff',
+            lineHeight: 1,
+            letterSpacing: '-0.02em',
+            fontVariantNumeric: 'tabular-nums',
+          }}
+        >
+          {score}
+        </span>
+      )}
+
+      {showOverflowMarker && (
+        <span
+          style={{
+            position: 'relative',
+            fontSize: 9,
+            fontWeight: 800,
+            color: '#fff',
+            lineHeight: 1,
+          }}
+        >
+          +
+        </span>
+      )}
+    </div>
+  );
+};
+
+// ─── NineRow — one row of 9 cells with label and per-nine total ─────────
+const NineRow: React.FC<{
+  label: string;
+  holes: HoleRow[];
+}> = ({ label, holes }) => {
+  let total = 0;
+  let parTotal = 0;
+  let anyPlayed = false;
+  for (const h of holes) {
+    if (h.played && h.actual_gross != null && h.par != null) {
+      total += h.actual_gross;
+      parTotal += h.par;
+      anyPlayed = true;
+    }
+  }
+  const delta = anyPlayed ? total - parTotal : 0;
+  const deltaStr = anyPlayed
+    ? delta === 0
+      ? 'E'
+      : delta > 0
+        ? `+${delta}`
+        : `${delta}`
+    : '';
+
+  return (
+    <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+      <span
+        style={{
+          fontSize: 8.5,
+          fontWeight: 800,
+          color: WHITE_55,
+          letterSpacing: '0.14em',
+          textTransform: 'uppercase',
+          width: 28,
+          flexShrink: 0,
+        }}
+      >
+        {label}
+      </span>
+      <div
+        style={{
+          flex: 1,
+          display: 'grid',
+          gridTemplateColumns: 'repeat(9, 1fr)',
+          gap: 2,
+        }}
+      >
+        {holes.map((h, i) => {
+          const score = h.played ? (h.adjusted_gross ?? h.actual_gross ?? null) : null;
+          return (
+            <MiniHoleCell key={`${h.hole_no}-${i}`} score={score} par={h.par ?? 4} />
+          );
+        })}
+      </div>
+      <span
+        style={{
+          display: 'inline-flex',
+          alignItems: 'baseline',
+          gap: 4,
+          width: 48,
+          flexShrink: 0,
+          justifyContent: 'flex-end',
+          fontVariantNumeric: 'tabular-nums',
+        }}
+      >
+        <span
+          style={{
+            fontSize: 13,
+            fontWeight: 800,
+            color: '#fff',
+            letterSpacing: '-0.02em',
+          }}
+        >
+          {anyPlayed ? total : '—'}
+        </span>
+        {anyPlayed && (
+          <span
+            style={{
+              fontSize: 10,
+              fontWeight: 700,
+              color: AMBER,
+            }}
+          >
+            {deltaStr}
+          </span>
+        )}
+      </span>
+    </div>
+  );
+};
+
+// ─── HoleStripTwoLine — OUT (front 9) and IN (back 9) rows ───────────────
+const HoleStripTwoLine: React.FC<{ holes: HoleRow[] }> = ({ holes }) => {
+  const sorted = [...holes].sort((a, b) => a.hole_no - b.hole_no);
+  const front9 = sorted.filter(h => h.hole_no <= 9);
+  const back9 = sorted.filter(h => h.hole_no > 9);
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+      <NineRow label="OUT" holes={front9} />
+      {back9.length > 0 && <NineRow label="IN" holes={back9} />}
     </div>
   );
 };
