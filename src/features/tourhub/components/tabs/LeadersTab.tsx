@@ -244,92 +244,35 @@ export function LeadersTab() {
   );
   const { data: recentResultsMap } = useRecentPlayerResults(sortedPlayerIds);
 
-  // ─── Champion streak + recent form for hero pills ───
+  // ─── Champion streak for caption metadata (World Rankings only) ───
   const { data: streakWeeks } = useChampionStreak(
     isWorldCategory ? leader?.playerId : null,
   );
-  const { data: recentForm } = useChampionRecentForm(leader?.playerId, 8);
 
-  // ─── Build hero narrative pills (Phase 2: Margin → Streak → vs Avg → Recent Form) ───
-  // - Margin uses the shared formatStatMargin util — handles higher-better,
-  //   lower-better (with U+2212), and tied uniformly. Phase 2 unlocks Margin
-  //   pills for putt_avg/scoring_avg for the first time.
-  // - vs Avg renders only when category.tourAverageNumeric !== null. Always
-  //   slate normal variant (editorial context, not a dominance moment).
-  const heroPills = useMemo<MastheadPill[]>(() => {
-    const out: MastheadPill[] = [];
-    if (!leader) return out;
+  // Streak label — World Rankings only, ≥2 weeks.
+  const streakLabel = useMemo<string | null>(() => {
+    if (!isWorldCategory || !streakWeeks || streakWeeks < 2) return null;
+    return `${streakWeeks} CONSECUTIVE WEEKS`;
+  }, [isWorldCategory, streakWeeks]);
 
-    // 1. Margin pill — stat-aware, handles all three branches.
-    if (runnerUp) {
-      const margin = formatStatMargin({
-        leaderValue: leader.value,
-        runnerValue: runnerUp.value,
-        unit: category.unit,
-        higherIsBetter: category.higherIsBetter,
-        categoryKey: category.key,
-      });
-      out.push({
-        variant: margin.variant,
-        label: 'Margin:',
-        value: margin.copy,
-      });
+  // Margin label — only when there's a meaningful gap to the runner-up.
+  const marginLabel = useMemo<string | null>(() => {
+    if (!leader || !runnerUp) return null;
+    const a = leader.value;
+    const b = runnerUp.value;
+    if (a == null || b == null) return null;
+    if (isWorldCategory) {
+      const diff = a - b;
+      if (diff <= 0) return null;
+      return `MARGIN +${Math.round(diff)} PTS`;
     }
-
-    // 2. Streak pill — World Rankings only.
-    if (category.showStreak && streakWeeks && streakWeeks >= 2) {
-      out.push({
-        variant: 'highlight',
-        icon: 'flame',
-        value: `${streakWeeks}-week leader`,
-      });
-    }
-
-    // 3. vs Avg pill — render whenever a numeric tour average exists.
-    //    Always slate normal variant regardless of direction. Edge case
-    //    "at avg" prevents "+0"/"−0" from rendering as a fake margin.
-    if (category.tourAverageNumeric !== null) {
-      const tourAvg = category.tourAverageNumeric;
-      const diff = leader.value - tourAvg;
-      let value: string;
-      if (diff === 0) {
-        value = 'at avg';
-      } else {
-        const absDiff = Math.abs(diff);
-        const formatted = formatStatMarginGap(absDiff, category.unit, category.key);
-        // Higher-better: positive diff = above avg (good) → '+'.
-        //                negative diff = below avg (rare/bad) → U+2212.
-        // Lower-better:  negative diff = below avg (good)    → U+2212.
-        //                positive diff = above avg (rare/bad) → '+'.
-        const sign = diff > 0 ? '+' : '\u2212';
-        value = `${sign}${formatted}`;
-      }
-      out.push({
-        variant: 'normal',
-        label: 'vs avg:',
-        value,
-      });
-    }
-
-    // 4. Recent Form pill — when leader has played ≥3 events in last 8 weeks.
-    if (recentForm && recentForm.starts >= 3) {
-      let value: string | null = null;
-      if (recentForm.wins > 0) {
-        value = `${recentForm.starts} starts · ${recentForm.wins} ${recentForm.wins === 1 ? 'win' : 'wins'}`;
-      } else if (recentForm.top10s > 0) {
-        value = `${recentForm.starts} starts · ${recentForm.top10s} top-10${recentForm.top10s === 1 ? '' : 's'}`;
-      }
-      if (value) {
-        out.push({
-          variant: 'normal',
-          icon: 'trophy',
-          value,
-        });
-      }
-    }
-
-    return out;
-  }, [leader, runnerUp, category, streakWeeks, recentForm]);
+    const higher = category.higherIsBetter !== false;
+    const diff = higher ? a - b : b - a;
+    if (diff <= 0) return null;
+    const rounded = Math.abs(diff) >= 10 ? Math.round(diff) : Math.round(diff * 10) / 10;
+    const unit = category.unit ? ` ${category.unit.toUpperCase()}` : '';
+    return `MARGIN +${rounded}${unit}`;
+  }, [leader, runnerUp, isWorldCategory, category]);
 
   // ─── Loading skeleton ───
   if (isLoading) {
