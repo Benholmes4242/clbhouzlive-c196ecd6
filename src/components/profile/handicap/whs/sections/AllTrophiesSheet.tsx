@@ -26,10 +26,19 @@ const RED_14    = 'rgba(159,18,57,0.14)';
 const FONT_GEIST = 'Geist, system-ui, -apple-system, BlinkMacSystemFont, sans-serif';
 
 const ICONS: Record<string, React.ComponentType<any>> = {
-  Trophy, Flame, TrendingDown, Award, Map: MapIcon, Calendar, Star,
-  Flag, Link2, Target, MapPin, BarChart3, CheckCircle2, Activity,
-  Zap, Users, UserCheck, Swords, Plane, Crown,
+  Trophy, Crown, Flag, Link2, Target, MapPin, Globe, Hash,
+  CheckCircle2, Plane, Users,
 };
+
+const GREEN_DEEP  = '#059669';
+const GREEN_TINT  = 'rgba(5,150,105,0.10)';
+const GREEN_SOFT  = 'rgba(5,150,105,0.06)';
+const BLUE        = '#0EA5E9';
+const BLUE_TINT   = 'rgba(14,165,233,0.10)';
+const BLUE_SOFT   = 'rgba(14,165,233,0.06)';
+const PURPLE      = '#7C3AED';
+const PURPLE_TINT = 'rgba(124,58,237,0.10)';
+const PURPLE_SOFT = 'rgba(124,58,237,0.06)';
 
 type CategoryKey = NonNullable<Achievement['category']>;
 
@@ -41,22 +50,18 @@ interface CategoryStyle {
 }
 
 const CATEGORY_STYLE: Record<CategoryKey, CategoryStyle> = {
-  round_quality: { label: 'Round quality', accent: AMBER,  accentBg: AMBER_14, accentBgSoft: AMBER_06 },
-  volume:        { label: 'Volume',        accent: GREEN,  accentBg: GREEN_14, accentBgSoft: GREEN_06 },
-  improvement:   { label: 'Improvement',   accent: RED,    accentBg: RED_14,   accentBgSoft: RED_06 },
-  course:        { label: 'Course',        accent: INK_70, accentBg: INK_06,   accentBgSoft: INK_04 },
-  social:        { label: 'Social',        accent: INK_70, accentBg: INK_06,   accentBgSoft: INK_04 },
-  milestone:     { label: 'Milestone',     accent: INK_70, accentBg: INK_06,   accentBgSoft: INK_04 },
+  handicap:  { label: 'Handicap',         accent: GREEN_DEEP, accentBg: GREEN_TINT,  accentBgSoft: GREEN_SOFT },
+  scoring:   { label: 'Scoring & shots',  accent: AMBER,      accentBg: AMBER_14,    accentBgSoft: AMBER_06 },
+  courses:   { label: 'Courses & travel', accent: BLUE,       accentBg: BLUE_TINT,   accentBgSoft: BLUE_SOFT },
+  community: { label: 'Community',        accent: PURPLE,     accentBg: PURPLE_TINT, accentBgSoft: PURPLE_SOFT },
 };
 
-const CATEGORY_ORDER: CategoryKey[] = [
-  'round_quality', 'volume', 'improvement', 'course', 'social', 'milestone',
-];
+const CATEGORY_ORDER: CategoryKey[] = ['handicap', 'scoring', 'courses', 'community'];
 
 const JUST_EARNED_DAYS = 7;
 
 const isJustEarned = (a: Achievement): boolean => {
-  if (!a.earned || !a.achieved_at) return false;
+  if (a.kind !== 'binary' || !a.earned || !a.achieved_at) return false;
   const days = (Date.now() - new Date(a.achieved_at).getTime()) / 86_400_000;
   return days >= 0 && days < JUST_EARNED_DAYS;
 };
@@ -72,24 +77,6 @@ const formatTrophyDate = (iso: string, now: Date = new Date()): string => {
   return format(d, 'd MMM yyyy').toUpperCase();
 };
 
-const computeNextRewardText = (a: Achievement): string | null => {
-  if (a.progress == null || a.progressLabel == null) return null;
-  const m = /^(?:Top\s)?([\d.]+)\s*\/\s*([\d.]+)/.exec(a.progressLabel);
-  if (!m) return null;
-  const current = parseFloat(m[1]);
-  const target = parseFloat(m[2]);
-  if (!Number.isFinite(current) || !Number.isFinite(target)) return null;
-  const remaining = target - current;
-  if (remaining <= 0) return null;
-  const remainingStr = Number.isInteger(remaining)
-    ? remaining.toString()
-    : remaining.toFixed(1);
-  if (a.earned && a.tier != null && a.totalTiers != null && a.tier < a.totalTiers) {
-    return `${remainingStr} more for tier ${a.tier + 1}`;
-  }
-  return `${remainingStr} more to unlock`;
-};
-
 interface Props {
   open: boolean;
   onClose: () => void;
@@ -99,130 +86,192 @@ interface Props {
 type FilterValue = 'all' | 'earned' | 'in_progress' | 'locked';
 
 const TrophyRow: React.FC<{ a: Achievement }> = ({ a }) => {
-  const Icon = ICONS[a.icon_name] ?? Star;
-  const isLocked = !a.earned;
-  const isTiered = a.tier != null && a.totalTiers != null && a.totalTiers > 1;
-  const isMaxTier = isTiered && a.earned && a.tier === a.totalTiers;
-  const justEarned = isJustEarned(a);
-  const cat = CATEGORY_STYLE[a.category as CategoryKey] ?? CATEGORY_STYLE.milestone;
+  const Icon = ICONS[a.icon_name] ?? Trophy;
+  const cat = CATEGORY_STYLE[a.category as CategoryKey] ?? CATEGORY_STYLE.handicap;
+  const isCounter = a.kind === 'counter';
+  const isList = a.kind === 'list';
+  const isBinary = a.kind === 'binary';
+  const isEarned = a.earned === true;
+  const isLocked = isBinary && !isEarned;
+  const justEarned = isBinary && isEarned && isJustEarned(a);
+  const listComplete = isList && (a.list_played ?? 0) >= (a.list_total ?? 100);
 
-  const showsProgressBar =
-    (isTiered && a.earned && !isMaxTier) ||
-    (isLocked && a.progress != null);
-  const nextRewardText = computeNextRewardText(a);
+  const iconLooksLocked = isLocked;
 
   return (
     <div
       style={{
         display: 'flex',
-        gap: 12,
+        gap: 14,
         alignItems: 'flex-start',
         padding: 14,
-        borderRadius: 14,
-        background: justEarned ? cat.accentBgSoft : '#fff',
-        border: isLocked
+        borderRadius: 12,
+        background: justEarned ? cat.accentBgSoft : iconLooksLocked ? 'transparent' : '#fff',
+        border: iconLooksLocked
           ? `1px dashed ${INK_10}`
-          : `0.5px solid ${justEarned ? cat.accentBg : INK_10}`,
+          : justEarned
+            ? `1px solid ${cat.accent}`
+            : `0.5px solid ${INK_10}`,
         fontFamily: FONT_GEIST,
       }}
     >
+      {/* Icon disc */}
       <div
         style={{
           flex: '0 0 44px',
           height: 44,
           borderRadius: 12,
-          background: isLocked ? INK_06 : cat.accentBg,
+          background: iconLooksLocked ? INK_06 : cat.accentBg,
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
         }}
       >
-        <Icon size={20} color={isLocked ? INK_40 : cat.accent} strokeWidth={2.2} />
+        <Icon size={20} color={iconLooksLocked ? INK_40 : cat.accent} strokeWidth={2.2} />
       </div>
 
+      {/* Middle */}
       <div style={{ flex: 1, minWidth: 0 }}>
         <div style={{
-          display: 'flex', alignItems: 'center', gap: 8,
-          flexWrap: 'wrap',
-          marginBottom: a.subtitle ? 3 : 0,
-        }}>
-          <span style={{
-            fontSize: 15, fontWeight: 700,
-            color: isLocked ? INK_55 : INK,
-            letterSpacing: '-0.01em',
-          }}>{a.title}</span>
-          {isMaxTier && (
-            <span style={{
-              background: AMBER_14, color: AMBER,
-              borderRadius: 999, padding: '2px 7px',
-              fontSize: 8.5, fontWeight: 800, letterSpacing: '0.14em',
-            }}>MAX</span>
-          )}
-          {isTiered && a.earned && !isMaxTier && (
-            <span style={{
-              background: INK_06, color: INK_55,
-              borderRadius: 999, padding: '2px 7px',
-              fontSize: 8.5, fontWeight: 800, letterSpacing: '0.14em',
-              fontVariantNumeric: 'tabular-nums',
-            }}>TIER {a.tier} / {a.totalTiers}</span>
-          )}
-          {justEarned && (
-            <span style={{
-              background: cat.accent, color: '#fff',
-              borderRadius: 999, padding: '2px 7px',
-              fontSize: 8.5, fontWeight: 800, letterSpacing: '0.14em',
-            }}>JUST EARNED</span>
-          )}
-        </div>
+          fontSize: 15,
+          fontWeight: 700,
+          color: iconLooksLocked ? INK_55 : INK,
+          letterSpacing: '-0.01em',
+          marginBottom: 6,
+        }}>{a.title}</div>
 
-        {a.subtitle && (
-          <div style={{
-            fontSize: 12.5, color: INK_55,
-            marginBottom: showsProgressBar ? 10 : 0,
-          }}>{a.subtitle}</div>
-        )}
-
-        {showsProgressBar && (
-          <div style={{ marginTop: a.subtitle ? 0 : 6 }}>
+        {isList && (
+          <div style={{ marginBottom: 8 }}>
             <div style={{
-              height: 3, background: INK_06, borderRadius: 999,
-              overflow: 'hidden', marginBottom: 6,
+              height: 4,
+              background: INK_06,
+              borderRadius: 999,
+              overflow: 'hidden',
             }}>
               <div style={{
-                width: `${(a.progress ?? 0) * 100}%`,
+                width: `${Math.min(100, ((a.list_played ?? 0) / (a.list_total ?? 100)) * 100)}%`,
                 height: '100%',
-                background: isLocked ? INK_40 : cat.accent,
+                background: cat.accent,
                 borderRadius: 999,
               }} />
             </div>
             <div style={{
-              display: 'flex', justifyContent: 'space-between', alignItems: 'baseline',
-              gap: 8,
+              display: 'flex',
+              justifyContent: 'space-between',
+              marginTop: 5,
+              fontSize: 10.5,
+              fontVariantNumeric: 'tabular-nums',
+              fontWeight: 600,
+              letterSpacing: '-0.01em',
             }}>
-              <span style={{
-                fontSize: 11, color: INK_55, fontWeight: 600,
-                fontVariantNumeric: 'tabular-nums',
-              }}>{a.progressLabel ?? ''}</span>
-              {nextRewardText && (
-                <span style={{
-                  fontSize: 11, color: cat.accent, fontWeight: 700,
-                }}>{nextRewardText}</span>
+              <span style={{ color: INK_55 }}>
+                {a.list_played ?? 0} / {a.list_total ?? 100} played
+              </span>
+              {!listComplete && (
+                <span style={{ color: cat.accent, fontWeight: 700 }}>
+                  {(a.list_total ?? 100) - (a.list_played ?? 0)} to go
+                </span>
               )}
             </div>
           </div>
         )}
+
+        <div style={{
+          display: 'flex',
+          alignItems: 'flex-start',
+          gap: 6,
+          fontSize: 11.5,
+          color: INK_55,
+          fontWeight: 500,
+          lineHeight: 1.4,
+        }}>
+          {iconLooksLocked && (
+            <Lock size={11} color={INK_40} strokeWidth={2.2}
+              style={{ flexShrink: 0, marginTop: 1 }} />
+          )}
+          <span>{a.description}</span>
+        </div>
       </div>
 
-      {a.earned && !showsProgressBar && a.achieved_at && (
+      {/* Right column */}
+      {isCounter && (
         <div style={{
-          fontSize: 10.5, fontWeight: 700, color: INK_40,
-          letterSpacing: '0.12em',
-          textAlign: 'right',
-          flexShrink: 0,
-          marginTop: 4,
-          maxWidth: 90,
+          textAlign: 'center',
+          fontFamily: FONT_GEIST,
+          minWidth: 60,
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
         }}>
-          {formatTrophyDate(a.achieved_at)}
+          <div style={{
+            fontSize: 24,
+            fontWeight: 800,
+            color: INK,
+            lineHeight: 1,
+            fontVariantNumeric: 'tabular-nums',
+            letterSpacing: '-0.03em',
+          }}>{(a.count ?? 0).toLocaleString()}</div>
+          {a.count_label && (
+            <div style={{
+              fontSize: 9,
+              fontWeight: 800,
+              color: INK_55,
+              letterSpacing: '0.10em',
+              textTransform: 'uppercase',
+              marginTop: 3,
+            }}>{a.count_label}</div>
+          )}
+        </div>
+      )}
+
+      {isBinary && isEarned && a.achieved_at && (
+        <div style={{
+          textAlign: 'center',
+          fontFamily: FONT_GEIST,
+          minWidth: 64,
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          gap: 6,
+        }}>
+          <div style={{
+            fontSize: 10.5,
+            fontWeight: 800,
+            color: INK_40,
+            letterSpacing: '0.10em',
+            textTransform: 'uppercase',
+          }}>{formatTrophyDate(a.achieved_at)}</div>
+          <div style={{ fontSize: 18, lineHeight: 1 }}>🏆</div>
+        </div>
+      )}
+
+      {isList && listComplete && (
+        <div style={{
+          textAlign: 'center',
+          fontFamily: FONT_GEIST,
+          minWidth: 64,
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          gap: 4,
+        }}>
+          <div style={{
+            fontSize: 22,
+            fontWeight: 800,
+            color: INK,
+            lineHeight: 1,
+            fontVariantNumeric: 'tabular-nums',
+            letterSpacing: '-0.03em',
+          }}>{a.list_total ?? 100}</div>
+          <div style={{
+            fontSize: 9,
+            fontWeight: 800,
+            color: INK_55,
+            letterSpacing: '0.10em',
+            textTransform: 'uppercase',
+            marginTop: 1,
+          }}>played</div>
+          <div style={{ fontSize: 16, lineHeight: 1, marginTop: 3 }}>🏆</div>
         </div>
       )}
     </div>
