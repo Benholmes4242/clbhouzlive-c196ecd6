@@ -18,6 +18,7 @@ import { extractPlayerStats, deriveSGProxies, formatStatsForPrompt } from './det
 import { calculateCourseFitScores, formatCourseFitForPrompt } from './courseFitCalculator.ts';
 import { calculateVenueHistoryScores, formatVenueHistoryForPrompt } from './venueHistory.ts';
 import { runConsensus } from './consensusEngine.ts';
+import { buildSyntheticCourseDNA, isMajorTournament } from './syntheticCourseDNA.ts';
 import type { PlayerStats as EnrichedPlayerStats } from './detailedStats.ts';
 import type { CourseDNAProfile } from './courseFitCalculator.ts';
 
@@ -144,7 +145,7 @@ serve(async (req) => {
         .eq('tournament_id', tournament.id)
         .single();
 
-      if (existing && !isPredictionStale(existing)) {
+      if (existing && !(await isPredictionStale(existing, supabase, tournament.venue_name))) {
         console.log(`[generate-predictions] Using cached predictions`);
         return new Response(
           JSON.stringify({
@@ -460,13 +461,15 @@ ${researchResults[3]?.trim() || 'No weather forecast available.'}
 
     // --- 4A: Fetch Course DNA profile ---
     let courseDNA: any = null;
+    let dnaSource: 'historical' | 'synthetic' = 'historical';
+
     try {
       const { data: dnaResult } = await supabase
         .from('course_dna_profiles')
         .select('*')
         .eq('venue_name', tournament.venue_name)
         .single();
-      
+
       courseDNA = dnaResult;
 
       if (!courseDNA) {
@@ -491,8 +494,22 @@ ${researchResults[3]?.trim() || 'No weather forecast available.'}
         }
       }
 
+      // Synthetic fallback if no historical DNA could be obtained
+      if (!courseDNA) {
+        console.log(`[generate-predictions] No historical DNA for ${tournament.venue_name} — generating synthetic profile`);
+        courseDNA = buildSyntheticCourseDNA({
+          venueName: tournament.venue_name,
+          par: tournament.venue_par,
+          yardage: tournament.venue_yardage,
+          isMajor: isMajorTournament(tournament.name),
+        });
+        dnaSource = 'synthetic';
+      }
+
       if (courseDNA) {
-        console.log(`[generate-predictions] Course DNA: ${courseDNA.course_type} for ${courseDNA.venue_name}`);
+        const ctype = courseDNA.course_type || courseDNA.courseType;
+        const vname = courseDNA.venue_name || courseDNA.venueName;
+        console.log(`[generate-predictions] Course DNA (${dnaSource}): ${ctype} for ${vname}`);
       }
     } catch (err) {
       console.warn('[generate-predictions] Course DNA fetch failed:', err);
@@ -539,20 +556,23 @@ ${researchResults[3]?.trim() || 'No weather forecast available.'}
     let fitScoreMap = new Map<string, number>();
 
     if (courseDNA) {
-      const dnaProfile: CourseDNAProfile = {
-        venueName: courseDNA.venue_name,
-        drivingDistanceImportance: courseDNA.driving_distance_importance || 0,
-        drivingAccuracyImportance: courseDNA.driving_accuracy_importance || 0,
-        girImportance: courseDNA.gir_importance || 0,
-        scramblingImportance: courseDNA.scrambling_importance || 0,
-        puttingImportance: courseDNA.putting_importance || 0,
-        sgOffTeeImportance: courseDNA.sg_off_tee_importance || 0,
-        sgApproachImportance: courseDNA.sg_approach_importance || 0,
-        sgAroundGreenImportance: courseDNA.sg_around_green_importance || 0,
-        sgPuttingImportance: courseDNA.sg_putting_importance || 0,
-        courseType: courseDNA.course_type || 'balanced',
-        avgWinningScore: courseDNA.avg_winning_score || null,
-      };
+      // Map either historical (snake_case from DB) or synthetic (camelCase) into the calculator's expected shape
+      const dnaProfile: CourseDNAProfile = dnaSource === 'synthetic'
+        ? courseDNA as CourseDNAProfile
+        : {
+            venueName: courseDNA.venue_name,
+            drivingDistanceImportance: courseDNA.driving_distance_importance || 0,
+            drivingAccuracyImportance: courseDNA.driving_accuracy_importance || 0,
+            girImportance: courseDNA.gir_importance || 0,
+            scramblingImportance: courseDNA.scrambling_importance || 0,
+            puttingImportance: courseDNA.putting_importance || 0,
+            sgOffTeeImportance: courseDNA.sg_off_tee_importance || 0,
+            sgApproachImportance: courseDNA.sg_approach_importance || 0,
+            sgAroundGreenImportance: courseDNA.sg_around_green_importance || 0,
+            sgPuttingImportance: courseDNA.sg_putting_importance || 0,
+            courseType: courseDNA.course_type || 'balanced',
+            avgWinningScore: courseDNA.avg_winning_score || null,
+          };
 
       courseFitScores = calculateCourseFitScores(dnaProfile, enrichedPlayers);
 
@@ -560,7 +580,7 @@ ${researchResults[3]?.trim() || 'No weather forecast available.'}
         fitScoreMap.set(playerId, result.fitScore);
       }
 
-      console.log(`[generate-predictions] Calculated course fit for ${courseFitScores.size} players`);
+      console.log(`[generate-predictions] Calculated course fit for ${courseFitScores.size} players (${dnaSource})`);
     } else {
       console.log('[generate-predictions] No course DNA — skipping calculated fit scores');
     }
@@ -594,7 +614,7 @@ ${researchResults[3]?.trim() || 'No weather forecast available.'}
       tournament, players, researchContext, hasConfirmedField,
       courseHistoryData, recentFormData,
       courseFitSection, venueHistorySection, detailedStatsSection,
-      courseDNA?.course_type || null,
+      (courseDNA?.course_type || courseDNA?.courseType) || null,
     );
 
     console.log('[generate-predictions] Running consensus engine...');
@@ -684,13 +704,14 @@ ${researchResults[3]?.trim() || 'No weather forecast available.'}
             error: r.error,
           })),
           courseDNA: courseDNA ? {
-            courseType: courseDNA.course_type,
-            venueName: courseDNA.venue_name,
+            courseType: courseDNA.course_type || courseDNA.courseType,
+            venueName: courseDNA.venue_name || courseDNA.venueName,
           } : null,
           enrichmentStats: {
             playersEnriched: enrichedPlayers.length,
             courseFitCalculated: courseFitScores.size,
             venueHistoryCalculated: venueHistoryScores.size,
+            dnaSource,
           },
         },
         research_context: researchContext ? { raw: researchContext, fetched_at: new Date().toISOString() } : null,
@@ -750,25 +771,32 @@ ${researchResults[3]?.trim() || 'No weather forecast available.'}
 // HELPER FUNCTIONS
 // =============================================
 
-function isPredictionStale(prediction: any): boolean {
+async function isPredictionStale(
+  prediction: any,
+  supabase: any,
+  venueName: string | null,
+): Promise<boolean> {
   if (!prediction?.generated_at) return true;
 
   // 1. Age — predictions older than 6 hours are stale.
-  //    Tournaments evolve, field changes, stats refresh.
   const ageMs = Date.now() - new Date(prediction.generated_at).getTime();
   const sixHoursMs = 6 * 60 * 60 * 1000;
   if (ageMs > sixHoursMs) return true;
 
   // 2. Calculation failure — if course fit was never calculated server-side,
-  //    the prediction is fundamentally incomplete and should be regenerated
-  //    as soon as DNA becomes available.
+  //    the prediction is fundamentally incomplete and should be regenerated.
   const enrichmentStats = prediction?.consensus_data?.enrichmentStats;
   if (enrichmentStats?.courseFitCalculated === 0) return true;
 
-  // 3. DNA backfill — if a Course DNA profile was added AFTER this prediction
-  //    was generated, we should regenerate to pick up real fit data.
-  //    (Skipped here — requires extra DNA query per cache check.
-  //     Checks 1+2 cover the immediate Aronimink case; revisit as a follow-up.)
+  // 3. Synthetic DNA was used, but real DNA now exists — promote to real.
+  if (enrichmentStats?.dnaSource === 'synthetic' && venueName) {
+    const { data: dnaRow } = await supabase
+      .from('course_dna_profiles')
+      .select('venue_name')
+      .eq('venue_name', venueName)
+      .maybeSingle();
+    if (dnaRow) return true;
+  }
 
   return false;
 }
