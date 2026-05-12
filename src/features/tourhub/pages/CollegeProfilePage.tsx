@@ -1,10 +1,11 @@
-import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
+import { useState, useEffect, useRef, useCallback, useMemo, Fragment } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import { RefreshCw, AlertCircle, ChevronLeft } from 'lucide-react';
+import { RefreshCw, AlertCircle, ChevronLeft, GraduationCap, ChevronRight, Crown } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { getCollegeLogoUrl } from '@/utils/collegeLogo';
 import { useQueryClient } from '@tanstack/react-query';
 import { PageRoot } from '@/components/layout/PageRoot';
+import { Skeleton } from '@/components/ui/skeleton';
 import { useHeader } from '@/contexts/GlobalHeaderContext';
 import { useMedianStatusBar } from '@/hooks/useMedianStatusBar';
 import { formatCurrency } from '@/lib/utils/formatCurrency';
@@ -13,7 +14,7 @@ import {
   AlumniDepthChart,
   H2HRivalStrip,
 } from '../components/college';
-import { PillView, type MastheadPill } from '../components/leaders/LeadersMasthead';
+import { splitStatValue } from '../utils/splitStatValue';
 
 import { useCollegeStats, useCollegeSeasonStats } from '../hooks/useCollegeStats';
 import { useCollegeMediaMap } from '../hooks/useCollegeMedia';
