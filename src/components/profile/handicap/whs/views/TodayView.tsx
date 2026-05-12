@@ -4,9 +4,9 @@ import type { WhsConnection } from '@/lib/whs/types';
 import MorningMoment from '@/components/handicap/MorningMoment';
 import HeroHandicapCard from '../sections/HeroHandicapCard';
 import LastRoundCard from '../sections/LastRoundCard';
+import RoundsThatCountCard from '../sections/RoundsThatCountCard';
 import StreaksSection from '../sections/StreaksSection';
 import SinceLastVisitRail from '../sections/since-last-visit/SinceLastVisitRail';
-import WhsConnectionCaption from '../sections/WhsConnectionCaption';
 
 interface Props {
   connection: WhsConnection;
@@ -23,7 +23,7 @@ export const TodayView: React.FC<Props> = ({
   connection,
   connectionId,
   userId,
-  currentHandicap: _currentHandicap,
+  currentHandicap,
   connectionCreatedAt: _connectionCreatedAt,
   readOnly = false,
   showReauthBanner = false,
@@ -53,11 +53,11 @@ export const TodayView: React.FC<Props> = ({
 
       <LastRoundCard connectionId={connectionId} />
 
+      <RoundsThatCountCard connectionId={connectionId} currentHandicap={currentHandicap} />
+
       {!readOnly && <StreaksSection connectionId={connectionId} userId={userId} />}
 
       {!readOnly && <SinceLastVisitRail userId={userId} />}
-
-      {!readOnly && <WhsConnectionCaption membershipNumber={connection.membership_number} />}
     </div>
   );
 };
