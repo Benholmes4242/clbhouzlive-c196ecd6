@@ -7,7 +7,7 @@
  * Failure paths silently hide the card and fire an analytics event.
  */
 import React from 'react';
-import { Wind, Sun, Navigation, CloudRain } from 'lucide-react';
+import { Navigation } from 'lucide-react';
 import { useHomeCourseWeather, WeatherUnresolvedError } from '@/lib/weather/useHomeCourseWeather';
 import {
   pickConditionState,
