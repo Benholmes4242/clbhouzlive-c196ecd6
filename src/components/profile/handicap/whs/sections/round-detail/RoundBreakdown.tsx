@@ -7,12 +7,7 @@ interface Props {
 
 const INK = '#0F172A';
 const INK_55 = 'rgba(15,23,42,0.55)';
-
-const HOLE_GOLD = '#D4A82A';
-const EAGLE_GREEN = '#0E9F6E';
-const BIRDIE_GREEN = '#10B981';
-const BOGEY_RED = '#E11D48';
-const DOUBLE_RED = '#9F1239';
+const AMBER = '#F7931E';
 
 export const RoundBreakdown: React.FC<Props> = ({ holes }) => {
   const counts = useMemo(() => {
