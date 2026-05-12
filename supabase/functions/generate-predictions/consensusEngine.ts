@@ -321,8 +321,9 @@ export function aggregateConsensus(
       ? data.winProbabilities.reduce((a, b) => a + b, 0) / data.winProbabilities.length : 0;
 
     // Course-fit fallback chain:
-    //   1. Calculated score from courseFitCalculator
-    //   2. Average of model-returned scores
+    //   1. Calculated score from courseFitCalculator (real statistical fit)
+    //   2. Average of model-returned scores — ONLY when DNA was available
+    //      (without DNA, model values are hallucinations and were not collected)
     //   3. Null — UI hides the bar gracefully
     const calculatedFit = calculatedFitScores?.get(playerId);
     const modelFitValues = [...data.courseFitScores.values()];
