@@ -538,6 +538,40 @@ const MiniHoleCell: React.FC<{
           {showInnermostRing && (
             <MiniShapePath kind={shape} inset={size * 0.42} stroke={stroke} size={size} />
           )}
+          {showNumeral && (
+            <text
+              x={size / 2}
+              y={size / 2}
+              textAnchor="middle"
+              dominantBaseline="central"
+              fill="#fff"
+              style={{
+                fontSize: 9,
+                fontWeight: 800,
+                letterSpacing: '-0.02em',
+                fontVariantNumeric: 'tabular-nums',
+                fontFamily: 'Geist, system-ui, -apple-system, BlinkMacSystemFont, sans-serif',
+              }}
+            >
+              {score}
+            </text>
+          )}
+          {showOverflowMarker && (
+            <text
+              x={size / 2}
+              y={size / 2}
+              textAnchor="middle"
+              dominantBaseline="central"
+              fill="#fff"
+              style={{
+                fontSize: 9,
+                fontWeight: 800,
+                fontFamily: 'Geist, system-ui, -apple-system, BlinkMacSystemFont, sans-serif',
+              }}
+            >
+              +
+            </text>
+          )}
         </svg>
       )}
 
@@ -566,36 +600,6 @@ const MiniHoleCell: React.FC<{
             background: 'rgba(255,255,255,0.35)',
           }}
         />
-      )}
-
-      {showNumeral && (
-        <span
-          style={{
-            position: 'relative',
-            fontSize: 9,
-            fontWeight: 800,
-            color: '#fff',
-            lineHeight: 1,
-            letterSpacing: '-0.02em',
-            fontVariantNumeric: 'tabular-nums',
-          }}
-        >
-          {score}
-        </span>
-      )}
-
-      {showOverflowMarker && (
-        <span
-          style={{
-            position: 'relative',
-            fontSize: 9,
-            fontWeight: 800,
-            color: '#fff',
-            lineHeight: 1,
-          }}
-        >
-          +
-        </span>
       )}
     </div>
   );
