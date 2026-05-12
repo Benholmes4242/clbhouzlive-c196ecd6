@@ -32,60 +32,6 @@ const buildLocationLabel = (club: ClubLocation): string => {
   return parts.join(', ');
 };
 
-const WeatherStat: React.FC<{
-  icon: React.ReactNode;
-  label: string;
-  value: string;
-  unit: string;
-  divider?: boolean;
-}> = ({ icon, label, value, unit, divider }) => (
-  <div
-    style={{
-      flex: 1,
-      minWidth: 0,
-      display: 'flex',
-      flexDirection: 'column',
-      gap: 4,
-      padding: '10px 8px',
-      borderLeft: divider ? '0.5px solid rgba(255,255,255,0.18)' : 'none',
-    }}
-  >
-    <div
-      style={{
-        display: 'flex',
-        alignItems: 'center',
-        gap: 4,
-        fontSize: 9,
-        fontWeight: 800,
-        letterSpacing: '0.16em',
-        color: 'rgba(255,255,255,0.70)',
-        textTransform: 'uppercase',
-      }}
-    >
-      {icon}
-      <span>{label}</span>
-    </div>
-    <div
-      style={{
-        display: 'flex',
-        alignItems: 'baseline',
-        gap: 3,
-        color: '#fff',
-        fontFeatureSettings: '"kern" 1, "liga" 1',
-        fontVariantNumeric: 'tabular-nums',
-      }}
-    >
-      <span style={{ fontSize: 18, fontWeight: 700, letterSpacing: '-0.02em', lineHeight: 1 }}>
-        {value}
-      </span>
-      {unit && (
-        <span style={{ fontSize: 10, fontWeight: 600, color: 'rgba(255,255,255,0.65)' }}>
-          {unit}
-        </span>
-      )}
-    </div>
-  </div>
-);
 
 const HomeCourseWeatherCard: React.FC<Props> = ({ club, userId }) => {
   const { data: weather, isLoading, isError, error } = useHomeCourseWeather(club);
