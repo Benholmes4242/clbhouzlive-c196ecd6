@@ -748,13 +748,13 @@ export function PlayersTab() {
                       marginBottom: 6,
                     }}
                   >
-                    <Users size={11} strokeWidth={2.6} style={{ color: '#F7931E' }} />
-                    <span style={{ fontSize: 10.5, fontWeight: 800, letterSpacing: '0.16em', color: '#F7931E' }}>
+                    <Users size={13} strokeWidth={2.5} style={{ color: '#F7931E' }} />
+                    <span style={{ fontSize: 10.5, fontWeight: 700, letterSpacing: '0.14em', color: '#F7931E', textTransform: 'uppercase' as const }}>
                       PLAYERS
                     </span>
-                    <ChevronRight size={11} strokeWidth={2.6} style={{ color: '#F7931E' }} />
+                    <ChevronRight size={11} strokeWidth={2.5} style={{ color: '#F7931E', marginTop: 1 }} />
                   </button>
-                  <h1 style={{ fontSize: 18, fontWeight: 800, color: '#0F172A', letterSpacing: '-0.02em', margin: 0, lineHeight: 1.15 }}>
+                  <h1 style={{ fontSize: 18, fontWeight: 800, color: '#0F172A', letterSpacing: '-0.015em', margin: 0, lineHeight: 1.2 }}>
                     Players
                   </h1>
                   <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 8, marginTop: 4 }}>
