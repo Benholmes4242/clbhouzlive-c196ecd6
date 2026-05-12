@@ -461,13 +461,15 @@ ${researchResults[3]?.trim() || 'No weather forecast available.'}
 
     // --- 4A: Fetch Course DNA profile ---
     let courseDNA: any = null;
+    let dnaSource: 'historical' | 'synthetic' = 'historical';
+
     try {
       const { data: dnaResult } = await supabase
         .from('course_dna_profiles')
         .select('*')
         .eq('venue_name', tournament.venue_name)
         .single();
-      
+
       courseDNA = dnaResult;
 
       if (!courseDNA) {
@@ -492,8 +494,22 @@ ${researchResults[3]?.trim() || 'No weather forecast available.'}
         }
       }
 
+      // Synthetic fallback if no historical DNA could be obtained
+      if (!courseDNA) {
+        console.log(`[generate-predictions] No historical DNA for ${tournament.venue_name} — generating synthetic profile`);
+        courseDNA = buildSyntheticCourseDNA({
+          venueName: tournament.venue_name,
+          par: tournament.venue_par,
+          yardage: tournament.venue_yardage,
+          isMajor: isMajorTournament(tournament.name),
+        });
+        dnaSource = 'synthetic';
+      }
+
       if (courseDNA) {
-        console.log(`[generate-predictions] Course DNA: ${courseDNA.course_type} for ${courseDNA.venue_name}`);
+        const ctype = courseDNA.course_type || courseDNA.courseType;
+        const vname = courseDNA.venue_name || courseDNA.venueName;
+        console.log(`[generate-predictions] Course DNA (${dnaSource}): ${ctype} for ${vname}`);
       }
     } catch (err) {
       console.warn('[generate-predictions] Course DNA fetch failed:', err);
@@ -540,20 +556,23 @@ ${researchResults[3]?.trim() || 'No weather forecast available.'}
     let fitScoreMap = new Map<string, number>();
 
     if (courseDNA) {
-      const dnaProfile: CourseDNAProfile = {
-        venueName: courseDNA.venue_name,
-        drivingDistanceImportance: courseDNA.driving_distance_importance || 0,
-        drivingAccuracyImportance: courseDNA.driving_accuracy_importance || 0,
-        girImportance: courseDNA.gir_importance || 0,
-        scramblingImportance: courseDNA.scrambling_importance || 0,
-        puttingImportance: courseDNA.putting_importance || 0,
-        sgOffTeeImportance: courseDNA.sg_off_tee_importance || 0,
-        sgApproachImportance: courseDNA.sg_approach_importance || 0,
-        sgAroundGreenImportance: courseDNA.sg_around_green_importance || 0,
-        sgPuttingImportance: courseDNA.sg_putting_importance || 0,
-        courseType: courseDNA.course_type || 'balanced',
-        avgWinningScore: courseDNA.avg_winning_score || null,
-      };
+      // Map either historical (snake_case from DB) or synthetic (camelCase) into the calculator's expected shape
+      const dnaProfile: CourseDNAProfile = dnaSource === 'synthetic'
+        ? courseDNA as CourseDNAProfile
+        : {
+            venueName: courseDNA.venue_name,
+            drivingDistanceImportance: courseDNA.driving_distance_importance || 0,
+            drivingAccuracyImportance: courseDNA.driving_accuracy_importance || 0,
+            girImportance: courseDNA.gir_importance || 0,
+            scramblingImportance: courseDNA.scrambling_importance || 0,
+            puttingImportance: courseDNA.putting_importance || 0,
+            sgOffTeeImportance: courseDNA.sg_off_tee_importance || 0,
+            sgApproachImportance: courseDNA.sg_approach_importance || 0,
+            sgAroundGreenImportance: courseDNA.sg_around_green_importance || 0,
+            sgPuttingImportance: courseDNA.sg_putting_importance || 0,
+            courseType: courseDNA.course_type || 'balanced',
+            avgWinningScore: courseDNA.avg_winning_score || null,
+          };
 
       courseFitScores = calculateCourseFitScores(dnaProfile, enrichedPlayers);
 
@@ -561,7 +580,7 @@ ${researchResults[3]?.trim() || 'No weather forecast available.'}
         fitScoreMap.set(playerId, result.fitScore);
       }
 
-      console.log(`[generate-predictions] Calculated course fit for ${courseFitScores.size} players`);
+      console.log(`[generate-predictions] Calculated course fit for ${courseFitScores.size} players (${dnaSource})`);
     } else {
       console.log('[generate-predictions] No course DNA — skipping calculated fit scores');
     }
