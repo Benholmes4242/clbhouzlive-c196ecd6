@@ -587,7 +587,14 @@ const ReportageCard: React.FC<{
           <img
             src={activity.course_thumbnail_image}
             alt={activity.last_round_course_name ?? ''}
-            style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+            style={{
+              position: 'absolute',
+              inset: 0,
+              width: '100%',
+              height: '100%',
+              objectFit: 'cover',
+              display: 'block',
+            }}
           />
         ) : (
           <svg
