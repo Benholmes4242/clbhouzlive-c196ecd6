@@ -104,12 +104,11 @@ async function callGPT4(
     },
     body: JSON.stringify({
       model: 'gpt-5-mini',
-      max_tokens: 4096,
+      max_tokens: 16384,
       messages: [
         { role: 'system', content: systemPrompt },
         { role: 'user', content: userPrompt },
       ],
-      temperature: 0.7,
       response_format: { type: 'json_object' },
     }),
   });
