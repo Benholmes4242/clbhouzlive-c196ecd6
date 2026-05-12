@@ -202,7 +202,7 @@ function Section({ tier, alumni, defaultExpanded = true, legacyMap }: SectionPro
           {TIER_SUBTITLES[tier]}
         </span>
         <span style={{ fontSize: 11, color: '#94A3B8' }}>{alumni.length}</span>
-        <span style={{ fontSize: 11, color: '#CBD5E1' }}>{isExpanded ? '▾' : '▸'}</span>
+        <span style={{ fontSize: 11, color: '#94A3B8' }}>{isExpanded ? '▾' : '▸'}</span>
       </button>
 
       {isExpanded && (
