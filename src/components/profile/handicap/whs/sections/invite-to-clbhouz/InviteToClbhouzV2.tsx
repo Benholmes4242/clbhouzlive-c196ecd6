@@ -84,18 +84,15 @@ export const InviteToClbhouzV2: React.FC<Props> = ({ ownerUserId }) => {
       (friends ?? [])
         .filter((f) => !f.is_clbhouz_user && f.friend_passport_id != null)
         .sort((a, b) => {
-          // Primary: rounds in last 30 days, descending.
-          // Secondary: handicap ascending (stronger players first as tiebreaker).
-          const activityDelta = b.rounds_last_30d - a.rounds_last_30d;
-          if (activityDelta !== 0) return activityDelta;
+          // Primary: most recently played first.
+          // Friends without a known last_round_played_at sink to the bottom.
+          const aT = a.last_round_played_at ? new Date(a.last_round_played_at).getTime() : -Infinity;
+          const bT = b.last_round_played_at ? new Date(b.last_round_played_at).getTime() : -Infinity;
+          if (aT !== bT) return bT - aT;
+          // Tiebreaker: handicap ascending (stronger players first).
           return (a.friend_handicap_index ?? 99) - (b.friend_handicap_index ?? 99);
         }),
     [friends],
-  );
-
-  const maxRounds = useMemo(
-    () => (invitable.length > 0 ? invitable[0].rounds_last_30d : 0),
-    [invitable],
   );
 
   const sentCount = invites?.length ?? 0;
