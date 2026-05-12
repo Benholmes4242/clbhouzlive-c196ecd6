@@ -141,6 +141,16 @@ const HeroHandicapCard: React.FC<Props> = ({ connection }) => {
   const current = trend?.current ?? null;
   const points: HandicapPoint[] = history ?? [];
 
+  // Range-aware handicap delta. Uses the same snapshots feeding the sparkline,
+  // so the arc and label below the HANDICAP ring reflect the active range
+  // rather than the hardcoded 30-day delta from useHandicapTrend.
+  const rangeDelta = useMemo<number | null>(() => {
+    if (!history || history.length < 2) return null;
+    const oldest = history[0].handicap_index;
+    const latest = history[history.length - 1].handicap_index;
+    return latest - oldest;
+  }, [history]);
+
   // Date-windowed slice of all rounds for the active range. Drives FORM,
   // SCORING AVG, and the round counts in sub-labels.
   const rangeFilteredScores = useMemo(() => {
@@ -319,7 +329,7 @@ const HeroHandicapCard: React.FC<Props> = ({ connection }) => {
   
 
   // Monthly movement math — inner ring (replaces form)
-  const monthly = calcMonthlyMovement(trend?.delta ?? null);
+  const monthly = calcMonthlyMovement(rangeDelta);
   const useMonthlyRing = monthly.delta != null;
   const fallbackForm = calcForm(current, last5Diffs);
 
@@ -337,19 +347,20 @@ const HeroHandicapCard: React.FC<Props> = ({ connection }) => {
 
   // Form delta UI
   const formNode = (() => {
-    if (trend?.delta != null) {
+    if (rangeDelta != null) {
       const STEADY_THRESHOLD = 0.05;
-      const delta = trend.delta;
+      const delta = rangeDelta;
       const absDelta = Math.abs(delta);
+      const rangeLabel = range === 30 ? 'last month' : range === 365 ? 'last year' : 'lifetime';
       if (absDelta < STEADY_THRESHOLD) {
-        return <span style={{ color: INK_40 }}>Steady · last month</span>;
+        return <span style={{ color: INK_40 }}>Steady · {rangeLabel}</span>;
       }
       if (delta < 0) {
         return (
           <span style={{ color: GREEN, display: 'inline-flex', alignItems: 'center', gap: 4 }}>
             <ArrowDown size={13} strokeWidth={2.5} />
             <span style={{ fontVariantNumeric: 'tabular-nums' }}>
-              {absDelta.toFixed(1)} last month
+              {absDelta.toFixed(1)} {rangeLabel}
             </span>
           </span>
         );
@@ -358,7 +369,7 @@ const HeroHandicapCard: React.FC<Props> = ({ connection }) => {
         <span style={{ color: RED, display: 'inline-flex', alignItems: 'center', gap: 4 }}>
           <ArrowUp size={13} strokeWidth={2.5} />
           <span style={{ fontVariantNumeric: 'tabular-nums' }}>
-            {absDelta.toFixed(1)} last month
+            {absDelta.toFixed(1)} {rangeLabel}
           </span>
         </span>
       );
@@ -407,7 +418,7 @@ const HeroHandicapCard: React.FC<Props> = ({ connection }) => {
 
   // ── Combined delta inline ────────────────────────────────────────────────
   const deltaInline = (() => {
-    const d = trend?.delta;
+    const d = rangeDelta;
     if (d == null || Math.abs(d) < 0.05) {
       return <span style={{ color: INK_55, fontWeight: 600 }}>Steady</span>;
     }
@@ -425,12 +436,12 @@ const HeroHandicapCard: React.FC<Props> = ({ connection }) => {
 
   // ── Delta sub text + direction (for centre ring label-stack) ─────────────
   const deltaTodayDir: 'up' | 'down' | 'flat' = (() => {
-    const d = trend?.delta;
+    const d = rangeDelta;
     if (d == null || Math.abs(d) < 0.05) return 'flat';
     return d < 0 ? 'down' : 'up';
   })();
   const deltaSubText = (() => {
-    const d = trend?.delta;
+    const d = rangeDelta;
     if (d == null) return 'Awaiting data';
     if (Math.abs(d) < 0.05) return 'Steady';
     return `${d < 0 ? '↓' : '↑'} ${Math.abs(d).toFixed(1)}`;
