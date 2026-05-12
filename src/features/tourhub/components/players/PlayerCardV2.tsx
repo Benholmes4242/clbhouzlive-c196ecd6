@@ -212,10 +212,10 @@ export function PlayerCardV2({
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '4px', marginTop: '2px' }}>
             <CountryFlag country={player.country} size="sm" />
-            <span style={{ fontSize: '10px', color: '#94A3B8' }}>{countryName}</span>
+            <span style={{ fontSize: '11px', fontWeight: 600, color: '#64748B' }}>{countryName}</span>
             {/* OWGR secondary for tour-specific pages */}
             {isTourRanking && !isLPGA && owgr != null && owgr > 0 && (
-              <span style={{ fontSize: '10px', color: '#CBD5E1', marginLeft: '4px' }}>· #{owgr} OWGR</span>
+              <span style={{ fontSize: '11px', fontWeight: 600, color: '#94A3B8', marginLeft: '4px' }}>· #{owgr} OWGR</span>
             )}
           </div>
         </div>
@@ -225,34 +225,28 @@ export function PlayerCardV2({
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 2, padding: `${rowPaddingY}px 14px ${rowPaddingY}px 0`, flexShrink: 0 }}>
             {displayValue ? (
               // Tour Hub standard override (Stat Watch, etc.) — bypasses sort-mode selection.
-              <span style={{ fontSize: '13px', fontWeight: 800, color: tierAccent && worldRank === 1 ? '#F7931E' : '#0F172A', fontVariantNumeric: 'tabular-nums' }}>
+              <span style={{ fontSize: '13px', fontWeight: 800, color: '#0F172A', fontVariantNumeric: 'tabular-nums' }}>
                 {displayValue.main}
-                {displayValue.label && (
-                  <span style={{ fontSize: '9px', fontWeight: 800, color: '#94A3B8', marginLeft: 2 }}>
-                    {displayValue.label}
-                  </span>
-                )}
               </span>
             ) : (
               <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                 {!isTourRanking && !isPgaEarnings && !isPgaFedex && totalPoints != null && totalPoints > 0 && activeSort !== 'most-wins' && (
-                  <span style={{ fontSize: '11px', fontWeight: 800, color: '#0F172A', fontVariantNumeric: 'tabular-nums' }}>
+                  <span style={{ fontSize: '13px', fontWeight: 800, color: '#0F172A', fontVariantNumeric: 'tabular-nums' }}>
                     {totalPoints.toLocaleString(undefined, { maximumFractionDigits: 1 })}
-                    <span style={{ fontSize: '9px', fontWeight: 800, color: '#0F172A' }}>pts</span>
                   </span>
                 )}
                 {rightValue && (
-                  <span style={{ fontSize: '13px', fontWeight: 800, color: isFirst ? '#F7931E' : '#0F172A', fontVariantNumeric: 'tabular-nums' }}>
+                  <span style={{ fontSize: '13px', fontWeight: 800, color: '#0F172A', fontVariantNumeric: 'tabular-nums' }}>
                     {rightValue.main}
-                    {rightValue.label && (
-                      <span style={{ fontSize: '9px', fontWeight: 800, color: '#0F172A' }}>
+                    {rightValue.label && activeSort === 'most-wins' && (
+                      <span style={{ fontSize: '11px', fontWeight: 700, color: '#64748B', marginLeft: 3 }}>
                         {rightValue.label}
                       </span>
                     )}
                   </span>
                 )}
                 {!isTourRanking && !isPgaOwgr && !isPgaEarnings && !isPgaFedex && winCount > 0 && activeSort !== 'most-wins' && (
-                  <span style={{ fontSize: '12px', fontWeight: 800, color: '#16A34A', fontVariantNumeric: 'tabular-nums' }}>
+                  <span style={{ fontSize: '12px', fontWeight: 800, color: '#047857', fontVariantNumeric: 'tabular-nums' }}>
                     {winCount} {winCount === 1 ? 'win' : 'wins'}
                   </span>
                 )}
