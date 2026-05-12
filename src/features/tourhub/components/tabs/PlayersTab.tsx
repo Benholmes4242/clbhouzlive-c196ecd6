@@ -138,29 +138,29 @@ function HeroChampion({ champion, runnerUp, champStats, champPhotoUrl, sort, act
       style={{
         background: 'linear-gradient(180deg, rgba(255,184,0,0.10) 0%, rgba(255,184,0,0.04) 100%)',
         border: '1px solid rgba(255,184,0,0.32)',
-        borderRadius: 10,
+        borderRadius: 14,
         padding: 14,
         marginBottom: 14,
       }}
     >
       {/* Caption row */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 12 }}>
-        <Crown size={11} strokeWidth={2.6} style={{ color: '#B45309', flexShrink: 0 }} />
-        <span style={{ fontSize: 9.5, fontWeight: 900, letterSpacing: '0.14em', color: '#0F172A' }}>
+        <Crown size={13} strokeWidth={2.5} fill="#FFB800" style={{ color: '#D97706', flexShrink: 0 }} />
+        <span style={{ fontSize: 10.5, fontWeight: 800, letterSpacing: '0.14em', color: '#0F172A' }}>
           {rankLabel}
         </span>
         {showStreak && (
           <>
-            <span style={{ color: '#94A3B8', fontSize: 9.5, fontWeight: 800 }}>·</span>
-            <span style={{ fontSize: 9.5, fontWeight: 800, letterSpacing: '0.12em', color: '#64748B' }}>
+            <span style={{ color: '#94A3B8', fontSize: 10.5, fontWeight: 800 }}>·</span>
+            <span style={{ fontSize: 10.5, fontWeight: 800, letterSpacing: '0.14em', color: '#64748B' }}>
               {streakWeeks} CONSECUTIVE WEEKS
             </span>
           </>
         )}
         {marginPts != null && (
           <>
-            <span style={{ color: '#94A3B8', fontSize: 9.5, fontWeight: 800 }}>·</span>
-            <span style={{ fontSize: 9.5, fontWeight: 800, letterSpacing: '0.12em', color: '#64748B' }}>
+            <span style={{ color: '#94A3B8', fontSize: 10.5, fontWeight: 800 }}>·</span>
+            <span style={{ fontSize: 10.5, fontWeight: 800, letterSpacing: '0.14em', color: '#64748B' }}>
               MARGIN +{marginPts.toFixed(0)} PTS
             </span>
           </>
@@ -181,12 +181,12 @@ function HeroChampion({ champion, runnerUp, champStats, champPhotoUrl, sort, act
           </div>
           <div
             style={{
-              position: 'absolute', bottom: -2, right: -2,
+              position: 'absolute', bottom: -4, right: -4,
               width: 22, height: 22, borderRadius: '50%',
               background: '#FFB800', color: '#0F172A',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               fontSize: 11, fontWeight: 900,
-              border: '2px solid #ffffff',
+              border: '2.5px solid #ffffff',
               boxShadow: '0 1px 3px rgba(15,23,42,0.15)',
               fontVariantNumeric: 'tabular-nums',
             }}
@@ -209,10 +209,10 @@ function HeroChampion({ champion, runnerUp, champStats, champPhotoUrl, sort, act
 
           {primary && (
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', flexShrink: 0 }}>
-              <div style={{ fontSize: 22, fontWeight: 800, color: '#0F172A', letterSpacing: '-0.02em', lineHeight: 1, fontVariantNumeric: 'tabular-nums' }}>
+              <div style={{ fontSize: 22, fontWeight: 800, color: '#0F172A', letterSpacing: '-0.025em', lineHeight: 1, fontVariantNumeric: 'tabular-nums' }}>
                 {primary.value}
               </div>
-              <div style={{ fontSize: 9, fontWeight: 800, letterSpacing: '0.12em', color: '#64748B', marginTop: 4 }}>
+              <div style={{ fontSize: 9, fontWeight: 800, letterSpacing: '0.16em', color: '#64748B', marginTop: 4, textTransform: 'uppercase' as const }}>
                 {primary.label}
               </div>
             </div>
@@ -748,13 +748,13 @@ export function PlayersTab() {
                       marginBottom: 6,
                     }}
                   >
-                    <Users size={11} strokeWidth={2.6} style={{ color: '#F7931E' }} />
-                    <span style={{ fontSize: 10.5, fontWeight: 800, letterSpacing: '0.16em', color: '#F7931E' }}>
+                    <Users size={13} strokeWidth={2.5} style={{ color: '#F7931E' }} />
+                    <span style={{ fontSize: 10.5, fontWeight: 700, letterSpacing: '0.14em', color: '#F7931E', textTransform: 'uppercase' as const }}>
                       PLAYERS
                     </span>
-                    <ChevronRight size={11} strokeWidth={2.6} style={{ color: '#F7931E' }} />
+                    <ChevronRight size={11} strokeWidth={2.5} style={{ color: '#F7931E', marginTop: 1 }} />
                   </button>
-                  <h1 style={{ fontSize: 18, fontWeight: 800, color: '#0F172A', letterSpacing: '-0.02em', margin: 0, lineHeight: 1.15 }}>
+                  <h1 style={{ fontSize: 18, fontWeight: 800, color: '#0F172A', letterSpacing: '-0.015em', margin: 0, lineHeight: 1.2 }}>
                     Players
                   </h1>
                   <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 8, marginTop: 4 }}>
