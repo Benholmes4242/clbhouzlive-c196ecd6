@@ -5,7 +5,7 @@ import {
   useSentInvites,
 } from '@/lib/whs/hooks';
 import SectionHeader from '../SectionHeader';
-import InviteRow from './InviteRow';
+import InviteCard from './InviteCard';
 import SentInvitesSheet from './SentInvitesSheet';
 
 interface Props {
@@ -84,18 +84,15 @@ export const InviteToClbhouzV2: React.FC<Props> = ({ ownerUserId }) => {
       (friends ?? [])
         .filter((f) => !f.is_clbhouz_user && f.friend_passport_id != null)
         .sort((a, b) => {
-          // Primary: rounds in last 30 days, descending.
-          // Secondary: handicap ascending (stronger players first as tiebreaker).
-          const activityDelta = b.rounds_last_30d - a.rounds_last_30d;
-          if (activityDelta !== 0) return activityDelta;
+          // Primary: most recently played first.
+          // Friends without a known last_round_played_at sink to the bottom.
+          const aT = a.last_round_played_at ? new Date(a.last_round_played_at).getTime() : -Infinity;
+          const bT = b.last_round_played_at ? new Date(b.last_round_played_at).getTime() : -Infinity;
+          if (aT !== bT) return bT - aT;
+          // Tiebreaker: handicap ascending (stronger players first).
           return (a.friend_handicap_index ?? 99) - (b.friend_handicap_index ?? 99);
         }),
     [friends],
-  );
-
-  const maxRounds = useMemo(
-    () => (invitable.length > 0 ? invitable[0].rounds_last_30d : 0),
-    [invitable],
   );
 
   const sentCount = invites?.length ?? 0;
@@ -123,8 +120,8 @@ export const InviteToClbhouzV2: React.FC<Props> = ({ ownerUserId }) => {
     <section id="invite-to-clbhouz-section" style={{ marginTop: 28 }}>
       <SectionHeader
         eyebrow="MAKE YOUR FEED LOUDER"
-        title="Your most active friends"
-        sub="They post the most rounds — invite them to see it all"
+        title="Friends on England Golf"
+        sub="Not on Clbhouz yet — invite them to share rounds."
         right={
           sentCount > 0 ? (
             <SentBadge count={sentCount} onClick={() => setSheetOpen(true)} />
@@ -138,23 +135,21 @@ export const InviteToClbhouzV2: React.FC<Props> = ({ ownerUserId }) => {
         <div style={{ margin: '0 20px' }}>
           <div
             style={{
-              background: T.cardBg,
-              border: `1px solid ${T.hairline}`,
-              borderRadius: 14,
-              overflow: 'hidden',
+              display: 'grid',
+              gridTemplateColumns: '1fr 1fr',
+              gap: 8,
             }}
           >
             {(showAll ? invitable : invitable.slice(0, 4)).map((f) => (
-              <InviteRow
+              <InviteCard
                 key={String(f.friend_passport_id)}
                 friend={f}
-                maxRounds={maxRounds}
               />
             ))}
           </div>
-          {!showAll && invitable.length > 4 && (
+          {invitable.length > 4 && (
             <button
-              onClick={() => setShowAll(true)}
+              onClick={() => setShowAll(!showAll)}
               style={{
                 width: '100%',
                 padding: '10px 14px',
@@ -173,8 +168,17 @@ export const InviteToClbhouzV2: React.FC<Props> = ({ ownerUserId }) => {
                 gap: 4,
               }}
             >
-              See all {invitable.length} invitable
-              <ChevronDown size={14} />
+              {showAll ? (
+                <>
+                  Show less
+                  <ChevronDown size={14} style={{ transform: 'rotate(180deg)' }} />
+                </>
+              ) : (
+                <>
+                  See all {invitable.length} invitable
+                  <ChevronDown size={14} />
+                </>
+              )}
             </button>
           )}
         </div>
