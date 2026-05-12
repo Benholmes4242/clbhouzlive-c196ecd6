@@ -892,12 +892,41 @@ export interface TrophyAggregates {
   hole_stats: {
     aces_count: number;
     eagles_count: number;
+    birdies_count: number;
+    albatross_count: number;
     sub_par_rounds_count: number;
     rounds_with_holes_count: number;
     total_rounds_count: number;
+    /** Lowest gross score across 18-hole rounds. 9-hole rounds excluded. */
+    best_gross: number | null;
+    /** Earliest play_date of an 18-hole round under 80 strokes. */
+    first_sub_80_at: string | null;
+    /** Earliest play_date of an 18-hole round under 90 strokes. */
+    first_sub_90_at: string | null;
+    /** Earliest play_date of an 18-hole round under 100 strokes. */
+    first_sub_100_at: string | null;
+    /** Earliest play_date of an 18-hole sub-par round. */
+    first_sub_par_at: string | null;
   };
   course_stats: {
     countries_played: string[];
+    /** Unique courses played across all WHS rounds. */
+    unique_courses_count: number;
+    /** Count of unique top-100 courses played, per list slug. */
+    top100_lists: {
+      global: number;
+      usa: number;
+      europe: number;
+      'gb-i': number;
+    };
+    /** Total courses in each list (so we don't hardcode 100 on the frontend). */
+    top100_list_sizes: {
+      global: number;
+      usa: number;
+      europe: number;
+      'gb-i': number;
+    };
+    /** Preserved for back-compat — not consumed by the new catalog. */
     best_top100_global_rank: number | null;
     best_top100_country_rank: number | null;
   };
