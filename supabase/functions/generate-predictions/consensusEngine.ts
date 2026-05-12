@@ -104,7 +104,7 @@ async function callGPT4(
     },
     body: JSON.stringify({
       model: 'gpt-5-mini',
-      max_tokens: 16384,
+      max_completion_tokens: 16384,
       messages: [
         { role: 'system', content: systemPrompt },
         { role: 'user', content: userPrompt },
@@ -113,7 +113,19 @@ async function callGPT4(
     }),
   });
   const data = await res.json();
-  return { response: data.choices?.[0]?.message?.content || '', latencyMs: Date.now() - start };
+  const content = data.choices?.[0]?.message?.content || '';
+  const finishReason = data.choices?.[0]?.finish_reason;
+  const usage = data.usage;
+  if (!content || content.length < 50) {
+    console.warn('[Consensus] GPT-5 short/empty response:',
+      'finish_reason:', finishReason,
+      'content_len:', content.length,
+      'usage:', JSON.stringify(usage),
+      'http_status:', res.status,
+      'api_error:', data.error?.message,
+    );
+  }
+  return { response: content, latencyMs: Date.now() - start };
 }
 
 async function callGemini(
