@@ -279,13 +279,15 @@ export function LeadersTab() {
     return (
       <div style={{ background: '#F8FAFC' }}>
         {/* Masthead skeleton */}
-        <div style={{ background: '#0F172A', padding: 'calc(16px + env(safe-area-inset-top, 0px)) 16px 14px' }}>
-          <Skeleton className="h-3 w-48 mb-3" style={{ background: 'rgba(255,255,255,0.06)' }} />
-          <Skeleton className="h-6 w-40 mb-4" style={{ background: 'rgba(255,255,255,0.06)' }} />
-          <Skeleton className="h-24 w-full rounded-lg" style={{ background: 'rgba(255,255,255,0.06)' }} />
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', marginTop: '8px' }}>
-            {[1, 2].map(i => <Skeleton key={i} className="h-10 rounded-lg" style={{ background: 'rgba(255,255,255,0.06)' }} />)}
-          </div>
+        <div style={{ background: '#F8FAFC', padding: 'calc(16px + max(env(safe-area-inset-top, 0px), 47px)) 16px 14px' }}>
+          {/* Eyebrow line (10.5px / 700) */}
+          <Skeleton className="h-3 w-24 mb-2" style={{ background: 'rgba(15,23,42,0.06)' }} />
+          {/* h1 (18px / 800) */}
+          <Skeleton className="h-5 w-40 mb-2" style={{ background: 'rgba(15,23,42,0.06)' }} />
+          {/* Subhead (13px) */}
+          <Skeleton className="h-3 w-56 mb-3" style={{ background: 'rgba(15,23,42,0.06)' }} />
+          {/* Leader card */}
+          <Skeleton className="h-28 w-full rounded-[14px]" style={{ background: 'rgba(255,184,0,0.10)' }} />
         </div>
         {/* Sticky header skeleton */}
         <div style={{ padding: '12px 16px' }}>
@@ -525,7 +527,7 @@ export function LeadersTab() {
                   })}
                   {/* Footer */}
                   <div style={{ padding: '12px 16px', textAlign: 'center', borderTop: '0.5px solid rgba(15,23,42,0.07)' }}>
-                    <span style={{ fontSize: '9px', fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.14em', textTransform: 'uppercase' as const }}>
+                    <span style={{ fontSize: 9, fontWeight: 800, color: '#94A3B8', letterSpacing: '0.14em', textTransform: 'uppercase' as const }}>
                       SEASON LEADERS · AVAILABLE TOURNAMENT DATA
                     </span>
                   </div>
