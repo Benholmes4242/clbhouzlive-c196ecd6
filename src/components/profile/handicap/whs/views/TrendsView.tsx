@@ -1,6 +1,5 @@
 import React from 'react';
 import TrendCardsStack from '../sections/trends/TrendCardsStack';
-import RoundsThatCountCard from '../sections/RoundsThatCountCard';
 import EchoInsightsCard from '../sections/EchoInsightsCard';
 
 interface Props {
@@ -24,7 +23,6 @@ export const TrendsView: React.FC<Props> = ({
       aria-labelledby="handicap-tab-trends"
     >
       <TrendCardsStack connectionId={connectionId} currentHandicap={currentHandicap} splitAt="hero-only" />
-      <RoundsThatCountCard connectionId={connectionId} currentHandicap={currentHandicap} />
       <TrendCardsStack connectionId={connectionId} currentHandicap={currentHandicap} splitAt="rest" />
       {!readOnly && <EchoInsightsCard connectionId={connectionId} />}
     </div>

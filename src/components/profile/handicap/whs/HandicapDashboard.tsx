@@ -7,6 +7,7 @@ import TrendsView from './views/TrendsView';
 import RecordsView from './views/RecordsView';
 import FriendsView from './views/FriendsView';
 import TrophiesSheetMount from './sections/TrophiesSheetMount';
+import WhsConnectionCaption from './sections/WhsConnectionCaption';
 import { isHandicapSubtab, type HandicapSubtab } from './types';
 
 interface Props {
@@ -84,6 +85,10 @@ export const HandicapDashboard: React.FC<Props> = ({ connection, userId, readOnl
           />
         )}
       </div>
+
+      {!readOnly && (
+        <WhsConnectionCaption membershipNumber={connection.membership_number} />
+      )}
 
       {!readOnly && (
         <TrophiesSheetMount
