@@ -54,22 +54,22 @@ function MetricCompareRow({ label, value1, value2, format = String, lowerIsBette
   const value2Color = isLeading2 ? '#0F172A' : '#94A3B8';
 
   return (
-    <div style={{ padding: '9px 20px', borderBottom: isLast ? 'none' : '0.5px solid rgba(15,23,42,0.07)' }}>
+    <div style={{ padding: '9px 16px', borderBottom: isLast ? 'none' : '0.5px solid rgba(15,23,42,0.07)' }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '5px' }}>
         <span style={{ flex: 1, fontSize: '15px', fontWeight: value1Weight, color: value1Color, fontVariantNumeric: 'tabular-nums', textAlign: 'left' as const }}>
           {format(value1)}
         </span>
         {isTied ? (
           <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', flexShrink: 0 }}>
-            <span style={{ padding: '2px 6px', borderRadius: '4px', background: 'rgba(15,23,42,0.06)', fontSize: '9px', fontWeight: 900, color: '#0F172A', letterSpacing: '0.12em' }}>
+            <span style={{ padding: '2px 6px', borderRadius: '4px', background: 'rgba(15,23,42,0.06)', fontSize: '9px', fontWeight: 800, color: '#0F172A', letterSpacing: '0.14em' }}>
               TIED
             </span>
-            <span style={{ fontSize: '13px', fontWeight: 800, color: '#CBD5E1', letterSpacing: '0.1em', textTransform: 'uppercase' as const, whiteSpace: 'nowrap' as const }}>
+            <span style={{ fontSize: '11px', fontWeight: 800, color: '#94A3B8', letterSpacing: '0.14em', textTransform: 'uppercase' as const, whiteSpace: 'nowrap' as const }}>
               {label}
             </span>
           </span>
         ) : (
-          <span style={{ fontSize: '13px', fontWeight: 800, color: '#CBD5E1', letterSpacing: '0.1em', textTransform: 'uppercase' as const, whiteSpace: 'nowrap' as const, flexShrink: 0 }}>
+          <span style={{ fontSize: '11px', fontWeight: 800, color: '#94A3B8', letterSpacing: '0.14em', textTransform: 'uppercase' as const, whiteSpace: 'nowrap' as const, flexShrink: 0 }}>
             {label}
           </span>
         )}
