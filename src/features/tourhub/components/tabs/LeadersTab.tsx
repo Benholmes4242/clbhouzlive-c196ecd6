@@ -15,15 +15,13 @@ import { useTourSeason, useTourPlayerStatistics } from '../../hooks/useTourHubDa
 import { useWorldRankingsLeaders } from '../../hooks/useWorldRankingsLeaders';
 import { useElitePlayers } from '../../hooks/useElitePlayers';
 import { useChampionStreak } from '../../hooks/useChampionStreak';
-import { useChampionRecentForm } from '../../hooks/useChampionRecentForm';
 import { useRecentPlayerResults } from '../../hooks/useRecentPlayerResults';
 import { useDebouncedValue } from '@/hooks/useDebouncedValue';
 import { LEADER_CATEGORIES, getCategoryByKey } from '../leaders/constants';
 import { LeadersCategorySheet } from '../leaders/LeadersCategorySheet';
-import { LeadersMasthead, type MastheadPill } from '../leaders/LeadersMasthead';
+import { LeadersMasthead } from '../leaders/LeadersMasthead';
 import { PlayerCardV2 } from '../players/PlayerCardV2';
 import { LeadersEmptyState } from '../leaders/LeadersEmptyState';
-import { formatStatMargin, formatStatMarginGap } from '../../utils/formatStatMargin';
 
 interface RankedItem {
   player: {
