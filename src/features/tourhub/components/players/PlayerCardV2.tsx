@@ -137,19 +137,15 @@ export function PlayerCardV2({
     return null;
   })();
 
-  // Top-10 tier accent (list-position 0-8 below hero) takes precedence over the
-  // legacy isFirst styling. Hero already renders #1 separately, so isFirst here
-  // is effectively only for the all-tours fallback.
-  const isFirst = (worldRank === 1 && (activeSort === 'world-rank-desc' || activeTour === 'all'));
+  // Top-10 tier accent (list-position 0-8 below hero).
+  // Rank-1 is rendered by HeroChampion, never by PlayerCardV2 — no isFirst branch needed.
   const tierAccent = isTopTen;
 
   const photoSize = tierAccent ? 38 : 34;
-  const nameWeight = tierAccent ? 900 : (isFirst ? 800 : 600);
-  const nameSize = tierAccent ? 15 : 14;
+  const nameWeight = tierAccent ? 800 : 700;
+  const nameSize = 14;
   const rankSize = tierAccent ? 16 : 18;
-  const rankColor = tierAccent
-    ? '#F7931E'
-    : (isFirst ? 'rgba(247,147,30,0.25)' : 'rgba(15,23,42,0.1)');
+  const rankColor = tierAccent ? '#F7931E' : 'rgba(15,23,42,0.10)';
   const rowPaddingY = tierAccent ? 14 : 12;
 
   return (
