@@ -217,7 +217,9 @@ export function aggregateConsensus(
         ...p,
         rank: i + 1,
         consensusScore: 100 - i * 10,
-        courseFitScore: calculatedFitScores?.get(p.playerId) ?? (typeof p.courseFitScore === 'number' && p.courseFitScore > 0 ? p.courseFitScore : null),
+        courseFitScore: dnaAvailable
+          ? (calculatedFitScores?.get(p.playerId) ?? (typeof p.courseFitScore === 'number' && p.courseFitScore > 0 ? p.courseFitScore : null))
+          : null,
         modelVotes: [{ model: model.model, rank: p.rank, winProbability: p.winProbability }],
         isDarkHorse: false,
       })),
