@@ -745,7 +745,7 @@ const ReportageCard: React.FC<{
             display: 'flex',
             alignItems: 'center',
             gap: 6,
-            flexWrap: 'wrap',
+            flexWrap: 'nowrap',
             fontSize: 11,
             color: T.inkMute,
             fontWeight: 600,
