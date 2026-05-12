@@ -209,148 +209,170 @@ export function CollegeProfilePage() {
         </div>
       )}
 
-      {/* ── HERO MASTHEAD ── (eyebrow retired in Phase 1) */}
+      {/* ── HERO MASTHEAD ── canonical light pattern */}
       <div style={{
         position: 'relative',
-        background: 'linear-gradient(180deg, #0B1426 0%, #070D1A 100%)',
-        padding: 'calc(16px + env(safe-area-inset-top, 0px)) 16px 0',
-        overflow: 'hidden',
+        background: '#F8FAFC',
+        paddingTop: 'max(env(safe-area-inset-top, 0px), 47px)',
+        paddingLeft: 16,
+        paddingRight: 16,
+        paddingBottom: 16,
       }}>
-        {/* Watermark rank — 130px ghost behind content */}
-        {collegeRank && (
-          <div
-            aria-hidden
+        {/* Section header (canonical §2) */}
+        <div style={{ marginBottom: 14 }}>
+          <button
+            type="button"
+            onClick={() => navigate(collegeHubRoute())}
+            aria-label="College Profile — open College Golf"
             style={{
-              position: 'absolute',
-              right: -8,
-              top: 'calc(env(safe-area-inset-top, 0px) + 8px)',
-              fontSize: 130, fontWeight: 900, lineHeight: 1,
-              color: 'rgba(255,255,255,0.04)',
-              letterSpacing: '-8px',
-              pointerEvents: 'none',
-              userSelect: 'none' as const,
+              background: 'transparent',
+              border: 'none',
+              padding: 0,
+              cursor: 'pointer',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 6,
+              marginBottom: 6,
             }}
           >
-            {collegeRank}
-          </div>
-        )}
+            <GraduationCap size={13} strokeWidth={2.5} style={{ color: '#F7931E' }} />
+            <span style={{ fontSize: 10.5, fontWeight: 700, color: '#F7931E', letterSpacing: '0.14em', textTransform: 'uppercase' as const }}>
+              COLLEGE PROFILE
+            </span>
+            <ChevronRight size={11} strokeWidth={2.5} style={{ color: '#F7931E' }} />
+          </button>
 
-        {/* Masthead double-rule band */}
-        <div style={{ borderTop: '2px solid rgba(255,255,255,0.15)', borderBottom: '0.5px solid rgba(255,255,255,0.08)', padding: '10px 0', marginBottom: 14, position: 'relative' }}>
-          <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 10 }}>
-            <h1 style={{ fontSize: 26, fontWeight: 800, color: '#ffffff', letterSpacing: '-0.8px', lineHeight: 1, margin: 0, flex: 1 }}>
-              {displayName}
-            </h1>
-            {collegeRank && (
-              <div style={{ display: 'flex', alignItems: 'center', gap: 4, padding: '4px 8px', borderRadius: 6, background: 'rgba(247,147,30,0.12)', border: '1px solid rgba(247,147,30,0.27)', flexShrink: 0 }}>
-                <span style={{ fontSize: 10, fontWeight: 900, color: '#F7931E', letterSpacing: '0.1em' }}>#{collegeRank}</span>
-                <span style={{ fontSize: 9, color: 'rgba(255,255,255,0.3)' }}>EARNINGS</span>
-              </div>
-            )}
-          </div>
+          <h1 style={{ fontSize: 18, fontWeight: 800, letterSpacing: '-0.015em', lineHeight: 1.2, color: '#0F172A', margin: 0 }}>
+            {displayName}
+          </h1>
 
-          {/* Subtitle — cross-tour roll-up */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 6 }}>
-            {subtitleText && (
-              <span style={{ fontSize: 11, fontWeight: 500, color: 'rgba(255,255,255,0.4)', letterSpacing: 0 }}>
-                {subtitleText}
-              </span>
-            )}
-            <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.15)' }}>·</span>
-            <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.6)', fontWeight: 800 }}>Season {seasonYear}</span>
+          <div style={{ fontSize: 13, fontWeight: 500, color: '#64748B', marginTop: 4 }}>
+            {[subtitleText, `Season ${seasonYear}`].filter(Boolean).join(' · ')}
           </div>
         </div>
 
-        {/* Cover story — ghost rank + earnings + logo */}
-        {stats && (
-          <div style={{ display: 'flex', alignItems: 'flex-end', gap: 14, marginBottom: 0, position: 'relative' }}>
-            <div style={{ flex: 1, paddingBottom: 14 }}>
-              {/* Primary-stat eyebrow with rank + tour scope */}
-              <div style={{ fontSize: 11, fontWeight: 800, color: '#F7931E', letterSpacing: '1.4px', textTransform: 'uppercase' as const, marginBottom: 6 }}>
-                {collegeRank ? `#${collegeRank} EARNINGS · COLLEGE` : 'SEASON EARNINGS'}
-              </div>
-              <div style={{ fontSize: 30, fontWeight: 900, color: '#F7931E', letterSpacing: '-1px', lineHeight: 1, fontVariantNumeric: 'tabular-nums' }}>
-                {formatCurrency(stats.earnings_total)}
-              </div>
-              {/* Captain context line (when dominant) */}
-              {captainContextLine && (
-                <div style={{ fontSize: 12, fontWeight: 600, color: 'rgba(255,255,255,0.55)', marginTop: 8, letterSpacing: 0 }}>
-                  {captainShortName(captain!.fullName)} · {captainContextLine}
-                </div>
-              )}
-              {!captainContextLine && (
-                <div style={{ display: 'flex', gap: 12, marginTop: 8 }}>
-                  {stats.wins_total > 0 && (
-                    <span style={{ fontSize: 11, fontWeight: 500, color: 'rgba(255,255,255,0.4)' }}>
-                      {stats.wins_total} {stats.wins_total === 1 ? 'win' : 'wins'}
-                    </span>
+        {/* Champion content (no card chrome — Q1 = b) */}
+        {stats && !isLoading && (
+          <div>
+            {/* Caption row */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 10, flexWrap: 'wrap' }}>
+              <Crown size={13} strokeWidth={2.5} fill="#FFB800" style={{ color: '#D97706' }} />
+              {captionMetadata.map((part, i) => (
+                <Fragment key={i}>
+                  {i > 0 && (
+                    <span style={{ fontSize: 10, color: '#CBD5E1' }}>·</span>
                   )}
-                  {stats.top10_total > 0 && (
-                    <span style={{ fontSize: 11, fontWeight: 500, color: 'rgba(255,255,255,0.4)' }}>
-                      {stats.top10_total} top 10s
-                    </span>
-                  )}
-                </div>
-              )}
+                  <span style={{
+                    fontSize: 10,
+                    fontWeight: 800,
+                    letterSpacing: '0.14em',
+                    textTransform: 'uppercase' as const,
+                    color: i === 0 ? '#0F172A' : '#64748B',
+                  }}>
+                    {part}
+                  </span>
+                </Fragment>
+              ))}
             </div>
 
-            {/* College logo chip — bottom-anchored */}
-            <div style={{ flexShrink: 0, paddingBottom: 14 }}>
-              <div style={{ width: 72, height: 72, borderRadius: '14px 14px 0 0', overflow: 'hidden', background: 'rgba(255,255,255,0.07)', border: '1.5px solid rgba(255,255,255,0.12)', borderBottom: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                {logoUrl && !heroImgError ? (
-                  <img
-                    src={logoUrl}
-                    alt={displayName}
-                    style={{ width: 52, height: 52, objectFit: 'contain' }}
-                    onError={() => setHeroImgError(true)}
-                  />
-                ) : (
-                  <span style={{ fontSize: 28, fontWeight: 900, color: 'rgba(255,255,255,0.18)' }}>
-                    {displayName?.charAt(0)?.toUpperCase() ?? '?'}
-                  </span>
+            {/* Body row diverges from Player Profile pattern: no middle name block.
+                The h1 already carries the college name; duplicating it inside the card
+                would be redundant ("the champion of... themselves?"). */}
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 14 }}>
+              {/* Logo tile + position badge */}
+              <div style={{ position: 'relative', flexShrink: 0 }}>
+                <div style={{
+                  width: 80,
+                  height: 80,
+                  borderRadius: '27px',
+                  background: '#FFFFFF',
+                  padding: 10,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  border: '2.5px solid #FFB800',
+                  boxShadow: '0 4px 12px rgba(255,184,0,0.20)',
+                  overflow: 'hidden',
+                }}>
+                  {logoUrl && !heroImgError ? (
+                    <img
+                      src={logoUrl}
+                      alt={displayName}
+                      style={{ width: '100%', height: '100%', objectFit: 'contain' }}
+                      onError={() => setHeroImgError(true)}
+                    />
+                  ) : (
+                    <span style={{ fontSize: 28, fontWeight: 900, color: '#0F172A' }}>
+                      {displayName?.charAt(0)?.toUpperCase() ?? '?'}
+                    </span>
+                  )}
+                </div>
+
+                {/* Position badge — gated to collegeRank ≤ 99 */}
+                {collegeRank && collegeRank <= 99 && (
+                  <div style={{
+                    position: 'absolute',
+                    bottom: -2,
+                    right: -2,
+                    width: 24,
+                    height: 24,
+                    borderRadius: '50%',
+                    background: '#FFB800',
+                    border: '2.5px solid #FFFFFF',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontSize: 11,
+                    fontWeight: 900,
+                    color: '#0F172A',
+                    fontVariantNumeric: 'tabular-nums',
+                  }}>
+                    {collegeRank}
+                  </div>
                 )}
               </div>
+
+              {/* Stat right (no name — name is the h1; Q1 = b) */}
+              <div style={{ textAlign: 'right' as const }}>
+                <div style={{
+                  fontSize: 22,
+                  fontWeight: 800,
+                  letterSpacing: '-0.025em',
+                  lineHeight: 1,
+                  color: '#0F172A',
+                  fontVariantNumeric: 'tabular-nums',
+                }}>
+                  {primaryInteger}
+                  {primaryDecimal && <span style={{ color: '#F7931E' }}>{primaryDecimal}</span>}
+                  {primarySuffix}
+                </div>
+                <div style={{
+                  fontSize: 9,
+                  fontWeight: 800,
+                  color: '#64748B',
+                  letterSpacing: '0.16em',
+                  textTransform: 'uppercase' as const,
+                  marginTop: 5,
+                }}>
+                  EARNINGS
+                </div>
+              </div>
             </div>
           </div>
         )}
 
-        {/* Narrative pills row */}
-        {heroPills.length > 0 && (
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, padding: '0 0 12px', position: 'relative' }}>
-            {heroPills.map((p, i) => (
-              <PillView key={`${p.label ?? ''}-${p.value}-${i}`} pill={p} />
-            ))}
-          </div>
-        )}
-
-        {/* 4-col stat grid */}
-        {stats && (
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', borderTop: '0.5px solid rgba(255,255,255,0.08)' }}>
-            {([
-              { label: 'EARNINGS', value: formatCurrency(stats.earnings_total), accent: true },
-              { label: 'WINS', value: String(stats.wins_total), accent: false },
-              { label: 'TOP 10s', value: String(stats.top10_total), accent: false },
-              { label: 'ALUMNI', value: String(stats.player_count), accent: false },
-            ] as const).map((s, i) => (
-              <div key={s.label} style={{ padding: '9px 0 11px', textAlign: 'center' as const, borderRight: i < 3 ? '0.5px solid rgba(255,255,255,0.06)' : 'none' }}>
-                <div style={{ fontSize: 9.5, fontWeight: 900, color: 'rgba(255,255,255,0.25)', letterSpacing: '0.12em', marginBottom: 3 }}>
-                  {s.label}
-                </div>
-                <div style={{ fontSize: 14, fontWeight: 900, color: s.accent ? '#F7931E' : '#ffffff', letterSpacing: '-0.02em', fontVariantNumeric: 'tabular-nums' }}>
-                  {s.value}
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
-
-        {/* Loading skeleton */}
+        {/* Loading skeleton — light surface */}
         {isLoading && (
-          <div className="animate-pulse" style={{ paddingBottom: 16 }}>
-            <div style={{ height: 22, width: '60%', borderRadius: 4, background: 'rgba(255,255,255,0.08)', marginBottom: 10 }} />
-            <div style={{ height: 34, width: '40%', borderRadius: 4, background: 'rgba(255,255,255,0.05)', marginBottom: 10 }} />
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', borderTop: '0.5px solid rgba(255,255,255,0.08)', paddingTop: 12 }}>
-              {[1, 2, 3, 4].map(i => <div key={i} style={{ height: 32, background: 'rgba(255,255,255,0.04)', margin: '0 4px' }} />)}
+          <div>
+            <Skeleton style={{ height: 12, width: 120, marginBottom: 8, background: 'rgba(15,23,42,0.06)' }} />
+            <Skeleton style={{ height: 22, width: '50%', marginBottom: 6, background: 'rgba(15,23,42,0.06)' }} />
+            <Skeleton style={{ height: 14, width: '70%', marginBottom: 16, background: 'rgba(15,23,42,0.06)' }} />
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 14 }}>
+              <Skeleton style={{ width: 80, height: 80, borderRadius: 27, background: 'rgba(255,184,0,0.10)' }} />
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 6 }}>
+                <Skeleton style={{ height: 22, width: 90, background: 'rgba(15,23,42,0.06)' }} />
+                <Skeleton style={{ height: 10, width: 60, background: 'rgba(15,23,42,0.06)' }} />
+              </div>
             </div>
           </div>
         )}
