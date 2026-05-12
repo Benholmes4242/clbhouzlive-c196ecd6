@@ -3,26 +3,8 @@ import { ChevronRight } from 'lucide-react';
 import AllTrophiesSheet from './AllTrophiesSheet';
 import { format } from 'date-fns';
 import {
-  Trophy,
-  Flame,
-  TrendingDown,
-  Award,
-  Map as MapIcon,
-  Calendar,
-  Star,
-  Crown,
-  Flag,
-  Link2,
-  Target,
-  MapPin,
-  BarChart3,
-  CheckCircle2,
-  Activity,
-  Zap,
-  Users,
-  UserCheck,
-  Swords,
-  Plane,
+  Trophy, Crown, Flag, Link2, Target, MapPin, Globe, Hash,
+  CheckCircle2, Plane, Users, Lock,
 } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { useAllScores, useHandicapHistory, useTrophyAggregates } from '@/lib/whs/hooks';
@@ -38,26 +20,8 @@ interface Props {
 }
 
 const ICONS: Record<string, React.ComponentType<any>> = {
-  Trophy,
-  Flame,
-  TrendingDown,
-  Award,
-  Map: MapIcon,
-  Calendar,
-  Star,
-  Flag,
-  Link2,
-  Target,
-  MapPin,
-  BarChart3,
-  CheckCircle2,
-  Activity,
-  Zap,
-  Users,
-  UserCheck,
-  Swords,
-  Plane,
-  Crown,
+  Trophy, Crown, Flag, Link2, Target, MapPin, Globe, Hash,
+  CheckCircle2, Plane, Users,
 };
 
 const TROPHY_TILE_WIDTH = 130;
@@ -72,82 +36,67 @@ const AMBER = '#F7931E';
 const AMBER_14 = 'rgba(247,147,30,0.14)';
 const FONT_GEIST = 'Geist, system-ui, -apple-system, BlinkMacSystemFont, sans-serif';
 
+// Category accent palette (mirrors AllTrophiesSheet)
+const CAT_ACCENT: Record<string, { accent: string; tint: string }> = {
+  handicap:  { accent: '#059669', tint: 'rgba(5,150,105,0.10)' },
+  scoring:   { accent: AMBER,     tint: AMBER_14 },
+  courses:   { accent: '#0EA5E9', tint: 'rgba(14,165,233,0.10)' },
+  community: { accent: '#7C3AED', tint: 'rgba(124,58,237,0.10)' },
+};
+
 const TrophyTile: React.FC<{ a: Achievement }> = ({ a }) => {
-  const Icon = ICONS[a.icon_name] ?? Star;
-  const isHighlight = a.highlight && a.earned;
-  const isLocked = !a.earned;
-  const isTiered = a.tier != null && a.totalTiers != null && a.totalTiers > 1;
+  const Icon = ICONS[a.icon_name] ?? Trophy;
+  const cat = CAT_ACCENT[a.category] ?? CAT_ACCENT.handicap;
+  const isCounter = a.kind === 'counter';
+  const isList = a.kind === 'list';
+  const isBinary = a.kind === 'binary';
+  const isEarned = a.earned === true;
+  const isLocked = isBinary && !isEarned;
+  const listComplete = isList && (a.list_played ?? 0) >= (a.list_total ?? 100);
 
   return (
     <div
       style={{
         flex: `0 0 ${TROPHY_TILE_WIDTH}px`,
         position: 'relative',
-        padding: '14px 12px',
+        padding: '12px 12px',
         borderRadius: 12,
         background: isLocked ? 'rgba(15,23,42,0.025)' : '#fff',
         border: isLocked
           ? `1px dashed rgba(15,23,42,0.18)`
           : `0.5px solid ${INK_10}`,
         scrollSnapAlign: 'start',
-        opacity: isLocked ? 0.85 : 1,
+        display: 'flex',
+        flexDirection: 'column',
+        gap: 8,
+        fontFamily: FONT_GEIST,
       }}
     >
-      {isHighlight && (
-        <div
-          style={{
-            position: 'absolute',
-            top: 8,
-            right: 8,
-            background: AMBER_14,
-            borderRadius: 999,
-            padding: '3px 8px',
-            fontSize: 8.5,
-            fontWeight: 800,
-            color: AMBER,
-            letterSpacing: '0.14em',
-            fontFamily: FONT_GEIST,
-          }}
-        >
-          MAX TIER
-        </div>
-      )}
-
-      {!isHighlight && isTiered && a.earned && (
-        <div
-          style={{
-            position: 'absolute',
-            top: 8,
-            right: 8,
-            fontSize: 8,
-            fontWeight: 800,
-            color: INK_55,
-            background: INK_06,
-            padding: '2px 6px',
-            borderRadius: 4,
-            letterSpacing: '0.06em',
-          }}
-        >
-          TIER {a.tier} / {a.totalTiers}
-        </div>
-      )}
-
-      <Icon
-        size={20}
-        color={isHighlight ? AMBER : isLocked ? '#94A3B8' : '#64748B'}
-        strokeWidth={2}
-        style={{ opacity: isLocked ? 0.55 : 1 }}
-      />
+      <div
+        style={{
+          width: 32,
+          height: 32,
+          borderRadius: 8,
+          background: isLocked ? INK_06 : cat.tint,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}
+      >
+        <Icon
+          size={16}
+          color={isLocked ? 'rgba(15,23,42,0.40)' : cat.accent}
+          strokeWidth={2.2}
+        />
+      </div>
 
       <div
         style={{
           fontSize: 13,
           fontWeight: 800,
-          color: isLocked ? 'rgba(15,23,42,0.55)' : '#0F172A',
+          color: isLocked ? INK_55 : INK,
           letterSpacing: '-0.01em',
           lineHeight: 1.2,
-          marginTop: 10,
-          marginBottom: 3,
           display: '-webkit-box',
           WebkitLineClamp: 2,
           WebkitBoxOrient: 'vertical',
@@ -157,80 +106,90 @@ const TrophyTile: React.FC<{ a: Achievement }> = ({ a }) => {
         {a.title}
       </div>
 
-      <div
-        style={{
-          fontSize: 11,
-          fontWeight: 500,
-          color: isLocked ? 'rgba(15,23,42,0.40)' : '#64748B',
-          lineHeight: 1.3,
-          marginBottom: 8,
-          display: '-webkit-box',
-          WebkitLineClamp: 2,
-          WebkitBoxOrient: 'vertical',
-          overflow: 'hidden',
-        }}
-      >
-        {a.subtitle}
-      </div>
-
-      {isTiered && !isLocked && a.progress != null && (
-        <>
-          <div
-            style={{
-              height: 3,
-              borderRadius: 999,
-              background: INK_06,
-              overflow: 'hidden',
-              marginBottom: 6,
-            }}
-          >
-            <div
-              style={{
-                height: '100%',
-                width: `${Math.round(a.progress * 100)}%`,
-                background: isHighlight ? AMBER : INK_70,
-                borderRadius: 999,
-              }}
-            />
-          </div>
-          {a.progressLabel && (
-            <div
-              style={{
-                fontSize: 10,
-                fontWeight: 600,
-                color: '#64748B',
-                fontVariantNumeric: 'tabular-nums',
-              }}
-            >
-              {a.progressLabel}
-            </div>
-          )}
-        </>
-      )}
-
-      {isLocked && a.progressLabel && (
-        <div
-          style={{
-            fontSize: 10,
-            fontWeight: 600,
-            color: 'rgba(15,23,42,0.45)',
+      {/* Render path by kind */}
+      {isCounter && (
+        <div style={{ marginTop: 'auto' }}>
+          <div style={{
+            fontSize: 20,
+            fontWeight: 800,
+            color: INK,
+            lineHeight: 1,
             fontVariantNumeric: 'tabular-nums',
-          }}
-        >
-          {a.progressLabel}
+            letterSpacing: '-0.03em',
+          }}>{(a.count ?? 0).toLocaleString()}</div>
+          {a.count_label && (
+            <div style={{
+              fontSize: 9,
+              fontWeight: 800,
+              color: INK_55,
+              letterSpacing: '0.10em',
+              textTransform: 'uppercase',
+              marginTop: 3,
+            }}>{a.count_label}</div>
+          )}
         </div>
       )}
 
-      {a.earned && !isTiered && a.achieved_at && (
-        <div
-          style={{
-            fontSize: 10,
-            fontWeight: 600,
-            color: '#94A3B8',
-            letterSpacing: '0.02em',
-          }}
-        >
-          {format(new Date(a.achieved_at), 'd MMM yyyy').toUpperCase()}
+      {isList && !listComplete && (
+        <div style={{ marginTop: 'auto' }}>
+          <div style={{
+            height: 3, background: INK_06, borderRadius: 999, overflow: 'hidden', marginBottom: 5,
+          }}>
+            <div style={{
+              width: `${Math.min(100, ((a.list_played ?? 0) / (a.list_total ?? 100)) * 100)}%`,
+              height: '100%',
+              background: cat.accent,
+              borderRadius: 999,
+            }} />
+          </div>
+          <div style={{
+            fontSize: 10, fontWeight: 700, color: INK_55,
+            fontVariantNumeric: 'tabular-nums',
+          }}>
+            {a.list_played ?? 0} / {a.list_total ?? 100}
+          </div>
+        </div>
+      )}
+
+      {isList && listComplete && (
+        <div style={{ marginTop: 'auto', display: 'flex', alignItems: 'baseline', gap: 4 }}>
+          <span style={{
+            fontSize: 18, fontWeight: 800, color: INK,
+            fontVariantNumeric: 'tabular-nums', letterSpacing: '-0.03em',
+          }}>{a.list_total ?? 100}</span>
+          <span style={{ fontSize: 14 }}>🏆</span>
+        </div>
+      )}
+
+      {isBinary && isEarned && a.achieved_at && (
+        <div style={{ marginTop: 'auto', display: 'flex', alignItems: 'center', gap: 4 }}>
+          <span style={{
+            fontSize: 10, fontWeight: 700, color: '#94A3B8',
+            letterSpacing: '0.04em',
+          }}>{format(new Date(a.achieved_at), 'd MMM yyyy').toUpperCase()}</span>
+          <span style={{ fontSize: 12, marginLeft: 'auto' }}>🏆</span>
+        </div>
+      )}
+
+      {isLocked && (
+        <div style={{
+          marginTop: 'auto',
+          display: 'flex',
+          alignItems: 'flex-start',
+          gap: 4,
+          fontSize: 10,
+          fontWeight: 500,
+          color: 'rgba(15,23,42,0.55)',
+          lineHeight: 1.3,
+        }}>
+          <Lock size={10} color="rgba(15,23,42,0.40)" strokeWidth={2.2}
+            style={{ flexShrink: 0, marginTop: 1 }} />
+          <span style={{
+            display: '-webkit-box',
+            WebkitLineClamp: 2,
+            WebkitBoxOrient: 'vertical',
+            overflow: 'hidden',
+          }}>{a.description}</span>
         </div>
       )}
     </div>
@@ -363,7 +322,11 @@ export const AchievementsStrip: React.FC<Props> = ({
   }, [scores, history, connectionCreatedAt, primaryClub, aggregates]);
 
   const earnedAchievements = useMemo(
-    () => allAchievements.filter((a) => a.earned),
+    () => allAchievements.filter((a) =>
+      (a.kind === 'binary' && a.earned === true) ||
+      (a.kind === 'list' && (a.list_played ?? 0) >= (a.list_total ?? 100)) ||
+      a.kind === 'counter'
+    ),
     [allAchievements],
   );
 
@@ -377,7 +340,13 @@ export const AchievementsStrip: React.FC<Props> = ({
     [earnedAchievements, nextUpTrophies],
   );
 
-  const earnedCount = earnedAchievements.length;
+  const earnedCount = useMemo(
+    () => allAchievements.filter((a) =>
+      (a.kind === 'binary' && a.earned === true) ||
+      (a.kind === 'list' && (a.list_played ?? 0) >= (a.list_total ?? 100))
+    ).length,
+    [allAchievements],
+  );
   const isLoading = sLoading || hLoading;
   const [showAll, setShowAll] = useState(false);
 
