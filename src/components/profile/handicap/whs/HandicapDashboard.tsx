@@ -1,9 +1,6 @@
 import React, { useState } from 'react';
-import { useQueryClient } from '@tanstack/react-query';
 import { useSearchParams } from 'react-router-dom';
-import { toast } from 'sonner';
-import { callSyncWhsOne } from '@/lib/whs/api';
-import { useHandicapTrend, whsKeys } from '@/lib/whs/hooks';
+import { useHandicapTrend } from '@/lib/whs/hooks';
 import type { WhsConnection } from '@/lib/whs/types';
 import TodayView from './views/TodayView';
 import TrendsView from './views/TrendsView';
@@ -26,14 +23,12 @@ interface Props {
 const DEFAULT_SUBTAB: HandicapSubtab = 'today';
 
 export const HandicapDashboard: React.FC<Props> = ({ connection, userId, readOnly = false }) => {
-  const queryClient = useQueryClient();
   const [searchParams] = useSearchParams();
-  const [isSyncing, setIsSyncing] = useState(false);
   const lastSyncedAtForInit = connection.last_synced_at ? new Date(connection.last_synced_at) : null;
   const isOldEnoughForReauth =
     !lastSyncedAtForInit ||
     Date.now() - lastSyncedAtForInit.getTime() > 48 * 3600_000;
-  const [reauthRequired, setReauthRequired] = useState(
+  const [reauthRequired] = useState(
     connection.last_sync_status === 'auth_failed' && isOldEnoughForReauth
   );
 
@@ -47,52 +42,7 @@ export const HandicapDashboard: React.FC<Props> = ({ connection, userId, readOnl
   const { data: trend } = useHandicapTrend(connection.id);
   const currentHandicap = trend?.current ?? null;
 
-  // ── Sync handler ────────────────────────────────────────────────────────
-  const handleSyncNow = async () => {
-    if (isSyncing) return;
-    setIsSyncing(true);
-    try {
-      const data = await callSyncWhsOne();
-      if (!data.ok) {
-        if (data.error === 'credentials_invalid') {
-          setReauthRequired(true);
-          toast.error('Your England Golf password changed. Please disconnect and reconnect.');
-          return;
-        }
-        toast.error(data.message ?? "Couldn't sync right now. Try again later.");
-        return;
-      }
-      queryClient.invalidateQueries({ queryKey: whsKeys.connection(userId) });
-      queryClient.invalidateQueries({ queryKey: whsKeys.trend(connection.id) });
-      queryClient.invalidateQueries({ queryKey: whsKeys.lastRound(connection.id) });
-      queryClient.invalidateQueries({ queryKey: ['whs-round-detail'] });
-      queryClient.invalidateQueries({ queryKey: whsKeys.counters(connection.id) });
-      queryClient.invalidateQueries({ queryKey: whsKeys.allScores(connection.id) });
-      queryClient.invalidateQueries({ queryKey: whsKeys.friendLeaderboard(userId) });
-      queryClient.invalidateQueries({ queryKey: whsKeys.friendWindowRankings(userId) });
-      queryClient.invalidateQueries({ queryKey: whsKeys.friendsActivity(userId) });
-      queryClient.invalidateQueries({ queryKey: whsKeys.friendCourseBests(userId) });
-      if (data.handicap_changed && typeof data.handicap_index === 'number') {
-        toast.success(`Handicap updated to ${data.handicap_index.toFixed(1)}!`);
-      } else {
-        toast.success('Refreshed — no changes');
-      }
-    } catch {
-      toast.error("Couldn't reach clbhouz. Check your connection.");
-    } finally {
-      setIsSyncing(false);
-    }
-  };
-
-  // ── Sync state ──────────────────────────────────────────────────────────
-  const lastSyncedAt = connection.last_synced_at ? new Date(connection.last_synced_at) : null;
-  const hoursSinceSync = lastSyncedAt
-    ? (Date.now() - lastSyncedAt.getTime()) / 3600_000
-    : Infinity;
-
-  // Banner priority: re-auth (only after 48h) > stale (after 24h) > nothing
   const showReauthBanner = !readOnly && reauthRequired;
-  const showStaleBanner = !readOnly && !showReauthBanner && hoursSinceSync > 24;
 
   return (
     <div className="pb-10">
@@ -107,10 +57,6 @@ export const HandicapDashboard: React.FC<Props> = ({ connection, userId, readOnl
             connectionCreatedAt={connection.created_at}
             readOnly={readOnly}
             showReauthBanner={showReauthBanner}
-            showStaleBanner={showStaleBanner}
-            lastSyncedAt={lastSyncedAt}
-            isSyncing={isSyncing}
-            onSyncNow={handleSyncNow}
           />
         )}
         {activeSubtab === 'trends' && (
