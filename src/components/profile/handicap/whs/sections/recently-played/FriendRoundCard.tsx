@@ -696,12 +696,12 @@ const ReportageCard: React.FC<{
             style={{
               fontSize: 8.5,
               fontWeight: 800,
-              color: T.slate,
-              letterSpacing: '0.16em',
+              color: '#F7931E',
+              letterSpacing: '0.18em',
               textTransform: 'uppercase',
             }}
           >
-            · Reported · England Golf
+            England Golf
           </span>
         </div>
 
