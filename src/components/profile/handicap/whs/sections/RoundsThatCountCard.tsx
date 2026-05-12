@@ -434,7 +434,7 @@ export const RoundsThatCountCard: React.FC<Props> = ({ connectionId, currentHand
                   borderStyle = `2.5px solid ${RED}`;
                 } else if (isLatest) {
                   dotSize = 12;
-                  background = r.is_counter ? AMBER : '#fff';
+                  background = '#fff';
                   borderStyle = `2.5px solid ${INK}`;
                 } else if (r.is_counter) {
                   dotSize = 9;
@@ -472,28 +472,7 @@ export const RoundsThatCountCard: React.FC<Props> = ({ connectionId, currentHand
                 );
               })}
 
-              {/* Pulsing halo behind the latest dot */}
-              {(() => {
-                const last = enriched.rounds[enriched.rounds.length - 1];
-                if (!last) return null;
-                return (
-                  <div
-                    aria-hidden
-                    className="latestHalo"
-                    style={{
-                      position: 'absolute',
-                      left: `${xFor(enriched.rounds.length - 1)}%`,
-                      top: yFor(last.handicap_differential ?? 0),
-                      width: 28, height: 28,
-                      marginLeft: -14, marginTop: -14,
-                      borderRadius: '50%',
-                      background: 'rgba(247,147,30,0.20)',
-                      pointerEvents: 'none',
-                      zIndex: 1,
-                    }}
-                  />
-                );
-              })()}
+              {/* Pulsing halo behind the latest dot — removed to match best/worst ring weight */}
 
               {/* Scrub tooltip */}
               {scrubIdx !== null && (() => {
