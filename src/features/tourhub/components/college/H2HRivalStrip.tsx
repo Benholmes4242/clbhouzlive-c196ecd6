@@ -133,13 +133,12 @@ export function H2HRivalStrip({ normalizedName, className }: H2HRivalStripProps)
 function SectionHeader() {
   return (
     <div style={{ padding: SECTION_PADDING }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 6 }}>
-        <div style={{ width: 3, height: 12, background: '#F7931E', borderRadius: 1, flexShrink: 0 }} />
-        <span style={{ fontSize: 11, fontWeight: 800, color: '#F7931E', letterSpacing: '1.4px', textTransform: 'uppercase' as const }}>
+      <div style={{ display: 'flex', alignItems: 'center', marginBottom: 6 }}>
+        <span style={{ fontSize: 9, fontWeight: 800, color: '#64748B', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>
           Head-to-Head
         </span>
       </div>
-      <div style={{ fontSize: 12, fontWeight: 500, color: '#64748B', marginBottom: 10, paddingLeft: 13 }}>
+      <div style={{ fontSize: 13, fontWeight: 500, color: '#64748B', marginBottom: 10 }}>
         Compare with another program
       </div>
     </div>
