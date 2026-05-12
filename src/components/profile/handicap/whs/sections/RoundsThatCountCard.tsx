@@ -876,31 +876,33 @@ const SafeState: React.FC<{ cutTarget: number; settleAt: number }> = ({
       border: `0.5px solid rgba(5,150,105,0.18)`,
       borderLeft: `3px solid ${GREEN}`,
       borderRadius: 10,
-      padding: '10px 11px',
+      padding: '8px 11px',
+      display: 'flex', alignItems: 'center', gap: 10,
     }}>
-      <div style={{
-        display: 'flex', alignItems: 'center', gap: 5, marginBottom: 4,
-      }}>
-        <TrendingDown size={11} strokeWidth={2.4} color={GREEN} />
-        <span style={{
-          fontSize: 9.5, fontWeight: 800, color: GREEN,
-          letterSpacing: '0.12em',
-        }}>FOR A CUT</span>
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <div style={{
+          display: 'flex', alignItems: 'center', gap: 5, marginBottom: 2,
+        }}>
+          <TrendingDown size={11} strokeWidth={2.4} color={GREEN} />
+          <span style={{
+            fontSize: 9.5, fontWeight: 800, color: GREEN,
+            letterSpacing: '0.12em',
+          }}>FOR A CUT</span>
+        </div>
+        <p style={{
+          margin: 0, fontSize: 10.5, color: INK_55, lineHeight: 1.35,
+        }}>
+          Beat this and your handicap drops.
+        </p>
       </div>
       <div style={{
-        fontSize: 22, fontWeight: 700, color: GREEN,
+        fontSize: 16, fontWeight: 700, color: GREEN,
         fontVariantNumeric: 'tabular-nums',
         letterSpacing: '-0.02em', lineHeight: 1,
-        fontFamily: FONT_GEIST,
+        fontFamily: FONT_GEIST, flexShrink: 0,
       }}>
         {fmtDiff(cutTarget)}
       </div>
-      <p style={{
-        margin: '6px 0 0', fontSize: 11, color: INK_55,
-        lineHeight: 1.4,
-      }}>
-        Beat this and your handicap drops.
-      </p>
     </div>
     {/* OTHERWISE */}
     <div style={{
@@ -908,31 +910,33 @@ const SafeState: React.FC<{ cutTarget: number; settleAt: number }> = ({
       border: `0.5px solid ${INK_10}`,
       borderLeft: `3px solid ${INK_10}`,
       borderRadius: 10,
-      padding: '10px 11px',
+      padding: '8px 11px',
+      display: 'flex', alignItems: 'center', gap: 10,
     }}>
-      <div style={{
-        display: 'flex', alignItems: 'center', gap: 5, marginBottom: 4,
-      }}>
-        <Minus size={11} strokeWidth={2.4} color={INK_55} />
-        <span style={{
-          fontSize: 9.5, fontWeight: 800, color: INK_55,
-          letterSpacing: '0.12em',
-        }}>OTHERWISE</span>
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <div style={{
+          display: 'flex', alignItems: 'center', gap: 5, marginBottom: 2,
+        }}>
+          <Minus size={11} strokeWidth={2.4} color={INK_55} />
+          <span style={{
+            fontSize: 9.5, fontWeight: 800, color: INK_55,
+            letterSpacing: '0.12em',
+          }}>OTHERWISE</span>
+        </div>
+        <p style={{
+          margin: 0, fontSize: 10.5, color: INK_55, lineHeight: 1.35,
+        }}>
+          Settles here · no risk of going up.
+        </p>
       </div>
       <div style={{
-        fontSize: 22, fontWeight: 700, color: INK,
+        fontSize: 16, fontWeight: 700, color: INK,
         fontVariantNumeric: 'tabular-nums',
         letterSpacing: '-0.02em', lineHeight: 1,
-        fontFamily: FONT_GEIST,
+        fontFamily: FONT_GEIST, flexShrink: 0,
       }}>
         {fmtDiff(settleAt)}
       </div>
-      <p style={{
-        margin: '6px 0 0', fontSize: 11, color: INK_55,
-        lineHeight: 1.4,
-      }}>
-        Settles here · no risk of going up.
-      </p>
     </div>
   </div>
 );
