@@ -418,7 +418,7 @@ const HeroHandicapCard: React.FC<Props> = ({ connection }) => {
 
   // ── Combined delta inline ────────────────────────────────────────────────
   const deltaInline = (() => {
-    const d = trend?.delta;
+    const d = rangeDelta;
     if (d == null || Math.abs(d) < 0.05) {
       return <span style={{ color: INK_55, fontWeight: 600 }}>Steady</span>;
     }
@@ -436,12 +436,12 @@ const HeroHandicapCard: React.FC<Props> = ({ connection }) => {
 
   // ── Delta sub text + direction (for centre ring label-stack) ─────────────
   const deltaTodayDir: 'up' | 'down' | 'flat' = (() => {
-    const d = trend?.delta;
+    const d = rangeDelta;
     if (d == null || Math.abs(d) < 0.05) return 'flat';
     return d < 0 ? 'down' : 'up';
   })();
   const deltaSubText = (() => {
-    const d = trend?.delta;
+    const d = rangeDelta;
     if (d == null) return 'Awaiting data';
     if (Math.abs(d) < 0.05) return 'Steady';
     return `${d < 0 ? '↓' : '↑'} ${Math.abs(d).toFixed(1)}`;
