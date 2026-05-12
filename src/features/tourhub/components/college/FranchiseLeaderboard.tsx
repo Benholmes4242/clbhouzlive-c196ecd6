@@ -1,6 +1,6 @@
 /**
  * FranchiseLeaderboard — Phase 1 polish
- *  - Shared <SectionHeader> reused (eyebrow-only mode).
+ *  - Inline §6 slate-caps sub-section eyebrow (was SectionHeader).
  *  - Captain anchors fed into each row from useFranchiseCaptains.
  *  - earningsRankChange piped from useTopMovers per-row.
  *  - Column header WIN/T10/EARNINGS labels retained.
