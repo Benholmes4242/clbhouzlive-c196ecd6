@@ -4,7 +4,7 @@ import { useCounters, useAllScores } from '@/lib/whs/hooks';
 import { fmtDiff, fmtAxis } from '@/lib/whs/format';
 import { projectNextRound } from '@/lib/whs/handicapMath';
 import HandicapExplainerSheet from './HandicapExplainerSheet';
-import SectionHeader from './SectionHeader';
+import { SectionHeader } from './_shared/atoms';
 
 const fmtDiffPlus = (n: number) => fmtDiff(n, { plus: true });
 
