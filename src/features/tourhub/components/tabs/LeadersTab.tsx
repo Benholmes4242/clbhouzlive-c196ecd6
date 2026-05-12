@@ -527,7 +527,7 @@ export function LeadersTab() {
                   })}
                   {/* Footer */}
                   <div style={{ padding: '12px 16px', textAlign: 'center', borderTop: '0.5px solid rgba(15,23,42,0.07)' }}>
-                    <span style={{ fontSize: '9px', fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.14em', textTransform: 'uppercase' as const }}>
+                    <span style={{ fontSize: 9, fontWeight: 800, color: '#94A3B8', letterSpacing: '0.14em', textTransform: 'uppercase' as const }}>
                       SEASON LEADERS · AVAILABLE TOURNAMENT DATA
                     </span>
                   </div>
