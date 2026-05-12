@@ -704,13 +704,14 @@ ${researchResults[3]?.trim() || 'No weather forecast available.'}
             error: r.error,
           })),
           courseDNA: courseDNA ? {
-            courseType: courseDNA.course_type,
-            venueName: courseDNA.venue_name,
+            courseType: courseDNA.course_type || courseDNA.courseType,
+            venueName: courseDNA.venue_name || courseDNA.venueName,
           } : null,
           enrichmentStats: {
             playersEnriched: enrichedPlayers.length,
             courseFitCalculated: courseFitScores.size,
             venueHistoryCalculated: venueHistoryScores.size,
+            dnaSource,
           },
         },
         research_context: researchContext ? { raw: researchContext, fetched_at: new Date().toISOString() } : null,
