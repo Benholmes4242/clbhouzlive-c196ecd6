@@ -15,7 +15,7 @@ import { useCollegeMediaMap } from '../../hooks/useCollegeMedia';
 import { useTopMovers } from '../../hooks/useCollegeStatus';
 import { useBatchCollegeAlumni } from '../../hooks/useBatchCollegeAlumni';
 import { useFranchiseCaptains } from '../../hooks/useFranchiseCaptains';
-import { SectionHeader } from '../shared/SectionHeader';
+
 import { FranchiseCard } from './FranchiseCard';
 import { FranchiseMovers } from './FranchiseMovers';
 
