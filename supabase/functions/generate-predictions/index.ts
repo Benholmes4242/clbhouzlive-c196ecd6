@@ -145,7 +145,7 @@ serve(async (req) => {
         .eq('tournament_id', tournament.id)
         .single();
 
-      if (existing && !isPredictionStale(existing)) {
+      if (existing && !(await isPredictionStale(existing, supabase, tournament.venue_name))) {
         console.log(`[generate-predictions] Using cached predictions`);
         return new Response(
           JSON.stringify({
