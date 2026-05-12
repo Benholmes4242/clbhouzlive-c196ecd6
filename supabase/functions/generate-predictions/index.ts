@@ -603,6 +603,7 @@ ${researchResults[3]?.trim() || 'No weather forecast available.'}
       '', // system prompt is embedded in the user prompt
       prompt,
       fitScoreMap,
+      courseDNA !== null, // dnaAvailable — gate AI fit-score collection
     );
 
     console.log(`[generate-predictions] Consensus complete: ${consensus.consensusMethod}, ${consensus.topContenders.length} contenders`);
@@ -750,6 +751,25 @@ ${researchResults[3]?.trim() || 'No weather forecast available.'}
 // =============================================
 
 function isPredictionStale(prediction: any): boolean {
+  if (!prediction?.generated_at) return true;
+
+  // 1. Age — predictions older than 6 hours are stale.
+  //    Tournaments evolve, field changes, stats refresh.
+  const ageMs = Date.now() - new Date(prediction.generated_at).getTime();
+  const sixHoursMs = 6 * 60 * 60 * 1000;
+  if (ageMs > sixHoursMs) return true;
+
+  // 2. Calculation failure — if course fit was never calculated server-side,
+  //    the prediction is fundamentally incomplete and should be regenerated
+  //    as soon as DNA becomes available.
+  const enrichmentStats = prediction?.consensus_data?.enrichmentStats;
+  if (enrichmentStats?.courseFitCalculated === 0) return true;
+
+  // 3. DNA backfill — if a Course DNA profile was added AFTER this prediction
+  //    was generated, we should regenerate to pick up real fit data.
+  //    (Skipped here — requires extra DNA query per cache check.
+  //     Checks 1+2 cover the immediate Aronimink case; revisit as a follow-up.)
+
   return false;
 }
 
@@ -975,7 +995,7 @@ Return a JSON object with this exact structure:
 3. **Each contender MUST have exactly 3 reasons**
 4. **Win probabilities should sum to approximately 60-80%** for all 8
 5. **Be specific in reasons** - cite actual statistics and course history
-6. **Course fit scores should be 1-100**
+6. **Course fit scores**: Only provide \`courseFitScore\` (1-100) if the CALCULATED COURSE FIT SCORES section above lists numerical data for that player. If "No calculated course fit data available" is shown, OMIT the \`courseFitScore\` field entirely — do NOT guess or use a neutral midpoint like 50.
 7. **Return ONLY valid JSON** - no markdown, no explanation outside the JSON
 8. **No gambling language**
 
