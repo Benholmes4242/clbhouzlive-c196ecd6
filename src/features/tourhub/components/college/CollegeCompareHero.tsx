@@ -253,6 +253,12 @@ function formatSg(v: number): string {
   return v >= 0 ? `+${v.toFixed(2)}` : v.toFixed(2);
 }
 
+function formatEarnings(v: number): string {
+  if (v >= 1_000_000) return `$${(v / 1_000_000).toFixed(1)}M`;
+  if (v >= 1_000) return `$${Math.round(v / 1_000)}K`;
+  return `$${v}`;
+}
+
 /* ── Main component ── */
 export function CollegeCompareHero({ data, className }: CollegeCompareHeroProps) {
   const { college1, college2 } = data;
