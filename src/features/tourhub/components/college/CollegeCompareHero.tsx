@@ -188,7 +188,7 @@ function AlumniCompareBlock({ title, alumni1, alumni2, statKey, name1, name2, em
                   </div>
                 </Link>
               ) : (
-                <span style={{ fontSize: '13px', color: '#CBD5E1' }}>{emptyLabel || '—'}</span>
+                <span style={{ fontSize: '13px', color: '#94A3B8' }}>{emptyLabel || '—'}</span>
               )}
             </div>
 
@@ -221,7 +221,7 @@ function AlumniCompareBlock({ title, alumni1, alumni2, statKey, name1, name2, em
                   </div>
                 </Link>
               ) : (
-                <span style={{ fontSize: '13px', color: '#CBD5E1' }}>{emptyLabel || '—'}</span>
+                <span style={{ fontSize: '13px', color: '#94A3B8' }}>{emptyLabel || '—'}</span>
               )}
             </div>
           </div>
