@@ -810,7 +810,19 @@ export function PlayersTab() {
           <button
             type="button"
             onClick={() => navigate('/tourhub?tab=overview', { replace: true })}
-            className="-ml-1 flex items-center gap-0.5 text-[12px] font-medium text-muted-foreground/70 active:opacity-50 transition-opacity shrink-0"
+            className="active:opacity-50 transition-opacity shrink-0"
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 2,
+              fontSize: 12,
+              fontWeight: 600,
+              color: '#64748B',
+              background: 'none',
+              border: 'none',
+              padding: 0,
+              cursor: 'pointer',
+            }}
           >
             <ChevronLeft size={13} strokeWidth={2.5} />
             Tour Overview
@@ -818,22 +830,57 @@ export function PlayersTab() {
 
           <div style={{ flex: 1 }} />
 
-          {/* Search icon — only visible when search not expanded (count+search bar handles expanded state) */}
-          {!searchExpanded && (
+          {/* Search button + tour filter pill — right cluster */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+            {!searchExpanded && (
+              <button
+                onClick={() => setSearchExpanded(true)}
+                style={{
+                  display: 'flex', alignItems: 'center', gap: 5,
+                  padding: '6px 11px', borderRadius: 8,
+                  background: '#EDF1F5',
+                  border: 'none', cursor: 'pointer',
+                }}
+                aria-label="Search players"
+              >
+                <Search className="w-3 h-3" style={{ color: '#0F172A' }} strokeWidth={2.5} />
+                <span style={{ fontSize: 12, fontWeight: 700, color: '#0F172A' }}>Search</span>
+              </button>
+            )}
+            {/* Tour filter pill — moved from masthead */}
             <button
-              onClick={() => setSearchExpanded(true)}
+              onClick={() => setTourSheetOpen(true)}
+              className="active:scale-[0.97] transition-all duration-150"
               style={{
-                display: 'flex', alignItems: 'center', gap: 5,
-                padding: '6px 10px', borderRadius: 8,
-                background: 'rgba(15,23,42,0.04)',
-                border: 'none', cursor: 'pointer',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 6,
+                padding: '6px 11px',
+                background: '#FEF3E7',
+                border: '1.5px solid #F7931E',
+                borderRadius: 10,
+                fontSize: 12,
+                fontWeight: 600,
+                color: '#0F172A',
+                cursor: 'pointer',
               }}
-              aria-label="Search players"
             >
-              <Search className="w-3 h-3" style={{ color: '#0F172A' }} strokeWidth={2.5} />
-              <span style={{ fontSize: 12, fontWeight: 700, color: '#0F172A' }}>Search</span>
+              {hasTourLogo(activeTour.toLowerCase())
+                ? <img src={getTourLogo(activeTour.toLowerCase())} alt={activeTour} className="shrink-0" style={{ width: 14, height: 14, objectFit: 'contain' }} />
+                : <Globe className="w-[12px] h-[12px] shrink-0" style={{ color: '#F7931E' }} strokeWidth={2.5} />
+              }
+              <span>
+                {activeTour === 'pga' ? 'PGA Tour'
+                  : activeTour === 'EURO' ? 'DP World Tour'
+                  : activeTour === 'LPGA' ? 'LPGA'
+                  : activeTour === 'PGAD' ? 'Korn Ferry'
+                  : activeTour === 'LIV' ? 'LIV Golf'
+                  : activeTour === 'CHAMP' ? 'Champions Tour'
+                  : 'Tour'}
+              </span>
+              <ChevronDown className="w-2.5 h-2.5" style={{ color: '#94A3B8' }} strokeWidth={2.5} />
             </button>
-          )}
+          </div>
         </div>
 
         {/* Underline tour-specific tabs (A-Z removed Phase 1 fix.1.6) */}
