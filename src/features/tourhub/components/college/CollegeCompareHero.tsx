@@ -157,7 +157,7 @@ function AlumniCompareBlock({ title, alumni1, alumni2, statKey, name1, name2, em
         const isLast = i === rowCount - 1;
 
         return (
-          <div key={i} style={{ display: 'flex', alignItems: 'center', padding: '9px 20px', borderBottom: isLast ? 'none' : '0.5px solid rgba(15,23,42,0.07)' }}>
+          <div key={i} style={{ display: 'flex', alignItems: 'center', padding: '9px 16px', borderBottom: isLast ? 'none' : '0.5px solid rgba(15,23,42,0.07)' }}>
             <span style={{ width: '18px', fontSize: '10px', fontWeight: 700, color: 'rgba(15,23,42,0.18)', flexShrink: 0, fontVariantNumeric: 'tabular-nums' }}>
               {i + 1}
             </span>
