@@ -54,11 +54,10 @@ export function FranchiseStoryStrip({ normalizedName, className }: FranchiseStor
 
   return (
     <div className={className} style={{ background: '#ffffff', borderTop: '1px solid rgba(15,23,42,0.07)', borderBottom: '1px solid rgba(15,23,42,0.07)', marginTop: '8px' }}>
-      {/* Section rule marker */}
-      <div style={{ padding: '12px 20px 0' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '10px' }}>
-          <div style={{ width: 3, height: 14, background: '#F7931E', borderRadius: 1, flexShrink: 0 }} />
-          <span style={{ fontSize: '10px', fontWeight: 900, color: '#F7931E', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>
+      {/* Section eyebrow — canonical §6 slate-caps */}
+      <div style={{ padding: '12px 16px 0' }}>
+        <div style={{ marginBottom: '10px' }}>
+          <span style={{ fontSize: '9px', fontWeight: 800, color: '#64748B', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>
             Franchise Dispatch
           </span>
         </div>
@@ -67,14 +66,14 @@ export function FranchiseStoryStrip({ normalizedName, className }: FranchiseStor
       {/* Two flat cells */}
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr' }}>
         {/* This Week */}
-        <div style={{ padding: '10px 20px 14px', borderRight: '0.5px solid rgba(15,23,42,0.07)' }}>
-          <div style={{ fontSize: '10px', fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.1em', textTransform: 'uppercase' as const, marginBottom: '6px' }}>
+        <div style={{ padding: '10px 16px 14px', borderRight: '0.5px solid rgba(15,23,42,0.07)' }}>
+          <div style={{ fontSize: '9px', fontWeight: 800, color: '#94A3B8', letterSpacing: '0.14em', textTransform: 'uppercase' as const, marginBottom: '6px' }}>
             This Week
           </div>
           {hasWeekActivity ? (
             <>
               {weekEarnings !== 0 && (
-                <div style={{ fontSize: '18px', fontWeight: 900, letterSpacing: '-0.03em', lineHeight: 1, color: weekEarnings > 0 ? '#16A34A' : '#DC2626', marginBottom: '3px' }}>
+                <div style={{ fontSize: '18px', fontWeight: 900, letterSpacing: '-0.03em', lineHeight: 1, color: weekEarnings > 0 ? '#047857' : '#DC2626', marginBottom: '3px' }}>
                   {weekEarnings > 0 ? '+' : ''}{formatCurrency(weekEarnings)}
                 </div>
               )}
@@ -90,8 +89,8 @@ export function FranchiseStoryStrip({ normalizedName, className }: FranchiseStor
         </div>
 
         {/* Top Performer */}
-        <div style={{ padding: '10px 20px 14px' }}>
-          <div style={{ fontSize: '10px', fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.1em', textTransform: 'uppercase' as const, marginBottom: '6px' }}>
+        <div style={{ padding: '10px 16px 14px' }}>
+          <div style={{ fontSize: '9px', fontWeight: 800, color: '#94A3B8', letterSpacing: '0.14em', textTransform: 'uppercase' as const, marginBottom: '6px' }}>
             {alumni && alumni.length === 1 ? 'Alumni' : 'Top Performer'}
           </div>
           {topAlumnus ? (
