@@ -892,12 +892,32 @@ export interface TrophyAggregates {
   hole_stats: {
     aces_count: number;
     eagles_count: number;
+    birdies_count: number;
+    albatross_count: number;
     sub_par_rounds_count: number;
     rounds_with_holes_count: number;
     total_rounds_count: number;
+    best_gross: number | null;
+    first_sub_80_at: string | null;
+    first_sub_90_at: string | null;
+    first_sub_100_at: string | null;
+    first_sub_par_at: string | null;
   };
   course_stats: {
     countries_played: string[];
+    unique_courses_count: number;
+    top100_lists: {
+      global: number;
+      usa: number;
+      europe: number;
+      'gb-i': number;
+    };
+    top100_list_sizes: {
+      global: number;
+      usa: number;
+      europe: number;
+      'gb-i': number;
+    };
     best_top100_global_rank: number | null;
     best_top100_country_rank: number | null;
   };
