@@ -3,155 +3,216 @@ import type { WhsScoreHole } from '@/lib/whs/types';
 
 interface Props {
   hole: WhsScoreHole;
+  /** Outer cell size in px. Defaults to 44. */
   size?: number;
 }
 
+// ─── Design tokens ─────────────────────────────────────────────────────
 const INK = '#0F172A';
 const INK_55 = 'rgba(15,23,42,0.55)';
 const INK_40 = 'rgba(15,23,42,0.40)';
-const PAR_FILL_LIGHT = 'rgba(15,23,42,0.06)';
+const HAIRLINE = 'rgba(15,23,42,0.16)';
+const AMBER = '#F7931E';
 
-const HOLE_GOLD = '#D4A82A';
-const EAGLE_GREEN = '#0E9F6E';
-const BIRDIE_GREEN = '#10B981';
-const BOGEY_RED = '#E11D48';
-const DOUBLE_RED = '#9F1239';
+const FONT_GEIST =
+  'Geist, system-ui, -apple-system, BlinkMacSystemFont, sans-serif';
 
-const colourFor = (score: number, par: number): string => {
-  if (score === 1) return HOLE_GOLD;
-  const diff = score - par;
-  if (diff <= -2) return EAGLE_GREEN;
-  if (diff === -1) return BIRDIE_GREEN;
-  if (diff === 0) return INK_55;
-  if (diff === 1) return BOGEY_RED;
-  return DOUBLE_RED;
+// Universal stroke width — single, double, triple ALL use this.
+// Depth is achieved by adding shapes, never by thickening lines.
+const STROKE_W = 1.5;
+
+// Inner-shape inset for nested shapes
+const INSET_DOUBLE = 4;
+const INSET_TRIPLE = 7;
+
+// ─── Variant resolution ────────────────────────────────────────────────
+type Variant =
+  | 'empty'
+  | 'par'
+  | 'birdie'
+  | 'eagle'
+  | 'alba'
+  | 'hio'
+  | 'bogey'
+  | 'doub'
+  | 'triple';
+
+const variantFor = (strokes: number | null, par: number): Variant => {
+  if (strokes == null) return 'empty';
+  if (strokes === 1) return 'hio';
+  const diff = strokes - par;
+  if (diff <= -3) return 'alba';
+  if (diff === -2) return 'eagle';
+  if (diff === -1) return 'birdie';
+  if (diff === 0) return 'par';
+  if (diff === 1) return 'bogey';
+  if (diff === 2) return 'doub';
+  return 'triple';
 };
 
-const fillFor = (score: number, par: number): string => {
-  if (score === 1) return 'rgba(212,168,42,0.14)';
-  const diff = score - par;
-  if (diff <= -2) return 'rgba(14,159,110,0.12)';
-  if (diff === -1) return 'rgba(16,185,129,0.12)';
-  if (diff === 0) return PAR_FILL_LIGHT;
-  if (diff === 1) return 'rgba(225,29,72,0.10)';
-  return 'rgba(159,18,57,0.12)';
+interface VariantSpec {
+  shape: 'circle' | 'square' | null;
+  depth: 0 | 1 | 2 | 3;
+  stroke: string;
+}
+
+const SPECS: Record<Variant, VariantSpec> = {
+  empty:  { shape: null,     depth: 0, stroke: HAIRLINE },
+  par:    { shape: null,     depth: 0, stroke: HAIRLINE },
+  birdie: { shape: 'circle', depth: 1, stroke: AMBER },
+  eagle:  { shape: 'circle', depth: 2, stroke: AMBER },
+  alba:   { shape: 'circle', depth: 3, stroke: AMBER },
+  hio:    { shape: 'circle', depth: 3, stroke: AMBER },
+  bogey:  { shape: 'square', depth: 1, stroke: INK },
+  doub:   { shape: 'square', depth: 2, stroke: INK },
+  triple: { shape: 'square', depth: 3, stroke: INK },
 };
 
+// ─── Shape primitive ───────────────────────────────────────────────────
+const Shape: React.FC<{
+  kind: 'circle' | 'square';
+  inset: number;
+  stroke: string;
+  size: number;
+}> = ({ kind, inset, stroke, size }) => {
+  if (kind === 'circle') {
+    const r = size / 2 - inset - STROKE_W / 2;
+    return (
+      <svg
+        width={size}
+        height={size}
+        style={{ position: 'absolute', inset: 0, pointerEvents: 'none' }}
+        aria-hidden
+      >
+        <circle
+          cx={size / 2}
+          cy={size / 2}
+          r={r}
+          fill="none"
+          stroke={stroke}
+          strokeWidth={STROKE_W}
+        />
+      </svg>
+    );
+  }
+  const dim = size - 2 * inset - STROKE_W;
+  return (
+    <svg
+      width={size}
+      height={size}
+      style={{ position: 'absolute', inset: 0, pointerEvents: 'none' }}
+      aria-hidden
+    >
+      <rect
+        x={inset + STROKE_W / 2}
+        y={inset + STROKE_W / 2}
+        width={dim}
+        height={dim}
+        rx={2}
+        fill="none"
+        stroke={stroke}
+        strokeWidth={STROKE_W}
+      />
+    </svg>
+  );
+};
+
+// ─── RoundHoleCell ─────────────────────────────────────────────────────
 export const RoundHoleCell: React.FC<Props> = ({ hole, size = 44 }) => {
   const strokes = hole.played
     ? (hole.adjusted_gross ?? hole.actual_gross ?? null)
     : null;
-  const par = hole.par;
-  const holeNumber = hole.hole_no;
-
-  if (strokes === null || strokes === undefined) {
-    return (
-      <div
-        style={{
-          width: '100%',
-          height: size,
-          borderRadius: 10,
-          border: '1.5px dashed rgba(15,23,42,0.12)',
-          opacity: 0.5,
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          justifyContent: 'center',
-          gap: 2,
-          padding: '4px 0 5px',
-        }}
-      >
-        <span
-          style={{
-            fontSize: 7,
-            fontWeight: 800,
-            color: INK_40,
-            letterSpacing: '0.04em',
-            fontVariantNumeric: 'tabular-nums',
-            lineHeight: 1,
-          }}
-        >
-          {holeNumber}
-        </span>
-        <span
-          style={{
-            fontSize: 14,
-            fontWeight: 800,
-            color: INK_40,
-            lineHeight: 1,
-          }}
-        >
-          {'\u2014'}
-        </span>
-      </div>
-    );
-  }
-
-  const colour = colourFor(strokes, par);
-  const fill = fillFor(strokes, par);
-  const diff = strokes - par;
-  const isPar = diff === 0;
-  const isAce = strokes === 1;
-  const isEaglePlus = diff <= -2;
-  const showDot = isAce || isEaglePlus;
+  const variant = variantFor(strokes, hole.par);
+  const spec = SPECS[variant];
 
   return (
     <div
       style={{
-        position: 'relative',
         width: '100%',
-        height: size,
-        borderRadius: 10,
-        background: fill,
-        border: isPar ? '1.5px solid transparent' : `1.5px solid ${colour}`,
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
-        justifyContent: 'center',
-        padding: '4px 0 5px',
+        gap: 3,
+        fontFamily: FONT_GEIST,
       }}
     >
+      {/* Hole number — above the tile */}
       <span
         style={{
-          fontSize: 7,
-          fontWeight: 800,
-          color: isPar ? INK_40 : colour,
+          fontSize: 9,
+          fontWeight: 500,
+          color: INK_55,
           letterSpacing: '0.04em',
           fontVariantNumeric: 'tabular-nums',
           lineHeight: 1,
-          opacity: 0.85,
         }}
       >
-        {holeNumber}
+        {hole.hole_no}
       </span>
-      <span
+
+      {/* Tile */}
+      <div
         style={{
-          fontSize: 17,
-          fontWeight: 800,
-          color: isPar ? INK : colour,
-          lineHeight: 1,
-          marginTop: 4,
-          letterSpacing: '-0.03em',
-          fontVariantNumeric: 'tabular-nums',
+          position: 'relative',
+          width: size,
+          height: size,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
         }}
       >
-        {strokes}
-      </span>
-      {showDot && (
+        {/* Empty placeholder — dashed square */}
+        {variant === 'empty' && (
+          <div
+            style={{
+              position: 'absolute',
+              inset: 0,
+              border: `${STROKE_W}px dashed ${HAIRLINE}`,
+              borderRadius: 3,
+            }}
+          />
+        )}
+
+        {/* Par placeholder — solid hairline square */}
+        {variant === 'par' && (
+          <div
+            style={{
+              position: 'absolute',
+              inset: 0,
+              border: `${STROKE_W}px solid ${HAIRLINE}`,
+              borderRadius: 3,
+            }}
+          />
+        )}
+
+        {/* Shape(s) for non-par variants */}
+        {spec.shape && (
+          <>
+            <Shape kind={spec.shape} inset={0} stroke={spec.stroke} size={size} />
+            {spec.depth >= 2 && (
+              <Shape kind={spec.shape} inset={INSET_DOUBLE} stroke={spec.stroke} size={size} />
+            )}
+            {spec.depth >= 3 && (
+              <Shape kind={spec.shape} inset={INSET_TRIPLE} stroke={spec.stroke} size={size} />
+            )}
+          </>
+        )}
+
+        {/* Score numeral */}
         <span
-          aria-hidden
           style={{
-            position: 'absolute',
-            top: -3,
-            right: -3,
-            width: 8,
-            height: 8,
-            borderRadius: '50%',
-            background: isAce ? HOLE_GOLD : EAGLE_GREEN,
-            border: '1.5px solid #fff',
+            position: 'relative',
+            fontSize: 17,
+            fontWeight: 700,
+            color: strokes == null ? INK_40 : INK,
+            lineHeight: 1,
+            letterSpacing: '-0.02em',
+            fontVariantNumeric: 'tabular-nums',
           }}
-        />
-      )}
+        >
+          {strokes == null ? '\u2014' : strokes}
+        </span>
+      </div>
     </div>
   );
 };
