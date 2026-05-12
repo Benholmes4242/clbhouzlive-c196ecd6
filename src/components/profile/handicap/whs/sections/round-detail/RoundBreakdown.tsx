@@ -31,16 +31,16 @@ export const RoundBreakdown: React.FC<Props> = ({ holes }) => {
   }, [holes]);
 
   const chips: Array<{ color: string; value: number; label: string }> = [];
-  if (counts.ace > 0) chips.push({ color: HOLE_GOLD, value: counts.ace, label: 'ACE' });
+  if (counts.ace > 0) chips.push({ color: AMBER, value: counts.ace, label: 'ACE' });
   if (counts.eagle > 0)
     chips.push({
-      color: EAGLE_GREEN,
+      color: AMBER,
       value: counts.eagle,
       label: counts.eagle === 1 ? 'EAGLE' : 'EAGLES',
     });
   if (counts.birdie > 0)
     chips.push({
-      color: BIRDIE_GREEN,
+      color: AMBER,
       value: counts.birdie,
       label: counts.birdie === 1 ? 'BIRDIE' : 'BIRDIES',
     });
@@ -50,12 +50,12 @@ export const RoundBreakdown: React.FC<Props> = ({ holes }) => {
     label: counts.par === 1 ? 'PAR' : 'PARS',
   });
   chips.push({
-    color: BOGEY_RED,
+    color: INK,
     value: counts.bogey,
     label: counts.bogey === 1 ? 'BGY' : 'BGYS',
   });
   if (counts.doublePlus > 0)
-    chips.push({ color: DOUBLE_RED, value: counts.doublePlus, label: 'DBL+' });
+    chips.push({ color: INK, value: counts.doublePlus, label: 'DBL+' });
 
   return (
     <div
