@@ -747,13 +747,6 @@ export const RoundsThatCountCard: React.FC<Props> = ({ connectionId, currentHand
                 </>
               )}
             </p>
-            <span style={{
-              fontSize: 9.5, fontWeight: 700, color: INK_40,
-              letterSpacing: '0.10em', textTransform: 'uppercase',
-              whiteSpace: 'nowrap',
-            }}>
-              Updates daily
-            </span>
           </div>
         );
       })()}
