@@ -7,7 +7,7 @@
  * Failure paths silently hide the card and fire an analytics event.
  */
 import React from 'react';
-import { Wind, Sun, Navigation, CloudRain } from 'lucide-react';
+import { Navigation } from 'lucide-react';
 import { useHomeCourseWeather, WeatherUnresolvedError } from '@/lib/weather/useHomeCourseWeather';
 import {
   pickConditionState,
@@ -32,60 +32,6 @@ const buildLocationLabel = (club: ClubLocation): string => {
   return parts.join(', ');
 };
 
-const WeatherStat: React.FC<{
-  icon: React.ReactNode;
-  label: string;
-  value: string;
-  unit: string;
-  divider?: boolean;
-}> = ({ icon, label, value, unit, divider }) => (
-  <div
-    style={{
-      flex: 1,
-      minWidth: 0,
-      display: 'flex',
-      flexDirection: 'column',
-      gap: 4,
-      padding: '10px 8px',
-      borderLeft: divider ? '0.5px solid rgba(255,255,255,0.18)' : 'none',
-    }}
-  >
-    <div
-      style={{
-        display: 'flex',
-        alignItems: 'center',
-        gap: 4,
-        fontSize: 9,
-        fontWeight: 800,
-        letterSpacing: '0.16em',
-        color: 'rgba(255,255,255,0.70)',
-        textTransform: 'uppercase',
-      }}
-    >
-      {icon}
-      <span>{label}</span>
-    </div>
-    <div
-      style={{
-        display: 'flex',
-        alignItems: 'baseline',
-        gap: 3,
-        color: '#fff',
-        fontFeatureSettings: '"kern" 1, "liga" 1',
-        fontVariantNumeric: 'tabular-nums',
-      }}
-    >
-      <span style={{ fontSize: 18, fontWeight: 700, letterSpacing: '-0.02em', lineHeight: 1 }}>
-        {value}
-      </span>
-      {unit && (
-        <span style={{ fontSize: 10, fontWeight: 600, color: 'rgba(255,255,255,0.65)' }}>
-          {unit}
-        </span>
-      )}
-    </div>
-  </div>
-);
 
 const HomeCourseWeatherCard: React.FC<Props> = ({ club, userId }) => {
   const { data: weather, isLoading, isError, error } = useHomeCourseWeather(club);
@@ -117,10 +63,6 @@ const HomeCourseWeatherCard: React.FC<Props> = ({ club, userId }) => {
   const background = buildBackgroundCss(warped);
   const locationLabel = buildLocationLabel(club);
 
-  const windDescriptor =
-    weather.windSpeed < 5 ? 'Calm' : weather.windSpeed < 12 ? 'Light breeze' : 'Breezy';
-  const rainSuffix = weather.precipProbabilityMax4h >= 40 ? ' · rain likely' : '';
-
   return (
     <div
       role="group"
@@ -128,8 +70,8 @@ const HomeCourseWeatherCard: React.FC<Props> = ({ club, userId }) => {
       style={{
         position: 'relative',
         width: '100%',
-        height: 210,
-        borderRadius: 14,
+        height: 130,
+        borderRadius: 18,
         overflow: 'hidden',
         background,
         marginBottom: 8,
@@ -138,6 +80,8 @@ const HomeCourseWeatherCard: React.FC<Props> = ({ club, userId }) => {
         boxShadow: '0 1px 2px rgba(15,23,42,0.06)',
         display: 'flex',
         flexDirection: 'column',
+        justifyContent: 'space-between',
+        padding: '14px 16px',
       }}
     >
       {/* Sun glow — daylight + clear conditions only */}
@@ -163,9 +107,9 @@ const HomeCourseWeatherCard: React.FC<Props> = ({ club, userId }) => {
         aria-hidden
         style={{
           position: 'absolute',
-          top: 36,
+          top: 30,
           left: -40,
-          width: 240,
+          width: 220,
           height: 60,
           borderRadius: '50%',
           background: 'radial-gradient(ellipse, rgba(255,255,255,0.18) 0%, rgba(255,255,255,0) 70%)',
@@ -173,165 +117,131 @@ const HomeCourseWeatherCard: React.FC<Props> = ({ club, userId }) => {
         }}
       />
 
-      {/* Top: course eyebrow */}
-      <div style={{ padding: '14px 16px 0', position: 'relative', zIndex: 1 }}>
-        <div
-          style={{
-            fontSize: 9,
-            fontWeight: 800,
-            letterSpacing: '0.18em',
-            textTransform: 'uppercase',
-            color: state.textMutedOnBg,
-            marginBottom: 4,
-          }}
-        >
-          Your course
-        </div>
-        <div
-          style={{
-            fontSize: 13,
-            fontWeight: 700,
-            lineHeight: 1.2,
-            color: state.textOnBg,
-            overflow: 'hidden',
-            textOverflow: 'ellipsis',
-            whiteSpace: 'nowrap',
-          }}
-        >
-          {club.name}
-          {locationLabel && ` · ${locationLabel}`}
-        </div>
-      </div>
-
-      {/* Centre: temp + condition */}
+      {/* Top row: course meta (left) + temperature (right) */}
       <div
         style={{
-          flex: 1,
           display: 'flex',
-          alignItems: 'flex-end',
           justifyContent: 'space-between',
-          padding: '0 16px 12px',
+          alignItems: 'flex-start',
           gap: 12,
           position: 'relative',
           zIndex: 1,
         }}
       >
-        <div style={{ display: 'flex', flexDirection: 'column' }}>
+        <div style={{ flex: 1, minWidth: 0 }}>
           <div
             style={{
-              display: 'flex',
-              alignItems: 'flex-start',
+              fontSize: 17,
+              fontWeight: 700,
+              letterSpacing: '-0.015em',
+              lineHeight: 1.2,
               color: state.textOnBg,
-              fontFeatureSettings: '"kern" 1, "liga" 1',
-              fontVariantNumeric: 'tabular-nums',
-              lineHeight: 0.9,
+              whiteSpace: 'nowrap',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
             }}
           >
-            <span style={{ fontSize: 80, fontWeight: 100, letterSpacing: '-0.05em' }}>
-              {Math.round(weather.temperature)}
-            </span>
-            <span
+            {club.name}
+          </div>
+          {locationLabel && (
+            <div
               style={{
-                fontSize: 28,
-                fontWeight: 200,
-                marginTop: 6,
-                marginLeft: 2,
+                fontSize: 12,
+                fontWeight: 500,
+                color: state.textMutedOnBg,
+                marginTop: 2,
+                whiteSpace: 'nowrap',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
               }}
             >
-              °
-            </span>
-          </div>
-          <div
-            style={{
-              fontSize: 9,
-              fontWeight: 800,
-              letterSpacing: '0.16em',
-              textTransform: 'uppercase',
-              color: state.textMutedOnBg,
-              marginTop: 4,
-            }}
-          >
-            Feels like {Math.round(weather.apparentTemperature)}°
-          </div>
+              {locationLabel}
+            </div>
+          )}
         </div>
-
-        <div style={{ textAlign: 'right', maxWidth: '50%' }}>
-          <div
-            style={{
-              fontSize: 15,
-              fontWeight: 700,
-              color: state.textOnBg,
-              letterSpacing: '-0.01em',
-              lineHeight: 1.2,
-            }}
-          >
-            {weather.description}
-          </div>
-          <div
-            style={{
-              fontSize: 11,
-              fontWeight: 600,
-              color: state.textMutedOnBg,
-              marginTop: 2,
-            }}
-          >
-            {windDescriptor}
-            {rainSuffix}
-          </div>
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'flex-start',
+            lineHeight: 0.9,
+            fontVariantNumeric: 'tabular-nums',
+            fontFeatureSettings: '"kern" 1, "liga" 1',
+            color: state.textOnBg,
+            flexShrink: 0,
+          }}
+        >
+          <span style={{ fontSize: 56, fontWeight: 200, letterSpacing: '-0.05em' }}>
+            {Math.round(weather.temperature)}
+          </span>
+          <span style={{ fontSize: 22, fontWeight: 300, marginTop: 4 }}>°</span>
         </div>
       </div>
 
-      {/* Bottom: golf-utility metrics strip */}
+      {/* Bottom row: condition + wind (left) + feels like (right) */}
       <div
         style={{
           display: 'flex',
-          alignItems: 'stretch',
-          background: 'rgba(15,23,42,0.78)',
-          backdropFilter: 'blur(10px)',
-          WebkitBackdropFilter: 'blur(10px)',
-          borderTop: '0.5px solid rgba(255,255,255,0.12)',
+          justifyContent: 'space-between',
+          alignItems: 'baseline',
+          gap: 12,
           position: 'relative',
           zIndex: 1,
         }}
       >
-        <WeatherStat
-          icon={
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'baseline',
+            gap: 8,
+            minWidth: 0,
+            flex: 1,
+          }}
+        >
+          <span
+            style={{
+              fontSize: 14,
+              fontWeight: 700,
+              letterSpacing: '-0.005em',
+              color: state.textOnBg,
+              whiteSpace: 'nowrap',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+            }}
+          >
+            {weather.description}
+          </span>
+          <span style={{ color: state.textMutedOnBg, fontSize: 11, fontWeight: 600 }}>·</span>
+          <span
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 3,
+              fontSize: 12,
+              fontWeight: 600,
+              color: state.textOnBg,
+              fontVariantNumeric: 'tabular-nums',
+              flexShrink: 0,
+            }}
+          >
             <Navigation
-              size={10}
+              size={9}
               strokeWidth={2.4}
-              color="rgba(255,255,255,0.70)"
+              color={state.textMutedOnBg}
               style={{ transform: `rotate(${weather.windDirection}deg)` }}
             />
-          }
-          label="Wind"
-          value={String(Math.round(weather.windSpeed))}
-          unit="mph"
-        />
-        <WeatherStat
-          icon={<Wind size={10} strokeWidth={2.4} color="rgba(255,255,255,0.70)" />}
-          label="Gust"
-          value={String(Math.round(weather.windGust))}
-          unit="mph"
-          divider
-        />
-        <WeatherStat
-          icon={<Sun size={10} strokeWidth={2.4} color="rgba(255,255,255,0.70)" />}
-          label="Daylight"
-          value={
-            weather.daylightHoursRemaining != null
-              ? weather.daylightHoursRemaining.toFixed(1)
-              : '—'
-          }
-          unit={weather.daylightHoursRemaining != null ? 'hrs' : ''}
-          divider
-        />
-        <WeatherStat
-          icon={<CloudRain size={10} strokeWidth={2.4} color="rgba(255,255,255,0.70)" />}
-          label="Rain 4hr"
-          value={String(weather.precipProbabilityMax4h)}
-          unit="%"
-          divider
-        />
+            {Math.round(weather.windSpeed)} mph
+          </span>
+        </div>
+        <div
+          style={{
+            fontSize: 11,
+            fontWeight: 600,
+            color: state.textMutedOnBg,
+            flexShrink: 0,
+          }}
+        >
+          Feels like {Math.round(weather.apparentTemperature)}°
+        </div>
       </div>
     </div>
   );
