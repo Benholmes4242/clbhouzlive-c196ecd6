@@ -394,23 +394,6 @@ export const RoundsThatCountCard: React.FC<Props> = ({ connectionId, currentHand
                       vectorEffect="non-scaling-stroke"
                     />
                   </svg>
-                  <div style={{
-                    position: 'absolute',
-                    top: yFor(projection.cutTarget) - 9,
-                    right: 4,
-                    padding: '2px 7px',
-                    borderRadius: 4,
-                    background: GREEN,
-                    color: '#fff',
-                    fontSize: 8.5, fontWeight: 800,
-                    letterSpacing: '0.06em',
-                    fontFamily: FONT_GEIST,
-                    pointerEvents: 'none',
-                    zIndex: 3,
-                    whiteSpace: 'nowrap',
-                  }}>
-                    CUT IF BELOW
-                  </div>
                 </>
               )}
 
