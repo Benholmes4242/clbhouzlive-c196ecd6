@@ -720,13 +720,12 @@ const ReportageCard: React.FC<{
           {activity.friend_name}
         </p>
 
-        {/* Course in italic serif */}
+        {/* Course name */}
         <p
           style={{
             margin: '2px 0 0',
             fontSize: 12,
             fontWeight: 600,
-            fontStyle: 'italic',
             fontFamily: FONT_GEIST,
             color: T.inkMute,
             lineHeight: 1.25,
