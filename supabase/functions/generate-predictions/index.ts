@@ -995,7 +995,7 @@ Return a JSON object with this exact structure:
 3. **Each contender MUST have exactly 3 reasons**
 4. **Win probabilities should sum to approximately 60-80%** for all 8
 5. **Be specific in reasons** - cite actual statistics and course history
-6. **Course fit scores should be 1-100**
+6. **Course fit scores**: Only provide \`courseFitScore\` (1-100) if the CALCULATED COURSE FIT SCORES section above lists numerical data for that player. If "No calculated course fit data available" is shown, OMIT the \`courseFitScore\` field entirely — do NOT guess or use a neutral midpoint like 50.
 7. **Return ONLY valid JSON** - no markdown, no explanation outside the JSON
 8. **No gambling language**
 
