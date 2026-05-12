@@ -23,7 +23,7 @@ export function MovementIndicator({ delta }: MovementIndicatorProps) {
           display: 'inline-flex',
           alignItems: 'center',
           gap: 1,
-          color: '#16A34A',
+          color: '#047857',
           fontSize: 10,
           fontWeight: 800,
           fontVariantNumeric: 'tabular-nums',
