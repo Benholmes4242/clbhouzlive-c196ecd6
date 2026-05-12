@@ -102,13 +102,7 @@ export function CollegeProfilePage() {
   const captain = collegeSlug ? captainMap.data?.get(collegeSlug) : undefined;
   const showCaptainPill = captainDominates(captain);
 
-  // Captain's % of season earnings (≥30% renders, otherwise omitted from the
-  // captain pill copy — keeps the line "{Last} · #N OWGR" without a noisy %).
-  const captainEarningsPct = useMemo(() => {
-    if (!captain || !stats || stats.earnings_total <= 0) return null;
-    const pct = (captain.earnings / stats.earnings_total) * 100;
-    return pct >= 30 ? Math.round(pct) : null;
-  }, [captain, stats]);
+
 
   // Captain OWGR (PGA-biased; null when no live ranking available)
   const captainOwgr = useMemo(() => {
