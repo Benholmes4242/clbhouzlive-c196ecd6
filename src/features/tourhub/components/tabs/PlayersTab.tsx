@@ -6,7 +6,7 @@
 import { useState, useMemo, useCallback, useEffect, useRef, type RefObject } from 'react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useSearchParams, useLocation, useNavigate } from 'react-router-dom';
-import { Search, X, ChevronDown, ChevronLeft, RefreshCw, Globe, Flame, Trophy } from 'lucide-react';
+import { Search, X, ChevronDown, ChevronLeft, ChevronRight, RefreshCw, Globe, Users, Crown } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useQueryClient } from '@tanstack/react-query';
 import { cn } from '@/lib/utils';
@@ -15,7 +15,6 @@ import { useElitePlayers, type ElitePlayer } from '../../hooks/useElitePlayers';
 import { useRecentPlayerResults } from '../../hooks/useRecentPlayerResults';
 import { useTourSeasonRankings } from '../../hooks/useTourSeasonRankings';
 import { useChampionStreak } from '../../hooks/useChampionStreak';
-import { useChampionRecentForm } from '../../hooks/useChampionRecentForm';
 import { type PlayerTourCode } from '../players/PlayersTourFilterSheet';
 import { type PlayerSortType, getDefaultSortForTour } from '../players/PlayerSortControl';
 import { PlayerCardV2 } from '../players/PlayerCardV2';
@@ -63,8 +62,8 @@ function useDebouncedValue(value: string, delay: number): string {
 const PAGE_SIZE = 50;
 
 // ─────────────────────────────────────────────────────────────────────────────
-// HeroChampion — the No.1 cover story (Phase 1 fix.1.3)
-// 56px rank · 26px name · 28px value · 68px squircle photo · pill row
+// HeroChampion — World-Rankings #1 card (IMG_6046 exemplar)
+// Caption row · 80px squircle photo (gold ring + "1" badge) · name+country · big points
 // ─────────────────────────────────────────────────────────────────────────────
 interface HeroChampionProps {
   champion: ElitePlayer;
@@ -76,24 +75,30 @@ interface HeroChampionProps {
   onClick: () => void;
 }
 
+function formatEarningsCompact(amount: number): string {
+  if (amount >= 1_000_000) return `$${(amount / 1_000_000).toFixed(1)}M`;
+  if (amount >= 1_000) return `$${(amount / 1_000).toFixed(0)}K`;
+  return `$${amount}`;
+}
+
 function HeroChampion({ champion, runnerUp, champStats, champPhotoUrl, sort, activeTour, onClick }: HeroChampionProps) {
   const { data: streakWeeks } = useChampionStreak(champion.playerId);
-  const { data: recentForm } = useChampionRecentForm(champion.playerId, 8);
 
-  // Primary value computation — mirrors original logic, just collapsed
   const primary = (() => {
     if (sort === 'fedex-points') {
       if (!champStats?.points || champStats.points <= 0) return null;
-      return { value: champStats.points.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }), unit: 'pts' };
+      return {
+        value: champStats.points.toLocaleString(undefined, { maximumFractionDigits: 0 }),
+        label: 'FEDEX POINTS',
+      };
     }
     if (sort === 'highest-earnings') {
       if (!champStats?.earnings || champStats.earnings <= 0) return null;
-      const e = champStats.earnings;
-      return { value: e >= 1_000_000 ? `$${(e / 1_000_000).toFixed(1)}M` : `$${(e / 1_000).toFixed(0)}K`, unit: '' };
+      return { value: formatEarningsCompact(champStats.earnings), label: 'SEASON EARNINGS' };
     }
     if (sort === 'most-wins') {
       if (!champStats?.wins) return null;
-      return { value: String(champStats.wins), unit: champStats.wins === 1 ? 'win' : 'wins' };
+      return { value: String(champStats.wins), label: champStats.wins === 1 ? 'WIN' : 'WINS' };
     }
     const isNonPgaTour = activeTour === 'EURO' || activeTour === 'LPGA' || activeTour === 'PGAD' || activeTour === 'LIV' || activeTour === 'CHAMP';
     const tourPts = champStats?.points && champStats.points > 0 && (sort !== 'world-rank-desc' && (sort !== 'alpha-az' && sort !== 'alpha-za' || isNonPgaTour))
@@ -102,10 +107,20 @@ function HeroChampion({ champion, runnerUp, champStats, champPhotoUrl, sort, act
     const owgrPts = champion.totalPoints ?? champion.avgPoints;
     const displayPts = tourPts ?? (isNonPgaTour ? null : owgrPts);
     if (displayPts == null) return null;
-    return { value: displayPts.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }), unit: 'pts' };
+    return {
+      value: displayPts.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
+      label: 'TOTAL POINTS',
+    };
   })();
 
-  // Margin pill — only on World Ranking sort with runner-up data
+  const rankLabel = sort === 'world-rank-desc' ? 'WORLD #1'
+    : sort === 'fedex-points' ? 'FEDEX LEADER'
+    : sort === 'highest-earnings' ? 'MONEY LEADER'
+    : sort === 'most-wins' ? 'WINS LEADER'
+    : 'TOUR LEADER';
+
+  const showStreak = (streakWeeks ?? 0) >= 2;
+
   const marginPts = (() => {
     if (sort !== 'world-rank-desc') return null;
     const a = champion.totalPoints ?? champion.avgPoints;
@@ -116,91 +131,93 @@ function HeroChampion({ champion, runnerUp, champStats, champPhotoUrl, sort, act
     return diff;
   })();
 
-  const showStreak = (streakWeeks ?? 0) >= 2;
-  const showRecentForm = recentForm && recentForm.starts >= 3;
-
   return (
     <div
-      style={{
-        display: 'flex', alignItems: 'flex-start', gap: 14,
-        marginBottom: 14, paddingBottom: 14,
-        borderBottom: '0.5px solid rgba(15,23,42,0.07)',
-        background: 'linear-gradient(180deg, rgba(247,147,30,0.05) 0%, transparent 100%)',
-        borderRadius: 8, padding: 12,
-      }}
       onClick={onClick}
       className="cursor-pointer active:opacity-80 transition-opacity"
+      style={{
+        background: 'linear-gradient(180deg, rgba(255,184,0,0.10) 0%, rgba(255,184,0,0.04) 100%)',
+        border: '1px solid rgba(255,184,0,0.32)',
+        borderRadius: 10,
+        padding: 14,
+        marginBottom: 14,
+      }}
     >
-      {/* Large faded rank number */}
-      <div style={{ flexShrink: 0, width: 56, paddingTop: 4 }}>
-        <div style={{ fontSize: 9, fontWeight: 900, color: '#64748B', letterSpacing: '0.1em', marginBottom: 2 }}>NO.1</div>
-        <span style={{ fontSize: 56, fontWeight: 900, color: 'rgba(247,147,30,0.18)', lineHeight: 0.9, letterSpacing: '-0.05em', display: 'block' }}>1</span>
-      </div>
-
-      {/* Player info */}
-      <div style={{ flex: 1, minWidth: 0 }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 4 }}>
-          <CountryFlag country={champion.country} size="sm" />
-          <span style={{ fontSize: 11, fontWeight: 600, color: '#64748B' }}>{titleCaseCountry(champion.country)}</span>
-        </div>
-        <div style={{ fontSize: 26, fontWeight: 900, color: '#0F172A', letterSpacing: '-0.03em', lineHeight: 1.05, marginBottom: 6 }}>
-          {champion.playerName}
-        </div>
-        {primary && (
-          <div style={{ marginBottom: 10 }}>
-            <span style={{ fontSize: 28, fontWeight: 900, color: '#F7931E', letterSpacing: '-0.02em' }}>{primary.value}</span>
-            {primary.unit && <span style={{ fontSize: 11, fontWeight: 700, color: '#c97a10', marginLeft: 2 }}>{primary.unit}</span>}
-          </div>
+      {/* Caption row */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 12 }}>
+        <Crown size={11} strokeWidth={2.6} style={{ color: '#B45309', flexShrink: 0 }} />
+        <span style={{ fontSize: 9.5, fontWeight: 900, letterSpacing: '0.14em', color: '#0F172A' }}>
+          {rankLabel}
+        </span>
+        {showStreak && (
+          <>
+            <span style={{ color: '#94A3B8', fontSize: 9.5, fontWeight: 800 }}>·</span>
+            <span style={{ fontSize: 9.5, fontWeight: 800, letterSpacing: '0.12em', color: '#64748B' }}>
+              {streakWeeks} CONSECUTIVE WEEKS
+            </span>
+          </>
         )}
-
-        {/* Pills row */}
-        {(marginPts != null || showStreak || showRecentForm) && (
-          <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
-            {marginPts != null && (
-              <span style={{
-                display: 'inline-flex', alignItems: 'center', gap: 4,
-                padding: '5px 9px', borderRadius: 6,
-                background: '#ffffff', border: '1px solid #E2E8F0',
-                fontSize: 11, fontWeight: 700,
-              }}>
-                <span style={{ color: '#64748B' }}>Margin:</span>
-                <span style={{ color: '#F7931E', fontWeight: 800 }}>+{marginPts.toFixed(2)}pts</span>
-              </span>
-            )}
-            {showStreak && (
-              <span style={{
-                display: 'inline-flex', alignItems: 'center', gap: 4,
-                padding: '5px 9px', borderRadius: 6,
-                background: 'rgba(247,147,30,0.08)', border: '1px solid rgba(247,147,30,0.30)',
-                fontSize: 11, fontWeight: 800, color: '#c97a10',
-              }}>
-                <Flame size={11} strokeWidth={2.5} />
-                {streakWeeks}-week leader
-              </span>
-            )}
-            {showRecentForm && recentForm && (
-              <span style={{
-                display: 'inline-flex', alignItems: 'center', gap: 4,
-                padding: '5px 9px', borderRadius: 6,
-                background: '#ffffff', border: '1px solid #E2E8F0',
-                fontSize: 11, fontWeight: 700, color: '#334155',
-              }}>
-                <Trophy size={11} strokeWidth={2.5} style={{ color: '#F7931E' }} />
-                {recentForm.starts} starts · {recentForm.wins > 0 ? `${recentForm.wins} ${recentForm.wins === 1 ? 'win' : 'wins'}` : `${recentForm.top10s} top-10${recentForm.top10s === 1 ? '' : 's'}`}
-              </span>
-            )}
-          </div>
+        {marginPts != null && (
+          <>
+            <span style={{ color: '#94A3B8', fontSize: 9.5, fontWeight: 800 }}>·</span>
+            <span style={{ fontSize: 9.5, fontWeight: 800, letterSpacing: '0.12em', color: '#64748B' }}>
+              MARGIN +{marginPts.toFixed(0)} PTS
+            </span>
+          </>
         )}
       </div>
 
-      {/* Headshot — 68px squircle */}
-      <div style={{ width: 68, height: 68, borderRadius: '34%', overflow: 'hidden', flexShrink: 0, background: 'rgba(15,23,42,0.06)', border: '1.5px solid #ffffff', boxShadow: '0 2px 8px rgba(15,23,42,0.08)' }}>
-        <img
-          src={champPhotoUrl}
-          alt={champion.playerName}
-          style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center 8%' }}
-          onError={e => { (e.target as HTMLImageElement).src = PLAYER_SILHOUETTE_URL; }}
-        />
+      {/* Body row */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+        {/* Photo + "1" badge */}
+        <div style={{ position: 'relative', flexShrink: 0 }}>
+          <div style={{ width: 80, height: 80, borderRadius: '34%', overflow: 'hidden', background: 'rgba(15,23,42,0.06)', border: '2.5px solid #FFB800', boxShadow: '0 4px 12px rgba(255,184,0,0.20)' }}>
+            <img
+              src={champPhotoUrl}
+              alt={champion.playerName}
+              style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center 8%' }}
+              onError={e => { (e.target as HTMLImageElement).src = PLAYER_SILHOUETTE_URL; }}
+            />
+          </div>
+          <div
+            style={{
+              position: 'absolute', bottom: -2, right: -2,
+              width: 22, height: 22, borderRadius: '50%',
+              background: '#FFB800', color: '#0F172A',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              fontSize: 11, fontWeight: 900,
+              border: '2px solid #ffffff',
+              boxShadow: '0 1px 3px rgba(15,23,42,0.15)',
+              fontVariantNumeric: 'tabular-nums',
+            }}
+          >
+            1
+          </div>
+        </div>
+
+        {/* Info */}
+        <div style={{ flex: 1, minWidth: 0, display: 'flex', alignItems: 'center', gap: 10 }}>
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <div style={{ fontSize: 22, fontWeight: 800, color: '#0F172A', letterSpacing: '-0.025em', lineHeight: 1.1, marginBottom: 4, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+              {champion.playerName}
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+              <CountryFlag country={champion.country} size="sm" />
+              <span style={{ fontSize: 12, fontWeight: 600, color: '#64748B' }}>{titleCaseCountry(champion.country)}</span>
+            </div>
+          </div>
+
+          {primary && (
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', flexShrink: 0 }}>
+              <div style={{ fontSize: 22, fontWeight: 800, color: '#0F172A', letterSpacing: '-0.02em', lineHeight: 1, fontVariantNumeric: 'tabular-nums' }}>
+                {primary.value}
+              </div>
+              <div style={{ fontSize: 9, fontWeight: 800, letterSpacing: '0.12em', color: '#64748B', marginTop: 4 }}>
+                {primary.label}
+              </div>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
@@ -705,44 +722,52 @@ export function PlayersTab() {
         return (
           <div style={{ padding: '16px 16px 0', background: '#F8FAFC' }}>
             {/* ── MASTHEAD ── */}
-            <div style={{ borderBottom: '2px solid #0F172A', paddingBottom: '10px', marginBottom: '14px' }}>
-              <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between' }}>
-                <div>
-                  <div style={{ fontSize: '8.5px', fontWeight: 900, color: '#F7931E', letterSpacing: '0.16em', textTransform: 'uppercase' as const, marginBottom: '4px' }}>
-                    ⚡ CLBHOUZ · TOUR HUB
-                  </div>
-                  <h1 style={{ fontSize: '26px', fontWeight: 900, color: '#0F172A', letterSpacing: '-0.04em', margin: 0, lineHeight: 1 }}>
+            {(() => {
+              const tourLabel = activeTour === 'pga' ? 'PGA Tour'
+                : activeTour === 'EURO' ? 'DP World Tour'
+                : activeTour === 'LPGA' ? 'LPGA'
+                : activeTour === 'PGAD' ? 'Korn Ferry'
+                : activeTour === 'LIV' ? 'LIV Golf'
+                : activeTour === 'CHAMP' ? 'PGA Tour Champions'
+                : 'Tour';
+              const seasonLabel = `${season?.year ?? new Date().getFullYear()} ${tourLabel} Season`;
+              return (
+                <div style={{ marginBottom: 14 }}>
+                  <button
+                    type="button"
+                    onClick={() => navigate('/tourhub?tab=overview', { replace: true })}
+                    aria-label="Players — open Tour Overview"
+                    style={{
+                      background: 'transparent',
+                      border: 'none',
+                      padding: 0,
+                      cursor: 'pointer',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: 6,
+                      marginBottom: 6,
+                    }}
+                  >
+                    <Users size={11} strokeWidth={2.6} style={{ color: '#F7931E' }} />
+                    <span style={{ fontSize: 10.5, fontWeight: 800, letterSpacing: '0.16em', color: '#F7931E' }}>
+                      PLAYERS
+                    </span>
+                    <ChevronRight size={11} strokeWidth={2.6} style={{ color: '#F7931E' }} />
+                  </button>
+                  <h1 style={{ fontSize: 18, fontWeight: 800, color: '#0F172A', letterSpacing: '-0.02em', margin: 0, lineHeight: 1.15 }}>
                     Players
                   </h1>
+                  <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 8, marginTop: 4 }}>
+                    <span style={{ fontSize: 13, fontWeight: 600, color: '#64748B' }}>
+                      {seasonLabel}
+                    </span>
+                    <span style={{ fontSize: 13, fontWeight: 700, color: '#0F172A', fontVariantNumeric: 'tabular-nums' }}>
+                      {totalCount.toLocaleString()} players
+                    </span>
+                  </div>
                 </div>
-                {/* Tour filter pill — lives in masthead */}
-                <button
-                  onClick={() => setTourSheetOpen(true)}
-                  style={{
-                    display: 'flex', alignItems: 'center', gap: '5px',
-                    borderRadius: '9px', padding: '6px 10px',
-                    border: '1px solid rgba(247,147,30,0.4)',
-                    background: 'rgba(247,147,30,0.06)',
-                    boxShadow: '0 1px 3px rgba(15,23,42,0.05)',
-                    cursor: 'pointer', marginBottom: '2px',
-                  }}
-                >
-                  {hasTourLogo(activeTour.toLowerCase())
-                    ? <img src={getTourLogo(activeTour.toLowerCase())} alt={activeTour} className="shrink-0" style={{ width: 16, height: 16, objectFit: 'contain' }} />
-                    : <Globe className="w-[14px] h-[14px] shrink-0" style={{ color: '#F7931E' }} strokeWidth={2.5} />
-                  }
-                  <span style={{ fontSize: '11px', fontWeight: 700, color: '#0F172A' }}>
-                    {activeTour === 'pga' ? 'PGA Tour'
-                      : activeTour === 'EURO' ? 'DP World Tour'
-                      : activeTour === 'LPGA' ? 'LPGA'
-                      : activeTour === 'PGAD' ? 'Korn Ferry'
-                      : activeTour === 'LIV' ? 'LIV Golf'
-                      : 'PGA Tour'}
-                  </span>
-                  <ChevronDown className="w-2.5 h-2.5" style={{ color: '#94A3B8' }} strokeWidth={2.5} />
-                </button>
-              </div>
-            </div>
+              );
+            })()}
 
             {/* ── NO.1 COVER STORY ── */}
             <HeroChampion
@@ -785,7 +810,19 @@ export function PlayersTab() {
           <button
             type="button"
             onClick={() => navigate('/tourhub?tab=overview', { replace: true })}
-            className="-ml-1 flex items-center gap-0.5 text-[12px] font-medium text-muted-foreground/70 active:opacity-50 transition-opacity shrink-0"
+            className="active:opacity-50 transition-opacity shrink-0"
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 2,
+              fontSize: 12,
+              fontWeight: 600,
+              color: '#64748B',
+              background: 'none',
+              border: 'none',
+              padding: 0,
+              cursor: 'pointer',
+            }}
           >
             <ChevronLeft size={13} strokeWidth={2.5} />
             Tour Overview
@@ -793,22 +830,57 @@ export function PlayersTab() {
 
           <div style={{ flex: 1 }} />
 
-          {/* Search icon — only visible when search not expanded (count+search bar handles expanded state) */}
-          {!searchExpanded && (
+          {/* Search button + tour filter pill — right cluster */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+            {!searchExpanded && (
+              <button
+                onClick={() => setSearchExpanded(true)}
+                style={{
+                  display: 'flex', alignItems: 'center', gap: 5,
+                  padding: '6px 11px', borderRadius: 8,
+                  background: '#EDF1F5',
+                  border: 'none', cursor: 'pointer',
+                }}
+                aria-label="Search players"
+              >
+                <Search className="w-3 h-3" style={{ color: '#0F172A' }} strokeWidth={2.5} />
+                <span style={{ fontSize: 12, fontWeight: 700, color: '#0F172A' }}>Search</span>
+              </button>
+            )}
+            {/* Tour filter pill — moved from masthead */}
             <button
-              onClick={() => setSearchExpanded(true)}
+              onClick={() => setTourSheetOpen(true)}
+              className="active:scale-[0.97] transition-all duration-150"
               style={{
-                display: 'flex', alignItems: 'center', gap: 5,
-                padding: '6px 10px', borderRadius: 8,
-                background: 'rgba(15,23,42,0.04)',
-                border: 'none', cursor: 'pointer',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 6,
+                padding: '6px 11px',
+                background: '#FEF3E7',
+                border: '1.5px solid #F7931E',
+                borderRadius: 10,
+                fontSize: 12,
+                fontWeight: 600,
+                color: '#0F172A',
+                cursor: 'pointer',
               }}
-              aria-label="Search players"
             >
-              <Search className="w-3 h-3" style={{ color: '#0F172A' }} strokeWidth={2.5} />
-              <span style={{ fontSize: 12, fontWeight: 700, color: '#0F172A' }}>Search</span>
+              {hasTourLogo(activeTour.toLowerCase())
+                ? <img src={getTourLogo(activeTour.toLowerCase())} alt={activeTour} className="shrink-0" style={{ width: 14, height: 14, objectFit: 'contain' }} />
+                : <Globe className="w-[12px] h-[12px] shrink-0" style={{ color: '#F7931E' }} strokeWidth={2.5} />
+              }
+              <span>
+                {activeTour === 'pga' ? 'PGA Tour'
+                  : activeTour === 'EURO' ? 'DP World Tour'
+                  : activeTour === 'LPGA' ? 'LPGA'
+                  : activeTour === 'PGAD' ? 'Korn Ferry'
+                  : activeTour === 'LIV' ? 'LIV Golf'
+                  : activeTour === 'CHAMP' ? 'Champions Tour'
+                  : 'Tour'}
+              </span>
+              <ChevronDown className="w-2.5 h-2.5" style={{ color: '#94A3B8' }} strokeWidth={2.5} />
             </button>
-          )}
+          </div>
         </div>
 
         {/* Underline tour-specific tabs (A-Z removed Phase 1 fix.1.6) */}
@@ -836,8 +908,8 @@ export function PlayersTab() {
                   key={tab.value}
                   onClick={() => { setSort(tab.value); setVisibleCount(PAGE_SIZE); }}
                   style={{
-                    flex: 1, padding: '8px 0',
-                    fontSize: '11px', fontWeight: isActive ? 800 : 500,
+                    flex: 1, padding: '12px 0',
+                    fontSize: '12px', fontWeight: isActive ? 800 : 600,
                     color: isActive ? '#0F172A' : '#94A3B8',
                     background: 'transparent', border: 'none',
                     borderBottom: `2px solid ${isActive ? '#F7931E' : 'transparent'}`,
@@ -853,11 +925,12 @@ export function PlayersTab() {
 
         {/* Count+sort bar OR search input — mutually exclusive (Phase 1 fix.1.7) */}
         {!searchExpanded ? (
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '6px 16px 8px', gap: 8 }}>
-            <span style={{ fontSize: 11, fontWeight: 600, color: '#64748B' }}>
-              {totalCount.toLocaleString()} {totalCount === 1 ? 'player' : 'players'}
-              <span style={{ color: '#CBD5E1' }}> · sorted by </span>
-              <span style={{ color: '#0F172A', fontWeight: 700 }}>{getSortShortLabel(sort, activeTour)}</span>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '8px 16px', gap: 8 }}>
+            <span style={{ fontSize: 9, fontWeight: 800, color: '#0F172A', letterSpacing: '0.16em', fontVariantNumeric: 'tabular-nums' }}>
+              {totalCount.toLocaleString()} {totalCount === 1 ? 'PLAYER' : 'PLAYERS'}
+            </span>
+            <span style={{ fontSize: 9, fontWeight: 800, color: '#64748B', letterSpacing: '0.14em' }}>
+              SORTED BY {getSortShortLabel(sort, activeTour).toUpperCase()}
             </span>
           </div>
         ) : (
@@ -970,6 +1043,13 @@ export function PlayersTab() {
           >
             {displayRows.length > 0 ? (
               <>
+                {!debouncedSearch && sort === 'world-rank-desc' && (
+                  <div style={{ padding: '12px 16px 6px', background: '#ffffff' }}>
+                    <span style={{ fontSize: 9, fontWeight: 800, color: '#64748B', letterSpacing: '0.16em' }}>
+                      CHASING
+                    </span>
+                  </div>
+                )}
                 {displayRows.map((player, index) => {
                   const rank = rankMap.get(player.id);
                   const pStats = statsMap.get(player.id);

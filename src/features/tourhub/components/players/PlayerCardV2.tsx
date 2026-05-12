@@ -137,19 +137,15 @@ export function PlayerCardV2({
     return null;
   })();
 
-  // Top-10 tier accent (list-position 0-8 below hero) takes precedence over the
-  // legacy isFirst styling. Hero already renders #1 separately, so isFirst here
-  // is effectively only for the all-tours fallback.
-  const isFirst = (worldRank === 1 && (activeSort === 'world-rank-desc' || activeTour === 'all'));
+  // Top-10 tier accent (list-position 0-8 below hero).
+  // Rank-1 is rendered by HeroChampion, never by PlayerCardV2 — no isFirst branch needed.
   const tierAccent = isTopTen;
 
   const photoSize = tierAccent ? 38 : 34;
-  const nameWeight = tierAccent ? 900 : (isFirst ? 800 : 600);
-  const nameSize = tierAccent ? 15 : 14;
+  const nameWeight = tierAccent ? 800 : 700;
+  const nameSize = 14;
   const rankSize = tierAccent ? 16 : 18;
-  const rankColor = tierAccent
-    ? '#F7931E'
-    : (isFirst ? 'rgba(247,147,30,0.25)' : 'rgba(15,23,42,0.1)');
+  const rankColor = tierAccent ? '#F7931E' : 'rgba(15,23,42,0.10)';
   const rowPaddingY = tierAccent ? 14 : 12;
 
   return (
@@ -167,12 +163,8 @@ export function PlayerCardV2({
           alignItems: 'center',
           gap: 0,
           borderBottom: '0.5px solid rgba(15,23,42,0.07)',
-          borderLeft: tierAccent
-            ? '2px solid rgba(247,147,30,0.30)'
-            : (isFirst ? '3px solid #F7931E' : '2px solid transparent'),
-          background: tierAccent
-            ? 'rgba(247,147,30,0.05)'
-            : (isFirst ? 'rgba(247,147,30,0.025)' : 'transparent'),
+          borderLeft: '2px solid transparent',
+          background: tierAccent ? '#FEF3E7' : 'transparent',
           textDecoration: 'none',
         }}
         className="active:bg-black/[0.02] transition-colors"
@@ -220,10 +212,10 @@ export function PlayerCardV2({
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '4px', marginTop: '2px' }}>
             <CountryFlag country={player.country} size="sm" />
-            <span style={{ fontSize: '10px', color: '#94A3B8' }}>{countryName}</span>
+            <span style={{ fontSize: '11px', fontWeight: 600, color: '#64748B' }}>{countryName}</span>
             {/* OWGR secondary for tour-specific pages */}
             {isTourRanking && !isLPGA && owgr != null && owgr > 0 && (
-              <span style={{ fontSize: '10px', color: '#CBD5E1', marginLeft: '4px' }}>· #{owgr} OWGR</span>
+              <span style={{ fontSize: '11px', fontWeight: 600, color: '#94A3B8', marginLeft: '4px' }}>· #{owgr} OWGR</span>
             )}
           </div>
         </div>
@@ -233,34 +225,28 @@ export function PlayerCardV2({
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 2, padding: `${rowPaddingY}px 14px ${rowPaddingY}px 0`, flexShrink: 0 }}>
             {displayValue ? (
               // Tour Hub standard override (Stat Watch, etc.) — bypasses sort-mode selection.
-              <span style={{ fontSize: '13px', fontWeight: 800, color: tierAccent && worldRank === 1 ? '#F7931E' : '#0F172A', fontVariantNumeric: 'tabular-nums' }}>
+              <span style={{ fontSize: '13px', fontWeight: 800, color: '#0F172A', fontVariantNumeric: 'tabular-nums' }}>
                 {displayValue.main}
-                {displayValue.label && (
-                  <span style={{ fontSize: '9px', fontWeight: 800, color: '#94A3B8', marginLeft: 2 }}>
-                    {displayValue.label}
-                  </span>
-                )}
               </span>
             ) : (
               <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                 {!isTourRanking && !isPgaEarnings && !isPgaFedex && totalPoints != null && totalPoints > 0 && activeSort !== 'most-wins' && (
-                  <span style={{ fontSize: '11px', fontWeight: 800, color: '#0F172A', fontVariantNumeric: 'tabular-nums' }}>
+                  <span style={{ fontSize: '13px', fontWeight: 800, color: '#0F172A', fontVariantNumeric: 'tabular-nums' }}>
                     {totalPoints.toLocaleString(undefined, { maximumFractionDigits: 1 })}
-                    <span style={{ fontSize: '9px', fontWeight: 800, color: '#0F172A' }}>pts</span>
                   </span>
                 )}
                 {rightValue && (
-                  <span style={{ fontSize: '13px', fontWeight: 800, color: isFirst ? '#F7931E' : '#0F172A', fontVariantNumeric: 'tabular-nums' }}>
+                  <span style={{ fontSize: '13px', fontWeight: 800, color: '#0F172A', fontVariantNumeric: 'tabular-nums' }}>
                     {rightValue.main}
-                    {rightValue.label && (
-                      <span style={{ fontSize: '9px', fontWeight: 800, color: '#0F172A' }}>
+                    {rightValue.label && activeSort === 'most-wins' && (
+                      <span style={{ fontSize: '11px', fontWeight: 700, color: '#64748B', marginLeft: 3 }}>
                         {rightValue.label}
                       </span>
                     )}
                   </span>
                 )}
                 {!isTourRanking && !isPgaOwgr && !isPgaEarnings && !isPgaFedex && winCount > 0 && activeSort !== 'most-wins' && (
-                  <span style={{ fontSize: '12px', fontWeight: 800, color: '#16A34A', fontVariantNumeric: 'tabular-nums' }}>
+                  <span style={{ fontSize: '12px', fontWeight: 800, color: '#047857', fontVariantNumeric: 'tabular-nums' }}>
                     {winCount} {winCount === 1 ? 'win' : 'wins'}
                   </span>
                 )}
