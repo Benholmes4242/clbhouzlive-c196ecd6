@@ -35,7 +35,7 @@ export const TrendCardsStack: React.FC<Props> = ({ connectionId, currentHandicap
 
   const deltaStr =
     prediction.delta && prediction.delta !== 0
-      ? `${prediction.direction === 'up' ? '+' : '\u2212'}${Math.abs(prediction.delta).toFixed(1)} in 5 rounds`
+      ? `${prediction.direction === 'up' ? '+' : '\u2212'}${Math.abs(prediction.delta).toFixed(1)} Projected`
       : null;
 
   const showHero = !prediction.insufficientData && !isLoading;
@@ -132,7 +132,7 @@ export const TrendCardsStack: React.FC<Props> = ({ connectionId, currentHandicap
               lineHeight: 1.5,
             }}
           >
-            Three signals explaining your trajectory.
+            Your last 5 rounds suggest where your handicap is heading.
           </p>
 
           {showInfo && (
