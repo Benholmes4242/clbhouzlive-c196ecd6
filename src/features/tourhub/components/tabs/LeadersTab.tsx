@@ -177,11 +177,6 @@ export function LeadersTab() {
     : undefined;
   const worldUnitOverride = isWorldCategory ? '' : undefined;
 
-  // Leader value for active pill preview
-  const leaderValue = rankedPlayers.length > 0
-    ? (worldFormatOverride ?? category.format)(rankedPlayers[0].value)
-    : undefined;
-
   // Leader name+value for each category — shown in the sheet grid tiles
   const categoryLeaderValues = useMemo(() => {
     const map: Record<string, { name: string; value: string }> = {};
