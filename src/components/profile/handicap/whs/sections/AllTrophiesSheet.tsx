@@ -295,45 +295,46 @@ export const AllTrophiesSheet: React.FC<Props> = ({ open, onClose, achievements 
     };
   }, [open, onClose]);
 
+  const isEarnedFn = (a: Achievement) =>
+    (a.kind === 'binary' && a.earned === true) ||
+    (a.kind === 'list' && (a.list_played ?? 0) >= (a.list_total ?? 100));
+  const isInProgressFn = (a: Achievement) =>
+    a.kind === 'list' &&
+    (a.list_played ?? 0) > 0 &&
+    (a.list_played ?? 0) < (a.list_total ?? 100);
+  const isLockedFn = (a: Achievement) =>
+    (a.kind === 'binary' && a.earned === false) ||
+    (a.kind === 'list' && (a.list_played ?? 0) === 0);
+
   const counts = useMemo(() => ({
     all: achievements.length,
-    earned: achievements.filter((a) => a.earned).length,
-    in_progress: achievements.filter((a) => !a.earned && (a.progress ?? 0) > 0).length,
-    locked: achievements.filter((a) => !a.earned && (a.progress ?? 0) === 0).length,
+    earned: achievements.filter(isEarnedFn).length,
+    in_progress: achievements.filter(isInProgressFn).length,
+    locked: achievements.filter(isLockedFn).length,
   }), [achievements]);
 
   const filtered = useMemo(() => {
     if (filter === 'all') return achievements;
-    if (filter === 'earned') return achievements.filter((a) => a.earned);
-    if (filter === 'in_progress') return achievements.filter((a) => !a.earned && (a.progress ?? 0) > 0);
-    if (filter === 'locked') return achievements.filter((a) => !a.earned && (a.progress ?? 0) === 0);
+    if (filter === 'earned') return achievements.filter(isEarnedFn);
+    if (filter === 'in_progress') return achievements.filter(isInProgressFn);
+    if (filter === 'locked') return achievements.filter(isLockedFn);
     return achievements;
   }, [achievements, filter]);
 
   const grouped = useMemo(() => {
     const map = new Map<string, Achievement[]>();
     for (const a of filtered) {
-      const key = a.category ?? 'other';
+      const key = a.category ?? 'community';
       if (!map.has(key)) map.set(key, []);
       map.get(key)!.push(a);
     }
-    for (const list of map.values()) {
-      list.sort((a, b) => {
-        if (a.earned !== b.earned) return a.earned ? -1 : 1;
-        if (a.earned && b.earned) {
-          const aDate = a.achieved_at ? new Date(a.achieved_at).getTime() : 0;
-          const bDate = b.achieved_at ? new Date(b.achieved_at).getTime() : 0;
-          return bDate - aDate;
-        }
-        return (b.progress ?? 0) - (a.progress ?? 0);
-      });
-    }
+    // No re-sort — computeAchievements() emits hardest-first
     return map;
   }, [filtered]);
 
-  const earnedCount = achievements.filter((a) => a.earned).length;
-  const totalCount = achievements.length;
-  const pct = totalCount > 0 ? (earnedCount / totalCount) * 100 : 0;
+  const earnedCount = achievements.filter(isEarnedFn).length;
+  const earnableCount = achievements.filter((a) => a.kind !== 'counter').length;
+  const pct = earnableCount > 0 ? (earnedCount / earnableCount) * 100 : 0;
 
   const filterOpts: Array<{ id: FilterValue; label: string }> = [
     { id: 'all',         label: 'All' },
