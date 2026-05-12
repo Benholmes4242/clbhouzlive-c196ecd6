@@ -732,10 +732,6 @@ export const RoundsThatCountCard: React.FC<Props> = ({ connectionId, currentHand
             marginTop: 12,
             borderTop: `0.5px solid ${INK_10}`,
           }}>
-            <div style={{
-              width: 6, height: 6, borderRadius: '50%',
-              background: accent, flexShrink: 0,
-            }} />
             <p style={{
               margin: 0, flex: 1, fontSize: 11, color: INK_70, lineHeight: 1.4,
               fontFamily: FONT_GEIST,
