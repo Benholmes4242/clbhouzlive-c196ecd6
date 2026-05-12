@@ -157,8 +157,8 @@ export function FranchiseCard({
         {rank !== undefined && !isDelta && (
           <div style={{ width: '32px', flexShrink: 0, textAlign: 'center' as const }}>
             <span style={{
-              fontSize: isTopThree ? '17px' : '16px',
-              fontWeight: rankNumberWeight,
+              fontSize: isTopThree ? '16px' : '18px',
+              fontWeight: 900,
               color: rankNumberColor,
               fontVariantNumeric: 'tabular-nums',
               letterSpacing: '-0.02em',
