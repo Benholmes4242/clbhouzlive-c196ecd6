@@ -184,7 +184,7 @@ export function TournamentHero({ tournament, imageUrl, leader, leaderboard }: To
       <div
         style={{
           position: 'relative',
-          height: 'calc(220px + var(--sat, env(safe-area-inset-top, 0px)))',
+          height: 'calc(220px + max(env(safe-area-inset-top, 0px), 47px))',
           overflow: 'hidden',
         }}
       >
@@ -233,7 +233,7 @@ export function TournamentHero({ tournament, imageUrl, leader, leaderboard }: To
           <div
             style={{
               position: 'absolute',
-              top: 'calc(var(--sat, env(safe-area-inset-top, 0px)) + 14px)',
+              top: 'calc(max(env(safe-area-inset-top, 0px), 47px) + 14px)',
               left: 16,
               right: 16,
               display: 'flex',
@@ -249,33 +249,35 @@ export function TournamentHero({ tournament, imageUrl, leader, leaderboard }: To
 
         {/* Bottom — location + tournament name */}
         <div style={{ position: 'absolute', bottom: 0, left: 16, right: 16, paddingBottom: 14 }}>
-          <h1 style={{ fontSize: 24, fontWeight: 900, color: '#ffffff', letterSpacing: '-0.04em', lineHeight: 1.1, margin: '0 0 6px' }}>
+          <h1 style={{ fontSize: 22, fontWeight: 800, color: '#ffffff', letterSpacing: '-0.025em', lineHeight: 1.1, margin: '0 0 6px' }}>
             {tournament.name}
           </h1>
-          {(tournament.venue_city || tournament.venue_country) && (
-            <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.55)', fontWeight: 600, marginBottom: 2 }}>
-              {[tournament.venue_city, expandCountry(tournament.venue_country)].filter(Boolean).join(', ')}
-            </div>
-          )}
-          {dateRange && (
-            <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.35)', fontWeight: 600 }}>
-              {dateRange}
+          {(tournament.venue_city || tournament.venue_country || dateRange) && (
+            <div style={{
+              fontSize: 13,
+              fontWeight: 500,
+              color: 'rgba(255,255,255,0.70)',
+              letterSpacing: '-0.005em',
+            }}>
+              {[
+                [tournament.venue_city, expandCountry(tournament.venue_country)].filter(Boolean).join(', '),
+                dateRange,
+              ].filter(Boolean).join(' · ')}
             </div>
           )}
         </div>
       </div>
 
-      {/* 4-col stat grid on slate */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1.4fr', borderTop: '0.5px solid rgba(255,255,255,0.08)' }}>
+      {/* 3-col stat grid on slate */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', borderTop: '0.5px solid rgba(255,255,255,0.08)' }}>
         {[
           { label: 'PURSE', value: formattedPurse ?? '—' },
           { label: 'PAR', value: tournament.venue_par ? `Par ${tournament.venue_par}` : '—' },
           { label: 'YARDS', value: tournament.venue_yardage ? `${tournament.venue_yardage.toLocaleString()}` : '—' },
-          { label: 'COURSE', value: tournament.venue_course_name ?? tournament.venue_name ?? '—' },
         ].map((s, i) => (
-          <div key={s.label} style={{ padding: '9px 0 11px', textAlign: 'center' as const, borderRight: i < 3 ? '0.5px solid rgba(255,255,255,0.06)' : 'none' }}>
-            <div style={{ fontSize: '9.5px', fontWeight: 900, color: 'rgba(255,255,255,0.25)', letterSpacing: '0.12em', marginBottom: '3px' }}>{s.label}</div>
-            <div style={{ fontSize: '14px', fontWeight: 900, color: '#ffffff', letterSpacing: '-0.01em', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const, padding: '0 4px' }}>{s.value}</div>
+          <div key={s.label} style={{ padding: '9px 0 11px', textAlign: 'center' as const, borderRight: i < 2 ? '0.5px solid rgba(255,255,255,0.06)' : 'none' }}>
+            <div style={{ fontSize: 9, fontWeight: 800, color: 'rgba(255,255,255,0.40)', letterSpacing: '0.16em', marginBottom: '3px' }}>{s.label}</div>
+            <div style={{ fontSize: 14, fontWeight: 800, color: '#ffffff', letterSpacing: '-0.025em', fontVariantNumeric: 'tabular-nums' }}>{s.value}</div>
           </div>
         ))}
       </div>
