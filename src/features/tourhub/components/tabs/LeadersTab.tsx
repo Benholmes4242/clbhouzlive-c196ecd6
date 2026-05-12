@@ -15,15 +15,13 @@ import { useTourSeason, useTourPlayerStatistics } from '../../hooks/useTourHubDa
 import { useWorldRankingsLeaders } from '../../hooks/useWorldRankingsLeaders';
 import { useElitePlayers } from '../../hooks/useElitePlayers';
 import { useChampionStreak } from '../../hooks/useChampionStreak';
-import { useChampionRecentForm } from '../../hooks/useChampionRecentForm';
 import { useRecentPlayerResults } from '../../hooks/useRecentPlayerResults';
 import { useDebouncedValue } from '@/hooks/useDebouncedValue';
 import { LEADER_CATEGORIES, getCategoryByKey } from '../leaders/constants';
 import { LeadersCategorySheet } from '../leaders/LeadersCategorySheet';
-import { LeadersMasthead, type MastheadPill } from '../leaders/LeadersMasthead';
+import { LeadersMasthead } from '../leaders/LeadersMasthead';
 import { PlayerCardV2 } from '../players/PlayerCardV2';
 import { LeadersEmptyState } from '../leaders/LeadersEmptyState';
-import { formatStatMargin, formatStatMarginGap } from '../../utils/formatStatMargin';
 
 interface RankedItem {
   player: {
@@ -179,11 +177,6 @@ export function LeadersTab() {
     : undefined;
   const worldUnitOverride = isWorldCategory ? '' : undefined;
 
-  // Leader value for active pill preview
-  const leaderValue = rankedPlayers.length > 0
-    ? (worldFormatOverride ?? category.format)(rankedPlayers[0].value)
-    : undefined;
-
   // Leader name+value for each category — shown in the sheet grid tiles
   const categoryLeaderValues = useMemo(() => {
     const map: Record<string, { name: string; value: string }> = {};
@@ -251,92 +244,35 @@ export function LeadersTab() {
   );
   const { data: recentResultsMap } = useRecentPlayerResults(sortedPlayerIds);
 
-  // ─── Champion streak + recent form for hero pills ───
+  // ─── Champion streak for caption metadata (World Rankings only) ───
   const { data: streakWeeks } = useChampionStreak(
     isWorldCategory ? leader?.playerId : null,
   );
-  const { data: recentForm } = useChampionRecentForm(leader?.playerId, 8);
 
-  // ─── Build hero narrative pills (Phase 2: Margin → Streak → vs Avg → Recent Form) ───
-  // - Margin uses the shared formatStatMargin util — handles higher-better,
-  //   lower-better (with U+2212), and tied uniformly. Phase 2 unlocks Margin
-  //   pills for putt_avg/scoring_avg for the first time.
-  // - vs Avg renders only when category.tourAverageNumeric !== null. Always
-  //   slate normal variant (editorial context, not a dominance moment).
-  const heroPills = useMemo<MastheadPill[]>(() => {
-    const out: MastheadPill[] = [];
-    if (!leader) return out;
+  // Streak label — World Rankings only, ≥2 weeks.
+  const streakLabel = useMemo<string | null>(() => {
+    if (!isWorldCategory || !streakWeeks || streakWeeks < 2) return null;
+    return `${streakWeeks} CONSECUTIVE WEEKS`;
+  }, [isWorldCategory, streakWeeks]);
 
-    // 1. Margin pill — stat-aware, handles all three branches.
-    if (runnerUp) {
-      const margin = formatStatMargin({
-        leaderValue: leader.value,
-        runnerValue: runnerUp.value,
-        unit: category.unit,
-        higherIsBetter: category.higherIsBetter,
-        categoryKey: category.key,
-      });
-      out.push({
-        variant: margin.variant,
-        label: 'Margin:',
-        value: margin.copy,
-      });
+  // Margin label — only when there's a meaningful gap to the runner-up.
+  const marginLabel = useMemo<string | null>(() => {
+    if (!leader || !runnerUp) return null;
+    const a = leader.value;
+    const b = runnerUp.value;
+    if (a == null || b == null) return null;
+    if (isWorldCategory) {
+      const diff = a - b;
+      if (diff <= 0) return null;
+      return `MARGIN +${Math.round(diff)} PTS`;
     }
-
-    // 2. Streak pill — World Rankings only.
-    if (category.showStreak && streakWeeks && streakWeeks >= 2) {
-      out.push({
-        variant: 'highlight',
-        icon: 'flame',
-        value: `${streakWeeks}-week leader`,
-      });
-    }
-
-    // 3. vs Avg pill — render whenever a numeric tour average exists.
-    //    Always slate normal variant regardless of direction. Edge case
-    //    "at avg" prevents "+0"/"−0" from rendering as a fake margin.
-    if (category.tourAverageNumeric !== null) {
-      const tourAvg = category.tourAverageNumeric;
-      const diff = leader.value - tourAvg;
-      let value: string;
-      if (diff === 0) {
-        value = 'at avg';
-      } else {
-        const absDiff = Math.abs(diff);
-        const formatted = formatStatMarginGap(absDiff, category.unit, category.key);
-        // Higher-better: positive diff = above avg (good) → '+'.
-        //                negative diff = below avg (rare/bad) → U+2212.
-        // Lower-better:  negative diff = below avg (good)    → U+2212.
-        //                positive diff = above avg (rare/bad) → '+'.
-        const sign = diff > 0 ? '+' : '\u2212';
-        value = `${sign}${formatted}`;
-      }
-      out.push({
-        variant: 'normal',
-        label: 'vs avg:',
-        value,
-      });
-    }
-
-    // 4. Recent Form pill — when leader has played ≥3 events in last 8 weeks.
-    if (recentForm && recentForm.starts >= 3) {
-      let value: string | null = null;
-      if (recentForm.wins > 0) {
-        value = `${recentForm.starts} starts · ${recentForm.wins} ${recentForm.wins === 1 ? 'win' : 'wins'}`;
-      } else if (recentForm.top10s > 0) {
-        value = `${recentForm.starts} starts · ${recentForm.top10s} top-10${recentForm.top10s === 1 ? '' : 's'}`;
-      }
-      if (value) {
-        out.push({
-          variant: 'normal',
-          icon: 'trophy',
-          value,
-        });
-      }
-    }
-
-    return out;
-  }, [leader, runnerUp, category, streakWeeks, recentForm]);
+    const higher = category.higherIsBetter !== false;
+    const diff = higher ? a - b : b - a;
+    if (diff <= 0) return null;
+    const rounded = Math.abs(diff) >= 10 ? Math.round(diff) : Math.round(diff * 10) / 10;
+    const unit = category.unit ? ` ${category.unit.toUpperCase()}` : '';
+    return `MARGIN +${rounded}${unit}`;
+  }, [leader, runnerUp, isWorldCategory, category]);
 
   // ─── Loading skeleton ───
   if (isLoading) {
@@ -398,8 +334,11 @@ export function LeadersTab() {
         category={category}
         formatOverride={worldFormatOverride}
         unitOverride={worldUnitOverride}
-        leaderValue={leaderValue}
-        pills={heroPills}
+        streakLabel={streakLabel}
+        marginLabel={marginLabel}
+        seasonYear={season?.year ?? null}
+        tourLabel="PGA"
+        onEyebrowTap={() => navigate('/tourhub?tab=overview', { replace: true })}
       />
 
       {/* Sticky header — back link + group tabs + chip rail + count/search */}
@@ -419,7 +358,7 @@ export function LeadersTab() {
             to="/tourhub?tab=overview"
             replace
             className="flex items-center gap-0.5 active:opacity-50 transition-opacity shrink-0"
-            style={{ fontSize: '12px', fontWeight: 500, color: 'rgba(15,23,42,0.5)', textDecoration: 'none', marginLeft: '-4px' }}
+            style={{ fontSize: '12px', fontWeight: 500, color: '#64748B', textDecoration: 'none', marginLeft: '-4px' }}
           >
             <ChevronLeft size={13} strokeWidth={2.5} />
             Tour Overview
@@ -433,7 +372,7 @@ export function LeadersTab() {
               style={{
                 display: 'flex', alignItems: 'center', gap: 5,
                 padding: '6px 10px', borderRadius: 8,
-                background: 'rgba(15,23,42,0.04)',
+                background: '#EDF1F5',
                 border: 'none', cursor: 'pointer',
               }}
               aria-label="Search players"
@@ -445,7 +384,7 @@ export function LeadersTab() {
         </div>
 
         {/* Group underline tabs */}
-        <div style={{ display: 'flex', borderBottom: '0.5px solid rgba(15,23,42,0.07)', marginTop: '6px' }}>
+        <div style={{ display: 'flex', borderBottom: '1px solid rgba(15,23,42,0.10)', marginTop: '6px' }}>
           {Object.keys(GROUP_KEYS).map((groupLabel) => {
             const isActive = groupLabel === activeGroup;
             const firstKey = GROUP_KEYS[groupLabel]?.[0];
@@ -455,9 +394,9 @@ export function LeadersTab() {
                 onClick={() => { if (firstKey) setCategory(firstKey); }}
                 className="active:opacity-70 transition-opacity"
                 style={{
-                  flex: 1, padding: '10px 4px 9px',
-                  fontSize: '13px',
-                  fontWeight: isActive ? 800 : 500,
+                  flex: 1, padding: '12px 0',
+                  fontSize: '12px',
+                  fontWeight: isActive ? 800 : 600,
                   color: isActive ? '#0F172A' : '#94A3B8',
                   background: 'transparent', border: 'none',
                   borderBottom: isActive ? '2px solid #F7931E' : '2px solid transparent',
@@ -471,8 +410,8 @@ export function LeadersTab() {
           })}
         </div>
 
-        {/* Category chips — amber language family (Phase 1 fix.1.6) */}
-        <div style={{ display: 'flex', gap: '8px', padding: '14px 18px 12px', overflowX: 'auto', scrollbarWidth: 'none' }}>
+        {/* Category chips — canonical filter-pill treatment */}
+        <div style={{ display: 'flex', gap: '8px', padding: '14px 20px 12px', overflowX: 'auto', scrollbarWidth: 'none' }}>
           {activeGroupCats.map(cat => {
             const on = cat.key === categoryKey;
             return (
@@ -483,9 +422,9 @@ export function LeadersTab() {
                 style={{
                   padding: '6px 12px', borderRadius: '8px',
                   fontSize: '11px', fontWeight: on ? 800 : 700,
-                  color: on ? '#c97a10' : '#334155',
-                  background: on ? 'rgba(247,147,30,0.08)' : '#ffffff',
-                  border: `1px solid ${on ? 'rgba(247,147,30,0.30)' : '#E2E8F0'}`,
+                  color: '#0F172A',
+                  background: on ? '#FEF3E7' : '#ffffff',
+                  border: `1.5px solid ${on ? '#F7931E' : '#E2E8F0'}`,
                   cursor: 'pointer', whiteSpace: 'nowrap' as const,
                   transition: 'background 0.15s, border-color 0.15s',
                 }}
@@ -496,13 +435,14 @@ export function LeadersTab() {
           })}
         </div>
 
-        {/* Count bar OR search input — mutually exclusive (Phase 1 fix.1.7) */}
+        {/* Count bar OR search input — mutually exclusive */}
         {!searchExpanded ? (
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '6px 16px 8px', gap: 8 }}>
-            <span style={{ fontSize: 11, fontWeight: 600, color: '#64748B' }}>
-              {listPlayers.length.toLocaleString()} {listPlayers.length === 1 ? 'player' : 'players'}
-              <span style={{ color: '#CBD5E1' }}> · ranked by </span>
-              <span style={{ color: '#0F172A', fontWeight: 700 }}>{category.shortLabel}</span>
+          <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, padding: '6px 16px 8px' }}>
+            <span style={{ fontSize: 9, fontWeight: 800, color: '#0F172A', letterSpacing: '0.14em', textTransform: 'uppercase' as const, fontVariantNumeric: 'tabular-nums' }}>
+              {listPlayers.length.toLocaleString()} {listPlayers.length === 1 ? 'PLAYER' : 'PLAYERS'}
+            </span>
+            <span style={{ fontSize: 9, fontWeight: 800, color: '#64748B', letterSpacing: '0.14em', textTransform: 'uppercase' as const }}>
+              RANKED BY <span style={{ color: '#0F172A' }}>{category.shortLabel.toUpperCase()}</span>
             </span>
           </div>
         ) : (
@@ -545,6 +485,13 @@ export function LeadersTab() {
             >
               {listPlayers.length > 0 ? (
                 <>
+                  {!search && (
+                    <div style={{ padding: '12px 16px 6px' }}>
+                      <span style={{ fontSize: 9, fontWeight: 800, color: '#64748B', letterSpacing: '0.14em', textTransform: 'uppercase' as const }}>
+                        CHASING
+                      </span>
+                    </div>
+                  )}
                   {listPlayers.map((item, idx) => {
                     const fmt = worldFormatOverride ?? category.format;
                     const unit = worldUnitOverride ?? category.unit;
@@ -596,7 +543,7 @@ export function LeadersTab() {
         categories={LEADER_CATEGORIES}
         activeKey={category.key}
         onCategoryChange={setCategory}
-        leaderValue={leaderValue}
+        leaderValue={leader ? `${(worldFormatOverride ?? category.format)(leader.value)}${(worldUnitOverride ?? category.unit) ? ` ${worldUnitOverride ?? category.unit}` : ''}` : undefined}
         categoryLeaderValues={categoryLeaderValues}
         externalOpen={categorySheetOpen}
         onExternalClose={() => setCategorySheetOpen(false)}
