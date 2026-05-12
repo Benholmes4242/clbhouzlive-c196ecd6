@@ -101,15 +101,8 @@ interface LeadersMastheadProps {
   onEyebrowTap?: () => void;
 }
 
-/**
- * Splits a formatted stat value into integer + decimal-tail parts.
- * The decimal tail renders in amber per Stat Watch exemplar (IMG_6047).
- */
-function splitStatValue(formatted: string): { integer: string; decimal: string; suffix: string } {
-  const match = formatted.match(/^([^\d-]*-?\d+)(\.\d+)?(.*)$/);
-  if (!match) return { integer: formatted, decimal: '', suffix: '' };
-  return { integer: match[1], decimal: match[2] ?? '', suffix: match[3] ?? '' };
-}
+
+
 
 export function LeadersMasthead({
   leader,
