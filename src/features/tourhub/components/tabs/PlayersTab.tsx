@@ -722,44 +722,52 @@ export function PlayersTab() {
         return (
           <div style={{ padding: '16px 16px 0', background: '#F8FAFC' }}>
             {/* ── MASTHEAD ── */}
-            <div style={{ borderBottom: '2px solid #0F172A', paddingBottom: '10px', marginBottom: '14px' }}>
-              <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between' }}>
-                <div>
-                  <div style={{ fontSize: '8.5px', fontWeight: 900, color: '#F7931E', letterSpacing: '0.16em', textTransform: 'uppercase' as const, marginBottom: '4px' }}>
-                    ⚡ CLBHOUZ · TOUR HUB
-                  </div>
-                  <h1 style={{ fontSize: '26px', fontWeight: 900, color: '#0F172A', letterSpacing: '-0.04em', margin: 0, lineHeight: 1 }}>
+            {(() => {
+              const tourLabel = activeTour === 'pga' ? 'PGA Tour'
+                : activeTour === 'EURO' ? 'DP World Tour'
+                : activeTour === 'LPGA' ? 'LPGA'
+                : activeTour === 'PGAD' ? 'Korn Ferry'
+                : activeTour === 'LIV' ? 'LIV Golf'
+                : activeTour === 'CHAMP' ? 'PGA Tour Champions'
+                : 'Tour';
+              const seasonLabel = `${season?.year ?? new Date().getFullYear()} ${tourLabel} Season`;
+              return (
+                <div style={{ marginBottom: 14 }}>
+                  <button
+                    type="button"
+                    onClick={() => navigate('/tourhub?tab=overview', { replace: true })}
+                    aria-label="Players — open Tour Overview"
+                    style={{
+                      background: 'transparent',
+                      border: 'none',
+                      padding: 0,
+                      cursor: 'pointer',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: 6,
+                      marginBottom: 6,
+                    }}
+                  >
+                    <Users size={11} strokeWidth={2.6} style={{ color: '#F7931E' }} />
+                    <span style={{ fontSize: 10.5, fontWeight: 800, letterSpacing: '0.16em', color: '#F7931E' }}>
+                      PLAYERS
+                    </span>
+                    <ChevronRight size={11} strokeWidth={2.6} style={{ color: '#F7931E' }} />
+                  </button>
+                  <h1 style={{ fontSize: 18, fontWeight: 800, color: '#0F172A', letterSpacing: '-0.02em', margin: 0, lineHeight: 1.15 }}>
                     Players
                   </h1>
+                  <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 8, marginTop: 4 }}>
+                    <span style={{ fontSize: 13, fontWeight: 600, color: '#64748B' }}>
+                      {seasonLabel}
+                    </span>
+                    <span style={{ fontSize: 13, fontWeight: 700, color: '#0F172A', fontVariantNumeric: 'tabular-nums' }}>
+                      {totalCount.toLocaleString()} players
+                    </span>
+                  </div>
                 </div>
-                {/* Tour filter pill — lives in masthead */}
-                <button
-                  onClick={() => setTourSheetOpen(true)}
-                  style={{
-                    display: 'flex', alignItems: 'center', gap: '5px',
-                    borderRadius: '9px', padding: '6px 10px',
-                    border: '1px solid rgba(247,147,30,0.4)',
-                    background: 'rgba(247,147,30,0.06)',
-                    boxShadow: '0 1px 3px rgba(15,23,42,0.05)',
-                    cursor: 'pointer', marginBottom: '2px',
-                  }}
-                >
-                  {hasTourLogo(activeTour.toLowerCase())
-                    ? <img src={getTourLogo(activeTour.toLowerCase())} alt={activeTour} className="shrink-0" style={{ width: 16, height: 16, objectFit: 'contain' }} />
-                    : <Globe className="w-[14px] h-[14px] shrink-0" style={{ color: '#F7931E' }} strokeWidth={2.5} />
-                  }
-                  <span style={{ fontSize: '11px', fontWeight: 700, color: '#0F172A' }}>
-                    {activeTour === 'pga' ? 'PGA Tour'
-                      : activeTour === 'EURO' ? 'DP World Tour'
-                      : activeTour === 'LPGA' ? 'LPGA'
-                      : activeTour === 'PGAD' ? 'Korn Ferry'
-                      : activeTour === 'LIV' ? 'LIV Golf'
-                      : 'PGA Tour'}
-                  </span>
-                  <ChevronDown className="w-2.5 h-2.5" style={{ color: '#94A3B8' }} strokeWidth={2.5} />
-                </button>
-              </div>
-            </div>
+              );
+            })()}
 
             {/* ── NO.1 COVER STORY ── */}
             <HeroChampion
