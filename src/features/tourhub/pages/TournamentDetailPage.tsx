@@ -413,7 +413,7 @@ export function TournamentDetailPage() {
           <div style={{ display: 'flex', alignItems: 'center', padding: '7px 20px 0', gap: '4px' }}>
             <button
               onClick={() => { if (window.history.length > 1) navigate(-1); else navigate('/tourhub?tab=schedule'); }}
-              style={{ display: 'flex', alignItems: 'center', gap: '2px', fontSize: '13px', fontWeight: 500, color: 'rgba(15,23,42,0.5)', background: 'transparent', border: 'none', padding: 0, cursor: 'pointer' }}
+              style={{ display: 'flex', alignItems: 'center', gap: '2px', fontSize: 12, fontWeight: 600, color: '#64748B', background: 'transparent', border: 'none', padding: 0, cursor: 'pointer' }}
               className="active:opacity-50 transition-opacity"
             >
               <ChevronLeft size={13} strokeWidth={2.5} />
