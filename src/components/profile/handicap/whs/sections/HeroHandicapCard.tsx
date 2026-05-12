@@ -10,7 +10,7 @@ interface Props {
   connection: WhsConnection;
 }
 
-type Range = 30 | 365 | 'all';
+type Range = 30 | 90 | 365;
 
 // FORM ring temperature colours — only used by the FORM ring
 const FORM_HOT = '#E11D48';   // crimson, reads as red-hot
@@ -128,7 +128,7 @@ function formStateLabel(formStrokes: number): { title: string; sub: string } {
 }
 
 const HeroHandicapCard: React.FC<Props> = ({ connection }) => {
-  const [range, setRange] = useState<Range>(365);
+  const [range, setRange] = useState<Range>(90);
   const [scrubIdx, setScrubIdx] = useState<number | null>(null);
   const [drawn, setDrawn] = useState(false);
   const svgRef = useRef<SVGSVGElement | null>(null);
@@ -155,7 +155,6 @@ const HeroHandicapCard: React.FC<Props> = ({ connection }) => {
   // SCORING AVG, and the round counts in sub-labels.
   const rangeFilteredScores = useMemo(() => {
     if (!recent) return [] as any[];
-    if (range === 'all') return recent as any[];
     const cutoff = Date.now() - range * 24 * 60 * 60 * 1000;
     return (recent as any[]).filter((r: any) => {
       if (!r?.play_date) return false;
@@ -351,7 +350,7 @@ const HeroHandicapCard: React.FC<Props> = ({ connection }) => {
       const STEADY_THRESHOLD = 0.05;
       const delta = rangeDelta;
       const absDelta = Math.abs(delta);
-      const rangeLabel = range === 30 ? 'last month' : range === 365 ? 'last year' : 'lifetime';
+      const rangeLabel = range === 30 ? 'last month' : range === 90 ? 'last 3 months' : 'last year';
       if (absDelta < STEADY_THRESHOLD) {
         return <span style={{ color: INK_40 }}>Steady · {rangeLabel}</span>;
       }
@@ -488,7 +487,7 @@ const HeroHandicapCard: React.FC<Props> = ({ connection }) => {
   // formStrokes from fallbackForm (computed above using rangeDiffs).
   const formStrokesValue = fallbackForm.formStrokes;
   const formLabel = formStateLabel(formStrokesValue);
-  const formCap = range === 'all' ? 3 : 2;
+  const formCap = range === 365 ? 3 : 2;
   const formClamped = Math.max(-formCap, Math.min(formCap, formStrokesValue));
   const formMagnitude = Math.abs(formClamped) / formCap; // 0–1
   const formIsHot = formClamped > 0.05;
@@ -518,10 +517,10 @@ const HeroHandicapCard: React.FC<Props> = ({ connection }) => {
     : 0.5;
 
   const scoringSub = range === 30
-    ? 'Over 30 days'
-    : range === 365
-      ? 'Over 1 year'
-      : 'Career';
+    ? 'Over 1 month'
+    : range === 90
+      ? 'Over 3 months'
+      : 'Over 1 year';
 
   return (
     <section style={{ margin: '0 0 24px', padding: '0 20px', fontFamily: FONT_GEIST }}>
@@ -539,9 +538,9 @@ const HeroHandicapCard: React.FC<Props> = ({ connection }) => {
           </span>
         </div>
         <div style={{ display: 'inline-flex', gap: 2, padding: 2, background: INK_04, borderRadius: 999 }}>
-          {([30, 365, 'all'] as Range[]).map(r => {
+          {([30, 90, 365] as Range[]).map(r => {
             const active = r === range;
-            const label = r === 'all' ? 'ALL' : r === 365 ? '1Y' : '30D';
+            const label = r === 30 ? '1M' : r === 90 ? '3M' : '1Y';
             return (
               <button
                 key={String(r)}
@@ -573,10 +572,10 @@ const HeroHandicapCard: React.FC<Props> = ({ connection }) => {
         padding: '0 4px',
       }}>
         {range === 30
-          ? 'Your performance in the past 30 days'
-          : range === 365
-            ? 'Your performance over the past year'
-            : 'Your career performance to date'}
+          ? 'Your performance in the past month'
+          : range === 90
+            ? 'Your performance over the past 3 months'
+            : 'Your performance over the past year'}
       </div>
 
       {/* Three-ring row */}
