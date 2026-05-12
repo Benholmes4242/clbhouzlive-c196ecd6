@@ -5,6 +5,8 @@ import { reformatFriendName } from '@/lib/whs/utils/nameFormat';
 import SectionHeader from '../SectionHeader';
 import BuildYourCircleCTA from './BuildYourCircleCTA';
 
+const FONT_GEIST = 'Geist, system-ui, -apple-system, BlinkMacSystemFont, sans-serif';
+
 interface Props {
   userId: string;
 }
@@ -60,7 +62,7 @@ export const FeaturedFriendRoundHero: React.FC<Props> = ({ userId }) => {
           flexDirection: 'column',
           justifyContent: 'flex-end',
           color: '#fff',
-          fontFamily: '"Geist", system-ui, sans-serif',
+          fontFamily: FONT_GEIST,
         }}>
           <div style={{
             position: 'absolute',
@@ -136,7 +138,7 @@ export const FeaturedFriendRoundHero: React.FC<Props> = ({ userId }) => {
 
           <div style={{ padding: '60px 18px 14px' }}>
             <h3 style={{
-              fontFamily: 'Georgia, serif',
+              fontFamily: FONT_GEIST,
               fontSize: 26,
               fontWeight: 900,
               letterSpacing: '-0.03em',

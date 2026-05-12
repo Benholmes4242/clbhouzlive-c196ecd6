@@ -5,6 +5,8 @@ import type { FriendRivalryHydrated } from '@/lib/whs/types';
 import { firstName } from '@/lib/whs/utils/initials';
 import { fmtHcp } from '@/lib/whs/format';
 
+const FONT_GEIST = 'Geist, system-ui, -apple-system, BlinkMacSystemFont, sans-serif';
+
 interface Props {
   rivalry: FriendRivalryHydrated | null;
   open: boolean;
@@ -61,7 +63,7 @@ export const RivalryInfoSheet: React.FC<Props> = ({ rivalry, open, onClose }) =>
             borderTopRightRadius: 20,
             maxHeight: '70vh',
             overflow: 'hidden',
-            fontFamily: 'SF Pro Display, system-ui, sans-serif',
+            fontFamily: FONT_GEIST,
           }}
         >
           <DrawerPrimitive.Title className="sr-only">Why this rival</DrawerPrimitive.Title>
@@ -97,7 +99,7 @@ export const RivalryInfoSheet: React.FC<Props> = ({ rivalry, open, onClose }) =>
                   margin: 0,
                   fontSize: 22,
                   fontWeight: 900,
-                  fontFamily: 'Georgia, serif',
+                  fontFamily: FONT_GEIST,
                   letterSpacing: '-0.02em',
                   color: INK,
                   lineHeight: 1.15,

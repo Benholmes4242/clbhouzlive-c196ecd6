@@ -23,9 +23,7 @@ const AMBER_TINT = 'rgba(247,147,30,0.10)';
 const AMBER_DEEP = '#C97211';
 const AMBER_INK = '#9A6116';
 const WHITE_55 = 'rgba(255,255,255,0.70)';
-const FONT_SERIF = 'Georgia, "Iowan Old Style", "Apple Garamond", serif';
-const FONT_DISPLAY =
-  'SF Pro Display, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
+const FONT_GEIST = 'Geist, system-ui, -apple-system, BlinkMacSystemFont, sans-serif';
 
 const SheetSkeleton: React.FC = () => (
   <div className="animate-pulse">
@@ -224,7 +222,7 @@ export const RoundDetailSheet: React.FC<Props> = ({ scoreId, open, onClose, hand
                       margin: 0,
                       fontSize: 22,
                       fontWeight: 800,
-                      fontFamily: FONT_SERIF,
+                      fontFamily: FONT_GEIST,
                       letterSpacing: '-0.02em',
                       lineHeight: 1.1,
                       textShadow: '0 2px 12px rgba(0,0,0,0.45)',
@@ -334,7 +332,7 @@ export const RoundDetailSheet: React.FC<Props> = ({ scoreId, open, onClose, hand
                         fontSize: 22,
                         fontWeight: 800,
                         color: INK,
-                        fontFamily: FONT_DISPLAY,
+                        fontFamily: FONT_GEIST,
                         letterSpacing: '-0.03em',
                         lineHeight: 1,
                       }}

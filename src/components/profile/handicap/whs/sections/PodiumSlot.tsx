@@ -16,6 +16,8 @@ const MEDAL = {
   3: '#A16207',
 } as const;
 
+const FONT_GEIST = 'Geist, system-ui, -apple-system, BlinkMacSystemFont, sans-serif';
+
 const PLINTH_HEIGHT = {
   1: 88,
   2: 64,
@@ -149,7 +151,7 @@ export const PodiumSlot: React.FC<PodiumSlotProps> = ({
         style={{
           fontSize: 15,
           fontWeight: 900,
-          fontFamily: 'Georgia, serif',
+          fontFamily: FONT_GEIST,
           letterSpacing: '-0.02em',
           fontVariantNumeric: 'tabular-nums',
           color: isEmpty ? '#94A3B8' : '#0F172A',
@@ -178,7 +180,7 @@ export const PodiumSlot: React.FC<PodiumSlotProps> = ({
           style={{
             fontSize: isEmpty ? 11 : 22,
             fontWeight: 900,
-            fontFamily: 'Georgia, serif',
+            fontFamily: FONT_GEIST,
             color: isEmpty ? '#94A3B8' : '#fff',
             lineHeight: 1,
             letterSpacing: '-0.02em',

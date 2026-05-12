@@ -36,7 +36,7 @@ const MOMENTUM_GREEN_DEEP = '#047857';     // forest gradient start (was #15803D
 const MOMENTUM_GREEN_BRIGHT = '#10B981';   // forest gradient end (was #4ADE80)
 
 const MONTHS = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
-const FONT_DISPLAY = 'SF Pro Display, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
+const FONT_GEIST = 'Geist, system-ui, -apple-system, BlinkMacSystemFont, sans-serif';
 
 // Hero ring (responsive — viewBox is fixed coordinate space, rendered size is clamp())
 const HERO_VIEWBOX = 200;
@@ -513,7 +513,7 @@ const HeroHandicapCard: React.FC<Props> = ({ connection }) => {
       : 'Career';
 
   return (
-    <section style={{ margin: '0 0 24px', padding: '0 20px', fontFamily: FONT_DISPLAY }}>
+    <section style={{ margin: '0 0 24px', padding: '0 20px', fontFamily: FONT_GEIST }}>
       {/* Eyebrow row */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8, padding: '0 4px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>

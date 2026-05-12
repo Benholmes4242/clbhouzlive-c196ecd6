@@ -18,7 +18,7 @@ const T = {
   slate: '#94A3B8',
 };
 
-const FONT_DISPLAY = 'SF Pro Display, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
+const FONT_GEIST = 'Geist, system-ui, -apple-system, BlinkMacSystemFont, sans-serif';
 
 export const RivalryAddCard: React.FC<Props> = ({ slotIndex: _slotIndex, label: _label, onClick }) => {
   return (
@@ -36,7 +36,7 @@ export const RivalryAddCard: React.FC<Props> = ({ slotIndex: _slotIndex, label: 
         overflow: 'hidden',
         position: 'relative',
         cursor: 'pointer',
-        fontFamily: FONT_DISPLAY,
+        fontFamily: FONT_GEIST,
         border: 'none',
         padding: '32px 20px',
         textAlign: 'center',

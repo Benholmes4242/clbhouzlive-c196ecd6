@@ -28,7 +28,7 @@ const AMBER_BORDER = 'rgba(247,147,30,0.30)';
 const GREEN = '#059669';
 const RED = '#9F1D1D';
 
-const FONT_DISPLAY = 'SF Pro Display, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
+const FONT_GEIST = 'Geist, system-ui, -apple-system, BlinkMacSystemFont, sans-serif';
 
 const WEEKDAY = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
@@ -277,7 +277,7 @@ export const RoundsThatCountCard: React.FC<Props> = ({ connectionId, currentHand
                 <div key={t} style={{
                   position: 'absolute', top: yFor(t) - 7,
                   right: 6, fontSize: 11.5, fontWeight: 700,
-                  color: INK_55, fontFamily: FONT_DISPLAY,
+                  color: INK_55, fontFamily: FONT_GEIST,
                   fontVariantNumeric: 'tabular-nums',
                   textAlign: 'right', width: '100%',
                 }}>
@@ -403,7 +403,7 @@ export const RoundsThatCountCard: React.FC<Props> = ({ connectionId, currentHand
                     color: '#fff',
                     fontSize: 8.5, fontWeight: 800,
                     letterSpacing: '0.06em',
-                    fontFamily: FONT_DISPLAY,
+                    fontFamily: FONT_GEIST,
                     pointerEvents: 'none',
                     zIndex: 3,
                     whiteSpace: 'nowrap',
@@ -553,7 +553,7 @@ export const RoundsThatCountCard: React.FC<Props> = ({ connectionId, currentHand
                       padding: '8px 12px',
                       boxShadow: '0 8px 24px rgba(15,23,42,0.20)',
                       minWidth: 140,
-                      fontFamily: FONT_DISPLAY,
+                      fontFamily: FONT_GEIST,
                     }}>
                       <div style={{
                         display: 'flex', alignItems: 'center', justifyContent: 'space-between',
@@ -643,7 +643,7 @@ export const RoundsThatCountCard: React.FC<Props> = ({ connectionId, currentHand
                     <div style={{
                       fontSize: 9.5, fontWeight: isLatest ? 700 : 600,
                       color: isLatest ? INK : INK_40,
-                      fontFamily: FONT_DISPLAY,
+                      fontFamily: FONT_GEIST,
                       fontVariantNumeric: 'tabular-nums',
                       letterSpacing: '0.04em',
                       marginTop: 1,
@@ -727,7 +727,7 @@ export const RoundsThatCountCard: React.FC<Props> = ({ connectionId, currentHand
             }}>
               Your current index is{' '}
               <strong style={{
-                color: INK, fontWeight: 700, fontFamily: FONT_DISPLAY,
+                color: INK, fontWeight: 700, fontFamily: FONT_GEIST,
                 fontVariantNumeric: 'tabular-nums',
               }}>
                 {currentHandicap.toFixed(1)}
@@ -798,7 +798,7 @@ export const RoundsThatCountCard: React.FC<Props> = ({ connectionId, currentHand
             )}
             <p style={{
               margin: 0, fontSize: 11.5, color: INK_70, lineHeight: 1.5,
-              fontFamily: FONT_DISPLAY,
+              fontFamily: FONT_GEIST,
             }}>
               {willDropCounter ? (
                 <>
@@ -853,7 +853,7 @@ const StatCell: React.FC<{
       </span>
       <span style={{
         fontSize: 22, fontWeight: 700, color: valueColor,
-        fontFamily: FONT_DISPLAY, fontVariantNumeric: 'tabular-nums',
+        fontFamily: FONT_GEIST, fontVariantNumeric: 'tabular-nums',
         letterSpacing: '-0.02em',
         lineHeight: 1,
       }}>
@@ -934,7 +934,7 @@ const SafeState: React.FC<{ cutTarget: number; settleAt: number }> = ({
           <span style={{
             fontSize: 22, fontWeight: 700, color: INK,
             letterSpacing: '-0.02em', fontVariantNumeric: 'tabular-nums',
-            fontFamily: FONT_DISPLAY,
+            fontFamily: FONT_GEIST,
           }}>
             {fmtDiff(settleAt, { plus: true })}
           </span>
@@ -974,7 +974,7 @@ const CutTargetCard: React.FC<{ cutTarget: number }> = ({ cutTarget }) => (
         <span style={{
           fontSize: 22, fontWeight: 700, color: GREEN,
           letterSpacing: '-0.02em', fontVariantNumeric: 'tabular-nums',
-          fontFamily: FONT_DISPLAY,
+          fontFamily: FONT_GEIST,
         }}>
           {fmtDiff(cutTarget, { plus: true })}
         </span>

@@ -21,7 +21,7 @@ const T = {
   greenTint: 'rgba(5,150,105,0.12)',
   greyTint: 'rgba(15,23,42,0.05)',
 };
-const FONT_SERIF = 'Georgia, "Iowan Old Style", "Apple Garamond", serif';
+const FONT_GEIST = 'Geist, system-ui, -apple-system, BlinkMacSystemFont, sans-serif';
 
 const StatusBadge: React.FC<{ status: WhsInviteStatus['status'] }> = ({ status }) => {
   if (status === 'redeemed') {
@@ -153,7 +153,7 @@ export const SentInvitesSheet: React.FC<Props> = ({ open, onClose }) => {
           <DrawerPrimitive.Title
             style={{
               padding: '20px 60px 8px 20px',
-              fontFamily: FONT_SERIF,
+              fontFamily: FONT_GEIST,
               fontSize: 20,
               fontWeight: 900,
               letterSpacing: '-0.02em',
