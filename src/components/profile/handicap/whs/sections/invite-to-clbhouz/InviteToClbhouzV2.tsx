@@ -5,7 +5,7 @@ import {
   useSentInvites,
 } from '@/lib/whs/hooks';
 import SectionHeader from '../SectionHeader';
-import InviteRow from './InviteRow';
+import InviteCard from './InviteCard';
 import SentInvitesSheet from './SentInvitesSheet';
 
 interface Props {
