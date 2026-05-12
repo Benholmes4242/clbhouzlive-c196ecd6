@@ -163,12 +163,8 @@ export function PlayerCardV2({
           alignItems: 'center',
           gap: 0,
           borderBottom: '0.5px solid rgba(15,23,42,0.07)',
-          borderLeft: tierAccent
-            ? '2px solid rgba(247,147,30,0.30)'
-            : (isFirst ? '3px solid #F7931E' : '2px solid transparent'),
-          background: tierAccent
-            ? 'rgba(247,147,30,0.05)'
-            : (isFirst ? 'rgba(247,147,30,0.025)' : 'transparent'),
+          borderLeft: '2px solid transparent',
+          background: tierAccent ? '#FEF3E7' : 'transparent',
           textDecoration: 'none',
         }}
         className="active:bg-black/[0.02] transition-colors"
