@@ -18,6 +18,7 @@ import { extractPlayerStats, deriveSGProxies, formatStatsForPrompt } from './det
 import { calculateCourseFitScores, formatCourseFitForPrompt } from './courseFitCalculator.ts';
 import { calculateVenueHistoryScores, formatVenueHistoryForPrompt } from './venueHistory.ts';
 import { runConsensus } from './consensusEngine.ts';
+import { buildSyntheticCourseDNA, isMajorTournament } from './syntheticCourseDNA.ts';
 import type { PlayerStats as EnrichedPlayerStats } from './detailedStats.ts';
 import type { CourseDNAProfile } from './courseFitCalculator.ts';
 
