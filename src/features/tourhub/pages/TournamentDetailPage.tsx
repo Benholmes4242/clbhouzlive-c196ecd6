@@ -410,7 +410,7 @@ export function TournamentDetailPage() {
           }}
         >
           {/* Back link */}
-          <div style={{ display: 'flex', alignItems: 'center', padding: '7px 20px 0', gap: '4px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', padding: '7px 16px 0', gap: '4px' }}>
             <button
               onClick={() => { if (window.history.length > 1) navigate(-1); else navigate('/tourhub?tab=schedule'); }}
               style={{ display: 'flex', alignItems: 'center', gap: '2px', fontSize: 12, fontWeight: 600, color: '#64748B', background: 'transparent', border: 'none', padding: 0, cursor: 'pointer' }}
