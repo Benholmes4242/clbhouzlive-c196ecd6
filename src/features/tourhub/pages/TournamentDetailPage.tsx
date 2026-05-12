@@ -167,15 +167,22 @@ export function TournamentDetailPage() {
     return (
       <TourHubShell>
         {/* Slate masthead skeleton */}
-        <div style={{ background: '#0F172A', padding: 'calc(16px + env(safe-area-inset-top, 0px)) 16px 0' }} className="animate-pulse">
-          <div style={{ height: '8px', width: '140px', background: 'rgba(255,255,255,0.08)', borderRadius: '4px', marginBottom: '10px' }} />
-          <div style={{ height: '22px', width: '70%', background: 'rgba(255,255,255,0.06)', borderRadius: '4px', marginBottom: '10px' }} />
-          <div style={{ height: '120px', background: 'rgba(255,255,255,0.04)', borderRadius: '10px 10px 0 0' }} />
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', borderTop: '0.5px solid rgba(255,255,255,0.06)' }}>
-            {[1,2,3,4].map(i => (
-              <div key={i} style={{ padding: '9px 4px 11px', display: 'flex', flexDirection: 'column' as const, alignItems: 'center', gap: '4px' }}>
-                <div style={{ height: '8px', width: '40px', background: 'rgba(255,255,255,0.06)', borderRadius: '4px' }} />
-                <div style={{ height: '13px', width: '50px', background: 'rgba(255,255,255,0.04)', borderRadius: '4px' }} />
+        <div style={{ background: '#0F172A', padding: 'calc(16px + max(env(safe-area-inset-top, 0px), 47px)) 16px 0' }} className="animate-pulse">
+          {/* Pills row */}
+          <div style={{ display: 'flex', gap: 6, marginBottom: 60 }}>
+            <div style={{ height: 22, width: 88, background: 'rgba(255,255,255,0.10)', borderRadius: 6 }} />
+            <div style={{ height: 22, width: 140, background: 'rgba(255,255,255,0.10)', borderRadius: 6 }} />
+          </div>
+          {/* h1 */}
+          <div style={{ height: 22, width: '65%', background: 'rgba(255,255,255,0.10)', borderRadius: 4, marginBottom: 8 }} />
+          {/* Subhead */}
+          <div style={{ height: 13, width: '55%', background: 'rgba(255,255,255,0.10)', borderRadius: 4, marginBottom: 16 }} />
+          {/* 3-col stat strip */}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', borderTop: '0.5px solid rgba(255,255,255,0.08)' }}>
+            {[0, 1, 2].map(i => (
+              <div key={i} style={{ padding: '9px 0 11px', textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
+                <div style={{ height: 8, width: 40, background: 'rgba(255,255,255,0.10)', borderRadius: 4 }} />
+                <div style={{ height: 13, width: 50, background: 'rgba(255,255,255,0.10)', borderRadius: 4 }} />
               </div>
             ))}
           </div>
