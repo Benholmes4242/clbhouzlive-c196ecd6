@@ -3,26 +3,8 @@ import { ChevronRight } from 'lucide-react';
 import AllTrophiesSheet from './AllTrophiesSheet';
 import { format } from 'date-fns';
 import {
-  Trophy,
-  Flame,
-  TrendingDown,
-  Award,
-  Map as MapIcon,
-  Calendar,
-  Star,
-  Crown,
-  Flag,
-  Link2,
-  Target,
-  MapPin,
-  BarChart3,
-  CheckCircle2,
-  Activity,
-  Zap,
-  Users,
-  UserCheck,
-  Swords,
-  Plane,
+  Trophy, Crown, Flag, Link2, Target, MapPin, Globe, Hash,
+  CheckCircle2, Plane, Users, Lock,
 } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { useAllScores, useHandicapHistory, useTrophyAggregates } from '@/lib/whs/hooks';
