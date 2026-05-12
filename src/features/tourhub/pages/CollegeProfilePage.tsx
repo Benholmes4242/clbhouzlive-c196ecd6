@@ -389,11 +389,11 @@ export function CollegeProfilePage() {
           paddingTop: 'env(safe-area-inset-top, 0px)',
         }}
       >
-        <div style={{ display: 'flex', alignItems: 'center', padding: '8px 20px 10px', gap: 6 }}>
+        <div style={{ display: 'flex', alignItems: 'center', padding: '8px 16px 10px', gap: 6 }}>
           <button
             type="button"
             onClick={() => navigate(collegeHubRoute())}
-            style={{ display: 'flex', alignItems: 'center', gap: 2, fontSize: 12, fontWeight: 500, color: 'rgba(15,23,42,0.5)', background: 'transparent', border: 'none', padding: 0, cursor: 'pointer' }}
+            style={{ display: 'flex', alignItems: 'center', gap: 2, fontSize: 12, fontWeight: 600, color: '#64748B', background: 'transparent', border: 'none', padding: 0, cursor: 'pointer' }}
             className="active:opacity-50 transition-opacity"
           >
             <ChevronLeft size={13} strokeWidth={2.5} />
