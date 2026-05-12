@@ -20,26 +20,8 @@ interface Props {
 }
 
 const ICONS: Record<string, React.ComponentType<any>> = {
-  Trophy,
-  Flame,
-  TrendingDown,
-  Award,
-  Map: MapIcon,
-  Calendar,
-  Star,
-  Flag,
-  Link2,
-  Target,
-  MapPin,
-  BarChart3,
-  CheckCircle2,
-  Activity,
-  Zap,
-  Users,
-  UserCheck,
-  Swords,
-  Plane,
-  Crown,
+  Trophy, Crown, Flag, Link2, Target, MapPin, Globe, Hash,
+  CheckCircle2, Plane, Users,
 };
 
 const TROPHY_TILE_WIDTH = 130;
