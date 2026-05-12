@@ -249,7 +249,7 @@ export const HandicapProjectionCard: React.FC<Props> = ({ scores }) => {
               textAnchor="end"
               style={{ fontSize: 10, fontWeight: 700, fill: theme.accentInk, fontFamily: FONT }}
             >
-              5 rounds out
+              Projected
             </text>
           </svg>
         </div>
