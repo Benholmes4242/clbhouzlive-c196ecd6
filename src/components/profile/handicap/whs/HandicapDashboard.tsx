@@ -87,6 +87,10 @@ export const HandicapDashboard: React.FC<Props> = ({ connection, userId, readOnl
       </div>
 
       {!readOnly && (
+        <WhsConnectionCaption membershipNumber={connection.membership_number} />
+      )}
+
+      {!readOnly && (
         <TrophiesSheetMount
           connectionId={connection.id}
           connectionCreatedAt={connection.created_at}
