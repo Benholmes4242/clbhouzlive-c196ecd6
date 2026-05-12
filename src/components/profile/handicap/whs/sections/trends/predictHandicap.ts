@@ -161,7 +161,7 @@ export const VERDICT_META: Record<FormVerdict, VerdictMeta> = {
     theme: 'negative',
   },
   cold: {
-    label: 'Cold',
+    label: 'Off form',
     description:
       'Recent rounds are well above your counters. Your handicap is set to rise.',
     why: (recent, counters) =>
