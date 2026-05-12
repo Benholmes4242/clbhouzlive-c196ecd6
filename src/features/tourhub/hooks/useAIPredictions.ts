@@ -389,19 +389,30 @@ async function fetchPredictionsForTournament(tournament: any): Promise<AIPredict
     .eq('tournament_id', tournament.id)
     .maybeSingle();
 
-  if (!aiPredictions) {
-    // Try to generate predictions
+  // Check staleness BEFORE deciding whether to serve the cached row
+  const cachedEnrichmentStats = (aiPredictions as any)?.consensus_data?.enrichmentStats;
+  const cachedStale = aiPredictions
+    ? isPredictionStale(tournament, aiPredictions.generated_at, null, cachedEnrichmentStats)
+    : true; // no row = treat as stale → triggers generation
+
+  if (cachedStale) {
     try {
       const { data, error } = await supabase.functions.invoke('generate-predictions', {
-        body: { tournamentId: tournament.id },
+        body: { tournamentId: tournament.id, forceRegenerate: !!aiPredictions },
       });
       if (!error && data?.predictions) {
         return formatPredictions(tournament, data.predictions, true);
       }
+      if (aiPredictions) {
+        console.warn('[useAIPredictions] Regeneration failed, serving stale row as fallback');
+      } else {
+        return null;
+      }
     } catch (err) {
       console.error('[useAIPredictions] Failed to generate predictions:', err);
+      if (!aiPredictions) return null;
+      // fall through to serve stale row as degraded fallback
     }
-    return null;
   }
 
   const rawPredictions = {
@@ -608,19 +619,24 @@ function formatPredictions(
     confidence: predictions.confidence || 0.7,
     generatedAt: generatedAt || new Date().toISOString(),
     isAIPowered,
-    isStale: isPredictionStale(tournament, generatedAt, researchContext),
+    isStale: isPredictionStale(tournament, generatedAt, researchContext, predictions?.enrichmentStats),
   };
 }
 
 /**
- * Returns true when predictions should be considered stale:
- * - Generated >24h ago AND tournament hasn't started yet
+ * Returns true when predictions should be considered stale and regenerated:
  * - Flagged as needs_full_regeneration by the validation edge function
+ * - Older than 6 hours (mirrors server-side isPredictionStale in generate-predictions/index.ts)
+ * - Missing the dnaSource field (means the row was generated against pre-Patch-B code)
+ * - Reports courseFitCalculated = 0 (means the calculator never ran successfully)
+ *
+ * Skipped entirely for in-progress / closed tournaments — those values are final.
  */
 function isPredictionStale(
   tournament: any,
   generatedAt?: string,
-  researchContext?: any
+  researchContext?: any,
+  enrichmentStats?: any,
 ): boolean {
   if (researchContext?.needs_full_regeneration) return true;
 
@@ -629,11 +645,20 @@ function isPredictionStale(
     return false;
   }
 
-  if (!generatedAt) return false;
+  if (!generatedAt) return true;
 
+  // 6h age check — matches server-side
   const generatedTime = new Date(generatedAt).getTime();
-  const twentyFourHours = 24 * 60 * 60 * 1000;
-  return (Date.now() - generatedTime) > twentyFourHours;
+  const sixHours = 6 * 60 * 60 * 1000;
+  if (Date.now() - generatedTime > sixHours) return true;
+
+  // Pre-Patch-B rows have no dnaSource
+  if (enrichmentStats && !enrichmentStats.dnaSource) return true;
+
+  // Calculator failed to run
+  if (enrichmentStats?.courseFitCalculated === 0) return true;
+
+  return false;
 }
 
 /**
