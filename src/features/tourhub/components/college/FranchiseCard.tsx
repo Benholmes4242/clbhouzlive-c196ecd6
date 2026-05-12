@@ -194,8 +194,11 @@ export function FranchiseCard({
           <div style={{ minWidth: 0, flex: 1 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 6, minWidth: 0 }}>
               <p style={{
-                fontSize: 15, fontWeight: nameWeight, color: '#0F172A',
-                margin: 0, letterSpacing: '-0.3px',
+                fontSize: 14,
+                fontWeight: nameWeight,
+                color: '#0F172A',
+                margin: 0,
+                letterSpacing: isTopThree ? '-0.01em' : 0,
                 overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const,
               }}>
                 {displayName}
