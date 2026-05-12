@@ -84,8 +84,7 @@ export function PlayerTournamentHistory({ playerId, playerName }: PlayerTourname
                     display: 'flex', alignItems: 'center',
                     padding: '11px 16px',
                     borderBottom: '0.5px solid rgba(15,23,42,0.07)',
-                    borderLeft: isWin ? '3px solid #F7931E' : '3px solid transparent',
-                    background: isWin ? 'rgba(247,147,30,0.03)' : 'transparent',
+                    background: isWin ? '#FEF3E7' : 'transparent',
                     textDecoration: 'none',
                   }}
                   className="active:bg-black/[0.02] transition-colors"
