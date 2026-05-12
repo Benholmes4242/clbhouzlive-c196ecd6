@@ -457,11 +457,8 @@ export function CollegeCompareHero({ data, className }: CollegeCompareHeroProps)
       {/* ── PERFORMANCE STATS ── */}
       {hasPerformanceData && (
         <div style={{ background: '#ffffff', borderTop: '1px solid rgba(15,23,42,0.07)', borderBottom: '1px solid rgba(15,23,42,0.07)', marginTop: '8px' }}>
-          <div style={{ padding: '14px 20px 0' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '10px' }}>
-              <div style={{ width: 3, height: 14, background: '#0F172A', borderRadius: 1, flexShrink: 0 }} />
-              <span style={{ fontSize: '13px', fontWeight: 900, color: '#0F172A', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>Performance Stats</span>
-            </div>
+          <div style={{ padding: '14px 16px 10px' }}>
+            <span style={{ fontSize: '9px', fontWeight: 800, color: '#64748B', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>Performance Stats</span>
           </div>
           <div style={{ borderTop: '0.5px solid rgba(15,23,42,0.07)' }}>
             <MetricCompareRow label="Avg Scoring" value1={s1?.avg_scoring || 0} value2={s2?.avg_scoring || 0} format={formatAvg} lowerIsBetter />
