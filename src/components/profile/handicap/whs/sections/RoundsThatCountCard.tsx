@@ -434,7 +434,7 @@ export const RoundsThatCountCard: React.FC<Props> = ({ connectionId, currentHand
                   borderStyle = `2.5px solid ${RED}`;
                 } else if (isLatest) {
                   dotSize = 12;
-                  background = r.is_counter ? AMBER : '#fff';
+                  background = '#fff';
                   borderStyle = `2.5px solid ${INK}`;
                 } else if (r.is_counter) {
                   dotSize = 9;
