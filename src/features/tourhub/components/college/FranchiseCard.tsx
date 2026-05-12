@@ -142,17 +142,12 @@ export function FranchiseCard({
           borderBottom: '0.5px solid rgba(15,23,42,0.07)',
           textDecoration: 'none',
           ...(isDelta && deltas ? {
-            borderLeft: deltas.earnings_delta >= 0
-              ? '3px solid #16A34A'
-              : '3px solid #DC2626',
             background: deltas.earnings_delta >= 0
-              ? 'rgba(22,163,74,0.025)'
+              ? 'rgba(16,185,129,0.04)'
               : 'rgba(220,38,38,0.02)',
           } : isTopThree ? {
-            borderLeft: '3px solid #F7931E',
-            background: 'rgba(247,147,30,0.05)',
+            background: '#FEF3E7',
           } : {
-            borderLeft: '3px solid transparent',
             background: 'transparent',
           }),
         }}
