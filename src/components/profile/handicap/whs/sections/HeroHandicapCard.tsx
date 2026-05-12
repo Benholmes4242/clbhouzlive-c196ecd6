@@ -691,26 +691,8 @@ const HeroHandicapCard: React.FC<Props> = ({ connection }) => {
         />
       </div>
 
-      {/* Sparkline section header */}
-      <div style={{
-        marginTop: 28,
-        padding: '0 4px',
-        display: 'flex', alignItems: 'center', gap: 8,
-      }}>
-        <span aria-hidden style={{
-          display: 'inline-block',
-          width: 3, height: 11, background: AMBER, borderRadius: 1,
-        }} />
-        <span style={{
-          fontSize: 9, fontWeight: 800, color: AMBER,
-          letterSpacing: '0.16em', textTransform: 'uppercase',
-        }}>
-          {range === 30 ? '30-day index' : range === 365 ? '1-year index' : 'Lifetime index'}
-        </span>
-      </div>
-
       {/* Sparkline strip */}
-      <div style={{ padding: '0 10px', marginTop: 8 }}>
+      <div style={{ padding: '0 10px', marginTop: 20 }}>
         <svg
           ref={svgRef}
           width="100%"
