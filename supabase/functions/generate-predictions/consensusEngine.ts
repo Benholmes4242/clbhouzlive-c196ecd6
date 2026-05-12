@@ -367,6 +367,7 @@ export async function runConsensus(
   systemPrompt: string,
   userPrompt: string,
   calculatedFitScores?: Map<string, number>,
+  dnaAvailable: boolean = false,
   modelWeights?: Record<string, number>,
 ): Promise<ConsensusResult> {
   
