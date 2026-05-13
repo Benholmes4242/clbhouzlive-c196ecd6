@@ -290,6 +290,12 @@ function deriveHeroState(data: FriendYesterday): HeroState {
   return 'nudge';
 }
 
+const bannerContextLine = (data: FriendYesterday): string => {
+  const parts: string[] = ['YESTERDAY'];
+  parts.push(data.is_counter ? 'COUNTER' : 'NON COUNTER');
+  return parts.join(' · ');
+};
+
 const HeroHeader: React.FC<{ data: FriendYesterday; onClick: () => void }> = ({ data, onClick }) => (
   <div
     onClick={onClick}
@@ -335,17 +341,17 @@ const HeroHeader: React.FC<{ data: FriendYesterday; onClick: () => void }> = ({ 
           whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
           textShadow: '0 1px 4px rgba(0,0,0,0.6)',
         }}>
-          {data.name}
+          {[data.name, data.course_name].filter(Boolean).join(' · ')}
         </div>
-        {data.course_name && (
-          <div style={{
-            fontSize: 11, color: 'rgba(255,255,255,0.85)', marginTop: 2,
-            whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
-            textShadow: '0 1px 3px rgba(0,0,0,0.6)',
-          }}>
-            {data.course_name}
-          </div>
-        )}
+        <div style={{
+          fontSize: 10, fontWeight: 700, color: 'rgba(255,255,255,0.78)',
+          marginTop: 3, letterSpacing: '0.10em', textTransform: 'uppercase',
+          whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
+          textShadow: '0 1px 3px rgba(0,0,0,0.6)',
+          fontVariantNumeric: 'tabular-nums',
+        }}>
+          {bannerContextLine(data)}
+        </div>
       </div>
     </div>
   </div>
