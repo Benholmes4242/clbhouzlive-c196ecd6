@@ -273,7 +273,7 @@ const AvailableCard: React.FC<{
           fontFamily: FONT_GEIST,
           fontSize: 13,
           color: INK_55,
-          padding: '6px 20px 0',
+          padding: '6px 16px 0',
           margin: 0,
           lineHeight: 1.5,
         }}
@@ -283,7 +283,7 @@ const AvailableCard: React.FC<{
 
       <div
         style={{
-          margin: '14px 20px 0',
+          margin: '14px 16px 0',
           background: '#FFFFFF',
           border: `0.5px solid ${INK_10}`,
           borderRadius: 14,
