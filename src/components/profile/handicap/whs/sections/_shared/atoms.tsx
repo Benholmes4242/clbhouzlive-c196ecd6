@@ -214,7 +214,7 @@ export const EchoCallout: React.FC<EchoCalloutProps> = ({
             fontSize: 10,
             fontWeight: 800,
             color: AMBER_DEEP,
-            letterSpacing: '0.18em',
+            letterSpacing: '0.16em',
             textTransform: 'uppercase',
             marginBottom: 6,
             fontFamily: FONT,

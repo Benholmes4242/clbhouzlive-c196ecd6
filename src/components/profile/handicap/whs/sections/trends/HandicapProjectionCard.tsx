@@ -107,7 +107,7 @@ export const HandicapProjectionCard: React.FC<Props> = ({ scores }) => {
         <div style={{ padding: '12px 14px 12px 0', position: 'relative', borderRight: `1px solid ${T.hairline}` }}>
           <p style={{
             margin: 0,
-            fontSize: 9.5,
+            fontSize: 9,
             fontWeight: 800,
             letterSpacing: '0.16em',
             textTransform: 'uppercase',
@@ -134,7 +134,7 @@ export const HandicapProjectionCard: React.FC<Props> = ({ scores }) => {
         <div style={{ padding: '12px 0 12px 14px' }}>
           <p style={{
             margin: 0,
-            fontSize: 9.5,
+            fontSize: 9,
             fontWeight: 800,
             letterSpacing: '0.16em',
             textTransform: 'uppercase',

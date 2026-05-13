@@ -43,10 +43,10 @@ export const TrendCardsStack: React.FC<Props> = ({ connectionId, currentHandicap
   const [showInfo, setShowInfo] = useState(false);
 
   return (
-    <section style={{ padding: '10px 20px 0', marginBottom: 28, fontFamily: FONT }}>
+    <section style={{ padding: '14px 16px 0', marginBottom: 28, fontFamily: FONT }}>
       {splitAt !== 'rest' && (showHero ? (
-        <div style={{ padding: '0 4px 16px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, marginBottom: 10 }}>
+        <div style={{ padding: '0 0 16px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, marginBottom: 12 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
               <span
                 style={{
@@ -59,10 +59,10 @@ export const TrendCardsStack: React.FC<Props> = ({ connectionId, currentHandicap
               />
               <span
                 style={{
-                  fontSize: 11,
+                  fontSize: 9,
                   fontWeight: 800,
-                  color: INK_55,
-                  letterSpacing: '0.14em',
+                  color: '#64748B',
+                  letterSpacing: '0.16em',
                   textTransform: 'uppercase',
                   fontFamily: FONT,
                 }}
