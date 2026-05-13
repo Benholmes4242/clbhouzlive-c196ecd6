@@ -117,6 +117,26 @@ export const LastRoundCard: React.FC<Props> = ({ connectionId }) => {
       >
         {courseName}
       </div>
+      {contextLine && (
+        <div
+          style={{
+            marginTop: 3,
+            fontSize: 10,
+            fontWeight: 700,
+            color: 'rgba(255,255,255,0.78)',
+            letterSpacing: '0.10em',
+            textTransform: 'uppercase',
+            whiteSpace: 'nowrap',
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            textShadow: '0 1px 3px rgba(0,0,0,0.6)',
+            fontVariantNumeric: 'tabular-nums',
+            fontFamily: FONT_GEIST,
+          }}
+        >
+          {contextLine}
+        </div>
+      )}
     </div>
   );
 
@@ -140,11 +160,11 @@ export const LastRoundCard: React.FC<Props> = ({ connectionId }) => {
           <RoundCardShell
             courseThumbnailUrl={lastRound.course_thumbnail_image}
             banner={banner}
-            contextLine={contextLine}
             gross={lastRound.adjusted_gross ?? null}
             differential={lastRound.handicap_differential ?? null}
             stableford={lastRound.stableford_points ?? null}
             handicapDelta={lastRound.handicap_delta ?? null}
+            isCounter={lastRound.is_counter ?? false}
             holes={holes}
             onClick={() => setSheetOpen(true)}
           />
