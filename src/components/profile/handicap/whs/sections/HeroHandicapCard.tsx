@@ -553,8 +553,8 @@ const HeroHandicapCard: React.FC<Props> = ({ connection }) => {
   const formMagnitude = Math.abs(formClamped) / formCap; // 0–1
   const formIsHot = formClamped > 0.05;
   const formIsCold = formClamped < -0.05;
-  const formArcColor = formIsHot ? FORM_HOT : formIsCold ? FORM_COLD : INK_40;
-  const formHasData = last5Diffs.length > 0;
+  const formArcColor = pickFormRingColor(fallbackForm.direction, fallbackForm.enoughData);
+  const formHasData = fallbackForm.enoughData;
 
   // ── SCORING AVG within active range ───────────────────────────────────
   const rangeGrossList = rangeFilteredScores
