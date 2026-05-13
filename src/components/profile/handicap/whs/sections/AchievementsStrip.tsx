@@ -8,6 +8,7 @@ import {
 } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { useAllScores, useHandicapHistory, useTrophyAggregates } from '@/lib/whs/hooks';
+import { useTop100ProgressForUser } from '@/hooks/useTop100ProgressForUser';
 import { computeAchievements, pickNextUpTrophies } from '@/lib/whs/achievements';
 import type { Achievement } from '@/lib/whs/types';
 import { supabase } from '@/integrations/supabase/client';
@@ -283,6 +284,7 @@ export const AchievementsStrip: React.FC<Props> = ({
   const { data: scores, isLoading: sLoading } = useAllScores(connectionId);
   const { data: history, isLoading: hLoading } = useHandicapHistory(connectionId, 365);
   const { data: aggregates } = useTrophyAggregates(userId, connectionId);
+  const { data: top100Progress } = useTop100ProgressForUser(userId);
 
   // Fetch primary club for "Home club master" trophy
   const { data: primaryClub } = useQuery({
@@ -311,6 +313,20 @@ export const AchievementsStrip: React.FC<Props> = ({
     staleTime: 5 * 60_000,
   });
 
+  const top100ProgressMap = useMemo(() => {
+    if (!top100Progress?.lists) return undefined;
+    const map: Record<string, { played: number; total: number }> = {};
+    for (const list of top100Progress.lists) {
+      map[list.listSlug] = { played: list.played, total: list.total };
+    }
+    return map as {
+      global?: { played: number; total: number };
+      usa?: { played: number; total: number };
+      europe?: { played: number; total: number };
+      'gb-i'?: { played: number; total: number };
+    };
+  }, [top100Progress]);
+
   const allAchievements = useMemo<Achievement[]>(() => {
     if (!scores || !history) return [];
     return computeAchievements({
@@ -320,8 +336,9 @@ export const AchievementsStrip: React.FC<Props> = ({
       primaryClubId: primaryClub?.primary_club_id ?? null,
       primaryClubName: primaryClub?.primary_club_name ?? null,
       aggregates: aggregates ?? null,
+      top100Progress: top100ProgressMap,
     });
-  }, [scores, history, connectionCreatedAt, primaryClub, aggregates]);
+  }, [scores, history, connectionCreatedAt, primaryClub, aggregates, top100ProgressMap]);
 
   const earnedAchievements = useMemo(
     () => allAchievements.filter((a) =>

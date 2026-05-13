@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAllScores, useHandicapHistory, useTrophyAggregates } from '@/lib/whs/hooks';
+import { useTop100ProgressForUser } from '@/hooks/useTop100ProgressForUser';
 import { computeAchievements } from '@/lib/whs/achievements';
 import type { Achievement } from '@/lib/whs/types';
 import AllTrophiesSheet from './AllTrophiesSheet';
@@ -30,6 +31,7 @@ export const TrophiesSheetMount: React.FC<Props> = ({
   const { data: scores } = useAllScores(connectionId);
   const { data: history } = useHandicapHistory(connectionId, 365);
   const { data: aggregates } = useTrophyAggregates(userId, connectionId);
+  const { data: top100Progress } = useTop100ProgressForUser(userId);
 
   const { data: primaryClub } = useQuery({
     queryKey: ['user-primary-club', userId],
@@ -57,6 +59,20 @@ export const TrophiesSheetMount: React.FC<Props> = ({
     staleTime: 5 * 60_000,
   });
 
+  const top100ProgressMap = useMemo(() => {
+    if (!top100Progress?.lists) return undefined;
+    const map: Record<string, { played: number; total: number }> = {};
+    for (const list of top100Progress.lists) {
+      map[list.listSlug] = { played: list.played, total: list.total };
+    }
+    return map as {
+      global?: { played: number; total: number };
+      usa?: { played: number; total: number };
+      europe?: { played: number; total: number };
+      'gb-i'?: { played: number; total: number };
+    };
+  }, [top100Progress]);
+
   const allAchievements = useMemo<Achievement[]>(() => {
     if (!scores || !history) return [];
     return computeAchievements({
@@ -66,8 +82,9 @@ export const TrophiesSheetMount: React.FC<Props> = ({
       primaryClubId: primaryClub?.primary_club_id ?? null,
       primaryClubName: primaryClub?.primary_club_name ?? null,
       aggregates: aggregates ?? null,
+      top100Progress: top100ProgressMap,
     });
-  }, [scores, history, connectionCreatedAt, primaryClub, aggregates]);
+  }, [scores, history, connectionCreatedAt, primaryClub, aggregates, top100ProgressMap]);
 
   return (
     <AllTrophiesSheet

@@ -15,6 +15,19 @@ interface AchievementContext {
   /** Unused but kept for back-compat. */
   primaryClubName: string | null;
   aggregates?: TrophyAggregates | null;
+  /**
+   * Top 100 list progress from useTop100ProgressForUser.
+   * When present, takes precedence over agg.course_stats.top100_lists for the
+   * four Top 100 list trophies. Each entry maps slug -> { played, total }.
+   * Source of truth: user_course_activity intersect course_top100_memberships.
+   * Falls back to the RPC's WHS-scoped count if undefined.
+   */
+  top100Progress?: {
+    global?: { played: number; total: number };
+    usa?: { played: number; total: number };
+    europe?: { played: number; total: number };
+    'gb-i'?: { played: number; total: number };
+  };
 }
 
 /** Earliest handicap snapshot strictly below threshold. */
@@ -194,8 +207,15 @@ export function computeAchievements(ctx: AchievementContext): Achievement[] {
     { slug: 'gb-i', title: 'GB&I Top 100', type: 'top100_gb_i' },
   ];
   for (const lc of listCards) {
-    const played = agg?.course_stats?.top100_lists?.[lc.slug] ?? 0;
-    const total = agg?.course_stats?.top100_list_sizes?.[lc.slug] ?? 100;
+    // Prefer the client-computed progress (matches Milestones page).
+    // Falls back to the RPC's WHS-scoped count if the hook hasn't loaded yet.
+    const hookProgress = ctx.top100Progress?.[lc.slug];
+    const played = hookProgress?.played
+      ?? agg?.course_stats?.top100_lists?.[lc.slug]
+      ?? 0;
+    const total = hookProgress?.total
+      ?? agg?.course_stats?.top100_list_sizes?.[lc.slug]
+      ?? 100;
     out.push({
       id: lc.type, type: lc.type,
       title: lc.title,
