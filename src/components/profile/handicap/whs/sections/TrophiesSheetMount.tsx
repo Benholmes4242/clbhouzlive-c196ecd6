@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAllScores, useHandicapHistory, useTrophyAggregates } from '@/lib/whs/hooks';
+import { useTop100ProgressForUser } from '@/hooks/useTop100ProgressForUser';
 import { computeAchievements } from '@/lib/whs/achievements';
 import type { Achievement } from '@/lib/whs/types';
 import AllTrophiesSheet from './AllTrophiesSheet';
