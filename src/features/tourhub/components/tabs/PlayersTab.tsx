@@ -996,7 +996,7 @@ export function PlayersTab() {
               aria-pressed={isSelected}
               style={{
                 width: '100%', display: 'flex', alignItems: 'center', gap: 12,
-                padding: '14px 20px',
+                padding: '14px 16px',
                 background: isSelected ? 'rgba(247,147,30,0.04)' : 'transparent',
                 border: 'none',
                 borderLeft: isSelected ? '3px solid #F7931E' : '3px solid transparent',
