@@ -1,6 +1,6 @@
 import React from 'react';
 import { Drawer as DrawerPrimitive } from 'vaul';
-import { X } from 'lucide-react';
+import SheetHeader from '../_shared/SheetHeader';
 import { formatDistanceToNow } from 'date-fns';
 import { useSentInvites } from '@/lib/whs/hooks';
 import { firstName } from '@/lib/whs/utils/initials';
@@ -127,53 +127,17 @@ export const SentInvitesSheet: React.FC<Props> = ({ open, onClose }) => {
             }}
           />
 
-          {/* Close */}
-          <button
-            onClick={onClose}
-            aria-label="Close"
-            style={{
-              position: 'absolute',
-              top: 14,
-              right: 14,
-              width: 32,
-              height: 32,
-              borderRadius: '50%',
-              background: '#FFFFFF',
-              border: `1px solid ${T.hairline}`,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              cursor: 'pointer',
-              zIndex: 1,
-            }}
-          >
-            <X size={16} color={T.ink} />
-          </button>
-
-          <DrawerPrimitive.Title
-            style={{
-              padding: '20px 60px 8px 20px',
-              fontFamily: FONT_GEIST,
-              fontSize: 20,
-              fontWeight: 900,
-              letterSpacing: '-0.02em',
-              color: T.ink,
-              margin: 0,
-            }}
-          >
-            Sent invites
-          </DrawerPrimitive.Title>
-          <DrawerPrimitive.Description
-            style={{
-              padding: '0 20px 16px',
-              fontSize: 13,
-              color: T.inkMute,
-              margin: 0,
-              lineHeight: 1.45,
-            }}
-          >
+          <DrawerPrimitive.Title className="sr-only">Sent invites</DrawerPrimitive.Title>
+          <DrawerPrimitive.Description className="sr-only">
             Tap a pending invite to share it again.
           </DrawerPrimitive.Description>
+
+          <SheetHeader
+            eyebrow="INVITES SENT"
+            title="Sent invites"
+            sub="Tap a pending invite to share it again."
+            onClose={onClose}
+          />
 
           <div
             style={{

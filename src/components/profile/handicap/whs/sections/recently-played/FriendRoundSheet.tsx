@@ -209,7 +209,7 @@ export const FriendRoundSheet: React.FC<Props> = ({ activity, open, onClose }) =
                     style={{
                       margin: 0,
                       fontSize: 22,
-                      fontWeight: 900,
+                      fontWeight: 800,
                       fontFamily: FONT_GEIST,
                       letterSpacing: '-0.02em',
                       lineHeight: 1.15,

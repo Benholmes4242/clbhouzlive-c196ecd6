@@ -1,6 +1,6 @@
 import React from 'react';
 import { Drawer as DrawerPrimitive } from 'vaul';
-import { X } from 'lucide-react';
+import SheetHeader from '../_shared/SheetHeader';
 import type { FriendRivalryHydrated } from '@/lib/whs/types';
 import { firstName } from '@/lib/whs/utils/initials';
 import { fmtHcp } from '@/lib/whs/format';
@@ -16,7 +16,7 @@ interface Props {
 const INK = '#0F172A';
 const INK_MUTE = 'rgba(15,23,42,0.6)';
 const HAIRLINE = 'rgba(15,23,42,0.08)';
-const AMBER = '#F7931E';
+
 
 const slotExplanation = (kind: string): { title: string; body: string } => {
   switch (kind) {
@@ -71,51 +71,14 @@ export const RivalryInfoSheet: React.FC<Props> = ({ rivalry, open, onClose }) =>
             <div style={{ width: 36, height: 4, borderRadius: 2, background: 'rgba(15,23,42,0.15)' }} />
           </div>
 
-          <div style={{ padding: '8px 20px 20px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                <span aria-hidden style={{ width: 3, height: 8, borderRadius: 1, background: AMBER }} />
-                <span style={{ fontSize: 9, fontWeight: 900, color: AMBER, letterSpacing: '0.16em' }}>
-                  WHY THIS RIVAL
-                </span>
-              </div>
-              <button
-                onClick={onClose}
-                aria-label="Close"
-                style={{
-                  width: 30, height: 30, borderRadius: '50%',
-                  background: 'rgba(15,23,42,0.06)',
-                  border: 'none', cursor: 'pointer',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                }}
-              >
-                <X size={15} color={INK} strokeWidth={2.4} />
-              </button>
-            </div>
+          <SheetHeader
+            eyebrow="WHY THIS RIVAL"
+            title={explain?.title ?? 'About this rival'}
+            sub={explain?.body}
+            onClose={onClose}
+          />
 
-            {explain && (
-              <>
-                <h3 style={{
-                  margin: 0,
-                  fontSize: 22,
-                  fontWeight: 900,
-                  fontFamily: FONT_GEIST,
-                  letterSpacing: '-0.02em',
-                  color: INK,
-                  lineHeight: 1.15,
-                }}>
-                  {explain.title}
-                </h3>
-                <p style={{
-                  margin: '10px 0 0',
-                  fontSize: 14,
-                  color: INK_MUTE,
-                  lineHeight: 1.55,
-                }}>
-                  {explain.body}
-                </p>
-              </>
-            )}
+          <div style={{ padding: '8px 16px 20px' }}>
 
             {rivalry && (
               <div style={{
@@ -125,7 +88,7 @@ export const RivalryInfoSheet: React.FC<Props> = ({ rivalry, open, onClose }) =>
                 background: 'rgba(15,23,42,0.04)',
                 border: `1px solid ${HAIRLINE}`,
               }}>
-                <p style={{ margin: 0, fontSize: 11, color: INK_MUTE, fontWeight: 700, letterSpacing: '0.04em' }}>
+                <p style={{ margin: 0, fontSize: 11, color: INK_MUTE, fontWeight: 700 }}>
                   About {rivalry.rival_name ? firstName(rivalry.rival_name) : 'this rival'}
                 </p>
                 <ul style={{
@@ -152,7 +115,7 @@ export const RivalryInfoSheet: React.FC<Props> = ({ rivalry, open, onClose }) =>
               borderRadius: 12,
               border: `1px solid ${HAIRLINE}`,
             }}>
-              <p style={{ margin: 0, fontSize: 11, color: INK_MUTE, fontWeight: 700, letterSpacing: '0.04em' }}>
+              <p style={{ margin: 0, fontSize: 11, color: INK_MUTE, fontWeight: 700, letterSpacing: '0.14em' }}>
                 HOW RIVAL SLOTS WORK
               </p>
               <ul style={{

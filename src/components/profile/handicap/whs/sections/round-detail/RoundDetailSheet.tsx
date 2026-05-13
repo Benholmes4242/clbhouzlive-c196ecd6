@@ -208,9 +208,9 @@ export const RoundDetailSheet: React.FC<Props> = ({ scoreId, open, onClose, hand
                   <div
                     style={{
                       fontSize: 9,
-                      fontWeight: 900,
+                      fontWeight: 800,
                       color: AMBER,
-                      letterSpacing: '0.22em',
+                      letterSpacing: '0.16em',
                       marginBottom: 4,
                     }}
                   >
@@ -237,7 +237,7 @@ export const RoundDetailSheet: React.FC<Props> = ({ scoreId, open, onClose, hand
                         fontSize: 10,
                         fontWeight: 700,
                         color: WHITE_55,
-                        letterSpacing: '0.06em',
+                        letterSpacing: '0.14em',
                         textTransform: 'uppercase',
                         fontVariantNumeric: 'tabular-nums',
                       }}
@@ -312,8 +312,8 @@ export const RoundDetailSheet: React.FC<Props> = ({ scoreId, open, onClose, hand
                   <span
                     style={{
                       fontSize: 9,
-                      fontWeight: 900,
-                      letterSpacing: '0.20em',
+                      fontWeight: 800,
+                      letterSpacing: '0.16em',
                       color: AMBER_DEEP,
                     }}
                   >
@@ -390,7 +390,7 @@ export const RoundDetailSheet: React.FC<Props> = ({ scoreId, open, onClose, hand
                       fontWeight: 800,
                       textDecoration: 'none',
                       border: 'none',
-                      letterSpacing: '0.04em',
+                      letterSpacing: '0.14em',
                       flexShrink: 0,
                       boxShadow:
                         '0 1px 0 rgba(247,147,30,0.40), 0 4px 10px -2px rgba(15,23,42,0.20)',
