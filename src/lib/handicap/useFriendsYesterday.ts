@@ -143,6 +143,9 @@ export function useFriendsYesterday(ownerUserId: string) {
 
       const friends: FriendYesterday[] = playedYesterday.map((f) => ({
         user_id: f.friend_user_id,
+        is_clbhouz_user: !!f.is_clbhouz_user,
+        friend_connection_id: f.friend_connection_id ?? null,
+        friend_passport_id: f.friend_passport_id ?? null,
         name: f.friend_name ?? 'Player',
         thumbnail_url: f.friend_thumbnail_url ?? null,
         initial: ((f.friend_name?.charAt(0) ?? '?').toUpperCase()),
