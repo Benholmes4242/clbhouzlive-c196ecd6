@@ -181,7 +181,7 @@ const TrophyRow: React.FC<{ a: Achievement }> = ({ a }) => {
           display: 'flex',
           alignItems: 'flex-start',
           gap: 6,
-          fontSize: 11.5,
+          fontSize: 11,
           color: INK_55,
           fontWeight: 500,
           lineHeight: 1.4,
