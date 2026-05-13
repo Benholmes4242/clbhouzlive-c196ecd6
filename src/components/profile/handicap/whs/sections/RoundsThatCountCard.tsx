@@ -597,7 +597,7 @@ export const RoundsThatCountCard: React.FC<Props> = ({ connectionId, currentHand
                     }}
                   >
                     <div style={{
-                      fontSize: 9.5, fontWeight: 600,
+                      fontSize: 9, fontWeight: 600,
                       color: isLatest ? INK : INK_40,
                       letterSpacing: '0.04em',
                     }}>
