@@ -29,8 +29,6 @@ const fmtDiff = (n: number | null | undefined) => {
 };
 
 export interface RoundCardBodyProps {
-  /** Eyebrow context line above the hero row, e.g. "3 MAY · PAR 71 · SL 135". */
-  contextLine: string;
   /** Gross score — required. */
   gross: number | null;
   /** Differential, e.g. -2.1 → "−2.1 DIFF" below gross. Null hides the strip. */
@@ -39,6 +37,12 @@ export interface RoundCardBodyProps {
   stableford: number | null;
   /** HCP index delta, e.g. -0.1 → green pill ↓0.1. Null/abs<0.05 hides the pill. */
   handicapDelta: number | null;
+  /**
+   * Whether the round was a counter (entered the user's best-8). Non-counters
+   * mathematically cannot move the index, so the HCP pill is suppressed for
+   * them even when handicapDelta is non-null.
+   */
+  isCounter: boolean;
   /** Hole-by-hole data. If absent, the strip block is omitted. */
   holes?: HoleRow[] | null;
   /** Whether to show "View scorecard" chip in the strip block. Default true if holes present. */
@@ -55,16 +59,17 @@ export interface RoundCardShellProps extends RoundCardBodyProps {
 }
 
 const _RoundCardBody: React.FC<RoundCardBodyProps> = ({
-  contextLine,
   gross,
   differential,
   stableford,
   handicapDelta,
+  isCounter,
   holes,
   showViewScorecard = true,
   onClick,
 }) => {
-  const showHcp = handicapDelta != null && Math.abs(handicapDelta) >= 0.05;
+  const showHcp =
+    isCounter && handicapDelta != null && Math.abs(handicapDelta) >= 0.05;
   const hcpIsCut = showHcp && handicapDelta! < 0;
   const hcpColor = hcpIsCut ? GREEN_DEEP : RED_INK;
   const hcpBg = hcpIsCut ? GREEN_SOFT : RED_SOFT;
@@ -81,20 +86,6 @@ const _RoundCardBody: React.FC<RoundCardBodyProps> = ({
         background: '#fff',
       }}
     >
-      {/* Context eyebrow */}
-      <div
-        style={{
-          fontSize: 10,
-          fontWeight: 700,
-          color: INK_55,
-          letterSpacing: '0.12em',
-          textTransform: 'uppercase',
-          fontVariantNumeric: 'tabular-nums',
-        }}
-      >
-        {contextLine}
-      </div>
-
       {/* Hero row */}
       <div
         style={{
