@@ -30,6 +30,7 @@ import CountryFlag from '@/components/ui/country-flag';
 import { toTitleCase } from '../hooks/useWorldRankings';
 import { getTourLogo } from '../utils/tourLogos';
 import { BottomSheet } from '@/components/ui/BottomSheet';
+import SheetHeader from '@/components/ui/SheetHeader';
 import { PlayerAvatar } from './PlayerAvatar';
 import { Shimmer } from './shared/Shimmer';
 import { TOUR_MAP, type TourCode } from '../constants/tourMap';
