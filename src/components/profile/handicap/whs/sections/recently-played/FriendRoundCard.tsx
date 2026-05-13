@@ -724,7 +724,7 @@ const ReportageCard: React.FC<{
             textOverflow: 'ellipsis',
           }}
         >
-          {activity.friend_name}
+          {reformatFriendName(activity.friend_name)}
         </p>
 
         {/* Course name */}
