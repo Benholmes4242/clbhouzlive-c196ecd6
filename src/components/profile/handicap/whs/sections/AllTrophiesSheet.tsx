@@ -5,6 +5,7 @@ import {
   CheckCircle2, Plane, Users, Lock, Info,
 } from 'lucide-react';
 import SheetHeader from '@/components/ui/SheetHeader';
+import AchievementInfoSheet from './AchievementInfoSheet';
 import type { Achievement } from '@/lib/whs/types';
 
 const AMBER     = '#F7931E';
