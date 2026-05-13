@@ -58,15 +58,19 @@ export const InviteCard: React.FC<Props> = ({ friend }) => {
       {/* Top row: avatar + name + HCP */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 10, minWidth: 0 }}>
         <div
+          role="img"
+          aria-label={friend.friend_name}
           style={{
             width: 36,
             height: 36,
             borderRadius: 12,
             overflow: 'hidden',
-            background: INK_06,
+            background: friend.friend_thumbnail_url
+              ? INK_06
+              : 'linear-gradient(135deg, #1a3c2a 0%, #0f172a 100%)',
             flexShrink: 0,
             display: 'flex',
-            alignItems: 'center',
+            alignItems: 'flex-end',
             justifyContent: 'center',
           }}
         >
@@ -77,9 +81,17 @@ export const InviteCard: React.FC<Props> = ({ friend }) => {
               style={{ width: '100%', height: '100%', objectFit: 'cover' }}
             />
           ) : (
-            <span style={{ fontSize: 10, fontWeight: 800, color: '#64748B' }}>
-              {initials(friend.friend_name)}
-            </span>
+            <svg
+              viewBox="0 0 64 64"
+              width="100%"
+              height="100%"
+              preserveAspectRatio="xMidYMax meet"
+              style={{ opacity: 0.56, display: 'block' }}
+              aria-hidden="true"
+            >
+              <circle cx="32" cy="25" r="11" fill="#ffffff" />
+              <path d="M11 64 C 11 48, 21 40, 32 40 C 43 40, 53 48, 53 64 Z" fill="#ffffff" />
+            </svg>
           )}
         </div>
 
