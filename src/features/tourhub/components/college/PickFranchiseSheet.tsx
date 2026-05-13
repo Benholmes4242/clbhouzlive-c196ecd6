@@ -8,6 +8,7 @@ import { useNavigate } from 'react-router-dom';
 import { Search } from 'lucide-react';
 import { getCollegeLogoUrl } from '@/utils/collegeLogo';
 import { BottomSheet } from '@/components/ui/BottomSheet';
+import SheetHeader from '@/components/ui/SheetHeader';
 import { useCollegeSeasonStats } from '../../hooks/useCollegeStats';
 import { useCollegeMediaMap } from '../../hooks/useCollegeMedia';
 import { useFollowedColleges, useFollowCollegeMutations } from '../../hooks/useCollegeMovers';
