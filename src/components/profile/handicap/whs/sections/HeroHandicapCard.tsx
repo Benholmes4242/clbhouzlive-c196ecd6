@@ -407,10 +407,10 @@ const HeroHandicapCard: React.FC<Props> = ({ connection }) => {
   const milestone = calcMilestoneProgress(scrubValue);
   
 
-  // Monthly movement math — inner ring (replaces form)
-  const monthly = calcMonthlyMovement(rangeDelta);
+  // Handicap movement math — inner ring (HCP-bucket-scaled threshold)
+  const monthly = calcHandicapMovement(rangeDelta, current, range);
   const useMonthlyRing = monthly.delta != null;
-  const fallbackForm = calcPeriodForm(rangeRoundsForForm);
+  const fallbackForm = calcStablefordForm(rangeFilteredScores as any[], (recent ?? []) as any[]);
 
   const innerFillLength = useMonthlyRing
     ? (monthly.fillFraction * C_INNER) / 2
