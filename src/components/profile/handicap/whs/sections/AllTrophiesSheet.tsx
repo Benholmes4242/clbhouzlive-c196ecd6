@@ -312,6 +312,7 @@ const TrophyRow: React.FC<{ a: Achievement; onInfoClick?: (a: Achievement) => vo
 
 export const AllTrophiesSheet: React.FC<Props> = ({ open, onClose, achievements }) => {
   const [filter, setFilter] = useState<FilterValue>('all');
+  const [infoSheetTrophy, setInfoSheetTrophy] = useState<Achievement | null>(null);
 
   useEffect(() => {
     if (!open) return;
