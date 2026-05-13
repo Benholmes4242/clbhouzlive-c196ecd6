@@ -128,7 +128,7 @@ const Shape: React.FC<{
 };
 
 // ─── RoundHoleCell ─────────────────────────────────────────────────────
-export const RoundHoleCell: React.FC<Props> = ({ hole, size = 44 }) => {
+export const RoundHoleCell: React.FC<Props> = ({ hole }) => {
   const strokes = hole.played
     ? (hole.adjusted_gross ?? hole.actual_gross ?? null)
     : null;
@@ -160,12 +160,14 @@ export const RoundHoleCell: React.FC<Props> = ({ hole, size = 44 }) => {
         {hole.hole_no}
       </span>
 
-      {/* Tile */}
+      {/* Tile — fills the grid column width, square via aspect-ratio.
+          Caps at 44px on wide viewports so the tiles don't get huge. */}
       <div
         style={{
           position: 'relative',
-          width: size,
-          height: size,
+          width: '100%',
+          maxWidth: 44,
+          aspectRatio: '1 / 1',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
@@ -198,21 +200,21 @@ export const RoundHoleCell: React.FC<Props> = ({ hole, size = 44 }) => {
         {/* Shape(s) for non-par variants */}
         {spec.shape && (
           <>
-            <Shape kind={spec.shape} inset={0} stroke={spec.stroke} size={size} />
+            <Shape kind={spec.shape} inset={0} stroke={spec.stroke} />
             {spec.depth >= 2 && (
-              <Shape kind={spec.shape} inset={INSET_DOUBLE} stroke={spec.stroke} size={size} />
+              <Shape kind={spec.shape} inset={INSET_DOUBLE} stroke={spec.stroke} />
             )}
             {spec.depth >= 3 && (
-              <Shape kind={spec.shape} inset={INSET_TRIPLE} stroke={spec.stroke} size={size} />
+              <Shape kind={spec.shape} inset={INSET_TRIPLE} stroke={spec.stroke} />
             )}
           </>
         )}
 
-        {/* Score numeral */}
+        {/* Score numeral — font scales subtly with cell width via clamp() */}
         <span
           style={{
             position: 'relative',
-            fontSize: 17,
+            fontSize: 'clamp(14px, 3.8vw, 17px)',
             fontWeight: 700,
             color: strokes == null ? INK_40 : INK,
             lineHeight: 1,
