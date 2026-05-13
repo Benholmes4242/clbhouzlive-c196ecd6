@@ -1,10 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { cn } from '@/lib/utils';
 import { getDirectImageUrl } from '@/utils/r2ImageUtils';
-import {
-  getAvatarFallbackColor,
-  getInitialsFromName,
-} from '@/lib/avatarFallback';
+import { getInitialsFromName } from '@/lib/avatarFallback';
 import { 
   getRingColorForTotalPlayed,
   THEME_COLORS,
