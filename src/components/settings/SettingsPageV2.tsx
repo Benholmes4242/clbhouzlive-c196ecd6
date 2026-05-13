@@ -334,11 +334,9 @@ export function SettingsPageV2() {
             }
             iconTheme="account"
             onClick={() => {
-              if (whsConnection) {
-                setWhsSheetOpen(true);
-              } else {
-                navigate('/handicap');
-              }
+              // Always open the sheet — it has both empty and synced states.
+              // The empty-state CTA inside the sheet navigates to /handicap.
+              setWhsSheetOpen(true);
             }}
           />
         </SettingsSection>
