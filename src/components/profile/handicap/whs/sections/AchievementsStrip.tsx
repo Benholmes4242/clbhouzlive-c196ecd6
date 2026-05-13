@@ -284,6 +284,7 @@ export const AchievementsStrip: React.FC<Props> = ({
   const { data: scores, isLoading: sLoading } = useAllScores(connectionId);
   const { data: history, isLoading: hLoading } = useHandicapHistory(connectionId, 365);
   const { data: aggregates } = useTrophyAggregates(userId, connectionId);
+  const { data: top100Progress } = useTop100ProgressForUser(userId);
 
   // Fetch primary club for "Home club master" trophy
   const { data: primaryClub } = useQuery({
