@@ -5,6 +5,7 @@
 
 import { useState, useCallback, useEffect } from 'react';
 import { BottomSheet } from '@/components/ui/BottomSheet';
+import SheetHeader from '@/components/ui/SheetHeader';
 import type { LeaderCategory } from './constants';
 
 interface CategoryGroup {
