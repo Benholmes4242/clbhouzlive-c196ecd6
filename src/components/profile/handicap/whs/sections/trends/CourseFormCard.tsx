@@ -268,14 +268,20 @@ const CourseRow: React.FC<{
           height: expanded ? 80 : 56,
           borderRadius: 8,
           flexShrink: 0,
+          position: 'relative',
+          overflow: 'hidden',
           background: course.course_thumbnail_image
             ? `url(${course.course_thumbnail_image})`
-            : `linear-gradient(135deg, ${T.amberTint}, rgba(15,23,42,0.04))`,
+            : undefined,
           backgroundSize: 'cover',
           backgroundPosition: 'center',
         }}
         aria-hidden
-      />
+      >
+        {!course.course_thumbnail_image && (
+          <CourseImageFallback flagOpacity={0.18} />
+        )}
+      </div>
 
       <div style={{ flex: 1, minWidth: 0 }}>
         <div
