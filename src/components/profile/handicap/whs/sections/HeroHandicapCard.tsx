@@ -547,7 +547,7 @@ const HeroHandicapCard: React.FC<Props> = ({ connection }) => {
   // ── FORM (range-aware) ────────────────────────────────────────────────
   // formStrokes from fallbackForm (computed above using rangeDiffs).
   const formStrokesValue = fallbackForm.formStrokes;
-  const formLabel = formStateLabel(formStrokesValue);
+  const formLabel = formStateLabel(formStrokesValue, fallbackForm.enoughData);
   const formCap = range === 365 ? 3 : 2;
   const formClamped = Math.max(-formCap, Math.min(formCap, formStrokesValue));
   const formMagnitude = Math.abs(formClamped) / formCap; // 0–1
