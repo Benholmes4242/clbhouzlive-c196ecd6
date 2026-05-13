@@ -191,3 +191,41 @@ export function formatUpdatedAt(fetchedAt: number, nowMs: number = Date.now()): 
 export function shouldShowTrajectory(w: WeatherData): boolean {
   return w.peakTempToday >= w.temperature + 3 && w.peakTempTimeLabel !== '';
 }
+
+// ── Icon-hero style mapping ───────────────────────────────────────────
+// Used by the lightened HomeCourseWeatherCard. Maps an iconType to a
+// lucide-react component + a calm tint colour (rendered at 0.32 opacity).
+
+import {
+  Sun,
+  Cloud,
+  CloudDrizzle,
+  CloudRain,
+  CloudSnow,
+  CloudLightning,
+  CloudFog,
+  Wind,
+  Moon,
+} from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
+
+export interface ConditionIconStyle {
+  Icon: LucideIcon;
+  tint: string;
+}
+
+export function pickConditionIconStyle(
+  iconType: ConditionState['iconType'],
+): ConditionIconStyle {
+  switch (iconType) {
+    case 'sun':     return { Icon: Sun,            tint: '#EAB308' };
+    case 'cloud':   return { Icon: Cloud,          tint: '#64748B' };
+    case 'drizzle': return { Icon: CloudDrizzle,   tint: '#3B82F6' };
+    case 'rain':    return { Icon: CloudRain,      tint: '#3B82F6' };
+    case 'snow':    return { Icon: CloudSnow,      tint: '#7D87E8' };
+    case 'storm':   return { Icon: CloudLightning, tint: '#2563EB' };
+    case 'fog':     return { Icon: CloudFog,       tint: '#94A3B8' };
+    case 'wind':    return { Icon: Wind,           tint: '#64748B' };
+    case 'moon':    return { Icon: Moon,           tint: '#6366F1' };
+  }
+}
