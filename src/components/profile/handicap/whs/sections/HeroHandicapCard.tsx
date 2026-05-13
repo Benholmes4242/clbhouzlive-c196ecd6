@@ -212,6 +212,7 @@ function formStateLabel(
 
 const HeroHandicapCard: React.FC<Props> = ({ connection }) => {
   const [range, setRange] = useState<Range>(90);
+  const [infoSheetOpen, setInfoSheetOpen] = useState(false);
   const [scrubIdx, setScrubIdx] = useState<number | null>(null);
   const [drawn, setDrawn] = useState(false);
   const svgRef = useRef<SVGSVGElement | null>(null);
