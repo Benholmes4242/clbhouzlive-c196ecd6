@@ -300,16 +300,21 @@ const HeroHandicapCard: React.FC<Props> = ({ connection }) => {
   if (current === null) {
     return (
       <section style={{ padding: '24px 12px 20px', marginBottom: 24 }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14, padding: '0 4px' }}>
-          <span
-            style={{
-              width: 6, height: 6, borderRadius: '50%', background: AMBER,
-              animation: 'liveDot 2s ease-in-out infinite',
-            }}
-          />
-          <span style={{ fontSize: 10, fontWeight: 800, color: INK_55, letterSpacing: '0.22em' }}>
-            HANDICAP INDEX
-          </span>
+        <div style={{ marginBottom: 14, padding: '0 4px' }}>
+          <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+            <span
+              style={{
+                width: 5, height: 5, borderRadius: '50%', background: AMBER,
+                animation: 'liveDot 2s ease-in-out infinite',
+              }}
+            />
+            <span style={{
+              fontSize: 9, fontWeight: 800, color: '#64748B',
+              letterSpacing: '0.16em', textTransform: 'uppercase',
+            }}>
+              HANDICAP INDEX
+            </span>
+          </div>
         </div>
         <p style={{ fontSize: 14, color: INK_55, fontStyle: 'italic', lineHeight: 1.5, margin: 0, padding: '0 4px' }}>
           Your handicap will appear after your first 8 rounds.
