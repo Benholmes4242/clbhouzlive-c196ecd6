@@ -28,6 +28,10 @@ export interface FriendYesterday {
   bogey: number | null;
   double_plus: number | null;
   hole_in_one: boolean;
+  // ── State-branching fields for un-enriched hero states ──
+  is_clbhouz_user: boolean;
+  friend_connection_id: string | null;
+  friend_passport_id: number | null;
 }
 
 export type FriendsYesterdayAbsenceReason =
@@ -139,6 +143,9 @@ export function useFriendsYesterday(ownerUserId: string) {
 
       const friends: FriendYesterday[] = playedYesterday.map((f) => ({
         user_id: f.friend_user_id,
+        is_clbhouz_user: !!f.is_clbhouz_user,
+        friend_connection_id: f.friend_connection_id ?? null,
+        friend_passport_id: f.friend_passport_id ?? null,
         name: f.friend_name ?? 'Player',
         thumbnail_url: f.friend_thumbnail_url ?? null,
         initial: ((f.friend_name?.charAt(0) ?? '?').toUpperCase()),

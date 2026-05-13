@@ -3,10 +3,13 @@
  * standout friend (hero card) and the rest of the group (horizontal
  * scroll of 250px mini cards). Tap-through navigates to Friends sub-tab.
  */
-import React from 'react';
-import { Trophy, Crown, Sparkles } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Trophy, Crown, Sparkles, RefreshCw, Send, Bell, ChevronRight, Check } from 'lucide-react';
 import { useSearchParams } from 'react-router-dom';
+import { toast } from 'sonner';
 import type { FriendsYesterdayResult, FriendYesterday } from '@/lib/handicap/useFriendsYesterday';
+import { callCreateInvite } from '@/lib/whs/api';
+import { sendWhsConnectionNudge, hasRecentlyNudged } from '@/lib/whs/nudge';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 
 const T = {
@@ -268,114 +271,315 @@ const HcpRowMini: React.FC<{ data: FriendYesterday }> = ({ data }) => {
 };
 
 // ── Hero card ───────────────────────────────────────────────
-const HeroCard: React.FC<{ data: FriendYesterday; onClick: () => void }> = ({ data, onClick }) => (
-  <button
-    type="button"
+// Branches into 4 states based on friend's clbhouz / EG state:
+//   enriched: full stat layout
+//   syncing : clbhouz + EG, enrichment pending → narrative + grey strip
+//   invite  : not on clbhouz → narrative + amber Invite CTA
+//   nudge   : on clbhouz, no EG connection → narrative + green Nudge CTA
+
+type HeroState = 'enriched' | 'syncing' | 'invite' | 'nudge';
+
+function deriveHeroState(data: FriendYesterday): HeroState {
+  const enriched =
+    data.stableford !== null && data.differential !== null && hasBreakdown(data);
+  if (enriched) return 'enriched';
+  if (!data.is_clbhouz_user) return 'invite';
+  if (data.user_id && data.friend_connection_id) return 'syncing';
+  return 'nudge';
+}
+
+const HeroHeader: React.FC<{ data: FriendYesterday; onClick: () => void }> = ({ data, onClick }) => (
+  <div
     onClick={onClick}
     style={{
-      display: 'block', width: '100%', padding: 0, background: '#fff',
-      border: `0.5px solid ${T.ink10}`, borderRadius: 14, overflow: 'hidden',
-      textAlign: 'left', cursor: 'pointer', fontFamily: FONT,
-    }}
-  >
-    {/* Course image */}
-    <div style={{
-      position: 'relative', width: '100%', aspectRatio: '16 / 4',
+      position: 'relative', width: '100%', aspectRatio: '16 / 4', cursor: 'pointer',
       background: data.course_thumbnail_image
         ? `url(${data.course_thumbnail_image}) center/cover`
         : `linear-gradient(135deg, #1f2937, #0f172a)`,
+    }}
+  >
+    <div style={{
+      position: 'absolute', inset: 0,
+      background: 'linear-gradient(to top, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0.10) 50%, rgba(0,0,0,0.35) 100%)',
+    }} />
+    <div style={{
+      position: 'absolute', top: 10, right: 10,
+      display: 'inline-flex', alignItems: 'center', gap: 4,
+      padding: '4px 9px', borderRadius: 999,
+      background: `linear-gradient(135deg, ${T.gold}, ${T.amber})`,
+      color: '#0F172A', fontSize: 9.5, fontWeight: 800, letterSpacing: '0.10em',
+    }}>
+      <Trophy size={10} strokeWidth={2.5} />
+      BEST OF GROUP
+    </div>
+    <div style={{
+      position: 'absolute', left: 12, right: 12, bottom: 10,
+      display: 'flex', alignItems: 'center', gap: 10,
     }}>
       <div style={{
-        position: 'absolute', inset: 0,
-        background: 'linear-gradient(to top, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0.10) 50%, rgba(0,0,0,0.35) 100%)',
-      }} />
-
-      {/* BEST OF GROUP pill */}
-      <div style={{
-        position: 'absolute', top: 10, right: 10,
-        display: 'inline-flex', alignItems: 'center', gap: 4,
-        padding: '4px 9px', borderRadius: 999,
-        background: `linear-gradient(135deg, ${T.gold}, ${T.amber})`,
-        color: '#0F172A', fontSize: 9.5, fontWeight: 800, letterSpacing: '0.10em',
+        width: 36, height: 36, borderRadius: 10, flexShrink: 0,
+        background: data.thumbnail_url
+          ? `url(${data.thumbnail_url}) center/cover`
+          : 'linear-gradient(135deg, #22C55E, #15803D)',
+        border: '1.5px solid rgba(255,255,255,0.9)',
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        color: '#fff', fontSize: 14, fontWeight: 800,
       }}>
-        <Trophy size={10} strokeWidth={2.5} />
-        BEST OF GROUP
+        {!data.thumbnail_url && data.initial}
       </div>
-
-      {/* Avatar + name */}
-      <div style={{
-        position: 'absolute', left: 12, right: 12, bottom: 10,
-        display: 'flex', alignItems: 'center', gap: 10,
-      }}>
+      <div style={{ flex: 1, minWidth: 0 }}>
         <div style={{
-          width: 36, height: 36, borderRadius: 10, flexShrink: 0,
-          background: data.thumbnail_url
-            ? `url(${data.thumbnail_url}) center/cover`
-            : 'linear-gradient(135deg, #22C55E, #15803D)',
-          border: '1.5px solid rgba(255,255,255,0.9)',
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          color: '#fff', fontSize: 14, fontWeight: 800,
+          fontSize: 14, fontWeight: 700, color: '#fff', lineHeight: 1.2,
+          whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
+          textShadow: '0 1px 4px rgba(0,0,0,0.6)',
         }}>
-          {!data.thumbnail_url && data.initial}
+          {data.name}
         </div>
-        <div style={{ flex: 1, minWidth: 0 }}>
+        {data.course_name && (
           <div style={{
-            fontSize: 14, fontWeight: 700, color: '#fff', lineHeight: 1.2,
+            fontSize: 11, color: 'rgba(255,255,255,0.85)', marginTop: 2,
             whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
-            textShadow: '0 1px 4px rgba(0,0,0,0.6)',
+            textShadow: '0 1px 3px rgba(0,0,0,0.6)',
           }}>
-            {data.name}
+            {data.course_name}
           </div>
-          {data.course_name && (
-            <div style={{
-              fontSize: 11, color: 'rgba(255,255,255,0.85)', marginTop: 2,
-              whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
-              textShadow: '0 1px 3px rgba(0,0,0,0.6)',
-            }}>
-              {data.course_name}
-            </div>
-          )}
-        </div>
+        )}
       </div>
     </div>
-
-    {/* Body */}
-    <div style={{ padding: '14px 16px', display: 'flex', flexDirection: 'column', gap: 12 }}>
-      <div style={{ display: 'flex', alignItems: 'flex-start' }}>
-        <StatCell label="GROSS" value={data.score} sub={data.is_counter ? 'Counter' : '\u00A0'} />
-        <StatCell label="STABLEFORD" value={data.stableford ?? '—'} sub={data.stableford !== null ? 'pts' : '\u00A0'} border />
-        <StatCell label="DIFFERENTIAL" value={fmtDiff(data.differential)} sub="vs course" border valueColor={diffColor(data.differential)} />
-      </div>
-
-      {/* Breakdown row */}
-      {hasBreakdown(data) ? (
-        <div style={{ paddingTop: 10, borderTop: `0.5px solid ${T.ink10}` }}>
-          <BreakdownRow data={data} label="ROUND" />
-        </div>
-      ) : (
-        <div style={{
-          paddingTop: 10, borderTop: `0.5px solid ${T.ink10}`,
-          fontSize: 11, color: T.ink40, fontStyle: 'italic',
-        }}>
-          Hole-by-hole not synced
-        </div>
-      )}
-
-      {/* Hcp row */}
-      <div style={{
-        paddingTop: 10, borderTop: `0.5px solid ${T.ink10}`,
-        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-      }}>
-        <span style={{
-          fontSize: 11, fontWeight: 700, color: T.ink55, letterSpacing: '0.06em',
-        }}>
-          Handicap index
-        </span>
-        <HcpRow data={data} />
-      </div>
-    </div>
-  </button>
+  </div>
 );
+
+const firstNameOf = (name: string): string =>
+  name.split(',').slice(-1)[0].trim().split(' ')[0] || 'friend';
+
+const NarrativeSubtitle: React.FC<{ data: FriendYesterday }> = ({ data }) => {
+  const bits: string[] = [];
+  bits.push(data.is_counter ? 'Counter' : 'Non counter');
+  if (data.friend_handicap_index !== null) {
+    bits.push(`handicap index ${data.friend_handicap_index.toFixed(1)}`);
+  }
+  return (
+    <div style={{ fontSize: 12, color: T.ink55, fontWeight: 600 }}>
+      {bits.join(' · ')}
+    </div>
+  );
+};
+
+const NarrativeTop: React.FC<{ data: FriendYesterday; onClick: () => void }> = ({ data, onClick }) => (
+  <div
+    onClick={onClick}
+    style={{ cursor: 'pointer', display: 'flex', flexDirection: 'column', gap: 4 }}
+  >
+    <div style={{ display: 'flex', alignItems: 'baseline', gap: 6, flexWrap: 'wrap' }}>
+      <span style={{ fontSize: 14, color: T.ink70, fontWeight: 600 }}>Shot a</span>
+      <span style={{
+        fontSize: 22, fontWeight: 800, color: T.ink, lineHeight: 1,
+        fontFeatureSettings: '"tnum" 1', fontVariantNumeric: 'tabular-nums',
+      }}>
+        {data.score}
+      </span>
+      <span style={{ fontSize: 14, color: T.ink70, fontWeight: 600 }}>yesterday</span>
+    </div>
+    <NarrativeSubtitle data={data} />
+  </div>
+);
+
+const SyncingStrip: React.FC = () => (
+  <div style={{
+    display: 'flex', alignItems: 'center', gap: 8,
+    padding: '10px 12px', borderRadius: 10,
+    background: T.ink04, color: T.ink55,
+    fontSize: 11.5, fontWeight: 600,
+  }}>
+    <RefreshCw size={13} strokeWidth={2.2} />
+    <span style={{ flex: 1 }}>
+      Hole-by-hole stats syncing — usually arrives within a few hours.
+    </span>
+  </div>
+);
+
+const CtaTile: React.FC<{
+  tone: 'amber' | 'green';
+  icon: React.ReactNode;
+  title: string;
+  subtitle: string;
+  showChevron: boolean;
+  onClick?: () => void;
+  disabled?: boolean;
+}> = ({ tone, icon, title, subtitle, showChevron, onClick, disabled }) => {
+  const palette = tone === 'amber'
+    ? { bg: 'rgba(247,147,30,0.10)', border: 'rgba(247,147,30,0.35)', icon: T.amber }
+    : { bg: T.greenSoft, border: 'rgba(34,197,94,0.35)', icon: T.greenDeep };
+  return (
+    <button
+      type="button"
+      onClick={(e) => { e.stopPropagation(); if (!disabled) onClick?.(); }}
+      disabled={disabled}
+      style={{
+        display: 'flex', alignItems: 'center', gap: 12,
+        width: '100%', padding: '12px 14px', borderRadius: 12,
+        background: palette.bg, border: `0.5px solid ${palette.border}`,
+        textAlign: 'left', cursor: disabled ? 'default' : 'pointer',
+        fontFamily: FONT,
+      }}
+    >
+      <div style={{
+        width: 32, height: 32, borderRadius: 9, flexShrink: 0,
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        background: '#fff', color: palette.icon,
+      }}>
+        {icon}
+      </div>
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <div style={{ fontSize: 13, fontWeight: 800, color: T.ink, lineHeight: 1.25 }}>
+          {title}
+        </div>
+        <div style={{ fontSize: 11, color: T.ink55, marginTop: 2, fontWeight: 600, lineHeight: 1.3 }}>
+          {subtitle}
+        </div>
+      </div>
+      {showChevron && <ChevronRight size={16} color={T.ink40} strokeWidth={2.2} />}
+    </button>
+  );
+};
+
+const InviteCTA: React.FC<{ data: FriendYesterday }> = ({ data }) => {
+  const [sending, setSending] = useState(false);
+  const [sent, setSent] = useState(false);
+  const fname = firstNameOf(data.name);
+
+  const handleInvite = async () => {
+    if (sending || sent) return;
+    if (data.friend_passport_id === null) {
+      toast.error("Can't invite without an England Golf member ID");
+      return;
+    }
+    setSending(true);
+    const res = await callCreateInvite(data.friend_passport_id, 'best_of_group_card');
+    setSending(false);
+    if (res.ok) {
+      setSent(true);
+      toast.success(`Invite sent to ${fname}`);
+    } else {
+      toast.error(res.message || 'Could not send invite');
+    }
+  };
+
+  return (
+    <CtaTile
+      tone={sent ? 'green' : 'amber'}
+      icon={sent ? <Check size={16} strokeWidth={2.6} /> : <Send size={15} strokeWidth={2.4} />}
+      title={sent ? 'Invite sent' : `Invite ${fname} to clbhouz`}
+      subtitle={sent ? "We'll let you know if they join." : 'See their hole-by-hole stats, Stableford and form.'}
+      showChevron={!sent}
+      onClick={handleInvite}
+      disabled={sending || sent}
+    />
+  );
+};
+
+const NudgeCTA: React.FC<{ data: FriendYesterday }> = ({ data }) => {
+  const [sending, setSending] = useState(false);
+  const [sent, setSent] = useState(false);
+  const fname = firstNameOf(data.name);
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      if (!data.user_id) return;
+      const recent = await hasRecentlyNudged(data.user_id);
+      if (!cancelled && recent) setSent(true);
+    })();
+    return () => { cancelled = true; };
+  }, [data.user_id]);
+
+  const handleNudge = async () => {
+    if (sending || sent) return;
+    if (!data.user_id) {
+      toast.error("Can't send a nudge without a clbhouz user ID");
+      return;
+    }
+    setSending(true);
+    const res = await sendWhsConnectionNudge(data.user_id);
+    setSending(false);
+    if (res.ok) {
+      setSent(true);
+      toast.success(`Nudge sent to ${fname}`);
+    } else if (res.reason === 'rate_limited') {
+      setSent(true);
+      toast.message('Already nudged in the last 7 days');
+    } else {
+      toast.error('Could not send nudge');
+    }
+  };
+
+  return (
+    <CtaTile
+      tone="green"
+      icon={sent ? <Check size={16} strokeWidth={2.6} /> : <Bell size={15} strokeWidth={2.4} />}
+      title={sent ? 'Nudge sent' : `Nudge ${fname} to connect EG`}
+      subtitle={sent
+        ? `We'll remind ${fname} again in a week if needed.`
+        : `${fname} is on clbhouz — see hole-by-hole stats once connected.`}
+      showChevron={!sent}
+      onClick={handleNudge}
+      disabled={sending || sent}
+    />
+  );
+};
+
+const EnrichedBody: React.FC<{ data: FriendYesterday }> = ({ data }) => (
+  <div style={{ padding: '14px 16px', display: 'flex', flexDirection: 'column', gap: 12 }}>
+    <div style={{ display: 'flex', alignItems: 'flex-start' }}>
+      <StatCell label="GROSS" value={data.score} sub={data.is_counter ? 'Counter' : '\u00A0'} />
+      <StatCell label="STABLEFORD" value={data.stableford ?? '—'} sub={data.stableford !== null ? 'pts' : '\u00A0'} border />
+      <StatCell label="DIFFERENTIAL" value={fmtDiff(data.differential)} sub="vs course" border valueColor={diffColor(data.differential)} />
+    </div>
+    <div style={{ paddingTop: 10, borderTop: `0.5px solid ${T.ink10}` }}>
+      <BreakdownRow data={data} label="ROUND" />
+    </div>
+    <div style={{
+      paddingTop: 10, borderTop: `0.5px solid ${T.ink10}`,
+      display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+    }}>
+      <span style={{
+        fontSize: 11, fontWeight: 700, color: T.ink55, letterSpacing: '0.06em',
+      }}>
+        Handicap index
+      </span>
+      <HcpRow data={data} />
+    </div>
+  </div>
+);
+
+const UnenrichedBody: React.FC<{
+  data: FriendYesterday;
+  state: 'syncing' | 'invite' | 'nudge';
+  onTapStats: () => void;
+}> = ({ data, state, onTapStats }) => (
+  <div style={{ padding: '14px 16px', display: 'flex', flexDirection: 'column', gap: 12 }}>
+    <NarrativeTop data={data} onClick={onTapStats} />
+    {state === 'syncing' && <SyncingStrip />}
+    {state === 'invite' && <InviteCTA data={data} />}
+    {state === 'nudge' && <NudgeCTA data={data} />}
+  </div>
+);
+
+const HeroCard: React.FC<{ data: FriendYesterday; onClick: () => void }> = ({ data, onClick }) => {
+  const state = deriveHeroState(data);
+  return (
+    <div style={{
+      width: '100%', background: '#fff',
+      border: `0.5px solid ${T.ink10}`, borderRadius: 14, overflow: 'hidden',
+      fontFamily: FONT,
+    }}>
+      <HeroHeader data={data} onClick={onClick} />
+      {state === 'enriched'
+        ? <EnrichedBody data={data} />
+        : <UnenrichedBody data={data} state={state} onTapStats={onClick} />}
+    </div>
+  );
+};
 
 // ── Mini card (250px) ───────────────────────────────────────
 const MiniCard: React.FC<{ data: FriendYesterday; onClick: () => void }> = ({ data, onClick }) => (
