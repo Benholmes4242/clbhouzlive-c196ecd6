@@ -891,7 +891,7 @@ const SafeState: React.FC<{ cutTarget: number; settleAt: number }> = ({
         }}>
           <Minus size={11} strokeWidth={2.4} color={INK_55} />
           <span style={{
-            fontSize: 9.5, fontWeight: 800, color: INK_55,
+            fontSize: 9, fontWeight: 800, color: INK_55,
             letterSpacing: '0.12em',
           }}>OTHERWISE</span>
         </div>
