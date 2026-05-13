@@ -5,7 +5,7 @@ import type { FriendLeaderboardEntry, FriendRivalry } from '@/lib/whs/types';
 import type { SharedRoundsResult } from '@/lib/whs/api';
 import { fmtHcp } from '@/lib/whs/format';
 import { fmtRelative, reformatFriendName } from '@/lib/whs/utils/nameFormat';
-import { initials } from '@/lib/whs/utils/initials';
+
 import { useUpsertRivalOverride, useDeleteRivalOverride } from '@/lib/whs/hooks';
 
 const T = {
