@@ -569,16 +569,21 @@ const HeroHandicapCard: React.FC<Props> = ({ connection }) => {
     };
   })();
 
-  // ── FORM (range-aware) ────────────────────────────────────────────────
-  // formStrokes from fallbackForm (computed above using rangeDiffs).
-  const formStrokesValue = fallbackForm.formStrokes;
-  const formLabel = formStateLabel(formStrokesValue, fallbackForm.enoughData, fallbackForm.roundsCount);
-  const formCap = range === 365 ? 3 : 2;
-  const formClamped = Math.max(-formCap, Math.min(formCap, formStrokesValue));
-  const formMagnitude = Math.abs(formClamped) / formCap; // 0–1
-  const formIsHot = formClamped > 0.05;
-  const formIsCold = formClamped < -0.05;
-  const formArcColor = pickFormRingColor(fallbackForm.direction, fallbackForm.enoughData);
+  // ── FORM (Stableford-vs-personal-baseline) ───────────────────────────
+  const formLabel = formStateLabel(
+    fallbackForm.formDelta,
+    fallbackForm.enoughData,
+    fallbackForm.roundsCount,
+    fallbackForm.periodAvg,
+  );
+  const formMagnitude = fallbackForm.fillFraction; // already 0–1
+  const formIsHot = fallbackForm.direction === 'positive';
+  const formIsCold = fallbackForm.direction === 'negative';
+  const formArcColor = pickFormRingColor(
+    fallbackForm.direction,
+    fallbackForm.enoughData,
+    fallbackForm.formDelta,
+  );
   const formHasData = fallbackForm.enoughData;
 
   // ── SCORING AVG within active range ───────────────────────────────────
