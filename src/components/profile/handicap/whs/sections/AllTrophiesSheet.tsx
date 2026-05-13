@@ -5,6 +5,7 @@ import {
   CheckCircle2, Plane, Users, Lock, Info,
 } from 'lucide-react';
 import SheetHeader from '@/components/ui/SheetHeader';
+import AchievementInfoSheet from './AchievementInfoSheet';
 import type { Achievement } from '@/lib/whs/types';
 
 const AMBER     = '#F7931E';
@@ -86,7 +87,7 @@ interface Props {
 
 type FilterValue = 'all' | 'earned' | 'in_progress' | 'locked';
 
-const TrophyRow: React.FC<{ a: Achievement }> = ({ a }) => {
+const TrophyRow: React.FC<{ a: Achievement; onInfoClick?: (a: Achievement) => void }> = ({ a, onInfoClick }) => {
   const Icon = ICONS[a.icon_name] ?? Trophy;
   const cat = CATEGORY_STYLE[a.category as CategoryKey] ?? CATEGORY_STYLE.handicap;
   const isCounter = a.kind === 'counter';
@@ -222,33 +223,34 @@ const TrophyRow: React.FC<{ a: Achievement }> = ({ a }) => {
               marginTop: 3,
               display: 'flex',
               alignItems: 'center',
-              gap: 3,
+              gap: 4,
             }}>
               <span>{a.count_label}</span>
               {a.hole_data_denominator && (
-                <Info
-                  size={10}
-                  color={INK_55}
-                  strokeWidth={2.4}
-                  aria-label="Counted from rounds with hole-by-hole detail"
-                />
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onInfoClick?.(a);
+                  }}
+                  aria-label={`About ${a.title} count`}
+                  style={{
+                    width: 16,
+                    height: 16,
+                    borderRadius: '50%',
+                    border: 'none',
+                    background: 'transparent',
+                    color: INK_55,
+                    cursor: 'pointer',
+                    padding: 0,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}
+                >
+                  <Info size={11} strokeWidth={2.4} />
+                </button>
               )}
-            </div>
-          )}
-          {a.hole_data_denominator && (
-            <div
-              title="Counted from rounds with hole-by-hole detail. EG records full hole data on rounds entered via the MyEG app; older or club-submitted rounds may show totals only."
-              style={{
-                fontSize: 10,
-                fontWeight: 700,
-                color: INK_55,
-                marginTop: 5,
-                fontVariantNumeric: 'tabular-nums',
-                letterSpacing: '0.02em',
-                whiteSpace: 'nowrap',
-              }}
-            >
-              {a.hole_data_denominator.rounds_with_holes} / {a.hole_data_denominator.total_rounds} rounds
             </div>
           )}
         </div>
@@ -310,6 +312,7 @@ const TrophyRow: React.FC<{ a: Achievement }> = ({ a }) => {
 
 export const AllTrophiesSheet: React.FC<Props> = ({ open, onClose, achievements }) => {
   const [filter, setFilter] = useState<FilterValue>('all');
+  const [infoSheetTrophy, setInfoSheetTrophy] = useState<Achievement | null>(null);
 
   useEffect(() => {
     if (!open) return;
@@ -561,7 +564,7 @@ export const AllTrophiesSheet: React.FC<Props> = ({ open, onClose, achievements 
                   </div>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                     {list.map((a) => (
-                      <TrophyRow key={a.id} a={a} />
+                      <TrophyRow key={a.id} a={a} onInfoClick={setInfoSheetTrophy} />
                     ))}
                   </div>
                 </div>
@@ -570,6 +573,12 @@ export const AllTrophiesSheet: React.FC<Props> = ({ open, onClose, achievements 
           )}
         </div>
       </div>
+
+      <AchievementInfoSheet
+        open={!!infoSheetTrophy}
+        achievement={infoSheetTrophy}
+        onClose={() => setInfoSheetTrophy(null)}
+      />
 
       <style>{`
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }

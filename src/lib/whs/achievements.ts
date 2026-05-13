@@ -131,6 +131,14 @@ export function computeAchievements(ctx: AchievementContext): Achievement[] {
     count: agg?.hole_stats?.eagles_count ?? 0, count_label: 'total',
     hole_data_denominator: holeDenominator,
   });
+  out.push({
+    id: 'birdies', type: 'birdies',
+    title: 'Birdies',
+    description: 'Score one under par on any hole.',
+    icon_name: 'Flag', category: 'scoring', kind: 'counter',
+    count: agg?.hole_stats?.birdies_count ?? 0, count_label: 'total',
+    hole_data_denominator: holeDenominator,
+  });
   {
     const at = agg?.hole_stats?.first_sub_par_at ?? null;
     out.push({
@@ -171,14 +179,8 @@ export function computeAchievements(ctx: AchievementContext): Achievement[] {
       earned: at !== null, achieved_at: at,
     });
   }
-  out.push({
-    id: 'birdies', type: 'birdies',
-    title: 'Birdies',
-    description: 'Score one under par on any hole.',
-    icon_name: 'Flag', category: 'scoring', kind: 'counter',
-    count: agg?.hole_stats?.birdies_count ?? 0, count_label: 'total',
-    hole_data_denominator: holeDenominator,
-  });
+
+
 
   // ── COURSES & TRAVEL (6, hardest-first) ────────────────────────────
   const listCards: Array<{

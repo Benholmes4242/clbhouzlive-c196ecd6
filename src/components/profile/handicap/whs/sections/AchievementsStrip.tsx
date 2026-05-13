@@ -4,7 +4,7 @@ import AllTrophiesSheet from './AllTrophiesSheet';
 import { format } from 'date-fns';
 import {
   Trophy, Crown, Flag, Link2, Target, MapPin, Globe, Hash,
-  CheckCircle2, Plane, Users, Lock, Info,
+  CheckCircle2, Plane, Users, Lock,
 } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { useAllScores, useHandicapHistory, useTrophyAggregates } from '@/lib/whs/hooks';
@@ -125,34 +125,8 @@ const TrophyTile: React.FC<{ a: Achievement }> = ({ a }) => {
               letterSpacing: '0.10em',
               textTransform: 'uppercase',
               marginTop: 3,
-              display: 'flex',
-              alignItems: 'center',
-              gap: 3,
             }}>
-              <span>{a.count_label}</span>
-              {a.hole_data_denominator && (
-                <Info
-                  size={9}
-                  color={INK_55}
-                  strokeWidth={2.4}
-                  aria-label="Counted from rounds with hole-by-hole detail"
-                />
-              )}
-            </div>
-          )}
-          {a.hole_data_denominator && (
-            <div
-              title="Counted from rounds with hole-by-hole detail. EG records full hole data on rounds entered via the MyEG app; older or club-submitted rounds may show totals only."
-              style={{
-                fontSize: 9,
-                fontWeight: 700,
-                color: INK_55,
-                marginTop: 4,
-                fontVariantNumeric: 'tabular-nums',
-                letterSpacing: '0.02em',
-              }}
-            >
-              {a.hole_data_denominator.rounds_with_holes} / {a.hole_data_denominator.total_rounds} rounds
+              {a.count_label}
             </div>
           )}
         </div>
