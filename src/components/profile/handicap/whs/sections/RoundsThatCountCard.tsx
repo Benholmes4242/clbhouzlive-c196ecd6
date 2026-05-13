@@ -461,9 +461,13 @@ export const RoundsThatCountCard: React.FC<Props> = ({ connectionId, currentHand
                       borderRadius: '50%',
                       background,
                       border: borderStyle,
+                      // Skip the ink selection halo for the latest dot —
+                      // its own border is already ink, so the halo would
+                      // double-stack and render as a thicker ring than
+                      // the green BEST / red WORST equivalents.
                       boxShadow: isActiveScrub
                         ? `0 0 0 3px rgba(247,147,30,0.18)`
-                        : isSel ? `0 0 0 2px ${INK}` : 'none',
+                        : isSel && !isLatest ? `0 0 0 2px ${INK}` : 'none',
                       padding: 0,
                       pointerEvents: 'none',
                       zIndex: 2,
