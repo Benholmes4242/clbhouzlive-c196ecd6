@@ -213,7 +213,7 @@ export const RivalryEditSheet: React.FC<Props> = ({ userId, rivalry, slotIndex, 
                       <p style={{ margin: 0, fontSize: 11, color: INK_MUTE, fontVariantNumeric: 'tabular-nums' }}>
                         HCP {fmtHcp(c.friend_handicap_index)}
                         {!c.is_clbhouz_user && (
-                          <span style={{ marginLeft: 8, color: AMBER_DEEP, fontWeight: 700, letterSpacing: '0.08em', fontSize: 9 }}>
+                          <span style={{ marginLeft: 8, color: AMBER_DEEP, fontWeight: 700, letterSpacing: '0.14em', fontSize: 9 }}>
                             INVITE
                           </span>
                         )}
