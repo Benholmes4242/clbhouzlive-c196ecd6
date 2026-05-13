@@ -61,8 +61,10 @@ const PAD_RIGHT = 0;
 // ── Milestone progress ────────────────────────────────────────────────────
 function calcMilestoneProgress(h: number) {
   const displayed = whsDisplayedHcp(h);
+  // Window matches WHS displayed-integer band: Math.floor(h + 0.5).
+  // h in [displayed − 0.6, displayed + 0.4] all round to `displayed`.
   const windowTop = displayed + 0.4;
-  const windowBottom = displayed - 0.5;
+  const windowBottom = displayed - 0.6;
   const progress = (windowTop - h) / (windowTop - windowBottom);
   return {
     displayed,

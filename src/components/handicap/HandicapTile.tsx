@@ -44,8 +44,10 @@ function HandicapTile({ userId, onClick }: HandicapTileProps) {
     }
     const h = trend.current;
     const displayed = h < 0 ? Math.floor(h) : Math.ceil(h);
+    // Window matches WHS displayed-integer band: Math.floor(h + 0.5).
+    // h in [displayed − 0.6, displayed + 0.4] all round to `displayed`.
     const windowTop = displayed + 0.4;
-    const windowBottom = displayed - 0.5;
+    const windowBottom = displayed - 0.6;
     const progress = (windowTop - h) / (windowTop - windowBottom);
     return { displayed, progress: Math.max(0, Math.min(1, progress)) };
   }, [trend]);
