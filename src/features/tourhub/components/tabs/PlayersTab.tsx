@@ -968,11 +968,11 @@ export function PlayersTab() {
         onClose={() => setTourSheetOpen(false)}
         ariaLabelledBy="players-tour-sheet-title"
       >
-        <div style={{ padding: '6px 20px 14px' }}>
-          <div style={{ fontSize: 8.5, fontWeight: 900, color: '#F7931E', letterSpacing: '0.16em', textTransform: 'uppercase' as const, marginBottom: 4 }}>Filter</div>
-          <div id="players-tour-sheet-title" style={{ fontSize: 20, fontWeight: 900, color: '#0F172A', letterSpacing: '-0.03em' }}>Select Tour</div>
-        </div>
-        <div style={{ borderTop: '0.5px solid rgba(15,23,42,0.07)' }}>
+        <SheetHeader
+          eyebrow="FILTER"
+          title={<span id="players-tour-sheet-title">Select tour</span>}
+          onClose={() => setTourSheetOpen(false)}
+        />
         {(['pga', 'EURO', 'LPGA', 'CHAMP', 'PGAD', 'LIV'] as const).map((code) => {
           const labels: Record<string, string> = {
             pga: 'PGA Tour', EURO: 'DP World Tour',
