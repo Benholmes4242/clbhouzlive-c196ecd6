@@ -185,8 +185,19 @@ function GridTile({
           </span>
         )}
       </div>
-      <div className="w-full">
-        <div style={{ fontSize: 15, fontWeight: 700, color: '#0f172a', lineHeight: 1.2 }}>{label}</div>
+      <div className="w-full" style={{ minWidth: 0 }}>
+        <div
+          style={{
+            fontSize: 15,
+            fontWeight: 700,
+            color: '#0f172a',
+            lineHeight: 1.15,
+            wordBreak: 'break-word',
+            hyphens: 'auto',
+          }}
+        >
+          {label}
+        </div>
         <div style={{ fontSize: 11, color: '#64748B', marginTop: 2 }}>{sub}</div>
       </div>
     </button>
@@ -314,8 +325,8 @@ function ProfileHubSheet({
             onDragEnd={handleSheetDragEnd}
             style={{
               y: sheetY,
-              maxHeight: '92dvh',
-              minHeight: 'min(72dvh, 520px)',
+              maxHeight: '70dvh',
+              minHeight: 'min(60dvh, 480px)',
               paddingBottom: 'env(safe-area-inset-bottom, 0px)',
             }}
             initial={{ y: '100%' }}
@@ -481,8 +492,19 @@ function ProfileHubSheet({
                         </div>
                       </div>
                     </div>
-                    <div className="w-full">
-                      <div style={{ fontSize: 15, fontWeight: 700, color: '#0f172a', lineHeight: 1.2 }}>Echo</div>
+                    <div className="w-full" style={{ minWidth: 0 }}>
+                      <div
+                        style={{
+                          fontSize: 15,
+                          fontWeight: 700,
+                          color: '#0f172a',
+                          lineHeight: 1.15,
+                          wordBreak: 'break-word',
+                          hyphens: 'auto',
+                        }}
+                      >
+                        Echo
+                      </div>
                       <div style={{ fontSize: 11, color: '#64748B', marginTop: 2 }}>Ask anything</div>
                     </div>
                   </button>
