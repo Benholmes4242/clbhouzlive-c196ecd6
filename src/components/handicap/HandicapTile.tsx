@@ -71,7 +71,7 @@ function HandicapTile({ userId, onClick }: HandicapTileProps) {
     const pct = Math.round(milestone.progress * 100);
     if (pct >= 95) return `Almost at ${milestoneToLabel}`;
     if (pct <= 5) return `Just hit ${milestoneFromLabel}`;
-    return `${pct}% to next milestone`;
+    return `${pct}% of the way to ${milestoneToLabel}`;
   }, [milestone, milestoneFromLabel, milestoneToLabel]);
 
   const deltaColor = useMemo(() => {
