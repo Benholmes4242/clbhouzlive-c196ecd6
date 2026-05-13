@@ -96,42 +96,14 @@ export const RivalryEditSheet: React.FC<Props> = ({ userId, rivalry, slotIndex, 
             <div style={{ width: 36, height: 4, borderRadius: 2, background: 'rgba(15,23,42,0.15)' }} />
           </div>
 
-          <div style={{ padding: '8px 20px 12px', flexShrink: 0 }}>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                <span aria-hidden style={{ width: 3, height: 8, borderRadius: 1, background: AMBER }} />
-                <span style={{ fontSize: 9, fontWeight: 900, color: AMBER, letterSpacing: '0.16em' }}>
-                  PIN A RIVAL · SLOT {(sIdx ?? 0) + 1}
-                </span>
-              </div>
-              <button
-                onClick={onClose}
-                aria-label="Close"
-                style={{
-                  width: 30, height: 30, borderRadius: '50%',
-                  background: 'rgba(15,23,42,0.06)', border: 'none', cursor: 'pointer',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                }}
-              >
-                <X size={15} color={INK} strokeWidth={2.4} />
-              </button>
-            </div>
+          <SheetHeader
+            eyebrow={`PIN A RIVAL · SLOT ${(sIdx ?? 0) + 1}`}
+            title={rivalry?.rival_name ? `Replace ${firstName(rivalry.rival_name)}` : 'Choose a rival'}
+            sub="Pick someone from your circle. Pinned rivals stay in your slot until you remove them."
+            onClose={onClose}
+          />
 
-            <h3 style={{
-              margin: 0,
-              fontSize: 22,
-              fontWeight: 900,
-              fontFamily: FONT_GEIST,
-              letterSpacing: '-0.02em',
-              color: INK,
-              lineHeight: 1.15,
-            }}>
-              {rivalry?.rival_name ? `Replace ${firstName(rivalry.rival_name)}` : 'Choose a rival'}
-            </h3>
-            <p style={{ margin: '6px 0 12px', fontSize: 13, color: INK_MUTE, lineHeight: 1.5 }}>
-              Pick someone from your circle. Pinned rivals stay in your slot until you remove them.
-            </p>
-
+          <div style={{ padding: '12px 16px 12px', flexShrink: 0 }}>
             {/* Search */}
             <div style={{
               display: 'flex',
