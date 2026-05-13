@@ -17,13 +17,15 @@ interface SheetHeaderProps {
 }
 
 /**
- * Canonical sheet header for the handicap area.
+ * Canonical sheet header for bottom sheets across the app.
  *
  * Pattern: optional eyebrow caps + 24/800 ink h1 + optional subhead + X close button.
- * Sibling to SectionHeader (in-page section headers) and EchoCallout (AI voice callouts).
+ * Used in filter-selection sheets, info-explainer sheets, and nav overlays.
  *
- * Photo-led sheets (FriendRoundSheet, RoundDetailSheet) use their own dark-photo chrome.
- * Icon-tile sheets (StablefordDetailSheet) use their card-detail-continuation pattern.
+ * NOT used for photo-led sheets (FriendRoundSheet, RoundDetailSheet) which have
+ * their own dark-photo chrome, or icon-tile card-detail sheets (StablefordDetailSheet,
+ * IntelligenceSheet) which use a card-detail-continuation pattern with smaller
+ * 17/800 titles. Those are documented exceptions, not anti-patterns.
  */
 export const SheetHeader: React.FC<SheetHeaderProps> = ({
   eyebrow,

@@ -7,6 +7,7 @@ import { useState, useCallback } from 'react';
 import { ChevronDown, Globe } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { BottomSheet } from '@/components/ui/BottomSheet';
+import SheetHeader from '@/components/ui/SheetHeader';
 import { getTourLogo, hasTourLogo } from '../../utils/tourLogos';
 
 export type TourFilterCode = 'all' | 'pga' | 'EURO' | 'LPGA' | 'CHAMP' | 'PGAD' | 'LIV';
@@ -96,13 +97,14 @@ export function ScheduleTourFilter({
         ariaLabelledBy="schedule-tour-sheet-title"
       >
         {/* Header */}
-        <div style={{ padding: '6px 20px 14px' }}>
-          <div style={{ fontSize: 8.5, fontWeight: 900, color: '#F7931E', letterSpacing: '0.16em', textTransform: 'uppercase' as const, marginBottom: 4 }}>Filter</div>
-          <div id="schedule-tour-sheet-title" style={{ fontSize: 20, fontWeight: 900, color: '#0F172A', letterSpacing: '-0.03em' }}>Select Tour</div>
-        </div>
+        <SheetHeader
+          eyebrow="FILTER"
+          title={<span id="schedule-tour-sheet-title">Select tour</span>}
+          onClose={() => setOpen(false)}
+        />
 
         {/* Flat option rows */}
-        <div style={{ borderTop: '0.5px solid rgba(15,23,42,0.07)' }}>
+        <div>
           {TOUR_OPTIONS.filter(tour => tour.code === 'all' || (tourCounts[tour.code] ?? 0) > 0).map((tour) => {
             const isActive = activeTour === tour.code;
             const count = tour.code === 'all' ? totalCount : (tourCounts[tour.code] || 0);
@@ -114,7 +116,7 @@ export function ScheduleTourFilter({
                 aria-pressed={isActive}
                 style={{
                   width: '100%', display: 'flex', alignItems: 'center', gap: 12,
-                  padding: '14px 20px',
+                  padding: '14px 16px',
                   background: isActive ? 'rgba(247,147,30,0.04)' : 'transparent',
                   border: 'none',
                   borderLeft: isActive ? '3px solid #F7931E' : '3px solid transparent',

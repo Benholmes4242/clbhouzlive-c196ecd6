@@ -8,6 +8,7 @@ import { useNavigate } from 'react-router-dom';
 import { Search } from 'lucide-react';
 import { getCollegeLogoUrl } from '@/utils/collegeLogo';
 import { BottomSheet } from '@/components/ui/BottomSheet';
+import SheetHeader from '@/components/ui/SheetHeader';
 import { useCollegeSeasonStats } from '../../hooks/useCollegeStats';
 import { useCollegeMediaMap } from '../../hooks/useCollegeMedia';
 import { useFollowedColleges, useFollowCollegeMutations } from '../../hooks/useCollegeMovers';
@@ -135,14 +136,15 @@ export function PickFranchiseSheet({ open, onOpenChange }: PickFranchiseSheetPro
         style={{ maxHeight: 'calc(85dvh - 60px)' }}
       >
         {/* Header */}
-        <div style={{ padding: '6px 20px 10px' }}>
-          <div style={{ fontSize: 8.5, fontWeight: 900, color: '#F7931E', letterSpacing: '0.16em', textTransform: 'uppercase' as const, marginBottom: 4 }}>College Golf</div>
-          <div id="pick-franchise-title" style={{ fontSize: 20, fontWeight: 900, color: '#0F172A', letterSpacing: '-0.03em' }}>Pick Your Franchise</div>
-          <div style={{ fontSize: 11, color: '#94A3B8', marginTop: 4 }}>Follow a college and join the rivalry</div>
-        </div>
+        <SheetHeader
+          eyebrow="COLLEGE GOLF"
+          title={<span id="pick-franchise-title">Pick your franchise</span>}
+          sub="Follow a college and join the rivalry."
+          onClose={() => onOpenChange(false)}
+        />
 
         {/* Search input */}
-        <div style={{ margin: '0 20px 10px', display: 'flex', alignItems: 'center', gap: 8, background: 'rgba(15,23,42,0.04)', borderRadius: 10, padding: '0 12px', height: 40, border: '0.5px solid rgba(15,23,42,0.07)' }}>
+        <div style={{ margin: '12px 16px 10px', display: 'flex', alignItems: 'center', gap: 8, background: 'rgba(15,23,42,0.04)', borderRadius: 10, padding: '0 12px', height: 40, border: '0.5px solid rgba(15,23,42,0.07)' }}>
           <Search className="w-4 h-4" style={{ color: '#94A3B8', flexShrink: 0 }} />
           <input
             type="text"
@@ -155,16 +157,15 @@ export function PickFranchiseSheet({ open, onOpenChange }: PickFranchiseSheetPro
 
         {/* Section label */}
         {!isSearching && (
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '8px 20px 6px' }}>
-            <div style={{ width: 3, height: 12, background: '#0F172A', borderRadius: 1, flexShrink: 0 }} />
-            <span style={{ fontSize: 8.5, fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.14em', textTransform: 'uppercase' as const }}>Popular Franchises</span>
+          <div style={{ padding: '8px 16px 6px' }}>
+            <span style={{ fontSize: 9, fontWeight: 800, color: '#64748B', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>Popular Franchises</span>
           </div>
         )}
 
         {/* Search results */}
         {isSearching && searchResults ? (
           searchResults.length === 0 ? (
-            <p style={{ textAlign: 'center', color: '#94A3B8', padding: '32px 20px', fontSize: 14 }}>
+            <p style={{ textAlign: 'center', color: '#94A3B8', padding: '32px 16px', fontSize: 14 }}>
               No colleges found for "{searchQuery}"
             </p>
           ) : (

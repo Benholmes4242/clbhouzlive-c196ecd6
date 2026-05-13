@@ -11,12 +11,13 @@
 
 import { memo, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Activity, ChevronDown, ChevronRight, X } from 'lucide-react';
+import { Activity, ChevronDown, ChevronRight } from 'lucide-react';
 import { useGamifiedLeaderboards } from '../hooks/useGamifiedLeaderboards';
 import { useStatOfWeekCopy } from '../hooks/useStatOfWeekCopy';
 import { useTourSelection } from '../hooks/useTourSelection';
 import { LEADER_CATEGORIES, type LeaderCategory } from './leaders/constants';
 import { BottomSheet } from '@/components/ui/BottomSheet';
+import SheetHeader from '@/components/ui/SheetHeader';
 import { PlayerAvatar } from './PlayerAvatar';
 import { Shimmer } from './shared/Shimmer';
 import CountryFlag from '@/components/ui/country-flag';
@@ -617,53 +618,17 @@ export const StatOfTheWeek = memo(function StatOfTheWeek() {
         onClose={() => setSheetOpen(false)}
         ariaLabelledBy="stat-of-week-picker-title"
       >
+        <SheetHeader
+          title={<span id="stat-of-week-picker-title">Choose a category</span>}
+          onClose={() => setSheetOpen(false)}
+        />
         <div
           style={{
-            padding: '8px 20px 24px',
+            padding: '12px 16px 24px',
             maxHeight: '85vh',
             overflowY: 'auto',
           }}
         >
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              marginBottom: 18,
-            }}
-          >
-            <h2
-              id="stat-of-week-picker-title"
-              style={{
-                fontSize: 18,
-                fontWeight: 900,
-                color: INK,
-                letterSpacing: '-0.01em',
-                margin: 0,
-              }}
-            >
-              Choose a category
-            </h2>
-            <button
-              type="button"
-              onClick={() => setSheetOpen(false)}
-              style={{
-                width: 32,
-                height: 32,
-                borderRadius: 16,
-                border: 'none',
-                background: 'rgba(15,23,42,0.06)',
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-              }}
-              aria-label="Close"
-            >
-              <X size={16} color={SLATE_600} />
-            </button>
-          </div>
-
           {GROUP_ORDER.map((groupKey) => {
             const cats = LEADER_CATEGORIES.filter((c) => c.group === groupKey);
             if (cats.length === 0) return null;
@@ -671,10 +636,11 @@ export const StatOfTheWeek = memo(function StatOfTheWeek() {
               <div key={groupKey} style={{ marginBottom: 18 }}>
                 <div
                   style={{
-                    fontSize: 10,
-                    fontWeight: 900,
+                    fontSize: 9,
+                    fontWeight: 800,
                     color: SLATE_500,
-                    letterSpacing: '0.12em',
+                    letterSpacing: '0.16em',
+                    textTransform: 'uppercase' as const,
                     marginBottom: 8,
                   }}
                 >

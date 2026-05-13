@@ -30,6 +30,7 @@ import CountryFlag from '@/components/ui/country-flag';
 import { toTitleCase } from '../hooks/useWorldRankings';
 import { getTourLogo } from '../utils/tourLogos';
 import { BottomSheet } from '@/components/ui/BottomSheet';
+import SheetHeader from '@/components/ui/SheetHeader';
 import { PlayerAvatar } from './PlayerAvatar';
 import { Shimmer } from './shared/Shimmer';
 import { TOUR_MAP, type TourCode } from '../constants/tourMap';
@@ -837,32 +838,12 @@ export const WorldRankingsHero = memo(function WorldRankingsHero() {
         onClose={() => setSheetOpen(false)}
         ariaLabelledBy="rankings-hero-tour-sheet-title"
       >
-        <div style={{ padding: '6px 20px 14px' }}>
-          <div
-            style={{
-              fontSize: 8.5,
-              fontWeight: 900,
-              color: AMBER,
-              letterSpacing: '0.16em',
-              textTransform: 'uppercase' as const,
-              marginBottom: 4,
-            }}
-          >
-            Filter
-          </div>
-          <div
-            id="rankings-hero-tour-sheet-title"
-            style={{
-              fontSize: 20,
-              fontWeight: 900,
-              color: INK,
-              letterSpacing: '-0.03em',
-            }}
-          >
-            Rankings by Tour
-          </div>
-        </div>
-        <div style={{ borderTop: '0.5px solid rgba(15,23,42,0.07)' }}>
+        <SheetHeader
+          eyebrow="FILTER"
+          title={<span id="rankings-hero-tour-sheet-title">Rankings by tour</span>}
+          onClose={() => setSheetOpen(false)}
+        />
+        <div>
           {RANKING_TOUR_OPTIONS.map((tour) => {
             const isActive = activeTour === tour.code;
             return (
@@ -878,7 +859,7 @@ export const WorldRankingsHero = memo(function WorldRankingsHero() {
                   display: 'flex',
                   alignItems: 'center',
                   gap: 12,
-                  padding: '12px 20px',
+                  padding: '12px 16px',
                   background: isActive ? 'rgba(247,147,30,0.04)' : 'transparent',
                   border: 'none',
                   borderLeft: isActive ? `3px solid ${AMBER}` : '3px solid transparent',

@@ -4,7 +4,7 @@ import {
   Trophy, Crown, Flag, Link2, Target, MapPin, Globe, Hash,
   CheckCircle2, Plane, Users, Lock, Info,
 } from 'lucide-react';
-import SheetHeader from './_shared/SheetHeader';
+import SheetHeader from '@/components/ui/SheetHeader';
 import type { Achievement } from '@/lib/whs/types';
 
 const AMBER     = '#F7931E';

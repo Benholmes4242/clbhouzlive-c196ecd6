@@ -24,6 +24,7 @@ import { cn } from '@/lib/utils';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
 import { BottomSheet } from '@/components/ui/BottomSheet';
+import SheetHeader from '@/components/ui/SheetHeader';
 import { getTourLogo, hasTourLogo } from '../../utils/tourLogos';
 import { TOUR_MAP, getTourLabel, getTourShort, getTourMeta } from '../../constants/tourMap';
 import { getCurrentWeek, getCurrentMonthKey, isInCurrentWeek } from '../../utils/getCurrentWeek';
@@ -769,16 +770,13 @@ export function ScheduleTab() {
         onClose={() => setTourSheetOpen(false)}
         ariaLabelledBy="schedule-tour-sheet-title"
       >
-        <div style={{ padding: '6px 20px 14px' }}>
-          <div style={{ fontSize: 8.5, fontWeight: 900, color: '#F7931E', letterSpacing: '0.16em', textTransform: 'uppercase', marginBottom: 4 }}>
-            Filter
-          </div>
-          <div id="schedule-tour-sheet-title" style={{ fontSize: 20, fontWeight: 900, color: '#0F172A', letterSpacing: '-0.03em' }}>
-            Select Tour
-          </div>
-        </div>
+        <SheetHeader
+          eyebrow="FILTER"
+          title={<span id="schedule-tour-sheet-title">Select tour</span>}
+          onClose={() => setTourSheetOpen(false)}
+        />
 
-        <div style={{ borderTop: '0.5px solid rgba(15,23,42,0.07)' }}>
+        <div>
           {(['all', 'pga', 'EURO', 'LPGA', 'CHAMP', 'PGAD', 'LIV'] as const).map((code) => {
             const meta = code === 'all' ? null : getTourMeta(code);
             const label = code === 'all' ? 'All Tours' : (meta?.short ?? code);
@@ -800,7 +798,7 @@ export function ScheduleTab() {
                   display: 'flex',
                   alignItems: 'center',
                   gap: 12,
-                  padding: '14px 20px',
+                  padding: '14px 16px',
                   background: isSelected ? 'rgba(247,147,30,0.04)' : 'transparent',
                   border: 'none',
                   borderLeft: isSelected ? '3px solid #F7931E' : '3px solid transparent',
