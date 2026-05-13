@@ -159,22 +159,21 @@ function calcMonthlyMovement(delta: number | null) {
 function formStateLabel(
   formStrokes: number,
   enoughData: boolean,
+  roundsCount: number,
 ): { title: string; sub: string } {
   if (!enoughData) {
     return { title: 'NO FORM YET', sub: 'Not enough rounds' };
   }
-  // Display sign convention: negative = below typical (good), positive
-  // = above typical (bad). Internal formStrokes is +ve when hot, so
-  // negate for display only.
   const display = -formStrokes;
   const sign = display >= 0 ? '+' : '\u2212';
-  const subStr = `${sign}${Math.abs(display).toFixed(1)} vs typical`;
+  const roundsSub = `${roundsCount} round${roundsCount === 1 ? '' : 's'}`;
+  const subStr = `${sign}${Math.abs(display).toFixed(1)} over ${roundsSub}`;
 
-  if (formStrokes > 1.0) return { title: 'RED HOT FORM', sub: subStr };
-  if (formStrokes > 0.1) return { title: 'WARM FORM', sub: subStr };
-  if (formStrokes < -1.0) return { title: 'OUT OF FORM', sub: subStr };
-  if (formStrokes < -0.1) return { title: 'COLD FORM', sub: subStr };
-  return { title: 'STEADY', sub: 'On form' };
+  if (formStrokes > 0.5) return { title: 'RED HOT FORM', sub: subStr };
+  if (formStrokes > 0.05) return { title: 'WARM FORM', sub: subStr };
+  if (formStrokes < -0.5) return { title: 'OUT OF FORM', sub: subStr };
+  if (formStrokes < -0.05) return { title: 'COLD FORM', sub: subStr };
+  return { title: 'STEADY', sub: `On form over ${roundsSub}` };
 }
 
 const HeroHandicapCard: React.FC<Props> = ({ connection }) => {
