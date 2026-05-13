@@ -150,19 +150,25 @@ function calcMonthlyMovement(delta: number | null) {
  * Maps form strokes to a 5-tier state label. Same ladder across all
  * ranges — the user's "FORM" is always one of these five words.
  */
-function formStateLabel(formStrokes: number): { title: string; sub: string } {
-  // Display sign convention: negative = below handicap (good), positive
-  // = above handicap (bad). Internal formStrokes uses the opposite sign
-  // (positive = hot) for ring-fill math, so negate for display only.
+function formStateLabel(
+  formStrokes: number,
+  enoughData: boolean,
+): { title: string; sub: string } {
+  if (!enoughData) {
+    return { title: 'NO FORM YET', sub: 'Not enough rounds' };
+  }
+  // Display sign convention: negative = below typical (good), positive
+  // = above typical (bad). Internal formStrokes is +ve when hot, so
+  // negate for display only.
   const display = -formStrokes;
   const sign = display >= 0 ? '+' : '\u2212';
-  const subStr = `${sign}${Math.abs(display).toFixed(1)} vs handicap`;
+  const subStr = `${sign}${Math.abs(display).toFixed(1)} vs typical`;
 
   if (formStrokes > 1.0) return { title: 'RED HOT FORM', sub: subStr };
   if (formStrokes > 0.1) return { title: 'WARM FORM', sub: subStr };
   if (formStrokes < -1.0) return { title: 'OUT OF FORM', sub: subStr };
   if (formStrokes < -0.1) return { title: 'COLD FORM', sub: subStr };
-  return { title: 'STEADY', sub: 'On handicap' };
+  return { title: 'STEADY', sub: 'On form' };
 }
 
 const HeroHandicapCard: React.FC<Props> = ({ connection }) => {
