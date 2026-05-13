@@ -325,7 +325,7 @@ function ProfileHubSheet({
             onDragEnd={handleSheetDragEnd}
             style={{
               y: sheetY,
-              maxHeight: '70dvh',
+              maxHeight: '80dvh',
               minHeight: 'min(60dvh, 480px)',
               paddingBottom: 'env(safe-area-inset-bottom, 0px)',
             }}
