@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { X } from 'lucide-react';
+import SheetHeader from './_shared/SheetHeader';
 import { fmtDiff } from '@/lib/whs/format';
 
 const INK = '#0F172A';
