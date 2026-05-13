@@ -1,18 +1,23 @@
-import { useState } from 'react';
-import { X, RefreshCw, Link2Off, Trash2, CheckCircle2, AlertTriangle } from 'lucide-react';
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { X, Link2Off, Trash2, CheckCircle2, AlertTriangle, ArrowRight } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { Sheet, SheetContent } from '@/components/ui/sheet';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import {
-  AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
-  AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
-} from '@/components/ui/alert-dialog';
 import { toast } from 'sonner';
 import { useQueryClient } from '@tanstack/react-query';
-import { callSyncWhsOne, callDisconnectWhs, callDeleteWhsData } from '@/lib/whs/api';
+import { callDisconnectWhs, callDeleteWhsData } from '@/lib/whs/api';
 import { whsKeys } from '@/lib/whs/hooks';
 import type { WhsConnection } from '@/lib/whs/types';
+import { MiniFlag } from '@/components/profile/handicap/whs/connect/MiniFlag';
+import DisconnectConfirmSheet from './DisconnectConfirmSheet';
+import DeleteAllDataConfirmSheet from './DeleteAllDataConfirmSheet';
+
+const INK = '#0F172A';
+const INK_55 = '#64748B';
+const AMBER = '#F7931E';
+const GREEN = '#059669';
+const RED = '#B91C1C';
+const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
 
 interface Props {
   open: boolean;
@@ -22,20 +27,14 @@ interface Props {
 }
 
 export default function WhsConnectionSheet({ open, onClose, connection, userId }: Props) {
+  const navigate = useNavigate();
   const queryClient = useQueryClient();
-  const [isSyncing, setIsSyncing] = useState(false);
   const [confirmDisconnect, setConfirmDisconnect] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
-  const [deleteText, setDeleteText] = useState('');
   const [isWorking, setIsWorking] = useState(false);
 
-  if (!connection) return null;
-
-  const lastSyncedAt = connection.last_synced_at ? new Date(connection.last_synced_at) : null;
-  const isAuthFailed = connection.last_sync_status === 'auth_failed';
-  const connectedAt = new Date(connection.created_at);
-
   const invalidateAll = () => {
+    if (!connection) return;
     if (userId) {
       queryClient.invalidateQueries({ queryKey: whsKeys.connection(userId) });
       queryClient.invalidateQueries({ queryKey: whsKeys.friendLeaderboard(userId) });
@@ -48,24 +47,6 @@ export default function WhsConnectionSheet({ open, onClose, connection, userId }
     queryClient.invalidateQueries({ queryKey: ['whs-round-detail'] });
     queryClient.invalidateQueries({ queryKey: whsKeys.counters(connection.id) });
     queryClient.invalidateQueries({ queryKey: whsKeys.allScores(connection.id) });
-  };
-
-  const handleSync = async () => {
-    if (isSyncing) return;
-    setIsSyncing(true);
-    try {
-      const data = await callSyncWhsOne();
-      if (!data.ok) {
-        toast.error(data.message ?? "Couldn't sync right now.");
-        return;
-      }
-      invalidateAll();
-      toast.success(data.handicap_changed ? `Handicap updated to ${data.handicap_index?.toFixed(1)}` : 'Refreshed — no changes');
-    } catch {
-      toast.error("Couldn't reach clbhouz.");
-    } finally {
-      setIsSyncing(false);
-    }
   };
 
   const handleDisconnect = async () => {
@@ -95,7 +76,6 @@ export default function WhsConnectionSheet({ open, onClose, connection, userId }
       }
       invalidateAll();
       toast.success('Data deleted');
-      setDeleteText('');
       setConfirmDelete(false);
       onClose();
     } finally {
@@ -103,157 +83,230 @@ export default function WhsConnectionSheet({ open, onClose, connection, userId }
     }
   };
 
+  const handleConnectCta = () => {
+    onClose();
+    navigate('/handicap');
+  };
+
   return (
     <>
       <Sheet open={open} onOpenChange={(v) => !v && onClose()}>
         <SheetContent
           side="bottom"
-          className="rounded-t-[20px] bg-background border-0 px-5"
           hideCloseButton
-          style={{ paddingBottom: 'calc(var(--sab) + 24px)' }}
+          className="p-0 rounded-t-[20px] border-0 max-h-[92dvh] flex flex-col"
+          style={{ fontFamily: FONT, color: INK, background: '#fff' }}
         >
-          <div className="w-9 h-1 rounded-full bg-muted mx-auto mt-3 mb-4" />
+          {/* Drag handle */}
+          <div style={{ display: 'flex', justifyContent: 'center', paddingTop: 8, paddingBottom: 8 }}>
+            <div style={{ width: 36, height: 4, borderRadius: 2, background: 'rgba(15,23,42,0.18)' }} />
+          </div>
 
           {/* Header */}
-          <div className="flex items-start justify-between mb-5">
-            <div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 4 }}>
-                <div style={{ width: 3, height: 8, background: '#F7931E', borderRadius: 1 }} />
-                <span style={{ fontSize: 9, fontWeight: 900, color: '#F7931E', letterSpacing: '0.16em', textTransform: 'uppercase' }}>
+          <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', padding: '4px 20px 16px' }}>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
+                <MiniFlag iso="GB-ENG" />
+                <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: AMBER }}>
                   England Golf
                 </span>
               </div>
-              <h2 className="text-[20px] font-bold tracking-tight text-foreground">Connection details</h2>
+              <h2 style={{ fontSize: 22, fontWeight: 700, letterSpacing: '-0.01em', margin: 0, lineHeight: 1.2 }}>
+                {connection ? 'Connection details' : 'Connect handicap'}
+              </h2>
             </div>
-            <button onClick={onClose} className="flex items-center justify-center min-h-[44px] min-w-[44px] text-muted-foreground">
+            <button
+              onClick={onClose}
+              aria-label="Close"
+              style={{ background: 'transparent', border: 'none', padding: 6, marginLeft: 8, cursor: 'pointer', color: INK_55 }}
+            >
               <X size={20} />
             </button>
           </div>
 
-          {/* Facts */}
-          <div className="rounded-2xl px-4 py-3 mb-3" style={{ background: '#ffffff', border: '1px solid rgba(15,23,42,0.07)' }}>
-            <FactRow label="Membership" value={connection.membership_number} />
-            <FactRow label="Passport ID" value={String(connection.passport_id)} />
-            <FactRow label="Connected" value={formatDistanceToNow(connectedAt, { addSuffix: true })} />
-            <FactRow label="Last sync" value={lastSyncedAt ? formatDistanceToNow(lastSyncedAt, { addSuffix: true }) : '—'} isLast />
-          </div>
-
-          {/* Status */}
-          <div
-            className="flex items-center gap-2 rounded-xl px-3 py-2.5 mb-5"
-            style={{
-              background: isAuthFailed ? 'rgba(247,147,30,0.08)' : 'rgba(16,185,129,0.08)',
-              border: `1px solid ${isAuthFailed ? 'rgba(247,147,30,0.20)' : 'rgba(16,185,129,0.20)'}`,
-            }}
-          >
-            {isAuthFailed ? (
-              <AlertTriangle size={16} style={{ color: '#F7931E' }} />
+          {/* Body */}
+          <div style={{ flex: 1, overflowY: 'auto', paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 16px)' }}>
+            {connection ? (
+              <SyncedBody
+                connection={connection}
+                onDisconnect={() => setConfirmDisconnect(true)}
+                onDelete={() => setConfirmDelete(true)}
+              />
             ) : (
-              <CheckCircle2 size={16} style={{ color: '#10B981' }} />
+              <EmptyBody onConnect={handleConnectCta} />
             )}
-            <span className="text-[13px] font-medium" style={{ color: isAuthFailed ? '#9A5B0E' : '#0F6E4F' }}>
-              {isAuthFailed
-                ? 'Sync issue — try Disconnect & reconnect'
-                : `Synced ${lastSyncedAt ? formatDistanceToNow(lastSyncedAt, { addSuffix: true }) : 'recently'}`}
-            </span>
-          </div>
-
-          {/* Actions */}
-          <div className="space-y-2.5">
-            <Button
-              onClick={handleSync}
-              disabled={isSyncing}
-              className="w-full min-h-[44px]"
-              style={{ background: '#F7931E', color: '#ffffff', boxShadow: '0 2px 10px rgba(247,147,30,0.28)' }}
-            >
-              <RefreshCw size={16} className={isSyncing ? 'animate-spin mr-2' : 'mr-2'} />
-              {isSyncing ? 'Syncing…' : 'Sync now'}
-            </Button>
-
-            <Button
-              variant="outline"
-              onClick={() => setConfirmDisconnect(true)}
-              className="w-full min-h-[44px]"
-            >
-              <Link2Off size={16} className="mr-2" />
-              Disconnect
-            </Button>
-
-            <button
-              onClick={() => setConfirmDelete(true)}
-              className="w-full min-h-[44px] flex items-center justify-center gap-2 text-[14px] font-medium text-destructive"
-            >
-              <Trash2 size={16} />
-              Delete all data
-            </button>
           </div>
         </SheetContent>
       </Sheet>
 
-      {/* Disconnect confirm */}
-      <AlertDialog open={confirmDisconnect} onOpenChange={setConfirmDisconnect}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Disconnect England Golf?</AlertDialogTitle>
-            <AlertDialogDescription>
-              Your handicap and round history will be kept. You can reconnect any time to resume daily syncing.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel disabled={isWorking}>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={handleDisconnect} disabled={isWorking}>
-              {isWorking ? 'Disconnecting…' : 'Disconnect'}
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      <DisconnectConfirmSheet
+        open={confirmDisconnect}
+        onClose={() => setConfirmDisconnect(false)}
+        onConfirm={handleDisconnect}
+        isWorking={isWorking}
+      />
 
-      {/* Delete confirm */}
-      <AlertDialog open={confirmDelete} onOpenChange={(v) => { setConfirmDelete(v); if (!v) setDeleteText(''); }}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Delete all England Golf data?</AlertDialogTitle>
-            <AlertDialogDescription>
-              This will permanently delete your synced handicap, all your round history, hole-by-hole data,
-              and your friends list from England Golf. This cannot be undone.
-              <br /><br />
-              Your friends on Clbhouz will still see your last known data, but no new updates.
-              <br /><br />
-              Type <strong>DELETE</strong> to confirm.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <div className="px-1 pb-2">
-            <Input
-              placeholder="Type DELETE to confirm"
-              value={deleteText}
-              onChange={(e) => setDeleteText(e.target.value)}
-              className="mt-2"
-            />
-          </div>
-          <AlertDialogFooter>
-            <AlertDialogCancel disabled={isWorking}>Cancel</AlertDialogCancel>
-            <AlertDialogAction
-              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-              disabled={deleteText !== 'DELETE' || isWorking}
-              onClick={handleDelete}
-            >
-              {isWorking ? 'Deleting…' : 'Delete all data'}
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      <DeleteAllDataConfirmSheet
+        open={confirmDelete}
+        onClose={() => setConfirmDelete(false)}
+        onConfirm={handleDelete}
+        isWorking={isWorking}
+      />
     </>
   );
 }
 
+// ─────────────────────────────────────────────────────────────────────
+// EMPTY STATE
+// ─────────────────────────────────────────────────────────────────────
+
+const HeroArt: React.FC = () => (
+  <svg width="120" height="120" viewBox="0 0 120 120" fill="none" aria-hidden>
+    <defs>
+      <radialGradient id="whs-sheet-globe-grad" cx="0.35" cy="0.30" r="0.75">
+        <stop offset="0%" stopColor="#FFE5C2"/>
+        <stop offset="60%" stopColor="#F7931E"/>
+        <stop offset="100%" stopColor="#C97211"/>
+      </radialGradient>
+    </defs>
+    <ellipse cx="60" cy="108" rx="32" ry="4" fill="rgba(15,23,42,0.10)" />
+    <circle cx="60" cy="58" r="42" fill="url(#whs-sheet-globe-grad)" stroke={INK} strokeWidth="2" />
+    <ellipse cx="60" cy="58" rx="42" ry="14" fill="none" stroke="rgba(15,23,42,0.40)" strokeWidth="1" />
+    <ellipse cx="60" cy="58" rx="22" ry="42" fill="none" stroke="rgba(15,23,42,0.40)" strokeWidth="1" />
+    <line x1="18" y1="58" x2="102" y2="58" stroke="rgba(15,23,42,0.40)" strokeWidth="1" />
+    <line x1="60" y1="16" x2="60" y2="-2" stroke={INK} strokeWidth="2" strokeLinecap="round" />
+    <path d="M 60 0 L 78 4 L 60 8 Z" fill={AMBER} stroke={INK} strokeWidth="1.5" strokeLinejoin="round" />
+    <ellipse cx="48" cy="42" rx="8" ry="6" fill="rgba(255,255,255,0.30)" />
+  </svg>
+);
+
+const EmptyBody: React.FC<{ onConnect: () => void }> = ({ onConnect }) => (
+  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', padding: '20px 24px 28px' }}>
+    <div style={{ marginBottom: 20 }}>
+      <HeroArt />
+    </div>
+
+    <p style={{ fontSize: 15, lineHeight: 1.5, color: INK_55, margin: '0 0 24px', maxWidth: 320 }}>
+      Link your handicap to track every round, watch your index move, and play against your friends.
+    </p>
+
+    <button
+      onClick={onConnect}
+      style={{
+        width: '100%', maxWidth: 360,
+        display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+        padding: '14px 18px', borderRadius: 12,
+        background: AMBER, color: '#fff', border: 'none',
+        fontSize: 15, fontWeight: 600, fontFamily: FONT, cursor: 'pointer',
+      }}
+    >
+      Connect handicap
+      <ArrowRight size={18} strokeWidth={2.4} />
+    </button>
+  </div>
+);
+
+// ─────────────────────────────────────────────────────────────────────
+// SYNCED STATE
+// ─────────────────────────────────────────────────────────────────────
+
+const SyncedBody: React.FC<{
+  connection: WhsConnection;
+  onDisconnect: () => void;
+  onDelete: () => void;
+}> = ({ connection, onDisconnect, onDelete }) => {
+  const lastSyncedAt = connection.last_synced_at ? new Date(connection.last_synced_at) : null;
+  const isAuthFailed = connection.last_sync_status === 'auth_failed';
+  const connectedAt = new Date(connection.created_at);
+
+  return (
+    <div style={{ padding: '4px 20px 24px' }}>
+      {/* Facts card */}
+      <div style={{
+        background: '#F8FAFC',
+        border: '0.5px solid rgba(15,23,42,0.10)',
+        borderRadius: 14,
+        padding: '4px 16px',
+        marginBottom: 16,
+      }}>
+        <FactRow label="Membership" value={connection.membership_number || '—'} />
+        <FactRow label="Passport ID" value={String(connection.passport_id ?? '—')} />
+        <FactRow label="Connected" value={formatDistanceToNow(connectedAt, { addSuffix: true })} />
+        <FactRow
+          label="Last sync"
+          value={lastSyncedAt ? formatDistanceToNow(lastSyncedAt, { addSuffix: true }) : '—'}
+          isLast
+        />
+      </div>
+
+      {/* Status pill */}
+      <div style={{
+        display: 'flex', alignItems: 'center', gap: 8,
+        padding: '10px 14px', borderRadius: 999,
+        background: isAuthFailed ? 'rgba(247,147,30,0.10)' : 'rgba(5,150,105,0.10)',
+        marginBottom: 12,
+      }}>
+        {isAuthFailed
+          ? <AlertTriangle size={16} color={AMBER} strokeWidth={2.4} />
+          : <CheckCircle2 size={16} color={GREEN} strokeWidth={2.4} />}
+        <span style={{ fontSize: 13, fontWeight: 600, color: isAuthFailed ? AMBER : GREEN }}>
+          {isAuthFailed
+            ? 'Sync issue — try disconnect & reconnect'
+            : `Synced ${lastSyncedAt ? formatDistanceToNow(lastSyncedAt, { addSuffix: true }) : 'recently'}`}
+        </span>
+      </div>
+
+      {/* Sync frequency info */}
+      <p style={{ fontSize: 13, color: INK_55, margin: '0 0 24px', textAlign: 'center', lineHeight: 1.5 }}>
+        Your handicap syncs automatically twice daily.
+      </p>
+
+      {/* Actions */}
+      <button
+        onClick={onDisconnect}
+        style={{
+          width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+          padding: '13px 16px', borderRadius: 12,
+          background: '#fff', color: INK,
+          border: '1px solid rgba(15,23,42,0.14)',
+          fontSize: 15, fontWeight: 500, fontFamily: FONT, cursor: 'pointer',
+          marginBottom: 8,
+        }}
+      >
+        <Link2Off size={16} />
+        Disconnect
+      </button>
+
+      <button
+        onClick={onDelete}
+        style={{
+          width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
+          padding: '11px 16px', borderRadius: 12,
+          background: 'transparent', color: RED,
+          border: 'none',
+          fontSize: 13, fontWeight: 500, fontFamily: FONT, cursor: 'pointer',
+        }}
+      >
+        <Trash2 size={14} />
+        Delete all data
+      </button>
+    </div>
+  );
+};
+
 function FactRow({ label, value, isLast }: { label: string; value: string; isLast?: boolean }) {
   return (
-    <div
-      className="flex items-center justify-between py-2"
-      style={isLast ? undefined : { borderBottom: '0.5px solid rgba(15,23,42,0.06)' }}
-    >
-      <span className="text-[12px] uppercase tracking-wide font-semibold text-muted-foreground">{label}</span>
-      <span className="text-[13px] font-medium text-foreground">{value}</span>
+    <div style={{
+      display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+      padding: '12px 0',
+      borderBottom: isLast ? 'none' : '0.5px solid rgba(15,23,42,0.08)',
+    }}>
+      <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.10em', textTransform: 'uppercase', color: INK_55 }}>
+        {label}
+      </span>
+      <span style={{ fontSize: 14, fontWeight: 500, color: INK, fontVariantNumeric: 'tabular-nums' }}>
+        {value}
+      </span>
     </div>
   );
 }
