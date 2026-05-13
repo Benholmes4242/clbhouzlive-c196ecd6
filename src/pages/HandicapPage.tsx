@@ -450,6 +450,9 @@ const HandicapPage: React.FC = () => {
     return <Navigate to="/auth" replace />;
   }
 
+  const { data: ownConnection } = useWhsConnection(isFriendView ? null as any : ownerUserId);
+  const hasConnection = isFriendView ? true : !!ownConnection;
+
   return (
     <PageRoot style={{ background: BG_SURFACE }}>
       <HandicapPageHeader
@@ -458,6 +461,7 @@ const HandicapPage: React.FC = () => {
         readOnly={isFriendView}
         activeTab={activeTab}
         onTabChange={handleTabChange}
+        hasConnection={hasConnection}
         friendAvatarUrl={isFriendView ? profile?.profile_photo_url : null}
         friendUsername={isFriendView ? profile?.username : null}
         viewerUserId={user.id}
