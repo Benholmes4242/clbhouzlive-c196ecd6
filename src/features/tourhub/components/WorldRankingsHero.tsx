@@ -838,32 +838,12 @@ export const WorldRankingsHero = memo(function WorldRankingsHero() {
         onClose={() => setSheetOpen(false)}
         ariaLabelledBy="rankings-hero-tour-sheet-title"
       >
-        <div style={{ padding: '6px 20px 14px' }}>
-          <div
-            style={{
-              fontSize: 8.5,
-              fontWeight: 900,
-              color: AMBER,
-              letterSpacing: '0.16em',
-              textTransform: 'uppercase' as const,
-              marginBottom: 4,
-            }}
-          >
-            Filter
-          </div>
-          <div
-            id="rankings-hero-tour-sheet-title"
-            style={{
-              fontSize: 20,
-              fontWeight: 900,
-              color: INK,
-              letterSpacing: '-0.03em',
-            }}
-          >
-            Rankings by Tour
-          </div>
-        </div>
-        <div style={{ borderTop: '0.5px solid rgba(15,23,42,0.07)' }}>
+        <SheetHeader
+          eyebrow="FILTER"
+          title={<span id="rankings-hero-tour-sheet-title">Rankings by tour</span>}
+          onClose={() => setSheetOpen(false)}
+        />
+        <div>
           {RANKING_TOUR_OPTIONS.map((tour) => {
             const isActive = activeTour === tour.code;
             return (
