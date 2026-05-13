@@ -107,10 +107,10 @@ export const InviteCard: React.FC<Props> = ({ friend }) => {
           >
             <span
               style={{
-                fontSize: 9.5,
+                fontSize: 9,
                 fontWeight: 800,
                 color: INK_MUTE,
-                letterSpacing: '0.04em',
+                letterSpacing: '0.14em',
               }}
             >
               HCP
@@ -135,7 +135,7 @@ export const InviteCard: React.FC<Props> = ({ friend }) => {
           style={{
             marginLeft: 46,
             marginTop: -4,
-            fontSize: 10.5,
+            fontSize: 11,
             color: INK_MUTE,
             fontWeight: 500,
             whiteSpace: 'nowrap',

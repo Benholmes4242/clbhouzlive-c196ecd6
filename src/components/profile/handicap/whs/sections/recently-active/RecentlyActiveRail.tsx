@@ -59,7 +59,7 @@ export const RecentlyActiveRail: React.FC<Props> = ({ userId }) => {
                 padding: '4px 0',
                 fontSize: 11,
                 fontWeight: 800,
-                letterSpacing: '0.08em',
+                letterSpacing: '0.14em',
                 color: '#0F172A',
                 textTransform: 'uppercase',
                 cursor: 'pointer',
