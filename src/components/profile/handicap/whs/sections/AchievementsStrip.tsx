@@ -4,7 +4,7 @@ import AllTrophiesSheet from './AllTrophiesSheet';
 import { format } from 'date-fns';
 import {
   Trophy, Crown, Flag, Link2, Target, MapPin, Globe, Hash,
-  CheckCircle2, Plane, Users, Lock,
+  CheckCircle2, Plane, Users, Lock, Info,
 } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { useAllScores, useHandicapHistory, useTrophyAggregates } from '@/lib/whs/hooks';
