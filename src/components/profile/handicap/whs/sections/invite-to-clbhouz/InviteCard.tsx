@@ -4,7 +4,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { callCreateInvite } from '@/lib/whs/api';
 import { shareInvite } from '@/lib/whs/share';
-import { firstName, initials } from '@/lib/whs/utils/initials';
+import { firstName } from '@/lib/whs/utils/initials';
 import { whsKeys } from '@/lib/whs/hooks';
 import type { FriendLeaderboardEntry } from '@/lib/whs/types';
 import { fmtHcp } from '@/lib/whs/format';
