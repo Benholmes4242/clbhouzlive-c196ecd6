@@ -5,7 +5,7 @@ import type { FriendLeaderboardEntry, FriendRivalry } from '@/lib/whs/types';
 import type { SharedRoundsResult } from '@/lib/whs/api';
 import { fmtHcp } from '@/lib/whs/format';
 import { fmtRelative, reformatFriendName } from '@/lib/whs/utils/nameFormat';
-import { initials } from '@/lib/whs/utils/initials';
+
 import { useUpsertRivalOverride, useDeleteRivalOverride } from '@/lib/whs/hooks';
 
 const T = {
@@ -26,17 +26,22 @@ export const ProfileHeader: React.FC<{ friend: FriendLeaderboardEntry }> = ({ fr
   const displayName = reformatFriendName(friend.friend_name);
   return (
     <div style={{ padding: '8px 20px 16px', display: 'flex', alignItems: 'center', gap: 14 }}>
-      <div style={{
-        width: 64,
-        height: 64,
-        borderRadius: '34%',
-        overflow: 'hidden',
-        background: 'rgba(15,23,42,0.06)',
-        flexShrink: 0,
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-      }}>
+      <div
+        role="img"
+        aria-label={displayName}
+        style={{
+          width: 64,
+          height: 64,
+          borderRadius: '34%',
+          overflow: 'hidden',
+          background: friend.friend_thumbnail_url
+            ? 'rgba(15,23,42,0.06)'
+            : 'linear-gradient(135deg, #1a3c2a 0%, #0f172a 100%)',
+          flexShrink: 0,
+          display: 'flex',
+          alignItems: 'flex-end',
+          justifyContent: 'center',
+        }}>
         {friend.friend_thumbnail_url ? (
           <img
             src={friend.friend_thumbnail_url}
@@ -44,9 +49,17 @@ export const ProfileHeader: React.FC<{ friend: FriendLeaderboardEntry }> = ({ fr
             style={{ width: '100%', height: '100%', objectFit: 'cover' }}
           />
         ) : (
-          <span style={{ fontSize: 22, fontWeight: 800, color: T.inkMute }}>
-            {initials(friend.friend_name)}
-          </span>
+          <svg
+            viewBox="0 0 64 64"
+            width="100%"
+            height="100%"
+            preserveAspectRatio="xMidYMax meet"
+            style={{ opacity: 0.56, display: 'block' }}
+            aria-hidden="true"
+          >
+            <circle cx="32" cy="25" r="11" fill="#ffffff" />
+            <path d="M11 64 C 11 48, 21 40, 32 40 C 43 40, 53 48, 53 64 Z" fill="#ffffff" />
+          </svg>
         )}
       </div>
       <div style={{ flex: 1, minWidth: 0 }}>
