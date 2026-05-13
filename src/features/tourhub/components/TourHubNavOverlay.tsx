@@ -17,6 +17,7 @@ import {
   type LucideProps,
 } from 'lucide-react';
 import { BottomSheet } from '@/components/ui/BottomSheet';
+import SheetHeader from '@/components/ui/SheetHeader';
 import { haptic } from '@/utils/haptics';
 import { useTopWorldRanked, toTitleCase, getInitials } from '../hooks/useWorldRankings';
 import { getPlayerHeadshotUrl, PLAYER_SILHOUETTE_URL } from '@/utils/playerHeadshot';
