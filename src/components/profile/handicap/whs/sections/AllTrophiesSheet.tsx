@@ -265,7 +265,7 @@ const TrophyRow: React.FC<{ a: Achievement }> = ({ a }) => {
           gap: 6,
         }}>
           <div style={{
-            fontSize: 10.5,
+            fontSize: 11,
             fontWeight: 800,
             color: INK_40,
             letterSpacing: '0.10em',
