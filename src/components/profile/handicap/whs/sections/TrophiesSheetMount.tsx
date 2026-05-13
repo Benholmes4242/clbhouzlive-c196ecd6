@@ -31,6 +31,7 @@ export const TrophiesSheetMount: React.FC<Props> = ({
   const { data: scores } = useAllScores(connectionId);
   const { data: history } = useHandicapHistory(connectionId, 365);
   const { data: aggregates } = useTrophyAggregates(userId, connectionId);
+  const { data: top100Progress } = useTop100ProgressForUser(userId);
 
   const { data: primaryClub } = useQuery({
     queryKey: ['user-primary-club', userId],
