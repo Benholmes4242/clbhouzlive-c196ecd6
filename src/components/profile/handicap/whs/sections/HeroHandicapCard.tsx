@@ -531,14 +531,17 @@ const HeroHandicapCard: React.FC<Props> = ({ connection }) => {
     <section style={{ margin: '0 0 24px', padding: '0 20px', fontFamily: FONT_GEIST }}>
       {/* Eyebrow row */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8, padding: '0 4px' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+        <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
           <span
             style={{
-              width: 6, height: 6, borderRadius: '50%', background: AMBER,
+              width: 5, height: 5, borderRadius: '50%', background: AMBER,
               animation: 'liveDot 2s ease-in-out infinite',
             }}
           />
-          <span style={{ fontSize: 10, fontWeight: 800, color: INK_55, letterSpacing: '0.22em' }}>
+          <span style={{
+            fontSize: 9, fontWeight: 800, color: '#64748B',
+            letterSpacing: '0.16em', textTransform: 'uppercase',
+          }}>
             HANDICAP INDEX
           </span>
         </div>
