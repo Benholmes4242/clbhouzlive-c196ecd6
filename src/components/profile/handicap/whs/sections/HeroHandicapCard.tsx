@@ -379,7 +379,7 @@ const HeroHandicapCard: React.FC<Props> = ({ connection }) => {
   // Monthly movement math — inner ring (replaces form)
   const monthly = calcMonthlyMovement(rangeDelta);
   const useMonthlyRing = monthly.delta != null;
-  const fallbackForm = calcRecentForm(allDiffsOldestFirst);
+  const fallbackForm = calcPeriodForm(rangeRoundsForForm);
 
   const innerFillLength = useMonthlyRing
     ? (monthly.fillFraction * C_INNER) / 2
