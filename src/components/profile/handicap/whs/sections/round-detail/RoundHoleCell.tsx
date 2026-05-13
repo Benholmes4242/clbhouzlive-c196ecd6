@@ -3,8 +3,6 @@ import type { WhsScoreHole } from '@/lib/whs/types';
 
 interface Props {
   hole: WhsScoreHole;
-  /** Outer cell size in px. Defaults to 44. */
-  size?: number;
 }
 
 // ─── Design tokens ─────────────────────────────────────────────────────
