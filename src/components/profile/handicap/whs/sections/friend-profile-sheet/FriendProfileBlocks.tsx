@@ -106,7 +106,7 @@ const StatTile: React.FC<{
     <span style={{
       fontSize: 9,
       fontWeight: 800,
-      letterSpacing: '0.18em',
+      letterSpacing: '0.16em',
       color: T.inkMute,
     }}>
       {label}
@@ -166,14 +166,14 @@ export const HeroStatsRow: React.FC<{ friend: FriendLeaderboardEntry }> = ({ fri
 // ─── Section wrapper ────────────────────────────────────────────────────
 
 const SectionWrapper: React.FC<{ eyebrow: string; children: React.ReactNode }> = ({ eyebrow, children }) => (
-  <div style={{ padding: '12px 20px 16px', borderTop: `1px solid ${T.hairline}` }}>
-    <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
-      <span aria-hidden style={{ width: 3, height: 8, borderRadius: 1, background: T.amber }} />
+  <div style={{ padding: '12px 16px 16px', borderTop: `1px solid ${T.hairline}` }}>
+    <div style={{ marginBottom: 10 }}>
       <span style={{
         fontSize: 9,
-        fontWeight: 900,
-        color: T.amber,
+        fontWeight: 800,
+        color: '#64748B',
         letterSpacing: '0.16em',
+        textTransform: 'uppercase' as const,
       }}>
         {eyebrow}
       </span>
@@ -205,7 +205,7 @@ const FilledH2H: React.FC<{ sharedRounds: SharedRoundsResult }> = ({ sharedRound
     <>
       <p style={{ margin: 0, fontSize: 14, fontWeight: 700, color: T.ink }}>
         You {sf.wins}{'\u2013'}{sf.losses} them ·{' '}
-        <span style={{ color: verdictColor, fontWeight: 800, letterSpacing: '0.04em' }}>
+        <span style={{ color: verdictColor, fontWeight: 800, letterSpacing: '0.14em' }}>
           {verdict}
         </span>
       </p>
@@ -214,7 +214,7 @@ const FilledH2H: React.FC<{ sharedRounds: SharedRoundsResult }> = ({ sharedRound
         fontSize: 11,
         fontWeight: 700,
         color: T.inkSoft,
-        letterSpacing: '0.04em',
+        letterSpacing: '0.14em',
       }}>
         GROSS {gross.wins}{'\u2013'}{gross.losses}
       </p>
