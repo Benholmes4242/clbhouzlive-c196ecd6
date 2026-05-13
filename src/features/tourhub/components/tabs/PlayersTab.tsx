@@ -20,6 +20,7 @@ import { type PlayerSortType, getDefaultSortForTour } from '../players/PlayerSor
 import { PlayerCardV2 } from '../players/PlayerCardV2';
 import { PlayersEmptyState } from '../players/PlayersEmptyState';
 import { BottomSheet } from '@/components/ui/BottomSheet';
+import SheetHeader from '@/components/ui/SheetHeader';
 import { getTourLogo, hasTourLogo } from '../../utils/tourLogos';
 import { getPlayerHeadshotUrl, PLAYER_SILHOUETTE_URL } from '@/utils/playerHeadshot';
 import { titleCaseCountry } from '../../utils/countryFlags';
