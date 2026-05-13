@@ -465,6 +465,8 @@ const HeroHandicapCard: React.FC<Props> = ({ connection }) => {
     : INK_55;
 
   // ── Combined delta inline ────────────────────────────────────────────────
+  // Always amber — matches the amber handicap ring above. Arrow direction
+  // (↓ vs ↑) carries the down=good semantic now that colour does not.
   const deltaInline = (() => {
     const d = rangeDelta;
     if (d == null || Math.abs(d) < 0.05) {
@@ -473,7 +475,7 @@ const HeroHandicapCard: React.FC<Props> = ({ connection }) => {
     const isDown = d < 0;
     return (
       <span style={{
-        color: isDown ? GREEN : RED, fontWeight: 600,
+        color: RING_HANDICAP, fontWeight: 600,
         display: 'inline-flex', alignItems: 'center', gap: 3,
       }}>
         {isDown ? <ArrowDown size={10} strokeWidth={2.5} /> : <ArrowUp size={10} strokeWidth={2.5} />}
