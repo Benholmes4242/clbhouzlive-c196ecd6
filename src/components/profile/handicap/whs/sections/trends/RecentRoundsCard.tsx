@@ -442,7 +442,7 @@ const DateTile: React.FC<DateTileProps> = ({ dateString, thumbnailUrl }) => {
         overflow: 'hidden',
       }}
     >
-      {thumbnailUrl && (
+      {thumbnailUrl ? (
         <>
           <img
             src={thumbnailUrl}
@@ -470,6 +470,8 @@ const DateTile: React.FC<DateTileProps> = ({ dateString, thumbnailUrl }) => {
             }}
           />
         </>
+      ) : (
+        <CourseImageFallback flagOpacity={0.18} gradientAngle={150} />
       )}
       <span
         style={{
