@@ -250,13 +250,6 @@ const HeroHandicapCard: React.FC<Props> = ({ connection }) => {
     });
   }, [recent, range]);
 
-  // Rounds in the active range, shaped for calcPeriodForm.
-  const rangeRoundsForForm = useMemo(() => {
-    return rangeFilteredScores.map((r: any) => ({
-      handicap_differential: r.handicap_differential,
-      handicap_index_at_time: r.handicap_index_at_time,
-    }));
-  }, [rangeFilteredScores]);
 
   const coords = useMemo(() => {
     if (points.length === 0) return [] as { x: number; y: number; idx: number }[];
