@@ -25,6 +25,7 @@ const ComingSoonArt: React.FC<{ iso: string }> = ({ iso }) => (
     </defs>
     <g clipPath="url(#flag-triangle)">
       <foreignObject x="35" y="14" width="50" height="24">
+        {/* @ts-ignore xmlns is required on foreignObject children */}
         <div xmlns="http://www.w3.org/1999/xhtml" style={{ width: '100%', height: '100%' }}>
           <MiniFlag iso={iso} />
         </div>
