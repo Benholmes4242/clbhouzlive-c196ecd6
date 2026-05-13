@@ -859,7 +859,7 @@ export const WorldRankingsHero = memo(function WorldRankingsHero() {
                   display: 'flex',
                   alignItems: 'center',
                   gap: 12,
-                  padding: '12px 20px',
+                  padding: '12px 16px',
                   background: isActive ? 'rgba(247,147,30,0.04)' : 'transparent',
                   border: 'none',
                   borderLeft: isActive ? `3px solid ${AMBER}` : '3px solid transparent',
