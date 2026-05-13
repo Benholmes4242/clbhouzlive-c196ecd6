@@ -424,7 +424,7 @@ const HeroHandicapCard: React.FC<Props> = ({ connection }) => {
     }
 
     // FALLBACK — form-last-5
-    if (last5Diffs.length < 5) {
+    if (!fallbackForm.enoughData) {
       return <span style={{ color: INK_40 }}>Steady form · last 5</span>;
     }
     if (fallbackForm.direction === 'positive') {
