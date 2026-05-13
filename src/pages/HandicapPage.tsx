@@ -180,17 +180,18 @@ const HandicapPageHeader: React.FC<HeaderProps> = ({
 
   const greeting = useMemo(() => getGreeting(), []);
 
-  // Title varies by mode
-  const eyebrow = readOnly ? 'HANDICAP' : 'HANDICAP';
-  const title: { line1: string; line2?: string } = readOnly
-    ? { line1: displayName ? `${displayName}'s handicap` : 'Handicap' }
-    : displayName
-      ? { line1: `${greeting},`, line2: displayName }
-      : { line1: 'Welcome back' };
-
   // Sentinel-based detection: suppress safe-area padding while CompactHeader
   // is visible at top to avoid doubled inset gap.
   const { sentinelRef, paddingTop } = useStickyHeaderSafeArea();
+
+  const subheadOwn = useMemo(() => {
+    const dateStr = new Date().toLocaleDateString('en-GB', {
+      weekday: 'short', day: 'numeric', month: 'short',
+    });
+    return displayName
+      ? `${greeting}, ${displayName} · ${dateStr}`
+      : `${greeting} · ${dateStr}`;
+  }, [greeting, displayName]);
 
   return (
     <>
@@ -207,9 +208,8 @@ const HandicapPageHeader: React.FC<HeaderProps> = ({
           transition: 'padding-top 200ms ease',
         }}
       >
-      {/* Row 2 — title */}
       {readOnly ? (
-        <div style={{ padding: '12px 20px 16px' }}>
+        <div style={{ padding: '12px 16px 16px' }}>
           <FriendTitleRow
             displayName={displayName}
             avatarUrl={friendAvatarUrl}
@@ -219,18 +219,49 @@ const HandicapPageHeader: React.FC<HeaderProps> = ({
           />
         </div>
       ) : (
-        <div style={{ padding: '14px 20px 18px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
-          <h1 style={{
-            fontFamily: FONT_GEIST,
-            fontSize: 28, fontWeight: 700, color: INK,
-            lineHeight: 1.1, letterSpacing: '-0.02em',
-            margin: 0, flex: 1, minWidth: 0,
-          }}>
-            <span style={{ display: 'block' }}>{title.line1}</span>
-            {title.line2 && (
-              <span style={{ display: 'block' }}>{title.line2}</span>
-            )}
-          </h1>
+        <div style={{ padding: '14px 16px 14px', display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 12 }}>
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <div style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 6,
+              marginBottom: 6,
+            }}>
+              <Activity size={13} strokeWidth={2.5} color={AMBER} />
+              <span style={{
+                fontSize: 10.5,
+                fontWeight: 700,
+                color: AMBER,
+                letterSpacing: '0.14em',
+                textTransform: 'uppercase',
+                fontFamily: FONT_GEIST,
+              }}>
+                HANDICAP
+              </span>
+            </div>
+            <h1 style={{
+              fontFamily: FONT_GEIST,
+              fontSize: 18,
+              fontWeight: 800,
+              color: INK,
+              lineHeight: 1.2,
+              letterSpacing: '-0.015em',
+              margin: 0,
+            }}>
+              Handicap
+            </h1>
+            <div style={{
+              fontFamily: FONT_GEIST,
+              fontSize: 13,
+              fontWeight: 500,
+              color: INK_55,
+              letterSpacing: '-0.005em',
+              lineHeight: 1.3,
+              marginTop: 6,
+            }}>
+              {subheadOwn}
+            </div>
+          </div>
           <button
             onClick={() => openTrophiesSheet()}
             aria-label="View all trophies"
@@ -258,27 +289,29 @@ const HandicapPageHeader: React.FC<HeaderProps> = ({
         </div>
       )}
 
-      {/* Row 3 — segmented control */}
+      {/* Tab strip — canonical 12px / 800-600 weight */}
       <div style={{
         display: 'flex',
         justifyContent: 'center',
+        borderBottom: '0.5px solid rgba(15,23,42,0.08)',
       }}>
         {(['today', 'trends', 'records', 'friends'] as const).map(tab => (
           <button
             key={tab}
             onClick={() => onTabChange(tab)}
             style={{
-              padding: '10px 14px',
+              padding: '12px 14px',
               background: 'transparent',
               border: 'none',
               borderBottom: activeTab === tab ? `2px solid ${AMBER}` : '2px solid transparent',
               marginBottom: -1,
-              fontSize: 14,
-              fontWeight: activeTab === tab ? 700 : 500,
+              fontSize: 12,
+              fontWeight: activeTab === tab ? 800 : 600,
               color: activeTab === tab ? INK : INK_55,
               cursor: 'pointer',
               fontFamily: FONT_GEIST,
               textTransform: 'capitalize',
+              letterSpacing: '-0.005em',
             }}
           >
             {tab}
