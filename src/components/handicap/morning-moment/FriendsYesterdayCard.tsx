@@ -607,7 +607,7 @@ const HeroCard: React.FC<{ data: FriendYesterday; onClick: () => void }> = ({ da
     }}>
       <HeroHeader data={data} onClick={onClick} />
       {state === 'enriched'
-        ? <EnrichedBody data={data} />
+        ? <EnrichedBody data={data} onTapStats={onClick} />
         : <UnenrichedBody data={data} state={state} onTapStats={onClick} />}
     </div>
   );
