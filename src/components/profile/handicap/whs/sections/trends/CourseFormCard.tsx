@@ -475,7 +475,7 @@ export const CourseFormCard: React.FC<Props> = ({ connectionId, currentHandicap 
           activeView === 'toughest'
             ? 'toughest test'
             : activeView === 'best'
-              ? 'home advantage'
+              ? 'best course'
               : 'home course';
         return (
           <div
