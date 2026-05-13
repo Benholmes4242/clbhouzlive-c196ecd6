@@ -3,10 +3,13 @@
  * standout friend (hero card) and the rest of the group (horizontal
  * scroll of 250px mini cards). Tap-through navigates to Friends sub-tab.
  */
-import React from 'react';
-import { Trophy, Crown, Sparkles } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Trophy, Crown, Sparkles, RefreshCw, Send, Bell, ChevronRight, Check } from 'lucide-react';
 import { useSearchParams } from 'react-router-dom';
+import { toast } from 'sonner';
 import type { FriendsYesterdayResult, FriendYesterday } from '@/lib/handicap/useFriendsYesterday';
+import { callCreateInvite } from '@/lib/whs/api';
+import { sendWhsConnectionNudge, hasRecentlyNudged } from '@/lib/whs/nudge';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 
 const T = {
