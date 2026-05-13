@@ -857,7 +857,7 @@ const SafeState: React.FC<{ cutTarget: number; settleAt: number }> = ({
         }}>
           <TrendingDown size={11} strokeWidth={2.4} color={GREEN} />
           <span style={{
-            fontSize: 9.5, fontWeight: 800, color: GREEN,
+            fontSize: 9, fontWeight: 800, color: GREEN,
             letterSpacing: '0.12em',
           }}>FOR A CUT</span>
         </div>
