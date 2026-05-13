@@ -10,6 +10,8 @@ import { toast } from 'sonner';
 import type { FriendsYesterdayResult, FriendYesterday } from '@/lib/handicap/useFriendsYesterday';
 import { callCreateInvite } from '@/lib/whs/api';
 import { sendWhsConnectionNudge, hasRecentlyNudged } from '@/lib/whs/nudge';
+import { useFriendRoundDetail } from '@/lib/whs/hooks';
+import { RoundCardBody, type HoleRow } from '@/components/profile/handicap/whs/sections/round-card';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 
 const T = {
@@ -528,29 +530,59 @@ const NudgeCTA: React.FC<{ data: FriendYesterday }> = ({ data }) => {
   );
 };
 
-const EnrichedBody: React.FC<{ data: FriendYesterday }> = ({ data }) => (
-  <div style={{ padding: '14px 16px', display: 'flex', flexDirection: 'column', gap: 12 }}>
-    <div style={{ display: 'flex', alignItems: 'flex-start' }}>
-      <StatCell label="GROSS" value={data.score} sub={data.is_counter ? 'Counter' : '\u00A0'} />
-      <StatCell label="STABLEFORD" value={data.stableford ?? '—'} sub={data.stableford !== null ? 'pts' : '\u00A0'} border />
-      <StatCell label="DIFFERENTIAL" value={fmtDiff(data.differential)} sub="vs course" border valueColor={diffColor(data.differential)} />
-    </div>
-    <div style={{ paddingTop: 10, borderTop: `0.5px solid ${T.ink10}` }}>
-      <BreakdownRow data={data} label="ROUND" />
-    </div>
-    <div style={{
-      paddingTop: 10, borderTop: `0.5px solid ${T.ink10}`,
-      display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-    }}>
-      <span style={{
-        fontSize: 11, fontWeight: 700, color: T.ink55, letterSpacing: '0.06em',
-      }}>
-        Handicap index
-      </span>
-      <HcpRow data={data} />
-    </div>
-  </div>
-);
+const EnrichedBody: React.FC<{ data: FriendYesterday; onTapStats: () => void }> = ({ data, onTapStats }) => {
+  const { data: roundDetail } = useFriendRoundDetail(
+    data.last_round_score_id,
+    !!data.last_round_score_id,
+  );
+
+  const par = React.useMemo<number | null>(() => {
+    if (!roundDetail?.holes || !roundDetail.hole_by_hole_fetched) return null;
+    let total = 0;
+    let any = false;
+    for (const h of roundDetail.holes) {
+      if (h.par != null) { total += h.par; any = true; }
+    }
+    return any ? total : null;
+  }, [roundDetail]);
+
+  const handicapDelta =
+    data.handicap_index_at_time != null && data.friend_handicap_index != null
+      ? data.friend_handicap_index - data.handicap_index_at_time
+      : null;
+
+  const contextLine = [
+    'YESTERDAY',
+    par != null ? `PAR ${par}` : null,
+    data.is_counter ? 'COUNTER' : 'NON COUNTER',
+  ]
+    .filter(Boolean)
+    .join(' · ');
+
+  const holes: HoleRow[] | null =
+    roundDetail?.holes && roundDetail.hole_by_hole_fetched
+      ? roundDetail.holes.map((h) => ({
+          hole_no: h.hole_no,
+          par: h.par,
+          actual_gross: h.actual_gross,
+          adjusted_gross: h.adjusted_gross,
+          played: h.played,
+          hole_alias: h.hole_alias,
+        }))
+      : null;
+
+  return (
+    <RoundCardBody
+      contextLine={contextLine}
+      gross={data.score}
+      differential={data.differential}
+      stableford={data.stableford}
+      handicapDelta={handicapDelta}
+      holes={holes}
+      onClick={onTapStats}
+    />
+  );
+};
 
 const UnenrichedBody: React.FC<{
   data: FriendYesterday;
@@ -575,7 +607,7 @@ const HeroCard: React.FC<{ data: FriendYesterday; onClick: () => void }> = ({ da
     }}>
       <HeroHeader data={data} onClick={onClick} />
       {state === 'enriched'
-        ? <EnrichedBody data={data} />
+        ? <EnrichedBody data={data} onTapStats={onClick} />
         : <UnenrichedBody data={data} state={state} onTapStats={onClick} />}
     </div>
   );
