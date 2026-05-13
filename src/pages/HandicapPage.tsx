@@ -433,6 +433,15 @@ const HandicapPage: React.FC = () => {
     }
   }, [ownerUserId, isFriendView, user?.id]);
 
+  // Call the WHS connection hook BEFORE any early returns so it's called
+  // on every render in the same order (rules of hooks).
+  // `useWhsConnection` is guarded internally by `enabled: !!userId`, so
+  // passing undefined is safe — it just stays disabled.
+  const { data: ownConnection } = useWhsConnection(
+    isFriendView ? undefined : (ownerUserId ?? undefined)
+  );
+  const hasConnection = isFriendView ? true : !!ownConnection;
+
   if (loading) {
     return <PageRoot><div /></PageRoot>;
   }
@@ -449,9 +458,6 @@ const HandicapPage: React.FC = () => {
   if (!ownerUserId) {
     return <Navigate to="/auth" replace />;
   }
-
-  const { data: ownConnection } = useWhsConnection(isFriendView ? undefined : ownerUserId);
-  const hasConnection = isFriendView ? true : !!ownConnection;
 
   return (
     <PageRoot style={{ background: BG_SURFACE }}>
