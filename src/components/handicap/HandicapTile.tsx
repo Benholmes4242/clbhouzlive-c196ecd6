@@ -82,6 +82,66 @@ function HandicapTile({ userId, onClick }: HandicapTileProps) {
 
   const showNewBadge = SHOW_HANDICAP_NEW_BADGE;
 
+  // Empty-state branch — render dashed amber CTA tile when not connected.
+  if (!connection) {
+    return (
+      <button
+        type="button"
+        onClick={onClick}
+        className="relative active:scale-[0.97] transition-transform"
+        style={{
+          width: '100%',
+          background: 'linear-gradient(135deg, rgba(247,147,30,0.04), #fff)',
+          border: '1.5px dashed rgba(247,147,30,0.36)',
+          borderRadius: 16,
+          padding: '18px 18px',
+          display: 'flex',
+          alignItems: 'center',
+          gap: 14,
+          cursor: 'pointer',
+          textAlign: 'left',
+        }}
+        aria-label="Connect your handicap"
+      >
+        <div
+          style={{
+            width: 44, height: 44, borderRadius: 12,
+            background: 'linear-gradient(135deg, #FBA738, #F7931E)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            flexShrink: 0,
+            boxShadow: '0 3px 8px rgba(247,147,30,0.24)',
+          }}
+        >
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M3 6 L3 18 M3 12 Q9 7 15 12 T 21 12" />
+          </svg>
+        </div>
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <div style={{
+            fontSize: 9.5, fontWeight: 800, color: AMBER,
+            letterSpacing: '0.14em', textTransform: 'uppercase',
+            marginBottom: 3,
+          }}>
+            HANDICAP
+          </div>
+          <div style={{
+            fontSize: 14.5, fontWeight: 700, color: INK,
+            letterSpacing: '-0.01em', marginBottom: 2,
+          }}>
+            Connect your handicap
+          </div>
+          <div style={{
+            fontSize: 11.5, color: 'rgba(15,23,42,0.55)',
+            lineHeight: 1.35,
+          }}>
+            Sync rounds, track your index, play against friends.
+          </div>
+        </div>
+        <ChevronRight size={18} color="rgba(15,23,42,0.40)" strokeWidth={2} />
+      </button>
+    );
+  }
+
   return (
     <button
       type="button"
