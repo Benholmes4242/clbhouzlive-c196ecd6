@@ -157,7 +157,7 @@ function HandicapTile({ userId, onClick }: HandicapTileProps) {
 
       {/* Bottom — milestone progress bar */}
       <div style={{ marginTop: 'auto', width: '100%', paddingTop: 10 }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6 }}>
           <span style={{
             fontSize: 9, fontWeight: 700,
             color: 'rgba(15,23,42,0.40)',
@@ -187,11 +187,18 @@ function HandicapTile({ userId, onClick }: HandicapTileProps) {
             }}
           />
         </div>
+        {/* Caption: percentage is the answer — bolder ink than the rest of the line. */}
         <div style={{
-          marginTop: 4, fontSize: 10,
-          color: 'rgba(15,23,42,0.55)', fontWeight: 500,
+          marginTop: 6, fontSize: 11,
+          color: 'rgba(15,23,42,0.65)', fontWeight: 400,
         }}>
-          {milestoneProgressLabel}
+          {milestoneProgressLabel.replace(/^(\d+%)/, '§§§$1§§§')
+            .split('§§§')
+            .map((part, i) =>
+              /^\d+%$/.test(part)
+                ? <span key={i} style={{ fontWeight: 500, color: 'rgba(15,23,42,0.85)' }}>{part}</span>
+                : part
+            )}
         </div>
       </div>
     </button>
