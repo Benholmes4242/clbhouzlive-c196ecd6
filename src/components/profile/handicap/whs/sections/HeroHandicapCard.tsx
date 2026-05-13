@@ -1040,7 +1040,7 @@ const FlankRing: React.FC<FlankRingProps> = ({
 
   // Scoring single-direction frac
   const scoringFrac = !isForm ? (fraction ?? 0) : 0;
-  const scoringColor = 'url(#flankScoringGradient)';
+  const scoringColor = RING_SCORING;
 
   // FORM bidirectional dasharray length — half the circumference scaled by magnitude
   const formArcLen = ((formMagnitude ?? 0) * FC) / 2;
