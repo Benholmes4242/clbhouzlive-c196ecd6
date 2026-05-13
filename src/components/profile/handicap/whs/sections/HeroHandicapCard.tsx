@@ -460,39 +460,43 @@ const HeroHandicapCard: React.FC<Props> = ({ connection }) => {
     }
     if (fallbackForm.direction === 'positive') {
       return (
-        <span style={{ color: GREEN, display: 'inline-flex', alignItems: 'center', gap: 4 }}>
-          <ArrowDown size={13} strokeWidth={2.5} />
+        <span style={{ color: FORM_WARM, display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+          <ArrowUp size={13} strokeWidth={2.5} />
           <span style={{ fontVariantNumeric: 'tabular-nums' }}>
-            {fmtDiff(-Math.abs(fallbackForm.formStrokes))} form
+            +{Math.abs(fallbackForm.formDelta).toFixed(1)} pts
           </span>
-          <span style={{ color: INK_40 }}>· last 5</span>
+          <span style={{ color: INK_40 }}>· vs typical</span>
         </span>
       );
     }
     if (fallbackForm.direction === 'negative') {
       return (
-        <span style={{ color: RED, display: 'inline-flex', alignItems: 'center', gap: 4 }}>
-          <ArrowUp size={13} strokeWidth={2.5} />
+        <span style={{ color: FORM_COLD, display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+          <ArrowDown size={13} strokeWidth={2.5} />
           <span style={{ fontVariantNumeric: 'tabular-nums' }}>
-            +{Math.abs(fallbackForm.formStrokes).toFixed(1)} form
+            {Math.abs(fallbackForm.formDelta).toFixed(1)} pts
           </span>
-          <span style={{ color: INK_40 }}>· last 5</span>
+          <span style={{ color: INK_40 }}>· vs typical</span>
         </span>
       );
     }
-    return <span style={{ color: INK_40 }}>Steady form · last 5</span>;
+    return <span style={{ color: INK_40 }}>Steady · vs typical</span>;
   })();
 
-  // ── Status word (driven by 30-day form direction) ───────────────────────
+  // ── Status word (driven by Stableford formDelta) ────────────────────────
+  // formDelta sign: positive = period avg ABOVE personal avg (hot).
+  const fd = fallbackForm.formDelta;
   const statusWord =
-    fallbackForm.direction === 'negative' && Math.abs(fallbackForm.formStrokes) > 0.5 ? 'EXCELLENT'
-    : fallbackForm.direction === 'negative' ? 'TRENDING DOWN'
-    : fallbackForm.direction === 'positive' && Math.abs(fallbackForm.formStrokes) > 0.5 ? 'DRIFTING UP'
-    : fallbackForm.direction === 'positive' ? 'STEADY'
+    fallbackForm.direction === 'positive' && fd > 3.0 ? 'EXCELLENT'
+    : fallbackForm.direction === 'positive' && fd > 1.0 ? 'TRENDING UP'
+    : fallbackForm.direction === 'negative' && fd < -3.0 ? 'DRIFTING DOWN'
+    : fallbackForm.direction === 'negative' && fd < -1.0 ? 'TRENDING DOWN'
     : 'STEADY';
   const statusColor =
-    fallbackForm.direction === 'negative' ? GREEN
-    : fallbackForm.direction === 'positive' && Math.abs(fallbackForm.formStrokes) > 0.5 ? '#9F1239'
+    fallbackForm.direction === 'positive' && fd > 3.0 ? FORM_RED_HOT
+    : fallbackForm.direction === 'positive' ? FORM_WARM
+    : fallbackForm.direction === 'negative' && fd < -3.0 ? FORM_OUT
+    : fallbackForm.direction === 'negative' ? FORM_COLD
     : INK_55;
 
   // ── Combined delta inline ────────────────────────────────────────────────
