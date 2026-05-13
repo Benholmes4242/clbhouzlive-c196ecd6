@@ -799,7 +799,12 @@ const HeroHandicapCard: React.FC<Props> = ({ connection }) => {
         </div>
 
         {/* CENTRE — SCORING AVG */}
-        <FlankRing metric="scoring" value={scoringAvgStr ?? '—'} fraction={scoringFraction} sub={scoringSub} />
+        <FlankRing
+          metric="scoring"
+          value={scoringAvgStr ?? '—'}
+          fraction={scoringFraction}
+          sub={scoringIsEmpty ? 'Not enough rounds' : scoringSub}
+        />
 
         {/* RIGHT — FORM */}
         <FlankRing
