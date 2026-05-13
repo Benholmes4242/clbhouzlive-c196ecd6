@@ -16,7 +16,7 @@ interface Props {
 const INK = '#0F172A';
 const INK_MUTE = 'rgba(15,23,42,0.6)';
 const HAIRLINE = 'rgba(15,23,42,0.08)';
-const AMBER = '#F7931E';
+
 
 const slotExplanation = (kind: string): { title: string; body: string } => {
   switch (kind) {
