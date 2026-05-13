@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { Activity, ArrowDown, ArrowUp, Flame, Minus, Snowflake } from 'lucide-react';
+import { Activity, ArrowDown, ArrowUp, Flame, Info, Minus, Snowflake } from 'lucide-react';
 import { useHandicapHistory, useHandicapTrend, useAllScores } from '@/lib/whs/hooks';
+import HandicapRingsInfoSheet from './HandicapRingsInfoSheet';
 import { whsDisplayedHcp, formatDisplayedHcp, fmtDiff } from '@/lib/whs/format';
 import type { WhsConnection, HandicapPoint } from '@/lib/whs/types';
 import { openTrophiesSheet } from '../trophiesSheetEvents';
