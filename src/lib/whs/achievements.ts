@@ -92,12 +92,28 @@ export function computeAchievements(ctx: AchievementContext): Achievement[] {
   });
 
   // ── SCORING & SHOTS (8, hardest-first) ─────────────────────────────
+  /**
+   * Hole-derived counters need a "n of N rounds with hole detail"
+   * denominator. EG records full hole data on rounds entered via the
+   * MyEG app; older or club-submitted rounds may show totals only.
+   */
+  const holeDenominator =
+    agg?.hole_stats &&
+    typeof agg.hole_stats.rounds_with_holes_count === 'number' &&
+    typeof agg.hole_stats.total_rounds_count === 'number'
+      ? {
+          rounds_with_holes: agg.hole_stats.rounds_with_holes_count,
+          total_rounds: agg.hole_stats.total_rounds_count,
+        }
+      : undefined;
+
   out.push({
     id: 'hole_in_one', type: 'hole_in_one',
     title: 'Hole-in-one',
     description: 'Sink it in one shot.',
     icon_name: 'Crown', category: 'scoring', kind: 'counter',
     count: agg?.hole_stats?.aces_count ?? 0, count_label: 'total',
+    hole_data_denominator: holeDenominator,
   });
   out.push({
     id: 'albatross', type: 'albatross',
@@ -105,6 +121,7 @@ export function computeAchievements(ctx: AchievementContext): Achievement[] {
     description: 'Score three under par on a single hole.',
     icon_name: 'Flag', category: 'scoring', kind: 'counter',
     count: agg?.hole_stats?.albatross_count ?? 0, count_label: 'total',
+    hole_data_denominator: holeDenominator,
   });
   out.push({
     id: 'eagles', type: 'eagles',
@@ -112,6 +129,7 @@ export function computeAchievements(ctx: AchievementContext): Achievement[] {
     description: 'Score two under par on a single hole.',
     icon_name: 'Flag', category: 'scoring', kind: 'counter',
     count: agg?.hole_stats?.eagles_count ?? 0, count_label: 'total',
+    hole_data_denominator: holeDenominator,
   });
   {
     const at = agg?.hole_stats?.first_sub_par_at ?? null;
@@ -159,6 +177,7 @@ export function computeAchievements(ctx: AchievementContext): Achievement[] {
     description: 'Score one under par on any hole.',
     icon_name: 'Flag', category: 'scoring', kind: 'counter',
     count: agg?.hole_stats?.birdies_count ?? 0, count_label: 'total',
+    hole_data_denominator: holeDenominator,
   });
 
   // ── COURSES & TRAVEL (6, hardest-first) ────────────────────────────
