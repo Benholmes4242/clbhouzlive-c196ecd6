@@ -604,7 +604,7 @@ export const RoundsThatCountCard: React.FC<Props> = ({ connectionId, currentHand
                       {WEEKDAY[d.getDay()]}
                     </div>
                     <div style={{
-                      fontSize: 9.5, fontWeight: isLatest ? 700 : 600,
+                      fontSize: 9, fontWeight: isLatest ? 700 : 600,
                       color: isLatest ? INK : INK_40,
                       fontFamily: FONT_GEIST,
                       fontVariantNumeric: 'tabular-nums',
