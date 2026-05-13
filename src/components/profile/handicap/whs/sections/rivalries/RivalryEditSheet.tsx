@@ -1,7 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import { Drawer as DrawerPrimitive } from 'vaul';
 import { Search, Trash2, Check } from 'lucide-react';
-import SheetHeader from '../_shared/SheetHeader';
+import SheetHeader from '@/components/ui/SheetHeader';
 import { useFriendLeaderboard, useUpsertRivalOverride, useDeleteRivalOverride } from '@/lib/whs/hooks';
 import { initials, firstName } from '@/lib/whs/utils/initials';
 import { fmtHcp } from '@/lib/whs/format';

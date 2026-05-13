@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import SheetHeader from './_shared/SheetHeader';
+import SheetHeader from '@/components/ui/SheetHeader';
 import { fmtDiff } from '@/lib/whs/format';
 
 const INK = '#0F172A';

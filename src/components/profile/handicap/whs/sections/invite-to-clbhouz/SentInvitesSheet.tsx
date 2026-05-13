@@ -1,6 +1,6 @@
 import React from 'react';
 import { Drawer as DrawerPrimitive } from 'vaul';
-import SheetHeader from '../_shared/SheetHeader';
+import SheetHeader from '@/components/ui/SheetHeader';
 import { formatDistanceToNow } from 'date-fns';
 import { useSentInvites } from '@/lib/whs/hooks';
 import { firstName } from '@/lib/whs/utils/initials';
