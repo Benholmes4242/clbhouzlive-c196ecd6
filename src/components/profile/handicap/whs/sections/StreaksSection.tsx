@@ -130,7 +130,7 @@ const Timeline: React.FC<{ timeline: StreaksData['timeline'] }> = ({ timeline })
           display: 'flex',
           justifyContent: 'space-between',
           marginTop: 6,
-          fontSize: 9.5,
+          fontSize: 9,
           fontWeight: 700,
           color: INK_40,
           letterSpacing: '0.14em',
