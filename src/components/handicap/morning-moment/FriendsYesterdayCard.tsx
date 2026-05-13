@@ -363,9 +363,9 @@ const firstNameOf = (name: string): string =>
 
 const NarrativeSubtitle: React.FC<{ data: FriendYesterday }> = ({ data }) => {
   const bits: string[] = [];
-  bits.push(data.is_counter ? 'Counter' : 'Non counter');
+  bits.push(data.is_counter ? 'Counter' : 'Non counting round');
   if (data.friend_handicap_index !== null) {
-    bits.push(`handicap index ${data.friend_handicap_index.toFixed(1)}`);
+    bits.push(`Handicap index ${data.friend_handicap_index.toFixed(1)}`);
   }
   return (
     <div style={{ fontSize: 12, color: T.ink55, fontWeight: 600 }}>
@@ -479,7 +479,7 @@ const InviteCTA: React.FC<{ data: FriendYesterday }> = ({ data }) => {
       tone={sent ? 'green' : 'amber'}
       icon={sent ? <Check size={16} strokeWidth={2.6} /> : <Send size={15} strokeWidth={2.4} />}
       title={sent ? 'Invite sent' : `Invite ${fname} to clbhouz`}
-      subtitle={sent ? "We'll let you know if they join." : 'See their hole-by-hole stats, Stableford and form.'}
+      subtitle={sent ? "We'll let you know if they join." : 'See their hole-by-hole stats, stableford points and form.'}
       showChevron={!sent}
       onClick={handleInvite}
       disabled={sending || sent}
