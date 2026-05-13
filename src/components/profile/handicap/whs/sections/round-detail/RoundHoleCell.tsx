@@ -67,29 +67,35 @@ const SPECS: Record<Variant, VariantSpec> = {
 };
 
 /**
- * Shape primitive — renders in a 100×100 viewBox so it scales with its
- * container. Inset is expressed in viewBox units (0–100) so the existing
- * INSET_DOUBLE / INSET_TRIPLE constants below are scaled up by ~2.27 here.
+ * Shape primitive — renders in a 100×100 viewBox, scales with container.
  *
- * Uses vector-effect="non-scaling-stroke" so the stroke width stays
- * crisp regardless of how small the cell renders.
+ * Stroke width is in viewBox units (not screen pixels) — calibrated so
+ * that at the 44px maxWidth cap the stroke renders at the original
+ * 1.5px target. Geometry is inset by half the stroke width so the full
+ * stroke sits INSIDE the viewBox (no edge clipping).
  */
+const STROKE_VB = 1.5 * (100 / 44); // ≈ 3.41 viewBox units
+const STROKE_HALF = STROKE_VB / 2;
+
 const Shape: React.FC<{
   kind: 'circle' | 'square';
   inset: number;
   stroke: string;
 }> = ({ kind, inset, stroke }) => {
-  // The inset constants below were calibrated for a 44px cell.
-  // Convert to viewBox units (44 → 100): multiply by 100/44 = ~2.273.
   const insetVB = inset * (100 / 44);
 
   if (kind === 'circle') {
-    const r = 50 - insetVB;
+    const r = 50 - insetVB - STROKE_HALF;
     return (
       <svg
         viewBox="0 0 100 100"
         preserveAspectRatio="xMidYMid meet"
-        style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', pointerEvents: 'none' }}
+        style={{
+          position: 'absolute', inset: 0,
+          width: '100%', height: '100%',
+          pointerEvents: 'none',
+          overflow: 'visible',
+        }}
         aria-hidden
       >
         <circle
@@ -98,30 +104,34 @@ const Shape: React.FC<{
           r={r}
           fill="none"
           stroke={stroke}
-          strokeWidth={STROKE_W}
-          vectorEffect="non-scaling-stroke"
+          strokeWidth={STROKE_VB}
         />
       </svg>
     );
   }
-  const dim = 100 - 2 * insetVB;
+
+  const origin = insetVB + STROKE_HALF;
+  const dim = 100 - 2 * insetVB - STROKE_VB;
   return (
     <svg
       viewBox="0 0 100 100"
       preserveAspectRatio="xMidYMid meet"
-      style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', pointerEvents: 'none' }}
+      style={{
+        position: 'absolute', inset: 0,
+        width: '100%', height: '100%',
+        pointerEvents: 'none',
+        overflow: 'visible',
+      }}
       aria-hidden
     >
       <rect
-        x={insetVB}
-        y={insetVB}
+        x={origin}
+        y={origin}
         width={dim}
         height={dim}
-        rx={4.5}
         fill="none"
         stroke={stroke}
-        strokeWidth={STROKE_W}
-        vectorEffect="non-scaling-stroke"
+        strokeWidth={STROKE_VB}
       />
     </svg>
   );
