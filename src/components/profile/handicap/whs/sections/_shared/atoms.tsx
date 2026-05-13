@@ -32,28 +32,18 @@ export const SectionHeader: React.FC<SectionHeaderProps> = ({
       alignItems: 'flex-start',
       justifyContent: 'space-between',
       gap: 12,
-      padding: '0 20px 12px',
+      padding: '0 16px 12px',
       fontFamily: FONT,
     }}
   >
     <div style={{ flex: 1, minWidth: 0 }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
-        <span
-          aria-hidden
-          style={{
-            display: 'inline-block',
-            width: 3,
-            height: 8,
-            borderRadius: 1,
-            background: AMBER,
-          }}
-        />
+      <div style={{ marginBottom: 6 }}>
         <span
           style={{
             fontSize: 9,
-            fontWeight: 900,
-            color: AMBER,
-            letterSpacing: '0.18em',
+            fontWeight: 800,
+            color: '#64748B',
+            letterSpacing: '0.16em',
             textTransform: 'uppercase',
           }}
         >
@@ -62,11 +52,11 @@ export const SectionHeader: React.FC<SectionHeaderProps> = ({
       </div>
       <h2
         style={{
-          fontSize: 24,
-          fontWeight: 900,
+          fontSize: 18,
+          fontWeight: 800,
           fontFamily: FONT,
-          letterSpacing: '-0.035em',
-          lineHeight: 1.08,
+          letterSpacing: '-0.015em',
+          lineHeight: 1.2,
           color: INK,
           margin: 0,
         }}
@@ -76,10 +66,11 @@ export const SectionHeader: React.FC<SectionHeaderProps> = ({
       {sub && (
         <p
           style={{
-            fontSize: 12,
-            lineHeight: 1.4,
+            fontSize: 13,
+            fontWeight: 500,
+            lineHeight: 1.3,
             color: INK_55,
-            margin: '4px 0 0',
+            margin: '6px 0 0',
           }}
         >
           {sub}
