@@ -11,12 +11,13 @@
 
 import { memo, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Activity, ChevronDown, ChevronRight, X } from 'lucide-react';
+import { Activity, ChevronDown, ChevronRight } from 'lucide-react';
 import { useGamifiedLeaderboards } from '../hooks/useGamifiedLeaderboards';
 import { useStatOfWeekCopy } from '../hooks/useStatOfWeekCopy';
 import { useTourSelection } from '../hooks/useTourSelection';
 import { LEADER_CATEGORIES, type LeaderCategory } from './leaders/constants';
 import { BottomSheet } from '@/components/ui/BottomSheet';
+import SheetHeader from '@/components/ui/SheetHeader';
 import { PlayerAvatar } from './PlayerAvatar';
 import { Shimmer } from './shared/Shimmer';
 import CountryFlag from '@/components/ui/country-flag';
