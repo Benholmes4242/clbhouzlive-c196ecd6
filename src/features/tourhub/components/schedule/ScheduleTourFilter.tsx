@@ -7,6 +7,7 @@ import { useState, useCallback } from 'react';
 import { ChevronDown, Globe } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { BottomSheet } from '@/components/ui/BottomSheet';
+import SheetHeader from '@/components/ui/SheetHeader';
 import { getTourLogo, hasTourLogo } from '../../utils/tourLogos';
 
 export type TourFilterCode = 'all' | 'pga' | 'EURO' | 'LPGA' | 'CHAMP' | 'PGAD' | 'LIV';
