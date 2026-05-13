@@ -53,6 +53,8 @@ interface HeaderProps {
   readOnly: boolean;
   activeTab: HandicapSubtab;
   onTabChange: (tab: HandicapSubtab) => void;
+  /** When false (own mode + no WHS connection), hide tab strip / trophy / subhead. */
+  hasConnection: boolean;
   /** Friend mode: avatar URL for the tappable title row. */
   friendAvatarUrl?: string | null;
   /** Friend mode: username for /profile/:username navigation. */
@@ -172,6 +174,7 @@ const HandicapPageHeader: React.FC<HeaderProps> = ({
   readOnly,
   activeTab,
   onTabChange,
+  hasConnection,
   friendAvatarUrl,
   friendUsername,
   viewerUserId,
@@ -248,76 +251,82 @@ const HandicapPageHeader: React.FC<HeaderProps> = ({
               letterSpacing: '-0.015em',
               margin: 0,
             }}>
-              My Index
+              {hasConnection ? 'My Index' : 'Connect'}
             </h1>
-            <div style={{
-              fontFamily: FONT_GEIST,
-              fontSize: 13,
-              fontWeight: 500,
-              color: INK_55,
-              letterSpacing: '-0.005em',
-              lineHeight: 1.3,
-              marginTop: 6,
-            }}>
-              {subheadOwn}
-            </div>
+            {hasConnection && (
+              <div style={{
+                fontFamily: FONT_GEIST,
+                fontSize: 13,
+                fontWeight: 500,
+                color: INK_55,
+                letterSpacing: '-0.005em',
+                lineHeight: 1.3,
+                marginTop: 6,
+              }}>
+                {subheadOwn}
+              </div>
+            )}
           </div>
-          <button
-            onClick={() => openTrophiesSheet()}
-            aria-label="View all trophies"
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: 2,
-              padding: '6px 8px 6px 10px',
-              background: AMBER_SOFT,
-              border: `1px solid ${AMBER_BORDER}`,
-              borderRadius: 12,
-              cursor: 'pointer',
-              flexShrink: 0,
-              fontFamily: FONT_GEIST,
-            }}
-          >
-            <Trophy
-              size={20}
-              color={AMBER}
-              strokeWidth={2.3}
-              fill="rgba(247,147,30,0.10)"
-            />
-            <ChevronRight size={14} color={AMBER_INK} strokeWidth={2.5} />
-          </button>
+          {hasConnection && (
+            <button
+              onClick={() => openTrophiesSheet()}
+              aria-label="View all trophies"
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 2,
+                padding: '6px 8px 6px 10px',
+                background: AMBER_SOFT,
+                border: `1px solid ${AMBER_BORDER}`,
+                borderRadius: 12,
+                cursor: 'pointer',
+                flexShrink: 0,
+                fontFamily: FONT_GEIST,
+              }}
+            >
+              <Trophy
+                size={20}
+                color={AMBER}
+                strokeWidth={2.3}
+                fill="rgba(247,147,30,0.10)"
+              />
+              <ChevronRight size={14} color={AMBER_INK} strokeWidth={2.5} />
+            </button>
+          )}
         </div>
       )}
 
-      {/* Tab strip — canonical 12px / 800-600 weight */}
-      <div style={{
-        display: 'flex',
-        justifyContent: 'center',
-        borderBottom: '0.5px solid rgba(15,23,42,0.08)',
-      }}>
-        {(['today', 'trends', 'records', 'friends'] as const).map(tab => (
-          <button
-            key={tab}
-            onClick={() => onTabChange(tab)}
-            style={{
-              padding: '12px 14px',
-              background: 'transparent',
-              border: 'none',
-              borderBottom: activeTab === tab ? `2px solid ${AMBER}` : '2px solid transparent',
-              marginBottom: -1,
-              fontSize: 12,
-              fontWeight: activeTab === tab ? 800 : 600,
-              color: activeTab === tab ? INK : INK_55,
-              cursor: 'pointer',
-              fontFamily: FONT_GEIST,
-              textTransform: 'capitalize',
-              letterSpacing: '-0.005em',
-            }}
-          >
-            {tab}
-          </button>
-        ))}
-      </div>
+      {/* Tab strip — hidden when own user has no connection */}
+      {(readOnly || hasConnection) && (
+        <div style={{
+          display: 'flex',
+          justifyContent: 'center',
+          borderBottom: '0.5px solid rgba(15,23,42,0.08)',
+        }}>
+          {(['today', 'trends', 'records', 'friends'] as const).map(tab => (
+            <button
+              key={tab}
+              onClick={() => onTabChange(tab)}
+              style={{
+                padding: '12px 14px',
+                background: 'transparent',
+                border: 'none',
+                borderBottom: activeTab === tab ? `2px solid ${AMBER}` : '2px solid transparent',
+                marginBottom: -1,
+                fontSize: 12,
+                fontWeight: activeTab === tab ? 800 : 600,
+                color: activeTab === tab ? INK : INK_55,
+                cursor: 'pointer',
+                fontFamily: FONT_GEIST,
+                textTransform: 'capitalize',
+                letterSpacing: '-0.005em',
+              }}
+            >
+              {tab}
+            </button>
+          ))}
+        </div>
+      )}
     </header>
     </>
   );
