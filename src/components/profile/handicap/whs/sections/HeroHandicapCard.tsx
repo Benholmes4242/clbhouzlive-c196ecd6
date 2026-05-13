@@ -195,23 +195,18 @@ function formStateLabel(
   if (!enoughData) {
     return { title: 'NO FORM YET', sub: 'Not enough rounds' };
   }
-  const sign = formDelta >= 0 ? '+' : '\u2212';
-  const magStr = `${sign}${Math.abs(formDelta).toFixed(1)}`;
-  const ptsStr = periodAvg !== null
-    ? ` · ${periodAvg.toFixed(1)} pts avg`
-    : '';
-  const subStr = `${magStr} vs typical${ptsStr}`;
+  // Sub-line is just the Stableford avg. Title carries the form
+  // judgement; the number carries the data. No "vs typical" framing —
+  // the absolute pts figure is what golfers actually read.
+  const subStr = periodAvg !== null
+    ? `${periodAvg.toFixed(1)} pts avg`
+    : `Last ${roundsCount} rounds`;
 
   if (formDelta > 3.0) return { title: 'RED HOT FORM', sub: subStr };
   if (formDelta > 1.0) return { title: 'WARM FORM', sub: subStr };
   if (formDelta < -3.0) return { title: 'OUT OF FORM', sub: subStr };
   if (formDelta < -1.0) return { title: 'COLD FORM', sub: subStr };
-  return {
-    title: 'STEADY',
-    sub: periodAvg !== null
-      ? `${periodAvg.toFixed(1)} pts avg · last ${roundsCount}`
-      : `Last ${roundsCount} rounds`,
-  };
+  return { title: 'STEADY', sub: subStr };
 }
 
 const HeroHandicapCard: React.FC<Props> = ({ connection }) => {
