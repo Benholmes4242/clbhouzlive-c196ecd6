@@ -31,7 +31,7 @@ const ExplainerBlock: React.FC<BlockProps> = ({ eyebrow, eyebrowColor, title, bo
   <div>
     <div style={{
       fontSize: 9, fontWeight: 800, color: eyebrowColor,
-      letterSpacing: '0.22em', marginBottom: 4,
+      letterSpacing: '0.16em', marginBottom: 4,
     }}>
       {eyebrow}
     </div>
