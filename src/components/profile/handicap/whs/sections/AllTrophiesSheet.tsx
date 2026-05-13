@@ -546,7 +546,7 @@ export const AllTrophiesSheet: React.FC<Props> = ({ open, onClose, achievements 
                         width: 6, height: 6, borderRadius: '50%', background: cat.accent,
                       }} />
                       <span style={{
-                        fontSize: 10.5, fontWeight: 700, color: INK_70,
+                        fontSize: 11, fontWeight: 700, color: INK_70,
                         letterSpacing: '0.14em', textTransform: 'uppercase',
                       }}>
                         {cat.label}
