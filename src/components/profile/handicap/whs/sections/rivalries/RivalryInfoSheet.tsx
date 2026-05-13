@@ -88,7 +88,7 @@ export const RivalryInfoSheet: React.FC<Props> = ({ rivalry, open, onClose }) =>
                 background: 'rgba(15,23,42,0.04)',
                 border: `1px solid ${HAIRLINE}`,
               }}>
-                <p style={{ margin: 0, fontSize: 11, color: INK_MUTE, fontWeight: 700, letterSpacing: '0.04em' }}>
+                <p style={{ margin: 0, fontSize: 11, color: INK_MUTE, fontWeight: 700 }}>
                   About {rivalry.rival_name ? firstName(rivalry.rival_name) : 'this rival'}
                 </p>
                 <ul style={{
