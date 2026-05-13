@@ -369,7 +369,7 @@ const FilterChip: React.FC<{
     </span>
     <span
       style={{
-        fontSize: 10.5,
+        fontSize: 11,
         fontWeight: 700,
         opacity: active ? 0.7 : 0.5,
       }}
@@ -408,7 +408,6 @@ const MonthDivider: React.FC<{ month: string; count: number }> = ({
         fontSize: 10,
         fontWeight: 700,
         color: T.inkFaded,
-        letterSpacing: '0.04em',
       }}
     >
       {count} {count === 1 ? 'round' : 'rounds'}
@@ -618,7 +617,7 @@ const FeedCard: React.FC<FeedCardProps> = ({ round, isBest, onTap }) => {
                     borderRadius: 99,
                     fontSize: 9,
                     fontWeight: 800,
-                    letterSpacing: '0.08em',
+                    letterSpacing: '0.14em',
                   }}
                 >
                   <Trophy size={9} strokeWidth={2.5} />
@@ -633,7 +632,7 @@ const FeedCard: React.FC<FeedCardProps> = ({ round, isBest, onTap }) => {
                     borderRadius: 99,
                     fontSize: 9,
                     fontWeight: 800,
-                    letterSpacing: '0.08em',
+                    letterSpacing: '0.14em',
                   }}
                 >
                   COUNTER

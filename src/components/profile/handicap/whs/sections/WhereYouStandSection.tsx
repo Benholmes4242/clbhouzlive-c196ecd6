@@ -117,7 +117,7 @@ const DistributionChart: React.FC<{
           position: 'absolute',
           top: 0,
           left: 4,
-          fontSize: 8.5,
+          fontSize: 9,
           fontWeight: 800,
           color: '#15803D',
           letterSpacing: '0.16em',
@@ -218,13 +218,16 @@ const AvailableCard: React.FC<{
       {/* Hero: number + tone pill on one row */}
       <div
         style={{
-          padding: '0 20px',
+          padding: '0 16px',
           display: 'flex',
           alignItems: 'baseline',
           flexWrap: 'wrap',
           gap: 12,
         }}
       >
+        {/* Editorial display headline — preserved as a deliberate exception to the
+            canonical 18/800 h1 scale. This is the section's centrepiece moment;
+            shrinking it would flatten the surface. See alignment sweep notes. */}
         <h3
           style={{
             fontFamily: FONT_GEIST,
@@ -244,7 +247,7 @@ const AvailableCard: React.FC<{
             display: 'inline-flex',
             alignItems: 'center',
             gap: 5,
-            padding: '5px 11px',
+            padding: '4px 10px',
             borderRadius: 999,
             background:
               copy.pillTone === 'positive' ? 'rgba(34,197,94,0.12)'
@@ -254,9 +257,10 @@ const AvailableCard: React.FC<{
               copy.pillTone === 'positive' ? '#15803D'
               : copy.pillTone === 'neutral' ? '#854F0B'
               : INK_70,
-            fontSize: 11.5,
+            fontSize: 11,
             fontWeight: 800,
-            letterSpacing: '0.04em',
+            letterSpacing: '0.14em',
+            textTransform: 'uppercase' as const,
             fontFamily: FONT_GEIST,
           }}
         >
@@ -269,7 +273,7 @@ const AvailableCard: React.FC<{
           fontFamily: FONT_GEIST,
           fontSize: 13,
           color: INK_55,
-          padding: '6px 20px 0',
+          padding: '6px 16px 0',
           margin: 0,
           lineHeight: 1.5,
         }}
@@ -279,7 +283,7 @@ const AvailableCard: React.FC<{
 
       <div
         style={{
-          margin: '14px 20px 0',
+          margin: '14px 16px 0',
           background: '#FFFFFF',
           border: `0.5px solid ${INK_10}`,
           borderRadius: 14,
@@ -393,7 +397,7 @@ export const WhereYouStandSection: React.FC<Props> = ({ userId }) => {
         <SectionHeader eyebrow="WHERE YOU STAND" title="Among active golfers" />
         <div
           style={{
-            margin: '0 20px',
+            margin: '0 16px',
             height: 240,
             borderRadius: 14,
             background: INK_06,
