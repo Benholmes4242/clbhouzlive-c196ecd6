@@ -390,7 +390,7 @@ export const RoundDetailSheet: React.FC<Props> = ({ scoreId, open, onClose, hand
                       fontWeight: 800,
                       textDecoration: 'none',
                       border: 'none',
-                      letterSpacing: '0.04em',
+                      letterSpacing: '0.14em',
                       flexShrink: 0,
                       boxShadow:
                         '0 1px 0 rgba(247,147,30,0.40), 0 4px 10px -2px rgba(15,23,42,0.20)',
