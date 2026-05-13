@@ -40,38 +40,13 @@ export const RecentlyActiveItem: React.FC<Props> = ({ entry, isActive, onClick }
       }}
     >
       <div style={{ position: 'relative', width: 60, height: 60 }}>
-        {entry.friend_thumbnail_url ? (
-          <img
-            src={entry.friend_thumbnail_url}
-            alt={display}
-            style={{
-              width: 60,
-              height: 60,
-              borderRadius: '34%',
-              objectFit: 'cover',
-              border: '1px solid rgba(15,23,42,0.08)',
-              background: '#F1F5F9',
-            }}
-          />
-        ) : (
-          <div
-            style={{
-              width: 60,
-              height: 60,
-              borderRadius: '34%',
-              background: '#E2E8F0',
-              color: '#0F172A',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              fontSize: 18,
-              fontWeight: 800,
-              border: '1px solid rgba(15,23,42,0.08)',
-            }}
-          >
-            {initials(entry.friend_name)}
-          </div>
-        )}
+        <SquircleAvatar
+          src={entry.friend_thumbnail_url}
+          alt={entry.friend_name}
+          size={60}
+          userId={entry.friend_id}
+          hideRing
+        />
         {dotColor && (
           <span
             aria-label={
