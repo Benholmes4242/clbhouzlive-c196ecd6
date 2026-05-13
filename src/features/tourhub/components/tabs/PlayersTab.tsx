@@ -1027,7 +1027,6 @@ export function PlayersTab() {
             </button>
           );
         })}
-        </div>
         <div style={{ paddingBottom: 'calc(var(--sab, env(safe-area-inset-bottom, 0px)) + 8px)' }} />
       </BottomSheet>
 
