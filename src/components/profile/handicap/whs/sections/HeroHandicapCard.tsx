@@ -595,17 +595,36 @@ const HeroHandicapCard: React.FC<Props> = ({ connection }) => {
     : null;
   const scoringRoundCount = rangeGrossList.length;
 
-  // Ring fill scale uses last-50 best/worst across all rounds — independent
-  // of the active range so the visual position is stable.
-  const allGrossList = ((recent ?? []) as any[])
+  // Personal ceiling — avg of best 8 gross scores out of last 20.
+  // Mirrors WHS calc grammar (best 8 of 20) on raw gross.
+  const allGrossListSorted = ((recent ?? []) as any[])
     .map((r: any) => (typeof r?.adjusted_gross === 'number' ? r.adjusted_gross : null))
     .filter((v: any): v is number => v != null);
-  const last50Gross = allGrossList.slice(0, 50);
-  const grossBest = last50Gross.length ? Math.min(...last50Gross) : null;
-  const grossWorst = last50Gross.length ? Math.max(...last50Gross) : null;
-  const scoringFraction = (scoringAvgStr !== null && grossBest !== null && grossWorst !== null && grossWorst !== grossBest)
-    ? Math.max(0, Math.min(1, (grossWorst - parseFloat(scoringAvgStr)) / (grossWorst - grossBest)))
-    : 0.5;
+  // `recent` is newest-first, so first N entries are the last N rounds.
+  const last20 = allGrossListSorted.slice(0, 20);
+
+  const personalCeiling = (() => {
+    if (last20.length < 8) return null;
+    const bestCount = last20.length >= 20 ? 8 : Math.floor(last20.length / 2);
+    if (bestCount < 4) return null;
+    const sorted = [...last20].sort((a, b) => a - b);
+    const best = sorted.slice(0, bestCount);
+    return best.reduce((s, v) => s + v, 0) / best.length;
+  })();
+
+  // Fill scale: rangeWorst (= 0%) → personalCeiling (= 100%).
+  const rangeWorst = rangeGrossList.length ? Math.max(...rangeGrossList) : null;
+  const scoringFraction = (() => {
+    if (scoringAvgStr === null) return 0;
+    if (personalCeiling === null) return 0;
+    if (rangeWorst === null) return 0;
+    if (rangeWorst === personalCeiling) return 0.5;
+    const periodAvg = parseFloat(scoringAvgStr);
+    const raw = (rangeWorst - periodAvg) / (rangeWorst - personalCeiling);
+    return Math.max(0, Math.min(1, raw));
+  })();
+
+  const scoringIsEmpty = personalCeiling === null || scoringAvgStr === null;
 
   const scoringSub = range === 30
     ? 'Over 1 month'
