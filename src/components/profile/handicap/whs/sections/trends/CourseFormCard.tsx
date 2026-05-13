@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { MapPin, Info, Trophy } from 'lucide-react';
+import { MapPin, Trophy } from 'lucide-react';
 import { useCourseForm } from '@/lib/whs/hooks';
 import type { CourseForm } from '@/lib/whs/types';
 
@@ -147,27 +147,6 @@ const CardHeader: React.FC<{ sublabel: string }> = ({ sublabel }) => (
         </p>
       </div>
     </div>
-    {/* Detail sheet TBD — placeholder button for visual continuity. */}
-    <button
-      aria-label="Open detail sheet"
-      style={{
-        width: 26,
-        height: 26,
-        borderRadius: 999,
-        border: `1px solid ${T.hairline}`,
-        background: 'transparent',
-        color: T.inkMute,
-        cursor: 'pointer',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        padding: 0,
-        flexShrink: 0,
-        marginLeft: 8,
-      }}
-    >
-      <Info size={13} strokeWidth={2.2} />
-    </button>
   </div>
 );
 
