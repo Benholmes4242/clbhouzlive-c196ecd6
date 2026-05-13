@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { format } from 'date-fns';
 import {
   X, Trophy, Crown, Flag, Link2, Target, MapPin, Globe, Hash,
-  CheckCircle2, Plane, Users, Lock,
+  CheckCircle2, Plane, Users, Lock, Info,
 } from 'lucide-react';
 import type { Achievement } from '@/lib/whs/types';
 
