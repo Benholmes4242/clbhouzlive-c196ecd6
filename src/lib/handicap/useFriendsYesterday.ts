@@ -5,6 +5,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { format, parseISO, subDays, isValid } from 'date-fns';
 import { fetchFriendsActivity } from '@/lib/whs/api';
+import { reformatFriendName } from '@/lib/whs/utils/nameFormat';
 
 export interface FriendYesterday {
   user_id: string | null;
@@ -147,9 +148,9 @@ export function useFriendsYesterday(ownerUserId: string) {
         is_clbhouz_user: !!f.is_clbhouz_user,
         friend_connection_id: f.friend_connection_id ?? null,
         friend_passport_id: f.friend_passport_id ?? null,
-        name: f.friend_name ?? 'Player',
+        name: reformatFriendName(f.friend_name) || 'Player',
         thumbnail_url: f.friend_thumbnail_url ?? null,
-        initial: ((f.friend_name?.charAt(0) ?? '?').toUpperCase()),
+        initial: ((reformatFriendName(f.friend_name).charAt(0) || '?').toUpperCase()),
         score: f.last_round_adjusted_gross ?? 0,
         course_name: f.last_round_course_name ?? '',
         course_thumbnail_image: f.course_thumbnail_image ?? null,
