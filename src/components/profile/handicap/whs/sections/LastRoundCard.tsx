@@ -256,7 +256,7 @@ export const LastRoundCard: React.FC<Props> = ({ connectionId }) => {
                     <div
                       style={{
                         fontSize: 9,
-                      fontWeight: 800,
+                        fontWeight: 800,
                         color: WHITE_45,
                         letterSpacing: '0.16em',
                         textTransform: 'uppercase',
