@@ -237,7 +237,7 @@ export const RoundDetailSheet: React.FC<Props> = ({ scoreId, open, onClose, hand
                         fontSize: 10,
                         fontWeight: 700,
                         color: WHITE_55,
-                        letterSpacing: '0.06em',
+                        letterSpacing: '0.14em',
                         textTransform: 'uppercase',
                         fontVariantNumeric: 'tabular-nums',
                       }}
