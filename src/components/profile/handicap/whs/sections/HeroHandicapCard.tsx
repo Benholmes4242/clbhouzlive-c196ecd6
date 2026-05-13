@@ -1033,6 +1033,10 @@ const HeroHandicapCard: React.FC<Props> = ({ connection }) => {
       </div>
 
       <style>{keyframes}</style>
+      <HandicapRingsInfoSheet
+        open={infoSheetOpen}
+        onClose={() => setInfoSheetOpen(false)}
+      />
     </section>
   );
 };
