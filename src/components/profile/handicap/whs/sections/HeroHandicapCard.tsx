@@ -13,8 +13,28 @@ interface Props {
 type Range = 30 | 90 | 365;
 
 // FORM ring temperature colours — only used by the FORM ring
-const FORM_HOT = '#E11D48';   // crimson, reads as red-hot
-const FORM_COLD = '#38BDF8';  // ice blue
+const FORM_HOT = '#E11D48';   // crimson, reads as red-hot (legacy, unused)
+const FORM_COLD = '#38BDF8';  // ice blue (legacy, unused)
+
+// Ring palette — amber family for cohesion with the chart line.
+const RING_HANDICAP = '#F7931E';   // brand amber — matches the chart
+const RING_SCORING  = '#BA7517';   // deeper gold — distinct from handicap, still in family
+const RING_FORM_BASE = '#FAC775';  // lightest amber — used for neutral/steady form
+
+// Dynamic form ring colours — override the amber base when form has a direction.
+const RING_FORM_HOT  = '#15803D';  // green — recent better than typical
+const RING_FORM_COLD = '#DC2626';  // red — recent worse than typical
+const RING_FORM_EMPTY = 'rgba(15,23,42,0.10)'; // hairline grey — "Not enough rounds"
+
+function pickFormRingColor(
+  direction: 'positive' | 'negative' | 'neutral',
+  enoughData: boolean,
+): string {
+  if (!enoughData) return RING_FORM_EMPTY;
+  if (direction === 'positive') return RING_FORM_HOT;
+  if (direction === 'negative') return RING_FORM_COLD;
+  return RING_FORM_BASE;
+}
 
 // ── Tokens ────────────────────────────────────────────────────────────────
 const AMBER = '#F7931E';
@@ -75,12 +95,27 @@ function calcMilestoneProgress(h: number) {
 }
 
 // ── Form calculation ──────────────────────────────────────────────────────
-function calcForm(hcp: number, last5Diffs: number[]) {
-  if (last5Diffs.length === 0) {
-    return { formStrokes: 0, fillFraction: 0, direction: 'neutral' as const };
+// "Form" measures whether RECENT play (last 5 rounds) is better or worse
+// than TYPICAL recent play (last 20, or all rounds if fewer).
+function calcRecentForm(allDiffsOldestFirst: number[]) {
+  const total = allDiffsOldestFirst.length;
+  if (total < 5) {
+    return {
+      formStrokes: 0,
+      fillFraction: 0,
+      direction: 'neutral' as const,
+      enoughData: false,
+    };
   }
-  const avg = last5Diffs.reduce((s, v) => s + v, 0) / last5Diffs.length;
-  const formStrokes = hcp - avg;
+  const last5 = allDiffsOldestFirst.slice(-5);
+  const typical = total >= 20
+    ? allDiffsOldestFirst.slice(-20)
+    : allDiffsOldestFirst;
+
+  const avgRecent = last5.reduce((s, v) => s + v, 0) / last5.length;
+  const avgTypical = typical.reduce((s, v) => s + v, 0) / typical.length;
+  const formStrokes = avgTypical - avgRecent; // +ve = hot, -ve = cold
+
   const capped = Math.max(-2, Math.min(2, formStrokes));
   const fillFraction = Math.abs(capped) / 2;
   return {
@@ -90,6 +125,7 @@ function calcForm(hcp: number, last5Diffs: number[]) {
       formStrokes > 0.05 ? ('positive' as const)
       : formStrokes < -0.05 ? ('negative' as const)
       : ('neutral' as const),
+    enoughData: true,
   };
 }
 
@@ -114,19 +150,25 @@ function calcMonthlyMovement(delta: number | null) {
  * Maps form strokes to a 5-tier state label. Same ladder across all
  * ranges — the user's "FORM" is always one of these five words.
  */
-function formStateLabel(formStrokes: number): { title: string; sub: string } {
-  // Display sign convention: negative = below handicap (good), positive
-  // = above handicap (bad). Internal formStrokes uses the opposite sign
-  // (positive = hot) for ring-fill math, so negate for display only.
+function formStateLabel(
+  formStrokes: number,
+  enoughData: boolean,
+): { title: string; sub: string } {
+  if (!enoughData) {
+    return { title: 'NO FORM YET', sub: 'Not enough rounds' };
+  }
+  // Display sign convention: negative = below typical (good), positive
+  // = above typical (bad). Internal formStrokes is +ve when hot, so
+  // negate for display only.
   const display = -formStrokes;
   const sign = display >= 0 ? '+' : '\u2212';
-  const subStr = `${sign}${Math.abs(display).toFixed(1)} vs handicap`;
+  const subStr = `${sign}${Math.abs(display).toFixed(1)} vs typical`;
 
   if (formStrokes > 1.0) return { title: 'RED HOT FORM', sub: subStr };
   if (formStrokes > 0.1) return { title: 'WARM FORM', sub: subStr };
   if (formStrokes < -1.0) return { title: 'OUT OF FORM', sub: subStr };
   if (formStrokes < -0.1) return { title: 'COLD FORM', sub: subStr };
-  return { title: 'STEADY', sub: 'On handicap' };
+  return { title: 'STEADY', sub: 'On form' };
 }
 
 const HeroHandicapCard: React.FC<Props> = ({ connection }) => {
@@ -177,6 +219,18 @@ const HeroHandicapCard: React.FC<Props> = ({ connection }) => {
       .map((r: any) => r.handicap_differential)
       .filter((d: any): d is number => typeof d === 'number');
   }, [rangeFilteredScores, recent]);
+
+  // All available differentials, oldest-first, for calcRecentForm.
+  // Independent of the active range — form is "recent" by its own definition.
+  // `recent` (from useAllScores) is newest-first; reverse for chronology.
+  const allDiffsOldestFirst = useMemo(() => {
+    if (!recent) return [] as number[];
+    return ((recent ?? []) as any[])
+      .slice()
+      .reverse()
+      .map((r: any) => r.handicap_differential)
+      .filter((d: any): d is number => typeof d === 'number');
+  }, [recent]);
 
   const coords = useMemo(() => {
     if (points.length === 0) return [] as { x: number; y: number; idx: number }[];
@@ -337,7 +391,7 @@ const HeroHandicapCard: React.FC<Props> = ({ connection }) => {
   // Monthly movement math — inner ring (replaces form)
   const monthly = calcMonthlyMovement(rangeDelta);
   const useMonthlyRing = monthly.delta != null;
-  const fallbackForm = calcForm(current, last5Diffs);
+  const fallbackForm = calcRecentForm(allDiffsOldestFirst);
 
   const innerFillLength = useMonthlyRing
     ? (monthly.fillFraction * C_INNER) / 2
@@ -493,14 +547,14 @@ const HeroHandicapCard: React.FC<Props> = ({ connection }) => {
   // ── FORM (range-aware) ────────────────────────────────────────────────
   // formStrokes from fallbackForm (computed above using rangeDiffs).
   const formStrokesValue = fallbackForm.formStrokes;
-  const formLabel = formStateLabel(formStrokesValue);
+  const formLabel = formStateLabel(formStrokesValue, fallbackForm.enoughData);
   const formCap = range === 365 ? 3 : 2;
   const formClamped = Math.max(-formCap, Math.min(formCap, formStrokesValue));
   const formMagnitude = Math.abs(formClamped) / formCap; // 0–1
   const formIsHot = formClamped > 0.05;
   const formIsCold = formClamped < -0.05;
-  const formArcColor = formIsHot ? FORM_HOT : formIsCold ? FORM_COLD : INK_40;
-  const formHasData = last5Diffs.length > 0;
+  const formArcColor = pickFormRingColor(fallbackForm.direction, fallbackForm.enoughData);
+  const formHasData = fallbackForm.enoughData;
 
   // ── SCORING AVG within active range ───────────────────────────────────
   const rangeGrossList = rangeFilteredScores
@@ -635,7 +689,7 @@ const HeroHandicapCard: React.FC<Props> = ({ connection }) => {
               {showGreenArc && (
                 <circle
                   cx={50} cy={50} r={42} fill="none"
-                  stroke="url(#heroMomentumGreen)" strokeWidth={6}
+                  stroke={RING_HANDICAP} strokeWidth={6}
                   strokeDasharray={`${(innerFillLength / C_INNER) * (2 * Math.PI * 42)} ${2 * Math.PI * 42}`}
                   strokeLinecap="round"
                   transform={`rotate(-90 50 50)`}
@@ -986,7 +1040,7 @@ const FlankRing: React.FC<FlankRingProps> = ({
 
   // Scoring single-direction frac
   const scoringFrac = !isForm ? (fraction ?? 0) : 0;
-  const scoringColor = 'url(#flankScoringGradient)';
+  const scoringColor = RING_SCORING;
 
   // FORM bidirectional dasharray length — half the circumference scaled by magnitude
   const formArcLen = ((formMagnitude ?? 0) * FC) / 2;
@@ -1036,7 +1090,7 @@ const FlankRing: React.FC<FlankRingProps> = ({
           {/* FORM hot arc — right side, clockwise from top */}
           {isForm && formIsHot && formArcLen > 0 && (
             <circle cx={FCX} cy={FCY} r={FR} fill="none"
-              stroke={FORM_HOT} strokeWidth={FSTROKE}
+              stroke={formArcColor ?? RING_FORM_BASE} strokeWidth={FSTROKE}
               strokeLinecap="round"
               strokeDasharray={`${formArcLen} ${FC}`}
               transform={`rotate(-90 ${FCX} ${FCY})`}
@@ -1047,7 +1101,7 @@ const FlankRing: React.FC<FlankRingProps> = ({
           {/* FORM cold arc — left side, mirrored */}
           {isForm && formIsCold && formArcLen > 0 && (
             <circle cx={FCX} cy={FCY} r={FR} fill="none"
-              stroke={FORM_COLD} strokeWidth={FSTROKE}
+              stroke={formArcColor ?? RING_FORM_BASE} strokeWidth={FSTROKE}
               strokeLinecap="round"
               strokeDasharray={`${formArcLen} ${FC}`}
               transform={`rotate(-90 ${FCX} ${FCY}) scale(-1, 1) translate(${-VIEWBOX}, 0)`}
