@@ -212,30 +212,13 @@ const HeroHandicapCard: React.FC<Props> = ({ connection }) => {
     });
   }, [recent, range]);
 
-  // Differentials within active range — drives FORM. Falls back to last-5
-  // if active range has fewer than 3 rounds, so the ring isn't empty.
-  const last5Diffs = useMemo(() => {
-    const inRange = rangeFilteredScores
-      .map((r: any) => r.handicap_differential)
-      .filter((d: any): d is number => typeof d === 'number');
-    if (inRange.length >= 3) return inRange;
-    return ((recent ?? []) as any[])
-      .slice(0, 5)
-      .map((r: any) => r.handicap_differential)
-      .filter((d: any): d is number => typeof d === 'number');
-  }, [rangeFilteredScores, recent]);
-
-  // All available differentials, oldest-first, for calcRecentForm.
-  // Independent of the active range — form is "recent" by its own definition.
-  // `recent` (from useAllScores) is newest-first; reverse for chronology.
-  const allDiffsOldestFirst = useMemo(() => {
-    if (!recent) return [] as number[];
-    return ((recent ?? []) as any[])
-      .slice()
-      .reverse()
-      .map((r: any) => r.handicap_differential)
-      .filter((d: any): d is number => typeof d === 'number');
-  }, [recent]);
+  // Rounds in the active range, shaped for calcPeriodForm.
+  const rangeRoundsForForm = useMemo(() => {
+    return rangeFilteredScores.map((r: any) => ({
+      handicap_differential: r.handicap_differential,
+      handicap_index_at_time: r.handicap_index_at_time,
+    }));
+  }, [rangeFilteredScores]);
 
   const coords = useMemo(() => {
     if (points.length === 0) return [] as { x: number; y: number; idx: number }[];
