@@ -419,46 +419,15 @@ export const AllTrophiesSheet: React.FC<Props> = ({ open, onClose, achievements 
           />
         </div>
 
-        <button
-          onClick={onClose}
-          aria-label="Close"
-          style={{
-            position: 'absolute',
-            top: 14,
-            right: 14,
-            width: 32,
-            height: 32,
-            borderRadius: 16,
-            background: 'rgba(15,23,42,0.06)',
-            border: 'none',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            cursor: 'pointer',
-            zIndex: 1,
-          }}
-        >
-          <X size={16} color={INK} strokeWidth={2.5} />
-        </button>
+        <SheetHeader
+          eyebrow="ACHIEVEMENTS"
+          title="All achievements"
+          onClose={onClose}
+          borderBottom={false}
+        />
 
-        {/* Header */}
-        <div style={{ padding: '20px 20px 24px', borderBottom: `1px solid ${INK_06}` }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
-            <span style={{ width: 6, height: 6, borderRadius: '50%', background: AMBER }} />
-            <span style={{
-              fontSize: 10.5, fontWeight: 700, color: INK_70,
-              letterSpacing: '0.14em', textTransform: 'uppercase',
-            }}>
-              Achievements
-            </span>
-          </div>
-          <h2 style={{
-            margin: '0 0 16px',
-            fontSize: 32, fontWeight: 800, color: INK,
-            letterSpacing: '-0.025em', lineHeight: 1.1,
-          }}>
-            All achievements
-          </h2>
+        {/* Custom hero panel — the 56px count + percent + progress bar */}
+        <div style={{ padding: '0 16px 20px', borderBottom: `1px solid ${INK_06}` }}>
           <div style={{
             display: 'flex', alignItems: 'baseline', gap: 8, marginBottom: 12,
           }}>
