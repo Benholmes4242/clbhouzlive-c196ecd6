@@ -143,19 +143,22 @@ const MorningMomentSection: React.FC<Props> = ({ userId }) => {
   if (isLoading) {
     return (
       <section aria-label="Today" style={{ padding: '10px 16px 8px' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
-          <div style={{ width: 5, height: 5, borderRadius: '50%', background: AMBER }} />
-          <span
-            style={{
-              fontSize: 10,
-              fontWeight: 800,
-              color: INK_55,
-              letterSpacing: '0.22em',
-              fontFamily: FONT_GEIST,
-            }}
-          >
-            TODAY · {todayLabel}
-          </span>
+        <div style={{ marginBottom: 12 }}>
+          <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+            <div style={{ width: 5, height: 5, borderRadius: '50%', background: AMBER }} />
+            <span
+              style={{
+                fontSize: 9,
+                fontWeight: 800,
+                color: '#64748B',
+                letterSpacing: '0.16em',
+                textTransform: 'uppercase',
+                fontFamily: FONT_GEIST,
+              }}
+            >
+              TODAY · {todayLabel}
+            </span>
+          </div>
         </div>
         <SkeletonCard />
       </section>
@@ -169,19 +172,22 @@ const MorningMomentSection: React.FC<Props> = ({ userId }) => {
 
   return (
     <section aria-label="Today" style={{ padding: '10px 16px 8px' }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
-        <div style={{ width: 5, height: 5, borderRadius: '50%', background: AMBER }} />
-        <span
-          style={{
-            fontSize: 10,
-            fontWeight: 800,
-            color: INK_55,
-            letterSpacing: '0.22em',
-            fontFamily: FONT_GEIST,
-          }}
-        >
-          TODAY · {todayLabel}
-        </span>
+      <div style={{ marginBottom: 12 }}>
+        <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+          <div style={{ width: 5, height: 5, borderRadius: '50%', background: AMBER }} />
+          <span
+            style={{
+              fontSize: 9,
+              fontWeight: 800,
+              color: '#64748B',
+              letterSpacing: '0.16em',
+              textTransform: 'uppercase',
+              fontFamily: FONT_GEIST,
+            }}
+          >
+            TODAY · {todayLabel}
+          </span>
+        </div>
       </div>
 
       {hasClubSet && clubData!.club && (

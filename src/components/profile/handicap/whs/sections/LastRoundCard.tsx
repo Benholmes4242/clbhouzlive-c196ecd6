@@ -87,30 +87,13 @@ export const LastRoundCard: React.FC<Props> = ({ connectionId }) => {
   return (
     <>
       <section style={{ marginTop: 28, fontFamily: FONT_GEIST }}>
-        {/* External eyebrow — matches SectionHeader pattern */}
-        <div
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: 8,
-            padding: '0 20px 8px',
-          }}
-        >
-          <span
-            aria-hidden
-            style={{
-              display: 'inline-block',
-              width: 3,
-              height: 8,
-              borderRadius: 1,
-              background: AMBER,
-            }}
-          />
+        {/* External eyebrow — canonical Tour Hub §6 slate-caps */}
+        <div style={{ marginBottom: 6, padding: '0 16px 8px' }}>
           <span
             style={{
               fontSize: 9,
-              fontWeight: 900,
-              color: AMBER,
+              fontWeight: 800,
+              color: '#64748B',
               letterSpacing: '0.16em',
               textTransform: 'uppercase',
             }}
@@ -241,7 +224,7 @@ export const LastRoundCard: React.FC<Props> = ({ connectionId }) => {
                   <div
                     style={{
                       fontSize: 9,
-                      fontWeight: 900,
+                      fontWeight: 800,
                       color: WHITE_45,
                       letterSpacing: '0.16em',
                       textTransform: 'uppercase',
@@ -273,7 +256,7 @@ export const LastRoundCard: React.FC<Props> = ({ connectionId }) => {
                     <div
                       style={{
                         fontSize: 9,
-                        fontWeight: 900,
+                        fontWeight: 800,
                         color: WHITE_45,
                         letterSpacing: '0.16em',
                         textTransform: 'uppercase',

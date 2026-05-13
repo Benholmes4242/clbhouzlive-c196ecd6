@@ -597,14 +597,14 @@ export const RoundsThatCountCard: React.FC<Props> = ({ connectionId, currentHand
                     }}
                   >
                     <div style={{
-                      fontSize: 9.5, fontWeight: 600,
+                      fontSize: 9, fontWeight: 600,
                       color: isLatest ? INK : INK_40,
                       letterSpacing: '0.04em',
                     }}>
                       {WEEKDAY[d.getDay()]}
                     </div>
                     <div style={{
-                      fontSize: 9.5, fontWeight: isLatest ? 700 : 600,
+                      fontSize: 9, fontWeight: isLatest ? 700 : 600,
                       color: isLatest ? INK : INK_40,
                       fontFamily: FONT_GEIST,
                       fontVariantNumeric: 'tabular-nums',
@@ -668,7 +668,7 @@ export const RoundsThatCountCard: React.FC<Props> = ({ connectionId, currentHand
             marginBottom: 10,
           }}>
             <span style={{
-              fontSize: 9, fontWeight: 800, color: INK_55, letterSpacing: '0.22em',
+              fontSize: 9, fontWeight: 800, color: '#64748B', letterSpacing: '0.16em',
             }}>
               NEXT ROUND
             </span>
@@ -857,7 +857,7 @@ const SafeState: React.FC<{ cutTarget: number; settleAt: number }> = ({
         }}>
           <TrendingDown size={11} strokeWidth={2.4} color={GREEN} />
           <span style={{
-            fontSize: 9.5, fontWeight: 800, color: GREEN,
+            fontSize: 9, fontWeight: 800, color: GREEN,
             letterSpacing: '0.12em',
           }}>FOR A CUT</span>
         </div>
@@ -891,7 +891,7 @@ const SafeState: React.FC<{ cutTarget: number; settleAt: number }> = ({
         }}>
           <Minus size={11} strokeWidth={2.4} color={INK_55} />
           <span style={{
-            fontSize: 9.5, fontWeight: 800, color: INK_55,
+            fontSize: 9, fontWeight: 800, color: INK_55,
             letterSpacing: '0.12em',
           }}>OTHERWISE</span>
         </div>
