@@ -117,7 +117,7 @@ const DistributionChart: React.FC<{
           position: 'absolute',
           top: 0,
           left: 4,
-          fontSize: 8.5,
+          fontSize: 9,
           fontWeight: 800,
           color: '#15803D',
           letterSpacing: '0.16em',
