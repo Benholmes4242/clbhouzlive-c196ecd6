@@ -363,9 +363,9 @@ const firstNameOf = (name: string): string =>
 
 const NarrativeSubtitle: React.FC<{ data: FriendYesterday }> = ({ data }) => {
   const bits: string[] = [];
-  bits.push(data.is_counter ? 'Counter' : 'Non counter');
+  bits.push(data.is_counter ? 'Counter' : 'Non counting round');
   if (data.friend_handicap_index !== null) {
-    bits.push(`handicap index ${data.friend_handicap_index.toFixed(1)}`);
+    bits.push(`Handicap index ${data.friend_handicap_index.toFixed(1)}`);
   }
   return (
     <div style={{ fontSize: 12, color: T.ink55, fontWeight: 600 }}>
