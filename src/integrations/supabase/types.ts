@@ -14306,6 +14306,27 @@ export type Database = {
           },
         ]
       }
+      whs_connection_nudges: {
+        Row: {
+          id: string
+          recipient_id: string
+          sender_id: string
+          sent_at: string
+        }
+        Insert: {
+          id?: string
+          recipient_id: string
+          sender_id: string
+          sent_at?: string
+        }
+        Update: {
+          id?: string
+          recipient_id?: string
+          sender_id?: string
+          sent_at?: string
+        }
+        Relationships: []
+      }
       whs_connections: {
         Row: {
           consecutive_failures: number
@@ -18537,6 +18558,10 @@ export type Database = {
         }[]
       }
       gettransactionid: { Args: never; Returns: unknown }
+      has_recently_nudged_whs: {
+        Args: { p_recipient_id: string }
+        Returns: boolean
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -18942,6 +18967,10 @@ export type Database = {
         Returns: undefined
       }
       send_user_ping: { Args: { p_recipient_id: string }; Returns: undefined }
+      send_whs_connection_nudge: {
+        Args: { p_recipient_id: string }
+        Returns: Json
+      }
       set_business_access: {
         Args: {
           p_access: string
