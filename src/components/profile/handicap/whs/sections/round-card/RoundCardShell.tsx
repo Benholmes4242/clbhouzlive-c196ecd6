@@ -59,16 +59,17 @@ export interface RoundCardShellProps extends RoundCardBodyProps {
 }
 
 const _RoundCardBody: React.FC<RoundCardBodyProps> = ({
-  contextLine,
   gross,
   differential,
   stableford,
   handicapDelta,
+  isCounter,
   holes,
   showViewScorecard = true,
   onClick,
 }) => {
-  const showHcp = handicapDelta != null && Math.abs(handicapDelta) >= 0.05;
+  const showHcp =
+    isCounter && handicapDelta != null && Math.abs(handicapDelta) >= 0.05;
   const hcpIsCut = showHcp && handicapDelta! < 0;
   const hcpColor = hcpIsCut ? GREEN_DEEP : RED_INK;
   const hcpBg = hcpIsCut ? GREEN_SOFT : RED_SOFT;
@@ -85,20 +86,6 @@ const _RoundCardBody: React.FC<RoundCardBodyProps> = ({
         background: '#fff',
       }}
     >
-      {/* Context eyebrow */}
-      <div
-        style={{
-          fontSize: 10,
-          fontWeight: 700,
-          color: INK_55,
-          letterSpacing: '0.12em',
-          textTransform: 'uppercase',
-          fontVariantNumeric: 'tabular-nums',
-        }}
-      >
-        {contextLine}
-      </div>
-
       {/* Hero row */}
       <div
         style={{
