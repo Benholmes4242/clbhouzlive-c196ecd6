@@ -668,7 +668,7 @@ export const RoundsThatCountCard: React.FC<Props> = ({ connectionId, currentHand
             marginBottom: 10,
           }}>
             <span style={{
-              fontSize: 9, fontWeight: 800, color: INK_55, letterSpacing: '0.22em',
+              fontSize: 9, fontWeight: 800, color: '#64748B', letterSpacing: '0.16em',
             }}>
               NEXT ROUND
             </span>
