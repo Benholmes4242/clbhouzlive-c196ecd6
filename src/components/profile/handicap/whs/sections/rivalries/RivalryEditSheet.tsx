@@ -224,7 +224,7 @@ export const RivalryEditSheet: React.FC<Props> = ({ userId, rivalry, slotIndex, 
                         display: 'inline-flex', alignItems: 'center', gap: 4,
                         padding: '4px 8px', borderRadius: 999,
                         background: AMBER_TINT, color: AMBER_DEEP,
-                        fontSize: 9, fontWeight: 900, letterSpacing: '0.1em',
+                        fontSize: 9, fontWeight: 800, letterSpacing: '0.14em',
                         border: '1px solid rgba(247,147,30,0.20)',
                       }}>
                         <Check size={10} strokeWidth={2.5} />CURRENT
