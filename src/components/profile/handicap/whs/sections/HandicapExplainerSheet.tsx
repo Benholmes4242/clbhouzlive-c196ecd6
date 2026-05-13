@@ -99,7 +99,7 @@ const HandicapExplainerSheet: React.FC<Props> = ({
           margin: '0 auto', width: '100%', maxWidth: 420,
           background: '#fff',
           borderRadius: '20px 20px 0 0',
-          padding: '20px 20px 32px',
+          padding: '20px 0 32px',
           zIndex: 9999,
           animation: 'slideUp 280ms cubic-bezier(0.22, 0.61, 0.36, 1)',
           boxShadow: '0 -8px 32px rgba(15,23,42,0.18)',
@@ -111,34 +111,18 @@ const HandicapExplainerSheet: React.FC<Props> = ({
       >
         <div style={{
           width: 36, height: 4, background: INK_10, borderRadius: 2,
-          margin: '0 auto 16px',
+          margin: '0 auto 8px',
         }} />
 
-        <button
-          onClick={onClose}
-          aria-label="Close"
-          style={{
-            position: 'absolute', top: 16, right: 16,
-            width: 28, height: 28, borderRadius: '50%',
-            background: INK_06, border: 'none', cursor: 'pointer',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-          }}
-        >
-          <X size={14} color={INK} strokeWidth={2.4} />
-        </button>
+        <SheetHeader
+          eyebrow="HOW IT WORKS"
+          title="How your handicap moves"
+          sub="The system is more forgiving than people think — here's why."
+          onClose={onClose}
+          borderBottom={false}
+        />
 
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 22, paddingTop: 4 }}>
-          <div>
-            <h2 style={{
-              fontSize: 19, fontWeight: 700, color: INK,
-              margin: 0, marginBottom: 4, letterSpacing: '-0.01em',
-            }}>
-              How your handicap moves
-            </h2>
-            <p style={{ fontSize: 13, color: INK_55, margin: 0 }}>
-              The system is more forgiving than people think — here's why.
-            </p>
-          </div>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 22, padding: '8px 16px 0' }}>
 
           <ExplainerBlock
             eyebrow="STEP 1"
