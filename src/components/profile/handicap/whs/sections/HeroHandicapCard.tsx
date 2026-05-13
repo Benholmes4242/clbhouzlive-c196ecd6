@@ -13,8 +13,28 @@ interface Props {
 type Range = 30 | 90 | 365;
 
 // FORM ring temperature colours — only used by the FORM ring
-const FORM_HOT = '#E11D48';   // crimson, reads as red-hot
-const FORM_COLD = '#38BDF8';  // ice blue
+const FORM_HOT = '#E11D48';   // crimson, reads as red-hot (legacy, unused)
+const FORM_COLD = '#38BDF8';  // ice blue (legacy, unused)
+
+// Ring palette — amber family for cohesion with the chart line.
+const RING_HANDICAP = '#F7931E';   // brand amber — matches the chart
+const RING_SCORING  = '#BA7517';   // deeper gold — distinct from handicap, still in family
+const RING_FORM_BASE = '#FAC775';  // lightest amber — used for neutral/steady form
+
+// Dynamic form ring colours — override the amber base when form has a direction.
+const RING_FORM_HOT  = '#15803D';  // green — recent better than typical
+const RING_FORM_COLD = '#DC2626';  // red — recent worse than typical
+const RING_FORM_EMPTY = 'rgba(15,23,42,0.10)'; // hairline grey — "Not enough rounds"
+
+function pickFormRingColor(
+  direction: 'positive' | 'negative' | 'neutral',
+  enoughData: boolean,
+): string {
+  if (!enoughData) return RING_FORM_EMPTY;
+  if (direction === 'positive') return RING_FORM_HOT;
+  if (direction === 'negative') return RING_FORM_COLD;
+  return RING_FORM_BASE;
+}
 
 // ── Tokens ────────────────────────────────────────────────────────────────
 const AMBER = '#F7931E';
