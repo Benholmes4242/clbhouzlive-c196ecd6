@@ -32,6 +32,7 @@ export interface FriendYesterday {
   is_clbhouz_user: boolean;
   friend_connection_id: string | null;
   friend_passport_id: number | null;
+  last_round_score_id: string | null;
 }
 
 export type FriendsYesterdayAbsenceReason =
@@ -164,6 +165,7 @@ export function useFriendsYesterday(ownerUserId: string) {
         bogey: null,
         double_plus: null,
         hole_in_one: false,
+        last_round_score_id: f.last_round_score_id ?? null,
       }));
 
       return {
