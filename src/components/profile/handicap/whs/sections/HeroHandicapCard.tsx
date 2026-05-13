@@ -729,7 +729,7 @@ const HeroHandicapCard: React.FC<Props> = ({ connection }) => {
             }}>HANDICAP</div>
             <div style={{
               fontSize: 'clamp(9px, 2.6vw, 10px)',
-              color: deltaTodayDir === 'down' ? '#15803D' : deltaTodayDir === 'up' ? RED : INK_40,
+              color: deltaTodayDir === 'flat' ? INK_40 : RING_HANDICAP,
               marginTop: 2, fontWeight: deltaTodayDir === 'flat' ? 500 : 700,
               whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
               fontVariantNumeric: 'tabular-nums',
