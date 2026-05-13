@@ -647,27 +647,42 @@ const HeroHandicapCard: React.FC<Props> = ({ connection }) => {
             HANDICAP INDEX
           </span>
         </div>
-        <div style={{ display: 'inline-flex', gap: 2, padding: 2, background: INK_04, borderRadius: 999 }}>
-          {([30, 90, 365] as Range[]).map(r => {
-            const active = r === range;
-            const label = r === 30 ? '1M' : r === 90 ? '3M' : '1Y';
-            return (
-              <button
-                key={String(r)}
-                onClick={() => setRange(r)}
-                style={{
-                  padding: '4px 10px', fontSize: 10, fontWeight: 800,
-                  border: 'none', borderRadius: 999, cursor: 'pointer',
-                  background: active ? INK : 'transparent',
-                  color: active ? '#fff' : INK_55,
-                  letterSpacing: '0.02em',
-                  transition: 'background 150ms ease, color 150ms ease',
-                }}
-              >
-                {label}
-              </button>
-            );
-          })}
+        <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
+          <div style={{ display: 'inline-flex', gap: 2, padding: 2, background: INK_04, borderRadius: 999 }}>
+            {([30, 90, 365] as Range[]).map(r => {
+              const active = r === range;
+              const label = r === 30 ? '1M' : r === 90 ? '3M' : '1Y';
+              return (
+                <button
+                  key={String(r)}
+                  onClick={() => setRange(r)}
+                  style={{
+                    padding: '4px 10px', fontSize: 10, fontWeight: 800,
+                    border: 'none', borderRadius: 999, cursor: 'pointer',
+                    background: active ? INK : 'transparent',
+                    color: active ? '#fff' : INK_55,
+                    letterSpacing: '0.02em',
+                    transition: 'background 150ms ease, color 150ms ease',
+                  }}
+                >
+                  {label}
+                </button>
+              );
+            })}
+          </div>
+          <button
+            onClick={() => setInfoSheetOpen(true)}
+            aria-label="How these rings work"
+            style={{
+              width: 24, height: 24, borderRadius: 999,
+              border: '1px solid rgba(15,23,42,0.12)',
+              background: 'transparent', color: '#64748B',
+              cursor: 'pointer', padding: 0, flexShrink: 0,
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+            }}
+          >
+            <Info size={12} strokeWidth={2.2} />
+          </button>
         </div>
       </div>
 
