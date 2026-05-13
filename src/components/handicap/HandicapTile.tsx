@@ -44,8 +44,10 @@ function HandicapTile({ userId, onClick }: HandicapTileProps) {
     }
     const h = trend.current;
     const displayed = h < 0 ? Math.floor(h) : Math.ceil(h);
+    // Window matches WHS displayed-integer band: Math.floor(h + 0.5).
+    // h in [displayed − 0.6, displayed + 0.4] all round to `displayed`.
     const windowTop = displayed + 0.4;
-    const windowBottom = displayed - 0.5;
+    const windowBottom = displayed - 0.6;
     const progress = (windowTop - h) / (windowTop - windowBottom);
     return { displayed, progress: Math.max(0, Math.min(1, progress)) };
   }, [trend]);
@@ -132,7 +134,7 @@ function HandicapTile({ userId, onClick }: HandicapTileProps) {
       </div>
 
       {/* Middle — number + monthly delta on one line */}
-      <div style={{ display: 'flex', alignItems: 'baseline', gap: 6, marginTop: 4 }}>
+      <div style={{ display: 'flex', alignItems: 'baseline', gap: 6, marginTop: 8 }}>
         <span style={{
           fontSize: 28, fontWeight: 700, color: INK,
           letterSpacing: '-0.04em', lineHeight: 1,
@@ -140,18 +142,22 @@ function HandicapTile({ userId, onClick }: HandicapTileProps) {
         }}>
           {displayValue}
         </span>
-        <span style={{
-          fontSize: 11, fontWeight: 700,
-          color: deltaColor,
-          fontVariantNumeric: 'tabular-nums',
-        }}>
-          {subLine}
-        </span>
+        {/* Only render the delta slot when there's a real trend signal. */}
+        {/* No-data state relies on the chevron to convey "tap me". */}
+        {trend && trend.delta !== null && trend.delta !== undefined && (
+          <span style={{
+            fontSize: 11, fontWeight: 700,
+            color: deltaColor,
+            fontVariantNumeric: 'tabular-nums',
+          }}>
+            {subLine}
+          </span>
+        )}
       </div>
 
       {/* Bottom — milestone progress bar */}
       <div style={{ marginTop: 'auto', width: '100%', paddingTop: 10 }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6 }}>
           <span style={{
             fontSize: 9, fontWeight: 700,
             color: 'rgba(15,23,42,0.40)',
@@ -181,11 +187,18 @@ function HandicapTile({ userId, onClick }: HandicapTileProps) {
             }}
           />
         </div>
+        {/* Caption: percentage is the answer — bolder ink than the rest of the line. */}
         <div style={{
-          marginTop: 4, fontSize: 10,
-          color: 'rgba(15,23,42,0.55)', fontWeight: 500,
+          marginTop: 6, fontSize: 11,
+          color: 'rgba(15,23,42,0.65)', fontWeight: 400,
         }}>
-          {milestoneProgressLabel}
+          {milestoneProgressLabel.replace(/^(\d+%)/, '§§§$1§§§')
+            .split('§§§')
+            .map((part, i) =>
+              /^\d+%$/.test(part)
+                ? <span key={i} style={{ fontWeight: 500, color: 'rgba(15,23,42,0.85)' }}>{part}</span>
+                : part
+            )}
         </div>
       </div>
     </button>
