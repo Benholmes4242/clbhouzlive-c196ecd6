@@ -134,7 +134,7 @@ function HandicapTile({ userId, onClick }: HandicapTileProps) {
       </div>
 
       {/* Middle — number + monthly delta on one line */}
-      <div style={{ display: 'flex', alignItems: 'baseline', gap: 6, marginTop: 4 }}>
+      <div style={{ display: 'flex', alignItems: 'baseline', gap: 6, marginTop: 8 }}>
         <span style={{
           fontSize: 28, fontWeight: 700, color: INK,
           letterSpacing: '-0.04em', lineHeight: 1,
@@ -142,13 +142,17 @@ function HandicapTile({ userId, onClick }: HandicapTileProps) {
         }}>
           {displayValue}
         </span>
-        <span style={{
-          fontSize: 11, fontWeight: 700,
-          color: deltaColor,
-          fontVariantNumeric: 'tabular-nums',
-        }}>
-          {subLine}
-        </span>
+        {/* Only render the delta slot when there's a real trend signal. */}
+        {/* No-data state relies on the chevron to convey "tap me". */}
+        {trend && trend.delta !== null && trend.delta !== undefined && (
+          <span style={{
+            fontSize: 11, fontWeight: 700,
+            color: deltaColor,
+            fontVariantNumeric: 'tabular-nums',
+          }}>
+            {subLine}
+          </span>
+        )}
       </div>
 
       {/* Bottom — milestone progress bar */}
