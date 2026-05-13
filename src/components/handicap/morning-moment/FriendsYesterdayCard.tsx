@@ -542,28 +542,10 @@ const EnrichedBody: React.FC<{ data: FriendYesterday; onTapStats: () => void }> 
     !!data.last_round_score_id,
   );
 
-  const par = React.useMemo<number | null>(() => {
-    if (!roundDetail?.holes || !roundDetail.hole_by_hole_fetched) return null;
-    let total = 0;
-    let any = false;
-    for (const h of roundDetail.holes) {
-      if (h.par != null) { total += h.par; any = true; }
-    }
-    return any ? total : null;
-  }, [roundDetail]);
-
   const handicapDelta =
     data.handicap_index_at_time != null && data.friend_handicap_index != null
       ? data.friend_handicap_index - data.handicap_index_at_time
       : null;
-
-  const contextLine = [
-    'YESTERDAY',
-    par != null ? `PAR ${par}` : null,
-    data.is_counter ? 'COUNTER' : 'NON COUNTER',
-  ]
-    .filter(Boolean)
-    .join(' · ');
 
   const holes: HoleRow[] | null =
     roundDetail?.holes && roundDetail.hole_by_hole_fetched
@@ -579,11 +561,11 @@ const EnrichedBody: React.FC<{ data: FriendYesterday; onTapStats: () => void }> 
 
   return (
     <RoundCardBody
-      contextLine={contextLine}
       gross={data.score}
       differential={data.differential}
       stableford={data.stableford}
       handicapDelta={handicapDelta}
+      isCounter={data.is_counter}
       holes={holes}
       onClick={onTapStats}
     />
