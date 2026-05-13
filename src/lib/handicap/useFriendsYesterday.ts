@@ -5,6 +5,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { format, parseISO, subDays, isValid } from 'date-fns';
 import { fetchFriendsActivity } from '@/lib/whs/api';
+import { reformatFriendName } from '@/lib/whs/utils/nameFormat';
 
 export interface FriendYesterday {
   user_id: string | null;
