@@ -312,8 +312,8 @@ export const RoundDetailSheet: React.FC<Props> = ({ scoreId, open, onClose, hand
                   <span
                     style={{
                       fontSize: 9,
-                      fontWeight: 900,
-                      letterSpacing: '0.20em',
+                      fontWeight: 800,
+                      letterSpacing: '0.16em',
                       color: AMBER_DEEP,
                     }}
                   >
