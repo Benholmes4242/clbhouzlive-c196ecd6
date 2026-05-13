@@ -58,6 +58,20 @@ export const TrophiesSheetMount: React.FC<Props> = ({
     staleTime: 5 * 60_000,
   });
 
+  const top100ProgressMap = useMemo(() => {
+    if (!top100Progress?.lists) return undefined;
+    const map: Record<string, { played: number; total: number }> = {};
+    for (const list of top100Progress.lists) {
+      map[list.listSlug] = { played: list.played, total: list.total };
+    }
+    return map as {
+      global?: { played: number; total: number };
+      usa?: { played: number; total: number };
+      europe?: { played: number; total: number };
+      'gb-i'?: { played: number; total: number };
+    };
+  }, [top100Progress]);
+
   const allAchievements = useMemo<Achievement[]>(() => {
     if (!scores || !history) return [];
     return computeAchievements({
@@ -67,8 +81,9 @@ export const TrophiesSheetMount: React.FC<Props> = ({
       primaryClubId: primaryClub?.primary_club_id ?? null,
       primaryClubName: primaryClub?.primary_club_name ?? null,
       aggregates: aggregates ?? null,
+      top100Progress: top100ProgressMap,
     });
-  }, [scores, history, connectionCreatedAt, primaryClub, aggregates]);
+  }, [scores, history, connectionCreatedAt, primaryClub, aggregates, top100ProgressMap]);
 
   return (
     <AllTrophiesSheet
