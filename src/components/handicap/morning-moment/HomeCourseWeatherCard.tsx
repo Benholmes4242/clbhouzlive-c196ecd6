@@ -55,9 +55,12 @@ const HomeCourseWeatherCard: React.FC<Props> = ({ club, userId }) => {
   if (isError || !weather) return null;
 
   const state = pickConditionState(weather);
-  const warped = warpGradient(state, weather.dayProgress);
-  const background = buildBackgroundCss(warped);
+  const iconStyle = pickConditionIconStyle(state.iconType);
+  const HeroIcon = iconStyle.Icon;
   const locationLabel = buildLocationLabel(club);
+
+  const INK = '#0F172A';
+  const INK_MUTE = 'rgba(15,23,42,0.55)';
 
   return (
     <div
@@ -69,49 +72,34 @@ const HomeCourseWeatherCard: React.FC<Props> = ({ club, userId }) => {
         height: 104,
         borderRadius: 16,
         overflow: 'hidden',
-        background,
+        background: '#F8FAFC',
+        border: '0.5px solid rgba(15,23,42,0.10)',
         marginBottom: 8,
         fontFamily: FONT,
-        color: state.textOnBg,
-        boxShadow: '0 1px 2px rgba(15,23,42,0.06)',
+        color: INK,
+        boxShadow: '0 1px 2px rgba(15,23,42,0.04)',
         display: 'flex',
         flexDirection: 'column',
         justifyContent: 'space-between',
         padding: '11px 14px',
       }}
     >
-      {/* Sun glow — daylight + clear conditions only (scaled to match smaller card) */}
-      {weather.isDay === 1 && state.iconType === 'sun' && (
-        <div
-          aria-hidden
-          style={{
-            position: 'absolute',
-            top: -50,
-            right: -50,
-            width: 180,
-            height: 180,
-            borderRadius: '50%',
-            background:
-              'radial-gradient(circle, rgba(255,236,170,0.55) 0%, rgba(255,236,170,0) 70%)',
-            pointerEvents: 'none',
-          }}
-        />
-      )}
-
-      {/* Soft cloud whisp (scaled to match smaller card) */}
+      {/* Hero icon — right-centre, behind the temperature. Condition-tinted. */}
       <div
         aria-hidden
         style={{
           position: 'absolute',
-          top: 24,
-          left: -40,
-          width: 180,
-          height: 48,
-          borderRadius: '50%',
-          background: 'radial-gradient(ellipse, rgba(255,255,255,0.18) 0%, rgba(255,255,255,0) 70%)',
+          right: 10,
+          top: '50%',
+          transform: 'translateY(-50%)',
+          opacity: 0.32,
+          color: iconStyle.tint,
           pointerEvents: 'none',
+          lineHeight: 0,
         }}
-      />
+      >
+        <HeroIcon size={96} strokeWidth={1.5} />
+      </div>
 
       {/* Top row: course meta (left) + temperature (right) */}
       <div
@@ -131,7 +119,7 @@ const HomeCourseWeatherCard: React.FC<Props> = ({ club, userId }) => {
               fontWeight: 700,
               letterSpacing: '-0.015em',
               lineHeight: 1.2,
-              color: state.textOnBg,
+              color: INK,
               whiteSpace: 'nowrap',
               overflow: 'hidden',
               textOverflow: 'ellipsis',
@@ -144,7 +132,7 @@ const HomeCourseWeatherCard: React.FC<Props> = ({ club, userId }) => {
               style={{
                 fontSize: 11,
                 fontWeight: 500,
-                color: state.textMutedOnBg,
+                color: INK_MUTE,
                 marginTop: 2,
                 whiteSpace: 'nowrap',
                 overflow: 'hidden',
@@ -162,7 +150,7 @@ const HomeCourseWeatherCard: React.FC<Props> = ({ club, userId }) => {
             lineHeight: 0.9,
             fontVariantNumeric: 'tabular-nums',
             fontFeatureSettings: '"kern" 1, "liga" 1',
-            color: state.textOnBg,
+            color: INK,
             flexShrink: 0,
           }}
         >
@@ -198,7 +186,7 @@ const HomeCourseWeatherCard: React.FC<Props> = ({ club, userId }) => {
               fontSize: 13,
               fontWeight: 700,
               letterSpacing: '-0.005em',
-              color: state.textOnBg,
+              color: INK,
               whiteSpace: 'nowrap',
               overflow: 'hidden',
               textOverflow: 'ellipsis',
@@ -206,7 +194,7 @@ const HomeCourseWeatherCard: React.FC<Props> = ({ club, userId }) => {
           >
             {weather.description}
           </span>
-          <span style={{ color: state.textMutedOnBg, fontSize: 11, fontWeight: 600 }}>·</span>
+          <span style={{ color: INK_MUTE, fontSize: 11, fontWeight: 600 }}>·</span>
           <span
             style={{
               display: 'inline-flex',
@@ -214,7 +202,7 @@ const HomeCourseWeatherCard: React.FC<Props> = ({ club, userId }) => {
               gap: 3,
               fontSize: 11,
               fontWeight: 600,
-              color: state.textOnBg,
+              color: INK,
               fontVariantNumeric: 'tabular-nums',
               flexShrink: 0,
             }}
@@ -222,7 +210,7 @@ const HomeCourseWeatherCard: React.FC<Props> = ({ club, userId }) => {
             <Navigation
               size={9}
               strokeWidth={2.4}
-              color={state.textMutedOnBg}
+              color={INK_MUTE}
               style={{ transform: `rotate(${weather.windDirection}deg)` }}
             />
             {Math.round(weather.windSpeed)} mph
@@ -232,7 +220,7 @@ const HomeCourseWeatherCard: React.FC<Props> = ({ club, userId }) => {
           style={{
             fontSize: 11,
             fontWeight: 600,
-            color: state.textMutedOnBg,
+            color: INK_MUTE,
             flexShrink: 0,
           }}
         >
