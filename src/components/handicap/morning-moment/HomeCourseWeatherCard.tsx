@@ -70,8 +70,8 @@ const HomeCourseWeatherCard: React.FC<Props> = ({ club, userId }) => {
       style={{
         position: 'relative',
         width: '100%',
-        height: 130,
-        borderRadius: 18,
+        height: 104,
+        borderRadius: 16,
         overflow: 'hidden',
         background,
         marginBottom: 8,
@@ -81,19 +81,19 @@ const HomeCourseWeatherCard: React.FC<Props> = ({ club, userId }) => {
         display: 'flex',
         flexDirection: 'column',
         justifyContent: 'space-between',
-        padding: '14px 16px',
+        padding: '11px 14px',
       }}
     >
-      {/* Sun glow — daylight + clear conditions only */}
+      {/* Sun glow — daylight + clear conditions only (scaled to match smaller card) */}
       {weather.isDay === 1 && state.iconType === 'sun' && (
         <div
           aria-hidden
           style={{
             position: 'absolute',
-            top: -60,
-            right: -60,
-            width: 220,
-            height: 220,
+            top: -50,
+            right: -50,
+            width: 180,
+            height: 180,
             borderRadius: '50%',
             background:
               'radial-gradient(circle, rgba(255,236,170,0.55) 0%, rgba(255,236,170,0) 70%)',
@@ -102,15 +102,15 @@ const HomeCourseWeatherCard: React.FC<Props> = ({ club, userId }) => {
         />
       )}
 
-      {/* Soft cloud whisp */}
+      {/* Soft cloud whisp (scaled to match smaller card) */}
       <div
         aria-hidden
         style={{
           position: 'absolute',
-          top: 30,
+          top: 24,
           left: -40,
-          width: 220,
-          height: 60,
+          width: 180,
+          height: 48,
           borderRadius: '50%',
           background: 'radial-gradient(ellipse, rgba(255,255,255,0.18) 0%, rgba(255,255,255,0) 70%)',
           pointerEvents: 'none',
@@ -131,7 +131,7 @@ const HomeCourseWeatherCard: React.FC<Props> = ({ club, userId }) => {
         <div style={{ flex: 1, minWidth: 0 }}>
           <div
             style={{
-              fontSize: 17,
+              fontSize: 15,
               fontWeight: 700,
               letterSpacing: '-0.015em',
               lineHeight: 1.2,
@@ -146,7 +146,7 @@ const HomeCourseWeatherCard: React.FC<Props> = ({ club, userId }) => {
           {locationLabel && (
             <div
               style={{
-                fontSize: 12,
+                fontSize: 11,
                 fontWeight: 500,
                 color: state.textMutedOnBg,
                 marginTop: 2,
@@ -170,10 +170,10 @@ const HomeCourseWeatherCard: React.FC<Props> = ({ club, userId }) => {
             flexShrink: 0,
           }}
         >
-          <span style={{ fontSize: 56, fontWeight: 200, letterSpacing: '-0.05em' }}>
+          <span style={{ fontSize: 44, fontWeight: 200, letterSpacing: '-0.05em' }}>
             {Math.round(weather.temperature)}
           </span>
-          <span style={{ fontSize: 22, fontWeight: 300, marginTop: 4 }}>°</span>
+          <span style={{ fontSize: 18, fontWeight: 300, marginTop: 3 }}>°</span>
         </div>
       </div>
 
@@ -199,7 +199,7 @@ const HomeCourseWeatherCard: React.FC<Props> = ({ club, userId }) => {
         >
           <span
             style={{
-              fontSize: 14,
+              fontSize: 13,
               fontWeight: 700,
               letterSpacing: '-0.005em',
               color: state.textOnBg,
@@ -216,7 +216,7 @@ const HomeCourseWeatherCard: React.FC<Props> = ({ club, userId }) => {
               display: 'inline-flex',
               alignItems: 'center',
               gap: 3,
-              fontSize: 12,
+              fontSize: 11,
               fontWeight: 600,
               color: state.textOnBg,
               fontVariantNumeric: 'tabular-nums',
