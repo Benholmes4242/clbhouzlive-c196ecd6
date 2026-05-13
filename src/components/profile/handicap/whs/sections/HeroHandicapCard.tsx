@@ -214,6 +214,18 @@ const HeroHandicapCard: React.FC<Props> = ({ connection }) => {
       .filter((d: any): d is number => typeof d === 'number');
   }, [rangeFilteredScores, recent]);
 
+  // All available differentials, oldest-first, for calcRecentForm.
+  // Independent of the active range — form is "recent" by its own definition.
+  // `recent` (from useAllScores) is newest-first; reverse for chronology.
+  const allDiffsOldestFirst = useMemo(() => {
+    if (!recent) return [] as number[];
+    return ((recent ?? []) as any[])
+      .slice()
+      .reverse()
+      .map((r: any) => r.handicap_differential)
+      .filter((d: any): d is number => typeof d === 'number');
+  }, [recent]);
+
   const coords = useMemo(() => {
     if (points.length === 0) return [] as { x: number; y: number; idx: number }[];
     const values = points.map(p => p.handicap_index);
