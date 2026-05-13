@@ -397,7 +397,7 @@ export const WhereYouStandSection: React.FC<Props> = ({ userId }) => {
         <SectionHeader eyebrow="WHERE YOU STAND" title="Among active golfers" />
         <div
           style={{
-            margin: '0 20px',
+            margin: '0 16px',
             height: 240,
             borderRadius: 14,
             background: INK_06,
