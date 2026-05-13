@@ -108,34 +108,35 @@ const _RoundCardBody: React.FC<RoundCardBodyProps> = ({
           >
             GROSS
           </div>
-          <div
-            style={{
-              fontSize: 56,
-              fontWeight: 200,
-              color: INK,
-              letterSpacing: '-0.05em',
-              lineHeight: 0.85,
-              fontVariantNumeric: 'tabular-nums',
-            }}
-          >
-            {gross ?? '\u2014'}
-          </div>
-          {differential != null && (
-            <div style={{ marginTop: 6 }}>
+          <div style={{ display: 'flex', alignItems: 'baseline', gap: 10, flexWrap: 'wrap' }}>
+            <span
+              style={{
+                fontSize: 56,
+                fontWeight: 200,
+                color: INK,
+                letterSpacing: '-0.05em',
+                lineHeight: 0.85,
+                fontVariantNumeric: 'tabular-nums',
+              }}
+            >
+              {gross ?? '\u2014'}
+            </span>
+            {differential != null && (
               <span
                 style={{
-                  fontSize: 11,
+                  fontSize: 13,
                   fontWeight: 700,
                   color: AMBER_INK,
                   letterSpacing: '0.08em',
                   textTransform: 'uppercase',
                   fontVariantNumeric: 'tabular-nums',
+                  paddingBottom: 6,
                 }}
               >
                 {fmtDiff(differential)} DIFF
               </span>
-            </div>
-          )}
+            )}
+          </div>
         </div>
 
         <div
