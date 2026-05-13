@@ -29,8 +29,6 @@ const fmtDiff = (n: number | null | undefined) => {
 };
 
 export interface RoundCardBodyProps {
-  /** Eyebrow context line above the hero row, e.g. "3 MAY · PAR 71 · SL 135". */
-  contextLine: string;
   /** Gross score — required. */
   gross: number | null;
   /** Differential, e.g. -2.1 → "−2.1 DIFF" below gross. Null hides the strip. */
@@ -39,6 +37,12 @@ export interface RoundCardBodyProps {
   stableford: number | null;
   /** HCP index delta, e.g. -0.1 → green pill ↓0.1. Null/abs<0.05 hides the pill. */
   handicapDelta: number | null;
+  /**
+   * Whether the round was a counter (entered the user's best-8). Non-counters
+   * mathematically cannot move the index, so the HCP pill is suppressed for
+   * them even when handicapDelta is non-null.
+   */
+  isCounter: boolean;
   /** Hole-by-hole data. If absent, the strip block is omitted. */
   holes?: HoleRow[] | null;
   /** Whether to show "View scorecard" chip in the strip block. Default true if holes present. */
