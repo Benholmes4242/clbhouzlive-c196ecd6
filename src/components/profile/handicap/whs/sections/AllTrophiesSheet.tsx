@@ -564,7 +564,7 @@ export const AllTrophiesSheet: React.FC<Props> = ({ open, onClose, achievements 
                   </div>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                     {list.map((a) => (
-                      <TrophyRow key={a.id} a={a} />
+                      <TrophyRow key={a.id} a={a} onInfoClick={setInfoSheetTrophy} />
                     ))}
                   </div>
                 </div>
@@ -573,6 +573,12 @@ export const AllTrophiesSheet: React.FC<Props> = ({ open, onClose, achievements 
           )}
         </div>
       </div>
+
+      <AchievementInfoSheet
+        open={!!infoSheetTrophy}
+        achievement={infoSheetTrophy}
+        onClose={() => setInfoSheetTrophy(null)}
+      />
 
       <style>{`
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
