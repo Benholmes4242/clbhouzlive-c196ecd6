@@ -24,6 +24,7 @@ import { cn } from '@/lib/utils';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
 import { BottomSheet } from '@/components/ui/BottomSheet';
+import SheetHeader from '@/components/ui/SheetHeader';
 import { getTourLogo, hasTourLogo } from '../../utils/tourLogos';
 import { TOUR_MAP, getTourLabel, getTourShort, getTourMeta } from '../../constants/tourMap';
 import { getCurrentWeek, getCurrentMonthKey, isInCurrentWeek } from '../../utils/getCurrentWeek';
