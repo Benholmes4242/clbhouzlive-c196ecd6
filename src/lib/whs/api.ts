@@ -202,23 +202,82 @@ export async function fetchHandicapHistory(
   connectionId: string,
   daysBack: number | 'all',
 ): Promise<HandicapPoint[]> {
-  let query = supabase
+  // Union snapshots with score-derived history.
+  //
+  // whs_handicap_snapshots only records explicit handicap-change events from
+  // our daily sync, so a freshly-connected user has just 1 row — not enough
+  // to draw a chart. whs_scores.handicap_index_at_time captures the user's
+  // handicap at the time each round was played, giving us a dense historical
+  // dataset going back to their first EG round.
+  //
+  // We union both sources and dedupe by date (snapshots take precedence over
+  // score-derived points when both exist for the same day).
+
+  const sinceIso =
+    daysBack === 'all'
+      ? null
+      : new Date(Date.now() - daysBack * 86400_000).toISOString();
+
+  // 1. Snapshots (precise events)
+  let snapshotsQuery = supabase
     .from('whs_handicap_snapshots' as any)
     .select('observed_at, handicap_index')
     .eq('connection_id', connectionId)
     .order('observed_at', { ascending: true });
 
-  if (daysBack !== 'all') {
-    const since = new Date(Date.now() - daysBack * 86400_000).toISOString();
-    query = query.gte('observed_at', since);
+  if (sinceIso) {
+    snapshotsQuery = snapshotsQuery.gte('observed_at', sinceIso);
   }
 
-  const { data, error } = await query;
-  if (error) throw error;
-  return (data ?? []).map((d: any) => ({
-    observed_at: d.observed_at,
-    handicap_index: Number(d.handicap_index),
-  }));
+  // 2. Score-derived points (handicap at time of each round)
+  let scoresQuery = supabase
+    .from('whs_scores' as any)
+    .select('play_date, handicap_index_at_time')
+    .eq('connection_id', connectionId)
+    .not('handicap_index_at_time', 'is', null)
+    .order('play_date', { ascending: true });
+
+  if (sinceIso) {
+    // play_date is a DATE column, so compare to YYYY-MM-DD
+    scoresQuery = scoresQuery.gte('play_date', sinceIso.split('T')[0]);
+  }
+
+  const [snapsRes, scoresRes] = await Promise.all([
+    snapshotsQuery,
+    scoresQuery,
+  ]);
+
+  if (snapsRes.error) throw snapsRes.error;
+  if (scoresRes.error) throw scoresRes.error;
+
+  // Build a date-keyed map. Snapshots win where both exist for the same day.
+  const dayMap = new Map<string, HandicapPoint>();
+
+  // Add score-derived points first (lower priority)
+  for (const row of (scoresRes.data as any[]) ?? []) {
+    if (row.handicap_index_at_time == null || !row.play_date) continue;
+    // Normalise to ISO with midnight UTC so the chart x-axis is consistent
+    const dateKey = String(row.play_date).slice(0, 10);
+    const observedAt = `${dateKey}T00:00:00Z`;
+    dayMap.set(dateKey, {
+      observed_at: observedAt,
+      handicap_index: Number(row.handicap_index_at_time),
+    });
+  }
+
+  // Overlay snapshots (higher priority — overwrite same-day entries)
+  for (const row of (snapsRes.data as any[]) ?? []) {
+    if (!row.observed_at) continue;
+    const dateKey = String(row.observed_at).slice(0, 10);
+    dayMap.set(dateKey, {
+      observed_at: row.observed_at,
+      handicap_index: Number(row.handicap_index),
+    });
+  }
+
+  return Array.from(dayMap.values()).sort((a, b) =>
+    a.observed_at.localeCompare(b.observed_at),
+  );
 }
 
 export async function fetchFriendCourseBests(
