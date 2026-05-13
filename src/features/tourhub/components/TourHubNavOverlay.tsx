@@ -562,7 +562,7 @@ export function TourHubNavOverlay({
                 style={{
                   width: '100%',
                   display: 'flex', alignItems: 'center', gap: 12,
-                  padding: '12px 20px',
+                  padding: '12px 16px',
                   background: isActive ? 'rgba(247,147,30,0.04)' : 'transparent',
                   border: 'none',
                   borderLeft: isActive ? '3px solid #F7931E' : '3px solid transparent',
@@ -602,7 +602,7 @@ export function TourHubNavOverlay({
                 style={{
                   width: '100%',
                   display: 'flex', alignItems: 'center', gap: 12,
-                  padding: '12px 20px',
+                  padding: '12px 16px',
                   background: 'transparent',
                   border: 'none',
                   borderLeft: '3px solid transparent',
