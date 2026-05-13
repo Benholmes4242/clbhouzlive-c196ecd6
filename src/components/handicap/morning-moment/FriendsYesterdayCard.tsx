@@ -479,7 +479,7 @@ const InviteCTA: React.FC<{ data: FriendYesterday }> = ({ data }) => {
       tone={sent ? 'green' : 'amber'}
       icon={sent ? <Check size={16} strokeWidth={2.6} /> : <Send size={15} strokeWidth={2.4} />}
       title={sent ? 'Invite sent' : `Invite ${fname} to clbhouz`}
-      subtitle={sent ? "We'll let you know if they join." : 'See their hole-by-hole stats, Stableford and form.'}
+      subtitle={sent ? "We'll let you know if they join." : 'See their hole-by-hole stats, stableford points and form.'}
       showChevron={!sent}
       onClick={handleInvite}
       disabled={sending || sent}
