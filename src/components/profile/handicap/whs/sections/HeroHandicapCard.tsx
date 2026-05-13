@@ -95,27 +95,32 @@ function calcMilestoneProgress(h: number) {
 }
 
 // ── Form calculation ──────────────────────────────────────────────────────
-// "Form" measures whether RECENT play (last 5 rounds) is better or worse
-// than TYPICAL recent play (last 20, or all rounds if fewer).
-function calcRecentForm(allDiffsOldestFirst: number[]) {
-  const total = allDiffsOldestFirst.length;
-  if (total < 5) {
+// Period form: average (handicap_index_at_time − differential) across every
+// round in the active filter window. Positive = beating handicap-at-time
+// = HOT. Reacts to 1M / 3M / 1Y filter like the other rings.
+type RoundForForm = { handicap_differential: number; handicap_index_at_time: number | null };
+
+function calcPeriodForm(rangeRounds: RoundForForm[]) {
+  const valid = rangeRounds.filter(
+    (r) =>
+      typeof r.handicap_differential === 'number' &&
+      typeof r.handicap_index_at_time === 'number',
+  );
+  const n = valid.length;
+  if (n < 3) {
     return {
       formStrokes: 0,
       fillFraction: 0,
       direction: 'neutral' as const,
       enoughData: false,
+      roundsCount: n,
     };
   }
-  const last5 = allDiffsOldestFirst.slice(-5);
-  const typical = total >= 20
-    ? allDiffsOldestFirst.slice(-20)
-    : allDiffsOldestFirst;
-
-  const avgRecent = last5.reduce((s, v) => s + v, 0) / last5.length;
-  const avgTypical = typical.reduce((s, v) => s + v, 0) / typical.length;
-  const formStrokes = avgTypical - avgRecent; // +ve = hot, -ve = cold
-
+  let sum = 0;
+  for (const r of valid) {
+    sum += (r.handicap_index_at_time as number) - r.handicap_differential;
+  }
+  const formStrokes = sum / n;
   const capped = Math.max(-2, Math.min(2, formStrokes));
   const fillFraction = Math.abs(capped) / 2;
   return {
@@ -126,6 +131,7 @@ function calcRecentForm(allDiffsOldestFirst: number[]) {
       : formStrokes < -0.05 ? ('negative' as const)
       : ('neutral' as const),
     enoughData: true,
+    roundsCount: n,
   };
 }
 
