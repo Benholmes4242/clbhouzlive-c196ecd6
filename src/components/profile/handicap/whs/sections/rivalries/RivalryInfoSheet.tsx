@@ -1,6 +1,6 @@
 import React from 'react';
 import { Drawer as DrawerPrimitive } from 'vaul';
-import { X } from 'lucide-react';
+import SheetHeader from '../_shared/SheetHeader';
 import type { FriendRivalryHydrated } from '@/lib/whs/types';
 import { firstName } from '@/lib/whs/utils/initials';
 import { fmtHcp } from '@/lib/whs/format';
