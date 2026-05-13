@@ -102,26 +102,20 @@ export function LeadersCategorySheet({
         onClose={closeSheet}
         ariaLabelledBy="leaders-category-sheet-title"
       >
+        <SheetHeader
+          eyebrow="LEADERBOARDS"
+          title={<span id="leaders-category-sheet-title">Stat Watch</span>}
+          onClose={closeSheet}
+        />
         <div
-          style={{ maxHeight: 'calc(70vh - 60px)', paddingTop: '8px', overflowY: 'auto' }}
+          style={{ maxHeight: 'calc(70vh - 60px)', overflowY: 'auto' }}
           className="overscroll-contain"
         >
-          {/* Dispatch header */}
-          <div style={{ padding: '0 20px 14px' }}>
-            <div style={{ fontSize: '11px', fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.14em', textTransform: 'uppercase' as const, marginBottom: '4px' }}>
-              LEADERBOARDS
-            </div>
-            <div id="leaders-category-sheet-title" style={{ fontSize: '20px', fontWeight: 900, color: '#0F172A', letterSpacing: '-0.03em' }}>
-              Stat Watch
-            </div>
-          </div>
-
           {groups.map((group) => (
             <div key={group.label}>
-              {/* Group rule marker */}
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '14px 20px 8px' }}>
-                <div style={{ width: 3, height: 12, background: '#0F172A', borderRadius: 1, flexShrink: 0 }} />
-                <span style={{ fontSize: '10px', fontWeight: 900, color: '#0F172A', letterSpacing: '0.14em', textTransform: 'uppercase' as const }}>
+              {/* Group label */}
+              <div style={{ padding: '14px 16px 8px' }}>
+                <span style={{ fontSize: 9, fontWeight: 800, color: '#64748B', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>
                   {group.label}
                 </span>
               </div>
@@ -138,7 +132,7 @@ export function LeadersCategorySheet({
                     aria-pressed={isActive}
                     style={{
                       width: '100%', display: 'flex', alignItems: 'center', gap: '12px',
-                      padding: '11px 20px',
+                      padding: '11px 16px',
                       background: isActive ? 'rgba(247,147,30,0.04)' : 'transparent',
                       border: 'none',
                       borderLeft: isActive ? '3px solid #F7931E' : '3px solid transparent',
