@@ -116,25 +116,27 @@ const CardHeader: React.FC<{ sublabel: string }> = ({ sublabel }) => (
       >
         <MapPin size={15} color={T.amberDeep} strokeWidth={2.2} />
       </div>
-      <div style={{ minWidth: 0 }}>
+      <div style={{ flex: 1, minWidth: 0 }}>
         <p
           style={{
             margin: 0,
-            fontSize: 13,
+            fontSize: 16,
             fontWeight: 700,
             color: T.ink,
-            letterSpacing: '-0.01em',
+            letterSpacing: '-0.015em',
             fontFamily: FONT,
+            whiteSpace: 'nowrap',
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
           }}
         >
           Course Form
         </p>
         <p
           style={{
-            margin: 0,
-            fontSize: 10,
+            margin: '1px 0 0',
+            fontSize: 11,
             color: T.inkMute,
-            marginTop: 1,
             fontFamily: FONT,
             whiteSpace: 'nowrap',
             overflow: 'hidden',
