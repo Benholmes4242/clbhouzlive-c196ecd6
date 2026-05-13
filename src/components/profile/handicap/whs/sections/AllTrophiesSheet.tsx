@@ -160,7 +160,7 @@ const TrophyRow: React.FC<{ a: Achievement }> = ({ a }) => {
               display: 'flex',
               justifyContent: 'space-between',
               marginTop: 5,
-              fontSize: 10.5,
+              fontSize: 11,
               fontVariantNumeric: 'tabular-nums',
               fontWeight: 600,
               letterSpacing: '-0.01em',
