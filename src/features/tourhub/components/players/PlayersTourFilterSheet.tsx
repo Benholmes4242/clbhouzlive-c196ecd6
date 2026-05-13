@@ -88,18 +88,19 @@ export function PlayersTourFilterSheet({
         ariaLabelledBy="players-tour-sheet-title"
       >
         {/* Header */}
-        <div style={{ padding: '6px 20px 14px' }}>
-          <div style={{ fontSize: 8.5, fontWeight: 900, color: '#F7931E', letterSpacing: '0.16em', textTransform: 'uppercase' as const, marginBottom: 4 }}>Filter</div>
-          <div id="players-tour-sheet-title" style={{ fontSize: 20, fontWeight: 900, color: '#0F172A', letterSpacing: '-0.03em' }}>Filter by Tour</div>
-        </div>
+        <SheetHeader
+          eyebrow="FILTER"
+          title={<span id="players-tour-sheet-title">Select tour</span>}
+          onClose={() => setOpen(false)}
+        />
 
         {/* Flat option rows */}
-        <div style={{ borderTop: '0.5px solid rgba(15,23,42,0.07)' }}>
+        <div>
           {TOUR_OPTIONS.filter(tour =>
             (tourCounts[tour.code] ?? 0) > 0
           ).map((tour) => {
             const isActive = activeTour === tour.code;
-            const count = tourCounts[tour.code] || 0;
+            const count = tour.code === 'pga' ? tourCounts.pga : (tourCounts[tour.code] || 0);
 
             return (
               <button
@@ -108,7 +109,7 @@ export function PlayersTourFilterSheet({
                 aria-pressed={isActive}
                 style={{
                   width: '100%', display: 'flex', alignItems: 'center', gap: 12,
-                  padding: '12px 20px',
+                  padding: '12px 16px',
                   background: isActive ? 'rgba(247,147,30,0.04)' : 'transparent',
                   border: 'none',
                   borderLeft: isActive ? '3px solid #F7931E' : '3px solid transparent',
