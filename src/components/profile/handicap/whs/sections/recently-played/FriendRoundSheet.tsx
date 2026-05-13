@@ -122,7 +122,12 @@ export const FriendRoundSheet: React.FC<Props> = ({ activity, open, onClose }) =
                   position: 'relative',
                   width: '100%',
                   aspectRatio: '16 / 8',
+                  minHeight: 'calc(100vw * 0.5)',
+                  maxHeight: 'calc(100vw * 0.5)',
                   flexShrink: 0,
+                  flexGrow: 0,
+                  flexBasis: 'auto',
+                  overflow: 'hidden',
                 }}
               >
                 {activity.course_thumbnail_image ? (
