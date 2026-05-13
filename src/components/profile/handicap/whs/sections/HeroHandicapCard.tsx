@@ -95,27 +95,32 @@ function calcMilestoneProgress(h: number) {
 }
 
 // ── Form calculation ──────────────────────────────────────────────────────
-// "Form" measures whether RECENT play (last 5 rounds) is better or worse
-// than TYPICAL recent play (last 20, or all rounds if fewer).
-function calcRecentForm(allDiffsOldestFirst: number[]) {
-  const total = allDiffsOldestFirst.length;
-  if (total < 5) {
+// Period form: average (handicap_index_at_time − differential) across every
+// round in the active filter window. Positive = beating handicap-at-time
+// = HOT. Reacts to 1M / 3M / 1Y filter like the other rings.
+type RoundForForm = { handicap_differential: number; handicap_index_at_time: number | null };
+
+function calcPeriodForm(rangeRounds: RoundForForm[]) {
+  const valid = rangeRounds.filter(
+    (r) =>
+      typeof r.handicap_differential === 'number' &&
+      typeof r.handicap_index_at_time === 'number',
+  );
+  const n = valid.length;
+  if (n < 3) {
     return {
       formStrokes: 0,
       fillFraction: 0,
       direction: 'neutral' as const,
       enoughData: false,
+      roundsCount: n,
     };
   }
-  const last5 = allDiffsOldestFirst.slice(-5);
-  const typical = total >= 20
-    ? allDiffsOldestFirst.slice(-20)
-    : allDiffsOldestFirst;
-
-  const avgRecent = last5.reduce((s, v) => s + v, 0) / last5.length;
-  const avgTypical = typical.reduce((s, v) => s + v, 0) / typical.length;
-  const formStrokes = avgTypical - avgRecent; // +ve = hot, -ve = cold
-
+  let sum = 0;
+  for (const r of valid) {
+    sum += (r.handicap_index_at_time as number) - r.handicap_differential;
+  }
+  const formStrokes = sum / n;
   const capped = Math.max(-2, Math.min(2, formStrokes));
   const fillFraction = Math.abs(capped) / 2;
   return {
@@ -126,6 +131,7 @@ function calcRecentForm(allDiffsOldestFirst: number[]) {
       : formStrokes < -0.05 ? ('negative' as const)
       : ('neutral' as const),
     enoughData: true,
+    roundsCount: n,
   };
 }
 
@@ -153,22 +159,21 @@ function calcMonthlyMovement(delta: number | null) {
 function formStateLabel(
   formStrokes: number,
   enoughData: boolean,
+  roundsCount: number,
 ): { title: string; sub: string } {
   if (!enoughData) {
     return { title: 'NO FORM YET', sub: 'Not enough rounds' };
   }
-  // Display sign convention: negative = below typical (good), positive
-  // = above typical (bad). Internal formStrokes is +ve when hot, so
-  // negate for display only.
   const display = -formStrokes;
   const sign = display >= 0 ? '+' : '\u2212';
-  const subStr = `${sign}${Math.abs(display).toFixed(1)} vs typical`;
+  const roundsSub = `${roundsCount} round${roundsCount === 1 ? '' : 's'}`;
+  const subStr = `${sign}${Math.abs(display).toFixed(1)} over ${roundsSub}`;
 
-  if (formStrokes > 1.0) return { title: 'RED HOT FORM', sub: subStr };
-  if (formStrokes > 0.1) return { title: 'WARM FORM', sub: subStr };
-  if (formStrokes < -1.0) return { title: 'OUT OF FORM', sub: subStr };
-  if (formStrokes < -0.1) return { title: 'COLD FORM', sub: subStr };
-  return { title: 'STEADY', sub: 'On form' };
+  if (formStrokes > 0.5) return { title: 'RED HOT FORM', sub: subStr };
+  if (formStrokes > 0.05) return { title: 'WARM FORM', sub: subStr };
+  if (formStrokes < -0.5) return { title: 'OUT OF FORM', sub: subStr };
+  if (formStrokes < -0.05) return { title: 'COLD FORM', sub: subStr };
+  return { title: 'STEADY', sub: `On form over ${roundsSub}` };
 }
 
 const HeroHandicapCard: React.FC<Props> = ({ connection }) => {
@@ -207,30 +212,13 @@ const HeroHandicapCard: React.FC<Props> = ({ connection }) => {
     });
   }, [recent, range]);
 
-  // Differentials within active range — drives FORM. Falls back to last-5
-  // if active range has fewer than 3 rounds, so the ring isn't empty.
-  const last5Diffs = useMemo(() => {
-    const inRange = rangeFilteredScores
-      .map((r: any) => r.handicap_differential)
-      .filter((d: any): d is number => typeof d === 'number');
-    if (inRange.length >= 3) return inRange;
-    return ((recent ?? []) as any[])
-      .slice(0, 5)
-      .map((r: any) => r.handicap_differential)
-      .filter((d: any): d is number => typeof d === 'number');
-  }, [rangeFilteredScores, recent]);
-
-  // All available differentials, oldest-first, for calcRecentForm.
-  // Independent of the active range — form is "recent" by its own definition.
-  // `recent` (from useAllScores) is newest-first; reverse for chronology.
-  const allDiffsOldestFirst = useMemo(() => {
-    if (!recent) return [] as number[];
-    return ((recent ?? []) as any[])
-      .slice()
-      .reverse()
-      .map((r: any) => r.handicap_differential)
-      .filter((d: any): d is number => typeof d === 'number');
-  }, [recent]);
+  // Rounds in the active range, shaped for calcPeriodForm.
+  const rangeRoundsForForm = useMemo(() => {
+    return rangeFilteredScores.map((r: any) => ({
+      handicap_differential: r.handicap_differential,
+      handicap_index_at_time: r.handicap_index_at_time,
+    }));
+  }, [rangeFilteredScores]);
 
   const coords = useMemo(() => {
     if (points.length === 0) return [] as { x: number; y: number; idx: number }[];
@@ -391,7 +379,7 @@ const HeroHandicapCard: React.FC<Props> = ({ connection }) => {
   // Monthly movement math — inner ring (replaces form)
   const monthly = calcMonthlyMovement(rangeDelta);
   const useMonthlyRing = monthly.delta != null;
-  const fallbackForm = calcRecentForm(allDiffsOldestFirst);
+  const fallbackForm = calcPeriodForm(rangeRoundsForForm);
 
   const innerFillLength = useMonthlyRing
     ? (monthly.fillFraction * C_INNER) / 2
@@ -436,7 +424,7 @@ const HeroHandicapCard: React.FC<Props> = ({ connection }) => {
     }
 
     // FALLBACK — form-last-5
-    if (last5Diffs.length < 5) {
+    if (!fallbackForm.enoughData) {
       return <span style={{ color: INK_40 }}>Steady form · last 5</span>;
     }
     if (fallbackForm.direction === 'positive') {
@@ -477,6 +465,8 @@ const HeroHandicapCard: React.FC<Props> = ({ connection }) => {
     : INK_55;
 
   // ── Combined delta inline ────────────────────────────────────────────────
+  // Always amber — matches the amber handicap ring above. Arrow direction
+  // (↓ vs ↑) carries the down=good semantic now that colour does not.
   const deltaInline = (() => {
     const d = rangeDelta;
     if (d == null || Math.abs(d) < 0.05) {
@@ -485,7 +475,7 @@ const HeroHandicapCard: React.FC<Props> = ({ connection }) => {
     const isDown = d < 0;
     return (
       <span style={{
-        color: isDown ? GREEN : RED, fontWeight: 600,
+        color: RING_HANDICAP, fontWeight: 600,
         display: 'inline-flex', alignItems: 'center', gap: 3,
       }}>
         {isDown ? <ArrowDown size={10} strokeWidth={2.5} /> : <ArrowUp size={10} strokeWidth={2.5} />}
@@ -547,7 +537,7 @@ const HeroHandicapCard: React.FC<Props> = ({ connection }) => {
   // ── FORM (range-aware) ────────────────────────────────────────────────
   // formStrokes from fallbackForm (computed above using rangeDiffs).
   const formStrokesValue = fallbackForm.formStrokes;
-  const formLabel = formStateLabel(formStrokesValue, fallbackForm.enoughData);
+  const formLabel = formStateLabel(formStrokesValue, fallbackForm.enoughData, fallbackForm.roundsCount);
   const formCap = range === 365 ? 3 : 2;
   const formClamped = Math.max(-formCap, Math.min(formCap, formStrokesValue));
   const formMagnitude = Math.abs(formClamped) / formCap; // 0–1
@@ -739,7 +729,7 @@ const HeroHandicapCard: React.FC<Props> = ({ connection }) => {
             }}>HANDICAP</div>
             <div style={{
               fontSize: 'clamp(9px, 2.6vw, 10px)',
-              color: deltaTodayDir === 'down' ? '#15803D' : deltaTodayDir === 'up' ? RED : INK_40,
+              color: deltaTodayDir === 'flat' ? INK_40 : RING_HANDICAP,
               marginTop: 2, fontWeight: deltaTodayDir === 'flat' ? 500 : 700,
               whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
               fontVariantNumeric: 'tabular-nums',
