@@ -2,15 +2,14 @@ import React from 'react';
 
 interface SectionHeaderProps {
   eyebrow: string;
-  title: string;
+  title: React.ReactNode;
   sub?: string;
   right?: React.ReactNode;
 }
 
 /**
  * Standard section header for the handicap tab.
- * Pattern: 3px amber tab + uppercase eyebrow + Georgia serif title + optional sub.
- * Used across all redesigned sections to establish visual consistency.
+ * Canonical Tour Hub pattern: 9/800/slate-500/0.16em caps eyebrow → 18/800 ink h1 → 13/500 slate-500 subhead.
  */
 export const SectionHeader: React.FC<SectionHeaderProps> = ({
   eyebrow,
@@ -24,26 +23,16 @@ export const SectionHeader: React.FC<SectionHeaderProps> = ({
       alignItems: 'flex-start',
       justifyContent: 'space-between',
       gap: 12,
-      padding: '0 20px 12px',
+      padding: '0 16px 12px',
     }}
   >
     <div style={{ flex: 1, minWidth: 0 }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
-        <span
-          aria-hidden
-          style={{
-            display: 'inline-block',
-            width: 3,
-            height: 8,
-            borderRadius: 1,
-            background: '#F7931E',
-          }}
-        />
+      <div style={{ marginBottom: 6 }}>
         <span
           style={{
             fontSize: 9,
-            fontWeight: 900,
-            color: '#F7931E',
+            fontWeight: 800,
+            color: '#64748B',
             letterSpacing: '0.16em',
             textTransform: 'uppercase',
           }}
@@ -53,11 +42,10 @@ export const SectionHeader: React.FC<SectionHeaderProps> = ({
       </div>
       <h2
         style={{
-          fontSize: 22,
-          fontWeight: 900,
-          fontFamily: 'inherit',
-          letterSpacing: '-0.03em',
-          lineHeight: 1.1,
+          fontSize: 18,
+          fontWeight: 800,
+          letterSpacing: '-0.015em',
+          lineHeight: 1.2,
           color: '#0F172A',
           margin: 0,
         }}
@@ -67,10 +55,11 @@ export const SectionHeader: React.FC<SectionHeaderProps> = ({
       {sub && (
         <p
           style={{
-            fontSize: 12,
-            lineHeight: 1.4,
+            fontSize: 13,
+            fontWeight: 500,
+            lineHeight: 1.3,
             color: '#64748B',
-            margin: '4px 0 0',
+            margin: '6px 0 0',
           }}
         >
           {sub}
