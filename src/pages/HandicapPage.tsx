@@ -248,7 +248,7 @@ const HandicapPageHeader: React.FC<HeaderProps> = ({
               letterSpacing: '-0.015em',
               margin: 0,
             }}>
-              Handicap
+              My Index
             </h1>
             <div style={{
               fontFamily: FONT_GEIST,
