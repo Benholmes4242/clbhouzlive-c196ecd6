@@ -1,5 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { MapPin, Trophy } from 'lucide-react';
+import { CourseImageFallback } from '@/components/whs/CourseImageFallback';
 import { useCourseForm } from '@/lib/whs/hooks';
 import type { CourseForm } from '@/lib/whs/types';
 
