@@ -1,6 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import { Trophy, ChevronDown } from 'lucide-react';
 import { format } from 'date-fns';
+import { CourseImageFallback } from '@/components/whs/CourseImageFallback';
 import { useAllScores } from '@/lib/whs/hooks';
 import { computeRoundDeltas, type RoundWithDelta } from './computeRoundDeltas';
 import RoundDetailSheet from '../round-detail/RoundDetailSheet';
@@ -441,7 +442,7 @@ const DateTile: React.FC<DateTileProps> = ({ dateString, thumbnailUrl }) => {
         overflow: 'hidden',
       }}
     >
-      {thumbnailUrl && (
+      {thumbnailUrl ? (
         <>
           <img
             src={thumbnailUrl}
@@ -469,6 +470,8 @@ const DateTile: React.FC<DateTileProps> = ({ dateString, thumbnailUrl }) => {
             }}
           />
         </>
+      ) : (
+        <CourseImageFallback flagOpacity={0.18} gradientAngle={150} />
       )}
       <span
         style={{
