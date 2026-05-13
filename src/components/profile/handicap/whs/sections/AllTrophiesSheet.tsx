@@ -1,9 +1,10 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { format } from 'date-fns';
 import {
-  X, Trophy, Crown, Flag, Link2, Target, MapPin, Globe, Hash,
+  Trophy, Crown, Flag, Link2, Target, MapPin, Globe, Hash,
   CheckCircle2, Plane, Users, Lock, Info,
 } from 'lucide-react';
+import SheetHeader from './_shared/SheetHeader';
 import type { Achievement } from '@/lib/whs/types';
 
 const AMBER     = '#F7931E';
