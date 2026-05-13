@@ -556,7 +556,7 @@ export const AllTrophiesSheet: React.FC<Props> = ({ open, onClose, achievements 
                       fontSize: 11, fontWeight: 700,
                       color: countColor,
                       fontVariantNumeric: 'tabular-nums',
-                      letterSpacing: '0.04em',
+                      letterSpacing: '0.14em',
                     }}>{countLabel}</span>
                   </div>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
