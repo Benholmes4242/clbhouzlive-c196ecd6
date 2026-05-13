@@ -44,7 +44,7 @@ export const RecentlyActiveItem: React.FC<Props> = ({ entry, isActive, onClick }
           src={entry.friend_thumbnail_url}
           alt={entry.friend_name}
           size={60}
-          userId={entry.friend_id}
+          userId={entry.friend_user_id ?? entry.friend_row_id}
           hideRing
         />
         {dotColor && (
