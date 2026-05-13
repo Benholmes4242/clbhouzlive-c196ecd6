@@ -104,7 +104,7 @@ export const FriendProfileSheet: React.FC<Props> = ({
               fontSize: 10,
               fontWeight: 800,
               color: 'rgba(15,23,42,0.40)',
-              letterSpacing: '0.10em',
+              letterSpacing: '0.04em',
               pointerEvents: 'none',
             }}>
               {currentIndex + 1} / {friends.length}
