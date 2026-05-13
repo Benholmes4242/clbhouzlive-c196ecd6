@@ -8,6 +8,7 @@ import {
 } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { useAllScores, useHandicapHistory, useTrophyAggregates } from '@/lib/whs/hooks';
+import { useTop100ProgressForUser } from '@/hooks/useTop100ProgressForUser';
 import { computeAchievements, pickNextUpTrophies } from '@/lib/whs/achievements';
 import type { Achievement } from '@/lib/whs/types';
 import { supabase } from '@/integrations/supabase/client';
