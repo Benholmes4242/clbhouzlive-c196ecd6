@@ -218,13 +218,16 @@ const AvailableCard: React.FC<{
       {/* Hero: number + tone pill on one row */}
       <div
         style={{
-          padding: '0 20px',
+          padding: '0 16px',
           display: 'flex',
           alignItems: 'baseline',
           flexWrap: 'wrap',
           gap: 12,
         }}
       >
+        {/* Editorial display headline — preserved as a deliberate exception to the
+            canonical 18/800 h1 scale. This is the section's centrepiece moment;
+            shrinking it would flatten the surface. See alignment sweep notes. */}
         <h3
           style={{
             fontFamily: FONT_GEIST,
@@ -244,7 +247,7 @@ const AvailableCard: React.FC<{
             display: 'inline-flex',
             alignItems: 'center',
             gap: 5,
-            padding: '5px 11px',
+            padding: '4px 10px',
             borderRadius: 999,
             background:
               copy.pillTone === 'positive' ? 'rgba(34,197,94,0.12)'
@@ -254,9 +257,10 @@ const AvailableCard: React.FC<{
               copy.pillTone === 'positive' ? '#15803D'
               : copy.pillTone === 'neutral' ? '#854F0B'
               : INK_70,
-            fontSize: 11.5,
+            fontSize: 11,
             fontWeight: 800,
-            letterSpacing: '0.04em',
+            letterSpacing: '0.14em',
+            textTransform: 'uppercase' as const,
             fontFamily: FONT_GEIST,
           }}
         >
