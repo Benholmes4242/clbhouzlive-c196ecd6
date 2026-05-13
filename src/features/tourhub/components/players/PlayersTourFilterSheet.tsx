@@ -100,7 +100,7 @@ export function PlayersTourFilterSheet({
             (tourCounts[tour.code] ?? 0) > 0
           ).map((tour) => {
             const isActive = activeTour === tour.code;
-            const count = tour.code === 'pga' ? tourCounts.pga : (tourCounts[tour.code] || 0);
+            const count = tourCounts[tour.code] || 0;
 
             return (
               <button
