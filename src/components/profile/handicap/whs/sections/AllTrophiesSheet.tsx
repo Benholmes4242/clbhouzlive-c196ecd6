@@ -223,33 +223,34 @@ const TrophyRow: React.FC<{ a: Achievement; onInfoClick?: (a: Achievement) => vo
               marginTop: 3,
               display: 'flex',
               alignItems: 'center',
-              gap: 3,
+              gap: 4,
             }}>
               <span>{a.count_label}</span>
               {a.hole_data_denominator && (
-                <Info
-                  size={10}
-                  color={INK_55}
-                  strokeWidth={2.4}
-                  aria-label="Counted from rounds with hole-by-hole detail"
-                />
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onInfoClick?.(a);
+                  }}
+                  aria-label={`About ${a.title} count`}
+                  style={{
+                    width: 16,
+                    height: 16,
+                    borderRadius: '50%',
+                    border: 'none',
+                    background: 'transparent',
+                    color: INK_55,
+                    cursor: 'pointer',
+                    padding: 0,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}
+                >
+                  <Info size={11} strokeWidth={2.4} />
+                </button>
               )}
-            </div>
-          )}
-          {a.hole_data_denominator && (
-            <div
-              title="Counted from rounds with hole-by-hole detail. EG records full hole data on rounds entered via the MyEG app; older or club-submitted rounds may show totals only."
-              style={{
-                fontSize: 10,
-                fontWeight: 700,
-                color: INK_55,
-                marginTop: 5,
-                fontVariantNumeric: 'tabular-nums',
-                letterSpacing: '0.02em',
-                whiteSpace: 'nowrap',
-              }}
-            >
-              {a.hole_data_denominator.rounds_with_holes} / {a.hole_data_denominator.total_rounds} rounds
             </div>
           )}
         </div>
