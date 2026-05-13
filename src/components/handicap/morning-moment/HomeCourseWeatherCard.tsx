@@ -9,11 +9,7 @@
 import React from 'react';
 import { Navigation } from 'lucide-react';
 import { useHomeCourseWeather, WeatherUnresolvedError } from '@/lib/weather/useHomeCourseWeather';
-import {
-  pickConditionState,
-  warpGradient,
-  buildBackgroundCss,
-} from '@/lib/weather/conditionPalette';
+import { pickConditionState, pickConditionIconStyle } from '@/lib/weather/conditionPalette';
 import type { ClubLocation, WeatherUnresolvedReason } from '@/lib/weather/types';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 
