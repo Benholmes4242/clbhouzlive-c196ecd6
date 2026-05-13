@@ -1090,7 +1090,7 @@ const FlankRing: React.FC<FlankRingProps> = ({
           {/* FORM hot arc — right side, clockwise from top */}
           {isForm && formIsHot && formArcLen > 0 && (
             <circle cx={FCX} cy={FCY} r={FR} fill="none"
-              stroke={FORM_HOT} strokeWidth={FSTROKE}
+              stroke={formArcColor ?? RING_FORM_BASE} strokeWidth={FSTROKE}
               strokeLinecap="round"
               strokeDasharray={`${formArcLen} ${FC}`}
               transform={`rotate(-90 ${FCX} ${FCY})`}
