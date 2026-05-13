@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { Activity, ArrowDown, ArrowUp, Flame, Minus, Snowflake } from 'lucide-react';
+import { Activity, ArrowDown, ArrowUp, Flame, Info, Minus, Snowflake } from 'lucide-react';
 import { useHandicapHistory, useHandicapTrend, useAllScores } from '@/lib/whs/hooks';
+import HandicapRingsInfoSheet from './HandicapRingsInfoSheet';
 import { whsDisplayedHcp, formatDisplayedHcp, fmtDiff } from '@/lib/whs/format';
 import type { WhsConnection, HandicapPoint } from '@/lib/whs/types';
 import { openTrophiesSheet } from '../trophiesSheetEvents';
@@ -211,6 +212,7 @@ function formStateLabel(
 
 const HeroHandicapCard: React.FC<Props> = ({ connection }) => {
   const [range, setRange] = useState<Range>(90);
+  const [infoSheetOpen, setInfoSheetOpen] = useState(false);
   const [scrubIdx, setScrubIdx] = useState<number | null>(null);
   const [drawn, setDrawn] = useState(false);
   const svgRef = useRef<SVGSVGElement | null>(null);
@@ -645,27 +647,42 @@ const HeroHandicapCard: React.FC<Props> = ({ connection }) => {
             HANDICAP INDEX
           </span>
         </div>
-        <div style={{ display: 'inline-flex', gap: 2, padding: 2, background: INK_04, borderRadius: 999 }}>
-          {([30, 90, 365] as Range[]).map(r => {
-            const active = r === range;
-            const label = r === 30 ? '1M' : r === 90 ? '3M' : '1Y';
-            return (
-              <button
-                key={String(r)}
-                onClick={() => setRange(r)}
-                style={{
-                  padding: '4px 10px', fontSize: 10, fontWeight: 800,
-                  border: 'none', borderRadius: 999, cursor: 'pointer',
-                  background: active ? INK : 'transparent',
-                  color: active ? '#fff' : INK_55,
-                  letterSpacing: '0.02em',
-                  transition: 'background 150ms ease, color 150ms ease',
-                }}
-              >
-                {label}
-              </button>
-            );
-          })}
+        <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
+          <div style={{ display: 'inline-flex', gap: 2, padding: 2, background: INK_04, borderRadius: 999 }}>
+            {([30, 90, 365] as Range[]).map(r => {
+              const active = r === range;
+              const label = r === 30 ? '1M' : r === 90 ? '3M' : '1Y';
+              return (
+                <button
+                  key={String(r)}
+                  onClick={() => setRange(r)}
+                  style={{
+                    padding: '4px 10px', fontSize: 10, fontWeight: 800,
+                    border: 'none', borderRadius: 999, cursor: 'pointer',
+                    background: active ? INK : 'transparent',
+                    color: active ? '#fff' : INK_55,
+                    letterSpacing: '0.02em',
+                    transition: 'background 150ms ease, color 150ms ease',
+                  }}
+                >
+                  {label}
+                </button>
+              );
+            })}
+          </div>
+          <button
+            onClick={() => setInfoSheetOpen(true)}
+            aria-label="How these rings work"
+            style={{
+              width: 24, height: 24, borderRadius: 999,
+              border: '1px solid rgba(15,23,42,0.12)',
+              background: 'transparent', color: '#64748B',
+              cursor: 'pointer', padding: 0, flexShrink: 0,
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+            }}
+          >
+            <Info size={12} strokeWidth={2.2} />
+          </button>
         </div>
       </div>
 
@@ -1016,6 +1033,10 @@ const HeroHandicapCard: React.FC<Props> = ({ connection }) => {
       </div>
 
       <style>{keyframes}</style>
+      <HandicapRingsInfoSheet
+        open={infoSheetOpen}
+        onClose={() => setInfoSheetOpen(false)}
+      />
     </section>
   );
 };
