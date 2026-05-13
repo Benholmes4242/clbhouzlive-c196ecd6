@@ -87,7 +87,7 @@ interface Props {
 
 type FilterValue = 'all' | 'earned' | 'in_progress' | 'locked';
 
-const TrophyRow: React.FC<{ a: Achievement }> = ({ a }) => {
+const TrophyRow: React.FC<{ a: Achievement; onInfoClick?: (a: Achievement) => void }> = ({ a, onInfoClick }) => {
   const Icon = ICONS[a.icon_name] ?? Trophy;
   const cat = CATEGORY_STYLE[a.category as CategoryKey] ?? CATEGORY_STYLE.handicap;
   const isCounter = a.kind === 'counter';
