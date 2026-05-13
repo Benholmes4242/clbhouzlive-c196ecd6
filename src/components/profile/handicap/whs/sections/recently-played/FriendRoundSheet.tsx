@@ -8,6 +8,7 @@ import { toast } from 'sonner';
 import RoundStatStrip from '../round-detail/RoundStatStrip';
 import RoundScorecard from '../round-detail/RoundScorecard';
 import RoundBreakdown from '../round-detail/RoundBreakdown';
+import { CourseImageFallback } from '@/components/whs/CourseImageFallback';
 import { useFriendRoundDetail, useSentInvites, whsKeys } from '@/lib/whs/hooks';
 import { callCreateInvite } from '@/lib/whs/api';
 import { shareInvite, firstName } from '@/lib/whs/share';
@@ -122,10 +123,9 @@ export const FriendRoundSheet: React.FC<Props> = ({ activity, open, onClose }) =
                   width: '100%',
                   aspectRatio: '16 / 8',
                   flexShrink: 0,
-                  background: 'linear-gradient(135deg, #1e293b 0%, #0f172a 100%)',
                 }}
               >
-                {activity.course_thumbnail_image && (
+                {activity.course_thumbnail_image ? (
                   <img
                     src={activity.course_thumbnail_image}
                     alt={activity.last_round_course_name ?? ''}
@@ -136,6 +136,8 @@ export const FriendRoundSheet: React.FC<Props> = ({ activity, open, onClose }) =
                       display: 'block',
                     }}
                   />
+                ) : (
+                  <CourseImageFallback flagOpacity={0.18} />
                 )}
                 <div
                   style={{
@@ -363,7 +365,7 @@ export const FriendRoundSheet: React.FC<Props> = ({ activity, open, onClose }) =
                         maxWidth: 280,
                       }}
                     >
-                      Invite {firstName(activity.friend_name)} to Clbhouz to unlock detailed
+                      Invite {firstName(activity.friend_name)} to clbhouz to unlock detailed
                       round data, head-to-head comparisons, and shared achievements.
                     </p>
 
