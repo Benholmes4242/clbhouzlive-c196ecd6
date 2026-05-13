@@ -127,9 +127,10 @@ const FriendTitleRow: React.FC<{
       <div style={{ flex: 1, minWidth: 0 }}>
         <div
           style={{
-            fontSize: 11, fontWeight: 800, color: INK_55,
-            letterSpacing: '0.22em', marginBottom: 2,
+            fontSize: 10.5, fontWeight: 700, color: AMBER,
+            letterSpacing: '0.14em', marginBottom: 2,
             fontFamily: FONT_GEIST,
+            textTransform: 'uppercase',
           }}
         >
           HANDICAP
