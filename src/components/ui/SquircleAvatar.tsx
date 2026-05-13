@@ -162,36 +162,34 @@ export const SquircleAvatar: React.FC<SquircleAvatarProps> = ({
     setImageLoaded(false);
   };
 
-  // Compute deterministic fallback colour and initials.
+  // Compute deterministic fallback colour. Initials kept for aria-label only.
   const fallbackColor = getAvatarFallbackColor(userId ?? alt);
   const fallbackInitials = fallback || getInitialsFromName(alt) || '?';
 
-  // Initials are slightly smaller than silhouette proportions: ~36% of container.
-  const fallbackFontSize = Math.max(10, Math.round(pixelSize * 0.36));
-
-  // Inner avatar content (image or fallback)
-  // Fallback is shown immediately (even while image is loading) so the avatar
-  // is never invisible. The image cross-fades in on top once loaded.
+  // Inner avatar content (image or fallback). Fallback: white bust silhouette
+  // at 56% opacity over deterministic slate tone — same visual family as
+  // CourseImageFallback (flag-on-green) for missing-data states.
   const avatarContent = (
     <>
       {(!imageLoaded || showFallback) && (
         <div
-          className="absolute inset-0 flex items-center justify-center"
+          className="absolute inset-0 flex items-end justify-center overflow-hidden"
           style={{ background: fallbackColor }}
+          aria-label={alt || fallbackInitials}
         >
-          <span
-            style={{
-              color: '#ffffff',
-              fontFamily: 'DM Sans, system-ui, -apple-system, sans-serif',
-              fontWeight: 700,
-              fontSize: `${fallbackFontSize}px`,
-              lineHeight: 1,
-              letterSpacing: '-0.01em',
-              userSelect: 'none',
-            }}
+          <svg
+            viewBox="0 0 64 64"
+            width="100%"
+            height="100%"
+            preserveAspectRatio="xMidYMax meet"
+            style={{ opacity: 0.56, display: 'block' }}
+            aria-hidden="true"
           >
-            {fallbackInitials}
-          </span>
+            {/* Head */}
+            <circle cx="32" cy="25" r="11" fill="#ffffff" />
+            {/* Shoulders / bust — extends past viewBox bottom to bleed */}
+            <path d="M11 64 C 11 48, 21 40, 32 40 C 43 40, 53 48, 53 64 Z" fill="#ffffff" />
+          </svg>
         </div>
       )}
       {imageSrc && !showFallback && (
