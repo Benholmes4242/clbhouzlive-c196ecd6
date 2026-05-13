@@ -28,6 +28,10 @@ export interface FriendYesterday {
   bogey: number | null;
   double_plus: number | null;
   hole_in_one: boolean;
+  // ── State-branching fields for un-enriched hero states ──
+  is_clbhouz_user: boolean;
+  friend_connection_id: string | null;
+  friend_passport_id: number | null;
 }
 
 export type FriendsYesterdayAbsenceReason =
