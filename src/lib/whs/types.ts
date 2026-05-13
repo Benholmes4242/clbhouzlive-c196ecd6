@@ -175,6 +175,19 @@ export interface Achievement {
   list_played?: number;
   /** Total courses on the list (typically 100). */
   list_total?: number;
+
+  // ── Hole-derived counter honesty ────────────────────────────────
+  /**
+   * For counter trophies whose tally requires per-hole stroke data
+   * (birdies, eagles, albatrosses, hole-in-ones). Surfaces the
+   * "n of N rounds have hole-by-hole detail" denominator so users
+   * understand why old club-submitted rounds don't contribute.
+   * Absent on counters derived from totals only (rounds_played, etc).
+   */
+  hole_data_denominator?: {
+    rounds_with_holes: number;
+    total_rounds: number;
+  };
 }
 
 export interface CourseForm {
