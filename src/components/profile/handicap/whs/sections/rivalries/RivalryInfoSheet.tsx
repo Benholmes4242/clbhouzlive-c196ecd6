@@ -115,7 +115,7 @@ export const RivalryInfoSheet: React.FC<Props> = ({ rivalry, open, onClose }) =>
               borderRadius: 12,
               border: `1px solid ${HAIRLINE}`,
             }}>
-              <p style={{ margin: 0, fontSize: 11, color: INK_MUTE, fontWeight: 700, letterSpacing: '0.04em' }}>
+              <p style={{ margin: 0, fontSize: 11, color: INK_MUTE, fontWeight: 700, letterSpacing: '0.14em' }}>
                 HOW RIVAL SLOTS WORK
               </p>
               <ul style={{
