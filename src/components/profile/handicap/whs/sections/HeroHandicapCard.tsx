@@ -1145,7 +1145,7 @@ const MetricRing: React.FC<{ spec: MetricCellSpec }> = ({ spec }) => {
       </div>
       <div style={{
         marginTop: 8,
-        fontSize: 9.5, fontWeight: 700, color: INK_55,
+        fontSize: 9, fontWeight: 700, color: '#64748B',
         letterSpacing: '0.10em', textTransform: 'uppercase',
         textAlign: 'center', whiteSpace: 'nowrap',
       }}>
