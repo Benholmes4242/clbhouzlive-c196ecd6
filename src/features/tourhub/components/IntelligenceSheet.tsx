@@ -335,7 +335,7 @@ function AnalyseRowItem({ row, isLast }: { row: AnalyseRow; isLast: boolean }) {
         <div style={{ fontSize: 12.5, fontWeight: 700, color: SLATE_900, letterSpacing: '-0.1px' }}>
           {row.title}
         </div>
-        <div style={{ marginTop: 2, fontSize: 11.5, lineHeight: 1.45, color: SLATE_600 }}>
+        <div style={{ marginTop: 2, fontSize: 11, lineHeight: 1.45, color: SLATE_600 }}>
           {row.body}
         </div>
       </div>
@@ -358,7 +358,7 @@ function BackedByResultsCard({ wins, topFives }: { wins: number; topFives: numbe
     >
       <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 10 }}>
         <Award size={12} color={AMBER_DEEP} strokeWidth={2.5} />
-        <span style={{ fontSize: 9.5, fontWeight: 700, letterSpacing: '0.14em', color: AMBER_DEEP }}>
+        <span style={{ fontSize: 9, fontWeight: 800, letterSpacing: '0.16em', color: AMBER_DEEP }}>
           BACKED BY RESULTS
         </span>
       </div>
@@ -637,9 +637,9 @@ function TournamentCard({
               display: 'inline-flex',
               alignItems: 'center',
               gap: 4,
-              fontSize: 9.5,
+              fontSize: 9,
               fontWeight: 800,
-              letterSpacing: '0.1em',
+              letterSpacing: '0.16em',
               padding: '4px 9px',
               borderRadius: 6,
               background: chip.bg,
