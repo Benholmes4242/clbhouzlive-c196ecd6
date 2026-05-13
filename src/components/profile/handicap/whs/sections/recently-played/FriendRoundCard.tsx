@@ -140,7 +140,7 @@ const OnAppCard: React.FC<{ activity: WhsFriendActivityWithImage; onClick: () =>
               <span
                 style={{
                   fontSize: 9,
-                  fontWeight: 900,
+                  fontWeight: 800,
                   letterSpacing: '0.14em',
                   color: '#006747',
                 }}
@@ -237,8 +237,8 @@ const OnAppCard: React.FC<{ activity: WhsFriendActivityWithImage; onClick: () =>
               background: T.amberTint,
               color: T.amberDeep,
               fontSize: 9,
-              fontWeight: 900,
-              letterSpacing: '0.10em',
+              fontWeight: 800,
+              letterSpacing: '0.14em',
               border: `1px solid rgba(247,147,30,0.20)`,
               flexShrink: 0,
             }}
@@ -315,7 +315,7 @@ const OnAppCard: React.FC<{ activity: WhsFriendActivityWithImage; onClick: () =>
             <span
               style={{
                 fontSize: 9,
-                fontWeight: 900,
+                fontWeight: 800,
                 color: 'rgba(255,255,255,0.7)',
                 letterSpacing: '0.16em',
               }}
@@ -376,7 +376,7 @@ const OnAppCard: React.FC<{ activity: WhsFriendActivityWithImage; onClick: () =>
           <span
             style={{
               fontSize: 9,
-              fontWeight: 900,
+              fontWeight: 800,
               letterSpacing: '0.14em',
               color: T.inkMute,
               padding: '4px 8px',
@@ -413,7 +413,7 @@ const OnAppCard: React.FC<{ activity: WhsFriendActivityWithImage; onClick: () =>
               style={{
                 color: T.inkSoft,
                 fontSize: 9,
-                fontWeight: 900,
+                fontWeight: 800,
                 letterSpacing: '0.14em',
                 marginRight: 2,
               }}
@@ -636,8 +636,8 @@ const ReportageCard: React.FC<{
           >
             <span
               style={{
-                fontSize: 8,
-                fontWeight: 900,
+                fontSize: 9,
+                fontWeight: 800,
                 color: 'rgba(255,255,255,0.7)',
                 letterSpacing: '0.16em',
               }}
@@ -673,9 +673,9 @@ const ReportageCard: React.FC<{
               borderRadius: 999,
               background: T.amberTint,
               color: T.amberDeep,
-              fontSize: 8,
-              fontWeight: 900,
-              letterSpacing: '0.10em',
+              fontSize: 9,
+              fontWeight: 800,
+              letterSpacing: '0.14em',
               border: `1px solid ${T.amberBorder}`,
             }}
           >
@@ -699,10 +699,10 @@ const ReportageCard: React.FC<{
         <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
           <span
             style={{
-              fontSize: 8.5,
+              fontSize: 9,
               fontWeight: 800,
               color: '#F7931E',
-              letterSpacing: '0.18em',
+              letterSpacing: '0.14em',
               textTransform: 'uppercase',
             }}
           >
@@ -780,7 +780,7 @@ const ReportageCard: React.FC<{
                   style={{
                     color: T.inkSoft,
                     fontSize: 9,
-                    fontWeight: 900,
+                    fontWeight: 800,
                     letterSpacing: '0.14em',
                     marginRight: 1,
                   }}
@@ -827,7 +827,7 @@ const ReportageCard: React.FC<{
                 color: T.amberDeep,
                 background: 'rgba(247,147,30,0.08)',
                 border: `1px solid ${T.amberBorder}`,
-                letterSpacing: '0.08em',
+                letterSpacing: '0.14em',
                 cursor: 'pointer',
                 fontFamily: FONT_GEIST,
                 flexShrink: 0,

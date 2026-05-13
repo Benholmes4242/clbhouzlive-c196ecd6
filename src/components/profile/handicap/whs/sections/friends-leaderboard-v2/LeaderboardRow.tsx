@@ -183,9 +183,9 @@ export const LeaderboardRow: React.FC<Props> = ({
                   color: T.amberInk,
                   padding: '1px 5px',
                   borderRadius: 4,
-                  fontSize: 8.5,
+                  fontSize: 9,
                   fontWeight: 800,
-                  letterSpacing: '0.06em',
+                  letterSpacing: '0.14em',
                 }}
               >
                 STALE
@@ -253,7 +253,7 @@ export const LeaderboardRow: React.FC<Props> = ({
         {gapFromYou != null && (
           <span
             style={{
-              fontSize: 9.5,
+              fontSize: 9,
               fontWeight: 700,
               color: gapFromYou < 0 ? T.greenDeep : T.redDeep,
               fontVariantNumeric: 'tabular-nums',

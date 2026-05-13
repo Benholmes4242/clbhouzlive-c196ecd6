@@ -113,7 +113,7 @@ export const RecentlyActiveItem: React.FC<Props> = ({ entry, isActive, onClick }
           fontSize: 10,
           fontWeight: 700,
           color: '#64748B',
-          letterSpacing: '0.04em',
+          letterSpacing: '-0.005em',
           fontVariantNumeric: 'tabular-nums',
         }}
       >

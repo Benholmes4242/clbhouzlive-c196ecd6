@@ -159,7 +159,7 @@ export const InviteToClbhouzV2: React.FC<Props> = ({ ownerUserId }) => {
                 borderRadius: 10,
                 cursor: 'pointer',
                 fontFamily: FONT,
-                fontSize: 11.5,
+                fontSize: 11,
                 fontWeight: 700,
                 color: T.inkSoft,
                 display: 'flex',
