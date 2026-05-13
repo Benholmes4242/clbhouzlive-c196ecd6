@@ -1,6 +1,7 @@
 import React from 'react';
-import { initials, firstName } from '@/lib/whs/utils/initials';
+import { firstName } from '@/lib/whs/utils/initials';
 import { fmtHcp } from '@/lib/whs/format';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import type { FriendLeaderboardEntry } from '@/lib/whs/types';
 
 interface Props {
