@@ -545,18 +545,13 @@ export function TourHubNavOverlay({
           </div>
         )}
 
-        {/* Header — title only (NAVIGATE eyebrow removed) */}
-        <div style={{ padding: '14px 20px 14px' }}>
-          <div
-            id="tour-nav-menu-title"
-            style={{ fontSize: 22, fontWeight: 900, color: '#0F172A', letterSpacing: -0.5 }}
-          >
-            Tour Hub
-          </div>
-        </div>
+        <SheetHeader
+          title={<span id="tour-nav-menu-title">Tour Hub</span>}
+          onClose={onClose}
+        />
 
         {/* Nav Items + Link Items — Dispatch flat rows */}
-        <div style={{ borderTop: '0.5px solid rgba(15,23,42,0.07)' }}>
+        <div>
           {NAV_ITEMS.map((item) => {
             const isActive = activeTab === item.value;
 
