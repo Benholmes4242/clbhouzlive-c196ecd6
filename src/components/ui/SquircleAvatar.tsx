@@ -159,19 +159,18 @@ export const SquircleAvatar: React.FC<SquircleAvatarProps> = ({
     setImageLoaded(false);
   };
 
-  // Compute deterministic fallback colour. Initials kept for aria-label only.
-  const fallbackColor = getAvatarFallbackColor(userId ?? alt);
+  // Initials kept for aria-label accessibility only.
   const fallbackInitials = fallback || getInitialsFromName(alt) || '?';
 
   // Inner avatar content (image or fallback). Fallback: white bust silhouette
-  // at 56% opacity over deterministic slate tone — same visual family as
-  // CourseImageFallback (flag-on-green) for missing-data states.
+  // at 56% opacity over the same dark-green gradient as CourseImageFallback
+  // — missing-photo and missing-course-image states read as one family.
   const avatarContent = (
     <>
       {(!imageLoaded || showFallback) && (
         <div
           className="absolute inset-0 flex items-end justify-center overflow-hidden"
-          style={{ background: fallbackColor }}
+          style={{ background: 'linear-gradient(135deg, #1a3c2a 0%, #0f172a 100%)' }}
           aria-label={alt || fallbackInitials}
         >
           <svg
