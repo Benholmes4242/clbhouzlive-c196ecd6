@@ -689,7 +689,7 @@ const HeroHandicapCard: React.FC<Props> = ({ connection }) => {
               {showGreenArc && (
                 <circle
                   cx={50} cy={50} r={42} fill="none"
-                  stroke="url(#heroMomentumGreen)" strokeWidth={6}
+                  stroke={RING_HANDICAP} strokeWidth={6}
                   strokeDasharray={`${(innerFillLength / C_INNER) * (2 * Math.PI * 42)} ${2 * Math.PI * 42}`}
                   strokeLinecap="round"
                   transform={`rotate(-90 50 50)`}
