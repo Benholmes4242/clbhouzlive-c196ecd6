@@ -532,7 +532,7 @@ const EnrichedBody: React.FC<{ data: FriendYesterday }> = ({ data }) => (
   <div style={{ padding: '14px 16px', display: 'flex', flexDirection: 'column', gap: 12 }}>
     <div style={{ display: 'flex', alignItems: 'flex-start' }}>
       <StatCell label="GROSS" value={data.score} sub={data.is_counter ? 'Counter' : '\u00A0'} />
-      <StatCell label="stableford score" value={data.stableford ?? '—'} sub={data.stableford !== null ? 'pts' : '\u00A0'} border />
+      <StatCell label="STABLEFORD" value={data.stableford ?? '—'} sub={data.stableford !== null ? 'pts' : '\u00A0'} border />
       <StatCell label="DIFFERENTIAL" value={fmtDiff(data.differential)} sub="vs course" border valueColor={diffColor(data.differential)} />
     </div>
     <div style={{ paddingTop: 10, borderTop: `0.5px solid ${T.ink10}` }}>
