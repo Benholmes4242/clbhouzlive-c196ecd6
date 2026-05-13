@@ -450,7 +450,7 @@ const HandicapPage: React.FC = () => {
     return <Navigate to="/auth" replace />;
   }
 
-  const { data: ownConnection } = useWhsConnection(isFriendView ? null as any : ownerUserId);
+  const { data: ownConnection } = useWhsConnection(isFriendView ? undefined : ownerUserId);
   const hasConnection = isFriendView ? true : !!ownConnection;
 
   return (
