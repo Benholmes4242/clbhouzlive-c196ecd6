@@ -8,6 +8,7 @@ import { toast } from 'sonner';
 import RoundStatStrip from '../round-detail/RoundStatStrip';
 import RoundScorecard from '../round-detail/RoundScorecard';
 import RoundBreakdown from '../round-detail/RoundBreakdown';
+import { CourseImageFallback } from '@/components/whs/CourseImageFallback';
 import { useFriendRoundDetail, useSentInvites, whsKeys } from '@/lib/whs/hooks';
 import { callCreateInvite } from '@/lib/whs/api';
 import { shareInvite, firstName } from '@/lib/whs/share';
