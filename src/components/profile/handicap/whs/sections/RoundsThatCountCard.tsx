@@ -711,8 +711,8 @@ export const RoundsThatCountCard: React.FC<Props> = ({ connectionId, currentHand
         return (
           <div style={{
             display: 'flex', alignItems: 'center', gap: 10,
-            padding: '10px 0 0',
-            marginTop: 12,
+            padding: '6px 0 0',
+            marginTop: 8,
             borderTop: `0.5px solid ${INK_10}`,
           }}>
             <p style={{
