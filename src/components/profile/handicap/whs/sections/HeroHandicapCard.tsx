@@ -652,7 +652,7 @@ const HeroHandicapCard: React.FC<Props> = ({ connection }) => {
       : 'Over 1 year';
 
   return (
-    <section style={{ margin: '0 0 24px', padding: '0 20px', fontFamily: FONT_GEIST }}>
+    <section style={{ padding: '0 20px', fontFamily: FONT_GEIST }}>
       {/* Eyebrow row */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8, padding: '0 4px' }}>
         <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
