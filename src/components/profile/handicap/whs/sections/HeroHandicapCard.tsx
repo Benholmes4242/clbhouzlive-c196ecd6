@@ -654,7 +654,7 @@ const HeroHandicapCard: React.FC<Props> = ({ connection }) => {
   return (
     <section style={{ padding: '0 20px', fontFamily: FONT_GEIST }}>
       {/* Eyebrow row */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8, padding: '0 4px' }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 4, padding: '0 4px' }}>
         <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
           <span
             style={{
@@ -718,8 +718,8 @@ const HeroHandicapCard: React.FC<Props> = ({ connection }) => {
         fontSize: 12,
         fontWeight: 500,
         color: INK_55,
-        marginTop: 4,
-        marginBottom: 12,
+        marginTop: 2,
+        marginBottom: 6,
         lineHeight: 1.4,
         padding: '0 4px',
       }}>
@@ -736,7 +736,7 @@ const HeroHandicapCard: React.FC<Props> = ({ connection }) => {
         gridTemplateColumns: '1fr 1fr 1fr',
         alignItems: 'center',
         gap: 4,
-        padding: '6px 0 4px',
+        padding: '2px 0 2px',
       }}>
         {/* LEFT — HANDICAP (hero ring) */}
         <div style={{
