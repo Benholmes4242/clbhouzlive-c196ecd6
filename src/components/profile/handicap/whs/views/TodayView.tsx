@@ -50,7 +50,15 @@ export const TodayView: React.FC<Props> = ({
         </div>
       )}
 
-      <HeroHandicapCard connection={connection} />
+      {/*!
+        When MorningMoment is rendered above (not readOnly), HeroHandicapCard
+        is the SECOND content block on the tab — it needs the canonical 32px
+        inter-section gap above it. In readOnly mode (friend view) MorningMoment
+        is hidden and HeroHandicapCard is first, so no margin.
+      */}
+      <div style={{ marginTop: !readOnly ? 32 : 0 }}>
+        <HeroHandicapCard connection={connection} />
+      </div>
 
       <LastRoundCard connectionId={connectionId} />
 
