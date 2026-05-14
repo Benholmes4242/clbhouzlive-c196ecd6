@@ -1,45 +1,54 @@
 import React, { useMemo } from 'react';
 import { Drawer as DrawerPrimitive } from 'vaul';
-import { X, ExternalLink } from 'lucide-react';
-import { format } from 'date-fns';
-import { useRoundDetail } from '@/lib/whs/hooks';
-import RoundStatStrip from './RoundStatStrip';
+import { useNavigate } from 'react-router-dom';
+import { useRoundDetail, useFriendRoundDetail, useAllScores } from '@/lib/whs/hooks';
 import RoundScorecard from './RoundScorecard';
 import RoundBreakdown from './RoundBreakdown';
+import {
+  SheetHero,
+  SheetHeroGlass,
+  UserEyebrow,
+  FriendEyebrow,
+  CounterPill,
+  SheetFooterInk,
+  FooterPill,
+  ScorecardEmpty,
+  NonClbhouzFriendBody,
+} from './cinema-sheet';
+import { firstName } from '@/lib/whs/share';
+import { reformatFriendName } from '@/lib/whs/utils/nameFormat';
+import type { WhsFriendActivityWithImage } from '@/lib/whs/types';
 
 interface Props {
-  scoreId: string | null;
+  variant?: 'user' | 'friend';
   open: boolean;
   onClose: () => void;
+  // user variant
+  scoreId?: string | null;
   handicapDelta?: number | null;
+  connectionId?: string | null;
+  // friend variant
+  activity?: WhsFriendActivityWithImage | null;
 }
 
 const PAGE_BG = '#F8FAFC';
-const INK = '#0F172A';
 const INK_MUTE = 'rgba(15,23,42,0.55)';
-const HAIRLINE = 'rgba(15,23,42,0.08)';
-const AMBER = '#F7931E';
-const AMBER_TINT = 'rgba(247,147,30,0.10)';
-const AMBER_DEEP = '#C97211';
-const AMBER_INK = '#9A6116';
-const WHITE_55 = 'rgba(255,255,255,0.70)';
 const FONT_GEIST = 'Geist, system-ui, -apple-system, BlinkMacSystemFont, sans-serif';
+const AMBER = '#F7931E';
 
 const SheetSkeleton: React.FC = () => (
   <div className="animate-pulse">
-    <div style={{ width: '100%', height: 132, background: 'rgba(15,23,42,0.06)' }} />
-    <div style={{ padding: 20 }}>
-      <div style={{ height: 60, background: 'rgba(15,23,42,0.06)', borderRadius: 8, marginBottom: 16 }} />
-      <div style={{ height: 200, background: 'rgba(15,23,42,0.04)', borderRadius: 8 }} />
+    <div style={{ width: '100%', height: 300, background: 'rgba(15,23,42,0.06)' }} />
+    <div style={{ padding: 18 }}>
+      <div style={{ height: 180, background: 'rgba(15,23,42,0.04)', borderRadius: 8, marginBottom: 12 }} />
+      <div style={{ height: 60, background: 'rgba(15,23,42,0.04)', borderRadius: 8 }} />
     </div>
   </div>
 );
 
 const SheetEmpty: React.FC<{ onClose: () => void }> = ({ onClose }) => (
-  <div style={{ padding: '60px 20px', textAlign: 'center' }}>
-    <p style={{ margin: '0 0 8px', fontSize: 14, color: INK_MUTE }}>
-      No round to show yet.
-    </p>
+  <div style={{ padding: '60px 20px', textAlign: 'center', fontFamily: FONT_GEIST }}>
+    <p style={{ margin: '0 0 8px', fontSize: 14, color: INK_MUTE }}>No round to show yet.</p>
     <button
       onClick={onClose}
       style={{
@@ -59,23 +68,252 @@ const SheetEmpty: React.FC<{ onClose: () => void }> = ({ onClose }) => (
   </div>
 );
 
-export const RoundDetailSheet: React.FC<Props> = ({ scoreId, open, onClose, handicapDelta }) => {
-  const { data, isLoading } = useRoundDetail(scoreId, open);
+export const RoundDetailSheet: React.FC<Props> = ({
+  variant = 'user',
+  open,
+  onClose,
+  scoreId,
+  handicapDelta,
+  connectionId,
+  activity,
+}) => {
+  const navigate = useNavigate();
+  const isFriend = variant === 'friend';
 
-  const parTotal = useMemo(() => {
-    if (!data?.holes || data.holes.length === 0) return null;
-    return data.holes.reduce((s, h) => s + (h.par ?? 0), 0);
-  }, [data?.holes]);
+  // ── User variant ──
+  const userQuery = useRoundDetail(isFriend ? null : scoreId, !isFriend && open);
+  const { data: allScores } = useAllScores(
+    !isFriend && open ? connectionId ?? undefined : undefined,
+  );
 
-  const subLine = useMemo(() => {
-    if (!data) return '';
-    return [
-      parTotal != null ? `PAR ${parTotal}` : null,
-      data.slope_rating != null ? `SL ${data.slope_rating}` : null,
-    ]
-      .filter(Boolean)
-      .join(' · ');
-  }, [data, parTotal]);
+  // ── Friend variant ──
+  const friendIsClbhouz = !!activity?.is_clbhouz_user;
+  const friendScoreId = isFriend && friendIsClbhouz ? activity?.last_round_score_id ?? null : null;
+  const friendQuery = useFriendRoundDetail(friendScoreId, isFriend && !!friendScoreId && open);
+
+  const userData = !isFriend ? userQuery.data : null;
+  const userLoading = !isFriend && userQuery.isLoading;
+  const friendDetail = isFriend ? friendQuery.data : null;
+  const friendLoading = isFriend && friendIsClbhouz && friendQuery.isLoading;
+
+  const parTotal = useMemo<number | null>(() => {
+    const holes = isFriend ? friendDetail?.holes : userData?.holes;
+    if (!holes || holes.length === 0) return null;
+    let total = 0;
+    let any = false;
+    for (const h of holes) {
+      if (h.par != null) {
+        total += h.par;
+        any = true;
+      }
+    }
+    return any ? total : null;
+  }, [isFriend, friendDetail, userData]);
+
+  const counterRank = useMemo<number | null>(() => {
+    if (isFriend || !userData?.is_counter || !allScores) return null;
+    const last20 = allScores.slice(0, 20);
+    const sorted = [...last20]
+      .filter((s) => s.handicap_differential != null)
+      .sort((a, b) => a.handicap_differential! - b.handicap_differential!);
+    const idx = sorted.findIndex((s) => s.id === userData.id);
+    if (idx === -1) return null;
+    return Math.min(idx + 1, 20);
+  }, [isFriend, userData, allScores]);
+
+  const renderUserBody = () => {
+    if (userLoading) return <SheetSkeleton />;
+    if (!userData) return <SheetEmpty onClose={onClose} />;
+
+    const holes = userData.holes;
+    const hasHoles = !!holes && holes.length > 0;
+    const previousIndex =
+      handicapDelta != null && userData.handicap_index_at_time != null
+        ? userData.handicap_index_at_time - handicapDelta
+        : null;
+
+    return (
+      <>
+        <SheetHero
+          imageUrl={userData.course_header_image}
+          onClose={onClose}
+          topEyebrow={<UserEyebrow playDate={userData.play_date} />}
+          topRightPill={
+            <CounterPill isCounter={!!userData.is_counter} rank={counterRank} />
+          }
+          glass={
+            <SheetHeroGlass
+              courseName={userData.course?.name ?? 'Unknown course'}
+              par={parTotal}
+              slope={userData.slope_rating}
+              gross={userData.adjusted_gross}
+              stableford={userData.stableford_points}
+              differential={userData.handicap_differential}
+              holes={hasHoles ? holes : null}
+            />
+          }
+        />
+
+        {hasHoles ? (
+          <>
+            <RoundScorecard holes={holes!} isNineHole={userData.is_nine_hole} />
+            <RoundBreakdown holes={holes!} />
+          </>
+        ) : (
+          <ScorecardEmpty
+            message={
+              userData.hole_by_hole_fetched
+                ? 'No hole-by-hole data for this round.'
+                : 'Hole data is still syncing'
+            }
+            subMessage={
+              userData.hole_by_hole_fetched ? undefined : 'Check back in a few hours.'
+            }
+          />
+        )}
+
+        <SheetFooterInk
+          label="INDEX IMPACT"
+          currentIndex={userData.handicap_index_at_time ?? null}
+          previousIndex={previousIndex}
+          delta={handicapDelta ?? null}
+          action={
+            userData.permalink_url ? (
+              <FooterPill
+                href={userData.permalink_url}
+                label="Open in MyEG"
+                external
+              />
+            ) : null
+          }
+        />
+      </>
+    );
+  };
+
+  const renderFriendBody = () => {
+    if (!activity) return <SheetSkeleton />;
+    const fname = firstName(reformatFriendName(activity.friend_name));
+
+    // Hero data composed from activity
+    const courseName = activity.last_round_course_name ?? 'Round played';
+    const heroImage = activity.course_thumbnail_image;
+
+    if (!friendIsClbhouz) {
+      // Non-Clbhouz: hero with invite-state glass + invite block; no scorecard / no footer
+      return (
+        <>
+          <SheetHero
+            imageUrl={heroImage}
+            onClose={onClose}
+            topEyebrow={<FriendEyebrow activity={activity} />}
+            glass={
+              <SheetHeroGlass
+                courseName={courseName}
+                par={null}
+                slope={null}
+                gross={activity.last_round_adjusted_gross}
+                stableford={activity.last_round_stableford}
+                differential={activity.last_round_differential}
+                holes={null}
+                metaOverride={
+                  <div
+                    style={{
+                      marginTop: 3,
+                      fontSize: 11,
+                      fontWeight: 600,
+                      color: AMBER,
+                      letterSpacing: '0.10em',
+                      textTransform: 'uppercase',
+                    }}
+                  >
+                    {activity.friend_handicap_index != null
+                      ? `England Golf · Handicap ${activity.friend_handicap_index.toFixed(1)}`
+                      : 'England Golf'}
+                  </div>
+                }
+              />
+            }
+          />
+          <NonClbhouzFriendBody activity={activity} />
+        </>
+      );
+    }
+
+    // Clbhouz friend (synced)
+    const holes = friendDetail?.holes ?? null;
+    const hasHoles = !!holes && holes.length > 0;
+    const friendDelta =
+      activity.handicap_index_at_time != null && activity.friend_handicap_index != null
+        ? activity.friend_handicap_index - activity.handicap_index_at_time
+        : null;
+
+    return (
+      <>
+        <SheetHero
+          imageUrl={heroImage}
+          onClose={onClose}
+          topEyebrow={<FriendEyebrow activity={activity} />}
+          glass={
+            <SheetHeroGlass
+              courseName={courseName}
+              par={parTotal}
+              slope={friendDetail?.slope_rating ?? null}
+              gross={activity.last_round_adjusted_gross}
+              stableford={activity.last_round_stableford}
+              differential={activity.last_round_differential}
+              holes={hasHoles ? holes : null}
+            />
+          }
+        />
+
+        {friendLoading && !friendDetail ? (
+          <ScorecardEmpty message="Loading hole data\u2026" />
+        ) : hasHoles ? (
+          <>
+            <RoundScorecard holes={holes!} isNineHole={!!friendDetail?.is_nine_hole} />
+            <RoundBreakdown holes={holes!} />
+          </>
+        ) : friendDetail && !friendDetail.hole_by_hole_fetched ? (
+          <ScorecardEmpty
+            message="Hole data is still syncing"
+            subMessage={`Check back in a few hours for ${fname}'s hole-by-hole.`}
+          />
+        ) : (
+          <ScorecardEmpty
+            message={`No hole-by-hole data for ${fname}'s round.`}
+          />
+        )}
+
+        <SheetFooterInk
+          label={`${fname.toUpperCase()}'S INDEX`}
+          currentIndex={activity.friend_handicap_index ?? null}
+          previousIndex={
+            friendDelta != null && activity.handicap_index_at_time != null
+              ? activity.handicap_index_at_time
+              : null
+          }
+          delta={friendDelta}
+          action={
+            activity.friend_user_id ? (
+              <FooterPill
+                onClick={() => {
+                  onClose();
+                  navigate(`/profile/${activity.friend_user_id}`);
+                }}
+                label="View profile"
+                trailing={<span style={{ opacity: 0.7, marginLeft: 2 }}>{'\u203A'}</span>}
+              />
+            ) : null
+          }
+        />
+      </>
+    );
+  };
+
+  const titleText = isFriend
+    ? activity?.last_round_course_name ?? 'Friend round detail'
+    : userData?.course?.name ?? 'Round detail';
 
   return (
     <DrawerPrimitive.Root
@@ -98,311 +336,11 @@ export const RoundDetailSheet: React.FC<Props> = ({ scoreId, open, onClose, hand
             maxHeight: '92vh',
             overflow: 'hidden',
             boxShadow: '0 -10px 40px -10px rgba(15,23,42,0.25)',
+            fontFamily: FONT_GEIST,
           }}
         >
-          <DrawerPrimitive.Title className="sr-only">
-            {data?.course?.name ?? 'Round detail'}
-          </DrawerPrimitive.Title>
-
-          {isLoading ? (
-            <SheetSkeleton />
-          ) : !data ? (
-            <SheetEmpty onClose={onClose} />
-          ) : (
-            <>
-              {/* HERO — flush to top, drag handle overlays */}
-              <div
-                style={{
-                  position: 'relative',
-                  width: '100%',
-                  minHeight: 132,
-                  flexShrink: 0,
-                  background: 'linear-gradient(135deg, #1e293b 0%, #0f172a 100%)',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  justifyContent: 'flex-end',
-                }}
-              >
-                {data.course_header_image && (
-                  <img
-                    src={data.course_header_image}
-                    alt={data.course?.name ?? ''}
-                    style={{
-                      position: 'absolute',
-                      inset: 0,
-                      width: '100%',
-                      height: '100%',
-                      objectFit: 'cover',
-                      display: 'block',
-                    }}
-                  />
-                )}
-                {/* forest-green tint */}
-                <div
-                  style={{
-                    position: 'absolute',
-                    inset: 0,
-                    background: 'rgba(6,46,29,0.45)',
-                  }}
-                />
-                {/* highlight + bottom darken */}
-                <div
-                  style={{
-                    position: 'absolute',
-                    inset: 0,
-                    background:
-                      'linear-gradient(180deg, rgba(255,255,255,0.06) 0%, rgba(15,23,42,0.10) 40%, rgba(15,23,42,0.78) 100%)',
-                  }}
-                />
-
-                {/* Drag handle overlay */}
-                <div
-                  aria-hidden
-                  style={{
-                    position: 'absolute',
-                    top: 8,
-                    left: '50%',
-                    transform: 'translateX(-50%)',
-                    width: 36,
-                    height: 4,
-                    borderRadius: 2,
-                    background: 'rgba(255,255,255,0.50)',
-                    zIndex: 3,
-                  }}
-                />
-
-                {/* Close X */}
-                <button
-                  onClick={onClose}
-                  aria-label="Close"
-                  style={{
-                    position: 'absolute',
-                    top: 14,
-                    right: 14,
-                    width: 28,
-                    height: 28,
-                    borderRadius: '50%',
-                    background: 'rgba(255,255,255,0.18)',
-                    backdropFilter: 'blur(10px)',
-                    WebkitBackdropFilter: 'blur(10px)',
-                    border: '1px solid rgba(255,255,255,0.25)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    cursor: 'pointer',
-                    zIndex: 3,
-                  }}
-                >
-                  <X size={14} color="#fff" strokeWidth={2.5} />
-                </button>
-
-                {/* Content stack at bottom */}
-                <div
-                  style={{
-                    position: 'relative',
-                    padding: '0 56px 12px 16px',
-                    color: '#fff',
-                    zIndex: 2,
-                  }}
-                >
-                  <div
-                    style={{
-                      fontSize: 9,
-                      fontWeight: 800,
-                      color: AMBER,
-                      letterSpacing: '0.16em',
-                      marginBottom: 4,
-                    }}
-                  >
-                    {format(new Date(data.play_date), 'd MMM yyyy').toUpperCase()}
-                  </div>
-                  <h2
-                    id="round-detail-sheet-title"
-                    style={{
-                      margin: 0,
-                      fontSize: 22,
-                      fontWeight: 800,
-                      fontFamily: FONT_GEIST,
-                      letterSpacing: '-0.02em',
-                      lineHeight: 1.1,
-                      textShadow: '0 2px 12px rgba(0,0,0,0.45)',
-                    }}
-                  >
-                    {data.course?.name ?? 'Unknown course'}
-                  </h2>
-                  {subLine && (
-                    <div
-                      style={{
-                        marginTop: 3,
-                        fontSize: 10,
-                        fontWeight: 700,
-                        color: WHITE_55,
-                        letterSpacing: '0.14em',
-                        textTransform: 'uppercase',
-                        fontVariantNumeric: 'tabular-nums',
-                      }}
-                    >
-                      {subLine}
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              {/* METRICS ROW */}
-              <RoundStatStrip
-                gross={data.adjusted_gross}
-                stableford={data.stableford_points}
-                differential={data.handicap_differential}
-              />
-
-              {/* SCORECARD */}
-              {data.holes && data.holes.length > 0 && (
-                <RoundScorecard holes={data.holes} isNineHole={data.is_nine_hole} />
-              )}
-
-              {!data.holes && (
-                <div
-                  style={{
-                    margin: '14px 16px',
-                    padding: '16px',
-                    background: 'rgba(15,23,42,0.03)',
-                    borderRadius: 12,
-                    border: `1px dashed ${HAIRLINE}`,
-                    textAlign: 'center',
-                  }}
-                >
-                  <p style={{ margin: 0, fontSize: 12, color: INK_MUTE }}>
-                    No hole-by-hole data for this round.
-                  </p>
-                </div>
-              )}
-
-              {/* BREAKDOWN */}
-              {data.holes && data.holes.length > 0 && (
-                <RoundBreakdown holes={data.holes} />
-              )}
-
-              {/* FOOTER */}
-              <div
-                style={{
-                  position: 'relative',
-                  marginTop: 'auto',
-                  padding: '14px 16px',
-                  paddingBottom: 'calc(14px + env(safe-area-inset-bottom, 0px))',
-                  background: '#FFFBF5',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                  gap: 12,
-                }}
-              >
-                <div
-                  aria-hidden
-                  style={{
-                    position: 'absolute',
-                    top: 0,
-                    left: 0,
-                    right: 0,
-                    height: 2,
-                    background:
-                      'linear-gradient(90deg, transparent, #F7931E, transparent)',
-                  }}
-                />
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 3, minWidth: 0 }}>
-                  <span
-                    style={{
-                      fontSize: 9,
-                      fontWeight: 800,
-                      letterSpacing: '0.16em',
-                      color: AMBER_DEEP,
-                    }}
-                  >
-                    HANDICAP AT TIME
-                  </span>
-                  <span
-                    style={{
-                      display: 'inline-flex',
-                      alignItems: 'baseline',
-                      gap: 8,
-                      fontVariantNumeric: 'tabular-nums',
-                    }}
-                  >
-                    <span
-                      style={{
-                        fontSize: 22,
-                        fontWeight: 800,
-                        color: INK,
-                        fontFamily: FONT_GEIST,
-                        letterSpacing: '-0.03em',
-                        lineHeight: 1,
-                      }}
-                    >
-                      {data.handicap_index_at_time?.toFixed(1) ?? '\u2014'}
-                    </span>
-                    {handicapDelta != null &&
-                      Math.abs(handicapDelta) >= 0.05 &&
-                      data.handicap_index_at_time != null && (
-                        <>
-                          <span
-                            style={{
-                              fontSize: 11,
-                              fontWeight: 700,
-                              color: 'rgba(15,23,42,0.40)',
-                              textDecoration: 'line-through',
-                              textDecorationColor: 'rgba(15,23,42,0.30)',
-                            }}
-                          >
-                            {(data.handicap_index_at_time - handicapDelta).toFixed(1)}
-                          </span>
-                          <span
-                            style={{
-                              fontSize: 12,
-                              fontWeight: 800,
-                              color: handicapDelta < 0 ? '#10B981' : '#E11D48',
-                              letterSpacing: '0.02em',
-                              display: 'inline-flex',
-                              alignItems: 'baseline',
-                              gap: 2,
-                            }}
-                          >
-                            {handicapDelta < 0 ? '\u2193' : '\u2191'}
-                            {' '}
-                            {Math.abs(handicapDelta).toFixed(1)}
-                          </span>
-                        </>
-                      )}
-                  </span>
-                </div>
-                {data.permalink_url && (
-                  <a
-                    href={data.permalink_url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    style={{
-                      display: 'inline-flex',
-                      alignItems: 'center',
-                      gap: 5,
-                      padding: '9px 14px',
-                      borderRadius: 999,
-                      background: INK,
-                      color: '#fff',
-                      fontSize: 11,
-                      fontWeight: 800,
-                      textDecoration: 'none',
-                      border: 'none',
-                      letterSpacing: '0.14em',
-                      flexShrink: 0,
-                      boxShadow:
-                        '0 1px 0 rgba(247,147,30,0.40), 0 4px 10px -2px rgba(15,23,42,0.20)',
-                    }}
-                  >
-                    Open in MyEG
-                    <ExternalLink size={11} strokeWidth={2.5} />
-                  </a>
-                )}
-              </div>
-            </>
-          )}
+          <DrawerPrimitive.Title className="sr-only">{titleText}</DrawerPrimitive.Title>
+          {isFriend ? renderFriendBody() : renderUserBody()}
         </DrawerPrimitive.Content>
       </DrawerPrimitive.Portal>
     </DrawerPrimitive.Root>
