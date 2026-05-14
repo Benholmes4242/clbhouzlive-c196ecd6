@@ -160,8 +160,6 @@ export function PlayerProfilePage() {
     <PageRoot
       className="min-h-screen w-full"
       hasBottomNav
-      immersive
-      immersiveStatusBar
       style={{ background: '#F8FAFC' }}
     >
       {/* Pull-to-refresh indicator */}
