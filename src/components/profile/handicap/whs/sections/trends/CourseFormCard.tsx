@@ -366,7 +366,7 @@ export const CourseFormCard: React.FC<Props> = ({ connectionId, currentHandicap,
 
   if (isLoading) {
     return (
-      <section style={SECTION_STYLE}>
+      <section style={sectionStyle}>
         <SectionHeader eyebrow="COURSE FORM" title="Your courses ranked" sub="Loading…" />
         <div style={{ padding: '0 20px' }}>
           <div
@@ -400,7 +400,7 @@ export const CourseFormCard: React.FC<Props> = ({ connectionId, currentHandicap,
 
   if (!data || data.length === 0) {
     return (
-      <section style={SECTION_STYLE}>
+      <section style={sectionStyle}>
         <SectionHeader
           eyebrow="COURSE FORM"
           title="Your courses ranked"
@@ -419,7 +419,7 @@ export const CourseFormCard: React.FC<Props> = ({ connectionId, currentHandicap,
   }
 
   return (
-    <section style={SECTION_STYLE}>
+    <section style={sectionStyle}>
       <SectionHeader eyebrow="COURSE FORM" title="Your courses ranked" sub={view.sublabel} />
       <div style={{ padding: '0 20px' }}>
         <ViewToggle activeView={activeView} onChange={setActiveView} />
