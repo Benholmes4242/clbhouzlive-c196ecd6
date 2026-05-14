@@ -226,82 +226,36 @@ interface CardHeaderProps {
 }
 
 const CardHeader: React.FC<CardHeaderProps> = ({ scope, setScope, onOpenSheet }) => (
-  <div
-    style={{
-      padding: '12px 20px 14px',
-      borderBottom: `1px solid ${T.hairline}`,
-    }}
-  >
-    {/* Row 1 — icon + title block + Info button */}
-    <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-      <div
-        style={{
-          width: 30,
-          height: 30,
-          borderRadius: 9,
-          background: T.amberTint,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          flexShrink: 0,
-        }}
-      >
-        <Target size={15} color={T.amberDeep} strokeWidth={2.2} />
-      </div>
-      <div style={{ flex: 1, minWidth: 0 }}>
-        <p
+  <div style={{ paddingBottom: 14, borderBottom: `1px solid ${T.hairline}` }}>
+    <SectionHeader
+      eyebrow="STABLEFORD POINTS"
+      title="How you're scoring on points"
+      right={
+        <button
+          onClick={onOpenSheet}
+          aria-label="Open Stableford detail sheet"
           style={{
-            margin: 0,
-            fontSize: 16,
-            fontWeight: 700,
-            color: T.ink,
-            letterSpacing: '-0.015em',
-            fontFamily: FONT,
-            whiteSpace: 'nowrap',
-            overflow: 'hidden',
-            textOverflow: 'ellipsis',
-          }}
-        >
-          Stableford Points
-        </p>
-        <p
-          style={{
-            margin: '1px 0 0',
-            fontSize: 11,
+            width: 26,
+            height: 26,
+            borderRadius: 999,
+            border: `1px solid ${T.hairline}`,
+            background: 'transparent',
             color: T.inkMute,
-            fontFamily: FONT,
-            whiteSpace: 'nowrap',
-            overflow: 'hidden',
-            textOverflow: 'ellipsis',
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: 0,
+            flexShrink: 0,
           }}
         >
-          How you&apos;re scoring on points
-        </p>
-      </div>
-      <button
-        onClick={onOpenSheet}
-        aria-label="Open Stableford detail sheet"
-        style={{
-          width: 26,
-          height: 26,
-          borderRadius: 999,
-          border: `1px solid ${T.hairline}`,
-          background: 'transparent',
-          color: T.inkMute,
-          cursor: 'pointer',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          padding: 0,
-          flexShrink: 0,
-        }}
-      >
-        <Info size={13} strokeWidth={2.2} />
-      </button>
-    </div>
+          <Info size={13} strokeWidth={2.2} />
+        </button>
+      }
+    />
 
-    {/* Row 2 — scope toggle on its own row */}
-    <div style={{ marginTop: 12 }}>
+    {/* Scope toggle */}
+    <div style={{ padding: '0 16px' }}>
       <div
         style={{
           display: 'inline-flex',
