@@ -61,6 +61,7 @@ export function CollegeGolfHubPage() {
   const [pullDistance, setPullDistance] = useState(0);
   const touchStartY = useRef(0);
   const PULL_THRESHOLD = 50;
+  const { sentinelRef, paddingTop: stickyPaddingTop } = useStickyHeaderSafeArea();
 
   const onTouchStart = useCallback((e: React.TouchEvent) => {
     if (window.scrollY <= 0) touchStartY.current = e.touches[0].clientY;
