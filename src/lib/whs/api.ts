@@ -652,11 +652,13 @@ export async function fetchFriendRoundDetail(
 ): Promise<{
   hole_by_hole_fetched: boolean;
   is_nine_hole: boolean;
+  slope_rating: number | null;
+  course_rating: number | null;
   holes: WhsScoreHole[];
 } | null> {
   const { data: score, error } = await supabase
     .from('whs_scores' as any)
-    .select('id, hole_by_hole_fetched, is_nine_hole')
+    .select('id, hole_by_hole_fetched, is_nine_hole, slope_rating, course_rating')
     .eq('id', scoreId)
     .maybeSingle();
   if (error) throw error;
@@ -667,6 +669,8 @@ export async function fetchFriendRoundDetail(
     return {
       hole_by_hole_fetched: false,
       is_nine_hole: !!s.is_nine_hole,
+      slope_rating: s.slope_rating ?? null,
+      course_rating: s.course_rating ?? null,
       holes: [],
     };
   }
