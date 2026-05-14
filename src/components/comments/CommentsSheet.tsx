@@ -406,12 +406,12 @@ function CommentsSheet({
           <div className="flex items-center gap-1.5 flex-wrap">
             <span
               className="truncate max-w-[160px]"
-              style={{ fontSize: 13.5, fontWeight: 700, color: INK, letterSpacing: '-0.01em' }}
+              style={{ fontSize: 14, fontWeight: 700, color: INK, letterSpacing: '-0.01em' }}
             >
               {comment.user_name}
             </span>
             {isOP && (
-              <span style={{ padding: '1px 6px', borderRadius: 4, fontSize: 9, fontWeight: 800, textTransform: 'uppercase' as const, letterSpacing: '0.06em', background: 'rgba(247,147,30,0.10)', color: AMBER }}>
+              <span style={{ padding: '1px 6px', borderRadius: 4, fontSize: 9, fontWeight: 800, textTransform: 'uppercase' as const, letterSpacing: '0.14em', background: 'rgba(247,147,30,0.10)', color: AMBER }}>
                 OP
               </span>
             )}
@@ -419,7 +419,7 @@ function CommentsSheet({
               · {relativeTime(comment.created_at)}
             </span>
             {(comment as any).is_edited && (
-              <span style={{ fontSize: 11, color: 'rgba(15,23,42,0.3)' }}>
+              <span style={{ fontSize: 11, color: '#94A3B8' }}>
                 edited
               </span>
             )}
@@ -454,9 +454,9 @@ function CommentsSheet({
                   requestAnimationFrame(() => textareaRef.current?.focus());
                 }}
                 style={{
-                  fontSize: 11.5,
+                  fontSize: 11,
                   fontWeight: 600,
-                  color: 'rgba(15,23,42,0.5)',
+                  color: '#64748B',
                   background: 'none',
                   border: 0,
                   cursor: 'pointer',
@@ -714,7 +714,7 @@ function CommentsSheet({
                           style={{
                             fontSize: 13,
                             fontWeight: 500,
-                            color: isActive ? 'rgba(15,23,42,0.5)' : INK_SUBTLE,
+                            color: isActive ? '#64748B' : INK_SUBTLE,
                             lineHeight: 1.2,
                           }}
                         >
@@ -839,7 +839,7 @@ function CommentsSheet({
                         'inline-flex items-center gap-1 cursor-pointer bg-transparent border-0 p-0 min-h-[28px]',
                         cleanCaption ? 'mt-1' : ''
                       )}
-                      style={{ fontSize: 11.5, color: INK_SUBTLE, textAlign: 'left' }}
+                      style={{ fontSize: 11, color: INK_SUBTLE, textAlign: 'left' }}
                       aria-label={`View ${displayCourseName}`}
                     >
                       <MapPin size={11} style={{ color: AMBER }} strokeWidth={2.25} />
