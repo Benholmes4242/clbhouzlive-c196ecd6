@@ -45,10 +45,10 @@ export const TrendCardsStack: React.FC<Props> = ({ connectionId, currentHandicap
   const [showInfo, setShowInfo] = useState(false);
 
   return (
-    <section style={{ padding: '0 16px', marginTop: topMargin ?? 32, fontFamily: FONT }}>
+    <section style={{ padding: '0 16px', marginTop: topMargin ?? 20, fontFamily: FONT }}>
       {splitAt !== 'rest' && (showHero ? (
-        <div style={{ padding: '0 0 16px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, marginBottom: 12 }}>
+        <div style={{ padding: '0 0 10px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, marginBottom: 6 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
               <span
                 style={{
