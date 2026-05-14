@@ -145,6 +145,7 @@ const _RoundCardBody: React.FC<RoundCardBodyProps> = ({
             flexDirection: 'column',
             alignItems: 'flex-end',
             gap: 8,
+            paddingBottom: 6,
           }}
         >
           {stableford != null && (
