@@ -91,7 +91,7 @@ export function CollegeComparePage() {
   })();
 
   return (
-    <TourHubShell immersive>
+    <TourHubShell>
       <div className="relative min-h-screen bg-background">
         {/* ── CANONICAL LIGHT MASTHEAD (Path B) ── */}
         <div
