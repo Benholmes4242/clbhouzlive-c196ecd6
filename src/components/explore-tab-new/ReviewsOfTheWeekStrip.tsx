@@ -4,6 +4,7 @@ import clbhouzLogo from '@/assets/clbhouz-logo.png';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { ExploreSectionHeader } from './ExploreSectionHeader';
 
 interface ReviewItem {
   post_id: string;
