@@ -49,6 +49,28 @@ function pickFormRingColor(
 // ── Tokens ────────────────────────────────────────────────────────────────
 const AMBER = '#F7931E';
 const AMBER_DEEP = '#C97211';
+// Amber → gold gradient stops (matches "Exceptional" rating in Course detail)
+const GRAD_AMBER = '#F59E0B';
+const GRAD_GOLD  = '#FBBF24';
+// Scoring ring gradient — deep amber to gold (richer, distinct from handicap)
+const GRAD_SCORING_DEEP = '#B45309';
+const GRAD_SCORING_LITE = '#FBBF24';
+// Whoop-style red-arc gradient (worsening handicap)
+const GRAD_RED_DEEP = '#7F1D1D';
+const GRAD_RED_LITE = '#EF4444';
+
+// Resolve a complementary "bright" stop for the form ring gradient based
+// on the chosen formArcColor so each form state pops without losing its
+// temperature meaning.
+function formGradientLite(deep: string): string {
+  switch (deep) {
+    case '#B91C1C': return '#F59E0B'; // hot → ember to warm amber
+    case '#F59E0B': return '#FCD34D'; // warm → amber to soft gold
+    case '#38BDF8': return '#7DD3FC'; // cold → sky to ice
+    case '#0E7490': return '#38BDF8'; // out → deep cyan to sky
+    default:        return deep;       // steady / empty → flat
+  }
+}
 const INK = '#0F172A';
 const INK_55 = 'rgba(15,23,42,0.55)';
 const INK_40 = 'rgba(15,23,42,0.40)';
@@ -641,7 +663,12 @@ const HeroHandicapCard: React.FC<Props> = ({ connection }) => {
             }}
           />
           <span style={{
-            fontSize: 9, fontWeight: 800, color: '#64748B',
+            fontSize: 9, fontWeight: 800,
+            background: `linear-gradient(90deg, ${GRAD_AMBER} 0%, ${GRAD_GOLD} 100%)`,
+            WebkitBackgroundClip: 'text',
+            backgroundClip: 'text',
+            WebkitTextFillColor: 'transparent',
+            color: 'transparent',
             letterSpacing: '0.16em', textTransform: 'uppercase',
           }}>
             HANDICAP INDEX
@@ -732,6 +759,17 @@ const HeroHandicapCard: React.FC<Props> = ({ connection }) => {
                   <stop offset="0%" stopColor={MOMENTUM_GREEN_DEEP} />
                   <stop offset="100%" stopColor={MOMENTUM_GREEN_BRIGHT} />
                 </linearGradient>
+                {/* Amber → gold gradient — matches the "Exceptional" rating
+                    treatment in Course detail, makes the ring pop like Whoop. */}
+                <linearGradient id="heroHandicapGradient" x1="0" y1="0" x2="1" y2="1">
+                  <stop offset="0%"   stopColor={GRAD_AMBER} />
+                  <stop offset="55%"  stopColor="#F7B324" />
+                  <stop offset="100%" stopColor={GRAD_GOLD} />
+                </linearGradient>
+                <linearGradient id="heroHandicapRedGradient" x1="0" y1="0" x2="1" y2="1">
+                  <stop offset="0%"   stopColor={GRAD_RED_DEEP} />
+                  <stop offset="100%" stopColor={GRAD_RED_LITE} />
+                </linearGradient>
                 {/* Subtle drop-shadow filter for filled arc lift */}
                 <filter id="heroArcLift" x="-20%" y="-20%" width="140%" height="140%">
                   <feGaussianBlur in="SourceAlpha" stdDeviation="0.6" />
@@ -746,11 +784,11 @@ const HeroHandicapCard: React.FC<Props> = ({ connection }) => {
                 fill="none" stroke={RING_TRACK} strokeWidth={6}
                 vectorEffect="non-scaling-stroke"
               />
-              {/* Momentum arc — green for improving, red for worsening */}
+              {/* Momentum arc — amber→gold gradient for improving */}
               {showGreenArc && (
                 <circle
                   cx={50} cy={50} r={42} fill="none"
-                  stroke={RING_HANDICAP} strokeWidth={6}
+                  stroke="url(#heroHandicapGradient)" strokeWidth={6}
                   strokeDasharray={`${(innerFillLength / C_INNER) * (2 * Math.PI * 42)} ${2 * Math.PI * 42}`}
                   strokeLinecap="round"
                   transform={`rotate(-90 50 50)`}
@@ -763,7 +801,7 @@ const HeroHandicapCard: React.FC<Props> = ({ connection }) => {
                 <g transform={`scale(-1, 1) translate(-100, 0)`}>
                   <circle
                     cx={50} cy={50} r={42} fill="none"
-                    stroke={RED} strokeWidth={6}
+                    stroke="url(#heroHandicapRedGradient)" strokeWidth={6}
                     strokeDasharray={`${(innerFillLength / C_INNER) * (2 * Math.PI * 42)} ${2 * Math.PI * 42}`}
                     strokeLinecap="round"
                     transform={`rotate(-90 50 50)`}
@@ -1131,9 +1169,16 @@ const FlankRing: React.FC<FlankRingProps> = ({
           preserveAspectRatio="xMidYMid meet"
         >
           <defs>
-            <linearGradient id="flankScoringGradient" x1="0" y1="0" x2="1" y2="1">
-              <stop offset="0%" stopColor={SCORING_BLUE_DEEP} />
-              <stop offset="100%" stopColor={SCORING_BLUE} />
+            {/* Scoring ring — deep amber → gold (Whoop-style pop). */}
+            <linearGradient id={`flankScoringGradient-${metric}`} x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%"   stopColor={GRAD_SCORING_DEEP} />
+              <stop offset="55%"  stopColor="#D97706" />
+              <stop offset="100%" stopColor={GRAD_SCORING_LITE} />
+            </linearGradient>
+            {/* Form ring — paired bright stop derived from active state. */}
+            <linearGradient id={`flankFormGradient-${metric}`} x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%"   stopColor={formArcColor ?? RING_FORM_BASE} />
+              <stop offset="100%" stopColor={formGradientLite(formArcColor ?? RING_FORM_BASE)} />
             </linearGradient>
             <filter id="flankArcLift" x="-20%" y="-20%" width="140%" height="140%">
               <feGaussianBlur in="SourceAlpha" stdDeviation="0.6" />
@@ -1149,7 +1194,7 @@ const FlankRing: React.FC<FlankRingProps> = ({
           {/* Scoring single arc (clockwise from top) */}
           {!isForm && scoringFrac > 0 && (
             <circle cx={FCX} cy={FCY} r={FR} fill="none"
-              stroke={scoringColor} strokeWidth={FSTROKE}
+              stroke={`url(#flankScoringGradient-${metric})`} strokeWidth={FSTROKE}
               strokeLinecap="round"
               strokeDasharray={`${scoringFrac * FC} ${FC}`}
               transform={`rotate(-90 ${FCX} ${FCY})`}
@@ -1160,7 +1205,7 @@ const FlankRing: React.FC<FlankRingProps> = ({
           {/* FORM hot arc — right side, clockwise from top */}
           {isForm && formIsHot && formArcLen > 0 && (
             <circle cx={FCX} cy={FCY} r={FR} fill="none"
-              stroke={formArcColor ?? RING_FORM_BASE} strokeWidth={FSTROKE}
+              stroke={`url(#flankFormGradient-${metric})`} strokeWidth={FSTROKE}
               strokeLinecap="round"
               strokeDasharray={`${formArcLen} ${FC}`}
               transform={`rotate(-90 ${FCX} ${FCY})`}
@@ -1171,7 +1216,7 @@ const FlankRing: React.FC<FlankRingProps> = ({
           {/* FORM cold arc — left side, mirrored */}
           {isForm && formIsCold && formArcLen > 0 && (
             <circle cx={FCX} cy={FCY} r={FR} fill="none"
-              stroke={formArcColor ?? RING_FORM_BASE} strokeWidth={FSTROKE}
+              stroke={`url(#flankFormGradient-${metric})`} strokeWidth={FSTROKE}
               strokeLinecap="round"
               strokeDasharray={`${formArcLen} ${FC}`}
               transform={`rotate(-90 ${FCX} ${FCY}) scale(-1, 1) translate(${-VIEWBOX}, 0)`}
