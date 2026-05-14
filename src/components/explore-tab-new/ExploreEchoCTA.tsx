@@ -173,8 +173,8 @@ function ExploreEchoCTAInner({ mood }: ExploreEchoCTAProps) {
           <p
             style={{
               fontSize: 10,
-              fontWeight: 700,
-              letterSpacing: '0.08em',
+              fontWeight: 800,
+              letterSpacing: '0.14em',
               textTransform: 'uppercase',
               color: ECHO_AMBER_INK,
               margin: 0,
