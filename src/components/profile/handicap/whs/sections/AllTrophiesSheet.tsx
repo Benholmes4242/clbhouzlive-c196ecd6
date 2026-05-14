@@ -135,12 +135,47 @@ const TrophyRow: React.FC<{ a: Achievement; onInfoClick?: (a: Achievement) => vo
       {/* Middle */}
       <div style={{ flex: 1, minWidth: 0 }}>
         <div style={{
-          fontSize: 15,
-          fontWeight: 700,
-          color: iconLooksLocked ? INK_55 : INK,
-          letterSpacing: '-0.01em',
+          display: 'flex',
+          alignItems: 'center',
+          gap: 6,
           marginBottom: 6,
-        }}>{a.title}</div>
+        }}>
+          <span style={{
+            fontSize: 15,
+            fontWeight: 700,
+            color: iconLooksLocked ? INK_55 : INK,
+            letterSpacing: '-0.01em',
+            lineHeight: 1.2,
+          }}>
+            {a.title}
+          </span>
+          {isCounter && a.hole_data_denominator && (
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                onInfoClick?.(a);
+              }}
+              aria-label={`About ${a.title}`}
+              style={{
+                width: 18,
+                height: 18,
+                borderRadius: '50%',
+                border: 'none',
+                background: 'transparent',
+                color: 'rgba(15,23,42,0.40)',
+                cursor: 'pointer',
+                padding: 0,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                flexShrink: 0,
+              }}
+            >
+              <Info size={13} strokeWidth={2.4} />
+            </button>
+          )}
+        </div>
 
         {isList && (
           <div style={{ marginBottom: 8 }}>
