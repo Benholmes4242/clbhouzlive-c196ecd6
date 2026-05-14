@@ -393,7 +393,7 @@ export const WhereYouStandSection: React.FC<Props> = ({ userId }) => {
 
   if (isLoading) {
     return (
-      <section style={{ marginTop: 28 }}>
+      <section style={{ marginTop: 32 }}>
         <SectionHeader eyebrow="WHERE YOU STAND" title="Among active golfers" />
         <div
           style={{
@@ -414,7 +414,7 @@ export const WhereYouStandSection: React.FC<Props> = ({ userId }) => {
   }
 
   return (
-    <section ref={sectionRef} style={{ marginTop: 28 }}>
+    <section ref={sectionRef} style={{ marginTop: 32 }}>
       <SectionHeader eyebrow="WHERE YOU STAND" title="Among active golfers" />
       {d.available === true ? (
         <AvailableCard data={d} />

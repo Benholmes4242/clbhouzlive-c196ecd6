@@ -380,7 +380,7 @@ const HeroHandicapCard: React.FC<Props> = ({ connection }) => {
   // ── Loading state ───────────────────────────────────────────────────────
   if (trendLoading || historyLoading) {
     return (
-      <section style={{ padding: '24px 12px 20px', marginBottom: 24 }}>
+      <section style={{ padding: '24px 12px 20px' }}>
         <div style={{ height: 12, width: 80, background: INK_10, borderRadius: 2, marginBottom: 14 }} />
         <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 14 }}>
           <div style={{ height: RING_SIZE, width: RING_SIZE, background: INK_06, borderRadius: '50%' }} />
@@ -393,7 +393,7 @@ const HeroHandicapCard: React.FC<Props> = ({ connection }) => {
   // ── Empty state ─────────────────────────────────────────────────────────
   if (current === null) {
     return (
-      <section style={{ padding: '24px 12px 20px', marginBottom: 24 }}>
+      <section style={{ padding: '24px 12px 20px' }}>
         <div style={{ marginBottom: 14, padding: '0 4px' }}>
           <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
             <span
@@ -652,7 +652,7 @@ const HeroHandicapCard: React.FC<Props> = ({ connection }) => {
       : 'Over 1 year';
 
   return (
-    <section style={{ margin: '0 0 24px', padding: '0 20px', fontFamily: FONT_GEIST }}>
+    <section style={{ padding: '0 20px', fontFamily: FONT_GEIST }}>
       {/* Eyebrow row */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8, padding: '0 4px' }}>
         <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>

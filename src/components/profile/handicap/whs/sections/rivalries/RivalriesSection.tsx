@@ -46,7 +46,7 @@ export const RivalriesSection: React.FC<Props> = ({ userId }) => {
   }, [filledRivalries]);
 
   return (
-    <section style={{ padding: '0 0 24px', marginTop: 28 }}>
+    <section style={{ marginTop: 32 }}>
       <SectionHeader
         eyebrow="RIVALRIES"
         title="Your rivals"

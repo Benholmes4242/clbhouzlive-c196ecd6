@@ -21,8 +21,9 @@ export const RecordsView: React.FC<Props> = ({
       role="tabpanel"
       id="handicap-panel-records"
       aria-labelledby="handicap-tab-records"
+      style={{ paddingTop: 16 }}
     >
-      <CourseFormCard connectionId={connectionId} currentHandicap={currentHandicap ?? undefined} />
+      <CourseFormCard connectionId={connectionId} currentHandicap={currentHandicap ?? undefined} topMargin={0} />
       <RecentRoundsCard connectionId={connectionId} />
     </div>
   );

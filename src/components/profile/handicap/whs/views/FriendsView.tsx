@@ -16,7 +16,7 @@ interface Props {
 
 export const FriendsView: React.FC<Props> = ({ userId, currentHandicap, connectionId, readOnly = false }) => {
   return (
-    <div role="tabpanel" id="handicap-panel-friends" aria-labelledby="handicap-tab-friends">
+    <div role="tabpanel" id="handicap-panel-friends" aria-labelledby="handicap-tab-friends" style={{ paddingTop: 16 }}>
       <FriendsHeaderSection userId={userId} />
       <RecentlyActiveRail userId={userId} />
       {!readOnly && <FriendsEchoSection connectionId={connectionId} />}

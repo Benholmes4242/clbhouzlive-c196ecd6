@@ -28,7 +28,7 @@ export const FriendsHeaderSection: React.FC<Props> = ({ userId }) => {
 
   if (isLoading || !stats) {
     return (
-      <section style={{ padding: '10px 16px 0' }}>
+      <section style={{ padding: '0 16px' }}>
         <div
           className="animate-pulse"
           style={{ height: 64, borderRadius: 12, background: 'rgba(15,23,42,0.06)' }}
@@ -44,7 +44,7 @@ export const FriendsHeaderSection: React.FC<Props> = ({ userId }) => {
       : undefined;
 
   return (
-    <section style={{ paddingTop: 10 }}>
+    <section>
       <SectionHeader eyebrow="YOUR CIRCLE" title={title} sub={sub} />
     </section>
   );

@@ -8,6 +8,8 @@ import SectionHeader from '../SectionHeader';
 interface Props {
   connectionId: string;
   currentHandicap: number | null | undefined;
+  /** Override the canonical top margin. Pass 0 for the first card on the tab. */
+  topMargin?: number;
 }
 
 const T = {
@@ -85,7 +87,7 @@ function deltaColor(d: number): string {
 
 
 const SECTION_STYLE: React.CSSProperties = {
-  marginTop: 28,
+  marginTop: 32,
   fontFamily: FONT,
 };
 
@@ -352,18 +354,19 @@ const CourseList: React.FC<{ courses: CourseForm[]; view: ViewKey }> = ({ course
   );
 };
 
-export const CourseFormCard: React.FC<Props> = ({ connectionId, currentHandicap }) => {
+export const CourseFormCard: React.FC<Props> = ({ connectionId, currentHandicap, topMargin }) => {
   const { data, isLoading } = useCourseForm(connectionId, currentHandicap);
   const [activeView, setActiveView] = useState<ViewKey>('best');
 
   const view = VIEWS[activeView];
   const courses = useMemo(() => (data ? view.select(data) : []), [data, view]);
+  const sectionStyle: React.CSSProperties = { ...SECTION_STYLE, marginTop: topMargin ?? 32 };
 
   if (currentHandicap === null || currentHandicap === undefined) return null;
 
   if (isLoading) {
     return (
-      <section style={SECTION_STYLE}>
+      <section style={sectionStyle}>
         <SectionHeader eyebrow="COURSE FORM" title="Your courses ranked" sub="Loading…" />
         <div style={{ padding: '0 20px' }}>
           <div
@@ -397,7 +400,7 @@ export const CourseFormCard: React.FC<Props> = ({ connectionId, currentHandicap 
 
   if (!data || data.length === 0) {
     return (
-      <section style={SECTION_STYLE}>
+      <section style={sectionStyle}>
         <SectionHeader
           eyebrow="COURSE FORM"
           title="Your courses ranked"
@@ -416,7 +419,7 @@ export const CourseFormCard: React.FC<Props> = ({ connectionId, currentHandicap 
   }
 
   return (
-    <section style={SECTION_STYLE}>
+    <section style={sectionStyle}>
       <SectionHeader eyebrow="COURSE FORM" title="Your courses ranked" sub={view.sublabel} />
       <div style={{ padding: '0 20px' }}>
         <ViewToggle activeView={activeView} onChange={setActiveView} />
