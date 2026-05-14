@@ -47,10 +47,10 @@ export const RecentlyActiveItem: React.FC<Props> = ({ entry, isActive, onClick }
           userId={entry.friend_user_id ?? entry.friend_row_id}
           hideRing
         />
-        {dotColor && (
+        {dotBackground && (
           <span
             aria-label={
-              dotColor === '#22C55E'
+              isOnApp
                 ? 'Active in last 7 days'
                 : 'Played in last 7 days, not on Clbhouz'
             }
@@ -61,7 +61,7 @@ export const RecentlyActiveItem: React.FC<Props> = ({ entry, isActive, onClick }
               width: 14,
               height: 14,
               borderRadius: '50%',
-              background: dotColor,
+              background: dotBackground,
               border: '2px solid #F8FAFC',
             }}
           />
