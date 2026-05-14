@@ -839,7 +839,7 @@ function CommentsSheet({
                         'inline-flex items-center gap-1 cursor-pointer bg-transparent border-0 p-0 min-h-[28px]',
                         cleanCaption ? 'mt-1' : ''
                       )}
-                      style={{ fontSize: 11.5, color: INK_SUBTLE, textAlign: 'left' }}
+                      style={{ fontSize: 11, color: INK_SUBTLE, textAlign: 'left' }}
                       aria-label={`View ${displayCourseName}`}
                     >
                       <MapPin size={11} style={{ color: AMBER }} strokeWidth={2.25} />
