@@ -367,7 +367,7 @@ export function TournamentDetailPage() {
   };
   
   return (
-    <TourHubShell immersive>
+    <TourHubShell>
       {/* Pull-to-refresh indicator */}
       <AnimatePresence>
         {(pullDistance > 0 || isRefreshing) && (
