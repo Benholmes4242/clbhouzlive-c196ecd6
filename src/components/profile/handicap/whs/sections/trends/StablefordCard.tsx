@@ -297,13 +297,14 @@ const CardHeader: React.FC<CardHeaderProps> = ({ scope, setScope, onOpenSheet })
 
 interface SummaryCellProps {
   color: string;
+  accent?: string;
   label: string;
   count: number;
   pct: number;
   range: string;
 }
 
-const SummaryCell: React.FC<SummaryCellProps> = ({ color, label, count, pct, range }) => (
+const SummaryCell: React.FC<SummaryCellProps> = ({ color, accent, label, count, pct, range }) => (
   <div
     style={{
       borderRadius: 10,
@@ -313,7 +314,7 @@ const SummaryCell: React.FC<SummaryCellProps> = ({ color, label, count, pct, ran
       overflow: 'hidden',
     }}
   >
-    <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 3, background: color }} />
+    <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 3, background: accent ?? color }} />
     <p
       style={{
         margin: '4px 0 6px',
