@@ -1169,9 +1169,16 @@ const FlankRing: React.FC<FlankRingProps> = ({
           preserveAspectRatio="xMidYMid meet"
         >
           <defs>
-            <linearGradient id="flankScoringGradient" x1="0" y1="0" x2="1" y2="1">
-              <stop offset="0%" stopColor={SCORING_BLUE_DEEP} />
-              <stop offset="100%" stopColor={SCORING_BLUE} />
+            {/* Scoring ring — deep amber → gold (Whoop-style pop). */}
+            <linearGradient id={`flankScoringGradient-${metric}`} x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%"   stopColor={GRAD_SCORING_DEEP} />
+              <stop offset="55%"  stopColor="#D97706" />
+              <stop offset="100%" stopColor={GRAD_SCORING_LITE} />
+            </linearGradient>
+            {/* Form ring — paired bright stop derived from active state. */}
+            <linearGradient id={`flankFormGradient-${metric}`} x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%"   stopColor={formArcColor ?? RING_FORM_BASE} />
+              <stop offset="100%" stopColor={formGradientLite(formArcColor ?? RING_FORM_BASE)} />
             </linearGradient>
             <filter id="flankArcLift" x="-20%" y="-20%" width="140%" height="140%">
               <feGaussianBlur in="SourceAlpha" stdDeviation="0.6" />
@@ -1187,7 +1194,7 @@ const FlankRing: React.FC<FlankRingProps> = ({
           {/* Scoring single arc (clockwise from top) */}
           {!isForm && scoringFrac > 0 && (
             <circle cx={FCX} cy={FCY} r={FR} fill="none"
-              stroke={scoringColor} strokeWidth={FSTROKE}
+              stroke={`url(#flankScoringGradient-${metric})`} strokeWidth={FSTROKE}
               strokeLinecap="round"
               strokeDasharray={`${scoringFrac * FC} ${FC}`}
               transform={`rotate(-90 ${FCX} ${FCY})`}
@@ -1198,7 +1205,7 @@ const FlankRing: React.FC<FlankRingProps> = ({
           {/* FORM hot arc — right side, clockwise from top */}
           {isForm && formIsHot && formArcLen > 0 && (
             <circle cx={FCX} cy={FCY} r={FR} fill="none"
-              stroke={formArcColor ?? RING_FORM_BASE} strokeWidth={FSTROKE}
+              stroke={`url(#flankFormGradient-${metric})`} strokeWidth={FSTROKE}
               strokeLinecap="round"
               strokeDasharray={`${formArcLen} ${FC}`}
               transform={`rotate(-90 ${FCX} ${FCY})`}
@@ -1209,7 +1216,7 @@ const FlankRing: React.FC<FlankRingProps> = ({
           {/* FORM cold arc — left side, mirrored */}
           {isForm && formIsCold && formArcLen > 0 && (
             <circle cx={FCX} cy={FCY} r={FR} fill="none"
-              stroke={formArcColor ?? RING_FORM_BASE} strokeWidth={FSTROKE}
+              stroke={`url(#flankFormGradient-${metric})`} strokeWidth={FSTROKE}
               strokeLinecap="round"
               strokeDasharray={`${formArcLen} ${FC}`}
               transform={`rotate(-90 ${FCX} ${FCY}) scale(-1, 1) translate(${-VIEWBOX}, 0)`}
