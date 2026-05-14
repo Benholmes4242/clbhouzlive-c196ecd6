@@ -314,7 +314,7 @@ const HeroHeader: React.FC<{ data: FriendYesterday; onClick: () => void }> = ({ 
       position: 'absolute', top: 10, right: 10,
       display: 'inline-flex', alignItems: 'center', gap: 4,
       padding: '4px 9px', borderRadius: 999,
-      background: `linear-gradient(135deg, ${T.gold}, ${T.amber})`,
+      background: `linear-gradient(135deg, #F59E0B 0%, #FBBF24 100%)`,
       color: '#0F172A', fontSize: 9.5, fontWeight: 800, letterSpacing: '0.10em',
     }}>
       <Trophy size={10} strokeWidth={2.5} />
