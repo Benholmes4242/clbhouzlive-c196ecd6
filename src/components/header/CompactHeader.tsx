@@ -105,9 +105,6 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
       } else if (isWatchSubpageRoute) {
         navigate(-1);
       }
-    } else if (isTourRoute) {
-      haptic('light');
-      openTourNav();
     } else {
       navigate('/clubhouse');
     }
