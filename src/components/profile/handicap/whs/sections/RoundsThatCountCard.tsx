@@ -206,12 +206,12 @@ export const RoundsThatCountCard: React.FC<Props> = ({ connectionId, currentHand
     .join(' ');
 
   return (
-    <section style={{ marginTop: 32 }}>
+    <section style={{ marginTop: 20 }}>
       <SectionHeader eyebrow="ROUNDS THAT COUNT" title="The 8 best of your last 20" />
       <div style={{ padding: '0 20px' }}>
 
       {/* Chart — full-bleed on page background, no card wrapper */}
-      <div style={{ padding: '4px 0 12px' }}>
+      <div style={{ padding: '0 0 8px' }}>
         <style>{`
           @keyframes pulseHeartbeat {
             0%, 100% { opacity: 0.20; }
