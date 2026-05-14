@@ -61,6 +61,7 @@ export function TournamentDetailPage() {
   const [isRefreshing, setIsRefreshing] = useState(false);
   const touchStartY = useRef(0);
   const PULL_THRESHOLD = 50;
+  const { sentinelRef, paddingTop: stickyPaddingTop } = useStickyHeaderSafeArea();
 
   const handleTouchStart = useCallback((e: React.TouchEvent) => {
     if (window.scrollY <= 0) {
