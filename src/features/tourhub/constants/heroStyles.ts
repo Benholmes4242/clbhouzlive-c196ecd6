@@ -45,6 +45,12 @@ export const HERO_STYLES = {
     height: `calc(${HERO_HEIGHT_EDITORIAL} + env(safe-area-inset-top, 0px))`,
     minHeight: `calc(${HERO_MIN_HEIGHT}px + env(safe-area-inset-top, 0px))`,
   },
+  /** Hero container - sits cleanly below the compact header. No bleed. */
+  containerBelowHeader: {
+    marginTop: 0,
+    height: HERO_HEIGHT,
+    minHeight: HERO_MIN_HEIGHT,
+  },
   /** Content inside hero should use this to stay below notch */
   content: {
     paddingTop: 'env(safe-area-inset-top)',
