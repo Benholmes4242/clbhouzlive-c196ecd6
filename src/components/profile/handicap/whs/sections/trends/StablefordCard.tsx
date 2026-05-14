@@ -178,7 +178,7 @@ export const StablefordCard: React.FC<Props> = ({ scores }) => {
                 alignItems: 'center',
                 justifyContent: 'center',
                 color: '#fff',
-                fontSize: 22,
+                fontSize: 16,
                 fontWeight: 800,
                 letterSpacing: '-0.02em',
                 fontFamily: FONT,
