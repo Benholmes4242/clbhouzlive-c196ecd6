@@ -70,7 +70,7 @@ export async function fetchHandicapTrend(connectionId: string): Promise<WhsHandi
     .limit(1)
     .maybeSingle();
 
-  const latest = latestRow as { play_date: string; handicap_index_at_time: number } | null;
+  const latest = latestRow as unknown as { play_date: string; handicap_index_at_time: number } | null;
 
   if (!latest) {
     return {
@@ -92,7 +92,7 @@ export async function fetchHandicapTrend(connectionId: string): Promise<WhsHandi
     .limit(1)
     .maybeSingle();
 
-  const previous = previousRow as { play_date: string; handicap_index_at_time: number } | null;
+  const previous = previousRow as unknown as { play_date: string; handicap_index_at_time: number } | null;
 
   if (!previous) {
     return {
