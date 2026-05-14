@@ -165,32 +165,16 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
           className="mx-auto flex items-center justify-between px-3 sm:px-4 max-w-5xl"
           style={{ height: `${contentHeight}px` }}
         >
-          {/* Left section: Back Button, Tour Menu Icon, or Logo (fixed width, 44px tap target) */}
+          {/* Left section: Back Button or Logo (fixed width, 44px tap target) */}
           <div className="flex-shrink-0">
             <button
               type="button"
               className="flex items-center gap-2 bg-transparent border-0 transition-transform min-h-[44px] cursor-pointer active:scale-[0.98]"
               onClick={handleLogoClick}
-              onTouchStart={isTourRoute ? prefetchNavMenu : undefined}
-              aria-label={isBackArrowRoute ? "Go back" : isTourRoute ? "Go to tour menu" : "Go to home"}
+              aria-label={isBackArrowRoute ? "Go back" : "Go to home"}
             >
               {isBackArrowRoute ? (
                 <ArrowLeft className="h-6 w-6 text-foreground" />
-              ) : isTourRoute ? (
-                <span className="relative inline-flex">
-                  <NineDotsIcon 
-                    className="text-foreground"
-                    size={28} 
-                  />
-                  {hasLiveTournaments && (
-                    <motion.span
-                      className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 rounded-full border-2 border-background"
-                      style={{ background: 'hsl(var(--destructive))' }}
-                      animate={{ scale: [1, 1.2, 1] }}
-                      transition={{ duration: 2, repeat: Infinity }}
-                    />
-                  )}
-                </span>
               ) : (
                 <img
                   src="/lovable-uploads/29e83040-b5c5-48e4-84d7-3f99640e4a80.png"
