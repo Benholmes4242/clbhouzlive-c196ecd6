@@ -14,10 +14,14 @@ interface SectionHeaderProps {
 /**
  * Pro Shop primitive — editorial section header with kicker, title, optional
  * subhead and action CTA. Used at the top of every rail in the Watch tab.
+ *
+ * Canonical alignment phase: tokens now match Tour Hub section headers (slate
+ * kicker default, 18/800 title, slate-500 sub, ink-bold action). API is
+ * unchanged; consumers inherit the new look automatically.
  */
 function SectionHeaderInner({
   kicker,
-  kickerColor = 'amber',
+  kickerColor = 'slate',
   title,
   sub,
   action,
@@ -37,10 +41,10 @@ function SectionHeaderInner({
         {kicker ? <Kicker color={kickerColor}>{kicker}</Kicker> : null}
         <h2
           style={{
-            fontSize: 20,
+            fontSize: 18,
             fontWeight: 800,
-            lineHeight: 1.15,
-            letterSpacing: '-0.02em',
+            lineHeight: 1.2,
+            letterSpacing: '-0.015em',
             color: '#0F172A',
             margin: 0,
           }}
@@ -50,10 +54,10 @@ function SectionHeaderInner({
         {sub ? (
           <p
             style={{
-              fontSize: 12,
+              fontSize: 13,
               fontWeight: 500,
-              color: 'rgba(15,23,42,0.55)',
-              margin: '4px 0 0',
+              color: '#64748B',
+              margin: '3px 0 0',
               lineHeight: 1.35,
             }}
           >
@@ -74,14 +78,14 @@ function SectionHeaderInner({
             display: 'inline-flex',
             alignItems: 'center',
             gap: 2,
-            fontSize: 12,
-            fontWeight: 600,
-            // Phase 5b: #c97a10 = canonical "amber on white" CTA colour.
-            // It is the AA-contrast pair of brand amber #F7931E (which fails
-            // AA on white). Two ambers, two roles, one brand:
-            //   #F7931E → fills, accents, kickers (decorative)
-            //   #c97a10 → text on white surfaces (legibility)
-            color: '#c97a10',
+            fontSize: 11,
+            fontWeight: 800,
+            letterSpacing: '-0.005em',
+            // Canonical action affordance: ink-bold + chevron. Matches the
+            // pattern used across handicap, Tour Hub, Profile, Search, etc.
+            // The chevron carries the "click me" affordance; the ink colour
+            // ensures AA contrast on white without needing accent text.
+            color: '#0F172A',
             background: 'transparent',
             border: 'none',
             minHeight: 44,
@@ -91,7 +95,7 @@ function SectionHeaderInner({
           }}
         >
           {action.label}
-          <ChevronRight size={14} strokeWidth={2.5} />
+          <ChevronRight size={12} strokeWidth={2.4} />
         </button>
       ) : null}
     </div>
