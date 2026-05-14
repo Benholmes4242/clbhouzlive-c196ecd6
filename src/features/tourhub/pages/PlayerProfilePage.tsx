@@ -192,6 +192,9 @@ export function PlayerProfilePage() {
         {/* Hero */}
         <PlayerHero player={player} playerStats={playerStats ?? null} />
 
+        {/* Sentinel for sticky-header safe-area detection */}
+        <div ref={sentinelRef} aria-hidden style={{ height: 1 }} />
+
         {/* Sticky header — underline tab bar */}
         <div
           style={{
@@ -202,7 +205,8 @@ export function PlayerProfilePage() {
             backdropFilter: 'blur(20px)',
             WebkitBackdropFilter: 'blur(20px)',
             borderBottom: '0.5px solid rgba(15,23,42,0.08)',
-            paddingTop: 'env(safe-area-inset-top, 0px)',
+            paddingTop: stickyPaddingTop,
+            transition: 'padding-top 200ms ease',
           }}
         >
           {/* Back link */}
