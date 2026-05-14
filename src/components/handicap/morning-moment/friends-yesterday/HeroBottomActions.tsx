@@ -65,24 +65,21 @@ const InviteAction: React.FC<{ friend: FriendYesterday }> = ({ friend }) => {
   };
 
   return (
-    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, width: '100%' }}>
-      <span style={HINT}>{sent ? 'Invite sent' : 'Not on Clbhouz yet'}</span>
-      <button
-        type="button"
-        onClick={handle}
-        disabled={sending || sent}
-        style={{
-          ...RIGHT_PILL_BASE,
-          background: 'rgba(247,147,30,0.22)',
-          border: '0.5px solid rgba(247,147,30,0.55)',
-          color: '#FED7AA',
-          cursor: sending || sent ? 'default' : 'pointer',
-          opacity: sending ? 0.7 : 1,
-        }}
-      >
-        {sent ? 'INVITED \u2713' : `INVITE ${fname.toUpperCase()} \u203A`}
-      </button>
-    </div>
+    <button
+      type="button"
+      onClick={handle}
+      disabled={sending || sent}
+      style={{
+        ...RIGHT_PILL_BASE,
+        background: 'rgba(247,147,30,0.22)',
+        border: '0.5px solid rgba(247,147,30,0.55)',
+        color: '#FED7AA',
+        cursor: sending || sent ? 'default' : 'pointer',
+        opacity: sending ? 0.7 : 1,
+      }}
+    >
+      {sent ? 'INVITED \u2713' : `INVITE ${fname.toUpperCase()} \u203A`}
+    </button>
   );
 };
 
@@ -123,33 +120,29 @@ const NudgeAction: React.FC<{ friend: FriendYesterday }> = ({ friend }) => {
   };
 
   return (
-    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, width: '100%' }}>
-      <span style={HINT}>{sent ? 'Nudged this week' : 'WHS not synced'}</span>
-      <button
-        type="button"
-        onClick={handle}
-        disabled={sending || sent}
-        style={{
-          ...RIGHT_PILL_BASE,
-          background: 'rgba(34,197,94,0.22)',
-          border: '0.5px solid rgba(34,197,94,0.55)',
-          color: '#86EFAC',
-          cursor: sending || sent ? 'default' : 'pointer',
-          opacity: sending ? 0.7 : 1,
-        }}
-      >
-        {sent ? 'NUDGED \u2713' : `NUDGE ${fname.toUpperCase()} \u203A`}
-      </button>
-    </div>
+    <button
+      type="button"
+      onClick={handle}
+      disabled={sending || sent}
+      style={{
+        ...RIGHT_PILL_BASE,
+        background: 'rgba(34,197,94,0.22)',
+        border: '0.5px solid rgba(34,197,94,0.55)',
+        color: '#86EFAC',
+        cursor: sending || sent ? 'default' : 'pointer',
+        opacity: sending ? 0.7 : 1,
+      }}
+    >
+      {sent ? 'NUDGED \u2713' : `NUDGE ${fname.toUpperCase()} \u203A`}
+    </button>
   );
 };
-
-interface Props {
   state: HeroState;
   friend: FriendYesterday;
 }
 
 export const HeroBottomActions: React.FC<Props> = ({ state, friend }) => {
+  const isAction = state === 'invite' || state === 'nudge';
   return (
     <div
       style={{
@@ -160,8 +153,8 @@ export const HeroBottomActions: React.FC<Props> = ({ state, friend }) => {
         zIndex: 3,
         display: 'flex',
         alignItems: 'center',
-        justifyContent: 'flex-end',
-        pointerEvents: state === 'invite' || state === 'nudge' ? 'auto' : 'none',
+        justifyContent: isAction ? 'center' : 'flex-end',
+        pointerEvents: isAction ? 'auto' : 'none',
       }}
     >
       {state === 'enriched' && <PassivePill label="SCORECARD" />}
