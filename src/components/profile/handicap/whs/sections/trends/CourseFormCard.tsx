@@ -1,8 +1,9 @@
 import React, { useState, useMemo } from 'react';
-import { MapPin, Trophy } from 'lucide-react';
+import { Trophy } from 'lucide-react';
 import { CourseImageFallback } from '@/components/whs/CourseImageFallback';
 import { useCourseForm } from '@/lib/whs/hooks';
 import type { CourseForm } from '@/lib/whs/types';
+import SectionHeader from '../SectionHeader';
 
 interface Props {
   connectionId: string;
@@ -83,73 +84,10 @@ function deltaColor(d: number): string {
 }
 
 
-const CARD_STYLE: React.CSSProperties = {
-  background: T.cardBg,
-  borderRadius: 16,
-  border: `1px solid ${T.hairline}`,
-  marginBottom: 14,
-  overflow: 'hidden',
+const SECTION_STYLE: React.CSSProperties = {
+  marginTop: 28,
   fontFamily: FONT,
 };
-
-const CardHeader: React.FC<{ sublabel: string }> = ({ sublabel }) => (
-  <div
-    style={{
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'space-between',
-      padding: '14px 16px',
-      borderBottom: `1px solid ${T.hairline}`,
-    }}
-  >
-    <div style={{ display: 'flex', alignItems: 'center', gap: 10, minWidth: 0, flex: 1 }}>
-      <div
-        style={{
-          width: 30,
-          height: 30,
-          borderRadius: 9,
-          background: T.amberTint,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          flexShrink: 0,
-        }}
-      >
-        <MapPin size={15} color={T.amberDeep} strokeWidth={2.2} />
-      </div>
-      <div style={{ flex: 1, minWidth: 0 }}>
-        <p
-          style={{
-            margin: 0,
-            fontSize: 16,
-            fontWeight: 700,
-            color: T.ink,
-            letterSpacing: '-0.015em',
-            fontFamily: FONT,
-            whiteSpace: 'nowrap',
-            overflow: 'hidden',
-            textOverflow: 'ellipsis',
-          }}
-        >
-          Course Form
-        </p>
-        <p
-          style={{
-            margin: '1px 0 0',
-            fontSize: 11,
-            color: T.inkMute,
-            fontFamily: FONT,
-            whiteSpace: 'nowrap',
-            overflow: 'hidden',
-            textOverflow: 'ellipsis',
-          }}
-        >
-          {sublabel}
-        </p>
-      </div>
-    </div>
-  </div>
-);
 
 const ViewToggle: React.FC<{
   activeView: ViewKey;
@@ -161,7 +99,8 @@ const ViewToggle: React.FC<{
     style={{
       display: 'flex',
       padding: 4,
-      margin: '12px 16px 4px',
+      marginTop: 14,
+      marginBottom: 4,
       background: T.slateTint,
       borderRadius: 10,
       gap: 2,
@@ -405,7 +344,7 @@ const CourseList: React.FC<{ courses: CourseForm[]; view: ViewKey }> = ({ course
   const expanded = courses.length === 1;
 
   return (
-    <div style={{ padding: '12px 16px 8px' }}>
+    <div style={{ paddingTop: 12, paddingBottom: 8 }}>
       {courses.map((c, i) => (
         <CourseRow key={c.course_id} course={c} rank={i + 1} expanded={expanded} view={view} />
       ))}
@@ -424,40 +363,47 @@ export const CourseFormCard: React.FC<Props> = ({ connectionId, currentHandicap 
 
   if (isLoading) {
     return (
-      <div style={CARD_STYLE}>
-        <CardHeader sublabel="Loading…" />
-        <div
-          className="animate-pulse"
-          style={{
-            margin: '12px 16px 4px',
-            height: 36,
-            background: T.slateTint,
-            borderRadius: 10,
-          }}
-        />
-        <div style={{ padding: '14px 16px 16px' }}>
-          {Array.from({ length: 3 }).map((_, i) => (
-            <div
-              key={i}
-              className="animate-pulse"
-              style={{
-                height: 56,
-                background: T.slateTint,
-                borderRadius: 4,
-                marginBottom: i < 2 ? 12 : 0,
-              }}
-            />
-          ))}
+      <section style={SECTION_STYLE}>
+        <SectionHeader eyebrow="COURSE FORM" title="Your courses ranked" sub="Loading…" />
+        <div style={{ padding: '0 20px' }}>
+          <div
+            className="animate-pulse"
+            style={{
+              marginTop: 14,
+              marginBottom: 4,
+              height: 36,
+              background: T.slateTint,
+              borderRadius: 10,
+            }}
+          />
+          <div style={{ paddingTop: 14, paddingBottom: 16 }}>
+            {Array.from({ length: 3 }).map((_, i) => (
+              <div
+                key={i}
+                className="animate-pulse"
+                style={{
+                  height: 56,
+                  background: T.slateTint,
+                  borderRadius: 4,
+                  marginBottom: i < 2 ? 12 : 0,
+                }}
+              />
+            ))}
+          </div>
         </div>
-      </div>
+      </section>
     );
   }
 
   if (!data || data.length === 0) {
     return (
-      <div style={CARD_STYLE}>
-        <CardHeader sublabel="Play more rounds to see how each course suits your game" />
-        <div style={{ padding: '24px 16px 28px', textAlign: 'center' }}>
+      <section style={SECTION_STYLE}>
+        <SectionHeader
+          eyebrow="COURSE FORM"
+          title="Your courses ranked"
+          sub="Play more rounds to see how each course suits your game"
+        />
+        <div style={{ padding: '24px 20px 28px', textAlign: 'center' }}>
           <p style={{ margin: 0, fontSize: 13, fontWeight: 700, color: T.ink, fontFamily: FONT }}>
             Add some rounds to get started
           </p>
@@ -465,46 +411,49 @@ export const CourseFormCard: React.FC<Props> = ({ connectionId, currentHandicap 
             We&apos;ll show how you score at each course once you&apos;ve logged a few rounds.
           </p>
         </div>
-      </div>
+      </section>
     );
   }
 
   return (
-    <div style={CARD_STYLE}>
-      <CardHeader sublabel={view.sublabel} />
-      <ViewToggle activeView={activeView} onChange={setActiveView} />
-      <CourseList courses={courses} view={activeView} />
-      {courses.length > 0 && (() => {
-        const top = courses[0];
-        const sign = top.delta < 0 ? 'under' : 'over';
-        const deltaAbs = Math.abs(top.delta).toFixed(1);
-        const role =
-          activeView === 'toughest'
-            ? 'toughest test'
-            : activeView === 'best'
-              ? 'best course'
-              : 'home course';
-        return (
-          <div
-            style={{
-              margin: '4px 16px 16px',
-              padding: '10px 12px',
-              background: T.slateTint,
-              borderRadius: 10,
-            }}
-          >
-            <p style={{ margin: 0, fontSize: 12.5, lineHeight: 1.55, color: T.inkSoft, fontFamily: FONT }}>
-              <span style={{ fontWeight: 700, color: T.ink }}>{top.course_name}</span>{' '}
-              is your {role}.{' '}
-              <span style={{ fontVariantNumeric: 'tabular-nums' }}>
-                {sign === 'over' ? '+' : '\u2212'}{deltaAbs}
-              </span>{' '}
-              vs hcp across {top.rounds_played} {top.rounds_played === 1 ? 'round' : 'rounds'}.
-            </p>
-          </div>
-        );
-      })()}
-    </div>
+    <section style={SECTION_STYLE}>
+      <SectionHeader eyebrow="COURSE FORM" title="Your courses ranked" sub={view.sublabel} />
+      <div style={{ padding: '0 20px' }}>
+        <ViewToggle activeView={activeView} onChange={setActiveView} />
+        <CourseList courses={courses} view={activeView} />
+        {courses.length > 0 && (() => {
+          const top = courses[0];
+          const sign = top.delta < 0 ? 'under' : 'over';
+          const deltaAbs = Math.abs(top.delta).toFixed(1);
+          const role =
+            activeView === 'toughest'
+              ? 'toughest test'
+              : activeView === 'best'
+                ? 'best course'
+                : 'home course';
+          return (
+            <div
+              style={{
+                marginTop: 4,
+                marginBottom: 16,
+                padding: '10px 12px',
+                background: T.slateTint,
+                borderRadius: 10,
+              }}
+            >
+              <p style={{ margin: 0, fontSize: 12.5, lineHeight: 1.55, color: T.inkSoft, fontFamily: FONT }}>
+                <span style={{ fontWeight: 700, color: T.ink }}>{top.course_name}</span>{' '}
+                is your {role}.{' '}
+                <span style={{ fontVariantNumeric: 'tabular-nums' }}>
+                  {sign === 'over' ? '+' : '\u2212'}{deltaAbs}
+                </span>{' '}
+                vs hcp across {top.rounds_played} {top.rounds_played === 1 ? 'round' : 'rounds'}.
+              </p>
+            </div>
+          );
+        })()}
+      </div>
+    </section>
   );
 };
 
