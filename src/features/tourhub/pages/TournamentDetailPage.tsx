@@ -400,11 +400,15 @@ export function TournamentDetailPage() {
           leaderboard={leaderboard ?? null}
         />
 
+        {/* Sentinel for sticky-header safe-area detection */}
+        <div ref={sentinelRef} aria-hidden style={{ height: 1 }} />
+
         {/* STICKY HEADER — ← Back | underline tabs */}
         <div
           className="sticky top-0 z-20"
           style={{
-            paddingTop: 'env(safe-area-inset-top, 0px)',
+            paddingTop: stickyPaddingTop,
+            transition: 'padding-top 200ms ease',
             background: 'rgba(248,250,252,0.97)',
             backdropFilter: 'blur(20px)',
             WebkitBackdropFilter: 'blur(20px)',
