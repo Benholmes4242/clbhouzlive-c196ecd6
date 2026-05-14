@@ -436,29 +436,69 @@ export function ComingUpCalendar() {
   const navigate = useNavigate();
   const { data: tournaments, isLoading, error, refetch } = useUpcomingTournaments(20);
 
-  const { monday, sunday } = useMemo(() => {
-    const m = getMondayOfWeek(new Date());
-    const s = new Date(m);
-    s.setUTCDate(s.getUTCDate() + 6);
-    s.setUTCHours(23, 59, 59, 999);
-    return { monday: m, sunday: s };
-  }, []);
+  const displayWeek = useMemo(() => {
+    const endOfWeek = (m: Date) => {
+      const s = new Date(m);
+      s.setUTCDate(s.getUTCDate() + 6);
+      s.setUTCHours(23, 59, 59, 999);
+      return s;
+    };
+    const currentMonday = getMondayOfWeek(new Date());
+    const currentSunday = endOfWeek(currentMonday);
 
-  const thisWeekEvents = useMemo(() => {
-    if (!tournaments) return [];
-    return tournaments.filter(t => {
+    const list = tournaments ?? [];
+    const currentWeekEvents = list.filter(t => {
       const start = parseUTC(t.startDate);
-      return start >= monday && start <= sunday;
+      return start >= currentMonday && start <= currentSunday;
     });
-  }, [tournaments, monday, sunday]);
 
-  const headline = useMemo(() => pickHeadlineEvent(thisWeekEvents), [thisWeekEvents]);
+    if (currentWeekEvents.length > 0 || list.length === 0) {
+      return {
+        monday: currentMonday,
+        sunday: currentSunday,
+        events: currentWeekEvents,
+        isCurrentWeek: true,
+        daysUntilNext: null as number | null,
+      };
+    }
+
+    const nextEvent = list.find(t => parseUTC(t.startDate) > currentSunday);
+    if (!nextEvent) {
+      return {
+        monday: currentMonday,
+        sunday: currentSunday,
+        events: [],
+        isCurrentWeek: true,
+        daysUntilNext: null as number | null,
+      };
+    }
+
+    const nextMonday = getMondayOfWeek(parseUTC(nextEvent.startDate));
+    const nextSunday = endOfWeek(nextMonday);
+    const nextWeekEvents = list.filter(t => {
+      const start = parseUTC(t.startDate);
+      return start >= nextMonday && start <= nextSunday;
+    });
+    const daysUntilNext = Math.max(0, Math.ceil(
+      (parseUTC(nextEvent.startDate).getTime() - Date.now()) / (1000 * 60 * 60 * 24)
+    ));
+
+    return {
+      monday: nextMonday,
+      sunday: nextSunday,
+      events: nextWeekEvents,
+      isCurrentWeek: false,
+      daysUntilNext,
+    };
+  }, [tournaments]);
+
+  const headline = useMemo(() => pickHeadlineEvent(displayWeek.events), [displayWeek.events]);
   const remaining = useMemo(() => {
     if (!headline) return [];
-    return thisWeekEvents
+    return displayWeek.events
       .filter(e => e.id !== headline.id)
       .sort((a, b) => a.startDate.localeCompare(b.startDate));
-  }, [thisWeekEvents, headline]);
+  }, [displayWeek.events, headline]);
 
   if (isLoading) return <CalendarSkeleton />;
 
@@ -505,8 +545,22 @@ export function ComingUpCalendar() {
         </button>
       </div>
 
-      {/* "This week" headline + sublabel — matches Intelligence h1 styling */}
+      {/* Headline + sublabel — matches Intelligence h1 styling */}
       <div style={{ padding: '0 16px', marginBottom: 14 }}>
+        {!displayWeek.isCurrentWeek && displayWeek.daysUntilNext !== null && (
+          <div style={{
+            fontSize: 10,
+            fontWeight: 700,
+            color: AMBER,
+            letterSpacing: '0.16em',
+            textTransform: 'uppercase',
+            marginBottom: 6,
+          }}>
+            {displayWeek.daysUntilNext === 0
+              ? 'Off this week · Next event today'
+              : `Off this week · Next event in ${displayWeek.daysUntilNext} ${displayWeek.daysUntilNext === 1 ? 'day' : 'days'}`}
+          </div>
+        )}
         <h2 style={{
           fontSize: 18,
           fontWeight: 800,
@@ -515,7 +569,7 @@ export function ComingUpCalendar() {
           lineHeight: 1.2,
           margin: 0,
         }}>
-          This week
+          {displayWeek.isCurrentWeek ? 'This week' : 'Next'}
         </h2>
         <div style={{
           display: 'flex', alignItems: 'baseline', justifyContent: 'space-between',
@@ -525,28 +579,21 @@ export function ComingUpCalendar() {
             fontSize: 13, fontWeight: 700, color: INK,
             letterSpacing: '-0.005em', lineHeight: 1.25,
           }}>
-            {formatWeekRange(monday)}
+            {formatWeekRange(displayWeek.monday)}
           </span>
           <span style={{ fontSize: 11, fontWeight: 600, color: SLATE_400 }}>
-            {thisWeekEvents.length} {thisWeekEvents.length === 1 ? 'event' : 'events'}
+            {displayWeek.events.length} {displayWeek.events.length === 1 ? 'event' : 'events'}
           </span>
         </div>
       </div>
 
-      {/* Empty state */}
-      {thisWeekEvents.length === 0 && (
+      {/* Genuine end-of-schedule fallback */}
+      {displayWeek.events.length === 0 && (
         <div style={{
-          margin: '0 16px', padding: '24px 16px',
-          background: '#fff', borderRadius: 14, border: `1px solid ${SLATE_200}`,
-          textAlign: 'center',
+          margin: '0 16px', padding: '16px',
+          fontSize: 12, color: SLATE_500, textAlign: 'center',
         }}>
-          <Calendar size={20} color={SLATE_400} style={{ marginBottom: 8 }} />
-          <div style={{ fontSize: 13, fontWeight: 700, color: INK, marginBottom: 4 }}>
-            Off week
-          </div>
-          <div style={{ fontSize: 12, color: SLATE_500 }}>
-            No tournaments scheduled this week.
-          </div>
+          No upcoming tournaments scheduled.
         </div>
       )}
 
