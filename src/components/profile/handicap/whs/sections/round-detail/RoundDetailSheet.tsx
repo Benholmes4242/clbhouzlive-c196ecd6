@@ -37,7 +37,7 @@ const AMBER = '#F7931E';
 
 const SheetSkeleton: React.FC = () => (
   <div className="animate-pulse">
-    <div style={{ width: '100%', height: 300, background: 'rgba(15,23,42,0.06)' }} />
+    <div style={{ width: '100%', height: 340, background: 'rgba(15,23,42,0.06)' }} />
     <div style={{ padding: 18 }}>
       <div style={{ height: 180, background: 'rgba(15,23,42,0.04)', borderRadius: 8, marginBottom: 12 }} />
       <div style={{ height: 60, background: 'rgba(15,23,42,0.04)', borderRadius: 8 }} />
