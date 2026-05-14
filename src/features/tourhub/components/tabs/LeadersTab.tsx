@@ -345,15 +345,19 @@ export function LeadersTab() {
         onEyebrowTap={() => navigate('/tourhub?tab=overview', { replace: true })}
       />
 
+      {/* Sentinel for sticky-header safe-area detection */}
+      <div ref={sentinelRef} aria-hidden style={{ height: 1 }} />
+
       {/* Sticky header — back link + group tabs + chip rail + count/search */}
       <div
         className="sticky top-0 z-20"
         style={{
-          paddingTop: 'env(safe-area-inset-top, 0px)',
+          paddingTop,
           background: 'rgba(248,250,252,0.97)',
           backdropFilter: 'blur(20px)',
           WebkitBackdropFilter: 'blur(20px)',
           borderBottom: '0.5px solid rgba(15,23,42,0.08)',
+          transition: 'padding-top 200ms ease',
         }}
       >
         {/* Control row — back link + search button */}
