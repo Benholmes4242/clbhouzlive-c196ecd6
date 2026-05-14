@@ -406,7 +406,7 @@ function CommentsSheet({
           <div className="flex items-center gap-1.5 flex-wrap">
             <span
               className="truncate max-w-[160px]"
-              style={{ fontSize: 13.5, fontWeight: 700, color: INK, letterSpacing: '-0.01em' }}
+              style={{ fontSize: 14, fontWeight: 700, color: INK, letterSpacing: '-0.01em' }}
             >
               {comment.user_name}
             </span>
