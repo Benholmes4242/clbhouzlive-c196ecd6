@@ -41,6 +41,8 @@ export function PlayerProfilePage() {
 
   useMedianStatusBar("dark", "transparent", true, false);
 
+  const { sentinelRef, paddingTop: stickyPaddingTop } = useStickyHeaderSafeArea();
+
   const { data: player, isLoading: playerLoading, refetch } = useTourPlayer(playerId || '');
   const { data: playerStats } = useSinglePlayerStatistics(playerId);
 
