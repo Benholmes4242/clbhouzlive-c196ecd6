@@ -12,6 +12,7 @@ import { formatDistanceToNow } from 'date-fns';
 import { useQueryClient } from '@tanstack/react-query';
 import { cn } from '@/lib/utils';
 import { TourHubShell } from '../components/TourHubShell';
+import { useStickyHeaderSafeArea } from '@/hooks/useStickyHeaderSafeArea';
 import { useTourTournament, useTourLeaderboard } from '../hooks/useTourHubData';
 import { useLeaderboardRealtime } from '../hooks/useLeaderboardRealtime';
 import { useSingleCourseImage } from '../hooks/useCourseImageResolver';
