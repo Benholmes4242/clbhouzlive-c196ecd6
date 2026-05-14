@@ -1,7 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { useNavigate, useLocation, useSearchParams } from "react-router-dom";
 import { Search, ArrowLeft } from 'lucide-react';
-import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { useUnreadNotifications } from '@/hooks/useUnreadNotifications';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
@@ -11,10 +10,7 @@ import { PostingAsMenu } from './PostingAsMenu';
 import GlobalSearchOverlay from '@/components/search/GlobalSearchOverlay';
 import { ActingAsIndicator } from './ActingAsIndicator';
 import { cn } from '@/lib/utils';
-import { NineDotsIcon } from '@/features/tourhub/components/NineDotsIcon';
-import { openTourNav } from '@/features/tourhub/contexts/TourNavContext';
 import { haptic } from '@/utils/haptics';
-import { useLiveTournamentCount, usePrefetchNavMenu } from '@/features/tourhub/hooks/useNavMenuData';
 
 interface CompactHeaderProps {
   className?: string;
