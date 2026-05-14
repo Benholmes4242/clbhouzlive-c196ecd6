@@ -3,7 +3,7 @@ import { useFriendsActivity } from '@/lib/whs/hooks';
 import SectionHeader from '../SectionHeader';
 import Paged8 from '../_shared/Paged8';
 import FriendRoundCard from './FriendRoundCard';
-import FriendRoundSheet from './FriendRoundSheet';
+import RoundDetailSheet from '../round-detail/RoundDetailSheet';
 import type { WhsFriendActivityWithImage } from '@/lib/whs/types';
 
 interface Props {
@@ -80,7 +80,8 @@ export const RecentlyPlayedFeed: React.FC<Props> = ({ ownerUserId }) => {
         />
       )}
 
-      <FriendRoundSheet
+      <RoundDetailSheet
+        variant="friend"
         activity={sheetActivity}
         open={!!sheetActivity}
         onClose={() => setSheetActivity(null)}
