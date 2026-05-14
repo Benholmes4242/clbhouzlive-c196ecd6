@@ -22,7 +22,7 @@ const relativeDay = (iso: string) => {
 };
 
 const SectionEyebrow: React.FC<{ label: string }> = ({ label }) => (
-  <div style={{ marginBottom: 6, padding: '0 16px 8px' }}>
+  <div style={{ marginBottom: 6, padding: '0 16px 12px' }}>
     <span
       style={{
         fontSize: 9,
@@ -58,7 +58,7 @@ export const LastRoundCard: React.FC<Props> = ({ connectionId }) => {
 
   if (isLoading) {
     return (
-      <section style={{ marginTop: 28 }}>
+      <section style={{ marginTop: 32 }}>
         <SectionEyebrow label="LAST ROUND" />
         <div style={{ padding: '0 20px' }}>
           <div className="space-y-2 animate-pulse">
@@ -71,7 +71,7 @@ export const LastRoundCard: React.FC<Props> = ({ connectionId }) => {
 
   if (!lastRound) {
     return (
-      <section style={{ marginTop: 28 }}>
+      <section style={{ marginTop: 32 }}>
         <SectionEyebrow label="LAST ROUND" />
         <div style={{ padding: '0 20px' }}>
           <p style={{ fontSize: 14, color: INK_55, fontFamily: FONT_GEIST }}>
@@ -154,7 +154,7 @@ export const LastRoundCard: React.FC<Props> = ({ connectionId }) => {
 
   return (
     <>
-      <section style={{ marginTop: 28, fontFamily: FONT_GEIST }}>
+      <section style={{ marginTop: 32, fontFamily: FONT_GEIST }}>
         <SectionEyebrow label="LAST ROUND" />
         <div style={{ padding: '0 20px' }}>
           <RoundCardShell

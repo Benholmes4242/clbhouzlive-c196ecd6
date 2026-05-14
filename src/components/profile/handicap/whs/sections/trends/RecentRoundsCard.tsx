@@ -156,7 +156,7 @@ export const RecentRoundsCard: React.FC<Props> = ({ connectionId }) => {
   };
 
   return (
-    <section style={{ marginTop: 28, fontFamily: FONT }}>
+    <section style={{ marginTop: 32, fontFamily: FONT }}>
       <SectionHeader
         eyebrow="RECENT ROUNDS"
         title={`${rounds.length} ${rounds.length === 1 ? 'round' : 'rounds'} tracked`}
