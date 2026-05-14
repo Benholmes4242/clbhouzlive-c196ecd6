@@ -17,6 +17,7 @@ import { useElitePlayers } from '../../hooks/useElitePlayers';
 import { useChampionStreak } from '../../hooks/useChampionStreak';
 import { useRecentPlayerResults } from '../../hooks/useRecentPlayerResults';
 import { useDebouncedValue } from '@/hooks/useDebouncedValue';
+import { useStickyHeaderSafeArea } from '@/hooks/useStickyHeaderSafeArea';
 import { LEADER_CATEGORIES, getCategoryByKey } from '../leaders/constants';
 import { LeadersCategorySheet } from '../leaders/LeadersCategorySheet';
 import { LeadersMasthead } from '../leaders/LeadersMasthead';
