@@ -380,7 +380,7 @@ const HeroHandicapCard: React.FC<Props> = ({ connection }) => {
   // ── Loading state ───────────────────────────────────────────────────────
   if (trendLoading || historyLoading) {
     return (
-      <section style={{ padding: '24px 12px 20px', marginBottom: 24 }}>
+      <section style={{ padding: '24px 12px 20px' }}>
         <div style={{ height: 12, width: 80, background: INK_10, borderRadius: 2, marginBottom: 14 }} />
         <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 14 }}>
           <div style={{ height: RING_SIZE, width: RING_SIZE, background: INK_06, borderRadius: '50%' }} />
