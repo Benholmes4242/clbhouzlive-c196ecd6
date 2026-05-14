@@ -280,7 +280,7 @@ export function EditorialUpcomingHero({
       display: 'flex',
       flexDirection: 'column',
       background: lightBg,
-      paddingTop: 'calc(env(safe-area-inset-top, 0px) + 28px)',
+      paddingTop: 'calc(max(env(safe-area-inset-top, 0px), 47px) + 28px)',
       paddingInline: 20,
       paddingBottom: 16,
       boxSizing: 'border-box',
