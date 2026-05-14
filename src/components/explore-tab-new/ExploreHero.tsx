@@ -112,7 +112,7 @@ function ExploreHeroInner({ userId, mood }: ExploreHeroProps) {
               gap: 5,
               fontSize: 10,
               fontWeight: 800,
-              letterSpacing: '0.12em',
+              letterSpacing: '0.14em',
               textTransform: 'uppercase',
               color: '#FFFFFF',
               background: 'rgba(0, 0, 0, 0.28)',
@@ -162,7 +162,7 @@ function ExploreHeroInner({ userId, mood }: ExploreHeroProps) {
               style={{
                 fontSize: 10,
                 fontWeight: 700,
-                letterSpacing: '0.1em',
+                letterSpacing: '0.14em',
                 textTransform: 'uppercase',
                 color: 'rgba(255,255,255,0.75)',
                 margin: '0 0 6px',
@@ -174,7 +174,7 @@ function ExploreHeroInner({ userId, mood }: ExploreHeroProps) {
           <h2
             style={{
               fontSize: 28,
-              fontWeight: 900,
+              fontWeight: 800,
               letterSpacing: '-0.02em',
               lineHeight: 1.05,
               margin: 0,

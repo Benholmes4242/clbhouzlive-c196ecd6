@@ -98,11 +98,11 @@ function ExploreEchoCTAInner({ mood }: ExploreEchoCTAProps) {
       <div style={{ padding: '0 0 12px' }}>
         <p
           style={{
-            fontSize: 10,
-            fontWeight: 700,
-            letterSpacing: '0.08em',
+            fontSize: 9,
+            fontWeight: 800,
+            letterSpacing: '0.16em',
             textTransform: 'uppercase',
-            color: '#F7931E',
+            color: '#64748B',
             margin: 0,
             lineHeight: 1,
           }}
@@ -112,11 +112,11 @@ function ExploreEchoCTAInner({ mood }: ExploreEchoCTAProps) {
         <h2
           style={{
             fontSize: 18,
-            fontWeight: 900,
-            letterSpacing: '-0.02em',
+            fontWeight: 800,
+            letterSpacing: '-0.015em',
             color: '#0F172A',
-            margin: '4px 0 0',
-            lineHeight: 1.15,
+            margin: '6px 0 0',
+            lineHeight: 1.2,
           }}
         >
           Echo, your course concierge
@@ -173,8 +173,8 @@ function ExploreEchoCTAInner({ mood }: ExploreEchoCTAProps) {
           <p
             style={{
               fontSize: 10,
-              fontWeight: 700,
-              letterSpacing: '0.08em',
+              fontWeight: 800,
+              letterSpacing: '0.14em',
               textTransform: 'uppercase',
               color: ECHO_AMBER_INK,
               margin: 0,
