@@ -62,15 +62,8 @@ export function OverviewPageV3() {
   }, []);
 
   const { data: tickerData } = useAllToursTickerData();
-  const activeStatus = activeTournamentId
-    ? (tickerData?.live.find(c => c.id === activeTournamentId) ? 'live'
-      : tickerData?.completed.find(c => c.id === activeTournamentId) ? 'completed'
-      : tickerData?.upcoming.find(c => c.id === activeTournamentId) ? 'upcoming'
-      : null)
-    : null;
-  const heroContainerStyle = activeStatus === 'live' || activeStatus === 'completed'
-    ? HERO_STYLES.containerEditorial
-    : HERO_STYLES.containerNoHeader;
+  void tickerData;
+  const heroContainerStyle = HERO_STYLES.containerBelowHeader;
 
 
   return (
