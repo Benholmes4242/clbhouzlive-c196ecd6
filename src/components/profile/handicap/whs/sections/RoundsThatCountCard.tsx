@@ -244,7 +244,7 @@ export const RoundsThatCountCard: React.FC<Props> = ({ connectionId, currentHand
               <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
                 <span style={{
                   width: 8, height: 8, borderRadius: '50%',
-                  background: AMBER, border: `1.5px solid ${AMBER}`,
+                  background: AMBER_GOLD_GRAD, border: 'none',
                 }} />
                 COUNTER
               </span>
