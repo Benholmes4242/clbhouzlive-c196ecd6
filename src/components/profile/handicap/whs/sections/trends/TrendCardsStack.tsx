@@ -197,7 +197,6 @@ export const TrendCardsStack: React.FC<Props> = ({ connectionId, currentHandicap
             <>
               <StablefordCard scores={scores ?? []} />
               <TrendNarrativeSection connectionId={connectionId} />
-              <CourseFormCard connectionId={connectionId} currentHandicap={currentHandicap} />
             </>
           )}
         </>
