@@ -1,5 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { formatDistanceToNow } from 'date-fns';
+import { ChevronRight } from 'lucide-react';
 import { useNetworkActivity, type NetworkFriend } from '@/hooks/useNetworkActivity';
 
 interface OnCourseNowStripProps {
