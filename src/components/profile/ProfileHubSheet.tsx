@@ -85,8 +85,7 @@ function ProfileHubSheetSkeleton() {
 
       {/* ── Switch Profile skeleton ── */}
       <div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8, paddingTop: 14, paddingBottom: 8 }}>
-          <div style={{ width: 3, height: 12, borderRadius: 1, background: 'rgba(15,23,42,0.08)', flexShrink: 0 }} />
+        <div style={{ paddingTop: 14, paddingBottom: 8 }}>
           <Skeleton className="h-2.5 w-24 rounded" />
         </div>
         <div className="flex gap-3 overflow-hidden">
