@@ -83,7 +83,7 @@ export const FriendsLeaderboardSection: React.FC<Props> = ({ userId }) => {
   const yourHcp = activeRows[yourActiveIdx]?.friend_handicap_index ?? null;
 
   return (
-    <section style={{ padding: '24px 0 8px' }}>
+    <section style={{ marginTop: 32 }}>
       <SectionHeader
         eyebrow="LEADERBOARD"
         title={

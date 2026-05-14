@@ -43,7 +43,7 @@ export const RecentlyActiveRail: React.FC<Props> = ({ userId }) => {
   const cutoff = Date.now() - SEVEN_DAYS_MS;
 
   return (
-    <section style={{ padding: '20px 0 8px' }}>
+    <section style={{ marginTop: 32 }}>
       <SectionHeader
         eyebrow="RECENTLY ACTIVE"
         title="Your circle"
@@ -118,7 +118,7 @@ export const RecentlyActiveRail: React.FC<Props> = ({ userId }) => {
 };
 
 const RecentlyActiveSkeleton: React.FC = () => (
-  <section style={{ padding: '20px 0 8px' }}>
+  <section style={{ marginTop: 32 }}>
     <SectionHeader eyebrow="RECENTLY ACTIVE" title="Your circle" />
     <div style={{ display: 'flex', gap: 14, padding: '4px 20px 6px', overflow: 'hidden' }}>
       {Array.from({ length: 6 }).map((_, i) => (

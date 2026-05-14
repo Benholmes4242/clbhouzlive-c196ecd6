@@ -100,7 +100,7 @@ export const InviteToClbhouzV2: React.FC<Props> = ({ ownerUserId }) => {
   // Empty / no-invitable state
   if (!friendsLoading && invitable.length === 0) {
     return (
-      <section id="invite-to-clbhouz-section" style={{ marginTop: 24 }}>
+      <section id="invite-to-clbhouz-section" style={{ marginTop: 32 }}>
         <SectionHeader
           eyebrow="MAKE YOUR FEED LOUDER"
           title="Everyone's here"
@@ -117,7 +117,7 @@ export const InviteToClbhouzV2: React.FC<Props> = ({ ownerUserId }) => {
   }
 
   return (
-    <section id="invite-to-clbhouz-section" style={{ marginTop: 28 }}>
+    <section id="invite-to-clbhouz-section" style={{ marginTop: 32 }}>
       <SectionHeader
         eyebrow="MAKE YOUR FEED LOUDER"
         title="Friends on England Golf"

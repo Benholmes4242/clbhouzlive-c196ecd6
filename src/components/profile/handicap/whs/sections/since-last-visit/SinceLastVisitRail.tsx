@@ -38,7 +38,7 @@ export const SinceLastVisitRail: React.FC<Props> = ({ userId }) => {
 
   if (isLoading) {
     return (
-      <section style={{ marginBottom: 24 }}>
+      <section style={{ marginTop: 32 }}>
         <SectionHeader eyebrow="Your circle" title="Since last visit" sub="Loading…" />
         <div style={{ padding: '0 20px' }}>
           <div
@@ -68,7 +68,7 @@ export const SinceLastVisitRail: React.FC<Props> = ({ userId }) => {
     : 'Since your last visit';
 
   return (
-    <section style={{ marginBottom: 24, fontFamily: FONT }}>
+    <section style={{ marginTop: 32, fontFamily: FONT }}>
       <SectionHeader eyebrow="Your circle" title={headerTitle} sub={headerSub} />
       <div
         style={{
