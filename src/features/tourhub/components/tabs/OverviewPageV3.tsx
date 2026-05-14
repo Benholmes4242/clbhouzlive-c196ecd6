@@ -35,16 +35,11 @@ import ScrollToTopGlass from '@/components/common/ScrollToTopGlass';
 export function OverviewPageV3() {
   const { isOnline } = useNetworkStatus();
 
-  // Prevent pull-down overscroll bounce on this immersive page
-  usePreventOverscroll();
-
   // Parallax scale + fade on hero as user scrolls past
   const { scrollY } = useScroll();
   const heroOpacity = useTransform(scrollY, [0, 120], [1, 0.85]);
   const heroScale = useTransform(scrollY, [0, 120], [1, 0.97]);
 
-  // Set transparent status bar with WHITE icons for dark hero image
-  useMedianStatusBar("dark", "transparent", true, false);
 
   // ── Phase A: Hero ↔ Ticker shared active-tournament state ──
   // SINGLE SOURCE OF TRUTH: HeroCarousel emits its current slide id upward via
