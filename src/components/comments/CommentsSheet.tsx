@@ -714,7 +714,7 @@ function CommentsSheet({
                           style={{
                             fontSize: 13,
                             fontWeight: 500,
-                            color: isActive ? 'rgba(15,23,42,0.5)' : INK_SUBTLE,
+                            color: isActive ? '#64748B' : INK_SUBTLE,
                             lineHeight: 1.2,
                           }}
                         >
