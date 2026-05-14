@@ -218,6 +218,7 @@ interface StreakCardProps {
   sub: string;
   color: string;
   colorTint: string;
+  gradient?: string;
   icon: 'flame' | 'trending-down' | 'shield';
 }
 
