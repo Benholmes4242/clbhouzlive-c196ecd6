@@ -184,7 +184,7 @@ export function TournamentHero({ tournament, imageUrl, leader, leaderboard }: To
       <div
         style={{
           position: 'relative',
-          height: 'calc(220px + max(env(safe-area-inset-top, 0px), 47px))',
+          height: '220px',
           overflow: 'hidden',
         }}
       >
