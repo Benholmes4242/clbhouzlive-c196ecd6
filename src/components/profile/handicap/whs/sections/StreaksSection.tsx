@@ -285,7 +285,7 @@ const StreakCard: React.FC<StreakCardProps> = ({
           style={{
             padding: '3px 9px',
             borderRadius: 99,
-            background: isActive ? color : INK_10,
+            background: isActive ? fillBg : INK_10,
             color: isActive ? '#fff' : INK_55,
             fontSize: 9,
             fontWeight: 800,
