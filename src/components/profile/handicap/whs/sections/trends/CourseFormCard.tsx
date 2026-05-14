@@ -354,12 +354,13 @@ const CourseList: React.FC<{ courses: CourseForm[]; view: ViewKey }> = ({ course
   );
 };
 
-export const CourseFormCard: React.FC<Props> = ({ connectionId, currentHandicap }) => {
+export const CourseFormCard: React.FC<Props> = ({ connectionId, currentHandicap, topMargin }) => {
   const { data, isLoading } = useCourseForm(connectionId, currentHandicap);
   const [activeView, setActiveView] = useState<ViewKey>('best');
 
   const view = VIEWS[activeView];
   const courses = useMemo(() => (data ? view.select(data) : []), [data, view]);
+  const sectionStyle: React.CSSProperties = { ...SECTION_STYLE, marginTop: topMargin ?? 32 };
 
   if (currentHandicap === null || currentHandicap === undefined) return null;
 
