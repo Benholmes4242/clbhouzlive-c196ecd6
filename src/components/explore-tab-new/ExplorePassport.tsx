@@ -1,6 +1,7 @@
 import { memo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useUserPassport } from './hooks/useUserPassport';
+import { ExploreSectionHeader } from './ExploreSectionHeader';
 
 interface ExplorePassportProps {
   userId: string | undefined;
@@ -63,28 +64,19 @@ function ExplorePassportInner({ userId }: ExplorePassportProps) {
       : 'Lifetime totals';
 
   return (
-    <section style={{ padding: '24px 16px 0' }}>
-      <div style={{ padding: '0 0 12px' }}>
-        <p
-          style={{
-            fontSize: 10,
-            fontWeight: 700,
-            letterSpacing: '0.08em',
-            textTransform: 'uppercase',
-            color: '#F7931E',
-            margin: 0,
-            lineHeight: 1,
-          }}
-        >
-          Your Journey
-        </p>
-        <h2 style={{ fontSize: 18, fontWeight: 900, letterSpacing: '-0.02em', color: '#0F172A', margin: '4px 0 0', lineHeight: 1.15 }}>
-          Season passport
-        </h2>
-        <p style={{ fontSize: 12, color: 'rgba(15,23,42,0.55)', margin: '2px 0 0', fontWeight: 500 }}>
-          {sinceLabel}
-        </p>
-      </div>
+    <section>
+      <ExploreSectionHeader
+        kicker="Your Journey"
+        title="Season passport"
+        sub={sinceLabel}
+      />
+      <div style={{ padding: '0 16px' }}>
+      <ExploreSectionHeader
+        kicker="Your Journey"
+        title="Season passport"
+        sub={sinceLabel}
+        paddingX={16}
+      />
       <div
         style={{
           background: 'linear-gradient(135deg, #0F4A3A 0%, #1A6A54 100%)',
