@@ -63,7 +63,7 @@ export const MiniGlass: React.FC<Props> = ({ gross, diffStr }) => {
           {hasGross ? gross : '\u2014'}
         </span>
       </div>
-      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
         <span
           style={{
             fontSize: 8,
@@ -73,6 +73,7 @@ export const MiniGlass: React.FC<Props> = ({ gross, diffStr }) => {
             textTransform: 'uppercase',
             marginBottom: 1,
             lineHeight: 1,
+            textAlign: 'center',
           }}
         >
           DIFF
@@ -86,6 +87,7 @@ export const MiniGlass: React.FC<Props> = ({ gross, diffStr }) => {
             fontVariantNumeric: 'tabular-nums',
             letterSpacing: '-0.02em',
             lineHeight: 1,
+            textAlign: 'center',
           }}
         >
           {hasDiff ? diffStr : '\u2014'}
