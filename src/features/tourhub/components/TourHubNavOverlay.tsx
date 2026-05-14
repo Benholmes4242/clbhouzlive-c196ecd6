@@ -548,7 +548,7 @@ export function TourHubNavOverlay({
                           <p style={{ color: '#0f172a', fontSize: 11, fontWeight: 700, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', margin: 0 }}>
                             {lastName}
                           </p>
-                          <p style={{ color: '#64748b', fontSize: 9, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', margin: 0 }}>
+                          <p style={{ color: '#64748B', fontSize: 9, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', margin: 0 }}>
                             {country || 'Unknown'}
                           </p>
                         </div>
