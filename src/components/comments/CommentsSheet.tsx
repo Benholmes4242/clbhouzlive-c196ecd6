@@ -454,9 +454,9 @@ function CommentsSheet({
                   requestAnimationFrame(() => textareaRef.current?.focus());
                 }}
                 style={{
-                  fontSize: 11.5,
+                  fontSize: 11,
                   fontWeight: 600,
-                  color: 'rgba(15,23,42,0.5)',
+                  color: '#64748B',
                   background: 'none',
                   border: 0,
                   cursor: 'pointer',
