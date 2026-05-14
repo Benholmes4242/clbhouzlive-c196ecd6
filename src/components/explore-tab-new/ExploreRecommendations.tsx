@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useExploreRecommendations, type ExploreRecRow } from './hooks/useExploreRecommendations';
 import type { ExploreMoodId } from './hooks/useExploreMood';
 import clbhouzLogo from '@/assets/clbhouz-logo.png';
+import { ExploreSectionHeader } from './ExploreSectionHeader';
 
 interface ExploreRecommendationsProps {
   userId: string | undefined;
