@@ -528,6 +528,7 @@ export const StreaksSection: React.FC<Props> = ({ connectionId, userId }) => {
           sub="Rounds without your handicap going up"
           color={AMBER}
           colorTint={AMBER_14}
+          gradient="linear-gradient(135deg, #F59E0B 0%, #FBBF24 100%)"
           icon="flame"
         />
         <StreakCard
@@ -536,6 +537,7 @@ export const StreaksSection: React.FC<Props> = ({ connectionId, userId }) => {
           sub="Consecutive rounds dropping handicap"
           color="#22C55E"
           colorTint="rgba(34,197,94,0.12)"
+          gradient="linear-gradient(135deg, #15803D 0%, #4ADE80 100%)"
           icon="trending-down"
         />
         <StreakCard
@@ -544,6 +546,7 @@ export const StreaksSection: React.FC<Props> = ({ connectionId, userId }) => {
           sub="Consecutive rounds being counted"
           color="#7C3AED"
           colorTint="rgba(124,58,237,0.12)"
+          gradient="linear-gradient(135deg, #6D28D9 0%, #A78BFA 100%)"
           icon="shield"
         />
       </div>
