@@ -1,18 +1,19 @@
 import React from 'react';
 import TrendCardsStack from '../sections/trends/TrendCardsStack';
+import WhereYouStandSection from '../sections/WhereYouStandSection';
 import EchoInsightsCard from '../sections/EchoInsightsCard';
 
 interface Props {
   connectionId: string;
   userId: string;
   currentHandicap: number | null;
-  /** When true, hides personal-only sections (Echo Insights). */
+  /** When true, hides personal-only sections (Echo Insights, Where You Stand). */
   readOnly?: boolean;
 }
 
 export const TrendsView: React.FC<Props> = ({
   connectionId,
-  userId: _userId,
+  userId,
   currentHandicap,
   readOnly = false,
 }) => {
@@ -24,6 +25,7 @@ export const TrendsView: React.FC<Props> = ({
     >
       <TrendCardsStack connectionId={connectionId} currentHandicap={currentHandicap} splitAt="hero-only" />
       <TrendCardsStack connectionId={connectionId} currentHandicap={currentHandicap} splitAt="rest" />
+      {!readOnly && <WhereYouStandSection userId={userId} />}
       {!readOnly && <EchoInsightsCard connectionId={connectionId} />}
     </div>
   );

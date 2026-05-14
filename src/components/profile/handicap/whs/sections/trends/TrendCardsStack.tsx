@@ -4,7 +4,7 @@ import { useAllScores } from '@/lib/whs/hooks';
 import SectionHeader from '../SectionHeader';
 import HandicapProjectionCard from './HandicapProjectionCard';
 import StablefordCard from './StablefordCard';
-import CourseFormCard from './CourseFormCard';
+
 import { predictHandicap, VERDICT_META } from './predictHandicap';
 import TrendNarrativeSection from './TrendNarrativeSection';
 
@@ -197,7 +197,6 @@ export const TrendCardsStack: React.FC<Props> = ({ connectionId, currentHandicap
             <>
               <StablefordCard scores={scores ?? []} />
               <TrendNarrativeSection connectionId={connectionId} />
-              <CourseFormCard connectionId={connectionId} currentHandicap={currentHandicap} />
             </>
           )}
         </>
