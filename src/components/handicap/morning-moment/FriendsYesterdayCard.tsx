@@ -83,7 +83,7 @@ const BreakdownRow: React.FC<BreakdownRowProps> = ({ data, label = null }) => {
           <div style={{
             display: 'inline-flex', alignItems: 'center', gap: 3,
             padding: '2px 6px', borderRadius: 6,
-            background: `linear-gradient(135deg, ${T.gold}, ${T.amber})`,
+            background: `linear-gradient(135deg, #F59E0B 0%, #FBBF24 100%)`,
             color: '#fff', fontSize: 9, fontWeight: 800, letterSpacing: '0.08em',
           }}>
             <Sparkles size={9} strokeWidth={2.4} />
