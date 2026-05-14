@@ -207,7 +207,7 @@ export function CollegeProfilePage() {
       <div style={{
         position: 'relative',
         background: '#F8FAFC',
-        paddingTop: 'max(env(safe-area-inset-top, 0px), 47px)',
+        paddingTop: 0,
         paddingLeft: 16,
         paddingRight: 16,
         paddingBottom: 16,
