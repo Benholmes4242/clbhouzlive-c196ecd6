@@ -81,7 +81,7 @@ const _RoundCardBody: React.FC<RoundCardBodyProps> = ({
         padding: '8px 16px 10px',
         display: 'flex',
         flexDirection: 'column',
-        gap: 10,
+        gap: 2,
         fontFamily: FONT_GEIST,
         background: '#fff',
       }}
