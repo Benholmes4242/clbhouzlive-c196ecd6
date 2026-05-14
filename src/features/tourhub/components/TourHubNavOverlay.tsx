@@ -524,7 +524,7 @@ export function TourHubNavOverlay({
                         <span
                           style={{
                             fontSize: 13, fontWeight: 800,
-                            color: isFirst ? '#F7931E' : 'rgba(0,0,0,0.3)',
+                            color: isFirst ? '#F7931E' : '#94A3B8',
                             minWidth: 14,
                             fontVariantNumeric: 'tabular-nums',
                             flexShrink: 0,
