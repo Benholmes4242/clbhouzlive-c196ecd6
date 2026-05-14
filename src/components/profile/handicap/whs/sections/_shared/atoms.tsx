@@ -199,7 +199,7 @@ export const EchoCallout: React.FC<EchoCalloutProps> = ({
           width: 32,
           height: 32,
           borderRadius: 10,
-          background: AMBER,
+          background: 'linear-gradient(135deg, #F59E0B 0%, #FBBF24 100%)',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
