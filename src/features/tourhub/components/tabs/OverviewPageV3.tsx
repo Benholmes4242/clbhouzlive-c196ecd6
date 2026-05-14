@@ -100,7 +100,7 @@ export function OverviewPageV3() {
           style={{ ...heroContainerStyle, maxWidth: 960, opacity: heroOpacity, scale: heroScale }}
         >
           <HeroCarousel
-            hasHeader={false}
+            hasHeader={true}
             mode="overview"
             activeTournamentId={activeTournamentId}
             onActiveChange={handleHeroActiveChange}
