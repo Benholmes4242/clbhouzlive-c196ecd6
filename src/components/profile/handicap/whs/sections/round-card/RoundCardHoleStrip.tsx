@@ -16,6 +16,7 @@ const INK_20 = 'rgba(15,23,42,0.20)';
 const INK_55 = 'rgba(15,23,42,0.55)';
 const INK_85 = 'rgba(15,23,42,0.85)';
 const AMBER_INK = '#C97211';
+const AMBER_GRAD = 'url(#hsAmberGoldStroke)';
 const FONT_GEIST = 'Geist, system-ui, -apple-system, BlinkMacSystemFont, sans-serif';
 const STRIP_STROKE = 1.4;
 
@@ -82,9 +83,9 @@ const HoleCell: React.FC<{
   if (score != null) {
     const diff = score - par;
     if (score === 1 || diff <= -2) {
-      shape = 'circle'; depth = 2; stroke = AMBER_INK; numeralColor = AMBER_INK;
+      shape = 'circle'; depth = 2; stroke = AMBER_GRAD; numeralColor = AMBER_INK;
     } else if (diff === -1) {
-      shape = 'circle'; depth = 1; stroke = AMBER_INK; numeralColor = AMBER_INK;
+      shape = 'circle'; depth = 1; stroke = AMBER_GRAD; numeralColor = AMBER_INK;
     } else if (diff === 0) {
       shape = 'square'; depth = 1; stroke = INK_20;
     } else if (diff === 1) {
@@ -261,6 +262,14 @@ export const RoundCardHoleStrip: React.FC<{ holes: HoleRow[] }> = ({ holes }) =>
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+      <svg width={0} height={0} style={{ position: 'absolute' }} aria-hidden>
+        <defs>
+          <linearGradient id="hsAmberGoldStroke" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stopColor="#F59E0B" />
+            <stop offset="100%" stopColor="#FBBF24" />
+          </linearGradient>
+        </defs>
+      </svg>
       <NineRow label="OUT" holes={front9} />
       {back9.length > 0 && <NineRow label="IN" holes={back9} />}
     </div>

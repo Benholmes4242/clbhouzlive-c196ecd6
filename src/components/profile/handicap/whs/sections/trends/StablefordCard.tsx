@@ -86,10 +86,14 @@ export const StablefordCard: React.FC<Props> = ({ scores }) => {
     scope === '90d' ? 'vs prior 90D' :
     null;
 
+  const GREEN_GRAD = 'linear-gradient(90deg, #15803D 0%, #4ADE80 100%)';
+  const AMBER_GRAD = 'linear-gradient(90deg, #F59E0B 0%, #FBBF24 100%)';
+  const RED_GRAD = 'linear-gradient(90deg, #991B1B 0%, #DC2626 100%)';
+
   const segs = [
-    { count: dist.inZoneCount, color: T.green },
-    { count: dist.solidCount, color: T.amber },
-    { count: dist.offDayCount, color: T.red },
+    { count: dist.inZoneCount, color: T.green, gradient: GREEN_GRAD },
+    { count: dist.solidCount, color: T.amber, gradient: AMBER_GRAD },
+    { count: dist.offDayCount, color: T.red, gradient: RED_GRAD },
   ].filter((s) => s.count > 0);
 
   return (
@@ -168,7 +172,7 @@ export const StablefordCard: React.FC<Props> = ({ scores }) => {
               key={i}
               style={{
                 flex: s.count,
-                background: s.color,
+                background: s.gradient,
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
@@ -209,9 +213,9 @@ export const StablefordCard: React.FC<Props> = ({ scores }) => {
           padding: '4px 20px 14px',
         }}
       >
-        <SummaryCell color={T.green} label="IN THE ZONE" count={dist.inZoneCount} pct={dist.inZonePct} range="36+" />
-        <SummaryCell color={T.amber} label="SOLID" count={dist.solidCount} pct={dist.solidPct} range="33–35" />
-        <SummaryCell color={T.red} label="OFF DAY" count={dist.offDayCount} pct={dist.offDayPct} range="<33" />
+        <SummaryCell color={T.green} accent={GREEN_GRAD} label="IN THE ZONE" count={dist.inZoneCount} pct={dist.inZonePct} range="36+" />
+        <SummaryCell color={T.amber} accent={AMBER_GRAD} label="SOLID" count={dist.solidCount} pct={dist.solidPct} range="33–35" />
+        <SummaryCell color={T.red} accent={RED_GRAD} label="OFF DAY" count={dist.offDayCount} pct={dist.offDayPct} range="<33" />
       </div>
 
       <StablefordDetailSheet open={sheetOpen} onClose={() => setSheetOpen(false)} dist={dist} />
@@ -293,13 +297,14 @@ const CardHeader: React.FC<CardHeaderProps> = ({ scope, setScope, onOpenSheet })
 
 interface SummaryCellProps {
   color: string;
+  accent?: string;
   label: string;
   count: number;
   pct: number;
   range: string;
 }
 
-const SummaryCell: React.FC<SummaryCellProps> = ({ color, label, count, pct, range }) => (
+const SummaryCell: React.FC<SummaryCellProps> = ({ color, accent, label, count, pct, range }) => (
   <div
     style={{
       borderRadius: 10,
@@ -309,7 +314,7 @@ const SummaryCell: React.FC<SummaryCellProps> = ({ color, label, count, pct, ran
       overflow: 'hidden',
     }}
   >
-    <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 3, background: color }} />
+    <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 3, background: accent ?? color }} />
     <p
       style={{
         margin: '4px 0 6px',

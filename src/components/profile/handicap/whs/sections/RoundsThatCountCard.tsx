@@ -25,6 +25,7 @@ const AMBER_DEEP = '#C97211';
 const AMBER_TINT_06 = 'rgba(247,147,30,0.06)';
 const AMBER_TINT_08 = 'rgba(247,147,30,0.08)';
 const AMBER_BORDER = 'rgba(247,147,30,0.30)';
+const AMBER_GOLD_GRAD = 'linear-gradient(135deg, #F59E0B 0%, #FBBF24 100%)';
 const GREEN = '#059669';
 const RED = '#9F1D1D';
 
@@ -243,7 +244,7 @@ export const RoundsThatCountCard: React.FC<Props> = ({ connectionId, currentHand
               <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
                 <span style={{
                   width: 8, height: 8, borderRadius: '50%',
-                  background: AMBER, border: `1.5px solid ${AMBER}`,
+                  background: AMBER_GOLD_GRAD, border: 'none',
                 }} />
                 COUNTER
               </span>
@@ -438,8 +439,8 @@ export const RoundsThatCountCard: React.FC<Props> = ({ connectionId, currentHand
                   borderStyle = `2.5px solid ${INK}`;
                 } else if (r.is_counter) {
                   dotSize = 9;
-                  background = AMBER;
-                  borderStyle = `2px solid ${AMBER}`;
+                  background = AMBER_GOLD_GRAD;
+                  borderStyle = `none`;
                 } else {
                   dotSize = 8;
                   background = '#fff';

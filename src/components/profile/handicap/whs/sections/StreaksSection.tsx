@@ -218,12 +218,14 @@ interface StreakCardProps {
   sub: string;
   color: string;
   colorTint: string;
+  gradient?: string;
   icon: 'flame' | 'trending-down' | 'shield';
 }
 
 const StreakCard: React.FC<StreakCardProps> = ({
-  streak, label, sub, color, colorTint, icon,
+  streak, label, sub, color, colorTint, gradient, icon,
 }) => {
+  const fillBg = gradient ?? color;
   const isPb = streak.current > 0 && streak.current === streak.best;
   const remaining = Math.max(0, streak.best - streak.current);
   const fillPct = streak.best > 0
@@ -283,7 +285,7 @@ const StreakCard: React.FC<StreakCardProps> = ({
           style={{
             padding: '3px 9px',
             borderRadius: 99,
-            background: isActive ? color : INK_10,
+            background: isActive ? fillBg : INK_10,
             color: isActive ? '#fff' : INK_55,
             fontSize: 9,
             fontWeight: 800,
@@ -358,7 +360,7 @@ const StreakCard: React.FC<StreakCardProps> = ({
               bottom: 0,
               left: 0,
               width: `${fillPct}%`,
-              background: color,
+              background: fillBg,
               borderRadius: 3,
               transition: 'width 320ms ease',
             }}
@@ -526,6 +528,7 @@ export const StreaksSection: React.FC<Props> = ({ connectionId, userId }) => {
           sub="Rounds without your handicap going up"
           color={AMBER}
           colorTint={AMBER_14}
+          gradient="linear-gradient(135deg, #F59E0B 0%, #FBBF24 100%)"
           icon="flame"
         />
         <StreakCard
@@ -534,6 +537,7 @@ export const StreaksSection: React.FC<Props> = ({ connectionId, userId }) => {
           sub="Consecutive rounds dropping handicap"
           color="#22C55E"
           colorTint="rgba(34,197,94,0.12)"
+          gradient="linear-gradient(135deg, #15803D 0%, #4ADE80 100%)"
           icon="trending-down"
         />
         <StreakCard
@@ -542,6 +546,7 @@ export const StreaksSection: React.FC<Props> = ({ connectionId, userId }) => {
           sub="Consecutive rounds being counted"
           color="#7C3AED"
           colorTint="rgba(124,58,237,0.12)"
+          gradient="linear-gradient(135deg, #6D28D9 0%, #A78BFA 100%)"
           icon="shield"
         />
       </div>
