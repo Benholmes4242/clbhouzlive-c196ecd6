@@ -11,6 +11,8 @@ export interface WhsConnection {
 export interface WhsHandicapTrend {
   current: number | null;
   delta: number | null;
+  previousHandicap: number | null;
+  totalRoundsInRecord: number;
   hasHistory: boolean;
 }
 
