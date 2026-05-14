@@ -30,7 +30,7 @@ export const FriendsEchoSection: React.FC<Props> = ({ connectionId }) => {
   if (!narrative) return null;
 
   return (
-    <div style={{ padding: '0 16px', marginBottom: 14 }}>
+    <div style={{ padding: '0 16px', marginTop: 32 }}>
       <EchoCallout
         context="YOUR CIRCLE"
         body={<p style={{ margin: 0 }}>{renderBoldMarkdown(narrative)}</p>}
