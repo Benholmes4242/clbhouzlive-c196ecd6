@@ -35,14 +35,14 @@ export const GLOBAL_HEADER_EXCLUDED_PREFIXES = [
 
 /**
  * Special routes that are conditionally excluded based on query params.
- * Tour Hub: show CompactHeader ONLY on Schedule and Players tabs.
- * Overview, Leaderboards, and all sub-pages remain immersive.
+ * Tour Hub: show CompactHeader ONLY on Schedule, Players, and Leaders tabs.
+ * Overview and all sub-pages remain immersive.
  */
 export function isConditionallyExcluded(pathname: string, searchParams: URLSearchParams): boolean {
-  // Tour Hub overview routes — only Schedule & Players get the header.
+  // Tour Hub overview routes — Schedule, Players, and Leaders get the header.
   if (pathname === '/tourhub' || pathname === '/tour') {
     const tab = searchParams.get('tab');
-    return tab !== 'schedule' && tab !== 'players';
+    return tab !== 'schedule' && tab !== 'players' && tab !== 'leaderboards';
   }
 
   // All sub-pages under /tourhub/... or /tour/... stay immersive.

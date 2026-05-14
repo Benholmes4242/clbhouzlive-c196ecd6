@@ -17,6 +17,7 @@ import { useElitePlayers } from '../../hooks/useElitePlayers';
 import { useChampionStreak } from '../../hooks/useChampionStreak';
 import { useRecentPlayerResults } from '../../hooks/useRecentPlayerResults';
 import { useDebouncedValue } from '@/hooks/useDebouncedValue';
+import { useStickyHeaderSafeArea } from '@/hooks/useStickyHeaderSafeArea';
 import { LEADER_CATEGORIES, getCategoryByKey } from '../leaders/constants';
 import { LeadersCategorySheet } from '../leaders/LeadersCategorySheet';
 import { LeadersMasthead } from '../leaders/LeadersMasthead';
@@ -51,6 +52,7 @@ export function LeadersTab() {
   const categoryKey = searchParams.get('category') || 'world_rank';
   const category = getCategoryByKey(categoryKey) || LEADER_CATEGORIES[0];
   const queryClient = useQueryClient();
+  const { sentinelRef, paddingTop } = useStickyHeaderSafeArea();
 
   const { data: season } = useTourSeason();
   const { data: playerStats, isLoading: statsLoading } = useTourPlayerStatistics(season?.id);
@@ -279,7 +281,7 @@ export function LeadersTab() {
     return (
       <div style={{ background: '#F8FAFC' }}>
         {/* Masthead skeleton */}
-        <div style={{ background: '#F8FAFC', padding: 'calc(16px + max(env(safe-area-inset-top, 0px), 47px)) 16px 14px' }}>
+        <div style={{ background: '#F8FAFC', padding: '16px 16px 14px' }}>
           {/* Eyebrow line (10.5px / 700) */}
           <Skeleton className="h-3 w-24 mb-2" style={{ background: 'rgba(15,23,42,0.06)' }} />
           {/* h1 (18px / 800) */}
@@ -343,15 +345,19 @@ export function LeadersTab() {
         onEyebrowTap={() => navigate('/tourhub?tab=overview', { replace: true })}
       />
 
+      {/* Sentinel for sticky-header safe-area detection */}
+      <div ref={sentinelRef} aria-hidden style={{ height: 1 }} />
+
       {/* Sticky header — back link + group tabs + chip rail + count/search */}
       <div
         className="sticky top-0 z-20"
         style={{
-          paddingTop: 'env(safe-area-inset-top, 0px)',
+          paddingTop,
           background: 'rgba(248,250,252,0.97)',
           backdropFilter: 'blur(20px)',
           WebkitBackdropFilter: 'blur(20px)',
           borderBottom: '0.5px solid rgba(15,23,42,0.08)',
+          transition: 'padding-top 200ms ease',
         }}
       >
         {/* Control row — back link + search button */}
