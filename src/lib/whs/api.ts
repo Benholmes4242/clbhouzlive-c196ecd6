@@ -686,6 +686,8 @@ export async function fetchFriendRoundDetail(
   return {
     hole_by_hole_fetched: true,
     is_nine_hole: !!s.is_nine_hole,
+    slope_rating: s.slope_rating ?? null,
+    course_rating: s.course_rating ?? null,
     holes: ((holes as any[]) ?? []) as WhsScoreHole[],
   };
 }
