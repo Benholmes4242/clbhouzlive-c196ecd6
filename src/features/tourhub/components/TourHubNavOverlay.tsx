@@ -639,7 +639,7 @@ export function TourHubNavOverlay({
                     {item.badge && (
                       <span style={{
                         fontSize: 10, fontWeight: 700, padding: '2px 6px', borderRadius: 99,
-                        textTransform: 'uppercase', letterSpacing: '0.5px',
+                        textTransform: 'uppercase', letterSpacing: '0.14em',
                         color: '#fff', background: '#F7931E',
                       }}>
                         {item.badge}
