@@ -48,7 +48,7 @@ export const HandicapDashboard: React.FC<Props> = ({ connection, userId, readOnl
   return (
     <div className="pb-10">
       {/* SWAPPABLE — active view */}
-      <div key={activeSubtab} className="anim-fadeSlide pt-2">
+      <div key={activeSubtab} className="anim-fadeSlide">
         {activeSubtab === 'today' && (
           <TodayView
             connection={connection}
