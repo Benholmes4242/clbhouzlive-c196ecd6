@@ -13,6 +13,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { PageRoot } from '@/components/layout/PageRoot';
 import { useHeader } from '@/contexts/GlobalHeaderContext';
 import { useMedianStatusBar } from '@/hooks/useMedianStatusBar';
+import { useStickyHeaderSafeArea } from '@/hooks/useStickyHeaderSafeArea';
 import {
   PlayerHero,
   PlayerSeasonStats,
