@@ -162,7 +162,7 @@ function ExploreHeroInner({ userId, mood }: ExploreHeroProps) {
               style={{
                 fontSize: 10,
                 fontWeight: 700,
-                letterSpacing: '0.1em',
+                letterSpacing: '0.14em',
                 textTransform: 'uppercase',
                 color: 'rgba(255,255,255,0.75)',
                 margin: '0 0 6px',
