@@ -393,12 +393,12 @@ export function TourHubNavOverlay({
                 transition={{ duration: 1.5, repeat: Infinity }}
               />
               <div>
-                <div style={{ fontSize: 9, fontWeight: 700, color: '#22C55E', letterSpacing: '1.5px', textTransform: 'uppercase' }}>Live now</div>
+                <div style={{ fontSize: 9, fontWeight: 800, color: '#15803D', letterSpacing: '0.16em', textTransform: 'uppercase' }}>Live now</div>
                 <div style={{ fontSize: 12, fontWeight: 600, color: '#0f172a' }}>{leaderTeaser.tournamentName}</div>
               </div>
             </div>
             <div style={{ textAlign: 'right' }}>
-              <div style={{ fontSize: 9, color: 'rgba(0,0,0,0.35)' }}>Leader</div>
+              <div style={{ fontSize: 9, fontWeight: 800, color: '#64748B', letterSpacing: '0.16em', textTransform: 'uppercase' }}>Leader</div>
               <div style={{ fontSize: 13, fontWeight: 800, color: '#0f172a' }}>
                 {leaderTeaser.playerName.split(' ').pop()}{' '}
                 <span style={{ color: '#0f172a' }}>
@@ -428,11 +428,27 @@ export function TourHubNavOverlay({
         {(rankingsLoading || displayPlayers.length > 0) && (
           <div>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', margin: '14px 18px 8px' }}>
-              <span style={{ fontSize: 9, fontWeight: 700, color: 'rgba(0,0,0,0.35)', letterSpacing: '2px', textTransform: 'uppercase' }}>
+              <span style={{ fontSize: 9, fontWeight: 800, color: '#64748B', letterSpacing: '0.16em', textTransform: 'uppercase' }}>
                 World Rankings
               </span>
-              <button onClick={handleViewAllRankings} style={{ fontSize: 10, color: '#F7931E', fontWeight: 600, background: 'none', border: 'none', cursor: 'pointer' }}>
-                View all ›
+              <button
+                onClick={handleViewAllRankings}
+                style={{
+                  fontSize: 11,
+                  color: '#0F172A',
+                  fontWeight: 800,
+                  letterSpacing: '-0.005em',
+                  background: 'none',
+                  border: 'none',
+                  cursor: 'pointer',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 2,
+                  padding: 0,
+                }}
+              >
+                View all
+                <ChevronRight size={12} strokeWidth={2.4} />
               </button>
             </div>
 
@@ -508,7 +524,7 @@ export function TourHubNavOverlay({
                         <span
                           style={{
                             fontSize: 13, fontWeight: 800,
-                            color: isFirst ? '#F7931E' : 'rgba(0,0,0,0.3)',
+                            color: isFirst ? '#F7931E' : '#94A3B8',
                             minWidth: 14,
                             fontVariantNumeric: 'tabular-nums',
                             flexShrink: 0,
@@ -532,7 +548,7 @@ export function TourHubNavOverlay({
                           <p style={{ color: '#0f172a', fontSize: 11, fontWeight: 700, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', margin: 0 }}>
                             {lastName}
                           </p>
-                          <p style={{ color: '#64748b', fontSize: 9, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', margin: 0 }}>
+                          <p style={{ color: '#64748B', fontSize: 9, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', margin: 0 }}>
                             {country || 'Unknown'}
                           </p>
                         </div>
@@ -623,7 +639,7 @@ export function TourHubNavOverlay({
                     {item.badge && (
                       <span style={{
                         fontSize: 10, fontWeight: 700, padding: '2px 6px', borderRadius: 99,
-                        textTransform: 'uppercase', letterSpacing: '0.5px',
+                        textTransform: 'uppercase', letterSpacing: '0.14em',
                         color: '#fff', background: '#F7931E',
                       }}>
                         {item.badge}
