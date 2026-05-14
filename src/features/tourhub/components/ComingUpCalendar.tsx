@@ -545,8 +545,22 @@ export function ComingUpCalendar() {
         </button>
       </div>
 
-      {/* "This week" headline + sublabel — matches Intelligence h1 styling */}
+      {/* Headline + sublabel — matches Intelligence h1 styling */}
       <div style={{ padding: '0 16px', marginBottom: 14 }}>
+        {!displayWeek.isCurrentWeek && displayWeek.daysUntilNext !== null && (
+          <div style={{
+            fontSize: 10,
+            fontWeight: 700,
+            color: AMBER,
+            letterSpacing: '0.16em',
+            textTransform: 'uppercase',
+            marginBottom: 6,
+          }}>
+            {displayWeek.daysUntilNext === 0
+              ? 'Off this week · Next event today'
+              : `Off this week · Next event in ${displayWeek.daysUntilNext} ${displayWeek.daysUntilNext === 1 ? 'day' : 'days'}`}
+          </div>
+        )}
         <h2 style={{
           fontSize: 18,
           fontWeight: 800,
@@ -555,7 +569,7 @@ export function ComingUpCalendar() {
           lineHeight: 1.2,
           margin: 0,
         }}>
-          This week
+          {displayWeek.isCurrentWeek ? 'This week' : 'Next'}
         </h2>
         <div style={{
           display: 'flex', alignItems: 'baseline', justifyContent: 'space-between',
@@ -565,28 +579,21 @@ export function ComingUpCalendar() {
             fontSize: 13, fontWeight: 700, color: INK,
             letterSpacing: '-0.005em', lineHeight: 1.25,
           }}>
-            {formatWeekRange(monday)}
+            {formatWeekRange(displayWeek.monday)}
           </span>
           <span style={{ fontSize: 11, fontWeight: 600, color: SLATE_400 }}>
-            {thisWeekEvents.length} {thisWeekEvents.length === 1 ? 'event' : 'events'}
+            {displayWeek.events.length} {displayWeek.events.length === 1 ? 'event' : 'events'}
           </span>
         </div>
       </div>
 
-      {/* Empty state */}
-      {thisWeekEvents.length === 0 && (
+      {/* Genuine end-of-schedule fallback */}
+      {displayWeek.events.length === 0 && (
         <div style={{
-          margin: '0 16px', padding: '24px 16px',
-          background: '#fff', borderRadius: 14, border: `1px solid ${SLATE_200}`,
-          textAlign: 'center',
+          margin: '0 16px', padding: '16px',
+          fontSize: 12, color: SLATE_500, textAlign: 'center',
         }}>
-          <Calendar size={20} color={SLATE_400} style={{ marginBottom: 8 }} />
-          <div style={{ fontSize: 13, fontWeight: 700, color: INK, marginBottom: 4 }}>
-            Off week
-          </div>
-          <div style={{ fontSize: 12, color: SLATE_500 }}>
-            No tournaments scheduled this week.
-          </div>
+          No upcoming tournaments scheduled.
         </div>
       )}
 
