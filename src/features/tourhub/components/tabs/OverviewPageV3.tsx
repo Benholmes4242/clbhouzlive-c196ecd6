@@ -27,8 +27,6 @@ import { useAllToursTickerData } from '../../hooks/useOverviewModules';
 import { IntelligenceHero } from '../IntelligenceHero';
 import { WorldRankingsHero } from '../WorldRankingsHero';
 import { StatOfTheWeek } from '../StatOfTheWeek';
-import { useMedianStatusBar } from '@/hooks/useMedianStatusBar';
-import { usePreventOverscroll } from '@/hooks/usePreventOverscroll';
 import { useNetworkStatus } from '@/hooks/useNetworkStatus';
 import { HERO_STYLES } from '../../constants/heroStyles';
 import { WifiOff } from 'lucide-react';
