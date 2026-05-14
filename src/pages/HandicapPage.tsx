@@ -276,22 +276,21 @@ const HandicapPageHeader: React.FC<HeaderProps> = ({
                 alignItems: 'center',
                 gap: 2,
                 padding: '6px 8px 6px 10px',
-                background: 'linear-gradient(135deg, #F59E0B 0%, #FBBF24 100%)',
-                border: 'none',
+                background: AMBER_SOFT,
+                border: `1px solid ${AMBER_BORDER}`,
                 borderRadius: 12,
                 cursor: 'pointer',
                 flexShrink: 0,
                 fontFamily: FONT_GEIST,
-                boxShadow: '0 2px 8px rgba(247,147,30,0.25)',
               }}
             >
               <Trophy
                 size={20}
-                color="#FFFFFF"
+                color={AMBER}
                 strokeWidth={2.3}
-                fill="rgba(255,255,255,0.18)"
+                fill="rgba(247,147,30,0.10)"
               />
-              <ChevronRight size={14} color="#FFFFFF" strokeWidth={2.5} />
+              <ChevronRight size={14} color={AMBER_INK} strokeWidth={2.5} />
             </button>
           )}
         </div>
