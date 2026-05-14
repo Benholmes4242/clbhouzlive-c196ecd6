@@ -16,6 +16,7 @@ const INK_20 = 'rgba(15,23,42,0.20)';
 const INK_55 = 'rgba(15,23,42,0.55)';
 const INK_85 = 'rgba(15,23,42,0.85)';
 const AMBER_INK = '#C97211';
+const AMBER_GRAD = 'url(#hsAmberGoldStroke)';
 const FONT_GEIST = 'Geist, system-ui, -apple-system, BlinkMacSystemFont, sans-serif';
 const STRIP_STROKE = 1.4;
 
