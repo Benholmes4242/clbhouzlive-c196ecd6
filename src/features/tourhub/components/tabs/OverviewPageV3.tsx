@@ -1,16 +1,16 @@
 /**
  * OverviewPageV3 - World-class Tour Hub Overview
- * Full-bleed immersive hero that extends behind the iOS status bar
- * NO header on this page - fully immersive experience
- * 
- * MODULE ORDER (Updated):
+ * Compact header (clbhouz logo + search + identity) sits above the hero.
+ * Hero starts below the header; no safe-area bleed.
+ *
+ * MODULE ORDER (unchanged):
  * 1. Hero Carousel (Featured/Latest Tournaments)
- * 2. Live Right Now (Conditional - only shows when live action)
- * 3. Tournament Schedule (Moved up for user priority)
- * 4. Tournament Insights (AI Predictions - differentiator)
- * 5. Unified World Rankings (Movers + OWGR Table combined)
- * 6. Season Leaderboards (Statistical category leaders)
- * 7. College Golf Rankings (NEW - preview of college leaderboard)
+ * 2. Live Right Now (Conditional)
+ * 3. Tournament Schedule
+ * 4. Tournament Insights
+ * 5. Unified World Rankings
+ * 6. Season Leaderboards
+ * 7. College Golf Rankings
  */
 
 import { useRef, useState, useEffect, useCallback } from 'react';
