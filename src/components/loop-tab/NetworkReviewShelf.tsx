@@ -67,9 +67,9 @@ export function NetworkReviewShelf({ userId }: NetworkReviewShelfProps) {
         style={{
           padding: '0 16px 10px',
           fontSize: 12,
-          fontWeight: 700,
+          fontWeight: 800,
           textTransform: 'uppercase',
-          letterSpacing: 0.5,
+          letterSpacing: '0.14em',
           color: '#c97a10',
         }}
       >
