@@ -43,7 +43,7 @@ export const RecentlyActiveRail: React.FC<Props> = ({ userId }) => {
   const cutoff = Date.now() - SEVEN_DAYS_MS;
 
   return (
-    <section style={{ marginTop: 32 }}>
+    <section style={{ marginTop: 18 }}>
       <SectionHeader
         eyebrow="RECENTLY ACTIVE"
         title="Your circle"
