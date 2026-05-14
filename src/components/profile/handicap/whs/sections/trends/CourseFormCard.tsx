@@ -84,73 +84,10 @@ function deltaColor(d: number): string {
 }
 
 
-const CARD_STYLE: React.CSSProperties = {
-  background: T.cardBg,
-  borderRadius: 16,
-  border: `1px solid ${T.hairline}`,
-  marginBottom: 14,
-  overflow: 'hidden',
+const SECTION_STYLE: React.CSSProperties = {
+  marginTop: 28,
   fontFamily: FONT,
 };
-
-const CardHeader: React.FC<{ sublabel: string }> = ({ sublabel }) => (
-  <div
-    style={{
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'space-between',
-      padding: '14px 16px',
-      borderBottom: `1px solid ${T.hairline}`,
-    }}
-  >
-    <div style={{ display: 'flex', alignItems: 'center', gap: 10, minWidth: 0, flex: 1 }}>
-      <div
-        style={{
-          width: 30,
-          height: 30,
-          borderRadius: 9,
-          background: T.amberTint,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          flexShrink: 0,
-        }}
-      >
-        <MapPin size={15} color={T.amberDeep} strokeWidth={2.2} />
-      </div>
-      <div style={{ flex: 1, minWidth: 0 }}>
-        <p
-          style={{
-            margin: 0,
-            fontSize: 16,
-            fontWeight: 700,
-            color: T.ink,
-            letterSpacing: '-0.015em',
-            fontFamily: FONT,
-            whiteSpace: 'nowrap',
-            overflow: 'hidden',
-            textOverflow: 'ellipsis',
-          }}
-        >
-          Course Form
-        </p>
-        <p
-          style={{
-            margin: '1px 0 0',
-            fontSize: 11,
-            color: T.inkMute,
-            fontFamily: FONT,
-            whiteSpace: 'nowrap',
-            overflow: 'hidden',
-            textOverflow: 'ellipsis',
-          }}
-        >
-          {sublabel}
-        </p>
-      </div>
-    </div>
-  </div>
-);
 
 const ViewToggle: React.FC<{
   activeView: ViewKey;
@@ -162,7 +99,8 @@ const ViewToggle: React.FC<{
     style={{
       display: 'flex',
       padding: 4,
-      margin: '12px 16px 4px',
+      marginTop: 14,
+      marginBottom: 4,
       background: T.slateTint,
       borderRadius: 10,
       gap: 2,
