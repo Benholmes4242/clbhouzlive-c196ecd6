@@ -412,7 +412,7 @@ export const FriendRoundSheet: React.FC<Props> = ({ activity, open, onClose }) =
                         style={{
                           padding: '14px 28px',
                           borderRadius: 999,
-                          background: '#F7931E',
+                          background: 'linear-gradient(135deg, #F59E0B 0%, #FBBF24 100%)',
                           border: 'none',
                           color: '#FFFFFF',
                           fontSize: 14,
