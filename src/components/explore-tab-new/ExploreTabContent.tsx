@@ -16,6 +16,7 @@ import { ReviewsOfTheWeekStrip } from './ReviewsOfTheWeekStrip';
 import ExploreGrid from './ExploreGrid';
 import ExploreAutoplay from './ExploreAutoplay';
 import { ExploreSearchOverlay } from './ExploreSearchOverlay';
+import { ExploreSectionHeader } from './ExploreSectionHeader';
 
 interface ExploreTabContentProps {
   embedded?: boolean;
