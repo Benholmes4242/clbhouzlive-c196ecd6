@@ -279,7 +279,7 @@ export function LeadersTab() {
     return (
       <div style={{ background: '#F8FAFC' }}>
         {/* Masthead skeleton */}
-        <div style={{ background: '#F8FAFC', padding: 'calc(16px + max(env(safe-area-inset-top, 0px), 47px)) 16px 14px' }}>
+        <div style={{ background: '#F8FAFC', padding: '16px 16px 14px' }}>
           {/* Eyebrow line (10.5px / 700) */}
           <Skeleton className="h-3 w-24 mb-2" style={{ background: 'rgba(15,23,42,0.06)' }} />
           {/* h1 (18px / 800) */}
