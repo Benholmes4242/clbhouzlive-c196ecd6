@@ -73,7 +73,7 @@ function computeAxis(dataMin: number, dataMax: number): {
 }
 
 const Skeleton: React.FC = () => (
-  <section style={{ marginTop: 32 }}>
+  <section style={{ marginTop: 20 }}>
     <SectionHeader eyebrow="ROUNDS THAT COUNT" title="The 8 best of your last 20" />
     <div style={{ padding: '0 20px' }}>
     <div style={{ height: 12, width: 140, background: INK_06, borderRadius: 2, marginBottom: 10 }} />
@@ -206,12 +206,12 @@ export const RoundsThatCountCard: React.FC<Props> = ({ connectionId, currentHand
     .join(' ');
 
   return (
-    <section style={{ marginTop: 32 }}>
+    <section style={{ marginTop: 20 }}>
       <SectionHeader eyebrow="ROUNDS THAT COUNT" title="The 8 best of your last 20" />
       <div style={{ padding: '0 20px' }}>
 
       {/* Chart — full-bleed on page background, no card wrapper */}
-      <div style={{ padding: '4px 0 12px' }}>
+      <div style={{ padding: '0 0 8px' }}>
         <style>{`
           @keyframes pulseHeartbeat {
             0%, 100% { opacity: 0.20; }
@@ -225,7 +225,7 @@ export const RoundsThatCountCard: React.FC<Props> = ({ connectionId, currentHand
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
-            marginBottom: 8,
+            marginBottom: 4,
             paddingLeft: 4,
             gap: 8,
           }}>
@@ -667,10 +667,10 @@ export const RoundsThatCountCard: React.FC<Props> = ({ connectionId, currentHand
 
       {/* Next-round targets — flat, two-column, eyebrow on left */}
       {projection?.hasData && (
-        <div style={{ padding: '14px 0 4px' }}>
+        <div style={{ padding: '8px 0 2px' }}>
           <div style={{
             display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-            marginBottom: 10,
+            marginBottom: 6,
           }}>
             <span style={{
               fontSize: 9, fontWeight: 800, color: '#64748B', letterSpacing: '0.16em',
@@ -711,8 +711,8 @@ export const RoundsThatCountCard: React.FC<Props> = ({ connectionId, currentHand
         return (
           <div style={{
             display: 'flex', alignItems: 'center', gap: 10,
-            padding: '10px 0 0',
-            marginTop: 12,
+            padding: '6px 0 0',
+            marginTop: 8,
             borderTop: `0.5px solid ${INK_10}`,
           }}>
             <p style={{
