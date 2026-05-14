@@ -23,7 +23,7 @@ import { ComingUpCalendar } from '../ComingUpCalendar';
 import { CollegeRivalry } from '../CollegeRivalry';
 import { LazySection } from '../overview-v3/LazySection';
 import { AllToursTicker } from '../AllToursTicker';
-import { useAllToursTickerData } from '../../hooks/useOverviewModules';
+
 import { IntelligenceHero } from '../IntelligenceHero';
 import { WorldRankingsHero } from '../WorldRankingsHero';
 import { StatOfTheWeek } from '../StatOfTheWeek';
