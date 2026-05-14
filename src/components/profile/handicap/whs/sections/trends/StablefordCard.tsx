@@ -86,10 +86,14 @@ export const StablefordCard: React.FC<Props> = ({ scores }) => {
     scope === '90d' ? 'vs prior 90D' :
     null;
 
+  const GREEN_GRAD = 'linear-gradient(90deg, #15803D 0%, #4ADE80 100%)';
+  const AMBER_GRAD = 'linear-gradient(90deg, #F59E0B 0%, #FBBF24 100%)';
+  const RED_GRAD = 'linear-gradient(90deg, #991B1B 0%, #DC2626 100%)';
+
   const segs = [
-    { count: dist.inZoneCount, color: T.green },
-    { count: dist.solidCount, color: T.amber },
-    { count: dist.offDayCount, color: T.red },
+    { count: dist.inZoneCount, color: T.green, gradient: GREEN_GRAD },
+    { count: dist.solidCount, color: T.amber, gradient: AMBER_GRAD },
+    { count: dist.offDayCount, color: T.red, gradient: RED_GRAD },
   ].filter((s) => s.count > 0);
 
   return (
