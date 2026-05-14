@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useSearchParams, useNavigate, Link } from 'react-router-dom';
 import { ArrowLeftRight, ChevronLeft, ChevronRight, Search, X } from 'lucide-react';
 import { TourHubShell } from '../components';
+import { useStickyHeaderSafeArea } from '@/hooks/useStickyHeaderSafeArea';
 import { CollegeCompareHero } from '../components/college/CollegeCompareHero';
 import { useCollegeCompare } from '../hooks/useCollegeCompare';
 import { useCollegeSearch } from '../hooks/useCollegeStats';
