@@ -663,7 +663,12 @@ const HeroHandicapCard: React.FC<Props> = ({ connection }) => {
             }}
           />
           <span style={{
-            fontSize: 9, fontWeight: 800, color: '#64748B',
+            fontSize: 9, fontWeight: 800,
+            background: `linear-gradient(90deg, ${GRAD_AMBER} 0%, ${GRAD_GOLD} 100%)`,
+            WebkitBackgroundClip: 'text',
+            backgroundClip: 'text',
+            WebkitTextFillColor: 'transparent',
+            color: 'transparent',
             letterSpacing: '0.16em', textTransform: 'uppercase',
           }}>
             HANDICAP INDEX
