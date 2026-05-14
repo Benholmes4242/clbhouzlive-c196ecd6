@@ -156,7 +156,7 @@ export function CollegeMasthead({
         transition={{ duration: 0.3 }}
         style={{
           background: '#F8FAFC',
-          padding: 'calc(16px + max(env(safe-area-inset-top, 0px), 47px)) 16px 14px',
+          padding: '16px 16px 14px',
         }}
       >
         {/* Section header (canonical §2) */}

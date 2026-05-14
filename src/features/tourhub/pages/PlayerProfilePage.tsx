@@ -13,6 +13,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { PageRoot } from '@/components/layout/PageRoot';
 import { useHeader } from '@/contexts/GlobalHeaderContext';
 import { useMedianStatusBar } from '@/hooks/useMedianStatusBar';
+import { useStickyHeaderSafeArea } from '@/hooks/useStickyHeaderSafeArea';
 import {
   PlayerHero,
   PlayerSeasonStats,
@@ -39,6 +40,8 @@ export function PlayerProfilePage() {
   const { hideHeader, showHeader } = useHeader();
 
   useMedianStatusBar("dark", "transparent", true, false);
+
+  const { sentinelRef, paddingTop: stickyPaddingTop } = useStickyHeaderSafeArea();
 
   const { data: player, isLoading: playerLoading, refetch } = useTourPlayer(playerId || '');
   const { data: playerStats } = useSinglePlayerStatistics(playerId);
@@ -106,8 +109,8 @@ export function PlayerProfilePage() {
 
   if (playerLoading) {
     return (
-      <PageRoot className="min-h-screen w-full" hasBottomNav immersive immersiveStatusBar style={{ background: '#F8FAFC' }}>
-        <div style={{ background: '#F8FAFC', padding: 'max(env(safe-area-inset-top, 0px), 47px) 16px 14px' }}>
+      <PageRoot className="min-h-screen w-full" hasBottomNav style={{ background: '#F8FAFC' }}>
+        <div style={{ background: '#F8FAFC', padding: '16px 16px 14px' }}>
           {/* Eyebrow */}
           <Skeleton className="h-2.5 w-20 mb-2" style={{ background: 'rgba(15,23,42,0.06)' }} />
           {/* h1 */}
@@ -157,8 +160,6 @@ export function PlayerProfilePage() {
     <PageRoot
       className="min-h-screen w-full"
       hasBottomNav
-      immersive
-      immersiveStatusBar
       style={{ background: '#F8FAFC' }}
     >
       {/* Pull-to-refresh indicator */}
@@ -191,6 +192,9 @@ export function PlayerProfilePage() {
         {/* Hero */}
         <PlayerHero player={player} playerStats={playerStats ?? null} />
 
+        {/* Sentinel for sticky-header safe-area detection */}
+        <div ref={sentinelRef} aria-hidden style={{ height: 1 }} />
+
         {/* Sticky header — underline tab bar */}
         <div
           style={{
@@ -201,7 +205,8 @@ export function PlayerProfilePage() {
             backdropFilter: 'blur(20px)',
             WebkitBackdropFilter: 'blur(20px)',
             borderBottom: '0.5px solid rgba(15,23,42,0.08)',
-            paddingTop: 'env(safe-area-inset-top, 0px)',
+            paddingTop: stickyPaddingTop,
+            transition: 'padding-top 200ms ease',
           }}
         >
           {/* Back link */}

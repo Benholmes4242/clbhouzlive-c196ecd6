@@ -12,6 +12,7 @@ import { formatDistanceToNow } from 'date-fns';
 import { useQueryClient } from '@tanstack/react-query';
 import { cn } from '@/lib/utils';
 import { TourHubShell } from '../components/TourHubShell';
+import { useStickyHeaderSafeArea } from '@/hooks/useStickyHeaderSafeArea';
 import { useTourTournament, useTourLeaderboard } from '../hooks/useTourHubData';
 import { useLeaderboardRealtime } from '../hooks/useLeaderboardRealtime';
 import { useSingleCourseImage } from '../hooks/useCourseImageResolver';
@@ -60,6 +61,7 @@ export function TournamentDetailPage() {
   const [isRefreshing, setIsRefreshing] = useState(false);
   const touchStartY = useRef(0);
   const PULL_THRESHOLD = 50;
+  const { sentinelRef, paddingTop: stickyPaddingTop } = useStickyHeaderSafeArea();
 
   const handleTouchStart = useCallback((e: React.TouchEvent) => {
     if (window.scrollY <= 0) {
@@ -167,7 +169,7 @@ export function TournamentDetailPage() {
     return (
       <TourHubShell>
         {/* Slate masthead skeleton */}
-        <div style={{ background: '#0F172A', padding: 'calc(16px + max(env(safe-area-inset-top, 0px), 47px)) 16px 0' }} className="animate-pulse">
+        <div style={{ background: '#0F172A', padding: '16px 16px 0' }} className="animate-pulse">
           {/* Pills row */}
           <div style={{ display: 'flex', gap: 6, marginBottom: 60 }}>
             <div style={{ height: 22, width: 88, background: 'rgba(255,255,255,0.10)', borderRadius: 6 }} />
@@ -365,7 +367,7 @@ export function TournamentDetailPage() {
   };
   
   return (
-    <TourHubShell immersive>
+    <TourHubShell>
       {/* Pull-to-refresh indicator */}
       <AnimatePresence>
         {(pullDistance > 0 || isRefreshing) && (
@@ -398,11 +400,15 @@ export function TournamentDetailPage() {
           leaderboard={leaderboard ?? null}
         />
 
+        {/* Sentinel for sticky-header safe-area detection */}
+        <div ref={sentinelRef} aria-hidden style={{ height: 1 }} />
+
         {/* STICKY HEADER — ← Back | underline tabs */}
         <div
           className="sticky top-0 z-20"
           style={{
-            paddingTop: 'env(safe-area-inset-top, 0px)',
+            paddingTop: stickyPaddingTop,
+            transition: 'padding-top 200ms ease',
             background: 'rgba(248,250,252,0.97)',
             backdropFilter: 'blur(20px)',
             WebkitBackdropFilter: 'blur(20px)',

@@ -6,6 +6,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { useDebouncedValue } from '@/hooks/useDebouncedValue';
 import { formatCurrency } from '@/lib/utils/formatCurrency';
 import { TourHubShell } from '../components';
+import { useStickyHeaderSafeArea } from '@/hooks/useStickyHeaderSafeArea';
 import { FranchiseLeaderboard } from '../components/college';
 import { CollegeMasthead } from '../components/college/CollegeMasthead';
 import { CollegeCard } from '../components/college/CollegeCard';
@@ -60,6 +61,7 @@ export function CollegeGolfHubPage() {
   const [pullDistance, setPullDistance] = useState(0);
   const touchStartY = useRef(0);
   const PULL_THRESHOLD = 50;
+  const { sentinelRef, paddingTop: stickyPaddingTop } = useStickyHeaderSafeArea();
 
   const onTouchStart = useCallback((e: React.TouchEvent) => {
     if (window.scrollY <= 0) touchStartY.current = e.touches[0].clientY;
@@ -174,7 +176,7 @@ export function CollegeGolfHubPage() {
   const showSearchResults = searchExpanded && debouncedSearch.length >= 2;
 
   return (
-    <TourHubShell immersive>
+    <TourHubShell>
       <div className="relative" onTouchStart={onTouchStart} onTouchMove={onTouchMove} onTouchEnd={onTouchEnd}>
         {/* Pull-to-refresh indicator */}
         {(pullDistance > 0 || isRefreshing) && (
@@ -190,7 +192,7 @@ export function CollegeGolfHubPage() {
 
         {/* Masthead */}
         {statsLoading ? (
-          <div style={{ background: '#0F172A', padding: 'calc(16px + env(safe-area-inset-top, 0px)) 16px 0' }}>
+          <div style={{ background: '#0F172A', padding: '16px 16px 0' }}>
             <div style={{ height: '14px', width: '200px', background: 'rgba(255,255,255,0.06)', borderRadius: '4px', marginBottom: '12px' }} className="animate-pulse" />
             <div style={{ height: '24px', width: '180px', background: 'rgba(255,255,255,0.06)', borderRadius: '4px', marginBottom: '16px' }} className="animate-pulse" />
             <div style={{ height: '100px', background: 'rgba(255,255,255,0.04)', borderRadius: '8px', marginBottom: '12px' }} className="animate-pulse" />
@@ -215,6 +217,9 @@ export function CollegeGolfHubPage() {
           />
         ) : null}
 
+        {/* Sentinel for sticky-header safe-area detection */}
+        <div ref={sentinelRef} aria-hidden style={{ height: 1 }} />
+
         {/* Sticky header */}
         <div
           className="sticky top-0 z-20"
@@ -223,7 +228,8 @@ export function CollegeGolfHubPage() {
             backdropFilter: 'blur(20px)',
             WebkitBackdropFilter: 'blur(20px)',
             borderBottom: '0.5px solid rgba(15,23,42,0.08)',
-            paddingTop: 'env(safe-area-inset-top, 0px)',
+            paddingTop: stickyPaddingTop,
+            transition: 'padding-top 200ms ease',
           }}
         >
           {/* Collapsible search bar */}

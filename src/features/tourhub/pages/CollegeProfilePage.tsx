@@ -8,6 +8,7 @@ import { PageRoot } from '@/components/layout/PageRoot';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useHeader } from '@/contexts/GlobalHeaderContext';
 import { useMedianStatusBar } from '@/hooks/useMedianStatusBar';
+import { useStickyHeaderSafeArea } from '@/hooks/useStickyHeaderSafeArea';
 import { formatCurrency } from '@/lib/utils/formatCurrency';
 import {
   FranchiseStoryStrip,
@@ -67,6 +68,7 @@ export function CollegeProfilePage() {
 
   // Transparent status bar for immersive hero bleed into safe area
   useMedianStatusBar('dark', 'transparent', true, false);
+  const { sentinelRef, paddingTop: stickyPaddingTop } = useStickyHeaderSafeArea();
 
   const { data: stats, isLoading: statsLoading, error: _statsError, refetch: refetchStats } = useCollegeStats(collegeSlug);
   const { data: collegeMap, isLoading: mediaLoading } = useCollegeMediaMap();
@@ -185,8 +187,6 @@ export function CollegeProfilePage() {
     <PageRoot
       className="min-h-screen w-full bg-background"
       hasBottomNav
-      immersive
-      immersiveStatusBar
       onTouchStart={handleTouchStart}
       onTouchMove={handleTouchMove}
       onTouchEnd={handleTouchEnd}
@@ -207,7 +207,7 @@ export function CollegeProfilePage() {
       <div style={{
         position: 'relative',
         background: '#F8FAFC',
-        paddingTop: 'max(env(safe-area-inset-top, 0px), 47px)',
+        paddingTop: 0,
         paddingLeft: 16,
         paddingRight: 16,
         paddingBottom: 16,
@@ -372,6 +372,9 @@ export function CollegeProfilePage() {
         )}
       </div>
 
+      {/* Sentinel for sticky-header safe-area detection */}
+      <div ref={sentinelRef} aria-hidden style={{ height: 1 }} />
+
       {/* Sticky header (Compare button retired) */}
       <div
         className="sticky top-0 z-20"
@@ -380,7 +383,8 @@ export function CollegeProfilePage() {
           backdropFilter: 'blur(20px)',
           WebkitBackdropFilter: 'blur(20px)',
           borderBottom: '0.5px solid rgba(15,23,42,0.08)',
-          paddingTop: 'env(safe-area-inset-top, 0px)',
+          paddingTop: stickyPaddingTop,
+          transition: 'padding-top 200ms ease',
         }}
       >
         <div style={{ display: 'flex', alignItems: 'center', padding: '8px 16px 10px', gap: 6 }}>

@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useSearchParams, useNavigate, Link } from 'react-router-dom';
 import { ArrowLeftRight, ChevronLeft, ChevronRight, Search, X } from 'lucide-react';
 import { TourHubShell } from '../components';
+import { useStickyHeaderSafeArea } from '@/hooks/useStickyHeaderSafeArea';
 import { CollegeCompareHero } from '../components/college/CollegeCompareHero';
 import { useCollegeCompare } from '../hooks/useCollegeCompare';
 import { useCollegeSearch } from '../hooks/useCollegeStats';
@@ -34,6 +35,7 @@ export function CollegeComparePage() {
   const c2 = searchParams.get('c2') || '';
 
   const { data, isLoading, error } = useCollegeCompare(c1, c2);
+  const { sentinelRef, isAtTop } = useStickyHeaderSafeArea();
 
   const hasValidParams = c1 && c2;
 
@@ -89,13 +91,13 @@ export function CollegeComparePage() {
   })();
 
   return (
-    <TourHubShell immersive>
+    <TourHubShell>
       <div className="relative min-h-screen bg-background">
         {/* ── CANONICAL LIGHT MASTHEAD (Path B) ── */}
         <div
           style={{
             background: '#F8FAFC',
-            paddingTop: 'max(env(safe-area-inset-top, 0px), 47px)',
+            paddingTop: 0,
             paddingLeft: 16,
             paddingRight: 16,
             paddingBottom: 16,
@@ -176,6 +178,9 @@ export function CollegeComparePage() {
           )}
         </div>
 
+        {/* Sentinel for sticky-header safe-area detection */}
+        <div ref={sentinelRef} aria-hidden style={{ height: 1 }} />
+
         {/* ── STICKY HEADER ── */}
         <div
           className="sticky top-0 z-20"
@@ -184,7 +189,8 @@ export function CollegeComparePage() {
             backdropFilter: 'blur(20px)',
             WebkitBackdropFilter: 'blur(20px)',
             borderBottom: '0.5px solid rgba(15,23,42,0.08)',
-            paddingTop: 'calc(env(safe-area-inset-top, 0px) + 8px)',
+            paddingTop: isAtTop ? 8 : 'calc(max(env(safe-area-inset-top, 0px), 47px) + 8px)',
+            transition: 'padding-top 200ms ease',
           }}
         >
           <div style={{ display: 'flex', alignItems: 'center', padding: '9px 16px', gap: '6px' }}>
