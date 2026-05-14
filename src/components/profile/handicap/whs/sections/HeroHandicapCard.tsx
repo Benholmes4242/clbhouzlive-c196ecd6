@@ -393,7 +393,7 @@ const HeroHandicapCard: React.FC<Props> = ({ connection }) => {
   // ── Empty state ─────────────────────────────────────────────────────────
   if (current === null) {
     return (
-      <section style={{ padding: '24px 12px 20px', marginBottom: 24 }}>
+      <section style={{ padding: '24px 12px 20px' }}>
         <div style={{ marginBottom: 14, padding: '0 4px' }}>
           <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
             <span
