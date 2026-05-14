@@ -869,8 +869,19 @@ const HeroHandicapCard: React.FC<Props> = ({ connection }) => {
         />
       </div>
 
+      {/* Hairline divider between rings and sparkline — visually unifies
+          the Handicap Index section into one panel. */}
+      <div
+        aria-hidden
+        style={{
+          height: 1,
+          background: 'rgba(15,23,42,0.06)',
+          margin: '20px 10px 0',
+        }}
+      />
+
       {/* Sparkline strip */}
-      <div style={{ padding: '0 10px', marginTop: 20 }}>
+      <div style={{ padding: '0 10px', marginTop: 12 }}>
         <svg
           ref={svgRef}
           width="100%"
