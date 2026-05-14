@@ -99,7 +99,7 @@ export const TrendCardsStack: React.FC<Props> = ({ connectionId, currentHandicap
             <h2
               style={{
                 margin: 0,
-                fontSize: 32,
+                fontSize: 26,
                 fontWeight: 600,
                 letterSpacing: '-0.025em',
                 color: INK,
@@ -127,11 +127,11 @@ export const TrendCardsStack: React.FC<Props> = ({ connectionId, currentHandicap
 
           <p
             style={{
-              margin: '8px 0 0',
+              margin: '4px 0 0',
               fontSize: 13,
               color: INK_55,
               fontFamily: FONT,
-              lineHeight: 1.5,
+              lineHeight: 1.4,
             }}
           >
             Your last 5 rounds suggest where your handicap is heading.
