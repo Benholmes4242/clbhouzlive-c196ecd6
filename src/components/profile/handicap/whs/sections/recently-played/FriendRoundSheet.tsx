@@ -310,7 +310,7 @@ export const FriendRoundSheet: React.FC<Props> = ({ activity, open, onClose }) =
                       <button
                         onClick={() => {
                           onClose();
-                          navigate(`/p/${activity.friend_user_id}`);
+                          navigate(`/profile/${activity.friend_user_id}`);
                         }}
                         style={{
                           margin: '20px 20px 0',
