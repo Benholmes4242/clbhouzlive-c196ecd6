@@ -154,15 +154,16 @@ export const StablefordCard: React.FC<Props> = ({ scores }) => {
         </div>
       </div>
 
-      {/* Horizontal segmented bar */}
-      <div style={{ padding: '0 20px 10px' }}>
+      {/* Horizontal segmented bar — taller, with confident counts inside */}
+      <div style={{ padding: '0 20px 16px' }}>
         <div
           style={{
             display: 'flex',
-            height: 36,
-            borderRadius: 8,
+            height: 64,
+            borderRadius: 12,
             overflow: 'hidden',
             background: T.ink04,
+            boxShadow: '0 2px 4px rgba(15,23,42,0.04)',
           }}
           role="img"
           aria-label={`Distribution: ${dist.inZoneCount} in zone, ${dist.solidCount} solid, ${dist.offDayCount} off`}
@@ -177,8 +178,9 @@ export const StablefordCard: React.FC<Props> = ({ scores }) => {
                 alignItems: 'center',
                 justifyContent: 'center',
                 color: '#fff',
-                fontSize: 12,
+                fontSize: 22,
                 fontWeight: 800,
+                letterSpacing: '-0.02em',
                 fontFamily: FONT,
                 fontVariantNumeric: 'tabular-nums',
               }}
@@ -187,35 +189,20 @@ export const StablefordCard: React.FC<Props> = ({ scores }) => {
             </div>
           ))}
         </div>
+        {/* Anchored keys — colour dot + band name + range·pct, columns mirror bar segments */}
         <div
           style={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            marginTop: 6,
-            fontSize: 10,
-            color: T.ink40,
+            display: 'grid',
+            gridTemplateColumns: `${Math.max(dist.inZoneCount, 0.5)}fr ${Math.max(dist.solidCount, 0.5)}fr ${Math.max(dist.offDayCount, 0.5)}fr`,
+            gap: 0,
+            marginTop: 10,
             fontFamily: FONT,
-            letterSpacing: '0.04em',
           }}
         >
-          <span>36+ · zone</span>
-          <span>33–35 · solid</span>
-          <span>&lt;33 · off</span>
+          <KeyCell color={T.green} label="IN THE ZONE" meta={`36+ · ${dist.inZonePct}%`} />
+          <KeyCell color={T.amber} label="SOLID" meta={`33–35 · ${dist.solidPct}%`} />
+          <KeyCell color={T.red} label="OFF DAY" meta={`<33 · ${dist.offDayPct}%`} />
         </div>
-      </div>
-
-      {/* 3-cell summary row */}
-      <div
-        style={{
-          display: 'grid',
-          gridTemplateColumns: '1fr 1fr 1fr',
-          gap: 8,
-          padding: '4px 20px 14px',
-        }}
-      >
-        <SummaryCell color={T.green} accent={GREEN_GRAD} label="IN THE ZONE" count={dist.inZoneCount} pct={dist.inZonePct} range="36+" />
-        <SummaryCell color={T.amber} accent={AMBER_GRAD} label="SOLID" count={dist.solidCount} pct={dist.solidPct} range="33–35" />
-        <SummaryCell color={T.red} accent={RED_GRAD} label="OFF DAY" count={dist.offDayCount} pct={dist.offDayPct} range="<33" />
       </div>
 
       <StablefordDetailSheet open={sheetOpen} onClose={() => setSheetOpen(false)} dist={dist} />
