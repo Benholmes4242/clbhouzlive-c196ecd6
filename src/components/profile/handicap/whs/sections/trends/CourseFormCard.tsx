@@ -8,6 +8,8 @@ import SectionHeader from '../SectionHeader';
 interface Props {
   connectionId: string;
   currentHandicap: number | null | undefined;
+  /** Override the canonical top margin. Pass 0 for the first card on the tab. */
+  topMargin?: number;
 }
 
 const T = {
