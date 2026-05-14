@@ -10,6 +10,12 @@ interface SuggestedCreatorsShelfProps {
   showViewAll?: boolean;
   onViewAll?: () => void;
   containerStyle?: React.CSSProperties;
+  /**
+   * Header scale variant.
+   * - 'default' (15/700): standalone page contexts (Watch, profile pages)
+   * - 'search' (13/600/-0.01em): inside the search overlay, alongside other 13/600 section headers
+   */
+  headerScale?: 'default' | 'search';
 }
 
 export const SuggestedCreatorsShelf: React.FC<SuggestedCreatorsShelfProps> = ({
@@ -19,6 +25,7 @@ export const SuggestedCreatorsShelf: React.FC<SuggestedCreatorsShelfProps> = ({
   showViewAll = false,
   onViewAll,
   containerStyle,
+  headerScale = 'default',
 }) => {
   const { data: creators, isLoading } = useSuggestedCreators(userId);
   const isDark = variant === 'dark';
@@ -26,32 +33,44 @@ export const SuggestedCreatorsShelf: React.FC<SuggestedCreatorsShelfProps> = ({
   // Guard: don't render if not loading and < 2 creators
   if (!isLoading && (!creators || creators.length < 1)) return null;
 
+  const isSearchScale = headerScale === 'search';
+  const headerPadding = isSearchScale ? '18px 16px 10px' : '0 16px';
+  const headerMarginBottom = isSearchScale ? 0 : 14;
+  const labelStyle: React.CSSProperties = isSearchScale
+    ? {
+        fontSize: 13,
+        fontWeight: 600,
+        letterSpacing: '-0.01em',
+        color: isDark ? 'rgba(255,255,255,0.7)' : 'hsl(var(--foreground))',
+      }
+    : {
+        fontSize: 15,
+        fontWeight: 700,
+        color: isDark ? 'rgba(255,255,255,0.7)' : 'hsl(var(--foreground))',
+      };
+
   return (
     <div
       style={{
         width: '100%',
-        paddingTop: 16,
+        paddingTop: isSearchScale ? 0 : 16,
         paddingBottom: 20,
         background: isDark ? 'transparent' : 'hsl(var(--background))',
-        borderTop: isDark
-          ? '1px solid rgba(255,255,255,0.08)'
-          : '1px solid hsl(var(--border) / 0.6)',
-        borderBottom: isDark ? 'none' : '1px solid hsl(var(--border) / 0.6)',
+        borderTop: isSearchScale
+          ? 'none'
+          : isDark
+            ? '1px solid rgba(255,255,255,0.08)'
+            : '1px solid hsl(var(--border) / 0.6)',
+        borderBottom: isSearchScale || isDark ? 'none' : '1px solid hsl(var(--border) / 0.6)',
         ...containerStyle,
       }}
     >
       {/* Header */}
       <div
         className="flex items-center justify-between"
-        style={{ padding: '0 16px', marginBottom: 14 }}
+        style={{ padding: headerPadding, marginBottom: headerMarginBottom }}
       >
-        <span
-          style={{
-            fontSize: 15,
-            fontWeight: 700,
-            color: isDark ? 'rgba(255,255,255,0.7)' : 'hsl(var(--foreground))',
-          }}
-        >
+        <span style={labelStyle}>
           {title}
         </span>
       </div>

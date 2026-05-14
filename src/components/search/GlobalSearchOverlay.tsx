@@ -1,6 +1,6 @@
 import { memo, useRef, useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Search, X, Clock, BadgeCheck, Briefcase, Star, Lock, MessageCircle, Loader2 } from 'lucide-react';
+import { Search, X, Clock, BadgeCheck, Briefcase, Star, Lock, MessageCircle, Loader2, ChevronRight } from 'lucide-react';
 import { useStartDM } from '@/hooks/useStartDM';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { SuggestedCreatorsShelf } from '@/components/shared/SuggestedCreatorsShelf';
@@ -68,16 +68,21 @@ function SectionHeader({
           type="button"
           onClick={onActionClick}
           style={{
-            fontSize: 12,
-            fontWeight: 600,
-            color: AMBER,
+            fontSize: 11,
+            fontWeight: 800,
+            color: INK,
+            letterSpacing: '-0.005em',
             background: 'none',
             border: 'none',
             cursor: 'pointer',
             padding: 0,
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: 2,
           }}
         >
           {action}
+          <ChevronRight size={12} strokeWidth={2.4} />
         </button>
       )}
     </div>
@@ -521,7 +526,7 @@ function GlobalSearchOverlay({ isOpen, onClose }: GlobalSearchOverlayProps) {
                           <div style={{ padding: '8px 2px 0' }}>
                             <div
                               style={{
-                                fontSize: 12.5,
+                                fontSize: 13,
                                 fontWeight: 600,
                                 color: INK,
                                 letterSpacing: '-0.01em',
@@ -530,8 +535,9 @@ function GlobalSearchOverlay({ isOpen, onClose }: GlobalSearchOverlayProps) {
                                 WebkitLineClamp: 2,
                                 WebkitBoxOrient: 'vertical' as const,
                                 overflow: 'hidden',
-                                // Reserve 2 lines of height so 1-line names don't collapse the card
-                                minHeight: 'calc(12.5px * 1.25 * 2)',
+                                // Reserve EXACTLY 2 lines of height — every card has identical name slot geometry
+                                height: 'calc(13px * 1.25 * 2)',
+                                marginBottom: 2,
                               }}
                             >
                               {item.label}
@@ -541,10 +547,14 @@ function GlobalSearchOverlay({ isOpen, onClose }: GlobalSearchOverlayProps) {
                                 style={{
                                   fontSize: 11,
                                   color: INK_SUBTLE,
-                                  marginTop: 2,
+                                  lineHeight: 1.3,
+                                  whiteSpace: 'nowrap',
+                                  overflow: 'hidden',
+                                  textOverflow: 'ellipsis',
+                                  height: 'calc(11px * 1.3)',
                                 }}
                               >
-                                {item.subtitle.split('·')[0].trim()}
+                                {item.subtitle.split('•')[0].trim()}
                               </div>
                             )}
                           </div>
@@ -560,6 +570,7 @@ function GlobalSearchOverlay({ isOpen, onClose }: GlobalSearchOverlayProps) {
                   title="Golfers to follow"
                   showViewAll={true}
                   onViewAll={() => { navigate('/golfers'); onClose(); }}
+                  headerScale="search"
                   containerStyle={{
                     background: 'transparent',
                     borderTop: 'none',
