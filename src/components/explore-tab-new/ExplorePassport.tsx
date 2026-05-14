@@ -65,6 +65,11 @@ function ExplorePassportInner({ userId }: ExplorePassportProps) {
 
   return (
     <section>
+      <ExploreSectionHeader
+        kicker="Your Journey"
+        title="Season passport"
+        sub={sinceLabel}
+      />
       <div style={{ padding: '0 16px' }}>
       <ExploreSectionHeader
         kicker="Your Journey"
