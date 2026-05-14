@@ -436,29 +436,69 @@ export function ComingUpCalendar() {
   const navigate = useNavigate();
   const { data: tournaments, isLoading, error, refetch } = useUpcomingTournaments(20);
 
-  const { monday, sunday } = useMemo(() => {
-    const m = getMondayOfWeek(new Date());
-    const s = new Date(m);
-    s.setUTCDate(s.getUTCDate() + 6);
-    s.setUTCHours(23, 59, 59, 999);
-    return { monday: m, sunday: s };
-  }, []);
+  const displayWeek = useMemo(() => {
+    const endOfWeek = (m: Date) => {
+      const s = new Date(m);
+      s.setUTCDate(s.getUTCDate() + 6);
+      s.setUTCHours(23, 59, 59, 999);
+      return s;
+    };
+    const currentMonday = getMondayOfWeek(new Date());
+    const currentSunday = endOfWeek(currentMonday);
 
-  const thisWeekEvents = useMemo(() => {
-    if (!tournaments) return [];
-    return tournaments.filter(t => {
+    const list = tournaments ?? [];
+    const currentWeekEvents = list.filter(t => {
       const start = parseUTC(t.startDate);
-      return start >= monday && start <= sunday;
+      return start >= currentMonday && start <= currentSunday;
     });
-  }, [tournaments, monday, sunday]);
 
-  const headline = useMemo(() => pickHeadlineEvent(thisWeekEvents), [thisWeekEvents]);
+    if (currentWeekEvents.length > 0 || list.length === 0) {
+      return {
+        monday: currentMonday,
+        sunday: currentSunday,
+        events: currentWeekEvents,
+        isCurrentWeek: true,
+        daysUntilNext: null as number | null,
+      };
+    }
+
+    const nextEvent = list.find(t => parseUTC(t.startDate) > currentSunday);
+    if (!nextEvent) {
+      return {
+        monday: currentMonday,
+        sunday: currentSunday,
+        events: [],
+        isCurrentWeek: true,
+        daysUntilNext: null as number | null,
+      };
+    }
+
+    const nextMonday = getMondayOfWeek(parseUTC(nextEvent.startDate));
+    const nextSunday = endOfWeek(nextMonday);
+    const nextWeekEvents = list.filter(t => {
+      const start = parseUTC(t.startDate);
+      return start >= nextMonday && start <= nextSunday;
+    });
+    const daysUntilNext = Math.max(0, Math.ceil(
+      (parseUTC(nextEvent.startDate).getTime() - Date.now()) / (1000 * 60 * 60 * 24)
+    ));
+
+    return {
+      monday: nextMonday,
+      sunday: nextSunday,
+      events: nextWeekEvents,
+      isCurrentWeek: false,
+      daysUntilNext,
+    };
+  }, [tournaments]);
+
+  const headline = useMemo(() => pickHeadlineEvent(displayWeek.events), [displayWeek.events]);
   const remaining = useMemo(() => {
     if (!headline) return [];
-    return thisWeekEvents
+    return displayWeek.events
       .filter(e => e.id !== headline.id)
       .sort((a, b) => a.startDate.localeCompare(b.startDate));
-  }, [thisWeekEvents, headline]);
+  }, [displayWeek.events, headline]);
 
   if (isLoading) return <CalendarSkeleton />;
 
