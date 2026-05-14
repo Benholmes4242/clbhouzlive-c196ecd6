@@ -8,6 +8,7 @@ import { PageRoot } from '@/components/layout/PageRoot';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useHeader } from '@/contexts/GlobalHeaderContext';
 import { useMedianStatusBar } from '@/hooks/useMedianStatusBar';
+import { useStickyHeaderSafeArea } from '@/hooks/useStickyHeaderSafeArea';
 import { formatCurrency } from '@/lib/utils/formatCurrency';
 import {
   FranchiseStoryStrip,
