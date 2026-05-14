@@ -64,7 +64,8 @@ function ExplorePassportInner({ userId }: ExplorePassportProps) {
       : 'Lifetime totals';
 
   return (
-    <section style={{ padding: '24px 16px 0' }}>
+    <section>
+      <div style={{ padding: '0 16px' }}>
       <ExploreSectionHeader
         kicker="Your Journey"
         title="Season passport"
