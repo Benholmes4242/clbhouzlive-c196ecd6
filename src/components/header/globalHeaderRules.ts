@@ -35,8 +35,9 @@ export const GLOBAL_HEADER_EXCLUDED_PREFIXES = [
 
 /**
  * Special routes that are conditionally excluded based on query params.
- * Tour Hub: show CompactHeader ONLY on Schedule, Players, and Leaders tabs.
- * Overview and all sub-pages remain immersive.
+ * Tour Hub: show CompactHeader on Schedule, Players, and Leaders tabs,
+ * plus Tournament detail, Player profile, and all College Golf sub-pages.
+ * Overview and the other sub-pages (live, tour/:tour, event, rankings) remain immersive.
  */
 export function isConditionallyExcluded(pathname: string, searchParams: URLSearchParams): boolean {
   // Tour Hub overview routes — Schedule, Players, and Leaders get the header.
@@ -45,7 +46,15 @@ export function isConditionallyExcluded(pathname: string, searchParams: URLSearc
     return tab !== 'schedule' && tab !== 'players' && tab !== 'leaderboards';
   }
 
-  // All sub-pages under /tourhub/... or /tour/... stay immersive.
+  // Tour sub-pages WITH CompactHeader (return false = show header):
+  //   /tourhub/tournament/:id
+  //   /tourhub/player/:id
+  //   /tourhub/college-golf  (and any /college-golf/... below it)
+  if (pathname.startsWith('/tourhub/tournament/')) return false;
+  if (pathname.startsWith('/tourhub/player/')) return false;
+  if (pathname.startsWith('/tourhub/college-golf')) return false;
+
+  // All other sub-pages under /tourhub/... or /tour/... stay immersive.
   if (pathname.startsWith('/tourhub/') || pathname.startsWith('/tour/')) {
     return true;
   }
