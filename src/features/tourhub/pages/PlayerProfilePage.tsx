@@ -109,8 +109,8 @@ export function PlayerProfilePage() {
 
   if (playerLoading) {
     return (
-      <PageRoot className="min-h-screen w-full" hasBottomNav immersive immersiveStatusBar style={{ background: '#F8FAFC' }}>
-        <div style={{ background: '#F8FAFC', padding: 'max(env(safe-area-inset-top, 0px), 47px) 16px 14px' }}>
+      <PageRoot className="min-h-screen w-full" hasBottomNav style={{ background: '#F8FAFC' }}>
+        <div style={{ background: '#F8FAFC', padding: '16px 16px 14px' }}>
           {/* Eyebrow */}
           <Skeleton className="h-2.5 w-20 mb-2" style={{ background: 'rgba(15,23,42,0.06)' }} />
           {/* h1 */}
