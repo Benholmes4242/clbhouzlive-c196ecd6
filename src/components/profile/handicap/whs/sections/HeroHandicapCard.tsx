@@ -49,6 +49,28 @@ function pickFormRingColor(
 // ── Tokens ────────────────────────────────────────────────────────────────
 const AMBER = '#F7931E';
 const AMBER_DEEP = '#C97211';
+// Amber → gold gradient stops (matches "Exceptional" rating in Course detail)
+const GRAD_AMBER = '#F59E0B';
+const GRAD_GOLD  = '#FBBF24';
+// Scoring ring gradient — deep amber to gold (richer, distinct from handicap)
+const GRAD_SCORING_DEEP = '#B45309';
+const GRAD_SCORING_LITE = '#FBBF24';
+// Whoop-style red-arc gradient (worsening handicap)
+const GRAD_RED_DEEP = '#7F1D1D';
+const GRAD_RED_LITE = '#EF4444';
+
+// Resolve a complementary "bright" stop for the form ring gradient based
+// on the chosen formArcColor so each form state pops without losing its
+// temperature meaning.
+function formGradientLite(deep: string): string {
+  switch (deep) {
+    case '#B91C1C': return '#F59E0B'; // hot → ember to warm amber
+    case '#F59E0B': return '#FCD34D'; // warm → amber to soft gold
+    case '#38BDF8': return '#7DD3FC'; // cold → sky to ice
+    case '#0E7490': return '#38BDF8'; // out → deep cyan to sky
+    default:        return deep;       // steady / empty → flat
+  }
+}
 const INK = '#0F172A';
 const INK_55 = 'rgba(15,23,42,0.55)';
 const INK_40 = 'rgba(15,23,42,0.40)';
