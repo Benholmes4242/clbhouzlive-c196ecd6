@@ -159,7 +159,7 @@ export const StablefordCard: React.FC<Props> = ({ scores }) => {
         <div
           style={{
             display: 'flex',
-            height: 64,
+            height: 48,
             borderRadius: 12,
             overflow: 'hidden',
             background: T.ink04,
