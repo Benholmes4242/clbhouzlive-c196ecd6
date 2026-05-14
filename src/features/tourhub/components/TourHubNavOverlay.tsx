@@ -393,7 +393,7 @@ export function TourHubNavOverlay({
                 transition={{ duration: 1.5, repeat: Infinity }}
               />
               <div>
-                <div style={{ fontSize: 9, fontWeight: 700, color: '#22C55E', letterSpacing: '1.5px', textTransform: 'uppercase' }}>Live now</div>
+                <div style={{ fontSize: 9, fontWeight: 800, color: '#15803D', letterSpacing: '0.16em', textTransform: 'uppercase' }}>Live now</div>
                 <div style={{ fontSize: 12, fontWeight: 600, color: '#0f172a' }}>{leaderTeaser.tournamentName}</div>
               </div>
             </div>
