@@ -22,8 +22,9 @@ export const TrendsView: React.FC<Props> = ({
       role="tabpanel"
       id="handicap-panel-trends"
       aria-labelledby="handicap-tab-trends"
+      style={{ paddingTop: 16 }}
     >
-      <TrendCardsStack connectionId={connectionId} currentHandicap={currentHandicap} splitAt="hero-only" />
+      <TrendCardsStack connectionId={connectionId} currentHandicap={currentHandicap} splitAt="hero-only" topMargin={0} />
       <TrendCardsStack connectionId={connectionId} currentHandicap={currentHandicap} splitAt="rest" />
       {!readOnly && <WhereYouStandSection userId={userId} />}
       {!readOnly && <EchoInsightsCard connectionId={connectionId} />}
