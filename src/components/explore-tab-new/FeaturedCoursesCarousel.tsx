@@ -13,16 +13,11 @@ export function FeaturedCoursesCarousel({ onRegionSelect }: FeaturedCoursesCarou
 
   if (isLoading) {
     return (
-      <section style={{ padding: '24px 16px 0' }}>
-        <div style={{ padding: '0 0 12px' }}>
-          <h2 style={{ fontSize: 18, fontWeight: 900, letterSpacing: '-0.02em', color: '#0F172A', margin: 0 }}>
-            Course of the week
-          </h2>
-          <p style={{ fontSize: 12, color: 'rgba(15,23,42,0.55)', margin: '2px 0 0', fontWeight: 500 }}>
-            Editorial pick
-          </p>
+      <section>
+        <ExploreSectionHeader title="Course of the week" sub="Editorial pick" />
+        <div style={{ padding: '0 16px' }}>
+          <div className="w-full bg-muted animate-pulse rounded-[12px]" style={{ aspectRatio: '16/10' }} />
         </div>
-        <div className="w-full bg-muted animate-pulse rounded-[12px]" style={{ aspectRatio: '16/10' }} />
       </section>
     );
   }
