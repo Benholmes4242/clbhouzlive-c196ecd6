@@ -73,7 +73,7 @@ function computeAxis(dataMin: number, dataMax: number): {
 }
 
 const Skeleton: React.FC = () => (
-  <section style={{ marginTop: 32 }}>
+  <section style={{ marginTop: 20 }}>
     <SectionHeader eyebrow="ROUNDS THAT COUNT" title="The 8 best of your last 20" />
     <div style={{ padding: '0 20px' }}>
     <div style={{ height: 12, width: 140, background: INK_06, borderRadius: 2, marginBottom: 10 }} />
