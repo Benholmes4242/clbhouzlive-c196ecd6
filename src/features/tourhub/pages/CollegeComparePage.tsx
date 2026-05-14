@@ -35,7 +35,7 @@ export function CollegeComparePage() {
   const c2 = searchParams.get('c2') || '';
 
   const { data, isLoading, error } = useCollegeCompare(c1, c2);
-  const { sentinelRef, paddingTop: stickyPaddingTop, isAtTop } = useStickyHeaderSafeArea();
+  const { sentinelRef, isAtTop } = useStickyHeaderSafeArea();
 
   const hasValidParams = c1 && c2;
 
