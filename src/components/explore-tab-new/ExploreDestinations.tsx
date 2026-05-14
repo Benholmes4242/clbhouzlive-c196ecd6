@@ -12,12 +12,8 @@ function ExploreDestinationsInner({ activeRegion, onRegionSelect }: ExploreDesti
 
   if (isLoading) {
     return (
-      <section style={{ padding: '24px 0 0' }}>
-        <div style={{ padding: '0 16px 12px' }}>
-          <h2 style={{ fontSize: 18, fontWeight: 900, letterSpacing: '-0.02em', color: '#0F172A', margin: 0 }}>
-            Destinations
-          </h2>
-        </div>
+      <section style={{ padding: '0 0 0' }}>
+        <ExploreSectionHeader title="Destinations" />
         <div className="flex gap-3 px-4 overflow-x-auto scrollbar-hide">
           {[0, 1, 2, 3].map(i => (
             <div
