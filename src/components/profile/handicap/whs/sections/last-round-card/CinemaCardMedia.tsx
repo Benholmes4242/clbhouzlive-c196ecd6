@@ -1,5 +1,6 @@
 import React from 'react';
 import { format } from 'date-fns';
+import FlagSilhouetteOverlay from '@/components/whs/FlagSilhouetteOverlay';
 
 const FONT_GEIST = 'Geist, system-ui, -apple-system, BlinkMacSystemFont, sans-serif';
 const AMBER = '#F7931E';
@@ -50,6 +51,7 @@ export const CinemaCardMedia: React.FC<Props> = ({
             : FALLBACK_GRADIENT,
         }}
       />
+      {!imageUrl && <FlagSilhouetteOverlay opacity={0.12} />}
       {/* z=1 atmospheric */}
       <div style={{ position: 'absolute', inset: 0, background: ATMOSPHERIC, pointerEvents: 'none' }} />
       {/* z=2 legibility */}
