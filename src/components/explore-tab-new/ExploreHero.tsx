@@ -174,7 +174,7 @@ function ExploreHeroInner({ userId, mood }: ExploreHeroProps) {
           <h2
             style={{
               fontSize: 28,
-              fontWeight: 900,
+              fontWeight: 800,
               letterSpacing: '-0.02em',
               lineHeight: 1.05,
               margin: 0,
