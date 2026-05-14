@@ -61,8 +61,6 @@ export function OverviewPageV3() {
     setActiveTournamentId(tournamentId);
   }, []);
 
-  const { data: tickerData } = useAllToursTickerData();
-  void tickerData;
   const heroContainerStyle = HERO_STYLES.containerBelowHeader;
 
 
