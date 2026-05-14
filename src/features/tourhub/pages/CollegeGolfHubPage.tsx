@@ -6,6 +6,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { useDebouncedValue } from '@/hooks/useDebouncedValue';
 import { formatCurrency } from '@/lib/utils/formatCurrency';
 import { TourHubShell } from '../components';
+import { useStickyHeaderSafeArea } from '@/hooks/useStickyHeaderSafeArea';
 import { FranchiseLeaderboard } from '../components/college';
 import { CollegeMasthead } from '../components/college/CollegeMasthead';
 import { CollegeCard } from '../components/college/CollegeCard';
