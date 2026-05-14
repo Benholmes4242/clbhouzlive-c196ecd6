@@ -55,12 +55,11 @@ interface ProfileHubSheetProps {
   isLoading?: boolean;
 }
 
-// ── Dispatch Rule Marker ──
+// ── Section Marker (canonical caps eyebrow) ──
 function RuleMarker({ label }: { label: string }) {
   return (
-    <div style={{ display: 'flex', alignItems: 'center', gap: 8, paddingTop: 14, paddingBottom: 8 }}>
-      <div style={{ width: 3, height: 12, background: '#F7931E', borderRadius: 1, flexShrink: 0 }} />
-      <span style={{ fontSize: 9, fontWeight: 900, color: '#F7931E', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>
+    <div style={{ paddingTop: 14, paddingBottom: 8 }}>
+      <span style={{ fontSize: 9, fontWeight: 800, color: '#64748B', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>
         {label}
       </span>
     </div>
@@ -86,8 +85,7 @@ function ProfileHubSheetSkeleton() {
 
       {/* ── Switch Profile skeleton ── */}
       <div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8, paddingTop: 14, paddingBottom: 8 }}>
-          <div style={{ width: 3, height: 12, borderRadius: 1, background: 'rgba(15,23,42,0.08)', flexShrink: 0 }} />
+        <div style={{ paddingTop: 14, paddingBottom: 8 }}>
           <Skeleton className="h-2.5 w-24 rounded" />
         </div>
         <div className="flex gap-3 overflow-hidden">
@@ -119,8 +117,7 @@ function ProfileHubSheetSkeleton() {
 
       {/* ── Account rows skeleton ── */}
       <div className="py-3 space-y-1">
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8, paddingTop: 14, paddingBottom: 8 }}>
-          <div style={{ width: 3, height: 12, borderRadius: 1, background: 'rgba(15,23,42,0.08)', flexShrink: 0 }} />
+        <div style={{ paddingTop: 14, paddingBottom: 8 }}>
           <Skeleton className="h-2.5 w-16 rounded" />
         </div>
         {[0, 1, 2].map(i => (
