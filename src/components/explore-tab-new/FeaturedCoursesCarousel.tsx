@@ -1,6 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import { useCourseOfTheWeek } from './hooks/useCourseOfTheWeek';
 import clbhouzLogo from '@/assets/clbhouz-logo.png';
+import { ExploreSectionHeader } from './ExploreSectionHeader';
 
 interface FeaturedCoursesCarouselProps {
   onRegionSelect: (slug: string) => void;
