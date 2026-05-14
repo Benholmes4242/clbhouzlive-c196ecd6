@@ -1,8 +1,11 @@
-import React, { useState } from 'react';
-import { format } from 'date-fns';
-import { useLastRound, useRoundDetail } from '@/lib/whs/hooks';
+import React, { useMemo, useState } from 'react';
+import { useLastRound, useRoundDetail, useAllScores } from '@/lib/whs/hooks';
 import RoundDetailSheet from './round-detail/RoundDetailSheet';
-import { RoundCardShell, type HoleRow } from './round-card';
+import {
+  CinemaCard,
+  CinemaCardSkeleton,
+  buildLastRoundFooter,
+} from './last-round-card';
 
 interface Props {
   connectionId: string;
@@ -10,16 +13,6 @@ interface Props {
 
 const FONT_GEIST = 'Geist, system-ui, -apple-system, BlinkMacSystemFont, sans-serif';
 const INK_55 = 'rgba(15,23,42,0.55)';
-
-const relativeDay = (iso: string) => {
-  const d = new Date(iso);
-  const now = new Date();
-  const days = Math.floor((now.getTime() - d.getTime()) / 86_400_000);
-  if (days <= 0) return 'Today';
-  if (days === 1) return 'Yesterday';
-  if (days < 7) return `${days} days ago`;
-  return format(d, 'd MMM');
-};
 
 const SectionEyebrow: React.FC<{ label: string }> = ({ label }) => (
   <div style={{ marginBottom: 6, padding: '0 16px 12px' }}>
@@ -41,9 +34,10 @@ const SectionEyebrow: React.FC<{ label: string }> = ({ label }) => (
 export const LastRoundCard: React.FC<Props> = ({ connectionId }) => {
   const { data: lastRound, isLoading } = useLastRound(connectionId);
   const { data: roundDetail } = useRoundDetail(lastRound?.id, !!lastRound?.id);
+  const { data: allScores } = useAllScores(connectionId);
   const [sheetOpen, setSheetOpen] = useState(false);
 
-  const par = React.useMemo<number | null>(() => {
+  const par = useMemo<number | null>(() => {
     if (!roundDetail?.holes || !roundDetail.hole_by_hole_fetched) return null;
     let total = 0;
     let any = false;
@@ -56,14 +50,35 @@ export const LastRoundCard: React.FC<Props> = ({ connectionId }) => {
     return any ? total : null;
   }, [roundDetail]);
 
+  const counterRank = useMemo<number | null>(() => {
+    if (!lastRound || !lastRound.is_counter || !allScores) return null;
+    const last20 = allScores.slice(0, 20);
+    const sorted = [...last20]
+      .filter((s) => s.handicap_differential != null)
+      .sort((a, b) => a.handicap_differential! - b.handicap_differential!);
+    const idx = sorted.findIndex((s) => s.id === lastRound.id);
+    if (idx === -1) return null;
+    return Math.min(idx + 1, 8);
+  }, [lastRound, allScores]);
+
+  const footerCopy = useMemo(() => {
+    if (!lastRound) return null;
+    return buildLastRoundFooter({
+      gross: lastRound.adjusted_gross ?? null,
+      par,
+      courseHandicap: roundDetail?.course_handicap ?? null,
+      handicapDelta: lastRound.handicap_delta ?? null,
+      handicapIndexAtTime: lastRound.handicap_index_at_time ?? null,
+      isCounter: lastRound.is_counter ?? false,
+    });
+  }, [lastRound, par, roundDetail]);
+
   if (isLoading) {
     return (
       <section style={{ marginTop: 32 }}>
         <SectionEyebrow label="LAST ROUND" />
         <div style={{ padding: '0 20px' }}>
-          <div className="space-y-2 animate-pulse">
-            <div className="h-[200px] w-full bg-muted rounded-2xl" />
-          </div>
+          <CinemaCardSkeleton />
         </div>
       </section>
     );
@@ -82,90 +97,27 @@ export const LastRoundCard: React.FC<Props> = ({ connectionId }) => {
     );
   }
 
-  const courseName = lastRound.course?.name ?? 'Unknown course';
-  const contextLine = [
-    relativeDay(lastRound.play_date).toUpperCase(),
-    par != null ? `PAR ${par}` : null,
-    lastRound.slope_rating != null ? `SL ${lastRound.slope_rating}` : null,
-  ]
-    .filter(Boolean)
-    .join(' · ');
-
-  const banner = (
-    <div
-      style={{
-        position: 'absolute',
-        left: 12,
-        right: 12,
-        bottom: 10,
-        zIndex: 1,
-      }}
-    >
-      <div
-        style={{
-          fontSize: 16,
-          fontWeight: 800,
-          color: '#fff',
-          letterSpacing: '-0.01em',
-          lineHeight: 1.15,
-          whiteSpace: 'nowrap',
-          overflow: 'hidden',
-          textOverflow: 'ellipsis',
-          textShadow: '0 1px 4px rgba(0,0,0,0.6)',
-          fontFamily: FONT_GEIST,
-        }}
-      >
-        {courseName}
-      </div>
-      {contextLine && (
-        <div
-          style={{
-            marginTop: 3,
-            fontSize: 10,
-            fontWeight: 700,
-            color: 'rgba(255,255,255,0.78)',
-            letterSpacing: '0.10em',
-            textTransform: 'uppercase',
-            whiteSpace: 'nowrap',
-            overflow: 'hidden',
-            textOverflow: 'ellipsis',
-            textShadow: '0 1px 3px rgba(0,0,0,0.6)',
-            fontVariantNumeric: 'tabular-nums',
-            fontFamily: FONT_GEIST,
-          }}
-        >
-          {contextLine}
-        </div>
-      )}
-    </div>
-  );
-
-  const holes: HoleRow[] | null =
-    roundDetail?.holes && roundDetail.hole_by_hole_fetched
-      ? roundDetail.holes.map((h) => ({
-          hole_no: h.hole_no,
-          par: h.par,
-          actual_gross: h.actual_gross,
-          adjusted_gross: h.adjusted_gross,
-          played: h.played,
-          hole_alias: h.hole_alias,
-        }))
-      : null;
+  const holes =
+    roundDetail?.holes && roundDetail.hole_by_hole_fetched ? roundDetail.holes : null;
 
   return (
     <>
       <section style={{ marginTop: 32, fontFamily: FONT_GEIST }}>
         <SectionEyebrow label="LAST ROUND" />
         <div style={{ padding: '0 20px' }}>
-          <RoundCardShell
-            courseThumbnailUrl={lastRound.course_thumbnail_image}
-            banner={banner}
-            gross={lastRound.adjusted_gross ?? null}
-            differential={lastRound.handicap_differential ?? null}
-            stableford={lastRound.stableford_points ?? null}
-            handicapDelta={lastRound.handicap_delta ?? null}
+          <CinemaCard
+            imageUrl={lastRound.course_thumbnail_image}
+            playDate={lastRound.play_date}
             isCounter={lastRound.is_counter ?? false}
+            counterRank={counterRank}
+            courseName={lastRound.course?.name ?? 'Unknown course'}
+            par={par}
+            slope={lastRound.slope_rating ?? null}
+            gross={lastRound.adjusted_gross ?? null}
+            stableford={lastRound.stableford_points ?? null}
+            differential={lastRound.handicap_differential ?? null}
             holes={holes}
+            footerCopy={footerCopy}
             onClick={() => setSheetOpen(true)}
           />
         </div>
