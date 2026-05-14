@@ -268,7 +268,7 @@ const CounterBadge: React.FC<{ count: number }> = ({ count }) => (
           width: 5,
           height: 5,
           borderRadius: 999,
-          background: T.amber,
+          background: 'linear-gradient(135deg, #F59E0B 0%, #FBBF24 100%)',
         }}
       />
       {count} {count === 1 ? 'counter' : 'counters'}
