@@ -40,10 +40,9 @@ export const GLOBAL_HEADER_EXCLUDED_PREFIXES = [
  * Overview and the other sub-pages (live, tour/:tour, event, rankings) remain immersive.
  */
 export function isConditionallyExcluded(pathname: string, searchParams: URLSearchParams): boolean {
-  // Tour Hub overview routes — Schedule, Players, and Leaders get the header.
+  // Tour Hub overview routes — all sub-tabs (overview, schedule, players, leaderboards) get the header.
   if (pathname === '/tourhub' || pathname === '/tour') {
-    const tab = searchParams.get('tab');
-    return tab !== 'schedule' && tab !== 'players' && tab !== 'leaderboards';
+    return false;
   }
 
   // Tour sub-pages WITH CompactHeader (return false = show header):

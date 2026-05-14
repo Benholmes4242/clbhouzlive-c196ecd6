@@ -1,7 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { useNavigate, useLocation, useSearchParams } from "react-router-dom";
 import { Search, ArrowLeft } from 'lucide-react';
-import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { useUnreadNotifications } from '@/hooks/useUnreadNotifications';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
@@ -11,10 +10,7 @@ import { PostingAsMenu } from './PostingAsMenu';
 import GlobalSearchOverlay from '@/components/search/GlobalSearchOverlay';
 import { ActingAsIndicator } from './ActingAsIndicator';
 import { cn } from '@/lib/utils';
-import { NineDotsIcon } from '@/features/tourhub/components/NineDotsIcon';
-import { openTourNav } from '@/features/tourhub/contexts/TourNavContext';
 import { haptic } from '@/utils/haptics';
-import { useLiveTournamentCount, usePrefetchNavMenu } from '@/features/tourhub/hooks/useNavMenuData';
 
 interface CompactHeaderProps {
   className?: string;
@@ -48,16 +44,10 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
   const [menuOpen, setMenuOpen] = useState(false);
   const pillRef = useRef<HTMLButtonElement>(null);
   
-  // Live tournament data for Tour routes
-  // Only the Overview tab shows the nine-dot tour menu icon. Sub-tabs (schedule,
-  // players, leaderboards) match the Discover compact header style with the clbhouz logo.
-  const isTourPath = location.pathname.startsWith('/tour') || location.pathname.startsWith('/tourhub');
-  const tourTabParam = searchParams.get('tab');
-  const isTourOverview = isTourPath && (!tourTabParam || tourTabParam === 'overview');
-  const isTourRoute = isTourOverview;
-  const { data: liveCount } = useLiveTournamentCount();
-  const prefetchNavMenu = usePrefetchNavMenu();
-  const hasLiveTournaments = isTourRoute && (liveCount ?? 0) > 0;
+  // Tour routes are treated identically across all sub-tabs.
+  // The clbhouz logo renders on the left; tour menu access lives in the bottom-nav 'Tour Nav' button.
+  // (isTourPath retained for potential future use; not currently branched on.)
+
   
   // Determine routes
   const isEditProfileRoute = location.pathname === '/edit-profile';
@@ -115,9 +105,6 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
       } else if (isWatchSubpageRoute) {
         navigate(-1);
       }
-    } else if (isTourRoute) {
-      haptic('light');
-      openTourNav();
     } else {
       navigate('/clubhouse');
     }
@@ -178,32 +165,16 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
           className="mx-auto flex items-center justify-between px-3 sm:px-4 max-w-5xl"
           style={{ height: `${contentHeight}px` }}
         >
-          {/* Left section: Back Button, Tour Menu Icon, or Logo (fixed width, 44px tap target) */}
+          {/* Left section: Back Button or Logo (fixed width, 44px tap target) */}
           <div className="flex-shrink-0">
             <button
               type="button"
               className="flex items-center gap-2 bg-transparent border-0 transition-transform min-h-[44px] cursor-pointer active:scale-[0.98]"
               onClick={handleLogoClick}
-              onTouchStart={isTourRoute ? prefetchNavMenu : undefined}
-              aria-label={isBackArrowRoute ? "Go back" : isTourRoute ? "Go to tour menu" : "Go to home"}
+              aria-label={isBackArrowRoute ? "Go back" : "Go to home"}
             >
               {isBackArrowRoute ? (
                 <ArrowLeft className="h-6 w-6 text-foreground" />
-              ) : isTourRoute ? (
-                <span className="relative inline-flex">
-                  <NineDotsIcon 
-                    className="text-foreground"
-                    size={28} 
-                  />
-                  {hasLiveTournaments && (
-                    <motion.span
-                      className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 rounded-full border-2 border-background"
-                      style={{ background: 'hsl(var(--destructive))' }}
-                      animate={{ scale: [1, 1.2, 1] }}
-                      transition={{ duration: 2, repeat: Infinity }}
-                    />
-                  )}
-                </span>
               ) : (
                 <img
                   src="/lovable-uploads/29e83040-b5c5-48e4-84d7-3f99640e4a80.png"
