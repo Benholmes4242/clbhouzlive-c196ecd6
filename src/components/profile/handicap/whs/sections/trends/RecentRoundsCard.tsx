@@ -630,7 +630,7 @@ const FeedCard: React.FC<FeedCardProps> = ({ round, isBest, onTap }) => {
                 <span
                   style={{
                     padding: '2px 6px',
-                    background: T.amber,
+                    background: 'linear-gradient(135deg, #F59E0B 0%, #FBBF24 100%)',
                     color: '#FFFFFF',
                     borderRadius: 99,
                     fontSize: 9,
