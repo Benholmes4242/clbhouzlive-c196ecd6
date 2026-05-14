@@ -52,7 +52,7 @@ function classifyHandicapTileState(
 
   // Without a 30D baseline (or with a tiny delta), fall through to steady.
   if (!trend.hasHistory || trend.delta === null) return 'steady';
-  if (Math.abs(trend.delta) < 0.2) return 'steady';
+  if (Math.abs(trend.delta) < 0.05) return 'steady';
   return trend.delta < 0 ? 'improving' : 'drifting';
 }
 
