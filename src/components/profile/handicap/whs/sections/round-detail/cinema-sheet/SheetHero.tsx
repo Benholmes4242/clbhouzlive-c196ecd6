@@ -1,5 +1,6 @@
 import React from 'react';
 import { X } from 'lucide-react';
+import FlagSilhouetteOverlay from '@/components/whs/FlagSilhouetteOverlay';
 
 interface Props {
   imageUrl: string | null;
@@ -11,19 +12,19 @@ interface Props {
 
 const FALLBACK = 'linear-gradient(140deg,#2d3a2d 0%,#4a5d4a 25%,#6b7a5a 50%,#8a9670 72%,#c4a574 88%,#d4956b 100%)';
 
-/** 300px Cinema hero — gradient/photo, atmospheric scrims, drag handle, close X, eyebrow, optional pill, glass tile. */
+/** 340px Cinema hero — gradient/photo, atmospheric scrims, drag handle, close X, eyebrow, optional pill, glass tile. */
 export const SheetHero: React.FC<Props> = ({ imageUrl, onClose, topEyebrow, topRightPill, glass }) => (
   <div
     style={{
       position: 'relative',
       width: '100%',
-      height: 300,
+      height: 340,
       flexShrink: 0,
       background: FALLBACK,
       overflow: 'hidden',
     }}
   >
-    {imageUrl && (
+    {imageUrl ? (
       <img
         src={imageUrl}
         alt=""
@@ -36,6 +37,8 @@ export const SheetHero: React.FC<Props> = ({ imageUrl, onClose, topEyebrow, topR
           display: 'block',
         }}
       />
+    ) : (
+      <FlagSilhouetteOverlay opacity={0.12} />
     )}
     {/* atmospheric */}
     <div

@@ -3,7 +3,6 @@ import { Drawer as DrawerPrimitive } from 'vaul';
 import { useNavigate } from 'react-router-dom';
 import { useRoundDetail, useFriendRoundDetail, useAllScores } from '@/lib/whs/hooks';
 import RoundScorecard from './RoundScorecard';
-import RoundBreakdown from './RoundBreakdown';
 import {
   SheetHero,
   SheetHeroGlass,
@@ -38,7 +37,7 @@ const AMBER = '#F7931E';
 
 const SheetSkeleton: React.FC = () => (
   <div className="animate-pulse">
-    <div style={{ width: '100%', height: 300, background: 'rgba(15,23,42,0.06)' }} />
+    <div style={{ width: '100%', height: 340, background: 'rgba(15,23,42,0.06)' }} />
     <div style={{ padding: 18 }}>
       <div style={{ height: 180, background: 'rgba(15,23,42,0.04)', borderRadius: 8, marginBottom: 12 }} />
       <div style={{ height: 60, background: 'rgba(15,23,42,0.04)', borderRadius: 8 }} />
@@ -155,10 +154,7 @@ export const RoundDetailSheet: React.FC<Props> = ({
         />
 
         {hasHoles ? (
-          <>
-            <RoundScorecard holes={holes!} isNineHole={userData.is_nine_hole} />
-            <RoundBreakdown holes={holes!} />
-          </>
+          <RoundScorecard holes={holes!} isNineHole={userData.is_nine_hole} />
         ) : (
           <ScorecardEmpty
             message={
@@ -270,10 +266,7 @@ export const RoundDetailSheet: React.FC<Props> = ({
         {friendLoading && !friendDetail ? (
           <ScorecardEmpty message="Loading hole data\u2026" />
         ) : hasHoles ? (
-          <>
-            <RoundScorecard holes={holes!} isNineHole={!!friendDetail?.is_nine_hole} />
-            <RoundBreakdown holes={holes!} />
-          </>
+          <RoundScorecard holes={holes!} isNineHole={!!friendDetail?.is_nine_hole} />
         ) : friendDetail && !friendDetail.hole_by_hole_fetched ? (
           <ScorecardEmpty
             message="Hole data is still syncing"

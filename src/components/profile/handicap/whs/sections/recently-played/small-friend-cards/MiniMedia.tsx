@@ -1,4 +1,5 @@
 import React from 'react';
+import FlagSilhouetteOverlay from '@/components/whs/FlagSilhouetteOverlay';
 
 interface Props {
   thumbnailUrl: string | null;
@@ -26,7 +27,7 @@ export const MiniMedia: React.FC<Props> = ({ thumbnailUrl, altText, children }) 
         overflow: 'hidden',
       }}
     >
-      {thumbnailUrl && (
+      {thumbnailUrl ? (
         <img
           src={thumbnailUrl}
           alt={altText}
@@ -39,6 +40,8 @@ export const MiniMedia: React.FC<Props> = ({ thumbnailUrl, altText, children }) 
             display: 'block',
           }}
         />
+      ) : (
+        <FlagSilhouetteOverlay opacity={0.20} />
       )}
       {/* Atmospheric scrim — softens raw photos */}
       <div

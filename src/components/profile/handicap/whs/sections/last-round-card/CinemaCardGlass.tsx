@@ -79,7 +79,7 @@ export const CinemaCardGlass: React.FC<Props> = ({
         position: 'absolute',
         left: 14,
         right: 14,
-        bottom: 14,
+        bottom: 64,
         zIndex: 3,
         padding: '16px 18px',
         borderRadius: 16,

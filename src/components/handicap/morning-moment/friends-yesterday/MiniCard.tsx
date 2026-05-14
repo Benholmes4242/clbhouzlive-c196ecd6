@@ -1,5 +1,6 @@
 import React from 'react';
 import type { FriendYesterday } from '@/lib/handicap/useFriendsYesterday';
+import FlagSilhouetteOverlay from '@/components/whs/FlagSilhouetteOverlay';
 import { deriveHeroState } from './deriveHeroState';
 import TopEyebrow from './TopEyebrow';
 import MiniGlass from './MiniGlass';
@@ -72,7 +73,10 @@ export const MiniCard: React.FC<Props> = ({ friend, rank, onClick }) => {
           }}
         />
       ) : (
-        <div style={{ position: 'absolute', inset: 0, background: FALLBACK_GRADIENT }} />
+        <>
+          <div style={{ position: 'absolute', inset: 0, background: FALLBACK_GRADIENT }} />
+          <FlagSilhouetteOverlay opacity={0.20} />
+        </>
       )}
 
       <div style={{ position: 'absolute', inset: 0, background: ATMOSPHERIC, pointerEvents: 'none' }} />

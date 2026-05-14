@@ -1,6 +1,7 @@
 import React from 'react';
 import { firstName } from '@/lib/whs/utils/initials';
 import { useFriendRoundDetail } from '@/lib/whs/hooks';
+import FlagSilhouetteOverlay from '@/components/whs/FlagSilhouetteOverlay';
 import type { WhsFriendActivityWithImage } from '@/lib/whs/types';
 import CinemaFriendEyebrow from './CinemaFriendEyebrow';
 import CinemaFriendGlass from './CinemaFriendGlass';
@@ -72,7 +73,10 @@ export const CinemaFriendCard: React.FC<Props> = ({ activity, onClick }) => {
           }}
         />
       ) : (
-        <div style={{ position: 'absolute', inset: 0, background: FALLBACK_GRADIENT }} />
+        <>
+          <div style={{ position: 'absolute', inset: 0, background: FALLBACK_GRADIENT }} />
+          <FlagSilhouetteOverlay opacity={0.12} />
+        </>
       )}
 
       {/* Scrims */}

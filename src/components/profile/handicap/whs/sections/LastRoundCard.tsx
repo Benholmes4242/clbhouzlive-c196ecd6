@@ -4,7 +4,6 @@ import RoundDetailSheet from './round-detail/RoundDetailSheet';
 import {
   CinemaCard,
   CinemaCardSkeleton,
-  buildLastRoundFooter,
 } from './last-round-card';
 
 interface Props {
@@ -61,17 +60,6 @@ export const LastRoundCard: React.FC<Props> = ({ connectionId }) => {
     return Math.min(idx + 1, 8);
   }, [lastRound, allScores]);
 
-  const footerCopy = useMemo(() => {
-    if (!lastRound) return null;
-    return buildLastRoundFooter({
-      gross: lastRound.adjusted_gross ?? null,
-      par,
-      courseHandicap: roundDetail?.course_handicap ?? null,
-      handicapDelta: lastRound.handicap_delta ?? null,
-      handicapIndexAtTime: lastRound.handicap_index_at_time ?? null,
-      isCounter: lastRound.is_counter ?? false,
-    });
-  }, [lastRound, par, roundDetail]);
 
   if (isLoading) {
     return (
@@ -117,7 +105,7 @@ export const LastRoundCard: React.FC<Props> = ({ connectionId }) => {
             stableford={lastRound.stableford_points ?? null}
             differential={lastRound.handicap_differential ?? null}
             holes={holes}
-            footerCopy={footerCopy}
+            handicapDelta={lastRound.handicap_delta ?? null}
             onClick={() => setSheetOpen(true)}
           />
         </div>

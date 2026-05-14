@@ -8,7 +8,7 @@ interface Props {
 export const CounterPill: React.FC<Props> = ({ isCounter, rank }) => {
   const base: React.CSSProperties = {
     position: 'absolute',
-    top: 66,
+    top: 86,
     right: 18,
     zIndex: 3,
     padding: '4px 9px',

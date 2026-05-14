@@ -2,8 +2,7 @@ import React from 'react';
 import type { WhsScoreHole } from '@/lib/whs/types';
 import CinemaCardMedia from './CinemaCardMedia';
 import CinemaCardGlass from './CinemaCardGlass';
-import CinemaCardFooter from './CinemaCardFooter';
-import type { FooterCopy } from './lastRoundFooter';
+import CinemaCardOnPhotoFooter from './CinemaCardOnPhotoFooter';
 
 interface Props {
   imageUrl: string | null;
@@ -17,7 +16,7 @@ interface Props {
   stableford: number | null;
   differential: number | null;
   holes: WhsScoreHole[] | null;
-  footerCopy: FooterCopy | null;
+  handicapDelta: number | null;
   onClick: () => void;
 }
 
@@ -33,7 +32,7 @@ export const CinemaCard: React.FC<Props> = ({
   stableford,
   differential,
   holes,
-  footerCopy,
+  handicapDelta,
   onClick,
 }) => {
   return (
@@ -69,8 +68,11 @@ export const CinemaCard: React.FC<Props> = ({
           differential={differential}
           holes={holes}
         />
+        <CinemaCardOnPhotoFooter
+          isCounter={isCounter}
+          handicapDelta={handicapDelta}
+        />
       </CinemaCardMedia>
-      <CinemaCardFooter copy={footerCopy} />
     </button>
   );
 };
