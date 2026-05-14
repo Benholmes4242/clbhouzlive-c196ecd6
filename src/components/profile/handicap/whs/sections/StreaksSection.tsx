@@ -223,8 +223,9 @@ interface StreakCardProps {
 }
 
 const StreakCard: React.FC<StreakCardProps> = ({
-  streak, label, sub, color, colorTint, icon,
+  streak, label, sub, color, colorTint, gradient, icon,
 }) => {
+  const fillBg = gradient ?? color;
   const isPb = streak.current > 0 && streak.current === streak.best;
   const remaining = Math.max(0, streak.best - streak.current);
   const fillPct = streak.best > 0
