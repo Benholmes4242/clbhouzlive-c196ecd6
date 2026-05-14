@@ -419,7 +419,7 @@ function CommentsSheet({
               · {relativeTime(comment.created_at)}
             </span>
             {(comment as any).is_edited && (
-              <span style={{ fontSize: 11, color: 'rgba(15,23,42,0.3)' }}>
+              <span style={{ fontSize: 11, color: '#94A3B8' }}>
                 edited
               </span>
             )}
