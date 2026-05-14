@@ -1,6 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import { Plus } from 'lucide-react';
 import { useBucketListCourses } from '@/hooks/useBucketListCourses';
+import { ExploreSectionHeader } from './ExploreSectionHeader';
 
 export function BucketListStrip() {
   const navigate = useNavigate();
