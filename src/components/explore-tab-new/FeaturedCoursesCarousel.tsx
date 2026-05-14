@@ -89,6 +89,7 @@ export function FeaturedCoursesCarousel({ onRegionSelect }: FeaturedCoursesCarou
           )}
         </div>
       </button>
+      </div>
     </section>
   );
 }
