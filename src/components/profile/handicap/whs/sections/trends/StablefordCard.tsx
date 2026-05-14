@@ -213,9 +213,9 @@ export const StablefordCard: React.FC<Props> = ({ scores }) => {
           padding: '4px 20px 14px',
         }}
       >
-        <SummaryCell color={T.green} label="IN THE ZONE" count={dist.inZoneCount} pct={dist.inZonePct} range="36+" />
-        <SummaryCell color={T.amber} label="SOLID" count={dist.solidCount} pct={dist.solidPct} range="33–35" />
-        <SummaryCell color={T.red} label="OFF DAY" count={dist.offDayCount} pct={dist.offDayPct} range="<33" />
+        <SummaryCell color={T.green} accent={GREEN_GRAD} label="IN THE ZONE" count={dist.inZoneCount} pct={dist.inZonePct} range="36+" />
+        <SummaryCell color={T.amber} accent={AMBER_GRAD} label="SOLID" count={dist.solidCount} pct={dist.solidPct} range="33–35" />
+        <SummaryCell color={T.red} accent={RED_GRAD} label="OFF DAY" count={dist.offDayCount} pct={dist.offDayPct} range="<33" />
       </div>
 
       <StablefordDetailSheet open={sheetOpen} onClose={() => setSheetOpen(false)} dist={dist} />
