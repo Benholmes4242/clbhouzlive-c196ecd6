@@ -338,7 +338,7 @@ export function ResultsHeroSkeleton() {
   return (
     <div style={{
       height: '100%', background: lightBg,
-      paddingTop: 'calc(env(safe-area-inset-top, 0px) + 28px)',
+      paddingTop: 'calc(max(env(safe-area-inset-top, 0px), 47px) + 28px)',
       paddingInline: 20, paddingBottom: 16,
       boxSizing: 'border-box', overflow: 'hidden',
       display: 'flex', flexDirection: 'column',
@@ -459,7 +459,7 @@ export function EditorialResultsHero({
       display: 'flex',
       flexDirection: 'column',
       background: lightBg,
-      paddingTop: 'calc(env(safe-area-inset-top, 0px) + 28px)',
+      paddingTop: 'calc(max(env(safe-area-inset-top, 0px), 47px) + 28px)',
       paddingInline: 20,
       paddingBottom: 16,
       boxSizing: 'border-box',
