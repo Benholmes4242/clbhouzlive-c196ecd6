@@ -67,13 +67,27 @@ export async function fetchHandicapTrend(connectionId: string): Promise<WhsHandi
     .limit(1)
     .maybeSingle();
 
+  // Count total rounds in scoring record for "awaiting data" classification.
+  const { count: roundCount } = await supabase
+    .from('whs_scores' as any)
+    .select('id', { count: 'exact', head: true })
+    .eq('connection_id', connectionId);
+
   const l = latest as any;
   const p = previous as any;
-  if (!l) return { current: null, delta: null, hasHistory: false };
-  if (!p) return { current: Number(l.handicap_index), delta: null, hasHistory: false };
+  const totalRoundsInRecord = roundCount ?? 0;
+
+  if (!l) {
+    return { current: null, delta: null, previousHandicap: null, totalRoundsInRecord, hasHistory: false };
+  }
+  if (!p) {
+    return { current: Number(l.handicap_index), delta: null, previousHandicap: null, totalRoundsInRecord, hasHistory: false };
+  }
   return {
     current: Number(l.handicap_index),
     delta: Number(l.handicap_index) - Number(p.handicap_index),
+    previousHandicap: Number(p.handicap_index),
+    totalRoundsInRecord,
     hasHistory: true,
   };
 }
