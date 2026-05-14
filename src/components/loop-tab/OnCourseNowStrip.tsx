@@ -48,7 +48,7 @@ export function OnCourseNowStrip({ userId }: OnCourseNowStripProps) {
         style={{ padding: '10px 16px 8px' }}
       >
         <div className="flex items-center gap-2">
-          <span style={{ fontSize: 16, fontWeight: 700, color: 'hsl(var(--foreground))', letterSpacing: '-0.02em' }}>
+          <span style={{ fontSize: 18, fontWeight: 800, color: '#0F172A', letterSpacing: '-0.015em' }}>
             Recently active
           </span>
           {onlineCount > 0 && (
@@ -56,8 +56,8 @@ export function OnCourseNowStrip({ userId }: OnCourseNowStripProps) {
               style={{
                 fontSize: 11,
                 fontWeight: 600,
-                color: '#16a34a',
-                background: 'rgba(22,163,74,0.08)',
+                color: '#15803D',
+                background: 'rgba(21,128,61,0.08)',
                 borderRadius: 10,
                 padding: '2px 8px',
               }}
@@ -68,9 +68,22 @@ export function OnCourseNowStrip({ userId }: OnCourseNowStripProps) {
         </div>
         <button
           onClick={() => navigate('/golferstofollow')}
-          style={{ fontSize: 12, fontWeight: 600, color: '#F7931E', background: 'none', border: 'none', cursor: 'pointer' }}
+          style={{
+            fontSize: 11,
+            fontWeight: 800,
+            color: '#0F172A',
+            letterSpacing: '-0.005em',
+            background: 'none',
+            border: 'none',
+            cursor: 'pointer',
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: 2,
+            padding: 0,
+          }}
         >
-          See all →
+          See all
+          <ChevronRight size={12} strokeWidth={2.4} color="#0F172A" />
         </button>
       </div>
 
