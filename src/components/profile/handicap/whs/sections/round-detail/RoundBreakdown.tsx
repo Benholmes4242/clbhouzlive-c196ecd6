@@ -5,9 +5,21 @@ interface Props {
   holes: WhsScoreHole[];
 }
 
+const FONT_GEIST = 'Geist, system-ui, -apple-system, BlinkMacSystemFont, sans-serif';
+const FONT_MONO = "'Geist Mono', ui-monospace, SFMono-Regular, Menlo, monospace";
 const INK = '#0F172A';
-const INK_55 = 'rgba(15,23,42,0.55)';
+const INK_45 = 'rgba(15,23,42,0.45)';
+const HAIRLINE = 'rgba(15,23,42,0.08)';
 const AMBER = '#F7931E';
+const RED = '#EF4444';
+const MAROON = '#991B1B';
+
+interface ChipDef {
+  color: string;
+  value: number;
+  label: string;
+  alwaysShow?: boolean;
+}
 
 export const RoundBreakdown: React.FC<Props> = ({ holes }) => {
   const counts = useMemo(() => {
@@ -30,85 +42,81 @@ export const RoundBreakdown: React.FC<Props> = ({ holes }) => {
     return c;
   }, [holes]);
 
-  const chips: Array<{ color: string; value: number; label: string }> = [];
-  if (counts.ace > 0) chips.push({ color: AMBER, value: counts.ace, label: 'ACE' });
+  const chips: ChipDef[] = [];
+  if (counts.ace > 0)
+    chips.push({ color: AMBER, value: counts.ace, label: counts.ace === 1 ? 'ACE' : 'ACES' });
   if (counts.eagle > 0)
-    chips.push({
-      color: AMBER,
-      value: counts.eagle,
-      label: counts.eagle === 1 ? 'EAGLE' : 'EAGLES',
-    });
+    chips.push({ color: AMBER, value: counts.eagle, label: counts.eagle === 1 ? 'EAGLE' : 'EAGLES' });
   if (counts.birdie > 0)
-    chips.push({
-      color: AMBER,
-      value: counts.birdie,
-      label: counts.birdie === 1 ? 'BIRDIE' : 'BIRDIES',
-    });
-  chips.push({
-    color: INK_55,
-    value: counts.par,
-    label: counts.par === 1 ? 'PAR' : 'PARS',
-  });
-  chips.push({
-    color: INK,
-    value: counts.bogey,
-    label: counts.bogey === 1 ? 'BGY' : 'BGYS',
-  });
+    chips.push({ color: AMBER, value: counts.birdie, label: counts.birdie === 1 ? 'BIRDIE' : 'BIRDIES' });
+  chips.push({ color: INK_45, value: counts.par, label: counts.par === 1 ? 'PAR' : 'PARS', alwaysShow: true });
+  chips.push({ color: RED, value: counts.bogey, label: counts.bogey === 1 ? 'BOGEY' : 'BOGEYS', alwaysShow: true });
   if (counts.doublePlus > 0)
-    chips.push({ color: INK, value: counts.doublePlus, label: 'DBL+' });
+    chips.push({ color: MAROON, value: counts.doublePlus, label: 'DBL+' });
 
   return (
-    <div
-      style={{
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        flexWrap: 'wrap',
-        gap: 14,
-        padding: '14px 16px 12px',
-        borderTop: `1px solid rgba(15,23,42,0.08)`,
-      }}
-    >
-      {chips.map((c, i) => (
+    <div style={{ padding: '12px 0 16px', fontFamily: FONT_GEIST }}>
+      <div style={{ height: 0.5, background: 'rgba(15,23,42,0.15)', margin: '0 18px' }} />
+      <div style={{ padding: '0 18px', margin: '12px 0 10px' }}>
         <span
-          key={`c-${i}-${c.label}`}
           style={{
-            display: 'inline-flex',
-            alignItems: 'baseline',
-            gap: 4,
+            fontSize: 11,
+            fontWeight: 700,
+            letterSpacing: '0.18em',
+            color: AMBER,
+            textTransform: 'uppercase',
           }}
         >
-          <span
-            style={{
-              width: 6,
-              height: 6,
-              borderRadius: '50%',
-              background: c.color,
-              alignSelf: 'center',
-            }}
-          />
-          <span
-            style={{
-              fontSize: 12,
-              fontWeight: 800,
-              color: INK,
-              fontVariantNumeric: 'tabular-nums',
-            }}
-          >
-            {c.value}
-          </span>
-          <span
-            style={{
-              fontSize: 10,
-              fontWeight: 700,
-              color: INK_55,
-              letterSpacing: '0.10em',
-            }}
-          >
-            {c.label}
-          </span>
+          BREAKDOWN
         </span>
-      ))}
+      </div>
+      <div style={{ padding: '0 18px', display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+        {chips.map((c, i) => (
+          <span
+            key={`c-${i}-${c.label}`}
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 5,
+              padding: '6px 10px',
+              borderRadius: 999,
+              background: '#FFFFFF',
+              border: `0.5px solid ${HAIRLINE}`,
+            }}
+          >
+            <span
+              style={{
+                width: 5,
+                height: 5,
+                borderRadius: '50%',
+                background: c.color,
+              }}
+            />
+            <span
+              style={{
+                fontSize: 12,
+                fontWeight: 600,
+                color: INK,
+                fontFamily: FONT_MONO,
+                fontVariantNumeric: 'tabular-nums',
+              }}
+            >
+              {c.value}
+            </span>
+            <span
+              style={{
+                fontSize: 9,
+                fontWeight: 700,
+                color: INK_45,
+                letterSpacing: '0.10em',
+                textTransform: 'uppercase',
+              }}
+            >
+              {c.label}
+            </span>
+          </span>
+        ))}
+      </div>
     </div>
   );
 };
