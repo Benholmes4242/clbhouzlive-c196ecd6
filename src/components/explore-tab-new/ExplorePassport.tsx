@@ -1,6 +1,7 @@
 import { memo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useUserPassport } from './hooks/useUserPassport';
+import { ExploreSectionHeader } from './ExploreSectionHeader';
 
 interface ExplorePassportProps {
   userId: string | undefined;
