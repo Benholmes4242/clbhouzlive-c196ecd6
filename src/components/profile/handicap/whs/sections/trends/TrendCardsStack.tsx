@@ -4,7 +4,7 @@ import { useAllScores } from '@/lib/whs/hooks';
 import SectionHeader from '../SectionHeader';
 import HandicapProjectionCard from './HandicapProjectionCard';
 import StablefordCard from './StablefordCard';
-import CourseFormCard from './CourseFormCard';
+
 import { predictHandicap, VERDICT_META } from './predictHandicap';
 import TrendNarrativeSection from './TrendNarrativeSection';
 
