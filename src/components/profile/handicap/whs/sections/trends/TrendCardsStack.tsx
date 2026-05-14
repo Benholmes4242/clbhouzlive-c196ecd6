@@ -45,10 +45,10 @@ export const TrendCardsStack: React.FC<Props> = ({ connectionId, currentHandicap
   const [showInfo, setShowInfo] = useState(false);
 
   return (
-    <section style={{ padding: '0 16px', marginTop: topMargin ?? 32, fontFamily: FONT }}>
+    <section style={{ padding: '0 16px', marginTop: topMargin ?? 20, fontFamily: FONT }}>
       {splitAt !== 'rest' && (showHero ? (
-        <div style={{ padding: '0 0 16px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, marginBottom: 12 }}>
+        <div style={{ padding: '0 0 10px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, marginBottom: 6 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
               <span
                 style={{
@@ -99,7 +99,7 @@ export const TrendCardsStack: React.FC<Props> = ({ connectionId, currentHandicap
             <h2
               style={{
                 margin: 0,
-                fontSize: 32,
+                fontSize: 26,
                 fontWeight: 600,
                 letterSpacing: '-0.025em',
                 color: INK,
@@ -127,11 +127,11 @@ export const TrendCardsStack: React.FC<Props> = ({ connectionId, currentHandicap
 
           <p
             style={{
-              margin: '8px 0 0',
+              margin: '4px 0 0',
               fontSize: 13,
               color: INK_55,
               fontFamily: FONT,
-              lineHeight: 1.5,
+              lineHeight: 1.4,
             }}
           >
             Your last 5 rounds suggest where your handicap is heading.
