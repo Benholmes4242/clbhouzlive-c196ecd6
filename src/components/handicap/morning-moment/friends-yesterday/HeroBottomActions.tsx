@@ -137,6 +137,8 @@ const NudgeAction: React.FC<{ friend: FriendYesterday }> = ({ friend }) => {
     </button>
   );
 };
+
+interface Props {
   state: HeroState;
   friend: FriendYesterday;
 }
