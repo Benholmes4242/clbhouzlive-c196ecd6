@@ -398,7 +398,7 @@ export function TourHubNavOverlay({
               </div>
             </div>
             <div style={{ textAlign: 'right' }}>
-              <div style={{ fontSize: 9, color: 'rgba(0,0,0,0.35)' }}>Leader</div>
+              <div style={{ fontSize: 9, fontWeight: 800, color: '#64748B', letterSpacing: '0.16em', textTransform: 'uppercase' }}>Leader</div>
               <div style={{ fontSize: 13, fontWeight: 800, color: '#0f172a' }}>
                 {leaderTeaser.playerName.split(' ').pop()}{' '}
                 <span style={{ color: '#0f172a' }}>
