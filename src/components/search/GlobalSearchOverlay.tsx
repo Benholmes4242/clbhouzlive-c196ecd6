@@ -570,6 +570,7 @@ function GlobalSearchOverlay({ isOpen, onClose }: GlobalSearchOverlayProps) {
                   title="Golfers to follow"
                   showViewAll={true}
                   onViewAll={() => { navigate('/golfers'); onClose(); }}
+                  headerScale="search"
                   containerStyle={{
                     background: 'transparent',
                     borderTop: 'none',
