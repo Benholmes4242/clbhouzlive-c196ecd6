@@ -718,8 +718,8 @@ const HeroHandicapCard: React.FC<Props> = ({ connection }) => {
         fontSize: 12,
         fontWeight: 500,
         color: INK_55,
-        marginTop: 4,
-        marginBottom: 12,
+        marginTop: 2,
+        marginBottom: 6,
         lineHeight: 1.4,
         padding: '0 4px',
       }}>
