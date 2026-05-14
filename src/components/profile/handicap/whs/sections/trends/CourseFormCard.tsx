@@ -87,7 +87,7 @@ function deltaColor(d: number): string {
 
 
 const SECTION_STYLE: React.CSSProperties = {
-  marginTop: 28,
+  marginTop: 32,
   fontFamily: FONT,
 };
 
