@@ -30,15 +30,8 @@ function ExploreDestinationsInner({ activeRegion, onRegionSelect }: ExploreDesti
   if (!regions || regions.length === 0) return null;
 
   return (
-    <section style={{ padding: '24px 0 0' }}>
-      <div style={{ padding: '0 16px 12px' }}>
-        <h2 style={{ fontSize: 18, fontWeight: 900, letterSpacing: '-0.02em', color: '#0F172A', margin: 0 }}>
-          Destinations
-        </h2>
-        <p style={{ fontSize: 12, color: 'rgba(15,23,42,0.55)', margin: '2px 0 0', fontWeight: 500 }}>
-          Pick a region to filter the feed
-        </p>
-      </div>
+    <section style={{ padding: '0 0 0' }}>
+      <ExploreSectionHeader title="Destinations" sub="Pick a region to filter the feed" />
       <div className="flex gap-3 px-4 overflow-x-auto scrollbar-hide" style={{ paddingBottom: 4 }}>
         {regions.map((r: any) => {
           const slug = r.slug ?? r.id ?? r.region_slug;
