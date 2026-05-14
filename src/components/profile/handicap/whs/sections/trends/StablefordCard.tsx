@@ -1,11 +1,12 @@
 import React, { useState, useMemo } from 'react';
-import { Target, Info, ArrowUp, ArrowDown } from 'lucide-react';
+import { Info, ArrowUp, ArrowDown } from 'lucide-react';
 import type { WhsScore } from '@/lib/whs/types';
 import {
   computeStablefordDistribution,
   type StablefordScope,
 } from './computeStablefordDistribution';
 import StablefordDetailSheet from './StablefordDetailSheet';
+import SectionHeader from '../SectionHeader';
 
 interface Props {
   scores: WhsScore[];
