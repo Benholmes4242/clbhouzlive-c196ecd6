@@ -83,9 +83,9 @@ const HoleCell: React.FC<{
   if (score != null) {
     const diff = score - par;
     if (score === 1 || diff <= -2) {
-      shape = 'circle'; depth = 2; stroke = AMBER_INK; numeralColor = AMBER_INK;
+      shape = 'circle'; depth = 2; stroke = AMBER_GRAD; numeralColor = AMBER_INK;
     } else if (diff === -1) {
-      shape = 'circle'; depth = 1; stroke = AMBER_INK; numeralColor = AMBER_INK;
+      shape = 'circle'; depth = 1; stroke = AMBER_GRAD; numeralColor = AMBER_INK;
     } else if (diff === 0) {
       shape = 'square'; depth = 1; stroke = INK_20;
     } else if (diff === 1) {
