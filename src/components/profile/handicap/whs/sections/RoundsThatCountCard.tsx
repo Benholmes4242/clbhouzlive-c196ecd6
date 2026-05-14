@@ -25,6 +25,7 @@ const AMBER_DEEP = '#C97211';
 const AMBER_TINT_06 = 'rgba(247,147,30,0.06)';
 const AMBER_TINT_08 = 'rgba(247,147,30,0.08)';
 const AMBER_BORDER = 'rgba(247,147,30,0.30)';
+const AMBER_GOLD_GRAD = 'linear-gradient(135deg, #F59E0B 0%, #FBBF24 100%)';
 const GREEN = '#059669';
 const RED = '#9F1D1D';
 
