@@ -178,6 +178,9 @@ export function CollegeComparePage() {
           )}
         </div>
 
+        {/* Sentinel for sticky-header safe-area detection */}
+        <div ref={sentinelRef} aria-hidden style={{ height: 1 }} />
+
         {/* ── STICKY HEADER ── */}
         <div
           className="sticky top-0 z-20"
@@ -186,7 +189,8 @@ export function CollegeComparePage() {
             backdropFilter: 'blur(20px)',
             WebkitBackdropFilter: 'blur(20px)',
             borderBottom: '0.5px solid rgba(15,23,42,0.08)',
-            paddingTop: 'calc(env(safe-area-inset-top, 0px) + 8px)',
+            paddingTop: isAtTop ? 8 : 'calc(max(env(safe-area-inset-top, 0px), 47px) + 8px)',
+            transition: 'padding-top 200ms ease',
           }}
         >
           <div style={{ display: 'flex', alignItems: 'center', padding: '9px 16px', gap: '6px' }}>
