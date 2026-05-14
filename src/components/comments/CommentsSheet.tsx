@@ -411,7 +411,7 @@ function CommentsSheet({
               {comment.user_name}
             </span>
             {isOP && (
-              <span style={{ padding: '1px 6px', borderRadius: 4, fontSize: 9, fontWeight: 800, textTransform: 'uppercase' as const, letterSpacing: '0.06em', background: 'rgba(247,147,30,0.10)', color: AMBER }}>
+              <span style={{ padding: '1px 6px', borderRadius: 4, fontSize: 9, fontWeight: 800, textTransform: 'uppercase' as const, letterSpacing: '0.14em', background: 'rgba(247,147,30,0.10)', color: AMBER }}>
                 OP
               </span>
             )}
