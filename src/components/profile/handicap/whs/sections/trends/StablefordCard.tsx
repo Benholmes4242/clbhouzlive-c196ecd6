@@ -282,65 +282,46 @@ const CardHeader: React.FC<CardHeaderProps> = ({ scope, setScope, onOpenSheet })
   </div>
 );
 
-interface SummaryCellProps {
+interface KeyCellProps {
   color: string;
-  accent?: string;
   label: string;
-  count: number;
-  pct: number;
-  range: string;
+  meta: string;
 }
 
-const SummaryCell: React.FC<SummaryCellProps> = ({ color, accent, label, count, pct, range }) => (
-  <div
-    style={{
-      borderRadius: 10,
-      background: T.ink04,
-      padding: '10px 10px 10px',
-      position: 'relative',
-      overflow: 'hidden',
-    }}
-  >
-    <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 3, background: accent ?? color }} />
-    <p
+const KeyCell: React.FC<KeyCellProps> = ({ color, label, meta }) => (
+  <div style={{ textAlign: 'center', padding: '0 4px', fontFamily: FONT }}>
+    <div
       style={{
-        margin: '4px 0 6px',
-        fontSize: 9,
+        fontSize: 10,
         fontWeight: 800,
-        letterSpacing: '0.10em',
+        color: T.ink,
+        letterSpacing: '0.12em',
         textTransform: 'uppercase',
-        color: T.inkMute,
-        fontFamily: FONT,
+        lineHeight: 1.2,
+        marginBottom: 3,
+        display: 'inline-flex',
+        alignItems: 'center',
+        gap: 5,
         whiteSpace: 'nowrap',
       }}
     >
+      <span
+        aria-hidden
+        style={{ width: 6, height: 6, borderRadius: '50%', background: color, flexShrink: 0 }}
+      />
       {label}
-    </p>
-    <p
+    </div>
+    <div
       style={{
-        margin: 0,
-        fontSize: 22,
-        fontWeight: 200,
-        color: T.ink,
-        letterSpacing: '-0.02em',
-        lineHeight: 1,
-        fontFamily: FONT,
-        fontVariantNumeric: 'tabular-nums',
-      }}
-    >
-      {count}
-    </p>
-    <p
-      style={{
-        margin: '4px 0 0',
-        fontSize: 10,
+        fontSize: 10.5,
         color: T.inkMute,
-        fontFamily: FONT,
+        fontWeight: 600,
         fontVariantNumeric: 'tabular-nums',
+        whiteSpace: 'nowrap',
       }}
     >
-      {pct}% · {range}
-    </p>
+      {meta}
+    </div>
   </div>
 );
 
