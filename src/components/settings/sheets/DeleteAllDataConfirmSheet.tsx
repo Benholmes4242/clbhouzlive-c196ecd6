@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Trash2, X } from 'lucide-react';
+import { Sheet, SheetContent } from '@/components/ui/sheet';
 
 const INK = '#0F172A';
 const INK_55 = '#64748B';
@@ -26,34 +27,17 @@ export default function DeleteAllDataConfirmSheet({ open, onClose, onConfirm, is
     onClose();
   };
 
-  if (!open) return null;
-
   return (
-    <>
-      <div
-        onClick={handleClose}
+    <Sheet open={open} onOpenChange={(v) => { if (!v) handleClose(); }}>
+      <SheetContent
+        side="bottom"
+        hideCloseButton
+        className="p-0 rounded-t-[20px] border-0 max-h-[90dvh] overflow-auto"
         style={{
-          position: 'fixed', inset: 0,
-          background: 'rgba(15,23,42,0.45)',
-          zIndex: 10080,
-          animation: 'whsConfirmFade 200ms ease',
-        }}
-      />
-      <div
-        role="dialog"
-        aria-modal="true"
-        style={{
-          position: 'fixed', left: 0, right: 0, bottom: 0,
-          zIndex: 10081,
-          background: '#fff',
-          borderTopLeftRadius: 20,
-          borderTopRightRadius: 20,
           fontFamily: FONT,
           color: INK,
+          background: '#fff',
           paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 16px)',
-          animation: 'whsConfirmSlide 280ms cubic-bezier(0.32, 0.72, 0, 1)',
-          maxHeight: '90dvh',
-          overflow: 'auto',
         }}
       >
         <div style={{ display: 'flex', justifyContent: 'center', paddingTop: 8, paddingBottom: 8 }}>
@@ -144,12 +128,7 @@ export default function DeleteAllDataConfirmSheet({ open, onClose, onConfirm, is
             Cancel
           </button>
         </div>
-      </div>
-
-      <style>{`
-        @keyframes whsConfirmFade { from { opacity: 0 } to { opacity: 1 } }
-        @keyframes whsConfirmSlide { from { transform: translateY(100%) } to { transform: translateY(0) } }
-      `}</style>
-    </>
+      </SheetContent>
+    </Sheet>
   );
 }
