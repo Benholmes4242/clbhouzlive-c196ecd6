@@ -256,36 +256,8 @@ const TrophyRow: React.FC<{ a: Achievement; onInfoClick?: (a: Achievement) => vo
               letterSpacing: '0.10em',
               textTransform: 'uppercase',
               marginTop: 3,
-              display: 'flex',
-              alignItems: 'center',
-              gap: 4,
             }}>
-              <span>{a.count_label}</span>
-              {a.hole_data_denominator && (
-                <button
-                  type="button"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onInfoClick?.(a);
-                  }}
-                  aria-label={`About ${a.title} count`}
-                  style={{
-                    width: 16,
-                    height: 16,
-                    borderRadius: '50%',
-                    border: 'none',
-                    background: 'transparent',
-                    color: INK_55,
-                    cursor: 'pointer',
-                    padding: 0,
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                  }}
-                >
-                  <Info size={11} strokeWidth={2.4} />
-                </button>
-              )}
+              {a.count_label}
             </div>
           )}
         </div>
