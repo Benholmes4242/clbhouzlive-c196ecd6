@@ -1,5 +1,6 @@
 import { memo } from 'react';
 import { useExploreRegionsWithImages } from './hooks/useExploreRegionsWithImages';
+import { ExploreSectionHeader } from './ExploreSectionHeader';
 
 interface ExploreDestinationsProps {
   activeRegion: string | null;
