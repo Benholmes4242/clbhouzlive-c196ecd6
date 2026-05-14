@@ -191,15 +191,11 @@ function ExploreRecommendationsInner({ userId, mood }: ExploreRecommendationsPro
     null;
 
   return (
-    <section style={{ padding: '24px 0 0' }}>
-      <div style={{ padding: '0 16px 12px' }}>
-        <h2 style={{ fontSize: 18, fontWeight: 900, letterSpacing: '-0.02em', color: '#0F172A', margin: 0 }}>
-          {MOOD_HEADINGS[mood]}
-        </h2>
-        <p style={{ fontSize: 12, color: 'rgba(15,23,42,0.55)', margin: '2px 0 0', fontWeight: 500 }}>
-          {tierLabel ?? MOOD_SUBHEADS[mood]}
-        </p>
-      </div>
+    <section style={{ padding: '0 0 0' }}>
+      <ExploreSectionHeader
+        title={MOOD_HEADINGS[mood]}
+        sub={tierLabel ?? MOOD_SUBHEADS[mood]}
+      />
       <div className="flex gap-3 px-4 overflow-x-auto scrollbar-hide" style={{ paddingBottom: 4 }}>
         {recs.map(rec => (
           <RecCard key={rec.course_id} rec={rec} onTap={() => navigate(`/courses/${rec.course_id}`)} />
