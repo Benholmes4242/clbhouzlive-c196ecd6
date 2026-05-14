@@ -48,45 +48,66 @@ export async function fetchWhsConnection(userId: string): Promise<WhsConnection 
 }
 
 export async function fetchHandicapTrend(connectionId: string): Promise<WhsHandicapTrend> {
-  const thirtyDaysAgo = new Date(Date.now() - 30 * 86400_000).toISOString();
+  // Source of truth: whs_scores.handicap_index_at_time.
+  // whs_handicap_snapshots is effectively write-once (only seeded at connect time),
+  // so the snapshot table cannot serve trend data. Scoring rows carry the historical
+  // index value alongside each round and have full coverage going back years.
+  const thirtyDaysAgoIso = new Date(Date.now() - 30 * 86_400_000).toISOString().slice(0, 10);
 
-  const { data: latest } = await supabase
-    .from('whs_handicap_snapshots' as any)
-    .select('handicap_index, observed_at')
-    .eq('connection_id', connectionId)
-    .order('observed_at', { ascending: false })
-    .limit(1)
-    .maybeSingle();
-
-  const { data: previous } = await supabase
-    .from('whs_handicap_snapshots' as any)
-    .select('handicap_index, observed_at')
-    .eq('connection_id', connectionId)
-    .lte('observed_at', thirtyDaysAgo)
-    .order('observed_at', { ascending: false })
-    .limit(1)
-    .maybeSingle();
-
-  // Count total rounds in scoring record for "awaiting data" classification.
   const { count: roundCount } = await supabase
     .from('whs_scores' as any)
     .select('id', { count: 'exact', head: true })
     .eq('connection_id', connectionId);
 
-  const l = latest as any;
-  const p = previous as any;
   const totalRoundsInRecord = roundCount ?? 0;
 
-  if (!l) {
-    return { current: null, delta: null, previousHandicap: null, totalRoundsInRecord, hasHistory: false };
+  const { data: latestRow } = await supabase
+    .from('whs_scores' as any)
+    .select('play_date, handicap_index_at_time')
+    .eq('connection_id', connectionId)
+    .not('handicap_index_at_time', 'is', null)
+    .order('play_date', { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
+  const latest = latestRow as unknown as { play_date: string; handicap_index_at_time: number } | null;
+
+  if (!latest) {
+    return {
+      current: null,
+      delta: null,
+      previousHandicap: null,
+      totalRoundsInRecord,
+      hasHistory: false,
+    };
   }
-  if (!p) {
-    return { current: Number(l.handicap_index), delta: null, previousHandicap: null, totalRoundsInRecord, hasHistory: false };
+
+  const { data: previousRow } = await supabase
+    .from('whs_scores' as any)
+    .select('play_date, handicap_index_at_time')
+    .eq('connection_id', connectionId)
+    .not('handicap_index_at_time', 'is', null)
+    .lte('play_date', thirtyDaysAgoIso)
+    .order('play_date', { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
+  const previous = previousRow as unknown as { play_date: string; handicap_index_at_time: number } | null;
+
+  if (!previous) {
+    return {
+      current: Number(latest.handicap_index_at_time),
+      delta: null,
+      previousHandicap: null,
+      totalRoundsInRecord,
+      hasHistory: false,
+    };
   }
+
   return {
-    current: Number(l.handicap_index),
-    delta: Number(l.handicap_index) - Number(p.handicap_index),
-    previousHandicap: Number(p.handicap_index),
+    current: Number(latest.handicap_index_at_time),
+    delta: Number(latest.handicap_index_at_time) - Number(previous.handicap_index_at_time),
+    previousHandicap: Number(previous.handicap_index_at_time),
     totalRoundsInRecord,
     hasHistory: true,
   };

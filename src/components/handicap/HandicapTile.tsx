@@ -39,16 +39,19 @@ function classifyHandicapTileState(
 ): HandicapTileState {
   if (!hasConnection) return 'connect';
   if (!trend || trend.current === null) return 'nodata';
-  if (trend.totalRoundsInRecord < 8 || !trend.hasHistory) return 'nodata';
+  // True "awaiting data" — user hasn't built enough scoring record yet.
+  if (trend.totalRoundsInRecord < 8) return 'nodata';
 
-  if (trend.previousHandicap !== null) {
+  // Milestone crossing — only checkable when we have a 30D baseline.
+  if (trend.hasHistory && trend.previousHandicap !== null) {
     const currentDisplayed = trend.current < 0 ? Math.floor(trend.current) : Math.ceil(trend.current);
     const previousDisplayed =
       trend.previousHandicap < 0 ? Math.floor(trend.previousHandicap) : Math.ceil(trend.previousHandicap);
     if (currentDisplayed !== previousDisplayed) return 'milestone';
   }
 
-  if (trend.delta === null) return 'nodata';
+  // Without a 30D baseline (or with a tiny delta), fall through to steady.
+  if (!trend.hasHistory || trend.delta === null) return 'steady';
   if (Math.abs(trend.delta) < 0.2) return 'steady';
   return trend.delta < 0 ? 'improving' : 'drifting';
 }
@@ -310,7 +313,7 @@ function HandicapTile({ userId, onClick }: HandicapTileProps) {
             {stateTokens.deltaArrow} {Math.abs(trend.delta).toFixed(1)} / 30D
           </span>
         )}
-        {state === 'nodata' && trend && (
+        {state === 'nodata' && trend && trend.totalRoundsInRecord < 8 && (
           <span style={{
             fontSize: 11, fontWeight: 700,
             color: stateTokens.deltaColor,
