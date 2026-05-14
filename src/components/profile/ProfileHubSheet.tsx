@@ -117,8 +117,7 @@ function ProfileHubSheetSkeleton() {
 
       {/* ── Account rows skeleton ── */}
       <div className="py-3 space-y-1">
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8, paddingTop: 14, paddingBottom: 8 }}>
-          <div style={{ width: 3, height: 12, borderRadius: 1, background: 'rgba(15,23,42,0.08)', flexShrink: 0 }} />
+        <div style={{ paddingTop: 14, paddingBottom: 8 }}>
           <Skeleton className="h-2.5 w-16 rounded" />
         </div>
         {[0, 1, 2].map(i => (
