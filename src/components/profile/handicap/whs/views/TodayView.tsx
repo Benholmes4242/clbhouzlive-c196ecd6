@@ -33,6 +33,7 @@ export const TodayView: React.FC<Props> = ({
       role="tabpanel"
       id="handicap-panel-today"
       aria-labelledby="handicap-tab-today"
+      style={{ paddingTop: 16 }}
     >
       {!readOnly && <MorningMoment userId={userId} />}
 
