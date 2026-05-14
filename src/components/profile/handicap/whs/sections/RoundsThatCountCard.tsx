@@ -667,10 +667,10 @@ export const RoundsThatCountCard: React.FC<Props> = ({ connectionId, currentHand
 
       {/* Next-round targets — flat, two-column, eyebrow on left */}
       {projection?.hasData && (
-        <div style={{ padding: '14px 0 4px' }}>
+        <div style={{ padding: '8px 0 2px' }}>
           <div style={{
             display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-            marginBottom: 10,
+            marginBottom: 6,
           }}>
             <span style={{
               fontSize: 9, fontWeight: 800, color: '#64748B', letterSpacing: '0.16em',
