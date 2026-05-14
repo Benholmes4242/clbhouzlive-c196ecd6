@@ -428,11 +428,27 @@ export function TourHubNavOverlay({
         {(rankingsLoading || displayPlayers.length > 0) && (
           <div>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', margin: '14px 18px 8px' }}>
-              <span style={{ fontSize: 9, fontWeight: 700, color: 'rgba(0,0,0,0.35)', letterSpacing: '2px', textTransform: 'uppercase' }}>
+              <span style={{ fontSize: 9, fontWeight: 800, color: '#64748B', letterSpacing: '0.16em', textTransform: 'uppercase' }}>
                 World Rankings
               </span>
-              <button onClick={handleViewAllRankings} style={{ fontSize: 10, color: '#F7931E', fontWeight: 600, background: 'none', border: 'none', cursor: 'pointer' }}>
-                View all ›
+              <button
+                onClick={handleViewAllRankings}
+                style={{
+                  fontSize: 11,
+                  color: '#0F172A',
+                  fontWeight: 800,
+                  letterSpacing: '-0.005em',
+                  background: 'none',
+                  border: 'none',
+                  cursor: 'pointer',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 2,
+                  padding: 0,
+                }}
+              >
+                View all
+                <ChevronRight size={12} strokeWidth={2.4} />
               </button>
             </div>
 
