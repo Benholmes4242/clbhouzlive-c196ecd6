@@ -15,11 +15,11 @@ export const RecentlyActiveItem: React.FC<Props> = ({ entry, isActive, onClick }
   const Tag: any = onClick ? 'button' : 'div';
 
   const isOnApp = entry.is_clbhouz_user;
-  // Active dot: green for on-app, amber for EG-only. No dot if inactive.
-  const dotColor: string | null = isActive
+  // Active dot: green for on-app, amber-gold gradient (matches handicap ring) for EG-only.
+  const dotBackground: string | null = isActive
     ? isOnApp
       ? '#22C55E'
-      : '#F7931E'
+      : 'linear-gradient(135deg, #F59E0B 0%, #FBBF24 100%)'
     : null;
 
   return (
