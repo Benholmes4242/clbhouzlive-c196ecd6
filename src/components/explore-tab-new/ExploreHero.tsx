@@ -112,7 +112,7 @@ function ExploreHeroInner({ userId, mood }: ExploreHeroProps) {
               gap: 5,
               fontSize: 10,
               fontWeight: 800,
-              letterSpacing: '0.12em',
+              letterSpacing: '0.14em',
               textTransform: 'uppercase',
               color: '#FFFFFF',
               background: 'rgba(0, 0, 0, 0.28)',
