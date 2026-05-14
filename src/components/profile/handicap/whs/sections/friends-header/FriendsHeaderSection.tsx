@@ -44,7 +44,7 @@ export const FriendsHeaderSection: React.FC<Props> = ({ userId }) => {
       : undefined;
 
   return (
-    <section style={{ paddingTop: 10 }}>
+    <section>
       <SectionHeader eyebrow="YOUR CIRCLE" title={title} sub={sub} />
     </section>
   );
