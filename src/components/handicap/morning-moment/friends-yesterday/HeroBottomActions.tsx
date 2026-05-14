@@ -165,7 +165,7 @@ export const HeroBottomActions: React.FC<Props> = ({ state, friend }) => {
       }}
     >
       {state === 'enriched' && <PassivePill label="SCORECARD" />}
-      {state === 'syncing' && <PassivePill label="VIEW \u00B7 SYNCING" />}
+      {state === 'syncing' && <PassivePill label={'VIEW \u00B7 SYNCING'} />}
       {state === 'invite' && <InviteAction friend={friend} />}
       {state === 'nudge' && <NudgeAction friend={friend} />}
     </div>
