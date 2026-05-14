@@ -212,7 +212,7 @@ export const BreathingRoomBottomBar: React.FC<BreathingRoomBottomBarProps> = ({
                       fontSize: 10,
                       fontWeight: 600,
                       color: 'rgba(255,255,255,0.7)',
-                      letterSpacing: '0.04em',
+                      letterSpacing: '-0.005em',
                       fontVariantNumeric: 'tabular-nums',
                       flexShrink: 0,
                       textShadow: '0 1px 2px rgba(0,0,0,0.6)',
