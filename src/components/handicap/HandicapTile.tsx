@@ -1,11 +1,11 @@
 /**
  * HandicapTile — full-width primary tile in the ProfileHubSheet.
- * Shows live current handicap with a horizontal milestone progress bar.
+ * Six-state state machine: improving / drifting / steady / milestone / nodata / connect.
  *
  * NEW badge: gated by SHOW_HANDICAP_NEW_BADGE in featureFlags.ts.
  */
 import { memo, useMemo } from 'react';
-import { ChevronRight } from 'lucide-react';
+import { ChevronRight, Trophy } from 'lucide-react';
 import { useWhsConnection, useHandicapTrend } from '@/lib/whs/hooks';
 import { SHOW_HANDICAP_NEW_BADGE } from '@/config/featureFlags';
 
@@ -17,9 +17,50 @@ interface HandicapTileProps {
   onClick: () => void;
 }
 
+type HandicapTileState =
+  | 'improving'
+  | 'drifting'
+  | 'steady'
+  | 'milestone'
+  | 'nodata'
+  | 'connect';
+
+function classifyHandicapTileState(
+  hasConnection: boolean,
+  trend:
+    | {
+        current: number | null;
+        delta: number | null;
+        previousHandicap: number | null;
+        totalRoundsInRecord: number;
+        hasHistory: boolean;
+      }
+    | undefined,
+): HandicapTileState {
+  if (!hasConnection) return 'connect';
+  if (!trend || trend.current === null) return 'nodata';
+  if (trend.totalRoundsInRecord < 8 || !trend.hasHistory) return 'nodata';
+
+  if (trend.previousHandicap !== null) {
+    const currentDisplayed = trend.current < 0 ? Math.floor(trend.current) : Math.ceil(trend.current);
+    const previousDisplayed =
+      trend.previousHandicap < 0 ? Math.floor(trend.previousHandicap) : Math.ceil(trend.previousHandicap);
+    if (currentDisplayed !== previousDisplayed) return 'milestone';
+  }
+
+  if (trend.delta === null) return 'nodata';
+  if (Math.abs(trend.delta) < 0.2) return 'steady';
+  return trend.delta < 0 ? 'improving' : 'drifting';
+}
+
 function HandicapTile({ userId, onClick }: HandicapTileProps) {
   const { data: connection } = useWhsConnection(userId);
   const { data: trend } = useHandicapTrend(connection?.id);
+
+  const state = useMemo(
+    () => classifyHandicapTileState(!!connection, trend as any),
+    [connection, trend],
+  );
 
   const displayValue = useMemo(() => {
     if (trend?.current === null || trend?.current === undefined) return '—';
@@ -27,25 +68,12 @@ function HandicapTile({ userId, onClick }: HandicapTileProps) {
     return v < 0 ? `+${Math.abs(v).toFixed(1)}` : v.toFixed(1);
   }, [trend]);
 
-  const subLine = useMemo(() => {
-    if (!connection) return 'Connect to view';
-    if (!trend || trend.delta === null || trend.delta === undefined) return 'Tap to view';
-    const d = trend.delta;
-    if (Math.abs(d) < 0.05) return 'Steady this month';
-    const arrow = d < 0 ? '↓' : '↑';
-    return `${arrow} ${Math.abs(d).toFixed(1)} this month`;
-  }, [connection, trend]);
-
-  // Local milestone calculation — duplicates HeroHandicapCard's calcMilestoneProgress
-  // to avoid cross-file imports.
   const milestone = useMemo(() => {
     if (trend?.current === null || trend?.current === undefined) {
       return { displayed: null as number | null, progress: 0 };
     }
     const h = trend.current;
     const displayed = h < 0 ? Math.floor(h) : Math.ceil(h);
-    // Window matches WHS displayed-integer band: Math.floor(h + 0.5).
-    // h in [displayed − 0.6, displayed + 0.4] all round to `displayed`.
     const windowTop = displayed + 0.4;
     const windowBottom = displayed - 0.6;
     const progress = (windowTop - h) / (windowTop - windowBottom);
@@ -74,16 +102,77 @@ function HandicapTile({ userId, onClick }: HandicapTileProps) {
     return `${pct}% of the way to ${milestoneToLabel}`;
   }, [milestone, milestoneFromLabel, milestoneToLabel]);
 
-  const deltaColor = useMemo(() => {
-    if (!trend || trend.delta === null || trend.delta === undefined) return 'rgba(15,23,42,0.55)';
-    if (Math.abs(trend.delta) < 0.05) return 'rgba(15,23,42,0.55)';
-    return trend.delta < 0 ? '#15803D' : '#DC2626';
-  }, [trend]);
+  const stateTokens = useMemo(() => {
+    switch (state) {
+      case 'improving':
+        return {
+          background: 'linear-gradient(135deg, rgba(34,197,94,0.07), transparent 70%), #FFFFFF',
+          borderColor: 'rgba(34,197,94,0.22)',
+          boxShadow: '0 2px 12px rgba(34,197,94,0.08)',
+          dotColor: '#22C55E',
+          tagColor: '#15803D',
+          tagText: 'Improving',
+          deltaColor: '#15803D',
+          deltaArrow: '↓',
+          fillGradient: 'linear-gradient(90deg, #22C55E 0%, #4ADE80 100%)',
+        };
+      case 'drifting':
+        return {
+          background: 'linear-gradient(135deg, rgba(220,38,38,0.06), transparent 70%), #FFFFFF',
+          borderColor: 'rgba(220,38,38,0.20)',
+          boxShadow: '0 2px 12px rgba(220,38,38,0.06)',
+          dotColor: '#DC2626',
+          tagColor: '#991B1B',
+          tagText: 'Drifting',
+          deltaColor: '#991B1B',
+          deltaArrow: '↑',
+          fillGradient: 'linear-gradient(90deg, #DC2626 0%, #F87171 100%)',
+        };
+      case 'steady':
+        return {
+          background: 'linear-gradient(135deg, rgba(100,116,139,0.05), transparent 70%), #FFFFFF',
+          borderColor: 'rgba(100,116,139,0.18)',
+          boxShadow: '0 2px 12px rgba(15,23,42,0.04)',
+          dotColor: '#94A3B8',
+          tagColor: '#64748B',
+          tagText: 'Steady',
+          deltaColor: '#64748B',
+          deltaArrow: '—',
+          fillGradient: 'linear-gradient(90deg, #94A3B8 0%, #CBD5E1 100%)',
+        };
+      case 'milestone':
+        return {
+          background: 'linear-gradient(135deg, rgba(247,147,30,0.10), transparent 70%), #FFFFFF',
+          borderColor: 'rgba(247,147,30,0.32)',
+          boxShadow: '0 4px 16px rgba(247,147,30,0.14)',
+          dotColor: '#F7931E',
+          tagColor: '#C97211',
+          tagText: 'Milestone',
+          deltaColor: '#C97211',
+          deltaArrow: trend && trend.delta !== null && trend.delta < 0 ? '↓' : '↑',
+          fillGradient: 'linear-gradient(90deg, #F7931E 0%, #FBBC2E 100%)',
+        };
+      case 'nodata':
+        return {
+          background: 'linear-gradient(135deg, rgba(15,23,42,0.04), transparent 70%), #FFFFFF',
+          borderColor: 'rgba(15,23,42,0.10)',
+          boxShadow: 'none',
+          dotColor: '#CBD5E1',
+          tagColor: '#64748B',
+          tagText: 'Awaiting data',
+          deltaColor: '#94A3B8',
+          deltaArrow: '',
+          fillGradient: 'linear-gradient(90deg, #94A3B8 0%, #CBD5E1 100%)',
+        };
+      default:
+        return null;
+    }
+  }, [state, trend]);
 
   const showNewBadge = SHOW_HANDICAP_NEW_BADGE;
 
   // Empty-state branch — render dashed amber CTA tile when not connected.
-  if (!connection) {
+  if (state === 'connect') {
     return (
       <button
         type="button"
@@ -118,8 +207,8 @@ function HandicapTile({ userId, onClick }: HandicapTileProps) {
         </div>
         <div style={{ flex: 1, minWidth: 0 }}>
           <div style={{
-            fontSize: 9.5, fontWeight: 800, color: AMBER,
-            letterSpacing: '0.14em', textTransform: 'uppercase',
+            fontSize: 9, fontWeight: 800, color: '#C97211',
+            letterSpacing: '0.16em', textTransform: 'uppercase',
             marginBottom: 3,
           }}>
             HANDICAP
@@ -131,7 +220,7 @@ function HandicapTile({ userId, onClick }: HandicapTileProps) {
             Connect your handicap
           </div>
           <div style={{
-            fontSize: 11.5, color: 'rgba(15,23,42,0.55)',
+            fontSize: 11, color: '#64748B',
             lineHeight: 1.35,
           }}>
             Sync rounds, track your index, play against friends.
@@ -141,6 +230,9 @@ function HandicapTile({ userId, onClick }: HandicapTileProps) {
       </button>
     );
   }
+
+  // Defensive: stateTokens only null for 'connect', already handled above.
+  if (!stateTokens) return null;
 
   return (
     <button
@@ -152,15 +244,15 @@ function HandicapTile({ userId, onClick }: HandicapTileProps) {
         minHeight: 110,
         padding: '12px 14px 14px',
         borderRadius: 14,
-        background: 'linear-gradient(135deg, rgba(247,147,30,0.08), transparent 70%), #ffffff',
-        border: '1px solid rgba(247,147,30,0.30)',
-        boxShadow: '0 2px 12px rgba(247,147,30,0.10)',
+        background: stateTokens.background,
+        border: `1px solid ${stateTokens.borderColor}`,
+        boxShadow: stateTokens.boxShadow,
         cursor: 'pointer',
         display: 'flex',
         flexDirection: 'column',
         textAlign: 'left',
       }}
-      aria-label={`Handicap ${displayValue}. ${subLine}.`}
+      aria-label={`Handicap ${displayValue}. ${stateTokens.tagText}.`}
     >
       {showNewBadge && (
         <span
@@ -170,7 +262,7 @@ function HandicapTile({ userId, onClick }: HandicapTileProps) {
             padding: '3px 8px',
             borderRadius: 999,
             background: AMBER, color: '#fff',
-            fontSize: 9, fontWeight: 800, letterSpacing: '0.10em',
+            fontSize: 9, fontWeight: 800, letterSpacing: '0.14em',
             boxShadow: '0 2px 6px rgba(247,147,30,0.40)',
             lineHeight: 1,
           }}
@@ -179,12 +271,19 @@ function HandicapTile({ userId, onClick }: HandicapTileProps) {
         </span>
       )}
 
-      {/* Top — eyebrow + chevron */}
+      {/* Top — state tag · Handicap eyebrow + chevron */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-          <span style={{ width: 5, height: 5, borderRadius: '50%', background: AMBER }} />
+        <div style={{ display: 'flex', alignItems: 'center', gap: 6, minWidth: 0 }}>
+          <span style={{ width: 6, height: 6, borderRadius: '50%', background: stateTokens.dotColor, flexShrink: 0 }} />
           <span style={{
-            fontSize: 9, fontWeight: 800, color: 'rgba(15,23,42,0.55)',
+            fontSize: 9, fontWeight: 800, color: stateTokens.tagColor,
+            letterSpacing: '0.16em', textTransform: 'uppercase',
+          }}>
+            {stateTokens.tagText}
+          </span>
+          <span style={{ fontSize: 9, fontWeight: 800, color: '#94A3B8' }}>·</span>
+          <span style={{
+            fontSize: 9, fontWeight: 800, color: '#64748B',
             letterSpacing: '0.16em', textTransform: 'uppercase',
           }}>
             Handicap
@@ -193,8 +292,8 @@ function HandicapTile({ userId, onClick }: HandicapTileProps) {
         <ChevronRight size={16} color="rgba(15,23,42,0.40)" strokeWidth={2.2} />
       </div>
 
-      {/* Middle — number + monthly delta on one line */}
-      <div style={{ display: 'flex', alignItems: 'baseline', gap: 6, marginTop: 8 }}>
+      {/* Middle — number + 30D delta on one line */}
+      <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, marginTop: 8 }}>
         <span style={{
           fontSize: 28, fontWeight: 700, color: INK,
           letterSpacing: '-0.04em', lineHeight: 1,
@@ -202,15 +301,22 @@ function HandicapTile({ userId, onClick }: HandicapTileProps) {
         }}>
           {displayValue}
         </span>
-        {/* Only render the delta slot when there's a real trend signal. */}
-        {/* No-data state relies on the chevron to convey "tap me". */}
-        {trend && trend.delta !== null && trend.delta !== undefined && (
+        {state !== 'nodata' && trend && trend.delta !== null && (
           <span style={{
             fontSize: 11, fontWeight: 700,
-            color: deltaColor,
+            color: stateTokens.deltaColor,
             fontVariantNumeric: 'tabular-nums',
           }}>
-            {subLine}
+            {stateTokens.deltaArrow} {Math.abs(trend.delta).toFixed(1)} / 30D
+          </span>
+        )}
+        {state === 'nodata' && trend && (
+          <span style={{
+            fontSize: 11, fontWeight: 700,
+            color: stateTokens.deltaColor,
+            fontVariantNumeric: 'tabular-nums',
+          }}>
+            {trend.totalRoundsInRecord} of 8 rounds
           </span>
         )}
       </div>
@@ -220,15 +326,17 @@ function HandicapTile({ userId, onClick }: HandicapTileProps) {
         <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6 }}>
           <span style={{
             fontSize: 9, fontWeight: 700,
-            color: 'rgba(15,23,42,0.40)',
-            letterSpacing: '0.12em',
+            color: '#94A3B8',
+            letterSpacing: '0.14em',
+            textTransform: 'uppercase' as const,
           }}>
             {milestoneFromLabel}
           </span>
           <span style={{
             fontSize: 9, fontWeight: 800,
             color: '#C97211',
-            letterSpacing: '0.12em',
+            letterSpacing: '0.14em',
+            textTransform: 'uppercase' as const,
           }}>
             {milestoneToLabel} →
           </span>
@@ -241,25 +349,37 @@ function HandicapTile({ userId, onClick }: HandicapTileProps) {
             style={{
               position: 'absolute', left: 0, top: 0, bottom: 0,
               width: `${Math.round(milestoneProgress * 100)}%`,
-              background: `linear-gradient(90deg, ${AMBER} 0%, #FBBC2E 100%)`,
+              background: stateTokens.fillGradient,
               borderRadius: 3,
               transition: 'width 320ms cubic-bezier(0.22, 0.61, 0.36, 1)',
             }}
           />
         </div>
-        {/* Caption: percentage is the answer — bolder ink than the rest of the line. */}
-        <div style={{
-          marginTop: 6, fontSize: 11,
-          color: 'rgba(15,23,42,0.65)', fontWeight: 400,
-        }}>
-          {milestoneProgressLabel.replace(/^(\d+%)/, '§§§$1§§§')
-            .split('§§§')
-            .map((part, i) =>
-              /^\d+%$/.test(part)
-                ? <span key={i} style={{ fontWeight: 500, color: 'rgba(15,23,42,0.85)' }}>{part}</span>
-                : part
-            )}
-        </div>
+        {state === 'milestone' ? (
+          <div style={{
+            marginTop: 6, fontSize: 11, fontWeight: 700, color: '#C97211',
+            display: 'flex', alignItems: 'center', gap: 4,
+          }}>
+            <Trophy size={12} strokeWidth={2.4} />
+            <span>You crossed into {milestoneFromLabel}</span>
+          </div>
+        ) : state === 'nodata' ? (
+          <div style={{ marginTop: 6, fontSize: 11, color: 'rgba(15,23,42,0.65)' }}>
+            {trend && trend.totalRoundsInRecord < 8
+              ? `Trend appears after ${8 - trend.totalRoundsInRecord} more rounds`
+              : 'Trend updates with your next round'}
+          </div>
+        ) : (
+          <div style={{ marginTop: 6, fontSize: 11, color: 'rgba(15,23,42,0.65)' }}>
+            {milestoneProgressLabel.replace(/^(\d+%)/, '§§§$1§§§')
+              .split('§§§')
+              .map((part, i) =>
+                /^\d+%$/.test(part)
+                  ? <span key={i} style={{ fontWeight: 500, color: 'rgba(15,23,42,0.85)' }}>{part}</span>
+                  : part
+              )}
+          </div>
+        )}
       </div>
     </button>
   );
