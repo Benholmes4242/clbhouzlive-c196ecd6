@@ -68,16 +68,21 @@ function SectionHeader({
           type="button"
           onClick={onActionClick}
           style={{
-            fontSize: 12,
-            fontWeight: 600,
-            color: AMBER,
+            fontSize: 11,
+            fontWeight: 800,
+            color: INK,
+            letterSpacing: '-0.005em',
             background: 'none',
             border: 'none',
             cursor: 'pointer',
             padding: 0,
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: 2,
           }}
         >
           {action}
+          <ChevronRight size={12} strokeWidth={2.4} />
         </button>
       )}
     </div>
