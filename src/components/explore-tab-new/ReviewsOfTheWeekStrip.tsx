@@ -68,15 +68,8 @@ function ReviewsOfTheWeekStripInner({ activeRegion = null }: ReviewsOfTheWeekStr
   };
 
   return (
-    <section style={{ padding: '24px 0 4px' }}>
-      <div style={{ padding: '0 16px 12px' }}>
-        <h2 style={{ fontSize: 18, fontWeight: 900, letterSpacing: '-0.02em', color: '#0F172A', margin: 0 }}>
-          Most loved this month
-        </h2>
-        <p style={{ fontSize: 12, color: 'rgba(15,23,42,0.55)', margin: '2px 0 0', fontWeight: 500 }}>
-          Top reviews your community shared
-        </p>
-      </div>
+    <section style={{ paddingBottom: 4 }}>
+      <ExploreSectionHeader title="Most loved this month" sub="Top reviews your community shared" />
       <div className="flex gap-3 px-4 overflow-x-auto scrollbar-hide">
         {reviews.map((review) => (
           <button
