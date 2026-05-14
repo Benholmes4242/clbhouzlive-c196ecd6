@@ -168,7 +168,7 @@ export function TournamentDetailPage() {
     return (
       <TourHubShell>
         {/* Slate masthead skeleton */}
-        <div style={{ background: '#0F172A', padding: 'calc(16px + max(env(safe-area-inset-top, 0px), 47px)) 16px 0' }} className="animate-pulse">
+        <div style={{ background: '#0F172A', padding: '16px 16px 0' }} className="animate-pulse">
           {/* Pills row */}
           <div style={{ display: 'flex', gap: 6, marginBottom: 60 }}>
             <div style={{ height: 22, width: 88, background: 'rgba(255,255,255,0.10)', borderRadius: 6 }} />
