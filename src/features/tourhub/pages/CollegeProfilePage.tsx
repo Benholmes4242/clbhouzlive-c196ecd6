@@ -68,6 +68,7 @@ export function CollegeProfilePage() {
 
   // Transparent status bar for immersive hero bleed into safe area
   useMedianStatusBar('dark', 'transparent', true, false);
+  const { sentinelRef, paddingTop: stickyPaddingTop } = useStickyHeaderSafeArea();
 
   const { data: stats, isLoading: statsLoading, error: _statsError, refetch: refetchStats } = useCollegeStats(collegeSlug);
   const { data: collegeMap, isLoading: mediaLoading } = useCollegeMediaMap();
