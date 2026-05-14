@@ -654,7 +654,7 @@ const HeroHandicapCard: React.FC<Props> = ({ connection }) => {
   return (
     <section style={{ padding: '0 20px', fontFamily: FONT_GEIST }}>
       {/* Eyebrow row */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8, padding: '0 4px' }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 4, padding: '0 4px' }}>
         <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
           <span
             style={{
