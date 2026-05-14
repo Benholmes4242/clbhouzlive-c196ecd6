@@ -172,7 +172,7 @@ export const StablefordCard: React.FC<Props> = ({ scores }) => {
               key={i}
               style={{
                 flex: s.count,
-                background: s.color,
+                background: s.gradient,
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
