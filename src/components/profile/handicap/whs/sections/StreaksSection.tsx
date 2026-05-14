@@ -360,7 +360,7 @@ const StreakCard: React.FC<StreakCardProps> = ({
               bottom: 0,
               left: 0,
               width: `${fillPct}%`,
-              background: color,
+              background: fillBg,
               borderRadius: 3,
               transition: 'width 320ms ease',
             }}
