@@ -27,7 +27,7 @@ const HOT_RED = '#DC2626';
 const COLD_BLUE = '#0EA5E9';
 const SLATE = '#475569';
 
-export const TrendCardsStack: React.FC<Props> = ({ connectionId, currentHandicap, splitAt }) => {
+export const TrendCardsStack: React.FC<Props> = ({ connectionId, currentHandicap, splitAt, topMargin }) => {
   const { data: scores, isLoading } = useAllScores(connectionId);
   const prediction = predictHandicap(scores ?? []);
   const meta = VERDICT_META[prediction.verdict];
