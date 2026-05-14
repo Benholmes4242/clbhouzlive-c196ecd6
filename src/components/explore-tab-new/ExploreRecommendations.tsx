@@ -154,11 +154,7 @@ function ExploreRecommendationsInner({ userId, mood }: ExploreRecommendationsPro
   if (isLoading) {
     return (
       <section style={{ padding: '20px 0 0' }}>
-        <div style={{ padding: '0 16px 12px' }}>
-          <h2 style={{ fontSize: 18, fontWeight: 900, letterSpacing: '-0.02em', color: '#0F172A', margin: 0 }}>
-            {MOOD_HEADINGS[mood]}
-          </h2>
-        </div>
+        <ExploreSectionHeader title={MOOD_HEADINGS[mood]} paddingTop={0} />
         <div className="flex gap-3 px-4 overflow-x-auto scrollbar-hide">
           {[0, 1, 2].map(i => (
             <div
