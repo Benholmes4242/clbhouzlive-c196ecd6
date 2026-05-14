@@ -148,31 +148,22 @@ const _RoundCardBody: React.FC<RoundCardBodyProps> = ({
           }}
         >
           {stableford != null && (
-            // Baseline-aligned with the DIFF text on the left.
-            // Eyebrow + value on a single line, mirroring the left side
-            // pattern of "80  +5.5 DIFF".
-            <div
-              style={{
-                display: 'flex',
-                alignItems: 'baseline',
-                gap: 8,
-                paddingBottom: 6,
-              }}
-            >
-              <span
+            <div style={{ textAlign: 'right' }}>
+              <div
                 style={{
                   fontSize: 9,
                   fontWeight: 800,
                   color: INK_55,
                   letterSpacing: '0.16em',
                   textTransform: 'uppercase',
+                  marginBottom: 4,
                 }}
               >
                 STABLEFORD
-              </span>
-              <span
+              </div>
+              <div
                 style={{
-                  fontSize: 22,
+                  fontSize: 26,
                   fontWeight: 800,
                   color: INK,
                   letterSpacing: '-0.02em',
@@ -181,7 +172,7 @@ const _RoundCardBody: React.FC<RoundCardBodyProps> = ({
                 }}
               >
                 {stableford}
-              </span>
+              </div>
             </div>
           )}
           {showHcp && (
