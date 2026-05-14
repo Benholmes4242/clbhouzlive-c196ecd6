@@ -225,7 +225,7 @@ export const RoundsThatCountCard: React.FC<Props> = ({ connectionId, currentHand
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
-            marginBottom: 8,
+            marginBottom: 4,
             paddingLeft: 4,
             gap: 8,
           }}>
