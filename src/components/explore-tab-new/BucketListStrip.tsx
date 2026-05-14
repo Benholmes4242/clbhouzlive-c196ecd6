@@ -9,15 +9,8 @@ export function BucketListStrip() {
 
   if (isLoading) {
     return (
-      <section style={{ padding: '24px 0 0' }}>
-        <div style={{ padding: '0 16px 12px' }}>
-          <h2 style={{ fontSize: 18, fontWeight: 900, letterSpacing: '-0.02em', color: '#0F172A', margin: 0 }}>
-            Your bucket list
-          </h2>
-          <p style={{ fontSize: 12, color: 'rgba(15,23,42,0.55)', margin: '2px 0 0', fontWeight: 500 }}>
-            Places you've saved
-          </p>
-        </div>
+      <section>
+        <ExploreSectionHeader title="Your bucket list" sub="Places you've saved" />
         <div className="flex overflow-x-auto" style={{ padding: '0 16px', gap: 12, scrollbarWidth: 'none' }}>
           {Array.from({ length: 3 }).map((_, i) => (
             <div
