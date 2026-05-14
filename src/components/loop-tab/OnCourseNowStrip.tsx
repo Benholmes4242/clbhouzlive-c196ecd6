@@ -191,7 +191,7 @@ function FriendPill({ friend, onTap }: { friend: NetworkFriend; onTap: () => voi
           style={{
             fontSize: 11,
             fontWeight: 500,
-            color: isActive ? '#16a34a' : 'hsl(var(--muted-foreground))',
+            color: isActive ? '#15803D' : 'hsl(var(--muted-foreground))',
           }}
         >
           {isActive ? `● Active` : timeAgo ? `${timeAgo} ago` : 'Recently'}
