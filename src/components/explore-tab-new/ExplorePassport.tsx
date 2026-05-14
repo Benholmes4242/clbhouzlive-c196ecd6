@@ -71,55 +71,50 @@ function ExplorePassportInner({ userId }: ExplorePassportProps) {
         sub={sinceLabel}
       />
       <div style={{ padding: '0 16px' }}>
-      <ExploreSectionHeader
-        kicker="Your Journey"
-        title="Season passport"
-        sub={sinceLabel}
-        paddingX={16}
-      />
-      <div
-        style={{
-          background: 'linear-gradient(135deg, #0F4A3A 0%, #1A6A54 100%)',
-          border: 'none',
-          borderRadius: 14,
-          padding: 18,
-          position: 'relative',
-        }}
-      >
-        <div style={{ display: 'flex', alignItems: 'stretch' }}>
-          <Stat value={passport.courses_played ?? 0} label="Courses" />
-          <div style={{ width: 1, background: 'rgba(255,255,255,0.18)', margin: '8px 0' }} />
-          <Stat value={passport.countries_played ?? 0} label="Countries" />
-          <div style={{ width: 1, background: 'rgba(255,255,255,0.18)', margin: '8px 0' }} />
-          <Stat value={passport.top_100_played ?? 0} label="Top 100" />
-          <div style={{ width: 1, background: 'rgba(255,255,255,0.18)', margin: '8px 0' }} />
-          <Stat
-            value={
-              passport.avg_rating_given != null
-                ? Number(passport.avg_rating_given).toFixed(1)
-                : '—'
-            }
-            label="Avg given"
-          />
-        </div>
-        <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 14 }}>
-          <button
-            type="button"
-            onClick={() => navigate('/profile')}
-            className="active:scale-[0.97] transition-transform"
-            style={{
-              fontSize: 11,
-              fontWeight: 700,
-              letterSpacing: '0.02em',
-              color: '#FFFFFF',
-              background: 'rgba(255,255,255,0.14)',
-              border: '1px solid rgba(255,255,255,0.2)',
-              padding: '6px 12px',
-              borderRadius: 999,
-            }}
-          >
-            View profile
-          </button>
+        <div
+          style={{
+            background: 'linear-gradient(135deg, #0F4A3A 0%, #1A6A54 100%)',
+            border: 'none',
+            borderRadius: 14,
+            padding: 18,
+            position: 'relative',
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'stretch' }}>
+            <Stat value={passport.courses_played ?? 0} label="Courses" />
+            <div style={{ width: 1, background: 'rgba(255,255,255,0.18)', margin: '8px 0' }} />
+            <Stat value={passport.countries_played ?? 0} label="Countries" />
+            <div style={{ width: 1, background: 'rgba(255,255,255,0.18)', margin: '8px 0' }} />
+            <Stat value={passport.top_100_played ?? 0} label="Top 100" />
+            <div style={{ width: 1, background: 'rgba(255,255,255,0.18)', margin: '8px 0' }} />
+            <Stat
+              value={
+                passport.avg_rating_given != null
+                  ? Number(passport.avg_rating_given).toFixed(1)
+                  : '—'
+              }
+              label="Avg given"
+            />
+          </div>
+          <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 14 }}>
+            <button
+              type="button"
+              onClick={() => navigate('/profile')}
+              className="active:scale-[0.97] transition-transform"
+              style={{
+                fontSize: 11,
+                fontWeight: 700,
+                letterSpacing: '0.02em',
+                color: '#FFFFFF',
+                background: 'rgba(255,255,255,0.14)',
+                border: '1px solid rgba(255,255,255,0.2)',
+                padding: '6px 12px',
+                borderRadius: 999,
+              }}
+            >
+              View profile
+            </button>
+          </div>
         </div>
       </div>
     </section>
