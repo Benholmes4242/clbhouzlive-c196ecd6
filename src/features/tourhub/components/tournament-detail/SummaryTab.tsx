@@ -105,7 +105,7 @@ function WinnerCard({ winner, runnerUp, headshotMap, tournamentName }: { winner:
           <div style={{ padding: '12px 20px 14px', borderLeft: '3px solid #F7931E', background: 'rgba(247,147,30,0.025)', borderTop: '0.5px solid rgba(15,23,42,0.07)' }}>
             <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', gap: '12px' }}>
               <div style={{ flex: 1, minWidth: 0 }}>
-                <div style={{ fontSize: '10px', fontWeight: 900, color: '#F7931E', letterSpacing: '0.12em', textTransform: 'uppercase' as const, marginBottom: '4px' }}>Winner</div>
+                <div style={{ fontSize: '9px', fontWeight: 800, color: '#F7931E', letterSpacing: '0.14em', textTransform: 'uppercase' as const, marginBottom: '4px' }}>Winner</div>
                 <div style={{ fontSize: '24px', fontWeight: 900, color: '#0F172A', letterSpacing: '-0.03em', lineHeight: 1.1, marginBottom: '4px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const }}>
                   {winner.player?.full_name ?? 'Unknown'}
                 </div>
