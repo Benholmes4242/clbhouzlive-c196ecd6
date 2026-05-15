@@ -12,7 +12,6 @@
  */
 
 import React, { useState, useEffect, useCallback } from 'react';
-import type { PlayerInfo } from '@/components/tourhub/PlayerScorecardCard';
 import { Link, useNavigate } from 'react-router-dom';
 import { tournamentRoute } from '../../routes';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -26,7 +25,6 @@ import { useTournamentLeadersWinners } from '../../hooks/useTournamentLeadersWin
 import { useTourLeaderboard } from '../../hooks/useTourHubData';
 import { useLeaderboardRealtime } from '../../hooks/useLeaderboardRealtime';
 import { ExpandedLeaderboardError, ExpandedLeaderboardEmpty } from './ExpandedLeaderboard';
-import { PlayerScorecardCard } from '@/components/tourhub/PlayerScorecardCard';
 
 import { useVenueImage, getFallbackCourseImage } from '../../hooks/useVenueImage';
 import livUpcomingHero from '@/assets/liv-upcoming-hero.webp';
@@ -74,8 +72,6 @@ interface HeroSlideProps {
   isExpanded: boolean;
   onToggleExpand: () => void;
   onInteraction: () => void;
-  onScorecardOpen?: () => void;
-  onScorecardClose?: () => void;
   onCardTouchStart: (e: React.TouchEvent) => void;
   onCardTouchMove: (e: React.TouchEvent) => void;
   onCardTouchEnd: (e: React.TouchEvent) => void;
@@ -109,7 +105,7 @@ function getDefendingChampionSubtext(tournament: {
   return tourFallbacks[tourSlug] ?? 'The defending champion';
 }
 
-function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, leadersWinnersMap, isExpanded, onToggleExpand, onInteraction, onScorecardOpen, onScorecardClose, onCardTouchStart, onCardTouchMove, onCardTouchEnd }: HeroSlideProps) {
+function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, leadersWinnersMap, isExpanded, onToggleExpand, onInteraction, onCardTouchStart, onCardTouchMove, onCardTouchEnd }: HeroSlideProps) {
   const { tournament, type } = slide;
   const navigate = useNavigate();
   
@@ -125,16 +121,8 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
   const podiumData = isCompleted ? leadersWinnersMap?.get(tournament.id) : undefined;
   const allFetchedData = podiumData?.allFetched ?? podiumData?.topFinishers ?? [];
 
-  // Scorecard state — player tapped in expanded leaderboard
-  const [selectedPlayer, setSelectedPlayer] = useState<PlayerInfo | null>(null);
-  const handleScorecardTap = useCallback((player: PlayerInfo) => {
-    setSelectedPlayer(player);
-    onScorecardOpen?.();
-  }, [onScorecardOpen]);
-  const handleBackToLeaderboard = useCallback(() => {
-    setSelectedPlayer(null);
-    onScorecardClose?.();
-  }, [onScorecardClose]);
+  // Hero rows are passive in the new HybridHero design (HYBRID_HERO_IMPLEMENTATION_BRIEF §15).
+  // PlayerScorecardCard / scorecard-tap flow has been removed.
 
   // Full leaderboard — drives EditorialLiveHero
   const { data: fullLeaderboard = [], isLoading: isLoadingFull, isError: isFullError, refetch: refetchFull } = useTourLeaderboard(
