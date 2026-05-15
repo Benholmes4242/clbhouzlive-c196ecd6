@@ -497,12 +497,7 @@ export const GroupInfoPage: React.FC<GroupInfoPageProps> = ({
         <div style={{ marginBottom: 14 }}>
           {/* Header row */}
           <div className="flex items-center justify-between" style={{ padding: '0 4px', marginBottom: 8 }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-              <div style={{ width: 3, height: 10, background: '#F7931E', borderRadius: 1, flexShrink: 0 }} />
-              <span style={{ fontSize: 9, fontWeight: 900, color: '#F7931E', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>
-                {conversation.participants.length} Members
-              </span>
-            </div>
+            <SectionEyebrow label="Members" count={conversation.participants.length} />
             {isAdmin && (
               <button
                 onClick={() => setIsAddMembersOpen(true)}
