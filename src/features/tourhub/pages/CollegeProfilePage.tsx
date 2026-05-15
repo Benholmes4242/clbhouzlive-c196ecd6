@@ -136,60 +136,12 @@ export function CollegeProfilePage() {
   }, [collegeRank, captain, showCaptainPill, captainOwgr, stats]);
 
 
-  /* ── Pull-to-refresh ── */
-  const handleTouchStart = useCallback((e: React.TouchEvent) => {
-    if (window.scrollY <= 0) {
-      touchStartY.current = e.touches[0].clientY;
-      isPulling.current = true;
-    }
-  }, []);
-
-  const handleTouchMove = useCallback((e: React.TouchEvent) => {
-    if (!isPulling.current) return;
-    const delta = e.touches[0].clientY - touchStartY.current;
-    if (delta > 0) setPullDistance(Math.min(delta, 100));
-  }, []);
-
-  const handleTouchEnd = useCallback(async () => {
-    if (pullDistance >= 50 && !isRefreshing) {
-      setIsRefreshing(true);
-      setPullDistance(0);
-      await Promise.all([
-        queryClient.invalidateQueries({ queryKey: ['college-stats', collegeSlug] }),
-        queryClient.invalidateQueries({ queryKey: ['college-alumni', collegeSlug] }),
-        queryClient.invalidateQueries({ queryKey: ['college-rivalries', collegeSlug] }),
-      ]);
-      setIsRefreshing(false);
-    } else {
-      setPullDistance(0);
-    }
-    isPulling.current = false;
-  }, [pullDistance, isRefreshing, queryClient, collegeSlug]);
-
-  useEffect(() => {
-    hideHeader();
-    return () => { showHeader(); };
-  }, [hideHeader, showHeader]);
-
   return (
     <PageRoot
       className="min-h-screen w-full bg-background"
       hasBottomNav
-      onTouchStart={handleTouchStart}
-      onTouchMove={handleTouchMove}
-      onTouchEnd={handleTouchEnd}
     >
-      {/* Pull-to-refresh indicator */}
-      {(pullDistance > 0 || isRefreshing) && (
-        <div className="flex justify-center py-3 relative z-50">
-          <motion.div
-            animate={{ rotate: isRefreshing ? 360 : pullDistance * 3.6 }}
-            transition={isRefreshing ? { repeat: Infinity, duration: 0.8, ease: 'linear' } : { duration: 0 }}
-          >
-            <RefreshCw className="w-5 h-5 text-muted-foreground" />
-          </motion.div>
-        </div>
-      )}
+      <div style={{ paddingTop: 'var(--chrome-total-h, 0px)' }}>
 
       {/* ── HERO MASTHEAD ── canonical light pattern */}
       <div style={{
