@@ -172,15 +172,14 @@ export function SummaryTab({
         <motion.div style={{ marginTop: '8px' }} {...sectionEntrance}>
           <div style={{ padding: '14px 20px 0', background: '#ffffff', borderTop: '1px solid rgba(15,23,42,0.07)' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '10px' }}>
-              <div style={{ width: 3, height: 14, background: '#0F172A', borderRadius: 1 }} />
-              <span style={{ fontSize: '10px', fontWeight: 900, color: '#0F172A', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>Round Scoring</span>
+              <span style={{ fontSize: '9px', fontWeight: 800, color: '#64748B', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>Round Scoring</span>
             </div>
           </div>
 
           {/* Column headers */}
           <div style={{ display: 'flex', alignItems: 'center', padding: '5px 20px', background: 'rgba(15,23,42,0.02)', borderBottom: '0.5px solid rgba(15,23,42,0.07)', borderTop: '0.5px solid rgba(15,23,42,0.07)' }}>
             {['ROUND', 'LOW', 'AVG', 'BIRDIES', 'BOGEYS'].map((h, i) => (
-              <span key={h} style={{ fontSize: '10px', fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.1em', flex: i === 0 ? '0 0 52px' : '1', textAlign: i > 0 ? 'center' as const : 'left' as const }}>{h}</span>
+              <span key={h} style={{ fontSize: '9px', fontWeight: 800, color: '#64748B', letterSpacing: '0.14em', flex: i === 0 ? '0 0 52px' : '1', textAlign: i > 0 ? 'center' as const : 'left' as const }}>{h}</span>
             ))}
           </div>
 
