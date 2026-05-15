@@ -240,7 +240,7 @@ export function useHeroCarouselData() {
           defendingChampionPhotoUrl: champData?.photo_url ?? null,
           defendingChampionPgaTourId: champData?.pga_tour_id ?? null,
           championNarrative: row.champion_narrative || null,
-          isMajor: contextLabel === 'MAJOR CHAMPIONSHIP',
+          isMajor: contextLabel === 'MAJOR CHAMPIONSHIP' || isAnyMajor(row.name || ''),
           isSignature: contextLabel === 'SIGNATURE EVENT' || contextLabel === 'ROLEX SERIES',
           winnerId: row.winner_id,
           winnerName,
