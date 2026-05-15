@@ -5,6 +5,9 @@ import { TourHubShellTabs } from '../components/TourHubShellTabs';
 import { ShellSlot } from '@/components/header/ShellSlot';
 import type { TourHubTab } from '../components/types';
 import { OverviewTab, ScheduleTab, PlayersTab, LeadersTab } from '../components/tabs';
+import { ScheduleShellRow } from '../components/shell/ScheduleShellRow';
+import { PlayersShellRow } from '../components/shell/PlayersShellRow';
+import { LeadersShellRow } from '../components/shell/LeadersShellRow';
 import { useTournamentStatusRealtime } from '../hooks/useTournamentStatusRealtime';
 
 export function TourHubMainPage() {
@@ -44,10 +47,20 @@ export function TourHubMainPage() {
     }
   };
 
+  const renderShellRow = () => {
+    switch (activeTab) {
+      case 'schedule':    return <ScheduleShellRow />;
+      case 'players':     return <PlayersShellRow />;
+      case 'leaderboards':return <LeadersShellRow />;
+      default:            return null;
+    }
+  };
+
   return (
     <TourHubShell>
       <ShellSlot>
         <TourHubShellTabs />
+        {renderShellRow()}
       </ShellSlot>
 
       <div

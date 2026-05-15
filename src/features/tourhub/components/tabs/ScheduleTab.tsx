@@ -12,31 +12,21 @@
 import { useState, useMemo, useEffect, useCallback, useRef } from 'react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useSearchParams, useNavigate } from 'react-router-dom';
-import { Search, X, AlertCircle, RefreshCw, ChevronLeft, ChevronDown, ChevronRight, Globe, Clock, Calendar } from 'lucide-react';
-import { useQueryClient } from '@tanstack/react-query';
+import { AlertCircle, ChevronRight, Calendar } from 'lucide-react';
 import { useTourSeason, useTourTournaments, type TourTournament } from '../../hooks/useTourHubData';
 import { useTournamentLeadersWinners } from '../../hooks/useTournamentLeadersWinners';
 import { useScheduleDefendingChampionPhotos } from '../../hooks/useScheduleDefendingChampionPhotos';
 import { deriveFieldStrength } from '../../utils/deriveFieldStrength';
 import { TourHubEmptyState } from '../TourHubEmptyState';
 import { format } from 'date-fns';
-import { cn } from '@/lib/utils';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
-import { BottomSheet } from '@/components/ui/BottomSheet';
-import SheetHeader from '@/components/ui/SheetHeader';
-import { getTourLogo, hasTourLogo } from '../../utils/tourLogos';
-import { TOUR_MAP, getTourLabel, getTourShort, getTourMeta } from '../../constants/tourMap';
+import { getTourLabel, getTourMeta } from '../../constants/tourMap';
 import { getCurrentWeek, getCurrentMonthKey, isInCurrentWeek } from '../../utils/getCurrentWeek';
-import { TourPill } from '../shared/TourPill';
-import { EventTag, type EventTagKind } from '../shared/EventTag';
 import { CompactNextUp } from '../shared/CompactNextUp';
 import { ThisWeekAnchor } from '../shared/ThisWeekAnchor';
-import { getContextLabel } from '../../utils/tournamentClassification';
-import { useStickyHeaderSafeArea } from '@/hooks/useStickyHeaderSafeArea';
 
 import {
-  ScheduleFilterPills,
   type ScheduleFilterType,
   ScheduleTournamentCard,
   ScheduleMonthHeader,
@@ -84,13 +74,9 @@ function InViewCard({ children }: { children: React.ReactNode }) {
 export function ScheduleTab() {
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
-  const [searchInput, setSearchInput] = useState('');
-  const { sentinelRef: stickysentinelRef, paddingTop: stickyPaddingTop } = useStickyHeaderSafeArea();
   const thisWeekAnchorRef = useRef<HTMLDivElement>(null);
   const [isThisWeekVisible, setIsThisWeekVisible] = useState(true);
   const hasAutoScrolledAllTab = useRef(false);
-  const [searchExpanded, setSearchExpanded] = useState(false);
-  const [tourSheetOpen, setTourSheetOpen] = useState(false);
 
   const filter = (searchParams.get('filter') as ScheduleFilterType) || 'all';
   const activeTour = (searchParams.get('tour') as TourFilterCode) || 'all';
@@ -107,8 +93,6 @@ export function ScheduleTab() {
       window.scrollTo(0, 0);
     });
   }, []);
-
-
 
   // Track THIS WEEK anchor visibility for sticky Today pill
   useEffect(() => {
@@ -138,7 +122,6 @@ export function ScheduleTab() {
   useEffect(() => {
     if (filter !== 'all') return;
     if (hasAutoScrolledAllTab.current) return;
-    // Wait a tick for monthGroups to render
     const t = setTimeout(() => {
       const el = document.getElementById(`month-${currentMonthKey}`);
       if (el) {
@@ -149,74 +132,25 @@ export function ScheduleTab() {
     return () => clearTimeout(t);
   }, [filter, currentMonthKey]);
 
-  const scrollToThisWeek = useCallback(() => {
-    const el = thisWeekAnchorRef.current ?? document.getElementById(`month-${currentMonthKey}`);
-    if (el) el.scrollIntoView({ block: 'start', behavior: 'smooth' });
-  }, [currentMonthKey]);
-  
-  const setFilter = useCallback((f: ScheduleFilterType) => {
-    const params = new URLSearchParams(searchParams);
-    if (f === 'all') { params.delete('filter'); } else { params.set('filter', f); }
-    setSearchParams(params, { replace: true });
-    // Scroll to top on filter change
-    window.scrollTo({ top: 0 });
-  }, [searchParams, setSearchParams]);
-
   const setActiveTour = useCallback((t: TourFilterCode) => {
     const params = new URLSearchParams(searchParams);
     if (t === 'all') { params.delete('tour'); } else { params.set('tour', t); }
     setSearchParams(params, { replace: true });
   }, [searchParams, setSearchParams]);
 
-  const search = useDebouncedValue(searchInput, 200);
-  
-  const queryClient = useQueryClient();
+  const search: string = '';
+
+  const setFilter = useCallback((f: ScheduleFilterType) => {
+    const params = new URLSearchParams(searchParams);
+    if (f === 'all') params.delete('filter'); else params.set('filter', f);
+    setSearchParams(params, { replace: true });
+    window.scrollTo({ top: 0 });
+  }, [searchParams, setSearchParams]);
+
   const { data: season } = useTourSeason();
   const { data: tournaments, isLoading, error, refetch } = useTourTournaments(season?.id, {
-    // B43 FIX 4: poll upcoming tab too
     refetchInterval: filter === 'live' ? 30000 : filter === 'upcoming' ? 60000 : false,
   });
-
-  // Pull-to-refresh state
-  const [isRefreshing, setIsRefreshing] = useState(false);
-  const [pullDistance, setPullDistance] = useState(0);
-  const touchStartY = useRef(0);
-  const isPulling = useRef(false);
-
-  const handleRefresh = useCallback(async () => {
-    setIsRefreshing(true);
-    await Promise.all([
-      queryClient.invalidateQueries({ queryKey: ['tourhub', 'tournaments'] }),
-      queryClient.invalidateQueries({ queryKey: ['tournament-leaders-winners'] }),
-    ]);
-    setIsRefreshing(false);
-  }, [queryClient]);
-
-  const onTouchStart = useCallback((e: React.TouchEvent) => {
-    if (window.scrollY === 0) {
-      touchStartY.current = e.touches[0].clientY;
-      isPulling.current = true;
-    }
-  }, []);
-
-  const onTouchMove = useCallback((e: React.TouchEvent) => {
-    if (!isPulling.current) return;
-    const distance = e.touches[0].clientY - touchStartY.current;
-    if (distance > 0 && window.scrollY === 0) {
-      setPullDistance(Math.min(distance * 0.5, 80));
-    } else {
-      isPulling.current = false;
-      setPullDistance(0);
-    }
-  }, []);
-
-  const onTouchEnd = useCallback(() => {
-    if (pullDistance > 50) {
-      handleRefresh();
-    }
-    setPullDistance(0);
-    isPulling.current = false;
-  }, [pullDistance, handleRefresh]);
 
   const { liveIds, completedIds } = useMemo(() => {
     if (!tournaments) return { liveIds: [] as string[], completedIds: [] as string[] };
@@ -414,33 +348,8 @@ export function ScheduleTab() {
   }
   
   return (
-    <div
-      className="min-h-screen -mx-5"
-      onTouchStart={onTouchStart}
-      onTouchMove={onTouchMove}
-      onTouchEnd={onTouchEnd}
-    >
-      {/* Pull-to-refresh indicator — SC-08 */}
-      <AnimatePresence>
-        {(pullDistance > 0 || isRefreshing) && (
-          <motion.div
-            className="flex items-center justify-center"
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: isRefreshing ? 48 : pullDistance, opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 0.2 }}
-          >
-            <RefreshCw
-              className={cn(
-                'w-5 h-5 text-muted-foreground transition-transform',
-                isRefreshing && 'animate-spin'
-              )}
-              style={{ transform: isRefreshing ? undefined : `rotate(${pullDistance * 3}deg)` }}
-            />
-          </motion.div>
-        )}
-      </AnimatePresence>
-      
+    <div className="min-h-screen -mx-5">
+
       {/* ── SCHEDULE MASTHEAD — canonical section header on all tabs ── */}
       {!search && (() => {
         const tourCount = new Set(
@@ -524,147 +433,7 @@ export function ScheduleTab() {
           <LiveRightNow />
         </div>
       )}
-      {/* Sentinel for sticky detection */}
-      <div ref={stickysentinelRef} style={{ height: 1, marginTop: -1 }} />
 
-      {/* Content below hero */}
-      <div
-        className="sticky top-0 z-30 bg-background/95 backdrop-blur-xl border-b border-border/10"
-        style={{ paddingTop: stickyPaddingTop, transition: 'padding-top 200ms ease' }}
-      >
-        {/* ── ROW 1: Filter underline tabs ── */}
-        <div style={{ padding: '0' }}>
-          <ScheduleFilterPills
-            activeFilter={filter}
-            onFilterChange={setFilter}
-            counts={filterStats}
-          />
-        </div>
-
-        {/* ── SEARCH BAR — collapsible ── */}
-        <div
-          className="overflow-hidden transition-all ease-in-out px-5"
-          style={{ maxHeight: searchExpanded ? 60 : 0, opacity: searchExpanded ? 1 : 0, transitionDuration: '250ms' }}
-        >
-          <div className="relative pt-2.5">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 z-10 text-muted-foreground w-[17px] h-[17px] mt-[5px]" strokeWidth={2.5} />
-            <input
-              type="text"
-              placeholder="Search tournaments, venues, tours..."
-              value={searchInput}
-              onChange={(e) => setSearchInput(e.target.value)}
-              className={cn(
-                'w-full h-11 pl-10 pr-9 rounded-xl text-[13px] transition-all duration-200',
-                'bg-card border text-foreground placeholder:text-muted-foreground',
-                'focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-400/60',
-                'border-border/50'
-              )}
-            />
-            <AnimatePresence>
-              {searchInput && (
-                <motion.button
-                  onClick={() => setSearchInput('')}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 mt-[5px] p-1.5 rounded-full bg-muted hover:bg-muted/80 transition-colors active:scale-90"
-                  initial={{ opacity: 0, scale: 0.8 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.8 }}
-                >
-                  <X className="w-3 h-3 text-muted-foreground" />
-                </motion.button>
-              )}
-            </AnimatePresence>
-          </div>
-        </div>
-
-        {/* ── ROW 2: ← Tour Overview + Search + Tour filter pill ── */}
-        <div className="flex items-center justify-between pt-2 pb-2.5" style={{ paddingLeft: 16, paddingRight: 16 }}>
-          <button
-            type="button"
-            onClick={() => navigate('/tourhub?tab=overview', { replace: true })}
-            className="active:opacity-50 transition-opacity"
-            style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: 2,
-              fontSize: 12,
-              fontWeight: 600,
-              color: '#64748B',
-              background: 'none',
-              border: 'none',
-              padding: 0,
-              cursor: 'pointer',
-            }}
-          >
-            <ChevronLeft size={13} strokeWidth={2.5} color="#64748B" />
-            Tour Overview
-          </button>
-          <div className="flex items-center gap-2">
-            {/* Today jump pill — All tab only, when current week not visible */}
-            {filter === 'all' && !isThisWeekVisible && (
-              <button
-                onClick={scrollToThisWeek}
-                style={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: 5,
-                  padding: '7px 11px',
-                  background: '#F7931E',
-                  color: '#FFFFFF',
-                  borderRadius: 8,
-                  fontSize: 12,
-                  fontWeight: 800,
-                  border: 'none',
-                  cursor: 'pointer',
-                }}
-                className="active:scale-[0.97] transition-transform"
-                aria-label="Jump to this week"
-              >
-                <Clock size={12} strokeWidth={2.8} color="#FFFFFF" />
-                Today
-              </button>
-            )}
-            <button
-              onClick={() => setSearchExpanded(v => !v)}
-              className={cn(
-                'w-[34px] h-[34px] rounded-[10px] flex items-center justify-center shrink-0 transition-colors duration-150',
-                searchExpanded ? 'bg-amber-50' : 'bg-transparent'
-              )}
-            >
-              <Search
-                className="w-[15px] h-[15px] transition-colors duration-150"
-                style={{ color: searchExpanded ? '#D97706' : undefined }}
-                strokeWidth={2.5}
-              />
-            </button>
-            <button
-              onClick={() => setTourSheetOpen(true)}
-              className="active:scale-[0.97] transition-all duration-150"
-              style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: 6,
-                padding: '6px 11px',
-                background: activeTour !== 'all' ? '#FEF3E7' : '#FFFFFF',
-                border: `1.5px solid ${activeTour !== 'all' ? '#F7931E' : '#E2E8F0'}`,
-                borderRadius: 10,
-                fontSize: 12,
-                fontWeight: 600,
-                color: '#0F172A',
-                cursor: 'pointer',
-              }}
-            >
-              {activeTour !== 'all' && hasTourLogo(activeTour.toLowerCase())
-                ? <img src={getTourLogo(activeTour.toLowerCase())} alt={activeTour} className="shrink-0" style={{ width: 16, height: 16, objectFit: 'contain' }} />
-                : <Globe size={12} strokeWidth={2.5} color="#D97706" />
-              }
-              <span>
-                {activeTour === 'all' ? 'All Tours' : (getTourMeta(activeTour)?.short ?? activeTour)}
-              </span>
-              <ChevronDown size={11} strokeWidth={2.5} color="#94A3B8" />
-            </button>
-          </div>
-        </div>
-      </div>
 
       <div style={{ background: '#ffffff', marginTop: '8px' }}>
 
@@ -764,81 +533,6 @@ export function ScheduleTab() {
         )}
       </div>
 
-      {/* Tour Filter Bottom Sheet — portaled to escape backdrop-blur stacking context */}
-      <BottomSheet
-        open={tourSheetOpen}
-        onClose={() => setTourSheetOpen(false)}
-        ariaLabelledBy="schedule-tour-sheet-title"
-      >
-        <SheetHeader
-          eyebrow="FILTER"
-          title={<span id="schedule-tour-sheet-title">Select tour</span>}
-          onClose={() => setTourSheetOpen(false)}
-        />
-
-        <div>
-          {(['all', 'pga', 'EURO', 'LPGA', 'CHAMP', 'PGAD', 'LIV'] as const).map((code) => {
-            const meta = code === 'all' ? null : getTourMeta(code);
-            const label = code === 'all' ? 'All Tours' : (meta?.short ?? code);
-            const description = code === 'all'
-              ? 'Show events from every tour'
-              : `${meta?.label ?? code} events`;
-            const isSelected = activeTour === code;
-            const count = code === 'all'
-              ? Object.values(tourCounts).reduce((s, c) => s + c, 0)
-              : tourCounts[code] ?? 0;
-
-            return (
-              <button
-                key={code}
-                onClick={() => { setActiveTour(code as TourFilterCode); setTourSheetOpen(false); }}
-                aria-pressed={isSelected}
-                style={{
-                  width: '100%',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 12,
-                  padding: '14px 16px',
-                  background: isSelected ? 'rgba(247,147,30,0.04)' : 'transparent',
-                  border: 'none',
-                  borderLeft: isSelected ? '3px solid #F7931E' : '3px solid transparent',
-                  borderBottom: '0.5px solid rgba(15,23,42,0.07)',
-                  cursor: 'pointer',
-                  textAlign: 'left',
-                }}
-              >
-                <div style={{ width: 36, height: 22, borderRadius: 4, background: 'rgba(15,23,42,0.06)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                  {code === 'all' ? (
-                    <Globe className="w-4 h-4" style={{ color: '#94A3B8' }} />
-                  ) : hasTourLogo(code.toLowerCase()) ? (
-                    <img
-                      src={getTourLogo(code.toLowerCase())}
-                      alt=""
-                      aria-hidden="true"
-                      style={{ width: 28, height: 18, objectFit: 'contain' }}
-                    />
-                  ) : null}
-                </div>
-
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ fontSize: 15, fontWeight: isSelected ? 700 : 500, color: '#0F172A' }}>
-                    {label}
-                  </div>
-                  <div style={{ fontSize: 12, color: '#94A3B8', marginTop: 2 }}>
-                    {description}
-                  </div>
-                </div>
-
-                <span style={{ fontSize: 13, color: '#94A3B8', fontVariantNumeric: 'tabular-nums', flexShrink: 0 }}>
-                  {count}
-                </span>
-
-                {isSelected && <div style={{ width: 6, height: 6, borderRadius: '50%', background: '#F7931E', flexShrink: 0 }} />}
-              </button>
-            );
-          })}
-        </div>
-      </BottomSheet>
 
       {/* Bottom safe area */}
       <div style={{ paddingBottom: 'calc(var(--sab, 30px) + 16px)' }} />

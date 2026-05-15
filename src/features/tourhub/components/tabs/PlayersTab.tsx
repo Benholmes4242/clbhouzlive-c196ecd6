@@ -7,9 +7,13 @@ import { useState, useMemo, useCallback, useEffect, useRef, type RefObject } fro
 import { Skeleton } from '@/components/ui/skeleton';
 import { useSearchParams, useLocation, useNavigate } from 'react-router-dom';
 import { Search, X, ChevronDown, ChevronLeft, ChevronRight, RefreshCw, Globe, Users, Crown } from 'lucide-react';
+import { cn } from '@/lib/utils';
+import { BottomSheet } from '@/components/ui/BottomSheet';
+import SheetHeader from '@/components/ui/SheetHeader';
+import { getTourLogo, hasTourLogo } from '../../utils/tourLogos';
+import { useStickyHeaderSafeArea } from '@/hooks/useStickyHeaderSafeArea';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useQueryClient } from '@tanstack/react-query';
-import { cn } from '@/lib/utils';
 import { useTourPlayers, useTourSeason, useTourPlayerStatistics, type TourPlayer } from '../../hooks/useTourHubData';
 import { useElitePlayers, type ElitePlayer } from '../../hooks/useElitePlayers';
 import { useRecentPlayerResults } from '../../hooks/useRecentPlayerResults';
@@ -19,13 +23,9 @@ import { type PlayerTourCode } from '../players/PlayersTourFilterSheet';
 import { type PlayerSortType, getDefaultSortForTour } from '../players/PlayerSortControl';
 import { PlayerCardV2 } from '../players/PlayerCardV2';
 import { PlayersEmptyState } from '../players/PlayersEmptyState';
-import { BottomSheet } from '@/components/ui/BottomSheet';
-import SheetHeader from '@/components/ui/SheetHeader';
-import { getTourLogo, hasTourLogo } from '../../utils/tourLogos';
 import { getPlayerHeadshotUrl, PLAYER_SILHOUETTE_URL } from '@/utils/playerHeadshot';
 import { titleCaseCountry } from '../../utils/countryFlags';
 import CountryFlag from '@/components/ui/country-flag';
-import { useStickyHeaderSafeArea } from '@/hooks/useStickyHeaderSafeArea';
 
 // Inline sort label resolver
 function getSortShortLabel(sort: PlayerSortType, activeTour: string): string {
@@ -237,52 +237,14 @@ export function PlayersTab() {
   const [sort, setSort] = useState<PlayerSortType>(getDefaultSortForTour(initialTour));
   const [searchExpanded, setSearchExpanded] = useState(false);
   const [tourSheetOpen, setTourSheetOpen] = useState(false);
-
-  // Pull-to-refresh state
-  const [isRefreshing, setIsRefreshing] = useState(false);
-  const [pullDistance, setPullDistance] = useState(0);
-  const touchStartY = useRef(0);
-  const isPulling = useRef(false);
+  const [isRefreshing] = useState(false);
+  const [pullDistance] = useState(0);
+  const onTouchStart = () => {};
+  const onTouchMove = () => {};
+  const onTouchEnd = () => {};
+  const { sentinelRef: stickyHeaderSentinelRef, paddingTop: stickyPaddingTop } = useStickyHeaderSafeArea();
   const sentinelRef = useRef<HTMLDivElement>(null);
   const isFetchingRef = useRef(false);
-  const { sentinelRef: stickyHeaderSentinelRef, paddingTop: stickyPaddingTop } = useStickyHeaderSafeArea();
-
-  const handleRefresh = useCallback(async () => {
-    setIsRefreshing(true);
-    await Promise.all([
-      queryClient.invalidateQueries({ queryKey: ['tourhub', 'players'] }),
-      queryClient.invalidateQueries({ queryKey: ['elite-players'] }),
-      queryClient.invalidateQueries({ queryKey: ['tourhub', 'player-statistics'] }),
-      queryClient.invalidateQueries({ queryKey: ['tour-season-rankings'] }),
-    ]);
-    setIsRefreshing(false);
-  }, [queryClient]);
-
-  const onTouchStart = useCallback((e: React.TouchEvent) => {
-    if (window.scrollY === 0) {
-      touchStartY.current = e.touches[0].clientY;
-      isPulling.current = true;
-    }
-  }, []);
-
-  const onTouchMove = useCallback((e: React.TouchEvent) => {
-    if (!isPulling.current) return;
-    const distance = e.touches[0].clientY - touchStartY.current;
-    if (distance > 0 && window.scrollY === 0) {
-      setPullDistance(Math.min(distance * 0.5, 80));
-    } else {
-      isPulling.current = false;
-      setPullDistance(0);
-    }
-  }, []);
-
-  const onTouchEnd = useCallback(() => {
-    if (pullDistance > 50) {
-      handleRefresh();
-    }
-    setPullDistance(0);
-    isPulling.current = false;
-  }, [pullDistance, handleRefresh]);
 
   // Tour filter from URL
   const activeTour = (searchParams.get('tour') as PlayerTourCode) || 'pga';
