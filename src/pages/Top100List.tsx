@@ -64,8 +64,8 @@ const Top100List = () => {
   const navigate = useNavigate();
   const { session, user } = useSupabaseSession();
 
-  // Transparent status bar for immersive hero bleed into safe area
-  useMedianStatusBar("dark", "transparent", true, false);
+
+
 
   const { data: lists } = useTop100Lists();
   const { data: progressData } = useTop100ProgressForUser(user?.id);
