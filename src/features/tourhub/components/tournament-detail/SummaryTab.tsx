@@ -228,7 +228,7 @@ export function SummaryTab({
                 {segments.map((seg) => (
                   <div key={seg.label}>
                     <div style={{ fontSize: '14px', fontWeight: 800, color: '#0F172A', fontVariantNumeric: 'tabular-nums' }}>{seg.count}</div>
-                    <div style={{ fontSize: '10px', fontWeight: 800, color: '#CBD5E1', letterSpacing: '0.1em', textTransform: 'uppercase' as const }}>{seg.label}</div>
+                    <div style={{ fontSize: '9px', fontWeight: 800, color: '#64748B', letterSpacing: '0.14em', textTransform: 'uppercase' as const }}>{seg.label}</div>
                   </div>
                 ))}
               </div>
