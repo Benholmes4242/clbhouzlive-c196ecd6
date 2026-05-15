@@ -273,7 +273,7 @@ export function EchoPageWelcome({ profile, onChipSelect }: EchoPageWelcomeProps)
               <span className="flex items-center gap-2 min-w-0">
                 {prompt.isPersonalized && (
                   <span
-                    className="flex-shrink-0 px-1.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider"
+                    className="flex-shrink-0 px-1.5 py-0.5 rounded text-[9px] font-extrabold uppercase tracking-[0.14em]"
                     style={{ background: 'rgba(247,147,30,0.15)', color: '#F7931E' }}
                   >
                     For You
