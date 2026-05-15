@@ -80,12 +80,12 @@ export default function VideosSubpage() {
         >
           {/* Editorial header */}
           <div style={{ padding: '14px 16px 0' }}>
-            <Kicker color="amber">Long-form</Kicker>
+            <Kicker>Long-form</Kicker>
             <h1
               style={{
                 fontSize: 22,
-                fontWeight: 900,
-                letterSpacing: '-0.02em',
+                fontWeight: 800,
+                letterSpacing: '-0.025em',
                 color: '#0F172A',
                 lineHeight: 1.05,
                 margin: 0,
@@ -95,8 +95,8 @@ export default function VideosSubpage() {
             </h1>
             <p
               style={{
-                fontSize: 12,
-                color: 'rgba(15,23,42,0.55)',
+                fontSize: 13,
+                color: '#64748B',
                 margin: '4px 0 0',
                 fontWeight: 500,
               }}
