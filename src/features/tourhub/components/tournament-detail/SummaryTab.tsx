@@ -307,21 +307,21 @@ export function SummaryTab({
               <div style={{ padding: '14px 20px 0' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '10px' }}>
                   <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#22C55E', display: 'inline-block', flexShrink: 0 }} />
-                  <span style={{ fontSize: '10px', fontWeight: 900, color: '#22C55E', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>Live Round Summary</span>
+                  <span style={{ fontSize: '9px', fontWeight: 800, color: '#15803D', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>Live Round Summary</span>
                 </div>
               </div>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', textAlign: 'center' as const, padding: '0 20px 14px' }}>
                 <div>
-                  <div style={{ fontSize: '10px', fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.1em', marginBottom: '3px' }}>LOW ROUND</div>
-                  <div style={{ fontSize: '18px', fontWeight: 900, color: '#0F172A', fontVariantNumeric: 'tabular-nums' }}>{latestRound.lowScore}</div>
+                  <div style={{ fontSize: '9px', fontWeight: 800, color: '#64748B', letterSpacing: '0.14em', marginBottom: '3px' }}>LOW ROUND</div>
+                  <div style={{ fontSize: '18px', fontWeight: 800, color: '#0F172A', fontVariantNumeric: 'tabular-nums' }}>{latestRound.lowScore}</div>
                 </div>
                 <div>
-                  <div style={{ fontSize: '10px', fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.1em', marginBottom: '3px' }}>SCORING AVG</div>
-                  <div style={{ fontSize: '18px', fontWeight: 900, color: '#0F172A', fontVariantNumeric: 'tabular-nums' }}>{latestRound.avgScore.toFixed(1)}</div>
+                  <div style={{ fontSize: '9px', fontWeight: 800, color: '#64748B', letterSpacing: '0.14em', marginBottom: '3px' }}>SCORING AVG</div>
+                  <div style={{ fontSize: '18px', fontWeight: 800, color: '#0F172A', fontVariantNumeric: 'tabular-nums' }}>{latestRound.avgScore.toFixed(1)}</div>
                 </div>
                 <div>
-                  <div style={{ fontSize: '10px', fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.1em', marginBottom: '3px' }}>FIELD</div>
-                  <div style={{ fontSize: '18px', fontWeight: 900, color: '#0F172A', fontVariantNumeric: 'tabular-nums' }}>{latestRound.playerCount}</div>
+                  <div style={{ fontSize: '9px', fontWeight: 800, color: '#64748B', letterSpacing: '0.14em', marginBottom: '3px' }}>FIELD</div>
+                  <div style={{ fontSize: '18px', fontWeight: 800, color: '#0F172A', fontVariantNumeric: 'tabular-nums' }}>{latestRound.playerCount}</div>
                 </div>
               </div>
             </div>
