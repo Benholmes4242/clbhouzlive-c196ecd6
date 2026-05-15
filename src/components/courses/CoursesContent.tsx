@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { useStickyHeaderSafeArea } from '@/hooks/useStickyHeaderSafeArea';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import ShellSlot from '@/components/header/ShellSlot';
 import CourseExplorer from './CourseExplorer';
 import MyCourses from './MyCourses';
 import FriendsCoursesSignedOutEmpty from './FriendsCoursesSignedOutEmpty';
