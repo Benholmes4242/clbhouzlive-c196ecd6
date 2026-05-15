@@ -233,17 +233,21 @@ export function PhotoBand({
         }}
       >
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-          <span
-            style={{
-              fontSize: 10,
-              fontWeight: 800,
-              letterSpacing: '0.18em',
-              color: 'rgba(255,255,255,0.85)',
-              textShadow: '0 1px 3px rgba(0,0,0,0.4)',
-            }}
-          >
-            {tourLabel}
-          </span>
+          {isMajor ? (
+            <MajorBadge />
+          ) : (
+            <span
+              style={{
+                fontSize: 10,
+                fontWeight: 800,
+                letterSpacing: '0.18em',
+                color: 'rgba(255,255,255,0.85)',
+                textShadow: '0 1px 3px rgba(0,0,0,0.4)',
+              }}
+            >
+              {tourLabel}
+            </span>
+          )}
           <StatusPill state={state} />
         </div>
         <span
