@@ -7,11 +7,11 @@ import { fmtRelative } from '@/lib/whs/utils/nameFormat';
 import type { FriendRoundSinceLastVisit } from '@/lib/whs/types';
 
 const T = {
-  ink: '#0F172A',
-  ink55: 'rgba(15,23,42,0.55)',
-  ink40: 'rgba(15,23,42,0.40)',
-  ink08: 'rgba(15,23,42,0.08)',
-  ink06: 'rgba(15,23,42,0.06)',
+  ink: 'var(--hcp-t-100)',
+  ink55: 'var(--hcp-t-60)',
+  ink40: 'var(--hcp-t-40)',
+  ink08: 'var(--hcp-line-2)',
+  ink06: 'var(--hcp-bg-3)',
   amber: '#F7931E',
   green: '#059669',
   green14: 'rgba(5,150,105,0.14)',
