@@ -34,7 +34,7 @@ function FilterChips({ totalUnread, conversationFilter, onFilterChange }: {
           style={{
             padding: '5px 13px',
             borderRadius: 99,
-            fontSize: '12.5px',
+            fontSize: 13,
             fontWeight: 600,
             border: 'none',
             cursor: 'pointer',
