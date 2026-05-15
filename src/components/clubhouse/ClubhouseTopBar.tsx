@@ -9,6 +9,7 @@
  */
 
 import React, { useState, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Search } from 'lucide-react';
 import { PostingAsPill } from '@/components/header/PostingAsPill';
 import { PostingAsMenu } from '@/components/header/PostingAsMenu';
@@ -59,6 +60,7 @@ export const ClubhouseTopBar: React.FC<ClubhouseTopBarProps> = ({
   hideSearch = false,
   hideProfilePill = false,
 }) => {
+  const navigate = useNavigate();
   const [searchOpen, setSearchOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const pillRef = useRef<HTMLButtonElement>(null);
@@ -128,7 +130,7 @@ export const ClubhouseTopBar: React.FC<ClubhouseTopBarProps> = ({
             )}
 
             {!hideProfilePill && user && (
-              <HandicapPill onTap={() => setMenuOpen((v) => !v)} />
+              <HandicapPill onTap={() => navigate('/handicap')} />
             )}
 
             {!hideProfilePill && user && (
