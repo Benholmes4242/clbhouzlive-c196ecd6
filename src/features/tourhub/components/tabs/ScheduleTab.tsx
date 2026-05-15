@@ -341,33 +341,8 @@ export function ScheduleTab() {
   }
   
   return (
-    <div
-      className="min-h-screen -mx-5"
-      onTouchStart={onTouchStart}
-      onTouchMove={onTouchMove}
-      onTouchEnd={onTouchEnd}
-    >
-      {/* Pull-to-refresh indicator — SC-08 */}
-      <AnimatePresence>
-        {(pullDistance > 0 || isRefreshing) && (
-          <motion.div
-            className="flex items-center justify-center"
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: isRefreshing ? 48 : pullDistance, opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 0.2 }}
-          >
-            <RefreshCw
-              className={cn(
-                'w-5 h-5 text-muted-foreground transition-transform',
-                isRefreshing && 'animate-spin'
-              )}
-              style={{ transform: isRefreshing ? undefined : `rotate(${pullDistance * 3}deg)` }}
-            />
-          </motion.div>
-        )}
-      </AnimatePresence>
-      
+    <div className="min-h-screen -mx-5">
+
       {/* ── SCHEDULE MASTHEAD — canonical section header on all tabs ── */}
       {!search && (() => {
         const tourCount = new Set(
