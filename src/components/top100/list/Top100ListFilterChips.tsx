@@ -16,7 +16,6 @@ interface Top100ListFilterChipsProps {
   activeSort: Top100SortMode;
   onSortChange: (sort: Top100SortMode) => void;
   counts?: Partial<Record<Top100FilterChip, number>>;
-  isSticky?: boolean;
   hasReviewData?: boolean;
 }
 
