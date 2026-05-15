@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import type { TourHubTab } from './types';
 
@@ -10,11 +10,11 @@ interface TabDef {
 }
 
 const TABS: TabDef[] = [
-  { id: 'overview', label: 'Overview' },
-  { id: 'schedule', label: 'Schedule' },
-  { id: 'players', label: 'Players' },
+  { id: 'overview',     label: 'Overview' },
+  { id: 'schedule',     label: 'Schedule' },
+  { id: 'players',      label: 'Players' },
   { id: 'leaderboards', label: 'Leaders' },
-  { id: 'college', label: 'College' },
+  { id: 'college',      label: 'College' },
 ];
 
 function computeActiveTab(pathname: string, searchParams: URLSearchParams): TabId {
@@ -28,10 +28,8 @@ function computeActiveTab(pathname: string, searchParams: URLSearchParams): TabI
 
 /**
  * TourHubShellTabs — Canonical 5-destination tab strip for the Tour Hub shell.
- *
- * Tour-Hub variant of the Discover tab strip: 15px font / 24px gap / ~36px
- * row height. All other specs (padding, 2.5px amber underline, weights,
- * letter-spacing) match Discover.
+ * Soft-squircle pills (8px radius, cream-fill active) on a horizontally
+ * scrollable rail. Shares the canonical spec with Discover's SegmentedControl.
  *
  * Tabs 1–4 update ?tab= on /tourhub. Tab 5 (College) navigates to
  * /tourhub/college-golf and reads as active across all college sub-paths.
@@ -41,32 +39,58 @@ export const TourHubShellTabs: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
 
+  const scrollerRef = useRef<HTMLDivElement | null>(null);
+  const [overflowing, setOverflowing] = useState(false);
+
+  useEffect(() => {
+    const el = scrollerRef.current;
+    if (!el) return;
+    const check = () => setOverflowing(el.scrollWidth > el.clientWidth + 1);
+    check();
+    const ro = new ResizeObserver(check);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
+
   const active = computeActiveTab(location.pathname, searchParams);
 
-  const handleTap = (id: TabId) => {
+  const handleTap = (id: TabId, btn: HTMLButtonElement | null) => {
     if (id === 'college') {
       navigate('/tourhub/college-golf');
-      return;
-    }
-    if (location.pathname !== '/tourhub') {
-      navigate(`/tourhub?tab=${id}`);
     } else {
-      setSearchParams({ tab: id });
+      if (location.pathname !== '/tourhub') {
+        navigate(`/tourhub?tab=${id}`);
+      } else {
+        setSearchParams({ tab: id });
+      }
+      window.scrollTo(0, 0);
+      document.documentElement.scrollTop = 0;
     }
-    window.scrollTo(0, 0);
-    document.documentElement.scrollTop = 0;
+    if (btn) {
+      btn.scrollIntoView({ block: 'nearest', inline: 'center', behavior: 'smooth' });
+    }
   };
 
   return (
-    <section className="py-0 px-4 bg-background flex justify-center">
+    <section
+      className="relative bg-background"
+      style={{
+        borderBottom: '0.5px solid rgba(15,23,42,0.06)',
+      }}
+    >
       <div
+        ref={scrollerRef}
+        className="segmented-scroller"
         role="tablist"
         aria-label="Tour Hub navigation"
         style={{
-          borderBottom: '1px solid hsl(var(--border))',
-          display: 'inline-flex',
-          gap: 24,
-          justifyContent: 'center',
+          display: 'flex',
+          gap: 8,
+          padding: '8px 16px',
+          overflowX: 'auto',
+          overflowY: 'hidden',
+          WebkitOverflowScrolling: 'touch',
+          scrollbarWidth: 'none',
         }}
       >
         {TABS.map((tab) => {
@@ -76,41 +100,45 @@ export const TourHubShellTabs: React.FC = () => {
               key={tab.id}
               role="tab"
               aria-selected={isActive}
-              onClick={() => handleTap(tab.id)}
+              onClick={(e) => handleTap(tab.id, e.currentTarget)}
               style={{
-                background: 'none',
-                border: 'none',
-                cursor: 'pointer',
-                padding: '10px 4px 9px',
-                fontSize: 15,
+                flexShrink: 0,
+                height: 32,
+                padding: '0 12px',
+                fontSize: 14,
                 fontWeight: isActive ? 700 : 500,
-                color: isActive ? 'hsl(var(--foreground))' : 'hsl(var(--muted-foreground))',
-                letterSpacing: isActive ? '-0.025em' : '0',
-                position: 'relative',
-                display: 'flex',
-                alignItems: 'center',
-                transition: 'color 0.18s',
+                borderRadius: 8,
+                background: isActive ? '#FEF3E7' : 'transparent',
+                border: isActive ? '1px solid #F7931E' : '1px solid transparent',
+                color: isActive ? '#c97a10' : 'hsl(var(--muted-foreground))',
+                letterSpacing: '-0.01em',
                 whiteSpace: 'nowrap',
+                cursor: 'pointer',
+                transition: 'all 0.15s',
+                display: 'inline-flex',
+                alignItems: 'center',
               }}
             >
               {tab.label}
-              {isActive && (
-                <div
-                  style={{
-                    position: 'absolute',
-                    bottom: 0,
-                    left: 0,
-                    right: 0,
-                    height: 2.5,
-                    borderRadius: 2,
-                    background: 'linear-gradient(90deg, #F59E0B, #F7931E)',
-                  }}
-                />
-              )}
             </button>
           );
         })}
       </div>
+
+      {overflowing && (
+        <div
+          aria-hidden
+          style={{
+            position: 'absolute',
+            top: 0,
+            right: 0,
+            bottom: 0,
+            width: 28,
+            pointerEvents: 'none',
+            background: 'linear-gradient(to right, rgba(248,250,252,0), #F8FAFC)',
+          }}
+        />
+      )}
     </section>
   );
 };
