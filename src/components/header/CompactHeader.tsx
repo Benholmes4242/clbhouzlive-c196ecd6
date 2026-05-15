@@ -11,6 +11,7 @@ import GlobalSearchOverlay from '@/components/search/GlobalSearchOverlay';
 import { ActingAsIndicator } from './ActingAsIndicator';
 import { cn } from '@/lib/utils';
 import { haptic } from '@/utils/haptics';
+import { safeGoBack } from '@/utils/navigation';
 
 interface CompactHeaderProps {
   className?: string;
