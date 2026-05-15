@@ -18,6 +18,12 @@ const INK_10 = 'rgba(15,23,42,0.10)';
 const INK_06 = 'rgba(15,23,42,0.06)';
 const GREEN = '#059669';
 const FONT_GEIST = 'Geist, system-ui, -apple-system, BlinkMacSystemFont, sans-serif';
+const D_BG    = 'var(--hcp-bg-1)';
+const D_LINE  = 'var(--hcp-line)';
+const D_T100  = 'var(--hcp-t-100)';
+const D_T60   = 'var(--hcp-t-60)';
+const D_T40   = 'var(--hcp-t-40)';
+
 
 interface Props {
   connectionId: string;
@@ -49,7 +55,7 @@ const BestCaption: React.FC<{ streak: StreakResult }> = ({ streak }) => {
       style={{
         fontSize: 12,
         fontWeight: 600,
-        color: INK_55,
+        color: D_T60,
         display: 'flex',
         alignItems: 'center',
         gap: 3,
@@ -132,7 +138,7 @@ const Timeline: React.FC<{ timeline: StreaksData['timeline'] }> = ({ timeline })
           marginTop: 6,
           fontSize: 9,
           fontWeight: 700,
-          color: INK_40,
+          color: D_T40,
           letterSpacing: '0.14em',
         }}
       >
@@ -156,8 +162,8 @@ const SecondaryStreakTile: React.FC<{
       style={{
         flex: '1 1 0',
         minWidth: 0,
-        background: '#fff',
-        border: `0.5px solid ${INK_10}`,
+        background: D_BG,
+        border: `1px solid ${D_LINE}`,
         borderRadius: 14,
         padding: 14,
         display: 'flex',
@@ -184,7 +190,7 @@ const SecondaryStreakTile: React.FC<{
           style={{
             fontSize: 9,
             fontWeight: 800,
-            color: INK_55,
+            color: D_T60,
             letterSpacing: '0.16em',
             marginBottom: 4,
           }}
@@ -196,7 +202,7 @@ const SecondaryStreakTile: React.FC<{
             style={{
               fontSize: 28,
               fontWeight: 700,
-              color: INK,
+              color: D_T100,
               letterSpacing: '-0.03em',
               fontVariantNumeric: 'tabular-nums',
               lineHeight: 1,
@@ -204,10 +210,10 @@ const SecondaryStreakTile: React.FC<{
           >
             {value}
           </span>
-          <span style={{ fontSize: 13, color: INK_55, fontWeight: 500 }}>rounds</span>
+          <span style={{ fontSize: 13, color: D_T60, fontWeight: 500 }}>rounds</span>
         </div>
       </div>
-      <div style={{ fontSize: 11.5, color: INK_55, marginTop: 'auto' }}>{bestText}</div>
+      <div style={{ fontSize: 11.5, color: D_T60, marginTop: 'auto' }}>{bestText}</div>
     </div>
   );
 };
@@ -234,7 +240,7 @@ const StreakCard: React.FC<StreakCardProps> = ({
   const isActive = streak.isActive;
 
   const renderIcon = () => {
-    const iconColor = isActive ? color : INK_40;
+    const iconColor = isActive ? color : D_T40;
     const fill = isActive && icon === 'flame' ? color : 'none';
     if (icon === 'flame') {
       return <Flame size={16} color={iconColor} strokeWidth={2.4} fill={fill} />;
@@ -250,9 +256,9 @@ const StreakCard: React.FC<StreakCardProps> = ({
       style={{
         flexShrink: 0,
         width: 240,
-        background: '#fff',
+        background: D_BG,
         borderRadius: 18,
-        border: `0.5px solid ${INK_10}`,
+        border: `1px solid ${D_LINE}`,
         padding: '16px 14px 14px',
         boxShadow: '0 1px 2px rgba(15,23,42,0.04)',
         fontFamily: FONT_GEIST,
@@ -273,7 +279,7 @@ const StreakCard: React.FC<StreakCardProps> = ({
             width: 36,
             height: 36,
             borderRadius: 10,
-            background: isActive ? colorTint : INK_06,
+            background: isActive ? colorTint : 'var(--hcp-bg-3)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
@@ -285,8 +291,8 @@ const StreakCard: React.FC<StreakCardProps> = ({
           style={{
             padding: '3px 9px',
             borderRadius: 99,
-            background: isActive ? fillBg : INK_10,
-            color: isActive ? '#fff' : INK_55,
+            background: isActive ? fillBg : 'var(--hcp-bg-3)',
+            color: isActive ? '#fff' : D_T60,
             fontSize: 9,
             fontWeight: 800,
             letterSpacing: '0.10em',
@@ -300,7 +306,7 @@ const StreakCard: React.FC<StreakCardProps> = ({
           fontSize: 10,
           fontWeight: 800,
           letterSpacing: '0.12em',
-          color: INK_55,
+          color: D_T60,
           textTransform: 'uppercase',
           marginBottom: 4,
         }}
@@ -310,7 +316,7 @@ const StreakCard: React.FC<StreakCardProps> = ({
       <div
         style={{
           fontSize: 11,
-          color: INK_40,
+          color: D_T40,
           fontWeight: 500,
           lineHeight: 1.35,
           marginBottom: 16,
@@ -331,7 +337,7 @@ const StreakCard: React.FC<StreakCardProps> = ({
           style={{
             fontSize: 40,
             fontWeight: 800,
-            color: INK,
+            color: D_T100,
             lineHeight: 1,
             letterSpacing: '-0.04em',
             fontVariantNumeric: 'tabular-nums',
@@ -339,7 +345,7 @@ const StreakCard: React.FC<StreakCardProps> = ({
         >
           {streak.current}
         </span>
-        <span style={{ fontSize: 14, color: INK_55, fontWeight: 600 }}>
+        <span style={{ fontSize: 14, color: D_T60, fontWeight: 600 }}>
           rounds
         </span>
       </div>
@@ -373,13 +379,13 @@ const StreakCard: React.FC<StreakCardProps> = ({
             justifyContent: 'space-between',
             fontSize: 10,
             fontWeight: 700,
-            color: INK_40,
+            color: D_T40,
             fontVariantNumeric: 'tabular-nums',
             letterSpacing: '0.04em',
           }}
         >
           <span>{streak.current}</span>
-          <span style={{ color: isPb ? AMBER : INK_55 }}>
+          <span style={{ color: isPb ? AMBER : D_T60 }}>
             {isPb ? 'NEW PB!' : streak.best > 0 ? `PB · ${streak.best}` : 'NO PB YET'}
           </span>
         </div>
@@ -389,11 +395,11 @@ const StreakCard: React.FC<StreakCardProps> = ({
           style={{
             marginTop: 'auto',
             padding: '6px 10px',
-            background: isActive ? colorTint : INK_06,
+            background: isActive ? colorTint : 'var(--hcp-bg-3)',
             borderRadius: 8,
             fontSize: 11,
             fontWeight: 700,
-            color: isActive ? color : INK_55,
+            color: isActive ? color : D_T60,
             textAlign: 'center',
           }}
         >
@@ -428,7 +434,7 @@ const StreakCard: React.FC<StreakCardProps> = ({
             borderRadius: 8,
             fontSize: 11,
             fontWeight: 700,
-            color: INK_55,
+            color: D_T60,
             textAlign: 'center',
           }}
         >
