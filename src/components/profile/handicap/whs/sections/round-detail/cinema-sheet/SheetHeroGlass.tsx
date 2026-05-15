@@ -2,6 +2,7 @@ import React from 'react';
 import type { WhsScoreHole } from '@/lib/whs/types';
 import { splitCourseName } from '../../last-round-card/splitCourseName';
 import CinemaCardShapeStrip from '../../last-round-card/CinemaCardShapeStrip';
+import { GlassGrossRing } from '../../shared/GrossCounterRing';
 
 const FONT_GEIST = 'Geist, system-ui, -apple-system, BlinkMacSystemFont, sans-serif';
 const FONT_MONO = "'Geist Mono', ui-monospace, SFMono-Regular, Menlo, monospace";
@@ -19,6 +20,7 @@ interface Props {
   holes: WhsScoreHole[] | null;
   /** Override meta line (e.g. invite-state amber meta). When omitted, default suffix · PAR · SL is rendered. */
   metaOverride?: React.ReactNode;
+  isCounter?: boolean;
 }
 
 const HAIR: React.CSSProperties = {
@@ -63,6 +65,7 @@ export const SheetHeroGlass: React.FC<Props> = ({
   differential,
   holes,
   metaOverride,
+  isCounter = false,
 }) => {
   const { title, suffix } = splitCourseName(courseName);
   const meta = metaOverride
@@ -129,14 +132,22 @@ export const SheetHeroGlass: React.FC<Props> = ({
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
         <div style={{ textAlign: 'left' }}>
           <div style={labelStyle}>GROSS</div>
-          <div style={valueStyle('#FFFFFF')}>{gross != null ? gross : EM_DASH}</div>
+          <span
+            aria-label={`Gross score ${gross ?? ''}${isCounter ? ', counts toward index' : ''}`}
+          >
+            <GlassGrossRing
+              value={gross != null ? gross : EM_DASH}
+              isCounter={isCounter}
+              numeralSize={28}
+            />
+          </span>
         </div>
         <div style={{ textAlign: 'center' }}>
           <div style={labelStyle}>STABLEFORD</div>
           <div style={valueStyle('#FFFFFF')}>{stableford != null ? stableford : EM_DASH}</div>
         </div>
         <div style={{ textAlign: 'right' }}>
-          <div style={labelStyle}>DIFF</div>
+          <div style={labelStyle}>SCORE DIFF</div>
           <div style={valueStyle(differential != null ? AMBER : '#FFFFFF')}>
             {fmtDiffLocal(differential)}
           </div>
