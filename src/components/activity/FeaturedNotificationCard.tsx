@@ -225,17 +225,11 @@ export const FeaturedNotificationCard: React.FC<FeaturedNotificationCardProps> =
           {/* Content */}
           <div className="px-3.5 pt-2.5 pb-3.5 relative">
             {notification.is_unread && (
-              <span
-                style={{
-                  position: 'absolute',
-                  top: 10, left: 10,
-                  width: 8, height: 8,
-                  borderRadius: '50%',
-                  background: AMBER,
-                }}
-              />
+              <div style={{ position: 'absolute', top: 10, right: 10 }}>
+                <NewBadge />
+              </div>
             )}
-            <p className="text-[13.5px] leading-[1.45]" style={{ color: INK }}>
+            <p className="text-[14px] leading-[1.45]" style={{ color: INK }}>
               <span className="font-semibold">{actorName}</span>{' '}
               <span style={{ color: INK_SOFT }} className="font-normal">{actionText}</span>
             </p>
