@@ -1,27 +1,20 @@
-import { useState, useRef, useMemo } from 'react';
+import { useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
-import { MapPin, MoreHorizontal } from 'lucide-react';
-import { useWatchCategoryChips } from './hooks/useWatchCategoryChips';
 import TrendingThisWeek from './TrendingThisWeek';
 import LatestVideosRail from './LatestVideosRail';
 import WatchAutoplay from './WatchAutoplay';
 import WatchGrid from './WatchGrid';
-import WatchSectionHeader from './WatchSectionHeader';
 // WatchSectionDivider removed in Phase 4 — kicker + h1 already separate
 // sections clearly; dividers fragmented the surface visually.
-import WatchMoreCategoriesSheet from './WatchMoreCategoriesSheet';
 import ContinueWatchingRail from './ContinueWatchingRail';
 import LongPressTipBanner from './LongPressTipBanner';
 import { WatchActionsProvider } from './context/WatchActionsContext';
 import { useWatchFeed } from './hooks/useWatchFeed';
-import { Skeleton } from '@/components/ui/skeleton';
 import ScrollToTopGlass from '@/components/common/ScrollToTopGlass';
 import { WatchOfTheWeekHero } from './proshop/WatchOfTheWeekHero';
 import { CourseAnchoredRail } from './proshop/CourseAnchoredRail';
 import { MostLovedRail } from './proshop/MostLovedRail';
-import { WatchMoodChips } from './proshop/WatchMoodChips';
-import { useWatchMood } from './proshop/hooks/useWatchMood';
 
 interface ChipButtonProps {
   label: string;
