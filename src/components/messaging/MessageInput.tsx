@@ -176,7 +176,7 @@ export function MessageInput({
             <span style={{ fontSize: 11, fontWeight: 700, color: '#F7931E', display: 'block', marginBottom: 2 }}>
               Replying to {replyToName}
             </span>
-            <p className="truncate" style={{ fontSize: '12.5px', color: '#64748b', margin: 0, whiteSpace: 'nowrap' as const }}>
+            <p className="truncate" style={{ fontSize: 13, color: '#64748b', margin: 0, whiteSpace: 'nowrap' as const }}>
               {replyingTo.content}
             </p>
           </div>
