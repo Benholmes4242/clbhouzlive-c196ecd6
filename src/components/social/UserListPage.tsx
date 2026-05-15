@@ -151,7 +151,7 @@ const HandicapInline: React.FC<{ value: number }> = ({ value }) => (
         fontSize: 9,
         fontWeight: 800,
         color: INK_SUBTLE,
-        letterSpacing: '0.1em',
+        letterSpacing: '0.14em',
         textTransform: 'uppercase',
       }}
     >
