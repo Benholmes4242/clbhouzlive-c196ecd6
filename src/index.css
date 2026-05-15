@@ -207,6 +207,10 @@ html.lightbox-open {
   --sal: env(safe-area-inset-left, 0px);
   --sar: env(safe-area-inset-right, 0px);
 
+  /* Fixed-shell offset — written by <ShellSlot> via ResizeObserver. Pages that
+     consume the slot offset their main scroll container with paddingTop: var(--shell-extra-h). */
+  --shell-extra-h: 0px;
+
   /* Back-compat aliases (used by useChromeAnchors) */
   --safe-top: env(safe-area-inset-top, 0px);
   --safe-bottom: var(--sab);
