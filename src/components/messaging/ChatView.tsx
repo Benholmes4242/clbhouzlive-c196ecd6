@@ -538,7 +538,7 @@ export function ChatView({ conversationId, onBack }: ChatViewProps) {
               </span>
               {!isGroupChat && otherUser?.profile?.eg_handicap_index != null && (
                 <span style={{
-                  fontSize: '10.5px', fontWeight: 600, color: '#F7931E',
+                  fontSize: 10, fontWeight: 600, color: '#F7931E',
                   background: 'rgba(247,147,30,0.10)', border: '1px solid rgba(247,147,30,0.25)',
                   borderRadius: 99, padding: '1px 7px',
                 }}>
