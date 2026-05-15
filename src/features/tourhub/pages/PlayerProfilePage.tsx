@@ -2,18 +2,13 @@
  * PlayerProfilePage - Dispatch-style player profile.
  */
 
-import { useEffect, useState, useRef, useCallback } from 'react';
+import { useEffect } from 'react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { ArrowLeft, TrendingUp, AlertCircle, RefreshCw, ChevronLeft } from 'lucide-react';
-// NOTE: ArrowLeft remains used in the error branch (L144). P3 (orphan import) is
-// out of scope this loop and remains in the resume queue.
-import { useQueryClient } from '@tanstack/react-query';
+import { ArrowLeft, TrendingUp, AlertCircle } from 'lucide-react';
 import { PageRoot } from '@/components/layout/PageRoot';
-import { useHeader } from '@/contexts/GlobalHeaderContext';
 import { useMedianStatusBar } from '@/hooks/useMedianStatusBar';
-import { useStickyHeaderSafeArea } from '@/hooks/useStickyHeaderSafeArea';
 import {
   PlayerHero,
   PlayerSeasonStats,
@@ -22,82 +17,25 @@ import {
   FormSection,
 } from '../components/player';
 import { useTourPlayer, useSinglePlayerStatistics } from '../hooks/useTourHubData';
-import { getPlayerReferrerLabel, type PlayerReferrer } from '../routes';
 
 const sectionVariants = {
   hidden: { opacity: 0, y: 24 },
   visible: { opacity: 1, y: 0 },
 };
 
-const PULL_THRESHOLD = 50;
-// STAT_TABS moved into PlayerSeasonStats (Fix 1 — segmented control now lives inside the card).
-
 export function PlayerProfilePage() {
   const { playerId } = useParams<{ playerId: string }>();
   const navigate = useNavigate();
   const location = useLocation();
-  const queryClient = useQueryClient();
-  const { hideHeader, showHeader } = useHeader();
 
   useMedianStatusBar("dark", "transparent", true, false);
-
-  const { sentinelRef, paddingTop: stickyPaddingTop } = useStickyHeaderSafeArea();
 
   const { data: player, isLoading: playerLoading, refetch } = useTourPlayer(playerId || '');
   const { data: playerStats } = useSinglePlayerStatistics(playerId);
 
-  // activeStatTab state moved into PlayerSeasonStats (Fix 1).
-
-  // Pull-to-refresh
-  const [isRefreshing, setIsRefreshing] = useState(false);
-  const [pullDistance, setPullDistance] = useState(0);
-  const touchStartY = useRef(0);
-  const containerRef = useRef<HTMLDivElement>(null);
-
-  const handleTouchStart = useCallback((e: React.TouchEvent) => {
-    if (window.scrollY === 0) {
-      touchStartY.current = e.touches[0].clientY;
-    }
-  }, []);
-
-  const handleTouchMove = useCallback((e: React.TouchEvent) => {
-    if (touchStartY.current === 0 || isRefreshing) return;
-    const delta = e.touches[0].clientY - touchStartY.current;
-    if (delta > 0 && window.scrollY === 0) {
-      setPullDistance(Math.min(delta * 0.5, 100));
-    }
-  }, [isRefreshing]);
-
-  const handleTouchEnd = useCallback(async () => {
-    if (pullDistance >= PULL_THRESHOLD && !isRefreshing) {
-      setIsRefreshing(true);
-      setPullDistance(PULL_THRESHOLD);
-      await Promise.all([
-        queryClient.invalidateQueries({ queryKey: ['player', playerId] }),
-        queryClient.invalidateQueries({ queryKey: ['player-stats', playerId] }),
-        queryClient.invalidateQueries({ queryKey: ['player-results', playerId] }),
-        queryClient.invalidateQueries({ queryKey: ['world-rankings', playerId] }),
-        queryClient.invalidateQueries({ queryKey: ['player-rating', playerId] }),
-      ]);
-      setIsRefreshing(false);
-    }
-    setPullDistance(0);
-    touchStartY.current = 0;
-  }, [pullDistance, isRefreshing, queryClient, playerId]);
-
   useEffect(() => {
     window.scrollTo(0, 0);
   }, [playerId]);
-
-  useEffect(() => {
-    hideHeader();
-    return () => {
-      showHeader();
-    };
-  }, [hideHeader, showHeader]);
-
-  const referrer = (location.state as { referrer?: PlayerReferrer } | null)?.referrer;
-  const backLabel = getPlayerReferrerLabel(referrer);
 
   const handleBack = () => {
     if (location.key !== 'default') {
@@ -110,19 +48,17 @@ export function PlayerProfilePage() {
   if (playerLoading) {
     return (
       <PageRoot className="min-h-screen w-full" hasBottomNav style={{ background: '#F8FAFC' }}>
-        <div style={{ background: '#F8FAFC', padding: '16px 16px 14px' }}>
-          {/* Eyebrow */}
-          <Skeleton className="h-2.5 w-20 mb-2" style={{ background: 'rgba(15,23,42,0.06)' }} />
-          {/* h1 */}
-          <Skeleton className="h-5 w-40 mb-2" style={{ background: 'rgba(15,23,42,0.06)' }} />
-          {/* Subhead */}
-          <Skeleton className="h-3 w-56 mb-4" style={{ background: 'rgba(15,23,42,0.06)' }} />
-          {/* Champion card placeholder */}
-          <Skeleton className="h-24 w-full rounded-xl" style={{ background: 'rgba(255,184,0,0.10)' }} />
-        </div>
-        <div style={{ padding: '16px', marginTop: 8 }}>
-          <Skeleton className="h-48 rounded-lg" style={{ background: 'rgba(15,23,42,0.06)' }} />
-          <Skeleton className="h-64 rounded-lg mt-4" style={{ background: 'rgba(15,23,42,0.06)' }} />
+        <div style={{ paddingTop: 'var(--chrome-total-h, 0px)' }}>
+          <div style={{ background: '#F8FAFC', padding: '16px 16px 14px' }}>
+            <Skeleton className="h-2.5 w-20 mb-2" style={{ background: 'rgba(15,23,42,0.06)' }} />
+            <Skeleton className="h-5 w-40 mb-2" style={{ background: 'rgba(15,23,42,0.06)' }} />
+            <Skeleton className="h-3 w-56 mb-4" style={{ background: 'rgba(15,23,42,0.06)' }} />
+            <Skeleton className="h-24 w-full rounded-xl" style={{ background: 'rgba(255,184,0,0.10)' }} />
+          </div>
+          <div style={{ padding: '16px', marginTop: 8 }}>
+            <Skeleton className="h-48 rounded-lg" style={{ background: 'rgba(15,23,42,0.06)' }} />
+            <Skeleton className="h-64 rounded-lg mt-4" style={{ background: 'rgba(15,23,42,0.06)' }} />
+          </div>
         </div>
       </PageRoot>
     );
@@ -131,7 +67,7 @@ export function PlayerProfilePage() {
   if (!player) {
     return (
       <PageRoot className="min-h-screen w-full bg-background">
-        <div className="pt-20 px-5">
+        <div style={{ paddingTop: 'var(--chrome-total-h, 0px)' }} className="px-5">
           <button
             onClick={handleBack}
             className="text-primary hover:underline flex items-center gap-1 mb-6 text-sm active:opacity-70 transition-opacity"
@@ -154,82 +90,21 @@ export function PlayerProfilePage() {
     );
   }
 
-  const pullProgress = Math.min(pullDistance / PULL_THRESHOLD, 1);
-
   return (
     <PageRoot
       className="min-h-screen w-full"
       hasBottomNav
       style={{ background: '#F8FAFC' }}
     >
-      {/* Pull-to-refresh indicator */}
-      {(pullDistance > 0 || isRefreshing) && (
-        <div
-          className="absolute left-0 right-0 flex items-center justify-center z-50"
-          style={{ top: 0, height: pullDistance || PULL_THRESHOLD }}
-        >
-          <motion.div
-            className="w-10 h-10 rounded-full bg-background shadow-md border border-border flex items-center justify-center"
-            animate={isRefreshing ? { rotate: 360 } : { rotate: pullProgress * 360 }}
-            transition={isRefreshing ? { repeat: Infinity, duration: 0.8, ease: 'linear' } : { duration: 0 }}
-            style={{ opacity: Math.min(pullProgress * 1.5, 1) }}
-          >
-            <RefreshCw className="w-5 h-5 text-primary" />
-          </motion.div>
-        </div>
-      )}
-
-      <div
-        ref={containerRef}
-        onTouchStart={handleTouchStart}
-        onTouchMove={handleTouchMove}
-        onTouchEnd={handleTouchEnd}
-        style={{
-          transform: pullDistance > 0 ? `translateY(${pullDistance}px)` : undefined,
-          transition: !pullDistance && !isRefreshing ? 'transform 0.2s ease-out' : 'none',
-        }}
-      >
+      <div style={{ paddingTop: 'var(--chrome-total-h, 0px)' }}>
         {/* Hero */}
         <PlayerHero player={player} playerStats={playerStats ?? null} />
 
-        {/* Sentinel for sticky-header safe-area detection */}
-        <div ref={sentinelRef} aria-hidden style={{ height: 1 }} />
-
-        {/* Sticky header — underline tab bar */}
-        <div
-          style={{
-            position: 'sticky',
-            top: 0,
-            zIndex: 20,
-            background: 'rgba(248,250,252,0.97)',
-            backdropFilter: 'blur(20px)',
-            WebkitBackdropFilter: 'blur(20px)',
-            borderBottom: '0.5px solid rgba(15,23,42,0.08)',
-            paddingTop: stickyPaddingTop,
-            transition: 'padding-top 200ms ease',
-          }}
-        >
-          {/* Back link */}
-          <div style={{ display: 'flex', alignItems: 'center', padding: '8px 16px 0' }}>
-            <button
-              onClick={handleBack}
-              style={{ display: 'flex', alignItems: 'center', gap: '2px', fontSize: '12px', fontWeight: 600, color: '#64748B', background: 'transparent', border: 'none', padding: 0, cursor: 'pointer' }}
-              className="active:opacity-50 transition-opacity"
-            >
-              <ChevronLeft size={13} strokeWidth={2.5} />
-              {backLabel}
-            </button>
-          </div>
-
-          {/* Stats segmented control now lives inside PlayerSeasonStats (Fix 1). */}
-        </div>
-
-        {/* Form section — three-branch render (Heating up / In form / Steady / Out of form). */}
+        {/* Form section */}
         {playerId && <FormSection playerId={playerId} />}
 
         {/* Content sections */}
         <div style={{ paddingBottom: 'calc(var(--sab, env(safe-area-inset-bottom, 0px)) + 80px)' }}>
-          {/* Season Performance */}
           <motion.div
             style={{ marginTop: 8 }}
             variants={sectionVariants}
@@ -253,9 +128,6 @@ export function PlayerProfilePage() {
             )}
           </motion.div>
 
-          {/* Skill Build — REMOVED in Phase 1 (D8). Metrics now covered by the four stats tabs. */}
-
-          {/* Recent Tournaments */}
           {playerId && (
             <motion.div
               style={{ marginTop: 8 }}
@@ -269,7 +141,6 @@ export function PlayerProfilePage() {
             </motion.div>
           )}
 
-          {/* Player Info */}
           <motion.div
             style={{ marginTop: 8 }}
             variants={sectionVariants}
@@ -281,7 +152,6 @@ export function PlayerProfilePage() {
             <PlayerInfoCard player={player} />
           </motion.div>
 
-          {/* Bottom spacer */}
           <div style={{ marginTop: 8 }} />
         </div>
       </div>
