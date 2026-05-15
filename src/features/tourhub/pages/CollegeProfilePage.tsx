@@ -359,6 +359,6 @@ export function CollegeProfilePage() {
         )}
       </div>
       </div>
-    </PageRoot>
+    </TourHubShell>
   );
 }
