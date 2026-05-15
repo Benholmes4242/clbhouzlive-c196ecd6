@@ -127,9 +127,6 @@ const NextRoundWatch: React.FC<Props> = ({ connectionId, currentHandicap }) => {
                 }}
               />
 
-              {/* Settle marker */}
-              <Tick atPercent={pos(settle)} color="var(--hcp-t-60)" />
-
               {/* Oldest marker */}
               {oldest && <Tick atPercent={pos(oldest.diff)} color="var(--hcp-t-40)" dashed />}
 
@@ -140,9 +137,9 @@ const NextRoundWatch: React.FC<Props> = ({ connectionId, currentHandicap }) => {
             {/* Labels under the bar */}
             <div
               style={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                marginTop: 8,
+                position: 'relative',
+                height: 32,
+                marginTop: 14,
                 fontSize: 10,
                 color: 'var(--hcp-t-60)',
                 fontVariantNumeric: 'tabular-nums',
@@ -151,10 +148,16 @@ const NextRoundWatch: React.FC<Props> = ({ connectionId, currentHandicap }) => {
                 fontWeight: 700,
               }}
             >
-              <BarLabel label="scratch" value="0" />
-              <BarLabel label="cut" value={target.toFixed(1)} highlight="var(--hcp-good)" />
-              <BarLabel label="settle" value={settle.toFixed(1)} />
-              {oldest && <BarLabel label="oldest" value={oldest.diff.toFixed(1)} />}
+              <BarLabel atPercent="0%" label="scratch" value="0" align="start" />
+              <BarLabel atPercent={pos(target)} label="cut" value={target.toFixed(1)} highlight="var(--hcp-good)" />
+              {oldest && (
+                <BarLabel
+                  atPercent={pos(oldest.diff)}
+                  label="oldest"
+                  value={oldest.diff.toFixed(1)}
+                  align={(BAR_MAX - oldest.diff) < 0.5 ? 'end' : 'center'}
+                />
+              )}
             </div>
           </div>
 
