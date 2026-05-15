@@ -232,7 +232,7 @@ export function HoleStatsTab({ tournamentId, isCompleted }: HoleStatsTabProps) {
             {/* Front Nine header */}
             {frontNine.length > 0 && (
               <div style={{ padding: '8px 20px', borderBottom: '0.5px solid rgba(15,23,42,0.07)', background: 'rgba(15,23,42,0.02)' }}>
-                <span style={{ fontSize: '10px', fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.12em', textTransform: 'uppercase' as const }}>Front Nine</span>
+                <span style={{ fontSize: '9px', fontWeight: 800, color: '#64748B', letterSpacing: '0.14em', textTransform: 'uppercase' as const }}>Front Nine</span>
               </div>
             )}
             {frontNine.map((hole) => {
