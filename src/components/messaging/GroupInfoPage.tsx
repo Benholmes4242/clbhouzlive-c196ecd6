@@ -788,8 +788,8 @@ export const GroupInfoPage: React.FC<GroupInfoPageProps> = ({
           }}
         >
           <div style={{ textAlign: 'center' }}>
-            <h3 style={{ fontSize: 16, fontWeight: 900, color: '#0F172A', letterSpacing: '-0.02em', margin: '0 0 8px' }}>Leave group?</h3>
-            <p style={{ fontSize: '13.5px', color: '#64748b', lineHeight: 1.5, margin: 0 }}>
+            <h3 style={{ fontSize: 16, fontWeight: 800, color: '#0F172A', letterSpacing: '-0.015em', margin: '0 0 8px' }}>Leave group?</h3>
+            <p style={{ fontSize: 14, color: '#64748b', lineHeight: 1.5, margin: 0 }}>
               You'll need to be re-added by a member to rejoin.
             </p>
           </div>
