@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { HelpCircle, TrendingDown, AlertTriangle, Minus } from 'lucide-react';
+import { TrendingDown, AlertTriangle, Minus } from 'lucide-react';
 import { useCounters, useAllScores } from '@/lib/whs/hooks';
 import { fmtDiff, fmtAxis } from '@/lib/whs/format';
 import { projectNextRound } from '@/lib/whs/handicapMath';
@@ -671,75 +671,9 @@ export const RoundsThatCountCard: React.FC<Props> = ({ connectionId, currentHand
         />
       </div>
 
-      {/* Next-round targets — flat, two-column, eyebrow on left */}
-      {projection?.hasData && (
-        <div style={{ padding: '8px 0 2px' }}>
-          <div style={{
-            display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-            marginBottom: 6,
-          }}>
-            <span style={{
-              fontSize: 9, fontWeight: 800, color: 'var(--hcp-t-60)', letterSpacing: '0.16em',
-            }}>
-              NEXT ROUND
-            </span>
-            <button
-              onClick={() => setShowExplainer(true)}
-              style={{
-                background: 'transparent', border: 'none', padding: 0,
-                display: 'inline-flex', alignItems: 'center', gap: 4,
-                fontSize: 10, fontWeight: 700, color: AMBER_DEEP, cursor: 'pointer',
-              }}
-            >
-              <HelpCircle size={11} strokeWidth={2.4} />
-              How does this work?
-            </button>
-          </div>
-
-          {projection.isAtRisk ? (
-            <AtRiskState cutTarget={projection.cutTarget} settleAt={projection.settleAt} />
-          ) : (
-            <SafeState cutTarget={projection.cutTarget} settleAt={projection.settleAt} />
-          )}
-        </div>
-      )}
-
-      {/* Utility bar — oldest round + refresh note, single condensed row */}
-      {(() => {
-        const oldest = enriched.rounds[0];
-        if (!oldest || oldest.handicap_differential == null) return null;
-        const oldestDate = new Date(oldest.play_date);
-        const dateLabel = `${oldestDate.getDate()} ${
-          oldestDate.toLocaleDateString('en-GB', { month: 'short' })
-        }`;
-        const diffStr = fmtDiff(oldest.handicap_differential);
-        const willDropCounter = oldest.is_counter;
-        return (
-          <div style={{
-            display: 'flex', alignItems: 'center', gap: 10,
-            padding: '6px 0 0',
-            marginTop: 8,
-            borderTop: `0.5px solid ${INK_10}`,
-          }}>
-            <p style={{
-              margin: 0, flex: 1, fontSize: 11, color: D_T60, lineHeight: 1.4,
-              fontFamily: FONT_GEIST,
-            }}>
-              {willDropCounter ? (
-                <>
-                  <strong style={{ color: D_T100, fontWeight: 700 }}>{diffStr}</strong>
-                  {' '}from {dateLabel} is a counter — handicap may shift when it drops off.
-                </>
-              ) : (
-                <>
-                  Oldest <strong style={{ color: D_T100, fontWeight: 700 }}>{diffStr}</strong>
-                  {' '}({dateLabel}) isn't a counter — its drop-off won't change your handicap.
-                </>
-              )}
-            </p>
-          </div>
-        );
-      })()}
+      {/* NOTE: Next-round target pair + oldest-round caption moved to NextRoundWatch.
+          The SafeState/AtRiskState component definitions remain below as a one-cycle
+          safety net but are no longer rendered here. */}
 
       <HandicapExplainerSheet
         open={showExplainer}

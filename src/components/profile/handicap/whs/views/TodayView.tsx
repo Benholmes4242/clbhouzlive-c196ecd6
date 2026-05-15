@@ -3,6 +3,7 @@ import { AlertTriangle } from 'lucide-react';
 import type { WhsConnection } from '@/lib/whs/types';
 import HeroHandicapCardDark from '../sections/HeroHandicapCardDark';
 import LastRoundCard from '../sections/LastRoundCard';
+import NextRoundWatch from '../sections/NextRoundWatch';
 import RoundsThatCountCard from '../sections/RoundsThatCountCard';
 import StreaksSection from '../sections/StreaksSection';
 import SinceLastVisitRail from '../sections/since-last-visit/SinceLastVisitRail';
@@ -48,6 +49,8 @@ export const TodayView: React.FC<Props> = ({
       )}
 
       <HeroHandicapCardDark connection={connection} />
+
+      <NextRoundWatch connectionId={connectionId} currentHandicap={currentHandicap} />
 
       <LastRoundCard connectionId={connectionId} />
 
