@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react';
-import { Trophy, ChevronDown } from 'lucide-react';
+import { ChevronDown } from 'lucide-react';
 import { format } from 'date-fns';
 import { CourseImageFallback } from '@/components/whs/CourseImageFallback';
 import { useAllScores } from '@/lib/whs/hooks';
