@@ -71,23 +71,6 @@ export const FeaturedFriendRoundHero: React.FC<Props> = ({ userId }) => {
             background: 'linear-gradient(90deg, rgba(245,158,11,0.8), transparent)',
           }} />
 
-          {data.is_personal_best && (
-            <div style={{
-              position: 'absolute',
-              top: 14,
-              right: 14,
-              background: 'linear-gradient(135deg, #F59E0B, #C97211)',
-              color: '#fff',
-              fontSize: 9,
-              fontWeight: 800,
-              letterSpacing: '0.18em',
-              padding: '5px 10px',
-              borderRadius: 999,
-              boxShadow: '0 4px 12px -2px rgba(247,147,30,0.5)',
-            }}>
-              PERSONAL BEST
-            </div>
-          )}
 
           <div style={{
             position: 'absolute',
