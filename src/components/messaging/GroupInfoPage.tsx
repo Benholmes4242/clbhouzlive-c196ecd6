@@ -559,7 +559,7 @@ export const GroupInfoPage: React.FC<GroupInfoPageProps> = ({
                       <div className="flex items-center" style={{ gap: 4, marginTop: 2 }}>
                         {participant.profile?.eg_handicap_index != null && (
                           <span style={{
-                            fontSize: '9.5px', fontWeight: 600, color: '#F7931E',
+                            fontSize: 9, fontWeight: 600, color: '#F7931E',
                             background: 'rgba(247,147,30,0.10)', border: '1px solid rgba(247,147,30,0.25)',
                             borderRadius: 99, padding: '0px 5px',
                           }}>
