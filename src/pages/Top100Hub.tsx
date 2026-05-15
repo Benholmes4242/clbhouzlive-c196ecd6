@@ -6,20 +6,18 @@ import { useTop100ProgressForUser } from '@/hooks/useTop100ProgressForUser';
 import { useTop100ListSummaries } from '@/hooks/useTop100ListSummaries';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { Map as MapIcon } from 'lucide-react';
-import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import Top100MyProgressPanel from '@/components/courses/Top100MyProgressPanel';
 import Top100MapModal from '@/components/top100/Top100MapModal';
 import { Top100MapScope } from '@/hooks/useTop100MapCourses';
 import { Top100RegionCard } from '@/components/top100/Top100RegionCard';
 import ScrollToTopGlass from '@/components/common/ScrollToTopGlass';
-import { cn } from '@/lib/utils';
 import { PageRoot } from '@/components/layout/PageRoot';
-import { getProgressInsightsForLists } from '@/lib/utils/progressInsightCopy';
-import { useStickyHeaderSafeArea } from '@/hooks/useStickyHeaderSafeArea';
+import ShellSlot from '@/components/header/ShellSlot';
+import SegmentedControl from '@/components/discover/SegmentedControl';
 
 const Top100Hub = () => {
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const { session } = useSupabaseSession();
   const { data: lists, isLoading: listsLoading } = useTop100Lists();
   const { data: progress } = useTop100ProgressForUser(session?.user?.id);
@@ -27,55 +25,45 @@ const Top100Hub = () => {
 
   const tabFromUrl = searchParams.get('tab');
   const viewFromUrl = searchParams.get('view');
-  
-  // Validate tab and use safe default - removed 'leaderboard' tab
+
   const validTabs = ['courses', 'my-progress'] as const;
   type ValidTab = typeof validTabs[number];
-  const safeTab: ValidTab = validTabs.includes(tabFromUrl as any) 
-    ? (tabFromUrl as ValidTab) 
+  const safeTab: ValidTab = validTabs.includes(tabFromUrl as any)
+    ? (tabFromUrl as ValidTab)
     : 'courses';
-  
+
   const [activeTab, setActiveTab] = useState<ValidTab>(safeTab);
-  const { sentinelRef, paddingTop: stickyPaddingTop } = useStickyHeaderSafeArea();
-  
-  // Scroll to top on tab switch
-  const handleTabChange = (tab: ValidTab) => {
-    setActiveTab(tab);
+
+  const handleTabChange = (id: string) => {
+    const next = id as ValidTab;
+    setActiveTab(next);
+    const params = new URLSearchParams(searchParams);
+    params.set('tab', next);
+    setSearchParams(params, { replace: true });
     window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
   };
-  
-  // Map modal state — auto-open if ?view=map
+
   const [isMapModalOpen, setIsMapModalOpen] = useState(viewFromUrl === 'map');
-  
   const [selectedListSlug, setSelectedListSlug] = useState<Top100MapScope>('global');
 
-  const handleMapClick = () => {
-    setIsMapModalOpen(true);
-  };
-
+  const handleMapClick = () => setIsMapModalOpen(true);
   const handleMapModalClose = (open: boolean) => {
-    if (!open) {
-      setIsMapModalOpen(false);
-    }
+    if (!open) setIsMapModalOpen(false);
   };
 
-  // Per-list sub-line for the editorial header (GB&I → Global → USA → Europe)
   const perListSubline = useMemo(() => {
     if (!listSummaries || listSummaries.length === 0) return null;
-
     const order: Array<{ slug: string; label: string }> = [
       { slug: 'gb-i', label: 'GB&I' },
       { slug: 'global', label: 'GLOBAL' },
       { slug: 'usa', label: 'USA' },
       { slug: 'europe', label: 'EUROPE' },
     ];
-
     const parts = order.map(({ slug, label }) => {
       const summary = listSummaries.find(s => s.slug === slug);
       const count = summary?.played_count ?? 0;
       return { count, label };
     });
-
     return (
       <>
         {parts.map((p, i) => (
@@ -90,7 +78,6 @@ const Top100Hub = () => {
     );
   }, [listSummaries]);
 
-  // Guard against invalid data
   if (!lists && !listsLoading) {
     return (
       <PageRoot className="min-h-screen bg-background">
@@ -119,81 +106,49 @@ const Top100Hub = () => {
 
   return (
     <PageRoot className="min-h-screen bg-background">
-      <main className="px-4 md:container md:mx-auto md:px-0 pb-3">
+      <ShellSlot>
+        <SegmentedControl
+          tabs={[
+            { id: 'courses', label: 'Courses' },
+            { id: 'my-progress', label: 'My Progress' },
+          ]}
+          activeTab={activeTab}
+          onTabChange={handleTabChange}
+        />
+      </ShellSlot>
+
+      <main
+        className="px-4 md:container md:mx-auto md:px-0 pb-3"
+        style={{ paddingTop: 'var(--chrome-total-h, 0px)' }}
+      >
         <div className="max-w-6xl mx-auto">
-          
-          <div className="space-y-5 pt-6">
-          {/* Hero Section */}
-          <div className="mx-auto flex max-w-5xl flex-col gap-2 px-4 pb-1">
-            <div className="flex justify-center mb-1.5">
-              <div className="flex items-center gap-1.5">
-                <div style={{ width: 3, height: 8, background: '#F7931E', borderRadius: 1, flexShrink: 0 }} />
-                <span style={{ fontSize: 9, fontWeight: 900, color: '#F7931E', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>World's Best</span>
-              </div>
-            </div>
-            <h1 className="text-center text-[22px] text-foreground" style={{ fontWeight: 900, letterSpacing: '-0.03em' }}>
-              Top 100 Golf Courses
-            </h1>
-            <p className="text-center text-sm text-muted-foreground">
-              Explore the world's most prestigious courses
-            </p>
-          </div>
-
-          {/* Tabs: Courses | My Progress */}
-          <Tabs value={activeTab} onValueChange={(v) => handleTabChange(v as ValidTab)} className="w-full">
-            <div ref={sentinelRef} aria-hidden style={{ height: 1 }} />
-            <div
-              className="sticky bg-background"
-              style={{
-                top: 0,
-                zIndex: 20,
-                paddingTop: stickyPaddingTop === 0 ? 8 : `calc(${stickyPaddingTop} + 8px)`,
-                paddingBottom: 8,
-                transition: 'padding-top 200ms ease',
-              }}
-            >
-            <TabsList className="flex gap-1 rounded-xl p-1 mb-0 border-0" style={{ background: 'rgba(15,23,42,0.05)' }}>
-              <TabsTrigger 
-                value="courses" 
-                className="flex-1 py-2 px-4 text-sm rounded-lg transition-all duration-150 active:scale-[0.97] after:hidden data-[state=active]:shadow-none data-[state=active]:border-0 data-[state=inactive]:bg-transparent data-[state=inactive]:border-0 data-[state=inactive]:shadow-none data-[state=active]:font-semibold data-[state=inactive]:font-medium"
-                style={{ background: activeTab === 'courses' ? '#0F172A' : 'transparent', color: activeTab === 'courses' ? '#ffffff' : '#64748B' }}
-              >
-                Courses
-              </TabsTrigger>
-              <TabsTrigger 
-                value="my-progress" 
-                className="flex-1 py-2 px-4 text-sm rounded-lg transition-all duration-150 active:scale-[0.97] after:hidden data-[state=active]:shadow-none data-[state=active]:border-0 data-[state=inactive]:bg-transparent data-[state=inactive]:border-0 data-[state=inactive]:shadow-none data-[state=active]:font-semibold data-[state=inactive]:font-medium"
-                style={{ background: activeTab === 'my-progress' ? '#0F172A' : 'transparent', color: activeTab === 'my-progress' ? '#ffffff' : '#64748B' }}
-              >
-                My Progress
-              </TabsTrigger>
-            </TabsList>
-            </div>
-
-            <TabsContent value="courses" className="mt-0">
-              {/* Editorial header — mirrors Explore + My Progress patterns */}
-              <div className="mb-4 flex items-start justify-between gap-3">
-                <div className="min-w-0 flex-1">
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 3 }}>
-                    <div style={{ width: 3, height: 8, background: '#F7931E', borderRadius: 1, flexShrink: 0 }} />
-                    <span style={{ fontSize: 9, fontWeight: 900, color: '#F7931E', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>
-                      Your Lists
-                    </span>
-                  </div>
-                  <h2 style={{ fontSize: 22, fontWeight: 900, color: '#0F172A', letterSpacing: '-0.03em', margin: 0, lineHeight: 1.1 }}>
-                    Pick your list
-                  </h2>
-                  {session && perListSubline && (
-                    <p style={{
-                      fontSize: 11, color: '#64748B', margin: '10px 0 0',
-                      fontWeight: 600, letterSpacing: '0.10em', textTransform: 'uppercase',
-                    }}>
-                      {perListSubline}
-                    </p>
-                  )}
+          <div className="space-y-5 pt-4">
+            {/* Editorial header — left-aligned, with optional Map pill on Courses tab */}
+            <div className="flex items-start justify-between gap-3">
+              <div className="min-w-0 flex-1">
+                <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 3 }}>
+                  <div style={{ width: 3, height: 8, background: '#F7931E', borderRadius: 1, flexShrink: 0 }} />
+                  <span style={{ fontSize: 9, fontWeight: 900, color: '#F7931E', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>
+                    World's Best
+                  </span>
                 </div>
+                <h1
+                  className="text-foreground"
+                  style={{ fontSize: 22, fontWeight: 900, letterSpacing: '-0.03em', margin: 0, lineHeight: 1.1 }}
+                >
+                  Top 100 Golf Courses
+                </h1>
+                {session && perListSubline && activeTab === 'courses' && (
+                  <p style={{
+                    fontSize: 11, color: '#64748B', margin: '10px 0 0',
+                    fontWeight: 600, letterSpacing: '0.10em', textTransform: 'uppercase',
+                  }}>
+                    {perListSubline}
+                  </p>
+                )}
+              </div>
 
-                {/* Map pill — labelled, right-aligned */}
+              {activeTab === 'courses' && (
                 <button
                   type="button"
                   onClick={handleMapClick}
@@ -210,9 +165,10 @@ const Top100Hub = () => {
                   <MapIcon className="h-3.5 w-3.5" />
                   Map
                 </button>
-              </div>
+              )}
+            </div>
 
-              {/* Always render List view - Map is shown in modal */}
+            {activeTab === 'courses' && (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {summariesLoading ? (
                   <div className="col-span-full text-center py-12 text-muted-foreground">
@@ -220,7 +176,6 @@ const Top100Hub = () => {
                   </div>
                 ) : (
                   (() => {
-                    // Sort cards: highest progress first, 0% last
                     const sorted = [...(listSummaries || [])].sort((a, b) => {
                       const progA = a.total_courses > 0 ? a.played_count / a.total_courses : 0;
                       const progB = b.total_courses > 0 ? b.played_count / b.total_courses : 0;
@@ -239,25 +194,23 @@ const Top100Hub = () => {
                   })()
                 )}
               </div>
+            )}
 
-              {/* Map Modal */}
-              <Top100MapModal
-                open={isMapModalOpen}
-                onOpenChange={handleMapModalClose}
-                scope={selectedListSlug}
-                onScopeChange={setSelectedListSlug}
-              />
-            </TabsContent>
-
-            <TabsContent value="my-progress" className="mt-0">
+            {activeTab === 'my-progress' && (
               <Top100MyProgressPanel />
-            </TabsContent>
-          </Tabs>
+            )}
+
+            {/* Map Modal — outside conditional render so it survives tab switches */}
+            <Top100MapModal
+              open={isMapModalOpen}
+              onOpenChange={handleMapModalClose}
+              scope={selectedListSlug}
+              onScopeChange={setSelectedListSlug}
+            />
           </div>
         </div>
       </main>
 
-      {/* Scroll to top button */}
       <ScrollToTopGlass />
     </PageRoot>
   );

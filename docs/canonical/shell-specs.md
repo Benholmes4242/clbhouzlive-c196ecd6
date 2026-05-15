@@ -115,6 +115,8 @@ Pages consume `--chrome-total-h`. They do not consume `--shell-extra-h` directly
 | Tab-tier           | Tour Hub (Overview/Schedule/Players/Leaders/College) | Soft-squircle pills (5 tabs, scrolling) | per-page chrome (Schedule = season chips, Players = search/sort, Leaders = 4-stat chips, College = none) |
 | Subpage            | Watch/Videos, Watch/Clips                          | editorial title      | filter chips |
 | Subpage            | Tour Hub detail pages                              | editorial title (or none — CompactHeader back arrow handles nav) | Tournament Detail = 4-tab equal-width strip; Player/College = none |
+| Tab-tier           | /top100 (Courses / My Progress)                    | Soft-squircle pills (2 tabs) | — |
+| Leaf               | /top100/:slug                                      | (no shell row — CompactHeader + body only) | — |
 
 ## Tour Hub tab-tier variant
 

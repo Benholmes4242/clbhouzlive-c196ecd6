@@ -11,7 +11,7 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import GolfClubView from '@/components/golf-club/GolfClubView';
 
-import { useMedianStatusBar } from '@/hooks/useMedianStatusBar';
+
 import {
   Top100ListLeaderboard,
   Top100ListFilterChips,
@@ -64,8 +64,8 @@ const Top100List = () => {
   const navigate = useNavigate();
   const { session, user } = useSupabaseSession();
 
-  // Transparent status bar for immersive hero bleed into safe area
-  useMedianStatusBar("dark", "transparent", true, false);
+
+
 
   const { data: lists } = useTop100Lists();
   const { data: progressData } = useTop100ProgressForUser(user?.id);
@@ -375,10 +375,10 @@ const Top100List = () => {
 
   if (isLoading) {
     return (
-      <PageRoot className="min-h-screen bg-background" immersive immersiveStatusBar>
-        <main className="pb-20">
+      <PageRoot className="min-h-screen bg-background">
+        <main className="pb-20" style={{ paddingTop: 'var(--chrome-total-h, 0px)' }}>
           <div className="space-y-4 pt-0">
-            <Skeleton className="h-[260px] rounded-none" />
+            <Skeleton className="h-[200px] rounded-none" />
             <Skeleton className="h-20 rounded-2xl mx-4" />
             <Skeleton className="h-32 rounded-2xl mx-4" />
             {[...Array(4)].map((_, i) => (
@@ -399,18 +399,18 @@ const Top100List = () => {
   const compactPercent = totalCount > 0 ? Math.round((playedCount / totalCount) * 100) : 0;
 
   return (
-    <PageRoot className="min-h-screen bg-background" immersive immersiveStatusBar>
-      {/* 1. Full-bleed Hero - MUST be direct child of PageRoot */}
-      {listSummary && (
-        <Top100HeroShell
-          list={listSummary}
-          playedCount={playedCount}
-          totalCount={totalCount}
-          listDisplayName={listDisplayName}
-        />
-      )}
+    <PageRoot className="min-h-screen bg-background">
+      <main style={{ paddingTop: 'var(--chrome-total-h, 0px)' }}>
+        {/* 1. Hero (inline, no notch bleed) */}
+        {listSummary && (
+          <Top100HeroShell
+            list={listSummary}
+            playedCount={playedCount}
+            totalCount={totalCount}
+            listDisplayName={listDisplayName}
+          />
+        )}
 
-      <main>
 
         {/* 2. Compact progress strip — replaces both the hero progress slab and the milestone card (Phase B) */}
         {session && totalCount > 0 && (
@@ -485,19 +485,8 @@ const Top100List = () => {
         {/* Ref target for scroll-to-top after pagination */}
         <div ref={listTopRef} />
 
-        {/* 5. Filter Chips — sticky */}
-        {/* Spacing: Token rail → Filter = 24px */}
-        <div
-          ref={filterRef}
-          className="mt-6 sticky bg-background"
-          style={{
-            top: 0,
-            zIndex: 20,
-            paddingTop: 8,
-            paddingBottom: 8,
-            borderBottom: '1px solid hsl(var(--border) / 0.12)',
-          }}
-        >
+        {/* 5. Filter Chips — inline (no longer sticky) */}
+        <div ref={filterRef} className="mt-6">
           <Top100ListFilterChips
             activeFilter={filterChip}
             onFilterChange={handleFilterChange}
