@@ -109,7 +109,7 @@ export const TopEyebrow: React.FC<Props> = ({ friend, variant, rightPill, rank }
           }}
         >
           <Trophy size={10} strokeWidth={2.5} color="#FCE38A" />
-          BEST OF GROUP
+          ROUND OF THE DAY
         </span>
       )}
       {rightPill === 'rank' && rank != null && (

@@ -43,31 +43,6 @@ export const EgOnlyCard: React.FC<Props> = ({ activity, onClick, onInviteClick }
         thumbnailUrl={activity.course_thumbnail_image}
         altText={courseName}
       >
-        {activity.is_course_best && (
-          <span
-            style={{
-              position: 'absolute',
-              top: 6,
-              left: 6,
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: 3,
-              padding: '3px 7px',
-              borderRadius: 999,
-              background: 'rgba(247,147,30,0.20)',
-              border: '0.5px solid rgba(247,147,30,0.5)',
-              backdropFilter: 'blur(20px)',
-              WebkitBackdropFilter: 'blur(20px)',
-              fontSize: 9,
-              fontWeight: 700,
-              letterSpacing: '0.14em',
-              color: T.amber,
-              textTransform: 'uppercase',
-            }}
-          >
-            {'\u2605'} BEST
-          </span>
-        )}
         <MiniGlass gross={activity.last_round_adjusted_gross} diffStr={diffStr} />
       </MiniMedia>
 

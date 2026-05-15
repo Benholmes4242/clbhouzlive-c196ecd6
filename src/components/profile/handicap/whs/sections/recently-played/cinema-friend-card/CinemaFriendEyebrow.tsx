@@ -107,29 +107,6 @@ export const CinemaFriendEyebrow: React.FC<Props> = ({ activity }) => {
 
       {/* Right cluster */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexShrink: 0 }}>
-        {activity.is_course_best && (
-          <span
-            style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: 4,
-              padding: '4px 9px',
-              borderRadius: 999,
-              background: 'rgba(247,147,30,0.18)',
-              border: '0.5px solid rgba(247,147,30,0.5)',
-              backdropFilter: 'blur(20px)',
-              WebkitBackdropFilter: 'blur(20px)',
-              fontSize: 10,
-              fontWeight: 700,
-              letterSpacing: '0.14em',
-              color: '#F7931E',
-              textTransform: 'uppercase',
-              whiteSpace: 'nowrap',
-            }}
-          >
-            {'\u2605'} COURSE BEST
-          </span>
-        )}
         {showImpact && (
           <span
             style={{

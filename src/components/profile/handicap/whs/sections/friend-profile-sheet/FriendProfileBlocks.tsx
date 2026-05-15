@@ -286,7 +286,7 @@ export const CourseBestsBlock: React.FC<{
   friend: FriendLeaderboardEntry;
   ownerUserId: string;
 }> = () => (
-  <SectionWrapper eyebrow="COURSE BESTS">
+  <SectionWrapper eyebrow="STANDOUT ROUNDS">
     <p style={{ margin: 0, fontSize: 13, color: T.inkMute, fontStyle: 'italic' }}>
       Course bests coming soon
     </p>
