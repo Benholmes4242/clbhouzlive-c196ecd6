@@ -1,6 +1,10 @@
 /**
- * SectionHeader — backward-compatible stub for old edit-v2 components
+ * SectionHeader — backward-compat shim over the shared SectionEyebrow primitive.
+ * Existing edit-v2 consumers (GolfInfoSection) keep working; new code should
+ * import SectionEyebrow directly from @/components/ui/SectionEyebrow.
  */
+import { SectionEyebrow } from '@/components/ui/SectionEyebrow';
+
 interface Props {
   title: string;
   icon?: React.ReactNode;
@@ -10,11 +14,8 @@ interface Props {
 
 export function SectionHeader({ title }: Props) {
   return (
-    <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 12 }}>
-      <div style={{ width: 3, height: 10, background: '#F7931E', borderRadius: 1, flexShrink: 0 }} />
-      <span style={{ fontSize: 9, fontWeight: 900, color: '#F7931E', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>
-        {title}
-      </span>
+    <div style={{ marginBottom: 12 }}>
+      <SectionEyebrow label={title} />
     </div>
   );
 }
