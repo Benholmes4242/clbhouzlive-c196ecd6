@@ -230,54 +230,9 @@ export function PlayersTab() {
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
   const initialTour = searchParams.get('tour') || 'pga';
   const [sort, setSort] = useState<PlayerSortType>(getDefaultSortForTour(initialTour));
-  const [searchExpanded, setSearchExpanded] = useState(false);
-  const [tourSheetOpen, setTourSheetOpen] = useState(false);
-
-  // Pull-to-refresh state
-  const [isRefreshing, setIsRefreshing] = useState(false);
-  const [pullDistance, setPullDistance] = useState(0);
-  const touchStartY = useRef(0);
-  const isPulling = useRef(false);
+  const searchExpanded = false;
   const sentinelRef = useRef<HTMLDivElement>(null);
   const isFetchingRef = useRef(false);
-  const { sentinelRef: stickyHeaderSentinelRef, paddingTop: stickyPaddingTop } = useStickyHeaderSafeArea();
-
-  const handleRefresh = useCallback(async () => {
-    setIsRefreshing(true);
-    await Promise.all([
-      queryClient.invalidateQueries({ queryKey: ['tourhub', 'players'] }),
-      queryClient.invalidateQueries({ queryKey: ['elite-players'] }),
-      queryClient.invalidateQueries({ queryKey: ['tourhub', 'player-statistics'] }),
-      queryClient.invalidateQueries({ queryKey: ['tour-season-rankings'] }),
-    ]);
-    setIsRefreshing(false);
-  }, [queryClient]);
-
-  const onTouchStart = useCallback((e: React.TouchEvent) => {
-    if (window.scrollY === 0) {
-      touchStartY.current = e.touches[0].clientY;
-      isPulling.current = true;
-    }
-  }, []);
-
-  const onTouchMove = useCallback((e: React.TouchEvent) => {
-    if (!isPulling.current) return;
-    const distance = e.touches[0].clientY - touchStartY.current;
-    if (distance > 0 && window.scrollY === 0) {
-      setPullDistance(Math.min(distance * 0.5, 80));
-    } else {
-      isPulling.current = false;
-      setPullDistance(0);
-    }
-  }, []);
-
-  const onTouchEnd = useCallback(() => {
-    if (pullDistance > 50) {
-      handleRefresh();
-    }
-    setPullDistance(0);
-    isPulling.current = false;
-  }, [pullDistance, handleRefresh]);
 
   // Tour filter from URL
   const activeTour = (searchParams.get('tour') as PlayerTourCode) || 'pga';
