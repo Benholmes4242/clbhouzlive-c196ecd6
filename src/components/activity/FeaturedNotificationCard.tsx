@@ -30,6 +30,28 @@ const INK_SUBTLE = '#94A3B8';
 const BORDER = 'rgba(15,23,42,0.07)';
 const AMBER = '#F7931E';
 const AMBER_DEEP = '#C97A10';
+const UNREAD_BG = 'rgba(247,147,30,0.04)';
+const UNREAD_BORDER = 'rgba(247,147,30,0.18)';
+const CARD_TRANSITION = 'background 200ms ease, border-color 200ms ease';
+
+const NewBadge: React.FC = () => (
+  <span
+    style={{
+      display: 'inline-block',
+      fontSize: 8,
+      fontWeight: 800,
+      color: AMBER_DEEP,
+      letterSpacing: '0.14em',
+      textTransform: 'uppercase',
+      background: 'rgba(247,147,30,0.10)',
+      padding: '2px 6px',
+      borderRadius: 4,
+      lineHeight: 1,
+    }}
+  >
+    New
+  </span>
+);
 
 function getNotificationActionText(notification: ActivityNotification): string {
   const { type, message, title } = notification;
