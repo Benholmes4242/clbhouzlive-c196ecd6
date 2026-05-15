@@ -6,6 +6,7 @@ import { useAllScores } from '@/lib/whs/hooks';
 import { computeRoundDeltas, type RoundWithDelta } from './computeRoundDeltas';
 import RoundDetailSheet from '../round-detail/RoundDetailSheet';
 import SectionHeader from '../SectionHeader';
+import { InkGrossRing } from '../shared/GrossCounterRing';
 
 interface Props {
   connectionId: string;
@@ -598,8 +599,8 @@ const FeedCard: React.FC<FeedCardProps> = ({ round, isBest, onTap }) => {
             )}
           </div>
 
-          {/* Row 2: tag pill (BEST or COUNTER) — only when present */}
-          {(isBest || round.is_counter) && (
+          {/* Row 2: BEST tag pill — only when present (counter signal moved to gross ring) */}
+          {isBest && (
             <div
               style={{
                 marginTop: 6,
@@ -608,58 +609,38 @@ const FeedCard: React.FC<FeedCardProps> = ({ round, isBest, onTap }) => {
                 gap: 6,
               }}
             >
-              {isBest ? (
-                <span
-                  style={{
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: 3,
-                    padding: '2px 6px 2px 5px',
-                    background: T.gold,
-                    color: '#3F2A05',
-                    borderRadius: 99,
-                    fontSize: 9,
-                    fontWeight: 800,
-                    letterSpacing: '0.14em',
-                  }}
-                >
-                  <Trophy size={9} strokeWidth={2.5} />
-                  BEST
-                </span>
-              ) : round.is_counter ? (
-                <span
-                  style={{
-                    padding: '2px 6px',
-                    background: 'linear-gradient(135deg, #F59E0B 0%, #FBBF24 100%)',
-                    color: '#FFFFFF',
-                    borderRadius: 99,
-                    fontSize: 9,
-                    fontWeight: 800,
-                    letterSpacing: '0.14em',
-                  }}
-                >
-                  COUNTER
-                </span>
-              ) : null}
+              <span
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 3,
+                  padding: '2px 6px 2px 5px',
+                  background: T.gold,
+                  color: '#3F2A05',
+                  borderRadius: 99,
+                  fontSize: 9,
+                  fontWeight: 800,
+                  letterSpacing: '0.14em',
+                }}
+              >
+                <Trophy size={9} strokeWidth={2.5} />
+                BEST
+              </span>
             </div>
           )}
         </div>
-        <div style={{ textAlign: 'right', flexShrink: 0 }}>
-          <div
-            style={{
-              fontSize: 26,
-              fontWeight: 800,
-              lineHeight: 1,
-              color: T.ink,
-              letterSpacing: '-0.02em',
-              fontVariantNumeric: 'tabular-nums',
-            }}
+        <div style={{ textAlign: 'right', flexShrink: 0, display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 4 }}>
+          <span
+            aria-label={`Gross score ${round.adjusted_gross ?? ''}${round.is_counter ? ', counts toward index' : ''}`}
           >
-            {round.adjusted_gross ?? '\u2014'}
-          </div>
+            <InkGrossRing
+              value={round.adjusted_gross ?? '\u2014'}
+              isCounter={!!round.is_counter}
+              size="md"
+            />
+          </span>
           <div
             style={{
-              marginTop: 4,
               fontSize: 11,
               fontWeight: 700,
               color: diffColor(round.handicap_differential),
