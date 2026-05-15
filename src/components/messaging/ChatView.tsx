@@ -518,7 +518,7 @@ export function ChatView({ conversationId, onBack }: ChatViewProps) {
             </div>
             {/* Row 2: Status */}
             <div className="flex items-center" style={{ gap: 6, alignItems: 'center', flexWrap: 'wrap' }}>
-              <span style={{ fontSize: '11.5px', fontWeight: 500 }}>
+              <span style={{ fontSize: 11, fontWeight: 500 }}>
                 {isTyping ? (
                   <span style={{ color: '#F7931E' }}>typing...</span>
                 ) : isGroupChat && conversation ? (
