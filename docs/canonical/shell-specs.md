@@ -24,20 +24,39 @@ Three layers, top to bottom:
 
 `ShellSlot` is `position: fixed; top: calc(55px + var(--sat))`. Below CompactHeader on the z-axis (z 29; header is z 30). Page bodies offset themselves with `paddingTop: var(--chrome-total-h)` — a CSS calc that composes CompactHeader height + safe-area + ShellSlot's measured height.
 
-## Tab row specs (Discover variant — canonical)
+## Tab row specs (canonical — soft-squircle pills)
+
+Single tab style for all destination tab strips (Discover 3 tabs, Courses 3 tabs, Tour Hub 5 tabs). Horizontal scroll handles overflow.
 
 | Property | Value |
 |---|---|
-| Font size | 16px |
+| Font size | 14px |
 | Font weight | 700 active / 500 inactive |
-| Letter-spacing | -0.025em active / 0 inactive |
-| Padding | `10px 4px 9px` |
-| Gap between tabs | 34px |
-| Underline | 2.5px, `linear-gradient(90deg, #F59E0B, #F7931E)` |
-| `minHeight` | none (do not enforce 44px) |
-| Row height | ~37px |
+| Letter-spacing | -0.01em |
+| Pill height | 32px |
+| Pill padding | `0 12px` |
+| Border-radius | 8px (soft squircle) |
+| Gap between tabs | 8px |
+| Active background | `#FEF3E7` (cream — same as INVITE button) |
+| Active border | `1px solid #F7931E` |
+| Active text | `#c97a10` |
+| Inactive background | `transparent` |
+| Inactive border | `1px solid transparent` (preserves layout, no jump) |
+| Inactive text | `#64748B` (`hsl(var(--muted-foreground))`) |
+| Wrapper padding | `8px 16px` |
+| Wrapper background | `#F8FAFC` (`hsl(var(--background))`) |
+| Wrapper border-bottom | `0.5px solid rgba(15,23,42,0.06)` |
+| Right-edge fade | 28px `linear-gradient(to right, transparent, #F8FAFC)` — only when row overflows |
+| Transition | `all 0.15s` |
 
-Implementation reference: `SegmentedControl.tsx`.
+**Behavioural rules:**
+
+- Horizontal scroll always on (`overflow-x: auto`, `-webkit-overflow-scrolling: touch`). Scrollbar hidden via `.segmented-scroller::-webkit-scrollbar { display: none }`.
+- No snap-to-tab.
+- Active tab does NOT auto-scroll into view on initial render. Tapping a partially-clipped tab smooth-scrolls it into view (`scrollIntoView({ inline: 'center', behavior: 'smooth' })`).
+- Right-edge fade is conditional — render only when `scrollWidth > clientWidth` (ResizeObserver-driven).
+
+Implementation references: `src/components/discover/SegmentedControl.tsx`, `src/features/tourhub/components/TourHubShellTabs.tsx`.
 
 ## Filter chip specs (canonical)
 
