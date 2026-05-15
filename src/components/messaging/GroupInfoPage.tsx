@@ -256,7 +256,7 @@ export const GroupInfoPage: React.FC<GroupInfoPageProps> = ({
           <ChevronLeft size={20} style={{ color: '#475569' }} strokeWidth={2.5} />
         </button>
         <div className="flex-1 text-center">
-          <span style={{ fontSize: 17, fontWeight: 900, color: '#0F172A', letterSpacing: '-0.02em' }}>Group Info</span>
+          <span style={{ fontSize: 17, fontWeight: 800, color: '#0F172A', letterSpacing: '-0.015em' }}>Group Info</span>
         </div>
         <div style={{ width: 34 }} />
       </div>
