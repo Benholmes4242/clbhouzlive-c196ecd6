@@ -1,0 +1,98 @@
+/**
+ * useTournamentDefendingChamp — last year's winner data for an Upcoming tournament.
+ * Per §7.2 of HYBRID_HERO_IMPLEMENTATION_BRIEF.
+ *
+ * Looks up the prior-year instance of the same tournament (by tour + name basename)
+ * and returns the winner. Returns null when no prior instance exists or the winner
+ * cannot be resolved — the hero's MiddleBand fallback chain handles null gracefully.
+ */
+
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
+import { fmtScore } from '../components/overview-v3/HybridHero.utils';
+
+export interface DefendingChampData {
+  name: string;
+  country: string;
+  score: string;
+  year: string;
+}
+
+function normaliseName(name: string): string {
+  // Strip year prefix/suffix, trim sponsor prefixes that change yearly.
+  return name
+    .toLowerCase()
+    .replace(/\b(19|20)\d{2}\b/g, '')
+    .replace(/[^a-z0-9 ]/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+export function useTournamentDefendingChamp(tournamentId: string | null | undefined) {
+  return useQuery<DefendingChampData | null>({
+    queryKey: ['hybrid-hero', 'defending-champ', tournamentId],
+    enabled: !!tournamentId,
+    staleTime: 1000 * 60 * 60 * 24, // 24h — prior winner doesn't change mid-week
+    queryFn: async () => {
+      if (!tournamentId) return null;
+
+      // 1. Resolve current tournament to get tour + name + year
+      const { data: current, error: currentErr } = await supabase
+        .from('sr_tournaments')
+        .select('id, name, start_date, season:sr_seasons!sr_tournaments_season_id_fkey(tour_name, year)')
+        .eq('id', tournamentId)
+        .maybeSingle();
+
+      if (currentErr || !current) return null;
+
+      const currentYear = new Date(current.start_date).getFullYear();
+      const tourName = (current as any).season?.tour_name;
+      if (!tourName) return null;
+      const baseName = normaliseName(current.name);
+      if (!baseName) return null;
+
+      // 2. Find prior-year tournament on same tour with similar name
+      const { data: candidates, error: candErr } = await supabase
+        .from('sr_tournaments')
+        .select('id, name, end_date, season:sr_seasons!sr_tournaments_season_id_fkey(tour_name, year)')
+        .lt('start_date', `${currentYear}-01-01`)
+        .gte('start_date', `${currentYear - 2}-01-01`)
+        .order('start_date', { ascending: false })
+        .limit(50);
+
+      if (candErr || !candidates) return null;
+
+      const prior = candidates.find((c: any) => {
+        if (c?.season?.tour_name !== tourName) return false;
+        return normaliseName(c.name) === baseName;
+      });
+      if (!prior) return null;
+
+      // 3. Fetch position-1 finisher
+      const { data: winnerRow } = await supabase
+        .from('sr_leaderboards')
+        .select('score, player:sr_players!sr_leaderboards_player_id_fkey(first_name, last_name, full_name, country, country_code)')
+        .eq('tournament_id', prior.id)
+        .eq('position', 1)
+        .gt('strokes', 0)
+        .limit(1)
+        .maybeSingle();
+
+      const player: any = (winnerRow as any)?.player;
+      if (!player) return null;
+      const name =
+        player.full_name ||
+        `${player.first_name ?? ''} ${player.last_name ?? ''}`.trim();
+      if (!name) return null;
+
+      const priorYear = (prior as any)?.season?.year ?? new Date(prior.end_date).getFullYear();
+
+      return {
+        name,
+        country: player.country_code || player.country || '',
+        score: fmtScore(winnerRow?.score ?? 0),
+        year: String(priorYear),
+      };
+    },
+  });
+}

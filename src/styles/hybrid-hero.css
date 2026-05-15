@@ -1,0 +1,48 @@
+/* HybridHero — animations + responsive title clamp.
+   Spec: HYBRID_HERO_IMPLEMENTATION_BRIEF §8 + §4.4 */
+
+@keyframes hybrid-marquee {
+  0%   { transform: translate3d(0, 0, 0); }
+  100% { transform: translate3d(-50%, 0, 0); }
+}
+
+@keyframes hybrid-pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50%      { opacity: 0.6; transform: scale(0.85); }
+}
+
+.hybrid-marquee-track {
+  animation: hybrid-marquee 40s linear infinite;
+  will-change: transform;
+}
+.hybrid-marquee-track:hover,
+.hybrid-marquee-track:active {
+  animation-play-state: paused;
+}
+
+.hybrid-hero-title {
+  margin: 0;
+  font-family: 'Geist', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-weight: 800;
+  letter-spacing: -0.035em;
+  font-size: clamp(28px, 10vw, 48px);
+  line-height: 0.96;
+  color: white;
+  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.40);
+  text-wrap: balance;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  word-break: break-word;
+}
+
+.hybrid-live-pulse {
+  animation: hybrid-pulse 1.6s ease-in-out infinite;
+  will-change: transform, opacity;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hybrid-marquee-track,
+  .hybrid-live-pulse { animation: none; }
+}
