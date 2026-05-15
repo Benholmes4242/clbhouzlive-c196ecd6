@@ -14,6 +14,7 @@ interface ChipDef {
 }
 
 const FILTERS: ChipDef[] = [
+  { id: 'all', label: 'All' },
   { id: 'completed', label: 'Past' },
   { id: 'live', label: 'Live' },
   { id: 'upcoming', label: 'Upcoming' },
@@ -31,7 +32,7 @@ const TOUR_CODES: Array<'all' | 'pga' | 'EURO' | 'LPGA' | 'CHAMP' | 'PGAD' | 'LI
  */
 function ScheduleShellRowInner() {
   const [searchParams, setSearchParams] = useSearchParams();
-  const activeFilter = (searchParams.get('filter') as ScheduleFilterType) || 'live';
+  const activeFilter = (searchParams.get('filter') as ScheduleFilterType) || 'all';
   const activeTour = (searchParams.get('tour') as TourFilterCode) || 'all';
   const [tourSheetOpen, setTourSheetOpen] = useState(false);
 
@@ -50,7 +51,8 @@ function ScheduleShellRowInner() {
 
   const setFilter = (f: ScheduleFilterType) => {
     const params = new URLSearchParams(searchParams);
-    params.set('filter', f);
+    if (f === 'all') params.delete('filter');
+    else params.set('filter', f);
     setSearchParams(params, { replace: true });
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };

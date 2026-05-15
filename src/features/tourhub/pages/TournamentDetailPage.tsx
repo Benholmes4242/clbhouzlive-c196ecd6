@@ -108,19 +108,9 @@ export function TournamentDetailPage() {
     return { name: `${name} leads`, score: scoreStr };
   }, [isLive, leaderboard]);
 
-  // Redirect to 'summary' tab for completed tournaments if on 'overview'
-  useEffect(() => {
-    if (isCompleted && activeTab === 'overview') {
-      setActiveTab('summary');
-      const newParams = new URLSearchParams(searchParams);
-      newParams.set('tab', 'summary');
-      setSearchParams(newParams, { replace: true });
-    }
-  }, [isCompleted, activeTab, searchParams, setSearchParams]);
-
   if (isLoading) {
     return (
-      <TourHubShell>
+      <TourHubShell immersive={true}>
         {/* Slate masthead skeleton */}
         <div style={{ background: '#0F172A', padding: '16px 16px 0' }} className="animate-pulse">
           {/* Pills row */}
@@ -165,7 +155,7 @@ export function TournamentDetailPage() {
   
   if (!tournament) {
     return (
-      <TourHubShell>
+      <TourHubShell immersive={true}>
         <div className="pt-6 px-5">
           <div className="flex items-center justify-center py-20">
             <div className="text-center space-y-4">
@@ -320,11 +310,10 @@ export function TournamentDetailPage() {
   };
   
   return (
-    <TourHubShell>
+    <TourHubShell immersive={true}>
       <ShellSlot>
         <TournamentTabsShellRow
           activeTab={activeTab}
-          isCompleted={isCompleted}
           onChange={handleTabChange}
         />
       </ShellSlot>
