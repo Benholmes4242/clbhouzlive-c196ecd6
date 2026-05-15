@@ -1,14 +1,13 @@
 import React, { useMemo } from 'react';
 import { Drawer as DrawerPrimitive } from 'vaul';
 import { useNavigate } from 'react-router-dom';
-import { useRoundDetail, useFriendRoundDetail, useAllScores } from '@/lib/whs/hooks';
+import { useRoundDetail, useFriendRoundDetail } from '@/lib/whs/hooks';
 import RoundScorecard from './RoundScorecard';
 import {
   SheetHero,
   SheetHeroGlass,
   UserEyebrow,
   FriendEyebrow,
-  CounterPill,
   SheetFooterInk,
   FooterPill,
   ScorecardEmpty,
@@ -81,9 +80,6 @@ export const RoundDetailSheet: React.FC<Props> = ({
 
   // ── User variant ──
   const userQuery = useRoundDetail(isFriend ? null : scoreId, !isFriend && open);
-  const { data: allScores } = useAllScores(
-    !isFriend && open ? connectionId ?? undefined : undefined,
-  );
 
   // ── Friend variant ──
   const friendIsClbhouz = !!activity?.is_clbhouz_user;
@@ -109,16 +105,7 @@ export const RoundDetailSheet: React.FC<Props> = ({
     return any ? total : null;
   }, [isFriend, friendDetail, userData]);
 
-  const counterRank = useMemo<number | null>(() => {
-    if (isFriend || !userData?.is_counter || !allScores) return null;
-    const last20 = allScores.slice(0, 20);
-    const sorted = [...last20]
-      .filter((s) => s.handicap_differential != null)
-      .sort((a, b) => a.handicap_differential! - b.handicap_differential!);
-    const idx = sorted.findIndex((s) => s.id === userData.id);
-    if (idx === -1) return null;
-    return Math.min(idx + 1, 20);
-  }, [isFriend, userData, allScores]);
+  // counterRank: previously used by removed CounterPill (signal now via gross ring).
 
   const renderUserBody = () => {
     if (userLoading) return <SheetSkeleton />;
@@ -137,9 +124,6 @@ export const RoundDetailSheet: React.FC<Props> = ({
           imageUrl={userData.course_header_image}
           onClose={onClose}
           topEyebrow={<UserEyebrow playDate={userData.play_date} />}
-          topRightPill={
-            <CounterPill isCounter={!!userData.is_counter} rank={counterRank} />
-          }
           glass={
             <SheetHeroGlass
               courseName={userData.course?.name ?? 'Unknown course'}
@@ -149,6 +133,7 @@ export const RoundDetailSheet: React.FC<Props> = ({
               stableford={userData.stableford_points}
               differential={userData.handicap_differential}
               holes={hasHoles ? holes : null}
+              isCounter={!!userData.is_counter}
             />
           }
         />

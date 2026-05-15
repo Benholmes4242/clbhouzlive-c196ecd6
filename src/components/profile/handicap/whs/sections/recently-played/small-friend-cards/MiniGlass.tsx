@@ -1,17 +1,19 @@
 import React from 'react';
+import { MiniGrossRing } from '../../shared/GrossCounterRing';
 
 const FONT_GEIST_MONO = 'Geist Mono, ui-monospace, SFMono-Regular, Menlo, monospace';
 
 interface Props {
   gross: number | null | undefined;
   diffStr: string | null;
+  isCounter?: boolean;
 }
 
 /**
  * Frosted glass tile inside MiniMedia — GROSS + DIFF micro-stats.
  * Returns null when both values are missing so the photo stands alone.
  */
-export const MiniGlass: React.FC<Props> = ({ gross, diffStr }) => {
+export const MiniGlass: React.FC<Props> = ({ gross, diffStr, isCounter = false }) => {
   const hasGross = gross !== null && gross !== undefined;
   const hasDiff = diffStr !== null;
   if (!hasGross && !hasDiff) return null;
@@ -50,17 +52,9 @@ export const MiniGlass: React.FC<Props> = ({ gross, diffStr }) => {
           GROSS
         </span>
         <span
-          style={{
-            fontSize: 22,
-            fontWeight: 300,
-            color: '#fff',
-            fontFamily: FONT_GEIST_MONO,
-            fontVariantNumeric: 'tabular-nums',
-            letterSpacing: '-0.03em',
-            lineHeight: 1,
-          }}
+          aria-label={`Gross score ${hasGross ? gross : ''}${isCounter ? ', counts toward index' : ''}`}
         >
-          {hasGross ? gross : '\u2014'}
+          <MiniGrossRing value={hasGross ? (gross as number) : '\u2014'} isCounter={isCounter} />
         </span>
       </div>
       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
@@ -76,7 +70,7 @@ export const MiniGlass: React.FC<Props> = ({ gross, diffStr }) => {
             textAlign: 'center',
           }}
         >
-          DIFF
+          SCORE DIFF
         </span>
         <span
           style={{

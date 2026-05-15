@@ -1,6 +1,7 @@
 import React from 'react';
 import type { FriendYesterday } from '@/lib/handicap/useFriendsYesterday';
 import { fmtDiff } from '@/lib/whs/format';
+import { MiniGrossRing } from '@/components/profile/handicap/whs/sections/shared/GrossCounterRing';
 
 const FONT_GEIST = 'Geist, system-ui, -apple-system, BlinkMacSystemFont, sans-serif';
 const FONT_MONO = "'Geist Mono', ui-monospace, SFMono-Regular, Menlo, monospace";
@@ -64,14 +65,21 @@ export const MiniGlass: React.FC<Props> = ({ friend }) => {
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: 6 }}>
         <div style={{ textAlign: 'left' }}>
           <div style={labelStyle}>GROSS</div>
-          <div style={valueStyle('#FFFFFF')}>{friend.score != null ? friend.score : EM_DASH}</div>
+          <span
+            aria-label={`Gross score ${friend.score ?? ''}${friend.is_counter ? ', counts toward index' : ''}`}
+          >
+            <MiniGrossRing
+              value={friend.score != null ? friend.score : EM_DASH}
+              isCounter={!!friend.is_counter}
+            />
+          </span>
         </div>
         <div style={{ textAlign: 'center' }}>
           <div style={labelStyle}>POINTS</div>
           <div style={valueStyle('#FFFFFF')}>{friend.stableford != null ? friend.stableford : EM_DASH}</div>
         </div>
         <div style={{ textAlign: 'right' }}>
-          <div style={labelStyle}>DIFF</div>
+          <div style={labelStyle}>SCORE DIFF</div>
           <div style={valueStyle(friend.differential != null ? AMBER : '#FFFFFF')}>
             {friend.differential != null ? fmtDiff(friend.differential, { plus: true }) : EM_DASH}
           </div>

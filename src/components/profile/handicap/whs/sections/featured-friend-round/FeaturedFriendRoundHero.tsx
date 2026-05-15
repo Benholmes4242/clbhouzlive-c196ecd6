@@ -159,7 +159,7 @@ export const FeaturedFriendRoundHero: React.FC<Props> = ({ userId }) => {
           }}>
             <StatTile label="GROSS" value={String(data.adjusted_gross)} />
             <StatTile
-              label="DIFF"
+              label="SCORE DIFF"
               value={data.handicap_differential !== null ? fmtDiff(data.handicap_differential, { plus: true }) : '—'}
             />
             <StatTile

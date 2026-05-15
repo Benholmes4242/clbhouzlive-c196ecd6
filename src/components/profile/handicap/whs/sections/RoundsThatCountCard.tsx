@@ -235,7 +235,7 @@ export const RoundsThatCountCard: React.FC<Props> = ({ connectionId, currentHand
               color: INK_55,
               letterSpacing: '0.16em',
               textTransform: 'uppercase',
-            }}>DIFFERENTIAL</span>
+            }}>SCORE DIFF</span>
             <div style={{
               display: 'flex', alignItems: 'center', gap: 10,
               fontSize: 9, fontWeight: 700, color: INK_55,

@@ -4,6 +4,7 @@ import type { WhsScoreHole } from '@/lib/whs/types';
 import { fmtDiff } from '@/lib/whs/format';
 import { splitCourseName } from '@/components/profile/handicap/whs/sections/last-round-card/splitCourseName';
 import CinemaCardShapeStrip from '@/components/profile/handicap/whs/sections/last-round-card/CinemaCardShapeStrip';
+import { GlassGrossRing } from '@/components/profile/handicap/whs/sections/shared/GrossCounterRing';
 import { GlassShell, CourseHeader, HAIR, labelStyle, valueStyle } from './glassPrimitives';
 
 const AMBER = '#F7931E';
@@ -38,14 +39,22 @@ export const HeroGlassEnriched: React.FC<Props> = ({ friend, par, slope, holes }
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: 8 }}>
         <div style={{ textAlign: 'left' }}>
           <div style={labelStyle}>GROSS</div>
-          <div style={valueStyle('#FFFFFF')}>{friend.score != null ? friend.score : EM_DASH}</div>
+          <span
+            aria-label={`Gross score ${friend.score ?? ''}${friend.is_counter ? ', counts toward index' : ''}`}
+          >
+            <GlassGrossRing
+              value={friend.score != null ? friend.score : EM_DASH}
+              isCounter={!!friend.is_counter}
+              numeralSize={28}
+            />
+          </span>
         </div>
         <div style={{ textAlign: 'center' }}>
           <div style={labelStyle}>STABLEFORD</div>
           <div style={valueStyle('#FFFFFF')}>{friend.stableford != null ? friend.stableford : EM_DASH}</div>
         </div>
         <div style={{ textAlign: 'right' }}>
-          <div style={labelStyle}>DIFF</div>
+          <div style={labelStyle}>SCORE DIFF</div>
           <div style={valueStyle(friend.differential != null ? AMBER : '#FFFFFF')}>
             {friend.differential != null ? fmtDiff(friend.differential, { plus: true }) : EM_DASH}
           </div>

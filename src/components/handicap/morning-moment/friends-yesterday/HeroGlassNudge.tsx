@@ -22,7 +22,7 @@ export const HeroGlassNudge: React.FC<{ friend: FriendYesterday }> = ({ friend }
         <div style={valueStyle('#FFFFFF')}>{friend.stableford != null ? friend.stableford : EM_DASH}</div>
       </div>
       <div style={{ textAlign: 'right' }}>
-        <div style={labelStyle}>DIFF</div>
+        <div style={labelStyle}>SCORE DIFF</div>
         <div style={valueStyle(friend.differential != null ? AMBER : '#FFFFFF')}>
           {friend.differential != null ? fmtDiff(friend.differential, { plus: true }) : EM_DASH}
         </div>

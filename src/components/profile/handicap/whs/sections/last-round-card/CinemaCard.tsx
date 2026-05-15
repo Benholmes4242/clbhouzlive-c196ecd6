@@ -67,6 +67,7 @@ export const CinemaCard: React.FC<Props> = ({
           stableford={stableford}
           differential={differential}
           holes={holes}
+          isCounter={isCounter}
         />
         <CinemaCardOnPhotoFooter
           isCounter={isCounter}

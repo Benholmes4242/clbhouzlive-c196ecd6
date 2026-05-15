@@ -3,6 +3,7 @@ import type { WhsScoreHole } from '@/lib/whs/types';
 import { splitCourseName } from '../../last-round-card/splitCourseName';
 import CinemaCardShapeStrip from '../../last-round-card/CinemaCardShapeStrip';
 import { fmtDiff } from '@/lib/whs/format';
+import { GlassGrossRing } from '../../shared/GrossCounterRing';
 
 const FONT_GEIST = 'Geist, system-ui, -apple-system, BlinkMacSystemFont, sans-serif';
 const FONT_MONO = "'Geist Mono', ui-monospace, SFMono-Regular, Menlo, monospace";
@@ -17,6 +18,7 @@ interface Props {
   stableford: number | null;
   differential: number | null;
   holes: WhsScoreHole[] | null;
+  isCounter?: boolean;
 }
 
 const HAIR: React.CSSProperties = {
@@ -52,6 +54,7 @@ export const CinemaFriendGlass: React.FC<Props> = ({
   stableford,
   differential,
   holes,
+  isCounter = false,
 }) => {
   const { title, suffix } = splitCourseName(courseName ?? 'Round played');
   const meta = [
@@ -108,14 +111,23 @@ export const CinemaFriendGlass: React.FC<Props> = ({
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: 8 }}>
         <div style={{ textAlign: 'left' }}>
           <div style={labelStyle}>GROSS</div>
-          <div style={valueStyle('#FFFFFF')}>{gross != null ? gross : EM_DASH}</div>
+          <div
+            style={{ marginTop: 3 }}
+            aria-label={`Gross score ${gross ?? ''}${isCounter ? ', counts toward index' : ''}`}
+          >
+            <GlassGrossRing
+              value={gross != null ? gross : EM_DASH}
+              isCounter={isCounter}
+              numeralSize={28}
+            />
+          </div>
         </div>
         <div style={{ textAlign: 'center' }}>
           <div style={labelStyle}>STABLEFORD</div>
           <div style={valueStyle('#FFFFFF')}>{stableford != null ? stableford : EM_DASH}</div>
         </div>
         <div style={{ textAlign: 'right' }}>
-          <div style={labelStyle}>DIFF</div>
+          <div style={labelStyle}>SCORE DIFF</div>
           <div style={valueStyle(differential != null ? AMBER : '#FFFFFF')}>
             {differential != null ? fmtDiff(differential, { plus: true }) : EM_DASH}
           </div>

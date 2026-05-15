@@ -2,6 +2,7 @@ import React from 'react';
 import type { WhsScoreHole } from '@/lib/whs/types';
 import { splitCourseName } from './splitCourseName';
 import CinemaCardShapeStrip from './CinemaCardShapeStrip';
+import { GlassGrossRing } from '../shared/GrossCounterRing';
 
 const FONT_GEIST = 'Geist, system-ui, -apple-system, BlinkMacSystemFont, sans-serif';
 const FONT_MONO = "'Geist Mono', ui-monospace, SFMono-Regular, Menlo, monospace";
@@ -17,6 +18,7 @@ interface Props {
   stableford: number | null;
   differential: number | null;
   holes: WhsScoreHole[] | null;
+  isCounter?: boolean;
 }
 
 const HAIR: React.CSSProperties = {
@@ -60,6 +62,7 @@ export const CinemaCardGlass: React.FC<Props> = ({
   stableford,
   differential,
   holes,
+  isCounter = false,
 }) => {
   const { title, suffix } = splitCourseName(courseName);
   const meta = [
@@ -131,14 +134,23 @@ export const CinemaCardGlass: React.FC<Props> = ({
       >
         <div style={{ textAlign: 'left' }}>
           <div style={labelStyle}>GROSS</div>
-          <div style={valueStyle('#FFFFFF')}>{gross != null ? gross : EM_DASH}</div>
+          <div
+            style={{ marginTop: 4 }}
+            aria-label={`Gross score ${gross ?? ''}${isCounter ? ', counts toward index' : ''}`}
+          >
+            <GlassGrossRing
+              value={gross != null ? gross : EM_DASH}
+              isCounter={isCounter}
+              numeralSize={32}
+            />
+          </div>
         </div>
         <div style={{ textAlign: 'center' }}>
           <div style={labelStyle}>STABLEFORD</div>
           <div style={valueStyle('#FFFFFF')}>{stableford != null ? stableford : EM_DASH}</div>
         </div>
         <div style={{ textAlign: 'right' }}>
-          <div style={labelStyle}>DIFF</div>
+          <div style={labelStyle}>SCORE DIFF</div>
           <div style={valueStyle(differential != null ? AMBER : '#FFFFFF')}>
             {fmtDiff(differential)}
           </div>

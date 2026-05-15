@@ -99,26 +99,7 @@ export const CinemaCardMedia: React.FC<Props> = ({
             </div>
           )}
         </div>
-        {showCounter && (
-          <div
-            style={{
-              padding: '5px 10px',
-              borderRadius: 999,
-              background: 'rgba(247,147,30,0.18)',
-              border: '0.5px solid rgba(247,147,30,0.5)',
-              backdropFilter: 'blur(20px) saturate(180%)',
-              WebkitBackdropFilter: 'blur(20px) saturate(180%)',
-              fontSize: 10,
-              fontWeight: 700,
-              letterSpacing: '0.14em',
-              color: AMBER,
-              textTransform: 'uppercase',
-              whiteSpace: 'nowrap',
-            }}
-          >
-            {'\u25CF'} COUNTER · #{Math.min(counterRank!, 8)}/20
-          </div>
-        )}
+        {/* Counter status now signaled via green ring on gross score in glass tile */}
       </div>
 
       {children}
