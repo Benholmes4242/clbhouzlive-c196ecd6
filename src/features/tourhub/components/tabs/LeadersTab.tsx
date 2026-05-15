@@ -52,7 +52,7 @@ export function LeadersTab() {
   const categoryKey = searchParams.get('category') || 'world_rank';
   const category = getCategoryByKey(categoryKey) || LEADER_CATEGORIES[0];
   const queryClient = useQueryClient();
-  const { sentinelRef, paddingTop } = useStickyHeaderSafeArea();
+  
 
   const { data: season } = useTourSeason();
   const { data: playerStats, isLoading: statsLoading } = useTourPlayerStatistics(season?.id);
