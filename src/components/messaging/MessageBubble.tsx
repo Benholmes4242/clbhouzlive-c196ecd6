@@ -128,7 +128,7 @@ export function MessageBubble({
 
         <div className="flex flex-col" style={{ maxWidth: 260, alignItems: isOwnMessage ? 'flex-end' : 'flex-start' }}>
           {!isOwnMessage && showSenderInfo && (
-            <span style={{ fontSize: '11.5px', fontWeight: 700, color: '#334155', marginBottom: 3, paddingLeft: 1 }}>
+            <span style={{ fontSize: 11, fontWeight: 700, color: '#334155', marginBottom: 3, paddingLeft: 1 }}>
               {senderName}
             </span>
           )}
@@ -159,7 +159,7 @@ export function MessageBubble({
               <div className="absolute inset-0" style={{ background: 'linear-gradient(to bottom, rgba(0,0,0,0.3) 0%, transparent 40%)' }} />
               
               {/* Course name on image */}
-              <span className="absolute" style={{ bottom: 10, left: 12, right: 12, fontSize: '13.5px', fontWeight: 700, color: '#fff', lineHeight: 1.3 }}>
+              <span className="absolute" style={{ bottom: 10, left: 12, right: 12, fontSize: 13, fontWeight: 700, color: '#fff', lineHeight: 1.3 }}>
                 {course.course_name}
               </span>
               
@@ -197,7 +197,7 @@ export function MessageBubble({
               {course.location && (
                 <div className="flex items-center" style={{ gap: 4, marginBottom: 8 }}>
                   <MapPin size={11} style={{ color: '#94a3b8' }} />
-                  <span style={{ fontSize: '11.5px', color: '#64748b' }}>{course.location}</span>
+                  <span style={{ fontSize: 11, color: '#64748b' }}>{course.location}</span>
                 </div>
               )}
               
@@ -208,7 +208,7 @@ export function MessageBubble({
                   gap: 6, padding: '7px 0', borderRadius: 10,
                   background: 'rgba(247,147,30,0.08)',
                   border: '1px solid rgba(247,147,30,0.22)',
-                  fontSize: '12.5px', fontWeight: 600, color: '#F7931E',
+                  fontSize: 13, fontWeight: 600, color: '#F7931E',
                 }}
               >
                 View Course
@@ -318,12 +318,12 @@ export function MessageBubble({
         {/* Sender name + chips for groups */}
         {!isOwnMessage && showSenderInfo && (
           <div className="flex items-center" style={{ gap: 5, marginBottom: 3, paddingLeft: 1, flexWrap: 'wrap' }}>
-            <span style={{ fontSize: '11.5px', fontWeight: 700, color: '#334155' }}>
+            <span style={{ fontSize: 11, fontWeight: 700, color: '#334155' }}>
               {senderName}
             </span>
             {message.sender?.eg_handicap_index != null && (
               <span style={{
-                fontSize: '9.5px', fontWeight: 600, color: '#F7931E',
+                fontSize: 9, fontWeight: 600, color: '#F7931E',
                 background: 'rgba(247,147,30,0.10)', border: '1px solid rgba(247,147,30,0.25)',
                 borderRadius: 99, padding: '0px 5px',
               }}>
@@ -332,7 +332,7 @@ export function MessageBubble({
             )}
             {message.sender?.home_club && (
               <span style={{
-                fontSize: '9.5px', fontWeight: 600, color: '#006747',
+                fontSize: 9, fontWeight: 600, color: '#006747',
                 background: 'rgba(0,103,71,0.07)', border: '1px solid rgba(0,103,71,0.18)',
                 borderRadius: 99, padding: '0px 5px',
               }}>
@@ -449,7 +449,7 @@ export function MessageBubble({
         <div style={{ padding: '12px 16px 8px', borderBottom: '1px solid rgba(0,0,0,0.05)', textAlign: 'center' as const }}>
           <div style={{ fontSize: 12, color: '#94a3b8', marginBottom: 4 }}>{formatMessageTime(message.created_at)}</div>
           {message.content && (
-            <p style={{ fontSize: '13.5px', color: '#1e293b', lineHeight: 1.4, margin: 0 }}>
+            <p style={{ fontSize: 14, color: '#1e293b', lineHeight: 1.4, margin: 0 }}>
               {message.content.length > 60 ? message.content.slice(0, 60) + '…' : message.content}
             </p>
           )}

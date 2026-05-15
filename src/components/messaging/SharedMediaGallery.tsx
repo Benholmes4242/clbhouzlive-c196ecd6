@@ -163,7 +163,7 @@ export function SharedMediaGallery({ conversationId, onClose }: SharedMediaGalle
               }}
             >
               <IconComponent size={15} style={{ color: iconColor }} />
-              <span style={{ fontSize: '12.5px', fontWeight: isActive ? 700 : 500, color: textColor }}>
+              <span style={{ fontSize: 12, fontWeight: isActive ? 700 : 500, color: textColor }}>
                 {tab.label} ({tab.count})
               </span>
               {/* Underline */}

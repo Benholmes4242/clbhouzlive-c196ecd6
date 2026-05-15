@@ -92,9 +92,8 @@ function DateSeparator({ date }: { date: string }) {
     <div className="flex justify-center" style={{ padding: '8px 0 4px' }}>
       <span
         style={{
-          fontSize: '10.5px',
-          fontWeight: 700,
-          letterSpacing: '0.06em',
+          fontSize: 11,
+          fontWeight: 600,
           color: '#94a3b8',
           background: 'rgba(0,0,0,0.05)',
           borderRadius: 99,
@@ -512,14 +511,14 @@ export function ChatView({ conversationId, onBack }: ChatViewProps) {
             <div className="flex items-center" style={{ gap: 6 }}>
               <span
                 className="truncate"
-                style={{ fontSize: 15, fontWeight: 900, color: '#0F172A', letterSpacing: '-0.02em' }}
+                style={{ fontSize: 15, fontWeight: 800, color: '#0F172A', letterSpacing: '-0.015em' }}
               >
                 {headerInfo.name}
               </span>
             </div>
             {/* Row 2: Status */}
             <div className="flex items-center" style={{ gap: 6, alignItems: 'center', flexWrap: 'wrap' }}>
-              <span style={{ fontSize: '11.5px', fontWeight: 500 }}>
+              <span style={{ fontSize: 11, fontWeight: 500 }}>
                 {isTyping ? (
                   <span style={{ color: '#F7931E' }}>typing...</span>
                 ) : isGroupChat && conversation ? (
@@ -539,7 +538,7 @@ export function ChatView({ conversationId, onBack }: ChatViewProps) {
               </span>
               {!isGroupChat && otherUser?.profile?.eg_handicap_index != null && (
                 <span style={{
-                  fontSize: '10.5px', fontWeight: 600, color: '#F7931E',
+                  fontSize: 10, fontWeight: 600, color: '#F7931E',
                   background: 'rgba(247,147,30,0.10)', border: '1px solid rgba(247,147,30,0.25)',
                   borderRadius: 99, padding: '1px 7px',
                 }}>
@@ -548,7 +547,7 @@ export function ChatView({ conversationId, onBack }: ChatViewProps) {
               )}
               {!isGroupChat && otherUser?.profile?.home_club && (
                 <span className="flex items-center" style={{
-                  gap: 3, fontSize: '10.5px', fontWeight: 600, color: '#006747',
+                  gap: 3, fontSize: 10, fontWeight: 600, color: '#006747',
                   background: 'rgba(0,103,71,0.07)', border: '1px solid rgba(0,103,71,0.18)',
                   borderRadius: 99, padding: '1px 7px',
                 }}>
