@@ -118,7 +118,37 @@ Tabs 1–4 (`Overview / Schedule / Players / Leaders`) drive `?tab=` on
 
 Implementation reference: `src/features/tourhub/components/TourHubShellTabs.tsx`
 
-## Variants planned
+## Tour Hub subpage variant
 
-- Tour Hub detail/subpage (rollout brief PR 3) — editorial title + 4-tab Row 2 (Tournament Detail) or empty Row 2 (Player / College profiles)
+Used on the four Tour Hub detail pages: `/tourhub/tournament/:id`,
+`/tourhub/player/:id`, `/tourhub/college/profile/:slug`, `/tourhub/college/compare`.
+
+- **Row 1:** none. Back navigation is handled by CompactHeader's existing
+  `isBackArrowRoute` logic — no in-page back link, no editorial title row.
+- **Row 2:**
+  - **Tournament Detail** — 4-tab equal-width strip:
+    `Overview / Leaderboard / Tee Times / Holes` (in-progress or upcoming) or
+    `Overview / Leaderboard / Tee Times / Summary` (completed). Drives
+    `?tab=` on the page. Specs match the Tour Hub tab-tier row (15px / 700-500
+    / 2.5px amber gradient underline).
+  - **Player / College Profile / College Compare** — no Row 2. ShellSlot
+    collapses; pages still consume `--chrome-total-h` for offset.
+
+Implementation references:
+`src/features/tourhub/components/shell/TournamentTabsShellRow.tsx`,
+`src/features/tourhub/pages/PlayerProfilePage.tsx`,
+`src/features/tourhub/pages/CollegeProfilePage.tsx`,
+`src/features/tourhub/pages/CollegeComparePage.tsx`.
+
+## Acceptance — Tour Hub rollout
+
+- [x] Bottom-sheet nav overlay deleted (`TourHubNavOverlay.tsx`, `TourNavWrapper.tsx`, `TourNavContext.tsx`, `useNavMenuData.ts` removed)
+- [x] Burger button removed from `GlobalBottomNavigation`
+- [x] 5-tab strip always visible across tab-tier routes via `TourHubShellTabs`
+- [x] Subpage variant on all 4 detail pages
+- [x] All PTR removed from Tour Hub pages
+- [x] All `useStickyHeaderSafeArea` removed from Tour Hub pages
+- [x] All in-page back links removed (CompactHeader handles back nav)
+- [x] This doc updated with Tour Hub tab-tier + subpage variants
+
 
