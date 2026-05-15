@@ -211,11 +211,10 @@ export function TeeTimesTab({ tournamentId, tournamentName, isCompleted }: TeeTi
         </div>
       )}
 
-      {/* Section rule marker */}
+      {/* Section eyebrow */}
       <div style={{ padding: '0 20px 0' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
-          <div style={{ width: 3, height: 14, background: '#F7931E', borderRadius: 1 }} />
-          <span style={{ fontSize: '10px', fontWeight: 900, color: '#F7931E', letterSpacing: '0.16em', textTransform: 'uppercase' as const, flex: 1 }}>
+          <span style={{ fontSize: '9px', fontWeight: 800, color: '#64748B', letterSpacing: '0.16em', textTransform: 'uppercase' as const, flex: 1 }}>
             Tee Times · {teeTimeDate ?? `Round ${roundNumber}`}
           </span>
           <span style={{ fontSize: '10px', color: '#94A3B8' }}>{groups.length} groups</span>
