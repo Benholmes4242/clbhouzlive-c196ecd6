@@ -165,10 +165,11 @@ export function LeaderboardCard({
       {onViewAll && hasMore && (
         <button
           onClick={onViewAll}
-          style={{ width: '100%', padding: '10px 0', fontSize: '11px', fontWeight: 700, color: '#0F172A', background: 'transparent', border: 'none', borderTop: '0.5px solid rgba(15,23,42,0.07)', cursor: 'pointer' }}
+          style={{ width: '100%', padding: '12px 0', fontSize: '11px', fontWeight: 800, color: '#0F172A', background: 'transparent', border: 'none', borderTop: '0.5px solid rgba(15,23,42,0.07)', cursor: 'pointer', letterSpacing: '-0.005em', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 2 }}
           className="active:opacity-70 transition-opacity"
         >
-          Full Leaderboard ›
+          Full Leaderboard
+          <ChevronRight size={14} strokeWidth={2.25} />
         </button>
       )}
     </motion.div>
