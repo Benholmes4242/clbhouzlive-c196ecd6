@@ -1759,18 +1759,18 @@ body.ecm-open .app-shell--with-header-padding {
   padding-top: 0 !important;
 }
 
-/* Clubhouse header: anchored to top */
+/* Clubhouse header: positioning is owned by the component (Tailwind .fixed
+   on CompactHeader, or per-surface overrides). Do NOT set `position` here —
+   an unlayered `position: relative` was overriding Tailwind's `.fixed`
+   utility (which lives inside @layer utilities) and causing the global
+   header to scroll with the page on Discover/Watch and any other surface
+   that mounts CompactHeader. */
 .clubhouse-header {
-  position: relative;
   z-index: 60;
   /* NOTE: safe-area padding is handled inline by CompactHeader based on route */
   touch-action: pan-x; /* no vertical pull on header */
-  
-  /* GPU compositing for smooth transforms */
-  will-change: transform, opacity;
-  transform: translateZ(0);
-  transition: 
-    transform var(--chrome-trans-ms, 260ms) var(--chrome-ease, cubic-bezier(.22,.61,.36,1)), 
+  transition:
+    transform var(--chrome-trans-ms, 260ms) var(--chrome-ease, cubic-bezier(.22,.61,.36,1)),
     opacity var(--chrome-fade-ms, 180ms) ease-out;
 }
 
