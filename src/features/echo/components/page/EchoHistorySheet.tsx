@@ -13,6 +13,7 @@ import { toast } from 'sonner';
 import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
 import { haptic } from '@/utils/haptics';
 import { AnimatedEchoWave } from '@/features/echo/components/ui/AnimatedEchoWave';
+import { SectionEyebrow } from '@/components/ui/SectionEyebrow';
 
 interface EchoHistorySheetProps {
   isOpen: boolean;
