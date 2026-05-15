@@ -49,12 +49,11 @@ const AMBER_DEEP = '#C97A10';
 const FONT_SERIF = '"Geist", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
 
 const SectionHeader: React.FC<{ label: string }> = ({ label }) => (
-  <div
+    <div
     className="sticky top-0 z-10 flex items-center gap-2 px-5 py-2"
     style={{ background: BG_SURFACE }}
   >
-    <div style={{ width: 3, height: 9, background: AMBER, borderRadius: 1, flexShrink: 0 }} />
-    <span style={{ fontSize: 10, fontWeight: 800, color: INK_SUBTLE, letterSpacing: '0.22em', textTransform: 'uppercase' }}>
+    <span style={{ fontSize: 9, fontWeight: 800, color: '#64748B', letterSpacing: '0.16em', textTransform: 'uppercase' }}>
       {label}
     </span>
   </div>
