@@ -10,7 +10,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Search, X } from 'lucide-react';
-import { useQueryClient } from '@tanstack/react-query';
+
 import { useTourSeason, useTourPlayerStatistics } from '../../hooks/useTourHubData';
 import { useWorldRankingsLeaders } from '../../hooks/useWorldRankingsLeaders';
 import { useElitePlayers } from '../../hooks/useElitePlayers';
