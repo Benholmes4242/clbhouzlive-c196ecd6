@@ -134,11 +134,40 @@ export function CollegeProfilePage() {
   }, [collegeRank, captain, showCaptainPill, captainOwgr, stats]);
 
 
+  const sectionMetaSubtitle = [subtitleText, `Season ${seasonYear}`].filter(Boolean).join(' · ');
+
   return (
-    <PageRoot
-      className="min-h-screen w-full bg-background"
-      hasBottomNav
-    >
+    <TourHubShell>
+      <ShellSlot>
+        <button
+          type="button"
+          onClick={() => navigate(collegeHubRoute())}
+          aria-label="College Profile — open College Franchise"
+          style={{
+            background: '#F8FAFC',
+            border: 'none',
+            padding: '14px 16px 12px',
+            cursor: 'pointer',
+            display: 'block',
+            width: '100%',
+            textAlign: 'left' as const,
+          }}
+        >
+          <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, marginBottom: 4 }}>
+            <Kicker color="amber">College Franchise</Kicker>
+            <ChevronRight size={11} strokeWidth={2.5} style={{ color: '#F7931E', marginTop: -4 }} />
+          </div>
+          <h1 style={{ fontSize: 22, fontWeight: 800, letterSpacing: '-0.025em', lineHeight: 1.05, color: '#0F172A', margin: 0 }}>
+            {displayName}
+          </h1>
+          {sectionMetaSubtitle && (
+            <div style={{ fontSize: 13, fontWeight: 500, color: '#64748B', marginTop: 4 }}>
+              {sectionMetaSubtitle}
+            </div>
+          )}
+        </button>
+      </ShellSlot>
+
       <div style={{ paddingTop: 'var(--chrome-total-h, 0px)' }}>
 
       {/* ── HERO MASTHEAD ── canonical light pattern */}
@@ -150,38 +179,6 @@ export function CollegeProfilePage() {
         paddingRight: 16,
         paddingBottom: 16,
       }}>
-        {/* Section header (canonical §2) */}
-        <div style={{ marginBottom: 14 }}>
-          <button
-            type="button"
-            onClick={() => navigate(collegeHubRoute())}
-            aria-label="College Profile — open College Franchise"
-            style={{
-              background: 'transparent',
-              border: 'none',
-              padding: 0,
-              cursor: 'pointer',
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: 6,
-              marginBottom: 6,
-            }}
-          >
-            <GraduationCap size={13} strokeWidth={2.5} style={{ color: '#F7931E' }} />
-            <span style={{ fontSize: 10.5, fontWeight: 700, color: '#F7931E', letterSpacing: '0.14em', textTransform: 'uppercase' as const }}>
-              COLLEGE PROFILE
-            </span>
-            <ChevronRight size={11} strokeWidth={2.5} style={{ color: '#F7931E' }} />
-          </button>
-
-          <h1 style={{ fontSize: 18, fontWeight: 800, letterSpacing: '-0.015em', lineHeight: 1.2, color: '#0F172A', margin: 0 }}>
-            {displayName}
-          </h1>
-
-          <div style={{ fontSize: 13, fontWeight: 500, color: '#64748B', marginTop: 4 }}>
-            {[subtitleText, `Season ${seasonYear}`].filter(Boolean).join(' · ')}
-          </div>
-        </div>
 
         {/* Champion content (no card chrome — Q1 = b) */}
         {stats && !isLoading && (
