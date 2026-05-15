@@ -197,7 +197,7 @@ export function MessageBubble({
               {course.location && (
                 <div className="flex items-center" style={{ gap: 4, marginBottom: 8 }}>
                   <MapPin size={11} style={{ color: '#94a3b8' }} />
-                  <span style={{ fontSize: '11.5px', color: '#64748b' }}>{course.location}</span>
+                  <span style={{ fontSize: 11, color: '#64748b' }}>{course.location}</span>
                 </div>
               )}
               
