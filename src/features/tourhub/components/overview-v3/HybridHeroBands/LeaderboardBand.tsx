@@ -285,6 +285,7 @@ export function LeaderboardBand({
               key={i}
               rank={r.rank}
               name={r.name}
+              country={r.country}
               score={r.score}
               year={r.year}
               isWinner={i === 0}
