@@ -51,9 +51,8 @@ export function SettingsSkeleton({
       <div className="px-4 pb-32 space-y-6">
         {sections.map((section, sectionIdx) => (
           <div key={sectionIdx}>
-            {/* Eyebrow — dispatch rule marker shape */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8 }}>
-              <div style={{ width: 3, height: 10, borderRadius: 1, background: 'rgba(15,23,42,0.10)', flexShrink: 0 }} />
+            {/* Eyebrow — canonical caps label skeleton */}
+            <div style={{ marginBottom: 8 }}>
               <Skeleton className="h-2.5" style={{ width: `${section.title.length * 7}px` }} />
             </div>
 
