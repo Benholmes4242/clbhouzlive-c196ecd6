@@ -547,7 +547,7 @@ export function ChatView({ conversationId, onBack }: ChatViewProps) {
               )}
               {!isGroupChat && otherUser?.profile?.home_club && (
                 <span className="flex items-center" style={{
-                  gap: 3, fontSize: '10.5px', fontWeight: 600, color: '#006747',
+                  gap: 3, fontSize: 10, fontWeight: 600, color: '#006747',
                   background: 'rgba(0,103,71,0.07)', border: '1px solid rgba(0,103,71,0.18)',
                   borderRadius: 99, padding: '1px 7px',
                 }}>
