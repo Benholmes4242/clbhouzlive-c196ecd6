@@ -153,10 +153,7 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
     return () => window.removeEventListener('popstate', handlePopState);
   }, [isExpanded, onToggleExpand]);
 
-  // Clear selected player when glass card collapses
-  useEffect(() => {
-    if (!isExpanded) setSelectedPlayer(null);
-  }, [isExpanded]);
+  // (scorecard tap flow removed — rows are passive in HybridHero)
 
   // Venue-specific hero image overrides (upcoming + live)
   const venueOverride = (isUpcoming || isLive) ? (
