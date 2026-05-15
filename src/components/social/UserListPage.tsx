@@ -134,7 +134,7 @@ const FriendBadge: React.FC = () => (
       color: AMBER_DEEP,
       fontSize: 9,
       fontWeight: 800,
-      letterSpacing: '0.08em',
+      letterSpacing: '0.14em',
       textTransform: 'uppercase',
       lineHeight: 1,
       flexShrink: 0,
