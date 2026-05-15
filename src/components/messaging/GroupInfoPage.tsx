@@ -22,6 +22,7 @@ import { ConversationWithDetails, ParticipantWithProfile } from '@/types/messagi
 import { AddMembersSheet } from './AddMembersSheet';
 import { ReportSheet } from './ReportSheet';
 import { SharedMediaGallery } from './SharedMediaGallery';
+import { SectionEyebrow } from '@/components/ui/SectionEyebrow';
 
 interface GroupInfoPageProps {
   conversation: ConversationWithDetails;
@@ -255,7 +256,7 @@ export const GroupInfoPage: React.FC<GroupInfoPageProps> = ({
           <ChevronLeft size={20} style={{ color: '#475569' }} strokeWidth={2.5} />
         </button>
         <div className="flex-1 text-center">
-          <span style={{ fontSize: 17, fontWeight: 900, color: '#0F172A', letterSpacing: '-0.02em' }}>Group Info</span>
+          <span style={{ fontSize: 17, fontWeight: 800, color: '#0F172A', letterSpacing: '-0.015em' }}>Group Info</span>
         </div>
         <div style={{ width: 34 }} />
       </div>
@@ -350,7 +351,7 @@ export const GroupInfoPage: React.FC<GroupInfoPageProps> = ({
               </div>
             ) : (
               <>
-                <h2 style={{ fontSize: 22, fontWeight: 800, color: '#0f172a', letterSpacing: '-0.3px', margin: 0 }}>
+                <h2 style={{ fontSize: 22, fontWeight: 800, color: '#0f172a', letterSpacing: '-0.025em', margin: 0 }}>
                   {conversation.name}
                 </h2>
                 {isAdmin && (
@@ -496,12 +497,7 @@ export const GroupInfoPage: React.FC<GroupInfoPageProps> = ({
         <div style={{ marginBottom: 14 }}>
           {/* Header row */}
           <div className="flex items-center justify-between" style={{ padding: '0 4px', marginBottom: 8 }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-              <div style={{ width: 3, height: 10, background: '#F7931E', borderRadius: 1, flexShrink: 0 }} />
-              <span style={{ fontSize: 9, fontWeight: 900, color: '#F7931E', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>
-                {conversation.participants.length} Members
-              </span>
-            </div>
+            <SectionEyebrow label="Members" count={conversation.participants.length} />
             {isAdmin && (
               <button
                 onClick={() => setIsAddMembersOpen(true)}
@@ -563,7 +559,7 @@ export const GroupInfoPage: React.FC<GroupInfoPageProps> = ({
                       <div className="flex items-center" style={{ gap: 4, marginTop: 2 }}>
                         {participant.profile?.eg_handicap_index != null && (
                           <span style={{
-                            fontSize: '9.5px', fontWeight: 600, color: '#F7931E',
+                            fontSize: 9, fontWeight: 600, color: '#F7931E',
                             background: 'rgba(247,147,30,0.10)', border: '1px solid rgba(247,147,30,0.25)',
                             borderRadius: 99, padding: '0px 5px',
                           }}>
@@ -572,7 +568,7 @@ export const GroupInfoPage: React.FC<GroupInfoPageProps> = ({
                         )}
                         {participant.profile?.home_club && (
                           <span style={{
-                            fontSize: '9.5px', fontWeight: 600, color: '#006747',
+                            fontSize: 9, fontWeight: 600, color: '#006747',
                             background: 'rgba(0,103,71,0.07)', border: '1px solid rgba(0,103,71,0.18)',
                             borderRadius: 99, padding: '0px 5px',
                           }}>
@@ -792,8 +788,8 @@ export const GroupInfoPage: React.FC<GroupInfoPageProps> = ({
           }}
         >
           <div style={{ textAlign: 'center' }}>
-            <h3 style={{ fontSize: 16, fontWeight: 900, color: '#0F172A', letterSpacing: '-0.02em', margin: '0 0 8px' }}>Leave group?</h3>
-            <p style={{ fontSize: '13.5px', color: '#64748b', lineHeight: 1.5, margin: 0 }}>
+            <h3 style={{ fontSize: 16, fontWeight: 800, color: '#0F172A', letterSpacing: '-0.015em', margin: '0 0 8px' }}>Leave group?</h3>
+            <p style={{ fontSize: 14, color: '#64748b', lineHeight: 1.5, margin: 0 }}>
               You'll need to be re-added by a member to rejoin.
             </p>
           </div>
@@ -834,8 +830,8 @@ export const GroupInfoPage: React.FC<GroupInfoPageProps> = ({
           }}
         >
           <div style={{ textAlign: 'center' }}>
-            <h3 style={{ fontSize: 16, fontWeight: 900, color: '#0F172A', letterSpacing: '-0.02em', margin: '0 0 8px' }}>Delete group for everyone?</h3>
-            <p style={{ fontSize: '13.5px', color: '#64748b', lineHeight: 1.5, margin: 0 }}>
+            <h3 style={{ fontSize: 16, fontWeight: 800, color: '#0F172A', letterSpacing: '-0.015em', margin: '0 0 8px' }}>Delete group for everyone?</h3>
+            <p style={{ fontSize: 14, color: '#64748b', lineHeight: 1.5, margin: 0 }}>
               This cannot be undone. All messages and media will be permanently deleted.
             </p>
           </div>
