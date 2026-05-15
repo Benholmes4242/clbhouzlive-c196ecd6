@@ -425,7 +425,7 @@ export function ConversationList({
                   <span
                     className="truncate"
                     style={{
-                      fontSize: '14.5px',
+                      fontSize: 14,
                       fontWeight: hasUnread ? 700 : 600,
                       color: hasUnread ? '#0f172a' : '#1e293b',
                     }}
