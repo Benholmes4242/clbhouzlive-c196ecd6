@@ -128,6 +128,10 @@ export const ClubhouseTopBar: React.FC<ClubhouseTopBarProps> = ({
             )}
 
             {!hideProfilePill && user && (
+              <HandicapPill onTap={() => setMenuOpen((v) => !v)} />
+            )}
+
+            {!hideProfilePill && user && (
               <PostingAsPill
                 ref={pillRef}
                 onClick={() => setMenuOpen((v) => !v)}
