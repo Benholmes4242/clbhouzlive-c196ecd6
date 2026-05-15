@@ -1,10 +1,11 @@
 import { useState, useEffect, useMemo, Fragment } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import { RefreshCw, AlertCircle, GraduationCap, ChevronRight, Crown } from 'lucide-react';
+import { RefreshCw, AlertCircle, ChevronRight, Crown } from 'lucide-react';
 import { getCollegeLogoUrl } from '@/utils/collegeLogo';
-import { PageRoot } from '@/components/layout/PageRoot';
+import { TourHubShell } from '../components/TourHubShell';
+import { ShellSlot } from '@/components/header/ShellSlot';
+import { Kicker } from '@/components/watch/proshop/Kicker';
 import { Skeleton } from '@/components/ui/skeleton';
-import { useMedianStatusBar } from '@/hooks/useMedianStatusBar';
 import { formatCurrency } from '@/lib/utils/formatCurrency';
 import {
   FranchiseStoryStrip,
