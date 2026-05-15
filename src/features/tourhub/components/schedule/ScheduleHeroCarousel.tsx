@@ -15,11 +15,9 @@
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Menu } from 'lucide-react';
 import type { TourTournament } from '../../hooks/useTourHubData';
 import type { TournamentLeaderWinner } from '../../hooks/useTournamentLeadersWinners';
 import { ScheduleHeroCard } from './ScheduleHeroCard';
-import { openTourNav } from '../../contexts/TourNavContext';
 import '@/styles/hero-glass.css';
 
 type HeroItemType = 'live' | 'upcoming' | 'recent';
@@ -104,18 +102,6 @@ export function ScheduleHeroCarousel({ items, leadersMap }: ScheduleHeroCarousel
 
   return (
     <div className="relative">
-      <button
-        className="absolute z-20 flex items-center justify-center"
-        style={{ top: 'calc(var(--sat, env(safe-area-inset-top, 0px)) + 52px)', left: '16px', width: '44px', height: '44px' }}
-        onClick={openTourNav}
-        aria-label="Open tour menu"
-      >
-        <Menu
-          className="w-[22px] h-[22px]"
-          strokeWidth={2}
-          style={{ color: '#FFFFFF', filter: 'drop-shadow(0 1px 3px rgba(0, 0, 0, 0.5))' }}
-        />
-      </button>
       <div
         onTouchStart={count > 1 ? handleTouchStart : undefined}
         onTouchMove={count > 1 ? handleTouchMove : undefined}
