@@ -21,7 +21,7 @@ interface Props {
 }
 
 interface HintInfo {
-  label: string;
+  label: string | null;
   color: string;
 }
 
@@ -30,10 +30,8 @@ function hintFor(friend: FriendYesterday): HintInfo {
   if (state === 'invite') return { label: '\u2197 INVITE', color: '#FED7AA' };
   if (state === 'nudge') return { label: '\u27F3 NUDGE TO SYNC', color: '#86EFAC' };
   if (state === 'syncing') return { label: '\u27F3 SYNCING', color: 'rgba(255,255,255,0.70)' };
-  return {
-    label: friend.is_counter ? 'COUNTER' : 'NON-COUNTER',
-    color: 'rgba(255,255,255,0.55)',
-  };
+  // enriched state: counter status now shown via gross ring; no text hint.
+  return { label: null, color: 'rgba(255,255,255,0.55)' };
 }
 
 export const MiniCard: React.FC<Props> = ({ friend, rank, onClick }) => {
@@ -116,21 +114,25 @@ export const MiniCard: React.FC<Props> = ({ friend, rank, onClick }) => {
           pointerEvents: 'none',
         }}
       >
-        <span
-          style={{
-            fontSize: 9,
-            fontWeight: 700,
-            color: hint.color,
-            letterSpacing: '0.14em',
-            textTransform: 'uppercase',
-            textShadow: '0 1px 2px rgba(0,0,0,0.3)',
-            whiteSpace: 'nowrap',
-            overflow: 'hidden',
-            textOverflow: 'ellipsis',
-          }}
-        >
-          {hint.label}
-        </span>
+        {hint.label ? (
+          <span
+            style={{
+              fontSize: 9,
+              fontWeight: 700,
+              color: hint.color,
+              letterSpacing: '0.14em',
+              textTransform: 'uppercase',
+              textShadow: '0 1px 2px rgba(0,0,0,0.3)',
+              whiteSpace: 'nowrap',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+            }}
+          >
+            {hint.label}
+          </span>
+        ) : (
+          <span />
+        )}
         <span
           style={{
             fontSize: 10,
