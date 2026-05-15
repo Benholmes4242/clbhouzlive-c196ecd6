@@ -15,6 +15,7 @@ import { CancelledPanel } from './CancelledPanel';
 import { PlayoffPendingPanel } from './PlayoffPendingPanel';
 import { INK, INK_15, AMBER } from '../HybridHero.constants';
 import type { TeeTimeGroup } from '../../../hooks/useTournamentTeeTimes';
+import { getPlayerHeadshotUrl } from '@/utils/playerHeadshot';
 
 export interface LeaderboardBandProps {
   state: HeroState;
@@ -23,10 +24,12 @@ export interface LeaderboardBandProps {
   cutLine?: number | null;
   champion?: { name: string; country?: string; score: string; playoffWin?: boolean; avatarUrl?: string | null };
   teeTimes?: TeeTimeGroup[];
-  lastYearFinishers?: { rank: string; name: string; score: string; year: string; avatarUrl?: string | null }[];
+  lastYearFinishers?: { rank: string; name: string; country?: string | null; score: string; year: string; avatarUrl?: string | null }[];
   /** When true and lastYearFinishers is empty, render the inaugural-event placeholder. */
   firstYearEvent?: boolean;
   cancelReason?: string;
+  /** Tour code used to resolve R2 player headshot URLs. */
+  tourSlug?: string;
   onCtaTap?: () => void;
 }
 
@@ -56,12 +59,7 @@ function header(state: HeroState, leaderboard: any[], tiedLeaders: TopTie | null
     return { left: 'FINAL', right: `${leaderboard.length} players` };
   }
   if (state.variant === 'imminent') return { left: 'ROUND 1 · MARQUEE GROUPS', right: 'R1 · marquee groups' };
-  // Upcoming far — derive year from any provided last-year row
   return { left: "LAST YEAR'S TOP 4", right: '' };
-}
-
-function entryAvatar(entry: any): string | null {
-  return entry?.player?.photo_url ?? null;
 }
 
 function entryName(entry: any): string {
@@ -69,10 +67,23 @@ function entryName(entry: any): string {
   return p?.full_name || `${p?.first_name ?? ''} ${p?.last_name ?? ''}`.trim() || '—';
 }
 
+function entryCountry(entry: any): string | null {
+  const p = entry?.player;
+  return p?.country_code || p?.country || null;
+}
+
 function entryThru(entry: any): string {
   if (entry?.thru === 18 || entry?.thru === 'F') return 'F';
   if (entry?.thru == null) return '—';
   return String(entry.thru);
+}
+
+function resolveAvatar(entry: any, tourSlug?: string): string | null {
+  const direct = entry?.player?.photo_url ?? null;
+  if (direct) return direct;
+  const name = entry?.player?.full_name || `${entry?.player?.first_name ?? ''} ${entry?.player?.last_name ?? ''}`.trim();
+  if (!name || !tourSlug) return null;
+  return getPlayerHeadshotUrl(name, tourSlug);
 }
 
 export function LeaderboardBand({
@@ -84,9 +95,11 @@ export function LeaderboardBand({
   lastYearFinishers,
   firstYearEvent,
   cancelReason,
+  tourSlug,
   onCtaTap,
 }: LeaderboardBandProps) {
   const h = header(state, leaderboard, tiedLeaders);
+  const entryAvatar = (entry: any) => resolveAvatar(entry, tourSlug);
 
   // Body rows by state
   let body: React.ReactNode = null;
