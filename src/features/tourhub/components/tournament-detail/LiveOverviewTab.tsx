@@ -30,20 +30,17 @@ interface LiveOverviewTabProps {
 
 const sectionRule = (label: string) => (
   <div style={{ padding: '14px 20px 8px', background: '#F8FAFC' }}>
-    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-      <div style={{ width: 3, height: 14, background: '#F7931E', borderRadius: 1, flexShrink: 0 }} />
-      <span
-        style={{
-          fontSize: 10,
-          fontWeight: 900,
-          color: '#F7931E',
-          letterSpacing: '0.16em',
-          textTransform: 'uppercase' as const,
-        }}
-      >
-        {label}
-      </span>
-    </div>
+    <span
+      style={{
+        fontSize: 9,
+        fontWeight: 800,
+        color: '#64748B',
+        letterSpacing: '0.16em',
+        textTransform: 'uppercase' as const,
+      }}
+    >
+      {label}
+    </span>
   </div>
 );
 
@@ -116,10 +113,10 @@ function CutContextCard({
           >
             <div
               style={{
-                fontSize: 10,
-                fontWeight: 900,
-                color: '#94A3B8',
-                letterSpacing: '0.12em',
+                fontSize: 9,
+                fontWeight: 800,
+                color: '#64748B',
+                letterSpacing: '0.14em',
                 marginBottom: 4,
               }}
             >
@@ -128,7 +125,7 @@ function CutContextCard({
             <div
               style={{
                 fontSize: 18,
-                fontWeight: 900,
+                fontWeight: 800,
                 color: '#0F172A',
                 letterSpacing: '-0.02em',
                 fontVariantNumeric: 'tabular-nums',
@@ -154,8 +151,7 @@ export function LiveOverviewTab({
 
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.3 }}>
-      {/* 1. LEADER */}
-      {sectionRule('Leader')}
+      {/* 1. LEADERBOARD — header rendered by LeaderboardCard itself (canonical eyebrow + View all action) */}
       {hasLeaderboard ? (
         <LeaderboardCard
           entries={leaderboard!}

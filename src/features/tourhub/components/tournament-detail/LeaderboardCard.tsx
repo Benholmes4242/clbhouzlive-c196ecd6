@@ -3,6 +3,7 @@
  */
 
 import { Link } from 'react-router-dom';
+import { ChevronRight } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { BatchPlayerAvatar } from '../PlayerAvatar';
@@ -82,17 +83,17 @@ export function LeaderboardCard({
       viewport={{ once: true, margin: '-40px' }}
       transition={{ duration: 0.35 }}
     >
-      {/* Section rule marker */}
+      {/* Section header */}
       {showHeader && (
         <div style={{ padding: '0 20px 0' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '10px' }}>
-            <div style={{ width: 3, height: 14, background: '#F7931E', borderRadius: 1, flexShrink: 0 }} />
-            <span style={{ fontSize: '11px', fontWeight: 900, color: '#F7931E', letterSpacing: '0.16em', textTransform: 'uppercase' as const, flex: 1 }}>
+            <span style={{ fontSize: '9px', fontWeight: 800, color: '#64748B', letterSpacing: '0.16em', textTransform: 'uppercase' as const, flex: 1 }}>
               {title}
             </span>
             {onViewAll && (
-              <button onClick={onViewAll} style={{ fontSize: '11px', fontWeight: 700, color: '#F7931E', background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}>
-                View all ›
+              <button onClick={onViewAll} style={{ fontSize: '11px', fontWeight: 800, color: '#0F172A', background: 'none', border: 'none', cursor: 'pointer', padding: 0, letterSpacing: '-0.005em', display: 'inline-flex', alignItems: 'center', gap: 2 }}>
+                View all
+                <ChevronRight size={14} strokeWidth={2.25} />
               </button>
             )}
           </div>
@@ -101,10 +102,10 @@ export function LeaderboardCard({
 
       {/* Column headers */}
       <div style={{ display: 'flex', alignItems: 'center', gap: '4px', padding: '5px 20px', background: 'rgba(15,23,42,0.02)', borderTop: '0.5px solid rgba(15,23,42,0.07)', borderBottom: '0.5px solid rgba(15,23,42,0.07)' }}>
-        <span style={{ width: '36px', fontSize: '10px', fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.1em', flexShrink: 0 }}>POS</span>
-        <span style={{ flex: 1, fontSize: '10px', fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.1em' }}>PLAYER</span>
-        <span style={{ width: '36px', textAlign: 'center' as const, fontSize: '10px', fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.1em', flexShrink: 0 }}>THRU</span>
-        <span style={{ width: '44px', textAlign: 'center' as const, fontSize: '10px', fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.1em', flexShrink: 0 }}>SCORE</span>
+        <span style={{ width: '36px', fontSize: '9px', fontWeight: 800, color: '#64748B', letterSpacing: '0.14em', flexShrink: 0 }}>POS</span>
+        <span style={{ flex: 1, fontSize: '9px', fontWeight: 800, color: '#64748B', letterSpacing: '0.14em' }}>PLAYER</span>
+        <span style={{ width: '36px', textAlign: 'center' as const, fontSize: '9px', fontWeight: 800, color: '#64748B', letterSpacing: '0.14em', flexShrink: 0 }}>THRU</span>
+        <span style={{ width: '44px', textAlign: 'center' as const, fontSize: '9px', fontWeight: 800, color: '#64748B', letterSpacing: '0.14em', flexShrink: 0 }}>SCORE</span>
       </div>
 
       {/* Rows */}
@@ -133,7 +134,7 @@ export function LeaderboardCard({
                 className="active:bg-black/[0.02] transition-colors"
               >
                 {/* Position */}
-                <span style={{ width: '36px', fontSize: '14px', fontWeight: 900, color: entry.position === 1 ? '#F7931E' : '#94A3B8', flexShrink: 0, fontVariantNumeric: 'tabular-nums' }}>
+                <span style={{ width: '36px', fontSize: '14px', fontWeight: 800, color: entry.position === 1 ? '#F7931E' : '#94A3B8', flexShrink: 0, fontVariantNumeric: 'tabular-nums' }}>
                   {isMissedCut ? 'MC' : entry.status === 'WD' ? 'WD' : entry.position_tied ? `T${entry.position}` : String(entry.position)}
                 </span>
 
@@ -164,10 +165,11 @@ export function LeaderboardCard({
       {onViewAll && hasMore && (
         <button
           onClick={onViewAll}
-          style={{ width: '100%', padding: '10px 0', fontSize: '11px', fontWeight: 700, color: '#0F172A', background: 'transparent', border: 'none', borderTop: '0.5px solid rgba(15,23,42,0.07)', cursor: 'pointer' }}
+          style={{ width: '100%', padding: '12px 0', fontSize: '11px', fontWeight: 800, color: '#0F172A', background: 'transparent', border: 'none', borderTop: '0.5px solid rgba(15,23,42,0.07)', cursor: 'pointer', letterSpacing: '-0.005em', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 2 }}
           className="active:opacity-70 transition-opacity"
         >
-          Full Leaderboard ›
+          Full Leaderboard
+          <ChevronRight size={14} strokeWidth={2.25} />
         </button>
       )}
     </motion.div>

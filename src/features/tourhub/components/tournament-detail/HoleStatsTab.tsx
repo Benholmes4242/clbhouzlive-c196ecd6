@@ -191,18 +191,18 @@ export function HoleStatsTab({ tournamentId, isCompleted }: HoleStatsTabProps) {
           {hasRoundData && toughestHoles.length > 0 && easiestHoles.length > 0 && (
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', background: '#ffffff', borderTop: '1px solid rgba(15,23,42,0.07)', borderBottom: '0.5px solid rgba(15,23,42,0.07)' }}>
               <div style={{ padding: '11px 0', textAlign: 'center' as const, borderRight: '0.5px solid rgba(15,23,42,0.07)' }}>
-                <div style={{ fontSize: '12px', fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.1em', marginBottom: '3px' }}>HARDEST</div>
-                <div style={{ fontSize: '15px', fontWeight: 900, color: '#0F172A' }}>Hole {toughestHoles[0]?.holeNumber}</div>
+                <div style={{ fontSize: '9px', fontWeight: 800, color: '#64748B', letterSpacing: '0.14em', marginBottom: '3px' }}>HARDEST</div>
+                <div style={{ fontSize: '15px', fontWeight: 800, color: '#0F172A' }}>Hole {toughestHoles[0]?.holeNumber}</div>
                 <div style={{ fontSize: '12px', color: '#DC2626', fontWeight: 700 }}>+{toughestHoles[0]?.avgDiff.toFixed(2)}</div>
               </div>
               <div style={{ padding: '11px 0', textAlign: 'center' as const, borderRight: '0.5px solid rgba(15,23,42,0.07)' }}>
-                <div style={{ fontSize: '12px', fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.1em', marginBottom: '3px' }}>EASIEST</div>
-                <div style={{ fontSize: '15px', fontWeight: 900, color: '#0F172A' }}>Hole {easiestHoles[0]?.holeNumber}</div>
+                <div style={{ fontSize: '9px', fontWeight: 800, color: '#64748B', letterSpacing: '0.14em', marginBottom: '3px' }}>EASIEST</div>
+                <div style={{ fontSize: '15px', fontWeight: 800, color: '#0F172A' }}>Hole {easiestHoles[0]?.holeNumber}</div>
                 <div style={{ fontSize: '12px', color: '#F7931E', fontWeight: 700 }}>{easiestHoles[0]?.avgDiff.toFixed(2)}</div>
               </div>
               <div style={{ padding: '11px 0', textAlign: 'center' as const }}>
-                <div style={{ fontSize: '12px', fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.1em', marginBottom: '3px' }}>FIELD AVG</div>
-                <div style={{ fontSize: '15px', fontWeight: 900, color: '#0F172A' }}>{roundScoringAvg !== null ? (roundScoringAvg > 0 ? `+${roundScoringAvg.toFixed(1)}` : roundScoringAvg.toFixed(1)) : '—'}</div>
+                <div style={{ fontSize: '9px', fontWeight: 800, color: '#64748B', letterSpacing: '0.14em', marginBottom: '3px' }}>FIELD AVG</div>
+                <div style={{ fontSize: '15px', fontWeight: 800, color: '#0F172A' }}>{roundScoringAvg !== null ? (roundScoringAvg > 0 ? `+${roundScoringAvg.toFixed(1)}` : roundScoringAvg.toFixed(1)) : '—'}</div>
                 <div style={{ fontSize: '12px', color: '#94A3B8' }}>vs par</div>
               </div>
             </div>
@@ -211,8 +211,7 @@ export function HoleStatsTab({ tournamentId, isCompleted }: HoleStatsTabProps) {
           {/* Section header */}
           <div style={{ padding: '14px 20px 0' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
-              <div style={{ width: 3, height: 14, background: '#F7931E', borderRadius: 1, flexShrink: 0 }} />
-              <span style={{ fontSize: '10px', fontWeight: 900, color: '#F7931E', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>
+              <span style={{ fontSize: '9px', fontWeight: 800, color: '#64748B', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>
                 Hole by Hole
               </span>
             </div>
@@ -220,12 +219,12 @@ export function HoleStatsTab({ tournamentId, isCompleted }: HoleStatsTabProps) {
 
           {/* Column headers */}
           <div style={{ display: 'flex', alignItems: 'center', padding: '5px 20px', background: 'rgba(15,23,42,0.02)', borderBottom: '0.5px solid rgba(15,23,42,0.07)', borderTop: '0.5px solid rgba(15,23,42,0.07)' }}>
-            <span style={{ width: '28px', fontSize: '12px', fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.1em', flexShrink: 0 }}>H</span>
-            <span style={{ width: '28px', fontSize: '12px', fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.1em', flexShrink: 0 }}>PAR</span>
+            <span style={{ width: '28px', fontSize: '9px', fontWeight: 800, color: '#64748B', letterSpacing: '0.14em', flexShrink: 0 }}>H</span>
+            <span style={{ width: '28px', fontSize: '9px', fontWeight: 800, color: '#64748B', letterSpacing: '0.14em', flexShrink: 0 }}>PAR</span>
             {/* YDS column dropped Phase 1 — sr_hole_statistics.yardage is 100% NULL.
                 See audit B10. Re-introduce when ingestion populates this field. */}
-            <span style={{ flex: 1, fontSize: '12px', fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.1em' }}>SCORING DIST.</span>
-            <span style={{ width: '44px', textAlign: 'right' as const, fontSize: '12px', fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.1em', flexShrink: 0 }}>AVG</span>
+            <span style={{ flex: 1, fontSize: '9px', fontWeight: 800, color: '#64748B', letterSpacing: '0.14em' }}>SCORING DIST.</span>
+            <span style={{ width: '44px', textAlign: 'right' as const, fontSize: '9px', fontWeight: 800, color: '#64748B', letterSpacing: '0.14em', flexShrink: 0 }}>AVG</span>
           </div>
 
           {/* Hole rows */}
@@ -233,7 +232,7 @@ export function HoleStatsTab({ tournamentId, isCompleted }: HoleStatsTabProps) {
             {/* Front Nine header */}
             {frontNine.length > 0 && (
               <div style={{ padding: '8px 20px', borderBottom: '0.5px solid rgba(15,23,42,0.07)', background: 'rgba(15,23,42,0.02)' }}>
-                <span style={{ fontSize: '10px', fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.12em', textTransform: 'uppercase' as const }}>Front Nine</span>
+                <span style={{ fontSize: '9px', fontWeight: 800, color: '#64748B', letterSpacing: '0.14em', textTransform: 'uppercase' as const }}>Front Nine</span>
               </div>
             )}
             {frontNine.map((hole) => {
@@ -245,7 +244,7 @@ export function HoleStatsTab({ tournamentId, isCompleted }: HoleStatsTabProps) {
               const isEasy = hole.avgDiff < -0.2;
               return (
                 <div key={hole.holeNumber} style={{ display: 'flex', alignItems: 'center', padding: '10px 20px', borderBottom: '0.5px solid rgba(15,23,42,0.07)' }}>
-                  <span style={{ width: '28px', fontSize: '14px', fontWeight: 900, color: isHard ? '#DC2626' : isEasy ? '#F7931E' : '#94A3B8', flexShrink: 0 }}>{hole.holeNumber}</span>
+                  <span style={{ width: '28px', fontSize: '14px', fontWeight: 800, color: isHard ? '#DC2626' : isEasy ? '#F7931E' : '#94A3B8', flexShrink: 0 }}>{hole.holeNumber}</span>
                   <span style={{ width: '28px', fontSize: '12px', color: '#64748B', flexShrink: 0 }}>{hole.par}</span>
                   {/* yardage column dropped — see header comment */}
                   <div style={{ flex: 1, height: '6px', borderRadius: '3px', overflow: 'hidden', display: 'flex' }}>
@@ -263,7 +262,7 @@ export function HoleStatsTab({ tournamentId, isCompleted }: HoleStatsTabProps) {
             {/* Back Nine header */}
             {backNine.length > 0 && (
               <div style={{ padding: '8px 20px', borderBottom: '0.5px solid rgba(15,23,42,0.07)', background: 'rgba(15,23,42,0.02)' }}>
-                <span style={{ fontSize: '10px', fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.12em', textTransform: 'uppercase' as const }}>Back Nine</span>
+                <span style={{ fontSize: '9px', fontWeight: 800, color: '#64748B', letterSpacing: '0.14em', textTransform: 'uppercase' as const }}>Back Nine</span>
               </div>
             )}
             {backNine.map((hole) => {
@@ -275,7 +274,7 @@ export function HoleStatsTab({ tournamentId, isCompleted }: HoleStatsTabProps) {
               const isEasy = hole.avgDiff < -0.2;
               return (
                 <div key={hole.holeNumber} style={{ display: 'flex', alignItems: 'center', padding: '10px 20px', borderBottom: '0.5px solid rgba(15,23,42,0.07)' }}>
-                  <span style={{ width: '28px', fontSize: '14px', fontWeight: 900, color: isHard ? '#DC2626' : isEasy ? '#F7931E' : '#94A3B8', flexShrink: 0 }}>{hole.holeNumber}</span>
+                  <span style={{ width: '28px', fontSize: '14px', fontWeight: 800, color: isHard ? '#DC2626' : isEasy ? '#F7931E' : '#94A3B8', flexShrink: 0 }}>{hole.holeNumber}</span>
                   <span style={{ width: '28px', fontSize: '12px', color: '#64748B', flexShrink: 0 }}>{hole.par}</span>
                   {/* yardage column dropped — see header comment */}
                   <div style={{ flex: 1, height: '6px', borderRadius: '3px', overflow: 'hidden', display: 'flex' }}>

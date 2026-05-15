@@ -211,11 +211,10 @@ export function TeeTimesTab({ tournamentId, tournamentName, isCompleted }: TeeTi
         </div>
       )}
 
-      {/* Section rule marker */}
+      {/* Section eyebrow */}
       <div style={{ padding: '0 20px 0' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
-          <div style={{ width: 3, height: 14, background: '#F7931E', borderRadius: 1 }} />
-          <span style={{ fontSize: '10px', fontWeight: 900, color: '#F7931E', letterSpacing: '0.16em', textTransform: 'uppercase' as const, flex: 1 }}>
+          <span style={{ fontSize: '9px', fontWeight: 800, color: '#64748B', letterSpacing: '0.16em', textTransform: 'uppercase' as const, flex: 1 }}>
             Tee Times · {teeTimeDate ?? `Round ${roundNumber}`}
           </span>
           <span style={{ fontSize: '10px', color: '#94A3B8' }}>{groups.length} groups</span>
@@ -244,9 +243,9 @@ export function TeeTimesTab({ tournamentId, tournamentName, isCompleted }: TeeTi
 
       {/* Column headers */}
       <div style={{ display: 'flex', alignItems: 'center', padding: '5px 20px', background: 'rgba(15,23,42,0.02)', borderTop: '0.5px solid rgba(15,23,42,0.07)', borderBottom: '0.5px solid rgba(15,23,42,0.07)' }}>
-        <span style={{ fontSize: '10px', fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.1em', width: '72px', flexShrink: 0 }}>TIME</span>
-        <span style={{ fontSize: '10px', fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.1em', width: '52px', flexShrink: 0 }}>HOLE</span>
-        <span style={{ fontSize: '10px', fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.1em', flex: 1 }}>PLAYERS</span>
+        <span style={{ fontSize: '9px', fontWeight: 800, color: '#64748B', letterSpacing: '0.14em', width: '72px', flexShrink: 0 }}>TIME</span>
+        <span style={{ fontSize: '9px', fontWeight: 800, color: '#64748B', letterSpacing: '0.14em', width: '52px', flexShrink: 0 }}>HOLE</span>
+        <span style={{ fontSize: '9px', fontWeight: 800, color: '#64748B', letterSpacing: '0.14em', flex: 1 }}>PLAYERS</span>
       </div>
 
       {/* Groups */}
@@ -260,7 +259,7 @@ export function TeeTimesTab({ tournamentId, tournamentName, isCompleted }: TeeTi
         {hasSplitTees && groupedByHole ? (
           groupedByHole.map(([hole, holeGroups]) => (
             <div key={hole}>
-              <p style={{ fontSize: '10px', fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.12em', textTransform: 'uppercase' as const, padding: '10px 20px 4px' }}>
+              <p style={{ fontSize: '9px', fontWeight: 800, color: '#64748B', letterSpacing: '0.14em', textTransform: 'uppercase' as const, padding: '10px 20px 4px' }}>
                 Hole {hole} Start
               </p>
               {holeGroups.map((group, idx) => (
