@@ -488,11 +488,11 @@ export const UserListPage: React.FC<UserListPageProps> = ({
               <h1
                 style={{
                   fontFamily: FONT_SERIF,
-                  fontSize: 32,
-                  fontWeight: 900,
+                  fontSize: 34,
+                  fontWeight: 800,
                   color: INK,
                   lineHeight: 1.05,
-                  letterSpacing: '-0.01em',
+                  letterSpacing: '-0.025em',
                   margin: 0,
                   fontFeatureSettings: '"kern" 1, "liga" 1',
                 }}
