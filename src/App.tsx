@@ -172,12 +172,6 @@ const DiscoverGamesPage = lazy(() => import("./features/games/pages/DiscoverGame
 const EchoSharePage = lazy(() => import("./pages/EchoSharePage").then(m => ({ default: m.EchoSharePage })));
 
 // Tour Hub pages
-const TourHubHomePage = lazy(() => import("./features/tourhub/pages").then(m => ({ default: m.TourHubHomePage })));
-const TourHubLivePage = lazy(() => import("./features/tourhub/pages").then(m => ({ default: m.TourHubLivePage })));
-const TourHubTourPage = lazy(() => import("./features/tourhub/pages").then(m => ({ default: m.TourHubTourPage })));
-const TourHubEventPage = lazy(() => import("./features/tourhub/pages").then(m => ({ default: m.TourHubEventPage })));
-
-const TourHubRankingsPage = lazy(() => import("./features/tourhub/pages").then(m => ({ default: m.TourHubRankingsPage })));
 const TourHubMainPage = lazy(() => import("./features/tourhub/pages").then(m => ({ default: m.TourHubMainPage })));
 const TournamentDetailPage = lazy(() => import("./features/tourhub/pages").then(m => ({ default: m.TournamentDetailPage })));
 const PlayerProfilePage = lazy(() => import("./features/tourhub/pages").then(m => ({ default: m.PlayerProfilePage })));
