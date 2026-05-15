@@ -1,5 +1,5 @@
 /**
- * FriendsYesterdayCard — Cinema-language two-tier section. The BEST OF GROUP
+ * FriendsYesterdayCard — Cinema-language two-tier section. The ROUND OF THE DAY
  * hero (280px) sits above a horizontal scroll of 250×168 mini cards for the
  * remaining players. Tap-through navigates to the Friends sub-tab.
  */
