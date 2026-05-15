@@ -694,7 +694,7 @@ export function NewConversationModal({
                     <span
                       className="truncate"
                       style={{
-                        fontSize: '12.5px', fontWeight: 600,
+                        fontSize: 13, fontWeight: 600,
                         color: '#c2770f', maxWidth: 80,
                       }}
                     >
@@ -760,7 +760,7 @@ export function NewConversationModal({
                       </div>
                     ))}
                   </div>
-                  <span style={{ fontSize: '12.5px', color: '#64748b' }}>
+                  <span style={{ fontSize: 12, color: '#64748b' }}>
                     {selectedUsers.length} member{selectedUsers.length !== 1 ? 's' : ''} selected
                   </span>
                 </div>
@@ -772,7 +772,7 @@ export function NewConversationModal({
                 className="w-full flex items-center justify-center active:scale-[0.97] transition-transform"
                 style={{
                   height: 48, borderRadius: 14,
-                  fontSize: '14.5px', fontWeight: 700, gap: 8,
+                  fontSize: 14, fontWeight: 700, gap: 8,
                   cursor: isGroupValid && !creatingGroup ? 'pointer' : 'default',
                   ...(isGroupValid
                     ? {
