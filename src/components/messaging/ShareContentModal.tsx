@@ -8,6 +8,7 @@ import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { toast } from 'sonner';
 import { useQuery } from '@tanstack/react-query';
 import type { MessageType, SharedCourse } from '@/types/messaging';
+import { SectionEyebrow } from '@/components/ui/SectionEyebrow';
 
 interface ShareContentModalProps {
   open: boolean;
@@ -205,13 +206,8 @@ export function ShareContentModal({
               </div>
 
               {/* Section label */}
-              <div style={{
-                padding: '6px 0 4px',
-                fontSize: 10, fontWeight: 700,
-                letterSpacing: '0.08em', color: '#c0c8d0',
-                textTransform: 'uppercase' as const,
-              }}>
-                Recently Played
+              <div style={{ padding: '6px 0 4px' }}>
+                <SectionEyebrow label="Recently Played" />
               </div>
 
               {coursesLoading ? (
@@ -337,7 +333,7 @@ export function ShareContentModal({
                     <ImagePlus size={22} style={{ color: '#F7931E' }} />
                   </div>
                   <span style={{ fontSize: 15, fontWeight: 700, color: '#0f172a' }}>Select Photos & Videos</span>
-                  <span style={{ fontSize: '12.5px', color: '#94a3b8' }}>Up to {MAX_MEDIA} items</span>
+                  <span style={{ fontSize: 12, color: '#94a3b8' }}>Up to {MAX_MEDIA} items</span>
                 </button>
               )}
               
@@ -357,7 +353,7 @@ export function ShareContentModal({
                   className="w-full flex items-center justify-center active:scale-[0.98] transition-transform disabled:opacity-60"
                   style={{
                     height: 48, borderRadius: 14,
-                    fontSize: '14.5px', fontWeight: 700,
+                    fontSize: 14, fontWeight: 700,
                     background: 'rgba(247,147,30,0.10)',
                     border: '1px solid rgba(247,147,30,0.28)',
                     color: '#F7931E',

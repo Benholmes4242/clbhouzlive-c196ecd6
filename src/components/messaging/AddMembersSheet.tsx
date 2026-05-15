@@ -9,6 +9,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useDebounce } from '@/hooks/useDebounce';
 import { cn } from '@/lib/utils';
 import { AppLog } from '@/lib/logger';
+import { SectionEyebrow } from '@/components/ui/SectionEyebrow';
 
 interface AddMembersSheetProps {
   isOpen: boolean;
@@ -114,11 +115,8 @@ export const AddMembersSheet: React.FC<AddMembersSheetProps> = ({
       <div className="p-4 space-y-4">
         {/* Drag handle */}
         <div style={{ width: 36, height: 4, borderRadius: 2, background: 'rgba(15,23,42,0.12)', margin: '0 auto 8px', flexShrink: 0 }} />
-        <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 16 }}>
-          <div style={{ width: 3, height: 10, background: '#F7931E', borderRadius: 1, flexShrink: 0 }} />
-          <span style={{ fontSize: 9, fontWeight: 900, color: '#F7931E', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>
-            Add Members
-          </span>
+        <div style={{ marginBottom: 16 }}>
+          <SectionEyebrow label="Add Members" />
         </div>
         {/* Search Input */}
         <div className="relative">
