@@ -51,7 +51,8 @@ function ScheduleShellRowInner() {
 
   const setFilter = (f: ScheduleFilterType) => {
     const params = new URLSearchParams(searchParams);
-    params.set('filter', f);
+    if (f === 'all') params.delete('filter');
+    else params.set('filter', f);
     setSearchParams(params, { replace: true });
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
