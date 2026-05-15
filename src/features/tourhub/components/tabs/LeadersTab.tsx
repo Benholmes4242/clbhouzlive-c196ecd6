@@ -66,12 +66,7 @@ export function LeadersTab() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }, [categoryKey]);
 
-  // ─── Pull-to-refresh ───
-  const [isRefreshing, setIsRefreshing] = useState(false);
-  const [pullDistance, setPullDistance] = useState(0);
   const [categorySheetOpen, setCategorySheetOpen] = useState(false);
-  const touchStartY = useRef(0);
-  const isPulling = useRef(false);
 
   // ─── Inline search (Phase 1 fix.1.7) ───
   const [search, setSearch] = useState('');
@@ -92,40 +87,6 @@ export function LeadersTab() {
     return map;
   }, [elitePlayers]);
 
-  const handleRefresh = useCallback(async () => {
-    setIsRefreshing(true);
-    await queryClient.invalidateQueries({ queryKey: ['tour-player-statistics'] });
-    await queryClient.invalidateQueries({ queryKey: ['world-rankings-leaders'] });
-    setTimeout(() => {
-      setIsRefreshing(false);
-      setPullDistance(0);
-    }, 600);
-  }, [queryClient]);
-
-  const onTouchStart = useCallback((e: React.TouchEvent) => {
-    if (window.scrollY <= 0) {
-      touchStartY.current = e.touches[0].clientY;
-      isPulling.current = true;
-    }
-  }, []);
-
-  const onTouchMove = useCallback((e: React.TouchEvent) => {
-    if (!isPulling.current || isRefreshing) return;
-    const diff = e.touches[0].clientY - touchStartY.current;
-    if (diff > 0) {
-      setPullDistance(Math.min(diff * 0.5, 80));
-    }
-  }, [isRefreshing]);
-
-  const onTouchEnd = useCallback(() => {
-    if (!isPulling.current) return;
-    isPulling.current = false;
-    if (pullDistance >= 50) {
-      handleRefresh();
-    } else {
-      setPullDistance(0);
-    }
-  }, [pullDistance, handleRefresh]);
 
   const setCategory = (key: string) => {
     const params = new URLSearchParams(searchParams);
