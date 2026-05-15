@@ -4,6 +4,7 @@ import { HeaderPhotoCard } from '@/components/profile/edit-v2/HeaderPhotoCard';
 import { ProfilePhotoCard } from '@/components/profile/edit-v2/ProfilePhotoCard';
 import { SectionCard } from '@/components/profile/edit-v2/SectionCard';
 import { DISPLAY_NAME_MAX, USERNAME_MAX } from '../types';
+import { SectionEyebrow } from '@/components/ui/SectionEyebrow';
 
 interface Props {
   form: ProfileFormData;
@@ -17,17 +18,6 @@ const GENDER_OPTIONS = [
   { value: 'female', label: 'Female' },
   { value: 'prefer_not_to_say', label: 'Prefer not to say' },
 ] as const;
-
-function RuleLabel({ text }: { text: string }) {
-  return (
-    <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8 }}>
-      <div style={{ width: 3, height: 10, background: '#F7931E', borderRadius: 1, flexShrink: 0 }} />
-      <span style={{ fontSize: 9, fontWeight: 900, color: '#F7931E', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>
-        {text}
-      </span>
-    </div>
-  );
-}
 
 export function PhotosIdentityStep({
   form, usernameIsLocked, displayNameError, onFieldChange,
@@ -71,7 +61,7 @@ export function PhotosIdentityStep({
           {/* Display Name field */}
           <div className="px-4 pt-4 pb-3" style={{ borderBottom: '0.5px solid rgba(15,23,42,0.07)' }}>
             <div className="flex justify-between items-baseline">
-              <RuleLabel text="Display Name" />
+              <div style={{ marginBottom: 8 }}><SectionEyebrow label="Display Name" /></div>
               <span className="text-[11px] text-muted-foreground/60">
                 {form.displayName.length}/{DISPLAY_NAME_MAX}
               </span>
@@ -92,7 +82,7 @@ export function PhotosIdentityStep({
           {/* Username field */}
           <div className="px-4 pt-3 pb-4" style={{ borderBottom: '0.5px solid rgba(15,23,42,0.07)' }}>
             <div className="flex justify-between items-baseline">
-              <RuleLabel text="Username" />
+              <div style={{ marginBottom: 8 }}><SectionEyebrow label="Username" /></div>
               {usernameIsLocked && (
                 <span className="text-[11px] text-muted-foreground/60">
                   Contact{' '}
@@ -122,7 +112,7 @@ export function PhotosIdentityStep({
 
           {/* Gender field */}
           <div className="px-4 pt-3 pb-4">
-            <RuleLabel text="Gender" />
+            <div style={{ marginBottom: 8 }}><SectionEyebrow label="Gender" /></div>
             <div className="flex gap-2 flex-wrap">
               {GENDER_OPTIONS.map((opt) => {
                 const isActive = form.gender === opt.value;

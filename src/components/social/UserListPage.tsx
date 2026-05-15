@@ -93,34 +93,7 @@ interface UserListPageProps {
 // Editorial helpers
 // ---------------------------------------------------------------------------
 
-const SectionEyebrow: React.FC<{ label: string; count?: number }> = ({ label, count }) => (
-  <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-    <span
-      style={{
-        fontSize: 9,
-        fontWeight: 800,
-        color: '#64748B',
-        letterSpacing: '0.16em',
-        textTransform: 'uppercase',
-        fontFeatureSettings: '"kern" 1, "liga" 1',
-      }}
-    >
-      {label}
-    </span>
-    {count != null && (
-      <span
-        style={{
-          fontSize: 9,
-          fontWeight: 800,
-          color: '#94A3B8',
-          fontVariantNumeric: 'tabular-nums',
-        }}
-      >
-        {count.toLocaleString()}
-      </span>
-    )}
-  </div>
-);
+import { SectionEyebrow } from '@/components/ui/SectionEyebrow';
 
 const FriendBadge: React.FC = () => (
   <span

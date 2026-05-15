@@ -3,6 +3,7 @@ import { Plus, X, Search } from 'lucide-react';
 import { useClubSearch } from '@/hooks/useClubSearch';
 import { ClubEntry } from '@/components/profile/profile-wizard/types';
 import { VisibilityDropdown } from './VisibilityDropdown';
+import { SectionEyebrow } from '@/components/ui/SectionEyebrow';
 
 interface Props {
   clubs: ClubEntry[];
@@ -31,12 +32,7 @@ export function AdditionalClubsList({
   return (
     <div className="space-y-3">
       <div className="flex items-center justify-between mb-3">
-        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-          <div style={{ width: 3, height: 10, background: '#F7931E', borderRadius: 1, flexShrink: 0 }} />
-          <span style={{ fontSize: 9, fontWeight: 900, color: '#F7931E', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>
-            Additional Clubs
-          </span>
-        </div>
+        <SectionEyebrow label="Additional Clubs" />
         <VisibilityDropdown value={visibility as any} onChange={onVisibilityChange as any} />
       </div>
 
