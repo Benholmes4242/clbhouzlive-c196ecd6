@@ -399,18 +399,18 @@ const Top100List = () => {
   const compactPercent = totalCount > 0 ? Math.round((playedCount / totalCount) * 100) : 0;
 
   return (
-    <PageRoot className="min-h-screen bg-background" immersive immersiveStatusBar>
-      {/* 1. Full-bleed Hero - MUST be direct child of PageRoot */}
-      {listSummary && (
-        <Top100HeroShell
-          list={listSummary}
-          playedCount={playedCount}
-          totalCount={totalCount}
-          listDisplayName={listDisplayName}
-        />
-      )}
+    <PageRoot className="min-h-screen bg-background">
+      <main style={{ paddingTop: 'var(--chrome-total-h, 0px)' }}>
+        {/* 1. Hero (inline, no notch bleed) */}
+        {listSummary && (
+          <Top100HeroShell
+            list={listSummary}
+            playedCount={playedCount}
+            totalCount={totalCount}
+            listDisplayName={listDisplayName}
+          />
+        )}
 
-      <main>
 
         {/* 2. Compact progress strip — replaces both the hero progress slab and the milestone card (Phase B) */}
         {session && totalCount > 0 && (
