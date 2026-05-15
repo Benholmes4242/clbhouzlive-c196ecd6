@@ -136,7 +136,7 @@ export function SharedMediaGallery({ conversationId, onClose }: SharedMediaGalle
         >
           <ChevronLeft size={20} style={{ color: '#475569' }} strokeWidth={2.5} />
         </button>
-        <h1 className="flex-1 text-center" style={{ fontSize: 17, fontWeight: 700, color: '#0f172a', letterSpacing: '-0.3px' }}>
+        <h1 className="flex-1 text-center" style={{ fontSize: 17, fontWeight: 800, color: '#0f172a', letterSpacing: '-0.015em' }}>
           Shared Media
         </h1>
         <div style={{ width: 34 }} />
