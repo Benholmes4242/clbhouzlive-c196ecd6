@@ -927,8 +927,8 @@ const SafeState: React.FC<{ cutTarget: number; settleAt: number }> = ({
 const CutTargetCard: React.FC<{ cutTarget: number }> = ({ cutTarget }) => (
   <div style={{
     display: 'flex',
-    background: '#fff',
-    border: `0.5px solid rgba(5,150,105,0.14)`,
+    background: 'var(--hcp-good-tint)',
+    border: '1px solid rgba(34,197,94,0.30)',
     borderRadius: 12,
     overflow: 'hidden',
   }}>
