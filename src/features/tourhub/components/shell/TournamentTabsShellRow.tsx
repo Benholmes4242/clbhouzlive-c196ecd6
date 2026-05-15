@@ -6,32 +6,28 @@ interface TabDef {
   label: string;
 }
 
-const LIVE_TABS: TabDef[] = [
+// Always show all five tabs. Tab content handles its own empty/loading state
+// (e.g. Summary renders an empty state for in-progress tournaments; Overview
+// renders a "tournament complete" view for closed ones).
+const TABS: TabDef[] = [
   { value: 'overview',    label: 'Overview' },
   { value: 'leaderboard', label: 'Leaderboard' },
-  { value: 'tee-times',   label: 'Tee Times' },
-  { value: 'hole-stats',  label: 'Holes' },
-];
-
-const COMPLETED_TABS: TabDef[] = [
   { value: 'summary',     label: 'Summary' },
-  { value: 'leaderboard', label: 'Leaderboard' },
   { value: 'tee-times',   label: 'Tee Times' },
   { value: 'hole-stats',  label: 'Holes' },
 ];
 
 interface Props {
   activeTab: TournamentTab;
-  isCompleted: boolean;
   onChange: (tab: TournamentTab) => void;
 }
 
 /**
  * Tour Hub detail/subpage variant — Row 1 of <ShellSlot> for Tournament Detail.
- * 4-tab equal-width underline strip. Tabs vary by tournament status (live vs completed).
+ * 5-tab equal-width strip. Always shows all tabs unconditionally; tab content
+ * owns its own empty/loading state per tournament status.
  */
-function TournamentTabsShellRowInner({ activeTab, isCompleted, onChange }: Props) {
-  const tabs = isCompleted ? COMPLETED_TABS : LIVE_TABS;
+function TournamentTabsShellRowInner({ activeTab, onChange }: Props) {
   return (
     <div
       role="tablist"
@@ -42,7 +38,7 @@ function TournamentTabsShellRowInner({ activeTab, isCompleted, onChange }: Props
         borderBottom: '0.5px solid rgba(15,23,42,0.08)',
       }}
     >
-      {tabs.map((tab) => {
+      {TABS.map((tab) => {
         const isActive = activeTab === tab.value;
         return (
           <button
@@ -54,7 +50,7 @@ function TournamentTabsShellRowInner({ activeTab, isCompleted, onChange }: Props
             style={{
               flex: 1,
               padding: '12px 0',
-              fontSize: '12px',
+              fontSize: 12,
               fontWeight: isActive ? 800 : 600,
               color: isActive ? '#0F172A' : '#94A3B8',
               background: 'transparent',
