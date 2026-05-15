@@ -318,12 +318,12 @@ export function MessageBubble({
         {/* Sender name + chips for groups */}
         {!isOwnMessage && showSenderInfo && (
           <div className="flex items-center" style={{ gap: 5, marginBottom: 3, paddingLeft: 1, flexWrap: 'wrap' }}>
-            <span style={{ fontSize: '11.5px', fontWeight: 700, color: '#334155' }}>
+            <span style={{ fontSize: 11, fontWeight: 700, color: '#334155' }}>
               {senderName}
             </span>
             {message.sender?.eg_handicap_index != null && (
               <span style={{
-                fontSize: '9.5px', fontWeight: 600, color: '#F7931E',
+                fontSize: 9, fontWeight: 600, color: '#F7931E',
                 background: 'rgba(247,147,30,0.10)', border: '1px solid rgba(247,147,30,0.25)',
                 borderRadius: 99, padding: '0px 5px',
               }}>
@@ -332,7 +332,7 @@ export function MessageBubble({
             )}
             {message.sender?.home_club && (
               <span style={{
-                fontSize: '9.5px', fontWeight: 600, color: '#006747',
+                fontSize: 9, fontWeight: 600, color: '#006747',
                 background: 'rgba(0,103,71,0.07)', border: '1px solid rgba(0,103,71,0.18)',
                 borderRadius: 99, padding: '0px 5px',
               }}>
