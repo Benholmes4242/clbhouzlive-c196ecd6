@@ -830,8 +830,8 @@ export const GroupInfoPage: React.FC<GroupInfoPageProps> = ({
           }}
         >
           <div style={{ textAlign: 'center' }}>
-            <h3 style={{ fontSize: 16, fontWeight: 900, color: '#0F172A', letterSpacing: '-0.02em', margin: '0 0 8px' }}>Delete group for everyone?</h3>
-            <p style={{ fontSize: '13.5px', color: '#64748b', lineHeight: 1.5, margin: 0 }}>
+            <h3 style={{ fontSize: 16, fontWeight: 800, color: '#0F172A', letterSpacing: '-0.015em', margin: '0 0 8px' }}>Delete group for everyone?</h3>
+            <p style={{ fontSize: 14, color: '#64748b', lineHeight: 1.5, margin: 0 }}>
               This cannot be undone. All messages and media will be permanently deleted.
             </p>
           </div>
