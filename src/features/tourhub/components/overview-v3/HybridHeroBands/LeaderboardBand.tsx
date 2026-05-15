@@ -81,6 +81,7 @@ export function LeaderboardBand({
   champion,
   teeTimes,
   lastYearFinishers,
+  firstYearEvent,
   cancelReason,
   onCtaTap,
 }: LeaderboardBandProps) {
