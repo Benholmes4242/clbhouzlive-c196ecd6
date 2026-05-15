@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import { cn } from '@/lib/utils';
 
 interface Tab {
@@ -15,7 +15,10 @@ interface SegmentedControlProps {
 }
 
 /**
- * SegmentedControl — Pinpoint main tab (typographic underline, keeps icon support)
+ * SegmentedControl — Canonical destination tab strip.
+ * Soft-squircle pills (8px radius) with cream-fill active state, horizontally
+ * scrollable. Used for Discover (3 tabs) and Courses (3 tabs). Tour Hub uses
+ * the same spec via TourHubShellTabs.
  */
 const SegmentedControl: React.FC<SegmentedControlProps> = ({
   tabs,
@@ -23,11 +26,46 @@ const SegmentedControl: React.FC<SegmentedControlProps> = ({
   onTabChange,
   className,
 }) => {
+  const scrollerRef = useRef<HTMLDivElement | null>(null);
+  const [overflowing, setOverflowing] = useState(false);
+
+  useEffect(() => {
+    const el = scrollerRef.current;
+    if (!el) return;
+    const check = () => setOverflowing(el.scrollWidth > el.clientWidth + 1);
+    check();
+    const ro = new ResizeObserver(check);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, [tabs]);
+
+  const handleTap = (tabId: string, btn: HTMLButtonElement | null) => {
+    onTabChange(tabId);
+    if (btn) {
+      btn.scrollIntoView({ block: 'nearest', inline: 'center', behavior: 'smooth' });
+    }
+  };
+
   return (
-    <section className={cn('py-0 px-4 bg-background flex justify-center', className)}>
+    <section
+      className={cn('relative bg-background', className)}
+      style={{
+        borderBottom: '0.5px solid rgba(15,23,42,0.06)',
+      }}
+    >
       <div
+        ref={scrollerRef}
+        className="segmented-scroller"
         role="tablist"
-        style={{ borderBottom: '1px solid hsl(var(--border))', display: 'inline-flex', gap: 34, justifyContent: 'center' }}
+        style={{
+          display: 'flex',
+          gap: 8,
+          padding: '8px 16px',
+          overflowX: 'auto',
+          overflowY: 'hidden',
+          WebkitOverflowScrolling: 'touch',
+          scrollbarWidth: 'none',
+        }}
       >
         {tabs.map((tab) => {
           const isActive = activeTab === tab.id;
@@ -36,41 +74,47 @@ const SegmentedControl: React.FC<SegmentedControlProps> = ({
               key={tab.id}
               role="tab"
               aria-selected={isActive}
-              onClick={() => onTabChange(tab.id)}
+              onClick={(e) => handleTap(tab.id, e.currentTarget)}
               style={{
-                background: 'none',
-                border: 'none',
-                cursor: 'pointer',
-                padding: '10px 4px 9px',
-                fontSize: 16,
+                flexShrink: 0,
+                height: 32,
+                padding: '0 12px',
+                fontSize: 14,
                 fontWeight: isActive ? 700 : 500,
-                color: isActive ? 'hsl(var(--foreground))' : 'hsl(var(--muted-foreground))',
-                letterSpacing: isActive ? '-0.025em' : '0',
-                position: 'relative',
-                display: 'flex',
+                borderRadius: 8,
+                background: isActive ? '#FEF3E7' : 'transparent',
+                border: isActive ? '1px solid #F7931E' : '1px solid transparent',
+                color: isActive ? '#c97a10' : 'hsl(var(--muted-foreground))',
+                letterSpacing: '-0.01em',
+                whiteSpace: 'nowrap',
+                cursor: 'pointer',
+                transition: 'all 0.15s',
+                display: 'inline-flex',
                 alignItems: 'center',
                 gap: 6,
-                transition: 'color 0.18s',
-                whiteSpace: 'nowrap',
               }}
             >
               {tab.icon && <span>{tab.icon}</span>}
               {tab.label}
-              {isActive && (
-                <div style={{
-                  position: 'absolute',
-                  bottom: 0,
-                  left: 0,
-                  right: 0,
-                  height: 2.5,
-                  borderRadius: 2,
-                  background: 'linear-gradient(90deg, #F59E0B, #F7931E)',
-                }} />
-              )}
             </button>
           );
         })}
       </div>
+
+      {overflowing && (
+        <div
+          aria-hidden
+          style={{
+            position: 'absolute',
+            top: 0,
+            right: 0,
+            bottom: 0,
+            width: 28,
+            pointerEvents: 'none',
+            background: 'linear-gradient(to right, rgba(248,250,252,0), #F8FAFC)',
+          }}
+        />
+      )}
     </section>
   );
 };
