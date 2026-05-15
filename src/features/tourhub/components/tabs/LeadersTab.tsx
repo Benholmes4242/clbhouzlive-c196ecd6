@@ -268,10 +268,7 @@ export function LeadersTab() {
     );
   }
 
-  // Active group detection
-  const activeGroup = Object.entries(GROUP_KEYS).find(([, keys]) => keys.includes(categoryKey))?.[0] ?? 'General';
-  const activeGroupKeys = GROUP_KEYS[activeGroup] ?? [];
-  const activeGroupCats = LEADER_CATEGORIES.filter(c => activeGroupKeys.includes(c.key));
+
 
   return (
     <div>
