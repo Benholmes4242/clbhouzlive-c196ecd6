@@ -1,0 +1,203 @@
+import { memo, useMemo, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
+import { ChevronDown, Globe } from 'lucide-react';
+import { BottomSheet } from '@/components/ui/BottomSheet';
+import SheetHeader from '@/components/ui/SheetHeader';
+import { useTourSeason, useTourTournaments } from '../../hooks/useTourHubData';
+import { getTourLogo, hasTourLogo } from '../../utils/tourLogos';
+import { getTourMeta } from '../../constants/tourMap';
+import type { ScheduleFilterType, TourFilterCode } from '../schedule';
+
+interface ChipDef {
+  id: ScheduleFilterType;
+  label: string;
+}
+
+const FILTERS: ChipDef[] = [
+  { id: 'completed', label: 'Past' },
+  { id: 'live', label: 'Live' },
+  { id: 'upcoming', label: 'Upcoming' },
+];
+
+const TOUR_CODES: Array<'all' | 'pga' | 'EURO' | 'LPGA' | 'CHAMP' | 'PGAD' | 'LIV'> = [
+  'all', 'pga', 'EURO', 'LPGA', 'CHAMP', 'PGAD', 'LIV',
+];
+
+/**
+ * Row 2 of the Tour Hub shell on /tourhub?tab=schedule.
+ * Past / Live / Upcoming canonical chips + trailing 🌍 Tour overflow pill.
+ * URL is the single source of truth — both this row and ScheduleTab read
+ * `filter` and `tour` from searchParams.
+ */
+function ScheduleShellRowInner() {
+  const [searchParams, setSearchParams] = useSearchParams();
+  const activeFilter = (searchParams.get('filter') as ScheduleFilterType) || 'live';
+  const activeTour = (searchParams.get('tour') as TourFilterCode) || 'all';
+  const [tourSheetOpen, setTourSheetOpen] = useState(false);
+
+  const { data: season } = useTourSeason();
+  const { data: tournaments } = useTourTournaments(season?.id);
+
+  const tourCounts = useMemo(() => {
+    const counts: Record<string, number> = { all: 0 };
+    if (!tournaments) return counts;
+    counts.all = tournaments.length;
+    for (const t of tournaments) {
+      if (t.tour_code) counts[t.tour_code] = (counts[t.tour_code] || 0) + 1;
+    }
+    return counts;
+  }, [tournaments]);
+
+  const setFilter = (f: ScheduleFilterType) => {
+    const params = new URLSearchParams(searchParams);
+    params.set('filter', f);
+    setSearchParams(params, { replace: true });
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const setActiveTour = (t: TourFilterCode) => {
+    const params = new URLSearchParams(searchParams);
+    if (t === 'all') params.delete('tour');
+    else params.set('tour', t);
+    setSearchParams(params, { replace: true });
+  };
+
+  const tourLabel = activeTour === 'all'
+    ? 'All Tours'
+    : (getTourMeta(activeTour)?.short ?? activeTour);
+
+  return (
+    <>
+      <div
+        className="relative"
+        style={{
+          background: '#F8FAFC',
+          borderBottom: '0.5px solid rgba(15,23,42,0.06)',
+        }}
+      >
+        <div
+          role="tablist"
+          aria-label="Filter Schedule"
+          className="flex items-center justify-between gap-1.5"
+          style={{ padding: '8.5px 16px' }}
+        >
+          <div className="flex items-center gap-1.5">
+            {FILTERS.map((f) => {
+              const isActive = activeFilter === f.id;
+              return (
+                <button
+                  key={f.id}
+                  type="button"
+                  role="tab"
+                  aria-selected={isActive}
+                  onClick={() => setFilter(f.id)}
+                  className="shrink-0 transition-colors active:scale-[0.97] flex items-center"
+                  style={{
+                    height: 30,
+                    padding: '0 11px',
+                    fontSize: 12,
+                    fontWeight: 600,
+                    borderRadius: 15,
+                    background: isActive ? 'rgba(247,147,30,0.12)' : 'transparent',
+                    border: isActive ? '1px solid #F7931E' : '1.5px solid hsl(var(--border))',
+                    color: isActive ? '#c97a10' : 'hsl(var(--muted-foreground))',
+                    letterSpacing: '-0.01em',
+                    whiteSpace: 'nowrap',
+                  }}
+                >
+                  {f.label}
+                </button>
+              );
+            })}
+          </div>
+
+          <button
+            type="button"
+            onClick={() => setTourSheetOpen(true)}
+            className="shrink-0 active:scale-[0.97] flex items-center"
+            aria-label="Filter by tour"
+            style={{
+              height: 30,
+              padding: '0 11px',
+              fontSize: 12,
+              fontWeight: 600,
+              borderRadius: 15,
+              background: activeTour !== 'all' ? 'rgba(247,147,30,0.12)' : 'transparent',
+              border: activeTour !== 'all' ? '1px solid #F7931E' : '1.5px solid hsl(var(--border))',
+              color: activeTour !== 'all' ? '#c97a10' : 'hsl(var(--muted-foreground))',
+              gap: 5,
+              whiteSpace: 'nowrap',
+            }}
+          >
+            {activeTour !== 'all' && hasTourLogo(activeTour.toLowerCase())
+              ? <img src={getTourLogo(activeTour.toLowerCase())} alt="" className="shrink-0" style={{ width: 14, height: 14, objectFit: 'contain' }} />
+              : <Globe size={12} strokeWidth={2.5} />
+            }
+            <span>{tourLabel}</span>
+            <ChevronDown size={11} strokeWidth={2.5} style={{ opacity: 0.6 }} />
+          </button>
+        </div>
+      </div>
+
+      <BottomSheet
+        open={tourSheetOpen}
+        onClose={() => setTourSheetOpen(false)}
+        ariaLabelledBy="schedule-tour-sheet-title"
+      >
+        <SheetHeader
+          eyebrow="FILTER"
+          title={<span id="schedule-tour-sheet-title">Select tour</span>}
+          onClose={() => setTourSheetOpen(false)}
+        />
+        <div>
+          {TOUR_CODES.map((code) => {
+            const meta = code === 'all' ? null : getTourMeta(code);
+            const label = code === 'all' ? 'All Tours' : (meta?.short ?? code);
+            const description = code === 'all'
+              ? 'Show events from every tour'
+              : `${meta?.label ?? code} events`;
+            const isSelected = activeTour === code;
+            const count = tourCounts[code] ?? 0;
+            return (
+              <button
+                key={code}
+                onClick={() => { setActiveTour(code as TourFilterCode); setTourSheetOpen(false); }}
+                aria-pressed={isSelected}
+                style={{
+                  width: '100%',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 12,
+                  padding: '14px 16px',
+                  background: isSelected ? 'rgba(247,147,30,0.04)' : 'transparent',
+                  border: 'none',
+                  borderLeft: isSelected ? '3px solid #F7931E' : '3px solid transparent',
+                  borderBottom: '0.5px solid rgba(15,23,42,0.07)',
+                  cursor: 'pointer',
+                  textAlign: 'left',
+                }}
+              >
+                <div style={{ width: 36, height: 22, borderRadius: 4, background: 'rgba(15,23,42,0.06)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                  {code === 'all' ? (
+                    <Globe className="w-4 h-4" style={{ color: '#94A3B8' }} />
+                  ) : hasTourLogo(code.toLowerCase()) ? (
+                    <img src={getTourLogo(code.toLowerCase())} alt="" aria-hidden="true" style={{ width: 28, height: 18, objectFit: 'contain' }} />
+                  ) : null}
+                </div>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ fontSize: 15, fontWeight: isSelected ? 700 : 500, color: '#0F172A' }}>{label}</div>
+                  <div style={{ fontSize: 12, color: '#94A3B8', marginTop: 2 }}>{description}</div>
+                </div>
+                <span style={{ fontSize: 13, color: '#94A3B8', fontVariantNumeric: 'tabular-nums', flexShrink: 0 }}>{count}</span>
+                {isSelected && <div style={{ width: 6, height: 6, borderRadius: '50%', background: '#F7931E', flexShrink: 0 }} />}
+              </button>
+            );
+          })}
+        </div>
+      </BottomSheet>
+    </>
+  );
+}
+
+export const ScheduleShellRow = memo(ScheduleShellRowInner);
+export default ScheduleShellRow;
