@@ -173,7 +173,8 @@ export function HybridHero({ slide }: HybridHeroProps) {
       navigate('/tour'); // schedule landing
       return;
     }
-    navigate(tournamentRoute(tournament.id));
+    const target = tournamentRoute(tournament.id);
+    navigate(target.to, { state: target.state });
   };
 
   // Tour label
