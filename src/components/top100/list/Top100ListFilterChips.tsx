@@ -140,6 +140,6 @@ export const Top100ListFilterChips: React.FC<Top100ListFilterChipsProps> = ({
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
-    </motion.div>
+    </div>
   );
 };
