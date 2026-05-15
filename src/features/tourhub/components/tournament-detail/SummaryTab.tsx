@@ -278,7 +278,7 @@ export function SummaryTab({
                     }}
                     className="active:bg-black/[0.02] transition-colors"
                   >
-                    <span style={{ width: '36px', fontSize: '14px', fontWeight: 900, color: isWinner ? '#F7931E' : '#94A3B8', flexShrink: 0, fontVariantNumeric: 'tabular-nums' }}>
+                    <span style={{ width: '36px', fontSize: '14px', fontWeight: 800, color: isWinner ? '#F7931E' : '#94A3B8', flexShrink: 0, fontVariantNumeric: 'tabular-nums' }}>
                       {entry.position_tied ? `T${entry.position}` : entry.position}
                     </span>
                     <div style={{ flex: 1, display: 'flex', alignItems: 'center', gap: '8px', minWidth: 0 }}>
