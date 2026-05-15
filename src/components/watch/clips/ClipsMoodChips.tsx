@@ -7,9 +7,7 @@ interface ClipsMoodChipsProps {
 }
 
 /**
- * Pro Shop chip strip for the Clips subpage. Solid-dark active state matches
- * the Watch tab Pro Shop pattern. Cream #F5F1EA background ties the row into
- * the Pro Shop surface; right-edge fade signals horizontal overflow.
+ * Canonical chip strip — matches WatchMoodChips exactly.
  */
 function ClipsMoodChipsInner({ active, onChange }: ClipsMoodChipsProps) {
   return (
@@ -23,8 +21,8 @@ function ClipsMoodChipsInner({ active, onChange }: ClipsMoodChipsProps) {
       <div
         role="tablist"
         aria-label="Filter Clips by mood"
-        className="flex gap-2 px-4 py-3 overflow-x-auto scrollbar-hide"
-        style={{ paddingRight: 32 }}
+        className="flex gap-1.5 overflow-x-auto scrollbar-hide"
+        style={{ padding: '8.5px 28px 8.5px 16px' }}
       >
         {CLIPS_MOODS.map((m) => {
           const isActive = active === m.id;
@@ -35,18 +33,19 @@ function ClipsMoodChipsInner({ active, onChange }: ClipsMoodChipsProps) {
               role="tab"
               aria-selected={isActive}
               onClick={() => onChange(m.id)}
-              className="shrink-0 transition-colors active:scale-[0.97] flex items-center gap-1.5"
+              className="shrink-0 transition-colors active:scale-[0.97] flex items-center"
               style={{
-                height: 36,
-                padding: '0 14px',
-                fontSize: 14,
+                height: 30,
+                padding: '0 11px',
+                fontSize: 12,
                 fontWeight: 600,
-                borderRadius: 999,
-                background: isActive ? 'rgba(247,147,30,0.12)' : '#FFFFFF',
-                border: isActive ? '1px solid rgba(247,147,30,0.4)' : '1px solid rgba(15,23,42,0.12)',
-                color: isActive ? '#B86A0A' : '#0F172A',
-                whiteSpace: 'nowrap',
+                borderRadius: 15,
+                background: isActive ? 'rgba(247,147,30,0.12)' : 'transparent',
+                border: isActive ? '1px solid #F7931E' : '1.5px solid hsl(var(--border))',
+                color: isActive ? '#c97a10' : 'hsl(var(--muted-foreground))',
                 letterSpacing: '-0.01em',
+                gap: 5,
+                whiteSpace: 'nowrap',
               }}
             >
               <span aria-hidden style={{ fontSize: 13 }}>{m.emoji}</span>
@@ -56,12 +55,11 @@ function ClipsMoodChipsInner({ active, onChange }: ClipsMoodChipsProps) {
         })}
       </div>
 
-      {/* Right-edge fade to cream — signals horizontal overflow */}
       <div
         aria-hidden
         className="pointer-events-none absolute top-0 right-0 h-full"
         style={{
-          width: 40,
+          width: 28,
           background: 'linear-gradient(to right, rgba(248,250,252,0) 0%, #F8FAFC 100%)',
         }}
       />
