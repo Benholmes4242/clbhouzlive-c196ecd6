@@ -12,6 +12,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { SwipeableConversationItem } from './SwipeableConversationItem';
 import type { ConversationWithDetails } from '@/types/messaging';
+import { SectionEyebrow } from '@/components/ui/SectionEyebrow';
 
 interface ConversationListProps {
   onSelectConversation: (id: string) => void;
@@ -210,11 +211,8 @@ function ConversationCard({ children }: { children: React.ReactNode }) {
 
 function SectionLabel({ text }: { text: string }) {
   return (
-    <div style={{ padding: '10px 16px 6px', display: 'flex', alignItems: 'center', gap: 6 }}>
-      <div style={{ width: 3, height: 10, background: '#F7931E', borderRadius: 1, flexShrink: 0 }} />
-      <span style={{ fontSize: 9, fontWeight: 900, color: '#64748b', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>
-        {text}
-      </span>
+    <div style={{ padding: '10px 16px 6px' }}>
+      <SectionEyebrow label={text} />
     </div>
   );
 }
@@ -427,7 +425,7 @@ export function ConversationList({
                   <span
                     className="truncate"
                     style={{
-                      fontSize: '14.5px',
+                      fontSize: 14,
                       fontWeight: hasUnread ? 700 : 600,
                       color: hasUnread ? '#0f172a' : '#1e293b',
                     }}
@@ -441,7 +439,7 @@ export function ConversationList({
                 <span
                   className="flex-shrink-0"
                   style={{
-                    fontSize: '11.5px', fontWeight: 500,
+                    fontSize: 11, fontWeight: 500,
                     color: hasUnread ? '#F7931E' : '#94a3b8',
                   }}
                 >
@@ -572,7 +570,7 @@ export function ConversationList({
           >
             <div className="flex items-center" style={{ gap: 8 }}>
               <Archive size={16} style={{ color: '#64748b' }} />
-              <span style={{ fontSize: '13.5px', fontWeight: 600, color: '#64748b' }}>Archived</span>
+              <span style={{ fontSize: 13, fontWeight: 600, color: '#64748b' }}>Archived</span>
               <span style={{ fontSize: 12, color: '#94a3b8' }}>({archivedConversations.length})</span>
             </div>
             {showArchived 

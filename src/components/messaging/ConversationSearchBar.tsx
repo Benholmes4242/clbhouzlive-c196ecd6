@@ -50,7 +50,7 @@ export function ConversationSearchBar({
         onBlur={() => setIsFocused(false)}
         className="flex-1 bg-transparent outline-none"
         style={{
-          fontSize: '13.5px', color: '#1e293b',
+          fontSize: 14, color: '#1e293b',
           border: 'none',
         }}
       />
