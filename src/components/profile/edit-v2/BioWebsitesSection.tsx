@@ -1,5 +1,6 @@
 import { Plus, X } from 'lucide-react';
 import { WebsiteEntry, BIO_MAX } from '@/components/profile/profile-wizard/types';
+import { SectionEyebrow } from '@/components/ui/SectionEyebrow';
 
 interface Props {
   bio: string;
@@ -14,11 +15,8 @@ interface Props {
 
 function RuleLabel({ text }: { text: string }) {
   return (
-    <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8 }}>
-      <div style={{ width: 3, height: 10, background: '#F7931E', borderRadius: 1, flexShrink: 0 }} />
-      <span style={{ fontSize: 9, fontWeight: 900, color: '#F7931E', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>
-        {text}
-      </span>
+    <div style={{ marginBottom: 8 }}>
+      <SectionEyebrow label={text} />
     </div>
   );
 }

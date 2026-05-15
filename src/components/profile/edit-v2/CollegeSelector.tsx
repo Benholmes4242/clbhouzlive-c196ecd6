@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { Search, X, GraduationCap } from 'lucide-react';
 import { useCollegeMediaSearch } from '@/hooks/useCollegeMediaSearch';
+import { SectionEyebrow } from '@/components/ui/SectionEyebrow';
 
 interface Props {
   collegeName: string | null;
@@ -26,11 +27,8 @@ export function CollegeSelector({ collegeName, collegeId, onSelect }: Props) {
 
   return (
     <div>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8 }}>
-        <div style={{ width: 3, height: 10, background: '#F7931E', borderRadius: 1, flexShrink: 0 }} />
-        <span style={{ fontSize: 9, fontWeight: 900, color: '#F7931E', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>
-          College / University
-        </span>
+      <div style={{ marginBottom: 8 }}>
+        <SectionEyebrow label="College / University" />
       </div>
       <div ref={containerRef} className="relative">
         <GraduationCap size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />

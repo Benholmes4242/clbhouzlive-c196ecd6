@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Plus } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { SectionEyebrow } from '@/components/ui/SectionEyebrow';
 
 interface Props {
   value: string;
@@ -44,11 +45,8 @@ export function HandicapInput({ value, onChange }: Props) {
 
   return (
     <div>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8 }}>
-        <div style={{ width: 3, height: 10, background: '#F7931E', borderRadius: 1, flexShrink: 0 }} />
-        <span style={{ fontSize: 9, fontWeight: 900, color: '#F7931E', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>
-          Handicap Index
-        </span>
+      <div style={{ marginBottom: 8 }}>
+        <SectionEyebrow label="Handicap Index" />
       </div>
 
       {/* Standard / Plus toggle */}

@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import { Search, X, MapPin } from 'lucide-react';
 import { useClubSearch } from '@/hooks/useClubSearch';
 import { VisibilityDropdown } from './VisibilityDropdown';
+import { SectionEyebrow } from '@/components/ui/SectionEyebrow';
 
 interface Props {
   clubName: string;
@@ -51,11 +52,8 @@ export function HomeClubCard({
 
   return (
     <div className="space-y-3">
-      <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8 }}>
-        <div style={{ width: 3, height: 10, background: '#F7931E', borderRadius: 1, flexShrink: 0 }} />
-        <span style={{ fontSize: 9, fontWeight: 900, color: '#F7931E', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>
-          Home Club
-        </span>
+      <div style={{ marginBottom: 8 }}>
+        <SectionEyebrow label="Home Club" />
       </div>
       <div ref={containerRef} className="relative">
         <div className="relative">

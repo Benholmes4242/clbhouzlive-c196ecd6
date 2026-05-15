@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { CheckCircle2, Star, BookOpen } from 'lucide-react';
+import { SectionEyebrow } from '@/components/ui/SectionEyebrow';
 
 interface Props {
   username: string;
@@ -27,7 +28,7 @@ export function WizardSuccessScreen({ username, isNewUser = false }: Props) {
             <CheckCircle2 size={44} style={{ color: '#F7931E' }} strokeWidth={1.5} />
           </div>
           <div className="text-center">
-            <p style={{ fontSize: 22, fontWeight: 900, color: '#0F172A', letterSpacing: '-0.03em' }}>
+            <p style={{ fontSize: 22, fontWeight: 800, color: '#0F172A', letterSpacing: '-0.025em' }}>
               Profile saved
             </p>
             <p className="text-[14px] text-muted-foreground mt-1">
@@ -48,13 +49,10 @@ export function WizardSuccessScreen({ username, isNewUser = false }: Props) {
         </div>
 
         <div className="text-center mb-8">
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, marginBottom: 8 }}>
-            <div style={{ width: 3, height: 10, background: '#F7931E', borderRadius: 1 }} />
-            <span style={{ fontSize: 9, fontWeight: 900, color: '#F7931E', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>
-              Welcome to clbhouz
-            </span>
+          <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 8 }}>
+            <SectionEyebrow label="Welcome to clbhouz" />
           </div>
-          <p style={{ fontSize: 24, fontWeight: 900, color: '#0F172A', letterSpacing: '-0.03em', margin: '0 0 6px' }}>
+          <p style={{ fontSize: 22, fontWeight: 800, color: '#0F172A', letterSpacing: '-0.025em', margin: '0 0 6px' }}>
             You're all set!
           </p>
           <p className="text-[14px] text-muted-foreground mt-1.5">

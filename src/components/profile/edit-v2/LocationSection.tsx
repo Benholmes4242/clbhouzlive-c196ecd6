@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { MapPin, ChevronDown, Search, X } from 'lucide-react';
 import { MAP_CONFIG } from '@/config/maps';
+import { SectionEyebrow } from '@/components/ui/SectionEyebrow';
 
 // ─── Country list ─────────────────────────────────────────────────────────────
 // Golf-primary markets first, then alphabetical.
@@ -247,11 +248,8 @@ export function LocationSection({ country, city, onCountryChange, onCityChange }
 
   return (
     <div className="space-y-3">
-      <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8 }}>
-        <div style={{ width: 3, height: 10, background: '#F7931E', borderRadius: 1, flexShrink: 0 }} />
-        <span style={{ fontSize: 9, fontWeight: 900, color: '#F7931E', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>
-          Location
-        </span>
+      <div style={{ marginBottom: 8 }}>
+        <SectionEyebrow label="Location" />
       </div>
       {/* Country first */}
       <CountryPicker value={country} onChange={handleCountryChange} />

@@ -36,7 +36,7 @@ export function WizardHeader({ step, isFirstStep, onBack, onClose, onSkip }: Pro
 
       {/* Centre — title */}
       <div className="text-center">
-        <p style={{ fontSize: 16, fontWeight: 900, color: '#0F172A', letterSpacing: '-0.02em', margin: 0 }}>
+        <p style={{ fontSize: 16, fontWeight: 800, color: '#0F172A', letterSpacing: '-0.015em', margin: 0 }}>
           Edit Profile
         </p>
       </div>
@@ -46,7 +46,7 @@ export function WizardHeader({ step, isFirstStep, onBack, onClose, onSkip }: Pro
         <button
           onClick={onSkip}
           className="flex items-center justify-center min-h-[44px] -mr-2 text-[12px] font-normal"
-          style={{ color: 'rgba(15,23,42,0.55)' }}
+          style={{ color: '#64748B' }}
         >
           Skip for now
         </button>
