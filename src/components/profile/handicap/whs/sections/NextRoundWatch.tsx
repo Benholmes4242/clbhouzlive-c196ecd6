@@ -291,8 +291,24 @@ const BarLabel: React.FC<{
   label: string;
   value: string;
   highlight?: string;
-}> = ({ label, value, highlight }) => (
-  <span style={{ display: 'inline-flex', flexDirection: 'column', gap: 2, alignItems: 'center' }}>
+  atPercent: string;
+  align?: 'start' | 'center' | 'end';
+}> = ({ label, value, highlight, atPercent, align = 'center' }) => (
+  <span
+    style={{
+      position: 'absolute',
+      left: atPercent,
+      transform:
+        align === 'start' ? 'translateX(0)' :
+        align === 'end'   ? 'translateX(-100%)' :
+        'translateX(-50%)',
+      display: 'flex',
+      flexDirection: 'column',
+      gap: 2,
+      alignItems: 'center',
+      whiteSpace: 'nowrap',
+    }}
+  >
     <span style={{ color: highlight ?? 'var(--hcp-t-100)', fontWeight: 700 }}>{value}</span>
     <span style={{ color: 'var(--hcp-t-40)', fontWeight: 600 }}>{label}</span>
   </span>
