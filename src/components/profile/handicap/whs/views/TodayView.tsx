@@ -2,7 +2,7 @@ import React from 'react';
 import { AlertTriangle } from 'lucide-react';
 import type { WhsConnection } from '@/lib/whs/types';
 import MorningMoment from '@/components/handicap/MorningMoment';
-import HeroHandicapCard from '../sections/HeroHandicapCard';
+import HeroHandicapCardDark from '../sections/HeroHandicapCardDark';
 import LastRoundCard from '../sections/LastRoundCard';
 import RoundsThatCountCard from '../sections/RoundsThatCountCard';
 import StreaksSection from '../sections/StreaksSection';
@@ -57,7 +57,7 @@ export const TodayView: React.FC<Props> = ({
         is hidden and HeroHandicapCard is first, so no margin.
       */}
       <div style={{ marginTop: !readOnly ? 32 : 0 }}>
-        <HeroHandicapCard connection={connection} />
+        <HeroHandicapCardDark connection={connection} />
       </div>
 
       <LastRoundCard connectionId={connectionId} />

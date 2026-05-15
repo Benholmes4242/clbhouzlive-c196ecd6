@@ -12,6 +12,8 @@ interface PageRootProps extends React.HTMLAttributes<HTMLDivElement> {
   hasBottomNav?: boolean;
   /** When true, pulls the page up into .app-shell's safe-area padding so hero images can bleed to viewport top */
   immersive?: boolean;
+  /** When true, applies the handicap dark "performance terminal" palette (.hcp-dark) and dark status bar. */
+  dark?: boolean;
 }
 
 /**
@@ -23,9 +25,16 @@ interface PageRootProps extends React.HTMLAttributes<HTMLDivElement> {
  *  - Supports fixedHeight mode for pages that should not scroll (like Hub)
  */
 export const PageRoot = React.forwardRef<HTMLDivElement, PageRootProps>(
-  ({ children, className, immersiveStatusBar = false, fixedHeight = false, hasBottomNav = true, immersive = false, style, ...rest }, ref) => {
-    // Default light chrome for all pages (disabled when child controls status bar)
-    useMedianStatusBar("light", "#F8FAFC", false, false, !immersiveStatusBar);
+  ({ children, className, immersiveStatusBar = false, fixedHeight = false, hasBottomNav = true, immersive = false, dark = false, style, ...rest }, ref) => {
+    // Default light chrome for all pages (disabled when child controls status bar).
+    // When `dark` is set, flip the status bar to dark icons + the dark canvas hex.
+    useMedianStatusBar(
+      dark ? "dark" : "light",
+      dark ? "#0A0E14" : "#F8FAFC",
+      false,
+      false,
+      !immersiveStatusBar,
+    );
 
     // Bottom nav (64px) + safe area spacer (30px) = 94px clearance
     const bottomPadding = hasBottomNav ? '94px' : undefined;
@@ -40,6 +49,7 @@ export const PageRoot = React.forwardRef<HTMLDivElement, PageRootProps>(
         ref={ref}
         className={cn(
           `page-root w-full max-w-[480px] mx-auto flex flex-col ${immersiveStatusBar ? 'bg-black' : 'bg-[var(--bg-page)]'}`,
+          dark && 'hcp-dark',
           !fixedHeight && "min-h-[100vh]",
           fixedHeight && "h-[100dvh] overflow-hidden",
           className
