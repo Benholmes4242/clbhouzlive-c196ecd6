@@ -4,6 +4,8 @@
  */
 
 import React from 'react';
+import CountryFlag from '@/components/ui/country-flag';
+import { PLAYER_SILHOUETTE_URL } from '@/utils/playerHeadshot';
 import {
   INK,
   INK_15,
@@ -17,19 +19,25 @@ import {
 const LEADER_TINT_LIVE = 'rgba(251,188,46,0.07)';
 const LEADER_TINT_RESULTS = 'rgba(251,188,46,0.10)';
 
-function PlayerHead({ size = 36, src }: { size?: number; src?: string | null }) {
+function PlayerHead({ size = 36, src, ring }: { size?: number; src?: string | null; ring?: boolean }) {
   return (
-    <div
+    <img
+      src={src || PLAYER_SILHOUETTE_URL}
+      alt=""
+      onError={(e) => {
+        const t = e.target as HTMLImageElement;
+        if (t.src !== PLAYER_SILHOUETTE_URL) t.src = PLAYER_SILHOUETTE_URL;
+      }}
       style={{
         width: size,
         height: size,
         borderRadius: '34%',
-        background: src
-          ? `url(${src}) center/cover`
-          : 'linear-gradient(135deg, #CBD5E1 0%, #94A3B8 100%)',
+        objectFit: 'cover',
+        objectPosition: 'center 18%',
         flexShrink: 0,
+        background: 'linear-gradient(135deg, #CBD5E1 0%, #94A3B8 100%)',
+        border: ring ? '1.5px solid white' : '0.5px solid rgba(15,23,42,0.10)',
       }}
-      aria-hidden="true"
     />
   );
 }
@@ -43,7 +51,7 @@ function liveScoreColour(s: string): string {
 interface SoloLeaderRowProps {
   rank: string;
   name: string;
-  country?: string;
+  country?: string | null;
   score: string;
   thru: string;
   avatarUrl?: string | null;
@@ -86,8 +94,8 @@ export function SoloLeaderRow({
       </span>
       <div style={{ display: 'flex', gap: 12, alignItems: 'center', minWidth: 0 }}>
         <PlayerHead size={36} src={avatarUrl} />
-        <div style={{ minWidth: 0 }}>
-          <div
+        <div style={{ display: 'flex', alignItems: 'center', gap: 6, minWidth: 0 }}>
+          <span
             style={{
               fontSize: 16,
               fontWeight: 800,
@@ -99,20 +107,8 @@ export function SoloLeaderRow({
             }}
           >
             {name}
-          </div>
-          {country && (
-            <div
-              style={{
-                fontSize: 10,
-                fontWeight: 600,
-                color: INK_45,
-                letterSpacing: '0.04em',
-                marginTop: 1,
-              }}
-            >
-              {country}
-            </div>
-          )}
+          </span>
+          {country && <CountryFlag country={country} size="sm" />}
         </div>
       </div>
       <span
@@ -142,20 +138,35 @@ export function SoloLeaderRow({
   );
 }
 
-function StackedAvatars({ count, size = 34 }: { count: number; size?: number }) {
-  const visible = Math.min(count, 3);
+function StackedAvatars({
+  players,
+  size = 34,
+}: {
+  players: { avatarUrl?: string | null }[];
+  size?: number;
+}) {
+  const visible = players.slice(0, 3);
+  const total = players.length;
   return (
     <div style={{ display: 'flex', alignItems: 'center' }}>
-      {Array.from({ length: visible }).map((_, i) => (
-        <div
+      {visible.map((p, i) => (
+        <img
           key={i}
+          src={p.avatarUrl || PLAYER_SILHOUETTE_URL}
+          alt=""
+          onError={(e) => {
+            const t = e.target as HTMLImageElement;
+            if (t.src !== PLAYER_SILHOUETTE_URL) t.src = PLAYER_SILHOUETTE_URL;
+          }}
           style={{
             marginLeft: i === 0 ? 0 : -10,
-            zIndex: visible - i,
-            opacity: count > 3 && i === visible - 1 ? 0.85 : 1,
+            zIndex: visible.length - i,
+            opacity: total > 3 && i === visible.length - 1 ? 0.85 : 1,
             width: size,
             height: size,
             borderRadius: '34%',
+            objectFit: 'cover',
+            objectPosition: 'center 18%',
             background: 'linear-gradient(135deg, #CBD5E1 0%, #94A3B8 100%)',
             boxShadow: '0 0 0 2px rgba(251,188,46,0.55)',
           }}
@@ -168,10 +179,12 @@ function StackedAvatars({ count, size = 34 }: { count: number; size?: number }) 
 interface TiedLeadersRowProps {
   count: number;
   score: string;
+  players?: { avatarUrl?: string | null }[];
   isLast?: boolean;
 }
 
-export function TiedLeadersRow({ count, score, isLast = false }: TiedLeadersRowProps) {
+export function TiedLeadersRow({ count, score, players, isLast = false }: TiedLeadersRowProps) {
+  const stack = players && players.length > 0 ? players : Array.from({ length: count }, () => ({ avatarUrl: null }));
   return (
     <div
       style={{
@@ -197,7 +210,7 @@ export function TiedLeadersRow({ count, score, isLast = false }: TiedLeadersRowP
         T1
       </span>
       <div style={{ display: 'flex', alignItems: 'center', gap: 14, minWidth: 0 }}>
-        <StackedAvatars count={count} />
+        <StackedAvatars players={stack} />
         <div
           style={{
             fontSize: 16,
@@ -230,7 +243,7 @@ export function TiedLeadersRow({ count, score, isLast = false }: TiedLeadersRowP
 interface ChampionRowProps {
   rank?: string;
   name: string;
-  country?: string;
+  country?: string | null;
   score: string;
   playoffWin?: boolean;
   avatarUrl?: string | null;
@@ -257,7 +270,6 @@ export function ChampionRow({
         borderBottom: isLast ? 'none' : `0.5px solid ${INK_15}`,
       }}
     >
-      {/* trophy SVG instead of rank */}
       <span style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}>
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-label="Champion">
           <title>Champion</title>
@@ -269,8 +281,8 @@ export function ChampionRow({
       </span>
       <div style={{ display: 'flex', gap: 12, alignItems: 'center', minWidth: 0 }}>
         <PlayerHead size={36} src={avatarUrl} />
-        <div style={{ minWidth: 0 }}>
-          <div
+        <div style={{ display: 'flex', alignItems: 'center', gap: 6, minWidth: 0 }}>
+          <span
             style={{
               fontSize: 16,
               fontWeight: 800,
@@ -295,20 +307,8 @@ export function ChampionRow({
                 * PLAYOFF
               </span>
             )}
-          </div>
-          {country && (
-            <div
-              style={{
-                fontSize: 10,
-                fontWeight: 600,
-                color: INK_45,
-                letterSpacing: '0.04em',
-                marginTop: 1,
-              }}
-            >
-              {country}
-            </div>
-          )}
+          </span>
+          {country && <CountryFlag country={country} size="sm" />}
         </div>
       </div>
       <span
