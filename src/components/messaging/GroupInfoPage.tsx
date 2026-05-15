@@ -323,7 +323,7 @@ export const GroupInfoPage: React.FC<GroupInfoPageProps> = ({
                   autoFocus
                   className="text-center"
                   style={{
-                    fontSize: 22, fontWeight: 800, color: '#0f172a', letterSpacing: '-0.3px',
+                    fontSize: 22, fontWeight: 800, color: '#0f172a', letterSpacing: '-0.025em',
                     background: 'transparent', border: '1px solid rgba(0,0,0,0.1)',
                     borderRadius: 10, padding: '4px 12px', outline: 'none',
                   }}
