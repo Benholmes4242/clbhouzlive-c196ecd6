@@ -155,7 +155,7 @@ export function TournamentDetailPage() {
   
   if (!tournament) {
     return (
-      <TourHubShell>
+      <TourHubShell immersive={true}>
         <div className="pt-6 px-5">
           <div className="flex items-center justify-center py-20">
             <div className="text-center space-y-4">
