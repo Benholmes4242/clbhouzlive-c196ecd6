@@ -40,7 +40,7 @@ export function EchoPageHeader({ onBack, onNew, onHistory, hasMessages }: EchoPa
       {/* Centre: Echo title */}
       <div className="flex-1 flex items-center justify-center gap-2">
         <AnimatedEchoWave size={22} active={true} />
-        <span style={{ fontSize: 20, fontWeight: 900, color: '#0F172A', letterSpacing: '-0.025em' }}>
+        <span style={{ fontSize: 20, fontWeight: 800, color: '#0F172A', letterSpacing: '-0.025em' }}>
           Echo
         </span>
       </div>
