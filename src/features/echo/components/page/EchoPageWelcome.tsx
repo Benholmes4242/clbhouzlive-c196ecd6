@@ -228,7 +228,7 @@ export function EchoPageWelcome({ profile, onChipSelect }: EchoPageWelcomeProps)
         {/* Greeting */}
         <div className="text-center mb-2">
           <h1
-            className="text-[28px] font-bold tracking-tight"
+            className="text-[28px] font-extrabold tracking-tight"
             style={{ color: '#0F172A' }}
           >
             {profile.firstName ? `${greeting}, ${profile.firstName}.` : `${greeting}.`}
