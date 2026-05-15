@@ -24,7 +24,7 @@ export function TypingIndicator({ typingUsers, className }: TypingIndicatorProps
 
       <div>
         {/* Sender name strip */}
-        <div style={{ fontSize: '10.5px', fontWeight: 600, color: '#64748b', paddingLeft: 4, marginBottom: 3 }}>
+        <div style={{ fontSize: 11, fontWeight: 600, color: '#64748b', paddingLeft: 4, marginBottom: 3 }}>
           {getTypingText()}
         </div>
 
