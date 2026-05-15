@@ -128,7 +128,7 @@ export function MessageBubble({
 
         <div className="flex flex-col" style={{ maxWidth: 260, alignItems: isOwnMessage ? 'flex-end' : 'flex-start' }}>
           {!isOwnMessage && showSenderInfo && (
-            <span style={{ fontSize: '11.5px', fontWeight: 700, color: '#334155', marginBottom: 3, paddingLeft: 1 }}>
+            <span style={{ fontSize: 11, fontWeight: 700, color: '#334155', marginBottom: 3, paddingLeft: 1 }}>
               {senderName}
             </span>
           )}
