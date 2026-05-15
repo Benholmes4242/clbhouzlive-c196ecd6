@@ -12,31 +12,21 @@
 import { useState, useMemo, useEffect, useCallback, useRef } from 'react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useSearchParams, useNavigate } from 'react-router-dom';
-import { Search, X, AlertCircle, RefreshCw, ChevronLeft, ChevronDown, ChevronRight, Globe, Clock, Calendar } from 'lucide-react';
-import { useQueryClient } from '@tanstack/react-query';
+import { AlertCircle, ChevronRight, Calendar } from 'lucide-react';
 import { useTourSeason, useTourTournaments, type TourTournament } from '../../hooks/useTourHubData';
 import { useTournamentLeadersWinners } from '../../hooks/useTournamentLeadersWinners';
 import { useScheduleDefendingChampionPhotos } from '../../hooks/useScheduleDefendingChampionPhotos';
 import { deriveFieldStrength } from '../../utils/deriveFieldStrength';
 import { TourHubEmptyState } from '../TourHubEmptyState';
 import { format } from 'date-fns';
-import { cn } from '@/lib/utils';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
-import { BottomSheet } from '@/components/ui/BottomSheet';
-import SheetHeader from '@/components/ui/SheetHeader';
-import { getTourLogo, hasTourLogo } from '../../utils/tourLogos';
-import { TOUR_MAP, getTourLabel, getTourShort, getTourMeta } from '../../constants/tourMap';
+import { getTourLabel, getTourMeta } from '../../constants/tourMap';
 import { getCurrentWeek, getCurrentMonthKey, isInCurrentWeek } from '../../utils/getCurrentWeek';
-import { TourPill } from '../shared/TourPill';
-import { EventTag, type EventTagKind } from '../shared/EventTag';
 import { CompactNextUp } from '../shared/CompactNextUp';
 import { ThisWeekAnchor } from '../shared/ThisWeekAnchor';
-import { getContextLabel } from '../../utils/tournamentClassification';
-import { useStickyHeaderSafeArea } from '@/hooks/useStickyHeaderSafeArea';
 
 import {
-  ScheduleFilterPills,
   type ScheduleFilterType,
   ScheduleTournamentCard,
   ScheduleMonthHeader,
