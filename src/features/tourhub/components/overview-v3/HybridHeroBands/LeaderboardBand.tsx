@@ -23,6 +23,8 @@ export interface LeaderboardBandProps {
   champion?: { name: string; country?: string; score: string; playoffWin?: boolean; avatarUrl?: string | null };
   teeTimes?: TeeTimeGroup[];
   lastYearFinishers?: { rank: string; name: string; score: string; year: string; avatarUrl?: string | null }[];
+  /** When true and lastYearFinishers is empty, render the inaugural-event placeholder. */
+  firstYearEvent?: boolean;
   cancelReason?: string;
   onCtaTap?: () => void;
 }
