@@ -45,7 +45,7 @@ export const CinemaCard: React.FC<Props> = ({
         textAlign: 'left',
         padding: 0,
         margin: 0,
-        border: '0.5px solid rgba(15,23,42,0.07)',
+        border: '1px solid var(--hcp-line)',
         borderRadius: 24,
         overflow: 'hidden',
         background: '#0F172A',
