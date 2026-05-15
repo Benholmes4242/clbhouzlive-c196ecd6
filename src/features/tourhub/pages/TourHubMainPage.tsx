@@ -1,29 +1,20 @@
 import { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { TourHubShell } from '../components/TourHubShell';
-import { TourHubNavOverlay } from '../components/TourHubNavOverlay';
+import { TourHubShellTabs } from '../components/TourHubShellTabs';
+import { ShellSlot } from '@/components/header/ShellSlot';
 import type { TourHubTab } from '../components/types';
-// TourHubEmptyState available if needed for future tab variants
 import { OverviewTab, ScheduleTab, PlayersTab, LeadersTab } from '../components/tabs';
-import { TourNavProvider, useTourNav } from '../contexts/TourNavContext';
 import { useTournamentStatusRealtime } from '../hooks/useTournamentStatusRealtime';
-import { useBottomNavigation } from '@/contexts/BottomNavigationContext';
 
-function TourHubMainPageInner() {
+export function TourHubMainPage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const tabParam = searchParams.get('tab') as TourHubTab | null;
   const [activeTab, setActiveTab] = useState<TourHubTab>(tabParam || 'overview');
-  const { isNavOpen, closeNav } = useTourNav();
-  const { hideBottomNav, showBottomNav } = useBottomNavigation();
 
-  const handleCloseNav = () => {
-    closeNav();
-    // Don't touch bottom nav visibility on overview — the IntersectionObserver controls it
-  };
-  
   // Subscribe to tournament status changes (live/completed transitions)
   useTournamentStatusRealtime();
-  
+
   // Sync tab with URL + redirect legacy player-stats to leaderboards
   useEffect(() => {
     if (tabParam === ('player-stats' as string)) {
@@ -31,21 +22,13 @@ function TourHubMainPageInner() {
       setActiveTab('leaderboards');
       return;
     }
-    
+
     if (tabParam && tabParam !== activeTab) {
       setActiveTab(tabParam);
       window.scrollTo(0, 0);
     }
   }, [tabParam]);
-  
-  const handleTabChange = (tab: TourHubTab) => {
-    setActiveTab(tab);
-    setSearchParams({ tab });
-    // Scroll to top when switching tabs
-    window.scrollTo(0, 0);
-    document.documentElement.scrollTop = 0;
-  };
-  
+
   const renderTab = () => {
     switch (activeTab) {
       case 'overview':
@@ -60,30 +43,19 @@ function TourHubMainPageInner() {
         return <OverviewTab />;
     }
   };
-  
+
   return (
     <TourHubShell>
-      
-      
-      <div className="pb-24">
+      <ShellSlot>
+        <TourHubShellTabs />
+      </ShellSlot>
+
+      <div
+        className="pb-24"
+        style={{ paddingTop: 'var(--chrome-total-h, 0px)' }}
+      >
         {renderTab()}
       </div>
-      
-      {/* Navigation Overlay */}
-      <TourHubNavOverlay
-        isOpen={isNavOpen}
-        onClose={handleCloseNav}
-        activeTab={activeTab}
-        onNavigate={handleTabChange}
-      />
     </TourHubShell>
-  );
-}
-
-export function TourHubMainPage() {
-  return (
-    <TourNavProvider>
-      <TourHubMainPageInner />
-    </TourNavProvider>
   );
 }
