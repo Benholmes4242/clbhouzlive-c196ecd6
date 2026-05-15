@@ -375,10 +375,10 @@ const Top100List = () => {
 
   if (isLoading) {
     return (
-      <PageRoot className="min-h-screen bg-background" immersive immersiveStatusBar>
-        <main className="pb-20">
+      <PageRoot className="min-h-screen bg-background">
+        <main className="pb-20" style={{ paddingTop: 'var(--chrome-total-h, 0px)' }}>
           <div className="space-y-4 pt-0">
-            <Skeleton className="h-[260px] rounded-none" />
+            <Skeleton className="h-[200px] rounded-none" />
             <Skeleton className="h-20 rounded-2xl mx-4" />
             <Skeleton className="h-32 rounded-2xl mx-4" />
             {[...Array(4)].map((_, i) => (
