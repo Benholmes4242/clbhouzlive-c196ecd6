@@ -172,12 +172,6 @@ const DiscoverGamesPage = lazy(() => import("./features/games/pages/DiscoverGame
 const EchoSharePage = lazy(() => import("./pages/EchoSharePage").then(m => ({ default: m.EchoSharePage })));
 
 // Tour Hub pages
-const TourHubHomePage = lazy(() => import("./features/tourhub/pages").then(m => ({ default: m.TourHubHomePage })));
-const TourHubLivePage = lazy(() => import("./features/tourhub/pages").then(m => ({ default: m.TourHubLivePage })));
-const TourHubTourPage = lazy(() => import("./features/tourhub/pages").then(m => ({ default: m.TourHubTourPage })));
-const TourHubEventPage = lazy(() => import("./features/tourhub/pages").then(m => ({ default: m.TourHubEventPage })));
-
-const TourHubRankingsPage = lazy(() => import("./features/tourhub/pages").then(m => ({ default: m.TourHubRankingsPage })));
 const TourHubMainPage = lazy(() => import("./features/tourhub/pages").then(m => ({ default: m.TourHubMainPage })));
 const TournamentDetailPage = lazy(() => import("./features/tourhub/pages").then(m => ({ default: m.TournamentDetailPage })));
 const PlayerProfilePage = lazy(() => import("./features/tourhub/pages").then(m => ({ default: m.PlayerProfilePage })));
@@ -444,10 +438,6 @@ function AppRoutes() {
         <Route path="/tourhub" element={<Suspense fallback={<GenericPageSkeleton />}><TourHubMainPage /></Suspense>} />
         <Route path="/tourhub/tournament/:tournamentId" element={<Suspense fallback={<GenericPageSkeleton />}><TourNavWrapper><TournamentDetailPage /></TourNavWrapper></Suspense>} />
         <Route path="/tourhub/player/:playerId" element={<Suspense fallback={<GenericPageSkeleton />}><TourNavWrapper><PlayerProfilePage /></TourNavWrapper></Suspense>} />
-        <Route path="/tourhub/live" element={<Suspense fallback={<GenericPageSkeleton />}><TourHubLivePage /></Suspense>} />
-        <Route path="/tourhub/tour/:tour" element={<Suspense fallback={<GenericPageSkeleton />}><TourHubTourPage /></Suspense>} />
-        <Route path="/tourhub/event/:tour/:eventId" element={<Suspense fallback={<GenericPageSkeleton />}><TourHubEventPage /></Suspense>} />
-        <Route path="/tourhub/rankings" element={<Suspense fallback={<GenericPageSkeleton />}><TourHubRankingsPage /></Suspense>} />
         <Route path="/tourhub/college-golf" element={<Suspense fallback={<GenericPageSkeleton />}><TourNavWrapper><CollegeGolfHubPage /></TourNavWrapper></Suspense>} />
         <Route path="/tourhub/college-golf/compare" element={<Suspense fallback={<GenericPageSkeleton />}><TourNavWrapper><CollegeComparePage /></TourNavWrapper></Suspense>} />
         <Route path="/tourhub/college-golf/:collegeSlug" element={<Suspense fallback={<GenericPageSkeleton />}><TourNavWrapper><CollegeProfilePage /></TourNavWrapper></Suspense>} />

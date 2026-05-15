@@ -217,7 +217,7 @@ export function CollegeProfilePage() {
           <button
             type="button"
             onClick={() => navigate(collegeHubRoute())}
-            aria-label="College Profile — open College Golf"
+            aria-label="College Profile — open College Franchise"
             style={{
               background: 'transparent',
               border: 'none',
@@ -395,7 +395,7 @@ export function CollegeProfilePage() {
             className="active:opacity-50 transition-opacity"
           >
             <ChevronLeft size={13} strokeWidth={2.5} />
-            College Golf
+            College Franchise
           </button>
           <div style={{ flex: 1 }} />
         </div>

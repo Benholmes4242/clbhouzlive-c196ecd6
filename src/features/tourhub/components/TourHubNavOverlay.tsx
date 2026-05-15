@@ -31,7 +31,7 @@ import { useUpcomingTournaments } from '../hooks/useUpcomingTournaments';
 import { TOUR_COLORS } from '../constants/colors';
 import { formatCurrency } from '@/lib/utils/formatCurrency';
 import { formatCountdown } from '../utils/formatCountdown';
-import type { TourHubTab } from './TourHubTabs';
+import type { TourHubTab } from './types';
 
 type LucideIcon = ComponentType<LucideProps>;
 
@@ -57,13 +57,13 @@ const NAV_ITEMS: NavItem[] = [
   { value: 'overview',     label: 'Overview',    subtitle: 'The global golf season at a glance.',     iconComponent: Globe,    iconColor: '#F7931E' },
   { value: 'schedule',     label: 'Schedule',    subtitle: 'Past, present, and the road ahead.',      iconComponent: Calendar, iconColor: '#0A5A3C' },
   { value: 'players',      label: 'Players',     subtitle: 'The names shaping the season.',           iconComponent: Users,    iconColor: '#3B82F6' },
-  { value: 'leaderboards', label: 'Stat Watch',  subtitle: 'Every stat, every category, every tour.', iconComponent: Trophy,   iconColor: '#F7931E' },
+  { value: 'leaderboards', label: 'Leaders',  subtitle: 'Stat Watch — every category, every tour.', iconComponent: Trophy,   iconColor: '#F7931E' },
 ];
 
 const LINK_ITEMS: LinkItem[] = [
   {
     id: 'college-golf',
-    label: 'College Franchise Rankings',
+    label: 'College Franchise',
     subtitle: 'Where college legacies battle on tour.',
     path: '/tourhub/college-golf',
     iconComponent: GraduationCap,
