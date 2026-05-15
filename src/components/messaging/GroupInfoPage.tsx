@@ -568,7 +568,7 @@ export const GroupInfoPage: React.FC<GroupInfoPageProps> = ({
                         )}
                         {participant.profile?.home_club && (
                           <span style={{
-                            fontSize: '9.5px', fontWeight: 600, color: '#006747',
+                            fontSize: 9, fontWeight: 600, color: '#006747',
                             background: 'rgba(0,103,71,0.07)', border: '1px solid rgba(0,103,71,0.18)',
                             borderRadius: 99, padding: '0px 5px',
                           }}>
