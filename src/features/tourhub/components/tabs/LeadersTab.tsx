@@ -38,12 +38,6 @@ interface RankedItem {
   rank: number;
 }
 
-// Group keys for tabs and chips
-const GROUP_KEYS: Record<string, string[]> = {
-  'General': ['world_rank', 'events_played', 'cuts_made', 'top_10', 'earnings', 'strokes_gained_total', 'scoring_avg'],
-  'Ball Striking': ['drive_avg', 'drive_acc', 'gir_pct'],
-  'Short Game': ['putt_avg', 'sand_saves_pct', 'scrambling_pct'],
-};
 
 export function LeadersTab() {
   const navigate = useNavigate();
