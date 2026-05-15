@@ -163,7 +163,7 @@ const CoursesContent: React.FC<CoursesContentProps> = ({ username, displayName }
   const [rateSheetOpen, setRateSheetOpen] = useState(false);
   const [searchParams, setSearchParams] = useSearchParams();
   const location = useLocation();
-  const { sentinelRef, paddingTop } = useStickyHeaderSafeArea();
+  
   
   // Default to 'explore' since we're removing my-courses tab
   const [activeTab, setActiveTab] = useState(() => {
