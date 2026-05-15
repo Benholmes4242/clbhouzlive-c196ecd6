@@ -1,0 +1,386 @@
+import React, { useEffect, useMemo, useState } from 'react';
+import {
+  DarkSectionHeader,
+  TripleStrip,
+  KPICell,
+  VerdictNumber,
+  VerdictPill,
+  verdictForDelta,
+  type Verdict,
+} from './_shared/darkAtoms';
+import {
+  useHandicapTrend,
+  useHandicapHistory,
+  useAllScores,
+} from '@/lib/whs/hooks';
+import { formatDisplayedHcp, whsDisplayedHcp } from '@/lib/whs/format';
+import type { WhsConnection } from '@/lib/whs/types';
+
+interface Props {
+  connection: WhsConnection;
+}
+
+const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
+
+// Ring geometry — 230×230 in a 240 container.
+const RING_BOX = 240;
+const RING_R = 110;          // outer radius
+const STROKE_W = 5;
+const RING_TRACK_R = RING_R; // single arc, single track
+const ARC_R = 44;            // per brief: circumference = 2π·44 ≈ 276.5
+// Actually re-read brief: 230×230 ring; uses dashOffset = 276.5 * Math.min(handicap/36,1).
+// Implementation: SVG circle r=44 in a viewBox we scale to 230. Keep simple — we render a
+// 230×230 SVG with viewBox -120 -120 240 240 and circle r=110 stroke=5; map fill via 0..1.
+// Use native circumference.
+const CIRC_R = 110;
+const CIRCUMFERENCE = 2 * Math.PI * CIRC_R; // ≈ 691.15
+
+function formatToday(): string {
+  return new Date()
+    .toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' })
+    .toUpperCase()
+    .replace(/,/g, '');
+}
+
+function arcGradient(verdict: Verdict): { from: string; to: string } {
+  if (verdict === 'good') return { from: '#22C55E', to: '#4ADE80' };
+  if (verdict === 'bad') return { from: '#EF4444', to: '#FCA5A5' };
+  return { from: '#F7931E', to: '#FFB45A' };
+}
+
+// Form temperature label from a Stableford delta vs personal baseline.
+function formLabel(periodAvg: number | null, allAvg: number | null): {
+  label: string;
+  verdict: 'warm' | 'cold' | 'neutral';
+} {
+  if (periodAvg == null || allAvg == null) return { label: '—', verdict: 'neutral' };
+  const d = periodAvg - allAvg;
+  if (d > 3.0) return { label: 'Hot', verdict: 'warm' };
+  if (d > 1.0) return { label: 'Warm', verdict: 'warm' };
+  if (d < -3.0) return { label: 'Cold', verdict: 'cold' };
+  if (d < -1.0) return { label: 'Cold', verdict: 'cold' };
+  return { label: 'Steady', verdict: 'neutral' };
+}
+
+const HeroHandicapCardDark: React.FC<Props> = ({ connection }) => {
+  const { data: trend, isLoading: trendLoading } = useHandicapTrend(connection.id);
+  const { data: history90, isLoading: history90Loading } = useHandicapHistory(connection.id, 90);
+  const { data: allScores } = useAllScores(connection.id);
+
+  const handicap = trend?.current ?? null;
+
+  // 90-day delta derived from the same snapshots that drive the chart.
+  const delta90 = useMemo<number | null>(() => {
+    if (!history90 || history90.length < 2) return null;
+    const oldest = history90[0].handicap_index;
+    const latest = history90[history90.length - 1].handicap_index;
+    return latest - oldest;
+  }, [history90]);
+
+  // Verdict drives ring colour + pill + tag word.
+  const verdict: Verdict = useMemo(() => {
+    if (delta90 == null) return 'neutral';
+    if (Math.abs(delta90) <= 0.2) return 'mid';
+    return verdictForDelta(delta90); // negative = good (handicap going down)
+  }, [delta90]);
+
+  // Animate ring fill from empty → target on mount.
+  const [animatedHcp, setAnimatedHcp] = useState<number | null>(null);
+  useEffect(() => {
+    if (handicap == null) return;
+    setAnimatedHcp(null);
+    const t = setTimeout(() => setAnimatedHcp(handicap), 30);
+    return () => clearTimeout(t);
+  }, [handicap]);
+
+  const fillFraction = useMemo(() => {
+    const h = animatedHcp ?? null;
+    if (h == null) return 0;
+    // 0 (scratch) → 100% filled; 36 → 0% filled.
+    // Plus handicaps clamp to 100%.
+    return 1 - Math.min(Math.max(h, 0) / 36, 1);
+  }, [animatedHcp]);
+
+  const dashOffset = CIRCUMFERENCE * (1 - fillFraction);
+
+  const grad = arcGradient(verdict);
+  const verdictColor =
+    verdict === 'good' ? 'var(--hcp-good)' :
+    verdict === 'bad'  ? 'var(--hcp-bad)' :
+    verdict === 'mid'  ? 'var(--hcp-amber)' :
+    'var(--hcp-t-100)';
+
+  const arrowChar = verdict === 'good' ? '↓' : verdict === 'bad' ? '↑' : '—';
+
+  // Scratch zone: half-step below current displayed value (e.g. 1.8 → 1.6).
+  const scratchZone = useMemo(() => {
+    if (handicap == null) return null;
+    return (Math.floor(handicap * 5) / 5).toFixed(1);
+  }, [handicap]);
+
+  const tagWord =
+    verdict === 'good' ? 'IMPROVING' :
+    verdict === 'bad'  ? 'TRENDING UP' :
+    verdict === 'mid'  ? 'HOLDING' : '';
+
+  // ── KPI strip data ────────────────────────────────────────────────
+  const scores = (allScores ?? []) as any[];
+  const counters = scores.filter((s) => s?.is_counter !== false);
+
+  const scoringAvg = useMemo<number | null>(() => {
+    const vals = scores
+      .map((s) => s?.adjusted_gross)
+      .filter((v: any): v is number => typeof v === 'number');
+    if (vals.length === 0) return null;
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  }, [scores]);
+
+  const roundCount = scores.length;
+
+  // 30-day window for form.
+  const thirtyDaysAgo = Date.now() - 30 * 86_400_000;
+  const recent30 = useMemo(
+    () =>
+      scores.filter((s) => {
+        if (!s?.play_date) return false;
+        const t = new Date(s.play_date).getTime();
+        return Number.isFinite(t) && t >= thirtyDaysAgo;
+      }),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [scores],
+  );
+
+  const periodAvgPts = useMemo<number | null>(() => {
+    const v = recent30.map((s) => s?.stableford_points).filter((p: any): p is number => typeof p === 'number');
+    if (v.length === 0) return null;
+    return v.reduce((a, b) => a + b, 0) / v.length;
+  }, [recent30]);
+
+  const allAvgPts = useMemo<number | null>(() => {
+    const v = scores.map((s) => s?.stableford_points).filter((p: any): p is number => typeof p === 'number');
+    if (v.length === 0) return null;
+    return v.reduce((a, b) => a + b, 0) / v.length;
+  }, [scores]);
+
+  const form = formLabel(periodAvgPts, allAvgPts);
+
+  const best = useMemo(() => {
+    const withDiff = counters.filter(
+      (s) => typeof s?.handicap_differential === 'number',
+    );
+    if (withDiff.length === 0) return null;
+    let bestRow = withDiff[0];
+    for (const r of withDiff) {
+      if (r.handicap_differential < bestRow.handicap_differential) bestRow = r;
+    }
+    const date = bestRow.play_date
+      ? new Date(bestRow.play_date).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })
+      : null;
+    const courseName: string | undefined = bestRow.course?.name;
+    const courseShort = courseName ? courseName.split(' ')[0] : null;
+    return {
+      diff: bestRow.handicap_differential as number,
+      meta: [date, courseShort].filter(Boolean).join(' · ') || null,
+    };
+  }, [counters]);
+
+  const isLoading = trendLoading || history90Loading;
+
+  return (
+    <section
+      style={{
+        background:
+          'radial-gradient(ellipse at 50% 0%, rgba(247,147,30,0.08), transparent 55%), var(--hcp-bg-0)',
+        borderBottom: '1px solid var(--hcp-line)',
+        padding: '4px 0 22px',
+        fontFamily: FONT,
+      }}
+    >
+      <DarkSectionHeader eyebrow="My Handicap Index" right={formatToday()} />
+
+      {/* Ring */}
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'center',
+          padding: '4px 0 6px',
+        }}
+      >
+        <div style={{ position: 'relative', width: RING_BOX, height: RING_BOX }}>
+          <svg
+            width={RING_BOX}
+            height={RING_BOX}
+            viewBox={`0 0 ${RING_BOX} ${RING_BOX}`}
+            style={{ transform: 'rotate(-90deg)' }}
+            aria-hidden
+          >
+            <defs>
+              <linearGradient id="hcp-arc-grad" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" stopColor={grad.from} />
+                <stop offset="100%" stopColor={grad.to} />
+              </linearGradient>
+            </defs>
+            {/* Track */}
+            <circle
+              cx={RING_BOX / 2}
+              cy={RING_BOX / 2}
+              r={CIRC_R}
+              fill="none"
+              stroke="rgba(255,255,255,0.06)"
+              strokeWidth={STROKE_W}
+            />
+            {/* Tick marks at top/right/bottom/left */}
+            {[0, 90, 180, 270].map((deg) => {
+              const rad = (deg * Math.PI) / 180;
+              const cx = RING_BOX / 2;
+              const cy = RING_BOX / 2;
+              const r1 = CIRC_R + STROKE_W / 2;
+              const r2 = CIRC_R - STROKE_W / 2 - 6;
+              return (
+                <line
+                  key={deg}
+                  x1={cx + Math.cos(rad) * r1}
+                  y1={cy + Math.sin(rad) * r1}
+                  x2={cx + Math.cos(rad) * r2}
+                  y2={cy + Math.sin(rad) * r2}
+                  stroke="rgba(255,255,255,0.12)"
+                  strokeWidth={1}
+                />
+              );
+            })}
+            {/* Progress arc */}
+            <circle
+              cx={RING_BOX / 2}
+              cy={RING_BOX / 2}
+              r={CIRC_R}
+              fill="none"
+              stroke="url(#hcp-arc-grad)"
+              strokeWidth={STROKE_W}
+              strokeLinecap="round"
+              strokeDasharray={CIRCUMFERENCE}
+              strokeDashoffset={animatedHcp == null ? CIRCUMFERENCE : dashOffset}
+              style={{
+                transition: 'stroke-dashoffset 700ms cubic-bezier(0.22,0.61,0.36,1)',
+              }}
+            />
+          </svg>
+
+          {/* Inner content */}
+          <div
+            style={{
+              position: 'absolute',
+              inset: 0,
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: 8,
+              pointerEvents: 'none',
+            }}
+          >
+            <span
+              style={{
+                textTransform: 'uppercase',
+                fontSize: 10.5,
+                letterSpacing: '0.18em',
+                fontWeight: 700,
+                color: 'var(--hcp-t-60)',
+              }}
+            >
+              INDEX
+            </span>
+            <span
+              style={{
+                fontSize: 76,
+                fontWeight: 700,
+                letterSpacing: '-0.04em',
+                lineHeight: 1,
+                color: verdictColor,
+                fontVariantNumeric: 'tabular-nums',
+              }}
+            >
+              {isLoading || handicap == null
+                ? '—'
+                : formatDisplayedHcp(whsDisplayedHcp(handicap))}
+            </span>
+            {!isLoading && delta90 != null && (
+              <VerdictPill verdict={verdict}>
+                {arrowChar} {Math.abs(delta90).toFixed(1)} · 90D
+              </VerdictPill>
+            )}
+            {isLoading && (
+              <div
+                style={{
+                  width: 64,
+                  height: 16,
+                  borderRadius: 999,
+                  background: 'var(--hcp-bg-3)',
+                }}
+              />
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* Tag line */}
+      <div
+        style={{
+          textAlign: 'center',
+          padding: '8px 20px 0',
+          fontSize: 11,
+          fontWeight: 700,
+          letterSpacing: '0.18em',
+          textTransform: 'uppercase',
+          fontFamily: FONT,
+        }}
+      >
+        {handicap == null ? (
+          <span style={{ color: 'var(--hcp-t-60)' }}>CONNECT WHS TO START</span>
+        ) : (
+          <>
+            {tagWord && <span style={{ color: verdictColor }}>{tagWord}</span>}
+            {tagWord && (
+              <span style={{ color: 'var(--hcp-t-60)' }}> · </span>
+            )}
+            {scratchZone && (
+              <span style={{ color: 'var(--hcp-t-60)' }}>SCRATCH ZONE {scratchZone}</span>
+            )}
+          </>
+        )}
+      </div>
+
+      {/* TripleStrip */}
+      <TripleStrip>
+        <KPICell
+          label="Scoring"
+          value={scoringAvg != null ? scoringAvg.toFixed(1) : '—'}
+          meta={`avg · ${roundCount} rds`}
+        />
+        <KPICell
+          label="Form"
+          value={form.label}
+          meta={periodAvgPts != null ? `${periodAvgPts.toFixed(1)} pts avg` : '—'}
+          verdict={form.verdict}
+        />
+        <KPICell
+          label="Best"
+          value={
+            best ? (
+              <VerdictNumber
+                value={best.diff}
+                digits={1}
+                forceVerdict={best.diff < 0 ? 'good' : 'bad'}
+                size="lg"
+              />
+            ) : (
+              '—'
+            )
+          }
+          meta={best?.meta ?? '—'}
+        />
+      </TripleStrip>
+    </section>
+  );
+};
+
+export default HeroHandicapCardDark;
