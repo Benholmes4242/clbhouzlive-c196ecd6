@@ -202,20 +202,20 @@ export function FullLeaderboard({
 
       {/* Column headers */}
       <div style={{ display: 'flex', alignItems: 'center', gap: '4px', padding: '5px 20px', background: 'rgba(15,23,42,0.02)', borderTop: '0.5px solid rgba(15,23,42,0.07)', borderBottom: '0.5px solid rgba(15,23,42,0.07)' }}>
-        <span style={{ width: '34px', fontSize: '10px', fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.1em', flexShrink: 0 }}>POS</span>
-        <span style={{ flex: 1, fontSize: '10px', fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.1em' }}>PLAYER</span>
+        <span style={{ width: '34px', fontSize: '9px', fontWeight: 800, color: '#64748B', letterSpacing: '0.14em', flexShrink: 0 }}>POS</span>
+        <span style={{ flex: 1, fontSize: '9px', fontWeight: 800, color: '#64748B', letterSpacing: '0.14em' }}>PLAYER</span>
         {showRoundColumns && (
           <>
-            <span style={{ width: '26px', textAlign: 'center' as const, fontSize: '10px', fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.1em', flexShrink: 0 }}>R1</span>
-            <span style={{ width: '26px', textAlign: 'center' as const, fontSize: '10px', fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.1em', flexShrink: 0 }}>R2</span>
-            <span style={{ width: '26px', textAlign: 'center' as const, fontSize: '10px', fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.1em', flexShrink: 0 }}>R3</span>
-            <span style={{ width: '26px', textAlign: 'center' as const, fontSize: '10px', fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.1em', flexShrink: 0 }}>R4</span>
+            <span style={{ width: '26px', textAlign: 'center' as const, fontSize: '9px', fontWeight: 800, color: '#64748B', letterSpacing: '0.14em', flexShrink: 0 }}>R1</span>
+            <span style={{ width: '26px', textAlign: 'center' as const, fontSize: '9px', fontWeight: 800, color: '#64748B', letterSpacing: '0.14em', flexShrink: 0 }}>R2</span>
+            <span style={{ width: '26px', textAlign: 'center' as const, fontSize: '9px', fontWeight: 800, color: '#64748B', letterSpacing: '0.14em', flexShrink: 0 }}>R3</span>
+            <span style={{ width: '26px', textAlign: 'center' as const, fontSize: '9px', fontWeight: 800, color: '#64748B', letterSpacing: '0.14em', flexShrink: 0 }}>R4</span>
           </>
         )}
-        <span style={{ width: '44px', textAlign: 'center' as const, fontSize: '10px', fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.1em', flexShrink: 0 }}>
+        <span style={{ width: '44px', textAlign: 'center' as const, fontSize: '9px', fontWeight: 800, color: '#64748B', letterSpacing: '0.14em', flexShrink: 0 }}>
           {selectedRound === 'Overall' ? 'TOT' : 'SCORE'}
         </span>
-        <span style={{ width: '44px', textAlign: 'center' as const, fontSize: '10px', fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.1em', flexShrink: 0 }}>THRU</span>
+        <span style={{ width: '44px', textAlign: 'center' as const, fontSize: '9px', fontWeight: 800, color: '#64748B', letterSpacing: '0.14em', flexShrink: 0 }}>THRU</span>
       </div>
 
       {/* Player rows */}
