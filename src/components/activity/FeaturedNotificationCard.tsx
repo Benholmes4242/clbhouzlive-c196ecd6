@@ -254,38 +254,37 @@ export const FeaturedNotificationCard: React.FC<FeaturedNotificationCardProps> =
       className="cursor-pointer active:scale-[0.98] transition-transform"
     >
       <div
-        className="relative rounded-2xl bg-white"
+        className="relative rounded-2xl"
         style={{
-          border: `1px solid ${BORDER}`,
+          background: notification.is_unread ? UNREAD_BG : 'white',
+          border: `1px solid ${notification.is_unread ? UNREAD_BORDER : BORDER}`,
           padding: '12px 14px',
-          paddingLeft: 18,
+          paddingLeft: 14,
+          transition: CARD_TRANSITION,
         }}
       >
-        {/* Unread dot — top-left */}
-        {notification.is_unread && (
-          <span
-            style={{
-              position: 'absolute',
-              top: 12, left: 8,
-              width: 8, height: 8,
-              borderRadius: '50%',
-              background: AMBER,
-            }}
-          />
-        )}
-
-        {/* Timestamp — top right */}
-        <span
+        {/* Right-stack: NEW badge (if unread) + timestamp */}
+        <div
           style={{
             position: 'absolute',
             top: 12, right: 14,
-            fontSize: 11,
-            fontWeight: 500,
-            color: INK_SUBTLE,
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'flex-end',
+            gap: 4,
           }}
         >
-          {notification.time_ago}
-        </span>
+          {notification.is_unread && <NewBadge />}
+          <span
+            style={{
+              fontSize: 11,
+              fontWeight: 500,
+              color: INK_SUBTLE,
+            }}
+          >
+            {notification.time_ago}
+          </span>
+        </div>
 
         <div className="flex items-start gap-3" style={{ paddingRight: 56 }}>
           {/* Avatar with badge */}
