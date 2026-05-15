@@ -8,7 +8,7 @@ import { useRehydrationSafe } from '@/contexts/RehydrationContext';
 import SegmentedControl from '@/components/discover/SegmentedControl';
 import SlidingPanels from '@/components/ui/SlidingPanels';
 import { useDiscoverQuery } from '@/utils/useDiscoverQuery';
-import { useNavigate } from 'react-router-dom';
+
 import ShellSlot from '@/components/header/ShellSlot';
 import { WatchMoodChips } from '@/components/watch/proshop/WatchMoodChips';
 import { useWatchMood } from '@/components/watch/proshop/hooks/useWatchMood';
@@ -26,7 +26,7 @@ const NewCoursesTab = lazy(() => import('@/components/discover/NewExploreTab'));
 type MainKey = 'watch' | 'loop' | 'courses';
 
 const Discover = () => {
-  const navigate = useNavigate();
+  // (navigate not used here)
 
   const { isRehydrating } = useRehydrationSafe();
   const { main, setMain } = useDiscoverQuery();
