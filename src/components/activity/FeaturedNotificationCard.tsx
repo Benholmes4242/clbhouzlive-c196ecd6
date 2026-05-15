@@ -149,8 +149,12 @@ export const FeaturedNotificationCard: React.FC<FeaturedNotificationCardProps> =
         className="cursor-pointer active:scale-[0.98] transition-transform"
       >
         <div
-          className="rounded-2xl overflow-hidden bg-white"
-          style={{ border: `1px solid ${BORDER}` }}
+          className="rounded-2xl overflow-hidden"
+          style={{
+            background: notification.is_unread ? UNREAD_BG : 'white',
+            border: `1px solid ${notification.is_unread ? UNREAD_BORDER : BORDER}`,
+            transition: CARD_TRANSITION,
+          }}
         >
           {/* Photo hero */}
           <div className="relative" style={{ height: 110 }}>
