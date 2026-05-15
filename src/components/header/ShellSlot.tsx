@@ -70,7 +70,7 @@ export const ShellSlot: React.FC<ShellSlotProps> = ({ children }) => {
         marginRight: 'auto',
         width: '100%',
         maxWidth: 480,
-        zIndex: 'calc(var(--z-header) - 1)' as unknown as number,
+        zIndex: 29, // CompactHeader is var(--z-header) = 30; sit one below it.
         background: 'hsl(var(--background))',
         borderBottom: '0.5px solid hsl(var(--border) / 0.5)',
         boxShadow: scrolled ? '0 6px 18px -10px rgba(15,23,42,0.18)' : 'none',
