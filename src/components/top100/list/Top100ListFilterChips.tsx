@@ -40,7 +40,6 @@ export const Top100ListFilterChips: React.FC<Top100ListFilterChipsProps> = ({
   activeSort,
   onSortChange,
   counts = {},
-  isSticky = false,
   hasReviewData = false,
 }) => {
   const currentFilterLabel = FILTER_OPTIONS.find(f => f.value === activeFilter)?.label || 'Official Rating';
@@ -53,21 +52,12 @@ export const Top100ListFilterChips: React.FC<Top100ListFilterChipsProps> = ({
   );
 
   return (
-    <motion.div 
-      className={`px-4 py-3 transition-all duration-200 ${
-        isSticky 
-          ? 'backdrop-blur-md shadow-sm' 
-          : ''
-      }`}
+    <div
+      className="px-4 py-3"
       style={{
-        background: isSticky ? 'rgba(248,250,252,0.97)' : 'rgba(15,23,42,0.03)',
+        background: 'rgba(15,23,42,0.03)',
         borderBottom: '0.5px solid rgba(15,23,42,0.07)',
       }}
-      initial={false}
-      animate={{ 
-        boxShadow: isSticky ? '0 4px 12px rgba(0,0,0,0.06)' : '0 0 0 rgba(0,0,0,0)' 
-      }}
-      transition={{ duration: 0.2 }}
     >
       <div className="flex items-center justify-center gap-2">
         {/* Show dropdown (Filter) */}
