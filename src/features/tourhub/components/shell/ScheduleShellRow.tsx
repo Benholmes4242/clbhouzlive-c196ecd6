@@ -32,7 +32,7 @@ const TOUR_CODES: Array<'all' | 'pga' | 'EURO' | 'LPGA' | 'CHAMP' | 'PGAD' | 'LI
  */
 function ScheduleShellRowInner() {
   const [searchParams, setSearchParams] = useSearchParams();
-  const activeFilter = (searchParams.get('filter') as ScheduleFilterType) || 'live';
+  const activeFilter = (searchParams.get('filter') as ScheduleFilterType) || 'all';
   const activeTour = (searchParams.get('tour') as TourFilterCode) || 'all';
   const [tourSheetOpen, setTourSheetOpen] = useState(false);
 
