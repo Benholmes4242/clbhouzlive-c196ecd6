@@ -310,11 +310,10 @@ export function TournamentDetailPage() {
   };
   
   return (
-    <TourHubShell>
+    <TourHubShell immersive={true}>
       <ShellSlot>
         <TournamentTabsShellRow
           activeTab={activeTab}
-          isCompleted={isCompleted}
           onChange={handleTabChange}
         />
       </ShellSlot>
