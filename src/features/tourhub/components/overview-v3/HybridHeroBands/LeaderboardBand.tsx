@@ -224,7 +224,7 @@ export function LeaderboardBand({
       const championRow = champion ?? (finishers[0]
         ? {
             name: entryName(finishers[0]),
-            country: finishers[0].player?.country_code,
+            country: entryCountry(finishers[0]),
             score: fmtScore(finishers[0].score),
             avatarUrl: entryAvatar(finishers[0]),
             playoffWin: state.variant === 'playoff',
@@ -247,6 +247,7 @@ export function LeaderboardBand({
               key={i}
               rank={String(e.position)}
               name={entryName(e)}
+              country={entryCountry(e)}
               score={fmtScore(e.score)}
               thru="F"
               avatarUrl={entryAvatar(e)}
