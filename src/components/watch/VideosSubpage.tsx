@@ -61,7 +61,7 @@ export default function VideosSubpage() {
           <VideosMoodChips active={mood} onChange={setMood} />
         </ShellSlot>
 
-        <div style={{ paddingTop: 'var(--shell-extra-h, 0px)' }}>
+        <div style={{ paddingTop: 'var(--chrome-total-h, 0px)' }}>
           <VideoOfTheWeekHero />
           <VideosContinueWatchingRail userId={userId} />
           <VideosCourseAnchoredRail userId={userId} />

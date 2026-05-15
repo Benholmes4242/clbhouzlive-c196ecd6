@@ -208,8 +208,14 @@ html.lightbox-open {
   --sar: env(safe-area-inset-right, 0px);
 
   /* Fixed-shell offset — written by <ShellSlot> via ResizeObserver. Pages that
-     consume the slot offset their main scroll container with paddingTop: var(--shell-extra-h). */
+     consume the slot offset their main scroll container with paddingTop: var(--chrome-total-h). */
   --shell-extra-h: 0px;
+
+  /* Total fixed chrome height above any page body that uses ShellSlot.
+     Composes CompactHeader (55px content + safe-area top) plus the
+     ShellSlot's own measured height. Pages consume this via
+     paddingTop: var(--chrome-total-h). */
+  --chrome-total-h: calc(55px + var(--sat, 0px) + var(--shell-extra-h, 0px));
 
   /* Back-compat aliases (used by useChromeAnchors) */
   --safe-top: env(safe-area-inset-top, 0px);

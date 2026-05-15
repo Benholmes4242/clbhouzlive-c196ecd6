@@ -82,7 +82,7 @@ const Discover = () => {
       <FadeInContent>
         <main
           className="pb-20 bg-background"
-          style={{ paddingTop: 'var(--shell-extra-h, 0px)' }}
+          style={{ paddingTop: 'var(--chrome-total-h, 0px)' }}
         >
           <SlidingPanels
             activeKey={main as MainKey}
