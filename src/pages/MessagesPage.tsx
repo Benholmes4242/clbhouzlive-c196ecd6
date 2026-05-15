@@ -444,7 +444,7 @@ function MessagesPageInner() {
                 <div className="absolute rounded-full" style={{ width: 36, height: 36, background: 'rgba(247,147,30,0.15)' }} />
                 <MessageCircle style={{ color: '#F7931E' }} className="w-5 h-5 relative z-10" />
               </div>
-              <h2 style={{ fontSize: 18, fontWeight: 900, color: '#0F172A', letterSpacing: '-0.02em', marginBottom: 6 }}>
+              <h2 style={{ fontSize: 18, fontWeight: 800, color: '#0F172A', letterSpacing: '-0.015em', marginBottom: 6 }}>
                 Select a conversation
               </h2>
               <p style={{ fontSize: 14, color: '#94a3b8', maxWidth: 240, marginBottom: 20 }}>
