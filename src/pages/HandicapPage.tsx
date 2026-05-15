@@ -180,13 +180,7 @@ const HandicapPageHeader: React.FC<HeaderProps> = ({
   friendUsername,
   viewerUserId,
 }) => {
-  const navigate = useNavigate();
-
   const greeting = useMemo(() => getGreeting(), []);
-
-  // Sentinel-based detection: suppress safe-area padding while CompactHeader
-  // is visible at top to avoid doubled inset gap.
-  const { sentinelRef, paddingTop } = useStickyHeaderSafeArea();
 
   const subheadOwn = useMemo(() => {
     const dateStr = new Date().toLocaleDateString('en-GB', {
@@ -197,23 +191,20 @@ const HandicapPageHeader: React.FC<HeaderProps> = ({
       : `${greeting} · ${dateStr}`;
   }, [greeting, displayName]);
 
+  const tabs = useMemo(
+    () => [
+      { id: 'today', label: 'Today' },
+      { id: 'trends', label: 'Trends' },
+      { id: 'records', label: 'Records' },
+      { id: 'friends', label: 'Friends' },
+    ],
+    [],
+  );
+
   return (
-    <>
-      <div
-        ref={sentinelRef}
-        aria-hidden
-        style={{ height: 1, width: '100%', pointerEvents: 'none' }}
-      />
-      <header
-        className="sticky top-0 z-30"
-        style={{
-          background: BG_SURFACE,
-          paddingTop,
-          transition: 'padding-top 200ms ease',
-        }}
-      >
+    <ShellSlot>
       {readOnly ? (
-        <div style={{ padding: '12px 16px 16px' }}>
+        <div style={{ padding: '12px 16px 12px' }}>
           <FriendTitleRow
             displayName={displayName}
             avatarUrl={friendAvatarUrl}
@@ -223,7 +214,7 @@ const HandicapPageHeader: React.FC<HeaderProps> = ({
           />
         </div>
       ) : (
-        <div style={{ padding: '14px 16px 14px', display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 12 }}>
+        <div style={{ padding: '14px 16px 12px', display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 12 }}>
           <div style={{ flex: 1, minWidth: 0 }}>
             <div style={{
               display: 'inline-flex',
@@ -297,39 +288,14 @@ const HandicapPageHeader: React.FC<HeaderProps> = ({
         </div>
       )}
 
-      {/* Tab strip — hidden when own user has no connection */}
       {(readOnly || hasConnection) && (
-        <div style={{
-          display: 'flex',
-          justifyContent: 'center',
-          borderBottom: '0.5px solid rgba(15,23,42,0.08)',
-        }}>
-          {(['today', 'trends', 'records', 'friends'] as const).map(tab => (
-            <button
-              key={tab}
-              onClick={() => onTabChange(tab)}
-              style={{
-                padding: '12px 14px',
-                background: 'transparent',
-                border: 'none',
-                borderBottom: activeTab === tab ? `2px solid ${AMBER}` : '2px solid transparent',
-                marginBottom: -1,
-                fontSize: 12,
-                fontWeight: activeTab === tab ? 800 : 600,
-                color: activeTab === tab ? INK : INK_55,
-                cursor: 'pointer',
-                fontFamily: FONT_GEIST,
-                textTransform: 'capitalize',
-                letterSpacing: '-0.005em',
-              }}
-            >
-              {tab}
-            </button>
-          ))}
-        </div>
+        <SegmentedControl
+          tabs={tabs}
+          activeTab={activeTab}
+          onTabChange={(id) => onTabChange(id as HandicapSubtab)}
+        />
       )}
-    </header>
-    </>
+    </ShellSlot>
   );
 };
 
