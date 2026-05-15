@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { HelpCircle, TrendingDown, AlertTriangle, Minus } from 'lucide-react';
+import { TrendingDown, AlertTriangle, Minus } from 'lucide-react';
 import { useCounters, useAllScores } from '@/lib/whs/hooks';
 import { fmtDiff, fmtAxis } from '@/lib/whs/format';
 import { projectNextRound } from '@/lib/whs/handicapMath';
