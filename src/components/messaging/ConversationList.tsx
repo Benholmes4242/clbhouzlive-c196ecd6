@@ -439,7 +439,7 @@ export function ConversationList({
                 <span
                   className="flex-shrink-0"
                   style={{
-                    fontSize: '11.5px', fontWeight: 500,
+                    fontSize: 11, fontWeight: 500,
                     color: hasUnread ? '#F7931E' : '#94a3b8',
                   }}
                 >
