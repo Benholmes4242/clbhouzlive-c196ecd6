@@ -92,11 +92,10 @@ function WinnerCard({ winner, runnerUp, headshotMap, tournamentName }: { winner:
 
   return (
     <motion.div style={{ marginTop: '8px' }} {...sectionEntrance}>
-      {/* Rule marker */}
+      {/* Section eyebrow */}
       <div style={{ padding: '14px 20px 0', background: '#ffffff', borderTop: '1px solid rgba(15,23,42,0.07)' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '10px' }}>
-          <div style={{ width: 3, height: 14, background: '#F7931E', borderRadius: 1, flexShrink: 0 }} />
-          <span style={{ fontSize: '10px', fontWeight: 900, color: '#F7931E', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>Tournament Champion</span>
+          <span style={{ fontSize: '9px', fontWeight: 800, color: '#64748B', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>Tournament Champion</span>
         </div>
       </div>
 
