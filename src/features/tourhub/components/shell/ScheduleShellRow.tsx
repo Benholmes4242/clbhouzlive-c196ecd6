@@ -14,6 +14,7 @@ interface ChipDef {
 }
 
 const FILTERS: ChipDef[] = [
+  { id: 'all', label: 'All' },
   { id: 'completed', label: 'Past' },
   { id: 'live', label: 'Live' },
   { id: 'upcoming', label: 'Upcoming' },
