@@ -1,14 +1,10 @@
-import { useState, useEffect, useRef, useCallback, useMemo, Fragment } from 'react';
+import { useState, useEffect, useMemo, Fragment } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import { RefreshCw, AlertCircle, ChevronLeft, GraduationCap, ChevronRight, Crown } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { RefreshCw, AlertCircle, GraduationCap, ChevronRight, Crown } from 'lucide-react';
 import { getCollegeLogoUrl } from '@/utils/collegeLogo';
-import { useQueryClient } from '@tanstack/react-query';
 import { PageRoot } from '@/components/layout/PageRoot';
 import { Skeleton } from '@/components/ui/skeleton';
-import { useHeader } from '@/contexts/GlobalHeaderContext';
 import { useMedianStatusBar } from '@/hooks/useMedianStatusBar';
-import { useStickyHeaderSafeArea } from '@/hooks/useStickyHeaderSafeArea';
 import { formatCurrency } from '@/lib/utils/formatCurrency';
 import {
   FranchiseStoryStrip,
@@ -62,13 +58,10 @@ function buildAlumniSubtitle(
 export function CollegeProfilePage() {
   const { collegeSlug } = useParams<{ collegeSlug: string }>();
 
-  const queryClient = useQueryClient();
   const navigate = useNavigate();
-  const { hideHeader, showHeader } = useHeader();
 
   // Transparent status bar for immersive hero bleed into safe area
   useMedianStatusBar('dark', 'transparent', true, false);
-  const { sentinelRef, paddingTop: stickyPaddingTop } = useStickyHeaderSafeArea();
 
   const { data: stats, isLoading: statsLoading, error: _statsError, refetch: refetchStats } = useCollegeStats(collegeSlug);
   const { data: collegeMap, isLoading: mediaLoading } = useCollegeMediaMap();
@@ -80,11 +73,6 @@ export function CollegeProfilePage() {
 
   const [heroImgError, setHeroImgError] = useState(false);
 
-  // Pull-to-refresh state
-  const [isRefreshing, setIsRefreshing] = useState(false);
-  const [pullDistance, setPullDistance] = useState(0);
-  const touchStartY = useRef(0);
-  const isPulling = useRef(false);
 
   const college = collegeSlug ? collegeMap?.get(collegeSlug) || null : null;
   const displayName = college?.short_name || college?.college_name || collegeSlug || 'College';
@@ -148,60 +136,12 @@ export function CollegeProfilePage() {
   }, [collegeRank, captain, showCaptainPill, captainOwgr, stats]);
 
 
-  /* ── Pull-to-refresh ── */
-  const handleTouchStart = useCallback((e: React.TouchEvent) => {
-    if (window.scrollY <= 0) {
-      touchStartY.current = e.touches[0].clientY;
-      isPulling.current = true;
-    }
-  }, []);
-
-  const handleTouchMove = useCallback((e: React.TouchEvent) => {
-    if (!isPulling.current) return;
-    const delta = e.touches[0].clientY - touchStartY.current;
-    if (delta > 0) setPullDistance(Math.min(delta, 100));
-  }, []);
-
-  const handleTouchEnd = useCallback(async () => {
-    if (pullDistance >= 50 && !isRefreshing) {
-      setIsRefreshing(true);
-      setPullDistance(0);
-      await Promise.all([
-        queryClient.invalidateQueries({ queryKey: ['college-stats', collegeSlug] }),
-        queryClient.invalidateQueries({ queryKey: ['college-alumni', collegeSlug] }),
-        queryClient.invalidateQueries({ queryKey: ['college-rivalries', collegeSlug] }),
-      ]);
-      setIsRefreshing(false);
-    } else {
-      setPullDistance(0);
-    }
-    isPulling.current = false;
-  }, [pullDistance, isRefreshing, queryClient, collegeSlug]);
-
-  useEffect(() => {
-    hideHeader();
-    return () => { showHeader(); };
-  }, [hideHeader, showHeader]);
-
   return (
     <PageRoot
       className="min-h-screen w-full bg-background"
       hasBottomNav
-      onTouchStart={handleTouchStart}
-      onTouchMove={handleTouchMove}
-      onTouchEnd={handleTouchEnd}
     >
-      {/* Pull-to-refresh indicator */}
-      {(pullDistance > 0 || isRefreshing) && (
-        <div className="flex justify-center py-3 relative z-50">
-          <motion.div
-            animate={{ rotate: isRefreshing ? 360 : pullDistance * 3.6 }}
-            transition={isRefreshing ? { repeat: Infinity, duration: 0.8, ease: 'linear' } : { duration: 0 }}
-          >
-            <RefreshCw className="w-5 h-5 text-muted-foreground" />
-          </motion.div>
-        </div>
-      )}
+      <div style={{ paddingTop: 'var(--chrome-total-h, 0px)' }}>
 
       {/* ── HERO MASTHEAD ── canonical light pattern */}
       <div style={{
@@ -372,35 +312,6 @@ export function CollegeProfilePage() {
         )}
       </div>
 
-      {/* Sentinel for sticky-header safe-area detection */}
-      <div ref={sentinelRef} aria-hidden style={{ height: 1 }} />
-
-      {/* Sticky header (Compare button retired) */}
-      <div
-        className="sticky top-0 z-20"
-        style={{
-          background: 'rgba(248,250,252,0.97)',
-          backdropFilter: 'blur(20px)',
-          WebkitBackdropFilter: 'blur(20px)',
-          borderBottom: '0.5px solid rgba(15,23,42,0.08)',
-          paddingTop: stickyPaddingTop,
-          transition: 'padding-top 200ms ease',
-        }}
-      >
-        <div style={{ display: 'flex', alignItems: 'center', padding: '8px 16px 10px', gap: 6 }}>
-          <button
-            type="button"
-            onClick={() => navigate(collegeHubRoute())}
-            style={{ display: 'flex', alignItems: 'center', gap: 2, fontSize: 12, fontWeight: 600, color: '#64748B', background: 'transparent', border: 'none', padding: 0, cursor: 'pointer' }}
-            className="active:opacity-50 transition-opacity"
-          >
-            <ChevronLeft size={13} strokeWidth={2.5} />
-            College Franchise
-          </button>
-          <div style={{ flex: 1 }} />
-        </div>
-      </div>
-
       {/* Content */}
       <div style={{ paddingBottom: 'calc(var(--sab, env(safe-area-inset-bottom, 0px)) + 80px)' }}>
         {/* Franchise Dispatch strip */}
@@ -451,6 +362,7 @@ export function CollegeProfilePage() {
             </Link>
           </div>
         )}
+      </div>
       </div>
     </PageRoot>
   );

@@ -2,24 +2,22 @@
  * TournamentDetailPage - Editorial tournament detail experience
  */
 
-import { useState, useMemo, useEffect, useRef, useCallback } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useBottomNavigation } from '@/contexts/BottomNavigationContext';
 
-import { useParams, useSearchParams, useNavigate, useLocation, Link } from 'react-router-dom';
-import { Trophy, RefreshCw, AlertCircle, ChevronLeft } from 'lucide-react';
+import { useParams, useSearchParams, Link } from 'react-router-dom';
+import { Trophy, AlertCircle } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { formatDistanceToNow } from 'date-fns';
-import { useQueryClient } from '@tanstack/react-query';
-import { cn } from '@/lib/utils';
 import { TourHubShell } from '../components/TourHubShell';
-import { useStickyHeaderSafeArea } from '@/hooks/useStickyHeaderSafeArea';
+import { ShellSlot } from '@/components/header/ShellSlot';
+import { TournamentTabsShellRow } from '../components/shell/TournamentTabsShellRow';
 import { useTourTournament, useTourLeaderboard } from '../hooks/useTourHubData';
 import { useLeaderboardRealtime } from '../hooks/useLeaderboardRealtime';
 import { useSingleCourseImage } from '../hooks/useCourseImageResolver';
 import { getCourseImage } from '../utils/placeholders';
 import { EventWinnerCard } from '../components/EventWinnerCard';
 import { EventMomentsList } from '../components/EventMomentsList';
-import { getReferrerLabel, type TournamentReferrer } from '../routes';
 
 import {
   TournamentHero,
@@ -43,11 +41,6 @@ export function TournamentDetailPage() {
   const { setVisible } = useBottomNavigation();
   useEffect(() => { setVisible(true); }, [setVisible]);
   const [searchParams, setSearchParams] = useSearchParams();
-  const queryClient = useQueryClient();
-  const navigate = useNavigate();
-  const location = useLocation();
-  const referrer = (location.state as { referrer?: TournamentReferrer } | null)?.referrer;
-  const backLabel = getReferrerLabel(referrer);
 
   const [activeTab, setActiveTab] = useState<TournamentTab>(() => {
     const tabParam = searchParams.get('tab') as TournamentTab | null;
@@ -55,46 +48,6 @@ export function TournamentDetailPage() {
     return 'overview';
   });
 
-  // TD-01: Pull-to-refresh
-  const [isPulling, setIsPulling] = useState(false);
-  const [pullDistance, setPullDistance] = useState(0);
-  const [isRefreshing, setIsRefreshing] = useState(false);
-  const touchStartY = useRef(0);
-  const PULL_THRESHOLD = 50;
-  const { sentinelRef, paddingTop: stickyPaddingTop } = useStickyHeaderSafeArea();
-
-  const handleTouchStart = useCallback((e: React.TouchEvent) => {
-    if (window.scrollY <= 0) {
-      touchStartY.current = e.touches[0].clientY;
-      setIsPulling(true);
-    }
-  }, []);
-
-  const handleTouchMove = useCallback((e: React.TouchEvent) => {
-    if (!isPulling) return;
-    const delta = e.touches[0].clientY - touchStartY.current;
-    if (delta > 0) {
-      setPullDistance(Math.min(delta, 100));
-    }
-  }, [isPulling]);
-
-  const handleTouchEnd = useCallback(async () => {
-    if (pullDistance >= PULL_THRESHOLD && !isRefreshing) {
-      setIsRefreshing(true);
-      setPullDistance(0);
-      await Promise.all([
-        queryClient.invalidateQueries({ queryKey: ['tournament', tournamentId] }),
-        queryClient.invalidateQueries({ queryKey: ['tournament-leaderboard', tournamentId] }),
-        queryClient.invalidateQueries({ queryKey: ['tournament-tee-times', tournamentId] }),
-        queryClient.invalidateQueries({ queryKey: ['tournament-holes', tournamentId] }),
-      ]);
-      setIsRefreshing(false);
-    } else {
-      setPullDistance(0);
-    }
-    setIsPulling(false);
-  }, [pullDistance, isRefreshing, queryClient, tournamentId]);
-  
   const handleTabChange = (tab: TournamentTab) => {
     setActiveTab(tab);
     window.scrollTo({ top: 0, behavior: 'instant' });
@@ -368,117 +321,21 @@ export function TournamentDetailPage() {
   
   return (
     <TourHubShell>
-      {/* Pull-to-refresh indicator */}
-      <AnimatePresence>
-        {(pullDistance > 0 || isRefreshing) && (
-          <motion.div
-            className="flex items-center justify-center py-3 bg-background z-50 relative"
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: 'auto', opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-          >
-            <RefreshCw
-              className={cn(
-                "w-5 h-5 text-muted-foreground transition-transform",
-                isRefreshing && "animate-spin"
-              )}
-              style={!isRefreshing ? { transform: `rotate(${(pullDistance / PULL_THRESHOLD) * 360}deg)` } : undefined}
-            />
-          </motion.div>
-        )}
-      </AnimatePresence>
+      <ShellSlot>
+        <TournamentTabsShellRow
+          activeTab={activeTab}
+          isCompleted={isCompleted}
+          onChange={handleTabChange}
+        />
+      </ShellSlot>
 
-      <div
-        onTouchStart={handleTouchStart}
-        onTouchMove={handleTouchMove}
-        onTouchEnd={handleTouchEnd}
-      >
-        <TournamentHero 
-          tournament={tournament} 
+      <div style={{ paddingTop: 'var(--chrome-total-h, 0px)' }}>
+        <TournamentHero
+          tournament={tournament}
           imageUrl={heroImageUrl}
           leader={leader}
           leaderboard={leaderboard ?? null}
         />
-
-        {/* Sentinel for sticky-header safe-area detection */}
-        <div ref={sentinelRef} aria-hidden style={{ height: 1 }} />
-
-        {/* STICKY HEADER — ← Back | underline tabs */}
-        <div
-          className="sticky top-0 z-20"
-          style={{
-            paddingTop: stickyPaddingTop,
-            transition: 'padding-top 200ms ease',
-            background: 'rgba(248,250,252,0.97)',
-            backdropFilter: 'blur(20px)',
-            WebkitBackdropFilter: 'blur(20px)',
-            borderBottom: '0.5px solid rgba(15,23,42,0.08)',
-          }}
-        >
-          {/* Back link */}
-          <div style={{ display: 'flex', alignItems: 'center', padding: '7px 16px 0', gap: '4px' }}>
-            <button
-              onClick={() => { if (window.history.length > 1) navigate(-1); else navigate('/tourhub?tab=schedule'); }}
-              style={{ display: 'flex', alignItems: 'center', gap: '2px', fontSize: 12, fontWeight: 600, color: '#64748B', background: 'transparent', border: 'none', padding: 0, cursor: 'pointer' }}
-              className="active:opacity-50 transition-opacity"
-            >
-              <ChevronLeft size={13} strokeWidth={2.5} />
-              {backLabel}
-            </button>
-          </div>
-
-          {/* Underline tab bar — flex:1 equal-width */}
-          <div
-            style={{ display: 'flex', borderBottom: '1px solid rgba(15,23,42,0.10)', marginTop: '6px' }}
-            role="tablist"
-            aria-label="Tournament Sections"
-          >
-            {(isCompleted
-              ? [
-                  { value: 'summary' as TournamentTab, label: 'Summary' },
-                  { value: 'leaderboard' as TournamentTab, label: 'Leaderboard' },
-                  { value: 'tee-times' as TournamentTab, label: 'Tee Times' },
-                  { value: 'hole-stats' as TournamentTab, label: 'Holes' },
-                ]
-              : [
-                  { value: 'overview' as TournamentTab, label: 'Overview' },
-                  { value: 'leaderboard' as TournamentTab, label: 'Leaderboard' },
-                  { value: 'tee-times' as TournamentTab, label: 'Tee Times' },
-                  { value: 'hole-stats' as TournamentTab, label: 'Holes' },
-                ]
-            ).map((tab) => {
-              const isActive = activeTab === tab.value;
-              return (
-                <button
-                  key={tab.value}
-                  role="tab"
-                  aria-selected={isActive}
-                  onClick={() => handleTabChange(tab.value)}
-                  className="active:opacity-70 transition-opacity"
-                  style={{
-                    flex: 1,
-                    padding: '12px 0',
-                    fontSize: '12px',
-                    fontWeight: isActive ? 800 : 600,
-                    color: isActive ? '#0F172A' : '#94A3B8',
-                    background: 'transparent',
-                    border: 'none',
-                    borderBottom: isActive ? '2px solid #F7931E' : '2px solid transparent',
-                    cursor: 'pointer',
-                    whiteSpace: 'nowrap' as const,
-                    textAlign: 'center' as const,
-                  }}
-                >
-                  {tab.label}
-                </button>
-              );
-            })}
-          </div>
-        </div>
-
-        {/* Live leader is now rendered as a hero pill (see TournamentHero buildPills).
-            The legacy floating "LIVE • leader" block was removed in Phase 1 to
-            avoid duplication with the hero narrative pills. */}
 
         <div style={{ paddingBottom: 'calc(var(--sab, env(safe-area-inset-bottom, 0px)) + 80px)' }}>
           <AnimatePresence mode="wait">
