@@ -28,6 +28,12 @@ const AMBER_BORDER = 'rgba(247,147,30,0.30)';
 const AMBER_GOLD_GRAD = 'linear-gradient(135deg, #F59E0B 0%, #FBBF24 100%)';
 const GREEN = '#059669';
 const RED = '#9F1D1D';
+const D_BG    = 'var(--hcp-bg-1)';
+const D_LINE  = 'var(--hcp-line)';
+const D_T100  = 'var(--hcp-t-100)';
+const D_T60   = 'var(--hcp-t-60)';
+const D_T40   = 'var(--hcp-t-40)';
+
 
 const FONT_GEIST = 'Geist, system-ui, -apple-system, BlinkMacSystemFont, sans-serif';
 
@@ -76,14 +82,14 @@ const Skeleton: React.FC = () => (
   <section style={{ marginTop: 20 }}>
     <SectionHeader eyebrow="ROUNDS THAT COUNT" title="The 8 best of your last 20" />
     <div style={{ padding: '0 20px' }}>
-    <div style={{ height: 12, width: 140, background: INK_06, borderRadius: 2, marginBottom: 10 }} />
-    <div style={{ height: 56, background: INK_06, borderRadius: 12, marginBottom: 12 }} />
+    <div style={{ height: 12, width: 140, background: 'var(--hcp-bg-3)', borderRadius: 2, marginBottom: 10 }} />
+    <div style={{ height: 56, background: 'var(--hcp-bg-3)', borderRadius: 12, marginBottom: 12 }} />
     <div style={{
-      background: '#fff', border: `0.5px solid ${INK_10}`, borderRadius: 14, overflow: 'hidden',
+      background: D_BG, border: `1px solid ${D_LINE}`, borderRadius: 14, overflow: 'hidden',
     }}>
-      <div style={{ height: 220, background: INK_06 }} />
-      <div style={{ height: 60, background: INK_06, borderTop: `0.5px solid ${INK_10}` }} />
-      <div style={{ height: 110, background: INK_06, borderTop: `0.5px solid ${INK_10}` }} />
+      <div style={{ height: 220, background: 'var(--hcp-bg-3)' }} />
+      <div style={{ height: 60, background: 'var(--hcp-bg-3)', borderTop: `1px solid ${D_LINE}` }} />
+      <div style={{ height: 110, background: 'var(--hcp-bg-3)', borderTop: `1px solid ${D_LINE}` }} />
     </div>
     </div>
   </section>
@@ -232,13 +238,13 @@ export const RoundsThatCountCard: React.FC<Props> = ({ connectionId, currentHand
             <span style={{
               fontSize: 9,
               fontWeight: 800,
-              color: INK_55,
+              color: D_T60,
               letterSpacing: '0.16em',
               textTransform: 'uppercase',
             }}>SCORE DIFF</span>
             <div style={{
               display: 'flex', alignItems: 'center', gap: 10,
-              fontSize: 9, fontWeight: 700, color: INK_55,
+              fontSize: 9, fontWeight: 700, color: D_T60,
               letterSpacing: '0.04em',
             }}>
               <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
@@ -251,7 +257,7 @@ export const RoundsThatCountCard: React.FC<Props> = ({ connectionId, currentHand
               <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
                 <span style={{
                   width: 8, height: 8, borderRadius: '50%',
-                  background: '#fff', border: `1.5px solid ${AMBER}`,
+                  background: 'var(--hcp-bg-0)', border: `1.5px solid ${AMBER}`,
                 }} />
                 NON
               </span>
@@ -279,7 +285,7 @@ export const RoundsThatCountCard: React.FC<Props> = ({ connectionId, currentHand
                 <div key={t} style={{
                   position: 'absolute', top: yFor(t) - 7,
                   right: 6, fontSize: 11.5, fontWeight: 700,
-                  color: INK_55, fontFamily: FONT_GEIST,
+                  color: D_T60, fontFamily: FONT_GEIST,
                   fontVariantNumeric: 'tabular-nums',
                   textAlign: 'right', width: '100%',
                 }}>
@@ -360,7 +366,7 @@ export const RoundsThatCountCard: React.FC<Props> = ({ connectionId, currentHand
                 {ticks.map(t => (
                   <line key={t}
                     x1="0" y1={yFor(t)} x2="100%" y2={yFor(t)}
-                    stroke={INK_06} strokeWidth={1}
+                    stroke="var(--hcp-line)" strokeWidth={1}
                     strokeDasharray="2 4"
                     opacity={0.6}
                     vectorEffect="non-scaling-stroke"
@@ -427,15 +433,15 @@ export const RoundsThatCountCard: React.FC<Props> = ({ connectionId, currentHand
                 let borderStyle: string;
                 if (r.is_best) {
                   dotSize = 12;
-                  background = '#fff';
+                  background = 'var(--hcp-bg-0)';
                   borderStyle = `2.5px solid ${GREEN}`;
                 } else if (r.is_worst) {
                   dotSize = 12;
-                  background = '#fff';
+                  background = 'var(--hcp-bg-0)';
                   borderStyle = `2.5px solid ${RED}`;
                 } else if (isLatest) {
                   dotSize = 12;
-                  background = '#fff';
+                  background = 'var(--hcp-bg-0)';
                   borderStyle = `2.5px solid ${INK}`;
                 } else if (r.is_counter) {
                   dotSize = 9;
@@ -443,7 +449,7 @@ export const RoundsThatCountCard: React.FC<Props> = ({ connectionId, currentHand
                   borderStyle = `none`;
                 } else {
                   dotSize = 8;
-                  background = '#fff';
+                  background = 'var(--hcp-bg-0)';
                   borderStyle = `1.5px solid ${AMBER}`;
                 }
                 if (isActiveScrub) {
@@ -603,14 +609,14 @@ export const RoundsThatCountCard: React.FC<Props> = ({ connectionId, currentHand
                   >
                     <div style={{
                       fontSize: 9, fontWeight: 600,
-                      color: isLatest ? INK : INK_40,
+                      color: isLatest ? D_T100 : D_T40,
                       letterSpacing: '0.04em',
                     }}>
                       {WEEKDAY[d.getDay()]}
                     </div>
                     <div style={{
                       fontSize: 9, fontWeight: isLatest ? 700 : 600,
-                      color: isLatest ? INK : INK_40,
+                      color: isLatest ? D_T100 : D_T40,
                       fontFamily: FONT_GEIST,
                       fontVariantNumeric: 'tabular-nums',
                       letterSpacing: '0.04em',
@@ -646,7 +652,7 @@ export const RoundsThatCountCard: React.FC<Props> = ({ connectionId, currentHand
       <div style={{
         display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)',
         borderTop: `0.5px solid ${INK_10}`,
-        borderBottom: `0.5px solid ${INK_10}`,
+        borderBottom: `1px solid ${D_LINE}`,
       }}>
         <StatCell
           label="BEST" value={enriched.minDiff} dotColor={GREEN} valueColor={GREEN}
@@ -673,7 +679,7 @@ export const RoundsThatCountCard: React.FC<Props> = ({ connectionId, currentHand
             marginBottom: 6,
           }}>
             <span style={{
-              fontSize: 9, fontWeight: 800, color: '#64748B', letterSpacing: '0.16em',
+              fontSize: 9, fontWeight: 800, color: 'var(--hcp-t-60)', letterSpacing: '0.16em',
             }}>
               NEXT ROUND
             </span>
@@ -716,17 +722,17 @@ export const RoundsThatCountCard: React.FC<Props> = ({ connectionId, currentHand
             borderTop: `0.5px solid ${INK_10}`,
           }}>
             <p style={{
-              margin: 0, flex: 1, fontSize: 11, color: INK_70, lineHeight: 1.4,
+              margin: 0, flex: 1, fontSize: 11, color: D_T60, lineHeight: 1.4,
               fontFamily: FONT_GEIST,
             }}>
               {willDropCounter ? (
                 <>
-                  <strong style={{ color: INK, fontWeight: 700 }}>{diffStr}</strong>
+                  <strong style={{ color: D_T100, fontWeight: 700 }}>{diffStr}</strong>
                   {' '}from {dateLabel} is a counter — handicap may shift when it drops off.
                 </>
               ) : (
                 <>
-                  Oldest <strong style={{ color: INK, fontWeight: 700 }}>{diffStr}</strong>
+                  Oldest <strong style={{ color: D_T100, fontWeight: 700 }}>{diffStr}</strong>
                   {' '}({dateLabel}) isn't a counter — its drop-off won't change your handicap.
                 </>
               )}
@@ -769,7 +775,7 @@ const StatCell: React.FC<{
         padding: '8px 8px 10px',
         background: active ? AMBER_TINT_06 : 'transparent',
         border: 'none',
-        borderRight: withRightBorder ? `0.5px solid ${INK_10}` : 'none',
+        borderRight: withRightBorder ? `1px solid ${D_LINE}` : 'none',
         cursor: disabled ? 'default' : 'pointer',
         textAlign: 'center',
       }}
@@ -780,7 +786,7 @@ const StatCell: React.FC<{
       }}>
         <span style={{ width: 5, height: 5, borderRadius: '50%', background: dotColor }} />
         <span style={{
-          fontSize: 9, fontWeight: 800, color: INK_55, letterSpacing: '0.14em',
+          fontSize: 9, fontWeight: 800, color: D_T60, letterSpacing: '0.14em',
           whiteSpace: 'nowrap',
         }}>
           {label}
@@ -825,7 +831,7 @@ const AtRiskState: React.FC<{ cutTarget: number; settleAt: number }> = ({
           HEADS UP
         </span>
       </div>
-      <div style={{ fontSize: 13, color: INK, lineHeight: 1.45 }}>
+      <div style={{ fontSize: 13, color: D_T100, lineHeight: 1.45 }}>
         A good counter is dropping off. Your handicap rises to{' '}
         <strong style={{
           fontWeight: 700, color: RED, fontVariantNumeric: 'tabular-nums',
@@ -849,8 +855,8 @@ const SafeState: React.FC<{ cutTarget: number; settleAt: number }> = ({
   }}>
     {/* FOR A CUT */}
     <div style={{
-      background: '#fff',
-      border: `0.5px solid rgba(5,150,105,0.18)`,
+      background: 'var(--hcp-good-tint)',
+      border: '1px solid rgba(34,197,94,0.30)',
       borderLeft: `3px solid ${GREEN}`,
       borderRadius: 10,
       padding: '8px 11px',
@@ -867,7 +873,7 @@ const SafeState: React.FC<{ cutTarget: number; settleAt: number }> = ({
           }}>FOR A CUT</span>
         </div>
         <p style={{
-          margin: 0, fontSize: 10.5, color: INK_55, lineHeight: 1.35,
+          margin: 0, fontSize: 10.5, color: D_T60, lineHeight: 1.35,
         }}>
           Beat this and your handicap drops.
         </p>
@@ -883,9 +889,9 @@ const SafeState: React.FC<{ cutTarget: number; settleAt: number }> = ({
     </div>
     {/* OTHERWISE */}
     <div style={{
-      background: '#fff',
-      border: `0.5px solid ${INK_10}`,
-      borderLeft: `3px solid ${INK_10}`,
+      background: D_BG,
+      border: `1px solid ${D_LINE}`,
+      borderLeft: `3px solid ${D_LINE}`,
       borderRadius: 10,
       padding: '8px 11px',
       display: 'flex', alignItems: 'center', gap: 10,
@@ -894,20 +900,20 @@ const SafeState: React.FC<{ cutTarget: number; settleAt: number }> = ({
         <div style={{
           display: 'flex', alignItems: 'center', gap: 5, marginBottom: 2,
         }}>
-          <Minus size={11} strokeWidth={2.4} color={INK_55} />
+          <Minus size={11} strokeWidth={2.4} color="var(--hcp-t-60)" />
           <span style={{
-            fontSize: 9, fontWeight: 800, color: INK_55,
+            fontSize: 9, fontWeight: 800, color: D_T60,
             letterSpacing: '0.12em',
           }}>OTHERWISE</span>
         </div>
         <p style={{
-          margin: 0, fontSize: 10.5, color: INK_55, lineHeight: 1.35,
+          margin: 0, fontSize: 10.5, color: D_T60, lineHeight: 1.35,
         }}>
           Settles here · no risk of going up.
         </p>
       </div>
       <div style={{
-        fontSize: 16, fontWeight: 700, color: INK,
+        fontSize: 16, fontWeight: 700, color: D_T100,
         fontVariantNumeric: 'tabular-nums',
         letterSpacing: '-0.02em', lineHeight: 1,
         fontFamily: FONT_GEIST, flexShrink: 0,
@@ -944,7 +950,7 @@ const CutTargetCard: React.FC<{ cutTarget: number }> = ({ cutTarget }) => (
           {fmtDiff(cutTarget)}
         </span>
       </div>
-      <div style={{ fontSize: 12.5, color: INK_55, marginTop: 6, lineHeight: 1.4 }}>
+      <div style={{ fontSize: 12.5, color: D_T60, marginTop: 6, lineHeight: 1.4 }}>
         Beat this differential and your handicap drops.
       </div>
     </div>
