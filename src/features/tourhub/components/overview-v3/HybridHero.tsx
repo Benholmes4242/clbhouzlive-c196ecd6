@@ -202,6 +202,7 @@ export function HybridHero({ slide }: HybridHeroProps) {
     return lastYearTop4.map(f => ({
       rank: f.rank,
       name: f.name,
+      country: f.country,
       score: f.score,
       year: f.year,
       avatarUrl: f.photoUrl,
@@ -246,6 +247,7 @@ export function HybridHero({ slide }: HybridHeroProps) {
         venueImageUrl={venueImageUrl}
         state={state}
         tourLabel={tourLabel}
+        isMajor={tournament.isMajor}
       />
       <MiddleBand
         state={state}
@@ -265,6 +267,7 @@ export function HybridHero({ slide }: HybridHeroProps) {
         teeTimes={teeTimes}
         lastYearFinishers={lastYearFinishers}
         firstYearEvent={showFirstYearPlaceholder}
+        tourSlug={tournament.tourSlug}
         onCtaTap={onCtaTap}
       />
     </div>

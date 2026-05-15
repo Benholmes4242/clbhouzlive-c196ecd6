@@ -18,6 +18,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { TOUR_CONFIG, type TourId } from './useOverviewData';
 import { useTournamentsCache, type CachedTournament } from '@/hooks/useTournamentsCache';
 import { getContextLabel } from '../utils/tournamentClassification';
+import { isAnyMajor } from '../utils/majorScope';
 
 // Tour priority order for sorting live tournaments
 const TOUR_PRIORITY: TourId[] = ['pga', 'liv', 'euro', 'lpga', 'pgad', 'champ'];
@@ -240,7 +241,7 @@ export function useHeroCarouselData() {
           defendingChampionPhotoUrl: champData?.photo_url ?? null,
           defendingChampionPgaTourId: champData?.pga_tour_id ?? null,
           championNarrative: row.champion_narrative || null,
-          isMajor: contextLabel === 'MAJOR CHAMPIONSHIP',
+          isMajor: contextLabel === 'MAJOR CHAMPIONSHIP' || isAnyMajor(row.name || ''),
           isSignature: contextLabel === 'SIGNATURE EVENT' || contextLabel === 'ROLEX SERIES',
           winnerId: row.winner_id,
           winnerName,
