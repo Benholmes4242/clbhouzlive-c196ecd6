@@ -58,13 +58,10 @@ function buildAlumniSubtitle(
 export function CollegeProfilePage() {
   const { collegeSlug } = useParams<{ collegeSlug: string }>();
 
-  const queryClient = useQueryClient();
   const navigate = useNavigate();
-  const { hideHeader, showHeader } = useHeader();
 
   // Transparent status bar for immersive hero bleed into safe area
   useMedianStatusBar('dark', 'transparent', true, false);
-  const { sentinelRef, paddingTop: stickyPaddingTop } = useStickyHeaderSafeArea();
 
   const { data: stats, isLoading: statsLoading, error: _statsError, refetch: refetchStats } = useCollegeStats(collegeSlug);
   const { data: collegeMap, isLoading: mediaLoading } = useCollegeMediaMap();
@@ -76,11 +73,6 @@ export function CollegeProfilePage() {
 
   const [heroImgError, setHeroImgError] = useState(false);
 
-  // Pull-to-refresh state
-  const [isRefreshing, setIsRefreshing] = useState(false);
-  const [pullDistance, setPullDistance] = useState(0);
-  const touchStartY = useRef(0);
-  const isPulling = useRef(false);
 
   const college = collegeSlug ? collegeMap?.get(collegeSlug) || null : null;
   const displayName = college?.short_name || college?.college_name || collegeSlug || 'College';
