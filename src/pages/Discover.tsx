@@ -8,10 +8,15 @@ import { useRehydrationSafe } from '@/contexts/RehydrationContext';
 import SegmentedControl from '@/components/discover/SegmentedControl';
 import SlidingPanels from '@/components/ui/SlidingPanels';
 import { useDiscoverQuery } from '@/utils/useDiscoverQuery';
-import { useNavigate } from 'react-router-dom';
+
 import ShellSlot from '@/components/header/ShellSlot';
 import { WatchMoodChips } from '@/components/watch/proshop/WatchMoodChips';
 import { useWatchMood } from '@/components/watch/proshop/hooks/useWatchMood';
+import DiscoverExploreShellRow from '@/components/discover/DiscoverExploreShellRow';
+import DiscoverFriendsShellRow from '@/components/discover/DiscoverFriendsShellRow';
+import { useExploreMood } from '@/components/explore-tab-new/hooks/useExploreMood';
+import { useExploreRegion } from '@/components/explore-tab-new/hooks/useExploreRegion';
+import { useLoopMode } from '@/components/loop-tab/hooks/useLoopMode';
 
 // Lazy load heavy/inactive components for better initial bundle size
 const WatchTab = lazy(() => import('@/components/discover/WatchTab'));
@@ -21,11 +26,16 @@ const NewCoursesTab = lazy(() => import('@/components/discover/NewExploreTab'));
 type MainKey = 'watch' | 'loop' | 'courses';
 
 const Discover = () => {
-  const navigate = useNavigate();
+  // (navigate not used here)
 
   const { isRehydrating } = useRehydrationSafe();
   const { main, setMain } = useDiscoverQuery();
   const { mood, setMood } = useWatchMood();
+
+  // URL-backed filter state shared with the active sub-tab's body.
+  const { mood: exploreMood, setMood: setExploreMood } = useExploreMood();
+  const { region: exploreRegion, setRegion: setExploreRegion } = useExploreRegion();
+  const { mode: loopMode, setMode: setLoopMode } = useLoopMode();
 
   useEffect(() => {
     logDiscoverPageMount();
@@ -52,6 +62,20 @@ const Discover = () => {
         </div>
         {main === 'watch' && (
           <WatchMoodChips active={mood} onChange={setMood} />
+        )}
+        {main === 'courses' && (
+          <DiscoverExploreShellRow
+            activeMood={exploreMood}
+            onMoodChange={setExploreMood}
+            activeRegion={exploreRegion}
+            onRegionChange={setExploreRegion}
+          />
+        )}
+        {main === 'loop' && (
+          <DiscoverFriendsShellRow
+            activeMode={loopMode}
+            onModeChange={setLoopMode}
+          />
         )}
       </ShellSlot>
 

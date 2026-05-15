@@ -1,17 +1,31 @@
 import { memo } from 'react';
-import { VIDEOS_MOODS, type VideosMoodId } from './hooks/useVideosMood';
+import type { LoopMode } from '@/components/loop-tab/types';
 
-interface VideosMoodChipsProps {
-  active: VideosMoodId;
-  onChange: (id: VideosMoodId) => void;
+interface ChipDef {
+  id: LoopMode;
+  label: string;
+  emoji?: string;
+}
+
+const MODES: ChipDef[] = [
+  { id: 'latest', label: 'Latest' },
+  { id: 'popular', label: 'Popular' },
+  { id: 'live_now', label: 'Live now', emoji: '🟢' },
+];
+
+interface DiscoverFriendsShellRowProps {
+  activeMode: LoopMode;
+  onModeChange: (mode: LoopMode) => void;
 }
 
 /**
- * Canonical chip strip — matches WatchMoodChips exactly. 30px tall pills,
- * 12px label / 13px emoji, transparent inactive bg, amber active state,
- * 28px right-edge fade.
+ * Row 2 of the Discover shell when main=loop. Canonical chip styling
+ * (matches WatchMoodChips). Three chips: Latest / Popular / 🟢 Live now.
  */
-function VideosMoodChipsInner({ active, onChange }: VideosMoodChipsProps) {
+function DiscoverFriendsShellRowInner({
+  activeMode,
+  onModeChange,
+}: DiscoverFriendsShellRowProps) {
   return (
     <div
       className="relative"
@@ -22,19 +36,22 @@ function VideosMoodChipsInner({ active, onChange }: VideosMoodChipsProps) {
     >
       <div
         role="tablist"
-        aria-label="Filter Videos by mood"
+        aria-label="Filter Friends feed"
         className="flex gap-1.5 overflow-x-auto scrollbar-hide"
         style={{ padding: '8.5px 28px 8.5px 16px' }}
       >
-        {VIDEOS_MOODS.map((m) => {
-          const isActive = active === m.id;
+        {MODES.map((m) => {
+          const isActive = activeMode === m.id;
           return (
             <button
               key={m.id}
               type="button"
               role="tab"
               aria-selected={isActive}
-              onClick={() => onChange(m.id)}
+              onClick={() => {
+                onModeChange(m.id);
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+              }}
               className="shrink-0 transition-colors active:scale-[0.97] flex items-center"
               style={{
                 height: 30,
@@ -50,7 +67,7 @@ function VideosMoodChipsInner({ active, onChange }: VideosMoodChipsProps) {
                 whiteSpace: 'nowrap',
               }}
             >
-              <span aria-hidden style={{ fontSize: 13 }}>{m.emoji}</span>
+              {m.emoji && <span aria-hidden style={{ fontSize: 13 }}>{m.emoji}</span>}
               <span>{m.label}</span>
             </button>
           );
@@ -69,5 +86,5 @@ function VideosMoodChipsInner({ active, onChange }: VideosMoodChipsProps) {
   );
 }
 
-export const VideosMoodChips = memo(VideosMoodChipsInner);
-export default VideosMoodChips;
+export const DiscoverFriendsShellRow = memo(DiscoverFriendsShellRowInner);
+export default DiscoverFriendsShellRow;
