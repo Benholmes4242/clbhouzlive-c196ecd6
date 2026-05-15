@@ -246,6 +246,7 @@ export function HybridHero({ slide }: HybridHeroProps) {
         venueImageUrl={venueImageUrl}
         state={state}
         tourLabel={tourLabel}
+        isMajor={tournament.isMajor}
       />
       <MiddleBand
         state={state}
@@ -265,6 +266,7 @@ export function HybridHero({ slide }: HybridHeroProps) {
         teeTimes={teeTimes}
         lastYearFinishers={lastYearFinishers}
         firstYearEvent={showFirstYearPlaceholder}
+        tourSlug={tournament.tourSlug}
         onCtaTap={onCtaTap}
       />
     </div>
