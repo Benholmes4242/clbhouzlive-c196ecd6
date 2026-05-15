@@ -717,101 +717,24 @@ export function PlayersTab() {
         );
       })()}
 
-      {/* Sentinel for sticky-header safe-area detection */}
-      <div ref={stickyHeaderSentinelRef} aria-hidden style={{ height: 1 }} />
-
-      {/* ══════════════════════════════════════════════
-          STICKY HEADER — back link · sort · search
-          ══════════════════════════════════════════════ */}
-      <div
-        className="sticky top-0 z-20"
-        style={{
-          paddingTop: stickyPaddingTop,
-          transition: 'padding-top 200ms ease',
-          background: 'rgba(248,250,252,0.97)',
-          backdropFilter: 'blur(20px)',
-          WebkitBackdropFilter: 'blur(20px)',
-          borderBottom: '0.5px solid rgba(15,23,42,0.08)',
-        }}
-      >
-        {/* Top collapsible search removed — search now lives inline replacing the count bar (Phase 1 fix.1.7) */}
-
-        {/* Control row — back link + search button (sort pill removed Phase 1 fix.1.2) */}
-        <div style={{ display: 'flex', alignItems: 'center', padding: '8px 16px 0', gap: '6px' }}>
-          <button
-            type="button"
-            onClick={() => navigate('/tourhub?tab=overview', { replace: true })}
-            className="active:opacity-50 transition-opacity shrink-0"
-            style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: 2,
-              fontSize: 12,
-              fontWeight: 600,
-              color: '#64748B',
-              background: 'none',
-              border: 'none',
-              padding: 0,
-              cursor: 'pointer',
-            }}
-          >
-            <ChevronLeft size={13} strokeWidth={2.5} />
-            Tour Overview
-          </button>
-
-          <div style={{ flex: 1 }} />
-
-          {/* Search button + tour filter pill — right cluster */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-            {!searchExpanded && (
-              <button
-                onClick={() => setSearchExpanded(true)}
-                style={{
-                  display: 'flex', alignItems: 'center', gap: 5,
-                  padding: '6px 11px', borderRadius: 8,
-                  background: '#EDF1F5',
-                  border: 'none', cursor: 'pointer',
-                }}
-                aria-label="Search players"
-              >
-                <Search className="w-3 h-3" style={{ color: '#0F172A' }} strokeWidth={2.5} />
-                <span style={{ fontSize: 12, fontWeight: 700, color: '#0F172A' }}>Search</span>
-              </button>
-            )}
-            {/* Tour filter pill — moved from masthead */}
+      {/* Inline control row — search button only (back link + tour pill moved to shell) */}
+      <div>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', padding: '8px 16px 0' }}>
+          {!searchExpanded && (
             <button
-              onClick={() => setTourSheetOpen(true)}
-              className="active:scale-[0.97] transition-all duration-150"
+              onClick={() => setSearchExpanded(true)}
               style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: 6,
-                padding: '6px 11px',
-                background: '#FEF3E7',
-                border: '1.5px solid #F7931E',
-                borderRadius: 10,
-                fontSize: 12,
-                fontWeight: 600,
-                color: '#0F172A',
-                cursor: 'pointer',
+                display: 'flex', alignItems: 'center', gap: 5,
+                padding: '6px 11px', borderRadius: 8,
+                background: '#EDF1F5',
+                border: 'none', cursor: 'pointer',
               }}
+              aria-label="Search players"
             >
-              {hasTourLogo(activeTour.toLowerCase())
-                ? <img src={getTourLogo(activeTour.toLowerCase())} alt={activeTour} className="shrink-0" style={{ width: 14, height: 14, objectFit: 'contain' }} />
-                : <Globe className="w-[12px] h-[12px] shrink-0" style={{ color: '#F7931E' }} strokeWidth={2.5} />
-              }
-              <span>
-                {activeTour === 'pga' ? 'PGA Tour'
-                  : activeTour === 'EURO' ? 'DP World Tour'
-                  : activeTour === 'LPGA' ? 'LPGA'
-                  : activeTour === 'PGAD' ? 'Korn Ferry'
-                  : activeTour === 'LIV' ? 'LIV Golf'
-                  : activeTour === 'CHAMP' ? 'Champions Tour'
-                  : 'Tour'}
-              </span>
-              <ChevronDown className="w-2.5 h-2.5" style={{ color: '#94A3B8' }} strokeWidth={2.5} />
+              <Search className="w-3 h-3" style={{ color: '#0F172A' }} strokeWidth={2.5} />
+              <span style={{ fontSize: 12, fontWeight: 700, color: '#0F172A' }}>Search</span>
             </button>
-          </div>
+          )}
         </div>
 
         {/* Underline tour-specific tabs (A-Z removed Phase 1 fix.1.6) */}
