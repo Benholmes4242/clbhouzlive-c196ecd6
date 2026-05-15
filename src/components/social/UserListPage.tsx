@@ -95,13 +95,12 @@ interface UserListPageProps {
 
 const SectionEyebrow: React.FC<{ label: string; count?: number }> = ({ label, count }) => (
   <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-    <div style={{ width: 3, height: 10, background: AMBER, borderRadius: 1 }} />
     <span
       style={{
-        fontSize: 10,
+        fontSize: 9,
         fontWeight: 800,
-        color: INK_SUBTLE,
-        letterSpacing: '0.25em',
+        color: '#64748B',
+        letterSpacing: '0.16em',
         textTransform: 'uppercase',
         fontFeatureSettings: '"kern" 1, "liga" 1',
       }}
@@ -111,10 +110,9 @@ const SectionEyebrow: React.FC<{ label: string; count?: number }> = ({ label, co
     {count != null && (
       <span
         style={{
-          fontSize: 10,
+          fontSize: 9,
           fontWeight: 800,
-          color: INK_FAINT,
-          letterSpacing: '0.16em',
+          color: '#94A3B8',
           fontVariantNumeric: 'tabular-nums',
         }}
       >
@@ -136,7 +134,7 @@ const FriendBadge: React.FC = () => (
       color: AMBER_DEEP,
       fontSize: 9,
       fontWeight: 800,
-      letterSpacing: '0.08em',
+      letterSpacing: '0.14em',
       textTransform: 'uppercase',
       lineHeight: 1,
       flexShrink: 0,
@@ -153,7 +151,7 @@ const HandicapInline: React.FC<{ value: number }> = ({ value }) => (
         fontSize: 9,
         fontWeight: 800,
         color: INK_SUBTLE,
-        letterSpacing: '0.1em',
+        letterSpacing: '0.14em',
         textTransform: 'uppercase',
       }}
     >
@@ -192,7 +190,7 @@ const FollowingFilterChip: React.FC<FollowingFilterChipProps> = ({ label, count,
       color: isActive ? '#FFFFFF' : INK_SOFT,
       border: isActive ? '1px solid transparent' : `1px solid ${BORDER}`,
       borderRadius: 999,
-      fontSize: 12.5,
+      fontSize: 13,
       fontWeight: 700,
       cursor: 'pointer',
       display: 'inline-flex',
@@ -490,11 +488,11 @@ export const UserListPage: React.FC<UserListPageProps> = ({
               <h1
                 style={{
                   fontFamily: FONT_SERIF,
-                  fontSize: 32,
-                  fontWeight: 900,
+                  fontSize: 34,
+                  fontWeight: 800,
                   color: INK,
                   lineHeight: 1.05,
-                  letterSpacing: '-0.01em',
+                  letterSpacing: '-0.025em',
                   margin: 0,
                   fontFeatureSettings: '"kern" 1, "liga" 1',
                 }}
