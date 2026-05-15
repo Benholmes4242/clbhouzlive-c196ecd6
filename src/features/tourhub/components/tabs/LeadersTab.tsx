@@ -316,22 +316,7 @@ export function LeadersTab() {
   const activeGroupCats = LEADER_CATEGORIES.filter(c => activeGroupKeys.includes(c.key));
 
   return (
-    <div
-      onTouchStart={onTouchStart}
-      onTouchMove={onTouchMove}
-      onTouchEnd={onTouchEnd}
-    >
-      {/* Pull-to-refresh indicator */}
-      <div className="flex justify-center overflow-hidden" style={{ height: pullDistance > 0 || isRefreshing ? `${Math.max(pullDistance, isRefreshing ? 40 : 0)}px` : '0px', transition: isRefreshing ? 'none' : 'height 0.2s ease' }}>
-        <motion.div
-          className="flex items-center justify-center"
-          animate={{ rotate: isRefreshing ? 360 : pullDistance * 3.6 }}
-          transition={isRefreshing ? { repeat: Infinity, duration: 0.8, ease: 'linear' } : { duration: 0 }}
-        >
-          <RefreshCw className="w-5 h-5 text-muted-foreground" />
-        </motion.div>
-      </div>
-
+    <div>
       {/* Unified editorial masthead */}
       <LeadersMasthead
         leader={leader}
@@ -345,35 +330,9 @@ export function LeadersTab() {
         onEyebrowTap={() => navigate('/tourhub?tab=overview', { replace: true })}
       />
 
-      {/* Sentinel for sticky-header safe-area detection */}
-      <div ref={sentinelRef} aria-hidden style={{ height: 1 }} />
-
-      {/* Sticky header — back link + group tabs + chip rail + count/search */}
-      <div
-        className="sticky top-0 z-20"
-        style={{
-          paddingTop,
-          background: 'rgba(248,250,252,0.97)',
-          backdropFilter: 'blur(20px)',
-          WebkitBackdropFilter: 'blur(20px)',
-          borderBottom: '0.5px solid rgba(15,23,42,0.08)',
-          transition: 'padding-top 200ms ease',
-        }}
-      >
-        {/* Control row — back link + search button */}
-        <div style={{ display: 'flex', alignItems: 'center', padding: '8px 16px 0', gap: 6 }}>
-          <Link
-            to="/tourhub?tab=overview"
-            replace
-            className="flex items-center gap-0.5 active:opacity-50 transition-opacity shrink-0"
-            style={{ fontSize: '12px', fontWeight: 500, color: '#64748B', textDecoration: 'none', marginLeft: '-4px' }}
-          >
-            <ChevronLeft size={13} strokeWidth={2.5} />
-            Tour Overview
-          </Link>
-
-          <div style={{ flex: 1 }} />
-
+      {/* Inline control row — search button only (back link + group/chip nav moved to shell) */}
+      <div>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', padding: '8px 16px 0' }}>
           {!searchExpanded && (
             <button
               onClick={() => setSearchExpanded(true)}
@@ -389,58 +348,6 @@ export function LeadersTab() {
               <span style={{ fontSize: 12, fontWeight: 700, color: '#0F172A' }}>Search</span>
             </button>
           )}
-        </div>
-
-        {/* Group underline tabs */}
-        <div style={{ display: 'flex', borderBottom: '1px solid rgba(15,23,42,0.10)', marginTop: '6px' }}>
-          {Object.keys(GROUP_KEYS).map((groupLabel) => {
-            const isActive = groupLabel === activeGroup;
-            const firstKey = GROUP_KEYS[groupLabel]?.[0];
-            return (
-              <button
-                key={groupLabel}
-                onClick={() => { if (firstKey) setCategory(firstKey); }}
-                className="active:opacity-70 transition-opacity"
-                style={{
-                  flex: 1, padding: '12px 0',
-                  fontSize: '12px',
-                  fontWeight: isActive ? 800 : 600,
-                  color: isActive ? '#0F172A' : '#94A3B8',
-                  background: 'transparent', border: 'none',
-                  borderBottom: isActive ? '2px solid #F7931E' : '2px solid transparent',
-                  cursor: 'pointer', whiteSpace: 'nowrap' as const,
-                  textAlign: 'center' as const,
-                }}
-              >
-                {groupLabel}
-              </button>
-            );
-          })}
-        </div>
-
-        {/* Category chips — canonical filter-pill treatment */}
-        <div style={{ display: 'flex', gap: '8px', padding: '14px 20px 12px', overflowX: 'auto', scrollbarWidth: 'none' }}>
-          {activeGroupCats.map(cat => {
-            const on = cat.key === categoryKey;
-            return (
-              <button
-                key={cat.key}
-                onClick={() => setCategory(cat.key)}
-                className="flex-shrink-0 active:scale-[0.97]"
-                style={{
-                  padding: '6px 12px', borderRadius: '8px',
-                  fontSize: '11px', fontWeight: on ? 800 : 700,
-                  color: '#0F172A',
-                  background: on ? '#FEF3E7' : '#ffffff',
-                  border: `1.5px solid ${on ? '#F7931E' : '#E2E8F0'}`,
-                  cursor: 'pointer', whiteSpace: 'nowrap' as const,
-                  transition: 'background 0.15s, border-color 0.15s',
-                }}
-              >
-                {(cat as any).emoji} {cat.shortLabel}
-              </button>
-            );
-          })}
         </div>
 
         {/* Count bar OR search input — mutually exclusive */}
