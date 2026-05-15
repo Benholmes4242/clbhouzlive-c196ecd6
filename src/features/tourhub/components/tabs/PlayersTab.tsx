@@ -6,7 +6,12 @@
 import { useState, useMemo, useCallback, useEffect, useRef, type RefObject } from 'react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useSearchParams, useLocation, useNavigate } from 'react-router-dom';
-import { ChevronRight, Crown, Users } from 'lucide-react';
+import { Search, X, ChevronDown, ChevronLeft, ChevronRight, RefreshCw, Globe, Users, Crown } from 'lucide-react';
+import { cn } from '@/lib/utils';
+import { BottomSheet } from '@/components/ui/BottomSheet';
+import SheetHeader from '@/components/ui/SheetHeader';
+import { getTourLogo, hasTourLogo } from '../../utils/tourLogos';
+import { useStickyHeaderSafeArea } from '@/hooks/useStickyHeaderSafeArea';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useQueryClient } from '@tanstack/react-query';
 import { useTourPlayers, useTourSeason, useTourPlayerStatistics, type TourPlayer } from '../../hooks/useTourHubData';
