@@ -606,7 +606,6 @@ export function NewConversationModal({
             <div style={{ padding: '6px 20px 6px' }}>
               <SectionEyebrow label={dmSearch.trim() ? 'Results' : 'Suggested'} />
             </div>
-            </div>
 
             <ScrollArea className="flex-1">
               {dmSearch.trim() ? (
