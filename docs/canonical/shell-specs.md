@@ -94,7 +94,8 @@ Pages consume `--chrome-total-h`. They do not consume `--shell-extra-h` directly
 |--------------------|----------------------------------------------------|----------------------|--------------|
 | Tab-tier           | Discover/Watch, Discover/Explore, Discover/Friends | Discover tabs        | filter chips |
 | Subpage            | Watch/Videos, Watch/Clips                          | editorial title      | filter chips |
-| Tour Hub tab-tier  | /tourhub (Overview/Schedule/Players/Leaders), /tourhub/college-golf | 5-destination Tour Hub tab strip | filter chips (per page) |
+| Tour Hub tab-tier  | /tourhub (Overview/Schedule/Players/Leaders), /tourhub/college-golf | 5-destination Tour Hub tab strip | per-page chrome (Schedule = season chips, Players = search/sort, Leaders = 4-stat chips, College = none) |
+| Tour Hub subpage   | /tourhub/tournament/:id, /tourhub/player/:id, /tourhub/college/profile/:slug, /tourhub/college/compare | (none — CompactHeader back arrow handles nav) | Tournament Detail = 4-tab strip (Overview/Leaderboard/Tee Times/Holes\|Summary); Player/College = none |
 
 ## Tour Hub tab-tier variant
 
