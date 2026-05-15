@@ -13,6 +13,7 @@ import { toast } from 'sonner';
 import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
 import { haptic } from '@/utils/haptics';
 import { AnimatedEchoWave } from '@/features/echo/components/ui/AnimatedEchoWave';
+import { SectionEyebrow } from '@/components/ui/SectionEyebrow';
 
 interface EchoHistorySheetProps {
   isOpen: boolean;
@@ -287,12 +288,7 @@ export function EchoHistorySheet({ isOpen, onClose, onSelectConversation }: Echo
               className="px-5 pb-3 flex items-center justify-between"
               style={{ borderBottom: '0.5px solid rgba(15,23,42,0.07)' }}
             >
-              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                <div style={{ width: 3, height: 12, background: '#F7931E', borderRadius: 1, flexShrink: 0 }} />
-                <span style={{ fontSize: 9, fontWeight: 900, color: '#F7931E', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>
-                  Conversations
-                </span>
-              </div>
+              <SectionEyebrow label="Conversations" />
               <button
                 onClick={onClose}
                 className="flex items-center justify-center active:scale-[0.95] transition-transform"

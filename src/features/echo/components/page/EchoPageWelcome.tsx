@@ -228,7 +228,7 @@ export function EchoPageWelcome({ profile, onChipSelect }: EchoPageWelcomeProps)
         {/* Greeting */}
         <div className="text-center mb-2">
           <h1
-            className="text-[28px] font-bold tracking-tight"
+            className="text-[28px] font-extrabold tracking-tight"
             style={{ color: '#0F172A' }}
           >
             {profile.firstName ? `${greeting}, ${profile.firstName}.` : `${greeting}.`}
@@ -245,8 +245,8 @@ export function EchoPageWelcome({ profile, onChipSelect }: EchoPageWelcomeProps)
         <div className="flex items-center gap-3 my-6 w-full max-w-[340px]">
           <div className="flex-1 h-px" style={{ background: 'rgba(15,23,42,0.07)' }} />
           <span
-            className="text-[11px] font-semibold uppercase tracking-[0.12em]"
-            style={{ color: '#94A3B8' }}
+            className="text-[9px] font-extrabold uppercase tracking-[0.16em]"
+            style={{ color: '#64748B' }}
           >
             Try asking
           </span>
@@ -273,7 +273,7 @@ export function EchoPageWelcome({ profile, onChipSelect }: EchoPageWelcomeProps)
               <span className="flex items-center gap-2 min-w-0">
                 {prompt.isPersonalized && (
                   <span
-                    className="flex-shrink-0 px-1.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider"
+                    className="flex-shrink-0 px-1.5 py-0.5 rounded text-[9px] font-extrabold uppercase tracking-[0.14em]"
                     style={{ background: 'rgba(247,147,30,0.15)', color: '#F7931E' }}
                   >
                     For You
@@ -287,7 +287,7 @@ export function EchoPageWelcome({ profile, onChipSelect }: EchoPageWelcomeProps)
         </div>
 
         {/* Hint */}
-        <p className="mt-4 text-[12px] text-center" style={{ color: 'rgba(15,23,42,0.25)' }}>
+        <p className="mt-4 text-[12px] text-center" style={{ color: '#94A3B8' }}>
           Ask me anything about golf
         </p>
       </div>

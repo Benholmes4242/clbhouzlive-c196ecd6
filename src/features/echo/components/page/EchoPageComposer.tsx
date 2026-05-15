@@ -168,7 +168,7 @@ export const EchoPageComposer = forwardRef<HTMLInputElement, EchoPageComposerPro
               className="w-8 h-8 rounded-full flex items-center justify-center bg-transparent opacity-50"
               aria-label="Send message"
             >
-              <ArrowUp className="w-4 h-4" style={{ color: 'rgba(15,23,42,0.3)' }} />
+              <ArrowUp className="w-4 h-4" style={{ color: '#94A3B8' }} />
             </button>
           )}
         </div>
