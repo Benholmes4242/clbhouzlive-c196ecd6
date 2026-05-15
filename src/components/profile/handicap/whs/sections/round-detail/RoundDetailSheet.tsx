@@ -108,16 +108,7 @@ export const RoundDetailSheet: React.FC<Props> = ({
     return any ? total : null;
   }, [isFriend, friendDetail, userData]);
 
-  const counterRank = useMemo<number | null>(() => {
-    if (isFriend || !userData?.is_counter || !allScores) return null;
-    const last20 = allScores.slice(0, 20);
-    const sorted = [...last20]
-      .filter((s) => s.handicap_differential != null)
-      .sort((a, b) => a.handicap_differential! - b.handicap_differential!);
-    const idx = sorted.findIndex((s) => s.id === userData.id);
-    if (idx === -1) return null;
-    return Math.min(idx + 1, 20);
-  }, [isFriend, userData, allScores]);
+  // counterRank: previously used by removed CounterPill (signal now via gross ring).
 
   const renderUserBody = () => {
     if (userLoading) return <SheetSkeleton />;
