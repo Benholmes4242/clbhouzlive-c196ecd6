@@ -30,20 +30,17 @@ interface LiveOverviewTabProps {
 
 const sectionRule = (label: string) => (
   <div style={{ padding: '14px 20px 8px', background: '#F8FAFC' }}>
-    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-      <div style={{ width: 3, height: 14, background: '#F7931E', borderRadius: 1, flexShrink: 0 }} />
-      <span
-        style={{
-          fontSize: 10,
-          fontWeight: 900,
-          color: '#F7931E',
-          letterSpacing: '0.16em',
-          textTransform: 'uppercase' as const,
-        }}
-      >
-        {label}
-      </span>
-    </div>
+    <span
+      style={{
+        fontSize: 9,
+        fontWeight: 800,
+        color: '#64748B',
+        letterSpacing: '0.16em',
+        textTransform: 'uppercase' as const,
+      }}
+    >
+      {label}
+    </span>
   </div>
 );
 
