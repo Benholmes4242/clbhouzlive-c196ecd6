@@ -68,7 +68,7 @@ const RoundRow: React.FC<{
         </p>
         {/* Score and diff */}
         <p className="text-xs text-muted-foreground mt-0.5">
-          {round.score} ({scoreToPar > 0 ? '+' : ''}{scoreToPar}) · Diff: {round.differential.toFixed(1)}
+          {round.score} ({scoreToPar > 0 ? '+' : ''}{scoreToPar}) · Score Diff: {round.differential.toFixed(1)}
         </p>
       </div>
       

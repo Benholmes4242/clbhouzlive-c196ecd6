@@ -38,9 +38,9 @@ export interface RoundCardBodyProps {
   /** HCP index delta, e.g. -0.1 → green pill ↓0.1. Null/abs<0.05 hides the pill. */
   handicapDelta: number | null;
   /**
-   * Whether the round was a counter (entered the user's best-8). Non-counters
-   * mathematically cannot move the index, so the HCP pill is suppressed for
-   * them even when handicapDelta is non-null.
+   * Whether the round counts toward the user's handicap index. Counting
+   * rounds render with a green ring around the gross score; non-counting
+   * rounds render plain.
    */
   isCounter: boolean;
   /** Hole-by-hole data. If absent, the strip block is omitted. */
