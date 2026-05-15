@@ -274,7 +274,7 @@ export function HoleStatsTab({ tournamentId, isCompleted }: HoleStatsTabProps) {
               const isEasy = hole.avgDiff < -0.2;
               return (
                 <div key={hole.holeNumber} style={{ display: 'flex', alignItems: 'center', padding: '10px 20px', borderBottom: '0.5px solid rgba(15,23,42,0.07)' }}>
-                  <span style={{ width: '28px', fontSize: '14px', fontWeight: 900, color: isHard ? '#DC2626' : isEasy ? '#F7931E' : '#94A3B8', flexShrink: 0 }}>{hole.holeNumber}</span>
+                  <span style={{ width: '28px', fontSize: '14px', fontWeight: 800, color: isHard ? '#DC2626' : isEasy ? '#F7931E' : '#94A3B8', flexShrink: 0 }}>{hole.holeNumber}</span>
                   <span style={{ width: '28px', fontSize: '12px', color: '#64748B', flexShrink: 0 }}>{hole.par}</span>
                   {/* yardage column dropped — see header comment */}
                   <div style={{ flex: 1, height: '6px', borderRadius: '3px', overflow: 'hidden', display: 'flex' }}>
