@@ -42,7 +42,7 @@ interface RankedItem {
 export function LeadersTab() {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
-  const categoryKey = searchParams.get('category') || 'world_rank';
+  const categoryKey = searchParams.get('category') || 'earnings';
   const category = getCategoryByKey(categoryKey) || LEADER_CATEGORIES[0];
 
   const { data: season } = useTourSeason();
