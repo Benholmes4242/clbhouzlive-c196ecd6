@@ -197,8 +197,15 @@ const HeaderNavigation: React.FC<HeaderNavigationProps> = ({ onInteraction, useL
     );
   }
 
+  const isClubhouseRoute = location.pathname === '/' || location.pathname === '/clubhouse';
+
   return (
     <div ref={navigationRef} className="flex items-center space-x-1 md:space-x-4">
+      {/* Handicap Pill — Clubhouse header only, left of avatar */}
+      {isClubhouseRoute && !useLightTheme && (
+        <HandicapPill onTap={handleProfileClick} />
+      )}
+
       {/* Identity Selector - only shown when user has multiple identities */}
       <div className="hidden sm:block">
         <IdentitySelector />
