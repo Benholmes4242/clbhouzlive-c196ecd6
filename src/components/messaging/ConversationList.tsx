@@ -12,6 +12,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { SwipeableConversationItem } from './SwipeableConversationItem';
 import type { ConversationWithDetails } from '@/types/messaging';
+import { SectionEyebrow } from '@/components/ui/SectionEyebrow';
 
 interface ConversationListProps {
   onSelectConversation: (id: string) => void;
