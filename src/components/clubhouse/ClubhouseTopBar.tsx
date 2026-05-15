@@ -60,6 +60,7 @@ export const ClubhouseTopBar: React.FC<ClubhouseTopBarProps> = ({
   hideSearch = false,
   hideProfilePill = false,
 }) => {
+  const navigate = useNavigate();
   const [searchOpen, setSearchOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const pillRef = useRef<HTMLButtonElement>(null);
