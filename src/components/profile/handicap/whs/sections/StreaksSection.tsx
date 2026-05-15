@@ -18,6 +18,12 @@ const INK_10 = 'rgba(15,23,42,0.10)';
 const INK_06 = 'rgba(15,23,42,0.06)';
 const GREEN = '#059669';
 const FONT_GEIST = 'Geist, system-ui, -apple-system, BlinkMacSystemFont, sans-serif';
+const D_BG    = 'var(--hcp-bg-1)';
+const D_LINE  = 'var(--hcp-line)';
+const D_T100  = 'var(--hcp-t-100)';
+const D_T60   = 'var(--hcp-t-60)';
+const D_T40   = 'var(--hcp-t-40)';
+
 
 interface Props {
   connectionId: string;
@@ -156,8 +162,8 @@ const SecondaryStreakTile: React.FC<{
       style={{
         flex: '1 1 0',
         minWidth: 0,
-        background: '#fff',
-        border: `0.5px solid ${INK_10}`,
+        background: D_BG,
+        border: `1px solid ${D_LINE}`,
         borderRadius: 14,
         padding: 14,
         display: 'flex',
@@ -234,7 +240,7 @@ const StreakCard: React.FC<StreakCardProps> = ({
   const isActive = streak.isActive;
 
   const renderIcon = () => {
-    const iconColor = isActive ? color : INK_40;
+    const iconColor = isActive ? color : D_T40;
     const fill = isActive && icon === 'flame' ? color : 'none';
     if (icon === 'flame') {
       return <Flame size={16} color={iconColor} strokeWidth={2.4} fill={fill} />;
@@ -250,9 +256,9 @@ const StreakCard: React.FC<StreakCardProps> = ({
       style={{
         flexShrink: 0,
         width: 240,
-        background: '#fff',
+        background: D_BG,
         borderRadius: 18,
-        border: `0.5px solid ${INK_10}`,
+        border: `1px solid ${D_LINE}`,
         padding: '16px 14px 14px',
         boxShadow: '0 1px 2px rgba(15,23,42,0.04)',
         fontFamily: FONT_GEIST,
@@ -286,7 +292,7 @@ const StreakCard: React.FC<StreakCardProps> = ({
             padding: '3px 9px',
             borderRadius: 99,
             background: isActive ? fillBg : 'var(--hcp-bg-3)',
-            color: isActive ? '#fff' : INK_55,
+            color: isActive ? '#fff' : D_T60,
             fontSize: 9,
             fontWeight: 800,
             letterSpacing: '0.10em',
@@ -379,7 +385,7 @@ const StreakCard: React.FC<StreakCardProps> = ({
           }}
         >
           <span>{streak.current}</span>
-          <span style={{ color: isPb ? AMBER : INK_55 }}>
+          <span style={{ color: isPb ? AMBER : D_T60 }}>
             {isPb ? 'NEW PB!' : streak.best > 0 ? `PB · ${streak.best}` : 'NO PB YET'}
           </span>
         </div>
@@ -393,7 +399,7 @@ const StreakCard: React.FC<StreakCardProps> = ({
             borderRadius: 8,
             fontSize: 11,
             fontWeight: 700,
-            color: isActive ? color : INK_55,
+            color: isActive ? color : D_T60,
             textAlign: 'center',
           }}
         >
