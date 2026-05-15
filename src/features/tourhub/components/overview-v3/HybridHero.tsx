@@ -151,23 +151,47 @@ export function HybridHero({ slide }: HybridHeroProps) {
     };
   }, [state, tournament, safeLeaderboard]);
 
-  // Last year finishers — currently use defending champ as #1, leave 2-4 placeholders.
-  // (Full prior-year top 4 fetch is out of scope per data brief; defending champ
-  // covers the highest-signal slot. The remaining rows render as a "preview"
-  // empty state when no prior data is available.)
+  // Team winner detection — uses synthesized team data on safeLeaderboard[0]
+  // (sr_leaderboards joins sr_teams + sr_team_players for LIV team events).
+  const teamWinner = useMemo(() => {
+    if (state.kind !== 'results') return null;
+    const top: any = safeLeaderboard[0];
+    const team = top?.team;
+    if (!team) return null;
+    const members = (team.members || [])
+      .filter((m: any) => m.player)
+      .sort((a: any, b: any) => (a.position_in_team ?? 0) - (b.position_in_team ?? 0))
+      .map((m: any) => ({
+        fullName:
+          m.player.full_name ||
+          `${m.player.first_name ?? ''} ${m.player.last_name ?? ''}`.trim(),
+        photoUrl: m.player.photo_url ?? null,
+      }));
+    return {
+      teamName: team.abbr_name || team.display_name || 'Team',
+      members,
+      score: fmtScore(top.score),
+    };
+  }, [state, safeLeaderboard]);
+
+  // Last year top 4 (Upcoming · far). Null → first-year-event placeholder.
   const lastYearFinishers = useMemo(() => {
     if (state.kind !== 'upcoming' || state.variant !== 'far') return undefined;
-    if (!defendingChamp) return undefined;
-    return [
-      {
-        rank: '1',
-        name: defendingChamp.name,
-        score: defendingChamp.score,
-        year: defendingChamp.year,
-        avatarUrl: null as string | null,
-      },
-    ];
-  }, [state, defendingChamp]);
+    if (!lastYearTop4 || lastYearTop4.length === 0) return undefined;
+    return lastYearTop4.map(f => ({
+      rank: f.rank,
+      name: f.name,
+      score: f.score,
+      year: f.year,
+      avatarUrl: f.photoUrl,
+    }));
+  }, [state, lastYearTop4]);
+
+  const showFirstYearPlaceholder =
+    state.kind === 'upcoming' &&
+    state.variant === 'far' &&
+    !lastYearFinishers &&
+    lastYearTop4 === null;
 
   // CTA navigation
   const onCtaTap = () => {
@@ -208,6 +232,7 @@ export function HybridHero({ slide }: HybridHeroProps) {
         champion={champion}
         tiedLeaders={tiedLeaders}
         defendingChamp={defendingChamp}
+        teamWinner={teamWinner}
       />
       <LeaderboardBand
         state={state}
@@ -216,6 +241,7 @@ export function HybridHero({ slide }: HybridHeroProps) {
         champion={champion}
         teeTimes={teeTimes}
         lastYearFinishers={lastYearFinishers}
+        firstYearEvent={showFirstYearPlaceholder}
         onCtaTap={onCtaTap}
       />
     </div>
