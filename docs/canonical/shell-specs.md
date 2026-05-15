@@ -90,12 +90,34 @@ Pages consume `--chrome-total-h`. They do not consume `--shell-extra-h` directly
 
 ## Variants currently live
 
-| Variant  | Pages                                              | Row 1           | Row 2        |
-|----------|----------------------------------------------------|-----------------|--------------|
-| Tab-tier | Discover/Watch, Discover/Explore, Discover/Friends | Discover tabs   | filter chips |
-| Subpage  | Watch/Videos, Watch/Clips                          | editorial title | filter chips |
+| Variant            | Pages                                              | Row 1                | Row 2        |
+|--------------------|----------------------------------------------------|----------------------|--------------|
+| Tab-tier           | Discover/Watch, Discover/Explore, Discover/Friends | Discover tabs        | filter chips |
+| Subpage            | Watch/Videos, Watch/Clips                          | editorial title      | filter chips |
+| Tour Hub tab-tier  | /tourhub (Overview/Schedule/Players/Leaders), /tourhub/college-golf | 5-destination Tour Hub tab strip | filter chips (per page) |
+
+## Tour Hub tab-tier variant
+
+Used on /tourhub for the 5-destination tab strip. Same anatomy as the Discover
+tab-tier (Row 1 tabs, optional Row 2 chips), but Row 1 uses tighter specs to
+fit 5 destinations on a 390pt phone.
+
+| Property         | Discover | Tour Hub |
+|------------------|----------|----------|
+| Font size        | 16px     | 15px     |
+| Gap between tabs | 34px     | 24px     |
+| Row height       | ~37px    | ~36px    |
+
+All other specs (padding `10px 4px 9px`, 2.5px amber gradient underline,
+weights 700/500, letter-spacing -0.025em on active) identical to Discover.
+
+Tabs 1–4 (`Overview / Schedule / Players / Leaders`) drive `?tab=` on
+`/tourhub`. Tab 5 (`College`) is a virtual entry that navigates to
+`/tourhub/college-golf` and reads as active across all college sub-paths.
+
+Implementation reference: `src/features/tourhub/components/TourHubShellTabs.tsx`
 
 ## Variants planned
 
-- Tour Hub tab-tier (rollout brief pending) — 5-destination tab strip variant
-- Tour Hub detail/subpage (rollout brief pending) — editorial title + 4-tab Row 2 (Tournament Detail) or empty Row 2 (Player / College profiles)
+- Tour Hub detail/subpage (rollout brief PR 3) — editorial title + 4-tab Row 2 (Tournament Detail) or empty Row 2 (Player / College profiles)
+

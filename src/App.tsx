@@ -178,7 +178,7 @@ const PlayerProfilePage = lazy(() => import("./features/tourhub/pages").then(m =
 const CollegeGolfHubPage = lazy(() => import("./features/tourhub/pages").then(m => ({ default: m.CollegeGolfHubPage })));
 const CollegeProfilePage = lazy(() => import("./features/tourhub/pages").then(m => ({ default: m.CollegeProfilePage })));
 const CollegeComparePage = lazy(() => import("./features/tourhub/pages").then(m => ({ default: m.CollegeComparePage })));
-import { TourNavWrapper } from './features/tourhub/components/TourNavWrapper';
+
 
 // Video Player Modal (Phase 6A-1)
 // Video Player Modal (Phase 6A-1)
@@ -436,11 +436,11 @@ function AppRoutes() {
         
         {/* Tour Hub routes */}
         <Route path="/tourhub" element={<Suspense fallback={<GenericPageSkeleton />}><TourHubMainPage /></Suspense>} />
-        <Route path="/tourhub/tournament/:tournamentId" element={<Suspense fallback={<GenericPageSkeleton />}><TourNavWrapper><TournamentDetailPage /></TourNavWrapper></Suspense>} />
-        <Route path="/tourhub/player/:playerId" element={<Suspense fallback={<GenericPageSkeleton />}><TourNavWrapper><PlayerProfilePage /></TourNavWrapper></Suspense>} />
-        <Route path="/tourhub/college-golf" element={<Suspense fallback={<GenericPageSkeleton />}><TourNavWrapper><CollegeGolfHubPage /></TourNavWrapper></Suspense>} />
-        <Route path="/tourhub/college-golf/compare" element={<Suspense fallback={<GenericPageSkeleton />}><TourNavWrapper><CollegeComparePage /></TourNavWrapper></Suspense>} />
-        <Route path="/tourhub/college-golf/:collegeSlug" element={<Suspense fallback={<GenericPageSkeleton />}><TourNavWrapper><CollegeProfilePage /></TourNavWrapper></Suspense>} />
+        <Route path="/tourhub/tournament/:tournamentId" element={<Suspense fallback={<GenericPageSkeleton />}><TournamentDetailPage /></Suspense>} />
+        <Route path="/tourhub/player/:playerId" element={<Suspense fallback={<GenericPageSkeleton />}><PlayerProfilePage /></Suspense>} />
+        <Route path="/tourhub/college-golf" element={<Suspense fallback={<GenericPageSkeleton />}><CollegeGolfHubPage /></Suspense>} />
+        <Route path="/tourhub/college-golf/compare" element={<Suspense fallback={<GenericPageSkeleton />}><CollegeComparePage /></Suspense>} />
+        <Route path="/tourhub/college-golf/:collegeSlug" element={<Suspense fallback={<GenericPageSkeleton />}><CollegeProfilePage /></Suspense>} />
         
         {/* Hub routes removed — redirects to clubhouse */}
         <Route path="/hub" element={<Navigate to="/clubhouse" replace />} />
