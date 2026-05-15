@@ -6,20 +6,57 @@ import { useWhsConnection, useHandicapTrend } from '@/lib/whs/hooks';
 
 const GREEN = '#22C55E';
 const RED = '#EF4444';
-const MUTED = 'rgba(255,255,255,0.45)';
+const MUTED_DARK = 'rgba(255,255,255,0.45)';
+const MUTED_LIGHT = 'rgba(15,23,42,0.45)';
+
+type Variant = 'glass-dark' | 'solid-light';
 
 interface HandicapPillProps {
   /** Called when the pill is tapped. Should open the profile sheet (same as avatar tap). */
   onTap: () => void;
+  /** Visual variant. Defaults to glass-dark. */
+  variant?: Variant;
 }
 
-/**
- * HandicapPill — small glass pill rendering the user's WHS handicap index
- * with a trend arrow. Renders immediately to the left of the avatar in the
- * Clubhouse header. Visible only when the user has a synced WHS handicap
- * AND has not chosen to hide their handicap publicly.
- */
-export function HandicapPill({ onTap }: HandicapPillProps) {
+function getPillChromeStyle(variant: Variant): React.CSSProperties {
+  const base: React.CSSProperties = {
+    height: 28,
+    boxSizing: 'border-box',
+    display: 'inline-flex',
+    alignItems: 'center',
+    gap: 4,
+    padding: '5px 9px 5px 10px',
+    borderRadius: 999,
+  };
+  if (variant === 'glass-dark') {
+    return {
+      ...base,
+      background: 'rgba(255,255,255,0.12)',
+      border: '0.5px solid rgba(255,255,255,0.25)',
+      backdropFilter: 'blur(20px)',
+      WebkitBackdropFilter: 'blur(20px)',
+    };
+  }
+  return {
+    ...base,
+    background: 'rgba(15,23,42,0.04)',
+    border: '0.5px solid rgba(15,23,42,0.10)',
+  };
+}
+
+function getNumeralStyle(variant: Variant): React.CSSProperties {
+  return {
+    fontFamily: "'Geist Mono', ui-monospace, monospace",
+    fontSize: 13,
+    fontWeight: 700,
+    color: variant === 'glass-dark' ? 'white' : '#0F172A',
+    letterSpacing: '-0.02em',
+    fontVariantNumeric: 'tabular-nums',
+    lineHeight: 1,
+  };
+}
+
+export function HandicapPill({ onTap, variant = 'glass-dark' }: HandicapPillProps) {
   const { user } = useSupabaseSession();
 
   const { data: profile } = useQuery({
@@ -82,43 +119,20 @@ export function HandicapPill({ onTap }: HandicapPillProps) {
         cursor: 'pointer',
         display: 'inline-flex',
         alignItems: 'center',
+        flexShrink: 0,
       }}
     >
-      <span
-        style={{
-          height: 28,
-          display: 'inline-flex',
-          alignItems: 'center',
-          gap: 4,
-          padding: '5px 9px 5px 10px',
-          borderRadius: 999,
-          background: 'rgba(255, 255, 255, 0.12)',
-          border: '0.5px solid rgba(255, 255, 255, 0.25)',
-          backdropFilter: 'blur(20px)',
-          WebkitBackdropFilter: 'blur(20px)',
-        }}
-      >
-        <span
-          style={{
-            fontFamily: "'Geist Mono', ui-monospace, monospace",
-            fontSize: 13,
-            fontWeight: 700,
-            color: 'white',
-            letterSpacing: '-0.02em',
-            fontVariantNumeric: 'tabular-nums',
-            lineHeight: 1,
-          }}
-        >
-          {formatted}
-        </span>
-        <TrendArrow direction={direction} />
+      <span style={getPillChromeStyle(variant)}>
+        <span style={getNumeralStyle(variant)}>{formatted}</span>
+        <TrendArrow direction={direction} variant={variant} />
       </span>
     </button>
   );
 }
 
-function TrendArrow({ direction }: { direction: 'down' | 'flat' | 'up' }) {
-  const color = direction === 'down' ? GREEN : direction === 'up' ? RED : MUTED;
+function TrendArrow({ direction, variant }: { direction: 'down' | 'flat' | 'up'; variant: Variant }) {
+  const muted = variant === 'glass-dark' ? MUTED_DARK : MUTED_LIGHT;
+  const color = direction === 'down' ? GREEN : direction === 'up' ? RED : muted;
 
   if (direction === 'flat') {
     return (
