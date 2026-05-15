@@ -177,35 +177,11 @@ export function CollegeComparePage() {
           )}
         </div>
 
-        {/* Sentinel for sticky-header safe-area detection */}
-        <div ref={sentinelRef} aria-hidden style={{ height: 1 }} />
-
-        {/* ── STICKY HEADER ── */}
-        <div
-          className="sticky top-0 z-20"
-          style={{
-            background: 'rgba(248,250,252,0.97)',
-            backdropFilter: 'blur(20px)',
-            WebkitBackdropFilter: 'blur(20px)',
-            borderBottom: '0.5px solid rgba(15,23,42,0.08)',
-            paddingTop: isAtTop ? 8 : 'calc(max(env(safe-area-inset-top, 0px), 47px) + 8px)',
-            transition: 'padding-top 200ms ease',
-          }}
-        >
-          <div style={{ display: 'flex', alignItems: 'center', padding: '9px 16px', gap: '6px' }}>
-            <button
-              onClick={() => navigate('/tourhub/college-golf')}
-              style={{ display: 'flex', alignItems: 'center', gap: 2, fontSize: 12, fontWeight: 600, color: '#64748B', background: 'transparent', border: 'none', padding: 0, cursor: 'pointer' }}
-              className="active:opacity-50 transition-opacity"
-            >
-              <ChevronLeft size={13} strokeWidth={2.5} />
-              College Franchise
-            </button>
-            <div style={{ flex: 1 }} />
-            <span style={{ fontSize: 9, color: '#94A3B8', fontWeight: 800, letterSpacing: '0.14em', textTransform: 'uppercase' }}>
-              {seasonCaps}
-            </span>
-          </div>
+        {/* Back link + season caps moved to CompactHeader (PR3 — chrome stripped) */}
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', padding: '9px 16px' }}>
+          <span style={{ fontSize: 9, color: '#94A3B8', fontWeight: 800, letterSpacing: '0.14em', textTransform: 'uppercase' }}>
+            {seasonCaps}
+          </span>
         </div>
 
         {/* ── CONTENT ── */}
