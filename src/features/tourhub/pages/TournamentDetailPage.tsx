@@ -41,11 +41,6 @@ export function TournamentDetailPage() {
   const { setVisible } = useBottomNavigation();
   useEffect(() => { setVisible(true); }, [setVisible]);
   const [searchParams, setSearchParams] = useSearchParams();
-  const queryClient = useQueryClient();
-  const navigate = useNavigate();
-  const location = useLocation();
-  const referrer = (location.state as { referrer?: TournamentReferrer } | null)?.referrer;
-  const backLabel = getReferrerLabel(referrer);
 
   const [activeTab, setActiveTab] = useState<TournamentTab>(() => {
     const tabParam = searchParams.get('tab') as TournamentTab | null;
@@ -53,46 +48,6 @@ export function TournamentDetailPage() {
     return 'overview';
   });
 
-  // TD-01: Pull-to-refresh
-  const [isPulling, setIsPulling] = useState(false);
-  const [pullDistance, setPullDistance] = useState(0);
-  const [isRefreshing, setIsRefreshing] = useState(false);
-  const touchStartY = useRef(0);
-  const PULL_THRESHOLD = 50;
-  const { sentinelRef, paddingTop: stickyPaddingTop } = useStickyHeaderSafeArea();
-
-  const handleTouchStart = useCallback((e: React.TouchEvent) => {
-    if (window.scrollY <= 0) {
-      touchStartY.current = e.touches[0].clientY;
-      setIsPulling(true);
-    }
-  }, []);
-
-  const handleTouchMove = useCallback((e: React.TouchEvent) => {
-    if (!isPulling) return;
-    const delta = e.touches[0].clientY - touchStartY.current;
-    if (delta > 0) {
-      setPullDistance(Math.min(delta, 100));
-    }
-  }, [isPulling]);
-
-  const handleTouchEnd = useCallback(async () => {
-    if (pullDistance >= PULL_THRESHOLD && !isRefreshing) {
-      setIsRefreshing(true);
-      setPullDistance(0);
-      await Promise.all([
-        queryClient.invalidateQueries({ queryKey: ['tournament', tournamentId] }),
-        queryClient.invalidateQueries({ queryKey: ['tournament-leaderboard', tournamentId] }),
-        queryClient.invalidateQueries({ queryKey: ['tournament-tee-times', tournamentId] }),
-        queryClient.invalidateQueries({ queryKey: ['tournament-holes', tournamentId] }),
-      ]);
-      setIsRefreshing(false);
-    } else {
-      setPullDistance(0);
-    }
-    setIsPulling(false);
-  }, [pullDistance, isRefreshing, queryClient, tournamentId]);
-  
   const handleTabChange = (tab: TournamentTab) => {
     setActiveTab(tab);
     window.scrollTo({ top: 0, behavior: 'instant' });
