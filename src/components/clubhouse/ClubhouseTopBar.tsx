@@ -130,7 +130,7 @@ export const ClubhouseTopBar: React.FC<ClubhouseTopBarProps> = ({
             )}
 
             {!hideProfilePill && user && (
-              <HandicapPill onTap={() => setMenuOpen((v) => !v)} />
+              <HandicapPill onTap={() => navigate('/handicap')} />
             )}
 
             {!hideProfilePill && user && (
