@@ -221,8 +221,7 @@ const ActivityPage: React.FC = () => {
           <div className="px-5 pt-4 pb-0 flex items-end justify-between">
             <div>
               <div className="flex items-center gap-2 mb-1.5">
-                <div style={{ width: 3, height: 10, background: AMBER, borderRadius: 1, flexShrink: 0 }} />
-                <span style={{ fontSize: 10, fontWeight: 800, color: INK_SUBTLE, letterSpacing: '0.25em', textTransform: 'uppercase' }}>Activity</span>
+                <span style={{ fontSize: 9, fontWeight: 800, color: '#64748B', letterSpacing: '0.16em', textTransform: 'uppercase' }}>Activity</span>
               </div>
               <div className="flex items-baseline gap-2.5">
                 <h1
@@ -233,10 +232,10 @@ const ActivityPage: React.FC = () => {
                   )}
                   style={{
                     fontFamily: FONT_SERIF,
-                    fontWeight: 900,
+                    fontWeight: 800,
                     color: INK,
                     fontSize: 34,
-                    letterSpacing: '-0.02em',
+                    letterSpacing: '-0.025em',
                   }}
                   aria-label="Notifications - tap to refresh"
                 >
