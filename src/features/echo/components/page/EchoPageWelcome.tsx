@@ -245,8 +245,8 @@ export function EchoPageWelcome({ profile, onChipSelect }: EchoPageWelcomeProps)
         <div className="flex items-center gap-3 my-6 w-full max-w-[340px]">
           <div className="flex-1 h-px" style={{ background: 'rgba(15,23,42,0.07)' }} />
           <span
-            className="text-[11px] font-semibold uppercase tracking-[0.12em]"
-            style={{ color: '#94A3B8' }}
+            className="text-[9px] font-extrabold uppercase tracking-[0.16em]"
+            style={{ color: '#64748B' }}
           >
             Try asking
           </span>
