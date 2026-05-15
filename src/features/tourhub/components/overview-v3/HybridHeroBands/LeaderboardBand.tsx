@@ -10,6 +10,7 @@ import { SoloLeaderRow, TiedLeadersRow, ChampionRow } from './LeaderRow';
 import { ChaserRow } from './ChaserRow';
 import { LastYearRow } from './LastYearRow';
 import { TeeTimeRow } from './TeeTimeRow';
+import { TeamFinishRow } from './TeamFinishRow';
 import { CancelledPanel } from './CancelledPanel';
 import { PlayoffPendingPanel } from './PlayoffPendingPanel';
 import { INK, INK_15, AMBER } from '../HybridHero.constants';
@@ -164,6 +165,41 @@ export function LeaderboardBand({
           avatarUrl: entryAvatar(e),
         }));
       body = <PlayoffPendingPanel tied={tied} chasers={chasers} />;
+    } else if (state.variant === 'team') {
+      // Team event — render TeamFinishRow for each of the top 4 teams (Polish Patch §3.4)
+      const finishers = leaderboard.slice(0, 4);
+      body = (
+        <>
+          {finishers.map((e: any, i: number) => {
+            const isChampion = i === 0;
+            const team = e?.team;
+            const teamName =
+              team?.display_name || team?.abbr_name || e?.player?._teamName || entryName(e);
+            const members = (team?.members || [])
+              .filter((m: any) => m.player)
+              .sort((a: any, b: any) => (a.position_in_team ?? 0) - (b.position_in_team ?? 0))
+              .map((m: any) => ({
+                fullName:
+                  m.player.full_name ||
+                  `${m.player.first_name ?? ''} ${m.player.last_name ?? ''}`.trim(),
+              }));
+            return (
+              <TeamFinishRow
+                key={i}
+                rank={String(e?.position ?? i + 1)}
+                teamName={teamName}
+                teamColor={null}
+                teamCrestUrl={null}
+                members={members}
+                score={fmtScore(e?.score)}
+                thru="F"
+                isChampion={isChampion}
+                isLast={i === finishers.length - 1}
+              />
+            );
+          })}
+        </>
+      );
     } else {
       const finishers = leaderboard.slice(0, 4);
       const championRow = champion ?? (finishers[0]
