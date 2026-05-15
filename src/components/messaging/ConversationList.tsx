@@ -570,7 +570,7 @@ export function ConversationList({
           >
             <div className="flex items-center" style={{ gap: 8 }}>
               <Archive size={16} style={{ color: '#64748b' }} />
-              <span style={{ fontSize: '13.5px', fontWeight: 600, color: '#64748b' }}>Archived</span>
+              <span style={{ fontSize: 13, fontWeight: 600, color: '#64748b' }}>Archived</span>
               <span style={{ fontSize: 12, color: '#94a3b8' }}>({archivedConversations.length})</span>
             </div>
             {showArchived 
