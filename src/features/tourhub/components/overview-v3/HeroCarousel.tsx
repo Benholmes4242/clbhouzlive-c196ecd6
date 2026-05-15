@@ -37,9 +37,7 @@ import volvoChinaOpenUpcoming from '@/assets/tours/volvo-china-open-upcoming.jpg
 import { getPlayerHeadshotUrl } from '@/utils/playerHeadshot';
 import { format, differenceInDays, isToday, isTomorrow } from 'date-fns';
 // formatPurse/PlayerAvatar/UpcomingCountdown no longer used here — moved into EditorialUpcomingHero
-import { EditorialLiveHero, LiveHeroSkeleton } from './EditorialLiveHero';
-import { EditorialResultsHero } from './EditorialResultsHero';
-import { EditorialUpcomingHero } from './EditorialUpcomingHero';
+import { HybridHero, HybridHeroSkeleton } from './HybridHero';
 import { cn } from '@/lib/utils';
 import '@/styles/hero-glass.css';
 import { EchoContextualButton } from '@/components/echo/EchoContextualButton';
@@ -354,167 +352,21 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
             {/* ─── State-specific content — each section uses Capsule spring easing ─── */}
             <AnimatePresence mode="popLayout">
 
-              {/* LIVE LAYOUT — EditorialLiveHero is the only render. No collapsed fork. */}
-              {isLive && (
-                <motion.div
-                  key="live-content"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  transition={{ duration: 0.22, ease: [0.19, 1, 0.22, 1] }}
-                  style={{ overflow: 'hidden', flex: 1, height: '100%', minHeight: 0, display: 'flex', flexDirection: 'column' as const }}
-                >
-                  <AnimatePresence mode="wait">
-                    {selectedPlayer ? (
-                      <motion.div
-                        key="scorecard"
-                        initial={{ opacity: 0, x: 60 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        exit={{ opacity: 0, x: 60 }}
-                        transition={{ type: 'spring', damping: 28, stiffness: 300 }}
-                        style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column' }}
-                      >
-                        <PlayerScorecardCard
-                          player={selectedPlayer}
-                          tournamentId={tournament.id}
-                          tournamentName={tournament.name}
-                          courseName={tournament.venueName || ''}
-                          onBack={handleBackToLeaderboard}
-                          onClose={handleBackToLeaderboard}
-                        />
-                      </motion.div>
-                    ) : (
-                      <motion.div
-                        key="leaderboard"
-                        initial={{ opacity: 1 }}
-                        animate={{ opacity: 1 }}
-                        exit={{ opacity: 0, x: -40 }}
-                        transition={{ type: 'spring', damping: 28, stiffness: 300 }}
-                        style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column' }}
-                      >
-                        {isLoadingFull ? (
-                          <LiveHeroSkeleton />
-                        ) : isFullError ? (
-                          <ExpandedLeaderboardError onRetry={() => refetchFull()} />
-                        ) : fullLeaderboard.length === 0 ? (
-                          <ExpandedLeaderboardEmpty />
-                        ) : (
-                          <EditorialLiveHero
-                            tournament={{
-                              id: tournament.id,
-                              name: tournament.name,
-                              tourSlug: tournament.tourSlug,
-                              venueName: tournament.venueName,
-                              venueCity: tournament.venueCity,
-                              startDate: tournament.startDate,
-                            }}
-                            leaderboard={fullLeaderboard as any[]}
-                            currentRound={(() => {
-                              const first = (fullLeaderboard as any[])[0];
-                              if (!first) return 1;
-                              const last = [4, 3, 2, 1].find(n => first[`round_${n}`] !== null) ?? 0;
-                              return last === 0 ? 1 : Math.min(last + 1, 4);
-                            })()}
-                            onPlayerTap={(entry) => {
-                              const player = entry.player;
-                              if (!player) return;
-                              const fullName = player.full_name || `${player.first_name || ''} ${player.last_name || ''}`.trim();
-                              const tourCode = player.tour_codes?.[0] ?? tournament.tourSlug ?? 'pga';
-                              handleScorecardTap({
-                                id: player.id,
-                                srId: player.sr_id || '',
-                                name: fullName,
-                                firstName: player.first_name,
-                                lastName: player.last_name,
-                                photoUrl: getPlayerHeadshotUrl(fullName, tourCode, player.headshot_override) || undefined,
-                                countryCode: player.country || undefined,
-                                position: entry.position,
-                                totalScore: entry.score ?? 0,
-                                thru: entry.thru === 18 ? 'F' : `${entry.thru ?? '—'}`,
-                                currentRound: entry.thru === 18 ? Math.min((entry.last_completed_round ?? 0) + 1, 4) : 4,
-                              });
-                            }}
-                          />
-                        )}
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-                </motion.div>
-              )}
-
-              {/* COMPLETED LAYOUT — full-bleed dark, matching live aesthetic */}
-              {isCompleted && (
-                <motion.div
-                  key="completed-content"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  transition={{ duration: 0.22, ease: [0.19, 1, 0.22, 1] }}
-                  style={{ overflow: 'hidden', flex: 1, height: '100%', display: 'flex', flexDirection: 'column' as const, minHeight: 0 }}
-                >
-                {selectedPlayer ? (
-                  <motion.div
-                    key="completed-scorecard"
-                    initial={{ opacity: 0, x: 60 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    exit={{ opacity: 0, x: 60 }}
-                    transition={{ type: 'spring', damping: 28, stiffness: 300 }}
-                    style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column' }}
-                  >
-                    <PlayerScorecardCard
-                      player={selectedPlayer}
-                      tournamentId={tournament.id}
-                      tournamentName={tournament.name}
-                      courseName={tournament.venueName || ''}
-                      isCompleted={true}
-                      onBack={handleBackToLeaderboard}
-                      onClose={() => {
-                        setSelectedPlayer(null);
-                      }}
-                    />
-                  </motion.div>
+              {/* HYBRID HERO — single component handles live / completed / upcoming */}
+              <motion.div
+                key="hybrid-hero-content"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.22, ease: [0.19, 1, 0.22, 1] }}
+                style={{ overflow: 'hidden', flex: 1, height: '100%', minHeight: 0, display: 'flex', flexDirection: 'column' as const }}
+              >
+                {(isLive || isCompleted) && isLoadingFull && fullLeaderboard.length === 0 ? (
+                  <HybridHeroSkeleton />
                 ) : (
-                  <EditorialResultsHero
-                    tournament={{
-                      id: tournament.id,
-                      name: tournament.name,
-                      tourSlug: tournament.tourSlug,
-                      venueName: tournament.venueName,
-                      venueCity: tournament.venueCity,
-                    }}
-                    finishers={allFetchedData}
-                    onPlayerTap={handleScorecardTap}
-                  />
+                  <HybridHero slide={slide} />
                 )}
-                </motion.div>
-              )}
-
-              {/* UPCOMING LAYOUT — EditorialUpcomingHero (light, elastic) */}
-              {isUpcoming && (
-                <motion.div
-                  key="upcoming-content"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  transition={{ duration: 0.22, ease: [0.19, 1, 0.22, 1] }}
-                  style={{ overflow: 'hidden', flex: 1, height: '100%', minHeight: 0, display: 'flex', flexDirection: 'column' as const }}
-                >
-                  <EditorialUpcomingHero
-                    tournament={{
-                      id: tournament.id,
-                      name: tournament.name,
-                      tourSlug: tournament.tourSlug,
-                      venueName: tournament.venueName,
-                      venueCity: tournament.venueCity,
-                      startDate: tournament.startDate,
-                      purse: tournament.purse,
-                      venuePar: tournament.venuePar,
-                      venueYardage: tournament.venueYardage,
-                      defendingChampion: tournament.defendingChampion,
-                    }}
-                  />
-                </motion.div>
-              )}
+              </motion.div>
 
             </AnimatePresence>
 
