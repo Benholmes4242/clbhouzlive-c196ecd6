@@ -37,13 +37,7 @@ export default function LoopTabContent({ embedded = false }: LoopTabContentProps
 
   const visiblePosts = useMemo(() => {
     if (!activeAuthorIds) return posts;
-    return posts.filter(p => {
-      const authorId = (p as unknown as { authorId?: string; userId?: string; user_id?: string })
-        .authorId
-        ?? (p as unknown as { userId?: string }).userId
-        ?? (p as unknown as { user_id?: string }).user_id;
-      return authorId ? activeAuthorIds.has(authorId) : false;
-    });
+    return posts.filter(p => activeAuthorIds.has(p.userId));
   }, [posts, activeAuthorIds]);
 
   return (
