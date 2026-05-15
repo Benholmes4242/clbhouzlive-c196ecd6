@@ -63,7 +63,7 @@ function TourHubMainPageInner() {
   
   return (
     <TourHubShell>
-      <TourHubHeader activeTab={activeTab} />
+      
       
       <div className="pb-24">
         {renderTab()}
