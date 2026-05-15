@@ -4,6 +4,7 @@
  */
 
 import React from 'react';
+import { Star } from 'lucide-react';
 import {
   PHOTO_BAND_HEIGHT,
   COURSE_GRADIENT,
@@ -25,6 +26,33 @@ interface PhotoBandProps {
   venueImageUrl: string | null;
   state: HeroState;
   tourLabel: string;
+  isMajor?: boolean;
+}
+
+function MajorBadge() {
+  return (
+    <span
+      style={{
+        display: 'inline-flex',
+        alignItems: 'center',
+        gap: 4,
+        padding: '4px 9px 4px 7px',
+        borderRadius: 999,
+        background: 'rgba(255,184,0,0.22)',
+        border: '1px solid rgba(255,184,0,0.45)',
+        backdropFilter: 'blur(20px)',
+        WebkitBackdropFilter: 'blur(20px)',
+        color: '#FFB800',
+        fontSize: 10,
+        fontWeight: 800,
+        letterSpacing: '0.14em',
+        textShadow: '0 1px 3px rgba(0,0,0,0.4)',
+      }}
+    >
+      <Star size={10} fill="#FFB800" stroke="#FFB800" strokeWidth={1} />
+      MAJOR
+    </span>
+  );
 }
 
 function StatusPill({ state }: { state: HeroState }) {
