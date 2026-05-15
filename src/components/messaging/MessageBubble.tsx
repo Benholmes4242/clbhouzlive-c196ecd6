@@ -449,7 +449,7 @@ export function MessageBubble({
         <div style={{ padding: '12px 16px 8px', borderBottom: '1px solid rgba(0,0,0,0.05)', textAlign: 'center' as const }}>
           <div style={{ fontSize: 12, color: '#94a3b8', marginBottom: 4 }}>{formatMessageTime(message.created_at)}</div>
           {message.content && (
-            <p style={{ fontSize: '13.5px', color: '#1e293b', lineHeight: 1.4, margin: 0 }}>
+            <p style={{ fontSize: 14, color: '#1e293b', lineHeight: 1.4, margin: 0 }}>
               {message.content.length > 60 ? message.content.slice(0, 60) + '…' : message.content}
             </p>
           )}
