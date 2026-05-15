@@ -93,55 +93,33 @@ export function CollegeComparePage() {
 
   return (
     <TourHubShell>
-      <div className="relative min-h-screen bg-background">
-        {/* ── CANONICAL LIGHT MASTHEAD (Path B) ── */}
-        <div
+      <ShellSlot>
+        <button
+          type="button"
+          onClick={() => navigate('/tourhub/college-golf')}
+          aria-label="Head-to-Head — open College Franchise"
           style={{
             background: '#F8FAFC',
-            paddingTop: 0,
-            paddingLeft: 16,
-            paddingRight: 16,
-            paddingBottom: 16,
+            border: 'none',
+            padding: '14px 16px 12px',
+            cursor: 'pointer',
+            display: 'block',
+            width: '100%',
+            textAlign: 'left' as const,
           }}
         >
-          {/* Section header (canonical §2) */}
-          <button
-            type="button"
-            onClick={() => navigate('/tourhub/college-golf')}
-            aria-label="Head-to-Head — open College Franchise"
-            style={{
-              background: 'transparent',
-              border: 'none',
-              padding: 0,
-              cursor: 'pointer',
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: 6,
-              marginBottom: 6,
-            }}
-          >
-            <ArrowLeftRight size={13} strokeWidth={2.5} color="#F7931E" />
-            <span
-              style={{
-                fontSize: 10.5,
-                fontWeight: 700,
-                color: '#F7931E',
-                letterSpacing: '0.14em',
-                textTransform: 'uppercase',
-              }}
-            >
-              HEAD-TO-HEAD
-            </span>
-            <ChevronRight size={11} strokeWidth={2.5} color="#F7931E" />
-          </button>
-
+          <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, marginBottom: 4 }}>
+            <ArrowLeftRight size={11} strokeWidth={2.5} color="#F7931E" style={{ marginTop: -4 }} />
+            <Kicker color="amber">Head-to-head</Kicker>
+            <ChevronRight size={11} strokeWidth={2.5} color="#F7931E" style={{ marginTop: -4 }} />
+          </div>
           <h1
             style={{
-              fontSize: 18,
+              fontSize: 22,
               fontWeight: 800,
               color: '#0F172A',
-              letterSpacing: '-0.015em',
-              lineHeight: 1.15,
+              letterSpacing: '-0.025em',
+              lineHeight: 1.05,
               margin: 0,
               overflow: 'hidden',
               textOverflow: 'ellipsis',
@@ -150,22 +128,41 @@ export function CollegeComparePage() {
           >
             {h1Text}
           </h1>
+          {subheadText && (
+            <div
+              style={{
+                fontSize: 13,
+                fontWeight: 500,
+                color: '#64748B',
+                lineHeight: 1.4,
+                marginTop: 4,
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                whiteSpace: 'nowrap',
+              }}
+            >
+              {subheadText}
+            </div>
+          )}
+        </button>
+      </ShellSlot>
 
-          <div
-            style={{
-              fontSize: 13,
-              fontWeight: 500,
-              color: '#64748B',
-              lineHeight: 1.4,
-              marginTop: 2,
-            }}
-          >
-            {subheadText}
-          </div>
+      <div
+        className="relative min-h-screen bg-background"
+        style={{ paddingTop: 'var(--chrome-total-h, 0px)' }}
+      >
+        {/* Season caps row — stays in body, no longer cropped under chrome */}
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', padding: '9px 16px' }}>
+          <span style={{ fontSize: 9, color: '#94A3B8', fontWeight: 800, letterSpacing: '0.14em', textTransform: 'uppercase' }}>
+            {seasonCaps}
+          </span>
+        </div>
 
-          {/* Loading skeleton — light surface */}
-          {isLoading && (
-            <div style={{ marginTop: 10 }}>
+        {/* ── CONTENT ── */}
+        <div style={{ paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 80px)' }}>
+          {/* Loading skeleton renders in body, not pinned */}
+          {isLoading && hasValidParams && (
+            <div style={{ padding: '12px 16px' }}>
               <div
                 className="animate-pulse"
                 style={{
@@ -177,17 +174,6 @@ export function CollegeComparePage() {
               />
             </div>
           )}
-        </div>
-
-        {/* Back link + season caps moved to CompactHeader (PR3 — chrome stripped) */}
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', padding: '9px 16px' }}>
-          <span style={{ fontSize: 9, color: '#94A3B8', fontWeight: 800, letterSpacing: '0.14em', textTransform: 'uppercase' }}>
-            {seasonCaps}
-          </span>
-        </div>
-
-        {/* ── CONTENT ── */}
-        <div style={{ paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 80px)' }}>
           {!hasValidParams ? (
             <div style={{ padding: '20px' }}>
               {/* Heading */}
