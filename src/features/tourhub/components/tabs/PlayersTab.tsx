@@ -815,73 +815,7 @@ export function PlayersTab() {
 
 
 
-      {/* Tour filter bottom sheet */}
-      <BottomSheet
-        open={tourSheetOpen}
-        onClose={() => setTourSheetOpen(false)}
-        ariaLabelledBy="players-tour-sheet-title"
-      >
-        <SheetHeader
-          eyebrow="FILTER"
-          title={<span id="players-tour-sheet-title">Select tour</span>}
-          onClose={() => setTourSheetOpen(false)}
-        />
-        {(['pga', 'EURO', 'LPGA', 'CHAMP', 'PGAD', 'LIV'] as const).map((code) => {
-          const labels: Record<string, string> = {
-            pga: 'PGA Tour', EURO: 'DP World Tour',
-            LPGA: 'LPGA', CHAMP: 'Champions', PGAD: 'Korn Ferry', LIV: 'LIV Golf',
-          };
-          const descriptions: Record<string, string> = {
-            pga: 'PGA Tour players',
-            EURO: 'DP World Tour players',
-            LPGA: 'LPGA Tour players',
-            CHAMP: 'PGA Champions Tour players',
-            PGAD: 'Korn Ferry Tour players',
-            LIV: 'LIV Golf players',
-          };
-          const isSelected = activeTour === code;
-          const count = tourCounts[code] ?? 0;
-          if (count === 0) return null;
-          return (
-            <button
-              key={code}
-              onClick={() => { setActiveTour(code as PlayerTourCode); setTourSheetOpen(false); }}
-              aria-pressed={isSelected}
-              style={{
-                width: '100%', display: 'flex', alignItems: 'center', gap: 12,
-                padding: '14px 16px',
-                background: isSelected ? 'rgba(247,147,30,0.04)' : 'transparent',
-                border: 'none',
-                borderLeft: isSelected ? '3px solid #F7931E' : '3px solid transparent',
-                borderBottom: '0.5px solid rgba(15,23,42,0.07)',
-                cursor: 'pointer', textAlign: 'left' as const,
-              }}
-            >
-              {/* Tour logo chip */}
-              <div style={{ width: 36, height: 22, borderRadius: 4, background: 'rgba(15,23,42,0.06)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                {hasTourLogo(code.toLowerCase())
-                    ? <img src={getTourLogo(code.toLowerCase())} alt="" aria-hidden="true" style={{ width: 28, height: 18, objectFit: 'contain' }} />
-                    : null
-                }
-              </div>
-              {/* Label + description */}
-              <div style={{ flex: 1, minWidth: 0 }}>
-                <div style={{ fontSize: 15, fontWeight: isSelected ? 700 : 500, color: '#0F172A' }}>
-                  {labels[code]}
-                </div>
-                <div style={{ fontSize: 12, color: '#94A3B8', marginTop: 2 }}>
-                  {descriptions[code]}
-                </div>
-              </div>
-              {/* Count */}
-              {count > 0 && <span style={{ fontSize: 13, color: '#94A3B8', fontVariantNumeric: 'tabular-nums', flexShrink: 0 }}>{count.toLocaleString()}</span>}
-              {/* Active dot */}
-              {isSelected && <div style={{ width: 6, height: 6, borderRadius: '50%', background: '#F7931E', flexShrink: 0 }} />}
-            </button>
-          );
-        })}
-        <div style={{ paddingBottom: 'calc(var(--sab, env(safe-area-inset-bottom, 0px)) + 8px)' }} />
-      </BottomSheet>
+      {/* Tour filter bottom sheet — moved to PlayersShellRow */}
 
       {/* Content — white surface */}
       <div style={{ background: '#ffffff', borderTop: '1px solid rgba(15,23,42,0.07)', marginTop: '8px' }}>
