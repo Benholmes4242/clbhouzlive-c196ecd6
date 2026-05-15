@@ -175,6 +175,7 @@ export function PhotoBand({
   venueImageUrl,
   state,
   tourLabel,
+  isMajor = false,
 }: PhotoBandProps) {
   const useDusk = state.kind === 'results' && (state.variant === 'declared' || state.variant === 'cancelled');
   return (
