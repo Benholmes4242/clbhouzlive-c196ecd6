@@ -187,7 +187,11 @@ const NextRoundWatch: React.FC<Props> = ({ connectionId, currentHandicap }) => {
               label="FALLBACK"
               caption={`Miss → settles ${settle.toFixed(1)}`}
               value={settle.toFixed(1)}
-              valueColor="var(--hcp-t-100)"
+              valueColor={
+                currentHandicap != null && settle < currentHandicap - 0.05
+                  ? 'var(--hcp-good)'
+                  : 'var(--hcp-t-100)'
+              }
               labelColor="var(--hcp-t-60)"
             />
           </div>
