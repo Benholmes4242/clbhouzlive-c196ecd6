@@ -202,6 +202,7 @@ export function HybridHero({ slide }: HybridHeroProps) {
     return lastYearTop4.map(f => ({
       rank: f.rank,
       name: f.name,
+      country: f.country,
       score: f.score,
       year: f.year,
       avatarUrl: f.photoUrl,
