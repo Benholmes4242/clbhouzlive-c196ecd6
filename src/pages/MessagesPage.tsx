@@ -341,7 +341,7 @@ function MessagesPageInner() {
           </button>
 
           <div className="flex items-center" style={{ gap: 6 }}>
-            <span style={{ fontSize: 17, fontWeight: 900, color: '#0F172A', letterSpacing: '-0.02em' }}>Messages</span>
+            <span style={{ fontSize: 17, fontWeight: 800, color: '#0F172A', letterSpacing: '-0.015em' }}>Messages</span>
             {totalUnread > 0 && (
               <span
                 className="flex items-center justify-center"
