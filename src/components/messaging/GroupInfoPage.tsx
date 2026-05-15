@@ -22,6 +22,7 @@ import { ConversationWithDetails, ParticipantWithProfile } from '@/types/messagi
 import { AddMembersSheet } from './AddMembersSheet';
 import { ReportSheet } from './ReportSheet';
 import { SharedMediaGallery } from './SharedMediaGallery';
+import { SectionEyebrow } from '@/components/ui/SectionEyebrow';
 
 interface GroupInfoPageProps {
   conversation: ConversationWithDetails;
