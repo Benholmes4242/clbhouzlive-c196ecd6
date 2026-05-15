@@ -233,11 +233,8 @@ export function HybridHero({ slide }: HybridHeroProps) {
       style={{
         background: BG,
         width: '100%',
-        height: '100%',
         display: 'flex',
         flexDirection: 'column',
-        overflowY: 'auto',
-        WebkitOverflowScrolling: 'touch',
       }}
     >
       <PhotoBand
