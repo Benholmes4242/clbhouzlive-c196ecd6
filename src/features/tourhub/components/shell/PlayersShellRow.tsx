@@ -58,31 +58,36 @@ function PlayersShellRowInner() {
           className="flex items-center justify-end"
           style={{ padding: '8.5px 16px' }}
         >
-          <button
-            type="button"
-            onClick={() => setTourSheetOpen(true)}
-            className="shrink-0 active:scale-[0.97] flex items-center"
-            aria-label="Filter by tour"
-            style={{
-              height: 30,
-              padding: '0 11px',
-              fontSize: 12,
-              fontWeight: 600,
-              borderRadius: 15,
-              background: 'rgba(247,147,30,0.12)',
-              border: '1px solid #F7931E',
-              color: '#c97a10',
-              gap: 5,
-              whiteSpace: 'nowrap',
-            }}
-          >
-            {hasTourLogo(activeTour.toLowerCase())
-              ? <img src={getTourLogo(activeTour.toLowerCase())} alt="" className="shrink-0" style={{ width: 14, height: 14, objectFit: 'contain' }} />
-              : <Globe size={12} strokeWidth={2.5} />
-            }
-            <span>{TOUR_LABELS[activeTour] ?? 'Tour'}</span>
-            <ChevronDown size={11} strokeWidth={2.5} style={{ opacity: 0.6 }} />
-          </button>
+          {(() => {
+            const isActive = activeTour !== 'pga';
+            return (
+              <button
+                type="button"
+                onClick={() => setTourSheetOpen(true)}
+                className="shrink-0 active:scale-[0.97] flex items-center"
+                aria-label="Filter by tour"
+                style={{
+                  height: 30,
+                  padding: '0 11px',
+                  fontSize: 12,
+                  fontWeight: 600,
+                  borderRadius: 15,
+                  background: isActive ? 'rgba(247,147,30,0.12)' : 'transparent',
+                  border: isActive ? '1px solid #F7931E' : '1.5px solid hsl(var(--border))',
+                  color: isActive ? '#c97a10' : 'hsl(var(--muted-foreground))',
+                  gap: 5,
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                {hasTourLogo(activeTour.toLowerCase())
+                  ? <img src={getTourLogo(activeTour.toLowerCase())} alt="" className="shrink-0" style={{ width: 14, height: 14, objectFit: 'contain' }} />
+                  : <Globe size={12} strokeWidth={2.5} />
+                }
+                <span>{TOUR_LABELS[activeTour] ?? 'Tour'}</span>
+                <ChevronDown size={11} strokeWidth={2.5} style={{ opacity: 0.6 }} />
+              </button>
+            );
+          })()}
         </div>
       </div>
 
