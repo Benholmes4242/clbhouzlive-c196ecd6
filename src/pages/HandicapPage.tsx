@@ -439,7 +439,7 @@ const HandicapPage: React.FC = () => {
         friendUsername={isFriendView ? profile?.username : null}
         viewerUserId={user.id}
       />
-      <main>
+      <main style={{ paddingTop: 'var(--chrome-total-h, 0px)' }}>
         {isFriendView ? (
           <FriendHandicapDashboard userId={ownerUserId} />
         ) : (
