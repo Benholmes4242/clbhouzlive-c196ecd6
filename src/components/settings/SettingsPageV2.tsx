@@ -42,6 +42,7 @@ import {
 } from '@/components/ui/alert-dialog';
 import { Input } from '@/components/ui/input';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { SectionEyebrow } from '@/components/ui/SectionEyebrow';
 
 function maskEmail(email: string): string {
   const [local, domain] = email.split('@');
@@ -114,11 +115,10 @@ export function SettingsPageV2() {
           <ChevronLeft size={20} strokeWidth={2.5} style={{ color: '#64748B' }} />
         </button>
         <div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 2 }}>
-            <div style={{ width: 3, height: 8, background: '#F7931E', borderRadius: 1, flexShrink: 0 }} />
-            <span style={{ fontSize: 9, fontWeight: 900, color: '#F7931E', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>Profile</span>
+          <div style={{ marginBottom: 2 }}>
+            <SectionEyebrow label="Profile" />
           </div>
-          <h1 style={{ fontSize: 22, fontWeight: 900, color: '#0F172A', letterSpacing: '-0.03em', margin: 0 }}>
+          <h1 style={{ fontSize: 22, fontWeight: 800, color: '#0F172A', letterSpacing: '-0.025em', margin: 0 }}>
             Settings
           </h1>
         </div>

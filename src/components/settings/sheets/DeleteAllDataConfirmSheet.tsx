@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { Trash2, X } from 'lucide-react';
+import { X } from 'lucide-react';
 import { Sheet, SheetContent } from '@/components/ui/sheet';
+import { SectionEyebrow } from '@/components/ui/SectionEyebrow';
 
 const INK = '#0F172A';
 const INK_55 = '#64748B';
-const RED = '#B91C1C';
+const RED = '#DC2626';
 const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
 
 interface Props {
@@ -46,13 +47,10 @@ export default function DeleteAllDataConfirmSheet({ open, onClose, onConfirm, is
 
         <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', padding: '4px 20px 12px' }}>
           <div style={{ flex: 1, minWidth: 0 }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
-              <Trash2 size={12} color={RED} strokeWidth={2.4} />
-              <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: RED }}>
-                Permanent
-              </span>
+            <div style={{ marginBottom: 6 }}>
+              <SectionEyebrow label="Permanent" color="danger" />
             </div>
-            <h2 style={{ fontSize: 22, fontWeight: 700, letterSpacing: '-0.01em', margin: 0, lineHeight: 1.2 }}>
+            <h2 style={{ fontSize: 22, fontWeight: 800, letterSpacing: '-0.025em', margin: 0, lineHeight: 1.2 }}>
               Delete all data?
             </h2>
           </div>
@@ -78,9 +76,9 @@ export default function DeleteAllDataConfirmSheet({ open, onClose, onConfirm, is
             Your friends on clbhouz will still see your last-known data, but no new updates.
           </p>
 
-          <label style={{ display: 'block', fontSize: 11, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: INK_55, marginBottom: 8 }}>
-            Type DELETE to confirm
-          </label>
+          <div style={{ marginBottom: 8 }}>
+            <SectionEyebrow label="Type DELETE to confirm" />
+          </div>
           <input
             type="text"
             value={confirmText}
@@ -89,6 +87,7 @@ export default function DeleteAllDataConfirmSheet({ open, onClose, onConfirm, is
             autoCapitalize="characters"
             autoCorrect="off"
             spellCheck={false}
+            aria-label="Type DELETE to confirm"
             style={{
               width: '100%', padding: '12px 14px',
               border: '1px solid rgba(15,23,42,0.14)', borderRadius: 12,
@@ -105,7 +104,7 @@ export default function DeleteAllDataConfirmSheet({ open, onClose, onConfirm, is
             disabled={!canConfirm}
             style={{
               width: '100%', padding: '14px 16px', borderRadius: 12,
-              background: canConfirm ? RED : 'rgba(185,28,28,0.30)',
+              background: canConfirm ? RED : 'rgba(220,38,38,0.30)',
               color: '#fff', border: 'none',
               fontSize: 15, fontWeight: 600, fontFamily: FONT,
               cursor: canConfirm ? 'pointer' : 'not-allowed',

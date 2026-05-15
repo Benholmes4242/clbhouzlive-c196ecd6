@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { X, Link2Off, Trash2, CheckCircle2, AlertTriangle, ArrowRight } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { Sheet, SheetContent } from '@/components/ui/sheet';
+import { SectionEyebrow } from '@/components/ui/SectionEyebrow';
 import { toast } from 'sonner';
 import { useQueryClient } from '@tanstack/react-query';
 import { callDisconnectWhs, callDeleteWhsData } from '@/lib/whs/api';
@@ -107,11 +108,9 @@ export default function WhsConnectionSheet({ open, onClose, connection, userId }
             <div style={{ flex: 1, minWidth: 0 }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
                 <MiniFlag iso="GB-ENG" />
-                <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: AMBER }}>
-                  England Golf
-                </span>
+                <SectionEyebrow label="England Golf" color="amber" />
               </div>
-              <h2 style={{ fontSize: 22, fontWeight: 700, letterSpacing: '-0.01em', margin: 0, lineHeight: 1.2 }}>
+              <h2 style={{ fontSize: 22, fontWeight: 800, letterSpacing: '-0.025em', margin: 0, lineHeight: 1.2 }}>
                 {connection ? 'Connection details' : 'Connect handicap'}
               </h2>
             </div>
@@ -301,9 +300,7 @@ function FactRow({ label, value, isLast }: { label: string; value: string; isLas
       padding: '12px 0',
       borderBottom: isLast ? 'none' : '0.5px solid rgba(15,23,42,0.08)',
     }}>
-      <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.10em', textTransform: 'uppercase', color: INK_55 }}>
-        {label}
-      </span>
+      <SectionEyebrow label={label} />
       <span style={{ fontSize: 14, fontWeight: 500, color: INK, fontVariantNumeric: 'tabular-nums' }}>
         {value}
       </span>

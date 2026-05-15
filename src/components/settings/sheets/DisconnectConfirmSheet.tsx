@@ -1,6 +1,7 @@
 import React from 'react';
-import { Link2Off, X } from 'lucide-react';
+import { X } from 'lucide-react';
 import { Sheet, SheetContent } from '@/components/ui/sheet';
+import { SectionEyebrow } from '@/components/ui/SectionEyebrow';
 
 const INK = '#0F172A';
 const INK_55 = '#64748B';
@@ -36,13 +37,10 @@ export default function DisconnectConfirmSheet({ open, onClose, onConfirm, isWor
         {/* Header */}
         <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', padding: '4px 20px 12px' }}>
           <div style={{ flex: 1, minWidth: 0 }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
-              <Link2Off size={12} color={AMBER} strokeWidth={2.4} />
-              <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: AMBER }}>
-                Disconnect
-              </span>
+            <div style={{ marginBottom: 6 }}>
+              <SectionEyebrow label="Disconnect" color="amber" />
             </div>
-            <h2 style={{ fontSize: 22, fontWeight: 700, letterSpacing: '-0.01em', margin: 0, lineHeight: 1.2 }}>
+            <h2 style={{ fontSize: 22, fontWeight: 800, letterSpacing: '-0.025em', margin: 0, lineHeight: 1.2 }}>
               Disconnect England Golf?
             </h2>
           </div>

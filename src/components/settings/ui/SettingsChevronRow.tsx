@@ -75,8 +75,8 @@ export function SettingsChevronRow({
           <span
             style={{
               fontSize: 10,
-              fontWeight: 700,
-              letterSpacing: '0.08em',
+              fontWeight: 800,
+              letterSpacing: '0.14em',
               textTransform: 'uppercase',
               color: '#64748B',
               background: 'rgba(15,23,42,0.06)',

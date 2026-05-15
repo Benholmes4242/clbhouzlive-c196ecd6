@@ -1,5 +1,6 @@
 import React from 'react';
 import { cn } from '@/lib/utils';
+import { SectionEyebrow } from '@/components/ui/SectionEyebrow';
 
 interface SettingsSectionProps {
   title: string;
@@ -9,22 +10,19 @@ interface SettingsSectionProps {
   variant?: 'default' | 'danger';
 }
 
-export function SettingsSection({ 
-  title, 
-  children, 
+export function SettingsSection({
+  title,
+  children,
   className,
-  variant = 'default'
+  variant = 'default',
 }: SettingsSectionProps) {
   const isDanger = variant === 'danger';
 
   return (
     <section className={cn('w-full', className)}>
-      {/* Dispatch rule marker eyebrow */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8 }}>
-        <div style={{ width: 3, height: 10, background: isDanger ? '#DC2626' : '#F7931E', borderRadius: 1, flexShrink: 0 }} />
-        <span style={{ fontSize: 9, fontWeight: 900, color: isDanger ? '#DC2626' : '#F7931E', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>
-          {title}
-        </span>
+      {/* Canonical section eyebrow */}
+      <div style={{ marginBottom: 8 }}>
+        <SectionEyebrow label={title} color={isDanger ? 'danger' : 'slate'} />
       </div>
 
       {/* Content card */}
