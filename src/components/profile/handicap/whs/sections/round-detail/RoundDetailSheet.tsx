@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react';
 import { Drawer as DrawerPrimitive } from 'vaul';
 import { useNavigate } from 'react-router-dom';
-import { useRoundDetail, useFriendRoundDetail, useAllScores } from '@/lib/whs/hooks';
+import { useRoundDetail, useFriendRoundDetail } from '@/lib/whs/hooks';
 import RoundScorecard from './RoundScorecard';
 import {
   SheetHero,
@@ -80,9 +80,6 @@ export const RoundDetailSheet: React.FC<Props> = ({
 
   // ── User variant ──
   const userQuery = useRoundDetail(isFriend ? null : scoreId, !isFriend && open);
-  const { data: allScores } = useAllScores(
-    !isFriend && open ? connectionId ?? undefined : undefined,
-  );
 
   // ── Friend variant ──
   const friendIsClbhouz = !!activity?.is_clbhouz_user;
