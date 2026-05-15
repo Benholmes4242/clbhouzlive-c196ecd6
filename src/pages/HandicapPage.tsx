@@ -11,7 +11,7 @@
  * in the leaderboard / a legacy ?tab=stats redirect (friend).
  */
 
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo } from 'react';
 import { useNavigate, Navigate, useSearchParams, useParams } from 'react-router-dom';
 import { ChevronRight, Trophy, Activity } from 'lucide-react';
 import { openTrophiesSheet } from '@/components/profile/handicap/whs/trophiesSheetEvents';
@@ -22,7 +22,8 @@ import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useWhsConnection } from '@/lib/whs/hooks';
 import WhsHandicapTab from '@/components/profile/handicap/whs/WhsHandicapTab';
 import HandicapDashboard from '@/components/profile/handicap/whs/HandicapDashboard';
-import { useStickyHeaderSafeArea } from '@/hooks/useStickyHeaderSafeArea';
+import ShellSlot from '@/components/header/ShellSlot';
+import SegmentedControl from '@/components/discover/SegmentedControl';
 
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { isHandicapSubtab, type HandicapSubtab } from '@/components/profile/handicap/whs/types';
