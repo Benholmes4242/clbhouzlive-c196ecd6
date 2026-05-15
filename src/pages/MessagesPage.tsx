@@ -217,7 +217,7 @@ function MessagesPageInner() {
           {/* Title + badge */}
           <div style={{ display: 'flex', flexDirection: 'column' as const, alignItems: 'center', gap: 2 }}>
             <div className="flex items-center" style={{ gap: 6 }}>
-              <span style={{ fontSize: 17, fontWeight: 900, color: '#0F172A', letterSpacing: '-0.02em' }}>
+              <span style={{ fontSize: 17, fontWeight: 800, color: '#0F172A', letterSpacing: '-0.015em' }}>
                 Messages
               </span>
             {totalUnread > 0 && (
