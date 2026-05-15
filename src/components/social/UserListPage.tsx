@@ -95,13 +95,12 @@ interface UserListPageProps {
 
 const SectionEyebrow: React.FC<{ label: string; count?: number }> = ({ label, count }) => (
   <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-    <div style={{ width: 3, height: 10, background: AMBER, borderRadius: 1 }} />
     <span
       style={{
-        fontSize: 10,
+        fontSize: 9,
         fontWeight: 800,
-        color: INK_SUBTLE,
-        letterSpacing: '0.25em',
+        color: '#64748B',
+        letterSpacing: '0.16em',
         textTransform: 'uppercase',
         fontFeatureSettings: '"kern" 1, "liga" 1',
       }}
@@ -111,10 +110,9 @@ const SectionEyebrow: React.FC<{ label: string; count?: number }> = ({ label, co
     {count != null && (
       <span
         style={{
-          fontSize: 10,
+          fontSize: 9,
           fontWeight: 800,
-          color: INK_FAINT,
-          letterSpacing: '0.16em',
+          color: '#94A3B8',
           fontVariantNumeric: 'tabular-nums',
         }}
       >
