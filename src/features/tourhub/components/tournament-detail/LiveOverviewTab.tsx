@@ -113,10 +113,10 @@ function CutContextCard({
           >
             <div
               style={{
-                fontSize: 10,
-                fontWeight: 900,
-                color: '#94A3B8',
-                letterSpacing: '0.12em',
+                fontSize: 9,
+                fontWeight: 800,
+                color: '#64748B',
+                letterSpacing: '0.14em',
                 marginBottom: 4,
               }}
             >
@@ -125,7 +125,7 @@ function CutContextCard({
             <div
               style={{
                 fontSize: 18,
-                fontWeight: 900,
+                fontWeight: 800,
                 color: '#0F172A',
                 letterSpacing: '-0.02em',
                 fontVariantNumeric: 'tabular-nums',
