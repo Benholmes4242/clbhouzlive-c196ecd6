@@ -9,6 +9,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { cn } from '@/lib/utils';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useSuggestedUsers, suggestionReasonLabel, type SuggestedUser } from '@/hooks/useSuggestedUsers';
+import { SectionEyebrow } from '@/components/ui/SectionEyebrow';
 
 interface UserProfile {
   id: string;
@@ -225,7 +226,7 @@ export function NewConversationModal({
         value={value}
         onChange={(e) => onChange(e.target.value)}
         className="flex-1 bg-transparent outline-none"
-        style={{ fontSize: '13.5px', color: '#1e293b', border: 'none' }}
+        style={{ fontSize: 14, color: '#1e293b', border: 'none' }}
       />
       {value && (
         <button onClick={() => onChange('')}>
@@ -270,7 +271,7 @@ export function NewConversationModal({
               {userProfile.eg_handicap_index != null && (
                 <span
                   style={{
-                    fontSize: '10.5px', fontWeight: 600, color: '#F7931E',
+                    fontSize: 10, fontWeight: 600, color: '#F7931E',
                     background: 'rgba(247,147,30,0.08)',
                     border: '1px solid rgba(247,147,30,0.20)',
                     borderRadius: 99, padding: '0 6px',
@@ -283,7 +284,7 @@ export function NewConversationModal({
                 <span
                   className="flex items-center truncate"
                   style={{
-                    fontSize: '10.5px', fontWeight: 600, color: '#006747',
+                    fontSize: 10, fontWeight: 600, color: '#006747',
                     background: 'rgba(0,103,71,0.07)',
                     border: '1px solid rgba(0,103,71,0.18)',
                     borderRadius: 99, padding: '0 6px',
@@ -372,7 +373,7 @@ export function NewConversationModal({
                 <span
                   className="truncate"
                   style={{
-                    fontSize: '10.5px', fontWeight: 600, color: '#475569',
+                    fontSize: 10, fontWeight: 600, color: '#475569',
                     background: 'rgba(15,23,42,0.05)',
                     border: '1px solid rgba(15,23,42,0.10)',
                     borderRadius: 99, padding: '0 6px',
@@ -385,7 +386,7 @@ export function NewConversationModal({
               {s.eg_handicap_index != null && (
                 <span
                   style={{
-                    fontSize: '10.5px', fontWeight: 600, color: '#F7931E',
+                    fontSize: 10, fontWeight: 600, color: '#F7931E',
                     background: 'rgba(247,147,30,0.08)',
                     border: '1px solid rgba(247,147,30,0.20)',
                     borderRadius: 99, padding: '0 6px',
@@ -531,11 +532,8 @@ export function NewConversationModal({
 
         {/* Header */}
         <div className="relative flex items-center justify-center" style={{ padding: '12px 20px 14px', borderBottom: '0.5px solid rgba(15,23,42,0.07)' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-            <div style={{ width: 3, height: 10, background: '#F7931E', borderRadius: 1, flexShrink: 0 }} />
-            <span style={{ fontSize: 9, fontWeight: 900, color: '#F7931E', letterSpacing: '0.16em', textTransform: 'uppercase' as const }} id="new-message-title">
-              New Message
-            </span>
+          <div id="new-message-title">
+            <SectionEyebrow label="New Message" />
           </div>
           <button
             onClick={handleClose}
@@ -605,11 +603,9 @@ export function NewConversationModal({
             />
 
             {/* Section label */}
-            <div style={{ padding: '6px 20px 6px', display: 'flex', alignItems: 'center', gap: 6 }}>
-              <div style={{ width: 3, height: 10, background: '#F7931E', borderRadius: 1, flexShrink: 0 }} />
-              <span style={{ fontSize: 9, fontWeight: 900, color: '#F7931E', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>
-              {dmSearch.trim() ? 'Results' : 'Suggested'}
-              </span>
+            <div style={{ padding: '6px 20px 6px' }}>
+              <SectionEyebrow label={dmSearch.trim() ? 'Results' : 'Suggested'} />
+            </div>
             </div>
 
             <ScrollArea className="flex-1">
