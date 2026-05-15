@@ -92,9 +92,8 @@ function DateSeparator({ date }: { date: string }) {
     <div className="flex justify-center" style={{ padding: '8px 0 4px' }}>
       <span
         style={{
-          fontSize: '10.5px',
-          fontWeight: 700,
-          letterSpacing: '0.06em',
+          fontSize: 11,
+          fontWeight: 600,
           color: '#94a3b8',
           background: 'rgba(0,0,0,0.05)',
           borderRadius: 99,
