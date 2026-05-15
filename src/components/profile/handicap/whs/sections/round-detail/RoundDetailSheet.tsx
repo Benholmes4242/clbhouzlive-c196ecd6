@@ -8,7 +8,6 @@ import {
   SheetHeroGlass,
   UserEyebrow,
   FriendEyebrow,
-  CounterPill,
   SheetFooterInk,
   FooterPill,
   ScorecardEmpty,
@@ -137,9 +136,6 @@ export const RoundDetailSheet: React.FC<Props> = ({
           imageUrl={userData.course_header_image}
           onClose={onClose}
           topEyebrow={<UserEyebrow playDate={userData.play_date} />}
-          topRightPill={
-            <CounterPill isCounter={!!userData.is_counter} rank={counterRank} />
-          }
           glass={
             <SheetHeroGlass
               courseName={userData.course?.name ?? 'Unknown course'}
@@ -149,6 +145,7 @@ export const RoundDetailSheet: React.FC<Props> = ({
               stableford={userData.stableford_points}
               differential={userData.handicap_differential}
               holes={hasHoles ? holes : null}
+              isCounter={!!userData.is_counter}
             />
           }
         />
