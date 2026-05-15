@@ -326,13 +326,13 @@ export const FeaturedNotificationCard: React.FC<FeaturedNotificationCardProps> =
 
           {/* Content column */}
           <div className="flex-1 min-w-0">
-            <p className="text-[13.5px] leading-[1.4] line-clamp-2" style={{ color: INK }}>
+            <p className="text-[14px] leading-[1.4] line-clamp-2" style={{ color: INK }}>
               <span className="font-semibold">{actorName}</span>{' '}
               <span style={{ color: INK_SOFT }} className="font-normal">{actionText}</span>
             </p>
 
             {!isPrivateFollow && !incomplete && notification.actor_username && (
-              <p style={{ fontSize: 11.5, color: INK_SUBTLE, marginTop: 1 }}>
+              <p style={{ fontSize: 11, color: INK_SUBTLE, marginTop: 2 }}>
                 @{notification.actor_username}
               </p>
             )}
@@ -344,7 +344,7 @@ export const FeaturedNotificationCard: React.FC<FeaturedNotificationCardProps> =
             )}
 
             {isPrivateFollow && (
-              <p style={{ fontSize: 11.5, color: INK_SUBTLE, marginTop: 2, fontStyle: 'italic' }}>
+              <p style={{ fontSize: 12, color: INK_SUBTLE, marginTop: 2, fontStyle: 'italic' }}>
                 Private profile · no profile to view
               </p>
             )}
