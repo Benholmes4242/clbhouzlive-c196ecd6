@@ -438,10 +438,6 @@ function AppRoutes() {
         <Route path="/tourhub" element={<Suspense fallback={<GenericPageSkeleton />}><TourHubMainPage /></Suspense>} />
         <Route path="/tourhub/tournament/:tournamentId" element={<Suspense fallback={<GenericPageSkeleton />}><TourNavWrapper><TournamentDetailPage /></TourNavWrapper></Suspense>} />
         <Route path="/tourhub/player/:playerId" element={<Suspense fallback={<GenericPageSkeleton />}><TourNavWrapper><PlayerProfilePage /></TourNavWrapper></Suspense>} />
-        <Route path="/tourhub/live" element={<Suspense fallback={<GenericPageSkeleton />}><TourHubLivePage /></Suspense>} />
-        <Route path="/tourhub/tour/:tour" element={<Suspense fallback={<GenericPageSkeleton />}><TourHubTourPage /></Suspense>} />
-        <Route path="/tourhub/event/:tour/:eventId" element={<Suspense fallback={<GenericPageSkeleton />}><TourHubEventPage /></Suspense>} />
-        <Route path="/tourhub/rankings" element={<Suspense fallback={<GenericPageSkeleton />}><TourHubRankingsPage /></Suspense>} />
         <Route path="/tourhub/college-golf" element={<Suspense fallback={<GenericPageSkeleton />}><TourNavWrapper><CollegeGolfHubPage /></TourNavWrapper></Suspense>} />
         <Route path="/tourhub/college-golf/compare" element={<Suspense fallback={<GenericPageSkeleton />}><TourNavWrapper><CollegeComparePage /></TourNavWrapper></Suspense>} />
         <Route path="/tourhub/college-golf/:collegeSlug" element={<Suspense fallback={<GenericPageSkeleton />}><TourNavWrapper><CollegeProfilePage /></TourNavWrapper></Suspense>} />
