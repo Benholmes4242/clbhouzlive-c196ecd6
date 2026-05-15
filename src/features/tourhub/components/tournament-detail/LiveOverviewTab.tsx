@@ -151,8 +151,7 @@ export function LiveOverviewTab({
 
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.3 }}>
-      {/* 1. LEADER */}
-      {sectionRule('Leader')}
+      {/* 1. LEADERBOARD — header rendered by LeaderboardCard itself (canonical eyebrow + View all action) */}
       {hasLeaderboard ? (
         <LeaderboardCard
           entries={leaderboard!}
