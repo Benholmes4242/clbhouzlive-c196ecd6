@@ -1,6 +1,6 @@
 /**
  * MiddleBand — state-driven 40-62px band between photo and leaderboard.
- * §5 of HYBRID_HERO_IMPLEMENTATION_BRIEF + Patch 01 §3.
+ * §5 of HYBRID_HERO_IMPLEMENTATION_BRIEF + Patch 01 §3 + Polish Patch §4.
  */
 
 import React from 'react';
@@ -8,7 +8,11 @@ import type { HeroState, TickerRow, TopTie } from '../HybridHero.utils';
 import { Ticker } from './Ticker';
 import { ChampionStrip, CancelledStrip, PlayoffStrip } from './ChampionStrip';
 import { TeamWinnerStrip } from './TeamWinnerStrip';
+import { FieldStrengthStrip } from './FieldStrengthStrip';
+import { CourseStatsStrip } from './CourseStatsStrip';
 import type { DefendingChampData } from '../../../hooks/useTournamentDefendingChamp';
+import type { FieldStrength } from '../../../hooks/useTournamentFieldStrength';
+import type { CourseStats } from '../../../hooks/useTournamentCourseStats';
 
 export interface TeamWinner {
   teamName: string;
@@ -25,6 +29,8 @@ interface MiddleBandProps {
   champion?: { name: string; country?: string; score: string; playoffWin?: boolean; avatarUrl?: string | null };
   tiedLeaders?: TopTie | null;
   defendingChamp?: DefendingChampData | null;
+  fieldStrength?: FieldStrength | null;
+  courseStats?: CourseStats | null;
   cancelReason?: string;
   fallbackPreview?: { eyebrow: string; body: string };
   teamWinner?: TeamWinner | null;
@@ -36,6 +42,8 @@ export function MiddleBand({
   champion,
   tiedLeaders,
   defendingChamp,
+  fieldStrength,
+  courseStats,
   cancelReason,
   fallbackPreview,
   teamWinner,
@@ -51,7 +59,6 @@ export function MiddleBand({
     if (state.variant === 'awaiting-playoff' && tiedLeaders) {
       return <PlayoffStrip count={tiedLeaders.count} score={tiedLeaders.score} />;
     }
-    // Team winner takes precedence over solo champion strip when present.
     if (teamWinner) {
       return (
         <TeamWinnerStrip
@@ -79,7 +86,8 @@ export function MiddleBand({
     return <ChampionStrip name="Result pending" score="—" eyebrow="🏆 CHAMPION" />;
   }
 
-  // Upcoming
+  // Upcoming — 4-level fallback chain (Polish Patch §4.5)
+  // Level 1: Defending champion
   if (defendingChamp) {
     return (
       <ChampionStrip
@@ -91,6 +99,28 @@ export function MiddleBand({
       />
     );
   }
+  // Level 2: Field strength
+  if (fieldStrength && fieldStrength.totalPlayers > 0) {
+    return (
+      <FieldStrengthStrip
+        totalPlayers={fieldStrength.totalPlayers}
+        topRanked={fieldStrength.topRanked}
+        headshots={fieldStrength.headshots}
+      />
+    );
+  }
+  // Level 3: Course stats
+  if (courseStats && (courseStats.par || courseStats.yardage)) {
+    return (
+      <CourseStatsStrip
+        par={courseStats.par}
+        yardage={courseStats.yardage}
+        courseRecord={courseStats.courseRecord}
+        courseRecordHolder={courseStats.courseRecordHolder}
+      />
+    );
+  }
+  // Level 4: Generic preview
   if (fallbackPreview) {
     return (
       <ChampionStrip

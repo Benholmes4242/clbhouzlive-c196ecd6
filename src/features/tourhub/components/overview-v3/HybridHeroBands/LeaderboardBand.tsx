@@ -10,6 +10,7 @@ import { SoloLeaderRow, TiedLeadersRow, ChampionRow } from './LeaderRow';
 import { ChaserRow } from './ChaserRow';
 import { LastYearRow } from './LastYearRow';
 import { TeeTimeRow } from './TeeTimeRow';
+import { TeamFinishRow } from './TeamFinishRow';
 import { CancelledPanel } from './CancelledPanel';
 import { PlayoffPendingPanel } from './PlayoffPendingPanel';
 import { INK, INK_15, AMBER } from '../HybridHero.constants';
