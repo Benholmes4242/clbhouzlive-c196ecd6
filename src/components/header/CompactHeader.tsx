@@ -11,6 +11,7 @@ import GlobalSearchOverlay from '@/components/search/GlobalSearchOverlay';
 import { ActingAsIndicator } from './ActingAsIndicator';
 import { cn } from '@/lib/utils';
 import { haptic } from '@/utils/haptics';
+import { safeGoBack } from '@/utils/navigation';
 
 interface CompactHeaderProps {
   className?: string;
@@ -57,6 +58,9 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
   const isMessagesConversationRoute = location.pathname.startsWith('/messages/');
   const isHandicapRoute = location.pathname === '/handicap' || location.pathname.startsWith('/handicap/');
   const isWatchSubpageRoute = location.pathname === '/watch/videos' || location.pathname === '/watch/clips';
+  // Course detail: /courses/:courseId (exactly 3 segments — excludes /reviews, /rate, /share-review subroutes)
+  const isCourseDetailRoute = location.pathname.startsWith('/courses/')
+    && location.pathname.split('/').length === 3;
 
 
   // Discover sub-page detection:
@@ -78,7 +82,7 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
   const isTop100Route = isTop100HubPage || isTop100SubPage;
   
   // Routes that should show back arrow instead of logo
-  const isBackArrowRoute = isDiscoverSubPage || isTop100Route || isEditProfileRoute || isFriendsActivityRoute || isAchievementsRoute || isMessagesRoute || isHandicapRoute || isWatchSubpageRoute;
+  const isBackArrowRoute = isDiscoverSubPage || isTop100Route || isCourseDetailRoute || isEditProfileRoute || isFriendsActivityRoute || isAchievementsRoute || isMessagesRoute || isHandicapRoute || isWatchSubpageRoute;
   
   // Search overlay always uses light mode app-wide
   const useLightTheme = true;
@@ -90,6 +94,8 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
         handleDiscoverBack();
       } else if (isTop100Route) {
         handleTop100Back();
+      } else if (isCourseDetailRoute) {
+        safeGoBack(navigate, '/courses');
       } else if (isEditProfileRoute) {
         navigate('/profile');
       } else if (isFriendsActivityRoute) {

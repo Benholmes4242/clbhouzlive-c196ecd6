@@ -4,7 +4,6 @@ import { Button } from '@/components/ui/button';
 import GolfClubView from '@/components/golf-club/GolfClubView';
 import { FadeInContent } from '@/components/ui/FadeInContent';
 import { PageRoot } from '@/components/layout/PageRoot';
-import { useMedianStatusBar } from '@/hooks/useMedianStatusBar';
 import { usePreventOverscroll } from '@/hooks/usePreventOverscroll';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import ScrollToTopGlass from '@/components/common/ScrollToTopGlass';
@@ -13,9 +12,8 @@ const CourseDetailPage = () => {
   const params = useParams();
   const courseId = params?.courseId;
   const navigate = useNavigate();
-  
+
   usePreventOverscroll();
-  useMedianStatusBar("dark", "transparent", true, false);
 
   useEffect(() => {
     window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
@@ -47,7 +45,7 @@ const CourseDetailPage = () => {
   }
 
   return (
-    <PageRoot className="min-h-screen bg-background" immersive immersiveStatusBar style={{ overscrollBehaviorY: 'none' }}>
+    <PageRoot className="min-h-screen bg-background" style={{ overscrollBehaviorY: 'none' }}>
       <FadeInContent>
         <GolfClubView courseId={courseId} isInModal={false} />
       </FadeInContent>
