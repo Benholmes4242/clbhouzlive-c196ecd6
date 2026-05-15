@@ -1,14 +1,10 @@
-import { useState, useEffect, useRef, useCallback, useMemo, Fragment } from 'react';
+import { useState, useEffect, useMemo, Fragment } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import { RefreshCw, AlertCircle, ChevronLeft, GraduationCap, ChevronRight, Crown } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { RefreshCw, AlertCircle, GraduationCap, ChevronRight, Crown } from 'lucide-react';
 import { getCollegeLogoUrl } from '@/utils/collegeLogo';
-import { useQueryClient } from '@tanstack/react-query';
 import { PageRoot } from '@/components/layout/PageRoot';
 import { Skeleton } from '@/components/ui/skeleton';
-import { useHeader } from '@/contexts/GlobalHeaderContext';
 import { useMedianStatusBar } from '@/hooks/useMedianStatusBar';
-import { useStickyHeaderSafeArea } from '@/hooks/useStickyHeaderSafeArea';
 import { formatCurrency } from '@/lib/utils/formatCurrency';
 import {
   FranchiseStoryStrip,
