@@ -5,15 +5,20 @@ interface SectionEyebrowProps {
   label: string;
   /** Optional inline count rendered alongside the label. */
   count?: number;
-  /** Override the default slate-500 colour. Defaults to slate. */
-  color?: 'slate' | 'amber';
+  /** Override the default slate-500 colour. Defaults to slate.
+   *  - 'slate' (default): canonical neutral eyebrow.
+   *  - 'amber': editorial brand moment (amber-on-amber-tint chrome).
+   *  - 'danger': destructive-section eyebrow (#DC2626).
+   */
+  color?: 'slate' | 'amber' | 'danger';
   /** Optional className for layout wrapper customisation. */
   className?: string;
 }
 
-const COLOR_MAP: Record<'slate' | 'amber', string> = {
+const COLOR_MAP: Record<'slate' | 'amber' | 'danger', string> = {
   slate: '#64748B',
   amber: '#F7931E',
+  danger: '#DC2626',
 };
 
 /**
