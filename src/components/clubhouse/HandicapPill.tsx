@@ -122,24 +122,27 @@ function TrendArrow({ direction }: { direction: 'down' | 'flat' | 'up' }) {
 
   if (direction === 'flat') {
     return (
-      <svg width="10" height="10" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <svg width="8" height="8" viewBox="0 0 24 24" fill="none" aria-hidden="true">
         <path d="M5 12 H19" stroke={color} strokeWidth="3" strokeLinecap="round" />
       </svg>
     );
   }
 
+  const SIZE = 8;
   const path =
-    direction === 'down' ? 'M7 10 L12 15 L17 10' : 'M7 14 L12 9 L17 14';
+    direction === 'down'
+      ? `M ${SIZE / 2} ${SIZE} L 0 0 L ${SIZE} 0 Z`
+      : `M ${SIZE / 2} 0 L 0 ${SIZE} L ${SIZE} ${SIZE} Z`;
 
   return (
-    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-      <path
-        d={path}
-        stroke={color}
-        strokeWidth="3"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
+    <svg
+      width={SIZE}
+      height={SIZE}
+      viewBox={`0 0 ${SIZE} ${SIZE}`}
+      style={{ display: 'inline-block', verticalAlign: 'middle' }}
+      aria-hidden="true"
+    >
+      <path d={path} fill={color} />
     </svg>
   );
 }
