@@ -1,6 +1,6 @@
 import React, { useState, useCallback } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { useNavigate, useLocation, useSearchParams } from 'react-router-dom';
+import { useLocation, useSearchParams } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { ChevronLeft } from 'lucide-react';
 import { Tabs, TabsContent } from '@/components/ui/tabs';
@@ -10,8 +10,9 @@ import CourseReviewsTab from '@/components/courses/course-detail/CourseReviewsTa
 import CourseMediaTabNew from '@/components/course-media-tab/CourseMediaTabNew';
 import CourseRankBadges from '@/components/courses/CourseRankBadges';
 import { CourseTabs } from '@/components/courses/course-detail/CourseTabs';
+import ShellSlot from '@/components/header/ShellSlot';
+import SegmentedControl from '@/components/discover/SegmentedControl';
 import { formatCourseLocation } from '@/utils/courseLocation';
-import { safeGoBack } from '@/utils/navigation';
 import { CourseDetailSkeleton } from '@/components/skeletons/CourseDetailSkeleton';
 import { useCourseRatingAggregates } from '@/hooks/useCourseRatingAggregates';
 
@@ -24,7 +25,6 @@ interface GolfClubViewProps {
 
 const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false, onClose }) => {
   const { user } = useSupabaseSession();
-  const navigate = useNavigate();
   const location = useLocation();
   const [searchParams] = useSearchParams();
   const queryClient = useQueryClient();
