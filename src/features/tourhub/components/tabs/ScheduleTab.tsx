@@ -74,13 +74,9 @@ function InViewCard({ children }: { children: React.ReactNode }) {
 export function ScheduleTab() {
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
-  const [searchInput, setSearchInput] = useState('');
-  const { sentinelRef: stickysentinelRef, paddingTop: stickyPaddingTop } = useStickyHeaderSafeArea();
   const thisWeekAnchorRef = useRef<HTMLDivElement>(null);
   const [isThisWeekVisible, setIsThisWeekVisible] = useState(true);
   const hasAutoScrolledAllTab = useRef(false);
-  const [searchExpanded, setSearchExpanded] = useState(false);
-  const [tourSheetOpen, setTourSheetOpen] = useState(false);
 
   const filter = (searchParams.get('filter') as ScheduleFilterType) || 'all';
   const activeTour = (searchParams.get('tour') as TourFilterCode) || 'all';
@@ -97,8 +93,6 @@ export function ScheduleTab() {
       window.scrollTo(0, 0);
     });
   }, []);
-
-
 
   // Track THIS WEEK anchor visibility for sticky Today pill
   useEffect(() => {
@@ -128,7 +122,6 @@ export function ScheduleTab() {
   useEffect(() => {
     if (filter !== 'all') return;
     if (hasAutoScrolledAllTab.current) return;
-    // Wait a tick for monthGroups to render
     const t = setTimeout(() => {
       const el = document.getElementById(`month-${currentMonthKey}`);
       if (el) {
@@ -139,74 +132,18 @@ export function ScheduleTab() {
     return () => clearTimeout(t);
   }, [filter, currentMonthKey]);
 
-  const scrollToThisWeek = useCallback(() => {
-    const el = thisWeekAnchorRef.current ?? document.getElementById(`month-${currentMonthKey}`);
-    if (el) el.scrollIntoView({ block: 'start', behavior: 'smooth' });
-  }, [currentMonthKey]);
-  
-  const setFilter = useCallback((f: ScheduleFilterType) => {
-    const params = new URLSearchParams(searchParams);
-    if (f === 'all') { params.delete('filter'); } else { params.set('filter', f); }
-    setSearchParams(params, { replace: true });
-    // Scroll to top on filter change
-    window.scrollTo({ top: 0 });
-  }, [searchParams, setSearchParams]);
-
   const setActiveTour = useCallback((t: TourFilterCode) => {
     const params = new URLSearchParams(searchParams);
     if (t === 'all') { params.delete('tour'); } else { params.set('tour', t); }
     setSearchParams(params, { replace: true });
   }, [searchParams, setSearchParams]);
 
-  const search = useDebouncedValue(searchInput, 200);
-  
-  const queryClient = useQueryClient();
+  const search = '';
+
   const { data: season } = useTourSeason();
   const { data: tournaments, isLoading, error, refetch } = useTourTournaments(season?.id, {
-    // B43 FIX 4: poll upcoming tab too
     refetchInterval: filter === 'live' ? 30000 : filter === 'upcoming' ? 60000 : false,
   });
-
-  // Pull-to-refresh state
-  const [isRefreshing, setIsRefreshing] = useState(false);
-  const [pullDistance, setPullDistance] = useState(0);
-  const touchStartY = useRef(0);
-  const isPulling = useRef(false);
-
-  const handleRefresh = useCallback(async () => {
-    setIsRefreshing(true);
-    await Promise.all([
-      queryClient.invalidateQueries({ queryKey: ['tourhub', 'tournaments'] }),
-      queryClient.invalidateQueries({ queryKey: ['tournament-leaders-winners'] }),
-    ]);
-    setIsRefreshing(false);
-  }, [queryClient]);
-
-  const onTouchStart = useCallback((e: React.TouchEvent) => {
-    if (window.scrollY === 0) {
-      touchStartY.current = e.touches[0].clientY;
-      isPulling.current = true;
-    }
-  }, []);
-
-  const onTouchMove = useCallback((e: React.TouchEvent) => {
-    if (!isPulling.current) return;
-    const distance = e.touches[0].clientY - touchStartY.current;
-    if (distance > 0 && window.scrollY === 0) {
-      setPullDistance(Math.min(distance * 0.5, 80));
-    } else {
-      isPulling.current = false;
-      setPullDistance(0);
-    }
-  }, []);
-
-  const onTouchEnd = useCallback(() => {
-    if (pullDistance > 50) {
-      handleRefresh();
-    }
-    setPullDistance(0);
-    isPulling.current = false;
-  }, [pullDistance, handleRefresh]);
 
   const { liveIds, completedIds } = useMemo(() => {
     if (!tournaments) return { liveIds: [] as string[], completedIds: [] as string[] };
