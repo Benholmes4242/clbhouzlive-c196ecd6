@@ -11,7 +11,7 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import GolfClubView from '@/components/golf-club/GolfClubView';
 
-import { useMedianStatusBar } from '@/hooks/useMedianStatusBar';
+
 import {
   Top100ListLeaderboard,
   Top100ListFilterChips,
