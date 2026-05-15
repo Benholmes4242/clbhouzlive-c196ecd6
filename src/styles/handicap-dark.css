@@ -133,3 +133,21 @@
   display: inline-block;
   flex-shrink: 0;
 }
+
+/* Shell + tab strip surface override inside the dark zone.
+ * ShellSlot uses position:fixed but remains a DOM descendant of PageRoot,
+ * so .hcp-dark ancestor selectors still match. */
+.hcp-dark [data-chrome="shell-slot"] {
+  background: var(--hcp-bg-0) !important;
+  border-bottom-color: var(--hcp-line) !important;
+}
+.hcp-dark [data-chrome="shell-slot"] section {
+  background: var(--hcp-bg-0) !important;
+  border-bottom-color: var(--hcp-line) !important;
+}
+.hcp-dark [data-chrome="shell-slot"] [role="tab"] {
+  color: var(--hcp-t-60);
+}
+.hcp-dark [data-chrome="shell-slot"] [role="tab"][aria-selected="true"] {
+  color: var(--hcp-t-100) !important;
+}
