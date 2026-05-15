@@ -599,35 +599,6 @@ const FeedCard: React.FC<FeedCardProps> = ({ round, isBest, onTap }) => {
             )}
           </div>
 
-          {/* Row 2: BEST tag pill — only when present (counter signal moved to gross ring) */}
-          {isBest && (
-            <div
-              style={{
-                marginTop: 6,
-                display: 'flex',
-                alignItems: 'center',
-                gap: 6,
-              }}
-            >
-              <span
-                style={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: 3,
-                  padding: '2px 6px 2px 5px',
-                  background: T.gold,
-                  color: '#3F2A05',
-                  borderRadius: 99,
-                  fontSize: 9,
-                  fontWeight: 800,
-                  letterSpacing: '0.14em',
-                }}
-              >
-                <Trophy size={9} strokeWidth={2.5} />
-                BEST
-              </span>
-            </div>
-          )}
         </div>
         <div style={{ textAlign: 'right', flexShrink: 0, display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 4 }}>
           <span
