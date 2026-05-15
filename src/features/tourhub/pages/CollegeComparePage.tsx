@@ -107,7 +107,7 @@ export function CollegeComparePage() {
           <button
             type="button"
             onClick={() => navigate('/tourhub/college-golf')}
-            aria-label="Head-to-Head — open College Golf"
+            aria-label="Head-to-Head — open College Franchise"
             style={{
               background: 'transparent',
               border: 'none',
@@ -200,7 +200,7 @@ export function CollegeComparePage() {
               className="active:opacity-50 transition-opacity"
             >
               <ChevronLeft size={13} strokeWidth={2.5} />
-              College Golf
+              College Franchise
             </button>
             <div style={{ flex: 1 }} />
             <span style={{ fontSize: 9, color: '#94A3B8', fontWeight: 800, letterSpacing: '0.14em', textTransform: 'uppercase' }}>
