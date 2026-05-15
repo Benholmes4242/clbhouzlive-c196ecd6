@@ -236,13 +236,6 @@ export function PlayersTab() {
   const initialTour = searchParams.get('tour') || 'pga';
   const [sort, setSort] = useState<PlayerSortType>(getDefaultSortForTour(initialTour));
   const [searchExpanded, setSearchExpanded] = useState(false);
-  const [tourSheetOpen, setTourSheetOpen] = useState(false);
-  const [isRefreshing] = useState(false);
-  const [pullDistance] = useState(0);
-  const onTouchStart = () => {};
-  const onTouchMove = () => {};
-  const onTouchEnd = () => {};
-  const { sentinelRef: stickyHeaderSentinelRef, paddingTop: stickyPaddingTop } = useStickyHeaderSafeArea();
   const sentinelRef = useRef<HTMLDivElement>(null);
   const isFetchingRef = useRef(false);
 
