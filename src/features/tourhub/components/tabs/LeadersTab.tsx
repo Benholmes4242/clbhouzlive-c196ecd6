@@ -5,11 +5,11 @@
  * across Tour Hub destinations.
  */
 
-import { useMemo, useEffect, useRef, useState, useCallback } from 'react';
+import { useMemo, useEffect, useState } from 'react';
 import { Skeleton } from '@/components/ui/skeleton';
-import { useSearchParams, useNavigate, Link } from 'react-router-dom';
+import { useSearchParams, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { RefreshCw, ChevronLeft, ChevronDown, Search, X } from 'lucide-react';
+import { Search, X } from 'lucide-react';
 import { useQueryClient } from '@tanstack/react-query';
 import { useTourSeason, useTourPlayerStatistics } from '../../hooks/useTourHubData';
 import { useWorldRankingsLeaders } from '../../hooks/useWorldRankingsLeaders';
@@ -17,7 +17,6 @@ import { useElitePlayers } from '../../hooks/useElitePlayers';
 import { useChampionStreak } from '../../hooks/useChampionStreak';
 import { useRecentPlayerResults } from '../../hooks/useRecentPlayerResults';
 import { useDebouncedValue } from '@/hooks/useDebouncedValue';
-import { useStickyHeaderSafeArea } from '@/hooks/useStickyHeaderSafeArea';
 import { LEADER_CATEGORIES, getCategoryByKey } from '../leaders/constants';
 import { LeadersCategorySheet } from '../leaders/LeadersCategorySheet';
 import { LeadersMasthead } from '../leaders/LeadersMasthead';
