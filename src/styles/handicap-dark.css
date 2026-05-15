@@ -1,0 +1,135 @@
+/**
+ * Handicap Dashboard — Dark Performance-Terminal Mode
+ * ===================================================
+ *
+ * Scope: every element under `.hcp-dark` inherits these variables.
+ * Nothing outside this scope is affected. The light Clbhouz feed,
+ * Discover, Courses, Tour Hub are all untouched.
+ *
+ * Token naming follows the design-system convention (`--hcp-*`)
+ * so these can't collide with the global `--background` / `--surface-card`
+ * tokens already in src/index.css.
+ *
+ * The dark zone is reserved for the FOUR My Index tabs:
+ *   Today · Trends · Records · Friends
+ *
+ * It is intentional that the Clubhouse feed and tournament pages
+ * remain light. The dark zone signals "your performance, focused".
+ */
+
+.hcp-dark {
+  /* ── Surface hierarchy ──────────────────────────────────────────── */
+  --hcp-bg-0:   #0A0E14;          /* page canvas */
+  --hcp-bg-1:   #0F1419;          /* default card */
+  --hcp-bg-2:   #161C24;          /* raised / inset */
+  --hcp-bg-3:   #1F2730;          /* track / chip / icon-square neutral */
+  --hcp-bg-4:   #283341;          /* hover / pressed */
+
+  /* Hairlines */
+  --hcp-line:   rgba(255, 255, 255, 0.06);  /* default card border */
+  --hcp-line-2: rgba(255, 255, 255, 0.10);  /* lifted card border */
+  --hcp-line-3: rgba(255, 255, 255, 0.16);  /* strong divider */
+
+  /* ── Text hierarchy ─────────────────────────────────────────────── */
+  --hcp-t-100: rgba(255, 255, 255, 0.96);   /* primary */
+  --hcp-t-80:  rgba(255, 255, 255, 0.72);   /* body */
+  --hcp-t-60:  rgba(255, 255, 255, 0.55);   /* secondary / meta */
+  --hcp-t-40:  rgba(255, 255, 255, 0.38);   /* tertiary / disabled */
+  --hcp-t-20:  rgba(255, 255, 255, 0.20);   /* hairline-text */
+
+  /* ── Brand (unchanged from app-wide) ────────────────────────────── */
+  --hcp-amber:      #F7931E;
+  --hcp-amber-2:    #FFB45A;
+  --hcp-amber-d:    #C97211;
+  --hcp-amber-tint:    rgba(247, 147, 30, 0.16);
+  --hcp-amber-tint-2:  rgba(247, 147, 30, 0.08);
+
+  /* ── Verdict palette ─────────────────────────────────────────────
+   * SEMANTIC ONLY. Never used decoratively.
+   *   good = improvement  (under handicap, downward index movement)
+   *   bad  = worsening    (over handicap, upward index movement)
+   *   mid  = neutral hold (rare; usually expressed as t-60)
+   * Tuned for WCAG AA against bg-0 and bg-1.
+   */
+  --hcp-good:       #22C55E;
+  --hcp-good-2:     #4ADE80;
+  --hcp-good-tint:  rgba(34, 197, 94, 0.14);
+
+  --hcp-mid:        #FACC15;
+  --hcp-mid-tint:   rgba(250, 204, 21, 0.14);
+
+  --hcp-bad:        #EF4444;
+  --hcp-bad-2:      #FCA5A5;
+  --hcp-bad-tint:   rgba(239, 68, 68, 0.14);
+
+  /* ── Form temperature ────────────────────────────────────────────
+   * Only used in the Trends tab Form Hero, where "cold/warm/hot" is
+   * a temperature metaphor. Distinct from verdict colour.
+   */
+  --hcp-hot:    #EF4444;
+  --hcp-warm:   #F59E0B;
+  --hcp-steady: #94A3B8;
+  --hcp-cold:   #38BDF8;
+
+  /* ── Apply to the scope ─────────────────────────────────────────── */
+  background: var(--hcp-bg-0);
+  color: var(--hcp-t-100);
+  font-variant-numeric: tabular-nums;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* The dashboard wrapper bleeds full-width within the parent screen.
+ * Cancel any inherited light padding so the dark canvas extends edge-to-edge.
+ */
+.hcp-dark {
+  min-height: 100%;
+}
+
+/* ── Inline element overrides ──────────────────────────────────────
+ * Some legacy sections still use hex-literal colours via inline style.
+ * We don't override those globally (would cause weird inversions). Instead,
+ * legacy sections opt INTO the new dark vocabulary one at a time as they
+ * get ported — each section adds `.hcp-section` to its root and uses the
+ * darkAtoms primitives.
+ */
+
+/* Pulsing live dot (used in topbar status line) */
+@keyframes hcp-pulse {
+  0%, 100% { box-shadow: 0 0 0 4px rgba(34, 197, 94, 0.12); }
+  50%      { box-shadow: 0 0 0 6px rgba(34, 197, 94, 0.04); }
+}
+.hcp-dark .hcp-live-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--hcp-good);
+  box-shadow: 0 0 0 4px rgba(34, 197, 94, 0.12);
+  animation: hcp-pulse 2s infinite;
+  display: inline-block;
+}
+
+/* Tab underline switches to amber-on-dark in the dashboard */
+.hcp-dark [role="tab"][aria-selected="true"] {
+  color: var(--hcp-t-100) !important;
+}
+
+/* Section eyebrow — amber dot + tracked caps. Used everywhere. */
+.hcp-dark .hcp-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  text-transform: uppercase;
+  font-size: 10.5px;
+  letter-spacing: 0.16em;
+  font-weight: 700;
+  color: var(--hcp-t-60);
+}
+.hcp-dark .hcp-eyebrow::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--hcp-amber);
+  display: inline-block;
+  flex-shrink: 0;
+}
