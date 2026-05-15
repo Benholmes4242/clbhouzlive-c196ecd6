@@ -31,6 +31,9 @@ img[src*="Silhouette"] {
 /* SnapFeed — hide scrollbar via CSS instead of per-render inline <style> */
 [data-snap-feed]::-webkit-scrollbar { display: none; }
 
+/* Canonical destination tab strip (Discover SegmentedControl + TourHubShellTabs) */
+.segmented-scroller::-webkit-scrollbar { display: none; }
+
 /* 
  * ============================================================================
  * CRITICAL: PREVENT PULL-TO-REFRESH AND OVERSCROLL - DO NOT MODIFY OR REMOVE
