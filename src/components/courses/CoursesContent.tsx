@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { useStickyHeaderSafeArea } from '@/hooks/useStickyHeaderSafeArea';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import ShellSlot from '@/components/header/ShellSlot';
 import CourseExplorer from './CourseExplorer';
 import MyCourses from './MyCourses';
 import FriendsCoursesSignedOutEmpty from './FriendsCoursesSignedOutEmpty';
@@ -163,7 +163,7 @@ const CoursesContent: React.FC<CoursesContentProps> = ({ username, displayName }
   const [rateSheetOpen, setRateSheetOpen] = useState(false);
   const [searchParams, setSearchParams] = useSearchParams();
   const location = useLocation();
-  const { sentinelRef, paddingTop } = useStickyHeaderSafeArea();
+  
   
   // Default to 'explore' since we're removing my-courses tab
   const [activeTab, setActiveTab] = useState(() => {
@@ -300,71 +300,54 @@ const CoursesContent: React.FC<CoursesContentProps> = ({ username, displayName }
         </Tabs>
       ) : (
         /* Main courses page - show Explore, Global Top 100, and Friends' Courses */
-        <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
-          {/* Sentinel for sticky-header safe-area detection */}
-          <div ref={sentinelRef} aria-hidden style={{ height: 1 }} />
-          <div
-            className="sticky bg-background"
-            style={{
-              top: 0,
-              zIndex: 20,
-              borderBottom: '1px solid hsl(var(--border) / 0.12)',
-              paddingTop,
-              transition: 'padding-top 200ms ease',
-            }}
-          >
-            <SegmentedControl
-              tabs={[
-                { id: 'explore', label: 'Explore' },
-                { id: 'top100', label: 'Top 100' },
-                { id: 'leaderboards', label: 'Rankings' },
-              ]}
-              activeTab={activeTab}
-              onTabChange={handleTabChange}
-            />
-          </div>
+        <>
+          <ShellSlot>
+            <div className="px-1">
+              <SegmentedControl
+                tabs={[
+                  { id: 'explore', label: 'Explore' },
+                  { id: 'top100', label: 'Top 100' },
+                  { id: 'leaderboards', label: 'Rankings' },
+                ]}
+                activeTab={activeTab}
+                onTabChange={handleTabChange}
+              />
+            </div>
+          </ShellSlot>
 
-          {/* Rate a Course CTA — slim row, visible on all tabs */}
-          {user && (
-            <button
-              onClick={() => setRateSheetOpen(true)}
-              style={{
-                width: '100%',
-                display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-                padding: '10px 14px', marginTop: 10, marginBottom: 10,
-                background: 'rgba(247,147,30,0.05)',
-                border: '1px solid rgba(247,147,30,0.18)',
-                borderRadius: 12,
-                cursor: 'pointer',
-              }}
-              className="active:scale-[0.97] transition-all"
-            >
-              <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                <Star size={14} fill="#F7931E" color="#F7931E" strokeWidth={0} />
-                <span style={{ fontSize: 13.5, fontWeight: 600, color: '#0F172A' }}>
-                  Rate a course you've played
-                </span>
-              </div>
-              <ChevronRight size={14} color="#c97a10" strokeWidth={2.5} />
-            </button>
-          )}
-
-          <TabsContent value="explore" className="mt-3">
-            <CourseExplorer />
-          </TabsContent>
-
-          <TabsContent value="top100" className="mt-3">
-            <Top100CoursesHubPanel />
-          </TabsContent>
-
-          <TabsContent value="leaderboards" className="mt-3">
-            {user ? (
-              <Top100LeaderboardPanel />
-            ) : (
-              <FriendsCoursesSignedOutEmpty />
+          <div className="px-4" style={{ paddingTop: 'var(--chrome-total-h, 0px)' }}>
+            {/* Rate a Course CTA — slim row, visible on all tabs */}
+            {user && (
+              <button
+                onClick={() => setRateSheetOpen(true)}
+                style={{
+                  width: '100%',
+                  display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                  padding: '10px 14px', marginTop: 10, marginBottom: 10,
+                  background: 'rgba(247,147,30,0.05)',
+                  border: '1px solid rgba(247,147,30,0.18)',
+                  borderRadius: 12,
+                  cursor: 'pointer',
+                }}
+                className="active:scale-[0.97] transition-all"
+              >
+                <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                  <Star size={14} fill="#F7931E" color="#F7931E" strokeWidth={0} />
+                  <span style={{ fontSize: 13.5, fontWeight: 600, color: '#0F172A' }}>
+                    Rate a course you've played
+                  </span>
+                </div>
+                <ChevronRight size={14} color="#c97a10" strokeWidth={2.5} />
+              </button>
             )}
-          </TabsContent>
-        </Tabs>
+
+            {activeTab === 'explore' && <CourseExplorer />}
+            {activeTab === 'top100' && <Top100CoursesHubPanel />}
+            {activeTab === 'leaderboards' && (
+              user ? <Top100LeaderboardPanel /> : <FriendsCoursesSignedOutEmpty />
+            )}
+          </div>
+        </>
       )}
 
         {/* Global scroll-to-top button */}
