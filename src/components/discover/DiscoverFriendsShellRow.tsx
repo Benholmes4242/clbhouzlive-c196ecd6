@@ -10,7 +10,6 @@ interface ChipDef {
 const MODES: ChipDef[] = [
   { id: 'latest', label: 'Latest' },
   { id: 'popular', label: 'Popular' },
-  { id: 'live_now', label: 'Live now', emoji: '🟢' },
 ];
 
 interface DiscoverFriendsShellRowProps {
@@ -20,7 +19,7 @@ interface DiscoverFriendsShellRowProps {
 
 /**
  * Row 2 of the Discover shell when main=loop. Canonical chip styling
- * (matches WatchMoodChips). Three chips: Latest / Popular / 🟢 Live now.
+ * (matches WatchMoodChips). Two pills centered: Latest / Popular.
  */
 function DiscoverFriendsShellRowInner({
   activeMode,
@@ -37,8 +36,8 @@ function DiscoverFriendsShellRowInner({
       <div
         role="tablist"
         aria-label="Filter Friends feed"
-        className="flex gap-1.5 overflow-x-auto scrollbar-hide"
-        style={{ padding: '8.5px 28px 8.5px 16px' }}
+        className="flex justify-center gap-1.5"
+        style={{ padding: '8.5px 16px' }}
       >
         {MODES.map((m) => {
           const isActive = activeMode === m.id;
@@ -73,15 +72,6 @@ function DiscoverFriendsShellRowInner({
           );
         })}
       </div>
-
-      <div
-        aria-hidden
-        className="pointer-events-none absolute top-0 right-0 h-full"
-        style={{
-          width: 28,
-          background: 'linear-gradient(to right, rgba(248,250,252,0) 0%, #F8FAFC 100%)',
-        }}
-      />
     </div>
   );
 }
