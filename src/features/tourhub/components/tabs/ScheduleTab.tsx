@@ -138,7 +138,14 @@ export function ScheduleTab() {
     setSearchParams(params, { replace: true });
   }, [searchParams, setSearchParams]);
 
-  const search = '';
+  const search: string = '';
+
+  const setFilter = useCallback((f: ScheduleFilterType) => {
+    const params = new URLSearchParams(searchParams);
+    if (f === 'all') params.delete('filter'); else params.set('filter', f);
+    setSearchParams(params, { replace: true });
+    window.scrollTo({ top: 0 });
+  }, [searchParams, setSearchParams]);
 
   const { data: season } = useTourSeason();
   const { data: tournaments, isLoading, error, refetch } = useTourTournaments(season?.id, {
