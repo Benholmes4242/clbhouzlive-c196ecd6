@@ -109,7 +109,7 @@ export const CinemaFriendCard: React.FC<Props> = ({ activity, onClick }) => {
             stableford={activity.last_round_stableford}
             differential={activity.last_round_differential}
             holes={showShape ? detail!.holes : null}
-            isCounter={detail?.is_counter ?? false}
+            isCounter={false}
           />
         </div>
       </div>
