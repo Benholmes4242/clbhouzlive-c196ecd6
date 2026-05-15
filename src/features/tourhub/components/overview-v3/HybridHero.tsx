@@ -16,6 +16,8 @@ import { useBatchCourseImages } from '../../hooks/useBatchCourseImages';
 import { useTournamentDefendingChamp } from '../../hooks/useTournamentDefendingChamp';
 import { useTournamentLastYearTop4 } from '../../hooks/useTournamentLastYearTop4';
 import { useTournamentTeeTimes } from '../../hooks/useTournamentTeeTimes';
+import { useTournamentFieldStrength } from '../../hooks/useTournamentFieldStrength';
+import { useTournamentCourseStats } from '../../hooks/useTournamentCourseStats';
 import { tournamentRoute } from '../../routes';
 
 import { PhotoBand } from './HybridHeroBands/PhotoBand';
@@ -115,11 +117,30 @@ export function HybridHero({ slide }: HybridHeroProps) {
   const teeTimesEnabled = isUpcoming && hoursUntilStart <= 48;
   const { data: teeTimes = [] } = useTournamentTeeTimes(tournament.id, teeTimesEnabled);
 
+  // Upcoming · far fallback chain — only enabled when no defending champion data
+  const fallbackEnabled = isUpcoming && !defendingChamp;
+  const { data: fieldStrength } = useTournamentFieldStrength(fallbackEnabled ? tournament.id : null);
+  const { data: courseStats } = useTournamentCourseStats(fallbackEnabled ? tournament.id : null);
+
   // Derive state
-  const state = useMemo(
+  const baseState = useMemo(
     () => deriveHeroState(tournament, now, { teeTimesAvailable: teeTimes.length > 0 }),
     [tournament, now, teeTimes.length]
   );
+
+  // Detect team event from leaderboard shape — promote results.standard → results.team
+  const isTeamEvent = !!(safeLeaderboard[0] as any)?.team;
+  const state = useMemo(() => {
+    if (
+      baseState.kind === 'results' &&
+      isTeamEvent &&
+      baseState.variant !== 'cancelled' &&
+      baseState.variant !== 'awaiting-playoff'
+    ) {
+      return { ...baseState, variant: 'team' as const };
+    }
+    return baseState;
+  }, [baseState, isTeamEvent]);
 
   // Ticker + tie detection
   const top10 = useMemo(() => deriveTickerRows(safeLeaderboard), [safeLeaderboard]);
