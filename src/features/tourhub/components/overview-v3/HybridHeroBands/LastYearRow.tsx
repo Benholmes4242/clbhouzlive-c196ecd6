@@ -4,6 +4,8 @@
  */
 
 import React from 'react';
+import CountryFlag from '@/components/ui/country-flag';
+import { PLAYER_SILHOUETTE_URL } from '@/utils/playerHeadshot';
 import {
   INK,
   INK_15,
@@ -14,17 +16,23 @@ import {
 
 function PlayerHead({ size = 28, src }: { size?: number; src?: string | null }) {
   return (
-    <div
+    <img
+      src={src || PLAYER_SILHOUETTE_URL}
+      alt=""
+      onError={(e) => {
+        const t = e.target as HTMLImageElement;
+        if (t.src !== PLAYER_SILHOUETTE_URL) t.src = PLAYER_SILHOUETTE_URL;
+      }}
       style={{
         width: size,
         height: size,
         borderRadius: '34%',
-        background: src
-          ? `url(${src}) center/cover`
-          : 'linear-gradient(135deg, #CBD5E1 0%, #94A3B8 100%)',
+        objectFit: 'cover',
+        objectPosition: 'center 18%',
         flexShrink: 0,
+        background: 'linear-gradient(135deg, #CBD5E1 0%, #94A3B8 100%)',
+        border: '0.5px solid rgba(15,23,42,0.10)',
       }}
-      aria-hidden="true"
     />
   );
 }
@@ -32,6 +40,7 @@ function PlayerHead({ size = 28, src }: { size?: number; src?: string | null }) 
 interface LastYearRowProps {
   rank: string;
   name: string;
+  country?: string | null;
   score: string;
   year: string;
   isWinner?: boolean;
@@ -42,6 +51,7 @@ interface LastYearRowProps {
 export function LastYearRow({
   rank,
   name,
+  country,
   score,
   year,
   isWinner,
@@ -71,19 +81,22 @@ export function LastYearRow({
       )}
       <div style={{ display: 'flex', gap: 12, alignItems: 'center', minWidth: 0 }}>
         <PlayerHead size={isWinner ? 36 : 28} src={avatarUrl} />
-        <span
-          style={{
-            fontSize: isWinner ? 16 : 14,
-            fontWeight: isWinner ? 800 : 700,
-            color: INK,
-            letterSpacing: '-0.005em',
-            whiteSpace: 'nowrap',
-            overflow: 'hidden',
-            textOverflow: 'ellipsis',
-          }}
-        >
-          {name}
-        </span>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 6, minWidth: 0 }}>
+          <span
+            style={{
+              fontSize: isWinner ? 16 : 14,
+              fontWeight: isWinner ? 800 : 700,
+              color: INK,
+              letterSpacing: '-0.005em',
+              whiteSpace: 'nowrap',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+            }}
+          >
+            {name}
+          </span>
+          {country && <CountryFlag country={country} size="sm" />}
+        </div>
       </div>
       <span
         style={{
