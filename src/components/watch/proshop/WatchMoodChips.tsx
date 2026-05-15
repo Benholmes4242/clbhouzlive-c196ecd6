@@ -24,8 +24,8 @@ function WatchMoodChipsInner({ active, onChange }: WatchMoodChipsProps) {
       <div
         role="tablist"
         aria-label="Filter Watch by mood"
-        className="flex gap-2 px-4 py-3 overflow-x-auto scrollbar-hide"
-        style={{ paddingRight: 32 }}
+        className="flex gap-1.5 overflow-x-auto scrollbar-hide"
+        style={{ padding: '8.5px 28px 8.5px 16px' }}
       >
         {WATCH_MOODS.map((m) => {
           const isActive = active === m.id;
@@ -36,17 +36,18 @@ function WatchMoodChipsInner({ active, onChange }: WatchMoodChipsProps) {
               role="tab"
               aria-selected={isActive}
               onClick={() => onChange(m.id)}
-              className="shrink-0 transition-colors active:scale-[0.97] flex items-center gap-1.5"
+              className="shrink-0 transition-colors active:scale-[0.97] flex items-center"
               style={{
-                minHeight: 36,
-                padding: '0 14px',
-                fontSize: 13,
+                height: 30,
+                padding: '0 11px',
+                fontSize: 12,
                 fontWeight: 600,
-                borderRadius: 20,
+                borderRadius: 15,
                 background: isActive ? 'rgba(247,147,30,0.12)' : 'transparent',
                 border: isActive ? '1px solid #F7931E' : '1.5px solid hsl(var(--border))',
                 color: isActive ? '#c97a10' : 'hsl(var(--muted-foreground))',
                 letterSpacing: '-0.01em',
+                gap: 5,
               }}
             >
               <span aria-hidden style={{ fontSize: 13 }}>{m.emoji}</span>
@@ -61,7 +62,7 @@ function WatchMoodChipsInner({ active, onChange }: WatchMoodChipsProps) {
         aria-hidden
         className="pointer-events-none absolute top-0 right-0 h-full"
         style={{
-          width: 40,
+          width: 28,
           background: 'linear-gradient(to right, rgba(248,250,252,0) 0%, #F8FAFC 100%)',
         }}
       />
