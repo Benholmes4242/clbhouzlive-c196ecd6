@@ -191,18 +191,18 @@ export function HoleStatsTab({ tournamentId, isCompleted }: HoleStatsTabProps) {
           {hasRoundData && toughestHoles.length > 0 && easiestHoles.length > 0 && (
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', background: '#ffffff', borderTop: '1px solid rgba(15,23,42,0.07)', borderBottom: '0.5px solid rgba(15,23,42,0.07)' }}>
               <div style={{ padding: '11px 0', textAlign: 'center' as const, borderRight: '0.5px solid rgba(15,23,42,0.07)' }}>
-                <div style={{ fontSize: '12px', fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.1em', marginBottom: '3px' }}>HARDEST</div>
-                <div style={{ fontSize: '15px', fontWeight: 900, color: '#0F172A' }}>Hole {toughestHoles[0]?.holeNumber}</div>
+                <div style={{ fontSize: '9px', fontWeight: 800, color: '#64748B', letterSpacing: '0.14em', marginBottom: '3px' }}>HARDEST</div>
+                <div style={{ fontSize: '15px', fontWeight: 800, color: '#0F172A' }}>Hole {toughestHoles[0]?.holeNumber}</div>
                 <div style={{ fontSize: '12px', color: '#DC2626', fontWeight: 700 }}>+{toughestHoles[0]?.avgDiff.toFixed(2)}</div>
               </div>
               <div style={{ padding: '11px 0', textAlign: 'center' as const, borderRight: '0.5px solid rgba(15,23,42,0.07)' }}>
-                <div style={{ fontSize: '12px', fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.1em', marginBottom: '3px' }}>EASIEST</div>
-                <div style={{ fontSize: '15px', fontWeight: 900, color: '#0F172A' }}>Hole {easiestHoles[0]?.holeNumber}</div>
+                <div style={{ fontSize: '9px', fontWeight: 800, color: '#64748B', letterSpacing: '0.14em', marginBottom: '3px' }}>EASIEST</div>
+                <div style={{ fontSize: '15px', fontWeight: 800, color: '#0F172A' }}>Hole {easiestHoles[0]?.holeNumber}</div>
                 <div style={{ fontSize: '12px', color: '#F7931E', fontWeight: 700 }}>{easiestHoles[0]?.avgDiff.toFixed(2)}</div>
               </div>
               <div style={{ padding: '11px 0', textAlign: 'center' as const }}>
-                <div style={{ fontSize: '12px', fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.1em', marginBottom: '3px' }}>FIELD AVG</div>
-                <div style={{ fontSize: '15px', fontWeight: 900, color: '#0F172A' }}>{roundScoringAvg !== null ? (roundScoringAvg > 0 ? `+${roundScoringAvg.toFixed(1)}` : roundScoringAvg.toFixed(1)) : '—'}</div>
+                <div style={{ fontSize: '9px', fontWeight: 800, color: '#64748B', letterSpacing: '0.14em', marginBottom: '3px' }}>FIELD AVG</div>
+                <div style={{ fontSize: '15px', fontWeight: 800, color: '#0F172A' }}>{roundScoringAvg !== null ? (roundScoringAvg > 0 ? `+${roundScoringAvg.toFixed(1)}` : roundScoringAvg.toFixed(1)) : '—'}</div>
                 <div style={{ fontSize: '12px', color: '#94A3B8' }}>vs par</div>
               </div>
             </div>
