@@ -6,12 +6,8 @@
 import { useState, useMemo, useCallback, useEffect, useRef, type RefObject } from 'react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useSearchParams, useLocation, useNavigate } from 'react-router-dom';
-import { Search, X, ChevronDown, ChevronLeft, ChevronRight, RefreshCw, Globe, Users, Crown } from 'lucide-react';
-import { cn } from '@/lib/utils';
-import { BottomSheet } from '@/components/ui/BottomSheet';
-import SheetHeader from '@/components/ui/SheetHeader';
-import { getTourLogo, hasTourLogo } from '../../utils/tourLogos';
-import { useStickyHeaderSafeArea } from '@/hooks/useStickyHeaderSafeArea';
+import { Search, X, ChevronDown, ChevronRight, Users, Crown } from 'lucide-react';
+
 import { AnimatePresence, motion } from 'framer-motion';
 import { useQueryClient } from '@tanstack/react-query';
 import { useTourPlayers, useTourSeason, useTourPlayerStatistics, type TourPlayer } from '../../hooks/useTourHubData';
@@ -236,13 +232,6 @@ export function PlayersTab() {
   const initialTour = searchParams.get('tour') || 'pga';
   const [sort, setSort] = useState<PlayerSortType>(getDefaultSortForTour(initialTour));
   const [searchExpanded, setSearchExpanded] = useState(false);
-  const [tourSheetOpen, setTourSheetOpen] = useState(false);
-  const [isRefreshing] = useState(false);
-  const [pullDistance] = useState(0);
-  const onTouchStart = () => {};
-  const onTouchMove = () => {};
-  const onTouchEnd = () => {};
-  const { sentinelRef: stickyHeaderSentinelRef, paddingTop: stickyPaddingTop } = useStickyHeaderSafeArea();
   const sentinelRef = useRef<HTMLDivElement>(null);
   const isFetchingRef = useRef(false);
 
@@ -646,32 +635,7 @@ export function PlayersTab() {
   }
 
   return (
-    <div
-      onTouchStart={onTouchStart}
-      onTouchMove={onTouchMove}
-      onTouchEnd={onTouchEnd}
-      style={{ background: '#F8FAFC' }}
-    >
-      {/* Pull-to-refresh indicator */}
-      <AnimatePresence>
-        {(pullDistance > 0 || isRefreshing) && (
-          <motion.div
-            className="flex items-center justify-center"
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: isRefreshing ? 48 : pullDistance, opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 0.2 }}
-          >
-            <RefreshCw
-              className={cn(
-                'w-5 h-5 text-muted-foreground transition-transform',
-                isRefreshing && 'animate-spin'
-              )}
-              style={{ transform: isRefreshing ? undefined : `rotate(${pullDistance * 3}deg)` }}
-            />
-          </motion.div>
-        )}
-      </AnimatePresence>
+    <div style={{ background: '#F8FAFC' }}>
 
       {/* ── EDITORIAL OPENING — Masthead + No.1 Cover Story + Movers Grid ── */}
       {!debouncedSearch && elitePlayers && elitePlayers.length > 0 && (() => {
@@ -749,101 +713,24 @@ export function PlayersTab() {
         );
       })()}
 
-      {/* Sentinel for sticky-header safe-area detection */}
-      <div ref={stickyHeaderSentinelRef} aria-hidden style={{ height: 1 }} />
-
-      {/* ══════════════════════════════════════════════
-          STICKY HEADER — back link · sort · search
-          ══════════════════════════════════════════════ */}
-      <div
-        className="sticky top-0 z-20"
-        style={{
-          paddingTop: stickyPaddingTop,
-          transition: 'padding-top 200ms ease',
-          background: 'rgba(248,250,252,0.97)',
-          backdropFilter: 'blur(20px)',
-          WebkitBackdropFilter: 'blur(20px)',
-          borderBottom: '0.5px solid rgba(15,23,42,0.08)',
-        }}
-      >
-        {/* Top collapsible search removed — search now lives inline replacing the count bar (Phase 1 fix.1.7) */}
-
-        {/* Control row — back link + search button (sort pill removed Phase 1 fix.1.2) */}
-        <div style={{ display: 'flex', alignItems: 'center', padding: '8px 16px 0', gap: '6px' }}>
-          <button
-            type="button"
-            onClick={() => navigate('/tourhub?tab=overview', { replace: true })}
-            className="active:opacity-50 transition-opacity shrink-0"
-            style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: 2,
-              fontSize: 12,
-              fontWeight: 600,
-              color: '#64748B',
-              background: 'none',
-              border: 'none',
-              padding: 0,
-              cursor: 'pointer',
-            }}
-          >
-            <ChevronLeft size={13} strokeWidth={2.5} />
-            Tour Overview
-          </button>
-
-          <div style={{ flex: 1 }} />
-
-          {/* Search button + tour filter pill — right cluster */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-            {!searchExpanded && (
-              <button
-                onClick={() => setSearchExpanded(true)}
-                style={{
-                  display: 'flex', alignItems: 'center', gap: 5,
-                  padding: '6px 11px', borderRadius: 8,
-                  background: '#EDF1F5',
-                  border: 'none', cursor: 'pointer',
-                }}
-                aria-label="Search players"
-              >
-                <Search className="w-3 h-3" style={{ color: '#0F172A' }} strokeWidth={2.5} />
-                <span style={{ fontSize: 12, fontWeight: 700, color: '#0F172A' }}>Search</span>
-              </button>
-            )}
-            {/* Tour filter pill — moved from masthead */}
+      {/* Inline control row — search button only (back link + tour pill moved to shell) */}
+      <div>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', padding: '8px 16px 0' }}>
+          {!searchExpanded && (
             <button
-              onClick={() => setTourSheetOpen(true)}
-              className="active:scale-[0.97] transition-all duration-150"
+              onClick={() => setSearchExpanded(true)}
               style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: 6,
-                padding: '6px 11px',
-                background: '#FEF3E7',
-                border: '1.5px solid #F7931E',
-                borderRadius: 10,
-                fontSize: 12,
-                fontWeight: 600,
-                color: '#0F172A',
-                cursor: 'pointer',
+                display: 'flex', alignItems: 'center', gap: 5,
+                padding: '6px 11px', borderRadius: 8,
+                background: '#EDF1F5',
+                border: 'none', cursor: 'pointer',
               }}
+              aria-label="Search players"
             >
-              {hasTourLogo(activeTour.toLowerCase())
-                ? <img src={getTourLogo(activeTour.toLowerCase())} alt={activeTour} className="shrink-0" style={{ width: 14, height: 14, objectFit: 'contain' }} />
-                : <Globe className="w-[12px] h-[12px] shrink-0" style={{ color: '#F7931E' }} strokeWidth={2.5} />
-              }
-              <span>
-                {activeTour === 'pga' ? 'PGA Tour'
-                  : activeTour === 'EURO' ? 'DP World Tour'
-                  : activeTour === 'LPGA' ? 'LPGA'
-                  : activeTour === 'PGAD' ? 'Korn Ferry'
-                  : activeTour === 'LIV' ? 'LIV Golf'
-                  : activeTour === 'CHAMP' ? 'Champions Tour'
-                  : 'Tour'}
-              </span>
-              <ChevronDown className="w-2.5 h-2.5" style={{ color: '#94A3B8' }} strokeWidth={2.5} />
+              <Search className="w-3 h-3" style={{ color: '#0F172A' }} strokeWidth={2.5} />
+              <span style={{ fontSize: 12, fontWeight: 700, color: '#0F172A' }}>Search</span>
             </button>
-          </div>
+          )}
         </div>
 
         {/* Underline tour-specific tabs (A-Z removed Phase 1 fix.1.6) */}
@@ -924,73 +811,7 @@ export function PlayersTab() {
 
 
 
-      {/* Tour filter bottom sheet */}
-      <BottomSheet
-        open={tourSheetOpen}
-        onClose={() => setTourSheetOpen(false)}
-        ariaLabelledBy="players-tour-sheet-title"
-      >
-        <SheetHeader
-          eyebrow="FILTER"
-          title={<span id="players-tour-sheet-title">Select tour</span>}
-          onClose={() => setTourSheetOpen(false)}
-        />
-        {(['pga', 'EURO', 'LPGA', 'CHAMP', 'PGAD', 'LIV'] as const).map((code) => {
-          const labels: Record<string, string> = {
-            pga: 'PGA Tour', EURO: 'DP World Tour',
-            LPGA: 'LPGA', CHAMP: 'Champions', PGAD: 'Korn Ferry', LIV: 'LIV Golf',
-          };
-          const descriptions: Record<string, string> = {
-            pga: 'PGA Tour players',
-            EURO: 'DP World Tour players',
-            LPGA: 'LPGA Tour players',
-            CHAMP: 'PGA Champions Tour players',
-            PGAD: 'Korn Ferry Tour players',
-            LIV: 'LIV Golf players',
-          };
-          const isSelected = activeTour === code;
-          const count = tourCounts[code] ?? 0;
-          if (count === 0) return null;
-          return (
-            <button
-              key={code}
-              onClick={() => { setActiveTour(code as PlayerTourCode); setTourSheetOpen(false); }}
-              aria-pressed={isSelected}
-              style={{
-                width: '100%', display: 'flex', alignItems: 'center', gap: 12,
-                padding: '14px 16px',
-                background: isSelected ? 'rgba(247,147,30,0.04)' : 'transparent',
-                border: 'none',
-                borderLeft: isSelected ? '3px solid #F7931E' : '3px solid transparent',
-                borderBottom: '0.5px solid rgba(15,23,42,0.07)',
-                cursor: 'pointer', textAlign: 'left' as const,
-              }}
-            >
-              {/* Tour logo chip */}
-              <div style={{ width: 36, height: 22, borderRadius: 4, background: 'rgba(15,23,42,0.06)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                {hasTourLogo(code.toLowerCase())
-                    ? <img src={getTourLogo(code.toLowerCase())} alt="" aria-hidden="true" style={{ width: 28, height: 18, objectFit: 'contain' }} />
-                    : null
-                }
-              </div>
-              {/* Label + description */}
-              <div style={{ flex: 1, minWidth: 0 }}>
-                <div style={{ fontSize: 15, fontWeight: isSelected ? 700 : 500, color: '#0F172A' }}>
-                  {labels[code]}
-                </div>
-                <div style={{ fontSize: 12, color: '#94A3B8', marginTop: 2 }}>
-                  {descriptions[code]}
-                </div>
-              </div>
-              {/* Count */}
-              {count > 0 && <span style={{ fontSize: 13, color: '#94A3B8', fontVariantNumeric: 'tabular-nums', flexShrink: 0 }}>{count.toLocaleString()}</span>}
-              {/* Active dot */}
-              {isSelected && <div style={{ width: 6, height: 6, borderRadius: '50%', background: '#F7931E', flexShrink: 0 }} />}
-            </button>
-          );
-        })}
-        <div style={{ paddingBottom: 'calc(var(--sab, env(safe-area-inset-bottom, 0px)) + 8px)' }} />
-      </BottomSheet>
+      {/* Tour filter bottom sheet — moved to PlayersShellRow */}
 
       {/* Content — white surface */}
       <div style={{ background: '#ffffff', borderTop: '1px solid rgba(15,23,42,0.07)', marginTop: '8px' }}>

@@ -1,12 +1,12 @@
-import { useMemo, useEffect, useRef, useState, useCallback } from 'react';
-import { Link, useSearchParams } from 'react-router-dom';
-import { RefreshCw, ChevronLeft, Search, X } from 'lucide-react';
+import { useMemo, useEffect, useState, useCallback } from 'react';
+import { useSearchParams } from 'react-router-dom';
+import { Search, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useQueryClient } from '@tanstack/react-query';
 import { useDebouncedValue } from '@/hooks/useDebouncedValue';
-import { formatCurrency } from '@/lib/utils/formatCurrency';
 import { TourHubShell } from '../components';
-import { useStickyHeaderSafeArea } from '@/hooks/useStickyHeaderSafeArea';
+import { TourHubShellTabs } from '../components/TourHubShellTabs';
+import { ShellSlot } from '@/components/header/ShellSlot';
+import { CollegeShellRow } from '../components/shell/CollegeShellRow';
 import { FranchiseLeaderboard } from '../components/college';
 import { CollegeMasthead } from '../components/college/CollegeMasthead';
 import { CollegeCard } from '../components/college/CollegeCard';
@@ -18,13 +18,6 @@ import { useCollegeWeeklyMovers } from '../hooks/useCollegeMovers';
 
 type MetricTab = 'earnings' | 'wins' | 'top10s' | 'movers';
 const VALID_METRICS = new Set<string>(['earnings', 'wins', 'top10s', 'movers']);
-
-const METRIC_TABS: { value: MetricTab; label: string }[] = [
-  { value: 'earnings', label: 'Earnings' },
-  { value: 'wins',     label: 'Wins'     },
-  { value: 'top10s',   label: 'Top 10s'  },
-  { value: 'movers',   label: 'Movers'   },
-];
 
 function getMetricValue(s: CollegeSeasonStats, metric: MetricTab): number {
   switch (metric) {
@@ -38,7 +31,6 @@ export function CollegeGolfHubPage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const sortParam = searchParams.get('sort') || 'earnings';
   const activeMetric: MetricTab = VALID_METRICS.has(sortParam) ? (sortParam as MetricTab) : 'earnings';
-  const queryClient = useQueryClient();
 
   const { data: allStats, isLoading: statsLoading } = useCollegeSeasonStats();
   const { data: collegeMap } = useCollegeMediaMap();
@@ -55,37 +47,6 @@ export function CollegeGolfHubPage() {
     setSearchParams(params, { replace: true });
     window.scrollTo(0, 0);
   }, [searchParams, setSearchParams]);
-
-  // Pull-to-refresh
-  const [isRefreshing, setIsRefreshing] = useState(false);
-  const [pullDistance, setPullDistance] = useState(0);
-  const touchStartY = useRef(0);
-  const PULL_THRESHOLD = 50;
-  const { sentinelRef, paddingTop: stickyPaddingTop } = useStickyHeaderSafeArea();
-
-  const onTouchStart = useCallback((e: React.TouchEvent) => {
-    if (window.scrollY <= 0) touchStartY.current = e.touches[0].clientY;
-  }, []);
-
-  const onTouchMove = useCallback((e: React.TouchEvent) => {
-    if (window.scrollY > 0 || isRefreshing) return;
-    const delta = e.touches[0].clientY - touchStartY.current;
-    if (delta > 0) setPullDistance(Math.min(delta, 100));
-  }, [isRefreshing]);
-
-  const onTouchEnd = useCallback(async () => {
-    if (pullDistance >= PULL_THRESHOLD && !isRefreshing) {
-      setIsRefreshing(true);
-      await Promise.all([
-        queryClient.invalidateQueries({ queryKey: ['college-season-stats'] }),
-        queryClient.invalidateQueries({ queryKey: ['college-movers'] }),
-        queryClient.invalidateQueries({ queryKey: ['college-media'] }),
-        queryClient.invalidateQueries({ queryKey: ['hero-alumni'] }),
-      ]);
-      setIsRefreshing(false);
-    }
-    setPullDistance(0);
-  }, [pullDistance, isRefreshing, queryClient]);
 
   // Scroll position retention
   useEffect(() => {
@@ -151,9 +112,6 @@ export function CollegeGolfHubPage() {
     if (activeMetric !== 'movers' || !weeklyRisers || weeklyRisers.length === 0) return null;
     const climberCount = weeklyRisers.length;
     const topByDelta = [...weeklyRisers].sort((a, b) => b.earnings_delta - a.earnings_delta)[0];
-    // Data layer: positive earnings_rank_change = rank improved here.
-    // (See useCollegeMovers — direction:'up' filter sorts by earnings_delta DESC.
-    // The rank_change sign is the raw data layer value.)
     const topByRank = [...weeklyRisers]
       .filter(m => (m.earnings_rank_change ?? 0) > 0)
       .sort((a, b) => (b.earnings_rank_change ?? 0) - (a.earnings_rank_change ?? 0))[0];
@@ -177,19 +135,15 @@ export function CollegeGolfHubPage() {
 
   return (
     <TourHubShell>
-      <div className="relative" onTouchStart={onTouchStart} onTouchMove={onTouchMove} onTouchEnd={onTouchEnd}>
-        {/* Pull-to-refresh indicator */}
-        {(pullDistance > 0 || isRefreshing) && (
-          <div className="flex justify-center py-2" style={{ height: pullDistance > 0 ? pullDistance * 0.4 : 32 }}>
-            <motion.div
-              animate={{ rotate: isRefreshing ? 360 : (pullDistance / PULL_THRESHOLD) * 180 }}
-              transition={isRefreshing ? { repeat: Infinity, duration: 0.8, ease: 'linear' } : { duration: 0 }}
-            >
-              <RefreshCw className="w-5 h-5 text-muted-foreground" />
-            </motion.div>
-          </div>
-        )}
+      <ShellSlot>
+        <TourHubShellTabs />
+        <CollegeShellRow />
+      </ShellSlot>
 
+      <div
+        className="pb-24"
+        style={{ paddingTop: 'var(--chrome-total-h, 0px)' }}
+      >
         {/* Masthead */}
         {statsLoading ? (
           <div style={{ background: '#0F172A', padding: '16px 16px 0' }}>
@@ -217,22 +171,24 @@ export function CollegeGolfHubPage() {
           />
         ) : null}
 
-        {/* Sentinel for sticky-header safe-area detection */}
-        <div ref={sentinelRef} aria-hidden style={{ height: 1 }} />
+        {/* Inline search bar (back link + metric tabs moved to shell) */}
+        <div>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', padding: '8px 16px 0' }}>
+            <button
+              onClick={() => setSearchExpanded(v => !v)}
+              style={{
+                width: '32px', height: '32px', borderRadius: '8px',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                background: searchExpanded ? '#FEF3E7' : '#EDF1F5',
+                border: 'none', cursor: 'pointer',
+              }}
+              aria-label="Search franchises"
+            >
+              <Search className="w-4 h-4" style={{ color: searchExpanded ? '#F7931E' : '#0F172A' }} strokeWidth={2.5} />
+            </button>
+          </div>
 
-        {/* Sticky header */}
-        <div
-          className="sticky top-0 z-20"
-          style={{
-            background: 'rgba(248,250,252,0.97)',
-            backdropFilter: 'blur(20px)',
-            WebkitBackdropFilter: 'blur(20px)',
-            borderBottom: '0.5px solid rgba(15,23,42,0.08)',
-            paddingTop: stickyPaddingTop,
-            transition: 'padding-top 200ms ease',
-          }}
-        >
-          {/* Collapsible search bar */}
+          {/* Collapsible search input */}
           <div
             className="overflow-hidden transition-all duration-250 ease-in-out px-4"
             style={{
@@ -263,67 +219,6 @@ export function CollegeGolfHubPage() {
                 )}
               </AnimatePresence>
             </div>
-          </div>
-
-          {/* Back link + search icon */}
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '7px 16px 0' }}>
-            <Link
-              to="/tourhub?tab=overview"
-              replace
-              className="active:opacity-50 transition-opacity"
-              style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: 2,
-                fontSize: 12,
-                fontWeight: 600,
-                color: '#64748B',
-                textDecoration: 'none',
-              }}
-            >
-              <ChevronLeft size={13} strokeWidth={2.5} />
-              Tour Overview
-            </Link>
-
-            <button
-              onClick={() => setSearchExpanded(v => !v)}
-              style={{
-                width: '32px', height: '32px', borderRadius: '8px',
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                background: searchExpanded ? '#FEF3E7' : '#EDF1F5',
-                border: 'none', cursor: 'pointer',
-              }}
-              aria-label="Search franchises"
-            >
-              <Search className="w-4 h-4" style={{ color: searchExpanded ? '#F7931E' : '#0F172A' }} strokeWidth={2.5} />
-            </button>
-          </div>
-
-          {/* Underline metric tabs — canonical 12px / 800 active, 12px / 600 inactive.
-              Aligned across Schedule, Players, Leaders, College Franchise. */}
-          <div style={{ display: 'flex', marginTop: '4px', borderBottom: '1px solid rgba(15,23,42,0.10)' }}>
-            {METRIC_TABS.map(tab => {
-              const isActive = activeMetric === tab.value;
-              return (
-                <button
-                  key={tab.value}
-                  onClick={() => setActiveMetric(tab.value)}
-                  className="flex-shrink-0 active:scale-[0.97] transition-transform"
-                  style={{
-                    flex: 1,
-                    padding: '12px 0',
-                    fontSize: '12px',
-                    fontWeight: isActive ? 800 : 600,
-                    color: isActive ? '#0F172A' : '#94A3B8',
-                    background: 'transparent', border: 'none',
-                    borderBottom: `2px solid ${isActive ? '#F7931E' : 'transparent'}`,
-                    cursor: 'pointer', transition: 'all 0.15s',
-                  }}
-                >
-                  {tab.label}
-                </button>
-              );
-            })}
           </div>
         </div>
 
