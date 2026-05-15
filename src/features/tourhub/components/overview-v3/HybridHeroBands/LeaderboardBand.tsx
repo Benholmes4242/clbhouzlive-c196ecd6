@@ -239,18 +239,23 @@ export function LeaderboardBand({
         </>
       );
     } else {
+      const placeholderText = firstYearEvent
+        ? 'INAUGURAL EVENT · NO PRIOR RESULTS'
+        : 'Tournament preview coming soon.';
       body = (
         <div
           style={{
             padding: '32px 20px',
             textAlign: 'center',
             color: 'rgba(15,23,42,0.45)',
-            fontSize: 13,
-            fontWeight: 600,
+            fontSize: firstYearEvent ? 11 : 13,
+            fontWeight: firstYearEvent ? 800 : 600,
+            letterSpacing: firstYearEvent ? '0.16em' : 'normal',
+            textTransform: firstYearEvent ? 'uppercase' : 'none',
             borderTop: `0.5px solid ${INK_15}`,
           }}
         >
-          Tournament preview coming soon.
+          {placeholderText}
         </div>
       );
     }
