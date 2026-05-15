@@ -208,7 +208,7 @@ export function MessageBubble({
                   gap: 6, padding: '7px 0', borderRadius: 10,
                   background: 'rgba(247,147,30,0.08)',
                   border: '1px solid rgba(247,147,30,0.22)',
-                  fontSize: '12.5px', fontWeight: 600, color: '#F7931E',
+                  fontSize: 13, fontWeight: 600, color: '#F7931E',
                 }}
               >
                 View Course
