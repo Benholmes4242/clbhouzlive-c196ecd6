@@ -287,7 +287,7 @@ export function EchoPageWelcome({ profile, onChipSelect }: EchoPageWelcomeProps)
         </div>
 
         {/* Hint */}
-        <p className="mt-4 text-[12px] text-center" style={{ color: 'rgba(15,23,42,0.25)' }}>
+        <p className="mt-4 text-[12px] text-center" style={{ color: '#94A3B8' }}>
           Ask me anything about golf
         </p>
       </div>
