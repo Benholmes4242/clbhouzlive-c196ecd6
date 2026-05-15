@@ -50,8 +50,6 @@ export function LeadersTab() {
   const [searchParams, setSearchParams] = useSearchParams();
   const categoryKey = searchParams.get('category') || 'world_rank';
   const category = getCategoryByKey(categoryKey) || LEADER_CATEGORIES[0];
-  const queryClient = useQueryClient();
-  
 
   const { data: season } = useTourSeason();
   const { data: playerStats, isLoading: statsLoading } = useTourPlayerStatistics(season?.id);
