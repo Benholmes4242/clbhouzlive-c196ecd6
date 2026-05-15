@@ -14,8 +14,10 @@ interface ShellSlotProps {
  *   - Sits at top: calc(55px + var(--sat)) — flush under CompactHeader.
  *   - Same surface colour as the body (--background) so they read as one canvas.
  *   - Below CompactHeader on the z-axis (z-header - 1), above page content.
- *   - Writes its own measured height to --shell-extra-h on :root so each page's
- *     scroll container can offset by `paddingTop: var(--shell-extra-h)`.
+ *   - Writes its own measured height to --shell-extra-h on :root. Pages
+ *     that consume the slot offset their main scroll container with
+ *     paddingTop: var(--chrome-total-h), which composes CompactHeader
+ *     (55px + safe-area) plus --shell-extra-h via CSS calc().
  *
  * No scroll listeners, no sticky positioning, no threshold transitions —
  * the shell is in its final position from mount.

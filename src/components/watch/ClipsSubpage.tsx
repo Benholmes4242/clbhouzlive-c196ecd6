@@ -66,7 +66,7 @@ export default function ClipsSubpage() {
           <ClipsMoodChips active={mood} onChange={setMood} />
         </ShellSlot>
 
-        <div style={{ paddingTop: 'var(--shell-extra-h, 0px)' }}>
+        <div style={{ paddingTop: 'var(--chrome-total-h, 0px)' }}>
           <ClipOfTheWeekHero />
           <LightningRoundRail userId={userId} mood={mood} />
           <ClipsCourseAnchoredRail userId={userId} mood={mood} />
