@@ -31,7 +31,7 @@ import { useUpcomingTournaments } from '../hooks/useUpcomingTournaments';
 import { TOUR_COLORS } from '../constants/colors';
 import { formatCurrency } from '@/lib/utils/formatCurrency';
 import { formatCountdown } from '../utils/formatCountdown';
-import type { TourHubTab } from './TourHubTabs';
+import type { TourHubTab } from './types';
 
 type LucideIcon = ComponentType<LucideProps>;
 
