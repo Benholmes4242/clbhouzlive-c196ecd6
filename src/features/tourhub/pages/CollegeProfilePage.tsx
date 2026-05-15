@@ -312,35 +312,6 @@ export function CollegeProfilePage() {
         )}
       </div>
 
-      {/* Sentinel for sticky-header safe-area detection */}
-      <div ref={sentinelRef} aria-hidden style={{ height: 1 }} />
-
-      {/* Sticky header (Compare button retired) */}
-      <div
-        className="sticky top-0 z-20"
-        style={{
-          background: 'rgba(248,250,252,0.97)',
-          backdropFilter: 'blur(20px)',
-          WebkitBackdropFilter: 'blur(20px)',
-          borderBottom: '0.5px solid rgba(15,23,42,0.08)',
-          paddingTop: stickyPaddingTop,
-          transition: 'padding-top 200ms ease',
-        }}
-      >
-        <div style={{ display: 'flex', alignItems: 'center', padding: '8px 16px 10px', gap: 6 }}>
-          <button
-            type="button"
-            onClick={() => navigate(collegeHubRoute())}
-            style={{ display: 'flex', alignItems: 'center', gap: 2, fontSize: 12, fontWeight: 600, color: '#64748B', background: 'transparent', border: 'none', padding: 0, cursor: 'pointer' }}
-            className="active:opacity-50 transition-opacity"
-          >
-            <ChevronLeft size={13} strokeWidth={2.5} />
-            College Franchise
-          </button>
-          <div style={{ flex: 1 }} />
-        </div>
-      </div>
-
       {/* Content */}
       <div style={{ paddingBottom: 'calc(var(--sab, env(safe-area-inset-bottom, 0px)) + 80px)' }}>
         {/* Franchise Dispatch strip */}
@@ -391,6 +362,7 @@ export function CollegeProfilePage() {
             </Link>
           </div>
         )}
+      </div>
       </div>
     </PageRoot>
   );
