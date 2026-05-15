@@ -211,11 +211,8 @@ function ConversationCard({ children }: { children: React.ReactNode }) {
 
 function SectionLabel({ text }: { text: string }) {
   return (
-    <div style={{ padding: '10px 16px 6px', display: 'flex', alignItems: 'center', gap: 6 }}>
-      <div style={{ width: 3, height: 10, background: '#F7931E', borderRadius: 1, flexShrink: 0 }} />
-      <span style={{ fontSize: 9, fontWeight: 900, color: '#64748b', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>
-        {text}
-      </span>
+    <div style={{ padding: '10px 16px 6px' }}>
+      <SectionEyebrow label={text} />
     </div>
   );
 }
