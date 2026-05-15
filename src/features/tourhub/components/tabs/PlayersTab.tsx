@@ -639,32 +639,7 @@ export function PlayersTab() {
   }
 
   return (
-    <div
-      onTouchStart={onTouchStart}
-      onTouchMove={onTouchMove}
-      onTouchEnd={onTouchEnd}
-      style={{ background: '#F8FAFC' }}
-    >
-      {/* Pull-to-refresh indicator */}
-      <AnimatePresence>
-        {(pullDistance > 0 || isRefreshing) && (
-          <motion.div
-            className="flex items-center justify-center"
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: isRefreshing ? 48 : pullDistance, opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 0.2 }}
-          >
-            <RefreshCw
-              className={cn(
-                'w-5 h-5 text-muted-foreground transition-transform',
-                isRefreshing && 'animate-spin'
-              )}
-              style={{ transform: isRefreshing ? undefined : `rotate(${pullDistance * 3}deg)` }}
-            />
-          </motion.div>
-        )}
-      </AnimatePresence>
+    <div style={{ background: '#F8FAFC' }}>
 
       {/* ── EDITORIAL OPENING — Masthead + No.1 Cover Story + Movers Grid ── */}
       {!debouncedSearch && elitePlayers && elitePlayers.length > 0 && (() => {
