@@ -125,19 +125,16 @@ export const NotificationActionsSheet: React.FC<NotificationActionsSheetProps> =
         className="rounded-t-[20px] bg-[#F8FAFC]"
         style={{ paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 16px)' }}
       >
-        {/* Dispatch handle */}
+        {/* Drag handle */}
         <div style={{ display: 'flex', justifyContent: 'center', padding: '2px 0 4px' }}>
           <div style={{ width: 36, height: 4, borderRadius: 2, background: 'rgba(15,23,42,0.12)' }} />
         </div>
 
-        {/* Dispatch eyebrow header */}
+        {/* Canonical eyebrow header */}
         <div style={{ padding: '6px 20px 14px', borderBottom: '0.5px solid rgba(15,23,42,0.07)' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            <div style={{ width: 3, height: 12, background: '#F7931E', borderRadius: 1, flexShrink: 0 }} />
-            <span style={{ fontSize: 9, fontWeight: 900, color: '#F7931E', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>
-              Notification options
-            </span>
-          </div>
+          <span style={{ fontSize: 9, fontWeight: 800, color: '#64748B', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>
+            Notification options
+          </span>
         </div>
 
         {/* Flat action rows */}

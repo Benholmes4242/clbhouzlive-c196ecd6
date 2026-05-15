@@ -30,6 +30,28 @@ const INK_SUBTLE = '#94A3B8';
 const BORDER = 'rgba(15,23,42,0.07)';
 const AMBER = '#F7931E';
 const AMBER_DEEP = '#C97A10';
+const UNREAD_BG = 'rgba(247,147,30,0.04)';
+const UNREAD_BORDER = 'rgba(247,147,30,0.18)';
+const CARD_TRANSITION = 'background 200ms ease, border-color 200ms ease';
+
+const NewBadge: React.FC = () => (
+  <span
+    style={{
+      display: 'inline-block',
+      fontSize: 8,
+      fontWeight: 800,
+      color: AMBER_DEEP,
+      letterSpacing: '0.14em',
+      textTransform: 'uppercase',
+      background: 'rgba(247,147,30,0.10)',
+      padding: '2px 6px',
+      borderRadius: 4,
+      lineHeight: 1,
+    }}
+  >
+    New
+  </span>
+);
 
 function getNotificationActionText(notification: ActivityNotification): string {
   const { type, message, title } = notification;
@@ -127,8 +149,12 @@ export const FeaturedNotificationCard: React.FC<FeaturedNotificationCardProps> =
         className="cursor-pointer active:scale-[0.98] transition-transform"
       >
         <div
-          className="rounded-2xl overflow-hidden bg-white"
-          style={{ border: `1px solid ${BORDER}` }}
+          className="rounded-2xl overflow-hidden"
+          style={{
+            background: notification.is_unread ? UNREAD_BG : 'white',
+            border: `1px solid ${notification.is_unread ? UNREAD_BORDER : BORDER}`,
+            transition: CARD_TRANSITION,
+          }}
         >
           {/* Photo hero */}
           <div className="relative" style={{ height: 110 }}>
@@ -199,17 +225,11 @@ export const FeaturedNotificationCard: React.FC<FeaturedNotificationCardProps> =
           {/* Content */}
           <div className="px-3.5 pt-2.5 pb-3.5 relative">
             {notification.is_unread && (
-              <span
-                style={{
-                  position: 'absolute',
-                  top: 10, left: 10,
-                  width: 8, height: 8,
-                  borderRadius: '50%',
-                  background: AMBER,
-                }}
-              />
+              <div style={{ position: 'absolute', top: 10, right: 10 }}>
+                <NewBadge />
+              </div>
             )}
-            <p className="text-[13.5px] leading-[1.45]" style={{ color: INK }}>
+            <p className="text-[14px] leading-[1.45]" style={{ color: INK }}>
               <span className="font-semibold">{actorName}</span>{' '}
               <span style={{ color: INK_SOFT }} className="font-normal">{actionText}</span>
             </p>
@@ -234,38 +254,37 @@ export const FeaturedNotificationCard: React.FC<FeaturedNotificationCardProps> =
       className="cursor-pointer active:scale-[0.98] transition-transform"
     >
       <div
-        className="relative rounded-2xl bg-white"
+        className="relative rounded-2xl"
         style={{
-          border: `1px solid ${BORDER}`,
+          background: notification.is_unread ? UNREAD_BG : 'white',
+          border: `1px solid ${notification.is_unread ? UNREAD_BORDER : BORDER}`,
           padding: '12px 14px',
-          paddingLeft: 18,
+          paddingLeft: 14,
+          transition: CARD_TRANSITION,
         }}
       >
-        {/* Unread dot — top-left */}
-        {notification.is_unread && (
-          <span
-            style={{
-              position: 'absolute',
-              top: 12, left: 8,
-              width: 8, height: 8,
-              borderRadius: '50%',
-              background: AMBER,
-            }}
-          />
-        )}
-
-        {/* Timestamp — top right */}
-        <span
+        {/* Right-stack: NEW badge (if unread) + timestamp */}
+        <div
           style={{
             position: 'absolute',
             top: 12, right: 14,
-            fontSize: 11,
-            fontWeight: 500,
-            color: INK_SUBTLE,
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'flex-end',
+            gap: 4,
           }}
         >
-          {notification.time_ago}
-        </span>
+          {notification.is_unread && <NewBadge />}
+          <span
+            style={{
+              fontSize: 11,
+              fontWeight: 500,
+              color: INK_SUBTLE,
+            }}
+          >
+            {notification.time_ago}
+          </span>
+        </div>
 
         <div className="flex items-start gap-3" style={{ paddingRight: 56 }}>
           {/* Avatar with badge */}
@@ -307,13 +326,13 @@ export const FeaturedNotificationCard: React.FC<FeaturedNotificationCardProps> =
 
           {/* Content column */}
           <div className="flex-1 min-w-0">
-            <p className="text-[13.5px] leading-[1.4] line-clamp-2" style={{ color: INK }}>
+            <p className="text-[14px] leading-[1.4] line-clamp-2" style={{ color: INK }}>
               <span className="font-semibold">{actorName}</span>{' '}
               <span style={{ color: INK_SOFT }} className="font-normal">{actionText}</span>
             </p>
 
             {!isPrivateFollow && !incomplete && notification.actor_username && (
-              <p style={{ fontSize: 11.5, color: INK_SUBTLE, marginTop: 1 }}>
+              <p style={{ fontSize: 11, color: INK_SUBTLE, marginTop: 2 }}>
                 @{notification.actor_username}
               </p>
             )}
@@ -325,7 +344,7 @@ export const FeaturedNotificationCard: React.FC<FeaturedNotificationCardProps> =
             )}
 
             {isPrivateFollow && (
-              <p style={{ fontSize: 11.5, color: INK_SUBTLE, marginTop: 2, fontStyle: 'italic' }}>
+              <p style={{ fontSize: 12, color: INK_SUBTLE, marginTop: 2, fontStyle: 'italic' }}>
                 Private profile · no profile to view
               </p>
             )}
