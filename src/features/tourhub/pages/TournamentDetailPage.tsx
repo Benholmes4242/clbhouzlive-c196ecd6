@@ -2,24 +2,22 @@
  * TournamentDetailPage - Editorial tournament detail experience
  */
 
-import { useState, useMemo, useEffect, useRef, useCallback } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useBottomNavigation } from '@/contexts/BottomNavigationContext';
 
-import { useParams, useSearchParams, useNavigate, useLocation, Link } from 'react-router-dom';
-import { Trophy, RefreshCw, AlertCircle, ChevronLeft } from 'lucide-react';
+import { useParams, useSearchParams, Link } from 'react-router-dom';
+import { Trophy, AlertCircle } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { formatDistanceToNow } from 'date-fns';
-import { useQueryClient } from '@tanstack/react-query';
-import { cn } from '@/lib/utils';
 import { TourHubShell } from '../components/TourHubShell';
-import { useStickyHeaderSafeArea } from '@/hooks/useStickyHeaderSafeArea';
+import { ShellSlot } from '@/components/header/ShellSlot';
+import { TournamentTabsShellRow } from '../components/shell/TournamentTabsShellRow';
 import { useTourTournament, useTourLeaderboard } from '../hooks/useTourHubData';
 import { useLeaderboardRealtime } from '../hooks/useLeaderboardRealtime';
 import { useSingleCourseImage } from '../hooks/useCourseImageResolver';
 import { getCourseImage } from '../utils/placeholders';
 import { EventWinnerCard } from '../components/EventWinnerCard';
 import { EventMomentsList } from '../components/EventMomentsList';
-import { getReferrerLabel, type TournamentReferrer } from '../routes';
 
 import {
   TournamentHero,
