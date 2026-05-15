@@ -8,6 +8,7 @@ import {
   SheetContent,
 } from '@/components/ui/sheet';
 import { haptic } from '@/utils/haptics';
+import { SectionEyebrow } from '@/components/ui/SectionEyebrow';
 
 interface DeleteMessageSheetProps {
   open: boolean;
@@ -55,11 +56,8 @@ export function DeleteMessageSheet({
         />
 
         {/* Title */}
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, padding: '12px 16px', marginBottom: 4, borderBottom: '0.5px solid rgba(15,23,42,0.07)' }}>
-          <div style={{ width: 3, height: 10, background: '#DC2626', borderRadius: 1, flexShrink: 0 }} />
-          <span style={{ fontSize: 9, fontWeight: 900, color: '#DC2626', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>
-            Delete Message
-          </span>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '12px 16px', marginBottom: 4, borderBottom: '0.5px solid rgba(15,23,42,0.07)' }}>
+          <SectionEyebrow label="Delete Message" color="danger" />
         </div>
 
         <div style={{ padding: '0 16px' }}>
@@ -125,7 +123,7 @@ export function DeleteMessageSheet({
               padding: '13px 0', borderRadius: 14,
               border: '1px solid transparent',
               background: 'rgba(247,147,30,0.08)',
-              fontSize: '14.5px', fontWeight: 600, color: '#F7931E',
+              fontSize: 14, fontWeight: 600, color: '#F7931E',
               cursor: 'pointer', marginTop: 8,
             }}
           >

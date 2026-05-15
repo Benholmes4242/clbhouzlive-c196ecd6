@@ -15,6 +15,7 @@ import { toast } from 'sonner';
 import { haptic } from '@/utils/haptics';
 import { AppLog } from '@/lib/logger';
 import { cn } from '@/lib/utils';
+import { SectionEyebrow } from '@/components/ui/SectionEyebrow';
 
 interface ReportSheetProps {
   open: boolean;
@@ -78,11 +79,8 @@ export function ReportSheet({
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent side="bottom" className="rounded-t-3xl px-4 pb-8 max-h-[80vh] overflow-y-auto">
         <div style={{ width: 36, height: 4, borderRadius: 2, background: 'rgba(15,23,42,0.12)', margin: '10px auto 0' }} />
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, padding: '12px 16px 14px', borderBottom: '0.5px solid rgba(15,23,42,0.07)' }}>
-          <div style={{ width: 3, height: 10, background: '#DC2626', borderRadius: 1, flexShrink: 0 }} />
-          <span style={{ fontSize: 9, fontWeight: 900, color: '#DC2626', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>
-            Report {reportType === 'group' ? 'Group' : 'User'}
-          </span>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '12px 16px 14px', borderBottom: '0.5px solid rgba(15,23,42,0.07)' }}>
+          <SectionEyebrow label={`Report ${reportType === 'group' ? 'Group' : 'User'}`} color="danger" />
         </div>
 
         <div className="space-y-4">
