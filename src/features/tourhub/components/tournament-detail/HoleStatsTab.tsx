@@ -211,8 +211,7 @@ export function HoleStatsTab({ tournamentId, isCompleted }: HoleStatsTabProps) {
           {/* Section header */}
           <div style={{ padding: '14px 20px 0' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
-              <div style={{ width: 3, height: 14, background: '#F7931E', borderRadius: 1, flexShrink: 0 }} />
-              <span style={{ fontSize: '10px', fontWeight: 900, color: '#F7931E', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>
+              <span style={{ fontSize: '9px', fontWeight: 800, color: '#64748B', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>
                 Hole by Hole
               </span>
             </div>
@@ -220,12 +219,12 @@ export function HoleStatsTab({ tournamentId, isCompleted }: HoleStatsTabProps) {
 
           {/* Column headers */}
           <div style={{ display: 'flex', alignItems: 'center', padding: '5px 20px', background: 'rgba(15,23,42,0.02)', borderBottom: '0.5px solid rgba(15,23,42,0.07)', borderTop: '0.5px solid rgba(15,23,42,0.07)' }}>
-            <span style={{ width: '28px', fontSize: '12px', fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.1em', flexShrink: 0 }}>H</span>
-            <span style={{ width: '28px', fontSize: '12px', fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.1em', flexShrink: 0 }}>PAR</span>
+            <span style={{ width: '28px', fontSize: '9px', fontWeight: 800, color: '#64748B', letterSpacing: '0.14em', flexShrink: 0 }}>H</span>
+            <span style={{ width: '28px', fontSize: '9px', fontWeight: 800, color: '#64748B', letterSpacing: '0.14em', flexShrink: 0 }}>PAR</span>
             {/* YDS column dropped Phase 1 — sr_hole_statistics.yardage is 100% NULL.
                 See audit B10. Re-introduce when ingestion populates this field. */}
-            <span style={{ flex: 1, fontSize: '12px', fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.1em' }}>SCORING DIST.</span>
-            <span style={{ width: '44px', textAlign: 'right' as const, fontSize: '12px', fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.1em', flexShrink: 0 }}>AVG</span>
+            <span style={{ flex: 1, fontSize: '9px', fontWeight: 800, color: '#64748B', letterSpacing: '0.14em' }}>SCORING DIST.</span>
+            <span style={{ width: '44px', textAlign: 'right' as const, fontSize: '9px', fontWeight: 800, color: '#64748B', letterSpacing: '0.14em', flexShrink: 0 }}>AVG</span>
           </div>
 
           {/* Hole rows */}
