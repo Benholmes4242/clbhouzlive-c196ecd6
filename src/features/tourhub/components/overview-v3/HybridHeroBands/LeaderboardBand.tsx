@@ -106,17 +106,22 @@ export function LeaderboardBand({
 
   if (state.kind === 'live') {
     if (tiedLeaders) {
-      // tied leader row (1) + 3 chasers from non-tied region
       const firstChaser = leaderboard.findIndex(e => (e?.score ?? e?.total) !== leaderboard[0]?.score);
       const chasers = firstChaser >= 0 ? leaderboard.slice(firstChaser, firstChaser + 3) : leaderboard.slice(tiedLeaders.count, tiedLeaders.count + 3);
+      const tiedScore = leaderboard[0]?.score;
+      const tiedPlayers = leaderboard
+        .filter(e => (e?.score ?? e?.total) === tiedScore)
+        .slice(0, tiedLeaders.count)
+        .map(e => ({ avatarUrl: entryAvatar(e) }));
       body = (
         <>
-          <TiedLeadersRow count={tiedLeaders.count} score={tiedLeaders.score} />
+          <TiedLeadersRow count={tiedLeaders.count} score={tiedLeaders.score} players={tiedPlayers} />
           {chasers.map((e, i) => (
             <ChaserRow
               key={i}
               rank={String(e.position)}
               name={entryName(e)}
+              country={entryCountry(e)}
               score={fmtScore(e.score)}
               thru={entryThru(e)}
               avatarUrl={entryAvatar(e)}
@@ -134,7 +139,7 @@ export function LeaderboardBand({
             <SoloLeaderRow
               rank={String(leader.position ?? 1)}
               name={entryName(leader)}
-              country={leader.player?.country_code || leader.player?.country}
+              country={entryCountry(leader)}
               score={fmtScore(leader.score)}
               thru={entryThru(leader)}
               avatarUrl={entryAvatar(leader)}
@@ -145,6 +150,7 @@ export function LeaderboardBand({
               key={i}
               rank={String(e.position)}
               name={entryName(e)}
+              country={entryCountry(e)}
               score={fmtScore(e.score)}
               thru={entryThru(e)}
               avatarUrl={entryAvatar(e)}
