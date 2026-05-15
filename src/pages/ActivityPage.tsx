@@ -266,7 +266,7 @@ const ActivityPage: React.FC = () => {
                     background: isActive ? INK : 'transparent',
                     color: isActive ? '#FFFFFF' : INK_SOFT,
                     border: isActive ? '1px solid transparent' : `1px solid ${BORDER}`,
-                    fontSize: 12.5,
+                    fontSize: 13,
                     fontWeight: 600,
                     gap: 6,
                   }}
