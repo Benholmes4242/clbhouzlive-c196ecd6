@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useSearchParams, useNavigate, Link } from 'react-router-dom';
-import { ArrowLeftRight, ChevronLeft, ChevronRight, Search, X } from 'lucide-react';
+import { ArrowLeftRight, ChevronRight, Search, X } from 'lucide-react';
 import { TourHubShell } from '../components';
 
 import { CollegeCompareHero } from '../components/college/CollegeCompareHero';
