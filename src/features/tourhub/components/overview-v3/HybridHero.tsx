@@ -253,6 +253,8 @@ export function HybridHero({ slide }: HybridHeroProps) {
         champion={champion}
         tiedLeaders={tiedLeaders}
         defendingChamp={defendingChamp}
+        fieldStrength={fieldStrength}
+        courseStats={courseStats}
         teamWinner={teamWinner}
       />
       <LeaderboardBand
