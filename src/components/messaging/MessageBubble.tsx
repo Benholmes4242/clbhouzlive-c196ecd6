@@ -159,7 +159,7 @@ export function MessageBubble({
               <div className="absolute inset-0" style={{ background: 'linear-gradient(to bottom, rgba(0,0,0,0.3) 0%, transparent 40%)' }} />
               
               {/* Course name on image */}
-              <span className="absolute" style={{ bottom: 10, left: 12, right: 12, fontSize: '13.5px', fontWeight: 700, color: '#fff', lineHeight: 1.3 }}>
+              <span className="absolute" style={{ bottom: 10, left: 12, right: 12, fontSize: 13, fontWeight: 700, color: '#fff', lineHeight: 1.3 }}>
                 {course.course_name}
               </span>
               
