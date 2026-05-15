@@ -105,9 +105,10 @@ export function HybridHero({ slide }: HybridHeroProps) {
   const { data: leaderboard = [] } = useTourLeaderboard(needsLeaderboard ? tournament.id : '');
   const safeLeaderboard = Array.isArray(leaderboard) ? leaderboard : [];
 
-  // Defending champion (Upcoming) + tee times (Upcoming · imminent)
+  // Defending champion (Upcoming) + last-year top 4 (Upcoming · far) + tee times (Upcoming · imminent)
   const isUpcoming = slide.type === 'upcoming';
   const { data: defendingChamp } = useTournamentDefendingChamp(isUpcoming ? tournament.id : null);
+  const { data: lastYearTop4 } = useTournamentLastYearTop4(isUpcoming ? tournament.id : null);
 
   const startMs = tournament.startDate ? new Date(tournament.startDate).getTime() : 0;
   const hoursUntilStart = startMs ? (startMs - now.getTime()) / 3_600_000 : Infinity;
