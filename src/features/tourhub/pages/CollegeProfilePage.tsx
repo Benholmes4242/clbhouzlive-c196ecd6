@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, Fragment } from 'react';
+import { useState, useMemo, Fragment } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { RefreshCw, AlertCircle, ChevronRight, Crown } from 'lucide-react';
 import { getCollegeLogoUrl } from '@/utils/collegeLogo';
