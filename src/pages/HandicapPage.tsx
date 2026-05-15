@@ -238,7 +238,7 @@ const HandicapPageHeader: React.FC<HeaderProps> = ({
               fontFamily: FONT_GEIST,
               fontSize: 18,
               fontWeight: 800,
-              color: INK,
+              color: 'var(--hcp-t-100)',
               lineHeight: 1.2,
               letterSpacing: '-0.015em',
               margin: 0,
@@ -250,7 +250,7 @@ const HandicapPageHeader: React.FC<HeaderProps> = ({
                 fontFamily: FONT_GEIST,
                 fontSize: 13,
                 fontWeight: 500,
-                color: INK_55,
+                color: 'var(--hcp-t-60)',
                 letterSpacing: '-0.005em',
                 lineHeight: 1.3,
                 marginTop: 6,
@@ -427,7 +427,7 @@ const HandicapPage: React.FC = () => {
   }
 
   return (
-    <PageRoot style={{ background: BG_SURFACE }}>
+    <PageRoot dark style={{ background: 'var(--hcp-bg-0)' }}>
       <HandicapPageHeader
         ownerUserId={ownerUserId}
         displayName={displayName}
