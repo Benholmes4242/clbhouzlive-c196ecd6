@@ -14,6 +14,7 @@ import type { HeroSlide } from '../../hooks/useHeroCarouselData';
 import { useTourLeaderboard, type TourTournament } from '../../hooks/useTourHubData';
 import { useBatchCourseImages } from '../../hooks/useBatchCourseImages';
 import { useTournamentDefendingChamp } from '../../hooks/useTournamentDefendingChamp';
+import { useTournamentLastYearTop4 } from '../../hooks/useTournamentLastYearTop4';
 import { useTournamentTeeTimes } from '../../hooks/useTournamentTeeTimes';
 import { tournamentRoute } from '../../routes';
 
