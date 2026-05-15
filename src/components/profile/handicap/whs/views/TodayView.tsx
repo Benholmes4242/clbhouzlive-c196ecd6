@@ -1,7 +1,6 @@
 import React from 'react';
 import { AlertTriangle } from 'lucide-react';
 import type { WhsConnection } from '@/lib/whs/types';
-import MorningMoment from '@/components/handicap/MorningMoment';
 import HeroHandicapCardDark from '../sections/HeroHandicapCardDark';
 import LastRoundCard from '../sections/LastRoundCard';
 import RoundsThatCountCard from '../sections/RoundsThatCountCard';
@@ -33,10 +32,8 @@ export const TodayView: React.FC<Props> = ({
       role="tabpanel"
       id="handicap-panel-today"
       aria-labelledby="handicap-tab-today"
-      style={{ paddingTop: 16 }}
+      style={{ paddingTop: 4 }}
     >
-      {!readOnly && <MorningMoment userId={userId} />}
-
       {showReauthBanner && (
         <div
           className="mx-5 mt-5 mb-3 p-3 rounded-xl flex gap-2.5 text-[13px]"
@@ -50,15 +47,7 @@ export const TodayView: React.FC<Props> = ({
         </div>
       )}
 
-      {/*!
-        When MorningMoment is rendered above (not readOnly), HeroHandicapCard
-        is the SECOND content block on the tab — it needs the canonical 32px
-        inter-section gap above it. In readOnly mode (friend view) MorningMoment
-        is hidden and HeroHandicapCard is first, so no margin.
-      */}
-      <div style={{ marginTop: !readOnly ? 32 : 0 }}>
-        <HeroHandicapCardDark connection={connection} />
-      </div>
+      <HeroHandicapCardDark connection={connection} />
 
       <LastRoundCard connectionId={connectionId} />
 

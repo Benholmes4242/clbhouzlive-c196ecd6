@@ -13,7 +13,7 @@ import {
   useHandicapHistory,
   useAllScores,
 } from '@/lib/whs/hooks';
-import { formatDisplayedHcp, whsDisplayedHcp } from '@/lib/whs/format';
+import { fmtHcp } from '@/lib/whs/format';
 import type { WhsConnection } from '@/lib/whs/types';
 
 interface Props {
@@ -295,13 +295,11 @@ const HeroHandicapCardDark: React.FC<Props> = ({ connection }) => {
                 fontWeight: 700,
                 letterSpacing: '-0.04em',
                 lineHeight: 1,
-                color: verdictColor,
+                color: 'var(--hcp-t-100)',
                 fontVariantNumeric: 'tabular-nums',
               }}
             >
-              {isLoading || handicap == null
-                ? '—'
-                : formatDisplayedHcp(whsDisplayedHcp(handicap))}
+              {isLoading || handicap == null ? '—' : fmtHcp(handicap)}
             </span>
             {!isLoading && delta90 != null && (
               <VerdictPill verdict={verdict}>
