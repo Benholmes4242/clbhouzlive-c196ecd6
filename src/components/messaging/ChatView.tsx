@@ -511,7 +511,7 @@ export function ChatView({ conversationId, onBack }: ChatViewProps) {
             <div className="flex items-center" style={{ gap: 6 }}>
               <span
                 className="truncate"
-                style={{ fontSize: 15, fontWeight: 900, color: '#0F172A', letterSpacing: '-0.02em' }}
+                style={{ fontSize: 15, fontWeight: 800, color: '#0F172A', letterSpacing: '-0.015em' }}
               >
                 {headerInfo.name}
               </span>
