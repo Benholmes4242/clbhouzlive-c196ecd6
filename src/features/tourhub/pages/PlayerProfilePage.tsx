@@ -7,8 +7,9 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ArrowLeft, TrendingUp, AlertCircle } from 'lucide-react';
-import { PageRoot } from '@/components/layout/PageRoot';
-import { useMedianStatusBar } from '@/hooks/useMedianStatusBar';
+import { TourHubShell } from '../components/TourHubShell';
+import { ShellSlot } from '@/components/header/ShellSlot';
+import { Kicker } from '@/components/watch/proshop/Kicker';
 import {
   PlayerHero,
   PlayerSeasonStats,
@@ -23,12 +24,36 @@ const sectionVariants = {
   visible: { opacity: 1, y: 0 },
 };
 
+function getTourBadgeText(tourCode: string | null | undefined): string {
+  switch ((tourCode || '').toLowerCase()) {
+    case 'pga':   return 'PGA Tour';
+    case 'euro':  return 'DP World Tour';
+    case 'lpga':  return 'LPGA';
+    case 'champ': return 'PGA Champions';
+    case 'pgad':  return 'Korn Ferry';
+    case 'liv':   return 'LIV Golf';
+    default:      return 'Player';
+  }
+}
+
+const SHELL_SLOT_BG: React.CSSProperties = {
+  background: '#F8FAFC',
+  padding: '14px 16px 12px',
+};
+
+const SHELL_H1_STYLE: React.CSSProperties = {
+  fontSize: 22,
+  fontWeight: 800,
+  letterSpacing: '-0.025em',
+  color: '#0F172A',
+  lineHeight: 1.05,
+  margin: 0,
+};
+
 export function PlayerProfilePage() {
   const { playerId } = useParams<{ playerId: string }>();
   const navigate = useNavigate();
   const location = useLocation();
-
-  useMedianStatusBar("dark", "transparent", true, false);
 
   const { data: player, isLoading: playerLoading, refetch } = useTourPlayer(playerId || '');
   const { data: playerStats } = useSinglePlayerStatistics(playerId);
@@ -47,12 +72,15 @@ export function PlayerProfilePage() {
 
   if (playerLoading) {
     return (
-      <PageRoot className="min-h-screen w-full" hasBottomNav style={{ background: '#F8FAFC' }}>
+      <TourHubShell>
+        <ShellSlot>
+          <div style={SHELL_SLOT_BG}>
+            <Kicker>Player</Kicker>
+            <Skeleton className="h-5 w-40" style={{ background: 'rgba(15,23,42,0.06)' }} />
+          </div>
+        </ShellSlot>
         <div style={{ paddingTop: 'var(--chrome-total-h, 0px)' }}>
-          <div style={{ background: '#F8FAFC', padding: '16px 16px 14px' }}>
-            <Skeleton className="h-2.5 w-20 mb-2" style={{ background: 'rgba(15,23,42,0.06)' }} />
-            <Skeleton className="h-5 w-40 mb-2" style={{ background: 'rgba(15,23,42,0.06)' }} />
-            <Skeleton className="h-3 w-56 mb-4" style={{ background: 'rgba(15,23,42,0.06)' }} />
+          <div style={{ background: '#F8FAFC', padding: '16px' }}>
             <Skeleton className="h-24 w-full rounded-xl" style={{ background: 'rgba(255,184,0,0.10)' }} />
           </div>
           <div style={{ padding: '16px', marginTop: 8 }}>
@@ -60,13 +88,19 @@ export function PlayerProfilePage() {
             <Skeleton className="h-64 rounded-lg mt-4" style={{ background: 'rgba(15,23,42,0.06)' }} />
           </div>
         </div>
-      </PageRoot>
+      </TourHubShell>
     );
   }
 
   if (!player) {
     return (
-      <PageRoot className="min-h-screen w-full bg-background">
+      <TourHubShell>
+        <ShellSlot>
+          <div style={SHELL_SLOT_BG}>
+            <Kicker>Player</Kicker>
+            <h1 style={SHELL_H1_STYLE}>Player Profile</h1>
+          </div>
+        </ShellSlot>
         <div style={{ paddingTop: 'var(--chrome-total-h, 0px)' }} className="px-5">
           <button
             onClick={handleBack}
@@ -86,16 +120,21 @@ export function PlayerProfilePage() {
             </button>
           </div>
         </div>
-      </PageRoot>
+      </TourHubShell>
     );
   }
 
+  const tourBadge = getTourBadgeText(player.tour_codes?.[0]);
+
   return (
-    <PageRoot
-      className="min-h-screen w-full"
-      hasBottomNav
-      style={{ background: '#F8FAFC' }}
-    >
+    <TourHubShell>
+      <ShellSlot>
+        <div style={SHELL_SLOT_BG}>
+          <Kicker>{tourBadge}</Kicker>
+          <h1 style={SHELL_H1_STYLE}>{player.full_name}</h1>
+        </div>
+      </ShellSlot>
+
       <div style={{ paddingTop: 'var(--chrome-total-h, 0px)' }}>
         {/* Hero */}
         <PlayerHero player={player} playerStats={playerStats ?? null} />
@@ -155,6 +194,6 @@ export function PlayerProfilePage() {
           <div style={{ marginTop: 8 }} />
         </div>
       </div>
-    </PageRoot>
+    </TourHubShell>
   );
 }
