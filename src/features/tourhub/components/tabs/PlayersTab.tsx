@@ -7,7 +7,7 @@ import { useState, useMemo, useCallback, useEffect, useRef, type RefObject } fro
 import { Skeleton } from '@/components/ui/skeleton';
 import { useSearchParams, useLocation, useNavigate } from 'react-router-dom';
 import { Search, X, ChevronDown, ChevronRight, Users, Crown } from 'lucide-react';
-import { cn } from '@/lib/utils';
+
 import { AnimatePresence, motion } from 'framer-motion';
 import { useQueryClient } from '@tanstack/react-query';
 import { useTourPlayers, useTourSeason, useTourPlayerStatistics, type TourPlayer } from '../../hooks/useTourHubData';
