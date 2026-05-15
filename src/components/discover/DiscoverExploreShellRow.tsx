@@ -1,7 +1,7 @@
 import { memo, useState } from 'react';
-import { EXPLORE_MOODS, type ExploreMoodId } from './hooks/useExploreMood';
-import RegionSheet from './RegionSheet';
-import { useExploreRegionChips } from './hooks/useExploreRegionChips';
+import { EXPLORE_MOODS, type ExploreMoodId } from '@/components/explore-tab-new/hooks/useExploreMood';
+import RegionSheet from '@/components/explore-tab-new/RegionSheet';
+import { useExploreRegionChips } from '@/components/explore-tab-new/hooks/useExploreRegionChips';
 
 interface DiscoverExploreShellRowProps {
   activeMood: ExploreMoodId;
