@@ -24,20 +24,39 @@ Three layers, top to bottom:
 
 `ShellSlot` is `position: fixed; top: calc(55px + var(--sat))`. Below CompactHeader on the z-axis (z 29; header is z 30). Page bodies offset themselves with `paddingTop: var(--chrome-total-h)` — a CSS calc that composes CompactHeader height + safe-area + ShellSlot's measured height.
 
-## Tab row specs (Discover variant — canonical)
+## Tab row specs (canonical — soft-squircle pills)
+
+Single tab style for all destination tab strips (Discover 3 tabs, Courses 3 tabs, Tour Hub 5 tabs). Horizontal scroll handles overflow.
 
 | Property | Value |
 |---|---|
-| Font size | 16px |
+| Font size | 14px |
 | Font weight | 700 active / 500 inactive |
-| Letter-spacing | -0.025em active / 0 inactive |
-| Padding | `10px 4px 9px` |
-| Gap between tabs | 34px |
-| Underline | 2.5px, `linear-gradient(90deg, #F59E0B, #F7931E)` |
-| `minHeight` | none (do not enforce 44px) |
-| Row height | ~37px |
+| Letter-spacing | -0.01em |
+| Pill height | 32px |
+| Pill padding | `0 12px` |
+| Border-radius | 8px (soft squircle) |
+| Gap between tabs | 8px |
+| Active background | `#FEF3E7` (cream — same as INVITE button) |
+| Active border | `1px solid #F7931E` |
+| Active text | `#c97a10` |
+| Inactive background | `transparent` |
+| Inactive border | `1px solid transparent` (preserves layout, no jump) |
+| Inactive text | `#64748B` (`hsl(var(--muted-foreground))`) |
+| Wrapper padding | `8px 16px` |
+| Wrapper background | `#F8FAFC` (`hsl(var(--background))`) |
+| Wrapper border-bottom | `0.5px solid rgba(15,23,42,0.06)` |
+| Right-edge fade | 28px `linear-gradient(to right, transparent, #F8FAFC)` — only when row overflows |
+| Transition | `all 0.15s` |
 
-Implementation reference: `SegmentedControl.tsx`.
+**Behavioural rules:**
+
+- Horizontal scroll always on (`overflow-x: auto`, `-webkit-overflow-scrolling: touch`). Scrollbar hidden via `.segmented-scroller::-webkit-scrollbar { display: none }`.
+- No snap-to-tab.
+- Active tab does NOT auto-scroll into view on initial render. Tapping a partially-clipped tab smooth-scrolls it into view (`scrollIntoView({ inline: 'center', behavior: 'smooth' })`).
+- Right-edge fade is conditional — render only when `scrollWidth > clientWidth` (ResizeObserver-driven).
+
+Implementation references: `src/components/discover/SegmentedControl.tsx`, `src/features/tourhub/components/TourHubShellTabs.tsx`.
 
 ## Filter chip specs (canonical)
 
@@ -92,29 +111,16 @@ Pages consume `--chrome-total-h`. They do not consume `--shell-extra-h` directly
 
 | Variant            | Pages                                              | Row 1                | Row 2        |
 |--------------------|----------------------------------------------------|----------------------|--------------|
-| Tab-tier           | Discover/Watch, Discover/Explore, Discover/Friends | Discover tabs        | filter chips |
+| Tab-tier           | Discover/Watch, Discover/Explore, Discover/Friends | Soft-squircle pills (3 tabs) | filter chips |
+| Tab-tier           | Tour Hub (Overview/Schedule/Players/Leaders/College) | Soft-squircle pills (5 tabs, scrolling) | per-page chrome (Schedule = season chips, Players = search/sort, Leaders = 4-stat chips, College = none) |
 | Subpage            | Watch/Videos, Watch/Clips                          | editorial title      | filter chips |
-| Tour Hub tab-tier  | /tourhub (Overview/Schedule/Players/Leaders), /tourhub/college-golf | 5-destination Tour Hub tab strip | per-page chrome (Schedule = season chips, Players = search/sort, Leaders = 4-stat chips, College = none) |
-| Tour Hub subpage   | /tourhub/tournament/:id, /tourhub/player/:id, /tourhub/college/profile/:slug, /tourhub/college/compare | (none — CompactHeader back arrow handles nav) | Tournament Detail = 4-tab strip (Overview/Leaderboard/Tee Times/Holes\|Summary); Player/College = none |
+| Subpage            | Tour Hub detail pages                              | editorial title (or none — CompactHeader back arrow handles nav) | Tournament Detail = 4-tab equal-width strip; Player/College = none |
 
 ## Tour Hub tab-tier variant
 
-Used on /tourhub for the 5-destination tab strip. Same anatomy as the Discover
-tab-tier (Row 1 tabs, optional Row 2 chips), but Row 1 uses tighter specs to
-fit 5 destinations on a 390pt phone.
+Same canonical pill spec as Discover (see "Tab row specs" above). Tour Hub renders 5 destinations on a horizontally-scrolling rail; College may require a swipe to reach on 375pt phones.
 
-| Property         | Discover | Tour Hub |
-|------------------|----------|----------|
-| Font size        | 16px     | 15px     |
-| Gap between tabs | 34px     | 24px     |
-| Row height       | ~37px    | ~36px    |
-
-All other specs (padding `10px 4px 9px`, 2.5px amber gradient underline,
-weights 700/500, letter-spacing -0.025em on active) identical to Discover.
-
-Tabs 1–4 (`Overview / Schedule / Players / Leaders`) drive `?tab=` on
-`/tourhub`. Tab 5 (`College`) is a virtual entry that navigates to
-`/tourhub/college-golf` and reads as active across all college sub-paths.
+Tabs 1–4 (`Overview / Schedule / Players / Leaders`) drive `?tab=` on `/tourhub`. Tab 5 (`College`) is a virtual entry that navigates to `/tourhub/college-golf` and reads as active across all college sub-paths.
 
 Implementation reference: `src/features/tourhub/components/TourHubShellTabs.tsx`
 
@@ -123,16 +129,11 @@ Implementation reference: `src/features/tourhub/components/TourHubShellTabs.tsx`
 Used on the four Tour Hub detail pages: `/tourhub/tournament/:id`,
 `/tourhub/player/:id`, `/tourhub/college/profile/:slug`, `/tourhub/college/compare`.
 
-- **Row 1:** none. Back navigation is handled by CompactHeader's existing
-  `isBackArrowRoute` logic — no in-page back link, no editorial title row.
+- **Row 1:** none on Player/College (CompactHeader back arrow), or editorial title where applicable.
 - **Row 2:**
-  - **Tournament Detail** — 4-tab equal-width strip:
-    `Overview / Leaderboard / Tee Times / Holes` (in-progress or upcoming) or
-    `Overview / Leaderboard / Tee Times / Summary` (completed). Drives
-    `?tab=` on the page. Specs match the Tour Hub tab-tier row (15px / 700-500
-    / 2.5px amber gradient underline).
-  - **Player / College Profile / College Compare** — no Row 2. ShellSlot
-    collapses; pages still consume `--chrome-total-h` for offset.
+  - **Tournament Detail** — 5-tab equal-width strip:
+    `Overview / Leaderboard / Summary / Tee Times / Holes`. Drives `?tab=` on the page. Sub-page facet pattern (NOT the canonical destination pill spec) — equal-width flex row, amber underline, unchanged.
+  - **Player / College Profile / College Compare** — no Row 2. ShellSlot collapses; pages still consume `--chrome-total-h` for offset.
 
 Implementation references:
 `src/features/tourhub/components/shell/TournamentTabsShellRow.tsx`,

@@ -3,11 +3,11 @@ import { Skeleton } from "@/components/ui/skeleton"
 export const DiscoverSkeleton = () => {
   return (
     <div className="min-h-screen page-with-header pb-20 bg-background">
-      {/* Top tabs — 3 underline-style tabs matching SegmentedControl */}
-      <div className="flex justify-center" style={{ gap: 34, padding: '14px 7px 12px', borderBottom: '1px solid hsl(var(--border))' }}>
-        <Skeleton className="h-5 w-14 rounded" />
-        <Skeleton className="h-5 w-16 rounded" />
-        <Skeleton className="h-5 w-14 rounded" />
+      {/* Top tabs — 3 soft-squircle pills matching SegmentedControl */}
+      <div className="flex" style={{ gap: 8, padding: '8px 16px', borderBottom: '0.5px solid rgba(15,23,42,0.06)' }}>
+        <Skeleton className="h-8 w-[72px] rounded-lg" style={{ background: 'rgba(15,23,42,0.06)' }} />
+        <Skeleton className="h-8 w-[78px] rounded-lg" style={{ background: 'rgba(15,23,42,0.06)' }} />
+        <Skeleton className="h-8 w-[70px] rounded-lg" style={{ background: 'rgba(15,23,42,0.06)' }} />
       </div>
 
       {/* Sub-tabs — Clips/Videos pills */}
