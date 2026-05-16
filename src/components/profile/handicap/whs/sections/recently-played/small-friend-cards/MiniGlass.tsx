@@ -19,10 +19,10 @@ export const MiniGlass: React.FC<Props> = ({ gross, diffStr: _diffStr, isCounter
     <div
       style={{
         position: 'absolute',
-        right: 6,
-        bottom: 6,
-        padding: '4px 7px',
-        borderRadius: 8,
+        right: 5,
+        bottom: 5,
+        padding: '2px 5px',
+        borderRadius: 6,
         background: 'rgba(255,255,255,0.10)',
         border: '0.5px solid rgba(255,255,255,0.20)',
         backdropFilter: 'blur(30px) saturate(180%)',
