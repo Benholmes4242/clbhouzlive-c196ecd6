@@ -520,7 +520,7 @@ export async function fetchCourseForm(
   }
 
   // First pass: build the base CourseForm rows including best/worst diffs.
-  const baseRows: Omit<CourseForm, 'course_thumbnail_image'>[] = [];
+  const baseRows: Omit<CourseForm, 'course_thumbnail_image' | 'course_region'>[] = [];
   for (const [course_id, info] of grouped) {
     if (info.diffs.length < minRounds) continue;
     const avg = info.diffs.reduce((a, b) => a + b, 0) / info.diffs.length;
