@@ -604,6 +604,7 @@ const FeedCard: React.FC<FeedCardProps> = ({ round, isBest, onTap }) => {
                   color: deltaInfo.color,
                   fontWeight: 700,
                   letterSpacing: '0.02em',
+                  textShadow: deltaInfo.glow,
                 }}>
                   HCP {deltaInfo.sign} {deltaInfo.value}
                 </span>
