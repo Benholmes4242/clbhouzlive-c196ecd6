@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react';
-import { Pencil, Swords } from 'lucide-react';
-import SectionHeader from '../SectionHeader';
+import { Pencil } from 'lucide-react';
+import { DarkSectionHeader } from '../_shared/darkAtoms';
 import RivalryCard from './RivalryCard';
 import RivalryAddCard from './RivalryAddCard';
 import RivalryInfoSheet from './RivalryInfoSheet';
@@ -47,7 +47,7 @@ export const RivalriesSection: React.FC<Props> = ({ userId }) => {
 
   return (
     <section style={{ marginTop: 32 }}>
-      <SectionHeader
+      <DarkSectionHeader
         eyebrow="RIVALRIES"
         title="Your rivals"
         sub={
@@ -57,6 +57,7 @@ export const RivalriesSection: React.FC<Props> = ({ userId }) => {
               ? 'Pick golfers to track head-to-head.'
               : 'Auto-picked from your circle. Pin to lock a slot.'
         }
+        withDot
         right={
           hasFilled && hasAnyH2HData ? (
             <button
@@ -70,7 +71,7 @@ export const RivalriesSection: React.FC<Props> = ({ userId }) => {
                 gap: 4,
                 padding: '4px 10px',
                 background: 'transparent',
-                border: '1px solid rgba(15,23,42,0.12)',
+                border: '1px solid var(--hcp-line-2)',
                 borderRadius: 999,
                 cursor: 'pointer',
                 color: 'var(--hcp-t-80)',
@@ -119,8 +120,10 @@ export const RivalriesSection: React.FC<Props> = ({ userId }) => {
             />
           ))
         ) : !hasAnyH2HData ? (
-          <RivalryEmptyCard
-            onPickRival={() => setEditTarget({ rivalry: null, slotIndex: 0 })}
+          <RivalryAddCard
+            slotIndex={0}
+            label="Add a rival"
+            onClick={() => setEditTarget({ rivalry: null, slotIndex: 0 })}
           />
         ) : (
           <>
@@ -161,65 +164,6 @@ export const RivalriesSection: React.FC<Props> = ({ userId }) => {
   );
 };
 
-const RivalryEmptyCard: React.FC<{ onPickRival: () => void }> = ({ onPickRival }) => (
-  <div
-    style={{
-      flex: '0 0 auto',
-      width: 'calc(100vw - 32px)',
-      maxWidth: 360,
-      background: 'var(--hcp-bg-1)',
-      border: '1px solid var(--hcp-line)',
-      borderRadius: 14,
-      padding: 20,
-      display: 'flex',
-      flexDirection: 'column',
-      alignItems: 'center',
-      textAlign: 'center',
-      gap: 10,
-      fontFamily: '"Geist", system-ui, sans-serif',
-    }}
-  >
-    <div
-      style={{
-        width: 44,
-        height: 44,
-        borderRadius: '50%',
-        background: 'rgba(247,147,30,0.14)',
-        color: '#B45309',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-      }}
-    >
-      <Swords size={22} strokeWidth={2.2} />
-    </div>
-    <p style={{ margin: 0, fontSize: 15, fontWeight: 800, color: 'var(--hcp-t-100)', letterSpacing: '-0.01em' }}>
-      Build your rival list
-    </p>
-    <p style={{ margin: 0, fontSize: 12, color: 'var(--hcp-t-60)', lineHeight: 1.4 }}>
-      Pick someone to track head-to-head. Stats update with every round you both play.
-    </p>
-    <button
-      type="button"
-      onClick={onPickRival}
-      style={{
-        marginTop: 4,
-        padding: '8px 16px',
-        borderRadius: 999,
-        background: 'rgba(247,147,30,0.08)',
-        color: '#C97211',
-        fontSize: 12,
-        fontWeight: 800,
-        letterSpacing: '0.02em',
-        border: '1px solid rgba(247,147,30,0.20)',
-        cursor: 'pointer',
-        fontFamily: '"Geist", system-ui, sans-serif',
-      }}
-    >
-      Pick a rival
-    </button>
-  </div>
-);
 
 export default RivalriesSection;
 
