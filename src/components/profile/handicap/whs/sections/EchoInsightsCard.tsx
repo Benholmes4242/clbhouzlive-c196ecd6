@@ -231,7 +231,6 @@ export const EchoInsightsCard: React.FC<Props> = ({ connectionId }) => {
       style={{
         background:
           'linear-gradient(180deg, rgba(247,147,30,0.06) 0%, rgba(247,147,30,0) 60%)',
-        borderTop: `0.5px solid ${INK_10}`,
         padding: '32px 0 0',
         marginTop: 8,
       }}
