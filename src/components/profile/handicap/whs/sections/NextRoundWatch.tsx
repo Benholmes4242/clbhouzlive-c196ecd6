@@ -202,7 +202,7 @@ const NextRoundWatch: React.FC<Props> = ({ connectionId, currentHandicap }) => {
             borderRight
           />
           <InnerCell
-            eyebrow="OTHERWISE"
+            eyebrow="Otherwise you'll stay at"
             eyebrowIcon={<Minus size={11} strokeWidth={2.6} />}
             eyebrowColor="var(--hcp-t-60)"
             value={settle.toFixed(1)}
@@ -211,7 +211,7 @@ const NextRoundWatch: React.FC<Props> = ({ connectionId, currentHandicap }) => {
                 ? 'var(--hcp-good)'
                 : 'var(--hcp-t-100)'
             }
-            subtext="Holds. No risk of going up."
+            subtext="With no risk of going up"
           />
         </div>
 
