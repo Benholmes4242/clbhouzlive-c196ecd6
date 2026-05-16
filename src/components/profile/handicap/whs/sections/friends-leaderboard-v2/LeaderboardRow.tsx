@@ -90,6 +90,7 @@ export const LeaderboardRow: React.FC<Props> = ({
       role={onClick ? undefined : 'listitem'}
       aria-label={`${displayName}${rank != null ? `, ranked ${rank}` : ''}, handicap ${fmtHcp(hcp)}${isStaleRow ? ', stale' : ''}`}
       style={{
+        position: 'relative',
         display: 'flex',
         alignItems: 'center',
         width: 'calc(100% - 40px)',
@@ -107,6 +108,20 @@ export const LeaderboardRow: React.FC<Props> = ({
         color: 'inherit',
       }}
     >
+      {isYou && (
+        <span
+          aria-hidden
+          style={{
+            position: 'absolute',
+            left: -20,
+            top: 0,
+            bottom: 0,
+            width: 3,
+            background: 'linear-gradient(180deg, #FBBC2E, transparent)',
+            pointerEvents: 'none',
+          }}
+        />
+      )}
       {/* Rank */}
       <div
         style={{
@@ -115,7 +130,7 @@ export const LeaderboardRow: React.FC<Props> = ({
           flexShrink: 0,
           fontSize: 12,
           fontWeight: 700,
-          color: rank != null && rank <= 3 ? T.amberDeep : T.inkMute,
+          color: medalColor(rank) ?? T.inkMute,
           fontVariantNumeric: 'tabular-nums',
         }}
       >
