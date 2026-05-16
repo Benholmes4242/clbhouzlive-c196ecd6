@@ -43,9 +43,11 @@ function formatToday(): string {
 }
 
 function arcGradient(verdict: Verdict): { from: string; to: string } {
-  if (verdict === 'good') return { from: '#22C55E', to: '#4ADE80' };
-  if (verdict === 'bad') return { from: '#EF4444', to: '#FCA5A5' };
-  return { from: '#F7931E', to: '#FFB45A' };
+  // Solid colour at both stops — eliminates the visible seam where the
+  // linear gradient wraps around the top/bottom of the ring (T8).
+  if (verdict === 'good') return { from: '#22C55E', to: '#22C55E' };
+  if (verdict === 'bad') return { from: '#EF4444', to: '#EF4444' };
+  return { from: '#F7931E', to: '#F7931E' };
 }
 
 // Form temperature label from a Stableford delta vs personal baseline.
