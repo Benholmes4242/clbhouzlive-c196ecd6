@@ -1,7 +1,7 @@
 import React from 'react';
 import type { WhsScoreHole } from '@/lib/whs/types';
 import { splitCourseName } from './splitCourseName';
-import CinemaCardShapeStrip from './CinemaCardShapeStrip';
+
 import { GlassGrossRing } from '../shared/GrossCounterRing';
 
 const FONT_GEIST = 'Geist, system-ui, -apple-system, BlinkMacSystemFont, sans-serif';
@@ -157,12 +157,6 @@ export const CinemaCardGlass: React.FC<Props> = ({
         </div>
       </div>
 
-      {showShape && (
-        <>
-          <div style={{ ...HAIR, margin: '14px 0 12px' }} />
-          <CinemaCardShapeStrip holes={holes!} />
-        </>
-      )}
     </div>
   );
 };
