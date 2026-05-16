@@ -304,11 +304,11 @@ export const RoundDetailSheet: React.FC<Props> = ({
       <DrawerPrimitive.Portal>
         <DrawerPrimitive.Overlay
           className="fixed inset-0 z-[10001]"
-          style={{ background: 'var(--hcp-t-40)' }}
+          style={{ background: 'rgba(0,0,0,0.6)' }}
         />
         <DrawerPrimitive.Content
           aria-labelledby="round-detail-sheet-title"
-          className="fixed inset-x-0 bottom-0 z-[10002] flex flex-col rounded-t-[20px] outline-none"
+          className="hcp-dark fixed inset-x-0 bottom-0 z-[10002] flex flex-col rounded-t-[20px] outline-none"
           style={{
             background: PAGE_BG,
             maxHeight: '92vh',
