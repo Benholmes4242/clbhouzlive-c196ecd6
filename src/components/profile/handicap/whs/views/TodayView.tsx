@@ -67,7 +67,7 @@ export const TodayView: React.FC<Props> = ({
 
       <IndexHistoryCard connectionId={connectionId} />
 
-      <LastRoundCard connectionId={connectionId} />
+      <LastRoundCard connectionId={connectionId} userId={userId} />
 
       <RoundsThatCountCard connectionId={connectionId} currentHandicap={currentHandicap} />
 

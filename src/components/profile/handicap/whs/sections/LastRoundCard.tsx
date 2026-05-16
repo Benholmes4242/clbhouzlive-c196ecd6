@@ -1,65 +1,53 @@
 import React, { useMemo, useState } from 'react';
-import { useLastRound, useRoundDetail, useAllScores } from '@/lib/whs/hooks';
+import { useLastRound } from '@/lib/whs/hooks';
+import { useUserProfile } from '@/hooks/useUserProfile';
+import type { WhsFriendActivityWithImage } from '@/lib/whs/types';
 import RoundDetailSheet from './round-detail/RoundDetailSheet';
-import {
-  CinemaCard,
-  CinemaCardSkeleton,
-} from './last-round-card';
+import { CinemaFriendCard } from './recently-played/cinema-friend-card';
+import { CinemaCardSkeleton } from './last-round-card';
 import { DarkSectionHeader } from './_shared/darkAtoms';
 
 interface Props {
   connectionId: string;
+  userId: string;
 }
 
 const FONT_GEIST = 'Geist, system-ui, -apple-system, BlinkMacSystemFont, sans-serif';
-const INK_55 = 'var(--hcp-t-60)';
-const SectionEyebrow: React.FC<{ label: string }> = ({ label }) => (
-  <div style={{ marginBottom: 6, padding: '0 16px 12px' }}>
-    <span
-      style={{
-        fontSize: 9,
-        fontWeight: 800,
-        color: 'var(--hcp-t-60)',
-        letterSpacing: '0.16em',
-        textTransform: 'uppercase',
-        fontFamily: FONT_GEIST,
-      }}
-    >
-      {label}
-    </span>
-  </div>
-);
 
-export const LastRoundCard: React.FC<Props> = ({ connectionId }) => {
+export const LastRoundCard: React.FC<Props> = ({ connectionId, userId }) => {
   const { data: lastRound, isLoading } = useLastRound(connectionId);
-  const { data: roundDetail } = useRoundDetail(lastRound?.id, !!lastRound?.id);
-  const { data: allScores } = useAllScores(connectionId);
+  const { data: profile } = useUserProfile(userId);
   const [sheetOpen, setSheetOpen] = useState(false);
 
-  const par = useMemo<number | null>(() => {
-    if (!roundDetail?.holes || !roundDetail.hole_by_hole_fetched) return null;
-    let total = 0;
-    let any = false;
-    for (const h of roundDetail.holes) {
-      if (h.par != null) {
-        total += h.par;
-        any = true;
-      }
-    }
-    return any ? total : null;
-  }, [roundDetail]);
-
-  const counterRank = useMemo<number | null>(() => {
-    if (!lastRound || !lastRound.is_counter || !allScores) return null;
-    const last20 = allScores.slice(0, 20);
-    const sorted = [...last20]
-      .filter((s) => s.handicap_differential != null)
-      .sort((a, b) => a.handicap_differential! - b.handicap_differential!);
-    const idx = sorted.findIndex((s) => s.id === lastRound.id);
-    if (idx === -1) return null;
-    return Math.min(idx + 1, 8);
-  }, [lastRound, allScores]);
-
+  const activity = useMemo<WhsFriendActivityWithImage | null>(() => {
+    if (!lastRound) return null;
+    const delta = lastRound.handicap_delta ?? null;
+    // Synthesize so CinemaFriendEyebrow's impactDelta = friend_handicap_index - handicap_index_at_time = delta
+    const handicap_index_at_time = delta !== null ? 0 : null;
+    const friend_handicap_index = delta !== null ? delta : null;
+    return {
+      friend_row_id: lastRound.id,
+      friend_passport_id: 0,
+      friend_name: profile?.display_name ?? profile?.username ?? 'You',
+      friend_thumbnail_url: profile?.profile_photo_url ?? null,
+      friend_user_id: userId,
+      friend_connection_id: connectionId,
+      is_clbhouz_user: true,
+      last_round_played_at: lastRound.play_date,
+      last_round_course_name: lastRound.course?.name ?? 'Unknown course',
+      last_round_adjusted_gross: lastRound.adjusted_gross ?? null,
+      last_round_stableford: lastRound.stableford_points ?? null,
+      last_round_differential: lastRound.handicap_differential ?? null,
+      last_round_score_id: lastRound.id,
+      course_thumbnail_image: lastRound.course_thumbnail_image ?? null,
+      is_course_best: false,
+      friend_handicap_index,
+      is_counter: lastRound.is_counter ?? false,
+      handicap_index_at_time,
+      viewer_has_reacted: false,
+      total_reactions: 0,
+    } as unknown as WhsFriendActivityWithImage;
+  }, [lastRound, profile, userId, connectionId]);
 
   if (isLoading) {
     return (
@@ -72,7 +60,7 @@ export const LastRoundCard: React.FC<Props> = ({ connectionId }) => {
     );
   }
 
-  if (!lastRound) {
+  if (!lastRound || !activity) {
     return (
       <section style={{ marginTop: 32 }}>
         <DarkSectionHeader eyebrow="Last Round" />
@@ -91,30 +79,11 @@ export const LastRoundCard: React.FC<Props> = ({ connectionId }) => {
         .toUpperCase()
     : undefined;
 
-  const holes =
-    roundDetail?.holes && roundDetail.hole_by_hole_fetched ? roundDetail.holes : null;
-
   return (
     <>
       <section style={{ marginTop: 32, fontFamily: FONT_GEIST }}>
         <DarkSectionHeader eyebrow="Last Round" right={formattedDate} />
-        <div style={{ padding: '0 20px' }}>
-          <CinemaCard
-            imageUrl={lastRound.course_thumbnail_image}
-            playDate={lastRound.play_date}
-            isCounter={lastRound.is_counter ?? false}
-            counterRank={counterRank}
-            courseName={lastRound.course?.name ?? 'Unknown course'}
-            par={par}
-            slope={lastRound.slope_rating ?? null}
-            gross={lastRound.adjusted_gross ?? null}
-            stableford={lastRound.stableford_points ?? null}
-            differential={lastRound.handicap_differential ?? null}
-            holes={holes}
-            handicapDelta={lastRound.handicap_delta ?? null}
-            onClick={() => setSheetOpen(true)}
-          />
-        </div>
+        <CinemaFriendCard activity={activity} onClick={() => setSheetOpen(true)} />
       </section>
 
       <RoundDetailSheet
