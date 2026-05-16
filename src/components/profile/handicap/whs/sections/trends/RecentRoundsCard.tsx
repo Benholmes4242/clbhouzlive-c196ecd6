@@ -455,7 +455,7 @@ const DateTile: React.FC<DateTileProps> = ({ dateString, thumbnailUrl }) => {
         width: 88,
         flexShrink: 0,
         background: `linear-gradient(150deg, ${T.tileFrom}, ${T.tileTo})`,
-        color: 'var(--hcp-bg-1)',
+        color: '#FFFFFF',
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
