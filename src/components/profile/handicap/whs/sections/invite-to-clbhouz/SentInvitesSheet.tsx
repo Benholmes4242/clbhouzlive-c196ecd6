@@ -19,7 +19,7 @@ const T = {
   hairline: 'var(--hcp-line-2)',
   green: '#059669',
   greenTint: 'rgba(5,150,105,0.12)',
-  greyTint: 'rgba(15,23,42,0.05)',
+  greyTint: 'var(--hcp-bg-2)',
 };
 const FONT_GEIST = 'Geist, system-ui, -apple-system, BlinkMacSystemFont, sans-serif';
 
