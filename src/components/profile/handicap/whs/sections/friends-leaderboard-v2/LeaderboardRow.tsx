@@ -270,9 +270,12 @@ export const LeaderboardRow: React.FC<Props> = ({
           style={{
             fontSize: 15,
             fontWeight: 700,
-            color: isPlusHandicap ? T.amberInk : T.ink,
+            color: isPlusHandicap ? T.amber : T.ink,
             fontVariantNumeric: 'tabular-nums',
             letterSpacing: '-0.01em',
+            textShadow: isPlusHandicap
+              ? '0 0 6px rgba(247,147,30,0.30), 0 0 2px rgba(247,147,30,0.20)'
+              : 'none',
           }}
         >
           {fmtHcp(hcp)}
@@ -282,9 +285,13 @@ export const LeaderboardRow: React.FC<Props> = ({
             style={{
               fontSize: 9,
               fontWeight: 700,
-              color: gapFromYou < 0 ? T.greenDeep : T.redDeep,
+              color: gapFromYou < 0 ? 'var(--hcp-good)' : 'var(--hcp-bad)',
               fontVariantNumeric: 'tabular-nums',
               letterSpacing: '-0.01em',
+              textShadow:
+                gapFromYou < 0
+                  ? '0 0 6px rgba(34,197,94,0.40), 0 0 2px rgba(34,197,94,0.25)'
+                  : '0 0 6px rgba(239,68,68,0.40), 0 0 2px rgba(239,68,68,0.25)',
             }}
           >
             {gapFromYou < 0
