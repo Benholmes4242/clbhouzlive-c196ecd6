@@ -154,12 +154,7 @@ export const SheetHeroGlass: React.FC<Props> = ({
         </div>
       </div>
 
-      {showShape && (
-        <>
-          <div style={{ ...HAIR, margin: '12px 0 10px' }} />
-          <CinemaCardShapeStrip holes={holes!} />
-        </>
-      )}
+      {/* Shape-of-the-round strip intentionally removed */}
     </div>
   );
 };
