@@ -4,7 +4,7 @@ import {
   useFriendLeaderboard,
   useSentInvites,
 } from '@/lib/whs/hooks';
-import SectionHeader from '../SectionHeader';
+import { DarkSectionHeader } from '../_shared/darkAtoms';
 import InviteCard from './InviteCard';
 import SentInvitesSheet from './SentInvitesSheet';
 
