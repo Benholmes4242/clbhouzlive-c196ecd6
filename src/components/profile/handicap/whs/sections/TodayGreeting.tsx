@@ -101,28 +101,39 @@ const TodayGreeting: React.FC<Props> = ({ connectionId, userId }) => {
     return best;
   }, [allScores]);
 
-  /** Resolve coords from golf_courses by name (exact match). */
-  const { data: coords } = useQuery<{ lat: number; lng: number } | null>({
-    queryKey: ['today-greeting-course-coords', homeCourseName],
+  /** Resolve coords from golf_courses by normalised-name match. */
+  const { data: courseLookup } = useQuery<{ lat: number; lng: number; canonicalName: string } | null>({
+    queryKey: ['today-greeting-course-lookup', homeCourseName],
     enabled: !!homeCourseName,
     staleTime: 60 * 60 * 1000,
     queryFn: async () => {
       if (!homeCourseName) return null;
+      const firstWord = homeCourseName
+        .toLowerCase()
+        .replace(/[^a-z\s]/g, ' ')
+        .split(/\s+/)
+        .find(w => w.length > 2 && !['the', 'golf', 'club'].includes(w));
+      if (!firstWord) return null;
       const { data, error } = await (supabase as any)
         .from('golf_courses')
-        .select('latitude, longitude')
-        .ilike('name', homeCourseName)
+        .select('name, latitude, longitude')
+        .ilike('name', `%${firstWord}%`)
         .not('latitude', 'is', null)
         .not('longitude', 'is', null)
-        .limit(1)
-        .maybeSingle();
-      if (error || !data) return null;
-      const lat = Number(data.latitude);
-      const lng = Number(data.longitude);
+        .limit(20);
+      if (error || !data || data.length === 0) return null;
+      const target = normaliseCourseName(homeCourseName);
+      const match = (data as Array<{ name: string; latitude: number; longitude: number }>)
+        .find(c => normaliseCourseName(c.name) === target);
+      if (!match) return null;
+      const lat = Number(match.latitude);
+      const lng = Number(match.longitude);
       if (!Number.isFinite(lat) || !Number.isFinite(lng)) return null;
-      return { lat, lng };
+      return { lat, lng, canonicalName: match.name };
     },
   });
+
+  const coords = courseLookup ? { lat: courseLookup.lat, lng: courseLookup.lng } : null;
 
   const { data: weather } = useTodayWeather(coords?.lat ?? null, coords?.lng ?? null);
 
