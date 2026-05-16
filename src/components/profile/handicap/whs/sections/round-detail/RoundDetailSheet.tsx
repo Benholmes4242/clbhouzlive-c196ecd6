@@ -313,7 +313,7 @@ export const RoundDetailSheet: React.FC<Props> = ({
             background: PAGE_BG,
             maxHeight: '92vh',
             overflow: 'hidden',
-            boxShadow: '0 -10px 40px -10px rgba(15,23,42,0.25)',
+            boxShadow: '0 -10px 40px -10px rgba(0,0,0,0.5)',
             fontFamily: FONT_GEIST,
           }}
         >
