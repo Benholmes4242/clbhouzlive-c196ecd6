@@ -85,7 +85,7 @@ export const CinemaFriendEyebrow: React.FC<Props> = ({ activity }) => {
           {time && (
             <span
               style={{
-                fontSize: 11,
+                fontSize: 9,
                 fontWeight: 500,
                 color: 'rgba(255,255,255,0.65)',
                 letterSpacing: '0.02em',
