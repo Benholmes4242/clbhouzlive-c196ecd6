@@ -302,7 +302,7 @@ const CoursesContent: React.FC<CoursesContentProps> = ({ username, displayName }
         /* Main courses page - show Explore, Global Top 100, and Friends' Courses */
         <>
           <ShellSlot>
-            <div className="px-1">
+            <div>
               <SegmentedControl
                 tabs={[
                   { id: 'explore', label: 'Explore' },
@@ -311,6 +311,8 @@ const CoursesContent: React.FC<CoursesContentProps> = ({ username, displayName }
                 ]}
                 activeTab={activeTab}
                 onTabChange={handleTabChange}
+                variant="dark"
+                align="center"
               />
             </div>
           </ShellSlot>
