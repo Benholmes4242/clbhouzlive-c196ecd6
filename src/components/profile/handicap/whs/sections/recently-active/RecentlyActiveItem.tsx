@@ -61,7 +61,7 @@ export const RecentlyActiveItem: React.FC<Props> = ({ entry, isActive, onClick }
               height: 14,
               borderRadius: '50%',
               background: dotBackground,
-              border: '2px solid #F8FAFC',
+              border: '2px solid var(--hcp-bg-0)',
             }}
           />
         )}
