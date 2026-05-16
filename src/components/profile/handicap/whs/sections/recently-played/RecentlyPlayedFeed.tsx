@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useFriendsActivity } from '@/lib/whs/hooks';
-import SectionHeader from '../SectionHeader';
+
 import Paged8 from '../_shared/Paged8';
 import FriendRoundCard from './FriendRoundCard';
 import RoundDetailSheet from '../round-detail/RoundDetailSheet';
@@ -25,17 +25,52 @@ export const RecentlyPlayedFeed: React.FC<Props> = ({ ownerUserId }) => {
 
   return (
     <section style={{ marginTop: 32 }}>
-      <SectionHeader
-        eyebrow="ACTIVITY"
-        title="Your friends' rounds"
-        sub={
-          isLoading
-            ? 'Loading…'
-            : items.length === 0
-              ? undefined
-              : `${items.length} round${items.length === 1 ? '' : 's'} in the last fortnight`
-        }
-      />
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          padding: '0 20px 8px',
+          fontFamily: '"Geist", system-ui, sans-serif',
+        }}
+      >
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 8,
+            fontSize: 11,
+            fontWeight: 800,
+            letterSpacing: '0.14em',
+            color: 'var(--hcp-t-100)',
+            textTransform: 'uppercase',
+          }}
+        >
+          <span
+            style={{
+              width: 6,
+              height: 6,
+              borderRadius: '50%',
+              background: 'var(--hcp-amber, #F59E0B)',
+            }}
+          />
+          Friends' Rounds
+        </div>
+        {!isLoading && items.length > 0 && (
+          <span
+            style={{
+              fontSize: 11,
+              fontWeight: 800,
+              letterSpacing: '0.14em',
+              color: 'var(--hcp-t-60)',
+              textTransform: 'uppercase',
+              fontVariantNumeric: 'tabular-nums',
+            }}
+          >
+            {items.length} · Fortnight
+          </span>
+        )}
+      </div>
       {isLoading ? (
         <div style={{ padding: '0 20px' }}>
           {Array.from({ length: 3 }).map((_, i) => (
