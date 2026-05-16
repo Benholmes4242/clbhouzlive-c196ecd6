@@ -107,9 +107,9 @@ export const RoundDetailSheet: React.FC<Props> = ({
 
   // counterRank: previously used by removed CounterPill (signal now via gross ring).
 
-  const renderUserBody = () => {
-    if (userLoading) return <SheetSkeleton />;
-    if (!userData) return <SheetEmpty onClose={onClose} />;
+  const renderUserBody = (): { scroll: React.ReactNode; footer: React.ReactNode } => {
+    if (userLoading) return { scroll: <SheetSkeleton />, footer: null };
+    if (!userData) return { scroll: <SheetEmpty onClose={onClose} />, footer: null };
 
     const holes = userData.holes;
     const hasHoles = !!holes && holes.length > 0;
@@ -118,41 +118,44 @@ export const RoundDetailSheet: React.FC<Props> = ({
         ? userData.handicap_index_at_time - handicapDelta
         : null;
 
-    return (
-      <>
-        <SheetHero
-          imageUrl={userData.course_header_image}
-          onClose={onClose}
-          topEyebrow={<UserEyebrow playDate={userData.play_date} />}
-          glass={
-            <SheetHeroGlass
-              courseName={userData.course?.name ?? 'Unknown course'}
-              par={parTotal}
-              slope={userData.slope_rating}
-              gross={userData.adjusted_gross}
-              stableford={userData.stableford_points}
-              differential={userData.handicap_differential}
-              holes={hasHoles ? holes : null}
-              isCounter={!!userData.is_counter}
-            />
-          }
-        />
-
-        {hasHoles ? (
-          <RoundScorecard holes={holes!} isNineHole={userData.is_nine_hole} />
-        ) : (
-          <ScorecardEmpty
-            message={
-              userData.hole_by_hole_fetched
-                ? 'No hole-by-hole data for this round.'
-                : 'Hole data is still syncing'
-            }
-            subMessage={
-              userData.hole_by_hole_fetched ? undefined : 'Check back in a few hours.'
+    return {
+      scroll: (
+        <>
+          <SheetHero
+            imageUrl={userData.course_header_image}
+            onClose={onClose}
+            topEyebrow={<UserEyebrow playDate={userData.play_date} />}
+            glass={
+              <SheetHeroGlass
+                courseName={userData.course?.name ?? 'Unknown course'}
+                par={parTotal}
+                slope={userData.slope_rating}
+                gross={userData.adjusted_gross}
+                stableford={userData.stableford_points}
+                differential={userData.handicap_differential}
+                holes={hasHoles ? holes : null}
+                isCounter={!!userData.is_counter}
+              />
             }
           />
-        )}
 
+          {hasHoles ? (
+            <RoundScorecard holes={holes!} isNineHole={userData.is_nine_hole} />
+          ) : (
+            <ScorecardEmpty
+              message={
+                userData.hole_by_hole_fetched
+                  ? 'No hole-by-hole data for this round.'
+                  : 'Hole data is still syncing'
+              }
+              subMessage={
+                userData.hole_by_hole_fetched ? undefined : 'Check back in a few hours.'
+              }
+            />
+          )}
+        </>
+      ),
+      footer: (
         <SheetFooterInk
           label="INDEX IMPACT"
           currentIndex={userData.handicap_index_at_time ?? null}
@@ -168,8 +171,8 @@ export const RoundDetailSheet: React.FC<Props> = ({
             ) : null
           }
         />
-      </>
-    );
+      ),
+    };
   };
 
   const renderFriendBody = () => {
