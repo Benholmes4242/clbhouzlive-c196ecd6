@@ -13,13 +13,13 @@ interface Props {
 }
 
 const T = {
-  ink: '#0F172A',
-  ink70: '#475569',
-  inkMute: 'rgba(15,23,42,0.55)',
-  ink40: 'rgba(15,23,42,0.40)',
-  hairline: 'rgba(15,23,42,0.08)',
-  ink04: 'rgba(15,23,42,0.04)',
-  cardBg: '#FFFFFF',
+  ink: 'var(--hcp-t-100)',
+  ink70: 'var(--hcp-t-80)',
+  inkMute: 'var(--hcp-t-60)',
+  ink40: 'var(--hcp-t-40)',
+  hairline: 'var(--hcp-line-2)',
+  ink04: 'var(--hcp-bg-2)',
+  cardBg: 'var(--hcp-bg-1)',
   amber: '#F7931E',
   amberDeep: '#C97211',
   amberTint: 'rgba(247,147,30,0.10)',
@@ -30,7 +30,7 @@ const T = {
   red: '#DC2626',
   redInk: '#991B1B',
   redSoft: 'rgba(220,38,38,0.10)',
-  ringTrack: 'rgba(15,23,42,0.06)',
+  ringTrack: 'var(--hcp-bg-3)',
 };
 const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
 
@@ -177,7 +177,7 @@ export const StablefordCard: React.FC<Props> = ({ scores }) => {
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                color: '#fff',
+                color: 'var(--hcp-bg-1)',
                 fontSize: 16,
                 fontWeight: 800,
                 letterSpacing: '-0.02em',
@@ -265,7 +265,7 @@ const CardHeader: React.FC<CardHeaderProps> = ({ scope, setScope, onOpenSheet })
               padding: '4px 9px',
               borderRadius: 99,
               background: scope === s ? T.ink : 'transparent',
-              color: scope === s ? '#fff' : T.ink70,
+              color: scope === s ? 'var(--hcp-bg-1)' : T.ink70,
               border: 'none',
               cursor: 'pointer',
               fontFamily: FONT,

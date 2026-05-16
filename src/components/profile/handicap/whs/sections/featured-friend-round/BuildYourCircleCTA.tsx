@@ -3,13 +3,13 @@ import { ArrowRight, Users } from 'lucide-react';
 import SectionHeader from '../SectionHeader';
 
 const T = {
-  bgFrom: '#0F172A',
+  bgFrom: 'var(--hcp-t-100)',
   bgTo: '#1e293b',
   amber: '#F7931E',
   amberDeep: '#FFB459',
   amberRingOuter: 'rgba(247,147,30,0.15)',
   amberRingInner: 'rgba(247,147,30,0.10)',
-  white: '#FFFFFF',
+  white: 'var(--hcp-bg-1)',
   whiteMute: 'rgba(148,163,184,1)',
   whiteSoft: 'rgba(255,255,255,0.35)',
   hairline: 'rgba(247,147,30,0.18)',

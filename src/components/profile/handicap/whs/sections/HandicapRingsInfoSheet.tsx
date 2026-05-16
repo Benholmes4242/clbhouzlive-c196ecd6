@@ -10,11 +10,11 @@ interface Props {
 // Mirrors palette from HeroHandicapCard so the dots in the sheet match
 // the actual ring colours on the page.
 const T = {
-  ink: '#0F172A',
-  inkMute: 'rgba(15,23,42,0.55)',
-  inkSoft: 'rgba(15,23,42,0.78)',
-  hairline: 'rgba(15,23,42,0.08)',
-  neutralTint: 'rgba(15,23,42,0.04)',
+  ink: 'var(--hcp-t-100)',
+  inkMute: 'var(--hcp-t-60)',
+  inkSoft: 'var(--hcp-t-80)',
+  hairline: 'var(--hcp-line-2)',
+  neutralTint: 'var(--hcp-bg-2)',
   amber: '#F7931E',
   amberDeep: '#C97211',
   amberTint: 'rgba(247,147,30,0.10)',
@@ -24,7 +24,7 @@ const T = {
   // Form ring ember/ice ramp
   redHot: '#B91C1C',
   warm: '#F59E0B',
-  steady: 'rgba(15,23,42,0.40)',
+  steady: 'var(--hcp-t-40)',
   cold: '#38BDF8',
   out: '#0E7490',
 };
@@ -85,7 +85,7 @@ const BandLadder: React.FC<BandLadderProps> = ({ rows }) => (
           display: 'flex', alignItems: 'center', gap: 10,
           padding: '10px 12px',
           borderTop: i === 0 ? 'none' : `0.5px solid ${T.hairline}`,
-          background: i % 2 === 0 ? '#fff' : T.neutralTint,
+          background: i % 2 === 0 ? 'var(--hcp-bg-1)' : T.neutralTint,
         }}
       >
         <span

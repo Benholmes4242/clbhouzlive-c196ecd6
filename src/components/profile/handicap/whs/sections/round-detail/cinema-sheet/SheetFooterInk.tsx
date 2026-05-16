@@ -42,7 +42,7 @@ export const SheetFooterInk: React.FC<Props> = ({
     <div
       style={{
         background: INK,
-        color: '#fff',
+        color: 'var(--hcp-bg-1)',
         padding: '14px 18px 18px',
         paddingBottom: 'calc(18px + env(safe-area-inset-bottom, 0px))',
         display: 'flex',
@@ -69,7 +69,7 @@ export const SheetFooterInk: React.FC<Props> = ({
               style={{
                 fontSize: 22,
                 fontWeight: 400,
-                color: '#fff',
+                color: 'var(--hcp-bg-1)',
                 fontFamily: FONT_MONO,
                 letterSpacing: '-0.02em',
                 lineHeight: 1,
@@ -128,7 +128,7 @@ export const FooterPill: React.FC<{
     fontSize: 11,
     fontWeight: 700,
     letterSpacing: '0.10em',
-    color: '#fff',
+    color: 'var(--hcp-bg-1)',
     textTransform: 'uppercase',
     textDecoration: 'none',
     cursor: 'pointer',

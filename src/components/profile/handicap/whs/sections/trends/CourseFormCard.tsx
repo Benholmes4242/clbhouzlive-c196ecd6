@@ -13,24 +13,24 @@ interface Props {
 }
 
 const T = {
-  ink: '#0F172A',
-  inkMute: 'rgba(15,23,42,0.55)',
-  inkSoft: 'rgba(15,23,42,0.78)',
-  hairline: 'rgba(15,23,42,0.08)',
-  cardBg: '#FFFFFF',
+  ink: 'var(--hcp-t-100)',
+  inkMute: 'var(--hcp-t-60)',
+  inkSoft: 'var(--hcp-t-80)',
+  hairline: 'var(--hcp-line-2)',
+  cardBg: 'var(--hcp-bg-1)',
   amber: '#F7931E',
   amberDeep: '#C97211',
   amberTint: 'rgba(247,147,30,0.10)',
   amberInk: '#854F0B',
   greenInk: '#065F46',
   redInk: '#991B1B',
-  slateTint: 'rgba(15,23,42,0.04)',
+  slateTint: 'var(--hcp-bg-2)',
   gold: '#FBBC2E',
-  silver: '#94A3B8',
+  silver: 'var(--hcp-t-60)',
   bronze: '#B45309',
-  ink04: 'rgba(15,23,42,0.04)',
-  ink08: 'rgba(15,23,42,0.08)',
-  ink40: 'rgba(15,23,42,0.40)',
+  ink04: 'var(--hcp-bg-2)',
+  ink08: 'var(--hcp-line-2)',
+  ink40: 'var(--hcp-t-40)',
 };
 const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
 
