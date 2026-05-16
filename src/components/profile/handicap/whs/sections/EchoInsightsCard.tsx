@@ -332,7 +332,7 @@ export const EchoInsightsCard: React.FC<Props> = ({ connectionId }) => {
       </div>
 
       {/* Test yourself */}
-      <div style={{ marginTop: 16 }}>
+      <div style={{ marginTop: 16, position: 'relative', zIndex: 1 }}>
         <SectionHeader
           eyebrow="TEST YOURSELF"
           title="Three courses to grow your game"
