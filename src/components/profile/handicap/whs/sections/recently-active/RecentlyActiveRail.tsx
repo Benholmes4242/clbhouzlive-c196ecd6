@@ -1,6 +1,5 @@
 import React, { useMemo, useState } from 'react';
 import { useFriendLeaderboard } from '@/lib/whs/hooks';
-import SectionHeader from '../SectionHeader';
 import RecentlyActiveItem from './RecentlyActiveItem';
 import FriendProfileSheet from '../friend-profile-sheet/FriendProfileSheet';
 
