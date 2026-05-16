@@ -44,7 +44,7 @@ export const HeroGlassEnriched: React.FC<Props> = ({ friend, par, slope, holes }
           >
             <GlassGrossRing
               value={friend.score != null ? friend.score : EM_DASH}
-              isCounter={false}
+              isCounter={!!friend.is_counter}
               numeralSize={28}
             />
           </span>
