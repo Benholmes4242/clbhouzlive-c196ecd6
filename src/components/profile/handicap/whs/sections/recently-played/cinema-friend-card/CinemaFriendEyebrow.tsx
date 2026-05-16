@@ -19,6 +19,7 @@ export const CinemaFriendEyebrow: React.FC<Props> = ({ activity }) => {
       : null;
   const showImpact = impactDelta !== null && Math.abs(impactDelta) >= 0.05;
   const impactIsImprovement = (impactDelta ?? 0) < 0;
+  const showHotFlame = showImpact && impactIsImprovement;
 
   const time = fmtRelative(activity.last_round_played_at, { compact: false });
 
@@ -135,6 +136,20 @@ export const CinemaFriendEyebrow: React.FC<Props> = ({ activity }) => {
               <ArrowUp size={10} strokeWidth={1.6} />
             )}
             {Math.abs(impactDelta!).toFixed(1)}
+            {showHotFlame && (
+              <span
+                aria-label="Hot round — handicap cut"
+                style={{
+                  fontSize: 12,
+                  lineHeight: 1,
+                  marginLeft: 2,
+                  filter:
+                    'drop-shadow(0 0 4px rgba(247,147,30,0.50)) drop-shadow(0 1px 2px rgba(0,0,0,0.4))',
+                }}
+              >
+                🔥
+              </span>
+            )}
           </span>
         )}
       </div>
