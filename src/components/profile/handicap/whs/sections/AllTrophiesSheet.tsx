@@ -414,7 +414,7 @@ export const AllTrophiesSheet: React.FC<Props> = ({ open, onClose, achievements 
           display: 'flex',
           flexDirection: 'column',
           animation: 'slideUp 240ms cubic-bezier(0.32, 0.72, 0, 1)',
-          boxShadow: '0 -8px 30px rgba(15,23,42,0.18)',
+          boxShadow: '0 -8px 30px rgba(0,0,0,0.4)',
           fontFamily: FONT_GEIST,
         }}
       >
