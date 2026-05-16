@@ -99,11 +99,11 @@ export const CinemaFriendGlass: React.FC<Props> = ({
             display: 'inline-flex',
             alignItems: 'center',
             gap: 4,
-            padding: '3px 8px',
+            padding: '2px 6px',
             borderRadius: 999,
             background: 'rgba(255,255,255,0.10)',
             border: '0.5px solid rgba(255,255,255,0.25)',
-            fontSize: 10,
+            fontSize: 8,
             fontWeight: 700,
             letterSpacing: '0.10em',
             color: '#FFFFFF',
@@ -113,7 +113,7 @@ export const CinemaFriendGlass: React.FC<Props> = ({
           }}
         >
           SCORECARD
-          <span style={{ fontSize: 10, opacity: 0.7 }}>{'\u203A'}</span>
+          <span style={{ fontSize: 8, opacity: 0.7 }}>{'\u203A'}</span>
         </span>
       </div>
       {meta && (
