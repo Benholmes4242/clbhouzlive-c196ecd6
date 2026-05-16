@@ -7,11 +7,11 @@ interface Props {
   onChange: (next: number) => void;
 }
 
-const HAIRLINE = 'rgba(15,23,42,0.08)';
-const INK = '#0F172A';
-const INK_FAINT = 'rgba(15,23,42,0.30)';
+const HAIRLINE = 'var(--hcp-line-2)';
+const INK = 'var(--hcp-t-100)';
+const INK_FAINT = 'rgba(255,255,255,0.30)';
 const AMBER = '#F7931E';
-const CARD_BG = '#FFFFFF';
+const CARD_BG = 'var(--hcp-bg-1)';
 
 export const Pager: React.FC<Props> = ({ page, totalPages, onChange }) => {
   // Condense dots if there are too many — show first, current, last with separators
@@ -61,7 +61,7 @@ export const Pager: React.FC<Props> = ({ page, totalPages, onChange }) => {
           padding: '8px 12px',
           borderRadius: 999,
           border: `1px solid ${HAIRLINE}`,
-          background: atStart ? 'rgba(15,23,42,0.02)' : CARD_BG,
+          background: atStart ? 'rgba(255,255,255,0.04)' : CARD_BG,
           color: atStart ? INK_FAINT : INK,
           fontSize: 12,
           fontWeight: 700,
@@ -99,7 +99,7 @@ export const Pager: React.FC<Props> = ({ page, totalPages, onChange }) => {
                 background:
                   d.i === page
                     ? 'linear-gradient(90deg, #F59E0B 0%, #FBBF24 100%)'
-                    : 'rgba(15,23,42,0.18)',
+                    : 'rgba(255,255,255,0.25)',
                 transition: 'all 200ms ease',
               }}
             />
@@ -122,7 +122,7 @@ export const Pager: React.FC<Props> = ({ page, totalPages, onChange }) => {
           padding: '8px 12px',
           borderRadius: 999,
           border: `1px solid ${HAIRLINE}`,
-          background: atEnd ? 'rgba(15,23,42,0.02)' : CARD_BG,
+          background: atEnd ? 'rgba(255,255,255,0.04)' : CARD_BG,
           color: atEnd ? INK_FAINT : INK,
           fontSize: 12,
           fontWeight: 700,

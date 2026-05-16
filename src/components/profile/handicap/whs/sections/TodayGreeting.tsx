@@ -9,10 +9,12 @@
  */
 import React, { useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
+import { Trophy } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAllScores } from '@/lib/whs/hooks';
 import { useUserProfile } from '@/hooks/useUserProfile';
 import { useTodayWeather } from '@/lib/whs/useTodayWeather';
+import { openTrophiesSheet } from '@/components/profile/handicap/whs/trophiesSheetEvents';
 
 const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
 
@@ -28,7 +30,7 @@ function getTimeOfDay(now: Date = new Date()): 'Morning' | 'Afternoon' | 'Evenin
   return 'Evening';
 }
 
-function formatToday(): string {
+export function formatToday(): string {
   return new Date()
     .toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' })
     .toUpperCase();
@@ -155,20 +157,50 @@ const TodayGreeting: React.FC<Props> = ({ connectionId, userId }) => {
     >
       <div
         style={{
-          fontSize: 22,
-          fontWeight: 800,
-          letterSpacing: '-0.01em',
-          lineHeight: 1.15,
-          color: 'var(--hcp-t-100)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          gap: 12,
         }}
       >
-        {tod}
-        {firstName ? <>, <span>{firstName}</span></> : null}
+        <div
+          style={{
+            fontSize: 22,
+            fontWeight: 800,
+            letterSpacing: '-0.01em',
+            lineHeight: 1.15,
+            color: 'var(--hcp-t-100)',
+          }}
+        >
+          {tod}
+          {firstName ? <>, <span>{firstName}</span></> : null}
+        </div>
+        <button
+          type="button"
+          onClick={() => openTrophiesSheet()}
+          aria-label="Open trophies"
+          style={{
+            flexShrink: 0,
+            width: 40,
+            height: 40,
+            display: 'inline-flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            borderRadius: 12,
+            background: 'var(--hcp-bg-1)',
+            border: '1px solid var(--hcp-line-2)',
+            color: '#F7931E',
+            cursor: 'pointer',
+            padding: 0,
+          }}
+        >
+          <Trophy size={18} strokeWidth={2} />
+        </button>
       </div>
 
       {showMeta && homeCourseName && (
         <>
-          {/* Row 1: course name (left) + today's date (right) */}
+          {/* Row 1: course name */}
           <div
             style={{
               marginTop: 8,
@@ -184,7 +216,6 @@ const TodayGreeting: React.FC<Props> = ({ connectionId, userId }) => {
             }}
           >
             <span>{cleanCourseDisplay(courseLookup?.canonicalName ?? homeCourseName)}</span>
-            <span style={{ color: 'var(--hcp-t-40)' }}>{formatToday()}</span>
           </div>
 
           {/* Row 2: weather, left-aligned */}
