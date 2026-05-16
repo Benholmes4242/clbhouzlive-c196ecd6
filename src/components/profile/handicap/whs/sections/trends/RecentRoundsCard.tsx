@@ -46,20 +46,41 @@ const fmtDiff = (d: number | null | undefined): string => {
 
 const diffColor = (d: number | null | undefined): string => {
   if (d === null || d === undefined) return T.inkMute;
-  if (d < 0) return T.greenInk;
-  if (d > 0) return T.redInk;
+  if (d < 0) return 'var(--hcp-good)';
+  if (d > 0) return 'var(--hcp-bad)';
   return T.inkSoft;
+};
+
+/** Text-shadow halo to lift coloured delta values off the dark canvas. */
+const diffGlow = (d: number | null | undefined): string => {
+  if (d === null || d === undefined) return 'none';
+  if (d < 0) return '0 0 8px rgba(34,197,94,0.40), 0 0 3px rgba(34,197,94,0.25)';
+  if (d > 0) return '0 0 8px rgba(239,68,68,0.40), 0 0 3px rgba(239,68,68,0.25)';
+  return 'none';
 };
 
 interface HcpDeltaInfo {
   sign: string;
   value: string;
   color: string;
+  glow: string;
 }
 const fmtHcpDelta = (n: number | null): HcpDeltaInfo | null => {
   if (n === null || Math.abs(n) < 0.05) return null;
-  if (n < 0) return { sign: '\u2193', value: Math.abs(n).toFixed(1), color: T.greenInk };
-  return { sign: '\u2191', value: n.toFixed(1), color: T.redInk };
+  if (n < 0) {
+    return {
+      sign: '\u2193',
+      value: Math.abs(n).toFixed(1),
+      color: 'var(--hcp-good)',
+      glow: '0 0 8px rgba(34,197,94,0.40), 0 0 3px rgba(34,197,94,0.25)',
+    };
+  }
+  return {
+    sign: '\u2191',
+    value: n.toFixed(1),
+    color: 'var(--hcp-bad)',
+    glow: '0 0 8px rgba(239,68,68,0.40), 0 0 3px rgba(239,68,68,0.25)',
+  };
 };
 
 const fmtRelativeDate = (iso: string): string => {
