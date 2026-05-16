@@ -64,7 +64,7 @@ export const LastRoundCard: React.FC<Props> = ({ connectionId }) => {
   if (isLoading) {
     return (
       <section style={{ marginTop: 32 }}>
-        <SectionEyebrow label="LAST ROUND" />
+        <DarkSectionHeader eyebrow="Last Round" />
         <div style={{ padding: '0 20px' }}>
           <CinemaCardSkeleton />
         </div>
@@ -75,7 +75,7 @@ export const LastRoundCard: React.FC<Props> = ({ connectionId }) => {
   if (!lastRound) {
     return (
       <section style={{ marginTop: 32 }}>
-        <SectionEyebrow label="LAST ROUND" />
+        <DarkSectionHeader eyebrow="Last Round" />
         <div style={{ padding: '0 20px' }}>
           <p style={{ fontSize: 14, color: 'var(--hcp-t-60)', fontFamily: FONT_GEIST }}>
             Your rounds will appear here as soon as you start posting scores in MyEG.
@@ -84,6 +84,12 @@ export const LastRoundCard: React.FC<Props> = ({ connectionId }) => {
       </section>
     );
   }
+
+  const formattedDate = lastRound.play_date
+    ? new Date(lastRound.play_date)
+        .toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' })
+        .toUpperCase()
+    : undefined;
 
   const holes =
     roundDetail?.holes && roundDetail.hole_by_hole_fetched ? roundDetail.holes : null;
