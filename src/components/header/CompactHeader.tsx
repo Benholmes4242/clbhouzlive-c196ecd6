@@ -80,6 +80,10 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
   const isMessagesConversationRoute = location.pathname.startsWith('/messages/');
   const isHandicapRoute = location.pathname === '/handicap' || location.pathname.startsWith('/handicap/');
   const isWatchSubpageRoute = location.pathname === '/watch/videos' || location.pathname === '/watch/clips';
+  // Tour Hub overview + sub-tabs share the handicap dark chrome treatment
+  // (dark header background, white controls, dark identity pill) but keep the
+  // clbhouz logo on the left — they're top-level hubs, not back-arrow pages.
+  const isTourRoute = location.pathname === '/tourhub' || location.pathname === '/tour';
   // Course detail: /courses/:courseId (exactly 3 segments — excludes /reviews, /rate, /share-review subroutes)
   const isCourseDetailRoute = location.pathname.startsWith('/courses/')
     && location.pathname.split('/').length === 3;
@@ -106,10 +110,10 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
   // Routes that should show back arrow instead of logo
   const isBackArrowRoute = isDiscoverSubPage || isTop100Route || isCourseDetailRoute || isEditProfileRoute || isFriendsActivityRoute || isAchievementsRoute || isMessagesRoute || isHandicapRoute || isWatchSubpageRoute;
   
-  // Most routes use the light theme. The handicap route runs the dark
-  // performance-terminal chrome, so its identity pill and nav controls
-  // need the dark variant.
-  const useLightTheme = !isHandicapRoute;
+  // Dark chrome routes (handicap + tour hub). The light theme governs the
+  // identity pill, search icon, and posting-as menu palette.
+  const isDarkChrome = isHandicapRoute || isTourRoute;
+  const useLightTheme = !isDarkChrome;
 
   const handleLogoClick = () => {
     if (isBackArrowRoute) {
