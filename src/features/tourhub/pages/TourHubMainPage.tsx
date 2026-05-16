@@ -58,7 +58,7 @@ export function TourHubMainPage() {
 
   return (
     <TourHubShell>
-      <ShellSlot>
+      <ShellSlot dark>
         <TourHubShellTabs />
         {renderShellRow()}
       </ShellSlot>
