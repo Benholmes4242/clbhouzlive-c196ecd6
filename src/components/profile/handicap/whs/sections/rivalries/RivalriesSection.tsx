@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { Pencil, Swords } from 'lucide-react';
-import SectionHeader from '../SectionHeader';
+import { DarkSectionHeader } from '../_shared/darkAtoms';
 import RivalryCard from './RivalryCard';
 import RivalryAddCard from './RivalryAddCard';
 import RivalryInfoSheet from './RivalryInfoSheet';
