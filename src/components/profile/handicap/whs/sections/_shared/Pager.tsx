@@ -98,7 +98,7 @@ export const Pager: React.FC<Props> = ({ page, totalPages, onChange }) => {
                 borderRadius: 999,
                 background:
                   d.i === page
-                    ? 'linear-gradient(90deg, #F59E0B 0%, #FBBF24 100%)'
+                    ? '#FFFFFF'
                     : 'rgba(255,255,255,0.25)',
                 transition: 'all 200ms ease',
               }}
