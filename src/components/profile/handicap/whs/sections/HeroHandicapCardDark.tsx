@@ -25,7 +25,7 @@ const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
 // Ring geometry — 230×230 in a 240 container.
 const RING_BOX = 240;
 const RING_R = 110;          // outer radius
-const STROKE_W = 5;
+const STROKE_W = 9;
 const RING_TRACK_R = RING_R; // single arc, single track
 const ARC_R = 44;            // per brief: circumference = 2π·44 ≈ 276.5
 // Actually re-read brief: 230×230 ring; uses dashOffset = 276.5 * Math.min(handicap/36,1).
