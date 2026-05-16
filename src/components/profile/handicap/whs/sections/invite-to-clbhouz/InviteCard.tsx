@@ -48,7 +48,7 @@ export const InviteCard: React.FC<Props> = ({ friend }) => {
         flexDirection: 'column',
         gap: 10,
         padding: 12,
-        background: '#FFFFFF',
+        background: 'var(--hcp-bg-1)',
         border: `1px solid ${HAIRLINE}`,
         borderRadius: 12,
         fontFamily: FONT_GEIST,
@@ -100,7 +100,7 @@ export const InviteCard: React.FC<Props> = ({ friend }) => {
             style={{
               fontSize: 13.5,
               fontWeight: 700,
-              color: INK,
+              color: 'var(--hcp-t-100)',
               letterSpacing: '-0.01em',
               whiteSpace: 'nowrap',
               overflow: 'hidden',
@@ -131,7 +131,7 @@ export const InviteCard: React.FC<Props> = ({ friend }) => {
               style={{
                 fontSize: 11,
                 fontWeight: 700,
-                color: INK,
+                color: 'var(--hcp-t-100)',
                 fontVariantNumeric: 'tabular-nums',
               }}
             >

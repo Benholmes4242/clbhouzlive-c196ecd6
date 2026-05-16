@@ -58,7 +58,7 @@ export const RivalryInfoSheet: React.FC<Props> = ({ rivalry, open, onClose }) =>
             right: 0,
             bottom: 0,
             zIndex: 81,
-            background: '#FFFFFF',
+            background: 'var(--hcp-bg-1)',
             borderTopLeftRadius: 20,
             borderTopRightRadius: 20,
             maxHeight: '70vh',
@@ -85,7 +85,7 @@ export const RivalryInfoSheet: React.FC<Props> = ({ rivalry, open, onClose }) =>
                 marginTop: 18,
                 padding: 14,
                 borderRadius: 12,
-                background: 'rgba(15,23,42,0.04)',
+                background: 'var(--hcp-bg-2)',
                 border: `1px solid ${HAIRLINE}`,
               }}>
                 <p style={{ margin: 0, fontSize: 11, color: INK_MUTE, fontWeight: 700 }}>
@@ -96,7 +96,7 @@ export const RivalryInfoSheet: React.FC<Props> = ({ rivalry, open, onClose }) =>
                   padding: 0,
                   listStyle: 'none',
                   fontSize: 13,
-                  color: INK,
+                  color: 'var(--hcp-t-100)',
                   lineHeight: 1.7,
                 }}>
                   <li>Shared rounds: <strong style={{ fontVariantNumeric: 'tabular-nums' }}>{rivalry.shared_rounds_count}</strong></li>
@@ -122,7 +122,7 @@ export const RivalryInfoSheet: React.FC<Props> = ({ rivalry, open, onClose }) =>
                 margin: '8px 0 0',
                 paddingLeft: 18,
                 fontSize: 12,
-                color: INK,
+                color: 'var(--hcp-t-100)',
                 lineHeight: 1.6,
               }}>
                 <li>Slots 1–2: your most-played-with friends in the last 90 days</li>

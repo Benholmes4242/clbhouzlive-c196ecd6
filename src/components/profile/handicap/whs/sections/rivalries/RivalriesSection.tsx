@@ -73,7 +73,7 @@ export const RivalriesSection: React.FC<Props> = ({ userId }) => {
                 border: '1px solid rgba(15,23,42,0.12)',
                 borderRadius: 999,
                 cursor: 'pointer',
-                color: 'rgba(15,23,42,0.78)',
+                color: 'var(--hcp-t-80)',
                 fontSize: 10,
                 fontWeight: 800,
                 letterSpacing: '0.14em',
@@ -114,7 +114,7 @@ export const RivalriesSection: React.FC<Props> = ({ userId }) => {
                 width: 264,
                 height: 220,
                 borderRadius: 18,
-                background: 'rgba(15,23,42,0.06)',
+                background: 'var(--hcp-bg-3)',
               }}
             />
           ))
@@ -167,8 +167,8 @@ const RivalryEmptyCard: React.FC<{ onPickRival: () => void }> = ({ onPickRival }
       flex: '0 0 auto',
       width: 'calc(100vw - 32px)',
       maxWidth: 360,
-      background: '#FFFFFF',
-      border: '1px solid rgba(15,23,42,0.08)',
+      background: 'var(--hcp-bg-1)',
+      border: '1px solid var(--hcp-line)',
       borderRadius: 14,
       padding: 20,
       display: 'flex',
@@ -193,10 +193,10 @@ const RivalryEmptyCard: React.FC<{ onPickRival: () => void }> = ({ onPickRival }
     >
       <Swords size={22} strokeWidth={2.2} />
     </div>
-    <p style={{ margin: 0, fontSize: 15, fontWeight: 800, color: '#0F172A', letterSpacing: '-0.01em' }}>
+    <p style={{ margin: 0, fontSize: 15, fontWeight: 800, color: 'var(--hcp-t-100)', letterSpacing: '-0.01em' }}>
       Build your rival list
     </p>
-    <p style={{ margin: 0, fontSize: 12, color: 'rgba(15,23,42,0.55)', lineHeight: 1.4 }}>
+    <p style={{ margin: 0, fontSize: 12, color: 'var(--hcp-t-60)', lineHeight: 1.4 }}>
       Pick someone to track head-to-head. Stats update with every round you both play.
     </p>
     <button

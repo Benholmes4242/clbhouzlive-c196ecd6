@@ -80,7 +80,7 @@ export const RoundBreakdown: React.FC<Props> = ({ holes }) => {
               gap: 5,
               padding: '6px 10px',
               borderRadius: 999,
-              background: '#FFFFFF',
+              background: 'var(--hcp-bg-1)',
               border: `0.5px solid ${HAIRLINE}`,
             }}
           >
@@ -96,7 +96,7 @@ export const RoundBreakdown: React.FC<Props> = ({ holes }) => {
               style={{
                 fontSize: 12,
                 fontWeight: 600,
-                color: INK,
+                color: 'var(--hcp-t-100)',
                 fontFamily: FONT_MONO,
                 fontVariantNumeric: 'tabular-nums',
               }}

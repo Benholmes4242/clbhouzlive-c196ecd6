@@ -50,7 +50,7 @@ const StatusBadge: React.FC<{ status: WhsInviteStatus['status'] }> = ({ status }
           padding: '3px 10px',
           borderRadius: 999,
           background: T.greyTint,
-          color: '#94A3B8',
+          color: 'var(--hcp-t-60)',
           fontSize: 11,
           fontWeight: 800,
         }}
@@ -65,7 +65,7 @@ const StatusBadge: React.FC<{ status: WhsInviteStatus['status'] }> = ({ status }
         padding: '3px 10px',
         borderRadius: 999,
         background: T.greyTint,
-        color: '#64748B',
+        color: 'var(--hcp-t-60)',
         fontSize: 11,
         fontWeight: 800,
       }}
@@ -154,7 +154,7 @@ export const SentInvitesSheet: React.FC<Props> = ({ open, onClose }) => {
                   style={{
                     height: 56,
                     margin: '0 20px 8px',
-                    background: 'rgba(15,23,42,0.04)',
+                    background: 'var(--hcp-bg-2)',
                     borderRadius: 8,
                   }}
                 />
@@ -195,7 +195,7 @@ export const SentInvitesSheet: React.FC<Props> = ({ open, onClose }) => {
                       justifyContent: 'space-between',
                       gap: 12,
                       borderTop: idx === 0 ? 'none' : `1px solid ${T.hairline}`,
-                      background: '#FFFFFF',
+                      background: 'var(--hcp-bg-1)',
                       border: 'none',
                       cursor: isPending ? 'pointer' : 'default',
                     }}

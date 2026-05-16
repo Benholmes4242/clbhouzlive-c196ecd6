@@ -60,7 +60,7 @@ export const RecentlyActiveRail: React.FC<Props> = ({ userId }) => {
                 fontSize: 11,
                 fontWeight: 800,
                 letterSpacing: '0.14em',
-                color: '#0F172A',
+                color: 'var(--hcp-t-100)',
                 textTransform: 'uppercase',
                 cursor: 'pointer',
               }}
@@ -125,10 +125,10 @@ const RecentlyActiveSkeleton: React.FC = () => (
         <div key={i} style={{ flex: '0 0 auto', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6 }}>
           <div
             className="animate-pulse"
-            style={{ width: 60, height: 60, borderRadius: '34%', background: 'rgba(15,23,42,0.06)' }}
+            style={{ width: 60, height: 60, borderRadius: '34%', background: 'var(--hcp-bg-3)' }}
           />
-          <div className="animate-pulse" style={{ width: 42, height: 10, borderRadius: 4, background: 'rgba(15,23,42,0.06)' }} />
-          <div className="animate-pulse" style={{ width: 26, height: 8, borderRadius: 4, background: 'rgba(15,23,42,0.06)' }} />
+          <div className="animate-pulse" style={{ width: 42, height: 10, borderRadius: 4, background: 'var(--hcp-bg-3)' }} />
+          <div className="animate-pulse" style={{ width: 26, height: 8, borderRadius: 4, background: 'var(--hcp-bg-3)' }} />
         </div>
       ))}
     </div>

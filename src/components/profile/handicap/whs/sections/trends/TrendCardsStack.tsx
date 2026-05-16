@@ -63,7 +63,7 @@ export const TrendCardsStack: React.FC<Props> = ({ connectionId, currentHandicap
                 style={{
                   fontSize: 9,
                   fontWeight: 800,
-                  color: '#64748B',
+                  color: 'var(--hcp-t-60)',
                   letterSpacing: '0.16em',
                   textTransform: 'uppercase',
                   fontFamily: FONT,
@@ -102,7 +102,7 @@ export const TrendCardsStack: React.FC<Props> = ({ connectionId, currentHandicap
                 fontSize: 26,
                 fontWeight: 600,
                 letterSpacing: '-0.025em',
-                color: INK,
+                color: 'var(--hcp-t-100)',
                 lineHeight: 1.05,
                 fontFamily: FONT,
               }}
@@ -129,7 +129,7 @@ export const TrendCardsStack: React.FC<Props> = ({ connectionId, currentHandicap
             style={{
               margin: '4px 0 0',
               fontSize: 13,
-              color: INK_55,
+              color: 'var(--hcp-t-60)',
               fontFamily: FONT,
               lineHeight: 1.4,
             }}
@@ -142,8 +142,8 @@ export const TrendCardsStack: React.FC<Props> = ({ connectionId, currentHandicap
               style={{
                 marginTop: 12,
                 padding: '12px 14px',
-                background: 'rgba(15,23,42,0.04)',
-                border: '1px solid rgba(15,23,42,0.08)',
+                background: 'var(--hcp-bg-2)',
+                border: '1px solid var(--hcp-line)',
                 borderRadius: 10,
               }}
             >
@@ -152,7 +152,7 @@ export const TrendCardsStack: React.FC<Props> = ({ connectionId, currentHandicap
                   margin: 0,
                   fontSize: 11,
                   fontWeight: 800,
-                  color: INK,
+                  color: 'var(--hcp-t-100)',
                   letterSpacing: '0.08em',
                   textTransform: 'uppercase',
                   marginBottom: 6,
@@ -161,7 +161,7 @@ export const TrendCardsStack: React.FC<Props> = ({ connectionId, currentHandicap
               >
                 How this works
               </p>
-              <p style={{ margin: 0, fontSize: 12, lineHeight: 1.55, color: 'rgba(15,23,42,0.78)', fontFamily: FONT }}>
+              <p style={{ margin: 0, fontSize: 12, lineHeight: 1.55, color: 'var(--hcp-t-80)', fontFamily: FONT }}>
                 Your <strong>differential</strong> is each round&apos;s score adjusted for course difficulty.
                 Lower is better. Your <strong>handicap</strong> is the average of your best 8 differentials
                 from your last 20 rounds — those are your <strong>counters</strong>. The{' '}
@@ -186,7 +186,7 @@ export const TrendCardsStack: React.FC<Props> = ({ connectionId, currentHandicap
             className="animate-pulse"
             style={{
               height: h,
-              background: 'rgba(15,23,42,0.04)',
+              background: 'var(--hcp-bg-2)',
               borderRadius: 16,
               marginBottom: 14,
             }}

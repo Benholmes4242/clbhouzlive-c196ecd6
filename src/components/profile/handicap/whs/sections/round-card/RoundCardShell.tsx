@@ -83,7 +83,7 @@ const _RoundCardBody: React.FC<RoundCardBodyProps> = ({
         flexDirection: 'column',
         gap: 2,
         fontFamily: FONT_GEIST,
-        background: '#fff',
+        background: 'var(--hcp-bg-1)',
       }}
     >
       {/* Hero row */}
@@ -100,7 +100,7 @@ const _RoundCardBody: React.FC<RoundCardBodyProps> = ({
             style={{
               fontSize: 9,
               fontWeight: 800,
-              color: INK_55,
+              color: 'var(--hcp-t-60)',
               letterSpacing: '0.16em',
               textTransform: 'uppercase',
               marginBottom: 2,
@@ -113,7 +113,7 @@ const _RoundCardBody: React.FC<RoundCardBodyProps> = ({
               style={{
                 fontSize: 56,
                 fontWeight: 200,
-                color: INK,
+                color: 'var(--hcp-t-100)',
                 letterSpacing: '-0.05em',
                 lineHeight: 0.85,
                 fontVariantNumeric: 'tabular-nums',
@@ -154,7 +154,7 @@ const _RoundCardBody: React.FC<RoundCardBodyProps> = ({
                 style={{
                   fontSize: 9,
                   fontWeight: 800,
-                  color: INK_55,
+                  color: 'var(--hcp-t-60)',
                   letterSpacing: '0.16em',
                   textTransform: 'uppercase',
                   marginBottom: 4,
@@ -166,7 +166,7 @@ const _RoundCardBody: React.FC<RoundCardBodyProps> = ({
                 style={{
                   fontSize: 26,
                   fontWeight: 800,
-                  color: INK,
+                  color: 'var(--hcp-t-100)',
                   letterSpacing: '-0.02em',
                   lineHeight: 1,
                   fontVariantNumeric: 'tabular-nums',
@@ -217,7 +217,7 @@ const _RoundCardBody: React.FC<RoundCardBodyProps> = ({
               style={{
                 fontSize: 9,
                 fontWeight: 800,
-                color: INK_55,
+                color: 'var(--hcp-t-60)',
                 letterSpacing: '0.16em',
                 textTransform: 'uppercase',
               }}
@@ -233,11 +233,11 @@ const _RoundCardBody: React.FC<RoundCardBodyProps> = ({
                   gap: 3,
                   padding: '4px 8px 4px 12px',
                   borderRadius: 999,
-                  background: 'rgba(15,23,42,0.06)',
-                  border: `0.5px solid ${INK_10}`,
+                  background: 'var(--hcp-bg-3)',
+                  border: '1px solid var(--hcp-line-2)',
                   fontSize: 10,
                   fontWeight: 800,
-                  color: INK,
+                  color: 'var(--hcp-t-100)',
                   letterSpacing: '0.06em',
                   textTransform: 'uppercase',
                 }}
@@ -271,11 +271,11 @@ export const RoundCardShell: React.FC<RoundCardShellProps> = ({
         width: '100%',
         margin: 0,
         padding: 0,
-        border: `0.5px solid ${INK_10}`,
+        border: '1px solid var(--hcp-line-2)',
         borderRadius: 16,
         overflow: 'hidden',
         cursor: 'pointer',
-        background: '#fff',
+        background: 'var(--hcp-bg-1)',
         textAlign: 'left',
         fontFamily: FONT_GEIST,
       }}

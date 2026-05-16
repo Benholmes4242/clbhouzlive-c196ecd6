@@ -182,7 +182,7 @@ const BandRow: React.FC<BandRowProps> = ({ color, ink, title, description }) => 
     />
     <div>
       <p style={{ margin: 0, fontSize: 12, fontWeight: 700, color: ink, fontFamily: FONT }}>{title}</p>
-      <p style={{ margin: '2px 0 0', fontSize: 12, lineHeight: 1.5, color: 'rgba(15,23,42,0.78)', fontFamily: FONT }}>
+      <p style={{ margin: '2px 0 0', fontSize: 12, lineHeight: 1.5, color: 'var(--hcp-t-80)', fontFamily: FONT }}>
         {description}
       </p>
     </div>

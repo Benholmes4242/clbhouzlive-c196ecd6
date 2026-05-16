@@ -91,7 +91,7 @@ export const ActivityFeedStrip: React.FC<Props> = ({ ownerUserId }) => {
                       <div
                         className="w-9 h-9 flex items-center justify-center text-[11px] font-bold text-muted-foreground"
                         style={{
-                          background: 'rgba(15,23,42,0.06)',
+                          background: 'var(--hcp-bg-3)',
                           borderRadius: '34%',
                         }}
                       >
@@ -118,7 +118,7 @@ export const ActivityFeedStrip: React.FC<Props> = ({ ownerUserId }) => {
                     style={
                       isOnClbhouz
                         ? { background: 'rgba(16,185,129,0.12)', color: '#059669' }
-                        : { background: 'rgba(15,23,42,0.05)', color: '#64748B' }
+                        : { background: 'rgba(15,23,42,0.05)', color: 'var(--hcp-t-60)' }
                     }
                   >
                     {isOnClbhouz ? (

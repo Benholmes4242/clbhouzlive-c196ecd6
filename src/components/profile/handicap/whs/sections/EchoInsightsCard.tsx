@@ -35,8 +35,8 @@ const CourseCarouselCard: React.FC<{
     style={{
       flexShrink: 0,
       width: 240,
-      background: '#fff',
-      border: `0.5px solid ${INK_10}`,
+      background: 'var(--hcp-bg-1)',
+      border: '1px solid var(--hcp-line-2)',
       borderRadius: 14,
       overflow: 'hidden',
       cursor: 'pointer',
@@ -86,8 +86,8 @@ const CourseCarouselCard: React.FC<{
             position: 'absolute',
             top: 8,
             right: 8,
-            background: '#fff',
-            border: `0.5px solid ${INK_10}`,
+            background: 'var(--hcp-bg-1)',
+            border: '1px solid var(--hcp-line-2)',
             borderRadius: 8,
             padding: '4px 8px',
             display: 'flex',
@@ -128,7 +128,7 @@ const CourseCarouselCard: React.FC<{
         style={{
           fontSize: 14,
           fontWeight: 700,
-          color: INK,
+          color: 'var(--hcp-t-100)',
           letterSpacing: '-0.01em',
           lineHeight: 1.2,
           overflow: 'hidden',
@@ -145,7 +145,7 @@ const CourseCarouselCard: React.FC<{
             alignItems: 'center',
             gap: 4,
             fontSize: 11,
-            color: INK_55,
+            color: 'var(--hcp-t-60)',
             minWidth: 0,
           }}
         >
@@ -167,7 +167,7 @@ const CourseCarouselCard: React.FC<{
             margin: '4px 0 0',
             fontSize: 12,
             lineHeight: 1.45,
-            color: INK_55,
+            color: 'var(--hcp-t-60)',
             display: '-webkit-box',
             WebkitLineClamp: 3,
             WebkitBoxOrient: 'vertical' as const,
@@ -202,8 +202,8 @@ const EmptyBlock = () => (
       width: 240,
       padding: '24px 14px',
       fontSize: 11,
-      color: INK_55,
-      background: '#fff',
+      color: 'var(--hcp-t-60)',
+      background: 'var(--hcp-bg-1)',
       border: `0.5px dashed ${INK_10}`,
       borderRadius: 14,
       textAlign: 'center',
@@ -253,7 +253,7 @@ export const EchoInsightsCard: React.FC<Props> = ({ connectionId }) => {
       `}</style>
 
       {error && (
-        <div style={{ padding: '0 20px 12px', fontSize: 11, color: INK_55 }}>
+        <div style={{ padding: '0 20px 12px', fontSize: 11, color: 'var(--hcp-t-60)' }}>
           Couldn't generate insights right now.
         </div>
       )}

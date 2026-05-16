@@ -44,7 +44,7 @@ export const RecentlyPlayedFeed: React.FC<Props> = ({ ownerUserId }) => {
               className="animate-pulse"
               style={{
                 height: 280,
-                background: 'rgba(15,23,42,0.04)',
+                background: 'var(--hcp-bg-2)',
                 borderRadius: 16,
                 marginBottom: 12,
               }}

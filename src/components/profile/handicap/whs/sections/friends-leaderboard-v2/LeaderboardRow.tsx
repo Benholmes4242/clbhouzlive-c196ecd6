@@ -127,7 +127,7 @@ export const LeaderboardRow: React.FC<Props> = ({
             height: 33,
             borderRadius: '34%',
             overflow: 'hidden',
-            background: 'rgba(15,23,42,0.06)',
+            background: 'var(--hcp-bg-3)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',

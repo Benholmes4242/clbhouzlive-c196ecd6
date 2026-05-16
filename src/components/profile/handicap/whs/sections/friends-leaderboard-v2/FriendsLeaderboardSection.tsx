@@ -14,7 +14,7 @@ const HEADER_LABEL: React.CSSProperties = {
   margin: 0,
   fontSize: 8,
   fontWeight: 800,
-  color: 'rgba(15,23,42,0.40)',
+  color: 'var(--hcp-t-40)',
   letterSpacing: '0.16em',
 };
 
@@ -129,7 +129,7 @@ export const FriendsLeaderboardSection: React.FC<Props> = ({ userId }) => {
             style={{
               margin: '0 20px 1px',
               height: 54,
-              background: 'rgba(15,23,42,0.04)',
+              background: 'var(--hcp-bg-2)',
               borderRadius: 6,
             }}
           />
@@ -190,10 +190,10 @@ export const FriendsLeaderboardSection: React.FC<Props> = ({ userId }) => {
             width: 'calc(100% - 40px)',
             margin: '12px 20px 0',
             padding: '10px 16px',
-            background: '#fff',
-            border: '0.5px solid rgba(15,23,42,0.10)',
+            background: 'var(--hcp-bg-1)',
+            border: '1px solid var(--hcp-line-2)',
             borderRadius: 12,
-            color: 'rgba(15,23,42,0.78)',
+            color: 'var(--hcp-t-80)',
             fontSize: 12,
             fontWeight: 700,
             letterSpacing: '0.02em',
@@ -219,10 +219,10 @@ export const FriendsLeaderboardSection: React.FC<Props> = ({ userId }) => {
             width: 'calc(100% - 40px)',
             margin: '12px 20px 0',
             padding: '10px 16px',
-            background: '#fff',
-            border: '0.5px solid rgba(15,23,42,0.10)',
+            background: 'var(--hcp-bg-1)',
+            border: '1px solid var(--hcp-line-2)',
             borderRadius: 12,
-            color: 'rgba(15,23,42,0.78)',
+            color: 'var(--hcp-t-80)',
             fontSize: 12,
             fontWeight: 700,
             letterSpacing: '0.02em',

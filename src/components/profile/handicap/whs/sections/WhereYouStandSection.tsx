@@ -234,7 +234,7 @@ const AvailableCard: React.FC<{
             margin: 0,
             fontSize: 44,
             fontWeight: 800,
-            color: INK,
+            color: 'var(--hcp-t-100)',
             letterSpacing: '-0.04em',
             lineHeight: 1,
             fontVariantNumeric: 'tabular-nums',
@@ -272,7 +272,7 @@ const AvailableCard: React.FC<{
         style={{
           fontFamily: FONT_GEIST,
           fontSize: 13,
-          color: INK_55,
+          color: 'var(--hcp-t-60)',
           padding: '6px 16px 0',
           margin: 0,
           lineHeight: 1.5,
@@ -284,8 +284,8 @@ const AvailableCard: React.FC<{
       <div
         style={{
           margin: '14px 16px 0',
-          background: '#FFFFFF',
-          border: `0.5px solid ${INK_10}`,
+          background: 'var(--hcp-bg-1)',
+          border: '1px solid var(--hcp-line-2)',
           borderRadius: 14,
           padding: 14,
         }}
@@ -307,7 +307,7 @@ const AvailableCard: React.FC<{
             fontFamily: FONT_GEIST,
             fontSize: 10.5,
             fontWeight: 600,
-            color: INK_55,
+            color: 'var(--hcp-t-60)',
           }}
         >
           <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5 }}>
@@ -344,8 +344,8 @@ const UnavailableCard: React.FC<{ reason: 'cohort_unavailable' }> = () => (
       margin: '0 20px',
       padding: '20px',
       borderRadius: 14,
-      background: 'rgba(15,23,42,0.04)',
-      border: '0.5px solid rgba(15,23,42,0.10)',
+      background: 'var(--hcp-bg-2)',
+      border: '1px solid var(--hcp-line-2)',
       fontFamily: FONT_GEIST,
       textAlign: 'center',
     }}
@@ -353,7 +353,7 @@ const UnavailableCard: React.FC<{ reason: 'cohort_unavailable' }> = () => (
     <p style={{
       margin: 0,
       fontSize: 13,
-      color: 'rgba(15,23,42,0.55)',
+      color: 'var(--hcp-t-60)',
     }}>
       Comparison data is being prepared. Check back soon.
     </p>

@@ -171,7 +171,7 @@ const SectionWrapper: React.FC<{ eyebrow: string; children: React.ReactNode }> =
       <span style={{
         fontSize: 9,
         fontWeight: 800,
-        color: '#64748B',
+        color: 'var(--hcp-t-60)',
         letterSpacing: '0.16em',
         textTransform: 'uppercase' as const,
       }}>
@@ -332,7 +332,7 @@ export const PinFooter: React.FC<{
       left: 0,
       right: 0,
       padding: '12px 20px max(12px, env(safe-area-inset-bottom))',
-      background: '#FFFFFF',
+      background: 'var(--hcp-bg-1)',
       borderTop: `1px solid ${T.hairline}`,
       zIndex: 2,
     }}>

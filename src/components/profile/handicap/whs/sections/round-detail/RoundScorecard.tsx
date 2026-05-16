@@ -39,7 +39,7 @@ const NineGrid: React.FC<{ label: string; holes: WhsScoreHole[] }> = ({ label, h
           style={{
             fontSize: 10,
             fontWeight: 700,
-            color: INK,
+            color: 'var(--hcp-t-100)',
             letterSpacing: '0.18em',
             textTransform: 'uppercase',
           }}
@@ -52,7 +52,7 @@ const NineGrid: React.FC<{ label: string; holes: WhsScoreHole[] }> = ({ label, h
             alignItems: 'baseline',
             gap: 6,
             padding: '3px 9px',
-            background: 'rgba(15,23,42,0.04)',
+            background: 'var(--hcp-bg-2)',
             borderRadius: 999,
             fontVariantNumeric: 'tabular-nums',
           }}
@@ -61,7 +61,7 @@ const NineGrid: React.FC<{ label: string; holes: WhsScoreHole[] }> = ({ label, h
             style={{
               fontSize: 13,
               fontWeight: 600,
-              color: INK,
+              color: 'var(--hcp-t-100)',
               fontFamily: FONT_MONO,
               letterSpacing: '-0.02em',
             }}

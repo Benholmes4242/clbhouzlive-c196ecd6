@@ -35,10 +35,10 @@ const ExplainerBlock: React.FC<BlockProps> = ({ eyebrow, eyebrowColor, title, bo
     }}>
       {eyebrow}
     </div>
-    <div style={{ fontSize: 14, fontWeight: 700, color: INK, marginBottom: 6 }}>
+    <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--hcp-t-100)', marginBottom: 6 }}>
       {title}
     </div>
-    <div style={{ fontSize: 13, color: INK_70, lineHeight: 1.5 }}>
+    <div style={{ fontSize: 13, color: 'var(--hcp-t-80)', lineHeight: 1.5 }}>
       {body}
     </div>
   </div>
@@ -97,7 +97,7 @@ const HandicapExplainerSheet: React.FC<Props> = ({
         style={{
           position: 'fixed', left: 0, right: 0, bottom: 0,
           margin: '0 auto', width: '100%', maxWidth: 420,
-          background: '#fff',
+          background: 'var(--hcp-bg-1)',
           borderRadius: '20px 20px 0 0',
           padding: '20px 0 32px',
           zIndex: 9999,
@@ -145,7 +145,7 @@ const HandicapExplainerSheet: React.FC<Props> = ({
             body={
               <>
                 Your handicap index is the average of those 8 lowest differentials. Right now that's{' '}
-                <strong style={{ color: INK, fontWeight: 700 }}>
+                <strong style={{ color: 'var(--hcp-t-100)', fontWeight: 700 }}>
                   {currentHandicap.toFixed(1)}
                 </strong>.
               </>
@@ -176,7 +176,7 @@ const HandicapExplainerSheet: React.FC<Props> = ({
                       {fmtDiff(cutTarget, { plus: true })}
                     </strong>{' '}
                     and your handicap drops. If you don't, it settles at{' '}
-                    <strong style={{ color: INK, fontWeight: 700 }}>
+                    <strong style={{ color: 'var(--hcp-t-100)', fontWeight: 700 }}>
                       {fmtDiff(settleAt, { plus: true })}
                     </strong>{' '}
                     — close to where it is now. No risk of going up this round.

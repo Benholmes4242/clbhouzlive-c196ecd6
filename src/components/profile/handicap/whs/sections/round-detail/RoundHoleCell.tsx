@@ -161,7 +161,7 @@ export const RoundHoleCell: React.FC<Props> = ({ hole }) => {
         style={{
           fontSize: 9,
           fontWeight: 500,
-          color: INK_55,
+          color: 'var(--hcp-t-60)',
           letterSpacing: '0.04em',
           fontVariantNumeric: 'tabular-nums',
           lineHeight: 1,

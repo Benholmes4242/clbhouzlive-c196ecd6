@@ -30,7 +30,7 @@ export const SmallCardShell: React.FC<Props> = ({ onClick, ariaLabel, children }
         flexDirection: 'row',
         minHeight: 124,
         margin: '0 20px 12px',
-        background: '#FFFFFF',
+        background: 'var(--hcp-bg-1)',
         border: '0.5px solid rgba(15,23,42,0.07)',
         borderRadius: 16,
         overflow: 'hidden',

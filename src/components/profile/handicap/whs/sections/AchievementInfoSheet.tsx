@@ -91,7 +91,7 @@ export const AchievementInfoSheet: React.FC<Props> = ({ open, onClose, achieveme
           right: 0,
           bottom: 0,
           maxHeight: '80vh',
-          background: '#FFFFFF',
+          background: 'var(--hcp-bg-1)',
           borderTopLeftRadius: 20,
           borderTopRightRadius: 20,
           zIndex: 10001,
