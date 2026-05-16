@@ -80,7 +80,7 @@ export const CinemaFriendEyebrow: React.FC<Props> = ({ activity }) => {
               textOverflow: 'ellipsis',
             }}
           >
-            {activity.friend_name}
+            {displayName(activity.friend_name)}
           </p>
           {time && (
             <span
