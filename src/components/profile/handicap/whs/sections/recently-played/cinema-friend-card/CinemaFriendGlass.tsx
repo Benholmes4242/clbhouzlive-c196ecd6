@@ -56,6 +56,7 @@ export const CinemaFriendGlass: React.FC<Props> = ({
   differential,
   holes,
   isCounter = false,
+  showHotFlame = false,
 }) => {
   const { title, suffix } = splitCourseName(courseName ?? 'Round played');
   const meta = [
