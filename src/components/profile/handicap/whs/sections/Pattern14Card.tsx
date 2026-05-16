@@ -103,12 +103,12 @@ const Pattern14Card: React.FC<Props> = ({ connectionId }) => {
           {olderRounds.length > 0 && (
             <div
               style={{
-                marginTop: 14,
+                marginTop: 16,
                 paddingTop: 12,
                 borderTop: '1px solid var(--hcp-line)',
                 display: 'flex',
                 alignItems: 'center',
-                gap: 10,
+                gap: 16,
               }}
             >
               <span
@@ -126,18 +126,18 @@ const Pattern14Card: React.FC<Props> = ({ connectionId }) => {
               </span>
               <div
                 style={{
-                  flex: 1,
-                  display: 'grid',
-                  gridTemplateColumns: `repeat(${olderRounds.length}, 1fr)`,
+                  display: 'flex',
                   gap: 4,
+                  flex: '0 0 auto',
                 }}
               >
                 {olderRounds.map((r) => (
-                  <PatternSquare key={r.id} delta={r.delta} faded />
+                  <PatternSquare key={r.id} delta={r.delta} faded size={18} />
                 ))}
               </div>
               <span
                 style={{
+                  marginLeft: 'auto',
                   fontSize: 9.5,
                   letterSpacing: '0.14em',
                   textTransform: 'uppercase',
