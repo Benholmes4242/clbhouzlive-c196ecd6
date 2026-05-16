@@ -24,7 +24,7 @@ const Pattern14Card: React.FC<Props> = ({ connectionId }) => {
 
   const olderRounds = useMemo(() => {
     if (!allScores || allScores.length <= 14) return [];
-    const slice = [...allScores].slice(14, 21);
+    const slice = [...allScores].slice(14, 28);
     return slice.reverse().map((r: any) => {
       const diff = r.handicap_differential;
       const hcp = r.handicap_index_at_time;
@@ -33,57 +33,52 @@ const Pattern14Card: React.FC<Props> = ({ connectionId }) => {
     });
   }, [allScores]);
 
-  if (isLoading || rounds14.length === 0) return null;
+  const fmtDate = (s: string): string =>
+    new Date(s)
+      .toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })
+      .toUpperCase();
 
-  const firstDate = rounds14[0]?.play_date;
-  const firstDateLabel = firstDate
-    ? new Date(firstDate)
-        .toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })
-        .toUpperCase()
-    : null;
+  const mainCounter = useMemo<string | null>(() => {
+    if (rounds14.length === 0) return null;
+    const first = rounds14[0]?.play_date;
+    if (!first) return null;
+    return `${fmtDate(first)} → TODAY · ${rounds14.length} ROUNDS`;
+  }, [rounds14]);
+
+  const olderRange = useMemo<string | null>(() => {
+    if (olderRounds.length === 0) return null;
+    const first = olderRounds[0]?.play_date;
+    const last = olderRounds[olderRounds.length - 1]?.play_date;
+    if (!first || !last) return null;
+    const a = fmtDate(first);
+    const b = fmtDate(last);
+    const range = a === b ? a : `${a} → ${b}`;
+    const noun = olderRounds.length === 1 ? 'round' : 'rounds';
+    return `${olderRounds.length} ${noun} from ${range}`;
+  }, [olderRounds]);
+
+  if (isLoading || rounds14.length === 0) return null;
 
   return (
     <section style={{ marginTop: 10 }}>
       <DarkSectionHeader eyebrow="Last 14 Rounds" right="SCORE DIFF VS HCP" />
       <DarkCard>
         <div style={{ padding: '14px 16px 16px', fontFamily: FONT }}>
-          {/* Inner header */}
+          {/* Direction labels above the main grid */}
           <div
             style={{
               display: 'flex',
-              alignItems: 'center',
               justifyContent: 'space-between',
-              marginBottom: 12,
+              marginBottom: 8,
+              fontSize: 9,
+              fontWeight: 700,
+              letterSpacing: '0.18em',
+              textTransform: 'uppercase',
+              color: 'var(--hcp-t-40)',
             }}
           >
-            <span
-              style={{
-                fontSize: 14,
-                fontWeight: 700,
-                color: 'var(--hcp-t-100)',
-                letterSpacing: '-0.01em',
-              }}
-            >
-              Pattern
-            </span>
-            <span
-              style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: 6,
-                fontSize: 9.5,
-                letterSpacing: '0.14em',
-                textTransform: 'uppercase',
-                fontWeight: 700,
-                color: 'var(--hcp-t-60)',
-              }}
-            >
-              <LegendDot color="var(--hcp-good)" />
-              <span>Under</span>
-              <span style={{ color: 'var(--hcp-t-40)' }}>·</span>
-              <LegendDot color="var(--hcp-bad)" />
-              <span>Over</span>
-            </span>
+            <span><span style={{ color: 'var(--hcp-t-60)' }}>←</span> Older</span>
+            <span>Newest <span style={{ color: 'var(--hcp-t-60)' }}>→</span></span>
           </div>
 
           {/* Main 14-square row */}
@@ -99,56 +94,85 @@ const Pattern14Card: React.FC<Props> = ({ connectionId }) => {
             ))}
           </div>
 
+          {/* Date+count line under the grid */}
+          {mainCounter && (
+            <div
+              style={{
+                marginTop: 8,
+                textAlign: 'right',
+                fontSize: 9.5,
+                fontWeight: 700,
+                letterSpacing: '0.14em',
+                textTransform: 'uppercase',
+                color: 'var(--hcp-t-40)',
+                fontVariantNumeric: 'tabular-nums',
+              }}
+            >
+              {mainCounter}
+            </div>
+          )}
+
+          {/* Legend — 3 buckets */}
+          <div
+            style={{
+              marginTop: 14,
+              paddingTop: 12,
+              borderTop: '1px solid var(--hcp-line)',
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              gap: 12,
+              fontSize: 10.5,
+              fontWeight: 700,
+              color: 'var(--hcp-t-80)',
+            }}
+          >
+            <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+              <LegendSwatch color="var(--hcp-good)" />
+              <span style={{ color: 'var(--hcp-t-100)' }}>Better</span>
+            </span>
+            <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+              <LegendSwatch color="var(--hcp-bg-3)" bordered />
+              <span style={{ color: 'var(--hcp-t-100)' }}>On handicap</span>
+            </span>
+            <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+              <LegendSwatch color="var(--hcp-bad)" />
+              <span style={{ color: 'var(--hcp-t-100)' }}>Worse</span>
+            </span>
+          </div>
+
           {/* Older row */}
           {olderRounds.length > 0 && (
             <div
               style={{
-                marginTop: 16,
+                marginTop: 14,
                 paddingTop: 12,
                 borderTop: '1px solid var(--hcp-line)',
-                display: 'flex',
-                alignItems: 'center',
-                gap: 16,
               }}
             >
-              <span
+              <p
                 style={{
-                  fontSize: 9.5,
-                  letterSpacing: '0.14em',
-                  textTransform: 'uppercase',
-                  fontWeight: 700,
-                  color: 'var(--hcp-t-40)',
-                  fontVariantNumeric: 'tabular-nums',
-                  minWidth: 48,
+                  margin: '0 0 8px',
+                  fontSize: 11,
+                  fontWeight: 600,
+                  color: 'var(--hcp-t-60)',
+                  lineHeight: 1.4,
                 }}
               >
-                {firstDateLabel ?? ''}
-              </span>
+                <strong style={{ color: 'var(--hcp-t-100)', fontWeight: 700 }}>Before that</strong>
+                {olderRange && <> · {olderRange}</>}
+              </p>
               <div
                 style={{
-                  display: 'flex',
+                  display: 'grid',
+                  gridTemplateColumns: `repeat(${olderRounds.length}, 1fr)`,
                   gap: 4,
-                  flex: '0 0 auto',
                 }}
               >
                 {olderRounds.map((r) => (
-                  <PatternSquare key={r.id} delta={r.delta} faded size={18} />
+                  <PatternSquare key={r.id} delta={r.delta} faded />
                 ))}
               </div>
-              <span
-                style={{
-                  marginLeft: 'auto',
-                  fontSize: 9.5,
-                  letterSpacing: '0.14em',
-                  textTransform: 'uppercase',
-                  fontWeight: 700,
-                  color: 'var(--hcp-t-60)',
-                  minWidth: 44,
-                  textAlign: 'right',
-                }}
-              >
-                TODAY
-              </span>
             </div>
           )}
         </div>
@@ -177,13 +201,14 @@ const PatternSquare: React.FC<{ delta: number | null; faded?: boolean; size?: nu
   );
 };
 
-const LegendDot: React.FC<{ color: string }> = ({ color }) => (
+const LegendSwatch: React.FC<{ color: string; bordered?: boolean }> = ({ color, bordered }) => (
   <span
     style={{
-      width: 7,
-      height: 7,
-      borderRadius: '50%',
+      width: 12,
+      height: 12,
+      borderRadius: 3,
       background: color,
+      border: bordered ? '1px solid var(--hcp-line)' : 'none',
       display: 'inline-block',
     }}
   />
@@ -191,12 +216,10 @@ const LegendDot: React.FC<{ color: string }> = ({ color }) => (
 
 function colorForDelta(delta: number | null): { bg: string } {
   if (delta == null) return { bg: 'var(--hcp-bg-3)' };
-  if (delta <= -3) return { bg: 'var(--hcp-good)' };
-  if (delta <= -1) return { bg: 'rgba(34,197,94,0.55)' };
-  if (delta < 0) return { bg: 'rgba(34,197,94,0.20)' };
-  if (delta < 1) return { bg: 'rgba(239,68,68,0.20)' };
-  if (delta < 3) return { bg: 'rgba(239,68,68,0.55)' };
-  return { bg: 'var(--hcp-bad)' };
+  // 3-bucket scale: better, on-handicap (within ±1), worse.
+  if (delta <= -1) return { bg: 'var(--hcp-good)' };
+  if (delta >= 1) return { bg: 'var(--hcp-bad)' };
+  return { bg: 'var(--hcp-bg-3)' };
 }
 
 export default Pattern14Card;
