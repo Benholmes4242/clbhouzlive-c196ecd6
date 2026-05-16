@@ -102,6 +102,19 @@ export const CinemaFriendEyebrow: React.FC<Props> = ({ activity }) => {
 
       {/* Right cluster */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexShrink: 0 }}>
+        {showImpact && impactIsImprovement && (
+          <span
+            aria-label="Hot round — handicap cut"
+            style={{
+              fontSize: 14,
+              lineHeight: 1,
+              filter:
+                'drop-shadow(0 0 4px rgba(247,147,30,0.50)) drop-shadow(0 1px 2px rgba(0,0,0,0.4))',
+            }}
+          >
+            🔥
+          </span>
+        )}
         {showImpact && (
           <span
             style={{
