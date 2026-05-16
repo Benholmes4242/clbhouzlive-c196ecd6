@@ -143,7 +143,7 @@ export const RecentlyActiveRail: React.FC<Props> = ({ userId }) => {
 
 const RecentlyActiveSkeleton: React.FC = () => (
   <section style={{ marginTop: 18 }}>
-    <SectionHeader eyebrow="RECENTLY ACTIVE" title="Your circle" />
+    <div style={{ height: 18, margin: '0 20px 8px', background: 'var(--hcp-bg-3)', borderRadius: 4 }} className="animate-pulse" />
     <div style={{ display: 'flex', gap: 14, padding: '4px 20px 6px', overflow: 'hidden' }}>
       {Array.from({ length: 6 }).map((_, i) => (
         <div key={i} style={{ flex: '0 0 auto', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6 }}>
