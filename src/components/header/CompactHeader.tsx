@@ -181,7 +181,7 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
         )}
         style={{
           top: 0,
-          background: isHandicapRoute ? 'var(--hcp-bg-0)' : 'hsl(var(--background))',
+          background: isHandicapRoute ? '#0A0E14' : 'hsl(var(--background))',
           backdropFilter: isHandicapRoute ? 'none' : 'blur(20px)',
           WebkitBackdropFilter: isHandicapRoute ? 'none' : 'blur(20px)',
           height: `calc(${contentHeight}px + var(--sat, 0px))`,
