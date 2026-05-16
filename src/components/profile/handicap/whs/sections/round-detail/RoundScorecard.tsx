@@ -99,7 +99,7 @@ export const RoundScorecard: React.FC<Props> = ({ holes, isNineHole }) => {
   const back9 = isNineHole ? [] : sorted.filter((h) => h.hole_no > 9);
 
   return (
-    <div style={{ height: 280, padding: '18px 0 6px', fontFamily: FONT_GEIST, boxSizing: 'border-box' }}>
+    <div style={{ padding: '18px 0 6px', fontFamily: FONT_GEIST }}>
       <div style={{ padding: '0 18px', marginBottom: 10 }}>
         <span
           style={{
