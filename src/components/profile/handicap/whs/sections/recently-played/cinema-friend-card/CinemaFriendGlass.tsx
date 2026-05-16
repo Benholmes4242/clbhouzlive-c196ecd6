@@ -19,6 +19,7 @@ interface Props {
   differential: number | null;
   holes: WhsScoreHole[] | null;
   isCounter?: boolean;
+  showHotFlame?: boolean;
 }
 
 const HAIR: React.CSSProperties = {
