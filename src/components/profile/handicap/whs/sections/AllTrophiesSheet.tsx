@@ -396,7 +396,7 @@ export const AllTrophiesSheet: React.FC<Props> = ({ open, onClose, achievements 
         style={{
           position: 'fixed',
           inset: 0,
-          background: 'var(--hcp-t-40)',
+          background: 'rgba(0,0,0,0.65)',
           zIndex: 9998,
           animation: 'fadeIn 180ms ease-out',
         }}
