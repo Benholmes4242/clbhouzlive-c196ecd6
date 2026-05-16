@@ -508,12 +508,19 @@ export const StreaksSection: React.FC<Props> = ({ connectionId, userId }) => {
       ref={sectionRef}
       style={{ marginTop: 32, fontFamily: FONT_GEIST }}
     >
-      <SectionHeader
-        eyebrow="STREAKS"
-        title="Three runs to beat"
-        sub="Each one tracks a different chapter of your form."
-      />
-
+      {(() => {
+        const activeCount = [
+          streaks.noUp?.current > 0,
+          streaks.cutting?.current > 0,
+          streaks.counter?.current > 0,
+        ].filter(Boolean).length;
+        return (
+          <DarkSectionHeader
+            eyebrow="Three Runs to Beat"
+            right={activeCount > 0 ? `${activeCount} ACTIVE` : 'NONE ACTIVE'}
+          />
+        );
+      })()}
       <style>{`
         .hide-scrollbar::-webkit-scrollbar { display: none; }
       `}</style>
