@@ -354,13 +354,19 @@ const HeroHandicapCardDark: React.FC<Props> = ({ connection }) => {
       <TripleStrip variant="flush">
         <KPICell
           label="Scoring"
-          value={scoringAvg != null ? scoringAvg.toFixed(1) : '—'}
-          meta={`avg · ${roundCount} rds`}
+          value={scoringAvg90 != null ? scoringAvg90.toFixed(1) : '—'}
+          meta={
+            scoringAvg90 != null
+              ? `avg · ${roundCount90} rds in 90D`
+              : roundCount90 === 0
+                ? 'no rounds in 90D'
+                : `< 3 rds in 90D`
+          }
         />
         <KPICell
           label="Form"
           value={form.label}
-          meta={periodAvgPts != null ? `${periodAvgPts.toFixed(1)} pts avg` : '—'}
+          meta={periodAvgPts90 != null ? `${periodAvgPts90.toFixed(1)} pts avg in 90D` : '—'}
           verdict={form.verdict}
         />
         <KPICell
