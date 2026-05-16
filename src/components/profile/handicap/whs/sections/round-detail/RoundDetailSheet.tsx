@@ -301,6 +301,8 @@ export const RoundDetailSheet: React.FC<Props> = ({
     ? activity?.last_round_course_name ?? 'Friend round detail'
     : userData?.course?.name ?? 'Round detail';
 
+  const { scroll, footer } = isFriend ? renderFriendBody() : renderUserBody();
+
   return (
     <DrawerPrimitive.Root
       open={open}
@@ -319,14 +321,24 @@ export const RoundDetailSheet: React.FC<Props> = ({
           className="fixed inset-x-0 bottom-0 z-[10002] flex flex-col rounded-t-[20px] outline-none"
           style={{
             background: PAGE_BG,
-            maxHeight: '92vh',
+            height: '80dvh',
             overflow: 'hidden',
             boxShadow: '0 -10px 40px -10px rgba(0,0,0,0.5)',
             fontFamily: FONT_GEIST,
           }}
         >
           <DrawerPrimitive.Title className="sr-only">{titleText}</DrawerPrimitive.Title>
-          {isFriend ? renderFriendBody() : renderUserBody()}
+          <div
+            style={{
+              flex: 1,
+              minHeight: 0,
+              overflowY: 'auto',
+              WebkitOverflowScrolling: 'touch',
+            }}
+          >
+            {scroll}
+          </div>
+          {footer}
         </DrawerPrimitive.Content>
       </DrawerPrimitive.Portal>
     </DrawerPrimitive.Root>
