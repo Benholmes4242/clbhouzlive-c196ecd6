@@ -68,10 +68,11 @@ export const RecentlyActiveItem: React.FC<Props> = ({ entry, isActive, onClick }
       </div>
       <p
         style={{
-          margin: 0,
+          marginTop: 6,
+          marginBottom: 0,
           fontSize: 12,
           fontWeight: 700,
-          color: '#0F172A',
+          color: 'var(--hcp-t-100)',
           letterSpacing: '-0.01em',
           maxWidth: 76,
           overflow: 'hidden',
@@ -84,7 +85,8 @@ export const RecentlyActiveItem: React.FC<Props> = ({ entry, isActive, onClick }
       </p>
       <p
         style={{
-          margin: 0,
+          marginTop: 2,
+          marginBottom: 0,
           fontSize: 10,
           fontWeight: 700,
           color: '#64748B',
