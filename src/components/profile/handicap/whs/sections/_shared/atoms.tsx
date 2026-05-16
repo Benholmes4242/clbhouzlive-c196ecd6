@@ -182,17 +182,6 @@ export const EchoCallout: React.FC<EchoCalloutProps> = ({
       overflow: 'hidden',
     }}
   >
-    <span
-      aria-hidden
-      style={{
-        position: 'absolute',
-        left: 0,
-        top: 0,
-        bottom: 0,
-        width: 3,
-        background: 'linear-gradient(180deg, var(--hcp-amber), transparent)',
-      }}
-    />
     <div style={{ display: 'flex', gap: 12, alignItems: 'flex-start' }}>
       <div
         style={{
