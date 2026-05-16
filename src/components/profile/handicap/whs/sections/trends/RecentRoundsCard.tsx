@@ -46,20 +46,41 @@ const fmtDiff = (d: number | null | undefined): string => {
 
 const diffColor = (d: number | null | undefined): string => {
   if (d === null || d === undefined) return T.inkMute;
-  if (d < 0) return T.greenInk;
-  if (d > 0) return T.redInk;
+  if (d < 0) return 'var(--hcp-good)';
+  if (d > 0) return 'var(--hcp-bad)';
   return T.inkSoft;
+};
+
+/** Text-shadow halo to lift coloured delta values off the dark canvas. */
+const diffGlow = (d: number | null | undefined): string => {
+  if (d === null || d === undefined) return 'none';
+  if (d < 0) return '0 0 8px rgba(34,197,94,0.40), 0 0 3px rgba(34,197,94,0.25)';
+  if (d > 0) return '0 0 8px rgba(239,68,68,0.40), 0 0 3px rgba(239,68,68,0.25)';
+  return 'none';
 };
 
 interface HcpDeltaInfo {
   sign: string;
   value: string;
   color: string;
+  glow: string;
 }
 const fmtHcpDelta = (n: number | null): HcpDeltaInfo | null => {
   if (n === null || Math.abs(n) < 0.05) return null;
-  if (n < 0) return { sign: '\u2193', value: Math.abs(n).toFixed(1), color: T.greenInk };
-  return { sign: '\u2191', value: n.toFixed(1), color: T.redInk };
+  if (n < 0) {
+    return {
+      sign: '\u2193',
+      value: Math.abs(n).toFixed(1),
+      color: 'var(--hcp-good)',
+      glow: '0 0 8px rgba(34,197,94,0.40), 0 0 3px rgba(34,197,94,0.25)',
+    };
+  }
+  return {
+    sign: '\u2191',
+    value: n.toFixed(1),
+    color: 'var(--hcp-bad)',
+    glow: '0 0 8px rgba(239,68,68,0.40), 0 0 3px rgba(239,68,68,0.25)',
+  };
 };
 
 const fmtRelativeDate = (iso: string): string => {
@@ -466,7 +487,7 @@ const DateTile: React.FC<DateTileProps> = ({ dateString, thumbnailUrl }) => {
               position: 'absolute',
               inset: 0,
               background:
-                'linear-gradient(150deg, rgba(15,77,46,0.78), rgba(16,62,37,0.86))',
+                'linear-gradient(180deg, rgba(0,0,0,0.30), rgba(0,0,0,0.65))',
               pointerEvents: 'none',
             }}
           />
@@ -474,15 +495,6 @@ const DateTile: React.FC<DateTileProps> = ({ dateString, thumbnailUrl }) => {
       ) : (
         <CourseImageFallback flagOpacity={0.18} gradientAngle={150} />
       )}
-      <span
-        style={{
-          position: 'absolute',
-          inset: 0,
-          background:
-            'radial-gradient(circle at 30% 25%, rgba(255,255,255,0.14), transparent 60%)',
-          pointerEvents: 'none',
-        }}
-      />
       <span
         style={{
           fontSize: 9,
@@ -534,13 +546,13 @@ const FeedCard: React.FC<FeedCardProps> = ({ round, isBest, onTap }) => {
         minHeight: 72,
         padding: 0,
         background: T.cardBg,
-        border: `1px solid ${isBest ? 'rgba(247,147,30,0.30)' : T.hairline}`,
+        border: `1px solid ${T.hairline}`,
         borderRadius: 12,
         overflow: 'hidden',
         textAlign: 'left',
         fontFamily: FONT,
         cursor: 'pointer',
-        boxShadow: isBest ? '0 4px 14px -6px rgba(247,147,30,0.30)' : 'none',
+        boxShadow: 'none',
       }}
     >
       <DateTile
@@ -592,6 +604,7 @@ const FeedCard: React.FC<FeedCardProps> = ({ round, isBest, onTap }) => {
                   color: deltaInfo.color,
                   fontWeight: 700,
                   letterSpacing: '0.02em',
+                  textShadow: deltaInfo.glow,
                 }}>
                   HCP {deltaInfo.sign} {deltaInfo.value}
                 </span>
@@ -600,7 +613,16 @@ const FeedCard: React.FC<FeedCardProps> = ({ round, isBest, onTap }) => {
           </div>
 
         </div>
-        <div style={{ textAlign: 'right', flexShrink: 0, display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 4 }}>
+        <div
+          style={{
+            flexShrink: 0,
+            width: 36,
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            gap: 4,
+          }}
+        >
           <span
             aria-label={`Gross score ${round.adjusted_gross ?? ''}${round.is_counter ? ', counts toward index' : ''}`}
           >
@@ -616,6 +638,8 @@ const FeedCard: React.FC<FeedCardProps> = ({ round, isBest, onTap }) => {
               fontWeight: 700,
               color: diffColor(round.handicap_differential),
               fontVariantNumeric: 'tabular-nums',
+              textShadow: diffGlow(round.handicap_differential),
+              textAlign: 'center',
             }}
           >
             {fmtDiff(round.handicap_differential)}
