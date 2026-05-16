@@ -59,7 +59,7 @@ export const RecentlyPlayedFeed: React.FC<Props> = ({ ownerUserId }) => {
               fontVariantNumeric: 'tabular-nums',
             }}
           >
-            Last fortnight · {items.length} {items.length === 1 ? 'round' : 'rounds'}
+            Last fortnight
           </span>
         )}
       </div>
