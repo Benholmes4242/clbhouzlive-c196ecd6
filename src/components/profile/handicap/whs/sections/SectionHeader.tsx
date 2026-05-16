@@ -32,7 +32,7 @@ export const SectionHeader: React.FC<SectionHeaderProps> = ({
           style={{
             fontSize: 9,
             fontWeight: 800,
-            color: '#64748B',
+            color: 'var(--hcp-t-60)',
             letterSpacing: '0.16em',
             textTransform: 'uppercase',
           }}
