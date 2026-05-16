@@ -96,7 +96,7 @@ export const FriendsLeaderboardSection: React.FC<Props> = ({ userId }) => {
             ? `Active = round in last 90 days · ${inactiveCount} inactive`
             : 'Your circle, ranked by current handicap'
         }
-        withDot
+        
       />
 
       {/* Column headers */}
