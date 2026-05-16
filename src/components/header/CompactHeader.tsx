@@ -84,6 +84,9 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
   // (dark header background, white controls, dark identity pill) but keep the
   // clbhouz logo on the left — they're top-level hubs, not back-arrow pages.
   const isTourRoute = location.pathname === '/tourhub' || location.pathname === '/tour';
+  // Routes that keep the light Dispatch chrome (clubhouse feed + profile pages).
+  const isClubhouseChromeRoute = location.pathname === '/' || location.pathname === '/clubhouse';
+  const isProfileChromeRoute = location.pathname === '/profile' || location.pathname.startsWith('/profile/');
   // Course detail: /courses/:courseId (exactly 3 segments — excludes /reviews, /rate, /share-review subroutes)
   const isCourseDetailRoute = location.pathname.startsWith('/courses/')
     && location.pathname.split('/').length === 3;
@@ -110,9 +113,10 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
   // Routes that should show back arrow instead of logo
   const isBackArrowRoute = isDiscoverSubPage || isTop100Route || isCourseDetailRoute || isEditProfileRoute || isFriendsActivityRoute || isAchievementsRoute || isMessagesRoute || isHandicapRoute || isWatchSubpageRoute;
   
-  // Dark chrome routes (handicap + tour hub). The light theme governs the
-  // identity pill, search icon, and posting-as menu palette.
-  const isDarkChrome = isHandicapRoute || isTourRoute;
+  // Dark chrome is now the default across the app. Only the Clubhouse feed and
+  // Profile pages keep the light Dispatch chrome (identity pill, search icon,
+  // posting-as menu palette).
+  const isDarkChrome = !(isClubhouseChromeRoute || isProfileChromeRoute);
   const useLightTheme = !isDarkChrome;
 
   const handleLogoClick = () => {
