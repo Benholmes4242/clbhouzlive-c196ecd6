@@ -2,7 +2,7 @@ import React, { useMemo } from 'react';
 import { TrendingDown, Minus } from 'lucide-react';
 import { useAllScores } from '@/lib/whs/hooks';
 import { projectNextRound } from '@/lib/whs/handicapMath';
-import { DarkSectionHeader, DarkCard, VerdictPill } from './_shared/darkAtoms';
+import { DarkSectionHeader, DarkCard } from './_shared/darkAtoms';
 
 const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
 
