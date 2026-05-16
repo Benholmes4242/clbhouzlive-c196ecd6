@@ -109,7 +109,7 @@ export const SentInvitesSheet: React.FC<Props> = ({ open, onClose }) => {
             overflow: 'hidden',
             display: 'flex',
             flexDirection: 'column',
-            boxShadow: '0 -10px 40px -10px rgba(15,23,42,0.25)',
+            boxShadow: '0 -10px 40px -10px rgba(0,0,0,0.5)',
           }}
         >
           {/* Drag handle */}
