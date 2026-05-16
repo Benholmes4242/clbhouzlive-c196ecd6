@@ -36,6 +36,18 @@ const T = {
   greenDeep: '#15803D',
   red: '#9F1339',
   redDeep: '#991B1B',
+  /** Medal palette — matches Course Form T9.7 */
+  gold: '#FBBC2E',
+  silver: '#C0C5CF',
+  bronze: '#C97D45',
+};
+
+/** Medal color for top-3 ranks. Anything below 3 returns null. */
+const medalColor = (rank: number | null): string | null => {
+  if (rank === 1) return T.gold;
+  if (rank === 2) return T.silver;
+  if (rank === 3) return T.bronze;
+  return null;
 };
 
 const fmtRel = (iso: string | null) => fmtRelative(iso, { compact: true });
