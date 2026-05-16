@@ -9,10 +9,12 @@
  */
 import React, { useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
+import { Trophy } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAllScores } from '@/lib/whs/hooks';
 import { useUserProfile } from '@/hooks/useUserProfile';
 import { useTodayWeather } from '@/lib/whs/useTodayWeather';
+import { openTrophiesSheet } from '@/components/profile/handicap/whs/trophiesSheetEvents';
 
 const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
 
