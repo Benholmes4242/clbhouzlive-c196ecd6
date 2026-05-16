@@ -10,7 +10,7 @@ export const ScorecardEmpty: React.FC<Props> = ({ message, subMessage }) => (
     style={{
       margin: '14px 18px',
       padding: 16,
-      background: 'rgba(15,23,42,0.03)',
+      background: 'var(--hcp-bg-2)',
       borderRadius: 12,
       border: '1px dashed var(--hcp-line)',
       textAlign: 'center',
