@@ -82,50 +82,6 @@ export function detectTopTie(leaderboard: any[]): TopTie | null {
   return { count: tied.length, score: fmtScore(topScore) };
 }
 
-// ---------- Row builder (collapses tied positions into single rows) ---------
-
-export type DisplayRow =
-  | { kind: 'solo'; position: number; entry: any }
-  | { kind: 'tied'; position: number; count: number; sharedScore: number; entries: any[] };
-
-/**
- * Build the hero's display rows from a sorted leaderboard. Always returns at
- * most 4 rows. Contiguous entries sharing the same `position` collapse into
- * a single `tied` row; solo positions become `solo` rows.
- */
-export function buildLeaderboardRows(leaderboard: any[], maxRows = 4): DisplayRow[] {
-  if (!leaderboard?.length) return [];
-  const sorted = [...leaderboard].sort(
-    (a, b) => (a?.position ?? 999) - (b?.position ?? 999),
-  );
-
-  const rows: DisplayRow[] = [];
-  let i = 0;
-  while (i < sorted.length && rows.length < maxRows) {
-    const cur = sorted[i];
-    if (cur?.position == null) { i++; continue; }
-    const same: any[] = [];
-    let j = i;
-    while (j < sorted.length && sorted[j]?.position === cur.position) {
-      same.push(sorted[j]);
-      j++;
-    }
-    if (same.length >= 2) {
-      rows.push({
-        kind: 'tied',
-        position: cur.position,
-        count: same.length,
-        sharedScore: cur.score ?? cur.total ?? 0,
-        entries: same,
-      });
-    } else {
-      rows.push({ kind: 'solo', position: cur.position, entry: cur });
-    }
-    i = j;
-  }
-  return rows;
-}
-
 // ---------- Countdown -------------------------------------------------------
 
 export function formatCountdown(start: Date, now: Date = new Date()): string {
