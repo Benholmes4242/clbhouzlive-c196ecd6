@@ -83,7 +83,7 @@ export const CinemaFriendGlass: React.FC<Props> = ({
       <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 10 }}>
         <div
           style={{
-            fontSize: 17,
+            fontSize: 15,
             fontWeight: 700,
             color: '#FFFFFF',
             letterSpacing: '-0.02em',
