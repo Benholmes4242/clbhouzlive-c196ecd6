@@ -175,8 +175,8 @@ export const RoundDetailSheet: React.FC<Props> = ({
     };
   };
 
-  const renderFriendBody = () => {
-    if (!activity) return <SheetSkeleton />;
+  const renderFriendBody = (): { scroll: React.ReactNode; footer: React.ReactNode } => {
+    if (!activity) return { scroll: <SheetSkeleton />, footer: null };
     const fname = firstName(reformatFriendName(activity.friend_name));
 
     // Hero data composed from activity
@@ -184,44 +184,46 @@ export const RoundDetailSheet: React.FC<Props> = ({
     const heroImage = activity.course_thumbnail_image;
 
     if (!friendIsClbhouz) {
-      // Non-Clbhouz: hero with invite-state glass + invite block; no scorecard / no footer
-      return (
-        <>
-          <SheetHero
-            imageUrl={heroImage}
-            onClose={onClose}
-            topEyebrow={<FriendEyebrow activity={activity} />}
-            glass={
-              <SheetHeroGlass
-                courseName={courseName}
-                par={null}
-                slope={null}
-                gross={activity.last_round_adjusted_gross}
-                stableford={activity.last_round_stableford}
-                differential={activity.last_round_differential}
-                holes={null}
-                metaOverride={
-                  <div
-                    style={{
-                      marginTop: 3,
-                      fontSize: 11,
-                      fontWeight: 600,
-                      color: AMBER,
-                      letterSpacing: '0.10em',
-                      textTransform: 'uppercase',
-                    }}
-                  >
-                    {activity.friend_handicap_index != null
-                      ? `England Golf · Handicap ${activity.friend_handicap_index.toFixed(1)}`
-                      : 'England Golf'}
-                  </div>
-                }
-              />
-            }
-          />
-          <NonClbhouzFriendBody activity={activity} />
-        </>
-      );
+      return {
+        scroll: (
+          <>
+            <SheetHero
+              imageUrl={heroImage}
+              onClose={onClose}
+              topEyebrow={<FriendEyebrow activity={activity} />}
+              glass={
+                <SheetHeroGlass
+                  courseName={courseName}
+                  par={null}
+                  slope={null}
+                  gross={activity.last_round_adjusted_gross}
+                  stableford={activity.last_round_stableford}
+                  differential={activity.last_round_differential}
+                  holes={null}
+                  metaOverride={
+                    <div
+                      style={{
+                        marginTop: 3,
+                        fontSize: 11,
+                        fontWeight: 600,
+                        color: AMBER,
+                        letterSpacing: '0.10em',
+                        textTransform: 'uppercase',
+                      }}
+                    >
+                      {activity.friend_handicap_index != null
+                        ? `England Golf · Handicap ${activity.friend_handicap_index.toFixed(1)}`
+                        : 'England Golf'}
+                    </div>
+                  }
+                />
+              }
+            />
+            <NonClbhouzFriendBody activity={activity} />
+          </>
+        ),
+        footer: null,
+      };
     }
 
     // Clbhouz friend (synced)
@@ -232,40 +234,43 @@ export const RoundDetailSheet: React.FC<Props> = ({
         ? activity.friend_handicap_index - activity.handicap_index_at_time
         : null;
 
-    return (
-      <>
-        <SheetHero
-          imageUrl={heroImage}
-          onClose={onClose}
-          topEyebrow={<FriendEyebrow activity={activity} />}
-          glass={
-            <SheetHeroGlass
-              courseName={courseName}
-              par={parTotal}
-              slope={friendDetail?.slope_rating ?? null}
-              gross={activity.last_round_adjusted_gross}
-              stableford={activity.last_round_stableford}
-              differential={activity.last_round_differential}
-              holes={hasHoles ? holes : null}
+    return {
+      scroll: (
+        <>
+          <SheetHero
+            imageUrl={heroImage}
+            onClose={onClose}
+            topEyebrow={<FriendEyebrow activity={activity} />}
+            glass={
+              <SheetHeroGlass
+                courseName={courseName}
+                par={parTotal}
+                slope={friendDetail?.slope_rating ?? null}
+                gross={activity.last_round_adjusted_gross}
+                stableford={activity.last_round_stableford}
+                differential={activity.last_round_differential}
+                holes={hasHoles ? holes : null}
+              />
+            }
+          />
+
+          {friendLoading && !friendDetail ? (
+            <ScorecardEmpty message="Loading hole data\u2026" />
+          ) : hasHoles ? (
+            <RoundScorecard holes={holes!} isNineHole={!!friendDetail?.is_nine_hole} />
+          ) : friendDetail && !friendDetail.hole_by_hole_fetched ? (
+            <ScorecardEmpty
+              message="Hole data is still syncing"
+              subMessage={`Check back in a few hours for ${fname}'s hole-by-hole.`}
             />
-          }
-        />
-
-        {friendLoading && !friendDetail ? (
-          <ScorecardEmpty message="Loading hole data\u2026" />
-        ) : hasHoles ? (
-          <RoundScorecard holes={holes!} isNineHole={!!friendDetail?.is_nine_hole} />
-        ) : friendDetail && !friendDetail.hole_by_hole_fetched ? (
-          <ScorecardEmpty
-            message="Hole data is still syncing"
-            subMessage={`Check back in a few hours for ${fname}'s hole-by-hole.`}
-          />
-        ) : (
-          <ScorecardEmpty
-            message={`No hole-by-hole data for ${fname}'s round.`}
-          />
-        )}
-
+          ) : (
+            <ScorecardEmpty
+              message={`No hole-by-hole data for ${fname}'s round.`}
+            />
+          )}
+        </>
+      ),
+      footer: (
         <SheetFooterInk
           label={`${fname.toUpperCase()}'S INDEX`}
           currentIndex={activity.friend_handicap_index ?? null}
@@ -288,8 +293,8 @@ export const RoundDetailSheet: React.FC<Props> = ({
             ) : null
           }
         />
-      </>
-    );
+      ),
+    };
   };
 
   const titleText = isFriend
