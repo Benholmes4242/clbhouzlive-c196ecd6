@@ -190,11 +190,6 @@ const CourseRow: React.FC<{
     };
   })();
 
-  return (
-    <div
-      style={{
-        display: 'flex',
-        gap: 10,
   const railColor = medalColor(rank);
 
   return (
