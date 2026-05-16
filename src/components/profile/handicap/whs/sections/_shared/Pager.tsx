@@ -7,11 +7,11 @@ interface Props {
   onChange: (next: number) => void;
 }
 
-const HAIRLINE = 'rgba(15,23,42,0.08)';
-const INK = '#0F172A';
-const INK_FAINT = 'rgba(15,23,42,0.30)';
+const HAIRLINE = 'var(--hcp-line-2)';
+const INK = 'var(--hcp-t-100)';
+const INK_FAINT = 'rgba(255,255,255,0.30)';
 const AMBER = '#F7931E';
-const CARD_BG = '#FFFFFF';
+const CARD_BG = 'var(--hcp-bg-1)';
 
 export const Pager: React.FC<Props> = ({ page, totalPages, onChange }) => {
   // Condense dots if there are too many — show first, current, last with separators
