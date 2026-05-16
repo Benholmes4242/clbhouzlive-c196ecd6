@@ -90,10 +90,10 @@ export const CinemaFriendCard: React.FC<Props> = ({ activity, onClick }) => {
       <div
         style={{
           position: 'absolute',
-          left: 14,
-          right: 14,
-          top: 44,
-          bottom: 12,
+          left: 11,
+          right: 11,
+          top: 36,
+          bottom: 10,
           display: 'flex',
           alignItems: 'flex-end',
           zIndex: 3,
