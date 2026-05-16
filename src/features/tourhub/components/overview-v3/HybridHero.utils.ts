@@ -63,6 +63,13 @@ export function shortenName(fullName?: string | null): string {
   return `${initials}. ${last}`;
 }
 
+// ---------- Rank formatting -------------------------------------------------
+
+export function formatRank(entry: { position?: number | null; position_tied?: boolean | null }): string {
+  if (entry?.position == null) return '—';
+  return entry.position_tied ? `T${entry.position}` : `${entry.position}`;
+}
+
 // ---------- Tie detection ---------------------------------------------------
 
 export function detectTopTie(leaderboard: any[]): TopTie | null {
