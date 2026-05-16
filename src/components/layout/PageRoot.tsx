@@ -1,6 +1,17 @@
 import * as React from "react";
+import { useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { useMedianStatusBar } from "@/hooks/useMedianStatusBar";
+
+/**
+ * Routes that keep the light Dispatch chrome (notch/status bar stays cream).
+ * Every other route inherits the dark handicap chrome by default.
+ */
+function isLightChromeRoute(pathname: string): boolean {
+  if (pathname === '/' || pathname === '/clubhouse') return true;
+  if (pathname === '/profile' || pathname.startsWith('/profile/')) return true;
+  return false;
+}
 
 interface PageRootProps extends React.HTMLAttributes<HTMLDivElement> {
   children: React.ReactNode;
@@ -25,12 +36,16 @@ interface PageRootProps extends React.HTMLAttributes<HTMLDivElement> {
  *  - Supports fixedHeight mode for pages that should not scroll (like Hub)
  */
 export const PageRoot = React.forwardRef<HTMLDivElement, PageRootProps>(
-  ({ children, className, immersiveStatusBar = false, fixedHeight = false, hasBottomNav = true, immersive = false, dark = false, style, ...rest }, ref) => {
-    // Default light chrome for all pages (disabled when child controls status bar).
-    // When `dark` is set, flip the status bar to dark icons + the dark canvas hex.
+  ({ children, className, immersiveStatusBar = false, fixedHeight = false, hasBottomNav = true, immersive = false, dark, style, ...rest }, ref) => {
+    // Route-aware default: every page except Clubhouse and Profile inherits
+    // the dark handicap chrome (notch + status bar + canvas).
+    const location = useLocation();
+    const resolvedDark = dark ?? !isLightChromeRoute(location.pathname);
+
+    // Default light chrome for the Clubhouse/Profile pages; dark elsewhere.
     useMedianStatusBar(
-      dark ? "dark" : "light",
-      dark ? "#0A0E14" : "#F8FAFC",
+      resolvedDark ? "dark" : "light",
+      resolvedDark ? "#0A0E14" : "#F8FAFC",
       false,
       false,
       !immersiveStatusBar,
@@ -49,7 +64,7 @@ export const PageRoot = React.forwardRef<HTMLDivElement, PageRootProps>(
         ref={ref}
         className={cn(
           `page-root w-full max-w-[480px] mx-auto flex flex-col ${immersiveStatusBar ? 'bg-black' : 'bg-[var(--bg-page)]'}`,
-          dark && 'hcp-dark',
+          dark === true && 'hcp-dark',
           !fixedHeight && "min-h-[100vh]",
           fixedHeight && "h-[100dvh] overflow-hidden",
           className
