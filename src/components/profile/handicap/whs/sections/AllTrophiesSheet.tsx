@@ -438,6 +438,7 @@ export const AllTrophiesSheet: React.FC<Props> = ({ open, onClose, achievements 
           title="All achievements"
           onClose={onClose}
           borderBottom={false}
+          dark
         />
 
         {/* Custom hero panel — the 56px count + percent + progress bar */}
