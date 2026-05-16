@@ -264,14 +264,18 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
               className={cn(
                 "p-0 flex items-center justify-center rounded-full active:scale-[0.94] transition-all",
                 "h-11 w-11",
-                useLightTheme
-                  ? "text-muted-foreground"
-                  : "hover:bg-[hsl(var(--clubhouse-active-bg))]"
+                isHandicapRoute
+                  ? "text-white"
+                  : useLightTheme
+                    ? "text-muted-foreground"
+                    : "hover:bg-[hsl(var(--clubhouse-active-bg))]"
               )}
               style={{ 
-                color: useLightTheme 
-                  ? undefined 
-                  : 'hsl(var(--clubhouse-text-muted))',
+                color: isHandicapRoute
+                  ? 'var(--hcp-t-100)'
+                  : useLightTheme 
+                    ? undefined 
+                    : 'hsl(var(--clubhouse-text-muted))',
                 transition: 'all var(--motion-fast) var(--ease-standard)'
               }}
               onClick={handleSearchClick}
