@@ -456,7 +456,7 @@ export const AllTrophiesSheet: React.FC<Props> = ({ open, onClose, achievements 
             </span>
             <span style={{ flex: 1 }} />
             <span style={{
-              fontSize: 11, fontWeight: 800, color: AMBER,
+              fontSize: 11, fontWeight: 800, color: '#FFFFFF',
               letterSpacing: '0.14em',
               fontVariantNumeric: 'tabular-nums',
             }}>
