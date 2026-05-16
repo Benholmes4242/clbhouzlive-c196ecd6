@@ -131,7 +131,7 @@ const IndexHistoryCard: React.FC<Props> = ({ connectionId }) => {
     range === '1M' ? '30-day trend' : range === '3M' ? '90-day trend' : '1-year trend';
 
   return (
-    <>
+    <section style={{ marginTop: 10 }}>
       <DarkSectionHeader
         eyebrow="INDEX HISTORY"
         right={`${fmtHcp(firstHcp)} → ${fmtHcp(lastHcp)}`}

@@ -79,7 +79,7 @@ function computeAxis(dataMin: number, dataMax: number): {
 }
 
 const Skeleton: React.FC = () => (
-  <section style={{ marginTop: 20 }}>
+  <section style={{ marginTop: 32 }}>
     <SectionHeader eyebrow="ROUNDS THAT COUNT" title="The 8 best of your last 20" />
     <div style={{ padding: '0 20px' }}>
     <div style={{ height: 12, width: 140, background: 'var(--hcp-bg-3)', borderRadius: 2, marginBottom: 10 }} />
@@ -212,7 +212,7 @@ export const RoundsThatCountCard: React.FC<Props> = ({ connectionId, currentHand
     .join(' ');
 
   return (
-    <section style={{ marginTop: 20 }}>
+    <section style={{ marginTop: 32 }}>
       <SectionHeader eyebrow="ROUNDS THAT COUNT" title="The 8 best of your last 20" />
       <div style={{ padding: '0 20px' }}>
 
