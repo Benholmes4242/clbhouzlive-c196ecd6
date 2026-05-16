@@ -30,7 +30,7 @@ function getTimeOfDay(now: Date = new Date()): 'Morning' | 'Afternoon' | 'Evenin
   return 'Evening';
 }
 
-function formatToday(): string {
+export function formatToday(): string {
   return new Date()
     .toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' })
     .toUpperCase();
