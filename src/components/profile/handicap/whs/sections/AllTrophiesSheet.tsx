@@ -469,7 +469,7 @@ export const AllTrophiesSheet: React.FC<Props> = ({ open, onClose, achievements 
             <div style={{
               width: `${pct}%`,
               height: '100%',
-              background: 'linear-gradient(90deg, #F59E0B 0%, #FBBF24 100%)',
+              background: '#FFFFFF',
               borderRadius: 999,
             }} />
           </div>
