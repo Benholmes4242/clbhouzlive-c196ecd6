@@ -4,7 +4,7 @@ import { fmtDiff } from '@/lib/whs/format';
 import { MiniGrossRing } from '@/components/profile/handicap/whs/sections/shared/GrossCounterRing';
 
 const FONT_GEIST = 'Geist, system-ui, -apple-system, BlinkMacSystemFont, sans-serif';
-const FONT_MONO = "'Geist Mono', ui-monospace, SFMono-Regular, Menlo, monospace";
+const FONT_MONO = "Geist, system-ui, -apple-system, BlinkMacSystemFont, sans-serif";
 const AMBER = '#F7931E';
 const EM_DASH = '\u2014';
 

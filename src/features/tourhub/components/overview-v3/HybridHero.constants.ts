@@ -40,5 +40,5 @@ export const LEGIBILITY_SCRIM =
 export const MARQUEE_DURATION_SECONDS = 40;
 
 // Type fonts
-export const FONT_MONO = "'Geist Mono', ui-monospace, SFMono-Regular, Menlo, monospace";
+export const FONT_MONO = "Geist, system-ui, -apple-system, BlinkMacSystemFont, sans-serif";
 export const FONT_SANS = "'Geist', -apple-system, BlinkMacSystemFont, sans-serif";

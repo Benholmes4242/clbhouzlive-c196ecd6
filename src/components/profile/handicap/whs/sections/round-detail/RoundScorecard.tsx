@@ -8,7 +8,7 @@ interface Props {
 }
 
 const FONT_GEIST = 'Geist, system-ui, -apple-system, BlinkMacSystemFont, sans-serif';
-const FONT_MONO = "'Geist Mono', ui-monospace, SFMono-Regular, Menlo, monospace";
+const FONT_MONO = "Geist, system-ui, -apple-system, BlinkMacSystemFont, sans-serif";
 const INK = 'var(--hcp-t-100)';
 const INK_45 = 'var(--hcp-t-40)';
 const AMBER = '#F7931E';
