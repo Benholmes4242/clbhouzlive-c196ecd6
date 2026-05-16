@@ -14,7 +14,7 @@ interface Props {
 }
 
 const INK = 'var(--hcp-t-100)';
-const INK_MUTE = 'rgba(15,23,42,0.6)';
+const INK_MUTE = 'var(--hcp-t-60)';
 const HAIRLINE = 'var(--hcp-line-2)';
 
 
