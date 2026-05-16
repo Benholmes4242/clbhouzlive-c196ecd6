@@ -163,7 +163,7 @@ const NextRoundWatch: React.FC<Props> = ({ connectionId, currentHandicap }) => {
           <div
             style={{
               display: 'grid',
-              gridTemplateColumns: 'repeat(4, 1fr)',
+              gridTemplateColumns: 'repeat(3, 1fr)',
               marginTop: 10,
               fontFamily: FONT,
               fontVariantNumeric: 'tabular-nums',
@@ -171,7 +171,6 @@ const NextRoundWatch: React.FC<Props> = ({ connectionId, currentHandicap }) => {
           >
             <BarStack label="SCRATCH" value="0" align="start" />
             <BarStack label="CUT" value={target.toFixed(1)} valueColor="var(--hcp-good)" />
-            <BarStack label="HOLD" value={settle.toFixed(1)} />
             <BarStack
               label="OLDEST"
               value={oldest ? oldest.diff.toFixed(1) : '—'}
