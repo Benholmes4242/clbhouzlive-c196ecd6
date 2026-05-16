@@ -9,7 +9,7 @@ import { fmtRelative, reformatFriendName } from '@/lib/whs/utils/nameFormat';
 import { useUpsertRivalOverride, useDeleteRivalOverride } from '@/lib/whs/hooks';
 
 const T = {
-  ink: '#0F172A',
+  ink: 'var(--hcp-t-100)',
   inkMute: 'var(--hcp-t-60)',
   inkSoft: 'var(--hcp-t-40)',
   hairline: 'var(--hcp-line-2)',
