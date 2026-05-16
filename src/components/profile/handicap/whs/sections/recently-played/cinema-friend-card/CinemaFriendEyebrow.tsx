@@ -26,9 +26,9 @@ export const CinemaFriendEyebrow: React.FC<Props> = ({ activity }) => {
     <div
       style={{
         position: 'absolute',
-        top: 12,
-        left: 14,
-        right: 14,
+        top: 10,
+        left: 11,
+        right: 11,
         zIndex: 3,
         display: 'flex',
         alignItems: 'center',
