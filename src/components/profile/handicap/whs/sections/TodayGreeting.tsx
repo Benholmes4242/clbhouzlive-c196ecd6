@@ -98,7 +98,7 @@ const TodayGreeting: React.FC<Props> = ({ connectionId, userId }) => {
 
   const { data: weather } = useTodayWeather(coords?.lat ?? null, coords?.lng ?? null);
 
-  const showMeta = !!homeCourseName && !!weather;
+  const showMeta = !!homeCourseName;
 
   return (
     <div
