@@ -172,8 +172,9 @@ export const EchoCallout: React.FC<EchoCalloutProps> = ({
   <div
     style={{
       position: 'relative',
-      background: 'var(--hcp-bg-1)',
-      border: '1px solid var(--hcp-line)',
+      background:
+        'radial-gradient(ellipse 100% 100% at 0% 0%, rgba(247,147,30,0.16), transparent 60%), var(--hcp-bg-1)',
+      border: '1px solid rgba(247,147,30,0.40)',
       borderRadius: 14,
       padding: 14,
       paddingTop: 16,
@@ -182,17 +183,6 @@ export const EchoCallout: React.FC<EchoCalloutProps> = ({
       overflow: 'hidden',
     }}
   >
-    <div
-      aria-hidden
-      style={{
-        position: 'absolute',
-        top: 0,
-        left: 0,
-        right: 0,
-        height: 2,
-        background: 'var(--hcp-amber)',
-      }}
-    />
     <div style={{ display: 'flex', gap: 12, alignItems: 'flex-start' }}>
       <div
         style={{
