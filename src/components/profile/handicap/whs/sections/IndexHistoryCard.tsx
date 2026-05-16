@@ -271,7 +271,7 @@ const RangePills: React.FC<{
             onClick={() => onChange(opt)}
             style={{
               padding: '5px 12px',
-              background: active ? 'var(--hcp-amber, #F7931E)' : 'transparent',
+              background: active ? '#FFFFFF' : 'transparent',
               color: active ? '#0A0E14' : 'var(--hcp-t-60)',
               fontFamily: FONT,
               fontSize: 11,
