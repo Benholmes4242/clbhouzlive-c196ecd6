@@ -2,6 +2,7 @@ import React from 'react';
 import { AlertTriangle } from 'lucide-react';
 import type { WhsConnection } from '@/lib/whs/types';
 import HeroHandicapCardDark from '../sections/HeroHandicapCardDark';
+import TodayGreeting from '../sections/TodayGreeting';
 import LastRoundCard from '../sections/LastRoundCard';
 import NextRoundWatch from '../sections/NextRoundWatch';
 import Pattern14Card from '../sections/Pattern14Card';
@@ -49,6 +50,8 @@ export const TodayView: React.FC<Props> = ({
           </p>
         </div>
       )}
+
+      {!readOnly && <TodayGreeting connectionId={connectionId} userId={userId} />}
 
       <HeroHandicapCardDark connection={connection} />
 
