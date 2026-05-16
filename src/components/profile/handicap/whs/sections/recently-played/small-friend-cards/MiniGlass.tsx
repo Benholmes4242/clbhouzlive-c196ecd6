@@ -13,10 +13,9 @@ interface Props {
  * Frosted glass tile inside MiniMedia — GROSS + DIFF micro-stats.
  * Returns null when both values are missing so the photo stands alone.
  */
-export const MiniGlass: React.FC<Props> = ({ gross, diffStr, isCounter = false }) => {
+export const MiniGlass: React.FC<Props> = ({ gross, diffStr: _diffStr, isCounter = false }) => {
   const hasGross = gross !== null && gross !== undefined;
-  const hasDiff = diffStr !== null;
-  if (!hasGross && !hasDiff) return null;
+  if (!hasGross) return null;
 
   return (
     <div
@@ -33,11 +32,11 @@ export const MiniGlass: React.FC<Props> = ({ gross, diffStr, isCounter = false }
         WebkitBackdropFilter: 'blur(30px) saturate(180%)',
         display: 'flex',
         alignItems: 'baseline',
-        justifyContent: 'space-between',
+        justifyContent: 'center',
         gap: 8,
       }}
     >
-      <div style={{ display: 'flex', flexDirection: 'column' }}>
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
         <span
           style={{
             fontSize: 8,
@@ -52,39 +51,9 @@ export const MiniGlass: React.FC<Props> = ({ gross, diffStr, isCounter = false }
           GROSS
         </span>
         <span
-          aria-label={`Gross score ${hasGross ? gross : ''}${isCounter ? ', counts toward index' : ''}`}
+          aria-label={`Gross score ${gross}${isCounter ? ', counts toward index' : ''}`}
         >
-          <MiniGrossRing value={hasGross ? (gross as number) : '\u2014'} isCounter={isCounter} />
-        </span>
-      </div>
-      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-        <span
-          style={{
-            fontSize: 8,
-            fontWeight: 700,
-            color: 'rgba(255,255,255,0.55)',
-            letterSpacing: '0.16em',
-            textTransform: 'uppercase',
-            marginBottom: 1,
-            lineHeight: 1,
-            textAlign: 'center',
-          }}
-        >
-          SCORE DIFF
-        </span>
-        <span
-          style={{
-            fontSize: 13,
-            fontWeight: 400,
-            color: '#F7931E',
-            fontFamily: FONT_GEIST_MONO,
-            fontVariantNumeric: 'tabular-nums',
-            letterSpacing: '-0.02em',
-            lineHeight: 1,
-            textAlign: 'center',
-          }}
-        >
-          {hasDiff ? diffStr : '\u2014'}
+          <MiniGrossRing value={gross as number} isCounter={isCounter} />
         </span>
       </div>
     </div>
