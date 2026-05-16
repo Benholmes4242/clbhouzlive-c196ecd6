@@ -87,7 +87,7 @@ export const SheetHeroGlass: React.FC<Props> = ({
         position: 'absolute',
         left: 14,
         right: 14,
-        top: 130,
+        bottom: 10,
         zIndex: 3,
         padding: '14px 16px',
         borderRadius: 16,
