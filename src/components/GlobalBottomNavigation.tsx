@@ -175,12 +175,12 @@ const GlobalBottomNavigation: React.FC<GlobalBottomNavigationProps> = ({ chromeS
               style={{
                 background: isWarmGradientRoute
                     ? 'rgba(255,253,248,0.55)'
-                    : isClubhouseRoute 
+                    : isDarkChromeRoute 
                       ? 'hsl(var(--clubhouse-bg-footer))'
                       : 'hsl(210 40% 98% / 0.95)',
                 borderTop: isWarmGradientRoute
                     ? '1px solid rgba(255,255,255,0.3)'
-                    : `0.5px solid ${isClubhouseRoute ? 'hsl(var(--clubhouse-border))' : 'hsl(215 25% 27% / 0.2)'}`,
+                    : `0.5px solid ${isDarkChromeRoute ? 'hsl(var(--clubhouse-border))' : 'hsl(215 25% 27% / 0.2)'}`,
                 backdropFilter: isWarmGradientRoute ? 'blur(24px)' : 'blur(20px)',
                 WebkitBackdropFilter: isWarmGradientRoute ? 'blur(24px)' : 'blur(20px)',
                 paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 20px)',
@@ -191,7 +191,7 @@ const GlobalBottomNavigation: React.FC<GlobalBottomNavigationProps> = ({ chromeS
                 activeTab={activeTab}
                 onTabClick={handleTabClickWithCamera}
                 onPrefetch={handleNavPrefetch}
-                variant={isClubhouseRoute ? 'clubhouse' : 'default'}
+                variant={isDarkChromeRoute ? 'clubhouse' : 'default'}
                 isDimmed={false}
                 useAmberActive={isWarmGradientRoute}
                 showBorder={false}
