@@ -73,7 +73,7 @@ export const RivalryEditSheet: React.FC<Props> = ({ userId, rivalry, slotIndex, 
   return (
     <DrawerPrimitive.Root open={open} onOpenChange={(o) => { if (!o) onClose(); }}>
       <DrawerPrimitive.Portal>
-        <DrawerPrimitive.Overlay style={{ position: 'fixed', inset: 0, background: 'rgba(15,23,42,0.5)', zIndex: 80 }} />
+        <DrawerPrimitive.Overlay style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.65)', zIndex: 80 }} />
         <DrawerPrimitive.Content
           style={{
             position: 'fixed',
@@ -140,9 +140,9 @@ export const RivalryEditSheet: React.FC<Props> = ({ userId, rivalry, slotIndex, 
                   width: '100%',
                   padding: '10px 12px',
                   borderRadius: 10,
-                  background: 'rgba(220,38,38,0.06)',
+                  background: 'var(--hcp-bad-tint)',
                   border: '1px solid rgba(220,38,38,0.20)',
-                  color: '#B91C1C',
+                  color: 'var(--hcp-bad)',
                   fontSize: 13,
                   fontWeight: 700,
                   cursor: busy ? 'wait' : 'pointer',

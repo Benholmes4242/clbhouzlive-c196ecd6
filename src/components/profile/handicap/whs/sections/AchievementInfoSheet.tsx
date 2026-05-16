@@ -98,7 +98,7 @@ export const AchievementInfoSheet: React.FC<Props> = ({ open, onClose, achieveme
           display: 'flex',
           flexDirection: 'column',
           animation: 'achInfoSlideUp 240ms cubic-bezier(0.32, 0.72, 0, 1)',
-          boxShadow: '0 -8px 30px rgba(15,23,42,0.18)',
+          boxShadow: '0 -8px 30px rgba(0,0,0,0.4)',
           fontFamily: FONT,
         }}
       >
@@ -108,7 +108,7 @@ export const AchievementInfoSheet: React.FC<Props> = ({ open, onClose, achieveme
               width: 36,
               height: 4,
               borderRadius: 2,
-              background: 'rgba(15,23,42,0.18)',
+              background: 'var(--hcp-line-3)',
             }}
           />
         </div>

@@ -9,7 +9,7 @@ interface Props {
 const INK = 'var(--hcp-t-100)';
 const INK_55 = 'var(--hcp-t-60)';
 const INK_40 = 'var(--hcp-t-40)';
-const HAIRLINE = 'rgba(15,23,42,0.16)';
+const HAIRLINE = 'var(--hcp-line-2)';
 const AMBER = '#F7931E';
 
 const FONT_GEIST =

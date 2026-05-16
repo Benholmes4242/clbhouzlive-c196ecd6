@@ -14,7 +14,7 @@ interface Props {
 }
 
 const INK = 'var(--hcp-t-100)';
-const INK_MUTE = 'rgba(15,23,42,0.6)';
+const INK_MUTE = 'var(--hcp-t-60)';
 const HAIRLINE = 'var(--hcp-line-2)';
 
 
@@ -50,7 +50,7 @@ export const RivalryInfoSheet: React.FC<Props> = ({ rivalry, open, onClose }) =>
   return (
     <DrawerPrimitive.Root open={open} onOpenChange={(o) => { if (!o) onClose(); }}>
       <DrawerPrimitive.Portal>
-        <DrawerPrimitive.Overlay style={{ position: 'fixed', inset: 0, background: 'rgba(15,23,42,0.5)', zIndex: 80 }} />
+        <DrawerPrimitive.Overlay style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.65)', zIndex: 80 }} />
         <DrawerPrimitive.Content
           style={{
             position: 'fixed',

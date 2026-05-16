@@ -19,7 +19,7 @@ const T = {
   hairline: 'var(--hcp-line-2)',
   green: '#059669',
   greenTint: 'rgba(5,150,105,0.12)',
-  greyTint: 'rgba(15,23,42,0.05)',
+  greyTint: 'var(--hcp-bg-2)',
 };
 const FONT_GEIST = 'Geist, system-ui, -apple-system, BlinkMacSystemFont, sans-serif';
 
@@ -109,7 +109,7 @@ export const SentInvitesSheet: React.FC<Props> = ({ open, onClose }) => {
             overflow: 'hidden',
             display: 'flex',
             flexDirection: 'column',
-            boxShadow: '0 -10px 40px -10px rgba(15,23,42,0.25)',
+            boxShadow: '0 -10px 40px -10px rgba(0,0,0,0.5)',
           }}
         >
           {/* Drag handle */}
@@ -123,7 +123,7 @@ export const SentInvitesSheet: React.FC<Props> = ({ open, onClose }) => {
               width: 36,
               height: 4,
               borderRadius: 2,
-              background: 'rgba(15,23,42,0.18)',
+              background: 'var(--hcp-line-3)',
             }}
           />
 

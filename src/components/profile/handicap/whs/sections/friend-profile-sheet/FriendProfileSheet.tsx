@@ -61,7 +61,7 @@ export const FriendProfileSheet: React.FC<Props> = ({
           style={{
             position: 'fixed',
             inset: 0,
-            background: 'rgba(15,23,42,0.5)',
+            background: 'rgba(0,0,0,0.65)',
             zIndex: 80,
           }}
         />
