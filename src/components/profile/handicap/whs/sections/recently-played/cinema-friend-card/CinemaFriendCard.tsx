@@ -5,7 +5,7 @@ import FlagSilhouetteOverlay from '@/components/whs/FlagSilhouetteOverlay';
 import type { WhsFriendActivityWithImage } from '@/lib/whs/types';
 import CinemaFriendEyebrow from './CinemaFriendEyebrow';
 import CinemaFriendGlass from './CinemaFriendGlass';
-import CinemaFriendActions from './CinemaFriendActions';
+
 
 const FALLBACK_GRADIENT =
   'linear-gradient(140deg, #2d3a2d 0%, #4a5d4a 25%, #6b7a5a 50%, #8a9670 72%, #c4a574 88%, #d4956b 100%)';
