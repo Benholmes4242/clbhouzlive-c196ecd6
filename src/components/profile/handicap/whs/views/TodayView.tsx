@@ -56,6 +56,8 @@ export const TodayView: React.FC<Props> = ({
 
       <Pattern14Card connectionId={connectionId} />
 
+      <IndexHistoryCard connectionId={connectionId} />
+
       <LastRoundCard connectionId={connectionId} />
 
       <RoundsThatCountCard connectionId={connectionId} currentHandicap={currentHandicap} />
