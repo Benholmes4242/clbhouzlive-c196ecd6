@@ -39,7 +39,7 @@ export const MiniGlass: React.FC<Props> = ({ gross, diffStr: _diffStr, isCounter
           color: 'rgba(255,255,255,0.65)',
           letterSpacing: '0.16em',
           textTransform: 'uppercase',
-          marginBottom: 1,
+          marginBottom: 0,
           lineHeight: 1,
         }}
       >
