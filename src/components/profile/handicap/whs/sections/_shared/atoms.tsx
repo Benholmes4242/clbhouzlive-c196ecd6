@@ -176,23 +176,12 @@ export const EchoCallout: React.FC<EchoCalloutProps> = ({
         'linear-gradient(180deg, rgba(247,147,30,0.10) 0%, transparent 60%), var(--hcp-bg-1)',
       border: '1px solid var(--hcp-line-2)',
       borderRadius: 14,
-      padding: '16px 14px 14px 17px',
+      padding: '16px 14px 14px 14px',
       marginBottom,
       fontFamily: FONT,
       overflow: 'hidden',
     }}
   >
-    <span
-      aria-hidden
-      style={{
-        position: 'absolute',
-        left: 0,
-        top: 0,
-        bottom: 0,
-        width: 3,
-        background: 'linear-gradient(180deg, var(--hcp-amber), transparent)',
-      }}
-    />
     <div style={{ display: 'flex', gap: 12, alignItems: 'flex-start' }}>
       <div
         style={{
