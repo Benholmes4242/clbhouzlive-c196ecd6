@@ -105,7 +105,6 @@ export const InviteToClbhouzV2: React.FC<Props> = ({ ownerUserId }) => {
           eyebrow="MAKE YOUR FEED LOUDER"
           title="Everyone's here"
           sub="All your England Golf friends are already on Clbhouz 🎉"
-          withDot
           right={
             sentCount > 0 ? (
               <SentBadge count={sentCount} onClick={() => setSheetOpen(true)} />
