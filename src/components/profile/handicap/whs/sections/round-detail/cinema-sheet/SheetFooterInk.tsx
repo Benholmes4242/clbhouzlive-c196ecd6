@@ -2,7 +2,7 @@ import React from 'react';
 import { ExternalLink } from 'lucide-react';
 
 const FONT_GEIST = 'Geist, system-ui, -apple-system, BlinkMacSystemFont, sans-serif';
-const FONT_MONO = "'Geist Mono', ui-monospace, SFMono-Regular, Menlo, monospace";
+const FONT_MONO = "Geist, system-ui, -apple-system, BlinkMacSystemFont, sans-serif";
 const INK = 'var(--hcp-t-100)';
 interface Props {
   label: string;

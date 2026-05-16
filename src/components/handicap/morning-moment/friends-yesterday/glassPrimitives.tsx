@@ -2,7 +2,7 @@ import React from 'react';
 import { splitCourseName } from '@/components/profile/handicap/whs/sections/last-round-card/splitCourseName';
 
 const FONT_GEIST = 'Geist, system-ui, -apple-system, BlinkMacSystemFont, sans-serif';
-const FONT_MONO = "'Geist Mono', ui-monospace, SFMono-Regular, Menlo, monospace";
+const FONT_MONO = "Geist, system-ui, -apple-system, BlinkMacSystemFont, sans-serif";
 
 export const HAIR: React.CSSProperties = {
   height: 0,

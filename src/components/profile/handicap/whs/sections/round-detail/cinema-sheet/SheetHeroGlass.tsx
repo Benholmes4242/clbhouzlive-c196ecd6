@@ -5,7 +5,7 @@ import CinemaCardShapeStrip from '../../last-round-card/CinemaCardShapeStrip';
 import { GlassGrossRing } from '../../shared/GrossCounterRing';
 
 const FONT_GEIST = 'Geist, system-ui, -apple-system, BlinkMacSystemFont, sans-serif';
-const FONT_MONO = "'Geist Mono', ui-monospace, SFMono-Regular, Menlo, monospace";
+const FONT_MONO = "Geist, system-ui, -apple-system, BlinkMacSystemFont, sans-serif";
 const AMBER = '#F7931E';
 const MINUS = '\u2212';
 const EM_DASH = '\u2014';
