@@ -137,6 +137,7 @@ export const SentInvitesSheet: React.FC<Props> = ({ open, onClose }) => {
             title="Sent invites"
             sub="Tap a pending invite to share it again."
             onClose={onClose}
+            dark
           />
 
           <div
