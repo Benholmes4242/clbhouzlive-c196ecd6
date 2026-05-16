@@ -334,6 +334,7 @@ const CourseRow: React.FC<{
               background: 'var(--hcp-bg-3)',
               borderRadius: 4,
               fontVariantNumeric: 'tabular-nums',
+              textShadow: view === 'most_played' ? 'none' : glowFor(course.delta),
               letterSpacing: '-0.005em',
             }}
           >
