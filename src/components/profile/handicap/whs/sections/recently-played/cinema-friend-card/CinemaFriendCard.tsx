@@ -114,14 +114,6 @@ export const CinemaFriendCard: React.FC<Props> = ({ activity, onClick }) => {
         </div>
       </div>
     </div>
-
-      {/* Bottom actions */}
-      <CinemaFriendActions
-        scoreId={activity.last_round_score_id}
-        reactionCount={activity.reaction_count}
-        viewerHasReacted={activity.viewer_has_reacted}
-      />
-    </div>
   );
 };
 
