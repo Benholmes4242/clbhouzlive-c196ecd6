@@ -40,7 +40,7 @@ export const CinemaCardMedia: React.FC<Props> = ({
   const showCounter = isCounter && counterRank != null;
 
   return (
-    <div style={{ position: 'relative', height: 320, overflow: 'hidden' }}>
+    <div style={{ position: 'relative', height: 280, overflow: 'hidden' }}>
       {/* z=0 image / fallback */}
       <div
         style={{
@@ -73,21 +73,9 @@ export const CinemaCardMedia: React.FC<Props> = ({
         }}
       >
         <div>
-          <div
-            style={{
-              fontSize: 11,
-              fontWeight: 700,
-              color: AMBER,
-              letterSpacing: '0.18em',
-              textTransform: 'uppercase',
-            }}
-          >
-            LAST ROUND
-          </div>
           {dateLabel && (
             <div
               style={{
-                marginTop: 5,
                 fontSize: 12,
                 fontWeight: 600,
                 color: 'rgba(255,255,255,0.85)',

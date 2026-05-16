@@ -34,47 +34,6 @@ export const CinemaCardOnPhotoFooter: React.FC<Props> = (props) => {
 
   return (
     <>
-      {/* bottom-left status stack */}
-      <div
-        style={{
-          position: 'absolute',
-          left: 14,
-          bottom: 14,
-          zIndex: 3,
-          display: 'flex',
-          flexDirection: 'column',
-          gap: 2,
-          fontFamily: FONT_GEIST,
-          pointerEvents: 'none',
-          maxWidth: 'calc(100% - 150px)',
-        }}
-      >
-        <span
-          style={{
-            fontSize: 10,
-            fontWeight: 700,
-            color: 'rgba(255,255,255,0.55)',
-            letterSpacing: '0.16em',
-            textTransform: 'uppercase',
-            textShadow: TEXT_SHADOW,
-            lineHeight: 1.1,
-          }}
-        >
-          VS EXPECTED
-        </span>
-        <span
-          style={{
-            fontSize: 12,
-            fontWeight: 600,
-            color: status.color,
-            textShadow: TEXT_SHADOW,
-            lineHeight: 1.2,
-          }}
-        >
-          {status.text}
-        </span>
-      </div>
-
       {/* bottom-right SCORECARD pill */}
       <div
         style={{
