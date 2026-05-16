@@ -44,7 +44,7 @@ const Pattern14Card: React.FC<Props> = ({ connectionId }) => {
 
   return (
     <>
-      <DarkSectionHeader eyebrow="● LAST 14 ROUNDS" right="DIFF VS HCP" />
+      <DarkSectionHeader eyebrow="LAST 14 ROUNDS" right="DIFF VS HCP" />
       <DarkCard>
         <div style={{ padding: '14px 16px 16px', fontFamily: FONT }}>
           {/* Inner header */}
@@ -103,12 +103,12 @@ const Pattern14Card: React.FC<Props> = ({ connectionId }) => {
           {olderRounds.length > 0 && (
             <div
               style={{
-                marginTop: 14,
+                marginTop: 16,
                 paddingTop: 12,
                 borderTop: '1px solid var(--hcp-line)',
                 display: 'flex',
                 alignItems: 'center',
-                gap: 10,
+                gap: 16,
               }}
             >
               <span
@@ -126,18 +126,18 @@ const Pattern14Card: React.FC<Props> = ({ connectionId }) => {
               </span>
               <div
                 style={{
-                  flex: 1,
-                  display: 'grid',
-                  gridTemplateColumns: `repeat(${olderRounds.length}, 1fr)`,
+                  display: 'flex',
                   gap: 4,
+                  flex: '0 0 auto',
                 }}
               >
                 {olderRounds.map((r) => (
-                  <PatternSquare key={r.id} delta={r.delta} faded />
+                  <PatternSquare key={r.id} delta={r.delta} faded size={18} />
                 ))}
               </div>
               <span
                 style={{
+                  marginLeft: 'auto',
                   fontSize: 9.5,
                   letterSpacing: '0.14em',
                   textTransform: 'uppercase',
@@ -157,16 +157,18 @@ const Pattern14Card: React.FC<Props> = ({ connectionId }) => {
   );
 };
 
-const PatternSquare: React.FC<{ delta: number | null; faded?: boolean }> = ({
+const PatternSquare: React.FC<{ delta: number | null; faded?: boolean; size?: number }> = ({
   delta,
   faded,
+  size,
 }) => {
   const { bg } = colorForDelta(delta);
   return (
     <div
       style={{
-        aspectRatio: '1 / 1',
-        width: '100%',
+        width: size ?? '100%',
+        height: size,
+        aspectRatio: size ? undefined : '1 / 1',
         background: bg,
         borderRadius: 4,
         opacity: faded ? 0.45 : 1,
