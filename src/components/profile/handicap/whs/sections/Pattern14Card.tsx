@@ -44,7 +44,7 @@ const Pattern14Card: React.FC<Props> = ({ connectionId }) => {
 
   return (
     <>
-      <DarkSectionHeader eyebrow="LAST 14 ROUNDS" right="DIFF VS HCP" />
+      <DarkSectionHeader eyebrow="Last 14 Rounds" right="SCORE DIFF VS HCP" noDot />
       <DarkCard>
         <div style={{ padding: '14px 16px 16px', fontFamily: FONT }}>
           {/* Inner header */}

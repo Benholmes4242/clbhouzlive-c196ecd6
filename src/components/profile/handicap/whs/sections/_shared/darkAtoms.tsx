@@ -48,6 +48,8 @@ export interface DarkSectionHeaderProps {
   title?: React.ReactNode;
   sub?: string;
   right?: React.ReactNode;
+  /** Suppress the amber bullet rendered via .hcp-eyebrow::before */
+  noDot?: boolean;
 }
 
 export const DarkSectionHeader: React.FC<DarkSectionHeaderProps> = ({
@@ -55,6 +57,7 @@ export const DarkSectionHeader: React.FC<DarkSectionHeaderProps> = ({
   title,
   sub,
   right,
+  noDot = false,
 }) => (
   <>
     <div
@@ -66,7 +69,18 @@ export const DarkSectionHeader: React.FC<DarkSectionHeaderProps> = ({
         fontFamily: FONT,
       }}
     >
-      <span className="hcp-eyebrow">{eyebrow}</span>
+      <span
+        className={noDot ? undefined : 'hcp-eyebrow'}
+        style={noDot ? {
+          textTransform: 'uppercase',
+          fontSize: 10.5,
+          letterSpacing: '0.16em',
+          fontWeight: 700,
+          color: 'var(--hcp-t-60)',
+        } : undefined}
+      >
+        {eyebrow}
+      </span>
       {right && (
         <span
           style={{
