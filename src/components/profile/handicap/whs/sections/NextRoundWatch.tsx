@@ -247,16 +247,6 @@ const NextRoundWatch: React.FC<Props> = ({ connectionId, currentHandicap }) => {
                 {last5Avg.toFixed(1)}
               </span>
             </span>
-            <span
-              style={{
-                color: isBeatingTarget ? 'var(--hcp-good)' : 'var(--hcp-amber)',
-                fontWeight: 600,
-              }}
-            >
-              {isBeatingTarget
-                ? `${(target - last5Avg).toFixed(1)} below target`
-                : `${(last5Avg - target).toFixed(1)} above target`}
-            </span>
           </div>
         )}
       </DarkCard>
