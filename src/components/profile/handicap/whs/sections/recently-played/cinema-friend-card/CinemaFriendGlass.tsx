@@ -99,7 +99,7 @@ export const CinemaFriendGlass: React.FC<Props> = ({
             display: 'inline-flex',
             alignItems: 'center',
             gap: 4,
-            padding: '5px 10px',
+            padding: '3px 8px',
             borderRadius: 999,
             background: 'rgba(255,255,255,0.10)',
             border: '0.5px solid rgba(255,255,255,0.25)',
