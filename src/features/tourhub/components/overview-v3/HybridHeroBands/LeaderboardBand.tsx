@@ -119,7 +119,7 @@ export function LeaderboardBand({
           {chasers.map((e, i) => (
             <ChaserRow
               key={i}
-              rank={String(e.position)}
+              rank={formatRank(e)}
               name={entryName(e)}
               country={entryCountry(e)}
               score={fmtScore(e.score)}
@@ -148,7 +148,7 @@ export function LeaderboardBand({
           {chasers.map((e, i) => (
             <ChaserRow
               key={i}
-              rank={String(e.position)}
+              rank={formatRank(e)}
               name={entryName(e)}
               country={entryCountry(e)}
               score={fmtScore(e.score)}
@@ -178,7 +178,7 @@ export function LeaderboardBand({
         .filter(e => (e?.score ?? 0) !== tiedScore)
         .slice(0, 4)
         .map(e => ({
-          rank: String(e.position),
+          rank: formatRank(e),
           name: entryName(e),
           score: fmtScore(e.score),
           avatarUrl: entryAvatar(e),
@@ -205,7 +205,7 @@ export function LeaderboardBand({
             return (
               <TeamFinishRow
                 key={i}
-                rank={String(e?.position ?? i + 1)}
+                rank={e?.position != null ? formatRank(e) : String(i + 1)}
                 teamName={teamName}
                 teamColor={null}
                 teamCrestUrl={null}
@@ -245,7 +245,7 @@ export function LeaderboardBand({
           {rest.map((e, i) => (
             <ChaserRow
               key={i}
-              rank={String(e.position)}
+              rank={formatRank(e)}
               name={entryName(e)}
               country={entryCountry(e)}
               score={fmtScore(e.score)}
