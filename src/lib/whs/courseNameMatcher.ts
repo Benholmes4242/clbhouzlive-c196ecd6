@@ -13,7 +13,12 @@
 
 import { supabase } from '@/integrations/supabase/client';
 
-type GolfCourseLite = { id: string; name: string; thumbnail_image: string | null };
+type GolfCourseLite = {
+  id: string;
+  name: string;
+  thumbnail_image: string | null;
+  region: string | null;
+};
 type MatchMethod = 'cache' | 'exact' | 'normalised' | 'dash' | 'suffix' | 'fuzzy';
 
 const COMMON_SUFFIXES = [
@@ -97,7 +102,7 @@ export async function resolveCourseFromWhsName(
   // 1. Cache hit?
   const { data: aliasHit } = await supabase
     .from('whs_course_aliases')
-    .select('course_id, golf_courses!whs_course_aliases_course_id_fkey(id, name, thumbnail_image)')
+    .select('course_id, golf_courses!whs_course_aliases_course_id_fkey(id, name, thumbnail_image, region)')
     .eq('whs_name_norm', norm)
     .maybeSingle();
 
@@ -109,7 +114,7 @@ export async function resolveCourseFromWhsName(
   {
     const { data } = await supabase
       .from('golf_courses')
-      .select('id, name, thumbnail_image')
+      .select('id, name, thumbnail_image, region')
       .ilike('name', whsName.trim())
       .maybeSingle();
     if (data) {
@@ -123,7 +128,7 @@ export async function resolveCourseFromWhsName(
   if (baseWords.length >= 3) {
     const { data: candidates } = await supabase
       .from('golf_courses')
-      .select('id, name, thumbnail_image')
+      .select('id, name, thumbnail_image, region')
       .ilike('name', `%${baseWords}%`)
       .limit(20);
 
@@ -149,7 +154,7 @@ export async function resolveCourseFromWhsName(
     if (variant === whsName.trim()) continue;
     const { data } = await supabase
       .from('golf_courses')
-      .select('id, name, thumbnail_image')
+      .select('id, name, thumbnail_image, region')
       .ilike('name', variant)
       .maybeSingle();
     if (data) {
@@ -165,7 +170,7 @@ export async function resolveCourseFromWhsName(
     const suffixCore = suffix.replace(/\s*course\s*$/i, '').trim();
     const { data } = await supabase
       .from('golf_courses')
-      .select('id, name, thumbnail_image')
+      .select('id, name, thumbnail_image, region')
       .ilike('name', `${base.trim()}%${suffixCore}%`)
       .limit(1);
     if (data && data.length > 0) {
@@ -182,4 +187,15 @@ export async function resolveCourseFromWhsName(
 export async function lookupCourseThumbnailV2(whsName: string): Promise<string | null> {
   const course = await resolveCourseFromWhsName(whsName);
   return course?.thumbnail_image ?? null;
+}
+
+/** Returns `{ thumbnail_image, region }` from the matched `golf_courses` row.
+ *  Used by `fetchCourseForm` so we don't re-resolve the course twice (once for thumb,
+ *  once for region). Null on miss. */
+export async function lookupCourseMetaV2(
+  whsName: string,
+): Promise<{ thumbnail_image: string | null; region: string | null } | null> {
+  const course = await resolveCourseFromWhsName(whsName);
+  if (!course) return null;
+  return { thumbnail_image: course.thumbnail_image, region: course.region };
 }

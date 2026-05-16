@@ -538,19 +538,19 @@ export async function fetchCourseForm(
     });
   }
 
-  // Second pass: enrich with course thumbnails. Same parallel-fan-out
-  // pattern used by fetchAllScores / fetchFriendsActivity.
+  // Second pass: enrich with course thumbnail + region in a single matcher hit.
   const uniqueNames = Array.from(new Set(baseRows.map((r) => r.course_name)));
-  const thumbsByName: Record<string, string | null> = {};
+  const metaByName: Record<string, { thumbnail_image: string | null; region: string | null } | null> = {};
   await Promise.all(
     uniqueNames.map(async (name) => {
-      thumbsByName[name.toLowerCase()] = await lookupCourseThumbnail(name);
+      metaByName[name.toLowerCase()] = await lookupCourseMetaV2(name);
     }),
   );
 
   const result: CourseForm[] = baseRows.map((r) => ({
     ...r,
-    course_thumbnail_image: thumbsByName[r.course_name.toLowerCase()] ?? null,
+    course_thumbnail_image: metaByName[r.course_name.toLowerCase()]?.thumbnail_image ?? null,
+    course_region: metaByName[r.course_name.toLowerCase()]?.region ?? null,
   }));
   return result.sort((a, b) => a.delta - b.delta);
 }
@@ -730,6 +730,13 @@ export async function callDeleteWhsData(): Promise<{ ok: boolean; message?: stri
 async function lookupCourseThumbnail(whsName: string): Promise<string | null> {
   const { lookupCourseThumbnailV2 } = await import('./courseNameMatcher');
   return lookupCourseThumbnailV2(whsName);
+}
+
+async function lookupCourseMetaV2(
+  whsName: string,
+): Promise<{ thumbnail_image: string | null; region: string | null } | null> {
+  const { lookupCourseMetaV2: impl } = await import('./courseNameMatcher');
+  return impl(whsName);
 }
 
 // ─── Phase 0 (Friends Tab Redesign): Featured round + rivalries fetchers ──

@@ -195,6 +195,10 @@ export interface Achievement {
 export interface CourseForm {
   course_id: string;
   course_name: string;
+  /** Region label from `golf_courses.region`. Used in the Course Form row to show
+   *  course location below the name (e.g. "Sandwich, Kent"). Null when the course
+   *  wasn't resolved to a `golf_courses` row or has no region populated. */
+  course_region: string | null;
   rounds_played: number;
   avg_differential: number;
   expected_differential: number;
