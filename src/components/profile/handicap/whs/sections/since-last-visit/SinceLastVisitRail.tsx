@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import { ChevronRight } from 'lucide-react';
 import SectionHeader from '../SectionHeader';
+import { DarkSectionHeader } from '../_shared/darkAtoms';
 import { useFriendRoundsSinceLastVisit, useMarkTodayVisited } from '@/lib/whs/hooks';
 import { firstName, initials } from '@/lib/whs/utils/initials';
 import { fmtRelative } from '@/lib/whs/utils/nameFormat';
