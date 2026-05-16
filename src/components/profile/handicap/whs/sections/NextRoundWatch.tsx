@@ -202,7 +202,7 @@ const NextRoundWatch: React.FC<Props> = ({ connectionId, currentHandicap }) => {
             borderRight
           />
           <InnerCell
-            eyebrow="Otherwise you'll stay at"
+            eyebrow="Otherwise, stay at"
             eyebrowIcon={<Minus size={11} strokeWidth={2.6} />}
             eyebrowColor="var(--hcp-t-60)"
             value={settle.toFixed(1)}
