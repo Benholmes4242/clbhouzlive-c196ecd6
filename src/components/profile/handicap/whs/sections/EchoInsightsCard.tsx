@@ -229,10 +229,10 @@ export const EchoInsightsCard: React.FC<Props> = ({ connectionId }) => {
   return (
     <section
       style={{
-        background:
-          'linear-gradient(180deg, rgba(247,147,30,0.06) 0%, rgba(247,147,30,0) 60%)',
         padding: '32px 0 0',
         marginTop: 8,
+        position: 'relative',
+        overflow: 'hidden',
       }}
     >
       <style>{`
@@ -240,6 +240,42 @@ export const EchoInsightsCard: React.FC<Props> = ({ connectionId }) => {
           0%, 100% { opacity: 1; }
           50% { opacity: 0.55; }
         }
+        @keyframes echoSparkleFloat {
+          0%, 100% { opacity: 0; transform: translate(0, 0) scale(0.5); }
+          20% { opacity: 1; transform: translate(8px, -6px) scale(1); }
+          50% { opacity: 0.8; transform: translate(20px, 4px) scale(1.2); }
+          80% { opacity: 0.4; transform: translate(35px, -2px) scale(0.8); }
+        }
+        .echoPlume {
+          position: absolute;
+          left: 0;
+          right: 0;
+          top: 0;
+          bottom: 0;
+          pointer-events: none;
+          background: radial-gradient(
+            ellipse 320px 200px at 0% 55%,
+            rgba(247,147,30,0.28) 0%,
+            rgba(247,147,30,0.10) 30%,
+            transparent 65%
+          );
+          z-index: 0;
+        }
+        .echoSparkle {
+          position: absolute;
+          width: 3px;
+          height: 3px;
+          border-radius: 50%;
+          background: #FFE5B0;
+          box-shadow: 0 0 4px rgba(255,229,176,0.9), 0 0 10px rgba(247,147,30,0.5);
+          pointer-events: none;
+          z-index: 0;
+        }
+        .echoSparkle.s1 { top: 48%; left: 20px;  animation: echoSparkleFloat 5s ease-in-out infinite; }
+        .echoSparkle.s2 { top: 58%; left: 60px;  animation: echoSparkleFloat 6.5s ease-in-out infinite 1s; }
+        .echoSparkle.s3 { top: 52%; left: 110px; animation: echoSparkleFloat 7s ease-in-out infinite 2.5s; }
+        .echoSparkle.s4 { top: 46%; left: 160px; animation: echoSparkleFloat 8s ease-in-out infinite 0.5s; }
+        .echoSparkle.s5 { top: 60%; left: 200px; animation: echoSparkleFloat 5.5s ease-in-out infinite 3s; }
         .insightsCarousel {
           display: flex;
           gap: 10px;
@@ -251,6 +287,14 @@ export const EchoInsightsCard: React.FC<Props> = ({ connectionId }) => {
         .insightsCarousel::-webkit-scrollbar { display: none; }
       `}</style>
 
+      {/* Background plume — amber radial glow + drifting sparkles. Sits behind all content. */}
+      <div className="echoPlume" aria-hidden="true" />
+      <span className="echoSparkle s1" aria-hidden="true" />
+      <span className="echoSparkle s2" aria-hidden="true" />
+      <span className="echoSparkle s3" aria-hidden="true" />
+      <span className="echoSparkle s4" aria-hidden="true" />
+      <span className="echoSparkle s5" aria-hidden="true" />
+
       {error && (
         <div style={{ padding: '0 20px 12px', fontSize: 11, color: 'var(--hcp-t-60)' }}>
           Couldn't generate insights right now.
@@ -258,7 +302,7 @@ export const EchoInsightsCard: React.FC<Props> = ({ connectionId }) => {
       )}
 
       {/* Suited */}
-      <div>
+      <div style={{ position: 'relative', zIndex: 1 }}>
         <SectionHeader
           eyebrow="SUITED TO YOUR GAME"
           title="Three courses for posting low scores"
@@ -288,7 +332,7 @@ export const EchoInsightsCard: React.FC<Props> = ({ connectionId }) => {
       </div>
 
       {/* Test yourself */}
-      <div style={{ marginTop: 16 }}>
+      <div style={{ marginTop: 16, position: 'relative', zIndex: 1 }}>
         <SectionHeader
           eyebrow="TEST YOURSELF"
           title="Three courses to grow your game"
