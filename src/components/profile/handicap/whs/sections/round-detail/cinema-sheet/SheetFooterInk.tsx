@@ -149,7 +149,7 @@ export const FooterPill: React.FC<{
     );
   }
   return (
-    <button onClick={onClick} style={{ ...style, border: 'none', borderTop: '0', borderRight: '0', borderBottom: '0', borderLeft: '0', borderWidth: '0.5px', borderStyle: 'solid', borderColor: 'rgba(255,255,255,0.25)' }}>
+    <button onClick={onClick} style={style}>
       {inner}
     </button>
   );
