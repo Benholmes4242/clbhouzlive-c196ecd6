@@ -28,7 +28,7 @@ const HAIR: React.CSSProperties = {
 };
 
 const labelStyle: React.CSSProperties = {
-  fontSize: 8,
+  fontSize: 10,
   fontWeight: 700,
   color: 'rgba(255,255,255,0.55)',
   letterSpacing: '0.16em',
@@ -37,7 +37,7 @@ const labelStyle: React.CSSProperties = {
 };
 
 const valueStyle = (color: string): React.CSSProperties => ({
-  fontSize: 19,
+  fontSize: 22,
   fontWeight: 300,
   color,
   fontFamily: FONT_MONO,
@@ -85,7 +85,7 @@ export const CinemaFriendGlass: React.FC<Props> = ({
       <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 10 }}>
         <div
           style={{
-            fontSize: 12,
+            fontSize: 14,
             fontWeight: 700,
             color: '#FFFFFF',
             letterSpacing: '-0.02em',
@@ -108,7 +108,7 @@ export const CinemaFriendGlass: React.FC<Props> = ({
             borderRadius: 999,
             background: 'rgba(255,255,255,0.10)',
             border: '0.5px solid rgba(255,255,255,0.25)',
-            fontSize: 8,
+            fontSize: 10,
             fontWeight: 700,
             letterSpacing: '0.10em',
             color: '#FFFFFF',
@@ -118,14 +118,14 @@ export const CinemaFriendGlass: React.FC<Props> = ({
           }}
         >
           SCORECARD
-          <span style={{ fontSize: 8, opacity: 0.7 }}>{'\u203A'}</span>
+          <span style={{ fontSize: 10, opacity: 0.7 }}>{'\u203A'}</span>
         </span>
       </div>
       {meta && (
         <div
           style={{
             marginTop: 1,
-            fontSize: 8,
+            fontSize: 10,
             fontWeight: 600,
             color: 'rgba(255,255,255,0.60)',
             letterSpacing: '0.06em',
@@ -148,7 +148,7 @@ export const CinemaFriendGlass: React.FC<Props> = ({
             <GlassGrossRing
               value={gross != null ? gross : EM_DASH}
               isCounter={isCounter}
-              numeralSize={19}
+              numeralSize={22}
             />
           </div>
         </div>
