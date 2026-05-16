@@ -121,7 +121,7 @@ const TodayGreeting: React.FC<Props> = ({ connectionId, userId }) => {
         {firstName ? <>, <span>{firstName}</span></> : null}
       </div>
 
-      {showMeta && weather && homeCourseName && (
+      {showMeta && homeCourseName && (
         <div
           style={{
             marginTop: 6,
@@ -137,28 +137,32 @@ const TodayGreeting: React.FC<Props> = ({ connectionId, userId }) => {
           }}
         >
           <span style={{ color: 'var(--hcp-t-60)' }}>{homeCourseName}</span>
-          <span>·</span>
-          <span style={{ color: '#F7931E', fontSize: 13, lineHeight: 1 }}>
-            {weatherGlyph(weather.code)}
-          </span>
-          <span style={{ color: 'var(--hcp-t-100)', fontVariantNumeric: 'tabular-nums' }}>
-            {Math.round(weather.tempNow)}°
-          </span>
-          {weather.tempMax != null && (
+          {weather && (
             <>
               <span>·</span>
-              <span>
-                peak{' '}
-                <span style={{ color: 'var(--hcp-t-100)', fontVariantNumeric: 'tabular-nums' }}>
-                  {Math.round(weather.tempMax)}°
-                </span>
+              <span style={{ color: '#F7931E', fontSize: 13, lineHeight: 1 }}>
+                {weatherGlyph(weather.code)}
               </span>
-            </>
-          )}
-          {weather.windWord && (
-            <>
-              <span>·</span>
-              <span>{weather.windWord}</span>
+              <span style={{ color: 'var(--hcp-t-100)', fontVariantNumeric: 'tabular-nums' }}>
+                {Math.round(weather.tempNow)}°
+              </span>
+              {weather.tempMax != null && (
+                <>
+                  <span>·</span>
+                  <span>
+                    peak{' '}
+                    <span style={{ color: 'var(--hcp-t-100)', fontVariantNumeric: 'tabular-nums' }}>
+                      {Math.round(weather.tempMax)}°
+                    </span>
+                  </span>
+                </>
+              )}
+              {weather.windWord && (
+                <>
+                  <span>·</span>
+                  <span>{weather.windWord}</span>
+                </>
+              )}
             </>
           )}
         </div>
