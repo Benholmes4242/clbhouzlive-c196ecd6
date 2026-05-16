@@ -105,61 +105,55 @@ export function LeaderboardBand({
   let body: React.ReactNode = null;
 
   if (state.kind === 'live') {
-    if (tiedLeaders) {
-      const firstChaser = leaderboard.findIndex(e => (e?.score ?? e?.total) !== leaderboard[0]?.score);
-      const chasers = firstChaser >= 0 ? leaderboard.slice(firstChaser, firstChaser + 3) : leaderboard.slice(tiedLeaders.count, tiedLeaders.count + 3);
-      const tiedScore = leaderboard[0]?.score;
-      const tiedPlayers = leaderboard
-        .filter(e => (e?.score ?? e?.total) === tiedScore)
-        .slice(0, tiedLeaders.count)
-        .map(e => ({ avatarUrl: entryAvatar(e) }));
-      body = (
-        <>
-          <TiedLeadersRow count={tiedLeaders.count} score={tiedLeaders.score} players={tiedPlayers} />
-          {chasers.map((e, i) => (
+    const rows = buildLeaderboardRows(leaderboard, 4);
+    body = (
+      <>
+        {rows.map((row, i) => {
+          const isLast = i === rows.length - 1;
+          if (row.kind === 'tied') {
+            const isChampion = row.position === 1;
+            return (
+              <TiedGroupRow
+                key={`tied-${row.position}-${i}`}
+                rank={`T${row.position}`}
+                count={row.count}
+                score={fmtScore(row.sharedScore)}
+                players={row.entries.slice(0, 3).map(e => ({ avatarUrl: entryAvatar(e) }))}
+                isChampion={isChampion}
+                isLast={isLast}
+              />
+            );
+          }
+          const e = row.entry;
+          if (i === 0 && row.position === 1) {
+            return (
+              <SoloLeaderRow
+                key={`solo-${i}`}
+                rank={String(e.position ?? 1)}
+                name={entryName(e)}
+                country={entryCountry(e)}
+                score={fmtScore(e.score)}
+                thru={entryThru(e)}
+                avatarUrl={entryAvatar(e)}
+                isLast={isLast}
+              />
+            );
+          }
+          return (
             <ChaserRow
-              key={i}
+              key={`chaser-${i}`}
               rank={formatRank(e)}
               name={entryName(e)}
               country={entryCountry(e)}
               score={fmtScore(e.score)}
               thru={entryThru(e)}
               avatarUrl={entryAvatar(e)}
-              isLast={i === chasers.length - 1}
+              isLast={isLast}
             />
-          ))}
-        </>
-      );
-    } else {
-      const leader = leaderboard[0];
-      const chasers = leaderboard.slice(1, 4);
-      body = (
-        <>
-          {leader && (
-            <SoloLeaderRow
-              rank={String(leader.position ?? 1)}
-              name={entryName(leader)}
-              country={entryCountry(leader)}
-              score={fmtScore(leader.score)}
-              thru={entryThru(leader)}
-              avatarUrl={entryAvatar(leader)}
-            />
-          )}
-          {chasers.map((e, i) => (
-            <ChaserRow
-              key={i}
-              rank={formatRank(e)}
-              name={entryName(e)}
-              country={entryCountry(e)}
-              score={fmtScore(e.score)}
-              thru={entryThru(e)}
-              avatarUrl={entryAvatar(e)}
-              isLast={i === chasers.length - 1}
-            />
-          ))}
-        </>
-      );
-    }
+          );
+        })}
+      </>
+    );
   } else if (state.kind === 'results') {
     if (state.variant === 'cancelled') {
       body = <CancelledPanel reason={cancelReason} />;
