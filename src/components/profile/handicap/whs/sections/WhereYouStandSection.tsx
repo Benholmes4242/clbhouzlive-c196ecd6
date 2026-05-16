@@ -153,7 +153,7 @@ const DistributionChart: React.FC<{
             const heightPct = (b.pct / (maxPct * 1.1)) * 100;
             const isEmpty = b.pct === 0;
             const barBg = isUser
-              ? `linear-gradient(180deg, #FBBF24 0%, #F59E0B 100%)`
+              ? AMBER
               : isMedian
                 ? `linear-gradient(180deg, rgba(255,255,255,0.18), rgba(255,255,255,0.08))`
                 : `linear-gradient(180deg, rgba(255,255,255,0.08), rgba(255,255,255,0.03))`;
