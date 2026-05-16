@@ -83,7 +83,7 @@ const TodayGreeting: React.FC<Props> = ({ connectionId, userId }) => {
       const { data, error } = await (supabase as any)
         .from('golf_courses')
         .select('latitude, longitude')
-        .eq('name', homeCourseName)
+        .ilike('name', homeCourseName)
         .not('latitude', 'is', null)
         .not('longitude', 'is', null)
         .limit(1)
