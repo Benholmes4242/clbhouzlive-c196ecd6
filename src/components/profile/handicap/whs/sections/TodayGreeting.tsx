@@ -175,7 +175,9 @@ const TodayGreeting: React.FC<Props> = ({ connectionId, userId }) => {
             color: 'var(--hcp-t-60)',
           }}
         >
-          <span style={{ color: 'var(--hcp-t-60)' }}>{homeCourseName}</span>
+          <span style={{ color: 'var(--hcp-t-60)' }}>
+            {cleanCourseDisplay(courseLookup?.canonicalName ?? homeCourseName)}
+          </span>
           {weather && (
             <>
               <span>·</span>
