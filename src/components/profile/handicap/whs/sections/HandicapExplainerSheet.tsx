@@ -120,6 +120,7 @@ const HandicapExplainerSheet: React.FC<Props> = ({
           sub="The system is more forgiving than people think — here's why."
           onClose={onClose}
           borderBottom={false}
+          dark
         />
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: 22, padding: '8px 16px 0' }}>
