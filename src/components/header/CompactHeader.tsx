@@ -268,14 +268,14 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
               className={cn(
                 "p-0 flex items-center justify-center rounded-full active:scale-[0.94] transition-all",
                 "h-11 w-11",
-                isHandicapRoute
+                isDarkChrome
                   ? "text-white"
                   : useLightTheme
                     ? "text-muted-foreground"
                     : "hover:bg-[hsl(var(--clubhouse-active-bg))]"
               )}
               style={{ 
-                color: isHandicapRoute
+                color: isDarkChrome
                   ? 'var(--hcp-t-100)'
                   : useLightTheme 
                     ? undefined 
