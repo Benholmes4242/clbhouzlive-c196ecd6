@@ -71,7 +71,7 @@ export const RivalriesSection: React.FC<Props> = ({ userId }) => {
                 gap: 4,
                 padding: '4px 10px',
                 background: 'transparent',
-                border: '1px solid rgba(15,23,42,0.12)',
+                border: '1px solid var(--hcp-line-2)',
                 borderRadius: 999,
                 cursor: 'pointer',
                 color: 'var(--hcp-t-80)',
