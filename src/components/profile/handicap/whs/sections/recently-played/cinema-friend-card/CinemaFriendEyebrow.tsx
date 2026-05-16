@@ -69,7 +69,7 @@ export const CinemaFriendEyebrow: React.FC<Props> = ({ activity }) => {
           <p
             style={{
               margin: 0,
-              fontSize: 16,
+              fontSize: 13,
               fontWeight: 700,
               color: '#FFFFFF',
               letterSpacing: '-0.015em',
