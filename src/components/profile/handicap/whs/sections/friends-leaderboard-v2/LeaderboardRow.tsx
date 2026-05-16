@@ -36,6 +36,18 @@ const T = {
   greenDeep: '#15803D',
   red: '#9F1339',
   redDeep: '#991B1B',
+  /** Medal palette — matches Course Form T9.7 */
+  gold: '#FBBC2E',
+  silver: '#C0C5CF',
+  bronze: '#C97D45',
+};
+
+/** Medal color for top-3 ranks. Anything below 3 returns null. */
+const medalColor = (rank: number | null): string | null => {
+  if (rank === 1) return T.gold;
+  if (rank === 2) return T.silver;
+  if (rank === 3) return T.bronze;
+  return null;
 };
 
 const fmtRel = (iso: string | null) => fmtRelative(iso, { compact: true });
@@ -78,6 +90,7 @@ export const LeaderboardRow: React.FC<Props> = ({
       role={onClick ? undefined : 'listitem'}
       aria-label={`${displayName}${rank != null ? `, ranked ${rank}` : ''}, handicap ${fmtHcp(hcp)}${isStaleRow ? ', stale' : ''}`}
       style={{
+        position: 'relative',
         display: 'flex',
         alignItems: 'center',
         width: 'calc(100% - 40px)',
@@ -95,6 +108,20 @@ export const LeaderboardRow: React.FC<Props> = ({
         color: 'inherit',
       }}
     >
+      {isYou && (
+        <span
+          aria-hidden
+          style={{
+            position: 'absolute',
+            left: -20,
+            top: 0,
+            bottom: 0,
+            width: 3,
+            background: 'linear-gradient(180deg, #FBBC2E, transparent)',
+            pointerEvents: 'none',
+          }}
+        />
+      )}
       {/* Rank */}
       <div
         style={{
@@ -103,7 +130,7 @@ export const LeaderboardRow: React.FC<Props> = ({
           flexShrink: 0,
           fontSize: 12,
           fontWeight: 700,
-          color: rank != null && rank <= 3 ? T.amberDeep : T.inkMute,
+          color: medalColor(rank) ?? T.inkMute,
           fontVariantNumeric: 'tabular-nums',
         }}
       >
@@ -243,9 +270,12 @@ export const LeaderboardRow: React.FC<Props> = ({
           style={{
             fontSize: 15,
             fontWeight: 700,
-            color: isPlusHandicap ? T.amberInk : T.ink,
+            color: isPlusHandicap ? T.amber : T.ink,
             fontVariantNumeric: 'tabular-nums',
             letterSpacing: '-0.01em',
+            textShadow: isPlusHandicap
+              ? '0 0 6px rgba(247,147,30,0.30), 0 0 2px rgba(247,147,30,0.20)'
+              : 'none',
           }}
         >
           {fmtHcp(hcp)}
@@ -255,9 +285,13 @@ export const LeaderboardRow: React.FC<Props> = ({
             style={{
               fontSize: 9,
               fontWeight: 700,
-              color: gapFromYou < 0 ? T.greenDeep : T.redDeep,
+              color: gapFromYou < 0 ? 'var(--hcp-good)' : 'var(--hcp-bad)',
               fontVariantNumeric: 'tabular-nums',
               letterSpacing: '-0.01em',
+              textShadow:
+                gapFromYou < 0
+                  ? '0 0 6px rgba(34,197,94,0.40), 0 0 2px rgba(34,197,94,0.25)'
+                  : '0 0 6px rgba(239,68,68,0.40), 0 0 2px rgba(239,68,68,0.25)',
             }}
           >
             {gapFromYou < 0

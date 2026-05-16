@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react';
-import SectionHeader from '../SectionHeader';
+import { DarkSectionHeader } from '../_shared/darkAtoms';
 import LeaderboardRow from './LeaderboardRow';
 import FriendProfileSheet from '../friend-profile-sheet/FriendProfileSheet';
 import { useFriendLeaderboard } from '@/lib/whs/hooks';
@@ -84,7 +84,7 @@ export const FriendsLeaderboardSection: React.FC<Props> = ({ userId }) => {
 
   return (
     <section style={{ marginTop: 32 }}>
-      <SectionHeader
+      <DarkSectionHeader
         eyebrow="LEADERBOARD"
         title={
           isLoading || totalActive === 0
@@ -96,6 +96,7 @@ export const FriendsLeaderboardSection: React.FC<Props> = ({ userId }) => {
             ? `Active = round in last 90 days · ${inactiveCount} inactive`
             : 'Your circle, ranked by current handicap'
         }
+        withDot
       />
 
       {/* Column headers */}
