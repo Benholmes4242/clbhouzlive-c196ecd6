@@ -142,7 +142,7 @@ const TodayGreeting: React.FC<Props> = ({ connectionId, userId }) => {
   return (
     <div
       style={{
-        padding: '14px 20px 8px',
+        padding: '18px 20px 16px',
         fontFamily: FONT,
         color: 'var(--hcp-t-100)',
       }}

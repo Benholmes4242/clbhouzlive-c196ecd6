@@ -191,8 +191,7 @@ const HeroHandicapCardDark: React.FC<Props> = ({ connection }) => {
   return (
     <section
       style={{
-        background:
-          'radial-gradient(ellipse at 50% 0%, rgba(247,147,30,0.08), transparent 55%), var(--hcp-bg-0)',
+        background: 'var(--hcp-bg-0)',
         borderBottom: '1px solid var(--hcp-line)',
         padding: '4px 0 22px',
         fontFamily: FONT,
