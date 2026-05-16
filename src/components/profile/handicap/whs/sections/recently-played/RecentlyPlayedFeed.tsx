@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useFriendsActivity } from '@/lib/whs/hooks';
-import SectionHeader from '../SectionHeader';
+
 import Paged8 from '../_shared/Paged8';
 import FriendRoundCard from './FriendRoundCard';
 import RoundDetailSheet from '../round-detail/RoundDetailSheet';
