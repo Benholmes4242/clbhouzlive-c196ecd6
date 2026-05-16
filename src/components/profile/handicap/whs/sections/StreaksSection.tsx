@@ -544,7 +544,7 @@ export const StreaksSection: React.FC<Props> = ({ connectionId, userId }) => {
           sub="Rounds without your handicap going up"
           color={AMBER}
           colorTint={AMBER_14}
-          gradient="linear-gradient(135deg, #F59E0B 0%, #FBBF24 100%)"
+          gradient={AMBER}
           icon="flame"
         />
         <StreakCard
