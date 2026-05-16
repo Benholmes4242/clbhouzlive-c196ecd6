@@ -29,7 +29,7 @@ interface Props {
   activity?: WhsFriendActivityWithImage | null;
 }
 
-const PAGE_BG = '#F8FAFC';
+const PAGE_BG = '#0A0E14';
 const INK_MUTE = 'var(--hcp-t-60)';
 const FONT_GEIST = 'Geist, system-ui, -apple-system, BlinkMacSystemFont, sans-serif';
 const AMBER = '#F7931E';
@@ -304,11 +304,11 @@ export const RoundDetailSheet: React.FC<Props> = ({
       <DrawerPrimitive.Portal>
         <DrawerPrimitive.Overlay
           className="fixed inset-0 z-[10001]"
-          style={{ background: 'var(--hcp-t-40)' }}
+          style={{ background: 'rgba(0,0,0,0.6)' }}
         />
         <DrawerPrimitive.Content
           aria-labelledby="round-detail-sheet-title"
-          className="fixed inset-x-0 bottom-0 z-[10002] flex flex-col rounded-t-[20px] outline-none"
+          className="hcp-dark fixed inset-x-0 bottom-0 z-[10002] flex flex-col rounded-t-[20px] outline-none"
           style={{
             background: PAGE_BG,
             maxHeight: '92vh',
