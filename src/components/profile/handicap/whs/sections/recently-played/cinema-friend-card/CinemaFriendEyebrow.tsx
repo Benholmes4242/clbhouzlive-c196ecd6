@@ -26,9 +26,9 @@ export const CinemaFriendEyebrow: React.FC<Props> = ({ activity }) => {
     <div
       style={{
         position: 'absolute',
-        top: 12,
-        left: 14,
-        right: 14,
+        top: 10,
+        left: 11,
+        right: 11,
         zIndex: 3,
         display: 'flex',
         alignItems: 'center',
@@ -41,8 +41,8 @@ export const CinemaFriendEyebrow: React.FC<Props> = ({ activity }) => {
       <div style={{ display: 'flex', alignItems: 'center', gap: 8, flex: 1, minWidth: 0 }}>
         <div
           style={{
-            width: 28,
-            height: 28,
+            width: 22,
+            height: 22,
             borderRadius: '34%',
             overflow: 'hidden',
             border: '0.5px solid rgba(255,255,255,0.25)',
@@ -60,7 +60,7 @@ export const CinemaFriendEyebrow: React.FC<Props> = ({ activity }) => {
               style={{ width: '100%', height: '100%', objectFit: 'cover' }}
             />
           ) : (
-            <span style={{ fontSize: 10, fontWeight: 800, color: '#FFFFFF' }}>
+            <span style={{ fontSize: 9, fontWeight: 800, color: '#FFFFFF' }}>
               {initials(activity.friend_name)}
             </span>
           )}
@@ -69,7 +69,7 @@ export const CinemaFriendEyebrow: React.FC<Props> = ({ activity }) => {
           <p
             style={{
               margin: 0,
-              fontSize: 16,
+              fontSize: 13,
               fontWeight: 700,
               color: '#FFFFFF',
               letterSpacing: '-0.015em',
@@ -85,7 +85,7 @@ export const CinemaFriendEyebrow: React.FC<Props> = ({ activity }) => {
           {time && (
             <span
               style={{
-                fontSize: 11,
+                fontSize: 9,
                 fontWeight: 500,
                 color: 'rgba(255,255,255,0.65)',
                 letterSpacing: '0.02em',
@@ -108,9 +108,9 @@ export const CinemaFriendEyebrow: React.FC<Props> = ({ activity }) => {
               display: 'inline-flex',
               alignItems: 'center',
               gap: 4,
-              padding: '4px 9px',
+              padding: '3px 7px',
               borderRadius: 999,
-              fontSize: 11,
+              fontSize: 9,
               fontWeight: 700,
               fontVariantNumeric: 'tabular-nums',
               letterSpacing: '0.02em',
@@ -127,11 +127,11 @@ export const CinemaFriendEyebrow: React.FC<Props> = ({ activity }) => {
               flexShrink: 0,
             }}
           >
-            <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.10em' }}>HCP</span>
+            <span style={{ fontSize: 8, fontWeight: 700, letterSpacing: '0.10em' }}>HCP</span>
             {impactIsImprovement ? (
-              <ArrowDown size={10} strokeWidth={1.6} />
+              <ArrowDown size={8} strokeWidth={1.6} />
             ) : (
-              <ArrowUp size={10} strokeWidth={1.6} />
+              <ArrowUp size={8} strokeWidth={1.6} />
             )}
             {Math.abs(impactDelta!).toFixed(1)}
           </span>

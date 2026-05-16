@@ -27,7 +27,7 @@ const HAIR: React.CSSProperties = {
 };
 
 const labelStyle: React.CSSProperties = {
-  fontSize: 10,
+  fontSize: 8,
   fontWeight: 700,
   color: 'rgba(255,255,255,0.55)',
   letterSpacing: '0.16em',
@@ -36,7 +36,7 @@ const labelStyle: React.CSSProperties = {
 };
 
 const valueStyle = (color: string): React.CSSProperties => ({
-  fontSize: 24,
+  fontSize: 19,
   fontWeight: 300,
   color,
   fontFamily: FONT_MONO,
@@ -71,8 +71,8 @@ export const CinemaFriendGlass: React.FC<Props> = ({
   return (
     <div
       style={{
-        padding: '8px 10px',
-        borderRadius: 12,
+        padding: '6px 8px',
+        borderRadius: 10,
         background: 'rgba(255,255,255,0.08)',
         border: '0.5px solid rgba(255,255,255,0.18)',
         backdropFilter: 'blur(40px) saturate(180%)',
@@ -83,7 +83,7 @@ export const CinemaFriendGlass: React.FC<Props> = ({
       <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 10 }}>
         <div
           style={{
-            fontSize: 15,
+            fontSize: 12,
             fontWeight: 700,
             color: '#FFFFFF',
             letterSpacing: '-0.02em',
@@ -99,11 +99,11 @@ export const CinemaFriendGlass: React.FC<Props> = ({
             display: 'inline-flex',
             alignItems: 'center',
             gap: 4,
-            padding: '3px 8px',
+            padding: '2px 6px',
             borderRadius: 999,
             background: 'rgba(255,255,255,0.10)',
             border: '0.5px solid rgba(255,255,255,0.25)',
-            fontSize: 10,
+            fontSize: 8,
             fontWeight: 700,
             letterSpacing: '0.10em',
             color: '#FFFFFF',
@@ -113,14 +113,14 @@ export const CinemaFriendGlass: React.FC<Props> = ({
           }}
         >
           SCORECARD
-          <span style={{ fontSize: 10, opacity: 0.7 }}>{'\u203A'}</span>
+          <span style={{ fontSize: 8, opacity: 0.7 }}>{'\u203A'}</span>
         </span>
       </div>
       {meta && (
         <div
           style={{
             marginTop: 1,
-            fontSize: 10,
+            fontSize: 8,
             fontWeight: 600,
             color: 'rgba(255,255,255,0.60)',
             letterSpacing: '0.06em',
@@ -131,7 +131,7 @@ export const CinemaFriendGlass: React.FC<Props> = ({
         </div>
       )}
 
-      <div style={{ ...HAIR, margin: '6px 0' }} />
+      <div style={{ ...HAIR, margin: '5px 0' }} />
 
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: 8 }}>
         <div style={{ textAlign: 'left' }}>
@@ -143,7 +143,7 @@ export const CinemaFriendGlass: React.FC<Props> = ({
             <GlassGrossRing
               value={gross != null ? gross : EM_DASH}
               isCounter={isCounter}
-              numeralSize={24}
+              numeralSize={19}
             />
           </div>
         </div>
