@@ -70,7 +70,11 @@ export const SinceLastVisitRail: React.FC<Props> = ({ userId }) => {
 
   return (
     <section style={{ marginTop: 32, fontFamily: FONT }}>
-      <SectionHeader eyebrow="Your circle" title={headerTitle} sub={headerSub} />
+      <DarkSectionHeader
+        eyebrow="Your Circle"
+        right={count === 1 ? '1 ROUND' : `${count} ROUNDS`}
+        sub="Posted since you last opened the app."
+      />
       <div
         style={{
           display: 'flex',
