@@ -14,8 +14,8 @@ function ClipsMoodChipsInner({ active, onChange }: ClipsMoodChipsProps) {
     <div
       className="relative"
       style={{
-        background: '#F8FAFC',
-        borderBottom: '0.5px solid rgba(15,23,42,0.06)',
+        background: '#0A0E14',
+        borderBottom: '0.5px solid rgba(255,255,255,0.06)',
       }}
     >
       <div
