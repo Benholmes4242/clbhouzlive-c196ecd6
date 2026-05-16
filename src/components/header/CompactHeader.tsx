@@ -157,12 +157,14 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
         )}
         style={{
           top: 0,
-          background: 'hsl(var(--background))',
+          background: isHandicapRoute ? 'var(--hcp-bg-0)' : 'hsl(var(--background))',
           backdropFilter: 'blur(20px)',
           WebkitBackdropFilter: 'blur(20px)',
           height: `calc(${contentHeight}px + var(--sat, 0px))`,
           paddingTop: 'var(--sat, 0px)',
-          borderBottom: `0.5px solid hsl(var(--border) / 0.5)`,
+          borderBottom: isHandicapRoute
+            ? '1px solid var(--hcp-line)'
+            : `0.5px solid hsl(var(--border) / 0.5)`,
           boxShadow: 'none',
         }}
       >
@@ -180,7 +182,7 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
               aria-label={isBackArrowRoute ? "Go back" : "Go to home"}
             >
               {isBackArrowRoute ? (
-                <ArrowLeft className="h-6 w-6 text-foreground" />
+                <ArrowLeft className={cn("h-6 w-6", isHandicapRoute ? "text-white" : "text-foreground")} />
               ) : (
                 <img
                   src="/lovable-uploads/29e83040-b5c5-48e4-84d7-3f99640e4a80.png"
@@ -191,7 +193,12 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
             </button>
           </div>
 
-          {/* Center section: Clubhouse tabs (mobile) or Desktop nav (lg+) */}
+          {/* Center section */}
+          {isHandicapRoute ? (
+            <div className="flex-1 flex justify-center">
+              <LiveStatusInline />
+            </div>
+          ) : (
           <div className="hidden lg:flex flex-1 justify-center">
             {/* Desktop: main nav links */}
             <nav className="hidden lg:flex items-center gap-1">
@@ -224,6 +231,7 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
               })}
             </nav>
           </div>
+          )}
 
           {/* Right section: Search + Identity pill (fixed width) */}
           <div className="flex items-center gap-1.5 sm:gap-2 flex-shrink-0">
