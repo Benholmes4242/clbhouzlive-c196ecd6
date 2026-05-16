@@ -73,9 +73,9 @@ export const TourHubShellTabs: React.FC = () => {
 
   return (
     <section
-      className="relative bg-background"
+      className="relative"
       style={{
-        borderBottom: '0.5px solid rgba(15,23,42,0.06)',
+        background: '#0A0E14',
       }}
     >
       <div
@@ -85,12 +85,14 @@ export const TourHubShellTabs: React.FC = () => {
         aria-label="Tour Hub navigation"
         style={{
           display: 'flex',
+          justifyContent: 'center',
           gap: 8,
           padding: '8px 16px',
           overflowX: 'auto',
           overflowY: 'hidden',
           WebkitOverflowScrolling: 'touch',
           scrollbarWidth: 'none',
+          fontFamily: 'Geist, system-ui, -apple-system, BlinkMacSystemFont, sans-serif',
         }}
       >
         {TABS.map((tab) => {
@@ -102,21 +104,22 @@ export const TourHubShellTabs: React.FC = () => {
               aria-selected={isActive}
               onClick={(e) => handleTap(tab.id, e.currentTarget)}
               style={{
-                flexShrink: 0,
+                flex: '0 0 auto',
                 height: 32,
                 padding: '0 12px',
+                borderRadius: 8,
+                border: isActive ? '1px solid rgba(255,255,255,0.55)' : '1px solid transparent',
+                background: isActive ? 'rgba(255,255,255,0.10)' : 'transparent',
+                color: isActive ? '#FFFFFF' : 'var(--hcp-t-60)',
+                fontFamily: 'inherit',
                 fontSize: 14,
                 fontWeight: isActive ? 700 : 500,
-                borderRadius: 8,
-                background: isActive ? '#FEF3E7' : 'transparent',
-                border: isActive ? '1px solid #F7931E' : '1px solid transparent',
-                color: isActive ? '#c97a10' : 'hsl(var(--muted-foreground))',
                 letterSpacing: '-0.01em',
                 whiteSpace: 'nowrap',
                 cursor: 'pointer',
-                transition: 'all 0.15s',
                 display: 'inline-flex',
                 alignItems: 'center',
+                transition: 'all 0.15s',
               }}
             >
               {tab.label}
@@ -135,7 +138,7 @@ export const TourHubShellTabs: React.FC = () => {
             bottom: 0,
             width: 28,
             pointerEvents: 'none',
-            background: 'linear-gradient(to right, rgba(248,250,252,0), #F8FAFC)',
+            background: 'linear-gradient(to right, rgba(10,14,20,0), #0A0E14)',
           }}
         />
       )}
