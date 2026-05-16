@@ -101,10 +101,11 @@ export const InviteToClbhouzV2: React.FC<Props> = ({ ownerUserId }) => {
   if (!friendsLoading && invitable.length === 0) {
     return (
       <section id="invite-to-clbhouz-section" style={{ marginTop: 32 }}>
-        <SectionHeader
+        <DarkSectionHeader
           eyebrow="MAKE YOUR FEED LOUDER"
           title="Everyone's here"
           sub="All your England Golf friends are already on Clbhouz 🎉"
+          withDot
           right={
             sentCount > 0 ? (
               <SentBadge count={sentCount} onClick={() => setSheetOpen(true)} />
