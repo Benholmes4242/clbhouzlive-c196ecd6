@@ -502,8 +502,8 @@ export const AllTrophiesSheet: React.FC<Props> = ({ open, onClose, achievements 
               >
                 {o.label}
                 <span style={{
-                  background: active ? 'rgba(255,255,255,0.20)' : INK_06,
-                  color: active ? '#fff' : INK_55,
+                  background: active ? 'var(--hcp-amber-tint)' : 'var(--hcp-bg-3)',
+                  color: active ? 'var(--hcp-amber)' : 'var(--hcp-t-60)',
                   borderRadius: 999,
                   padding: '1px 6px',
                   fontSize: 10, fontWeight: 700,
