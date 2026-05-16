@@ -4,6 +4,7 @@ import type { WhsConnection } from '@/lib/whs/types';
 import HeroHandicapCardDark from '../sections/HeroHandicapCardDark';
 import LastRoundCard from '../sections/LastRoundCard';
 import NextRoundWatch from '../sections/NextRoundWatch';
+import Pattern14Card from '../sections/Pattern14Card';
 import RoundsThatCountCard from '../sections/RoundsThatCountCard';
 import StreaksSection from '../sections/StreaksSection';
 import SinceLastVisitRail from '../sections/since-last-visit/SinceLastVisitRail';
@@ -51,6 +52,8 @@ export const TodayView: React.FC<Props> = ({
       <HeroHandicapCardDark connection={connection} />
 
       <NextRoundWatch connectionId={connectionId} currentHandicap={currentHandicap} />
+
+      <Pattern14Card connectionId={connectionId} />
 
       <LastRoundCard connectionId={connectionId} />
 
