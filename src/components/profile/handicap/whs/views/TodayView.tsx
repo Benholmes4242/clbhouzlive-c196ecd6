@@ -5,6 +5,7 @@ import HeroHandicapCardDark from '../sections/HeroHandicapCardDark';
 import LastRoundCard from '../sections/LastRoundCard';
 import NextRoundWatch from '../sections/NextRoundWatch';
 import Pattern14Card from '../sections/Pattern14Card';
+import IndexHistoryCard from '../sections/IndexHistoryCard';
 import RoundsThatCountCard from '../sections/RoundsThatCountCard';
 import StreaksSection from '../sections/StreaksSection';
 import SinceLastVisitRail from '../sections/since-last-visit/SinceLastVisitRail';
@@ -54,6 +55,8 @@ export const TodayView: React.FC<Props> = ({
       <NextRoundWatch connectionId={connectionId} currentHandicap={currentHandicap} />
 
       <Pattern14Card connectionId={connectionId} />
+
+      <IndexHistoryCard connectionId={connectionId} />
 
       <LastRoundCard connectionId={connectionId} />
 
