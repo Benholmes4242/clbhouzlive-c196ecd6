@@ -60,7 +60,7 @@ export const CinemaFriendEyebrow: React.FC<Props> = ({ activity }) => {
               style={{ width: '100%', height: '100%', objectFit: 'cover' }}
             />
           ) : (
-            <span style={{ fontSize: 10, fontWeight: 800, color: '#FFFFFF' }}>
+            <span style={{ fontSize: 9, fontWeight: 800, color: '#FFFFFF' }}>
               {initials(activity.friend_name)}
             </span>
           )}
