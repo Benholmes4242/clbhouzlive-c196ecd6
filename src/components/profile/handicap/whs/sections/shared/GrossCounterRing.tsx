@@ -147,7 +147,7 @@ export const MiniGrossRing: React.FC<MiniGrossRingProps> = ({ value, isCounter }
       <span
         style={{
           fontFamily: FONT_MONO,
-          fontSize: 22,
+          fontSize: 16,
           fontWeight: 300,
           color: '#FFFFFF',
           letterSpacing: '-0.03em',
