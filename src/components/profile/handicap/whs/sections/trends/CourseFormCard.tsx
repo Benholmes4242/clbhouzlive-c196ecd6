@@ -1,4 +1,5 @@
 import React, { useState, useMemo } from 'react';
+import { MapPin } from 'lucide-react';
 import { CourseImageFallback } from '@/components/whs/CourseImageFallback';
 import { useCourseForm } from '@/lib/whs/hooks';
 import type { CourseForm } from '@/lib/whs/types';
@@ -260,37 +261,6 @@ const CourseRow: React.FC<{
       <div style={{ flex: 1, minWidth: 0 }}>
         <div
           style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: 6,
-            marginBottom: 2,
-          }}
-        >
-          <span
-            aria-hidden
-            style={{
-              width: 8,
-              height: 8,
-              borderRadius: '50%',
-              background: railColor,
-              display: 'inline-block',
-              flexShrink: 0,
-              boxShadow: isFirst ? `0 0 6px ${railColor}80` : 'none',
-            }}
-          />
-          <span
-            style={{
-              fontSize: 9,
-              fontWeight: 800,
-              color: railColor,
-              letterSpacing: '0.14em',
-            }}
-          >
-            {rank === 1 ? '1ST' : rank === 2 ? '2ND' : '3RD'}
-          </span>
-        </div>
-        <div
-          style={{
             fontSize: 13,
             fontWeight: 800,
             color: T.ink,
@@ -299,6 +269,7 @@ const CourseRow: React.FC<{
             whiteSpace: 'nowrap',
             overflow: 'hidden',
             textOverflow: 'ellipsis',
+            marginBottom: 3,
           }}
         >
           {course.course_name}
@@ -323,23 +294,38 @@ const CourseRow: React.FC<{
             />
           </div>
         ) : (
-          <span
+          <div
             style={{
-              display: 'inline-block',
-              marginTop: 4,
-              padding: '1px 6px',
-              fontSize: 10,
-              fontWeight: 700,
-              color: T.inkSoft,
-              background: 'var(--hcp-bg-3)',
-              borderRadius: 4,
-              fontVariantNumeric: 'tabular-nums',
-              textShadow: view === 'most_played' ? 'none' : glowFor(course.delta),
+              display: 'flex',
+              alignItems: 'center',
+              gap: 5,
+              fontSize: 11,
+              fontWeight: 500,
+              color: 'var(--hcp-t-60)',
               letterSpacing: '-0.005em',
+              minWidth: 0,
             }}
           >
-            {course.rounds_played} {course.rounds_played === 1 ? 'round' : 'rounds'}
-          </span>
+            {course.course_region && (
+              <>
+                <MapPin size={10} color="var(--hcp-t-40)" strokeWidth={2} style={{ flexShrink: 0 }} />
+                <span
+                  style={{
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    whiteSpace: 'nowrap',
+                    minWidth: 0,
+                  }}
+                >
+                  {course.course_region}
+                </span>
+                <span aria-hidden style={{ color: 'var(--hcp-t-40)' }}>·</span>
+              </>
+            )}
+            <span style={{ fontVariantNumeric: 'tabular-nums', flexShrink: 0 }}>
+              {course.rounds_played} {course.rounds_played === 1 ? 'round' : 'rounds'}
+            </span>
+          </div>
         )}
       </div>
 
