@@ -93,9 +93,9 @@ export const CinemaFriendCard: React.FC<Props> = ({ activity, onClick }) => {
           left: 14,
           right: 14,
           top: 44,
-          bottom: 44,
+          bottom: 12,
           display: 'flex',
-          alignItems: 'center',
+          alignItems: 'flex-end',
           zIndex: 3,
           pointerEvents: 'none',
         }}
@@ -113,6 +113,7 @@ export const CinemaFriendCard: React.FC<Props> = ({ activity, onClick }) => {
           />
         </div>
       </div>
+    </div>
 
       {/* Bottom actions */}
       <CinemaFriendActions
