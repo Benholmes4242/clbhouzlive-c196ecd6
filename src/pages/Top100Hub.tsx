@@ -114,6 +114,8 @@ const Top100Hub = () => {
           ]}
           activeTab={activeTab}
           onTabChange={handleTabChange}
+          variant="dark"
+          align="center"
         />
       </ShellSlot>
 

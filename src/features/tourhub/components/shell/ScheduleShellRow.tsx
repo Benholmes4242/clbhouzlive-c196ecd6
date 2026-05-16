@@ -73,8 +73,8 @@ function ScheduleShellRowInner() {
       <div
         className="relative"
         style={{
-          background: '#F8FAFC',
-          borderBottom: '0.5px solid rgba(15,23,42,0.06)',
+          background: '#0A0E14',
+          borderBottom: '0.5px solid rgba(255,255,255,0.06)',
         }}
       >
         <div
@@ -100,9 +100,9 @@ function ScheduleShellRowInner() {
                     fontSize: 12,
                     fontWeight: 600,
                     borderRadius: 15,
-                    background: isActive ? 'rgba(247,147,30,0.12)' : 'transparent',
-                    border: isActive ? '1px solid #F7931E' : '1.5px solid hsl(var(--border))',
-                    color: isActive ? '#c97a10' : 'hsl(var(--muted-foreground))',
+                    background: isActive ? 'rgba(255,255,255,0.10)' : 'transparent',
+                    border: isActive ? '1px solid rgba(255,255,255,0.55)' : '1px solid rgba(255,255,255,0.18)',
+                    color: isActive ? '#FFFFFF' : 'rgba(255,255,255,0.65)',
                     letterSpacing: '-0.01em',
                     whiteSpace: 'nowrap',
                   }}
@@ -124,9 +124,9 @@ function ScheduleShellRowInner() {
               fontSize: 12,
               fontWeight: 600,
               borderRadius: 15,
-              background: activeTour !== 'all' ? 'rgba(247,147,30,0.12)' : 'transparent',
-              border: activeTour !== 'all' ? '1px solid #F7931E' : '1.5px solid hsl(var(--border))',
-              color: activeTour !== 'all' ? '#c97a10' : 'hsl(var(--muted-foreground))',
+              background: activeTour !== 'all' ? 'rgba(255,255,255,0.10)' : 'transparent',
+              border: activeTour !== 'all' ? '1px solid rgba(255,255,255,0.55)' : '1px solid rgba(255,255,255,0.18)',
+              color: activeTour !== 'all' ? '#FFFFFF' : 'rgba(255,255,255,0.65)',
               gap: 5,
               whiteSpace: 'nowrap',
             }}

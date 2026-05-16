@@ -34,8 +34,8 @@ function TournamentTabsShellRowInner({ activeTab, onChange }: Props) {
       aria-label="Tournament Sections"
       style={{
         display: 'flex',
-        background: '#F8FAFC',
-        borderBottom: '0.5px solid rgba(15,23,42,0.08)',
+        background: '#0A0E14',
+        borderBottom: '0.5px solid rgba(255,255,255,0.06)',
       }}
     >
       {TABS.map((tab) => {
@@ -52,7 +52,7 @@ function TournamentTabsShellRowInner({ activeTab, onChange }: Props) {
               padding: '12px 0',
               fontSize: 12,
               fontWeight: isActive ? 800 : 600,
-              color: isActive ? '#0F172A' : '#94A3B8',
+              color: isActive ? '#FFFFFF' : 'rgba(255,255,255,0.55)',
               background: 'transparent',
               border: 'none',
               borderBottom: isActive ? '2px solid #F7931E' : '2px solid transparent',
