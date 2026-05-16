@@ -41,8 +41,8 @@ export const CinemaFriendEyebrow: React.FC<Props> = ({ activity }) => {
       <div style={{ display: 'flex', alignItems: 'center', gap: 8, flex: 1, minWidth: 0 }}>
         <div
           style={{
-            width: 28,
-            height: 28,
+            width: 22,
+            height: 22,
             borderRadius: '34%',
             overflow: 'hidden',
             border: '0.5px solid rgba(255,255,255,0.25)',
