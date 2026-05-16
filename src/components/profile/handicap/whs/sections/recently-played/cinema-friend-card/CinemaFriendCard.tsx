@@ -48,9 +48,9 @@ export const CinemaFriendCard: React.FC<Props> = ({ activity, onClick }) => {
       }}
       style={{
         position: 'relative',
-        height: 280,
-        margin: '0 20px 12px',
-        borderRadius: 22,
+        height: 224,
+        margin: '0 20px 10px',
+        borderRadius: 18,
         overflow: 'hidden',
         background: '#0F172A',
         border: '0.5px solid rgba(15,23,42,0.07)',
