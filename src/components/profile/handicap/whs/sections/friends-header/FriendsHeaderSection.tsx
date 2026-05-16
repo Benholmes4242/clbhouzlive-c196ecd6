@@ -68,14 +68,6 @@ export const FriendsHeaderSection: React.FC<Props> = ({ userId }) => {
             textTransform: 'uppercase',
           }}
         >
-          <span
-            style={{
-              width: 6,
-              height: 6,
-              borderRadius: '50%',
-              background: 'var(--hcp-amber, #F59E0B)',
-            }}
-          />
           Your Circle
         </div>
         <p
