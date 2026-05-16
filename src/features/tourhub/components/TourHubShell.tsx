@@ -1,7 +1,6 @@
 import { ReactNode, useEffect } from 'react';
 import { PageRoot } from '@/components/layout/PageRoot';
 import { useHeader } from '@/contexts/GlobalHeaderContext';
-import { useMedianStatusBar } from '@/hooks/useMedianStatusBar';
 
 interface TourHubShellProps {
   children: ReactNode;
@@ -12,11 +11,6 @@ interface TourHubShellProps {
 export function TourHubShell({ children, immersive = false }: TourHubShellProps) {
   const { setVariant } = useHeader();
 
-  // All Tour Hub pages use immersiveStatusBar={true} on PageRoot, which disables
-  // PageRoot's default hook. This call takes ownership so the transparent status bar
-  // is re-applied on iOS resume (prevents grey safe-area flash).
-  useMedianStatusBar("dark", "transparent", true, false);
-
   useEffect(() => {
     setVariant('solid-light');
     return () => setVariant('solid-light');
@@ -26,7 +20,7 @@ export function TourHubShell({ children, immersive = false }: TourHubShellProps)
   if (immersive) {
     return (
       <PageRoot
-        className="min-h-screen w-full bg-background"
+        className="min-h-screen w-full"
         immersive
         immersiveStatusBar
       >
@@ -37,11 +31,14 @@ export function TourHubShell({ children, immersive = false }: TourHubShellProps)
     );
   }
 
-  // All tabs (overview, players, schedule, leaders, college): full-bleed into safe area
+  // Match handicap page: dark PageRoot canvas + default (non-immersive)
+  // status bar so the safe-area notch renders as the same dark band as the
+  // header chrome. PageRoot dark adds .hcp-dark and pads for the bottom nav.
   return (
     <PageRoot
-      className="min-h-screen w-full bg-background"
-      immersiveStatusBar
+      dark
+      className="min-h-screen w-full"
+      style={{ background: 'var(--hcp-bg-0)' }}
     >
       {children}
     </PageRoot>
