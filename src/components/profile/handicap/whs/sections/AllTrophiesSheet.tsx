@@ -493,9 +493,9 @@ export const AllTrophiesSheet: React.FC<Props> = ({ open, onClose, achievements 
                 type="button"
                 onClick={() => setFilter(o.id)}
                 style={{
-                  background: active ? 'var(--hcp-bg-3)' : 'transparent',
-                  color: active ? 'var(--hcp-t-100)' : 'var(--hcp-t-60)',
-                  border: `0.5px solid ${active ? INK : INK_10}`,
+                  background: active ? 'var(--hcp-t-100)' : 'var(--hcp-bg-2)',
+                  color: active ? 'var(--hcp-bg-1)' : 'var(--hcp-t-60)',
+                  border: 'none',
                   borderRadius: 999,
                   padding: '7px 12px',
                   fontSize: 12, fontWeight: 600,
@@ -507,8 +507,8 @@ export const AllTrophiesSheet: React.FC<Props> = ({ open, onClose, achievements 
               >
                 {o.label}
                 <span style={{
-                  background: active ? 'var(--hcp-amber-tint)' : 'var(--hcp-bg-3)',
-                  color: active ? 'var(--hcp-amber)' : 'var(--hcp-t-60)',
+                  background: active ? 'rgba(15,23,42,0.10)' : 'var(--hcp-bg-3)',
+                  color: active ? 'var(--hcp-bg-1)' : 'var(--hcp-t-60)',
                   borderRadius: 999,
                   padding: '1px 6px',
                   fontSize: 10, fontWeight: 700,
