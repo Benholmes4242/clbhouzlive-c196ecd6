@@ -5,7 +5,7 @@
 
 import React from 'react';
 import type { HeroState, TopTie } from '../HybridHero.utils';
-import { fmtScore } from '../HybridHero.utils';
+import { fmtScore, formatRank } from '../HybridHero.utils';
 import { SoloLeaderRow, TiedLeadersRow, ChampionRow } from './LeaderRow';
 import { ChaserRow } from './ChaserRow';
 import { LastYearRow } from './LastYearRow';
