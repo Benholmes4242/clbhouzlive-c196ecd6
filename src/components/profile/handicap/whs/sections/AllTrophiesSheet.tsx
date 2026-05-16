@@ -424,7 +424,7 @@ export const AllTrophiesSheet: React.FC<Props> = ({ open, onClose, achievements 
               width: 36,
               height: 4,
               borderRadius: 2,
-              background: 'rgba(15,23,42,0.18)',
+              background: 'var(--hcp-line-3)',
             }}
           />
         </div>
