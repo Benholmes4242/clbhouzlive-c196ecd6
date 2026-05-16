@@ -49,7 +49,7 @@ const Discover = () => {
   return (
     <PageRoot className="min-h-screen text-foreground bg-background">
       <ShellSlot>
-        <div className="px-1">
+        <div>
           <SegmentedControl
             tabs={[
               { id: 'watch', label: 'Watch' },
@@ -58,6 +58,8 @@ const Discover = () => {
             ]}
             activeTab={main}
             onTabChange={(id) => setMain(id as MainKey)}
+            variant="dark"
+            align="center"
           />
         </div>
         {main === 'watch' && (
