@@ -137,7 +137,7 @@ const SectionLabel: React.FC<{ children: React.ReactNode; style?: React.CSSPrope
 
 export const HandicapRingsInfoSheet: React.FC<Props> = ({ open, onClose }) => {
   return (
-    <BottomSheet open={open} onClose={onClose} ariaLabelledBy="handicap-rings-info-title">
+    <BottomSheet open={open} onClose={onClose} ariaLabelledBy="handicap-rings-info-title" className="hcp-dark" style={{ background: 'var(--hcp-bg-1)' }}>
       {/* Header — mirrors StablefordDetailSheet */}
       <div style={{
         display: 'flex', alignItems: 'center', justifyContent: 'space-between',
