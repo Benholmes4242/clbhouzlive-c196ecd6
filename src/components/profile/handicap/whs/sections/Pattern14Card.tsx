@@ -157,16 +157,18 @@ const Pattern14Card: React.FC<Props> = ({ connectionId }) => {
   );
 };
 
-const PatternSquare: React.FC<{ delta: number | null; faded?: boolean }> = ({
+const PatternSquare: React.FC<{ delta: number | null; faded?: boolean; size?: number }> = ({
   delta,
   faded,
+  size,
 }) => {
   const { bg } = colorForDelta(delta);
   return (
     <div
       style={{
-        aspectRatio: '1 / 1',
-        width: '100%',
+        width: size ?? '100%',
+        height: size,
+        aspectRatio: size ? undefined : '1 / 1',
         background: bg,
         borderRadius: 4,
         opacity: faded ? 0.45 : 1,
