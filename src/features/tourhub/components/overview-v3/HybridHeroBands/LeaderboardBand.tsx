@@ -6,7 +6,7 @@
 import React from 'react';
 import type { HeroState, TopTie } from '../HybridHero.utils';
 import { fmtScore, formatRank, buildLeaderboardRows } from '../HybridHero.utils';
-import { SoloLeaderRow, TiedLeadersRow, TiedGroupRow, ChampionRow } from './LeaderRow';
+import { SoloLeaderRow, TiedGroupRow, ChampionRow } from './LeaderRow';
 import { ChaserRow } from './ChaserRow';
 import { LastYearRow } from './LastYearRow';
 import { TeeTimeRow } from './TeeTimeRow';
