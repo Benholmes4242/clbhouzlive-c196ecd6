@@ -219,9 +219,7 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
 
           {/* Center section */}
           {isHandicapRoute ? (
-            <div className="flex-1 flex justify-center">
-              <LiveStatusInline />
-            </div>
+            <div className="flex-1" />
           ) : (
           <div className="hidden lg:flex flex-1 justify-center">
             {/* Desktop: main nav links */}
