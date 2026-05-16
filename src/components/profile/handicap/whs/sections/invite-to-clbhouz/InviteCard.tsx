@@ -110,35 +110,22 @@ export const InviteCard: React.FC<Props> = ({ friend }) => {
           >
             {firstName(friend.friend_name)}
           </div>
-          <div
+          <span
             style={{
-              display: 'flex',
-              alignItems: 'baseline',
-              gap: 4,
+              display: 'inline-block',
               marginTop: 1,
+              fontSize: 12,
+              fontWeight: 700,
+              color: isPlusHandicap ? AMBER : 'var(--hcp-t-100)',
+              fontVariantNumeric: 'tabular-nums',
+              letterSpacing: '-0.01em',
+              textShadow: isPlusHandicap
+                ? '0 0 6px rgba(247,147,30,0.30), 0 0 2px rgba(247,147,30,0.20)'
+                : 'none',
             }}
           >
-            <span
-              style={{
-                fontSize: 9,
-                fontWeight: 800,
-                color: INK_MUTE,
-                letterSpacing: '0.14em',
-              }}
-            >
-              HCP
-            </span>
-            <span
-              style={{
-                fontSize: 11,
-                fontWeight: 700,
-                color: 'var(--hcp-t-100)',
-                fontVariantNumeric: 'tabular-nums',
-              }}
-            >
-              {fmtHcp(friend.friend_handicap_index)}
-            </span>
-          </div>
+            {fmtHcp(hcp)}
+          </span>
         </div>
       </div>
 
