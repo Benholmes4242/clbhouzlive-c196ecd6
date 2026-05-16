@@ -330,7 +330,7 @@ export const RoundDetailSheet: React.FC<Props> = ({
           <DrawerPrimitive.Title className="sr-only">{titleText}</DrawerPrimitive.Title>
           <div
             style={{
-              flex: 1,
+              flex: '0 1 auto',
               minHeight: 0,
               overflowY: 'auto',
               WebkitOverflowScrolling: 'touch',
