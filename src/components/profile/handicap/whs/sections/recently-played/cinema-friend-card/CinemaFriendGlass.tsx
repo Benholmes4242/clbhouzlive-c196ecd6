@@ -134,12 +134,6 @@ export const CinemaFriendGlass: React.FC<Props> = ({
         </div>
       </div>
 
-      {showShape && (
-        <>
-          <div style={{ ...HAIR, margin: '10px 0 8px' }} />
-          <CinemaCardShapeStrip holes={holes!} />
-        </>
-      )}
     </div>
   );
 };
