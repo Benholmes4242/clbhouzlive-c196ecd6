@@ -41,6 +41,34 @@ function weatherGlyph(code: number | null | undefined): string {
   return '☀';
 }
 
+function normaliseCourseName(raw: string): string {
+  return raw
+    .toLowerCase()
+    .replace(/\([^)]*\)/g, ' ')
+    .replace(/-/g, ' ')
+    .replace(/\b(golf|country|club|links|course|the)\b/g, ' ')
+    .replace(/\b(east|west|north|south|old|new|championship|main|number\s*\d+|no\s*\d+)\b/g, ' ')
+    .replace(/[^a-z0-9]+/g, '')
+    .trim();
+}
+
+function cleanCourseDisplay(raw: string): string {
+  let s = raw.replace(/\([^)]*\)/g, ' ').replace(/-/g, ' ');
+  s = s.replace(/\s+/g, ' ').trim();
+  const STOP = new Set([
+    'golf', 'club', 'country', 'links', 'course',
+    'east', 'west', 'north', 'south', 'old', 'new',
+    'championship', 'main',
+  ]);
+  const tokens = s.split(' ').filter(Boolean);
+  while (tokens.length > 1 && STOP.has(tokens[tokens.length - 1].toLowerCase())) {
+    tokens.pop();
+  }
+  return tokens
+    .map(t => t.charAt(0).toUpperCase() + t.slice(1).toLowerCase())
+    .join(' ');
+}
+
 const TodayGreeting: React.FC<Props> = ({ connectionId, userId }) => {
   const tod = useMemo(() => getTimeOfDay(), []);
   const { data: profile } = useUserProfile(userId);
