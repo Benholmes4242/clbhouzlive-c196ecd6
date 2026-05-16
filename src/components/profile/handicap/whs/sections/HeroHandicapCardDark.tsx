@@ -8,7 +8,7 @@ import {
   verdictForDelta,
   type Verdict,
 } from './_shared/darkAtoms';
-import { formatToday } from './TodayGreeting';
+
 import {
   useHandicapTrend,
   useHandicapHistory,
