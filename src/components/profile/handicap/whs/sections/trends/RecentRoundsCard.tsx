@@ -546,13 +546,13 @@ const FeedCard: React.FC<FeedCardProps> = ({ round, isBest, onTap }) => {
         minHeight: 72,
         padding: 0,
         background: T.cardBg,
-        border: `1px solid ${isBest ? 'rgba(247,147,30,0.30)' : T.hairline}`,
+        border: `1px solid ${T.hairline}`,
         borderRadius: 12,
         overflow: 'hidden',
         textAlign: 'left',
         fontFamily: FONT,
         cursor: 'pointer',
-        boxShadow: isBest ? '0 4px 14px -6px rgba(247,147,30,0.30)' : 'none',
+        boxShadow: 'none',
       }}
     >
       <DateTile
