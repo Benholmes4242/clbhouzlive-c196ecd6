@@ -122,7 +122,7 @@ export const Pager: React.FC<Props> = ({ page, totalPages, onChange }) => {
           padding: '8px 12px',
           borderRadius: 999,
           border: `1px solid ${HAIRLINE}`,
-          background: atEnd ? 'rgba(15,23,42,0.02)' : CARD_BG,
+          background: atEnd ? 'rgba(255,255,255,0.04)' : CARD_BG,
           color: atEnd ? INK_FAINT : INK,
           fontSize: 12,
           fontWeight: 700,
