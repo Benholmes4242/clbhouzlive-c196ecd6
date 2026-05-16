@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react';
-import SectionHeader from '../SectionHeader';
+import { DarkSectionHeader } from '../_shared/darkAtoms';
 import LeaderboardRow from './LeaderboardRow';
 import FriendProfileSheet from '../friend-profile-sheet/FriendProfileSheet';
 import { useFriendLeaderboard } from '@/lib/whs/hooks';
