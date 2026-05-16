@@ -173,18 +173,11 @@ const GlobalBottomNavigation: React.FC<GlobalBottomNavigationProps> = ({ chromeS
               className="chrome-bottom-nav clubhouse-footer"
               data-chrome="bottom-nav"
               style={{
-                background: isWarmGradientRoute
-                    ? 'rgba(255,253,248,0.55)'
-                    : (isHandicapRoute || isTourHubRoute)
-                      ? 'rgba(10,14,20,0.98)'
-                      : isClubhouseRoute
-                        ? 'hsl(var(--clubhouse-bg-footer))'
-                        : 'hsl(210 40% 98% / 0.95)',
-                borderTop: isWarmGradientRoute
-                    ? '1px solid rgba(255,255,255,0.3)'
-                    : `0.5px solid ${(isHandicapRoute || isTourHubRoute) ? 'rgba(255,255,255,0.06)' : isClubhouseRoute ? 'hsl(var(--clubhouse-border))' : 'hsl(215 25% 27% / 0.2)'}`,
-                backdropFilter: isWarmGradientRoute ? 'blur(24px)' : 'blur(20px)',
-                WebkitBackdropFilter: isWarmGradientRoute ? 'blur(24px)' : 'blur(20px)',
+                // Unified dark bottom nav across every route (handicap-style).
+                background: 'rgba(10,14,20,0.98)',
+                borderTop: '0.5px solid rgba(255,255,255,0.06)',
+                backdropFilter: 'blur(20px)',
+                WebkitBackdropFilter: 'blur(20px)',
                 paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 20px)',
                 transition: 'all var(--motion-slow) cubic-bezier(0.22, 1, 0.36, 1)',
               }}
@@ -193,7 +186,7 @@ const GlobalBottomNavigation: React.FC<GlobalBottomNavigationProps> = ({ chromeS
                 activeTab={activeTab}
                 onTabClick={handleTabClickWithCamera}
                 onPrefetch={handleNavPrefetch}
-                variant={isDarkChromeRoute ? 'clubhouse' : 'default'}
+                variant={'clubhouse'}
                 isDimmed={false}
                 useAmberActive={isWarmGradientRoute}
                 showBorder={false}
