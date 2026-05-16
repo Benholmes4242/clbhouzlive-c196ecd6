@@ -5,7 +5,7 @@ import FlagSilhouetteOverlay from '@/components/whs/FlagSilhouetteOverlay';
 import type { WhsFriendActivityWithImage } from '@/lib/whs/types';
 import CinemaFriendEyebrow from './CinemaFriendEyebrow';
 import CinemaFriendGlass from './CinemaFriendGlass';
-import CinemaFriendActions from './CinemaFriendActions';
+
 
 const FALLBACK_GRADIENT =
   'linear-gradient(140deg, #2d3a2d 0%, #4a5d4a 25%, #6b7a5a 50%, #8a9670 72%, #c4a574 88%, #d4956b 100%)';
@@ -93,9 +93,9 @@ export const CinemaFriendCard: React.FC<Props> = ({ activity, onClick }) => {
           left: 14,
           right: 14,
           top: 44,
-          bottom: 44,
+          bottom: 12,
           display: 'flex',
-          alignItems: 'center',
+          alignItems: 'flex-end',
           zIndex: 3,
           pointerEvents: 'none',
         }}
@@ -113,13 +113,6 @@ export const CinemaFriendCard: React.FC<Props> = ({ activity, onClick }) => {
           />
         </div>
       </div>
-
-      {/* Bottom actions */}
-      <CinemaFriendActions
-        scoreId={activity.last_round_score_id}
-        reactionCount={activity.reaction_count}
-        viewerHasReacted={activity.viewer_has_reacted}
-      />
     </div>
   );
 };

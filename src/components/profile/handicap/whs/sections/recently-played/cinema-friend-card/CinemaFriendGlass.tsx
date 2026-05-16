@@ -80,16 +80,41 @@ export const CinemaFriendGlass: React.FC<Props> = ({
         fontFamily: FONT_GEIST,
       }}
     >
-      <div
-        style={{
-          fontSize: 17,
-          fontWeight: 700,
-          color: '#FFFFFF',
-          letterSpacing: '-0.02em',
-          lineHeight: 1.1,
-        }}
-      >
-        {title}
+      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 10 }}>
+        <div
+          style={{
+            fontSize: 17,
+            fontWeight: 700,
+            color: '#FFFFFF',
+            letterSpacing: '-0.02em',
+            lineHeight: 1.1,
+            minWidth: 0,
+            flex: 1,
+          }}
+        >
+          {title}
+        </div>
+        <span
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: 4,
+            padding: '5px 10px',
+            borderRadius: 999,
+            background: 'rgba(255,255,255,0.10)',
+            border: '0.5px solid rgba(255,255,255,0.25)',
+            fontSize: 10,
+            fontWeight: 700,
+            letterSpacing: '0.10em',
+            color: '#FFFFFF',
+            textTransform: 'uppercase',
+            flexShrink: 0,
+            marginTop: 1,
+          }}
+        >
+          SCORECARD
+          <span style={{ fontSize: 10, opacity: 0.7 }}>{'\u203A'}</span>
+        </span>
       </div>
       {meta && (
         <div
