@@ -22,7 +22,7 @@ interface ShellSlotProps {
  * No scroll listeners, no sticky positioning, no threshold transitions —
  * the shell is in its final position from mount.
  */
-export const ShellSlot: React.FC<ShellSlotProps> = ({ children }) => {
+export const ShellSlot: React.FC<ShellSlotProps & { dark?: boolean }> = ({ children, dark = false }) => {
   const ref = useRef<HTMLDivElement>(null);
   const [scrolled, setScrolled] = useState(false);
 
