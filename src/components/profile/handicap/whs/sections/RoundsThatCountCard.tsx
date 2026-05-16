@@ -661,7 +661,7 @@ export const RoundsThatCountCard: React.FC<Props> = ({ connectionId, currentHand
           withRightBorder
         />
         <StatCell
-          label="AVG" value={enriched.avgDiff} dotColor={INK_40} valueColor={INK}
+          label="AVG" value={enriched.avgDiff} dotColor="var(--hcp-t-60)" valueColor="var(--hcp-t-100)"
           disabled withRightBorder
         />
         <StatCell

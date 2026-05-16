@@ -257,9 +257,11 @@ const StreakCard: React.FC<StreakCardProps> = ({
       style={{
         flexShrink: 0,
         width: 240,
-        background: D_BG,
+        background: isActive
+          ? `linear-gradient(135deg, ${colorTint} 0%, transparent 55%), ${D_BG}`
+          : D_BG,
         borderRadius: 18,
-        border: `1px solid ${D_LINE}`,
+        border: isActive ? `1px solid ${color}33` : `1px solid ${D_LINE}`,
         padding: '16px 14px 14px',
         boxShadow: '0 1px 2px rgba(15,23,42,0.04)',
         fontFamily: FONT_GEIST,

@@ -42,7 +42,7 @@ export const SectionHeader: React.FC<SectionHeaderProps> = ({
           style={{
             fontSize: 9,
             fontWeight: 800,
-            color: '#64748B',
+            color: 'var(--hcp-t-60)',
             letterSpacing: '0.16em',
             textTransform: 'uppercase',
           }}
@@ -57,7 +57,7 @@ export const SectionHeader: React.FC<SectionHeaderProps> = ({
           fontFamily: FONT,
           letterSpacing: '-0.015em',
           lineHeight: 1.2,
-          color: INK,
+          color: 'var(--hcp-t-100)',
           margin: 0,
         }}
       >
@@ -69,7 +69,7 @@ export const SectionHeader: React.FC<SectionHeaderProps> = ({
             fontSize: 13,
             fontWeight: 500,
             lineHeight: 1.3,
-            color: INK_55,
+            color: 'var(--hcp-t-60)',
             margin: '6px 0 0',
           }}
         >
@@ -129,7 +129,7 @@ export const InlineCardHeader: React.FC<InlineCardHeaderProps> = ({
         style={{
           fontSize: 14,
           fontWeight: 700,
-          color: INK,
+          color: 'var(--hcp-t-100)',
           letterSpacing: '-0.01em',
           lineHeight: 1.2,
         }}
@@ -140,7 +140,7 @@ export const InlineCardHeader: React.FC<InlineCardHeaderProps> = ({
         <div
           style={{
             fontSize: 11,
-            color: INK_55,
+            color: 'var(--hcp-t-60)',
             marginTop: 2,
             lineHeight: 1.3,
           }}
@@ -227,7 +227,7 @@ export const EchoCallout: React.FC<EchoCalloutProps> = ({
             margin: 0,
             fontSize: 14,
             lineHeight: 1.5,
-            color: INK,
+            color: 'var(--hcp-t-100)',
             fontFamily: FONT,
             fontVariantNumeric: 'tabular-nums',
           }}
