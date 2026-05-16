@@ -1,6 +1,6 @@
 import React from 'react';
 import { ArrowDown, ArrowUp } from 'lucide-react';
-import { initials } from '@/lib/whs/utils/initials';
+import { initials, displayName } from '@/lib/whs/utils/initials';
 import { fmtRelative } from '@/lib/whs/utils/nameFormat';
 import type { WhsFriendActivityWithImage } from '@/lib/whs/types';
 
@@ -80,7 +80,7 @@ export const CinemaFriendEyebrow: React.FC<Props> = ({ activity }) => {
               textOverflow: 'ellipsis',
             }}
           >
-            {activity.friend_name}
+            {displayName(activity.friend_name)}
           </p>
           {time && (
             <span
