@@ -73,9 +73,9 @@ export const ShellSlot: React.FC<ShellSlotProps & { dark?: boolean }> = ({ child
         width: '100%',
         maxWidth: 480,
         zIndex: 29, // CompactHeader is var(--z-header) = 30; sit one below it.
-        background: dark ? 'var(--hcp-bg-0)' : 'hsl(var(--background))',
+        background: dark ? '#0A0E14' : 'hsl(var(--background))',
         borderBottom: dark
-          ? '1px solid var(--hcp-line)'
+          ? '1px solid rgba(255,255,255,0.06)'
           : '0.5px solid hsl(var(--border) / 0.5)',
         boxShadow: scrolled
           ? (dark
