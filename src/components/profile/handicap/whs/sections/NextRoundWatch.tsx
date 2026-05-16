@@ -62,7 +62,7 @@ const NextRoundWatch: React.FC<Props> = ({ connectionId, currentHandicap }) => {
 
   return (
     <section style={{ marginTop: 10 }}>
-      <DarkSectionHeader eyebrow="Next Round · Watch" right="UPDATED HOURLY" />
+      <DarkSectionHeader eyebrow="Next Round Watch" />
 
       <DarkCard
         accent="good"
@@ -212,7 +212,7 @@ const NextRoundWatch: React.FC<Props> = ({ connectionId, currentHandicap }) => {
                 ? 'var(--hcp-good)'
                 : 'var(--hcp-t-100)'
             }
-            subtext="Holds. No risk going up."
+            subtext="Holds. No risk of going up."
           />
         </div>
 
