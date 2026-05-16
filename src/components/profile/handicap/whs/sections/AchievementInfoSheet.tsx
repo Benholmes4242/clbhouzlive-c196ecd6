@@ -15,7 +15,7 @@ interface Props {
 }
 
 const T = {
-  ink: '#0F172A',
+  ink: 'var(--hcp-t-100)',
   inkMute: 'var(--hcp-t-60)',
   inkSoft: 'var(--hcp-t-80)',
   hairline: 'var(--hcp-line-2)',

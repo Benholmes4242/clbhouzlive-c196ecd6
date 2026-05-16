@@ -14,7 +14,7 @@ interface Props {
 
 const T = {
   pageBg: '#F8FAFC',
-  ink: '#0F172A',
+  ink: 'var(--hcp-t-100)',
   inkMute: 'var(--hcp-t-60)',
   hairline: 'var(--hcp-line-2)',
   green: '#059669',
