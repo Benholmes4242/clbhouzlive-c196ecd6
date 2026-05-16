@@ -40,7 +40,7 @@ export const SinceLastVisitRail: React.FC<Props> = ({ userId }) => {
   if (isLoading) {
     return (
       <section style={{ marginTop: 32 }}>
-        <SectionHeader eyebrow="Your circle" title="Since last visit" sub="Loading…" />
+        <DarkSectionHeader eyebrow="Your Circle" sub="Loading…" />
         <div style={{ padding: '0 20px' }}>
           <div
             style={{
