@@ -12,7 +12,7 @@ export const ScorecardEmpty: React.FC<Props> = ({ message, subMessage }) => (
       padding: 16,
       background: 'rgba(15,23,42,0.03)',
       borderRadius: 12,
-      border: '1px dashed rgba(15,23,42,0.08)',
+      border: '1px dashed var(--hcp-line)',
       textAlign: 'center',
     }}
   >

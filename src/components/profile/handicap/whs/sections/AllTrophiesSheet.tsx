@@ -108,7 +108,7 @@ const TrophyRow: React.FC<{ a: Achievement; onInfoClick?: (a: Achievement) => vo
         alignItems: 'flex-start',
         padding: 14,
         borderRadius: 12,
-        background: justEarned ? cat.accentBgSoft : iconLooksLocked ? 'transparent' : '#fff',
+        background: justEarned ? cat.accentBgSoft : iconLooksLocked ? 'transparent' : 'var(--hcp-bg-1)',
         border: iconLooksLocked
           ? `1px dashed ${INK_10}`
           : justEarned
@@ -488,8 +488,8 @@ export const AllTrophiesSheet: React.FC<Props> = ({ open, onClose, achievements 
                 type="button"
                 onClick={() => setFilter(o.id)}
                 style={{
-                  background: active ? INK : '#fff',
-                  color: active ? '#fff' : INK_70,
+                  background: active ? 'var(--hcp-bg-3)' : 'transparent',
+                  color: active ? 'var(--hcp-t-100)' : 'var(--hcp-t-60)',
                   border: `0.5px solid ${active ? INK : INK_10}`,
                   borderRadius: 999,
                   padding: '7px 12px',

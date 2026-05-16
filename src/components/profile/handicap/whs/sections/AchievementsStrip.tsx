@@ -62,7 +62,7 @@ const TrophyTile: React.FC<{ a: Achievement }> = ({ a }) => {
         position: 'relative',
         padding: '12px 12px',
         borderRadius: 12,
-        background: isLocked ? 'rgba(15,23,42,0.025)' : '#fff',
+        background: isLocked ? 'var(--hcp-bg-2)' : 'var(--hcp-bg-1)',
         border: isLocked
           ? `1px dashed rgba(15,23,42,0.18)`
           : `0.5px solid ${INK_10}`,

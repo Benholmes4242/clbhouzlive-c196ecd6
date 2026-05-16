@@ -155,8 +155,8 @@ const DistributionChart: React.FC<{
             const barBg = isUser
               ? `linear-gradient(180deg, #FBBF24 0%, #F59E0B 100%)`
               : isMedian
-                ? `linear-gradient(180deg, rgba(15,23,42,0.25), rgba(15,23,42,0.10))`
-                : `linear-gradient(180deg, rgba(15,23,42,0.10), rgba(15,23,42,0.04))`;
+                ? `linear-gradient(180deg, rgba(255,255,255,0.18), rgba(255,255,255,0.08))`
+                : `linear-gradient(180deg, rgba(255,255,255,0.08), rgba(255,255,255,0.03))`;
             return (
               <div
                 key={b.bucket}
