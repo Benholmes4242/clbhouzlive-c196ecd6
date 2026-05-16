@@ -74,7 +74,6 @@ export const CinemaCardGlass: React.FC<Props> = ({
     .join(' · ')
     .toUpperCase();
 
-  const showShape = !!holes && holes.length > 0;
 
   return (
     <div
