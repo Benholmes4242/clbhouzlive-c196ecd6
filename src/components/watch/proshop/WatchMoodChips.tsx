@@ -17,8 +17,8 @@ function WatchMoodChipsInner({ active, onChange }: WatchMoodChipsProps) {
     <div
       className="relative"
       style={{
-        background: '#F8FAFC',
-        borderBottom: '0.5px solid rgba(15,23,42,0.06)',
+        background: '#0A0E14',
+        borderBottom: '0.5px solid rgba(255,255,255,0.06)',
       }}
     >
       <div
@@ -43,9 +43,9 @@ function WatchMoodChipsInner({ active, onChange }: WatchMoodChipsProps) {
                 fontSize: 12,
                 fontWeight: 600,
                 borderRadius: 15,
-                background: isActive ? 'rgba(247,147,30,0.12)' : 'transparent',
-                border: isActive ? '1px solid #F7931E' : '1.5px solid hsl(var(--border))',
-                color: isActive ? '#c97a10' : 'hsl(var(--muted-foreground))',
+                background: isActive ? 'rgba(255,255,255,0.10)' : 'transparent',
+                border: isActive ? '1px solid rgba(255,255,255,0.55)' : '1px solid rgba(255,255,255,0.18)',
+                color: isActive ? '#FFFFFF' : 'rgba(255,255,255,0.65)',
                 letterSpacing: '-0.01em',
                 gap: 5,
               }}
@@ -63,7 +63,7 @@ function WatchMoodChipsInner({ active, onChange }: WatchMoodChipsProps) {
         className="pointer-events-none absolute top-0 right-0 h-full"
         style={{
           width: 28,
-          background: 'linear-gradient(to right, rgba(248,250,252,0) 0%, #F8FAFC 100%)',
+          background: 'linear-gradient(to right, rgba(10,14,20,0) 0%, #0A0E14 100%)',
         }}
       />
     </div>
