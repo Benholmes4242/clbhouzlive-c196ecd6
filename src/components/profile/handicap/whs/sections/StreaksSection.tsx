@@ -479,7 +479,7 @@ export const StreaksSection: React.FC<Props> = ({ connectionId, userId }) => {
   if (isLoading) {
     return (
       <section style={{ marginTop: 32 }}>
-        <SectionHeader eyebrow="STREAKS" title="Three runs to beat" />
+        <DarkSectionHeader eyebrow="Three Runs to Beat" />
         <div
           style={{
             margin: '0 20px',
