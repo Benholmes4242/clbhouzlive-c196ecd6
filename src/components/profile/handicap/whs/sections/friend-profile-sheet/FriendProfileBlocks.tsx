@@ -36,7 +36,7 @@ export const ProfileHeader: React.FC<{ friend: FriendLeaderboardEntry }> = ({ fr
           overflow: 'hidden',
           background: friend.friend_thumbnail_url
             ? 'var(--hcp-bg-3)'
-            : 'linear-gradient(135deg, #1a3c2a 0%, #0f172a 100%)',
+            : 'linear-gradient(135deg, #1a3c2a 0%, #0a0e14 100%)',
           flexShrink: 0,
           display: 'flex',
           alignItems: 'flex-end',
