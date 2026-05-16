@@ -43,7 +43,7 @@ const Pattern14Card: React.FC<Props> = ({ connectionId }) => {
     : null;
 
   return (
-    <>
+    <section style={{ marginTop: 10 }}>
       <DarkSectionHeader eyebrow="Last 14 Rounds" right="SCORE DIFF VS HCP" />
       <DarkCard>
         <div style={{ padding: '14px 16px 16px', fontFamily: FONT }}>
@@ -153,7 +153,7 @@ const Pattern14Card: React.FC<Props> = ({ connectionId }) => {
           )}
         </div>
       </DarkCard>
-    </>
+    </section>
   );
 };
 

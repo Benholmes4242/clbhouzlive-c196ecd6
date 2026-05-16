@@ -480,7 +480,7 @@ export const StreaksSection: React.FC<Props> = ({ connectionId, userId }) => {
 
   if (isLoading) {
     return (
-      <section style={{ marginTop: 32 }}>
+      <section style={{ marginTop: 10 }}>
         <DarkSectionHeader eyebrow="Three Runs to Beat" />
         <div
           style={{
@@ -508,7 +508,7 @@ export const StreaksSection: React.FC<Props> = ({ connectionId, userId }) => {
   return (
     <section
       ref={sectionRef}
-      style={{ marginTop: 32, fontFamily: FONT_GEIST }}
+      style={{ marginTop: 10, fontFamily: FONT_GEIST }}
     >
       {(() => {
         const activeCount = [
