@@ -59,191 +59,207 @@ const NextRoundWatch: React.FC<Props> = ({ connectionId, currentHandicap }) => {
     `${Math.min(100, Math.max(0, ((val - BAR_MIN) / (BAR_MAX - BAR_MIN)) * 100))}%`;
 
   const isBeatingTarget = last5Avg != null && last5Avg <= target;
-  const verdictHeadlineColor = isBeatingTarget ? 'var(--hcp-good)' : 'var(--hcp-t-100)';
-  const pinColor = isBeatingTarget ? 'var(--hcp-good)' : 'var(--hcp-amber)';
-  const statusVerdict: 'good' | 'neutral' = isBeatingTarget ? 'good' : 'neutral';
-  const statusLabel = isBeatingTarget ? 'ON TARGET' : 'READY TO PLAY';
 
   return (
     <section style={{ marginTop: 8 }}>
-      <DarkSectionHeader
-        eyebrow="NEXT ROUND WATCH"
-        right={<VerdictPill verdict={statusVerdict}>{statusLabel}</VerdictPill>}
-      />
+      <DarkSectionHeader eyebrow="Next Round · Watch" right="UPDATED HOURLY" />
 
-      <DarkCard accent={isBeatingTarget ? 'good' : 'amber'} glow={isBeatingTarget ? 'good' : 'amber'}>
-        <div style={{ padding: '16px 18px 18px', fontFamily: FONT }}>
-          {/* Headline */}
-          <h3
+      <DarkCard
+        accent="good"
+        glow={isBeatingTarget ? 'good' : 'amber'}
+        style={{ padding: 0 }}
+      >
+        {/* Sub-eyebrow row */}
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'baseline',
+            justifyContent: 'space-between',
+            padding: '14px 18px 0',
+            fontFamily: FONT,
+          }}
+        >
+          <span
             style={{
-              margin: 0,
-              fontSize: 19,
-              lineHeight: 1.25,
-              fontWeight: 800,
-              letterSpacing: '-0.018em',
-              color: 'var(--hcp-t-100)',
+              textTransform: 'uppercase',
+              fontSize: 10.5,
+              letterSpacing: '0.16em',
+              fontWeight: 700,
+              color: 'var(--hcp-t-80)',
             }}
           >
-            Shoot{' '}
-            <span style={{ color: verdictHeadlineColor, fontVariantNumeric: 'tabular-nums' }}>
-              {target.toFixed(1)}
-            </span>{' '}
-            or better to drop your index
-          </h3>
-          <p
+            Today's Targets
+          </span>
+          <span
             style={{
-              margin: '6px 0 0',
-              fontSize: 13,
-              lineHeight: 1.45,
+              fontSize: 12,
               color: 'var(--hcp-t-60)',
+              fontVariantNumeric: 'tabular-nums',
             }}
           >
-            Your 8 best of 20 are locked in. One round changes the math.
-          </p>
+            vs your 8 counters
+          </span>
+        </div>
 
-          {/* Target bar */}
-          <div style={{ marginTop: 18 }}>
-            <div
-              style={{
-                position: 'relative',
-                height: 28,
-                background: 'var(--hcp-bg-3)',
-                borderRadius: 6,
-                overflow: 'visible',
-              }}
-            >
-              {/* Cut zone (0 → cutTarget) */}
-              <div
-                aria-hidden
-                style={{
-                  position: 'absolute',
-                  top: 0,
-                  bottom: 0,
-                  left: pos(BAR_MIN),
-                  width: pos(target),
-                  background: 'var(--hcp-good-tint)',
-                  borderRight: '1px dashed var(--hcp-good)',
-                  borderRadius: '6px 0 0 6px',
-                }}
-              />
+        {/* Headline */}
+        <h3
+          style={{
+            margin: 0,
+            padding: '10px 18px 0',
+            fontSize: 19,
+            fontWeight: 800,
+            letterSpacing: '-0.018em',
+            lineHeight: 1.25,
+            color: 'var(--hcp-t-100)',
+            fontFamily: FONT,
+          }}
+        >
+          Shoot{' '}
+          <span style={{ color: 'var(--hcp-good)', fontVariantNumeric: 'tabular-nums' }}>
+            {target.toFixed(1)} or better
+          </span>{' '}
+          to drop your index.
+        </h3>
 
-              {/* Oldest marker */}
-              {oldest && <Tick atPercent={pos(oldest.diff)} color="var(--hcp-t-40)" dashed />}
-
-              {/* Last 5 avg pin */}
-              {last5Avg != null && <PinMarker atPercent={pos(last5Avg)} color={pinColor} />}
-            </div>
-
-            {/* Labels under the bar */}
-            <div
-              style={{
-                position: 'relative',
-                height: 32,
-                marginTop: 14,
-                fontSize: 10,
-                color: 'var(--hcp-t-60)',
-                fontVariantNumeric: 'tabular-nums',
-                letterSpacing: '0.04em',
-                textTransform: 'uppercase',
-                fontWeight: 700,
-              }}
-            >
-              <BarLabel atPercent="0%" label="scratch" value="0" align="start" />
-              <BarLabel atPercent={pos(target)} label="cut" value={target.toFixed(1)} highlight="var(--hcp-good)" />
-              {oldest && (
-                <BarLabel
-                  atPercent={pos(oldest.diff)}
-                  label="oldest"
-                  value={oldest.diff.toFixed(1)}
-                  align={(BAR_MAX - oldest.diff) < 0.5 ? 'end' : 'center'}
-                />
-              )}
-            </div>
-          </div>
-
-          {/* Two-column TARGET / FALLBACK */}
+        {/* Thin bar */}
+        <div style={{ padding: '18px 18px 0', position: 'relative' }}>
           <div
             style={{
-              marginTop: 18,
-              display: 'grid',
-              gridTemplateColumns: '1fr 1fr',
-              border: '1px solid var(--hcp-line)',
-              borderRadius: 12,
-              overflow: 'hidden',
-              background: 'var(--hcp-bg-2, var(--hcp-bg-1))',
+              position: 'relative',
+              height: 6,
+              background: 'var(--hcp-bg-3)',
+              borderRadius: 999,
+              overflow: 'visible',
             }}
           >
-            <DuelCell
-              icon={<TrendingDown size={11} strokeWidth={2.6} />}
-              label="TARGET"
-              caption={`Beat ${target.toFixed(1)} → drop`}
-              value={target.toFixed(1)}
-              valueColor="var(--hcp-good)"
-              labelColor="var(--hcp-good)"
-              borderRight
+            <div
+              aria-hidden
+              style={{
+                position: 'absolute',
+                top: 0,
+                bottom: 0,
+                left: 0,
+                width: pos(target),
+                background: 'var(--hcp-good)',
+                borderRadius: 999,
+              }}
             />
-            <DuelCell
-              icon={<Minus size={11} strokeWidth={2.6} />}
-              label="FALLBACK"
-              caption={`Miss → settles ${settle.toFixed(1)}`}
-              value={settle.toFixed(1)}
-              valueColor={
-                currentHandicap != null && settle < currentHandicap - 0.05
-                  ? 'var(--hcp-good)'
-                  : 'var(--hcp-t-100)'
-              }
-              labelColor="var(--hcp-t-60)"
+            <span
+              aria-hidden
+              style={{
+                position: 'absolute',
+                top: -3,
+                bottom: -3,
+                left: pos(target),
+                width: 2,
+                background: 'var(--hcp-t-100)',
+                transform: 'translateX(-1px)',
+                borderRadius: 1,
+              }}
             />
           </div>
 
-          {/* Pulse line */}
-          {last5Avg != null && (
-            <p
-              style={{
-                margin: '14px 0 0',
-                fontSize: 12.5,
-                lineHeight: 1.5,
-                color: 'var(--hcp-t-80, var(--hcp-t-60))',
-                fontVariantNumeric: 'tabular-nums',
-              }}
-            >
-              Last 5 avg ·{' '}
+          {/* Bar labels — 4 stacked items, evenly spaced */}
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(4, 1fr)',
+              marginTop: 10,
+              fontFamily: FONT,
+              fontVariantNumeric: 'tabular-nums',
+            }}
+          >
+            <BarStack label="SCRATCH" value="0" align="start" />
+            <BarStack label="CUT" value={target.toFixed(1)} valueColor="var(--hcp-good)" />
+            <BarStack label="HOLD" value={settle.toFixed(1)} />
+            <BarStack
+              label="OLDEST"
+              value={oldest ? oldest.diff.toFixed(1) : '—'}
+              align="end"
+            />
+          </div>
+        </div>
+
+        {/* Inner cell pair — FOR A CUT / OTHERWISE */}
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: '1fr 1fr',
+            marginTop: 18,
+            borderTop: '1px solid var(--hcp-line)',
+          }}
+        >
+          <InnerCell
+            eyebrow="FOR A CUT"
+            eyebrowIcon={<TrendingDown size={11} strokeWidth={2.6} />}
+            eyebrowColor="var(--hcp-good)"
+            value={target.toFixed(1)}
+            valueColor="var(--hcp-good)"
+            subtext={
+              oldest
+                ? `Replaces weakest counter (${oldest.diff.toFixed(1)})`
+                : 'Replaces your weakest counter'
+            }
+            borderRight
+          />
+          <InnerCell
+            eyebrow="OTHERWISE"
+            eyebrowIcon={<Minus size={11} strokeWidth={2.6} />}
+            eyebrowColor="var(--hcp-t-60)"
+            value={settle.toFixed(1)}
+            valueColor={
+              currentHandicap != null && settle < currentHandicap - 0.05
+                ? 'var(--hcp-good)'
+                : 'var(--hcp-t-100)'
+            }
+            subtext="Holds. No risk going up."
+          />
+        </div>
+
+        {/* Pulse line */}
+        {last5Avg != null && (
+          <div
+            style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              padding: '14px 18px 16px',
+              fontFamily: FONT,
+              fontSize: 12.5,
+              fontVariantNumeric: 'tabular-nums',
+              borderTop: '1px solid var(--hcp-line)',
+            }}
+          >
+            <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
+              <span className="hcp-live-dot" />
+              <span
+                style={{
+                  textTransform: 'uppercase',
+                  fontSize: 10.5,
+                  letterSpacing: '0.14em',
+                  fontWeight: 700,
+                  color: 'var(--hcp-good)',
+                }}
+              >
+                Last 5 avg
+              </span>
+              <span style={{ color: 'var(--hcp-t-40)' }}>·</span>
               <span style={{ color: 'var(--hcp-t-100)', fontWeight: 700 }}>
                 {last5Avg.toFixed(1)}
               </span>
-              {' — '}
-              <span
-                style={{
-                  color: isBeatingTarget ? 'var(--hcp-good)' : 'var(--hcp-amber)',
-                  fontWeight: 700,
-                }}
-              >
-                {isBeatingTarget
-                  ? `${(target - last5Avg).toFixed(1)} below target`
-                  : `${(last5Avg - target).toFixed(1)} above target`}
-              </span>
-            </p>
-          )}
-
-          {/* Oldest supplementary */}
-          {oldest && (
-            <p
+            </span>
+            <span
               style={{
-                margin: '4px 0 0',
-                fontSize: 11.5,
-                lineHeight: 1.5,
-                color: 'var(--hcp-t-60)',
-                fontVariantNumeric: 'tabular-nums',
+                color: isBeatingTarget ? 'var(--hcp-good)' : 'var(--hcp-amber)',
+                fontWeight: 600,
               }}
             >
-              Oldest{' '}
-              <span style={{ color: 'var(--hcp-t-100)', fontWeight: 700 }}>
-                {oldest.diff.toFixed(1)}
-              </span>{' '}
-              ({oldest.date}) rolls off after your next round.
-            </p>
-          )}
-        </div>
+              {isBeatingTarget
+                ? `${(target - last5Avg).toFixed(1)} below target`
+                : `${(last5Avg - target).toFixed(1)} above target`}
+            </span>
+          </div>
+        )}
       </DarkCard>
     </section>
   );
