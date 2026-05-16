@@ -134,7 +134,7 @@ export const CinemaFriendGlass: React.FC<Props> = ({
       <div style={{ ...HAIR, margin: '5px 0' }} />
 
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: 8 }}>
-        <div style={{ textAlign: 'left' }}>
+        <div style={{ textAlign: 'center', flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
           <div style={labelStyle}>GROSS</div>
           <div
             style={{ marginTop: 2 }}
@@ -147,11 +147,11 @@ export const CinemaFriendGlass: React.FC<Props> = ({
             />
           </div>
         </div>
-        <div style={{ textAlign: 'center' }}>
+        <div style={{ textAlign: 'center', flex: 1 }}>
           <div style={labelStyle}>STABLEFORD</div>
           <div style={valueStyle('#FFFFFF')}>{stableford != null ? stableford : EM_DASH}</div>
         </div>
-        <div style={{ textAlign: 'right' }}>
+        <div style={{ textAlign: 'center', flex: 1 }}>
           <div style={labelStyle}>SCORE DIFF</div>
           <div style={valueStyle(differential != null ? AMBER : '#FFFFFF')}>
             {differential != null ? fmtDiff(differential, { plus: true }) : EM_DASH}
