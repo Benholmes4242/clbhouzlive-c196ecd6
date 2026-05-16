@@ -234,21 +234,25 @@ const HandicapPageHeader: React.FC<HeaderProps> = ({
               <button
                 key={tab.id}
                 onClick={() => onTabChange(tab.id as HandicapSubtab)}
+                role="tab"
+                aria-selected={active}
                 style={{
                   flex: '0 0 auto',
-                  padding: '9px 18px',
-                  borderRadius: 999,
-                  border: active
-                    ? '1px solid transparent'
-                    : '1px solid rgba(255,255,255,0.10)',
-                  background: active ? 'var(--hcp-amber)' : 'transparent',
-                  color: active ? '#0A0E14' : 'var(--hcp-t-60)',
+                  height: 32,
+                  padding: '0 12px',
+                  borderRadius: 8,
+                  border: active ? '1px solid #F7931E' : '1px solid transparent',
+                  background: active ? '#FEF3E7' : 'transparent',
+                  color: active ? '#c97a10' : 'var(--hcp-t-60)',
                   fontFamily: 'inherit',
                   fontSize: 14,
-                  fontWeight: active ? 800 : 600,
-                  letterSpacing: '-0.005em',
+                  fontWeight: active ? 700 : 500,
+                  letterSpacing: '-0.01em',
+                  whiteSpace: 'nowrap',
                   cursor: 'pointer',
-                  transition: 'background 160ms ease, color 160ms ease, border 160ms ease',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  transition: 'all 0.15s',
                 }}
               >
                 {tab.label}
