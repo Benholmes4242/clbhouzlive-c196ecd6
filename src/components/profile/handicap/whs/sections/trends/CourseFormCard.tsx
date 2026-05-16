@@ -1,5 +1,4 @@
 import React, { useState, useMemo } from 'react';
-import { Trophy } from 'lucide-react';
 import { CourseImageFallback } from '@/components/whs/CourseImageFallback';
 import { useCourseForm } from '@/lib/whs/hooks';
 import type { CourseForm } from '@/lib/whs/types';
@@ -26,12 +25,17 @@ const T = {
   redInk: '#991B1B',
   slateTint: 'var(--hcp-bg-2)',
   gold: '#FBBC2E',
-  silver: 'var(--hcp-t-60)',
-  bronze: '#B45309',
+  silver: '#C0C5CF',
+  bronze: '#C97D45',
   ink04: 'var(--hcp-bg-2)',
   ink08: 'var(--hcp-line-2)',
   ink40: 'var(--hcp-t-40)',
 };
+function medalColor(rank: number): string {
+  if (rank === 1) return T.gold;
+  if (rank === 2) return T.silver;
+  return T.bronze;
+}
 const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
 
 const TOP_N = 3;
@@ -186,23 +190,37 @@ const CourseRow: React.FC<{
     };
   })();
 
+  const railColor = medalColor(rank);
+
   return (
     <div
       style={{
         display: 'flex',
         gap: 10,
-        padding: 10,
+        padding: '10px 10px 10px 13px',
         background: T.cardBg,
-        border: `1px solid ${isFirst ? 'rgba(247,147,30,0.25)' : T.hairline}`,
+        border: `1px solid ${T.hairline}`,
         borderRadius: 12,
         marginBottom: 8,
         alignItems: 'center',
-        boxShadow: isFirst
-          ? '0 2px 4px rgba(15,23,42,0.04), 0 6px 16px rgba(247,147,30,0.10)'
-          : '0 1px 2px rgba(15,23,42,0.04)',
+        boxShadow: '0 1px 2px rgba(15,23,42,0.04)',
+        position: 'relative',
+        overflow: 'hidden',
         fontFamily: FONT,
       }}
     >
+      <span
+        aria-hidden
+        style={{
+          position: 'absolute',
+          left: 0,
+          top: 0,
+          bottom: 0,
+          width: 3,
+          background: `linear-gradient(180deg, ${railColor}, transparent)`,
+          opacity: isFirst ? 1 : 0.7,
+        }}
+      />
       <div
         style={{
           width: expanded ? 80 : 56,
@@ -229,18 +247,27 @@ const CourseRow: React.FC<{
           style={{
             display: 'flex',
             alignItems: 'center',
-            gap: 5,
+            gap: 6,
             marginBottom: 2,
           }}
         >
-          {isFirst && (
-            <Trophy size={11} color={T.amberDeep} fill={T.amberTint} strokeWidth={2.4} />
-          )}
+          <span
+            aria-hidden
+            style={{
+              width: 8,
+              height: 8,
+              borderRadius: '50%',
+              background: railColor,
+              display: 'inline-block',
+              flexShrink: 0,
+              boxShadow: isFirst ? `0 0 6px ${railColor}80` : 'none',
+            }}
+          />
           <span
             style={{
               fontSize: 9,
               fontWeight: 800,
-              color: isFirst ? T.amberDeep : T.inkMute,
+              color: railColor,
               letterSpacing: '0.14em',
             }}
           >
@@ -281,19 +308,22 @@ const CourseRow: React.FC<{
             />
           </div>
         ) : (
-          <div
+          <span
             style={{
-              fontSize: 10.5,
-              color: T.inkMute,
-              marginTop: 2,
-              fontWeight: 600,
+              display: 'inline-block',
+              marginTop: 4,
+              padding: '1px 6px',
+              fontSize: 10,
+              fontWeight: 700,
+              color: T.inkSoft,
+              background: 'var(--hcp-bg-3)',
+              borderRadius: 4,
+              fontVariantNumeric: 'tabular-nums',
+              letterSpacing: '-0.005em',
             }}
           >
-            <strong style={{ color: T.ink, fontWeight: 800, fontVariantNumeric: 'tabular-nums' }}>
-              {course.rounds_played}
-            </strong>{' '}
-            {course.rounds_played === 1 ? 'round' : 'rounds'}
-          </div>
+            {course.rounds_played} {course.rounds_played === 1 ? 'round' : 'rounds'}
+          </span>
         )}
       </div>
 
@@ -309,7 +339,22 @@ const CourseRow: React.FC<{
               fontVariantNumeric: 'tabular-nums',
             }}
           >
-            {headline.value}
+            {view !== 'most_played' && course.delta !== 0 && (
+              <span
+                aria-hidden
+                style={{
+                  fontSize: 14,
+                  verticalAlign: 2,
+                  marginRight: 2,
+                  fontWeight: 700,
+                }}
+              >
+                {course.delta < 0 ? '\u2193' : '\u2191'}
+              </span>
+            )}
+            {view !== 'most_played' && course.delta !== 0
+              ? Math.abs(course.delta).toFixed(1)
+              : headline.value}
           </div>
           <div
             style={{
