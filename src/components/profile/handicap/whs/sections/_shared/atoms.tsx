@@ -176,7 +176,7 @@ export const EchoCallout: React.FC<EchoCalloutProps> = ({
         'linear-gradient(180deg, rgba(247,147,30,0.10) 0%, transparent 60%), var(--hcp-bg-1)',
       border: '1px solid var(--hcp-line-2)',
       borderRadius: 14,
-      padding: '16px 14px 14px 17px',
+      padding: '16px 14px 14px 14px',
       marginBottom,
       fontFamily: FONT,
       overflow: 'hidden',
