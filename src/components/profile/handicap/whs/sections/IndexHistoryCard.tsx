@@ -249,7 +249,7 @@ const IndexHistoryCard: React.FC<Props> = ({ connectionId }) => {
           </div>
         </div>
       </DarkCard>
-    </>
+    </section>
   );
 };
 

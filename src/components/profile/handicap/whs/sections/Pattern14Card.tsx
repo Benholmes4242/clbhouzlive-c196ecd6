@@ -153,7 +153,7 @@ const Pattern14Card: React.FC<Props> = ({ connectionId }) => {
           )}
         </div>
       </DarkCard>
-    </>
+    </section>
   );
 };
 
