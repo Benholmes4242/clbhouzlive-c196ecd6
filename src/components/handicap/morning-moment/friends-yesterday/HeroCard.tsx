@@ -72,9 +72,9 @@ export const HeroCard: React.FC<Props> = ({ friend, onClick }) => {
       }}
       style={{
         position: 'relative',
-        height: 280,
+        height: 224,
         width: '100%',
-        borderRadius: 22,
+        borderRadius: 18,
         overflow: 'hidden',
         background: '#0F172A',
         border: '0.5px solid rgba(15,23,42,0.07)',
@@ -117,21 +117,26 @@ export const HeroCard: React.FC<Props> = ({ friend, onClick }) => {
             position: 'absolute',
             left: 11,
             right: 11,
+            top: 36,
             bottom: 10,
-            zIndex: 2,
-            pointerEvents: 'auto',
+            display: 'flex',
+            alignItems: 'flex-end',
+            zIndex: 3,
+            pointerEvents: 'none',
           }}
         >
-          <CinemaFriendGlass
-            courseName={friend.course_name}
-            par={par}
-            slope={slope}
-            gross={friend.score ?? null}
-            stableford={friend.stableford}
-            differential={friend.differential}
-            holes={showShape ? detail!.holes : null}
-            isCounter={!!friend.is_counter}
-          />
+          <div style={{ width: '100%', pointerEvents: 'auto' }}>
+            <CinemaFriendGlass
+              courseName={friend.course_name}
+              par={par}
+              slope={slope}
+              gross={friend.score ?? null}
+              stableford={friend.stableford}
+              differential={friend.differential}
+              holes={showShape ? detail!.holes : null}
+              isCounter={!!friend.is_counter}
+            />
+          </div>
         </div>
       ) : (
         <>
