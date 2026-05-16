@@ -216,12 +216,18 @@ const HandicapPageHeader: React.FC<HeaderProps> = ({
       ) : null}
 
       {(readOnly || hasConnection) && (
-        <div style={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          padding: '0 24px',
-          fontFamily: FONT_GEIST,
-        }}>
+        <div
+          style={{
+            display: 'flex',
+            gap: 8,
+            padding: '4px 16px 12px',
+            overflowX: 'auto',
+            scrollbarWidth: 'none',
+            msOverflowStyle: 'none',
+            fontFamily: FONT_GEIST,
+          }}
+          className="hcp-tab-row"
+        >
           {tabs.map(tab => {
             const active = activeTab === tab.id;
             return (
@@ -229,25 +235,27 @@ const HandicapPageHeader: React.FC<HeaderProps> = ({
                 key={tab.id}
                 onClick={() => onTabChange(tab.id as HandicapSubtab)}
                 style={{
-                  padding: '16px 4px 12px',
-                  background: 'transparent',
-                  border: 'none',
-                  cursor: 'pointer',
-                  textTransform: 'uppercase',
-                  fontSize: 11,
-                  letterSpacing: '0.14em',
-                  fontWeight: active ? 800 : 700,
-                  color: active ? 'var(--hcp-t-100)' : 'var(--hcp-t-40)',
-                  borderBottom: active ? '2px solid var(--hcp-amber)' : '2px solid transparent',
-                  marginBottom: -1,
+                  flex: '0 0 auto',
+                  padding: '9px 18px',
+                  borderRadius: 999,
+                  border: active
+                    ? '1px solid transparent'
+                    : '1px solid rgba(255,255,255,0.10)',
+                  background: active ? 'var(--hcp-amber)' : 'transparent',
+                  color: active ? '#0A0E14' : 'var(--hcp-t-60)',
                   fontFamily: 'inherit',
-                  transition: 'color 160ms ease',
+                  fontSize: 14,
+                  fontWeight: active ? 800 : 600,
+                  letterSpacing: '-0.005em',
+                  cursor: 'pointer',
+                  transition: 'background 160ms ease, color 160ms ease, border 160ms ease',
                 }}
               >
                 {tab.label}
               </button>
             );
           })}
+          <style>{`.hcp-tab-row::-webkit-scrollbar { display: none; }`}</style>
         </div>
       )}
     </ShellSlot>
