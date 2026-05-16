@@ -487,7 +487,7 @@ const DateTile: React.FC<DateTileProps> = ({ dateString, thumbnailUrl }) => {
               position: 'absolute',
               inset: 0,
               background:
-                'linear-gradient(150deg, rgba(15,77,46,0.78), rgba(16,62,37,0.86))',
+                'linear-gradient(180deg, rgba(0,0,0,0.30), rgba(0,0,0,0.65))',
               pointerEvents: 'none',
             }}
           />
@@ -495,15 +495,6 @@ const DateTile: React.FC<DateTileProps> = ({ dateString, thumbnailUrl }) => {
       ) : (
         <CourseImageFallback flagOpacity={0.18} gradientAngle={150} />
       )}
-      <span
-        style={{
-          position: 'absolute',
-          inset: 0,
-          background:
-            'radial-gradient(circle at 30% 25%, rgba(255,255,255,0.14), transparent 60%)',
-          pointerEvents: 'none',
-        }}
-      />
       <span
         style={{
           fontSize: 9,
