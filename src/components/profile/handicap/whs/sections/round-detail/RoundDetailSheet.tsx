@@ -29,7 +29,7 @@ interface Props {
   activity?: WhsFriendActivityWithImage | null;
 }
 
-const PAGE_BG = '#F8FAFC';
+const PAGE_BG = '#0A0E14';
 const INK_MUTE = 'var(--hcp-t-60)';
 const FONT_GEIST = 'Geist, system-ui, -apple-system, BlinkMacSystemFont, sans-serif';
 const AMBER = '#F7931E';
