@@ -4,11 +4,13 @@ import { useFriendRoundDetail } from '@/lib/whs/hooks';
 import FlagSilhouetteOverlay from '@/components/whs/FlagSilhouetteOverlay';
 import { deriveHeroState } from './deriveHeroState';
 import TopEyebrow from './TopEyebrow';
-import HeroGlassEnriched from './HeroGlassEnriched';
 import HeroGlassSyncing from './HeroGlassSyncing';
 import HeroGlassInvite from './HeroGlassInvite';
 import HeroGlassNudge from './HeroGlassNudge';
 import HeroBottomActions from './HeroBottomActions';
+import CinemaFriendEyebrow from '@/components/profile/handicap/whs/sections/recently-played/cinema-friend-card/CinemaFriendEyebrow';
+import CinemaFriendGlass from '@/components/profile/handicap/whs/sections/recently-played/cinema-friend-card/CinemaFriendGlass';
+import type { WhsFriendActivityWithImage } from '@/lib/whs/types';
 
 const FALLBACK_GRADIENT =
   'linear-gradient(140deg, #2d3a2d 0%, #4a5d4a 25%, #6b7a5a 50%, #8a9670 72%, #c4a574 88%, #d4956b 100%)';
@@ -41,6 +43,21 @@ export const HeroCard: React.FC<Props> = ({ friend, onClick }) => {
 
   const slope = detail?.slope_rating ?? null;
   const showShape = !!detail?.hole_by_hole_fetched && (detail.holes?.length ?? 0) > 0;
+
+  // Adapter for CinemaFriendEyebrow (uses WhsFriendActivityWithImage shape)
+  const eyebrowActivity = React.useMemo(
+    () =>
+      ({
+        friend_name: friend.name,
+        friend_thumbnail_url: friend.thumbnail_url,
+        friend_handicap_index: friend.friend_handicap_index,
+        handicap_index_at_time: friend.handicap_index_at_time,
+        is_counter: friend.is_counter,
+        last_round_played_at: friend.played_at,
+        last_round_course_name: friend.course_name,
+      }) as unknown as WhsFriendActivityWithImage,
+    [friend],
+  );
 
   return (
     <div
@@ -88,37 +105,58 @@ export const HeroCard: React.FC<Props> = ({ friend, onClick }) => {
       <div style={{ position: 'absolute', inset: 0, background: ATMOSPHERIC, pointerEvents: 'none' }} />
       <div style={{ position: 'absolute', inset: 0, background: LEGIBILITY_SCRIM, pointerEvents: 'none' }} />
 
-      <TopEyebrow friend={friend} variant="hero" rightPill="best" />
+      {isEnriched ? (
+        <CinemaFriendEyebrow activity={eyebrowActivity} />
+      ) : (
+        <TopEyebrow friend={friend} variant="hero" rightPill="best" />
+      )}
 
-      <div
-        style={{
-          position: 'absolute',
-          left: 14,
-          right: 14,
-          top: 44,
-          bottom: 44,
-          display: 'flex',
-          alignItems: 'center',
-          zIndex: 2,
-          pointerEvents: 'none',
-        }}
-      >
-        <div style={{ width: '100%', pointerEvents: 'auto' }}>
-          {state === 'enriched' && (
-            <HeroGlassEnriched
-              friend={friend}
-              par={par}
-              slope={slope}
-              holes={showShape ? detail!.holes : null}
-            />
-          )}
-          {state === 'syncing' && <HeroGlassSyncing friend={friend} />}
-          {state === 'invite' && <HeroGlassInvite friend={friend} />}
-          {state === 'nudge' && <HeroGlassNudge friend={friend} />}
+      {isEnriched ? (
+        <div
+          style={{
+            position: 'absolute',
+            left: 11,
+            right: 11,
+            bottom: 10,
+            zIndex: 2,
+            pointerEvents: 'auto',
+          }}
+        >
+          <CinemaFriendGlass
+            courseName={friend.course_name}
+            par={par}
+            slope={slope}
+            gross={friend.score ?? null}
+            stableford={friend.stableford}
+            differential={friend.differential}
+            holes={showShape ? detail!.holes : null}
+            isCounter={!!friend.is_counter}
+          />
         </div>
-      </div>
-
-      <HeroBottomActions state={state} friend={friend} />
+      ) : (
+        <>
+          <div
+            style={{
+              position: 'absolute',
+              left: 14,
+              right: 14,
+              top: 44,
+              bottom: 44,
+              display: 'flex',
+              alignItems: 'center',
+              zIndex: 2,
+              pointerEvents: 'none',
+            }}
+          >
+            <div style={{ width: '100%', pointerEvents: 'auto' }}>
+              {state === 'syncing' && <HeroGlassSyncing friend={friend} />}
+              {state === 'invite' && <HeroGlassInvite friend={friend} />}
+              {state === 'nudge' && <HeroGlassNudge friend={friend} />}
+            </div>
+          </div>
+          <HeroBottomActions state={state} friend={friend} />
+        </>
+      )}
     </div>
   );
 };
