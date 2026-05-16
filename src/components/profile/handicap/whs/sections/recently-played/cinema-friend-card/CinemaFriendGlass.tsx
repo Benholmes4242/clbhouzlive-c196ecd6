@@ -131,7 +131,7 @@ export const CinemaFriendGlass: React.FC<Props> = ({
         </div>
       )}
 
-      <div style={{ ...HAIR, margin: '10px 0' }} />
+      <div style={{ ...HAIR, margin: '6px 0' }} />
 
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: 8 }}>
         <div style={{ textAlign: 'left' }}>
