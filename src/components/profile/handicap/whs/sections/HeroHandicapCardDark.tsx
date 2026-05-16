@@ -198,7 +198,7 @@ const HeroHandicapCardDark: React.FC<Props> = ({ connection }) => {
         fontFamily: FONT,
       }}
     >
-      <DarkSectionHeader eyebrow="My Handicap Index" />
+      <DarkSectionHeader eyebrow="My Handicap Index" right={formatToday()} />
 
       {/* Ring */}
       <div
