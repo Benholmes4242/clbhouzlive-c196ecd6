@@ -58,15 +58,12 @@ export function TourHubMainPage() {
 
   return (
     <TourHubShell>
-      <ShellSlot>
+      <ShellSlot dark>
         <TourHubShellTabs />
         {renderShellRow()}
       </ShellSlot>
 
-      <div
-        className="pb-24"
-        style={{ paddingTop: 'var(--chrome-total-h, 0px)' }}
-      >
+      <div style={{ paddingTop: 'var(--chrome-total-h, 0px)' }}>
         {renderTab()}
       </div>
     </TourHubShell>
