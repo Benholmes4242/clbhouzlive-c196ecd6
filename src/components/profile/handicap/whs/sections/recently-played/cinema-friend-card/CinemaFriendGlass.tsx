@@ -36,13 +36,13 @@ const labelStyle: React.CSSProperties = {
 };
 
 const valueStyle = (color: string): React.CSSProperties => ({
-  fontSize: 28,
+  fontSize: 24,
   fontWeight: 300,
   color,
   fontFamily: FONT_MONO,
   letterSpacing: '-0.03em',
   lineHeight: 1,
-  marginTop: 3,
+  marginTop: 2,
   fontVariantNumeric: 'tabular-nums',
 });
 
@@ -71,8 +71,8 @@ export const CinemaFriendGlass: React.FC<Props> = ({
   return (
     <div
       style={{
-        padding: '12px 14px',
-        borderRadius: 14,
+        padding: '8px 10px',
+        borderRadius: 12,
         background: 'rgba(255,255,255,0.08)',
         border: '0.5px solid rgba(255,255,255,0.18)',
         backdropFilter: 'blur(40px) saturate(180%)',
@@ -83,7 +83,7 @@ export const CinemaFriendGlass: React.FC<Props> = ({
       <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 10 }}>
         <div
           style={{
-            fontSize: 17,
+            fontSize: 15,
             fontWeight: 700,
             color: '#FFFFFF',
             letterSpacing: '-0.02em',
@@ -99,7 +99,7 @@ export const CinemaFriendGlass: React.FC<Props> = ({
             display: 'inline-flex',
             alignItems: 'center',
             gap: 4,
-            padding: '5px 10px',
+            padding: '3px 8px',
             borderRadius: 999,
             background: 'rgba(255,255,255,0.10)',
             border: '0.5px solid rgba(255,255,255,0.25)',
@@ -119,7 +119,7 @@ export const CinemaFriendGlass: React.FC<Props> = ({
       {meta && (
         <div
           style={{
-            marginTop: 2,
+            marginTop: 1,
             fontSize: 10,
             fontWeight: 600,
             color: 'rgba(255,255,255,0.60)',
@@ -131,19 +131,19 @@ export const CinemaFriendGlass: React.FC<Props> = ({
         </div>
       )}
 
-      <div style={{ ...HAIR, margin: '10px 0' }} />
+      <div style={{ ...HAIR, margin: '6px 0' }} />
 
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: 8 }}>
         <div style={{ textAlign: 'left' }}>
           <div style={labelStyle}>GROSS</div>
           <div
-            style={{ marginTop: 3 }}
+            style={{ marginTop: 2 }}
             aria-label={`Gross score ${gross ?? ''}${isCounter ? ', counts toward index' : ''}`}
           >
             <GlassGrossRing
               value={gross != null ? gross : EM_DASH}
               isCounter={isCounter}
-              numeralSize={28}
+              numeralSize={24}
             />
           </div>
         </div>
