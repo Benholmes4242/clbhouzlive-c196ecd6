@@ -22,7 +22,8 @@ const FONT_GEIST = '"Geist", system-ui, -apple-system, BlinkMacSystemFont, sans-
 
 export const InviteCard: React.FC<Props> = ({ friend }) => {
   const queryClient = useQueryClient();
-
+  const hcp = friend.friend_handicap_index;
+  const isPlusHandicap = hcp != null && hcp < 0;
   const handleInvite = async () => {
     if (friend.friend_passport_id == null) {
       toast.error('Cannot invite this friend (missing ID)');
