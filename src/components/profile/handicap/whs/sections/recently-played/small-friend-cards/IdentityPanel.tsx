@@ -47,7 +47,7 @@ export const IdentityPanel: React.FC<Props> = ({ name, thumbnailUrl }) => {
           height: 64,
           borderRadius: '34%',
           overflow: 'hidden',
-          border: '0.5px solid rgba(15,23,42,0.10)',
+          border: '1px solid var(--hcp-line-2)',
           background:
             'linear-gradient(135deg, #4a5d8a 0%, #6b7aaa 50%, #a4b4c4 100%)',
           display: 'flex',

@@ -14,13 +14,13 @@ interface Props {
 }
 
 const T = {
-  bgFrom: '#0F172A',
+  bgFrom: 'var(--hcp-t-100)',
   bgTo: '#1E293B',
   amber: '#F7931E',
   gold: '#FBBC2E',
   amberSoft: 'rgba(247,147,30,0.14)',
   amberInk: '#854F0B',
-  white: '#FFFFFF',
+  white: 'var(--hcp-bg-1)',
   whiteMute: 'rgba(255,255,255,0.55)',
   whiteFaded: 'rgba(255,255,255,0.40)',
   whiteSofter: 'rgba(255,255,255,0.30)',
@@ -29,7 +29,7 @@ const T = {
   red: '#DC2626',
   redInk: '#991B1B',
   hairline: 'rgba(255,255,255,0.10)',
-  ink: '#0F172A',
+  ink: 'var(--hcp-t-100)',
 };
 const FONT_GEIST = 'Geist, system-ui, -apple-system, BlinkMacSystemFont, sans-serif';
 
@@ -393,7 +393,7 @@ const Portrait: React.FC<PortraitProps> = ({
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        color: '#FFFFFF',
+        color: 'var(--hcp-bg-1)',
         fontSize: 16,
         fontWeight: 700,
         letterSpacing: '0.04em',
@@ -408,7 +408,7 @@ const Portrait: React.FC<PortraitProps> = ({
         fontSize: 10,
         fontWeight: 800,
         letterSpacing: '0.14em',
-        color: '#FFFFFF',
+        color: 'var(--hcp-bg-1)',
         textTransform: 'uppercase',
         maxWidth: 88,
         overflow: 'hidden',

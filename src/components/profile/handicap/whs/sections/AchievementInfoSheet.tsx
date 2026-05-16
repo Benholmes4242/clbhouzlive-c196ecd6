@@ -15,11 +15,11 @@ interface Props {
 }
 
 const T = {
-  ink: '#0F172A',
-  inkMute: 'rgba(15,23,42,0.55)',
-  inkSoft: 'rgba(15,23,42,0.78)',
-  hairline: 'rgba(15,23,42,0.08)',
-  neutralTint: 'rgba(15,23,42,0.04)',
+  ink: 'var(--hcp-t-100)',
+  inkMute: 'var(--hcp-t-60)',
+  inkSoft: 'var(--hcp-t-80)',
+  hairline: 'var(--hcp-line-2)',
+  neutralTint: 'var(--hcp-bg-2)',
   amber: '#F7931E',
   amberTint: 'rgba(247,147,30,0.10)',
   amberInk: '#854F0B',
@@ -76,7 +76,7 @@ export const AchievementInfoSheet: React.FC<Props> = ({ open, onClose, achieveme
         style={{
           position: 'fixed',
           inset: 0,
-          background: 'rgba(15,23,42,0.45)',
+          background: 'var(--hcp-t-40)',
           zIndex: 10000,
           animation: 'achInfoFadeIn 180ms ease-out',
         }}
@@ -91,7 +91,7 @@ export const AchievementInfoSheet: React.FC<Props> = ({ open, onClose, achieveme
           right: 0,
           bottom: 0,
           maxHeight: '80vh',
-          background: '#FFFFFF',
+          background: 'var(--hcp-bg-1)',
           borderTopLeftRadius: 20,
           borderTopRightRadius: 20,
           zIndex: 10001,

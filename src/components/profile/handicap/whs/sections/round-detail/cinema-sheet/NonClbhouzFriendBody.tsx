@@ -9,8 +9,8 @@ import { fmtRelative } from '@/lib/whs/utils/nameFormat';
 import type { WhsFriendActivityWithImage } from '@/lib/whs/types';
 
 const FONT_GEIST = 'Geist, system-ui, -apple-system, BlinkMacSystemFont, sans-serif';
-const INK = '#0F172A';
-const INK_MUTE = 'rgba(15,23,42,0.55)';
+const INK = 'var(--hcp-t-100)';
+const INK_MUTE = 'var(--hcp-t-60)';
 const AMBER_INK = '#9A6116';
 
 interface Props {
@@ -67,7 +67,7 @@ export const NonClbhouzFriendBody: React.FC<Props> = ({ activity }) => {
           margin: '0 0 8px',
           fontSize: 18,
           fontWeight: 800,
-          color: INK,
+          color: 'var(--hcp-t-100)',
           fontFamily: FONT_GEIST,
         }}
       >
@@ -93,7 +93,7 @@ export const NonClbhouzFriendBody: React.FC<Props> = ({ activity }) => {
             style={{
               padding: '12px 24px',
               borderRadius: 999,
-              background: '#FFFFFF',
+              background: 'var(--hcp-bg-1)',
               border: '1px solid #F7931E',
               color: AMBER_INK,
               fontSize: 14,
@@ -106,7 +106,7 @@ export const NonClbhouzFriendBody: React.FC<Props> = ({ activity }) => {
           >
             {sending ? 'Preparing\u2026' : `Resend invite to ${fname}`}
           </button>
-          <p style={{ margin: '10px 0 0', fontSize: 11, color: 'rgba(15,23,42,0.45)' }}>
+          <p style={{ margin: '10px 0 0', fontSize: 11, color: 'var(--hcp-t-40)' }}>
             Originally sent {fmtRelative(pendingInvite.sent_at, { compact: false })}
           </p>
         </>

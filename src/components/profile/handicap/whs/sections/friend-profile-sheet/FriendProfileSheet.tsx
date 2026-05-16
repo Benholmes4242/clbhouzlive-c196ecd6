@@ -72,7 +72,7 @@ export const FriendProfileSheet: React.FC<Props> = ({
             right: 0,
             bottom: 0,
             zIndex: 81,
-            background: '#FFFFFF',
+            background: 'var(--hcp-bg-1)',
             borderTopLeftRadius: 20,
             borderTopRightRadius: 20,
             maxHeight: '88vh',
@@ -91,7 +91,7 @@ export const FriendProfileSheet: React.FC<Props> = ({
 
           {/* Drag handle */}
           <div aria-hidden style={{ display: 'flex', justifyContent: 'center', padding: '8px 0 4px', flexShrink: 0 }}>
-            <div style={{ width: 36, height: 4, borderRadius: 2, background: 'rgba(15,23,42,0.15)' }} />
+            <div style={{ width: 36, height: 4, borderRadius: 2, background: 'var(--hcp-t-20)' }} />
           </div>
 
           {/* Position indicator */}
@@ -103,7 +103,7 @@ export const FriendProfileSheet: React.FC<Props> = ({
               transform: 'translateX(-50%)',
               fontSize: 10,
               fontWeight: 800,
-              color: 'rgba(15,23,42,0.40)',
+              color: 'var(--hcp-t-40)',
               letterSpacing: '0.04em',
               pointerEvents: 'none',
             }}>
@@ -120,7 +120,7 @@ export const FriendProfileSheet: React.FC<Props> = ({
                 width: 32,
                 height: 32,
                 borderRadius: '50%',
-                background: 'rgba(15,23,42,0.06)',
+                background: 'var(--hcp-bg-3)',
                 border: 'none',
                 cursor: 'pointer',
                 display: 'flex',

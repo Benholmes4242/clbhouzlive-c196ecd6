@@ -9,8 +9,8 @@ interface Props {
 
 const FONT_GEIST = 'Geist, system-ui, -apple-system, BlinkMacSystemFont, sans-serif';
 const FONT_MONO = "'Geist Mono', ui-monospace, SFMono-Regular, Menlo, monospace";
-const INK = '#0F172A';
-const INK_45 = 'rgba(15,23,42,0.45)';
+const INK = 'var(--hcp-t-100)';
+const INK_45 = 'var(--hcp-t-40)';
 const AMBER = '#F7931E';
 const AMBER_DEEP = '#C97211';
 const GREEN = '#10B981';
@@ -39,7 +39,7 @@ const NineGrid: React.FC<{ label: string; holes: WhsScoreHole[] }> = ({ label, h
           style={{
             fontSize: 10,
             fontWeight: 700,
-            color: INK,
+            color: 'var(--hcp-t-100)',
             letterSpacing: '0.18em',
             textTransform: 'uppercase',
           }}
@@ -52,7 +52,7 @@ const NineGrid: React.FC<{ label: string; holes: WhsScoreHole[] }> = ({ label, h
             alignItems: 'baseline',
             gap: 6,
             padding: '3px 9px',
-            background: 'rgba(15,23,42,0.04)',
+            background: 'var(--hcp-bg-2)',
             borderRadius: 999,
             fontVariantNumeric: 'tabular-nums',
           }}
@@ -61,7 +61,7 @@ const NineGrid: React.FC<{ label: string; holes: WhsScoreHole[] }> = ({ label, h
             style={{
               fontSize: 13,
               fontWeight: 600,
-              color: INK,
+              color: 'var(--hcp-t-100)',
               fontFamily: FONT_MONO,
               letterSpacing: '-0.02em',
             }}

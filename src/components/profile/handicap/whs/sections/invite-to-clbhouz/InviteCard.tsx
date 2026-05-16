@@ -13,10 +13,10 @@ interface Props {
   friend: FriendLeaderboardEntry;
 }
 
-const INK = '#0F172A';
-const INK_MUTE = 'rgba(15,23,42,0.55)';
-const INK_06 = 'rgba(15,23,42,0.06)';
-const HAIRLINE = 'rgba(15,23,42,0.08)';
+const INK = 'var(--hcp-t-100)';
+const INK_MUTE = 'var(--hcp-t-60)';
+const INK_06 = 'var(--hcp-bg-3)';
+const HAIRLINE = 'var(--hcp-line-2)';
 const AMBER = '#F7931E';
 const FONT_GEIST = '"Geist", system-ui, -apple-system, BlinkMacSystemFont, sans-serif';
 
@@ -48,7 +48,7 @@ export const InviteCard: React.FC<Props> = ({ friend }) => {
         flexDirection: 'column',
         gap: 10,
         padding: 12,
-        background: '#FFFFFF',
+        background: 'var(--hcp-bg-1)',
         border: `1px solid ${HAIRLINE}`,
         borderRadius: 12,
         fontFamily: FONT_GEIST,
@@ -100,7 +100,7 @@ export const InviteCard: React.FC<Props> = ({ friend }) => {
             style={{
               fontSize: 13.5,
               fontWeight: 700,
-              color: INK,
+              color: 'var(--hcp-t-100)',
               letterSpacing: '-0.01em',
               whiteSpace: 'nowrap',
               overflow: 'hidden',
@@ -131,7 +131,7 @@ export const InviteCard: React.FC<Props> = ({ friend }) => {
               style={{
                 fontSize: 11,
                 fontWeight: 700,
-                color: INK,
+                color: 'var(--hcp-t-100)',
                 fontVariantNumeric: 'tabular-nums',
               }}
             >

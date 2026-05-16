@@ -12,8 +12,8 @@ interface Props {
 }
 
 const T = {
-  ink: '#0F172A',
-  ink60: 'rgba(15,23,42,0.60)',
+  ink: 'var(--hcp-t-100)',
+  ink60: 'var(--hcp-t-60)',
   green: '#006747',
 };
 

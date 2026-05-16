@@ -12,13 +12,13 @@ export const ScorecardEmpty: React.FC<Props> = ({ message, subMessage }) => (
       padding: 16,
       background: 'rgba(15,23,42,0.03)',
       borderRadius: 12,
-      border: '1px dashed rgba(15,23,42,0.08)',
+      border: '1px dashed var(--hcp-line)',
       textAlign: 'center',
     }}
   >
-    <p style={{ margin: 0, fontSize: 13, fontWeight: 700, color: '#0F172A' }}>{message}</p>
+    <p style={{ margin: 0, fontSize: 13, fontWeight: 700, color: 'var(--hcp-t-100)' }}>{message}</p>
     {subMessage && (
-      <p style={{ margin: '4px 0 0', fontSize: 12, color: 'rgba(15,23,42,0.55)', lineHeight: 1.5 }}>
+      <p style={{ margin: '4px 0 0', fontSize: 12, color: 'var(--hcp-t-60)', lineHeight: 1.5 }}>
         {subMessage}
       </p>
     )}

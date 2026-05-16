@@ -10,10 +10,10 @@ interface Props {
 }
 
 const T = {
-  ink: '#0F172A',
-  inkMute: 'rgba(15,23,42,0.55)',
-  inkSoft: 'rgba(15,23,42,0.78)',
-  hairline: 'rgba(15,23,42,0.08)',
+  ink: 'var(--hcp-t-100)',
+  inkMute: 'var(--hcp-t-60)',
+  inkSoft: 'var(--hcp-t-80)',
+  hairline: 'var(--hcp-line-2)',
   amber: '#F7931E',
   amberDeep: '#C97211',
   amberTint: 'rgba(247,147,30,0.10)',
@@ -22,7 +22,7 @@ const T = {
   greenInk: '#065F46',
   red: '#9F1D1D',
   redInk: '#7F1D1D',
-  neutralTint: 'rgba(15,23,42,0.04)',
+  neutralTint: 'var(--hcp-bg-2)',
 };
 const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
 
@@ -182,7 +182,7 @@ const BandRow: React.FC<BandRowProps> = ({ color, ink, title, description }) => 
     />
     <div>
       <p style={{ margin: 0, fontSize: 12, fontWeight: 700, color: ink, fontFamily: FONT }}>{title}</p>
-      <p style={{ margin: '2px 0 0', fontSize: 12, lineHeight: 1.5, color: 'rgba(15,23,42,0.78)', fontFamily: FONT }}>
+      <p style={{ margin: '2px 0 0', fontSize: 12, lineHeight: 1.5, color: 'var(--hcp-t-80)', fontFamily: FONT }}>
         {description}
       </p>
     </div>

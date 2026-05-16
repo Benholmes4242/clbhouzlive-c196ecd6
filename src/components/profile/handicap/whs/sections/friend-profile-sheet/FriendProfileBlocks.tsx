@@ -9,10 +9,10 @@ import { fmtRelative, reformatFriendName } from '@/lib/whs/utils/nameFormat';
 import { useUpsertRivalOverride, useDeleteRivalOverride } from '@/lib/whs/hooks';
 
 const T = {
-  ink: '#0F172A',
-  inkMute: 'rgba(15,23,42,0.55)',
-  inkSoft: 'rgba(15,23,42,0.40)',
-  hairline: 'rgba(15,23,42,0.08)',
+  ink: 'var(--hcp-t-100)',
+  inkMute: 'var(--hcp-t-60)',
+  inkSoft: 'var(--hcp-t-40)',
+  hairline: 'var(--hcp-line-2)',
   amber: '#F7931E',
   amberDeep: '#C97211',
   amberTint: 'rgba(247,147,30,0.10)',
@@ -35,7 +35,7 @@ export const ProfileHeader: React.FC<{ friend: FriendLeaderboardEntry }> = ({ fr
           borderRadius: '34%',
           overflow: 'hidden',
           background: friend.friend_thumbnail_url
-            ? 'rgba(15,23,42,0.06)'
+            ? 'var(--hcp-bg-3)'
             : 'linear-gradient(135deg, #1a3c2a 0%, #0f172a 100%)',
           flexShrink: 0,
           display: 'flex',
@@ -171,7 +171,7 @@ const SectionWrapper: React.FC<{ eyebrow: string; children: React.ReactNode }> =
       <span style={{
         fontSize: 9,
         fontWeight: 800,
-        color: '#64748B',
+        color: 'var(--hcp-t-60)',
         letterSpacing: '0.16em',
         textTransform: 'uppercase' as const,
       }}>
@@ -221,7 +221,7 @@ const FilledH2H: React.FC<{ sharedRounds: SharedRoundsResult }> = ({ sharedRound
       <div style={{ display: 'flex', gap: 3 }}>
         {Array.from({ length: 8 }).map((_, i) => {
           const r = lastEight[i];
-          let bg = 'rgba(15,23,42,0.08)';
+          let bg = 'var(--hcp-line-2)';
           if (r) {
             if (r.stableford_outcome === 'W') bg = T.green;
             else if (r.stableford_outcome === 'L') bg = T.red;
@@ -332,7 +332,7 @@ export const PinFooter: React.FC<{
       left: 0,
       right: 0,
       padding: '12px 20px max(12px, env(safe-area-inset-bottom))',
-      background: '#FFFFFF',
+      background: 'var(--hcp-bg-1)',
       borderTop: `1px solid ${T.hairline}`,
       zIndex: 2,
     }}>
@@ -342,7 +342,7 @@ export const PinFooter: React.FC<{
         style={{
           width: '100%',
           padding: '14px',
-          background: isPinned ? 'rgba(15,23,42,0.06)' : T.amber,
+          background: isPinned ? 'var(--hcp-bg-3)' : T.amber,
           color: isPinned ? T.ink : '#fff',
           fontSize: 14,
           fontWeight: 800,

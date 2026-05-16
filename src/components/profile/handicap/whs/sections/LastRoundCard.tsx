@@ -11,15 +11,14 @@ interface Props {
 }
 
 const FONT_GEIST = 'Geist, system-ui, -apple-system, BlinkMacSystemFont, sans-serif';
-const INK_55 = 'rgba(15,23,42,0.55)';
-
+const INK_55 = 'var(--hcp-t-60)';
 const SectionEyebrow: React.FC<{ label: string }> = ({ label }) => (
   <div style={{ marginBottom: 6, padding: '0 16px 12px' }}>
     <span
       style={{
         fontSize: 9,
         fontWeight: 800,
-        color: '#64748B',
+        color: 'var(--hcp-t-60)',
         letterSpacing: '0.16em',
         textTransform: 'uppercase',
         fontFamily: FONT_GEIST,
@@ -77,7 +76,7 @@ export const LastRoundCard: React.FC<Props> = ({ connectionId }) => {
       <section style={{ marginTop: 32 }}>
         <SectionEyebrow label="LAST ROUND" />
         <div style={{ padding: '0 20px' }}>
-          <p style={{ fontSize: 14, color: INK_55, fontFamily: FONT_GEIST }}>
+          <p style={{ fontSize: 14, color: 'var(--hcp-t-60)', fontFamily: FONT_GEIST }}>
             Your rounds will appear here as soon as you start posting scores in MyEG.
           </p>
         </div>

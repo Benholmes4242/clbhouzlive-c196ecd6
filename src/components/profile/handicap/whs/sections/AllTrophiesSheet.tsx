@@ -11,13 +11,13 @@ import type { Achievement } from '@/lib/whs/types';
 const AMBER     = '#F7931E';
 const AMBER_06  = 'rgba(247,147,30,0.06)';
 const AMBER_14  = 'rgba(247,147,30,0.14)';
-const INK       = '#0F172A';
-const INK_70    = '#475569';
-const INK_55    = 'rgba(15,23,42,0.55)';
-const INK_40    = 'rgba(15,23,42,0.40)';
-const INK_10    = 'rgba(15,23,42,0.10)';
-const INK_06    = 'rgba(15,23,42,0.06)';
-const INK_04    = 'rgba(15,23,42,0.04)';
+const INK       = 'var(--hcp-t-100)';
+const INK_70    = 'var(--hcp-t-80)';
+const INK_55    = 'var(--hcp-t-60)';
+const INK_40    = 'var(--hcp-t-40)';
+const INK_10    = 'var(--hcp-line-2)';
+const INK_06    = 'var(--hcp-bg-3)';
+const INK_04    = 'var(--hcp-bg-2)';
 const GREEN     = '#059669';
 const GREEN_06  = 'rgba(5,150,105,0.06)';
 const GREEN_14  = 'rgba(5,150,105,0.14)';
@@ -108,7 +108,7 @@ const TrophyRow: React.FC<{ a: Achievement; onInfoClick?: (a: Achievement) => vo
         alignItems: 'flex-start',
         padding: 14,
         borderRadius: 12,
-        background: justEarned ? cat.accentBgSoft : iconLooksLocked ? 'transparent' : '#fff',
+        background: justEarned ? cat.accentBgSoft : iconLooksLocked ? 'transparent' : 'var(--hcp-bg-1)',
         border: iconLooksLocked
           ? `1px dashed ${INK_10}`
           : justEarned
@@ -163,7 +163,7 @@ const TrophyRow: React.FC<{ a: Achievement; onInfoClick?: (a: Achievement) => vo
                 borderRadius: '50%',
                 border: 'none',
                 background: 'transparent',
-                color: 'rgba(15,23,42,0.40)',
+                color: 'var(--hcp-t-40)',
                 cursor: 'pointer',
                 padding: 0,
                 display: 'flex',
@@ -201,7 +201,7 @@ const TrophyRow: React.FC<{ a: Achievement; onInfoClick?: (a: Achievement) => vo
               fontWeight: 600,
               letterSpacing: '-0.01em',
             }}>
-              <span style={{ color: INK_55 }}>
+              <span style={{ color: 'var(--hcp-t-60)' }}>
                 {a.list_played ?? 0} / {a.list_total ?? 100} played
               </span>
               {!listComplete && (
@@ -218,7 +218,7 @@ const TrophyRow: React.FC<{ a: Achievement; onInfoClick?: (a: Achievement) => vo
           alignItems: 'flex-start',
           gap: 6,
           fontSize: 11,
-          color: INK_55,
+          color: 'var(--hcp-t-60)',
           fontWeight: 500,
           lineHeight: 1.4,
         }}>
@@ -243,7 +243,7 @@ const TrophyRow: React.FC<{ a: Achievement; onInfoClick?: (a: Achievement) => vo
           <div style={{
             fontSize: 24,
             fontWeight: 800,
-            color: INK,
+            color: 'var(--hcp-t-100)',
             lineHeight: 1,
             fontVariantNumeric: 'tabular-nums',
             letterSpacing: '-0.03em',
@@ -252,7 +252,7 @@ const TrophyRow: React.FC<{ a: Achievement; onInfoClick?: (a: Achievement) => vo
             <div style={{
               fontSize: 9,
               fontWeight: 800,
-              color: INK_55,
+              color: 'var(--hcp-t-60)',
               letterSpacing: '0.10em',
               textTransform: 'uppercase',
               marginTop: 3,
@@ -276,7 +276,7 @@ const TrophyRow: React.FC<{ a: Achievement; onInfoClick?: (a: Achievement) => vo
           <div style={{
             fontSize: 11,
             fontWeight: 800,
-            color: INK_40,
+            color: 'var(--hcp-t-40)',
             letterSpacing: '0.10em',
             textTransform: 'uppercase',
           }}>{formatTrophyDate(a.achieved_at)}</div>
@@ -297,7 +297,7 @@ const TrophyRow: React.FC<{ a: Achievement; onInfoClick?: (a: Achievement) => vo
           <div style={{
             fontSize: 22,
             fontWeight: 800,
-            color: INK,
+            color: 'var(--hcp-t-100)',
             lineHeight: 1,
             fontVariantNumeric: 'tabular-nums',
             letterSpacing: '-0.03em',
@@ -305,7 +305,7 @@ const TrophyRow: React.FC<{ a: Achievement; onInfoClick?: (a: Achievement) => vo
           <div style={{
             fontSize: 9,
             fontWeight: 800,
-            color: INK_55,
+            color: 'var(--hcp-t-60)',
             letterSpacing: '0.10em',
             textTransform: 'uppercase',
             marginTop: 1,
@@ -392,7 +392,7 @@ export const AllTrophiesSheet: React.FC<Props> = ({ open, onClose, achievements 
         style={{
           position: 'fixed',
           inset: 0,
-          background: 'rgba(15,23,42,0.45)',
+          background: 'var(--hcp-t-40)',
           zIndex: 9998,
           animation: 'fadeIn 180ms ease-out',
         }}
@@ -407,7 +407,7 @@ export const AllTrophiesSheet: React.FC<Props> = ({ open, onClose, achievements 
           right: 0,
           bottom: 0,
           maxHeight: '90vh',
-          background: '#FFFFFF',
+          background: 'var(--hcp-bg-1)',
           borderTopLeftRadius: 20,
           borderTopRightRadius: 20,
           zIndex: 9999,
@@ -442,11 +442,11 @@ export const AllTrophiesSheet: React.FC<Props> = ({ open, onClose, achievements 
             display: 'flex', alignItems: 'baseline', gap: 8, marginBottom: 12,
           }}>
             <span style={{
-              fontSize: 56, fontWeight: 700, color: INK,
+              fontSize: 56, fontWeight: 700, color: 'var(--hcp-t-100)',
               letterSpacing: '-0.04em', lineHeight: 1,
               fontVariantNumeric: 'tabular-nums',
             }}>{earnedCount}</span>
-            <span style={{ fontSize: 16, color: INK_55, fontWeight: 500 }}>
+            <span style={{ fontSize: 16, color: 'var(--hcp-t-60)', fontWeight: 500 }}>
               of {earnableCount} earned
             </span>
             <span style={{ flex: 1 }} />
@@ -488,8 +488,8 @@ export const AllTrophiesSheet: React.FC<Props> = ({ open, onClose, achievements 
                 type="button"
                 onClick={() => setFilter(o.id)}
                 style={{
-                  background: active ? INK : '#fff',
-                  color: active ? '#fff' : INK_70,
+                  background: active ? 'var(--hcp-bg-3)' : 'transparent',
+                  color: active ? 'var(--hcp-t-100)' : 'var(--hcp-t-60)',
                   border: `0.5px solid ${active ? INK : INK_10}`,
                   borderRadius: 999,
                   padding: '7px 12px',
@@ -525,7 +525,7 @@ export const AllTrophiesSheet: React.FC<Props> = ({ open, onClose, achievements 
           {filtered.length === 0 ? (
             <div style={{
               padding: '60px 20px', textAlign: 'center',
-              color: INK_55, fontSize: 14, fontFamily: FONT_GEIST,
+              color: 'var(--hcp-t-60)', fontSize: 14, fontFamily: FONT_GEIST,
             }}>
               No trophies match this filter.
             </div>
@@ -558,7 +558,7 @@ export const AllTrophiesSheet: React.FC<Props> = ({ open, onClose, achievements 
                         width: 6, height: 6, borderRadius: '50%', background: cat.accent,
                       }} />
                       <span style={{
-                        fontSize: 11, fontWeight: 700, color: INK_70,
+                        fontSize: 11, fontWeight: 700, color: 'var(--hcp-t-80)',
                         letterSpacing: '0.14em', textTransform: 'uppercase',
                       }}>
                         {cat.label}

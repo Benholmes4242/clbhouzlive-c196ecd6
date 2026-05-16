@@ -30,16 +30,16 @@ interface Props {
 }
 
 const PAGE_BG = '#F8FAFC';
-const INK_MUTE = 'rgba(15,23,42,0.55)';
+const INK_MUTE = 'var(--hcp-t-60)';
 const FONT_GEIST = 'Geist, system-ui, -apple-system, BlinkMacSystemFont, sans-serif';
 const AMBER = '#F7931E';
 
 const SheetSkeleton: React.FC = () => (
   <div className="animate-pulse">
-    <div style={{ width: '100%', height: 340, background: 'rgba(15,23,42,0.06)' }} />
+    <div style={{ width: '100%', height: 340, background: 'var(--hcp-bg-3)' }} />
     <div style={{ padding: 18 }}>
-      <div style={{ height: 180, background: 'rgba(15,23,42,0.04)', borderRadius: 8, marginBottom: 12 }} />
-      <div style={{ height: 60, background: 'rgba(15,23,42,0.04)', borderRadius: 8 }} />
+      <div style={{ height: 180, background: 'var(--hcp-bg-2)', borderRadius: 8, marginBottom: 12 }} />
+      <div style={{ height: 60, background: 'var(--hcp-bg-2)', borderRadius: 8 }} />
     </div>
   </div>
 );
@@ -304,7 +304,7 @@ export const RoundDetailSheet: React.FC<Props> = ({
       <DrawerPrimitive.Portal>
         <DrawerPrimitive.Overlay
           className="fixed inset-0 z-[10001]"
-          style={{ background: 'rgba(15,23,42,0.40)' }}
+          style={{ background: 'var(--hcp-t-40)' }}
         />
         <DrawerPrimitive.Content
           aria-labelledby="round-detail-sheet-title"

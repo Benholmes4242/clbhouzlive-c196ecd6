@@ -10,12 +10,12 @@ import { analyticsEvents } from '@/utils/analyticsEvents';
 
 const AMBER     = '#F7931E';
 const AMBER_14  = 'rgba(247,147,30,0.14)';
-const INK       = '#0F172A';
-const INK_70    = '#475569';
-const INK_55    = 'rgba(15,23,42,0.55)';
-const INK_40    = 'rgba(15,23,42,0.40)';
-const INK_10    = 'rgba(15,23,42,0.10)';
-const INK_06    = 'rgba(15,23,42,0.06)';
+const INK       = 'var(--hcp-t-100)';
+const INK_70    = 'var(--hcp-t-80)';
+const INK_55    = 'var(--hcp-t-60)';
+const INK_40    = 'var(--hcp-t-40)';
+const INK_10    = 'var(--hcp-line-2)';
+const INK_06    = 'var(--hcp-bg-3)';
 const FONT_GEIST = 'Geist, system-ui, -apple-system, BlinkMacSystemFont, sans-serif';
 
 const BUCKET_ORDER: HandicapBucket[] = [
@@ -155,8 +155,8 @@ const DistributionChart: React.FC<{
             const barBg = isUser
               ? `linear-gradient(180deg, #FBBF24 0%, #F59E0B 100%)`
               : isMedian
-                ? `linear-gradient(180deg, rgba(15,23,42,0.25), rgba(15,23,42,0.10))`
-                : `linear-gradient(180deg, rgba(15,23,42,0.10), rgba(15,23,42,0.04))`;
+                ? `linear-gradient(180deg, rgba(255,255,255,0.18), rgba(255,255,255,0.08))`
+                : `linear-gradient(180deg, rgba(255,255,255,0.08), rgba(255,255,255,0.03))`;
             return (
               <div
                 key={b.bucket}
@@ -234,7 +234,7 @@ const AvailableCard: React.FC<{
             margin: 0,
             fontSize: 44,
             fontWeight: 800,
-            color: INK,
+            color: 'var(--hcp-t-100)',
             letterSpacing: '-0.04em',
             lineHeight: 1,
             fontVariantNumeric: 'tabular-nums',
@@ -252,7 +252,7 @@ const AvailableCard: React.FC<{
             background:
               copy.pillTone === 'positive' ? 'rgba(34,197,94,0.12)'
               : copy.pillTone === 'neutral' ? AMBER_14
-              : 'rgba(15,23,42,0.06)',
+              : 'var(--hcp-bg-3)',
             color:
               copy.pillTone === 'positive' ? '#15803D'
               : copy.pillTone === 'neutral' ? '#854F0B'
@@ -272,7 +272,7 @@ const AvailableCard: React.FC<{
         style={{
           fontFamily: FONT_GEIST,
           fontSize: 13,
-          color: INK_55,
+          color: 'var(--hcp-t-60)',
           padding: '6px 16px 0',
           margin: 0,
           lineHeight: 1.5,
@@ -284,8 +284,8 @@ const AvailableCard: React.FC<{
       <div
         style={{
           margin: '14px 16px 0',
-          background: '#FFFFFF',
-          border: `0.5px solid ${INK_10}`,
+          background: 'var(--hcp-bg-1)',
+          border: '1px solid var(--hcp-line-2)',
           borderRadius: 14,
           padding: 14,
         }}
@@ -307,7 +307,7 @@ const AvailableCard: React.FC<{
             fontFamily: FONT_GEIST,
             fontSize: 10.5,
             fontWeight: 600,
-            color: INK_55,
+            color: 'var(--hcp-t-60)',
           }}
         >
           <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5 }}>
@@ -326,7 +326,7 @@ const AvailableCard: React.FC<{
               style={{
                 width: 10,
                 height: 3,
-                background: 'rgba(15,23,42,0.25)',
+                background: 'var(--hcp-t-20)',
                 borderRadius: 1,
               }}
             />
@@ -344,8 +344,8 @@ const UnavailableCard: React.FC<{ reason: 'cohort_unavailable' }> = () => (
       margin: '0 20px',
       padding: '20px',
       borderRadius: 14,
-      background: 'rgba(15,23,42,0.04)',
-      border: '0.5px solid rgba(15,23,42,0.10)',
+      background: 'var(--hcp-bg-2)',
+      border: '1px solid var(--hcp-line-2)',
       fontFamily: FONT_GEIST,
       textAlign: 'center',
     }}
@@ -353,7 +353,7 @@ const UnavailableCard: React.FC<{ reason: 'cohort_unavailable' }> = () => (
     <p style={{
       margin: 0,
       fontSize: 13,
-      color: 'rgba(15,23,42,0.55)',
+      color: 'var(--hcp-t-60)',
     }}>
       Comparison data is being prepared. Check back soon.
     </p>

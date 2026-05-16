@@ -8,14 +8,14 @@ interface Props {
 }
 
 const T = {
-  bgFrom: '#0F172A',
+  bgFrom: 'var(--hcp-t-100)',
   bgTo: '#1e293b',
   amber: '#F7931E',
   amberLight: '#F59E0B',
   amberRingOuter: 'rgba(247,147,30,0.15)',
   amberRingInner: 'rgba(247,147,30,0.10)',
-  white: '#FFFFFF',
-  slate: '#94A3B8',
+  white: 'var(--hcp-bg-1)',
+  slate: 'var(--hcp-t-60)',
 };
 
 const FONT_GEIST = 'Geist, system-ui, -apple-system, BlinkMacSystemFont, sans-serif';
@@ -127,7 +127,7 @@ export const RivalryAddCard: React.FC<Props> = ({ slotIndex: _slotIndex, label: 
           border: 'none',
           borderRadius: 10,
           padding: '9px 18px',
-          color: '#fff',
+          color: 'var(--hcp-bg-1)',
           fontSize: 12,
           fontWeight: 700,
           boxShadow: '0 2px 10px rgba(247,147,30,0.30)',

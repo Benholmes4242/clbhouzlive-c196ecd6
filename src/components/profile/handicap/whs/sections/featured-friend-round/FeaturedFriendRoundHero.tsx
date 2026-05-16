@@ -211,7 +211,7 @@ const FeaturedHeroSkeleton: React.FC = () => (
   <section style={{ padding: '20px 20px 8px' }}>
     <div className="animate-pulse" style={{
       height: 280,
-      background: 'rgba(15,23,42,0.04)',
+      background: 'var(--hcp-bg-2)',
       borderRadius: 18,
     }} />
   </section>

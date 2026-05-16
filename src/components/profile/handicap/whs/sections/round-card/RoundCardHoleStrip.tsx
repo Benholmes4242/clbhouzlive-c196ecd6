@@ -11,9 +11,9 @@
  */
 import React from 'react';
 
-const INK = '#0F172A';
-const INK_20 = 'rgba(15,23,42,0.20)';
-const INK_55 = 'rgba(15,23,42,0.55)';
+const INK = 'var(--hcp-t-100)';
+const INK_20 = 'var(--hcp-t-20)';
+const INK_55 = 'var(--hcp-t-60)';
 const INK_85 = 'rgba(15,23,42,0.85)';
 const AMBER_INK = '#C97211';
 const AMBER_GRAD = 'url(#hsAmberGoldStroke)';
@@ -204,7 +204,7 @@ const NineRow: React.FC<{ label: string; holes: HoleRow[] }> = ({ label, holes }
           width: 24,
           fontSize: 9,
           fontWeight: 800,
-          color: INK_55,
+          color: 'var(--hcp-t-60)',
           letterSpacing: '0.12em',
           textTransform: 'uppercase',
         }}
@@ -235,7 +235,7 @@ const NineRow: React.FC<{ label: string; holes: HoleRow[] }> = ({ label, holes }
           fontVariantNumeric: 'tabular-nums',
         }}
       >
-        <span style={{ fontSize: 13, fontWeight: 800, color: INK }}>
+        <span style={{ fontSize: 13, fontWeight: 800, color: 'var(--hcp-t-100)' }}>
           {anyPlayed ? total : '\u2014'}
         </span>
         {anyPlayed && (
@@ -243,7 +243,7 @@ const NineRow: React.FC<{ label: string; holes: HoleRow[] }> = ({ label, holes }
             style={{
               fontSize: 9,
               fontWeight: 700,
-              color: INK_55,
+              color: 'var(--hcp-t-60)',
               letterSpacing: '0.04em',
             }}
           >

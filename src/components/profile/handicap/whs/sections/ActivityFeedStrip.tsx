@@ -75,7 +75,7 @@ export const ActivityFeedStrip: React.FC<Props> = ({ ownerUserId }) => {
                   onClick={onClick}
                   className="relative flex-shrink-0 w-[140px] rounded-xl border p-3 bg-background text-left transition-colors hover:bg-muted/30"
                   style={{
-                    borderColor: 'rgba(15,23,42,0.08)',
+                    borderColor: 'var(--hcp-line-2)',
                     scrollSnapAlign: 'start',
                   }}
                 >
@@ -91,7 +91,7 @@ export const ActivityFeedStrip: React.FC<Props> = ({ ownerUserId }) => {
                       <div
                         className="w-9 h-9 flex items-center justify-center text-[11px] font-bold text-muted-foreground"
                         style={{
-                          background: 'rgba(15,23,42,0.06)',
+                          background: 'var(--hcp-bg-3)',
                           borderRadius: '34%',
                         }}
                       >
@@ -118,7 +118,7 @@ export const ActivityFeedStrip: React.FC<Props> = ({ ownerUserId }) => {
                     style={
                       isOnClbhouz
                         ? { background: 'rgba(16,185,129,0.12)', color: '#059669' }
-                        : { background: 'rgba(15,23,42,0.05)', color: '#64748B' }
+                        : { background: 'rgba(15,23,42,0.05)', color: 'var(--hcp-t-60)' }
                     }
                   >
                     {isOnClbhouz ? (

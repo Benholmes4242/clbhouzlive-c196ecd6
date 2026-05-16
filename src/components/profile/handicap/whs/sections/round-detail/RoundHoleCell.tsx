@@ -6,9 +6,9 @@ interface Props {
 }
 
 // ─── Design tokens ─────────────────────────────────────────────────────
-const INK = '#0F172A';
-const INK_55 = 'rgba(15,23,42,0.55)';
-const INK_40 = 'rgba(15,23,42,0.40)';
+const INK = 'var(--hcp-t-100)';
+const INK_55 = 'var(--hcp-t-60)';
+const INK_40 = 'var(--hcp-t-40)';
 const HAIRLINE = 'rgba(15,23,42,0.16)';
 const AMBER = '#F7931E';
 
@@ -161,7 +161,7 @@ export const RoundHoleCell: React.FC<Props> = ({ hole }) => {
         style={{
           fontSize: 9,
           fontWeight: 500,
-          color: INK_55,
+          color: 'var(--hcp-t-60)',
           letterSpacing: '0.04em',
           fontVariantNumeric: 'tabular-nums',
           lineHeight: 1,

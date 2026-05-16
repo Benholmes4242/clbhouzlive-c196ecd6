@@ -26,12 +26,12 @@ const ICONS: Record<string, React.ComponentType<any>> = {
 };
 
 const TROPHY_TILE_WIDTH = 130;
-const HAIRLINE = 'rgba(15,23,42,0.08)';
-const INK = '#0F172A';
-const INK_55 = 'rgba(15,23,42,0.55)';
-const INK_10 = 'rgba(15,23,42,0.10)';
-const INK_06 = 'rgba(15,23,42,0.06)';
-const INK_70 = '#475569';
+const HAIRLINE = 'var(--hcp-line-2)';
+const INK = 'var(--hcp-t-100)';
+const INK_55 = 'var(--hcp-t-60)';
+const INK_10 = 'var(--hcp-line-2)';
+const INK_06 = 'var(--hcp-bg-3)';
+const INK_70 = 'var(--hcp-t-80)';
 const GOLD = '#D97706';
 const AMBER = '#F7931E';
 const AMBER_14 = 'rgba(247,147,30,0.14)';
@@ -62,7 +62,7 @@ const TrophyTile: React.FC<{ a: Achievement }> = ({ a }) => {
         position: 'relative',
         padding: '12px 12px',
         borderRadius: 12,
-        background: isLocked ? 'rgba(15,23,42,0.025)' : '#fff',
+        background: isLocked ? 'var(--hcp-bg-2)' : 'var(--hcp-bg-1)',
         border: isLocked
           ? `1px dashed rgba(15,23,42,0.18)`
           : `0.5px solid ${INK_10}`,
@@ -86,7 +86,7 @@ const TrophyTile: React.FC<{ a: Achievement }> = ({ a }) => {
       >
         <Icon
           size={16}
-          color={isLocked ? 'rgba(15,23,42,0.40)' : cat.accent}
+          color={isLocked ? 'var(--hcp-t-40)' : cat.accent}
           strokeWidth={2.2}
         />
       </div>
@@ -113,7 +113,7 @@ const TrophyTile: React.FC<{ a: Achievement }> = ({ a }) => {
           <div style={{
             fontSize: 20,
             fontWeight: 800,
-            color: INK,
+            color: 'var(--hcp-t-100)',
             lineHeight: 1,
             fontVariantNumeric: 'tabular-nums',
             letterSpacing: '-0.03em',
@@ -122,7 +122,7 @@ const TrophyTile: React.FC<{ a: Achievement }> = ({ a }) => {
             <div style={{
               fontSize: 9,
               fontWeight: 800,
-              color: INK_55,
+              color: 'var(--hcp-t-60)',
               letterSpacing: '0.10em',
               textTransform: 'uppercase',
               marginTop: 3,
@@ -146,7 +146,7 @@ const TrophyTile: React.FC<{ a: Achievement }> = ({ a }) => {
             }} />
           </div>
           <div style={{
-            fontSize: 10, fontWeight: 700, color: INK_55,
+            fontSize: 10, fontWeight: 700, color: 'var(--hcp-t-60)',
             fontVariantNumeric: 'tabular-nums',
           }}>
             {a.list_played ?? 0} / {a.list_total ?? 100}
@@ -157,7 +157,7 @@ const TrophyTile: React.FC<{ a: Achievement }> = ({ a }) => {
       {isList && listComplete && (
         <div style={{ marginTop: 'auto', display: 'flex', alignItems: 'baseline', gap: 4 }}>
           <span style={{
-            fontSize: 18, fontWeight: 800, color: INK,
+            fontSize: 18, fontWeight: 800, color: 'var(--hcp-t-100)',
             fontVariantNumeric: 'tabular-nums', letterSpacing: '-0.03em',
           }}>{a.list_total ?? 100}</span>
           <span style={{ fontSize: 14 }}>🏆</span>
@@ -167,7 +167,7 @@ const TrophyTile: React.FC<{ a: Achievement }> = ({ a }) => {
       {isBinary && isEarned && a.achieved_at && (
         <div style={{ marginTop: 'auto', display: 'flex', alignItems: 'center', gap: 4 }}>
           <span style={{
-            fontSize: 10, fontWeight: 700, color: '#94A3B8',
+            fontSize: 10, fontWeight: 700, color: 'var(--hcp-t-60)',
             letterSpacing: '0.04em',
           }}>{format(new Date(a.achieved_at), 'd MMM yyyy').toUpperCase()}</span>
           <span style={{ fontSize: 12, marginLeft: 'auto' }}>🏆</span>
@@ -182,7 +182,7 @@ const TrophyTile: React.FC<{ a: Achievement }> = ({ a }) => {
           gap: 4,
           fontSize: 10,
           fontWeight: 500,
-          color: 'rgba(15,23,42,0.55)',
+          color: 'var(--hcp-t-60)',
           lineHeight: 1.3,
         }}>
           <Lock size={10} color="rgba(15,23,42,0.40)" strokeWidth={2.2}
@@ -240,7 +240,7 @@ const ViewAllTile: React.FC<{ totalCount: number; onClick: () => void }> = ({
           style={{
             fontSize: 13,
             fontWeight: 800,
-            color: '#0F172A',
+            color: 'var(--hcp-t-100)',
             letterSpacing: '-0.01em',
             lineHeight: 1.2,
           }}

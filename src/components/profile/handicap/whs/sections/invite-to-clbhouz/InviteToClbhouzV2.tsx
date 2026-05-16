@@ -13,15 +13,15 @@ interface Props {
 }
 
 const T = {
-  ink: '#0F172A',
-  inkSoft: 'rgba(15,23,42,0.78)',
-  inkMute: 'rgba(15,23,42,0.55)',
-  hairline: 'rgba(15,23,42,0.08)',
+  ink: 'var(--hcp-t-100)',
+  inkSoft: 'var(--hcp-t-80)',
+  inkMute: 'var(--hcp-t-60)',
+  hairline: 'var(--hcp-line-2)',
   amber: '#F7931E',
   green: '#22C55E',
   greenDeep: '#15803D',
   greenSoft: 'rgba(34,197,94,0.12)',
-  cardBg: '#FFFFFF',
+  cardBg: 'var(--hcp-bg-1)',
 };
 const FONT = '"Geist", system-ui, sans-serif';
 

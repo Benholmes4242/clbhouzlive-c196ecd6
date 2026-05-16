@@ -7,9 +7,9 @@ interface Props {
 
 const FONT_GEIST = 'Geist, system-ui, -apple-system, BlinkMacSystemFont, sans-serif';
 const FONT_MONO = "'Geist Mono', ui-monospace, SFMono-Regular, Menlo, monospace";
-const INK = '#0F172A';
-const INK_45 = 'rgba(15,23,42,0.45)';
-const HAIRLINE = 'rgba(15,23,42,0.08)';
+const INK = 'var(--hcp-t-100)';
+const INK_45 = 'var(--hcp-t-40)';
+const HAIRLINE = 'var(--hcp-line-2)';
 const AMBER = '#F7931E';
 const RED = '#EF4444';
 const MAROON = '#991B1B';
@@ -56,7 +56,7 @@ export const RoundBreakdown: React.FC<Props> = ({ holes }) => {
 
   return (
     <div style={{ padding: '12px 0 16px', fontFamily: FONT_GEIST }}>
-      <div style={{ height: 0.5, background: 'rgba(15,23,42,0.15)', margin: '0 18px' }} />
+      <div style={{ height: 0.5, background: 'var(--hcp-t-20)', margin: '0 18px' }} />
       <div style={{ padding: '0 18px', margin: '12px 0 10px' }}>
         <span
           style={{
@@ -80,7 +80,7 @@ export const RoundBreakdown: React.FC<Props> = ({ holes }) => {
               gap: 5,
               padding: '6px 10px',
               borderRadius: 999,
-              background: '#FFFFFF',
+              background: 'var(--hcp-bg-1)',
               border: `0.5px solid ${HAIRLINE}`,
             }}
           >
@@ -96,7 +96,7 @@ export const RoundBreakdown: React.FC<Props> = ({ holes }) => {
               style={{
                 fontSize: 12,
                 fontWeight: 600,
-                color: INK,
+                color: 'var(--hcp-t-100)',
                 fontFamily: FONT_MONO,
                 fontVariantNumeric: 'tabular-nums',
               }}

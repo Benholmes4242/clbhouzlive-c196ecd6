@@ -18,9 +18,9 @@ interface Props {
   onClose: () => void;
 }
 
-const INK = '#0F172A';
-const INK_MUTE = 'rgba(15,23,42,0.55)';
-const HAIRLINE = 'rgba(15,23,42,0.08)';
+const INK = 'var(--hcp-t-100)';
+const INK_MUTE = 'var(--hcp-t-60)';
+const HAIRLINE = 'var(--hcp-line-2)';
 const AMBER = '#F7931E';
 const AMBER_DEEP = '#C97211';
 const AMBER_TINT = 'rgba(247,147,30,0.10)';
@@ -81,7 +81,7 @@ export const RivalryEditSheet: React.FC<Props> = ({ userId, rivalry, slotIndex, 
             right: 0,
             bottom: 0,
             zIndex: 81,
-            background: '#FFFFFF',
+            background: 'var(--hcp-bg-1)',
             borderTopLeftRadius: 20,
             borderTopRightRadius: 20,
             maxHeight: '85vh',
@@ -93,7 +93,7 @@ export const RivalryEditSheet: React.FC<Props> = ({ userId, rivalry, slotIndex, 
         >
           <DrawerPrimitive.Title className="sr-only">Edit rival</DrawerPrimitive.Title>
           <div aria-hidden style={{ display: 'flex', justifyContent: 'center', padding: '8px 0 4px', flexShrink: 0 }}>
-            <div style={{ width: 36, height: 4, borderRadius: 2, background: 'rgba(15,23,42,0.15)' }} />
+            <div style={{ width: 36, height: 4, borderRadius: 2, background: 'var(--hcp-t-20)' }} />
           </div>
 
           <SheetHeader
@@ -111,7 +111,7 @@ export const RivalryEditSheet: React.FC<Props> = ({ userId, rivalry, slotIndex, 
               gap: 8,
               padding: '10px 12px',
               borderRadius: 10,
-              background: 'rgba(15,23,42,0.04)',
+              background: 'var(--hcp-bg-2)',
               border: `1px solid ${HAIRLINE}`,
             }}>
               <Search size={14} color={INK_MUTE} strokeWidth={2.2} />
@@ -125,7 +125,7 @@ export const RivalryEditSheet: React.FC<Props> = ({ userId, rivalry, slotIndex, 
                   outline: 'none',
                   background: 'transparent',
                   fontSize: 14,
-                  color: INK,
+                  color: 'var(--hcp-t-100)',
                   fontFamily: 'inherit',
                 }}
               />
@@ -193,19 +193,19 @@ export const RivalryEditSheet: React.FC<Props> = ({ userId, rivalry, slotIndex, 
                     <div style={{
                       width: 38, height: 38, borderRadius: '34%',
                       overflow: 'hidden',
-                      background: 'rgba(15,23,42,0.06)',
+                      background: 'var(--hcp-bg-3)',
                       flexShrink: 0,
                       display: 'flex', alignItems: 'center', justifyContent: 'center',
                     }}>
                       {c.friend_thumbnail_url ? (
                         <img src={c.friend_thumbnail_url} alt={c.friend_name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                       ) : (
-                        <span style={{ fontSize: 11, fontWeight: 800, color: '#64748B' }}>{initials(c.friend_name)}</span>
+                        <span style={{ fontSize: 11, fontWeight: 800, color: 'var(--hcp-t-60)' }}>{initials(c.friend_name)}</span>
                       )}
                     </div>
                     <div style={{ flex: 1, minWidth: 0 }}>
                       <p style={{
-                        margin: 0, fontSize: 14, fontWeight: 700, color: INK,
+                        margin: 0, fontSize: 14, fontWeight: 700, color: 'var(--hcp-t-100)',
                         whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
                       }}>
                         {firstName(c.friend_name)}

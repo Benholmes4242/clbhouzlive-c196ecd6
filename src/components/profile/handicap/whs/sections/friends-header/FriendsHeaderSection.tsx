@@ -31,7 +31,7 @@ export const FriendsHeaderSection: React.FC<Props> = ({ userId }) => {
       <section style={{ padding: '0 16px' }}>
         <div
           className="animate-pulse"
-          style={{ height: 64, borderRadius: 12, background: 'rgba(15,23,42,0.06)' }}
+          style={{ height: 64, borderRadius: 12, background: 'var(--hcp-bg-3)' }}
         />
       </section>
     );
