@@ -34,6 +34,14 @@ export const CinemaFriendCard: React.FC<Props> = ({ activity, onClick }) => {
   const slope = detail?.slope_rating ?? null;
   const showShape = !!detail?.hole_by_hole_fetched && (detail.holes?.length ?? 0) > 0;
 
+  const impactDelta =
+    activity.is_counter &&
+    activity.handicap_index_at_time !== null &&
+    activity.friend_handicap_index !== null
+      ? activity.friend_handicap_index - activity.handicap_index_at_time
+      : null;
+  const showHotFlame = impactDelta !== null && Math.abs(impactDelta) >= 0.05 && impactDelta < 0;
+
   return (
     <div
       onClick={onClick}
@@ -110,6 +118,7 @@ export const CinemaFriendCard: React.FC<Props> = ({ activity, onClick }) => {
             differential={activity.last_round_differential}
             holes={showShape ? detail!.holes : null}
             isCounter={false}
+            showHotFlame={showHotFlame}
           />
         </div>
       </div>

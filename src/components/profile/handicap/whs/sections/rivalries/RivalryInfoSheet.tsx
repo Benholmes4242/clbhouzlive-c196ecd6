@@ -76,6 +76,7 @@ export const RivalryInfoSheet: React.FC<Props> = ({ rivalry, open, onClose }) =>
             title={explain?.title ?? 'About this rival'}
             sub={explain?.body}
             onClose={onClose}
+            dark
           />
 
           <div style={{ padding: '8px 16px 20px' }}>

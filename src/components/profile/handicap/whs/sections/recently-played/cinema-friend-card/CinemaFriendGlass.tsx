@@ -19,6 +19,7 @@ interface Props {
   differential: number | null;
   holes: WhsScoreHole[] | null;
   isCounter?: boolean;
+  showHotFlame?: boolean;
 }
 
 const HAIR: React.CSSProperties = {
@@ -55,6 +56,7 @@ export const CinemaFriendGlass: React.FC<Props> = ({
   differential,
   holes,
   isCounter = false,
+  showHotFlame = false,
 }) => {
   const { title, suffix } = splitCourseName(courseName ?? 'Round played');
   const meta = [
@@ -81,18 +83,36 @@ export const CinemaFriendGlass: React.FC<Props> = ({
       }}
     >
       <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 10 }}>
-        <div
-          style={{
-            fontSize: 12,
-            fontWeight: 700,
-            color: '#FFFFFF',
-            letterSpacing: '-0.02em',
-            lineHeight: 1.1,
-            minWidth: 0,
-            flex: 1,
-          }}
-        >
-          {title}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 6, minWidth: 0, flex: 1 }}>
+          <div
+            style={{
+              fontSize: 12,
+              fontWeight: 700,
+              color: '#FFFFFF',
+              letterSpacing: '-0.02em',
+              lineHeight: 1.1,
+              minWidth: 0,
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              whiteSpace: 'nowrap',
+            }}
+          >
+            {title}
+          </div>
+          {showHotFlame && (
+            <span
+              aria-label="Hot round — handicap cut"
+              style={{
+                fontSize: 13,
+                lineHeight: 1,
+                flexShrink: 0,
+                filter:
+                  'drop-shadow(0 0 4px rgba(247,147,30,0.50)) drop-shadow(0 1px 2px rgba(0,0,0,0.4))',
+              }}
+            >
+              🔥
+            </span>
+          )}
         </div>
         <span
           style={{

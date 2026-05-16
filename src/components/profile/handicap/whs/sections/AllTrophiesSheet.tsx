@@ -108,10 +108,14 @@ const TrophyRow: React.FC<{ a: Achievement; onInfoClick?: (a: Achievement) => vo
         alignItems: 'flex-start',
         padding: 14,
         borderRadius: 12,
-        background: justEarned ? cat.accentBgSoft : iconLooksLocked ? 'transparent' : 'var(--hcp-bg-1)',
+        background: (isBinary && isEarned)
+          ? cat.accentBgSoft
+          : iconLooksLocked
+            ? 'transparent'
+            : 'var(--hcp-bg-1)',
         border: iconLooksLocked
           ? `1px dashed ${INK_10}`
-          : justEarned
+          : (isBinary && isEarned)
             ? `1px solid ${cat.accent}`
             : `0.5px solid ${INK_10}`,
         fontFamily: FONT_GEIST,
@@ -392,7 +396,7 @@ export const AllTrophiesSheet: React.FC<Props> = ({ open, onClose, achievements 
         style={{
           position: 'fixed',
           inset: 0,
-          background: 'var(--hcp-t-40)',
+          background: 'rgba(0,0,0,0.65)',
           zIndex: 9998,
           animation: 'fadeIn 180ms ease-out',
         }}
@@ -434,6 +438,7 @@ export const AllTrophiesSheet: React.FC<Props> = ({ open, onClose, achievements 
           title="All achievements"
           onClose={onClose}
           borderBottom={false}
+          dark
         />
 
         {/* Custom hero panel — the 56px count + percent + progress bar */}
@@ -488,9 +493,9 @@ export const AllTrophiesSheet: React.FC<Props> = ({ open, onClose, achievements 
                 type="button"
                 onClick={() => setFilter(o.id)}
                 style={{
-                  background: active ? 'var(--hcp-bg-3)' : 'transparent',
-                  color: active ? 'var(--hcp-t-100)' : 'var(--hcp-t-60)',
-                  border: `0.5px solid ${active ? INK : INK_10}`,
+                  background: active ? 'var(--hcp-t-100)' : 'var(--hcp-bg-2)',
+                  color: active ? 'var(--hcp-bg-1)' : 'var(--hcp-t-60)',
+                  border: 'none',
                   borderRadius: 999,
                   padding: '7px 12px',
                   fontSize: 12, fontWeight: 600,
@@ -502,8 +507,8 @@ export const AllTrophiesSheet: React.FC<Props> = ({ open, onClose, achievements 
               >
                 {o.label}
                 <span style={{
-                  background: active ? 'var(--hcp-amber-tint)' : 'var(--hcp-bg-3)',
-                  color: active ? 'var(--hcp-amber)' : 'var(--hcp-t-60)',
+                  background: active ? 'rgba(15,23,42,0.10)' : 'var(--hcp-bg-3)',
+                  color: active ? 'var(--hcp-bg-1)' : 'var(--hcp-t-60)',
                   borderRadius: 999,
                   padding: '1px 6px',
                   fontSize: 10, fontWeight: 700,

@@ -101,6 +101,7 @@ export const RivalryEditSheet: React.FC<Props> = ({ userId, rivalry, slotIndex, 
             title={rivalry?.rival_name ? `Replace ${firstName(rivalry.rival_name)}` : 'Choose a rival'}
             sub="Pick someone from your circle. Pinned rivals stay in your slot until you remove them."
             onClose={onClose}
+            dark
           />
 
           <div style={{ padding: '12px 16px 12px', flexShrink: 0 }}>
