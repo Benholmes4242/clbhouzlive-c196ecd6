@@ -163,7 +163,7 @@ const NextRoundWatch: React.FC<Props> = ({ connectionId, currentHandicap }) => {
           <div
             style={{
               display: 'grid',
-              gridTemplateColumns: 'repeat(4, 1fr)',
+              gridTemplateColumns: 'repeat(3, 1fr)',
               marginTop: 10,
               fontFamily: FONT,
               fontVariantNumeric: 'tabular-nums',
@@ -171,7 +171,6 @@ const NextRoundWatch: React.FC<Props> = ({ connectionId, currentHandicap }) => {
           >
             <BarStack label="SCRATCH" value="0" align="start" />
             <BarStack label="CUT" value={target.toFixed(1)} valueColor="var(--hcp-good)" />
-            <BarStack label="HOLD" value={settle.toFixed(1)} />
             <BarStack
               label="OLDEST"
               value={oldest ? oldest.diff.toFixed(1) : '—'}
@@ -203,7 +202,7 @@ const NextRoundWatch: React.FC<Props> = ({ connectionId, currentHandicap }) => {
             borderRight
           />
           <InnerCell
-            eyebrow="OTHERWISE"
+            eyebrow="Otherwise you'll stay at"
             eyebrowIcon={<Minus size={11} strokeWidth={2.6} />}
             eyebrowColor="var(--hcp-t-60)"
             value={settle.toFixed(1)}
@@ -212,7 +211,7 @@ const NextRoundWatch: React.FC<Props> = ({ connectionId, currentHandicap }) => {
                 ? 'var(--hcp-good)'
                 : 'var(--hcp-t-100)'
             }
-            subtext="Holds. No risk of going up."
+            subtext="With no risk of going up"
           />
         </div>
 
@@ -247,16 +246,6 @@ const NextRoundWatch: React.FC<Props> = ({ connectionId, currentHandicap }) => {
               <span style={{ color: 'var(--hcp-t-100)', fontWeight: 700 }}>
                 {last5Avg.toFixed(1)}
               </span>
-            </span>
-            <span
-              style={{
-                color: isBeatingTarget ? 'var(--hcp-good)' : 'var(--hcp-amber)',
-                fontWeight: 600,
-              }}
-            >
-              {isBeatingTarget
-                ? `${(target - last5Avg).toFixed(1)} below target`
-                : `${(last5Avg - target).toFixed(1)} above target`}
             </span>
           </div>
         )}
