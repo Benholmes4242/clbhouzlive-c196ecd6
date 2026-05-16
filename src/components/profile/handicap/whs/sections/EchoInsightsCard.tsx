@@ -302,7 +302,7 @@ export const EchoInsightsCard: React.FC<Props> = ({ connectionId }) => {
       )}
 
       {/* Suited */}
-      <div>
+      <div style={{ position: 'relative', zIndex: 1 }}>
         <SectionHeader
           eyebrow="SUITED TO YOUR GAME"
           title="Three courses for posting low scores"
