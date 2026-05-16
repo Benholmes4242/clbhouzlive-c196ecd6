@@ -259,18 +259,26 @@ export const KPICell: React.FC<KPICellProps> = ({
 
 // ── Triple-strip (3 KPICells in a row, used under hero rings) ──────
 
-export const TripleStrip: React.FC<{ children: React.ReactNode; style?: React.CSSProperties }> = ({
-  children,
-  style,
-}) => (
+export const TripleStrip: React.FC<{
+  children: React.ReactNode;
+  style?: React.CSSProperties;
+  /**
+   * 'card' (default): boxed with bg, border, and rounded corners
+   * 'flush': no card wrapper; cells sit directly on canvas with
+   *          hairline dividers and a hairline above/below the row.
+   */
+  variant?: 'card' | 'flush';
+}> = ({ children, style, variant = 'card' }) => (
   <div
     style={{
       display: 'grid',
       gridTemplateColumns: 'repeat(3, 1fr)',
-      margin: '16px 20px 0',
-      background: 'var(--hcp-bg-1)',
-      border: '1px solid var(--hcp-line)',
-      borderRadius: 14,
+      margin: variant === 'flush' ? '20px 20px 0' : '16px 20px 0',
+      background: variant === 'flush' ? 'transparent' : 'var(--hcp-bg-1)',
+      border: variant === 'flush' ? 'none' : '1px solid var(--hcp-line)',
+      borderTop: variant === 'flush' ? '1px solid var(--hcp-line)' : undefined,
+      borderBottom: variant === 'flush' ? '1px solid var(--hcp-line)' : undefined,
+      borderRadius: variant === 'flush' ? 0 : 14,
       overflow: 'hidden',
       ...style,
     }}
