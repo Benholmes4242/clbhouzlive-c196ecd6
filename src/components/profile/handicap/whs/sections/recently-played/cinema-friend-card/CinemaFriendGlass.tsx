@@ -119,7 +119,7 @@ export const CinemaFriendGlass: React.FC<Props> = ({
       {meta && (
         <div
           style={{
-            marginTop: 2,
+            marginTop: 1,
             fontSize: 10,
             fontWeight: 600,
             color: 'rgba(255,255,255,0.60)',
