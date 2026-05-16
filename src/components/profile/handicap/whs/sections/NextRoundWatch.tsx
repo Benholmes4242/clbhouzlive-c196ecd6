@@ -391,4 +391,102 @@ const DuelCell: React.FC<{
   </div>
 );
 
+const BarStack: React.FC<{
+  label: string;
+  value: string;
+  valueColor?: string;
+  align?: 'start' | 'center' | 'end';
+}> = ({ label, value, valueColor, align = 'center' }) => (
+  <div
+    style={{
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems:
+        align === 'start' ? 'flex-start' :
+        align === 'end' ? 'flex-end' : 'center',
+      gap: 4,
+    }}
+  >
+    <span
+      style={{
+        fontSize: 14,
+        fontWeight: 700,
+        color: valueColor ?? 'var(--hcp-t-100)',
+        lineHeight: 1,
+      }}
+    >
+      {value}
+    </span>
+    <span
+      style={{
+        fontSize: 9.5,
+        fontWeight: 700,
+        letterSpacing: '0.14em',
+        textTransform: 'uppercase',
+        color: 'var(--hcp-t-40)',
+        lineHeight: 1,
+      }}
+    >
+      {label}
+    </span>
+  </div>
+);
+
+const InnerCell: React.FC<{
+  eyebrow: string;
+  eyebrowIcon: React.ReactNode;
+  eyebrowColor: string;
+  value: string;
+  valueColor: string;
+  subtext: string;
+  borderRight?: boolean;
+}> = ({ eyebrow, eyebrowIcon, eyebrowColor, value, valueColor, subtext, borderRight }) => (
+  <div
+    style={{
+      padding: '14px 18px 16px',
+      borderRight: borderRight ? '1px solid var(--hcp-line)' : 'none',
+      display: 'flex',
+      flexDirection: 'column',
+      gap: 8,
+    }}
+  >
+    <span
+      style={{
+        display: 'inline-flex',
+        alignItems: 'center',
+        gap: 6,
+        textTransform: 'uppercase',
+        fontSize: 10.5,
+        letterSpacing: '0.14em',
+        fontWeight: 700,
+        color: eyebrowColor,
+      }}
+    >
+      {eyebrowIcon}
+      {eyebrow}
+    </span>
+    <span
+      style={{
+        fontSize: 26,
+        fontWeight: 700,
+        letterSpacing: '-0.025em',
+        lineHeight: 1,
+        color: valueColor,
+        fontVariantNumeric: 'tabular-nums',
+      }}
+    >
+      {value}
+    </span>
+    <span
+      style={{
+        fontSize: 12,
+        color: 'var(--hcp-t-60)',
+        lineHeight: 1.4,
+      }}
+    >
+      {subtext}
+    </span>
+  </div>
+);
+
 export default NextRoundWatch;
