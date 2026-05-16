@@ -120,8 +120,10 @@ export const RivalriesSection: React.FC<Props> = ({ userId }) => {
             />
           ))
         ) : !hasAnyH2HData ? (
-          <RivalryEmptyCard
-            onPickRival={() => setEditTarget({ rivalry: null, slotIndex: 0 })}
+          <RivalryAddCard
+            slotIndex={0}
+            label="Add a rival"
+            onClick={() => setEditTarget({ rivalry: null, slotIndex: 0 })}
           />
         ) : (
           <>
