@@ -120,7 +120,7 @@ export const CinemaFriendGlass: React.FC<Props> = ({
         <div
           style={{
             marginTop: 1,
-            fontSize: 10,
+            fontSize: 8,
             fontWeight: 600,
             color: 'rgba(255,255,255,0.60)',
             letterSpacing: '0.06em',
