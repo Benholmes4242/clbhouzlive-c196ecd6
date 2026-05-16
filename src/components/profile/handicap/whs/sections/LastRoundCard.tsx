@@ -97,7 +97,7 @@ export const LastRoundCard: React.FC<Props> = ({ connectionId }) => {
   return (
     <>
       <section style={{ marginTop: 32, fontFamily: FONT_GEIST }}>
-        <SectionEyebrow label="LAST ROUND" />
+        <DarkSectionHeader eyebrow="Last Round" right={formattedDate} />
         <div style={{ padding: '0 20px' }}>
           <CinemaCard
             imageUrl={lastRound.course_thumbnail_image}
