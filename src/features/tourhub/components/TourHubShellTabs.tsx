@@ -73,10 +73,9 @@ export const TourHubShellTabs: React.FC = () => {
 
   return (
     <section
-      className="relative"
+      className="relative bg-background"
       style={{
-        background: 'var(--hcp-bg-0)',
-        borderBottom: '0.5px solid rgba(255,255,255,0.06)',
+        borderBottom: '0.5px solid rgba(15,23,42,0.06)',
       }}
     >
       <div
@@ -109,9 +108,9 @@ export const TourHubShellTabs: React.FC = () => {
                 fontSize: 14,
                 fontWeight: isActive ? 700 : 500,
                 borderRadius: 8,
-                background: isActive ? 'rgba(255,255,255,0.10)' : 'transparent',
-                border: isActive ? '1px solid rgba(255,255,255,0.55)' : '1px solid transparent',
-                color: isActive ? '#FFFFFF' : 'var(--hcp-t-60)',
+                background: isActive ? '#FEF3E7' : 'transparent',
+                border: isActive ? '1px solid #F7931E' : '1px solid transparent',
+                color: isActive ? '#c97a10' : 'hsl(var(--muted-foreground))',
                 letterSpacing: '-0.01em',
                 whiteSpace: 'nowrap',
                 cursor: 'pointer',
@@ -136,7 +135,7 @@ export const TourHubShellTabs: React.FC = () => {
             bottom: 0,
             width: 28,
             pointerEvents: 'none',
-            background: 'linear-gradient(to right, rgba(10,14,20,0), #0A0E14)',
+            background: 'linear-gradient(to right, rgba(248,250,252,0), #F8FAFC)',
           }}
         />
       )}

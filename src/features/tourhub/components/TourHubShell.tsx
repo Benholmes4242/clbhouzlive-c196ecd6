@@ -13,19 +13,14 @@ export function TourHubShell({ children, immersive = false }: TourHubShellProps)
   const { setVariant } = useHeader();
 
   // All Tour Hub pages use immersiveStatusBar={true} on PageRoot, which disables
-  // PageRoot's default hook. This call takes ownership so the status bar style
+  // PageRoot's default hook. This call takes ownership so the transparent status bar
   // is re-applied on iOS resume (prevents grey safe-area flash).
-  // Immersive (Tournament Detail) keeps dark icons over the hero photo.
-  // Non-immersive (the four Tour Hub tabs) needs light icons over the dark
-  // slate canvas.
-  useMedianStatusBar(immersive ? "dark" : "light", "transparent", true, false);
+  useMedianStatusBar("dark", "transparent", true, false);
 
   useEffect(() => {
-    // Immersive Tournament Detail keeps the existing solid-light header
-    // (glass over the hero); the four /tourhub tabs go dark.
-    setVariant(immersive ? 'solid-light' : 'glass-dark');
+    setVariant('solid-light');
     return () => setVariant('solid-light');
-  }, [setVariant, immersive]);
+  }, [setVariant]);
 
   // Tournament detail pages: immersive negative-margin + max-width container
   if (immersive) {
@@ -45,9 +40,7 @@ export function TourHubShell({ children, immersive = false }: TourHubShellProps)
   // All tabs (overview, players, schedule, leaders, college): full-bleed into safe area
   return (
     <PageRoot
-      className="min-h-screen w-full"
-      dark
-      style={{ background: 'var(--hcp-bg-0)' }}
+      className="min-h-screen w-full bg-background"
       immersiveStatusBar
     >
       {children}

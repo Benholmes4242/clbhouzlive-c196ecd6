@@ -50,8 +50,8 @@ function PlayersShellRowInner() {
       <div
         className="relative"
         style={{
-          background: 'var(--hcp-bg-0)',
-          borderBottom: '0.5px solid rgba(255,255,255,0.06)',
+          background: '#F8FAFC',
+          borderBottom: '0.5px solid rgba(15,23,42,0.06)',
         }}
       >
         <div
