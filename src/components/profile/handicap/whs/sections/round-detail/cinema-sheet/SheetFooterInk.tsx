@@ -122,12 +122,12 @@ export const FooterPill: React.FC<{
     gap: 6,
     padding: '8px 12px',
     borderRadius: 999,
-    background: 'rgba(255,255,255,0.10)',
-    border: '0.5px solid rgba(255,255,255,0.25)',
+    background: 'var(--hcp-bg-0)',
+    border: 'none',
     fontSize: 11,
     fontWeight: 700,
     letterSpacing: '0.10em',
-    color: 'var(--hcp-bg-1)',
+    color: '#FFFFFF',
     textTransform: 'uppercase',
     textDecoration: 'none',
     cursor: 'pointer',
@@ -149,7 +149,7 @@ export const FooterPill: React.FC<{
     );
   }
   return (
-    <button onClick={onClick} style={{ ...style, border: 'none', borderTop: '0', borderRight: '0', borderBottom: '0', borderLeft: '0', borderWidth: '0.5px', borderStyle: 'solid', borderColor: 'rgba(255,255,255,0.25)' }}>
+    <button onClick={onClick} style={style}>
       {inner}
     </button>
   );
