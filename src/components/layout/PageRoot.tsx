@@ -1,6 +1,17 @@
 import * as React from "react";
+import { useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { useMedianStatusBar } from "@/hooks/useMedianStatusBar";
+
+/**
+ * Routes that keep the light Dispatch chrome (notch/status bar stays cream).
+ * Every other route inherits the dark handicap chrome by default.
+ */
+function isLightChromeRoute(pathname: string): boolean {
+  if (pathname === '/' || pathname === '/clubhouse') return true;
+  if (pathname === '/profile' || pathname.startsWith('/profile/')) return true;
+  return false;
+}
 
 interface PageRootProps extends React.HTMLAttributes<HTMLDivElement> {
   children: React.ReactNode;
