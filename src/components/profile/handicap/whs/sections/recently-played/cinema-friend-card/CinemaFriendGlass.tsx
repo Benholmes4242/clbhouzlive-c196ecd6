@@ -71,8 +71,8 @@ export const CinemaFriendGlass: React.FC<Props> = ({
   return (
     <div
       style={{
-        padding: '12px 14px',
-        borderRadius: 14,
+        padding: '8px 10px',
+        borderRadius: 12,
         background: 'rgba(255,255,255,0.08)',
         border: '0.5px solid rgba(255,255,255,0.18)',
         backdropFilter: 'blur(40px) saturate(180%)',
