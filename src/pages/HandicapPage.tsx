@@ -202,7 +202,7 @@ const HandicapPageHeader: React.FC<HeaderProps> = ({
   );
 
   return (
-    <ShellSlot>
+    <ShellSlot dark>
       {readOnly ? (
         <div style={{ padding: '12px 16px 12px' }}>
           <FriendTitleRow
@@ -213,87 +213,42 @@ const HandicapPageHeader: React.FC<HeaderProps> = ({
             viewerUserId={viewerUserId}
           />
         </div>
-      ) : (
-        <div style={{ padding: '14px 16px 12px', display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 12 }}>
-          <div style={{ flex: 1, minWidth: 0 }}>
-            <div style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: 6,
-              marginBottom: 6,
-            }}>
-              <Activity size={13} strokeWidth={2.5} color={AMBER} />
-              <span style={{
-                fontSize: 10.5,
-                fontWeight: 700,
-                color: AMBER,
-                letterSpacing: '0.14em',
-                textTransform: 'uppercase',
-                fontFamily: FONT_GEIST,
-              }}>
-                HANDICAP
-              </span>
-            </div>
-            <h1 style={{
-              fontFamily: FONT_GEIST,
-              fontSize: 18,
-              fontWeight: 800,
-              color: 'var(--hcp-t-100)',
-              lineHeight: 1.2,
-              letterSpacing: '-0.015em',
-              margin: 0,
-            }}>
-              {hasConnection ? 'My Index' : 'Connect'}
-            </h1>
-            {hasConnection && (
-              <div style={{
-                fontFamily: FONT_GEIST,
-                fontSize: 13,
-                fontWeight: 500,
-                color: 'var(--hcp-t-60)',
-                letterSpacing: '-0.005em',
-                lineHeight: 1.3,
-                marginTop: 6,
-              }}>
-                {subheadOwn}
-              </div>
-            )}
-          </div>
-          {hasConnection && (
-            <button
-              onClick={() => openTrophiesSheet()}
-              aria-label="View all trophies"
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: 2,
-                padding: '6px 8px 6px 10px',
-                background: AMBER_SOFT,
-                border: `1px solid ${AMBER_BORDER}`,
-                borderRadius: 12,
-                cursor: 'pointer',
-                flexShrink: 0,
-                fontFamily: FONT_GEIST,
-              }}
-            >
-              <Trophy
-                size={20}
-                color={AMBER}
-                strokeWidth={2.3}
-                fill="rgba(247,147,30,0.10)"
-              />
-              <ChevronRight size={14} color={AMBER_INK} strokeWidth={2.5} />
-            </button>
-          )}
-        </div>
-      )}
+      ) : null}
 
       {(readOnly || hasConnection) && (
-        <SegmentedControl
-          tabs={tabs}
-          activeTab={activeTab}
-          onTabChange={(id) => onTabChange(id as HandicapSubtab)}
-        />
+        <div style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          padding: '0 24px',
+          fontFamily: FONT_GEIST,
+        }}>
+          {tabs.map(tab => {
+            const active = activeTab === tab.id;
+            return (
+              <button
+                key={tab.id}
+                onClick={() => onTabChange(tab.id as HandicapSubtab)}
+                style={{
+                  padding: '16px 4px 12px',
+                  background: 'transparent',
+                  border: 'none',
+                  cursor: 'pointer',
+                  textTransform: 'uppercase',
+                  fontSize: 11,
+                  letterSpacing: '0.14em',
+                  fontWeight: active ? 800 : 700,
+                  color: active ? 'var(--hcp-t-100)' : 'var(--hcp-t-40)',
+                  borderBottom: active ? '2px solid var(--hcp-amber)' : '2px solid transparent',
+                  marginBottom: -1,
+                  fontFamily: 'inherit',
+                  transition: 'color 160ms ease',
+                }}
+              >
+                {tab.label}
+              </button>
+            );
+          })}
+        </div>
       )}
     </ShellSlot>
   );

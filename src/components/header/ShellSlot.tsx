@@ -22,7 +22,7 @@ interface ShellSlotProps {
  * No scroll listeners, no sticky positioning, no threshold transitions —
  * the shell is in its final position from mount.
  */
-export const ShellSlot: React.FC<ShellSlotProps> = ({ children }) => {
+export const ShellSlot: React.FC<ShellSlotProps & { dark?: boolean }> = ({ children, dark = false }) => {
   const ref = useRef<HTMLDivElement>(null);
   const [scrolled, setScrolled] = useState(false);
 
@@ -73,9 +73,15 @@ export const ShellSlot: React.FC<ShellSlotProps> = ({ children }) => {
         width: '100%',
         maxWidth: 480,
         zIndex: 29, // CompactHeader is var(--z-header) = 30; sit one below it.
-        background: 'hsl(var(--background))',
-        borderBottom: '0.5px solid hsl(var(--border) / 0.5)',
-        boxShadow: scrolled ? '0 6px 18px -10px rgba(15,23,42,0.18)' : 'none',
+        background: dark ? 'var(--hcp-bg-0)' : 'hsl(var(--background))',
+        borderBottom: dark
+          ? '1px solid var(--hcp-line)'
+          : '0.5px solid hsl(var(--border) / 0.5)',
+        boxShadow: scrolled
+          ? (dark
+              ? '0 6px 18px -10px rgba(0,0,0,0.4)'
+              : '0 6px 18px -10px rgba(15,23,42,0.18)')
+          : 'none',
         transition: 'box-shadow 200ms ease',
       }}
     >

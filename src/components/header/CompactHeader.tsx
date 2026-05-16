@@ -17,6 +17,28 @@ interface CompactHeaderProps {
   className?: string;
 }
 
+const LiveStatusInline: React.FC = () => {
+  return (
+    <span style={{
+      display: 'inline-flex',
+      alignItems: 'center',
+      gap: 8,
+      fontFamily: 'Geist, system-ui, sans-serif',
+    }}>
+      <span className="hcp-live-dot" />
+      <span style={{
+        textTransform: 'uppercase',
+        fontSize: 10,
+        letterSpacing: '0.18em',
+        fontWeight: 700,
+        color: 'var(--hcp-t-60)',
+      }}>
+        <span style={{ color: 'var(--hcp-good)', fontWeight: 800 }}>LIVE</span>
+      </span>
+    </span>
+  );
+};
+
 /**
  * Compact Header (56px) - used on Discover, Tour, Notifications, Clubhouse
  * On Clubhouse: Uses chrome-header class for auto-hide system (body.chrome-hidden)
@@ -157,12 +179,14 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
         )}
         style={{
           top: 0,
-          background: 'hsl(var(--background))',
+          background: isHandicapRoute ? 'var(--hcp-bg-0)' : 'hsl(var(--background))',
           backdropFilter: 'blur(20px)',
           WebkitBackdropFilter: 'blur(20px)',
           height: `calc(${contentHeight}px + var(--sat, 0px))`,
           paddingTop: 'var(--sat, 0px)',
-          borderBottom: `0.5px solid hsl(var(--border) / 0.5)`,
+          borderBottom: isHandicapRoute
+            ? '1px solid var(--hcp-line)'
+            : `0.5px solid hsl(var(--border) / 0.5)`,
           boxShadow: 'none',
         }}
       >
@@ -180,7 +204,7 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
               aria-label={isBackArrowRoute ? "Go back" : "Go to home"}
             >
               {isBackArrowRoute ? (
-                <ArrowLeft className="h-6 w-6 text-foreground" />
+                <ArrowLeft className={cn("h-6 w-6", isHandicapRoute ? "text-white" : "text-foreground")} />
               ) : (
                 <img
                   src="/lovable-uploads/29e83040-b5c5-48e4-84d7-3f99640e4a80.png"
@@ -191,7 +215,12 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
             </button>
           </div>
 
-          {/* Center section: Clubhouse tabs (mobile) or Desktop nav (lg+) */}
+          {/* Center section */}
+          {isHandicapRoute ? (
+            <div className="flex-1 flex justify-center">
+              <LiveStatusInline />
+            </div>
+          ) : (
           <div className="hidden lg:flex flex-1 justify-center">
             {/* Desktop: main nav links */}
             <nav className="hidden lg:flex items-center gap-1">
@@ -224,6 +253,7 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
               })}
             </nav>
           </div>
+          )}
 
           {/* Right section: Search + Identity pill (fixed width) */}
           <div className="flex items-center gap-1.5 sm:gap-2 flex-shrink-0">
@@ -234,14 +264,18 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
               className={cn(
                 "p-0 flex items-center justify-center rounded-full active:scale-[0.94] transition-all",
                 "h-11 w-11",
-                useLightTheme
-                  ? "text-muted-foreground"
-                  : "hover:bg-[hsl(var(--clubhouse-active-bg))]"
+                isHandicapRoute
+                  ? "text-white"
+                  : useLightTheme
+                    ? "text-muted-foreground"
+                    : "hover:bg-[hsl(var(--clubhouse-active-bg))]"
               )}
               style={{ 
-                color: useLightTheme 
-                  ? undefined 
-                  : 'hsl(var(--clubhouse-text-muted))',
+                color: isHandicapRoute
+                  ? 'var(--hcp-t-100)'
+                  : useLightTheme 
+                    ? undefined 
+                    : 'hsl(var(--clubhouse-text-muted))',
                 transition: 'all var(--motion-fast) var(--ease-standard)'
               }}
               onClick={handleSearchClick}
