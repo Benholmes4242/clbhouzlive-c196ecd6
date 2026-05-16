@@ -17,6 +17,28 @@ interface CompactHeaderProps {
   className?: string;
 }
 
+const LiveStatusInline: React.FC = () => {
+  return (
+    <span style={{
+      display: 'inline-flex',
+      alignItems: 'center',
+      gap: 8,
+      fontFamily: 'Geist, system-ui, sans-serif',
+    }}>
+      <span className="hcp-live-dot" />
+      <span style={{
+        textTransform: 'uppercase',
+        fontSize: 10,
+        letterSpacing: '0.18em',
+        fontWeight: 700,
+        color: 'var(--hcp-t-60)',
+      }}>
+        <span style={{ color: 'var(--hcp-good)', fontWeight: 800 }}>LIVE</span>
+      </span>
+    </span>
+  );
+};
+
 /**
  * Compact Header (56px) - used on Discover, Tour, Notifications, Clubhouse
  * On Clubhouse: Uses chrome-header class for auto-hide system (body.chrome-hidden)
