@@ -119,10 +119,11 @@ export const InviteToClbhouzV2: React.FC<Props> = ({ ownerUserId }) => {
 
   return (
     <section id="invite-to-clbhouz-section" style={{ marginTop: 32 }}>
-      <SectionHeader
+      <DarkSectionHeader
         eyebrow="MAKE YOUR FEED LOUDER"
         title="Friends on England Golf"
         sub="Not on clbhouz yet — invite them to share rounds."
+        withDot
         right={
           sentCount > 0 ? (
             <SentBadge count={sentCount} onClick={() => setSheetOpen(true)} />
