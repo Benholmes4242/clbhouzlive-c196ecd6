@@ -219,6 +219,7 @@ const HandicapPageHeader: React.FC<HeaderProps> = ({
         <div
           style={{
             display: 'flex',
+            justifyContent: 'center',
             gap: 8,
             padding: '4px 16px 12px',
             overflowX: 'auto',
