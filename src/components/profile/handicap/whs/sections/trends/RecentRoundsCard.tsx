@@ -613,7 +613,16 @@ const FeedCard: React.FC<FeedCardProps> = ({ round, isBest, onTap }) => {
           </div>
 
         </div>
-        <div style={{ textAlign: 'right', flexShrink: 0, display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 4 }}>
+        <div
+          style={{
+            flexShrink: 0,
+            width: 36,
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            gap: 4,
+          }}
+        >
           <span
             aria-label={`Gross score ${round.adjusted_gross ?? ''}${round.is_counter ? ', counts toward index' : ''}`}
           >
@@ -629,6 +638,8 @@ const FeedCard: React.FC<FeedCardProps> = ({ round, isBest, onTap }) => {
               fontWeight: 700,
               color: diffColor(round.handicap_differential),
               fontVariantNumeric: 'tabular-nums',
+              textShadow: diffGlow(round.handicap_differential),
+              textAlign: 'center',
             }}
           >
             {fmtDiff(round.handicap_differential)}
