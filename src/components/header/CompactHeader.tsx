@@ -80,6 +80,10 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
   const isMessagesConversationRoute = location.pathname.startsWith('/messages/');
   const isHandicapRoute = location.pathname === '/handicap' || location.pathname.startsWith('/handicap/');
   const isWatchSubpageRoute = location.pathname === '/watch/videos' || location.pathname === '/watch/clips';
+  // Tour Hub overview + sub-tabs share the handicap dark chrome treatment
+  // (dark header background, white controls, dark identity pill) but keep the
+  // clbhouz logo on the left — they're top-level hubs, not back-arrow pages.
+  const isTourRoute = location.pathname === '/tourhub' || location.pathname === '/tour';
   // Course detail: /courses/:courseId (exactly 3 segments — excludes /reviews, /rate, /share-review subroutes)
   const isCourseDetailRoute = location.pathname.startsWith('/courses/')
     && location.pathname.split('/').length === 3;
@@ -106,10 +110,10 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
   // Routes that should show back arrow instead of logo
   const isBackArrowRoute = isDiscoverSubPage || isTop100Route || isCourseDetailRoute || isEditProfileRoute || isFriendsActivityRoute || isAchievementsRoute || isMessagesRoute || isHandicapRoute || isWatchSubpageRoute;
   
-  // Most routes use the light theme. The handicap route runs the dark
-  // performance-terminal chrome, so its identity pill and nav controls
-  // need the dark variant.
-  const useLightTheme = !isHandicapRoute;
+  // Dark chrome routes (handicap + tour hub). The light theme governs the
+  // identity pill, search icon, and posting-as menu palette.
+  const isDarkChrome = isHandicapRoute || isTourRoute;
+  const useLightTheme = !isDarkChrome;
 
   const handleLogoClick = () => {
     if (isBackArrowRoute) {
@@ -181,12 +185,12 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
         )}
         style={{
           top: 0,
-          background: isHandicapRoute ? '#0A0E14' : 'hsl(var(--background))',
-          backdropFilter: isHandicapRoute ? 'none' : 'blur(20px)',
-          WebkitBackdropFilter: isHandicapRoute ? 'none' : 'blur(20px)',
+          background: isDarkChrome ? '#0A0E14' : 'hsl(var(--background))',
+          backdropFilter: isDarkChrome ? 'none' : 'blur(20px)',
+          WebkitBackdropFilter: isDarkChrome ? 'none' : 'blur(20px)',
           height: `calc(${contentHeight}px + var(--sat, 0px))`,
           paddingTop: 'var(--sat, 0px)',
-          borderBottom: isHandicapRoute
+          borderBottom: isDarkChrome
             ? '1px solid rgba(255,255,255,0.06)'
             : `0.5px solid hsl(var(--border) / 0.5)`,
           boxShadow: 'none',
@@ -206,7 +210,7 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
               aria-label={isBackArrowRoute ? "Go back" : "Go to home"}
             >
               {isBackArrowRoute ? (
-                <ArrowLeft className={cn("h-6 w-6", isHandicapRoute ? "text-white" : "text-foreground")} />
+                <ArrowLeft className={cn("h-6 w-6", isDarkChrome ? "text-white" : "text-foreground")} />
               ) : (
                 <img
                   src="/lovable-uploads/29e83040-b5c5-48e4-84d7-3f99640e4a80.png"
@@ -218,7 +222,7 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
           </div>
 
           {/* Center section */}
-          {isHandicapRoute ? (
+          {isDarkChrome ? (
             <div className="flex-1" />
           ) : (
           <div className="hidden lg:flex flex-1 justify-center">
@@ -264,14 +268,14 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
               className={cn(
                 "p-0 flex items-center justify-center rounded-full active:scale-[0.94] transition-all",
                 "h-11 w-11",
-                isHandicapRoute
+                isDarkChrome
                   ? "text-white"
                   : useLightTheme
                     ? "text-muted-foreground"
                     : "hover:bg-[hsl(var(--clubhouse-active-bg))]"
               )}
               style={{ 
-                color: isHandicapRoute
+                color: isDarkChrome
                   ? 'var(--hcp-t-100)'
                   : useLightTheme 
                     ? undefined 
