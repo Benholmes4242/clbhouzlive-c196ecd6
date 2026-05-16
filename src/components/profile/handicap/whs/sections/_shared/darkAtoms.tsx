@@ -48,8 +48,11 @@ export interface DarkSectionHeaderProps {
   title?: React.ReactNode;
   sub?: string;
   right?: React.ReactNode;
-  /** Suppress the amber bullet rendered via .hcp-eyebrow::before */
-  noDot?: boolean;
+  /**
+   * Render the amber bullet via .hcp-eyebrow::before. Opt-IN — most
+   * sections render dotless for a cleaner read.
+   */
+  withDot?: boolean;
 }
 
 export const DarkSectionHeader: React.FC<DarkSectionHeaderProps> = ({
@@ -57,7 +60,7 @@ export const DarkSectionHeader: React.FC<DarkSectionHeaderProps> = ({
   title,
   sub,
   right,
-  noDot = false,
+  withDot = false,
 }) => (
   <>
     <div
@@ -70,8 +73,8 @@ export const DarkSectionHeader: React.FC<DarkSectionHeaderProps> = ({
       }}
     >
       <span
-        className={noDot ? undefined : 'hcp-eyebrow'}
-        style={noDot ? {
+        className={withDot ? 'hcp-eyebrow' : undefined}
+        style={!withDot ? {
           textTransform: 'uppercase',
           fontSize: 10.5,
           letterSpacing: '0.16em',

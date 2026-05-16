@@ -32,7 +32,7 @@ export const SectionHeader: React.FC<SectionHeaderProps> = ({
           style={{
             fontSize: 9,
             fontWeight: 800,
-            color: '#64748B',
+            color: 'var(--hcp-t-60)',
             letterSpacing: '0.16em',
             textTransform: 'uppercase',
           }}
@@ -46,7 +46,7 @@ export const SectionHeader: React.FC<SectionHeaderProps> = ({
           fontWeight: 800,
           letterSpacing: '-0.015em',
           lineHeight: 1.2,
-          color: '#0F172A',
+          color: 'var(--hcp-t-100)',
           margin: 0,
         }}
       >
@@ -58,7 +58,7 @@ export const SectionHeader: React.FC<SectionHeaderProps> = ({
             fontSize: 13,
             fontWeight: 500,
             lineHeight: 1.3,
-            color: '#64748B',
+            color: 'var(--hcp-t-60)',
             margin: '6px 0 0',
           }}
         >

@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import { ChevronRight } from 'lucide-react';
 import SectionHeader from '../SectionHeader';
+import { DarkSectionHeader } from '../_shared/darkAtoms';
 import { useFriendRoundsSinceLastVisit, useMarkTodayVisited } from '@/lib/whs/hooks';
 import { firstName, initials } from '@/lib/whs/utils/initials';
 import { fmtRelative } from '@/lib/whs/utils/nameFormat';
@@ -39,7 +40,7 @@ export const SinceLastVisitRail: React.FC<Props> = ({ userId }) => {
   if (isLoading) {
     return (
       <section style={{ marginTop: 32 }}>
-        <SectionHeader eyebrow="Your circle" title="Since last visit" sub="Loading…" />
+        <DarkSectionHeader eyebrow="Your Circle" sub="Loading…" />
         <div style={{ padding: '0 20px' }}>
           <div
             style={{
@@ -69,7 +70,11 @@ export const SinceLastVisitRail: React.FC<Props> = ({ userId }) => {
 
   return (
     <section style={{ marginTop: 32, fontFamily: FONT }}>
-      <SectionHeader eyebrow="Your circle" title={headerTitle} sub={headerSub} />
+      <DarkSectionHeader
+        eyebrow="Your Circle"
+        right={count === 1 ? '1 ROUND' : `${count} ROUNDS`}
+        sub="Posted since you last opened the app."
+      />
       <div
         style={{
           display: 'flex',

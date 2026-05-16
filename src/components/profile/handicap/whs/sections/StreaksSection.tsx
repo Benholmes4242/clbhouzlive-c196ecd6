@@ -3,6 +3,7 @@ import React, { useEffect, useRef } from 'react';
 import { ChevronRight, Flame, Shield, Trophy, TrendingDown } from 'lucide-react';
 import { toast } from 'sonner';
 import SectionHeader from './SectionHeader';
+import { DarkSectionHeader } from './_shared/darkAtoms';
 import { useStreaks, type StreakResult, type StreaksData } from '@/lib/whs/useStreaks';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 
@@ -478,7 +479,7 @@ export const StreaksSection: React.FC<Props> = ({ connectionId, userId }) => {
   if (isLoading) {
     return (
       <section style={{ marginTop: 32 }}>
-        <SectionHeader eyebrow="STREAKS" title="Three runs to beat" />
+        <DarkSectionHeader eyebrow="Three Runs to Beat" />
         <div
           style={{
             margin: '0 20px',
@@ -507,12 +508,19 @@ export const StreaksSection: React.FC<Props> = ({ connectionId, userId }) => {
       ref={sectionRef}
       style={{ marginTop: 32, fontFamily: FONT_GEIST }}
     >
-      <SectionHeader
-        eyebrow="STREAKS"
-        title="Three runs to beat"
-        sub="Each one tracks a different chapter of your form."
-      />
-
+      {(() => {
+        const activeCount = [
+          streaks.noUp?.current > 0,
+          streaks.cutting?.current > 0,
+          streaks.counter?.current > 0,
+        ].filter(Boolean).length;
+        return (
+          <DarkSectionHeader
+            eyebrow="Three Runs to Beat"
+            right={activeCount > 0 ? `${activeCount} ACTIVE` : 'NONE ACTIVE'}
+          />
+        );
+      })()}
       <style>{`
         .hide-scrollbar::-webkit-scrollbar { display: none; }
       `}</style>
