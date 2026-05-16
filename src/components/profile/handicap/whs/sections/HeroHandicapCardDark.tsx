@@ -130,42 +130,43 @@ const HeroHandicapCardDark: React.FC<Props> = ({ connection }) => {
   const scores = (allScores ?? []) as any[];
   const counters = scores.filter((s) => s?.is_counter !== false);
 
-  const scoringAvg = useMemo<number | null>(() => {
-    const vals = scores
-      .map((s) => s?.adjusted_gross)
-      .filter((v: any): v is number => typeof v === 'number');
-    if (vals.length === 0) return null;
-    return vals.reduce((a, b) => a + b, 0) / vals.length;
-  }, [scores]);
-
-  const roundCount = scores.length;
-
-  // 30-day window for form.
-  const thirtyDaysAgo = Date.now() - 30 * 86_400_000;
-  const recent30 = useMemo(
+  // 90-day window — shared by Scoring + Form.
+  const ninetyDaysAgo = Date.now() - 90 * 86_400_000;
+  const recent90 = useMemo(
     () =>
       scores.filter((s) => {
         if (!s?.play_date) return false;
         const t = new Date(s.play_date).getTime();
-        return Number.isFinite(t) && t >= thirtyDaysAgo;
+        return Number.isFinite(t) && t >= ninetyDaysAgo;
       }),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [scores],
   );
 
-  const periodAvgPts = useMemo<number | null>(() => {
-    const v = recent30.map((s) => s?.stableford_points).filter((p: any): p is number => typeof p === 'number');
-    if (v.length === 0) return null;
-    return v.reduce((a, b) => a + b, 0) / v.length;
-  }, [recent30]);
+  const scoringAvg90 = useMemo<number | null>(() => {
+    const vals = recent90
+      .map((s) => s?.adjusted_gross)
+      .filter((v: any): v is number => typeof v === 'number');
+    if (vals.length < 3) return null;
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  }, [recent90]);
 
-  const allAvgPts = useMemo<number | null>(() => {
+  const roundCount90 = recent90.length;
+
+  const periodAvgPts90 = useMemo<number | null>(() => {
+    const v = recent90.map((s) => s?.stableford_points).filter((p: any): p is number => typeof p === 'number');
+    if (v.length < 3) return null;
+    return v.reduce((a, b) => a + b, 0) / v.length;
+  }, [recent90]);
+
+  // Lifetime stableford baseline — used only as the comparison anchor for Form's label.
+  const lifetimeAvgPts = useMemo<number | null>(() => {
     const v = scores.map((s) => s?.stableford_points).filter((p: any): p is number => typeof p === 'number');
     if (v.length === 0) return null;
     return v.reduce((a, b) => a + b, 0) / v.length;
   }, [scores]);
 
-  const form = formLabel(periodAvgPts, allAvgPts);
+  const form = formLabel(periodAvgPts90, lifetimeAvgPts);
 
   const best = useMemo(() => {
     const withDiff = counters.filter(
