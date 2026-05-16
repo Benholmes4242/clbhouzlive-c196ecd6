@@ -13,10 +13,10 @@ interface Props {
   friend: FriendLeaderboardEntry;
 }
 
-const INK = '#0F172A';
-const INK_MUTE = 'rgba(15,23,42,0.55)';
-const INK_06 = 'rgba(15,23,42,0.06)';
-const HAIRLINE = 'rgba(15,23,42,0.08)';
+const INK = 'var(--hcp-t-100)';
+const INK_MUTE = 'var(--hcp-t-60)';
+const INK_06 = 'var(--hcp-bg-3)';
+const HAIRLINE = 'var(--hcp-line-2)';
 const AMBER = '#F7931E';
 const FONT_GEIST = '"Geist", system-ui, -apple-system, BlinkMacSystemFont, sans-serif';
 

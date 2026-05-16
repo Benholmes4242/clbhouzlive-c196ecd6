@@ -26,12 +26,12 @@ const ICONS: Record<string, React.ComponentType<any>> = {
 };
 
 const TROPHY_TILE_WIDTH = 130;
-const HAIRLINE = 'rgba(15,23,42,0.08)';
-const INK = '#0F172A';
-const INK_55 = 'rgba(15,23,42,0.55)';
-const INK_10 = 'rgba(15,23,42,0.10)';
-const INK_06 = 'rgba(15,23,42,0.06)';
-const INK_70 = '#475569';
+const HAIRLINE = 'var(--hcp-line-2)';
+const INK = 'var(--hcp-t-100)';
+const INK_55 = 'var(--hcp-t-60)';
+const INK_10 = 'var(--hcp-line-2)';
+const INK_06 = 'var(--hcp-bg-3)';
+const INK_70 = 'var(--hcp-t-80)';
 const GOLD = '#D97706';
 const AMBER = '#F7931E';
 const AMBER_14 = 'rgba(247,147,30,0.14)';
@@ -86,7 +86,7 @@ const TrophyTile: React.FC<{ a: Achievement }> = ({ a }) => {
       >
         <Icon
           size={16}
-          color={isLocked ? 'rgba(15,23,42,0.40)' : cat.accent}
+          color={isLocked ? 'var(--hcp-t-40)' : cat.accent}
           strokeWidth={2.2}
         />
       </div>

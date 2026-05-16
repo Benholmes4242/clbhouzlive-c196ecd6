@@ -2,11 +2,11 @@ import React, { useEffect } from 'react';
 import SheetHeader from '@/components/ui/SheetHeader';
 import { fmtDiff } from '@/lib/whs/format';
 
-const INK = '#0F172A';
-const INK_70 = 'rgba(15,23,42,0.70)';
-const INK_55 = 'rgba(15,23,42,0.55)';
-const INK_10 = 'rgba(15,23,42,0.10)';
-const INK_06 = 'rgba(15,23,42,0.06)';
+const INK = 'var(--hcp-t-100)';
+const INK_70 = 'var(--hcp-t-80)';
+const INK_55 = 'var(--hcp-t-60)';
+const INK_10 = 'var(--hcp-line-2)';
+const INK_06 = 'var(--hcp-bg-3)';
 const AMBER_DEEP = '#C97211';
 const GREEN = '#059669';
 const RED = '#9F1D1D';
@@ -87,7 +87,7 @@ const HandicapExplainerSheet: React.FC<Props> = ({
       <div
         onClick={onClose}
         style={{
-          position: 'fixed', inset: 0, background: 'rgba(15,23,42,0.45)',
+          position: 'fixed', inset: 0, background: 'var(--hcp-t-40)',
           zIndex: 9998, animation: 'fadeIn 200ms ease',
         }}
       />

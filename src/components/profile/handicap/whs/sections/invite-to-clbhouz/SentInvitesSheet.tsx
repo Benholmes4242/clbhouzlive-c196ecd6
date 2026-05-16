@@ -15,8 +15,8 @@ interface Props {
 const T = {
   pageBg: '#F8FAFC',
   ink: '#0F172A',
-  inkMute: 'rgba(15,23,42,0.55)',
-  hairline: 'rgba(15,23,42,0.08)',
+  inkMute: 'var(--hcp-t-60)',
+  hairline: 'var(--hcp-line-2)',
   green: '#059669',
   greenTint: 'rgba(5,150,105,0.12)',
   greyTint: 'rgba(15,23,42,0.05)',
@@ -89,7 +89,7 @@ export const SentInvitesSheet: React.FC<Props> = ({ open, onClose }) => {
           style={{
             position: 'fixed',
             inset: 0,
-            background: 'rgba(15,23,42,0.40)',
+            background: 'var(--hcp-t-40)',
             zIndex: 50,
           }}
         />

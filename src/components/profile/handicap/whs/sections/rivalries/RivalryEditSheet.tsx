@@ -18,9 +18,9 @@ interface Props {
   onClose: () => void;
 }
 
-const INK = '#0F172A';
-const INK_MUTE = 'rgba(15,23,42,0.55)';
-const HAIRLINE = 'rgba(15,23,42,0.08)';
+const INK = 'var(--hcp-t-100)';
+const INK_MUTE = 'var(--hcp-t-60)';
+const HAIRLINE = 'var(--hcp-line-2)';
 const AMBER = '#F7931E';
 const AMBER_DEEP = '#C97211';
 const AMBER_TINT = 'rgba(247,147,30,0.10)';
@@ -93,7 +93,7 @@ export const RivalryEditSheet: React.FC<Props> = ({ userId, rivalry, slotIndex, 
         >
           <DrawerPrimitive.Title className="sr-only">Edit rival</DrawerPrimitive.Title>
           <div aria-hidden style={{ display: 'flex', justifyContent: 'center', padding: '8px 0 4px', flexShrink: 0 }}>
-            <div style={{ width: 36, height: 4, borderRadius: 2, background: 'rgba(15,23,42,0.15)' }} />
+            <div style={{ width: 36, height: 4, borderRadius: 2, background: 'var(--hcp-t-20)' }} />
           </div>
 
           <SheetHeader

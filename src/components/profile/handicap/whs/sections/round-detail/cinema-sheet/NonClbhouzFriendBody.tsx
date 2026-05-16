@@ -9,8 +9,8 @@ import { fmtRelative } from '@/lib/whs/utils/nameFormat';
 import type { WhsFriendActivityWithImage } from '@/lib/whs/types';
 
 const FONT_GEIST = 'Geist, system-ui, -apple-system, BlinkMacSystemFont, sans-serif';
-const INK = '#0F172A';
-const INK_MUTE = 'rgba(15,23,42,0.55)';
+const INK = 'var(--hcp-t-100)';
+const INK_MUTE = 'var(--hcp-t-60)';
 const AMBER_INK = '#9A6116';
 
 interface Props {

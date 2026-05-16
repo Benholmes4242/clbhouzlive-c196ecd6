@@ -3,8 +3,7 @@ import { useHandicapInsights } from '@/lib/whs/insights/useHandicapInsights';
 import { renderBoldMarkdown } from '@/lib/whs/insights/renderBoldMarkdown';
 import { EchoCallout } from '../_shared/atoms';
 
-const INK_06 = 'rgba(15,23,42,0.06)';
-
+const INK_06 = 'var(--hcp-bg-3)';
 interface Props {
   connectionId: string;
 }

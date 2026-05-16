@@ -21,12 +21,12 @@ interface Props {
 
 const T = {
   ink: '#0F172A',
-  inkMute: 'rgba(15,23,42,0.55)',
-  inkSoft: 'rgba(15,23,42,0.78)',
-  inkFaded: 'rgba(15,23,42,0.40)',
-  ink25: 'rgba(15,23,42,0.25)',
-  hairline: 'rgba(15,23,42,0.08)',
-  hairlineSoft: 'rgba(15,23,42,0.06)',
+  inkMute: 'var(--hcp-t-60)',
+  inkSoft: 'var(--hcp-t-80)',
+  inkFaded: 'var(--hcp-t-40)',
+  ink25: 'var(--hcp-t-20)',
+  hairline: 'var(--hcp-line-2)',
+  hairlineSoft: 'var(--hcp-bg-3)',
   amber: '#F7931E',
   amberDeep: '#C97211',
   amberInk: '#854F0B',

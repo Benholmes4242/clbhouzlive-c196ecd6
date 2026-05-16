@@ -11,9 +11,9 @@ import React from 'react';
 import { ChevronRight, TrendingDown, TrendingUp } from 'lucide-react';
 import { RoundCardHoleStrip, type HoleRow } from './RoundCardHoleStrip';
 
-const INK = '#0F172A';
-const INK_55 = 'rgba(15,23,42,0.55)';
-const INK_10 = 'rgba(15,23,42,0.10)';
+const INK = 'var(--hcp-t-100)';
+const INK_55 = 'var(--hcp-t-60)';
+const INK_10 = 'var(--hcp-line-2)';
 const AMBER_INK = '#C97211';
 const GREEN_DEEP = '#15803D';
 const GREEN_SOFT = 'rgba(34,197,94,0.12)';

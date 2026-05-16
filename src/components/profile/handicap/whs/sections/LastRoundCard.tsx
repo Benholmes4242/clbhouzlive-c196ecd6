@@ -11,8 +11,7 @@ interface Props {
 }
 
 const FONT_GEIST = 'Geist, system-ui, -apple-system, BlinkMacSystemFont, sans-serif';
-const INK_55 = 'rgba(15,23,42,0.55)';
-
+const INK_55 = 'var(--hcp-t-60)';
 const SectionEyebrow: React.FC<{ label: string }> = ({ label }) => (
   <div style={{ marginBottom: 6, padding: '0 16px 12px' }}>
     <span

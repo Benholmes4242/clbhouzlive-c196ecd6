@@ -11,9 +11,9 @@
  */
 import React from 'react';
 
-const INK = '#0F172A';
-const INK_20 = 'rgba(15,23,42,0.20)';
-const INK_55 = 'rgba(15,23,42,0.55)';
+const INK = 'var(--hcp-t-100)';
+const INK_20 = 'var(--hcp-t-20)';
+const INK_55 = 'var(--hcp-t-60)';
 const INK_85 = 'rgba(15,23,42,0.85)';
 const AMBER_INK = '#C97211';
 const AMBER_GRAD = 'url(#hsAmberGoldStroke)';

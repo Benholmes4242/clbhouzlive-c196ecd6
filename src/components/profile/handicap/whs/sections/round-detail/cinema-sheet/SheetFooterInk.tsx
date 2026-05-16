@@ -3,8 +3,7 @@ import { ExternalLink } from 'lucide-react';
 
 const FONT_GEIST = 'Geist, system-ui, -apple-system, BlinkMacSystemFont, sans-serif';
 const FONT_MONO = "'Geist Mono', ui-monospace, SFMono-Regular, Menlo, monospace";
-const INK = '#0F172A';
-
+const INK = 'var(--hcp-t-100)';
 interface Props {
   label: string;
   currentIndex: number | null;

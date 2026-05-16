@@ -8,11 +8,11 @@ import { fmtDiff } from '@/lib/whs/format';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import SectionHeader from './SectionHeader';
 
-const INK = '#0F172A';
-const INK_55 = 'rgba(15,23,42,0.55)';
-const INK_40 = 'rgba(15,23,42,0.40)';
-const INK_10 = 'rgba(15,23,42,0.10)';
-const INK_06 = 'rgba(15,23,42,0.06)';
+const INK = 'var(--hcp-t-100)';
+const INK_55 = 'var(--hcp-t-60)';
+const INK_40 = 'var(--hcp-t-40)';
+const INK_10 = 'var(--hcp-line-2)';
+const INK_06 = 'var(--hcp-bg-3)';
 const AMBER_DEEP = '#C97211';
 const GREEN = '#059669';
 const GREEN_06 = 'rgba(5,150,105,0.06)';

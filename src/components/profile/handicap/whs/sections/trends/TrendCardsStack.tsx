@@ -21,12 +21,11 @@ interface Props {
 }
 
 const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
-const INK = '#0F172A';
-const INK_55 = 'rgba(15,23,42,0.55)';
+const INK = 'var(--hcp-t-100)';
+const INK_55 = 'var(--hcp-t-60)';
 const HOT_RED = '#DC2626';
 const COLD_BLUE = '#0EA5E9';
-const SLATE = '#475569';
-
+const SLATE = 'var(--hcp-t-80)';
 export const TrendCardsStack: React.FC<Props> = ({ connectionId, currentHandicap, splitAt, topMargin }) => {
   const { data: scores, isLoading } = useAllScores(connectionId);
   const prediction = predictHandicap(scores ?? []);

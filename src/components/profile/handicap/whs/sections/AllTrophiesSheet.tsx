@@ -11,13 +11,13 @@ import type { Achievement } from '@/lib/whs/types';
 const AMBER     = '#F7931E';
 const AMBER_06  = 'rgba(247,147,30,0.06)';
 const AMBER_14  = 'rgba(247,147,30,0.14)';
-const INK       = '#0F172A';
-const INK_70    = '#475569';
-const INK_55    = 'rgba(15,23,42,0.55)';
-const INK_40    = 'rgba(15,23,42,0.40)';
-const INK_10    = 'rgba(15,23,42,0.10)';
-const INK_06    = 'rgba(15,23,42,0.06)';
-const INK_04    = 'rgba(15,23,42,0.04)';
+const INK       = 'var(--hcp-t-100)';
+const INK_70    = 'var(--hcp-t-80)';
+const INK_55    = 'var(--hcp-t-60)';
+const INK_40    = 'var(--hcp-t-40)';
+const INK_10    = 'var(--hcp-line-2)';
+const INK_06    = 'var(--hcp-bg-3)';
+const INK_04    = 'var(--hcp-bg-2)';
 const GREEN     = '#059669';
 const GREEN_06  = 'rgba(5,150,105,0.06)';
 const GREEN_14  = 'rgba(5,150,105,0.14)';
@@ -392,7 +392,7 @@ export const AllTrophiesSheet: React.FC<Props> = ({ open, onClose, achievements 
         style={{
           position: 'fixed',
           inset: 0,
-          background: 'rgba(15,23,42,0.45)',
+          background: 'var(--hcp-t-40)',
           zIndex: 9998,
           animation: 'fadeIn 180ms ease-out',
         }}

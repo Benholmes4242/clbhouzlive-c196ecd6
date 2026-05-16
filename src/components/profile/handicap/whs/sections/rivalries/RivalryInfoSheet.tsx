@@ -13,9 +13,9 @@ interface Props {
   onClose: () => void;
 }
 
-const INK = '#0F172A';
+const INK = 'var(--hcp-t-100)';
 const INK_MUTE = 'rgba(15,23,42,0.6)';
-const HAIRLINE = 'rgba(15,23,42,0.08)';
+const HAIRLINE = 'var(--hcp-line-2)';
 
 
 const slotExplanation = (kind: string): { title: string; body: string } => {
@@ -68,7 +68,7 @@ export const RivalryInfoSheet: React.FC<Props> = ({ rivalry, open, onClose }) =>
         >
           <DrawerPrimitive.Title className="sr-only">Why this rival</DrawerPrimitive.Title>
           <div aria-hidden style={{ display: 'flex', justifyContent: 'center', padding: '8px 0 4px' }}>
-            <div style={{ width: 36, height: 4, borderRadius: 2, background: 'rgba(15,23,42,0.15)' }} />
+            <div style={{ width: 36, height: 4, borderRadius: 2, background: 'var(--hcp-t-20)' }} />
           </div>
 
           <SheetHeader

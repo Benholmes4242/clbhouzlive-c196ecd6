@@ -75,7 +75,7 @@ export const ActivityFeedStrip: React.FC<Props> = ({ ownerUserId }) => {
                   onClick={onClick}
                   className="relative flex-shrink-0 w-[140px] rounded-xl border p-3 bg-background text-left transition-colors hover:bg-muted/30"
                   style={{
-                    borderColor: 'rgba(15,23,42,0.08)',
+                    borderColor: 'var(--hcp-line-2)',
                     scrollSnapAlign: 'start',
                   }}
                 >

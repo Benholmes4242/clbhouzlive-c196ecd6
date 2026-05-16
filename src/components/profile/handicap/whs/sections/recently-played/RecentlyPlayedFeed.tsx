@@ -10,7 +10,7 @@ interface Props {
   ownerUserId: string;
 }
 
-const INK_MUTE = 'rgba(15,23,42,0.55)';
+const INK_MUTE = 'var(--hcp-t-60)';
 
 export const RecentlyPlayedFeed: React.FC<Props> = ({ ownerUserId }) => {
   const { data, isLoading } = useFriendsActivity(ownerUserId);

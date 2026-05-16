@@ -9,8 +9,8 @@ interface Props {
 
 const FONT_GEIST = 'Geist, system-ui, -apple-system, BlinkMacSystemFont, sans-serif';
 const FONT_MONO = "'Geist Mono', ui-monospace, SFMono-Regular, Menlo, monospace";
-const INK = '#0F172A';
-const INK_45 = 'rgba(15,23,42,0.45)';
+const INK = 'var(--hcp-t-100)';
+const INK_45 = 'var(--hcp-t-40)';
 const AMBER = '#F7931E';
 const AMBER_DEEP = '#C97211';
 const GREEN = '#10B981';

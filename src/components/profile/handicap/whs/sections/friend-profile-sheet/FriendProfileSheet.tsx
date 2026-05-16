@@ -91,7 +91,7 @@ export const FriendProfileSheet: React.FC<Props> = ({
 
           {/* Drag handle */}
           <div aria-hidden style={{ display: 'flex', justifyContent: 'center', padding: '8px 0 4px', flexShrink: 0 }}>
-            <div style={{ width: 36, height: 4, borderRadius: 2, background: 'rgba(15,23,42,0.15)' }} />
+            <div style={{ width: 36, height: 4, borderRadius: 2, background: 'var(--hcp-t-20)' }} />
           </div>
 
           {/* Position indicator */}
