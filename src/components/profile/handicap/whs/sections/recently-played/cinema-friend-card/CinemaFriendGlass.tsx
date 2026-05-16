@@ -27,7 +27,7 @@ const HAIR: React.CSSProperties = {
 };
 
 const labelStyle: React.CSSProperties = {
-  fontSize: 10,
+  fontSize: 8,
   fontWeight: 700,
   color: 'rgba(255,255,255,0.55)',
   letterSpacing: '0.16em',
@@ -36,7 +36,7 @@ const labelStyle: React.CSSProperties = {
 };
 
 const valueStyle = (color: string): React.CSSProperties => ({
-  fontSize: 24,
+  fontSize: 19,
   fontWeight: 300,
   color,
   fontFamily: FONT_MONO,
