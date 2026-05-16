@@ -172,8 +172,8 @@ export const EchoCallout: React.FC<EchoCalloutProps> = ({
   <div
     style={{
       position: 'relative',
-      background: CREAM,
-      border: `0.5px solid ${HAIRLINE}`,
+      background: 'var(--hcp-bg-1)',
+      border: '1px solid var(--hcp-line)',
       borderRadius: 14,
       padding: 14,
       paddingTop: 16,
@@ -190,7 +190,7 @@ export const EchoCallout: React.FC<EchoCalloutProps> = ({
         left: 0,
         right: 0,
         height: 2,
-        background: `linear-gradient(90deg, ${AMBER} 0%, ${AMBER_DEEP} 100%)`,
+        background: 'var(--hcp-amber)',
       }}
     />
     <div style={{ display: 'flex', gap: 12, alignItems: 'flex-start' }}>
@@ -213,7 +213,7 @@ export const EchoCallout: React.FC<EchoCalloutProps> = ({
           style={{
             fontSize: 10,
             fontWeight: 800,
-            color: AMBER_DEEP,
+            color: 'var(--hcp-amber)',
             letterSpacing: '0.16em',
             textTransform: 'uppercase',
             marginBottom: 6,
