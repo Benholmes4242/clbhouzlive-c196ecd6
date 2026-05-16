@@ -35,7 +35,6 @@ export const RecentlyActiveItem: React.FC<Props> = ({ entry, isActive, onClick }
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
-        gap: 6,
         fontFamily: '"Geist", system-ui, sans-serif',
       }}
     >
