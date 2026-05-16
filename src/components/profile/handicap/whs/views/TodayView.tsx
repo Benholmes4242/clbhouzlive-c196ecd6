@@ -51,9 +51,16 @@ export const TodayView: React.FC<Props> = ({
         </div>
       )}
 
-      {!readOnly && <TodayGreeting connectionId={connectionId} userId={userId} />}
-
-      <HeroHandicapCardDark connection={connection} />
+      <div
+        style={{
+          background:
+            'radial-gradient(ellipse 120% 70% at 50% 0%, rgba(247,147,30,0.10), transparent 70%), var(--hcp-bg-0)',
+          borderBottom: '1px solid var(--hcp-line)',
+        }}
+      >
+        {!readOnly && <TodayGreeting connectionId={connectionId} userId={userId} />}
+        <HeroHandicapCardDark connection={connection} />
+      </div>
 
       <NextRoundWatch connectionId={connectionId} currentHandicap={currentHandicap} />
 
