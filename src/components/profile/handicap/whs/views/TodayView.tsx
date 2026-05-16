@@ -54,7 +54,7 @@ export const TodayView: React.FC<Props> = ({
       <div
         style={{
           background:
-            'radial-gradient(ellipse 140% 130% at 50% 0%, rgba(247,147,30,0.14), rgba(247,147,30,0.06) 45%, transparent 85%), var(--hcp-bg-0)',
+            'radial-gradient(ellipse 130% 100% at 50% 60%, rgba(247,147,30,0.05), transparent 75%), var(--hcp-bg-0)',
           borderBottom: '1px solid var(--hcp-line)',
         }}
       >

@@ -28,6 +28,12 @@ function getTimeOfDay(now: Date = new Date()): 'Morning' | 'Afternoon' | 'Evenin
   return 'Evening';
 }
 
+function formatToday(): string {
+  return new Date()
+    .toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' })
+    .toUpperCase();
+}
+
 function weatherGlyph(code: number | null | undefined): string {
   if (code == null) return '';
   if (code === 0) return '☀';
@@ -161,26 +167,42 @@ const TodayGreeting: React.FC<Props> = ({ connectionId, userId }) => {
       </div>
 
       {showMeta && homeCourseName && (
-        <div
-          style={{
-            marginTop: 6,
-            display: 'flex',
-            flexWrap: 'wrap',
-            alignItems: 'center',
-            gap: 6,
-            fontSize: 11,
-            fontWeight: 700,
-            letterSpacing: '0.12em',
-            textTransform: 'uppercase',
-            color: 'var(--hcp-t-60)',
-          }}
-        >
-          <span style={{ color: 'var(--hcp-t-60)' }}>
-            {cleanCourseDisplay(courseLookup?.canonicalName ?? homeCourseName)}
-          </span>
+        <>
+          {/* Row 1: course name (left) + today's date (right) */}
+          <div
+            style={{
+              marginTop: 8,
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'baseline',
+              gap: 12,
+              fontSize: 11,
+              fontWeight: 700,
+              letterSpacing: '0.12em',
+              textTransform: 'uppercase',
+              color: 'var(--hcp-t-60)',
+            }}
+          >
+            <span>{cleanCourseDisplay(courseLookup?.canonicalName ?? homeCourseName)}</span>
+            <span style={{ color: 'var(--hcp-t-40)' }}>{formatToday()}</span>
+          </div>
+
+          {/* Row 2: weather, left-aligned */}
           {weather && (
-            <>
-              <span>·</span>
+            <div
+              style={{
+                marginTop: 6,
+                display: 'flex',
+                flexWrap: 'wrap',
+                alignItems: 'center',
+                gap: 6,
+                fontSize: 11,
+                fontWeight: 700,
+                letterSpacing: '0.12em',
+                textTransform: 'uppercase',
+                color: 'var(--hcp-t-60)',
+              }}
+            >
               <span style={{ color: '#F7931E', fontSize: 13, lineHeight: 1 }}>
                 {weatherGlyph(weather.code)}
               </span>
@@ -204,9 +226,9 @@ const TodayGreeting: React.FC<Props> = ({ connectionId, userId }) => {
                   <span>{weather.windWord}</span>
                 </>
               )}
-            </>
+            </div>
           )}
-        </div>
+        </>
       )}
     </div>
   );
