@@ -15,7 +15,7 @@ const AMBER = '#F7931E';
 const AMBER_DEEP = '#C97211';
 const GREEN = '#10B981';
 
-const NineGrid: React.FC<{ label: string; holes: WhsScoreHole[] }> = ({ label, holes }) => {
+const NineGrid: React.FC<{ label: string; holes: WhsScoreHole[]; isLast?: boolean }> = ({ label, holes, isLast }) => {
   const total = holes.reduce(
     (s, h) => s + (h.played ? (h.adjusted_gross ?? h.actual_gross ?? 0) : 0),
     0,
@@ -26,7 +26,7 @@ const NineGrid: React.FC<{ label: string; holes: WhsScoreHole[] }> = ({ label, h
   const toParLabel = toPar === 0 ? 'E' : `${toPar > 0 ? '+' : ''}${toPar}`;
 
   return (
-    <div style={{ marginBottom: 14 }}>
+    <div style={{ marginBottom: isLast ? 0 : 14 }}>
       <div
         style={{
           display: 'flex',
@@ -114,8 +114,8 @@ export const RoundScorecard: React.FC<Props> = ({ holes, isNineHole }) => {
         </span>
       </div>
       <div style={{ padding: '0 18px' }}>
-        <NineGrid label="Front 9" holes={front9} />
-        {!isNineHole && back9.length > 0 && <NineGrid label="Back 9" holes={back9} />}
+        <NineGrid label="Front 9" holes={front9} isLast={isNineHole || back9.length === 0} />
+        {!isNineHole && back9.length > 0 && <NineGrid label="Back 9" holes={back9} isLast />}
       </div>
     </div>
   );
