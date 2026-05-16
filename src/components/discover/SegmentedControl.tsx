@@ -27,9 +27,12 @@ const SegmentedControl: React.FC<SegmentedControlProps> = ({
   activeTab,
   onTabChange,
   className,
+  variant = 'light',
+  align = 'start',
 }) => {
   const scrollerRef = useRef<HTMLDivElement | null>(null);
   const [overflowing, setOverflowing] = useState(false);
+  const isDark = variant === 'dark';
 
   useEffect(() => {
     const el = scrollerRef.current;
@@ -50,9 +53,12 @@ const SegmentedControl: React.FC<SegmentedControlProps> = ({
 
   return (
     <section
-      className={cn('relative bg-background', className)}
+      className={cn('relative', !isDark && 'bg-background', className)}
       style={{
-        borderBottom: '0.5px solid rgba(15,23,42,0.06)',
+        background: isDark ? '#0A0E14' : undefined,
+        borderBottom: isDark
+          ? '0.5px solid rgba(255,255,255,0.06)'
+          : '0.5px solid rgba(15,23,42,0.06)',
       }}
     >
       <div
@@ -61,16 +67,24 @@ const SegmentedControl: React.FC<SegmentedControlProps> = ({
         role="tablist"
         style={{
           display: 'flex',
+          justifyContent: align === 'center' ? 'center' : 'flex-start',
           gap: 8,
           padding: '8px 16px',
           overflowX: 'auto',
           overflowY: 'hidden',
           WebkitOverflowScrolling: 'touch',
           scrollbarWidth: 'none',
+          fontFamily: isDark
+            ? 'Geist, system-ui, -apple-system, BlinkMacSystemFont, sans-serif'
+            : undefined,
         }}
       >
         {tabs.map((tab) => {
           const isActive = activeTab === tab.id;
+          const activeBg = isDark ? 'rgba(255,255,255,0.10)' : '#FEF3E7';
+          const activeBorder = isDark ? '1px solid rgba(255,255,255,0.55)' : '1px solid #F7931E';
+          const activeColor = isDark ? '#FFFFFF' : '#c97a10';
+          const inactiveColor = isDark ? 'var(--hcp-t-60)' : 'hsl(var(--muted-foreground))';
           return (
             <button
               key={tab.id}
@@ -84,9 +98,9 @@ const SegmentedControl: React.FC<SegmentedControlProps> = ({
                 fontSize: 14,
                 fontWeight: isActive ? 700 : 500,
                 borderRadius: 8,
-                background: isActive ? '#FEF3E7' : 'transparent',
-                border: isActive ? '1px solid #F7931E' : '1px solid transparent',
-                color: isActive ? '#c97a10' : 'hsl(var(--muted-foreground))',
+                background: isActive ? activeBg : 'transparent',
+                border: isActive ? activeBorder : '1px solid transparent',
+                color: isActive ? activeColor : inactiveColor,
                 letterSpacing: '-0.01em',
                 whiteSpace: 'nowrap',
                 cursor: 'pointer',
@@ -113,7 +127,9 @@ const SegmentedControl: React.FC<SegmentedControlProps> = ({
             bottom: 0,
             width: 28,
             pointerEvents: 'none',
-            background: 'linear-gradient(to right, rgba(248,250,252,0), #F8FAFC)',
+            background: isDark
+              ? 'linear-gradient(to right, rgba(10,14,20,0), #0A0E14)'
+              : 'linear-gradient(to right, rgba(248,250,252,0), #F8FAFC)',
           }}
         />
       )}
