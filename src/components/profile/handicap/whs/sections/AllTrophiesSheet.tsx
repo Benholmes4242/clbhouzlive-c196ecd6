@@ -108,10 +108,14 @@ const TrophyRow: React.FC<{ a: Achievement; onInfoClick?: (a: Achievement) => vo
         alignItems: 'flex-start',
         padding: 14,
         borderRadius: 12,
-        background: justEarned ? cat.accentBgSoft : iconLooksLocked ? 'transparent' : 'var(--hcp-bg-1)',
+        background: (isBinary && isEarned)
+          ? cat.accentBgSoft
+          : iconLooksLocked
+            ? 'transparent'
+            : 'var(--hcp-bg-1)',
         border: iconLooksLocked
           ? `1px dashed ${INK_10}`
-          : justEarned
+          : (isBinary && isEarned)
             ? `1px solid ${cat.accent}`
             : `0.5px solid ${INK_10}`,
         fontFamily: FONT_GEIST,
