@@ -154,13 +154,13 @@ export const InviteCard: React.FC<Props> = ({ friend }) => {
         aria-label={`Invite ${firstName(friend.friend_name)} to clbhouz`}
         style={{
           width: '100%',
-          padding: '8px 12px',
+          padding: '9px 12px',
           borderRadius: 999,
-          background: 'rgba(247,147,30,0.08)',
-          color: '#C97211',
+          background: AMBER,
+          color: '#FFFFFF',
           fontSize: 12,
           fontWeight: 800,
-          border: '1px solid rgba(247,147,30,0.20)',
+          border: 'none',
           cursor: 'pointer',
           display: 'inline-flex',
           alignItems: 'center',
