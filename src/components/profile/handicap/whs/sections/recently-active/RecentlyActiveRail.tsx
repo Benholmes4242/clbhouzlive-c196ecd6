@@ -43,32 +43,57 @@ export const RecentlyActiveRail: React.FC<Props> = ({ userId }) => {
 
   return (
     <section style={{ marginTop: 18 }}>
-      <SectionHeader
-        eyebrow="RECENTLY ACTIVE"
-        title="Your circle"
-        sub={`${activeCount} ${activeCount === 1 ? 'friend' : 'friends'} played this week`}
-        right={
-          overflow > 0 ? (
-            <button
-              type="button"
-              onClick={() => setShowAll((v) => !v)}
-              style={{
-                background: 'transparent',
-                border: 'none',
-                padding: '4px 0',
-                fontSize: 11,
-                fontWeight: 800,
-                letterSpacing: '0.14em',
-                color: 'var(--hcp-t-100)',
-                textTransform: 'uppercase',
-                cursor: 'pointer',
-              }}
-            >
-              {showAll ? 'Show less' : `See all (${sorted.length})`}
-            </button>
-          ) : null
-        }
-      />
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          padding: '0 20px 8px',
+          fontFamily: '"Geist", system-ui, sans-serif',
+        }}
+      >
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 8,
+            fontSize: 11,
+            fontWeight: 800,
+            letterSpacing: '0.14em',
+            color: 'var(--hcp-t-100)',
+            textTransform: 'uppercase',
+          }}
+        >
+          <span
+            style={{
+              width: 6,
+              height: 6,
+              borderRadius: '50%',
+              background: 'var(--hcp-amber, #F59E0B)',
+            }}
+          />
+          Recently Active
+        </div>
+        {overflow > 0 && (
+          <button
+            type="button"
+            onClick={() => setShowAll((v) => !v)}
+            style={{
+              background: 'transparent',
+              border: 'none',
+              padding: '4px 0',
+              fontSize: 11,
+              fontWeight: 800,
+              letterSpacing: '0.14em',
+              color: 'var(--hcp-t-100)',
+              textTransform: 'uppercase',
+              cursor: 'pointer',
+            }}
+          >
+            {showAll ? 'Show less' : `See all · ${sorted.length}`}
+          </button>
+        )}
+      </div>
 
       <div
         style={{
