@@ -8,14 +8,16 @@ interface Props {
 }
 
 const T = {
-  bgFrom: 'var(--hcp-t-100)',
-  bgTo: '#1e293b',
   amber: '#F7931E',
-  amberLight: '#F59E0B',
-  amberRingOuter: 'rgba(247,147,30,0.15)',
-  amberRingInner: 'rgba(247,147,30,0.10)',
-  white: 'var(--hcp-bg-1)',
-  slate: 'var(--hcp-t-60)',
+  amberLight: '#FBBF24',
+  amberRingOuter: 'rgba(247,147,30,0.18)',
+  amberRingInner: 'rgba(247,147,30,0.12)',
+  amberBorder: 'rgba(247,147,30,0.55)',
+  /** Card uses amber radial wash from top over dark canvas */
+  cardBg:
+    'radial-gradient(ellipse 80% 60% at 50% 0%, rgba(247,147,30,0.16), transparent 70%), var(--hcp-bg-1)',
+  ink: 'var(--hcp-t-100)',
+  inkMute: 'var(--hcp-t-60)',
 };
 
 const FONT_GEIST = 'Geist, system-ui, -apple-system, BlinkMacSystemFont, sans-serif';
@@ -31,13 +33,13 @@ export const RivalryAddCard: React.FC<Props> = ({ slotIndex: _slotIndex, label: 
         maxWidth: 320,
         minHeight: 240,
         scrollSnapAlign: 'start',
-        background: `linear-gradient(135deg, ${T.bgFrom} 0%, ${T.bgTo} 100%)`,
+        background: T.cardBg,
+        border: `1px solid ${T.amberBorder}`,
         borderRadius: 16,
         overflow: 'hidden',
         position: 'relative',
         cursor: 'pointer',
         fontFamily: FONT_GEIST,
-        border: 'none',
         padding: '32px 20px',
         textAlign: 'center',
         display: 'flex',
@@ -45,7 +47,6 @@ export const RivalryAddCard: React.FC<Props> = ({ slotIndex: _slotIndex, label: 
         alignItems: 'center',
         justifyContent: 'center',
         gap: 0,
-        boxShadow: '0 8px 24px -10px rgba(0,0,0,0.50), 0 0 0 1px rgba(255,255,255,0.06) inset',
       }}
     >
       <div
@@ -80,12 +81,12 @@ export const RivalryAddCard: React.FC<Props> = ({ slotIndex: _slotIndex, label: 
         style={{
           width: 56,
           height: 56,
-          borderRadius: '50%',
+          borderRadius: 18,
           background: `linear-gradient(135deg, ${T.amberLight}, ${T.amber})`,
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          boxShadow: '0 4px 12px rgba(247,147,30,0.35)',
+          boxShadow: '0 4px 12px rgba(247,147,30,0.45)',
           marginBottom: 14,
           position: 'relative',
         }}
@@ -99,7 +100,7 @@ export const RivalryAddCard: React.FC<Props> = ({ slotIndex: _slotIndex, label: 
           marginBottom: 6,
           fontSize: 16,
           fontWeight: 800,
-          color: T.white,
+          color: T.ink,
           letterSpacing: '-0.01em',
           position: 'relative',
         }}
@@ -110,11 +111,11 @@ export const RivalryAddCard: React.FC<Props> = ({ slotIndex: _slotIndex, label: 
       <p
         style={{
           margin: 0,
-          marginBottom: 16,
-          fontSize: 12,
-          color: T.slate,
+          marginBottom: 18,
+          fontSize: 12.5,
+          color: T.inkMute,
           lineHeight: 1.45,
-          maxWidth: 240,
+          maxWidth: 280,
           position: 'relative',
         }}
       >
@@ -123,22 +124,23 @@ export const RivalryAddCard: React.FC<Props> = ({ slotIndex: _slotIndex, label: 
 
       <div
         style={{
-          background: `linear-gradient(135deg, ${T.amberLight}, ${T.amber})`,
+          background: `linear-gradient(135deg, ${T.amberLight} 0%, ${T.amber} 100%)`,
           border: 'none',
-          borderRadius: 10,
-          padding: '9px 18px',
-          color: 'var(--hcp-bg-1)',
-          fontSize: 12,
-          fontWeight: 700,
-          boxShadow: '0 2px 10px rgba(247,147,30,0.30)',
+          borderRadius: 999,
+          padding: '12px 22px',
+          color: '#fff',
+          fontSize: 12.5,
+          fontWeight: 800,
+          letterSpacing: '0.10em',
+          textTransform: 'uppercase',
           display: 'inline-flex',
           alignItems: 'center',
           gap: 6,
           position: 'relative',
-          letterSpacing: '0.01em',
+          boxShadow:
+            '0 4px 14px rgba(247,147,30,0.40), inset 0 1px 0 rgba(255,255,255,0.20)',
         }}
       >
-        <span style={{ fontSize: 14, lineHeight: 1, fontWeight: 800 }}>+</span>
         Pick a rival
       </div>
     </button>
