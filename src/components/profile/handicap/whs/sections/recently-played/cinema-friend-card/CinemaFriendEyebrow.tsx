@@ -127,11 +127,11 @@ export const CinemaFriendEyebrow: React.FC<Props> = ({ activity }) => {
               flexShrink: 0,
             }}
           >
-            <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.10em' }}>HCP</span>
+            <span style={{ fontSize: 8, fontWeight: 700, letterSpacing: '0.10em' }}>HCP</span>
             {impactIsImprovement ? (
-              <ArrowDown size={10} strokeWidth={1.6} />
+              <ArrowDown size={8} strokeWidth={1.6} />
             ) : (
-              <ArrowUp size={10} strokeWidth={1.6} />
+              <ArrowUp size={8} strokeWidth={1.6} />
             )}
             {Math.abs(impactDelta!).toFixed(1)}
           </span>
