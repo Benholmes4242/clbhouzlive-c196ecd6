@@ -5,6 +5,7 @@ import {
   CinemaCard,
   CinemaCardSkeleton,
 } from './last-round-card';
+import { DarkSectionHeader } from './_shared/darkAtoms';
 
 interface Props {
   connectionId: string;
