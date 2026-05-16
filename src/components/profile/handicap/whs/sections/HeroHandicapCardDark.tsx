@@ -348,7 +348,7 @@ const HeroHandicapCardDark: React.FC<Props> = ({ connection }) => {
       </div>
 
       {/* TripleStrip */}
-      <TripleStrip>
+      <TripleStrip variant="flush">
         <KPICell
           label="Scoring"
           value={scoringAvg != null ? scoringAvg.toFixed(1) : '—'}
