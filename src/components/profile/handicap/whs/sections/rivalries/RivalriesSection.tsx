@@ -47,7 +47,7 @@ export const RivalriesSection: React.FC<Props> = ({ userId }) => {
 
   return (
     <section style={{ marginTop: 32 }}>
-      <SectionHeader
+      <DarkSectionHeader
         eyebrow="RIVALRIES"
         title="Your rivals"
         sub={
@@ -57,6 +57,7 @@ export const RivalriesSection: React.FC<Props> = ({ userId }) => {
               ? 'Pick golfers to track head-to-head.'
               : 'Auto-picked from your circle. Pin to lock a slot.'
         }
+        withDot
         right={
           hasFilled && hasAnyH2HData ? (
             <button
