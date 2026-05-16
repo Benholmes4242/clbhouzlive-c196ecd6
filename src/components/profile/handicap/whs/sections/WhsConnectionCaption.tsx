@@ -3,8 +3,6 @@ import { ShieldCheck } from 'lucide-react';
 
 const FONT_GEIST = 'Geist, system-ui, -apple-system, BlinkMacSystemFont, sans-serif';
 
-const INK_55 = 'rgba(15,23,42,0.55)';
-const INK_40 = 'rgba(15,23,42,0.40)';
 const SEASON_GREEN = '#006747';
 
 interface Props {
@@ -25,15 +23,15 @@ export const WhsConnectionCaption: React.FC<Props> = ({ membershipNumber }) => {
     >
       <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
         <ShieldCheck size={12} color={SEASON_GREEN} strokeWidth={2.5} />
-        <span style={{ fontSize: 11, fontWeight: 700, color: INK_55 }}>
+        <span style={{ fontSize: 11, fontWeight: 700, color: 'var(--hcp-t-60)' }}>
           Live WHS handicap data
         </span>
-        <span style={{ fontSize: 11, color: INK_40 }}>·</span>
+        <span style={{ fontSize: 11, color: 'var(--hcp-t-40)' }}>·</span>
         <span
           style={{
             fontSize: 11,
             fontWeight: 700,
-            color: INK_55,
+            color: 'var(--hcp-t-60)',
             fontVariantNumeric: 'tabular-nums',
           }}
         >
@@ -44,7 +42,7 @@ export const WhsConnectionCaption: React.FC<Props> = ({ membershipNumber }) => {
         style={{
           fontSize: 11,
           fontWeight: 400,
-          color: INK_40,
+          color: 'var(--hcp-t-40)',
         }}
       >
         Synced twice daily
