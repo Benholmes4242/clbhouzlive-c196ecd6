@@ -65,44 +65,39 @@ export const CinemaFriendEyebrow: React.FC<Props> = ({ activity }) => {
             </span>
           )}
         </div>
-        <p
-          style={{
-            margin: 0,
-            fontSize: 16,
-            fontWeight: 700,
-            color: '#FFFFFF',
-            letterSpacing: '-0.015em',
-            lineHeight: 1.1,
-            textShadow: '0 1px 3px rgba(0,0,0,0.4)',
-            whiteSpace: 'nowrap',
-            overflow: 'hidden',
-            textOverflow: 'ellipsis',
-            minWidth: 0,
-          }}
-        >
-          {firstName(activity.friend_name)}
-        </p>
-        <span
-          aria-label="Verified Clbhouz user"
-          style={{ display: 'inline-flex', flexShrink: 0 }}
-        >
-          <BadgeCheck size={13} strokeWidth={2.5} color="#FFFFFF" fill="#16A34A" />
-        </span>
-        {time && (
-          <span
+        <div style={{ display: 'flex', flexDirection: 'column', minWidth: 0, gap: 1 }}>
+          <p
             style={{
-              fontSize: 11,
-              fontWeight: 500,
-              color: 'rgba(255,255,255,0.65)',
-              letterSpacing: '0.02em',
-              textShadow: '0 1px 2px rgba(0,0,0,0.3)',
-              flexShrink: 0,
+              margin: 0,
+              fontSize: 16,
+              fontWeight: 700,
+              color: '#FFFFFF',
+              letterSpacing: '-0.015em',
+              lineHeight: 1.15,
+              textShadow: '0 1px 3px rgba(0,0,0,0.4)',
               whiteSpace: 'nowrap',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
             }}
           >
-            · {time}
-          </span>
-        )}
+            {activity.friend_name}
+          </p>
+          {time && (
+            <span
+              style={{
+                fontSize: 11,
+                fontWeight: 500,
+                color: 'rgba(255,255,255,0.65)',
+                letterSpacing: '0.02em',
+                textShadow: '0 1px 2px rgba(0,0,0,0.3)',
+                whiteSpace: 'nowrap',
+                lineHeight: 1.1,
+              }}
+            >
+              {time}
+            </span>
+          )}
+        </div>
       </div>
 
       {/* Right cluster */}
