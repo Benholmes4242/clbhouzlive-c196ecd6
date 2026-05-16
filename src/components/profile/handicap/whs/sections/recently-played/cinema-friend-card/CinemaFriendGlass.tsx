@@ -137,13 +137,13 @@ export const CinemaFriendGlass: React.FC<Props> = ({
         <div style={{ textAlign: 'left' }}>
           <div style={labelStyle}>GROSS</div>
           <div
-            style={{ marginTop: 3 }}
+            style={{ marginTop: 2 }}
             aria-label={`Gross score ${gross ?? ''}${isCounter ? ', counts toward index' : ''}`}
           >
             <GlassGrossRing
               value={gross != null ? gross : EM_DASH}
               isCounter={isCounter}
-              numeralSize={28}
+              numeralSize={24}
             />
           </div>
         </div>
