@@ -143,7 +143,7 @@ export const CinemaFriendGlass: React.FC<Props> = ({
             <GlassGrossRing
               value={gross != null ? gross : EM_DASH}
               isCounter={isCounter}
-              numeralSize={24}
+              numeralSize={19}
             />
           </div>
         </div>
