@@ -118,6 +118,7 @@ export const CinemaFriendCard: React.FC<Props> = ({ activity, onClick }) => {
             differential={activity.last_round_differential}
             holes={showShape ? detail!.holes : null}
             isCounter={false}
+            showHotFlame={showHotFlame}
           />
         </div>
       </div>
