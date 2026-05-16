@@ -46,14 +46,6 @@ export const RecentlyPlayedFeed: React.FC<Props> = ({ ownerUserId }) => {
             textTransform: 'uppercase',
           }}
         >
-          <span
-            style={{
-              width: 6,
-              height: 6,
-              borderRadius: '50%',
-              background: 'var(--hcp-amber, #F59E0B)',
-            }}
-          />
           Friends' Rounds
         </div>
         {!isLoading && items.length > 0 && (
