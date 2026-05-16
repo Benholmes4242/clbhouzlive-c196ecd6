@@ -46,7 +46,7 @@ export const SectionHeader: React.FC<SectionHeaderProps> = ({
           fontWeight: 800,
           letterSpacing: '-0.015em',
           lineHeight: 1.2,
-          color: '#0F172A',
+          color: 'var(--hcp-t-100)',
           margin: 0,
         }}
       >
