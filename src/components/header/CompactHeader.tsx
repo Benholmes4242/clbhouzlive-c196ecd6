@@ -106,8 +106,10 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
   // Routes that should show back arrow instead of logo
   const isBackArrowRoute = isDiscoverSubPage || isTop100Route || isCourseDetailRoute || isEditProfileRoute || isFriendsActivityRoute || isAchievementsRoute || isMessagesRoute || isHandicapRoute || isWatchSubpageRoute;
   
-  // Search overlay always uses light mode app-wide
-  const useLightTheme = true;
+  // Most routes use the light theme. The handicap route runs the dark
+  // performance-terminal chrome, so its identity pill and nav controls
+  // need the dark variant.
+  const useLightTheme = !isHandicapRoute;
 
   const handleLogoClick = () => {
     if (isBackArrowRoute) {
