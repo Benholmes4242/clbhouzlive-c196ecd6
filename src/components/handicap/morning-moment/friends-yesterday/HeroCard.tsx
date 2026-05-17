@@ -2,12 +2,6 @@ import React from 'react';
 import type { FriendYesterday } from '@/lib/handicap/useFriendsYesterday';
 import { useFriendRoundDetail } from '@/lib/whs/hooks';
 import FlagSilhouetteOverlay from '@/components/whs/FlagSilhouetteOverlay';
-import { deriveHeroState } from './deriveHeroState';
-import TopEyebrow from './TopEyebrow';
-import HeroGlassSyncing from './HeroGlassSyncing';
-import HeroGlassInvite from './HeroGlassInvite';
-import HeroGlassNudge from './HeroGlassNudge';
-import HeroBottomActions from './HeroBottomActions';
 import CinemaFriendEyebrow from '@/components/profile/handicap/whs/sections/recently-played/cinema-friend-card/CinemaFriendEyebrow';
 import CinemaFriendGlass from '@/components/profile/handicap/whs/sections/recently-played/cinema-friend-card/CinemaFriendGlass';
 import type { WhsFriendActivityWithImage } from '@/lib/whs/types';
@@ -27,11 +21,9 @@ interface Props {
 }
 
 export const HeroCard: React.FC<Props> = ({ friend, onClick }) => {
-  const state = deriveHeroState(friend);
-  const isEnriched = state === 'enriched';
   const { data: detail } = useFriendRoundDetail(
     friend.last_round_score_id,
-    isEnriched && !!friend.last_round_score_id,
+    !!friend.last_round_score_id,
   );
 
   const par = React.useMemo(() => {
@@ -105,63 +97,34 @@ export const HeroCard: React.FC<Props> = ({ friend, onClick }) => {
       <div style={{ position: 'absolute', inset: 0, background: ATMOSPHERIC, pointerEvents: 'none' }} />
       <div style={{ position: 'absolute', inset: 0, background: LEGIBILITY_SCRIM, pointerEvents: 'none' }} />
 
-      {isEnriched ? (
-        <CinemaFriendEyebrow activity={eyebrowActivity} />
-      ) : (
-        <TopEyebrow friend={friend} variant="hero" rightPill="best" />
-      )}
+      <CinemaFriendEyebrow activity={eyebrowActivity} />
 
-      {isEnriched ? (
-        <div
-          style={{
-            position: 'absolute',
-            left: 11,
-            right: 11,
-            top: 36,
-            bottom: 10,
-            display: 'flex',
-            alignItems: 'flex-end',
-            zIndex: 3,
-            pointerEvents: 'none',
-          }}
-        >
-          <div style={{ width: '100%', pointerEvents: 'auto' }}>
-            <CinemaFriendGlass
-              courseName={friend.course_name}
-              par={par}
-              slope={slope}
-              gross={friend.score ?? null}
-              stableford={friend.stableford}
-              differential={friend.differential}
-              holes={showShape ? detail!.holes : null}
-              isCounter={!!friend.is_counter}
-            />
-          </div>
+      <div
+        style={{
+          position: 'absolute',
+          left: 11,
+          right: 11,
+          top: 36,
+          bottom: 10,
+          display: 'flex',
+          alignItems: 'flex-end',
+          zIndex: 3,
+          pointerEvents: 'none',
+        }}
+      >
+        <div style={{ width: '100%', pointerEvents: 'auto' }}>
+          <CinemaFriendGlass
+            courseName={friend.course_name}
+            par={par}
+            slope={slope}
+            gross={friend.score ?? null}
+            stableford={friend.stableford}
+            differential={friend.differential}
+            holes={showShape ? detail!.holes : null}
+            isCounter={!!friend.is_counter}
+          />
         </div>
-      ) : (
-        <>
-          <div
-            style={{
-              position: 'absolute',
-              left: 14,
-              right: 14,
-              top: 44,
-              bottom: 44,
-              display: 'flex',
-              alignItems: 'center',
-              zIndex: 2,
-              pointerEvents: 'none',
-            }}
-          >
-            <div style={{ width: '100%', pointerEvents: 'auto' }}>
-              {state === 'syncing' && <HeroGlassSyncing friend={friend} />}
-              {state === 'invite' && <HeroGlassInvite friend={friend} />}
-              {state === 'nudge' && <HeroGlassNudge friend={friend} />}
-            </div>
-          </div>
-          <HeroBottomActions state={state} friend={friend} />
-        </>
-      )}
+      </div>
     </div>
   );
 };
