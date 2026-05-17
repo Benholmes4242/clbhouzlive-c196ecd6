@@ -179,6 +179,25 @@ export async function resolveCourseFromWhsName(
     }
   }
 
+  // 7. Server-side RPC fallback (apostrophe-tolerant + pg_trgm fuzzy)
+  try {
+    const { data: rpcMatch, error: rpcErr } = await supabase
+      .rpc('match_whs_course_to_golf_course', { p_whs_name: whsName.trim() } as any);
+    if (!rpcErr && rpcMatch && Array.isArray(rpcMatch) && rpcMatch.length > 0) {
+      const row = rpcMatch[0] as { id: string; name: string; thumbnail_image: string | null; region: string | null };
+      await persistAlias(whsName, norm, row.id, 'rpc');
+      return {
+        id: row.id,
+        name: row.name,
+        thumbnail_image: row.thumbnail_image,
+        region: row.region,
+      };
+    }
+  } catch (err) {
+    // eslint-disable-next-line no-console
+    console.warn('[courseNameMatcher] rpc fallback errored', err);
+  }
+
   // eslint-disable-next-line no-console
   console.info('[courseNameMatcher] miss', { whsName, norm });
   return null;
