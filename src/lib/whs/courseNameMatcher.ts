@@ -94,6 +94,7 @@ async function persistAlias(
 
 export async function resolveCourseFromWhsName(
   whsName: string,
+  countryCode?: string | null,
 ): Promise<GolfCourseLite | null> {
   if (!whsName || !whsName.trim()) return null;
 
@@ -179,10 +180,16 @@ export async function resolveCourseFromWhsName(
     }
   }
 
-  // 7. Server-side RPC fallback (apostrophe-tolerant + pg_trgm fuzzy)
+  // 7. Server-side RPC fallback (apostrophe-tolerant + pg_trgm fuzzy + country-filtered)
   try {
+    const rpcParams: { p_whs_name: string; p_country_code?: string } = {
+      p_whs_name: whsName.trim(),
+    };
+    if (countryCode && countryCode.trim().length > 0) {
+      rpcParams.p_country_code = countryCode.trim();
+    }
     const { data: rpcMatch, error: rpcErr } = await supabase
-      .rpc('match_whs_course_to_golf_course', { p_whs_name: whsName.trim() } as any);
+      .rpc('match_whs_course_to_golf_course', rpcParams as any);
     if (!rpcErr && rpcMatch && Array.isArray(rpcMatch) && rpcMatch.length > 0) {
       const row = rpcMatch[0] as { id: string; name: string; thumbnail_image: string | null; region: string | null };
       await persistAlias(whsName, norm, row.id, 'rpc');
@@ -203,8 +210,11 @@ export async function resolveCourseFromWhsName(
   return null;
 }
 
-export async function lookupCourseThumbnailV2(whsName: string): Promise<string | null> {
-  const course = await resolveCourseFromWhsName(whsName);
+export async function lookupCourseThumbnailV2(
+  whsName: string,
+  countryCode?: string | null,
+): Promise<string | null> {
+  const course = await resolveCourseFromWhsName(whsName, countryCode);
   return course?.thumbnail_image ?? null;
 }
 
@@ -213,8 +223,9 @@ export async function lookupCourseThumbnailV2(whsName: string): Promise<string |
  *  once for region). Null on miss. */
 export async function lookupCourseMetaV2(
   whsName: string,
+  countryCode?: string | null,
 ): Promise<{ thumbnail_image: string | null; region: string | null } | null> {
-  const course = await resolveCourseFromWhsName(whsName);
+  const course = await resolveCourseFromWhsName(whsName, countryCode);
   if (!course) return null;
   return { thumbnail_image: course.thumbnail_image, region: course.region };
 }

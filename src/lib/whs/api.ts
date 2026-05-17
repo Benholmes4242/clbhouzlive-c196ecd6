@@ -150,7 +150,7 @@ const SCORE_SELECT = `
   id, play_date, adjusted_gross, stableford_points,
   handicap_differential, course_rating, slope_rating, marker_name,
   is_counter, handicap_index_at_time,
-  course:whs_courses(name, country_name)
+  course:whs_courses(name, country_name, country_code)
 `;
 
 export async function fetchLastRound(connectionId: string): Promise<WhsLastRound | null> {
@@ -184,7 +184,7 @@ export async function fetchLastRound(connectionId: string): Promise<WhsLastRound
 
   let course_thumbnail_image: string | null = null;
   if (latest.course?.name) {
-    course_thumbnail_image = await lookupCourseThumbnail(latest.course.name);
+    course_thumbnail_image = await lookupCourseThumbnail(latest.course.name, (latest.course as any)?.country_code ?? null);
   }
 
   return {
@@ -221,15 +221,25 @@ export async function fetchAllScores(connectionId: string): Promise<WhsScoreWith
   const rawRows = (data as unknown as RawScore[]) ?? [];
   if (rawRows.length === 0) return [];
 
-  const courseNames = new Set<string>();
+  // Build a map of name → country_code so each thumbnail lookup uses the right
+  // country context. Multiple rounds at the same course will share one country_code;
+  // if somehow a course name appears with two different country_codes, we use the first.
+  const nameToCountryCode: Record<string, string | null> = {};
   for (const r of rawRows) {
-    if (r.course?.name) courseNames.add(r.course.name);
+    if (r.course?.name && !(r.course.name.toLowerCase() in nameToCountryCode)) {
+      nameToCountryCode[r.course.name.toLowerCase()] = (r.course as any)?.country_code ?? null;
+    }
   }
 
   const thumbsByName: Record<string, string | null> = {};
   await Promise.all(
-    Array.from(courseNames).map(async (name) => {
-      thumbsByName[name.toLowerCase()] = await lookupCourseThumbnail(name);
+    Object.keys(nameToCountryCode).map(async (nameLower) => {
+      const originalName = rawRows.find(r => r.course?.name?.toLowerCase() === nameLower)?.course?.name;
+      if (!originalName) {
+        thumbsByName[nameLower] = null;
+        return;
+      }
+      thumbsByName[nameLower] = await lookupCourseThumbnail(originalName, nameToCountryCode[nameLower]);
     }),
   );
 
@@ -617,7 +627,7 @@ export async function fetchRoundDetail(
       total_holes,
       hole_by_hole_fetched,
       permalink_url,
-      course:whs_courses(name, country_name)
+      course:whs_courses(name, country_name, country_code)
     `)
     .eq('id', scoreId)
     .maybeSingle();
@@ -631,7 +641,7 @@ export async function fetchRoundDetail(
   let courseHeaderImage: string | null = null;
   let courseThumbnailImage: string | null = null;
   if (r.course?.name) {
-    courseThumbnailImage = await lookupCourseThumbnail(r.course.name);
+    courseThumbnailImage = await lookupCourseThumbnail(r.course.name, r.course?.country_code ?? null);
     courseHeaderImage = courseThumbnailImage;
   }
 
@@ -764,9 +774,12 @@ export async function callDeleteWhsData(): Promise<{ ok: boolean; message?: stri
  *       canon: "Sundridge Park (West Course)"
  * Try a few permutations before giving up.
  */
-async function lookupCourseThumbnail(whsName: string): Promise<string | null> {
+async function lookupCourseThumbnail(
+  whsName: string,
+  countryCode?: string | null,
+): Promise<string | null> {
   const { lookupCourseThumbnailV2 } = await import('./courseNameMatcher');
-  return lookupCourseThumbnailV2(whsName);
+  return lookupCourseThumbnailV2(whsName, countryCode);
 }
 
 async function lookupCourseMetaV2(

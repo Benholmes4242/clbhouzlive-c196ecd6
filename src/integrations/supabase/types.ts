@@ -14378,6 +14378,27 @@ export type Database = {
         }
         Relationships: []
       }
+      whs_country_to_golf_country: {
+        Row: {
+          golf_country_bucket: string
+          golf_sub_country: string
+          notes: string | null
+          whs_country_code: string
+        }
+        Insert: {
+          golf_country_bucket: string
+          golf_sub_country: string
+          notes?: string | null
+          whs_country_code: string
+        }
+        Update: {
+          golf_country_bucket?: string
+          golf_sub_country?: string
+          notes?: string | null
+          whs_country_code?: string
+        }
+        Relationships: []
+      }
       whs_course_aliases: {
         Row: {
           course_id: string
@@ -18679,7 +18700,7 @@ export type Database = {
       mark_today_visited: { Args: never; Returns: undefined }
       match_tour_rankings_players: { Args: never; Returns: undefined }
       match_whs_course_to_golf_course: {
-        Args: { p_whs_name: string }
+        Args: { p_country_code?: string; p_whs_name: string }
         Returns: {
           id: string
           match_method: string
