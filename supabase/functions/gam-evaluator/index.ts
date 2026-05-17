@@ -249,7 +249,17 @@ function computeRoundStats(score: any, holes: any[], meta: any) {
   // WHS leaves actual_gross null on most rounds; the playable gross lives
   // in adjusted_gross. Prefer adjusted_gross, fall back to actual_gross.
   const grossScore = score.adjusted_gross ?? score.actual_gross ?? null;
-  const par = meta.course_par ?? null;
+  // golf_courses has no `par` column; fall back to summing hole pars when
+  // the round has hole-by-hole data, otherwise leave null.
+  let par: number | null = meta.course_par ?? null;
+  if (par == null && holes.length > 0) {
+    const holePars = holes
+      .filter((h: any) => h.played !== false && h.par != null)
+      .map((h: any) => Number(h.par));
+    if (holePars.length >= 9) {
+      par = holePars.reduce((a, b) => a + b, 0);
+    }
+  }
 
   const stats: any = {
     whs_score_id: score.id,
