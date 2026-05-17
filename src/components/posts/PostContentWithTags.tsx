@@ -119,11 +119,15 @@ const PostContentWithTags: React.FC<PostContentWithTagsProps> = ({
     const username = taggable_entities.username;
     const name = taggable_entities.name;
     const sliceLabel = content.slice(start_index, end_index);
-    const tagText = username
-      ? `@${username}`
-      : name
-        ? `@${name.replace(/\s+/g, '')}`
-        : sliceLabel.replace(/\s+/g, '') || `@${name || ''}`;
+    // Prefer the display name (clean camelcase — e.g. "DannyHolmes"); fall
+    // back to username with spaces stripped; final fallback is the original
+    // typed slice from the caption with any leading "@" removed. No "@" prefix
+    // anywhere — the visual cue is amber colour, not punctuation.
+    const tagText = (name && name.trim())
+      ? name.replace(/\s+/g, '')
+      : (username && username.trim())
+        ? username.replace(/\s+/g, '')
+        : sliceLabel.replace(/^@/, '').replace(/\s+/g, '');
 
     elements.push(
       <span
