@@ -133,11 +133,11 @@ export const EmptyStateScreen: React.FC<Props> = ({ onPickCountry, onWhyConnect 
           type="button"
           onClick={onWhyConnect}
           style={{
-            fontSize: 13, color: INK_55, fontWeight: 500,
+            fontSize: 13, color: MUTED_ON_DARK, fontWeight: 500,
             cursor: 'pointer', border: 'none',
             background: 'transparent', fontFamily: FONT,
             textDecoration: 'underline',
-            textDecorationColor: 'rgba(15,23,42,0.20)',
+            textDecorationColor: 'rgba(148,163,184,0.40)',
             textUnderlineOffset: 3,
           }}
         >
