@@ -70,7 +70,7 @@ const FriendsYesterdayCard: React.FC<Props> = ({ data, userId }) => {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', fontFamily: FONT }}>
       {/* Section eyebrow */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 7, marginBottom: 14 }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 7, marginBottom: 12 }}>
         <span
           style={{
             width: 6,
@@ -85,7 +85,7 @@ const FriendsYesterdayCard: React.FC<Props> = ({ data, userId }) => {
           style={{
             fontSize: 11,
             fontWeight: 700,
-            color: 'rgba(15,23,42,0.45)',
+            color: 'rgba(248,250,252,0.65)',
             letterSpacing: '0.18em',
             textTransform: 'uppercase',
           }}
@@ -104,15 +104,15 @@ const FriendsYesterdayCard: React.FC<Props> = ({ data, userId }) => {
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'space-between',
-              marginTop: 24,
-              marginBottom: 12,
+              marginTop: 12,
+              marginBottom: 10,
             }}
           >
             <span
               style={{
                 fontSize: 10,
                 fontWeight: 700,
-                color: 'rgba(15,23,42,0.45)',
+                color: 'rgba(248,250,252,0.65)',
                 letterSpacing: '0.18em',
                 textTransform: 'uppercase',
               }}
@@ -124,7 +124,7 @@ const FriendsYesterdayCard: React.FC<Props> = ({ data, userId }) => {
                 style={{
                   fontSize: 10,
                   fontWeight: 500,
-                  color: 'rgba(15,23,42,0.30)',
+                  color: 'rgba(248,250,252,0.40)',
                   letterSpacing: '0.08em',
                 }}
               >
