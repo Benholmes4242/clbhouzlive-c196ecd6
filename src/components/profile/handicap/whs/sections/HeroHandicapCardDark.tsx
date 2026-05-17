@@ -181,10 +181,10 @@ const HeroHandicapCardDark: React.FC<Props> = ({ connection }) => {
       ? new Date(bestRow.play_date).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })
       : null;
     const courseName: string | undefined = bestRow.course?.name;
-    const courseShort = courseName ? courseName.split(' ')[0] : null;
     return {
       diff: bestRow.handicap_differential as number,
-      meta: [date, courseShort].filter(Boolean).join(' · ') || null,
+      courseName: courseName ?? null,
+      date: date ?? null,
     };
   }, [counters]);
 
