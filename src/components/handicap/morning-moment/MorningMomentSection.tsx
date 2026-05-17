@@ -9,12 +9,8 @@
  * the joined golf_clubs row (name + coords). Two-step query rather than
  * embedded FK join to avoid coupling to a specific constraint name.
  */
-import React, { useEffect, useMemo } from 'react';
-import { useQuery } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
-import HomeCourseWeatherCard from './HomeCourseWeatherCard';
+import React, { useEffect } from 'react';
 import FriendsYesterdayCard from './FriendsYesterdayCard';
-import SetHomeClubPromptCard from './SetHomeClubPromptCard';
 import { useFriendsYesterday } from '@/lib/handicap/useFriendsYesterday';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 
