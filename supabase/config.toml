@@ -212,3 +212,21 @@ verify_jwt = true
 
 [functions.geocode-club]
 verify_jwt = false
+
+[functions.gam-evaluator]
+verify_jwt = false
+
+[functions.gam-notifications-dispatcher]
+verify_jwt = false
+
+[functions.gam-assemble-pods]
+verify_jwt = false
+
+[functions.gam-roll-leagues]
+verify_jwt = false
+
+[functions.gam-refresh-streaks-weekly]
+verify_jwt = false
+
+[functions.gam-backdate-replay]
+verify_jwt = false
