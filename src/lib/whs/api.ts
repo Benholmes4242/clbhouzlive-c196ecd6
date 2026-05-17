@@ -627,7 +627,7 @@ export async function fetchRoundDetail(
       total_holes,
       hole_by_hole_fetched,
       permalink_url,
-      course:whs_courses(name, country_name)
+      course:whs_courses(name, country_name, country_code)
     `)
     .eq('id', scoreId)
     .maybeSingle();
