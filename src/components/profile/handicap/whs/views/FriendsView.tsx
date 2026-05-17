@@ -6,6 +6,7 @@ import RecentlyPlayedFeed from '../sections/recently-played/RecentlyPlayedFeed';
 import RivalriesSection from '../sections/rivalries/RivalriesSection';
 import FriendsLeaderboardSection from '../sections/friends-leaderboard-v2/FriendsLeaderboardSection';
 import InviteToClbhouzV2 from '../sections/invite-to-clbhouz/InviteToClbhouzV2';
+import MorningMoment from '@/components/handicap/MorningMoment';
 
 interface Props {
   userId: string;
@@ -17,6 +18,7 @@ interface Props {
 export const FriendsView: React.FC<Props> = ({ userId, currentHandicap, connectionId, readOnly = false }) => {
   return (
     <div role="tabpanel" id="handicap-panel-friends" aria-labelledby="handicap-tab-friends" style={{ paddingTop: 16 }}>
+      {!readOnly && <MorningMoment userId={userId} />}
       <FriendsHeaderSection userId={userId} />
       <RecentlyActiveRail userId={userId} />
       {!readOnly && <FriendsEchoSection connectionId={connectionId} />}
