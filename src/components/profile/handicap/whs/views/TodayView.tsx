@@ -61,7 +61,7 @@ export const TodayView: React.FC<Props> = ({
         <HeroHandicapCardDark connection={connection} />
       </div>
 
-      {!readOnly && <MorningMoment userId={userId} />}
+
 
       <NextRoundWatch connectionId={connectionId} currentHandicap={currentHandicap} />
 
