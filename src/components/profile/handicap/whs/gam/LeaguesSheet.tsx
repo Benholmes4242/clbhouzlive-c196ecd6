@@ -35,9 +35,9 @@ function usePodMembers(podId: string, enabled: boolean) {
         .order('live_rank', { ascending: true });
       if (error || !data) return [];
 
-      const userIds = data.map((r: any) => r.user_id).filter(Boolean);
+      const userIds: string[] = data.map((r: any) => r.user_id).filter(Boolean);
       const profilesRes = userIds.length
-        ? await supabase
+        ? await (supabase as any)
             .from('user_profiles')
             .select('user_id, full_name, profile_photo_url')
             .in('user_id', userIds)
