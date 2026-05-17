@@ -99,39 +99,7 @@ const FriendsYesterdayCard: React.FC<Props> = ({ data, userId }) => {
 
       {others.length > 0 && (
         <>
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              marginTop: 12,
-              marginBottom: 10,
-            }}
-          >
-            <span
-              style={{
-                fontSize: 10,
-                fontWeight: 700,
-                color: 'rgba(248,250,252,0.65)',
-                letterSpacing: '0.18em',
-                textTransform: 'uppercase',
-              }}
-            >
-              {others.length} MORE PLAYED
-            </span>
-            {others.length > 1 && (
-              <span
-                style={{
-                  fontSize: 10,
-                  fontWeight: 500,
-                  color: 'rgba(248,250,252,0.40)',
-                  letterSpacing: '0.08em',
-                }}
-              >
-                ← swipe →
-              </span>
-            )}
-          </div>
+          <div style={{ height: 12 }} />
           <div
             className="fyc-scroll"
             style={{
