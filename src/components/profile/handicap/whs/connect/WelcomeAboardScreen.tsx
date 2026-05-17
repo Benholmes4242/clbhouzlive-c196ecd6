@@ -5,6 +5,8 @@ const INK = '#0F172A';
 const INK_55 = '#64748B';
 const AMBER = '#F7931E';
 const GREEN = '#059669';
+const INK_ON_DARK = '#F8FAFC';
+const MUTED_ON_DARK = '#94A3B8';
 const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
 
 interface Props {
@@ -88,7 +90,7 @@ export const WelcomeAboardScreen: React.FC<Props> = ({
 
       <h2
         style={{
-          fontSize: 24, fontWeight: 800, color: INK,
+          fontSize: 24, fontWeight: 800, color: INK_ON_DARK,
           letterSpacing: '-0.02em',
           margin: '0 0 14px',
         }}
@@ -194,7 +196,7 @@ export const WelcomeAboardScreen: React.FC<Props> = ({
       </div>
 
       <p style={{
-        fontSize: 13.5, color: INK_55, lineHeight: 1.5,
+        fontSize: 13.5, color: MUTED_ON_DARK, lineHeight: 1.5,
         margin: '0 0 22px', maxWidth: 290,
       }}>
         Everything's live — your handicap will update automatically after every counting round.
