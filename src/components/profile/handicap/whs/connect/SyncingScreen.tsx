@@ -114,12 +114,12 @@ export const SyncingScreen: React.FC = () => {
                   width: 22, height: 22, borderRadius: '50%',
                   flexShrink: 0,
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  background: isDone ? GREEN : isActive ? 'rgba(247,147,30,0.10)' : '#fff',
+                  background: isDone ? GREEN : isActive ? 'rgba(247,147,30,0.18)' : 'rgba(248,250,252,0.06)',
                   border: isDone
                     ? `1.5px solid ${GREEN}`
                     : isActive
                       ? `1.5px solid ${AMBER}`
-                      : '1.5px solid rgba(15,23,42,0.14)',
+                      : '1.5px solid rgba(248,250,252,0.18)',
                   color: '#fff',
                   transition: 'all 400ms ease',
                 }}
@@ -136,7 +136,7 @@ export const SyncingScreen: React.FC = () => {
                 style={{
                   fontSize: 13.5,
                   fontWeight: isActive ? 700 : 500,
-                  color: isActive ? INK : INK_55,
+                  color: isActive ? INK_ON_DARK : MUTED_ON_DARK,
                   transition: 'all 400ms ease',
                 }}
               >
