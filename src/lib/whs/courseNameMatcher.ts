@@ -210,8 +210,11 @@ export async function resolveCourseFromWhsName(
   return null;
 }
 
-export async function lookupCourseThumbnailV2(whsName: string): Promise<string | null> {
-  const course = await resolveCourseFromWhsName(whsName);
+export async function lookupCourseThumbnailV2(
+  whsName: string,
+  countryCode?: string | null,
+): Promise<string | null> {
+  const course = await resolveCourseFromWhsName(whsName, countryCode);
   return course?.thumbnail_image ?? null;
 }
 
@@ -220,8 +223,9 @@ export async function lookupCourseThumbnailV2(whsName: string): Promise<string |
  *  once for region). Null on miss. */
 export async function lookupCourseMetaV2(
   whsName: string,
+  countryCode?: string | null,
 ): Promise<{ thumbnail_image: string | null; region: string | null } | null> {
-  const course = await resolveCourseFromWhsName(whsName);
+  const course = await resolveCourseFromWhsName(whsName, countryCode);
   if (!course) return null;
   return { thumbnail_image: course.thumbnail_image, region: course.region };
 }
