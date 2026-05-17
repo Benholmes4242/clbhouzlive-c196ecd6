@@ -6,6 +6,7 @@ import SectionHeader from './SectionHeader';
 import { DarkSectionHeader } from './_shared/darkAtoms';
 import { useStreaks, type StreakResult, type StreaksData } from '@/lib/whs/useStreaks';
 import { analyticsEvents } from '@/utils/analyticsEvents';
+import { openAllStreaks } from '../gam/events';
 
 const AMBER = '#F7931E';
 const AMBER_14 = 'rgba(247,147,30,0.14)';
@@ -519,7 +520,20 @@ export const StreaksSection: React.FC<Props> = ({ connectionId, userId }) => {
         return (
           <DarkSectionHeader
             eyebrow="Three Runs to Beat"
-            right={activeCount > 0 ? `${activeCount} ACTIVE` : 'NONE ACTIVE'}
+            right={
+              <button
+                type="button"
+                onClick={() => { analyticsEvents.track('all_streaks_open', { user_id: userId }); openAllStreaks(); }}
+                style={{
+                  display: 'inline-flex', alignItems: 'center', gap: 2,
+                  background: 'transparent', border: 'none', cursor: 'pointer',
+                  color: 'var(--hcp-t-60)', fontSize: 10, fontWeight: 800, letterSpacing: '0.14em',
+                  padding: '4px 6px',
+                }}
+              >
+                SEE ALL <ChevronRight size={12} strokeWidth={2.4} />
+              </button>
+            }
           />
         );
       })()}
