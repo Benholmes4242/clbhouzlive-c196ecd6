@@ -764,9 +764,12 @@ export async function callDeleteWhsData(): Promise<{ ok: boolean; message?: stri
  *       canon: "Sundridge Park (West Course)"
  * Try a few permutations before giving up.
  */
-async function lookupCourseThumbnail(whsName: string): Promise<string | null> {
+async function lookupCourseThumbnail(
+  whsName: string,
+  countryCode?: string | null,
+): Promise<string | null> {
   const { lookupCourseThumbnailV2 } = await import('./courseNameMatcher');
-  return lookupCourseThumbnailV2(whsName);
+  return lookupCourseThumbnailV2(whsName, countryCode);
 }
 
 async function lookupCourseMetaV2(
