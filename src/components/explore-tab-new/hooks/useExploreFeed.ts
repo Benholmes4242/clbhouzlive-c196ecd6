@@ -44,7 +44,7 @@ export function useExploreFeed({ userId, region, searchQuery, enabled: externalE
         return { posts: [] as FeedPost[], nextCursor: undefined as string | undefined };
       }
 
-      const rows = data as FeedRpcRow[];
+      const rows = data as unknown as FeedRpcRow[];
       const posts = groupMultiMedia(rows.map(mapRowToFeedPost));
 
       for (const post of posts) {
