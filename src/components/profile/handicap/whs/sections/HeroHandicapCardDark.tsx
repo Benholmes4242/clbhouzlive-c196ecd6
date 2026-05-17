@@ -356,9 +356,9 @@ const HeroHandicapCardDark: React.FC<Props> = ({ connection }) => {
           label="Scoring"
           value={
             scoringAvg90 != null ? (
-              <span style={{ display: 'inline-flex', alignItems: 'baseline', gap: 4 }}>
+              <span style={{ display: 'inline-flex', alignItems: 'baseline', gap: 0 }}>
                 {scoringAvg90.toFixed(1)}
-                <span style={{ fontSize: 11, fontWeight: 700, color: 'var(--hcp-t-60)', letterSpacing: 0 }}>
+                <span style={{ fontSize: 11, fontWeight: 700, color: 'var(--hcp-t-100)', letterSpacing: 0 }}>
                   avg
                 </span>
               </span>
@@ -395,10 +395,18 @@ const HeroHandicapCardDark: React.FC<Props> = ({ connection }) => {
             )
           }
           meta={
-            best ? (
-              <span style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
-                {best.courseName && <span>{best.courseName}</span>}
-                {best.date && <span>{best.date}</span>}
+            best?.courseName ? (
+              <span
+                style={{
+                  display: '-webkit-box',
+                  WebkitLineClamp: 2,
+                  WebkitBoxOrient: 'vertical',
+                  overflow: 'hidden',
+                  textAlign: 'center',
+                  lineHeight: 1.25,
+                }}
+              >
+                {best.courseName}
               </span>
             ) : (
               '—'
