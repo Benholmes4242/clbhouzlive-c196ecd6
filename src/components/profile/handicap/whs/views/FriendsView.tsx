@@ -6,6 +6,7 @@ import RecentlyPlayedFeed from '../sections/recently-played/RecentlyPlayedFeed';
 import RivalriesSection from '../sections/rivalries/RivalriesSection';
 import FriendsLeaderboardSection from '../sections/friends-leaderboard-v2/FriendsLeaderboardSection';
 import InviteToClbhouzV2 from '../sections/invite-to-clbhouz/InviteToClbhouzV2';
+import MorningMoment from '@/components/handicap/MorningMoment';
 
 interface Props {
   userId: string;
