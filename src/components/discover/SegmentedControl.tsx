@@ -69,7 +69,7 @@ const SegmentedControl: React.FC<SegmentedControlProps> = ({
           display: 'flex',
           justifyContent: align === 'center' ? 'center' : 'flex-start',
           gap: 8,
-          padding: '8px 16px',
+          padding: variant === 'slate' ? '2px 16px' : '8px 16px',
           overflowX: 'auto',
           overflowY: 'hidden',
           WebkitOverflowScrolling: 'touch',
