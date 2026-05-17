@@ -94,9 +94,9 @@ const SegmentedControl: React.FC<SegmentedControlProps> = ({
               onClick={(e) => handleTap(tab.id, e.currentTarget)}
               style={{
                 flexShrink: 0,
-                height: 32,
-                padding: '0 12px',
-                fontSize: 14,
+                height: isSlate ? 40 : 32,
+                padding: isSlate ? '0 14px' : '0 12px',
+                fontSize: isSlate ? 17 : 14,
                 fontWeight: isActive ? 700 : 500,
                 borderRadius: 8,
                 background: isActive ? activeBg : 'transparent',
