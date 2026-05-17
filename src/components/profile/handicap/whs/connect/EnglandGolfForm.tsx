@@ -214,9 +214,9 @@ export const EnglandGolfForm: React.FC<Props> = ({
             padding: '14px',
             borderRadius: 999,
             background: !isValid || submitting
-              ? 'rgba(15,23,42,0.10)'
+              ? 'rgba(248,250,252,0.10)'
               : 'linear-gradient(180deg, #FBA738 0%, #F7931E 100%)',
-            color: !isValid || submitting ? 'rgba(15,23,42,0.40)' : '#fff',
+            color: !isValid || submitting ? 'rgba(248,250,252,0.40)' : '#fff',
             fontSize: 15, fontWeight: 700,
             border: 'none',
             cursor: !isValid || submitting ? 'not-allowed' : 'pointer',
