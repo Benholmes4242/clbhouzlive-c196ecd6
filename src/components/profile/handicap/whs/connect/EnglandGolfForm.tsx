@@ -112,7 +112,7 @@ export const EnglandGolfForm: React.FC<Props> = ({
               opacity: submitting ? 0.5 : 1,
             }}
           />
-          <div style={{ fontSize: 11.5, color: INK_55, marginTop: 5 }}>
+          <div style={{ fontSize: 11.5, color: MUTED_ON_DARK, marginTop: 5 }}>
             Find this on your member card or in MyEG
           </div>
         </div>
@@ -122,7 +122,7 @@ export const EnglandGolfForm: React.FC<Props> = ({
             htmlFor="whs-password"
             style={{
               display: 'block',
-              fontSize: 13, fontWeight: 600, color: INK,
+              fontSize: 13, fontWeight: 600, color: INK_ON_DARK,
               marginBottom: 6,
             }}
           >
