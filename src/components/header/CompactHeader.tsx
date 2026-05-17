@@ -271,19 +271,11 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
               size="icon"
               className={cn(
                 "p-0 flex items-center justify-center rounded-full active:scale-[0.94] transition-all",
-                "h-11 w-11",
-                isDarkChrome
-                  ? "text-white"
-                  : useLightTheme
-                    ? "text-muted-foreground"
-                    : "hover:bg-[hsl(var(--clubhouse-active-bg))]"
+                "h-11 w-11 text-white",
+                !isDarkChrome && !useLightTheme && "hover:bg-[hsl(var(--clubhouse-active-bg))]"
               )}
-              style={{ 
-                color: isDarkChrome
-                  ? 'var(--hcp-t-100)'
-                  : useLightTheme 
-                    ? undefined 
-                    : 'hsl(var(--clubhouse-text-muted))',
+              style={{
+                color: '#FFFFFF',
                 transition: 'all var(--motion-fast) var(--ease-standard)'
               }}
               onClick={handleSearchClick}
