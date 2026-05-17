@@ -193,15 +193,15 @@ export const EnglandGolfForm: React.FC<Props> = ({
         <div
           style={{
             display: 'flex', gap: 10, alignItems: 'flex-start',
-            background: 'rgba(5,150,105,0.06)',
-            border: '1px solid rgba(5,150,105,0.16)',
+            background: 'rgba(5,150,105,0.10)',
+            border: '1px solid rgba(5,150,105,0.28)',
             padding: '12px 14px', borderRadius: 12,
             marginBottom: 16,
           }}
         >
           <ShieldCheck size={18} color={GREEN} strokeWidth={2.2} style={{ marginTop: 1, flexShrink: 0 }} />
-          <div style={{ fontSize: 12, color: 'rgba(15,23,42,0.78)', lineHeight: 1.45 }}>
-            <span style={{ fontWeight: 700, color: INK }}>Your password is safe.</span>{' '}
+          <div style={{ fontSize: 12, color: 'rgba(248,250,252,0.78)', lineHeight: 1.45 }}>
+            <span style={{ fontWeight: 700, color: INK_ON_DARK }}>Your password is safe.</span>{' '}
             Stored encrypted, used only to fetch your handicap from England Golf. clbhouz staff can't read it. Disconnect anytime.
           </div>
         </div>
