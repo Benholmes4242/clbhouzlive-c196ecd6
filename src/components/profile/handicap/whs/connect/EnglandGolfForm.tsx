@@ -83,7 +83,7 @@ export const EnglandGolfForm: React.FC<Props> = ({
             htmlFor="whs-membership"
             style={{
               display: 'block',
-              fontSize: 13, fontWeight: 600, color: INK,
+              fontSize: 13, fontWeight: 600, color: INK_ON_DARK,
               marginBottom: 6,
             }}
           >
