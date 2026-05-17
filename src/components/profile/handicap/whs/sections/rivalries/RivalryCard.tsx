@@ -1,4 +1,5 @@
 import React, { useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Info, Flame, Sparkles } from 'lucide-react';
 import { initials } from '@/lib/whs/utils/initials';
 import { reformatFriendName } from '@/lib/whs/utils/nameFormat';
