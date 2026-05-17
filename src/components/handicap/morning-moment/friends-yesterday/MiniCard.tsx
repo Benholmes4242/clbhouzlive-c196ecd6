@@ -1,9 +1,10 @@
 import React from 'react';
 import type { FriendYesterday } from '@/lib/handicap/useFriendsYesterday';
+import { useFriendRoundDetail } from '@/lib/whs/hooks';
 import FlagSilhouetteOverlay from '@/components/whs/FlagSilhouetteOverlay';
-import { deriveHeroState } from './deriveHeroState';
-import TopEyebrow from './TopEyebrow';
+import CinemaFriendEyebrow from '@/components/profile/handicap/whs/sections/recently-played/cinema-friend-card/CinemaFriendEyebrow';
 import MiniGlass from './MiniGlass';
+import type { WhsFriendActivityWithImage } from '@/lib/whs/types';
 
 const FALLBACK_GRADIENT =
   'linear-gradient(140deg, #2d3a2d 0%, #4a5d4a 25%, #6b7a5a 50%, #8a9670 72%, #c4a574 88%, #d4956b 100%)';
@@ -20,22 +21,25 @@ interface Props {
   onClick: () => void;
 }
 
-interface HintInfo {
-  label: string | null;
-  color: string;
-}
+export const MiniCard: React.FC<Props> = ({ friend, rank: _rank, onClick }) => {
+  const { data: detail } = useFriendRoundDetail(
+    friend.last_round_score_id,
+    !!friend.last_round_score_id,
+  );
 
-function hintFor(friend: FriendYesterday): HintInfo {
-  const state = deriveHeroState(friend);
-  if (state === 'invite') return { label: '\u2197 INVITE', color: '#FED7AA' };
-  if (state === 'nudge') return { label: '\u27F3 NUDGE TO SYNC', color: '#86EFAC' };
-  if (state === 'syncing') return { label: '\u27F3 SYNCING', color: 'rgba(255,255,255,0.70)' };
-  // enriched state: counter status now shown via gross ring; no text hint.
-  return { label: null, color: 'rgba(255,255,255,0.55)' };
-}
-
-export const MiniCard: React.FC<Props> = ({ friend, rank, onClick }) => {
-  const hint = hintFor(friend);
+  const eyebrowActivity = React.useMemo(
+    () =>
+      ({
+        friend_name: friend.name,
+        friend_thumbnail_url: friend.thumbnail_url,
+        friend_handicap_index: friend.friend_handicap_index,
+        handicap_index_at_time: friend.handicap_index_at_time,
+        is_counter: friend.is_counter,
+        last_round_played_at: friend.played_at,
+        last_round_course_name: friend.course_name,
+      }) as unknown as WhsFriendActivityWithImage,
+    [friend],
+  );
 
   return (
     <button
@@ -43,8 +47,8 @@ export const MiniCard: React.FC<Props> = ({ friend, rank, onClick }) => {
       onClick={onClick}
       style={{
         flex: '0 0 auto',
-        width: 250,
-        height: 168,
+        width: 280,
+        height: 192,
         position: 'relative',
         borderRadius: 18,
         overflow: 'hidden',
@@ -80,73 +84,24 @@ export const MiniCard: React.FC<Props> = ({ friend, rank, onClick }) => {
       <div style={{ position: 'absolute', inset: 0, background: ATMOSPHERIC, pointerEvents: 'none' }} />
       <div style={{ position: 'absolute', inset: 0, background: LEGIBILITY_SCRIM, pointerEvents: 'none' }} />
 
-      <TopEyebrow friend={friend} variant="mini" rightPill="rank" rank={rank} />
+      <CinemaFriendEyebrow activity={eyebrowActivity} />
 
       <div
         style={{
           position: 'absolute',
           left: 10,
           right: 10,
-          top: 34,
-          bottom: 30,
+          top: 36,
+          bottom: 8,
           display: 'flex',
-          alignItems: 'center',
-          zIndex: 2,
+          alignItems: 'flex-end',
+          zIndex: 3,
           pointerEvents: 'none',
         }}
       >
-        <div style={{ width: '100%' }}>
+        <div style={{ width: '100%', pointerEvents: 'auto' }}>
           <MiniGlass friend={friend} />
         </div>
-      </div>
-
-      <div
-        style={{
-          position: 'absolute',
-          bottom: 8,
-          left: 10,
-          right: 10,
-          zIndex: 3,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          gap: 8,
-          pointerEvents: 'none',
-        }}
-      >
-        {hint.label ? (
-          <span
-            style={{
-              fontSize: 9,
-              fontWeight: 700,
-              color: hint.color,
-              letterSpacing: '0.14em',
-              textTransform: 'uppercase',
-              textShadow: '0 1px 2px rgba(0,0,0,0.3)',
-              whiteSpace: 'nowrap',
-              overflow: 'hidden',
-              textOverflow: 'ellipsis',
-            }}
-          >
-            {hint.label}
-          </span>
-        ) : (
-          <span />
-        )}
-        <span
-          style={{
-            fontSize: 10,
-            fontWeight: 700,
-            color: 'rgba(255,255,255,0.70)',
-            letterSpacing: '0.10em',
-            textTransform: 'uppercase',
-            textShadow: '0 1px 2px rgba(0,0,0,0.3)',
-            whiteSpace: 'nowrap',
-            flexShrink: 0,
-          }}
-        >
-          VIEW {'\u203A'}
-        </span>
       </div>
     </button>
   );
