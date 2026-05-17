@@ -12,7 +12,7 @@ interface SegmentedControlProps {
   activeTab: string;
   onTabChange: (tabId: string) => void;
   className?: string;
-  variant?: 'light' | 'dark';
+  variant?: 'light' | 'dark' | 'slate';
   align?: 'start' | 'center';
 }
 
