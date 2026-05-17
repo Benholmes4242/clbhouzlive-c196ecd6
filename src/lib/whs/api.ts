@@ -221,15 +221,25 @@ export async function fetchAllScores(connectionId: string): Promise<WhsScoreWith
   const rawRows = (data as unknown as RawScore[]) ?? [];
   if (rawRows.length === 0) return [];
 
-  const courseNames = new Set<string>();
+  // Build a map of name → country_code so each thumbnail lookup uses the right
+  // country context. Multiple rounds at the same course will share one country_code;
+  // if somehow a course name appears with two different country_codes, we use the first.
+  const nameToCountryCode: Record<string, string | null> = {};
   for (const r of rawRows) {
-    if (r.course?.name) courseNames.add(r.course.name);
+    if (r.course?.name && !(r.course.name.toLowerCase() in nameToCountryCode)) {
+      nameToCountryCode[r.course.name.toLowerCase()] = (r.course as any)?.country_code ?? null;
+    }
   }
 
   const thumbsByName: Record<string, string | null> = {};
   await Promise.all(
-    Array.from(courseNames).map(async (name) => {
-      thumbsByName[name.toLowerCase()] = await lookupCourseThumbnail(name);
+    Object.keys(nameToCountryCode).map(async (nameLower) => {
+      const originalName = rawRows.find(r => r.course?.name?.toLowerCase() === nameLower)?.course?.name;
+      if (!originalName) {
+        thumbsByName[nameLower] = null;
+        return;
+      }
+      thumbsByName[nameLower] = await lookupCourseThumbnail(originalName, nameToCountryCode[nameLower]);
     }),
   );
 
