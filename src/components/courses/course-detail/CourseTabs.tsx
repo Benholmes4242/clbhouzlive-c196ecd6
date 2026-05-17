@@ -1,6 +1,6 @@
 import React from 'react';
 
-export type CourseTabId = 'about' | 'reviews' | 'media';
+export type CourseTabId = 'about' | 'reviews' | 'media' | 'legends';
 
 interface CourseTabsProps {
   activeTab: CourseTabId;
@@ -13,6 +13,7 @@ const tabs: { id: CourseTabId; label: string }[] = [
   { id: 'about', label: 'About' },
   { id: 'reviews', label: 'Reviews' },
   { id: 'media', label: 'Media' },
+  { id: 'legends', label: 'Legends' },
 ];
 
 /**
