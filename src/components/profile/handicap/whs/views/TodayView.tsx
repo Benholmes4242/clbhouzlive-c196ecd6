@@ -10,6 +10,7 @@ import IndexHistoryCard from '../sections/IndexHistoryCard';
 import RoundsThatCountCard from '../sections/RoundsThatCountCard';
 import StreaksSection from '../sections/StreaksSection';
 import SinceLastVisitRail from '../sections/since-last-visit/SinceLastVisitRail';
+import MorningMoment from '@/components/handicap/MorningMoment';
 
 interface Props {
   connection: WhsConnection;
@@ -60,6 +61,8 @@ export const TodayView: React.FC<Props> = ({
         {!readOnly && <TodayGreeting connectionId={connectionId} userId={userId} />}
         <HeroHandicapCardDark connection={connection} />
       </div>
+
+      {!readOnly && <MorningMoment userId={userId} />}
 
       <NextRoundWatch connectionId={connectionId} currentHandicap={currentHandicap} />
 
