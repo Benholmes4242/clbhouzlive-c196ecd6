@@ -340,12 +340,6 @@ const HeroHandicapCardDark: React.FC<Props> = ({ connection }) => {
         ) : (
           <>
             {tagWord && <span style={{ color: verdictColor }}>{tagWord}</span>}
-            {tagWord && (
-              <span style={{ color: 'var(--hcp-t-60)' }}> · </span>
-            )}
-            {scratchZone && (
-              <span style={{ color: 'var(--hcp-t-60)' }}>SCRATCH ZONE {scratchZone}</span>
-            )}
           </>
         )}
       </div>
