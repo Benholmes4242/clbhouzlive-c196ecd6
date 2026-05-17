@@ -10,6 +10,9 @@ import IndexHistoryCard from '../sections/IndexHistoryCard';
 import RoundsThatCountCard from '../sections/RoundsThatCountCard';
 import StreaksSection from '../sections/StreaksSection';
 import SinceLastVisitRail from '../sections/since-last-visit/SinceLastVisitRail';
+import RecentUnlocksStrip from '../gam/RecentUnlocksStrip';
+import LegendStatusCard from '../gam/LegendStatusCard';
+import LeaguesCard from '../gam/LeaguesCard';
 
 interface Props {
   connection: WhsConnection;
