@@ -2,7 +2,7 @@ import React, { useMemo, useState } from 'react';
 import { ChevronDown } from 'lucide-react';
 import { format } from 'date-fns';
 import { CourseImageFallback } from '@/components/whs/CourseImageFallback';
-import { useAllScores } from '@/lib/whs/hooks';
+import { useAllScores, useHandicapTrend } from '@/lib/whs/hooks';
 import { computeRoundDeltas, type RoundWithDelta } from './computeRoundDeltas';
 import RoundDetailSheet from '../round-detail/RoundDetailSheet';
 import SectionHeader from '../SectionHeader';
@@ -108,13 +108,14 @@ type FilterKey = 'all' | 'counters' | string;
 
 export const RecentRoundsCard: React.FC<Props> = ({ connectionId }) => {
   const { data: allRounds, isLoading } = useAllScores(connectionId);
+  const { data: trend } = useHandicapTrend(connectionId);
   const [openScoreId, setOpenScoreId] = useState<string | null>(null);
   const [filter, setFilter] = useState<FilterKey>('all');
   const [displayedCount, setDisplayedCount] = useState<number>(INITIAL_COUNT);
 
   const rounds = useMemo(
-    () => (allRounds ? computeRoundDeltas(allRounds) : []),
-    [allRounds],
+    () => (allRounds ? computeRoundDeltas(allRounds, trend?.current ?? null) : []),
+    [allRounds, trend?.current],
   );
 
   const bestByCourseSet = useMemo(() => {
