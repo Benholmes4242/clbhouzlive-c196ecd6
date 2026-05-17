@@ -51,7 +51,7 @@ export function useCourseMedia({ userId, courseId, filter }: UseCourseMediaParam
         return { posts: [] as FeedPost[], nextCursor: undefined as string | undefined };
       }
 
-      const rows = data as FeedRpcRow[];
+      const rows = data as unknown as FeedRpcRow[];
       // Each row = one media item = one tile. Do NOT group by post.
       const posts = rows.map(mapRowToFeedPost);
 
