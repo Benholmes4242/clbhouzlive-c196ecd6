@@ -354,10 +354,21 @@ const HeroHandicapCardDark: React.FC<Props> = ({ connection }) => {
       <TripleStrip variant="flush">
         <KPICell
           label="Scoring"
-          value={scoringAvg90 != null ? scoringAvg90.toFixed(1) : '—'}
+          value={
+            scoringAvg90 != null ? (
+              <span style={{ display: 'inline-flex', alignItems: 'baseline', gap: 4 }}>
+                {scoringAvg90.toFixed(1)}
+                <span style={{ fontSize: 11, fontWeight: 700, color: 'var(--hcp-t-60)', letterSpacing: 0 }}>
+                  avg
+                </span>
+              </span>
+            ) : (
+              '—'
+            )
+          }
           meta={
             scoringAvg90 != null
-              ? `avg · ${roundCount90} rds in 90D`
+              ? `${roundCount90} rds in 90D`
               : roundCount90 === 0
                 ? 'no rounds in 90D'
                 : `< 3 rds in 90D`
@@ -376,14 +387,23 @@ const HeroHandicapCardDark: React.FC<Props> = ({ connection }) => {
               <VerdictNumber
                 value={best.diff}
                 digits={1}
-                forceVerdict={best.diff < 0 ? 'good' : 'bad'}
+                forceVerdict={best.diff < 0 ? 'good' : 'neutral'}
                 size="lg"
               />
             ) : (
               '—'
             )
           }
-          meta={best?.meta ?? '—'}
+          meta={
+            best ? (
+              <span style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
+                {best.courseName && <span>{best.courseName}</span>}
+                {best.date && <span>{best.date}</span>}
+              </span>
+            ) : (
+              '—'
+            )
+          }
         />
       </TripleStrip>
     </section>
