@@ -246,7 +246,9 @@ async function markDone(whsScoreId: string) {
 // compute_round_stats
 // ─────────────────────────────────────────────────────────────────────────────
 function computeRoundStats(score: any, holes: any[], meta: any) {
-  const grossScore = score.actual_gross ?? null;
+  // WHS leaves actual_gross null on most rounds; the playable gross lives
+  // in adjusted_gross. Prefer adjusted_gross, fall back to actual_gross.
+  const grossScore = score.adjusted_gross ?? score.actual_gross ?? null;
   const par = meta.course_par ?? null;
 
   const stats: any = {
