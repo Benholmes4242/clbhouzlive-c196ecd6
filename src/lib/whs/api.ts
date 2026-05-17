@@ -48,11 +48,11 @@ export async function fetchWhsConnection(userId: string): Promise<WhsConnection 
 }
 
 export async function fetchHandicapTrend(connectionId: string): Promise<WhsHandicapTrend> {
-  // Source of truth: whs_scores.handicap_index_at_time.
-  // whs_handicap_snapshots is effectively write-once (only seeded at connect time),
-  // so the snapshot table cannot serve trend data. Scoring rows carry the historical
-  // index value alongside each round and have full coverage going back years.
-  const thirtyDaysAgoIso = new Date(Date.now() - 30 * 86_400_000).toISOString().slice(0, 10);
+  // Source of truth: whs_handicap_snapshots (post-round, authoritative).
+  // Fall back to whs_scores.handicap_index_at_time (pre-round) only when no
+  // snapshot exists — true for users connected before the snapshot logic shipped.
+  const thirtyDaysAgoIso = new Date(Date.now() - 30 * 86_400_000).toISOString();
+  const thirtyDaysAgoDate = thirtyDaysAgoIso.slice(0, 10);
 
   const { count: roundCount } = await supabase
     .from('whs_scores' as any)
@@ -61,18 +61,34 @@ export async function fetchHandicapTrend(connectionId: string): Promise<WhsHandi
 
   const totalRoundsInRecord = roundCount ?? 0;
 
-  const { data: latestRow } = await supabase
-    .from('whs_scores' as any)
-    .select('play_date, handicap_index_at_time')
+  // ── current handicap ─────────────────────────────────────────────────
+  const { data: latestSnap } = await supabase
+    .from('whs_handicap_snapshots' as any)
+    .select('handicap_index')
     .eq('connection_id', connectionId)
-    .not('handicap_index_at_time', 'is', null)
-    .order('play_date', { ascending: false })
+    .order('observed_at', { ascending: false })
     .limit(1)
     .maybeSingle();
 
-  const latest = latestRow as unknown as { play_date: string; handicap_index_at_time: number } | null;
+  let current: number | null = latestSnap
+    ? Number((latestSnap as any).handicap_index)
+    : null;
 
-  if (!latest) {
+  if (current === null) {
+    const { data: latestScore } = await supabase
+      .from('whs_scores' as any)
+      .select('handicap_index_at_time')
+      .eq('connection_id', connectionId)
+      .not('handicap_index_at_time', 'is', null)
+      .order('play_date', { ascending: false })
+      .limit(1)
+      .maybeSingle();
+    current = latestScore
+      ? Number((latestScore as any).handicap_index_at_time)
+      : null;
+  }
+
+  if (current === null) {
     return {
       current: null,
       delta: null,
@@ -82,21 +98,38 @@ export async function fetchHandicapTrend(connectionId: string): Promise<WhsHandi
     };
   }
 
-  const { data: previousRow } = await supabase
-    .from('whs_scores' as any)
-    .select('play_date, handicap_index_at_time')
+  // ── 30-day-ago handicap ──────────────────────────────────────────────
+  const { data: prevSnap } = await supabase
+    .from('whs_handicap_snapshots' as any)
+    .select('handicap_index')
     .eq('connection_id', connectionId)
-    .not('handicap_index_at_time', 'is', null)
-    .lte('play_date', thirtyDaysAgoIso)
-    .order('play_date', { ascending: false })
+    .lte('observed_at', thirtyDaysAgoIso)
+    .order('observed_at', { ascending: false })
     .limit(1)
     .maybeSingle();
 
-  const previous = previousRow as unknown as { play_date: string; handicap_index_at_time: number } | null;
+  let previousHandicap: number | null = prevSnap
+    ? Number((prevSnap as any).handicap_index)
+    : null;
 
-  if (!previous) {
+  if (previousHandicap === null) {
+    const { data: prevScore } = await supabase
+      .from('whs_scores' as any)
+      .select('handicap_index_at_time')
+      .eq('connection_id', connectionId)
+      .not('handicap_index_at_time', 'is', null)
+      .lte('play_date', thirtyDaysAgoDate)
+      .order('play_date', { ascending: false })
+      .limit(1)
+      .maybeSingle();
+    previousHandicap = prevScore
+      ? Number((prevScore as any).handicap_index_at_time)
+      : null;
+  }
+
+  if (previousHandicap === null) {
     return {
-      current: Number(latest.handicap_index_at_time),
+      current,
       delta: null,
       previousHandicap: null,
       totalRoundsInRecord,
@@ -105,9 +138,9 @@ export async function fetchHandicapTrend(connectionId: string): Promise<WhsHandi
   }
 
   return {
-    current: Number(latest.handicap_index_at_time),
-    delta: Number(latest.handicap_index_at_time) - Number(previous.handicap_index_at_time),
-    previousHandicap: Number(previous.handicap_index_at_time),
+    current,
+    delta: current - previousHandicap,
+    previousHandicap,
     totalRoundsInRecord,
     hasHistory: true,
   };
