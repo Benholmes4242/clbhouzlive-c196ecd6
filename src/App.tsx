@@ -311,6 +311,7 @@ function AppRoutes() {
         <Route path="/profile/handicap" element={<Navigate to="/handicap" replace />} />
         <Route path="/handicap" element={<Suspense fallback={<ProfileSkeleton />}><HandicapPage /></Suspense>} />
         <Route path="/handicap/:userId" element={<Suspense fallback={<ProfileSkeleton />}><HandicapPage /></Suspense>} />
+        <Route path="/handicap/rivalry/:rivalId" element={<Suspense fallback={<ProfileSkeleton />}><RivalryDeepView /></Suspense>} />
         <Route path="/profile/quest" element={<Suspense fallback={<ProfileSkeleton />}><ProfileQuestView /></Suspense>} />
         <Route path="/profile/quest/index" element={<Suspense fallback={<ProfileSkeleton />}><QuestIndexView /></Suspense>} />
         <Route path="/profile/quest/replay" element={<Navigate to="/profile" replace />} />
