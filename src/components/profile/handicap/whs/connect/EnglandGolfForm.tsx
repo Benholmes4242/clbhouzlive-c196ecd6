@@ -32,8 +32,8 @@ export const EnglandGolfForm: React.FC<Props> = ({
       <div
         style={{
           display: 'flex', alignItems: 'center', gap: 8,
-          background: 'rgba(15,23,42,0.04)',
-          border: '1px solid rgba(15,23,42,0.08)',
+          background: 'rgba(248,250,252,0.04)',
+          border: '1px solid rgba(248,250,252,0.10)',
           borderRadius: 12,
           padding: '10px 14px',
           marginBottom: 18,
@@ -42,14 +42,14 @@ export const EnglandGolfForm: React.FC<Props> = ({
         <MiniFlag iso="GB-ENG" />
         <div style={{ flex: 1, minWidth: 0 }}>
           <div style={{
-            fontSize: 9, fontWeight: 800, color: INK_55,
+            fontSize: 9, fontWeight: 800, color: MUTED_ON_DARK,
             letterSpacing: '0.14em', textTransform: 'uppercase',
             marginBottom: 1,
           }}>
             CONNECTING TO
           </div>
           <div style={{
-            fontSize: 13.5, fontWeight: 700, color: INK,
+            fontSize: 13.5, fontWeight: 700, color: INK_ON_DARK,
             lineHeight: 1.2,
           }}>
             England Golf · MyEG
