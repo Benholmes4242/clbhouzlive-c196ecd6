@@ -94,6 +94,7 @@ async function persistAlias(
 
 export async function resolveCourseFromWhsName(
   whsName: string,
+  countryCode?: string | null,
 ): Promise<GolfCourseLite | null> {
   if (!whsName || !whsName.trim()) return null;
 
