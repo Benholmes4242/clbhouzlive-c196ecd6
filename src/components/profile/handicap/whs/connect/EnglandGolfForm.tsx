@@ -232,7 +232,7 @@ export const EnglandGolfForm: React.FC<Props> = ({
 
         {onSkip && (
           <div style={{
-            textAlign: 'center', fontSize: 13, color: INK_55,
+            textAlign: 'center', fontSize: 13, color: MUTED_ON_DARK,
             paddingTop: 14,
           }}>
             Not a member?{' '}
@@ -240,10 +240,10 @@ export const EnglandGolfForm: React.FC<Props> = ({
               type="button"
               onClick={onSkip}
               style={{
-                color: INK, fontWeight: 600,
+                color: INK_ON_DARK, fontWeight: 600,
                 background: 'transparent', border: 'none', cursor: 'pointer',
                 textDecoration: 'underline',
-                textDecorationColor: 'rgba(15,23,42,0.20)',
+                textDecorationColor: 'rgba(248,250,252,0.30)',
                 textUnderlineOffset: 3,
                 fontFamily: FONT,
               }}
