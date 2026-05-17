@@ -18678,6 +18678,17 @@ export type Database = {
       }
       mark_today_visited: { Args: never; Returns: undefined }
       match_tour_rankings_players: { Args: never; Returns: undefined }
+      match_whs_course_to_golf_course: {
+        Args: { p_whs_name: string }
+        Returns: {
+          id: string
+          match_method: string
+          name: string
+          region: string
+          similarity_score: number
+          thumbnail_image: string
+        }[]
+      }
       nearby_golfers: {
         Args: {
           limit_rows?: number
