@@ -81,9 +81,10 @@ const SegmentedControl: React.FC<SegmentedControlProps> = ({
       >
         {tabs.map((tab) => {
           const isActive = activeTab === tab.id;
-          const activeBg = isDark ? 'rgba(255,255,255,0.10)' : '#FEF3E7';
-          const activeBorder = isDark ? '1px solid rgba(255,255,255,0.55)' : '1px solid #F7931E';
-          const activeColor = isDark ? '#FFFFFF' : '#c97a10';
+          const isSlate = variant === 'slate';
+          const activeBg = isDark ? 'rgba(255,255,255,0.10)' : isSlate ? '#E2E8F0' : '#FEF3E7';
+          const activeBorder = isDark ? '1px solid rgba(255,255,255,0.55)' : isSlate ? '1px solid #0F172A' : '1px solid #F7931E';
+          const activeColor = isDark ? '#FFFFFF' : isSlate ? '#0F172A' : '#c97a10';
           const inactiveColor = isDark ? '#FFFFFF' : 'hsl(var(--muted-foreground))';
           return (
             <button
