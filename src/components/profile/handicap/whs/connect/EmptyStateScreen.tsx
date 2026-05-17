@@ -22,13 +22,13 @@ const HeroArt: React.FC = () => (
         <stop offset="100%" stopColor="#C97211"/>
       </radialGradient>
     </defs>
-    <ellipse cx="60" cy="108" rx="32" ry="4" fill="rgba(15,23,42,0.10)" />
-    <circle cx="60" cy="58" r="42" fill="url(#globe-grad)" stroke={INK} strokeWidth="2" />
+    <ellipse cx="60" cy="108" rx="32" ry="4" fill="rgba(0,0,0,0.35)" />
+    <circle cx="60" cy="58" r="42" fill="url(#globe-grad)" stroke="rgba(15,23,42,0.55)" strokeWidth="2" />
     <ellipse cx="60" cy="58" rx="42" ry="14" fill="none" stroke="rgba(15,23,42,0.40)" strokeWidth="1" />
     <ellipse cx="60" cy="58" rx="22" ry="42" fill="none" stroke="rgba(15,23,42,0.40)" strokeWidth="1" />
     <line x1="18" y1="58" x2="102" y2="58" stroke="rgba(15,23,42,0.40)" strokeWidth="1" />
-    <line x1="60" y1="16" x2="60" y2="-2" stroke={INK} strokeWidth="2" strokeLinecap="round" />
-    <path d="M 60 0 L 78 4 L 60 8 Z" fill={AMBER} stroke={INK} strokeWidth="1.5" strokeLinejoin="round" />
+    <line x1="60" y1="16" x2="60" y2="-2" stroke="#F8FAFC" strokeWidth="2" strokeLinecap="round" />
+    <path d="M 60 0 L 78 4 L 60 8 Z" fill={AMBER} stroke="#F8FAFC" strokeWidth="1.5" strokeLinejoin="round" />
     <ellipse cx="48" cy="42" rx="8" ry="6" fill="rgba(255,255,255,0.30)" />
   </svg>
 );
