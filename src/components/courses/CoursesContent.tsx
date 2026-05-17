@@ -311,7 +311,7 @@ const CoursesContent: React.FC<CoursesContentProps> = ({ username, displayName }
                 ]}
                 activeTab={activeTab}
                 onTabChange={handleTabChange}
-                variant="dark"
+                variant="light"
                 align="center"
               />
             </div>
