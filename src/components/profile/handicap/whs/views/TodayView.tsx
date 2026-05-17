@@ -10,6 +10,7 @@ import IndexHistoryCard from '../sections/IndexHistoryCard';
 import RoundsThatCountCard from '../sections/RoundsThatCountCard';
 import StreaksSection from '../sections/StreaksSection';
 import SinceLastVisitRail from '../sections/since-last-visit/SinceLastVisitRail';
+import MorningMoment from '@/components/handicap/MorningMoment';
 
 interface Props {
   connection: WhsConnection;
