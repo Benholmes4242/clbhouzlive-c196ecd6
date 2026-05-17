@@ -28,10 +28,10 @@ function useFeed(userId: string, enabled: boolean) {
       const [badges, legends] = await Promise.all([
         supabase
           .from('gam_user_badges')
-          .select('id, badge_id, awarded_at')
+          .select('id, badge_id, earned_at')
           .eq('user_id', userId)
-          .gte('awarded_at', since)
-          .order('awarded_at', { ascending: false })
+          .gte('earned_at', since)
+          .order('earned_at', { ascending: false })
           .limit(50),
         supabase
           .from('gam_course_legends')
@@ -48,7 +48,7 @@ function useFeed(userId: string, enabled: boolean) {
         kind: 'badge',
         title: 'Badge unlocked',
         sub: b.badge_id ?? 'New achievement',
-        iso: b.awarded_at,
+        iso: b.earned_at,
         icon: 'badge',
         badgeId: b.badge_id,
       }));

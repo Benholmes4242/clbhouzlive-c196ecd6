@@ -19,7 +19,6 @@ interface Catalogue {
 interface UserBadge {
   badge_id: string;
   awarded_at: string;
-  progress: number | null;
 }
 
 function useCatalogue(enabled: boolean) {
@@ -30,8 +29,16 @@ function useCatalogue(enabled: boolean) {
     queryFn: async (): Promise<Catalogue[]> => {
       const { data } = await supabase
         .from('gam_badge_catalogue')
-        .select('id, name, description, rarity, icon');
-      return (data ?? []) as Catalogue[];
+        .select('id, title, description, rarity, icon_name')
+        .eq('is_active', true)
+        .order('display_order', { ascending: true });
+      return (data ?? []).map((r: any) => ({
+        id: r.id,
+        name: r.title,
+        description: r.description,
+        rarity: r.rarity,
+        icon: r.icon_name,
+      }));
     },
   });
 }
@@ -44,9 +51,12 @@ function useMyBadges(userId: string, enabled: boolean) {
     queryFn: async (): Promise<UserBadge[]> => {
       const { data } = await supabase
         .from('gam_user_badges')
-        .select('badge_id, awarded_at, progress')
+        .select('badge_id, earned_at')
         .eq('user_id', userId);
-      return (data ?? []) as UserBadge[];
+      return (data ?? []).map((r: any) => ({
+        badge_id: r.badge_id,
+        awarded_at: r.earned_at,
+      }));
     },
   });
 }
