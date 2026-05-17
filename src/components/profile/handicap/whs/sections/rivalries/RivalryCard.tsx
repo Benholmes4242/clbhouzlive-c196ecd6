@@ -76,6 +76,7 @@ export const RivalryCard: React.FC<Props> = ({
   userHandicap,
   onInfo,
 }) => {
+  const navigate = useNavigate();
   const rivalDisplayName = reformatFriendName(rivalry.rival_name ?? 'Unknown');
   const userDisplayName = userName ?? 'You';
   const sf = rivalry.stableford_record ?? { wins: 0, losses: 0, ties: 0 };
@@ -102,8 +103,16 @@ export const RivalryCard: React.FC<Props> = ({
   const youScoreColor = winning ? T.gold : losing ? T.red : T.whiteFaded;
   const themScoreColor = losing ? T.gold : winning ? T.red : T.whiteFaded;
 
+  const rivalId = (rivalry as any).id ?? (rivalry as any).rivalry_id ?? null;
+  const canOpenDeep = hasH2H && !!rivalId;
+  const goDeep = () => { if (canOpenDeep) navigate(`/handicap/rivalry/${rivalId}`); };
+
   return (
     <div
+      role={canOpenDeep ? 'button' : undefined}
+      tabIndex={canOpenDeep ? 0 : undefined}
+      onClick={canOpenDeep ? goDeep : undefined}
+      onKeyDown={canOpenDeep ? (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); goDeep(); } } : undefined}
       style={{
         flex: '0 0 auto',
         width: 290,
@@ -115,6 +124,7 @@ export const RivalryCard: React.FC<Props> = ({
         fontFamily: FONT_GEIST,
         color: T.white,
         boxShadow: '0 6px 18px rgba(15,23,42,0.18)',
+        cursor: canOpenDeep ? 'pointer' : 'default',
       }}
     >
       {/* Backdrop glow */}
