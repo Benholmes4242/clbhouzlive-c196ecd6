@@ -168,7 +168,7 @@ export const EnglandGolfForm: React.FC<Props> = ({
               {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
             </button>
           </div>
-          <div style={{ fontSize: 11.5, color: INK_55, marginTop: 5 }}>
+          <div style={{ fontSize: 11.5, color: MUTED_ON_DARK, marginTop: 5 }}>
             Same password you use for the MyEG app
           </div>
         </div>
