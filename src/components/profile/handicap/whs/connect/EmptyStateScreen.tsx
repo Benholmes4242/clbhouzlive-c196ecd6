@@ -56,7 +56,7 @@ export const EmptyStateScreen: React.FC<Props> = ({ onPickCountry, onWhyConnect 
           fontSize: 26,
           fontWeight: 800,
           letterSpacing: '-0.025em',
-          color: INK,
+          color: INK_ON_DARK,
           lineHeight: 1.15,
           margin: '0 0 10px',
           maxWidth: 280,
@@ -68,7 +68,7 @@ export const EmptyStateScreen: React.FC<Props> = ({ onPickCountry, onWhyConnect 
       <p
         style={{
           fontSize: 14,
-          color: INK_55,
+          color: MUTED_ON_DARK,
           lineHeight: 1.5,
           margin: '0 0 28px',
           maxWidth: 290,
