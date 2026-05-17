@@ -10,6 +10,9 @@ import IndexHistoryCard from '../sections/IndexHistoryCard';
 import RoundsThatCountCard from '../sections/RoundsThatCountCard';
 import StreaksSection from '../sections/StreaksSection';
 import SinceLastVisitRail from '../sections/since-last-visit/SinceLastVisitRail';
+import RecentUnlocksStrip from '../gam/RecentUnlocksStrip';
+import LegendStatusCard from '../gam/LegendStatusCard';
+import LeaguesCard from '../gam/LeaguesCard';
 
 interface Props {
   connection: WhsConnection;
@@ -63,6 +66,10 @@ export const TodayView: React.FC<Props> = ({
 
 
 
+      <RecentUnlocksStrip userId={userId} readOnly={readOnly} />
+
+      <LegendStatusCard userId={userId} isOwner={!readOnly} />
+
       <NextRoundWatch connectionId={connectionId} currentHandicap={currentHandicap} />
 
       <Pattern14Card connectionId={connectionId} />
@@ -72,6 +79,8 @@ export const TodayView: React.FC<Props> = ({
       <LastRoundCard connectionId={connectionId} userId={userId} />
 
       <RoundsThatCountCard connectionId={connectionId} currentHandicap={currentHandicap} />
+
+      <LeaguesCard userId={userId} isOwner={!readOnly} />
 
       {!readOnly && <StreaksSection connectionId={connectionId} userId={userId} />}
 
