@@ -112,6 +112,7 @@ const EditProfilePage = lazy(() => import("./pages/EditProfilePage"));
 const QuickEditProfilePage = lazy(() => import("./pages/QuickEditProfilePage"));
 // ProfileHandicapView removed — /profile/handicap now redirects to /handicap (fix brief §2.1)
 const HandicapPage = lazy(() => import("./pages/HandicapPage"));
+const RivalryDeepView = lazy(() => import("./components/profile/handicap/whs/gam/RivalryDeepView"));
 const ProfileQuestView = lazy(() => import("./pages/ProfileQuestView"));
 const QuestIndexView = lazy(() => import("./pages/QuestIndexView"));
 const QuestReplayView = lazy(() => import("./pages/QuestReplayView"));
@@ -311,6 +312,7 @@ function AppRoutes() {
         <Route path="/profile/handicap" element={<Navigate to="/handicap" replace />} />
         <Route path="/handicap" element={<Suspense fallback={<ProfileSkeleton />}><HandicapPage /></Suspense>} />
         <Route path="/handicap/:userId" element={<Suspense fallback={<ProfileSkeleton />}><HandicapPage /></Suspense>} />
+        <Route path="/handicap/rivalry/:rivalId" element={<Suspense fallback={<ProfileSkeleton />}><RivalryDeepView /></Suspense>} />
         <Route path="/profile/quest" element={<Suspense fallback={<ProfileSkeleton />}><ProfileQuestView /></Suspense>} />
         <Route path="/profile/quest/index" element={<Suspense fallback={<ProfileSkeleton />}><QuestIndexView /></Suspense>} />
         <Route path="/profile/quest/replay" element={<Navigate to="/profile" replace />} />
