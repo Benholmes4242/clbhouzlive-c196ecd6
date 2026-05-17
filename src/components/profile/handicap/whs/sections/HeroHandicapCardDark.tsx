@@ -368,10 +368,10 @@ const HeroHandicapCardDark: React.FC<Props> = ({ connection }) => {
           }
           meta={
             scoringAvg90 != null
-              ? `${roundCount90} rds`
+              ? `${roundCount90} rounds`
               : roundCount90 === 0
                 ? 'no rounds'
-                : `< 3 rds`
+                : `< 3 rounds`
           }
         />
         <KPICell
