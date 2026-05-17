@@ -13,7 +13,9 @@
 
 import React, { useCallback, useEffect, useMemo } from 'react';
 import { useNavigate, Navigate, useSearchParams, useParams } from 'react-router-dom';
-import { ChevronRight, Trophy, Activity } from 'lucide-react';
+import { ChevronRight, Trophy, Activity, Bell } from 'lucide-react';
+import GamMount from '@/components/profile/handicap/whs/gam/GamMount';
+import { openNotifications } from '@/components/profile/handicap/whs/gam/events';
 import { openTrophiesSheet } from '@/components/profile/handicap/whs/trophiesSheetEvents';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -414,6 +416,7 @@ const HandicapPage: React.FC = () => {
           <WhsHandicapTab userId={ownerUserId} />
         )}
       </main>
+      <GamMount ownerUserId={ownerUserId} viewerUserId={user.id} readOnly={isFriendView} />
     </PageRoot>
   );
 };
