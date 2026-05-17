@@ -184,7 +184,7 @@ export async function fetchLastRound(connectionId: string): Promise<WhsLastRound
 
   let course_thumbnail_image: string | null = null;
   if (latest.course?.name) {
-    course_thumbnail_image = await lookupCourseThumbnail(latest.course.name);
+    course_thumbnail_image = await lookupCourseThumbnail(latest.course.name, (latest.course as any)?.country_code ?? null);
   }
 
   return {
