@@ -159,22 +159,26 @@ export async function fetchLastRound(connectionId: string): Promise<WhsLastRound
     .select(SCORE_SELECT)
     .eq('connection_id', connectionId)
     .order('play_date', { ascending: false })
-    .limit(2);
+    .limit(1);
   if (error) throw error;
   if (!data || data.length === 0) return null;
 
   const rows = data as unknown as Array<WhsScore & { handicap_index_at_time: number | null }>;
   const latest = rows[0];
-  const previous = rows[1] ?? null;
+
+  // Post-round value for the most recent round = current snapshot.
+  const { data: snap } = await supabase
+    .from('whs_handicap_snapshots' as any)
+    .select('handicap_index')
+    .eq('connection_id', connectionId)
+    .order('observed_at', { ascending: false })
+    .limit(1)
+    .maybeSingle();
 
   let handicap_delta: number | null = null;
-  if (
-    previous &&
-    latest.handicap_index_at_time !== null &&
-    previous.handicap_index_at_time !== null
-  ) {
+  if (snap && latest.handicap_index_at_time !== null) {
     handicap_delta = Number(
-      (latest.handicap_index_at_time - previous.handicap_index_at_time).toFixed(1)
+      (Number((snap as any).handicap_index) - Number(latest.handicap_index_at_time)).toFixed(1)
     );
   }
 
