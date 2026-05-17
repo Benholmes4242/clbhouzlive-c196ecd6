@@ -641,7 +641,7 @@ export async function fetchRoundDetail(
   let courseHeaderImage: string | null = null;
   let courseThumbnailImage: string | null = null;
   if (r.course?.name) {
-    courseThumbnailImage = await lookupCourseThumbnail(r.course.name);
+    courseThumbnailImage = await lookupCourseThumbnail(r.course.name, r.course?.country_code ?? null);
     courseHeaderImage = courseThumbnailImage;
   }
 
