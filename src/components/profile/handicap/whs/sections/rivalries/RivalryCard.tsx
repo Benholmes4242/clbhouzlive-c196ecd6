@@ -176,7 +176,7 @@ export const RivalryCard: React.FC<Props> = ({
           </span>
           <button
             type="button"
-            onClick={onInfo}
+            onClick={(e) => { e.stopPropagation(); onInfo(); }}
             aria-label="Rivalry info"
             style={{
               display: 'inline-flex',
