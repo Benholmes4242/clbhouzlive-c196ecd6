@@ -17055,6 +17055,7 @@ export type Database = {
           is_verified: boolean
           like_count: number
           post_id: string
+          post_tags: Json
           thumbnail_url: string
           user_id: string
           username: string
@@ -17081,6 +17082,7 @@ export type Database = {
           post_content: string
           post_created_at: string
           post_id: string
+          post_tags: Json
           post_user_id: string
           poster_url: string
           progress_seconds: number
@@ -17205,6 +17207,7 @@ export type Database = {
           post_created_at: string
           post_id: string
           post_status: string
+          post_tags: Json
           post_user_id: string
           poster_url: string
           review_clubhouse_score: number
@@ -17331,6 +17334,7 @@ export type Database = {
           post_created_at: string
           post_id: string
           post_status: string
+          post_tags: Json
           post_user_id: string
           poster_url: string
           review_clubhouse_score: number
@@ -17632,6 +17636,7 @@ export type Database = {
           post_content: string
           post_created_at: string
           post_id: string
+          post_tags: Json
           post_user_id: string
           poster_url: string
           review_categories: Json
@@ -17717,6 +17722,7 @@ export type Database = {
           user_id: string
         }[]
       }
+      get_post_tags_jsonb: { Args: { p_post_id: string }; Returns: Json }
       get_profile_posts: {
         Args: {
           p_actor_id: string
@@ -18437,6 +18443,7 @@ export type Database = {
           is_verified: boolean
           like_count: number
           post_id: string
+          post_tags: Json
           thumbnail_url: string
           user_id: string
           username: string
@@ -18494,6 +18501,7 @@ export type Database = {
           is_verified: boolean
           like_count: number
           post_id: string
+          post_tags: Json
           thumbnail_url: string
           user_id: string
           username: string
@@ -18541,6 +18549,7 @@ export type Database = {
           post_created_at: string
           post_id: string
           post_status: string
+          post_tags: Json
           post_user_id: string
           poster_url: string
           review_clubhouse_score: number
