@@ -19,7 +19,7 @@ type GolfCourseLite = {
   thumbnail_image: string | null;
   region: string | null;
 };
-type MatchMethod = 'cache' | 'exact' | 'normalised' | 'dash' | 'suffix' | 'fuzzy';
+type MatchMethod = 'cache' | 'exact' | 'normalised' | 'dash' | 'suffix' | 'fuzzy' | 'rpc';
 
 const COMMON_SUFFIXES = [
   'golf and country club',
