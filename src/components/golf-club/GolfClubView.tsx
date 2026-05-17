@@ -15,6 +15,7 @@ import SegmentedControl from '@/components/discover/SegmentedControl';
 import { formatCourseLocation } from '@/utils/courseLocation';
 import { CourseDetailSkeleton } from '@/components/skeletons/CourseDetailSkeleton';
 import { useCourseRatingAggregates } from '@/hooks/useCourseRatingAggregates';
+import CourseLegendsTab from '@/components/profile/handicap/whs/gam/CourseLegendsTab';
 
 
 interface GolfClubViewProps {
@@ -195,6 +196,15 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
             <CourseMediaTabNew courseId={course.id} courseName={course.name} />
           </TabsContent>
         )}
+
+        {visitedTabs.has('legends') && (
+          <TabsContent
+            value="legends"
+            className={`mt-0 transition-opacity duration-200 ${activeTab === 'legends' ? 'opacity-100' : 'hidden'}`}
+          >
+            <CourseLegendsTab courseId={course.id} />
+          </TabsContent>
+        )}
       </Tabs>
     </div>
   );
@@ -203,6 +213,7 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
     { id: 'about', label: 'About' },
     { id: 'reviews', label: 'Reviews' },
     { id: 'media', label: 'Media' },
+    { id: 'legends', label: 'Legends' },
   ];
 
   if (isInModal) {
