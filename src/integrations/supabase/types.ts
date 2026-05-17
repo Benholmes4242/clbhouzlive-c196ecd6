@@ -617,6 +617,13 @@ export type Database = {
             foreignKeyName: "business_access_requests_decided_by_fkey"
             columns: ["decided_by"]
             isOneToOne: false
+            referencedRelation: "gam_friend_handicap_leaderboard_view"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "business_access_requests_decided_by_fkey"
+            columns: ["decided_by"]
+            isOneToOne: false
             referencedRelation: "public_golfer_blurbs"
             referencedColumns: ["user_id"]
           },
@@ -633,6 +640,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "user_profiles"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "business_access_requests_requester_user_profile_id_fkey"
+            columns: ["requester_user_profile_id"]
+            isOneToOne: false
+            referencedRelation: "gam_friend_handicap_leaderboard_view"
+            referencedColumns: ["user_id"]
           },
           {
             foreignKeyName: "business_access_requests_requester_user_profile_id_fkey"
@@ -1053,6 +1067,13 @@ export type Database = {
             foreignKeyName: "business_follows_follower_id_fkey"
             columns: ["follower_id"]
             isOneToOne: false
+            referencedRelation: "gam_friend_handicap_leaderboard_view"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "business_follows_follower_id_fkey"
+            columns: ["follower_id"]
+            isOneToOne: false
             referencedRelation: "public_golfer_blurbs"
             referencedColumns: ["user_id"]
           },
@@ -1150,6 +1171,13 @@ export type Database = {
             foreignKeyName: "business_members_user_profile_id_fkey"
             columns: ["user_profile_id"]
             isOneToOne: false
+            referencedRelation: "gam_friend_handicap_leaderboard_view"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "business_members_user_profile_id_fkey"
+            columns: ["user_profile_id"]
+            isOneToOne: false
             referencedRelation: "public_golfer_blurbs"
             referencedColumns: ["user_id"]
           },
@@ -1227,6 +1255,13 @@ export type Database = {
           user_id?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "business_profile_events_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "gam_friend_handicap_leaderboard_view"
+            referencedColumns: ["user_id"]
+          },
           {
             foreignKeyName: "business_profile_events_business_id_fkey"
             columns: ["business_id"]
@@ -1335,6 +1370,13 @@ export type Database = {
             foreignKeyName: "business_team_members_user_profile_id_fkey"
             columns: ["user_profile_id"]
             isOneToOne: false
+            referencedRelation: "gam_friend_handicap_leaderboard_view"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "business_team_members_user_profile_id_fkey"
+            columns: ["user_profile_id"]
+            isOneToOne: false
             referencedRelation: "public_golfer_blurbs"
             referencedColumns: ["user_id"]
           },
@@ -1383,6 +1425,13 @@ export type Database = {
           reason?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "business_verification_events_business_profile_id_fkey"
+            columns: ["business_profile_id"]
+            isOneToOne: false
+            referencedRelation: "gam_friend_handicap_leaderboard_view"
+            referencedColumns: ["user_id"]
+          },
           {
             foreignKeyName: "business_verification_events_business_profile_id_fkey"
             columns: ["business_profile_id"]
@@ -1646,6 +1695,13 @@ export type Database = {
             foreignKeyName: "challenges_created_by_fkey"
             columns: ["created_by"]
             isOneToOne: false
+            referencedRelation: "gam_friend_handicap_leaderboard_view"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "challenges_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
             referencedRelation: "public_golfer_blurbs"
             referencedColumns: ["user_id"]
           },
@@ -1706,6 +1762,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "championship_seasons"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "championship_dispatches_subject_user_id_fkey"
+            columns: ["subject_user_id"]
+            isOneToOne: false
+            referencedRelation: "gam_friend_handicap_leaderboard_view"
+            referencedColumns: ["user_id"]
           },
           {
             foreignKeyName: "championship_dispatches_subject_user_id_fkey"
@@ -1887,6 +1950,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "golf_clubs"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "club_page_requests_requester_user_profile_id_fkey"
+            columns: ["requester_user_profile_id"]
+            isOneToOne: false
+            referencedRelation: "gam_friend_handicap_leaderboard_view"
+            referencedColumns: ["user_id"]
           },
           {
             foreignKeyName: "club_page_requests_requester_user_profile_id_fkey"
@@ -2759,6 +2829,13 @@ export type Database = {
             foreignKeyName: "cosmetic_loadouts_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: true
+            referencedRelation: "gam_friend_handicap_leaderboard_view"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "cosmetic_loadouts_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
             referencedRelation: "public_golfer_blurbs"
             referencedColumns: ["user_id"]
           },
@@ -3298,6 +3375,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "golf_courses"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "course_ratings_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "gam_friend_handicap_leaderboard_view"
+            referencedColumns: ["user_id"]
           },
           {
             foreignKeyName: "course_ratings_user_id_fkey"
@@ -4065,6 +4149,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "editorial_card_comments"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "editorial_card_comment_likes_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "gam_friend_handicap_leaderboard_view"
+            referencedColumns: ["user_id"]
           },
           {
             foreignKeyName: "editorial_card_comment_likes_user_id_fkey"
@@ -5140,6 +5231,962 @@ export type Database = {
         }
         Relationships: []
       }
+      gam_badge_catalogue: {
+        Row: {
+          category: string
+          color_token: string
+          counter_metric: string | null
+          counter_tiers: Json | null
+          created_at: string
+          description: string
+          display_order: number
+          icon_name: string
+          id: string
+          is_active: boolean
+          kind: string
+          rarity: string
+          season_end: string | null
+          season_start: string | null
+          threshold_field: string | null
+          threshold_op: string | null
+          threshold_value: number | null
+          title: string
+        }
+        Insert: {
+          category: string
+          color_token?: string
+          counter_metric?: string | null
+          counter_tiers?: Json | null
+          created_at?: string
+          description: string
+          display_order?: number
+          icon_name: string
+          id: string
+          is_active?: boolean
+          kind: string
+          rarity: string
+          season_end?: string | null
+          season_start?: string | null
+          threshold_field?: string | null
+          threshold_op?: string | null
+          threshold_value?: number | null
+          title: string
+        }
+        Update: {
+          category?: string
+          color_token?: string
+          counter_metric?: string | null
+          counter_tiers?: Json | null
+          created_at?: string
+          description?: string
+          display_order?: number
+          icon_name?: string
+          id?: string
+          is_active?: boolean
+          kind?: string
+          rarity?: string
+          season_end?: string | null
+          season_start?: string | null
+          threshold_field?: string | null
+          threshold_op?: string | null
+          threshold_value?: number | null
+          title?: string
+        }
+        Relationships: []
+      }
+      gam_course_legends: {
+        Row: {
+          attained_at: string
+          category: string
+          course_id: string
+          id: string
+          is_current: boolean
+          rank: number
+          trigger_whs_score_id: string | null
+          updated_at: string
+          user_id: string
+          value: number
+        }
+        Insert: {
+          attained_at: string
+          category: string
+          course_id: string
+          id?: string
+          is_current?: boolean
+          rank: number
+          trigger_whs_score_id?: string | null
+          updated_at?: string
+          user_id: string
+          value: number
+        }
+        Update: {
+          attained_at?: string
+          category?: string
+          course_id?: string
+          id?: string
+          is_current?: boolean
+          rank?: number
+          trigger_whs_score_id?: string | null
+          updated_at?: string
+          user_id?: string
+          value?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "gam_course_legends_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "golf_courses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "gam_course_legends_trigger_whs_score_id_fkey"
+            columns: ["trigger_whs_score_id"]
+            isOneToOne: false
+            referencedRelation: "whs_friend_course_bests"
+            referencedColumns: ["best_score_id"]
+          },
+          {
+            foreignKeyName: "gam_course_legends_trigger_whs_score_id_fkey"
+            columns: ["trigger_whs_score_id"]
+            isOneToOne: false
+            referencedRelation: "whs_scores"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "gam_course_legends_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "gam_friend_handicap_leaderboard_view"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "gam_course_legends_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "public_golfer_blurbs"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "gam_course_legends_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "public_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "gam_course_legends_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      gam_evaluation_queue: {
+        Row: {
+          attempts: number
+          enqueued_at: string
+          error: string | null
+          evaluator_version: number
+          id: string
+          processed_at: string | null
+          status: string
+          user_id: string
+          whs_score_id: string
+        }
+        Insert: {
+          attempts?: number
+          enqueued_at?: string
+          error?: string | null
+          evaluator_version?: number
+          id?: string
+          processed_at?: string | null
+          status?: string
+          user_id: string
+          whs_score_id: string
+        }
+        Update: {
+          attempts?: number
+          enqueued_at?: string
+          error?: string | null
+          evaluator_version?: number
+          id?: string
+          processed_at?: string | null
+          status?: string
+          user_id?: string
+          whs_score_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "gam_evaluation_queue_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "gam_friend_handicap_leaderboard_view"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "gam_evaluation_queue_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "public_golfer_blurbs"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "gam_evaluation_queue_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "public_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "gam_evaluation_queue_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "gam_evaluation_queue_whs_score_id_fkey"
+            columns: ["whs_score_id"]
+            isOneToOne: false
+            referencedRelation: "whs_friend_course_bests"
+            referencedColumns: ["best_score_id"]
+          },
+          {
+            foreignKeyName: "gam_evaluation_queue_whs_score_id_fkey"
+            columns: ["whs_score_id"]
+            isOneToOne: false
+            referencedRelation: "whs_scores"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      gam_league_history: {
+        Row: {
+          final_points: number
+          final_rank: number
+          league_id: string
+          pod_id: string | null
+          promoted: boolean
+          recorded_at: string
+          relegated: boolean
+          rounds_counted: number
+          user_id: string
+        }
+        Insert: {
+          final_points: number
+          final_rank: number
+          league_id: string
+          pod_id?: string | null
+          promoted?: boolean
+          recorded_at?: string
+          relegated?: boolean
+          rounds_counted: number
+          user_id: string
+        }
+        Update: {
+          final_points?: number
+          final_rank?: number
+          league_id?: string
+          pod_id?: string | null
+          promoted?: boolean
+          recorded_at?: string
+          relegated?: boolean
+          rounds_counted?: number
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "gam_league_history_league_id_fkey"
+            columns: ["league_id"]
+            isOneToOne: false
+            referencedRelation: "gam_leagues"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "gam_league_history_pod_id_fkey"
+            columns: ["pod_id"]
+            isOneToOne: false
+            referencedRelation: "gam_league_pods"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "gam_league_history_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "gam_friend_handicap_leaderboard_view"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "gam_league_history_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "public_golfer_blurbs"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "gam_league_history_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "public_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "gam_league_history_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      gam_league_members: {
+        Row: {
+          best_rank: number | null
+          current_points: number
+          current_rank: number | null
+          hcp_at_join: number | null
+          joined_at: string
+          last_updated_at: string
+          league_id: string
+          pod_id: string
+          rounds_counted: number
+          user_id: string
+        }
+        Insert: {
+          best_rank?: number | null
+          current_points?: number
+          current_rank?: number | null
+          hcp_at_join?: number | null
+          joined_at?: string
+          last_updated_at?: string
+          league_id: string
+          pod_id: string
+          rounds_counted?: number
+          user_id: string
+        }
+        Update: {
+          best_rank?: number | null
+          current_points?: number
+          current_rank?: number | null
+          hcp_at_join?: number | null
+          joined_at?: string
+          last_updated_at?: string
+          league_id?: string
+          pod_id?: string
+          rounds_counted?: number
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "gam_league_members_league_id_fkey"
+            columns: ["league_id"]
+            isOneToOne: false
+            referencedRelation: "gam_leagues"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "gam_league_members_pod_id_fkey"
+            columns: ["pod_id"]
+            isOneToOne: false
+            referencedRelation: "gam_league_pods"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "gam_league_members_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "gam_friend_handicap_leaderboard_view"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "gam_league_members_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "public_golfer_blurbs"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "gam_league_members_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "public_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "gam_league_members_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      gam_league_pods: {
+        Row: {
+          capacity: number
+          created_at: string
+          id: string
+          league_id: string
+          pod_number: number
+        }
+        Insert: {
+          capacity?: number
+          created_at?: string
+          id?: string
+          league_id: string
+          pod_number: number
+        }
+        Update: {
+          capacity?: number
+          created_at?: string
+          id?: string
+          league_id?: string
+          pod_number?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "gam_league_pods_league_id_fkey"
+            columns: ["league_id"]
+            isOneToOne: false
+            referencedRelation: "gam_leagues"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      gam_leagues: {
+        Row: {
+          bracket: string
+          created_at: string
+          hcp_max: number | null
+          hcp_min: number | null
+          id: string
+          is_active: boolean
+          season: string
+          season_end: string
+          season_start: string
+        }
+        Insert: {
+          bracket: string
+          created_at?: string
+          hcp_max?: number | null
+          hcp_min?: number | null
+          id?: string
+          is_active?: boolean
+          season: string
+          season_end: string
+          season_start: string
+        }
+        Update: {
+          bracket?: string
+          created_at?: string
+          hcp_max?: number | null
+          hcp_min?: number | null
+          id?: string
+          is_active?: boolean
+          season?: string
+          season_end?: string
+          season_start?: string
+        }
+        Relationships: []
+      }
+      gam_notification_outbox: {
+        Row: {
+          created_at: string
+          deduplication_key: string | null
+          id: string
+          notification_type: string
+          scheduled_for: string
+          sent_at: string | null
+          status: string
+          template_id: string
+          template_payload: Json
+          trigger_whs_score_id: string | null
+          urgency: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          deduplication_key?: string | null
+          id?: string
+          notification_type: string
+          scheduled_for?: string
+          sent_at?: string | null
+          status?: string
+          template_id: string
+          template_payload: Json
+          trigger_whs_score_id?: string | null
+          urgency?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          deduplication_key?: string | null
+          id?: string
+          notification_type?: string
+          scheduled_for?: string
+          sent_at?: string | null
+          status?: string
+          template_id?: string
+          template_payload?: Json
+          trigger_whs_score_id?: string | null
+          urgency?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "gam_notification_outbox_trigger_whs_score_id_fkey"
+            columns: ["trigger_whs_score_id"]
+            isOneToOne: false
+            referencedRelation: "whs_friend_course_bests"
+            referencedColumns: ["best_score_id"]
+          },
+          {
+            foreignKeyName: "gam_notification_outbox_trigger_whs_score_id_fkey"
+            columns: ["trigger_whs_score_id"]
+            isOneToOne: false
+            referencedRelation: "whs_scores"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "gam_notification_outbox_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "gam_friend_handicap_leaderboard_view"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "gam_notification_outbox_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "public_golfer_blurbs"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "gam_notification_outbox_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "public_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "gam_notification_outbox_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      gam_round_stats: {
+        Row: {
+          albatrosses: number
+          beat_par: boolean
+          birdies: number
+          bogeys: number
+          clean_card: boolean
+          course_id: string | null
+          course_name: string | null
+          course_par: number | null
+          course_rating: number | null
+          created_at: string
+          delta_index: number | null
+          double_bogeys: number
+          eagles: number
+          evaluator_version: number
+          gross_score: number | null
+          hcp_at_time: number | null
+          holes_in_one: number
+          holes_played: number | null
+          is_competition: boolean | null
+          is_counter: boolean
+          longest_birdie_run: number
+          longest_par_or_better_run: number
+          nett_score: number | null
+          pars: number
+          pcc: number | null
+          play_date: string
+          score_diff: number | null
+          slope_rating: number | null
+          stableford_points: number | null
+          sub_100: boolean
+          sub_70: boolean
+          sub_80: boolean
+          sub_90: boolean
+          tee_marker: string | null
+          triple_plus: number
+          updated_at: string
+          user_id: string
+          whs_score_id: string
+        }
+        Insert: {
+          albatrosses?: number
+          beat_par?: boolean
+          birdies?: number
+          bogeys?: number
+          clean_card?: boolean
+          course_id?: string | null
+          course_name?: string | null
+          course_par?: number | null
+          course_rating?: number | null
+          created_at?: string
+          delta_index?: number | null
+          double_bogeys?: number
+          eagles?: number
+          evaluator_version?: number
+          gross_score?: number | null
+          hcp_at_time?: number | null
+          holes_in_one?: number
+          holes_played?: number | null
+          is_competition?: boolean | null
+          is_counter?: boolean
+          longest_birdie_run?: number
+          longest_par_or_better_run?: number
+          nett_score?: number | null
+          pars?: number
+          pcc?: number | null
+          play_date: string
+          score_diff?: number | null
+          slope_rating?: number | null
+          stableford_points?: number | null
+          sub_100?: boolean
+          sub_70?: boolean
+          sub_80?: boolean
+          sub_90?: boolean
+          tee_marker?: string | null
+          triple_plus?: number
+          updated_at?: string
+          user_id: string
+          whs_score_id: string
+        }
+        Update: {
+          albatrosses?: number
+          beat_par?: boolean
+          birdies?: number
+          bogeys?: number
+          clean_card?: boolean
+          course_id?: string | null
+          course_name?: string | null
+          course_par?: number | null
+          course_rating?: number | null
+          created_at?: string
+          delta_index?: number | null
+          double_bogeys?: number
+          eagles?: number
+          evaluator_version?: number
+          gross_score?: number | null
+          hcp_at_time?: number | null
+          holes_in_one?: number
+          holes_played?: number | null
+          is_competition?: boolean | null
+          is_counter?: boolean
+          longest_birdie_run?: number
+          longest_par_or_better_run?: number
+          nett_score?: number | null
+          pars?: number
+          pcc?: number | null
+          play_date?: string
+          score_diff?: number | null
+          slope_rating?: number | null
+          stableford_points?: number | null
+          sub_100?: boolean
+          sub_70?: boolean
+          sub_80?: boolean
+          sub_90?: boolean
+          tee_marker?: string | null
+          triple_plus?: number
+          updated_at?: string
+          user_id?: string
+          whs_score_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "gam_round_stats_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "gam_friend_handicap_leaderboard_view"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "gam_round_stats_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "public_golfer_blurbs"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "gam_round_stats_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "public_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "gam_round_stats_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "gam_round_stats_whs_score_id_fkey"
+            columns: ["whs_score_id"]
+            isOneToOne: true
+            referencedRelation: "whs_friend_course_bests"
+            referencedColumns: ["best_score_id"]
+          },
+          {
+            foreignKeyName: "gam_round_stats_whs_score_id_fkey"
+            columns: ["whs_score_id"]
+            isOneToOne: true
+            referencedRelation: "whs_scores"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      gam_streaks: {
+        Row: {
+          best_count: number
+          best_ended_at: string | null
+          best_started_at: string | null
+          current_count: number
+          current_started_at: string | null
+          freeze_credits: number
+          freeze_refill_at: string | null
+          is_active: boolean
+          last_freeze_used_at: string | null
+          last_updated_round_id: string | null
+          streak_type: string
+          unit: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          best_count?: number
+          best_ended_at?: string | null
+          best_started_at?: string | null
+          current_count?: number
+          current_started_at?: string | null
+          freeze_credits?: number
+          freeze_refill_at?: string | null
+          is_active?: boolean
+          last_freeze_used_at?: string | null
+          last_updated_round_id?: string | null
+          streak_type: string
+          unit: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          best_count?: number
+          best_ended_at?: string | null
+          best_started_at?: string | null
+          current_count?: number
+          current_started_at?: string | null
+          freeze_credits?: number
+          freeze_refill_at?: string | null
+          is_active?: boolean
+          last_freeze_used_at?: string | null
+          last_updated_round_id?: string | null
+          streak_type?: string
+          unit?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "gam_streaks_last_updated_round_id_fkey"
+            columns: ["last_updated_round_id"]
+            isOneToOne: false
+            referencedRelation: "whs_friend_course_bests"
+            referencedColumns: ["best_score_id"]
+          },
+          {
+            foreignKeyName: "gam_streaks_last_updated_round_id_fkey"
+            columns: ["last_updated_round_id"]
+            isOneToOne: false
+            referencedRelation: "whs_scores"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "gam_streaks_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "gam_friend_handicap_leaderboard_view"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "gam_streaks_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "public_golfer_blurbs"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "gam_streaks_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "public_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "gam_streaks_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      gam_user_badges: {
+        Row: {
+          badge_id: string
+          counter_tier: number | null
+          counter_value: number | null
+          created_at: string
+          earned_at: string
+          id: string
+          is_visible: boolean
+          seen_by_user: boolean
+          trigger_whs_score_id: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          badge_id: string
+          counter_tier?: number | null
+          counter_value?: number | null
+          created_at?: string
+          earned_at?: string
+          id?: string
+          is_visible?: boolean
+          seen_by_user?: boolean
+          trigger_whs_score_id?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          badge_id?: string
+          counter_tier?: number | null
+          counter_value?: number | null
+          created_at?: string
+          earned_at?: string
+          id?: string
+          is_visible?: boolean
+          seen_by_user?: boolean
+          trigger_whs_score_id?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "gam_user_badges_badge_id_fkey"
+            columns: ["badge_id"]
+            isOneToOne: false
+            referencedRelation: "gam_badge_catalogue"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "gam_user_badges_trigger_whs_score_id_fkey"
+            columns: ["trigger_whs_score_id"]
+            isOneToOne: false
+            referencedRelation: "whs_friend_course_bests"
+            referencedColumns: ["best_score_id"]
+          },
+          {
+            foreignKeyName: "gam_user_badges_trigger_whs_score_id_fkey"
+            columns: ["trigger_whs_score_id"]
+            isOneToOne: false
+            referencedRelation: "whs_scores"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "gam_user_badges_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "gam_friend_handicap_leaderboard_view"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "gam_user_badges_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "public_golfer_blurbs"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "gam_user_badges_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "public_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "gam_user_badges_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      gam_user_milestones: {
+        Row: {
+          count: number
+          first_at: string | null
+          last_at: string | null
+          metric: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          count?: number
+          first_at?: string | null
+          last_at?: string | null
+          metric: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          count?: number
+          first_at?: string | null
+          last_at?: string | null
+          metric?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "gam_user_milestones_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "gam_friend_handicap_leaderboard_view"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "gam_user_milestones_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "public_golfer_blurbs"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "gam_user_milestones_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "public_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "gam_user_milestones_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       game_join_requests: {
         Row: {
           created_at: string
@@ -5285,6 +6332,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "games_as_events"
             referencedColumns: ["legacy_game_id"]
+          },
+          {
+            foreignKeyName: "game_participants_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "gam_friend_handicap_leaderboard_view"
+            referencedColumns: ["user_id"]
           },
           {
             foreignKeyName: "game_participants_user_id_fkey"
@@ -6177,6 +7231,13 @@ export type Database = {
             foreignKeyName: "join_requests_requester_id_fkey"
             columns: ["requester_id"]
             isOneToOne: false
+            referencedRelation: "gam_friend_handicap_leaderboard_view"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "join_requests_requester_id_fkey"
+            columns: ["requester_id"]
+            isOneToOne: false
             referencedRelation: "public_golfer_blurbs"
             referencedColumns: ["user_id"]
           },
@@ -6742,6 +7803,13 @@ export type Database = {
             foreignKeyName: "notifications_actor_fk"
             columns: ["actor_id"]
             isOneToOne: false
+            referencedRelation: "gam_friend_handicap_leaderboard_view"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "notifications_actor_fk"
+            columns: ["actor_id"]
+            isOneToOne: false
             referencedRelation: "public_golfer_blurbs"
             referencedColumns: ["user_id"]
           },
@@ -6758,6 +7826,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "user_profiles"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "notifications_user_fk"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "gam_friend_handicap_leaderboard_view"
+            referencedColumns: ["user_id"]
           },
           {
             foreignKeyName: "notifications_user_fk"
@@ -7795,6 +8870,13 @@ export type Database = {
             foreignKeyName: "posts_user_profile_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
+            referencedRelation: "gam_friend_handicap_leaderboard_view"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "posts_user_profile_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
             referencedRelation: "public_golfer_blurbs"
             referencedColumns: ["user_id"]
           },
@@ -8200,6 +9282,13 @@ export type Database = {
             foreignKeyName: "push_notification_queue_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
+            referencedRelation: "gam_friend_handicap_leaderboard_view"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "push_notification_queue_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
             referencedRelation: "public_golfer_blurbs"
             referencedColumns: ["user_id"]
           },
@@ -8514,6 +9603,13 @@ export type Database = {
             foreignKeyName: "rivals_rival_user_id_fkey"
             columns: ["rival_user_id"]
             isOneToOne: false
+            referencedRelation: "gam_friend_handicap_leaderboard_view"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "rivals_rival_user_id_fkey"
+            columns: ["rival_user_id"]
+            isOneToOne: false
             referencedRelation: "public_golfer_blurbs"
             referencedColumns: ["user_id"]
           },
@@ -8530,6 +9626,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "user_profiles"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "rivals_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "gam_friend_handicap_leaderboard_view"
+            referencedColumns: ["user_id"]
           },
           {
             foreignKeyName: "rivals_user_id_fkey"
@@ -8620,6 +9723,13 @@ export type Database = {
             foreignKeyName: "season_badges_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
+            referencedRelation: "gam_friend_handicap_leaderboard_view"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "season_badges_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
             referencedRelation: "public_golfer_blurbs"
             referencedColumns: ["user_id"]
           },
@@ -8682,6 +9792,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "user_season_xp_view"
             referencedColumns: ["season_id"]
+          },
+          {
+            foreignKeyName: "season_pass_tiers_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "gam_friend_handicap_leaderboard_view"
+            referencedColumns: ["user_id"]
           },
           {
             foreignKeyName: "season_pass_tiers_user_id_fkey"
@@ -8766,6 +9883,13 @@ export type Database = {
             foreignKeyName: "season_podium_archive_first_place_user_id_fkey"
             columns: ["first_place_user_id"]
             isOneToOne: false
+            referencedRelation: "gam_friend_handicap_leaderboard_view"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "season_podium_archive_first_place_user_id_fkey"
+            columns: ["first_place_user_id"]
+            isOneToOne: false
             referencedRelation: "public_golfer_blurbs"
             referencedColumns: ["user_id"]
           },
@@ -8794,6 +9918,13 @@ export type Database = {
             foreignKeyName: "season_podium_archive_second_place_user_id_fkey"
             columns: ["second_place_user_id"]
             isOneToOne: false
+            referencedRelation: "gam_friend_handicap_leaderboard_view"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "season_podium_archive_second_place_user_id_fkey"
+            columns: ["second_place_user_id"]
+            isOneToOne: false
             referencedRelation: "public_golfer_blurbs"
             referencedColumns: ["user_id"]
           },
@@ -8810,6 +9941,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "user_profiles"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "season_podium_archive_third_place_user_id_fkey"
+            columns: ["third_place_user_id"]
+            isOneToOne: false
+            referencedRelation: "gam_friend_handicap_leaderboard_view"
+            referencedColumns: ["user_id"]
           },
           {
             foreignKeyName: "season_podium_archive_third_place_user_id_fkey"
@@ -9005,6 +10143,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "user_season_xp_view"
             referencedColumns: ["season_id"]
+          },
+          {
+            foreignKeyName: "season_wrap_cards_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "gam_friend_handicap_leaderboard_view"
+            referencedColumns: ["user_id"]
           },
           {
             foreignKeyName: "season_wrap_cards_user_id_fkey"
@@ -10529,6 +11674,13 @@ export type Database = {
             foreignKeyName: "streaks_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: true
+            referencedRelation: "gam_friend_handicap_leaderboard_view"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "streaks_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
             referencedRelation: "public_golfer_blurbs"
             referencedColumns: ["user_id"]
           },
@@ -11060,6 +12212,13 @@ export type Database = {
             foreignKeyName: "top_ten_comment_mentions_mentioned_user_id_fkey"
             columns: ["mentioned_user_id"]
             isOneToOne: false
+            referencedRelation: "gam_friend_handicap_leaderboard_view"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "top_ten_comment_mentions_mentioned_user_id_fkey"
+            columns: ["mentioned_user_id"]
+            isOneToOne: false
             referencedRelation: "public_golfer_blurbs"
             referencedColumns: ["user_id"]
           },
@@ -11115,6 +12274,13 @@ export type Database = {
             foreignKeyName: "top_ten_comments_commenter_id_profiles_fkey"
             columns: ["commenter_id"]
             isOneToOne: false
+            referencedRelation: "gam_friend_handicap_leaderboard_view"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "top_ten_comments_commenter_id_profiles_fkey"
+            columns: ["commenter_id"]
+            isOneToOne: false
             referencedRelation: "public_golfer_blurbs"
             referencedColumns: ["user_id"]
           },
@@ -11145,6 +12311,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "top_ten_comments"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "top_ten_comments_target_user_id_profiles_fkey"
+            columns: ["target_user_id"]
+            isOneToOne: false
+            referencedRelation: "gam_friend_handicap_leaderboard_view"
+            referencedColumns: ["user_id"]
           },
           {
             foreignKeyName: "top_ten_comments_target_user_id_profiles_fkey"
@@ -11206,6 +12379,13 @@ export type Database = {
             foreignKeyName: "top_ten_reactions_reactor_id_profiles_fkey"
             columns: ["reactor_id"]
             isOneToOne: false
+            referencedRelation: "gam_friend_handicap_leaderboard_view"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "top_ten_reactions_reactor_id_profiles_fkey"
+            columns: ["reactor_id"]
+            isOneToOne: false
             referencedRelation: "public_golfer_blurbs"
             referencedColumns: ["user_id"]
           },
@@ -11222,6 +12402,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "user_profiles"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "top_ten_reactions_target_user_id_profiles_fkey"
+            columns: ["target_user_id"]
+            isOneToOne: false
+            referencedRelation: "gam_friend_handicap_leaderboard_view"
+            referencedColumns: ["user_id"]
           },
           {
             foreignKeyName: "top_ten_reactions_target_user_id_profiles_fkey"
@@ -12048,6 +13235,13 @@ export type Database = {
             foreignKeyName: "user_bag_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
+            referencedRelation: "gam_friend_handicap_leaderboard_view"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "user_bag_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
             referencedRelation: "public_golfer_blurbs"
             referencedColumns: ["user_id"]
           },
@@ -12120,6 +13314,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "challenges"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_challenge_progress_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "gam_friend_handicap_leaderboard_view"
+            referencedColumns: ["user_id"]
           },
           {
             foreignKeyName: "user_challenge_progress_user_id_fkey"
@@ -12213,6 +13414,13 @@ export type Database = {
             foreignKeyName: "user_cosmetic_unlocks_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
+            referencedRelation: "gam_friend_handicap_leaderboard_view"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "user_cosmetic_unlocks_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
             referencedRelation: "public_golfer_blurbs"
             referencedColumns: ["user_id"]
           },
@@ -12296,6 +13504,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "golf_courses"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_course_tracker_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "gam_friend_handicap_leaderboard_view"
+            referencedColumns: ["user_id"]
           },
           {
             foreignKeyName: "user_course_tracker_user_id_fkey"
@@ -12412,6 +13627,13 @@ export type Database = {
             foreignKeyName: "user_exploration_stats_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: true
+            referencedRelation: "gam_friend_handicap_leaderboard_view"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "user_exploration_stats_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
             referencedRelation: "public_golfer_blurbs"
             referencedColumns: ["user_id"]
           },
@@ -12482,6 +13704,13 @@ export type Database = {
             foreignKeyName: "user_follows_follower_fk"
             columns: ["follower_id"]
             isOneToOne: false
+            referencedRelation: "gam_friend_handicap_leaderboard_view"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "user_follows_follower_fk"
+            columns: ["follower_id"]
+            isOneToOne: false
             referencedRelation: "public_golfer_blurbs"
             referencedColumns: ["user_id"]
           },
@@ -12498,6 +13727,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "user_profiles"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_follows_following_fk"
+            columns: ["following_id"]
+            isOneToOne: false
+            referencedRelation: "gam_friend_handicap_leaderboard_view"
+            referencedColumns: ["user_id"]
           },
           {
             foreignKeyName: "user_follows_following_fk"
@@ -12552,6 +13788,13 @@ export type Database = {
             foreignKeyName: "user_friends_friend_fk"
             columns: ["friend_id"]
             isOneToOne: false
+            referencedRelation: "gam_friend_handicap_leaderboard_view"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "user_friends_friend_fk"
+            columns: ["friend_id"]
+            isOneToOne: false
             referencedRelation: "public_golfer_blurbs"
             referencedColumns: ["user_id"]
           },
@@ -12568,6 +13811,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "user_profiles"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_friends_user_fk"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "gam_friend_handicap_leaderboard_view"
+            referencedColumns: ["user_id"]
           },
           {
             foreignKeyName: "user_friends_user_fk"
@@ -12630,6 +13880,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "championship_seasons"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_hall_of_fame_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "gam_friend_handicap_leaderboard_view"
+            referencedColumns: ["user_id"]
           },
           {
             foreignKeyName: "user_hall_of_fame_user_id_fkey"
@@ -12700,6 +13957,13 @@ export type Database = {
             foreignKeyName: "user_handicap_history_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
+            referencedRelation: "gam_friend_handicap_leaderboard_view"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "user_handicap_history_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
             referencedRelation: "public_golfer_blurbs"
             referencedColumns: ["user_id"]
           },
@@ -12755,6 +14019,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "golf_clubs"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_home_clubs_user_profile_id_fkey"
+            columns: ["user_profile_id"]
+            isOneToOne: false
+            referencedRelation: "gam_friend_handicap_leaderboard_view"
+            referencedColumns: ["user_id"]
           },
           {
             foreignKeyName: "user_home_clubs_user_profile_id_fkey"
@@ -13354,6 +14625,13 @@ export type Database = {
             foreignKeyName: "user_rank_snapshots_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
+            referencedRelation: "gam_friend_handicap_leaderboard_view"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "user_rank_snapshots_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
             referencedRelation: "public_golfer_blurbs"
             referencedColumns: ["user_id"]
           },
@@ -13463,6 +14741,13 @@ export type Database = {
             foreignKeyName: "user_rivals_rival_id_fkey"
             columns: ["rival_id"]
             isOneToOne: false
+            referencedRelation: "gam_friend_handicap_leaderboard_view"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "user_rivals_rival_id_fkey"
+            columns: ["rival_id"]
+            isOneToOne: false
             referencedRelation: "public_golfer_blurbs"
             referencedColumns: ["user_id"]
           },
@@ -13479,6 +14764,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "user_profiles"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_rivals_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "gam_friend_handicap_leaderboard_view"
+            referencedColumns: ["user_id"]
           },
           {
             foreignKeyName: "user_rivals_user_id_fkey"
@@ -13547,6 +14839,13 @@ export type Database = {
           user_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "user_season_currency_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "gam_friend_handicap_leaderboard_view"
+            referencedColumns: ["user_id"]
+          },
           {
             foreignKeyName: "user_season_currency_user_id_fkey"
             columns: ["user_id"]
@@ -13687,6 +14986,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "championship_seasons"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_season_stats_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "gam_friend_handicap_leaderboard_view"
+            referencedColumns: ["user_id"]
           },
           {
             foreignKeyName: "user_season_stats_user_id_fkey"
@@ -13908,6 +15214,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "golf_courses"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_top10_exclusions_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "gam_friend_handicap_leaderboard_view"
+            referencedColumns: ["user_id"]
           },
           {
             foreignKeyName: "user_top10_exclusions_user_id_fkey"
@@ -14150,6 +15463,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "user_season_xp_view"
             referencedColumns: ["season_id"]
+          },
+          {
+            foreignKeyName: "weekly_challenge_ladder_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "gam_friend_handicap_leaderboard_view"
+            referencedColumns: ["user_id"]
           },
           {
             foreignKeyName: "weekly_challenge_ladder_user_id_fkey"
@@ -14856,6 +16176,7 @@ export type Database = {
           course_id: string | null
           course_rating: number | null
           created_at: string
+          evaluator_version_last: number
           handicap_differential: number | null
           handicap_index_at_time: number | null
           hole_by_hole_fetched: boolean
@@ -14888,6 +16209,7 @@ export type Database = {
           course_id?: string | null
           course_rating?: number | null
           created_at?: string
+          evaluator_version_last?: number
           handicap_differential?: number | null
           handicap_index_at_time?: number | null
           hole_by_hole_fetched?: boolean
@@ -14920,6 +16242,7 @@ export type Database = {
           course_id?: string | null
           course_rating?: number | null
           created_at?: string
+          evaluator_version_last?: number
           handicap_differential?: number | null
           handicap_index_at_time?: number | null
           hole_by_hole_fetched?: boolean
@@ -15023,6 +16346,13 @@ export type Database = {
             foreignKeyName: "whs_to_golf_course_map_reviewed_by_fkey"
             columns: ["reviewed_by"]
             isOneToOne: false
+            referencedRelation: "gam_friend_handicap_leaderboard_view"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "whs_to_golf_course_map_reviewed_by_fkey"
+            columns: ["reviewed_by"]
+            isOneToOne: false
             referencedRelation: "public_golfer_blurbs"
             referencedColumns: ["user_id"]
           },
@@ -15080,6 +16410,13 @@ export type Database = {
           profile_views: number | null
         }
         Relationships: [
+          {
+            foreignKeyName: "business_profile_events_business_id_fkey"
+            columns: ["business_profile_id"]
+            isOneToOne: false
+            referencedRelation: "gam_friend_handicap_leaderboard_view"
+            referencedColumns: ["user_id"]
+          },
           {
             foreignKeyName: "business_profile_events_business_id_fkey"
             columns: ["business_profile_id"]
@@ -15149,6 +16486,13 @@ export type Database = {
           user_id: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "posts_user_profile_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "gam_friend_handicap_leaderboard_view"
+            referencedColumns: ["user_id"]
+          },
           {
             foreignKeyName: "posts_user_profile_id_fkey"
             columns: ["user_id"]
@@ -15271,6 +16615,228 @@ export type Database = {
           user_id: string | null
         }
         Relationships: []
+      }
+      gam_course_legends_view: {
+        Row: {
+          attained_at: string | null
+          category: string | null
+          course_id: string | null
+          course_name: string | null
+          course_thumbnail: string | null
+          id: string | null
+          is_current: boolean | null
+          rank: number | null
+          trigger_whs_score_id: string | null
+          updated_at: string | null
+          user_hcp: number | null
+          user_home_club: string | null
+          user_id: string | null
+          user_photo_url: string | null
+          value: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "gam_course_legends_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "golf_courses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "gam_course_legends_trigger_whs_score_id_fkey"
+            columns: ["trigger_whs_score_id"]
+            isOneToOne: false
+            referencedRelation: "whs_friend_course_bests"
+            referencedColumns: ["best_score_id"]
+          },
+          {
+            foreignKeyName: "gam_course_legends_trigger_whs_score_id_fkey"
+            columns: ["trigger_whs_score_id"]
+            isOneToOne: false
+            referencedRelation: "whs_scores"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "gam_course_legends_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "gam_friend_handicap_leaderboard_view"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "gam_course_legends_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "public_golfer_blurbs"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "gam_course_legends_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "public_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "gam_course_legends_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      gam_friend_handicap_leaderboard_view: {
+        Row: {
+          badges_earned: number | null
+          eg_app_connected: boolean | null
+          eg_handicap_index: number | null
+          home_club: string | null
+          legend_titles: number | null
+          lifetime_birdies: number | null
+          lifetime_eagles: number | null
+          lifetime_holes_in_one: number | null
+          lifetime_rounds: number | null
+          lifetime_sub_80s: number | null
+          profile_photo_url: string | null
+          user_id: string | null
+        }
+        Relationships: []
+      }
+      gam_league_standings_mv: {
+        Row: {
+          bracket: string | null
+          current_points: number | null
+          current_rank: number | null
+          eg_handicap_index: number | null
+          home_club: string | null
+          league_id: string | null
+          live_rank: number | null
+          pod_id: string | null
+          pod_number: number | null
+          profile_photo_url: string | null
+          rounds_counted: number | null
+          season: string | null
+          season_end: string | null
+          user_id: string | null
+          zone: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "gam_league_members_league_id_fkey"
+            columns: ["league_id"]
+            isOneToOne: false
+            referencedRelation: "gam_leagues"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "gam_league_members_pod_id_fkey"
+            columns: ["pod_id"]
+            isOneToOne: false
+            referencedRelation: "gam_league_pods"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "gam_league_members_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "gam_friend_handicap_leaderboard_view"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "gam_league_members_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "public_golfer_blurbs"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "gam_league_members_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "public_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "gam_league_members_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      gam_rivalry_results_flat_view: {
+        Row: {
+          course_id: string | null
+          course_name: string | null
+          gross_outcome: string | null
+          play_date: string | null
+          rival_gross: number | null
+          rival_score_id: string | null
+          rival_stableford: number | null
+          rival_user_id: string | null
+          slot_index: number | null
+          slot_kind: string | null
+          stableford_outcome: string | null
+          user_gross: number | null
+          user_id: string | null
+          user_score_id: string | null
+          user_stableford: number | null
+        }
+        Relationships: []
+      }
+      gam_user_course_record_view: {
+        Row: {
+          course_id: string | null
+          course_name: string | null
+          legend_titles: number | null
+          podium_positions: number | null
+          rank_best_score_diff: number | null
+          rank_best_stableford_90d: number | null
+          rank_lowest_gross: number | null
+          rank_most_birdies_90d: number | null
+          rank_most_rounds_90d: number | null
+          top_10_positions: number | null
+          user_id: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "gam_course_legends_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "golf_courses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "gam_course_legends_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "gam_friend_handicap_leaderboard_view"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "gam_course_legends_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "public_golfer_blurbs"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "gam_course_legends_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "public_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "gam_course_legends_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       games_as_events: {
         Row: {
@@ -15679,6 +17245,13 @@ export type Database = {
             foreignKeyName: "course_ratings_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
+            referencedRelation: "gam_friend_handicap_leaderboard_view"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "course_ratings_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
             referencedRelation: "public_golfer_blurbs"
             referencedColumns: ["user_id"]
           },
@@ -15757,6 +17330,13 @@ export type Database = {
             foreignKeyName: "course_ratings_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
+            referencedRelation: "gam_friend_handicap_leaderboard_view"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "course_ratings_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
             referencedRelation: "public_golfer_blurbs"
             referencedColumns: ["user_id"]
           },
@@ -15784,6 +17364,13 @@ export type Database = {
           user_id: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "course_ratings_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "gam_friend_handicap_leaderboard_view"
+            referencedColumns: ["user_id"]
+          },
           {
             foreignKeyName: "course_ratings_user_id_fkey"
             columns: ["user_id"]
@@ -16818,6 +18405,19 @@ export type Database = {
         }[]
       }
       friend_content_nightly: { Args: never; Returns: Json }
+      gam_lock_for_eval: { Args: { p_whs_score_id: string }; Returns: boolean }
+      gam_mark_badge_seen: { Args: { p_badge_id: string }; Returns: undefined }
+      gam_reset_user: {
+        Args: { p_user_id: string }
+        Returns: {
+          badges_deleted: number
+          league_history_deleted: number
+          legends_deleted: number
+          milestones_deleted: number
+          rounds_queued: number
+          streaks_deleted: number
+        }[]
+      }
       game_request_decide: {
         Args: { p_decision: string; p_request_id: string }
         Returns: Json
@@ -17187,6 +18787,19 @@ export type Database = {
           rating_count: number
           region: string
           total_rounds: number
+        }[]
+      }
+      get_course_legends: {
+        Args: { p_course_id: string }
+        Returns: {
+          attained_at: string
+          category: string
+          home_club: string
+          is_self: boolean
+          rank: number
+          user_id: string
+          user_photo_url: string
+          value: number
         }[]
       }
       get_course_media: {
@@ -17689,6 +19302,39 @@ export type Database = {
         }[]
       }
       get_my_handicap_percentile: { Args: never; Returns: Json }
+      get_my_pod_standings: {
+        Args: never
+        Returns: {
+          bracket: string
+          current_points: number
+          eg_handicap_index: number
+          home_club: string
+          is_self: boolean
+          live_rank: number
+          pod_number: number
+          rounds_counted: number
+          season: string
+          season_end: string
+          user_id: string
+          user_photo_url: string
+          zone: string
+        }[]
+      }
+      get_my_streaks: {
+        Args: never
+        Returns: {
+          best_count: number
+          best_ended_at: string
+          best_started_at: string
+          current_count: number
+          current_started_at: string
+          freeze_credits: number
+          freeze_refill_at: string
+          is_active: boolean
+          streak_type: string
+          unit: string
+        }[]
+      }
       get_nearby_courses: {
         Args: {
           p_limit?: number
@@ -17842,6 +19488,19 @@ export type Database = {
           avg_rating: number
           courses_rated: number
           member_since: string
+        }[]
+      }
+      get_rivalry_breakdown: {
+        Args: { p_rival_user_id: string }
+        Returns: {
+          course_id: string
+          course_name: string
+          last_played: string
+          leader_side: string
+          rival_wins: number
+          rounds_played: number
+          ties: number
+          user_wins: number
         }[]
       }
       get_season_calendar: {
@@ -18276,6 +19935,26 @@ export type Database = {
         Returns: Json
       }
       get_unread_count: { Args: { p_conversation_id: string }; Returns: number }
+      get_user_achievements_for_viewer: {
+        Args: { p_user_id: string }
+        Returns: {
+          badge_id: string
+          category: string
+          color_token: string
+          counter_metric: string
+          counter_tier: number
+          counter_tiers: Json
+          counter_value: number
+          description: string
+          display_order: number
+          earned_at: string
+          icon_name: string
+          is_earned: boolean
+          kind: string
+          rarity: string
+          title: string
+        }[]
+      }
       get_user_business_ids: {
         Args: { p_user_profile_id: string }
         Returns: string[]
@@ -18362,6 +20041,19 @@ export type Database = {
           global_rank: number
           region_list: string[]
           regions_count: number
+        }[]
+      }
+      get_user_legend_status: {
+        Args: { p_user_id: string }
+        Returns: {
+          best_attained_at: string
+          best_category: string
+          best_course_id: string
+          best_course_name: string
+          best_rank: number
+          legend_titles: number
+          podium_positions: number
+          top_10_positions: number
         }[]
       }
       get_user_passport: {
@@ -18635,6 +20327,7 @@ export type Database = {
             Args: { p_business_id: string; p_user_profile_id: string }
             Returns: boolean
           }
+      is_eg_synced: { Args: { p_user_id: string }; Returns: boolean }
       is_following_actor: {
         Args: {
           p_target_actor_id: string
