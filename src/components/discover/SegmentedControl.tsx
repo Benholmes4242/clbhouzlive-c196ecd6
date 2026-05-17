@@ -84,7 +84,7 @@ const SegmentedControl: React.FC<SegmentedControlProps> = ({
           const activeBg = isDark ? 'rgba(255,255,255,0.10)' : '#FEF3E7';
           const activeBorder = isDark ? '1px solid rgba(255,255,255,0.55)' : '1px solid #F7931E';
           const activeColor = isDark ? '#FFFFFF' : '#c97a10';
-          const inactiveColor = isDark ? 'var(--hcp-t-60)' : 'hsl(var(--muted-foreground))';
+          const inactiveColor = isDark ? '#FFFFFF' : 'hsl(var(--muted-foreground))';
           return (
             <button
               key={tab.id}
