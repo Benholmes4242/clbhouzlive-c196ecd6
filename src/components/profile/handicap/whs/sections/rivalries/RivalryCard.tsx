@@ -5,7 +5,10 @@ import { initials } from '@/lib/whs/utils/initials';
 import { reformatFriendName } from '@/lib/whs/utils/nameFormat';
 import { fmtHcp } from '@/lib/whs/format';
 import type { FriendRivalryHydrated } from '@/lib/whs/types';
-import type { RivalryDimension } from '@/lib/whs/utils/useRivalryDimension';
+import {
+  useRivalryDimension,
+  type RivalryDimension,
+} from '@/lib/whs/utils/useRivalryDimension';
 
 interface Props {
   rivalry: FriendRivalryHydrated;
@@ -13,7 +16,10 @@ interface Props {
   userThumbnailUrl: string | null;
   userHandicap: number | null;
   onInfo: () => void;
-  /** Which scoring dimension to display. Defaults to 'stableford'. */
+  /**
+   * Optional override. When omitted (default), the card owns its own per-rival
+   * dimension state via useRivalryDimension(rivalKey) and renders an inline pill.
+   */
   dimension?: RivalryDimension;
 }
 
