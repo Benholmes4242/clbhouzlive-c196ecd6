@@ -1702,7 +1702,7 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
           <div style={{
             marginTop: 16, paddingTop: 12,
             borderTop: '1px solid rgba(15,23,42,0.08)',
-            fontSize: 10, color: '#94A3B8', letterSpacing: '0.06em',
+            fontSize: 10, color: '#94A3B8',
             fontStyle: 'italic', textAlign: 'center',
           }}>
             Headline by Editorial AI · Updated daily
