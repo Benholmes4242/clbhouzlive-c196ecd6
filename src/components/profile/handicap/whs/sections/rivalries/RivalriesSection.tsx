@@ -3,7 +3,6 @@ import { Pencil } from 'lucide-react';
 import { DarkSectionHeader } from '../_shared/darkAtoms';
 import RivalryCard from './RivalryCard';
 import RivalryAddCard from './RivalryAddCard';
-import RivalryInfoSheet from './RivalryInfoSheet';
 import RivalryEditSheet from './RivalryEditSheet';
 import { useFriendRivalries, useFriendLeaderboard } from '@/lib/whs/hooks';
 import type { FriendRivalryHydrated } from '@/lib/whs/types';
@@ -20,7 +19,6 @@ export const RivalriesSection: React.FC<Props> = ({ userId }) => {
     [leaderboard],
   );
 
-  const [infoTarget, setInfoTarget] = useState<FriendRivalryHydrated | null>(null);
   const [editTarget, setEditTarget] = useState<{ rivalry: FriendRivalryHydrated | null; slotIndex: number } | null>(null);
 
   const filledRivalries = useMemo(() => {
@@ -134,7 +132,7 @@ export const RivalriesSection: React.FC<Props> = ({ userId }) => {
                 userName={selfRow?.friend_name ?? null}
                 userThumbnailUrl={selfRow?.friend_thumbnail_url ?? null}
                 userHandicap={selfRow?.friend_handicap_index ?? null}
-                onInfo={() => setInfoTarget(rivalry)}
+                onInfo={() => { /* deprecated: card-tap routes to /handicap/rivalry/:rivalUserId */ }}
               />
             ))}
             {nextAvailableSlot !== null && (
@@ -148,11 +146,6 @@ export const RivalriesSection: React.FC<Props> = ({ userId }) => {
         )}
       </div>
 
-      <RivalryInfoSheet
-        rivalry={infoTarget}
-        open={!!infoTarget}
-        onClose={() => setInfoTarget(null)}
-      />
       <RivalryEditSheet
         userId={userId}
         rivalry={editTarget?.rivalry ?? null}
