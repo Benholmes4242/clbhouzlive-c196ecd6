@@ -19365,6 +19365,7 @@ export type Database = {
           freeze_credits: number
           freeze_refill_at: string
           is_active: boolean
+          recent_activity_days: number[]
           streak_type: string
           unit: string
         }[]
