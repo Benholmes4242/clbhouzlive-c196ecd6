@@ -6,6 +6,8 @@ import HandicapDashboard from './HandicapDashboard';
 
 interface Props {
   userId: string;
+  /** First name of the profile owner — threaded down for name-prefixed copy. */
+  ownerFirstName?: string | null;
 }
 
 const SkeletonView = () => (
@@ -21,7 +23,7 @@ const SkeletonView = () => (
   </div>
 );
 
-export const WhsHandicapTab: React.FC<Props> = ({ userId }) => {
+export const WhsHandicapTab: React.FC<Props> = ({ userId, ownerFirstName = null }) => {
   const navigate = useNavigate();
   const { data: connection, isLoading, refetch } = useWhsConnection(userId);
 
@@ -36,7 +38,7 @@ export const WhsHandicapTab: React.FC<Props> = ({ userId }) => {
     );
   }
 
-  return <HandicapDashboard connection={connection} userId={userId} />;
+  return <HandicapDashboard connection={connection} userId={userId} ownerFirstName={ownerFirstName} />;
 };
 
 export default WhsHandicapTab;
