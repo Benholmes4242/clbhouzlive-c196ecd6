@@ -21,6 +21,18 @@ interface Props {
    * dimension state via useRivalryDimension(rivalKey) and renders an inline pill.
    */
   dimension?: RivalryDimension;
+  /**
+   * Label rendered under the LEFT portrait. Defaults to 'YOU' for owner view.
+   * In friend view (Phase 3, file 13), secondary cards render the profile
+   * owner's name on the left, so the label becomes null (the name speaks for itself).
+   */
+  selfLabel?: string | null;
+  /**
+   * When set, card-tap routes to `/handicap/{friendViewOwnerId}/rivalry/{rivalId}`
+   * instead of the owner-view `/handicap/rivalry/{rivalId}`. Used for the
+   * file-13 friend-view secondary cards (Thomas-vs-X seen by Benjamin).
+   */
+  friendViewOwnerId?: string;
 }
 
 const T = {
@@ -88,6 +100,8 @@ export const RivalryCard: React.FC<Props> = ({
   userHandicap,
   onInfo,
   dimension: dimensionProp,
+  selfLabel = 'YOU',
+  friendViewOwnerId,
 }) => {
   const navigate = useNavigate();
   const rivalKey = rivalry.rival_user_id ?? rivalry.rival_friend_row_id ?? null;
@@ -132,7 +146,16 @@ export const RivalryCard: React.FC<Props> = ({
   // rival_user_id (Clbhouz friend) or rival_friend_row_id (non-Clbhouz friend).
   const rivalRouteId = rivalry.rival_user_id ?? rivalry.rival_friend_row_id ?? null;
   const canOpenDeep = hasH2H && !!rivalRouteId;
-  const goDeep = () => { if (canOpenDeep) navigate(`/handicap/rivalry/${rivalRouteId}`); };
+  const goDeep = () => {
+    if (!canOpenDeep) return;
+    // File-13 Phase 3: friend-view secondary cards route through the owner's
+    // namespace so RivalryPage knows which user owns the rivalry context.
+    if (friendViewOwnerId) {
+      navigate(`/handicap/${friendViewOwnerId}/rivalry/${rivalRouteId}`);
+    } else {
+      navigate(`/handicap/rivalry/${rivalRouteId}`);
+    }
+  };
 
   return (
     <div
@@ -220,7 +243,7 @@ export const RivalryCard: React.FC<Props> = ({
       >
         <Portrait
           name={userDisplayName}
-          label="YOU"
+          label={selfLabel}
           thumbnail={userThumbnailUrl}
           handicap={userHandicap}
           ringColor={youRing}
