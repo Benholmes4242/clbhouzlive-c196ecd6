@@ -499,7 +499,7 @@ export function CoursesLeaderboardView() {
                   borderRadius: 4,
                   padding: '4px 10px',
                   fontSize: 10, fontWeight: 800, color: '#FFFFFF',
-                  letterSpacing: '0.12em', textTransform: 'uppercase',
+                  letterSpacing: '0.16em', textTransform: 'uppercase',
                   transform: 'rotate(-6deg)', transformOrigin: 'top left',
                 }}
               >
@@ -511,15 +511,15 @@ export function CoursesLeaderboardView() {
 
             <div style={{ padding: '14px 18px 16px' }}>
               <h2 style={{
-                fontSize: 24, fontWeight: 900, color: '#fff',
-                letterSpacing: '-0.03em', margin: 0, lineHeight: 1.05,
+                fontSize: 22, fontWeight: 800, color: '#fff',
+                letterSpacing: '-0.025em', margin: 0, lineHeight: 1.05,
                 textShadow: '0 2px 18px rgba(0,0,0,0.55)',
               }}>
                 {mastheadCopy.headline}
                 {mastheadCopy.headlineTwo && (
                   <>
                     <br />
-                    <span style={{ fontStyle: 'italic', fontWeight: 900, color: 'rgba(255,255,255,0.78)' }}>
+                    <span style={{ fontStyle: 'italic', fontWeight: 800, color: 'rgba(255,255,255,0.78)' }}>
                       {mastheadCopy.headlineTwo}
                     </span>
                   </>
@@ -535,19 +535,19 @@ export function CoursesLeaderboardView() {
 
               <div style={{ display: 'flex', gap: 16, paddingTop: 10, borderTop: '1px solid rgba(255,255,255,0.18)' }}>
                 <div>
-                  <div style={{ fontSize: 9, fontWeight: 700, color: 'rgba(255,255,255,0.6)', letterSpacing: '0.22em', marginBottom: 2 }}>
+                  <div style={{ fontSize: 9, fontWeight: 800, color: 'rgba(255,255,255,0.6)', letterSpacing: '0.16em', marginBottom: 2 }}>
                     RATING
                   </div>
-                  <div style={{ fontSize: 18, fontWeight: 900, color: '#fff', letterSpacing: '-0.02em', fontVariantNumeric: 'tabular-nums lining-nums' }}>
+                  <div style={{ fontSize: 18, fontWeight: 800, color: '#fff', letterSpacing: '-0.015em', fontVariantNumeric: 'tabular-nums lining-nums' }}>
                     {masthead.avg_rating != null ? masthead.avg_rating.toFixed(1) : '—'}
                   </div>
                 </div>
                 <div style={{ width: 1, background: 'rgba(255,255,255,0.18)' }} />
                 <div>
-                  <div style={{ fontSize: 9, fontWeight: 700, color: 'rgba(255,255,255,0.6)', letterSpacing: '0.22em', marginBottom: 2 }}>
+                  <div style={{ fontSize: 9, fontWeight: 800, color: 'rgba(255,255,255,0.6)', letterSpacing: '0.16em', marginBottom: 2 }}>
                     PLAYS
                   </div>
-                  <div style={{ fontSize: 18, fontWeight: 900, color: '#fff', letterSpacing: '-0.02em', fontVariantNumeric: 'tabular-nums lining-nums' }}>
+                  <div style={{ fontSize: 18, fontWeight: 800, color: '#fff', letterSpacing: '-0.015em', fontVariantNumeric: 'tabular-nums lining-nums' }}>
                     {masthead.times_played ?? 0}
                     <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.7)', fontWeight: 700, marginLeft: 4 }}>this season</span>
                   </div>
