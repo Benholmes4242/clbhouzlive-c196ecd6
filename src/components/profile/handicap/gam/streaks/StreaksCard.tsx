@@ -268,28 +268,30 @@ export const StreaksCard: React.FC<Props> = ({ userId, readOnly = false }) => {
       <DarkSectionHeader
         eyebrow="Three Runs to Beat"
         right={
-          <button
-            type="button"
-            onClick={() => {
-              analyticsEvents.track('all_streaks_open', { user_id: userId });
-              openAllStreaks();
-            }}
-            style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: 2,
-              background: 'transparent',
-              border: 'none',
-              cursor: 'pointer',
-              color: 'var(--hcp-t-60)',
-              fontSize: 10,
-              fontWeight: 800,
-              letterSpacing: '0.14em',
-              padding: '4px 6px',
-            }}
-          >
-            SEE ALL <ChevronRight size={12} strokeWidth={2.4} />
-          </button>
+          readOnly ? null : (
+            <button
+              type="button"
+              onClick={() => {
+                analyticsEvents.track('all_streaks_open', { user_id: userId });
+                openAllStreaks();
+              }}
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 2,
+                background: 'transparent',
+                border: 'none',
+                cursor: 'pointer',
+                color: 'var(--hcp-t-60)',
+                fontSize: 10,
+                fontWeight: 800,
+                letterSpacing: '0.14em',
+                padding: '4px 6px',
+              }}
+            >
+              SEE ALL <ChevronRight size={12} strokeWidth={2.4} />
+            </button>
+          )
         }
       />
 
