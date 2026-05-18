@@ -1080,14 +1080,14 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
             </button>
           </div>
           <h2 style={{
-            fontSize: 28, fontWeight: 900, letterSpacing: '-0.03em',
+            fontSize: 28, fontWeight: 800, letterSpacing: '-0.025em',
             margin: 0, lineHeight: 1.05, color: '#0F172A',
           }}>
             {finalEditorial.headline}
             {finalEditorial.headlineTwo && (
               <>
                 <br />
-                <span style={{ fontStyle: 'italic', fontWeight: 900, color: '#475569' }}>
+                <span style={{ fontStyle: 'italic', fontWeight: 800, color: '#475569' }}>
                   {finalEditorial.headlineTwo}
                 </span>
               </>
