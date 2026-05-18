@@ -463,7 +463,10 @@ interface CourseAgg {
   lastPlayed: string;
 }
 
-function aggregateCourses(row: FriendRivalryHydrated): CourseAgg[] {
+function aggregateCourses(
+  row: FriendRivalryHydrated,
+  dimension: RivalryDimension,
+): CourseAgg[] {
   const map = new Map<string, CourseAgg>();
   for (const r of row.shared_round_results ?? []) {
     let agg = map.get(r.course_id);
@@ -480,8 +483,9 @@ function aggregateCourses(row: FriendRivalryHydrated): CourseAgg[] {
       map.set(r.course_id, agg);
     }
     agg.rounds += 1;
-    if (r.stableford_outcome === 'W') agg.ownerWins += 1;
-    else if (r.stableford_outcome === 'L') agg.rivalWins += 1;
+    const o = outcomeFor(r, dimension);
+    if (o === 'W') agg.ownerWins += 1;
+    else if (o === 'L') agg.rivalWins += 1;
     else agg.ties += 1;
     if (r.play_date > agg.lastPlayed) agg.lastPlayed = r.play_date;
   }
