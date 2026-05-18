@@ -140,6 +140,7 @@ export const RivalriesSection: React.FC<Props> = ({ userId }) => {
                 userName={selfRow?.friend_name ?? null}
                 userThumbnailUrl={selfRow?.friend_thumbnail_url ?? null}
                 userHandicap={selfRow?.friend_handicap_index ?? null}
+                dimension={dimension}
                 onInfo={() => { /* deprecated: card-tap routes to /handicap/rivalry/:rivalUserId */ }}
               />
             ))}
