@@ -20669,6 +20669,10 @@ export type Database = {
         Args: { _admin_note: string; _request_id: string }
         Returns: undefined
       }
+      release_orchestrator_lock: {
+        Args: { lock_name: string }
+        Returns: boolean
+      }
       remove_business_member: {
         Args: { p_business_id: string; p_member_user_id: string }
         Returns: Json
@@ -21552,6 +21556,10 @@ export type Database = {
       trigger_push_queue_processing: { Args: never; Returns: undefined }
       trigger_video_metadata_backfill: { Args: never; Returns: undefined }
       trigger_watch_editorial_blurb_refresh: { Args: never; Returns: undefined }
+      try_acquire_orchestrator_lock: {
+        Args: { lock_name: string }
+        Returns: boolean
+      }
       unaccent: { Args: { "": string }; Returns: string }
       unblock_user: { Args: { p_blocked_id: string }; Returns: undefined }
       unlockrows: { Args: { "": string }; Returns: number }
