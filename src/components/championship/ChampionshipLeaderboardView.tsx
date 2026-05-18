@@ -1589,7 +1589,7 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
               ) : (
                 <span style={{
                   textAlign: 'right', fontSize: 10, fontWeight: 800,
-                  color: '#64748B', letterSpacing: '0.06em',
+                  color: '#64748B', letterSpacing: '0.14em',
                   textTransform: 'uppercase' as const,
                 }}>
                   {abbreviateDivision(p.division_slug) || '—'}
@@ -1597,8 +1597,8 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
               )}
 
               <span style={{
-                fontSize: 22, fontWeight: 900, textAlign: 'right',
-                color: '#0F172A', letterSpacing: '-0.03em',
+                fontSize: 22, fontWeight: 800, textAlign: 'right',
+                color: '#0F172A', letterSpacing: '-0.025em',
                 fontVariantNumeric: 'tabular-nums lining-nums',
               }}>
                 {p.courses_this_season}
