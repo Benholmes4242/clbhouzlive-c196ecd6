@@ -12,6 +12,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { cn } from '@/lib/utils';
 import VirtualizedCourseList from './VirtualizedCourseList';
 import { AppSelect, type AppSelectOption } from '@/components/ui/AppSelect';
+import { SectionEyebrow } from '@/components/ui/SectionEyebrow';
 
 type Top100SortOption = 'official' | 'user_rating';
 
@@ -209,19 +210,14 @@ const Top100CoursesHubPanel = () => {
       <div className="px-4 pt-1">
         <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', gap: 16 }}>
           <div style={{ flex: 1, minWidth: 0 }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 3 }}>
-              <div style={{ width: 3, height: 8, background: '#F7931E', borderRadius: 1, flexShrink: 0 }} />
-              <span style={{ fontSize: 9, fontWeight: 900, color: '#F7931E', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>
-                Official World Ranking
-              </span>
-            </div>
-            <h2 style={{ fontSize: 22, fontWeight: 900, color: '#0F172A', letterSpacing: '-0.03em', margin: 0, lineHeight: 1.1 }}>
+            <SectionEyebrow label="Official World Ranking" color="amber" className="mb-[3px]" />
+            <h2 style={{ fontSize: 22, fontWeight: 800, color: '#0F172A', letterSpacing: '-0.025em', margin: 0, lineHeight: 1.1 }}>
               The world's best
             </h2>
             {user && totalCoursesInStartedLists > 0 && (
               <p style={{
                 fontSize: 11, color: '#64748B', margin: '6px 0 0',
-                fontWeight: 600, letterSpacing: '0.10em', textTransform: 'uppercase' as const,
+                fontWeight: 600, letterSpacing: '0.16em', textTransform: 'uppercase' as const,
               }}>
                 <span style={{ color: '#F7931E' }}>
                   {totalRated} of {totalCoursesInStartedLists}
@@ -314,8 +310,8 @@ const Top100CoursesHubPanel = () => {
       {!isLoading && allCourses.length > 0 && (
         <div className="flex items-center justify-between gap-3 pt-2 px-4">
           <span style={{
-            fontSize: 10, color: '#475569', flex: 1,
-            fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase',
+            fontSize: 11, color: '#64748B', flex: 1,
+            fontWeight: 600, letterSpacing: '0.16em', textTransform: 'uppercase',
           }}>
             {searchTerm ? (
               <>RESULTS · {allCourses.length} {allCourses.length === 1 ? 'COURSE' : 'COURSES'}</>

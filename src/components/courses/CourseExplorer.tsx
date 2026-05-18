@@ -571,8 +571,8 @@ const CourseExplorer = () => {
       {!isLoading && totalCount > 0 && (
         <div className="flex items-center justify-between gap-3 pt-2 px-4">
           <span style={{
-            fontSize: 10, color: '#475569', flex: 1,
-            fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase',
+            fontSize: 11, color: '#64748B', flex: 1,
+            fontWeight: 600, letterSpacing: '0.16em', textTransform: 'uppercase',
           }}>
             {hasSearch ? (
               <>RESULTS · {totalCount.toLocaleString()} {totalCount === 1 ? 'COURSE' : 'COURSES'}</>
