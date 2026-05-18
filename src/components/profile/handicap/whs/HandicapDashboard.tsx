@@ -61,6 +61,7 @@ export const HandicapDashboard: React.FC<Props> = ({ connection, userId, readOnl
             connectionCreatedAt={connection.created_at}
             readOnly={readOnly}
             showReauthBanner={showReauthBanner}
+            ownerFirstName={ownerFirstName}
           />
         )}
         {activeSubtab === 'trends' && (
