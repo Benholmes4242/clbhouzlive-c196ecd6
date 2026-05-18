@@ -363,7 +363,7 @@ const UnifiedCourseCardImpl: React.FC<UnifiedCourseCardProps> = ({
               <span
                 style={{
                   fontSize: 15, fontWeight: 800, color: '#fff',
-                  lineHeight: 1, letterSpacing: '-0.02em',
+                  lineHeight: 1, letterSpacing: '-0.015em',
                 }}
               >
                 {course.communityRating.toFixed(1)}
