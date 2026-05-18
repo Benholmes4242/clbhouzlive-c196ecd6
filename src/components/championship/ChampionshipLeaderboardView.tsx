@@ -1417,7 +1417,7 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
           padding: '10px 0 8px',
           borderBottom: '1px solid #0F172A',
           fontSize: 9, fontWeight: 800, color: '#94A3B8',
-          letterSpacing: '0.18em', alignItems: 'center',
+          letterSpacing: '0.16em', alignItems: 'center',
         }}>
           <span>POS</span>
           <span />
