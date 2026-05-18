@@ -495,6 +495,7 @@ interface Consensus {
   golf_course_id: string | null;
   agreement_count: number;
   confidence: number;
+  min_confidence: number; // min confidence across the top-voting LLMs (MATCH only)
   reasoning: string;
 }
 
@@ -524,11 +525,13 @@ function computeConsensus(responses: LlmResponse[]): Consensus {
 
   if (topVotes.length >= 2) {
     const conf = topVotes.reduce((s, r) => s + r.confidence, 0) / topVotes.length;
+    const minConf = topVotes.reduce((m, r) => Math.min(m, r.confidence), 1);
     return {
       decision: "MATCH",
       golf_course_id: topId,
       agreement_count: topVotes.length,
       confidence: conf,
+      min_confidence: minConf,
       reasoning: topVotes.map((r) => `${r.provider}: ${r.reasoning}`).join(" | "),
     };
   }
@@ -538,6 +541,7 @@ function computeConsensus(responses: LlmResponse[]): Consensus {
       golf_course_id: null,
       agreement_count: noMatch,
       confidence: 0.8,
+      min_confidence: 0,
       reasoning: valid
         .filter((r) => r.decision === "NO_MATCH")
         .map((r) => `${r.provider}: ${r.reasoning}`)
@@ -550,6 +554,7 @@ function computeConsensus(responses: LlmResponse[]): Consensus {
       golf_course_id: null,
       agreement_count: createNew,
       confidence: 0.8,
+      min_confidence: 0,
       reasoning: valid
         .filter((r) => r.decision === "CREATE_NEW")
         .map((r) => `${r.provider}: ${r.reasoning}`)
@@ -562,6 +567,7 @@ function computeConsensus(responses: LlmResponse[]): Consensus {
     golf_course_id: null,
     agreement_count: 1,
     confidence: 0.3,
+    min_confidence: 0,
     reasoning:
       "Split decision across LLMs — no 2/3 majority. " +
       valid.map((r) => `${r.provider}=${r.decision}`).join(", "),
@@ -570,12 +576,22 @@ function computeConsensus(responses: LlmResponse[]): Consensus {
 
 type Recommendation =
   | "auto_apply"
+  | "auto_apply_majority"
   | "admin_review"
   | "no_match"
   | "suggest_create_new";
 
+// Confidence floor required for a 2/3 MATCH majority to auto-apply.
+// Both top-voting LLMs must individually meet this bar.
+const MAJORITY_AUTO_APPLY_MIN_CONFIDENCE = 0.9;
+
 function recommendationFor(c: Consensus): Recommendation {
   if (c.decision === "MATCH" && c.agreement_count === 3) return "auto_apply";
+  if (c.decision === "MATCH" && c.agreement_count === 2) {
+    return c.min_confidence >= MAJORITY_AUTO_APPLY_MIN_CONFIDENCE
+      ? "auto_apply_majority"
+      : "admin_review";
+  }
   if (c.decision === "MATCH") return "admin_review";
   if (c.decision === "NO_MATCH" && c.agreement_count >= 2) return "no_match";
   if (c.decision === "CREATE_NEW" && c.agreement_count >= 2) return "suggest_create_new";
@@ -586,6 +602,8 @@ function methodFor(r: Recommendation): string {
   switch (r) {
     case "auto_apply":
       return "echo_consensus";
+    case "auto_apply_majority":
+      return "echo_consensus_majority";
     case "admin_review":
       return "echo_review";
     case "no_match":
@@ -594,6 +612,8 @@ function methodFor(r: Recommendation): string {
       return "create_new_course_suggested";
   }
 }
+
+const AUTO_APPLY_METHODS = new Set(["echo_consensus", "echo_consensus_majority"]);
 
 // ---- Persistence -------------------------------------------------------------
 
@@ -606,13 +626,16 @@ async function persist(
   reasoning: string,
   agreementCount: number,
 ) {
-  // For auto_apply we write the resolved golf_course_id. For all other Echo
-  // outcomes we deliberately leave golf_course_id null — the row exists to
-  // record that Echo has run and what it thought, so the admin queue and
-  // nightly orchestrator can skip it next pass.
+  // For auto_apply (3/3 or 2/3 high-conf majority) we write the resolved
+  // golf_course_id. For non-auto MATCH outcomes (echo_review) we still surface
+  // the suggested id via echo_suggested_golf_course_id so the admin queue can
+  // show "Echo suggests X" with a single-click confirm.
+  const isAuto = AUTO_APPLY_METHODS.has(method);
+  const isMatchSuggestion = method === "echo_review";
   const row = {
     whs_course_id: whsCourseId,
-    golf_course_id: method === "echo_consensus" ? golfCourseId : null,
+    golf_course_id: isAuto ? golfCourseId : null,
+    echo_suggested_golf_course_id: isMatchSuggestion ? golfCourseId : null,
     match_confidence: confidence,
     match_method: method,
     matched_at: new Date().toISOString(),
