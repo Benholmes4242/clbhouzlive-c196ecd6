@@ -199,6 +199,7 @@ const HandicapPageHeader: React.FC<HeaderProps> = ({
       { id: 'trends', label: 'Trends' },
       { id: 'records', label: 'Records' },
       { id: 'friends', label: 'Friends' },
+      { id: 'legends', label: 'Legends' },
     ],
     [],
   );
