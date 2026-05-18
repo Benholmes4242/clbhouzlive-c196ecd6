@@ -42,6 +42,26 @@ const TAB: React.CSSProperties = {
 const firstName = (n: string | null | undefined) =>
   (n ?? '').trim().split(/\s+/)[0] || 'Player';
 
+export type RivalryDimension = 'stableford' | 'gross';
+const DIMENSION_STORAGE_KEY = 'hcp-rivalry-dimension';
+
+function outcomeFor(
+  r: { stableford_outcome: 'W' | 'L' | 'T'; gross_outcome: 'W' | 'L' | 'T' },
+  dim: RivalryDimension,
+): 'W' | 'L' | 'T' {
+  return dim === 'gross' ? r.gross_outcome : r.stableford_outcome;
+}
+
+function recordFor(row: FriendRivalryHydrated, dim: RivalryDimension) {
+  return (
+    (dim === 'gross' ? row.gross_record : row.stableford_record) ?? {
+      wins: 0,
+      losses: 0,
+      ties: 0,
+    }
+  );
+}
+
 // ── Data: owner-view (reuse existing hook + pick row) ───────────────────
 function useOwnerRivalry(
   viewerId: string | undefined,
