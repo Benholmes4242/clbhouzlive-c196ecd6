@@ -749,7 +749,7 @@ export function CoursesLeaderboardView() {
           <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}>
             <div style={{ flex: 1, height: 1, background: 'rgba(15,23,42,0.15)' }} />
             <div style={{ width: 12, height: 1, background: '#0F172A' }} />
-            <span style={{ fontSize: 10, fontWeight: 800, color: '#0F172A', letterSpacing: '0.22em' }}>FROM YOUR CIRCLE</span>
+            <span style={{ fontSize: 10, fontWeight: 800, color: '#0F172A', letterSpacing: '0.16em' }}>FROM YOUR CIRCLE</span>
             <div style={{ width: 12, height: 1, background: '#0F172A' }} />
             <div style={{ flex: 1, height: 1, background: 'rgba(15,23,42,0.15)' }} />
           </div>
