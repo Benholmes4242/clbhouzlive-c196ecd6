@@ -7,6 +7,7 @@ import { useNetworkActivity } from '@/hooks/useNetworkActivity';
 import { NetworkAvatarStrip } from './NetworkAvatarStrip';
 // NetworkPulseCopy intentionally not imported — replaced by inline meta byline (deferred dead code; file retained for follow-up cleanup)
 import { NetworkHighlightCarousel } from './NetworkHighlightCarousel';
+import { SectionEyebrow } from '@/components/ui/SectionEyebrow';
 
 interface YourNetworkSectionProps {
   className?: string;
@@ -54,16 +55,13 @@ export const YourNetworkSection: React.FC<YourNetworkSectionProps> = ({ classNam
       {/* Header Row */}
       <div className="flex items-center justify-between mb-2">
         <div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 3 }}>
-            <div style={{ width: 3, height: 8, background: '#F7931E', borderRadius: 1, flexShrink: 0 }} />
-            <span style={{ fontSize: 9, fontWeight: 900, color: '#F7931E', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>Your Network</span>
-          </div>
+          <SectionEyebrow label="Your Network" color="amber" className="mb-[3px]" />
           {showEmptyActivityState ? (
-            <h2 style={{ fontSize: 22, fontWeight: 900, color: '#0F172A', letterSpacing: '-0.03em', margin: 0, lineHeight: 1.1 }}>
+            <h2 style={{ fontSize: 22, fontWeight: 800, color: '#0F172A', letterSpacing: '-0.025em', margin: 0, lineHeight: 1.1 }}>
               Your Network
             </h2>
           ) : (
-            <h2 style={{ fontSize: 22, fontWeight: 900, color: '#0F172A', letterSpacing: '-0.03em', margin: 0, lineHeight: 1.1 }}>
+            <h2 style={{ fontSize: 22, fontWeight: 800, color: '#0F172A', letterSpacing: '-0.025em', margin: 0, lineHeight: 1.1 }}>
               {pulse.total_rounds} {pulse.total_rounds === 1 ? 'round' : 'rounds'} this month
             </h2>
           )}
@@ -84,7 +82,7 @@ export const YourNetworkSection: React.FC<YourNetworkSectionProps> = ({ classNam
       {!showEmptyActivityState ? (
         <p style={{
           fontSize: 11, color: '#64748B', margin: '10px 0 0',
-          fontWeight: 600, letterSpacing: '0.10em', textTransform: 'uppercase',
+          fontWeight: 600, letterSpacing: '0.16em', textTransform: 'uppercase',
         }}>
           {pulse.active_friends} ACTIVE · {pulse.new_courses_discovered} COURSES · LAST 30 DAYS
         </p>

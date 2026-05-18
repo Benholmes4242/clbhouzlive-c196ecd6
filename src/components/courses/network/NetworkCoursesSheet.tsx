@@ -8,6 +8,7 @@ import SquircleAvatar from '@/components/ui/SquircleAvatar';
 import { getAvatarFallbackColor } from '@/lib/avatarFallback';
 import type { CourseCardModel } from '@/types/courseCard';
 import { format } from 'date-fns';
+import { SectionEyebrow } from '@/components/ui/SectionEyebrow';
 
 /* ──────────────────────────────────────────────────────────────────────────────
  * NetworkCoursesSheet
@@ -320,36 +321,15 @@ const NetworkCoursesSheet: React.FC<NetworkCoursesSheetProps> = ({ open, onClose
           {/* Left: eyebrow + headline + sub-line */}
           <div style={{ flex: 1, minWidth: 0 }}>
             {/* Eyebrow */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 6 }}>
-              <div
-                style={{
-                  width: 3,
-                  height: 8,
-                  background: '#F7931E',
-                  borderRadius: 1,
-                  flexShrink: 0,
-                }}
-              />
-              <span
-                style={{
-                  fontSize: 9,
-                  fontWeight: 900,
-                  color: '#F7931E',
-                  letterSpacing: '0.16em',
-                  textTransform: 'uppercase',
-                }}
-              >
-                Your Network
-              </span>
-            </div>
+            <SectionEyebrow label="Your Network" color="amber" className="mb-1.5" />
 
             {/* Two-line headline */}
             <h2
               style={{
-                fontSize: 24,
-                fontWeight: 900,
+                fontSize: 22,
+                fontWeight: 800,
                 color: '#0F172A',
-                letterSpacing: '-0.03em',
+                letterSpacing: '-0.025em',
                 margin: 0,
                 lineHeight: 1.1,
               }}
@@ -358,10 +338,10 @@ const NetworkCoursesSheet: React.FC<NetworkCoursesSheetProps> = ({ open, onClose
             </h2>
             <h2
               style={{
-                fontSize: 24,
-                fontWeight: 900,
+                fontSize: 22,
+                fontWeight: 800,
                 color: '#F7931E',
-                letterSpacing: '-0.03em',
+                letterSpacing: '-0.025em',
                 margin: 0,
                 lineHeight: 1.1,
               }}
@@ -376,7 +356,7 @@ const NetworkCoursesSheet: React.FC<NetworkCoursesSheetProps> = ({ open, onClose
                 color: '#64748B',
                 margin: '8px 0 0',
                 fontWeight: 600,
-                letterSpacing: '0.10em',
+                letterSpacing: '0.16em',
                 textTransform: 'uppercase',
               }}
             >
