@@ -779,7 +779,7 @@ const AtRiskState: React.FC<{ cutTarget: number; settleAt: number }> = ({
         </span>
       </div>
       <div style={{ fontSize: 13, color: D_T100, lineHeight: 1.45 }}>
-        A good counter is dropping off. Your handicap rises to{' '}
+        A good counter is dropping off. Handicap rises to{' '}
         <strong style={{
           fontWeight: 700, color: RED, fontVariantNumeric: 'tabular-nums',
         }}>
