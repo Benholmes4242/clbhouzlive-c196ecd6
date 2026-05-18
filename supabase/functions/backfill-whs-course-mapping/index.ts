@@ -137,32 +137,9 @@ async function processOne(supabase: any, whsCourseId: string) {
       match_method: "trigram_high",
     };
   }
-  if (tri && tri.similarity >= 0.7) {
-    await persist(
-      supabase,
-      whsCourseId,
-      tri.id,
-      tri.similarity,
-      "trigram_medium",
-    );
-    return {
-      whs_course_id: whsCourseId,
-      golf_course_id: tri.id,
-      match_confidence: tri.similarity,
-      match_method: "trigram_medium",
-    };
-  }
+  // trigram_medium and marker_aware tiers intentionally removed —
+  // orchestrator escalates no_match_found to Echo (tier 4) instead.
 
-  const marker = await findMarkerAwareMatch(supabase, whsCourse);
-  if (marker) {
-    await persist(supabase, whsCourseId, marker.id, 0.8, "marker_aware");
-    return {
-      whs_course_id: whsCourseId,
-      golf_course_id: marker.id,
-      match_confidence: 0.8,
-      match_method: "marker_aware",
-    };
-  }
 
   await persist(supabase, whsCourseId, null, 0.0, "no_match_found");
   return {
