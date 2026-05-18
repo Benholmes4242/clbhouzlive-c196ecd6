@@ -17,6 +17,10 @@ import { supabase } from '@/integrations/supabase/client';
 import { useFriendRivalries } from '@/lib/whs/hooks';
 import type { FriendRivalryHydrated } from '@/lib/whs/types';
 import { PageRoot } from '@/components/layout/PageRoot';
+import {
+  useRivalryDimension,
+  type RivalryDimension,
+} from '@/lib/whs/utils/useRivalryDimension';
 
 // ── Dark-mode handicap tokens (per project memory + brief) ──────────────
 const BG_0 = 'var(--hcp-bg-0)';
@@ -42,8 +46,8 @@ const TAB: React.CSSProperties = {
 const firstName = (n: string | null | undefined) =>
   (n ?? '').trim().split(/\s+/)[0] || 'Player';
 
-export type RivalryDimension = 'stableford' | 'gross';
-const DIMENSION_STORAGE_KEY = 'hcp-rivalry-dimension';
+// RivalryDimension + storage key are owned by useRivalryDimension hook.
+
 
 function outcomeFor(
   r: { stableford_outcome: 'W' | 'L' | 'T'; gross_outcome: 'W' | 'L' | 'T' },
@@ -1034,20 +1038,9 @@ const RivalryPage: React.FC = () => {
     });
   };
 
-  // Scoring dimension (Stableford default), persisted in localStorage
-  const [dimension, setDimension] = useState<RivalryDimension>(() => {
-    if (typeof window === 'undefined') return 'stableford';
-    const v = window.localStorage.getItem(DIMENSION_STORAGE_KEY);
-    return v === 'gross' ? 'gross' : 'stableford';
-  });
-  const handleDimensionChange = (d: RivalryDimension) => {
-    setDimension(d);
-    try {
-      window.localStorage.setItem(DIMENSION_STORAGE_KEY, d);
-    } catch {
-      /* noop */
-    }
-  };
+  // Scoring dimension — shared with Rivalries section cards
+  const [dimension, handleDimensionChange] = useRivalryDimension();
+
 
   // Owner-view: hydrate "ownerName/ownerThumb/ownerHcp" from viewer profile
   const ownerName = isFriendView

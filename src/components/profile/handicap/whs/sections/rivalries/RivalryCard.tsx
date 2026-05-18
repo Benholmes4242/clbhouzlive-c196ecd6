@@ -5,6 +5,7 @@ import { initials } from '@/lib/whs/utils/initials';
 import { reformatFriendName } from '@/lib/whs/utils/nameFormat';
 import { fmtHcp } from '@/lib/whs/format';
 import type { FriendRivalryHydrated } from '@/lib/whs/types';
+import type { RivalryDimension } from '@/lib/whs/utils/useRivalryDimension';
 
 interface Props {
   rivalry: FriendRivalryHydrated;
@@ -12,6 +13,8 @@ interface Props {
   userThumbnailUrl: string | null;
   userHandicap: number | null;
   onInfo: () => void;
+  /** Which scoring dimension to display. Defaults to 'stableford'. */
+  dimension?: RivalryDimension;
 }
 
 const T = {
@@ -41,16 +44,19 @@ interface StreakInfo {
 
 function computeStreak(
   results: FriendRivalryHydrated['shared_round_results'],
+  dimension: RivalryDimension,
 ): StreakInfo | null {
   if (!results || results.length === 0) return null;
   const sorted = [...results].sort(
     (a, b) => new Date(b.play_date).getTime() - new Date(a.play_date).getTime(),
   );
-  const head = sorted[0].stableford_outcome;
+  const pick = (r: typeof sorted[number]) =>
+    dimension === 'gross' ? r.gross_outcome : r.stableford_outcome;
+  const head = pick(sorted[0]);
   if (head === 'T') return null;
   let count = 1;
   for (let i = 1; i < sorted.length; i++) {
-    if (sorted[i].stableford_outcome === head) count++;
+    if (pick(sorted[i]) === head) count++;
     else break;
   }
   return { who: head === 'W' ? 'you' : 'them', count };
@@ -75,17 +81,24 @@ export const RivalryCard: React.FC<Props> = ({
   userThumbnailUrl,
   userHandicap,
   onInfo,
+  dimension = 'stableford',
 }) => {
   const navigate = useNavigate();
   const rivalDisplayName = reformatFriendName(rivalry.rival_name ?? 'Unknown');
   const userDisplayName = userName ?? 'You';
-  const sf = rivalry.stableford_record ?? { wins: 0, losses: 0, ties: 0 };
+  const record =
+    (dimension === 'gross' ? rivalry.gross_record : rivalry.stableford_record) ?? {
+      wins: 0,
+      losses: 0,
+      ties: 0,
+    };
+  const sf = record;
   const results = rivalry.shared_round_results ?? [];
   const hasH2H = rivalry.shared_rounds_count > 0;
   const winning = sf.wins > sf.losses;
   const losing = sf.losses > sf.wins;
 
-  const streak = useMemo(() => computeStreak(results), [results]);
+  const streak = useMemo(() => computeStreak(results, dimension), [results, dimension]);
   const lastResult = useMemo(() => {
     if (results.length === 0) return null;
     return [...results].sort(
