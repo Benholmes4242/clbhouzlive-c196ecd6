@@ -4,7 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 /**
  * Call a Supabase RPC with react-query. Returns typed data or throws on error.
  */
-export function useGamRpc<TResult, TArgs extends Record<string, unknown> = Record<string, never>>(
+export function useGamRpc<TResult, TArgs extends Record<string, unknown> = Record<string, unknown>>(
   rpcName: string,
   args: TArgs,
   options?: {
