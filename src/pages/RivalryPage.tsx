@@ -252,7 +252,9 @@ const RivalryHero: React.FC<HeroProps> = ({
       }}
     >
       {/* Dimension toggle */}
-      <DimensionToggle value={dimension} onChange={onDimensionChange} />
+      <div style={{ display: 'flex', justifyContent: 'center' }}>
+        <DimensionToggle value={dimension} onChange={onDimensionChange} />
+      </div>
 
       {/* Big record */}
       <div
