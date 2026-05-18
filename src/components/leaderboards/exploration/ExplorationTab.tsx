@@ -799,7 +799,7 @@ export function ExplorationTab() {
                 </div>
                 <div
                   style={{
-                    fontSize: 24,
+                    fontSize: 22,
                     fontWeight: 800,
                     color: '#fff',
                     letterSpacing: '-0.025em',
@@ -904,7 +904,7 @@ export function ExplorationTab() {
                 borderRadius: 4,
                 fontSize: 12,
                 fontWeight: 800,
-                letterSpacing: '0.06em',
+                letterSpacing: '0.16em',
                 cursor: 'pointer',
                 fontFamily: 'inherit',
               }}
@@ -1016,7 +1016,6 @@ export function ExplorationTab() {
                           fontSize: 9,
                           fontWeight: 700,
                           color: dateColor,
-                          letterSpacing: '0.06em',
                           fontVariantNumeric: 'tabular-nums lining-nums',
                         }}
                       >
@@ -1133,7 +1132,6 @@ export function ExplorationTab() {
           style={{
             fontSize: 10,
             color: INK_FAINT,
-            letterSpacing: '0.06em',
             fontStyle: 'italic',
           }}
         >
@@ -1162,7 +1160,6 @@ export function ExplorationTab() {
             border: 'none',
             fontSize: 12,
             fontWeight: 800,
-            letterSpacing: '0.04em',
             cursor: 'pointer',
             fontFamily: 'inherit',
             boxShadow: '0 6px 18px rgba(15,23,42,0.28)',
@@ -1272,7 +1269,6 @@ function ProgressTrack({
             fontSize: 11,
             fontWeight: 700,
             color: 'rgba(255,255,255,0.65)',
-            letterSpacing: '0.02em',
           }}
         >
           {label}
