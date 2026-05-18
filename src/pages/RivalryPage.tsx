@@ -17,6 +17,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useFriendRivalries } from '@/lib/whs/hooks';
 import type { FriendRivalryHydrated } from '@/lib/whs/types';
 import { PageRoot } from '@/components/layout/PageRoot';
+import { firstName as canonicalFirstName } from '@/lib/whs/utils/initials';
 import {
   useRivalryDimension,
   type RivalryDimension,
@@ -43,8 +44,14 @@ const TAB: React.CSSProperties = {
   fontFeatureSettings: '"kern" 1, "liga" 1',
 };
 
-const firstName = (n: string | null | undefined) =>
-  (n ?? '').trim().split(/\s+/)[0] || 'Player';
+// Local helper: normalize EG "Surname, Given" + extract first token. Falls
+// back to "Player" if the input is blank. Delegates to canonical firstName
+// in @/lib/whs/utils/initials, which handles comma-format + suffixes.
+const firstName = (n: string | null | undefined): string => {
+  const trimmed = (n ?? '').trim();
+  if (!trimmed) return 'Player';
+  return canonicalFirstName(trimmed) || 'Player';
+};
 
 // RivalryDimension + storage key are owned by useRivalryDimension hook.
 
@@ -379,6 +386,68 @@ const RivalryHero: React.FC<HeroProps> = ({
           </div>
         </div>
       )}
+
+      <SlotKindDisclosure row={row} ownerView={ownerView} ownerName={ownerName} />
+    </div>
+  );
+};
+
+// ── Slot-kind context disclosure (under hero record card) ───────────────
+// Hidden for `pinned` (self-explanatory). Numbers come from
+// shared_round_results aggregate — light, factual, no exclamations.
+const SlotKindDisclosure: React.FC<{
+  row: FriendRivalryHydrated;
+  ownerView: boolean;
+  ownerName: string | null;
+}> = ({ row, ownerView, ownerName }) => {
+  const rivalFirst = firstName(row.rival_name);
+  const ownerFirst = ownerView ? "You're" : `${firstName(ownerName)} is`;
+  const ownerFirstAlt = ownerView ? 'you' : firstName(ownerName);
+
+  const avgGrossDiff = useMemo(() => {
+    const rows = row.shared_round_results ?? [];
+    if (rows.length === 0) return null;
+    // Positive = owner is ABOVE rival in gross (worse — owner trails)
+    const sum = rows.reduce((s, r) => s + ((r.user_gross ?? 0) - (r.rival_gross ?? 0)), 0);
+    return sum / rows.length;
+  }, [row.shared_round_results]);
+
+  const fmtN = (n: number): string => {
+    const v = Math.abs(n);
+    if (v < 0.1) return '0';
+    return v < 10 ? v.toFixed(1).replace(/\.0$/, '') : Math.round(v).toString();
+  };
+
+  let copy: string | null = null;
+  if (row.slot_kind === 'pinned') {
+    copy = null;
+  } else if (row.slot_kind === 'chasing' && avgGrossDiff != null && avgGrossDiff > 0.1) {
+    copy = `${ownerFirst} ${fmtN(avgGrossDiff)} strokes behind ${rivalFirst} on average per round.`;
+  } else if (row.slot_kind === 'chased_by' && avgGrossDiff != null && avgGrossDiff < -0.1) {
+    copy = `${rivalFirst} is ${fmtN(avgGrossDiff)} strokes behind ${ownerFirstAlt} on average per round.`;
+  } else if (row.slot_kind === 'regular') {
+    const n = row.shared_rounds_last_90d ?? 0;
+    if (n > 0) {
+      copy = `Most-played with — ${n} shared round${n === 1 ? '' : 's'} in the last 90 days.`;
+    }
+  }
+
+  if (!copy) return null;
+  return (
+    <div
+      style={{
+        marginTop: 16,
+        paddingTop: 12,
+        borderTop: `1px solid ${LINE}`,
+        textAlign: 'center',
+        color: T60,
+        fontSize: 12,
+        fontStyle: 'italic',
+        fontFamily: FONT,
+        lineHeight: 1.4,
+      }}
+    >
+      {copy}
     </div>
   );
 };

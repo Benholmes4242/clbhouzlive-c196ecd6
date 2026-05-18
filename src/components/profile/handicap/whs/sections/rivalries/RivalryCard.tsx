@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Flame, Sparkles } from 'lucide-react';
-import { initials } from '@/lib/whs/utils/initials';
+import { initials, firstName } from '@/lib/whs/utils/initials';
 import { reformatFriendName } from '@/lib/whs/utils/nameFormat';
 import { fmtHcp } from '@/lib/whs/format';
 import type { FriendRivalryHydrated } from '@/lib/whs/types';
@@ -461,7 +461,7 @@ const Portrait: React.FC<PortraitProps> = ({
         textAlign: 'center',
       }}
     >
-      {label ?? name.split(' ')[0].toUpperCase()}
+      {label ?? firstName(name).toUpperCase()}
     </div>
     {handicap != null && (
       <div
