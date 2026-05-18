@@ -17,6 +17,10 @@ import { supabase } from '@/integrations/supabase/client';
 import { useFriendRivalries } from '@/lib/whs/hooks';
 import type { FriendRivalryHydrated } from '@/lib/whs/types';
 import { PageRoot } from '@/components/layout/PageRoot';
+import {
+  useRivalryDimension,
+  type RivalryDimension,
+} from '@/lib/whs/utils/useRivalryDimension';
 
 // ── Dark-mode handicap tokens (per project memory + brief) ──────────────
 const BG_0 = 'var(--hcp-bg-0)';
