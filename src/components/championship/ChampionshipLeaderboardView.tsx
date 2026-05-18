@@ -1617,7 +1617,7 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
                 gap: 8, color: '#94A3B8', fontSize: 12,
               }}>
                 <Loader2 className="animate-spin" style={{ width: 14, height: 14 }} />
-                <span style={{ letterSpacing: '0.12em', fontWeight: 700 }}>LOADING</span>
+                <span style={{ letterSpacing: '0.16em', fontWeight: 700 }}>LOADING</span>
               </div>
             )}
           </div>
