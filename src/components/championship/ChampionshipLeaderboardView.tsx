@@ -1572,7 +1572,7 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
 
               {timeFilter === 'seasonal' ? (
                 <span style={{
-                  textAlign: 'right', fontSize: 11, fontWeight: 700, letterSpacing: '0.04em',
+                  textAlign: 'right', fontSize: 11, fontWeight: 700,
                   color: p.rank_movement > 0
                     ? '#15803D'
                     : p.rank_movement < 0
