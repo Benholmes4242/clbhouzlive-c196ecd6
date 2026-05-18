@@ -222,7 +222,7 @@ const HandicapPageHeader: React.FC<HeaderProps> = ({
         <div
           style={{
             display: 'flex',
-            justifyContent: 'center',
+            justifyContent: 'flex-start',
             gap: 8,
             padding: '8px 16px',
             overflowX: 'auto',
@@ -243,7 +243,7 @@ const HandicapPageHeader: React.FC<HeaderProps> = ({
                 style={{
                   flex: '0 0 auto',
                   height: 32,
-                  padding: '0 12px',
+                  padding: '0 10px',
                   borderRadius: 8,
                   border: active ? '1px solid rgba(255,255,255,0.55)' : '1px solid transparent',
                   background: active ? 'rgba(255,255,255,0.10)' : 'transparent',
