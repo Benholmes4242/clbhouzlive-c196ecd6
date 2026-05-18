@@ -144,7 +144,7 @@ function WireTicker({ dispatches, onDispatchClick }: WireTickerProps) {
         style={{
           fontSize: 9,
           fontWeight: 800,
-          letterSpacing: '0.18em',
+          letterSpacing: '0.16em',
           color: '#9F1D1D',
           flexShrink: 0,
         }}
