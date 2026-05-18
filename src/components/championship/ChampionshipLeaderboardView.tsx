@@ -1115,12 +1115,12 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
           <div style={{ textAlign: 'center' }}>
             <div style={{
               fontSize: 9, fontWeight: 800, color: '#94A3B8',
-              letterSpacing: '0.18em', marginBottom: 4,
+              letterSpacing: '0.16em', marginBottom: 4,
             }}>
               LEADER
             </div>
             <div style={{
-              fontSize: 28, fontWeight: 900, letterSpacing: '-0.04em',
+              fontSize: 28, fontWeight: 800, letterSpacing: '-0.025em',
               lineHeight: 1, color: '#0F172A',
               fontVariantNumeric: 'tabular-nums lining-nums',
             }}>
@@ -1131,12 +1131,12 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
           <div style={{ textAlign: 'center' }}>
             <div style={{
               fontSize: 9, fontWeight: 800, color: '#9F1D1D',
-              letterSpacing: '0.18em', marginBottom: 4,
+              letterSpacing: '0.16em', marginBottom: 4,
             }}>
               YOU
             </div>
             <div style={{
-              fontSize: 28, fontWeight: 900, letterSpacing: '-0.04em',
+              fontSize: 28, fontWeight: 800, letterSpacing: '-0.025em',
               lineHeight: 1, color: '#9F1D1D',
               fontVariantNumeric: 'tabular-nums lining-nums',
             }}>
@@ -1148,12 +1148,12 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
             <div style={{
               fontSize: 9, fontWeight: 800,
               color: userIsLeader ? '#15803D' : '#94A3B8',
-              letterSpacing: '0.18em', marginBottom: 4,
+              letterSpacing: '0.16em', marginBottom: 4,
             }}>
               {userIsLeader ? 'LEAD' : 'GAP'}
             </div>
             <div style={{
-              fontSize: 28, fontWeight: 900, letterSpacing: '-0.04em',
+              fontSize: 28, fontWeight: 800, letterSpacing: '-0.025em',
               lineHeight: 1,
               color: userIsLeader ? '#15803D' : '#0F172A',
               fontVariantNumeric: 'tabular-nums lining-nums',
