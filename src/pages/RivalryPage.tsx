@@ -188,6 +188,8 @@ interface HeroProps {
   ownerName: string | null;
   ownerThumb: string | null;
   ownerHcp: number | null;
+  dimension: RivalryDimension;
+  onDimensionChange: (d: RivalryDimension) => void;
 }
 
 const RivalryHero: React.FC<HeroProps> = ({
@@ -196,25 +198,28 @@ const RivalryHero: React.FC<HeroProps> = ({
   ownerName,
   ownerThumb,
   ownerHcp,
+  dimension,
+  onDimensionChange,
 }) => {
-  const sf = row.stableford_record ?? { wins: 0, losses: 0, ties: 0 };
-  const wins = sf.wins ?? 0;
-  const losses = sf.losses ?? 0;
-  const ties = sf.ties ?? 0;
+  const rec = recordFor(row, dimension);
+  const wins = rec.wins ?? 0;
+  const losses = rec.losses ?? 0;
+  const ties = rec.ties ?? 0;
   const total = wins + losses + ties;
 
   const results = (row.shared_round_results ?? [])
     .slice()
     .sort((a, b) => b.play_date.localeCompare(a.play_date));
 
-  // Last 3 dots (own perspective — owner-side W/L/T)
+  // Last 3 dots (own perspective — owner-side W/L/T) per selected dimension
   const last3 = results.slice(0, 3);
   // Current streak
   let streakWho: 'owner' | 'rival' | null = null;
   let streakCount = 0;
   for (const r of results) {
+    const o = outcomeFor(r, dimension);
     const who: 'owner' | 'rival' | 'tie' =
-      r.stableford_outcome === 'W' ? 'owner' : r.stableford_outcome === 'L' ? 'rival' : 'tie';
+      o === 'W' ? 'owner' : o === 'L' ? 'rival' : 'tie';
     if (who === 'tie') break;
     if (streakWho === null) {
       streakWho = who;
