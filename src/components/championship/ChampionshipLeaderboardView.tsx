@@ -859,14 +859,14 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
         </div>
 
         <h1 style={{
-          fontSize: 38, fontWeight: 900, letterSpacing: '-0.035em',
+          fontSize: 38, fontWeight: 800, letterSpacing: '-0.025em',
           margin: 0, lineHeight: 0.95, color: '#0F172A',
         }}>
           The Top 100
         </h1>
 
         <div style={{
-          fontSize: 11, fontWeight: 600, letterSpacing: '0.32em',
+          fontSize: 11, fontWeight: 600, letterSpacing: '0.16em',
           color: '#64748B', marginTop: 6,
         }}>
           A CHAMPIONSHIP RECORD
