@@ -43,12 +43,16 @@ export const RivalryEditSheet: React.FC<Props> = ({ userId, rivalry, slotIndex, 
 
   const handlePick = async (friend_row_id: string | null, friend_user_id: string | null) => {
     if (sIdx === null) return;
+    // DB constraint: rival_user_id XOR rival_friend_row_id (never both).
+    // Prefer rival_user_id when the friend is a Clbhouz user; fall back to friend_row_id otherwise.
+    const identity = friend_user_id
+      ? { rival_user_id: friend_user_id, rival_friend_row_id: null }
+      : { rival_user_id: null, rival_friend_row_id: friend_row_id };
     try {
       await upsert.mutateAsync({
         userId,
         slotIndex: sIdx,
-        rival_user_id: friend_user_id ?? undefined,
-        rival_friend_row_id: friend_row_id ?? undefined,
+        ...identity,
       });
       toast.success('Rival pinned');
       onClose();
