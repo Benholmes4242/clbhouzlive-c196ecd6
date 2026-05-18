@@ -11,6 +11,9 @@ import { SectionHeader } from './_shared/atoms';
 interface Props {
   connectionId: string;
   currentHandicap: number | null;
+  /** 'owner' (default) shows first-person copy; 'friend' uses third-person + ownerFirstName. */
+  viewMode?: 'owner' | 'friend';
+  ownerFirstName?: string | null;
 }
 
 // ── Tokens ────────────────────────────────────────────────────────────────
