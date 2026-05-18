@@ -837,7 +837,7 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
         {/* TOP STRIP: single line, countdown-driven */}
         <div style={{
           display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 6,
-          fontSize: 11, fontWeight: 800, color: '#64748B', letterSpacing: '0.18em',
+          fontSize: 11, fontWeight: 800, color: '#64748B', letterSpacing: '0.16em',
           marginBottom: 12, fontVariantNumeric: 'tabular-nums lining-nums',
           minHeight: 14,
         }}>
