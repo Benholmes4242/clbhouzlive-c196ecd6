@@ -1553,7 +1553,7 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
                   {p.is_current_user && (
                     <span style={{
                       fontSize: 9, fontWeight: 800, color: '#9F1D1D',
-                      letterSpacing: '0.18em', marginLeft: 6,
+                      letterSpacing: '0.16em', marginLeft: 6,
                     }}>YOU</span>
                   )}
                 </div>
