@@ -508,7 +508,7 @@ export function ExplorationTab() {
             fontSize: 11,
             fontWeight: 800,
             color: INK_MUTED,
-            letterSpacing: '0.18em',
+            letterSpacing: '0.16em',
             marginBottom: 12,
             minHeight: 14,
           }}
@@ -525,8 +525,8 @@ export function ExplorationTab() {
         <h1
           style={{
             fontSize: 38,
-            fontWeight: 900,
-            letterSpacing: '-0.035em',
+            fontWeight: 800,
+            letterSpacing: '-0.025em',
             margin: 0,
             lineHeight: 0.95,
             color: INK,
@@ -538,7 +538,7 @@ export function ExplorationTab() {
           style={{
             fontSize: 11,
             fontWeight: 600,
-            letterSpacing: '0.32em',
+            letterSpacing: '0.16em',
             color: INK_MUTED,
             marginTop: 6,
           }}
@@ -589,7 +589,7 @@ export function ExplorationTab() {
             style={{
               fontSize: 10,
               fontWeight: 800,
-              letterSpacing: '0.28em',
+              letterSpacing: '0.16em',
               color: CRIMSON,
               marginBottom: 10,
             }}
@@ -599,8 +599,8 @@ export function ExplorationTab() {
           <h2
             style={{
               fontSize: 28,
-              fontWeight: 900,
-              letterSpacing: '-0.03em',
+              fontWeight: 800,
+              letterSpacing: '-0.025em',
               margin: 0,
               lineHeight: 1.05,
               color: INK,
@@ -608,7 +608,7 @@ export function ExplorationTab() {
           >
             {headline}
             <br />
-            <span style={{ fontStyle: 'italic', fontWeight: 900, color: INK_BODY }}>
+            <span style={{ fontStyle: 'italic', fontWeight: 800, color: INK_BODY }}>
               {headlineTwo}
             </span>
           </h2>
@@ -686,7 +686,7 @@ export function ExplorationTab() {
               style={{
                 fontSize: 10,
                 fontWeight: 800,
-                letterSpacing: '0.28em',
+                letterSpacing: '0.16em',
                 color: CRIMSON,
                 textAlign: 'center',
                 marginBottom: 12,
@@ -793,7 +793,7 @@ export function ExplorationTab() {
                     fontSize: 9,
                     fontWeight: 800,
                     color: 'rgba(255,255,255,0.5)',
-                    letterSpacing: '0.22em',
+                    letterSpacing: '0.16em',
                     marginBottom: 4,
                   }}
                 >
@@ -802,9 +802,9 @@ export function ExplorationTab() {
                 <div
                   style={{
                     fontSize: 24,
-                    fontWeight: 900,
+                    fontWeight: 800,
                     color: '#fff',
-                    letterSpacing: '-0.03em',
+                    letterSpacing: '-0.025em',
                     lineHeight: 1.05,
                   }}
                 >
@@ -817,7 +817,7 @@ export function ExplorationTab() {
                     fontSize: 9,
                     fontWeight: 800,
                     color: 'rgba(255,255,255,0.5)',
-                    letterSpacing: '0.22em',
+                    letterSpacing: '0.16em',
                     marginBottom: 4,
                   }}
                 >
@@ -1204,7 +1204,7 @@ function BoxStat({
           fontSize: 9,
           fontWeight: 800,
           color: INK_FAINT,
-          letterSpacing: '0.18em',
+          letterSpacing: '0.16em',
           marginBottom: 4,
         }}
       >
@@ -1221,8 +1221,8 @@ function BoxStat({
         <span
           style={{
             fontSize: 28,
-            fontWeight: 900,
-            letterSpacing: '-0.04em',
+            fontWeight: 800,
+            letterSpacing: '-0.025em',
             lineHeight: 1,
             color,
             fontVariantNumeric: 'tabular-nums lining-nums',
@@ -1236,7 +1236,7 @@ function BoxStat({
               fontSize: 12,
               fontWeight: 700,
               color: INK_FAINT,
-              letterSpacing: '-0.02em',
+              letterSpacing: '-0.015em',
               lineHeight: 1,
               fontVariantNumeric: 'tabular-nums lining-nums',
             }}
@@ -1317,7 +1317,7 @@ function SectionLabel({ children }: { children: React.ReactNode }) {
     <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}>
       <div style={{ flex: 1, height: 1, background: 'rgba(15,23,42,0.15)' }} />
       <div style={{ width: 12, height: 1, background: INK }} />
-      <span style={{ fontSize: 10, fontWeight: 800, color: INK, letterSpacing: '0.22em' }}>
+      <span style={{ fontSize: 10, fontWeight: 800, color: INK, letterSpacing: '0.16em' }}>
         {children}
       </span>
       <div style={{ width: 12, height: 1, background: INK }} />
@@ -1418,7 +1418,7 @@ function PlayerStandings({
           fontSize: 9,
           fontWeight: 800,
           color: INK_FAINT,
-          letterSpacing: '0.18em',
+          letterSpacing: '0.16em',
           alignItems: 'center',
         }}
       >
@@ -1469,7 +1469,7 @@ function PlayerStandings({
               fontSize: 12,
               fontWeight: 800,
               color: CRIMSON,
-              letterSpacing: '0.18em',
+              letterSpacing: '0.16em',
               fontFamily: 'inherit',
             }}
           >
@@ -1531,10 +1531,10 @@ function PlayerStandings({
             <span
               style={{
                 fontSize: 18,
-                fontWeight: 900,
+                fontWeight: 800,
                 color: p.rank <= 3 ? INK : INK_FAINT,
                 fontVariantNumeric: 'tabular-nums lining-nums',
-                letterSpacing: '-0.02em',
+                letterSpacing: '-0.015em',
               }}
             >
               {p.rank}
@@ -1582,7 +1582,7 @@ function PlayerStandings({
                       fontSize: 9,
                       fontWeight: 800,
                       color: CRIMSON,
-                      letterSpacing: '0.18em',
+                      letterSpacing: '0.16em',
                       marginLeft: 6,
                     }}
                   >
@@ -1627,10 +1627,10 @@ function PlayerStandings({
             <span
               style={{
                 fontSize: 22,
-                fontWeight: 900,
+                fontWeight: 800,
                 textAlign: 'right',
                 color: INK,
-                letterSpacing: '-0.03em',
+                letterSpacing: '-0.025em',
                 fontVariantNumeric: 'tabular-nums lining-nums',
               }}
             >
@@ -1663,7 +1663,7 @@ function CountryStandings({ countries, isLoading, userPlayed, navigate }: Countr
           fontSize: 9,
           fontWeight: 800,
           color: INK_FAINT,
-          letterSpacing: '0.18em',
+          letterSpacing: '0.16em',
           alignItems: 'center',
         }}
       >
@@ -1731,10 +1731,10 @@ function CountryStandings({ countries, isLoading, userPlayed, navigate }: Countr
             <span
               style={{
                 fontSize: 18,
-                fontWeight: 900,
+                fontWeight: 800,
                 color: i < 3 ? INK : INK_FAINT,
                 fontVariantNumeric: 'tabular-nums lining-nums',
-                letterSpacing: '-0.02em',
+                letterSpacing: '-0.015em',
               }}
             >
               {i + 1}
@@ -1791,10 +1791,10 @@ function CountryStandings({ countries, isLoading, userPlayed, navigate }: Countr
             <span
               style={{
                 fontSize: 22,
-                fontWeight: 900,
+                fontWeight: 800,
                 textAlign: 'right',
                 color: INK,
-                letterSpacing: '-0.03em',
+                letterSpacing: '-0.025em',
                 fontVariantNumeric: 'tabular-nums lining-nums',
               }}
             >
