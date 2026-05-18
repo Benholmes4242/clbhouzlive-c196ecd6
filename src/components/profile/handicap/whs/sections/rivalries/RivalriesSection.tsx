@@ -18,6 +18,7 @@ interface Props {
 export const RivalriesSection: React.FC<Props> = ({ userId }) => {
   const { data, isLoading } = useFriendRivalries(userId);
   const { data: leaderboard } = useFriendLeaderboard(userId);
+  const [dimension, setDimension] = useRivalryDimension();
   const selfRow = useMemo(
     () => leaderboard?.find((e) => e.is_self) ?? null,
     [leaderboard],
