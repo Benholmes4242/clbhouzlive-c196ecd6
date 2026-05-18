@@ -8,7 +8,8 @@ import NextRoundWatch from '../sections/NextRoundWatch';
 import Pattern14Card from '../sections/Pattern14Card';
 import IndexHistoryCard from '../sections/IndexHistoryCard';
 import RoundsThatCountCard from '../sections/RoundsThatCountCard';
-import StreaksSection from '../sections/StreaksSection';
+import StreaksCard from '../../gam/streaks/StreaksCard';
+import { StreaksSheetMount } from '../../gam/streaks/StreaksSheetMount';
 import SinceLastVisitRail from '../sections/since-last-visit/SinceLastVisitRail';
 import RecentUnlocksStrip from '../gam/RecentUnlocksStrip';
 import LegendStatusCard from '../../gam/legends/LegendStatusCard';
@@ -84,12 +85,13 @@ export const TodayView: React.FC<Props> = ({
 
       <LeaguesCard userId={userId} isOwner={!readOnly} />
 
-      {!readOnly && <StreaksSection connectionId={connectionId} userId={userId} />}
+      {!readOnly && <StreaksCard userId={userId} />}
 
       {!readOnly && <SinceLastVisitRail userId={userId} />}
 
       <LegendStatusSheetMount />
       <LeaguesSheetMount />
+      {!readOnly && <StreaksSheetMount />}
     </div>
   );
 };
