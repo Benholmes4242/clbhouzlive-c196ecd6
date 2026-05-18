@@ -255,7 +255,7 @@ async function buildCandidates(
 // ---- LLM orchestration -------------------------------------------------------
 
 const SYSTEM_PROMPT =
-  "You are a golf course identity reconciliation agent. Given a course name from the WHS (handicap) system, you must decide which row in our internal golf_courses table refers to the same physical course. Be conservative — when uncertain, return NO_MATCH or CREATE_NEW rather than guessing. Respond ONLY with a single JSON object matching the schema described, no prose, no markdown.";
+  "You are a golf course identity reconciliation agent. Given a course name from the WHS (handicap) system, decide which row in our internal golf_courses table refers to the same physical course. Be decisive: when name + club + layout clearly identify the same physical course, return MATCH even if secondary metadata (country, sub_country, region) disagrees — WHS metadata is frequently miscoded. Only return NO_MATCH when no candidate is plausibly the same course. Only return CREATE_NEW when you are confident the course is real but truly absent from the candidate list. Respond ONLY with a single JSON object matching the schema described, no prose, no markdown.";
 
 function userPrompt(
   whs: { name: string; country_code: string | null; country_name: string | null },
@@ -281,6 +281,27 @@ return NO_MATCH. If you are confident the WHS course is real but is
 missing from our table entirely, return CREATE_NEW. Watch for multi-course
 clubs where the WHS row encodes the layout (e.g. "Old Course", "West") —
 match to the specific course, not the parent club.
+
+Identity rules (apply in order):
+1. Physical identity wins. If the name, club, and layout clearly refer to
+   the same physical course, return MATCH even when secondary metadata
+   disagrees. Treat country / sub_country as TIE-BREAKERS between
+   otherwise-equivalent candidates, NOT as disqualifiers — WHS country
+   codes are frequently miscoded (e.g. Northern Ireland courses tagged
+   "IE", Portugal courses bucketed as "Continental Europe", apostrophes
+   and "The " prefixes dropped, "do" vs "da" typos).
+2. Prefer MATCH over CREATE_NEW whenever a candidate is plausibly the same
+   physical course. Only return CREATE_NEW when you are confident NONE of
+   the 15 candidates is the same course AND the WHS course is real.
+3. Spelling variants of the same proper noun (St George's / St Georges,
+   Prince's / Princes, Quinta do / Quinta da) are the same course.
+4. Country-code data errors NEVER block a MATCH. If the name unambiguously
+   identifies a real-world course (e.g. "Royal Portrush-Dunluce"), match
+   it to the corresponding candidate regardless of any country_code /
+   sub_country disagreement. Worked example: WHS "Royal Portrush-Dunluce"
+   with country_code=IE MUST match candidate "Royal Portrush Golf Club
+   (Dunluce)" with sub_country=Northern Ireland — same physical course,
+   the IE tag is a known WHS bucketing quirk for the island of Ireland.
 
 Respond with EXACTLY this JSON shape:
 {
