@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useRef } from 'react';
 import { ChevronRight } from 'lucide-react';
 import { DarkSectionHeader } from '../../whs/sections/_shared/darkAtoms';
 import { Skeleton } from '../_shared/GamAtoms';
-import { useMyStreaks } from '@/hooks/gam/useMyStreaks';
+import { useUserStreaks } from '@/hooks/gam/useUserStreaks';
 import type { StreakRow } from '@/lib/gam/types';
 import { STREAK_CARD_ORDER, type StreakCardEntry } from './streakConfig';
 import { openAllStreaks } from '../../whs/gam/events';
