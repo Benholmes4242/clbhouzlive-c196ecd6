@@ -561,6 +561,7 @@ interface RoundsProps {
   courseFilter: string | null;
   setCourseFilter: (id: string | null) => void;
   scrollAnchor: React.RefObject<HTMLDivElement>;
+  dimension: RivalryDimension;
 }
 
 const INITIAL_LIMIT = 20;
@@ -572,6 +573,7 @@ const RoundByRoundSection: React.FC<RoundsProps> = ({
   courseFilter,
   setCourseFilter,
   scrollAnchor,
+  dimension,
 }) => {
   const [showAll, setShowAll] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
