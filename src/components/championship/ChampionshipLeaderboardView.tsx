@@ -144,7 +144,7 @@ function WireTicker({ dispatches, onDispatchClick }: WireTickerProps) {
         style={{
           fontSize: 9,
           fontWeight: 800,
-          letterSpacing: '0.18em',
+          letterSpacing: '0.16em',
           color: '#9F1D1D',
           flexShrink: 0,
         }}
@@ -312,7 +312,7 @@ const InitialErrorState = ({ onRetry }: { onRetry: () => void }) => (
       style={{
         marginTop: 14, padding: '8px 18px', borderRadius: 4,
         background: '#0F172A', color: '#fff', fontSize: 12, fontWeight: 800,
-        letterSpacing: '0.18em', border: 'none', cursor: 'pointer',
+        letterSpacing: '0.16em', border: 'none', cursor: 'pointer',
       }}
     >
       RETRY
@@ -447,7 +447,7 @@ function LedeFactor({ label, value }: { label: string; value: string }) {
     }}>
       <span style={{
         fontSize: 10, fontWeight: 800, color: '#64748B',
-        letterSpacing: '0.12em', textTransform: 'uppercase',
+        letterSpacing: '0.16em', textTransform: 'uppercase',
       }}>
         {label}
       </span>
@@ -837,7 +837,7 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
         {/* TOP STRIP: single line, countdown-driven */}
         <div style={{
           display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 6,
-          fontSize: 11, fontWeight: 800, color: '#64748B', letterSpacing: '0.18em',
+          fontSize: 11, fontWeight: 800, color: '#64748B', letterSpacing: '0.16em',
           marginBottom: 12, fontVariantNumeric: 'tabular-nums lining-nums',
           minHeight: 14,
         }}>
@@ -859,14 +859,14 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
         </div>
 
         <h1 style={{
-          fontSize: 38, fontWeight: 900, letterSpacing: '-0.035em',
+          fontSize: 38, fontWeight: 800, letterSpacing: '-0.025em',
           margin: 0, lineHeight: 0.95, color: '#0F172A',
         }}>
           The Top 100
         </h1>
 
         <div style={{
-          fontSize: 11, fontWeight: 600, letterSpacing: '0.32em',
+          fontSize: 11, fontWeight: 600, letterSpacing: '0.16em',
           color: '#64748B', marginTop: 6,
         }}>
           A CHAMPIONSHIP RECORD
@@ -911,7 +911,7 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
                 gap: 6,
                 padding: '12px 20px 0',
                 fontSize: 10,
-                letterSpacing: '0.18em',
+                letterSpacing: '0.16em',
                 fontWeight: 700,
                 color: '#C97211',
                 textTransform: 'uppercase',
@@ -1080,14 +1080,14 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
             </button>
           </div>
           <h2 style={{
-            fontSize: 28, fontWeight: 900, letterSpacing: '-0.03em',
+            fontSize: 28, fontWeight: 800, letterSpacing: '-0.025em',
             margin: 0, lineHeight: 1.05, color: '#0F172A',
           }}>
             {finalEditorial.headline}
             {finalEditorial.headlineTwo && (
               <>
                 <br />
-                <span style={{ fontStyle: 'italic', fontWeight: 900, color: '#475569' }}>
+                <span style={{ fontStyle: 'italic', fontWeight: 800, color: '#475569' }}>
                   {finalEditorial.headlineTwo}
                 </span>
               </>
@@ -1115,12 +1115,12 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
           <div style={{ textAlign: 'center' }}>
             <div style={{
               fontSize: 9, fontWeight: 800, color: '#94A3B8',
-              letterSpacing: '0.18em', marginBottom: 4,
+              letterSpacing: '0.16em', marginBottom: 4,
             }}>
               LEADER
             </div>
             <div style={{
-              fontSize: 28, fontWeight: 900, letterSpacing: '-0.04em',
+              fontSize: 28, fontWeight: 800, letterSpacing: '-0.025em',
               lineHeight: 1, color: '#0F172A',
               fontVariantNumeric: 'tabular-nums lining-nums',
             }}>
@@ -1131,12 +1131,12 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
           <div style={{ textAlign: 'center' }}>
             <div style={{
               fontSize: 9, fontWeight: 800, color: '#9F1D1D',
-              letterSpacing: '0.18em', marginBottom: 4,
+              letterSpacing: '0.16em', marginBottom: 4,
             }}>
               YOU
             </div>
             <div style={{
-              fontSize: 28, fontWeight: 900, letterSpacing: '-0.04em',
+              fontSize: 28, fontWeight: 800, letterSpacing: '-0.025em',
               lineHeight: 1, color: '#9F1D1D',
               fontVariantNumeric: 'tabular-nums lining-nums',
             }}>
@@ -1148,12 +1148,12 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
             <div style={{
               fontSize: 9, fontWeight: 800,
               color: userIsLeader ? '#15803D' : '#94A3B8',
-              letterSpacing: '0.18em', marginBottom: 4,
+              letterSpacing: '0.16em', marginBottom: 4,
             }}>
               {userIsLeader ? 'LEAD' : 'GAP'}
             </div>
             <div style={{
-              fontSize: 28, fontWeight: 900, letterSpacing: '-0.04em',
+              fontSize: 28, fontWeight: 800, letterSpacing: '-0.025em',
               lineHeight: 1,
               color: userIsLeader ? '#15803D' : '#0F172A',
               fontVariantNumeric: 'tabular-nums lining-nums',
@@ -1195,7 +1195,7 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
                 >
                   <span style={{
                     fontSize: 9, fontWeight: 800, color: '#94A3B8',
-                    letterSpacing: '0.18em', minWidth: 14,
+                    letterSpacing: '0.16em', minWidth: 14,
                     fontVariantNumeric: 'tabular-nums lining-nums',
                   }}>
                     {String(i + 1).padStart(2, '0')}
@@ -1221,7 +1221,7 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
               marginTop: 14,
               textAlign: 'center',
               fontSize: 9, fontWeight: 700, color: '#94A3B8',
-              letterSpacing: '0.12em', fontStyle: 'italic',
+              fontStyle: 'italic',
             }}>
               Based on your weekly pace · Updated daily
             </div>
@@ -1238,7 +1238,7 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
             <div style={{ flex: 1, height: 1, background: 'rgba(15,23,42,0.15)' }} />
             <div style={{ width: 12, height: 1, background: '#0F172A' }} />
             <span style={{
-              fontSize: 10, fontWeight: 800, color: '#0F172A', letterSpacing: '0.22em',
+              fontSize: 10, fontWeight: 800, color: '#0F172A', letterSpacing: '0.16em',
             }}>SCHEDULE</span>
             <div style={{ width: 12, height: 1, background: '#0F172A' }} />
             <div style={{ flex: 1, height: 1, background: 'rgba(15,23,42,0.15)' }} />
@@ -1261,7 +1261,7 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
                   }}
                 >
                   <div style={{
-                    fontSize: 9, fontWeight: 800, letterSpacing: '0.18em', marginBottom: 4,
+                    fontSize: 9, fontWeight: 800, letterSpacing: '0.16em', marginBottom: 4,
                     color: status === 'active' ? '#9F1D1D' : '#94A3B8',
                   }}>
                     {labelTop}
@@ -1287,7 +1287,7 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
           <div style={{ flex: 1, height: 1, background: 'rgba(15,23,42,0.15)' }} />
           <div style={{ width: 12, height: 1, background: '#0F172A' }} />
           <span style={{
-            fontSize: 10, fontWeight: 800, color: '#0F172A', letterSpacing: '0.22em',
+            fontSize: 10, fontWeight: 800, color: '#0F172A', letterSpacing: '0.16em',
           }}>
             {timeFilter === 'all_time' ? 'ALL-TIME STANDINGS' : 'FULL STANDINGS'}
           </span>
@@ -1351,7 +1351,7 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
                   background: divisionFilter === d.key ? 'rgba(15,23,42,0.08)' : 'transparent',
                   color: divisionFilter === d.key ? '#0F172A' : '#94A3B8',
                   border: '1px solid rgba(15,23,42,0.1)',
-                  fontSize: 10, fontWeight: 700, cursor: 'pointer', letterSpacing: '0.04em',
+                  fontSize: 10, fontWeight: 700, cursor: 'pointer', letterSpacing: '0.14em',
                   whiteSpace: 'nowrap' as const,
                   flexShrink: 0,
                 }}
@@ -1394,7 +1394,6 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
               background: 'rgba(247,147,30,0.12)',
               border: '1px solid rgba(247,147,30,0.35)',
               fontSize: 10, fontWeight: 800, color: '#9A4A0F',
-              letterSpacing: '0.04em',
             }}>
               <span>Filtering by {activeFilterLabel || '…'}</span>
               <button
@@ -1418,7 +1417,7 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
           padding: '10px 0 8px',
           borderBottom: '1px solid #0F172A',
           fontSize: 9, fontWeight: 800, color: '#94A3B8',
-          letterSpacing: '0.18em', alignItems: 'center',
+          letterSpacing: '0.16em', alignItems: 'center',
         }}>
           <span>POS</span>
           <span />
@@ -1471,7 +1470,7 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
                 style={{
                   background: 'none', border: 'none', cursor: 'pointer',
                   fontSize: 12, fontWeight: 800, color: '#9F1D1D',
-                  letterSpacing: '0.18em',
+                  letterSpacing: '0.16em',
                 }}
               >
                 FIND FRIENDS →
@@ -1515,10 +1514,10 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
               )}
 
               <span style={{
-                fontSize: 18, fontWeight: 900,
+                fontSize: 18, fontWeight: 800,
                 color: p.current_rank <= 3 ? '#0F172A' : '#94A3B8',
                 fontVariantNumeric: 'tabular-nums lining-nums',
-                letterSpacing: '-0.02em',
+                letterSpacing: '-0.015em',
               }}>
                 {p.current_rank}
               </span>
@@ -1554,7 +1553,7 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
                   {p.is_current_user && (
                     <span style={{
                       fontSize: 9, fontWeight: 800, color: '#9F1D1D',
-                      letterSpacing: '0.18em', marginLeft: 6,
+                      letterSpacing: '0.16em', marginLeft: 6,
                     }}>YOU</span>
                   )}
                 </div>
@@ -1573,7 +1572,7 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
 
               {timeFilter === 'seasonal' ? (
                 <span style={{
-                  textAlign: 'right', fontSize: 11, fontWeight: 700, letterSpacing: '0.04em',
+                  textAlign: 'right', fontSize: 11, fontWeight: 700,
                   color: p.rank_movement > 0
                     ? '#15803D'
                     : p.rank_movement < 0
@@ -1590,7 +1589,7 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
               ) : (
                 <span style={{
                   textAlign: 'right', fontSize: 10, fontWeight: 800,
-                  color: '#64748B', letterSpacing: '0.06em',
+                  color: '#64748B', letterSpacing: '0.14em',
                   textTransform: 'uppercase' as const,
                 }}>
                   {abbreviateDivision(p.division_slug) || '—'}
@@ -1598,8 +1597,8 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
               )}
 
               <span style={{
-                fontSize: 22, fontWeight: 900, textAlign: 'right',
-                color: '#0F172A', letterSpacing: '-0.03em',
+                fontSize: 22, fontWeight: 800, textAlign: 'right',
+                color: '#0F172A', letterSpacing: '-0.025em',
                 fontVariantNumeric: 'tabular-nums lining-nums',
               }}>
                 {p.courses_this_season}
@@ -1618,7 +1617,7 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
                 gap: 8, color: '#94A3B8', fontSize: 12,
               }}>
                 <Loader2 className="animate-spin" style={{ width: 14, height: 14 }} />
-                <span style={{ letterSpacing: '0.12em', fontWeight: 700 }}>LOADING</span>
+                <span style={{ letterSpacing: '0.16em', fontWeight: 700 }}>LOADING</span>
               </div>
             )}
           </div>
@@ -1632,7 +1631,7 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
       {/* ── 8. FOOTER CAPTION ── */}
       <div style={{ padding: '20px 20px 28px', textAlign: 'center' }}>
         <div style={{
-          fontSize: 10, color: '#94A3B8', letterSpacing: '0.06em', fontStyle: 'italic',
+          fontSize: 10, color: '#94A3B8', fontStyle: 'italic',
         }}>
           Compiled from members' verified course visits · Updated daily
         </div>
@@ -1663,8 +1662,8 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
             margin: '0 auto 16px',
           }} />
           <div style={{
-            fontSize: 18, fontWeight: 900, color: '#0F172A',
-            letterSpacing: '-0.01em', marginBottom: 8,
+            fontSize: 18, fontWeight: 800, color: '#0F172A',
+            letterSpacing: '-0.015em', marginBottom: 8,
           }}>
             Why this headline
           </div>
@@ -1703,7 +1702,7 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
           <div style={{
             marginTop: 16, paddingTop: 12,
             borderTop: '1px solid rgba(15,23,42,0.08)',
-            fontSize: 10, color: '#94A3B8', letterSpacing: '0.06em',
+            fontSize: 10, color: '#94A3B8',
             fontStyle: 'italic', textAlign: 'center',
           }}>
             Headline by Editorial AI · Updated daily
