@@ -6,6 +6,7 @@ import TodayView from './views/TodayView';
 import TrendsView from './views/TrendsView';
 import RecordsView from './views/RecordsView';
 import FriendsView from './views/FriendsView';
+import LegendsView from './views/LegendsView';
 import TrophiesSheetMount from './sections/TrophiesSheetMount';
 import WhsConnectionCaption from './sections/WhsConnectionCaption';
 import { isHandicapSubtab, type HandicapSubtab } from './types';
@@ -83,6 +84,9 @@ export const HandicapDashboard: React.FC<Props> = ({ connection, userId, readOnl
             connectionId={connection.id}
             readOnly={readOnly}
           />
+        )}
+        {activeSubtab === 'legends' && (
+          <LegendsView userId={userId} readOnly={readOnly} />
         )}
       </div>
 
