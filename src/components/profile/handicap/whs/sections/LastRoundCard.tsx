@@ -10,11 +10,19 @@ import { DarkSectionHeader } from './_shared/darkAtoms';
 interface Props {
   connectionId: string;
   userId: string;
+  /** 'owner' (default) shows first-person copy; 'friend' uses third-person + ownerFirstName. */
+  viewMode?: 'owner' | 'friend';
+  ownerFirstName?: string | null;
 }
 
 const FONT_GEIST = 'Geist, system-ui, -apple-system, BlinkMacSystemFont, sans-serif';
 
-export const LastRoundCard: React.FC<Props> = ({ connectionId, userId }) => {
+export const LastRoundCard: React.FC<Props> = ({
+  connectionId,
+  userId,
+  viewMode = 'owner',
+  ownerFirstName = null,
+}) => {
   const { data: lastRound, isLoading } = useLastRound(connectionId);
   const { data: profile } = useUserProfile(userId);
   const [sheetOpen, setSheetOpen] = useState(false);
