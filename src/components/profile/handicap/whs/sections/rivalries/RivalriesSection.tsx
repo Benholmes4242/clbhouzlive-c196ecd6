@@ -195,9 +195,11 @@ const FriendViewRivalries: React.FC<{
     ? 'Loading…'
     : !hasAnything
       ? ownerFirst
-        ? `No rivalries with ${ownerFirst} or your shared friends yet.`
+        ? `No shared rivalries with ${ownerFirst} yet.`
         : 'No shared rivalries yet.'
-      : 'Head-to-head with you and your shared friends.';
+      : primary && secondary.length === 0 && ownerFirst
+        ? `You're not connected to ${ownerFirst}'s other rivals.`
+        : 'Head-to-head with you and your shared friends.';
 
   return (
     <section style={{ marginTop: 32 }}>
