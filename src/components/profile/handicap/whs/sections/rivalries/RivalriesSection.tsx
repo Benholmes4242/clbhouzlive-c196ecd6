@@ -6,10 +6,6 @@ import RivalryAddCard from './RivalryAddCard';
 import RivalryEditSheet from './RivalryEditSheet';
 import { useFriendRivalries, useFriendLeaderboard } from '@/lib/whs/hooks';
 import type { FriendRivalryHydrated } from '@/lib/whs/types';
-import {
-  useRivalryDimension,
-  type RivalryDimension,
-} from '@/lib/whs/utils/useRivalryDimension';
 
 interface Props {
   userId: string;
@@ -18,7 +14,6 @@ interface Props {
 export const RivalriesSection: React.FC<Props> = ({ userId }) => {
   const { data, isLoading } = useFriendRivalries(userId);
   const { data: leaderboard } = useFriendLeaderboard(userId);
-  const [dimension, setDimension] = useRivalryDimension();
   const selfRow = useMemo(
     () => leaderboard?.find((e) => e.is_self) ?? null,
     [leaderboard],
