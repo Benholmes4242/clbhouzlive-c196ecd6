@@ -14185,6 +14185,7 @@ export type Database = {
           email_change_requested_at: string | null
           email_change_token: string | null
           featured_post_id: string | null
+          gam_launch_seen_at: string | null
           gender: string | null
           golfer_verified_at: string | null
           golfer_verified_by: string | null
@@ -14303,6 +14304,7 @@ export type Database = {
           email_change_requested_at?: string | null
           email_change_token?: string | null
           featured_post_id?: string | null
+          gam_launch_seen_at?: string | null
           gender?: string | null
           golfer_verified_at?: string | null
           golfer_verified_by?: string | null
@@ -14421,6 +14423,7 @@ export type Database = {
           email_change_requested_at?: string | null
           email_change_token?: string | null
           featured_post_id?: string | null
+          gam_launch_seen_at?: string | null
           gender?: string | null
           golfer_verified_at?: string | null
           golfer_verified_by?: string | null
@@ -19230,6 +19233,7 @@ export type Database = {
           post_id: string
         }[]
       }
+      get_gam_launch_payload: { Args: { p_user_id: string }; Returns: Json }
       get_global_country_breakdown: {
         Args: { p_limit?: number; p_offset?: number }
         Returns: {
