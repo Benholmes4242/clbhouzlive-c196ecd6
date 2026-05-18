@@ -1261,7 +1261,7 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
                   }}
                 >
                   <div style={{
-                    fontSize: 9, fontWeight: 800, letterSpacing: '0.18em', marginBottom: 4,
+                    fontSize: 9, fontWeight: 800, letterSpacing: '0.16em', marginBottom: 4,
                     color: status === 'active' ? '#9F1D1D' : '#94A3B8',
                   }}>
                     {labelTop}
