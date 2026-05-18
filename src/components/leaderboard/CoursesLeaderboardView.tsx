@@ -618,7 +618,7 @@ export function CoursesLeaderboardView() {
         <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 14 }}>
           <div style={{ flex: 1, height: 1, background: 'rgba(15,23,42,0.15)' }} />
           <div style={{ width: 12, height: 1, background: '#0F172A' }} />
-          <span style={{ fontSize: 10, fontWeight: 800, color: '#0F172A', letterSpacing: '0.22em' }}>
+          <span style={{ fontSize: 10, fontWeight: 800, color: '#0F172A', letterSpacing: '0.16em' }}>
             THE FULL LIST
           </span>
           <div style={{ width: 12, height: 1, background: '#0F172A' }} />
@@ -630,7 +630,7 @@ export function CoursesLeaderboardView() {
           display: 'grid', gridTemplateColumns: '26px 48px 1fr 44px',
           padding: '10px 0 8px',
           borderBottom: '1px solid #0F172A',
-          fontSize: 9, fontWeight: 800, color: '#94A3B8', letterSpacing: '0.18em',
+          fontSize: 9, fontWeight: 800, color: '#94A3B8', letterSpacing: '0.16em',
           alignItems: 'center',
         }}>
           <span>POS</span>
