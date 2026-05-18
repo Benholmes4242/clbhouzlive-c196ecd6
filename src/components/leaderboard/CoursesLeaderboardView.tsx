@@ -566,11 +566,11 @@ export function CoursesLeaderboardView() {
         color: '#64748B',
         fontVariantNumeric: 'tabular-nums lining-nums',
       }}>
-        <span style={{ fontWeight: 900, color: '#9F1D1D' }}>{userPlayedCount}</span>
+        <span style={{ fontWeight: 800, color: '#9F1D1D' }}>{userPlayedCount}</span>
         <span> played · </span>
-        <span style={{ fontWeight: 900, color: '#9F1D1D' }}>{pctOfList}%</span>
+        <span style={{ fontWeight: 800, color: '#9F1D1D' }}>{pctOfList}%</span>
         <span> of list · </span>
-        <span style={{ fontWeight: 900, color: '#0F172A' }}>
+        <span style={{ fontWeight: 800, color: '#0F172A' }}>
           {totalInList === 0 ? '—' : (toGoCount === 0 ? '—' : toGoCount)}
         </span>
         <span> to go</span>
