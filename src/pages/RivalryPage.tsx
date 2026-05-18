@@ -1065,7 +1065,7 @@ const RivalryPage: React.FC = () => {
 
   return (
     <PageRoot
-      data-handicap-dark
+      className="hcp-dark"
       style={{
         background: BG_0,
         minHeight: '100vh',
