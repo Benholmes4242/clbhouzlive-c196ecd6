@@ -103,9 +103,11 @@ export const RivalryCard: React.FC<Props> = ({
   const youScoreColor = winning ? T.gold : losing ? T.red : T.whiteFaded;
   const themScoreColor = losing ? T.gold : winning ? T.red : T.whiteFaded;
 
-  const rivalId = (rivalry as any).id ?? (rivalry as any).rivalry_id ?? null;
-  const canOpenDeep = hasH2H && !!rivalId;
-  const goDeep = () => { if (canOpenDeep) navigate(`/handicap/rivalry/${rivalId}`); };
+  // friend_rivalry has no surrogate id — pair-keyed. Route param accepts either
+  // rival_user_id (Clbhouz friend) or rival_friend_row_id (non-Clbhouz friend).
+  const rivalRouteId = rivalry.rival_user_id ?? rivalry.rival_friend_row_id ?? null;
+  const canOpenDeep = hasH2H && !!rivalRouteId;
+  const goDeep = () => { if (canOpenDeep) navigate(`/handicap/rivalry/${rivalRouteId}`); };
 
   return (
     <div
