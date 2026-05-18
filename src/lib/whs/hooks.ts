@@ -279,8 +279,8 @@ export function useUpsertRivalOverride() {
     mutationFn: (params: {
       userId: string;
       slotIndex: number;
-      rival_user_id?: string;
-      rival_friend_row_id?: string;
+      rival_user_id?: string | null;
+      rival_friend_row_id?: string | null;
     }) =>
       upsertUserRivalOverride(params.userId, params.slotIndex, {
         rival_user_id: params.rival_user_id,

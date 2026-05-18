@@ -310,11 +310,14 @@ export const PinFooter: React.FC<{
         await remove.mutateAsync({ userId: ownerUserId, slotIndex: pinnedSlot.slot_index });
         toast.success('Unpinned');
       } else {
+        const identity = friend.friend_user_id
+          ? { rival_user_id: friend.friend_user_id, rival_friend_row_id: null }
+          : { rival_user_id: null, rival_friend_row_id: friend.friend_row_id };
+
         await upsert.mutateAsync({
           userId: ownerUserId,
           slotIndex: 4,
-          rival_user_id: friend.friend_user_id ?? undefined,
-          rival_friend_row_id: friend.friend_row_id ?? undefined,
+          ...identity,
         });
         toast.success('Pinned as rival');
       }
