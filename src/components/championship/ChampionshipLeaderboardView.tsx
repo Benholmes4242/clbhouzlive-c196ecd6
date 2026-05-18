@@ -1057,7 +1057,7 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
       ) : (
         <div style={{ padding: '22px 20px 0', textAlign: 'center' }}>
           <div style={{
-            fontSize: 10, fontWeight: 800, letterSpacing: '0.28em',
+            fontSize: 10, fontWeight: 800, letterSpacing: '0.16em',
             color: '#9F1D1D', marginBottom: 10,
             display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 6,
           }}>
@@ -1179,7 +1179,7 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
               top: -8, left: '50%', transform: 'translateX(-50%)',
               background: '#F8FAFC', padding: '0 10px',
               fontSize: 9, fontWeight: 800, color: '#9F1D1D',
-              letterSpacing: '0.28em',
+              letterSpacing: '0.16em',
             }}>
               ON THE CHASE
             </div>
