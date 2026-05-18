@@ -198,7 +198,7 @@ const RecentUnlocksStrip: React.FC<RecentUnlocksStripProps> = ({
           <UnlockCard
             key={`${unlock.kind}-${idx}-${unlock.occurred_at}`}
             unlock={unlock}
-            onTap={() => openTrophiesSheet()}
+            onTap={() => openGamAchievements()}
           />
         ))}
       </ScrollContainer>

@@ -177,7 +177,7 @@ const TodayGreeting: React.FC<Props> = ({ connectionId, userId }) => {
         </div>
         <button
           type="button"
-          onClick={() => openTrophiesSheet()}
+          onClick={() => openGamAchievements()}
           aria-label="Open trophies"
           style={{
             flexShrink: 0,
