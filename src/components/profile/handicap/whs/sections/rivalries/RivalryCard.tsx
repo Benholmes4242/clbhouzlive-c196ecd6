@@ -1,11 +1,14 @@
 import React, { useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Info, Flame, Sparkles } from 'lucide-react';
+import { Flame, Sparkles } from 'lucide-react';
 import { initials } from '@/lib/whs/utils/initials';
 import { reformatFriendName } from '@/lib/whs/utils/nameFormat';
 import { fmtHcp } from '@/lib/whs/format';
 import type { FriendRivalryHydrated } from '@/lib/whs/types';
-import type { RivalryDimension } from '@/lib/whs/utils/useRivalryDimension';
+import {
+  useRivalryDimension,
+  type RivalryDimension,
+} from '@/lib/whs/utils/useRivalryDimension';
 
 interface Props {
   rivalry: FriendRivalryHydrated;
@@ -13,7 +16,10 @@ interface Props {
   userThumbnailUrl: string | null;
   userHandicap: number | null;
   onInfo: () => void;
-  /** Which scoring dimension to display. Defaults to 'stableford'. */
+  /**
+   * Optional override. When omitted (default), the card owns its own per-rival
+   * dimension state via useRivalryDimension(rivalKey) and renders an inline pill.
+   */
   dimension?: RivalryDimension;
 }
 
@@ -81,9 +87,15 @@ export const RivalryCard: React.FC<Props> = ({
   userThumbnailUrl,
   userHandicap,
   onInfo,
-  dimension = 'stableford',
+  dimension: dimensionProp,
 }) => {
   const navigate = useNavigate();
+  const rivalKey = rivalry.rival_user_id ?? rivalry.rival_friend_row_id ?? null;
+  const [ownDimension, setOwnDimension] = useRivalryDimension(rivalKey);
+  // Prop wins if explicitly provided; otherwise self-owned per-rival preference.
+  const dimension: RivalryDimension = dimensionProp ?? ownDimension;
+  const showPill = dimensionProp === undefined;
+
   const rivalDisplayName = reformatFriendName(rivalry.rival_name ?? 'Unknown');
   const userDisplayName = userName ?? 'You';
   const record =
@@ -189,26 +201,9 @@ export const RivalryCard: React.FC<Props> = ({
           >
             {rivalry.shared_rounds_count} ROUNDS
           </span>
-          <button
-            type="button"
-            onClick={(e) => { e.stopPropagation(); onInfo(); }}
-            aria-label="Rivalry info"
-            style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              width: 22,
-              height: 22,
-              borderRadius: '50%',
-              border: 'none',
-              background: 'rgba(255,255,255,0.06)',
-              color: T.whiteMute,
-              cursor: 'pointer',
-              padding: 0,
-            }}
-          >
-            <Info size={12} strokeWidth={2.2} />
-          </button>
+          {showPill && hasH2H && rivalKey && (
+            <CardDimensionPill value={dimension} onChange={setOwnDimension} />
+          )}
         </div>
       </div>
 
@@ -459,5 +454,62 @@ const Portrait: React.FC<PortraitProps> = ({
     )}
   </div>
 );
+
+// ── Inline per-card dimension pill (STBL ↔ GROSS) ─────────────────────
+const CardDimensionPill: React.FC<{
+  value: RivalryDimension;
+  onChange: (d: RivalryDimension) => void;
+}> = ({ value, onChange }) => {
+  const opts: { id: RivalryDimension; label: string }[] = [
+    { id: 'stableford', label: 'STBL' },
+    { id: 'gross', label: 'GROSS' },
+  ];
+  return (
+    <div
+      role="tablist"
+      aria-label="Scoring dimension"
+      onClick={(e) => e.stopPropagation()}
+      style={{
+        display: 'inline-flex',
+        padding: 2,
+        background: 'rgba(0,0,0,0.28)',
+        border: '1px solid rgba(255,255,255,0.10)',
+        borderRadius: 999,
+        gap: 1,
+      }}
+    >
+      {opts.map((o) => {
+        const active = o.id === value;
+        return (
+          <button
+            key={o.id}
+            type="button"
+            role="tab"
+            aria-selected={active}
+            onClick={(e) => {
+              e.stopPropagation();
+              onChange(o.id);
+            }}
+            style={{
+              padding: '2px 7px',
+              borderRadius: 999,
+              border: 'none',
+              cursor: 'pointer',
+              fontFamily: FONT_GEIST,
+              fontSize: 9,
+              fontWeight: 800,
+              letterSpacing: '0.14em',
+              background: active ? '#F7931E' : 'transparent',
+              color: active ? '#0F172A' : 'rgba(255,255,255,0.55)',
+              transition: 'background-color 150ms ease, color 150ms ease',
+            }}
+          >
+            {o.label}
+          </button>
+        );
+      })}
+    </div>
+  );
+};
 
 export default RivalryCard;

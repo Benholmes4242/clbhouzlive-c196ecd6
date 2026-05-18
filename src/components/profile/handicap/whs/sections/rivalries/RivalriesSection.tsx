@@ -6,10 +6,6 @@ import RivalryAddCard from './RivalryAddCard';
 import RivalryEditSheet from './RivalryEditSheet';
 import { useFriendRivalries, useFriendLeaderboard } from '@/lib/whs/hooks';
 import type { FriendRivalryHydrated } from '@/lib/whs/types';
-import {
-  useRivalryDimension,
-  type RivalryDimension,
-} from '@/lib/whs/utils/useRivalryDimension';
 
 interface Props {
   userId: string;
@@ -18,7 +14,6 @@ interface Props {
 export const RivalriesSection: React.FC<Props> = ({ userId }) => {
   const { data, isLoading } = useFriendRivalries(userId);
   const { data: leaderboard } = useFriendLeaderboard(userId);
-  const [dimension, setDimension] = useRivalryDimension();
   const selfRow = useMemo(
     () => leaderboard?.find((e) => e.is_self) ?? null,
     [leaderboard],
@@ -63,32 +58,29 @@ export const RivalriesSection: React.FC<Props> = ({ userId }) => {
         
         right={
           hasFilled && hasAnyH2HData ? (
-            <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
-              <DimensionPill value={dimension} onChange={setDimension} />
-              <button
-                onClick={() => {
-                  const first = filledRivalries[0];
-                  setEditTarget({ rivalry: first, slotIndex: first.slot_index });
-                }}
-                style={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: 4,
-                  padding: '4px 10px',
-                  background: 'transparent',
-                  border: '1px solid var(--hcp-line-2)',
-                  borderRadius: 999,
-                  cursor: 'pointer',
-                  color: 'var(--hcp-t-80)',
-                  fontSize: 10,
-                  fontWeight: 800,
-                  letterSpacing: '0.14em',
-                }}
-              >
-                <Pencil size={11} strokeWidth={2.4} />
-                EDIT
-              </button>
-            </div>
+            <button
+              onClick={() => {
+                const first = filledRivalries[0];
+                setEditTarget({ rivalry: first, slotIndex: first.slot_index });
+              }}
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 4,
+                padding: '4px 10px',
+                background: 'transparent',
+                border: '1px solid var(--hcp-line-2)',
+                borderRadius: 999,
+                cursor: 'pointer',
+                color: 'var(--hcp-t-80)',
+                fontSize: 10,
+                fontWeight: 800,
+                letterSpacing: '0.14em',
+              }}
+            >
+              <Pencil size={11} strokeWidth={2.4} />
+              EDIT
+            </button>
           ) : null
         }
       />
@@ -140,7 +132,6 @@ export const RivalriesSection: React.FC<Props> = ({ userId }) => {
                 userName={selfRow?.friend_name ?? null}
                 userThumbnailUrl={selfRow?.friend_thumbnail_url ?? null}
                 userHandicap={selfRow?.friend_handicap_index ?? null}
-                dimension={dimension}
                 onInfo={() => { /* deprecated: card-tap routes to /handicap/rivalry/:rivalUserId */ }}
               />
             ))}
@@ -165,58 +156,5 @@ export const RivalriesSection: React.FC<Props> = ({ userId }) => {
     </section>
   );
 };
-
-// ── Compact section-level dimension pill (Stableford ↔ Gross) ──────────
-const DimensionPill: React.FC<{
-  value: RivalryDimension;
-  onChange: (d: RivalryDimension) => void;
-}> = ({ value, onChange }) => {
-  const opts: { id: RivalryDimension; label: string }[] = [
-    { id: 'stableford', label: 'STBL' },
-    { id: 'gross', label: 'GROSS' },
-  ];
-  return (
-    <div
-      role="tablist"
-      aria-label="Scoring dimension"
-      style={{
-        display: 'inline-flex',
-        padding: 2,
-        background: 'var(--hcp-bg-2)',
-        border: '1px solid var(--hcp-line)',
-        borderRadius: 999,
-        gap: 1,
-      }}
-    >
-      {opts.map((o) => {
-        const active = o.id === value;
-        return (
-          <button
-            key={o.id}
-            type="button"
-            role="tab"
-            aria-selected={active}
-            onClick={() => onChange(o.id)}
-            style={{
-              padding: '3px 9px',
-              borderRadius: 999,
-              border: 'none',
-              cursor: 'pointer',
-              fontSize: 10,
-              fontWeight: 800,
-              letterSpacing: '0.14em',
-              background: active ? 'var(--hcp-amber)' : 'transparent',
-              color: active ? '#0F172A' : 'var(--hcp-t-60)',
-              transition: 'background-color 150ms ease, color 150ms ease',
-            }}
-          >
-            {o.label}
-          </button>
-        );
-      })}
-    </div>
-  );
-};
-
 export default RivalriesSection;
 
