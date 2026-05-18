@@ -79,6 +79,7 @@ export const RivalryEditSheet: React.FC<Props> = ({ userId, rivalry, slotIndex, 
       <DrawerPrimitive.Portal>
         <DrawerPrimitive.Overlay style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.65)', zIndex: 80 }} />
         <DrawerPrimitive.Content
+          className="hcp-dark"
           style={{
             position: 'fixed',
             left: 0,
