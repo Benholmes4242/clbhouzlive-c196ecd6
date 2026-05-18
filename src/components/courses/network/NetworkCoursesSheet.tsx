@@ -97,7 +97,6 @@ const FriendStack: React.FC<{
             color: '#ffffff',
             fontSize: 10,
             fontWeight: 800,
-            boxShadow: '0 1px 4px rgba(0,0,0,0.30)',
           }}
         >
           +{more}
