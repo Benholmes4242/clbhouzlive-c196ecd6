@@ -42,6 +42,26 @@ const TAB: React.CSSProperties = {
 const firstName = (n: string | null | undefined) =>
   (n ?? '').trim().split(/\s+/)[0] || 'Player';
 
+export type RivalryDimension = 'stableford' | 'gross';
+const DIMENSION_STORAGE_KEY = 'hcp-rivalry-dimension';
+
+function outcomeFor(
+  r: { stableford_outcome: 'W' | 'L' | 'T'; gross_outcome: 'W' | 'L' | 'T' },
+  dim: RivalryDimension,
+): 'W' | 'L' | 'T' {
+  return dim === 'gross' ? r.gross_outcome : r.stableford_outcome;
+}
+
+function recordFor(row: FriendRivalryHydrated, dim: RivalryDimension) {
+  return (
+    (dim === 'gross' ? row.gross_record : row.stableford_record) ?? {
+      wins: 0,
+      losses: 0,
+      ties: 0,
+    }
+  );
+}
+
 // ── Data: owner-view (reuse existing hook + pick row) ───────────────────
 function useOwnerRivalry(
   viewerId: string | undefined,
@@ -168,6 +188,8 @@ interface HeroProps {
   ownerName: string | null;
   ownerThumb: string | null;
   ownerHcp: number | null;
+  dimension: RivalryDimension;
+  onDimensionChange: (d: RivalryDimension) => void;
 }
 
 const RivalryHero: React.FC<HeroProps> = ({
@@ -176,25 +198,28 @@ const RivalryHero: React.FC<HeroProps> = ({
   ownerName,
   ownerThumb,
   ownerHcp,
+  dimension,
+  onDimensionChange,
 }) => {
-  const sf = row.stableford_record ?? { wins: 0, losses: 0, ties: 0 };
-  const wins = sf.wins ?? 0;
-  const losses = sf.losses ?? 0;
-  const ties = sf.ties ?? 0;
+  const rec = recordFor(row, dimension);
+  const wins = rec.wins ?? 0;
+  const losses = rec.losses ?? 0;
+  const ties = rec.ties ?? 0;
   const total = wins + losses + ties;
 
   const results = (row.shared_round_results ?? [])
     .slice()
     .sort((a, b) => b.play_date.localeCompare(a.play_date));
 
-  // Last 3 dots (own perspective — owner-side W/L/T)
+  // Last 3 dots (own perspective — owner-side W/L/T) per selected dimension
   const last3 = results.slice(0, 3);
   // Current streak
   let streakWho: 'owner' | 'rival' | null = null;
   let streakCount = 0;
   for (const r of results) {
+    const o = outcomeFor(r, dimension);
     const who: 'owner' | 'rival' | 'tie' =
-      r.stableford_outcome === 'W' ? 'owner' : r.stableford_outcome === 'L' ? 'rival' : 'tie';
+      o === 'W' ? 'owner' : o === 'L' ? 'rival' : 'tie';
     if (who === 'tie') break;
     if (streakWho === null) {
       streakWho = who;
@@ -226,6 +251,11 @@ const RivalryHero: React.FC<HeroProps> = ({
         borderRadius: 12,
       }}
     >
+      {/* Dimension toggle */}
+      <div style={{ display: 'flex', justifyContent: 'center' }}>
+        <DimensionToggle value={dimension} onChange={onDimensionChange} />
+      </div>
+
       {/* Big record */}
       <div
         style={{
@@ -324,12 +354,8 @@ const RivalryHero: React.FC<HeroProps> = ({
               {[0, 1, 2].map((i) => {
                 const r = last3[i];
                 if (!r) return <Dot key={i} tone="empty" />;
-                const tone =
-                  r.stableford_outcome === 'W'
-                    ? 'win'
-                    : r.stableford_outcome === 'L'
-                      ? 'loss'
-                      : 'tie';
+                const o = outcomeFor(r, dimension);
+                const tone = o === 'W' ? 'win' : o === 'L' ? 'loss' : 'tie';
                 return <Dot key={i} tone={tone} />;
               })}
             </span>
@@ -349,6 +375,63 @@ const RivalryHero: React.FC<HeroProps> = ({
           </div>
         </div>
       )}
+    </div>
+  );
+};
+
+// ── Dimension toggle (Stableford ↔ Gross) ──────────────────────────────
+const DimensionToggle: React.FC<{
+  value: RivalryDimension;
+  onChange: (d: RivalryDimension) => void;
+}> = ({ value, onChange }) => {
+  const opts: { id: RivalryDimension; label: string }[] = [
+    { id: 'stableford', label: 'Stableford' },
+    { id: 'gross', label: 'Gross' },
+  ];
+  return (
+    <div
+      role="tablist"
+      aria-label="Scoring dimension"
+      style={{
+        display: 'inline-flex',
+        margin: '0 auto 16px',
+        padding: 3,
+        background: BG_2,
+        border: `1px solid ${LINE}`,
+        borderRadius: 999,
+        gap: 2,
+        // center the inline-flex inside the flex column hero
+        alignSelf: 'center',
+      }}
+    >
+      {opts.map((o) => {
+        const active = o.id === value;
+        return (
+          <button
+            key={o.id}
+            role="tab"
+            aria-selected={active}
+            type="button"
+            onClick={() => onChange(o.id)}
+            style={{
+              padding: '6px 14px',
+              borderRadius: 999,
+              border: 'none',
+              cursor: 'pointer',
+              fontFamily: FONT,
+              fontSize: 12,
+              fontWeight: 700,
+              letterSpacing: '0.04em',
+              textTransform: 'uppercase',
+              background: active ? AMBER : 'transparent',
+              color: active ? '#0F172A' : T60,
+              transition: 'background-color 150ms ease, color 150ms ease',
+            }}
+          >
+            {o.label}
+          </button>
+        );
+      })}
     </div>
   );
 };
@@ -380,7 +463,10 @@ interface CourseAgg {
   lastPlayed: string;
 }
 
-function aggregateCourses(row: FriendRivalryHydrated): CourseAgg[] {
+function aggregateCourses(
+  row: FriendRivalryHydrated,
+  dimension: RivalryDimension,
+): CourseAgg[] {
   const map = new Map<string, CourseAgg>();
   for (const r of row.shared_round_results ?? []) {
     let agg = map.get(r.course_id);
@@ -397,8 +483,9 @@ function aggregateCourses(row: FriendRivalryHydrated): CourseAgg[] {
       map.set(r.course_id, agg);
     }
     agg.rounds += 1;
-    if (r.stableford_outcome === 'W') agg.ownerWins += 1;
-    else if (r.stableford_outcome === 'L') agg.rivalWins += 1;
+    const o = outcomeFor(r, dimension);
+    if (o === 'W') agg.ownerWins += 1;
+    else if (o === 'L') agg.rivalWins += 1;
     else agg.ties += 1;
     if (r.play_date > agg.lastPlayed) agg.lastPlayed = r.play_date;
   }
@@ -474,6 +561,7 @@ interface RoundsProps {
   courseFilter: string | null;
   setCourseFilter: (id: string | null) => void;
   scrollAnchor: React.RefObject<HTMLDivElement>;
+  dimension: RivalryDimension;
 }
 
 const INITIAL_LIMIT = 20;
@@ -485,6 +573,7 @@ const RoundByRoundSection: React.FC<RoundsProps> = ({
   courseFilter,
   setCourseFilter,
   scrollAnchor,
+  dimension,
 }) => {
   const [showAll, setShowAll] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -617,17 +706,13 @@ const RoundByRoundSection: React.FC<RoundsProps> = ({
       ) : (
         <div style={{ marginTop: 12, display: 'flex', flexDirection: 'column', gap: 8 }}>
           {visible.map((r, i) => {
-            const dot =
-              r.stableford_outcome === 'W'
-                ? GREEN
-                : r.stableford_outcome === 'L'
-                  ? RED
-                  : GREY;
+            const o = outcomeFor(r, dimension);
+            const dot = o === 'W' ? GREEN : o === 'L' ? RED : GREY;
             const margin = Math.abs(r.user_gross - r.rival_gross);
             let verdict: string;
-            if (r.stableford_outcome === 'W') {
+            if (o === 'W') {
               verdict = `Win for ${leftLabel.toLowerCase() === 'you' ? 'you' : leftLabel} · ${margin} stroke${margin === 1 ? '' : 's'}`;
-            } else if (r.stableford_outcome === 'L') {
+            } else if (o === 'L') {
               verdict = `Win for ${rightLabel} · ${margin} stroke${margin === 1 ? '' : 's'}`;
             } else {
               verdict = `Tied · ${margin === 0 ? 'level' : `${margin} stroke${margin === 1 ? '' : 's'} each`}`;
@@ -949,6 +1034,21 @@ const RivalryPage: React.FC = () => {
     });
   };
 
+  // Scoring dimension (Stableford default), persisted in localStorage
+  const [dimension, setDimension] = useState<RivalryDimension>(() => {
+    if (typeof window === 'undefined') return 'stableford';
+    const v = window.localStorage.getItem(DIMENSION_STORAGE_KEY);
+    return v === 'gross' ? 'gross' : 'stableford';
+  });
+  const handleDimensionChange = (d: RivalryDimension) => {
+    setDimension(d);
+    try {
+      window.localStorage.setItem(DIMENSION_STORAGE_KEY, d);
+    } catch {
+      /* noop */
+    }
+  };
+
   // Owner-view: hydrate "ownerName/ownerThumb/ownerHcp" from viewer profile
   const ownerName = isFriendView
     ? friendProfile?.full_name ?? null
@@ -1010,9 +1110,11 @@ const RivalryPage: React.FC = () => {
             ownerName={ownerName}
             ownerThumb={ownerThumb}
             ownerHcp={ownerHcp}
+            dimension={dimension}
+            onDimensionChange={handleDimensionChange}
           />
           <CoursesPlayedSection
-            courses={aggregateCourses(row)}
+            courses={aggregateCourses(row, dimension)}
             onCoursePick={handleCoursePick}
           />
           <RoundByRoundSection
@@ -1022,6 +1124,7 @@ const RivalryPage: React.FC = () => {
             courseFilter={courseFilter}
             setCourseFilter={setCourseFilter}
             scrollAnchor={timelineRef}
+            dimension={dimension}
           />
         </>
       )}
