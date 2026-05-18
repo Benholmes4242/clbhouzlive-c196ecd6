@@ -412,9 +412,9 @@ const HandicapPage: React.FC = () => {
       />
       <main style={{ paddingTop: 'var(--chrome-total-h, 0px)' }}>
         {isFriendView ? (
-          <FriendHandicapDashboard userId={ownerUserId} />
+          <FriendHandicapDashboard userId={ownerUserId} ownerFirstName={displayName} />
         ) : (
-          <WhsHandicapTab userId={ownerUserId} />
+          <WhsHandicapTab userId={ownerUserId} ownerFirstName={displayName} />
         )}
       </main>
       <GamMount ownerUserId={ownerUserId} viewerUserId={user.id} readOnly={isFriendView} />
