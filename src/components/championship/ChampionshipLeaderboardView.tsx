@@ -1662,8 +1662,8 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
             margin: '0 auto 16px',
           }} />
           <div style={{
-            fontSize: 18, fontWeight: 900, color: '#0F172A',
-            letterSpacing: '-0.01em', marginBottom: 8,
+            fontSize: 18, fontWeight: 800, color: '#0F172A',
+            letterSpacing: '-0.015em', marginBottom: 8,
           }}>
             Why this headline
           </div>
