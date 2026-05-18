@@ -20193,6 +20193,22 @@ export type Database = {
           tier_name: string
         }[]
       }
+      get_user_streaks: {
+        Args: { p_user_id: string }
+        Returns: {
+          best_count: number
+          best_ended_at: string
+          best_started_at: string
+          current_count: number
+          current_started_at: string
+          freeze_credits: number
+          freeze_refill_at: string
+          is_active: boolean
+          recent_activity_days: number[]
+          streak_type: string
+          unit: string
+        }[]
+      }
       get_user_tier_unlocks: {
         Args: { p_user_id: string }
         Returns: {
