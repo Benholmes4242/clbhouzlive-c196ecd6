@@ -19,7 +19,7 @@ export function useDiscoverCoursesThisWeek() {
     queryKey: ['gam', 'discover-courses-this-week'],
     staleTime: 60_000,
     queryFn: async (): Promise<DiscoverCourseRow[]> => {
-      const { data, error } = await (supabase.rpc as any)('get_discover_courses_this_week', {});
+      const { data, error } = await (supabase.rpc as any)('get_discover_courses_this_week', { p_limit: 24 });
       if (error) return [];
       return (data ?? []) as DiscoverCourseRow[];
     },

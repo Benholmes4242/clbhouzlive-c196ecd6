@@ -18892,6 +18892,19 @@ export type Database = {
         Args: { p_conversation_id: string }
         Returns: string[]
       }
+      get_discover_courses_this_week: {
+        Args: { p_limit?: number }
+        Returns: {
+          course_country: string
+          course_id: string
+          course_name: string
+          course_region: string
+          course_thumbnail: string
+          course_type: string
+          player_count: number
+          round_count: number
+        }[]
+      }
       get_division_config: {
         Args: never
         Returns: {
@@ -20067,6 +20080,24 @@ export type Database = {
           reviews_written: number
           top_100_played: number
           wishlist_count: number
+        }[]
+      }
+      get_user_played_courses: {
+        Args: { p_limit?: number; p_user_id: string }
+        Returns: {
+          best_category: string
+          best_rank: number
+          course_country: string
+          course_id: string
+          course_name: string
+          course_region: string
+          course_thumbnail: string
+          course_type: string
+          last_played_date: string
+          legend_titles: number
+          podium_positions: number
+          rounds_played: number
+          top_10_positions: number
         }[]
       }
       get_user_podium_proximity: {
