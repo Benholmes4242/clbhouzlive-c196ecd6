@@ -626,13 +626,16 @@ async function persist(
   reasoning: string,
   agreementCount: number,
 ) {
-  // For auto_apply we write the resolved golf_course_id. For all other Echo
-  // outcomes we deliberately leave golf_course_id null — the row exists to
-  // record that Echo has run and what it thought, so the admin queue and
-  // nightly orchestrator can skip it next pass.
+  // For auto_apply (3/3 or 2/3 high-conf majority) we write the resolved
+  // golf_course_id. For non-auto MATCH outcomes (echo_review) we still surface
+  // the suggested id via echo_suggested_golf_course_id so the admin queue can
+  // show "Echo suggests X" with a single-click confirm.
+  const isAuto = AUTO_APPLY_METHODS.has(method);
+  const isMatchSuggestion = method === "echo_review";
   const row = {
     whs_course_id: whsCourseId,
-    golf_course_id: method === "echo_consensus" ? golfCourseId : null,
+    golf_course_id: isAuto ? golfCourseId : null,
+    echo_suggested_golf_course_id: isMatchSuggestion ? golfCourseId : null,
     match_confidence: confidence,
     match_method: method,
     matched_at: new Date().toISOString(),
