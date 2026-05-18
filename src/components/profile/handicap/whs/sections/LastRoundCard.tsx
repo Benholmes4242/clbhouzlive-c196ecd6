@@ -69,12 +69,16 @@ export const LastRoundCard: React.FC<Props> = ({
   }
 
   if (!lastRound || !activity) {
+    const emptyCopy =
+      viewMode === 'friend'
+        ? `Rounds will appear here once ${ownerFirstName ?? 'they'} starts posting scores in MyEG.`
+        : 'Your rounds will appear here as soon as you start posting scores in MyEG.';
     return (
       <section style={{ marginTop: 32 }}>
         <DarkSectionHeader eyebrow="Last Round" />
         <div style={{ padding: '0 20px' }}>
           <p style={{ fontSize: 14, color: 'var(--hcp-t-60)', fontFamily: FONT_GEIST }}>
-            Your rounds will appear here as soon as you start posting scores in MyEG.
+            {emptyCopy}
           </p>
         </div>
       </section>
