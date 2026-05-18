@@ -12,6 +12,7 @@ import StreaksSection from '../sections/StreaksSection';
 import SinceLastVisitRail from '../sections/since-last-visit/SinceLastVisitRail';
 import RecentUnlocksStrip from '../gam/RecentUnlocksStrip';
 import LegendStatusCard from '../../gam/legends/LegendStatusCard';
+import { LegendStatusSheetMount } from '../../gam/legends/LegendStatusSheetMount';
 import LeaguesCard from '../gam/LeaguesCard';
 
 interface Props {
@@ -85,6 +86,8 @@ export const TodayView: React.FC<Props> = ({
       {!readOnly && <StreaksSection connectionId={connectionId} userId={userId} />}
 
       {!readOnly && <SinceLastVisitRail userId={userId} />}
+
+      <LegendStatusSheetMount />
     </div>
   );
 };
