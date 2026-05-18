@@ -911,7 +911,7 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
                 gap: 6,
                 padding: '12px 20px 0',
                 fontSize: 10,
-                letterSpacing: '0.18em',
+                letterSpacing: '0.16em',
                 fontWeight: 700,
                 color: '#C97211',
                 textTransform: 'uppercase',
