@@ -39,6 +39,14 @@ export interface StreakRow {
   best_started_at: string | null;
   best_ended_at: string | null;
   freeze_refill_at: string | null;
+  /**
+   * Per-streak supplementary signal returned by `get_my_streaks`.
+   * Currently populated ONLY for `streak_type = 'counter'`:
+   *   length-7 int array, oldest -> newest (index 6 = today),
+   *   each element = number of counter rounds posted that day.
+   * Null for every other streak type.
+   */
+  recent_activity_days: number[] | null;
 }
 
 // League pod standings
