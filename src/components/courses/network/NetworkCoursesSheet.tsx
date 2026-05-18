@@ -8,6 +8,7 @@ import SquircleAvatar from '@/components/ui/SquircleAvatar';
 import { getAvatarFallbackColor } from '@/lib/avatarFallback';
 import type { CourseCardModel } from '@/types/courseCard';
 import { format } from 'date-fns';
+import { SectionEyebrow } from '@/components/ui/SectionEyebrow';
 
 /* ──────────────────────────────────────────────────────────────────────────────
  * NetworkCoursesSheet
