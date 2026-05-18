@@ -14,6 +14,7 @@ import { useTop100FriendsSnapshot } from '@/hooks/useTop100FriendsSnapshot';
 import { PageRoot } from '@/components/layout/PageRoot';
 import { Skeleton } from '@/components/ui/skeleton';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { SectionEyebrow } from '@/components/ui/SectionEyebrow';
 
 type LeaderboardRow = {
   id: string;
@@ -131,13 +132,15 @@ const Top100NetworkPage: React.FC = () => {
       <PageRoot>
         <NetworkHeader onBack={() => navigate(-1)} />
         <div className="px-4 pt-2">
-          <SectionTag label="Your Network" />
+          <div style={{ marginBottom: 3 }}>
+            <SectionEyebrow label="Your Network" color="amber" />
+          </div>
           <h1
             style={{
               fontSize: 22,
-              fontWeight: 900,
+              fontWeight: 800,
               color: '#0F172A',
-              letterSpacing: '-0.03em',
+              letterSpacing: '-0.025em',
               margin: 0,
               lineHeight: 1.1,
             }}
@@ -181,13 +184,15 @@ const Top100NetworkPage: React.FC = () => {
       <div className="pb-10">
         {/* ============ Hero ============ */}
         <div className="px-4 pt-2">
-          <SectionTag label="Your Network" />
+          <div style={{ marginBottom: 3 }}>
+            <SectionEyebrow label="Your Network" color="amber" />
+          </div>
           <h1
             style={{
               fontSize: 22,
-              fontWeight: 900,
+              fontWeight: 800,
               color: '#0F172A',
-              letterSpacing: '-0.03em',
+              letterSpacing: '-0.025em',
               margin: 0,
               lineHeight: 1.1,
             }}
@@ -221,7 +226,7 @@ const Top100NetworkPage: React.FC = () => {
         {/* ============ Leaderboard ============ */}
         <div className="pt-7">
           <div className="px-4 pb-2">
-            <SectionTag label="Standings" />
+            <SectionEyebrow label="Standings" color="amber" />
           </div>
           <div>
             {rows.map((row, i) => {
@@ -269,22 +274,6 @@ const NetworkHeader: React.FC<{ onBack: () => void }> = ({ onBack }) => (
   </div>
 );
 
-const SectionTag: React.FC<{ label: string }> = ({ label }) => (
-  <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 3 }}>
-    <div style={{ width: 3, height: 8, background: '#F7931E', borderRadius: 1 }} />
-    <span
-      style={{
-        fontSize: 9,
-        fontWeight: 900,
-        color: '#F7931E',
-        letterSpacing: '0.16em',
-        textTransform: 'uppercase' as const,
-      }}
-    >
-      {label}
-    </span>
-  </div>
-);
 
 const HeroStat: React.FC<{
   label: string;
@@ -298,7 +287,7 @@ const HeroStat: React.FC<{
         fontSize: 9,
         fontWeight: 800,
         color: '#64748B',
-        letterSpacing: '0.06em',
+        letterSpacing: '0.16em',
         textTransform: 'uppercase' as const,
       }}
     >
@@ -315,9 +304,9 @@ const HeroStat: React.FC<{
       <span
         style={{
           fontSize: 22,
-          fontWeight: 900,
+          fontWeight: 800,
           color: accent ? '#F7931E' : '#0F172A',
-          letterSpacing: '-0.03em',
+          letterSpacing: '-0.025em',
           fontVariantNumeric: 'tabular-nums' as const,
           lineHeight: 1,
         }}
@@ -369,9 +358,9 @@ const LeaderboardRowItem: React.FC<{ row: LeaderboardRow; rank: number }> = ({
           width: 28,
           textAlign: 'center' as const,
           fontSize: 14,
-          fontWeight: 900,
+          fontWeight: 800,
           color: rankColor,
-          letterSpacing: '-0.02em',
+          letterSpacing: '-0.015em',
           fontVariantNumeric: 'tabular-nums' as const,
           flexShrink: 0,
           display: 'flex',
@@ -415,7 +404,7 @@ const LeaderboardRowItem: React.FC<{ row: LeaderboardRow; rank: number }> = ({
                 fontSize: 9,
                 fontWeight: 800,
                 color: '#F7931E',
-                letterSpacing: '0.06em',
+                letterSpacing: '0.14em',
                 textTransform: 'uppercase' as const,
               }}
             >
@@ -449,9 +438,9 @@ const LeaderboardRowItem: React.FC<{ row: LeaderboardRow; rank: number }> = ({
         <div
           style={{
             fontSize: 18,
-            fontWeight: 900,
+            fontWeight: 800,
             color: '#0F172A',
-            letterSpacing: '-0.03em',
+            letterSpacing: '-0.015em',
             fontVariantNumeric: 'tabular-nums' as const,
             lineHeight: 1,
           }}
@@ -463,7 +452,7 @@ const LeaderboardRowItem: React.FC<{ row: LeaderboardRow; rank: number }> = ({
             fontSize: 9,
             fontWeight: 700,
             color: '#94A3B8',
-            letterSpacing: '0.04em',
+            letterSpacing: '0.16em',
             textTransform: 'uppercase' as const,
             marginTop: 3,
           }}
