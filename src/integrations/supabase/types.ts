@@ -17855,6 +17855,7 @@ export type Database = {
           status: string
         }[]
       }
+      backfill_unmapped_round_stats: { Args: never; Returns: Json }
       base_club_name: { Args: { p_course_name: string }; Returns: string }
       block_user: { Args: { p_blocked_id: string }; Returns: undefined }
       calculate_user_division: {
