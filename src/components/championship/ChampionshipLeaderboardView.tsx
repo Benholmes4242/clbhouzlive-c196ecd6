@@ -1351,7 +1351,7 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
                   background: divisionFilter === d.key ? 'rgba(15,23,42,0.08)' : 'transparent',
                   color: divisionFilter === d.key ? '#0F172A' : '#94A3B8',
                   border: '1px solid rgba(15,23,42,0.1)',
-                  fontSize: 10, fontWeight: 700, cursor: 'pointer', letterSpacing: '0.04em',
+                  fontSize: 10, fontWeight: 700, cursor: 'pointer', letterSpacing: '0.14em',
                   whiteSpace: 'nowrap' as const,
                   flexShrink: 0,
                 }}
