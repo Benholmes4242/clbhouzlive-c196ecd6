@@ -24,6 +24,7 @@ export function useUserPlayedCourses(userId: string | undefined) {
     queryFn: async (): Promise<PlayedCourseRow[]> => {
       const { data, error } = await (supabase.rpc as any)('get_user_played_courses', {
         p_user_id: userId!,
+        p_limit: 24,
       });
       if (error) {
         // RPC not deployed yet → render empty stub.
