@@ -436,54 +436,108 @@ const DrilldownView: React.FC<{
                   </div>
                 </div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-                  {rows.map((r: any, i: number) => (
-                    <div
-                      key={`${cat}-${r.user_id}-${i}`}
-                      style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: 10,
-                        fontFamily: FONT,
-                        fontSize: 13,
-                        color: 'var(--hcp-t-100)',
-                      }}
-                    >
-                      <span
+                  {rows.map((r: any, i: number) => {
+                    const displayName =
+                      r.user_display_name ?? r.display_name ?? 'Player';
+                    const subtitle = r.user_home_club ?? r.home_club ?? null;
+                    const photo = r.user_photo_url ?? null;
+                    return (
+                      <div
+                        key={`${cat}-${r.user_id}-${i}`}
                         style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: 10,
+                          fontFamily: FONT,
                           fontSize: 13,
-                          minWidth: 22,
-                          fontWeight: 700,
-                          color: 'var(--hcp-t-60)',
-                          fontVariantNumeric: 'tabular-nums',
+                          color: 'var(--hcp-t-100)',
                         }}
                       >
-                        {rankEmoji(r.rank)}
-                      </span>
-                      <span
-                        style={{
-                          flex: 1,
-                          minWidth: 0,
-                          whiteSpace: 'nowrap',
-                          overflow: 'hidden',
-                          textOverflow: 'ellipsis',
-                          fontWeight: r.is_self ? 700 : 500,
-                          color: r.is_self ? AMBER : 'var(--hcp-t-100)',
-                        }}
-                      >
-                        {r.home_club ?? 'Player'}
-                        {r.is_self ? ' (you)' : ''}
-                      </span>
-                      <span
-                        style={{
-                          fontVariantNumeric: 'tabular-nums',
-                          color: 'var(--hcp-t-60)',
-                          fontSize: 12,
-                        }}
-                      >
-                        {formatLegendValue(cat, r.value)}
-                      </span>
-                    </div>
-                  ))}
+                        <span
+                          style={{
+                            fontSize: 13,
+                            minWidth: 22,
+                            fontWeight: 700,
+                            color: 'var(--hcp-t-60)',
+                            fontVariantNumeric: 'tabular-nums',
+                          }}
+                        >
+                          {rankEmoji(r.rank)}
+                        </span>
+                        <div
+                          style={{
+                            width: 28,
+                            height: 28,
+                            borderRadius: '34%',
+                            overflow: 'hidden',
+                            background:
+                              'linear-gradient(135deg, var(--hcp-bg-3), var(--hcp-bg-2))',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            flexShrink: 0,
+                            color: 'var(--hcp-t-60)',
+                            fontSize: 11,
+                            fontWeight: 700,
+                          }}
+                        >
+                          {photo ? (
+                            <img
+                              src={photo}
+                              alt=""
+                              style={{
+                                width: '100%',
+                                height: '100%',
+                                objectFit: 'cover',
+                                display: 'block',
+                              }}
+                            />
+                          ) : (
+                            (displayName?.[0] ?? '?').toUpperCase()
+                          )}
+                        </div>
+                        <div style={{ flex: 1, minWidth: 0 }}>
+                          <div
+                            style={{
+                              whiteSpace: 'nowrap',
+                              overflow: 'hidden',
+                              textOverflow: 'ellipsis',
+                              fontWeight: r.is_self ? 700 : 600,
+                              color: r.is_self ? AMBER : 'var(--hcp-t-100)',
+                              lineHeight: 1.25,
+                            }}
+                          >
+                            {displayName}
+                            {r.is_self ? ' (you)' : ''}
+                          </div>
+                          {subtitle && (
+                            <div
+                              style={{
+                                fontSize: 11,
+                                color: 'var(--hcp-t-60)',
+                                whiteSpace: 'nowrap',
+                                overflow: 'hidden',
+                                textOverflow: 'ellipsis',
+                                lineHeight: 1.3,
+                                marginTop: 1,
+                              }}
+                            >
+                              {subtitle}
+                            </div>
+                          )}
+                        </div>
+                        <span
+                          style={{
+                            fontVariantNumeric: 'tabular-nums',
+                            color: 'var(--hcp-t-60)',
+                            fontSize: 12,
+                          }}
+                        >
+                          {formatLegendValue(cat, r.value)}
+                        </span>
+                      </div>
+                    );
+                  })}
                 </div>
               </GamCard>
             );
