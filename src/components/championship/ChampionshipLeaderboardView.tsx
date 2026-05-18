@@ -1394,7 +1394,6 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
               background: 'rgba(247,147,30,0.12)',
               border: '1px solid rgba(247,147,30,0.35)',
               fontSize: 10, fontWeight: 800, color: '#9A4A0F',
-              letterSpacing: '0.04em',
             }}>
               <span>Filtering by {activeFilterLabel || '…'}</span>
               <button
