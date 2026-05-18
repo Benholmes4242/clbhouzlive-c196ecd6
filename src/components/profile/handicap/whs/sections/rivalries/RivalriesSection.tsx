@@ -6,6 +6,10 @@ import RivalryAddCard from './RivalryAddCard';
 import RivalryEditSheet from './RivalryEditSheet';
 import { useFriendRivalries, useFriendLeaderboard } from '@/lib/whs/hooks';
 import type { FriendRivalryHydrated } from '@/lib/whs/types';
+import {
+  useRivalryDimension,
+  type RivalryDimension,
+} from '@/lib/whs/utils/useRivalryDimension';
 
 interface Props {
   userId: string;
