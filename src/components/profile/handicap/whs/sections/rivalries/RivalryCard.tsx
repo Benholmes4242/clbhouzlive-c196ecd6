@@ -201,26 +201,9 @@ export const RivalryCard: React.FC<Props> = ({
           >
             {rivalry.shared_rounds_count} ROUNDS
           </span>
-          <button
-            type="button"
-            onClick={(e) => { e.stopPropagation(); onInfo(); }}
-            aria-label="Rivalry info"
-            style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              width: 22,
-              height: 22,
-              borderRadius: '50%',
-              border: 'none',
-              background: 'rgba(255,255,255,0.06)',
-              color: T.whiteMute,
-              cursor: 'pointer',
-              padding: 0,
-            }}
-          >
-            <Info size={12} strokeWidth={2.2} />
-          </button>
+          {showPill && hasH2H && rivalKey && (
+            <CardDimensionPill value={dimension} onChange={setOwnDimension} />
+          )}
         </div>
       </div>
 
