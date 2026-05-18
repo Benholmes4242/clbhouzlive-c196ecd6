@@ -706,17 +706,13 @@ const RoundByRoundSection: React.FC<RoundsProps> = ({
       ) : (
         <div style={{ marginTop: 12, display: 'flex', flexDirection: 'column', gap: 8 }}>
           {visible.map((r, i) => {
-            const dot =
-              r.stableford_outcome === 'W'
-                ? GREEN
-                : r.stableford_outcome === 'L'
-                  ? RED
-                  : GREY;
+            const o = outcomeFor(r, dimension);
+            const dot = o === 'W' ? GREEN : o === 'L' ? RED : GREY;
             const margin = Math.abs(r.user_gross - r.rival_gross);
             let verdict: string;
-            if (r.stableford_outcome === 'W') {
+            if (o === 'W') {
               verdict = `Win for ${leftLabel.toLowerCase() === 'you' ? 'you' : leftLabel} · ${margin} stroke${margin === 1 ? '' : 's'}`;
-            } else if (r.stableford_outcome === 'L') {
+            } else if (o === 'L') {
               verdict = `Win for ${rightLabel} · ${margin} stroke${margin === 1 ? '' : 's'}`;
             } else {
               verdict = `Tied · ${margin === 0 ? 'level' : `${margin} stroke${margin === 1 ? '' : 's'} each`}`;
