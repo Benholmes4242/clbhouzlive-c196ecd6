@@ -81,9 +81,9 @@ function computeAxis(dataMin: number, dataMax: number): {
   return { yMin, yMax, ticks, step };
 }
 
-const Skeleton: React.FC = () => (
+const Skeleton: React.FC<{ title: string }> = ({ title }) => (
   <section style={{ marginTop: 32 }}>
-    <SectionHeader eyebrow="ROUNDS THAT COUNT" title="The 8 best of your last 20" />
+    <SectionHeader eyebrow="ROUNDS THAT COUNT" title={title} />
     <div style={{ padding: '0 20px' }}>
     <div style={{ height: 12, width: 140, background: 'var(--hcp-bg-3)', borderRadius: 2, marginBottom: 10 }} />
     <div style={{ height: 56, background: 'var(--hcp-bg-3)', borderRadius: 12, marginBottom: 12 }} />
