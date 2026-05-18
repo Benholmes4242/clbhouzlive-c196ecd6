@@ -16308,6 +16308,7 @@ export type Database = {
           echo_agreement_count: number | null
           echo_attempted_at: string | null
           echo_reasoning: string | null
+          echo_suggested_golf_course_id: string | null
           golf_course_id: string | null
           match_confidence: number
           match_method: string
@@ -16321,6 +16322,7 @@ export type Database = {
           echo_agreement_count?: number | null
           echo_attempted_at?: string | null
           echo_reasoning?: string | null
+          echo_suggested_golf_course_id?: string | null
           golf_course_id?: string | null
           match_confidence?: number
           match_method?: string
@@ -16334,6 +16336,7 @@ export type Database = {
           echo_agreement_count?: number | null
           echo_attempted_at?: string | null
           echo_reasoning?: string | null
+          echo_suggested_golf_course_id?: string | null
           golf_course_id?: string | null
           match_confidence?: number
           match_method?: string
@@ -16344,6 +16347,13 @@ export type Database = {
           whs_course_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "whs_to_golf_course_map_echo_suggested_golf_course_id_fkey"
+            columns: ["echo_suggested_golf_course_id"]
+            isOneToOne: false
+            referencedRelation: "golf_courses"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "whs_to_golf_course_map_golf_course_id_fkey"
             columns: ["golf_course_id"]
