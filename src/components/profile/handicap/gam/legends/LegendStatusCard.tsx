@@ -114,8 +114,6 @@ export const LegendStatusCard: React.FC<LegendStatusCardProps> = ({
   const { data: topLegends } = useUserTopLegends(userId, { limit: 3, maxRank: 3 });
 
   function handleCardTap() {
-    // Remove the console.log when file 03 ships.
-    console.log('[gam] LegendStatusCard tapped — sheet will open in file 03');
     window.dispatchEvent(
       new CustomEvent('legend-status-sheet:open', {
         detail: { userId, readOnly, friendName },
