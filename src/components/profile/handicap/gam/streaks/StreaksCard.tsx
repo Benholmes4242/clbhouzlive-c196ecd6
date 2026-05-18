@@ -13,6 +13,11 @@ const AMBER = '#F7931E';
 
 interface Props {
   userId: string;
+  /**
+   * Friend-view (read-only) mounts hide the "See all" affordance because the
+   * StreaksSheet is owner-only (mounted only on the viewer's own page).
+   */
+  readOnly?: boolean;
 }
 
 // ──────────────────────────────────────────────────────────────────
