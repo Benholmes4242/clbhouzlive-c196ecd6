@@ -154,39 +154,96 @@ function tokenJaccard(a: string, b: string): number {
   return inter / (sa.size + sb.size - inter);
 }
 
+// GBI country_code allowlist — matches the codes actually present in
+// whs_courses (ENG / GB-SCT / WAL / IE etc.) rather than ISO-2 only.
+const GBI_CODES = new Set([
+  "GB", "GBR",
+  "ENG", "GB-ENG",
+  "SCT", "GB-SCT", "SCO",
+  "WAL", "GB-WAL", "CYM",
+  "NIR", "GB-NIR",
+  "IE", "IRL",
+]);
+const GBI_NAME_RE = /united kingdom|great britain|britain|england|scotland|wales|northern ireland|ireland/i;
+
 async function buildCandidates(
   supabase: any,
   whs: { name: string; country_code: string | null; country_name: string | null },
 ): Promise<Candidate[]> {
   const isGbi =
-    whs.country_code === "GB" ||
-    whs.country_code === "IE" ||
-    !!whs.country_name?.match(/united kingdom|britain|ireland|scotland|wales/i);
+    (whs.country_code ? GBI_CODES.has(whs.country_code.toUpperCase()) : false) ||
+    !!whs.country_name?.match(GBI_NAME_RE);
 
+  // Pull the candidate pool. Bump well past the GBI corpus size (~2.3k)
+  // so we never truncate by row cap.
   let q = supabase
     .from("golf_courses")
     .select("id, name, country, sub_country, club_id, golf_clubs(name)")
-    .limit(2000);
+    .limit(5000);
   if (isGbi) q = q.eq("country", GBI);
   const { data } = await q;
-  if (!data) return [];
+  const pool = (data as any[]) ?? [];
 
   const target = normaliseName(whs.name);
-  const scored = (data as any[])
-    .map((c) => ({
-      id: c.id as string,
-      name: c.name as string,
-      country: (c.country ?? null) as string | null,
-      sub_country: (c.sub_country ?? null) as string | null,
-      club_name: (c.golf_clubs?.name ?? null) as string | null,
-      score: tokenJaccard(target, normaliseName(c.name)),
-    }))
-    .filter((c) => c.score > 0)
+  const scoredById = new Map<
+    string,
+    Candidate & { score: number }
+  >();
+  for (const c of pool) {
+    const score = tokenJaccard(target, normaliseName(c.name));
+    if (score <= 0) continue;
+    scoredById.set(c.id, {
+      id: c.id,
+      name: c.name,
+      country: c.country ?? null,
+      sub_country: c.sub_country ?? null,
+      club_name: c.golf_clubs?.name ?? null,
+      score,
+    });
+  }
+
+  // Belt-and-braces: also seed top trigram matches from Postgres so we
+  // catch real matches that fell outside the row cap or scored 0 on
+  // token-Jaccard (e.g. heavy punctuation differences).
+  try {
+    const { data: tri } = await supabase.rpc("find_best_trigram_match", {
+      input_name: whs.name,
+      country_filter: isGbi ? GBI : null,
+    });
+    const triIds = (tri ?? [])
+      .filter((r: any) => Number(r.similarity ?? 0) >= 0.3)
+      .slice(0, 10)
+      .map((r: any) => r.id as string);
+    const missing = triIds.filter((id) => !scoredById.has(id));
+    if (missing.length > 0) {
+      const { data: extra } = await supabase
+        .from("golf_courses")
+        .select("id, name, country, sub_country, club_id, golf_clubs(name)")
+        .in("id", missing);
+      for (const c of (extra as any[]) ?? []) {
+        scoredById.set(c.id, {
+          id: c.id,
+          name: c.name,
+          country: c.country ?? null,
+          sub_country: c.sub_country ?? null,
+          club_name: c.golf_clubs?.name ?? null,
+          // Synthetic floor so trigram-only matches still sort sensibly.
+          score: Math.max(
+            0.25,
+            tokenJaccard(target, normaliseName(c.name)),
+          ),
+        });
+      }
+    }
+  } catch (e) {
+    console.warn("[gam-course-mapping-echo] trigram seed failed", e);
+  }
+
+  const ranked = Array.from(scoredById.values())
     .sort((a, b) => b.score - a.score)
     .slice(0, 15);
 
-  // Drop the score before sending to LLMs / returning.
-  return scored.map(({ id, name, country, sub_country, club_name }) => ({
+  return ranked.map(({ id, name, country, sub_country, club_name }) => ({
     id,
     name,
     country,
