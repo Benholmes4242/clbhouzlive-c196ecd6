@@ -4,6 +4,7 @@ import {
   Flame, Sparkles, Shield, Medal, Star, Activity, Feather,
   TrendingDown, Map, CircleDot, Crosshair, Scissors,
   ArrowUp, Swords, Minus, Gauge,
+  type LucideIcon,
 } from 'lucide-react';
 import { useRecentUnlocks } from '@/hooks/gam/useRecentUnlocks';
 import { Skeleton, RetryStub } from '../../gam/_shared/GamAtoms';
@@ -13,7 +14,7 @@ import { openTrophiesSheet } from '../trophiesSheetEvents';
 
 const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
 
-const ICON_MAP: Record<string, React.ComponentType<{ size?: number; color?: string }>> = {
+const ICON_MAP: Record<string, LucideIcon> = {
   trophy: Trophy,
   crown: Crown,
   flag: Flag,

@@ -4470,3 +4470,7 @@ em-emoji-picker input:focus {
   0%, 100% { opacity: 0.3; }
   50% { opacity: 0.7; }
 }
+
+.gam-no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
