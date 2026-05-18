@@ -74,8 +74,6 @@ export const TodayView: React.FC<Props> = ({
 
       <LegendStatusCard userId={userId} readOnly={readOnly} />
 
-      <NextRoundWatch connectionId={connectionId} currentHandicap={currentHandicap} />
-
       <Pattern14Card connectionId={connectionId} />
 
       <IndexHistoryCard connectionId={connectionId} />
@@ -84,9 +82,13 @@ export const TodayView: React.FC<Props> = ({
 
       <RoundsThatCountCard connectionId={connectionId} currentHandicap={currentHandicap} />
 
-      <LeaguesCard userId={userId} isOwner={!readOnly} />
-
       {!readOnly && <StreaksCard userId={userId} />}
+
+      {!readOnly && <LeaguesCard userId={userId} isOwner={!readOnly} />}
+
+      {!readOnly && (
+        <NextRoundWatch connectionId={connectionId} currentHandicap={currentHandicap} />
+      )}
 
       {!readOnly && <SinceLastVisitRail userId={userId} />}
 
