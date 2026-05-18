@@ -104,7 +104,7 @@ export default function WhsCourseBridgeReviewPage() {
     let query = supabase
       .from('whs_to_golf_course_map')
       .select(
-        'whs_course_id, golf_course_id, match_confidence, match_method, matched_at, reviewed_at, echo_reasoning, echo_attempted_at, echo_agreement_count, echo_suggested_golf_course_id, whs_courses!inner(name,country_name), golf_courses(name,country,sub_country)',
+        'whs_course_id, golf_course_id, match_confidence, match_method, matched_at, reviewed_at, echo_reasoning, echo_attempted_at, echo_agreement_count, echo_suggested_golf_course_id, whs_courses!inner(name,country_name), golf_courses:golf_courses!whs_to_golf_course_map_golf_course_id_fkey(name,country,sub_country)',
       )
       .order('echo_attempted_at', { ascending: false, nullsFirst: false })
       .order('match_confidence', { ascending: true })
