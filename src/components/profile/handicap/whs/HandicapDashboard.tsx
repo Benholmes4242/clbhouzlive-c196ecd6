@@ -20,11 +20,13 @@ interface Props {
    * viewing a friend's handicap via /handicap/:userId.
    */
   readOnly?: boolean;
+  /** First name of the profile owner — threaded to TodayView for name-prefixed friend-view copy. */
+  ownerFirstName?: string | null;
 }
 
 const DEFAULT_SUBTAB: HandicapSubtab = 'today';
 
-export const HandicapDashboard: React.FC<Props> = ({ connection, userId, readOnly = false }) => {
+export const HandicapDashboard: React.FC<Props> = ({ connection, userId, readOnly = false, ownerFirstName = null }) => {
   const [searchParams] = useSearchParams();
   const lastSyncedAtForInit = connection.last_synced_at ? new Date(connection.last_synced_at) : null;
   const isOldEnoughForReauth =
@@ -59,6 +61,7 @@ export const HandicapDashboard: React.FC<Props> = ({ connection, userId, readOnl
             connectionCreatedAt={connection.created_at}
             readOnly={readOnly}
             showReauthBanner={showReauthBanner}
+            ownerFirstName={ownerFirstName}
           />
         )}
         {activeSubtab === 'trends' && (

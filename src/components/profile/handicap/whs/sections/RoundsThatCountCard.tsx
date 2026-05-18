@@ -11,6 +11,9 @@ import { SectionHeader } from './_shared/atoms';
 interface Props {
   connectionId: string;
   currentHandicap: number | null;
+  /** 'owner' (default) shows first-person copy; 'friend' uses third-person + ownerFirstName. */
+  viewMode?: 'owner' | 'friend';
+  ownerFirstName?: string | null;
 }
 
 // ── Tokens ────────────────────────────────────────────────────────────────
@@ -78,9 +81,9 @@ function computeAxis(dataMin: number, dataMax: number): {
   return { yMin, yMax, ticks, step };
 }
 
-const Skeleton: React.FC = () => (
+const Skeleton: React.FC<{ title: string }> = ({ title }) => (
   <section style={{ marginTop: 32 }}>
-    <SectionHeader eyebrow="ROUNDS THAT COUNT" title="The 8 best of your last 20" />
+    <SectionHeader eyebrow="ROUNDS THAT COUNT" title={title} />
     <div style={{ padding: '0 20px' }}>
     <div style={{ height: 12, width: 140, background: 'var(--hcp-bg-3)', borderRadius: 2, marginBottom: 10 }} />
     <div style={{ height: 56, background: 'var(--hcp-bg-3)', borderRadius: 12, marginBottom: 12 }} />
@@ -95,9 +98,19 @@ const Skeleton: React.FC = () => (
   </section>
 );
 
-export const RoundsThatCountCard: React.FC<Props> = ({ connectionId, currentHandicap }) => {
+export const RoundsThatCountCard: React.FC<Props> = ({
+  connectionId,
+  currentHandicap,
+  viewMode = 'owner',
+  ownerFirstName = null,
+}) => {
   const { data: counters, isLoading: loadingCounters } = useCounters(connectionId);
   const { data: allScores } = useAllScores(connectionId);
+
+  const headerTitle =
+    viewMode === 'friend'
+      ? `The 8 best of ${ownerFirstName ?? 'their'} last 20`
+      : 'The 8 best of your last 20';
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [showExplainer, setShowExplainer] = useState(false);
   const [scrubIdx, setScrubIdx] = useState<number | null>(null);
@@ -175,7 +188,7 @@ export const RoundsThatCountCard: React.FC<Props> = ({ connectionId, currentHand
     return bestIdx;
   }, [colCount]);
 
-  if (loadingCounters) return <Skeleton />;
+  if (loadingCounters) return <Skeleton title={headerTitle} />;
   if (!enriched || currentHandicap == null) return null;
 
   const defaultSelected = enriched.rounds[enriched.rounds.length - 1];
@@ -213,7 +226,7 @@ export const RoundsThatCountCard: React.FC<Props> = ({ connectionId, currentHand
 
   return (
     <section style={{ marginTop: 32 }}>
-      <SectionHeader eyebrow="ROUNDS THAT COUNT" title="The 8 best of your last 20" />
+      <SectionHeader eyebrow="ROUNDS THAT COUNT" title={headerTitle} />
       <div style={{ padding: '0 20px' }}>
 
       {/* Chart — full-bleed on page background, no card wrapper */}
@@ -766,13 +779,13 @@ const AtRiskState: React.FC<{ cutTarget: number; settleAt: number }> = ({
         </span>
       </div>
       <div style={{ fontSize: 13, color: D_T100, lineHeight: 1.45 }}>
-        A good counter is dropping off. Your handicap rises to{' '}
+        A good counter is dropping off. Handicap rises to{' '}
         <strong style={{
           fontWeight: 700, color: RED, fontVariantNumeric: 'tabular-nums',
         }}>
           {fmtDiff(settleAt)}
         </strong>{' '}
-        next round unless you beat your cut target.
+        next round unless the next score beats the cut target.
       </div>
     </div>
 
@@ -809,7 +822,7 @@ const SafeState: React.FC<{ cutTarget: number; settleAt: number }> = ({
         <p style={{
           margin: 0, fontSize: 10.5, color: D_T60, lineHeight: 1.35,
         }}>
-          Beat this and your handicap drops.
+          A score under this drops the handicap.
         </p>
       </div>
       <div style={{
@@ -885,7 +898,7 @@ const CutTargetCard: React.FC<{ cutTarget: number }> = ({ cutTarget }) => (
         </span>
       </div>
       <div style={{ fontSize: 12.5, color: D_T60, marginTop: 6, lineHeight: 1.4 }}>
-        Beat this differential and your handicap drops.
+        A score under this differential drops the handicap.
       </div>
     </div>
   </div>
