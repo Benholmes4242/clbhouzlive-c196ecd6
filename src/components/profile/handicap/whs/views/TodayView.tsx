@@ -13,7 +13,8 @@ import SinceLastVisitRail from '../sections/since-last-visit/SinceLastVisitRail'
 import RecentUnlocksStrip from '../gam/RecentUnlocksStrip';
 import LegendStatusCard from '../../gam/legends/LegendStatusCard';
 import { LegendStatusSheetMount } from '../../gam/legends/LegendStatusSheetMount';
-import LeaguesCard from '../gam/LeaguesCard';
+import LeaguesCard from '../../gam/leagues/LeaguesCard';
+import { LeaguesSheetMount } from '../../gam/leagues/LeaguesSheetMount';
 
 interface Props {
   connection: WhsConnection;
@@ -88,6 +89,7 @@ export const TodayView: React.FC<Props> = ({
       {!readOnly && <SinceLastVisitRail userId={userId} />}
 
       <LegendStatusSheetMount />
+      <LeaguesSheetMount />
     </div>
   );
 };
