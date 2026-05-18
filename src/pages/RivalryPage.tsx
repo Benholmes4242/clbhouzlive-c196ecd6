@@ -1038,20 +1038,9 @@ const RivalryPage: React.FC = () => {
     });
   };
 
-  // Scoring dimension (Stableford default), persisted in localStorage
-  const [dimension, setDimension] = useState<RivalryDimension>(() => {
-    if (typeof window === 'undefined') return 'stableford';
-    const v = window.localStorage.getItem(DIMENSION_STORAGE_KEY);
-    return v === 'gross' ? 'gross' : 'stableford';
-  });
-  const handleDimensionChange = (d: RivalryDimension) => {
-    setDimension(d);
-    try {
-      window.localStorage.setItem(DIMENSION_STORAGE_KEY, d);
-    } catch {
-      /* noop */
-    }
-  };
+  // Scoring dimension — shared with Rivalries section cards
+  const [dimension, handleDimensionChange] = useRivalryDimension();
+
 
   // Owner-view: hydrate "ownerName/ownerThumb/ownerHcp" from viewer profile
   const ownerName = isFriendView
