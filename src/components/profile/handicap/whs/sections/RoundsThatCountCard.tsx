@@ -98,9 +98,19 @@ const Skeleton: React.FC = () => (
   </section>
 );
 
-export const RoundsThatCountCard: React.FC<Props> = ({ connectionId, currentHandicap }) => {
+export const RoundsThatCountCard: React.FC<Props> = ({
+  connectionId,
+  currentHandicap,
+  viewMode = 'owner',
+  ownerFirstName = null,
+}) => {
   const { data: counters, isLoading: loadingCounters } = useCounters(connectionId);
   const { data: allScores } = useAllScores(connectionId);
+
+  const headerTitle =
+    viewMode === 'friend'
+      ? `The 8 best of ${ownerFirstName ?? 'their'} last 20`
+      : 'The 8 best of your last 20';
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [showExplainer, setShowExplainer] = useState(false);
   const [scrubIdx, setScrubIdx] = useState<number | null>(null);
