@@ -19125,6 +19125,30 @@ export type Database = {
         Args: { p_limit?: number }
         Returns: Json
       }
+      get_friend_view_rivalries_for_owner: {
+        Args: { p_owner_user_id: string; p_viewer_id: string }
+        Returns: {
+          computed_at: string
+          gross_record: Json
+          rival_friend_row_id: string | null
+          rival_handicap: number | null
+          rival_trend_delta: number | null
+          rival_user_id: string | null
+          shared_round_results: Json
+          shared_rounds_count: number
+          shared_rounds_last_90d: number
+          slot_index: number
+          slot_kind: string
+          stableford_record: Json
+          user_id: string
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "friend_rivalry"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
       get_friend_view_rivalry: {
         Args: { p_friend_id: string; p_rival_id: string; p_viewer_id: string }
         Returns: {
