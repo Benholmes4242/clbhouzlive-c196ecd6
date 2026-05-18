@@ -93,6 +93,7 @@ export const TodayView: React.FC<Props> = ({
       <LegendStatusSheetMount />
       <LeaguesSheetMount />
       {!readOnly && <StreaksSheetMount />}
+      {!readOnly && <LaunchSheetMount userId={userId} />}
     </div>
   );
 };
