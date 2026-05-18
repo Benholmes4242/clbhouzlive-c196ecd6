@@ -447,7 +447,7 @@ function LedeFactor({ label, value }: { label: string; value: string }) {
     }}>
       <span style={{
         fontSize: 10, fontWeight: 800, color: '#64748B',
-        letterSpacing: '0.12em', textTransform: 'uppercase',
+        letterSpacing: '0.16em', textTransform: 'uppercase',
       }}>
         {label}
       </span>
