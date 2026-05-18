@@ -82,7 +82,7 @@ export const YourNetworkSection: React.FC<YourNetworkSectionProps> = ({ classNam
       {!showEmptyActivityState ? (
         <p style={{
           fontSize: 11, color: '#64748B', margin: '10px 0 0',
-          fontWeight: 600, letterSpacing: '0.10em', textTransform: 'uppercase',
+          fontWeight: 600, letterSpacing: '0.16em', textTransform: 'uppercase',
         }}>
           {pulse.active_friends} ACTIVE · {pulse.new_courses_discovered} COURSES · LAST 30 DAYS
         </p>
