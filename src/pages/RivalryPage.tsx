@@ -251,6 +251,9 @@ const RivalryHero: React.FC<HeroProps> = ({
         borderRadius: 12,
       }}
     >
+      {/* Dimension toggle */}
+      <DimensionToggle value={dimension} onChange={onDimensionChange} />
+
       {/* Big record */}
       <div
         style={{
