@@ -352,12 +352,8 @@ const RivalryHero: React.FC<HeroProps> = ({
               {[0, 1, 2].map((i) => {
                 const r = last3[i];
                 if (!r) return <Dot key={i} tone="empty" />;
-                const tone =
-                  r.stableford_outcome === 'W'
-                    ? 'win'
-                    : r.stableford_outcome === 'L'
-                      ? 'loss'
-                      : 'tie';
+                const o = outcomeFor(r, dimension);
+                const tone = o === 'W' ? 'win' : o === 'L' ? 'loss' : 'tie';
                 return <Dot key={i} tone={tone} />;
               })}
             </span>
