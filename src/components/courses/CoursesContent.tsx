@@ -333,7 +333,7 @@ const CoursesContent: React.FC<CoursesContentProps> = ({ username, displayName }
               >
                 <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                   <Star size={14} fill="#F7931E" color="#F7931E" strokeWidth={0} />
-                  <span style={{ fontSize: 13.5, fontWeight: 600, color: '#0F172A' }}>
+                  <span style={{ fontSize: 13, fontWeight: 600, color: '#0F172A' }}>
                     Rate a course you've played
                   </span>
                 </div>
