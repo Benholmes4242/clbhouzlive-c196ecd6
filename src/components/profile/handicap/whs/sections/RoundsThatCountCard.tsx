@@ -226,7 +226,7 @@ export const RoundsThatCountCard: React.FC<Props> = ({
 
   return (
     <section style={{ marginTop: 32 }}>
-      <SectionHeader eyebrow="ROUNDS THAT COUNT" title="The 8 best of your last 20" />
+      <SectionHeader eyebrow="ROUNDS THAT COUNT" title={headerTitle} />
       <div style={{ padding: '0 20px' }}>
 
       {/* Chart — full-bleed on page background, no card wrapper */}
