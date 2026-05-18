@@ -58,32 +58,29 @@ export const RivalriesSection: React.FC<Props> = ({ userId }) => {
         
         right={
           hasFilled && hasAnyH2HData ? (
-            <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
-              <DimensionPill value={dimension} onChange={setDimension} />
-              <button
-                onClick={() => {
-                  const first = filledRivalries[0];
-                  setEditTarget({ rivalry: first, slotIndex: first.slot_index });
-                }}
-                style={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: 4,
-                  padding: '4px 10px',
-                  background: 'transparent',
-                  border: '1px solid var(--hcp-line-2)',
-                  borderRadius: 999,
-                  cursor: 'pointer',
-                  color: 'var(--hcp-t-80)',
-                  fontSize: 10,
-                  fontWeight: 800,
-                  letterSpacing: '0.14em',
-                }}
-              >
-                <Pencil size={11} strokeWidth={2.4} />
-                EDIT
-              </button>
-            </div>
+            <button
+              onClick={() => {
+                const first = filledRivalries[0];
+                setEditTarget({ rivalry: first, slotIndex: first.slot_index });
+              }}
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 4,
+                padding: '4px 10px',
+                background: 'transparent',
+                border: '1px solid var(--hcp-line-2)',
+                borderRadius: 999,
+                cursor: 'pointer',
+                color: 'var(--hcp-t-80)',
+                fontSize: 10,
+                fontWeight: 800,
+                letterSpacing: '0.14em',
+              }}
+            >
+              <Pencil size={11} strokeWidth={2.4} />
+              EDIT
+            </button>
           ) : null
         }
       />
