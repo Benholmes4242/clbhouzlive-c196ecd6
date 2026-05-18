@@ -408,16 +408,16 @@ export function CoursesLeaderboardView() {
       <div style={{ padding: '20px 20px 14px', borderBottom: '3px double #0F172A', textAlign: 'center', background: '#F8FAFC' }}>
         <div style={{
           display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 6,
-          fontSize: 11, fontWeight: 800, color: '#9F1D1D', letterSpacing: '0.18em',
+          fontSize: 11, fontWeight: 800, color: '#9F1D1D', letterSpacing: '0.16em',
           marginBottom: 12, minHeight: 14,
         }}>
           <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#9F1D1D' }} />
           <span>RANKINGS REFRESHED DAILY</span>
         </div>
-        <h1 style={{ fontSize: 38, fontWeight: 900, letterSpacing: '-0.035em', margin: 0, lineHeight: 0.95, color: '#0F172A' }}>
+        <h1 style={{ fontSize: 38, fontWeight: 800, letterSpacing: '-0.025em', margin: 0, lineHeight: 0.95, color: '#0F172A' }}>
           The Course Record
         </h1>
-        <div style={{ fontSize: 11, fontWeight: 600, letterSpacing: '0.32em', color: '#64748B', marginTop: 6 }}>
+        <div style={{ fontSize: 11, fontWeight: 600, letterSpacing: '0.16em', color: '#64748B', marginTop: 6 }}>
           THE WORLD'S GREATEST COURSES
         </div>
       </div>
