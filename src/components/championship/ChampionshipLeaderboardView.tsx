@@ -1470,7 +1470,7 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
                 style={{
                   background: 'none', border: 'none', cursor: 'pointer',
                   fontSize: 12, fontWeight: 800, color: '#9F1D1D',
-                  letterSpacing: '0.18em',
+                  letterSpacing: '0.16em',
                 }}
               >
                 FIND FRIENDS →
