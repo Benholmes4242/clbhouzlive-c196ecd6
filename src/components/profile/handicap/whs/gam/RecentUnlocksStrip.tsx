@@ -3,7 +3,7 @@ import { useRecentUnlocks } from '@/hooks/gam/useRecentUnlocks';
 import { Skeleton, RetryStub } from '../../gam/_shared/GamAtoms';
 import { relativeTime } from '@/lib/gam/visuals';
 import type { RecentUnlock } from '@/lib/gam/types';
-import { openTrophiesSheet } from '../trophiesSheetEvents';
+import { openGamAchievements } from './events';
 import { renderBadgeIcon } from './badgeIcons';
 
 const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';

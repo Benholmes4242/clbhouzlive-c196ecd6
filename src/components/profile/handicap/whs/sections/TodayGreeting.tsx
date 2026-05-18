@@ -14,7 +14,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAllScores } from '@/lib/whs/hooks';
 import { useUserProfile } from '@/hooks/useUserProfile';
 import { useTodayWeather } from '@/lib/whs/useTodayWeather';
-import { openTrophiesSheet } from '@/components/profile/handicap/whs/trophiesSheetEvents';
+import { openGamAchievements } from '@/components/profile/handicap/whs/gam/events';
 
 const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
 
