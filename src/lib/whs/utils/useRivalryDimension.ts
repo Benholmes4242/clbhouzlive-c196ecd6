@@ -1,43 +1,75 @@
 /**
- * Shared scoring-dimension preference for Rivalries UI.
- * Persisted in localStorage under `hcp-rivalry-dimension`.
- * Used by both the Rivalries section cards and the deep-view page so
- * the user's choice sticks across surfaces.
+ * Per-rivalry scoring-dimension preference.
+ * Persisted as a JSON map in localStorage under `hcp-rivalry-dimension-map`,
+ * keyed by rivalId (rival_user_id or rival_friend_row_id). Falls back to
+ * 'stableford' when a key has no stored value.
+ *
+ * Used by both the Rivalries section cards and the deep-view page so the
+ * user's per-rival choice sticks across surfaces and reloads.
  */
 import { useCallback, useEffect, useState } from 'react';
 
 export type RivalryDimension = 'stableford' | 'gross';
-export const RIVALRY_DIMENSION_KEY = 'hcp-rivalry-dimension';
-const RIVALRY_DIMENSION_EVENT = 'hcp-rivalry-dimension-change';
+const STORAGE_KEY = 'hcp-rivalry-dimension-map';
+const CHANGE_EVENT = 'hcp-rivalry-dimension-change';
 
-function read(): RivalryDimension {
-  if (typeof window === 'undefined') return 'stableford';
-  const v = window.localStorage.getItem(RIVALRY_DIMENSION_KEY);
+type DimensionMap = Record<string, RivalryDimension>;
+
+function readMap(): DimensionMap {
+  if (typeof window === 'undefined') return {};
+  try {
+    const raw = window.localStorage.getItem(STORAGE_KEY);
+    if (!raw) return {};
+    const parsed = JSON.parse(raw);
+    return parsed && typeof parsed === 'object' ? (parsed as DimensionMap) : {};
+  } catch {
+    return {};
+  }
+}
+
+function readOne(key: string | null | undefined): RivalryDimension {
+  if (!key) return 'stableford';
+  const v = readMap()[key];
   return v === 'gross' ? 'gross' : 'stableford';
 }
 
-export function useRivalryDimension(): [RivalryDimension, (d: RivalryDimension) => void] {
-  const [value, setValue] = useState<RivalryDimension>(read);
+export function useRivalryDimension(
+  key: string | null | undefined,
+): [RivalryDimension, (d: RivalryDimension) => void] {
+  const [value, setValue] = useState<RivalryDimension>(() => readOne(key));
 
   useEffect(() => {
-    const onChange = () => setValue(read());
-    window.addEventListener(RIVALRY_DIMENSION_EVENT, onChange);
-    window.addEventListener('storage', onChange);
-    return () => {
-      window.removeEventListener(RIVALRY_DIMENSION_EVENT, onChange);
-      window.removeEventListener('storage', onChange);
+    setValue(readOne(key));
+    const onChange = (e: Event) => {
+      const detail = (e as CustomEvent<{ key?: string }>).detail;
+      // Only re-read when the change affects our key (or unknown origin)
+      if (!detail?.key || detail.key === key) {
+        setValue(readOne(key));
+      }
     };
-  }, []);
+    const onStorage = () => setValue(readOne(key));
+    window.addEventListener(CHANGE_EVENT, onChange as EventListener);
+    window.addEventListener('storage', onStorage);
+    return () => {
+      window.removeEventListener(CHANGE_EVENT, onChange as EventListener);
+      window.removeEventListener('storage', onStorage);
+    };
+  }, [key]);
 
-  const update = useCallback((d: RivalryDimension) => {
-    setValue(d);
-    try {
-      window.localStorage.setItem(RIVALRY_DIMENSION_KEY, d);
-      window.dispatchEvent(new Event(RIVALRY_DIMENSION_EVENT));
-    } catch {
-      /* noop */
-    }
-  }, []);
+  const update = useCallback(
+    (d: RivalryDimension) => {
+      setValue(d);
+      if (!key) return;
+      try {
+        const next = { ...readMap(), [key]: d };
+        window.localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
+        window.dispatchEvent(new CustomEvent(CHANGE_EVENT, { detail: { key } }));
+      } catch {
+        /* noop */
+      }
+    },
+    [key],
+  );
 
   return [value, update];
 }
