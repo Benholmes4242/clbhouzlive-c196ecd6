@@ -188,7 +188,7 @@ export const RoundsThatCountCard: React.FC<Props> = ({
     return bestIdx;
   }, [colCount]);
 
-  if (loadingCounters) return <Skeleton />;
+  if (loadingCounters) return <Skeleton title={headerTitle} />;
   if (!enriched || currentHandicap == null) return null;
 
   const defaultSelected = enriched.rounds[enriched.rounds.length - 1];
