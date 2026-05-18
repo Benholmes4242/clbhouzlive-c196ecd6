@@ -68,8 +68,11 @@ export interface CourseLegendRow {
   category: LegendCategory;
   rank: number;
   user_id: string;
+  user_display_name: string | null;
   user_photo_url: string | null;
-  home_club: string | null;
+  user_home_club: string | null;
+  /** @deprecated use user_home_club */
+  home_club?: string | null;
   value: number;
   attained_at: string;
   is_self: boolean;
