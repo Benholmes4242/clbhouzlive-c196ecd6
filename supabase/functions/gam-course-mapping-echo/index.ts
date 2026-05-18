@@ -282,6 +282,20 @@ missing from our table entirely, return CREATE_NEW. Watch for multi-course
 clubs where the WHS row encodes the layout (e.g. "Old Course", "West") —
 match to the specific course, not the parent club.
 
+Identity rules (apply in order):
+1. Physical identity wins. If the name, club, and layout clearly refer to
+   the same physical course, return MATCH even when secondary metadata
+   disagrees. Treat country / sub_country as TIE-BREAKERS between
+   otherwise-equivalent candidates, NOT as disqualifiers — WHS country
+   codes are frequently miscoded (e.g. Northern Ireland courses tagged
+   "IE", Portugal courses bucketed as "Continental Europe", apostrophes
+   and "The " prefixes dropped, "do" vs "da" typos).
+2. Prefer MATCH over CREATE_NEW whenever a candidate is plausibly the same
+   physical course. Only return CREATE_NEW when you are confident NONE of
+   the 15 candidates is the same course AND the WHS course is real.
+3. Spelling variants of the same proper noun (St George's / St Georges,
+   Prince's / Princes, Quinta do / Quinta da) are the same course.
+
 Respond with EXACTLY this JSON shape:
 {
   "decision": "MATCH" | "NO_MATCH" | "CREATE_NEW",
