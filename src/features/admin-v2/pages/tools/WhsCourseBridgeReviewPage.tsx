@@ -28,10 +28,12 @@ interface GolfSearchResult {
 }
 
 const METHOD_FILTERS = [
+  'queue',
   'all',
   'unreviewed',
   'echo_review',
   'create_new_course_suggested',
+  'create_new_course_pending',
   'echo_consensus',
   'echo_consensus_majority',
   'echo_review_confirmed',
@@ -56,10 +58,38 @@ const ECHO_METHODS = new Set([
   'echo_review_rejected',
   'echo_no_match',
   'create_new_course_suggested',
+  'create_new_course_pending',
 ]);
 
+const MAPPED_METHODS_FOR_TELEMETRY = new Set<string>([
+  'echo_consensus',
+  'echo_consensus_majority',
+  'echo_review_confirmed',
+  'echo_review_override',
+  'trigram_high',
+  'trigram_medium',
+  'normalised_name',
+  'exact_name',
+  'marker_aware',
+  'manual',
+]);
+
+interface Telemetry {
+  totalWhs: number;
+  mapped: number;
+  queueDepth: number;
+  last24hProcessed: number;
+  last24hAutoApplied: number;
+  last24hForReview: number;
+  last24hNoMatch: number;
+}
+
+// Simple module-level cache for telemetry (staleTime 60s per brief)
+let telemetryCache: { value: Telemetry; ts: number } | null = null;
+const TELEMETRY_STALE_MS = 60_000;
+
 export default function WhsCourseBridgeReviewPage() {
-  const [filter, setFilter] = useState('echo_review');
+  const [filter, setFilter] = useState<string>('queue');
   const [rows, setRows] = useState<BridgeRow[]>([]);
   const [loading, setLoading] = useState(false);
   const [searchById, setSearchById] = useState<Record<string, string>>({});
@@ -67,6 +97,7 @@ export default function WhsCourseBridgeReviewPage() {
   const [stats, setStats] = useState<Record<string, number>>({});
   const [suggestedById, setSuggestedById] = useState<Record<string, GolfSearchResult>>({});
   const [expandedReasoning, setExpandedReasoning] = useState<Record<string, boolean>>({});
+  const [telemetry, setTelemetry] = useState<Telemetry | null>(telemetryCache?.value ?? null);
 
   const load = async () => {
     setLoading(true);
@@ -79,8 +110,15 @@ export default function WhsCourseBridgeReviewPage() {
       .order('match_confidence', { ascending: true })
       .limit(200);
 
-    if (filter === 'unreviewed') query = query.is('reviewed_at', null);
-    else if (filter !== 'all') query = query.eq('match_method', filter);
+    if (filter === 'queue') {
+      query = query
+        .in('match_method', ['echo_review', 'create_new_course_suggested'])
+        .is('reviewed_at', null);
+    } else if (filter === 'unreviewed') {
+      query = query.is('reviewed_at', null);
+    } else if (filter !== 'all') {
+      query = query.eq('match_method', filter);
+    }
 
     const { data, error } = await query;
     if (error) {
@@ -90,12 +128,9 @@ export default function WhsCourseBridgeReviewPage() {
       const list = (data ?? []) as unknown as BridgeRow[];
       setRows(list);
 
-      // Hydrate suggested course names for echo_review / create_new_course_suggested rows
       const suggestedIds = Array.from(
         new Set(
-          list
-            .map((r) => r.echo_suggested_golf_course_id)
-            .filter((v): v is string => !!v),
+          list.map((r) => r.echo_suggested_golf_course_id).filter((v): v is string => !!v),
         ),
       );
       if (suggestedIds.length > 0) {
@@ -114,18 +149,88 @@ export default function WhsCourseBridgeReviewPage() {
   const loadStats = async () => {
     const { data } = await supabase
       .from('whs_to_golf_course_map')
-      .select('match_method')
+      .select('match_method, reviewed_at')
       .limit(50000);
     const counts: Record<string, number> = {};
+    let queueDepth = 0;
     for (const r of data ?? []) {
       const m = (r as any).match_method as string;
       counts[m] = (counts[m] ?? 0) + 1;
+      const reviewed = (r as any).reviewed_at;
+      if (!reviewed && (m === 'echo_review' || m === 'create_new_course_suggested')) {
+        queueDepth += 1;
+      }
     }
+    counts['queue'] = queueDepth;
     setStats(counts);
   };
 
+  const loadTelemetry = async (force = false) => {
+    if (!force && telemetryCache && Date.now() - telemetryCache.ts < TELEMETRY_STALE_MS) {
+      setTelemetry(telemetryCache.value);
+      return;
+    }
+    // Query 1: total whs + mapping rollup
+    const { data: mappingData } = await supabase
+      .from('whs_to_golf_course_map')
+      .select('match_method, golf_course_id, reviewed_at')
+      .limit(50000);
+
+    // Total WHS courses (independent count, since not every whs course must be in map)
+    const { count: totalWhsCount } = await supabase
+      .from('whs_courses')
+      .select('*', { count: 'exact', head: true });
+
+    let mapped = 0;
+    let queueDepth = 0;
+    for (const r of mappingData ?? []) {
+      const m = (r as any).match_method as string;
+      const gcid = (r as any).golf_course_id;
+      const reviewed = (r as any).reviewed_at;
+      if (gcid && MAPPED_METHODS_FOR_TELEMETRY.has(m)) mapped += 1;
+      if (!reviewed && (m === 'echo_review' || m === 'create_new_course_suggested')) {
+        queueDepth += 1;
+      }
+    }
+
+    // Query 2: last 24h Echo activity
+    const since = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+    const { data: last24 } = await supabase
+      .from('whs_to_golf_course_map')
+      .select('match_method')
+      .gte('echo_attempted_at', since)
+      .limit(50000);
+
+    let processed = 0;
+    let autoApplied = 0;
+    let forReview = 0;
+    let noMatch = 0;
+    for (const r of last24 ?? []) {
+      const m = (r as any).match_method as string;
+      processed += 1;
+      if (m === 'echo_consensus' || m === 'echo_consensus_majority') autoApplied += 1;
+      else if (m === 'echo_review' || m === 'create_new_course_suggested') forReview += 1;
+      else if (m === 'echo_no_match') noMatch += 1;
+    }
+
+    const value: Telemetry = {
+      totalWhs: totalWhsCount ?? 0,
+      mapped,
+      queueDepth,
+      last24hProcessed: processed,
+      last24hAutoApplied: autoApplied,
+      last24hForReview: forReview,
+      last24hNoMatch: noMatch,
+    };
+    telemetryCache = { value, ts: Date.now() };
+    setTelemetry(value);
+  };
+
   useEffect(() => { load(); }, [filter]);
-  useEffect(() => { loadStats(); }, []);
+  useEffect(() => {
+    loadStats();
+    loadTelemetry();
+  }, []);
 
   const runBackfill = async () => {
     toast('Running backfill…');
@@ -135,6 +240,7 @@ export default function WhsCourseBridgeReviewPage() {
     if (error) toast.error('Backfill failed', { description: error.message });
     else toast('Backfill done', { description: JSON.stringify(data).slice(0, 200) });
     loadStats();
+    loadTelemetry(true);
     load();
   };
 
@@ -172,6 +278,7 @@ export default function WhsCourseBridgeReviewPage() {
       toast(successMsg);
       load();
       loadStats();
+      loadTelemetry(true);
     }
   };
 
@@ -215,9 +322,19 @@ export default function WhsCourseBridgeReviewPage() {
     );
   };
 
+  const markCreateNewPending = (row: BridgeRow) => {
+    writeReview(
+      row,
+      {
+        match_method: 'create_new_course_pending',
+        // intentionally no golf_course_id change
+      },
+      'Marked for new course creation',
+    );
+  };
+
   // ── Legacy non-Echo actions (preserved) ───────────────────────────
-  const confirmCurrent = (row: BridgeRow) =>
-    writeReview(row, {}, 'Confirmed');
+  const confirmCurrent = (row: BridgeRow) => writeReview(row, {}, 'Confirmed');
 
   const overrideMatch = (row: BridgeRow, golfCourseId: string) => {
     const isEchoRow = ECHO_METHODS.has(row.match_method);
@@ -234,22 +351,13 @@ export default function WhsCourseBridgeReviewPage() {
   };
 
   const totalRows = useMemo(
-    () => Object.values(stats).reduce((a, b) => a + b, 0),
+    () => Object.entries(stats).filter(([k]) => k !== 'queue').reduce((a, [, b]) => a + b, 0),
     [stats],
   );
 
-  // ── Telemetry counts ──────────────────────────────────────────────
-  const unreviewedEchoReview = stats['echo_review'] ?? 0;
-  const unreviewedCreateNew = stats['create_new_course_suggested'] ?? 0;
-  const consensusMajority = stats['echo_consensus_majority'] ?? 0;
-  const confirmedCount = stats['echo_review_confirmed'] ?? 0;
-  const overrideCount = stats['echo_review_override'] ?? 0;
-  const rejectedCount = stats['echo_review_rejected'] ?? 0;
-  const reviewActionTotal = confirmedCount + overrideCount + rejectedCount;
-  const confirmRatio =
-    reviewActionTotal > 0
-      ? `${Math.round((confirmedCount / reviewActionTotal) * 100)}%`
-      : '—';
+  const mappedPct = telemetry && telemetry.totalWhs > 0
+    ? `${((telemetry.mapped / telemetry.totalWhs) * 100).toFixed(1)}%`
+    : '—';
 
   return (
     <div className="p-6 space-y-6">
@@ -263,20 +371,45 @@ export default function WhsCourseBridgeReviewPage() {
         <Button onClick={runBackfill}>Run backfill (500 rows)</Button>
       </div>
 
-      {/* Echo telemetry pane */}
-      <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
-        <TelemetryStat label="Awaiting review" value={unreviewedEchoReview} tone="warn" />
-        <TelemetryStat label="Suggest create-new" value={unreviewedCreateNew} tone="warn" />
-        <TelemetryStat label="Rule B (majority)" value={consensusMajority} />
-        <TelemetryStat label="Confirm ratio" value={confirmRatio} />
+      {/* Telemetry pane (Brief 5 Phase 1b v1) */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         <TelemetryStat
-          label="Confirmed / Override / Reject"
-          value={`${confirmedCount} / ${overrideCount} / ${rejectedCount}`}
+          label="Total WHS courses"
+          value={telemetry?.totalWhs ?? '—'}
+        />
+        <TelemetryStat
+          label="Mapped"
+          value={
+            telemetry
+              ? `${telemetry.mapped} (${mappedPct})`
+              : '—'
+          }
+        />
+        <TelemetryStat
+          label="Queue depth"
+          value={telemetry?.queueDepth ?? '—'}
+          tone={telemetry && telemetry.queueDepth > 0 ? 'warn' : undefined}
+        />
+        <TelemetryStat
+          label="Last 24h Echo"
+          value={
+            telemetry
+              ? `${telemetry.last24hProcessed} processed`
+              : '—'
+          }
+          sub={
+            telemetry
+              ? `${telemetry.last24hAutoApplied} auto · ${telemetry.last24hForReview} review${
+                  telemetry.last24hNoMatch ? ` · ${telemetry.last24hNoMatch} no-match` : ''
+                }`
+              : undefined
+          }
         />
       </div>
 
       <div className="flex gap-2 flex-wrap text-xs">
         {Object.entries(stats)
+          .filter(([k]) => k !== 'queue')
           .sort(([a], [b]) => a.localeCompare(b))
           .map(([k, v]) => (
             <Badge key={k} variant="outline">{k}: {v}</Badge>
@@ -292,7 +425,7 @@ export default function WhsCourseBridgeReviewPage() {
             variant={filter === m ? 'default' : 'outline'}
             onClick={() => setFilter(m)}
           >
-            {m}
+            {m === 'queue' ? 'Queue' : m}
             {stats[m] != null && <span className="ml-1.5 opacity-60">({stats[m]})</span>}
           </Button>
         ))}
@@ -322,7 +455,7 @@ export default function WhsCourseBridgeReviewPage() {
                   <Badge variant="secondary">{row.match_method}</Badge>
                   <Badge variant="outline">conf {row.match_confidence?.toFixed?.(2) ?? '—'}</Badge>
                   {row.echo_agreement_count != null && (
-                    <Badge variant="outline">{row.echo_agreement_count}/3 LLMs</Badge>
+                    <Badge variant="outline">{row.echo_agreement_count}/3</Badge>
                   )}
                   {row.reviewed_at && <Badge variant="default">reviewed</Badge>}
                 </div>
@@ -360,26 +493,28 @@ export default function WhsCourseBridgeReviewPage() {
                 </div>
               )}
 
-              {/* Echo reasoning */}
+              {/* Echo reasoning — 2-line clamp by default, expand on tap */}
               {row.echo_reasoning && (
-                <div>
-                  <button
-                    className="text-xs text-muted-foreground underline"
-                    onClick={() =>
-                      setExpandedReasoning((s) => ({
-                        ...s,
-                        [row.whs_course_id]: !reasoningOpen,
-                      }))
+                <button
+                  className="block w-full text-left text-xs text-muted-foreground bg-muted/30 hover:bg-muted/50 rounded px-2 py-1.5 transition-colors"
+                  onClick={() =>
+                    setExpandedReasoning((s) => ({
+                      ...s,
+                      [row.whs_course_id]: !reasoningOpen,
+                    }))
+                  }
+                  title={reasoningOpen ? 'Tap to collapse' : 'Tap to expand'}
+                >
+                  <div
+                    className={
+                      reasoningOpen
+                        ? 'whitespace-pre-wrap'
+                        : 'line-clamp-2 whitespace-pre-wrap'
                     }
                   >
-                    {reasoningOpen ? 'Hide' : 'Show'} Echo reasoning
-                  </button>
-                  {reasoningOpen && (
-                    <pre className="mt-2 text-xs whitespace-pre-wrap bg-muted/50 p-2 rounded max-h-64 overflow-auto">
-                      {row.echo_reasoning}
-                    </pre>
-                  )}
-                </div>
+                    {row.echo_reasoning}
+                  </div>
+                </button>
               )}
 
               {/* Actions */}
@@ -390,13 +525,8 @@ export default function WhsCourseBridgeReviewPage() {
                   </Button>
                 )}
                 {isCreateNew && !row.reviewed_at && (
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    disabled
-                    title="Create-new workflow lands in Phase 4"
-                  >
-                    Create new course (Phase 4)
+                  <Button size="sm" onClick={() => markCreateNewPending(row)}>
+                    Mark for new course creation
                   </Button>
                 )}
                 {!isEchoReview && !isCreateNew && row.golf_course_id && !row.reviewed_at && (
@@ -452,10 +582,12 @@ export default function WhsCourseBridgeReviewPage() {
 function TelemetryStat({
   label,
   value,
+  sub,
   tone,
 }: {
   label: string;
   value: string | number;
+  sub?: string;
   tone?: 'warn';
 }) {
   return (
@@ -469,6 +601,9 @@ function TelemetryStat({
     >
       <div className="text-[11px] uppercase tracking-wide text-muted-foreground">{label}</div>
       <div className="text-lg font-semibold tabular-nums mt-0.5">{value}</div>
+      {sub && (
+        <div className="text-[11px] text-muted-foreground tabular-nums mt-0.5">{sub}</div>
+      )}
     </div>
   );
 }
