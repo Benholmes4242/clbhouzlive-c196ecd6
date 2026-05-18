@@ -295,6 +295,13 @@ Identity rules (apply in order):
    the 15 candidates is the same course AND the WHS course is real.
 3. Spelling variants of the same proper noun (St George's / St Georges,
    Prince's / Princes, Quinta do / Quinta da) are the same course.
+4. Country-code data errors NEVER block a MATCH. If the name unambiguously
+   identifies a real-world course (e.g. "Royal Portrush-Dunluce"), match
+   it to the corresponding candidate regardless of any country_code /
+   sub_country disagreement. Worked example: WHS "Royal Portrush-Dunluce"
+   with country_code=IE MUST match candidate "Royal Portrush Golf Club
+   (Dunluce)" with sub_country=Northern Ireland — same physical course,
+   the IE tag is a known WHS bucketing quirk for the island of Ireland.
 
 Respond with EXACTLY this JSON shape:
 {
