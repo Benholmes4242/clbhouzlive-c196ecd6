@@ -711,7 +711,6 @@ export function ExplorationTab() {
                       fontSize: 11,
                       fontWeight: 800,
                       color: INK_FAINT,
-                      letterSpacing: '0.06em',
                       fontVariantNumeric: 'tabular-nums lining-nums',
                     }}
                   >
@@ -743,7 +742,6 @@ export function ExplorationTab() {
                 color: INK_FAINT,
                 fontStyle: 'italic',
                 textAlign: 'center',
-                letterSpacing: '0.04em',
               }}
             >
               Based on your global standings · Updated daily
