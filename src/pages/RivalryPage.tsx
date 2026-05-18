@@ -377,6 +377,63 @@ const RivalryHero: React.FC<HeroProps> = ({
   );
 };
 
+// ── Dimension toggle (Stableford ↔ Gross) ──────────────────────────────
+const DimensionToggle: React.FC<{
+  value: RivalryDimension;
+  onChange: (d: RivalryDimension) => void;
+}> = ({ value, onChange }) => {
+  const opts: { id: RivalryDimension; label: string }[] = [
+    { id: 'stableford', label: 'Stableford' },
+    { id: 'gross', label: 'Gross' },
+  ];
+  return (
+    <div
+      role="tablist"
+      aria-label="Scoring dimension"
+      style={{
+        display: 'inline-flex',
+        margin: '0 auto 16px',
+        padding: 3,
+        background: BG_2,
+        border: `1px solid ${LINE}`,
+        borderRadius: 999,
+        gap: 2,
+        // center the inline-flex inside the flex column hero
+        alignSelf: 'center',
+      }}
+    >
+      {opts.map((o) => {
+        const active = o.id === value;
+        return (
+          <button
+            key={o.id}
+            role="tab"
+            aria-selected={active}
+            type="button"
+            onClick={() => onChange(o.id)}
+            style={{
+              padding: '6px 14px',
+              borderRadius: 999,
+              border: 'none',
+              cursor: 'pointer',
+              fontFamily: FONT,
+              fontSize: 12,
+              fontWeight: 700,
+              letterSpacing: '0.04em',
+              textTransform: 'uppercase',
+              background: active ? AMBER : 'transparent',
+              color: active ? '#0F172A' : T60,
+              transition: 'background-color 150ms ease, color 150ms ease',
+            }}
+          >
+            {o.label}
+          </button>
+        );
+      })}
+    </div>
+  );
+};
+
 const Stack: React.FC<{ name: string; hcp: number | null; url: string | null }> = ({
   name,
   hcp,
