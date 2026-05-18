@@ -17980,6 +17980,10 @@ export type Database = {
         Args: { p_message_id: string }
         Returns: undefined
       }
+      detect_shared_rounds: {
+        Args: { p_rival_user_id: string; p_user_id: string }
+        Returns: Json
+      }
       disablelongtransactions: { Args: never; Returns: string }
       dismiss_golfer_candidate: {
         Args: { p_reason?: string; p_user_id: string }
