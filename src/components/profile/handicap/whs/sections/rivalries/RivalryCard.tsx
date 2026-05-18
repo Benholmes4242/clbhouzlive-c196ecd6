@@ -44,16 +44,19 @@ interface StreakInfo {
 
 function computeStreak(
   results: FriendRivalryHydrated['shared_round_results'],
+  dimension: RivalryDimension,
 ): StreakInfo | null {
   if (!results || results.length === 0) return null;
   const sorted = [...results].sort(
     (a, b) => new Date(b.play_date).getTime() - new Date(a.play_date).getTime(),
   );
-  const head = sorted[0].stableford_outcome;
+  const pick = (r: typeof sorted[number]) =>
+    dimension === 'gross' ? r.gross_outcome : r.stableford_outcome;
+  const head = pick(sorted[0]);
   if (head === 'T') return null;
   let count = 1;
   for (let i = 1; i < sorted.length; i++) {
-    if (sorted[i].stableford_outcome === head) count++;
+    if (pick(sorted[i]) === head) count++;
     else break;
   }
   return { who: head === 'W' ? 'you' : 'them', count };
