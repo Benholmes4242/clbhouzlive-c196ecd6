@@ -16,7 +16,7 @@ import { useNavigate, Navigate, useSearchParams, useParams } from 'react-router-
 import { ChevronRight, Trophy, Activity, Bell } from 'lucide-react';
 import GamMount from '@/components/profile/handicap/whs/gam/GamMount';
 import { openNotifications } from '@/components/profile/handicap/whs/gam/events';
-import { openTrophiesSheet } from '@/components/profile/handicap/whs/trophiesSheetEvents';
+
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { PageRoot } from '@/components/layout/PageRoot';

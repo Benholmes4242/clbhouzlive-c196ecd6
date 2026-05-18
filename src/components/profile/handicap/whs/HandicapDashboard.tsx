@@ -97,7 +97,7 @@ export const HandicapDashboard: React.FC<Props> = ({ connection, userId, readOnl
         <WhsConnectionCaption membershipNumber={connection.membership_number} />
       )}
 
-      {/* Legacy TrophiesSheetMount removed — GamAchievementsSheet is mounted via GamMount on HandicapPage. */}
+      
 
       <style>{`
         @keyframes handicapViewFadeSlide {

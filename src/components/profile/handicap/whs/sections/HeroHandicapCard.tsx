@@ -4,7 +4,7 @@ import { useHandicapHistory, useHandicapTrend, useAllScores } from '@/lib/whs/ho
 import HandicapRingsInfoSheet from './HandicapRingsInfoSheet';
 import { whsDisplayedHcp, formatDisplayedHcp, fmtDiff } from '@/lib/whs/format';
 import type { WhsConnection, HandicapPoint } from '@/lib/whs/types';
-import { openTrophiesSheet } from '../trophiesSheetEvents';
+import { openGamAchievements } from '../gam/events';
 import { predictHandicap } from './trends/predictHandicap';
 
 interface Props {
