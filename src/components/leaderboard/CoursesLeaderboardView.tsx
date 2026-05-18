@@ -720,8 +720,8 @@ export function CoursesLeaderboardView() {
 
                 {/* Rating */}
                 <span style={{
-                  fontSize: 22, fontWeight: 900, textAlign: 'right',
-                  color: '#0F172A', letterSpacing: '-0.03em',
+                  fontSize: 22, fontWeight: 800, textAlign: 'right',
+                  color: '#0F172A', letterSpacing: '-0.025em',
                   fontVariantNumeric: 'tabular-nums lining-nums',
                 }}>
                   {c.avg_rating?.toFixed(1) ?? '—'}
