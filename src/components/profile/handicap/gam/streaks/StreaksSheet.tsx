@@ -205,7 +205,7 @@ export const StreaksSheet: React.FC<StreaksSheetProps> = ({ open, onClose }) => 
         sub={
           isLoading || isError
             ? undefined
-            : `${activeCount} active · ${dormantCount} dormant${totalFreezes > 0 ? ` · ${totalFreezes} freezes` : ''}`
+            : `${activeCount} active · ${dormantCount} dormant${totalFreezes > 0 ? ` · ${totalFreezes} freeze${totalFreezes === 1 ? '' : 's'}` : ''}`
         }
         onClose={onClose}
         dark
