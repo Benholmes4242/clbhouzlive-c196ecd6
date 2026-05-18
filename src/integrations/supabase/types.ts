@@ -16305,6 +16305,9 @@ export type Database = {
       }
       whs_to_golf_course_map: {
         Row: {
+          echo_agreement_count: number | null
+          echo_attempted_at: string | null
+          echo_reasoning: string | null
           golf_course_id: string | null
           match_confidence: number
           match_method: string
@@ -16315,6 +16318,9 @@ export type Database = {
           whs_course_id: string
         }
         Insert: {
+          echo_agreement_count?: number | null
+          echo_attempted_at?: string | null
+          echo_reasoning?: string | null
           golf_course_id?: string | null
           match_confidence?: number
           match_method?: string
@@ -16325,6 +16331,9 @@ export type Database = {
           whs_course_id: string
         }
         Update: {
+          echo_agreement_count?: number | null
+          echo_attempted_at?: string | null
+          echo_reasoning?: string | null
           golf_course_id?: string | null
           match_confidence?: number
           match_method?: string
