@@ -17,6 +17,7 @@ import { Search, X, Star, ChevronRight } from 'lucide-react';
 import SegmentedControl from '@/components/discover/SegmentedControl';
 import { supabase } from '@/integrations/supabase/client';
 import { useQuery } from '@tanstack/react-query';
+import { SectionEyebrow } from '@/components/ui/SectionEyebrow';
 
 /* ─── Rate a Course bottom sheet ─── */
 function RateCourseSheet({ open, onClose }: { open: boolean; onClose: () => void }) {
