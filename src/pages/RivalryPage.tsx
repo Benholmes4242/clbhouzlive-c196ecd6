@@ -46,8 +46,8 @@ const TAB: React.CSSProperties = {
 const firstName = (n: string | null | undefined) =>
   (n ?? '').trim().split(/\s+/)[0] || 'Player';
 
-export type RivalryDimension = 'stableford' | 'gross';
-const DIMENSION_STORAGE_KEY = 'hcp-rivalry-dimension';
+// RivalryDimension + storage key are owned by useRivalryDimension hook.
+
 
 function outcomeFor(
   r: { stableford_outcome: 'W' | 'L' | 'T'; gross_outcome: 'W' | 'L' | 'T' },
