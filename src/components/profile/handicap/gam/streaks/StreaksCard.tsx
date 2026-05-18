@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useRef } from 'react';
 import { ChevronRight } from 'lucide-react';
 import { DarkSectionHeader } from '../../whs/sections/_shared/darkAtoms';
 import { Skeleton } from '../_shared/GamAtoms';
-import { useMyStreaks } from '@/hooks/gam/useMyStreaks';
+import { useUserStreaks } from '@/hooks/gam/useUserStreaks';
 import type { StreakRow } from '@/lib/gam/types';
 import { STREAK_CARD_ORDER, type StreakCardEntry } from './streakConfig';
 import { openAllStreaks } from '../../whs/gam/events';
@@ -13,6 +13,11 @@ const AMBER = '#F7931E';
 
 interface Props {
   userId: string;
+  /**
+   * Friend-view (read-only) mounts hide the "See all" affordance because the
+   * StreaksSheet is owner-only (mounted only on the viewer's own page).
+   */
+  readOnly?: boolean;
 }
 
 // ──────────────────────────────────────────────────────────────────
@@ -199,8 +204,8 @@ const StreakTile: React.FC<StreakTileProps> = ({ entry, row }) => {
 // Section
 // ──────────────────────────────────────────────────────────────────
 
-export const StreaksCard: React.FC<Props> = ({ userId }) => {
-  const { data, isLoading } = useMyStreaks();
+export const StreaksCard: React.FC<Props> = ({ userId, readOnly = false }) => {
+  const { data, isLoading } = useUserStreaks(userId);
   const sectionRef = useRef<HTMLElement | null>(null);
   const firedRef = useRef(false);
 
@@ -263,28 +268,30 @@ export const StreaksCard: React.FC<Props> = ({ userId }) => {
       <DarkSectionHeader
         eyebrow="Three Runs to Beat"
         right={
-          <button
-            type="button"
-            onClick={() => {
-              analyticsEvents.track('all_streaks_open', { user_id: userId });
-              openAllStreaks();
-            }}
-            style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: 2,
-              background: 'transparent',
-              border: 'none',
-              cursor: 'pointer',
-              color: 'var(--hcp-t-60)',
-              fontSize: 10,
-              fontWeight: 800,
-              letterSpacing: '0.14em',
-              padding: '4px 6px',
-            }}
-          >
-            SEE ALL <ChevronRight size={12} strokeWidth={2.4} />
-          </button>
+          readOnly ? null : (
+            <button
+              type="button"
+              onClick={() => {
+                analyticsEvents.track('all_streaks_open', { user_id: userId });
+                openAllStreaks();
+              }}
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 2,
+                background: 'transparent',
+                border: 'none',
+                cursor: 'pointer',
+                color: 'var(--hcp-t-60)',
+                fontSize: 10,
+                fontWeight: 800,
+                letterSpacing: '0.14em',
+                padding: '4px 6px',
+              }}
+            >
+              SEE ALL <ChevronRight size={12} strokeWidth={2.4} />
+            </button>
+          )
         }
       />
 

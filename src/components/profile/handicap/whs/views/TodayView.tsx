@@ -82,7 +82,7 @@ export const TodayView: React.FC<Props> = ({
 
       <RoundsThatCountCard connectionId={connectionId} currentHandicap={currentHandicap} />
 
-      {!readOnly && <StreaksCard userId={userId} />}
+      <StreaksCard userId={userId} readOnly={readOnly} />
 
       {!readOnly && <LeaguesCard userId={userId} isOwner={!readOnly} />}
 
