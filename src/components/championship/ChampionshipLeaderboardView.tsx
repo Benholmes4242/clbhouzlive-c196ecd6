@@ -312,7 +312,7 @@ const InitialErrorState = ({ onRetry }: { onRetry: () => void }) => (
       style={{
         marginTop: 14, padding: '8px 18px', borderRadius: 4,
         background: '#0F172A', color: '#fff', fontSize: 12, fontWeight: 800,
-        letterSpacing: '0.18em', border: 'none', cursor: 'pointer',
+        letterSpacing: '0.16em', border: 'none', cursor: 'pointer',
       }}
     >
       RETRY
