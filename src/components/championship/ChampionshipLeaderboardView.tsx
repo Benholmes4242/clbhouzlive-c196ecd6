@@ -927,7 +927,7 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
                   fontSize: 32,
                   fontWeight: 800,
                   color: '#0F172A',
-                  letterSpacing: '-0.02em',
+                  letterSpacing: '-0.025em',
                   lineHeight: 1.1,
                 }}>
                   {season.prize_description}
