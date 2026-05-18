@@ -7,6 +7,7 @@ import { useNetworkActivity } from '@/hooks/useNetworkActivity';
 import { NetworkAvatarStrip } from './NetworkAvatarStrip';
 // NetworkPulseCopy intentionally not imported — replaced by inline meta byline (deferred dead code; file retained for follow-up cleanup)
 import { NetworkHighlightCarousel } from './NetworkHighlightCarousel';
+import { SectionEyebrow } from '@/components/ui/SectionEyebrow';
 
 interface YourNetworkSectionProps {
   className?: string;
