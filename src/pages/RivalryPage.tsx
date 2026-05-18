@@ -1038,8 +1038,8 @@ const RivalryPage: React.FC = () => {
     });
   };
 
-  // Scoring dimension — shared with Rivalries section cards
-  const [dimension, handleDimensionChange] = useRivalryDimension();
+  // Per-rival scoring dimension — same key the section card uses
+  const [dimension, handleDimensionChange] = useRivalryDimension(rivalParam ?? null);
 
 
   // Owner-view: hydrate "ownerName/ownerThumb/ownerHcp" from viewer profile
