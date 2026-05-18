@@ -200,7 +200,7 @@ const StreakTile: React.FC<StreakTileProps> = ({ entry, row }) => {
 // ──────────────────────────────────────────────────────────────────
 
 export const StreaksCard: React.FC<Props> = ({ userId }) => {
-  const { data, isLoading } = useMyStreaks();
+  const { data, isLoading } = useUserStreaks(userId);
   const sectionRef = useRef<HTMLElement | null>(null);
   const firedRef = useRef(false);
 
