@@ -255,7 +255,7 @@ async function buildCandidates(
 // ---- LLM orchestration -------------------------------------------------------
 
 const SYSTEM_PROMPT =
-  "You are a golf course identity reconciliation agent. Given a course name from the WHS (handicap) system, you must decide which row in our internal golf_courses table refers to the same physical course. Be conservative — when uncertain, return NO_MATCH or CREATE_NEW rather than guessing. Respond ONLY with a single JSON object matching the schema described, no prose, no markdown.";
+  "You are a golf course identity reconciliation agent. Given a course name from the WHS (handicap) system, decide which row in our internal golf_courses table refers to the same physical course. Be decisive: when name + club + layout clearly identify the same physical course, return MATCH even if secondary metadata (country, sub_country, region) disagrees — WHS metadata is frequently miscoded. Only return NO_MATCH when no candidate is plausibly the same course. Only return CREATE_NEW when you are confident the course is real but truly absent from the candidate list. Respond ONLY with a single JSON object matching the schema described, no prose, no markdown.";
 
 function userPrompt(
   whs: { name: string; country_code: string | null; country_name: string | null },
