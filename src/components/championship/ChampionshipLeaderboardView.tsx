@@ -1195,7 +1195,7 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
                 >
                   <span style={{
                     fontSize: 9, fontWeight: 800, color: '#94A3B8',
-                    letterSpacing: '0.18em', minWidth: 14,
+                    letterSpacing: '0.16em', minWidth: 14,
                     fontVariantNumeric: 'tabular-nums lining-nums',
                   }}>
                     {String(i + 1).padStart(2, '0')}
