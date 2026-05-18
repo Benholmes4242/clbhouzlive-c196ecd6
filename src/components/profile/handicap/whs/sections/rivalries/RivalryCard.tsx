@@ -243,7 +243,7 @@ export const RivalryCard: React.FC<Props> = ({
       >
         <Portrait
           name={userDisplayName}
-          label="YOU"
+          label={selfLabel}
           thumbnail={userThumbnailUrl}
           handicap={userHandicap}
           ringColor={youRing}
