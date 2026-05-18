@@ -89,6 +89,7 @@ export const TodayView: React.FC<Props> = ({
       {!readOnly && <SinceLastVisitRail userId={userId} />}
 
       <LegendStatusSheetMount />
+      <LeaguesSheetMount />
     </div>
   );
 };
