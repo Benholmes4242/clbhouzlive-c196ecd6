@@ -82,9 +82,19 @@ export const TodayView: React.FC<Props> = ({
 
       <IndexHistoryCard connectionId={connectionId} />
 
-      <LastRoundCard connectionId={connectionId} userId={userId} />
+      <LastRoundCard
+        connectionId={connectionId}
+        userId={userId}
+        viewMode={viewMode}
+        ownerFirstName={ownerFirstName}
+      />
 
-      <RoundsThatCountCard connectionId={connectionId} currentHandicap={currentHandicap} />
+      <RoundsThatCountCard
+        connectionId={connectionId}
+        currentHandicap={currentHandicap}
+        viewMode={viewMode}
+        ownerFirstName={ownerFirstName}
+      />
 
       <StreaksCard userId={userId} readOnly={readOnly} />
 
