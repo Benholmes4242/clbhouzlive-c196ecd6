@@ -788,9 +788,9 @@ export function CoursesLeaderboardView() {
                         {player.display_name}
                       </div>
                       <div style={{
-                        fontSize: 12, fontWeight: 900, color: '#F7931E',
+                        fontSize: 12, fontWeight: 800, color: '#F7931E',
                         fontVariantNumeric: 'tabular-nums lining-nums',
-                        letterSpacing: '-0.02em', marginLeft: 6, flexShrink: 0,
+                        letterSpacing: '-0.015em', marginLeft: 6, flexShrink: 0,
                       }}>
                         {round.rating?.toFixed(1) ?? '—'}
                       </div>
