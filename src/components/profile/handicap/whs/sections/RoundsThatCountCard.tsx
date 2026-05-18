@@ -898,7 +898,7 @@ const CutTargetCard: React.FC<{ cutTarget: number }> = ({ cutTarget }) => (
         </span>
       </div>
       <div style={{ fontSize: 12.5, color: D_T60, marginTop: 6, lineHeight: 1.4 }}>
-        Beat this differential and your handicap drops.
+        A score under this differential drops the handicap.
       </div>
     </div>
   </div>
