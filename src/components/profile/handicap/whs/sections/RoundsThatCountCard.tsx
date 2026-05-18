@@ -822,7 +822,7 @@ const SafeState: React.FC<{ cutTarget: number; settleAt: number }> = ({
         <p style={{
           margin: 0, fontSize: 10.5, color: D_T60, lineHeight: 1.35,
         }}>
-          Beat this and your handicap drops.
+          A score under this drops the handicap.
         </p>
       </div>
       <div style={{
