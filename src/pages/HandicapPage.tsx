@@ -275,7 +275,7 @@ const HandicapPageHeader: React.FC<HeaderProps> = ({
 // Pulls the friend's WHS connection and renders HandicapDashboard with
 // readOnly=true. If the friend has no connection, shows an empty state.
 // ───────────────────────────────────────────────────────────────────────
-const FriendHandicapDashboard: React.FC<{ userId: string }> = ({ userId }) => {
+const FriendHandicapDashboard: React.FC<{ userId: string; ownerFirstName: string | null }> = ({ userId, ownerFirstName }) => {
   const { data: connection, isLoading } = useWhsConnection(userId);
 
   if (isLoading) {
@@ -298,7 +298,7 @@ const FriendHandicapDashboard: React.FC<{ userId: string }> = ({ userId }) => {
     );
   }
 
-  return <HandicapDashboard connection={connection} userId={userId} readOnly />;
+  return <HandicapDashboard connection={connection} userId={userId} readOnly ownerFirstName={ownerFirstName} />;
 };
 
 const HandicapPage: React.FC = () => {
