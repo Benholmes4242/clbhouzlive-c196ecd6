@@ -946,15 +946,18 @@ export async function fetchUserRivalOverrides(
 export async function upsertUserRivalOverride(
   userId: string,
   slotIndex: number,
-  identifier: { rival_user_id?: string; rival_friend_row_id?: string },
+  identifier: { rival_user_id?: string | null; rival_friend_row_id?: string | null },
 ): Promise<void> {
+  const rivalUserId = identifier.rival_user_id ?? null;
+  const rivalFriendRowId = rivalUserId ? null : (identifier.rival_friend_row_id ?? null);
+
   const { error } = await supabase
     .from('user_rival_overrides' as any)
     .upsert({
       user_id: userId,
       slot_index: slotIndex,
-      rival_user_id: identifier.rival_user_id ?? null,
-      rival_friend_row_id: identifier.rival_friend_row_id ?? null,
+      rival_user_id: rivalUserId,
+      rival_friend_row_id: rivalFriendRowId,
     });
   if (error) throw error;
 }
