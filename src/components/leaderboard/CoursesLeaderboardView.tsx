@@ -669,10 +669,10 @@ export function CoursesLeaderboardView() {
               >
                 {/* Rank */}
                 <span style={{
-                  fontSize: 18, fontWeight: 900,
+                  fontSize: 18, fontWeight: 800,
                   color: isTop3 ? '#0F172A' : '#94A3B8',
                   fontVariantNumeric: 'tabular-nums lining-nums',
-                  letterSpacing: '-0.02em',
+                  letterSpacing: '-0.015em',
                 }}>
                   {c.rank}
                 </span>
