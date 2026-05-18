@@ -27,6 +27,8 @@ interface Props {
   /** When true, hides personal-only sections (Streaks, Where You Stand, Since Last Visit, Echo Insights, footer, banners). */
   readOnly?: boolean;
   showReauthBanner?: boolean;
+  /** First name of the profile owner — used to name-prefix friend-view copy. */
+  ownerFirstName?: string | null;
 }
 
 export const TodayView: React.FC<Props> = ({
@@ -37,7 +39,9 @@ export const TodayView: React.FC<Props> = ({
   connectionCreatedAt: _connectionCreatedAt,
   readOnly = false,
   showReauthBanner = false,
+  ownerFirstName = null,
 }) => {
+  const viewMode: 'owner' | 'friend' = readOnly ? 'friend' : 'owner';
   return (
     <div
       role="tabpanel"
