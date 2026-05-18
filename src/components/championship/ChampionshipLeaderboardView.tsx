@@ -1514,10 +1514,10 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
               )}
 
               <span style={{
-                fontSize: 18, fontWeight: 900,
+                fontSize: 18, fontWeight: 800,
                 color: p.current_rank <= 3 ? '#0F172A' : '#94A3B8',
                 fontVariantNumeric: 'tabular-nums lining-nums',
-                letterSpacing: '-0.02em',
+                letterSpacing: '-0.015em',
               }}>
                 {p.current_rank}
               </span>
