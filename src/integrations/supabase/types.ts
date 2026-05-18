@@ -16628,6 +16628,7 @@ export type Database = {
           rank: number | null
           trigger_whs_score_id: string | null
           updated_at: string | null
+          user_display_name: string | null
           user_hcp: number | null
           user_home_club: string | null
           user_id: string | null
