@@ -5,6 +5,7 @@ import { initials } from '@/lib/whs/utils/initials';
 import { reformatFriendName } from '@/lib/whs/utils/nameFormat';
 import { fmtHcp } from '@/lib/whs/format';
 import type { FriendRivalryHydrated } from '@/lib/whs/types';
+import type { RivalryDimension } from '@/lib/whs/utils/useRivalryDimension';
 
 interface Props {
   rivalry: FriendRivalryHydrated;
@@ -12,6 +13,8 @@ interface Props {
   userThumbnailUrl: string | null;
   userHandicap: number | null;
   onInfo: () => void;
+  /** Which scoring dimension to display. Defaults to 'stableford'. */
+  dimension?: RivalryDimension;
 }
 
 const T = {
