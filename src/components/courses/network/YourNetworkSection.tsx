@@ -55,16 +55,13 @@ export const YourNetworkSection: React.FC<YourNetworkSectionProps> = ({ classNam
       {/* Header Row */}
       <div className="flex items-center justify-between mb-2">
         <div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 3 }}>
-            <div style={{ width: 3, height: 8, background: '#F7931E', borderRadius: 1, flexShrink: 0 }} />
-            <span style={{ fontSize: 9, fontWeight: 900, color: '#F7931E', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>Your Network</span>
-          </div>
+          <SectionEyebrow label="Your Network" color="amber" className="mb-[3px]" />
           {showEmptyActivityState ? (
-            <h2 style={{ fontSize: 22, fontWeight: 900, color: '#0F172A', letterSpacing: '-0.03em', margin: 0, lineHeight: 1.1 }}>
+            <h2 style={{ fontSize: 22, fontWeight: 800, color: '#0F172A', letterSpacing: '-0.025em', margin: 0, lineHeight: 1.1 }}>
               Your Network
             </h2>
           ) : (
-            <h2 style={{ fontSize: 22, fontWeight: 900, color: '#0F172A', letterSpacing: '-0.03em', margin: 0, lineHeight: 1.1 }}>
+            <h2 style={{ fontSize: 22, fontWeight: 800, color: '#0F172A', letterSpacing: '-0.025em', margin: 0, lineHeight: 1.1 }}>
               {pulse.total_rounds} {pulse.total_rounds === 1 ? 'round' : 'rounds'} this month
             </h2>
           )}
