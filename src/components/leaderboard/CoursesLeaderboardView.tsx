@@ -808,7 +808,7 @@ export function CoursesLeaderboardView() {
 
       {/* ── FOOTER CAPTION ──────────────────────────────────────── */}
       <div style={{ padding: '20px 20px 32px', textAlign: 'center' }}>
-        <div style={{ fontSize: 10, color: '#94A3B8', letterSpacing: '0.06em', fontStyle: 'italic' }}>
+        <div style={{ fontSize: 10, color: '#94A3B8', fontStyle: 'italic' }}>
           Compiled from members' verified course ratings · Updated daily
         </div>
       </div>
