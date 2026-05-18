@@ -21,6 +21,7 @@ import {
 import { CLUB_STEPS } from '@/lib/top100Club';
 import { MILESTONE_THEMES } from '@/lib/globalAchievementMilestoneSystem';
 import type { Top100ListSlug } from '@/lib/regionTheme';
+import { SectionEyebrow } from '@/components/ui/SectionEyebrow';
 
 // Region card visual config — slug → label, color
 const REGIONAL_LISTS: { slug: Top100ListSlug; label: string; color: string }[] = [
@@ -149,26 +150,15 @@ const Top100JourneyPage: React.FC = () => {
       <div className="pb-10">
         {/* ============ Hero ============ */}
         <div className="px-4 pt-2">
-          <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 3 }}>
-            <div style={{ width: 3, height: 8, background: '#F7931E', borderRadius: 1 }} />
-            <span
-              style={{
-                fontSize: 9,
-                fontWeight: 900,
-                color: '#F7931E',
-                letterSpacing: '0.16em',
-                textTransform: 'uppercase' as const,
-              }}
-            >
-              Your Journey
-            </span>
+          <div style={{ marginBottom: 3 }}>
+            <SectionEyebrow label="Your Journey" color="amber" />
           </div>
           <h1
             style={{
               fontSize: 22,
-              fontWeight: 900,
+              fontWeight: 800,
               color: '#0F172A',
-              letterSpacing: '-0.03em',
+              letterSpacing: '-0.025em',
               margin: 0,
               lineHeight: 1.1,
             }}
@@ -202,7 +192,7 @@ const Top100JourneyPage: React.FC = () => {
                   fontSize: 11,
                   fontWeight: 700,
                   color: '#64748B',
-                  letterSpacing: '0.04em',
+                  letterSpacing: '0.16em',
                   textTransform: 'uppercase' as const,
                 }}
               >
@@ -212,10 +202,10 @@ const Top100JourneyPage: React.FC = () => {
                 <span
                   style={{
                     fontSize: 32,
-                    fontWeight: 900,
+                    fontWeight: 800,
                     color: '#F7931E',
                     lineHeight: 1,
-                    letterSpacing: '-0.04em',
+                    letterSpacing: '-0.025em',
                     fontVariantNumeric: 'tabular-nums' as const,
                   }}
                 >
@@ -247,7 +237,7 @@ const Top100JourneyPage: React.FC = () => {
 
         {/* ============ Milestones grid ============ */}
         <div className="px-4 pt-7">
-          <SectionHeader label="Milestones" />
+          <SectionEyebrow label="Milestones" color="amber" />
           <div
             style={{
               marginTop: 8,
@@ -300,9 +290,9 @@ const Top100JourneyPage: React.FC = () => {
                     <span
                       style={{
                         fontSize: 22,
-                        fontWeight: 900,
+                        fontWeight: 800,
                         color: unlocked ? '#0F172A' : '#94A3B8',
-                        letterSpacing: '-0.03em',
+                        letterSpacing: '-0.025em',
                         fontVariantNumeric: 'tabular-nums' as const,
                       }}
                     >
@@ -312,16 +302,16 @@ const Top100JourneyPage: React.FC = () => {
                   </div>
                   <div
                     style={{
-                      fontSize: 12.5,
+                      fontSize: 13,
                       fontWeight: 700,
                       color: unlocked ? '#0F172A' : '#64748B',
                       marginTop: 6,
-                      letterSpacing: '-0.01em',
+                      letterSpacing: '-0.005em',
                     }}
                   >
                     {step.tierName}
                   </div>
-                  <div style={{ fontSize: 10.5, color: '#94A3B8', marginTop: 2 }}>
+                  <div style={{ fontSize: 10, color: '#94A3B8', marginTop: 2 }}>
                     {unlocked ? 'Unlocked' : `${step.threshold - totalPlayed} more`}
                   </div>
                 </button>
@@ -332,7 +322,7 @@ const Top100JourneyPage: React.FC = () => {
 
         {/* ============ Regional progress ============ */}
         <div className="px-4 pt-7">
-          <SectionHeader label="Regional progress" />
+          <SectionEyebrow label="Regional progress" color="amber" />
           <div
             style={{
               marginTop: 8,
@@ -379,7 +369,7 @@ const Top100JourneyPage: React.FC = () => {
                         fontSize: 11,
                         fontWeight: 800,
                         color: '#0F172A',
-                        letterSpacing: '0.02em',
+                        letterSpacing: '0.14em',
                         textTransform: 'uppercase' as const,
                       }}
                     >
@@ -390,10 +380,10 @@ const Top100JourneyPage: React.FC = () => {
                     <div style={{ display: 'flex', alignItems: 'baseline', gap: 4 }}>
                       <span
                         style={{
-                          fontSize: 24,
-                          fontWeight: 900,
+                          fontSize: 22,
+                          fontWeight: 800,
                           color: '#0F172A',
-                          letterSpacing: '-0.03em',
+                          letterSpacing: '-0.025em',
                           fontVariantNumeric: 'tabular-nums' as const,
                         }}
                       >
@@ -473,22 +463,6 @@ const JourneyHeader: React.FC<{ onBack: () => void }> = ({ onBack }) => (
   </div>
 );
 
-const SectionHeader: React.FC<{ label: string }> = ({ label }) => (
-  <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-    <div style={{ width: 3, height: 8, background: '#F7931E', borderRadius: 1 }} />
-    <span
-      style={{
-        fontSize: 9,
-        fontWeight: 900,
-        color: '#F7931E',
-        letterSpacing: '0.16em',
-        textTransform: 'uppercase' as const,
-      }}
-    >
-      {label}
-    </span>
-  </div>
-);
 
 const StatCell: React.FC<{ label: string; value: string; suffix?: string }> = ({
   label,
@@ -508,7 +482,7 @@ const StatCell: React.FC<{ label: string; value: string; suffix?: string }> = ({
         fontSize: 9,
         fontWeight: 800,
         color: '#64748B',
-        letterSpacing: '0.06em',
+        letterSpacing: '0.16em',
         textTransform: 'uppercase' as const,
       }}
     >
@@ -518,9 +492,9 @@ const StatCell: React.FC<{ label: string; value: string; suffix?: string }> = ({
       style={{
         marginTop: 4,
         fontSize: 17,
-        fontWeight: 900,
+        fontWeight: 800,
         color: '#0F172A',
-        letterSpacing: '-0.02em',
+        letterSpacing: '-0.015em',
         fontVariantNumeric: 'tabular-nums' as const,
       }}
     >

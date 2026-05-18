@@ -427,7 +427,7 @@ const Top100List = () => {
               <div className="flex items-baseline gap-1">
                 <span
                   className="tabular-nums leading-none"
-                  style={{ color: regionRingColor, fontSize: 26, fontWeight: 900, letterSpacing: '-0.02em' }}
+                  style={{ color: regionRingColor, fontSize: 26, fontWeight: 800, letterSpacing: '-0.025em' }}
                 >
                   {playedCount}
                 </span>

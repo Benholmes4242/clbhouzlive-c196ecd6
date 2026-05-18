@@ -14,6 +14,7 @@ import ScrollToTopGlass from '@/components/common/ScrollToTopGlass';
 import { PageRoot } from '@/components/layout/PageRoot';
 import ShellSlot from '@/components/header/ShellSlot';
 import SegmentedControl from '@/components/discover/SegmentedControl';
+import { SectionEyebrow } from '@/components/ui/SectionEyebrow';
 
 const Top100Hub = () => {
   const navigate = useNavigate();
@@ -128,22 +129,19 @@ const Top100Hub = () => {
             {/* Editorial header — left-aligned, with optional Map pill on Courses tab */}
             <div className="flex items-start justify-between gap-3">
               <div className="min-w-0 flex-1">
-                <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 3 }}>
-                  <div style={{ width: 3, height: 8, background: '#F7931E', borderRadius: 1, flexShrink: 0 }} />
-                  <span style={{ fontSize: 9, fontWeight: 900, color: '#F7931E', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>
-                    World's Best
-                  </span>
+                <div style={{ marginBottom: 3 }}>
+                  <SectionEyebrow label="World's Best" color="amber" />
                 </div>
                 <h1
                   className="text-foreground"
-                  style={{ fontSize: 22, fontWeight: 900, letterSpacing: '-0.03em', margin: 0, lineHeight: 1.1 }}
+                  style={{ fontSize: 22, fontWeight: 800, letterSpacing: '-0.025em', margin: 0, lineHeight: 1.1 }}
                 >
                   Top 100 Golf Courses
                 </h1>
                 {session && perListSubline && activeTab === 'courses' && (
                   <p style={{
                     fontSize: 11, color: '#64748B', margin: '10px 0 0',
-                    fontWeight: 600, letterSpacing: '0.10em', textTransform: 'uppercase',
+                    fontWeight: 600, letterSpacing: '0.16em', textTransform: 'uppercase',
                   }}>
                     {perListSubline}
                   </p>
