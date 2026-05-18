@@ -1,19 +1,19 @@
 /**
- * Lightweight event bus to open the All Trophies sheet from anywhere
- * (page top-bar Trophy icon, HeroHandicapCard "View N trophies" link).
- *
- * The actual sheet is mounted inside HandicapDashboard via TrophiesSheetMount,
- * which owns the open/close state and computes the achievements list.
+ * Back-compat shim: legacy callers used `openTrophiesSheet()` to open the old
+ * AllTrophiesSheet. That sheet has been retired in favour of
+ * `GamAchievementsSheet`, which is mounted by `GamMount` and listens to the
+ * `gamAchievementsBus`. We re-route the old entrypoint to the new sheet so
+ * every Trophy icon / "View N trophies" link across the app opens the
+ * Dispatch-styled achievements sheet without per-callsite changes.
  */
-const listeners = new Set<() => void>();
+import { openGamAchievements } from './gam/events';
 
 export function openTrophiesSheet(): void {
-  listeners.forEach((fn) => fn());
+  openGamAchievements();
 }
 
-export function subscribeOpenTrophies(fn: () => void): () => void {
-  listeners.add(fn);
-  return () => {
-    listeners.delete(fn);
-  };
+/** @deprecated retained only so the legacy TrophiesSheetMount still compiles
+ *  if anything still references it. The new sheet manages its own subscription. */
+export function subscribeOpenTrophies(_fn: () => void): () => void {
+  return () => {};
 }

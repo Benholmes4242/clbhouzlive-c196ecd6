@@ -7,7 +7,7 @@ import TrendsView from './views/TrendsView';
 import RecordsView from './views/RecordsView';
 import FriendsView from './views/FriendsView';
 import LegendsView from './views/LegendsView';
-import TrophiesSheetMount from './sections/TrophiesSheetMount';
+
 import WhsConnectionCaption from './sections/WhsConnectionCaption';
 import { isHandicapSubtab, type HandicapSubtab } from './types';
 
@@ -94,13 +94,7 @@ export const HandicapDashboard: React.FC<Props> = ({ connection, userId, readOnl
         <WhsConnectionCaption membershipNumber={connection.membership_number} />
       )}
 
-      {!readOnly && (
-        <TrophiesSheetMount
-          connectionId={connection.id}
-          connectionCreatedAt={connection.created_at}
-          userId={userId}
-        />
-      )}
+      {/* Legacy TrophiesSheetMount removed — GamAchievementsSheet is mounted via GamMount on HandicapPage. */}
 
       <style>{`
         @keyframes handicapViewFadeSlide {
