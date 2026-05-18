@@ -17,6 +17,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useFriendRivalries } from '@/lib/whs/hooks';
 import type { FriendRivalryHydrated } from '@/lib/whs/types';
 import { PageRoot } from '@/components/layout/PageRoot';
+import { firstName as canonicalFirstName } from '@/lib/whs/utils/initials';
 import {
   useRivalryDimension,
   type RivalryDimension,
@@ -43,8 +44,14 @@ const TAB: React.CSSProperties = {
   fontFeatureSettings: '"kern" 1, "liga" 1',
 };
 
-const firstName = (n: string | null | undefined) =>
-  (n ?? '').trim().split(/\s+/)[0] || 'Player';
+// Local helper: normalize EG "Surname, Given" + extract first token. Falls
+// back to "Player" if the input is blank. Delegates to canonical firstName
+// in @/lib/whs/utils/initials, which handles comma-format + suffixes.
+const firstName = (n: string | null | undefined): string => {
+  const trimmed = (n ?? '').trim();
+  if (!trimmed) return 'Player';
+  return canonicalFirstName(trimmed) || 'Player';
+};
 
 // RivalryDimension + storage key are owned by useRivalryDimension hook.
 
