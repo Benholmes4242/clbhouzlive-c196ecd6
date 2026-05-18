@@ -703,7 +703,7 @@ export function CoursesLeaderboardView() {
                     {c.current_user_played && (
                       <span style={{
                         fontSize: 9, fontWeight: 800, color: '#F7931E',
-                        letterSpacing: '0.18em',
+                        letterSpacing: '0.16em',
                         flexShrink: 0,
                       }}>
                         PLAYED
