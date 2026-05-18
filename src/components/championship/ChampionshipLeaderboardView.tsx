@@ -1221,7 +1221,7 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
               marginTop: 14,
               textAlign: 'center',
               fontSize: 9, fontWeight: 700, color: '#94A3B8',
-              letterSpacing: '0.12em', fontStyle: 'italic',
+              fontStyle: 'italic',
             }}>
               Based on your weekly pace · Updated daily
             </div>
