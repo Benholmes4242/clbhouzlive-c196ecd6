@@ -87,9 +87,15 @@ export const RivalryCard: React.FC<Props> = ({
   userThumbnailUrl,
   userHandicap,
   onInfo,
-  dimension = 'stableford',
+  dimension: dimensionProp,
 }) => {
   const navigate = useNavigate();
+  const rivalKey = rivalry.rival_user_id ?? rivalry.rival_friend_row_id ?? null;
+  const [ownDimension, setOwnDimension] = useRivalryDimension(rivalKey);
+  // Prop wins if explicitly provided; otherwise self-owned per-rival preference.
+  const dimension: RivalryDimension = dimensionProp ?? ownDimension;
+  const showPill = dimensionProp === undefined;
+
   const rivalDisplayName = reformatFriendName(rivalry.rival_name ?? 'Unknown');
   const userDisplayName = userName ?? 'You';
   const record =
