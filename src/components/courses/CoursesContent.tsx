@@ -73,10 +73,7 @@ function RateCourseSheet({ open, onClose }: { open: boolean; onClose: () => void
         {/* Header */}
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '6px 16px 10px', borderBottom: '0.5px solid rgba(15,23,42,0.07)' }}>
           <div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 2 }}>
-              <div style={{ width: 3, height: 8, background: '#F7931E', borderRadius: 1, flexShrink: 0 }} />
-              <span style={{ fontSize: 9, fontWeight: 900, color: '#F7931E', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>Rate a Course</span>
-            </div>
+            <SectionEyebrow label="Rate a Course" color="amber" className="mb-0.5" />
             <p style={{ fontSize: 12, color: '#64748B', margin: 0 }}>Search any course you've played</p>
           </div>
           <button onClick={onClose} style={{ width: 32, height: 32, borderRadius: '50%', background: 'rgba(15,23,42,0.05)', border: '0.5px solid rgba(15,23,42,0.10)', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
