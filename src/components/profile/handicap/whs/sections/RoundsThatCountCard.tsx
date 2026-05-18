@@ -785,7 +785,7 @@ const AtRiskState: React.FC<{ cutTarget: number; settleAt: number }> = ({
         }}>
           {fmtDiff(settleAt)}
         </strong>{' '}
-        next round unless you beat your cut target.
+        next round unless the next score beats the cut target.
       </div>
     </div>
 
