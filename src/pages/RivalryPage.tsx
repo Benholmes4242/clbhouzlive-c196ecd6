@@ -1110,9 +1110,11 @@ const RivalryPage: React.FC = () => {
             ownerName={ownerName}
             ownerThumb={ownerThumb}
             ownerHcp={ownerHcp}
+            dimension={dimension}
+            onDimensionChange={handleDimensionChange}
           />
           <CoursesPlayedSection
-            courses={aggregateCourses(row)}
+            courses={aggregateCourses(row, dimension)}
             onCoursePick={handleCoursePick}
           />
           <RoundByRoundSection
@@ -1122,6 +1124,7 @@ const RivalryPage: React.FC = () => {
             courseFilter={courseFilter}
             setCourseFilter={setCourseFilter}
             scrollAnchor={timelineRef}
+            dimension={dimension}
           />
         </>
       )}
