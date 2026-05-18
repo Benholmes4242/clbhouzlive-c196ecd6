@@ -72,8 +72,6 @@ Deno.serve(async (req) => {
       exact_name: 0,
       normalised_name: 0,
       trigram_high: 0,
-      trigram_medium: 0,
-      marker_aware: 0,
       no_match_found: 0,
     };
     let processed = 0;
