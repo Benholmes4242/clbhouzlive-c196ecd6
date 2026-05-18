@@ -11,7 +11,7 @@ import RoundsThatCountCard from '../sections/RoundsThatCountCard';
 import StreaksSection from '../sections/StreaksSection';
 import SinceLastVisitRail from '../sections/since-last-visit/SinceLastVisitRail';
 import RecentUnlocksStrip from '../gam/RecentUnlocksStrip';
-import LegendStatusCard from '../gam/LegendStatusCard';
+import LegendStatusCard from '../../gam/legends/LegendStatusCard';
 import LeaguesCard from '../gam/LeaguesCard';
 
 interface Props {
@@ -68,7 +68,7 @@ export const TodayView: React.FC<Props> = ({
 
       <RecentUnlocksStrip userId={userId} readOnly={readOnly} />
 
-      <LegendStatusCard userId={userId} isOwner={!readOnly} />
+      <LegendStatusCard userId={userId} readOnly={readOnly} />
 
       <NextRoundWatch connectionId={connectionId} currentHandicap={currentHandicap} />
 
