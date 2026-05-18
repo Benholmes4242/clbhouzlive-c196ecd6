@@ -1,50 +1,15 @@
 import React from 'react';
-import {
-  Trophy, Crown, Flag, Target, MapPin, Hash, Award,
-  Flame, Sparkles, Shield, Medal, Star, Activity, Feather,
-  TrendingDown, Map, CircleDot, Crosshair, Scissors,
-  ArrowUp, Swords, Minus, Gauge,
-  type LucideIcon,
-} from 'lucide-react';
 import { useRecentUnlocks } from '@/hooks/gam/useRecentUnlocks';
 import { Skeleton, RetryStub } from '../../gam/_shared/GamAtoms';
 import { relativeTime } from '@/lib/gam/visuals';
 import type { RecentUnlock } from '@/lib/gam/types';
 import { openTrophiesSheet } from '../trophiesSheetEvents';
+import { renderBadgeIcon } from './badgeIcons';
 
 const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
 
-const ICON_MAP: Record<string, LucideIcon> = {
-  trophy: Trophy,
-  crown: Crown,
-  flag: Flag,
-  target: Target,
-  'map-pin': MapPin,
-  hash: Hash,
-  award: Award,
-  flame: Flame,
-  sparkles: Sparkles,
-  shield: Shield,
-  medal: Medal,
-  star: Star,
-  activity: Activity,
-  feather: Feather,
-  'trending-down': TrendingDown,
-  map: Map,
-  'circle-dot': CircleDot,
-  crosshair: Crosshair,
-  scissors: Scissors,
-  'arrow-up': ArrowUp,
-  swords: Swords,
-  minus: Minus,
-  gauge: Gauge,
-};
-
 function renderIcon(name: string, size = 26): React.ReactNode {
-  if (!name) return null;
-  const Icon = ICON_MAP[name.toLowerCase()];
-  if (Icon) return <Icon size={size} color="var(--hcp-t-100)" />;
-  return <span style={{ fontSize: size, lineHeight: 1 }}>{name}</span>;
+  return renderBadgeIcon(name, size, 'var(--hcp-t-100)');
 }
 
 interface RecentUnlocksStripProps {
