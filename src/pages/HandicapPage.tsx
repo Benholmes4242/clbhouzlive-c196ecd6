@@ -196,10 +196,10 @@ const HandicapPageHeader: React.FC<HeaderProps> = ({
   const tabs = useMemo(
     () => [
       { id: 'today', label: 'Today' },
-      { id: 'trends', label: 'Trends' },
+      { id: 'trends', label: 'Form' },
       { id: 'records', label: 'Records' },
       { id: 'friends', label: 'Friends' },
-      { id: 'legends', label: 'Legends' },
+      { id: 'legends', label: 'Compete' },
     ],
     [],
   );

@@ -3,8 +3,6 @@ import FriendsHeaderSection from '../sections/friends-header/FriendsHeaderSectio
 import RecentlyActiveRail from '../sections/recently-active/RecentlyActiveRail';
 import FriendsEchoSection from '../sections/friends/FriendsEchoSection';
 import RecentlyPlayedFeed from '../sections/recently-played/RecentlyPlayedFeed';
-import RivalriesSection from '../sections/rivalries/RivalriesSection';
-import FriendsLeaderboardSection from '../sections/friends-leaderboard-v2/FriendsLeaderboardSection';
 import InviteToClbhouzV2 from '../sections/invite-to-clbhouz/InviteToClbhouzV2';
 import MorningMoment from '@/components/handicap/MorningMoment';
 
@@ -15,20 +13,38 @@ interface Props {
   readOnly?: boolean;
 }
 
-export const FriendsView: React.FC<Props> = ({ userId, currentHandicap, connectionId, readOnly = false }) => {
+export const FriendsView: React.FC<Props> = ({
+  userId,
+  currentHandicap: _currentHandicap,
+  connectionId,
+  readOnly = false,
+}) => {
   return (
-    <div role="tabpanel" id="handicap-panel-friends" aria-labelledby="handicap-tab-friends" style={{ paddingTop: 16 }}>
+    <div
+      role="tabpanel"
+      id="handicap-panel-friends"
+      aria-labelledby="handicap-tab-friends"
+      style={{ paddingTop: 16 }}
+    >
+      {/* 1. Friends Yesterday — hero */}
       {!readOnly && <MorningMoment userId={userId} />}
+
+      {/* 2. Friends Yesterday — header section */}
       <FriendsHeaderSection userId={userId} />
+
+      {/* 3. Recently Active */}
       <RecentlyActiveRail userId={userId} />
+
+      {/* 4. Echo on Your Circle — owner only */}
       {!readOnly && <FriendsEchoSection connectionId={connectionId} />}
+
+      {/* 5. Friends' Rounds */}
       <RecentlyPlayedFeed ownerUserId={userId} />
-      <RivalriesSection userId={userId} />
-      <FriendsLeaderboardSection userId={userId} />
+
+      {/* 6. Make Your Feed Louder — owner only */}
       {!readOnly && <InviteToClbhouzV2 ownerUserId={userId} />}
     </div>
   );
 };
 
 export default FriendsView;
-

@@ -5,6 +5,14 @@ import { useUserHomeClubCourses } from '@/hooks/gam/useUserHomeClubCourses';
 import { useDiscoverCoursesThisWeek, type DiscoverCourseRow } from '@/hooks/gam/useDiscoverCoursesThisWeek';
 import { useCourseSearch, type CourseSearchResult } from '@/hooks/gam/useCourseSearch';
 import { useCourseLegends } from '@/hooks/gam/useCourseLegends';
+import LegendStatusCard from '../../gam/legends/LegendStatusCard';
+import { LegendStatusSheetMount } from '../../gam/legends/LegendStatusSheetMount';
+import StreaksCard from '../../gam/streaks/StreaksCard';
+import { StreaksSheetMount } from '../../gam/streaks/StreaksSheetMount';
+import LeaguesCard from '../../gam/leagues/LeaguesCard';
+import { LeaguesSheetMount } from '../../gam/leagues/LeaguesSheetMount';
+import RivalriesSection from '../sections/rivalries/RivalriesSection';
+import FriendsLeaderboardSection from '../sections/friends-leaderboard-v2/FriendsLeaderboardSection';
 import { GamCard, Skeleton, EmptyStub, RetryStub } from '../../gam/_shared/GamAtoms';
 import {
   legendCategoryLabel,
@@ -629,13 +637,36 @@ const DrilldownView: React.FC<{
 
 // ─── Top-level view ────────────────────────────────────────────────────
 
-export const LegendsView: React.FC<Props> = ({ userId }) => {
+export const LegendsView: React.FC<Props> = ({ userId, readOnly = false }) => {
   const [view, setView] = useState<ViewMode>({ mode: 'list' });
 
   return (
     <div role="tabpanel" id="handicap-panel-legends" aria-labelledby="handicap-tab-legends">
       {view.mode === 'list' ? (
-        <ListView userId={userId} onSelectCourse={(d) => setView(d)} />
+        <>
+          {/* 1. Friends Leaderboard (hero) */}
+          <FriendsLeaderboardSection userId={userId} />
+
+          {/* 2. Streaks — owner only */}
+          {!readOnly && <StreaksCard userId={userId} readOnly={readOnly} />}
+
+          {/* 3. Rivalries */}
+          <RivalriesSection userId={userId} />
+
+          {/* 4. Leagues — owner only */}
+          {!readOnly && <LeaguesCard userId={userId} isOwner={!readOnly} />}
+
+          {/* 5. Legend Status */}
+          <LegendStatusCard userId={userId} readOnly={readOnly} />
+
+          {/* 6. Course Legends — search + list + drilldown entry */}
+          <ListView userId={userId} onSelectCourse={(d) => setView(d)} />
+
+          {/* Sheet mounts */}
+          <LegendStatusSheetMount />
+          {!readOnly && <StreaksSheetMount />}
+          <LeaguesSheetMount />
+        </>
       ) : (
         <DrilldownView state={view} onBack={() => setView({ mode: 'list' })} />
       )}
