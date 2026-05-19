@@ -9,6 +9,8 @@ import {
   useRivalryDimension,
   type RivalryDimension,
 } from '@/lib/whs/utils/useRivalryDimension';
+import { useOpenFriendHybridSheet } from '@/components/friend-hybrid-sheet/FriendHybridSheetProvider';
+import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 
 interface Props {
   rivalry: FriendRivalryHydrated;
@@ -104,6 +106,9 @@ export const RivalryCard: React.FC<Props> = ({
   friendViewOwnerId,
 }) => {
   const navigate = useNavigate();
+  const { open: openHybridSheet } = useOpenFriendHybridSheet();
+  const { user } = useSupabaseSession();
+  const viewerId = user?.id ?? null;
   const rivalKey = rivalry.rival_user_id ?? rivalry.rival_friend_row_id ?? null;
   const [ownDimension, setOwnDimension] = useRivalryDimension(rivalKey);
   // Prop wins if explicitly provided; otherwise self-owned per-rival preference.
