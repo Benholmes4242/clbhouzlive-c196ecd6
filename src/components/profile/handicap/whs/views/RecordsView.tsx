@@ -1,5 +1,4 @@
 import React from 'react';
-import CourseFormCard from '../sections/trends/CourseFormCard';
 import RecentRoundsCard from '../sections/trends/RecentRoundsCard';
 
 interface Props {
@@ -13,7 +12,7 @@ interface Props {
 export const RecordsView: React.FC<Props> = ({
   connectionId,
   userId: _userId,
-  currentHandicap,
+  currentHandicap: _currentHandicap,
   readOnly: _readOnly = false,
 }) => {
   return (
@@ -23,7 +22,7 @@ export const RecordsView: React.FC<Props> = ({
       aria-labelledby="handicap-tab-records"
       style={{ paddingTop: 16 }}
     >
-      <CourseFormCard connectionId={connectionId} currentHandicap={currentHandicap ?? undefined} topMargin={0} />
+      {/* 1. Recent Rounds */}
       <RecentRoundsCard connectionId={connectionId} />
     </div>
   );
