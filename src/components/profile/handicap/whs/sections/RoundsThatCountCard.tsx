@@ -309,6 +309,8 @@ export const RoundsThatCountCard: React.FC<Props> = ({
       />
       <div style={{ padding: '0 20px' }}>
 
+      {chartMode === 'diff' && (
+      <>
       {/* Chart — full-bleed on page background, no card wrapper */}
       <div style={{ padding: '0 0 8px' }}>
         <style>{`
