@@ -22,6 +22,7 @@ import {
   useRivalryDimension,
   type RivalryDimension,
 } from '@/lib/whs/utils/useRivalryDimension';
+import { useOpenFriendHybridSheet } from '@/components/friend-hybrid-sheet/FriendHybridSheetProvider';
 
 // ── Dark-mode handicap tokens (per project memory + brief) ──────────────
 const BG_0 = 'var(--hcp-bg-0)';
@@ -201,6 +202,8 @@ interface HeroProps {
   ownerHcp: number | null;
   dimension: RivalryDimension;
   onDimensionChange: (d: RivalryDimension) => void;
+  onLeftAvatarTap?: () => void;
+  onRightAvatarTap?: () => void;
 }
 
 const RivalryHero: React.FC<HeroProps> = ({
@@ -211,6 +214,8 @@ const RivalryHero: React.FC<HeroProps> = ({
   ownerHcp,
   dimension,
   onDimensionChange,
+  onLeftAvatarTap,
+  onRightAvatarTap,
 }) => {
   const rec = recordFor(row, dimension);
   const wins = rec.wins ?? 0;
@@ -320,7 +325,7 @@ const RivalryHero: React.FC<HeroProps> = ({
           gap: 28,
         }}
       >
-        <Stack name={leftName} hcp={ownerHcp} url={ownerThumb} />
+        <Stack name={leftName} hcp={ownerHcp} url={ownerThumb} onTap={onLeftAvatarTap} />
         <span
           style={{
             color: T40,
@@ -336,6 +341,7 @@ const RivalryHero: React.FC<HeroProps> = ({
           name={rightName}
           hcp={row.rival_handicap}
           url={row.rival_thumbnail_url}
+          onTap={onRightAvatarTap}
         />
       </div>
 
@@ -509,21 +515,51 @@ const DimensionToggle: React.FC<{
   );
 };
 
-const Stack: React.FC<{ name: string; hcp: number | null; url: string | null }> = ({
+const Stack: React.FC<{ name: string; hcp: number | null; url: string | null; onTap?: () => void }> = ({
   name,
   hcp,
   url,
-}) => (
-  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 }}>
-    <Avatar url={url} size={64} />
-    <div style={{ color: T100, fontWeight: 700, fontSize: 14 }}>{name}</div>
-    {hcp != null && (
-      <div style={{ color: T60, fontWeight: 600, fontSize: 13, ...TAB }}>
-        {hcp.toFixed(1)}
-      </div>
-    )}
-  </div>
-);
+  onTap,
+}) => {
+  const inner = (
+    <>
+      <Avatar url={url} size={64} />
+      <div style={{ color: T100, fontWeight: 700, fontSize: 14 }}>{name}</div>
+      {hcp != null && (
+        <div style={{ color: T60, fontWeight: 600, fontSize: 13, ...TAB }}>
+          {hcp.toFixed(1)}
+        </div>
+      )}
+    </>
+  );
+  const baseStyle: React.CSSProperties = {
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    gap: 8,
+  };
+  if (onTap) {
+    return (
+      <button
+        type="button"
+        onClick={(e) => { e.stopPropagation(); onTap(); }}
+        aria-label={`Open ${name}'s snapshot`}
+        style={{
+          ...baseStyle,
+          background: 'transparent',
+          border: 'none',
+          padding: 0,
+          cursor: 'pointer',
+          font: 'inherit',
+          color: 'inherit',
+        }}
+      >
+        {inner}
+      </button>
+    );
+  }
+  return <div style={baseStyle}>{inner}</div>;
+};
 
 // ── Section: courses played together (in-memory groupBy) ───────────────
 interface CourseAgg {
@@ -1110,6 +1146,21 @@ const RivalryPage: React.FC = () => {
   // Per-rival scoring dimension — same key the section card uses
   const [dimension, handleDimensionChange] = useRivalryDimension(rivalParam ?? null);
 
+  // Avatar-tap rewiring (Issue 5) — open the hybrid sheet for friends,
+  // navigate to /handicap for self. Non-UUID rivals (whs_friend_matches.friend_row_id)
+  // remain non-tappable.
+  const openHybridSheet = useOpenFriendHybridSheet().open;
+  const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+  const rivalUserId = row?.rival_user_id ?? null;
+  const onLeftAvatarTap = isFriendView
+    ? (friendParam && UUID_RE.test(friendParam)
+        ? () => openHybridSheet({ targetUserId: friendParam, source: 'rivalry_page' as never })
+        : undefined)
+    : () => navigate('/handicap');
+  const onRightAvatarTap = rivalUserId && UUID_RE.test(rivalUserId)
+    ? () => openHybridSheet({ targetUserId: rivalUserId, source: 'rivalry_page' as never })
+    : undefined;
+
 
   // Owner-view: hydrate "ownerName/ownerThumb/ownerHcp" from viewer profile
   const ownerName = isFriendView
@@ -1174,6 +1225,8 @@ const RivalryPage: React.FC = () => {
             ownerHcp={ownerHcp}
             dimension={dimension}
             onDimensionChange={handleDimensionChange}
+            onLeftAvatarTap={onLeftAvatarTap}
+            onRightAvatarTap={onRightAvatarTap}
           />
           <CoursesPlayedSection
             courses={aggregateCourses(row, dimension)}

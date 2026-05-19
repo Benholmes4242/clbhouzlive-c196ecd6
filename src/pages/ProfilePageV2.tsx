@@ -649,7 +649,7 @@ const ProfilePageV2Content: React.FC = () => {
                   openHybridSheet({ targetUserId: profileUserId, source: 'profile_hcp_pill' });
                 }
               }}
-              className="px-4 py-1.5 text-sm font-semibold rounded-full text-foreground flex items-center justify-center active:scale-[0.98] transition-transform"
+              className="pl-4 pr-2.5 py-1.5 text-sm font-semibold rounded-full text-foreground flex items-center justify-center gap-1.5 active:scale-[0.98] transition-transform"
               style={{
                 background: '#FFFFFF',
                 boxShadow: '0 2px 8px rgba(31, 36, 40, 0.08)',
@@ -657,7 +657,8 @@ const ProfilePageV2Content: React.FC = () => {
                 cursor: 'pointer',
               }}
             >
-              HCP {formatHandicap(profile.eg_handicap_index)}
+              <span>HCP {formatHandicap(profile.eg_handicap_index)}</span>
+              <ChevronRight size={14} strokeWidth={2.4} style={{ color: '#64748B' }} />
             </button>
           )}
         </div>
