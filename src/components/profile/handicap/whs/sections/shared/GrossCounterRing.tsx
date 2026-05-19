@@ -93,7 +93,10 @@ export const InkGrossRing: React.FC<InkGrossRingProps> = ({
           fontFamily: FONT_MONO,
           fontSize,
           fontWeight: 600,
-          color: 'var(--hcp-t-100)',
+          // Non-counter rounds (or dash placeholder) sit visually behind
+          // counter rounds — dim to 60% ink so the green-ringed counters
+          // lead the eye when scanning the list.
+          color: 'var(--hcp-t-60)',
           letterSpacing: '-0.02em',
           fontVariantNumeric: 'tabular-nums',
           lineHeight: 1,

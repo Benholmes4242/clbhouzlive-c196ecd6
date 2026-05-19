@@ -167,14 +167,25 @@ export const PersonalBests: React.FC<Props> = ({ connectionId, currentHandicap }
       }
     }
     if (bestRun > 0) {
-      const fmt = (d: string) =>
-        new Date(d).toLocaleDateString('en-GB', { day: '2-digit', month: 'short' });
-      const startDate = fmt(chrono[bestStartIdx].play_date);
-      const endDate = fmt(chrono[bestEndIdx].play_date);
+      const startDateObj = new Date(chrono[bestStartIdx].play_date);
+      const endDateObj = new Date(chrono[bestEndIdx].play_date);
+      const sameYear = startDateObj.getFullYear() === endDateObj.getFullYear();
+      const fmtWithYear = (d: Date) =>
+        d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+      const fmtNoYear = (d: Date) =>
+        d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short' });
+      let caption: string;
+      if (bestStartIdx === bestEndIdx) {
+        caption = fmtWithYear(startDateObj);
+      } else if (sameYear) {
+        caption = `${fmtNoYear(startDateObj)} – ${fmtWithYear(endDateObj)}`;
+      } else {
+        caption = `${fmtWithYear(startDateObj)} – ${fmtWithYear(endDateObj)}`;
+      }
       longestStreak = {
         eyebrow: 'COUNTER STREAK',
         value: `${bestRun} in a row`,
-        caption: bestStartIdx === bestEndIdx ? startDate : `${startDate} – ${endDate}`,
+        caption,
       };
     }
 
