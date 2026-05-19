@@ -120,6 +120,8 @@ export const RoundsThatCountCard: React.FC<Props> = ({
       : 'The 8 best of your last 20';
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [showExplainer, setShowExplainer] = useState(false);
+  const [scrubIdx, setScrubIdx] = useState<number | null>(null);
+  const [isScrubbing, setIsScrubbing] = useState(false);
   const [chartMode, setChartMode] = useState<'diff' | 'stableford'>('diff');
   const [stablefordScope, setStablefordScope] = useState<StablefordScope>('all');
   const [stablefordSheetOpen, setStablefordSheetOpen] = useState(false);
