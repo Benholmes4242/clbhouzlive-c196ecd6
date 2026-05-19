@@ -159,6 +159,83 @@ const CourseRow: React.FC<CourseRowProps> = ({ name, type, region, country, onTa
   );
 };
 
+// ─── Home Club section ─────────────────────────────────────────────────
+
+const HomeClubSection: React.FC<{
+  userId: string;
+  onSelectCourse: (c: ViewMode & { mode: 'drilldown' }) => void;
+}> = ({ userId, onSelectCourse }) => {
+  const query = useUserHomeClubCourses(userId);
+  const courses = query.data ?? [];
+  const homeClubName = courses[0]?.home_club_name ?? null;
+
+  if (query.isLoading) {
+    return (
+      <>
+        <SectionEyebrow label="HOME CLUB" />
+        <div style={{ padding: '0 16px' }}>
+          <Skeleton height={68} radius={12} />
+        </div>
+      </>
+    );
+  }
+
+  if (!homeClubName && courses.length === 0) {
+    return (
+      <>
+        <SectionEyebrow label="HOME CLUB" />
+        <div style={{ padding: '0 16px' }}>
+          <EmptyStub
+            title="No home club set"
+            body="Add your home club in profile settings to see your home leaderboards here."
+          />
+        </div>
+      </>
+    );
+  }
+
+  if (homeClubName && courses.length === 0) {
+    return (
+      <>
+        <SectionEyebrow label={`HOME CLUB · ${homeClubName.toUpperCase()}`} />
+        <div style={{ padding: '0 16px' }}>
+          <EmptyStub
+            title="Courses not found"
+            body={`We couldn't match courses for "${homeClubName}" — try searching below.`}
+          />
+        </div>
+      </>
+    );
+  }
+
+  return (
+    <>
+      <SectionEyebrow label={`HOME CLUB · ${(homeClubName || '').toUpperCase()}`} />
+      <div style={{ padding: '0 16px', display: 'flex', flexDirection: 'column', gap: 10 }}>
+        {courses.map((c) => (
+          <CourseRow
+            key={c.course_id}
+            name={c.course_name}
+            type={c.course_type}
+            region={c.course_region}
+            country={c.course_country}
+            onTap={() =>
+              onSelectCourse({
+                mode: 'drilldown',
+                courseId: c.course_id,
+                courseName: c.course_name,
+                courseRegion: c.course_region,
+                courseCountry: c.course_country,
+                courseType: c.course_type,
+              })
+            }
+          />
+        ))}
+      </div>
+    </>
+  );
+};
+
 // ─── List view ─────────────────────────────────────────────────────────
 
 const ListView: React.FC<{
