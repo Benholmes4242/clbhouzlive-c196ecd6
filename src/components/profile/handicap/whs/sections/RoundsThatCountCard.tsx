@@ -404,6 +404,7 @@ export const RoundsThatCountCard: React.FC<Props> = ({
                 const idx = idxFromX(e.clientX);
                 setScrubIdx(idx);
                 setSelectedId(enriched.rounds[idx].id);
+                pointerStartRef.current = { x: e.clientX, y: e.clientY, t: Date.now() };
               }}
               onPointerMove={(e) => {
                 if (!isScrubbing) return;
@@ -411,14 +412,31 @@ export const RoundsThatCountCard: React.FC<Props> = ({
                 setScrubIdx(idx);
                 setSelectedId(enriched.rounds[idx].id);
               }}
-              onPointerUp={() => setIsScrubbing(false)}
-              onPointerCancel={() => setIsScrubbing(false)}
+              onPointerUp={(e) => {
+                setIsScrubbing(false);
+                const start = pointerStartRef.current;
+                pointerStartRef.current = null;
+                if (!start) return;
+                const dx = e.clientX - start.x;
+                const dy = e.clientY - start.y;
+                const dist = Math.hypot(dx, dy);
+                const elapsed = Date.now() - start.t;
+                if (dist < 6 && elapsed < 500) {
+                  const idx = idxFromX(e.clientX);
+                  const round = enriched.rounds[idx];
+                  if (round) setSheetScoreId(round.id);
+                }
+              }}
+              onPointerCancel={() => {
+                setIsScrubbing(false);
+                pointerStartRef.current = null;
+              }}
               style={{
                 flex: 1,
                 position: 'relative',
                 height: CHART_H,
                 touchAction: 'pan-y',
-                cursor: isScrubbing ? 'grabbing' : 'crosshair',
+                cursor: isScrubbing ? 'grabbing' : 'pointer',
                 userSelect: 'none',
               }}
             >
