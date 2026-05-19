@@ -19087,6 +19087,10 @@ export type Database = {
           top_friend_names: string[]
         }[]
       }
+      get_friend_hybrid_snapshot: {
+        Args: { p_target_user_id: string; p_viewer_id: string }
+        Returns: Json
+      }
       get_friend_leaderboard: {
         Args: { p_user_id: string }
         Returns: {
