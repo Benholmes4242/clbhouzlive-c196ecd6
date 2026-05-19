@@ -28,7 +28,7 @@ const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
 
 export const StablefordDetailSheet: React.FC<Props> = ({ open, onClose, dist }) => {
   return (
-    <BottomSheet open={open} onClose={onClose} ariaLabelledBy="stableford-sheet-title" className="hcp-dark" style={{ background: 'var(--hcp-bg-1)' }}>
+    <BottomSheet open={open} onClose={onClose} ariaLabelledBy="stableford-sheet-title" className="hcp-dark" style={{ background: 'var(--hcp-bg-1)', minHeight: 0 }}>
       <div
         style={{
           display: 'flex',

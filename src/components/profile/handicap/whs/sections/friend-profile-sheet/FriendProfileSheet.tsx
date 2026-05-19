@@ -77,6 +77,7 @@ export const FriendProfileSheet: React.FC<Props> = ({
             borderTopLeftRadius: 20,
             borderTopRightRadius: 20,
             maxHeight: '88vh',
+            minHeight: 0,
             overflow: 'hidden',
             display: 'flex',
             flexDirection: 'column',

@@ -322,6 +322,7 @@ export const RoundDetailSheet: React.FC<Props> = ({
           style={{
             background: PAGE_BG,
             height: '80dvh',
+            minHeight: 0,
             overflow: 'hidden',
             boxShadow: '0 -10px 40px -10px rgba(0,0,0,0.5)',
             fontFamily: FONT_GEIST,

@@ -101,6 +101,7 @@ export const SentInvitesSheet: React.FC<Props> = ({ open, onClose }) => {
             right: 0,
             bottom: 0,
             maxHeight: '92vh',
+            minHeight: 0,
             background: T.pageBg,
             borderTopLeftRadius: 20,
             borderTopRightRadius: 20,

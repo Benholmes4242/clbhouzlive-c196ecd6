@@ -108,6 +108,7 @@ export const HybridFriendSheet: React.FC<Props> = ({
             borderTopLeftRadius: 20,
             borderTopRightRadius: 20,
             maxHeight: '70vh',
+            minHeight: 0,
             overflow: 'hidden',
             display: 'flex',
             flexDirection: 'column',
