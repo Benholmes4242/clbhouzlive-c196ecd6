@@ -1,6 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import { ChevronLeft, ChevronRight, Search, MapPin, Crown } from 'lucide-react';
 import { useUserPlayedCourses, type PlayedCourseRow } from '@/hooks/gam/useUserPlayedCourses';
+import { useUserHomeClubCourses } from '@/hooks/gam/useUserHomeClubCourses';
 import { useDiscoverCoursesThisWeek, type DiscoverCourseRow } from '@/hooks/gam/useDiscoverCoursesThisWeek';
 import { useCourseSearch, type CourseSearchResult } from '@/hooks/gam/useCourseSearch';
 import { useCourseLegends } from '@/hooks/gam/useCourseLegends';
