@@ -253,6 +253,13 @@ export const RivalryCard: React.FC<Props> = ({
           handicap={userHandicap}
           ringColor={youRing}
           ringGlow={youGlow}
+          onAvatarTap={
+            // Left portrait — owner view: this is the viewer ("YOU"), navigate to own /handicap.
+            // Friend view secondary cards: this is the profile owner — open hybrid sheet for them.
+            friendViewOwnerId
+              ? () => openHybridSheet({ targetUserId: friendViewOwnerId, source: 'rivalries_section' })
+              : () => navigate('/handicap')
+          }
         />
 
         {/* Marquee score */}
@@ -330,6 +337,17 @@ export const RivalryCard: React.FC<Props> = ({
           handicap={rivalry.rival_handicap ?? null}
           ringColor={themRing}
           ringGlow={themGlow}
+          onAvatarTap={
+            rivalry.rival_user_id
+              ? () => {
+                  if (rivalry.rival_user_id === viewerId) {
+                    navigate('/handicap');
+                  } else {
+                    openHybridSheet({ targetUserId: rivalry.rival_user_id!, source: 'rivalries_section' });
+                  }
+                }
+              : undefined
+          }
         />
       </div>
 
