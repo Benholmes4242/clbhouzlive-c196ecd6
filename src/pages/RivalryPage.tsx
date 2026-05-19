@@ -22,6 +22,7 @@ import {
   useRivalryDimension,
   type RivalryDimension,
 } from '@/lib/whs/utils/useRivalryDimension';
+import { useOpenFriendHybridSheet } from '@/components/friend-hybrid-sheet/FriendHybridSheetProvider';
 
 // ── Dark-mode handicap tokens (per project memory + brief) ──────────────
 const BG_0 = 'var(--hcp-bg-0)';
