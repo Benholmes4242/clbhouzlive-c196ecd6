@@ -338,8 +338,17 @@ export const RoundDetailSheet: React.FC<Props> = ({
               background: PAGE_BG,
             }}
           >
-            {scroll}
+            <div
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                minHeight: '100%',
+              }}
+            >
+              {scroll}
+            </div>
           </div>
+
           {footer}
         </DrawerPrimitive.Content>
       </DrawerPrimitive.Portal>
