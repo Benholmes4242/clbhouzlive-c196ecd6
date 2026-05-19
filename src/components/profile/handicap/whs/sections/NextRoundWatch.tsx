@@ -61,7 +61,7 @@ const NextRoundWatch: React.FC<Props> = ({ connectionId, currentHandicap }) => {
   const isBeatingTarget = last5Avg != null && last5Avg <= target;
 
   return (
-    <section style={{ marginTop: 10 }}>
+    <section style={{ marginTop: 32 }}>
       <DarkSectionHeader eyebrow="Next Round Watch" />
 
       <DarkCard
@@ -105,11 +105,11 @@ const NextRoundWatch: React.FC<Props> = ({ connectionId, currentHandicap }) => {
         <h3
           style={{
             margin: 0,
-            padding: '10px 18px 0',
-            fontSize: 19,
+            padding: '12px 18px 0',
+            fontSize: 26,
             fontWeight: 800,
-            letterSpacing: '-0.018em',
-            lineHeight: 1.25,
+            letterSpacing: '-0.022em',
+            lineHeight: 1.18,
             color: 'var(--hcp-t-100)',
             fontFamily: FONT,
           }}
@@ -398,7 +398,7 @@ const BarStack: React.FC<{
   >
     <span
       style={{
-        fontSize: 14,
+        fontSize: 13,
         fontWeight: 700,
         color: valueColor ?? 'var(--hcp-t-100)',
         lineHeight: 1,
@@ -456,9 +456,9 @@ const InnerCell: React.FC<{
     </span>
     <span
       style={{
-        fontSize: 26,
+        fontSize: 20,
         fontWeight: 700,
-        letterSpacing: '-0.025em',
+        letterSpacing: '-0.02em',
         lineHeight: 1,
         color: valueColor,
         fontVariantNumeric: 'tabular-nums',
@@ -468,7 +468,7 @@ const InnerCell: React.FC<{
     </span>
     <span
       style={{
-        fontSize: 12,
+        fontSize: 11.5,
         color: 'var(--hcp-t-60)',
         lineHeight: 1.4,
       }}
