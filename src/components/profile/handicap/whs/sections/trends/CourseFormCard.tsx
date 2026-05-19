@@ -361,7 +361,8 @@ const CourseRow: React.FC<{
           <div
             style={{
               fontSize: 9,
-              color: T.inkMute,
+              color: headline.color !== T.ink ? headline.color : T.inkMute,
+              opacity: headline.color !== T.ink ? 0.7 : 1,
               fontWeight: 700,
               letterSpacing: '0.10em',
               marginTop: 3,

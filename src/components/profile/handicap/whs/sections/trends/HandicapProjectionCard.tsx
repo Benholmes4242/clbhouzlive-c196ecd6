@@ -251,6 +251,38 @@ export const HandicapProjectionCard: React.FC<Props> = ({ scores }) => {
             >
               Projected
             </text>
+            {prediction.direction === 'up' && (
+              <text
+                x="12" y="20"
+                textAnchor="start"
+                style={{
+                  fontSize: 9,
+                  fontWeight: 700,
+                  fill: T.inkMute,
+                  letterSpacing: '0.10em',
+                  fontFamily: FONT,
+                  opacity: 0.85,
+                }}
+              >
+                ↑ HIGHER = WORSE FORM
+              </text>
+            )}
+            {prediction.direction === 'down' && (
+              <text
+                x="12" y="20"
+                textAnchor="start"
+                style={{
+                  fontSize: 9,
+                  fontWeight: 700,
+                  fill: T.inkMute,
+                  letterSpacing: '0.10em',
+                  fontFamily: FONT,
+                  opacity: 0.85,
+                }}
+              >
+                ↓ LOWER = BETTER FORM
+              </text>
+            )}
           </svg>
         </div>
 

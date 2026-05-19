@@ -34,7 +34,7 @@ const CourseCarouselCard: React.FC<{
     onClick={() => onTap(course.id)}
     style={{
       flexShrink: 0,
-      width: 240,
+      width: 'calc((100vw - 32px - 12px) / 1.8)',
       background: 'var(--hcp-bg-1)',
       border: '1px solid var(--hcp-line-2)',
       borderRadius: 14,
@@ -186,7 +186,7 @@ const SkeletonCard = () => (
   <div
     style={{
       flexShrink: 0,
-      width: 240,
+      width: 'calc((100vw - 32px - 12px) / 1.8)',
       height: 200,
       background: INK_06,
       borderRadius: 14,
