@@ -99,7 +99,7 @@ export const RoundScorecard: React.FC<Props> = ({ holes, isNineHole }) => {
   const back9 = isNineHole ? [] : sorted.filter((h) => h.hole_no > 9);
 
   return (
-    <div style={{ padding: '18px 0 6px', fontFamily: FONT_GEIST }}>
+    <div style={{ padding: '18px 0 0', fontFamily: FONT_GEIST }}>
       <div style={{ padding: '0 18px', marginBottom: 10 }}>
         <span
           style={{
@@ -114,8 +114,8 @@ export const RoundScorecard: React.FC<Props> = ({ holes, isNineHole }) => {
         </span>
       </div>
       <div style={{ padding: '0 18px' }}>
-        <NineGrid label="Front 9" holes={front9} />
-        {!isNineHole && back9.length > 0 && <NineGrid label="Back 9" holes={back9} />}
+        <NineGrid label="Front 9" holes={front9} isLast={isNineHole || back9.length === 0} />
+        {!isNineHole && back9.length > 0 && <NineGrid label="Back 9" holes={back9} isLast />}
       </div>
     </div>
   );
