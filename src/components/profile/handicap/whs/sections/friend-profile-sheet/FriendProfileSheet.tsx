@@ -66,6 +66,7 @@ export const FriendProfileSheet: React.FC<Props> = ({
           }}
         />
         <DrawerPrimitive.Content
+          className="hcp-dark"
           style={{
             position: 'fixed',
             left: 0,
