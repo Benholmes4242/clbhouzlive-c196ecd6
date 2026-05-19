@@ -5,6 +5,13 @@ import { fmtDiff, fmtAxis } from '@/lib/whs/format';
 import { projectNextRound } from '@/lib/whs/handicapMath';
 import HandicapExplainerSheet from './HandicapExplainerSheet';
 import { SectionHeader } from './_shared/atoms';
+import type { WhsScore } from '@/lib/whs/types';
+import {
+  computeStablefordDistribution,
+  type StablefordScope,
+  type StablefordDistribution,
+} from './trends/computeStablefordDistribution';
+import StablefordDetailSheet from './trends/StablefordDetailSheet';
 
 
 
