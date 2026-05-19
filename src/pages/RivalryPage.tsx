@@ -514,21 +514,51 @@ const DimensionToggle: React.FC<{
   );
 };
 
-const Stack: React.FC<{ name: string; hcp: number | null; url: string | null }> = ({
+const Stack: React.FC<{ name: string; hcp: number | null; url: string | null; onTap?: () => void }> = ({
   name,
   hcp,
   url,
-}) => (
-  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 }}>
-    <Avatar url={url} size={64} />
-    <div style={{ color: T100, fontWeight: 700, fontSize: 14 }}>{name}</div>
-    {hcp != null && (
-      <div style={{ color: T60, fontWeight: 600, fontSize: 13, ...TAB }}>
-        {hcp.toFixed(1)}
-      </div>
-    )}
-  </div>
-);
+  onTap,
+}) => {
+  const inner = (
+    <>
+      <Avatar url={url} size={64} />
+      <div style={{ color: T100, fontWeight: 700, fontSize: 14 }}>{name}</div>
+      {hcp != null && (
+        <div style={{ color: T60, fontWeight: 600, fontSize: 13, ...TAB }}>
+          {hcp.toFixed(1)}
+        </div>
+      )}
+    </>
+  );
+  const baseStyle: React.CSSProperties = {
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    gap: 8,
+  };
+  if (onTap) {
+    return (
+      <button
+        type="button"
+        onClick={(e) => { e.stopPropagation(); onTap(); }}
+        aria-label={`Open ${name}'s snapshot`}
+        style={{
+          ...baseStyle,
+          background: 'transparent',
+          border: 'none',
+          padding: 0,
+          cursor: 'pointer',
+          font: 'inherit',
+          color: 'inherit',
+        }}
+      >
+        {inner}
+      </button>
+    );
+  }
+  return <div style={baseStyle}>{inner}</div>;
+};
 
 // ── Section: courses played together (in-memory groupBy) ───────────────
 interface CourseAgg {
