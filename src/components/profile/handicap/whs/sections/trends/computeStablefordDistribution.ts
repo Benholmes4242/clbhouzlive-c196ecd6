@@ -29,7 +29,9 @@ const SCOPE_DAYS: Record<Exclude<StablefordScope, 'all'>, number> = {
 };
 
 function isValid(s: WhsScore): s is WhsScore & { stableford_points: number } {
-  return s.stableford_points !== null && s.stableford_points !== undefined;
+  // Filter out null/undefined AND zero — a 0-point round is almost
+  // certainly a sync issue (incomplete round from England Golf).
+  return s.stableford_points != null && s.stableford_points > 0;
 }
 
 function computeAvg(
