@@ -15,6 +15,7 @@ import { useAllScores } from '@/lib/whs/hooks';
 import { useUserProfile } from '@/hooks/useUserProfile';
 import { useTodayWeather } from '@/lib/whs/useTodayWeather';
 import { openGamAchievements } from '@/components/profile/handicap/whs/gam/events';
+import { useRecentUnlocks } from '@/hooks/gam/useRecentUnlocks';
 
 const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
 
@@ -145,6 +146,14 @@ const TodayGreeting: React.FC<Props> = ({ connectionId, userId }) => {
 
   const { data: weather } = useTodayWeather(coords?.lat ?? null, coords?.lng ?? null);
 
+  const { data: recentUnlocks } = useRecentUnlocks(userId);
+
+  const recentUnlockCount = React.useMemo(() => {
+    if (!recentUnlocks || recentUnlocks.length === 0) return 0;
+    const cutoff = Date.now() - 7 * 24 * 60 * 60 * 1000;
+    return recentUnlocks.filter((u) => new Date(u.occurred_at).getTime() > cutoff).length;
+  }, [recentUnlocks]);
+
   const showMeta = !!homeCourseName;
 
   return (
@@ -178,8 +187,13 @@ const TodayGreeting: React.FC<Props> = ({ connectionId, userId }) => {
         <button
           type="button"
           onClick={() => openGamAchievements()}
-          aria-label="Open trophies"
+          aria-label={
+            recentUnlockCount > 0
+              ? `Open trophies — ${recentUnlockCount} new ${recentUnlockCount === 1 ? 'unlock' : 'unlocks'} this week`
+              : 'Open trophies'
+          }
           style={{
+            position: 'relative',
             flexShrink: 0,
             width: 40,
             height: 40,
@@ -195,6 +209,31 @@ const TodayGreeting: React.FC<Props> = ({ connectionId, userId }) => {
           }}
         >
           <Trophy size={18} strokeWidth={2} />
+          {recentUnlockCount > 0 && (
+            <span
+              aria-hidden="true"
+              style={{
+                position: 'absolute',
+                top: -4,
+                right: -4,
+                minWidth: 18,
+                height: 18,
+                padding: '0 5px',
+                borderRadius: 9,
+                background: '#F7931E',
+                color: '#0A0E14',
+                fontFamily: FONT,
+                fontSize: 10,
+                fontWeight: 800,
+                lineHeight: '18px',
+                textAlign: 'center',
+                boxShadow: '0 0 0 2px var(--hcp-bg-0)',
+                fontVariantNumeric: 'tabular-nums',
+              }}
+            >
+              {recentUnlockCount > 9 ? '9+' : recentUnlockCount}
+            </span>
+          )}
         </button>
       </div>
 
