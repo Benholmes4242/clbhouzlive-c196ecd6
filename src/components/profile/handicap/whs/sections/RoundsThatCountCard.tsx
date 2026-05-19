@@ -120,7 +120,35 @@ export const RoundsThatCountCard: React.FC<Props> = ({
       : 'The 8 best of your last 20';
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [showExplainer, setShowExplainer] = useState(false);
-  const [scrubIdx, setScrubIdx] = useState<number | null>(null);
+  const [chartMode, setChartMode] = useState<'diff' | 'stableford'>('diff');
+  const [stablefordScope, setStablefordScope] = useState<StablefordScope>('all');
+  const [stablefordSheetOpen, setStablefordSheetOpen] = useState(false);
+  const stablefordDist = useMemo(
+    () => computeStablefordDistribution(allScores ?? [], stablefordScope),
+    [allScores, stablefordScope],
+  );
+  const stablefordStats = useMemo(() => {
+    const valid = (allScores ?? []).filter(
+      (s) => s.stableford_points !== null && s.stableford_points !== undefined,
+    ) as Array<WhsScore & { stableford_points: number }>;
+    // Filter by scope window for consistency with the distribution
+    const now = Date.now();
+    const windowed =
+      stablefordScope === 'all'
+        ? valid
+        : valid.filter((s) => {
+            const days = stablefordScope === '30d' ? 30 : 90;
+            return new Date(s.play_date).getTime() >= now - days * 86_400_000;
+          });
+    if (windowed.length === 0) return { best: null, avg: null, worst: null };
+    const pts = windowed.map((s) => s.stableford_points);
+    const sum = pts.reduce((a, b) => a + b, 0);
+    return {
+      best: Math.max(...pts),
+      avg: Math.round(sum / pts.length),
+      worst: Math.min(...pts),
+    };
+  }, [allScores, stablefordScope]);
   const [isScrubbing, setIsScrubbing] = useState(false);
   const plotRef = useRef<HTMLDivElement>(null);
 
