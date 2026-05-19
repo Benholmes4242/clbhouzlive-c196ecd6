@@ -15666,7 +15666,7 @@ export type Database = {
           provider: Database["public"]["Enums"]["whs_provider"]
           updated_at: string
           user_id: string
-          vault_secret_id: string
+          vault_secret_id: string | null
         }
         Insert: {
           consecutive_failures?: number
@@ -15683,7 +15683,7 @@ export type Database = {
           provider?: Database["public"]["Enums"]["whs_provider"]
           updated_at?: string
           user_id: string
-          vault_secret_id: string
+          vault_secret_id?: string | null
         }
         Update: {
           consecutive_failures?: number
@@ -15700,7 +15700,7 @@ export type Database = {
           provider?: Database["public"]["Enums"]["whs_provider"]
           updated_at?: string
           user_id?: string
-          vault_secret_id?: string
+          vault_secret_id?: string | null
         }
         Relationships: []
       }
