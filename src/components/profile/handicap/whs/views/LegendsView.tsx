@@ -269,6 +269,7 @@ const ListView: React.FC<{
         </>
       ) : (
         <>
+          <HomeClubSection userId={userId} onSelectCourse={onSelectCourse} />
           <SectionEyebrow label="YOUR COURSES" />
           <div style={{ padding: '0 16px', display: 'flex', flexDirection: 'column', gap: 10 }}>
             {playedQuery.isLoading && <Skeleton height={68} radius={12} />}
