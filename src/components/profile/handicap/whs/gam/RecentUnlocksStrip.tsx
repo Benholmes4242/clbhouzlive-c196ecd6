@@ -193,7 +193,7 @@ const RecentUnlocksStrip: React.FC<RecentUnlocksStripProps> = ({
           {[0, 1, 2].map(i => (
             <div
               key={i}
-              style={{ flex: '0 0 160px', scrollSnapAlign: 'start' }}
+              style={{ flex: '0 0 calc((100vw - 32px - 20px) / 2.2)', scrollSnapAlign: 'start' }}
             >
               <Skeleton height={120} width="100%" radius={12} />
             </div>
