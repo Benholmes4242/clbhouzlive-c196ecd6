@@ -91,7 +91,7 @@ const NotificationsSheet: React.FC<Props> = ({ userId }) => {
         side="bottom"
         hideCloseButton
         className="p-0 max-h-[90dvh] rounded-t-2xl"
-        style={{ background: '#FFFFFF', color: GAM.INK, fontFamily: GAM.FONT_GEIST }}
+        style={{ background: '#FFFFFF', color: GAM.INK, fontFamily: GAM.FONT_GEIST, minHeight: 0 }}
       >
         <div style={{ display: 'flex', justifyContent: 'center', paddingTop: 8 }}>
           <div style={{ width: 36, height: 4, borderRadius: 2, background: GAM.INK_10 }} />
