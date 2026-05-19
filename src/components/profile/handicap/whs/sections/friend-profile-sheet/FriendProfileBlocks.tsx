@@ -141,7 +141,7 @@ export const HeroStatsRow: React.FC<{ friend: FriendLeaderboardEntry }> = ({ fri
       margin: '0 20px 20px',
       display: 'grid',
       gridTemplateColumns: '1fr 1fr 1fr',
-      background: '#F8FAFC',
+      background: 'var(--hcp-bg-1)',
       borderRadius: 14,
       border: `1px solid ${T.hairline}`,
       padding: '14px 0',
