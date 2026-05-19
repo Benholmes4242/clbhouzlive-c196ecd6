@@ -3,6 +3,7 @@ import { DarkSectionHeader } from '../_shared/darkAtoms';
 import LeaderboardRow from './LeaderboardRow';
 import FriendProfileSheet from '../friend-profile-sheet/FriendProfileSheet';
 import { useFriendLeaderboard } from '@/lib/whs/hooks';
+import { useOpenFriendHybridSheet } from '@/components/friend-hybrid-sheet/FriendHybridSheetProvider';
 import { ChevronDown } from 'lucide-react';
 import type { FriendLeaderboardEntry } from '@/lib/whs/types';
 
@@ -28,8 +29,10 @@ const isStale = (lastPlayed: string | null): boolean => {
 
 export const FriendsLeaderboardSection: React.FC<Props> = ({ userId }) => {
   const { data, isLoading } = useFriendLeaderboard(userId);
+  const { open: openHybridSheet } = useOpenFriendHybridSheet();
   const [showInactive, setShowInactive] = useState(false);
   const [showAllActive, setShowAllActive] = useState(false);
+  // Fallback sheet for EG-only friends (no friend_user_id) — hybrid RPC requires UUID.
   const [profileSheet, setProfileSheet] = useState<{ index: number } | null>(null);
 
   // Sort by handicap (low → high). NULL handicaps sink to the bottom.
@@ -169,8 +172,16 @@ export const FriendsLeaderboardSection: React.FC<Props> = ({ userId }) => {
                 entry.is_self
                   ? undefined
                   : () => {
-                      const realIdx = sorted.findIndex((e) => e === entry);
-                      if (realIdx >= 0) setProfileSheet({ index: realIdx });
+                      // Clbhouz user → hybrid sheet. EG-only (no user_id) → legacy sheet.
+                      if (entry.friend_user_id) {
+                        openHybridSheet({
+                          targetUserId: entry.friend_user_id,
+                          source: 'friends_leaderboard_row',
+                        });
+                      } else {
+                        const realIdx = sorted.findIndex((e) => e === entry);
+                        if (realIdx >= 0) setProfileSheet({ index: realIdx });
+                      }
                     }
               }
             />
