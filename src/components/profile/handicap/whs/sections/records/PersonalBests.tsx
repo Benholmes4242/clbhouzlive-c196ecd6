@@ -172,7 +172,7 @@ export const PersonalBests: React.FC<Props> = ({ connectionId, currentHandicap }
       const startDate = fmt(chrono[bestStartIdx].play_date);
       const endDate = fmt(chrono[bestEndIdx].play_date);
       longestStreak = {
-        eyebrow: 'LONGEST COUNTER STREAK',
+        eyebrow: 'COUNTER STREAK',
         value: `${bestRun} in a row`,
         caption: bestStartIdx === bestEndIdx ? startDate : `${startDate} – ${endDate}`,
       };
