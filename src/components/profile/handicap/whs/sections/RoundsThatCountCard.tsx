@@ -131,8 +131,11 @@ export const RoundsThatCountCard: React.FC<Props> = ({
     [allScores, stablefordScope],
   );
   const stablefordStats = useMemo(() => {
+    // Filter out null/undefined AND zero — a 0-point round is almost
+    // certainly a sync issue (incomplete round from England Golf).
+    // A genuine 0-point round would require blob on every hole.
     const valid = (allScores ?? []).filter(
-      (s) => s.stableford_points !== null && s.stableford_points !== undefined,
+      (s) => s.stableford_points != null && s.stableford_points > 0,
     ) as Array<WhsScore & { stableford_points: number }>;
     // Filter by scope window for consistency with the distribution
     const now = Date.now();
