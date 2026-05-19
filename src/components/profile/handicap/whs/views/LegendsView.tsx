@@ -637,13 +637,36 @@ const DrilldownView: React.FC<{
 
 // ─── Top-level view ────────────────────────────────────────────────────
 
-export const LegendsView: React.FC<Props> = ({ userId }) => {
+export const LegendsView: React.FC<Props> = ({ userId, readOnly = false }) => {
   const [view, setView] = useState<ViewMode>({ mode: 'list' });
 
   return (
     <div role="tabpanel" id="handicap-panel-legends" aria-labelledby="handicap-tab-legends">
       {view.mode === 'list' ? (
-        <ListView userId={userId} onSelectCourse={(d) => setView(d)} />
+        <>
+          {/* 1. Friends Leaderboard (hero) */}
+          <FriendsLeaderboardSection userId={userId} />
+
+          {/* 2. Streaks — owner only */}
+          {!readOnly && <StreaksCard userId={userId} readOnly={readOnly} />}
+
+          {/* 3. Rivalries */}
+          <RivalriesSection userId={userId} />
+
+          {/* 4. Leagues — owner only */}
+          {!readOnly && <LeaguesCard userId={userId} isOwner={!readOnly} />}
+
+          {/* 5. Legend Status */}
+          <LegendStatusCard userId={userId} readOnly={readOnly} />
+
+          {/* 6. Course Legends — search + list + drilldown entry */}
+          <ListView userId={userId} onSelectCourse={(d) => setView(d)} />
+
+          {/* Sheet mounts */}
+          <LegendStatusSheetMount />
+          {!readOnly && <StreaksSheetMount />}
+          <LeaguesSheetMount />
+        </>
       ) : (
         <DrilldownView state={view} onBack={() => setView({ mode: 'list' })} />
       )}
