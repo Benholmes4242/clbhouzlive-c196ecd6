@@ -1,9 +1,12 @@
 import React from 'react';
 
-const INK = '#0F172A';
 const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
 
-/** Render **bold** markdown inline as bold spans. */
+/**
+ * Render **bold** markdown inline as bold spans.
+ * Uses `currentColor` so the bold text inherits the parent's colour —
+ * works on both light and dark surfaces without surface-specific styling.
+ */
 export const renderBoldMarkdown = (text: string): React.ReactNode => {
   if (!text) return null;
   const parts = text.split(/(\*\*[^*]+\*\*)/g);
@@ -14,7 +17,7 @@ export const renderBoldMarkdown = (text: string): React.ReactNode => {
         {
           key: i,
           style: {
-            color: INK,
+            color: 'currentColor',
             fontWeight: 800,
             fontFamily: FONT,
             fontVariantNumeric: 'tabular-nums lining-nums',
