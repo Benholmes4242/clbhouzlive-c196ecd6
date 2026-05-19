@@ -262,7 +262,51 @@ export const RoundsThatCountCard: React.FC<Props> = ({
 
   return (
     <section style={{ marginTop: 32 }}>
-      <SectionHeader eyebrow="ROUNDS THAT COUNT" title={headerTitle} />
+      <SectionHeader
+        eyebrow="ROUNDS THAT COUNT"
+        title={headerTitle}
+        right={
+          <div
+            role="tablist"
+            aria-label="Chart mode"
+            style={{
+              display: 'inline-flex',
+              background: 'var(--hcp-bg-2)',
+              border: `1px solid ${D_LINE}`,
+              borderRadius: 999,
+              padding: 2,
+              gap: 0,
+            }}
+          >
+            {(['diff', 'stableford'] as const).map((m) => {
+              const isActive = chartMode === m;
+              return (
+                <button
+                  key={m}
+                  role="tab"
+                  aria-selected={isActive}
+                  onClick={() => setChartMode(m)}
+                  style={{
+                    fontFamily: FONT_GEIST,
+                    fontSize: 10,
+                    fontWeight: 700,
+                    letterSpacing: '0.08em',
+                    textTransform: 'uppercase',
+                    padding: '6px 10px',
+                    borderRadius: 999,
+                    border: 'none',
+                    background: isActive ? AMBER : 'transparent',
+                    color: isActive ? '#fff' : D_T60,
+                    cursor: 'pointer',
+                  }}
+                >
+                  {m === 'diff' ? 'Score diff' : 'Stableford'}
+                </button>
+              );
+            })}
+          </div>
+        }
+      />
       <div style={{ padding: '0 20px' }}>
 
       {/* Chart — full-bleed on page background, no card wrapper */}
