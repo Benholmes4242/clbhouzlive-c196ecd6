@@ -59,6 +59,7 @@ Deno.serve(async (req) => {
       .from("whs_connections")
       .select("id, user_id")
       .eq("id", connection_id)
+      .is("deleted_at", null)
       .maybeSingle();
     if (connErr || !conn || conn.user_id !== userId) {
       return json({ error: "Not found" }, 404);
