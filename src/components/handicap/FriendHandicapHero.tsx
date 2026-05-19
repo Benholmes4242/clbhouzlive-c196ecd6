@@ -11,8 +11,10 @@
 
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import { ChevronRight } from 'lucide-react';
 import { useWhsConnection, useHandicapTrend } from '@/lib/whs/hooks';
 import HeroHandicapCard from '@/components/profile/handicap/whs/sections/HeroHandicapCard';
+import { firstName } from '@/lib/whs/share';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 
 const INK_55 = '#64748B';
@@ -23,9 +25,11 @@ const FONT_GEIST =
 interface Props {
   userId: string;
   viewerUserId: string;
+  /** Optional display name for resolving {firstName} in the discoverability footer. */
+  displayName?: string | null;
 }
 
-const FriendHandicapHero: React.FC<Props> = ({ userId, viewerUserId }) => {
+const FriendHandicapHero: React.FC<Props> = ({ userId, viewerUserId, displayName }) => {
   const navigate = useNavigate();
   const { data: connection, isLoading: connLoading } = useWhsConnection(userId);
   const { data: trend, isLoading: trendLoading } = useHandicapTrend(connection?.id);
@@ -33,6 +37,10 @@ const FriendHandicapHero: React.FC<Props> = ({ userId, viewerUserId }) => {
   if (connLoading || trendLoading) return null;
   if (!connection) return null;
   if (trend?.current === null || trend?.current === undefined) return null;
+
+  const resolvedName =
+    firstName(displayName ?? (connection as { display_name?: string }).display_name ?? '') ||
+    'this golfer';
 
   const handleTap = () => {
     analyticsEvents.track?.('friend_handicap_page_viewed', {
@@ -56,7 +64,7 @@ const FriendHandicapHero: React.FC<Props> = ({ userId, viewerUserId }) => {
       tabIndex={0}
       onClick={handleTap}
       onKeyDown={handleKeyDown}
-      aria-label="View full handicap"
+      aria-label={`See ${resolvedName}'s journey — achievements, streaks, rivals, round history`}
       style={{
         padding: '20px 16px 24px',
         cursor: 'pointer',
@@ -96,6 +104,27 @@ const FriendHandicapHero: React.FC<Props> = ({ userId, viewerUserId }) => {
           harmless on a friend page; revisit if a true readOnly variant is
           built. TODO(handicap): plumb readOnly into HeroHandicapCard. */}
       <HeroHandicapCard connection={connection} />
+
+      {/* Discoverability footer — italic line + chevron is the affordance.
+          The whole section is already tappable; no extra CTA. */}
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: 4,
+          padding: '0 4px',
+          marginTop: 8,
+          fontFamily: FONT_GEIST,
+          fontSize: 12,
+          fontStyle: 'italic',
+          color: INK_55,
+        }}
+      >
+        <span>
+          See {resolvedName}'s journey — achievements, streaks, rivals, round history
+        </span>
+        <ChevronRight size={12} color={INK_55} style={{ marginLeft: -2 }} />
+      </div>
     </section>
   );
 };

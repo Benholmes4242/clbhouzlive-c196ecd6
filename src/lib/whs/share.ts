@@ -28,13 +28,23 @@ export async function shareInvite(invite: {
 }
 
 export function firstName(fullName: string): string {
-  // EG names typically come as "Surname, Given" — take given part
-  const trimmed = fullName.trim();
+  if (!fullName) return '';
+  // Normalize EG "Surname, Given" → "Given Surname" first, then take the
+  // leading word. This avoids brittle pop()/split() logic and keeps a single
+  // canonical normalization path.
+  const normalized = normalizeName(fullName);
+  return normalized.split(/\s+/)[0] ?? normalized;
+}
+
+/** Convert "Holmes, Tom" → "Tom Holmes"; pass-through otherwise. */
+function normalizeName(name: string): string {
+  const trimmed = name.trim();
   if (trimmed.includes(',')) {
-    const given = trimmed.split(',').pop()?.trim() ?? trimmed;
-    return given.split(/\s+/)[0] ?? given;
+    const [surname, ...rest] = trimmed.split(',');
+    const given = rest.join(',').trim();
+    if (given && surname) return `${given} ${surname.trim()}`;
   }
-  return trimmed.split(/\s+/)[0] ?? trimmed;
+  return trimmed;
 }
 
 /**
