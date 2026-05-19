@@ -15,6 +15,7 @@ import { useAllScores } from '@/lib/whs/hooks';
 import { useUserProfile } from '@/hooks/useUserProfile';
 import { useTodayWeather } from '@/lib/whs/useTodayWeather';
 import { openGamAchievements } from '@/components/profile/handicap/whs/gam/events';
+import { useRecentUnlocks } from '@/hooks/gam/useRecentUnlocks';
 
 const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
 
