@@ -12,6 +12,7 @@ import {
   type StablefordDistribution,
 } from './trends/computeStablefordDistribution';
 import StablefordDetailSheet from './trends/StablefordDetailSheet';
+import RoundDetailSheet from './round-detail/RoundDetailSheet';
 
 
 
