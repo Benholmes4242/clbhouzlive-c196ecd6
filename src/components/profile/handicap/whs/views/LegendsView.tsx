@@ -5,6 +5,14 @@ import { useUserHomeClubCourses } from '@/hooks/gam/useUserHomeClubCourses';
 import { useDiscoverCoursesThisWeek, type DiscoverCourseRow } from '@/hooks/gam/useDiscoverCoursesThisWeek';
 import { useCourseSearch, type CourseSearchResult } from '@/hooks/gam/useCourseSearch';
 import { useCourseLegends } from '@/hooks/gam/useCourseLegends';
+import LegendStatusCard from '../../gam/legends/LegendStatusCard';
+import { LegendStatusSheetMount } from '../../gam/legends/LegendStatusSheetMount';
+import StreaksCard from '../../gam/streaks/StreaksCard';
+import { StreaksSheetMount } from '../../gam/streaks/StreaksSheetMount';
+import LeaguesCard from '../../gam/leagues/LeaguesCard';
+import { LeaguesSheetMount } from '../../gam/leagues/LeaguesSheetMount';
+import RivalriesSection from '../sections/rivalries/RivalriesSection';
+import FriendsLeaderboardSection from '../sections/friends-leaderboard-v2/FriendsLeaderboardSection';
 import { GamCard, Skeleton, EmptyStub, RetryStub } from '../../gam/_shared/GamAtoms';
 import {
   legendCategoryLabel,
