@@ -456,9 +456,9 @@ const InnerCell: React.FC<{
     </span>
     <span
       style={{
-        fontSize: 26,
+        fontSize: 20,
         fontWeight: 700,
-        letterSpacing: '-0.025em',
+        letterSpacing: '-0.02em',
         lineHeight: 1,
         color: valueColor,
         fontVariantNumeric: 'tabular-nums',
@@ -468,7 +468,7 @@ const InnerCell: React.FC<{
     </span>
     <span
       style={{
-        fontSize: 12,
+        fontSize: 11.5,
         color: 'var(--hcp-t-60)',
         lineHeight: 1.4,
       }}
