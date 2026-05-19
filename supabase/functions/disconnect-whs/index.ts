@@ -53,6 +53,7 @@ Deno.serve(async (req) => {
     .select("id, vault_secret_id")
     .eq("user_id", user.id)
     .eq("provider", "england_golf")
+    .is("deleted_at", null)
     .maybeSingle();
 
   if (!conn) {
@@ -61,12 +62,18 @@ Deno.serve(async (req) => {
     });
   }
 
+  // Soft-delete: preserves historical whs_scores / gam_round_stats / gam_course_legends
+  // so reconnect can revive this exact row (avoids unique-constraint conflicts on
+  // (user_id, provider) and (passport_id, provider)).
   const { error: delErr } = await admin
     .from("whs_connections")
-    .delete()
+    .update({
+      deleted_at: new Date().toISOString(),
+      vault_secret_id: null,
+    })
     .eq("id", conn.id);
   if (delErr) {
-    console.error("[disconnect-whs] connection delete failed:", delErr);
+    console.error("[disconnect-whs] connection soft-delete failed:", delErr);
     return new Response(JSON.stringify({ ok: false, error: "disconnect_failed" }), {
       status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
