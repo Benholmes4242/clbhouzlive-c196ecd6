@@ -144,7 +144,7 @@ export const PersonalBests: React.FC<Props> = ({ connectionId, currentHandicap }
     }
 
     // #6 Longest counter streak
-    let longestStreak: Tile = empty('LONGEST COUNTER STREAK');
+    let longestStreak: Tile = empty('COUNTER STREAK');
     const chrono = [...list].sort(
       (a, b) => new Date(a.play_date).getTime() - new Date(b.play_date).getTime(),
     );
