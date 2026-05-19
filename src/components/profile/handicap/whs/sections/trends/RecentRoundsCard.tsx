@@ -59,6 +59,16 @@ const diffGlow = (d: number | null | undefined): string => {
   return 'none';
 };
 
+/**
+ * Trim noisy suffixes from course names for compact chip display.
+ * The full name stays as the filter key — only the display label changes.
+ */
+function shortenCourseName(name: string): string {
+  return name
+    .replace(/\s+(Golf\s+Club|Golf\s+Course|Country\s+Club|Course)$/i, '')
+    .trim();
+}
+
 interface HcpDeltaInfo {
   sign: string;
   value: string;
