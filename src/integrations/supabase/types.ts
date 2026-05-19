@@ -20142,6 +20142,25 @@ export type Database = {
           regions_count: number
         }[]
       }
+      get_user_home_club_courses: {
+        Args: { p_user_id: string }
+        Returns: {
+          best_category: string
+          best_rank: number
+          course_country: string
+          course_id: string
+          course_name: string
+          course_region: string
+          course_thumbnail: string
+          course_type: string
+          home_club_name: string
+          last_played_date: string
+          legend_titles: number
+          podium_positions: number
+          rounds_played: number
+          top_10_positions: number
+        }[]
+      }
       get_user_legend_status: {
         Args: { p_user_id: string }
         Returns: {
