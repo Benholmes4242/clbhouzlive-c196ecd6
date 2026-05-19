@@ -39,12 +39,13 @@ const labelStyle: React.CSSProperties = {
 };
 
 const valueStyle = (color: string): React.CSSProperties => ({
-  fontSize: 28,
+  fontSize: 36,
   fontWeight: 300,
   color,
   fontFamily: FONT_MONO,
   letterSpacing: '-0.03em',
   lineHeight: 1,
+  marginTop: 4,
   fontVariantNumeric: 'tabular-nums',
 });
 
@@ -87,9 +88,9 @@ export const SheetHeroGlass: React.FC<Props> = ({
         position: 'absolute',
         left: 14,
         right: 14,
-        top: 130,
+        bottom: 16,
         zIndex: 3,
-        padding: '14px 16px',
+        padding: '16px 18px',
         borderRadius: 16,
         background: 'rgba(255,255,255,0.08)',
         border: '0.5px solid rgba(255,255,255,0.18)',
@@ -98,7 +99,7 @@ export const SheetHeroGlass: React.FC<Props> = ({
         fontFamily: FONT_GEIST,
       }}
     >
-      <div style={{ marginBottom: 12 }}>
+      <div>
         <div
           style={{
             fontSize: 20,
@@ -127,20 +128,21 @@ export const SheetHeroGlass: React.FC<Props> = ({
         )}
       </div>
 
-      <div style={{ ...HAIR, marginBottom: 12 }} />
+      <div style={{ ...HAIR, margin: '14px 0' }} />
 
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
         <div style={{ textAlign: 'left' }}>
           <div style={labelStyle}>GROSS</div>
-          <span
+          <div
+            style={{ marginTop: 4 }}
             aria-label={`Gross score ${gross ?? ''}${isCounter ? ', counts toward index' : ''}`}
           >
             <GlassGrossRing
               value={gross != null ? gross : EM_DASH}
               isCounter={isCounter}
-              numeralSize={28}
+              numeralSize={32}
             />
-          </span>
+          </div>
         </div>
         <div style={{ textAlign: 'center' }}>
           <div style={labelStyle}>STABLEFORD</div>
@@ -153,13 +155,6 @@ export const SheetHeroGlass: React.FC<Props> = ({
           </div>
         </div>
       </div>
-
-      {showShape && (
-        <>
-          <div style={{ ...HAIR, margin: '12px 0 10px' }} />
-          <CinemaCardShapeStrip holes={holes!} />
-        </>
-      )}
     </div>
   );
 };
