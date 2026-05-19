@@ -430,6 +430,9 @@ interface PortraitProps {
   handicap: number | null;
   ringColor: string;
   ringGlow: boolean;
+  /** Optional tap on the avatar disc itself. Stop-propagated so the card body's
+   *  navigation isn't fired. Omit to leave avatar non-interactive. */
+  onAvatarTap?: () => void;
 }
 
 const Portrait: React.FC<PortraitProps> = ({
@@ -439,6 +442,7 @@ const Portrait: React.FC<PortraitProps> = ({
   handicap,
   ringColor,
   ringGlow,
+  onAvatarTap,
 }) => (
   <div
     style={{
@@ -450,6 +454,17 @@ const Portrait: React.FC<PortraitProps> = ({
     }}
   >
     <div
+      role={onAvatarTap ? 'button' : undefined}
+      tabIndex={onAvatarTap ? 0 : undefined}
+      aria-label={onAvatarTap ? `Open ${firstName(name)}'s snapshot` : undefined}
+      onClick={onAvatarTap ? (e) => { e.stopPropagation(); onAvatarTap(); } : undefined}
+      onKeyDown={onAvatarTap ? (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          e.stopPropagation();
+          onAvatarTap();
+        }
+      } : undefined}
       style={{
         width: 60,
         height: 60,
@@ -466,6 +481,7 @@ const Portrait: React.FC<PortraitProps> = ({
         letterSpacing: '0.04em',
         overflow: 'hidden',
         flexShrink: 0,
+        cursor: onAvatarTap ? 'pointer' : 'default',
       }}
     >
       {!thumbnail && initials(name)}
