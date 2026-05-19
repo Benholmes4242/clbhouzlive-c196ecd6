@@ -80,7 +80,7 @@
 
 /* The dashboard wrapper bleeds full-width within the parent screen.
  * Cancel any inherited light padding so the dark canvas extends edge-to-edge.
- * Do not apply this to portaled sheet/dialog roots: it overrides 80dvh sheet caps
+ * Do not apply this to portaled sheet/dialog roots: it overrides 90dvh sheet caps
  * and makes handicap drawers look full-screen.
  */
 .hcp-dark:not([role="dialog"]) {
