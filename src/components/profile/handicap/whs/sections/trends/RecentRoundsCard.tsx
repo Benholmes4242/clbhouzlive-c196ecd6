@@ -355,7 +355,7 @@ const FilterChips: React.FC<FilterChipsProps> = ({
       courseNames.slice(0, 4).map((c) => (
         <FilterChip
           key={c.name}
-          label={c.name}
+          label={shortenCourseName(c.name)}
           count={c.count}
           active={filter === c.name}
           onClick={() => onChange(c.name)}
