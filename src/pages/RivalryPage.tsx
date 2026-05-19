@@ -324,7 +324,7 @@ const RivalryHero: React.FC<HeroProps> = ({
           gap: 28,
         }}
       >
-        <Stack name={leftName} hcp={ownerHcp} url={ownerThumb} />
+        <Stack name={leftName} hcp={ownerHcp} url={ownerThumb} onTap={onLeftAvatarTap} />
         <span
           style={{
             color: T40,
@@ -340,6 +340,7 @@ const RivalryHero: React.FC<HeroProps> = ({
           name={rightName}
           hcp={row.rival_handicap}
           url={row.rival_thumbnail_url}
+          onTap={onRightAvatarTap}
         />
       </div>
 
