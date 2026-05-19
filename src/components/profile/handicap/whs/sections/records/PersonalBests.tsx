@@ -137,7 +137,7 @@ export const PersonalBests: React.FC<Props> = ({ connectionId, currentHandicap }
         }
       }
       mostMonth = {
-        eyebrow: 'MOST ROUNDS IN A MONTH',
+        eyebrow: 'BUSIEST MONTH',
         value: `${topCount} rounds`,
         caption: monthLabel(topKey),
       };
