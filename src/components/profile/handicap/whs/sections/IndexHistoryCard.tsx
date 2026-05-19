@@ -346,7 +346,7 @@ function formatRelativeDate(iso: string): string {
   const now = new Date();
   const ageDays = (now.getTime() - d.getTime()) / 86400_000;
   if (ageDays < 14) {
-    return d.toLocaleDateString('en-GB', { weekday: 'long' }).toLowerCase();
+    return d.toLocaleDateString('en-GB', { weekday: 'long' });
   }
   if (ageDays < 60) {
     const month = d.toLocaleDateString('en-GB', { month: 'short' });
@@ -354,7 +354,7 @@ function formatRelativeDate(iso: string): string {
     const which = day < 10 ? 'early' : day < 20 ? 'mid' : 'late';
     return `${which}-${month}`;
   }
-  return d.toLocaleDateString('en-GB', { month: 'long' }).toLowerCase();
+  return d.toLocaleDateString('en-GB', { month: 'long' });
 }
 
 export default IndexHistoryCard;
