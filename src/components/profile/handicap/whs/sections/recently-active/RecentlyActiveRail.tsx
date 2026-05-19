@@ -2,6 +2,7 @@ import React, { useMemo, useState } from 'react';
 import { useFriendLeaderboard } from '@/lib/whs/hooks';
 import RecentlyActiveItem from './RecentlyActiveItem';
 import FriendProfileSheet from '../friend-profile-sheet/FriendProfileSheet';
+import { useOpenFriendHybridSheet } from '@/components/friend-hybrid-sheet/FriendHybridSheetProvider';
 
 interface Props {
   userId: string;
@@ -12,7 +13,9 @@ const VISIBLE_LIMIT = 10;
 
 export const RecentlyActiveRail: React.FC<Props> = ({ userId }) => {
   const { data, isLoading } = useFriendLeaderboard(userId);
+  const { open: openHybridSheet } = useOpenFriendHybridSheet();
   const [showAll, setShowAll] = useState(false);
+  // Legacy sheet retained for EG-only friends (no user_id).
   const [profileSheet, setProfileSheet] = useState<{ index: number } | null>(null);
 
   const { sorted, activeCount } = useMemo(() => {
@@ -115,6 +118,13 @@ export const RecentlyActiveRail: React.FC<Props> = ({ userId }) => {
                 Date.parse(entry.last_round_played_at) >= cutoff
               }
               onClick={() => {
+                if (entry.friend_user_id) {
+                  openHybridSheet({
+                    targetUserId: entry.friend_user_id,
+                    source: 'recently_active_rail',
+                  });
+                  return;
+                }
                 const realIdx = sorted.findIndex((e) => e === entry);
                 if (realIdx >= 0) setProfileSheet({ index: realIdx });
               }}
