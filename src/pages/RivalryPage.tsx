@@ -1145,6 +1145,21 @@ const RivalryPage: React.FC = () => {
   // Per-rival scoring dimension — same key the section card uses
   const [dimension, handleDimensionChange] = useRivalryDimension(rivalParam ?? null);
 
+  // Avatar-tap rewiring (Issue 5) — open the hybrid sheet for friends,
+  // navigate to /handicap for self. Non-UUID rivals (whs_friend_matches.friend_row_id)
+  // remain non-tappable.
+  const openHybridSheet = useOpenFriendHybridSheet().open;
+  const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+  const rivalUserId = row?.rival_user_id ?? null;
+  const onLeftAvatarTap = isFriendView
+    ? (friendParam && UUID_RE.test(friendParam)
+        ? () => openHybridSheet({ targetUserId: friendParam, source: 'rivalry_page' as never })
+        : undefined)
+    : () => navigate('/handicap');
+  const onRightAvatarTap = rivalUserId && UUID_RE.test(rivalUserId)
+    ? () => openHybridSheet({ targetUserId: rivalUserId, source: 'rivalry_page' as never })
+    : undefined;
+
 
   // Owner-view: hydrate "ownerName/ownerThumb/ownerHcp" from viewer profile
   const ownerName = isFriendView
