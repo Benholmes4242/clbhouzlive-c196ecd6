@@ -1,6 +1,10 @@
 import React from 'react';
 import TrendCardsStack from '../sections/trends/TrendCardsStack';
+import TrendNarrativeSection from '../sections/trends/TrendNarrativeSection';
 import WhereYouStandSection from '../sections/WhereYouStandSection';
+import RoundsThatCountCard from '../sections/RoundsThatCountCard';
+import IndexHistoryCard from '../sections/IndexHistoryCard';
+import CourseFormCard from '../sections/trends/CourseFormCard';
 import EchoInsightsCard from '../sections/EchoInsightsCard';
 
 interface Props {
@@ -9,6 +13,8 @@ interface Props {
   currentHandicap: number | null;
   /** When true, hides personal-only sections (Echo Insights, Where You Stand). */
   readOnly?: boolean;
+  /** First name of the profile owner — used to name-prefix friend-view copy. */
+  ownerFirstName?: string | null;
 }
 
 export const TrendsView: React.FC<Props> = ({
@@ -16,7 +22,10 @@ export const TrendsView: React.FC<Props> = ({
   userId,
   currentHandicap,
   readOnly = false,
+  ownerFirstName = null,
 }) => {
+  const viewMode: 'owner' | 'friend' = readOnly ? 'friend' : 'owner';
+
   return (
     <div
       role="tabpanel"
@@ -24,9 +33,35 @@ export const TrendsView: React.FC<Props> = ({
       aria-labelledby="handicap-tab-trends"
       style={{ paddingTop: 16 }}
     >
-      <TrendCardsStack connectionId={connectionId} currentHandicap={currentHandicap} splitAt="hero-only" topMargin={0} />
-      <TrendCardsStack connectionId={connectionId} currentHandicap={currentHandicap} splitAt="rest" />
+      {/* 1. Form hero + projection */}
+      <TrendCardsStack
+        connectionId={connectionId}
+        currentHandicap={currentHandicap}
+        splitAt="hero-only"
+        topMargin={0}
+      />
+
+      {/* 2. Where You Stand — owner only */}
       {!readOnly && <WhereYouStandSection userId={userId} />}
+
+      {/* 3. Rounds That Count */}
+      <RoundsThatCountCard
+        connectionId={connectionId}
+        currentHandicap={currentHandicap}
+        viewMode={viewMode}
+        ownerFirstName={ownerFirstName}
+      />
+
+      {/* 4. Echo on Your Trend */}
+      <TrendNarrativeSection connectionId={connectionId} />
+
+      {/* 5. Index History */}
+      <IndexHistoryCard connectionId={connectionId} />
+
+      {/* 6. Course Form */}
+      <CourseFormCard connectionId={connectionId} currentHandicap={currentHandicap ?? undefined} />
+
+      {/* 7. Echo Insights — owner only */}
       {!readOnly && <EchoInsightsCard connectionId={connectionId} />}
     </div>
   );
