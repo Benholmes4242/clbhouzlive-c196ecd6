@@ -105,11 +105,11 @@ const NextRoundWatch: React.FC<Props> = ({ connectionId, currentHandicap }) => {
         <h3
           style={{
             margin: 0,
-            padding: '10px 18px 0',
-            fontSize: 19,
+            padding: '12px 18px 0',
+            fontSize: 26,
             fontWeight: 800,
-            letterSpacing: '-0.018em',
-            lineHeight: 1.25,
+            letterSpacing: '-0.022em',
+            lineHeight: 1.18,
             color: 'var(--hcp-t-100)',
             fontFamily: FONT,
           }}
