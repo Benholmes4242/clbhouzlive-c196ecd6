@@ -1225,6 +1225,8 @@ const RivalryPage: React.FC = () => {
             ownerHcp={ownerHcp}
             dimension={dimension}
             onDimensionChange={handleDimensionChange}
+            onLeftAvatarTap={onLeftAvatarTap}
+            onRightAvatarTap={onRightAvatarTap}
           />
           <CoursesPlayedSection
             courses={aggregateCourses(row, dimension)}
