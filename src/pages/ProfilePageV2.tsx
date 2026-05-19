@@ -11,6 +11,7 @@ import { cn } from '@/lib/utils';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { useEditProfileRoute } from '@/hooks/useEditProfileRoute';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
+import { useOpenFriendHybridSheet } from '@/components/friend-hybrid-sheet/FriendHybridSheetProvider';
 import { useUserProfile } from '@/hooks/useUserProfile.tsx';
 import { useTop100Overview } from '@/hooks/useTop100Overview';
 import PostsTabContent from '@/components/posts-tab/PostsTabContent';
