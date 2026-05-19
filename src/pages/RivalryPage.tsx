@@ -201,6 +201,8 @@ interface HeroProps {
   ownerHcp: number | null;
   dimension: RivalryDimension;
   onDimensionChange: (d: RivalryDimension) => void;
+  onLeftAvatarTap?: () => void;
+  onRightAvatarTap?: () => void;
 }
 
 const RivalryHero: React.FC<HeroProps> = ({
@@ -211,6 +213,8 @@ const RivalryHero: React.FC<HeroProps> = ({
   ownerHcp,
   dimension,
   onDimensionChange,
+  onLeftAvatarTap,
+  onRightAvatarTap,
 }) => {
   const rec = recordFor(row, dimension);
   const wins = rec.wins ?? 0;
