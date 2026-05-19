@@ -37,8 +37,8 @@ export const LifetimeStatStrip: React.FC<Props> = ({ connectionId }) => {
     }
 
     const counters = list.filter((s) => s.is_counter).length;
-    const grosses = list.map((s) => s.adjusted_gross).filter((v): v is number => v != null);
-    const diffs = list.map((s) => s.handicap_differential).filter((v): v is number => v != null);
+    const grosses = list.filter(isReasonableGross).map((s) => s.adjusted_gross as number);
+    const diffs = list.filter(isReasonableDiff).map((s) => s.handicap_differential as number);
     const stables = list.map((s) => s.stableford_points).filter((v): v is number => v != null);
     const courseIds = new Set(
       list
