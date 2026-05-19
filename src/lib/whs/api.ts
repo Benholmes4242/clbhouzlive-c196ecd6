@@ -42,6 +42,7 @@ export async function fetchWhsConnection(userId: string): Promise<WhsConnection 
     )
     .eq('user_id', userId)
     .eq('provider', 'england_golf')
+    .is('deleted_at', null)
     .maybeSingle();
   if (error) throw error;
   return (data as unknown as WhsConnection) ?? null;
