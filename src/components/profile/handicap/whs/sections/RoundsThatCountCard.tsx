@@ -727,6 +727,8 @@ export const RoundsThatCountCard: React.FC<Props> = ({
         </div>
       </div>
 
+      </div>
+
       {/* Tick connectors — slim, anchor stat row to chart */}
       <div style={{
         display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)',
