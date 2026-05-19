@@ -155,6 +155,8 @@ export const RoundsThatCountCard: React.FC<Props> = ({
       worst: Math.min(...pts),
     };
   }, [allScores, stablefordScope]);
+  const [sheetScoreId, setSheetScoreId] = useState<string | null>(null);
+  const pointerStartRef = useRef<{ x: number; y: number; t: number } | null>(null);
   const plotRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
