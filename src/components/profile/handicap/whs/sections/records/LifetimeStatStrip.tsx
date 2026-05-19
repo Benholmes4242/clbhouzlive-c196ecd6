@@ -1,6 +1,7 @@
 import React, { useMemo } from 'react';
 import { useAllScores } from '@/lib/whs/hooks';
 import { fmtDiff } from '@/lib/whs/format';
+import { isReasonableGross, isReasonableDiff } from '@/lib/whs/handicapMath';
 import { SectionHeader } from '../_shared/atoms';
 
 interface Props {
