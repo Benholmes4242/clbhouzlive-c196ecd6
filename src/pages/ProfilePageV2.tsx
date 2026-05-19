@@ -633,19 +633,30 @@ const ProfilePageV2Content: React.FC = () => {
           </button>
         </div>
 
-        {/* HCP pill - right side, just below header photo */}
+        {/* HCP pill - right side, just below header photo. Tappable: own → /handicap; friend → hybrid sheet. */}
         <div className="absolute right-5 z-20 flex items-center gap-2 pointer-events-auto" style={{ top: 'calc(35dvh + 12px)' }}>
-          {/* HCP pill - white, bigger size */}
           {profile?.eg_handicap_index != null && (
-            <span 
-             className="px-4 py-1.5 text-sm font-semibold rounded-full text-foreground flex items-center justify-center"
-              style={{ 
+            <button
+              type="button"
+              aria-label={isSelf ? 'Open your handicap' : `Open ${displayName}'s snapshot`}
+              onClick={(e) => {
+                e.stopPropagation();
+                if (isSelf) {
+                  navigate('/handicap');
+                } else if (profileUserId) {
+                  openHybridSheet({ targetUserId: profileUserId, source: 'profile_hcp_pill' });
+                }
+              }}
+              className="px-4 py-1.5 text-sm font-semibold rounded-full text-foreground flex items-center justify-center active:scale-[0.98] transition-transform"
+              style={{
                 background: '#FFFFFF',
-                boxShadow: '0 2px 8px rgba(31, 36, 40, 0.08)'
+                boxShadow: '0 2px 8px rgba(31, 36, 40, 0.08)',
+                border: 'none',
+                cursor: 'pointer',
               }}
             >
               HCP {formatHandicap(profile.eg_handicap_index)}
-            </span>
+            </button>
           )}
         </div>
       </div>
