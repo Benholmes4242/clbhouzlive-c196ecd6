@@ -1,9 +1,12 @@
 import React from 'react';
-import { initials } from '@/lib/whs/utils/initials';
+import { initials, firstName } from '@/lib/whs/utils/initials';
 
 interface Props {
   name: string;
   thumbnailUrl: string | null;
+  /** Optional: stop-propagated tap target around the avatar disc. Used to open
+   *  the hybrid friend sheet without firing the parent card's onClick. */
+  onAvatarTap?: () => void;
 }
 
 /**
@@ -11,7 +14,7 @@ interface Props {
  * Clbhouz-not-synced small friend card. Centers a 64px squircle avatar
  * with a verified badge in the bottom-right corner.
  */
-export const IdentityPanel: React.FC<Props> = ({ name, thumbnailUrl }) => {
+export const IdentityPanel: React.FC<Props> = ({ name, thumbnailUrl, onAvatarTap }) => {
   return (
     <div
       style={{
@@ -41,6 +44,17 @@ export const IdentityPanel: React.FC<Props> = ({ name, thumbnailUrl }) => {
 
       {/* Avatar squircle */}
       <div
+        role={onAvatarTap ? 'button' : undefined}
+        tabIndex={onAvatarTap ? 0 : undefined}
+        aria-label={onAvatarTap ? `Open ${firstName(name)}'s snapshot` : undefined}
+        onClick={onAvatarTap ? (e) => { e.stopPropagation(); onAvatarTap(); } : undefined}
+        onKeyDown={onAvatarTap ? (e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            e.stopPropagation();
+            onAvatarTap();
+          }
+        } : undefined}
         style={{
           position: 'relative',
           width: 64,
@@ -53,6 +67,7 @@ export const IdentityPanel: React.FC<Props> = ({ name, thumbnailUrl }) => {
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
+          cursor: onAvatarTap ? 'pointer' : 'default',
         }}
       >
         {thumbnailUrl ? (

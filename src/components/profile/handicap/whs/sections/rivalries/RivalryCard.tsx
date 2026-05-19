@@ -9,6 +9,8 @@ import {
   useRivalryDimension,
   type RivalryDimension,
 } from '@/lib/whs/utils/useRivalryDimension';
+import { useOpenFriendHybridSheet } from '@/components/friend-hybrid-sheet/FriendHybridSheetProvider';
+import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 
 interface Props {
   rivalry: FriendRivalryHydrated;
@@ -104,6 +106,9 @@ export const RivalryCard: React.FC<Props> = ({
   friendViewOwnerId,
 }) => {
   const navigate = useNavigate();
+  const { open: openHybridSheet } = useOpenFriendHybridSheet();
+  const { user } = useSupabaseSession();
+  const viewerId = user?.id ?? null;
   const rivalKey = rivalry.rival_user_id ?? rivalry.rival_friend_row_id ?? null;
   const [ownDimension, setOwnDimension] = useRivalryDimension(rivalKey);
   // Prop wins if explicitly provided; otherwise self-owned per-rival preference.
@@ -248,6 +253,13 @@ export const RivalryCard: React.FC<Props> = ({
           handicap={userHandicap}
           ringColor={youRing}
           ringGlow={youGlow}
+          onAvatarTap={
+            // Left portrait — owner view: this is the viewer ("YOU"), navigate to own /handicap.
+            // Friend view secondary cards: this is the profile owner — open hybrid sheet for them.
+            friendViewOwnerId
+              ? () => openHybridSheet({ targetUserId: friendViewOwnerId, source: 'rivalries_section' })
+              : () => navigate('/handicap')
+          }
         />
 
         {/* Marquee score */}
@@ -325,6 +337,17 @@ export const RivalryCard: React.FC<Props> = ({
           handicap={rivalry.rival_handicap ?? null}
           ringColor={themRing}
           ringGlow={themGlow}
+          onAvatarTap={
+            rivalry.rival_user_id
+              ? () => {
+                  if (rivalry.rival_user_id === viewerId) {
+                    navigate('/handicap');
+                  } else {
+                    openHybridSheet({ targetUserId: rivalry.rival_user_id!, source: 'rivalries_section' });
+                  }
+                }
+              : undefined
+          }
         />
       </div>
 
@@ -407,6 +430,9 @@ interface PortraitProps {
   handicap: number | null;
   ringColor: string;
   ringGlow: boolean;
+  /** Optional tap on the avatar disc itself. Stop-propagated so the card body's
+   *  navigation isn't fired. Omit to leave avatar non-interactive. */
+  onAvatarTap?: () => void;
 }
 
 const Portrait: React.FC<PortraitProps> = ({
@@ -416,6 +442,7 @@ const Portrait: React.FC<PortraitProps> = ({
   handicap,
   ringColor,
   ringGlow,
+  onAvatarTap,
 }) => (
   <div
     style={{
@@ -427,6 +454,17 @@ const Portrait: React.FC<PortraitProps> = ({
     }}
   >
     <div
+      role={onAvatarTap ? 'button' : undefined}
+      tabIndex={onAvatarTap ? 0 : undefined}
+      aria-label={onAvatarTap ? `Open ${firstName(name)}'s snapshot` : undefined}
+      onClick={onAvatarTap ? (e) => { e.stopPropagation(); onAvatarTap(); } : undefined}
+      onKeyDown={onAvatarTap ? (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          e.stopPropagation();
+          onAvatarTap();
+        }
+      } : undefined}
       style={{
         width: 60,
         height: 60,
@@ -443,6 +481,7 @@ const Portrait: React.FC<PortraitProps> = ({
         letterSpacing: '0.04em',
         overflow: 'hidden',
         flexShrink: 0,
+        cursor: onAvatarTap ? 'pointer' : 'default',
       }}
     >
       {!thumbnail && initials(name)}
