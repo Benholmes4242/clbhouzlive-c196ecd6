@@ -12,6 +12,7 @@ import {
   type StablefordDistribution,
 } from './trends/computeStablefordDistribution';
 import StablefordDetailSheet from './trends/StablefordDetailSheet';
+import RoundDetailSheet from './round-detail/RoundDetailSheet';
 
 
 
@@ -130,8 +131,11 @@ export const RoundsThatCountCard: React.FC<Props> = ({
     [allScores, stablefordScope],
   );
   const stablefordStats = useMemo(() => {
+    // Filter out null/undefined AND zero — a 0-point round is almost
+    // certainly a sync issue (incomplete round from England Golf).
+    // A genuine 0-point round would require blob on every hole.
     const valid = (allScores ?? []).filter(
-      (s) => s.stableford_points !== null && s.stableford_points !== undefined,
+      (s) => s.stableford_points != null && s.stableford_points > 0,
     ) as Array<WhsScore & { stableford_points: number }>;
     // Filter by scope window for consistency with the distribution
     const now = Date.now();
@@ -151,6 +155,8 @@ export const RoundsThatCountCard: React.FC<Props> = ({
       worst: Math.min(...pts),
     };
   }, [allScores, stablefordScope]);
+  const [sheetScoreId, setSheetScoreId] = useState<string | null>(null);
+  const pointerStartRef = useRef<{ x: number; y: number; t: number } | null>(null);
   const plotRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -261,6 +267,7 @@ export const RoundsThatCountCard: React.FC<Props> = ({
     .join(' ');
 
   return (
+    <>
     <section style={{ marginTop: 32 }}>
       <SectionHeader
         eyebrow="ROUNDS THAT COUNT"
@@ -398,6 +405,7 @@ export const RoundsThatCountCard: React.FC<Props> = ({
                 const idx = idxFromX(e.clientX);
                 setScrubIdx(idx);
                 setSelectedId(enriched.rounds[idx].id);
+                pointerStartRef.current = { x: e.clientX, y: e.clientY, t: Date.now() };
               }}
               onPointerMove={(e) => {
                 if (!isScrubbing) return;
@@ -405,14 +413,31 @@ export const RoundsThatCountCard: React.FC<Props> = ({
                 setScrubIdx(idx);
                 setSelectedId(enriched.rounds[idx].id);
               }}
-              onPointerUp={() => setIsScrubbing(false)}
-              onPointerCancel={() => setIsScrubbing(false)}
+              onPointerUp={(e) => {
+                setIsScrubbing(false);
+                const start = pointerStartRef.current;
+                pointerStartRef.current = null;
+                if (!start) return;
+                const dx = e.clientX - start.x;
+                const dy = e.clientY - start.y;
+                const dist = Math.hypot(dx, dy);
+                const elapsed = Date.now() - start.t;
+                if (dist < 6 && elapsed < 500) {
+                  const idx = idxFromX(e.clientX);
+                  const round = enriched.rounds[idx];
+                  if (round) setSheetScoreId(round.id);
+                }
+              }}
+              onPointerCancel={() => {
+                setIsScrubbing(false);
+                pointerStartRef.current = null;
+              }}
               style={{
                 flex: 1,
                 position: 'relative',
                 height: CHART_H,
                 touchAction: 'pan-y',
-                cursor: isScrubbing ? 'grabbing' : 'crosshair',
+                cursor: isScrubbing ? 'grabbing' : 'pointer',
                 userSelect: 'none',
               }}
             >
@@ -693,8 +718,11 @@ export const RoundsThatCountCard: React.FC<Props> = ({
                 return (
                   <button
                     key={r.id}
-                    onClick={() => setSelectedId(r.id)}
-                    aria-label={`Round on ${d.toLocaleDateString()}`}
+                    onClick={() => {
+                      setSelectedId(r.id);
+                      setSheetScoreId(r.id);
+                    }}
+                    aria-label={`Round on ${d.toLocaleDateString()}, tap to see details`}
                     style={{
                       flex: 1, textAlign: 'center',
                       background: 'transparent', border: 'none',
@@ -823,6 +851,15 @@ export const RoundsThatCountCard: React.FC<Props> = ({
 
       </div>
     </section>
+    <RoundDetailSheet
+      variant="user"
+      open={sheetScoreId != null}
+      onClose={() => setSheetScoreId(null)}
+      scoreId={sheetScoreId}
+      connectionId={connectionId}
+      handicapDelta={null}
+    />
+    </>
   );
 };
 
