@@ -254,7 +254,10 @@ export const RecentRoundsCard: React.FC<Props> = ({ connectionId }) => {
                 cursor: 'pointer',
               }}
             >
-              Load older rounds
+              <span>Load older rounds</span>
+              <span style={{ color: T.inkMute, fontWeight: 600 }}>
+                · {filteredRounds.length - displayedCount} more
+              </span>
               <ChevronDown size={14} strokeWidth={2.5} />
             </button>
           )}
