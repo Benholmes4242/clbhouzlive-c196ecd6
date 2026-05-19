@@ -15,7 +15,7 @@ const AMBER = '#F7931E';
 const AMBER_DEEP = '#C97211';
 const GREEN = '#10B981';
 
-const NineGrid: React.FC<{ label: string; holes: WhsScoreHole[] }> = ({ label, holes }) => {
+const NineGrid: React.FC<{ label: string; holes: WhsScoreHole[]; isLast?: boolean }> = ({ label, holes, isLast }) => {
   const total = holes.reduce(
     (s, h) => s + (h.played ? (h.adjusted_gross ?? h.actual_gross ?? 0) : 0),
     0,
