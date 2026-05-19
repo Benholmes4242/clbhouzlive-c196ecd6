@@ -15654,6 +15654,7 @@ export type Database = {
         Row: {
           consecutive_failures: number
           created_at: string
+          deleted_at: string | null
           id: string
           initial_sync_complete: boolean
           last_sync_error: string | null
@@ -15670,6 +15671,7 @@ export type Database = {
         Insert: {
           consecutive_failures?: number
           created_at?: string
+          deleted_at?: string | null
           id?: string
           initial_sync_complete?: boolean
           last_sync_error?: string | null
@@ -15686,6 +15688,7 @@ export type Database = {
         Update: {
           consecutive_failures?: number
           created_at?: string
+          deleted_at?: string | null
           id?: string
           initial_sync_complete?: boolean
           last_sync_error?: string | null
