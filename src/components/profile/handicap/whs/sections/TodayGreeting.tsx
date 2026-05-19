@@ -146,6 +146,14 @@ const TodayGreeting: React.FC<Props> = ({ connectionId, userId }) => {
 
   const { data: weather } = useTodayWeather(coords?.lat ?? null, coords?.lng ?? null);
 
+  const { data: recentUnlocks } = useRecentUnlocks(userId);
+
+  const recentUnlockCount = React.useMemo(() => {
+    if (!recentUnlocks || recentUnlocks.length === 0) return 0;
+    const cutoff = Date.now() - 7 * 24 * 60 * 60 * 1000;
+    return recentUnlocks.filter((u) => new Date(u.occurred_at).getTime() > cutoff).length;
+  }, [recentUnlocks]);
+
   const showMeta = !!homeCourseName;
 
   return (
