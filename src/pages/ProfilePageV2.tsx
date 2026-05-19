@@ -120,6 +120,7 @@ const ProfilePageV2Content: React.FC = () => {
   const editRoute = useEditProfileRoute();
   const { username: routeUsername } = useParams<{ username?: string }>();
   const { user, loading: authLoading } = useSupabaseSession();
+  const { open: openHybridSheet } = useOpenFriendHybridSheet();
 
   const { logPoint } = useProfileTouchDebug();
   
