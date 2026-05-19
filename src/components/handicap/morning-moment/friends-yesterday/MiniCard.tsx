@@ -99,7 +99,7 @@ export const MiniCard: React.FC<Props> = ({ friend, rank: _rank, onClick }) => {
           pointerEvents: 'none',
         }}
       >
-        <div style={{ width: '100%', pointerEvents: 'auto' }}>
+        <div style={{ width: '100%', pointerEvents: 'none' }}>
           <MiniGlass friend={friend} />
         </div>
       </div>

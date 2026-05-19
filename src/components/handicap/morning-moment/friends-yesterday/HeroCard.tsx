@@ -112,7 +112,7 @@ export const HeroCard: React.FC<Props> = ({ friend, onClick }) => {
           pointerEvents: 'none',
         }}
       >
-        <div style={{ width: '100%', pointerEvents: 'auto' }}>
+        <div style={{ width: '100%', pointerEvents: 'none' }}>
           <CinemaFriendGlass
             courseName={friend.course_name}
             par={par}
