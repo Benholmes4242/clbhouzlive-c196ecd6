@@ -49,38 +49,38 @@ export const PersonalBests: React.FC<Props> = ({ connectionId, currentHandicap }
 
     if (list.length === 0) {
       return [
-        empty('LOWEST GROSS'),
-        empty('LOWEST DIFFERENTIAL'),
+        empty('BEST GROSS'),
+        empty('BEST DIFF'),
         empty('BEST STABLEFORD'),
-        empty('BEST VS HANDICAP'),
-        empty('MOST ROUNDS IN A MONTH'),
-        empty('LONGEST COUNTER STREAK'),
+        empty('BEST VS HCP'),
+        empty('BUSIEST MONTH'),
+        empty('COUNTER STREAK'),
       ];
     }
 
-    // #1 Lowest gross
-    const grossList = list.filter((s) => s.adjusted_gross != null);
-    let bestGross: Tile = empty('LOWEST GROSS');
+    // #1 Lowest gross (sanity-filtered to exclude impossible rounds)
+    const grossList = list.filter(isReasonableGross);
+    let bestGross: Tile = empty('BEST GROSS');
     if (grossList.length) {
       const best = grossList.reduce((a, b) =>
         (a.adjusted_gross as number) <= (b.adjusted_gross as number) ? a : b,
       );
       bestGross = {
-        eyebrow: 'LOWEST GROSS',
+        eyebrow: 'BEST GROSS',
         value: String(best.adjusted_gross),
         caption: fmtCourseDate(best),
       };
     }
 
-    // #2 Lowest differential
-    const diffList = list.filter((s) => s.handicap_differential != null);
-    let bestDiff: Tile = empty('LOWEST DIFFERENTIAL');
+    // #2 Lowest differential (sanity-filtered to exclude impossible rounds)
+    const diffList = list.filter(isReasonableDiff);
+    let bestDiff: Tile = empty('BEST DIFF');
     if (diffList.length) {
       const best = diffList.reduce((a, b) =>
         (a.handicap_differential as number) <= (b.handicap_differential as number) ? a : b,
       );
       bestDiff = {
-        eyebrow: 'LOWEST DIFFERENTIAL',
+        eyebrow: 'BEST DIFF',
         value: fmtDiff(best.handicap_differential as number),
         caption: fmtCourseDate(best),
       };
