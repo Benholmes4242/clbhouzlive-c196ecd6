@@ -1,14 +1,9 @@
 /**
  * HybridFriendSheet — Vaul bottom sheet built against get_friend_hybrid_snapshot.
  *
- * Sections (top→bottom):
- *   1. Drag handle
- *   2. Header — squircle avatar, name, username, friendship pill
- *   3. Clbhouz snapshot — bio, posts/followers/mutuals, recent post line
- *   4. Hairline divider
- *   5. Handicap snapshot — synced (value + trend chip + chips + last round)
- *      OR non-synced (lock icon + conversion copy + social proof)
- *   6. Sticky footer — primary + secondary CTAs
+ * Dark-mode scoped via `.hcp-dark` wrapper (tokens defined in
+ * src/styles/handicap-dark.css). Z-stack uses Z.sheetBackdrop / Z.sheet so
+ * the sheet sits above GlobalBottomNavigation.
  *
  * Spec: Proposal B+E1.
  */
@@ -19,17 +14,24 @@ import { X, Lock, ChevronRight } from 'lucide-react';
 import { useFriendHybridSnapshot } from '@/lib/whs/hooks/useFriendHybridSnapshot';
 import { firstName } from '@/lib/whs/share';
 import { analyticsEvents } from '@/utils/analyticsEvents';
+import { Z } from '@/config/zIndex';
 
-const AMBER = '#F7931E';
-const INK_100 = '#0F172A';
-const INK_60 = '#64748B';
-const INK_40 = '#94A3B8';
-const INK_30 = '#CBD5E1';
-const GREEN = '#059669';
-const HAIRLINE = 'rgba(15,23,42,0.08)';
-const SURFACE = '#FFFFFF';
-const BG_TINT = '#F8FAFC';
-const FONT = '"Geist", system-ui, -apple-system, BlinkMacSystemFont, sans-serif';
+// ── Dark handicap tokens (resolved at runtime under .hcp-dark) ──────────
+const BG_0 = 'var(--hcp-bg-0)';
+const BG_1 = 'var(--hcp-bg-1)';
+const BG_2 = 'var(--hcp-bg-2)';
+const T100 = 'var(--hcp-t-100)';
+const T80 = 'var(--hcp-t-80)';
+const T60 = 'var(--hcp-t-60)';
+const T40 = 'var(--hcp-t-40)';
+const LINE = 'var(--hcp-line)';
+const LINE_2 = 'var(--hcp-line-2)';
+const AMBER = 'var(--hcp-amber)';
+const AMBER_TINT = 'var(--hcp-amber-tint)';
+const GOOD = 'var(--hcp-good)';
+const GOOD_TINT = 'var(--hcp-good-tint)';
+
+const FONT = 'Geist, system-ui, -apple-system, BlinkMacSystemFont, sans-serif';
 
 interface Props {
   viewerUserId: string;
@@ -90,18 +92,19 @@ export const HybridFriendSheet: React.FC<Props> = ({
           style={{
             position: 'fixed',
             inset: 0,
-            background: 'rgba(0,0,0,0.55)',
-            zIndex: 80,
+            background: 'rgba(0,0,0,0.65)',
+            zIndex: Z.sheetBackdrop,
           }}
         />
         <DrawerPrimitive.Content
+          className="hcp-dark"
           style={{
             position: 'fixed',
             left: 0,
             right: 0,
             bottom: 0,
-            zIndex: 81,
-            background: SURFACE,
+            zIndex: Z.sheet,
+            background: BG_0,
             borderTopLeftRadius: 20,
             borderTopRightRadius: 20,
             maxHeight: '70vh',
@@ -109,7 +112,7 @@ export const HybridFriendSheet: React.FC<Props> = ({
             display: 'flex',
             flexDirection: 'column',
             fontFamily: FONT,
-            color: INK_100,
+            color: T100,
           }}
         >
           <DrawerPrimitive.Title className="sr-only">{name}</DrawerPrimitive.Title>
@@ -119,7 +122,7 @@ export const HybridFriendSheet: React.FC<Props> = ({
 
           {/* Drag handle */}
           <div aria-hidden style={{ display: 'flex', justifyContent: 'center', padding: '8px 0 4px', flexShrink: 0 }}>
-            <div style={{ width: 36, height: 4, borderRadius: 2, background: 'rgba(15,23,42,0.18)' }} />
+            <div style={{ width: 36, height: 4, borderRadius: 2, background: 'rgba(255,255,255,0.22)' }} />
           </div>
 
           {/* Close */}
@@ -134,19 +137,20 @@ export const HybridFriendSheet: React.FC<Props> = ({
               width: 32,
               height: 32,
               borderRadius: '50%',
-              background: BG_TINT,
+              background: BG_2,
               border: 'none',
               cursor: 'pointer',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
+              color: T100,
             }}
           >
-            <X size={16} color={INK_100} strokeWidth={2.4} />
+            <X size={16} strokeWidth={2.4} />
           </button>
 
-          {/* Scrollable body */}
-          <div style={{ flex: 1, overflowY: 'auto', WebkitOverflowScrolling: 'touch' }}>
+          {/* Scrollable body — defense-in-depth bg ensures visibility even if data is empty */}
+          <div style={{ flex: 1, overflowY: 'auto', WebkitOverflowScrolling: 'touch', background: BG_0 }}>
             {/* Header */}
             <div style={{ padding: '12px 20px 16px', display: 'flex', alignItems: 'center', gap: 14 }}>
               <div
@@ -155,7 +159,7 @@ export const HybridFriendSheet: React.FC<Props> = ({
                   height: 60,
                   borderRadius: '34%',
                   overflow: 'hidden',
-                  background: BG_TINT,
+                  background: BG_2,
                   flexShrink: 0,
                 }}
               >
@@ -166,11 +170,11 @@ export const HybridFriendSheet: React.FC<Props> = ({
                 )}
               </div>
               <div style={{ flex: 1, minWidth: 0 }}>
-                <h2 style={{ margin: 0, fontSize: 28, fontWeight: 900, color: INK_100, letterSpacing: '-0.03em', lineHeight: 1.05 }}>
+                <h2 style={{ margin: 0, fontSize: 28, fontWeight: 900, color: T100, letterSpacing: '-0.03em', lineHeight: 1.05 }}>
                   {name}
                 </h2>
                 {profile?.username && profile.username !== profile.display_name && (
-                  <div style={{ fontSize: 15, color: INK_60, marginTop: 2 }}>@{profile.username}</div>
+                  <div style={{ fontSize: 15, color: T60, marginTop: 2 }}>@{profile.username}</div>
                 )}
               </div>
               {friendshipPill && (
@@ -178,13 +182,13 @@ export const HybridFriendSheet: React.FC<Props> = ({
                   style={{
                     padding: '4px 10px',
                     borderRadius: 999,
-                    background: BG_TINT,
+                    background: BG_2,
                     fontSize: 11,
                     fontWeight: 700,
-                    color: INK_60,
+                    color: T80,
                     letterSpacing: '0.04em',
                     flexShrink: 0,
-                    border: `1px solid ${HAIRLINE}`,
+                    border: `1px solid ${LINE}`,
                   }}
                 >
                   {friendshipPill}
@@ -195,7 +199,7 @@ export const HybridFriendSheet: React.FC<Props> = ({
             {/* Loading / error */}
             {isLoading && <SkeletonBody />}
             {error && (
-              <div style={{ padding: '20px', color: INK_60, fontSize: 14 }}>
+              <div style={{ padding: '20px', color: T60, fontSize: 14 }}>
                 Couldn't load profile snapshot.
               </div>
             )}
@@ -209,7 +213,7 @@ export const HybridFriendSheet: React.FC<Props> = ({
                     style={{
                       margin: '8px 0 12px',
                       fontSize: 15,
-                      color: INK_100,
+                      color: T100,
                       lineHeight: 1.4,
                       display: '-webkit-box',
                       WebkitLineClamp: 2,
@@ -228,7 +232,7 @@ export const HybridFriendSheet: React.FC<Props> = ({
                   ]}
                 />
                 {recentPost && (
-                  <div style={{ marginTop: 10, fontSize: 12, color: INK_60, fontStyle: 'italic' }}>
+                  <div style={{ marginTop: 10, fontSize: 12, color: T60, fontStyle: 'italic' }}>
                     Posted {fmtRelative(recentPost.created_at)} · {excerpt(recentPost.content, 30)}
                   </div>
                 )}
@@ -237,12 +241,12 @@ export const HybridFriendSheet: React.FC<Props> = ({
 
             {/* Divider */}
             {!isLoading && !error && data && (
-              <div style={{ height: 1, background: HAIRLINE, margin: '0 0 14px' }} />
+              <div style={{ height: 1, background: LINE, margin: '0 0 14px' }} />
             )}
 
-            {/* Handicap snapshot */}
-            {!isLoading && !error && hcp && (
-              hcp.is_synced ? (
+            {/* Handicap snapshot — render even if data.handicap is null (treat as non-synced) */}
+            {!isLoading && !error && data && (
+              hcp?.is_synced ? (
                 <SyncedHandicap hcp={hcp} />
               ) : (
                 <NonSyncedHandicap first={first} syncedFriends={data?.synced_friends_count ?? 0} />
@@ -257,12 +261,12 @@ export const HybridFriendSheet: React.FC<Props> = ({
             <div
               style={{
                 flexShrink: 0,
-                borderTop: `1px solid ${HAIRLINE}`,
+                borderTop: `1px solid ${LINE}`,
                 padding: '12px 16px',
                 paddingBottom: 'max(12px, env(safe-area-inset-bottom))',
                 display: 'flex',
                 gap: 12,
-                background: SURFACE,
+                background: BG_0,
               }}
             >
               <FooterButton variant="secondary" onClick={handleViewProfile}>
@@ -305,8 +309,8 @@ const MetricStrip: React.FC<{ items: { label: string; value: number | string }[]
     style={{
       display: 'grid',
       gridTemplateColumns: `repeat(${items.length}, 1fr)`,
-      background: BG_TINT,
-      border: `1px solid ${HAIRLINE}`,
+      background: BG_1,
+      border: `1px solid ${LINE}`,
       borderRadius: 12,
       padding: '12px 0',
     }}
@@ -319,13 +323,13 @@ const MetricStrip: React.FC<{ items: { label: string; value: number | string }[]
           flexDirection: 'column',
           alignItems: 'center',
           gap: 2,
-          borderLeft: i > 0 ? `1px solid ${HAIRLINE}` : 'none',
+          borderLeft: i > 0 ? `1px solid ${LINE}` : 'none',
         }}
       >
-        <span style={{ fontSize: 18, fontWeight: 900, color: INK_100, fontVariantNumeric: 'tabular-nums' }}>
+        <span style={{ fontSize: 18, fontWeight: 900, color: T100, fontVariantNumeric: 'tabular-nums' }}>
           {it.value}
         </span>
-        <span style={{ fontSize: 11, fontWeight: 700, color: INK_60, letterSpacing: '0.10em' }}>{it.label}</span>
+        <span style={{ fontSize: 11, fontWeight: 700, color: T60, letterSpacing: '0.10em' }}>{it.label}</span>
       </div>
     ))}
   </div>
@@ -335,16 +339,16 @@ const SyncedHandicap: React.FC<{ hcp: NonNullable<ReturnType<typeof useFriendHyb
   const delta = hcp.trend_delta;
   let chip: { label: string; bg: string; color: string } | null = null;
   if (delta != null) {
-    if (delta < -0.3) chip = { label: `↓ ${Math.abs(delta).toFixed(1)}`, bg: 'rgba(5,150,105,0.10)', color: GREEN };
-    else if (delta > 0.3) chip = { label: `↑ ${Math.abs(delta).toFixed(1)}`, bg: 'rgba(247,147,30,0.12)', color: AMBER };
-    else chip = { label: '→ flat', bg: BG_TINT, color: INK_40 };
+    if (delta < -0.3) chip = { label: `↓ ${Math.abs(delta).toFixed(1)}`, bg: GOOD_TINT, color: GOOD };
+    else if (delta > 0.3) chip = { label: `↑ ${Math.abs(delta).toFixed(1)}`, bg: AMBER_TINT, color: AMBER };
+    else chip = { label: '→ flat', bg: BG_2, color: T60 };
   }
 
   return (
     <div style={{ padding: '0 20px 18px' }}>
       <Eyebrow label="HANDICAP" />
       <div style={{ display: 'flex', alignItems: 'baseline', gap: 10, marginTop: 8 }}>
-        <span style={{ fontSize: 48, fontWeight: 900, color: INK_100, letterSpacing: '-0.04em', fontVariantNumeric: 'tabular-nums' }}>
+        <span style={{ fontSize: 48, fontWeight: 900, color: T100, letterSpacing: '-0.04em', fontVariantNumeric: 'tabular-nums' }}>
           {hcp.handicap_index?.toFixed(1) ?? '—'}
         </span>
         {chip && (
@@ -373,7 +377,7 @@ const SyncedHandicap: React.FC<{ hcp: NonNullable<ReturnType<typeof useFriendHyb
         />
       </div>
       {hcp.last_round && (
-        <div style={{ marginTop: 10, fontSize: 12, color: INK_60 }}>
+        <div style={{ marginTop: 10, fontSize: 12, color: T60 }}>
           Last round — {hcp.last_round.course_name ?? 'Course'}
           {hcp.last_round.adjusted_gross != null && <>, {hcp.last_round.adjusted_gross}</>}
           {hcp.last_round.play_date && <>, {fmtRelative(hcp.last_round.play_date)}</>}
@@ -387,13 +391,13 @@ const NonSyncedHandicap: React.FC<{ first: string; syncedFriends: number }> = ({
   <div style={{ padding: '0 20px 18px' }}>
     <Eyebrow label="HANDICAP" />
     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8, padding: '12px 0 4px' }}>
-      <Lock size={48} color={INK_30} strokeWidth={1.6} />
-      <div style={{ fontSize: 16, fontWeight: 700, color: INK_100 }}>Not synced yet</div>
-      <p style={{ margin: 0, fontSize: 14, color: INK_60, textAlign: 'center', lineHeight: 1.4, maxWidth: 320 }}>
+      <Lock size={48} color={T40 as unknown as string} strokeWidth={1.6} />
+      <div style={{ fontSize: 16, fontWeight: 700, color: T100 }}>Not synced yet</div>
+      <p style={{ margin: 0, fontSize: 14, color: T60, textAlign: 'center', lineHeight: 1.4, maxWidth: 320 }}>
         If {first} syncs their England Golf handicap, you'll see their live index, recent rounds, achievements, and head-to-head record.
       </p>
       {syncedFriends > 0 && (
-        <div style={{ display: 'flex', alignItems: 'center', gap: 2, fontSize: 12, color: INK_60, fontStyle: 'italic', marginTop: 4 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 2, fontSize: 12, color: T60, fontStyle: 'italic', marginTop: 4 }}>
           {syncedFriends} of your friends are already synced
           <ChevronRight size={14} />
         </div>
@@ -418,9 +422,9 @@ const FooterButton: React.FC<{
       fontSize: 14,
       fontWeight: 700,
       cursor: 'pointer',
-      border: variant === 'primary' ? 'none' : `1px solid ${HAIRLINE}`,
-      background: variant === 'primary' ? INK_100 : SURFACE,
-      color: variant === 'primary' ? '#FFFFFF' : INK_100,
+      border: variant === 'primary' ? 'none' : `1px solid ${LINE_2}`,
+      background: variant === 'primary' ? AMBER : 'transparent',
+      color: variant === 'primary' ? '#0A0E14' : T100,
     }}
   >
     {children}
@@ -433,7 +437,7 @@ const SkeletonBody: React.FC = () => (
       <div
         key={i}
         className="animate-pulse"
-        style={{ height: h, background: BG_TINT, borderRadius: 12, marginBottom: 10 }}
+        style={{ height: h, background: BG_1, borderRadius: 12, marginBottom: 10 }}
       />
     ))}
   </div>
@@ -441,8 +445,8 @@ const SkeletonBody: React.FC = () => (
 
 const PlaceholderSilhouette: React.FC = () => (
   <svg viewBox="0 0 64 64" width="100%" height="100%" preserveAspectRatio="xMidYMax meet" aria-hidden="true" style={{ display: 'block', opacity: 0.45 }}>
-    <circle cx="32" cy="25" r="11" fill={INK_30} />
-    <path d="M11 64 C 11 48, 21 40, 32 40 C 43 40, 53 48, 53 64 Z" fill={INK_30} />
+    <circle cx="32" cy="25" r="11" fill="rgba(255,255,255,0.35)" />
+    <path d="M11 64 C 11 48, 21 40, 32 40 C 43 40, 53 48, 53 64 Z" fill="rgba(255,255,255,0.35)" />
   </svg>
 );
 
