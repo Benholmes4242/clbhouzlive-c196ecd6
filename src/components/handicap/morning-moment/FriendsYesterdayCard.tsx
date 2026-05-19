@@ -4,10 +4,11 @@
  * remaining players. Tap-through navigates to the Friends sub-tab.
  */
 import React from 'react';
-import { useSearchParams } from 'react-router-dom';
-import type { FriendsYesterdayResult } from '@/lib/handicap/useFriendsYesterday';
+import type { FriendYesterday, FriendsYesterdayResult } from '@/lib/handicap/useFriendsYesterday';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { HeroCard, MiniCard } from './friends-yesterday';
+import RoundDetailSheet from '@/components/profile/handicap/whs/sections/round-detail/RoundDetailSheet';
+import type { WhsFriendActivityWithImage } from '@/lib/whs/types';
 
 const T = {
   ink: '#0F172A',
@@ -45,18 +46,43 @@ interface Props {
   userId: string;
 }
 
+const toSheetActivity = (friend: FriendYesterday): WhsFriendActivityWithImage => ({
+  friend_row_id:
+    friend.last_round_score_id ??
+    friend.user_id ??
+    `${friend.friend_passport_id ?? 'friend'}-${friend.name}`,
+  friend_passport_id: friend.friend_passport_id ?? 0,
+  friend_name: friend.name,
+  friend_thumbnail_url: friend.thumbnail_url,
+  friend_user_id: friend.user_id,
+  friend_connection_id: friend.friend_connection_id,
+  is_clbhouz_user: friend.is_clbhouz_user,
+  last_round_played_at: friend.played_at,
+  last_round_course_name: friend.course_name,
+  last_round_adjusted_gross: friend.score,
+  last_round_stableford: friend.stableford,
+  last_round_differential: friend.differential,
+  last_round_score_id: friend.last_round_score_id,
+  course_thumbnail_image: friend.course_thumbnail_image,
+  is_course_best: false,
+  friend_handicap_index: friend.friend_handicap_index,
+  is_counter: friend.is_counter,
+  handicap_index_at_time: friend.handicap_index_at_time,
+  viewer_has_reacted: false,
+  reaction_count: 0,
+});
+
 const FriendsYesterdayCard: React.FC<Props> = ({ data, userId }) => {
   const { friends, count, absenceReason } = data;
-  const [searchParams, setSearchParams] = useSearchParams();
+  const [sheetActivity, setSheetActivity] = React.useState<WhsFriendActivityWithImage | null>(null);
 
-  const handleTap = () => {
+  const handleTap = (friend: FriendYesterday) => {
     analyticsEvents.track('morning_moment_friends_tapped', {
       user_id: userId,
       friends_count: count,
+      score_id: friend.last_round_score_id,
     });
-    const params = new URLSearchParams(searchParams);
-    params.set('subtab', 'friends');
-    setSearchParams(params, { replace: false });
+    setSheetActivity(toSheetActivity(friend));
   };
 
   if (absenceReason && friends.length === 0) {
@@ -95,7 +121,7 @@ const FriendsYesterdayCard: React.FC<Props> = ({ data, userId }) => {
       </div>
 
       {/* Hero */}
-      <HeroCard friend={best} onClick={handleTap} />
+      <HeroCard friend={best} onClick={() => handleTap(best)} />
 
       {others.length > 0 && (
         <>
@@ -120,12 +146,19 @@ const FriendsYesterdayCard: React.FC<Props> = ({ data, userId }) => {
                 key={`${f.user_id ?? 'x'}-${i}`}
                 friend={f}
                 rank={i + 2}
-                onClick={handleTap}
+                onClick={() => handleTap(f)}
               />
             ))}
           </div>
         </>
       )}
+
+      <RoundDetailSheet
+        variant="friend"
+        activity={sheetActivity}
+        open={!!sheetActivity}
+        onClose={() => setSheetActivity(null)}
+      />
     </div>
   );
 };
