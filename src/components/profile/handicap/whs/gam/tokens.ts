@@ -29,6 +29,68 @@ export const RARITY_PILL: Record<string, { bg: string; fg: string; label: string
   legendary: { bg: 'linear-gradient(90deg,#FBBC2E,#F7931E)', fg: '#1A1300', label: 'Legendary' },
 };
 
+/**
+ * Dark-mode rarity tokens for surfaces rendered on var(--hcp-bg-0).
+ */
+export const RARITY_DARK: Record<
+  'common' | 'uncommon' | 'rare' | 'epic' | 'legendary',
+  {
+    iconBg: string;
+    iconRing: string;
+    labelFg: string;
+    cardBorder: string;
+    cardBg: string;
+    topStripe: string | null;
+    glow: string | null;
+  }
+> = {
+  common: {
+    iconBg: 'rgba(148,163,184,0.10)',
+    iconRing: 'rgba(148,163,184,0.18)',
+    labelFg: 'rgba(148,163,184,0.85)',
+    cardBorder: 'var(--hcp-line)',
+    cardBg: 'var(--hcp-bg-1)',
+    topStripe: null,
+    glow: null,
+  },
+  uncommon: {
+    iconBg: 'rgba(59,130,246,0.12)',
+    iconRing: 'rgba(59,130,246,0.32)',
+    labelFg: '#7DAFFF',
+    cardBorder: 'rgba(59,130,246,0.22)',
+    cardBg: 'linear-gradient(180deg, var(--hcp-bg-1) 0%, rgba(59,130,246,0.04) 100%)',
+    topStripe: null,
+    glow: null,
+  },
+  rare: {
+    iconBg: 'rgba(247,147,30,0.14)',
+    iconRing: 'rgba(247,147,30,0.40)',
+    labelFg: '#F7931E',
+    cardBorder: 'rgba(247,147,30,0.32)',
+    cardBg: 'linear-gradient(180deg, var(--hcp-bg-1) 0%, rgba(247,147,30,0.05) 100%)',
+    topStripe: null,
+    glow: null,
+  },
+  epic: {
+    iconBg: 'rgba(168,85,247,0.14)',
+    iconRing: 'rgba(168,85,247,0.40)',
+    labelFg: '#C084FC',
+    cardBorder: 'rgba(168,85,247,0.32)',
+    cardBg: 'linear-gradient(180deg, var(--hcp-bg-1) 0%, rgba(168,85,247,0.06) 100%)',
+    topStripe: 'linear-gradient(90deg, #A855F7 0%, #C084FC 100%)',
+    glow: null,
+  },
+  legendary: {
+    iconBg: 'rgba(247,147,30,0.20)',
+    iconRing: 'rgba(251,188,46,0.50)',
+    labelFg: '#FBBC2E',
+    cardBorder: 'rgba(247,147,30,0.45)',
+    cardBg: 'linear-gradient(180deg, var(--hcp-bg-1) 0%, rgba(247,147,30,0.08) 100%)',
+    topStripe: 'linear-gradient(90deg, #F7931E 0%, #FBBC2E 50%, #F7931E 100%)',
+    glow: 'inset 0 0 0 1px rgba(251,188,46,0.18), 0 0 24px -8px rgba(247,147,30,0.4)',
+  },
+};
+
 export const BRACKET_EMOJI: Record<string, string> = {
   platinum: '💎',
   gold: '🥇',
