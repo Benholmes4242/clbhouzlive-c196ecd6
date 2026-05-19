@@ -151,7 +151,6 @@ export const RoundsThatCountCard: React.FC<Props> = ({
       worst: Math.min(...pts),
     };
   }, [allScores, stablefordScope]);
-  const [isScrubbing, setIsScrubbing] = useState(false);
   const plotRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
