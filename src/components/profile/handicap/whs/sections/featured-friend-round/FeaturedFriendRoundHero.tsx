@@ -2,6 +2,7 @@ import React from 'react';
 import { useFriendFeaturedRound } from '@/lib/whs/hooks';
 import { fmtHcp, fmtDiff } from '@/lib/whs/format';
 import { reformatFriendName } from '@/lib/whs/utils/nameFormat';
+import { useOpenFriendHybridSheet } from '@/components/friend-hybrid-sheet/FriendHybridSheetProvider';
 import SectionHeader from '../SectionHeader';
 import BuildYourCircleCTA from './BuildYourCircleCTA';
 
@@ -20,6 +21,7 @@ function getFreshnessVariant(days: number): { eyebrow: string; titleVerb: string
 
 export const FeaturedFriendRoundHero: React.FC<Props> = ({ userId }) => {
   const { data, isLoading } = useFriendFeaturedRound(userId);
+  const { open: openHybridSheet } = useOpenFriendHybridSheet();
 
   if (isLoading) {
     return <FeaturedHeroSkeleton />;
@@ -72,14 +74,31 @@ export const FeaturedFriendRoundHero: React.FC<Props> = ({ userId }) => {
           }} />
 
 
-          <div style={{
-            position: 'absolute',
-            top: 14,
-            left: 14,
-            display: 'flex',
-            alignItems: 'center',
-            gap: 10,
-          }}>
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              if (data.friend_user_id) {
+                openHybridSheet({ targetUserId: data.friend_user_id, source: 'featured_friend_round' });
+              }
+            }}
+            disabled={!data.friend_user_id}
+            aria-label={`Open ${friendDisplay}'s snapshot`}
+            style={{
+              position: 'absolute',
+              top: 14,
+              left: 14,
+              display: 'flex',
+              alignItems: 'center',
+              gap: 10,
+              background: 'transparent',
+              border: 'none',
+              padding: 0,
+              cursor: data.friend_user_id ? 'pointer' : 'default',
+              color: '#fff',
+              textAlign: 'left',
+            }}
+          >
             {data.friend_thumbnail_url ? (
               <img
                 src={data.friend_thumbnail_url}
@@ -117,7 +136,7 @@ export const FeaturedFriendRoundHero: React.FC<Props> = ({ userId }) => {
                 </p>
               )}
             </div>
-          </div>
+          </button>
 
           <div style={{ padding: '60px 18px 14px' }}>
             <h3 style={{
