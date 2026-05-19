@@ -176,7 +176,7 @@ const RecentUnlocksStrip: React.FC<RecentUnlocksStripProps> = ({
 
   if (isError) {
     return (
-      <div style={{ padding: '0 16px', marginTop: 24 }}>
+      <div style={{ padding: '0 16px', marginTop: 32 }}>
         <RetryStub
           message="Couldn't load recent unlocks"
           onRetry={() => refetch()}
