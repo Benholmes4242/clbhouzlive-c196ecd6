@@ -4,6 +4,7 @@ import { reformatFriendName } from '@/lib/whs/utils/nameFormat';
 import type { WhsFriendActivityWithImage } from '@/lib/whs/types';
 import { SmallCardShell } from './SmallCardShell';
 import { IdentityPanel } from './IdentityPanel';
+import { useOpenFriendHybridSheet } from '@/components/friend-hybrid-sheet/FriendHybridSheetProvider';
 
 interface Props {
   activity: WhsFriendActivityWithImage;
@@ -24,13 +25,22 @@ const T = {
 export const ClbhouzNotSyncedCard: React.FC<Props> = ({ activity, onClick, onInviteClick }) => {
   const displayName = reformatFriendName(activity.friend_name);
   const first = firstName(activity.friend_name);
+  const { open: openHybridSheet } = useOpenFriendHybridSheet();
 
   return (
     <SmallCardShell
       onClick={onClick}
       ariaLabel={`Open ${first}'s profile`}
     >
-      <IdentityPanel name={displayName} thumbnailUrl={activity.friend_thumbnail_url} />
+      <IdentityPanel
+        name={displayName}
+        thumbnailUrl={activity.friend_thumbnail_url}
+        onAvatarTap={
+          activity.friend_user_id
+            ? () => openHybridSheet({ targetUserId: activity.friend_user_id!, source: 'cinema_friend_card' })
+            : undefined
+        }
+      />
 
       <div
         style={{
