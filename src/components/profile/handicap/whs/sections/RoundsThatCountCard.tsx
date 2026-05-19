@@ -829,14 +829,23 @@ export const RoundsThatCountCard: React.FC<Props> = ({
 // ── Stat cell ─────────────────────────────────────────────────────────────
 const StatCell: React.FC<{
   label: string;
-  value: number;
+  value: number | null;
   dotColor: string;
   valueColor: string;
   active?: boolean;
   disabled?: boolean;
   withRightBorder?: boolean;
   onClick?: () => void;
-}> = ({ label, value, dotColor, valueColor, active, disabled, withRightBorder, onClick }) => {
+  /** When set, the value is rendered as a raw integer followed by this unit suffix
+   *  (e.g. "pts") instead of via fmtDiff(). */
+  unit?: string;
+}> = ({ label, value, dotColor, valueColor, active, disabled, withRightBorder, onClick, unit }) => {
+  const display =
+    value == null
+      ? '—'
+      : unit
+        ? String(Math.round(value))
+        : fmtDiff(value);
   return (
     <button
       onClick={disabled ? undefined : onClick}
@@ -869,11 +878,166 @@ const StatCell: React.FC<{
         letterSpacing: '-0.02em',
         lineHeight: 1,
       }}>
-        {fmtDiff(value)}
+        {display}
+        {unit && value != null && (
+          <span style={{ fontSize: 10, fontWeight: 700, color: D_T60, marginLeft: 3 }}>
+            {unit}
+          </span>
+        )}
       </span>
     </button>
   );
 };
+
+// ── Stableford chart block (merged from StablefordCard) ─────────────────
+const SCOPE_BTN_LABEL: Record<StablefordScope, string> = {
+  '30d': '30D', '90d': '90D', all: 'ALL',
+};
+const SCOPE_LABEL_LONG: Record<StablefordScope, string> = {
+  '30d': 'LAST 30 DAYS', '90d': 'LAST 90 DAYS', all: 'ALL TIME',
+};
+const SF_GREEN = '#22C55E';
+const SF_AMBER = '#F7931E';
+const SF_RED = '#DC2626';
+const GREEN_GRAD = 'linear-gradient(90deg, #15803D 0%, #4ADE80 100%)';
+const AMBER_GRAD_SF = 'linear-gradient(90deg, #F59E0B 0%, #FBBF24 100%)';
+const RED_GRAD = 'linear-gradient(90deg, #991B1B 0%, #DC2626 100%)';
+
+const StablefordChartBlock: React.FC<{
+  dist: StablefordDistribution;
+  scope: StablefordScope;
+  onScopeChange: (s: StablefordScope) => void;
+  onOpenDetail: () => void;
+}> = ({ dist, scope, onScopeChange, onOpenDetail }) => {
+  const segs = [
+    { count: dist.inZoneCount, gradient: GREEN_GRAD },
+    { count: dist.solidCount, gradient: AMBER_GRAD_SF },
+    { count: dist.offDayCount, gradient: RED_GRAD },
+  ].filter((s) => s.count > 0);
+
+  return (
+    <div
+      style={{
+        background: D_BG,
+        border: `1px solid ${D_LINE}`,
+        borderRadius: 14,
+        overflow: 'hidden',
+        padding: '14px 16px 16px',
+        fontFamily: FONT_GEIST,
+      }}
+    >
+      {/* Scope toggle + label row */}
+      <div style={{
+        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+        gap: 10, marginBottom: 12,
+      }}>
+        <span style={{
+          fontSize: 9, fontWeight: 800, color: D_T60,
+          letterSpacing: '0.16em', textTransform: 'uppercase',
+        }}>
+          STABLEFORD · {SCOPE_LABEL_LONG[scope]} · {dist.total} ROUNDS
+        </span>
+        <div style={{
+          display: 'inline-flex', background: 'var(--hcp-bg-2)',
+          borderRadius: 99, padding: 2, gap: 0,
+        }}>
+          {(['30d', '90d', 'all'] as StablefordScope[]).map((s) => {
+            const a = scope === s;
+            return (
+              <button
+                key={s}
+                onClick={() => onScopeChange(s)}
+                aria-pressed={a}
+                style={{
+                  padding: '4px 8px',
+                  borderRadius: 99,
+                  background: a ? D_T100 : 'transparent',
+                  color: a ? 'var(--hcp-bg-1)' : D_T60,
+                  border: 'none', cursor: 'pointer',
+                  fontFamily: FONT_GEIST,
+                  fontSize: 10, fontWeight: 800, letterSpacing: '0.06em',
+                }}
+              >
+                {SCOPE_BTN_LABEL[s]}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      {dist.insufficientData ? (
+        <div style={{ padding: '20px 0', textAlign: 'center' }}>
+          <p style={{ margin: 0, fontSize: 13, fontWeight: 700, color: D_T100 }}>
+            Add a few more rounds
+          </p>
+          <p style={{ margin: '4px 0 0', fontSize: 11.5, color: D_T60 }}>
+            We need at least 3 rounds with Stableford to show your distribution.
+          </p>
+        </div>
+      ) : (
+        <>
+          {/* Distribution bar */}
+          <button
+            onClick={onOpenDetail}
+            aria-label="Open Stableford detail"
+            style={{
+              display: 'flex', width: '100%', height: 44,
+              borderRadius: 10, overflow: 'hidden',
+              background: 'var(--hcp-bg-2)',
+              border: 'none', padding: 0, cursor: 'pointer',
+            }}
+          >
+            {segs.map((s, i) => (
+              <div key={i} style={{
+                flex: s.count, background: s.gradient,
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                color: '#fff', fontSize: 14, fontWeight: 800,
+                letterSpacing: '-0.02em',
+                fontVariantNumeric: 'tabular-nums',
+              }}>
+                {s.count > dist.total * 0.1 ? s.count : ''}
+              </div>
+            ))}
+          </button>
+
+          {/* Chips row */}
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: `${Math.max(dist.inZoneCount, 0.5)}fr ${Math.max(dist.solidCount, 0.5)}fr ${Math.max(dist.offDayCount, 0.5)}fr`,
+            marginTop: 10,
+          }}>
+            <KeyCell color={SF_GREEN} label="IN THE ZONE" meta={`36+ · ${dist.inZonePct}%`} />
+            <KeyCell color={SF_AMBER} label="SOLID" meta={`33–35 · ${dist.solidPct}%`} />
+            <KeyCell color={SF_RED} label="OFF DAY" meta={`<33 · ${dist.offDayPct}%`} />
+          </div>
+        </>
+      )}
+    </div>
+  );
+};
+
+const KeyCell: React.FC<{ color: string; label: string; meta: string }> = ({ color, label, meta }) => (
+  <div style={{ textAlign: 'center', padding: '0 4px', fontFamily: FONT_GEIST }}>
+    <div style={{
+      fontSize: 9.5, fontWeight: 800, color: D_T100,
+      letterSpacing: '0.12em', textTransform: 'uppercase',
+      lineHeight: 1.2, marginBottom: 3,
+      display: 'inline-flex', alignItems: 'center', gap: 5, whiteSpace: 'nowrap',
+    }}>
+      <span aria-hidden style={{
+        width: 6, height: 6, borderRadius: '50%', background: color, flexShrink: 0,
+      }} />
+      {label}
+    </div>
+    <div style={{
+      fontSize: 10, color: D_T60, fontWeight: 600,
+      fontVariantNumeric: 'tabular-nums', whiteSpace: 'nowrap',
+    }}>
+      {meta}
+    </div>
+  </div>
+);
+
 
 // ── Next-round state cards ────────────────────────────────────────────────
 const AtRiskState: React.FC<{ cutTarget: number; settleAt: number }> = ({
