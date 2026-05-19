@@ -5,6 +5,7 @@ import { relativeTime } from '@/lib/gam/visuals';
 import type { RecentUnlock } from '@/lib/gam/types';
 import { openGamAchievements } from './events';
 import { renderBadgeIcon } from './badgeIcons';
+import { RARITY_DARK } from './tokens';
 
 const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
 
