@@ -108,7 +108,7 @@ export const CinemaFriendCard: React.FC<Props> = ({ activity, onClick }) => {
           pointerEvents: 'none',
         }}
       >
-        <div style={{ width: '100%', pointerEvents: 'auto' }}>
+        <div style={{ width: '100%', pointerEvents: 'none' }}>
           <CinemaFriendGlass
             courseName={activity.last_round_course_name}
             par={par}
