@@ -398,7 +398,7 @@ const BarStack: React.FC<{
   >
     <span
       style={{
-        fontSize: 14,
+        fontSize: 13,
         fontWeight: 700,
         color: valueColor ?? 'var(--hcp-t-100)',
         lineHeight: 1,
