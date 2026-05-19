@@ -765,10 +765,52 @@ export const RoundsThatCountCard: React.FC<Props> = ({
           onClick={() => setSelectedId(worstRound.id)}
         />
       </div>
+      </>
+      )}
+
+      {chartMode === 'stableford' && (
+        <>
+          <StablefordChartBlock
+            dist={stablefordDist}
+            scope={stablefordScope}
+            onScopeChange={setStablefordScope}
+            onOpenDetail={() => setStablefordSheetOpen(true)}
+          />
+          <div style={{
+            display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)',
+            borderTop: `0.5px solid ${INK_10}`,
+            borderBottom: `1px solid ${D_LINE}`,
+            marginTop: 14,
+          }}>
+            <StatCell
+              label="BEST" value={stablefordStats.best} unit="pts"
+              dotColor={GREEN} valueColor={GREEN}
+              disabled withRightBorder
+            />
+            <StatCell
+              label="AVG" value={stablefordStats.avg} unit="pts"
+              dotColor="var(--hcp-t-60)" valueColor="var(--hcp-t-100)"
+              disabled withRightBorder
+            />
+            <StatCell
+              label="WORST" value={stablefordStats.worst} unit="pts"
+              dotColor={RED} valueColor={RED}
+              disabled
+            />
+          </div>
+        </>
+      )}
+
+      <StablefordDetailSheet
+        open={stablefordSheetOpen}
+        onClose={() => setStablefordSheetOpen(false)}
+        dist={stablefordDist}
+      />
 
       {/* NOTE: Next-round target pair + oldest-round caption moved to NextRoundWatch.
           The SafeState/AtRiskState component definitions remain below as a one-cycle
           safety net but are no longer rendered here. */}
+
 
       <HandicapExplainerSheet
         open={showExplainer}
