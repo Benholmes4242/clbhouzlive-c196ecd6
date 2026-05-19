@@ -717,8 +717,11 @@ export const RoundsThatCountCard: React.FC<Props> = ({
                 return (
                   <button
                     key={r.id}
-                    onClick={() => setSelectedId(r.id)}
-                    aria-label={`Round on ${d.toLocaleDateString()}`}
+                    onClick={() => {
+                      setSelectedId(r.id);
+                      setSheetScoreId(r.id);
+                    }}
+                    aria-label={`Round on ${d.toLocaleDateString()}, tap to see details`}
                     style={{
                       flex: 1, textAlign: 'center',
                       background: 'transparent', border: 'none',
