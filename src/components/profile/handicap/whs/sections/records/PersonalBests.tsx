@@ -120,7 +120,7 @@ export const PersonalBests: React.FC<Props> = ({ connectionId, currentHandicap }
     }
 
     // #5 Most rounds in a month
-    let mostMonth: Tile = empty('MOST ROUNDS IN A MONTH');
+    let mostMonth: Tile = empty('BUSIEST MONTH');
     const monthCounts = new Map<string, number>();
     for (const s of list) {
       if (!s.play_date) continue;
