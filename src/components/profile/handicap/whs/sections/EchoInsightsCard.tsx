@@ -186,7 +186,7 @@ const SkeletonCard = () => (
   <div
     style={{
       flexShrink: 0,
-      width: 240,
+      width: 'calc((100vw - 32px - 12px) / 1.8)',
       height: 200,
       background: INK_06,
       borderRadius: 14,
