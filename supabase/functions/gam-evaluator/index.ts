@@ -146,13 +146,14 @@ async function processSingle(whsScoreId: string) {
   if (scoreRow.course_id) {
     const { data: mapRow } = await supabase
       .from("whs_to_golf_course_map")
-      .select("golf_course_id, golf_courses:golf_course_id(id,name,par)")
+      .select("golf_course_id, golf_courses:golf_course_id(id,name)")
       .eq("whs_course_id", scoreRow.course_id)
       .maybeSingle();
     if (mapRow?.golf_courses) {
       clbhouzCourseId = (mapRow.golf_courses as any).id;
       clbhouzCourseName = (mapRow.golf_courses as any).name;
-      clbhouzCoursePar = (mapRow.golf_courses as any).par;
+      // golf_courses has no `par` column; computeRoundStats falls back to summing hole pars.
+      clbhouzCoursePar = null;
     }
   }
 
