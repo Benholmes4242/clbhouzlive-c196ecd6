@@ -66,3 +66,33 @@ export function projectNextRound(
     hasData: true,
   };
 }
+
+// ─── Sanity filters ─────────────────────────────────────────────────────────
+// These predicates filter out corrupt WHS rows (incomplete syncs, 9-hole
+// rounds mis-flagged as 18, etc.) before they pollute "best ever" stats.
+// Thresholds are deliberately generous — far below any humanly achievable
+// 18-hole round — so legitimate "round of a lifetime" scores pass through.
+
+/**
+ * Minimum plausible 18-hole gross score.
+ * World record for 18 holes is 55 (2012, on a par-72). Anything below 50
+ * is essentially guaranteed to be a data error, not a real round.
+ */
+export const MIN_REASONABLE_GROSS = 50;
+
+/**
+ * Minimum plausible handicap differential. Differentials below -10 are
+ * implausible — they would imply shooting 10+ strokes better than the
+ * course rating. A tour pro on a great day might hit -3 to -5.
+ */
+export const MIN_REASONABLE_DIFF = -10;
+
+/** True if the round's adjusted_gross is in a humanly-achievable range. */
+export function isReasonableGross(s: { adjusted_gross: number | null }): boolean {
+  return s.adjusted_gross != null && s.adjusted_gross >= MIN_REASONABLE_GROSS;
+}
+
+/** True if the round's handicap_differential is plausible. */
+export function isReasonableDiff(s: { handicap_differential: number | null }): boolean {
+  return s.handicap_differential != null && s.handicap_differential >= MIN_REASONABLE_DIFF;
+}
