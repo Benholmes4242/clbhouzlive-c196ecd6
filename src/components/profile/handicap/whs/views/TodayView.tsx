@@ -6,16 +6,8 @@ import TodayGreeting from '../sections/TodayGreeting';
 import LastRoundCard from '../sections/LastRoundCard';
 import NextRoundWatch from '../sections/NextRoundWatch';
 import Pattern14Card from '../sections/Pattern14Card';
-import IndexHistoryCard from '../sections/IndexHistoryCard';
-import RoundsThatCountCard from '../sections/RoundsThatCountCard';
-import StreaksCard from '../../gam/streaks/StreaksCard';
-import { StreaksSheetMount } from '../../gam/streaks/StreaksSheetMount';
 import SinceLastVisitRail from '../sections/since-last-visit/SinceLastVisitRail';
 import RecentUnlocksStrip from '../gam/RecentUnlocksStrip';
-import LegendStatusCard from '../../gam/legends/LegendStatusCard';
-import { LegendStatusSheetMount } from '../../gam/legends/LegendStatusSheetMount';
-import LeaguesCard from '../../gam/leagues/LeaguesCard';
-import { LeaguesSheetMount } from '../../gam/leagues/LeaguesSheetMount';
 import { LaunchSheetMount } from '../../gam/launch/LaunchSheetMount';
 
 interface Props {
@@ -24,7 +16,7 @@ interface Props {
   userId: string;
   currentHandicap: number | null;
   connectionCreatedAt: string;
-  /** When true, hides personal-only sections (Streaks, Where You Stand, Since Last Visit, Echo Insights, footer, banners). */
+  /** When true, hides personal-only sections (Since Last Visit, banners). */
   readOnly?: boolean;
   showReauthBanner?: boolean;
   /** First name of the profile owner — used to name-prefix friend-view copy. */
@@ -42,6 +34,7 @@ export const TodayView: React.FC<Props> = ({
   ownerFirstName = null,
 }) => {
   const viewMode: 'owner' | 'friend' = readOnly ? 'friend' : 'owner';
+
   return (
     <div
       role="tabpanel"
@@ -62,6 +55,7 @@ export const TodayView: React.FC<Props> = ({
         </div>
       )}
 
+      {/* 1. Hero — greeting + handicap ring */}
       <div
         style={{
           background: 'var(--hcp-bg-0)',
@@ -72,16 +66,15 @@ export const TodayView: React.FC<Props> = ({
         <HeroHandicapCardDark connection={connection} />
       </div>
 
-
-
+      {/* 2. Recent Unlocks */}
       <RecentUnlocksStrip userId={userId} readOnly={readOnly} />
 
-      <LegendStatusCard userId={userId} readOnly={readOnly} />
+      {/* 3. Next Round Watch — owner only */}
+      {!readOnly && (
+        <NextRoundWatch connectionId={connectionId} currentHandicap={currentHandicap} />
+      )}
 
-      <Pattern14Card connectionId={connectionId} />
-
-      <IndexHistoryCard connectionId={connectionId} />
-
+      {/* 4. Last Round */}
       <LastRoundCard
         connectionId={connectionId}
         userId={userId}
@@ -89,27 +82,13 @@ export const TodayView: React.FC<Props> = ({
         ownerFirstName={ownerFirstName}
       />
 
-      <RoundsThatCountCard
-        connectionId={connectionId}
-        currentHandicap={currentHandicap}
-        viewMode={viewMode}
-        ownerFirstName={ownerFirstName}
-      />
-
-      <StreaksCard userId={userId} readOnly={readOnly} />
-
-      {!readOnly && <LeaguesCard userId={userId} isOwner={!readOnly} />}
-
-      {!readOnly && (
-        <NextRoundWatch connectionId={connectionId} currentHandicap={currentHandicap} />
-      )}
-
+      {/* 5. Since Last Visit — owner only */}
       {!readOnly && <SinceLastVisitRail userId={userId} />}
 
-      <LegendStatusSheetMount />
-      <LeaguesSheetMount />
-      {!readOnly && <StreaksSheetMount />}
-      {!readOnly && <LaunchSheetMount userId={userId} />}
+      {/* 6. Last 14 Rounds */}
+      <Pattern14Card connectionId={connectionId} />
+
+      <LaunchSheetMount userId={userId} />
     </div>
   );
 };
