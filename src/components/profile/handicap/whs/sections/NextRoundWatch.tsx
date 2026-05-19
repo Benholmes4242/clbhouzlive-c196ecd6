@@ -61,7 +61,7 @@ const NextRoundWatch: React.FC<Props> = ({ connectionId, currentHandicap }) => {
   const isBeatingTarget = last5Avg != null && last5Avg <= target;
 
   return (
-    <section style={{ marginTop: 10 }}>
+    <section style={{ marginTop: 32 }}>
       <DarkSectionHeader eyebrow="Next Round Watch" />
 
       <DarkCard
