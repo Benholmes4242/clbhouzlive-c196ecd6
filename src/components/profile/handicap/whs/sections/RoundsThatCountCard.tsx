@@ -267,6 +267,7 @@ export const RoundsThatCountCard: React.FC<Props> = ({
     .join(' ');
 
   return (
+    <>
     <section style={{ marginTop: 32 }}>
       <SectionHeader
         eyebrow="ROUNDS THAT COUNT"
