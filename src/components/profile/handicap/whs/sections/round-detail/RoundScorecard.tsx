@@ -26,7 +26,7 @@ const NineGrid: React.FC<{ label: string; holes: WhsScoreHole[]; isLast?: boolea
   const toParLabel = toPar === 0 ? 'E' : `${toPar > 0 ? '+' : ''}${toPar}`;
 
   return (
-    <div style={{ marginBottom: 14 }}>
+    <div style={{ marginBottom: isLast ? 0 : 14 }}>
       <div
         style={{
           display: 'flex',
