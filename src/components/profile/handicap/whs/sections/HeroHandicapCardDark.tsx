@@ -107,10 +107,6 @@ const HeroHandicapCardDark: React.FC<Props> = ({ connection }) => {
     return (Math.floor(handicap * 5) / 5).toFixed(1);
   }, [handicap]);
 
-  const tagWord =
-    verdict === 'good' ? 'IMPROVING' :
-    verdict === 'bad'  ? 'TRENDING UP' :
-    verdict === 'mid'  ? 'HOLDING' : '';
 
   // ── KPI strip data ────────────────────────────────────────────────
   const scores = (allScores ?? []) as any[];
