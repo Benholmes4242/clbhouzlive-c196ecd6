@@ -85,7 +85,7 @@ const DistributionChart: React.FC<{
         style={{
           position: 'absolute',
           top: 22,
-          bottom: 0,
+          bottom: 28,
           left: 0,
           width: 'calc(2 * ((100% - 36px) / 7) + 6px)',
           background: 'rgba(34,197,94,0.06)',
@@ -99,30 +99,43 @@ const DistributionChart: React.FC<{
         aria-hidden
         style={{
           position: 'absolute',
-          top: 14,
+          top: 18,
           left: 0,
           width: 'calc(2 * ((100% - 36px) / 7) + 6px)',
           height: 0,
-          borderTop: '1px dashed #22C55E',
+          borderTop: '1.5px dashed #22C55E',
           pointerEvents: 'none',
           zIndex: 2,
         }}
       />
-      {/* Tiny "SCRATCH" caps text above the dashed line */}
+      {/* "SCRATCH" badge sitting on the dashed top edge */}
       <div
         aria-hidden
         style={{
           position: 'absolute',
-          top: 0,
-          left: 4,
+          top: -3,
+          left: 6,
+          display: 'inline-flex',
+          alignItems: 'center',
+          gap: 4,
+          padding: '2px 6px',
           fontSize: 9,
           fontWeight: 800,
-          color: '#15803D',
-          letterSpacing: '0.16em',
+          color: '#4ADE80',
+          letterSpacing: '0.14em',
+          background: 'var(--hcp-bg-1)',
           pointerEvents: 'none',
-          zIndex: 2,
+          zIndex: 3,
         }}
       >
+        <span
+          style={{
+            width: 4,
+            height: 4,
+            borderRadius: 999,
+            background: '#22C55E',
+          }}
+        />
         SCRATCH
       </div>
       <div
@@ -130,8 +143,8 @@ const DistributionChart: React.FC<{
           display: 'flex',
           alignItems: 'flex-end',
           gap: 6,
-          height: 110,
-          paddingTop: 22,
+          height: 130,
+          paddingTop: 28,
           position: 'relative',
           zIndex: 1,
         }}
@@ -148,13 +161,8 @@ const DistributionChart: React.FC<{
           return orderedBuckets.map((b, i) => {
             const isUser = b.is_user_bucket;
             const isMedian = i === medianBucketIdx && !isUser;
-            const heightPct = (b.pct / (maxPct * 1.1)) * 100;
+            const heightPct = (b.pct / (maxPct * 1.15)) * 100;
             const isEmpty = b.pct === 0;
-            const barBg = isUser
-              ? AMBER
-              : isMedian
-                ? `linear-gradient(180deg, rgba(255,255,255,0.18), rgba(255,255,255,0.08))`
-                : `linear-gradient(180deg, rgba(255,255,255,0.08), rgba(255,255,255,0.03))`;
             return (
               <div
                 key={b.bucket}
@@ -168,17 +176,47 @@ const DistributionChart: React.FC<{
                   height: '100%',
                 }}
               >
-                {/* User-bucket identity carried entirely by amber gradient + glow shadow below */}
-                <div
-                  style={{
-                    width: '100%',
-                    height: isEmpty ? '3%' : `${Math.max(heightPct, 3)}%`,
-                    background: barBg,
-                    opacity: isEmpty && !isUser ? 0.5 : 1,
-                    borderRadius: '6px 6px 0 0',
-                    boxShadow: isUser ? '0 0 16px rgba(247,147,30,0.30)' : 'none',
-                  }}
-                />
+                {!isEmpty && (
+                  <div
+                    style={{
+                      fontSize: 10,
+                      fontWeight: 800,
+                      color: isUser ? AMBER : INK_55,
+                      marginBottom: 4,
+                      fontVariantNumeric: 'tabular-nums',
+                      letterSpacing: '-0.01em',
+                      fontFamily: FONT_GEIST,
+                    }}
+                  >
+                    {b.pct}%
+                  </div>
+                )}
+                {isEmpty ? (
+                  <div
+                    style={{
+                      width: '100%',
+                      height: '3%',
+                      border: '1px dashed var(--hcp-line-3)',
+                      borderRadius: '4px 4px 0 0',
+                      background: 'transparent',
+                      boxSizing: 'border-box',
+                    }}
+                  />
+                ) : (
+                  <div
+                    style={{
+                      width: '100%',
+                      height: `${Math.max(heightPct, 3)}%`,
+                      background: isUser
+                        ? `linear-gradient(180deg, ${AMBER} 0%, rgba(247, 147, 30, 0.6) 100%)`
+                        : isMedian
+                          ? `linear-gradient(180deg, rgba(255,255,255,0.20), rgba(255,255,255,0.08))`
+                          : `linear-gradient(180deg, rgba(255,255,255,0.10), rgba(255,255,255,0.04))`,
+                      borderRadius: '4px 4px 0 0',
+                      boxShadow: isUser ? '0 0 16px rgba(247,147,30,0.30)' : 'none',
+                    }}
+                  />
+                )}
               </div>
             );
           });
