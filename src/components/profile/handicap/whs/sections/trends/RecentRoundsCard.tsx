@@ -212,9 +212,9 @@ export const RecentRoundsCard: React.FC<Props> = ({ connectionId }) => {
                   <FeedCard
                     key={round.id}
                     round={round}
-                    isBest={bestByCourseSet.has(round.id)}
                     onTap={() => setOpenScoreId(round.id)}
                   />
+
                 ))}
               </div>
             </div>
