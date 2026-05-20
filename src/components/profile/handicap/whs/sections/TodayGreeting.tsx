@@ -238,53 +238,52 @@ const TodayGreeting: React.FC<Props> = ({ connectionId, userId }) => {
       </div>
 
       {showMeta && homeCourseName && (
-        <>
-          {/* Row 1: course name */}
-          <div
-            style={{
-              marginTop: 8,
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'baseline',
-              gap: 12,
-              fontSize: 11,
-              fontWeight: 700,
-              letterSpacing: '0.12em',
-              textTransform: 'uppercase',
-              color: 'var(--hcp-t-60)',
-            }}
-          >
-            <span>{cleanCourseDisplay(courseLookup?.canonicalName ?? homeCourseName)}</span>
-          </div>
-
-          {/* Row 2: weather, left-aligned */}
+        <div
+          style={{
+            marginTop: 10,
+            display: 'flex',
+            alignItems: 'center',
+            flexWrap: 'wrap',
+            gap: 8,
+            rowGap: 6,
+            fontSize: 11,
+            fontWeight: 700,
+            letterSpacing: '0.08em',
+            textTransform: 'uppercase',
+            color: 'var(--hcp-t-60)',
+          }}
+        >
+          <span style={{ color: 'var(--hcp-t-100)' }}>
+            {cleanCourseDisplay(courseLookup?.canonicalName ?? homeCourseName)}
+          </span>
           {weather && (
-            <div
-              style={{
-                marginTop: 6,
-                display: 'flex',
-                flexWrap: 'wrap',
-                alignItems: 'center',
-                gap: 6,
-                fontSize: 11,
-                fontWeight: 700,
-                letterSpacing: '0.12em',
-                textTransform: 'uppercase',
-                color: 'var(--hcp-t-60)',
-              }}
-            >
-              <span style={{ color: '#F7931E', fontSize: 13, lineHeight: 1 }}>
-                {weatherGlyph(weather.code)}
-              </span>
-              <span style={{ color: 'var(--hcp-t-100)', fontVariantNumeric: 'tabular-nums' }}>
-                {Math.round(weather.tempNow)}°
+            <>
+              <span style={{ opacity: 0.4 }}>·</span>
+              <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5 }}>
+                <span style={{ color: '#F7931E', fontSize: 13, lineHeight: 1 }}>
+                  {weatherGlyph(weather.code)}
+                </span>
+                <span>Now</span>
+                <span
+                  style={{
+                    color: 'var(--hcp-t-100)',
+                    fontVariantNumeric: 'tabular-nums',
+                  }}
+                >
+                  {Math.round(weather.tempNow)}°
+                </span>
               </span>
               {weather.tempMax != null && (
                 <>
-                  <span>·</span>
-                  <span>
-                    peak{' '}
-                    <span style={{ color: 'var(--hcp-t-100)', fontVariantNumeric: 'tabular-nums' }}>
+                  <span style={{ opacity: 0.4 }}>·</span>
+                  <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5 }}>
+                    <span>Peak</span>
+                    <span
+                      style={{
+                        color: 'var(--hcp-t-100)',
+                        fontVariantNumeric: 'tabular-nums',
+                      }}
+                    >
                       {Math.round(weather.tempMax)}°
                     </span>
                   </span>
@@ -292,13 +291,13 @@ const TodayGreeting: React.FC<Props> = ({ connectionId, userId }) => {
               )}
               {weather.windWord && (
                 <>
-                  <span>·</span>
+                  <span style={{ opacity: 0.4 }}>·</span>
                   <span>{weather.windWord}</span>
                 </>
               )}
-            </div>
+            </>
           )}
-        </>
+        </div>
       )}
     </div>
   );
