@@ -924,7 +924,7 @@ const StatCell: React.FC<{
       disabled={disabled}
       style={{
         display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2,
-        padding: '8px 8px 10px',
+        padding: '10px 8px 12px',
         background: active ? AMBER_TINT_06 : 'transparent',
         border: 'none',
         borderRight: withRightBorder ? `1px solid ${D_LINE}` : 'none',
@@ -945,14 +945,14 @@ const StatCell: React.FC<{
         </span>
       </span>
       <span style={{
-        fontSize: 20, fontWeight: 700, color: valueColor,
+        fontSize: 28, fontWeight: 800, color: valueColor,
         fontFamily: FONT_GEIST, fontVariantNumeric: 'tabular-nums',
-        letterSpacing: '-0.02em',
+        letterSpacing: '-0.03em',
         lineHeight: 1,
       }}>
         {display}
         {unit && value != null && (
-          <span style={{ fontSize: 10, fontWeight: 700, color: D_T60, marginLeft: 3 }}>
+          <span style={{ fontSize: 11, fontWeight: 600, color: D_T60, marginLeft: 4 }}>
             {unit}
           </span>
         )}
