@@ -27,7 +27,7 @@ const Eyebrow: React.FC = () => (
       letterSpacing: '0.14em',
       textTransform: 'uppercase',
       color: 'var(--hcp-t-60)',
-      padding: '0 16px',
+      padding: '0 20px',
       marginBottom: 10,
       marginTop: 32,
     }}
