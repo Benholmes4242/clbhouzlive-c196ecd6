@@ -86,9 +86,6 @@ export const HandicapProjectionCard: React.FC<Props> = ({ scores }) => {
     );
   }
 
-  const arrow =
-    prediction.direction === 'down' ? '↓' : prediction.direction === 'up' ? '↑' : '→';
-
   const curve = curveFor(prediction.direction);
 
   return (

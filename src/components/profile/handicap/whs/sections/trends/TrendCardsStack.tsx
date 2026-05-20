@@ -46,11 +46,6 @@ export const TrendCardsStack: React.FC<Props> = ({ connectionId, currentHandicap
   const accent =
     meta.theme === 'positive' ? HOT_RED : meta.theme === 'negative' ? COLD_BLUE : SLATE;
 
-  const deltaStr =
-    prediction.delta && prediction.delta !== 0
-      ? `${prediction.direction === 'up' ? '+' : '\u2212'}${Math.abs(prediction.delta).toFixed(1)} Projected`
-      : null;
-
   const showHero = !prediction.insufficientData && !isLoading;
 
   const [showInfo, setShowInfo] = useState(false);
