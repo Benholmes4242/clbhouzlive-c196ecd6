@@ -371,7 +371,13 @@ export const RoundsThatCountCard: React.FC<Props> = ({
               color: D_T60,
               letterSpacing: '0.16em',
               textTransform: 'uppercase',
-            }}>SCORE DIFF</span>
+            }}>
+              SCORE DIFF · LAST{' '}
+              <span style={{ color: D_T100, fontVariantNumeric: 'tabular-nums' }}>
+                {colCount}
+              </span>{' '}
+              ROUNDS
+            </span>
             <div style={{
               display: 'flex', alignItems: 'center', gap: 10,
               fontSize: 9, fontWeight: 700, color: D_T60,
