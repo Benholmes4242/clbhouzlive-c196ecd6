@@ -249,7 +249,17 @@ export const TrendCardsStack: React.FC<Props> = ({ connectionId, currentHandicap
         ))
       ) : (
         <>
-          {splitAt !== 'rest' && <HandicapProjectionCard scores={scores ?? []} />}
+          {splitAt !== 'rest' && (
+            <>
+              <LastFiveTokens
+                diffs={recentFiveDiffs}
+                avg={prediction.recentFormAvg}
+                accent={accent}
+                accentInk={accent}
+              />
+              <HandicapProjectionCard scores={scores ?? []} />
+            </>
+          )}
           {splitAt !== 'hero-only' && (
             <>
               <StablefordCard scores={scores ?? []} />
