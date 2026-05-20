@@ -1009,7 +1009,11 @@ const StablefordChartBlock: React.FC<{
           fontSize: 9, fontWeight: 800, color: D_T60,
           letterSpacing: '0.16em', textTransform: 'uppercase',
         }}>
-          STABLEFORD · {SCOPE_LABEL_LONG[scope]} · {dist.total} ROUNDS
+          STABLEFORD · {SCOPE_LABEL_LONG[scope]} ·{' '}
+          <span style={{ color: D_T100, fontVariantNumeric: 'tabular-nums' }}>
+            {dist.total}
+          </span>{' '}
+          ROUNDS
         </span>
         <div style={{
           display: 'inline-flex', background: 'var(--hcp-bg-2)',
