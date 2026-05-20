@@ -25,18 +25,10 @@ const T = {
   greenInk: '#065F46',
   redInk: '#991B1B',
   slateTint: 'var(--hcp-bg-2)',
-  gold: '#FBBC2E',
-  silver: '#C0C5CF',
-  bronze: '#C97D45',
   ink04: 'var(--hcp-bg-2)',
   ink08: 'var(--hcp-line-2)',
   ink40: 'var(--hcp-t-40)',
 };
-function medalColor(rank: number): string {
-  if (rank === 1) return T.gold;
-  if (rank === 2) return T.silver;
-  return T.bronze;
-}
 const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
 
 const TOP_N = 3;
