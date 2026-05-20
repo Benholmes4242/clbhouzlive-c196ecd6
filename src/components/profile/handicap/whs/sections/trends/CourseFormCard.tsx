@@ -179,9 +179,11 @@ const CourseRow: React.FC<{
   rank: number;
   expanded: boolean;
   view: ViewKey;
-}> = ({ course, rank, expanded, view }) => {
+  /** Largest |delta| among the visible courses. Used to scale the
+   *  ambient magnitude gradient behind the row. */
+  maxMag: number;
+}> = ({ course, rank, expanded, view, maxMag }) => {
   const valueColor = deltaColor(course.delta);
-  const isFirst = rank === 1;
 
   const headline = (() => {
     if (view === 'most_played') {
@@ -198,7 +200,7 @@ const CourseRow: React.FC<{
     };
   })();
 
-  const railColor = medalColor(rank);
+  const magFrac = Math.max(0.12, Math.abs(course.delta) / maxMag);
 
   return (
     <div
@@ -217,18 +219,28 @@ const CourseRow: React.FC<{
         fontFamily: FONT,
       }}
     >
-      <span
-        aria-hidden
-        style={{
-          position: 'absolute',
-          left: 0,
-          top: 0,
-          bottom: 0,
-          width: 3,
-          background: `linear-gradient(180deg, ${railColor}, transparent)`,
-          opacity: isFirst ? 1 : 0.7,
-        }}
-      />
+      {/* Ambient magnitude gradient. Green for negative deltas (better
+       *  than hcp), red for positive. Width proportional to |delta| / maxMag
+       *  with a floor of 0.12 so even small deltas show a hint of fill. */}
+      {course.delta !== 0 && (
+        <span
+          aria-hidden
+          style={{
+            position: 'absolute',
+            left: 0,
+            top: 0,
+            bottom: 0,
+            width: `${magFrac * 100}%`,
+            background:
+              course.delta < 0
+                ? 'linear-gradient(90deg, rgba(34,197,94,0.14) 0%, transparent 100%)'
+                : 'linear-gradient(90deg, rgba(239,68,68,0.14) 0%, transparent 100%)',
+            opacity: 0.5,
+            pointerEvents: 'none',
+            zIndex: 0,
+          }}
+        />
+      )}
       <div
         style={{
           width: expanded ? 80 : 56,
