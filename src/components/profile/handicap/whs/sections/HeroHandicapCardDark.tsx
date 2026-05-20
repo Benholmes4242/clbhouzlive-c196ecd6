@@ -100,13 +100,6 @@ const HeroHandicapCardDark: React.FC<Props> = ({ connection }) => {
   const dashOffset = CIRCUMFERENCE * (1 - fillFraction);
 
   const grad = arcGradient(verdict);
-  const verdictColor =
-    verdict === 'good' ? 'var(--hcp-good)' :
-    verdict === 'bad'  ? 'var(--hcp-bad)' :
-    verdict === 'mid'  ? 'var(--hcp-amber)' :
-    'var(--hcp-t-100)';
-
-  const arrowChar = verdict === 'good' ? '↓' : verdict === 'bad' ? '↑' : '—';
 
   // Scratch zone: half-step below current displayed value (e.g. 1.8 → 1.6).
   const scratchZone = useMemo(() => {
