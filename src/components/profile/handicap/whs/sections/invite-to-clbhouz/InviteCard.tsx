@@ -11,6 +11,11 @@ import { fmtHcp } from '@/lib/whs/format';
 
 interface Props {
   friend: FriendLeaderboardEntry;
+  /**
+   * When true, hide the home_club caption — used by the parent rail
+   * to deduplicate when 3+ friends share the same home club.
+   */
+  hideHomeClub?: boolean;
 }
 
 const INK = 'var(--hcp-t-100)';
