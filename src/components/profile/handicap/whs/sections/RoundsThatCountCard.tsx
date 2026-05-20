@@ -1054,10 +1054,6 @@ const StablefordChartBlock: React.FC<{
         </div>
       ) : (
         <>
-          {/* Distribution bar */}
-          <button
-            onClick={onOpenDetail}
-            aria-label="Open Stableford detail"
           {/* Distribution bar with "YOUR LAST" anchor pointer */}
           <div style={{ position: 'relative' }}>
             {latestRound && (() => {
