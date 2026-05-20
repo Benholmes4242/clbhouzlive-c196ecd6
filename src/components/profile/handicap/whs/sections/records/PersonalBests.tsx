@@ -21,6 +21,9 @@ const AMBER = '#F59E0B';
 interface Tile {
   eyebrow: string;
   value: string;
+  /** Optional unit suffix rendered at smaller size next to the value
+   *  in the trophy ribbon (e.g. "pts", "rounds", "in a row"). */
+  unit?: string;
   caption: string | null;
 }
 
