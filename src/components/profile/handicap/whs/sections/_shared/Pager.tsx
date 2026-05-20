@@ -1,5 +1,4 @@
 import React, { useMemo } from 'react';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 interface Props {
   page: number;
@@ -7,14 +6,9 @@ interface Props {
   onChange: (next: number) => void;
 }
 
-const HAIRLINE = 'var(--hcp-line-2)';
-const INK = 'var(--hcp-t-100)';
 const INK_FAINT = 'rgba(255,255,255,0.30)';
-const AMBER = '#F7931E';
-const CARD_BG = 'var(--hcp-bg-1)';
 
 export const Pager: React.FC<Props> = ({ page, totalPages, onChange }) => {
-  // Condense dots if there are too many — show first, current, last with separators
   const dots = useMemo(() => {
     if (totalPages <= 8) {
       return Array.from({ length: totalPages }, (_, i) => ({ kind: 'page' as const, i }));
@@ -34,105 +28,48 @@ export const Pager: React.FC<Props> = ({ page, totalPages, onChange }) => {
     });
   }, [page, totalPages]);
 
-  const atStart = page === 0;
-  const atEnd = page === totalPages - 1;
-
   return (
     <div
       style={{
         display: 'flex',
         alignItems: 'center',
-        justifyContent: 'space-between',
-        padding: '12px 20px 4px',
+        justifyContent: 'center',
+        gap: 6,
+        padding: '14px 20px 6px',
       }}
     >
-      <button
-        type="button"
-        onClick={(e) => {
-          e.preventDefault();
-          if (!atStart) onChange(page - 1);
-        }}
-        disabled={atStart}
-        aria-label="Previous page"
-        style={{
-          display: 'inline-flex',
-          alignItems: 'center',
-          gap: 4,
-          padding: '8px 12px',
-          borderRadius: 999,
-          border: `1px solid ${HAIRLINE}`,
-          background: atStart ? 'rgba(255,255,255,0.04)' : CARD_BG,
-          color: atStart ? INK_FAINT : INK,
-          fontSize: 12,
-          fontWeight: 700,
-          cursor: atStart ? 'default' : 'pointer',
-          letterSpacing: '0.01em',
-        }}
-      >
-        <ChevronLeft size={14} strokeWidth={2.4} />
-        Prev
-      </button>
-
-      <div
-        aria-hidden
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: 6,
-        }}
-      >
-        {dots.map((d, idx) =>
-          d.kind === 'gap' ? (
-            <span
-              key={`gap-${idx}`}
-              style={{ color: INK_FAINT, fontSize: 11, fontWeight: 700 }}
-            >
-              ·
-            </span>
-          ) : (
-            <span
-              key={`p-${d.i}`}
-              style={{
-                width: d.i === page ? 18 : 6,
-                height: 6,
-                borderRadius: 999,
-                background:
-                  d.i === page
-                    ? '#FFFFFF'
-                    : 'rgba(255,255,255,0.25)',
-                transition: 'all 200ms ease',
-              }}
-            />
-          ),
-        )}
-      </div>
-
-      <button
-        type="button"
-        onClick={(e) => {
-          e.preventDefault();
-          if (!atEnd) onChange(page + 1);
-        }}
-        disabled={atEnd}
-        aria-label="Next page"
-        style={{
-          display: 'inline-flex',
-          alignItems: 'center',
-          gap: 4,
-          padding: '8px 12px',
-          borderRadius: 999,
-          border: `1px solid ${HAIRLINE}`,
-          background: atEnd ? 'rgba(255,255,255,0.04)' : CARD_BG,
-          color: atEnd ? INK_FAINT : INK,
-          fontSize: 12,
-          fontWeight: 700,
-          cursor: atEnd ? 'default' : 'pointer',
-          letterSpacing: '0.01em',
-        }}
-      >
-        Next
-        <ChevronRight size={14} strokeWidth={2.4} />
-      </button>
+      {dots.map((d, idx) =>
+        d.kind === 'gap' ? (
+          <span
+            key={`gap-${idx}`}
+            aria-hidden
+            style={{ color: INK_FAINT, fontSize: 11, fontWeight: 700 }}
+          >
+            ·
+          </span>
+        ) : (
+          <button
+            type="button"
+            key={`p-${d.i}`}
+            aria-label={`Go to page ${(d.i ?? 0) + 1}`}
+            aria-current={d.i === page ? 'true' : undefined}
+            onClick={() => {
+              if (d.i != null && d.i !== page) onChange(d.i);
+            }}
+            style={{
+              width: d.i === page ? 18 : 6,
+              height: 6,
+              borderRadius: 999,
+              background: d.i === page ? '#FFFFFF' : 'rgba(255,255,255,0.25)',
+              border: 'none',
+              padding: 0,
+              cursor: d.i === page ? 'default' : 'pointer',
+              transition: 'all 200ms ease',
+              WebkitTapHighlightColor: 'transparent',
+            }}
+          />
+        ),
+      )}
     </div>
   );
 };
