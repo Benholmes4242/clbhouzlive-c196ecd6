@@ -8,6 +8,7 @@ import { renderBadgeIcon } from './badgeIcons';
 import { RARITY_DARK } from './tokens';
 
 const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
+const RAIL_INSET = 20;
 
 function renderIcon(name: string, size = 26): React.ReactNode {
   return renderBadgeIcon(name, size, 'var(--hcp-t-100)');
@@ -46,8 +47,10 @@ const ScrollContainer: React.FC<{ children: React.ReactNode }> = ({ children }) 
       overflowY: 'hidden',
       scrollSnapType: 'x mandatory',
       WebkitOverflowScrolling: 'touch',
-      paddingLeft: 20,
-      paddingRight: 20,
+      paddingLeft: RAIL_INSET,
+      paddingRight: RAIL_INSET,
+      scrollPaddingLeft: RAIL_INSET,
+      scrollPaddingRight: RAIL_INSET,
       paddingBottom: 4,
       msOverflowStyle: 'none',
       scrollbarWidth: 'none',
@@ -72,7 +75,7 @@ const UnlockCard: React.FC<{
       onTouchEnd={() => setPressed(false)}
       onTouchCancel={() => setPressed(false)}
       style={{
-        flex: '0 0 calc((100vw - 32px - 20px) / 2.2)',
+        flex: '0 0 calc((100% - 10px) / 2.2)',
         position: 'relative',
         scrollSnapAlign: 'start',
         padding: 14,
@@ -193,7 +196,7 @@ const RecentUnlocksStrip: React.FC<RecentUnlocksStripProps> = ({
           {[0, 1, 2].map(i => (
             <div
               key={i}
-              style={{ flex: '0 0 calc((100vw - 32px - 20px) / 2.2)', scrollSnapAlign: 'start' }}
+              style={{ flex: '0 0 calc((100% - 10px) / 2.2)', scrollSnapAlign: 'start' }}
             >
               <Skeleton height={120} width="100%" radius={12} />
             </div>
