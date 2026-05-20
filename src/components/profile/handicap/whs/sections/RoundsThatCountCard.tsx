@@ -980,7 +980,9 @@ const StablefordChartBlock: React.FC<{
   scope: StablefordScope;
   onScopeChange: (s: StablefordScope) => void;
   onOpenDetail: () => void;
-}> = ({ dist, scope, onScopeChange, onOpenDetail }) => {
+  /** Most recent stableford round in scope. Null if no valid rounds. */
+  latestRound: { bucket: 'inZone' | 'solid' | 'offDay'; points: number } | null;
+}> = ({ dist, scope, onScopeChange, onOpenDetail, latestRound }) => {
   const segs = [
     { count: dist.inZoneCount, gradient: GREEN_GRAD },
     { count: dist.solidCount, gradient: AMBER_GRAD_SF },
