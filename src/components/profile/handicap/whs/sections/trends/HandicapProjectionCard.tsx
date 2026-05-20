@@ -290,6 +290,11 @@ export const HandicapProjectionCard: React.FC<Props> = ({ scores }) => {
             : ''}
         </p>
       </div>
+    </div>
+  );
+};
+
+
 
 const SECTION_STYLE: React.CSSProperties = {
   marginBottom: 28,
