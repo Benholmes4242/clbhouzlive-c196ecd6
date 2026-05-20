@@ -335,7 +335,7 @@ const CourseRow: React.FC<{
       </div>
 
       {!expanded && (
-        <div style={{ textAlign: 'right', flexShrink: 0 }}>
+        <div style={{ textAlign: 'right', flexShrink: 0, position: 'relative', zIndex: 1 }}>
           <div
             style={{
               fontSize: 22,
