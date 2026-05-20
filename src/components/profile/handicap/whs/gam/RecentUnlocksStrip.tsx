@@ -10,84 +10,74 @@ import { RARITY_DARK } from './tokens';
 const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
 const RAIL_INSET = 20;
 
-function renderIcon(name: string, size = 26): React.ReactNode {
-  return renderBadgeIcon(name, size, 'var(--hcp-t-100)');
-}
-
 interface RecentUnlocksStripProps {
   userId: string;
   readOnly?: boolean;
 }
 
-const Eyebrow: React.FC = () => (
-  <div
-    style={{
-      fontFamily: FONT,
-      fontSize: 11,
-      fontWeight: 700,
-      letterSpacing: '0.14em',
-      textTransform: 'uppercase',
-      color: 'var(--hcp-t-60)',
-      padding: '0 20px',
-      marginBottom: 10,
-      marginTop: 32,
-    }}
-  >
-    <span style={{ color: '#F7931E', marginRight: 6 }}>•</span>
-    RECENT UNLOCKS
-  </div>
-);
+/**
+ * Eyebrow label + pulse state for a hero card.
+ */
+function getEyebrow(
+  occurredAt: string,
+  isLatest: boolean,
+): { label: string; pulse: boolean } {
+  const t = new Date(occurredAt).getTime();
+  if (!Number.isFinite(t)) return { label: '', pulse: false };
+  const hoursAgo = (Date.now() - t) / (1000 * 60 * 60);
 
-const ScrollContainer: React.FC<{ children: React.ReactNode }> = ({ children }) => (
-  <div
-    style={{
-      display: 'flex',
-      gap: 10,
-      overflowX: 'auto',
-      overflowY: 'hidden',
-      scrollSnapType: 'x mandatory',
-      WebkitOverflowScrolling: 'touch',
-      paddingLeft: RAIL_INSET,
-      paddingRight: RAIL_INSET,
-      scrollPaddingLeft: RAIL_INSET,
-      scrollPaddingRight: RAIL_INSET,
-      paddingBottom: 4,
-      msOverflowStyle: 'none',
-      scrollbarWidth: 'none',
-    }}
-    className="gam-no-scrollbar"
-  >
-    {children}
-  </div>
-);
+  if (isLatest) return { label: 'Just unlocked', pulse: true };
+  if (hoursAgo < 24) return { label: 'Earlier today', pulse: false };
+  if (hoursAgo < 168) return { label: 'This week', pulse: false };
+  return { label: relativeTime(occurredAt), pulse: false };
+}
 
-const UnlockCard: React.FC<{
+const UnlockHeroCard: React.FC<{
   unlock: RecentUnlock;
+  isLatest: boolean;
   onTap: () => void;
-}> = ({ unlock, onTap }) => {
+}> = ({ unlock, isLatest, onTap }) => {
   const [pressed, setPressed] = React.useState(false);
   const rarity = RARITY_DARK[unlock.rarity as keyof typeof RARITY_DARK] ?? RARITY_DARK.common;
+  const eyebrow = getEyebrow(unlock.occurred_at, isLatest);
+
+  const composedShadow = [rarity.glow, rarity.outerGlow]
+    .filter(Boolean)
+    .join(', ') || undefined;
 
   return (
     <div
+      role="button"
+      tabIndex={0}
       onClick={onTap}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          onTap();
+        }
+      }}
       onTouchStart={() => setPressed(true)}
       onTouchEnd={() => setPressed(false)}
       onTouchCancel={() => setPressed(false)}
+      onMouseDown={() => setPressed(true)}
+      onMouseUp={() => setPressed(false)}
+      onMouseLeave={() => setPressed(false)}
       style={{
-        flex: '0 0 calc((100% - 10px) / 2.2)',
         position: 'relative',
-        scrollSnapAlign: 'start',
-        padding: 14,
-        borderRadius: 12,
-        background: rarity.cardBg,
-        border: `1px solid ${rarity.cardBorder}`,
-        boxShadow: rarity.glow ?? undefined,
-        cursor: 'pointer',
-        transform: pressed ? 'scale(0.995)' : 'scale(1)',
-        transition: 'transform 120ms ease, box-shadow 200ms ease',
+        borderRadius: 16,
         overflow: 'hidden',
+        border: `1px solid ${rarity.cardBorder}`,
+        background: rarity.cardSweep,
+        boxShadow: composedShadow,
+        minHeight: 192,
+        padding: '18px 18px 16px',
+        cursor: 'pointer',
+        transform: pressed ? 'scale(0.98)' : 'scale(1)',
+        transition: 'transform 140ms cubic-bezier(0.22, 0.61, 0.36, 1)',
         fontFamily: FONT,
+        WebkitTapHighlightColor: 'transparent',
+        display: 'flex',
+        flexDirection: 'column',
       }}
     >
       {rarity.topStripe && (
@@ -103,79 +93,268 @@ const UnlockCard: React.FC<{
         />
       )}
 
+      {/* Decorative backdrop icon */}
       <div
+        aria-hidden
         style={{
-          width: 40,
-          height: 40,
-          borderRadius: 10,
-          background: rarity.iconBg,
-          border: `1px solid ${rarity.iconRing}`,
-          display: 'inline-flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          marginBottom: 10,
-        }}
-      >
-        {renderIcon(unlock.icon, 22)}
-      </div>
-
-      <div
-        style={{
-          fontSize: 14,
-          fontWeight: 700,
+          position: 'absolute',
+          right: -20,
+          bottom: -30,
+          opacity: 0.06,
+          transform: 'rotate(-12deg)',
           color: 'var(--hcp-t-100)',
-          lineHeight: 1.2,
-          marginBottom: 4,
-          whiteSpace: 'nowrap',
-          overflow: 'hidden',
-          textOverflow: 'ellipsis',
+          pointerEvents: 'none',
+          lineHeight: 0,
         }}
       >
-        {unlock.title}
+        {renderBadgeIcon(unlock.icon, 220, 'currentColor')}
       </div>
 
-      <div
-        style={{
-          fontSize: 12,
-          fontWeight: 400,
-          color: 'var(--hcp-t-60)',
-          lineHeight: 1.4,
-          display: '-webkit-box',
-          WebkitLineClamp: 2,
-          WebkitBoxOrient: 'vertical',
-          overflow: 'hidden',
-          minHeight: 33,
-        }}
-      >
-        {unlock.description}
+      {/* Eyebrow chip */}
+      {eyebrow.label && (
+        <div
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: 6,
+            alignSelf: 'flex-start',
+            padding: '4px 8px',
+            borderRadius: 999,
+            background: eyebrow.pulse
+              ? 'rgba(247,147,30,0.16)'
+              : 'rgba(255,255,255,0.06)',
+            border: `1px solid ${
+              eyebrow.pulse ? 'rgba(247,147,30,0.40)' : 'rgba(255,255,255,0.10)'
+            }`,
+            marginBottom: 14,
+            position: 'relative',
+            zIndex: 1,
+          }}
+        >
+          {eyebrow.pulse && (
+            <span
+              style={{
+                width: 6,
+                height: 6,
+                borderRadius: 999,
+                background: '#F7931E',
+                animation: 'recentUnlockPulse 1.6s ease-in-out infinite',
+              }}
+            />
+          )}
+          <span
+            style={{
+              fontSize: 10,
+              fontWeight: 700,
+              letterSpacing: '0.12em',
+              textTransform: 'uppercase',
+              color: eyebrow.pulse ? '#FBBC2E' : 'var(--hcp-t-60)',
+            }}
+          >
+            {eyebrow.label}
+          </span>
+        </div>
+      )}
+
+      {/* Icon + title + description */}
+      <div style={{ display: 'flex', gap: 14, alignItems: 'flex-start', position: 'relative', zIndex: 1, flex: 1 }}>
+        <div
+          style={{
+            width: 56,
+            height: 56,
+            borderRadius: 14,
+            background: rarity.iconBg,
+            border: `1px solid ${rarity.iconRing}`,
+            display: 'inline-flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            flexShrink: 0,
+          }}
+        >
+          {renderBadgeIcon(unlock.icon, 30, 'var(--hcp-t-100)')}
+        </div>
+        <div style={{ minWidth: 0, flex: 1 }}>
+          <div
+            style={{
+              fontSize: 26,
+              fontWeight: 800,
+              letterSpacing: '-0.02em',
+              color: 'var(--hcp-t-100)',
+              lineHeight: 1.1,
+              marginBottom: 6,
+            }}
+          >
+            {unlock.title}
+          </div>
+          <div
+            style={{
+              fontSize: 13,
+              fontWeight: 400,
+              color: 'var(--hcp-t-60)',
+              lineHeight: 1.4,
+              display: '-webkit-box',
+              WebkitLineClamp: 2,
+              WebkitBoxOrient: 'vertical',
+              overflow: 'hidden',
+            }}
+          >
+            {unlock.description}
+          </div>
+        </div>
       </div>
 
+      {/* Footer */}
       <div
         style={{
-          fontSize: 10,
-          fontWeight: 700,
-          color: 'var(--hcp-t-40)',
-          letterSpacing: '0.08em',
-          textTransform: 'uppercase',
-          marginTop: 8,
+          marginTop: 14,
+          paddingTop: 12,
+          borderTop: '1px solid rgba(255,255,255,0.06)',
           display: 'flex',
-          gap: 6,
           alignItems: 'center',
+          justifyContent: 'space-between',
+          position: 'relative',
+          zIndex: 1,
         }}
       >
-        <span>{relativeTime(unlock.occurred_at)}</span>
-        <span>·</span>
-        <span style={{ color: rarity.labelFg }}>{unlock.rarity}</span>
+        <span
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: 4,
+            padding: '4px 10px',
+            borderRadius: 999,
+            background: rarity.labelBg,
+            border: `1px solid ${rarity.pillBorder}`,
+            color: rarity.labelFg,
+            fontSize: 10,
+            fontWeight: 700,
+            letterSpacing: '0.10em',
+            textTransform: 'uppercase',
+          }}
+        >
+          ★ {unlock.rarity}
+        </span>
+        <span
+          style={{
+            fontSize: 11,
+            fontWeight: 600,
+            color: 'var(--hcp-t-40)',
+            letterSpacing: '0.04em',
+          }}
+        >
+          {relativeTime(unlock.occurred_at)}
+        </span>
       </div>
     </div>
   );
 };
+
+/**
+ * Dot pager — centred tappable dots, active dot is an 18px pill.
+ */
+const DotPager: React.FC<{
+  total: number;
+  current: number;
+  onChange: (n: number) => void;
+}> = ({ total, current, onChange }) => {
+  if (total <= 1) return null;
+  return (
+    <div
+      style={{
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        gap: 6,
+        marginTop: 12,
+      }}
+    >
+      {Array.from({ length: total }, (_, i) => (
+        <button
+          key={i}
+          type="button"
+          aria-label={`Go to unlock ${i + 1}`}
+          aria-current={i === current ? 'true' : undefined}
+          onClick={() => i !== current && onChange(i)}
+          style={{
+            width: i === current ? 18 : 6,
+            height: 6,
+            borderRadius: 999,
+            background:
+              i === current ? '#FFFFFF' : 'rgba(255, 255, 255, 0.25)',
+            border: 'none',
+            padding: 0,
+            cursor: i === current ? 'default' : 'pointer',
+            transition: 'all 200ms ease',
+            WebkitTapHighlightColor: 'transparent',
+          }}
+        />
+      ))}
+    </div>
+  );
+};
+
+const SectionHeader: React.FC<{ page: number; total: number }> = ({ page, total }) => (
+  <div
+    style={{
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      padding: '0 20px',
+      marginBottom: 10,
+      marginTop: 32,
+      fontFamily: FONT,
+    }}
+  >
+    <div
+      style={{
+        fontSize: 11,
+        fontWeight: 700,
+        letterSpacing: '0.14em',
+        textTransform: 'uppercase',
+        color: 'var(--hcp-t-60)',
+      }}
+    >
+      <span style={{ color: '#F7931E', marginRight: 6 }}>•</span>
+      RECENT UNLOCKS
+    </div>
+    {total > 1 && (
+      <div
+        style={{
+          fontSize: 11,
+          fontWeight: 700,
+          letterSpacing: '0.08em',
+          color: 'var(--hcp-t-40)',
+          fontVariantNumeric: 'tabular-nums',
+          fontFeatureSettings: '"kern" 1, "liga" 1',
+        }}
+      >
+        {page + 1} / {total}
+      </div>
+    )}
+  </div>
+);
 
 const RecentUnlocksStrip: React.FC<RecentUnlocksStripProps> = ({
   userId,
   readOnly: _readOnly = false,
 }) => {
   const { data, isLoading, isError, refetch } = useRecentUnlocks(userId);
+  const [page, setPage] = React.useState(0);
+  const scrollRef = React.useRef<HTMLDivElement | null>(null);
+
+  const handleScroll = React.useCallback(() => {
+    const el = scrollRef.current;
+    if (!el || el.clientWidth <= 0) return;
+    const newPage = Math.round(el.scrollLeft / el.clientWidth);
+    if (newPage !== page) setPage(newPage);
+  }, [page]);
+
+  const handlePagerChange = React.useCallback((n: number) => {
+    const el = scrollRef.current;
+    if (!el) return;
+    el.scrollTo({ left: el.clientWidth * n, behavior: 'smooth' });
+    setPage(n);
+  }, []);
 
   if (isError) {
     return (
@@ -191,17 +370,10 @@ const RecentUnlocksStrip: React.FC<RecentUnlocksStripProps> = ({
   if (isLoading) {
     return (
       <>
-        <Eyebrow />
-        <ScrollContainer>
-          {[0, 1, 2].map(i => (
-            <div
-              key={i}
-              style={{ flex: '0 0 calc((100% - 10px) / 2.2)', scrollSnapAlign: 'start' }}
-            >
-              <Skeleton height={120} width="100%" radius={12} />
-            </div>
-          ))}
-        </ScrollContainer>
+        <SectionHeader page={0} total={0} />
+        <div style={{ padding: `0 ${RAIL_INSET}px` }}>
+          <Skeleton height={192} width="100%" radius={16} />
+        </div>
       </>
     );
   }
@@ -210,18 +382,58 @@ const RecentUnlocksStrip: React.FC<RecentUnlocksStripProps> = ({
     return null;
   }
 
+  const total = data.length;
+
   return (
     <>
-      <Eyebrow />
-      <ScrollContainer>
+      <style>{`
+        @keyframes recentUnlockPulse {
+          0%, 100% { opacity: 1; transform: scale(1); }
+          50% { opacity: 0.5; transform: scale(1.5); }
+        }
+      `}</style>
+
+      <SectionHeader page={page} total={total} />
+
+      <div
+        ref={scrollRef}
+        onScroll={handleScroll}
+        className="gam-no-scrollbar"
+        style={{
+          display: 'flex',
+          overflowX: 'auto',
+          overflowY: 'hidden',
+          scrollSnapType: 'x mandatory',
+          WebkitOverflowScrolling: 'touch',
+          paddingLeft: RAIL_INSET,
+          paddingRight: RAIL_INSET,
+          scrollPaddingLeft: RAIL_INSET,
+          scrollPaddingRight: RAIL_INSET,
+          paddingBottom: 4,
+          msOverflowStyle: 'none',
+          scrollbarWidth: 'none',
+        }}
+      >
         {data.map((unlock, idx) => (
-          <UnlockCard
+          <div
             key={`${unlock.kind}-${idx}-${unlock.occurred_at}`}
-            unlock={unlock}
-            onTap={() => openGamAchievements()}
-          />
+            style={{
+              flex: '0 0 100%',
+              scrollSnapAlign: 'center',
+              paddingRight: idx === total - 1 ? 0 : 10,
+              boxSizing: 'border-box',
+            }}
+          >
+            <UnlockHeroCard
+              unlock={unlock}
+              isLatest={idx === 0}
+              onTap={() => openGamAchievements()}
+            />
+          </div>
         ))}
-      </ScrollContainer>
+      </div>
+
+      <DotPager total={total} current={page} onChange={handlePagerChange} />
     </>
   );
 };
