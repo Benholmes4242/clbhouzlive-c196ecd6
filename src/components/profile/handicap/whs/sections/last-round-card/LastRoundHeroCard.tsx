@@ -1,4 +1,5 @@
 import React from 'react';
+import { useFriendRoundDetail } from '@/lib/whs/hooks';
 import type { WhsLastRound } from '@/lib/whs/types';
 
 const FONT = 'Geist, system-ui, -apple-system, BlinkMacSystemFont, sans-serif';
@@ -90,7 +91,15 @@ interface Props {
 
 const LastRoundHeroCard: React.FC<Props> = ({ round, timeAgo, onClick }) => {
   const courseName = round.course?.name ?? 'Unknown course';
-  const par = (round.course as { par?: number | null } | null)?.par ?? null;
+  // Fetch hole-by-hole detail to compute par (mirrors CinemaFriendCard's approach).
+  const { data: detail } = useFriendRoundDetail(round.id);
+
+  const par = React.useMemo(() => {
+    if (!detail?.holes?.length) return null;
+    const played = detail.holes.filter((h) => h.played && h.par != null);
+    if (!played.length) return null;
+    return played.reduce((sum, h) => sum + (h.par ?? 0), 0);
+  }, [detail]);
   const slope = round.slope_rating ?? null;
   const gross = round.adjusted_gross;
   const stableford = round.stableford_points;
