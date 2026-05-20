@@ -214,25 +214,6 @@ const HeroHandicapCardDark: React.FC<Props> = ({ connection }) => {
               stroke="rgba(255,255,255,0.06)"
               strokeWidth={STROKE_W}
             />
-            {/* Tick marks at top/right/bottom/left */}
-            {[0, 90, 180, 270].map((deg) => {
-              const rad = (deg * Math.PI) / 180;
-              const cx = RING_BOX / 2;
-              const cy = RING_BOX / 2;
-              const r1 = CIRC_R + STROKE_W / 2;
-              const r2 = CIRC_R - STROKE_W / 2 - 6;
-              return (
-                <line
-                  key={deg}
-                  x1={cx + Math.cos(rad) * r1}
-                  y1={cy + Math.sin(rad) * r1}
-                  x2={cx + Math.cos(rad) * r2}
-                  y2={cy + Math.sin(rad) * r2}
-                  stroke="rgba(255,255,255,0.12)"
-                  strokeWidth={1}
-                />
-              );
-            })}
             {/* Progress arc */}
             <circle
               cx={RING_BOX / 2}
