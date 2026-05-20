@@ -314,7 +314,17 @@ const AvailableCard: React.FC<{
           lineHeight: 1.5,
         }}
       >
-        {copy.subline}
+        Out of all{' '}
+        <strong
+          style={{
+            color: 'var(--hcp-t-100)',
+            fontWeight: 700,
+            fontVariantNumeric: 'tabular-nums',
+          }}
+        >
+          {data.cohort_size.toLocaleString()}
+        </strong>{' '}
+        active golfers on clbhouz this season.
       </p>
 
       <div
@@ -337,37 +347,84 @@ const AvailableCard: React.FC<{
             display: 'flex',
             justifyContent: 'space-between',
             alignItems: 'center',
+            gap: 12,
             marginTop: 14,
             paddingTop: 12,
             borderTop: `0.5px solid ${INK_06}`,
             fontFamily: FONT_GEIST,
-            fontSize: 10.5,
-            fontWeight: 600,
-            color: 'var(--hcp-t-60)',
           }}
         >
-          <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5 }}>
+          {/* You callout (left) */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
             <span
+              aria-hidden
               style={{
-                display: 'inline-block',
-                width: 12,
-                height: 0,
-                borderTop: '1px dashed #22C55E',
+                width: 8,
+                height: 8,
+                borderRadius: 999,
+                background: AMBER,
+                boxShadow: `0 0 6px ${AMBER}`,
               }}
             />
-            <span>Scratch territory</span>
-          </span>
-          <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5 }}>
             <span
               style={{
-                width: 10,
-                height: 3,
-                background: 'var(--hcp-t-20)',
-                borderRadius: 1,
+                fontSize: 10,
+                fontWeight: 800,
+                letterSpacing: '0.12em',
+                textTransform: 'uppercase',
+                color: INK_55,
               }}
-            />
-            <span>Median bucket</span>
-          </span>
+            >
+              You
+            </span>
+            <span
+              style={{
+                fontSize: 18,
+                fontWeight: 800,
+                color: AMBER,
+                fontVariantNumeric: 'tabular-nums',
+                lineHeight: 1,
+                letterSpacing: '-0.02em',
+              }}
+            >
+              {data.user_handicap.toFixed(1)}
+            </span>
+          </div>
+
+          {/* Legend (right) */}
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 12,
+              fontSize: 10,
+              fontWeight: 600,
+              color: INK_55,
+            }}
+          >
+            <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5 }}>
+              <span
+                style={{
+                  display: 'inline-block',
+                  width: 12,
+                  height: 0,
+                  borderTop: '1.5px dashed #22C55E',
+                }}
+              />
+              <span>Scratch</span>
+            </span>
+            <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5 }}>
+              <span
+                style={{
+                  width: 10,
+                  height: 3,
+                  background: 'var(--hcp-t-20)',
+                  borderRadius: 1,
+                }}
+              />
+              <span>Median</span>
+            </span>
+          </div>
         </div>
       </div>
     </>
