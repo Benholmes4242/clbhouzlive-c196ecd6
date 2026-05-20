@@ -4,6 +4,7 @@ import { useFriendsActivity } from '@/lib/whs/hooks';
 import Paged8 from '../_shared/Paged8';
 import FriendRoundCard from './FriendRoundCard';
 import RoundDetailSheet from '../round-detail/RoundDetailSheet';
+import { DarkSectionHeader } from '../_shared/darkAtoms';
 import type { WhsFriendActivityWithImage } from '@/lib/whs/types';
 
 interface Props {
