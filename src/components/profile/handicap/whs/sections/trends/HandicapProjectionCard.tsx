@@ -93,112 +93,51 @@ export const HandicapProjectionCard: React.FC<Props> = ({ scores }) => {
 
   return (
     <div style={SECTION_STYLE}>
-      {/* DUAL-PANEL: Where you are / Heading to */}
-      <div
-        style={{
-          display: 'grid',
-          gridTemplateColumns: '1fr 1fr',
-          margin: '0 20px',
-          borderTop: `1px solid ${T.hairline}`,
-          borderBottom: `1px solid ${T.hairline}`,
-        }}
-      >
-        {/* LEFT — WHERE YOU ARE */}
-        <div style={{ padding: '12px 14px 12px 0', position: 'relative', borderRight: `1px solid ${T.hairline}` }}>
-          <p style={{
-            margin: 0,
-            fontSize: 9,
-            fontWeight: 800,
-            letterSpacing: '0.16em',
-            textTransform: 'uppercase',
-            color: T.inkMute,
-            fontFamily: FONT,
-          }}>
-            Where you are
-          </p>
-          <p style={{
-            margin: '8px 0 0',
-            fontSize: 30,
-            fontWeight: 800,
-            color: T.ink,
-            lineHeight: 1,
-            letterSpacing: '-0.04em',
-            fontVariantNumeric: 'tabular-nums',
-            fontFamily: FONT,
-          }}>
-            {prediction.current !== null ? prediction.current.toFixed(1) : '—'}
-          </p>
-        </div>
-
-        {/* RIGHT — HEADING TO */}
-        <div style={{ padding: '12px 0 12px 14px' }}>
-          <p style={{
-            margin: 0,
-            fontSize: 9,
-            fontWeight: 800,
-            letterSpacing: '0.16em',
-            textTransform: 'uppercase',
-            color: theme.accentInk,
-            fontFamily: FONT,
-          }}>
-            Heading to
-          </p>
-          <div style={{
-            marginTop: 8,
-            display: 'flex',
-            alignItems: 'baseline',
-            gap: 8,
-          }}>
-            <span style={{
-              fontSize: 30,
-              fontWeight: 800,
-              color: theme.accentInk,
-              lineHeight: 1,
-              letterSpacing: '-0.04em',
-              fontVariantNumeric: 'tabular-nums',
-              fontFamily: FONT,
-            }}>
-              {prediction.projected !== null ? prediction.projected.toFixed(1) : '—'}
-            </span>
-            {prediction.delta > 0 && (
-              <span
-                style={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: 3,
-                  padding: '3px 8px',
-                  background: theme.headerBg,
-                  borderRadius: 99,
-                  fontSize: 10.5,
-                  fontWeight: 800,
-                  color: theme.accentInk,
-                  fontVariantNumeric: 'tabular-nums',
-                  letterSpacing: '0.02em',
-                  fontFamily: FONT,
-                }}
-              >
-                {arrow} {prediction.delta.toFixed(1)}
-              </span>
-            )}
-          </div>
-        </div>
-      </div>
-
       <div style={{ padding: '0 20px' }}>
-        {/* SHARED CONVERGENCE CHART */}
-        <div style={{ padding: '14px 0' }}>
+        {/* CHART CARD with verdict halo */}
+        <div
+          style={{
+            position: 'relative',
+            padding: '20px 16px 16px',
+            background: 'var(--hcp-bg-1)',
+            border: '1px solid var(--hcp-line-2)',
+            borderRadius: 12,
+            overflow: 'hidden',
+            marginBottom: 14,
+          }}
+        >
+          {/* Verdict halo backdrop */}
+          <div
+            aria-hidden
+            style={{
+              position: 'absolute',
+              right: -40,
+              top: -20,
+              width: 180,
+              height: 180,
+              borderRadius: '50%',
+              background:
+                meta.theme === 'positive'
+                  ? 'radial-gradient(circle, rgba(220, 38, 38, 0.10), transparent 70%)'
+                  : meta.theme === 'negative'
+                    ? 'radial-gradient(circle, rgba(14, 165, 233, 0.10), transparent 70%)'
+                    : 'radial-gradient(circle, var(--hcp-bg-2), transparent 70%)',
+              pointerEvents: 'none',
+            }}
+          />
+          {/* SHARED CONVERGENCE CHART */}
           <svg
             viewBox="0 0 320 110"
             width="100%"
             height={110}
             preserveAspectRatio="none"
-            style={{ display: 'block', overflow: 'visible' }}
+            style={{ display: 'block', overflow: 'visible', position: 'relative' }}
             role="img"
             aria-label={`Handicap timeline showing past trajectory and projected ${prediction.direction} movement`}
           >
             <line
               x1="160" x2="160" y1="14" y2="84"
-              stroke="rgba(15,23,42,0.15)"
+              stroke="rgba(255, 255, 255, 0.18)"
               strokeWidth={1}
               strokeDasharray="2 4"
               vectorEffect="non-scaling-stroke"
@@ -228,29 +167,15 @@ export const HandicapProjectionCard: React.FC<Props> = ({ scores }) => {
               d={`M 160 ${curve.pastY3} Q 200 ${(curve.pastY3 + curve.futureY2) / 2}, 240 ${curve.futureY2} T 308 ${curve.futureY3}`}
               fill="none"
               stroke={theme.accent}
-              strokeWidth={2.4}
+              strokeWidth={2.6}
               strokeLinecap="round"
               vectorEffect="non-scaling-stroke"
             />
             <circle cx="12" cy={curve.pastY1} r="3" fill={T.inkMute} />
             <circle cx="80" cy={curve.pastY2} r="3" fill={T.inkMute} />
-            <circle cx="160" cy={curve.pastY3} r="5" fill="#FFFFFF" stroke={T.ink} strokeWidth={2} />
+            <circle cx="160" cy={curve.pastY3} r="5" fill={T.cardBg} stroke={T.ink} strokeWidth={2} />
             <circle cx="240" cy={curve.futureY2} r="3" fill={theme.accent} />
-            <circle cx="308" cy={curve.futureY3} r="6" fill={theme.accent} stroke="#FFFFFF" strokeWidth={2} />
-            <text
-              x="12" y="102"
-              textAnchor="start"
-              style={{ fontSize: 10, fontWeight: 600, fill: T.inkMute, fontFamily: FONT }}
-            >
-              90 days ago
-            </text>
-            <text
-              x="308" y="102"
-              textAnchor="end"
-              style={{ fontSize: 10, fontWeight: 700, fill: theme.accentInk, fontFamily: FONT }}
-            >
-              Projected
-            </text>
+            <circle cx="308" cy={curve.futureY3} r="6" fill={theme.accent} stroke={T.cardBg} strokeWidth={2} />
             {prediction.direction === 'up' && (
               <text
                 x="12" y="20"
@@ -284,19 +209,87 @@ export const HandicapProjectionCard: React.FC<Props> = ({ scores }) => {
               </text>
             )}
           </svg>
+          {/* Bigger endpoint labels below the chart */}
+          <div
+            style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'flex-start',
+              marginTop: 12,
+              position: 'relative',
+            }}
+          >
+            <div>
+              <div
+                style={{
+                  fontSize: 14,
+                  fontWeight: 800,
+                  color: T.ink,
+                  fontVariantNumeric: 'tabular-nums',
+                  lineHeight: 1,
+                  fontFamily: FONT,
+                }}
+              >
+                {prediction.current !== null ? prediction.current.toFixed(1) : '—'}
+              </div>
+              <div
+                style={{
+                  fontSize: 9,
+                  fontWeight: 800,
+                  letterSpacing: '0.14em',
+                  textTransform: 'uppercase',
+                  color: T.inkMute,
+                  marginTop: 4,
+                  fontFamily: FONT,
+                }}
+              >
+                90 days ago
+              </div>
+            </div>
+            <div style={{ textAlign: 'right' }}>
+              <div
+                style={{
+                  fontSize: 14,
+                  fontWeight: 800,
+                  color: theme.accentInk,
+                  fontVariantNumeric: 'tabular-nums',
+                  lineHeight: 1,
+                  fontFamily: FONT,
+                }}
+              >
+                {prediction.projected !== null ? prediction.projected.toFixed(1) : '—'}
+              </div>
+              <div
+                style={{
+                  fontSize: 9,
+                  fontWeight: 800,
+                  letterSpacing: '0.14em',
+                  textTransform: 'uppercase',
+                  color: theme.accentInk,
+                  marginTop: 4,
+                  fontFamily: FONT,
+                }}
+              >
+                Projected
+              </div>
+            </div>
+          </div>
         </div>
-
-        <div style={{ padding: '12px 0 0', borderTop: `1px solid ${T.hairline}` }}>
-          <p style={{ margin: 0, fontSize: 12, lineHeight: 1.55, color: T.ink, fontFamily: FONT }}>
-            {prediction.recentFormAvg !== null && prediction.countersAvg !== null
-              ? meta.why(prediction.recentFormAvg, prediction.countersAvg)
-              : ''}
-          </p>
-        </div>
+        {/* The "why" prose paragraph */}
+        <p
+          style={{
+            margin: 0,
+            fontSize: 13,
+            lineHeight: 1.55,
+            color: T.ink,
+            fontFamily: FONT,
+          }}
+        >
+          {prediction.recentFormAvg !== null && prediction.countersAvg !== null
+            ? meta.why(prediction.recentFormAvg, prediction.countersAvg)
+            : ''}
+        </p>
       </div>
-    </div>
-  );
-};
 
 const SECTION_STYLE: React.CSSProperties = {
   marginBottom: 28,
