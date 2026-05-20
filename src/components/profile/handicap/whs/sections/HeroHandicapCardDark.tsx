@@ -305,26 +305,6 @@ const HeroHandicapCardDark: React.FC<Props> = ({ connection }) => {
         </div>
       </div>
 
-      {/* Tag line */}
-      <div
-        style={{
-          textAlign: 'center',
-          padding: '8px 20px 0',
-          fontSize: 11,
-          fontWeight: 700,
-          letterSpacing: '0.18em',
-          textTransform: 'uppercase',
-          fontFamily: FONT,
-        }}
-      >
-        {handicap == null ? (
-          <span style={{ color: 'var(--hcp-t-60)' }}>CONNECT WHS TO START</span>
-        ) : (
-          <>
-            {tagWord && <span style={{ color: verdictColor }}>{tagWord}</span>}
-          </>
-        )}
-      </div>
 
       {/* TripleStrip */}
       <TripleStrip variant="flush">
