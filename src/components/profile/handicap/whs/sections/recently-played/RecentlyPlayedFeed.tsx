@@ -26,44 +26,11 @@ export const RecentlyPlayedFeed: React.FC<Props> = ({ ownerUserId }) => {
 
   return (
     <section style={{ marginTop: 32 }}>
-      <div
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          padding: '0 20px 8px',
-          fontFamily: '"Geist", system-ui, sans-serif',
-        }}
-      >
-        <div
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: 8,
-            fontSize: 11,
-            fontWeight: 800,
-            letterSpacing: '0.14em',
-            color: 'var(--hcp-t-100)',
-            textTransform: 'uppercase',
-          }}
-        >
-          Friends' Rounds
-        </div>
-        {!isLoading && items.length > 0 && (
-          <span
-            style={{
-              fontSize: 11,
-              fontWeight: 800,
-              letterSpacing: '0.14em',
-              color: 'var(--hcp-t-60)',
-              textTransform: 'uppercase',
-              fontVariantNumeric: 'tabular-nums',
-            }}
-          >
-            Last fortnight
-          </span>
-        )}
-      </div>
+      <DarkSectionHeader
+        eyebrow="Friends' Rounds"
+        right={!isLoading && items.length > 0 ? 'Last fortnight' : undefined}
+      />
+
       {isLoading ? (
         <div style={{ padding: '0 20px' }}>
           {Array.from({ length: 3 }).map((_, i) => (
