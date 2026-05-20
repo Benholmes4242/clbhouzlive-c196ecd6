@@ -36,26 +36,24 @@ type CopyBand = {
   headline: string;
   pillLabel: string;
   pillTone: 'positive' | 'neutral' | 'soft';
-  subline: string;
   emphasis: 'celebrate' | 'standard' | 'soft' | 'distribution_only';
 };
 
 function getPercentileCopy(percentile_top: number): CopyBand {
   const headline = `Top ${percentile_top}%`;
-  const subline = 'Out of all active golfers on clbhouz this season.';
   if (percentile_top <= 5) {
-    return { headline, pillLabel: 'TOP TIER', pillTone: 'positive', subline, emphasis: 'celebrate' };
+    return { headline, pillLabel: 'TOP TIER', pillTone: 'positive', emphasis: 'celebrate' };
   }
   if (percentile_top <= 25) {
-    return { headline, pillLabel: 'ABOVE MEDIAN', pillTone: 'positive', subline, emphasis: 'standard' };
+    return { headline, pillLabel: 'ABOVE MEDIAN', pillTone: 'positive', emphasis: 'standard' };
   }
   if (percentile_top <= 50) {
-    return { headline, pillLabel: 'ABOVE MEDIAN', pillTone: 'positive', subline, emphasis: 'soft' };
+    return { headline, pillLabel: 'ABOVE MEDIAN', pillTone: 'positive', emphasis: 'soft' };
   }
   if (percentile_top <= 75) {
-    return { headline, pillLabel: 'MID-PACK', pillTone: 'neutral', subline, emphasis: 'distribution_only' };
+    return { headline, pillLabel: 'MID-PACK', pillTone: 'neutral', emphasis: 'distribution_only' };
   }
-  return { headline, pillLabel: 'BUILDING', pillTone: 'soft', subline, emphasis: 'distribution_only' };
+  return { headline, pillLabel: 'BUILDING', pillTone: 'soft', emphasis: 'distribution_only' };
 }
 
 interface Props {
