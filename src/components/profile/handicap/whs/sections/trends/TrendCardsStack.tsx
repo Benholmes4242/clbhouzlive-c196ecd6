@@ -3,6 +3,7 @@ import { Info } from 'lucide-react';
 import { useAllScores } from '@/lib/whs/hooks';
 import SectionHeader from '../SectionHeader';
 import HandicapProjectionCard from './HandicapProjectionCard';
+import LastFiveTokens from './LastFiveTokens';
 import StablefordCard from './StablefordCard';
 
 import { predictHandicap, VERDICT_META } from './predictHandicap';
