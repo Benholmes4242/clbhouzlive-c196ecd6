@@ -98,7 +98,8 @@ export const PersonalBests: React.FC<Props> = ({ connectionId, currentHandicap }
       );
       bestSF = {
         eyebrow: 'BEST STABLEFORD',
-        value: `${best.stableford_points} pts`,
+        value: String(best.stableford_points),
+        unit: 'pts',
         caption: fmtCourseDate(best),
       };
     }
