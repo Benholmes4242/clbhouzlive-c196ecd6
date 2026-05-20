@@ -250,7 +250,7 @@ const HeroHandicapCardDark: React.FC<Props> = ({ connection }) => {
             />
           </svg>
 
-          {/* Inner content */}
+          {/* Inner content — just the number; verdict implied by ring colour + change chip below */}
           <div
             style={{
               position: 'absolute',
@@ -259,51 +259,107 @@ const HeroHandicapCardDark: React.FC<Props> = ({ connection }) => {
               flexDirection: 'column',
               alignItems: 'center',
               justifyContent: 'center',
-              gap: 8,
               pointerEvents: 'none',
             }}
           >
-            <span
-              style={{
-                textTransform: 'uppercase',
-                fontSize: 10.5,
-                letterSpacing: '0.18em',
-                fontWeight: 700,
-                color: 'var(--hcp-t-60)',
-              }}
-            >
-              INDEX
-            </span>
-            <span
-              style={{
-                fontSize: 76,
-                fontWeight: 700,
-                letterSpacing: '-0.04em',
-                lineHeight: 1,
-                color: 'var(--hcp-t-100)',
-                fontVariantNumeric: 'tabular-nums',
-              }}
-            >
-              {isLoading || handicap == null ? '—' : fmtHcp(handicap)}
-            </span>
-            {!isLoading && delta90 != null && (
-              <VerdictPill verdict={verdict}>
-                {arrowChar} {Math.abs(delta90).toFixed(1)} · 90D
-              </VerdictPill>
-            )}
-            {isLoading && (
-              <div
+            {handicap == null && !isLoading ? (
+              <span
                 style={{
-                  width: 64,
-                  height: 16,
-                  borderRadius: 999,
-                  background: 'var(--hcp-bg-3)',
+                  fontSize: 11,
+                  fontWeight: 700,
+                  letterSpacing: '0.18em',
+                  textTransform: 'uppercase',
+                  color: 'var(--hcp-t-60)',
+                  textAlign: 'center',
+                  padding: '0 20px',
                 }}
-              />
+              >
+                Connect WHS to start
+              </span>
+            ) : (
+              <span
+                style={{
+                  fontSize: 72,
+                  fontWeight: 700,
+                  letterSpacing: '-0.04em',
+                  lineHeight: 1,
+                  color: 'var(--hcp-t-100)',
+                  fontVariantNumeric: 'tabular-nums',
+                }}
+              >
+                {isLoading ? '—' : fmtHcp(handicap)}
+              </span>
             )}
           </div>
         </div>
       </div>
+
+      {/* Change chip — anchored below ring, the actionable delta */}
+      {!isLoading && delta90 != null && (
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'center',
+            marginTop: 6,
+          }}
+        >
+          <span
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 6,
+              padding: '5px 12px',
+              borderRadius: 999,
+              background:
+                verdict === 'good' ? 'rgba(34, 197, 94, 0.14)' :
+                verdict === 'bad'  ? 'rgba(239, 68, 68, 0.14)' :
+                'rgba(247, 147, 30, 0.14)',
+              border:
+                verdict === 'good' ? '1px solid rgba(34, 197, 94, 0.25)' :
+                verdict === 'bad'  ? '1px solid rgba(239, 68, 68, 0.25)' :
+                '1px solid rgba(247, 147, 30, 0.25)',
+              fontSize: 12,
+              fontWeight: 700,
+              color:
+                verdict === 'good' ? '#4ADE80' :
+                verdict === 'bad'  ? '#F87171' :
+                '#F7931E',
+              letterSpacing: '0.02em',
+              fontVariantNumeric: 'tabular-nums',
+            }}
+          >
+            <svg
+              width="11"
+              height="11"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="3"
+              strokeLinecap="round"
+              aria-hidden
+            >
+              {verdict === 'good' ? (
+                <>
+                  <path d="M12 5v14" />
+                  <path d="M19 12l-7 7-7-7" />
+                </>
+              ) : verdict === 'bad' ? (
+                <>
+                  <path d="M12 19V5" />
+                  <path d="M5 12l7-7 7 7" />
+                </>
+              ) : (
+                <path d="M5 12h14" />
+              )}
+            </svg>
+            {Math.abs(delta90).toFixed(1)} over 90 days
+            {verdict === 'good' && (
+              <span style={{ fontSize: 13, lineHeight: 1, marginLeft: 2 }}>🔥</span>
+            )}
+          </span>
+        </div>
+      )}
+
 
 
       {/* TripleStrip */}
