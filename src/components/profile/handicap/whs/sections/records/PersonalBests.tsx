@@ -189,7 +189,8 @@ export const PersonalBests: React.FC<Props> = ({ connectionId, currentHandicap }
       }
       longestStreak = {
         eyebrow: 'COUNTER STREAK',
-        value: `${bestRun} in a row`,
+        value: String(bestRun),
+        unit: 'in a row',
         caption,
       };
     }
