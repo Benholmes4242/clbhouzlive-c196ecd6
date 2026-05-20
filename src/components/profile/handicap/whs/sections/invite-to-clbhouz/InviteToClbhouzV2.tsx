@@ -163,6 +163,10 @@ export const InviteToClbhouzV2: React.FC<Props> = ({ ownerUserId }) => {
               <InviteCard
                 key={String(f.friend_passport_id)}
                 friend={f}
+                hideHomeClub={
+                  dominantHomeClub != null &&
+                  f.friend_home_club === dominantHomeClub
+                }
               />
             ))}
           </div>
