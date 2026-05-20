@@ -460,7 +460,6 @@ export const CourseFormCard: React.FC<Props> = ({ connectionId, currentHandicap,
         <SectionHeader
           eyebrow="COURSE FORM"
           title="Your courses ranked"
-          sub="Play more rounds to see how each course suits your game"
         />
         <div style={{ padding: '24px 20px 28px', textAlign: 'center' }}>
           <p style={{ margin: 0, fontSize: 13, fontWeight: 700, color: T.ink, fontFamily: FONT }}>
