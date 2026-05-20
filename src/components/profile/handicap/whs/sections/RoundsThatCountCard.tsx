@@ -1058,25 +1058,82 @@ const StablefordChartBlock: React.FC<{
           <button
             onClick={onOpenDetail}
             aria-label="Open Stableford detail"
-            style={{
-              display: 'flex', width: '100%', height: 44,
-              borderRadius: 10, overflow: 'hidden',
-              background: 'var(--hcp-bg-2)',
-              border: 'none', padding: 0, cursor: 'pointer',
-            }}
-          >
-            {segs.map((s, i) => (
-              <div key={i} style={{
-                flex: s.count, background: s.gradient,
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                color: '#fff', fontSize: 14, fontWeight: 800,
-                letterSpacing: '-0.02em',
-                fontVariantNumeric: 'tabular-nums',
-              }}>
-                {s.count > dist.total * 0.1 ? s.count : ''}
-              </div>
-            ))}
-          </button>
+          {/* Distribution bar with "YOUR LAST" anchor pointer */}
+          <div style={{ position: 'relative' }}>
+            {latestRound && (() => {
+              const total = dist.inZoneCount + dist.solidCount + dist.offDayCount;
+              if (total === 0) return null;
+              const inZoneEnd = dist.inZoneCount / total;
+              const solidEnd = (dist.inZoneCount + dist.solidCount) / total;
+              const center =
+                latestRound.bucket === 'inZone'
+                  ? inZoneEnd / 2
+                  : latestRound.bucket === 'solid'
+                    ? (inZoneEnd + solidEnd) / 2
+                    : (solidEnd + 1) / 2;
+              return (
+                <div
+                  aria-hidden
+                  style={{
+                    position: 'absolute',
+                    top: -22,
+                    left: `${center * 100}%`,
+                    transform: 'translateX(-50%)',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    gap: 2,
+                    pointerEvents: 'none',
+                    zIndex: 2,
+                  }}
+                >
+                  <span
+                    style={{
+                      fontSize: 9,
+                      fontWeight: 800,
+                      letterSpacing: '0.12em',
+                      textTransform: 'uppercase',
+                      color: AMBER,
+                      fontFamily: FONT_GEIST,
+                    }}
+                  >
+                    Your last
+                  </span>
+                  <span
+                    style={{
+                      width: 0,
+                      height: 0,
+                      borderLeft: '5px solid transparent',
+                      borderRight: '5px solid transparent',
+                      borderTop: `5px solid ${AMBER}`,
+                    }}
+                  />
+                </div>
+              );
+            })()}
+            <button
+              onClick={onOpenDetail}
+              aria-label="Open Stableford detail"
+              style={{
+                display: 'flex', width: '100%', height: 44,
+                borderRadius: 10, overflow: 'hidden',
+                background: 'var(--hcp-bg-2)',
+                border: 'none', padding: 0, cursor: 'pointer',
+              }}
+            >
+              {segs.map((s, i) => (
+                <div key={i} style={{
+                  flex: s.count, background: s.gradient,
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  color: '#fff', fontSize: 14, fontWeight: 800,
+                  letterSpacing: '-0.02em',
+                  fontVariantNumeric: 'tabular-nums',
+                }}>
+                  {s.count > dist.total * 0.1 ? s.count : ''}
+                </div>
+              ))}
+            </button>
+          </div>
 
           {/* Chips row */}
           <div style={{
