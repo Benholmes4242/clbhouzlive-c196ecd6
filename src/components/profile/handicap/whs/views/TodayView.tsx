@@ -6,7 +6,7 @@ import TodayGreeting from '../sections/TodayGreeting';
 import LastRoundCard from '../sections/LastRoundCard';
 import NextRoundWatch from '../sections/NextRoundWatch';
 import Pattern14Card from '../sections/Pattern14Card';
-import SinceLastVisitRail from '../sections/since-last-visit/SinceLastVisitRail';
+
 import RecentUnlocksStrip from '../gam/RecentUnlocksStrip';
 import { LaunchSheetMount } from '../../gam/launch/LaunchSheetMount';
 
@@ -16,7 +16,7 @@ interface Props {
   userId: string;
   currentHandicap: number | null;
   connectionCreatedAt: string;
-  /** When true, hides personal-only sections (Since Last Visit, banners). */
+  /** When true, hides personal-only sections (e.g. banners). */
   readOnly?: boolean;
   showReauthBanner?: boolean;
   /** First name of the profile owner — used to name-prefix friend-view copy. */
@@ -82,10 +82,7 @@ export const TodayView: React.FC<Props> = ({
         ownerFirstName={ownerFirstName}
       />
 
-      {/* 5. Since Last Visit — owner only */}
-      {!readOnly && <SinceLastVisitRail userId={userId} />}
-
-      {/* 6. Last 14 Rounds */}
+      {/* 5. Last 14 Rounds */}
       <Pattern14Card connectionId={connectionId} />
 
       <LaunchSheetMount userId={userId} />

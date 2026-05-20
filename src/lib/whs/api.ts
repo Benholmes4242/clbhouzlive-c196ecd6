@@ -18,7 +18,7 @@ import type {
   WhsFriendCourseBest,
   WhsFriendActivityWithImage,
   WhsFriendWindowRanking,
-  FriendRoundsSinceLastVisitResult,
+  
 } from './types';
 
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL as string;
@@ -1114,20 +1114,3 @@ export async function fetchTrophyAggregates(
   return (data as unknown) as TrophyAggregates;
 }
 
-// ─── Phase 7: Friend rounds since last Today visit ───────────────────────
-
-export async function fetchFriendRoundsSinceLastVisit(): Promise<FriendRoundsSinceLastVisitResult> {
-  const { data, error } = await supabase.rpc('get_friend_rounds_since_last_visit' as any, {
-    p_limit: 8,
-  });
-  if (error) throw error;
-  return data as unknown as FriendRoundsSinceLastVisitResult;
-}
-
-export async function callMarkTodayVisited(): Promise<void> {
-  const { error } = await supabase.rpc('mark_today_visited' as any);
-  if (error) {
-    // Soft-fail — non-critical. Log and continue.
-    console.warn('mark_today_visited failed:', error);
-  }
-}
