@@ -23,7 +23,7 @@ interface Props {
   connectionId: string;
 }
 
-const CourseCarouselCard: React.FC<{
+const HeroCard: React.FC<{
   course: SuitedCourse;
   accent: string;
   accentTint: string;
@@ -33,8 +33,7 @@ const CourseCarouselCard: React.FC<{
     type="button"
     onClick={() => onTap(course.id)}
     style={{
-      flexShrink: 0,
-      width: 'calc((100vw - 32px - 12px) / 1.8)',
+      width: '100%',
       background: 'var(--hcp-bg-1)',
       border: '1px solid var(--hcp-line-2)',
       borderRadius: 14,
@@ -46,15 +45,15 @@ const CourseCarouselCard: React.FC<{
       boxShadow: '0 1px 2px rgba(15,23,42,0.04)',
       display: 'flex',
       flexDirection: 'column',
+      marginBottom: 10,
     }}
     className="active:scale-[0.99] transition-transform"
   >
-    {/* Image / fallback strip — 16:9 ratio */}
     <div
       style={{
         position: 'relative',
         width: '100%',
-        aspectRatio: '16 / 9',
+        aspectRatio: '16 / 8',
         background: `linear-gradient(135deg, ${accentTint} 0%, rgba(255,255,255,0) 100%)`,
         display: 'flex',
         alignItems: 'center',
@@ -78,28 +77,28 @@ const CourseCarouselCard: React.FC<{
           }}
         />
       ) : (
-        <MapPin size={28} color={accent} strokeWidth={1.8} />
+        <MapPin size={32} color={accent} strokeWidth={1.8} />
       )}
       {course.expected_differential != null && (
         <div
           style={{
             position: 'absolute',
-            top: 8,
-            right: 8,
+            top: 10,
+            right: 10,
             background: 'var(--hcp-bg-1)',
             border: '1px solid var(--hcp-line-2)',
-            borderRadius: 8,
-            padding: '4px 8px',
+            borderRadius: 10,
+            padding: '6px 11px',
             display: 'flex',
             alignItems: 'baseline',
-            gap: 4,
+            gap: 5,
             boxShadow: '0 1px 2px rgba(15,23,42,0.06)',
             zIndex: 1,
           }}
         >
           <span
             style={{
-              fontSize: 8,
+              fontSize: 10,
               fontWeight: 800,
               color: accent,
               letterSpacing: '0.14em',
@@ -109,11 +108,12 @@ const CourseCarouselCard: React.FC<{
           </span>
           <span
             style={{
-              fontSize: 12,
-              fontWeight: 700,
+              fontSize: 20,
+              fontWeight: 800,
               color: accent,
-              letterSpacing: '-0.01em',
+              letterSpacing: '-0.02em',
               fontVariantNumeric: 'tabular-nums',
+              lineHeight: 1,
             }}
           >
             {fmtDiff(course.expected_differential, { plus: true })}
@@ -122,18 +122,14 @@ const CourseCarouselCard: React.FC<{
       )}
     </div>
 
-    {/* Body */}
-    <div style={{ padding: 12, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 4 }}>
+    <div style={{ padding: 14, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 5 }}>
       <div
         style={{
-          fontSize: 14,
-          fontWeight: 700,
+          fontSize: 16,
+          fontWeight: 800,
           color: 'var(--hcp-t-100)',
-          letterSpacing: '-0.01em',
-          lineHeight: 1.2,
-          overflow: 'hidden',
-          textOverflow: 'ellipsis',
-          whiteSpace: 'nowrap',
+          letterSpacing: '-0.015em',
+          lineHeight: 1.25,
         }}
       >
         {course.name || '—'}
@@ -144,12 +140,12 @@ const CourseCarouselCard: React.FC<{
             display: 'flex',
             alignItems: 'center',
             gap: 4,
-            fontSize: 11,
+            fontSize: 11.5,
             color: 'var(--hcp-t-60)',
             minWidth: 0,
           }}
         >
-          <MapPin size={10} color={INK_40} strokeWidth={2} style={{ flexShrink: 0 }} />
+          <MapPin size={11} color={INK_40} strokeWidth={2} style={{ flexShrink: 0 }} />
           <span
             style={{
               overflow: 'hidden',
@@ -164,14 +160,10 @@ const CourseCarouselCard: React.FC<{
       {course.rationale && (
         <p
           style={{
-            margin: '4px 0 0',
-            fontSize: 12,
-            lineHeight: 1.45,
-            color: 'var(--hcp-t-60)',
-            display: '-webkit-box',
-            WebkitLineClamp: 3,
-            WebkitBoxOrient: 'vertical' as const,
-            overflow: 'hidden',
+            margin: '6px 0 0',
+            fontSize: 13,
+            lineHeight: 1.5,
+            color: 'var(--hcp-t-80)',
           }}
         >
           {course.rationale}
@@ -181,15 +173,147 @@ const CourseCarouselCard: React.FC<{
   </button>
 );
 
+const MiniCard: React.FC<{
+  course: SuitedCourse;
+  accent: string;
+  accentTint: string;
+  onTap: (id: string) => void;
+}> = ({ course, accent, accentTint, onTap }) => (
+  <button
+    type="button"
+    onClick={() => onTap(course.id)}
+    style={{
+      width: '100%',
+      background: 'var(--hcp-bg-1)',
+      border: '1px solid var(--hcp-line-2)',
+      borderRadius: 12,
+      overflow: 'hidden',
+      cursor: 'pointer',
+      fontFamily: FONT_GEIST,
+      textAlign: 'left',
+      padding: 0,
+      display: 'flex',
+      flexDirection: 'column',
+    }}
+    className="active:scale-[0.99] transition-transform"
+  >
+    <div
+      style={{
+        position: 'relative',
+        width: '100%',
+        aspectRatio: '16 / 10',
+        background: `linear-gradient(135deg, ${accentTint} 0%, rgba(255,255,255,0) 100%)`,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        borderBottom: `0.5px solid ${INK_10}`,
+        overflow: 'hidden',
+      }}
+    >
+      {course.thumbnail_image ? (
+        <img
+          src={course.thumbnail_image}
+          alt=""
+          aria-hidden
+          loading="lazy"
+          style={{
+            position: 'absolute',
+            inset: 0,
+            width: '100%',
+            height: '100%',
+            objectFit: 'cover',
+          }}
+        />
+      ) : (
+        <MapPin size={22} color={accent} strokeWidth={1.8} />
+      )}
+      {course.expected_differential != null && (
+        <div
+          style={{
+            position: 'absolute',
+            top: 6,
+            right: 6,
+            background: 'var(--hcp-bg-1)',
+            border: '1px solid var(--hcp-line-2)',
+            borderRadius: 7,
+            padding: '3px 7px',
+            display: 'flex',
+            alignItems: 'baseline',
+            gap: 3,
+            zIndex: 1,
+          }}
+        >
+          <span style={{ fontSize: 8, fontWeight: 800, color: accent, letterSpacing: '0.12em' }}>
+            EXP
+          </span>
+          <span
+            style={{
+              fontSize: 12,
+              fontWeight: 800,
+              color: accent,
+              letterSpacing: '-0.02em',
+              fontVariantNumeric: 'tabular-nums',
+              lineHeight: 1,
+            }}
+          >
+            {fmtDiff(course.expected_differential, { plus: true })}
+          </span>
+        </div>
+      )}
+    </div>
 
-const SkeletonCard = () => (
+    <div style={{ padding: 10, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 2 }}>
+      <div
+        style={{
+          fontSize: 12.5,
+          fontWeight: 800,
+          color: 'var(--hcp-t-100)',
+          letterSpacing: '-0.01em',
+          lineHeight: 1.25,
+          overflow: 'hidden',
+          textOverflow: 'ellipsis',
+          whiteSpace: 'nowrap',
+        }}
+      >
+        {course.name || '—'}
+      </div>
+      {course.region && (
+        <div
+          style={{
+            fontSize: 10,
+            color: 'var(--hcp-t-60)',
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            whiteSpace: 'nowrap',
+          }}
+        >
+          {course.region}
+        </div>
+      )}
+    </div>
+  </button>
+);
+
+const HeroSkeleton = () => (
   <div
     style={{
-      flexShrink: 0,
-      width: 'calc((100vw - 32px - 12px) / 1.8)',
-      height: 200,
+      width: '100%',
+      height: 280,
       background: INK_06,
       borderRadius: 14,
+      animation: 'echoInsightsPulse 1.6s ease-in-out infinite',
+      marginBottom: 10,
+    }}
+  />
+);
+
+const MiniSkeleton = () => (
+  <div
+    style={{
+      width: '100%',
+      aspectRatio: '16 / 14',
+      background: INK_06,
+      borderRadius: 12,
       animation: 'echoInsightsPulse 1.6s ease-in-out infinite',
     }}
   />
@@ -225,6 +349,29 @@ export const EchoInsightsCard: React.FC<Props> = ({ connectionId }) => {
     analyticsEvents.track('echo_insights_course_tap', { course_id: courseId });
     navigate(`/courses/${courseId}`);
   };
+
+  // Sort SUITED ascending (easiest = lowest EXP first); TEST descending
+  // (hardest = highest EXP first). Null EXPs sort to the end so they never
+  // accidentally become the hero card.
+  const suitedSorted = React.useMemo(() => {
+    if (!insights?.suited_courses) return [];
+    return [...insights.suited_courses].sort((a, b) => {
+      if (a.expected_differential == null && b.expected_differential == null) return 0;
+      if (a.expected_differential == null) return 1;
+      if (b.expected_differential == null) return -1;
+      return a.expected_differential - b.expected_differential;
+    });
+  }, [insights?.suited_courses]);
+
+  const testSorted = React.useMemo(() => {
+    if (!insights?.test_courses) return [];
+    return [...insights.test_courses].sort((a, b) => {
+      if (a.expected_differential == null && b.expected_differential == null) return 0;
+      if (a.expected_differential == null) return 1;
+      if (b.expected_differential == null) return -1;
+      return b.expected_differential - a.expected_differential;
+    });
+  }, [insights?.test_courses]);
 
   return (
     <section
@@ -276,15 +423,6 @@ export const EchoInsightsCard: React.FC<Props> = ({ connectionId }) => {
         .echoSparkle.s3 { top: 52%; left: 110px; animation: echoSparkleFloat 7s ease-in-out infinite 2.5s; }
         .echoSparkle.s4 { top: 46%; left: 160px; animation: echoSparkleFloat 8s ease-in-out infinite 0.5s; }
         .echoSparkle.s5 { top: 60%; left: 200px; animation: echoSparkleFloat 5.5s ease-in-out infinite 3s; }
-        .insightsCarousel {
-          display: flex;
-          gap: 10px;
-          overflow-x: auto;
-          padding: 4px 20px 12px;
-          scrollbar-width: none;
-          -webkit-overflow-scrolling: touch;
-        }
-        .insightsCarousel::-webkit-scrollbar { display: none; }
       `}</style>
 
       {/* Background plume — amber radial glow + drifting sparkles. Sits behind all content. */}
@@ -306,27 +444,42 @@ export const EchoInsightsCard: React.FC<Props> = ({ connectionId }) => {
         <SectionHeader
           eyebrow="SUITED TO YOUR GAME"
           title="Three courses for posting low scores"
-          sub="Layouts that match your strengths."
         />
-        <div className="insightsCarousel">
+        <div style={{ padding: '4px 20px 12px' }}>
           {isLoading || !insights ? (
             <>
-              <SkeletonCard />
-              <SkeletonCard />
-              <SkeletonCard />
+              <HeroSkeleton />
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
+                <MiniSkeleton />
+                <MiniSkeleton />
+              </div>
             </>
-          ) : insights.suited_courses.length === 0 ? (
+          ) : suitedSorted.length === 0 ? (
             <EmptyBlock />
           ) : (
-            insights.suited_courses.map((c) => (
-              <CourseCarouselCard
-                key={c.id}
-                course={c}
-                accent={GREEN}
-                accentTint={GREEN_06}
-                onTap={handleCourseTap}
-              />
-            ))
+            <>
+              {suitedSorted[0] && (
+                <HeroCard
+                  course={suitedSorted[0]}
+                  accent={GREEN}
+                  accentTint={GREEN_06}
+                  onTap={handleCourseTap}
+                />
+              )}
+              {suitedSorted.length > 1 && (
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
+                  {suitedSorted.slice(1).map((c) => (
+                    <MiniCard
+                      key={c.id}
+                      course={c}
+                      accent={GREEN}
+                      accentTint={GREEN_06}
+                      onTap={handleCourseTap}
+                    />
+                  ))}
+                </div>
+              )}
+            </>
           )}
         </div>
       </div>
@@ -336,27 +489,42 @@ export const EchoInsightsCard: React.FC<Props> = ({ connectionId }) => {
         <SectionHeader
           eyebrow="TEST YOURSELF"
           title="Three courses to grow your game"
-          sub="Layouts that stretch what you don't usually face."
         />
-        <div className="insightsCarousel">
+        <div style={{ padding: '4px 20px 12px' }}>
           {isLoading || !insights ? (
             <>
-              <SkeletonCard />
-              <SkeletonCard />
-              <SkeletonCard />
+              <HeroSkeleton />
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
+                <MiniSkeleton />
+                <MiniSkeleton />
+              </div>
             </>
-          ) : insights.test_courses.length === 0 ? (
+          ) : testSorted.length === 0 ? (
             <EmptyBlock />
           ) : (
-            insights.test_courses.map((c) => (
-              <CourseCarouselCard
-                key={c.id}
-                course={c}
-                accent={AMBER_DEEP}
-                accentTint={AMBER_06}
-                onTap={handleCourseTap}
-              />
-            ))
+            <>
+              {testSorted[0] && (
+                <HeroCard
+                  course={testSorted[0]}
+                  accent={AMBER_DEEP}
+                  accentTint={AMBER_06}
+                  onTap={handleCourseTap}
+                />
+              )}
+              {testSorted.length > 1 && (
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
+                  {testSorted.slice(1).map((c) => (
+                    <MiniCard
+                      key={c.id}
+                      course={c}
+                      accent={AMBER_DEEP}
+                      accentTint={AMBER_06}
+                      onTap={handleCourseTap}
+                    />
+                  ))}
+                </div>
+              )}
+            </>
           )}
         </div>
       </div>
