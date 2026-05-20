@@ -13,7 +13,7 @@ interface Props {
   currentHandicap: number | null | undefined;
   /** Optional. Controls which subset of the stack renders.
    * 'hero-only' = form hero + HandicapProjectionCard.
-   * 'rest' = StablefordCard + TrendNarrativeSection + CourseFormCard.
+   * 'rest' = StablefordCard.
    * undefined (default) = whole stack (backwards-compatible). */
   splitAt?: 'hero-only' | 'rest';
   /** Override the canonical top margin. Pass 0 for the first card on the tab. */
