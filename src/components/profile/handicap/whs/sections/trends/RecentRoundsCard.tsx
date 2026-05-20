@@ -128,18 +128,6 @@ export const RecentRoundsCard: React.FC<Props> = ({ connectionId }) => {
     [allRounds, trend?.current],
   );
 
-  const bestByCourseSet = useMemo(() => {
-    const bestByCourse = new Map<string, { id: string; gross: number }>();
-    for (const r of rounds) {
-      const courseName = r.course?.name;
-      if (!courseName || r.adjusted_gross == null) continue;
-      const current = bestByCourse.get(courseName);
-      if (!current || r.adjusted_gross < current.gross) {
-        bestByCourse.set(courseName, { id: r.id, gross: r.adjusted_gross });
-      }
-    }
-    return new Set(Array.from(bestByCourse.values()).map((b) => b.id));
-  }, [rounds]);
 
   const courseNames = useMemo(() => {
     const counts = new Map<string, number>();
