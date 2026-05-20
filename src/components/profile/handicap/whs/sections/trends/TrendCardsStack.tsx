@@ -7,14 +7,13 @@ import LastFiveTokens from './LastFiveTokens';
 import StablefordCard from './StablefordCard';
 
 import { predictHandicap, VERDICT_META } from './predictHandicap';
-import TrendNarrativeSection from './TrendNarrativeSection';
 
 interface Props {
   connectionId: string;
   currentHandicap: number | null | undefined;
   /** Optional. Controls which subset of the stack renders.
    * 'hero-only' = form hero + HandicapProjectionCard.
-   * 'rest' = StablefordCard + TrendNarrativeSection + CourseFormCard.
+   * 'rest' = StablefordCard.
    * undefined (default) = whole stack (backwards-compatible). */
   splitAt?: 'hero-only' | 'rest';
   /** Override the canonical top margin. Pass 0 for the first card on the tab. */
@@ -256,10 +255,7 @@ export const TrendCardsStack: React.FC<Props> = ({ connectionId, currentHandicap
             </>
           )}
           {splitAt !== 'hero-only' && (
-            <>
-              <StablefordCard scores={scores ?? []} />
-              <TrendNarrativeSection connectionId={connectionId} />
-            </>
+            <StablefordCard scores={scores ?? []} />
           )}
         </>
       )}
