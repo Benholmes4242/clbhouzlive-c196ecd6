@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import { useAllScores } from '@/lib/whs/hooks';
-import { DarkSectionHeader, DarkCard } from './_shared/darkAtoms';
+import { DarkSectionHeader } from './_shared/darkAtoms';
 import RoundDetailSheet from './round-detail/RoundDetailSheet';
 
 const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
@@ -64,6 +64,27 @@ const Pattern14Card: React.FC<Props> = ({ connectionId }) => {
     return `${olderRounds.length} ${noun} from ${range}`;
   }, [olderRounds]);
 
+  const counts = useMemo(() => {
+    const acc = { better: 0, on: 0, worse: 0 };
+    for (const r of rounds14) {
+      const d = r.delta;
+      if (d == null) continue;
+      if (d <= -1) acc.better++;
+      else if (d >= 1) acc.worse++;
+      else acc.on++;
+    }
+    return acc;
+  }, [rounds14]);
+
+  const maxMag = useMemo(() => {
+    const allDeltas = [
+      ...rounds14.map((r) => r.delta),
+      ...olderRounds.map((r) => r.delta),
+    ].filter((d): d is number => d != null);
+    if (allDeltas.length === 0) return 1;
+    return Math.max(...allDeltas.map((d) => Math.abs(d)), 2);
+  }, [rounds14, olderRounds]);
+
   if (isLoading || rounds14.length === 0) return null;
 
   const selectedRound = selectedScoreId
@@ -74,31 +95,52 @@ const Pattern14Card: React.FC<Props> = ({ connectionId }) => {
     <>
       <section style={{ marginTop: 32 }}>
         <DarkSectionHeader eyebrow="Last 14 Rounds" right="SCORE DIFF VS HCP" />
-        <DarkCard>
-          <div style={{ padding: '14px 16px 16px', fontFamily: FONT }}>
-            {/* Direction labels above the main grid */}
+        <div
+          style={{
+            margin: '0 20px',
+            position: 'relative',
+            borderRadius: 16,
+            overflow: 'hidden',
+            background: 'var(--hcp-bg-1)',
+            border: '1px solid var(--hcp-line-2)',
+            fontFamily: FONT,
+          }}
+        >
+          {/* ── SUMMARY STRIP ──────────────────────── */}
+          <div
+            style={{
+              padding: '14px 16px 12px',
+              borderBottom: '1px solid var(--hcp-line-2)',
+              display: 'flex',
+              alignItems: 'center',
+              gap: 18,
+            }}
+          >
+            <SummaryStat value={counts.better} label="Better" color="var(--hcp-good-2)" />
+            <SummaryStat value={counts.on} label="On" color="var(--hcp-t-100)" />
+            <SummaryStat value={counts.worse} label="Worse" color="var(--hcp-bad-2)" />
+            <div style={{ flex: 1 }} />
+            <span
+              style={{
+                fontSize: 11,
+                fontWeight: 700,
+                color: 'var(--hcp-t-60)',
+                letterSpacing: '-0.01em',
+                fontVariantNumeric: 'tabular-nums',
+              }}
+            >
+              {rounds14.length} rounds
+            </span>
+          </div>
+
+          {/* ── MAIN HEATMAP ──────────────────────── */}
+          <div style={{ padding: '20px 16px 14px' }}>
             <div
               style={{
                 display: 'flex',
-                justifyContent: 'space-between',
-                marginBottom: 8,
-                fontSize: 9,
-                fontWeight: 700,
-                letterSpacing: '0.18em',
-                textTransform: 'uppercase',
-                color: 'var(--hcp-t-40)',
-              }}
-            >
-              <span><span style={{ color: 'var(--hcp-t-60)' }}>←</span> Older</span>
-              <span>Newest <span style={{ color: 'var(--hcp-t-60)' }}>→</span></span>
-            </div>
-
-            {/* Main 14-square row */}
-            <div
-              style={{
-                display: 'grid',
-                gridTemplateColumns: 'repeat(14, 1fr)',
+                alignItems: 'flex-end',
                 gap: 4,
+                height: 80,
               }}
             >
               {rounds14.map((r) => {
@@ -112,99 +154,84 @@ const Pattern14Card: React.FC<Props> = ({ connectionId }) => {
                         ? 'worse than handicap'
                         : 'on handicap';
                 return (
-                  <PatternSquare
+                  <PatternBar
                     key={r.id}
                     delta={r.delta}
+                    maxMag={maxMag}
                     onClick={() => setSelectedScoreId(r.id)}
                     ariaLabel={`Round on ${dateLabel}, ${deltaLabel}. Tap to see details.`}
                   />
                 );
               })}
             </div>
-
-            {/* Date+count line under the grid */}
-            {mainCounter && (
-              <div
-                style={{
-                  marginTop: 8,
-                  textAlign: 'right',
-                  fontSize: 9.5,
-                  fontWeight: 700,
-                  letterSpacing: '0.14em',
-                  textTransform: 'uppercase',
-                  color: 'var(--hcp-t-40)',
-                  fontVariantNumeric: 'tabular-nums',
-                }}
-              >
-                {mainCounter}
-              </div>
-            )}
-
-            {/* Legend — 3 buckets */}
             <div
               style={{
-                marginTop: 14,
-                paddingTop: 12,
-                borderTop: '1px solid var(--hcp-line)',
+                height: 1,
+                background: 'var(--hcp-line-2)',
+                margin: '0 0 8px',
+              }}
+            />
+            <div
+              style={{
                 display: 'flex',
                 justifyContent: 'space-between',
                 alignItems: 'center',
-                gap: 12,
-                fontSize: 10.5,
+                fontSize: 9,
                 fontWeight: 700,
-                color: 'var(--hcp-t-80)',
+                letterSpacing: '0.14em',
+                textTransform: 'uppercase',
+                color: 'var(--hcp-t-40)',
               }}
             >
-              <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
-                <LegendSwatch color="var(--hcp-good)" />
-                <span style={{ color: 'var(--hcp-t-100)' }}>Better</span>
+              <span>
+                <span style={{ color: 'var(--hcp-t-60)' }}>←</span> Older
               </span>
-              <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
-                <LegendSwatch color="var(--hcp-bg-3)" bordered />
-                <span style={{ color: 'var(--hcp-t-100)' }}>On handicap</span>
-              </span>
-              <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
-                <LegendSwatch color="var(--hcp-bad)" />
-                <span style={{ color: 'var(--hcp-t-100)' }}>Worse</span>
+              {mainCounter && (
+                <span style={{ fontVariantNumeric: 'tabular-nums' }}>{mainCounter}</span>
+              )}
+              <span>
+                Newest <span style={{ color: 'var(--hcp-t-60)' }}>→</span>
               </span>
             </div>
+          </div>
 
-            {/* Older row */}
-            {olderRounds.length > 0 && (
-              <div
+          {/* ── BEFORE THAT BAND ──────────────────── */}
+          {olderRounds.length > 0 && (
+            <div
+              style={{
+                padding: '12px 16px 14px',
+                borderTop: '1px solid var(--hcp-line-2)',
+              }}
+            >
+              <p
                 style={{
-                  marginTop: 14,
-                  paddingTop: 12,
-                  borderTop: '1px solid var(--hcp-line)',
+                  margin: '0 0 8px',
+                  fontSize: 11,
+                  fontWeight: 600,
+                  color: 'var(--hcp-t-60)',
+                  lineHeight: 1.4,
                 }}
               >
-                <p
-                  style={{
-                    margin: '0 0 8px',
-                    fontSize: 11,
-                    fontWeight: 600,
-                    color: 'var(--hcp-t-60)',
-                    lineHeight: 1.4,
-                  }}
-                >
-                  <strong style={{ color: 'var(--hcp-t-100)', fontWeight: 700 }}>Before that</strong>
-                  {olderRange && <> · {olderRange}</>}
-                </p>
-                <div
-                  style={{
-                    display: 'grid',
-                    gridTemplateColumns: `repeat(${olderRounds.length}, 1fr)`,
-                    gap: 4,
-                  }}
-                >
-                  {olderRounds.map((r) => (
-                    <PatternSquare key={r.id} delta={r.delta} faded />
-                  ))}
-                </div>
+                <strong style={{ color: 'var(--hcp-t-100)', fontWeight: 700 }}>
+                  Before that
+                </strong>
+                {olderRange && <> · {olderRange}</>}
+              </p>
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'flex-end',
+                  gap: 3,
+                  height: 28,
+                }}
+              >
+                {olderRounds.map((r) => (
+                  <PatternBar key={r.id} delta={r.delta} maxMag={maxMag} faded />
+                ))}
               </div>
-            )}
-          </div>
-        </DarkCard>
+            </div>
+          )}
+        </div>
       </section>
 
       <RoundDetailSheet
@@ -219,21 +246,62 @@ const Pattern14Card: React.FC<Props> = ({ connectionId }) => {
   );
 };
 
-const PatternSquare: React.FC<{
+const PatternBar: React.FC<{
   delta: number | null;
+  maxMag: number;
   faded?: boolean;
-  size?: number;
   onClick?: () => void;
   ariaLabel?: string;
-}> = ({ delta, faded, size, onClick, ariaLabel }) => {
-  const { bg } = colorForDelta(delta);
-  const baseStyle: React.CSSProperties = {
-    width: size ?? '100%',
-    height: size,
-    aspectRatio: size ? undefined : '1 / 1',
-    background: bg,
-    borderRadius: 4,
-    opacity: faded ? 0.45 : 1,
+}> = ({ delta, maxMag, faded, onClick, ariaLabel }) => {
+  const bucket: 'better' | 'on' | 'worse' | 'none' =
+    delta == null
+      ? 'none'
+      : delta <= -1
+        ? 'better'
+        : delta >= 1
+          ? 'worse'
+          : 'on';
+
+  const heightPct =
+    bucket === 'on' || bucket === 'none'
+      ? 0.12
+      : Math.max(0.18, Math.min(1, Math.abs(delta as number) / maxMag));
+
+  const fill =
+    bucket === 'better'
+      ? 'linear-gradient(180deg, var(--hcp-good) 0%, rgba(34, 197, 94, 0.5) 100%)'
+      : bucket === 'worse'
+        ? 'linear-gradient(180deg, var(--hcp-bad) 0%, rgba(239, 68, 68, 0.5) 100%)'
+        : 'var(--hcp-bg-3)';
+
+  const isBlowUp = delta != null && Math.abs(delta) >= 5;
+  const glow =
+    isBlowUp && bucket === 'worse'
+      ? '0 0 8px rgba(239, 68, 68, 0.45)'
+      : isBlowUp && bucket === 'better'
+        ? '0 0 8px rgba(34, 197, 94, 0.45)'
+        : undefined;
+
+  const inner = (
+    <div
+      style={{
+        width: '100%',
+        height: `${heightPct * 100}%`,
+        background: fill,
+        borderRadius: '3px 3px 0 0',
+        boxShadow: glow,
+        transition: 'transform 120ms ease',
+      }}
+    />
+  );
+
+  const container: React.CSSProperties = {
+    flex: 1,
+    height: '100%',
+    display: 'flex',
+    flexDirection: 'column',
+    justifyContent: 'flex-end',
+    opacity: faded ? 0.55 : 1,
   };
 
   if (onClick) {
@@ -243,48 +311,62 @@ const PatternSquare: React.FC<{
         onClick={onClick}
         aria-label={ariaLabel}
         style={{
-          ...baseStyle,
+          ...container,
           border: 'none',
           padding: 0,
+          background: 'transparent',
           cursor: 'pointer',
-          transition: 'transform 120ms ease',
           WebkitTapHighlightColor: 'transparent',
         }}
         onTouchStart={(e) => {
-          (e.currentTarget as HTMLButtonElement).style.transform = 'scale(0.92)';
+          (e.currentTarget.firstChild as HTMLDivElement).style.transform = 'scaleY(0.92)';
+          (e.currentTarget.firstChild as HTMLDivElement).style.transformOrigin = 'bottom';
         }}
         onTouchEnd={(e) => {
-          (e.currentTarget as HTMLButtonElement).style.transform = 'scale(1)';
+          (e.currentTarget.firstChild as HTMLDivElement).style.transform = 'scaleY(1)';
         }}
         onTouchCancel={(e) => {
-          (e.currentTarget as HTMLButtonElement).style.transform = 'scale(1)';
+          (e.currentTarget.firstChild as HTMLDivElement).style.transform = 'scaleY(1)';
         }}
-      />
+      >
+        {inner}
+      </button>
     );
   }
 
-  return <div style={baseStyle} />;
+  return <div style={container}>{inner}</div>;
 };
 
-const LegendSwatch: React.FC<{ color: string; bordered?: boolean }> = ({ color, bordered }) => (
-  <span
-    style={{
-      width: 12,
-      height: 12,
-      borderRadius: 3,
-      background: color,
-      border: bordered ? '1px solid var(--hcp-line)' : 'none',
-      display: 'inline-block',
-    }}
-  />
+const SummaryStat: React.FC<{
+  value: number;
+  label: string;
+  color: string;
+}> = ({ value, label, color }) => (
+  <div style={{ display: 'flex', alignItems: 'baseline', gap: 6 }}>
+    <span
+      style={{
+        fontSize: 22,
+        fontWeight: 800,
+        letterSpacing: '-0.02em',
+        color,
+        fontVariantNumeric: 'tabular-nums',
+        lineHeight: 1,
+      }}
+    >
+      {value}
+    </span>
+    <span
+      style={{
+        fontSize: 9,
+        fontWeight: 800,
+        letterSpacing: '0.16em',
+        textTransform: 'uppercase',
+        color: 'var(--hcp-t-60)',
+      }}
+    >
+      {label}
+    </span>
+  </div>
 );
-
-function colorForDelta(delta: number | null): { bg: string } {
-  if (delta == null) return { bg: 'var(--hcp-bg-3)' };
-  // 3-bucket scale: better, on-handicap (within ±1), worse.
-  if (delta <= -1) return { bg: 'var(--hcp-good)' };
-  if (delta >= 1) return { bg: 'var(--hcp-bad)' };
-  return { bg: 'var(--hcp-bg-3)' };
-}
 
 export default Pattern14Card;
