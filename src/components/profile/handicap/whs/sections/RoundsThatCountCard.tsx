@@ -837,6 +837,7 @@ export const RoundsThatCountCard: React.FC<Props> = ({
             scope={stablefordScope}
             onScopeChange={setStablefordScope}
             onOpenDetail={() => setStablefordSheetOpen(true)}
+            latestRound={latestStablefordRound}
           />
           <div style={{
             display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)',
