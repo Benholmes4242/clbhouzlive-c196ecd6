@@ -179,7 +179,7 @@ export const InviteToClbhouzV2: React.FC<Props> = ({ ownerUserId }) => {
                 marginTop: 12,
                 background: T.cardBg,
                 border: `1px solid ${T.hairline}`,
-                borderRadius: 10,
+                borderRadius: 12,
                 cursor: 'pointer',
                 fontFamily: FONT,
                 fontSize: 11,
