@@ -53,7 +53,7 @@ const TitlePill: React.FC<{ category: LegendCategory; courseName: string; rank: 
 }) => {
   const colors = RANK_COLORS[(rank as 1 | 2 | 3)] ?? RANK_COLORS[3];
   const truncatedCourse =
-    courseName.length > 12 ? courseName.slice(0, 11) + '…' : courseName;
+    courseName.length > 20 ? courseName.slice(0, 19) + '…' : courseName;
   return (
     <span
       style={{

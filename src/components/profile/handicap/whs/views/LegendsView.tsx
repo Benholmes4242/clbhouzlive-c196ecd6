@@ -252,13 +252,25 @@ const ListView: React.FC<{
 }> = ({ userId, onSelectCourse }) => {
   const [query, setQuery] = useState('');
   const playedQuery = useUserPlayedCourses(userId);
+  const homeClubQuery = useUserHomeClubCourses(userId);
   const discoverQuery = useDiscoverCoursesThisWeek();
   const searchQuery = useCourseSearch(query);
 
   const played = playedQuery.data ?? [];
+  const homeClubCourses = homeClubQuery.data ?? [];
   const discover = discoverQuery.data ?? [];
   const searchResults = searchQuery.data ?? [];
   const showSearchResults = query.trim().length >= 2;
+
+  // Dedupe: filter played courses to exclude any already shown in HOME CLUB section.
+  const homeClubIds = useMemo(
+    () => new Set(homeClubCourses.map((c) => c.course_id)),
+    [homeClubCourses],
+  );
+  const playedFiltered = useMemo(
+    () => played.filter((c) => !homeClubIds.has(c.course_id)),
+    [played, homeClubIds],
+  );
 
   const handlePlayedTap = (c: PlayedCourseRow) =>
     onSelectCourse({
@@ -358,13 +370,13 @@ const ListView: React.FC<{
           <SectionEyebrow label="YOUR COURSES" />
           <div style={{ padding: '0 16px', display: 'flex', flexDirection: 'column', gap: 10 }}>
             {playedQuery.isLoading && <Skeleton height={68} radius={12} />}
-            {!playedQuery.isLoading && played.length === 0 && (
+            {!playedQuery.isLoading && playedFiltered.length === 0 && (
               <EmptyStub
-                title="No courses yet"
-                body="Courses you've played will show here once your round history is in."
+                title="No other courses yet"
+                body="Courses you've played outside your home club will show here."
               />
             )}
-            {played.map((c) => (
+            {playedFiltered.map((c) => (
               <CourseRow
                 key={c.course_id}
                 name={c.course_name}
