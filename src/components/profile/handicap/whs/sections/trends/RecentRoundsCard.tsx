@@ -529,11 +529,11 @@ const DateTile: React.FC<DateTileProps> = ({ dateString, thumbnailUrl }) => {
 // ─── Feed card ──────────────────────────────────────────────────────
 interface FeedCardProps {
   round: RoundWithDelta;
-  isBest: boolean;
   onTap: () => void;
 }
 
-const FeedCard: React.FC<FeedCardProps> = ({ round, isBest, onTap }) => {
+const FeedCard: React.FC<FeedCardProps> = ({ round, onTap }) => {
+
   const courseName = round.course?.name ?? 'Unknown course';
   const deltaInfo = fmtHcpDelta(round.handicap_delta);
 
