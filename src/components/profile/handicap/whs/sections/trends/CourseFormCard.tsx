@@ -263,7 +263,7 @@ const CourseRow: React.FC<{
         )}
       </div>
 
-      <div style={{ flex: 1, minWidth: 0 }}>
+      <div style={{ flex: 1, minWidth: 0, position: 'relative', zIndex: 1 }}>
         <div
           style={{
             fontSize: 13,
