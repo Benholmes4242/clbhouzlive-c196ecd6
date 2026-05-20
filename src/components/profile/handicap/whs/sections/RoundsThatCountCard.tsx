@@ -155,6 +155,34 @@ export const RoundsThatCountCard: React.FC<Props> = ({
       worst: Math.min(...pts),
     };
   }, [allScores, stablefordScope]);
+
+  // Latest stableford round's bucket for the "YOUR LAST" anchor.
+  const latestStablefordRound = useMemo<{
+    bucket: 'inZone' | 'solid' | 'offDay';
+    points: number;
+  } | null>(() => {
+    if (!allScores) return null;
+    const valid = allScores.filter(
+      (s) => s.stableford_points != null && s.stableford_points > 0,
+    ) as Array<WhsScore & { stableford_points: number }>;
+    const now = Date.now();
+    const windowed =
+      stablefordScope === 'all'
+        ? valid
+        : valid.filter((s) => {
+            const days = stablefordScope === '30d' ? 30 : 90;
+            return new Date(s.play_date).getTime() >= now - days * 86_400_000;
+          });
+    if (windowed.length === 0) return null;
+    const sorted = [...windowed].sort(
+      (a, b) => new Date(b.play_date).getTime() - new Date(a.play_date).getTime(),
+    );
+    const latest = sorted[0];
+    const pts = latest.stableford_points;
+    const bucket: 'inZone' | 'solid' | 'offDay' =
+      pts >= 36 ? 'inZone' : pts >= 33 ? 'solid' : 'offDay';
+    return { bucket, points: pts };
+  }, [allScores, stablefordScope]);
   const [sheetScoreId, setSheetScoreId] = useState<string | null>(null);
   const pointerStartRef = useRef<{ x: number; y: number; t: number } | null>(null);
   const plotRef = useRef<HTMLDivElement>(null);
