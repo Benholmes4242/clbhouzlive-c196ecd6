@@ -75,7 +75,7 @@ const UnlockCard: React.FC<{
       onTouchEnd={() => setPressed(false)}
       onTouchCancel={() => setPressed(false)}
       style={{
-        flex: '0 0 calc((100vw - 32px - 20px) / 2.2)',
+        flex: '0 0 calc((100% - 10px) / 2.2)',
         position: 'relative',
         scrollSnapAlign: 'start',
         padding: 14,
