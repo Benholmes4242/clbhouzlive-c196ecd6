@@ -323,11 +323,11 @@ export const RoundsThatCountCard: React.FC<Props> = ({
                   onClick={() => setChartMode(m)}
                   style={{
                     fontFamily: FONT_GEIST,
-                    fontSize: 10,
-                    fontWeight: 700,
+                    fontSize: 11,
+                    fontWeight: 800,
                     letterSpacing: '0.08em',
                     textTransform: 'uppercase',
-                    padding: '6px 10px',
+                    padding: '7px 14px',
                     borderRadius: 999,
                     border: 'none',
                     background: isActive ? AMBER : 'transparent',
