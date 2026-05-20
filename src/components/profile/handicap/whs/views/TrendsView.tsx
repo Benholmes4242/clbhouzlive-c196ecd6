@@ -1,6 +1,5 @@
 import React from 'react';
 import TrendCardsStack from '../sections/trends/TrendCardsStack';
-import TrendNarrativeSection from '../sections/trends/TrendNarrativeSection';
 import WhereYouStandSection from '../sections/WhereYouStandSection';
 import RoundsThatCountCard from '../sections/RoundsThatCountCard';
 import IndexHistoryCard from '../sections/IndexHistoryCard';
@@ -52,16 +51,13 @@ export const TrendsView: React.FC<Props> = ({
         ownerFirstName={ownerFirstName}
       />
 
-      {/* 4. Echo on Your Trend */}
-      <TrendNarrativeSection connectionId={connectionId} />
-
-      {/* 5. Index History */}
+      {/* 4. Index History */}
       <IndexHistoryCard connectionId={connectionId} />
 
-      {/* 6. Course Form */}
+      {/* 5. Course Form */}
       <CourseFormCard connectionId={connectionId} currentHandicap={currentHandicap ?? undefined} />
 
-      {/* 7. Echo Insights — owner only */}
+      {/* 6. Echo Insights — owner only */}
       {!readOnly && <EchoInsightsCard connectionId={connectionId} />}
     </div>
   );
