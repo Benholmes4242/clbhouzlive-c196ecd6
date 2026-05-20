@@ -23,18 +23,11 @@ interface Props {
 
 const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
 
-// Ring geometry — 230×230 in a 240 container.
-const RING_BOX = 240;
-const RING_R = 110;          // outer radius
-const STROKE_W = 9;
-const RING_TRACK_R = RING_R; // single arc, single track
-const ARC_R = 44;            // per brief: circumference = 2π·44 ≈ 276.5
-// Actually re-read brief: 230×230 ring; uses dashOffset = 276.5 * Math.min(handicap/36,1).
-// Implementation: SVG circle r=44 in a viewBox we scale to 230. Keep simple — we render a
-// 230×230 SVG with viewBox -120 -120 240 240 and circle r=110 stroke=5; map fill via 0..1.
-// Use native circumference.
-const CIRC_R = 110;
-const CIRCUMFERENCE = 2 * Math.PI * CIRC_R; // ≈ 691.15
+// Ring geometry — tighter 220 box with confident 14px stroke.
+const RING_BOX = 220;
+const STROKE_W = 14;
+const CIRC_R = (RING_BOX - STROKE_W) / 2;     // 103
+const CIRCUMFERENCE = 2 * Math.PI * CIRC_R;    // ≈ 647.16
 
 function formatToday(): string {
   return new Date()
