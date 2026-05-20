@@ -135,7 +135,7 @@ export const InviteCard: React.FC<Props> = ({ friend, hideHomeClub = false }) =>
       </div>
 
       {/* Secondary line — home club, indented under the name */}
-      {friend.friend_home_club && (
+      {friend.friend_home_club && !hideHomeClub && (
         <div
           style={{
             marginLeft: 46,
