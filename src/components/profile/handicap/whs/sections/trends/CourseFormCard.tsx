@@ -475,7 +475,7 @@ export const CourseFormCard: React.FC<Props> = ({ connectionId, currentHandicap,
 
   return (
     <section style={sectionStyle}>
-      <SectionHeader eyebrow="COURSE FORM" title="Your courses ranked" sub={view.sublabel} />
+      <SectionHeader eyebrow="COURSE FORM" title="Your courses ranked" />
       <div style={{ padding: '0 20px' }}>
         <ViewToggle activeView={activeView} onChange={setActiveView} />
         <CourseList courses={courses} view={activeView} />
@@ -489,6 +489,21 @@ export const CourseFormCard: React.FC<Props> = ({ connectionId, currentHandicap,
               : activeView === 'best'
                 ? 'best course'
                 : 'home course';
+          const lowConfidence = top.rounds_played < 2;
+          const verbAndAfter = lowConfidence ? (
+            <>
+              {' '}leads on a single round — small sample.{' '}
+              <span style={{ color: T.inkMute }}>Play it again to confirm.</span>
+            </>
+          ) : (
+            <>
+              {' '}is your {role}.{' '}
+              <span style={{ fontVariantNumeric: 'tabular-nums' }}>
+                {sign === 'over' ? '+' : '\u2212'}{deltaAbs}
+              </span>{' '}
+              vs hcp across {top.rounds_played} rounds.
+            </>
+          );
           return (
             <div
               style={{
@@ -500,12 +515,8 @@ export const CourseFormCard: React.FC<Props> = ({ connectionId, currentHandicap,
               }}
             >
               <p style={{ margin: 0, fontSize: 12.5, lineHeight: 1.55, color: T.inkSoft, fontFamily: FONT }}>
-                <span style={{ fontWeight: 700, color: T.ink }}>{top.course_name}</span>{' '}
-                is your {role}.{' '}
-                <span style={{ fontVariantNumeric: 'tabular-nums' }}>
-                  {sign === 'over' ? '+' : '\u2212'}{deltaAbs}
-                </span>{' '}
-                vs hcp across {top.rounds_played} {top.rounds_played === 1 ? 'round' : 'rounds'}.
+                <span style={{ fontWeight: 700, color: T.ink }}>{top.course_name}</span>
+                {verbAndAfter}
               </p>
             </div>
           );
