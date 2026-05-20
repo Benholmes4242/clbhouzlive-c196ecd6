@@ -84,7 +84,7 @@ const OwnerViewRivalries: React.FC<{ userId: string }> = ({ userId }) => {
             ? 'Loading…'
             : !hasAnyH2HData
               ? 'Pick golfers to track head-to-head.'
-              : 'Auto-picked from your circle. Pin to lock a slot.'
+              : 'Auto-picked from your circle. Edit to choose your own.'
         }
         right={
           hasFilled && hasAnyH2HData ? (
