@@ -397,11 +397,14 @@ const CourseList: React.FC<{ courses: CourseForm[]; view: ViewKey }> = ({ course
   }
 
   const expanded = courses.length === 1;
+  // Largest absolute delta among the visible courses. Floor at 2 so that
+  // small-magnitude deltas don't fill the whole row.
+  const maxMag = Math.max(2, ...courses.map((c) => Math.abs(c.delta)));
 
   return (
     <div style={{ paddingTop: 12, paddingBottom: 8 }}>
       {courses.map((c, i) => (
-        <CourseRow key={c.course_id} course={c} rank={i + 1} expanded={expanded} view={view} />
+        <CourseRow key={c.course_id} course={c} rank={i + 1} expanded={expanded} view={view} maxMag={maxMag} />
       ))}
     </div>
   );
