@@ -7,7 +7,6 @@ import LastFiveTokens from './LastFiveTokens';
 import StablefordCard from './StablefordCard';
 
 import { predictHandicap, VERDICT_META } from './predictHandicap';
-import TrendNarrativeSection from './TrendNarrativeSection';
 
 interface Props {
   connectionId: string;
