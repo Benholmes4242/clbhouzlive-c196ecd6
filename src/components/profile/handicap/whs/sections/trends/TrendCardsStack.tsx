@@ -32,6 +32,17 @@ export const TrendCardsStack: React.FC<Props> = ({ connectionId, currentHandicap
   const prediction = predictHandicap(scores ?? []);
   const meta = VERDICT_META[prediction.verdict];
 
+  // Individual 5 most recent round differentials, ordered newest → oldest.
+  // Used by LastFiveTokens to render the magnitude-encoded mini chart.
+  const recentFiveDiffs = React.useMemo(() => {
+    if (!scores) return [];
+    return scores
+      .filter((s) => s.handicap_differential !== null)
+      .sort((a, b) => new Date(b.play_date).getTime() - new Date(a.play_date).getTime())
+      .slice(0, 5)
+      .map((s) => s.handicap_differential as number);
+  }, [scores]);
+
   const accent =
     meta.theme === 'positive' ? HOT_RED : meta.theme === 'negative' ? COLD_BLUE : SLATE;
 
