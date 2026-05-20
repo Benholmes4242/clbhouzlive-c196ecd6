@@ -246,7 +246,7 @@ export const StreaksCard: React.FC<Props> = ({ userId, readOnly = false }) => {
   if (isLoading) {
     return (
       <section style={{ marginTop: 10 }}>
-        <DarkSectionHeader eyebrow="Three Runs to Beat" />
+        <DarkSectionHeader eyebrow="Streaks to Beat" />
         <div style={{ padding: '4px 20px 12px' }}>
           <Skeleton height={224} radius={14} />
         </div>
@@ -266,7 +266,7 @@ export const StreaksCard: React.FC<Props> = ({ userId, readOnly = false }) => {
   return (
     <section ref={sectionRef} style={{ marginTop: 10, fontFamily: FONT }}>
       <DarkSectionHeader
-        eyebrow="Three Runs to Beat"
+        eyebrow="Streaks to Beat"
         right={
           readOnly ? null : (
             <button
