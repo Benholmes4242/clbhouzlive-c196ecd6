@@ -423,7 +423,7 @@ export const CourseFormCard: React.FC<Props> = ({ connectionId, currentHandicap,
   if (isLoading) {
     return (
       <section style={sectionStyle}>
-        <SectionHeader eyebrow="COURSE FORM" title="Your courses ranked" sub="Loading…" />
+        <SectionHeader eyebrow="COURSE FORM" title="Your courses ranked" />
         <div style={{ padding: '0 20px' }}>
           <div
             className="animate-pulse"
