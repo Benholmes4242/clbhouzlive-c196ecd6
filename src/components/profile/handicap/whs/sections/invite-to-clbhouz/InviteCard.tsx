@@ -25,7 +25,7 @@ const HAIRLINE = 'var(--hcp-line-2)';
 const AMBER = '#F7931E';
 const FONT_GEIST = '"Geist", system-ui, -apple-system, BlinkMacSystemFont, sans-serif';
 
-export const InviteCard: React.FC<Props> = ({ friend }) => {
+export const InviteCard: React.FC<Props> = ({ friend, hideHomeClub = false }) => {
   const queryClient = useQueryClient();
   const hcp = friend.friend_handicap_index;
   const isPlusHandicap = hcp != null && hcp < 0;
