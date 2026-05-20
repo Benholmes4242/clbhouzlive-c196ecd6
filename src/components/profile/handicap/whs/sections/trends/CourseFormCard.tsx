@@ -254,7 +254,6 @@ const CourseRow: React.FC<{
             : undefined,
           backgroundSize: 'cover',
           backgroundPosition: 'center',
-          position: 'relative',
           zIndex: 1,
         }}
         aria-hidden
