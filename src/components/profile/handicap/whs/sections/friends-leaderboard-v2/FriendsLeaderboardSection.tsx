@@ -218,7 +218,7 @@ export const FriendsLeaderboardSection: React.FC<Props> = ({ userId }) => {
         </button>
       )}
 
-      {/* Show inactive toggle */}
+      {/* Show inactive toggle — secondary affordance, ghost-button styling */}
       {!showInactive && !isLoading && inactiveCount > 0 && (
         <button
           type="button"
@@ -229,21 +229,21 @@ export const FriendsLeaderboardSection: React.FC<Props> = ({ userId }) => {
             justifyContent: 'center',
             gap: 5,
             width: 'calc(100% - 40px)',
-            margin: '12px 20px 0',
-            padding: '10px 16px',
-            background: 'var(--hcp-bg-1)',
-            border: '1px solid var(--hcp-line-2)',
-            borderRadius: 12,
-            color: 'var(--hcp-t-80)',
+            margin: '8px 20px 0',
+            padding: '8px 16px',
+            background: 'transparent',
+            border: 'none',
+            color: 'var(--hcp-t-60)',
             fontSize: 12,
-            fontWeight: 700,
+            fontWeight: 600,
             letterSpacing: '0.02em',
             cursor: 'pointer',
             fontFamily: '"Geist", system-ui, sans-serif',
+            WebkitTapHighlightColor: 'transparent',
           }}
         >
           Show {inactiveCount} inactive friend{inactiveCount === 1 ? '' : 's'}
-          <ChevronDown size={14} />
+          <ChevronDown size={14} strokeWidth={2} />
         </button>
       )}
 
