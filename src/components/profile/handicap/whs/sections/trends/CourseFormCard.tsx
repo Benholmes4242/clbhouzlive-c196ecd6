@@ -25,18 +25,10 @@ const T = {
   greenInk: '#065F46',
   redInk: '#991B1B',
   slateTint: 'var(--hcp-bg-2)',
-  gold: '#FBBC2E',
-  silver: '#C0C5CF',
-  bronze: '#C97D45',
   ink04: 'var(--hcp-bg-2)',
   ink08: 'var(--hcp-line-2)',
   ink40: 'var(--hcp-t-40)',
 };
-function medalColor(rank: number): string {
-  if (rank === 1) return T.gold;
-  if (rank === 2) return T.silver;
-  return T.bronze;
-}
 const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
 
 const TOP_N = 3;
@@ -187,9 +179,11 @@ const CourseRow: React.FC<{
   rank: number;
   expanded: boolean;
   view: ViewKey;
-}> = ({ course, rank, expanded, view }) => {
+  /** Largest |delta| among the visible courses. Used to scale the
+   *  ambient magnitude gradient behind the row. */
+  maxMag: number;
+}> = ({ course, rank, expanded, view, maxMag }) => {
   const valueColor = deltaColor(course.delta);
-  const isFirst = rank === 1;
 
   const headline = (() => {
     if (view === 'most_played') {
@@ -206,7 +200,7 @@ const CourseRow: React.FC<{
     };
   })();
 
-  const railColor = medalColor(rank);
+  const magFrac = Math.max(0.12, Math.abs(course.delta) / maxMag);
 
   return (
     <div
@@ -225,18 +219,28 @@ const CourseRow: React.FC<{
         fontFamily: FONT,
       }}
     >
-      <span
-        aria-hidden
-        style={{
-          position: 'absolute',
-          left: 0,
-          top: 0,
-          bottom: 0,
-          width: 3,
-          background: `linear-gradient(180deg, ${railColor}, transparent)`,
-          opacity: isFirst ? 1 : 0.7,
-        }}
-      />
+      {/* Ambient magnitude gradient. Green for negative deltas (better
+       *  than hcp), red for positive. Width proportional to |delta| / maxMag
+       *  with a floor of 0.12 so even small deltas show a hint of fill. */}
+      {course.delta !== 0 && (
+        <span
+          aria-hidden
+          style={{
+            position: 'absolute',
+            left: 0,
+            top: 0,
+            bottom: 0,
+            width: `${magFrac * 100}%`,
+            background:
+              course.delta < 0
+                ? 'linear-gradient(90deg, rgba(34,197,94,0.14) 0%, transparent 100%)'
+                : 'linear-gradient(90deg, rgba(239,68,68,0.14) 0%, transparent 100%)',
+            opacity: 0.5,
+            pointerEvents: 'none',
+            zIndex: 0,
+          }}
+        />
+      )}
       <div
         style={{
           width: expanded ? 80 : 56,
@@ -250,6 +254,7 @@ const CourseRow: React.FC<{
             : undefined,
           backgroundSize: 'cover',
           backgroundPosition: 'center',
+          zIndex: 1,
         }}
         aria-hidden
       >
@@ -258,7 +263,7 @@ const CourseRow: React.FC<{
         )}
       </div>
 
-      <div style={{ flex: 1, minWidth: 0 }}>
+      <div style={{ flex: 1, minWidth: 0, position: 'relative', zIndex: 1 }}>
         <div
           style={{
             fontSize: 13,
@@ -330,7 +335,7 @@ const CourseRow: React.FC<{
       </div>
 
       {!expanded && (
-        <div style={{ textAlign: 'right', flexShrink: 0 }}>
+        <div style={{ textAlign: 'right', flexShrink: 0, position: 'relative', zIndex: 1 }}>
           <div
             style={{
               fontSize: 22,
@@ -392,11 +397,14 @@ const CourseList: React.FC<{ courses: CourseForm[]; view: ViewKey }> = ({ course
   }
 
   const expanded = courses.length === 1;
+  // Largest absolute delta among the visible courses. Floor at 2 so that
+  // small-magnitude deltas don't fill the whole row.
+  const maxMag = Math.max(2, ...courses.map((c) => Math.abs(c.delta)));
 
   return (
     <div style={{ paddingTop: 12, paddingBottom: 8 }}>
       {courses.map((c, i) => (
-        <CourseRow key={c.course_id} course={c} rank={i + 1} expanded={expanded} view={view} />
+        <CourseRow key={c.course_id} course={c} rank={i + 1} expanded={expanded} view={view} maxMag={maxMag} />
       ))}
     </div>
   );
@@ -415,7 +423,7 @@ export const CourseFormCard: React.FC<Props> = ({ connectionId, currentHandicap,
   if (isLoading) {
     return (
       <section style={sectionStyle}>
-        <SectionHeader eyebrow="COURSE FORM" title="Your courses ranked" sub="Loading…" />
+        <SectionHeader eyebrow="COURSE FORM" title="Your courses ranked" />
         <div style={{ padding: '0 20px' }}>
           <div
             className="animate-pulse"
@@ -452,7 +460,6 @@ export const CourseFormCard: React.FC<Props> = ({ connectionId, currentHandicap,
         <SectionHeader
           eyebrow="COURSE FORM"
           title="Your courses ranked"
-          sub="Play more rounds to see how each course suits your game"
         />
         <div style={{ padding: '24px 20px 28px', textAlign: 'center' }}>
           <p style={{ margin: 0, fontSize: 13, fontWeight: 700, color: T.ink, fontFamily: FONT }}>
@@ -468,7 +475,7 @@ export const CourseFormCard: React.FC<Props> = ({ connectionId, currentHandicap,
 
   return (
     <section style={sectionStyle}>
-      <SectionHeader eyebrow="COURSE FORM" title="Your courses ranked" sub={view.sublabel} />
+      <SectionHeader eyebrow="COURSE FORM" title="Your courses ranked" />
       <div style={{ padding: '0 20px' }}>
         <ViewToggle activeView={activeView} onChange={setActiveView} />
         <CourseList courses={courses} view={activeView} />
@@ -482,6 +489,21 @@ export const CourseFormCard: React.FC<Props> = ({ connectionId, currentHandicap,
               : activeView === 'best'
                 ? 'best course'
                 : 'home course';
+          const lowConfidence = top.rounds_played < 2;
+          const verbAndAfter = lowConfidence ? (
+            <>
+              {' '}leads on a single round — small sample.{' '}
+              <span style={{ color: T.inkMute }}>Play it again to confirm.</span>
+            </>
+          ) : (
+            <>
+              {' '}is your {role}.{' '}
+              <span style={{ fontVariantNumeric: 'tabular-nums' }}>
+                {sign === 'over' ? '+' : '\u2212'}{deltaAbs}
+              </span>{' '}
+              vs hcp across {top.rounds_played} rounds.
+            </>
+          );
           return (
             <div
               style={{
@@ -493,12 +515,8 @@ export const CourseFormCard: React.FC<Props> = ({ connectionId, currentHandicap,
               }}
             >
               <p style={{ margin: 0, fontSize: 12.5, lineHeight: 1.55, color: T.inkSoft, fontFamily: FONT }}>
-                <span style={{ fontWeight: 700, color: T.ink }}>{top.course_name}</span>{' '}
-                is your {role}.{' '}
-                <span style={{ fontVariantNumeric: 'tabular-nums' }}>
-                  {sign === 'over' ? '+' : '\u2212'}{deltaAbs}
-                </span>{' '}
-                vs hcp across {top.rounds_played} {top.rounds_played === 1 ? 'round' : 'rounds'}.
+                <span style={{ fontWeight: 700, color: T.ink }}>{top.course_name}</span>
+                {verbAndAfter}
               </p>
             </div>
           );
