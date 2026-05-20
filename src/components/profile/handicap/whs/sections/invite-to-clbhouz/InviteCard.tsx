@@ -11,6 +11,11 @@ import { fmtHcp } from '@/lib/whs/format';
 
 interface Props {
   friend: FriendLeaderboardEntry;
+  /**
+   * When true, hide the home_club caption — used by the parent rail
+   * to deduplicate when 3+ friends share the same home club.
+   */
+  hideHomeClub?: boolean;
 }
 
 const INK = 'var(--hcp-t-100)';
@@ -20,7 +25,7 @@ const HAIRLINE = 'var(--hcp-line-2)';
 const AMBER = '#F7931E';
 const FONT_GEIST = '"Geist", system-ui, -apple-system, BlinkMacSystemFont, sans-serif';
 
-export const InviteCard: React.FC<Props> = ({ friend }) => {
+export const InviteCard: React.FC<Props> = ({ friend, hideHomeClub = false }) => {
   const queryClient = useQueryClient();
   const hcp = friend.friend_handicap_index;
   const isPlusHandicap = hcp != null && hcp < 0;
@@ -130,7 +135,7 @@ export const InviteCard: React.FC<Props> = ({ friend }) => {
       </div>
 
       {/* Secondary line — home club, indented under the name */}
-      {friend.friend_home_club && (
+      {friend.friend_home_club && !hideHomeClub && (
         <div
           style={{
             marginLeft: 46,

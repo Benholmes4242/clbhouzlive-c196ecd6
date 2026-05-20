@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo, useEffect, useRef } from 'react';
 import Pager from './Pager';
 
 export interface Paged8Props<T extends { id: string }> {
@@ -48,12 +48,34 @@ export function Paged8<T extends { id: string }>({
   const showPinnedRow =
     !!pinnedItem && !!pinnedRenderer && pinnedAbsoluteIndex >= 0 && !pinnedOnCurrentPage;
 
+  const swipeStartRef = useRef<{ x: number; y: number } | null>(null);
+  const handlePointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
+    swipeStartRef.current = { x: e.clientX, y: e.clientY };
+  };
+  const handlePointerUp = (e: React.PointerEvent<HTMLDivElement>) => {
+    const start = swipeStartRef.current;
+    swipeStartRef.current = null;
+    if (!start) return;
+    const dx = e.clientX - start.x;
+    const dy = e.clientY - start.y;
+    if (Math.abs(dx) < 50 || Math.abs(dx) < Math.abs(dy) * 1.5) return;
+    if (dx < 0 && page < totalPages - 1) setPage(page + 1);
+    else if (dx > 0 && page > 0) setPage(page - 1);
+  };
+
   if (items.length === 0) {
     return <>{emptyState}</>;
   }
 
   return (
-    <div role="list" aria-label={ariaLabel}>
+    <div
+      role="list"
+      aria-label={ariaLabel}
+      onPointerDown={handlePointerDown}
+      onPointerUp={handlePointerUp}
+      onPointerCancel={() => { swipeStartRef.current = null; }}
+      style={{ touchAction: 'pan-y' }}
+    >
       {/* Page contents — keyed by page so the inner subtree remounts on page change for animation */}
       <div
         key={page}
