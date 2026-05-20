@@ -3,6 +3,7 @@ import { Info } from 'lucide-react';
 import { useAllScores } from '@/lib/whs/hooks';
 import SectionHeader from '../SectionHeader';
 import HandicapProjectionCard from './HandicapProjectionCard';
+import LastFiveTokens from './LastFiveTokens';
 import StablefordCard from './StablefordCard';
 
 import { predictHandicap, VERDICT_META } from './predictHandicap';
@@ -30,6 +31,17 @@ export const TrendCardsStack: React.FC<Props> = ({ connectionId, currentHandicap
   const { data: scores, isLoading } = useAllScores(connectionId);
   const prediction = predictHandicap(scores ?? []);
   const meta = VERDICT_META[prediction.verdict];
+
+  // Individual 5 most recent round differentials, ordered newest → oldest.
+  // Used by LastFiveTokens to render the magnitude-encoded mini chart.
+  const recentFiveDiffs = React.useMemo(() => {
+    if (!scores) return [];
+    return scores
+      .filter((s) => s.handicap_differential !== null)
+      .sort((a, b) => new Date(b.play_date).getTime() - new Date(a.play_date).getTime())
+      .slice(0, 5)
+      .map((s) => s.handicap_differential as number);
+  }, [scores]);
 
   const accent =
     meta.theme === 'positive' ? HOT_RED : meta.theme === 'negative' ? COLD_BLUE : SLATE;
@@ -94,33 +106,77 @@ export const TrendCardsStack: React.FC<Props> = ({ connectionId, currentHandicap
             </button>
           </div>
 
-          <div style={{ display: 'flex', alignItems: 'baseline', flexWrap: 'wrap', gap: 10 }}>
-            <h2
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'flex-start',
+              justifyContent: 'space-between',
+              gap: 12,
+              marginBottom: 4,
+            }}
+          >
+            <h1
               style={{
                 margin: 0,
-                fontSize: 26,
-                fontWeight: 600,
-                letterSpacing: '-0.025em',
-                color: 'var(--hcp-t-100)',
-                lineHeight: 1.05,
+                fontSize: 68,
+                fontWeight: 800,
+                letterSpacing: '-0.05em',
+                lineHeight: 0.88,
+                color: accent,
+                textTransform: 'lowercase',
                 fontFamily: FONT,
               }}
             >
-              You&apos;re <span style={{ color: accent }}>{meta.label.toLowerCase()}</span>
-            </h2>
-            {deltaStr && (
-              <span
+              {meta.label.toLowerCase()}
+            </h1>
+            {prediction.delta > 0 && prediction.projected !== null && (
+              <div
                 style={{
-                  fontSize: 13,
-                  fontWeight: 700,
-                  color: accent,
-                  fontFamily: FONT,
-                  fontVariantNumeric: 'tabular-nums',
-                  letterSpacing: '-0.01em',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'flex-end',
+                  gap: 6,
+                  paddingTop: 8,
+                  flexShrink: 0,
                 }}
               >
-                {deltaStr}
-              </span>
+                <span
+                  style={{
+                    fontSize: 9,
+                    fontWeight: 800,
+                    letterSpacing: '0.18em',
+                    textTransform: 'uppercase',
+                    color: 'var(--hcp-t-40)',
+                    fontFamily: FONT,
+                  }}
+                >
+                  Projected
+                </span>
+                <span
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: 4,
+                    padding: '4px 12px',
+                    borderRadius: 999,
+                    background:
+                      meta.theme === 'positive'
+                        ? 'rgba(220, 38, 38, 0.10)'
+                        : meta.theme === 'negative'
+                          ? 'rgba(14, 165, 233, 0.10)'
+                          : 'var(--hcp-bg-2)',
+                    border: `1px solid ${accent}40`,
+                    fontSize: 14,
+                    fontWeight: 800,
+                    color: accent,
+                    fontVariantNumeric: 'tabular-nums',
+                    fontFamily: FONT,
+                  }}
+                >
+                  {prediction.direction === 'up' ? '↑' : prediction.direction === 'down' ? '↓' : '→'}{' '}
+                  {prediction.delta.toFixed(1)}
+                </span>
+              </div>
             )}
           </div>
 
@@ -193,7 +249,17 @@ export const TrendCardsStack: React.FC<Props> = ({ connectionId, currentHandicap
         ))
       ) : (
         <>
-          {splitAt !== 'rest' && <HandicapProjectionCard scores={scores ?? []} />}
+          {splitAt !== 'rest' && (
+            <>
+              <LastFiveTokens
+                diffs={recentFiveDiffs}
+                avg={prediction.recentFormAvg}
+                accent={accent}
+                accentInk={accent}
+              />
+              <HandicapProjectionCard scores={scores ?? []} />
+            </>
+          )}
           {splitAt !== 'hero-only' && (
             <>
               <StablefordCard scores={scores ?? []} />
