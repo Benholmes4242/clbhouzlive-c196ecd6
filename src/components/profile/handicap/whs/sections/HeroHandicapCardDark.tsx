@@ -23,18 +23,11 @@ interface Props {
 
 const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
 
-// Ring geometry — 230×230 in a 240 container.
-const RING_BOX = 240;
-const RING_R = 110;          // outer radius
-const STROKE_W = 9;
-const RING_TRACK_R = RING_R; // single arc, single track
-const ARC_R = 44;            // per brief: circumference = 2π·44 ≈ 276.5
-// Actually re-read brief: 230×230 ring; uses dashOffset = 276.5 * Math.min(handicap/36,1).
-// Implementation: SVG circle r=44 in a viewBox we scale to 230. Keep simple — we render a
-// 230×230 SVG with viewBox -120 -120 240 240 and circle r=110 stroke=5; map fill via 0..1.
-// Use native circumference.
-const CIRC_R = 110;
-const CIRCUMFERENCE = 2 * Math.PI * CIRC_R; // ≈ 691.15
+// Ring geometry — tighter 220 box with confident 14px stroke.
+const RING_BOX = 220;
+const STROKE_W = 14;
+const CIRC_R = (RING_BOX - STROKE_W) / 2;     // 103
+const CIRCUMFERENCE = 2 * Math.PI * CIRC_R;    // ≈ 647.16
 
 function formatToday(): string {
   return new Date()
@@ -107,13 +100,6 @@ const HeroHandicapCardDark: React.FC<Props> = ({ connection }) => {
   const dashOffset = CIRCUMFERENCE * (1 - fillFraction);
 
   const grad = arcGradient(verdict);
-  const verdictColor =
-    verdict === 'good' ? 'var(--hcp-good)' :
-    verdict === 'bad'  ? 'var(--hcp-bad)' :
-    verdict === 'mid'  ? 'var(--hcp-amber)' :
-    'var(--hcp-t-100)';
-
-  const arrowChar = verdict === 'good' ? '↓' : verdict === 'bad' ? '↑' : '—';
 
   // Scratch zone: half-step below current displayed value (e.g. 1.8 → 1.6).
   const scratchZone = useMemo(() => {
@@ -121,10 +107,6 @@ const HeroHandicapCardDark: React.FC<Props> = ({ connection }) => {
     return (Math.floor(handicap * 5) / 5).toFixed(1);
   }, [handicap]);
 
-  const tagWord =
-    verdict === 'good' ? 'IMPROVING' :
-    verdict === 'bad'  ? 'TRENDING UP' :
-    verdict === 'mid'  ? 'HOLDING' : '';
 
   // ── KPI strip data ────────────────────────────────────────────────
   const scores = (allScores ?? []) as any[];
@@ -199,7 +181,7 @@ const HeroHandicapCardDark: React.FC<Props> = ({ connection }) => {
         fontFamily: FONT,
       }}
     >
-      <DarkSectionHeader eyebrow="My Handicap Index · 90D" right={formatToday()} />
+      <DarkSectionHeader eyebrow="Index · 90D" right={formatToday()} />
 
       {/* Ring */}
       <div
@@ -232,25 +214,6 @@ const HeroHandicapCardDark: React.FC<Props> = ({ connection }) => {
               stroke="rgba(255,255,255,0.06)"
               strokeWidth={STROKE_W}
             />
-            {/* Tick marks at top/right/bottom/left */}
-            {[0, 90, 180, 270].map((deg) => {
-              const rad = (deg * Math.PI) / 180;
-              const cx = RING_BOX / 2;
-              const cy = RING_BOX / 2;
-              const r1 = CIRC_R + STROKE_W / 2;
-              const r2 = CIRC_R - STROKE_W / 2 - 6;
-              return (
-                <line
-                  key={deg}
-                  x1={cx + Math.cos(rad) * r1}
-                  y1={cy + Math.sin(rad) * r1}
-                  x2={cx + Math.cos(rad) * r2}
-                  y2={cy + Math.sin(rad) * r2}
-                  stroke="rgba(255,255,255,0.12)"
-                  strokeWidth={1}
-                />
-              );
-            })}
             {/* Progress arc */}
             <circle
               cx={RING_BOX / 2}
@@ -268,7 +231,7 @@ const HeroHandicapCardDark: React.FC<Props> = ({ connection }) => {
             />
           </svg>
 
-          {/* Inner content */}
+          {/* Inner content — just the number; verdict implied by ring colour + change chip below */}
           <div
             style={{
               position: 'absolute',
@@ -277,72 +240,108 @@ const HeroHandicapCardDark: React.FC<Props> = ({ connection }) => {
               flexDirection: 'column',
               alignItems: 'center',
               justifyContent: 'center',
-              gap: 8,
               pointerEvents: 'none',
             }}
           >
-            <span
-              style={{
-                textTransform: 'uppercase',
-                fontSize: 10.5,
-                letterSpacing: '0.18em',
-                fontWeight: 700,
-                color: 'var(--hcp-t-60)',
-              }}
-            >
-              INDEX
-            </span>
-            <span
-              style={{
-                fontSize: 76,
-                fontWeight: 700,
-                letterSpacing: '-0.04em',
-                lineHeight: 1,
-                color: 'var(--hcp-t-100)',
-                fontVariantNumeric: 'tabular-nums',
-              }}
-            >
-              {isLoading || handicap == null ? '—' : fmtHcp(handicap)}
-            </span>
-            {!isLoading && delta90 != null && (
-              <VerdictPill verdict={verdict}>
-                {arrowChar} {Math.abs(delta90).toFixed(1)} · 90D
-              </VerdictPill>
-            )}
-            {isLoading && (
-              <div
+            {handicap == null && !isLoading ? (
+              <span
                 style={{
-                  width: 64,
-                  height: 16,
-                  borderRadius: 999,
-                  background: 'var(--hcp-bg-3)',
+                  fontSize: 11,
+                  fontWeight: 700,
+                  letterSpacing: '0.18em',
+                  textTransform: 'uppercase',
+                  color: 'var(--hcp-t-60)',
+                  textAlign: 'center',
+                  padding: '0 20px',
                 }}
-              />
+              >
+                Connect WHS to start
+              </span>
+            ) : (
+              <span
+                style={{
+                  fontSize: 72,
+                  fontWeight: 700,
+                  letterSpacing: '-0.04em',
+                  lineHeight: 1,
+                  color: 'var(--hcp-t-100)',
+                  fontVariantNumeric: 'tabular-nums',
+                }}
+              >
+                {isLoading ? '—' : fmtHcp(handicap)}
+              </span>
             )}
           </div>
         </div>
       </div>
 
-      {/* Tag line */}
-      <div
-        style={{
-          textAlign: 'center',
-          padding: '8px 20px 0',
-          fontSize: 11,
-          fontWeight: 700,
-          letterSpacing: '0.18em',
-          textTransform: 'uppercase',
-          fontFamily: FONT,
-        }}
-      >
-        {handicap == null ? (
-          <span style={{ color: 'var(--hcp-t-60)' }}>CONNECT WHS TO START</span>
-        ) : (
-          <>
-            {tagWord && <span style={{ color: verdictColor }}>{tagWord}</span>}
-          </>
-        )}
-      </div>
+      {/* Change chip — anchored below ring, the actionable delta */}
+      {!isLoading && delta90 != null && (
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'center',
+            marginTop: 6,
+          }}
+        >
+          <span
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 6,
+              padding: '5px 12px',
+              borderRadius: 999,
+              background:
+                verdict === 'good' ? 'rgba(34, 197, 94, 0.14)' :
+                verdict === 'bad'  ? 'rgba(239, 68, 68, 0.14)' :
+                'rgba(247, 147, 30, 0.14)',
+              border:
+                verdict === 'good' ? '1px solid rgba(34, 197, 94, 0.25)' :
+                verdict === 'bad'  ? '1px solid rgba(239, 68, 68, 0.25)' :
+                '1px solid rgba(247, 147, 30, 0.25)',
+              fontSize: 12,
+              fontWeight: 700,
+              color:
+                verdict === 'good' ? '#4ADE80' :
+                verdict === 'bad'  ? '#F87171' :
+                '#F7931E',
+              letterSpacing: '0.02em',
+              fontVariantNumeric: 'tabular-nums',
+            }}
+          >
+            <svg
+              width="11"
+              height="11"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="3"
+              strokeLinecap="round"
+              aria-hidden
+            >
+              {verdict === 'good' ? (
+                <>
+                  <path d="M12 5v14" />
+                  <path d="M19 12l-7 7-7-7" />
+                </>
+              ) : verdict === 'bad' ? (
+                <>
+                  <path d="M12 19V5" />
+                  <path d="M5 12l7-7 7 7" />
+                </>
+              ) : (
+                <path d="M5 12h14" />
+              )}
+            </svg>
+            {Math.abs(delta90).toFixed(1)} over 90 days
+            {verdict === 'good' && (
+              <span style={{ fontSize: 13, lineHeight: 1, marginLeft: 2 }}>🔥</span>
+            )}
+          </span>
+        </div>
+      )}
+
+
 
       {/* TripleStrip */}
       <TripleStrip variant="flush">
