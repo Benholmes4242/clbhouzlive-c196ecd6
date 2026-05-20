@@ -996,7 +996,7 @@ const StablefordChartBlock: React.FC<{
         border: `1px solid ${D_LINE}`,
         borderRadius: 14,
         overflow: 'hidden',
-        padding: '14px 16px 16px',
+        padding: '28px 16px 16px',
         fontFamily: FONT_GEIST,
       }}
     >
