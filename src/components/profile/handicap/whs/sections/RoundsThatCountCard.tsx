@@ -155,6 +155,34 @@ export const RoundsThatCountCard: React.FC<Props> = ({
       worst: Math.min(...pts),
     };
   }, [allScores, stablefordScope]);
+
+  // Latest stableford round's bucket for the "YOUR LAST" anchor.
+  const latestStablefordRound = useMemo<{
+    bucket: 'inZone' | 'solid' | 'offDay';
+    points: number;
+  } | null>(() => {
+    if (!allScores) return null;
+    const valid = allScores.filter(
+      (s) => s.stableford_points != null && s.stableford_points > 0,
+    ) as Array<WhsScore & { stableford_points: number }>;
+    const now = Date.now();
+    const windowed =
+      stablefordScope === 'all'
+        ? valid
+        : valid.filter((s) => {
+            const days = stablefordScope === '30d' ? 30 : 90;
+            return new Date(s.play_date).getTime() >= now - days * 86_400_000;
+          });
+    if (windowed.length === 0) return null;
+    const sorted = [...windowed].sort(
+      (a, b) => new Date(b.play_date).getTime() - new Date(a.play_date).getTime(),
+    );
+    const latest = sorted[0];
+    const pts = latest.stableford_points;
+    const bucket: 'inZone' | 'solid' | 'offDay' =
+      pts >= 36 ? 'inZone' : pts >= 33 ? 'solid' : 'offDay';
+    return { bucket, points: pts };
+  }, [allScores, stablefordScope]);
   const [sheetScoreId, setSheetScoreId] = useState<string | null>(null);
   const pointerStartRef = useRef<{ x: number; y: number; t: number } | null>(null);
   const plotRef = useRef<HTMLDivElement>(null);
@@ -295,11 +323,11 @@ export const RoundsThatCountCard: React.FC<Props> = ({
                   onClick={() => setChartMode(m)}
                   style={{
                     fontFamily: FONT_GEIST,
-                    fontSize: 10,
-                    fontWeight: 700,
+                    fontSize: 11,
+                    fontWeight: 800,
                     letterSpacing: '0.08em',
                     textTransform: 'uppercase',
-                    padding: '6px 10px',
+                    padding: '7px 14px',
                     borderRadius: 999,
                     border: 'none',
                     background: isActive ? AMBER : 'transparent',
@@ -343,7 +371,13 @@ export const RoundsThatCountCard: React.FC<Props> = ({
               color: D_T60,
               letterSpacing: '0.16em',
               textTransform: 'uppercase',
-            }}>SCORE DIFF</span>
+            }}>
+              SCORE DIFF · LAST{' '}
+              <span style={{ color: D_T100, fontVariantNumeric: 'tabular-nums' }}>
+                {colCount}
+              </span>{' '}
+              ROUNDS
+            </span>
             <div style={{
               display: 'flex', alignItems: 'center', gap: 10,
               fontSize: 9, fontWeight: 700, color: D_T60,
@@ -803,6 +837,7 @@ export const RoundsThatCountCard: React.FC<Props> = ({
             scope={stablefordScope}
             onScopeChange={setStablefordScope}
             onOpenDetail={() => setStablefordSheetOpen(true)}
+            latestRound={latestStablefordRound}
           />
           <div style={{
             display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)',
@@ -889,7 +924,7 @@ const StatCell: React.FC<{
       disabled={disabled}
       style={{
         display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2,
-        padding: '8px 8px 10px',
+        padding: '10px 8px 12px',
         background: active ? AMBER_TINT_06 : 'transparent',
         border: 'none',
         borderRight: withRightBorder ? `1px solid ${D_LINE}` : 'none',
@@ -910,14 +945,14 @@ const StatCell: React.FC<{
         </span>
       </span>
       <span style={{
-        fontSize: 20, fontWeight: 700, color: valueColor,
+        fontSize: 28, fontWeight: 800, color: valueColor,
         fontFamily: FONT_GEIST, fontVariantNumeric: 'tabular-nums',
-        letterSpacing: '-0.02em',
+        letterSpacing: '-0.03em',
         lineHeight: 1,
       }}>
         {display}
         {unit && value != null && (
-          <span style={{ fontSize: 10, fontWeight: 700, color: D_T60, marginLeft: 3 }}>
+          <span style={{ fontSize: 11, fontWeight: 600, color: D_T60, marginLeft: 4 }}>
             {unit}
           </span>
         )}
@@ -945,7 +980,9 @@ const StablefordChartBlock: React.FC<{
   scope: StablefordScope;
   onScopeChange: (s: StablefordScope) => void;
   onOpenDetail: () => void;
-}> = ({ dist, scope, onScopeChange, onOpenDetail }) => {
+  /** Most recent stableford round in scope. Null if no valid rounds. */
+  latestRound: { bucket: 'inZone' | 'solid' | 'offDay'; points: number } | null;
+}> = ({ dist, scope, onScopeChange, onOpenDetail, latestRound }) => {
   const segs = [
     { count: dist.inZoneCount, gradient: GREEN_GRAD },
     { count: dist.solidCount, gradient: AMBER_GRAD_SF },
@@ -959,7 +996,7 @@ const StablefordChartBlock: React.FC<{
         border: `1px solid ${D_LINE}`,
         borderRadius: 14,
         overflow: 'hidden',
-        padding: '14px 16px 16px',
+        padding: '28px 16px 16px',
         fontFamily: FONT_GEIST,
       }}
     >
@@ -972,7 +1009,11 @@ const StablefordChartBlock: React.FC<{
           fontSize: 9, fontWeight: 800, color: D_T60,
           letterSpacing: '0.16em', textTransform: 'uppercase',
         }}>
-          STABLEFORD · {SCOPE_LABEL_LONG[scope]} · {dist.total} ROUNDS
+          STABLEFORD · {SCOPE_LABEL_LONG[scope]} ·{' '}
+          <span style={{ color: D_T100, fontVariantNumeric: 'tabular-nums' }}>
+            {dist.total}
+          </span>{' '}
+          ROUNDS
         </span>
         <div style={{
           display: 'inline-flex', background: 'var(--hcp-bg-2)',
@@ -1013,29 +1054,82 @@ const StablefordChartBlock: React.FC<{
         </div>
       ) : (
         <>
-          {/* Distribution bar */}
-          <button
-            onClick={onOpenDetail}
-            aria-label="Open Stableford detail"
-            style={{
-              display: 'flex', width: '100%', height: 44,
-              borderRadius: 10, overflow: 'hidden',
-              background: 'var(--hcp-bg-2)',
-              border: 'none', padding: 0, cursor: 'pointer',
-            }}
-          >
-            {segs.map((s, i) => (
-              <div key={i} style={{
-                flex: s.count, background: s.gradient,
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                color: '#fff', fontSize: 14, fontWeight: 800,
-                letterSpacing: '-0.02em',
-                fontVariantNumeric: 'tabular-nums',
-              }}>
-                {s.count > dist.total * 0.1 ? s.count : ''}
-              </div>
-            ))}
-          </button>
+          {/* Distribution bar with "YOUR LAST" anchor pointer */}
+          <div style={{ position: 'relative' }}>
+            {latestRound && (() => {
+              const total = dist.inZoneCount + dist.solidCount + dist.offDayCount;
+              if (total === 0) return null;
+              const inZoneEnd = dist.inZoneCount / total;
+              const solidEnd = (dist.inZoneCount + dist.solidCount) / total;
+              const center =
+                latestRound.bucket === 'inZone'
+                  ? inZoneEnd / 2
+                  : latestRound.bucket === 'solid'
+                    ? (inZoneEnd + solidEnd) / 2
+                    : (solidEnd + 1) / 2;
+              return (
+                <div
+                  aria-hidden
+                  style={{
+                    position: 'absolute',
+                    top: -22,
+                    left: `${center * 100}%`,
+                    transform: 'translateX(-50%)',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    gap: 2,
+                    pointerEvents: 'none',
+                    zIndex: 2,
+                  }}
+                >
+                  <span
+                    style={{
+                      fontSize: 9,
+                      fontWeight: 800,
+                      letterSpacing: '0.12em',
+                      textTransform: 'uppercase',
+                      color: AMBER,
+                      fontFamily: FONT_GEIST,
+                    }}
+                  >
+                    Your last
+                  </span>
+                  <span
+                    style={{
+                      width: 0,
+                      height: 0,
+                      borderLeft: '5px solid transparent',
+                      borderRight: '5px solid transparent',
+                      borderTop: `5px solid ${AMBER}`,
+                    }}
+                  />
+                </div>
+              );
+            })()}
+            <button
+              onClick={onOpenDetail}
+              aria-label="Open Stableford detail"
+              style={{
+                display: 'flex', width: '100%', height: 44,
+                borderRadius: 10, overflow: 'hidden',
+                background: 'var(--hcp-bg-2)',
+                border: 'none', padding: 0, cursor: 'pointer',
+              }}
+            >
+              {segs.map((s, i) => (
+                <div key={i} style={{
+                  flex: s.count, background: s.gradient,
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  color: '#fff', fontSize: 14, fontWeight: 800,
+                  letterSpacing: '-0.02em',
+                  fontVariantNumeric: 'tabular-nums',
+                }}>
+                  {s.count > dist.total * 0.1 ? s.count : ''}
+                </div>
+              ))}
+            </button>
+          </div>
 
           {/* Chips row */}
           <div style={{
