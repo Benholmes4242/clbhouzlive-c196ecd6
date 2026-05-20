@@ -205,7 +205,15 @@ export const RivalryCard: React.FC<Props> = ({
           borderBottom: `1px solid ${T.hairline}`,
         }}
       >
-        <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+        <div
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: 6,
+            whiteSpace: 'nowrap',
+            minWidth: 0,
+          }}
+        >
           <Sparkles size={11} strokeWidth={2.4} color={T.gold} />
           <span
             style={{
@@ -217,8 +225,6 @@ export const RivalryCard: React.FC<Props> = ({
           >
             HEAD TO HEAD
           </span>
-        </div>
-        <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
           <span
             style={{
               fontSize: 10,
@@ -227,12 +233,12 @@ export const RivalryCard: React.FC<Props> = ({
               color: T.whiteMute,
             }}
           >
-            {rivalry.shared_rounds_count} ROUNDS
+            · {rivalry.shared_rounds_count}
           </span>
-          {showPill && hasH2H && rivalKey && (
-            <CardDimensionPill value={dimension} onChange={setOwnDimension} />
-          )}
         </div>
+        {showPill && hasH2H && rivalKey && (
+          <CardDimensionPill value={dimension} onChange={setOwnDimension} />
+        )}
       </div>
 
       {/* Body */}
