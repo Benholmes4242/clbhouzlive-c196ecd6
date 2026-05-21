@@ -1,3 +1,5 @@
+import type React from 'react';
+
 // Re-export of the dark handicap token vars used across the friend hybrid sheet.
 export const BG_0 = 'var(--hcp-bg-0)';
 export const BG_1 = 'var(--hcp-bg-1)';
@@ -23,5 +25,3 @@ export const TAB: React.CSSProperties = {
   fontVariantNumeric: 'tabular-nums',
   fontFeatureSettings: '"kern" 1, "liga" 1',
 };
-
-import type React from 'react';
