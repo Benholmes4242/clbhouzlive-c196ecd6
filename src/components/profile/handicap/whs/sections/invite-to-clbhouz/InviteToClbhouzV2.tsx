@@ -86,11 +86,7 @@ export const InviteToClbhouzV2: React.FC<Props> = ({ ownerUserId }) => {
           eyebrow="MAKE YOUR FEED LOUDER"
           title="Everyone's here"
           sub="All your England Golf friends are already on Clbhouz 🎉"
-          right={
-            sentCount > 0 ? (
-              <SentBadge count={sentCount} onClick={() => setSheetOpen(true)} />
-            ) : undefined
-          }
+          right={<SentBadge count={sentCount} onClick={() => setSheetOpen(true)} />}
         />
         <SentInvitesSheet open={sheetOpen} onClose={() => setSheetOpen(false)} />
       </section>
@@ -103,14 +99,7 @@ export const InviteToClbhouzV2: React.FC<Props> = ({ ownerUserId }) => {
         eyebrow="MAKE YOUR FEED LOUDER"
         title="Friends on England Golf"
         sub="Not on clbhouz yet — invite them to share rounds."
-        
-        right={
-          sentCount > 0 ? (
-            <SentBadge count={sentCount} onClick={() => setSheetOpen(true)} />
-          ) : (
-            <SentLink count={sentCount} onClick={() => setSheetOpen(true)} />
-          )
-        }
+        right={<SentBadge count={sentCount} onClick={() => setSheetOpen(true)} />}
       />
 
       {!friendsLoading && invitable.length > 0 && (
@@ -126,12 +115,9 @@ export const InviteToClbhouzV2: React.FC<Props> = ({ ownerUserId }) => {
               <InviteCard
                 key={String(f.friend_passport_id)}
                 friend={f}
-                hideHomeClub={
-                  dominantHomeClub != null &&
-                  f.friend_home_club === dominantHomeClub
-                }
               />
             ))}
+
           </div>
           {invitable.length > 4 && (
             <button
