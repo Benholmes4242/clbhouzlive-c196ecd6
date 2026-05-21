@@ -21,6 +21,7 @@ const T = {
   green: '#22C55E',
   greenDeep: '#15803D',
   greenSoft: 'rgba(34,197,94,0.12)',
+  greenText: 'rgba(167,239,178,1)',
   cardBg: 'var(--hcp-bg-1)',
 };
 const FONT = '"Geist", system-ui, sans-serif';
@@ -32,46 +33,25 @@ const SentBadge: React.FC<{ count: number; onClick: () => void }> = ({ count, on
     style={{
       display: 'inline-flex',
       alignItems: 'center',
-      gap: 4,
+      gap: 5,
       padding: '4px 10px',
       borderRadius: 999,
       background: T.greenSoft,
-      border: `1px solid ${T.greenSoft}`,
-      color: T.greenDeep,
+      border: '1px solid rgba(34,197,94,0.20)',
+      color: T.greenText,
       fontFamily: FONT,
-      fontSize: 11,
+      fontSize: 10.5,
       fontWeight: 800,
+      letterSpacing: '0.04em',
+      textTransform: 'uppercase',
       cursor: 'pointer',
-      letterSpacing: '0.02em',
     }}
   >
-    <Check size={12} strokeWidth={3} />
-    Sent ({count})
+    <Check size={11} strokeWidth={3} />
+    {count} Sent
   </button>
 );
 
-const SentLink: React.FC<{ count: number; onClick: () => void }> = ({ count, onClick }) => (
-  <button
-    onClick={onClick}
-    aria-label="View sent invites"
-    style={{
-      fontSize: 12,
-      fontWeight: 700,
-      color: T.amber,
-      background: 'transparent',
-      border: 'none',
-      cursor: 'pointer',
-      display: 'inline-flex',
-      alignItems: 'center',
-      gap: 2,
-      padding: 0,
-      fontFamily: FONT,
-    }}
-  >
-    Sent {count > 0 ? `(${count})` : ''}
-    <ChevronRight size={14} />
-  </button>
-);
 
 export const InviteToClbhouzV2: React.FC<Props> = ({ ownerUserId }) => {
   const { data: friends, isLoading: friendsLoading } = useFriendLeaderboard(ownerUserId);
