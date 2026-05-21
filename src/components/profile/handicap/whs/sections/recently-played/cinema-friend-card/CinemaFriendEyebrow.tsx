@@ -38,7 +38,6 @@ export const CinemaFriendEyebrow: React.FC<Props> = ({ activity }) => {
         fontFamily: FONT_GEIST,
       }}
     >
-      {/* Left cluster */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 8, flex: 1, minWidth: 0 }}>
         <div
           style={{
@@ -101,9 +100,7 @@ export const CinemaFriendEyebrow: React.FC<Props> = ({ activity }) => {
         </div>
       </div>
 
-      {/* Right cluster */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexShrink: 0 }}>
-        {/* fire flame moved into CinemaFriendGlass */}
         {showImpact && (
           <span
             style={{

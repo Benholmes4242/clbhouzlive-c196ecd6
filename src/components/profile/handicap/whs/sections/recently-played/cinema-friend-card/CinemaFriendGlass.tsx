@@ -1,17 +1,14 @@
 import React from 'react';
 import type { WhsScoreHole } from '@/lib/whs/types';
-import { splitCourseName } from '../../last-round-card/splitCourseName';
-import CinemaCardShapeStrip from '../../last-round-card/CinemaCardShapeStrip';
-import { fmtDiff } from '@/lib/whs/format';
 import { GlassGrossRing } from '../../shared/GrossCounterRing';
 
 const FONT_GEIST = 'Geist, system-ui, -apple-system, BlinkMacSystemFont, sans-serif';
-const FONT_MONO = "Geist, system-ui, -apple-system, BlinkMacSystemFont, sans-serif";
 const AMBER = '#F7931E';
+const MINUS = '\u2212';
 const EM_DASH = '\u2014';
 
 interface Props {
-  courseName: string | null;
+  courseName: string;
   par: number | null;
   slope: number | null;
   gross: number | null;
@@ -19,7 +16,6 @@ interface Props {
   differential: number | null;
   holes: WhsScoreHole[] | null;
   isCounter?: boolean;
-  showHotFlame?: boolean;
 }
 
 const HAIR: React.CSSProperties = {
@@ -37,16 +33,28 @@ const labelStyle: React.CSSProperties = {
 };
 
 const valueStyle = (color: string): React.CSSProperties => ({
-  fontSize: 22,
+  fontSize: 30,
   fontWeight: 300,
   color,
-  fontFamily: FONT_MONO,
+  fontFamily: FONT_GEIST,
   letterSpacing: '-0.03em',
   lineHeight: 1,
-  marginTop: 2,
+  marginTop: 4,
   fontVariantNumeric: 'tabular-nums',
 });
 
+function fmtDiff(d: number | null): string {
+  if (d == null) return EM_DASH;
+  const rounded = Math.round(d * 10) / 10;
+  if (rounded === 0) return '0.0';
+  if (rounded > 0) return `+${rounded.toFixed(1)}`;
+  return `${MINUS}${Math.abs(rounded).toFixed(1)}`;
+}
+
+/**
+ * Flow-positioned glass block used by morning-moment HeroCard.
+ * Mirrors CinemaCardGlass visuals but lives inside a relative parent.
+ */
 export const CinemaFriendGlass: React.FC<Props> = ({
   courseName,
   par,
@@ -54,13 +62,9 @@ export const CinemaFriendGlass: React.FC<Props> = ({
   gross,
   stableford,
   differential,
-  holes,
   isCounter = false,
-  showHotFlame = false,
 }) => {
-  const { title, suffix } = splitCourseName(courseName ?? 'Round played');
   const meta = [
-    suffix,
     par != null ? `PAR ${par}` : null,
     slope != null ? `SL ${slope}` : null,
   ]
@@ -68,13 +72,11 @@ export const CinemaFriendGlass: React.FC<Props> = ({
     .join(' · ')
     .toUpperCase();
 
-  const showShape = !!holes && holes.length > 0;
-
   return (
     <div
       style={{
-        padding: '6px 8px',
-        borderRadius: 10,
+        padding: '14px 16px',
+        borderRadius: 14,
         background: 'rgba(255,255,255,0.08)',
         border: '0.5px solid rgba(255,255,255,0.18)',
         backdropFilter: 'blur(40px) saturate(180%)',
@@ -82,53 +84,28 @@ export const CinemaFriendGlass: React.FC<Props> = ({
         fontFamily: FONT_GEIST,
       }}
     >
-      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 10 }}>
-        <div
-          style={{
-            fontSize: 14,
-            fontWeight: 700,
-            color: '#FFFFFF',
-            letterSpacing: '-0.02em',
-            lineHeight: 1.1,
-            minWidth: 0,
-            flex: 1,
-            overflow: 'hidden',
-            textOverflow: 'ellipsis',
-            whiteSpace: 'nowrap',
-          }}
-        >
-          {title}
-        </div>
-        <span
-          style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: 4,
-            padding: '2px 6px',
-            borderRadius: 999,
-            background: 'rgba(255,255,255,0.10)',
-            border: '0.5px solid rgba(255,255,255,0.25)',
-            fontSize: 10,
-            fontWeight: 700,
-            letterSpacing: '0.10em',
-            color: '#FFFFFF',
-            textTransform: 'uppercase',
-            flexShrink: 0,
-            marginTop: 1,
-          }}
-        >
-          SCORECARD
-          <span style={{ fontSize: 10, opacity: 0.7 }}>{'\u203A'}</span>
-        </span>
+      <div
+        style={{
+          fontSize: 17,
+          fontWeight: 700,
+          color: '#FFFFFF',
+          letterSpacing: '-0.02em',
+          lineHeight: 1.15,
+          whiteSpace: 'nowrap',
+          overflow: 'hidden',
+          textOverflow: 'ellipsis',
+        }}
+      >
+        {courseName}
       </div>
       {meta && (
         <div
           style={{
-            marginTop: 1,
+            marginTop: 3,
             fontSize: 10,
             fontWeight: 600,
             color: 'rgba(255,255,255,0.60)',
-            letterSpacing: '0.06em',
+            letterSpacing: '0.08em',
             textTransform: 'uppercase',
           }}
         >
@@ -136,34 +113,39 @@ export const CinemaFriendGlass: React.FC<Props> = ({
         </div>
       )}
 
-      <div style={{ ...HAIR, margin: '5px 0' }} />
+      <div style={{ ...HAIR, margin: '10px 0' }} />
 
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: 8 }}>
-        <div style={{ textAlign: 'center', flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'baseline',
+        }}
+      >
+        <div style={{ textAlign: 'left' }}>
           <div style={labelStyle}>GROSS</div>
           <div
-            style={{ marginTop: 2 }}
+            style={{ marginTop: 4 }}
             aria-label={`Gross score ${gross ?? ''}${isCounter ? ', counts toward index' : ''}`}
           >
             <GlassGrossRing
               value={gross != null ? gross : EM_DASH}
               isCounter={isCounter}
-              numeralSize={22}
+              numeralSize={26}
             />
           </div>
         </div>
-        <div style={{ textAlign: 'center', flex: 1 }}>
+        <div style={{ textAlign: 'center' }}>
           <div style={labelStyle}>STABLEFORD</div>
           <div style={valueStyle('#FFFFFF')}>{stableford != null ? stableford : EM_DASH}</div>
         </div>
-        <div style={{ textAlign: 'center', flex: 1 }}>
+        <div style={{ textAlign: 'right' }}>
           <div style={labelStyle}>SCORE DIFF</div>
           <div style={valueStyle(differential != null ? AMBER : '#FFFFFF')}>
-            {differential != null ? fmtDiff(differential, { plus: true }) : EM_DASH}
+            {fmtDiff(differential)}
           </div>
         </div>
       </div>
-
     </div>
   );
 };
