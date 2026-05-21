@@ -79,7 +79,7 @@ export const RivalryEmptyCard: React.FC<Props> = ({ rivalry }) => {
             style={{
               fontSize: 15,
               fontWeight: 700,
-              color: 'var(--hcp-bg-1)',
+              color: 'var(--hcp-t-100)',
               whiteSpace: 'nowrap',
               overflow: 'hidden',
               textOverflow: 'ellipsis',
