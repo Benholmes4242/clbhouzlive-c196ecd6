@@ -5462,6 +5462,50 @@ export type Database = {
           },
         ]
       }
+      gam_legend_pulse_events: {
+        Row: {
+          category: string
+          category_value: number | null
+          counterparty_user_id: string | null
+          course_id: string
+          created_at: string
+          id: string
+          kind: string
+          occurred_at: string
+          user_id: string
+        }
+        Insert: {
+          category: string
+          category_value?: number | null
+          counterparty_user_id?: string | null
+          course_id: string
+          created_at?: string
+          id?: string
+          kind: string
+          occurred_at?: string
+          user_id: string
+        }
+        Update: {
+          category?: string
+          category_value?: number | null
+          counterparty_user_id?: string | null
+          course_id?: string
+          created_at?: string
+          id?: string
+          kind?: string
+          occurred_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "gam_legend_pulse_events_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "golf_courses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       gam_notification_outbox: {
         Row: {
           created_at: string
@@ -19118,6 +19162,23 @@ export type Database = {
           your_gap_to_first: number
           your_rank: number
           your_value: number
+        }[]
+      }
+      get_legend_pulse: {
+        Args: { p_days?: number; p_user_id: string }
+        Returns: {
+          category: string
+          category_value: number
+          counterparty_name: string
+          counterparty_user_id: string
+          course_id: string
+          course_name: string
+          gap_to_first: number
+          kind: string
+          occurred_at: string
+          pulse_id: string
+          viewer_rank: number
+          viewer_value: number
         }[]
       }
       get_long_form_videos: {

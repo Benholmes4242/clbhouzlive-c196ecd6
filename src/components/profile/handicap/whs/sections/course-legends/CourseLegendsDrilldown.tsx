@@ -4,7 +4,7 @@ import { useCourseLegends } from '@/hooks/gam/useCourseLegends';
 import { GamCard, Skeleton, EmptyStub, RetryStub } from '../../../gam/_shared/GamAtoms';
 import {
   legendCategoryLabel,
-  legendCategoryEmoji,
+  legendCategoryIcon,
   formatLegendValue,
   rankEmoji,
 } from '@/lib/gam/visuals';
@@ -117,7 +117,26 @@ export const CourseLegendsDrilldown: React.FC<Props> = ({ state, onBack }) => {
             return (
               <GamCard key={cat}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
-                  <span style={{ fontSize: 18 }}>{legendCategoryEmoji[cat]}</span>
+                  {(() => {
+                    const Icon = legendCategoryIcon[cat];
+                    return (
+                      <div
+                        style={{
+                          width: 28,
+                          height: 28,
+                          borderRadius: 8,
+                          background: 'var(--hcp-bg-3)',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          flexShrink: 0,
+                          color: 'var(--hcp-t-80)',
+                        }}
+                      >
+                        <Icon size={16} strokeWidth={2.2} />
+                      </div>
+                    );
+                  })()}
                   <div
                     style={{
                       fontFamily: FONT,
