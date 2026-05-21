@@ -18612,6 +18612,7 @@ export type Database = {
           category: string
           is_self: boolean
           rank: number
+          total_count_in_category: number
           user_display_name: string
           user_home_club: string
           user_id: string
@@ -18675,6 +18676,7 @@ export type Database = {
           width: number
         }[]
       }
+      get_course_meta: { Args: { p_course_id: string }; Returns: Json }
       get_course_of_the_week: {
         Args: never
         Returns: {
