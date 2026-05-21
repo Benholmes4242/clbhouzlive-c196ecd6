@@ -101,7 +101,7 @@ export const RivalryCompactCard: React.FC<Props> = ({ rivalry, tier, onTap }) =>
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              color: 'var(--hcp-bg-1)',
+              color: 'var(--hcp-t-60)',
               fontSize: 13,
               fontWeight: 700,
               flexShrink: 0,
