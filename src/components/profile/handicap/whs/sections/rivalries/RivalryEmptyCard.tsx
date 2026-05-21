@@ -55,7 +55,7 @@ export const RivalryEmptyCard: React.FC<Props> = ({ rivalry }) => {
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            color: 'var(--hcp-bg-1)',
+            color: 'var(--hcp-t-60)',
             fontSize: 13,
             fontWeight: 700,
             flexShrink: 0,
@@ -79,7 +79,7 @@ export const RivalryEmptyCard: React.FC<Props> = ({ rivalry }) => {
             style={{
               fontSize: 15,
               fontWeight: 700,
-              color: 'var(--hcp-bg-1)',
+              color: 'var(--hcp-t-100)',
               whiteSpace: 'nowrap',
               overflow: 'hidden',
               textOverflow: 'ellipsis',
@@ -98,7 +98,7 @@ export const RivalryEmptyCard: React.FC<Props> = ({ rivalry }) => {
           margin: 0,
           fontSize: 12,
           lineHeight: 1.45,
-          color: 'var(--hcp-t-70)',
+          color: 'var(--hcp-t-60)',
         }}
       >
         No shared rounds yet. Play a round together to start tracking your head-to-head.

@@ -102,7 +102,7 @@ export const RivalryHeroCard: React.FC<Props> = ({
         background: tokens.cardSweep,
         boxShadow: tokens.outerGlow ?? '0 6px 18px rgba(15,23,42,0.18)',
         fontFamily: FONT_GEIST,
-        color: 'var(--hcp-bg-1)',
+        color: 'var(--hcp-t-100)',
         padding: 0,
         textAlign: 'left',
         cursor: 'pointer',
@@ -288,7 +288,7 @@ export const RivalryHeroCard: React.FC<Props> = ({
                   fontSize: 10,
                   fontWeight: 800,
                   letterSpacing: '0.12em',
-                  color: streak.who === 'you' ? tokens.streakColor : '#EF4444',
+                  color: streak.who === 'you' ? '#FBBC2E' : '#EF4444',
                 }}
               >
                 {streak.count} {streak.who === 'you' ? 'WINS' : 'LOSSES'} IN A ROW
@@ -309,7 +309,7 @@ export const RivalryHeroCard: React.FC<Props> = ({
             borderTop: '1px solid rgba(255,255,255,0.08)',
             borderBottom: '1px solid rgba(255,255,255,0.08)',
             fontSize: 11,
-            color: 'var(--hcp-t-70)',
+            color: 'var(--hcp-t-60)',
             display: 'flex',
             alignItems: 'center',
             gap: 6,
@@ -321,7 +321,7 @@ export const RivalryHeroCard: React.FC<Props> = ({
             <>
               <span>
                 Strongest at{' '}
-                <strong style={{ color: 'var(--hcp-bg-1)' }}>
+                <strong style={{ color: '#FFFFFF' }}>
                   {tale.strongestCourse.name} ({tale.strongestCourse.wins}-
                   {tale.strongestCourse.losses})
                 </strong>
@@ -332,7 +332,7 @@ export const RivalryHeroCard: React.FC<Props> = ({
           {tale.lastMet && (
             <>
               <span>
-                Last met <strong style={{ color: 'var(--hcp-bg-1)' }}>{tale.lastMet}</strong>
+                Last met <strong style={{ color: '#FFFFFF' }}>{tale.lastMet}</strong>
               </span>
               {tale.averageEdge != null && <span style={{ opacity: 0.4 }}>·</span>}
             </>

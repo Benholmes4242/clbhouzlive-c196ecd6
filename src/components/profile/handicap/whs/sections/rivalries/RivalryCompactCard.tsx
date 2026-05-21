@@ -101,7 +101,7 @@ export const RivalryCompactCard: React.FC<Props> = ({ rivalry, tier, onTap }) =>
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              color: 'var(--hcp-bg-1)',
+              color: 'var(--hcp-t-60)',
               fontSize: 13,
               fontWeight: 700,
               flexShrink: 0,
@@ -127,7 +127,7 @@ export const RivalryCompactCard: React.FC<Props> = ({ rivalry, tier, onTap }) =>
               style={{
                 fontSize: 15,
                 fontWeight: 700,
-                color: 'var(--hcp-bg-1)',
+                color: 'var(--hcp-t-100)',
                 whiteSpace: 'nowrap',
                 overflow: 'hidden',
                 textOverflow: 'ellipsis',
@@ -221,7 +221,7 @@ export const RivalryCompactCard: React.FC<Props> = ({ rivalry, tier, onTap }) =>
                   fontSize: 10,
                   fontWeight: 800,
                   letterSpacing: '0.10em',
-                  color: streak.who === 'you' ? tokens.streakColor : '#EF4444',
+                  color: streak.who === 'you' ? '#FBBC2E' : '#EF4444',
                   whiteSpace: 'nowrap',
                 }}
               >
@@ -232,7 +232,7 @@ export const RivalryCompactCard: React.FC<Props> = ({ rivalry, tier, onTap }) =>
               <span
                 style={{
                   fontSize: 10,
-                  color: 'var(--hcp-t-50)',
+                  color: 'var(--hcp-t-40)',
                   whiteSpace: 'nowrap',
                   overflow: 'hidden',
                   textOverflow: 'ellipsis',
