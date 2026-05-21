@@ -2,43 +2,97 @@ import { Flame, TrendingDown, Trophy, type LucideIcon } from 'lucide-react';
 import type { StreakType } from '@/lib/gam/types';
 
 /**
- * STREAK_CARD_CONFIG — the three streaks featured on the home card.
- * Order here is the render order.
+ * STREAK_CARD_CONFIG — per-type display metadata for the home streak card.
+ * The picker (`selectFeaturedStreaks`) chooses which 3 to feature; this map
+ * provides labels/emojis/copy for any of the 7 types it might pick.
  */
 export interface StreakCardEntry {
-  type: Extract<StreakType, 'counter' | 'cutting' | 'sub_80'>;
+  type: StreakType;
   label: string;
+  emoji: string;
   icon: LucideIcon;
   unit: string;
   description: string;
+  actionVerb: string;
   showGrid?: boolean;
   gridCaption?: string;
 }
 
-export const STREAK_CARD_ORDER: StreakCardEntry[] = [
-  {
+export const STREAK_CARD_CONFIG: Record<StreakType, StreakCardEntry> = {
+  counter: {
     type: 'counter',
     label: 'Counter rounds in a row',
+    emoji: '🔥',
     icon: Flame,
     unit: 'rounds',
     description: 'Consecutive rounds being counted',
-    showGrid: true,
-    gridCaption: 'Counters in last 7 days',
+    actionVerb: 'Post a counter',
   },
-  {
+  cutting: {
     type: 'cutting',
-    label: 'Index cuts',
+    label: 'Index cuts in a row',
+    emoji: '📉',
     icon: TrendingDown,
     unit: 'rounds',
     description: 'Counter rounds that dropped your handicap',
+    actionVerb: 'Score better than your average',
   },
-  {
+  sub_80: {
     type: 'sub_80',
     label: 'Rounds under 80',
+    emoji: '🏆',
     icon: Trophy,
     unit: 'rounds',
     description: 'Posted scores below 80 in a row',
+    actionVerb: 'Break 80',
   },
+  no_up: {
+    type: 'no_up',
+    label: 'Index holds',
+    emoji: '🛡️',
+    icon: Trophy,
+    unit: 'rounds',
+    description: 'Counter rounds without an index increase',
+    actionVerb: 'Hold the line',
+  },
+  sub_par: {
+    type: 'sub_par',
+    label: 'Sub-par rounds',
+    emoji: '🏆',
+    icon: Trophy,
+    unit: 'rounds',
+    description: 'Counter rounds below par',
+    actionVerb: 'Break par',
+  },
+  birdie_round: {
+    type: 'birdie_round',
+    label: 'Birdie rounds',
+    emoji: '🐦',
+    icon: Trophy,
+    unit: 'rounds',
+    description: 'Rounds with at least one birdie',
+    actionVerb: 'Make a birdie',
+  },
+  round_played: {
+    type: 'round_played',
+    label: 'Weeks played',
+    emoji: '⛳',
+    icon: Trophy,
+    unit: 'weeks',
+    description: 'Weeks with at least one round',
+    actionVerb: 'Play next week',
+  },
+};
+
+/**
+ * @deprecated The home card now uses `selectFeaturedStreaks()` as the source
+ * of truth for which 3 streaks to display. Remove in a follow-up PR once no
+ * consumer imports this.
+ */
+export const STREAK_CARD_ORDER: StreakCardEntry[] = [
+  STREAK_CARD_CONFIG.counter,
+  STREAK_CARD_CONFIG.cutting,
+  STREAK_CARD_CONFIG.sub_80,
 ];
 
 /**
