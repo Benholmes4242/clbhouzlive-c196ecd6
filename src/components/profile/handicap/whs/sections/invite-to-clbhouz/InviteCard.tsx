@@ -5,30 +5,51 @@ import { toast } from 'sonner';
 import { callCreateInvite } from '@/lib/whs/api';
 import { shareInvite } from '@/lib/whs/share';
 import { firstName } from '@/lib/whs/utils/initials';
+import { fmtRelative } from '@/lib/whs/utils/nameFormat';
 import { whsKeys } from '@/lib/whs/hooks';
 import type { FriendLeaderboardEntry } from '@/lib/whs/types';
 import { fmtHcp } from '@/lib/whs/format';
 
 interface Props {
   friend: FriendLeaderboardEntry;
-  /**
-   * When true, hide the home_club caption — used by the parent rail
-   * to deduplicate when 3+ friends share the same home club.
-   */
-  hideHomeClub?: boolean;
 }
 
 const INK = 'var(--hcp-t-100)';
 const INK_MUTE = 'var(--hcp-t-60)';
-const INK_06 = 'var(--hcp-bg-3)';
 const HAIRLINE = 'var(--hcp-line-2)';
 const AMBER = '#F7931E';
 const FONT_GEIST = '"Geist", system-ui, -apple-system, BlinkMacSystemFont, sans-serif';
 
-export const InviteCard: React.FC<Props> = ({ friend, hideHomeClub = false }) => {
+const MONO_COLORS = [
+  '#5C7F4A',
+  '#7A4A5C',
+  '#4A6F8A',
+  '#A87A4A',
+  '#6F4A8A',
+  '#4A8A5C',
+  '#8A6F4A',
+  '#5C4A8A',
+];
+
+function monogramColor(seed: number): string {
+  return MONO_COLORS[Math.abs(seed) % MONO_COLORS.length];
+}
+
+function monogramLetter(name: string): string {
+  const first = firstName(name);
+  return first.charAt(0).toUpperCase() || '?';
+}
+
+export const InviteCard: React.FC<Props> = ({ friend }) => {
   const queryClient = useQueryClient();
   const hcp = friend.friend_handicap_index;
   const isPlusHandicap = hcp != null && hcp < 0;
+
+  const courseHint =
+    friend.last_round_course_name && friend.last_round_played_at
+      ? `${friend.last_round_course_name} · ${fmtRelative(friend.last_round_played_at, { compact: true })}`
+      : null;
+
   const handleInvite = async () => {
     if (friend.friend_passport_id == null) {
       toast.error('Cannot invite this friend (missing ID)');
@@ -50,133 +71,130 @@ export const InviteCard: React.FC<Props> = ({ friend, hideHomeClub = false }) =>
   return (
     <div
       style={{
-        display: 'flex',
-        flexDirection: 'column',
-        gap: 10,
         padding: 12,
         background: 'var(--hcp-bg-1)',
         border: `1px solid ${HAIRLINE}`,
         borderRadius: 12,
-        fontFamily: FONT_GEIST,
-        minWidth: 0,
+        display: 'flex',
+        flexDirection: 'column',
+        gap: 10,
       }}
     >
       {/* Top row: avatar + name + HCP */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 10, minWidth: 0 }}>
-        <div
-          role="img"
-          aria-label={friend.friend_name}
-          style={{
-            width: 36,
-            height: 36,
-            borderRadius: 12,
-            overflow: 'hidden',
-            background: friend.friend_thumbnail_url
-              ? INK_06
-              : 'linear-gradient(135deg, #1a3c2a 0%, #0f172a 100%)',
-            flexShrink: 0,
-            display: 'flex',
-            alignItems: 'flex-end',
-            justifyContent: 'center',
-          }}
-        >
-          {friend.friend_thumbnail_url ? (
-            <img
-              src={friend.friend_thumbnail_url}
-              alt={friend.friend_name}
-              style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-            />
-          ) : (
-            <svg
-              viewBox="0 0 64 64"
-              width="100%"
-              height="100%"
-              preserveAspectRatio="xMidYMax meet"
-              style={{ opacity: 0.56, display: 'block' }}
-              aria-hidden="true"
-            >
-              <circle cx="32" cy="25" r="11" fill="#ffffff" />
-              <path d="M11 64 C 11 48, 21 40, 32 40 C 43 40, 53 48, 53 64 Z" fill="#ffffff" />
-            </svg>
-          )}
-        </div>
-
-        <div style={{ flex: 1, minWidth: 0 }}>
+        {friend.friend_thumbnail_url ? (
           <div
             style={{
-              fontSize: 13.5,
-              fontWeight: 700,
-              color: 'var(--hcp-t-100)',
-              letterSpacing: '-0.01em',
-              whiteSpace: 'nowrap',
+              width: 36,
+              height: 36,
+              borderRadius: 12,
               overflow: 'hidden',
-              textOverflow: 'ellipsis',
+              flexShrink: 0,
+              background: 'var(--hcp-bg-2)',
             }}
           >
-            {firstName(friend.friend_name)}
+            <img
+              src={friend.friend_thumbnail_url}
+              alt=""
+              style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+            />
           </div>
-          <span
+        ) : (
+          <div
             style={{
-              display: 'inline-block',
-              marginTop: 1,
-              fontSize: 12,
-              fontWeight: 700,
-              color: isPlusHandicap ? AMBER : 'var(--hcp-t-100)',
-              fontVariantNumeric: 'tabular-nums',
-              letterSpacing: '-0.01em',
-              textShadow: isPlusHandicap
-                ? '0 0 6px rgba(247,147,30,0.30), 0 0 2px rgba(247,147,30,0.20)'
-                : 'none',
+              width: 36,
+              height: 36,
+              borderRadius: 12,
+              flexShrink: 0,
+              background: monogramColor(friend.friend_passport_id ?? 0),
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              color: '#FFFFFF',
+              fontFamily: FONT_GEIST,
+              fontSize: 15,
+              fontWeight: 800,
+              lineHeight: 1,
             }}
           >
-            {fmtHcp(hcp)}
-          </span>
+            {monogramLetter(friend.friend_name)}
+          </div>
+        )}
+
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <div style={{ display: 'flex', alignItems: 'baseline', gap: 6, minWidth: 0 }}>
+            <div
+              style={{
+                fontFamily: FONT_GEIST,
+                fontSize: 13.5,
+                fontWeight: 800,
+                color: INK,
+                letterSpacing: '-0.01em',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                whiteSpace: 'nowrap',
+                minWidth: 0,
+              }}
+            >
+              {firstName(friend.friend_name)}
+            </div>
+            <div
+              style={{
+                fontFamily: FONT_GEIST,
+                fontSize: 12,
+                fontWeight: 800,
+                color: isPlusHandicap ? AMBER : INK,
+                fontVariantNumeric: 'tabular-nums',
+                textShadow: isPlusHandicap ? '0 0 8px rgba(247,147,30,0.5)' : undefined,
+                flexShrink: 0,
+              }}
+            >
+              {fmtHcp(hcp)}
+            </div>
+          </div>
+          {courseHint && (
+            <div
+              style={{
+                marginTop: 2,
+                fontFamily: FONT_GEIST,
+                fontSize: 10,
+                fontWeight: 600,
+                color: INK_MUTE,
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                whiteSpace: 'nowrap',
+              }}
+            >
+              {courseHint}
+            </div>
+          )}
         </div>
       </div>
 
-      {/* Secondary line — home club, indented under the name */}
-      {friend.friend_home_club && !hideHomeClub && (
-        <div
-          style={{
-            marginLeft: 46,
-            marginTop: -4,
-            fontSize: 11,
-            color: INK_MUTE,
-            fontWeight: 500,
-            whiteSpace: 'nowrap',
-            overflow: 'hidden',
-            textOverflow: 'ellipsis',
-            minWidth: 0,
-          }}
-        >
-          {friend.friend_home_club}
-        </div>
-      )}
-
-      {/* Invite button, full-width across the card bottom */}
+      {/* Invite button — tightened */}
       <button
         onClick={handleInvite}
-        aria-label={`Invite ${firstName(friend.friend_name)} to clbhouz`}
         style={{
           width: '100%',
-          padding: '9px 12px',
-          borderRadius: 999,
-          background: 'linear-gradient(135deg, #FBBF24 0%, #F7931E 100%)',
-          boxShadow: '0 4px 14px rgba(247,147,30,0.40), inset 0 1px 0 rgba(255,255,255,0.20)',
-          color: '#FFFFFF',
-          fontSize: 12,
-          fontWeight: 800,
+          padding: '8px 12px',
+          borderRadius: 10,
           border: 'none',
+          background: `linear-gradient(180deg, ${AMBER} 0%, #E07F0A 100%)`,
+          color: '#0A0A0A',
+          fontFamily: FONT_GEIST,
+          fontSize: 11.5,
+          fontWeight: 800,
+          letterSpacing: '0.02em',
           cursor: 'pointer',
           display: 'inline-flex',
           alignItems: 'center',
           justifyContent: 'center',
-          gap: 4,
-          letterSpacing: '0.02em',
-          fontFamily: FONT_GEIST,
+          gap: 6,
+          boxShadow:
+            '0 2px 10px rgba(247,147,30,0.32), inset 0 1px 0 rgba(255,255,255,0.25)',
         }}
       >
-        <Send size={12} />
+        <Send size={12} strokeWidth={2.5} />
         Invite
       </button>
     </div>
