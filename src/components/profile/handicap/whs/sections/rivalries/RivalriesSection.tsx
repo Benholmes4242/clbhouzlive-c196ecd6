@@ -333,7 +333,7 @@ const DotPager: React.FC<{ count: number; active: number }> = ({ count, active }
             height: 6,
             width: isActive ? 18 : 6,
             borderRadius: 3,
-            background: isActive ? '#F7931E' : 'rgba(255,255,255,0.20)',
+            background: isActive ? '#FFFFFF' : 'rgba(255,255,255,0.25)',
             transition: 'width 160ms ease, background 160ms ease',
           }}
         />
