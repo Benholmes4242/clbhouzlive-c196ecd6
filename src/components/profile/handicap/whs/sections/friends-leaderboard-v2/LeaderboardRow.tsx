@@ -1,21 +1,14 @@
 import React from 'react';
-import { Minus } from 'lucide-react';
 import { initials } from '@/lib/whs/utils/initials';
-import { reformatFriendName, fmtRelative } from '@/lib/whs/utils/nameFormat';
+import { reformatFriendName } from '@/lib/whs/utils/nameFormat';
 import { fmtHcp } from '@/lib/whs/format';
 import type { FriendLeaderboardEntry } from '@/lib/whs/types';
 
 interface Props {
   entry: FriendLeaderboardEntry;
   rank: number | null;
-  isFirst: boolean;
-  isLast: boolean;
-  /** True when this friend hasn't played in the last 90 days. Always
-   *  false for the self row. */
+  /** True when this friend hasn't played in 90 days. Always false for self. */
   isStaleRow: boolean;
-  /** Gap to your own handicap, in strokes. Negative = friend is ahead.
-   *  Only populated for the rows immediately above and below "You". */
-  gapFromYou: number | null;
   onClick?: () => void;
 }
 
@@ -24,64 +17,65 @@ const T = {
   inkMute: 'var(--hcp-t-60)',
   inkSoft: 'var(--hcp-t-80)',
   inkFaded: 'var(--hcp-t-40)',
-  ink25: 'var(--hcp-t-20)',
+  ink25: 'rgba(255,255,255,0.18)',
   hairline: 'var(--hcp-line-2)',
   hairlineSoft: 'var(--hcp-bg-3)',
+  bg3: 'var(--hcp-bg-3)',
   amber: '#F7931E',
-  amberDeep: '#C97211',
+  amberSoft: 'rgba(247,147,30,0.14)',
   amberInk: '#854F0B',
   amberTint: 'rgba(247,147,30,0.10)',
-  amberSoft: 'rgba(247,147,30,0.14)',
-  green: '#059669',
-  greenDeep: '#15803D',
-  red: '#9F1339',
-  redDeep: '#991B1B',
-  /** Medal palette — matches Course Form T9.7 */
   gold: '#FBBC2E',
   silver: '#C0C5CF',
   bronze: '#C97D45',
 };
 
-/** Medal color for top-3 ranks. Anything below 3 returns null. */
-const medalColor = (rank: number | null): string | null => {
+const medalColor = (rank: number | null): string => {
   if (rank === 1) return T.gold;
   if (rank === 2) return T.silver;
   if (rank === 3) return T.bronze;
-  return null;
+  return T.inkMute;
 };
 
-const fmtRel = (iso: string | null) => fmtRelative(iso, { compact: true });
+const FlameIcon: React.FC<{ size?: number }> = ({ size = 11 }) => (
+  <svg
+    width={size}
+    height={size}
+    viewBox="0 0 24 24"
+    fill="#F7931E"
+    aria-hidden
+    style={{ flexShrink: 0 }}
+  >
+    <path d="M12 2c.4 3 2 5 4 7 2 2 3 4 3 7a7 7 0 1 1-14 0c0-2 1-4 2-5 0 2 1 3 2 3 0-3 1-7 3-12Z" />
+  </svg>
+);
 
-interface TrendPillInfo {
-  sign: string;
-  value: string;
-  color: string;
-}
+const StalePill: React.FC = () => (
+  <span
+    style={{
+      background: T.amberSoft,
+      color: T.amberInk,
+      padding: '1px 5px',
+      borderRadius: 4,
+      fontSize: 9,
+      fontWeight: 800,
+      letterSpacing: '0.14em',
+    }}
+  >
+    STALE
+  </span>
+);
 
-function buildTrendPill(delta: number | null | undefined): TrendPillInfo | null {
-  if (delta == null || Math.abs(delta) < 0.05) return null;
-  if (delta < 0) {
-    return { sign: '↓', value: Math.abs(delta).toFixed(1), color: T.green };
-  }
-  return { sign: '↑', value: delta.toFixed(1), color: T.red };
-}
-
-export const LeaderboardRow: React.FC<Props> = ({
-  entry,
-  rank,
-  isFirst,
-  isLast,
-  isStaleRow,
-  gapFromYou,
-  onClick,
-}) => {
+export const LeaderboardRow: React.FC<Props> = ({ entry, rank, isStaleRow, onClick }) => {
   const isYou = entry.is_self;
   const displayName = isYou ? 'You' : reformatFriendName(entry.friend_name);
-  const Tag: any = onClick ? 'button' : 'div';
-
   const hcp = entry.friend_handicap_index;
   const isPlusHandicap = hcp != null && hcp < 0;
-  const trend = buildTrendPill(entry.handicap_30d_delta);
+  const showFlame =
+    !isStaleRow &&
+    entry.handicap_30d_delta != null &&
+    entry.handicap_30d_delta <= -0.5;
+  const Tag: any = onClick ? 'button' : 'div';
 
   return (
     <Tag
@@ -97,10 +91,10 @@ export const LeaderboardRow: React.FC<Props> = ({
         margin: '0 20px',
         textAlign: 'left',
         padding: '10px 0',
-        borderTop: isFirst ? `1px solid ${T.hairline}` : 'none',
-        borderBottom: `1px solid ${isLast ? T.hairline : T.hairlineSoft}`,
+        borderBottom: `1px solid ${T.hairlineSoft}`,
         borderLeft: 'none',
         borderRight: 'none',
+        borderTop: 'none',
         background: isYou ? T.amberTint : 'transparent',
         opacity: isStaleRow ? 0.6 : 1,
         cursor: onClick ? 'pointer' : 'default',
@@ -122,6 +116,7 @@ export const LeaderboardRow: React.FC<Props> = ({
           }}
         />
       )}
+
       {/* Rank */}
       <div
         style={{
@@ -130,14 +125,14 @@ export const LeaderboardRow: React.FC<Props> = ({
           flexShrink: 0,
           fontSize: 12,
           fontWeight: 700,
-          color: medalColor(rank) ?? T.inkMute,
+          color: medalColor(rank),
           fontVariantNumeric: 'tabular-nums',
         }}
       >
         {rank ?? '\u2014'}
       </div>
 
-      {/* Avatar + name + meta */}
+      {/* Avatar + name + home club */}
       <div
         style={{
           display: 'flex',
@@ -154,7 +149,7 @@ export const LeaderboardRow: React.FC<Props> = ({
             height: 33,
             borderRadius: '34%',
             overflow: 'hidden',
-            background: 'var(--hcp-bg-3)',
+            background: T.bg3,
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
@@ -177,20 +172,31 @@ export const LeaderboardRow: React.FC<Props> = ({
         </div>
 
         <div style={{ minWidth: 0, flex: 1 }}>
-          <p
+          <div
             style={{
-              margin: 0,
-              fontSize: 14,
-              fontWeight: isYou ? 700 : 600,
-              color: T.ink,
-              letterSpacing: '-0.01em',
-              whiteSpace: 'nowrap',
-              overflow: 'hidden',
-              textOverflow: 'ellipsis',
+              display: 'flex',
+              alignItems: 'center',
+              gap: 6,
+              minWidth: 0,
             }}
           >
-            {displayName}
-          </p>
+            <p
+              style={{
+                margin: 0,
+                fontSize: 14,
+                fontWeight: isYou ? 700 : 600,
+                color: T.ink,
+                letterSpacing: '-0.01em',
+                whiteSpace: 'nowrap',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                minWidth: 0,
+              }}
+            >
+              {displayName}
+            </p>
+            {showFlame && <FlameIcon />}
+          </div>
           <p
             style={{
               margin: '2px 0 0',
@@ -201,69 +207,50 @@ export const LeaderboardRow: React.FC<Props> = ({
               display: 'flex',
               alignItems: 'center',
               gap: 5,
+              whiteSpace: 'nowrap',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
             }}
           >
-            {isStaleRow && (
-              <span
-                style={{
-                  background: T.amberSoft,
-                  color: T.amberInk,
-                  padding: '1px 5px',
-                  borderRadius: 4,
-                  fontSize: 9,
-                  fontWeight: 800,
-                  letterSpacing: '0.14em',
-                }}
-              >
-                STALE
-              </span>
-            )}
-            {fmtRel(entry.last_round_played_at)}
+            {isStaleRow && <StalePill />}
+            <span
+              style={{
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                whiteSpace: 'nowrap',
+                minWidth: 0,
+              }}
+            >
+              {entry.friend_home_club ?? (isYou ? 'No home club set' : '')}
+            </span>
           </p>
         </div>
       </div>
 
-      {/* Trend pill (30d delta) */}
+      {/* 30D slot — Phase 1 renders an em-dash placeholder; Phase 3 wires the rank-delta chip */}
       <div
         style={{
-          width: 60,
+          width: 32,
           flexShrink: 0,
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'flex-end',
+          fontSize: 12,
+          fontWeight: 600,
+          color: T.ink25,
+          fontVariantNumeric: 'tabular-nums',
         }}
       >
-        {trend ? (
-          <span
-            style={{
-              display: 'inline-flex',
-              alignItems: 'baseline',
-              gap: 1,
-              fontSize: 11,
-              fontWeight: 800,
-              color: trend.color,
-              fontVariantNumeric: 'tabular-nums',
-              letterSpacing: '-0.01em',
-            }}
-          >
-            <span style={{ fontSize: 10 }}>{trend.sign}</span>
-            {trend.value}
-          </span>
-        ) : (
-          <Minus size={12} color={T.ink25} strokeWidth={2.4} />
-        )}
+        {/* Phase 3 will render <RankDeltaChip delta={entry.rank_delta_30d} /> here */}
+        —
       </div>
 
-      {/* HCP + adjacent gap */}
+      {/* HCP */}
       <div
         style={{
-          width: 60,
+          width: 56,
           textAlign: 'right',
           flexShrink: 0,
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'flex-end',
-          gap: 1,
         }}
       >
         <span
@@ -280,25 +267,6 @@ export const LeaderboardRow: React.FC<Props> = ({
         >
           {fmtHcp(hcp)}
         </span>
-        {gapFromYou != null && (
-          <span
-            style={{
-              fontSize: 9,
-              fontWeight: 700,
-              color: gapFromYou < 0 ? 'var(--hcp-good)' : 'var(--hcp-bad)',
-              fontVariantNumeric: 'tabular-nums',
-              letterSpacing: '-0.01em',
-              textShadow:
-                gapFromYou < 0
-                  ? '0 0 6px rgba(34,197,94,0.40), 0 0 2px rgba(34,197,94,0.25)'
-                  : '0 0 6px rgba(239,68,68,0.40), 0 0 2px rgba(239,68,68,0.25)',
-            }}
-          >
-            {gapFromYou < 0
-              ? `${gapFromYou.toFixed(1)} from you`
-              : `+${gapFromYou.toFixed(1)} from you`}
-          </span>
-        )}
       </div>
     </Tag>
   );

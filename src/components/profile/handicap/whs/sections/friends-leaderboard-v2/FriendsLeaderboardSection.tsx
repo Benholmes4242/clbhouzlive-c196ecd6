@@ -1,130 +1,116 @@
-import React, { useMemo, useState } from 'react';
+import React, { useState } from 'react';
+import { ChevronDown } from 'lucide-react';
 import { DarkSectionHeader } from '../_shared/darkAtoms';
 import LeaderboardRow from './LeaderboardRow';
+import HeroPositionCard from './HeroPositionCard';
 import FriendProfileSheet from '../friend-profile-sheet/FriendProfileSheet';
 import { useFriendLeaderboard } from '@/lib/whs/hooks';
+import { useHandicapPercentile } from '@/lib/whs/usePercentile';
 import { useOpenFriendHybridSheet } from '@/components/friend-hybrid-sheet/FriendHybridSheetProvider';
-import { ChevronDown } from 'lucide-react';
+import { buildLeaderboardCohorts } from '@/lib/whs/utils/buildLeaderboardCohorts';
 import type { FriendLeaderboardEntry } from '@/lib/whs/types';
 
 interface Props {
   userId: string;
 }
 
-const HEADER_LABEL: React.CSSProperties = {
-  margin: 0,
-  fontSize: 8,
-  fontWeight: 800,
-  color: 'var(--hcp-t-40)',
-  letterSpacing: '0.16em',
-};
+const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
 
 const STALE_THRESHOLD_DAYS = 90;
-
 const isStale = (lastPlayed: string | null): boolean => {
   if (!lastPlayed) return true;
   const days = (Date.now() - new Date(lastPlayed).getTime()) / (1000 * 60 * 60 * 24);
   return days > STALE_THRESHOLD_DAYS;
 };
 
+const LABEL_STYLE: React.CSSProperties = {
+  margin: 0,
+  fontSize: 10,
+  fontWeight: 800,
+  color: 'var(--hcp-t-40)',
+  letterSpacing: '0.16em',
+};
+
 export const FriendsLeaderboardSection: React.FC<Props> = ({ userId }) => {
   const { data, isLoading } = useFriendLeaderboard(userId);
+  const percentileQuery = useHandicapPercentile(userId);
   const { open: openHybridSheet } = useOpenFriendHybridSheet();
   const [showInactive, setShowInactive] = useState(false);
-  const [showAllActive, setShowAllActive] = useState(false);
-  // Fallback sheet for EG-only friends (no friend_user_id) — hybrid RPC requires UUID.
   const [profileSheet, setProfileSheet] = useState<{ index: number } | null>(null);
 
-  // Sort by handicap (low → high). NULL handicaps sink to the bottom.
-  const sorted = useMemo(
-    () =>
-      (data ?? [])
-        .slice()
-        .sort(
-          (a, b) =>
-            (a.friend_handicap_index ?? 99) - (b.friend_handicap_index ?? 99),
-        ),
-    [data],
-  );
+  const cohorts = buildLeaderboardCohorts(data);
+  const selfRow =
+    cohorts.selfActiveIdx >= 0 ? cohorts.active[cohorts.selfActiveIdx] : null;
+  const percentileTop =
+    percentileQuery.data?.available === true ? percentileQuery.data.percentile_top : null;
 
-  // Split into active vs inactive. The "self" row is always treated as active
-  // even if its last round is old — we should never hide the user from
-  // their own leaderboard.
-  const { activeRows, inactiveRows } = useMemo(() => {
-    const active: FriendLeaderboardEntry[] = [];
-    const inactive: FriendLeaderboardEntry[] = [];
-    for (const e of sorted) {
-      if (e.is_self || !isStale(e.last_round_played_at)) {
-        active.push(e);
-      } else {
-        inactive.push(e);
-      }
+  const subLine = isLoading
+    ? 'Loading…'
+    : percentileTop != null
+      ? `You're top ${percentileTop}% of all Clbhouz · ${cohorts.totalActive} active${
+          cohorts.totalInactive > 0 ? `, ${cohorts.totalInactive} inactive` : ''
+        }`
+      : `Ranked by current handicap · ${cohorts.totalActive} active${
+          cohorts.totalInactive > 0 ? `, ${cohorts.totalInactive} inactive` : ''
+        }`;
+
+  const handleRowClick = (entry: FriendLeaderboardEntry) => {
+    if (entry.is_self) return;
+    if (entry.friend_user_id) {
+      openHybridSheet({
+        targetUserId: entry.friend_user_id,
+        source: 'friends_leaderboard_row',
+      });
+    } else {
+      // FriendProfileSheet expects an index into the sorted master list.
+      const sortedAll = [...cohorts.active, ...cohorts.inactive];
+      const realIdx = sortedAll.findIndex((e) => e === entry);
+      if (realIdx >= 0) setProfileSheet({ index: realIdx });
     }
-    return { activeRows: active, inactiveRows: inactive };
-  }, [sorted]);
-
-  const yourActiveRank = useMemo(
-    () => activeRows.findIndex((e) => e.is_self) + 1,
-    [activeRows],
-  );
-  const totalActive = activeRows.length;
-  const inactiveCount = inactiveRows.length;
-
-  // Cap active rows at the top 10 — but always include the user's own row.
-  const ACTIVE_CAP_DEFAULT = 10;
-  const activeCap = Math.max(ACTIVE_CAP_DEFAULT, yourActiveRank);
-  const activeRowsCapped = showAllActive
-    ? activeRows
-    : activeRows.slice(0, activeCap);
-  const hiddenActiveCount = activeRows.length - activeRowsCapped.length;
-
-  const visible = showInactive
-    ? [...activeRowsCapped, ...inactiveRows]
-    : activeRowsCapped;
-
-  const yourActiveIdx = activeRows.findIndex((e) => e.is_self);
-  const yourHcp = activeRows[yourActiveIdx]?.friend_handicap_index ?? null;
+  };
 
   return (
     <section style={{ marginTop: 32 }}>
       <DarkSectionHeader
         eyebrow="LEADERBOARD"
-        title={
-          isLoading || totalActive === 0
-            ? 'Loading…'
-            : `You're ${yourActiveRank} of ${totalActive} active`
-        }
-        sub={
-          inactiveCount > 0
-            ? `Active = round in last 90 days · ${inactiveCount} inactive`
-            : 'Your circle, ranked by current handicap'
-        }
-        
+        title="You vs your circle"
+        sub={subLine}
       />
 
-      {/* Column headers */}
+      {/* HERO */}
+      {isLoading ? (
+        <div
+          style={{
+            margin: '0 20px 16px',
+            height: 168,
+            background: 'var(--hcp-bg-2)',
+            border: '1px solid var(--hcp-line-2)',
+            borderRadius: 16,
+          }}
+          className="animate-pulse"
+        />
+      ) : (
+        <HeroPositionCard
+          selfRow={selfRow}
+          rowAbove={cohorts.rowAbove}
+          selfRank={cohorts.selfActiveRank}
+          totalActive={cohorts.totalActive}
+        />
+      )}
+
+      {/* TOP 5 + column label */}
       <div
         style={{
           display: 'flex',
           alignItems: 'center',
+          justifyContent: 'space-between',
           padding: '0 20px 8px',
         }}
       >
-        <div style={{ width: 22, textAlign: 'center', flexShrink: 0 }}>
-          <p style={HEADER_LABEL}>#</p>
-        </div>
-        <div style={{ flex: 1, minWidth: 0, paddingLeft: 16 }}>
-          <p style={HEADER_LABEL}>PLAYER</p>
-        </div>
-        <div style={{ width: 60, textAlign: 'right', flexShrink: 0 }}>
-          <p style={HEADER_LABEL}>30D</p>
-        </div>
-        <div style={{ width: 60, textAlign: 'right', flexShrink: 0 }}>
-          <p style={HEADER_LABEL}>HCP</p>
-        </div>
+        <p style={LABEL_STYLE}>TOP 5</p>
+        <p style={{ ...LABEL_STYLE, paddingRight: 60 }}>30D</p>
       </div>
 
-      {/* Rows */}
       {isLoading ? (
         Array.from({ length: 5 }).map((_, i) => (
           <div
@@ -139,116 +125,101 @@ export const FriendsLeaderboardSection: React.FC<Props> = ({ userId }) => {
           />
         ))
       ) : (
-        visible.map((entry, i) => {
-          // Find the entry's index in the active cohort. Returns -1 for inactive
-          // rows (which are only visible when showInactive is true).
-          const activeIdx = activeRows.findIndex((e) => e === entry);
-
-          // Rank within the active cohort. Inactive entries get a null rank — they
-          // aren't competing in the displayed leaderboard.
-          const activeRank: number | null = activeIdx >= 0 ? activeIdx + 1 : null;
-
-          const isActiveAdjacent =
-            !entry.is_self &&
-            activeIdx >= 0 &&
-            (activeIdx === yourActiveIdx - 1 || activeIdx === yourActiveIdx + 1);
-          const gapFromYou =
-            isActiveAdjacent && yourHcp != null && entry.friend_handicap_index != null
-              ? entry.friend_handicap_index - yourHcp
-              : null;
-
-          const staleRow = !entry.is_self && isStale(entry.last_round_played_at);
-
+        cohorts.topFive.map((entry) => {
+          const activeIdx = cohorts.active.findIndex((e) => e === entry);
+          const rank = activeIdx >= 0 ? activeIdx + 1 : null;
           return (
             <LeaderboardRow
               key={entry.is_self ? 'self' : `${entry.friend_user_id ?? ''}-${entry.friend_name}`}
               entry={entry}
-              rank={activeRank}
-              isFirst={i === 0}
-              isLast={i === visible.length - 1}
-              isStaleRow={staleRow}
-              gapFromYou={gapFromYou}
-              onClick={
-                entry.is_self
-                  ? undefined
-                  : () => {
-                      // Clbhouz user → hybrid sheet. EG-only (no user_id) → legacy sheet.
-                      if (entry.friend_user_id) {
-                        openHybridSheet({
-                          targetUserId: entry.friend_user_id,
-                          source: 'friends_leaderboard_row',
-                        });
-                      } else {
-                        const realIdx = sorted.findIndex((e) => e === entry);
-                        if (realIdx >= 0) setProfileSheet({ index: realIdx });
-                      }
-                    }
-              }
+              rank={rank}
+              isStaleRow={false}
+              onClick={entry.is_self ? undefined : () => handleRowClick(entry)}
             />
           );
         })
       )}
 
-      {/* Show more active friends */}
-      {!showAllActive && !isLoading && hiddenActiveCount > 0 && (
+      {/* See full leaderboard CTA */}
+      {!isLoading && cohorts.totalActive > 0 && (
         <button
           type="button"
-          onClick={() => setShowAllActive(true)}
+          onClick={() => {
+            // TODO Phase 1.1 — open full leaderboard sheet
+          }}
           style={{
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            gap: 5,
+            gap: 6,
             width: 'calc(100% - 40px)',
-            margin: '12px 20px 0',
-            padding: '10px 16px',
+            margin: '14px 20px 8px',
+            padding: '12px 16px',
             background: 'var(--hcp-bg-1)',
             border: '1px solid var(--hcp-line-2)',
             borderRadius: 12,
             color: 'var(--hcp-t-80)',
-            fontSize: 12,
+            fontSize: 13,
             fontWeight: 700,
-            letterSpacing: '0.02em',
             cursor: 'pointer',
-            fontFamily: '"Geist", system-ui, sans-serif',
+            fontFamily: FONT,
           }}
         >
-          Show {hiddenActiveCount} more
-          <ChevronDown size={14} />
+          See all {cohorts.totalActive} active
+          <span style={{ fontSize: 14, color: 'var(--hcp-t-60)' }}>›</span>
         </button>
       )}
 
-      {/* Show inactive toggle — secondary affordance, ghost-button styling */}
-      {!showInactive && !isLoading && inactiveCount > 0 && (
-        <button
-          type="button"
-          onClick={() => setShowInactive(true)}
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            gap: 5,
-            width: 'calc(100% - 40px)',
-            margin: '8px 20px 0',
-            padding: '8px 16px',
-            background: 'transparent',
-            border: 'none',
-            color: 'var(--hcp-t-60)',
-            fontSize: 12,
-            fontWeight: 600,
-            letterSpacing: '0.02em',
-            cursor: 'pointer',
-            fontFamily: '"Geist", system-ui, sans-serif',
-            WebkitTapHighlightColor: 'transparent',
-          }}
-        >
-          Show {inactiveCount} inactive friend{inactiveCount === 1 ? '' : 's'}
-          <ChevronDown size={14} strokeWidth={2} />
-        </button>
+      {/* Inactive section */}
+      {!isLoading && cohorts.totalInactive > 0 && (
+        <>
+          {showInactive ? (
+            <>
+              <div style={{ padding: '16px 20px 8px' }}>
+                <p style={LABEL_STYLE}>INACTIVE · {cohorts.totalInactive}</p>
+              </div>
+              {cohorts.inactive.map((entry) => (
+                <LeaderboardRow
+                  key={`inactive-${entry.friend_user_id ?? ''}-${entry.friend_name}`}
+                  entry={entry}
+                  rank={null}
+                  isStaleRow={!entry.is_self && isStale(entry.last_round_played_at)}
+                  onClick={() => handleRowClick(entry)}
+                />
+              ))}
+            </>
+          ) : (
+            <button
+              type="button"
+              onClick={() => setShowInactive(true)}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: 5,
+                width: 'calc(100% - 40px)',
+                margin: '4px 20px 16px',
+                padding: '8px 16px',
+                background: 'transparent',
+                border: 'none',
+                color: 'var(--hcp-t-60)',
+                fontSize: 12,
+                fontWeight: 600,
+                cursor: 'pointer',
+                fontFamily: FONT,
+                WebkitTapHighlightColor: 'transparent',
+              }}
+            >
+              Show {cohorts.totalInactive} inactive friend
+              {cohorts.totalInactive === 1 ? '' : 's'}
+              <ChevronDown size={14} strokeWidth={2} />
+            </button>
+          )}
+        </>
       )}
 
       <FriendProfileSheet
-        friends={sorted}
+        friends={[...cohorts.active, ...cohorts.inactive]}
         startIndex={profileSheet?.index ?? 0}
         ownerUserId={userId}
         open={!!profileSheet}
