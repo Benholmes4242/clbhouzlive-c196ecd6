@@ -201,15 +201,21 @@ export const FriendsLeaderboardSection: React.FC<Props> = ({ userId }) => {
               <div style={{ padding: '16px 20px 8px' }}>
                 <p style={LABEL_STYLE}>INACTIVE · {cohorts.totalInactive}</p>
               </div>
-              {cohorts.inactive.map((entry) => (
-                <LeaderboardRow
-                  key={`inactive-${entry.friend_user_id ?? ''}-${entry.friend_name}`}
-                  entry={entry}
-                  rank={null}
-                  isStaleRow={true}
-                  onClick={() => handleRowClick(entry)}
-                />
-              ))}
+              {cohorts.inactive.map((entry) => {
+                const delta = entry.friend_row_id
+                  ? deltasData?.byFriendRowId.get(entry.friend_row_id)
+                  : undefined;
+                return (
+                  <LeaderboardRow
+                    key={`inactive-${entry.friend_user_id ?? ''}-${entry.friend_name}`}
+                    entry={entry}
+                    rank={null}
+                    isStaleRow={true}
+                    rankDelta={delta}
+                    onClick={() => handleRowClick(entry)}
+                  />
+                );
+              })}
             </>
           ) : (
             <button
