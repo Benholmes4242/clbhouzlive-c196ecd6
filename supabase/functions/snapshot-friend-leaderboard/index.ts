@@ -2,7 +2,7 @@
 // ───────────────────────────────────────────────────────────────────
 // Nightly job: for every user with a friend leaderboard, compute the
 // current rank of every member of their circle and upsert into
-// `whs_leaderboard_rank_snapshot` for today's date.
+// `whs_friend_leaderboard_snapshots` for today's date.
 //
 // Powers the Phase 3 rank delta chips (↑3, ↓1, NEW) and weekly banner.
 //
