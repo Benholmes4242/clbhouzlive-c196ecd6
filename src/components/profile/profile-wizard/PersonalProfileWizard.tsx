@@ -49,8 +49,16 @@ export function PersonalProfileWizard() {
   const queryClient = useQueryClient();
   const { user } = useSupabaseSession();
   const { profile, loading } = useProfileData();
+  const [searchParams] = useSearchParams();
 
-  const [step, setStep] = useState<WizardStep>(1);
+  const initialStep: WizardStep = (() => {
+    const focus = searchParams.get('focus');
+    if (focus === 'gender') return 1;
+    if (focus === 'country') return 3;
+    return 1;
+  })();
+
+  const [step, setStep] = useState<WizardStep>(initialStep);
   const [direction, setDirection] = useState<WizardDirection>('forward');
   const [showDiscard, setShowDiscard] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
