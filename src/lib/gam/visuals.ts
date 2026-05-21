@@ -105,3 +105,21 @@ export function relativeTime(iso: string | null): string {
   return `${Math.floor(diffMo / 12)}y ago`;
 }
 
+
+const MINUS = '\u2212'; // Unicode minus sign (not ASCII hyphen)
+
+/**
+ * Format a legend value for inline display (e.g. in CourseLegendsCard
+ * holder cells). Returns the bare number; the unit is implied by the
+ * category label rendered above. Score is the only category with a sign.
+ */
+export function formatLegendValueCompact(
+  category: LegendCategory,
+  value: number,
+): string {
+  if (category === 'best_score_diff') {
+    if (value < 0) return `${MINUS}${Math.abs(value).toFixed(1)}`;
+    return `+${value.toFixed(1)}`;
+  }
+  return String(Math.round(value));
+}
