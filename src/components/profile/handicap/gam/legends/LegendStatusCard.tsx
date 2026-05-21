@@ -188,8 +188,16 @@ export const LegendStatusCard: React.FC<LegendStatusCardProps> = ({
   if (top10 === 0) return null;
 
   const isOwnView = !readOnly;
-  const subjectPossessive = isOwnView ? "you're" : `${friendName ?? 'they'} is`;
-  const subjectNegative = isOwnView ? "You haven't" : `${friendName ?? 'They'} hasn't`;
+  const subjectPossessive = isOwnView
+    ? "you're"
+    : friendName
+      ? `${friendName} is`
+      : "they're";
+  const subjectNegative = isOwnView
+    ? "You haven't"
+    : friendName
+      ? `${friendName} hasn't`
+      : "They haven't";
 
   let headline: string;
   let caption: string;

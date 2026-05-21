@@ -859,15 +859,10 @@ const URGENCY: Record<string, string> = {
   badge_earned: "low",
   legend_lost: "high",
   legend_earned: "medium",
-  league_climbed: "high",
-  league_dropped: "medium",
   streak_at_risk: "high",
   streak_broken: "low",
   streak_freeze_applied: "medium",
   rival_played: "medium",
-  season_promoted: "high",
-  season_relegated: "medium",
-  season_completed: "low",
 };
 
 function dedupKey(type: string, userId: string, payload: any): string {
@@ -875,11 +870,6 @@ function dedupKey(type: string, userId: string, payload: any): string {
     case "badge_earned": return `badge_earned:${userId}:${payload.badge_id}`;
     case "legend_lost": return `legend_lost:${userId}:${payload.course_id}:${payload.category}`;
     case "legend_earned": return `legend_earned:${userId}:${payload.course_id}:${payload.category}`;
-    case "league_climbed":
-    case "league_dropped": {
-      const week = isoWeekStart(new Date().toISOString().slice(0, 10));
-      return `league:${userId}:${week}`;
-    }
     case "streak_at_risk": return `streak_risk:${userId}:${payload.streak_type}`;
     case "streak_broken": return `streak_broken:${userId}:${payload.streak_type}:${new Date().toISOString().slice(0, 10)}`;
     case "rival_played": return `rival:${userId}:${payload.rival_user_id}:${payload.course_id}:${payload.play_date}`;

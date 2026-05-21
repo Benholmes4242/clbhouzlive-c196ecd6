@@ -221,18 +221,6 @@ function renderPush(r: OutboxRow, badgeMap: Map<string, any>) {
         body: `Top of the ${p.category} board.`,
         data: { route: `/courses/${p.course_id}?tab=legends`, course_id: p.course_id },
       };
-    case "league_climbed":
-      return {
-        title: `⚔️ You climbed to #${p.to} in your pod`,
-        body: `Up from #${p.from}.`,
-        data: { route: "/handicap?sheet=league", pod_id: p.pod_id },
-      };
-    case "league_dropped":
-      return {
-        title: `🔻 You dropped to #${p.to} in your pod`,
-        body: `Down from #${p.from}.`,
-        data: { route: "/handicap?sheet=league", pod_id: p.pod_id },
-      };
     case "streak_at_risk":
       return {
         title: `🔥 Your ${p.streak_type} streak is at risk`,
@@ -256,24 +244,6 @@ function renderPush(r: OutboxRow, badgeMap: Map<string, any>) {
         title: `🎯 A rival just posted a round`,
         body: "See how you compare.",
         data: { route: `/handicap/rivalry/${p.rival_user_id}` },
-      };
-    case "season_promoted":
-      return {
-        title: `🎉 You've been promoted`,
-        body: `Bracket ${p.bracket}, final rank #${p.rank}.`,
-        data: { route: "/handicap?sheet=league" },
-      };
-    case "season_relegated":
-      return {
-        title: `📉 You've been relegated`,
-        body: `Bracket ${p.bracket}, final rank #${p.rank}.`,
-        data: { route: "/handicap?sheet=league" },
-      };
-    case "season_completed":
-      return {
-        title: `🏁 Season complete`,
-        body: `Final rank #${p.rank} with ${p.points} pts.`,
-        data: { route: "/handicap?sheet=league" },
       };
     default:
       return null;
