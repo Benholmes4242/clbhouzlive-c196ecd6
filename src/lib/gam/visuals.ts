@@ -123,3 +123,29 @@ export function formatLegendValueCompact(
   }
   return String(Math.round(value));
 }
+
+/**
+ * Format a gap-to-first value for pulse "chase" cards.
+ * Returns e.g. "2 strokes", "1 birdie", "0.4 vs hcp".
+ */
+export function formatLegendGap(category: LegendCategory, gap: number): string {
+  const abs = Math.abs(gap);
+  switch (category) {
+    case 'best_score_diff':
+      return `${abs.toFixed(1)} vs hcp`;
+    case 'lowest_gross': {
+      const n = Math.round(abs);
+      return `${n} ${n === 1 ? 'stroke' : 'strokes'}`;
+    }
+    case 'most_birdies_90d': {
+      const n = Math.round(abs);
+      return `${n} ${n === 1 ? 'birdie' : 'birdies'}`;
+    }
+    case 'most_rounds_90d': {
+      const n = Math.round(abs);
+      return `${n} ${n === 1 ? 'round' : 'rounds'}`;
+    }
+    case 'best_stableford_90d':
+      return `${Math.round(abs)} pts`;
+  }
+}
