@@ -147,7 +147,7 @@ export const STREAK_SHEET_CONFIG: Record<StreakType, StreakSheetEntry> = {
     label: 'WEEKS PLAYED',
     emoji: '⛳',
     explainer: 'Weeks where you played at least one round. Pure activity streak — your engagement baseline.',
-    unit: 'rounds',
+    unit: 'weeks',
   },
 };
 
