@@ -41,8 +41,8 @@ function isStaleDate(lastPlayed: string | null): boolean {
 /**
  * Mirrors `buildLeaderboardCohorts.ts` on the client.
  * Sort by handicap_index ASC (NULLs sink), split into active vs stale.
- * Self is always active. Self row (friend_row_id null) is skipped — see
- * Phase 2 Work 3 implementation note.
+ * Self row (friend_row_id null) is filtered OUT before bucketing so it
+ * never consumes a rank slot — everyone below shifts up by 1.
  */
 function computeRanksForCircle(
   rows: FriendLeaderboardRow[],
@@ -56,27 +56,28 @@ function computeRanksForCircle(
   const active: FriendLeaderboardRow[] = [];
   const stale: FriendLeaderboardRow[] = [];
   for (const r of sorted) {
-    if (r.is_self || !isStaleDate(r.last_round_played_at)) active.push(r);
+    // Skip self before bucketing — self never enters the snapshot table
+    // and shouldn't consume a rank slot. Everyone below self shifts up by 1.
+    if (r.friend_row_id == null) continue;
+    if (!isStaleDate(r.last_round_played_at)) active.push(r);
     else stale.push(r);
   }
 
   const out: RankComputeResult[] = [];
 
   active.forEach((r, idx) => {
-    if (r.friend_row_id == null) return; // skip self
     out.push({
-      friend_row_id: r.friend_row_id,
+      friend_row_id: r.friend_row_id!,
       rank: idx + 1,
       handicap_index: r.friend_handicap_index,
-      is_self: r.is_self,
+      is_self: false, // never self after the filter
       is_stale: false,
     });
   });
 
   stale.forEach((r, idx) => {
-    if (r.friend_row_id == null) return; // defensive
     out.push({
-      friend_row_id: r.friend_row_id,
+      friend_row_id: r.friend_row_id!,
       rank: active.length + idx + 1,
       handicap_index: r.friend_handicap_index,
       is_self: false,
