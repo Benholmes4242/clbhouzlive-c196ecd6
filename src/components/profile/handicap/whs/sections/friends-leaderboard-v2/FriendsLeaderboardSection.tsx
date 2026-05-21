@@ -33,9 +33,12 @@ const LABEL_STYLE: React.CSSProperties = {
 export const FriendsLeaderboardSection: React.FC<Props> = ({ userId }) => {
   const { data, isLoading } = useFriendLeaderboard(userId);
   const percentileQuery = useHandicapPercentile(userId);
+  const { data: deltasData } = useFriendLeaderboardRankDeltas(userId, 90);
+  const { data: weeklyBanner } = useFriendLeaderboardWeeklyBanner(userId);
   const { open: openHybridSheet } = useOpenFriendHybridSheet();
   const [showInactive, setShowInactive] = useState(false);
   const [profileSheet, setProfileSheet] = useState<{ index: number } | null>(null);
+  const [heroExpanded, setHeroExpanded] = useState(false);
 
   const cohorts = buildLeaderboardCohorts(data);
   const selfRow =
