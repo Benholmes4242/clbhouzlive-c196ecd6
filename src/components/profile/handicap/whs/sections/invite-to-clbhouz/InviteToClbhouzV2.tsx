@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react';
-import { Check, ChevronRight, ChevronDown } from 'lucide-react';
+import { Check, ChevronDown } from 'lucide-react';
 import {
   useFriendLeaderboard,
   useSentInvites,
