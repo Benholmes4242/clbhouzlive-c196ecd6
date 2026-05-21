@@ -40,6 +40,20 @@ export const legendCategoryEmoji: Record<LegendCategory, string> = {
   best_stableford_90d: '⛳',
 };
 
+/**
+ * Lucide icon component per legend category. Use this for new dark-mode
+ * surfaces (CourseLegendsCard, LegendPulseTicker). The emoji map above is
+ * retained for back-compat with LegendsView drilldown, LegendStatusCard
+ * (Today tab), and LegendStatusSheet — migrate those in a follow-up PR.
+ */
+export const legendCategoryIcon: Record<LegendCategory, LucideIcon> = {
+  best_score_diff: TrendingDown,
+  most_birdies_90d: Feather,
+  most_rounds_90d: MapPin,
+  lowest_gross: Trophy,
+  best_stableford_90d: Target,
+};
+
 export const streakLabel: Record<StreakType, string> = {
   round_played: 'Round Streak',
   no_up: 'No-Up Streak',
