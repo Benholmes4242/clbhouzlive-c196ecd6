@@ -1,18 +1,21 @@
-import React, { useMemo } from 'react';
-import { ChevronLeft, Crown } from 'lucide-react';
+import React, { useMemo, useRef } from 'react';
+import { Crown } from 'lucide-react';
 import { useCourseLegends } from '@/hooks/gam/useCourseLegends';
-import { GamCard, Skeleton, EmptyStub, RetryStub } from '../../../gam/_shared/GamAtoms';
+import { useCourseMeta } from '@/hooks/gam/useCourseMeta';
+import { Skeleton, EmptyStub, RetryStub } from '../../../gam/_shared/GamAtoms';
 import {
   legendCategoryLabel,
   legendCategoryIcon,
   formatLegendValue,
-  rankEmoji,
 } from '@/lib/gam/visuals';
 import type { LegendCategory } from '@/lib/gam/types';
-import { CourseEyebrow } from './_shared/CourseEyebrow';
 import type { CourseSelection } from './types';
 
-const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
+import { DrilldownHeader } from './drilldown/DrilldownHeader';
+import { CourseMetaStrip } from './drilldown/CourseMetaStrip';
+import { CategoryNavRail } from './drilldown/CategoryNavRail';
+import { CategorySection } from './drilldown/CategorySection';
+
 const AMBER = '#F7931E';
 
 const CATEGORIES_ORDER: LegendCategory[] = [
@@ -23,6 +26,32 @@ const CATEGORIES_ORDER: LegendCategory[] = [
   'most_rounds_90d',
 ];
 
+const SHORT_LABELS: Record<LegendCategory, string> = {
+  best_score_diff: 'Score',
+  lowest_gross: 'Gross',
+  most_birdies_90d: 'Birdie',
+  best_stableford_90d: 'Stbl',
+  most_rounds_90d: 'Visitor',
+};
+
+const UNITS: Record<LegendCategory, string> = {
+  best_score_diff: 'vs hcp',
+  lowest_gross: '',
+  most_birdies_90d: '',
+  best_stableford_90d: 'pts',
+  most_rounds_90d: '',
+};
+
+interface SectionRow {
+  rank: number;
+  name: string;
+  photoUrl: string | null;
+  value: number;
+  valueDisplay: string;
+  attained_at: string;
+  isSelf: boolean;
+}
+
 interface Props {
   state: CourseSelection;
   onBack: () => void;
@@ -30,60 +59,70 @@ interface Props {
 
 export const CourseLegendsDrilldown: React.FC<Props> = ({ state, onBack }) => {
   const { data, isLoading, isError, refetch } = useCourseLegends(state.courseId);
+  const { data: meta } = useCourseMeta(state.courseId);
 
-  const grouped = useMemo(() => {
+  const groupedWithTotals = useMemo(() => {
+    const m = new Map<LegendCategory, { rows: SectionRow[]; total: number }>();
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const m = new Map<LegendCategory, any[]>();
-    (data ?? []).forEach((row) => {
-      const list = m.get(row.category) ?? [];
-      list.push(row);
-      m.set(row.category, list);
+    (data ?? []).forEach((row: any) => {
+      const cat = row.category as LegendCategory;
+      const entry = m.get(cat) ?? { rows: [], total: row.total_count_in_category ?? 0 };
+      entry.rows.push({
+        rank: row.rank,
+        name: row.user_display_name ?? 'Player',
+        photoUrl: row.user_photo_url ?? null,
+        value: row.value,
+        valueDisplay: formatLegendValue(cat, row.value),
+        attained_at: row.attained_at,
+        isSelf: row.is_self,
+      });
+      entry.total = row.total_count_in_category ?? entry.rows.length;
+      m.set(cat, entry);
     });
     return m;
   }, [data]);
 
+  const yourRanks = useMemo(() => {
+    const r: Record<LegendCategory, number | null> = {
+      best_score_diff: null,
+      lowest_gross: null,
+      most_birdies_90d: null,
+      best_stableford_90d: null,
+      most_rounds_90d: null,
+    };
+    CATEGORIES_ORDER.forEach((cat) => {
+      const entry = groupedWithTotals.get(cat);
+      const self = entry?.rows.find((row) => row.isSelf);
+      r[cat] = self?.rank ?? null;
+    });
+    return r;
+  }, [groupedWithTotals]);
+
+  const youOwnedCount = Object.values(yourRanks).filter((r) => r === 1).length;
+
+  const navCategories = useMemo(
+    () =>
+      CATEGORIES_ORDER.filter(
+        (cat) => (groupedWithTotals.get(cat)?.rows.length ?? 0) > 0,
+      ).map((cat) => ({
+        key: cat,
+        short: SHORT_LABELS[cat],
+        icon: legendCategoryIcon[cat],
+        yourRank: yourRanks[cat],
+      })),
+    [groupedWithTotals, yourRanks],
+  );
+
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  const handleNavSelect = (key: LegendCategory) => {
+    const el = containerRef.current?.querySelector(`[data-category="${key}"]`);
+    el?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
+
   return (
-    <div>
-      {/* HEADER */}
-      <div style={{ padding: '20px 16px 0' }}>
-        <button
-          onClick={onBack}
-          style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: 4,
-            background: 'transparent',
-            border: 'none',
-            padding: 0,
-            color: 'var(--hcp-t-60)',
-            fontFamily: FONT,
-            fontSize: 13,
-            fontWeight: 600,
-            cursor: 'pointer',
-            marginBottom: 12,
-          }}
-        >
-          <ChevronLeft size={16} />
-          All courses
-        </button>
-        <CourseEyebrow
-          type={state.courseType}
-          region={state.courseRegion}
-          country={state.courseCountry}
-        />
-        <div
-          style={{
-            fontFamily: FONT,
-            fontSize: 22,
-            fontWeight: 700,
-            color: 'var(--hcp-t-100)',
-            lineHeight: 1.2,
-            letterSpacing: '-0.01em',
-          }}
-        >
-          {state.courseName}
-        </div>
-      </div>
+    <div ref={containerRef}>
+      <DrilldownHeader state={state} onBack={onBack} youOwnedCount={youOwnedCount} />
 
       {isLoading && (
         <div style={{ padding: '20px 16px', display: 'flex', flexDirection: 'column', gap: 12 }}>
@@ -110,152 +149,34 @@ export const CourseLegendsDrilldown: React.FC<Props> = ({ state, onBack }) => {
       )}
 
       {!isLoading && !isError && (data ?? []).length > 0 && (
-        <div style={{ padding: '8px 16px 24px', display: 'flex', flexDirection: 'column', gap: 16 }}>
-          {CATEGORIES_ORDER.map((cat) => {
-            const rows = (grouped.get(cat) ?? []).slice(0, 5);
-            if (rows.length === 0) return null;
-            return (
-              <GamCard key={cat}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
-                  {(() => {
-                    const Icon = legendCategoryIcon[cat];
-                    return (
-                      <div
-                        style={{
-                          width: 28,
-                          height: 28,
-                          borderRadius: 8,
-                          background: 'var(--hcp-bg-3)',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          flexShrink: 0,
-                          color: 'var(--hcp-t-80)',
-                        }}
-                      >
-                        <Icon size={16} strokeWidth={2.2} />
-                      </div>
-                    );
-                  })()}
-                  <div
-                    style={{
-                      fontFamily: FONT,
-                      fontSize: 14,
-                      fontWeight: 700,
-                      color: 'var(--hcp-t-100)',
-                    }}
-                  >
-                    {legendCategoryLabel[cat]}
-                  </div>
+        <>
+          <CourseMetaStrip meta={meta} />
+          <CategoryNavRail categories={navCategories} onSelect={handleNavSelect} />
+          <div
+            style={{
+              padding: '20px 16px 32px',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: 28,
+            }}
+          >
+            {CATEGORIES_ORDER.map((cat) => {
+              const entry = groupedWithTotals.get(cat);
+              if (!entry || entry.rows.length === 0) return null;
+              return (
+                <div key={cat} data-category={cat}>
+                  <CategorySection
+                    categoryLabel={legendCategoryLabel[cat]}
+                    categoryIcon={legendCategoryIcon[cat]}
+                    unit={UNITS[cat]}
+                    rows={entry.rows}
+                    totalCount={entry.total}
+                  />
                 </div>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-                  {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
-                  {rows.map((r: any, i: number) => {
-                    const displayName = r.user_display_name ?? r.display_name ?? 'Player';
-                    const subtitle = r.user_home_club ?? r.home_club ?? null;
-                    const photo = r.user_photo_url ?? null;
-                    return (
-                      <div
-                        key={`${cat}-${r.user_id}-${i}`}
-                        style={{
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: 10,
-                          fontFamily: FONT,
-                          fontSize: 13,
-                          color: 'var(--hcp-t-100)',
-                        }}
-                      >
-                        <span
-                          style={{
-                            fontSize: 13,
-                            minWidth: 22,
-                            fontWeight: 700,
-                            color: 'var(--hcp-t-60)',
-                            fontVariantNumeric: 'tabular-nums',
-                          }}
-                        >
-                          {rankEmoji(r.rank)}
-                        </span>
-                        <div
-                          style={{
-                            width: 28,
-                            height: 28,
-                            borderRadius: '34%',
-                            overflow: 'hidden',
-                            background:
-                              'linear-gradient(135deg, var(--hcp-bg-3), var(--hcp-bg-2))',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            flexShrink: 0,
-                            color: 'var(--hcp-t-60)',
-                            fontSize: 11,
-                            fontWeight: 700,
-                          }}
-                        >
-                          {photo ? (
-                            <img
-                              src={photo}
-                              alt=""
-                              style={{
-                                width: '100%',
-                                height: '100%',
-                                objectFit: 'cover',
-                                display: 'block',
-                              }}
-                            />
-                          ) : (
-                            (displayName?.[0] ?? '?').toUpperCase()
-                          )}
-                        </div>
-                        <div style={{ flex: 1, minWidth: 0 }}>
-                          <div
-                            style={{
-                              whiteSpace: 'nowrap',
-                              overflow: 'hidden',
-                              textOverflow: 'ellipsis',
-                              fontWeight: r.is_self ? 700 : 600,
-                              color: r.is_self ? AMBER : 'var(--hcp-t-100)',
-                              lineHeight: 1.25,
-                            }}
-                          >
-                            {displayName}
-                            {r.is_self ? ' (you)' : ''}
-                          </div>
-                          {subtitle && (
-                            <div
-                              style={{
-                                fontSize: 11,
-                                color: 'var(--hcp-t-60)',
-                                whiteSpace: 'nowrap',
-                                overflow: 'hidden',
-                                textOverflow: 'ellipsis',
-                                lineHeight: 1.3,
-                                marginTop: 1,
-                              }}
-                            >
-                              {subtitle}
-                            </div>
-                          )}
-                        </div>
-                        <span
-                          style={{
-                            fontVariantNumeric: 'tabular-nums',
-                            color: 'var(--hcp-t-60)',
-                            fontSize: 12,
-                          }}
-                        >
-                          {formatLegendValue(cat, r.value)}
-                        </span>
-                      </div>
-                    );
-                  })}
-                </div>
-              </GamCard>
-            );
-          })}
-        </div>
+              );
+            })}
+          </div>
+        </>
       )}
     </div>
   );
