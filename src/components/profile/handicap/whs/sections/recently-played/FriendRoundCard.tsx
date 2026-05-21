@@ -1,7 +1,6 @@
 import React from 'react';
 import type { WhsFriendActivityWithImage } from '@/lib/whs/types';
-import { CinemaFriendCard } from './cinema-friend-card';
-import { EgOnlyCard, ClbhouzNotSyncedCard } from './small-friend-cards';
+import FriendRoundCardV2 from './FriendRoundCardV2';
 
 interface Props {
   activity: WhsFriendActivityWithImage;
@@ -10,28 +9,25 @@ interface Props {
   onInviteClick?: () => void;
 }
 
-// ─────────────────────────────────────────────────────────────────────
-// Top-level — branches by sync state.
-//   - Clbhouz user + WHS synced → CinemaFriendCard (immersive 280px)
-//   - Clbhouz user, no WHS sync → ClbhouzNotSyncedCard (identity-leading)
-//   - EG-only                   → EgOnlyCard (media-leading)
-// ─────────────────────────────────────────────────────────────────────
+export const FriendRoundCard: React.FC<Props> = ({
+  activity,
+  onClick,
+  onInviteClick,
+}) => {
+  const variant: 'clbhouz-synced' | 'clbhouz-not-synced' | 'eg-only' =
+    activity.is_clbhouz_user && activity.friend_connection_id
+      ? 'clbhouz-synced'
+      : activity.is_clbhouz_user
+        ? 'clbhouz-not-synced'
+        : 'eg-only';
 
-export const FriendRoundCard: React.FC<Props> = ({ activity, onClick, onInviteClick }) => {
-  if (activity.is_clbhouz_user && activity.friend_connection_id) {
-    return <CinemaFriendCard activity={activity} onClick={onClick} />;
-  }
-  if (activity.is_clbhouz_user) {
-    return (
-      <ClbhouzNotSyncedCard
-        activity={activity}
-        onClick={onClick}
-        onInviteClick={onInviteClick}
-      />
-    );
-  }
   return (
-    <EgOnlyCard activity={activity} onClick={onClick} onInviteClick={onInviteClick} />
+    <FriendRoundCardV2
+      activity={activity}
+      variant={variant}
+      onClick={onClick}
+      onInviteClick={onInviteClick}
+    />
   );
 };
 
