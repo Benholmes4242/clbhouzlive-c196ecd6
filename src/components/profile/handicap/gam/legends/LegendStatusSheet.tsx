@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Crown } from 'lucide-react';
+import { Crown, Medal, type LucideIcon } from 'lucide-react';
 import SheetHeader from '@/components/ui/SheetHeader';
 import { useUserLegendStatus } from '@/hooks/gam/useUserLegendStatus';
 import { useUserTopLegends, type TopLegendRow } from '@/hooks/gam/useUserTopLegends';
@@ -8,7 +8,7 @@ import { Skeleton, RetryStub, EmptyStub } from '../_shared/GamAtoms';
 import { GamSheet } from '../_shared/GamSheet';
 import {
   legendCategoryLabel,
-  legendCategoryEmoji,
+  legendCategoryIcon,
   formatLegendValue,
   relativeTime,
 } from '@/lib/gam/visuals';
@@ -33,7 +33,7 @@ const LegendRow: React.FC<LegendRowProps> = ({ row, onTap }) => {
 
   const valueLabel = formatLegendValue(row.category, row.value);
   const categoryLabel = legendCategoryLabel[row.category];
-  const emoji = legendCategoryEmoji[row.category];
+  const Icon = legendCategoryIcon[row.category];
   const time = relativeTime(row.attained_at);
 
   const meta =
@@ -74,7 +74,7 @@ const LegendRow: React.FC<LegendRowProps> = ({ row, onTap }) => {
           color: 'var(--hcp-t-60)',
         }}
       >
-        <span style={{ fontSize: 18 }}>{emoji}</span>
+        <Icon size={20} strokeWidth={2} color="var(--hcp-t-80)" />
       </div>
 
       <div style={{ flex: 1, minWidth: 0 }}>
@@ -109,11 +109,12 @@ const LegendRow: React.FC<LegendRowProps> = ({ row, onTap }) => {
   );
 };
 
-const GroupHeader: React.FC<{ emoji: string; label: string; count: number }> = ({
-  emoji,
-  label,
-  count,
-}) => (
+const GroupHeader: React.FC<{
+  Icon: LucideIcon | null;
+  iconColor?: string;
+  label: string;
+  count: number;
+}> = ({ Icon, iconColor, label, count }) => (
   <div
     style={{
       fontFamily: FONT,
@@ -124,9 +125,18 @@ const GroupHeader: React.FC<{ emoji: string; label: string; count: number }> = (
       textTransform: 'uppercase',
       marginTop: 24,
       marginBottom: 10,
+      display: 'flex',
+      alignItems: 'center',
     }}
   >
-    {emoji && <span style={{ marginRight: 6, fontSize: 14 }}>{emoji}</span>}
+    {Icon && (
+      <Icon
+        size={14}
+        strokeWidth={2.4}
+        color={iconColor ?? 'var(--hcp-t-80)'}
+        style={{ marginRight: 6, flexShrink: 0 }}
+      />
+    )}
     {label} ({count})
   </div>
 );
@@ -248,7 +258,7 @@ export const LegendStatusSheet: React.FC<LegendStatusSheetProps> = ({
       <div style={{ padding: '0 16px 32px' }}>
         {legends.length > 0 && (
           <>
-            <GroupHeader emoji="🏆" label="Legend" count={legends.length} />
+            <GroupHeader Icon={Crown} iconColor="#FBBC2E" label="Legend" count={legends.length} />
             <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
               {legends.map((row) => (
                 <LegendRow
@@ -263,7 +273,7 @@ export const LegendStatusSheet: React.FC<LegendStatusSheetProps> = ({
 
         {podium.length > 0 && (
           <>
-            <GroupHeader emoji="🥈" label="Top 3" count={podium.length} />
+            <GroupHeader Icon={Medal} iconColor="#C0C0C0" label="Top 3" count={podium.length} />
             <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
               {podium.map((row) => (
                 <LegendRow
@@ -278,7 +288,7 @@ export const LegendStatusSheet: React.FC<LegendStatusSheetProps> = ({
 
         {top10.length > 0 && (
           <>
-            <GroupHeader emoji="" label="Top 10" count={top10.length} />
+            <GroupHeader Icon={null} label="Top 10" count={top10.length} />
             <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
               {top10.map((row) => (
                 <LegendRow

@@ -2,7 +2,7 @@ import React from 'react';
 import { useUserLegendStatus } from '@/hooks/gam/useUserLegendStatus';
 import { useUserTopLegends, type TopLegendRow } from '@/hooks/gam/useUserTopLegends';
 import { GamCard, Skeleton, RetryStub } from '../_shared/GamAtoms';
-import { legendCategoryLabel, legendCategoryEmoji } from '@/lib/gam/visuals';
+import { legendCategoryLabel, legendCategoryIcon } from '@/lib/gam/visuals';
 import type { LegendCategory, UserLegendStatus } from '@/lib/gam/types';
 
 const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
@@ -74,9 +74,17 @@ const TitlePill: React.FC<{ category: LegendCategory; courseName: string; rank: 
         flexShrink: 0,
       }}
     >
-      <span style={{ fontSize: 13, lineHeight: 1, textTransform: 'none' }}>
-        {legendCategoryEmoji[category]}
-      </span>
+      {(() => {
+        const Icon = legendCategoryIcon[category];
+        return (
+          <Icon
+            size={12}
+            strokeWidth={2.4}
+            color={colors.color}
+            style={{ flexShrink: 0 }}
+          />
+        );
+      })()}
       <span>
         {shortLabel(category)}
         {' · '}
