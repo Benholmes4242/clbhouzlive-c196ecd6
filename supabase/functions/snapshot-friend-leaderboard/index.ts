@@ -2,7 +2,7 @@
 // ───────────────────────────────────────────────────────────────────
 // Nightly job: for every user with a friend leaderboard, compute the
 // current rank of every member of their circle and upsert into
-// `whs_leaderboard_rank_snapshot` for today's date.
+// `whs_friend_leaderboard_snapshots` for today's date.
 //
 // Powers the Phase 3 rank delta chips (↑3, ↓1, NEW) and weekly banner.
 //
@@ -132,7 +132,7 @@ Deno.serve(async (req) => {
         if (computed.length === 0) continue;
 
         const { error: upsertErr } = await supabase
-          .from('whs_leaderboard_rank_snapshot')
+          .from('whs_friend_leaderboard_snapshots')
           .upsert(
             computed.map((c) => ({
               snapshot_date: today,
@@ -162,7 +162,7 @@ Deno.serve(async (req) => {
     cutoff.setDate(cutoff.getDate() - RETENTION_DAYS);
     const cutoffStr = cutoff.toISOString().slice(0, 10);
     const { error: deleteErr, count } = await supabase
-      .from('whs_leaderboard_rank_snapshot')
+      .from('whs_friend_leaderboard_snapshots')
       .delete({ count: 'exact' })
       .lt('snapshot_date', cutoffStr);
     if (deleteErr) {

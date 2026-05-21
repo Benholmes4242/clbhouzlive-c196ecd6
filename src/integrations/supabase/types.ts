@@ -15826,6 +15826,39 @@ export type Database = {
         }
         Relationships: []
       }
+      whs_friend_leaderboard_snapshots: {
+        Row: {
+          created_at: string
+          friend_row_id: string
+          handicap_index: number | null
+          is_self: boolean
+          is_stale: boolean
+          rank: number
+          snapshot_date: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          friend_row_id: string
+          handicap_index?: number | null
+          is_self?: boolean
+          is_stale?: boolean
+          rank: number
+          snapshot_date: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          friend_row_id?: string
+          handicap_index?: number | null
+          is_self?: boolean
+          is_stale?: boolean
+          rank?: number
+          snapshot_date?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       whs_friends: {
         Row: {
           connection_id: string
@@ -19127,6 +19160,18 @@ export type Database = {
           review_count: number
           thumbnail_image: string
           top_friend_names: string[]
+        }[]
+      }
+      get_friend_recent_rounds: {
+        Args: { p_friend_connection_id: string; p_limit?: number }
+        Returns: {
+          adjusted_gross: number
+          course_name: string
+          handicap_differential: number
+          handicap_index_at_time: number
+          is_counter: boolean
+          play_date: string
+          score_id: string
         }[]
       }
       get_friend_rounds_since_last_visit: {
