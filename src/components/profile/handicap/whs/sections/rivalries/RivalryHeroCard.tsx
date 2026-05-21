@@ -102,7 +102,7 @@ export const RivalryHeroCard: React.FC<Props> = ({
         background: tokens.cardSweep,
         boxShadow: tokens.outerGlow ?? '0 6px 18px rgba(15,23,42,0.18)',
         fontFamily: FONT_GEIST,
-        color: 'var(--hcp-bg-1)',
+        color: 'var(--hcp-t-100)',
         padding: 0,
         textAlign: 'left',
         cursor: 'pointer',
