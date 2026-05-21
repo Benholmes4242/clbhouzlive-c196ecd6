@@ -13,6 +13,7 @@ import HomeClubSubsection from './subsections/HomeClubSubsection';
 import YourCoursesSubsection from './subsections/YourCoursesSubsection';
 import DiscoverSubsection from './subsections/DiscoverSubsection';
 import SearchResultsSubsection from './subsections/SearchResultsSubsection';
+import LegendPulseTicker from './LegendPulseTicker';
 import type { CourseSelection } from './types';
 
 interface Props {
@@ -86,6 +87,7 @@ export const CourseLegendsSection: React.FC<Props> = ({
         />
       ) : (
         <>
+          <LegendPulseTicker userId={userId} onSelectCourse={onSelectCourse} />
           <HomeClubSubsection
             userId={userId}
             holdersByCourse={holdersByCourse}

@@ -269,8 +269,11 @@ export const LegendPulseTicker: React.FC<Props> = ({
             row={row}
             onClick={() =>
               onSelectCourse({
-                course_id: row.course_id,
-                name: row.course_name,
+                courseId: row.course_id,
+                courseName: row.course_name,
+                courseRegion: null,
+                courseCountry: null,
+                courseType: null,
               })
             }
           />
