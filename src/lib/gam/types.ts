@@ -49,25 +49,6 @@ export interface StreakRow {
   recent_activity_days: number[] | null;
 }
 
-// League pod standings
-export type LeagueZone = 'promotion' | 'safe' | 'relegation';
-export type LeagueBracket = 'platinum' | 'gold' | 'silver' | 'bronze' | 'open';
-
-export interface PodStanding {
-  user_id: string;
-  current_points: number;
-  rounds_counted: number;
-  live_rank: number;
-  zone: LeagueZone;
-  is_self: boolean;
-  user_photo_url: string | null;
-  home_club: string | null;
-  eg_handicap_index: number | null;
-  bracket: LeagueBracket;
-  pod_number: number;
-  season: string;
-  season_end: string;
-}
 
 // Course legends
 export type LegendCategory = 'best_score_diff' | 'most_birdies_90d' | 'most_rounds_90d' | 'lowest_gross' | 'best_stableford_90d';

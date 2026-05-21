@@ -191,12 +191,10 @@ async function processSingle(whsScoreId: string) {
     earned = await applyBadges(userId, stats, whsScoreId);
     await applyStreaks(userId, stats);
     await applyCourseLegends(stats);
-    await applyLeaguePoints(userId, stats);
     await applyRivalryResults(userId, stats, whsScoreId);
   } else {
-    // Refresh course legends + league points are idempotent recomputes; safe to re-run
+    // Refresh course legends — idempotent recompute, safe to re-run
     await applyCourseLegends(stats);
-    await applyLeaguePoints(userId, stats);
   }
 
   // Mark whs_scores evaluated
