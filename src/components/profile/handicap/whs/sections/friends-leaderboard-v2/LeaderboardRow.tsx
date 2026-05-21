@@ -279,7 +279,7 @@ export const LeaderboardRow: React.FC<Props> = ({ entry, rank, isStaleRow, onCli
         </div>
       </div>
 
-      {/* 30D slot — Phase 1 renders an em-dash placeholder; Phase 3 wires the rank-delta chip */}
+      {/* 30D slot — Phase 3 rank delta chip */}
       <div
         style={{
           width: 32,
@@ -287,14 +287,13 @@ export const LeaderboardRow: React.FC<Props> = ({ entry, rank, isStaleRow, onCli
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'flex-end',
-          fontSize: 12,
-          fontWeight: 600,
-          color: T.ink25,
-          fontVariantNumeric: 'tabular-nums',
         }}
       >
-        {/* Phase 3 will render <RankDeltaChip delta={entry.rank_delta_30d} /> here */}
-        —
+        <RankDeltaChip
+          delta={rankDelta?.rank_delta ?? null}
+          isNew={rankDelta?.is_new ?? false}
+          isStale={isStaleRow}
+        />
       </div>
 
       {/* HCP */}
