@@ -98,20 +98,41 @@ export function PersonalProfileWizard() {
     }
   }, [isDirty, navigate]);
 
-  // Fix 3: Skip button handler
+  // Fix 3: Skip button handler — still enforces gender + country
   const handleSkip = useCallback(async () => {
     if (!user?.id) return;
+
+    if (!form.gender) {
+      toast.error('Please select a gender before continuing.');
+      setDirection('back');
+      setStep(1);
+      return;
+    }
+    if (!form.country?.trim()) {
+      toast.error('Please select a country before continuing.');
+      setDirection('forward');
+      setStep(3);
+      return;
+    }
+
     await supabase
       .from('user_profiles')
-      .update({ has_completed_onboarding: true })
+      .update({
+        gender: form.gender,
+        country: form.country.trim(),
+        has_completed_onboarding: true,
+      })
       .eq('id', user.id);
-    // FIX I5: Invalidate onboarding cache so AuthWrapper doesn't re-route
     queryClient.invalidateQueries({ queryKey: ['onboarding-status', user.id] });
     navigate('/', { replace: true });
-  }, [user, navigate, queryClient]);
+  }, [user, form.gender, form.country, navigate, queryClient]);
 
   const handleSave = useCallback(async () => {
     if (step < 3) {
+      if (step === 1 && !form.gender) {
+        toast.error('Please select a gender to continue.');
+        return;
+      }
       analyticsEvents.track('onboarding_step_completed', {
         step,
         has_photo: !!(form.profilePhotoBlob || form.profilePhotoUrl),
@@ -119,6 +140,14 @@ export function PersonalProfileWizard() {
         has_display_name: !!form.displayName,
       });
       goNext();
+      return;
+    }
+    if (!form.gender) {
+      toast.error('Please select a gender to complete your profile.');
+      return;
+    }
+    if (!form.country?.trim()) {
+      toast.error('Please select a country to complete your profile.');
       return;
     }
     const ok = await save(form);
