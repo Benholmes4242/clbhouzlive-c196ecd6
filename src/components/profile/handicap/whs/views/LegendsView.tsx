@@ -5,8 +5,6 @@ import { useUserHomeClubCourses } from '@/hooks/gam/useUserHomeClubCourses';
 import { useDiscoverCoursesThisWeek, type DiscoverCourseRow } from '@/hooks/gam/useDiscoverCoursesThisWeek';
 import { useCourseSearch, type CourseSearchResult } from '@/hooks/gam/useCourseSearch';
 import { useCourseLegends } from '@/hooks/gam/useCourseLegends';
-import LegendStatusCard from '../../gam/legends/LegendStatusCard';
-import { LegendStatusSheetMount } from '../../gam/legends/LegendStatusSheetMount';
 import StreaksCard from '../../gam/streaks/StreaksCard';
 import { StreaksSheetMount } from '../../gam/streaks/StreaksSheetMount';
 import RivalriesSection from '../sections/rivalries/RivalriesSection';
@@ -663,14 +661,10 @@ export const LegendsView: React.FC<Props> = ({ userId, readOnly = false }) => {
           {/* 3. Rivalries */}
           <RivalriesSection userId={userId} />
 
-          {/* 4. Legend Status */}
-          <LegendStatusCard userId={userId} readOnly={readOnly} />
-
-          {/* 5. Course Legends — search + list + drilldown entry */}
+          {/* 4. Course Legends — search + list + drilldown entry */}
           <ListView userId={userId} onSelectCourse={(d) => setView(d)} />
 
           {/* Sheet mounts */}
-          <LegendStatusSheetMount />
           {!readOnly && <StreaksSheetMount />}
         </>
       ) : (
