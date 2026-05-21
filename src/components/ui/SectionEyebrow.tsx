@@ -13,6 +13,8 @@ interface SectionEyebrowProps {
   color?: 'slate' | 'amber' | 'danger';
   /** Optional className for layout wrapper customisation. */
   className?: string;
+  /** Render a small amber asterisk after the label to indicate required. */
+  required?: boolean;
 }
 
 const COLOR_MAP: Record<'slate' | 'amber' | 'danger', string> = {
