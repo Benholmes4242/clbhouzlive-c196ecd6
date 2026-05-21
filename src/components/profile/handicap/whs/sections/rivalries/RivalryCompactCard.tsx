@@ -232,7 +232,7 @@ export const RivalryCompactCard: React.FC<Props> = ({ rivalry, tier, onTap }) =>
               <span
                 style={{
                   fontSize: 10,
-                  color: 'var(--hcp-t-50)',
+                  color: 'var(--hcp-t-40)',
                   whiteSpace: 'nowrap',
                   overflow: 'hidden',
                   textOverflow: 'ellipsis',
