@@ -2,7 +2,7 @@ import React from 'react';
 import { initials } from '@/lib/whs/utils/initials';
 import { reformatFriendName } from '@/lib/whs/utils/nameFormat';
 import { fmtHcp } from '@/lib/whs/format';
-import type { FriendLeaderboardEntry } from '@/lib/whs/types';
+import type { FriendLeaderboardEntry, FriendLeaderboardRankDelta } from '@/lib/whs/types';
 
 interface Props {
   entry: FriendLeaderboardEntry;
@@ -10,6 +10,8 @@ interface Props {
   /** True when this friend hasn't played in 90 days. Always false for self. */
   isStaleRow: boolean;
   onClick?: () => void;
+  /** Phase 3: rank movement chip data, undefined if not loaded yet. */
+  rankDelta?: FriendLeaderboardRankDelta;
 }
 
 const T = {
@@ -66,7 +68,57 @@ const StalePill: React.FC = () => (
   </span>
 );
 
-export const LeaderboardRow: React.FC<Props> = ({ entry, rank, isStaleRow, onClick }) => {
+interface RankDeltaChipProps {
+  delta: number | null;
+  isNew: boolean;
+  isStale: boolean;
+}
+
+const RankDeltaChip: React.FC<RankDeltaChipProps> = ({ delta, isNew, isStale }) => {
+  if (isStale) {
+    return <span style={{ fontSize: 11, color: T.ink25, fontWeight: 700 }}>—</span>;
+  }
+  if (isNew) {
+    return (
+      <span
+        style={{
+          fontSize: 9,
+          fontWeight: 800,
+          color: T.amber,
+          background: T.amberSoft,
+          padding: '1px 5px',
+          borderRadius: 4,
+          letterSpacing: '0.14em',
+        }}
+      >
+        NEW
+      </span>
+    );
+  }
+  if (delta == null || delta === 0) {
+    return <span style={{ fontSize: 11, color: T.ink25, fontWeight: 700 }}>—</span>;
+  }
+  const climbed = delta > 0;
+  return (
+    <span
+      style={{
+        fontSize: 11,
+        fontWeight: 800,
+        color: climbed ? '#22C55E' : '#EF4444',
+        fontVariantNumeric: 'tabular-nums',
+        letterSpacing: '-0.01em',
+        display: 'inline-flex',
+        alignItems: 'center',
+        gap: 1,
+      }}
+    >
+      <span style={{ fontSize: 9 }}>{climbed ? '↑' : '↓'}</span>
+      {Math.abs(delta)}
+    </span>
+  );
+};
+
+export const LeaderboardRow: React.FC<Props> = ({ entry, rank, isStaleRow, onClick, rankDelta }) => {
   const isYou = entry.is_self;
   const displayName = isYou ? 'You' : reformatFriendName(entry.friend_name);
   const hcp = entry.friend_handicap_index;
@@ -227,7 +279,7 @@ export const LeaderboardRow: React.FC<Props> = ({ entry, rank, isStaleRow, onCli
         </div>
       </div>
 
-      {/* 30D slot — Phase 1 renders an em-dash placeholder; Phase 3 wires the rank-delta chip */}
+      {/* 30D slot — Phase 3 rank delta chip */}
       <div
         style={{
           width: 32,
@@ -235,14 +287,13 @@ export const LeaderboardRow: React.FC<Props> = ({ entry, rank, isStaleRow, onCli
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'flex-end',
-          fontSize: 12,
-          fontWeight: 600,
-          color: T.ink25,
-          fontVariantNumeric: 'tabular-nums',
         }}
       >
-        {/* Phase 3 will render <RankDeltaChip delta={entry.rank_delta_30d} /> here */}
-        —
+        <RankDeltaChip
+          delta={rankDelta?.rank_delta ?? null}
+          isNew={rankDelta?.is_new ?? false}
+          isStale={isStaleRow}
+        />
       </div>
 
       {/* HCP */}

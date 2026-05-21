@@ -3,8 +3,13 @@ import { ChevronDown } from 'lucide-react';
 import { DarkSectionHeader } from '../_shared/darkAtoms';
 import LeaderboardRow from './LeaderboardRow';
 import HeroPositionCard from './HeroPositionCard';
+import WeeklyBanner from './WeeklyBanner';
 import FriendProfileSheet from '../friend-profile-sheet/FriendProfileSheet';
-import { useFriendLeaderboard } from '@/lib/whs/hooks';
+import {
+  useFriendLeaderboard,
+  useFriendLeaderboardRankDeltas,
+  useFriendLeaderboardWeeklyBanner,
+} from '@/lib/whs/hooks';
 import { useHandicapPercentile } from '@/lib/whs/usePercentile';
 import { useOpenFriendHybridSheet } from '@/components/friend-hybrid-sheet/FriendHybridSheetProvider';
 import { buildLeaderboardCohorts } from '@/lib/whs/utils/buildLeaderboardCohorts';
@@ -28,9 +33,12 @@ const LABEL_STYLE: React.CSSProperties = {
 export const FriendsLeaderboardSection: React.FC<Props> = ({ userId }) => {
   const { data, isLoading } = useFriendLeaderboard(userId);
   const percentileQuery = useHandicapPercentile(userId);
+  const { data: deltasData } = useFriendLeaderboardRankDeltas(userId, 90);
+  const { data: weeklyBanner } = useFriendLeaderboardWeeklyBanner(userId);
   const { open: openHybridSheet } = useOpenFriendHybridSheet();
   const [showInactive, setShowInactive] = useState(false);
   const [profileSheet, setProfileSheet] = useState<{ index: number } | null>(null);
+  const [heroExpanded, setHeroExpanded] = useState(false);
 
   const cohorts = buildLeaderboardCohorts(data);
   const selfRow =
@@ -71,6 +79,14 @@ export const FriendsLeaderboardSection: React.FC<Props> = ({ userId }) => {
         sub={subLine}
       />
 
+      {/* THIS WEEK banner */}
+      {!isLoading && (
+        <WeeklyBanner
+          banner={weeklyBanner ?? null}
+          friends={cohorts.active.concat(cohorts.inactive)}
+        />
+      )}
+
       {/* HERO */}
       {isLoading ? (
         <div
@@ -89,6 +105,8 @@ export const FriendsLeaderboardSection: React.FC<Props> = ({ userId }) => {
           rowAbove={cohorts.rowAbove}
           selfRank={cohorts.selfActiveRank}
           totalActive={cohorts.totalActive}
+          expanded={heroExpanded}
+          onToggleExpand={() => setHeroExpanded((v) => !v)}
         />
       )}
 
@@ -102,7 +120,14 @@ export const FriendsLeaderboardSection: React.FC<Props> = ({ userId }) => {
         }}
       >
         <p style={LABEL_STYLE}>TOP 5</p>
-        <p style={{ ...LABEL_STYLE, paddingRight: 60 }}>30D</p>
+        <p style={{ ...LABEL_STYLE, paddingRight: 60 }}>
+          {(() => {
+            const w = deltasData?.actualWindow;
+            if (w == null) return '90D';
+            if (w >= 90) return '90D';
+            return `${w}D`;
+          })()}
+        </p>
       </div>
 
       {isLoading ? (
@@ -122,12 +147,16 @@ export const FriendsLeaderboardSection: React.FC<Props> = ({ userId }) => {
         cohorts.topFive.map((entry) => {
           const activeIdx = cohorts.active.findIndex((e) => e === entry);
           const rank = activeIdx >= 0 ? activeIdx + 1 : null;
+          const delta = entry.friend_row_id
+            ? deltasData?.byFriendRowId.get(entry.friend_row_id)
+            : undefined;
           return (
             <LeaderboardRow
               key={entry.is_self ? 'self' : `${entry.friend_user_id ?? ''}-${entry.friend_name}`}
               entry={entry}
               rank={rank}
               isStaleRow={false}
+              rankDelta={delta}
               onClick={entry.is_self ? undefined : () => handleRowClick(entry)}
             />
           );
@@ -172,15 +201,21 @@ export const FriendsLeaderboardSection: React.FC<Props> = ({ userId }) => {
               <div style={{ padding: '16px 20px 8px' }}>
                 <p style={LABEL_STYLE}>INACTIVE · {cohorts.totalInactive}</p>
               </div>
-              {cohorts.inactive.map((entry) => (
-                <LeaderboardRow
-                  key={`inactive-${entry.friend_user_id ?? ''}-${entry.friend_name}`}
-                  entry={entry}
-                  rank={null}
-                  isStaleRow={true}
-                  onClick={() => handleRowClick(entry)}
-                />
-              ))}
+              {cohorts.inactive.map((entry) => {
+                const delta = entry.friend_row_id
+                  ? deltasData?.byFriendRowId.get(entry.friend_row_id)
+                  : undefined;
+                return (
+                  <LeaderboardRow
+                    key={`inactive-${entry.friend_user_id ?? ''}-${entry.friend_name}`}
+                    entry={entry}
+                    rank={null}
+                    isStaleRow={true}
+                    rankDelta={delta}
+                    onClick={() => handleRowClick(entry)}
+                  />
+                );
+              })}
             </>
           ) : (
             <button

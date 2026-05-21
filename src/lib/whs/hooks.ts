@@ -384,3 +384,88 @@ export function useToggleRoundReaction() {
     },
   });
 }
+
+// ─── Phase 3: snapshot-derived leaderboard hooks ────────────────────────
+
+import type {
+  FriendLeaderboardRankDelta,
+  LeaderboardWeeklyBanner,
+  FriendRecentRound,
+} from './types';
+
+/**
+ * Per-friend rank movement vs N days ago in the caller's circle.
+ * Returns a Map keyed by friend_row_id for cheap O(1) lookup, plus the
+ * actual window used (so the column header can label dynamically).
+ *
+ * Adaptive: if there's less than `maxWindowDays` of snapshot history,
+ * the RPC falls back to the oldest available snapshot.
+ */
+export function useFriendLeaderboardRankDeltas(
+  userId: string | null | undefined,
+  maxWindowDays = 90,
+) {
+  return useQuery({
+    queryKey: ['whs_leaderboard_rank_deltas', userId, maxWindowDays],
+    enabled: !!userId,
+    staleTime: 5 * 60 * 1000,
+    queryFn: async () => {
+      const { data, error } = await (supabase.rpc as any)(
+        'get_friend_leaderboard_rank_deltas',
+        { p_max_window_days: maxWindowDays },
+      );
+      if (error) throw error;
+      const rows = (data ?? []) as FriendLeaderboardRankDelta[];
+      const byFriendRowId = new Map<string, FriendLeaderboardRankDelta>();
+      for (const r of rows) byFriendRowId.set(r.friend_row_id, r);
+      const actualWindow = rows[0]?.actual_window_days ?? null;
+      return { byFriendRowId, actualWindow };
+    },
+  });
+}
+
+/**
+ * The single most interesting weekly insight for the caller's circle.
+ * Returns null when nothing meets thresholds.
+ */
+export function useFriendLeaderboardWeeklyBanner(
+  userId: string | null | undefined,
+) {
+  return useQuery({
+    queryKey: ['whs_leaderboard_weekly_banner', userId],
+    enabled: !!userId,
+    staleTime: 60 * 60 * 1000,
+    queryFn: async () => {
+      const { data, error } = await (supabase.rpc as any)(
+        'get_friend_leaderboard_weekly_banner',
+      );
+      if (error) throw error;
+      const rows = (data ?? []) as LeaderboardWeeklyBanner[];
+      return rows[0] ?? null;
+    },
+  });
+}
+
+/**
+ * Last N rounds for a friend identified by their connection_id.
+ * Used by the expanded hero "Catch X's recent form" mini-chart.
+ */
+export function useFriendRecentRounds(
+  friendConnectionId: string | null | undefined,
+  limit = 5,
+  enabled = true,
+) {
+  return useQuery({
+    queryKey: ['whs_friend_recent_rounds', friendConnectionId, limit],
+    enabled: enabled && !!friendConnectionId,
+    staleTime: 5 * 60 * 1000,
+    queryFn: async () => {
+      const { data, error } = await (supabase.rpc as any)(
+        'get_friend_recent_rounds',
+        { p_friend_connection_id: friendConnectionId, p_limit: limit },
+      );
+      if (error) throw error;
+      return (data ?? []) as FriendRecentRound[];
+    },
+  });
+}
