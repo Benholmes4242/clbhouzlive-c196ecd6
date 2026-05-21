@@ -1,3 +1,11 @@
+import {
+  Trophy,
+  Feather,
+  MapPin,
+  Target,
+  TrendingDown,
+  type LucideIcon,
+} from 'lucide-react';
 import type { BadgeRarity, LegendCategory, StreakType } from './types';
 
 export const rarityColor: Record<BadgeRarity, string> = {
@@ -30,6 +38,20 @@ export const legendCategoryEmoji: Record<LegendCategory, string> = {
   most_rounds_90d: '📍',
   lowest_gross: '🥏',
   best_stableford_90d: '⛳',
+};
+
+/**
+ * Lucide icon component per legend category. Use this for new dark-mode
+ * surfaces (CourseLegendsCard, LegendPulseTicker). The emoji map above is
+ * retained for back-compat with LegendsView drilldown, LegendStatusCard
+ * (Today tab), and LegendStatusSheet — migrate those in a follow-up PR.
+ */
+export const legendCategoryIcon: Record<LegendCategory, LucideIcon> = {
+  best_score_diff: TrendingDown,
+  most_birdies_90d: Feather,
+  most_rounds_90d: MapPin,
+  lowest_gross: Trophy,
+  best_stableford_90d: Target,
 };
 
 export const streakLabel: Record<StreakType, string> = {
@@ -83,3 +105,21 @@ export function relativeTime(iso: string | null): string {
   return `${Math.floor(diffMo / 12)}y ago`;
 }
 
+
+const MINUS = '\u2212'; // Unicode minus sign (not ASCII hyphen)
+
+/**
+ * Format a legend value for inline display (e.g. in CourseLegendsCard
+ * holder cells). Returns the bare number; the unit is implied by the
+ * category label rendered above. Score is the only category with a sign.
+ */
+export function formatLegendValueCompact(
+  category: LegendCategory,
+  value: number,
+): string {
+  if (category === 'best_score_diff') {
+    if (value < 0) return `${MINUS}${Math.abs(value).toFixed(1)}`;
+    return `+${value.toFixed(1)}`;
+  }
+  return String(Math.round(value));
+}
