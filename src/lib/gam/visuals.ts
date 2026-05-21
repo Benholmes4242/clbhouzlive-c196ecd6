@@ -1,4 +1,4 @@
-import type { BadgeRarity, LeagueBracket, LeagueZone, LegendCategory, StreakType } from './types';
+import type { BadgeRarity, LegendCategory, StreakType } from './types';
 
 export const rarityColor: Record<BadgeRarity, string> = {
   common: 'rgba(148, 163, 184, 0.6)',
@@ -14,36 +14,6 @@ export const rarityColorSoft: Record<BadgeRarity, string> = {
   rare: 'rgba(247, 147, 30, 0.10)',
   epic: 'rgba(168, 85, 247, 0.12)',
   legendary: 'rgba(251, 188, 46, 0.14)',
-};
-
-export const bracketEmoji: Record<LeagueBracket, string> = {
-  platinum: '💎',
-  gold: '🥇',
-  silver: '🥈',
-  bronze: '🥉',
-  open: '⛳',
-};
-
-export const bracketLabel: Record<LeagueBracket, string> = {
-  platinum: 'Platinum',
-  gold: 'Gold',
-  silver: 'Silver',
-  bronze: 'Bronze',
-  open: 'Open',
-};
-
-export const bracketHcpRange: Record<LeagueBracket, string> = {
-  platinum: 'scratch to 4.9',
-  gold: '5.0 to 9.9',
-  silver: '10.0 to 18.9',
-  bronze: '19.0 to 54.0',
-  open: 'all',
-};
-
-export const zoneColor: Record<LeagueZone, string> = {
-  promotion: '#059669',
-  safe: 'rgba(255, 255, 255, 0.4)',
-  relegation: '#DC2626',
 };
 
 export const legendCategoryLabel: Record<LegendCategory, string> = {
@@ -113,10 +83,3 @@ export function relativeTime(iso: string | null): string {
   return `${Math.floor(diffMo / 12)}y ago`;
 }
 
-export function daysUntil(iso: string | null): number | null {
-  if (!iso) return null;
-  const now = new Date();
-  const target = new Date(iso);
-  const ms = target.getTime() - now.getTime();
-  return Math.ceil(ms / (1000 * 60 * 60 * 24));
-}

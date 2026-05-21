@@ -191,12 +191,10 @@ async function processSingle(whsScoreId: string) {
     earned = await applyBadges(userId, stats, whsScoreId);
     await applyStreaks(userId, stats);
     await applyCourseLegends(stats);
-    await applyLeaguePoints(userId, stats);
     await applyRivalryResults(userId, stats, whsScoreId);
   } else {
-    // Refresh course legends + league points are idempotent recomputes; safe to re-run
+    // Refresh course legends — idempotent recompute, safe to re-run
     await applyCourseLegends(stats);
-    await applyLeaguePoints(userId, stats);
   }
 
   // Mark whs_scores evaluated
@@ -754,78 +752,6 @@ async function recomputeLegend(courseId: string, cfg: LegendCfg) {
     if (badge?.counter_tiers) {
       const tier = computeTier(count ?? 0, badge.counter_tiers);
       if (tier >= 0) await upsertBadgeTiered(newTopUser, "legend_at_course", count ?? 0, tier, null);
-    }
-  }
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// apply_league_points
-// ─────────────────────────────────────────────────────────────────────────────
-async function applyLeaguePoints(userId: string, stats: any) {
-  const { data: membership } = await supabase
-    .from("gam_league_members")
-    .select("league_id, pod_id, current_rank, gam_leagues:league_id(season_start,season_end,is_active)")
-    .eq("user_id", userId)
-    .maybeSingle();
-  if (!membership || !(membership.gam_leagues as any)?.is_active) return;
-  if (!stats.is_counter) return;
-
-  const league = membership.gam_leagues as any;
-  const { data: pool } = await supabase
-    .from("gam_round_stats")
-    .select("stableford_points")
-    .eq("user_id", userId)
-    .eq("is_counter", true)
-    .gte("play_date", league.season_start)
-    .lte("play_date", league.season_end)
-    .order("stableford_points", { ascending: false })
-    .limit(8);
-
-  const newPoints = (pool ?? []).reduce((s, r) => s + (r.stableford_points ?? 0), 0);
-  const roundsCounted = (pool ?? []).length;
-  const prevRank = membership.current_rank ?? 999;
-
-  await supabase.from("gam_league_members").update({
-    current_points: newPoints,
-    rounds_counted: roundsCounted,
-    last_updated_at: new Date().toISOString(),
-  }).eq("user_id", userId).eq("league_id", membership.league_id);
-
-  // Recompute pod ranks
-  const { data: podMembers } = await supabase
-    .from("gam_league_members")
-    .select("user_id, current_points, last_updated_at, best_rank")
-    .eq("pod_id", membership.pod_id)
-    .order("current_points", { ascending: false })
-    .order("last_updated_at", { ascending: true });
-  if (podMembers) {
-    for (let i = 0; i < podMembers.length; i++) {
-      const m = podMembers[i];
-      const newRank = i + 1;
-      const bestRank = Math.min(m.best_rank ?? newRank, newRank);
-      await supabase.from("gam_league_members").update({
-        current_rank: newRank, best_rank: bestRank,
-      }).eq("user_id", m.user_id).eq("pod_id", membership.pod_id);
-    }
-  }
-
-  // Refresh standings MV (best-effort)
-  try {
-    await supabase.rpc("refresh_gam_league_standings" as any);
-  } catch (_) { /* RPC may not exist; ignore */ }
-
-  // Notify on rank change
-  const newRank = podMembers?.findIndex((m) => m.user_id === userId) ?? -1;
-  const newRankNo = newRank >= 0 ? newRank + 1 : null;
-  if (newRankNo != null) {
-    if (newRankNo < prevRank && newRankNo <= 7) {
-      await enqueueNotification(userId, "league_climbed", {
-        from: prevRank, to: newRankNo, pod_id: membership.pod_id,
-      });
-    } else if (newRankNo > prevRank && newRankNo > 25) {
-      await enqueueNotification(userId, "league_dropped", {
-        from: prevRank, to: newRankNo, pod_id: membership.pod_id,
-      });
     }
   }
 }

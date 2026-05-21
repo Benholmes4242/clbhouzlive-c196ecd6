@@ -1,5 +1,5 @@
 import React from 'react';
-import { ArrowRight, Flame, Trophy, Medal, Swords } from 'lucide-react';
+import { ArrowRight, Flame, Trophy, Swords } from 'lucide-react';
 import GamSheet from '../_shared/GamSheet';
 import FeatureCard from './_internal/FeatureCard';
 import PersonalizationSection from './_internal/PersonalizationSection';
@@ -87,7 +87,7 @@ export const LaunchSheet: React.FC<LaunchSheetProps> = ({ open, payload, onDismi
           }}
         >
           We've built a gamification layer that turns your golf history into a journey. Streaks,
-          achievements, rivalries, and seasonal leagues — all powered by your handicap data.
+          achievements, and rivalries — all powered by your handicap data.
         </p>
 
         {/* Divider */}
@@ -110,11 +110,6 @@ export const LaunchSheet: React.FC<LaunchSheetProps> = ({ open, payload, onDismi
             icon={Trophy}
             title="Achievements"
             description="31 badges to earn across six categories"
-          />
-          <FeatureCard
-            icon={Medal}
-            title="Leagues"
-            description="Seasonal pods of 10 players competing weekly"
           />
           <FeatureCard
             icon={Swords}

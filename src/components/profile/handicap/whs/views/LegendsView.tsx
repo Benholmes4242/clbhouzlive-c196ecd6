@@ -9,8 +9,6 @@ import LegendStatusCard from '../../gam/legends/LegendStatusCard';
 import { LegendStatusSheetMount } from '../../gam/legends/LegendStatusSheetMount';
 import StreaksCard from '../../gam/streaks/StreaksCard';
 import { StreaksSheetMount } from '../../gam/streaks/StreaksSheetMount';
-import LeaguesCard from '../../gam/leagues/LeaguesCard';
-import { LeaguesSheetMount } from '../../gam/leagues/LeaguesSheetMount';
 import RivalriesSection from '../sections/rivalries/RivalriesSection';
 import FriendsLeaderboardSection from '../sections/friends-leaderboard-v2/FriendsLeaderboardSection';
 import { GamCard, Skeleton, EmptyStub, RetryStub } from '../../gam/_shared/GamAtoms';
@@ -665,19 +663,15 @@ export const LegendsView: React.FC<Props> = ({ userId, readOnly = false }) => {
           {/* 3. Rivalries */}
           <RivalriesSection userId={userId} />
 
-          {/* 4. Leagues — owner only */}
-          {!readOnly && <LeaguesCard userId={userId} isOwner={!readOnly} />}
-
-          {/* 5. Legend Status */}
+          {/* 4. Legend Status */}
           <LegendStatusCard userId={userId} readOnly={readOnly} />
 
-          {/* 6. Course Legends — search + list + drilldown entry */}
+          {/* 5. Course Legends — search + list + drilldown entry */}
           <ListView userId={userId} onSelectCourse={(d) => setView(d)} />
 
           {/* Sheet mounts */}
           <LegendStatusSheetMount />
           {!readOnly && <StreaksSheetMount />}
-          <LeaguesSheetMount />
         </>
       ) : (
         <DrilldownView state={view} onBack={() => setView({ mode: 'list' })} />
