@@ -79,6 +79,14 @@ export const FriendsLeaderboardSection: React.FC<Props> = ({ userId }) => {
         sub={subLine}
       />
 
+      {/* THIS WEEK banner */}
+      {!isLoading && (
+        <WeeklyBanner
+          banner={weeklyBanner ?? null}
+          friends={cohorts.active.concat(cohorts.inactive)}
+        />
+      )}
+
       {/* HERO */}
       {isLoading ? (
         <div
@@ -97,6 +105,8 @@ export const FriendsLeaderboardSection: React.FC<Props> = ({ userId }) => {
           rowAbove={cohorts.rowAbove}
           selfRank={cohorts.selfActiveRank}
           totalActive={cohorts.totalActive}
+          expanded={heroExpanded}
+          onToggleExpand={() => setHeroExpanded((v) => !v)}
         />
       )}
 
@@ -110,7 +120,14 @@ export const FriendsLeaderboardSection: React.FC<Props> = ({ userId }) => {
         }}
       >
         <p style={LABEL_STYLE}>TOP 5</p>
-        <p style={{ ...LABEL_STYLE, paddingRight: 60 }}>30D</p>
+        <p style={{ ...LABEL_STYLE, paddingRight: 60 }}>
+          {(() => {
+            const w = deltasData?.actualWindow;
+            if (w == null) return '90D';
+            if (w >= 90) return '90D';
+            return `${w}D`;
+          })()}
+        </p>
       </div>
 
       {isLoading ? (
@@ -130,12 +147,16 @@ export const FriendsLeaderboardSection: React.FC<Props> = ({ userId }) => {
         cohorts.topFive.map((entry) => {
           const activeIdx = cohorts.active.findIndex((e) => e === entry);
           const rank = activeIdx >= 0 ? activeIdx + 1 : null;
+          const delta = entry.friend_row_id
+            ? deltasData?.byFriendRowId.get(entry.friend_row_id)
+            : undefined;
           return (
             <LeaderboardRow
               key={entry.is_self ? 'self' : `${entry.friend_user_id ?? ''}-${entry.friend_name}`}
               entry={entry}
               rank={rank}
               isStaleRow={false}
+              rankDelta={delta}
               onClick={entry.is_self ? undefined : () => handleRowClick(entry)}
             />
           );
