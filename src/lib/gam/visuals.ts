@@ -1,3 +1,11 @@
+import {
+  Trophy,
+  Feather,
+  MapPin,
+  Target,
+  TrendingDown,
+  type LucideIcon,
+} from 'lucide-react';
 import type { BadgeRarity, LegendCategory, StreakType } from './types';
 
 export const rarityColor: Record<BadgeRarity, string> = {
