@@ -1,6 +1,5 @@
 import React from 'react';
 import YourCircleSection from '../sections/your-circle/YourCircleSection';
-import FriendsEchoSection from '../sections/friends/FriendsEchoSection';
 import RecentlyPlayedFeed from '../sections/recently-played/RecentlyPlayedFeed';
 import InviteToClbhouzV2 from '../sections/invite-to-clbhouz/InviteToClbhouzV2';
 import MorningMoment from '@/components/handicap/MorningMoment';
@@ -31,13 +30,10 @@ export const FriendsView: React.FC<Props> = ({
       {/* 2. Your Circle — leaderboard header + recently active rail */}
       <YourCircleSection userId={userId} />
 
-      {/* 3. Echo on Your Circle — owner only */}
-      {!readOnly && <FriendsEchoSection connectionId={connectionId} />}
-
-      {/* 4. Friends' Rounds */}
+      {/* 3. Friends' Rounds */}
       <RecentlyPlayedFeed ownerUserId={userId} />
 
-      {/* 5. Make Your Feed Louder — owner only */}
+      {/* 4. Make Your Feed Louder — owner only */}
       {!readOnly && <InviteToClbhouzV2 ownerUserId={userId} />}
     </div>
   );

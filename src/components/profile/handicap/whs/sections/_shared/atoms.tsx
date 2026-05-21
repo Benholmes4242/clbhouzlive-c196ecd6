@@ -1,5 +1,4 @@
 import React from 'react';
-import { Sparkles } from 'lucide-react';
 
 const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
 const INK = '#0F172A';
@@ -153,77 +152,3 @@ export const InlineCardHeader: React.FC<InlineCardHeaderProps> = ({
   </div>
 );
 
-/**
- * Echo callout — the AI voice. ONE treatment everywhere.
- * Cream background + 2px amber gradient rail at top + sparkle icon square
- * + ECHO ON {CONTEXT} eyebrow + body paragraph.
- */
-export interface EchoCalloutProps {
-  context: string;
-  body: React.ReactNode;
-  marginBottom?: number;
-}
-
-export const EchoCallout: React.FC<EchoCalloutProps> = ({
-  context,
-  body,
-  marginBottom = 0,
-}) => (
-  <div
-    style={{
-      position: 'relative',
-      background:
-        'linear-gradient(180deg, rgba(247,147,30,0.10) 0%, transparent 60%), var(--hcp-bg-1)',
-      border: '1px solid var(--hcp-line-2)',
-      borderRadius: 14,
-      padding: '16px 14px 14px 14px',
-      marginBottom,
-      fontFamily: FONT,
-      overflow: 'hidden',
-    }}
-  >
-    <div style={{ display: 'flex', gap: 12, alignItems: 'flex-start' }}>
-      <div
-        style={{
-          width: 32,
-          height: 32,
-          borderRadius: 10,
-          background: 'linear-gradient(135deg, #F59E0B 0%, #FBBF24 100%)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          flexShrink: 0,
-        }}
-      >
-        <Sparkles size={16} color="#fff" strokeWidth={2.25} />
-      </div>
-      <div style={{ flex: 1, minWidth: 0 }}>
-        <div
-          style={{
-            fontSize: 10,
-            fontWeight: 800,
-            color: 'var(--hcp-amber)',
-            letterSpacing: '0.16em',
-            textTransform: 'uppercase',
-            marginBottom: 6,
-            fontFamily: FONT,
-          }}
-        >
-          ECHO ON {context}
-        </div>
-        <div
-          style={{
-            margin: 0,
-            fontSize: 14,
-            lineHeight: 1.5,
-            color: 'var(--hcp-t-100)',
-            fontFamily: FONT,
-            fontVariantNumeric: 'tabular-nums',
-          }}
-        >
-          {body}
-        </div>
-      </div>
-    </div>
-  </div>
-);
