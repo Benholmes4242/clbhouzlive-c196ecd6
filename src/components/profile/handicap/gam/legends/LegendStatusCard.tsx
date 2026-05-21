@@ -1,5 +1,4 @@
 import React from 'react';
-import { ChevronRight } from 'lucide-react';
 import { useUserLegendStatus } from '@/hooks/gam/useUserLegendStatus';
 import { useUserTopLegends, type TopLegendRow } from '@/hooks/gam/useUserTopLegends';
 import { GamCard, Skeleton, RetryStub } from '../_shared/GamAtoms';
@@ -53,7 +52,7 @@ const TitlePill: React.FC<{ category: LegendCategory; courseName: string; rank: 
 }) => {
   const colors = RANK_COLORS[(rank as 1 | 2 | 3)] ?? RANK_COLORS[3];
   const truncatedCourse =
-    courseName.length > 20 ? courseName.slice(0, 19) + '…' : courseName;
+    courseName.length > 14 ? courseName.slice(0, 13) + '…' : courseName;
   return (
     <span
       style={{
@@ -72,6 +71,7 @@ const TitlePill: React.FC<{ category: LegendCategory; courseName: string; rank: 
         borderRadius: 999,
         whiteSpace: 'nowrap',
         lineHeight: 1.2,
+        flexShrink: 0,
       }}
     >
       <span style={{ fontSize: 13, lineHeight: 1, textTransform: 'none' }}>
@@ -85,6 +85,40 @@ const TitlePill: React.FC<{ category: LegendCategory; courseName: string; rank: 
     </span>
   );
 };
+
+const StatCell: React.FC<{ label: string; value: number; gold?: boolean }> = ({
+  label,
+  value,
+  gold,
+}) => (
+  <div style={{ textAlign: 'center' }}>
+    <div
+      style={{
+        fontFamily: FONT,
+        fontSize: 9,
+        fontWeight: 800,
+        letterSpacing: '0.14em',
+        color: 'var(--hcp-t-40)',
+        textTransform: 'uppercase',
+        marginBottom: 3,
+      }}
+    >
+      {label}
+    </div>
+    <div
+      style={{
+        fontFamily: FONT,
+        fontSize: 18,
+        fontWeight: 800,
+        color: gold ? '#FBBC2E' : 'var(--hcp-t-100)',
+        fontVariantNumeric: 'tabular-nums',
+        letterSpacing: '-0.02em',
+      }}
+    >
+      {value}
+    </div>
+  </div>
+);
 
 function pluralCourses(n: number): string {
   return n === 1 ? '1 course' : `${n} courses`;
@@ -111,7 +145,7 @@ export const LegendStatusCard: React.FC<LegendStatusCardProps> = ({
   friendName,
 }) => {
   const { data, isLoading, isError, refetch } = useUserLegendStatus(userId);
-  const { data: topLegends } = useUserTopLegends(userId, { limit: 3, maxRank: 3 });
+  const { data: topLegends } = useUserTopLegends(userId, { limit: 6, maxRank: 3 });
 
   function handleCardTap() {
     window.dispatchEvent(
@@ -137,7 +171,7 @@ export const LegendStatusCard: React.FC<LegendStatusCardProps> = ({
       <>
         <Eyebrow />
         <div style={{ padding: '0 16px' }}>
-          <Skeleton height={110} radius={12} />
+          <Skeleton height={210} radius={12} />
         </div>
       </>
     );
@@ -147,25 +181,26 @@ export const LegendStatusCard: React.FC<LegendStatusCardProps> = ({
   if (!row) return null;
 
   const titles = Number(row.legend_titles ?? 0);
+  const podiums = Number(row.podium_positions ?? 0);
   const top10 = Number(row.top_10_positions ?? 0);
 
   // Fully empty — hide entire section
   if (top10 === 0) return null;
 
   const isOwnView = !readOnly;
-  const subjectName = isOwnView ? "You're" : `${friendName ?? 'They'} is`;
-  const subjectNameForEmpty = isOwnView ? "You haven't" : `${friendName ?? 'They'} hasn't`;
+  const subjectPossessive = isOwnView ? "you're" : `${friendName ?? 'they'} is`;
+  const subjectNegative = isOwnView ? "You haven't" : `${friendName ?? 'They'} hasn't`;
 
   let headline: string;
   let caption: string;
   let pills: TopLegendRow[] = [];
 
   if (titles > 0) {
-    headline = `${subjectName} Legend at ${pluralCourses(titles)}`;
+    headline = `Courses where ${subjectPossessive} legend`;
     caption = captionForTitles(row);
-    pills = (topLegends ?? []).slice(0, 3);
+    pills = (topLegends ?? []).slice(0, 6);
   } else {
-    headline = `${subjectNameForEmpty} claimed a title yet`;
+    headline = `${subjectNegative} claimed a title yet`;
     caption =
       row.best_course_name && row.best_rank
         ? `Closest: Top ${row.best_rank} at ${row.best_course_name}`
@@ -185,60 +220,150 @@ export const LegendStatusCard: React.FC<LegendStatusCardProps> = ({
     }
   }
 
+  const heroNumber = titles > 0 ? titles : top10;
+  const allRank1 = pills.length > 0 && pills.every((p) => p.rank === 1);
+  const pillRailLabel = allRank1 ? 'RECENT TITLES' : 'TOP POSITIONS';
+
   return (
     <>
       <Eyebrow />
       <div style={{ padding: '0 16px' }}>
-        <GamCard onClick={handleCardTap}>
+        <GamCard
+          onClick={handleCardTap}
+          style={{
+            background:
+              'linear-gradient(135deg, var(--hcp-bg-1) 0%, var(--hcp-bg-2) 60%, rgba(251,188,46,0.06) 100%)',
+            border: '1px solid rgba(247,147,30,0.22)',
+            position: 'relative',
+            overflow: 'hidden',
+            padding: '20px 18px 18px',
+          }}
+        >
+          {/* Watermark */}
+          <div
+            aria-hidden
+            style={{
+              position: 'absolute',
+              right: -10,
+              top: -10,
+              fontSize: 100,
+              opacity: 0.04,
+              transform: 'rotate(15deg)',
+              pointerEvents: 'none',
+              lineHeight: 0,
+            }}
+          >
+            👑
+          </div>
+
+          {/* Hero row */}
           <div
             style={{
-              display: 'flex',
-              alignItems: 'flex-start',
-              justifyContent: 'space-between',
-              gap: 12,
-              marginBottom: caption ? 4 : 0,
+              display: 'grid',
+              gridTemplateColumns: 'auto 1fr',
+              gap: 18,
+              alignItems: 'end',
+              marginBottom: 16,
+              position: 'relative',
+              zIndex: 1,
             }}
           >
             <div
               style={{
                 fontFamily: FONT,
-                fontSize: 16,
-                fontWeight: 700,
-                color: 'var(--hcp-t-100)',
-                lineHeight: 1.3,
-                flex: 1,
+                fontSize: 56,
+                fontWeight: 800,
+                letterSpacing: '-0.05em',
+                lineHeight: 0.9,
+                color: '#FBBC2E',
+                fontVariantNumeric: 'tabular-nums',
+                textShadow: '0 0 24px rgba(251,188,46,0.20)',
               }}
             >
-              {headline}
+              {heroNumber}
             </div>
-            <ChevronRight
-              size={20}
-              color="var(--hcp-t-60)"
-              style={{ flexShrink: 0, marginTop: 2 }}
-            />
+            <div style={{ paddingBottom: 6 }}>
+              <div
+                style={{
+                  fontFamily: FONT,
+                  fontSize: 15,
+                  fontWeight: 700,
+                  color: 'var(--hcp-t-100)',
+                  letterSpacing: '-0.01em',
+                  lineHeight: 1.25,
+                }}
+              >
+                {headline}
+              </div>
+              {caption && (
+                <div
+                  style={{
+                    fontFamily: FONT,
+                    fontSize: 11,
+                    color: 'var(--hcp-t-60)',
+                    marginTop: 2,
+                    lineHeight: 1.4,
+                  }}
+                >
+                  {caption}
+                </div>
+              )}
+            </div>
           </div>
-          {caption && (
-            <div
-              style={{
-                fontFamily: FONT,
-                fontSize: 13,
-                color: 'var(--hcp-t-60)',
-                lineHeight: 1.4,
-              }}
-            >
-              {caption}
-            </div>
-          )}
+
+          {/* Stat strip */}
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: '1fr 1fr 1fr',
+              gap: 0,
+              borderTop: '1px solid rgba(255,255,255,0.08)',
+              borderBottom: '1px solid rgba(255,255,255,0.08)',
+              padding: '10px 0',
+              marginBottom: 14,
+              position: 'relative',
+              zIndex: 1,
+            }}
+          >
+            <StatCell label="★ TITLES" value={titles} gold />
+            <StatCell label="PODIUMS" value={podiums} />
+            <StatCell label="TOP 10" value={top10} />
+          </div>
+
+          {/* Pill rail */}
           {pills.length > 0 && (
-            <div style={{ marginTop: 14, display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-              {pills.map((p) => (
-                <TitlePill
-                  key={p.id}
-                  category={p.category}
-                  courseName={p.course_name}
-                  rank={p.rank}
-                />
-              ))}
+            <div style={{ position: 'relative', zIndex: 1 }}>
+              <div
+                style={{
+                  fontFamily: FONT,
+                  fontSize: 9,
+                  fontWeight: 800,
+                  letterSpacing: '0.14em',
+                  color: 'var(--hcp-t-40)',
+                  textTransform: 'uppercase',
+                  marginBottom: 8,
+                }}
+              >
+                {pillRailLabel}
+              </div>
+              <div
+                style={{
+                  display: 'flex',
+                  gap: 6,
+                  overflowX: 'auto',
+                  scrollbarWidth: 'none',
+                  WebkitOverflowScrolling: 'touch',
+                }}
+              >
+                {pills.map((p) => (
+                  <TitlePill
+                    key={p.id}
+                    category={p.category}
+                    courseName={p.course_name}
+                    rank={p.rank}
+                  />
+                ))}
+              </div>
             </div>
           )}
         </GamCard>
