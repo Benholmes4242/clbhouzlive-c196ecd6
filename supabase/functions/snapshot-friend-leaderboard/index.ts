@@ -162,7 +162,7 @@ Deno.serve(async (req) => {
     cutoff.setDate(cutoff.getDate() - RETENTION_DAYS);
     const cutoffStr = cutoff.toISOString().slice(0, 10);
     const { error: deleteErr, count } = await supabase
-      .from('whs_leaderboard_rank_snapshot')
+      .from('whs_friend_leaderboard_snapshots')
       .delete({ count: 'exact' })
       .lt('snapshot_date', cutoffStr);
     if (deleteErr) {
