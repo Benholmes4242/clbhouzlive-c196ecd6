@@ -19147,6 +19147,24 @@ export type Database = {
           rounds_last_30d: number
         }[]
       }
+      get_friend_leaderboard_rank_deltas: {
+        Args: { p_max_window_days?: number }
+        Returns: {
+          actual_window_days: number
+          friend_row_id: string
+          is_new: boolean
+          rank_delta: number
+        }[]
+      }
+      get_friend_leaderboard_weekly_banner: {
+        Args: never
+        Returns: {
+          banner_type: string
+          friend_row_id: string
+          metric_label: string
+          metric_value: number
+        }[]
+      }
       get_friend_played_recommendations: {
         Args: { p_limit?: number; p_user_id: string }
         Returns: {
