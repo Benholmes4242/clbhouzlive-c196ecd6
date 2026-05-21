@@ -309,7 +309,7 @@ export const RivalryHeroCard: React.FC<Props> = ({
             borderTop: '1px solid rgba(255,255,255,0.08)',
             borderBottom: '1px solid rgba(255,255,255,0.08)',
             fontSize: 11,
-            color: 'var(--hcp-t-70)',
+            color: 'var(--hcp-t-60)',
             display: 'flex',
             alignItems: 'center',
             gap: 6,
