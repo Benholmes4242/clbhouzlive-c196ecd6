@@ -75,25 +75,8 @@ export const InviteToClbhouzV2: React.FC<Props> = ({ ownerUserId }) => {
     [friends],
   );
 
-  const dominantHomeClub = useMemo<string | null>(() => {
-    if (!invitable || invitable.length < 3) return null;
-    const counts = new Map<string, number>();
-    for (const f of invitable) {
-      if (!f.friend_home_club) continue;
-      counts.set(f.friend_home_club, (counts.get(f.friend_home_club) ?? 0) + 1);
-    }
-    let topClub: string | null = null;
-    let topCount = 0;
-    for (const [club, count] of counts) {
-      if (count > topCount) {
-        topCount = count;
-        topClub = club;
-      }
-    }
-    return topCount >= 3 ? topClub : null;
-  }, [invitable]);
-
   const sentCount = invites?.length ?? 0;
+
 
   // Empty / no-invitable state
   if (!friendsLoading && invitable.length === 0) {
