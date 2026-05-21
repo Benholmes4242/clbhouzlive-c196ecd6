@@ -321,7 +321,7 @@ export const RivalryHeroCard: React.FC<Props> = ({
             <>
               <span>
                 Strongest at{' '}
-                <strong style={{ color: 'var(--hcp-bg-1)' }}>
+                <strong style={{ color: '#FFFFFF' }}>
                   {tale.strongestCourse.name} ({tale.strongestCourse.wins}-
                   {tale.strongestCourse.losses})
                 </strong>
