@@ -1,5 +1,5 @@
 import React from 'react';
-import { initials } from '@/lib/whs/utils/initials';
+import { firstName, initials } from '@/lib/whs/utils/initials';
 import { reformatFriendName } from '@/lib/whs/utils/nameFormat';
 import { fmtHcp } from '@/lib/whs/format';
 import { useHandicapPercentile } from '@/lib/whs/usePercentile';
@@ -32,10 +32,6 @@ const T = {
 };
 const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
 
-function firstName(name: string | null | undefined): string {
-  const formatted = reformatFriendName(name);
-  return formatted.split(' ')[0] || formatted;
-}
 
 export const HeroPositionCard: React.FC<Props> = ({
   selfRow,
@@ -73,42 +69,67 @@ export const HeroPositionCard: React.FC<Props> = ({
   return (
     <div
       style={{
+        position: 'relative',
+        overflow: 'hidden',
         margin: '0 20px 16px',
         padding: 16,
-        background: T.bg2,
+        background: T.bg1,
         border: `1px solid ${T.line2}`,
         borderRadius: 16,
         fontFamily: FONT,
       }}
     >
+      {/* Radial amber backdrop — the "this is YOU" glow */}
+      <div
+        style={{
+          position: 'absolute',
+          top: '-40%',
+          right: '-20%',
+          width: 260,
+          height: 260,
+          background: `radial-gradient(circle, rgba(247,147,30,0.18) 0%, transparent 70%)`,
+          pointerEvents: 'none',
+        }}
+      />
       {/* Top: avatar + position + percentile + hcp + club */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+      <div style={{ position: 'relative', display: 'flex', alignItems: 'center', gap: 14 }}>
         <div
           style={{
-            width: 56,
-            height: 56,
-            borderRadius: '34%',
-            overflow: 'hidden',
-            background: T.bg3,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            color: T.inkSoft,
             flexShrink: 0,
-            fontSize: 18,
-            fontWeight: 800,
-            letterSpacing: '-0.01em',
+            width: 68,
+            height: 68,
+            borderRadius: '34%',
+            padding: 3,
+            background: `linear-gradient(135deg, ${T.amber}, rgba(247,147,30,0.66))`,
+            boxShadow: `0 0 14px ${T.amber}55`,
           }}
         >
-          {selfRow.friend_thumbnail_url ? (
-            <img
-              src={selfRow.friend_thumbnail_url}
-              alt=""
-              style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-            />
-          ) : (
-            <span>{initials(selfRow.friend_name)}</span>
-          )}
+          <div
+            style={{
+              width: 62,
+              height: 62,
+              borderRadius: '34%',
+              overflow: 'hidden',
+              background: T.bg3,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              color: T.inkSoft,
+              fontSize: 20,
+              fontWeight: 800,
+              letterSpacing: '-0.01em',
+            }}
+          >
+            {selfRow.friend_thumbnail_url ? (
+              <img
+                src={selfRow.friend_thumbnail_url}
+                alt=""
+                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+              />
+            ) : (
+              <span>{initials(selfRow.friend_name)}</span>
+            )}
+          </div>
         </div>
 
         <div style={{ minWidth: 0, flex: 1 }}>
@@ -222,9 +243,8 @@ export const HeroPositionCard: React.FC<Props> = ({
             display: 'flex',
             alignItems: 'center',
             gap: 10,
-            background: T.bg1,
-            border: `1px solid ${T.line2}`,
-            borderRadius: 12,
+            background: T.bg2,
+            borderRadius: 10,
           }}
         >
           <div
@@ -254,14 +274,14 @@ export const HeroPositionCard: React.FC<Props> = ({
             )}
           </div>
 
-          <div style={{ flex: 1, minWidth: 0 }}>
+          <div style={{ flex: 1, minWidth: 1 }}>
             <p
               style={{
-                margin: 0,
-                fontSize: 9,
+                margin: 1,
+                fontSize: 11,
                 fontWeight: 800,
-                letterSpacing: '0.16em',
-                color: T.inkFaded,
+                letterSpacing: '0.08em',
+                color: T.inkMute,
                 textTransform: 'uppercase',
               }}
             >
@@ -278,8 +298,7 @@ export const HeroPositionCard: React.FC<Props> = ({
                 textOverflow: 'ellipsis',
               }}
             >
-              {reformatFriendName(rowAbove.friend_name)} · #
-              {(selfRank ?? 1) - 1} · {fmtHcp(aboveHcp)}
+              {reformatFriendName(rowAbove.friend_name)} · #{(selfRank ?? 1) - 1}
             </p>
           </div>
 
@@ -308,11 +327,11 @@ export const HeroPositionCard: React.FC<Props> = ({
               <p
                 style={{
                   margin: 0,
-                  fontSize: 16,
+                  fontSize: 22,
                   fontWeight: 800,
                   color: T.green,
                   fontVariantNumeric: 'tabular-nums',
-                  letterSpacing: '-0.01em',
+                  letterSpacing: '-0.02em',
                   textShadow:
                     '0 0 6px rgba(34,197,94,0.40), 0 0 2px rgba(34,197,94,0.25)',
                   lineHeight: 1,
@@ -323,9 +342,9 @@ export const HeroPositionCard: React.FC<Props> = ({
               <p
                 style={{
                   margin: '2px 0 0',
-                  fontSize: 8,
+                  fontSize: 9,
                   fontWeight: 800,
-                  letterSpacing: '0.16em',
+                  letterSpacing: '1.44px',
                   color: T.inkFaded,
                 }}
               >

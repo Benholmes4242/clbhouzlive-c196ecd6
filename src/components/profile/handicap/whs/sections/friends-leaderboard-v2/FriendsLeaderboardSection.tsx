@@ -16,12 +16,6 @@ interface Props {
 
 const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
 
-const STALE_THRESHOLD_DAYS = 90;
-const isStale = (lastPlayed: string | null): boolean => {
-  if (!lastPlayed) return true;
-  const days = (Date.now() - new Date(lastPlayed).getTime()) / (1000 * 60 * 60 * 24);
-  return days > STALE_THRESHOLD_DAYS;
-};
 
 const LABEL_STYLE: React.CSSProperties = {
   margin: 0,
@@ -183,7 +177,7 @@ export const FriendsLeaderboardSection: React.FC<Props> = ({ userId }) => {
                   key={`inactive-${entry.friend_user_id ?? ''}-${entry.friend_name}`}
                   entry={entry}
                   rank={null}
-                  isStaleRow={!entry.is_self && isStale(entry.last_round_played_at)}
+                  isStaleRow={true}
                   onClick={() => handleRowClick(entry)}
                 />
               ))}
