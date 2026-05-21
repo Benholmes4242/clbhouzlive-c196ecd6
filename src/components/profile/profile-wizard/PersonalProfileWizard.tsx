@@ -2,7 +2,8 @@ import { useState, useCallback, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { ProfileSkeleton } from '@/components/skeletons/ProfileSkeleton';
 import { AnimatePresence, motion } from 'framer-motion';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
+import { toast } from 'sonner';
 import { useQueryClient } from '@tanstack/react-query';
 import { useProfileData } from '@/hooks/useProfileData';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
@@ -48,8 +49,16 @@ export function PersonalProfileWizard() {
   const queryClient = useQueryClient();
   const { user } = useSupabaseSession();
   const { profile, loading } = useProfileData();
+  const [searchParams] = useSearchParams();
 
-  const [step, setStep] = useState<WizardStep>(1);
+  const initialStep: WizardStep = (() => {
+    const focus = searchParams.get('focus');
+    if (focus === 'gender') return 1;
+    if (focus === 'country') return 3;
+    return 1;
+  })();
+
+  const [step, setStep] = useState<WizardStep>(initialStep);
   const [direction, setDirection] = useState<WizardDirection>('forward');
   const [showDiscard, setShowDiscard] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
@@ -89,20 +98,41 @@ export function PersonalProfileWizard() {
     }
   }, [isDirty, navigate]);
 
-  // Fix 3: Skip button handler
+  // Fix 3: Skip button handler — still enforces gender + country
   const handleSkip = useCallback(async () => {
     if (!user?.id) return;
+
+    if (!form.gender) {
+      toast.error('Please select a gender before continuing.');
+      setDirection('back');
+      setStep(1);
+      return;
+    }
+    if (!form.country?.trim()) {
+      toast.error('Please select a country before continuing.');
+      setDirection('forward');
+      setStep(3);
+      return;
+    }
+
     await supabase
       .from('user_profiles')
-      .update({ has_completed_onboarding: true })
+      .update({
+        gender: form.gender,
+        country: form.country.trim(),
+        has_completed_onboarding: true,
+      })
       .eq('id', user.id);
-    // FIX I5: Invalidate onboarding cache so AuthWrapper doesn't re-route
     queryClient.invalidateQueries({ queryKey: ['onboarding-status', user.id] });
     navigate('/', { replace: true });
-  }, [user, navigate, queryClient]);
+  }, [user, form.gender, form.country, navigate, queryClient]);
 
   const handleSave = useCallback(async () => {
     if (step < 3) {
+      if (step === 1 && !form.gender) {
+        toast.error('Please select a gender to continue.');
+        return;
+      }
       analyticsEvents.track('onboarding_step_completed', {
         step,
         has_photo: !!(form.profilePhotoBlob || form.profilePhotoUrl),
@@ -110,6 +140,14 @@ export function PersonalProfileWizard() {
         has_display_name: !!form.displayName,
       });
       goNext();
+      return;
+    }
+    if (!form.gender) {
+      toast.error('Please select a gender to complete your profile.');
+      return;
+    }
+    if (!form.country?.trim()) {
+      toast.error('Please select a country to complete your profile.');
       return;
     }
     const ok = await save(form);

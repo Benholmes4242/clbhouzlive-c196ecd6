@@ -249,7 +249,7 @@ export function LocationSection({ country, city, onCountryChange, onCityChange }
   return (
     <div className="space-y-3">
       <div style={{ marginBottom: 8 }}>
-        <SectionEyebrow label="Location" />
+        <SectionEyebrow label="Location" required />
       </div>
       {/* Country first */}
       <CountryPicker value={country} onChange={handleCountryChange} />

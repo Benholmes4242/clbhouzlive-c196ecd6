@@ -5,6 +5,8 @@ import { X } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { useEditProfileRoute } from '@/hooks/useEditProfileRoute';
 
+const ESSENTIALS_DISMISS_KEY = 'profile_essentials_nudge_dismissed_until';
+
 export function ProfileCompleteNudge() {
   const navigate = useNavigate();
   const editRoute = useEditProfileRoute();
@@ -12,7 +14,7 @@ export function ProfileCompleteNudge() {
   const { profile } = useProfileData();
   const [dismissed, setDismissed] = useState(false);
 
-  // Only show for first 7 days after signup
+  // Only show 7-day completion nudge for first 7 days after signup
   const isRecent = profile?.created_at
     ? (Date.now() - new Date(profile.created_at).getTime()) < 7 * 24 * 60 * 60 * 1000
     : false;
@@ -22,27 +24,60 @@ export function ProfileCompleteNudge() {
   const hasBio = !!(profile as any)?.bio;
   const isComplete = hasPhoto && hasHomeClub;
 
-  // Persist dismissal in sessionStorage so it doesn't reappear mid-session
+  const genderRaw = (profile as any)?.gender as string | undefined;
+  const countryRaw = (profile as any)?.country as string | undefined;
+  const hasGender = !!genderRaw && genderRaw !== 'prefer_not_to_say';
+  const hasCountry = !!countryRaw?.trim();
+  const missingEssentials = !!profile && (!hasGender || !hasCountry);
+
+  // Essentials nudge shows anytime; completion nudge stays gated to first week
+  const shouldShow = missingEssentials || (isRecent && !isComplete);
+
+  // Persist dismissal — essentials: 24h localStorage; completion: session only
   useEffect(() => {
-    if (sessionStorage.getItem('profile_nudge_dismissed')) {
+    if (missingEssentials) {
+      const until = localStorage.getItem(ESSENTIALS_DISMISS_KEY);
+      if (until && parseInt(until, 10) > Date.now()) {
+        setDismissed(true);
+        return;
+      }
+    }
+    if (!missingEssentials && sessionStorage.getItem('profile_nudge_dismissed')) {
       setDismissed(true);
     }
-  }, []);
+  }, [missingEssentials]);
 
   const handleDismiss = () => {
-    sessionStorage.setItem('profile_nudge_dismissed', '1');
+    if (missingEssentials) {
+      localStorage.setItem(
+        ESSENTIALS_DISMISS_KEY,
+        String(Date.now() + 24 * 60 * 60 * 1000),
+      );
+    } else {
+      sessionStorage.setItem('profile_nudge_dismissed', '1');
+    }
     setDismissed(true);
   };
 
-  if (!user || !isRecent || isComplete || dismissed || !profile) return null;
+  if (!user || dismissed || !profile || !shouldShow) return null;
 
   const pct = Math.round(
     (hasPhoto ? 40 : 0) + (hasHomeClub ? 35 : 0) + (hasBio ? 25 : 0)
   );
 
-  const message = !hasPhoto
-    ? 'Add a profile photo — golfers with a photo get 3× more connections'
-    : 'Add your home club to appear on leaderboards';
+  const message = !hasGender
+    ? 'Help us match you to similar golfers — set your gender'
+    : !hasCountry
+      ? 'Set your country so we can show how you compare locally'
+      : !hasPhoto
+        ? 'Add a profile photo — golfers with a photo get 3× more connections'
+        : 'Add your home club to appear on leaderboards';
+
+  const handleAction = () => {
+    if (!hasGender) navigate(`${editRoute}?focus=gender`);
+    else if (!hasCountry) navigate(`${editRoute}?focus=country`);
+    else navigate(editRoute);
+  };
 
   // SVG progress ring calculations
   const radius = 16;
@@ -94,7 +129,7 @@ export function ProfileCompleteNudge() {
 
       {/* Text */}
       <button
-        onClick={() => navigate(editRoute)}
+        onClick={handleAction}
         style={{ flex: 1, textAlign: 'left', background: 'none', border: 'none', padding: 0, cursor: 'pointer' }}
       >
         <p style={{ fontSize: 13, fontWeight: 700, color: 'rgba(255,255,255,0.92)', margin: 0 }}>Complete your profile</p>

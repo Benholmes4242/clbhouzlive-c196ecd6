@@ -112,7 +112,7 @@ export function PhotosIdentityStep({
 
           {/* Gender field */}
           <div className="px-4 pt-3 pb-4">
-            <div style={{ marginBottom: 8 }}><SectionEyebrow label="Gender" /></div>
+            <div style={{ marginBottom: 8 }}><SectionEyebrow label="Gender" required /></div>
             <div className="flex gap-2 flex-wrap">
               {GENDER_OPTIONS.map((opt) => {
                 const isActive = form.gender === opt.value;
@@ -120,7 +120,7 @@ export function PhotosIdentityStep({
                   <button
                     key={opt.value}
                     type="button"
-                    onClick={() => onFieldChange('gender', isActive ? '' : opt.value)}
+                    onClick={() => onFieldChange('gender', opt.value)}
                     className="transition-all active:scale-[0.97]"
                     style={{
                       padding: '8px 16px',

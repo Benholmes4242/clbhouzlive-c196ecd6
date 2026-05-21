@@ -13957,7 +13957,7 @@ export type Database = {
           email_change_token: string | null
           featured_post_id: string | null
           gam_launch_seen_at: string | null
-          gender: string | null
+          gender: string
           golfer_verified_at: string | null
           golfer_verified_by: string | null
           handicap_sync_interest: boolean | null
@@ -14076,7 +14076,7 @@ export type Database = {
           email_change_token?: string | null
           featured_post_id?: string | null
           gam_launch_seen_at?: string | null
-          gender?: string | null
+          gender?: string
           golfer_verified_at?: string | null
           golfer_verified_by?: string | null
           handicap_sync_interest?: boolean | null
@@ -14195,7 +14195,7 @@ export type Database = {
           email_change_token?: string | null
           featured_post_id?: string | null
           gam_launch_seen_at?: string | null
-          gender?: string | null
+          gender?: string
           golfer_verified_at?: string | null
           golfer_verified_by?: string | null
           handicap_sync_interest?: boolean | null
@@ -19101,6 +19101,23 @@ export type Database = {
           country_code: string
           country_name: string
           user_count: number
+        }[]
+      }
+      get_legend_holders_for_courses: {
+        Args: { p_course_ids: string[]; p_user_id: string }
+        Returns: {
+          attained_at: string
+          category: string
+          course_id: string
+          display_name: string
+          is_self: boolean
+          photo_url: string
+          rank: number
+          user_id: string
+          value: number
+          your_gap_to_first: number
+          your_rank: number
+          your_value: number
         }[]
       }
       get_long_form_videos: {
