@@ -132,7 +132,7 @@ Deno.serve(async (req) => {
         if (computed.length === 0) continue;
 
         const { error: upsertErr } = await supabase
-          .from('whs_leaderboard_rank_snapshot')
+          .from('whs_friend_leaderboard_snapshots')
           .upsert(
             computed.map((c) => ({
               snapshot_date: today,
