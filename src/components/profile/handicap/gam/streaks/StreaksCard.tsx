@@ -1,15 +1,19 @@
-import React, { useEffect, useMemo, useRef } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { ChevronRight } from 'lucide-react';
 import { DarkSectionHeader } from '../../whs/sections/_shared/darkAtoms';
 import { Skeleton } from '../_shared/GamAtoms';
 import { useUserStreaks } from '@/hooks/gam/useUserStreaks';
 import type { StreakRow } from '@/lib/gam/types';
-import { STREAK_CARD_ORDER, type StreakCardEntry } from './streakConfig';
+import { STREAK_CARD_CONFIG, type StreakCardEntry } from './streakConfig';
+import { selectFeaturedStreaks } from './selectFeaturedStreaks';
+import { milestoneFor } from './streakMilestones';
 import { openAllStreaks } from '../../whs/gam/events';
 import { analyticsEvents } from '@/utils/analyticsEvents';
+import { relativeTime } from '@/lib/gam/visuals';
 
 const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
 const AMBER = '#F7931E';
+const GOLD = '#FBBC2E';
 
 interface Props {
   userId: string;
@@ -20,150 +24,363 @@ interface Props {
   readOnly?: boolean;
 }
 
-// ──────────────────────────────────────────────────────────────────
-// Single streak tile
-// ──────────────────────────────────────────────────────────────────
+type StreakState = 'atpb' | 'active' | 'dormant';
 
-interface StreakTileProps {
-  entry: StreakCardEntry;
-  row: StreakRow | null | undefined;
+interface StreakStateToken {
+  cardSweep: string;
+  cardBorder: string;
+  topStripe: string | null;
+  outerGlow: string | null;
+  iconBg: string;
+  iconRing: string;
+  iconOpacity: number;
+  iconFilter: string | null;
+  chipBg: string;
+  chipBorder: string;
+  chipColor: string;
+  chipPulse: boolean;
+  chipLabel: string;
+  heroNumColor: string;
+  heroNumShadow: string | null;
+  progressFill: string;
+  hintColor: string;
+  hintFontWeight: number;
 }
 
-const ActivityGrid: React.FC<{ days: number[] | null | undefined; caption: string }> = ({
-  days,
-  caption,
-}) => {
-  const slots = days && days.length === 7
-    ? days
-    : [0, 0, 0, 0, 0, 0, 0];
+const STREAK_STATE_TOKENS: Record<StreakState, StreakStateToken> = {
+  atpb: {
+    cardSweep: `linear-gradient(135deg, var(--hcp-bg-1) 0%, #1A1300 50%, rgba(247,147,30,0.22) 100%)`,
+    cardBorder: 'rgba(247,147,30,0.55)',
+    topStripe: `linear-gradient(90deg, transparent, ${GOLD} 50%, transparent)`,
+    outerGlow: '0 0 32px -10px rgba(247,147,30,0.40)',
+    iconBg: 'rgba(247,147,30,0.22)',
+    iconRing: 'rgba(247,147,30,0.65)',
+    iconOpacity: 1,
+    iconFilter: null,
+    chipBg: 'rgba(247,147,30,0.20)',
+    chipBorder: AMBER,
+    chipColor: GOLD,
+    chipPulse: true,
+    chipLabel: 'AT YOUR PB',
+    heroNumColor: GOLD,
+    heroNumShadow: '0 0 12px rgba(247,147,30,0.45)',
+    progressFill: `linear-gradient(90deg, ${AMBER} 0%, ${GOLD} 100%)`,
+    hintColor: GOLD,
+    hintFontWeight: 700,
+  },
+  active: {
+    cardSweep: `linear-gradient(135deg, var(--hcp-bg-1) 0%, var(--hcp-bg-2) 50%, rgba(247,147,30,0.14) 100%)`,
+    cardBorder: 'rgba(247,147,30,0.32)',
+    topStripe: null,
+    outerGlow: null,
+    iconBg: 'rgba(247,147,30,0.14)',
+    iconRing: 'rgba(247,147,30,0.42)',
+    iconOpacity: 1,
+    iconFilter: null,
+    chipBg: 'rgba(247,147,30,0.16)',
+    chipBorder: 'rgba(247,147,30,0.40)',
+    chipColor: GOLD,
+    chipPulse: true,
+    chipLabel: 'ACTIVE',
+    heroNumColor: GOLD,
+    heroNumShadow: null,
+    progressFill: `linear-gradient(90deg, ${AMBER}, ${GOLD})`,
+    hintColor: 'var(--hcp-t-60)',
+    hintFontWeight: 600,
+  },
+  dormant: {
+    cardSweep: `linear-gradient(135deg, var(--hcp-bg-1) 0%, var(--hcp-bg-2) 50%, rgba(148,163,184,0.08) 100%)`,
+    cardBorder: 'rgba(148,163,184,0.22)',
+    topStripe: null,
+    outerGlow: null,
+    iconBg: 'rgba(148,163,184,0.10)',
+    iconRing: 'rgba(148,163,184,0.25)',
+    iconOpacity: 0.7,
+    iconFilter: 'grayscale(80%)',
+    chipBg: 'rgba(255,255,255,0.04)',
+    chipBorder: 'rgba(255,255,255,0.08)',
+    chipColor: 'var(--hcp-t-40)',
+    chipPulse: false,
+    chipLabel: 'DORMANT',
+    heroNumColor: 'var(--hcp-t-40)',
+    heroNumShadow: null,
+    progressFill: 'rgba(148,163,184,0.30)',
+    hintColor: 'var(--hcp-t-60)',
+    hintFontWeight: 600,
+  },
+};
+
+function streakStateFor(row: StreakRow | null | undefined): StreakState {
+  if (!row) return 'dormant';
+  const current = row.current_count ?? 0;
+  const best = row.best_count ?? 0;
+  const isActive = !!row.is_active && current > 0;
+  if (isActive && current === best) return 'atpb';
+  if (isActive) return 'active';
+  return 'dormant';
+}
+
+// ──────────────────────────────────────────────────────────────────
+// Dot pager (inlined; mirrors RecentUnlocksStrip's pattern)
+// ──────────────────────────────────────────────────────────────────
+
+const DotPager: React.FC<{
+  total: number;
+  current: number;
+  onChange: (n: number) => void;
+}> = ({ total, current, onChange }) => {
+  if (total <= 1) return null;
   return (
-    <div style={{ marginTop: 10 }}>
-      <div style={{ display: 'flex', gap: 4, alignItems: 'flex-end', height: 22 }}>
-        {slots.map((count, i) => {
-          const filled = count > 0;
-          return (
-            <div
-              key={i}
-              style={{
-                flex: 1,
-                height: filled ? '100%' : '40%',
-                background: filled ? AMBER : 'var(--hcp-line)',
-                borderRadius: 2,
-                opacity: filled ? Math.min(1, 0.55 + count * 0.2) : 1,
-              }}
-            />
-          );
-        })}
-      </div>
-      <div
-        style={{
-          marginTop: 6,
-          fontSize: 10,
-          fontWeight: 700,
-          letterSpacing: '0.12em',
-          color: 'var(--hcp-t-40)',
-          textTransform: 'uppercase',
-        }}
-      >
-        {caption}
-      </div>
+    <div
+      style={{
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        gap: 6,
+        marginTop: 12,
+      }}
+    >
+      {Array.from({ length: total }, (_, i) => (
+        <button
+          key={i}
+          type="button"
+          aria-label={`Go to streak ${i + 1}`}
+          aria-current={i === current ? 'true' : undefined}
+          onClick={() => i !== current && onChange(i)}
+          style={{
+            width: i === current ? 18 : 6,
+            height: 6,
+            borderRadius: 999,
+            background: i === current ? '#FFFFFF' : 'rgba(255, 255, 255, 0.25)',
+            border: 'none',
+            padding: 0,
+            cursor: i === current ? 'default' : 'pointer',
+            transition: 'all 200ms ease',
+            WebkitTapHighlightColor: 'transparent',
+          }}
+        />
+      ))}
     </div>
   );
 };
 
-const StreakTile: React.FC<StreakTileProps> = ({ entry, row }) => {
-  const Icon = entry.icon;
+// ──────────────────────────────────────────────────────────────────
+// Streak hero card
+// ──────────────────────────────────────────────────────────────────
+
+interface StreakHeroCardProps {
+  entry: StreakCardEntry;
+  row: StreakRow | null | undefined;
+}
+
+const StreakHeroCard: React.FC<StreakHeroCardProps> = ({ entry, row }) => {
+  const state = streakStateFor(row);
+  const tokens = STREAK_STATE_TOKENS[state];
   const current = row?.current_count ?? 0;
   const best = row?.best_count ?? 0;
-  const isActive = !!row?.is_active && current > 0;
-  const isPb = current > 0 && current === best;
+  const milestone = milestoneFor(entry.type, current);
+
+  const progressTarget = milestone ?? best;
+  const progressPct =
+    milestone == null
+      ? 100
+      : progressTarget > 0
+        ? Math.min(100, (current / progressTarget) * 100)
+        : 0;
+
+  const hintCopy: string =
+    state === 'atpb'
+      ? '🔥 At your personal best'
+      : state === 'active'
+        ? best > 0
+          ? `PB · ${best}`
+          : 'First streak — keep going'
+        : best > 0
+          ? `Beat your record of ${best}`
+          : 'Post a counter to start';
+
+  const meta =
+    state === 'atpb' || state === 'active'
+      ? row?.current_started_at
+        ? `Started ${relativeTime(row.current_started_at)}`
+        : null
+      : best > 0 && row?.best_ended_at
+        ? `Last broken ${relativeTime(row.best_ended_at)}`
+        : null;
+
+  const progressLeft: string =
+    milestone == null
+      ? `PB · ${best}`
+      : current === best && current > 0
+        ? `PB · ${best} (matched)`
+        : best > 0
+          ? `${current} of ${milestone}`
+          : `Target · ${milestone}`;
+
+  const progressRight: string =
+    milestone == null
+      ? 'Legendary streak'
+      : state === 'atpb'
+        ? `${entry.actionVerb} to extend`
+        : state === 'active' && best > 0 && current < best
+          ? `${best - current} more to beat PB`
+          : state === 'dormant' && best > 0
+            ? `${entry.actionVerb} to start`
+            : `${milestone - current} to milestone`;
 
   return (
     <div
       style={{
-        flexShrink: 0,
-        width: 244,
-        background: 'var(--hcp-bg-1)',
-        border: `1px solid ${isActive ? 'rgba(247,147,30,0.32)' : 'var(--hcp-line)'}`,
-        borderRadius: 14,
-        padding: 16,
+        position: 'relative',
+        margin: '0 20px',
+        padding: '18px 18px 16px',
+        borderRadius: 16,
+        overflow: 'hidden',
+        minHeight: 230,
         display: 'flex',
         flexDirection: 'column',
+        background: tokens.cardSweep,
+        border: `1px solid ${tokens.cardBorder}`,
+        boxShadow: tokens.outerGlow ?? undefined,
         fontFamily: FONT,
+        WebkitTapHighlightColor: 'transparent',
       }}
     >
+      {tokens.topStripe && (
+        <div
+          aria-hidden
+          style={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            height: 2,
+            background: tokens.topStripe,
+          }}
+        />
+      )}
+
+      {/* Watermark */}
       <div
+        aria-hidden
         style={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          marginBottom: 12,
+          position: 'absolute',
+          right: -20,
+          bottom: -30,
+          opacity: 0.06,
+          transform: 'rotate(-12deg)',
+          pointerEvents: 'none',
+          lineHeight: 0,
+          fontSize: 220,
+          color: 'var(--hcp-t-100)',
         }}
       >
-        <div
-          style={{
-            width: 32,
-            height: 32,
-            borderRadius: 10,
-            background: isActive ? 'rgba(247,147,30,0.14)' : 'var(--hcp-bg-2)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-          }}
-        >
-          <Icon
-            size={16}
-            color={isActive ? AMBER : 'var(--hcp-t-60)'}
-            strokeWidth={2.2}
-            fill={isActive && entry.type === 'counter' ? AMBER : 'none'}
+        {entry.emoji}
+      </div>
+
+      {/* Chip */}
+      <div
+        style={{
+          alignSelf: 'flex-start',
+          padding: '4px 8px',
+          borderRadius: 999,
+          background: tokens.chipBg,
+          border: `1px solid ${tokens.chipBorder}`,
+          marginBottom: 14,
+          position: 'relative',
+          zIndex: 1,
+          display: 'inline-flex',
+          alignItems: 'center',
+          gap: 6,
+        }}
+      >
+        {tokens.chipPulse && (
+          <span
+            style={{
+              width: 6,
+              height: 6,
+              borderRadius: 999,
+              background: AMBER,
+              animation: 'streakChipPulse 1.6s ease-in-out infinite',
+            }}
           />
-        </div>
+        )}
         <span
           style={{
-            padding: '3px 9px',
-            borderRadius: 99,
-            background: isActive ? AMBER : 'var(--hcp-bg-2)',
-            color: isActive ? '#fff' : 'var(--hcp-t-60)',
-            fontSize: 9,
-            fontWeight: 800,
-            letterSpacing: '0.10em',
+            fontSize: 10,
+            fontWeight: 700,
+            letterSpacing: '0.12em',
+            color: tokens.chipColor,
+            textTransform: 'uppercase',
           }}
         >
-          {isActive ? 'ACTIVE' : 'DORMANT'}
+          {tokens.chipLabel}
         </span>
       </div>
 
-      <div
-        style={{
-          fontSize: 10,
-          fontWeight: 800,
-          letterSpacing: '0.12em',
-          color: 'var(--hcp-t-60)',
-          textTransform: 'uppercase',
-          marginBottom: 4,
-        }}
-      >
-        {entry.label}
-      </div>
-      <div
-        style={{
-          fontSize: 11,
-          color: 'var(--hcp-t-40)',
-          fontWeight: 500,
-          lineHeight: 1.35,
-          marginBottom: 14,
-          minHeight: 30,
-        }}
-      >
-        {entry.description}
+      {/* Icon + title + description */}
+      <div style={{ display: 'flex', gap: 14, alignItems: 'flex-start', position: 'relative', zIndex: 1 }}>
+        <div
+          style={{
+            width: 56,
+            height: 56,
+            borderRadius: 14,
+            background: tokens.iconBg,
+            border: `1px solid ${tokens.iconRing}`,
+            display: 'inline-flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            flexShrink: 0,
+            fontSize: 26,
+            opacity: tokens.iconOpacity,
+            filter: tokens.iconFilter ?? 'none',
+          }}
+        >
+          {entry.emoji}
+        </div>
+        <div style={{ minWidth: 0, flex: 1 }}>
+          <div
+            style={{
+              fontSize: 18,
+              fontWeight: 800,
+              letterSpacing: '-0.02em',
+              color: 'var(--hcp-t-100)',
+              lineHeight: 1.15,
+              marginBottom: 3,
+            }}
+          >
+            {entry.label}
+          </div>
+          <div
+            style={{
+              fontSize: 11,
+              color: 'var(--hcp-t-60)',
+              lineHeight: 1.35,
+            }}
+          >
+            {entry.description}
+          </div>
+        </div>
       </div>
 
-      <div style={{ display: 'flex', alignItems: 'baseline', gap: 5 }}>
+      {/* Hero number */}
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'baseline',
+          gap: 5,
+          position: 'relative',
+          zIndex: 1,
+          marginTop: 'auto',
+          marginBottom: 10,
+        }}
+      >
         <span
           style={{
-            fontSize: 40,
+            fontSize: 44,
             fontWeight: 800,
-            color: 'var(--hcp-t-100)',
+            color: tokens.heroNumColor,
+            textShadow: tokens.heroNumShadow ?? 'none',
             lineHeight: 1,
             letterSpacing: '-0.04em',
             fontVariantNumeric: 'tabular-nums',
@@ -172,30 +389,82 @@ const StreakTile: React.FC<StreakTileProps> = ({ entry, row }) => {
         >
           {current}
         </span>
-        <span style={{ fontSize: 14, color: 'var(--hcp-t-60)', fontWeight: 600 }}>
+        <span style={{ fontSize: 13, color: 'var(--hcp-t-60)', fontWeight: 600 }}>
           {entry.unit}
         </span>
       </div>
 
-      <div
-        style={{
-          marginTop: 8,
-          fontSize: 11,
-          fontWeight: 700,
-          color: isPb ? AMBER : 'var(--hcp-t-60)',
-          letterSpacing: '0.04em',
-          fontVariantNumeric: 'tabular-nums',
-        }}
-      >
-        {isPb ? 'NEW PB!' : best > 0 ? `PB · ${best}` : 'NO PB YET'}
+      {/* Progress bar */}
+      <div style={{ position: 'relative', zIndex: 1 }}>
+        <div
+          style={{
+            height: 4,
+            background: 'rgba(255,255,255,0.08)',
+            borderRadius: 999,
+            overflow: 'hidden',
+            marginBottom: 6,
+          }}
+        >
+          <div
+            style={{
+              height: '100%',
+              width: `${progressPct}%`,
+              background: tokens.progressFill,
+              transition: 'width 280ms ease',
+            }}
+          />
+        </div>
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            fontSize: 10,
+            fontWeight: 700,
+            color: 'var(--hcp-t-60)',
+            letterSpacing: '0.04em',
+            fontVariantNumeric: 'tabular-nums',
+          }}
+        >
+          <span>{progressLeft}</span>
+          <span style={{ color: 'var(--hcp-t-40)' }}>{progressRight}</span>
+        </div>
       </div>
 
-      {entry.showGrid && (
-        <ActivityGrid
-          days={row?.recent_activity_days ?? null}
-          caption={entry.gridCaption ?? ''}
-        />
-      )}
+      {/* Footer */}
+      <div
+        style={{
+          marginTop: 12,
+          paddingTop: 10,
+          borderTop: '1px solid rgba(255,255,255,0.06)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          position: 'relative',
+          zIndex: 1,
+        }}
+      >
+        <span
+          style={{
+            fontSize: 11,
+            color: tokens.hintColor,
+            fontWeight: tokens.hintFontWeight,
+          }}
+        >
+          {hintCopy}
+        </span>
+        {meta && (
+          <span
+            style={{
+              fontSize: 11,
+              color: 'var(--hcp-t-40)',
+              fontWeight: 600,
+              letterSpacing: '0.04em',
+            }}
+          >
+            {meta}
+          </span>
+        )}
+      </div>
     </div>
   );
 };
@@ -208,12 +477,18 @@ export const StreaksCard: React.FC<Props> = ({ userId, readOnly = false }) => {
   const { data, isLoading } = useUserStreaks(userId);
   const sectionRef = useRef<HTMLElement | null>(null);
   const firedRef = useRef(false);
+  const scrollRef = useRef<HTMLDivElement | null>(null);
+  const [page, setPage] = useState(0);
 
-  const byType = useMemo(() => {
-    const map = new Map<string, StreakRow>();
-    (data ?? []).forEach((r) => map.set(r.streak_type, r));
-    return map;
-  }, [data]);
+  const featured = useMemo(() => selectFeaturedStreaks(data ?? []), [data]);
+
+  const activeCount = useMemo(
+    () =>
+      (data ?? []).filter(
+        (r) => r.is_active && (r.current_count ?? 0) > 0,
+      ).length,
+    [data],
+  );
 
   useEffect(() => {
     if (!data || firedRef.current || !sectionRef.current) return;
@@ -223,15 +498,16 @@ export const StreaksCard: React.FC<Props> = ({ userId, readOnly = false }) => {
         entries.forEach((e) => {
           if (e.isIntersecting && !firedRef.current) {
             firedRef.current = true;
-            const counter = byType.get('counter');
-            const cutting = byType.get('cutting');
-            const sub80 = byType.get('sub_80');
             analyticsEvents.track('streaks_section_viewed', {
               user_id: userId,
-              counter_current: counter?.current_count ?? 0,
-              counter_active: !!counter?.is_active,
-              cutting_current: cutting?.current_count ?? 0,
-              sub_80_current: sub80?.current_count ?? 0,
+              featured_types: featured.map((f) => f.streak_type),
+              active_count: activeCount,
+              at_pb_count: featured.filter(
+                (r) =>
+                  r.is_active &&
+                  (r.current_count ?? 0) === (r.best_count ?? 0) &&
+                  (r.current_count ?? 0) > 0,
+              ).length,
             });
             obs.disconnect();
           }
@@ -241,14 +517,31 @@ export const StreaksCard: React.FC<Props> = ({ userId, readOnly = false }) => {
     );
     obs.observe(node);
     return () => obs.disconnect();
-  }, [data, byType, userId]);
+  }, [data, featured, activeCount, userId]);
+
+  const handleScroll = useCallback(() => {
+    const el = scrollRef.current;
+    if (!el || el.clientWidth <= 0) return;
+    const newPage = Math.round(el.scrollLeft / el.clientWidth);
+    if (newPage !== page) setPage(newPage);
+  }, [page]);
+
+  const handlePagerChange = useCallback((n: number) => {
+    const el = scrollRef.current;
+    if (!el) return;
+    el.scrollTo({ left: el.clientWidth * n, behavior: 'smooth' });
+    setPage(n);
+  }, []);
+
+  const eyebrowText =
+    activeCount > 0 ? `ON THE LINE · ${activeCount} ACTIVE` : 'ON THE LINE';
 
   if (isLoading) {
     return (
       <section style={{ marginTop: 10 }}>
-        <DarkSectionHeader eyebrow="Streaks to Beat" />
+        <DarkSectionHeader eyebrow={eyebrowText} />
         <div style={{ padding: '4px 20px 12px' }}>
-          <Skeleton height={224} radius={14} />
+          <Skeleton height={230} radius={16} />
         </div>
       </section>
     );
@@ -256,17 +549,25 @@ export const StreaksCard: React.FC<Props> = ({ userId, readOnly = false }) => {
 
   if (!data || data.length === 0) return null;
 
-  // Hide entirely if every featured card streak is 0 (best-and-current).
-  const everyZero = STREAK_CARD_ORDER.every((e) => {
-    const r = byType.get(e.type);
-    return (r?.current_count ?? 0) === 0 && (r?.best_count ?? 0) === 0;
-  });
+  const everyZero = data.every(
+    (r) => (r.current_count ?? 0) === 0 && (r.best_count ?? 0) === 0,
+  );
   if (everyZero) return null;
 
+  if (featured.length === 0) return null;
+
   return (
-    <section ref={sectionRef} style={{ marginTop: 10, fontFamily: FONT }}>
+    <section ref={sectionRef} style={{ marginTop: 32, fontFamily: FONT }}>
+      <style>{`
+        @keyframes streakChipPulse {
+          0%, 100% { opacity: 1; transform: scale(1); }
+          50% { opacity: 0.5; transform: scale(1.5); }
+        }
+        .gam-no-scrollbar::-webkit-scrollbar { display: none; }
+      `}</style>
+
       <DarkSectionHeader
-        eyebrow="Streaks to Beat"
+        eyebrow={eyebrowText}
         right={
           readOnly ? null : (
             <button
@@ -295,23 +596,40 @@ export const StreaksCard: React.FC<Props> = ({ userId, readOnly = false }) => {
         }
       />
 
-      <style>{`.gam-streaks-row::-webkit-scrollbar { display: none; }`}</style>
       <div
-        className="gam-streaks-row"
+        ref={scrollRef}
+        onScroll={handleScroll}
+        className="gam-no-scrollbar"
         style={{
           display: 'flex',
-          gap: 12,
           overflowX: 'auto',
-          padding: '4px 20px 12px',
-          scrollbarWidth: 'none',
+          overflowY: 'hidden',
+          scrollSnapType: 'x mandatory',
           WebkitOverflowScrolling: 'touch',
-          willChange: 'transform',
+          paddingBottom: 4,
+          msOverflowStyle: 'none',
+          scrollbarWidth: 'none',
         }}
       >
-        {STREAK_CARD_ORDER.map((entry) => (
-          <StreakTile key={entry.type} entry={entry} row={byType.get(entry.type) ?? null} />
-        ))}
+        {featured.map((row) => {
+          const entry = STREAK_CARD_CONFIG[row.streak_type];
+          if (!entry) return null;
+          return (
+            <div
+              key={row.streak_type}
+              style={{
+                flex: '0 0 100%',
+                scrollSnapAlign: 'center',
+                boxSizing: 'border-box',
+              }}
+            >
+              <StreakHeroCard entry={entry} row={row} />
+            </div>
+          );
+        })}
       </div>
+
+      <DotPager total={featured.length} current={page} onChange={handlePagerChange} />
     </section>
   );
 };
