@@ -55,7 +55,7 @@ export const RivalryEmptyCard: React.FC<Props> = ({ rivalry }) => {
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            color: 'var(--hcp-bg-1)',
+            color: 'var(--hcp-t-60)',
             fontSize: 13,
             fontWeight: 700,
             flexShrink: 0,
