@@ -98,7 +98,7 @@ export const RivalryEmptyCard: React.FC<Props> = ({ rivalry }) => {
           margin: 0,
           fontSize: 12,
           lineHeight: 1.45,
-          color: 'var(--hcp-t-70)',
+          color: 'var(--hcp-t-60)',
         }}
       >
         No shared rounds yet. Play a round together to start tracking your head-to-head.
