@@ -14,6 +14,7 @@ import { toast } from 'sonner';
 import { useQueryClient } from '@tanstack/react-query';
 import { AppLog } from '@/lib/logger';
 import { patchFollow } from '@/lib/followCache';
+import { whsKeys } from '@/lib/whs/hooks';
 import type { RelationshipStatusRow } from '@/hooks/useRelationshipStatuses';
 
 interface UseFriendActionsProps {
@@ -40,7 +41,12 @@ export const useFriendActions = ({ currentUserId }: UseFriendActionsProps) => {
     queryClient.invalidateQueries({ queryKey: ['friends-paginated'] });
     // Invalidate discovery exclusions so suggested users refreshes
     queryClient.invalidateQueries({ queryKey: ['discovery-exclusions'] });
-  }, [queryClient]);
+    // WHS-specific keys — friend changes affect all leaderboards/rivalries
+    queryClient.invalidateQueries({ queryKey: whsKeys.friendLeaderboard(currentUserId) });
+    queryClient.invalidateQueries({ queryKey: whsKeys.friendRivalries(currentUserId) });
+    queryClient.invalidateQueries({ queryKey: whsKeys.friendsActivity(currentUserId) });
+    queryClient.invalidateQueries({ queryKey: ['whs_leaderboard_rank_deltas'], exact: false });
+  }, [queryClient, currentUserId]);
 
   /**
    * Send a friend request to another user.
