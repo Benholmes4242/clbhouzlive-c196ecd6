@@ -3,8 +3,13 @@ import { ChevronDown } from 'lucide-react';
 import { DarkSectionHeader } from '../_shared/darkAtoms';
 import LeaderboardRow from './LeaderboardRow';
 import HeroPositionCard from './HeroPositionCard';
+import WeeklyBanner from './WeeklyBanner';
 import FriendProfileSheet from '../friend-profile-sheet/FriendProfileSheet';
-import { useFriendLeaderboard } from '@/lib/whs/hooks';
+import {
+  useFriendLeaderboard,
+  useFriendLeaderboardRankDeltas,
+  useFriendLeaderboardWeeklyBanner,
+} from '@/lib/whs/hooks';
 import { useHandicapPercentile } from '@/lib/whs/usePercentile';
 import { useOpenFriendHybridSheet } from '@/components/friend-hybrid-sheet/FriendHybridSheetProvider';
 import { buildLeaderboardCohorts } from '@/lib/whs/utils/buildLeaderboardCohorts';
