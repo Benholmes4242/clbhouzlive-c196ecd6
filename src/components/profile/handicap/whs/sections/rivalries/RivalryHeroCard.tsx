@@ -332,7 +332,7 @@ export const RivalryHeroCard: React.FC<Props> = ({
           {tale.lastMet && (
             <>
               <span>
-                Last met <strong style={{ color: 'var(--hcp-bg-1)' }}>{tale.lastMet}</strong>
+                Last met <strong style={{ color: '#FFFFFF' }}>{tale.lastMet}</strong>
               </span>
               {tale.averageEdge != null && <span style={{ opacity: 0.4 }}>·</span>}
             </>
