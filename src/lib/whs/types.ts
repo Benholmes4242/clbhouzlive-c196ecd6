@@ -449,6 +449,42 @@ export interface FriendLeaderboardEntry {
   rounds_last_30d: number;
 }
 
+// ─── Phase 3: Compete leaderboard snapshot-derived data ─────────────────
+
+/** Per-friend rank delta vs N days ago in the caller's circle. */
+export interface FriendLeaderboardRankDelta {
+  friend_row_id: string;
+  /** Spots changed: positive = climbed, negative = dropped, null = no comparison available or stale */
+  rank_delta: number | null;
+  /** True when friend exists today but not at comparison date. */
+  is_new: boolean;
+  /** Days between current_date and the comparison date used. */
+  actual_window_days: number;
+}
+
+export type LeaderboardWeeklyBannerType = 'climber' | 'improver' | 'activity';
+
+export interface LeaderboardWeeklyBanner {
+  banner_type: LeaderboardWeeklyBannerType;
+  /** Null when banner_type = 'activity'. */
+  friend_row_id: string | null;
+  metric_value: number;
+  /** Short human label like "climbed 3 spots". */
+  metric_label: string;
+}
+
+export interface FriendRecentRound {
+  score_id: string;
+  play_date: string;
+  course_name: string;
+  handicap_differential: number | null;
+  is_counter: boolean;
+  adjusted_gross: number;
+  handicap_index_at_time: number | null;
+}
+
+
+
 
 // ─── Phase 2B: Where You Stand peer comparison ────────────────────────────
 
