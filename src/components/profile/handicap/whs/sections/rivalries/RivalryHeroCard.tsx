@@ -288,7 +288,7 @@ export const RivalryHeroCard: React.FC<Props> = ({
                   fontSize: 10,
                   fontWeight: 800,
                   letterSpacing: '0.12em',
-                  color: streak.who === 'you' ? tokens.streakColor : '#EF4444',
+                  color: streak.who === 'you' ? '#FBBC2E' : '#EF4444',
                 }}
               >
                 {streak.count} {streak.who === 'you' ? 'WINS' : 'LOSSES'} IN A ROW
