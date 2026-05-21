@@ -21,11 +21,12 @@ const POINT_CATS: LegendCategory[] = ['best_stableford_90d'];
 const BIRDIE_CATS: LegendCategory[] = ['most_birdies_90d'];
 const ROUND_CATS: LegendCategory[] = ['most_rounds_90d'];
 
-function gapUnit(category: LegendCategory): string {
-  if (STROKE_CATS.includes(category)) return 'strokes';
+function gapUnit(category: LegendCategory, count: number): string {
+  const s = count === 1;
+  if (STROKE_CATS.includes(category)) return s ? 'stroke' : 'strokes';
   if (POINT_CATS.includes(category)) return 'pts';
-  if (BIRDIE_CATS.includes(category)) return 'birdies';
-  if (ROUND_CATS.includes(category)) return 'rounds';
+  if (BIRDIE_CATS.includes(category)) return s ? 'birdie' : 'birdies';
+  if (ROUND_CATS.includes(category)) return s ? 'round' : 'rounds';
   return 'vs hcp';
 }
 
@@ -58,7 +59,9 @@ export function getFooterCue(
     const catLabel = CAT_LABEL[row.category];
     if (row.your_gap_to_first != null && row.your_gap_to_first > 0) {
       const gap = row.your_gap_to_first;
-      const unit = gapUnit(row.category);
+      const gapNum =
+        row.category === 'best_score_diff' ? gap : Math.round(gap);
+      const unit = gapUnit(row.category, gapNum);
       const gapStr =
         row.category === 'best_score_diff' ? gap.toFixed(1) : String(Math.round(gap));
       return {
