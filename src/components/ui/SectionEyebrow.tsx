@@ -27,7 +27,7 @@ const COLOR_MAP: Record<'slate' | 'amber' | 'danger', string> = {
  * Canonical eyebrow primitive. 9/800/slate-500/0.16em.
  * Optional count: 9/800/slate-400, no positive letter-spacing, tabular-nums.
  */
-function SectionEyebrowInner({ label, count, color = 'slate', className }: SectionEyebrowProps) {
+function SectionEyebrowInner({ label, count, color = 'slate', className, required }: SectionEyebrowProps) {
   const labelColor = COLOR_MAP[color];
   return (
     <div
@@ -49,6 +49,14 @@ function SectionEyebrowInner({ label, count, color = 'slate', className }: Secti
         }}
       >
         {label}
+        {required && (
+          <span
+            aria-hidden="true"
+            style={{ color: '#F7931E', marginLeft: 3, letterSpacing: 0 }}
+          >
+            *
+          </span>
+        )}
       </span>
       {count != null && (
         <span
