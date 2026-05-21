@@ -2,7 +2,7 @@ import React from 'react';
 import { initials } from '@/lib/whs/utils/initials';
 import { reformatFriendName } from '@/lib/whs/utils/nameFormat';
 import { fmtHcp } from '@/lib/whs/format';
-import type { FriendLeaderboardEntry } from '@/lib/whs/types';
+import type { FriendLeaderboardEntry, FriendLeaderboardRankDelta } from '@/lib/whs/types';
 
 interface Props {
   entry: FriendLeaderboardEntry;
@@ -10,6 +10,8 @@ interface Props {
   /** True when this friend hasn't played in 90 days. Always false for self. */
   isStaleRow: boolean;
   onClick?: () => void;
+  /** Phase 3: rank movement chip data, undefined if not loaded yet. */
+  rankDelta?: FriendLeaderboardRankDelta;
 }
 
 const T = {
