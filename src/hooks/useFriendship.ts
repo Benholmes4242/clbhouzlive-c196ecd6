@@ -3,6 +3,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseSession } from './useSupabaseSession';
 import { toast } from 'sonner';
 import { patchFollow } from '@/lib/followCache';
+import { whsKeys } from '@/lib/whs/hooks';
 
 export type FriendshipStatus = 
   | 'none'           // No relationship
@@ -262,6 +263,11 @@ export function useFriendship(targetUserId: string | undefined) {
     queryClient.invalidateQueries({ queryKey: ['notifications'] });
     // Invalidate discovery exclusions so suggested users refreshes
     queryClient.invalidateQueries({ queryKey: ['discovery-exclusions'] });
+    // WHS-specific keys — friend changes affect all leaderboards/rivalries
+    queryClient.invalidateQueries({ queryKey: whsKeys.friendLeaderboard(currentUserId) });
+    queryClient.invalidateQueries({ queryKey: whsKeys.friendRivalries(currentUserId) });
+    queryClient.invalidateQueries({ queryKey: whsKeys.friendsActivity(currentUserId) });
+    queryClient.invalidateQueries({ queryKey: ['whs_leaderboard_rank_deltas'], exact: false });
   };
 
   const isUpdating = 

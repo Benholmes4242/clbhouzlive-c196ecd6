@@ -1,4 +1,3 @@
-import { Flame, TrendingDown, Trophy, type LucideIcon } from 'lucide-react';
 import type { StreakType } from '@/lib/gam/types';
 
 /**
@@ -10,7 +9,6 @@ export interface StreakCardEntry {
   type: StreakType;
   label: string;
   emoji: string;
-  icon: LucideIcon;
   unit: string;
   description: string;
   actionVerb: string;
@@ -23,7 +21,6 @@ export const STREAK_CARD_CONFIG: Record<StreakType, StreakCardEntry> = {
     type: 'counter',
     label: 'Counter rounds in a row',
     emoji: '🔥',
-    icon: Flame,
     unit: 'rounds',
     description: 'Consecutive rounds being counted',
     actionVerb: 'Post a counter',
@@ -32,7 +29,6 @@ export const STREAK_CARD_CONFIG: Record<StreakType, StreakCardEntry> = {
     type: 'cutting',
     label: 'Index cuts in a row',
     emoji: '📉',
-    icon: TrendingDown,
     unit: 'rounds',
     description: 'Counter rounds that dropped your handicap',
     actionVerb: 'Score better than your average',
@@ -41,7 +37,6 @@ export const STREAK_CARD_CONFIG: Record<StreakType, StreakCardEntry> = {
     type: 'sub_80',
     label: 'Rounds under 80',
     emoji: '🏆',
-    icon: Trophy,
     unit: 'rounds',
     description: 'Posted scores below 80 in a row',
     actionVerb: 'Break 80',
@@ -50,7 +45,6 @@ export const STREAK_CARD_CONFIG: Record<StreakType, StreakCardEntry> = {
     type: 'no_up',
     label: 'Index holds',
     emoji: '🛡️',
-    icon: Trophy,
     unit: 'rounds',
     description: 'Counter rounds without an index increase',
     actionVerb: 'Hold the line',
@@ -59,7 +53,6 @@ export const STREAK_CARD_CONFIG: Record<StreakType, StreakCardEntry> = {
     type: 'sub_par',
     label: 'Sub-par rounds',
     emoji: '🏆',
-    icon: Trophy,
     unit: 'rounds',
     description: 'Counter rounds below par',
     actionVerb: 'Break par',
@@ -68,7 +61,6 @@ export const STREAK_CARD_CONFIG: Record<StreakType, StreakCardEntry> = {
     type: 'birdie_round',
     label: 'Birdie rounds',
     emoji: '🐦',
-    icon: Trophy,
     unit: 'rounds',
     description: 'Rounds with at least one birdie',
     actionVerb: 'Make a birdie',
@@ -77,7 +69,6 @@ export const STREAK_CARD_CONFIG: Record<StreakType, StreakCardEntry> = {
     type: 'round_played',
     label: 'Weeks played',
     emoji: '⛳',
-    icon: Trophy,
     unit: 'weeks',
     description: 'Weeks with at least one round',
     actionVerb: 'Play next week',

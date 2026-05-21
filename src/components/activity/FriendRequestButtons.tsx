@@ -96,6 +96,10 @@ export const FriendRequestButtons: React.FC<FriendRequestButtonsProps> = ({
       queryClient.invalidateQueries({ queryKey: ['relationship-status'] });
       queryClient.invalidateQueries({ queryKey: ['notifications'] });
       queryClient.invalidateQueries({ queryKey: ['discovery-exclusions'] });
+      queryClient.invalidateQueries({ queryKey: ['whs-friend-leaderboard', user.id] });
+      queryClient.invalidateQueries({ queryKey: ['whs-friend-rivalries', user.id] });
+      queryClient.invalidateQueries({ queryKey: ['whs-friends-activity', user.id] });
+      queryClient.invalidateQueries({ queryKey: ['whs_leaderboard_rank_deltas'], exact: false });
     } catch (error) {
       console.error('[FriendRequestButtons] Error accepting friend request:', error);
       setState('pending');
@@ -133,6 +137,10 @@ export const FriendRequestButtons: React.FC<FriendRequestButtonsProps> = ({
       queryClient.invalidateQueries({ queryKey: ['friendRequests'] });
       queryClient.invalidateQueries({ queryKey: ['notifications'] });
       queryClient.invalidateQueries({ queryKey: ['discovery-exclusions'] });
+      queryClient.invalidateQueries({ queryKey: ['whs-friend-leaderboard', user.id] });
+      queryClient.invalidateQueries({ queryKey: ['whs-friend-rivalries', user.id] });
+      queryClient.invalidateQueries({ queryKey: ['whs-friends-activity', user.id] });
+      queryClient.invalidateQueries({ queryKey: ['whs_leaderboard_rank_deltas'], exact: false });
     } catch (error) {
       console.error('[FriendRequestButtons] Error declining friend request:', error);
       setState('pending');

@@ -197,7 +197,7 @@ const StreakHeroCard: React.FC<StreakHeroCardProps> = ({ entry, row }) => {
           : 'First streak — keep going'
         : best > 0
           ? `Beat your record of ${best}`
-          : 'Post a counter to start';
+          : `${entry.actionVerb} to start`;
 
   const meta =
     state === 'atpb' || state === 'active'
