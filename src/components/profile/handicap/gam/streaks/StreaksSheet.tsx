@@ -64,7 +64,7 @@ const StreakRowView: React.FC<{ type: StreakType; row: StreakRow | null }> = ({ 
           fontSize: 18,
         }}
       >
-        <meta.Icon size={18} aria-hidden />
+        {meta.emoji}
         {freeze > 0 && (
           <span
             aria-label="Freeze available"
