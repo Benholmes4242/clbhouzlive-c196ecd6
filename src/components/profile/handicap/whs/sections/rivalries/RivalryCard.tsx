@@ -12,7 +12,7 @@ interface Props {
   tier: RivalryTier;
   rank: number;
   total: number;
-  variant: 'hero' | 'compact' | 'empty';
+  variant: 'hero' | 'compact';
   /** Optional 180px portrait variant when the hero card is in a mixed-tier rail. */
   portraitVariant?: 'hero' | 'mixed';
   dimension?: RivalryDimension;
