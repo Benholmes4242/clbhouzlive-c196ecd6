@@ -44,7 +44,7 @@ export const ManageRivalsSheet: React.FC<Props> = ({ userId, open, onClose }) =>
     [rivalries],
   );
   const autoPicked = useMemo(
-    () => rivalries.filter((r) => r.slot_kind === 'auto'),
+    () => rivalries.filter((r) => r.slot_kind !== 'pinned'),
     [rivalries],
   );
 
