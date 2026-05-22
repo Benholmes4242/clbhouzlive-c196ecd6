@@ -15,7 +15,7 @@ import SegmentedControl from '@/components/discover/SegmentedControl';
 import { formatCourseLocation } from '@/utils/courseLocation';
 import { CourseDetailSkeleton } from '@/components/skeletons/CourseDetailSkeleton';
 import { useCourseRatingAggregates } from '@/hooks/useCourseRatingAggregates';
-import CourseLegendsTab from '@/components/profile/handicap/whs/gam/CourseLegendsTab';
+import { CourseLegendsDrilldown } from '@/components/profile/handicap/whs/sections/course-legends/CourseLegendsDrilldown';
 
 
 interface GolfClubViewProps {
@@ -202,7 +202,15 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
             value="legends"
             className={`mt-0 transition-opacity duration-200 ${activeTab === 'legends' ? 'opacity-100' : 'hidden'}`}
           >
-            <CourseLegendsTab courseId={course.id} />
+            <CourseLegendsDrilldown
+              selection={{
+                courseId: course.id,
+                courseName: course.name,
+                courseRegion: (course as any).region ?? null,
+                courseCountry: (course as any).country ?? null,
+                courseType: (course as any).course_type ?? null,
+              }}
+            />
           </TabsContent>
         )}
       </Tabs>

@@ -128,16 +128,6 @@ export const BRACKET_EMOJI: Record<string, string> = {
   bronze: '🥉',
 };
 
-export const LEGEND_CATEGORY_META: Record<
-  string,
-  { emoji: string; label: string; unit?: string }
-> = {
-  birdie_legend: { emoji: '🟠', label: 'Birdie Legend', unit: 'birdies' },
-  score_legend: { emoji: '🏆', label: 'Score Legend', unit: 'avg' },
-  visitor_legend: { emoji: '📍', label: 'Visitor Legend', unit: 'rounds' },
-  gross_record: { emoji: '🥏', label: 'Gross Record', unit: 'gross' },
-  stableford_champ: { emoji: '⛳', label: 'Stableford Champ', unit: 'pts' },
-};
 
 export function relativeDays(iso: string): string {
   const ms = Date.now() - new Date(iso).getTime();

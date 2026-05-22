@@ -1,7 +1,6 @@
 import {
   Trophy,
   Feather,
-  MapPin,
   Target,
   TrendingDown,
   Award,
@@ -38,8 +37,6 @@ export const legendCategoryLabel: Record<LegendCategory, string> = {
   best_score_diff_all_time: 'Score Legend',
   most_birdies_90d:         'Birdie Legend',
   most_birdies_all_time:    'Birdie Legend',
-  most_rounds_90d:          'Visitor Legend',
-  most_rounds_all_time:     'Visitor Legend',
   best_stableford_90d:      'Stableford Champ',
   best_stableford_all_time: 'Stableford Champ',
   most_eagles_90d:          'Eagle Catcher',
@@ -60,8 +57,6 @@ export const legendCategoryIcon: Record<LegendCategory, LucideIcon> = {
   best_score_diff_all_time: TrendingDown,
   most_birdies_90d:         Feather,
   most_birdies_all_time:    Feather,
-  most_rounds_90d:          MapPin,
-  most_rounds_all_time:     MapPin,
   best_stableford_90d:      Target,
   best_stableford_all_time: Target,
   most_eagles_90d:          Award,
@@ -81,8 +76,6 @@ export const legendCategoryWindow: Record<LegendCategory, '90d' | 'all_time'> = 
   best_score_diff_all_time: 'all_time',
   most_birdies_90d:         '90d',
   most_birdies_all_time:    'all_time',
-  most_rounds_90d:          '90d',
-  most_rounds_all_time:     'all_time',
   best_stableford_90d:      '90d',
   best_stableford_all_time: 'all_time',
   most_eagles_90d:          '90d',
@@ -109,9 +102,6 @@ export function formatLegendValue(category: LegendCategory, value: number): stri
     case 'most_birdies_90d':
     case 'most_birdies_all_time':
       return `${value} birdies`;
-    case 'most_rounds_90d':
-    case 'most_rounds_all_time':
-      return `${value} rounds`;
     case 'lowest_gross_90d':
     case 'lowest_gross_all_time':
       return `${value}`;
@@ -191,11 +181,6 @@ export function formatLegendGap(category: LegendCategory, gap: number): string {
     case 'most_birdies_all_time': {
       const n = Math.round(abs);
       return `${n} ${n === 1 ? 'birdie' : 'birdies'}`;
-    }
-    case 'most_rounds_90d':
-    case 'most_rounds_all_time': {
-      const n = Math.round(abs);
-      return `${n} ${n === 1 ? 'round' : 'rounds'}`;
     }
     case 'best_stableford_90d':
     case 'best_stableford_all_time':

@@ -5,39 +5,42 @@ import type { CourseSelection } from '../types';
 
 interface Props {
   state: CourseSelection;
-  onBack: () => void;
+  onBack?: () => void;
   youOwnedCount: number;
+  totalCategories?: number;
 }
 
 const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
 
-export const DrilldownHeader: React.FC<Props> = ({ state, onBack, youOwnedCount }) => (
+export const DrilldownHeader: React.FC<Props> = ({ state, onBack, youOwnedCount, totalCategories = 6 }) => (
   <>
-    <div style={{ padding: '20px 16px 0', fontFamily: FONT }}>
-      <button
-        onClick={onBack}
-        style={{
-          display: 'inline-flex',
-          alignItems: 'center',
-          gap: 2,
-          background: 'transparent',
-          border: 'none',
-          padding: 0,
-          color: 'var(--hcp-t-60)',
-          fontSize: 13,
-          fontWeight: 600,
-          cursor: 'pointer',
-          marginBottom: 12,
-        }}
-      >
-        <ChevronLeft size={16} />
-        All courses
-      </button>
-    </div>
+    {onBack && (
+      <div style={{ padding: '20px 16px 0', fontFamily: FONT }}>
+        <button
+          onClick={onBack}
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: 2,
+            background: 'transparent',
+            border: 'none',
+            padding: 0,
+            color: 'var(--hcp-t-60)',
+            fontSize: 13,
+            fontWeight: 600,
+            cursor: 'pointer',
+            marginBottom: 12,
+          }}
+        >
+          <ChevronLeft size={16} />
+          All courses
+        </button>
+      </div>
+    )}
 
     <div
       style={{
-        padding: '0 16px',
+        padding: onBack ? '0 16px' : '20px 16px 0',
         display: 'flex',
         justifyContent: 'space-between',
         alignItems: 'flex-start',
@@ -82,7 +85,7 @@ export const DrilldownHeader: React.FC<Props> = ({ state, onBack, youOwnedCount 
         }}
       >
         <Crown size={12} strokeWidth={2.5} />
-        {youOwnedCount}/5
+        {youOwnedCount}/{totalCategories}
       </div>
     </div>
   </>
