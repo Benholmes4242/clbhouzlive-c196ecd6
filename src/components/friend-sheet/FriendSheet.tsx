@@ -1,0 +1,525 @@
+/**
+ * FriendSheet — unified bottom sheet for all four friend states.
+ *
+ * - 1a/1b: clbhouz friend, WHS-synced (full H2H or duels-only)
+ * - 2:     WHS-only friend (not on clbhouz) — rendered from FriendLeaderboardEntry
+ * - 3:     clbhouz friend, WHS-synced, zero duels
+ * - 4:     clbhouz friend, NOT WHS-synced
+ */
+import React, { useMemo } from 'react';
+import { Drawer as DrawerPrimitive } from 'vaul';
+import { useNavigate } from 'react-router-dom';
+import { toast } from 'sonner';
+import {
+  X,
+  MessageCircle,
+  Pin,
+  UserPlus,
+} from 'lucide-react';
+import { useFriendHybridSnapshot } from '@/lib/whs/hooks/useFriendHybridSnapshot';
+import {
+  useFriendRivalries,
+  useUpsertRivalOverride,
+} from '@/lib/whs/hooks';
+import { Z } from '@/config/zIndex';
+import type { FriendLeaderboardEntry } from '@/lib/whs/types';
+
+import { SheetHeader } from './parts/SheetHeader';
+import { HeadToHeadCard } from './parts/HeadToHeadCard';
+import { TheirFormSection } from './parts/TheirFormSection';
+import { LatestPostCard } from './parts/LatestPostCard';
+import { RecentRoundsStub } from './parts/RecentRoundsStub';
+import { StandoutRoundsStub } from './parts/StandoutRoundsStub';
+import {
+  SheetActionFooter,
+  type FooterAction,
+} from './parts/SheetActionFooter';
+import {
+  BG_0,
+  BG_1,
+  BG_2,
+  T100,
+  T60,
+  LINE,
+  FONT,
+} from './parts/_shared/tokens';
+import {
+  deriveSheetStateFromSnapshot,
+  deriveSheetStateFromWhsEntry,
+  type SheetState,
+} from './parts/_shared/deriveSheetState';
+
+export interface FriendSheetProps {
+  viewerUserId: string;
+  /** Provided for clbhouz users (states 1a/1b/3/4). */
+  targetUserId?: string | null;
+  /** Provided for WHS-only friends (state 2). */
+  whsOnlyEntry?: FriendLeaderboardEntry | null;
+  source?: string;
+  open: boolean;
+  onClose: () => void;
+}
+
+export const FriendSheet: React.FC<FriendSheetProps> = ({
+  viewerUserId,
+  targetUserId,
+  whsOnlyEntry,
+  open,
+  onClose,
+}) => {
+  const navigate = useNavigate();
+  const isWhsOnlyMode = !!whsOnlyEntry && !targetUserId;
+
+  // Snapshot only fetched when we have a clbhouz targetUserId.
+  const { data: snapshot, isLoading, error } = useFriendHybridSnapshot(
+    isWhsOnlyMode ? null : viewerUserId,
+    isWhsOnlyMode ? null : targetUserId ?? null,
+  );
+  const { data: rivalries } = useFriendRivalries(viewerUserId);
+
+  const rivalry = useMemo(
+    () =>
+      targetUserId
+        ? rivalries?.find((r) => r.rival_user_id === targetUserId)
+        : undefined,
+    [rivalries, targetUserId],
+  );
+
+  const state = useMemo<SheetState | null>(() => {
+    if (isWhsOnlyMode && whsOnlyEntry) {
+      return deriveSheetStateFromWhsEntry(whsOnlyEntry);
+    }
+    if (snapshot) {
+      return deriveSheetStateFromSnapshot({ snapshot, rivalry });
+    }
+    return null;
+  }, [isWhsOnlyMode, whsOnlyEntry, snapshot, rivalry]);
+
+  const upsert = useUpsertRivalOverride();
+
+  // ─── Handlers ─────────────────────────────────────────────────────
+  const handleViewProfile = () => {
+    onClose();
+    const handle = snapshot?.profile.username ?? targetUserId;
+    if (handle) navigate(`/profile/${handle}`);
+  };
+  const handleMessage = () => handleViewProfile(); // v1 fallback
+  const handleSeeRivalry = () => {
+    if (!targetUserId) return;
+    onClose();
+    navigate(`/handicap/rivalry/${targetUserId}`);
+  };
+  const handleSeeHandicap = () => {
+    if (!targetUserId) return;
+    onClose();
+    navigate(`/handicap/${targetUserId}`);
+  };
+  const handlePinRival = async () => {
+    if (!whsOnlyEntry) return;
+    try {
+      const identity = whsOnlyEntry.friend_user_id
+        ? {
+            rival_user_id: whsOnlyEntry.friend_user_id,
+            rival_friend_row_id: null,
+          }
+        : {
+            rival_user_id: null,
+            rival_friend_row_id: whsOnlyEntry.friend_row_id,
+          };
+      await upsert.mutateAsync({
+        userId: viewerUserId,
+        slotIndex: 4,
+        ...identity,
+      });
+      toast.success('Pinned as rival');
+      onClose();
+    } catch (e: any) {
+      toast.error(e?.message ?? 'Could not pin rival');
+    }
+  };
+  const handleInvite = async () => {
+    const url = `${window.location.origin}/invite?ref=${viewerUserId}`;
+    if (typeof navigator !== 'undefined' && navigator.share) {
+      try {
+        await navigator.share({ title: 'Join clbhouz', url });
+      } catch {
+        /* cancelled */
+      }
+    } else if (typeof navigator !== 'undefined' && navigator.clipboard) {
+      await navigator.clipboard.writeText(url);
+      toast.success('Invite link copied');
+    }
+  };
+  const handleOpenPost = (postId: string) => {
+    onClose();
+    navigate(`/post/${postId}`);
+  };
+
+  // ─── Footer actions per state ────────────────────────────────────
+  const footer = state
+    ? buildFooter(state.kind, {
+        handleMessage,
+        handleViewProfile,
+        handleSeeRivalry,
+        handleSeeHandicap,
+        handlePinRival,
+        handleInvite,
+      })
+    : { actions: [] as FooterAction[], layout: 'horizontal' as const };
+
+  // ─── Header props per state ──────────────────────────────────────
+  const headerProps = (() => {
+    if (!state) return null;
+    if (state.kind === 'whs_only') {
+      const e = state.entry;
+      return {
+        avatarUrl: e.friend_thumbnail_url,
+        name: e.friend_name,
+        handle: null,
+        bio: null,
+        whsContext: {
+          homeClub: e.friend_home_club,
+          lastSeenRelativeTime: e.last_round_played_at
+            ? fmtRelative(e.last_round_played_at)
+            : null,
+        },
+        pill: { label: 'WHS', tone: 'whs' as const },
+      };
+    }
+    const p = snapshot?.profile;
+    return {
+      avatarUrl: p?.avatar_url ?? null,
+      name: p?.display_name ?? p?.username ?? 'Golfer',
+      handle: p?.username ?? null,
+      bio: p?.bio ?? null,
+      whsContext: null,
+      pill: snapshot?.social.is_friend
+        ? { label: 'Friends', tone: 'friends' as const }
+        : null,
+    };
+  })();
+
+  const titleName = headerProps?.name ?? 'Golfer';
+
+  return (
+    <DrawerPrimitive.Root
+      open={open}
+      onOpenChange={(o) => {
+        if (!o) onClose();
+      }}
+    >
+      <DrawerPrimitive.Portal>
+        <DrawerPrimitive.Overlay
+          style={{
+            position: 'fixed',
+            inset: 0,
+            background: 'rgba(0,0,0,0.65)',
+            zIndex: Z.sheetBackdrop,
+          }}
+        />
+        <DrawerPrimitive.Content
+          className="hcp-dark"
+          style={{
+            position: 'fixed',
+            left: 0,
+            right: 0,
+            bottom: 0,
+            zIndex: Z.sheet,
+            background: BG_0,
+            borderTopLeftRadius: 20,
+            borderTopRightRadius: 20,
+            maxHeight: '88vh',
+            minHeight: 0,
+            overflow: 'hidden',
+            display: 'flex',
+            flexDirection: 'column',
+            fontFamily: FONT,
+            color: T100,
+          }}
+        >
+          <DrawerPrimitive.Title className="sr-only">
+            {titleName}
+          </DrawerPrimitive.Title>
+          <DrawerPrimitive.Description className="sr-only">
+            Friend snapshot
+          </DrawerPrimitive.Description>
+
+          {/* Drag handle */}
+          <div
+            aria-hidden
+            style={{
+              display: 'flex',
+              justifyContent: 'center',
+              padding: '8px 0 4px',
+              flexShrink: 0,
+            }}
+          >
+            <div
+              style={{
+                width: 36,
+                height: 4,
+                borderRadius: 2,
+                background: 'rgba(255,255,255,0.22)',
+              }}
+            />
+          </div>
+
+          {/* Close */}
+          <button
+            onClick={onClose}
+            aria-label="Close"
+            style={{
+              position: 'absolute',
+              top: 14,
+              right: 14,
+              zIndex: 3,
+              width: 32,
+              height: 32,
+              borderRadius: '50%',
+              background: BG_2,
+              border: 'none',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              color: T100,
+            }}
+          >
+            <X size={16} strokeWidth={2.4} />
+          </button>
+
+          {/* Scrollable body */}
+          <div
+            style={{
+              flex: 1,
+              overflowY: 'auto',
+              WebkitOverflowScrolling: 'touch',
+              background: BG_0,
+            }}
+          >
+            {!isWhsOnlyMode && isLoading && <SkeletonBody />}
+            {!isWhsOnlyMode && error && (
+              <div style={{ padding: 20, color: T60, fontSize: 14 }}>
+                Couldn't load profile snapshot.
+              </div>
+            )}
+
+            {headerProps && state && (
+              <>
+                <SheetHeader {...headerProps} />
+
+                {/* HEAD-TO-HEAD — hidden only for clbhouz_not_synced */}
+                <HeadToHeadCard state={state} />
+
+                {/* THEIR FORM — synced clbhouz users + whs_only */}
+                {state.kind === 'clbhouz_synced_full' && snapshot?.handicap && (
+                  <TheirFormSection handicap={snapshot.handicap} />
+                )}
+                {state.kind === 'clbhouz_synced_duelsOnly' &&
+                  snapshot?.handicap && (
+                    <TheirFormSection handicap={snapshot.handicap} />
+                  )}
+                {state.kind === 'clbhouz_synced_empty' && snapshot?.handicap && (
+                  <TheirFormSection handicap={snapshot.handicap} />
+                )}
+                {state.kind === 'whs_only' && (
+                  <TheirFormSection
+                    handicap={{
+                      handicap_index: state.entry.friend_handicap_index,
+                      trend_delta: state.entry.handicap_30d_delta,
+                      badges_earned: 0,
+                      active_streaks: 0,
+                      last_round: state.entry.last_round_played_at
+                        ? {
+                            course_name: state.entry.last_round_course_name,
+                            adjusted_gross: null,
+                            play_date: state.entry.last_round_played_at,
+                          }
+                        : null,
+                    }}
+                  />
+                )}
+
+                {/* LATEST POST — clbhouz users only, when post exists */}
+                {state.kind !== 'whs_only' && snapshot?.recent_post && (
+                  <LatestPostCard
+                    post={snapshot.recent_post}
+                    onTap={() => handleOpenPost(snapshot.recent_post!.id)}
+                  />
+                )}
+
+                {/* WHS-only stubs */}
+                {state.kind === 'whs_only' && (
+                  <>
+                    <RecentRoundsStub
+                      lastRound={
+                        state.entry.last_round_played_at &&
+                        state.entry.last_round_course_name
+                          ? {
+                              courseName: state.entry.last_round_course_name,
+                              relativeTime: fmtRelative(
+                                state.entry.last_round_played_at,
+                              ),
+                            }
+                          : null
+                      }
+                    />
+                    <StandoutRoundsStub />
+                  </>
+                )}
+
+                <div style={{ height: 8 }} />
+              </>
+            )}
+          </div>
+
+          {/* Sticky footer */}
+          {state && footer.actions.length > 0 && (
+            <div
+              style={{
+                flexShrink: 0,
+                borderTop: `1px solid ${LINE}`,
+                padding: '12px 16px',
+                paddingBottom: 'max(12px, env(safe-area-inset-bottom))',
+                background: BG_0,
+              }}
+            >
+              <SheetActionFooter
+                actions={footer.actions}
+                layout={footer.layout}
+              />
+            </div>
+          )}
+        </DrawerPrimitive.Content>
+      </DrawerPrimitive.Portal>
+    </DrawerPrimitive.Root>
+  );
+};
+
+// ─── Helpers ───────────────────────────────────────────────────────
+interface Handlers {
+  handleMessage: () => void;
+  handleViewProfile: () => void;
+  handleSeeRivalry: () => void;
+  handleSeeHandicap: () => void;
+  handlePinRival: () => void;
+  handleInvite: () => void;
+}
+
+function buildFooter(
+  kind: SheetState['kind'],
+  h: Handlers,
+): { actions: FooterAction[]; layout: 'horizontal' | 'stacked' } {
+  switch (kind) {
+    case 'clbhouz_synced_full':
+    case 'clbhouz_synced_duelsOnly':
+      return {
+        layout: 'horizontal',
+        actions: [
+          {
+            variant: 'icon',
+            label: 'Message',
+            onClick: h.handleMessage,
+            icon: MessageCircle,
+          },
+          {
+            variant: 'secondary',
+            label: 'View profile',
+            onClick: h.handleViewProfile,
+          },
+          {
+            variant: 'primary',
+            label: 'See rivalry',
+            onClick: h.handleSeeRivalry,
+          },
+        ],
+      };
+    case 'clbhouz_synced_empty':
+      return {
+        layout: 'horizontal',
+        actions: [
+          {
+            variant: 'icon',
+            label: 'Message',
+            onClick: h.handleMessage,
+            icon: MessageCircle,
+          },
+          {
+            variant: 'secondary',
+            label: 'View profile',
+            onClick: h.handleViewProfile,
+          },
+          {
+            variant: 'primary',
+            label: 'See full handicap',
+            onClick: h.handleSeeHandicap,
+          },
+        ],
+      };
+    case 'clbhouz_not_synced':
+      return {
+        layout: 'horizontal',
+        actions: [
+          {
+            variant: 'icon',
+            label: 'Message',
+            onClick: h.handleMessage,
+            icon: MessageCircle,
+          },
+          {
+            variant: 'primary',
+            label: 'View profile',
+            onClick: h.handleViewProfile,
+          },
+        ],
+      };
+    case 'whs_only':
+      return {
+        layout: 'stacked',
+        actions: [
+          {
+            variant: 'primary',
+            label: 'Pin as rival',
+            onClick: h.handlePinRival,
+            icon: Pin,
+          },
+          {
+            variant: 'secondary',
+            label: 'Invite to clbhouz',
+            onClick: h.handleInvite,
+            icon: UserPlus,
+          },
+        ],
+      };
+  }
+}
+
+const SkeletonBody: React.FC = () => (
+  <div style={{ padding: '0 20px 20px' }}>
+    {[80, 100, 60].map((h, i) => (
+      <div
+        key={i}
+        className="animate-pulse"
+        style={{
+          height: h,
+          background: BG_1,
+          borderRadius: 12,
+          marginBottom: 10,
+        }}
+      />
+    ))}
+  </div>
+);
+
+function fmtRelative(iso: string): string {
+  const days = Math.floor((Date.now() - new Date(iso).getTime()) / 86_400_000);
+  if (days < 1) return 'today';
+  if (days < 30) return `${days}d ago`;
+  if (days < 365) return `${Math.floor(days / 7)}w ago`;
+  return new Date(iso).toLocaleDateString('en-GB', {
+    month: 'short',
+    day: '2-digit',
+  });
+}
+
+export default FriendSheet;
