@@ -19,16 +19,6 @@ const T = {
   amberSoft: 'rgba(247,147,30,0.14)',
 };
 
-const FlameIcon: React.FC<{ size?: number }> = ({ size = 14 }) => (
-  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" aria-hidden style={{ flexShrink: 0 }}>
-    <path
-      d="M12 2s4 4 4 8a4 4 0 1 1-8 0c0-2 2-3 2-5 0-1-1-2-1-2s3 1 3-1z"
-      fill={T.amber}
-      stroke={T.amber}
-      strokeWidth="0.5"
-    />
-  </svg>
-);
 
 export const WeeklyBanner: React.FC<Props> = ({ banner, friends }) => {
   if (!banner) return null;
@@ -45,7 +35,7 @@ export const WeeklyBanner: React.FC<Props> = ({ banner, friends }) => {
   }
 
   return (
-    <div style={{ padding: '8px 16px 0' }}>
+    <div style={{ padding: '8px 16px' }}>
       <div
         style={{
           background: `linear-gradient(135deg, ${T.bg2} 0%, ${T.bg1} 100%)`,
@@ -82,7 +72,7 @@ export const WeeklyBanner: React.FC<Props> = ({ banner, friends }) => {
             flexShrink: 0,
           }}
         >
-          <FlameIcon size={14} />
+          <span style={{ fontSize: 16, lineHeight: 1 }} aria-hidden>🔥</span>
         </div>
         <div style={{ flex: 1, minWidth: 0 }}>
           <div

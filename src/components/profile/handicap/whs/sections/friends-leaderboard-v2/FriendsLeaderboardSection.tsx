@@ -32,7 +32,7 @@ const LABEL_STYLE: React.CSSProperties = {
 export const FriendsLeaderboardSection: React.FC<Props> = ({ userId }) => {
   const { data, isLoading } = useFriendLeaderboard(userId);
   const percentileQuery = useHandicapPercentile(userId);
-  const { data: deltasData } = useFriendLeaderboardRankDeltas(userId, 90);
+  const { data: deltasData } = useFriendLeaderboardRankDeltas(userId, 7);
   const { data: weeklyBanner } = useFriendLeaderboardWeeklyBanner(userId);
   const { open: openSheet } = useOpenFriendSheet();
   const [showInactive, setShowInactive] = useState(false);
@@ -118,14 +118,7 @@ export const FriendsLeaderboardSection: React.FC<Props> = ({ userId }) => {
         }}
       >
         <p style={LABEL_STYLE}>TOP 5</p>
-        <p style={{ ...LABEL_STYLE, paddingRight: 60 }}>
-          {(() => {
-            const w = deltasData?.actualWindow;
-            if (w == null) return '90D';
-            if (w >= 90) return '90D';
-            return `${w}D`;
-          })()}
-        </p>
+        <p style={{ ...LABEL_STYLE, paddingRight: 60 }}>7D</p>
       </div>
 
       {isLoading ? (
@@ -134,7 +127,7 @@ export const FriendsLeaderboardSection: React.FC<Props> = ({ userId }) => {
             key={i}
             className="animate-pulse"
             style={{
-              margin: '0 20px 1px',
+              margin: '0 0 1px',
               height: 54,
               background: 'var(--hcp-bg-2)',
               borderRadius: 6,
