@@ -1,5 +1,3 @@
-import type { LucideIcon } from 'lucide-react';
-import { Flame, TrendingDown, Trophy, Shield, Award, Bird, Flag } from 'lucide-react';
 import type { StreakType } from '@/lib/gam/types';
 
 /**
@@ -10,7 +8,7 @@ import type { StreakType } from '@/lib/gam/types';
 export interface StreakCardEntry {
   type: StreakType;
   label: string;
-  Icon: LucideIcon;
+  emoji: string;
   unit: string;
   description: string;
   actionVerb: string;
@@ -22,7 +20,7 @@ export const STREAK_CARD_CONFIG: Record<StreakType, StreakCardEntry> = {
   counter: {
     type: 'counter',
     label: 'Counter rounds in a row',
-    Icon: Flame,
+    emoji: '🔥',
     unit: 'rounds',
     description: 'Consecutive rounds being counted',
     actionVerb: 'Post a counter',
@@ -30,7 +28,7 @@ export const STREAK_CARD_CONFIG: Record<StreakType, StreakCardEntry> = {
   cutting: {
     type: 'cutting',
     label: 'Index cuts in a row',
-    Icon: TrendingDown,
+    emoji: '📉',
     unit: 'rounds',
     description: 'Counter rounds that dropped your handicap',
     actionVerb: 'Score better than your average',
@@ -38,7 +36,7 @@ export const STREAK_CARD_CONFIG: Record<StreakType, StreakCardEntry> = {
   sub_80: {
     type: 'sub_80',
     label: 'Rounds under 80',
-    Icon: Trophy,
+    emoji: '🏆',
     unit: 'rounds',
     description: 'Posted scores below 80 in a row',
     actionVerb: 'Break 80',
@@ -46,7 +44,7 @@ export const STREAK_CARD_CONFIG: Record<StreakType, StreakCardEntry> = {
   no_up: {
     type: 'no_up',
     label: 'Index holds',
-    Icon: Shield,
+    emoji: '🛡️',
     unit: 'rounds',
     description: 'Counter rounds without an index increase',
     actionVerb: 'Hold the line',
@@ -54,7 +52,7 @@ export const STREAK_CARD_CONFIG: Record<StreakType, StreakCardEntry> = {
   sub_par: {
     type: 'sub_par',
     label: 'Sub-par rounds',
-    Icon: Award,
+    emoji: '🏆',
     unit: 'rounds',
     description: 'Counter rounds below par',
     actionVerb: 'Break par',
@@ -62,7 +60,7 @@ export const STREAK_CARD_CONFIG: Record<StreakType, StreakCardEntry> = {
   birdie_round: {
     type: 'birdie_round',
     label: 'Birdie rounds',
-    Icon: Bird,
+    emoji: '🐦',
     unit: 'rounds',
     description: 'Rounds with at least one birdie',
     actionVerb: 'Make a birdie',
@@ -70,7 +68,7 @@ export const STREAK_CARD_CONFIG: Record<StreakType, StreakCardEntry> = {
   round_played: {
     type: 'round_played',
     label: 'Weeks played',
-    Icon: Flag,
+    emoji: '⛳',
     unit: 'weeks',
     description: 'Weeks with at least one round',
     actionVerb: 'Play next week',
@@ -94,7 +92,7 @@ export const STREAK_CARD_ORDER: StreakCardEntry[] = [
  */
 export interface StreakSheetEntry {
   label: string;
-  Icon: LucideIcon;
+  emoji: string;
   explainer: string;
   unit: string;
 }
@@ -102,43 +100,43 @@ export interface StreakSheetEntry {
 export const STREAK_SHEET_CONFIG: Record<StreakType, StreakSheetEntry> = {
   counter: {
     label: 'COUNTER ROUNDS IN A ROW',
-    Icon: Flame,
+    emoji: '🔥',
     explainer: 'Consecutive rounds being counted towards your handicap.',
     unit: 'rounds',
   },
   cutting: {
     label: 'INDEX CUTS',
-    Icon: TrendingDown,
+    emoji: '📉',
     explainer: 'Counter rounds that dropped your handicap index.',
     unit: 'rounds',
   },
   sub_80: {
     label: 'ROUNDS UNDER 80',
-    Icon: Trophy,
+    emoji: '🏆',
     explainer: 'Posted scores below 80 in a row.',
     unit: 'rounds',
   },
   no_up: {
     label: 'NO INDEX INCREASES',
-    Icon: Shield,
+    emoji: '🛡️',
     explainer: 'Counter rounds that did not increase your handicap index. Defensive streak — holding the line.',
     unit: 'rounds',
   },
   sub_par: {
     label: 'SUB-PAR ROUNDS',
-    Icon: Award,
+    emoji: '🏆',
     explainer: 'Counter rounds with a score below par. The hardest streak in the system.',
     unit: 'rounds',
   },
   birdie_round: {
     label: 'BIRDIE ROUNDS',
-    Icon: Bird,
+    emoji: '🐦',
     explainer: 'Rounds with at least one birdie.',
     unit: 'rounds',
   },
   round_played: {
     label: 'WEEKS PLAYED',
-    Icon: Flag,
+    emoji: '⛳',
     explainer: 'Weeks where you played at least one round. Pure activity streak — your engagement baseline.',
     unit: 'weeks',
   },
