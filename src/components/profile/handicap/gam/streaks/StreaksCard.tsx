@@ -337,10 +337,9 @@ const StreakHeroCard: React.FC<StreakHeroCardProps> = ({ entry, row }) => {
             opacity: tokens.iconOpacity,
             filter: tokens.iconFilter ?? 'none',
             color: GOLD,
-            fontSize: 32,
           }}
         >
-          {entry.emoji}
+          <entry.Icon size={28} strokeWidth={2} />
         </div>
         <div style={{ minWidth: 0, flex: 1 }}>
           <div
