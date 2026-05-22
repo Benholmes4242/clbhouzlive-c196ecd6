@@ -38,8 +38,6 @@ export const legendCategoryLabel: Record<LegendCategory, string> = {
   best_score_diff_all_time: 'Score Legend',
   most_birdies_90d:         'Birdie Legend',
   most_birdies_all_time:    'Birdie Legend',
-  most_rounds_90d:          'Visitor Legend',
-  most_rounds_all_time:     'Visitor Legend',
   best_stableford_90d:      'Stableford Champ',
   best_stableford_all_time: 'Stableford Champ',
   most_eagles_90d:          'Eagle Catcher',
