@@ -3,6 +3,7 @@ import { ChevronDown } from 'lucide-react';
 import { DarkSectionHeader } from '../_shared/darkAtoms';
 import LeaderboardRow from './LeaderboardRow';
 import HeroPositionCard from './HeroPositionCard';
+import FullLeaderboardSheet from './FullLeaderboardSheet';
 import WeeklyBanner from './WeeklyBanner';
 import {
   useFriendLeaderboard,
@@ -37,6 +38,7 @@ export const FriendsLeaderboardSection: React.FC<Props> = ({ userId }) => {
   const { open: openSheet } = useOpenFriendSheet();
   const [showInactive, setShowInactive] = useState(false);
   const [heroExpanded, setHeroExpanded] = useState(false);
+  const [fullLeaderboardOpen, setFullLeaderboardOpen] = useState(false);
 
   const cohorts = buildLeaderboardCohorts(data);
   const selfRow =
@@ -172,9 +174,7 @@ export const FriendsLeaderboardSection: React.FC<Props> = ({ userId }) => {
       {!isLoading && cohorts.totalActive > 0 && (
         <button
           type="button"
-          onClick={() => {
-            // TODO Phase 1.1 — open full leaderboard sheet
-          }}
+          onClick={() => setFullLeaderboardOpen(true)}
           style={{
             display: 'flex',
             alignItems: 'center',
@@ -252,6 +252,16 @@ export const FriendsLeaderboardSection: React.FC<Props> = ({ userId }) => {
         </>
       )}
 
+      <FullLeaderboardSheet
+        open={fullLeaderboardOpen}
+        onClose={() => setFullLeaderboardOpen(false)}
+        cohorts={cohorts}
+        deltasData={deltasData}
+        onRowClick={(entry) => {
+          setFullLeaderboardOpen(false);
+          handleRowClick(entry);
+        }}
+      />
     </section>
   );
 };
