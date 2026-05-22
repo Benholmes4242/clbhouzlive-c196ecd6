@@ -18227,7 +18227,6 @@ export type Database = {
         Args: { p_user_id: string }
         Returns: {
           badges_deleted: number
-          league_history_deleted: number
           legends_deleted: number
           milestones_deleted: number
           rounds_queued: number
