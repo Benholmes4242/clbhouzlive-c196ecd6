@@ -12,20 +12,18 @@ import { getFooterCue, FOOTER_INTENT_STYLE } from './footerCue';
 const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
 const GOLD = '#FBBC2E';
 
-/**
- * Stable display order across both windows. Cards iterate this order then
- * filter to whichever categories actually have holder data.
- */
-const CATEGORY_ORDER: LegendCategory[] = [
-  // Row 1: ACE (left) · GROSS (right)
-  'most_aces_90d', 'lowest_gross_90d',
-  'most_aces_all_time', 'lowest_gross_all_time',
-  // Row 2: EAGLE (left) · STBL (right)
-  'most_eagles_90d', 'best_stableford_90d',
-  'most_eagles_all_time', 'best_stableford_all_time',
-  // Row 3: BIRDIE (left) · SCORE (right)
-  'most_birdies_90d', 'best_score_diff_90d',
-  'most_birdies_all_time', 'best_score_diff_all_time',
+/** Left column — achievements (rare events, ascending: ACE rarest) */
+const LEFT_CATEGORIES: LegendCategory[] = [
+  'most_aces_90d', 'most_aces_all_time',
+  'most_eagles_90d', 'most_eagles_all_time',
+  'most_birdies_90d', 'most_birdies_all_time',
+];
+
+/** Right column — scoring (round outcomes) */
+const RIGHT_CATEGORIES: LegendCategory[] = [
+  'lowest_gross_90d', 'lowest_gross_all_time',
+  'best_stableford_90d', 'best_stableford_all_time',
+  'best_score_diff_90d', 'best_score_diff_all_time',
 ];
 
 /**
@@ -73,14 +71,12 @@ function isHideWhenZero(c: LegendCategory): boolean {
 interface HolderCellProps {
   category: LegendCategory;
   holder: CourseLegendHolderRow;
-  span?: boolean;
   selfLabel: string;
 }
 
 const HolderCell: React.FC<HolderCellProps> = ({
   category,
   holder,
-  span,
   selfLabel,
 }) => {
   const Icon = legendCategoryIcon[category];
@@ -97,7 +93,6 @@ const HolderCell: React.FC<HolderCellProps> = ({
   return (
     <div
       style={{
-        gridColumn: span ? '1 / -1' : undefined,
         display: 'flex',
         alignItems: 'center',
         gap: 9,
@@ -197,19 +192,30 @@ export const CourseLegendsCard: React.FC<Props> = ({
 }) => {
   const [pressed, setPressed] = useState(false);
 
-  // Filter: drop Eagle/Ace cells when value is 0; only keep categories
-  // we actually have data for.
+  // Filter per column: drop Eagle/Ace cells when value is 0; only keep
+  // categories with holder data. Each column collapses upward independently.
+  const filterColumn = (categories: LegendCategory[]) => {
+    const result: Array<{ cat: LegendCategory; row: CourseLegendHolderRow }> = [];
+    for (const cat of categories) {
+      const row = holdersByCategory.get(cat);
+      if (!row) continue;
+      if (isHideWhenZero(cat) && (row.value ?? 0) === 0) continue;
+      result.push({ cat, row });
+    }
+    return result;
+  };
+
+  const leftColumn = filterColumn(LEFT_CATEGORIES);
+  const rightColumn = filterColumn(RIGHT_CATEGORIES);
+
+  // Combined map kept for getFooterCue + selfLabel logic that still expects it.
   const visibleHolders = new Map<LegendCategory, CourseLegendHolderRow>();
-  CATEGORY_ORDER.forEach((cat) => {
-    const row = holdersByCategory.get(cat);
-    if (!row) return;
-    if (isHideWhenZero(cat) && (row.value ?? 0) === 0) return;
+  [...leftColumn, ...rightColumn].forEach(({ cat, row }) => {
     visibleHolders.set(cat, row);
   });
 
-  const visibleCats = Array.from(visibleHolders.keys());
-  const youOwnedCount = Array.from(visibleHolders.values()).filter((r) => r.is_self).length;
   const totalCategories = visibleHolders.size;
+  const youOwnedCount = Array.from(visibleHolders.values()).filter((r) => r.is_self).length;
 
   // Hide cards entirely when the active window has no data — no skeleton.
   if (totalCategories === 0) {
@@ -286,23 +292,29 @@ export const CourseLegendsCard: React.FC<Props> = ({
         </div>
       </div>
 
-      {/* Holder grid */}
-      <div
-        style={{
-          display: 'grid',
-          gridTemplateColumns: '1fr 1fr',
-          gap: 6,
-        }}
-      >
-        {visibleCats.map((cat, idx) => (
-          <HolderCell
-            key={cat}
-            category={cat}
-            holder={visibleHolders.get(cat)!}
-            span={visibleCats.length % 2 === 1 && idx === visibleCats.length - 1}
-            selfLabel={selfLabel}
-          />
-        ))}
+      {/* Holder columns — two independent flex columns so filtering in one
+          doesn't shift items into the wrong column of a grid. */}
+      <div style={{ display: 'flex', gap: 6, alignItems: 'flex-start' }}>
+        <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 6 }}>
+          {leftColumn.map(({ cat, row }) => (
+            <HolderCell
+              key={cat}
+              category={cat}
+              holder={row}
+              selfLabel={selfLabel}
+            />
+          ))}
+        </div>
+        <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 6 }}>
+          {rightColumn.map(({ cat, row }) => (
+            <HolderCell
+              key={cat}
+              category={cat}
+              holder={row}
+              selfLabel={selfLabel}
+            />
+          ))}
+        </div>
       </div>
 
       {/* Footer */}

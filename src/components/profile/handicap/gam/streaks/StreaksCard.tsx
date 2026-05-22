@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { ChevronRight } from 'lucide-react';
+import { ChevronRight, Flame } from 'lucide-react';
 import { DarkSectionHeader } from '../../whs/sections/_shared/darkAtoms';
 import { Skeleton } from '../_shared/GamAtoms';
 import { useUserStreaks } from '@/hooks/gam/useUserStreaks';
@@ -188,9 +188,14 @@ const StreakHeroCard: React.FC<StreakHeroCardProps> = ({ entry, row }) => {
         ? Math.min(100, (current / progressTarget) * 100)
         : 0;
 
-  const hintCopy: string =
+  const hintCopy: React.ReactNode =
     state === 'atpb'
-      ? '🔥 At your personal best'
+      ? (
+        <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+          <Flame size={13} strokeWidth={2} />
+          At your personal best
+        </span>
+      )
       : state === 'active'
         ? best > 0
           ? `PB · ${best}`
@@ -268,14 +273,12 @@ const StreakHeroCard: React.FC<StreakHeroCardProps> = ({ entry, row }) => {
           right: -10,
           bottom: 8,
           opacity: 0.06,
-          fontSize: 220,
-          lineHeight: 1,
           transform: 'rotate(-12deg)',
           pointerEvents: 'none',
           color: 'var(--hcp-t-100)',
         }}
       >
-        {entry.emoji}
+        <entry.Icon size={180} strokeWidth={1.4} />
       </div>
 
       {/* Chip */}
@@ -334,10 +337,9 @@ const StreakHeroCard: React.FC<StreakHeroCardProps> = ({ entry, row }) => {
             opacity: tokens.iconOpacity,
             filter: tokens.iconFilter ?? 'none',
             color: GOLD,
-            fontSize: 32,
           }}
         >
-          {entry.emoji}
+          <entry.Icon size={28} strokeWidth={2} />
         </div>
         <div style={{ minWidth: 0, flex: 1 }}>
           <div
