@@ -521,7 +521,7 @@ export const StreaksCard: React.FC<Props> = ({ userId, readOnly = false }) => {
 
   const handleScroll = useCallback(() => {
     const el = scrollRef.current;
-    if (!el || el.clientWidth <=  = 0) return;
+    if (!el || el.clientWidth <= 0) return;
     const childWidth = el.firstElementChild?.clientWidth ?? el.clientWidth;
     if (childWidth <= 0) return;
     const newPage = Math.round(el.scrollLeft / childWidth);
