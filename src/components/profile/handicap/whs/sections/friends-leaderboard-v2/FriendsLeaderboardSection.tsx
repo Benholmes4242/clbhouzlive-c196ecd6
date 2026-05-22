@@ -118,14 +118,7 @@ export const FriendsLeaderboardSection: React.FC<Props> = ({ userId }) => {
         }}
       >
         <p style={LABEL_STYLE}>TOP 5</p>
-        <p style={{ ...LABEL_STYLE, paddingRight: 60 }}>
-          {(() => {
-            const w = deltasData?.actualWindow;
-            if (w == null) return '90D';
-            if (w >= 90) return '90D';
-            return `${w}D`;
-          })()}
-        </p>
+        <p style={{ ...LABEL_STYLE, paddingRight: 60 }}>7D</p>
       </div>
 
       {isLoading ? (
