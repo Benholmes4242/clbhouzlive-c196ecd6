@@ -146,42 +146,6 @@ const HolderCell: React.FC<HolderCellProps> = ({
   );
 };
 
-const SkeletonTile: React.FC = () => (
-  <div
-    style={{
-      display: 'flex',
-      alignItems: 'center',
-      gap: 9,
-      padding: '8px 10px',
-      borderRadius: 10,
-      background: 'transparent',
-      border: '1px solid var(--hcp-line)',
-    }}
-  >
-    <div
-      style={{
-        width: 22,
-        height: 22,
-        borderRadius: 6,
-        background: 'rgba(255,255,255,0.05)',
-        flexShrink: 0,
-      }}
-    />
-    <div style={{ flex: 1, minWidth: 0 }}>
-      <div style={{ height: 7, width: 44, background: 'var(--hcp-line)', borderRadius: 3 }} />
-      <div
-        style={{
-          marginTop: 4,
-          height: 9,
-          width: '70%',
-          background: 'var(--hcp-line)',
-          borderRadius: 3,
-        }}
-      />
-    </div>
-    <div style={{ width: 24, height: 10, background: 'var(--hcp-line)', borderRadius: 3 }} />
-  </div>
-);
 
 interface Props {
   courseId: string;
@@ -275,62 +239,45 @@ export const CourseLegendsCard: React.FC<Props> = ({
             {courseName}
           </div>
         </div>
-        {totalCategories > 0 && (
-          <div
-            style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: 4,
-              padding: '3px 7px',
-              borderRadius: 999,
-              background: 'rgba(251,188,46,0.14)',
-              border: '1px solid rgba(251,188,46,0.40)',
-              color: GOLD,
-              fontSize: 10,
-              fontWeight: 700,
-              letterSpacing: '0.04em',
-              flexShrink: 0,
-            }}
-          >
-            <Crown size={10} strokeWidth={2.5} />
-            {youOwnedCount}/{totalCategories}
-          </div>
-        )}
+        <div
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: 4,
+            padding: '3px 7px',
+            borderRadius: 999,
+            background: 'rgba(251,188,46,0.14)',
+            border: '1px solid rgba(251,188,46,0.40)',
+            color: GOLD,
+            fontSize: 10,
+            fontWeight: 700,
+            letterSpacing: '0.04em',
+            flexShrink: 0,
+          }}
+        >
+          <Crown size={10} strokeWidth={2.5} />
+          {youOwnedCount}/{totalCategories}
+        </div>
       </div>
 
-      {/* Holder grid (or empty skeleton) */}
-      {totalCategories === 0 ? (
-        <div
-          style={{
-            display: 'grid',
-            gridTemplateColumns: '1fr 1fr',
-            rowGap: 6,
-            columnGap: 8,
-            opacity: 0.35,
-            pointerEvents: 'none',
-          }}
-        >
-          {[0, 1, 2, 3].map((i) => <SkeletonTile key={i} />)}
-        </div>
-      ) : (
-        <div
-          style={{
-            display: 'grid',
-            gridTemplateColumns: '1fr 1fr',
-            gap: 6,
-          }}
-        >
-          {visibleCats.map((cat, idx) => (
-            <HolderCell
-              key={cat}
-              category={cat}
-              holder={visibleHolders.get(cat)!}
-              span={visibleCats.length % 2 === 1 && idx === visibleCats.length - 1}
-              selfLabel={selfLabel}
-            />
-          ))}
-        </div>
-      )}
+      {/* Holder grid */}
+      <div
+        style={{
+          display: 'grid',
+          gridTemplateColumns: '1fr 1fr',
+          gap: 6,
+        }}
+      >
+        {visibleCats.map((cat, idx) => (
+          <HolderCell
+            key={cat}
+            category={cat}
+            holder={visibleHolders.get(cat)!}
+            span={visibleCats.length % 2 === 1 && idx === visibleCats.length - 1}
+            selfLabel={selfLabel}
+          />
+        ))}
+      </div>
 
       {/* Footer */}
       <div
