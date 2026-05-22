@@ -474,7 +474,7 @@ const RecentFormRegion: React.FC<RecentFormRegionProps> = ({
             lineHeight: 1.5,
           }}
         >
-          {friendName} isn't on clbhouz — their rounds are tracked via WHS but you'll see more if they join
+          Plot twist: {friendName}'s rounds are hidden — they haven't joined clbhouz yet
         </div>
       )}
 
