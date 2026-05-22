@@ -273,14 +273,12 @@ const StreakHeroCard: React.FC<StreakHeroCardProps> = ({ entry, row }) => {
           right: -10,
           bottom: 8,
           opacity: 0.06,
-          fontSize: 220,
-          lineHeight: 1,
           transform: 'rotate(-12deg)',
           pointerEvents: 'none',
           color: 'var(--hcp-t-100)',
         }}
       >
-        {entry.emoji}
+        <entry.Icon size={180} strokeWidth={1.4} />
       </div>
 
       {/* Chip */}
