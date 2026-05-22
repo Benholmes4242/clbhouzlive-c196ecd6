@@ -154,6 +154,20 @@ export const LeaderboardRow: React.FC<Props> = ({ entry, rank, isStaleRow, onCli
         color: 'inherit',
       }}
     >
+      {isYou && (
+        <span
+          aria-hidden
+          style={{
+            position: 'absolute',
+            left: -20,
+            top: 0,
+            bottom: 0,
+            width: 3,
+            background: 'linear-gradient(180deg, #FBBC2E, transparent)',
+            pointerEvents: 'none',
+          }}
+        />
+      )}
 
       {/* Rank */}
       <div
