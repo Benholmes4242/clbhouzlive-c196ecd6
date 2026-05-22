@@ -17,13 +17,36 @@ const GOLD = '#FBBC2E';
  * filter to whichever categories actually have holder data.
  */
 const CATEGORY_ORDER: LegendCategory[] = [
-  'lowest_gross_90d', 'lowest_gross_all_time',
-  'most_birdies_90d', 'most_birdies_all_time',
-  'best_stableford_90d', 'best_stableford_all_time',
-  'best_score_diff_90d', 'best_score_diff_all_time',
-  'most_eagles_90d', 'most_eagles_all_time',
-  'most_aces_90d', 'most_aces_all_time',
+  // Row 1: ACE (left) · GROSS (right)
+  'most_aces_90d', 'lowest_gross_90d',
+  'most_aces_all_time', 'lowest_gross_all_time',
+  // Row 2: EAGLE (left) · STBL (right)
+  'most_eagles_90d', 'best_stableford_90d',
+  'most_eagles_all_time', 'best_stableford_all_time',
+  // Row 3: BIRDIE (left) · SCORE (right)
+  'most_birdies_90d', 'best_score_diff_90d',
+  'most_birdies_all_time', 'best_score_diff_all_time',
 ];
+
+/**
+ * Tile palette per category. Non-self tiles take a 10-12% tint of the
+ * category colour with a matching border. Self/active state overrides
+ * with gold (handled in HolderCell).
+ */
+const CATEGORY_TILE_PALETTE: Record<LegendCategory, { bg: string; border: string; icon: string }> = {
+  most_aces_90d:            { bg: 'rgba(217,70,239,0.10)', border: 'rgba(217,70,239,0.18)', icon: '#D946EF' },
+  most_aces_all_time:       { bg: 'rgba(217,70,239,0.10)', border: 'rgba(217,70,239,0.18)', icon: '#D946EF' },
+  most_eagles_90d:          { bg: 'rgba(34,197,94,0.10)', border: 'rgba(34,197,94,0.20)', icon: '#22C55E' },
+  most_eagles_all_time:     { bg: 'rgba(34,197,94,0.10)', border: 'rgba(34,197,94,0.20)', icon: '#22C55E' },
+  most_birdies_90d:         { bg: 'rgba(251,188,46,0.12)', border: 'rgba(251,188,46,0.22)', icon: '#FBBC2E' },
+  most_birdies_all_time:    { bg: 'rgba(251,188,46,0.12)', border: 'rgba(251,188,46,0.22)', icon: '#FBBC2E' },
+  lowest_gross_90d:         { bg: 'rgba(255,255,255,0.05)', border: 'rgba(255,255,255,0.08)', icon: 'var(--hcp-t-60)' },
+  lowest_gross_all_time:    { bg: 'rgba(255,255,255,0.05)', border: 'rgba(255,255,255,0.08)', icon: 'var(--hcp-t-60)' },
+  best_stableford_90d:      { bg: 'rgba(56,189,248,0.10)', border: 'rgba(56,189,248,0.18)', icon: '#38BDF8' },
+  best_stableford_all_time: { bg: 'rgba(56,189,248,0.10)', border: 'rgba(56,189,248,0.18)', icon: '#38BDF8' },
+  best_score_diff_90d:      { bg: 'rgba(239,68,68,0.10)', border: 'rgba(239,68,68,0.20)', icon: '#EF4444' },
+  best_score_diff_all_time: { bg: 'rgba(239,68,68,0.10)', border: 'rgba(239,68,68,0.20)', icon: '#EF4444' },
+};
 
 const CAT_SHORT: Record<LegendCategory, string> = {
   lowest_gross_90d:         'GROSS',
