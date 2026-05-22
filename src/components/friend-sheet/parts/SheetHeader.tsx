@@ -1,0 +1,164 @@
+import React from 'react';
+import { MapPin } from 'lucide-react';
+import { BG_2, T60, T100, GREEN, LINE_2, FONT } from './_shared/tokens';
+
+export interface SheetHeaderProps {
+  avatarUrl: string | null;
+  name: string;
+  /** Only for clbhouz users */
+  handle: string | null;
+  /** Only for clbhouz users */
+  bio: string | null;
+  /** For WHS-only friends — replaces bio */
+  whsContext?: {
+    homeClub: string | null;
+    lastSeenRelativeTime: string | null;
+  } | null;
+  pill: { label: string; tone: 'friends' | 'whs' } | null;
+}
+
+export const SheetHeader: React.FC<SheetHeaderProps> = ({
+  avatarUrl,
+  name,
+  handle,
+  bio,
+  whsContext,
+  pill,
+}) => (
+  <div style={{ padding: '12px 20px 14px', fontFamily: FONT }}>
+    <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+      <div
+        style={{
+          width: 64,
+          height: 64,
+          borderRadius: '34%',
+          overflow: 'hidden',
+          background: BG_2,
+          border: `2px solid ${LINE_2}`,
+          flexShrink: 0,
+        }}
+      >
+        {avatarUrl ? (
+          <img
+            src={avatarUrl}
+            alt={name}
+            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+          />
+        ) : (
+          <PlaceholderSilhouette />
+        )}
+      </div>
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 8,
+            flexWrap: 'wrap',
+          }}
+        >
+          <h2
+            style={{
+              margin: 0,
+              fontSize: 24,
+              fontWeight: 900,
+              color: T100,
+              letterSpacing: '-0.03em',
+              lineHeight: 1.05,
+              fontFamily: FONT,
+            }}
+          >
+            {name}
+          </h2>
+          {pill && <Pill label={pill.label} tone={pill.tone} />}
+        </div>
+        {handle && handle !== name && (
+          <div style={{ fontSize: 14, color: T60, marginTop: 2 }}>
+            @{handle}
+          </div>
+        )}
+        {whsContext && (
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 4,
+              marginTop: 4,
+              fontSize: 12,
+              color: T60,
+            }}
+          >
+            <MapPin size={12} strokeWidth={2} />
+            <span>
+              {whsContext.homeClub ?? 'No home club'}
+              {whsContext.lastSeenRelativeTime &&
+                ` · ${whsContext.lastSeenRelativeTime}`}
+            </span>
+          </div>
+        )}
+      </div>
+    </div>
+    {bio && (
+      <p
+        style={{
+          margin: '10px 0 0',
+          fontSize: 14,
+          color: T100,
+          lineHeight: 1.45,
+        }}
+      >
+        {bio}
+      </p>
+    )}
+  </div>
+);
+
+const Pill: React.FC<{ label: string; tone: 'friends' | 'whs' }> = ({
+  label,
+  tone,
+}) => {
+  const palette =
+    tone === 'friends'
+      ? {
+          bg: 'rgba(34,197,94,0.15)',
+          color: GREEN,
+        }
+      : {
+          bg: BG_2,
+          color: T60,
+        };
+  return (
+    <span
+      style={{
+        padding: '2px 8px',
+        borderRadius: 999,
+        background: palette.bg,
+        color: palette.color,
+        fontSize: 10,
+        fontWeight: 800,
+        letterSpacing: '0.06em',
+        textTransform: 'uppercase',
+        lineHeight: 1.4,
+      }}
+    >
+      {label}
+    </span>
+  );
+};
+
+const PlaceholderSilhouette: React.FC = () => (
+  <svg
+    viewBox="0 0 64 64"
+    width="100%"
+    height="100%"
+    preserveAspectRatio="xMidYMax meet"
+    aria-hidden="true"
+    style={{ display: 'block', opacity: 0.45 }}
+  >
+    <circle cx="32" cy="25" r="11" fill="rgba(255,255,255,0.35)" />
+    <path
+      d="M11 64 C 11 48, 21 40, 32 40 C 43 40, 53 48, 53 64 Z"
+      fill="rgba(255,255,255,0.35)"
+    />
+  </svg>
+);
