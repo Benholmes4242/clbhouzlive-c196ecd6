@@ -160,7 +160,7 @@ const FriendViewRivalries: React.FC<{
   }, [primary, secondary]);
 
   const tiers = useMemo(() => assignRivalryTiers(all), [all]);
-  const { hero, compact, empty } = useMemo(
+  const { hero, compact } = useMemo(
     () => splitByTier(all, tiers),
     [all, tiers],
   );
