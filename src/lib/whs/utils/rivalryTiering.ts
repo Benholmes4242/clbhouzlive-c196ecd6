@@ -1,6 +1,6 @@
 import type { FriendRivalryHydrated } from '../types';
 
-export type RivalryTier = 'archrival' | 'rival' | 'recent' | 'new';
+export type RivalryTier = 'archrival' | 'rival' | 'recent';
 
 /**
  * Relevance score for a rival.
