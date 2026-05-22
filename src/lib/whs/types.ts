@@ -414,6 +414,13 @@ export interface FriendRivalryHydrated extends FriendRivalry {
   rival_thumbnail_url: string | null;
   rival_is_clbhouz_user: boolean;
   rival_friend_connection_id: string | null;
+  // clbhouz profile fields for hero rendering
+  rival_header_photo_url: string | null;
+  rival_profile_photo_url: string | null;
+  rival_mobile_crop_x: number | null;
+  rival_mobile_crop_y: number | null;
+  rival_mobile_crop_width: number | null;
+  rival_mobile_crop_height: number | null;
 }
 
 export interface UserRivalOverride {

@@ -894,14 +894,45 @@ export async function fetchFriendRivalries(
     }
   }
 
+  // Pull clbhouz profile fields (header + avatar + mobile crop) for any rival
+  // with a known user_id, either directly on the rivalry row or via the
+  // friend match join. Rivals are always clbhouz-synced users.
+  const rivalUserIds = Array.from(
+    new Set(
+      rows
+        .map((r) => r.rival_user_id ?? matchesByRowId[r.rival_friend_row_id]?.friend_user_id)
+        .filter(Boolean) as string[],
+    ),
+  );
+  const profilesByUserId: Record<string, any> = {};
+  if (rivalUserIds.length > 0) {
+    const { data: profiles } = await supabase
+      .from('user_profiles')
+      .select(
+        'id, header_photo_url, profile_photo_url, mobile_crop_x, mobile_crop_y, mobile_crop_width, mobile_crop_height',
+      )
+      .in('id', rivalUserIds);
+    for (const p of (profiles as any[]) ?? []) {
+      profilesByUserId[p.id] = p;
+    }
+  }
+
   return rows.map((r): FriendRivalryHydrated => {
     const match = r.rival_friend_row_id ? matchesByRowId[r.rival_friend_row_id] : null;
+    const profileId = r.rival_user_id ?? match?.friend_user_id ?? null;
+    const profile = profileId ? profilesByUserId[profileId] : null;
     return {
       ...r,
       rival_name: match?.friend_name ?? null,
       rival_thumbnail_url: match?.friend_thumbnail_url ?? null,
       rival_is_clbhouz_user: !!match?.is_clbhouz_user,
       rival_friend_connection_id: match?.friend_connection_id ?? null,
+      rival_header_photo_url: profile?.header_photo_url ?? null,
+      rival_profile_photo_url: profile?.profile_photo_url ?? null,
+      rival_mobile_crop_x: profile?.mobile_crop_x ?? null,
+      rival_mobile_crop_y: profile?.mobile_crop_y ?? null,
+      rival_mobile_crop_width: profile?.mobile_crop_width ?? null,
+      rival_mobile_crop_height: profile?.mobile_crop_height ?? null,
     };
   });
 }
