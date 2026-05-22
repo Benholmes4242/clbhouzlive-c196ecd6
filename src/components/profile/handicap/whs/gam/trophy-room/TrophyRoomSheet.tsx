@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState, useCallback } from 'react';
-import { Crown } from 'lucide-react';
+import { Crown, type LucideIcon } from 'lucide-react';
 import { GamSheet } from '../../../gam/_shared/GamSheet';
 import { GAM } from '../tokens';
 import { gamAchievementsBus } from '../events';
@@ -43,7 +43,7 @@ const Eyebrow: React.FC = () => (
 );
 
 const SectionHeader: React.FC<{
-  Icon?: React.ComponentType<{ size?: number; color?: string; strokeWidth?: number }> | null;
+  Icon?: LucideIcon | null;
   iconColor?: string;
   label: string;
   count: number;

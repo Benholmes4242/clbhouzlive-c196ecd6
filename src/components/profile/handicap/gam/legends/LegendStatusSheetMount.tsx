@@ -1,56 +1,18 @@
-import React, { useEffect, useState } from 'react';
-import { LegendStatusSheet } from './LegendStatusSheet';
-
-interface SheetState {
-  open: boolean;
-  userId: string;
-  readOnly: boolean;
-  friendName?: string;
-}
-
-interface OpenEventDetail {
-  userId: string;
-  readOnly?: boolean;
-  friendName?: string;
-}
-
 /**
- * Subscribes to the global `legend-status-sheet:open` event dispatched by
- * `LegendStatusCard`. Mount once in `TodayView`.
+ * Listens for the legacy `legend-status-sheet:open` event dispatched by
+ * `LegendStatusCard` and routes it to the unified Trophy Room sheet
+ * via `openGamAchievements`. Mount once in `TodayView`.
  */
-export const LegendStatusSheetMount: React.FC = () => {
-  const [state, setState] = useState<SheetState>({
-    open: false,
-    userId: '',
-    readOnly: false,
-  });
+import React, { useEffect } from 'react';
+import { openGamAchievements } from '../../whs/gam/events';
 
+export const LegendStatusSheetMount: React.FC = () => {
   useEffect(() => {
-    const handler = (e: Event) => {
-      const detail = (e as CustomEvent<OpenEventDetail>).detail;
-      if (!detail?.userId) return;
-      setState({
-        open: true,
-        userId: detail.userId,
-        readOnly: detail.readOnly ?? false,
-        friendName: detail.friendName,
-      });
-    };
+    const handler = () => openGamAchievements();
     window.addEventListener('legend-status-sheet:open', handler);
     return () => window.removeEventListener('legend-status-sheet:open', handler);
   }, []);
-
-  if (!state.userId) return null;
-
-  return (
-    <LegendStatusSheet
-      open={state.open}
-      onClose={() => setState((s) => ({ ...s, open: false }))}
-      userId={state.userId}
-      readOnly={state.readOnly}
-      friendName={state.friendName}
-    />
-  );
+  return null;
 };
 
 export default LegendStatusSheetMount;
