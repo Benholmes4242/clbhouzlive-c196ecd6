@@ -61,10 +61,10 @@ const StreakRowView: React.FC<{ type: StreakType; row: StreakRow | null }> = ({ 
           justifyContent: 'center',
           flexShrink: 0,
           position: 'relative',
-          fontSize: 18,
+          color: isActive ? '#FBBC2E' : 'var(--hcp-t-60)',
         }}
       >
-        {meta.emoji}
+        <meta.Icon size={16} strokeWidth={2} aria-hidden />
         {freeze > 0 && (
           <span
             aria-label="Freeze available"
