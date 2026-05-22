@@ -220,6 +220,11 @@ export const CourseLegendsCard: React.FC<Props> = ({
   const visibleCats = Array.from(visibleHolders.keys());
   const youOwnedCount = Array.from(visibleHolders.values()).filter((r) => r.is_self).length;
   const totalCategories = visibleHolders.size;
+
+  // Hide cards entirely when the active window has no data — no skeleton.
+  if (totalCategories === 0) {
+    return null;
+  }
   const cue = getFooterCue(visibleHolders);
   const cueStyle = FOOTER_INTENT_STYLE[cue.intent];
   const selfLabel = friendName ? friendName : 'YOU';
