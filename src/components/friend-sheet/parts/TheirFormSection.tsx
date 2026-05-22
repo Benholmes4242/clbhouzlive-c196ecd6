@@ -14,7 +14,7 @@ import {
   TAB,
 } from './_shared/tokens';
 
-interface Handicap {
+export interface TheirFormHandicap {
   handicap_index: number | null;
   trend_delta: number | null;
   badges_earned: number;
@@ -27,14 +27,16 @@ interface Handicap {
 }
 
 interface Props {
-  handicap: Handicap;
+  handicap: TheirFormHandicap;
 }
 
 export const TheirFormSection: React.FC<Props> = ({ handicap }) => {
   const delta = handicap.trend_delta;
-  const isImproving = delta != null && delta < -0.3;
-  const isDeclining = delta != null && delta > 0.3;
-  const isFlat = delta != null && !isImproving && !isDeclining;
+  // Per brief: 0 is a real value (flat). "no 30d data" only when null.
+  const noData = delta === null || delta === undefined;
+  const isImproving = !noData && (delta as number) < -0.3;
+  const isDeclining = !noData && (delta as number) > 0.3;
+  const isFlat = !noData && !isImproving && !isDeclining;
 
   const chipBg = isImproving ? GOOD_TINT : isDeclining ? AMBER_TINT : BG_2;
   const chipColor = isImproving ? GOOD : isDeclining ? AMBER : T60;
@@ -62,28 +64,30 @@ export const TheirFormSection: React.FC<Props> = ({ handicap }) => {
         >
           {handicap.handicap_index?.toFixed(1) ?? '—'}
         </span>
-        {delta != null && (
-          <span
-            style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: 3,
-              fontSize: 11,
-              fontWeight: 800,
-              padding: '3px 8px',
-              borderRadius: 999,
-              background: chipBg,
-              color: chipColor,
-              ...TAB,
-            }}
-          >
-            {isImproving && <TrendingDown size={11} strokeWidth={2.4} />}
-            {isDeclining && <TrendingUp size={11} strokeWidth={2.4} />}
-            <span>
-              {isFlat ? 'flat' : `${Math.abs(delta).toFixed(1)} in 30d`}
-            </span>
+        <span
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: 3,
+            fontSize: 11,
+            fontWeight: 800,
+            padding: '3px 8px',
+            borderRadius: 999,
+            background: chipBg,
+            color: chipColor,
+            ...TAB,
+          }}
+        >
+          {isImproving && <TrendingDown size={11} strokeWidth={2.4} />}
+          {isDeclining && <TrendingUp size={11} strokeWidth={2.4} />}
+          <span>
+            {noData
+              ? 'no 30d data'
+              : isFlat
+                ? 'flat'
+                : `${Math.abs(delta as number).toFixed(1)} in 30d`}
           </span>
-        )}
+        </span>
       </div>
       <div
         style={{
@@ -138,9 +142,7 @@ export const TheirFormSection: React.FC<Props> = ({ handicap }) => {
 };
 
 function fmtRelative(iso: string): string {
-  const days = Math.floor(
-    (Date.now() - new Date(iso).getTime()) / 86_400_000,
-  );
+  const days = Math.floor((Date.now() - new Date(iso).getTime()) / 86_400_000);
   if (days < 1) return 'today';
   if (days < 30) return `${days}d ago`;
   if (days < 365) return `${Math.floor(days / 7)}w ago`;

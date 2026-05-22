@@ -46,7 +46,7 @@ import { ReviewBottomSheetPortal } from '@/components/posts/ReviewBottomSheetPor
 import { CourseMediaViewer } from '@/components/course-media-tab/CourseMediaViewer';
 import { MediaViewerOverlay } from '@/components/shared/MediaViewerOverlay';
 import { UploadResilienceProvider } from '@/contexts/UploadResilienceContext';
-import { FriendHybridSheetProvider } from '@/components/friend-hybrid-sheet/FriendHybridSheetProvider';
+import { FriendSheetProvider } from '@/components/friend-sheet/FriendSheetProvider';
 import { useUploadGuard } from '@/hooks/useUploadGuard';
 import { FLAGS } from '@/config/flags';
 import { FEATURE_FLAGS } from '@/config/featureFlags';
@@ -682,7 +682,7 @@ const AppInner: React.FC = () => {
                                         <AuthWrapper>
                                           <MessagingProvider>
                                           <UploadResilienceProvider>
-                                          <FriendHybridSheetProvider>
+                                          <FriendSheetProvider>
                                             <SeasonWrapModal />
                                             <AchievementToastWrapper />
                                             <Suspense fallback={null}>
@@ -703,7 +703,7 @@ const AppInner: React.FC = () => {
                                             <MediaViewerOverlay />
                                             {/* Unified ReviewBottomSheet portal — single mount, store-driven */}
                                             <ReviewBottomSheetPortal />
-                                          </FriendHybridSheetProvider>
+                                          </FriendSheetProvider>
                                           </UploadResilienceProvider>
                                           </MessagingProvider>
                                         </AuthWrapper>

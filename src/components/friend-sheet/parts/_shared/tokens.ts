@@ -1,6 +1,6 @@
 import type React from 'react';
 
-// Re-export of the dark handicap token vars used across the friend hybrid sheet.
+// Dark handicap token vars used across the unified friend sheet.
 export const BG_0 = 'var(--hcp-bg-0)';
 export const BG_1 = 'var(--hcp-bg-1)';
 export const BG_2 = 'var(--hcp-bg-2)';

@@ -25,7 +25,6 @@ interface Input {
 export function deriveH2HState({ sharedRounds, rivalry }: Input): H2HState {
   const rivalryDuels = rivalry?.shared_rounds_count ?? 0;
 
-  // True empty
   if (sharedRounds === 0 && rivalryDuels === 0) {
     return { kind: 'empty', duelsCount: 0 };
   }
