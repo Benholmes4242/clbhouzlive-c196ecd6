@@ -47,7 +47,7 @@ function gapUnit(category: LegendCategory, count: number): string {
   if (isGross(category)) return s ? 'stroke' : 'strokes';
   if (isStableford(category)) return 'pts';
   if (isBirdies(category)) return s ? 'birdie' : 'birdies';
-  if (isRounds(category)) return s ? 'round' : 'rounds';
+  
   if (isEagles(category)) return s ? 'eagle' : 'eagles';
   if (isAces(category)) return s ? 'ace' : 'aces';
   return 'vs hcp';
