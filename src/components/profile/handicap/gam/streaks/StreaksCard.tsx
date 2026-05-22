@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { ChevronRight } from 'lucide-react';
+import { ChevronRight, Flame } from 'lucide-react';
 import { DarkSectionHeader } from '../../whs/sections/_shared/darkAtoms';
 import { Skeleton } from '../_shared/GamAtoms';
 import { useUserStreaks } from '@/hooks/gam/useUserStreaks';
