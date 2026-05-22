@@ -109,7 +109,9 @@ export const SheetHeroGlass: React.FC<Props> = ({
   metaOverride,
   isCounter = false,
   handicapDelta = null,
+  lockMissingStats = false,
 }) => {
+
   const { title, suffix } = splitCourseName(courseName);
   const hasImpact =
     handicapDelta != null && Math.abs(handicapDelta) >= 0.05;
