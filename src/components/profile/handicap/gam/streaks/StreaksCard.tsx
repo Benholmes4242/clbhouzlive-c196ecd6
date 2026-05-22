@@ -265,17 +265,15 @@ const StreakHeroCard: React.FC<StreakHeroCardProps> = ({ entry, row }) => {
         aria-hidden
         style={{
           position: 'absolute',
-          right: -20,
-          bottom: -30,
+          right: -10,
+          bottom: 8,
           opacity: 0.06,
           transform: 'rotate(-12deg)',
           pointerEvents: 'none',
-          lineHeight: 0,
-          fontSize: 220,
           color: 'var(--hcp-t-100)',
         }}
       >
-        {entry.emoji}
+        <entry.Icon size={180} strokeWidth={1.4} />
       </div>
 
       {/* Chip */}
