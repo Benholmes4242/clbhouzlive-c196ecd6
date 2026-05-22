@@ -57,8 +57,6 @@ export const legendCategoryIcon: Record<LegendCategory, LucideIcon> = {
   best_score_diff_all_time: TrendingDown,
   most_birdies_90d:         Feather,
   most_birdies_all_time:    Feather,
-  most_birdies_90d:         Feather,
-  most_birdies_all_time:    Feather,
   best_stableford_90d:      Target,
   best_stableford_all_time: Target,
   most_eagles_90d:          Award,
