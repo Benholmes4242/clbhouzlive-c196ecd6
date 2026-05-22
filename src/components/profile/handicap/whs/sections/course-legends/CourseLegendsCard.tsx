@@ -292,23 +292,29 @@ export const CourseLegendsCard: React.FC<Props> = ({
         </div>
       </div>
 
-      {/* Holder grid */}
-      <div
-        style={{
-          display: 'grid',
-          gridTemplateColumns: '1fr 1fr',
-          gap: 6,
-        }}
-      >
-        {visibleCats.map((cat, idx) => (
-          <HolderCell
-            key={cat}
-            category={cat}
-            holder={visibleHolders.get(cat)!}
-            span={visibleCats.length % 2 === 1 && idx === visibleCats.length - 1}
-            selfLabel={selfLabel}
-          />
-        ))}
+      {/* Holder columns — two independent flex columns so filtering in one
+          doesn't shift items into the wrong column of a grid. */}
+      <div style={{ display: 'flex', gap: 6, alignItems: 'flex-start' }}>
+        <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 6 }}>
+          {leftColumn.map(({ cat, row }) => (
+            <HolderCell
+              key={cat}
+              category={cat}
+              holder={row}
+              selfLabel={selfLabel}
+            />
+          ))}
+        </div>
+        <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 6 }}>
+          {rightColumn.map(({ cat, row }) => (
+            <HolderCell
+              key={cat}
+              category={cat}
+              holder={row}
+              selfLabel={selfLabel}
+            />
+          ))}
+        </div>
       </div>
 
       {/* Footer */}
