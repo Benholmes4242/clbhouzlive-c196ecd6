@@ -423,10 +423,11 @@ const RecentFormRegion: React.FC<RecentFormRegionProps> = ({
   friendName,
   friendHcpDelta,
 }) => {
+  const isClbhouzFriend = !!friendConnectionId;
   const { data: rounds, isLoading, isError } = useFriendRecentRounds(
     friendConnectionId,
     5,
-    !!friendConnectionId,
+    isClbhouzFriend,
   );
 
   const formatDaysAgo = (playDate: string): string => {
@@ -463,7 +464,21 @@ const RecentFormRegion: React.FC<RecentFormRegionProps> = ({
         {friendName.toUpperCase()}'S RECENT FORM
       </div>
 
-      {isLoading && (
+      {!isClbhouzFriend && (
+        <div
+          style={{
+            fontSize: 12,
+            color: T.inkMute,
+            padding: '12px 0',
+            textAlign: 'center',
+            lineHeight: 1.5,
+          }}
+        >
+          {friendName} isn't on clbhouz — their rounds are tracked via WHS but you'll see more if they join
+        </div>
+      )}
+
+      {isClbhouzFriend && isLoading && (
         <div
           style={{
             display: 'flex',
@@ -488,7 +503,7 @@ const RecentFormRegion: React.FC<RecentFormRegionProps> = ({
         </div>
       )}
 
-      {!isLoading && !isError && (rounds == null || rounds.length === 0) && (
+      {isClbhouzFriend && !isLoading && !isError && (rounds == null || rounds.length === 0) && (
         <div
           style={{
             fontSize: 12,
@@ -500,6 +515,7 @@ const RecentFormRegion: React.FC<RecentFormRegionProps> = ({
           No recent rounds
         </div>
       )}
+
 
       {!isLoading && rounds && rounds.length > 0 && (
         <>
