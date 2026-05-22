@@ -193,7 +193,6 @@ const FriendViewRivalries: React.FC<{
         <TieredRivalries
           hero={hero}
           compact={compact}
-          empty={empty}
           friendViewOwnerId={ownerUserId}
         />
       )}
