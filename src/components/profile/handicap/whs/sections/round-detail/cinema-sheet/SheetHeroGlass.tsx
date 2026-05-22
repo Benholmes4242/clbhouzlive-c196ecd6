@@ -1,4 +1,5 @@
 import React from 'react';
+import { Lock } from 'lucide-react';
 import type { WhsScoreHole } from '@/lib/whs/types';
 import { splitCourseName } from '../../last-round-card/splitCourseName';
 import CinemaCardShapeStrip from '../../last-round-card/CinemaCardShapeStrip';
@@ -9,6 +10,41 @@ const FONT_MONO = "Geist, system-ui, -apple-system, BlinkMacSystemFont, sans-ser
 const AMBER = '#F7931E';
 const MINUS = '\u2212';
 const EM_DASH = '\u2014';
+
+const lockedLabelStyle: React.CSSProperties = {
+  fontSize: 10,
+  fontWeight: 700,
+  color: 'rgba(255,255,255,0.40)',
+  letterSpacing: '0.16em',
+  textTransform: 'uppercase',
+  fontFamily: FONT_GEIST,
+  marginBottom: 4,
+};
+
+const LockedTile: React.FC<{ label: string; align?: 'left' | 'right' | 'center' }> = ({
+  label,
+  align = 'center',
+}) => (
+  <div style={{ textAlign: align }} aria-label={`${label} locked — invite friend to clbhouz to unlock`}>
+    <div style={lockedLabelStyle}>{label}</div>
+    <div
+      style={{
+        marginTop: 4,
+        width: 36,
+        height: 36,
+        borderRadius: 8,
+        border: '1px dashed rgba(255,255,255,0.20)',
+        background: 'rgba(255,255,255,0.06)',
+        display: 'inline-flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+      }}
+    >
+      <Lock size={14} color="rgba(255,255,255,0.45)" strokeWidth={2} />
+    </div>
+  </div>
+);
+
 
 interface Props {
   courseName: string;
@@ -23,7 +59,10 @@ interface Props {
   isCounter?: boolean;
   /** When non-null and |delta| >= 0.05, renders 4th stat HCP IMPACT in a 2×2 grid. */
   handicapDelta?: number | null;
+  /** When true, missing Stableford and Score Diff render as dashed lock tiles (non-clbhouz friends). */
+  lockMissingStats?: boolean;
 }
+
 
 const HAIR: React.CSSProperties = {
   height: 0,
@@ -70,7 +109,9 @@ export const SheetHeroGlass: React.FC<Props> = ({
   metaOverride,
   isCounter = false,
   handicapDelta = null,
+  lockMissingStats = false,
 }) => {
+
   const { title, suffix } = splitCourseName(courseName);
   const hasImpact =
     handicapDelta != null && Math.abs(handicapDelta) >= 0.05;
@@ -171,16 +212,25 @@ export const SheetHeroGlass: React.FC<Props> = ({
             />
           </div>
         </div>
-        <div style={{ textAlign: hasImpact ? 'right' : 'center' }}>
-          <div style={labelStyle}>STABLEFORD</div>
-          <div style={valueStyle('#FFFFFF')}>{stableford != null ? stableford : EM_DASH}</div>
-        </div>
-        <div style={{ textAlign: hasImpact ? 'left' : 'right' }}>
-          <div style={labelStyle}>SCORE DIFF</div>
-          <div style={valueStyle(differential != null ? AMBER : '#FFFFFF')}>
-            {fmtDiffLocal(differential)}
+        {lockMissingStats ? (
+          <LockedTile label="STABLEFORD" align={hasImpact ? 'right' : 'center'} />
+        ) : (
+          <div style={{ textAlign: hasImpact ? 'right' : 'center' }}>
+            <div style={labelStyle}>STABLEFORD</div>
+            <div style={valueStyle('#FFFFFF')}>{stableford != null ? stableford : EM_DASH}</div>
           </div>
-        </div>
+        )}
+        {lockMissingStats ? (
+          <LockedTile label="SCORE DIFF" align={hasImpact ? 'left' : 'right'} />
+        ) : (
+          <div style={{ textAlign: hasImpact ? 'left' : 'right' }}>
+            <div style={labelStyle}>SCORE DIFF</div>
+            <div style={valueStyle(differential != null ? AMBER : '#FFFFFF')}>
+              {fmtDiffLocal(differential)}
+            </div>
+          </div>
+        )}
+
         {hasImpact && (
           <div style={{ textAlign: 'right' }}>
             <div style={labelStyle}>HCP IMPACT</div>

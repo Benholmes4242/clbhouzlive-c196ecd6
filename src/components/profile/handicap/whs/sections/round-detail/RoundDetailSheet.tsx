@@ -193,6 +193,7 @@ export const RoundDetailSheet: React.FC<Props> = ({
                   stableford={activity.last_round_stableford}
                   differential={activity.last_round_differential}
                   holes={null}
+                  lockMissingStats={true}
                   metaOverride={
                     <div
                       style={{
