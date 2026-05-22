@@ -22,6 +22,11 @@ export const YourCoursesSubsection: React.FC<Props> = ({
   onSelectCourse,
   friendName,
 }) => {
+  // Only render cards for courses that have data in the active window.
+  const populatedCourses = courses.filter(
+    (c) => (holdersByCourse.get(c.course_id)?.size ?? 0) > 0,
+  );
+
   return (
     <>
       <SubsectionEyebrow label="YOUR COURSES" />
@@ -33,7 +38,20 @@ export const YourCoursesSubsection: React.FC<Props> = ({
             body="Courses you've played outside your home club will show here."
           />
         )}
-        {courses.map((c) => (
+        {!isLoading && courses.length > 0 && populatedCourses.length === 0 && (
+          <div
+            style={{
+              padding: '20px 16px',
+              textAlign: 'center',
+              color: 'var(--hcp-t-40)',
+              fontSize: 13,
+              lineHeight: 1.5,
+            }}
+          >
+            No recent activity — switch to All time to see your records
+          </div>
+        )}
+        {populatedCourses.map((c) => (
           <CourseLegendsCard
             key={c.course_id}
             courseId={c.course_id}
