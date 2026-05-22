@@ -86,11 +86,10 @@ const HolderCell: React.FC<HolderCellProps> = ({
   const Icon = legendCategoryIcon[category];
   const isSelf = holder.is_self;
 
-  const nameColor = isSelf ? GOLD : 'var(--hcp-t-100)';
-  const labelColor = 'var(--hcp-t-60)';
-  const valueColor = nameColor;
-  const iconBg = isSelf ? 'rgba(251,188,46,0.16)' : 'rgba(255,255,255,0.05)';
-  const iconColor = isSelf ? GOLD : 'var(--hcp-t-60)';
+  const palette = CATEGORY_TILE_PALETTE[category];
+  const iconBg = isSelf ? 'rgba(251,188,46,0.16)' : palette.bg;
+  const iconBorder = isSelf ? 'rgba(251,188,46,0.30)' : palette.border;
+  const iconColor = isSelf ? GOLD : palette.icon;
 
   return (
     <div
@@ -114,11 +113,13 @@ const HolderCell: React.FC<HolderCellProps> = ({
           height: 22,
           borderRadius: 6,
           background: iconBg,
+          border: `1px solid ${iconBorder}`,
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
           flexShrink: 0,
           color: iconColor,
+          boxSizing: 'border-box',
         }}
       >
         <Icon size={13} strokeWidth={2.2} />
