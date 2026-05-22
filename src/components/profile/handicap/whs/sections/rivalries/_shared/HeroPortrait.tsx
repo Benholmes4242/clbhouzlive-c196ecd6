@@ -1,9 +1,7 @@
 import React from 'react';
-import { initials } from '@/lib/whs/utils/initials';
 import { getMobileCropPosition } from '@/utils/mobileCropUtils';
 
 interface HeroPortraitProps {
-  name: string | null;
   headerPhotoUrl: string | null;
   profilePhotoUrl: string | null;
   mobileCrop: {
@@ -17,7 +15,6 @@ interface HeroPortraitProps {
 }
 
 export const HeroPortrait: React.FC<HeroPortraitProps> = ({
-  name,
   headerPhotoUrl,
   profilePhotoUrl,
   mobileCrop,
@@ -137,7 +134,7 @@ export const HeroPortrait: React.FC<HeroPortraitProps> = ({
     );
   }
 
-  // Tier 3: initials fallback (unchanged)
+  // Tier 3: gradient + watermark fallback (no photo)
   return (
     <div
       aria-hidden
@@ -181,18 +178,6 @@ export const HeroPortrait: React.FC<HeroPortraitProps> = ({
           }}
         >
           {watermarkEmoji}
-        </div>
-        <div
-          style={{
-            fontSize: 110,
-            fontWeight: 800,
-            color: 'rgba(255,255,255,0.30)',
-            letterSpacing: '-0.04em',
-            lineHeight: 1,
-            zIndex: 1,
-          }}
-        >
-          {initials(name ?? '?')}
         </div>
       </div>
     </div>

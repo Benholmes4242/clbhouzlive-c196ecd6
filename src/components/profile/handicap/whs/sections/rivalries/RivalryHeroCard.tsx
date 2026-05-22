@@ -121,7 +121,6 @@ export const RivalryHeroCard: React.FC<Props> = ({
       {/* Hero portrait */}
       <div style={{ position: 'relative' }}>
         <HeroPortrait
-          name={rivalDisplayName}
           headerPhotoUrl={rivalry.rival_header_photo_url}
           profilePhotoUrl={rivalry.rival_profile_photo_url}
           mobileCrop={{
