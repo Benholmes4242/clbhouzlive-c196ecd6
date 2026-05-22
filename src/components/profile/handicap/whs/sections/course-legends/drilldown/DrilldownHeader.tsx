@@ -40,7 +40,7 @@ export const DrilldownHeader: React.FC<Props> = ({ state, onBack, youOwnedCount,
 
     <div
       style={{
-        padding: '0 16px',
+        padding: onBack ? '0 16px' : '20px 16px 0',
         display: 'flex',
         justifyContent: 'space-between',
         alignItems: 'flex-start',
