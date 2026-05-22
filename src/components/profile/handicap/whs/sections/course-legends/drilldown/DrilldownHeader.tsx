@@ -5,13 +5,14 @@ import type { CourseSelection } from '../types';
 
 interface Props {
   state: CourseSelection;
-  onBack: () => void;
+  onBack?: () => void;
   youOwnedCount: number;
+  totalCategories?: number;
 }
 
 const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
 
-export const DrilldownHeader: React.FC<Props> = ({ state, onBack, youOwnedCount }) => (
+export const DrilldownHeader: React.FC<Props> = ({ state, onBack, youOwnedCount, totalCategories = 6 }) => (
   <>
     <div style={{ padding: '20px 16px 0', fontFamily: FONT }}>
       <button
