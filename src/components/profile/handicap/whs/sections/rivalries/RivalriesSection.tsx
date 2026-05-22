@@ -38,21 +38,20 @@ function splitByTier(
 ) {
   const hero: Array<{ r: FriendRivalryHydrated; tier: RivalryTier }> = [];
   const compact: Array<{ r: FriendRivalryHydrated; tier: RivalryTier }> = [];
-  const empty: FriendRivalryHydrated[] = [];
   for (const r of rivalries) {
     const k = rivalKey(r);
     if (!k) continue;
     const t = tiers.get(k);
     if (t === 'archrival' || t === 'rival') hero.push({ r, tier: t });
     else if (t === 'recent') compact.push({ r, tier: t });
-    else if (t === 'new') empty.push(r);
+    // undefined tier (no shared rounds) — silently dropped
   }
   // Hero pager order: archrival first, then rival
   hero.sort((a, b) => {
     if (a.tier === b.tier) return 0;
     return a.tier === 'archrival' ? -1 : 1;
   });
-  return { hero, compact, empty };
+  return { hero, compact };
 }
 
 // ─── Owner view ───────────────────────────────────────────────────────────
