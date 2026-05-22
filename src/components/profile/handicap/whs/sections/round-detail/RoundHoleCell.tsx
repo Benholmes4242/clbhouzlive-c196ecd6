@@ -3,6 +3,7 @@ import type { WhsScoreHole } from '@/lib/whs/types';
 
 interface Props {
   hole: WhsScoreHole;
+  showPar?: boolean;
 }
 
 // ─── Design tokens ─────────────────────────────────────────────────────
@@ -138,7 +139,7 @@ const Shape: React.FC<{
 };
 
 // ─── RoundHoleCell ─────────────────────────────────────────────────────
-export const RoundHoleCell: React.FC<Props> = ({ hole }) => {
+export const RoundHoleCell: React.FC<Props> = ({ hole, showPar = true }) => {
   const strokes = hole.played
     ? (hole.adjusted_gross ?? hole.actual_gross ?? null)
     : null;
@@ -235,6 +236,23 @@ export const RoundHoleCell: React.FC<Props> = ({ hole }) => {
           {strokes == null ? '\u2014' : strokes}
         </span>
       </div>
+
+      {/* Par label — below the tile */}
+      {showPar && hole.par != null && (
+        <span
+          style={{
+            fontSize: 9,
+            fontWeight: 500,
+            color: INK_40,
+            letterSpacing: '0.02em',
+            fontVariantNumeric: 'tabular-nums',
+            lineHeight: 1,
+            marginTop: 1,
+          }}
+        >
+          par {hole.par}
+        </span>
+      )}
     </div>
   );
 };

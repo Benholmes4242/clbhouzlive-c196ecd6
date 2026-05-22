@@ -1,6 +1,7 @@
 import React, { useMemo } from 'react';
 import RoundHoleCell from './RoundHoleCell';
 import type { WhsScoreHole } from '@/lib/whs/types';
+import { nineSeverityTint } from './_shared/nineSeverityTint';
 
 interface Props {
   holes: WhsScoreHole[];
@@ -9,11 +10,7 @@ interface Props {
 
 const FONT_GEIST = 'Geist, system-ui, -apple-system, BlinkMacSystemFont, sans-serif';
 const FONT_MONO = "Geist, system-ui, -apple-system, BlinkMacSystemFont, sans-serif";
-const INK = 'var(--hcp-t-100)';
-const INK_45 = 'var(--hcp-t-40)';
 const AMBER = '#F7931E';
-const AMBER_DEEP = '#C97211';
-const GREEN = '#10B981';
 
 const NineGrid: React.FC<{ label: string; holes: WhsScoreHole[]; isLast?: boolean }> = ({ label, holes, isLast }) => {
   const total = holes.reduce(
@@ -22,7 +19,7 @@ const NineGrid: React.FC<{ label: string; holes: WhsScoreHole[]; isLast?: boolea
   );
   const par = holes.reduce((s, h) => s + (h.par ?? 0), 0);
   const toPar = total - par;
-  const toParColor = toPar > 0 ? AMBER_DEEP : toPar < 0 ? GREEN : INK_45;
+  const palette = nineSeverityTint(toPar);
   const toParLabel = toPar === 0 ? 'E' : `${toPar > 0 ? '+' : ''}${toPar}`;
 
   return (
@@ -52,7 +49,7 @@ const NineGrid: React.FC<{ label: string; holes: WhsScoreHole[]; isLast?: boolea
             alignItems: 'baseline',
             gap: 6,
             padding: '3px 9px',
-            background: 'var(--hcp-bg-2)',
+            background: palette.bgTint,
             borderRadius: 999,
             fontVariantNumeric: 'tabular-nums',
           }}
@@ -61,7 +58,7 @@ const NineGrid: React.FC<{ label: string; holes: WhsScoreHole[]; isLast?: boolea
             style={{
               fontSize: 13,
               fontWeight: 600,
-              color: 'var(--hcp-t-100)',
+              color: palette.numColor,
               fontFamily: FONT_MONO,
               letterSpacing: '-0.02em',
             }}
@@ -72,7 +69,7 @@ const NineGrid: React.FC<{ label: string; holes: WhsScoreHole[]; isLast?: boolea
             style={{
               fontSize: 10,
               fontWeight: 700,
-              color: toParColor,
+              color: palette.deltaColor,
               letterSpacing: '0.02em',
             }}
           >
