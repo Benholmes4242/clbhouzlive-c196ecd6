@@ -517,7 +517,7 @@ const RecentFormRegion: React.FC<RecentFormRegionProps> = ({
       )}
 
 
-      {!isLoading && rounds && rounds.length > 0 && (
+      {isClbhouzFriend && !isLoading && rounds && rounds.length > 0 && (
         <>
           <div
             style={{
