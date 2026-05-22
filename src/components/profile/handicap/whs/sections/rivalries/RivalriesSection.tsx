@@ -1,8 +1,8 @@
 import React, { useState, useMemo, useRef, useCallback, useEffect } from 'react';
-import { Pencil } from 'lucide-react';
+import { Settings2 } from 'lucide-react';
 import { DarkSectionHeader } from '../_shared/darkAtoms';
 import RivalryCard from './RivalryCard';
-import RivalryEditSheet from './RivalryEditSheet';
+import ManageRivalsSheet from './manage-sheet/ManageRivalsSheet';
 import { useFriendRivalries, useFriendLeaderboard } from '@/lib/whs/hooks';
 import { useFriendViewRivalriesForProfile } from '@/lib/whs/friendViewRivalries';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
@@ -64,10 +64,7 @@ const OwnerViewRivalries: React.FC<{ userId: string }> = ({ userId }) => {
     [leaderboard],
   );
 
-  const [editTarget, setEditTarget] = useState<{
-    rivalry: FriendRivalryHydrated | null;
-    slotIndex: number;
-  } | null>(null);
+  const [manageOpen, setManageOpen] = useState(false);
 
   const filledRivalries = useMemo(
     () => (data ?? []).slice().sort((a, b) => a.slot_index - b.slot_index),
@@ -100,31 +97,26 @@ const OwnerViewRivalries: React.FC<{ userId: string }> = ({ userId }) => {
               : 'Auto-picked from your most-played friends.'
         }
         right={
-          hasFilled ? (
-            <button
-              onClick={() => {
-                const first = filledRivalries[0];
-                setEditTarget({ rivalry: first, slotIndex: first.slot_index });
-              }}
-              style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: 4,
-                padding: '4px 10px',
-                background: 'transparent',
-                border: '1px solid var(--hcp-line-2)',
-                borderRadius: 999,
-                cursor: 'pointer',
-                color: 'var(--hcp-t-80)',
-                fontSize: 10,
-                fontWeight: 800,
-                letterSpacing: '0.14em',
-              }}
-            >
-              <Pencil size={11} strokeWidth={2.4} />
-              EDIT
-            </button>
-          ) : null
+          <button
+            onClick={() => setManageOpen(true)}
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 6,
+              padding: '6px 12px',
+              background: 'transparent',
+              border: '1px solid var(--hcp-line-2)',
+              borderRadius: 999,
+              cursor: 'pointer',
+              color: 'var(--hcp-t-80)',
+              fontSize: 12,
+              fontWeight: 700,
+              fontFamily: 'Geist, system-ui, sans-serif',
+            }}
+          >
+            <Settings2 size={13} strokeWidth={2.2} />
+            Manage rivals
+          </button>
         }
       />
 
@@ -136,12 +128,10 @@ const OwnerViewRivalries: React.FC<{ userId: string }> = ({ userId }) => {
         <TieredRivalries hero={hero} compact={compact} empty={empty} />
       )}
 
-      <RivalryEditSheet
+      <ManageRivalsSheet
         userId={userId}
-        rivalry={editTarget?.rivalry ?? null}
-        slotIndex={editTarget?.slotIndex ?? null}
-        open={!!editTarget}
-        onClose={() => setEditTarget(null)}
+        open={manageOpen}
+        onClose={() => setManageOpen(false)}
       />
     </section>
   );
