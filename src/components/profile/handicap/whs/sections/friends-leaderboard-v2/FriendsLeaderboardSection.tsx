@@ -41,18 +41,21 @@ export const FriendsLeaderboardSection: React.FC<Props> = ({ userId }) => {
   const cohorts = buildLeaderboardCohorts(data);
   const selfRow =
     cohorts.selfActiveIdx >= 0 ? cohorts.active[cohorts.selfActiveIdx] : null;
-  const percentileData = percentileQuery.data;
-  const percentileAvailable = percentileData?.available === true;
-  const percentileTopValue = percentileAvailable ? percentileData.percentile_top : null;
+  // Keep hook call — may feed other surfaces; not used for subtitle anymore.
+  void percentileQuery;
 
-  // Hybrid: show percentile ONLY when user is in top half of their friend leaderboard
-  // AND percentile is available (RPC handles cohort_size < 20 by returning available: false)
-  const isInTopHalf =
+  // Friend-circle percentile: "Top X% of your circle"
+  // Requires ≥5 active friends and user in top half of circle.
+  const MIN_CIRCLE_SIZE = 5;
+
+  const canShowCirclePercentile =
     cohorts.selfActiveRank != null &&
-    cohorts.totalActive > 0 &&
+    cohorts.totalActive >= MIN_CIRCLE_SIZE &&
     cohorts.selfActiveRank <= Math.ceil(cohorts.totalActive / 2);
 
-  const showPercentile = percentileTopValue != null && isInTopHalf;
+  const circlePercentile = canShowCirclePercentile
+    ? Math.max(5, Math.min(95, Math.ceil((cohorts.selfActiveRank! / cohorts.totalActive) * 20) * 5))
+    : null;
 
   const tail = `${cohorts.totalActive} active${
     cohorts.totalInactive > 0 ? `, ${cohorts.totalInactive} inactive` : ''
@@ -60,8 +63,8 @@ export const FriendsLeaderboardSection: React.FC<Props> = ({ userId }) => {
 
   const subLine = isLoading
     ? 'Loading…'
-    : showPercentile
-      ? `You're top ${percentileTopValue}% of all clbhouz · ${tail}`
+    : circlePercentile != null
+      ? `You're top ${circlePercentile}% of your circle · ${tail}`
       : `Ranked by current handicap · ${tail}`;
 
 
