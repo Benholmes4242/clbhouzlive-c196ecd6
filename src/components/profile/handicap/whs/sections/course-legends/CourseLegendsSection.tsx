@@ -30,7 +30,7 @@ interface Props {
   friendName?: string | null;
 }
 
-const WindowToggle: React.FC<{
+export const WindowToggle: React.FC<{
   window: LegendWindow;
   setWindow: (w: LegendWindow) => void;
 }> = ({ window, setWindow }) => (
