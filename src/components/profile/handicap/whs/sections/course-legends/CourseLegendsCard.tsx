@@ -192,19 +192,30 @@ export const CourseLegendsCard: React.FC<Props> = ({
 }) => {
   const [pressed, setPressed] = useState(false);
 
-  // Filter: drop Eagle/Ace cells when value is 0; only keep categories
-  // we actually have data for.
+  // Filter per column: drop Eagle/Ace cells when value is 0; only keep
+  // categories with holder data. Each column collapses upward independently.
+  const filterColumn = (categories: LegendCategory[]) => {
+    const result: Array<{ cat: LegendCategory; row: CourseLegendHolderRow }> = [];
+    for (const cat of categories) {
+      const row = holdersByCategory.get(cat);
+      if (!row) continue;
+      if (isHideWhenZero(cat) && (row.value ?? 0) === 0) continue;
+      result.push({ cat, row });
+    }
+    return result;
+  };
+
+  const leftColumn = filterColumn(LEFT_CATEGORIES);
+  const rightColumn = filterColumn(RIGHT_CATEGORIES);
+
+  // Combined map kept for getFooterCue + selfLabel logic that still expects it.
   const visibleHolders = new Map<LegendCategory, CourseLegendHolderRow>();
-  CATEGORY_ORDER.forEach((cat) => {
-    const row = holdersByCategory.get(cat);
-    if (!row) return;
-    if (isHideWhenZero(cat) && (row.value ?? 0) === 0) return;
+  [...leftColumn, ...rightColumn].forEach(({ cat, row }) => {
     visibleHolders.set(cat, row);
   });
 
-  const visibleCats = Array.from(visibleHolders.keys());
-  const youOwnedCount = Array.from(visibleHolders.values()).filter((r) => r.is_self).length;
   const totalCategories = visibleHolders.size;
+  const youOwnedCount = Array.from(visibleHolders.values()).filter((r) => r.is_self).length;
 
   // Hide cards entirely when the active window has no data — no skeleton.
   if (totalCategories === 0) {
