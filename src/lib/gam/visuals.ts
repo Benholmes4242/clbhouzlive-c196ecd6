@@ -4,6 +4,8 @@ import {
   MapPin,
   Target,
   TrendingDown,
+  Award,
+  Sparkles,
   type LucideIcon,
 } from 'lucide-react';
 import type { BadgeRarity, LegendCategory, StreakType } from './types';
@@ -24,12 +26,26 @@ export const rarityColorSoft: Record<BadgeRarity, string> = {
   legendary: 'rgba(251, 188, 46, 0.14)',
 };
 
+/**
+ * Display labels for legend categories. 90D and all-time variants share
+ * the same display name — the time window is implied by section context,
+ * not card-level metadata.
+ */
 export const legendCategoryLabel: Record<LegendCategory, string> = {
-  best_score_diff: 'Score Legend',
-  most_birdies_90d: 'Birdie Legend',
-  most_rounds_90d: 'Visitor Legend',
-  lowest_gross: 'Gross Record',
-  best_stableford_90d: 'Stableford Champ',
+  lowest_gross_90d:         'Gross Record',
+  lowest_gross_all_time:    'Gross Record',
+  best_score_diff_90d:      'Score Legend',
+  best_score_diff_all_time: 'Score Legend',
+  most_birdies_90d:         'Birdie Legend',
+  most_birdies_all_time:    'Birdie Legend',
+  most_rounds_90d:          'Visitor Legend',
+  most_rounds_all_time:     'Visitor Legend',
+  best_stableford_90d:      'Stableford Champ',
+  best_stableford_all_time: 'Stableford Champ',
+  most_eagles_90d:          'Eagle Catcher',
+  most_eagles_all_time:     'Eagle Catcher',
+  most_aces_90d:            'Hole-Out Hero',
+  most_aces_all_time:       'Hole-Out Hero',
 };
 
 
@@ -38,11 +54,41 @@ export const legendCategoryLabel: Record<LegendCategory, string> = {
  * for all gam surfaces.
  */
 export const legendCategoryIcon: Record<LegendCategory, LucideIcon> = {
-  best_score_diff: TrendingDown,
-  most_birdies_90d: Feather,
-  most_rounds_90d: MapPin,
-  lowest_gross: Trophy,
-  best_stableford_90d: Target,
+  lowest_gross_90d:         Trophy,
+  lowest_gross_all_time:    Trophy,
+  best_score_diff_90d:      TrendingDown,
+  best_score_diff_all_time: TrendingDown,
+  most_birdies_90d:         Feather,
+  most_birdies_all_time:    Feather,
+  most_rounds_90d:          MapPin,
+  most_rounds_all_time:     MapPin,
+  best_stableford_90d:      Target,
+  best_stableford_all_time: Target,
+  most_eagles_90d:          Award,
+  most_eagles_all_time:     Award,
+  most_aces_90d:            Sparkles,
+  most_aces_all_time:       Sparkles,
+};
+
+/**
+ * Whether a category represents a rolling 90-day or permanent all-time record.
+ * Used by the section toggle to filter visible categories.
+ */
+export const legendCategoryWindow: Record<LegendCategory, '90d' | 'all_time'> = {
+  lowest_gross_90d:         '90d',
+  lowest_gross_all_time:    'all_time',
+  best_score_diff_90d:      '90d',
+  best_score_diff_all_time: 'all_time',
+  most_birdies_90d:         '90d',
+  most_birdies_all_time:    'all_time',
+  most_rounds_90d:          '90d',
+  most_rounds_all_time:     'all_time',
+  best_stableford_90d:      '90d',
+  best_stableford_all_time: 'all_time',
+  most_eagles_90d:          '90d',
+  most_eagles_all_time:     'all_time',
+  most_aces_90d:            '90d',
+  most_aces_all_time:       'all_time',
 };
 
 export const streakLabel: Record<StreakType, string> = {
@@ -57,16 +103,27 @@ export const streakLabel: Record<StreakType, string> = {
 
 export function formatLegendValue(category: LegendCategory, value: number): string {
   switch (category) {
-    case 'best_score_diff':
+    case 'best_score_diff_90d':
+    case 'best_score_diff_all_time':
       return value < 0 ? `${value.toFixed(1)} vs hcp` : `+${value.toFixed(1)} vs hcp`;
     case 'most_birdies_90d':
+    case 'most_birdies_all_time':
       return `${value} birdies`;
     case 'most_rounds_90d':
+    case 'most_rounds_all_time':
       return `${value} rounds`;
-    case 'lowest_gross':
+    case 'lowest_gross_90d':
+    case 'lowest_gross_all_time':
       return `${value}`;
     case 'best_stableford_90d':
+    case 'best_stableford_all_time':
       return `${value} pts`;
+    case 'most_eagles_90d':
+    case 'most_eagles_all_time':
+      return `${value} eagle${value === 1 ? '' : 's'}`;
+    case 'most_aces_90d':
+    case 'most_aces_all_time':
+      return `${value} ace${value === 1 ? '' : 's'}`;
   }
 }
 
@@ -108,7 +165,7 @@ export function formatLegendValueCompact(
   category: LegendCategory,
   value: number,
 ): string {
-  if (category === 'best_score_diff') {
+  if (category === 'best_score_diff_90d' || category === 'best_score_diff_all_time') {
     if (value < 0) return `${MINUS}${Math.abs(value).toFixed(1)}`;
     return `+${value.toFixed(1)}`;
   }
@@ -122,21 +179,36 @@ export function formatLegendValueCompact(
 export function formatLegendGap(category: LegendCategory, gap: number): string {
   const abs = Math.abs(gap);
   switch (category) {
-    case 'best_score_diff':
+    case 'best_score_diff_90d':
+    case 'best_score_diff_all_time':
       return `${abs.toFixed(1)} vs hcp`;
-    case 'lowest_gross': {
+    case 'lowest_gross_90d':
+    case 'lowest_gross_all_time': {
       const n = Math.round(abs);
       return `${n} ${n === 1 ? 'stroke' : 'strokes'}`;
     }
-    case 'most_birdies_90d': {
+    case 'most_birdies_90d':
+    case 'most_birdies_all_time': {
       const n = Math.round(abs);
       return `${n} ${n === 1 ? 'birdie' : 'birdies'}`;
     }
-    case 'most_rounds_90d': {
+    case 'most_rounds_90d':
+    case 'most_rounds_all_time': {
       const n = Math.round(abs);
       return `${n} ${n === 1 ? 'round' : 'rounds'}`;
     }
     case 'best_stableford_90d':
+    case 'best_stableford_all_time':
       return `${Math.round(abs)} pts`;
+    case 'most_eagles_90d':
+    case 'most_eagles_all_time': {
+      const n = Math.round(abs);
+      return `${n} ${n === 1 ? 'eagle' : 'eagles'}`;
+    }
+    case 'most_aces_90d':
+    case 'most_aces_all_time': {
+      const n = Math.round(abs);
+      return `${n} ${n === 1 ? 'ace' : 'aces'}`;
+    }
   }
 }

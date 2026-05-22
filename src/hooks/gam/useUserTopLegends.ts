@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import type { LegendCategory } from '@/lib/gam/types';
+import type { LegendCategory, LegendWindow } from '@/lib/gam/types';
 
 export interface TopLegendRow {
   id: string;
@@ -17,6 +17,8 @@ interface Options {
   limit?: number;
   /** Only include rows where rank <= maxRank. Default 3. */
   maxRank?: number;
+  /** Filter to only categories in this time window. Default: undefined (all). */
+  window?: LegendWindow;
 }
 
 /**
@@ -26,18 +28,26 @@ interface Options {
  * Parameterised so file 03's sheet can reuse it for the full top-10 list.
  */
 export function useUserTopLegends(userId: string | undefined, options: Options = {}) {
-  const { limit = 3, maxRank = 3 } = options;
+  const { limit = 3, maxRank = 3, window } = options;
   return useQuery({
-    queryKey: ['gam', 'user-top-legends', userId, limit, maxRank],
+    queryKey: ['gam', 'user-top-legends', userId, limit, maxRank, window],
     enabled: Boolean(userId),
     staleTime: 60_000,
     queryFn: async (): Promise<TopLegendRow[]> => {
-      const { data, error } = await supabase
+      let q = supabase
         .from('gam_course_legends_view')
         .select('id, category, rank, value, course_id, course_name, attained_at')
         .eq('user_id', userId!)
         .eq('is_current', true)
-        .lte('rank', maxRank)
+        .lte('rank', maxRank);
+
+      if (window === '90d') {
+        q = q.like('category', '%_90d');
+      } else if (window === 'all_time') {
+        q = q.like('category', '%_all_time');
+      }
+
+      const { data, error } = await q
         .order('rank', { ascending: true })
         .order('attained_at', { ascending: false })
         .limit(limit);

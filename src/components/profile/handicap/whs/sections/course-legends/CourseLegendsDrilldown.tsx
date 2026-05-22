@@ -19,27 +19,47 @@ import { CategorySection } from './drilldown/CategorySection';
 const AMBER = '#F7931E';
 
 const CATEGORIES_ORDER: LegendCategory[] = [
-  'best_score_diff',
-  'lowest_gross',
-  'most_birdies_90d',
-  'best_stableford_90d',
-  'most_rounds_90d',
+  'best_score_diff_90d',      'best_score_diff_all_time',
+  'lowest_gross_90d',         'lowest_gross_all_time',
+  'most_birdies_90d',         'most_birdies_all_time',
+  'best_stableford_90d',      'best_stableford_all_time',
+  'most_rounds_90d',          'most_rounds_all_time',
+  'most_eagles_90d',          'most_eagles_all_time',
+  'most_aces_90d',            'most_aces_all_time',
 ];
 
 const SHORT_LABELS: Record<LegendCategory, string> = {
-  best_score_diff: 'Score',
-  lowest_gross: 'Gross',
-  most_birdies_90d: 'Birdie',
-  best_stableford_90d: 'Stbl',
-  most_rounds_90d: 'Visitor',
+  best_score_diff_90d:      'Score',
+  best_score_diff_all_time: 'Score',
+  lowest_gross_90d:         'Gross',
+  lowest_gross_all_time:    'Gross',
+  most_birdies_90d:         'Birdie',
+  most_birdies_all_time:    'Birdie',
+  best_stableford_90d:      'Stbl',
+  best_stableford_all_time: 'Stbl',
+  most_rounds_90d:          'Visitor',
+  most_rounds_all_time:     'Visitor',
+  most_eagles_90d:          'Eagle',
+  most_eagles_all_time:     'Eagle',
+  most_aces_90d:            'Ace',
+  most_aces_all_time:       'Ace',
 };
 
 const UNITS: Record<LegendCategory, string> = {
-  best_score_diff: 'vs hcp',
-  lowest_gross: '',
-  most_birdies_90d: '',
-  best_stableford_90d: 'pts',
-  most_rounds_90d: '',
+  best_score_diff_90d:      'vs hcp',
+  best_score_diff_all_time: 'vs hcp',
+  lowest_gross_90d:         '',
+  lowest_gross_all_time:    '',
+  most_birdies_90d:         '',
+  most_birdies_all_time:    '',
+  best_stableford_90d:      'pts',
+  best_stableford_all_time: 'pts',
+  most_rounds_90d:          '',
+  most_rounds_all_time:     '',
+  most_eagles_90d:          '',
+  most_eagles_all_time:     '',
+  most_aces_90d:            '',
+  most_aces_all_time:       '',
 };
 
 interface SectionRow {
@@ -83,13 +103,7 @@ export const CourseLegendsDrilldown: React.FC<Props> = ({ state, onBack }) => {
   }, [data]);
 
   const yourRanks = useMemo(() => {
-    const r: Record<LegendCategory, number | null> = {
-      best_score_diff: null,
-      lowest_gross: null,
-      most_birdies_90d: null,
-      best_stableford_90d: null,
-      most_rounds_90d: null,
-    };
+    const r: Partial<Record<LegendCategory, number | null>> = {};
     CATEGORIES_ORDER.forEach((cat) => {
       const entry = groupedWithTotals.get(cat);
       const self = entry?.rows.find((row) => row.isSelf);
@@ -108,7 +122,7 @@ export const CourseLegendsDrilldown: React.FC<Props> = ({ state, onBack }) => {
         key: cat,
         short: SHORT_LABELS[cat],
         icon: legendCategoryIcon[cat],
-        yourRank: yourRanks[cat],
+        yourRank: yourRanks[cat] ?? null,
       })),
     [groupedWithTotals, yourRanks],
   );

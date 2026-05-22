@@ -9,24 +9,52 @@ export interface FooterCue {
 }
 
 const CAT_LABEL: Record<LegendCategory, string> = {
-  best_score_diff: 'Score',
-  most_birdies_90d: 'Birdie',
-  most_rounds_90d: 'Visitor',
-  lowest_gross: 'Gross',
-  best_stableford_90d: 'Stableford',
+  best_score_diff_90d:      'Score',
+  best_score_diff_all_time: 'Score',
+  most_birdies_90d:         'Birdie',
+  most_birdies_all_time:    'Birdie',
+  most_rounds_90d:          'Visitor',
+  most_rounds_all_time:     'Visitor',
+  lowest_gross_90d:         'Gross',
+  lowest_gross_all_time:    'Gross',
+  best_stableford_90d:      'Stableford',
+  best_stableford_all_time: 'Stableford',
+  most_eagles_90d:          'Eagle',
+  most_eagles_all_time:     'Eagle',
+  most_aces_90d:            'Ace',
+  most_aces_all_time:       'Ace',
 };
 
-const STROKE_CATS: LegendCategory[] = ['lowest_gross'];
-const POINT_CATS: LegendCategory[] = ['best_stableford_90d'];
-const BIRDIE_CATS: LegendCategory[] = ['most_birdies_90d'];
-const ROUND_CATS: LegendCategory[] = ['most_rounds_90d'];
+function isScoreDiff(c: LegendCategory): boolean {
+  return c === 'best_score_diff_90d' || c === 'best_score_diff_all_time';
+}
+function isGross(c: LegendCategory): boolean {
+  return c === 'lowest_gross_90d' || c === 'lowest_gross_all_time';
+}
+function isStableford(c: LegendCategory): boolean {
+  return c === 'best_stableford_90d' || c === 'best_stableford_all_time';
+}
+function isBirdies(c: LegendCategory): boolean {
+  return c === 'most_birdies_90d' || c === 'most_birdies_all_time';
+}
+function isRounds(c: LegendCategory): boolean {
+  return c === 'most_rounds_90d' || c === 'most_rounds_all_time';
+}
+function isEagles(c: LegendCategory): boolean {
+  return c === 'most_eagles_90d' || c === 'most_eagles_all_time';
+}
+function isAces(c: LegendCategory): boolean {
+  return c === 'most_aces_90d' || c === 'most_aces_all_time';
+}
 
 function gapUnit(category: LegendCategory, count: number): string {
   const s = count === 1;
-  if (STROKE_CATS.includes(category)) return s ? 'stroke' : 'strokes';
-  if (POINT_CATS.includes(category)) return 'pts';
-  if (BIRDIE_CATS.includes(category)) return s ? 'birdie' : 'birdies';
-  if (ROUND_CATS.includes(category)) return s ? 'round' : 'rounds';
+  if (isGross(category)) return s ? 'stroke' : 'strokes';
+  if (isStableford(category)) return 'pts';
+  if (isBirdies(category)) return s ? 'birdie' : 'birdies';
+  if (isRounds(category)) return s ? 'round' : 'rounds';
+  if (isEagles(category)) return s ? 'eagle' : 'eagles';
+  if (isAces(category)) return s ? 'ace' : 'aces';
   return 'vs hcp';
 }
 
@@ -38,10 +66,11 @@ export function getFooterCue(
   holders: Map<LegendCategory, CourseLegendHolderRow>,
 ): FooterCue {
   const rows = Array.from(holders.values());
+  const total = rows.length;
   const youCount = rows.filter((r) => r.is_self).length;
 
-  if (youCount === 5) {
-    return { label: 'You hold all 5 records', intent: 'defend' };
+  if (total > 0 && youCount === total) {
+    return { label: `You hold all ${total} records`, intent: 'defend' };
   }
   if (youCount >= 2) {
     return { label: `Defend your ${youCount} records`, intent: 'defend' };
@@ -59,11 +88,11 @@ export function getFooterCue(
     const catLabel = CAT_LABEL[row.category];
     if (row.your_gap_to_first != null && row.your_gap_to_first > 0) {
       const gap = row.your_gap_to_first;
-      const gapNum =
-        row.category === 'best_score_diff' ? gap : Math.round(gap);
+      const gapNum = isScoreDiff(row.category) ? gap : Math.round(gap);
       const unit = gapUnit(row.category, gapNum);
-      const gapStr =
-        row.category === 'best_score_diff' ? gap.toFixed(1) : String(Math.round(gap));
+      const gapStr = isScoreDiff(row.category)
+        ? gap.toFixed(1)
+        : String(Math.round(gap));
       return {
         label: `${gapStr} ${unit} from ${catLabel} #1`,
         intent: 'chase',
