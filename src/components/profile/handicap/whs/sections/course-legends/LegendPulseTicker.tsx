@@ -79,7 +79,7 @@ const PulseCard: React.FC<{
         border: `1px solid ${tokens.cardBorder}`,
         background: tokens.cardSweep,
         boxShadow: tokens.outerGlow ?? 'none',
-        padding: '10px 12px',
+        padding: '10px 14px',
         textAlign: 'left',
         cursor: 'pointer',
         fontFamily: GAM.FONT_GEIST,
