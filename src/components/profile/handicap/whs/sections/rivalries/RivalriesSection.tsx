@@ -71,7 +71,7 @@ const OwnerViewRivalries: React.FC<{ userId: string }> = ({ userId }) => {
   );
 
   const tiers = useMemo(() => assignRivalryTiers(filledRivalries), [filledRivalries]);
-  const { hero, compact, empty } = useMemo(
+  const { hero, compact } = useMemo(
     () => splitByTier(filledRivalries, tiers),
     [filledRivalries, tiers],
   );
