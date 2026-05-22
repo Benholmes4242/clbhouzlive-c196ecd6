@@ -267,6 +267,8 @@ export const LegendPulseTicker: React.FC<Props> = ({
           scrollbarWidth: 'none',
           WebkitOverflowScrolling: 'touch',
           scrollSnapType: 'x mandatory',
+          scrollPaddingLeft: 16,
+          scrollPaddingRight: 16,
           padding: '4px 16px',
           willChange: 'transform',
         }}
