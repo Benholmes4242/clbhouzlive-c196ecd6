@@ -129,12 +129,12 @@ export const FriendsLeaderboardSection: React.FC<Props> = ({ userId }) => {
         style={{
           display: 'flex',
           alignItems: 'center',
-          justifyContent: 'space-between',
           padding: '0 20px 8px',
         }}
       >
-        <p style={LABEL_STYLE}>TOP 5</p>
-        <p style={{ ...LABEL_STYLE, paddingRight: 60 }}>7D</p>
+        <p style={{ ...LABEL_STYLE, flex: 1 }}>TOP 5</p>
+        <p style={{ ...LABEL_STYLE, width: 32, textAlign: 'center' }}>7D</p>
+        <div style={{ width: 56 }} />
       </div>
 
       {isLoading ? (

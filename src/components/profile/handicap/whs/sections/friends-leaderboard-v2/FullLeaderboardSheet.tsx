@@ -72,12 +72,12 @@ export const FullLeaderboardSheet: React.FC<FullLeaderboardSheetProps> = ({
           style={{
             display: 'flex',
             alignItems: 'center',
-            justifyContent: 'space-between',
             padding: '12px 20px 8px',
           }}
         >
-          <p style={LABEL_STYLE}>ALL ACTIVE · {cohorts.totalActive}</p>
-          <p style={{ ...LABEL_STYLE, paddingRight: 60 }}>7D</p>
+          <p style={{ ...LABEL_STYLE, flex: 1 }}>ALL ACTIVE · {cohorts.totalActive}</p>
+          <p style={{ ...LABEL_STYLE, width: 32, textAlign: 'center' }}>7D</p>
+          <div style={{ width: 56 }} />
         </div>
 
         {cohorts.active.map((entry, idx) => {
