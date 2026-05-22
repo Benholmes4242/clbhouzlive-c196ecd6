@@ -522,14 +522,17 @@ export const StreaksCard: React.FC<Props> = ({ userId, readOnly = false }) => {
   const handleScroll = useCallback(() => {
     const el = scrollRef.current;
     if (!el || el.clientWidth <= 0) return;
-    const newPage = Math.round(el.scrollLeft / el.clientWidth);
+    const childWidth = el.firstElementChild?.clientWidth ?? el.clientWidth;
+    if (childWidth <= 0) return;
+    const newPage = Math.round(el.scrollLeft / childWidth);
     if (newPage !== page) setPage(newPage);
   }, [page]);
 
   const handlePagerChange = useCallback((n: number) => {
     const el = scrollRef.current;
     if (!el) return;
-    el.scrollTo({ left: el.clientWidth * n, behavior: 'smooth' });
+    const childWidth = el.firstElementChild?.clientWidth ?? el.clientWidth;
+    el.scrollTo({ left: childWidth * n, behavior: 'smooth' });
     setPage(n);
   }, []);
 
@@ -606,6 +609,8 @@ export const StreaksCard: React.FC<Props> = ({ userId, readOnly = false }) => {
           overflowY: 'hidden',
           scrollSnapType: 'x mandatory',
           WebkitOverflowScrolling: 'touch',
+          paddingLeft: 16,
+          paddingRight: 16,
           paddingBottom: 4,
           msOverflowStyle: 'none',
           scrollbarWidth: 'none',
@@ -618,8 +623,8 @@ export const StreaksCard: React.FC<Props> = ({ userId, readOnly = false }) => {
             <div
               key={row.streak_type}
               style={{
-                flex: '0 0 100%',
-                scrollSnapAlign: 'center',
+                flex: '0 0 88%',
+                scrollSnapAlign: 'start',
                 boxSizing: 'border-box',
               }}
             >
