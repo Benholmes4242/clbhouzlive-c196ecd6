@@ -15,7 +15,7 @@ import SegmentedControl from '@/components/discover/SegmentedControl';
 import { formatCourseLocation } from '@/utils/courseLocation';
 import { CourseDetailSkeleton } from '@/components/skeletons/CourseDetailSkeleton';
 import { useCourseRatingAggregates } from '@/hooks/useCourseRatingAggregates';
-import CourseLegendsTab from '@/components/profile/handicap/whs/gam/CourseLegendsTab';
+import { CourseLegendsDrilldown } from '@/components/profile/handicap/whs/sections/course-legends/CourseLegendsDrilldown';
 
 
 interface GolfClubViewProps {
