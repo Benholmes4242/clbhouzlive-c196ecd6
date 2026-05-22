@@ -212,16 +212,25 @@ export const SheetHeroGlass: React.FC<Props> = ({
             />
           </div>
         </div>
-        <div style={{ textAlign: hasImpact ? 'right' : 'center' }}>
-          <div style={labelStyle}>STABLEFORD</div>
-          <div style={valueStyle('#FFFFFF')}>{stableford != null ? stableford : EM_DASH}</div>
-        </div>
-        <div style={{ textAlign: hasImpact ? 'left' : 'right' }}>
-          <div style={labelStyle}>SCORE DIFF</div>
-          <div style={valueStyle(differential != null ? AMBER : '#FFFFFF')}>
-            {fmtDiffLocal(differential)}
+        {lockMissingStats ? (
+          <LockedTile label="STABLEFORD" align={hasImpact ? 'right' : 'center'} />
+        ) : (
+          <div style={{ textAlign: hasImpact ? 'right' : 'center' }}>
+            <div style={labelStyle}>STABLEFORD</div>
+            <div style={valueStyle('#FFFFFF')}>{stableford != null ? stableford : EM_DASH}</div>
           </div>
-        </div>
+        )}
+        {lockMissingStats ? (
+          <LockedTile label="SCORE DIFF" align={hasImpact ? 'left' : 'right'} />
+        ) : (
+          <div style={{ textAlign: hasImpact ? 'left' : 'right' }}>
+            <div style={labelStyle}>SCORE DIFF</div>
+            <div style={valueStyle(differential != null ? AMBER : '#FFFFFF')}>
+              {fmtDiffLocal(differential)}
+            </div>
+          </div>
+        )}
+
         {hasImpact && (
           <div style={{ textAlign: 'right' }}>
             <div style={labelStyle}>HCP IMPACT</div>
