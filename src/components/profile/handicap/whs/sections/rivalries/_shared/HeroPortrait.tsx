@@ -1,9 +1,7 @@
 import React from 'react';
-import { initials } from '@/lib/whs/utils/initials';
 import { getMobileCropPosition } from '@/utils/mobileCropUtils';
 
 interface HeroPortraitProps {
-  name: string | null;
   headerPhotoUrl: string | null;
   profilePhotoUrl: string | null;
   mobileCrop: {
@@ -17,7 +15,6 @@ interface HeroPortraitProps {
 }
 
 export const HeroPortrait: React.FC<HeroPortraitProps> = ({
-  name,
   headerPhotoUrl,
   profilePhotoUrl,
   mobileCrop,
