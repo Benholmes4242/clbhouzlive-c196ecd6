@@ -19082,6 +19082,31 @@ export type Database = {
           post_id: string
         }[]
       }
+      get_friends_who_earned_badge: {
+        Args: { p_badge_id: string; p_limit?: number; p_viewer_user_id: string }
+        Returns: {
+          earned_at: string
+          friend_avatar_url: string
+          friend_name: string
+          friend_user_id: string
+        }[]
+      }
+      get_friends_who_held_legend: {
+        Args: {
+          p_category: string
+          p_course_id: string
+          p_limit?: number
+          p_viewer_user_id: string
+        }
+        Returns: {
+          attained_at: string
+          friend_avatar_url: string
+          friend_name: string
+          friend_user_id: string
+          rank: number
+          value: number
+        }[]
+      }
       get_gam_launch_payload: { Args: { p_user_id: string }; Returns: Json }
       get_global_country_breakdown: {
         Args: { p_limit?: number; p_offset?: number }
