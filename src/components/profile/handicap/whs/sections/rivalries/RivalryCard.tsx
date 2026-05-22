@@ -6,14 +6,13 @@ import type { RivalryTier } from '@/lib/whs/utils/rivalryTiering';
 import { rivalKey } from '@/lib/whs/utils/rivalryTiering';
 import RivalryHeroCard from './RivalryHeroCard';
 import RivalryCompactCard from './RivalryCompactCard';
-import RivalryEmptyCard from './RivalryEmptyCard';
 
 interface Props {
   rivalry: FriendRivalryHydrated;
   tier: RivalryTier;
   rank: number;
   total: number;
-  variant: 'hero' | 'compact' | 'empty';
+  variant: 'hero' | 'compact';
   /** Optional 180px portrait variant when the hero card is in a mixed-tier rail. */
   portraitVariant?: 'hero' | 'mixed';
   dimension?: RivalryDimension;
@@ -58,8 +57,6 @@ export const RivalryCard: React.FC<Props> = (props) => {
           onTap={handleNavigate}
         />
       );
-    case 'empty':
-      return <RivalryEmptyCard rivalry={props.rivalry} />;
   }
 };
 

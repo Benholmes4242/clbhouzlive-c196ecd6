@@ -38,21 +38,20 @@ function splitByTier(
 ) {
   const hero: Array<{ r: FriendRivalryHydrated; tier: RivalryTier }> = [];
   const compact: Array<{ r: FriendRivalryHydrated; tier: RivalryTier }> = [];
-  const empty: FriendRivalryHydrated[] = [];
   for (const r of rivalries) {
     const k = rivalKey(r);
     if (!k) continue;
     const t = tiers.get(k);
     if (t === 'archrival' || t === 'rival') hero.push({ r, tier: t });
     else if (t === 'recent') compact.push({ r, tier: t });
-    else if (t === 'new') empty.push(r);
+    // undefined tier (no shared rounds) — silently dropped
   }
   // Hero pager order: archrival first, then rival
   hero.sort((a, b) => {
     if (a.tier === b.tier) return 0;
     return a.tier === 'archrival' ? -1 : 1;
   });
-  return { hero, compact, empty };
+  return { hero, compact };
 }
 
 // ─── Owner view ───────────────────────────────────────────────────────────
@@ -72,7 +71,7 @@ const OwnerViewRivalries: React.FC<{ userId: string }> = ({ userId }) => {
   );
 
   const tiers = useMemo(() => assignRivalryTiers(filledRivalries), [filledRivalries]);
-  const { hero, compact, empty } = useMemo(
+  const { hero, compact } = useMemo(
     () => splitByTier(filledRivalries, tiers),
     [filledRivalries, tiers],
   );
@@ -125,7 +124,7 @@ const OwnerViewRivalries: React.FC<{ userId: string }> = ({ userId }) => {
           {Array.from({ length: 2 }).map((_, i) => <RivalrySkeleton key={i} />)}
         </div>
       ) : !hasFilled ? null : (
-        <TieredRivalries hero={hero} compact={compact} empty={empty} />
+        <TieredRivalries hero={hero} compact={compact} />
       )}
 
       <ManageRivalsSheet
@@ -161,7 +160,7 @@ const FriendViewRivalries: React.FC<{
   }, [primary, secondary]);
 
   const tiers = useMemo(() => assignRivalryTiers(all), [all]);
-  const { hero, compact, empty } = useMemo(
+  const { hero, compact } = useMemo(
     () => splitByTier(all, tiers),
     [all, tiers],
   );
@@ -194,7 +193,6 @@ const FriendViewRivalries: React.FC<{
         <TieredRivalries
           hero={hero}
           compact={compact}
-          empty={empty}
           friendViewOwnerId={ownerUserId}
         />
       )}
@@ -206,9 +204,8 @@ const FriendViewRivalries: React.FC<{
 const TieredRivalries: React.FC<{
   hero: Array<{ r: FriendRivalryHydrated; tier: RivalryTier }>;
   compact: Array<{ r: FriendRivalryHydrated; tier: RivalryTier }>;
-  empty: FriendRivalryHydrated[];
   friendViewOwnerId?: string;
-}> = ({ hero, compact, empty, friendViewOwnerId }) => {
+}> = ({ hero, compact, friendViewOwnerId }) => {
   const railRef = useRef<HTMLDivElement | null>(null);
   const [page, setPage] = useState(0);
   const total = hero.length;
@@ -260,7 +257,7 @@ const TieredRivalries: React.FC<{
         </>
       )}
 
-      {(compact.length > 0 || empty.length > 0) && (
+      {compact.length > 0 && (
         <div
           style={{
             display: 'flex',
@@ -279,20 +276,6 @@ const TieredRivalries: React.FC<{
                 rank={hero.length + idx + 1}
                 total={hero.length + compact.length}
                 variant="compact"
-                friendViewOwnerId={friendViewOwnerId}
-              />
-            );
-          })}
-          {empty.map((r, idx) => {
-            const key = rivalKey(r) ?? `empty-${idx}`;
-            return (
-              <RivalryCard
-                key={key}
-                rivalry={r}
-                tier="new"
-                rank={0}
-                total={0}
-                variant="empty"
                 friendViewOwnerId={friendViewOwnerId}
               />
             );

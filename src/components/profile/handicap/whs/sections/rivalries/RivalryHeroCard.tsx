@@ -27,7 +27,6 @@ const TIER_BADGE_LABEL: Record<RivalryTier, string> = {
   archrival: '★ ARCHRIVAL',
   rival: '★ RIVAL',
   recent: 'RECENT',
-  new: 'NEW',
 };
 
 interface Props {
