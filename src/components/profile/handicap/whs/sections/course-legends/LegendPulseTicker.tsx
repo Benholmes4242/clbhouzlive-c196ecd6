@@ -2,17 +2,21 @@ import React from 'react';
 import { useLegendPulse, type LegendPulseRow } from '@/hooks/gam/useLegendPulse';
 import {
   legendCategoryLabel,
+  legendCategoryIcon,
   formatLegendValueCompact,
   formatLegendGap,
 } from '@/lib/gam/visuals';
 import { PULSE_DARK, type PulseKind } from '../../gam/pulseTokens';
 import { GAM } from '../../gam/tokens';
+import type { LegendWindow } from '@/lib/gam/types';
 import type { CourseSelection } from './types';
 
 interface Props {
   userId: string;
   onSelectCourse: (c: CourseSelection) => void;
   days?: number;
+  /** Current section window — drives the indicator text. */
+  window?: LegendWindow;
 }
 
 function buildHeadline(row: LegendPulseRow): {
@@ -56,7 +60,8 @@ const PulseCard: React.FC<{
 }> = ({ row, onClick }) => {
   const kind = row.kind as PulseKind;
   const tokens = PULSE_DARK[kind];
-  const { Icon } = tokens;
+  // Category-specific icon (Eagle → Award, Stableford → Target, Gross → Trophy, etc.)
+  const CategoryIcon = legendCategoryIcon[row.category] ?? tokens.Icon;
   const { title, sub, cta } = buildHeadline(row);
 
   return (
@@ -94,7 +99,7 @@ const PulseCard: React.FC<{
           pointerEvents: 'none',
         }}
       >
-        <Icon size={120} strokeWidth={1.5} color={tokens.labelFg} />
+        <CategoryIcon size={120} strokeWidth={1.5} color={tokens.labelFg} />
       </div>
 
       {/* Eyebrow chip */}
@@ -139,7 +144,7 @@ const PulseCard: React.FC<{
           gap: 10,
         }}
       >
-        {/* Icon squircle */}
+        {/* Icon squircle — category-specific */}
         <div
           style={{
             width: 40,
@@ -153,7 +158,7 @@ const PulseCard: React.FC<{
             flex: '0 0 auto',
           }}
         >
-          <Icon size={18} strokeWidth={2} color={tokens.labelFg} />
+          <CategoryIcon size={18} strokeWidth={2} color={tokens.labelFg} />
         </div>
 
         <div style={{ minWidth: 0, flex: 1 }}>
@@ -206,11 +211,14 @@ export const LegendPulseTicker: React.FC<Props> = ({
   userId,
   onSelectCourse,
   days = 14,
+  window = '90d',
 }) => {
   const { data } = useLegendPulse(userId, days);
   const rows = data ?? [];
 
   if (rows.length === 0) return null;
+
+  const indicator = window === 'all_time' ? 'ALL' : `${days}D`;
 
   return (
     <div style={{ marginTop: 18, marginBottom: 6 }}>
@@ -246,7 +254,7 @@ export const LegendPulseTicker: React.FC<Props> = ({
             ...GAM.TABULAR,
           }}
         >
-          {days}D
+          {indicator}
         </span>
       </div>
 

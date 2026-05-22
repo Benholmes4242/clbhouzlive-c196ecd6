@@ -2,7 +2,8 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Crown, MapPin, ExternalLink } from 'lucide-react';
 import { GAM } from '../../tokens';
-import { relativeTime } from '@/lib/gam/visuals';
+import { relativeTime, legendCategoryWindow } from '@/lib/gam/visuals';
+import type { LegendCategory } from '@/lib/gam/types';
 import { FriendsBlock } from './FriendsBlock';
 import type { TrophyItem } from '../_shared/normalizeTrophyItem';
 
@@ -12,12 +13,21 @@ interface Props {
   onNavigateClose: () => void;
 }
 
-const LEGEND_CATEGORY_COPY: Record<string, string> = {
-  most_birdies_90d: 'Most birdies in the last 90 days at this course.',
-  most_rounds_90d: 'Most rounds played in the last 90 days at this course.',
-  lowest_gross: 'Lowest gross score posted at this course.',
-  best_score_diff: 'Best score differential vs handicap at this course.',
-  best_stableford_90d: 'Highest Stableford score in the last 90 days at this course.',
+const LEGEND_CATEGORY_COPY: Record<LegendCategory, string> = {
+  lowest_gross_90d:         'Lowest gross score posted at this course in the last 90 days.',
+  lowest_gross_all_time:    'Lowest gross score ever posted at this course.',
+  best_score_diff_90d:      'Best score differential vs handicap in the last 90 days.',
+  best_score_diff_all_time: 'Best score differential vs handicap of all time.',
+  most_birdies_90d:         'Most birdies in the last 90 days at this course.',
+  most_birdies_all_time:    'Most birdies ever recorded at this course.',
+  most_rounds_90d:          'Most rounds played at this course in the last 90 days.',
+  most_rounds_all_time:     'Most rounds ever played at this course.',
+  best_stableford_90d:      'Highest Stableford points in the last 90 days at this course.',
+  best_stableford_all_time: 'Highest Stableford points ever recorded at this course.',
+  most_eagles_90d:          'Most eagles in the last 90 days at this course.',
+  most_eagles_all_time:     'Most eagles ever recorded at this course.',
+  most_aces_90d:            'Most hole-in-ones in the last 90 days at this course.',
+  most_aces_all_time:       'Most hole-in-ones ever recorded at this course.',
 };
 
 const Eyebrow: React.FC<{ children: React.ReactNode; color?: string }> = ({ children, color }) => (
@@ -38,6 +48,7 @@ const Eyebrow: React.FC<{ children: React.ReactNode; color?: string }> = ({ chil
 export const LegendBody: React.FC<Props> = ({ item, viewerUserId, onNavigateClose }) => {
   const navigate = useNavigate();
   const description = LEGEND_CATEGORY_COPY[item.category] ?? '';
+  const isRolling = legendCategoryWindow[item.category] === '90d';
 
   const handleCourseTap = () => {
     onNavigateClose();
@@ -135,7 +146,9 @@ export const LegendBody: React.FC<Props> = ({ item, viewerUserId, onNavigateClos
           fontWeight: 700,
         }}
       >
-        90-day window · title resets when window rolls over
+        {isRolling
+          ? '90-day window · title resets when window rolls over'
+          : 'All-time course record · permanent'}
       </div>
     </div>
   );

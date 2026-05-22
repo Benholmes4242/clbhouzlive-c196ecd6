@@ -3,10 +3,14 @@ import { Search } from 'lucide-react';
 
 const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
 
-export const CourseSearch: React.FC<{
+interface Props {
   value: string;
   onChange: (v: string) => void;
-}> = ({ value, onChange }) => (
+  /** Optional helper subtitle rendered below the input. */
+  helper?: string;
+}
+
+export const CourseSearch: React.FC<Props> = ({ value, onChange, helper }) => (
   <div style={{ padding: '20px 16px 0' }}>
     <div
       style={{
@@ -36,6 +40,23 @@ export const CourseSearch: React.FC<{
         }}
       />
     </div>
+    {helper && (
+      <div
+        style={{
+          marginTop: 6,
+          fontSize: 11,
+          color: 'var(--hcp-t-40)',
+          display: 'flex',
+          alignItems: 'center',
+          gap: 5,
+          paddingLeft: 4,
+          fontFamily: FONT,
+        }}
+      >
+        <Search size={9} color="var(--hcp-t-40)" strokeWidth={2.2} />
+        {helper}
+      </div>
+    )}
   </div>
 );
 

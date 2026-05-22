@@ -12,27 +12,48 @@ import { getFooterCue, FOOTER_INTENT_STYLE } from './footerCue';
 const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
 const GOLD = '#FBBC2E';
 
+/**
+ * Stable display order across both windows. Cards iterate this order then
+ * filter to whichever categories actually have holder data.
+ */
 const CATEGORY_ORDER: LegendCategory[] = [
-  'lowest_gross',
-  'most_birdies_90d',
-  'most_rounds_90d',
-  'best_stableford_90d',
-  'best_score_diff',
+  'lowest_gross_90d', 'lowest_gross_all_time',
+  'most_birdies_90d', 'most_birdies_all_time',
+  'most_rounds_90d', 'most_rounds_all_time',
+  'best_stableford_90d', 'best_stableford_all_time',
+  'best_score_diff_90d', 'best_score_diff_all_time',
+  'most_eagles_90d', 'most_eagles_all_time',
+  'most_aces_90d', 'most_aces_all_time',
 ];
 
 const CAT_SHORT: Record<LegendCategory, string> = {
-  lowest_gross: 'GROSS',
-  most_birdies_90d: 'BIRDIE',
-  most_rounds_90d: 'VISITOR',
-  best_stableford_90d: 'STBL',
-  best_score_diff: 'SCORE',
+  lowest_gross_90d:         'GROSS',
+  lowest_gross_all_time:    'GROSS',
+  most_birdies_90d:         'BIRDIE',
+  most_birdies_all_time:    'BIRDIE',
+  most_rounds_90d:          'VISITOR',
+  most_rounds_all_time:     'VISITOR',
+  best_stableford_90d:      'STBL',
+  best_stableford_all_time: 'STBL',
+  best_score_diff_90d:      'SCORE',
+  best_score_diff_all_time: 'SCORE',
+  most_eagles_90d:          'EAGLE',
+  most_eagles_all_time:     'EAGLE',
+  most_aces_90d:            'ACE',
+  most_aces_all_time:       'ACE',
 };
+
+function isHideWhenZero(c: LegendCategory): boolean {
+  return (
+    c === 'most_eagles_90d' || c === 'most_eagles_all_time' ||
+    c === 'most_aces_90d' || c === 'most_aces_all_time'
+  );
+}
 
 interface HolderCellProps {
   category: LegendCategory;
-  holder: CourseLegendHolderRow | undefined;
+  holder: CourseLegendHolderRow;
   span?: boolean;
-  /** When parent view is friend (readOnly), "YOU" cells should still show name. */
   selfLabel: string;
 }
 
@@ -43,18 +64,13 @@ const HolderCell: React.FC<HolderCellProps> = ({
   selfLabel,
 }) => {
   const Icon = legendCategoryIcon[category];
-  const isSelf = holder?.is_self ?? false;
-  const empty = !holder;
+  const isSelf = holder.is_self;
 
-  const nameColor = empty
-    ? 'var(--hcp-t-40)'
-    : isSelf
-      ? GOLD
-      : 'var(--hcp-t-100)';
-  const labelColor = empty ? 'var(--hcp-t-40)' : 'var(--hcp-t-60)';
+  const nameColor = isSelf ? GOLD : 'var(--hcp-t-100)';
+  const labelColor = 'var(--hcp-t-60)';
   const valueColor = nameColor;
   const iconBg = isSelf ? 'rgba(251,188,46,0.16)' : 'rgba(255,255,255,0.05)';
-  const iconColor = empty ? 'var(--hcp-t-40)' : isSelf ? GOLD : 'var(--hcp-t-60)';
+  const iconColor = isSelf ? GOLD : 'var(--hcp-t-60)';
 
   return (
     <div
@@ -113,7 +129,7 @@ const HolderCell: React.FC<HolderCellProps> = ({
             textOverflow: 'ellipsis',
           }}
         >
-          {empty ? 'No legend yet' : isSelf ? selfLabel : holder!.display_name}
+          {isSelf ? selfLabel : holder.display_name}
         </div>
       </div>
       <div
@@ -127,11 +143,48 @@ const HolderCell: React.FC<HolderCellProps> = ({
           flexShrink: 0,
         }}
       >
-        {empty ? '—' : formatLegendValueCompact(category, holder!.value)}
+        {formatLegendValueCompact(category, holder.value)}
       </div>
     </div>
   );
 };
+
+const SkeletonTile: React.FC = () => (
+  <div
+    style={{
+      display: 'flex',
+      alignItems: 'center',
+      gap: 9,
+      padding: '8px 10px',
+      borderRadius: 10,
+      background: 'transparent',
+      border: '1px solid var(--hcp-line)',
+    }}
+  >
+    <div
+      style={{
+        width: 22,
+        height: 22,
+        borderRadius: 6,
+        background: 'rgba(255,255,255,0.05)',
+        flexShrink: 0,
+      }}
+    />
+    <div style={{ flex: 1, minWidth: 0 }}>
+      <div style={{ height: 7, width: 44, background: 'var(--hcp-line)', borderRadius: 3 }} />
+      <div
+        style={{
+          marginTop: 4,
+          height: 9,
+          width: '70%',
+          background: 'var(--hcp-line)',
+          borderRadius: 3,
+        }}
+      />
+    </div>
+    <div style={{ width: 24, height: 10, background: 'var(--hcp-line)', borderRadius: 3 }} />
+  </div>
+);
 
 interface Props {
   courseId: string;
@@ -139,6 +192,7 @@ interface Props {
   courseRegion: string | null;
   courseCountry: string | null;
   courseType: string | null;
+  /** Pre-filtered (by current window) holders map keyed by category. */
   holdersByCategory: Map<LegendCategory, CourseLegendHolderRow>;
   onTap: () => void;
   /** Friend view: show friend's name instead of "YOU" in self cells. */
@@ -156,9 +210,20 @@ export const CourseLegendsCard: React.FC<Props> = ({
 }) => {
   const [pressed, setPressed] = useState(false);
 
-  const rows = Array.from(holdersByCategory.values());
-  const youOwnedCount = rows.filter((r) => r.is_self).length;
-  const cue = getFooterCue(holdersByCategory);
+  // Filter: drop Eagle/Ace cells when value is 0; only keep categories
+  // we actually have data for.
+  const visibleHolders = new Map<LegendCategory, CourseLegendHolderRow>();
+  CATEGORY_ORDER.forEach((cat) => {
+    const row = holdersByCategory.get(cat);
+    if (!row) return;
+    if (isHideWhenZero(cat) && (row.value ?? 0) === 0) return;
+    visibleHolders.set(cat, row);
+  });
+
+  const visibleCats = Array.from(visibleHolders.keys());
+  const youOwnedCount = Array.from(visibleHolders.values()).filter((r) => r.is_self).length;
+  const totalCategories = visibleHolders.size;
+  const cue = getFooterCue(visibleHolders);
   const cueStyle = FOOTER_INTENT_STYLE[cue.intent];
   const selfLabel = friendName ? friendName : 'YOU';
 
@@ -208,7 +273,7 @@ export const CourseLegendsCard: React.FC<Props> = ({
             {courseName}
           </div>
         </div>
-        {youOwnedCount > 0 && (
+        {totalCategories > 0 && (
           <div
             style={{
               display: 'inline-flex',
@@ -226,29 +291,44 @@ export const CourseLegendsCard: React.FC<Props> = ({
             }}
           >
             <Crown size={10} strokeWidth={2.5} />
-            {youOwnedCount}/5
+            {youOwnedCount}/{totalCategories}
           </div>
         )}
       </div>
 
-      {/* Holder grid */}
-      <div
-        style={{
-          display: 'grid',
-          gridTemplateColumns: '1fr 1fr',
-          gap: 6,
-        }}
-      >
-        {CATEGORY_ORDER.map((cat, idx) => (
-          <HolderCell
-            key={cat}
-            category={cat}
-            holder={holdersByCategory.get(cat)}
-            span={idx === 4}
-            selfLabel={selfLabel}
-          />
-        ))}
-      </div>
+      {/* Holder grid (or empty skeleton) */}
+      {totalCategories === 0 ? (
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: '1fr 1fr',
+            rowGap: 6,
+            columnGap: 8,
+            opacity: 0.35,
+            pointerEvents: 'none',
+          }}
+        >
+          {[0, 1, 2, 3].map((i) => <SkeletonTile key={i} />)}
+        </div>
+      ) : (
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: '1fr 1fr',
+            gap: 6,
+          }}
+        >
+          {visibleCats.map((cat, idx) => (
+            <HolderCell
+              key={cat}
+              category={cat}
+              holder={visibleHolders.get(cat)!}
+              span={visibleCats.length % 2 === 1 && idx === visibleCats.length - 1}
+              selfLabel={selfLabel}
+            />
+          ))}
+        </div>
+      )}
 
       {/* Footer */}
       <div

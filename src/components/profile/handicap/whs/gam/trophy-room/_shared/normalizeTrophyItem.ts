@@ -45,15 +45,26 @@ export type TrophyItem =
 function categoryToIconKey(c: LegendCategory): string {
   switch (c) {
     case 'most_birdies_90d':
+    case 'most_birdies_all_time':
       return 'feather';
     case 'most_rounds_90d':
+    case 'most_rounds_all_time':
       return 'map-pin';
-    case 'lowest_gross':
+    case 'lowest_gross_90d':
+    case 'lowest_gross_all_time':
       return 'trophy';
-    case 'best_score_diff':
+    case 'best_score_diff_90d':
+    case 'best_score_diff_all_time':
       return 'trending-down';
     case 'best_stableford_90d':
+    case 'best_stableford_all_time':
       return 'target';
+    case 'most_eagles_90d':
+    case 'most_eagles_all_time':
+      return 'award';
+    case 'most_aces_90d':
+    case 'most_aces_all_time':
+      return 'sparkles';
   }
 }
 
