@@ -13,8 +13,6 @@ const CAT_LABEL: Record<LegendCategory, string> = {
   best_score_diff_all_time: 'Score',
   most_birdies_90d:         'Birdie',
   most_birdies_all_time:    'Birdie',
-  most_rounds_90d:          'Visitor',
-  most_rounds_all_time:     'Visitor',
   lowest_gross_90d:         'Gross',
   lowest_gross_all_time:    'Gross',
   best_stableford_90d:      'Stableford',
@@ -36,9 +34,6 @@ function isStableford(c: LegendCategory): boolean {
 }
 function isBirdies(c: LegendCategory): boolean {
   return c === 'most_birdies_90d' || c === 'most_birdies_all_time';
-}
-function isRounds(c: LegendCategory): boolean {
-  return c === 'most_rounds_90d' || c === 'most_rounds_all_time';
 }
 function isEagles(c: LegendCategory): boolean {
   return c === 'most_eagles_90d' || c === 'most_eagles_all_time';
