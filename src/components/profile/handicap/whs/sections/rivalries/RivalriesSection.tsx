@@ -1,8 +1,8 @@
 import React, { useState, useMemo, useRef, useCallback, useEffect } from 'react';
-import { Pencil } from 'lucide-react';
+import { Settings2 } from 'lucide-react';
 import { DarkSectionHeader } from '../_shared/darkAtoms';
 import RivalryCard from './RivalryCard';
-import RivalryEditSheet from './RivalryEditSheet';
+import ManageRivalsSheet from './manage-sheet/ManageRivalsSheet';
 import { useFriendRivalries, useFriendLeaderboard } from '@/lib/whs/hooks';
 import { useFriendViewRivalriesForProfile } from '@/lib/whs/friendViewRivalries';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
