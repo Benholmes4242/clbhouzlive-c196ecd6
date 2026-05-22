@@ -3,7 +3,7 @@ import { reformatFriendName } from '@/lib/whs/utils/nameFormat';
 import { initials } from '@/lib/whs/utils/initials';
 import { fmtHcp } from '@/lib/whs/format';
 import type { FriendRivalryHydrated } from '@/lib/whs/types';
-import { useOpenFriendHybridSheet } from '@/components/friend-hybrid-sheet/FriendHybridSheetProvider';
+import { useOpenFriendSheet } from '@/components/friend-sheet/FriendSheetProvider';
 
 const FONT_GEIST = 'Geist, system-ui, -apple-system, BlinkMacSystemFont, sans-serif';
 
@@ -12,7 +12,7 @@ interface Props {
 }
 
 export const RivalryEmptyCard: React.FC<Props> = ({ rivalry }) => {
-  const { open: openHybridSheet } = useOpenFriendHybridSheet();
+  const { open: openHybridSheet } = useOpenFriendSheet();
   const rivalDisplayName = reformatFriendName(rivalry.rival_name ?? 'Unknown');
 
   const handleInvite = (e: React.MouseEvent) => {

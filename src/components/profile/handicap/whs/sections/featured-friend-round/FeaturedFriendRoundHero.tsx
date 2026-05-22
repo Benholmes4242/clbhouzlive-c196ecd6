@@ -2,7 +2,7 @@ import React from 'react';
 import { useFriendFeaturedRound } from '@/lib/whs/hooks';
 import { fmtHcp, fmtDiff } from '@/lib/whs/format';
 import { reformatFriendName } from '@/lib/whs/utils/nameFormat';
-import { useOpenFriendHybridSheet } from '@/components/friend-hybrid-sheet/FriendHybridSheetProvider';
+import { useOpenFriendSheet } from '@/components/friend-sheet/FriendSheetProvider';
 import SectionHeader from '../SectionHeader';
 import BuildYourCircleCTA from './BuildYourCircleCTA';
 
@@ -21,7 +21,7 @@ function getFreshnessVariant(days: number): { eyebrow: string; titleVerb: string
 
 export const FeaturedFriendRoundHero: React.FC<Props> = ({ userId }) => {
   const { data, isLoading } = useFriendFeaturedRound(userId);
-  const { open: openHybridSheet } = useOpenFriendHybridSheet();
+  const { open: openHybridSheet } = useOpenFriendSheet();
 
   if (isLoading) {
     return <FeaturedHeroSkeleton />;

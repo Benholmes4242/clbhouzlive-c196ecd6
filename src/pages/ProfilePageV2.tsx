@@ -11,7 +11,7 @@ import { cn } from '@/lib/utils';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { useEditProfileRoute } from '@/hooks/useEditProfileRoute';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
-import { useOpenFriendHybridSheet } from '@/components/friend-hybrid-sheet/FriendHybridSheetProvider';
+import { useOpenFriendSheet } from '@/components/friend-sheet/FriendSheetProvider';
 import { useUserProfile } from '@/hooks/useUserProfile.tsx';
 import { useTop100Overview } from '@/hooks/useTop100Overview';
 import PostsTabContent from '@/components/posts-tab/PostsTabContent';
@@ -120,7 +120,7 @@ const ProfilePageV2Content: React.FC = () => {
   const editRoute = useEditProfileRoute();
   const { username: routeUsername } = useParams<{ username?: string }>();
   const { user, loading: authLoading } = useSupabaseSession();
-  const { open: openHybridSheet } = useOpenFriendHybridSheet();
+  const { open: openHybridSheet } = useOpenFriendSheet();
 
   const { logPoint } = useProfileTouchDebug();
   

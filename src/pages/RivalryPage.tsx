@@ -18,7 +18,7 @@ import { useFriendRivalries } from '@/lib/whs/hooks';
 import type { FriendRivalryHydrated } from '@/lib/whs/types';
 import { PageRoot } from '@/components/layout/PageRoot';
 import { useRivalryDimension } from '@/lib/whs/utils/useRivalryDimension';
-import { useOpenFriendHybridSheet } from '@/components/friend-hybrid-sheet/FriendHybridSheetProvider';
+import { useOpenFriendSheet } from '@/components/friend-sheet/FriendSheetProvider';
 
 import { DossierHeader } from './rivalry-page/DossierHeader';
 import { HeroScoreboard } from './rivalry-page/HeroScoreboard';
@@ -136,7 +136,7 @@ const RivalryPage: React.FC = () => {
   const navigate = useNavigate();
   const { user } = useSupabaseSession();
   const viewerId = user?.id;
-  const openHybridSheet = useOpenFriendHybridSheet().open;
+  const openHybridSheet = useOpenFriendSheet().open;
 
   const owner = useOwnerRivalry(
     !isFriendView ? viewerId : undefined,
