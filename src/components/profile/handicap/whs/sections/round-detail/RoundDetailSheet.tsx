@@ -9,6 +9,7 @@ import {
   UserEyebrow,
   FriendEyebrow,
   SheetFooterInk,
+  SheetFooterDark,
   FooterPill,
   ScorecardEmpty,
   NonClbhouzFriendBody,
@@ -135,6 +136,7 @@ export const RoundDetailSheet: React.FC<Props> = ({
                 differential={userData.handicap_differential}
                 holes={hasHoles ? holes : null}
                 isCounter={!!userData.is_counter}
+                handicapDelta={handicapDelta ?? null}
               />
             }
           />
@@ -156,20 +158,11 @@ export const RoundDetailSheet: React.FC<Props> = ({
         </>
       ),
       footer: (
-        <SheetFooterInk
-          label="INDEX IMPACT"
+        <SheetFooterDark
           currentIndex={userData.handicap_index_at_time ?? null}
           previousIndex={previousIndex}
           delta={handicapDelta ?? null}
-          action={
-            userData.permalink_url ? (
-              <FooterPill
-                href={userData.permalink_url}
-                label="Open in MyEG"
-                external
-              />
-            ) : null
-          }
+          myegHref={userData.permalink_url ?? null}
         />
       ),
     };

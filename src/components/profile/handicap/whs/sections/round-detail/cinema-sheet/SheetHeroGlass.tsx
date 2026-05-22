@@ -21,6 +21,8 @@ interface Props {
   /** Override meta line (e.g. invite-state amber meta). When omitted, default suffix · PAR · SL is rendered. */
   metaOverride?: React.ReactNode;
   isCounter?: boolean;
+  /** When non-null and |delta| >= 0.05, renders 4th stat HCP IMPACT in a 2×2 grid. */
+  handicapDelta?: number | null;
 }
 
 const HAIR: React.CSSProperties = {
@@ -67,8 +69,22 @@ export const SheetHeroGlass: React.FC<Props> = ({
   holes,
   metaOverride,
   isCounter = false,
+  handicapDelta = null,
 }) => {
   const { title, suffix } = splitCourseName(courseName);
+  const hasImpact =
+    handicapDelta != null && Math.abs(handicapDelta) >= 0.05;
+  const impactColor = hasImpact
+    ? handicapDelta! < 0
+      ? '#22C55E'
+      : AMBER
+    : '#FFFFFF';
+  const fmtImpact = (d: number): string => {
+    const r = Math.round(d * 10) / 10;
+    if (r > 0) return `+${r.toFixed(1)}`;
+    if (r < 0) return `${MINUS}${Math.abs(r).toFixed(1)}`;
+    return '0.0';
+  };
   const meta = metaOverride
     ? null
     : [
@@ -130,7 +146,18 @@ export const SheetHeroGlass: React.FC<Props> = ({
 
       <div style={{ ...HAIR, margin: '14px 0' }} />
 
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
+      <div
+        style={
+          hasImpact
+            ? {
+                display: 'grid',
+                gridTemplateColumns: '1fr 1fr',
+                rowGap: 14,
+                columnGap: 12,
+              }
+            : { display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }
+        }
+      >
         <div style={{ textAlign: 'left' }}>
           <div style={labelStyle}>GROSS</div>
           <div
@@ -144,16 +171,22 @@ export const SheetHeroGlass: React.FC<Props> = ({
             />
           </div>
         </div>
-        <div style={{ textAlign: 'center' }}>
+        <div style={{ textAlign: hasImpact ? 'right' : 'center' }}>
           <div style={labelStyle}>STABLEFORD</div>
           <div style={valueStyle('#FFFFFF')}>{stableford != null ? stableford : EM_DASH}</div>
         </div>
-        <div style={{ textAlign: 'right' }}>
+        <div style={{ textAlign: hasImpact ? 'left' : 'right' }}>
           <div style={labelStyle}>SCORE DIFF</div>
           <div style={valueStyle(differential != null ? AMBER : '#FFFFFF')}>
             {fmtDiffLocal(differential)}
           </div>
         </div>
+        {hasImpact && (
+          <div style={{ textAlign: 'right' }}>
+            <div style={labelStyle}>HCP IMPACT</div>
+            <div style={valueStyle(impactColor)}>{fmtImpact(handicapDelta!)}</div>
+          </div>
+        )}
       </div>
     </div>
   );
