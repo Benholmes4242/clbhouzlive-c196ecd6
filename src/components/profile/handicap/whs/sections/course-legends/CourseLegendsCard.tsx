@@ -71,14 +71,12 @@ function isHideWhenZero(c: LegendCategory): boolean {
 interface HolderCellProps {
   category: LegendCategory;
   holder: CourseLegendHolderRow;
-  span?: boolean;
   selfLabel: string;
 }
 
 const HolderCell: React.FC<HolderCellProps> = ({
   category,
   holder,
-  span,
   selfLabel,
 }) => {
   const Icon = legendCategoryIcon[category];
@@ -95,7 +93,6 @@ const HolderCell: React.FC<HolderCellProps> = ({
   return (
     <div
       style={{
-        gridColumn: span ? '1 / -1' : undefined,
         display: 'flex',
         alignItems: 'center',
         gap: 9,
