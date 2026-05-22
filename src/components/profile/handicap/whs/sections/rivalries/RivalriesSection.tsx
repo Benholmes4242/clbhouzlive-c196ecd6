@@ -235,7 +235,7 @@ const TieredRivalries: React.FC<{
                 <div
                   key={key}
                   style={{
-                    flex: '0 0 100%',
+                    flex: '0 0 92%',
                     scrollSnapAlign: 'center',
                     minWidth: 0,
                   }}
