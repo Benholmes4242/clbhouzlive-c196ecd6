@@ -663,9 +663,6 @@ const LEGEND_CATS: LegendCfg[] = [
   // ── Most birdies ──
   { category: "most_birdies_90d",         windowDays: 90,   sortDir: "desc", metric: "birdies",           aggregate: "sum" },
   { category: "most_birdies_all_time",    windowDays: null, sortDir: "desc", metric: "birdies",           aggregate: "sum" },
-  // ── Most rounds ──
-  { category: "most_rounds_90d",          windowDays: 90,   sortDir: "desc", metric: "rounds_count",      aggregate: "count" },
-  { category: "most_rounds_all_time",     windowDays: null, sortDir: "desc", metric: "rounds_count",      aggregate: "count" },
   // ── Best Stableford ──
   { category: "best_stableford_90d",      windowDays: 90,   sortDir: "desc", metric: "stableford_points", aggregate: "value" },
   { category: "best_stableford_all_time", windowDays: null, sortDir: "desc", metric: "stableford_points", aggregate: "value" },
