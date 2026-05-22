@@ -649,12 +649,32 @@ async function checkStreakBadges(userId: string, streakType: string, count: numb
 // ─────────────────────────────────────────────────────────────────────────────
 type LegendCfg = { category: string; windowDays: number | null; sortDir: "asc" | "desc"; metric: string; aggregate: "value" | "sum" | "count" };
 
+// 7 stats × 2 windows (90D + All Time) = 14 legend categories.
+// Naming convention: <stat>_90d for the rolling window, <stat>_all_time for permanent records.
+// NOTE: legacy names `best_score_diff`, `lowest_gross` were renamed for consistency.
+// Run `gam_reset_user` (via gam-backdate-replay) to wipe old rows and rebuild with the new names.
 const LEGEND_CATS: LegendCfg[] = [
-  { category: "best_score_diff", windowDays: 90, sortDir: "asc", metric: "score_diff", aggregate: "value" },
-  { category: "most_birdies_90d", windowDays: 90, sortDir: "desc", metric: "birdies", aggregate: "sum" },
-  { category: "most_rounds_90d", windowDays: 90, sortDir: "desc", metric: "rounds_count", aggregate: "count" },
-  { category: "lowest_gross", windowDays: null, sortDir: "asc", metric: "gross_score", aggregate: "value" },
-  { category: "best_stableford_90d", windowDays: 90, sortDir: "desc", metric: "stableford_points", aggregate: "value" },
+  // ── Lowest gross score ──
+  { category: "lowest_gross_90d",         windowDays: 90,   sortDir: "asc",  metric: "gross_score",       aggregate: "value" },
+  { category: "lowest_gross_all_time",    windowDays: null, sortDir: "asc",  metric: "gross_score",       aggregate: "value" },
+  // ── Best score differential ──
+  { category: "best_score_diff_90d",      windowDays: 90,   sortDir: "asc",  metric: "score_diff",        aggregate: "value" },
+  { category: "best_score_diff_all_time", windowDays: null, sortDir: "asc",  metric: "score_diff",        aggregate: "value" },
+  // ── Most birdies ──
+  { category: "most_birdies_90d",         windowDays: 90,   sortDir: "desc", metric: "birdies",           aggregate: "sum" },
+  { category: "most_birdies_all_time",    windowDays: null, sortDir: "desc", metric: "birdies",           aggregate: "sum" },
+  // ── Most rounds ──
+  { category: "most_rounds_90d",          windowDays: 90,   sortDir: "desc", metric: "rounds_count",      aggregate: "count" },
+  { category: "most_rounds_all_time",     windowDays: null, sortDir: "desc", metric: "rounds_count",      aggregate: "count" },
+  // ── Best Stableford ──
+  { category: "best_stableford_90d",      windowDays: 90,   sortDir: "desc", metric: "stableford_points", aggregate: "value" },
+  { category: "best_stableford_all_time", windowDays: null, sortDir: "desc", metric: "stableford_points", aggregate: "value" },
+  // ── Most eagles (NEW) ──
+  { category: "most_eagles_90d",          windowDays: 90,   sortDir: "desc", metric: "eagles",            aggregate: "sum" },
+  { category: "most_eagles_all_time",     windowDays: null, sortDir: "desc", metric: "eagles",            aggregate: "sum" },
+  // ── Most hole-in-ones (NEW) ──
+  { category: "most_aces_90d",            windowDays: 90,   sortDir: "desc", metric: "holes_in_one",      aggregate: "sum" },
+  { category: "most_aces_all_time",       windowDays: null, sortDir: "desc", metric: "holes_in_one",      aggregate: "sum" },
 ];
 
 async function applyCourseLegends(stats: any) {
@@ -677,7 +697,7 @@ async function recomputeLegend(courseId: string, cfg: LegendCfg) {
     : null;
   let q = supabase
     .from("gam_round_stats")
-    .select("user_id, play_date, birdies, gross_score, score_diff, stableford_points")
+    .select("user_id, play_date, birdies, gross_score, score_diff, stableford_points, eagles, holes_in_one")
     .eq("course_id", courseId)
     .eq("holes_played", 18); // Legends are 18-hole rounds only
   if (sinceDate) q = q.gte("play_date", sinceDate);
