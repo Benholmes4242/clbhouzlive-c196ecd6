@@ -102,9 +102,6 @@ export function formatLegendValue(category: LegendCategory, value: number): stri
     case 'most_birdies_90d':
     case 'most_birdies_all_time':
       return `${value} birdies`;
-    case 'most_rounds_90d':
-    case 'most_rounds_all_time':
-      return `${value} rounds`;
     case 'lowest_gross_90d':
     case 'lowest_gross_all_time':
       return `${value}`;
