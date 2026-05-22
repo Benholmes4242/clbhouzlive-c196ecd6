@@ -76,8 +76,6 @@ export const legendCategoryWindow: Record<LegendCategory, '90d' | 'all_time'> = 
   best_score_diff_all_time: 'all_time',
   most_birdies_90d:         '90d',
   most_birdies_all_time:    'all_time',
-  most_rounds_90d:          '90d',
-  most_rounds_all_time:     'all_time',
   best_stableford_90d:      '90d',
   best_stableford_all_time: 'all_time',
   most_eagles_90d:          '90d',
