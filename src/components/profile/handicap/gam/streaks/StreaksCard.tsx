@@ -232,7 +232,10 @@ const StreakHeroCard: React.FC<StreakHeroCardProps> = ({ entry, row }) => {
     <div
       style={{
         position: 'relative',
-        margin: '0 20px',
+        // NOTE: no horizontal margin here. Horizontal positioning is owned by
+        // the carousel container (paddingLeft/paddingRight: 20, gap: 12).
+        // Adding `margin: '0 20px'` here will double-gutter the cards and
+        // break the peek pattern (next card visible on the right edge).
         padding: '18px 18px 16px',
         borderRadius: 16,
         overflow: 'hidden',
