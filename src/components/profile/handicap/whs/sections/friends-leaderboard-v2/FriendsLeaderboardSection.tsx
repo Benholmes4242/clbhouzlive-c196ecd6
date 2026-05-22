@@ -127,7 +127,7 @@ export const FriendsLeaderboardSection: React.FC<Props> = ({ userId }) => {
             key={i}
             className="animate-pulse"
             style={{
-              margin: '0 20px 1px',
+              margin: '0 0 1px',
               height: 54,
               background: 'var(--hcp-bg-2)',
               borderRadius: 6,
