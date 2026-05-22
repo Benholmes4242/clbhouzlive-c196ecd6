@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Flag } from 'lucide-react';
+import { Eye, TrendingUp, Trophy, Send, type LucideIcon } from 'lucide-react';
 import { useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { callCreateInvite } from '@/lib/whs/api';
@@ -11,11 +11,18 @@ import type { WhsFriendActivityWithImage } from '@/lib/whs/types';
 const FONT_GEIST = 'Geist, system-ui, -apple-system, BlinkMacSystemFont, sans-serif';
 const INK = 'var(--hcp-t-100)';
 const INK_MUTE = 'var(--hcp-t-60)';
+const AMBER = '#F7931E';
 const AMBER_INK = '#9A6116';
 
 interface Props {
   activity: WhsFriendActivityWithImage;
 }
+
+const UNLOCK_ROWS: { icon: LucideIcon; label: string }[] = [
+  { icon: Eye, label: 'Hole-by-hole scorecard' },
+  { icon: TrendingUp, label: 'Head-to-head record' },
+  { icon: Trophy, label: 'Shared achievements' },
+];
 
 export const NonClbhouzFriendBody: React.FC<Props> = ({ activity }) => {
   const queryClient = useQueryClient();
@@ -46,44 +53,35 @@ export const NonClbhouzFriendBody: React.FC<Props> = ({ activity }) => {
   };
 
   return (
-    <div style={{ padding: '32px 20px 24px', textAlign: 'center', fontFamily: FONT_GEIST }}>
-      <div
-        style={{
-          width: 64,
-          height: 64,
-          borderRadius: 16,
-          margin: '0 auto 16px',
-          background: 'rgba(247,147,30,0.10)',
-          border: '1px solid rgba(247,147,30,0.20)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-        }}
-      >
-        <Flag size={28} color="#C97211" strokeWidth={2.2} />
-      </div>
+    <div style={{ padding: '28px 20px 24px', fontFamily: FONT_GEIST }}>
       <h3
         style={{
-          margin: '0 0 8px',
+          margin: '0 0 6px',
           fontSize: 18,
           fontWeight: 800,
-          color: 'var(--hcp-t-100)',
+          color: INK,
+          letterSpacing: '-0.01em',
           fontFamily: FONT_GEIST,
         }}
       >
-        See {fname}'s hole by hole
+        Unlock the full round
       </h3>
       <p
         style={{
-          margin: '0 auto 20px',
+          margin: '0 0 20px',
           fontSize: 13,
           color: INK_MUTE,
           lineHeight: 1.5,
-          maxWidth: 280,
         }}
       >
-        Invite {fname} to clbhouz to unlock detailed round data, head-to-head comparisons, and shared achievements.
+        When {fname} joins clbhouz, you'll see hole-by-hole, your head-to-head, and shared achievements.
       </p>
+
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 24 }}>
+        {UNLOCK_ROWS.map((row) => (
+          <UnlockRow key={row.label} icon={row.icon} label={row.label} />
+        ))}
+      </div>
 
       {pendingInvite ? (
         <>
@@ -91,10 +89,11 @@ export const NonClbhouzFriendBody: React.FC<Props> = ({ activity }) => {
             onClick={handleInvite}
             disabled={sending}
             style={{
-              padding: '12px 24px',
+              width: '100%',
+              padding: '13px 24px',
               borderRadius: 999,
-              background: 'var(--hcp-bg-1)',
-              border: '1px solid #F7931E',
+              background: 'transparent',
+              border: `1px solid ${AMBER}`,
               color: AMBER_INK,
               fontSize: 14,
               fontWeight: 700,
@@ -102,11 +101,23 @@ export const NonClbhouzFriendBody: React.FC<Props> = ({ activity }) => {
               cursor: sending ? 'default' : 'pointer',
               opacity: sending ? 0.7 : 1,
               fontFamily: FONT_GEIST,
+              display: 'inline-flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: 8,
             }}
           >
+            <Send size={15} strokeWidth={2.2} />
             {sending ? 'Preparing\u2026' : `Resend invite to ${fname}`}
           </button>
-          <p style={{ margin: '10px 0 0', fontSize: 11, color: 'var(--hcp-t-40)' }}>
+          <p
+            style={{
+              margin: '10px 0 0',
+              fontSize: 11,
+              color: 'var(--hcp-t-40)',
+              textAlign: 'center',
+            }}
+          >
             Originally sent {fmtRelative(pendingInvite.sent_at, { compact: false })}
           </p>
         </>
@@ -115,7 +126,8 @@ export const NonClbhouzFriendBody: React.FC<Props> = ({ activity }) => {
           onClick={handleInvite}
           disabled={sending}
           style={{
-            padding: '12px 24px',
+            width: '100%',
+            padding: '13px 24px',
             borderRadius: 999,
             background: 'linear-gradient(135deg, #F59E0B 0%, #FBBF24 100%)',
             border: 'none',
@@ -127,13 +139,48 @@ export const NonClbhouzFriendBody: React.FC<Props> = ({ activity }) => {
             cursor: sending ? 'default' : 'pointer',
             opacity: sending ? 0.7 : 1,
             fontFamily: FONT_GEIST,
+            display: 'inline-flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: 8,
           }}
         >
+          <Send size={15} strokeWidth={2.2} />
           {sending ? 'Preparing\u2026' : `Invite ${fname}`}
         </button>
       )}
     </div>
   );
 };
+
+const UnlockRow: React.FC<{ icon: LucideIcon; label: string }> = ({ icon: Icon, label }) => (
+  <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+    <div
+      style={{
+        width: 32,
+        height: 32,
+        borderRadius: 8,
+        background: 'rgba(247,147,30,0.10)',
+        border: '1px solid rgba(247,147,30,0.18)',
+        display: 'inline-flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        flexShrink: 0,
+      }}
+    >
+      <Icon size={15} color="#C97211" strokeWidth={2.2} />
+    </div>
+    <div
+      style={{
+        fontSize: 14,
+        fontWeight: 600,
+        color: INK,
+        fontFamily: FONT_GEIST,
+      }}
+    >
+      {label}
+    </div>
+  </div>
+);
 
 export default NonClbhouzFriendBody;
