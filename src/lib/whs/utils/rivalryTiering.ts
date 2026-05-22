@@ -36,10 +36,7 @@ export function assignRivalryTiers(
   rivalries.forEach((r, idx) => {
     const key = rivalKey(r);
     if (!key) return;
-    if ((r.shared_rounds_count ?? 0) === 0) {
-      tiers.set(key, 'new');
-      return;
-    }
+    if ((r.shared_rounds_count ?? 0) === 0) return;
     ranked.push({
       key,
       score: rivalryScore(r),
