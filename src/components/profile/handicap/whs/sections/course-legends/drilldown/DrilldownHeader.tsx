@@ -85,7 +85,7 @@ export const DrilldownHeader: React.FC<Props> = ({ state, onBack, youOwnedCount,
         }}
       >
         <Crown size={12} strokeWidth={2.5} />
-        {youOwnedCount}/5
+        {youOwnedCount}/{totalCategories}
       </div>
     </div>
   </>
