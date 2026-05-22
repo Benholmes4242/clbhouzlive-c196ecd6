@@ -72,7 +72,7 @@ export const WeeklyBanner: React.FC<Props> = ({ banner, friends }) => {
             flexShrink: 0,
           }}
         >
-          <FlameIcon size={14} />
+          <span style={{ fontSize: 16, lineHeight: 1 }} aria-hidden>🔥</span>
         </div>
         <div style={{ flex: 1, minWidth: 0 }}>
           <div
