@@ -20,8 +20,6 @@ const LEGEND_CATEGORY_COPY: Record<LegendCategory, string> = {
   best_score_diff_all_time: 'Best score differential vs handicap of all time.',
   most_birdies_90d:         'Most birdies in the last 90 days at this course.',
   most_birdies_all_time:    'Most birdies ever recorded at this course.',
-  most_rounds_90d:          'Most rounds played at this course in the last 90 days.',
-  most_rounds_all_time:     'Most rounds ever played at this course.',
   best_stableford_90d:      'Highest Stableford points in the last 90 days at this course.',
   best_stableford_all_time: 'Highest Stableford points ever recorded at this course.',
   most_eagles_90d:          'Most eagles in the last 90 days at this course.',
