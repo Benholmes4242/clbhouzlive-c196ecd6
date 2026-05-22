@@ -133,7 +133,7 @@ export const FriendsLeaderboardSection: React.FC<Props> = ({ userId }) => {
         }}
       >
         <p style={{ ...LABEL_STYLE, flex: 1 }}>TOP 5</p>
-        <p style={{ ...LABEL_STYLE, width: 32, textAlign: 'center' }}>7D</p>
+        <p style={{ ...LABEL_STYLE, width: 32, textAlign: 'right' }}>7D</p>
         <div style={{ width: 56 }} />
       </div>
 
