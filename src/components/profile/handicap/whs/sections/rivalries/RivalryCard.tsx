@@ -57,8 +57,6 @@ export const RivalryCard: React.FC<Props> = (props) => {
           onTap={handleNavigate}
         />
       );
-    case 'empty':
-      return <RivalryEmptyCard rivalry={props.rivalry} />;
   }
 };
 
