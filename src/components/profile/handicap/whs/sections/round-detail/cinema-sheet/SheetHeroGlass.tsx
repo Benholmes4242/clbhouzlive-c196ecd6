@@ -59,7 +59,10 @@ interface Props {
   isCounter?: boolean;
   /** When non-null and |delta| >= 0.05, renders 4th stat HCP IMPACT in a 2×2 grid. */
   handicapDelta?: number | null;
+  /** When true, missing Stableford and Score Diff render as dashed lock tiles (non-clbhouz friends). */
+  lockMissingStats?: boolean;
 }
+
 
 const HAIR: React.CSSProperties = {
   height: 0,
