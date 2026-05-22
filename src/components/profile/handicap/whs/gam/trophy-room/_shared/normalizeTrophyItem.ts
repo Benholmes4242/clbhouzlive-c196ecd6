@@ -47,9 +47,6 @@ function categoryToIconKey(c: LegendCategory): string {
     case 'most_birdies_90d':
     case 'most_birdies_all_time':
       return 'feather';
-    case 'most_rounds_90d':
-    case 'most_rounds_all_time':
-      return 'map-pin';
     case 'lowest_gross_90d':
     case 'lowest_gross_all_time':
       return 'trophy';
