@@ -146,7 +146,6 @@ const HolderCell: React.FC<HolderCellProps> = ({
   );
 };
 
-
 interface Props {
   courseId: string;
   courseName: string;
