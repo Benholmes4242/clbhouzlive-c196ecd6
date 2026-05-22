@@ -6,7 +6,6 @@ import type { RivalryTier } from '@/lib/whs/utils/rivalryTiering';
 import { rivalKey } from '@/lib/whs/utils/rivalryTiering';
 import RivalryHeroCard from './RivalryHeroCard';
 import RivalryCompactCard from './RivalryCompactCard';
-import RivalryEmptyCard from './RivalryEmptyCard';
 
 interface Props {
   rivalry: FriendRivalryHydrated;
