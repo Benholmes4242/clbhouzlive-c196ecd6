@@ -257,7 +257,7 @@ const TieredRivalries: React.FC<{
         </>
       )}
 
-      {(compact.length > 0 || empty.length > 0) && (
+      {compact.length > 0 && (
         <div
           style={{
             display: 'flex',
@@ -276,20 +276,6 @@ const TieredRivalries: React.FC<{
                 rank={hero.length + idx + 1}
                 total={hero.length + compact.length}
                 variant="compact"
-                friendViewOwnerId={friendViewOwnerId}
-              />
-            );
-          })}
-          {empty.map((r, idx) => {
-            const key = rivalKey(r) ?? `empty-${idx}`;
-            return (
-              <RivalryCard
-                key={key}
-                rivalry={r}
-                tier="new"
-                rank={0}
-                total={0}
-                variant="empty"
                 friendViewOwnerId={friendViewOwnerId}
               />
             );
