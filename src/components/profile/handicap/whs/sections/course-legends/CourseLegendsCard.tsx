@@ -12,20 +12,18 @@ import { getFooterCue, FOOTER_INTENT_STYLE } from './footerCue';
 const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
 const GOLD = '#FBBC2E';
 
-/**
- * Stable display order across both windows. Cards iterate this order then
- * filter to whichever categories actually have holder data.
- */
-const CATEGORY_ORDER: LegendCategory[] = [
-  // Row 1: ACE (left) · GROSS (right)
-  'most_aces_90d', 'lowest_gross_90d',
-  'most_aces_all_time', 'lowest_gross_all_time',
-  // Row 2: EAGLE (left) · STBL (right)
-  'most_eagles_90d', 'best_stableford_90d',
-  'most_eagles_all_time', 'best_stableford_all_time',
-  // Row 3: BIRDIE (left) · SCORE (right)
-  'most_birdies_90d', 'best_score_diff_90d',
-  'most_birdies_all_time', 'best_score_diff_all_time',
+/** Left column — achievements (rare events, ascending: ACE rarest) */
+const LEFT_CATEGORIES: LegendCategory[] = [
+  'most_aces_90d', 'most_aces_all_time',
+  'most_eagles_90d', 'most_eagles_all_time',
+  'most_birdies_90d', 'most_birdies_all_time',
+];
+
+/** Right column — scoring (round outcomes) */
+const RIGHT_CATEGORIES: LegendCategory[] = [
+  'lowest_gross_90d', 'lowest_gross_all_time',
+  'best_stableford_90d', 'best_stableford_all_time',
+  'best_score_diff_90d', 'best_score_diff_all_time',
 ];
 
 /**
