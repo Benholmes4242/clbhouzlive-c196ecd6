@@ -245,13 +245,6 @@ export const FriendsLeaderboardSection: React.FC<Props> = ({ userId }) => {
         </>
       )}
 
-      <FriendProfileSheet
-        friends={[...cohorts.active, ...cohorts.inactive]}
-        startIndex={profileSheet?.index ?? 0}
-        ownerUserId={userId}
-        open={!!profileSheet}
-        onClose={() => setProfileSheet(null)}
-      />
     </section>
   );
 };
