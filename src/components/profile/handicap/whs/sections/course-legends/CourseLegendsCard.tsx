@@ -19,7 +19,6 @@ const GOLD = '#FBBC2E';
 const CATEGORY_ORDER: LegendCategory[] = [
   'lowest_gross_90d', 'lowest_gross_all_time',
   'most_birdies_90d', 'most_birdies_all_time',
-  'most_rounds_90d', 'most_rounds_all_time',
   'best_stableford_90d', 'best_stableford_all_time',
   'best_score_diff_90d', 'best_score_diff_all_time',
   'most_eagles_90d', 'most_eagles_all_time',
@@ -31,8 +30,6 @@ const CAT_SHORT: Record<LegendCategory, string> = {
   lowest_gross_all_time:    'GROSS',
   most_birdies_90d:         'BIRDIE',
   most_birdies_all_time:    'BIRDIE',
-  most_rounds_90d:          'VISITOR',
-  most_rounds_all_time:     'VISITOR',
   best_stableford_90d:      'STBL',
   best_stableford_all_time: 'STBL',
   best_score_diff_90d:      'SCORE',
