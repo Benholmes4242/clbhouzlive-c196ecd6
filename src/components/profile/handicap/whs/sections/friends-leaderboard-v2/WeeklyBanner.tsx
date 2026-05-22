@@ -35,7 +35,7 @@ export const WeeklyBanner: React.FC<Props> = ({ banner, friends }) => {
   }
 
   return (
-    <div style={{ padding: '8px 16px 0' }}>
+    <div style={{ padding: '8px 16px' }}>
       <div
         style={{
           background: `linear-gradient(135deg, ${T.bg2} 0%, ${T.bg1} 100%)`,
