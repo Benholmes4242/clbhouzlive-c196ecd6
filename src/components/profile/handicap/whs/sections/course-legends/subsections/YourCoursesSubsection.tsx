@@ -27,6 +27,11 @@ export const YourCoursesSubsection: React.FC<Props> = ({
     (c) => (holdersByCourse.get(c.course_id)?.size ?? 0) > 0,
   );
 
+  // Hide entire subsection when user has played courses but none are populated in the active window.
+  if (!isLoading && courses.length > 0 && populatedCourses.length === 0) {
+    return null;
+  }
+
   return (
     <>
       <SubsectionEyebrow label="YOUR COURSES" />
@@ -37,19 +42,6 @@ export const YourCoursesSubsection: React.FC<Props> = ({
             title="No other courses yet"
             body="Courses you've played outside your home club will show here."
           />
-        )}
-        {!isLoading && courses.length > 0 && populatedCourses.length === 0 && (
-          <div
-            style={{
-              padding: '20px 16px',
-              textAlign: 'center',
-              color: 'var(--hcp-t-40)',
-              fontSize: 13,
-              lineHeight: 1.5,
-            }}
-          >
-            No recent activity — switch to All time to see your records
-          </div>
         )}
         {populatedCourses.map((c) => (
           <CourseLegendsCard

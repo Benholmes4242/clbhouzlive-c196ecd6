@@ -134,7 +134,9 @@ const SectionHero: React.FC<{
           lineHeight: 1.15,
         }}
       >
-        You hold {titleCount} title{titleCount === 1 ? '' : 's'}
+        {titleCount === 0
+          ? 'Your legend starts here'
+          : `You hold ${titleCount} title${titleCount === 1 ? '' : 's'}`}
       </div>
 
       <div
@@ -145,9 +147,11 @@ const SectionHero: React.FC<{
           marginBottom: 14,
         }}
       >
-        {window === '90d'
-          ? 'across rolling 90-day leaderboards'
-          : 'across all-time course records'}
+        {titleCount === 0
+          ? 'Top the leaderboard at any course to earn your first title'
+          : window === '90d'
+            ? 'across rolling 90-day leaderboards'
+            : 'across all-time course records'}
       </div>
 
       <WindowToggle window={window} setWindow={setWindow} />
