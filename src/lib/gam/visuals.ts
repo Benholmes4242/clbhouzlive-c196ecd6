@@ -1,7 +1,6 @@
 import {
   Trophy,
   Feather,
-  MapPin,
   Target,
   TrendingDown,
   Award,
