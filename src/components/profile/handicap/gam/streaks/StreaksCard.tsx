@@ -188,9 +188,14 @@ const StreakHeroCard: React.FC<StreakHeroCardProps> = ({ entry, row }) => {
         ? Math.min(100, (current / progressTarget) * 100)
         : 0;
 
-  const hintCopy: string =
+  const hintCopy: React.ReactNode =
     state === 'atpb'
-      ? '🔥 At your personal best'
+      ? (
+        <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+          <Flame size={13} />
+          At your personal best
+        </span>
+      )
       : state === 'active'
         ? best > 0
           ? `PB · ${best}`
