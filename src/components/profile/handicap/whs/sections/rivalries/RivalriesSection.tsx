@@ -204,9 +204,8 @@ const FriendViewRivalries: React.FC<{
 const TieredRivalries: React.FC<{
   hero: Array<{ r: FriendRivalryHydrated; tier: RivalryTier }>;
   compact: Array<{ r: FriendRivalryHydrated; tier: RivalryTier }>;
-  empty: FriendRivalryHydrated[];
   friendViewOwnerId?: string;
-}> = ({ hero, compact, empty, friendViewOwnerId }) => {
+}> = ({ hero, compact, friendViewOwnerId }) => {
   const railRef = useRef<HTMLDivElement | null>(null);
   const [page, setPage] = useState(0);
   const total = hero.length;
