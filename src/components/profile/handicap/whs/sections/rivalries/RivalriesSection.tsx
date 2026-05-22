@@ -235,7 +235,7 @@ const TieredRivalries: React.FC<{
                 <div
                   key={key}
                   style={{
-                    flex: '0 0 100%',
+                    flex: '0 0 92%',
                     scrollSnapAlign: 'center',
                     minWidth: 0,
                   }}
@@ -294,6 +294,7 @@ const DotPager: React.FC<{ count: number; active: number }> = ({ count, active }
       alignItems: 'center',
       gap: 6,
       marginTop: 10,
+      marginBottom: 20,
     }}
   >
     {Array.from({ length: count }).map((_, i) => {
