@@ -4,8 +4,7 @@ import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { fmtHcp } from '@/lib/whs/format';
 import SectionHeader from '../SectionHeader';
 import RecentlyActiveItem from './RecentlyActiveItem';
-import FriendProfileSheet from '../friend-profile-sheet/FriendProfileSheet';
-import { useOpenFriendHybridSheet } from '@/components/friend-hybrid-sheet/FriendHybridSheetProvider';
+import { useOpenFriendSheet } from '@/components/friend-sheet/FriendSheetProvider';
 
 interface Props {
   userId: string;
@@ -17,9 +16,8 @@ const FONT = '"Geist", system-ui, sans-serif';
 
 export const YourCircleSection: React.FC<Props> = ({ userId }) => {
   const { data, isLoading } = useFriendLeaderboard(userId);
-  const { open: openHybridSheet } = useOpenFriendHybridSheet();
+  const { open: openSheet } = useOpenFriendSheet();
   const [showAll, setShowAll] = useState(false);
-  const [profileSheet, setProfileSheet] = useState<{ index: number } | null>(null);
 
   const stats = useMemo(() => {
     if (!data) return null;
@@ -223,26 +221,21 @@ export const YourCircleSection: React.FC<Props> = ({ userId }) => {
                   }
                   onClick={() => {
                     if (entry.friend_user_id) {
-                      openHybridSheet({
+                      openSheet({
                         targetUserId: entry.friend_user_id,
                         source: 'recently_active_rail',
                       });
-                      return;
+                    } else {
+                      openSheet({
+                        whsOnlyEntry: entry,
+                        source: 'recently_active_rail',
+                      });
                     }
-                    const realIdx = rail.findIndex((e) => e === entry);
-                    if (realIdx >= 0) setProfileSheet({ index: realIdx });
                   }}
                 />
               </div>
             ))}
           </div>
-          <FriendProfileSheet
-            friends={rail}
-            startIndex={profileSheet?.index ?? 0}
-            ownerUserId={userId}
-            open={!!profileSheet}
-            onClose={() => setProfileSheet(null)}
-          />
         </div>
       )}
     </section>

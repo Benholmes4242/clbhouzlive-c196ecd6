@@ -4,14 +4,13 @@ import { DarkSectionHeader } from '../_shared/darkAtoms';
 import LeaderboardRow from './LeaderboardRow';
 import HeroPositionCard from './HeroPositionCard';
 import WeeklyBanner from './WeeklyBanner';
-import FriendProfileSheet from '../friend-profile-sheet/FriendProfileSheet';
 import {
   useFriendLeaderboard,
   useFriendLeaderboardRankDeltas,
   useFriendLeaderboardWeeklyBanner,
 } from '@/lib/whs/hooks';
 import { useHandicapPercentile } from '@/lib/whs/usePercentile';
-import { useOpenFriendHybridSheet } from '@/components/friend-hybrid-sheet/FriendHybridSheetProvider';
+import { useOpenFriendSheet } from '@/components/friend-sheet/FriendSheetProvider';
 import { buildLeaderboardCohorts } from '@/lib/whs/utils/buildLeaderboardCohorts';
 import type { FriendLeaderboardEntry } from '@/lib/whs/types';
 
@@ -35,9 +34,8 @@ export const FriendsLeaderboardSection: React.FC<Props> = ({ userId }) => {
   const percentileQuery = useHandicapPercentile(userId);
   const { data: deltasData } = useFriendLeaderboardRankDeltas(userId, 90);
   const { data: weeklyBanner } = useFriendLeaderboardWeeklyBanner(userId);
-  const { open: openHybridSheet } = useOpenFriendHybridSheet();
+  const { open: openSheet } = useOpenFriendSheet();
   const [showInactive, setShowInactive] = useState(false);
-  const [profileSheet, setProfileSheet] = useState<{ index: number } | null>(null);
   const [heroExpanded, setHeroExpanded] = useState(false);
 
   const cohorts = buildLeaderboardCohorts(data);
@@ -49,7 +47,7 @@ export const FriendsLeaderboardSection: React.FC<Props> = ({ userId }) => {
   const subLine = isLoading
     ? 'Loading…'
     : percentileTop != null
-      ? `You're top ${percentileTop}% of all Clbhouz · ${cohorts.totalActive} active${
+      ? `You're top ${percentileTop}% of all clbhouz · ${cohorts.totalActive} active${
           cohorts.totalInactive > 0 ? `, ${cohorts.totalInactive} inactive` : ''
         }`
       : `Ranked by current handicap · ${cohorts.totalActive} active${
@@ -59,15 +57,15 @@ export const FriendsLeaderboardSection: React.FC<Props> = ({ userId }) => {
   const handleRowClick = (entry: FriendLeaderboardEntry) => {
     if (entry.is_self) return;
     if (entry.friend_user_id) {
-      openHybridSheet({
+      openSheet({
         targetUserId: entry.friend_user_id,
         source: 'friends_leaderboard_row',
       });
     } else {
-      // FriendProfileSheet expects an index into the sorted master list.
-      const sortedAll = [...cohorts.active, ...cohorts.inactive];
-      const realIdx = sortedAll.findIndex((e) => e === entry);
-      if (realIdx >= 0) setProfileSheet({ index: realIdx });
+      openSheet({
+        whsOnlyEntry: entry,
+        source: 'friends_leaderboard_row',
+      });
     }
   };
 
