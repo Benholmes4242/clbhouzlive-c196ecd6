@@ -41,18 +41,29 @@ export const FriendsLeaderboardSection: React.FC<Props> = ({ userId }) => {
   const cohorts = buildLeaderboardCohorts(data);
   const selfRow =
     cohorts.selfActiveIdx >= 0 ? cohorts.active[cohorts.selfActiveIdx] : null;
-  const percentileTop =
-    percentileQuery.data?.available === true ? percentileQuery.data.percentile_top : null;
+  const percentileData = percentileQuery.data;
+  const percentileAvailable = percentileData?.available === true;
+  const percentileTopValue = percentileAvailable ? percentileData.percentile_top : null;
+
+  // Hybrid: show percentile ONLY when user is in top half of their friend leaderboard
+  // AND percentile is available (RPC handles cohort_size < 20 by returning available: false)
+  const isInTopHalf =
+    cohorts.selfActiveRank != null &&
+    cohorts.totalActive > 0 &&
+    cohorts.selfActiveRank <= Math.ceil(cohorts.totalActive / 2);
+
+  const showPercentile = percentileTopValue != null && isInTopHalf;
+
+  const tail = `${cohorts.totalActive} active${
+    cohorts.totalInactive > 0 ? `, ${cohorts.totalInactive} inactive` : ''
+  }`;
 
   const subLine = isLoading
     ? 'Loading…'
-    : percentileTop != null
-      ? `You're top ${percentileTop}% of all clbhouz · ${cohorts.totalActive} active${
-          cohorts.totalInactive > 0 ? `, ${cohorts.totalInactive} inactive` : ''
-        }`
-      : `Ranked by current handicap · ${cohorts.totalActive} active${
-          cohorts.totalInactive > 0 ? `, ${cohorts.totalInactive} inactive` : ''
-        }`;
+    : showPercentile
+      ? `You're top ${percentileTopValue}% of all clbhouz · ${tail}`
+      : `Ranked by current handicap · ${tail}`;
+
 
   const handleRowClick = (entry: FriendLeaderboardEntry) => {
     if (entry.is_self) return;
