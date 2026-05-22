@@ -1,4 +1,4 @@
-import React, { useMemo, useRef } from 'react';
+import React, { useMemo, useRef, useState } from 'react';
 import { Crown } from 'lucide-react';
 import { useCourseLegends } from '@/hooks/gam/useCourseLegends';
 import { useCourseMeta } from '@/hooks/gam/useCourseMeta';
@@ -8,24 +8,33 @@ import {
   legendCategoryIcon,
   formatLegendValue,
 } from '@/lib/gam/visuals';
-import type { LegendCategory } from '@/lib/gam/types';
+import type { LegendCategory, LegendWindow } from '@/lib/gam/types';
 import type { CourseSelection } from './types';
 
 import { DrilldownHeader } from './drilldown/DrilldownHeader';
 import { CourseMetaStrip } from './drilldown/CourseMetaStrip';
 import { CategoryNavRail } from './drilldown/CategoryNavRail';
 import { CategorySection } from './drilldown/CategorySection';
+import { WindowToggle } from './CourseLegendsSection';
 
 const AMBER = '#F7931E';
 
-const CATEGORIES_ORDER: LegendCategory[] = [
-  'best_score_diff_90d',      'best_score_diff_all_time',
-  'lowest_gross_90d',         'lowest_gross_all_time',
-  'most_birdies_90d',         'most_birdies_all_time',
-  'best_stableford_90d',      'best_stableford_all_time',
-  'most_rounds_90d',          'most_rounds_all_time',
-  'most_eagles_90d',          'most_eagles_all_time',
-  'most_aces_90d',            'most_aces_all_time',
+const CATEGORIES_ORDER_90D: LegendCategory[] = [
+  'best_score_diff_90d',
+  'lowest_gross_90d',
+  'most_birdies_90d',
+  'best_stableford_90d',
+  'most_eagles_90d',
+  'most_aces_90d',
+];
+
+const CATEGORIES_ORDER_ALL_TIME: LegendCategory[] = [
+  'best_score_diff_all_time',
+  'lowest_gross_all_time',
+  'most_birdies_all_time',
+  'best_stableford_all_time',
+  'most_eagles_all_time',
+  'most_aces_all_time',
 ];
 
 const SHORT_LABELS: Record<LegendCategory, string> = {
@@ -37,8 +46,6 @@ const SHORT_LABELS: Record<LegendCategory, string> = {
   most_birdies_all_time:    'Birdie',
   best_stableford_90d:      'Stbl',
   best_stableford_all_time: 'Stbl',
-  most_rounds_90d:          'Visitor',
-  most_rounds_all_time:     'Visitor',
   most_eagles_90d:          'Eagle',
   most_eagles_all_time:     'Eagle',
   most_aces_90d:            'Ace',
@@ -54,8 +61,6 @@ const UNITS: Record<LegendCategory, string> = {
   most_birdies_all_time:    '',
   best_stableford_90d:      'pts',
   best_stableford_all_time: 'pts',
-  most_rounds_90d:          '',
-  most_rounds_all_time:     '',
   most_eagles_90d:          '',
   most_eagles_all_time:     '',
   most_aces_90d:            '',
@@ -73,13 +78,23 @@ interface SectionRow {
 }
 
 interface Props {
-  state: CourseSelection;
-  onBack: () => void;
+  /** Course context. Accepts `selection` (preferred) or legacy `state`. */
+  selection?: CourseSelection;
+  /** @deprecated use `selection` */
+  state?: CourseSelection;
+  /** When omitted, the drill-down header hides its back affordance (tab-mount). */
+  onBack?: () => void;
 }
 
-export const CourseLegendsDrilldown: React.FC<Props> = ({ state, onBack }) => {
-  const { data, isLoading, isError, refetch } = useCourseLegends(state.courseId);
-  const { data: meta } = useCourseMeta(state.courseId);
+export const CourseLegendsDrilldown: React.FC<Props> = ({ selection, state, onBack }) => {
+  const ctx = selection ?? state;
+  if (!ctx) return null;
+
+  const { data, isLoading, isError, refetch } = useCourseLegends(ctx.courseId);
+  const { data: meta } = useCourseMeta(ctx.courseId);
+  const [window, setWindow] = useState<LegendWindow>('90d');
+
+  const visibleCategories = window === '90d' ? CATEGORIES_ORDER_90D : CATEGORIES_ORDER_ALL_TIME;
 
   const groupedWithTotals = useMemo(() => {
     const m = new Map<LegendCategory, { rows: SectionRow[]; total: number }>();
@@ -104,27 +119,27 @@ export const CourseLegendsDrilldown: React.FC<Props> = ({ state, onBack }) => {
 
   const yourRanks = useMemo(() => {
     const r: Partial<Record<LegendCategory, number | null>> = {};
-    CATEGORIES_ORDER.forEach((cat) => {
+    visibleCategories.forEach((cat) => {
       const entry = groupedWithTotals.get(cat);
       const self = entry?.rows.find((row) => row.isSelf);
       r[cat] = self?.rank ?? null;
     });
     return r;
-  }, [groupedWithTotals]);
+  }, [groupedWithTotals, visibleCategories]);
 
   const youOwnedCount = Object.values(yourRanks).filter((r) => r === 1).length;
 
   const navCategories = useMemo(
     () =>
-      CATEGORIES_ORDER.filter(
-        (cat) => (groupedWithTotals.get(cat)?.rows.length ?? 0) > 0,
-      ).map((cat) => ({
-        key: cat,
-        short: SHORT_LABELS[cat],
-        icon: legendCategoryIcon[cat],
-        yourRank: yourRanks[cat] ?? null,
-      })),
-    [groupedWithTotals, yourRanks],
+      visibleCategories
+        .filter((cat) => (groupedWithTotals.get(cat)?.rows.length ?? 0) > 0)
+        .map((cat) => ({
+          key: cat,
+          short: SHORT_LABELS[cat],
+          icon: legendCategoryIcon[cat],
+          yourRank: yourRanks[cat] ?? null,
+        })),
+    [groupedWithTotals, yourRanks, visibleCategories],
   );
 
   const containerRef = useRef<HTMLDivElement>(null);
@@ -136,7 +151,16 @@ export const CourseLegendsDrilldown: React.FC<Props> = ({ state, onBack }) => {
 
   return (
     <div ref={containerRef}>
-      <DrilldownHeader state={state} onBack={onBack} youOwnedCount={youOwnedCount} />
+      <DrilldownHeader
+        state={ctx}
+        onBack={onBack}
+        youOwnedCount={youOwnedCount}
+        totalCategories={visibleCategories.length}
+      />
+
+      <div style={{ padding: '14px 16px 4px', display: 'flex', justifyContent: 'flex-start' }}>
+        <WindowToggle window={window} setWindow={setWindow} />
+      </div>
 
       {isLoading && (
         <div style={{ padding: '20px 16px', display: 'flex', flexDirection: 'column', gap: 12 }}>
@@ -174,7 +198,7 @@ export const CourseLegendsDrilldown: React.FC<Props> = ({ state, onBack }) => {
               gap: 28,
             }}
           >
-            {CATEGORIES_ORDER.map((cat) => {
+            {visibleCategories.map((cat) => {
               const entry = groupedWithTotals.get(cat);
               if (!entry || entry.rows.length === 0) return null;
               return (
