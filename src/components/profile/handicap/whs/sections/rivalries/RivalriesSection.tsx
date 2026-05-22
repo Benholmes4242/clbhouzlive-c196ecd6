@@ -124,7 +124,7 @@ const OwnerViewRivalries: React.FC<{ userId: string }> = ({ userId }) => {
           {Array.from({ length: 2 }).map((_, i) => <RivalrySkeleton key={i} />)}
         </div>
       ) : !hasFilled ? null : (
-        <TieredRivalries hero={hero} compact={compact} empty={empty} />
+        <TieredRivalries hero={hero} compact={compact} />
       )}
 
       <ManageRivalsSheet
