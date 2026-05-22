@@ -86,6 +86,9 @@ const HolderCell: React.FC<HolderCellProps> = ({
   const Icon = legendCategoryIcon[category];
   const isSelf = holder.is_self;
 
+  const nameColor = isSelf ? GOLD : 'var(--hcp-t-100)';
+  const labelColor = 'var(--hcp-t-60)';
+  const valueColor = nameColor;
   const palette = CATEGORY_TILE_PALETTE[category];
   const iconBg = isSelf ? 'rgba(251,188,46,0.16)' : palette.bg;
   const iconBorder = isSelf ? 'rgba(251,188,46,0.30)' : palette.border;
