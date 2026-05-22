@@ -32,7 +32,7 @@ const LABEL_STYLE: React.CSSProperties = {
 export const FriendsLeaderboardSection: React.FC<Props> = ({ userId }) => {
   const { data, isLoading } = useFriendLeaderboard(userId);
   const percentileQuery = useHandicapPercentile(userId);
-  const { data: deltasData } = useFriendLeaderboardRankDeltas(userId, 90);
+  const { data: deltasData } = useFriendLeaderboardRankDeltas(userId, 7);
   const { data: weeklyBanner } = useFriendLeaderboardWeeklyBanner(userId);
   const { open: openSheet } = useOpenFriendSheet();
   const [showInactive, setShowInactive] = useState(false);
