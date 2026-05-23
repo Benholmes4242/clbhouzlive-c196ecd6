@@ -250,14 +250,8 @@ export const CourseLegendsSection: React.FC<Props> = ({
             friendName={friendName}
           />
 
-          {/* Search bar repositioned: between HOME CLUB and YOUR COURSES */}
-          <div style={{ margin: '4px 0 6px' }}>
-            <CourseSearch
-              value={query}
-              onChange={setQuery}
-              helper="Find a course — see the legends"
-            />
-          </div>
+          {/* Discover Prompt Card — engagement-driving search invitation */}
+          <DiscoverSearchCard value={query} onChange={setQuery} />
 
           <YourCoursesSubsection
             courses={playedFiltered}
