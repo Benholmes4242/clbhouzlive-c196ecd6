@@ -221,10 +221,6 @@ const HandicapPageHeader: React.FC<HeaderProps> = ({
       {(readOnly || hasConnection) && (
         <div
           style={{
-            display: 'flex',
-            justifyContent: 'flex-start',
-            gap: 8,
-            padding: '8px 16px 0',
             overflowX: 'auto',
             scrollbarWidth: 'none',
             msOverflowStyle: 'none',
@@ -232,37 +228,48 @@ const HandicapPageHeader: React.FC<HeaderProps> = ({
           }}
           className="hcp-tab-row"
         >
-          {tabs.map(tab => {
-            const active = activeTab === tab.id;
-            return (
-              <button
-                key={tab.id}
-                onClick={() => onTabChange(tab.id as HandicapSubtab)}
-                role="tab"
-                aria-selected={active}
-                style={{
-                  flex: '0 0 auto',
-                  height: 32,
-                  padding: '0 10px',
-                  borderRadius: 8,
-                  border: active ? '1px solid rgba(255,255,255,0.55)' : '1px solid transparent',
-                  background: active ? 'rgba(255,255,255,0.10)' : 'transparent',
-                  color: active ? '#FFFFFF' : 'var(--hcp-t-60)',
-                  fontFamily: 'inherit',
-                  fontSize: 14,
-                  fontWeight: active ? 700 : 500,
-                  letterSpacing: '-0.01em',
-                  whiteSpace: 'nowrap',
-                  cursor: 'pointer',
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  transition: 'all 0.15s',
-                }}
-              >
-                {tab.label}
-              </button>
-            );
-          })}
+          <div
+            style={{
+              display: 'flex',
+              gap: 8,
+              padding: '8px 16px 0',
+              margin: '0 auto',
+              width: 'fit-content',
+              minWidth: 'min-content',
+            }}
+          >
+            {tabs.map(tab => {
+              const active = activeTab === tab.id;
+              return (
+                <button
+                  key={tab.id}
+                  onClick={() => onTabChange(tab.id as HandicapSubtab)}
+                  role="tab"
+                  aria-selected={active}
+                  style={{
+                    flex: '0 0 auto',
+                    height: 32,
+                    padding: '0 10px',
+                    borderRadius: 8,
+                    border: active ? '1px solid rgba(255,255,255,0.55)' : '1px solid transparent',
+                    background: active ? 'rgba(255,255,255,0.10)' : 'transparent',
+                    color: active ? '#FFFFFF' : 'var(--hcp-t-60)',
+                    fontFamily: 'inherit',
+                    fontSize: 14,
+                    fontWeight: active ? 700 : 500,
+                    letterSpacing: '-0.01em',
+                    whiteSpace: 'nowrap',
+                    cursor: 'pointer',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    transition: 'all 0.15s',
+                  }}
+                >
+                  {tab.label}
+                </button>
+              );
+            })}
+          </div>
           <style>{`.hcp-tab-row::-webkit-scrollbar { display: none; }`}</style>
         </div>
       )}
