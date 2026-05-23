@@ -72,7 +72,7 @@ const PulseCard: React.FC<{
         flex: '0 0 auto',
         scrollSnapAlign: 'start',
         width: 280,
-        height: 88,
+        minHeight: 88,
         position: 'relative',
         overflow: 'hidden',
         borderRadius: 14,
