@@ -189,46 +189,53 @@ const NextRoundWatch: React.FC<Props> = ({ connectionId, currentHandicap }) => {
           >
             <div
               style={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                marginBottom: 12,
+                position: 'relative',
+                height: 26,
+                marginBottom: 8,
               }}
             >
-              <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
-                <span
-                  aria-hidden
-                  style={{
-                    width: 6,
-                    height: 6,
-                    borderRadius: '50%',
-                    background: verdictColor,
-                    animation: 'nextRoundPulse 1.6s ease-in-out infinite',
-                    display: 'inline-block',
-                  }}
-                />
-                <span
-                  style={{
-                    textTransform: 'uppercase',
-                    fontSize: 10,
-                    letterSpacing: '0.16em',
-                    fontWeight: 800,
-                    color: verdictColor,
-                  }}
-                >
-                  Live · Last 5 avg
-                </span>
-              </span>
-              <span
+              <div
                 style={{
-                  fontSize: 13,
-                  fontWeight: 700,
-                  color: 'var(--hcp-t-100)',
-                  fontVariantNumeric: 'tabular-nums',
+                  position: 'absolute',
+                  left: `${bubblePct}%`,
+                  top: '50%',
+                  transform: 'translate(-50%, -50%)',
+                  pointerEvents: 'none',
                 }}
               >
-                {last5Avg.toFixed(1)}
-              </span>
+                <span
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    padding: '2px 7px',
+                    borderRadius: 6,
+                    background: isOnPace ? 'rgba(34,197,94,0.14)' : 'rgba(247,147,30,0.14)',
+                    border: `1px solid ${isOnPace ? 'rgba(34,197,94,0.30)' : 'rgba(247,147,30,0.30)'}`,
+                    fontSize: 12,
+                    fontWeight: 800,
+                    color: verdictColor,
+                    fontVariantNumeric: 'tabular-nums',
+                    lineHeight: 1.2,
+                    position: 'relative',
+                  }}
+                >
+                  {last5Avg.toFixed(1)}
+                  <span
+                    aria-hidden
+                    style={{
+                      position: 'absolute',
+                      left: '50%',
+                      bottom: -5,
+                      transform: 'translateX(-50%)',
+                      width: 0,
+                      height: 0,
+                      borderLeft: '4px solid transparent',
+                      borderRight: '4px solid transparent',
+                      borderTop: `5px solid ${isOnPace ? 'rgba(34,197,94,0.30)' : 'rgba(247,147,30,0.30)'}`,
+                    }}
+                  />
+                </span>
+              </div>
             </div>
 
             {/* Pace bar */}
@@ -287,19 +294,49 @@ const NextRoundWatch: React.FC<Props> = ({ connectionId, currentHandicap }) => {
               />
             </div>
 
-            {/* Scale label */}
+            {/* Scale row — eyebrow left, scale labels right */}
             <div
               style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
                 marginTop: 8,
                 fontSize: 10,
                 fontWeight: 700,
                 letterSpacing: '0.12em',
                 textTransform: 'uppercase',
-                color: 'var(--hcp-t-40)',
                 fontVariantNumeric: 'tabular-nums',
               }}
             >
-              <span>Scratch · 0</span>
+              <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+                <span
+                  aria-hidden
+                  style={{
+                    width: 6,
+                    height: 6,
+                    borderRadius: '50%',
+                    background: verdictColor,
+                    animation: 'nextRoundPulse 1.6s ease-in-out infinite',
+                    display: 'inline-block',
+                  }}
+                />
+                <span
+                  style={{
+                    letterSpacing: '0.16em',
+                    fontSize: 10,
+                    fontWeight: 800,
+                    color: verdictColor,
+                  }}
+                >
+                  Live · Last 5 avg
+                </span>
+              </span>
+
+              <span style={{ display: 'inline-flex', alignItems: 'center', gap: 12, color: 'var(--hcp-t-40)' }}>
+                <span>Scratch · 0</span>
+                <span style={{ opacity: 0.4 }}>·</span>
+                <span>Weakest · {oldestDiff.toFixed(1)}</span>
+              </span>
             </div>
           </div>
         )}
