@@ -1,6 +1,7 @@
 import React from 'react';
 import { ArrowDown, ArrowUp } from 'lucide-react';
 import { initials, displayName } from '@/lib/whs/utils/initials';
+import { pickAvatarSrc } from '@/lib/whs/utils/avatarSrc';
 import { fmtRelative } from '@/lib/whs/utils/nameFormat';
 import type { WhsFriendActivityWithImage } from '@/lib/whs/types';
 
@@ -53,17 +54,20 @@ export const CinemaFriendEyebrow: React.FC<Props> = ({ activity }) => {
             justifyContent: 'center',
           }}
         >
-          {activity.friend_thumbnail_url ? (
-            <img
-              src={activity.friend_thumbnail_url}
-              alt={activity.friend_name}
-              style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-            />
-          ) : (
-            <span style={{ fontSize: 10, fontWeight: 800, color: '#FFFFFF' }}>
-              {initials(activity.friend_name)}
-            </span>
-          )}
+          {(() => {
+            const src = pickAvatarSrc(activity.friend_thumbnail_url, activity.friend_profile_photo_url);
+            return src ? (
+              <img
+                src={src}
+                alt={activity.friend_name}
+                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+              />
+            ) : (
+              <span style={{ fontSize: 10, fontWeight: 800, color: '#FFFFFF' }}>
+                {initials(activity.friend_name)}
+              </span>
+            );
+          })()}
         </div>
         <div style={{ display: 'flex', flexDirection: 'column', minWidth: 0, gap: 1 }}>
           <p

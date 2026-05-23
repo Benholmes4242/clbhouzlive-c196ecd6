@@ -1,5 +1,6 @@
 import React from 'react';
 import { firstName } from '@/lib/whs/utils/initials';
+import { pickAvatarSrc } from '@/lib/whs/utils/avatarSrc';
 import { fmtHcp } from '@/lib/whs/format';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import type { FriendLeaderboardEntry } from '@/lib/whs/types';
@@ -40,7 +41,7 @@ export const RecentlyActiveItem: React.FC<Props> = ({ entry, isActive, onClick }
     >
       <div style={{ position: 'relative', width: 60, height: 60 }}>
         <SquircleAvatar
-          src={entry.friend_thumbnail_url}
+          src={pickAvatarSrc(entry.friend_thumbnail_url, entry.friend_profile_photo_url)}
           alt={entry.friend_name}
           size={60}
           userId={entry.friend_user_id ?? entry.friend_row_id}

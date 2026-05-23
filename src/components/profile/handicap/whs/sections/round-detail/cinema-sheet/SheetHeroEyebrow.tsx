@@ -2,6 +2,7 @@ import React from 'react';
 import { format } from 'date-fns';
 import { BadgeCheck } from 'lucide-react';
 import { initials, firstName } from '@/lib/whs/utils/initials';
+import { pickAvatarSrc } from '@/lib/whs/utils/avatarSrc';
 import { reformatFriendName } from '@/lib/whs/utils/nameFormat';
 import type { WhsFriendActivityWithImage } from '@/lib/whs/types';
 
@@ -64,17 +65,20 @@ export const FriendEyebrow: React.FC<{ activity: WhsFriendActivityWithImage }> =
           justifyContent: 'center',
         }}
       >
-        {activity.friend_thumbnail_url ? (
-          <img
-            src={activity.friend_thumbnail_url}
-            alt={name}
-            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-          />
-        ) : (
-          <span style={{ fontSize: 11, fontWeight: 800, color: '#FFFFFF' }}>
-            {initials(name)}
-          </span>
-        )}
+        {(() => {
+          const src = pickAvatarSrc(activity.friend_thumbnail_url, activity.friend_profile_photo_url);
+          return src ? (
+            <img
+              src={src}
+              alt={name}
+              style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+            />
+          ) : (
+            <span style={{ fontSize: 11, fontWeight: 800, color: '#FFFFFF' }}>
+              {initials(name)}
+            </span>
+          );
+        })()}
       </div>
       <div style={{ display: 'flex', flexDirection: 'column', minWidth: 0 }}>
         <div style={{ display: 'inline-flex', alignItems: 'center', gap: 5 }}>

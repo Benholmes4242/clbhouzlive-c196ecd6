@@ -3,6 +3,8 @@ import { formatDistanceToNow } from 'date-fns';
 import { useNavigate } from 'react-router-dom';
 import { useFriendsActivity } from '@/lib/whs/hooks';
 import { firstName, shareInvite } from '@/lib/whs/share';
+import { initials } from '@/lib/whs/utils/initials';
+import { pickAvatarSrc } from '@/lib/whs/utils/avatarSrc';
 import { callCreateInvite } from '@/lib/whs/api';
 import { toast } from 'sonner';
 import { useQueryClient } from '@tanstack/react-query';
@@ -10,11 +12,6 @@ import { whsKeys } from '@/lib/whs/hooks';
 
 interface Props {
   ownerUserId: string;
-}
-
-function initials(name: string): string {
-  const fn = firstName(name);
-  return fn.slice(0, 2).toUpperCase();
 }
 
 export const ActivityFeedStrip: React.FC<Props> = ({ ownerUserId }) => {
@@ -80,24 +77,27 @@ export const ActivityFeedStrip: React.FC<Props> = ({ ownerUserId }) => {
                   }}
                 >
                   <div className="flex items-center gap-2 mb-2">
-                    {f.friend_thumbnail_url ? (
-                      <img
-                        src={f.friend_thumbnail_url}
-                        alt={f.friend_name}
-                        className="w-9 h-9 rounded-full object-cover"
-                        style={{ borderRadius: '34%' }}
-                      />
-                    ) : (
-                      <div
-                        className="w-9 h-9 flex items-center justify-center text-[11px] font-bold text-muted-foreground"
-                        style={{
-                          background: 'var(--hcp-bg-3)',
-                          borderRadius: '34%',
-                        }}
-                      >
-                        {initials(f.friend_name)}
-                      </div>
-                    )}
+                    {(() => {
+                      const src = pickAvatarSrc(f.friend_thumbnail_url, f.friend_profile_photo_url);
+                      return src ? (
+                        <img
+                          src={src}
+                          alt={f.friend_name}
+                          className="w-9 h-9 rounded-full object-cover"
+                          style={{ borderRadius: '34%' }}
+                        />
+                      ) : (
+                        <div
+                          className="w-9 h-9 flex items-center justify-center text-[11px] font-bold text-muted-foreground"
+                          style={{
+                            background: 'var(--hcp-bg-3)',
+                            borderRadius: '34%',
+                          }}
+                        >
+                          {initials(f.friend_name)}
+                        </div>
+                      );
+                    })()}
                     <p className="text-[12px] font-semibold text-foreground truncate">
                       {firstName(f.friend_name)}
                     </p>
