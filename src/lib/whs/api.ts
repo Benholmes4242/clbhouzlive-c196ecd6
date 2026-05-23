@@ -495,6 +495,7 @@ export async function fetchFriendsActivity(
       friend_passport_id: f.friend_passport_id,
       friend_name: f.friend_name,
       friend_thumbnail_url: f.friend_thumbnail_url,
+      friend_profile_photo_url: f.friend_profile_photo_url ?? null,
       friend_user_id: f.friend_user_id,
       friend_connection_id: f.friend_connection_id,
       is_clbhouz_user: !!f.is_clbhouz_user,
