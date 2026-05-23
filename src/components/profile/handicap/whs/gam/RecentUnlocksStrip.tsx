@@ -8,7 +8,7 @@ import { renderBadgeIcon } from './badgeIcons';
 import { RARITY_DARK } from './tokens';
 
 const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
-const RAIL_INSET = 16;
+const RAIL_INSET = 0;
 
 interface RecentUnlocksStripProps {
   userId: string;
