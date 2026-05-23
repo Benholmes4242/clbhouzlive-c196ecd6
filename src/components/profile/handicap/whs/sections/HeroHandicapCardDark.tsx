@@ -209,13 +209,11 @@ const HeroHandicapCardDark: React.FC<Props> = ({ connection }) => {
       style={{
         background: 'var(--hcp-bg-0)',
         borderBottom: '1px solid var(--hcp-line)',
-        padding: '4px 0 22px',
+        padding: '16px 0 22px',
         fontFamily: FONT,
       }}
     >
-      <DarkSectionHeader eyebrow="Index · 90D" right={formatToday()} />
-
-      {/* Ring */}
+      {/* Ring — content stack lives inside */}
       <div
         style={{
           display: 'flex',
@@ -263,7 +261,7 @@ const HeroHandicapCardDark: React.FC<Props> = ({ connection }) => {
             />
           </svg>
 
-          {/* Inner content — just the number; verdict implied by ring colour + change chip below */}
+          {/* Inner content stack: eyebrow → number → date footer */}
           <div
             style={{
               position: 'absolute',
@@ -290,18 +288,44 @@ const HeroHandicapCardDark: React.FC<Props> = ({ connection }) => {
                 Connect WHS to start
               </span>
             ) : (
-              <span
-                style={{
-                  fontSize: 72,
-                  fontWeight: 700,
-                  letterSpacing: '-0.04em',
-                  lineHeight: 1,
-                  color: 'var(--hcp-t-100)',
-                  fontVariantNumeric: 'tabular-nums',
-                }}
-              >
-                {isLoading ? '—' : fmtHcp(handicap)}
-              </span>
+              <>
+                <span
+                  style={{
+                    fontSize: 11,
+                    fontWeight: 800,
+                    letterSpacing: '0.18em',
+                    textTransform: 'uppercase',
+                    color: 'var(--hcp-t-60)',
+                    marginBottom: 8,
+                  }}
+                >
+                  Index · 90D
+                </span>
+                <span
+                  style={{
+                    fontSize: 52,
+                    fontWeight: 800,
+                    letterSpacing: '-0.04em',
+                    lineHeight: 1,
+                    color: 'var(--hcp-t-100)',
+                    fontVariantNumeric: 'tabular-nums',
+                  }}
+                >
+                  {isLoading ? '—' : fmtHcp(handicap)}
+                </span>
+                <span
+                  style={{
+                    fontSize: 10,
+                    fontWeight: 800,
+                    letterSpacing: '0.18em',
+                    textTransform: 'uppercase',
+                    color: 'var(--hcp-t-60)',
+                    marginTop: 10,
+                  }}
+                >
+                  {formatToday()}
+                </span>
+              </>
             )}
           </div>
         </div>
