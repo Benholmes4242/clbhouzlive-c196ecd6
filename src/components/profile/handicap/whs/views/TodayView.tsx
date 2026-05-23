@@ -8,8 +8,6 @@ import NextRoundWatch from '../sections/NextRoundWatch';
 import Pattern14Card from '../sections/Pattern14Card';
 
 import RecentUnlocksStrip from '../gam/RecentUnlocksStrip';
-import LegendStatusCard from '../../gam/legends/LegendStatusCard';
-import { LegendStatusSheetMount } from '../../gam/legends/LegendStatusSheetMount';
 import { LaunchSheetMount } from '../../gam/launch/LaunchSheetMount';
 
 interface Props {
@@ -71,19 +69,12 @@ export const TodayView: React.FC<Props> = ({
       {/* 2. Recent Unlocks */}
       <RecentUnlocksStrip userId={userId} readOnly={readOnly} />
 
-      {/* 3. Legend Status */}
-      <LegendStatusCard
-        userId={userId}
-        readOnly={readOnly}
-        friendName={ownerFirstName ?? undefined}
-      />
-
-      {/* 4. Next Round Watch — owner only */}
+      {/* 3. Next Round Watch — owner only */}
       {!readOnly && (
         <NextRoundWatch connectionId={connectionId} currentHandicap={currentHandicap} />
       )}
 
-      {/* 5. Last Round */}
+      {/* 4. Last Round */}
       <LastRoundCard
         connectionId={connectionId}
         userId={userId}
@@ -91,10 +82,9 @@ export const TodayView: React.FC<Props> = ({
         ownerFirstName={ownerFirstName}
       />
 
-      {/* 6. Last 14 Rounds */}
+      {/* 5. Last 14 Rounds */}
       <Pattern14Card connectionId={connectionId} />
 
-      <LegendStatusSheetMount />
       <LaunchSheetMount userId={userId} />
     </div>
   );
