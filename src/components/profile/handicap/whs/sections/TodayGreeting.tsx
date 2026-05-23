@@ -9,13 +9,13 @@
  */
 import React, { useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { Trophy } from 'lucide-react';
+import { Trophy, ChevronRight } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAllScores } from '@/lib/whs/hooks';
 import { useUserProfile } from '@/hooks/useUserProfile';
 import { useTodayWeather } from '@/lib/whs/useTodayWeather';
 import { openGamAchievements } from '@/components/profile/handicap/whs/gam/events';
-import { useRecentUnlocks } from '@/hooks/gam/useRecentUnlocks';
+import { useUserAchievements } from '@/hooks/gam/useUserAchievements';
 
 const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
 
