@@ -8,7 +8,7 @@ import { renderBadgeIcon } from './badgeIcons';
 import { RARITY_DARK } from './tokens';
 
 const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
-const RAIL_INSET = 20;
+const RAIL_INSET = 16;
 
 interface RecentUnlocksStripProps {
   userId: string;
@@ -418,9 +418,8 @@ const RecentUnlocksStrip: React.FC<RecentUnlocksStripProps> = ({
           <div
             key={`${unlock.kind}-${idx}-${unlock.occurred_at}`}
             style={{
-              flex: '0 0 100%',
-              scrollSnapAlign: 'center',
-              paddingRight: idx === total - 1 ? 0 : 10,
+              flex: '0 0 88%',
+              scrollSnapAlign: 'start',
               boxSizing: 'border-box',
             }}
           >
