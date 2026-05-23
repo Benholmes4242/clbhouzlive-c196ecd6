@@ -72,14 +72,15 @@ const PulseCard: React.FC<{
         flex: '0 0 auto',
         scrollSnapAlign: 'start',
         width: 280,
-        height: 95,
+        height: 88,
         position: 'relative',
         overflow: 'hidden',
         borderRadius: 14,
         border: `1px solid ${tokens.cardBorder}`,
         background: tokens.cardSweep,
         boxShadow: tokens.outerGlow ?? 'none',
-        padding: '10px 14px',
+        padding: '8px 14px',
+
         textAlign: 'left',
         cursor: 'pointer',
         fontFamily: GAM.FONT_GEIST,
@@ -180,28 +181,18 @@ const PulseCard: React.FC<{
             style={{
               fontSize: 11,
               color: 'var(--hcp-t-60)',
-              marginTop: 1,
+              marginTop: 2,
               overflow: 'hidden',
-              textOverflow: 'ellipsis',
-              whiteSpace: 'nowrap',
+              display: '-webkit-box',
+              WebkitLineClamp: 2,
+              WebkitBoxOrient: 'vertical',
+              lineHeight: 1.3,
             }}
           >
             {sub}
           </div>
         </div>
 
-        <div
-          style={{
-            fontSize: 10,
-            fontWeight: 700,
-            letterSpacing: '0.08em',
-            textTransform: 'uppercase',
-            color: tokens.labelFg,
-            flex: '0 0 auto',
-          }}
-        >
-          {cta}
-        </div>
       </div>
     </button>
   );

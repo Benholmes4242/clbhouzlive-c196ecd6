@@ -183,8 +183,11 @@ export function formatLegendGap(category: LegendCategory, gap: number): string {
       return `${n} ${n === 1 ? 'birdie' : 'birdies'}`;
     }
     case 'best_stableford_90d':
-    case 'best_stableford_all_time':
-      return `${Math.round(abs)} pts`;
+    case 'best_stableford_all_time': {
+      const n = Math.round(abs);
+      return `${n} ${n === 1 ? 'pt' : 'pts'}`;
+    }
+
     case 'most_eagles_90d':
     case 'most_eagles_all_time': {
       const n = Math.round(abs);
