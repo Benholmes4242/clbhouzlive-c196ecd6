@@ -182,7 +182,7 @@ const NextRoundWatch: React.FC<Props> = ({ connectionId, currentHandicap }) => {
         {last5Avg != null && (
           <div
             style={{
-              padding: '18px 18px 18px',
+              padding: '10px 18px',
               borderBottom: '1px solid var(--hcp-line-2)',
             }}
           >
@@ -191,7 +191,7 @@ const NextRoundWatch: React.FC<Props> = ({ connectionId, currentHandicap }) => {
                 clipping past the card's section border at extremes (pin = 0% or 100%). */}
             <div style={{ padding: '0 20px' }}>
               {/* TOP BUBBLE ROW — target pointing DOWN */}
-              <div style={{ position: 'relative', height: 26, marginBottom: 6 }}>
+              <div style={{ position: 'relative', height: 22, marginBottom: 3 }}>
                 <div
                   style={{
                     position: 'absolute',
