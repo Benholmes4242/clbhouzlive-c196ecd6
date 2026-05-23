@@ -404,6 +404,21 @@ export async function fetchFriendsActivity(
 
   if (friends.length === 0) return [];
 
+  // Hydrate clbhouz profile_photo_url for friends with a linked user_id.
+  const friendUserIds = friends
+    .map((f) => f.friend_user_id)
+    .filter((id): id is string => !!id);
+  const photoByUserId: Record<string, string | null> = {};
+  if (friendUserIds.length > 0) {
+    const { data: profiles } = await supabase
+      .from('user_profiles' as any)
+      .select('id, profile_photo_url')
+      .in('id', friendUserIds);
+    for (const p of ((profiles as any[]) ?? [])) {
+      photoByUserId[p.id] = p.profile_photo_url ?? null;
+    }
+  }
+
   const friendConnIds = friends
     .map((f) => f.friend_connection_id)
     .filter(Boolean);
