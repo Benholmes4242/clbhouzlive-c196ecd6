@@ -64,6 +64,7 @@ const UnlockHeroCard: React.FC<{
       onMouseLeave={() => setPressed(false)}
       style={{
         position: 'relative',
+        margin: '0 20px',
         borderRadius: 16,
         overflow: 'hidden',
         border: `1px solid ${rarity.cardBorder}`,
