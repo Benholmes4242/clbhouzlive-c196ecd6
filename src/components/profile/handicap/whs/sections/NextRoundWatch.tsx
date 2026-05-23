@@ -284,11 +284,9 @@ const NextRoundWatch: React.FC<Props> = ({ connectionId, currentHandicap }) => {
               />
             </div>
 
-            {/* Scale labels */}
+            {/* Scale label */}
             <div
               style={{
-                display: 'flex',
-                justifyContent: 'space-between',
                 marginTop: 8,
                 fontSize: 10,
                 fontWeight: 700,
@@ -299,7 +297,6 @@ const NextRoundWatch: React.FC<Props> = ({ connectionId, currentHandicap }) => {
               }}
             >
               <span>Scratch · 0</span>
-              <span>Weakest · {oldestDiff.toFixed(1)}</span>
             </div>
           </div>
         )}
