@@ -309,7 +309,7 @@ const LastRoundHeroCard: React.FC<Props> = ({ round, timeAgo, onClick }) => {
             gap: 12,
           }}
         >
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 2 }}>
             <span
               style={{
                 fontSize: 9,
@@ -317,7 +317,6 @@ const LastRoundHeroCard: React.FC<Props> = ({ round, timeAgo, onClick }) => {
                 letterSpacing: '0.12em',
                 textTransform: 'uppercase',
                 color: 'var(--hcp-t-60)',
-                textAlign: 'center',
               }}
             >
               Score Diff
@@ -330,7 +329,6 @@ const LastRoundHeroCard: React.FC<Props> = ({ round, timeAgo, onClick }) => {
                 lineHeight: 1,
                 color: diffColor,
                 fontFeatureSettings: '"tnum" 1',
-                textAlign: 'center',
               }}
             >
               {diffDisplay}
