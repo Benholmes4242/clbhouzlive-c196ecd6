@@ -309,7 +309,7 @@ const LastRoundHeroCard: React.FC<Props> = ({ round, timeAgo, onClick }) => {
             gap: 12,
           }}
         >
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 2 }}>
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: 2 }}>
             <span
               style={{
                 fontSize: 9,
