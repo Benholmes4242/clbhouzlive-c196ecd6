@@ -1,5 +1,6 @@
 import React from 'react';
 import { initials } from '@/lib/whs/utils/initials';
+import { pickAvatarSrc } from '@/lib/whs/utils/avatarSrc';
 import { reformatFriendName } from '@/lib/whs/utils/nameFormat';
 import { fmtHcp } from '@/lib/whs/format';
 import type { FriendLeaderboardEntry, FriendLeaderboardRankDelta } from '@/lib/whs/types';
@@ -198,15 +199,18 @@ export const LeaderboardRow: React.FC<Props> = ({ entry, rank, isStaleRow, onCli
             letterSpacing: '-0.01em',
           }}
         >
-          {entry.friend_thumbnail_url ? (
-            <img
-              src={entry.friend_thumbnail_url}
-              alt=""
-              style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-            />
-          ) : (
-            <span>{initials(entry.friend_name)}</span>
-          )}
+          {(() => {
+            const avatarSrc = pickAvatarSrc(entry.friend_thumbnail_url, entry.friend_profile_photo_url);
+            return avatarSrc ? (
+              <img
+                src={avatarSrc}
+                alt=""
+                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+              />
+            ) : (
+              <span>{initials(entry.friend_name)}</span>
+            );
+          })()}
         </div>
 
         <div style={{ minWidth: 0, flex: 1 }}>

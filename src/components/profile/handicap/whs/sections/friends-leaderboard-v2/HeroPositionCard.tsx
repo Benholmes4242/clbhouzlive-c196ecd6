@@ -1,5 +1,6 @@
 import React from 'react';
 import { firstName, initials } from '@/lib/whs/utils/initials';
+import { pickAvatarSrc } from '@/lib/whs/utils/avatarSrc';
 import { reformatFriendName } from '@/lib/whs/utils/nameFormat';
 import { fmtHcp } from '@/lib/whs/format';
 import { useHandicapPercentile } from '@/lib/whs/usePercentile';
@@ -128,15 +129,18 @@ export const HeroPositionCard: React.FC<Props> = ({
               letterSpacing: '-0.01em',
             }}
           >
-            {selfRow.friend_thumbnail_url ? (
-              <img
-                src={selfRow.friend_thumbnail_url}
-                alt=""
-                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-              />
-            ) : (
-              <span>{initials(selfRow.friend_name)}</span>
-            )}
+            {(() => {
+              const src = pickAvatarSrc(selfRow.friend_thumbnail_url, selfRow.friend_profile_photo_url);
+              return src ? (
+                <img
+                  src={src}
+                  alt=""
+                  style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                />
+              ) : (
+                <span>{initials(selfRow.friend_name)}</span>
+              );
+            })()}
           </div>
         </div>
 
@@ -286,15 +290,18 @@ export const HeroPositionCard: React.FC<Props> = ({
               fontWeight: 800,
             }}
           >
-            {rowAbove.friend_thumbnail_url ? (
-              <img
-                src={rowAbove.friend_thumbnail_url}
-                alt=""
-                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-              />
-            ) : (
-              <span>{initials(rowAbove.friend_name)}</span>
-            )}
+            {(() => {
+              const src = pickAvatarSrc(rowAbove.friend_thumbnail_url, rowAbove.friend_profile_photo_url);
+              return src ? (
+                <img
+                  src={src}
+                  alt=""
+                  style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                />
+              ) : (
+                <span>{initials(rowAbove.friend_name)}</span>
+              );
+            })()}
           </div>
 
           <div style={{ flex: 1, minWidth: 1 }}>
