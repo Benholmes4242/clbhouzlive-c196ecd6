@@ -131,7 +131,7 @@ export const CinemaCardGlass: React.FC<Props> = ({
           alignItems: 'baseline',
         }}
       >
-        <div style={{ textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+        <div style={{ textAlign: 'left' }}>
           <div style={labelStyle}>GROSS</div>
           <div
             style={{ marginTop: 4 }}
@@ -148,7 +148,7 @@ export const CinemaCardGlass: React.FC<Props> = ({
           <div style={labelStyle}>STABLEFORD</div>
           <div style={valueStyle('#FFFFFF')}>{stableford != null ? stableford : EM_DASH}</div>
         </div>
-        <div style={{ textAlign: 'center' }}>
+        <div style={{ textAlign: 'right' }}>
           <div style={labelStyle}>SCORE DIFF</div>
           <div style={valueStyle(differential != null ? AMBER : '#FFFFFF')}>
             {fmtDiff(differential)}
