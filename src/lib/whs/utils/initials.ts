@@ -15,7 +15,15 @@ export function displayName(name: string | null | undefined): string {
   return trimmed;
 }
 
-/** Get up-to-2-letter initials from first name only. */
-export function initials(name: string): string {
-  return firstName(name).slice(0, 2).toUpperCase();
+/** Get initials: first letter of first name + first letter of last name. */
+export function initials(name: string | null | undefined): string {
+  if (!name) return '?';
+  const normalised = displayName(name).trim();
+  if (!normalised) return '?';
+  const parts = normalised.split(/\s+/).filter(Boolean);
+  if (parts.length === 0) return '?';
+  if (parts.length === 1) return parts[0]!.charAt(0).toUpperCase();
+  const first = parts[0]!.charAt(0).toUpperCase();
+  const last = parts[parts.length - 1]!.charAt(0).toUpperCase();
+  return `${first}${last}`;
 }
