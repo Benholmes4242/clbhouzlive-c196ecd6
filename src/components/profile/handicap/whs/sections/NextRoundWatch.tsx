@@ -59,6 +59,9 @@ const NextRoundWatch: React.FC<Props> = ({ connectionId, currentHandicap }) => {
   const pinPct = Math.min(100, Math.max(0, ((last5Avg ?? 0) / barMax) * 100));
   const targetPct = Math.min(100, Math.max(0, (target / barMax) * 100));
 
+  // Clamped position for the floating bubble label so it stays visible at extremes.
+  const bubblePct = Math.min(92, Math.max(8, pinPct));
+
   const verdictColor = isOnPace ? 'var(--hcp-good)' : 'var(--hcp-amber)';
   const sweep = isOnPace
     ? 'linear-gradient(135deg, color-mix(in srgb, var(--hcp-good) 10%, transparent) 0%, transparent 60%)'
