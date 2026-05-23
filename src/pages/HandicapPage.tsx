@@ -224,7 +224,7 @@ const HandicapPageHeader: React.FC<HeaderProps> = ({
             display: 'flex',
             justifyContent: 'flex-start',
             gap: 8,
-            padding: '8px 16px',
+            padding: '8px 16px 0',
             overflowX: 'auto',
             scrollbarWidth: 'none',
             msOverflowStyle: 'none',
