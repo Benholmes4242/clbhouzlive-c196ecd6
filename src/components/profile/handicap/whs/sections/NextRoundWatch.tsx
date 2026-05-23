@@ -58,8 +58,7 @@ const NextRoundWatch: React.FC<Props> = ({ connectionId, currentHandicap }) => {
 
   const pinPct = Math.min(100, Math.max(0, ((last5Avg ?? 0) / barMax) * 100));
   const targetPct = Math.min(100, Math.max(0, (target / barMax) * 100));
-  // Clamp bottom bubble centre so it never hits the card's right/left edge.
-  const bottomBubblePct = Math.min(95, Math.max(5, pinPct));
+
 
 
   const verdictColor = isOnPace ? 'var(--hcp-good)' : 'var(--hcp-amber)';
@@ -187,153 +186,158 @@ const NextRoundWatch: React.FC<Props> = ({ connectionId, currentHandicap }) => {
               borderBottom: '1px solid var(--hcp-line-2)',
             }}
           >
-            {/* TOP BUBBLE ROW — target pointing DOWN */}
-            <div style={{ position: 'relative', height: 26, marginBottom: 6 }}>
-              <div
-                style={{
-                  position: 'absolute',
-                  left: `${targetPct}%`,
-                  top: '50%',
-                  transform: 'translate(-50%, -50%)',
-                  pointerEvents: 'none',
-                }}
-              >
-                <span
+            {/* Inset wrapper so the bar sits 20px inside the band's left/right edges.
+                This gives the floating bubbles room to centre on their data points without
+                clipping past the card's section border at extremes (pin = 0% or 100%). */}
+            <div style={{ padding: '0 20px' }}>
+              {/* TOP BUBBLE ROW — target pointing DOWN */}
+              <div style={{ position: 'relative', height: 26, marginBottom: 6 }}>
+                <div
                   style={{
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    padding: '2px 8px',
-                    borderRadius: 6,
-                    background: 'rgba(34,197,94,0.14)',
-                    border: '1px solid rgba(34,197,94,0.30)',
-                    fontSize: 12,
-                    fontWeight: 800,
-                    color: 'var(--hcp-good)',
-                    fontVariantNumeric: 'tabular-nums',
-                    lineHeight: 1.2,
-                    position: 'relative',
+                    position: 'absolute',
+                    left: `${targetPct}%`,
+                    top: '50%',
+                    transform: 'translate(-50%, -50%)',
+                    pointerEvents: 'none',
                   }}
                 >
-                  {target.toFixed(1)}
                   <span
-                    aria-hidden
                     style={{
-                      position: 'absolute',
-                      left: '50%',
-                      bottom: -6,
-                      transform: 'translateX(-50%)',
-                      width: 0,
-                      height: 0,
-                      borderLeft: '4px solid transparent',
-                      borderRight: '4px solid transparent',
-                      borderTop: '6px solid rgba(34,197,94,0.30)',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      padding: '2px 8px',
+                      borderRadius: 6,
+                      background: 'rgba(34,197,94,0.14)',
+                      border: '1px solid rgba(34,197,94,0.30)',
+                      fontSize: 12,
+                      fontWeight: 800,
+                      color: 'var(--hcp-good)',
+                      fontVariantNumeric: 'tabular-nums',
+                      lineHeight: 1.2,
+                      position: 'relative',
                     }}
-                  />
-                </span>
+                  >
+                    {target.toFixed(1)}
+                    <span
+                      aria-hidden
+                      style={{
+                        position: 'absolute',
+                        left: '50%',
+                        bottom: -6,
+                        transform: 'translateX(-50%)',
+                        width: 0,
+                        height: 0,
+                        borderLeft: '4px solid transparent',
+                        borderRight: '4px solid transparent',
+                        borderTop: '6px solid rgba(34,197,94,0.30)',
+                      }}
+                    />
+                  </span>
+                </div>
               </div>
-            </div>
 
-            {/* Bar */}
-            <div
-              style={{
-                position: 'relative',
-                height: 6,
-                background: 'var(--hcp-bg-3)',
-                borderRadius: 999,
-              }}
-            >
+              {/* Bar */}
               <div
-                aria-hidden
                 style={{
-                  position: 'absolute',
-                  top: 0,
-                  bottom: 0,
-                  left: 0,
-                  width: `${targetPct}%`,
-                  background: 'var(--hcp-good)',
-                  opacity: 0.5,
+                  position: 'relative',
+                  height: 6,
+                  background: 'var(--hcp-bg-3)',
                   borderRadius: 999,
                 }}
-              />
-              {/* Target CIRCLE */}
-              <span
-                aria-hidden
-                style={{
-                  position: 'absolute',
-                  top: '50%',
-                  left: `${targetPct}%`,
-                  width: 12,
-                  height: 12,
-                  borderRadius: '50%',
-                  background: 'var(--hcp-good)',
-                  border: '2px solid var(--hcp-bg-1)',
-                  boxShadow: '0 0 0 1px var(--hcp-good)',
-                  transform: 'translate(-50%, -50%)',
-                  zIndex: 2,
-                }}
-              />
-              {/* Last-5 pin */}
-              <span
-                aria-hidden
-                style={{
-                  position: 'absolute',
-                  top: '50%',
-                  left: `${pinPct}%`,
-                  width: 12,
-                  height: 12,
-                  borderRadius: '50%',
-                  background: verdictColor,
-                  border: '2px solid var(--hcp-bg-1)',
-                  boxShadow: `0 0 0 1px ${verdictColor}`,
-                  transform: 'translate(-50%, -50%)',
-                  zIndex: 3,
-                }}
-              />
-            </div>
-
-            {/* BOTTOM BUBBLE ROW — last5Avg pointing UP */}
-            <div style={{ position: 'relative', height: 26, marginTop: 6 }}>
-              <div
-                style={{
-                  position: 'absolute',
-                  left: `${bottomBubblePct}%`,
-                  top: '50%',
-                  transform: 'translate(-50%, -50%)',
-                  pointerEvents: 'none',
-                }}
               >
-                <span
+                <div
+                  aria-hidden
                   style={{
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    padding: '2px 8px',
-                    borderRadius: 6,
-                    background: isOnPace ? 'rgba(34,197,94,0.14)' : 'rgba(247,147,30,0.14)',
-                    border: `1px solid ${isOnPace ? 'rgba(34,197,94,0.30)' : 'rgba(247,147,30,0.30)'}`,
-                    fontSize: 12,
-                    fontWeight: 800,
-                    color: verdictColor,
-                    fontVariantNumeric: 'tabular-nums',
-                    lineHeight: 1.2,
-                    position: 'relative',
+                    position: 'absolute',
+                    top: 0,
+                    bottom: 0,
+                    left: 0,
+                    width: `${targetPct}%`,
+                    background: 'var(--hcp-good)',
+                    opacity: 0.5,
+                    borderRadius: 999,
+                  }}
+                />
+                {/* Target CIRCLE */}
+                <span
+                  aria-hidden
+                  style={{
+                    position: 'absolute',
+                    top: '50%',
+                    left: `${targetPct}%`,
+                    width: 12,
+                    height: 12,
+                    borderRadius: '50%',
+                    background: 'var(--hcp-good)',
+                    border: '2px solid var(--hcp-bg-1)',
+                    boxShadow: '0 0 0 1px var(--hcp-good)',
+                    transform: 'translate(-50%, -50%)',
+                    zIndex: 2,
+                  }}
+                />
+                {/* Last-5 pin */}
+                <span
+                  aria-hidden
+                  style={{
+                    position: 'absolute',
+                    top: '50%',
+                    left: `${pinPct}%`,
+                    width: 12,
+                    height: 12,
+                    borderRadius: '50%',
+                    background: verdictColor,
+                    border: '2px solid var(--hcp-bg-1)',
+                    boxShadow: `0 0 0 1px ${verdictColor}`,
+                    transform: 'translate(-50%, -50%)',
+                    zIndex: 3,
+                  }}
+                />
+              </div>
+
+              {/* BOTTOM BUBBLE ROW — last5Avg pointing UP */}
+              <div style={{ position: 'relative', height: 26, marginTop: 6 }}>
+                <div
+                  style={{
+                    position: 'absolute',
+                    left: `${pinPct}%`,
+                    top: '50%',
+                    transform: 'translate(-50%, -50%)',
+                    pointerEvents: 'none',
                   }}
                 >
-                  {last5Avg.toFixed(1)}
                   <span
-                    aria-hidden
                     style={{
-                      position: 'absolute',
-                      left: '50%',
-                      top: -6,
-                      transform: 'translateX(-50%)',
-                      width: 0,
-                      height: 0,
-                      borderLeft: '4px solid transparent',
-                      borderRight: '4px solid transparent',
-                      borderBottom: `6px solid ${isOnPace ? 'rgba(34,197,94,0.30)' : 'rgba(247,147,30,0.30)'}`,
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      padding: '2px 8px',
+                      borderRadius: 6,
+                      background: isOnPace ? 'rgba(34,197,94,0.14)' : 'rgba(247,147,30,0.14)',
+                      border: `1px solid ${isOnPace ? 'rgba(34,197,94,0.30)' : 'rgba(247,147,30,0.30)'}`,
+                      fontSize: 12,
+                      fontWeight: 800,
+                      color: verdictColor,
+                      fontVariantNumeric: 'tabular-nums',
+                      lineHeight: 1.2,
+                      position: 'relative',
                     }}
-                  />
-                </span>
+                  >
+                    {last5Avg.toFixed(1)}
+                    <span
+                      aria-hidden
+                      style={{
+                        position: 'absolute',
+                        left: '50%',
+                        top: -6,
+                        transform: 'translateX(-50%)',
+                        width: 0,
+                        height: 0,
+                        borderLeft: '4px solid transparent',
+                        borderRight: '4px solid transparent',
+                        borderBottom: `6px solid ${isOnPace ? 'rgba(34,197,94,0.30)' : 'rgba(247,147,30,0.30)'}`,
+                      }}
+                    />
+                  </span>
+                </div>
               </div>
             </div>
           </div>
