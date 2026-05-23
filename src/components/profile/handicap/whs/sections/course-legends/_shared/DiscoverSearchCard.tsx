@@ -10,7 +10,7 @@ interface Props {
 }
 
 export const DiscoverSearchCard: React.FC<Props> = ({ value, onChange }) => (
-  <div style={{ padding: '4px 16px', marginTop: 32 }}>
+  <div style={{ padding: '4px 16px', marginTop: 28 }}>
     <div
       style={{
         position: 'relative',
