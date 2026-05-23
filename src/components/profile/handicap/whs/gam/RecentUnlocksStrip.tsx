@@ -69,7 +69,7 @@ const UnlockHeroCard: React.FC<{
         border: `1px solid ${rarity.cardBorder}`,
         background: rarity.cardSweep,
         boxShadow: composedShadow,
-        minHeight: 192,
+        minHeight: 230,
         padding: '18px 18px 16px',
         cursor: 'pointer',
         transform: pressed ? 'scale(0.98)' : 'scale(1)',
