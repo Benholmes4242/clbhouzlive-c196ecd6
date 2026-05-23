@@ -83,7 +83,7 @@ const SectionHero: React.FC<{
 }> = ({ titleCount, window, setWindow }) => (
   <div
     style={{
-      margin: '0 16px 16px',
+      margin: '0 16px 20px',
       padding: 14,
       borderRadius: 14,
       background: `linear-gradient(135deg, ${GOLD_TINT} 0%, var(--hcp-bg-1) 70%)`,
