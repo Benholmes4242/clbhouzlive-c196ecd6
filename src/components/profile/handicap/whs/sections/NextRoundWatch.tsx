@@ -186,10 +186,10 @@ const NextRoundWatch: React.FC<Props> = ({ connectionId, currentHandicap }) => {
               borderBottom: '1px solid var(--hcp-line-2)',
             }}
           >
-            {/* Inset wrapper so the bar sits 10% inside the band's left/right edges.
+            {/* Inset wrapper so the bar sits 30% inside the band's left/right edges.
                 This gives the floating bubbles room to centre on their data points without
                 clipping past the card's section border at extremes (pin = 0% or 100%). */}
-            <div style={{ padding: '0 10%' }}>
+            <div style={{ padding: '0 30%' }}>
               {/* TOP BUBBLE ROW — target pointing DOWN */}
               <div style={{ position: 'relative', height: 26, marginBottom: 6 }}>
                 <div
