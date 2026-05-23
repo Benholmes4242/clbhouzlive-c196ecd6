@@ -952,6 +952,7 @@ export async function fetchFriendLeaderboard(
     friend_row_id: row.friend_row_id ?? null,
     friend_name: row.friend_name ?? 'Unknown',
     friend_thumbnail_url: row.friend_thumbnail_url ?? null,
+    friend_profile_photo_url: row.friend_profile_photo_url ?? null,
     friend_handicap_index: row.friend_handicap_index != null ? Number(row.friend_handicap_index) : null,
     friend_home_club: row.friend_home_club ?? null,
     last_round_played_at: row.last_round_played_at ?? null,
