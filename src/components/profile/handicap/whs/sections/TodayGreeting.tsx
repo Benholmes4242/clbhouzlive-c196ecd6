@@ -175,76 +175,17 @@ const TodayGreeting: React.FC<Props> = ({ connectionId, userId }) => {
     >
       <div
         style={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          gap: 12,
+          fontSize: 22,
+          fontWeight: 800,
+          letterSpacing: '-0.01em',
+          lineHeight: 1.15,
+          color: 'var(--hcp-t-100)',
         }}
       >
-        <div
-          style={{
-            fontSize: 22,
-            fontWeight: 800,
-            letterSpacing: '-0.01em',
-            lineHeight: 1.15,
-            color: 'var(--hcp-t-100)',
-          }}
-        >
-          {tod}
-          {firstName ? <>, <span>{firstName}</span></> : null}
-        </div>
-        <button
-          type="button"
-          onClick={() => openGamAchievements()}
-          aria-label={
-            recentUnlockCount > 0
-              ? `Open trophies — ${recentUnlockCount} new ${recentUnlockCount === 1 ? 'unlock' : 'unlocks'} this week`
-              : 'Open trophies'
-          }
-          style={{
-            position: 'relative',
-            flexShrink: 0,
-            width: 40,
-            height: 40,
-            display: 'inline-flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            borderRadius: 12,
-            background: 'var(--hcp-bg-1)',
-            border: '1px solid var(--hcp-line-2)',
-            color: '#F7931E',
-            cursor: 'pointer',
-            padding: 0,
-          }}
-        >
-          <Trophy size={18} strokeWidth={2} />
-          {recentUnlockCount > 0 && (
-            <span
-              aria-hidden="true"
-              style={{
-                position: 'absolute',
-                top: -4,
-                right: -4,
-                minWidth: 18,
-                height: 18,
-                padding: '0 5px',
-                borderRadius: 9,
-                background: '#F7931E',
-                color: '#0A0E14',
-                fontFamily: FONT,
-                fontSize: 10,
-                fontWeight: 800,
-                lineHeight: '18px',
-                textAlign: 'center',
-                boxShadow: '0 0 0 2px var(--hcp-bg-0)',
-                fontVariantNumeric: 'tabular-nums',
-              }}
-            >
-              {recentUnlockCount > 9 ? '9+' : recentUnlockCount}
-            </span>
-          )}
-        </button>
+        {tod}
+        {firstName ? <>, <span>{firstName}</span></> : null}
       </div>
+
 
       {showMeta && homeCourseName && (
         <div
