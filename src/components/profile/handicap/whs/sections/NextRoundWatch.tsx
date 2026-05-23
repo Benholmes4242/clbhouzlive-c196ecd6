@@ -295,7 +295,7 @@ const NextRoundWatch: React.FC<Props> = ({ connectionId, currentHandicap }) => {
               </div>
 
               {/* BOTTOM BUBBLE ROW — last5Avg pointing UP */}
-              <div style={{ position: 'relative', height: 26, marginTop: 6 }}>
+              <div style={{ position: 'relative', height: 22, marginTop: 3 }}>
                 <div
                   style={{
                     position: 'absolute',
