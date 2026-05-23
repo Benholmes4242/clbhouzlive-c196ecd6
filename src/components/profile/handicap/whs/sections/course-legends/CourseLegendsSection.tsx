@@ -274,7 +274,7 @@ export const CourseLegendsSection: React.FC<Props> = ({
           />
         </>
       )}
-    </div>
+    </section>
   );
 };
 
