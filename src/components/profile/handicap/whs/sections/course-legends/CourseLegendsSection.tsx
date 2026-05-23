@@ -12,6 +12,7 @@ import { useUserLegendTitleCount } from '@/hooks/gam/useUserLegendTitleCount';
 import type { LegendCategory, LegendWindow } from '@/lib/gam/types';
 import { legendCategoryWindow } from '@/lib/gam/visuals';
 import CourseSearch from './_shared/CourseSearch';
+import DiscoverSearchCard from './_shared/DiscoverSearchCard';
 import HomeClubSubsection from './subsections/HomeClubSubsection';
 import YourCoursesSubsection from './subsections/YourCoursesSubsection';
 import DiscoverSubsection from './subsections/DiscoverSubsection';
@@ -249,14 +250,8 @@ export const CourseLegendsSection: React.FC<Props> = ({
             friendName={friendName}
           />
 
-          {/* Search bar repositioned: between HOME CLUB and YOUR COURSES */}
-          <div style={{ margin: '4px 0 6px' }}>
-            <CourseSearch
-              value={query}
-              onChange={setQuery}
-              helper="Find a course — see the legends"
-            />
-          </div>
+          {/* Discover Prompt Card — engagement-driving search invitation */}
+          <DiscoverSearchCard value={query} onChange={setQuery} />
 
           <YourCoursesSubsection
             courses={playedFiltered}
