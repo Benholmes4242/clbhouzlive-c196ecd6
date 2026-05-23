@@ -58,6 +58,8 @@ const NextRoundWatch: React.FC<Props> = ({ connectionId, currentHandicap }) => {
 
   const pinPct = Math.min(100, Math.max(0, ((last5Avg ?? 0) / barMax) * 100));
   const targetPct = Math.min(100, Math.max(0, (target / barMax) * 100));
+  // Clamp bottom bubble centre so it never hits the card's right/left edge.
+  const bottomBubblePct = Math.min(95, Math.max(5, pinPct));
 
 
   const verdictColor = isOnPace ? 'var(--hcp-good)' : 'var(--hcp-amber)';
@@ -186,7 +188,7 @@ const NextRoundWatch: React.FC<Props> = ({ connectionId, currentHandicap }) => {
             }}
           >
             {/* TOP BUBBLE ROW — target pointing DOWN */}
-            <div style={{ position: 'relative', height: 26, marginBottom: 8 }}>
+            <div style={{ position: 'relative', height: 26, marginBottom: 6 }}>
               <div
                 style={{
                   position: 'absolute',
@@ -218,13 +220,13 @@ const NextRoundWatch: React.FC<Props> = ({ connectionId, currentHandicap }) => {
                     style={{
                       position: 'absolute',
                       left: '50%',
-                      bottom: -5,
+                      bottom: -6,
                       transform: 'translateX(-50%)',
                       width: 0,
                       height: 0,
                       borderLeft: '4px solid transparent',
                       borderRight: '4px solid transparent',
-                      borderTop: '5px solid rgba(34,197,94,0.30)',
+                      borderTop: '6px solid rgba(34,197,94,0.30)',
                     }}
                   />
                 </span>
@@ -294,7 +296,7 @@ const NextRoundWatch: React.FC<Props> = ({ connectionId, currentHandicap }) => {
               <div
                 style={{
                   position: 'absolute',
-                  left: `${pinPct}%`,
+                  left: `${bottomBubblePct}%`,
                   top: '50%',
                   transform: 'translate(-50%, -50%)',
                   pointerEvents: 'none',
@@ -322,13 +324,13 @@ const NextRoundWatch: React.FC<Props> = ({ connectionId, currentHandicap }) => {
                     style={{
                       position: 'absolute',
                       left: '50%',
-                      top: -5,
+                      top: -6,
                       transform: 'translateX(-50%)',
                       width: 0,
                       height: 0,
                       borderLeft: '4px solid transparent',
                       borderRight: '4px solid transparent',
-                      borderBottom: `5px solid ${isOnPace ? 'rgba(34,197,94,0.30)' : 'rgba(247,147,30,0.30)'}`,
+                      borderBottom: `6px solid ${isOnPace ? 'rgba(34,197,94,0.30)' : 'rgba(247,147,30,0.30)'}`,
                     }}
                   />
                 </span>
