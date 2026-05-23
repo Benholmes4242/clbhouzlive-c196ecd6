@@ -9,13 +9,13 @@
  */
 import React, { useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { Trophy } from 'lucide-react';
+import { Trophy, ChevronRight } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAllScores } from '@/lib/whs/hooks';
 import { useUserProfile } from '@/hooks/useUserProfile';
 import { useTodayWeather } from '@/lib/whs/useTodayWeather';
 import { openGamAchievements } from '@/components/profile/handicap/whs/gam/events';
-import { useRecentUnlocks } from '@/hooks/gam/useRecentUnlocks';
+import { useUserAchievements } from '@/hooks/gam/useUserAchievements';
 
 const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
 
@@ -146,13 +146,22 @@ const TodayGreeting: React.FC<Props> = ({ connectionId, userId }) => {
 
   const { data: weather } = useTodayWeather(coords?.lat ?? null, coords?.lng ?? null);
 
-  const { data: recentUnlocks } = useRecentUnlocks(userId);
+  const { data: achievements } = useUserAchievements(userId);
 
-  const recentUnlockCount = React.useMemo(() => {
-    if (!recentUnlocks || recentUnlocks.length === 0) return 0;
+  const { weeklyCount, lifetimeCount } = React.useMemo(() => {
+    if (!achievements) return { weeklyCount: 0, lifetimeCount: 0 };
     const cutoff = Date.now() - 7 * 24 * 60 * 60 * 1000;
-    return recentUnlocks.filter((u) => new Date(u.occurred_at).getTime() > cutoff).length;
-  }, [recentUnlocks]);
+    let weekly = 0;
+    let lifetime = 0;
+    for (const b of achievements) {
+      if (!b.is_earned) continue;
+      lifetime++;
+      if (b.earned_at && new Date(b.earned_at).getTime() > cutoff) {
+        weekly++;
+      }
+    }
+    return { weeklyCount: weekly, lifetimeCount: lifetime };
+  }, [achievements]);
 
   const showMeta = !!homeCourseName;
 
@@ -166,76 +175,17 @@ const TodayGreeting: React.FC<Props> = ({ connectionId, userId }) => {
     >
       <div
         style={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          gap: 12,
+          fontSize: 22,
+          fontWeight: 800,
+          letterSpacing: '-0.01em',
+          lineHeight: 1.15,
+          color: 'var(--hcp-t-100)',
         }}
       >
-        <div
-          style={{
-            fontSize: 22,
-            fontWeight: 800,
-            letterSpacing: '-0.01em',
-            lineHeight: 1.15,
-            color: 'var(--hcp-t-100)',
-          }}
-        >
-          {tod}
-          {firstName ? <>, <span>{firstName}</span></> : null}
-        </div>
-        <button
-          type="button"
-          onClick={() => openGamAchievements()}
-          aria-label={
-            recentUnlockCount > 0
-              ? `Open trophies — ${recentUnlockCount} new ${recentUnlockCount === 1 ? 'unlock' : 'unlocks'} this week`
-              : 'Open trophies'
-          }
-          style={{
-            position: 'relative',
-            flexShrink: 0,
-            width: 40,
-            height: 40,
-            display: 'inline-flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            borderRadius: 12,
-            background: 'var(--hcp-bg-1)',
-            border: '1px solid var(--hcp-line-2)',
-            color: '#F7931E',
-            cursor: 'pointer',
-            padding: 0,
-          }}
-        >
-          <Trophy size={18} strokeWidth={2} />
-          {recentUnlockCount > 0 && (
-            <span
-              aria-hidden="true"
-              style={{
-                position: 'absolute',
-                top: -4,
-                right: -4,
-                minWidth: 18,
-                height: 18,
-                padding: '0 5px',
-                borderRadius: 9,
-                background: '#F7931E',
-                color: '#0A0E14',
-                fontFamily: FONT,
-                fontSize: 10,
-                fontWeight: 800,
-                lineHeight: '18px',
-                textAlign: 'center',
-                boxShadow: '0 0 0 2px var(--hcp-bg-0)',
-                fontVariantNumeric: 'tabular-nums',
-              }}
-            >
-              {recentUnlockCount > 9 ? '9+' : recentUnlockCount}
-            </span>
-          )}
-        </button>
+        {tod}
+        {firstName ? <>, <span>{firstName}</span></> : null}
       </div>
+
 
       {showMeta && homeCourseName && (
         <div
@@ -298,6 +248,119 @@ const TodayGreeting: React.FC<Props> = ({ connectionId, userId }) => {
             </>
           )}
         </div>
+      )}
+
+      {lifetimeCount > 0 && (
+        <button
+          type="button"
+          onClick={() => openGamAchievements()}
+          aria-label={
+            weeklyCount > 0
+              ? `Open trophies — ${weeklyCount} new ${weeklyCount === 1 ? 'unlock' : 'unlocks'} this week`
+              : `Open trophies — ${lifetimeCount} earned`
+          }
+          style={{
+            marginTop: 14,
+            padding: '12px 14px',
+            borderRadius: 12,
+            display: 'flex',
+            alignItems: 'center',
+            gap: 12,
+            cursor: 'pointer',
+            width: '100%',
+            fontFamily: FONT,
+            textAlign: 'left',
+            background:
+              weeklyCount > 0
+                ? 'linear-gradient(135deg, rgba(247,147,30,0.12) 0%, rgba(251,188,46,0.05) 100%)'
+                : 'linear-gradient(135deg, rgba(247,147,30,0.06) 0%, rgba(251,188,46,0.02) 100%)',
+            border:
+              weeklyCount > 0
+                ? '1px solid rgba(247,147,30,0.30)'
+                : '1px solid rgba(247,147,30,0.20)',
+          }}
+        >
+          <div
+            style={{
+              width: 44,
+              height: 44,
+              borderRadius: 11,
+              background:
+                weeklyCount > 0 ? 'rgba(247,147,30,0.18)' : 'rgba(247,147,30,0.12)',
+              border:
+                weeklyCount > 0
+                  ? '1px solid rgba(247,147,30,0.40)'
+                  : '1px solid rgba(247,147,30,0.28)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              flexShrink: 0,
+              color: '#FBBC2E',
+            }}
+          >
+            <Trophy size={22} strokeWidth={2} />
+          </div>
+
+          <div style={{ flex: 1, minWidth: 0 }}>
+            {weeklyCount > 0 ? (
+              <>
+                <div
+                  style={{
+                    fontSize: 13,
+                    fontWeight: 700,
+                    color: '#FBBC2E',
+                    letterSpacing: '-0.01em',
+                    lineHeight: 1.2,
+                  }}
+                >
+                  {weeklyCount} new {weeklyCount === 1 ? 'trophy' : 'trophies'} this week
+                </div>
+                <div
+                  style={{
+                    fontSize: 11.5,
+                    color: 'var(--hcp-t-100)',
+                    marginTop: 2,
+                  }}
+                >
+                  Tap to see what you unlocked
+                </div>
+              </>
+            ) : (
+              <>
+                <div
+                  style={{
+                    fontSize: 13,
+                    fontWeight: 700,
+                    color: 'var(--hcp-t-100)',
+                    letterSpacing: '-0.01em',
+                    lineHeight: 1.2,
+                  }}
+                >
+                  <span style={{ color: '#FBBC2E', fontVariantNumeric: 'tabular-nums' }}>
+                    {lifetimeCount}
+                  </span>{' '}
+                  {lifetimeCount === 1 ? 'trophy' : 'trophies'} in your case
+                </div>
+                <div
+                  style={{
+                    fontSize: 11.5,
+                    color: 'var(--hcp-t-60)',
+                    marginTop: 2,
+                  }}
+                >
+                  See them all
+                </div>
+              </>
+            )}
+          </div>
+
+          <ChevronRight
+            size={16}
+            strokeWidth={2.4}
+            color={weeklyCount > 0 ? '#FBBC2E' : 'rgba(251,188,46,0.6)'}
+            style={{ flexShrink: 0 }}
+          />
+        </button>
       )}
     </div>
   );
