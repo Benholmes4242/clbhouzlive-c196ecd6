@@ -54,6 +54,7 @@ const toSheetActivity = (friend: FriendYesterday): WhsFriendActivityWithImage =>
   friend_passport_id: friend.friend_passport_id ?? 0,
   friend_name: friend.name,
   friend_thumbnail_url: friend.thumbnail_url,
+  friend_profile_photo_url: null,
   friend_user_id: friend.user_id,
   friend_connection_id: friend.friend_connection_id,
   is_clbhouz_user: friend.is_clbhouz_user,

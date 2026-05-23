@@ -1,11 +1,10 @@
 import React from 'react';
 import type { LeaderboardWeeklyBanner, FriendLeaderboardEntry } from '@/lib/whs/types';
-import { firstName } from '@/lib/whs/utils/initials';
 
 interface Props {
   banner: LeaderboardWeeklyBanner | null;
-  /** Used to resolve friend_row_id → friend_name for the banner copy. */
-  friends: FriendLeaderboardEntry[];
+  /** Retained for parent compatibility; no longer used (RPC delivers complete copy). */
+  friends?: FriendLeaderboardEntry[];
 }
 
 const T = {
@@ -20,19 +19,10 @@ const T = {
 };
 
 
-export const WeeklyBanner: React.FC<Props> = ({ banner, friends }) => {
+export const WeeklyBanner: React.FC<Props> = ({ banner }) => {
   if (!banner) return null;
 
-  let copy: string;
-  if (banner.banner_type === 'activity') {
-    copy = banner.metric_label;
-  } else {
-    const friend = banner.friend_row_id
-      ? friends.find((f) => f.friend_row_id === banner.friend_row_id)
-      : null;
-    const name = friend ? firstName(friend.friend_name) : 'A friend';
-    copy = `${name} ${banner.metric_label}`;
-  }
+  const copy = banner.metric_label;
 
   return (
     <div style={{ padding: '8px 16px' }}>

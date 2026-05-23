@@ -404,6 +404,21 @@ export async function fetchFriendsActivity(
 
   if (friends.length === 0) return [];
 
+  // Hydrate clbhouz profile_photo_url for friends with a linked user_id.
+  const friendUserIds = friends
+    .map((f) => f.friend_user_id)
+    .filter((id): id is string => !!id);
+  const photoByUserId: Record<string, string | null> = {};
+  if (friendUserIds.length > 0) {
+    const { data: profiles } = await supabase
+      .from('user_profiles' as any)
+      .select('id, profile_photo_url')
+      .in('id', friendUserIds);
+    for (const p of ((profiles as any[]) ?? [])) {
+      photoByUserId[p.id] = p.profile_photo_url ?? null;
+    }
+  }
+
   const friendConnIds = friends
     .map((f) => f.friend_connection_id)
     .filter(Boolean);
@@ -495,6 +510,7 @@ export async function fetchFriendsActivity(
       friend_passport_id: f.friend_passport_id,
       friend_name: f.friend_name,
       friend_thumbnail_url: f.friend_thumbnail_url,
+      friend_profile_photo_url: f.friend_user_id ? photoByUserId[f.friend_user_id] ?? null : null,
       friend_user_id: f.friend_user_id,
       friend_connection_id: f.friend_connection_id,
       is_clbhouz_user: !!f.is_clbhouz_user,
@@ -952,6 +968,7 @@ export async function fetchFriendLeaderboard(
     friend_row_id: row.friend_row_id ?? null,
     friend_name: row.friend_name ?? 'Unknown',
     friend_thumbnail_url: row.friend_thumbnail_url ?? null,
+    friend_profile_photo_url: row.friend_profile_photo_url ?? null,
     friend_handicap_index: row.friend_handicap_index != null ? Number(row.friend_handicap_index) : null,
     friend_home_club: row.friend_home_club ?? null,
     last_round_played_at: row.last_round_played_at ?? null,

@@ -244,6 +244,8 @@ export interface WhsFriendActivityWithImage {
   friend_passport_id: number;
   friend_name: string;
   friend_thumbnail_url: string | null;
+  /** Clbhouz profile photo (NULL for non-clbhouz friends). Fallback after WHS thumb. */
+  friend_profile_photo_url: string | null;
   friend_user_id: string | null;
   friend_connection_id: string | null;
   is_clbhouz_user: boolean;
@@ -441,6 +443,8 @@ export interface FriendLeaderboardEntry {
   friend_row_id: string | null;
   friend_name: string;
   friend_thumbnail_url: string | null;
+  /** Clbhouz profile photo (NULL for non-clbhouz friends). Fallback after WHS thumb. */
+  friend_profile_photo_url: string | null;
   /** Now nullable — friends without a posted handicap get NULL. */
   friend_handicap_index: number | null;
   /** England Golf home club name. NULL for self row. */
