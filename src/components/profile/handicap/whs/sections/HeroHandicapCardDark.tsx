@@ -73,6 +73,38 @@ const HeroHandicapCardDark: React.FC<Props> = ({ connection }) => {
     return latest - oldest;
   }, [history90]);
 
+  // Starting handicap (90d ago) — used to lock the tier.
+  const startingHcp = useMemo<number | null>(() => {
+    if (!history90 || history90.length < 2) return null;
+    return history90[0].handicap_index;
+  }, [history90]);
+
+  type Tier = 'div0' | 'div1' | 'div2' | 'div3';
+
+  const TIER_TARGET: Record<Tier, number> = {
+    div0: 0.5,
+    div1: 1.0,
+    div2: 2.0,
+    div3: 3.0,
+  };
+
+  const TIER_LABEL: Record<Tier, string> = {
+    div0: 'DIV 0',
+    div1: 'DIV 1',
+    div2: 'DIV 2',
+    div3: 'DIV 3',
+  };
+
+  // Tier locked from starting handicap if available, otherwise current.
+  const tier = useMemo<Tier | null>(() => {
+    const baseHcp = startingHcp ?? handicap;
+    if (baseHcp == null) return null;
+    if (baseHcp < 0) return 'div0';
+    if (baseHcp <= 10) return 'div1';
+    if (baseHcp <= 20) return 'div2';
+    return 'div3';
+  }, [startingHcp, handicap]);
+
   // Verdict drives ring colour + pill + tag word.
   const verdict: Verdict = useMemo(() => {
     if (delta90 == null) return 'neutral';
@@ -89,13 +121,14 @@ const HeroHandicapCardDark: React.FC<Props> = ({ connection }) => {
     return () => clearTimeout(t);
   }, [handicap]);
 
+  // Ring fill = improvement over 90d vs tier-specific target (0-1 clamped).
   const fillFraction = useMemo(() => {
-    const h = animatedHcp ?? null;
-    if (h == null) return 0;
-    // 0 (scratch) → 100% filled; 36 → 0% filled.
-    // Plus handicaps clamp to 100%.
-    return 1 - Math.min(Math.max(h, 0) / 36, 1);
-  }, [animatedHcp]);
+    if (delta90 == null || tier == null) return 0;
+    const improvement = -delta90; // delta is negative when improving
+    if (improvement <= 0) return 0;
+    return Math.min(improvement / TIER_TARGET[tier], 1);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [delta90, tier]);
 
   const dashOffset = CIRCUMFERENCE * (1 - fillFraction);
 
