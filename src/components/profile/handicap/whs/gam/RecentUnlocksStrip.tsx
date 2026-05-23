@@ -171,7 +171,7 @@ const UnlockHeroCard: React.FC<{
             flexShrink: 0,
           }}
         >
-          {renderBadgeIcon(unlock.icon, 30, 'var(--hcp-t-100)')}
+          {renderBadgeIcon(unlock.icon, 30, rarity.labelFg)}
         </div>
         <div style={{ minWidth: 0, flex: 1 }}>
           <div
