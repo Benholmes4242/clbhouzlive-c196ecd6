@@ -308,69 +308,94 @@ const HeroHandicapCardDark: React.FC<Props> = ({ connection }) => {
         </div>
       </div>
 
-      {/* Change chip — anchored below ring, the actionable delta */}
-      {!isLoading && delta90 != null && (
+      {/* Change chip + tier pill — anchored below ring */}
+      {!isLoading && (tier != null || delta90 != null) && (
         <div
           style={{
             display: 'flex',
             justifyContent: 'center',
+            alignItems: 'center',
+            gap: 6,
             marginTop: 6,
+            flexWrap: 'wrap',
           }}
         >
-          <span
-            style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: 6,
-              padding: '5px 12px',
-              borderRadius: 999,
-              background:
-                verdict === 'good' ? 'rgba(34, 197, 94, 0.14)' :
-                verdict === 'bad'  ? 'rgba(239, 68, 68, 0.14)' :
-                'rgba(247, 147, 30, 0.14)',
-              border:
-                verdict === 'good' ? '1px solid rgba(34, 197, 94, 0.25)' :
-                verdict === 'bad'  ? '1px solid rgba(239, 68, 68, 0.25)' :
-                '1px solid rgba(247, 147, 30, 0.25)',
-              fontSize: 12,
-              fontWeight: 700,
-              color:
-                verdict === 'good' ? '#4ADE80' :
-                verdict === 'bad'  ? '#F87171' :
-                '#F7931E',
-              letterSpacing: '0.02em',
-              fontVariantNumeric: 'tabular-nums',
-            }}
-          >
-            <svg
-              width="11"
-              height="11"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="3"
-              strokeLinecap="round"
-              aria-hidden
+          {tier && (
+            <span
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                padding: '5px 10px',
+                borderRadius: 999,
+                background: 'rgba(255,255,255,0.04)',
+                border: '1px solid rgba(255,255,255,0.10)',
+                fontSize: 10,
+                fontWeight: 800,
+                letterSpacing: '0.10em',
+                color: 'var(--hcp-t-60)',
+                textTransform: 'uppercase',
+              }}
             >
-              {verdict === 'good' ? (
-                <>
-                  <path d="M12 5v14" />
-                  <path d="M19 12l-7 7-7-7" />
-                </>
-              ) : verdict === 'bad' ? (
-                <>
-                  <path d="M12 19V5" />
-                  <path d="M5 12l7-7 7 7" />
-                </>
-              ) : (
-                <path d="M5 12h14" />
+              {TIER_LABEL[tier]}
+            </span>
+          )}
+
+          {delta90 != null && (
+            <span
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 6,
+                padding: '5px 12px',
+                borderRadius: 999,
+                background:
+                  verdict === 'good' ? 'rgba(34, 197, 94, 0.14)' :
+                  verdict === 'bad'  ? 'rgba(239, 68, 68, 0.14)' :
+                  'rgba(247, 147, 30, 0.14)',
+                border:
+                  verdict === 'good' ? '1px solid rgba(34, 197, 94, 0.25)' :
+                  verdict === 'bad'  ? '1px solid rgba(239, 68, 68, 0.25)' :
+                  '1px solid rgba(247, 147, 30, 0.25)',
+                fontSize: 12,
+                fontWeight: 700,
+                color:
+                  verdict === 'good' ? '#4ADE80' :
+                  verdict === 'bad'  ? '#F87171' :
+                  '#F7931E',
+                letterSpacing: '0.02em',
+                fontVariantNumeric: 'tabular-nums',
+              }}
+            >
+              <svg
+                width="11"
+                height="11"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="3"
+                strokeLinecap="round"
+                aria-hidden
+              >
+                {verdict === 'good' ? (
+                  <>
+                    <path d="M12 5v14" />
+                    <path d="M19 12l-7 7-7-7" />
+                  </>
+                ) : verdict === 'bad' ? (
+                  <>
+                    <path d="M12 19V5" />
+                    <path d="M5 12l7-7 7 7" />
+                  </>
+                ) : (
+                  <path d="M5 12h14" />
+                )}
+              </svg>
+              {Math.abs(delta90).toFixed(1)} over 90 days
+              {verdict === 'good' && (
+                <span style={{ fontSize: 13, lineHeight: 1, marginLeft: 2 }}>🔥</span>
               )}
-            </svg>
-            {Math.abs(delta90).toFixed(1)} over 90 days
-            {verdict === 'good' && (
-              <span style={{ fontSize: 13, lineHeight: 1, marginLeft: 2 }}>🔥</span>
-            )}
-          </span>
+            </span>
+          )}
         </div>
       )}
 
