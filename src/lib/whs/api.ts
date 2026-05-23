@@ -160,12 +160,13 @@ export async function fetchLastRound(connectionId: string): Promise<WhsLastRound
     .select(SCORE_SELECT)
     .eq('connection_id', connectionId)
     .order('play_date', { ascending: false })
-    .limit(1);
+    .limit(2);
   if (error) throw error;
   if (!data || data.length === 0) return null;
 
   const rows = data as unknown as Array<WhsScore & { handicap_index_at_time: number | null }>;
   const latest = rows[0];
+  const previous = rows[1] ?? null;
 
   // Post-round value for the most recent round = current snapshot.
   const { data: snap } = await supabase
@@ -177,9 +178,28 @@ export async function fetchLastRound(connectionId: string): Promise<WhsLastRound
     .maybeSingle();
 
   let handicap_delta: number | null = null;
+
+  // PRIMARY: snapshot-based calc (correct semantics: post-round − pre-round).
   if (snap && latest.handicap_index_at_time !== null) {
     handicap_delta = Number(
       (Number((snap as any).handicap_index) - Number(latest.handicap_index_at_time)).toFixed(1)
+    );
+  }
+
+  // FALLBACK: round-vs-round when snapshot is missing.
+  // NOTE: this computes the delta caused by the PREVIOUS round (n-1), not the
+  // latest round (n). When the snapshot table is populated, the primary path
+  // above will compute the correct "impact of latest round" semantics.
+  // This fallback exists to avoid showing "Your first round on record" to users
+  // who have many rounds but whose snapshot table is empty due to a sync bug.
+  if (
+    handicap_delta === null &&
+    previous &&
+    latest.handicap_index_at_time !== null &&
+    previous.handicap_index_at_time !== null
+  ) {
+    handicap_delta = Number(
+      (Number(latest.handicap_index_at_time) - Number(previous.handicap_index_at_time)).toFixed(1)
     );
   }
 
