@@ -117,7 +117,7 @@ const Pattern14Card: React.FC<Props> = ({ connectionId }) => {
             }}
           >
             <SummaryStat value={counts.better} label="Better" color="var(--hcp-good-2)" />
-            <SummaryStat value={counts.on} label="On" color="var(--hcp-t-100)" />
+            <SummaryStat value={counts.on} label="On pace" color="var(--hcp-t-100)" />
             <SummaryStat value={counts.worse} label="Worse" color="var(--hcp-bad-2)" />
             <div style={{ flex: 1 }} />
             <span
@@ -150,9 +150,9 @@ const Pattern14Card: React.FC<Props> = ({ connectionId }) => {
                     ? 'no data'
                     : r.delta <= -1
                       ? 'better than handicap'
-                      : r.delta >= 1
+                        : r.delta >= 1
                         ? 'worse than handicap'
-                        : 'on handicap';
+                        : 'on pace with handicap';
                 return (
                   <PatternBar
                     key={r.id}
