@@ -212,7 +212,7 @@ export const LegendPulseTicker: React.FC<Props> = ({
   const indicator = window === 'all_time' ? 'ALL' : `${days}D`;
 
   return (
-    <div style={{ marginTop: 18, marginBottom: 6 }}>
+    <div style={{ marginTop: 20, marginBottom: 20 }}>
       {/* Eyebrow */}
       <div
         style={{
