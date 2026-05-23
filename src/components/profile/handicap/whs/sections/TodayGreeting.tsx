@@ -146,13 +146,22 @@ const TodayGreeting: React.FC<Props> = ({ connectionId, userId }) => {
 
   const { data: weather } = useTodayWeather(coords?.lat ?? null, coords?.lng ?? null);
 
-  const { data: recentUnlocks } = useRecentUnlocks(userId);
+  const { data: achievements } = useUserAchievements(userId);
 
-  const recentUnlockCount = React.useMemo(() => {
-    if (!recentUnlocks || recentUnlocks.length === 0) return 0;
+  const { weeklyCount, lifetimeCount } = React.useMemo(() => {
+    if (!achievements) return { weeklyCount: 0, lifetimeCount: 0 };
     const cutoff = Date.now() - 7 * 24 * 60 * 60 * 1000;
-    return recentUnlocks.filter((u) => new Date(u.occurred_at).getTime() > cutoff).length;
-  }, [recentUnlocks]);
+    let weekly = 0;
+    let lifetime = 0;
+    for (const b of achievements) {
+      if (!b.is_earned) continue;
+      lifetime++;
+      if (b.earned_at && new Date(b.earned_at).getTime() > cutoff) {
+        weekly++;
+      }
+    }
+    return { weeklyCount: weekly, lifetimeCount: lifetime };
+  }, [achievements]);
 
   const showMeta = !!homeCourseName;
 
