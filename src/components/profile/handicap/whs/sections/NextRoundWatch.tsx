@@ -59,8 +59,6 @@ const NextRoundWatch: React.FC<Props> = ({ connectionId, currentHandicap }) => {
   const pinPct = Math.min(100, Math.max(0, ((last5Avg ?? 0) / barMax) * 100));
   const targetPct = Math.min(100, Math.max(0, (target / barMax) * 100));
 
-  // Clamped position for the floating bubble label so it stays visible at extremes.
-  const bubblePct = Math.min(92, Math.max(8, pinPct));
 
   const verdictColor = isOnPace ? 'var(--hcp-good)' : 'var(--hcp-amber)';
   const sweep = isOnPace
@@ -69,12 +67,6 @@ const NextRoundWatch: React.FC<Props> = ({ connectionId, currentHandicap }) => {
 
   return (
     <section style={{ marginTop: 32 }}>
-      <style>{`
-        @keyframes nextRoundPulse {
-          0%, 100% { opacity: 1; transform: scale(1); }
-          50% { opacity: 0.5; transform: scale(1.5); }
-        }
-      `}</style>
 
       <DarkSectionHeader
         eyebrow="Next Round Watch"
@@ -153,7 +145,7 @@ const NextRoundWatch: React.FC<Props> = ({ connectionId, currentHandicap }) => {
                   lineHeight: 1.35,
                   color: 'var(--hcp-t-60)',
                   textAlign: 'right',
-                  maxWidth: 160,
+                  maxWidth: 200,
                   paddingBottom: 6,
                 }}
               >
@@ -163,7 +155,10 @@ const NextRoundWatch: React.FC<Props> = ({ connectionId, currentHandicap }) => {
                     <strong style={{ color: 'var(--hcp-good)', fontWeight: 700 }}>
                       {Math.abs(gap).toFixed(1)} ahead
                     </strong>{' '}
-                    of pace
+                    of your last 5 avg of{' '}
+                    <strong style={{ color: 'var(--hcp-good)', fontWeight: 700 }}>
+                      {last5Avg!.toFixed(1)}
+                    </strong>
                   </>
                 ) : (
                   <>
@@ -171,7 +166,10 @@ const NextRoundWatch: React.FC<Props> = ({ connectionId, currentHandicap }) => {
                     <strong style={{ color: 'var(--hcp-amber)', fontWeight: 700 }}>
                       {gap.toFixed(1)} better
                     </strong>{' '}
-                    than your average
+                    than your last 5 avg of{' '}
+                    <strong style={{ color: 'var(--hcp-amber)', fontWeight: 700 }}>
+                      {last5Avg!.toFixed(1)}
+                    </strong>
                   </>
                 )}
               </span>
@@ -179,25 +177,20 @@ const NextRoundWatch: React.FC<Props> = ({ connectionId, currentHandicap }) => {
           </div>
         </div>
 
-        {/* ── LIVE PACE BAND ────────────────────── */}
+        {/* ── BUBBLE BAR BAND ───────────────────── */}
         {last5Avg != null && (
           <div
             style={{
-              padding: '14px 18px 16px',
+              padding: '18px 18px 18px',
               borderBottom: '1px solid var(--hcp-line-2)',
             }}
           >
-            <div
-              style={{
-                position: 'relative',
-                height: 26,
-                marginBottom: 8,
-              }}
-            >
+            {/* TOP BUBBLE ROW — target pointing DOWN */}
+            <div style={{ position: 'relative', height: 26, marginBottom: 8 }}>
               <div
                 style={{
                   position: 'absolute',
-                  left: `${bubblePct}%`,
+                  left: `${targetPct}%`,
                   top: '50%',
                   transform: 'translate(-50%, -50%)',
                   pointerEvents: 'none',
@@ -207,7 +200,111 @@ const NextRoundWatch: React.FC<Props> = ({ connectionId, currentHandicap }) => {
                   style={{
                     display: 'inline-flex',
                     alignItems: 'center',
-                    padding: '2px 7px',
+                    padding: '2px 8px',
+                    borderRadius: 6,
+                    background: 'rgba(34,197,94,0.14)',
+                    border: '1px solid rgba(34,197,94,0.30)',
+                    fontSize: 12,
+                    fontWeight: 800,
+                    color: 'var(--hcp-good)',
+                    fontVariantNumeric: 'tabular-nums',
+                    lineHeight: 1.2,
+                    position: 'relative',
+                  }}
+                >
+                  {target.toFixed(1)}
+                  <span
+                    aria-hidden
+                    style={{
+                      position: 'absolute',
+                      left: '50%',
+                      bottom: -5,
+                      transform: 'translateX(-50%)',
+                      width: 0,
+                      height: 0,
+                      borderLeft: '4px solid transparent',
+                      borderRight: '4px solid transparent',
+                      borderTop: '5px solid rgba(34,197,94,0.30)',
+                    }}
+                  />
+                </span>
+              </div>
+            </div>
+
+            {/* Bar */}
+            <div
+              style={{
+                position: 'relative',
+                height: 6,
+                background: 'var(--hcp-bg-3)',
+                borderRadius: 999,
+              }}
+            >
+              <div
+                aria-hidden
+                style={{
+                  position: 'absolute',
+                  top: 0,
+                  bottom: 0,
+                  left: 0,
+                  width: `${targetPct}%`,
+                  background: 'var(--hcp-good)',
+                  opacity: 0.5,
+                  borderRadius: 999,
+                }}
+              />
+              {/* Target CIRCLE */}
+              <span
+                aria-hidden
+                style={{
+                  position: 'absolute',
+                  top: '50%',
+                  left: `${targetPct}%`,
+                  width: 12,
+                  height: 12,
+                  borderRadius: '50%',
+                  background: 'var(--hcp-good)',
+                  border: '2px solid var(--hcp-bg-1)',
+                  boxShadow: '0 0 0 1px var(--hcp-good)',
+                  transform: 'translate(-50%, -50%)',
+                  zIndex: 2,
+                }}
+              />
+              {/* Last-5 pin */}
+              <span
+                aria-hidden
+                style={{
+                  position: 'absolute',
+                  top: '50%',
+                  left: `${pinPct}%`,
+                  width: 14,
+                  height: 14,
+                  borderRadius: '50%',
+                  background: verdictColor,
+                  border: '2px solid var(--hcp-bg-1)',
+                  boxShadow: `0 0 0 1px ${verdictColor}`,
+                  transform: 'translate(-50%, -50%)',
+                  zIndex: 3,
+                }}
+              />
+            </div>
+
+            {/* BOTTOM BUBBLE ROW — last5Avg pointing UP */}
+            <div style={{ position: 'relative', height: 26, marginTop: 8 }}>
+              <div
+                style={{
+                  position: 'absolute',
+                  left: `${pinPct}%`,
+                  top: '50%',
+                  transform: 'translate(-50%, -50%)',
+                  pointerEvents: 'none',
+                }}
+              >
+                <span
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    padding: '2px 8px',
                     borderRadius: 6,
                     background: isOnPace ? 'rgba(34,197,94,0.14)' : 'rgba(247,147,30,0.14)',
                     border: `1px solid ${isOnPace ? 'rgba(34,197,94,0.30)' : 'rgba(247,147,30,0.30)'}`,
@@ -225,118 +322,17 @@ const NextRoundWatch: React.FC<Props> = ({ connectionId, currentHandicap }) => {
                     style={{
                       position: 'absolute',
                       left: '50%',
-                      bottom: -5,
+                      top: -5,
                       transform: 'translateX(-50%)',
                       width: 0,
                       height: 0,
                       borderLeft: '4px solid transparent',
                       borderRight: '4px solid transparent',
-                      borderTop: `5px solid ${isOnPace ? 'rgba(34,197,94,0.30)' : 'rgba(247,147,30,0.30)'}`,
+                      borderBottom: `5px solid ${isOnPace ? 'rgba(34,197,94,0.30)' : 'rgba(247,147,30,0.30)'}`,
                     }}
                   />
                 </span>
               </div>
-            </div>
-
-            {/* Pace bar */}
-            <div
-              style={{
-                position: 'relative',
-                height: 6,
-                background: 'var(--hcp-bg-3)',
-                borderRadius: 999,
-              }}
-            >
-              {/* Green zone — 0 to target */}
-              <div
-                aria-hidden
-                style={{
-                  position: 'absolute',
-                  top: 0,
-                  bottom: 0,
-                  left: 0,
-                  width: `${targetPct}%`,
-                  background: 'var(--hcp-good)',
-                  opacity: 0.5,
-                  borderRadius: 999,
-                }}
-              />
-              {/* Target marker */}
-              <span
-                aria-hidden
-                style={{
-                  position: 'absolute',
-                  top: -3,
-                  bottom: -3,
-                  left: `${targetPct}%`,
-                  width: 2,
-                  background: 'var(--hcp-t-100)',
-                  transform: 'translateX(-1px)',
-                  borderRadius: 1,
-                }}
-              />
-              {/* Last-5 pin */}
-              <span
-                aria-hidden
-                style={{
-                  position: 'absolute',
-                  top: '50%',
-                  left: `${pinPct}%`,
-                  width: 14,
-                  height: 14,
-                  borderRadius: '50%',
-                  background: verdictColor,
-                  border: '2px solid var(--hcp-bg-1)',
-                  boxShadow: `0 0 0 1px ${verdictColor}`,
-                  transform: 'translate(-50%, -50%)',
-                  zIndex: 2,
-                }}
-              />
-            </div>
-
-            {/* Scale row — eyebrow left, scale labels right */}
-            <div
-              style={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-                marginTop: 8,
-                fontSize: 10,
-                fontWeight: 700,
-                letterSpacing: '0.12em',
-                textTransform: 'uppercase',
-                fontVariantNumeric: 'tabular-nums',
-              }}
-            >
-              <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
-                <span
-                  aria-hidden
-                  style={{
-                    width: 6,
-                    height: 6,
-                    borderRadius: '50%',
-                    background: verdictColor,
-                    animation: 'nextRoundPulse 1.6s ease-in-out infinite',
-                    display: 'inline-block',
-                  }}
-                />
-                <span
-                  style={{
-                    letterSpacing: '0.16em',
-                    fontSize: 10,
-                    fontWeight: 800,
-                    color: verdictColor,
-                  }}
-                >
-                  Live · Last 5 avg
-                </span>
-              </span>
-
-              <span style={{ display: 'inline-flex', alignItems: 'center', gap: 12, color: 'var(--hcp-t-40)' }}>
-                <span>Scratch · 0</span>
-                <span style={{ opacity: 0.4 }}>·</span>
-                <span>Weakest · {oldestDiff.toFixed(1)}</span>
-              </span>
             </div>
           </div>
         )}
