@@ -12,6 +12,7 @@ import { useUserLegendTitleCount } from '@/hooks/gam/useUserLegendTitleCount';
 import type { LegendCategory, LegendWindow } from '@/lib/gam/types';
 import { legendCategoryWindow } from '@/lib/gam/visuals';
 import CourseSearch from './_shared/CourseSearch';
+import DiscoverSearchCard from './_shared/DiscoverSearchCard';
 import HomeClubSubsection from './subsections/HomeClubSubsection';
 import YourCoursesSubsection from './subsections/YourCoursesSubsection';
 import DiscoverSubsection from './subsections/DiscoverSubsection';
