@@ -18888,6 +18888,7 @@ export type Database = {
           friend_home_club: string
           friend_name: string
           friend_passport_id: number
+          friend_profile_photo_url: string
           friend_row_id: string
           friend_thumbnail_url: string
           friend_user_id: string

@@ -1,6 +1,7 @@
 import React from 'react';
 import { Pin } from 'lucide-react';
 import { initials, firstName } from '@/lib/whs/utils/initials';
+import { pickAvatarSrc } from '@/lib/whs/utils/avatarSrc';
 import { fmtHcp } from '@/lib/whs/format';
 import type { FriendRivalryHydrated } from '@/lib/whs/types';
 
@@ -38,17 +39,20 @@ export const AutoPickedRow: React.FC<Props> = ({ rivalry, onPin, busy }) => (
         justifyContent: 'center',
       }}
     >
-      {rivalry.rival_thumbnail_url ? (
-        <img
-          src={rivalry.rival_thumbnail_url}
-          alt={rivalry.rival_name ?? ''}
-          style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-        />
-      ) : (
-        <span style={{ fontSize: 11, fontWeight: 800, color: 'var(--hcp-t-60)' }}>
-          {initials(rivalry.rival_name ?? '')}
-        </span>
-      )}
+      {(() => {
+        const src = pickAvatarSrc(rivalry.rival_thumbnail_url, rivalry.rival_profile_photo_url);
+        return src ? (
+          <img
+            src={src}
+            alt={rivalry.rival_name ?? ''}
+            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+          />
+        ) : (
+          <span style={{ fontSize: 11, fontWeight: 800, color: 'var(--hcp-t-60)' }}>
+            {initials(rivalry.rival_name ?? '')}
+          </span>
+        );
+      })()}
     </div>
     <div style={{ flex: 1, minWidth: 0 }}>
       <p

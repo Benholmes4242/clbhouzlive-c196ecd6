@@ -1,6 +1,7 @@
 import React from 'react';
 import { Plus } from 'lucide-react';
 import { initials, firstName } from '@/lib/whs/utils/initials';
+import { pickAvatarSrc } from '@/lib/whs/utils/avatarSrc';
 import { fmtHcp } from '@/lib/whs/format';
 import type { FriendLeaderboardEntry } from '@/lib/whs/types';
 
@@ -38,17 +39,20 @@ export const CandidateRow: React.FC<Props> = ({ candidate, onAdd, busy }) => (
         justifyContent: 'center',
       }}
     >
-      {candidate.friend_thumbnail_url ? (
-        <img
-          src={candidate.friend_thumbnail_url}
-          alt={candidate.friend_name}
-          style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-        />
-      ) : (
-        <span style={{ fontSize: 11, fontWeight: 800, color: 'var(--hcp-t-60)' }}>
-          {initials(candidate.friend_name)}
-        </span>
-      )}
+      {(() => {
+        const src = pickAvatarSrc(candidate.friend_thumbnail_url, candidate.friend_profile_photo_url);
+        return src ? (
+          <img
+            src={src}
+            alt={candidate.friend_name}
+            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+          />
+        ) : (
+          <span style={{ fontSize: 11, fontWeight: 800, color: 'var(--hcp-t-60)' }}>
+            {initials(candidate.friend_name)}
+          </span>
+        );
+      })()}
     </div>
     <div style={{ flex: 1, minWidth: 0 }}>
       <p

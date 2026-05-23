@@ -1,6 +1,7 @@
 import React, { useMemo } from 'react';
 import { reformatFriendName } from '@/lib/whs/utils/nameFormat';
 import { initials } from '@/lib/whs/utils/initials';
+import { pickAvatarSrc } from '@/lib/whs/utils/avatarSrc';
 import { fmtHcp } from '@/lib/whs/format';
 import type { FriendRivalryHydrated } from '@/lib/whs/types';
 import type { RivalryTier } from '@/lib/whs/utils/rivalryTiering';
@@ -95,9 +96,10 @@ export const RivalryCompactCard: React.FC<Props> = ({ rivalry, tier, onTap }) =>
               width: 44,
               height: 44,
               borderRadius: '50%',
-              background: rivalry.rival_thumbnail_url
-                ? `url(${rivalry.rival_thumbnail_url}) center/cover no-repeat`
-                : 'rgba(255,255,255,0.08)',
+              background: (() => {
+                const src = pickAvatarSrc(rivalry.rival_thumbnail_url, rivalry.rival_profile_photo_url);
+                return src ? `url(${src}) center/cover no-repeat` : 'rgba(255,255,255,0.08)';
+              })(),
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
@@ -107,7 +109,7 @@ export const RivalryCompactCard: React.FC<Props> = ({ rivalry, tier, onTap }) =>
               flexShrink: 0,
             }}
           >
-            {!rivalry.rival_thumbnail_url && initials(rivalDisplayName)}
+            {!pickAvatarSrc(rivalry.rival_thumbnail_url, rivalry.rival_profile_photo_url) && initials(rivalDisplayName)}
           </div>
 
           {/* Name block */}

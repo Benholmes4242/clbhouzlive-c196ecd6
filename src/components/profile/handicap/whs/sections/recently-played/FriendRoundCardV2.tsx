@@ -1,6 +1,7 @@
 import React, { useMemo } from 'react';
 import { Flame, ChevronRight } from 'lucide-react';
 import { displayName } from '@/lib/whs/utils/initials';
+import { pickAvatarSrc } from '@/lib/whs/utils/avatarSrc';
 import { fmtRelative } from '@/lib/whs/utils/nameFormat';
 import { useFriendRoundDetail } from '@/lib/whs/hooks';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
@@ -156,7 +157,7 @@ export const FriendRoundCardV2: React.FC<Props> = ({
             }}
           >
             <SquircleAvatar
-              src={activity.friend_thumbnail_url}
+              src={pickAvatarSrc(activity.friend_thumbnail_url, activity.friend_profile_photo_url)}
               alt={activity.friend_name ?? ''}
               size={30}
               hairlineRing
