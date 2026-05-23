@@ -1,6 +1,7 @@
 import React from 'react';
 import { Trash2, Pin } from 'lucide-react';
 import { initials, firstName } from '@/lib/whs/utils/initials';
+import { pickAvatarSrc } from '@/lib/whs/utils/avatarSrc';
 import { fmtHcp } from '@/lib/whs/format';
 import type { FriendRivalryHydrated } from '@/lib/whs/types';
 
@@ -26,7 +27,7 @@ export const PinnedRivalRow: React.FC<Props> = ({ rivalry, onRemove, busy }) => 
       fontFamily: FONT,
     }}
   >
-    <Avatar url={rivalry.rival_thumbnail_url} name={rivalry.rival_name ?? ''} />
+    <Avatar url={pickAvatarSrc(rivalry.rival_thumbnail_url, rivalry.rival_profile_photo_url)} name={rivalry.rival_name ?? ''} />
     <div style={{ flex: 1, minWidth: 0 }}>
       <p
         style={{

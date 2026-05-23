@@ -1,6 +1,7 @@
 import React, { useMemo } from 'react';
 import { reformatFriendName } from '@/lib/whs/utils/nameFormat';
 import { initials } from '@/lib/whs/utils/initials';
+import { pickAvatarSrc } from '@/lib/whs/utils/avatarSrc';
 import { fmtHcp } from '@/lib/whs/format';
 import type { FriendRivalryHydrated } from '@/lib/whs/types';
 import type { RivalryTier } from '@/lib/whs/utils/rivalryTiering';
