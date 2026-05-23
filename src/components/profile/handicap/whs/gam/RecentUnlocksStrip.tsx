@@ -419,7 +419,7 @@ const RecentUnlocksStrip: React.FC<RecentUnlocksStripProps> = ({
           <div
             key={`${unlock.kind}-${idx}-${unlock.occurred_at}`}
             style={{
-              flex: '0 0 88%',
+              flex: '0 0 calc(88vw - 28px)',
               scrollSnapAlign: 'start',
               boxSizing: 'border-box',
             }}
