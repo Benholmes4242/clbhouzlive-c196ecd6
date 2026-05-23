@@ -145,7 +145,7 @@ export const CinemaCardGlass: React.FC<Props> = ({
           </div>
         </div>
         <div style={{ textAlign: 'center' }}>
-          <div style={labelStyle}>STBL</div>
+          <div style={labelStyle}>STABLEFORD</div>
           <div style={valueStyle('#FFFFFF')}>{stableford != null ? stableford : EM_DASH}</div>
         </div>
         <div style={{ textAlign: 'center' }}>
