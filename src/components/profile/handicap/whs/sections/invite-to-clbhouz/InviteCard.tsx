@@ -5,6 +5,7 @@ import { toast } from 'sonner';
 import { callCreateInvite } from '@/lib/whs/api';
 import { shareInvite } from '@/lib/whs/share';
 import { firstName } from '@/lib/whs/utils/initials';
+import { pickAvatarSrc } from '@/lib/whs/utils/avatarSrc';
 import { fmtRelative } from '@/lib/whs/utils/nameFormat';
 import { whsKeys } from '@/lib/whs/hooks';
 import type { FriendLeaderboardEntry } from '@/lib/whs/types';
@@ -82,24 +83,28 @@ export const InviteCard: React.FC<Props> = ({ friend }) => {
     >
       {/* Top row: avatar + name + HCP */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 10, minWidth: 0 }}>
-        {friend.friend_thumbnail_url ? (
-          <div
-            style={{
-              width: 36,
-              height: 36,
-              borderRadius: 12,
-              overflow: 'hidden',
-              flexShrink: 0,
-              background: 'var(--hcp-bg-2)',
-            }}
-          >
-            <img
-              src={friend.friend_thumbnail_url}
-              alt=""
-              style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-            />
-          </div>
-        ) : (
+        {(() => {
+          const avatarSrc = pickAvatarSrc(friend.friend_thumbnail_url, friend.friend_profile_photo_url);
+          return avatarSrc ? (
+            <div
+              style={{
+                width: 36,
+                height: 36,
+                borderRadius: 12,
+                overflow: 'hidden',
+                flexShrink: 0,
+                background: 'var(--hcp-bg-2)',
+              }}
+            >
+              <img
+                src={avatarSrc}
+                alt=""
+                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+              />
+            </div>
+          ) : null;
+        })()}
+        {!pickAvatarSrc(friend.friend_thumbnail_url, friend.friend_profile_photo_url) && (
           <div
             style={{
               width: 36,

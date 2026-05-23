@@ -1,6 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import { useFriendLeaderboard } from '@/lib/whs/hooks';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { pickAvatarSrc } from '@/lib/whs/utils/avatarSrc';
 import { fmtHcp } from '@/lib/whs/format';
 import SectionHeader from '../SectionHeader';
 import RecentlyActiveItem from './RecentlyActiveItem';
@@ -86,7 +87,7 @@ export const YourCircleSection: React.FC<Props> = ({ userId }) => {
             }}
           >
             <SquircleAvatar
-              src={stats.self.friend_thumbnail_url}
+              src={pickAvatarSrc(stats.self.friend_thumbnail_url, stats.self.friend_profile_photo_url)}
               alt={stats.self.friend_name}
               size={40}
               userId={stats.self.friend_user_id ?? undefined}
