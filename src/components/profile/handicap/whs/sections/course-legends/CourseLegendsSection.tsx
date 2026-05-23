@@ -214,7 +214,7 @@ export const CourseLegendsSection: React.FC<Props> = ({
   }, [holderRows, window]);
 
   return (
-    <div>
+    <section style={{ marginTop: 32 }}>
       <SectionHero titleCount={titleCount} window={window} setWindow={setWindow} />
 
       {showSearchResults ? (
