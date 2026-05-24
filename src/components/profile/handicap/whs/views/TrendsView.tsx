@@ -52,18 +52,18 @@ export const TrendsView: React.FC<Props> = ({
       {/* 4. Index History */}
       <IndexHistoryCard connectionId={connectionId} />
 
-      {/* 5. Course Form */}
-      <CourseFormCard connectionId={connectionId} currentHandicap={currentHandicap ?? undefined} />
-
-      {/* 6. Echo Insights — owner only */}
-      {!readOnly && <EchoInsightsCard connectionId={connectionId} />}
-
-      {/* 7. Stableford distribution */}
+      {/* 5. Stableford distribution */}
       <TrendCardsStack
         connectionId={connectionId}
         currentHandicap={currentHandicap}
         splitAt="rest"
       />
+
+      {/* 6. Course Form */}
+      <CourseFormCard connectionId={connectionId} currentHandicap={currentHandicap ?? undefined} />
+
+      {/* 7. Echo Insights — owner only */}
+      {!readOnly && <EchoInsightsCard connectionId={connectionId} />}
     </div>
   );
 };
