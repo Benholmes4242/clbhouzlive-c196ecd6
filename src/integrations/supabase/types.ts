@@ -19906,7 +19906,12 @@ export type Database = {
         }[]
       }
       get_trophy_aggregates: {
-        Args: { p_connection_id: string; p_user_id: string }
+        Args: {
+          p_connection_id: string
+          p_from_date?: string
+          p_to_date?: string
+          p_user_id: string
+        }
         Returns: Json
       }
       get_unread_count: { Args: { p_conversation_id: string }; Returns: number }
