@@ -372,7 +372,8 @@ Deno.serve(async (req) => {
         return {
           id: r.id,
           name: c.name ?? "",
-          region: c.region ?? c.country ?? "",
+          region: c.region ?? "",
+          country: c.country ?? "",
           rationale: r.rationale,
           expected_differential: r.expected_differential,
           thumbnail_image: c.thumbnail_image ?? null,

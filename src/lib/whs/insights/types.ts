@@ -2,6 +2,7 @@ export type SuitedCourse = {
   id: string;
   name: string;
   region: string;
+  country: string;
   rationale: string;
   /** Predicted differential at this course based on user's recent form +
    *  course slope. Null if either input was unavailable at generation time. */
