@@ -27,6 +27,8 @@ export const CourseSearch: React.FC<Props> = ({ value, onChange, helper, inputRe
     >
       <Search size={16} color="var(--hcp-t-60)" />
       <input
+        ref={inputRef}
+        autoFocus={autoFocus}
         type="text"
         value={value}
         onChange={(e) => onChange(e.target.value)}
