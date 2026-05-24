@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Crown } from 'lucide-react';
 import { useUserPlayedCourses } from '@/hooks/gam/useUserPlayedCourses';
 import { useUserHomeClubCourses } from '@/hooks/gam/useUserHomeClubCourses';
