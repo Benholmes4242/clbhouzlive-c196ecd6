@@ -67,10 +67,6 @@ export const TodayView: React.FC<Props> = ({
         <HeroHandicapCardDark connection={connection} />
       </div>
 
-      {/* 1b. Forecast card — owner only */}
-      {!readOnly && (
-        <ForecastCard connectionId={connectionId} currentHandicap={currentHandicap} />
-      )}
 
       {/* 2. Recent Unlocks */}
       <RecentUnlocksStrip userId={userId} readOnly={readOnly} />
