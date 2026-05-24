@@ -22,10 +22,8 @@ const FONT = 'Geist, system-ui, -apple-system, BlinkMacSystemFont, sans-serif';
 const FALLBACK_GRADIENT =
   'linear-gradient(140deg, #2d3a2d 0%, #4a5d4a 25%, #6b7a5a 50%, #8a9670 72%, #c4a574 88%, #d4956b 100%)';
 
-const PHOTO_SCRIM_TOP =
-  'linear-gradient(180deg, rgba(5,8,16,0.55) 0%, rgba(5,8,16,0) 100%)';
-const PHOTO_SCRIM_BOTTOM =
-  'linear-gradient(180deg, rgba(5,8,16,0) 0%, rgba(5,8,16,0.92) 90%)';
+const PHOTO_SCRIM =
+  'linear-gradient(180deg, rgba(5,8,16,0.55) 0%, rgba(5,8,16,0.20) 60%, rgba(5,8,16,0.30) 100%)';
 
 export const FriendRoundCardV2: React.FC<Props> = ({
   activity,
