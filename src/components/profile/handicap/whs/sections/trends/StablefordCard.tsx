@@ -1189,7 +1189,6 @@ const MilestoneRow: React.FC<{
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'flex-end',
-          gap: 2,
           flexShrink: 0,
         }}
       >
@@ -1205,17 +1204,6 @@ const MilestoneRow: React.FC<{
           }}
         >
           {count}
-        </span>
-        <span
-          style={{
-            fontSize: 8.5,
-            fontWeight: 800,
-            color: 'rgba(255,255,255,0.4)',
-            letterSpacing: '0.08em',
-            fontFamily: FONT,
-          }}
-        >
-          TOTAL
         </span>
       </div>
     </div>
