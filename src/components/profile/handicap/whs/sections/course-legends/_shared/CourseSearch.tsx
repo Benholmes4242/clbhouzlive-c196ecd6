@@ -8,6 +8,8 @@ interface Props {
   onChange: (v: string) => void;
   /** Optional helper subtitle rendered below the input. */
   helper?: string;
+  inputRef?: React.RefObject<HTMLInputElement>;
+  autoFocus?: boolean;
 }
 
 export const CourseSearch: React.FC<Props> = ({ value, onChange, helper }) => (
