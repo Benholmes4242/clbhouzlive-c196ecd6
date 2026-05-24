@@ -738,7 +738,6 @@ export const RoundsThatCountCard: React.FC<Props> = ({
       </div>
     </section>
     <RoundDetailSheet
-      variant="user"
       open={sheetScoreId != null}
       onClose={() => setSheetScoreId(null)}
       scoreId={sheetScoreId}

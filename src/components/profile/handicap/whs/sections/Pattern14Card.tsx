@@ -235,7 +235,6 @@ const Pattern14Card: React.FC<Props> = ({ connectionId }) => {
       </section>
 
       <RoundDetailSheet
-        variant="user"
         open={selectedScoreId != null}
         onClose={() => setSelectedScoreId(null)}
         scoreId={selectedScoreId ?? ''}
