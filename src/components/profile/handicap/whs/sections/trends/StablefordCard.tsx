@@ -428,7 +428,7 @@ const PointsBody: React.FC<PointsBodyProps> = ({ dist, scope, scoringRange }) =>
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                color: 'var(--hcp-bg-1)',
+                color: '#FFFFFF',
                 fontSize: 16,
                 fontWeight: 800,
                 letterSpacing: '-0.02em',
@@ -733,14 +733,8 @@ const ShotsBody: React.FC<ShotsBodyProps> = ({ trophyAgg, shotsLoading, scope })
   };
   const allSegments: Segment[] = [
     {
-      key: 'eaglePlus',
-      count: eaglePlusCount,
-      background: 'linear-gradient(135deg, #BA6E12 0%, #F7931E 100%)',
-      textColor: '#FFFFFF',
-    },
-    {
-      key: 'birdie',
-      count: birdies,
+      key: 'birdiePlus',
+      count: birdiesOrBetter,
       background: 'linear-gradient(135deg, #B86A0E 0%, #F7931E 100%)',
       textColor: '#FFFFFF',
     },
@@ -767,8 +761,6 @@ const ShotsBody: React.FC<ShotsBodyProps> = ({ trophyAgg, shotsLoading, scope })
   const segments = allSegments.filter((s) => s.count > 0);
   const segTotal = segments.reduce((acc, s) => acc + s.count, 0) || 1;
 
-  const eaglePlusIsThin = eaglePlusCount > 0 && eaglePlusCount / segTotal < 0.05;
-  const eaglePlusCenterPct = (eaglePlusCount / segTotal) * 50; // half-width since it's first
 
   // Footnote
   const footnoteHtml =
@@ -834,40 +826,9 @@ const ShotsBody: React.FC<ShotsBodyProps> = ({ trophyAgg, shotsLoading, scope })
         </div>
       </div>
 
-      {/* 5-segment bar */}
+      {/* 4-segment bar */}
       <div style={{ padding: '0 18px' }}>
-        <div style={{ position: 'relative', margin: '42px 0 0' }}>
-          {/* Eagle+ callout */}
-          {eaglePlusIsThin && (
-            <div
-              style={{
-                position: 'absolute',
-                top: -34,
-                left: `${eaglePlusCenterPct}%`,
-                transform: 'translateX(-50%)',
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                pointerEvents: 'none',
-              }}
-            >
-              <span
-                style={{
-                  fontSize: 13,
-                  fontWeight: 800,
-                  color: T.amber,
-                  fontVariantNumeric: 'tabular-nums',
-                  letterSpacing: '-0.01em',
-                  lineHeight: 1,
-                  fontFamily: FONT,
-                }}
-              >
-                {eaglePlusCount}
-              </span>
-              <span style={{ width: 1, height: 8, background: 'rgba(247,147,30,0.5)', marginTop: 3 }} />
-            </div>
-          )}
-
+        <div style={{ margin: '16px 0 0' }}>
           <div
             style={{
               display: 'flex',
@@ -877,62 +838,49 @@ const ShotsBody: React.FC<ShotsBodyProps> = ({ trophyAgg, shotsLoading, scope })
               overflow: 'hidden',
             }}
             role="img"
-            aria-label={`Hole distribution: ${eaglePlusCount} eagle+, ${birdies} birdies, ${pars} pars, ${bogey} bogeys, ${doublePlus} double+`}
+            aria-label={`Hole distribution: ${birdiesOrBetter} birdies or better, ${pars} pars, ${bogey} bogeys, ${doublePlus} double+`}
           >
-            {segments.map((s) => {
-              const widthPct = s.count / segTotal;
-              const thin = widthPct < 0.05;
-              return (
-                <div
-                  key={s.key}
-                  style={{
-                    flex: s.count,
-                    background: s.background,
-                    border: s.border,
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    color: thin ? 'transparent' : s.textColor,
-                    fontSize: 15,
-                    fontWeight: 800,
-                    letterSpacing: '-0.02em',
-                    fontFamily: FONT,
-                    fontVariantNumeric: 'tabular-nums',
-                    transition: 'flex 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
-                  }}
-                >
-                  {s.count}
-                </div>
-              );
-            })}
+            {segments.map((s) => (
+              <div
+                key={s.key}
+                style={{
+                  flex: s.count,
+                  background: s.background,
+                  border: s.border,
+                  transition: 'flex 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
+                  minWidth: 0,
+                }}
+              />
+            ))}
           </div>
         </div>
 
-        {/* Key row */}
+        {/* Key row — 4 cols, count big + pct small */}
         <div
           style={{
             display: 'grid',
-            gridTemplateColumns: 'repeat(5, minmax(0, 1fr))',
+            gridTemplateColumns: 'repeat(4, minmax(0, 1fr))',
             gap: 4,
-            margin: '12px 0 0',
+            margin: '14px 0 0',
           }}
         >
           {[
-            { label: 'EAGLE+', count: eaglePlusCount },
-            { label: 'BIRDIE', count: birdies },
+            { label: 'BIRDIE+', count: birdiesOrBetter },
             { label: 'PAR', count: pars },
             { label: 'BOGEY', count: bogey },
             { label: 'DOUBLE+', count: doublePlus },
           ].map((cell) => {
-            const pct = segTotal > 0 ? Math.round((cell.count / segTotal) * 100) : 0;
+            const pctRaw = segTotal > 0 ? (cell.count / segTotal) * 100 : 0;
+            const pct = pctRaw < 10 ? pctRaw.toFixed(1) : Math.round(pctRaw).toString();
+            const isZero = cell.count === 0;
             return (
-              <div key={cell.label} style={{ textAlign: 'center', fontFamily: FONT }}>
+              <div key={cell.label} style={{ textAlign: 'center', fontFamily: FONT, minWidth: 0 }}>
                 <div
                   style={{
-                    fontSize: 9.5,
+                    fontSize: 10,
                     fontWeight: 800,
                     color: T.ink,
-                    letterSpacing: '0.10em',
+                    letterSpacing: '0.08em',
                     whiteSpace: 'nowrap',
                   }}
                 >
@@ -940,11 +888,25 @@ const ShotsBody: React.FC<ShotsBodyProps> = ({ trophyAgg, shotsLoading, scope })
                 </div>
                 <div
                   style={{
+                    fontSize: 20,
+                    fontWeight: isZero ? 400 : 800,
+                    color: isZero ? 'rgba(255,255,255,0.3)' : T.ink,
+                    fontVariantNumeric: 'tabular-nums',
+                    letterSpacing: '-0.02em',
+                    lineHeight: 1,
+                    marginTop: 7,
+                  }}
+                >
+                  {cell.count.toLocaleString()}
+                </div>
+                <div
+                  style={{
                     fontSize: 10,
                     fontWeight: 700,
-                    color: T.inkMute,
+                    color: 'rgba(255,255,255,0.4)',
                     fontVariantNumeric: 'tabular-nums',
-                    marginTop: 2,
+                    letterSpacing: '0.04em',
+                    marginTop: 4,
                   }}
                 >
                   {pct}%
@@ -953,6 +915,7 @@ const ShotsBody: React.FC<ShotsBodyProps> = ({ trophyAgg, shotsLoading, scope })
             );
           })}
         </div>
+
 
         {/* Footnote */}
         <p
