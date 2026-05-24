@@ -50,7 +50,7 @@ export const YourCircleSection: React.FC<Props> = ({ userId }) => {
 
   if (isLoading || !stats) {
     return (
-      <section style={{ padding: '0 16px' }}>
+      <section style={{ marginTop: 32, padding: '0 16px' }}>
         <div
           className="animate-pulse"
           style={{ height: 64, borderRadius: 12, background: 'var(--hcp-bg-3)' }}
