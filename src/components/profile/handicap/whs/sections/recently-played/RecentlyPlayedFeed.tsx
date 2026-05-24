@@ -76,8 +76,7 @@ export const RecentlyPlayedFeed: React.FC<Props> = ({ ownerUserId }) => {
       )}
 
       <RoundDetailSheet
-        variant="friend"
-        activity={sheetActivity}
+        scoreId={sheetActivity?.last_round_score_id ?? null}
         open={!!sheetActivity}
         onClose={() => setSheetActivity(null)}
       />

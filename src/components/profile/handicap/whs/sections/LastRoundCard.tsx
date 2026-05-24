@@ -88,7 +88,6 @@ export const LastRoundCard: React.FC<Props> = ({
       </section>
 
       <RoundDetailSheet
-        variant="user"
         scoreId={lastRound.id}
         connectionId={connectionId}
         open={sheetOpen}
