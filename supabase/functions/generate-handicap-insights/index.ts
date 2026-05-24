@@ -7,6 +7,24 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type",
 };
 
+function haversineMiles(
+  lat1: number | null | undefined,
+  lng1: number | null | undefined,
+  lat2: number | null | undefined,
+  lng2: number | null | undefined,
+): number | null {
+  if (lat1 == null || lng1 == null || lat2 == null || lng2 == null) return null;
+  const toRad = (deg: number) => (deg * Math.PI) / 180;
+  const R = 3959; // miles
+  const dLat = toRad(lat2 - lat1);
+  const dLng = toRad(lng2 - lng1);
+  const a =
+    Math.sin(dLat / 2) ** 2 +
+    Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLng / 2) ** 2;
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  return Math.round(R * c);
+}
+
 const todayKey = () => {
   const d = new Date();
   const y = d.getUTCFullYear();
@@ -324,16 +342,29 @@ Deno.serve(async (req) => {
     if (allRecIds.length > 0) {
       const { data: hydrated } = await admin
         .from("golf_courses")
-        .select("id, name, region, country, thumbnail_image")
+        .select("id, name, region, country, thumbnail_image, course_rating, latitude, longitude")
         .in("id", allRecIds);
       hyMap = new Map((hydrated ?? []).map((c: any) => [c.id, c]));
     }
+
+    // Fetch user's stored home location (PostGIS-backed user_nearby_status row).
+    const { data: nearbyRow } = await admin
+      .from("user_nearby_status")
+      .select("lat, lng")
+      .eq("user_id", userId)
+      .maybeSingle();
+    const userHomeLat: number | null = (nearbyRow as any)?.lat ?? null;
+    const userHomeLng: number | null = (nearbyRow as any)?.lng ?? null;
 
     const enrich = (
       arr: { id: string; rationale: string; expected_differential: number | null }[],
     ) =>
       arr.map((r) => {
         const c: any = hyMap.get(r.id) || {};
+        // Slope: reuse existing golf_course_id → whs_course_id bridge,
+        // then whs_course_id → last_seen_slope_rating.
+        const whsId = golfToWhs.get(r.id);
+        const slope = whsId ? whsSlopeById.get(whsId) : null;
         return {
           id: r.id,
           name: c.name ?? "",
@@ -341,6 +372,9 @@ Deno.serve(async (req) => {
           rationale: r.rationale,
           expected_differential: r.expected_differential,
           thumbnail_image: c.thumbnail_image ?? null,
+          slope_rating: typeof slope === "number" ? slope : null,
+          course_rating: typeof c.course_rating === "number" ? c.course_rating : null,
+          distance_miles: haversineMiles(userHomeLat, userHomeLng, c.latitude, c.longitude),
         };
       });
 

@@ -13,6 +13,14 @@ export type SuitedCourse = {
    * for legacy rows.
    */
   thumbnail_image: string | null;
+  /** Course slope rating (e.g. 131). Null when not mappable via whs bridge. */
+  slope_rating: number | null;
+  /** Course rating (e.g. 72.1). Null when missing on golf_courses. */
+  course_rating: number | null;
+  /** Distance from user's home location in miles, rounded.
+   *  Null if user has no stored location or course lacks lat/lng. */
+  distance_miles: number | null;
+
 };
 
 export type HandicapInsights = {
