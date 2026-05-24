@@ -1136,6 +1136,17 @@ export interface TrophyAggregates {
     first_sub_100_at: string | null;
     /** Earliest play_date of an 18-hole sub-par round. */
     first_sub_par_at: string | null;
+    /** Holes played in window where (strokes - par) === 0. */
+    pars_count: number;
+    /** Holes played in window where (strokes - par) === 1. */
+    bogey_count: number;
+    /** Holes played in window where (strokes - par) >= 2 AND strokes > 1. */
+    double_plus_count: number;
+    /** Total holes played in window (from whs_score_holes WHERE played = true). */
+    total_holes_in_window: number;
+    /** Aces + albatross + eagles + birdies for the immediately-preceding
+     *  window of same length. NULL for ALL scope. */
+    birdies_or_better_prev_window: number | null;
   };
   course_stats: {
     countries_played: string[];
@@ -1170,10 +1181,14 @@ export interface TrophyAggregates {
 export async function fetchTrophyAggregates(
   userId: string,
   connectionId: string,
+  fromDate?: string | null,
+  toDate?: string | null,
 ): Promise<TrophyAggregates | null> {
   const { data, error } = await supabase.rpc('get_trophy_aggregates' as any, {
     p_user_id: userId,
     p_connection_id: connectionId,
+    p_from_date: fromDate ?? null,
+    p_to_date: toDate ?? null,
   });
   if (error) {
     console.error('[fetchTrophyAggregates] failed:', error);
@@ -1181,4 +1196,5 @@ export async function fetchTrophyAggregates(
   }
   return (data as unknown) as TrophyAggregates;
 }
+
 
