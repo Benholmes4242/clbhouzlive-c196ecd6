@@ -278,8 +278,7 @@ export const EchoInsightsCard: React.FC<Props> = ({ connectionId }) => {
   return (
     <section
       style={{
-        padding: '32px 0 0',
-        marginTop: 8,
+        marginTop: 32,
         position: 'relative',
         overflow: 'hidden',
       }}
