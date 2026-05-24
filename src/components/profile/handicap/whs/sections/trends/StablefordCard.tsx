@@ -733,14 +733,8 @@ const ShotsBody: React.FC<ShotsBodyProps> = ({ trophyAgg, shotsLoading, scope })
   };
   const allSegments: Segment[] = [
     {
-      key: 'eaglePlus',
-      count: eaglePlusCount,
-      background: 'linear-gradient(135deg, #BA6E12 0%, #F7931E 100%)',
-      textColor: '#FFFFFF',
-    },
-    {
-      key: 'birdie',
-      count: birdies,
+      key: 'birdiePlus',
+      count: birdiesOrBetter,
       background: 'linear-gradient(135deg, #B86A0E 0%, #F7931E 100%)',
       textColor: '#FFFFFF',
     },
@@ -767,8 +761,6 @@ const ShotsBody: React.FC<ShotsBodyProps> = ({ trophyAgg, shotsLoading, scope })
   const segments = allSegments.filter((s) => s.count > 0);
   const segTotal = segments.reduce((acc, s) => acc + s.count, 0) || 1;
 
-  const eaglePlusIsThin = eaglePlusCount > 0 && eaglePlusCount / segTotal < 0.05;
-  const eaglePlusCenterPct = (eaglePlusCount / segTotal) * 50; // half-width since it's first
 
   // Footnote
   const footnoteHtml =
