@@ -1,10 +1,11 @@
 import React from 'react';
-import TrendCardsStack from '../sections/trends/TrendCardsStack';
+import ForecastCard from '../sections/ForecastCard';
 import WhereYouStandSection from '../sections/WhereYouStandSection';
 import RoundsThatCountCard from '../sections/RoundsThatCountCard';
 import IndexHistoryCard from '../sections/IndexHistoryCard';
 import CourseFormCard from '../sections/trends/CourseFormCard';
 import EchoInsightsCard from '../sections/EchoInsightsCard';
+
 
 interface Props {
   connectionId: string;
@@ -32,13 +33,9 @@ export const TrendsView: React.FC<Props> = ({
       aria-labelledby="handicap-tab-trends"
       style={{ paddingTop: 16 }}
     >
-      {/* 1. Form hero + projection */}
-      <TrendCardsStack
-        connectionId={connectionId}
-        currentHandicap={currentHandicap}
-        splitAt="hero-only"
-        topMargin={0}
-      />
+      {/* 1. Forecast */}
+      <ForecastCard connectionId={connectionId} currentHandicap={currentHandicap} />
+
 
       {/* 2. Where You Stand — owner only */}
       {!readOnly && <WhereYouStandSection userId={userId} />}

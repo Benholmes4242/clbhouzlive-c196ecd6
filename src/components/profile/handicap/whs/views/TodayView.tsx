@@ -6,7 +6,7 @@ import TodayGreeting from '../sections/TodayGreeting';
 import LastRoundCard from '../sections/LastRoundCard';
 import NextRoundWatch from '../sections/NextRoundWatch';
 import Pattern14Card from '../sections/Pattern14Card';
-import ForecastCard from '../sections/ForecastCard';
+
 
 import RecentUnlocksStrip from '../gam/RecentUnlocksStrip';
 import { LaunchSheetMount } from '../../gam/launch/LaunchSheetMount';
@@ -67,10 +67,6 @@ export const TodayView: React.FC<Props> = ({
         <HeroHandicapCardDark connection={connection} />
       </div>
 
-      {/* 1b. Forecast card — owner only */}
-      {!readOnly && (
-        <ForecastCard connectionId={connectionId} currentHandicap={currentHandicap} />
-      )}
 
       {/* 2. Recent Unlocks */}
       <RecentUnlocksStrip userId={userId} readOnly={readOnly} />
