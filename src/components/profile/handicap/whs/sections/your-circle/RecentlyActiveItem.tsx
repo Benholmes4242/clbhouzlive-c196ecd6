@@ -39,7 +39,7 @@ export const RecentlyActiveItem: React.FC<Props> = ({ entry, isActive, onClick }
         background: 'var(--hcp-bg-2)',
         border: '1px solid rgba(255,255,255,0.06)',
         borderRadius: 14,
-        padding: '10px 8px 9px',
+        padding: '9px 8px',
         cursor: onClick ? 'pointer' : 'default',
         display: 'flex',
         flexDirection: 'column',
@@ -78,12 +78,13 @@ export const RecentlyActiveItem: React.FC<Props> = ({ entry, isActive, onClick }
       </div>
       <p
         style={{
-          marginTop: 8,
+          marginTop: 6,
           marginBottom: 0,
           fontSize: 11.5,
           fontWeight: 800,
           color: 'var(--hcp-t-100)',
           letterSpacing: '-0.005em',
+          lineHeight: 1,
           maxWidth: 76,
           overflow: 'hidden',
           textOverflow: 'ellipsis',
@@ -101,6 +102,7 @@ export const RecentlyActiveItem: React.FC<Props> = ({ entry, isActive, onClick }
           color: isPlusHcp ? '#4ADE80' : 'var(--hcp-t-100)',
           fontVariantNumeric: 'tabular-nums',
           letterSpacing: '-0.02em',
+          lineHeight: 1,
         }}
       >
         {hcpStr}
@@ -108,7 +110,7 @@ export const RecentlyActiveItem: React.FC<Props> = ({ entry, isActive, onClick }
       {relative && (
         <p
           style={{
-            marginTop: 4,
+            marginTop: 3,
             marginBottom: 0,
             fontSize: 9,
             fontWeight: 700,
@@ -116,6 +118,7 @@ export const RecentlyActiveItem: React.FC<Props> = ({ entry, isActive, onClick }
             textTransform: 'uppercase',
             color: 'var(--hcp-t-40, rgba(255,255,255,0.4))',
             fontVariantNumeric: 'tabular-nums',
+            lineHeight: 1,
           }}
         >
           {relative}
