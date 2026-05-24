@@ -675,7 +675,7 @@ const ShotsBody: React.FC<ShotsBodyProps> = ({ trophyAgg, shotsLoading, scope })
   }
 
   const hs = trophyAgg?.hole_stats;
-  const roundsWithHoles = hs?.rounds_with_holes_count ?? 0;
+  const roundsWithHoles = hs?.rounds_with_holes_in_window ?? 0;
   const totalRounds = hs?.total_rounds_count ?? 0;
 
   // 2. No hole data at all
