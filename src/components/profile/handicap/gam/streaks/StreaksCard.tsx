@@ -544,7 +544,7 @@ export const StreaksCard: React.FC<Props> = ({ userId, readOnly = false }) => {
 
   if (isLoading) {
     return (
-      <section style={{ marginTop: 10 }}>
+      <section style={{ marginTop: 32 }}>
         <DarkSectionHeader eyebrow={eyebrowText} />
         <div style={{ padding: '4px 20px 12px' }}>
           <Skeleton height={230} radius={16} />

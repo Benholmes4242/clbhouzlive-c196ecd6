@@ -136,7 +136,7 @@ const IndexHistoryCard: React.FC<Props> = ({ connectionId }) => {
   const minDateLabel = formatMinDate(minDate);
 
   return (
-    <section style={{ marginTop: 10 }}>
+    <section style={{ marginTop: 32 }}>
       <DarkSectionHeader
         eyebrow="INDEX HISTORY"
         right={<RangePills value={range} onChange={setRange} />}

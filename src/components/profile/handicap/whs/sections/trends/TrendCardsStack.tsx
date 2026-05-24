@@ -17,8 +17,6 @@ interface Props {
    * 'rest' = StablefordCard.
    * undefined (default) = whole stack (backwards-compatible). */
   splitAt?: 'hero-only' | 'rest';
-  /** Override the canonical top margin. Pass 0 for the first card on the tab. */
-  topMargin?: number;
 }
 
 const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
@@ -27,7 +25,7 @@ const INK_55 = 'var(--hcp-t-60)';
 const HOT_RED = '#DC2626';
 const COLD_BLUE = '#0EA5E9';
 const SLATE = 'var(--hcp-t-80)';
-export const TrendCardsStack: React.FC<Props> = ({ connectionId, userId, currentHandicap, splitAt, topMargin }) => {
+export const TrendCardsStack: React.FC<Props> = ({ connectionId, userId, currentHandicap, splitAt }) => {
 
   const { data: scores, isLoading } = useAllScores(connectionId);
   const prediction = predictHandicap(scores ?? []);
@@ -52,7 +50,7 @@ export const TrendCardsStack: React.FC<Props> = ({ connectionId, userId, current
   const [showInfo, setShowInfo] = useState(false);
 
   return (
-    <section style={{ padding: '0 16px', marginTop: topMargin ?? 20, fontFamily: FONT }}>
+    <section style={{ padding: '0 16px', marginTop: 32, fontFamily: FONT }}>
       {splitAt !== 'rest' && (showHero ? (
         <div style={{ padding: '0 0 10px' }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, marginBottom: 6 }}>
