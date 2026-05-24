@@ -74,7 +74,7 @@ const CardShell: React.FC<{
 }> = ({ borderColor, bgTint, children }) => (
   <div
     style={{
-      margin: '0 20px',
+      margin: '0 16px',
       background: bgTint ? `${bgTint}, ${T.cardBg}` : T.cardBg,
       border: `1px solid ${borderColor ?? T.border}`,
       borderRadius: 16,
@@ -703,7 +703,7 @@ const ForecastSkeleton: React.FC = () => (
     <DarkSectionHeader eyebrow="Your form" />
     <div
       style={{
-        margin: '0 20px',
+        margin: '0 16px',
         background: T.cardBg,
         border: `1px solid ${T.border}`,
         borderRadius: 16,

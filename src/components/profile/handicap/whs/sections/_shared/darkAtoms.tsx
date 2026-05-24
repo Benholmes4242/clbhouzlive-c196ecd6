@@ -68,7 +68,7 @@ export const DarkSectionHeader: React.FC<DarkSectionHeaderProps> = ({
         display: 'flex',
         alignItems: 'baseline',
         justifyContent: 'space-between',
-        padding: '22px 20px 8px',
+        padding: '22px 16px 8px',
         fontFamily: FONT,
       }}
     >
@@ -101,7 +101,7 @@ export const DarkSectionHeader: React.FC<DarkSectionHeaderProps> = ({
     {title && (
       <h2
         style={{
-          padding: '0 20px 4px',
+          padding: '0 16px 4px',
           fontSize: 19,
           fontWeight: 800,
           letterSpacing: '-0.018em',
@@ -117,7 +117,7 @@ export const DarkSectionHeader: React.FC<DarkSectionHeaderProps> = ({
     {sub && (
       <p
         style={{
-          padding: '0 20px 12px',
+          padding: '0 16px 12px',
           fontSize: 12.5,
           color: 'var(--hcp-t-60)',
           lineHeight: 1.5,
@@ -167,7 +167,7 @@ export const DarkCard: React.FC<DarkCardProps> = ({
       className={className}
       style={{
         position: 'relative',
-        margin: '0 20px',
+        margin: '0 16px',
         background: glowStop
           ? `linear-gradient(180deg, ${glowStop} 0%, transparent 60%), var(--hcp-bg-1)`
           : 'var(--hcp-bg-1)',

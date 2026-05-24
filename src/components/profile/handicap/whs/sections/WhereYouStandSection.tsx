@@ -434,7 +434,7 @@ const AvailableCard: React.FC<{
 const UnavailableCard: React.FC<{ reason: 'cohort_unavailable' }> = () => (
   <div
     style={{
-      margin: '0 20px',
+      margin: '0 16px',
       padding: '20px',
       borderRadius: 14,
       background: 'var(--hcp-bg-2)',

@@ -139,7 +139,7 @@ const LastRoundHeroCard: React.FC<Props> = ({ round, timeAgo, onClick }) => {
       style={{
         position: 'relative',
         height: 280,
-        margin: '0 20px',
+        margin: '0 16px',
         borderRadius: 18,
         overflow: 'hidden',
         background: '#0F172A',
