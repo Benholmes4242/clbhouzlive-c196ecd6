@@ -300,48 +300,8 @@ export const RoundsThatCountCard: React.FC<Props> = ({
       <SectionHeader
         eyebrow="ROUNDS THAT COUNT"
         title={headerTitle}
-        right={
-          <div
-            role="tablist"
-            aria-label="Chart mode"
-            style={{
-              display: 'inline-flex',
-              background: 'var(--hcp-bg-2)',
-              border: `1px solid ${D_LINE}`,
-              borderRadius: 999,
-              padding: 2,
-              gap: 0,
-            }}
-          >
-            {(['diff', 'stableford'] as const).map((m) => {
-              const isActive = chartMode === m;
-              return (
-                <button
-                  key={m}
-                  role="tab"
-                  aria-selected={isActive}
-                  onClick={() => setChartMode(m)}
-                  style={{
-                    fontFamily: FONT_GEIST,
-                    fontSize: 11,
-                    fontWeight: 800,
-                    letterSpacing: '0.08em',
-                    textTransform: 'uppercase',
-                    padding: '7px 14px',
-                    borderRadius: 999,
-                    border: 'none',
-                    background: isActive ? AMBER : 'transparent',
-                    color: isActive ? '#fff' : D_T60,
-                    cursor: 'pointer',
-                  }}
-                >
-                  {m === 'diff' ? 'Score diff' : 'Stableford'}
-                </button>
-              );
-            })}
-          </div>
-        }
       />
+
       <div style={{ padding: '0 20px' }}>
 
       {chartMode === 'diff' && (
