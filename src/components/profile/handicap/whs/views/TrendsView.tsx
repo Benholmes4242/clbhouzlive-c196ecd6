@@ -5,6 +5,7 @@ import RoundsThatCountCard from '../sections/RoundsThatCountCard';
 import IndexHistoryCard from '../sections/IndexHistoryCard';
 import CourseFormCard from '../sections/trends/CourseFormCard';
 import EchoInsightsCard from '../sections/EchoInsightsCard';
+import TrendCardsStack from '../sections/trends/TrendCardsStack';
 
 
 interface Props {
