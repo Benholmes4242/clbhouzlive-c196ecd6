@@ -196,10 +196,10 @@ export const YourCircleSection: React.FC<Props> = ({ userId }) => {
           <div
             style={{
               display: 'flex',
-              gap: 14,
-              padding: '4px 20px 6px',
-              scrollPaddingLeft: 20,
-              scrollPaddingRight: 20,
+              gap: 8,
+              padding: '4px 16px 6px',
+              scrollPaddingLeft: 16,
+              scrollPaddingRight: 16,
               overflowX: 'auto',
               scrollSnapType: 'x proximity',
               WebkitOverflowScrolling: 'touch',
