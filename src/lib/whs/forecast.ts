@@ -189,7 +189,9 @@ export function buildForecast(
   else state = 'worsening';
 
   // ── Cut target (single source of truth) ─────────────────────────────
-  const next = projectNextRound(window, currentHandicap);
+  // projectNextRound only reads handicap_differential + play_date — the extra
+  // WhsScoreWithIndex fields aren't touched, so the cast is safe.
+  const next = projectNextRound(window as never, currentHandicap);
   const cutTarget = next.hasData ? next.cutTarget : null;
   const ifTheyHitCut = cutTarget != null ? round1(currentHandicap - 0.1) : null;
 
