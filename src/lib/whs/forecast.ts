@@ -149,13 +149,12 @@ export function buildForecast(
   const currentCounters = sortedByDiff.slice(0, COUNTER_COUNT);
 
   // ── Expiring / new / at-risk flags ──────────────────────────────────
-  const oldestInWindow = window[window.length - 1];
-  const isOldestACounter = currentCounters.some((c) => c.id === oldestInWindow?.id);
   const top5RecentIds = new Set(allScores.slice(0, 5).map((s) => s.id));
   const newCounters = currentCounters.filter((c) => top5RecentIds.has(c.id));
 
   // 5 oldest rounds in the window — these roll off over the projection horizon.
   const oldestHorizon = window.slice(-PROJECTION_HORIZON);
+  const horizonOldestIds = new Set(oldestHorizon.map((s) => s.id));
   const counterIds = new Set(currentCounters.map((c) => c.id));
   const countersAtRiskInHorizon = oldestHorizon.filter((s) => counterIds.has(s.id)).length;
 
