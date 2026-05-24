@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ChevronRight, Crown } from 'lucide-react';
+import { ChevronRight } from 'lucide-react';
 import type { LegendCategory } from '@/lib/gam/types';
 import {
   legendCategoryIcon,
