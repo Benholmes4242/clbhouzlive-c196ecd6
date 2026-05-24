@@ -1125,6 +1125,16 @@ export interface TrophyAggregates {
     albatross_count: number;
     sub_par_rounds_count: number;
     rounds_with_holes_count: number;
+    /** Aces in the windowed range. */
+    aces_count_window: number;
+    /** Albatross in the windowed range. */
+    albatross_count_window: number;
+    /** Eagles in the windowed range. */
+    eagles_count_window: number;
+    /** Birdies in the windowed range. */
+    birdies_count_window: number;
+    /** Rounds with hole-by-hole data in the windowed range. */
+    rounds_with_holes_in_window: number;
     total_rounds_count: number;
     /** Lowest gross score across 18-hole rounds. 9-hole rounds excluded. */
     best_gross: number | null;
