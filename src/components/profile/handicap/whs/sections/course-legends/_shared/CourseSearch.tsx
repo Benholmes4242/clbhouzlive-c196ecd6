@@ -8,9 +8,11 @@ interface Props {
   onChange: (v: string) => void;
   /** Optional helper subtitle rendered below the input. */
   helper?: string;
+  inputRef?: React.RefObject<HTMLInputElement>;
+  autoFocus?: boolean;
 }
 
-export const CourseSearch: React.FC<Props> = ({ value, onChange, helper }) => (
+export const CourseSearch: React.FC<Props> = ({ value, onChange, helper, inputRef, autoFocus }) => (
   <div style={{ padding: '20px 16px 0' }}>
     <div
       style={{
@@ -25,6 +27,8 @@ export const CourseSearch: React.FC<Props> = ({ value, onChange, helper }) => (
     >
       <Search size={16} color="var(--hcp-t-60)" />
       <input
+        ref={inputRef}
+        autoFocus={autoFocus}
         type="text"
         value={value}
         onChange={(e) => onChange(e.target.value)}

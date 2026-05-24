@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Crown } from 'lucide-react';
 import { useUserPlayedCourses } from '@/hooks/gam/useUserPlayedCourses';
 import { useUserHomeClubCourses } from '@/hooks/gam/useUserHomeClubCourses';
@@ -178,6 +178,18 @@ export const CourseLegendsSection: React.FC<Props> = ({
   const discover = discoverQuery.data ?? [];
   const showSearchResults = query.trim().length >= 2;
 
+  const searchInputRef = useRef<HTMLInputElement>(null);
+  const searchWrapperRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!showSearchResults) return;
+    const id = requestAnimationFrame(() => {
+      searchWrapperRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      searchInputRef.current?.focus({ preventScroll: true });
+    });
+    return () => cancelAnimationFrame(id);
+  }, [showSearchResults]);
+
   // Dedupe played against home club
   const homeClubIds = useMemo(
     () => new Set(homeClubCourses.map((c) => c.course_id)),
@@ -220,11 +232,13 @@ export const CourseLegendsSection: React.FC<Props> = ({
 
       {showSearchResults ? (
         <>
-          <div style={{ margin: '4px 0 0' }}>
+          <div ref={searchWrapperRef} style={{ margin: '4px 0 0', scrollMarginTop: 12 }}>
             <CourseSearch
               value={query}
               onChange={setQuery}
               helper="Find a course — see the legends"
+              inputRef={searchInputRef}
+              autoFocus
             />
           </div>
           <SearchResultsSubsection
