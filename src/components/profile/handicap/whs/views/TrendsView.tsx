@@ -33,13 +33,9 @@ export const TrendsView: React.FC<Props> = ({
       aria-labelledby="handicap-tab-trends"
       style={{ paddingTop: 16 }}
     >
-      {/* 1. Form hero + projection */}
-      <TrendCardsStack
-        connectionId={connectionId}
-        currentHandicap={currentHandicap}
-        splitAt="hero-only"
-        topMargin={0}
-      />
+      {/* 1. Forecast */}
+      <ForecastCard connectionId={connectionId} currentHandicap={currentHandicap} />
+
 
       {/* 2. Where You Stand — owner only */}
       {!readOnly && <WhereYouStandSection userId={userId} />}
