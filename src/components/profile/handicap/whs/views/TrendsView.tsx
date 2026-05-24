@@ -5,6 +5,7 @@ import RoundsThatCountCard from '../sections/RoundsThatCountCard';
 import IndexHistoryCard from '../sections/IndexHistoryCard';
 import CourseFormCard from '../sections/trends/CourseFormCard';
 import EchoInsightsCard from '../sections/EchoInsightsCard';
+import TrendCardsStack from '../sections/trends/TrendCardsStack';
 
 
 interface Props {
@@ -56,6 +57,13 @@ export const TrendsView: React.FC<Props> = ({
 
       {/* 6. Echo Insights — owner only */}
       {!readOnly && <EchoInsightsCard connectionId={connectionId} />}
+
+      {/* 7. Stableford distribution */}
+      <TrendCardsStack
+        connectionId={connectionId}
+        currentHandicap={currentHandicap}
+        splitAt="rest"
+      />
     </div>
   );
 };
