@@ -237,7 +237,7 @@ const StreakHeroCard: React.FC<StreakHeroCardProps> = ({ entry, row }) => {
     <div
       style={{
         position: 'relative',
-        margin: '0 20px',
+        margin: '0 16px',
         padding: '18px 18px 16px',
         borderRadius: 16,
         overflow: 'hidden',

@@ -107,7 +107,7 @@ const Pattern14Card: React.FC<Props> = ({ connectionId }) => {
         <DarkSectionHeader eyebrow="Last 14 Rounds" right="SCORE DIFF VS HCP" />
         <div
           style={{
-            margin: '0 20px',
+            margin: '0 16px',
             position: 'relative',
             borderRadius: 16,
             overflow: 'hidden',
