@@ -213,9 +213,9 @@ const MiniCard: React.FC<{
       >
         {course.name || '—'}
       </div>
-      {course.region && (
+      {(course.country || course.region) && (
         <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.7)', marginTop: 2 }}>
-          {course.region}
+          {[course.country, course.region].filter(Boolean).join(' · ')}
         </div>
       )}
     </div>
