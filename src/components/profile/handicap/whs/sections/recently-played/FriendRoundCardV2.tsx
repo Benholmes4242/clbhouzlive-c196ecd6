@@ -124,21 +124,12 @@ export const FriendRoundCardV2: React.FC<Props> = ({
           <FlagSilhouetteOverlay opacity={0.18} />
         )}
 
-        {/* Editorial scrim — top fade */}
+        {/* Editorial scrim */}
         <div
           aria-hidden
           style={{
-            position: 'absolute', top: 0, left: 0, right: 0, height: '40%',
-            background: PHOTO_SCRIM_TOP,
-            pointerEvents: 'none',
-          }}
-        />
-        {/* Editorial scrim — bottom fade */}
-        <div
-          aria-hidden
-          style={{
-            position: 'absolute', bottom: 0, left: 0, right: 0, height: '55%',
-            background: PHOTO_SCRIM_BOTTOM,
+            position: 'absolute', inset: 0,
+            background: PHOTO_SCRIM,
             pointerEvents: 'none',
           }}
         />
