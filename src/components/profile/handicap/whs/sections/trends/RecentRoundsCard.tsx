@@ -106,14 +106,7 @@ const fmtRelativeDate = (iso: string): string => {
   return `${Math.floor(days / 365)}y ago`;
 };
 
-const fmtAbsoluteDate = (iso: string): string => {
-  try {
-    return format(new Date(iso), 'd LLL yyyy');
-  } catch {
-    return iso;
-  }
-};
-
+import { fmtAbsoluteDate } from '@/lib/whs/utils/nameFormat';
 
 const fmtMonth = (iso: string): string => {
   try {
