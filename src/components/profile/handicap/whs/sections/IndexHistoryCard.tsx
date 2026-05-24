@@ -225,34 +225,41 @@ const IndexHistoryCard: React.FC<Props> = ({ connectionId }) => {
               stroke={lineColorHex}
               strokeWidth={1.5}
             />
-            {/* Start value label */}
-            <text
-              x={firstX + 6}
-              y={firstY - 8}
-              fontSize={10}
-              fontWeight={700}
-              fill="var(--hcp-t-60)"
-              textAnchor="start"
-              style={{ fontVariantNumeric: "tabular-nums" }}
-            >
-              {fmtHcp(firstHcp)}
-            </text>
 
             {/* End marker (filled) */}
             <circle cx={lastX} cy={lastY} r={4} fill={lineColorHex} />
-            {/* End value label */}
-            <text
-              x={lastX - 6}
-              y={lastY - 10}
-              fontSize={11}
-              fontWeight={800}
-              fill={lineColorHex}
-              textAnchor="end"
-              style={{ fontVariantNumeric: "tabular-nums" }}
+
+          </svg>
+
+          {/* Dot value labels — anchored above start/end date labels */}
+          <div style={{ position: 'relative', height: 16, marginTop: 4 }}>
+            <span
+              style={{
+                position: 'absolute',
+                left: `${(firstX / W) * 100}%`,
+                transform: 'translateX(0)',
+                fontSize: 11,
+                fontWeight: 700,
+                color: 'var(--hcp-t-60)',
+                fontVariantNumeric: 'tabular-nums',
+              }}
+            >
+              {fmtHcp(firstHcp)}
+            </span>
+            <span
+              style={{
+                position: 'absolute',
+                left: `${(lastX / W) * 100}%`,
+                transform: 'translateX(-100%)',
+                fontSize: 11,
+                fontWeight: 800,
+                color: lineColorHex,
+                fontVariantNumeric: 'tabular-nums',
+              }}
             >
               {fmtHcp(lastHcp)}
-            </text>
-          </svg>
+            </span>
+          </div>
 
           {/* X-axis labels */}
           <div
