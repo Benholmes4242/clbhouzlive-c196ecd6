@@ -90,7 +90,7 @@ const NextRoundWatch: React.FC<Props> = ({ connectionId, currentHandicap }) => {
       <div
         style={{
           margin: '0 20px',
-          background: 'var(--hcp-bg-1)',
+          background: `${sweep}, var(--hcp-bg-1)`,
           border: '1px solid var(--hcp-line-2)',
           borderRadius: 16,
           overflow: 'hidden',
@@ -102,7 +102,6 @@ const NextRoundWatch: React.FC<Props> = ({ connectionId, currentHandicap }) => {
           style={{
             position: 'relative',
             padding: '12px 18px 10px',
-            background: sweep,
           }}
         >
           <div
