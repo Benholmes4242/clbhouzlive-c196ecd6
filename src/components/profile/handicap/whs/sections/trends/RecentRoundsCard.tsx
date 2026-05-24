@@ -684,15 +684,28 @@ const FeedCard: React.FC<FeedCardProps> = ({ round, onTap }) => {
           ) : (
             <span
               style={{
-                fontSize: 22,
-                fontWeight: 200,
-                color: T.ink,
-                fontVariantNumeric: 'tabular-nums',
-                letterSpacing: '-0.04em',
-                lineHeight: 0.9,
+                width: 38,
+                height: 38,
+                display: 'inline-flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                border: '1.5px solid transparent',
+                borderRadius: '50%',
+                boxSizing: 'border-box',
               }}
             >
-              {round.adjusted_gross ?? '\u2014'}
+              <span
+                style={{
+                  fontSize: 22,
+                  fontWeight: 200,
+                  color: T.ink,
+                  fontVariantNumeric: 'tabular-nums',
+                  letterSpacing: '-0.04em',
+                  lineHeight: 0.9,
+                }}
+              >
+                {round.adjusted_gross ?? '\u2014'}
+              </span>
             </span>
           )}
         </span>
