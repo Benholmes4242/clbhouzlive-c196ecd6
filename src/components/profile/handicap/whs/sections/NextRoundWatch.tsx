@@ -102,7 +102,6 @@ const NextRoundWatch: React.FC<Props> = ({ connectionId, currentHandicap }) => {
           style={{
             position: 'relative',
             padding: '16px 18px 18px',
-            borderBottom: '1px solid var(--hcp-line-2)',
             background: sweep,
           }}
         >
@@ -183,7 +182,6 @@ const NextRoundWatch: React.FC<Props> = ({ connectionId, currentHandicap }) => {
           <div
             style={{
               padding: '18px 18px 18px',
-              borderBottom: '1px solid var(--hcp-line-2)',
             }}
           >
             {/* Inset wrapper so the bar sits 20px inside the band's left/right edges.
