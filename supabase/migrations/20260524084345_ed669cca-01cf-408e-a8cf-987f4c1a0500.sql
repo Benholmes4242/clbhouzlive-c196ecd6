@@ -1,0 +1,1 @@
+DELETE FROM public.whs_ai_insights WHERE connection_id = '789b4282-c5a6-492a-a011-e00d00b90d85';
