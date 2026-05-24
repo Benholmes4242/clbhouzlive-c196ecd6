@@ -103,11 +103,11 @@ export const InviteToClbhouzV2: React.FC<Props> = ({ ownerUserId }) => {
       />
 
       {!friendsLoading && invitable.length > 0 && (
-        <div style={{ margin: '0 20px' }}>
+        <div style={{ margin: '0 16px' }}>
           <div
             style={{
               display: 'grid',
-              gridTemplateColumns: '1fr 1fr',
+              gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr)',
               gap: 8,
             }}
           >
