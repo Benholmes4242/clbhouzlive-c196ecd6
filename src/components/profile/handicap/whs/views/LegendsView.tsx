@@ -24,7 +24,12 @@ export const LegendsView: React.FC<Props> = ({
   const [view, setView] = useState<ViewMode>({ mode: 'list' });
 
   return (
-    <div role="tabpanel" id="handicap-panel-legends" aria-labelledby="handicap-tab-legends">
+    <div
+      role="tabpanel"
+      id="handicap-panel-legends"
+      aria-labelledby="handicap-tab-legends"
+      style={{ paddingTop: 16 }}
+    >
       {view.mode === 'list' ? (
         <>
           {/* 1. Friends Leaderboard */}
