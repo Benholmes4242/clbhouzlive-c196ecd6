@@ -676,8 +676,7 @@ function computeFriendSignals(
 
 function buildPrompt(
   rounds: any[],
-  suitedPicks: any[],
-  testPicks: any[],
+  candidates: any[],
   dateKey: string,
   signals: TrendSignals,
   friendSignals: FriendSignals | null,
