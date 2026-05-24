@@ -6,7 +6,7 @@ import { useAllScores, useHandicapTrend } from '@/lib/whs/hooks';
 import { computeRoundDeltas, type RoundWithDelta } from './computeRoundDeltas';
 import RoundDetailSheet from '../round-detail/RoundDetailSheet';
 import SectionHeader from '../SectionHeader';
-import { InkGrossRing } from '../shared/GrossCounterRing';
+
 
 interface Props {
   connectionId: string;
@@ -675,39 +675,33 @@ const FeedCard: React.FC<FeedCardProps> = ({ round, onTap }) => {
         <span
           aria-label={`Gross score ${round.adjusted_gross ?? ''}${round.is_counter ? ', counts toward index' : ''}`}
         >
-          {round.is_counter ? (
-            <InkGrossRing
-              value={round.adjusted_gross ?? '\u2014'}
-              isCounter
-              size="md"
-            />
-          ) : (
+          <span
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              padding: '6px 12px',
+              borderRadius: 999,
+              border: round.is_counter
+                ? '1.5px solid #22C55E'
+                : '1.5px solid transparent',
+              boxSizing: 'border-box',
+              minWidth: 56,
+            }}
+          >
             <span
               style={{
-                width: 38,
-                height: 38,
-                display: 'inline-flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                border: '1.5px solid transparent',
-                borderRadius: '50%',
-                boxSizing: 'border-box',
+                fontSize: round.is_counter ? 17 : 22,
+                fontWeight: round.is_counter ? 800 : 200,
+                color: T.ink,
+                fontVariantNumeric: 'tabular-nums',
+                letterSpacing: '-0.03em',
+                lineHeight: 0.9,
               }}
             >
-              <span
-                style={{
-                  fontSize: 22,
-                  fontWeight: 200,
-                  color: T.ink,
-                  fontVariantNumeric: 'tabular-nums',
-                  letterSpacing: '-0.04em',
-                  lineHeight: 0.9,
-                }}
-              >
-                {round.adjusted_gross ?? '\u2014'}
-              </span>
+              {round.adjusted_gross ?? '\u2014'}
             </span>
-          )}
+          </span>
         </span>
         <div
           style={{
