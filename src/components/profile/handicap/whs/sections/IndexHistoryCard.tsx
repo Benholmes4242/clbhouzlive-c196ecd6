@@ -27,16 +27,15 @@ const IndexHistoryCard: React.FC<Props> = ({ connectionId }) => {
       ) as { observed_at: string; handicap_index: number }[];
   }, [history]);
 
-  // ── Geometry constants (safe to compute before early return) ────
+  // ── Geometry constants ──────────────────────────────────────
   const W = 320;
-  const H = 140;
+  const H = 180;
   const PADDING_X = 6;
-  const PADDING_Y_TOP = 10;
+  const PADDING_Y_TOP = 18;
   const PADDING_Y_BOTTOM = 14;
   const plotW = W - PADDING_X * 2;
   const plotH = H - PADDING_Y_TOP - PADDING_Y_BOTTOM;
 
-  // Compute everything via useMemo so hooks order is stable
   const chart = useMemo(() => {
     if (points.length < 2) return null;
     const first = points[0];
@@ -76,12 +75,16 @@ const IndexHistoryCard: React.FC<Props> = ({ connectionId }) => {
     const lastY = py(lastHcp);
     const areaPath = `${linePath} L ${lastX.toFixed(2)} ${baselineY} L ${firstX.toFixed(2)} ${baselineY} Z`;
 
+    const minIdx = allHcps.indexOf(minHcp);
+    const minDate = points[minIdx].observed_at;
+
     return {
       firstHcp,
       lastHcp,
       netDelta,
       minHcp,
       maxHcp,
+      minDate,
       firstT,
       lastT,
       px,
@@ -118,46 +121,71 @@ const IndexHistoryCard: React.FC<Props> = ({ connectionId }) => {
 
   if (isLoading || !chart) return null;
 
-  const { netDelta, firstHcp, lastHcp, linePath, areaPath, firstX, firstY, lastX, lastY } = chart;
+  const { netDelta, firstHcp, lastHcp, minHcp, minDate, linePath, areaPath, firstX, firstY, lastX, lastY } = chart;
 
   const isImproving = netDelta < -0.05;
   const isWorsening = netDelta > 0.05;
   const lineColorHex = isImproving ? '#22C55E' : isWorsening ? '#EF4444' : '#F7931E';
 
-  const summary = buildSummary(points, netDelta);
   const gradientId = `idx-fade-${connectionId.slice(0, 8)}`;
 
-  const innerTitle =
-    range === '1M' ? '30-day trend' : range === '3M' ? '90-day trend' : '1-year trend';
+  const periodLabel =
+    range === '1M' ? '30 days' : range === '3M' ? '90 days' : '1 year';
+
+  const arrow = netDelta < -0.05 ? '↓' : netDelta > 0.05 ? '↑' : '—';
+  const minDateLabel = formatMinDate(minDate);
 
   return (
     <section style={{ marginTop: 10 }}>
       <DarkSectionHeader
         eyebrow="INDEX HISTORY"
-        right={`${fmtHcp(firstHcp)} → ${fmtHcp(lastHcp)}`}
+        right={<RangePills value={range} onChange={setRange} />}
       />
       <DarkCard>
-        <div style={{ padding: '14px 16px 16px', fontFamily: FONT }}>
-          {/* Inner header */}
+        <div style={{ padding: '16px 18px', fontFamily: FONT }}>
+          {/* Inner header — big delta */}
           <div
             style={{
               display: 'flex',
-              alignItems: 'center',
               justifyContent: 'space-between',
-              marginBottom: 10,
+              alignItems: 'center',
+              paddingBottom: 10,
             }}
           >
+            <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
+              <span
+                style={{
+                  fontSize: 22,
+                  fontWeight: 800,
+                  letterSpacing: '-0.02em',
+                  lineHeight: 1,
+                  color: lineColorHex,
+                  fontVariantNumeric: 'tabular-nums',
+                }}
+              >
+                {arrow} {Math.abs(netDelta).toFixed(1)}
+              </span>
+              <span
+                style={{
+                  fontSize: 12,
+                  fontWeight: 600,
+                  color: 'var(--hcp-t-60)',
+                }}
+              >
+                over {periodLabel}
+              </span>
+            </div>
             <span
               style={{
-                fontSize: 14,
+                fontSize: 11,
                 fontWeight: 700,
-                color: 'var(--hcp-t-100)',
-                letterSpacing: '-0.01em',
+                letterSpacing: '0.08em',
+                color: 'var(--hcp-t-40)',
+                fontVariantNumeric: 'tabular-nums',
               }}
             >
-              {innerTitle}
+              {fmtHcp(firstHcp)} → {fmtHcp(lastHcp)}
             </span>
-            <RangePills value={range} onChange={setRange} />
           </div>
 
           {/* Chart */}
@@ -183,7 +211,7 @@ const IndexHistoryCard: React.FC<Props> = ({ connectionId }) => {
               d={linePath}
               fill="none"
               stroke={lineColorHex}
-              strokeWidth={2}
+              strokeWidth={2.5}
               strokeLinecap="round"
               strokeLinejoin="round"
             />
@@ -192,14 +220,38 @@ const IndexHistoryCard: React.FC<Props> = ({ connectionId }) => {
             <circle
               cx={firstX}
               cy={firstY}
-              r={3.5}
+              r={4}
               fill="var(--hcp-bg-2, #0d0d0d)"
               stroke={lineColorHex}
               strokeWidth={1.5}
             />
+            {/* Start value label */}
+            <text
+              x={firstX + 6}
+              y={firstY - 8}
+              fontSize={10}
+              fontWeight={700}
+              fill="var(--hcp-t-60)"
+              textAnchor="start"
+              fontVariantNumeric="tabular-nums"
+            >
+              {fmtHcp(firstHcp)}
+            </text>
 
             {/* End marker (filled) */}
-            <circle cx={lastX} cy={lastY} r={3.5} fill={lineColorHex} />
+            <circle cx={lastX} cy={lastY} r={4} fill={lineColorHex} />
+            {/* End value label */}
+            <text
+              x={lastX - 6}
+              y={lastY - 10}
+              fontSize={11}
+              fontWeight={800}
+              fill={lineColorHex}
+              textAnchor="end"
+              fontVariantNumeric="tabular-nums"
+            >
+              {fmtHcp(lastHcp)}
+            </text>
           </svg>
 
           {/* X-axis labels */}
@@ -234,18 +286,46 @@ const IndexHistoryCard: React.FC<Props> = ({ connectionId }) => {
             ))}
           </div>
 
-          {/* Summary line */}
+          {/* Footer */}
           <div
             style={{
-              marginTop: 14,
-              paddingTop: 12,
+              marginTop: 12,
+              padding: '12px 0 0',
               borderTop: '1px solid var(--hcp-line)',
-              fontSize: 12.5,
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              fontSize: 11,
               color: 'var(--hcp-t-60)',
-              lineHeight: 1.4,
             }}
           >
-            {summary}
+            <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+              <span
+                aria-hidden
+                style={{
+                  width: 6,
+                  height: 6,
+                  borderRadius: '50%',
+                  background: lineColorHex,
+                }}
+              />
+              <span>
+                Lowest{' '}
+                <strong
+                  style={{
+                    color: 'var(--hcp-t-100)',
+                    fontWeight: 700,
+                    fontVariantNumeric: 'tabular-nums',
+                  }}
+                >
+                  {fmtHcp(minHcp)}
+                </strong>{' '}
+                on {minDateLabel}
+              </span>
+            </span>
+            <span style={{ fontVariantNumeric: 'tabular-nums', color: 'var(--hcp-t-40)' }}>
+              {points.length} snapshots
+            </span>
           </div>
         </div>
       </DarkCard>
@@ -314,47 +394,14 @@ function uniqueMonthsBetween(start: number, end: number): number[] {
   return result;
 }
 
-function buildSummary(
-  points: { observed_at: string; handicap_index: number }[],
-  netDelta: number,
-): string {
-  if (points.length < 2) return '';
-  const allHcps = points.map((p) => p.handicap_index);
-  const minHcp = Math.min(...allHcps);
-  const maxHcp = Math.max(...allHcps);
-
-  if (Math.abs(netDelta) < 0.15) {
-    return `Flat. Held steady near ${fmtHcp((minHcp + maxHcp) / 2)} throughout.`;
-  }
-
-  const lowIdx = allHcps.indexOf(minHcp);
-  const highIdx = allHcps.indexOf(maxHcp);
-  const isImproving = netDelta < 0;
-  const direction = isImproving ? 'Down' : 'Up';
-  const magnitude = Math.abs(netDelta).toFixed(1);
-
-  const turningPoint = isImproving
-    ? `Low ${fmtHcp(minHcp)} ${formatRelativeDate(points[lowIdx].observed_at)}`
-    : `Peak ${fmtHcp(maxHcp)} ${formatRelativeDate(points[highIdx].observed_at)}`;
-
-  const tail = isImproving ? 'Holding gains.' : 'Trend wobbling.';
-  return `${direction} ${magnitude} net. ${turningPoint}. ${tail}`;
-}
-
-function formatRelativeDate(iso: string): string {
+function formatMinDate(iso: string): string {
   const d = new Date(iso);
   const now = new Date();
-  const ageDays = (now.getTime() - d.getTime()) / 86400_000;
+  const ageDays = (now.getTime() - d.getTime()) / 86_400_000;
   if (ageDays < 14) {
     return d.toLocaleDateString('en-GB', { weekday: 'long' });
   }
-  if (ageDays < 60) {
-    const month = d.toLocaleDateString('en-GB', { month: 'short' });
-    const day = d.getDate();
-    const which = day < 10 ? 'early' : day < 20 ? 'mid' : 'late';
-    return `${which}-${month}`;
-  }
-  return d.toLocaleDateString('en-GB', { month: 'long' });
+  return d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
 }
 
 export default IndexHistoryCard;
