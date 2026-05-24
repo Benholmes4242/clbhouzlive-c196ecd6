@@ -260,18 +260,6 @@ Deno.serve(async (req) => {
       return { ...c, slope_rating: candidateSlope, expected_differential: expectedDiff };
     });
 
-    // Pre-sort by EXP. Math picks the IDs; the LLM only writes rationale.
-    // Candidates with null EXP (no slope data) are excluded entirely.
-    const candidatesWithValidExp = candidatesWithExpected.filter(
-      (c: any) => typeof c.expected_differential === "number"
-    );
-    const sortedByExp = [...candidatesWithValidExp].sort(
-      (a: any, b: any) => a.expected_differential - b.expected_differential
-    );
-    const suitedPicks = sortedByExp.slice(0, 3);
-    const testPicksRaw = sortedByExp.slice(-3).reverse(); // hardest first
-    const suitedIds = new Set(suitedPicks.map((c: any) => c.id));
-    const testPicks = testPicksRaw.filter((c: any) => !suitedIds.has(c.id));
 
     const latestScoreId = rounds[0].id as string;
 
@@ -288,7 +276,7 @@ Deno.serve(async (req) => {
       trendSignals.current_index,
     );
 
-    const prompt = buildPrompt(roundsForPrompt, suitedPicks, testPicks, dateKey, trendSignals, friendSignals);
+    const prompt = buildPrompt(roundsForPrompt, candidatesWithExpected, dateKey, trendSignals, friendSignals);
 
     const aiResp = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
@@ -688,8 +676,7 @@ function computeFriendSignals(
 
 function buildPrompt(
   rounds: any[],
-  suitedPicks: any[],
-  testPicks: any[],
+  candidates: any[],
   dateKey: string,
   signals: TrendSignals,
   friendSignals: FriendSignals | null,
@@ -734,22 +721,16 @@ function buildPrompt(
   const formatCourseLine = (c: any) =>
     `- id: ${c.id} | name: ${c.name} | region: ${c.region ?? ""} | country: ${c.country ?? ""} | slope: ${c.slope_rating ?? "?"} | EXP: ${typeof c.expected_differential === "number" ? c.expected_differential.toFixed(1) : "?"}`;
 
-  const suitedBlock = suitedPicks.length > 0
-    ? `SUITED COURSES (pre-selected by math as the lowest-EXP matches across Britain & Ireland — write rationale for each):\n${suitedPicks.map(formatCourseLine).join("\n")}`
-    : `SUITED COURSES: none available`;
+  const candidatesBlock = candidates.length > 0
+    ? `CANDIDATE COURSES (pool across Britain & Ireland — pick 3 suited and 3 test from this list):\n${candidates.map(formatCourseLine).join("\n")}`
+    : `CANDIDATE COURSES: none available`;
 
-  const testBlock = testPicks.length > 0
-    ? `TEST COURSES (pre-selected by math as the highest-EXP tests across Britain & Ireland — write rationale for each):\n${testPicks.map(formatCourseLine).join("\n")}`
-    : `TEST COURSES: none available`;
-
-  return `Today is ${dateKey}. Analyse the user's recent WHS round history and write rationales for the pre-selected courses below.
+  return `Today is ${dateKey}. Analyse the user's recent WHS round history and recommend courses from the candidate pool below.
 
 USER'S ROUND HISTORY (last ${rounds.length} rounds, newest first):
 ${JSON.stringify(rounds)}
 
-${suitedBlock}
-
-${testBlock}
+${candidatesBlock}
 
 TREND CONTEXT (computed deterministically — write about these signals in trend_narrative):
 - Form verdict: ${signals.verdict.replace('_', ' ')}
@@ -769,16 +750,16 @@ Produce a JSON response with this exact structure:
   "rounds_pattern": "<1-2 sentences (max 30 words) about your recent counter rounds. Reference specific numbers and wrap key values in **bold** markdown (e.g. **+0.6**, **+1.7**). Use 'you' and 'your'. No speculation.>",
   "trend_narrative": "<EXACTLY 2 sentences, max 50 words total. Sentence 1 names the dominant signal driving your handicap trend in plain language. Sentence 2 grounds the claim in a specific number or course name from TREND CONTEXT. Use 'you' / 'your', never 'this player'. Wrap key numerics in **bold** markdown. NO bullets, NO lists, NO third sentence.>",
   ${friendNarrativeSchemaLine},
-  "suited_courses": [ { "id": "<copy the id from SUITED COURSES block>", "expected_differential": <copy the EXP value from the matching SUITED entry>, "rationale": "<one sentence, max 22 words, why THIS specific course matches the user's best scoring profile. Reference the course by name.>" } ],
-  "test_courses": [ { "id": "<copy the id from TEST COURSES block>", "expected_differential": <copy the EXP value from the matching TEST entry>, "rationale": "<one sentence, max 22 words, why THIS specific course will push the user's game (frame as growth). Reference the course by name.>" } ]
+  "suited_courses": [ { "id": "<id from CANDIDATE COURSES>", "expected_differential": <copy the EXP value from the matching candidate>, "rationale": "<one sentence, max 22 words, why THIS specific course matches the user's best scoring profile. Reference the course by name.>" } ],
+  "test_courses": [ { "id": "<id from CANDIDATE COURSES>", "expected_differential": <copy the EXP value from the matching candidate>, "rationale": "<one sentence, max 22 words, why THIS specific course will push the user's game (frame as growth). Reference the course by name.>" } ]
 }
 
 Rules:
-- Output one entry per SUITED COURSE provided (likely 3, possibly fewer).
-- Output one entry per TEST COURSE provided (likely 3, possibly fewer).
-- The id and expected_differential are pre-determined — copy them exactly from the blocks above.
-- Your only creative task is writing each rationale sentence. Each rationale must reference its specific course by name and explain WHY (suited: matches user's strengths; test: pushes growth).
-- Never invent IDs. Never swap entries between suited and test.
+- Pick exactly 3 suited_courses and 3 test_courses from the CANDIDATE COURSES list.
+- Suited = lowest expected differentials / best fit for the user's strengths. Test = higher expected differentials / stretch the user's game.
+- Never reuse the same id across suited and test. Never invent IDs not in the candidate list.
+- Copy the EXP value exactly from the candidate entry; if EXP is "?", use null.
+- Each rationale must reference its specific course by name and explain WHY (suited: matches strengths; test: pushes growth).
 - IDs go in the "id" field only — never write a UUID in any prose. Use the course name instead.
 - If round sample < 15, prefix scoring_profile with "Early signal: ".
 - rounds_pattern MUST wrap numeric values in **bold** markdown.
