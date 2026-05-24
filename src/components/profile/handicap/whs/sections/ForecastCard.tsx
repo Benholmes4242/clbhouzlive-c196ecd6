@@ -203,12 +203,9 @@ const CounterStrip: React.FC<{
         const fill = isLowerHalf ? T.goodFill : T.amberFill;
         const fillBorder = isLowerHalf ? T.goodFillBorder : T.amberFillBorder;
         const isSelected = selectedCellId === cell.score.id;
-        const baseShadow = cell.isNew
-          ? `0 0 0 2px rgba(34,197,94,0.55)`
-          : 'none';
         const shadow = isSelected
           ? `0 0 0 2px rgba(255,255,255,0.95)`
-          : baseShadow;
+          : 'none';
         return (
           <button
             key={cell.score.id}
