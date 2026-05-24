@@ -23,154 +23,128 @@ interface Props {
   connectionId: string;
 }
 
+function hexToRgba(hex: string, alpha: number): string {
+  const cleaned = hex.replace('#', '');
+  const r = parseInt(cleaned.substring(0, 2), 16);
+  const g = parseInt(cleaned.substring(2, 4), 16);
+  const b = parseInt(cleaned.substring(4, 6), 16);
+  return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+}
+
 const HeroCard: React.FC<{
   course: SuitedCourse;
   accent: string;
   accentTint: string;
   onTap: (id: string) => void;
-}> = ({ course, accent, accentTint, onTap }) => (
-  <button
-    type="button"
-    onClick={() => onTap(course.id)}
-    style={{
-      width: '100%',
-      background: 'var(--hcp-bg-1)',
-      border: '1px solid var(--hcp-line-2)',
-      borderRadius: 14,
-      overflow: 'hidden',
-      cursor: 'pointer',
-      fontFamily: FONT_GEIST,
-      textAlign: 'left',
-      padding: 0,
-      boxShadow: '0 1px 2px rgba(15,23,42,0.04)',
-      display: 'flex',
-      flexDirection: 'column',
-      marginBottom: 10,
-    }}
-    className="active:scale-[0.99] transition-transform"
-  >
-    <div
+  leadLabel: string;
+}> = ({ course, accent, accentTint, onTap, leadLabel }) => (
+  <div style={{ marginBottom: 10 }}>
+    <button
+      type="button"
+      onClick={() => onTap(course.id)}
       style={{
-        position: 'relative',
         width: '100%',
-        aspectRatio: '16 / 8',
-        background: `linear-gradient(135deg, ${accentTint} 0%, rgba(255,255,255,0) 100%)`,
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        borderBottom: `0.5px solid ${INK_10}`,
+        aspectRatio: '1 / 1',
+        position: 'relative',
+        background: course.thumbnail_image
+          ? 'transparent'
+          : `linear-gradient(180deg, ${accentTint} 0%, var(--hcp-bg-2) 100%)`,
+        borderRadius: 18,
         overflow: 'hidden',
+        border: '1px solid var(--hcp-line-2)',
+        padding: 0,
+        cursor: 'pointer',
+        fontFamily: FONT_GEIST,
       }}
+      className="active:scale-[0.99] transition-transform"
     >
-      {course.thumbnail_image ? (
+      {course.thumbnail_image && (
         <img
           src={course.thumbnail_image}
           alt=""
           aria-hidden
           loading="lazy"
-          style={{
-            position: 'absolute',
-            inset: 0,
-            width: '100%',
-            height: '100%',
-            objectFit: 'cover',
-          }}
+          style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }}
         />
-      ) : (
-        <MapPin size={32} color={accent} strokeWidth={1.8} />
       )}
-      {course.expected_differential != null && (
-        <div
-          style={{
-            position: 'absolute',
-            top: 10,
-            right: 10,
-            background: 'var(--hcp-bg-1)',
-            border: '1px solid var(--hcp-line-2)',
-            borderRadius: 10,
-            padding: '6px 11px',
-            display: 'flex',
-            alignItems: 'baseline',
-            gap: 5,
-            boxShadow: '0 1px 2px rgba(15,23,42,0.06)',
-            zIndex: 1,
-          }}
-        >
-          <span
-            style={{
-              fontSize: 10,
-              fontWeight: 800,
-              color: accent,
-              letterSpacing: '0.14em',
-            }}
-          >
-            EXP
-          </span>
-          <span
-            style={{
-              fontSize: 20,
-              fontWeight: 800,
-              color: accent,
-              letterSpacing: '-0.02em',
-              fontVariantNumeric: 'tabular-nums',
-              lineHeight: 1,
-            }}
-          >
-            {fmtDiff(course.expected_differential, { plus: true })}
-          </span>
-        </div>
-      )}
-    </div>
-
-    <div style={{ padding: 14, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 5 }}>
+      <div
+        aria-hidden
+        style={{
+          position: 'absolute', top: 0, left: 0, right: 0, height: '40%',
+          background: 'linear-gradient(180deg, rgba(5,8,16,0.55) 0%, rgba(5,8,16,0) 100%)',
+        }}
+      />
+      <div
+        aria-hidden
+        style={{
+          position: 'absolute', bottom: 0, left: 0, right: 0, height: '55%',
+          background: 'linear-gradient(180deg, rgba(5,8,16,0) 0%, rgba(5,8,16,0.92) 90%)',
+        }}
+      />
       <div
         style={{
-          fontSize: 16,
-          fontWeight: 800,
-          color: 'var(--hcp-t-100)',
-          letterSpacing: '-0.015em',
-          lineHeight: 1.25,
+          position: 'absolute', top: 14, left: 16, right: 16,
+          display: 'flex', justifyContent: 'space-between', alignItems: 'center',
         }}
       >
-        {course.name || '—'}
-      </div>
-      {course.region && (
-        <div
+        <span
           style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: 4,
-            fontSize: 11.5,
-            color: 'var(--hcp-t-60)',
-            minWidth: 0,
+            fontSize: 10, fontWeight: 800, letterSpacing: '0.20em',
+            color: 'rgba(255,255,255,0.85)', textTransform: 'uppercase',
           }}
         >
-          <MapPin size={11} color={INK_40} strokeWidth={2} style={{ flexShrink: 0 }} />
-          <span
+          {leadLabel}
+        </span>
+        <span
+          style={{
+            padding: '4px 8px', borderRadius: 6,
+            fontSize: 10, fontWeight: 800, letterSpacing: '0.06em',
+            background: hexToRgba(accent, 0.20),
+            color: accent,
+            border: `1px solid ${hexToRgba(accent, 0.40)}`,
+            fontVariantNumeric: 'tabular-nums',
+          }}
+        >
+          EXP {course.expected_differential != null
+            ? fmtDiff(course.expected_differential, { plus: true })
+            : '—'}
+        </span>
+      </div>
+      <div style={{ position: 'absolute', left: 18, right: 18, bottom: 16, textAlign: 'left' }}>
+        {course.region && (
+          <div
             style={{
-              overflow: 'hidden',
-              textOverflow: 'ellipsis',
-              whiteSpace: 'nowrap',
+              fontSize: 11, fontWeight: 800, letterSpacing: '0.14em',
+              color: 'rgba(255,255,255,0.65)', marginBottom: 6, textTransform: 'uppercase',
             }}
           >
             {course.region}
-          </span>
-        </div>
-      )}
-      {course.rationale && (
-        <p
+          </div>
+        )}
+        <div
           style={{
-            margin: '6px 0 0',
-            fontSize: 13,
-            lineHeight: 1.5,
-            color: 'var(--hcp-t-80)',
+            fontSize: 26, fontWeight: 800, letterSpacing: '-0.02em',
+            lineHeight: 1.1, color: '#F8FAFC',
           }}
         >
-          {course.rationale}
-        </p>
-      )}
-    </div>
-  </button>
+          {course.name || '—'}
+        </div>
+      </div>
+    </button>
+    {course.rationale && (
+      <p
+        style={{
+          margin: '12px 4px 0',
+          fontSize: 13.5,
+          lineHeight: 1.5,
+          color: 'var(--hcp-t-60)',
+          fontFamily: FONT_GEIST,
+        }}
+      >
+        {course.rationale}
+      </p>
+    )}
+  </div>
 );
 
 const MiniCard: React.FC<{
@@ -184,109 +158,63 @@ const MiniCard: React.FC<{
     onClick={() => onTap(course.id)}
     style={{
       width: '100%',
-      background: 'var(--hcp-bg-1)',
-      border: '1px solid var(--hcp-line-2)',
-      borderRadius: 12,
+      aspectRatio: '4 / 5',
+      position: 'relative',
+      background: course.thumbnail_image
+        ? 'transparent'
+        : `linear-gradient(180deg, ${accentTint} 0%, var(--hcp-bg-2) 100%)`,
+      borderRadius: 14,
       overflow: 'hidden',
+      border: '1px solid var(--hcp-line-2)',
+      padding: 0,
       cursor: 'pointer',
       fontFamily: FONT_GEIST,
-      textAlign: 'left',
-      padding: 0,
-      display: 'flex',
-      flexDirection: 'column',
     }}
     className="active:scale-[0.99] transition-transform"
   >
+    {course.thumbnail_image && (
+      <img
+        src={course.thumbnail_image}
+        alt=""
+        aria-hidden
+        loading="lazy"
+        style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }}
+      />
+    )}
     <div
+      aria-hidden
       style={{
-        position: 'relative',
-        width: '100%',
-        aspectRatio: '16 / 10',
-        background: `linear-gradient(135deg, ${accentTint} 0%, rgba(255,255,255,0) 100%)`,
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        borderBottom: `0.5px solid ${INK_10}`,
-        overflow: 'hidden',
+        position: 'absolute', bottom: 0, left: 0, right: 0, height: '50%',
+        background: 'linear-gradient(180deg, rgba(5,8,16,0) 0%, rgba(5,8,16,0.92) 90%)',
       }}
-    >
-      {course.thumbnail_image ? (
-        <img
-          src={course.thumbnail_image}
-          alt=""
-          aria-hidden
-          loading="lazy"
-          style={{
-            position: 'absolute',
-            inset: 0,
-            width: '100%',
-            height: '100%',
-            objectFit: 'cover',
-          }}
-        />
-      ) : (
-        <MapPin size={22} color={accent} strokeWidth={1.8} />
-      )}
-      {course.expected_differential != null && (
-        <div
-          style={{
-            position: 'absolute',
-            top: 6,
-            right: 6,
-            background: 'var(--hcp-bg-1)',
-            border: '1px solid var(--hcp-line-2)',
-            borderRadius: 7,
-            padding: '3px 7px',
-            display: 'flex',
-            alignItems: 'baseline',
-            gap: 3,
-            zIndex: 1,
-          }}
-        >
-          <span style={{ fontSize: 8, fontWeight: 800, color: accent, letterSpacing: '0.12em' }}>
-            EXP
-          </span>
-          <span
-            style={{
-              fontSize: 12,
-              fontWeight: 800,
-              color: accent,
-              letterSpacing: '-0.02em',
-              fontVariantNumeric: 'tabular-nums',
-              lineHeight: 1,
-            }}
-          >
-            {fmtDiff(course.expected_differential, { plus: true })}
-          </span>
-        </div>
-      )}
-    </div>
-
-    <div style={{ padding: 10, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 2 }}>
+    />
+    {course.expected_differential != null && (
+      <span
+        style={{
+          position: 'absolute', top: 10, right: 10,
+          padding: '3px 7px', borderRadius: 6,
+          fontSize: 11, fontWeight: 800, letterSpacing: '-0.01em',
+          background: 'rgba(5,8,16,0.75)',
+          backdropFilter: 'blur(8px)',
+          WebkitBackdropFilter: 'blur(8px)',
+          color: accent,
+          fontVariantNumeric: 'tabular-nums',
+        }}
+      >
+        {fmtDiff(course.expected_differential, { plus: true })}
+      </span>
+    )}
+    <div style={{ position: 'absolute', left: 12, right: 12, bottom: 12, textAlign: 'left' }}>
       <div
         style={{
-          fontSize: 12.5,
-          fontWeight: 800,
-          color: 'var(--hcp-t-100)',
-          letterSpacing: '-0.01em',
-          lineHeight: 1.25,
-          overflow: 'hidden',
-          textOverflow: 'ellipsis',
-          whiteSpace: 'nowrap',
+          fontSize: 14, fontWeight: 800, color: '#F8FAFC',
+          lineHeight: 1.15, letterSpacing: '-0.01em',
         }}
       >
         {course.name || '—'}
       </div>
       {course.region && (
-        <div
-          style={{
-            fontSize: 10,
-            color: 'var(--hcp-t-60)',
-            overflow: 'hidden',
-            textOverflow: 'ellipsis',
-            whiteSpace: 'nowrap',
-          }}
-        >
+        <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.7)', marginTop: 2 }}>
           {course.region}
         </div>
       )}
@@ -295,25 +223,40 @@ const MiniCard: React.FC<{
 );
 
 const HeroSkeleton = () => (
-  <div
-    style={{
-      width: '100%',
-      height: 280,
-      background: INK_06,
-      borderRadius: 14,
-      animation: 'echoInsightsPulse 1.6s ease-in-out infinite',
-      marginBottom: 10,
-    }}
-  />
+  <div style={{ marginBottom: 10 }}>
+    <div
+      style={{
+        width: '100%',
+        aspectRatio: '1 / 1',
+        background: INK_06,
+        borderRadius: 18,
+        animation: 'echoInsightsPulse 1.6s ease-in-out infinite',
+      }}
+    />
+    <div
+      style={{
+        width: '85%', height: 12, marginTop: 16, marginLeft: 4,
+        background: INK_06, borderRadius: 4,
+        animation: 'echoInsightsPulse 1.6s ease-in-out infinite',
+      }}
+    />
+    <div
+      style={{
+        width: '65%', height: 12, marginTop: 6, marginLeft: 4,
+        background: INK_06, borderRadius: 4,
+        animation: 'echoInsightsPulse 1.6s ease-in-out infinite',
+      }}
+    />
+  </div>
 );
 
 const MiniSkeleton = () => (
   <div
     style={{
       width: '100%',
-      aspectRatio: '16 / 14',
+      aspectRatio: '4 / 5',
       background: INK_06,
-      borderRadius: 12,
+      borderRadius: 14,
       animation: 'echoInsightsPulse 1.6s ease-in-out infinite',
     }}
   />
