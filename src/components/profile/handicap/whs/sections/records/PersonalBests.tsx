@@ -199,12 +199,12 @@ export const PersonalBests: React.FC<Props> = ({ connectionId, currentHandicap }
   }, [scores, currentHandicap]);
 
   return (
-    <section style={{ marginTop: 12, fontFamily: FONT }}>
+    <section style={{ marginTop: 16, fontFamily: FONT }}>
       <SectionHeader
         eyebrow="PERSONAL BESTS"
         title="Records to break"
       />
-      <div style={{ padding: '0 16px 8px' }}>
+      <div style={{ padding: '0 16px 12px' }}>
         <div
           style={{
             background: 'linear-gradient(180deg, rgba(255,255,255,0.025) 0%, rgba(255,255,255,0.01) 100%)',
@@ -219,8 +219,8 @@ export const PersonalBests: React.FC<Props> = ({ connectionId, currentHandicap }
               style={{
                 display: 'flex',
                 alignItems: 'center',
-                gap: 8,
-                padding: '9px 14px',
+                gap: 12,
+                padding: '13px 16px',
                 borderBottom: i < 5 ? '1px solid rgba(255,255,255,0.04)' : 'none',
                 position: 'relative',
               }}
@@ -231,7 +231,7 @@ export const PersonalBests: React.FC<Props> = ({ connectionId, currentHandicap }
                   style={{
                     position: 'absolute',
                     top: 0,
-                    left: 1,
+                    left: 0,
                     bottom: 0,
                     width: 2,
                     background: 'linear-gradient(180deg, #F7931E 0%, #BA6E12 100%)',
@@ -240,17 +240,17 @@ export const PersonalBests: React.FC<Props> = ({ connectionId, currentHandicap }
                 />
               )}
 
-              <div style={{ flex: 1, minWidth: 1 }}>
+              <div style={{ flex: 1, minWidth: 0 }}>
                 {isLoading ? (
                   <>
-                    <div style={{ height: 8, width: '45%', background: D_BG3, borderRadius: 2, marginBottom: 5 }} />
-                    <div style={{ height: 9, width: '70%', background: D_BG3, borderRadius: 2 }} />
+                    <div style={{ height: 9, width: '50%', background: D_BG3, borderRadius: 2, marginBottom: 6 }} />
+                    <div style={{ height: 10, width: '75%', background: D_BG3, borderRadius: 2 }} />
                   </>
                 ) : (
                   <>
                     <div
                       style={{
-                        fontSize: 9,
+                        fontSize: 10,
                         fontWeight: 800,
                         letterSpacing: '0.14em',
                         textTransform: 'uppercase',
@@ -262,11 +262,11 @@ export const PersonalBests: React.FC<Props> = ({ connectionId, currentHandicap }
                     {(t as Tile).caption && (
                       <div
                         style={{
-                          fontSize: 10,
+                          fontSize: 10.5,
                           color: D_T60,
-                          marginTop: 2,
+                          marginTop: 3,
                           fontWeight: 600,
-                          lineHeight: 1.3,
+                          lineHeight: 1.35,
                           whiteSpace: 'nowrap',
                           overflow: 'hidden',
                           textOverflow: 'ellipsis',
@@ -279,16 +279,16 @@ export const PersonalBests: React.FC<Props> = ({ connectionId, currentHandicap }
                 )}
               </div>
 
-              <div style={{ display: 'flex', alignItems: 'baseline', gap: 3, flexShrink: 0 }}>
+              <div style={{ display: 'flex', alignItems: 'baseline', gap: 4, flexShrink: 0 }}>
                 {isLoading ? (
-                  <div style={{ height: 20, width: 44, background: D_BG3, borderRadius: 4 }} />
+                  <div style={{ height: 22, width: 48, background: D_BG3, borderRadius: 4 }} />
                 ) : (
                   <>
                     <span
                       style={{
-                        fontSize: 22,
+                        fontSize: 26,
                         fontWeight: 200,
-                        color: (t as Tile).value === '—' ? 'rgba(255,255,255,1)' : D_T100,
+                        color: (t as Tile).value === '—' ? 'rgba(255,255,255,0.25)' : D_T100,
                         fontVariantNumeric: 'tabular-nums',
                         letterSpacing: '-0.04em',
                         lineHeight: 0.9,
@@ -299,7 +299,7 @@ export const PersonalBests: React.FC<Props> = ({ connectionId, currentHandicap }
                     {(t as Tile).unit && (
                       <span
                         style={{
-                          fontSize: 10,
+                          fontSize: 11,
                           fontWeight: 700,
                           color: 'rgba(255,255,255,0.4)',
                           letterSpacing: '-0.01em',
