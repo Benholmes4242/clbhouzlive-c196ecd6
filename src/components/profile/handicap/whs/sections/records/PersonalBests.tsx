@@ -199,7 +199,7 @@ export const PersonalBests: React.FC<Props> = ({ connectionId, currentHandicap }
   }, [scores, currentHandicap]);
 
   return (
-    <section style={{ marginTop: 10, fontFamily: FONT }}>
+    <section style={{ marginTop: 32, fontFamily: FONT }}>
       <SectionHeader
         eyebrow="PERSONAL BESTS"
         title="Records to break"
