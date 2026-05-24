@@ -260,6 +260,19 @@ Deno.serve(async (req) => {
       return { ...c, slope_rating: candidateSlope, expected_differential: expectedDiff };
     });
 
+    // Pre-sort by EXP. Math picks the IDs; the LLM only writes rationale.
+    // Candidates with null EXP (no slope data) are excluded entirely.
+    const candidatesWithValidExp = candidatesWithExpected.filter(
+      (c: any) => typeof c.expected_differential === "number"
+    );
+    const sortedByExp = [...candidatesWithValidExp].sort(
+      (a: any, b: any) => a.expected_differential - b.expected_differential
+    );
+    const suitedPicks = sortedByExp.slice(0, 3);
+    const testPicksRaw = sortedByExp.slice(-3).reverse(); // hardest first
+    const suitedIds = new Set(suitedPicks.map((c: any) => c.id));
+    const testPicks = testPicksRaw.filter((c: any) => !suitedIds.has(c.id));
+
     const latestScoreId = rounds[0].id as string;
 
     const trendSignals = computeTrendSignals(rounds as any[], roundsForPrompt);
@@ -275,7 +288,7 @@ Deno.serve(async (req) => {
       trendSignals.current_index,
     );
 
-    const prompt = buildPrompt(roundsForPrompt, candidatesWithExpected, dateKey, trendSignals, friendSignals);
+    const prompt = buildPrompt(roundsForPrompt, suitedPicks, testPicks, dateKey, trendSignals, friendSignals);
 
     const aiResp = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
