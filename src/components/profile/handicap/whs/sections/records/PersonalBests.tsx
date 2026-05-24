@@ -199,12 +199,12 @@ export const PersonalBests: React.FC<Props> = ({ connectionId, currentHandicap }
   }, [scores, currentHandicap]);
 
   return (
-    <section style={{ marginTop: 16, fontFamily: FONT }}>
+    <section style={{ marginTop: 10, fontFamily: FONT }}>
       <SectionHeader
         eyebrow="PERSONAL BESTS"
         title="Records to break"
       />
-      <div style={{ padding: '0 16px 12px' }}>
+      <div style={{ padding: '0 16px 8px' }}>
         <div
           style={{
             background: 'linear-gradient(180deg, rgba(255,255,255,0.025) 0%, rgba(255,255,255,0.01) 100%)',
@@ -219,8 +219,8 @@ export const PersonalBests: React.FC<Props> = ({ connectionId, currentHandicap }
               style={{
                 display: 'flex',
                 alignItems: 'center',
-                gap: 12,
-                padding: '13px 16px',
+                gap: 8,
+                padding: '10px 16px',
                 borderBottom: i < 5 ? '1px solid rgba(255,255,255,0.04)' : 'none',
                 position: 'relative',
               }}
@@ -243,7 +243,7 @@ export const PersonalBests: React.FC<Props> = ({ connectionId, currentHandicap }
               <div style={{ flex: 1, minWidth: 0 }}>
                 {isLoading ? (
                   <>
-                    <div style={{ height: 9, width: '50%', background: D_BG3, borderRadius: 2, marginBottom: 6 }} />
+                    <div style={{ height: 9, width: '50%', background: D_BG3, borderRadius: 2, marginBottom: 4 }} />
                     <div style={{ height: 10, width: '75%', background: D_BG3, borderRadius: 2 }} />
                   </>
                 ) : (
@@ -264,7 +264,7 @@ export const PersonalBests: React.FC<Props> = ({ connectionId, currentHandicap }
                         style={{
                           fontSize: 10.5,
                           color: D_T60,
-                          marginTop: 3,
+                          marginTop: 2,
                           fontWeight: 600,
                           lineHeight: 1.35,
                           whiteSpace: 'nowrap',
