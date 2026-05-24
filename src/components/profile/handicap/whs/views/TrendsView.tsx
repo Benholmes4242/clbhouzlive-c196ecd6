@@ -57,6 +57,13 @@ export const TrendsView: React.FC<Props> = ({
 
       {/* 6. Echo Insights — owner only */}
       {!readOnly && <EchoInsightsCard connectionId={connectionId} />}
+
+      {/* 7. Stableford distribution */}
+      <TrendCardsStack
+        connectionId={connectionId}
+        currentHandicap={currentHandicap}
+        splitAt="rest"
+      />
     </div>
   );
 };
