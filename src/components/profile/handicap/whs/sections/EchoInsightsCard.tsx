@@ -131,19 +131,6 @@ const HeroCard: React.FC<{
         </div>
       </div>
     </button>
-    {course.rationale && (
-      <p
-        style={{
-          margin: '12px 4px 0',
-          fontSize: 13.5,
-          lineHeight: 1.5,
-          color: 'var(--hcp-t-60)',
-          fontFamily: FONT_GEIST,
-        }}
-      >
-        {course.rationale}
-      </p>
-    )}
   </div>
 );
 
@@ -230,20 +217,6 @@ const HeroSkeleton = () => (
         aspectRatio: '1 / 1',
         background: INK_06,
         borderRadius: 18,
-        animation: 'echoInsightsPulse 1.6s ease-in-out infinite',
-      }}
-    />
-    <div
-      style={{
-        width: '85%', height: 12, marginTop: 16, marginLeft: 4,
-        background: INK_06, borderRadius: 4,
-        animation: 'echoInsightsPulse 1.6s ease-in-out infinite',
-      }}
-    />
-    <div
-      style={{
-        width: '65%', height: 12, marginTop: 6, marginLeft: 4,
-        background: INK_06, borderRadius: 4,
         animation: 'echoInsightsPulse 1.6s ease-in-out infinite',
       }}
     />
