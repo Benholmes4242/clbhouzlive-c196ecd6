@@ -427,12 +427,7 @@ const HeroHandicapCardDark: React.FC<Props> = ({ connection }) => {
                 : `< 3 rounds`
           }
         />
-        <KPICell
-          label="Form"
-          value={form.label}
-          meta={periodAvgPts90 != null ? `${periodAvgPts90.toFixed(1)} pts avg` : '—'}
-          verdict={form.verdict}
-        />
+        {/* FORM tile removed — see ForecastCard below the hero. */}
         <KPICell
           label="Best"
           value={
