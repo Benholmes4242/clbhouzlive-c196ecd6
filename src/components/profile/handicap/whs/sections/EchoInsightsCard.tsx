@@ -95,20 +95,6 @@ const HeroCard: React.FC<{
         >
           {leadLabel}
         </span>
-        <span
-          style={{
-            padding: '4px 8px', borderRadius: 6,
-            fontSize: 10, fontWeight: 800, letterSpacing: '0.06em',
-            background: hexToRgba(accent, 0.20),
-            color: accent,
-            border: `1px solid ${hexToRgba(accent, 0.40)}`,
-            fontVariantNumeric: 'tabular-nums',
-          }}
-        >
-          PRED {course.expected_differential != null
-            ? fmtDiff(course.expected_differential, { plus: true })
-            : '—'}
-        </span>
       </div>
       <div style={{ position: 'absolute', left: 18, right: 18, bottom: 16, textAlign: 'left' }}>
         {(course.country || course.region) && (
