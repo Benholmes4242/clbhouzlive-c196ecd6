@@ -706,7 +706,7 @@ const ShotsBody: React.FC<ShotsBodyProps> = ({ trophyAgg, shotsLoading, scope })
     );
   }
 
-  const aces = hs.aces_count_window ?? 1;
+  const aces = hs.aces_count_window ?? 0;
   const albatross = hs.albatross_count_window ?? 0;
   const eagles = hs.eagles_count_window ?? 0;
   const birdies = hs.birdies_count_window ?? 0;
