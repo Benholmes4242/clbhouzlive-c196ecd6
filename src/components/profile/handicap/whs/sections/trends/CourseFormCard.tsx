@@ -549,11 +549,49 @@ const CourseList: React.FC<{ courses: CourseForm[]; view: ViewKey }> = ({ course
   // Largest absolute delta among the visible courses. Floor at 2 so that
   // small-magnitude deltas don't fill the whole row.
   const maxMag = Math.max(2, ...courses.map((c) => Math.abs(c.delta)));
+  const maxRounds = Math.max(1, ...courses.map((c) => c.rounds_played));
+
+  if (expanded) {
+    return (
+      <div style={{ paddingTop: 12, paddingBottom: 8 }}>
+        {courses.map((c, i) => (
+          <CourseRow
+            key={c.course_id}
+            course={c}
+            rank={i + 1}
+            expanded
+            view={view}
+            maxMag={maxMag}
+            maxRounds={maxRounds}
+            isLast={i === courses.length - 1}
+          />
+        ))}
+      </div>
+    );
+  }
 
   return (
-    <div style={{ paddingTop: 12, paddingBottom: 8 }}>
+    <div
+      style={{
+        marginTop: 12,
+        background: 'rgba(255,255,255,0.012)',
+        border: `1px solid ${T.ink08}`,
+        borderRadius: 14,
+        overflow: 'hidden',
+        padding: '4px 0',
+      }}
+    >
       {courses.map((c, i) => (
-        <CourseRow key={c.course_id} course={c} rank={i + 1} expanded={expanded} view={view} maxMag={maxMag} />
+        <CourseRow
+          key={c.course_id}
+          course={c}
+          rank={i + 1}
+          expanded={false}
+          view={view}
+          maxMag={maxMag}
+          maxRounds={maxRounds}
+          isLast={i === courses.length - 1}
+        />
       ))}
     </div>
   );
