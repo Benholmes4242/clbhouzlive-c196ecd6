@@ -241,10 +241,13 @@ Deno.serve(async (req) => {
     const { data: candWhs } = candWhsIds.length
       ? await admin
           .from("whs_courses")
-          .select("id, last_seen_slope_rating")
+          .select("id, last_seen_slope_rating, last_seen_course_rating")
           .in("id", candWhsIds)
       : { data: [] as any[] };
     const whsSlopeById = new Map((candWhs ?? []).map((c: any) => [c.id, c.last_seen_slope_rating]));
+    const whsCourseRatingById = new Map(
+      (candWhs ?? []).map((c: any) => [c.id, c.last_seen_course_rating]),
+    );
 
     const candidatesWithExpected = candidates.map((c: any) => {
       const whsId = golfToWhs.get(c.id);
@@ -342,7 +345,7 @@ Deno.serve(async (req) => {
     if (allRecIds.length > 0) {
       const { data: hydrated } = await admin
         .from("golf_courses")
-        .select("id, name, region, country, thumbnail_image, course_rating, latitude, longitude")
+        .select("id, name, region, country, thumbnail_image, latitude, longitude")
         .in("id", allRecIds);
       hyMap = new Map((hydrated ?? []).map((c: any) => [c.id, c]));
     }
@@ -361,10 +364,11 @@ Deno.serve(async (req) => {
     ) =>
       arr.map((r) => {
         const c: any = hyMap.get(r.id) || {};
-        // Slope: reuse existing golf_course_id → whs_course_id bridge,
-        // then whs_course_id → last_seen_slope_rating.
+        // Slope + course_rating: reuse golf_course_id → whs_course_id bridge,
+        // then whs_courses.last_seen_*.
         const whsId = golfToWhs.get(r.id);
         const slope = whsId ? whsSlopeById.get(whsId) : null;
+        const courseRating = whsId ? whsCourseRatingById.get(whsId) : null;
         return {
           id: r.id,
           name: c.name ?? "",
@@ -373,7 +377,7 @@ Deno.serve(async (req) => {
           expected_differential: r.expected_differential,
           thumbnail_image: c.thumbnail_image ?? null,
           slope_rating: typeof slope === "number" ? slope : null,
-          course_rating: typeof c.course_rating === "number" ? c.course_rating : null,
+          course_rating: typeof courseRating === "number" ? courseRating : null,
           distance_miles: haversineMiles(userHomeLat, userHomeLng, c.latitude, c.longitude),
         };
       });
