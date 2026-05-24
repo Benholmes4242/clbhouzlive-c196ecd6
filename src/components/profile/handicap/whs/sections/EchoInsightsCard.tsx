@@ -454,7 +454,9 @@ export const EchoInsightsCard: React.FC<Props> = ({ connectionId }) => {
                   accent={AMBER_DEEP}
                   accentTint={AMBER_06}
                   onTap={handleCourseTap}
+                  leadLabel="YOUR HARDEST TEST"
                 />
+
               )}
               {testSorted.length > 1 && (
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
