@@ -182,8 +182,157 @@ const CourseRow: React.FC<{
   /** Largest |delta| among the visible courses. Used to scale the
    *  ambient magnitude gradient behind the row. */
   maxMag: number;
-}> = ({ course, rank, expanded, view, maxMag }) => {
+  /** Largest rounds_played among visible courses. Used to scale the
+   *  compact rounds-played bar. */
+  maxRounds: number;
+  /** True for the last row in the list — suppresses the bottom hairline. */
+  isLast: boolean;
+}> = ({ course, rank, expanded, view, maxMag, maxRounds, isLast }) => {
   const valueColor = deltaColor(course.delta);
+
+  // Compact list row — replaces the old large featured row for the
+  // multi-course case. Expanded mode (single course) keeps the old layout.
+  if (!expanded) {
+    return (
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: 10,
+          padding: '10px 12px',
+          borderBottom: isLast ? 'none' : `1px solid ${T.ink08}`,
+          fontFamily: FONT,
+        }}
+      >
+        {/* Rank number */}
+        <span
+          style={{
+            fontSize: 13,
+            fontWeight: 800,
+            color: T.ink40,
+            width: 18,
+            fontVariantNumeric: 'tabular-nums',
+            textAlign: 'left',
+            flexShrink: 0,
+          }}
+        >
+          {rank}
+        </span>
+
+        {/* Mini thumbnail */}
+        <div
+          style={{
+            width: 28,
+            height: 28,
+            borderRadius: 6,
+            overflow: 'hidden',
+            flexShrink: 0,
+            background: course.course_thumbnail_image
+              ? `url(${course.course_thumbnail_image}) center/cover no-repeat`
+              : T.ink04,
+            position: 'relative',
+          }}
+          aria-hidden
+        >
+          {!course.course_thumbnail_image && (
+            <CourseImageFallback flagOpacity={0.22} />
+          )}
+        </div>
+
+        {/* Name + meta */}
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <div
+            style={{
+              fontSize: 13,
+              fontWeight: 700,
+              color: T.ink,
+              whiteSpace: 'nowrap',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              letterSpacing: '-0.005em',
+            }}
+          >
+            {course.course_name}
+          </div>
+          <div
+            style={{
+              fontSize: 10.5,
+              color: T.ink40,
+              marginTop: 1,
+              fontWeight: 500,
+              whiteSpace: 'nowrap',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              fontVariantNumeric: 'tabular-nums',
+            }}
+          >
+            {course.course_region ? `${course.course_region} · ` : ''}
+            {course.rounds_played} {course.rounds_played === 1 ? 'round' : 'rounds'}
+          </div>
+        </div>
+
+        {/* Mini rounds-played bar */}
+        <div
+          style={{
+            width: 32,
+            height: 4,
+            background: 'rgba(255,255,255,0.06)',
+            borderRadius: 2,
+            position: 'relative',
+            overflow: 'hidden',
+            flexShrink: 0,
+          }}
+          aria-label={`${course.rounds_played} of max ${maxRounds} rounds played`}
+        >
+          <div
+            style={{
+              position: 'absolute',
+              left: 0,
+              top: 0,
+              bottom: 0,
+              width: `${Math.max(8, (course.rounds_played / Math.max(maxRounds, 1)) * 100)}%`,
+              background: 'rgba(255,255,255,0.40)',
+              borderRadius: 2,
+            }}
+          />
+        </div>
+
+        {/* Delta */}
+        <span
+          style={{
+            fontSize: 15,
+            fontWeight: 800,
+            color: view === 'most_played' ? T.ink : valueColor,
+            fontVariantNumeric: 'tabular-nums',
+            minWidth: 52,
+            textAlign: 'right',
+            textShadow: view === 'most_played' ? 'none' : glowFor(course.delta),
+            flexShrink: 0,
+            letterSpacing: '-0.02em',
+          }}
+        >
+          {view !== 'most_played' && course.delta !== 0 && (
+            <span
+              aria-hidden
+              style={{
+                fontSize: 11,
+                verticalAlign: 1,
+                marginRight: 1,
+                fontWeight: 700,
+              }}
+            >
+              {course.delta < 0 ? '\u2193' : '\u2191'}
+            </span>
+          )}
+          {view === 'most_played'
+            ? course.rounds_played
+            : course.delta !== 0
+              ? Math.abs(course.delta).toFixed(1)
+              : '0.0'}
+        </span>
+      </div>
+    );
+  }
 
   const headline = (() => {
     if (view === 'most_played') {
