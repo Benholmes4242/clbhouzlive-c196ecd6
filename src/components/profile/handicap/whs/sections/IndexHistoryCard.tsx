@@ -233,7 +233,7 @@ const IndexHistoryCard: React.FC<Props> = ({ connectionId }) => {
               fontWeight={700}
               fill="var(--hcp-t-60)"
               textAnchor="start"
-              fontVariantNumeric="tabular-nums"
+              style={{ fontVariantNumeric: "tabular-nums" }}
             >
               {fmtHcp(firstHcp)}
             </text>
@@ -248,7 +248,7 @@ const IndexHistoryCard: React.FC<Props> = ({ connectionId }) => {
               fontWeight={800}
               fill={lineColorHex}
               textAnchor="end"
-              fontVariantNumeric="tabular-nums"
+              style={{ fontVariantNumeric: "tabular-nums" }}
             >
               {fmtHcp(lastHcp)}
             </text>
