@@ -106,6 +106,15 @@ const fmtRelativeDate = (iso: string): string => {
   return `${Math.floor(days / 365)}y ago`;
 };
 
+const fmtAbsoluteDate = (iso: string): string => {
+  try {
+    return format(new Date(iso), 'd LLL yyyy');
+  } catch {
+    return iso;
+  }
+};
+
+
 const fmtMonth = (iso: string): string => {
   try {
     return format(new Date(iso), 'MMMM yyyy');
