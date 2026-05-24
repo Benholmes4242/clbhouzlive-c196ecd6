@@ -43,19 +43,8 @@ function arcGradient(verdict: Verdict): { from: string; to: string } {
   return { from: '#F7931E', to: '#F7931E' };
 }
 
-// Form temperature label from a Stableford delta vs personal baseline.
-function formLabel(periodAvg: number | null, allAvg: number | null): {
-  label: string;
-  verdict: 'warm' | 'cold' | 'neutral';
-} {
-  if (periodAvg == null || allAvg == null) return { label: '—', verdict: 'neutral' };
-  const d = periodAvg - allAvg;
-  if (d > 3.0) return { label: 'Hot', verdict: 'warm' };
-  if (d > 1.0) return { label: 'Warm', verdict: 'warm' };
-  if (d < -3.0) return { label: 'Cold', verdict: 'cold' };
-  if (d < -1.0) return { label: 'Cold', verdict: 'cold' };
-  return { label: 'Steady', verdict: 'neutral' };
-}
+// Form temperature label removed — replaced by the ForecastCard below the hero.
+
 
 const HeroHandicapCardDark: React.FC<Props> = ({ connection }) => {
   const { data: trend, isLoading: trendLoading } = useHandicapTrend(connection.id);
@@ -167,20 +156,10 @@ const HeroHandicapCardDark: React.FC<Props> = ({ connection }) => {
 
   const roundCount90 = recent90.length;
 
-  const periodAvgPts90 = useMemo<number | null>(() => {
-    const v = recent90.map((s) => s?.stableford_points).filter((p: any): p is number => typeof p === 'number');
-    if (v.length < 3) return null;
-    return v.reduce((a, b) => a + b, 0) / v.length;
-  }, [recent90]);
+  // FORM tile removed — Stableford form logic now lives in the ForecastCard
+  // below the hero (which uses handicap differentials, not Stableford points).
 
-  // Lifetime stableford baseline — used only as the comparison anchor for Form's label.
-  const lifetimeAvgPts = useMemo<number | null>(() => {
-    const v = scores.map((s) => s?.stableford_points).filter((p: any): p is number => typeof p === 'number');
-    if (v.length === 0) return null;
-    return v.reduce((a, b) => a + b, 0) / v.length;
-  }, [scores]);
 
-  const form = formLabel(periodAvgPts90, lifetimeAvgPts);
 
   const best = useMemo(() => {
     const withDiff = counters.filter(
@@ -448,12 +427,7 @@ const HeroHandicapCardDark: React.FC<Props> = ({ connection }) => {
                 : `< 3 rounds`
           }
         />
-        <KPICell
-          label="Form"
-          value={form.label}
-          meta={periodAvgPts90 != null ? `${periodAvgPts90.toFixed(1)} pts avg` : '—'}
-          verdict={form.verdict}
-        />
+        {/* FORM tile removed — see ForecastCard below the hero. */}
         <KPICell
           label="Best"
           value={
