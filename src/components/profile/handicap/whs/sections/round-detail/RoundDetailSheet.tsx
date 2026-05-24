@@ -1,33 +1,21 @@
 import React, { useMemo } from 'react';
 import { Drawer as DrawerPrimitive } from 'vaul';
-import { useNavigate } from 'react-router-dom';
-import { useRoundDetail, useFriendRoundDetail } from '@/lib/whs/hooks';
+import { useRoundDetail } from '@/lib/whs/hooks';
 import RoundScorecard from './RoundScorecard';
 import {
   SheetHero,
   SheetHeroGlass,
   UserEyebrow,
-  FriendEyebrow,
-  SheetFooterInk,
   SheetFooterDark,
-  FooterPill,
   ScorecardEmpty,
-  NonClbhouzFriendBody,
 } from './cinema-sheet';
-import { firstName } from '@/lib/whs/share';
-import { reformatFriendName } from '@/lib/whs/utils/nameFormat';
-import type { WhsFriendActivityWithImage } from '@/lib/whs/types';
 
 interface Props {
-  variant?: 'user' | 'friend';
   open: boolean;
   onClose: () => void;
-  // user variant
   scoreId?: string | null;
   handicapDelta?: number | null;
   connectionId?: string | null;
-  // friend variant
-  activity?: WhsFriendActivityWithImage | null;
 }
 
 const PAGE_BG = '#0A0E14';
@@ -68,32 +56,17 @@ const SheetEmpty: React.FC<{ onClose: () => void }> = ({ onClose }) => (
 );
 
 export const RoundDetailSheet: React.FC<Props> = ({
-  variant = 'user',
   open,
   onClose,
   scoreId,
   handicapDelta,
-  connectionId,
-  activity,
 }) => {
-  const navigate = useNavigate();
-  const isFriend = variant === 'friend';
-
-  // ── User variant ──
-  const userQuery = useRoundDetail(isFriend ? null : scoreId, !isFriend && open);
-
-  // ── Friend variant ──
-  const friendIsClbhouz = !!activity?.is_clbhouz_user;
-  const friendScoreId = isFriend && friendIsClbhouz ? activity?.last_round_score_id ?? null : null;
-  const friendQuery = useFriendRoundDetail(friendScoreId, isFriend && !!friendScoreId && open);
-
-  const userData = !isFriend ? userQuery.data : null;
-  const userLoading = !isFriend && userQuery.isLoading;
-  const friendDetail = isFriend ? friendQuery.data : null;
-  const friendLoading = isFriend && friendIsClbhouz && friendQuery.isLoading;
+  const userQuery = useRoundDetail(scoreId, open);
+  const userData = userQuery.data;
+  const userLoading = userQuery.isLoading;
 
   const parTotal = useMemo<number | null>(() => {
-    const holes = isFriend ? friendDetail?.holes : userData?.holes;
+    const holes = userData?.holes;
     if (!holes || holes.length === 0) return null;
     let total = 0;
     let any = false;
@@ -104,11 +77,9 @@ export const RoundDetailSheet: React.FC<Props> = ({
       }
     }
     return any ? total : null;
-  }, [isFriend, friendDetail, userData]);
+  }, [userData]);
 
-  // counterRank: previously used by removed CounterPill (signal now via gross ring).
-
-  const renderUserBody = (): { scroll: React.ReactNode; footer: React.ReactNode } => {
+  const renderBody = (): { scroll: React.ReactNode; footer: React.ReactNode } => {
     if (userLoading) return { scroll: <SheetSkeleton />, footer: null };
     if (!userData) return { scroll: <SheetEmpty onClose={onClose} />, footer: null };
 
@@ -168,134 +139,8 @@ export const RoundDetailSheet: React.FC<Props> = ({
     };
   };
 
-  const renderFriendBody = (): { scroll: React.ReactNode; footer: React.ReactNode } => {
-    if (!activity) return { scroll: <SheetSkeleton />, footer: null };
-    const fname = firstName(reformatFriendName(activity.friend_name));
-
-    // Hero data composed from activity
-    const courseName = activity.last_round_course_name ?? 'Round played';
-    const heroImage = activity.course_thumbnail_image;
-
-    if (!friendIsClbhouz) {
-      return {
-        scroll: (
-          <>
-            <SheetHero
-              imageUrl={heroImage}
-              onClose={onClose}
-              topEyebrow={<FriendEyebrow activity={activity} />}
-              glass={
-                <SheetHeroGlass
-                  courseName={courseName}
-                  par={null}
-                  slope={null}
-                  gross={activity.last_round_adjusted_gross}
-                  stableford={activity.last_round_stableford}
-                  differential={activity.last_round_differential}
-                  holes={null}
-                  lockMissingStats={true}
-                  metaOverride={
-                    <div
-                      style={{
-                        marginTop: 3,
-                        fontSize: 11,
-                        fontWeight: 600,
-                        color: AMBER,
-                        letterSpacing: '0.10em',
-                        textTransform: 'uppercase',
-                      }}
-                    >
-                      {activity.friend_handicap_index != null
-                        ? `England Golf · Handicap ${activity.friend_handicap_index.toFixed(1)}`
-                        : 'England Golf'}
-                    </div>
-                  }
-                />
-              }
-            />
-            <NonClbhouzFriendBody activity={activity} />
-          </>
-        ),
-        footer: null,
-      };
-    }
-
-    // Clbhouz friend (synced)
-    const holes = friendDetail?.holes ?? null;
-    const hasHoles = !!holes && holes.length > 0;
-    const friendDelta =
-      activity.handicap_index_at_time != null && activity.friend_handicap_index != null
-        ? activity.friend_handicap_index - activity.handicap_index_at_time
-        : null;
-
-    return {
-      scroll: (
-        <>
-          <SheetHero
-            imageUrl={heroImage}
-            onClose={onClose}
-            topEyebrow={<FriendEyebrow activity={activity} />}
-            glass={
-              <SheetHeroGlass
-                courseName={courseName}
-                par={parTotal}
-                slope={friendDetail?.slope_rating ?? null}
-                gross={activity.last_round_adjusted_gross}
-                stableford={activity.last_round_stableford}
-                differential={activity.last_round_differential}
-                holes={hasHoles ? holes : null}
-              />
-            }
-          />
-
-          {friendLoading && !friendDetail ? (
-            <ScorecardEmpty message="Loading hole data\u2026" />
-          ) : hasHoles ? (
-            <RoundScorecard holes={holes!} isNineHole={!!friendDetail?.is_nine_hole} />
-          ) : friendDetail && !friendDetail.hole_by_hole_fetched ? (
-            <ScorecardEmpty
-              message="Hole data is still syncing"
-              subMessage={`Check back in a few hours for ${fname}'s hole-by-hole.`}
-            />
-          ) : (
-            <ScorecardEmpty
-              message={`No hole-by-hole data for ${fname}'s round.`}
-            />
-          )}
-        </>
-      ),
-      footer: (
-        <SheetFooterInk
-          label={`${fname.toUpperCase()}'S INDEX`}
-          currentIndex={activity.friend_handicap_index ?? null}
-          previousIndex={
-            friendDelta != null && activity.handicap_index_at_time != null
-              ? activity.handicap_index_at_time
-              : null
-          }
-          delta={friendDelta}
-          action={
-            activity.friend_user_id ? (
-              <FooterPill
-                onClick={() => {
-                  onClose();
-                  navigate(`/profile/${activity.friend_user_id}`);
-                }}
-                label="View profile"
-                trailing={<span style={{ opacity: 0.7, marginLeft: 2 }}>{'\u203A'}</span>}
-              />
-            ) : null
-          }
-        />
-      ),
-    };
-  };
-
-  const titleText = isFriend
-    ? activity?.last_round_course_name ?? 'Friend round detail'
-    : userData?.course?.name ?? 'Round detail';
-
-  const { scroll, footer } = isFriend ? renderFriendBody() : renderUserBody();
+  const titleText = userData?.course?.name ?? 'Round detail';
+  const { scroll, footer } = renderBody();
 
   return (
     <DrawerPrimitive.Root
