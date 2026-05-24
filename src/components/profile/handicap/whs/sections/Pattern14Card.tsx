@@ -1,7 +1,8 @@
 import React, { useMemo, useState } from 'react';
-import { useAllScores } from '@/lib/whs/hooks';
+import { useAllScores, useHandicapTrend } from '@/lib/whs/hooks';
 import { DarkSectionHeader } from './_shared/darkAtoms';
 import RoundDetailSheet from './round-detail/RoundDetailSheet';
+import { computeRoundDeltas }  from './trends/computeRoundDeltas';
 
 const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
 
@@ -11,12 +12,21 @@ interface Props {
 
 const Pattern14Card: React.FC<Props> = ({ connectionId }) => {
   const { data: allScores, isLoading } = useAllScores(connectionId);
+  const { data: trend } = useHandicapTrend(connectionId);
   const [selectedScoreId, setSelectedScoreId] = useState<string | null>(null);
 
+  // Pre-compute handicap_delta for every round using the same helper
+  // RecentRoundsCard uses. Counter-gated; null for non-counters or when
+  // post-round index is unknown.
+  const scoresWithDelta = useMemo(
+    () => (allScores ? computeRoundDeltas(allScores, trend?.current ?? null) : []),
+    [allScores, trend],
+  );
+
   const rounds14 = useMemo(() => {
-    if (!allScores || allScores.length === 0) return [];
-    const newestFirst = [...allScores].slice(0, 14);
-    return newestFirst.reverse().map((r: any) => {
+    if (!scoresWithDelta || scoresWithDelta.length === 0) return [];
+    const newestFirst = [...scoresWithDelta].slice(0, 14);
+    return newestFirst.reverse().map((r) => {
       const diff = r.handicap_differential;
       const hcp = r.handicap_index_at_time;
       const delta = diff != null && hcp != null ? diff - hcp : null;
@@ -27,18 +37,18 @@ const Pattern14Card: React.FC<Props> = ({ connectionId }) => {
         handicapDelta: r.handicap_delta ?? null,
       };
     });
-  }, [allScores]);
+  }, [scoresWithDelta]);
 
   const olderRounds = useMemo(() => {
-    if (!allScores || allScores.length <= 14) return [];
-    const slice = [...allScores].slice(14, 28);
-    return slice.reverse().map((r: any) => {
+    if (!scoresWithDelta || scoresWithDelta.length <= 14) return [];
+    const slice = [...scoresWithDelta].slice(14, 28);
+    return slice.reverse().map((r) => {
       const diff = r.handicap_differential;
       const hcp = r.handicap_index_at_time;
       const delta = diff != null && hcp != null ? diff - hcp : null;
       return { id: r.id, play_date: r.play_date, delta };
     });
-  }, [allScores]);
+  }, [scoresWithDelta]);
 
   const fmtDate = (s: string): string =>
     new Date(s)
