@@ -79,50 +79,50 @@ const HeroCard: React.FC<{
       ) : (
         <MapPin size={32} color={accent} strokeWidth={1.8} />
       )}
-      {course.expected_differential != null && (
-        <div
+      <div
+        style={{
+          position: 'absolute',
+          top: 10,
+          right: 10,
+          background: 'var(--hcp-bg-1)',
+          border: '1px solid var(--hcp-line-2)',
+          borderRadius: 10,
+          padding: '6px 11px',
+          display: 'flex',
+          alignItems: 'baseline',
+          gap: 5,
+          boxShadow: '0 1px 2px rgba(15,23,42,0.06)',
+          zIndex: 1,
+        }}
+      >
+        <span
           style={{
-            position: 'absolute',
-            top: 10,
-            right: 10,
-            background: 'var(--hcp-bg-1)',
-            border: '1px solid var(--hcp-line-2)',
-            borderRadius: 10,
-            padding: '6px 11px',
-            display: 'flex',
-            alignItems: 'baseline',
-            gap: 5,
-            boxShadow: '0 1px 2px rgba(15,23,42,0.06)',
-            zIndex: 1,
+            fontSize: 10,
+            fontWeight: 800,
+            color: accent,
+            letterSpacing: '0.14em',
           }}
         >
-          <span
-            style={{
-              fontSize: 10,
-              fontWeight: 800,
-              color: accent,
-              letterSpacing: '0.14em',
-            }}
-          >
-            EXP
-          </span>
-          <span
-            style={{
-              fontSize: 20,
-              fontWeight: 800,
-              color: accent,
-              letterSpacing: '-0.02em',
-              fontVariantNumeric: 'tabular-nums',
-              lineHeight: 1,
-            }}
-          >
-            {fmtDiff(course.expected_differential, { plus: true })}
-          </span>
-        </div>
-      )}
+          EXP
+        </span>
+        <span
+          style={{
+            fontSize: 20,
+            fontWeight: 800,
+            color: accent,
+            letterSpacing: '-0.02em',
+            fontVariantNumeric: 'tabular-nums',
+            lineHeight: 1,
+          }}
+        >
+          {course.expected_differential != null
+            ? fmtDiff(course.expected_differential, { plus: true })
+            : '—'}
+        </span>
+      </div>
     </div>
 
-    <div style={{ padding: 14, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 5 }}>
+    <div style={{ padding: 14, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 8 }}>
       <div
         style={{
           fontSize: 16,
@@ -157,21 +157,84 @@ const HeroCard: React.FC<{
           </span>
         </div>
       )}
-      {course.rationale && (
-        <p
-          style={{
-            margin: '6px 0 0',
-            fontSize: 13,
-            lineHeight: 1.5,
-            color: 'var(--hcp-t-80)',
-          }}
-        >
-          {course.rationale}
-        </p>
-      )}
+      <StatStrip course={course} size="hero" />
     </div>
   </button>
 );
+
+const StatStrip: React.FC<{ course: SuitedCourse; size: 'hero' | 'mini' }> = ({ course, size }) => {
+  const stats: Array<{ label: string; value: string }> = [];
+  if (course.slope_rating != null) {
+    stats.push({ label: 'SLOPE', value: String(course.slope_rating) });
+  }
+  if (course.course_rating != null) {
+    stats.push({ label: 'RATING', value: course.course_rating.toFixed(1) });
+  }
+  if (course.distance_miles != null) {
+    stats.push({ label: 'DISTANCE', value: `${course.distance_miles} mi` });
+  }
+  if (stats.length === 0) return null;
+
+  const isHero = size === 'hero';
+  const labelSize = isHero ? 9 : 8;
+  const valueSize = isHero ? 14 : 11;
+  const padTop = isHero ? 8 : 6;
+
+  return (
+    <div
+      style={{
+        display: 'flex',
+        alignItems: 'stretch',
+        gap: 0,
+        marginTop: padTop,
+        paddingTop: padTop,
+        borderTop: `0.5px solid ${INK_10}`,
+      }}
+    >
+      {stats.map((s, i) => (
+        <div
+          key={s.label}
+          style={{
+            flex: 1,
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 2,
+            paddingLeft: i === 0 ? 0 : isHero ? 12 : 8,
+            paddingRight: i === stats.length - 1 ? 0 : isHero ? 12 : 8,
+            borderLeft: i === 0 ? 'none' : `0.5px solid ${INK_10}`,
+            minWidth: 0,
+          }}
+        >
+          <span
+            style={{
+              fontSize: labelSize,
+              fontWeight: 800,
+              color: 'var(--hcp-t-60)',
+              letterSpacing: '0.12em',
+            }}
+          >
+            {s.label}
+          </span>
+          <span
+            style={{
+              fontSize: valueSize,
+              fontWeight: 800,
+              color: 'var(--hcp-t-100)',
+              letterSpacing: '-0.01em',
+              fontVariantNumeric: 'tabular-nums',
+              lineHeight: 1.1,
+              whiteSpace: 'nowrap',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+            }}
+          >
+            {s.value}
+          </span>
+        </div>
+      ))}
+    </div>
+  );
+};
 
 const MiniCard: React.FC<{
   course: SuitedCourse;
@@ -227,42 +290,42 @@ const MiniCard: React.FC<{
       ) : (
         <MapPin size={22} color={accent} strokeWidth={1.8} />
       )}
-      {course.expected_differential != null && (
-        <div
+      <div
+        style={{
+          position: 'absolute',
+          top: 6,
+          right: 6,
+          background: 'var(--hcp-bg-1)',
+          border: '1px solid var(--hcp-line-2)',
+          borderRadius: 7,
+          padding: '3px 7px',
+          display: 'flex',
+          alignItems: 'baseline',
+          gap: 3,
+          zIndex: 1,
+        }}
+      >
+        <span style={{ fontSize: 8, fontWeight: 800, color: accent, letterSpacing: '0.12em' }}>
+          EXP
+        </span>
+        <span
           style={{
-            position: 'absolute',
-            top: 6,
-            right: 6,
-            background: 'var(--hcp-bg-1)',
-            border: '1px solid var(--hcp-line-2)',
-            borderRadius: 7,
-            padding: '3px 7px',
-            display: 'flex',
-            alignItems: 'baseline',
-            gap: 3,
-            zIndex: 1,
+            fontSize: 12,
+            fontWeight: 800,
+            color: accent,
+            letterSpacing: '-0.02em',
+            fontVariantNumeric: 'tabular-nums',
+            lineHeight: 1,
           }}
         >
-          <span style={{ fontSize: 8, fontWeight: 800, color: accent, letterSpacing: '0.12em' }}>
-            EXP
-          </span>
-          <span
-            style={{
-              fontSize: 12,
-              fontWeight: 800,
-              color: accent,
-              letterSpacing: '-0.02em',
-              fontVariantNumeric: 'tabular-nums',
-              lineHeight: 1,
-            }}
-          >
-            {fmtDiff(course.expected_differential, { plus: true })}
-          </span>
-        </div>
-      )}
+          {course.expected_differential != null
+            ? fmtDiff(course.expected_differential, { plus: true })
+            : '—'}
+        </span>
+      </div>
     </div>
 
-    <div style={{ padding: 10, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 2 }}>
+    <div style={{ padding: 10, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 6 }}>
       <div
         style={{
           fontSize: 12.5,
@@ -290,6 +353,7 @@ const MiniCard: React.FC<{
           {course.region}
         </div>
       )}
+      <StatStrip course={course} size="mini" />
     </div>
   </button>
 );
