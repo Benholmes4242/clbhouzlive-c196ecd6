@@ -220,20 +220,6 @@ const HeroSkeleton = () => (
         animation: 'echoInsightsPulse 1.6s ease-in-out infinite',
       }}
     />
-    <div
-      style={{
-        width: '85%', height: 12, marginTop: 16, marginLeft: 4,
-        background: INK_06, borderRadius: 4,
-        animation: 'echoInsightsPulse 1.6s ease-in-out infinite',
-      }}
-    />
-    <div
-      style={{
-        width: '65%', height: 12, marginTop: 6, marginLeft: 4,
-        background: INK_06, borderRadius: 4,
-        animation: 'echoInsightsPulse 1.6s ease-in-out infinite',
-      }}
-    />
   </div>
 );
 
