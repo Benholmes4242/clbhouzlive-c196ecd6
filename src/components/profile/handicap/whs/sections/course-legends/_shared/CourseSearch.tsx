@@ -12,7 +12,7 @@ interface Props {
   autoFocus?: boolean;
 }
 
-export const CourseSearch: React.FC<Props> = ({ value, onChange, helper }) => (
+export const CourseSearch: React.FC<Props> = ({ value, onChange, helper, inputRef, autoFocus }) => (
   <div style={{ padding: '20px 16px 0' }}>
     <div
       style={{
