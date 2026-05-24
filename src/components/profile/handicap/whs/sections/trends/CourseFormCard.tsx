@@ -31,7 +31,7 @@ const T = {
 };
 const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
 
-const TOP_N = 6;
+const TOP_N = 5;
 const MIN_ROUNDS_FOR_TOUGHEST = 2;
 
 type ViewKey = 'most_played' | 'best' | 'toughest';
