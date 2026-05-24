@@ -219,8 +219,8 @@ export const PersonalBests: React.FC<Props> = ({ connectionId, currentHandicap }
               style={{
                 display: 'flex',
                 alignItems: 'center',
-                gap: 8,
-                padding: '10px 16px',
+                gap: 12,
+                padding: '9px 14px',
                 borderBottom: i < 5 ? '1px solid rgba(255,255,255,0.04)' : 'none',
                 position: 'relative',
               }}
@@ -266,7 +266,7 @@ export const PersonalBests: React.FC<Props> = ({ connectionId, currentHandicap }
                           color: D_T60,
                           marginTop: 2,
                           fontWeight: 600,
-                          lineHeight: 1.35,
+                          lineHeight: 1.15,
                           whiteSpace: 'nowrap',
                           overflow: 'hidden',
                           textOverflow: 'ellipsis',
@@ -286,7 +286,7 @@ export const PersonalBests: React.FC<Props> = ({ connectionId, currentHandicap }
                   <>
                     <span
                       style={{
-                        fontSize: 26,
+                        fontSize: 22,
                         fontWeight: 200,
                         color: (t as Tile).value === '—' ? 'rgba(255,255,255,0.25)' : D_T100,
                         fontVariantNumeric: 'tabular-nums',
