@@ -27,7 +27,7 @@ export interface CounterCell {
   differential: number;
   /** 0 = best, 7 = weakest (within the current 8 counters, sorted ascending). */
   rank: number;
-  /** True if this counter is the oldest round in the last 20 (next to roll). */
+  /** True if this counter's round is among the 5 oldest in the window (at risk of rolling off within the projection horizon). */
   isExpiring: boolean;
   /** True if this counter is also in the most recent 5 rounds. */
   isNew: boolean;
@@ -44,14 +44,13 @@ export interface Forecast {
   roundsOut: 5 | null;
   /** Calendar label for the projection horizon (e.g. "late June"). */
   whenLabel: string | null;
-  /** 1 if the literal next-to-roll round is a current counter, else 0. */
+  /** Counters whose rounds fall in the 5 oldest of the window (at risk of rolling off in the horizon). Equals countersAtRiskInHorizon. */
   expiringCount: number;
   /** How many of the most recent 5 rounds are current counters. */
   newCount: number;
   /**
-   * How many of the 5 oldest rounds in the window are counters. These are the
-   * counters at risk over the 5-round projection horizon. Drives the strip
-   * header copy. The strip itself still marks only the single next-to-roll.
+   * How many of the 5 oldest rounds in the window are counters. Drives the
+   * strip header copy AND the marked amber bars on the strip — they agree.
    */
   countersAtRiskInHorizon: number;
   /** Sourced from projectNextRound — single source of truth shared with NextRoundWatch. */
@@ -150,13 +149,12 @@ export function buildForecast(
   const currentCounters = sortedByDiff.slice(0, COUNTER_COUNT);
 
   // ── Expiring / new / at-risk flags ──────────────────────────────────
-  const oldestInWindow = window[window.length - 1];
-  const isOldestACounter = currentCounters.some((c) => c.id === oldestInWindow?.id);
   const top5RecentIds = new Set(allScores.slice(0, 5).map((s) => s.id));
   const newCounters = currentCounters.filter((c) => top5RecentIds.has(c.id));
 
   // 5 oldest rounds in the window — these roll off over the projection horizon.
   const oldestHorizon = window.slice(-PROJECTION_HORIZON);
+  const horizonOldestIds = new Set(oldestHorizon.map((s) => s.id));
   const counterIds = new Set(currentCounters.map((c) => c.id));
   const countersAtRiskInHorizon = oldestHorizon.filter((s) => counterIds.has(s.id)).length;
 
@@ -206,7 +204,7 @@ export function buildForecast(
     delta: round1(delta),
     roundsOut: PROJECTION_HORIZON,
     whenLabel,
-    expiringCount: isOldestACounter ? 1 : 0,
+    expiringCount: countersAtRiskInHorizon,
     newCount: newCounters.length,
     countersAtRiskInHorizon,
     cutTarget,
@@ -215,7 +213,7 @@ export function buildForecast(
       score: c,
       differential: c.handicap_differential as number,
       rank: i,
-      isExpiring: c.id === oldestInWindow?.id,
+      isExpiring: horizonOldestIds.has(c.id),
       isNew: top5RecentIds.has(c.id),
     })),
     validRoundCount: windowDiffs.length,
