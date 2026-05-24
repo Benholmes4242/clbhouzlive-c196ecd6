@@ -138,7 +138,7 @@ export const FriendRoundCardV2: React.FC<Props> = ({
         <div
           style={{
             position: 'absolute',
-            bottom: 8,
+            top: 8,
             left: 8,
           }}
         >
@@ -227,11 +227,16 @@ export const FriendRoundCardV2: React.FC<Props> = ({
             >
               HCP {hcpDelta < 0 ? '↓' : '↑'} {Math.abs(hcpDelta).toFixed(1)}
               {showHotFlame && (
-                <Flame
-                  size={10}
-                  strokeWidth={2}
-                  style={{ color: '#F7931E', marginLeft: 1 }}
-                />
+                <span
+                  aria-label="Hot streak"
+                  style={{
+                    fontSize: 11,
+                    marginLeft: 2,
+                    lineHeight: 1,
+                  }}
+                >
+                  🔥
+                </span>
               )}
             </div>
           ) : !isSynced ? (
