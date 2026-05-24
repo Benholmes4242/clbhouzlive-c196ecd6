@@ -574,7 +574,7 @@ const FeedCard: React.FC<FeedCardProps> = ({ round, onTap }) => {
         display: 'flex',
         alignItems: 'center',
         width: '100%',
-        padding: '12px 14px',
+        padding: '9px 14px',
         gap: 12,
         background: 'transparent',
         border: 'none',
@@ -582,11 +582,10 @@ const FeedCard: React.FC<FeedCardProps> = ({ round, onTap }) => {
         textAlign: 'left',
         fontFamily: FONT,
         cursor: 'pointer',
-        minHeight: 56,
       }}
     >
       {/* Date column */}
-      <div style={{ flexShrink: 0, width: 42, textAlign: 'center' }}>
+      <div style={{ flexShrink: 0, width: 42, textAlign: 'center', lineHeight: 1 }}>
         <div
           style={{
             fontSize: 9,
@@ -594,6 +593,7 @@ const FeedCard: React.FC<FeedCardProps> = ({ round, onTap }) => {
             letterSpacing: '0.10em',
             color: T.inkMute,
             textTransform: 'uppercase',
+            lineHeight: 1,
           }}
         >
           {weekday}
@@ -606,7 +606,7 @@ const FeedCard: React.FC<FeedCardProps> = ({ round, onTap }) => {
             lineHeight: 1,
             letterSpacing: '-0.02em',
             fontVariantNumeric: 'tabular-nums',
-            marginTop: 2,
+            marginTop: 3,
           }}
         >
           {dayOfMonth}
@@ -624,7 +624,7 @@ const FeedCard: React.FC<FeedCardProps> = ({ round, onTap }) => {
             overflow: 'hidden',
             textOverflow: 'ellipsis',
             whiteSpace: 'nowrap',
-            marginBottom: 3,
+            lineHeight: 1.15,
           }}
         >
           {courseName}
@@ -636,21 +636,23 @@ const FeedCard: React.FC<FeedCardProps> = ({ round, onTap }) => {
             color: T.inkMute,
             display: 'inline-flex',
             alignItems: 'center',
-            gap: 6,
+            gap: 5,
             flexWrap: 'wrap',
+            lineHeight: 1.15,
+            marginTop: 2,
           }}
         >
-          <span>{fmtRelativeDate(round.play_date)}</span>
+          <span>{fmtAbsoluteDate(round.play_date)}</span>
           {deltaInfo && (
             <>
               <span
                 aria-hidden
                 style={{
                   display: 'inline-block',
-                  width: 3,
-                  height: 3,
+                  width: 2.5,
+                  height: 2.5,
                   borderRadius: '50%',
-                  background: 'rgba(255,255,255,0.20)',
+                  background: 'rgba(255,255,255,0.25)',
                 }}
               />
               <span
