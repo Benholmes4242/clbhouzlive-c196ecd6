@@ -51,6 +51,7 @@ export const YourCoursesSubsection: React.FC<Props> = ({
             courseType={c.course_type}
             courseRegion={c.course_region}
             courseCountry={c.course_country}
+            courseHeaderImage={c.course_header_image ?? null}
             holdersByCategory={holdersByCourse.get(c.course_id) ?? new Map()}
             friendName={friendName}
             onTap={() =>

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ChevronRight, Crown } from 'lucide-react';
+import { ChevronRight } from 'lucide-react';
 import type { LegendCategory } from '@/lib/gam/types';
 import {
   legendCategoryIcon,
@@ -96,13 +96,16 @@ const HolderCell: React.FC<HolderCellProps> = ({
         display: 'flex',
         alignItems: 'center',
         gap: 9,
-        padding: '8px 10px',
-        background: isSelf ? 'rgba(251,188,46,0.06)' : 'transparent',
+        padding: isSelf ? '6px 8px' : '8px 10px',
+        background: isSelf
+          ? 'linear-gradient(180deg, rgba(251,188,46,0.10) 0%, rgba(251,188,46,0.03) 100%)'
+          : 'transparent',
         border: isSelf
-          ? '1px solid rgba(251,188,46,0.30)'
+          ? '1px solid rgba(251,188,46,0.22)'
           : '1px solid transparent',
-        borderRadius: 10,
+        borderRadius: isSelf ? 9 : 10,
         minWidth: 0,
+        boxSizing: 'border-box',
       }}
     >
       <div
@@ -174,6 +177,8 @@ interface Props {
   courseRegion: string | null;
   courseCountry: string | null;
   courseType: string | null;
+  /** Hero strip background image (course photo). Falls back to gradient if null. */
+  courseHeaderImage?: string | null;
   /** Pre-filtered (by current window) holders map keyed by category. */
   holdersByCategory: Map<LegendCategory, CourseLegendHolderRow>;
   onTap: () => void;
@@ -186,6 +191,7 @@ export const CourseLegendsCard: React.FC<Props> = ({
   courseRegion,
   courseCountry,
   courseType,
+  courseHeaderImage,
   holdersByCategory,
   onTap,
   friendName,
@@ -235,23 +241,74 @@ export const CourseLegendsCard: React.FC<Props> = ({
         background: 'var(--hcp-bg-1)',
         border: '1px solid var(--hcp-line)',
         borderRadius: 14,
-        padding: '14px 14px 0',
+        overflow: 'hidden',
         cursor: 'pointer',
         transform: pressed ? 'scale(0.99)' : 'scale(1)',
         transition: 'transform 140ms cubic-bezier(0.22, 0.61, 0.36, 1)',
         fontFamily: FONT,
       }}
     >
-      {/* Header */}
+      {/* Hero strip with photo + scrims + overlaid title */}
       <div
         style={{
-          display: 'flex',
-          alignItems: 'flex-start',
-          gap: 10,
-          marginBottom: 12,
+          position: 'relative',
+          height: 88,
+          width: '100%',
+          background: courseHeaderImage
+            ? undefined
+            : 'linear-gradient(180deg, rgba(247,147,30,0.18) 0%, var(--hcp-bg-2) 100%)',
+          overflow: 'hidden',
         }}
       >
-        <div style={{ flex: 1, minWidth: 0 }}>
+        {courseHeaderImage && (
+          <img
+            src={courseHeaderImage}
+            alt=""
+            loading="lazy"
+            style={{
+              position: 'absolute',
+              inset: 0,
+              width: '100%',
+              height: '100%',
+              objectFit: 'cover',
+              display: 'block',
+            }}
+          />
+        )}
+        {/* TOP SCRIM — matches EchoInsightsCard "Suited to Your Game" exactly */}
+        <div
+          style={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            height: '40%',
+            background: 'linear-gradient(180deg, rgba(5,8,16,0.55) 0%, rgba(5,8,16,0) 100%)',
+            pointerEvents: 'none',
+          }}
+        />
+        {/* BOTTOM SCRIM — matches EchoInsightsCard "Suited to Your Game" exactly */}
+        <div
+          style={{
+            position: 'absolute',
+            bottom: 0,
+            left: 0,
+            right: 0,
+            height: '55%',
+            background: 'linear-gradient(180deg, rgba(5,8,16,0) 0%, rgba(5,8,16,0.92) 100%)',
+            pointerEvents: 'none',
+          }}
+        />
+        {/* Overlaid title block */}
+        <div
+          style={{
+            position: 'absolute',
+            left: 14,
+            right: 14,
+            bottom: 10,
+            minWidth: 0,
+          }}
+        >
           <CourseEyebrow
             type={courseType}
             region={courseRegion}
@@ -261,59 +318,44 @@ export const CourseLegendsCard: React.FC<Props> = ({
             style={{
               fontSize: 14,
               fontWeight: 700,
-              color: 'var(--hcp-t-100)',
+              color: '#FFFFFF',
               lineHeight: 1.3,
               whiteSpace: 'nowrap',
               overflow: 'hidden',
               textOverflow: 'ellipsis',
+              textShadow: '0 1px 3px rgba(0,0,0,0.55)',
+              marginTop: 2,
             }}
           >
             {courseName}
           </div>
         </div>
-        <div
-          style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: 4,
-            padding: '3px 7px',
-            borderRadius: 999,
-            background: 'rgba(251,188,46,0.14)',
-            border: '1px solid rgba(251,188,46,0.40)',
-            color: GOLD,
-            fontSize: 10,
-            fontWeight: 700,
-            letterSpacing: '0.04em',
-            flexShrink: 0,
-          }}
-        >
-          <Crown size={10} strokeWidth={2.5} />
-          {youOwnedCount}/{totalCategories}
-        </div>
       </div>
 
       {/* Holder columns — two independent flex columns so filtering in one
           doesn't shift items into the wrong column of a grid. */}
-      <div style={{ display: 'flex', gap: 6, alignItems: 'flex-start' }}>
-        <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 6 }}>
-          {leftColumn.map(({ cat, row }) => (
-            <HolderCell
-              key={cat}
-              category={cat}
-              holder={row}
-              selfLabel={selfLabel}
-            />
-          ))}
-        </div>
-        <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 6 }}>
-          {rightColumn.map(({ cat, row }) => (
-            <HolderCell
-              key={cat}
-              category={cat}
-              holder={row}
-              selfLabel={selfLabel}
-            />
-          ))}
+      <div style={{ padding: '12px 14px 0' }}>
+        <div style={{ display: 'flex', gap: 6, alignItems: 'flex-start' }}>
+          <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 6 }}>
+            {leftColumn.map(({ cat, row }) => (
+              <HolderCell
+                key={cat}
+                category={cat}
+                holder={row}
+                selfLabel={selfLabel}
+              />
+            ))}
+          </div>
+          <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 6 }}>
+            {rightColumn.map(({ cat, row }) => (
+              <HolderCell
+                key={cat}
+                category={cat}
+                holder={row}
+                selfLabel={selfLabel}
+              />
+            ))}
+          </div>
         </div>
       </div>
 
@@ -321,8 +363,6 @@ export const CourseLegendsCard: React.FC<Props> = ({
       <div
         style={{
           marginTop: 12,
-          marginLeft: -14,
-          marginRight: -14,
           borderTop: '1px solid var(--hcp-line)',
           padding: '10px 14px 11px 14px',
           display: 'flex',
