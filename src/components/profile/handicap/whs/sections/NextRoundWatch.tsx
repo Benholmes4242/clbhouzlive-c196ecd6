@@ -181,7 +181,7 @@ const NextRoundWatch: React.FC<Props> = ({ connectionId, currentHandicap }) => {
         {last5Avg != null && (
           <div
             style={{
-              padding: '18px 18px 18px',
+              padding: '12px 18px 12px',
             }}
           >
             {/* Inset wrapper so the bar sits 20px inside the band's left/right edges.
