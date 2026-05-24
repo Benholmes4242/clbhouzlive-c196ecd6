@@ -6,12 +6,6 @@ import { projectNextRound } from '@/lib/whs/handicapMath';
 import HandicapExplainerSheet from './HandicapExplainerSheet';
 import { SectionHeader } from './_shared/atoms';
 import type { WhsScore } from '@/lib/whs/types';
-import {
-  computeStablefordDistribution,
-  type StablefordScope,
-  type StablefordDistribution,
-} from './trends/computeStablefordDistribution';
-import StablefordDetailSheet from './trends/StablefordDetailSheet';
 import RoundDetailSheet from './round-detail/RoundDetailSheet';
 
 
@@ -123,66 +117,6 @@ export const RoundsThatCountCard: React.FC<Props> = ({
   const [showExplainer, setShowExplainer] = useState(false);
   const [scrubIdx, setScrubIdx] = useState<number | null>(null);
   const [isScrubbing, setIsScrubbing] = useState(false);
-  const [chartMode, setChartMode] = useState<'diff' | 'stableford'>('diff');
-  const [stablefordScope, setStablefordScope] = useState<StablefordScope>('all');
-  const [stablefordSheetOpen, setStablefordSheetOpen] = useState(false);
-  const stablefordDist = useMemo(
-    () => computeStablefordDistribution(allScores ?? [], stablefordScope),
-    [allScores, stablefordScope],
-  );
-  const stablefordStats = useMemo(() => {
-    // Filter out null/undefined AND zero — a 0-point round is almost
-    // certainly a sync issue (incomplete round from England Golf).
-    // A genuine 0-point round would require blob on every hole.
-    const valid = (allScores ?? []).filter(
-      (s) => s.stableford_points != null && s.stableford_points > 0,
-    ) as Array<WhsScore & { stableford_points: number }>;
-    // Filter by scope window for consistency with the distribution
-    const now = Date.now();
-    const windowed =
-      stablefordScope === 'all'
-        ? valid
-        : valid.filter((s) => {
-            const days = stablefordScope === '30d' ? 30 : 90;
-            return new Date(s.play_date).getTime() >= now - days * 86_400_000;
-          });
-    if (windowed.length === 0) return { best: null, avg: null, worst: null };
-    const pts = windowed.map((s) => s.stableford_points);
-    const sum = pts.reduce((a, b) => a + b, 0);
-    return {
-      best: Math.max(...pts),
-      avg: Math.round(sum / pts.length),
-      worst: Math.min(...pts),
-    };
-  }, [allScores, stablefordScope]);
-
-  // Latest stableford round's bucket for the "YOUR LAST" anchor.
-  const latestStablefordRound = useMemo<{
-    bucket: 'inZone' | 'solid' | 'offDay';
-    points: number;
-  } | null>(() => {
-    if (!allScores) return null;
-    const valid = allScores.filter(
-      (s) => s.stableford_points != null && s.stableford_points > 0,
-    ) as Array<WhsScore & { stableford_points: number }>;
-    const now = Date.now();
-    const windowed =
-      stablefordScope === 'all'
-        ? valid
-        : valid.filter((s) => {
-            const days = stablefordScope === '30d' ? 30 : 90;
-            return new Date(s.play_date).getTime() >= now - days * 86_400_000;
-          });
-    if (windowed.length === 0) return null;
-    const sorted = [...windowed].sort(
-      (a, b) => new Date(b.play_date).getTime() - new Date(a.play_date).getTime(),
-    );
-    const latest = sorted[0];
-    const pts = latest.stableford_points;
-    const bucket: 'inZone' | 'solid' | 'offDay' =
-      pts >= 36 ? 'inZone' : pts >= 33 ? 'solid' : 'offDay';
-    return { bucket, points: pts };
-  }, [allScores, stablefordScope]);
   const [sheetScoreId, setSheetScoreId] = useState<string | null>(null);
   const pointerStartRef = useRef<{ x: number; y: number; t: number } | null>(null);
   const plotRef = useRef<HTMLDivElement>(null);
@@ -304,8 +238,6 @@ export const RoundsThatCountCard: React.FC<Props> = ({
 
       <div style={{ padding: '0 20px' }}>
 
-      {chartMode === 'diff' && (
-      <>
       {/* Chart — full-bleed on page background, no card wrapper */}
       <div style={{ padding: '0 0 8px' }}>
         <style>{`
@@ -725,7 +657,7 @@ export const RoundsThatCountCard: React.FC<Props> = ({
                     }}
                   >
                     <div style={{
-                      fontSize: 9, fontWeight: 600,
+                      fontSize: 9, fontWeight: isLatest ? 700 : 600,
                       color: isLatest ? D_T100 : D_T40,
                       letterSpacing: '0.04em',
                     }}>
@@ -787,8 +719,6 @@ export const RoundsThatCountCard: React.FC<Props> = ({
           onClick={() => setSelectedId(worstRound.id)}
         />
       </div>
-      </>
-      )}
 
 
       {/* NOTE: Next-round target pair + oldest-round caption moved to NextRoundWatch.
@@ -882,213 +812,6 @@ const StatCell: React.FC<{
   );
 };
 
-// ── Stableford chart block (merged from StablefordCard) ─────────────────
-const SCOPE_BTN_LABEL: Record<StablefordScope, string> = {
-  '30d': '30D', '90d': '90D', all: 'ALL',
-};
-const SCOPE_LABEL_LONG: Record<StablefordScope, string> = {
-  '30d': 'LAST 30 DAYS', '90d': 'LAST 90 DAYS', all: 'ALL TIME',
-};
-const SF_GREEN = '#22C55E';
-const SF_AMBER = '#F7931E';
-const SF_RED = '#DC2626';
-const GREEN_GRAD = 'linear-gradient(90deg, #15803D 0%, #4ADE80 100%)';
-const AMBER_GRAD_SF = 'linear-gradient(90deg, #F59E0B 0%, #FBBF24 100%)';
-const RED_GRAD = 'linear-gradient(90deg, #991B1B 0%, #DC2626 100%)';
-
-const StablefordChartBlock: React.FC<{
-  dist: StablefordDistribution;
-  scope: StablefordScope;
-  onScopeChange: (s: StablefordScope) => void;
-  onOpenDetail: () => void;
-  /** Most recent stableford round in scope. Null if no valid rounds. */
-  latestRound: { bucket: 'inZone' | 'solid' | 'offDay'; points: number } | null;
-}> = ({ dist, scope, onScopeChange, onOpenDetail, latestRound }) => {
-  const segs = [
-    { count: dist.inZoneCount, gradient: GREEN_GRAD },
-    { count: dist.solidCount, gradient: AMBER_GRAD_SF },
-    { count: dist.offDayCount, gradient: RED_GRAD },
-  ].filter((s) => s.count > 0);
-
-  return (
-    <div
-      style={{
-        background: D_BG,
-        border: `1px solid ${D_LINE}`,
-        borderRadius: 14,
-        overflow: 'hidden',
-        padding: '28px 16px 16px',
-        fontFamily: FONT_GEIST,
-      }}
-    >
-      {/* Scope toggle + label row */}
-      <div style={{
-        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-        gap: 10, marginBottom: 12,
-      }}>
-        <span style={{
-          fontSize: 9, fontWeight: 800, color: D_T60,
-          letterSpacing: '0.16em', textTransform: 'uppercase',
-        }}>
-          STABLEFORD · {SCOPE_LABEL_LONG[scope]} ·{' '}
-          <span style={{ color: D_T100, fontVariantNumeric: 'tabular-nums' }}>
-            {dist.total}
-          </span>{' '}
-          ROUNDS
-        </span>
-        <div style={{
-          display: 'inline-flex', background: 'var(--hcp-bg-2)',
-          borderRadius: 99, padding: 2, gap: 0,
-        }}>
-          {(['30d', '90d', 'all'] as StablefordScope[]).map((s) => {
-            const a = scope === s;
-            return (
-              <button
-                key={s}
-                onClick={() => onScopeChange(s)}
-                aria-pressed={a}
-                style={{
-                  padding: '4px 8px',
-                  borderRadius: 99,
-                  background: a ? D_T100 : 'transparent',
-                  color: a ? 'var(--hcp-bg-1)' : D_T60,
-                  border: 'none', cursor: 'pointer',
-                  fontFamily: FONT_GEIST,
-                  fontSize: 10, fontWeight: 800, letterSpacing: '0.06em',
-                }}
-              >
-                {SCOPE_BTN_LABEL[s]}
-              </button>
-            );
-          })}
-        </div>
-      </div>
-
-      {dist.insufficientData ? (
-        <div style={{ padding: '20px 0', textAlign: 'center' }}>
-          <p style={{ margin: 0, fontSize: 13, fontWeight: 700, color: D_T100 }}>
-            Add a few more rounds
-          </p>
-          <p style={{ margin: '4px 0 0', fontSize: 11.5, color: D_T60 }}>
-            We need at least 3 rounds with Stableford to show your distribution.
-          </p>
-        </div>
-      ) : (
-        <>
-          {/* Distribution bar with "YOUR LAST" anchor pointer */}
-          <div style={{ position: 'relative' }}>
-            {latestRound && (() => {
-              const total = dist.inZoneCount + dist.solidCount + dist.offDayCount;
-              if (total === 0) return null;
-              const inZoneEnd = dist.inZoneCount / total;
-              const solidEnd = (dist.inZoneCount + dist.solidCount) / total;
-              const center =
-                latestRound.bucket === 'inZone'
-                  ? inZoneEnd / 2
-                  : latestRound.bucket === 'solid'
-                    ? (inZoneEnd + solidEnd) / 2
-                    : (solidEnd + 1) / 2;
-              return (
-                <div
-                  aria-hidden
-                  style={{
-                    position: 'absolute',
-                    top: -22,
-                    left: `${center * 100}%`,
-                    transform: 'translateX(-50%)',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'center',
-                    gap: 2,
-                    pointerEvents: 'none',
-                    zIndex: 2,
-                  }}
-                >
-                  <span
-                    style={{
-                      fontSize: 9,
-                      fontWeight: 800,
-                      letterSpacing: '0.12em',
-                      textTransform: 'uppercase',
-                      color: AMBER,
-                      fontFamily: FONT_GEIST,
-                    }}
-                  >
-                    Your last
-                  </span>
-                  <span
-                    style={{
-                      width: 0,
-                      height: 0,
-                      borderLeft: '5px solid transparent',
-                      borderRight: '5px solid transparent',
-                      borderTop: `5px solid ${AMBER}`,
-                    }}
-                  />
-                </div>
-              );
-            })()}
-            <button
-              onClick={onOpenDetail}
-              aria-label="Open Stableford detail"
-              style={{
-                display: 'flex', width: '100%', height: 44,
-                borderRadius: 10, overflow: 'hidden',
-                background: 'var(--hcp-bg-2)',
-                border: 'none', padding: 0, cursor: 'pointer',
-              }}
-            >
-              {segs.map((s, i) => (
-                <div key={i} style={{
-                  flex: s.count, background: s.gradient,
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  color: '#fff', fontSize: 14, fontWeight: 800,
-                  letterSpacing: '-0.02em',
-                  fontVariantNumeric: 'tabular-nums',
-                }}>
-                  {s.count > dist.total * 0.1 ? s.count : ''}
-                </div>
-              ))}
-            </button>
-          </div>
-
-          {/* Chips row */}
-          <div style={{
-            display: 'grid',
-            gridTemplateColumns: `${Math.max(dist.inZoneCount, 0.5)}fr ${Math.max(dist.solidCount, 0.5)}fr ${Math.max(dist.offDayCount, 0.5)}fr`,
-            marginTop: 10,
-          }}>
-            <KeyCell color={SF_GREEN} label="IN THE ZONE" meta={`36+ · ${dist.inZonePct}%`} />
-            <KeyCell color={SF_AMBER} label="SOLID" meta={`33–35 · ${dist.solidPct}%`} />
-            <KeyCell color={SF_RED} label="OFF DAY" meta={`<33 · ${dist.offDayPct}%`} />
-          </div>
-        </>
-      )}
-    </div>
-  );
-};
-
-const KeyCell: React.FC<{ color: string; label: string; meta: string }> = ({ color, label, meta }) => (
-  <div style={{ textAlign: 'center', padding: '0 4px', fontFamily: FONT_GEIST }}>
-    <div style={{
-      fontSize: 9.5, fontWeight: 800, color: D_T100,
-      letterSpacing: '0.12em', textTransform: 'uppercase',
-      lineHeight: 1.2, marginBottom: 3,
-      display: 'inline-flex', alignItems: 'center', gap: 5, whiteSpace: 'nowrap',
-    }}>
-      <span aria-hidden style={{
-        width: 6, height: 6, borderRadius: '50%', background: color, flexShrink: 0,
-      }} />
-      {label}
-    </div>
-    <div style={{
-      fontSize: 10, color: D_T60, fontWeight: 600,
-      fontVariantNumeric: 'tabular-nums', whiteSpace: 'nowrap',
-    }}>
-      {meta}
-    </div>
-  </div>
-);
 
 
 // ── Next-round state cards ────────────────────────────────────────────────
