@@ -177,6 +177,8 @@ interface Props {
   courseRegion: string | null;
   courseCountry: string | null;
   courseType: string | null;
+  /** Hero strip background image (course photo). Falls back to gradient if null. */
+  courseHeaderImage?: string | null;
   /** Pre-filtered (by current window) holders map keyed by category. */
   holdersByCategory: Map<LegendCategory, CourseLegendHolderRow>;
   onTap: () => void;
@@ -189,6 +191,7 @@ export const CourseLegendsCard: React.FC<Props> = ({
   courseRegion,
   courseCountry,
   courseType,
+  courseHeaderImage,
   holdersByCategory,
   onTap,
   friendName,
