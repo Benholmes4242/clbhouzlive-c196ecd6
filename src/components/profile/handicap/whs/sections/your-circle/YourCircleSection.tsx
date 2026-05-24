@@ -116,7 +116,7 @@ export const YourCircleSection: React.FC<Props> = ({ userId }) => {
                   whiteSpace: 'nowrap',
                 }}
               >
-                {stats.self.friend_name} · {fmtHcp(stats.self.friend_handicap_index)} hcp
+                {stats.self.friend_name} · {fmtHcp(stats.self.friend_handicap_index)}
               </div>
             </div>
             <div
