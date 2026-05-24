@@ -156,20 +156,10 @@ const HeroHandicapCardDark: React.FC<Props> = ({ connection }) => {
 
   const roundCount90 = recent90.length;
 
-  const periodAvgPts90 = useMemo<number | null>(() => {
-    const v = recent90.map((s) => s?.stableford_points).filter((p: any): p is number => typeof p === 'number');
-    if (v.length < 3) return null;
-    return v.reduce((a, b) => a + b, 0) / v.length;
-  }, [recent90]);
+  // FORM tile removed — Stableford form logic now lives in the ForecastCard
+  // below the hero (which uses handicap differentials, not Stableford points).
 
-  // Lifetime stableford baseline — used only as the comparison anchor for Form's label.
-  const lifetimeAvgPts = useMemo<number | null>(() => {
-    const v = scores.map((s) => s?.stableford_points).filter((p: any): p is number => typeof p === 'number');
-    if (v.length === 0) return null;
-    return v.reduce((a, b) => a + b, 0) / v.length;
-  }, [scores]);
 
-  const form = formLabel(periodAvgPts90, lifetimeAvgPts);
 
   const best = useMemo(() => {
     const withDiff = counters.filter(
