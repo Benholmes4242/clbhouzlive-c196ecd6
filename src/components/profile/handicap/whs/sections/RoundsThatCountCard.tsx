@@ -737,13 +737,30 @@ export const RoundsThatCountCard: React.FC<Props> = ({
 
       </div>
     </section>
-    <RoundDetailSheet
-      open={sheetScoreId != null}
-      onClose={() => setSheetScoreId(null)}
-      scoreId={sheetScoreId}
-      connectionId={connectionId}
-      handicapDelta={null}
-    />
+    {(() => {
+      const sheetIdx = sheetScoreId
+        ? enriched.rounds.findIndex((r) => r.id === sheetScoreId)
+        : -1;
+      const sheetRound = sheetIdx >= 0 ? enriched.rounds[sheetIdx] : null;
+      const prevRound = sheetIdx > 0 ? enriched.rounds[sheetIdx - 1] : null;
+      const delta =
+        sheetRound?.is_counter &&
+        sheetRound.handicap_index_at_time != null &&
+        prevRound?.handicap_index_at_time != null
+          ? Number(
+              (sheetRound.handicap_index_at_time - prevRound.handicap_index_at_time).toFixed(1),
+            )
+          : null;
+      return (
+        <RoundDetailSheet
+          open={sheetScoreId != null}
+          onClose={() => setSheetScoreId(null)}
+          scoreId={sheetScoreId}
+          connectionId={connectionId}
+          handicapDelta={delta}
+        />
+      );
+    })()}
     </>
   );
 };
