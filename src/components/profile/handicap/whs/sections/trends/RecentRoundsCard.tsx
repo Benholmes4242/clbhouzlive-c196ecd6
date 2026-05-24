@@ -486,10 +486,18 @@ const DateTile: React.FC<DateTileProps> = ({ dateString, thumbnailUrl }) => {
           <span
             aria-hidden
             style={{
-              position: 'absolute',
-              inset: 0,
+              position: 'absolute', top: 0, left: 0, right: 0, height: '40%',
               background:
-                'linear-gradient(180deg, rgba(0,0,0,0.30), rgba(0,0,0,0.65))',
+                'linear-gradient(180deg, rgba(5,8,16,0.55) 0%, rgba(5,8,16,0) 100%)',
+              pointerEvents: 'none',
+            }}
+          />
+          <span
+            aria-hidden
+            style={{
+              position: 'absolute', bottom: 0, left: 0, right: 0, height: '55%',
+              background:
+                'linear-gradient(180deg, rgba(5,8,16,0) 0%, rgba(5,8,16,0.92) 90%)',
               pointerEvents: 'none',
             }}
           />
