@@ -428,7 +428,7 @@ const PointsBody: React.FC<PointsBodyProps> = ({ dist, scope, scoringRange }) =>
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                color: 'var(--hcp-bg-1)',
+                color: '#FFFFFF',
                 fontSize: 16,
                 fontWeight: 800,
                 letterSpacing: '-0.02em',
