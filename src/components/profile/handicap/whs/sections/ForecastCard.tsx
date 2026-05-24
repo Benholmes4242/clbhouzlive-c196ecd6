@@ -175,7 +175,11 @@ const Headline: React.FC<{
 
 // ── Counter strip ───────────────────────────────────────────────────
 
-const CounterStrip: React.FC<{ cells: CounterCell[] }> = ({ cells }) => {
+const CounterStrip: React.FC<{
+  cells: CounterCell[];
+  selectedCellId: string | null;
+  onSelect: (id: string | null) => void;
+}> = ({ cells, selectedCellId, onSelect }) => {
   if (cells.length === 0) return null;
   const diffs = cells.map((c) => c.differential);
   const minDiff = Math.min(...diffs);
@@ -198,14 +202,22 @@ const CounterStrip: React.FC<{ cells: CounterCell[] }> = ({ cells }) => {
         const isLowerHalf = cell.rank < 4;
         const fill = isLowerHalf ? T.goodFill : T.amberFill;
         const fillBorder = isLowerHalf ? T.goodFillBorder : T.amberFillBorder;
-        const shadow = cell.isExpiring
-          ? `0 0 0 2px rgba(247,147,30,0.55)`
+        const isSelected = selectedCellId === cell.score.id;
+        const baseShadow = cell.isExpiring
+          ? `0 0 0 2px rgba(239,68,68,0.55)`
           : cell.isNew
             ? `0 0 0 2px rgba(34,197,94,0.55)`
             : 'none';
+        const shadow = isSelected
+          ? `0 0 0 2px rgba(255,255,255,0.95)`
+          : baseShadow;
         return (
-          <div
+          <button
             key={cell.score.id}
+            type="button"
+            aria-pressed={isSelected}
+            aria-label={`Counter ${cell.rank + 1}: differential ${cell.differential.toFixed(1)}`}
+            onClick={() => onSelect(isSelected ? null : cell.score.id)}
             style={{
               flex: 1,
               height: `${heightPct}%`,
@@ -214,6 +226,14 @@ const CounterStrip: React.FC<{ cells: CounterCell[] }> = ({ cells }) => {
               borderRadius: 3,
               boxShadow: shadow,
               position: 'relative',
+              padding: 0,
+              cursor: 'pointer',
+              transform: isSelected ? 'scaleY(1.05)' : 'scaleY(1)',
+              transformOrigin: 'bottom',
+              transition: 'transform 120ms ease, box-shadow 120ms ease',
+              appearance: 'none',
+              WebkitAppearance: 'none',
+              fontFamily: FONT,
             }}
           >
             {(cell.isExpiring || cell.isNew) && (
@@ -226,16 +246,84 @@ const CounterStrip: React.FC<{ cells: CounterCell[] }> = ({ cells }) => {
                   transform: 'translateX(-50%)',
                   fontSize: 9,
                   fontWeight: 800,
-                  color: cell.isExpiring ? T.amber : T.good,
+                  color: cell.isExpiring ? T.bad : T.good,
                   lineHeight: 1,
                 }}
               >
                 ▾
               </span>
             )}
-          </div>
+          </button>
         );
       })}
+    </div>
+  );
+};
+
+// ── Inline detail panel for selected counter ────────────────────────
+
+const formatPlayDate = (iso: string): string => {
+  try {
+    const d = new Date(iso);
+    if (Number.isNaN(d.getTime())) return iso;
+    return d.toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' });
+  } catch {
+    return iso;
+  }
+};
+
+const CounterDetailPanel: React.FC<{ cell: CounterCell }> = ({ cell }) => {
+  const courseName = cell.score.course?.name ?? 'Unknown course';
+  const status = cell.isExpiring ? 'Expiring soon' : cell.isNew ? 'New counter' : 'Counter';
+  const statusColor = cell.isExpiring ? T.bad : cell.isNew ? T.good : T.textMid;
+
+  const Item: React.FC<{ label: string; value: React.ReactNode; color?: string }> = ({ label, value, color }) => (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 2, minWidth: 0 }}>
+      <span
+        style={{
+          textTransform: 'uppercase',
+          fontSize: 9,
+          letterSpacing: '0.16em',
+          fontWeight: 700,
+          color: T.textLow,
+        }}
+      >
+        {label}
+      </span>
+      <span
+        style={{
+          fontSize: 12.5,
+          fontWeight: 700,
+          color: color ?? T.textHi,
+          fontVariantNumeric: 'tabular-nums',
+          whiteSpace: 'nowrap',
+          overflow: 'hidden',
+          textOverflow: 'ellipsis',
+        }}
+      >
+        {value}
+      </span>
+    </div>
+  );
+
+  return (
+    <div
+      style={{
+        margin: '10px 18px 0',
+        padding: '10px 12px',
+        border: `1px solid ${T.divider}`,
+        borderRadius: 10,
+        background: 'rgba(255,255,255,0.03)',
+        display: 'grid',
+        gridTemplateColumns: 'auto 1fr auto auto',
+        gap: 14,
+        alignItems: 'center',
+      }}
+    >
+      <Item label="Diff" value={cell.differential.toFixed(1)} />
+      <Item label="Course" value={courseName} />
+      <Item label="Date" value={formatPlayDate(cell.score.play_date)} />
+      <Item label="Status" value={status} color={statusColor} />
     </div>
   );
 };
