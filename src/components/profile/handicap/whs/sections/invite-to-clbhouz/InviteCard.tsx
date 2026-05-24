@@ -148,9 +148,8 @@ export const InviteCard: React.FC<Props> = ({ friend }) => {
                 fontFamily: FONT_GEIST,
                 fontSize: 12,
                 fontWeight: 800,
-                color: isPlusHandicap ? AMBER : INK,
+                color: isPlusHandicap ? '#4ADE80' : INK,
                 fontVariantNumeric: 'tabular-nums',
-                textShadow: isPlusHandicap ? '0 0 8px rgba(247,147,30,0.5)' : undefined,
                 flexShrink: 0,
               }}
             >
@@ -183,23 +182,22 @@ export const InviteCard: React.FC<Props> = ({ friend }) => {
           width: '100%',
           padding: '8px 12px',
           borderRadius: 10,
-          border: 'none',
-          background: `linear-gradient(180deg, ${AMBER} 0%, #E07F0A 100%)`,
-          color: '#0A0A0A',
+          border: '1px solid rgba(247,147,30,0.35)',
+          background: 'rgba(247,147,30,0.10)',
+          color: AMBER,
           fontFamily: FONT_GEIST,
-          fontSize: 11.5,
+          fontSize: 11,
           fontWeight: 800,
-          letterSpacing: '0.02em',
+          letterSpacing: '0.04em',
+          textTransform: 'uppercase',
           cursor: 'pointer',
           display: 'inline-flex',
           alignItems: 'center',
           justifyContent: 'center',
-          gap: 6,
-          boxShadow:
-            '0 2px 10px rgba(247,147,30,0.32), inset 0 1px 0 rgba(255,255,255,0.25)',
+          gap: 5,
         }}
       >
-        <Send size={12} strokeWidth={2.5} />
+        <Send size={11} strokeWidth={2.2} />
         Invite
       </button>
     </div>

@@ -83,7 +83,7 @@ export const InviteToClbhouzV2: React.FC<Props> = ({ ownerUserId }) => {
     return (
       <section id="invite-to-clbhouz-section" style={{ marginTop: 32 }}>
         <DarkSectionHeader
-          eyebrow="MAKE YOUR FEED LOUDER"
+          eyebrow="YOUR INVITES"
           title="Everyone's here"
           sub="All your England Golf friends are already on Clbhouz 🎉"
           right={<SentBadge count={sentCount} onClick={() => setSheetOpen(true)} />}
@@ -96,9 +96,9 @@ export const InviteToClbhouzV2: React.FC<Props> = ({ ownerUserId }) => {
   return (
     <section id="invite-to-clbhouz-section" style={{ marginTop: 32 }}>
       <DarkSectionHeader
-        eyebrow="MAKE YOUR FEED LOUDER"
+        eyebrow="YOUR INVITES"
         title="Friends on England Golf"
-        sub="Not on clbhouz yet — invite them to share rounds."
+        sub="Not on Clbhouz yet — invite them to share rounds."
         right={<SentBadge count={sentCount} onClick={() => setSheetOpen(true)} />}
       />
 
