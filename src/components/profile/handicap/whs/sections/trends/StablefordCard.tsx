@@ -675,7 +675,7 @@ const ShotsBody: React.FC<ShotsBodyProps> = ({ trophyAgg, shotsLoading, scope })
   }
 
   const hs = trophyAgg?.hole_stats;
-  const roundsWithHoles = hs?.rounds_with_holes_count ?? 0;
+  const roundsWithHoles = hs?.rounds_with_holes_in_window ?? 0;
   const totalRounds = hs?.total_rounds_count ?? 0;
 
   // 2. No hole data at all
@@ -706,10 +706,10 @@ const ShotsBody: React.FC<ShotsBodyProps> = ({ trophyAgg, shotsLoading, scope })
     );
   }
 
-  const aces = hs.aces_count ?? 0;
-  const albatross = hs.albatross_count ?? 0;
-  const eagles = hs.eagles_count ?? 0;
-  const birdies = hs.birdies_count ?? 0;
+  const aces = hs.aces_count_window ?? 0;
+  const albatross = hs.albatross_count_window ?? 0;
+  const eagles = hs.eagles_count_window ?? 0;
+  const birdies = hs.birdies_count_window ?? 0;
   const pars = hs.pars_count ?? 0;
   const bogey = hs.bogey_count ?? 0;
   const doublePlus = hs.double_plus_count ?? 0;
