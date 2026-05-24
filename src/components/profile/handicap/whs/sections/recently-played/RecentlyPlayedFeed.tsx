@@ -79,6 +79,13 @@ export const RecentlyPlayedFeed: React.FC<Props> = ({ ownerUserId }) => {
         scoreId={sheetActivity?.last_round_score_id ?? null}
         open={!!sheetActivity}
         onClose={() => setSheetActivity(null)}
+        handicapDelta={
+          sheetActivity?.is_counter &&
+          sheetActivity.friend_handicap_index != null &&
+          sheetActivity.handicap_index_at_time != null
+            ? sheetActivity.friend_handicap_index - sheetActivity.handicap_index_at_time
+            : null
+        }
       />
     </section>
   );
