@@ -131,19 +131,6 @@ const HeroCard: React.FC<{
         </div>
       </div>
     </button>
-    {course.rationale && (
-      <p
-        style={{
-          margin: '12px 4px 0',
-          fontSize: 13.5,
-          lineHeight: 1.5,
-          color: 'var(--hcp-t-60)',
-          fontFamily: FONT_GEIST,
-        }}
-      >
-        {course.rationale}
-      </p>
-    )}
   </div>
 );
 
