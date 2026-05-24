@@ -105,20 +105,20 @@ const HeroCard: React.FC<{
             fontVariantNumeric: 'tabular-nums',
           }}
         >
-          EXP {course.expected_differential != null
+          PRED {course.expected_differential != null
             ? fmtDiff(course.expected_differential, { plus: true })
             : '—'}
         </span>
       </div>
       <div style={{ position: 'absolute', left: 18, right: 18, bottom: 16, textAlign: 'left' }}>
-        {course.region && (
+        {(course.country || course.region) && (
           <div
             style={{
               fontSize: 11, fontWeight: 800, letterSpacing: '0.14em',
               color: 'rgba(255,255,255,0.65)', marginBottom: 6, textTransform: 'uppercase',
             }}
           >
-            {course.region}
+            {[course.country, course.region].filter(Boolean).join(' · ')}
           </div>
         )}
         <div
