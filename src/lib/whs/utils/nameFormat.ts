@@ -1,3 +1,5 @@
+import { format } from 'date-fns';
+
 /**
  * Convert England Golf "Surname, Given" name format to display order
  * "Given Surname". Returns the original string if there's no comma.
@@ -46,4 +48,17 @@ export function fmtRelative(
   }
   if (days < 30) return `${Math.floor(days / 7)}w ago`;
   return `${Math.floor(days / 30)}mo ago`;
+}
+
+/**
+ * Format a date as a short absolute string, e.g. "26 Apr 2026".
+ * Falls back to the raw ISO string if parsing fails.
+ */
+export function fmtAbsoluteDate(iso: string | null | undefined): string {
+  if (!iso) return '';
+  try {
+    return format(new Date(iso), 'd LLL yyyy');
+  } catch {
+    return iso;
+  }
 }

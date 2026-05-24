@@ -2,7 +2,7 @@ import React, { useMemo } from 'react';
 import { Flame, ChevronRight } from 'lucide-react';
 import { displayName } from '@/lib/whs/utils/initials';
 import { pickAvatarSrc } from '@/lib/whs/utils/avatarSrc';
-import { fmtRelative } from '@/lib/whs/utils/nameFormat';
+import { fmtAbsoluteDate } from '@/lib/whs/utils/nameFormat';
 import { useFriendRoundDetail } from '@/lib/whs/hooks';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import FlagSilhouetteOverlay from '@/components/whs/FlagSilhouetteOverlay';
@@ -60,7 +60,7 @@ export const FriendRoundCardV2: React.FC<Props> = ({
   const stableford = activity.last_round_stableford;
   const diff = activity.last_round_differential;
   const isCounter = activity.is_counter;
-  const timeAgo = fmtRelative(activity.last_round_played_at, { compact: false });
+  const playedDate = fmtAbsoluteDate(activity.last_round_played_at);
 
   const diffColor =
     diff != null && diff > 0
@@ -198,7 +198,7 @@ export const FriendRoundCardV2: React.FC<Props> = ({
                 textOverflow: 'ellipsis',
               }}
             >
-              {timeAgo}
+              {playedDate}
             </div>
           </div>
 

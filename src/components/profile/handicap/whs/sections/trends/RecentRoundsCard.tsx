@@ -6,6 +6,7 @@ import { useAllScores, useHandicapTrend } from '@/lib/whs/hooks';
 import { computeRoundDeltas, type RoundWithDelta } from './computeRoundDeltas';
 import RoundDetailSheet from '../round-detail/RoundDetailSheet';
 import SectionHeader from '../SectionHeader';
+import { fmtAbsoluteDate } from '@/lib/whs/utils/nameFormat';
 
 
 interface Props {
@@ -105,15 +106,6 @@ const fmtRelativeDate = (iso: string): string => {
   if (days < 365) return `${Math.floor(days / 30)}mo ago`;
   return `${Math.floor(days / 365)}y ago`;
 };
-
-const fmtAbsoluteDate = (iso: string): string => {
-  try {
-    return format(new Date(iso), 'd LLL yyyy');
-  } catch {
-    return iso;
-  }
-};
-
 
 const fmtMonth = (iso: string): string => {
   try {
