@@ -195,128 +195,125 @@ export const PersonalBests: React.FC<Props> = ({ connectionId, currentHandicap }
       };
     }
 
-    return [bestGross, bestDiff, bestSF, bestVsHcp, mostMonth, longestStreak];
+    return [bestDiff, bestGross, bestSF, bestVsHcp, mostMonth, longestStreak];
   }, [scores, currentHandicap]);
 
   return (
-    <section style={{ marginTop: 16 }}>
+    <section style={{ marginTop: 16, fontFamily: FONT }}>
       <SectionHeader
         eyebrow="PERSONAL BESTS"
         title="Records to break"
       />
-      <div
-        style={{
-          display: 'flex',
-          gap: 8,
-          overflowX: 'auto',
-          padding: '0 16px 12px',
-          scrollbarWidth: 'none',
-          WebkitOverflowScrolling: 'touch',
-          fontFamily: FONT,
-        }}
-      >
-        {(isLoading ? Array.from({ length: 6 }) : tiles).map((t, i) => (
-          <div
-            key={i}
-            style={{
-              flexShrink: 0,
-              width: 'calc((100vw - 32px - 8px) / 2.0)',
-              background: D_BG,
-              border: `1px solid ${D_LINE}`,
-              borderRadius: 12,
-              overflow: 'hidden',
-            }}
-          >
-            {isLoading ? (
-              <>
+      <div style={{ padding: '0 16px 12px' }}>
+        <div
+          style={{
+            background: 'linear-gradient(180deg, rgba(255,255,255,0.025) 0%, rgba(255,255,255,0.01) 100%)',
+            border: '1px solid rgba(255,255,255,0.05)',
+            borderRadius: 14,
+            overflow: 'hidden',
+          }}
+        >
+          {(isLoading ? Array.from({ length: 6 }) : tiles).map((t, i) => (
+            <div
+              key={i}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 12,
+                padding: '13px 16px',
+                borderBottom: i < 5 ? '1px solid rgba(255,255,255,0.04)' : 'none',
+                position: 'relative',
+              }}
+            >
+              {!isLoading && (t as Tile).value !== '—' && (
                 <div
+                  aria-hidden
                   style={{
-                    height: 72,
-                    background: D_BG3,
-                    borderBottom: `0.5px solid ${D_LINE}`,
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                    bottom: 0,
+                    width: 2,
+                    background: 'linear-gradient(180deg, #F7931E 0%, #BA6E12 100%)',
+                    opacity: 0.6,
                   }}
                 />
-                <div style={{ padding: '10px 12px 12px', minHeight: 60 }}>
-                  <div style={{ height: 8, width: '70%', margin: '0 auto 6px', background: D_BG3, borderRadius: 2 }} />
-                  <div style={{ height: 9, width: '85%', margin: '0 auto', background: D_BG3, borderRadius: 2 }} />
-                </div>
-              </>
-            ) : (
-              <>
-                <div
-                  style={{
-                    background: `linear-gradient(180deg, rgba(245,158,11,0.10) 0%, transparent 100%)`,
-                    height: 72,
-                    display: 'flex',
-                    alignItems: 'baseline',
-                    justifyContent: 'center',
-                    gap: 4,
-                    borderBottom: `0.5px solid ${D_LINE}`,
-                    paddingTop: 30,
-                  }}
-                >
-                  <span
-                    style={{
-                      fontSize: 38,
-                      fontWeight: 800,
-                      color: D_T100,
-                      fontVariantNumeric: 'tabular-nums',
-                      letterSpacing: '-0.035em',
-                      lineHeight: 1,
-                    }}
-                  >
-                    {(t as Tile).value}
-                  </span>
-                  {(t as Tile).unit && (
-                    <span
-                      style={{
-                        fontSize: 13,
-                        fontWeight: 700,
-                        color: D_T60,
-                        letterSpacing: '-0.01em',
-                      }}
-                    >
-                      {(t as Tile).unit}
-                    </span>
-                  )}
-                </div>
-                <div style={{ padding: '10px 12px 12px', minHeight: 60, textAlign: 'center' }}>
-                  <div
-                    style={{
-                      fontSize: 10,
-                      fontWeight: 800,
-                      color: AMBER,
-                      letterSpacing: '0.16em',
-                      textTransform: 'uppercase',
-                      marginBottom: 5,
-                      whiteSpace: 'nowrap',
-                      overflow: 'hidden',
-                      textOverflow: 'ellipsis',
-                    }}
-                  >
-                    {(t as Tile).eyebrow}
-                  </div>
-                  {(t as Tile).caption && (
+              )}
+
+              <div style={{ flex: 1, minWidth: 0 }}>
+                {isLoading ? (
+                  <>
+                    <div style={{ height: 9, width: '50%', background: D_BG3, borderRadius: 2, marginBottom: 6 }} />
+                    <div style={{ height: 10, width: '75%', background: D_BG3, borderRadius: 2 }} />
+                  </>
+                ) : (
+                  <>
                     <div
                       style={{
-                        fontSize: 11,
-                        color: D_T60,
-                        lineHeight: 1.35,
-                        fontWeight: 500,
-                        display: '-webkit-box',
-                        WebkitLineClamp: 2,
-                        WebkitBoxOrient: 'vertical',
-                        overflow: 'hidden',
+                        fontSize: 10,
+                        fontWeight: 800,
+                        letterSpacing: '0.14em',
+                        textTransform: 'uppercase',
+                        color: 'rgba(247,147,30,0.85)',
                       }}
                     >
-                      {(t as Tile).caption}
+                      {(t as Tile).eyebrow}
                     </div>
-                  )}
-                </div>
-              </>
-            )}
-          </div>
-        ))}
+                    {(t as Tile).caption && (
+                      <div
+                        style={{
+                          fontSize: 10.5,
+                          color: D_T60,
+                          marginTop: 3,
+                          fontWeight: 600,
+                          lineHeight: 1.35,
+                          whiteSpace: 'nowrap',
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis',
+                        }}
+                      >
+                        {(t as Tile).caption}
+                      </div>
+                    )}
+                  </>
+                )}
+              </div>
+
+              <div style={{ display: 'flex', alignItems: 'baseline', gap: 4, flexShrink: 0 }}>
+                {isLoading ? (
+                  <div style={{ height: 22, width: 48, background: D_BG3, borderRadius: 4 }} />
+                ) : (
+                  <>
+                    <span
+                      style={{
+                        fontSize: 26,
+                        fontWeight: 200,
+                        color: (t as Tile).value === '—' ? 'rgba(255,255,255,0.25)' : D_T100,
+                        fontVariantNumeric: 'tabular-nums',
+                        letterSpacing: '-0.04em',
+                        lineHeight: 0.9,
+                      }}
+                    >
+                      {(t as Tile).value}
+                    </span>
+                    {(t as Tile).unit && (
+                      <span
+                        style={{
+                          fontSize: 11,
+                          fontWeight: 700,
+                          color: 'rgba(255,255,255,0.4)',
+                          letterSpacing: '-0.01em',
+                        }}
+                      >
+                        {(t as Tile).unit}
+                      </span>
+                    )}
+                  </>
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
     </section>
   );
