@@ -27,7 +27,7 @@ export interface CounterCell {
   differential: number;
   /** 0 = best, 7 = weakest (within the current 8 counters, sorted ascending). */
   rank: number;
-  /** True if this counter is the oldest round in the last 20 (next to roll). */
+  /** True if this counter's round is among the 5 oldest in the window (at risk of rolling off within the projection horizon). */
   isExpiring: boolean;
   /** True if this counter is also in the most recent 5 rounds. */
   isNew: boolean;
