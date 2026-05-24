@@ -140,7 +140,7 @@ const LastRoundHeroCard: React.FC<Props> = ({ round, timeAgo, onClick }) => {
         position: 'relative',
         height: 280,
         margin: '0 20px',
-        borderRadius: 16,
+        borderRadius: 18,
         overflow: 'hidden',
         background: '#0F172A',
         border: '1px solid var(--hcp-line-2)',
@@ -166,14 +166,20 @@ const LastRoundHeroCard: React.FC<Props> = ({ round, timeAgo, onClick }) => {
         <div style={{ position: 'absolute', inset: 0, background: FALLBACK_GRADIENT }} />
       )}
 
-      {/* Legibility scrim — heavier top + bottom */}
+      {/* Editorial scrim — top fade (matches Suited HeroCard) */}
       <div
         aria-hidden
         style={{
-          position: 'absolute',
-          inset: 0,
-          background:
-            'linear-gradient(180deg, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.15) 28%, rgba(0,0,0,0.25) 55%, rgba(0,0,0,0.78) 100%)',
+          position: 'absolute', top: 0, left: 0, right: 0, height: '40%',
+          background: 'linear-gradient(180deg, rgba(5,8,16,0.55) 0%, rgba(5,8,16,0) 100%)',
+        }}
+      />
+      {/* Editorial scrim — bottom fade (matches Suited HeroCard) */}
+      <div
+        aria-hidden
+        style={{
+          position: 'absolute', bottom: 0, left: 0, right: 0, height: '55%',
+          background: 'linear-gradient(180deg, rgba(5,8,16,0) 0%, rgba(5,8,16,0.92) 90%)',
         }}
       />
 
