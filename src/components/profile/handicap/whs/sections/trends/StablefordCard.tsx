@@ -1106,7 +1106,7 @@ const MilestoneRow: React.FC<{
   name: string;
   count: number;
   rarity: string;
-  rings: 0 | 1 | 2;
+  rings: number;
   meta: string;
   isLast: boolean;
 }> = ({ name, count, rarity, rings, meta, isLast }) => {
