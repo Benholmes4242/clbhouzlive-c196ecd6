@@ -10,6 +10,7 @@ import { predictHandicap, VERDICT_META } from './predictHandicap';
 
 interface Props {
   connectionId: string;
+  userId: string;
   currentHandicap: number | null | undefined;
   /** Optional. Controls which subset of the stack renders.
    * 'hero-only' = form hero + HandicapProjectionCard.
@@ -26,7 +27,8 @@ const INK_55 = 'var(--hcp-t-60)';
 const HOT_RED = '#DC2626';
 const COLD_BLUE = '#0EA5E9';
 const SLATE = 'var(--hcp-t-80)';
-export const TrendCardsStack: React.FC<Props> = ({ connectionId, currentHandicap, splitAt, topMargin }) => {
+export const TrendCardsStack: React.FC<Props> = ({ connectionId, userId, currentHandicap, splitAt, topMargin }) => {
+
   const { data: scores, isLoading } = useAllScores(connectionId);
   const prediction = predictHandicap(scores ?? []);
   const meta = VERDICT_META[prediction.verdict];
