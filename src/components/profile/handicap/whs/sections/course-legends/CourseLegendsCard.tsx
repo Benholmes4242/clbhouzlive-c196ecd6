@@ -96,13 +96,16 @@ const HolderCell: React.FC<HolderCellProps> = ({
         display: 'flex',
         alignItems: 'center',
         gap: 9,
-        padding: '8px 10px',
-        background: isSelf ? 'rgba(251,188,46,0.06)' : 'transparent',
+        padding: isSelf ? '6px 8px' : '8px 10px',
+        background: isSelf
+          ? 'linear-gradient(180deg, rgba(251,188,46,0.10) 0%, rgba(251,188,46,0.03) 100%)'
+          : 'transparent',
         border: isSelf
-          ? '1px solid rgba(251,188,46,0.30)'
+          ? '1px solid rgba(251,188,46,0.22)'
           : '1px solid transparent',
-        borderRadius: 10,
+        borderRadius: isSelf ? 9 : 10,
         minWidth: 0,
+        boxSizing: 'border-box',
       }}
     >
       <div
