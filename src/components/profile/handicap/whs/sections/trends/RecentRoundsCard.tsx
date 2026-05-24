@@ -178,12 +178,16 @@ export const RecentRoundsCard: React.FC<Props> = ({ connectionId }) => {
 
   return (
     <section style={{ marginTop: 32, fontFamily: FONT }}>
+      <style>{`
+        .rr-last-row > button[data-feedrow="true"] { border-bottom: none; }
+      `}</style>
       <SectionHeader
         eyebrow="RECENT ROUNDS"
         title={`${rounds.length} ${rounds.length === 1 ? 'round' : 'rounds'} tracked`}
         sub="Your full posted history."
         right={counterCount > 0 ? <CounterBadge count={counterCount} /> : undefined}
       />
+
 
       <div style={{ padding: '0 20px' }}>
       {!isLoading && rounds.length > 0 && (
@@ -207,18 +211,31 @@ export const RecentRoundsCard: React.FC<Props> = ({ connectionId }) => {
           {grouped.map(({ month, rounds: monthRounds }) => (
             <div key={month} style={{ marginTop: 16 }}>
               <MonthDivider month={month} count={monthRounds.length} />
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginTop: 8 }}>
-                {monthRounds.map((round) => (
-                  <FeedCard
+              <div
+                style={{
+                  marginTop: 8,
+                  background:
+                    'linear-gradient(180deg, rgba(255,255,255,0.025) 0%, rgba(255,255,255,0.01) 100%)',
+                  border: '1px solid rgba(255,255,255,0.05)',
+                  borderRadius: 14,
+                  overflow: 'hidden',
+                }}
+              >
+                {monthRounds.map((round, i) => (
+                  <div
                     key={round.id}
-                    round={round}
-                    onTap={() => setOpenScoreId(round.id)}
-                  />
-
+                    className={i === monthRounds.length - 1 ? 'rr-last-row' : undefined}
+                  >
+                    <FeedCard
+                      round={round}
+                      onTap={() => setOpenScoreId(round.id)}
+                    />
+                  </div>
                 ))}
               </div>
             </div>
           ))}
+
 
           {hasMore && (
             <button
@@ -532,119 +549,154 @@ interface FeedCardProps {
 }
 
 const FeedCard: React.FC<FeedCardProps> = ({ round, onTap }) => {
-
   const courseName = round.course?.name ?? 'Unknown course';
   const deltaInfo = fmtHcpDelta(round.handicap_delta);
+
+  const d = new Date(round.play_date);
+  const dayOfMonth = d.getDate();
+  const weekday = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'][d.getDay()];
 
   return (
     <button
       type="button"
       onClick={onTap}
+      data-feedrow="true"
       style={{
         display: 'flex',
-        alignItems: 'stretch',
+        alignItems: 'center',
         width: '100%',
-        minHeight: 72,
-        padding: 0,
-        background: T.cardBg,
-        border: `1px solid ${T.hairline}`,
-        borderRadius: 12,
-        overflow: 'hidden',
+        padding: '12px 14px',
+        gap: 12,
+        background: 'transparent',
+        border: 'none',
+        borderBottom: `1px solid ${T.hairline}`,
         textAlign: 'left',
         fontFamily: FONT,
         cursor: 'pointer',
-        boxShadow: 'none',
+        minHeight: 56,
       }}
     >
-      <DateTile
-        dateString={round.play_date}
-        thumbnailUrl={round.course_thumbnail_image ?? null}
-      />
-      <div
-        style={{
-          flex: 1,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          padding: '10px 12px 10px 14px',
-          gap: 12,
-          minWidth: 0,
-        }}
-      >
-        <div style={{ minWidth: 0, flex: 1 }}>
-          <div
-            style={{
-              fontSize: 13,
-              fontWeight: 800,
-              color: T.ink,
-              letterSpacing: '-0.005em',
-              overflow: 'hidden',
-              textOverflow: 'ellipsis',
-              whiteSpace: 'nowrap',
-              marginBottom: 4,
-            }}
-          >
-            {courseName}
-          </div>
-          <div
-            style={{
-              fontSize: 11,
-              fontWeight: 600,
-              color: T.inkMute,
-              display: 'flex',
-              alignItems: 'center',
-              gap: 6,
-              flexWrap: 'wrap',
-            }}
-          >
-            <span>{fmtRelativeDate(round.play_date)}</span>
-            {deltaInfo && (
-              <>
-                <span style={{ color: T.ink25 }}>·</span>
-                <span style={{
+      {/* Date column */}
+      <div style={{ flexShrink: 0, width: 42, textAlign: 'center' }}>
+        <div
+          style={{
+            fontSize: 9,
+            fontWeight: 800,
+            letterSpacing: '0.10em',
+            color: T.inkMute,
+            textTransform: 'uppercase',
+          }}
+        >
+          {weekday}
+        </div>
+        <div
+          style={{
+            fontSize: 19,
+            fontWeight: 800,
+            color: T.ink,
+            lineHeight: 1,
+            letterSpacing: '-0.02em',
+            fontVariantNumeric: 'tabular-nums',
+            marginTop: 2,
+          }}
+        >
+          {dayOfMonth}
+        </div>
+      </div>
+
+      {/* Body */}
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <div
+          style={{
+            fontSize: 13,
+            fontWeight: 800,
+            color: T.ink,
+            letterSpacing: '-0.005em',
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            whiteSpace: 'nowrap',
+            marginBottom: 3,
+          }}
+        >
+          {courseName}
+        </div>
+        <div
+          style={{
+            fontSize: 10.5,
+            fontWeight: 600,
+            color: T.inkMute,
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: 6,
+            flexWrap: 'wrap',
+          }}
+        >
+          <span>{fmtRelativeDate(round.play_date)}</span>
+          {deltaInfo && (
+            <>
+              <span
+                aria-hidden
+                style={{
+                  display: 'inline-block',
+                  width: 3,
+                  height: 3,
+                  borderRadius: '50%',
+                  background: 'rgba(255,255,255,0.20)',
+                }}
+              />
+              <span
+                style={{
                   color: deltaInfo.color,
                   fontWeight: 700,
                   letterSpacing: '0.02em',
                   textShadow: deltaInfo.glow,
-                }}>
-                  HCP {deltaInfo.sign} {deltaInfo.value}
-                </span>
-              </>
-            )}
-          </div>
-
+                }}
+              >
+                HCP {deltaInfo.sign} {deltaInfo.value}
+              </span>
+            </>
+          )}
         </div>
-        <div
-          style={{
-            flexShrink: 0,
-            width: 36,
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            gap: 4,
-          }}
+      </div>
+
+      {/* Right: gross + diff */}
+      <div style={{ flexShrink: 0, display: 'flex', alignItems: 'center', gap: 10 }}>
+        <span
+          aria-label={`Gross score ${round.adjusted_gross ?? ''}${round.is_counter ? ', counts toward index' : ''}`}
         >
-          <span
-            aria-label={`Gross score ${round.adjusted_gross ?? ''}${round.is_counter ? ', counts toward index' : ''}`}
-          >
+          {round.is_counter ? (
             <InkGrossRing
               value={round.adjusted_gross ?? '\u2014'}
-              isCounter={!!round.is_counter}
+              isCounter
               size="md"
             />
-          </span>
-          <div
-            style={{
-              fontSize: 11,
-              fontWeight: 700,
-              color: diffColor(round.handicap_differential),
-              fontVariantNumeric: 'tabular-nums',
-              textShadow: diffGlow(round.handicap_differential),
-              textAlign: 'center',
-            }}
-          >
-            {fmtDiff(round.handicap_differential)}
-          </div>
+          ) : (
+            <span
+              style={{
+                fontSize: 22,
+                fontWeight: 200,
+                color: T.ink,
+                fontVariantNumeric: 'tabular-nums',
+                letterSpacing: '-0.04em',
+                lineHeight: 0.9,
+              }}
+            >
+              {round.adjusted_gross ?? '\u2014'}
+            </span>
+          )}
+        </span>
+        <div
+          style={{
+            fontSize: 11,
+            fontWeight: 700,
+            color: diffColor(round.handicap_differential),
+            fontVariantNumeric: 'tabular-nums',
+            textShadow: diffGlow(round.handicap_differential),
+            minWidth: 36,
+            textAlign: 'right',
+          }}
+        >
+          {fmtDiff(round.handicap_differential)}
         </div>
       </div>
     </button>
