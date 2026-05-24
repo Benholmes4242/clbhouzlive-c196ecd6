@@ -6,12 +6,6 @@ import { projectNextRound } from '@/lib/whs/handicapMath';
 import HandicapExplainerSheet from './HandicapExplainerSheet';
 import { SectionHeader } from './_shared/atoms';
 import type { WhsScore } from '@/lib/whs/types';
-import {
-  computeStablefordDistribution,
-  type StablefordScope,
-  type StablefordDistribution,
-} from './trends/computeStablefordDistribution';
-import StablefordDetailSheet from './trends/StablefordDetailSheet';
 import RoundDetailSheet from './round-detail/RoundDetailSheet';
 
 
@@ -123,66 +117,6 @@ export const RoundsThatCountCard: React.FC<Props> = ({
   const [showExplainer, setShowExplainer] = useState(false);
   const [scrubIdx, setScrubIdx] = useState<number | null>(null);
   const [isScrubbing, setIsScrubbing] = useState(false);
-  const [chartMode, setChartMode] = useState<'diff' | 'stableford'>('diff');
-  const [stablefordScope, setStablefordScope] = useState<StablefordScope>('all');
-  const [stablefordSheetOpen, setStablefordSheetOpen] = useState(false);
-  const stablefordDist = useMemo(
-    () => computeStablefordDistribution(allScores ?? [], stablefordScope),
-    [allScores, stablefordScope],
-  );
-  const stablefordStats = useMemo(() => {
-    // Filter out null/undefined AND zero — a 0-point round is almost
-    // certainly a sync issue (incomplete round from England Golf).
-    // A genuine 0-point round would require blob on every hole.
-    const valid = (allScores ?? []).filter(
-      (s) => s.stableford_points != null && s.stableford_points > 0,
-    ) as Array<WhsScore & { stableford_points: number }>;
-    // Filter by scope window for consistency with the distribution
-    const now = Date.now();
-    const windowed =
-      stablefordScope === 'all'
-        ? valid
-        : valid.filter((s) => {
-            const days = stablefordScope === '30d' ? 30 : 90;
-            return new Date(s.play_date).getTime() >= now - days * 86_400_000;
-          });
-    if (windowed.length === 0) return { best: null, avg: null, worst: null };
-    const pts = windowed.map((s) => s.stableford_points);
-    const sum = pts.reduce((a, b) => a + b, 0);
-    return {
-      best: Math.max(...pts),
-      avg: Math.round(sum / pts.length),
-      worst: Math.min(...pts),
-    };
-  }, [allScores, stablefordScope]);
-
-  // Latest stableford round's bucket for the "YOUR LAST" anchor.
-  const latestStablefordRound = useMemo<{
-    bucket: 'inZone' | 'solid' | 'offDay';
-    points: number;
-  } | null>(() => {
-    if (!allScores) return null;
-    const valid = allScores.filter(
-      (s) => s.stableford_points != null && s.stableford_points > 0,
-    ) as Array<WhsScore & { stableford_points: number }>;
-    const now = Date.now();
-    const windowed =
-      stablefordScope === 'all'
-        ? valid
-        : valid.filter((s) => {
-            const days = stablefordScope === '30d' ? 30 : 90;
-            return new Date(s.play_date).getTime() >= now - days * 86_400_000;
-          });
-    if (windowed.length === 0) return null;
-    const sorted = [...windowed].sort(
-      (a, b) => new Date(b.play_date).getTime() - new Date(a.play_date).getTime(),
-    );
-    const latest = sorted[0];
-    const pts = latest.stableford_points;
-    const bucket: 'inZone' | 'solid' | 'offDay' =
-      pts >= 36 ? 'inZone' : pts >= 33 ? 'solid' : 'offDay';
-    return { bucket, points: pts };
-  }, [allScores, stablefordScope]);
   const [sheetScoreId, setSheetScoreId] = useState<string | null>(null);
   const pointerStartRef = useRef<{ x: number; y: number; t: number } | null>(null);
   const plotRef = useRef<HTMLDivElement>(null);
@@ -304,8 +238,6 @@ export const RoundsThatCountCard: React.FC<Props> = ({
 
       <div style={{ padding: '0 20px' }}>
 
-      {chartMode === 'diff' && (
-      <>
       {/* Chart — full-bleed on page background, no card wrapper */}
       <div style={{ padding: '0 0 8px' }}>
         <style>{`
@@ -725,7 +657,7 @@ export const RoundsThatCountCard: React.FC<Props> = ({
                     }}
                   >
                     <div style={{
-                      fontSize: 9, fontWeight: 600,
+                      fontSize: 9, fontWeight: isLatest ? 700 : 600,
                       color: isLatest ? D_T100 : D_T40,
                       letterSpacing: '0.04em',
                     }}>
@@ -787,8 +719,6 @@ export const RoundsThatCountCard: React.FC<Props> = ({
           onClick={() => setSelectedId(worstRound.id)}
         />
       </div>
-      </>
-      )}
 
 
       {/* NOTE: Next-round target pair + oldest-round caption moved to NextRoundWatch.
