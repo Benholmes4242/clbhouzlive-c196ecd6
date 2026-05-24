@@ -290,42 +290,42 @@ const MiniCard: React.FC<{
       ) : (
         <MapPin size={22} color={accent} strokeWidth={1.8} />
       )}
-      {course.expected_differential != null && (
-        <div
+      <div
+        style={{
+          position: 'absolute',
+          top: 6,
+          right: 6,
+          background: 'var(--hcp-bg-1)',
+          border: '1px solid var(--hcp-line-2)',
+          borderRadius: 7,
+          padding: '3px 7px',
+          display: 'flex',
+          alignItems: 'baseline',
+          gap: 3,
+          zIndex: 1,
+        }}
+      >
+        <span style={{ fontSize: 8, fontWeight: 800, color: accent, letterSpacing: '0.12em' }}>
+          EXP
+        </span>
+        <span
           style={{
-            position: 'absolute',
-            top: 6,
-            right: 6,
-            background: 'var(--hcp-bg-1)',
-            border: '1px solid var(--hcp-line-2)',
-            borderRadius: 7,
-            padding: '3px 7px',
-            display: 'flex',
-            alignItems: 'baseline',
-            gap: 3,
-            zIndex: 1,
+            fontSize: 12,
+            fontWeight: 800,
+            color: accent,
+            letterSpacing: '-0.02em',
+            fontVariantNumeric: 'tabular-nums',
+            lineHeight: 1,
           }}
         >
-          <span style={{ fontSize: 8, fontWeight: 800, color: accent, letterSpacing: '0.12em' }}>
-            EXP
-          </span>
-          <span
-            style={{
-              fontSize: 12,
-              fontWeight: 800,
-              color: accent,
-              letterSpacing: '-0.02em',
-              fontVariantNumeric: 'tabular-nums',
-              lineHeight: 1,
-            }}
-          >
-            {fmtDiff(course.expected_differential, { plus: true })}
-          </span>
-        </div>
-      )}
+          {course.expected_differential != null
+            ? fmtDiff(course.expected_differential, { plus: true })
+            : '—'}
+        </span>
+      </div>
     </div>
 
-    <div style={{ padding: 10, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 2 }}>
+    <div style={{ padding: 10, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 6 }}>
       <div
         style={{
           fontSize: 12.5,
@@ -353,6 +353,7 @@ const MiniCard: React.FC<{
           {course.region}
         </div>
       )}
+      <StatStrip course={course} size="mini" />
     </div>
   </button>
 );
