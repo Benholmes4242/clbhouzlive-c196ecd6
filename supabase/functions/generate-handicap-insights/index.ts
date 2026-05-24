@@ -276,7 +276,7 @@ Deno.serve(async (req) => {
       trendSignals.current_index,
     );
 
-    const prompt = buildPrompt(roundsForPrompt, suitedPicks, testPicks, dateKey, trendSignals, friendSignals);
+    const prompt = buildPrompt(roundsForPrompt, candidatesWithExpected, dateKey, trendSignals, friendSignals);
 
     const aiResp = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
