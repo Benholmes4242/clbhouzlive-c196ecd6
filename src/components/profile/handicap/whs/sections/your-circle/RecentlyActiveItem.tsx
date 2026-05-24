@@ -12,16 +12,11 @@ interface Props {
   onClick?: () => void;
 }
 
-export const RecentlyActiveItem: React.FC<Props> = ({ entry, isActive, onClick }) => {
+export const RecentlyActiveItem: React.FC<Props> = ({ entry, isActive: _isActive, onClick }) => {
   const display = firstName(entry.friend_name);
   const Tag: any = onClick ? 'button' : 'div';
 
   const isOnApp = entry.is_clbhouz_user;
-  const dotBackground: string | null = isActive
-    ? isOnApp
-      ? '#F7931E'
-      : 'linear-gradient(135deg, #F59E0B 0%, #FBBF24 100%)'
-    : null;
 
   const hcpStr = fmtHcp(entry.friend_handicap_index);
   const isPlusHcp = typeof hcpStr === 'string' && hcpStr.trim().startsWith('+');
@@ -36,8 +31,12 @@ export const RecentlyActiveItem: React.FC<Props> = ({ entry, isActive, onClick }
       style={{
         flex: '0 0 auto',
         width: 92,
-        background: 'var(--hcp-bg-2)',
-        border: '1px solid rgba(255,255,255,0.06)',
+        background: isOnApp
+          ? 'linear-gradient(180deg, rgba(247,147,30,0.08) 0%, rgba(247,147,30,0.015) 100%)'
+          : 'var(--hcp-bg-2)',
+        border: isOnApp
+          ? '1px solid rgba(247,147,30,0.18)'
+          : '1px solid rgba(255,255,255,0.06)',
         borderRadius: 14,
         padding: '9px 8px',
         cursor: onClick ? 'pointer' : 'default',
@@ -48,34 +47,13 @@ export const RecentlyActiveItem: React.FC<Props> = ({ entry, isActive, onClick }
         fontFamily: '"Geist", system-ui, sans-serif',
       }}
     >
-      <div style={{ position: 'relative' }}>
-        <SquircleAvatar
-          src={pickAvatarSrc(entry.friend_thumbnail_url, entry.friend_profile_photo_url)}
-          alt={entry.friend_name}
-          size={56}
-          userId={entry.friend_user_id ?? entry.friend_row_id}
-          hideRing
-        />
-        {dotBackground && (
-          <span
-            aria-label={
-              isOnApp
-                ? 'Active in last 7 days'
-                : 'Played in last 7 days, not on Clbhouz'
-            }
-            style={{
-              position: 'absolute',
-              top: -1,
-              right: -1,
-              width: 12,
-              height: 12,
-              borderRadius: '50%',
-              background: dotBackground,
-              border: '2px solid var(--hcp-bg-2)',
-            }}
-          />
-        )}
-      </div>
+      <SquircleAvatar
+        src={pickAvatarSrc(entry.friend_thumbnail_url, entry.friend_profile_photo_url)}
+        alt={entry.friend_name}
+        size={56}
+        userId={entry.friend_user_id ?? entry.friend_row_id}
+        hideRing
+      />
       <p
         style={{
           marginTop: 6,
