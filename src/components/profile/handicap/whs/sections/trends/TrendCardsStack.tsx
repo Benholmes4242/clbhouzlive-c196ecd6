@@ -257,7 +257,7 @@ export const TrendCardsStack: React.FC<Props> = ({ connectionId, userId, current
             </>
           )}
           {splitAt !== 'hero-only' && (
-            <StablefordCard scores={scores ?? []} />
+            <StablefordCard scores={scores ?? []} userId={userId} connectionId={connectionId} />
           )}
         </>
       )}
