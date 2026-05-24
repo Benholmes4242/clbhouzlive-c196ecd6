@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { __hydrateHeaderImages } from './useDiscoverCoursesThisWeek';
 
 export interface PlayedCourseRow {
   course_id: string;
@@ -7,6 +8,7 @@ export interface PlayedCourseRow {
   course_region: string | null;
   course_country: string | null;
   course_type: string | null;
+  course_header_image?: string | null;
   rounds_count?: number | null;
   last_played_at?: string | null;
 }
@@ -26,11 +28,9 @@ export function useUserPlayedCourses(userId: string | undefined) {
         p_user_id: userId!,
         p_limit: 24,
       });
-      if (error) {
-        // RPC not deployed yet → render empty stub.
-        return [];
-      }
-      return (data ?? []) as PlayedCourseRow[];
+      if (error) return [];
+      const rows = (data ?? []) as PlayedCourseRow[];
+      return __hydrateHeaderImages(rows);
     },
   });
 }
