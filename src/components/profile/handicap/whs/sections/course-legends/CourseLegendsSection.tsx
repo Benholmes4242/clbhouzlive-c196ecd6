@@ -232,11 +232,13 @@ export const CourseLegendsSection: React.FC<Props> = ({
 
       {showSearchResults ? (
         <>
-          <div style={{ margin: '4px 0 0' }}>
+          <div ref={searchWrapperRef} style={{ margin: '4px 0 0', scrollMarginTop: 12 }}>
             <CourseSearch
               value={query}
               onChange={setQuery}
               helper="Find a course — see the legends"
+              inputRef={searchInputRef}
+              autoFocus
             />
           </div>
           <SearchResultsSubsection
