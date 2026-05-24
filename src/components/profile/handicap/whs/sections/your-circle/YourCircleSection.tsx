@@ -70,7 +70,7 @@ export const YourCircleSection: React.FC<Props> = ({ userId }) => {
   const cutoff = Date.now() - SEVEN_DAYS_MS;
 
   return (
-    <section style={{ fontFamily: FONT }}>
+    <section style={{ marginTop: 32, fontFamily: FONT }}>
       <SectionHeader eyebrow="YOUR CIRCLE" title={title} sub={sub} />
 
       {stats.self && stats.yourRank > 0 && stats.total > 0 && (
