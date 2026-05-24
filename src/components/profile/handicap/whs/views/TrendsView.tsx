@@ -1,10 +1,11 @@
 import React from 'react';
-import TrendCardsStack from '../sections/trends/TrendCardsStack';
+import ForecastCard from '../sections/ForecastCard';
 import WhereYouStandSection from '../sections/WhereYouStandSection';
 import RoundsThatCountCard from '../sections/RoundsThatCountCard';
 import IndexHistoryCard from '../sections/IndexHistoryCard';
 import CourseFormCard from '../sections/trends/CourseFormCard';
 import EchoInsightsCard from '../sections/EchoInsightsCard';
+
 
 interface Props {
   connectionId: string;
