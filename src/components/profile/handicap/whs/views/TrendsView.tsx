@@ -55,9 +55,11 @@ export const TrendsView: React.FC<Props> = ({
       {/* 5. Stableford distribution */}
       <TrendCardsStack
         connectionId={connectionId}
+        userId={userId}
         currentHandicap={currentHandicap}
         splitAt="rest"
       />
+
 
       {/* 6. Course Form */}
       <CourseFormCard connectionId={connectionId} currentHandicap={currentHandicap ?? undefined} />

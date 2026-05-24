@@ -319,14 +319,17 @@ export function useSharedRounds(
 export function useTrophyAggregates(
   userId: string | undefined,
   connectionId: string | undefined,
+  fromDate?: string | null,
+  toDate?: string | null,
 ) {
   return useQuery({
-    queryKey: ['trophy-aggregates', userId, connectionId],
+    queryKey: ['trophy-aggregates', userId, connectionId, fromDate ?? null, toDate ?? null],
     enabled: !!userId && !!connectionId,
-    queryFn: () => fetchTrophyAggregates(userId!, connectionId!),
+    queryFn: () => fetchTrophyAggregates(userId!, connectionId!, fromDate, toDate),
     staleTime: 5 * 60 * 1000,
   });
 }
+
 
 
 // ─── Phase 11: Round reactions ──────────────────────────────────────────
