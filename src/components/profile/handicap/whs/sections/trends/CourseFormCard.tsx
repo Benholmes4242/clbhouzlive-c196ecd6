@@ -89,10 +89,10 @@ function deltaColor(d: number): string {
  */
 function glowFor(d: number): string {
   if (d < 0) {
-    return '0 0 12px rgba(34,197,94,0.50), 0 0 4px rgba(34,197,94,0.30)';
+    return '0 0 8px rgba(34,197,94,0.28), 0 0 3px rgba(34,197,94,0.18)';
   }
   if (d > 0) {
-    return '0 0 12px rgba(239,68,68,0.50), 0 0 4px rgba(239,68,68,0.30)';
+    return '0 0 8px rgba(239,68,68,0.28), 0 0 3px rgba(239,68,68,0.18)';
   }
   return 'none';
 }
