@@ -17,8 +17,6 @@ interface Props {
    * 'rest' = StablefordCard.
    * undefined (default) = whole stack (backwards-compatible). */
   splitAt?: 'hero-only' | 'rest';
-  /** Override the canonical top margin. Pass 0 for the first card on the tab. */
-  topMargin?: number;
 }
 
 const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
