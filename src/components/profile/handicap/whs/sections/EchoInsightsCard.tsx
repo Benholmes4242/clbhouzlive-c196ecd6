@@ -407,7 +407,9 @@ export const EchoInsightsCard: React.FC<Props> = ({ connectionId }) => {
                   accent={GREEN}
                   accentTint={GREEN_06}
                   onTap={handleCourseTap}
+                  leadLabel="YOUR TOP MATCH"
                 />
+
               )}
               {suitedSorted.length > 1 && (
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
