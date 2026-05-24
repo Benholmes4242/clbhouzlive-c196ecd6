@@ -337,6 +337,12 @@ const StripBand: React.FC<{ f: Forecast }> = ({ f }) => {
       ? `${atRisk} counter${atRisk > 1 ? 's' : ''} at risk over next ${f.roundsOut} rounds`
       : `Projection over ${f.roundsOut} rounds`;
 
+  const [selectedCellId, setSelectedCellId] = React.useState<string | null>(null);
+  const selectedCell = React.useMemo(
+    () => f.counterCells.find((c) => c.score.id === selectedCellId) ?? null,
+    [f.counterCells, selectedCellId],
+  );
+
   return (
     <div
       style={{
@@ -356,7 +362,11 @@ const StripBand: React.FC<{ f: Forecast }> = ({ f }) => {
       >
         {header}
       </div>
-      <CounterStrip cells={f.counterCells} />
+      <CounterStrip
+        cells={f.counterCells}
+        selectedCellId={selectedCellId}
+        onSelect={setSelectedCellId}
+      />
       <div
         style={{
           display: 'flex',
@@ -372,6 +382,7 @@ const StripBand: React.FC<{ f: Forecast }> = ({ f }) => {
         <span>Best</span>
         <span>Weakest →</span>
       </div>
+      {selectedCell && <CounterDetailPanel cell={selectedCell} />}
     </div>
   );
 };
