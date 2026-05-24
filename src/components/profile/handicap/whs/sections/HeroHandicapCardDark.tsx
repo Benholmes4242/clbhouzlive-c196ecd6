@@ -43,19 +43,8 @@ function arcGradient(verdict: Verdict): { from: string; to: string } {
   return { from: '#F7931E', to: '#F7931E' };
 }
 
-// Form temperature label from a Stableford delta vs personal baseline.
-function formLabel(periodAvg: number | null, allAvg: number | null): {
-  label: string;
-  verdict: 'warm' | 'cold' | 'neutral';
-} {
-  if (periodAvg == null || allAvg == null) return { label: '—', verdict: 'neutral' };
-  const d = periodAvg - allAvg;
-  if (d > 3.0) return { label: 'Hot', verdict: 'warm' };
-  if (d > 1.0) return { label: 'Warm', verdict: 'warm' };
-  if (d < -3.0) return { label: 'Cold', verdict: 'cold' };
-  if (d < -1.0) return { label: 'Cold', verdict: 'cold' };
-  return { label: 'Steady', verdict: 'neutral' };
-}
+// Form temperature label removed — replaced by the ForecastCard below the hero.
+
 
 const HeroHandicapCardDark: React.FC<Props> = ({ connection }) => {
   const { data: trend, isLoading: trendLoading } = useHandicapTrend(connection.id);

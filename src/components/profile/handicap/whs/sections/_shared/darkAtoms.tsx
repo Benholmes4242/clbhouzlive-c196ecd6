@@ -285,32 +285,35 @@ export const TripleStrip: React.FC<{
    *          hairline dividers and a hairline above/below the row.
    */
   variant?: 'card' | 'flush';
-}> = ({ children, style, variant = 'card' }) => (
-  <div
-    style={{
-      display: 'grid',
-      gridTemplateColumns: 'repeat(3, 1fr)',
-      margin: variant === 'flush' ? '20px 20px 0' : '16px 20px 0',
-      background: variant === 'flush' ? 'transparent' : 'var(--hcp-bg-1)',
-      border: variant === 'flush' ? 'none' : '1px solid var(--hcp-line)',
-      borderTop: variant === 'flush' ? '1px solid var(--hcp-line)' : undefined,
-      borderBottom: variant === 'flush' ? '1px solid var(--hcp-line)' : undefined,
-      borderRadius: variant === 'flush' ? 0 : 14,
-      overflow: 'hidden',
-      ...style,
-    }}
-  >
-    {React.Children.map(children, (child, i) => (
-      <div
-        style={{
-          borderLeft: i > 0 ? '1px solid var(--hcp-line)' : 'none',
-        }}
-      >
-        {child}
-      </div>
-    ))}
-  </div>
-);
+}> = ({ children, style, variant = 'card' }) => {
+  const count = React.Children.count(children);
+  return (
+    <div
+      style={{
+        display: 'grid',
+        gridTemplateColumns: `repeat(${count || 1}, 1fr)`,
+        margin: variant === 'flush' ? '20px 20px 0' : '16px 20px 0',
+        background: variant === 'flush' ? 'transparent' : 'var(--hcp-bg-1)',
+        border: variant === 'flush' ? 'none' : '1px solid var(--hcp-line)',
+        borderTop: variant === 'flush' ? '1px solid var(--hcp-line)' : undefined,
+        borderBottom: variant === 'flush' ? '1px solid var(--hcp-line)' : undefined,
+        borderRadius: variant === 'flush' ? 0 : 14,
+        overflow: 'hidden',
+        ...style,
+      }}
+    >
+      {React.Children.map(children, (child, i) => (
+        <div
+          style={{
+            borderLeft: i > 0 ? '1px solid var(--hcp-line)' : 'none',
+          }}
+        >
+          {child}
+        </div>
+      ))}
+    </div>
+  );
+};
 
 // ── Verdict number (auto-coloured by sign) ─────────────────────────
 
