@@ -86,7 +86,7 @@ export const FriendsLeaderboardSection: React.FC<Props> = ({ userId }) => {
   };
 
   return (
-    <section style={{ marginTop: 24 }}>
+    <section style={{ marginTop: 32 }}>
       <DarkSectionHeader
         eyebrow="LEADERBOARD"
         title="You vs your circle"
