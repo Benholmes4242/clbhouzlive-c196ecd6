@@ -13,6 +13,22 @@ const EVALUATOR_VERSION = parseInt(Deno.env.get("GAM_EVALUATOR_VERSION") ?? "1",
 const BATCH_SIZE = 50;
 const MAX_ATTEMPTS = 5;
 
+// ─────────────────────────────────────────────────────────────────────────────
+// Top 100 list mapping
+// ─────────────────────────────────────────────────────────────────────────────
+// Catalogue counter_metric → top100_lists.slug. The catalogue uses descriptive
+// identifiers; list slugs come from product data. This map bridges them
+// without contaminating either side with the other's quirks.
+const TOP_100_SLUG_BY_METRIC: Record<string, string> = {
+  top_100_worldwide_distinct: 'global',
+  top_100_usa_distinct:       'usa',
+  top_100_gbni_distinct:      'gb-i',
+  top_100_europe_distinct:    'europe',
+};
+const TOP_100_METRIC_BY_SLUG: Record<string, string> = Object.fromEntries(
+  Object.entries(TOP_100_SLUG_BY_METRIC).map(([metric, slug]) => [slug, metric])
+);
+
 const supabase = createClient(
   Deno.env.get("SUPABASE_URL")!,
   Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
@@ -188,6 +204,7 @@ async function processSingle(whsScoreId: string) {
   let earned: string[] = [];
   if (!alreadyAtVersion) {
     await applyMilestones(userId, stats);
+    await recomputeTop100Milestones(userId);
     earned = await applyBadges(userId, stats, whsScoreId);
     await applyStreaks(userId, stats);
     await applyCourseLegends(stats);
@@ -373,6 +390,65 @@ async function getMilestone(userId: string, metric: string): Promise<number> {
     .eq("metric", metric)
     .maybeSingle();
   return data?.count ?? 0;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// recomputeTop100Milestones
+// Distinct rated-course counts per Top 100 list, written to gam_user_milestones.
+// Set-based (idempotent across replay). Called per evaluation so a user who
+// rates a course between rounds gets credit on the next score post too.
+// ─────────────────────────────────────────────────────────────────────────────
+async function recomputeTop100Milestones(userId: string) {
+  const { data, error } = await supabase
+    .from("course_top100_memberships")
+    .select(`
+      course_id,
+      top100_lists!inner ( slug, is_active ),
+      course_ratings!inner ( user_id, rating )
+    `)
+    .eq("top100_lists.is_active", true)
+    .eq("course_ratings.user_id", userId)
+    .not("course_ratings.rating", "is", null);
+
+  if (error) {
+    console.error("[recomputeTop100Milestones] query error", error);
+    return;
+  }
+
+  const distinctByList = new Map<string, Set<string>>();
+  for (const row of data ?? []) {
+    const slug = (row as any).top100_lists?.slug;
+    if (!slug || !TOP_100_METRIC_BY_SLUG[slug]) continue;
+    if (!distinctByList.has(slug)) distinctByList.set(slug, new Set());
+    distinctByList.get(slug)!.add((row as any).course_id);
+  }
+
+  const nowIso = new Date().toISOString();
+  for (const slug of Object.values(TOP_100_SLUG_BY_METRIC)) {
+    const metric = TOP_100_METRIC_BY_SLUG[slug];
+    const count = distinctByList.get(slug)?.size ?? 0;
+
+    const { data: existing } = await supabase
+      .from("gam_user_milestones")
+      .select("count")
+      .eq("user_id", userId)
+      .eq("metric", metric)
+      .maybeSingle();
+
+    if (existing && existing.count === count) continue;
+
+    await supabase.from("gam_user_milestones").upsert(
+      {
+        user_id: userId,
+        metric,
+        count,
+        first_at: existing ? undefined : (count > 0 ? nowIso : null),
+        last_at: nowIso,
+        updated_at: nowIso,
+      },
+      { onConflict: "user_id,metric" }
+    );
+  }
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
