@@ -1,0 +1,1 @@
+UPDATE gam_badge_catalogue SET description = 'No bogey or worse in a single round' WHERE id = 'clean_card';
