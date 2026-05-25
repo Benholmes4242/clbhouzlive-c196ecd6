@@ -33,6 +33,17 @@ function showpieceDisplayRarity(reachedTier: number, totalTiers: number): BadgeR
   return scale[idx];
 }
 
+// ─────────────────────────────────────────────────────────────────────────────
+// Showpiece counter labels — small caption rendered under the big counter to
+// give the number a category. Presentation only; unknown IDs fail-safe.
+// ─────────────────────────────────────────────────────────────────────────────
+const SHOWPIECE_COUNTER_LABEL: Record<string, string> = {
+  first_birdie: 'Lifetime birdies',
+  first_eagle: 'Lifetime eagles',
+  first_albatross: 'Lifetime albatrosses',
+  hole_in_one: 'Lifetime aces',
+};
+
 function paletteFor(item: TrophyItem): RarityPalette {
   if (item.kind === 'legend') return LEGEND_PALETTE;
 
