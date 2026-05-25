@@ -1,8 +1,8 @@
 import React from 'react';
 import {
-  Activity, ArrowUp, CircleDot, Crosshair, Crown, Feather, Flag, Flame, Flower, Gauge,
+  Activity, ArrowUp, Bird, CircleDot, Crosshair, Crown, Feather, Flag, Flame, Flower, Gauge, Globe,
   ListChecks, Map, MapPin, Medal, Minus, Scissors, Shield, Sparkles, Star, Swords, Target,
-  TrendingDown, Trophy,
+  TrendingDown, Trophy, Zap,
   type LucideIcon,
 } from 'lucide-react';
 
