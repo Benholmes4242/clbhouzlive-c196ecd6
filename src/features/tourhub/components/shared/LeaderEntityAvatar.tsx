@@ -119,12 +119,13 @@ export function LeaderEntityAvatar({
         <SingleAvatar
           src={p ? resolvePhoto(p) : null}
           alt={p?.fullName ?? ''}
+          fallbackName={p?.fullName ?? ''}
           size={size}
           borderColor={borderColor}
           borderWidth={borderWidth}
           radiusPct={radiusPct}
-          silhouetteSize={Math.round(size * 0.6)}
         />
+
       </div>
     );
   }
