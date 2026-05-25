@@ -861,7 +861,7 @@ export async function fetchFriendFeaturedRound(
   const { data: friendMatch } = await supabase
     .from('whs_friend_matches' as any)
     .select(
-      'friend_name, friend_thumbnail_url, friend_handicap_index, friend_user_id, friend_connection_id, is_clbhouz_user',
+      'friend_name, friend_thumbnail_url, friend_handicap_index, friend_user_id, friend_connection_id, is_clbhouz_user, friend_passport_id, friend_home_club',
     )
     .eq('owner_user_id', userId)
     .eq('friend_connection_id', (score as any).connection_id)
