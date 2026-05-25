@@ -60,12 +60,28 @@ export const TrophyDetailSheet: React.FC<Props> = ({ items, initialIndex, ownerU
   };
 
   const handleShare = () => {
-    const text =
-      current.kind === 'legend'
-        ? `I hold the #${current.rank} ${current.name} at ${current.courseName} on clbhouz`
-        : `I earned ${current.name} on clbhouz`;
+    const text = (() => {
+      if (current.kind === 'legend') {
+        return `I hold the #${current.rank} ${current.name} at ${current.courseName} on clbhouz`;
+      }
+      if (isTop100Achievement(current.badgeId)) {
+        const count = current.currentValue ?? 0;
+        const SHORT_LABEL: Record<string, string> = {
+          top_100_worldwide: 'Worldwide',
+          top_100_usa: 'USA',
+          top_100_gbni: 'GB&I',
+          top_100_europe: 'Continental Europe',
+        };
+        const label = SHORT_LABEL[current.badgeId] ?? current.name;
+        if (count === 0) return `I'm on the ${label} Top 100 journey on clbhouz`;
+        if (count === 1) return `I've played 1 of 100 ${label} Top 100 courses on clbhouz`;
+        if (count === 100) return `I've played the full ${label} Top 100 on clbhouz`;
+        return `I've played ${count} of 100 ${label} Top 100 courses on clbhouz`;
+      }
+      return `I earned ${current.name} on clbhouz`;
+    })();
     if (typeof navigator !== 'undefined' && navigator.share) {
-      navigator.share({ title: current.kind === 'legend' ? current.name : current.name, text }).catch(() => {});
+      navigator.share({ title: current.name, text }).catch(() => {});
     }
   };
 
