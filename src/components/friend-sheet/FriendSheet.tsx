@@ -146,11 +146,13 @@ export const FriendSheet: React.FC<FriendSheetProps> = ({
     navigate(`/post/${postId}`);
   };
 
-  // Compute firstName for the active state (used by stubs + invite button label).
+  // Compute firstName for the active state (used by pitch card + invite button label).
   const friendFirstName =
     state?.kind === 'whs_only'
       ? getFirstName(state.entry.friend_name)
-      : '';
+      : state?.kind === 'clbhouz_not_synced'
+        ? state.firstName
+        : '';
 
   // ─── Footer actions per state ────────────────────────────────────
   const footer = state
@@ -160,6 +162,7 @@ export const FriendSheet: React.FC<FriendSheetProps> = ({
         handleSeeRivalry,
         handleSeeHandicap,
         handleInvite,
+        handleNudgeSync,
       }, friendFirstName)
     : { actions: [] as FooterAction[], layout: 'horizontal' as const };
 
