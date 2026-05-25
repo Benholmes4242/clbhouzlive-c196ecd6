@@ -33,8 +33,9 @@ export const COURSE_GRADIENT_DUSK =
   'linear-gradient(140deg, #1a2a3a 0%, #2d3d5a 25%, #5a5a7a 50%, #8a7a8c 72%, #c4946b 90%, #a06054 100%)';
 export const COURSE_SCRIMS =
   'radial-gradient(ellipse 90% 60% at 50% 95%, rgba(0,0,0,0.55) 0%, transparent 70%), radial-gradient(ellipse 70% 50% at 30% 20%, rgba(0,80,40,0.30) 0%, transparent 60%)';
+// B6: diagonal scrim — heavy on bottom-left where title sits, transparent top-right
 export const LEGIBILITY_SCRIM =
-  'linear-gradient(180deg, rgba(0,0,0,0.18) 0%, rgba(0,0,0,0.04) 30%, rgba(0,0,0,0) 50%, rgba(0,0,0,0.55) 100%)';
+  'linear-gradient(135deg, rgba(0,0,0,0.65) 0%, rgba(0,0,0,0.35) 40%, transparent 75%)';
 
 // Animation
 export const MARQUEE_DURATION_SECONDS = 40;

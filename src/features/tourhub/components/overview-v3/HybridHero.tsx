@@ -24,6 +24,7 @@ import { getPlayerHeadshotUrl } from '@/utils/playerHeadshot';
 import { PhotoBand } from './HybridHeroBands/PhotoBand';
 import { MiddleBand } from './HybridHeroBands/MiddleBand';
 import { LeaderboardBand } from './HybridHeroBands/LeaderboardBand';
+import { HeroContextLine } from './HybridHeroBands/HeroContextLine';
 import {
   deriveHeroState,
   detectTopTie,
@@ -274,6 +275,7 @@ export function HybridHero({ slide }: HybridHeroProps) {
         courseStats={courseStats}
         teamWinner={teamWinner}
       />
+      <HeroContextLine state={state} champion={champion} onTap={onCtaTap} />
       <LeaderboardBand
         state={state}
         leaderboard={safeLeaderboard}
