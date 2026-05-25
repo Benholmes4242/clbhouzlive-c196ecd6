@@ -26,8 +26,9 @@ import { SheetHeader } from './parts/SheetHeader';
 import { HeadToHeadCard } from './parts/HeadToHeadCard';
 import { TheirFormSection } from './parts/TheirFormSection';
 import { LatestPostCard } from './parts/LatestPostCard';
-import { RecentRoundsStub } from './parts/RecentRoundsStub';
-import { StandoutRoundsStub } from './parts/StandoutRoundsStub';
+import { UnsyncedPitchCard } from './parts/UnsyncedPitchCard';
+import { callCreateInvite } from '@/lib/whs/api';
+import { shareInvite } from '@/lib/whs/share';
 import {
   SheetActionFooter,
   type FooterAction,
@@ -113,28 +114,45 @@ export const FriendSheet: React.FC<FriendSheetProps> = ({
     navigate(`/handicap/${targetUserId}`);
   };
   const handleInvite = async () => {
-    const url = `${window.location.origin}/invite?ref=${viewerUserId}`;
-    if (typeof navigator !== 'undefined' && navigator.share) {
-      try {
-        await navigator.share({ title: 'Join clbhouz', url });
-      } catch {
-        /* cancelled */
-      }
-    } else if (typeof navigator !== 'undefined' && navigator.clipboard) {
-      await navigator.clipboard.writeText(url);
-      toast.success('Invite link copied');
+    if (state?.kind !== 'whs_only') return;
+    const passportId = state.entry.friend_passport_id;
+    if (passportId == null) {
+      toast.error("Can't invite this player yet");
+      return;
     }
+    const res = await callCreateInvite(passportId, 'friend_sheet');
+    if (!res.ok || !res.share_url || !res.share_message) {
+      toast.error(res.message ?? "Couldn't create invite");
+      return;
+    }
+    await shareInvite({
+      share_url: res.share_url,
+      share_message: res.share_message,
+      invitee_name: state.entry.friend_name,
+    });
+  };
+  const handleNudgeSync = async () => {
+    if (state?.kind !== 'clbhouz_not_synced') return;
+    // CHECKPOINT: compose=nudge_sync query param is not yet wired on the
+    // profile page; this navigates to the profile and lets the viewer
+    // message manually. Follow-up brief needed to pre-fill compose.
+    const handle = snapshot?.profile.username ?? targetUserId;
+    if (!handle) return;
+    onClose();
+    navigate(`/profile/${handle}?compose=nudge_sync`);
   };
   const handleOpenPost = (postId: string) => {
     onClose();
     navigate(`/post/${postId}`);
   };
 
-  // Compute firstName for the active state (used by stubs + invite button label).
+  // Compute firstName for the active state (used by pitch card + invite button label).
   const friendFirstName =
     state?.kind === 'whs_only'
       ? getFirstName(state.entry.friend_name)
-      : '';
+      : state?.kind === 'clbhouz_not_synced'
+        ? state.firstName
+        : '';
 
   // ─── Footer actions per state ────────────────────────────────────
   const footer = state
@@ -144,6 +162,7 @@ export const FriendSheet: React.FC<FriendSheetProps> = ({
         handleSeeRivalry,
         handleSeeHandicap,
         handleInvite,
+        handleNudgeSync,
       }, friendFirstName)
     : { actions: [] as FooterAction[], layout: 'horizontal' as const };
 
@@ -297,64 +316,46 @@ export const FriendSheet: React.FC<FriendSheetProps> = ({
                   onClick={isClbhouzUser ? handleSeeHandicap : null}
                 />
 
-                {/* HEAD-TO-HEAD — hidden only for clbhouz_not_synced */}
-                <HeadToHeadCard state={state} />
-
-                {/* THEIR FORM — synced clbhouz users + whs_only */}
-                {state.kind === 'clbhouz_synced_full' && snapshot?.handicap && (
-                  <TheirFormSection handicap={snapshot.handicap} />
-                )}
-                {state.kind === 'clbhouz_synced_duelsOnly' &&
-                  snapshot?.handicap && (
-                    <TheirFormSection handicap={snapshot.handicap} />
-                  )}
-                {state.kind === 'clbhouz_synced_empty' && snapshot?.handicap && (
-                  <TheirFormSection handicap={snapshot.handicap} />
-                )}
+                {/* ─── UNSYNCED states: single hero pitch card ─────────────── */}
                 {state.kind === 'whs_only' && (
-                  <TheirFormSection
-                    handicap={{
-                      handicap_index: state.entry.friend_handicap_index,
-                      trend_delta: state.entry.handicap_30d_delta,
-                      badges_earned: 0,
-                      active_streaks: 0,
-                      last_round: state.entry.last_round_played_at
-                        ? {
-                            course_name: state.entry.last_round_course_name,
-                            adjusted_gross: null,
-                            play_date: state.entry.last_round_played_at,
-                          }
-                        : null,
-                    }}
+                  <UnsyncedPitchCard
+                    firstName={friendFirstName}
+                    eyebrow="Not on clbhouz yet"
+                    headline={`Get ${friendFirstName || 'them'} on clbhouz`}
+                    subCopy={`Once ${friendFirstName || 'they'} ${friendFirstName ? 'joins' : 'join'} and syncs their handicap, every stat below comes alive between you two.`}
+                  />
+                )}
+                {state.kind === 'clbhouz_not_synced' && (
+                  <UnsyncedPitchCard
+                    firstName={state.firstName}
+                    eyebrow="Handicap not synced"
+                    headline={`${state.firstName} hasn't synced yet`}
+                    subCopy={`${state.firstName} is on clbhouz but hasn't connected their official handicap. Nudge them to unlock head-to-heads and shared stats.`}
                   />
                 )}
 
-                {/* LATEST POST — clbhouz users only, when post exists */}
-                {state.kind !== 'whs_only' && snapshot?.recent_post && (
-                  <LatestPostCard
-                    post={snapshot.recent_post}
-                    onTap={() => handleOpenPost(snapshot.recent_post!.id)}
-                  />
-                )}
-
-                {/* WHS-only stubs */}
-                {state.kind === 'whs_only' && (
+                {/* ─── SYNCED states: existing cascade ──────────── */}
+                {state.kind !== 'whs_only' && state.kind !== 'clbhouz_not_synced' && (
                   <>
-                    <RecentRoundsStub
-                      firstName={friendFirstName}
-                      lastRound={
-                        state.entry.last_round_played_at &&
-                        state.entry.last_round_course_name
-                          ? {
-                              courseName: state.entry.last_round_course_name,
-                              relativeTime: fmtRelative(
-                                state.entry.last_round_played_at,
-                              ),
-                            }
-                          : null
-                      }
-                    />
-                    <StandoutRoundsStub firstName={friendFirstName} />
+                    <HeadToHeadCard state={state} />
+
+                    {state.kind === 'clbhouz_synced_full' && snapshot?.handicap && (
+                      <TheirFormSection handicap={snapshot.handicap} />
+                    )}
+                    {state.kind === 'clbhouz_synced_duelsOnly' &&
+                      snapshot?.handicap && (
+                        <TheirFormSection handicap={snapshot.handicap} />
+                      )}
+                    {state.kind === 'clbhouz_synced_empty' && snapshot?.handicap && (
+                      <TheirFormSection handicap={snapshot.handicap} />
+                    )}
+
+                    {snapshot?.recent_post && (
+                      <LatestPostCard
+                        post={snapshot.recent_post}
+                        onTap={() => handleOpenPost(snapshot.recent_post!.id)}
+                      />
+                    )}
                   </>
                 )}
 
@@ -393,6 +394,7 @@ interface Handlers {
   handleSeeRivalry: () => void;
   handleSeeHandicap: () => void;
   handleInvite: () => void;
+  handleNudgeSync: () => void;
 }
 
 function buildFooter(
@@ -453,18 +455,13 @@ function buildFooter(
       };
     case 'clbhouz_not_synced':
       return {
-        layout: 'horizontal',
+        layout: 'stacked',
         actions: [
           {
-            variant: 'icon',
-            label: 'Message',
-            onClick: h.handleMessage,
-            icon: MessageCircle,
-          },
-          {
             variant: 'primary',
-            label: 'View profile',
-            onClick: h.handleViewProfile,
+            label: firstName ? `Nudge ${firstName} to sync` : 'Nudge to sync',
+            onClick: h.handleNudgeSync,
+            icon: UserPlus,
           },
         ],
       };
@@ -474,7 +471,7 @@ function buildFooter(
         actions: [
           {
             variant: 'primary',
-            label: firstName ? `Invite ${firstName}` : 'Invite to clbhouz',
+            label: firstName ? `Invite ${firstName} to clbhouz` : 'Invite to clbhouz',
             onClick: h.handleInvite,
             icon: UserPlus,
           },
