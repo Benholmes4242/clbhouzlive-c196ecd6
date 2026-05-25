@@ -114,17 +114,32 @@ export const FriendSheet: React.FC<FriendSheetProps> = ({
     navigate(`/handicap/${targetUserId}`);
   };
   const handleInvite = async () => {
-    const url = `${window.location.origin}/invite?ref=${viewerUserId}`;
-    if (typeof navigator !== 'undefined' && navigator.share) {
-      try {
-        await navigator.share({ title: 'Join clbhouz', url });
-      } catch {
-        /* cancelled */
-      }
-    } else if (typeof navigator !== 'undefined' && navigator.clipboard) {
-      await navigator.clipboard.writeText(url);
-      toast.success('Invite link copied');
+    if (state?.kind !== 'whs_only') return;
+    const passportId = state.entry.friend_passport_id;
+    if (passportId == null) {
+      toast.error("Can't invite this player yet");
+      return;
     }
+    const res = await callCreateInvite(passportId, 'friend_sheet');
+    if (!res.ok || !res.invite) {
+      toast.error(res.message ?? "Couldn't create invite");
+      return;
+    }
+    await shareInvite({
+      share_url: res.invite.share_url,
+      share_message: res.invite.share_message,
+      invitee_name: state.entry.friend_name,
+    });
+  };
+  const handleNudgeSync = async () => {
+    if (state?.kind !== 'clbhouz_not_synced') return;
+    // CHECKPOINT: compose=nudge_sync query param is not yet wired on the
+    // profile page; this navigates to the profile and lets the viewer
+    // message manually. Follow-up brief needed to pre-fill compose.
+    const handle = snapshot?.profile.username ?? targetUserId;
+    if (!handle) return;
+    onClose();
+    navigate(`/profile/${handle}?compose=nudge_sync`);
   };
   const handleOpenPost = (postId: string) => {
     onClose();
