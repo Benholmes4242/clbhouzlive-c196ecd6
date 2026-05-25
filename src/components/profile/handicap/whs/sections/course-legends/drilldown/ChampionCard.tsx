@@ -29,12 +29,13 @@ export const ChampionCard: React.FC<Props> = ({ categoryIcon: CatIcon, unit, row
         position: 'relative',
         overflow: 'hidden',
         background: isYou
-          ? 'linear-gradient(135deg, rgba(251,188,46,0.14) 0%, var(--hcp-bg-1) 60%)'
-          : 'linear-gradient(135deg, rgba(251,188,46,0.10) 0%, var(--hcp-bg-1) 70%)',
-        border: `1px solid ${isYou ? 'rgba(251,188,46,0.45)' : 'rgba(251,188,46,0.30)'}`,
+          ? 'linear-gradient(135deg, rgba(251,188,46,0.16) 0%, rgba(247,147,30,0.04) 50%, var(--hcp-bg-1) 100%)'
+          : 'linear-gradient(135deg, rgba(251,188,46,0.11) 0%, rgba(247,147,30,0.02) 50%, var(--hcp-bg-1) 100%)',
+        border: `1px solid ${isYou ? 'rgba(251,188,46,0.40)' : 'rgba(251,188,46,0.24)'}`,
         borderRadius: 16,
-        padding: '14px 16px',
+        padding: '16px 18px',
         fontFamily: FONT,
+        boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.05), 0 1px 2px rgba(0,0,0,0.35)',
       }}
     >
       <div
@@ -66,26 +67,27 @@ export const ChampionCard: React.FC<Props> = ({ categoryIcon: CatIcon, unit, row
               display: 'inline-flex',
               alignItems: 'center',
               gap: 5,
-              padding: '3px 8px',
+              padding: '4px 10px',
               borderRadius: 999,
-              background: 'rgba(251,188,46,0.14)',
-              border: '1px solid rgba(251,188,46,0.40)',
+              background: 'linear-gradient(180deg, rgba(251,188,46,0.18), rgba(251,188,46,0.06))',
+              border: '1px solid rgba(251,188,46,0.35)',
               fontSize: 9,
               fontWeight: 800,
               color: '#FBBC2E',
-              letterSpacing: '0.14em',
+              letterSpacing: '0.16em',
               textTransform: 'uppercase',
+              boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.08)',
             }}
           >
-            <Crown size={10} strokeWidth={2.5} />
+            <Crown size={9.5} strokeWidth={2.4} />
             Champion
           </div>
           <div
             style={{
-              fontSize: 10,
+              fontSize: 9.5,
               fontWeight: 700,
-              color: 'var(--hcp-t-60)',
-              letterSpacing: '0.06em',
+              color: 'var(--hcp-t-40)',
+              letterSpacing: '0.14em',
               textTransform: 'uppercase',
               fontVariantNumeric: 'tabular-nums',
             }}
@@ -94,14 +96,15 @@ export const ChampionCard: React.FC<Props> = ({ categoryIcon: CatIcon, unit, row
           </div>
         </div>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
           <div
             style={{
-              width: 48,
-              height: 48,
+              width: 52,
+              height: 52,
               borderRadius: 14,
               background: 'rgba(255,255,255,0.06)',
-              border: '2px solid rgba(251,188,46,0.55)',
+              border: '1.5px solid rgba(251,188,46,0.45)',
+              boxShadow: '0 0 0 4px rgba(251,188,46,0.06)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
@@ -127,9 +130,9 @@ export const ChampionCard: React.FC<Props> = ({ categoryIcon: CatIcon, unit, row
             <div
               style={{
                 fontSize: 16,
-                fontWeight: 800,
+                fontWeight: 700,
                 color: isYou ? '#FBBC2E' : 'var(--hcp-t-100)',
-                letterSpacing: '-0.01em',
+                letterSpacing: '-0.015em',
                 whiteSpace: 'nowrap',
                 overflow: 'hidden',
                 textOverflow: 'ellipsis',
@@ -137,26 +140,27 @@ export const ChampionCard: React.FC<Props> = ({ categoryIcon: CatIcon, unit, row
             >
               {isYou ? 'YOU' : row.name}
             </div>
-            <div style={{ fontSize: 11, color: 'var(--hcp-t-60)', marginTop: 2 }}>
+            <div style={{ fontSize: 11, color: 'var(--hcp-t-60)', marginTop: 3 }}>
               Set {formatAttainedAt(row.attained_at)}
             </div>
           </div>
 
           <div
             style={{
-              fontSize: 28,
-              fontWeight: 900,
+              fontSize: 38,
+              fontWeight: 200,
               color: isYou ? '#FBBC2E' : 'var(--hcp-t-100)',
-              letterSpacing: '-0.03em',
+              letterSpacing: '-0.05em',
               flexShrink: 0,
               fontVariantNumeric: 'tabular-nums',
+              lineHeight: 0.9,
             }}
           >
             {row.valueDisplay}
             {unit && (
               <span
                 style={{
-                  fontSize: 11,
+                  fontSize: 10,
                   color: 'var(--hcp-t-60)',
                   marginLeft: 4,
                   fontWeight: 600,

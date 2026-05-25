@@ -8,85 +8,160 @@ interface Props {
   onBack?: () => void;
   youOwnedCount: number;
   totalCategories?: number;
+  /** Course header photo. Null/undefined → renders gradient fallback. */
+  courseHeaderImage?: string | null;
 }
 
 const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
 
-export const DrilldownHeader: React.FC<Props> = ({ state, onBack, youOwnedCount, totalCategories = 6 }) => (
-  <>
-    {onBack && (
-      <div style={{ padding: '20px 16px 0', fontFamily: FONT }}>
+export const DrilldownHeader: React.FC<Props> = ({
+  state,
+  onBack,
+  youOwnedCount,
+  totalCategories = 6,
+  courseHeaderImage,
+}) => (
+  <div
+    style={{
+      position: 'relative',
+      height: 160,
+      background: courseHeaderImage
+        ? 'transparent'
+        : 'linear-gradient(180deg, rgba(247,147,30,0.18) 0%, var(--hcp-bg-2) 100%)',
+      overflow: 'hidden',
+      fontFamily: FONT,
+    }}
+  >
+    {courseHeaderImage && (
+      <img
+        src={courseHeaderImage}
+        alt=""
+        aria-hidden
+        loading="eager"
+        style={{
+          position: 'absolute',
+          inset: 0,
+          width: '100%',
+          height: '100%',
+          objectFit: 'cover',
+        }}
+      />
+    )}
+
+    <div
+      aria-hidden
+      style={{
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        right: 0,
+        height: '50%',
+        background:
+          'linear-gradient(180deg, rgba(5,8,16,0.55) 0%, rgba(5,8,16,0) 100%)',
+      }}
+    />
+
+    <div
+      aria-hidden
+      style={{
+        position: 'absolute',
+        bottom: 0,
+        left: 0,
+        right: 0,
+        height: '60%',
+        background:
+          'linear-gradient(180deg, rgba(5,8,16,0) 0%, rgba(5,8,16,0.92) 90%)',
+      }}
+    />
+
+    <div
+      style={{
+        position: 'absolute',
+        top: 16,
+        left: 16,
+        right: 16,
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        gap: 12,
+      }}
+    >
+      {onBack ? (
         <button
           onClick={onBack}
           style={{
             display: 'inline-flex',
             alignItems: 'center',
-            gap: 2,
-            background: 'transparent',
-            border: 'none',
-            padding: 0,
-            color: 'var(--hcp-t-60)',
-            fontSize: 13,
+            gap: 4,
+            padding: '5px 11px 5px 8px',
+            background: 'rgba(0,0,0,0.45)',
+            border: '1px solid rgba(255,255,255,0.10)',
+            borderRadius: 999,
+            backdropFilter: 'blur(8px)',
+            WebkitBackdropFilter: 'blur(8px)',
+            color: '#FFFFFF',
+            fontFamily: FONT,
+            fontSize: 12,
             fontWeight: 600,
             cursor: 'pointer',
-            marginBottom: 12,
           }}
         >
-          <ChevronLeft size={16} />
+          <ChevronLeft size={14} strokeWidth={2.2} />
           All courses
         </button>
-      </div>
-    )}
+      ) : (
+        <div />
+      )}
 
-    <div
-      style={{
-        padding: onBack ? '0 16px' : '20px 16px 0',
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'flex-start',
-        gap: 12,
-      }}
-    >
-      <div style={{ flex: 1, minWidth: 0 }}>
-        <CourseEyebrow
-          type={state.courseType}
-          region={state.courseRegion}
-          country={state.courseCountry}
-        />
-        <div
-          style={{
-            marginTop: 4,
-            fontSize: 20,
-            fontWeight: 800,
-            color: 'var(--hcp-t-100)',
-            letterSpacing: '-0.02em',
-            lineHeight: 1.15,
-            fontFamily: FONT,
-          }}
-        >
-          {state.courseName}
-        </div>
-      </div>
       <div
         style={{
-          flexShrink: 0,
           display: 'inline-flex',
           alignItems: 'center',
           gap: 5,
-          padding: '5px 10px',
+          padding: '5px 11px',
           borderRadius: 999,
-          background: 'rgba(251,188,46,0.14)',
-          border: '1px solid rgba(251,188,46,0.40)',
-          fontFamily: FONT,
+          background: 'rgba(0,0,0,0.45)',
+          border: '1px solid rgba(251,188,46,0.45)',
+          backdropFilter: 'blur(8px)',
+          WebkitBackdropFilter: 'blur(8px)',
           fontSize: 11,
           fontWeight: 800,
           color: '#FBBC2E',
-          letterSpacing: '0.08em',
+          fontVariantNumeric: 'tabular-nums',
+          letterSpacing: '-0.01em',
         }}
       >
-        <Crown size={12} strokeWidth={2.5} />
+        <Crown size={11} strokeWidth={2.4} />
         {youOwnedCount}/{totalCategories}
       </div>
     </div>
-  </>
+
+    <div
+      style={{
+        position: 'absolute',
+        left: 16,
+        right: 16,
+        bottom: 14,
+      }}
+    >
+      <CourseEyebrow
+        type={state.courseType}
+        region={state.courseRegion}
+        country={state.courseCountry}
+      />
+      <div
+        style={{
+          marginTop: 5,
+          fontSize: 22,
+          fontWeight: 700,
+          color: '#FFFFFF',
+          letterSpacing: '-0.022em',
+          lineHeight: 1.15,
+          textShadow: '0 1px 3px rgba(0,0,0,0.55)',
+        }}
+      >
+        {state.courseName}
+      </div>
+    </div>
+  </div>
 );

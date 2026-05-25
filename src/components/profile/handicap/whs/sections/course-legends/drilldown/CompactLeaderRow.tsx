@@ -28,16 +28,21 @@ export const CompactLeaderRow: React.FC<Props> = ({ row, unit }) => {
         display: 'flex',
         alignItems: 'center',
         gap: 10,
-        padding: '10px 10px',
+        padding: '10px 11px',
         fontFamily: FONT,
-        background: isYou ? 'rgba(251,188,46,0.06)' : 'transparent',
+        background: isYou
+          ? 'linear-gradient(90deg, rgba(251,188,46,0.10), rgba(251,188,46,0.02))'
+          : 'transparent',
+        border: isYou ? '1px solid rgba(251,188,46,0.22)' : '1px solid transparent',
+        borderRadius: 8,
+        boxSizing: 'border-box',
       }}
     >
       <div
         style={{
           width: 22,
           height: 22,
-          borderRadius: 6,
+          borderRadius: 7,
           background: tier.bg,
           border: `1px solid ${tier.border}`,
           display: 'flex',
@@ -90,6 +95,7 @@ export const CompactLeaderRow: React.FC<Props> = ({ row, unit }) => {
               whiteSpace: 'nowrap',
               overflow: 'hidden',
               textOverflow: 'ellipsis',
+              letterSpacing: '-0.005em',
             }}
           >
             {isYou ? 'YOU' : row.name}
@@ -113,19 +119,20 @@ export const CompactLeaderRow: React.FC<Props> = ({ row, unit }) => {
             </span>
           )}
         </div>
-        <div style={{ fontSize: 10, color: 'var(--hcp-t-40)', marginTop: 1 }}>
+        <div style={{ fontSize: 10, color: 'var(--hcp-t-40)', marginTop: 2 }}>
           {formatAttainedAt(row.attained_at)}
         </div>
       </div>
 
       <div
         style={{
-          fontSize: 14,
-          fontWeight: 800,
+          fontSize: 18,
+          fontWeight: 200,
           color: isYou ? '#FBBC2E' : 'var(--hcp-t-100)',
           fontVariantNumeric: 'tabular-nums',
-          letterSpacing: '-0.01em',
+          letterSpacing: '-0.03em',
           flexShrink: 0,
+          lineHeight: 1,
         }}
       >
         {row.valueDisplay}
