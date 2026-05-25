@@ -393,6 +393,65 @@ async function getMilestone(userId: string, metric: string): Promise<number> {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
+// recomputeTop100Milestones
+// Distinct rated-course counts per Top 100 list, written to gam_user_milestones.
+// Set-based (idempotent across replay). Called per evaluation so a user who
+// rates a course between rounds gets credit on the next score post too.
+// ─────────────────────────────────────────────────────────────────────────────
+async function recomputeTop100Milestones(userId: string) {
+  const { data, error } = await supabase
+    .from("course_top100_memberships")
+    .select(`
+      course_id,
+      top100_lists!inner ( slug, is_active ),
+      course_ratings!inner ( user_id, rating )
+    `)
+    .eq("top100_lists.is_active", true)
+    .eq("course_ratings.user_id", userId)
+    .not("course_ratings.rating", "is", null);
+
+  if (error) {
+    console.error("[recomputeTop100Milestones] query error", error);
+    return;
+  }
+
+  const distinctByList = new Map<string, Set<string>>();
+  for (const row of data ?? []) {
+    const slug = (row as any).top100_lists?.slug;
+    if (!slug || !TOP_100_METRIC_BY_SLUG[slug]) continue;
+    if (!distinctByList.has(slug)) distinctByList.set(slug, new Set());
+    distinctByList.get(slug)!.add((row as any).course_id);
+  }
+
+  const nowIso = new Date().toISOString();
+  for (const slug of Object.values(TOP_100_SLUG_BY_METRIC)) {
+    const metric = TOP_100_METRIC_BY_SLUG[slug];
+    const count = distinctByList.get(slug)?.size ?? 0;
+
+    const { data: existing } = await supabase
+      .from("gam_user_milestones")
+      .select("count")
+      .eq("user_id", userId)
+      .eq("metric", metric)
+      .maybeSingle();
+
+    if (existing && existing.count === count) continue;
+
+    await supabase.from("gam_user_milestones").upsert(
+      {
+        user_id: userId,
+        metric,
+        count,
+        first_at: existing ? undefined : (count > 0 ? nowIso : null),
+        last_at: nowIso,
+        updated_at: nowIso,
+      },
+      { onConflict: "user_id,metric" }
+    );
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
 // apply_badges
 // ─────────────────────────────────────────────────────────────────────────────
 function computeTier(value: number, tiers: any): number {
