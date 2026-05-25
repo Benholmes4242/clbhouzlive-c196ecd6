@@ -7,6 +7,7 @@ import FriendsCoursesSignedOutEmpty from './FriendsCoursesSignedOutEmpty';
 import UserCoursesContent from './UserCoursesContent';
 import Top100CoursesHubPanel from './Top100CoursesHubPanel';
 import Top100LeaderboardPanel from './Top100LeaderboardPanel';
+import ExploreTabContent from '@/components/explore-tab-new/ExploreTabContent';
 import NetworkCoursesSheet from './network/NetworkCoursesSheet';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { Button } from '@/components/ui/button';
@@ -167,7 +168,7 @@ const CoursesContent: React.FC<CoursesContentProps> = ({ username, displayName }
   const [activeTab, setActiveTab] = useState(() => {
     if (username) return 'my-courses'; // Keep for user profile pages
     const tabParam = new URLSearchParams(window.location.search).get('tab');
-    if (tabParam && ['explore', 'top100', 'leaderboards'].includes(tabParam)) {
+    if (tabParam && ['explore', 'top100', 'discover'].includes(tabParam)) {
       return tabParam;
     }
     return 'explore'; // Default to explore for main courses page
@@ -181,12 +182,8 @@ const CoursesContent: React.FC<CoursesContentProps> = ({ username, displayName }
   // Also check for 'view' param which indicates we're on leaderboards sub-tab
   useEffect(() => {
     const tabParam = searchParams.get('tab');
-    const viewParam = searchParams.get('view');
-    
-    // If view param exists, we're on a leaderboard sub-tab - stay on leaderboards
-    if (viewParam && ['championship', 'courses', 'exploration', 'handicap', 'players'].includes(viewParam)) {
-      setActiveTab('leaderboards');
-    } else if (tabParam && (tabParam === 'explore' || tabParam === 'top100' || tabParam === 'leaderboards')) {
+
+    if (tabParam && (tabParam === 'explore' || tabParam === 'top100' || tabParam === 'discover')) {
       setActiveTab(tabParam);
     } else if (username) {
       // Default to my-courses for user profile pages
@@ -206,10 +203,6 @@ const CoursesContent: React.FC<CoursesContentProps> = ({ username, displayName }
   }, []);
 
   const handleTabChange = (value: string) => {
-    if (!user && value === 'leaderboards') {
-      navigate('/auth');
-      return;
-    }
     setActiveTab(value);
     // Persist tab to URL so it survives remount on back navigation
     const params = new URLSearchParams(searchParams);
@@ -305,7 +298,7 @@ const CoursesContent: React.FC<CoursesContentProps> = ({ username, displayName }
                 tabs={[
                   { id: 'explore', label: 'Explore' },
                   { id: 'top100', label: 'Top 100' },
-                  { id: 'leaderboards', label: 'Rankings' },
+                  { id: 'discover', label: 'Discover' },
                 ]}
                 activeTab={activeTab}
                 onTabChange={handleTabChange}
@@ -343,9 +336,7 @@ const CoursesContent: React.FC<CoursesContentProps> = ({ username, displayName }
 
             {activeTab === 'explore' && <CourseExplorer />}
             {activeTab === 'top100' && <Top100CoursesHubPanel />}
-            {activeTab === 'leaderboards' && (
-              user ? <Top100LeaderboardPanel /> : <FriendsCoursesSignedOutEmpty />
-            )}
+            {activeTab === 'discover' && <ExploreTabContent embedded />}
           </div>
         </>
       )}
