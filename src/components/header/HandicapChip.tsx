@@ -13,7 +13,7 @@
 import { useLocation, useNavigate } from 'react-router-dom';
 import { TrendingDown, TrendingUp } from 'lucide-react';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
-import { useWhsConnection } from '@/lib/whs/hooks';
+import { useWhsConnection, useHandicapTrend } from '@/lib/whs/hooks';
 import { useHandicapTrend90d, type HandicapTrend90dDirection } from '@/hooks/useHandicapTrend90d';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 
