@@ -296,8 +296,8 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
             {/* Handicap chip — dark chrome only (Phase 1: dark headers) */}
             {isDarkChrome && <HandicapChip />}
 
-            {/* Identity pill (mobile only) */}
-            <div className="sm:hidden">
+            {/* Identity pill (mobile only) — extra 6px ml on dark chrome so chip↔avatar gap = 14px */}
+            <div className="sm:hidden" style={{ marginLeft: isDarkChrome ? 6 : 0 }}>
               {user ? (
                 <PostingAsPill 
                   ref={pillRef}
