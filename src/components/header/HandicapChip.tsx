@@ -48,6 +48,7 @@ export function HandicapChip() {
   const location = useLocation();
 
   const { data: connection, isLoading: whsLoading } = useWhsConnection(user?.id);
+  const { data: trendData } = useHandicapTrend(connection?.id);
   const trend = useHandicapTrend90d(connection?.id);
 
   if (!user) return null;
@@ -98,8 +99,8 @@ export function HandicapChip() {
     );
   }
 
-  const indexValue = connection.current_index;
-  if (indexValue === null || indexValue === undefined) {
+  const indexValue = trendData?.current ?? null;
+  if (indexValue === null) {
     // Connection exists but no current index — fall back to Connect HCP.
     return (
       <button
