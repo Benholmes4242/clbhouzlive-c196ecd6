@@ -114,6 +114,7 @@ const QuickEditProfilePage = lazy(() => import("./pages/QuickEditProfilePage"));
 // ProfileHandicapView removed — /profile/handicap now redirects to /handicap (fix brief §2.1)
 const HandicapPage = lazy(() => import("./pages/HandicapPage"));
 const RivalryPage = lazy(() => import("./pages/RivalryPage"));
+const CourseLegendsPage = lazy(() => import("./pages/CourseLegendsPage"));
 
 const ProfileQuestView = lazy(() => import("./pages/ProfileQuestView"));
 const QuestIndexView = lazy(() => import("./pages/QuestIndexView"));
