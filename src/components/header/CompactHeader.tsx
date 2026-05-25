@@ -157,11 +157,11 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
   const handleDiscoverBack = () => {
     if (location.pathname.startsWith('/discover/explore/region/') || 
         location.pathname.startsWith('/discover/explore/theme/')) {
-      navigate('/discover?main=explore');
+      navigate('/courses?tab=discover');
     } else if (searchParams.get('section')) {
-      navigate('/discover?main=videos');
+      navigate('/watch');
     } else {
-      navigate('/discover');
+      navigate('/watch');
     }
   };
 
@@ -240,7 +240,7 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
             <nav className="hidden lg:flex items-center gap-1">
               {[
                 { label: 'Clbhouz', path: '/clubhouse' },
-                { label: 'Discover', path: '/discover' },
+                { label: 'Watch', path: '/watch' },
                 { label: 'Courses', path: '/courses' },
                 { label: 'Tour', path: '/tour' },
               ].map((item) => {

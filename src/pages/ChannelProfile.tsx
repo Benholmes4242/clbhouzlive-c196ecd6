@@ -22,7 +22,7 @@ export default function ChannelProfile() {
         } else {
           // TODO: Implement real channel fetch from Supabase
           // For now, redirect to discover page since channels aren't live yet
-          nav('/discover', { replace: true });
+          nav('/watch', { replace: true });
           return;
         }
       } finally {

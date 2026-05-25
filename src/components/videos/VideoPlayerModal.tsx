@@ -343,7 +343,7 @@ export const VideoPlayerModal: React.FC = () => {
     if (window.history.length > 2) {
       navigate(-1);
     } else {
-      navigate('/discover?main=videos');
+      navigate('/watch');
     }
   }, [navigate, flushProgress, videoPlayback, videoId, videoData]);
   

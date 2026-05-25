@@ -170,7 +170,7 @@ export function Top100PilgrimageView({ userId }: Top100PilgrimageViewProps) {
         <Button
           className="mt-3"
           variant="outline"
-          onClick={() => navigate('/discover?sub=top100')}
+          onClick={() => navigate('/courses?tab=top100')}
         >
           Find a Top 100 course
         </Button>
@@ -228,7 +228,7 @@ export function Top100PilgrimageView({ userId }: Top100PilgrimageViewProps) {
           <Button
             size="sm"
             variant="outline"
-            onClick={() => navigate('/discover?sub=top100')}
+            onClick={() => navigate('/courses?tab=top100')}
           >
             Find your next Top 100 stop
           </Button>
