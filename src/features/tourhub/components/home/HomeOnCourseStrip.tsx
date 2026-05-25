@@ -14,11 +14,13 @@ export function HomeOnCourseStrip() {
   const { session } = useSupabaseSession();
   const userId = session?.user?.id;
 
+  // Hook must run on every render — react-query gates internally on userId.
+  const { data, isLoading } = useNetworkActivity(userId);
+
   // Auth gate — strip is a personalised signal, not a logged-out surface.
   if (!userId) return null;
 
   // Mirror the OnCourseNowStrip empty-state guard to avoid rendering a lone eyebrow.
-  const { data, isLoading } = useNetworkActivity(userId);
   const activeCount = (data?.friends ?? []).filter(f => f.last_activity !== null).length;
   if (!isLoading && activeCount === 0) return null;
 
