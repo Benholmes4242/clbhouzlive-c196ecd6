@@ -136,7 +136,7 @@ export const TourHubShellTabs: React.FC = () => {
             top: 0,
             right: 0,
             bottom: 0,
-            width: 28,
+            width: 34,
             pointerEvents: 'none',
             background: 'linear-gradient(to right, rgba(10,14,20,0), #0A0E14)',
           }}
