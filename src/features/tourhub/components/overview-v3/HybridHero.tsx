@@ -19,6 +19,7 @@ import { useTournamentTeeTimes } from '../../hooks/useTournamentTeeTimes';
 import { useTournamentFieldStrength } from '../../hooks/useTournamentFieldStrength';
 import { useTournamentCourseStats } from '../../hooks/useTournamentCourseStats';
 import { tournamentRoute } from '../../routes';
+import { getPlayerHeadshotUrl } from '@/utils/playerHeadshot';
 
 import { PhotoBand } from './HybridHeroBands/PhotoBand';
 import { MiddleBand } from './HybridHeroBands/MiddleBand';
@@ -149,25 +150,42 @@ export function HybridHero({ slide }: HybridHeroProps) {
   // Champion data for results
   const champion = useMemo(() => {
     if (state.kind !== 'results') return undefined;
+    const top: any = safeLeaderboard[0];
     const winnerName = tournament.winnerName;
+
+    // Resolve avatar with the same priority leaderboard rows 2+ use:
+    //   1) explicit tournament.winnerPhotoUrl (when sync provides it)
+    //   2) joined leaderboard player photo (always present for ranked rows)
+    //   3) R2 headshot resolved by name + tour
+    const resolveWinnerAvatar = (name?: string | null): string | null => {
+      if (tournament.winnerPhotoUrl) return tournament.winnerPhotoUrl;
+      if (top?.player?.photo_url) return top.player.photo_url;
+      if (name && tournament.tourSlug) {
+        try {
+          return getPlayerHeadshotUrl(name, tournament.tourSlug);
+        } catch { return null; }
+      }
+      return null;
+    };
+
     if (winnerName) {
       return {
         name: winnerName,
-        country: undefined as string | undefined,
-        score: tournament.winnerScore || (safeLeaderboard[0] ? fmtScore(safeLeaderboard[0].score) : '—'),
-        avatarUrl: tournament.winnerPhotoUrl ?? null,
+        country: (top?.player?.country_code as string | undefined) ?? undefined,
+        score: tournament.winnerScore || (top ? fmtScore(top.score) : '—'),
+        avatarUrl: resolveWinnerAvatar(winnerName),
         playoffWin: state.variant === 'playoff',
       };
     }
-    const top = safeLeaderboard[0];
     if (!top) return undefined;
+    const topName =
+      top.player?.full_name ||
+      `${top.player?.first_name ?? ''} ${top.player?.last_name ?? ''}`.trim();
     return {
-      name:
-        top.player?.full_name ||
-        `${top.player?.first_name ?? ''} ${top.player?.last_name ?? ''}`.trim(),
+      name: topName,
       country: top.player?.country_code,
       score: fmtScore(top.score),
-      avatarUrl: top.player?.photo_url ?? null,
+      avatarUrl: resolveWinnerAvatar(topName),
       playoffWin: state.variant === 'playoff',
     };
   }, [state, tournament, safeLeaderboard]);
