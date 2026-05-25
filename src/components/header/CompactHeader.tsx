@@ -86,7 +86,9 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
   // clbhouz logo on the left — they're top-level hubs, not back-arrow pages.
   const isTourRoute = location.pathname === '/tourhub' || location.pathname === '/tour';
   // Routes that keep the light Dispatch chrome (clubhouse feed + profile pages).
-  const isClubhouseChromeRoute = location.pathname === '/' || location.pathname === '/clubhouse';
+  // NOTE: '/' is the Tour Hub landing — it must use dark chrome like /tourhub.
+  // Do not re-add '/' here.
+  const isClubhouseChromeRoute = location.pathname === '/clubhouse';
   const isProfileChromeRoute = location.pathname === '/profile' || location.pathname.startsWith('/profile/');
   // Course detail: /courses/:courseId (exactly 3 segments — excludes /reviews, /rate, /share-review subroutes)
   const isCourseDetailRoute = location.pathname.startsWith('/courses/')
