@@ -18227,6 +18227,10 @@ export type Database = {
       enablelongtransactions: { Args: never; Returns: string }
       ensure_user_season_stats: { Args: { p_user_id: string }; Returns: string }
       equals: { Args: { geom1: unknown; geom2: unknown }; Returns: boolean }
+      evaluate_user_top100_badges: {
+        Args: { p_user_id: string }
+        Returns: undefined
+      }
       execute_sql: { Args: { params?: Json; query: string }; Returns: Json }
       expire_pings: { Args: never; Returns: undefined }
       explore_courses_by_rating: {
@@ -20599,6 +20603,10 @@ export type Database = {
       }
       recalculate_review_vote_counts: {
         Args: { review_id_param: string }
+        Returns: undefined
+      }
+      recompute_user_top100_milestones: {
+        Args: { p_user_id: string }
         Returns: undefined
       }
       record_course_log_impact: {
