@@ -74,7 +74,7 @@ function normalizeTiersArray(raw: unknown): number[] {
 
 export function normalizeBadge(b: UserBadge): TrophyItem {
   const thresholds = normalizeTiersArray(b.counter_tiers);
-  const reached = Math.max(0, b.counter_tier ?? 0);
+  const reached = b.counter_tier ?? 0;
   const earned = Boolean(b.is_earned);
   const value = b.counter_value ?? 0;
   const nextThreshold =
