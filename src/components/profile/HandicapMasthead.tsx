@@ -1,28 +1,32 @@
 /**
- * HandicapMasthead — inline data masthead (no card chrome) for the
- * ProfileHubSheet. Sits directly on the #F8FAFC sheet surface.
+ * HandicapMasthead — Scorecard card surface for the ProfileHubSheet.
  *
  * Variants:
- *   connect          — never linked WHS (amber CTA pill)
- *   nodata           — connected, <8 rounds (Building Record)
- *   steady           — connected, |delta|<0.05
- *   improving        — connected, delta<0
- *   drifting         — connected, delta>0
- *   milestone        — crossed a whole-handicap boundary in window
+ *   connect          — never linked WHS (dark gradient conversion card)
+ *   nodata           — connected, <8 rounds (Building Record scorecard)
+ *   steady/improving/drifting/milestone — connected data scorecard
  *
- * Dev override: append ?state=connect|nodata|steady|improving|drifting|milestone
- * to the URL to manually force any state for QA.
+ * The whole card is a tap target → routes to /handicap (or connect flow on
+ * the connect variant).
+ *
+ * Dev override: ?state=connect|nodata|steady|improving|drifting|milestone
  */
 import { memo, useMemo } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
-import { useWhsConnection, useHandicapTrend } from '@/lib/whs/hooks';
+import { ArrowDownRight, ArrowUpRight, ArrowRight } from 'lucide-react';
+import { useWhsConnection, useHandicapTrend, useLastRound } from '@/lib/whs/hooks';
+import { useHandicapTrend12mo } from '@/hooks/useHandicapTrend12mo';
 
 const INK = '#0F172A';
 const INK_SOFT = '#475569';
 const INK_FAINT = '#94A3B8';
-const SLATE_200 = '#E2E8F0';
+const HAIRLINE = 'rgba(15,23,42,0.08)';
 const AMBER = '#F7931E';
 const AMBER_DEEP = '#D97706';
+const SLATE_200 = '#E2E8F0';
+const SEASON_GREEN = '#006747';
+const CRIMSON = '#9F1D1D';
+
 const TABULAR: React.CSSProperties = {
   fontVariantNumeric: 'tabular-nums',
   fontFeatureSettings: '"kern" 1, "liga" 1',
@@ -38,23 +42,13 @@ export type HandicapMastheadState =
 
 interface Props {
   userId: string;
-  /** Tapping the Connect CTA on the connect-state. */
   onConnectTap: () => void;
-  /** Federation name displayed on connect state. Hardcoded today. */
-  federationLabel?: string;
+  onCardTap?: () => void;
 }
 
 function classifyState(
   hasConnection: boolean,
-  trend:
-    | {
-        current: number | null;
-        delta: number | null;
-        previousHandicap: number | null;
-        totalRoundsInRecord: number;
-        hasHistory: boolean;
-      }
-    | undefined,
+  trend: any,
 ): HandicapMastheadState {
   if (!hasConnection) return 'connect';
   if (!trend || trend.current === null) return 'nodata';
@@ -62,10 +56,9 @@ function classifyState(
 
   if (trend.hasHistory && trend.previousHandicap !== null) {
     const cur = trend.current < 0 ? Math.floor(trend.current) : Math.ceil(trend.current);
-    const prev =
-      trend.previousHandicap < 0
-        ? Math.floor(trend.previousHandicap)
-        : Math.ceil(trend.previousHandicap);
+    const prev = trend.previousHandicap < 0
+      ? Math.floor(trend.previousHandicap)
+      : Math.ceil(trend.previousHandicap);
     if (cur !== prev) return 'milestone';
   }
 
@@ -74,77 +67,67 @@ function classifyState(
   return trend.delta < 0 ? 'improving' : 'drifting';
 }
 
-function Eyebrow({ amber, children }: { amber: boolean; children: React.ReactNode }) {
+function OfficialHandicapMark({ size = 13, color = AMBER }: { size?: number; color?: string }) {
   return (
-    <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 10 }}>
-      <span
-        style={{
-          width: 6,
-          height: 6,
-          borderRadius: '50%',
-          background: amber ? AMBER : INK_FAINT,
-          flexShrink: 0,
-        }}
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <path
+        d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"
+        stroke={color}
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
       />
-      <span
-        style={{
-          fontSize: 10,
-          fontWeight: 700,
-          color: amber ? AMBER_DEEP : INK_FAINT,
-          letterSpacing: '0.12em',
-          textTransform: 'uppercase' as const,
-        }}
-      >
-        {children}
-      </span>
-    </div>
+      <path
+        d="M8.5 12l2.5 2.5L15.5 10"
+        stroke={color}
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
   );
 }
 
-function ProgressBar({ pct, amber = true }: { pct: number; amber?: boolean }) {
-  return (
-    <div
-      style={{
-        marginTop: 4,
-        height: 2,
-        width: '100%',
-        background: SLATE_200,
-        borderRadius: 1,
-        overflow: 'hidden',
-      }}
-    >
-      <div
-        style={{
-          width: `${Math.max(0, Math.min(100, pct))}%`,
-          height: '100%',
-          background: amber ? AMBER : INK_SOFT,
-          transition: 'width 320ms cubic-bezier(0.22, 0.61, 0.36, 1)',
-        }}
-      />
-    </div>
-  );
+function formatHandicap(v: number | null): string {
+  if (v === null) return '—';
+  return v < 0 ? `+${Math.abs(v).toFixed(1)}` : v.toFixed(1);
 }
 
-function HandicapMasthead({ userId, onConnectTap, federationLabel = 'England Golf' }: Props) {
+function formatDelta(v: number | null | undefined): string {
+  if (v === null || v === undefined) return '+0.0';
+  const sign = v < 0 ? '-' : '+';
+  return `${sign}${Math.abs(v).toFixed(1)}`;
+}
+
+function lastRoundLabel(playDate: string | null | undefined): string {
+  if (!playDate) return '—';
+  const ms = Date.now() - new Date(playDate).getTime();
+  if (ms < 24 * 3600_000) return 'Today';
+  if (ms < 48 * 3600_000) return 'Yesterday';
+  const days = Math.floor(ms / 86_400_000);
+  return `${days} days`;
+}
+
+function HandicapMasthead({ userId, onConnectTap, onCardTap }: Props) {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const { data: connection } = useWhsConnection(userId);
   const { data: trend } = useHandicapTrend(connection?.id);
+  const { data: lastRound } = useLastRound(connection?.id);
+  const trend12 = useHandicapTrend12mo(connection?.id);
 
   const realState = useMemo(
     () => classifyState(!!connection, trend as any),
     [connection, trend],
   );
 
-  // Dev override
   const override = searchParams.get('state') as HandicapMastheadState | null;
-  const allowedOverrides: HandicapMastheadState[] = [
+  const allowed: HandicapMastheadState[] = [
     'connect', 'nodata', 'steady', 'improving', 'drifting', 'milestone',
   ];
   const state: HandicapMastheadState =
-    override && allowedOverrides.includes(override) ? override : realState;
+    override && allowed.includes(override) ? override : realState;
 
-  // Mock trend for overrides so the UI still has something to render
   const mockTrend = useMemo(() => {
     if (!override) return trend as any;
     switch (state) {
@@ -157,75 +140,135 @@ function HandicapMasthead({ userId, onConnectTap, federationLabel = 'England Gol
     }
   }, [override, state, trend]);
 
-  // ── Connect variant ──
+  const goToHandicap = () => {
+    if (onCardTap) onCardTap();
+    else navigate('/handicap');
+  };
+
+  // ── Connect variant: dark gradient card ──
   if (state === 'connect') {
     return (
-      <div style={{ paddingTop: 18, paddingBottom: 22 }}>
-        <Eyebrow amber>CONNECT · HANDICAP</Eyebrow>
-        <div
-          style={{
-            fontSize: 22,
-            fontWeight: 800,
-            color: INK,
-            letterSpacing: '-0.015em',
-            lineHeight: 1.15,
-          }}
-        >
-          Track your index.
-        </div>
-        <div
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: 7,
-            marginTop: 6,
-            fontSize: 13,
-            fontWeight: 600,
-            color: INK_SOFT,
-          }}
-        >
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke={INK_SOFT} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
-          </svg>
-          <span>{federationLabel} · WHS</span>
-        </div>
-
-        <div
-          style={{
-            marginTop: 18,
-            fontSize: 11.5,
-            color: INK_FAINT,
-            textAlign: 'center',
-          }}
-        >
-          Takes 30 seconds · We never post on your behalf
-        </div>
+      <div style={{ paddingTop: 14 }}>
         <button
           type="button"
           onClick={onConnectTap}
-          className="active:scale-[0.98] transition-transform"
+          className="w-full text-left active:scale-[0.995] transition-transform"
           style={{
-            marginTop: 10,
-            width: '100%',
-            height: 44,
-            borderRadius: 12,
-            background: `linear-gradient(135deg, ${AMBER}, ${AMBER_DEEP})`,
+            position: 'relative',
+            overflow: 'hidden',
+            display: 'block',
+            background: 'linear-gradient(135deg, #1A1F2C 0%, #0F1419 100%)',
+            borderRadius: 14,
             border: 'none',
-            color: '#FFFFFF',
-            fontSize: 14,
-            fontWeight: 700,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            gap: 8,
+            padding: '20px 20px 18px',
             cursor: 'pointer',
-            boxShadow: '0 4px 12px rgba(247,147,30,0.30)',
+            boxShadow: '0 4px 20px rgba(15,23,42,0.12)',
           }}
         >
-          <span>Connect handicap</span>
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M5 12h14M13 5l7 7-7 7" />
-          </svg>
+          {/* Amber glow */}
+          <div
+            aria-hidden
+            style={{
+              pointerEvents: 'none',
+              position: 'absolute',
+              top: -40,
+              right: -40,
+              width: 160,
+              height: 160,
+              background:
+                'radial-gradient(circle, rgba(247,147,30,0.22) 0%, rgba(247,147,30,0) 70%)',
+            }}
+          />
+          {/* Grid texture */}
+          <div
+            aria-hidden
+            style={{
+              pointerEvents: 'none',
+              position: 'absolute',
+              inset: 0,
+              opacity: 0.04,
+              backgroundImage:
+                'linear-gradient(rgba(255,255,255,1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,1) 1px, transparent 1px)',
+              backgroundSize: '24px 24px',
+            }}
+          />
+
+          <div style={{ position: 'relative' }}>
+            {/* Eyebrow */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 10 }}>
+              <OfficialHandicapMark size={13} color={AMBER} />
+              <span
+                style={{
+                  fontSize: 9.5,
+                  fontWeight: 800,
+                  color: AMBER,
+                  letterSpacing: '0.14em',
+                  textTransform: 'uppercase' as const,
+                }}
+              >
+                WHS · Official Handicap
+              </span>
+            </div>
+
+            {/* Headline */}
+            <div
+              style={{
+                fontSize: 22,
+                fontWeight: 800,
+                color: '#FFFFFF',
+                letterSpacing: '-0.015em',
+                lineHeight: 1.1,
+                marginBottom: 4,
+              }}
+            >
+              Track your handicap.
+            </div>
+
+            {/* Sub */}
+            <div
+              style={{
+                fontSize: 13,
+                fontWeight: 500,
+                color: 'rgba(255,255,255,0.65)',
+                lineHeight: 1.4,
+                maxWidth: 280,
+                marginBottom: 16,
+              }}
+            >
+              Sync your official index, see your trend, compare with friends.
+            </div>
+
+            {/* CTA pill */}
+            <span
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 8,
+                padding: '11px 18px',
+                borderRadius: 10,
+                background: `linear-gradient(135deg, ${AMBER}, ${AMBER_DEEP})`,
+                color: '#FFFFFF',
+                fontSize: 13.5,
+                fontWeight: 700,
+                boxShadow: '0 4px 14px rgba(247,147,30,0.40)',
+              }}
+            >
+              Connect handicap
+              <ArrowRight size={14} color="#FFFFFF" strokeWidth={2.4} />
+            </span>
+
+            {/* Microcopy */}
+            <div
+              style={{
+                marginTop: 12,
+                fontSize: 10.5,
+                fontWeight: 500,
+                color: 'rgba(255,255,255,0.45)',
+              }}
+            >
+              Takes 30 seconds · We never post on your behalf
+            </div>
+          </div>
         </button>
       </div>
     );
@@ -237,157 +280,299 @@ function HandicapMasthead({ userId, onConnectTap, federationLabel = 'England Gol
     const needed = 8;
     const pct = Math.min(100, (played / needed) * 100);
     const remaining = Math.max(0, needed - played);
+    const lastRoundText = lastRoundLabel(lastRound?.play_date as any);
+
     return (
-      <div style={{ paddingTop: 18, paddingBottom: 22 }}>
-        <Eyebrow amber>HANDICAP · BUILDING RECORD</Eyebrow>
-        <div
+      <div style={{ paddingTop: 14 }}>
+        <button
+          type="button"
+          onClick={goToHandicap}
+          className="w-full text-left active:bg-[rgba(15,23,42,0.015)] transition-colors"
           style={{
-            display: 'grid',
-            gridTemplateColumns: '1fr 1fr 1fr',
-            gap: 16,
-            marginBottom: 18,
-            alignItems: 'baseline',
+            display: 'block',
+            background: '#FFFFFF',
+            border: `0.5px solid ${HAIRLINE}`,
+            borderRadius: 14,
+            padding: 0,
+            cursor: 'pointer',
+            overflow: 'hidden',
           }}
         >
-          <Col label="INDEX">
-            <span style={{ fontSize: 48, fontWeight: 200, color: 'rgba(15,23,42,0.25)', letterSpacing: '-0.02em', ...TABULAR }}>
-              —
-            </span>
-          </Col>
-          <Col label="ROUNDS">
-            <span style={{ fontSize: 28, fontWeight: 300, color: INK, ...TABULAR }}>{played}</span>
-            <span style={{ fontSize: 18, fontWeight: 400, color: INK_FAINT, marginLeft: 4, ...TABULAR }}>/ {needed}</span>
-          </Col>
-          <Col label="LAST ROUND">
-            <span style={{ fontSize: 20, fontWeight: 500, color: played > 0 ? INK_SOFT : INK_FAINT, ...TABULAR }}>
-              {played > 0 ? '—' : '—'}
-            </span>
-          </Col>
-        </div>
-        <ProgressBar pct={pct} />
-        <div
-          style={{
-            marginTop: 14,
-            fontSize: 13,
-            fontWeight: 500,
-            color: INK_SOFT,
-          }}
-        >
-          Play{' '}
-          <span style={{ fontWeight: 700, color: INK }}>
-            {remaining} more counting round{remaining === 1 ? '' : 's'}
-          </span>{' '}
-          to see your index.
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr' }}>
+            {/* Left: ROUNDS LOGGED */}
+            <div
+              style={{
+                padding: '16px 18px 16px 20px',
+                borderRight: `0.5px solid ${HAIRLINE}`,
+              }}
+            >
+              <div
+                style={{
+                  fontSize: 9,
+                  fontWeight: 700,
+                  color: INK_FAINT,
+                  letterSpacing: '0.12em',
+                  textTransform: 'uppercase' as const,
+                  marginBottom: 6,
+                }}
+              >
+                Rounds Logged
+              </div>
+              <div style={{ display: 'inline-flex', alignItems: 'baseline', gap: 6, lineHeight: 0.92 }}>
+                <span
+                  style={{
+                    fontSize: 56,
+                    fontWeight: 200,
+                    color: INK,
+                    letterSpacing: '-0.025em',
+                    ...TABULAR,
+                  }}
+                >
+                  {played}
+                </span>
+                <span
+                  style={{
+                    fontSize: 22,
+                    fontWeight: 300,
+                    color: INK_FAINT,
+                    ...TABULAR,
+                  }}
+                >
+                  / {needed}
+                </span>
+              </div>
+            </div>
+
+            {/* Right: STATUS / LAST ROUND stacked */}
+            <div style={{ display: 'flex', flexDirection: 'column' }}>
+              <div style={{ padding: '10px 18px', borderBottom: `0.5px solid ${HAIRLINE}` }}>
+                <div
+                  style={{
+                    fontSize: 9,
+                    fontWeight: 700,
+                    color: INK_FAINT,
+                    letterSpacing: '0.12em',
+                    textTransform: 'uppercase' as const,
+                  }}
+                >
+                  Status
+                </div>
+                <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, marginTop: 4 }}>
+                  <span
+                    style={{
+                      width: 6,
+                      height: 6,
+                      borderRadius: '50%',
+                      background: AMBER,
+                      boxShadow: '0 0 0 3px rgba(247,147,30,0.18)',
+                      flexShrink: 0,
+                    }}
+                  />
+                  <span style={{ fontSize: 13, fontWeight: 700, color: INK }}>Building</span>
+                </div>
+              </div>
+              <div style={{ padding: '10px 18px' }}>
+                <div
+                  style={{
+                    fontSize: 9,
+                    fontWeight: 700,
+                    color: INK_FAINT,
+                    letterSpacing: '0.12em',
+                    textTransform: 'uppercase' as const,
+                  }}
+                >
+                  Last Round
+                </div>
+                <div
+                  style={{
+                    fontSize: 18,
+                    fontWeight: 500,
+                    color: lastRoundText === '—' ? INK_FAINT : INK_SOFT,
+                    marginTop: 2,
+                    ...TABULAR,
+                  }}
+                >
+                  {lastRoundText}
+                </div>
+              </div>
+            </div>
+          </div>
+        </button>
+
+        {/* Progress meter */}
+        <div style={{ marginTop: 10, display: 'flex', alignItems: 'center', gap: 10 }}>
+          <div
+            style={{
+              flex: 1,
+              height: 2,
+              background: SLATE_200,
+              borderRadius: 1,
+              overflow: 'hidden',
+            }}
+          >
+            <div
+              style={{
+                width: `${pct}%`,
+                height: '100%',
+                background: AMBER,
+                transition: 'width 320ms cubic-bezier(0.22, 0.61, 0.36, 1)',
+              }}
+            />
+          </div>
+          <span
+            style={{
+              fontSize: 11,
+              fontWeight: 700,
+              color: INK_SOFT,
+              whiteSpace: 'nowrap',
+              ...TABULAR,
+            }}
+          >
+            {remaining} more round{remaining === 1 ? '' : 's'}
+          </span>
         </div>
       </div>
     );
   }
 
-  // ── Active / connected variants: steady / improving / drifting / milestone ──
+  // ── Data scorecard variant (steady / improving / drifting / milestone) ──
   const current = mockTrend?.current ?? null;
-  const delta = mockTrend?.delta ?? 0;
-  const isMilestone = state === 'milestone';
-  const eyebrow =
-    state === 'steady'    ? 'HANDICAP · STEADY · 30D'
-    : state === 'improving' ? 'HANDICAP · IMPROVING · 30D'
-    : state === 'drifting'  ? 'HANDICAP · DRIFTING · 30D'
-    : 'HANDICAP · NEW MILESTONE';
+  const delta30 = mockTrend?.delta ?? 0;
 
-  const displayedHandicap =
-    current === null
+  // 12-month color & icon
+  const dir = trend12.direction;
+  const delta12 = trend12.delta;
+  let twelveColor = INK_SOFT;
+  let TwelveIcon: typeof ArrowDownRight | null = null;
+  if (delta12 !== null) {
+    if (dir === 'down') {
+      twelveColor = SEASON_GREEN;
+      TwelveIcon = ArrowDownRight;
+    } else if (dir === 'up') {
+      twelveColor = CRIMSON;
+      TwelveIcon = ArrowUpRight;
+    }
+  }
+  const twelveText =
+    delta12 === null
       ? '—'
-      : current < 0
-        ? `+${Math.abs(current).toFixed(1)}`
-        : current.toFixed(1);
-
-  const deltaLabel = (() => {
-    if (delta === null || delta === undefined) return '+0.0';
-    const sign = delta < 0 ? '-' : '+';
-    return `${sign}${Math.abs(delta).toFixed(1)}`;
-  })();
-
-  // NEXT HCP progress
-  const milestoneDisplayed =
-    current === null ? null : (current < 0 ? Math.floor(current) : Math.ceil(current));
-  const nextTarget = milestoneDisplayed !== null ? milestoneDisplayed - 1 : null;
-  const progressPct = (() => {
-    if (current === null || milestoneDisplayed === null) return 0;
-    const top = milestoneDisplayed + 0.4;
-    const bottom = milestoneDisplayed - 0.6;
-    const p = (top - current) / (top - bottom);
-    return Math.max(0, Math.min(100, p * 100));
-  })();
+      : formatDelta(delta12);
+  const twelveColorFinal = delta12 === null ? INK_FAINT : twelveColor;
 
   return (
-    <div style={{ paddingTop: 18, paddingBottom: 22 }}>
-      <Eyebrow amber={isMilestone}>{eyebrow}</Eyebrow>
-      <div
+    <div style={{ paddingTop: 14 }}>
+      <button
+        type="button"
+        onClick={goToHandicap}
+        className="w-full text-left active:bg-[rgba(15,23,42,0.015)] transition-colors"
         style={{
-          display: 'grid',
-          gridTemplateColumns: '1fr 1fr 1fr',
-          gap: 16,
-          marginBottom: 18,
-          alignItems: 'baseline',
+          display: 'block',
+          background: '#FFFFFF',
+          border: `0.5px solid ${HAIRLINE}`,
+          borderRadius: 14,
+          padding: 0,
+          cursor: 'pointer',
+          overflow: 'hidden',
         }}
       >
-        <Col label="INDEX" milestoneDot={isMilestone}>
-          <span style={{ fontSize: 48, fontWeight: 200, color: INK, letterSpacing: '-0.02em', ...TABULAR }}>
-            {displayedHandicap}
-          </span>
-        </Col>
-        <Col label="30 DAYS">
-          <span style={{ fontSize: 28, fontWeight: 300, color: INK_SOFT, ...TABULAR }}>
-            {deltaLabel}
-          </span>
-        </Col>
-        <Col label="NEXT HCP">
-          <span style={{ display: 'inline-flex', alignItems: 'baseline' }}>
-            <span style={{ fontSize: 28, fontWeight: 300, color: INK, ...TABULAR }}>
-              {Math.round(progressPct)}
-            </span>
-            <span style={{ fontSize: 14, fontWeight: 600, color: INK_SOFT, marginLeft: 2, ...TABULAR }}>%</span>
-            {nextTarget !== null && (
-              <span style={{ fontSize: 13, fontWeight: 400, color: INK_FAINT, marginLeft: 6, ...TABULAR }}>
-                → {nextTarget}
-              </span>
-            )}
-          </span>
-        </Col>
-      </div>
-      <ProgressBar pct={progressPct} />
-    </div>
-  );
-}
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr' }}>
+          {/* Left: CURRENT INDEX */}
+          <div
+            style={{
+              padding: '16px 18px 16px 20px',
+              borderRight: `0.5px solid ${HAIRLINE}`,
+            }}
+          >
+            <div
+              style={{
+                fontSize: 9,
+                fontWeight: 700,
+                color: INK_FAINT,
+                letterSpacing: '0.12em',
+                textTransform: 'uppercase' as const,
+                marginBottom: 6,
+              }}
+            >
+              Current Index
+            </div>
+            <div
+              style={{
+                fontSize: 56,
+                fontWeight: 200,
+                color: INK,
+                letterSpacing: '-0.025em',
+                lineHeight: 0.92,
+                ...TABULAR,
+              }}
+            >
+              {formatHandicap(current)}
+            </div>
+          </div>
 
-function Col({ label, milestoneDot, children }: { label: string; milestoneDot?: boolean; children: React.ReactNode }) {
-  return (
-    <div>
-      <div style={{ display: 'flex', alignItems: 'baseline', minHeight: 48 }}>
-        {children}
-      </div>
-      <div
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: 6,
-          marginTop: 8,
-        }}
-      >
-        {milestoneDot && (
-          <span style={{ width: 6, height: 6, borderRadius: '50%', background: AMBER, flexShrink: 0 }} />
-        )}
-        <span
-          style={{
-            fontSize: 10,
-            fontWeight: 700,
-            color: INK_FAINT,
-            letterSpacing: '0.12em',
-            textTransform: 'uppercase' as const,
-          }}
-        >
-          {label}
-        </span>
-      </div>
+          {/* Right: 30 DAYS / 12 MONTHS stacked */}
+          <div style={{ display: 'flex', flexDirection: 'column' }}>
+            <div style={{ padding: '10px 18px', borderBottom: `0.5px solid ${HAIRLINE}` }}>
+              <div
+                style={{
+                  fontSize: 9,
+                  fontWeight: 700,
+                  color: INK_FAINT,
+                  letterSpacing: '0.12em',
+                  textTransform: 'uppercase' as const,
+                }}
+              >
+                30 Days
+              </div>
+              <div
+                style={{
+                  fontSize: 22,
+                  fontWeight: 300,
+                  color: INK_SOFT,
+                  marginTop: 2,
+                  ...TABULAR,
+                }}
+              >
+                {formatDelta(delta30)}
+              </div>
+            </div>
+            <div style={{ padding: '10px 18px' }}>
+              <div
+                style={{
+                  fontSize: 9,
+                  fontWeight: 700,
+                  color: INK_FAINT,
+                  letterSpacing: '0.12em',
+                  textTransform: 'uppercase' as const,
+                }}
+              >
+                12 Months
+              </div>
+              <div
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'baseline',
+                  gap: 3,
+                  marginTop: 2,
+                  fontSize: 22,
+                  fontWeight: 300,
+                  color: twelveColorFinal,
+                  ...TABULAR,
+                }}
+              >
+                <span>{twelveText}</span>
+                {TwelveIcon && (
+                  <TwelveIcon
+                    size={15}
+                    color={twelveColorFinal}
+                    strokeWidth={2.4}
+                    style={{ alignSelf: 'center' }}
+                  />
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      </button>
     </div>
   );
 }
