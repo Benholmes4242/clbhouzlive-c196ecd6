@@ -26,8 +26,9 @@ import { SheetHeader } from './parts/SheetHeader';
 import { HeadToHeadCard } from './parts/HeadToHeadCard';
 import { TheirFormSection } from './parts/TheirFormSection';
 import { LatestPostCard } from './parts/LatestPostCard';
-import { RecentRoundsStub } from './parts/RecentRoundsStub';
-import { StandoutRoundsStub } from './parts/StandoutRoundsStub';
+import { UnsyncedPitchCard } from './parts/UnsyncedPitchCard';
+import { callCreateInvite } from '@/lib/whs/api';
+import { shareInvite } from '@/lib/whs/share';
 import {
   SheetActionFooter,
   type FooterAction,
