@@ -4,21 +4,67 @@ import { renderBadgeIcon } from '../badgeIcons';
 import { GAM } from '../tokens';
 import { RARITY_PALETTE, LEGEND_PALETTE, LOCKED_PALETTE, type RarityPalette } from './_shared/rarityPalette';
 import type { TrophyItem } from './_shared/normalizeTrophyItem';
+import { isShowpiece } from './_shared/showpieces';
+import type { BadgeRarity } from '@/lib/gam/types';
 
 interface Props {
   item: TrophyItem;
   onTap: (item: TrophyItem) => void;
 }
 
+/**
+ * For showpiece achievements, derive a "display rarity" from the user's reached
+ * tier and the achievement's total tier count. Returns null if locked.
+ */
+function showpieceDisplayRarity(reachedTier: number, totalTiers: number): BadgeRarity | null {
+  if (reachedTier <= 0) return null;
+  if (totalTiers <= 0) return null;
+
+  const scales: Record<number, BadgeRarity[]> = {
+    1: ['legendary'],
+    2: ['epic', 'legendary'],
+    3: ['rare', 'epic', 'legendary'],
+    4: ['common', 'rare', 'epic', 'legendary'],
+    5: ['common', 'uncommon', 'rare', 'epic', 'legendary'],
+  };
+
+  const scale = scales[Math.min(totalTiers, 5)] ?? scales[5];
+  const idx = Math.min(Math.max(reachedTier, 1), scale.length) - 1;
+  return scale[idx];
+}
+
 function paletteFor(item: TrophyItem): RarityPalette {
   if (item.kind === 'legend') return LEGEND_PALETTE;
-  if (!item.earned && (item.currentValue == null || item.currentValue === 0)) return LOCKED_PALETTE;
+
+  if (item.kind === 'achievement' && isShowpiece(item.badgeId)) {
+    if (!item.earned && (item.currentValue == null || item.currentValue === 0)) {
+      return LOCKED_PALETTE;
+    }
+    const displayRarity = showpieceDisplayRarity(item.reachedTier, item.tiers.length);
+    if (displayRarity) return RARITY_PALETTE[displayRarity];
+    return RARITY_PALETTE[item.rarity];
+  }
+
+  if (!item.earned && (item.currentValue == null || item.currentValue === 0)) {
+    return LOCKED_PALETTE;
+  }
   return RARITY_PALETTE[item.rarity];
 }
 
 function metaLine(item: TrophyItem): string {
   if (item.kind === 'legend') {
     return item.rank === 1 ? `#1 · ${item.formattedValue}` : `#${item.rank} · ${item.formattedValue}`;
+  }
+  if (
+    item.kind === 'achievement' &&
+    isShowpiece(item.badgeId) &&
+    item.currentValue != null &&
+    item.currentValue > 0
+  ) {
+    if (item.tiers.length > 1 && item.reachedTier > 0) {
+      return `Tier ${item.reachedTier} of ${item.tiers.length}`;
+    }
+    return 'Unlocked';
   }
   if (item.earned) {
     return item.tiers.length > 1
@@ -44,6 +90,11 @@ export const TrophyCard: React.FC<Props> = ({ item, onTap }) => {
     item.kind === 'achievement' && !item.earned && (item.currentValue == null || item.currentValue === 0);
   const dimmed = locked;
   const pill = pillContent(item);
+  const showpieceWithCounter =
+    item.kind === 'achievement' &&
+    isShowpiece(item.badgeId) &&
+    item.currentValue != null &&
+    item.currentValue > 0;
 
   return (
     <button
@@ -91,7 +142,7 @@ export const TrophyCard: React.FC<Props> = ({ item, onTap }) => {
         />
       )}
 
-      {/* Watermark */}
+      {/* Watermark — fades back when a big counter is present */}
       <div
         aria-hidden
         style={{
@@ -101,7 +152,7 @@ export const TrophyCard: React.FC<Props> = ({ item, onTap }) => {
           width: 130,
           height: 130,
           transform: 'rotate(-6deg)',
-          opacity: dimmed ? 0.05 : 0.10,
+          opacity: dimmed ? 0.05 : showpieceWithCounter ? 0.06 : 0.10,
           color: palette.color,
           pointerEvents: 'none',
           display: 'flex',
@@ -162,14 +213,45 @@ export const TrophyCard: React.FC<Props> = ({ item, onTap }) => {
         )}
       </div>
 
+      {/* Showpiece counter — big number centered, only for unlocked showpieces */}
+      {showpieceWithCounter && (
+        <div
+          style={{
+            position: 'relative',
+            zIndex: 1,
+            flex: 1,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: '4px 0',
+            minHeight: 0,
+          }}
+        >
+          <span
+            style={{
+              fontSize: 44,
+              fontWeight: 200,
+              letterSpacing: '-0.045em',
+              color: palette.color,
+              lineHeight: 0.9,
+              fontVariantNumeric: 'tabular-nums',
+              fontFeatureSettings: '"kern" 1, "liga" 1',
+              textShadow: palette.outerGlow ? `0 0 24px ${palette.color}40` : undefined,
+            }}
+          >
+            {(item.kind === 'achievement' ? item.currentValue ?? 0 : 0).toLocaleString()}
+          </span>
+        </div>
+      )}
+
       {/* Bottom: name + meta */}
       <div style={{ position: 'relative', zIndex: 1 }}>
         <div
           style={{
-            fontSize: 13,
-            fontWeight: 700,
+            fontSize: showpieceWithCounter ? 12.5 : 13,
+            fontWeight: showpieceWithCounter ? 600 : 700,
             lineHeight: 1.2,
-            color: 'var(--hcp-t-100)',
+            color: showpieceWithCounter ? 'var(--hcp-t-80)' : 'var(--hcp-t-100)',
             letterSpacing: '-0.015em',
             display: '-webkit-box',
             WebkitLineClamp: 2,
