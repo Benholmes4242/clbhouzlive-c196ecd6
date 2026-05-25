@@ -52,7 +52,7 @@ interface Props {
   viewerUserId?: string;
 }
 
-type Tab = 'earned' | 'progress' | 'locked';
+type Tab = 'all' | 'earned' | 'locked';
 
 interface DetailContext {
   items: TrophyItem[];
@@ -60,8 +60,8 @@ interface DetailContext {
 }
 
 const TAB_LABEL: Record<Tab, string> = {
+  all: 'All',
   earned: 'Earned',
-  progress: 'In progress',
   locked: 'Locked',
 };
 
@@ -173,7 +173,7 @@ const CourseLegendsCollapsibleSection: React.FC<{
 
 export const TrophyRoomSheet: React.FC<Props> = ({ userId, viewerUserId }) => {
   const [open, setOpen] = useState(false);
-  const [tab, setTab] = useState<Tab>('earned');
+  const [tab, setTab] = useState<Tab>('all');
   const [detailCtx, setDetailCtx] = useState<DetailContext | null>(null);
 
   useEffect(() => gamAchievementsBus.subscribe(() => setOpen(true)), []);
@@ -195,19 +195,18 @@ export const TrophyRoomSheet: React.FC<Props> = ({ userId, viewerUserId }) => {
       ),
     [achievementItems],
   );
-  const inProgressAchievements = useMemo(
-    () =>
-      achievementItems.filter(
-        (a): a is Extract<TrophyItem, { kind: 'achievement' }> =>
-          a.kind === 'achievement' && !a.earned && a.currentValue != null && a.currentValue > 0,
-      ),
-    [achievementItems],
-  );
   const lockedAchievements = useMemo(
     () =>
       achievementItems.filter(
         (a): a is Extract<TrophyItem, { kind: 'achievement' }> =>
-          a.kind === 'achievement' && !a.earned && (a.currentValue == null || a.currentValue === 0),
+          a.kind === 'achievement' && !a.earned,
+      ),
+    [achievementItems],
+  );
+  const allAchievements = useMemo(
+    () =>
+      achievementItems.filter(
+        (a): a is Extract<TrophyItem, { kind: 'achievement' }> => a.kind === 'achievement',
       ),
     [achievementItems],
   );
@@ -219,10 +218,10 @@ export const TrophyRoomSheet: React.FC<Props> = ({ userId, viewerUserId }) => {
     (item: TrophyItem) => {
       if (item.kind === 'achievement') {
         const list =
-          tab === 'earned'
-            ? earnedAchievements
-            : tab === 'progress'
-              ? inProgressAchievements
+          tab === 'all'
+            ? allAchievements
+            : tab === 'earned'
+              ? earnedAchievements
               : lockedAchievements;
         const index = list.findIndex((i) => i.id === item.id);
         setDetailCtx({ items: list, index: Math.max(0, index) });
@@ -231,7 +230,7 @@ export const TrophyRoomSheet: React.FC<Props> = ({ userId, viewerUserId }) => {
         setDetailCtx({ items: allLegends, index: Math.max(0, index) });
       }
     },
-    [tab, earnedAchievements, inProgressAchievements, lockedAchievements, allLegends],
+    [tab, earnedAchievements, allAchievements, lockedAchievements, allLegends],
   );
 
   const isLoading = badgesLoading || legendsLoading;
@@ -317,13 +316,13 @@ export const TrophyRoomSheet: React.FC<Props> = ({ userId, viewerUserId }) => {
             fontFamily: GAM.FONT_GEIST,
           }}
         >
-          {(['earned', 'progress', 'locked'] as Tab[]).map((key) => {
+          {(['all', 'earned', 'locked'] as Tab[]).map((key) => {
             const active = tab === key;
             const count =
-              key === 'earned'
-                ? earnedTotal
-                : key === 'progress'
-                  ? inProgressAchievements.length
+              key === 'all'
+                ? allAchievements.length + allLegends.length
+                : key === 'earned'
+                  ? earnedTotal
                   : lockedAchievements.length;
             return (
               <button
@@ -410,24 +409,33 @@ export const TrophyRoomSheet: React.FC<Props> = ({ userId, viewerUserId }) => {
             );
           })()}
 
-          {!isLoading && tab === 'progress' && (
-            inProgressAchievements.length > 0 ? (
+          {!isLoading && tab === 'all' && (() => {
+            const allGroups = groupAchievementsByCategory(allAchievements);
+            const anyAchievements = allAchievements.length > 0;
+            const anyLegends = allLegends.length > 0;
+            if (!anyAchievements && !anyLegends) {
+              return (
+                <EmptyState message={isFriendView ? 'No trophies yet.' : "You don't have any trophies yet."} />
+              );
+            }
+            return (
               <>
                 {CATEGORY_ORDER.map((cat) => {
-                  const items = groupAchievementsByCategory(inProgressAchievements)[cat];
+                  const items = allGroups[cat];
                   if (!items || items.length === 0) return null;
                   return (
-                    <React.Fragment key={`progress-${cat}`}>
+                    <React.Fragment key={`all-${cat}`}>
                       <SectionHeader label={CATEGORY_LABEL[cat]} count={items.length} amberDot />
                       <Grid items={items} onTap={openDetail} />
                     </React.Fragment>
                   );
                 })}
+                {anyLegends && (
+                  <CourseLegendsCollapsibleSection items={allLegends} onTap={openDetail} />
+                )}
               </>
-            ) : (
-              <EmptyState message="Nothing in progress right now." />
-            )
-          )}
+            );
+          })()}
 
           {!isLoading && tab === 'locked' && (
             lockedAchievements.length > 0 ? (
