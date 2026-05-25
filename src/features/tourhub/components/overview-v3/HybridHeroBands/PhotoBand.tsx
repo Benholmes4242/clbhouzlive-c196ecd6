@@ -4,7 +4,7 @@
  */
 
 import React from 'react';
-import { Star } from 'lucide-react';
+import { Star, MapPin } from 'lucide-react';
 import {
   PHOTO_BAND_HEIGHT,
   COURSE_GRADIENT,
