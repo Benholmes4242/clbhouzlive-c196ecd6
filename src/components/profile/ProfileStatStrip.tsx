@@ -56,6 +56,7 @@ export function ProfileStatStrip({
   return (
     <div
       style={{
+        marginTop: 12,
         marginLeft: -16,
         marginRight: -16,
         padding: '14px 16px',
