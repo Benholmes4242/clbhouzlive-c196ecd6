@@ -93,7 +93,7 @@ export const RecentlyPlayedFeed: React.FC<Props> = ({ ownerUserId }) => {
           renderItem={(item) => (
             <FriendRoundCard
               activity={item}
-              onClick={() => setSheetActivity(item)}
+              onClick={() => handleOpen(item)}
               onInviteClick={() => {
                 document
                   .getElementById('invite-to-clbhouz-section')
