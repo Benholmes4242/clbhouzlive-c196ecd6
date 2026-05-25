@@ -28,7 +28,7 @@ import { IntelligenceHero } from '../IntelligenceHero';
 import { WorldRankingsHero } from '../WorldRankingsHero';
 import { StatOfTheWeek } from '../StatOfTheWeek';
 import { HomeOnCourseStrip } from '../home/HomeOnCourseStrip';
-import { HomePGAModule } from '../home/HomePGAModule';
+
 import { HomeCourseOfWeekModule } from '../home/HomeCourseOfWeekModule';
 import { HomeWatchRail } from '../home/HomeWatchRail';
 import { HomeConnectHandicapModule } from '../home/HomeConnectHandicapModule';
