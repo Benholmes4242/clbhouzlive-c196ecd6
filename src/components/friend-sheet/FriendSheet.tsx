@@ -311,7 +311,10 @@ export const FriendSheet: React.FC<FriendSheetProps> = ({
 
             {headerProps && state && (
               <>
-                <SheetHeader {...headerProps} />
+                <SheetHeader
+                  {...headerProps}
+                  onClick={isClbhouzUser ? handleSeeHandicap : null}
+                />
 
                 {/* HEAD-TO-HEAD — hidden only for clbhouz_not_synced */}
                 <HeadToHeadCard state={state} />
