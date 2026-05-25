@@ -4,7 +4,7 @@ import { renderBadgeIcon } from '../badgeIcons';
 import { GAM } from '../tokens';
 import { RARITY_PALETTE, LEGEND_PALETTE, LOCKED_PALETTE, type RarityPalette } from './_shared/rarityPalette';
 import type { TrophyItem } from './_shared/normalizeTrophyItem';
-import { isShowpiece, isTop100Achievement } from './_shared/showpieces';
+import { isShowpiece } from './_shared/showpieces';
 import type { BadgeRarity } from '@/lib/gam/types';
 
 interface Props {
@@ -43,11 +43,12 @@ const SHOWPIECE_COUNTER_LABEL: Record<string, string> = {
   first_eagle: 'Lifetime eagles',
   first_albatross: 'Lifetime albatrosses',
   hole_in_one: 'Lifetime aces',
-  // Bounded-set — caption answers "22 of how many?"
-  top_100_worldwide: 'of 100 played',
-  top_100_usa: 'of 100 played',
-  top_100_gbni: 'of 100 played',
-  top_100_europe: 'of 100 played',
+  // Bounded-set — caption carries the list identity now that title is suppressed.
+  // Detail sheet keeps the full formal title (e.g. "Top 100 Continental Europe").
+  top_100_worldwide: 'of Worldwide Top 100 played',
+  top_100_usa:       'of USA Top 100 played',
+  top_100_gbni:      'of GB&I Top 100 played',
+  top_100_europe:    'of Europe Top 100 played',
 };
 
 function paletteFor(item: TrophyItem): RarityPalette {
@@ -113,12 +114,12 @@ export const TrophyCard: React.FC<Props> = ({ item, onTap }) => {
     item.currentValue != null &&
     item.currentValue > 0;
 
-  // Lifetime showpieces (not Top 100) with a counter showing — caption acts as
-  // the card identifier, so the title block can be suppressed.
-  const isLifetimeShowpieceWithCounter =
+  // All showpieces with a counter showing — caption now carries the identity
+  // (lifetime metric for Birdies/Eagles/etc., regional list for Top 100s), so
+  // the title block can be suppressed across the board.
+  const isShowpieceWithCounterRendered =
     showpieceWithCounter &&
-    item.kind === 'achievement' &&
-    !isTop100Achievement(item.badgeId);
+    item.kind === 'achievement';
 
   return (
     <button
@@ -281,7 +282,7 @@ export const TrophyCard: React.FC<Props> = ({ item, onTap }) => {
 
       {/* Bottom: name + meta */}
       <div style={{ position: 'relative', zIndex: 1, flexShrink: 0 }}>
-        {!isLifetimeShowpieceWithCounter && (
+        {!isShowpieceWithCounterRendered && (
           <div
             style={{
               fontSize: showpieceWithCounter ? 12.5 : 13,
@@ -300,7 +301,7 @@ export const TrophyCard: React.FC<Props> = ({ item, onTap }) => {
         )}
         <div
           style={{
-            marginTop: isLifetimeShowpieceWithCounter ? 0 : 4,
+            marginTop: isShowpieceWithCounterRendered ? 0 : 4,
             fontSize: 9.5,
             fontWeight: 700,
             color: palette.metaColor,
