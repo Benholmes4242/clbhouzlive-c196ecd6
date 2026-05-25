@@ -121,13 +121,13 @@ export const FriendSheet: React.FC<FriendSheetProps> = ({
       return;
     }
     const res = await callCreateInvite(passportId, 'friend_sheet');
-    if (!res.ok || !res.invite) {
+    if (!res.ok || !res.share_url || !res.share_message) {
       toast.error(res.message ?? "Couldn't create invite");
       return;
     }
     await shareInvite({
-      share_url: res.invite.share_url,
-      share_message: res.invite.share_message,
+      share_url: res.share_url,
+      share_message: res.share_message,
       invitee_name: state.entry.friend_name,
     });
   };
