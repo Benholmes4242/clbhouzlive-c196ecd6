@@ -382,31 +382,48 @@ export const TrophyRoomSheet: React.FC<Props> = ({ userId, viewerUserId }) => {
             </div>
           )}
 
-          {!isLoading && tab === 'earned' && (
-            <>
-              {earnedAchievements.length > 0 && (
-                <>
-                  <SectionHeader label="Achievements" count={earnedAchievements.length} amberDot />
-                  <Grid items={earnedAchievements} onTap={openDetail} />
-                </>
-              )}
-              {allLegends.length > 0 && (
-                <>
-                  <SectionHeader Icon={Crown} iconColor={GAM.GOLD} label="Course legends" count={allLegends.length} />
-                  <Grid items={allLegends} onTap={openDetail} />
-                </>
-              )}
-              {earnedAchievements.length === 0 && allLegends.length === 0 && (
+          {!isLoading && tab === 'earned' && (() => {
+            const earnedGroups = groupAchievementsByCategory(earnedAchievements);
+            const anyEarnedAchievements = earnedAchievements.length > 0;
+            const anyLegends = allLegends.length > 0;
+            if (!anyEarnedAchievements && !anyLegends) {
+              return (
                 <EmptyState message={isFriendView ? 'No trophies earned yet.' : "You haven't earned any trophies yet."} />
-              )}
-            </>
-          )}
+              );
+            }
+            return (
+              <>
+                {CATEGORY_ORDER.map((cat) => {
+                  const items = earnedGroups[cat];
+                  if (!items || items.length === 0) return null;
+                  return (
+                    <React.Fragment key={`earned-${cat}`}>
+                      <SectionHeader label={CATEGORY_LABEL[cat]} count={items.length} amberDot />
+                      <Grid items={items} onTap={openDetail} />
+                    </React.Fragment>
+                  );
+                })}
+                {anyLegends && (
+                  <CourseLegendsCollapsibleSection items={allLegends} onTap={openDetail} />
+                )}
+              </>
+            );
+          })()}
 
           {!isLoading && tab === 'progress' && (
             inProgressAchievements.length > 0 ? (
-              <div style={{ marginTop: 16 }}>
-                <Grid items={inProgressAchievements} onTap={openDetail} />
-              </div>
+              <>
+                {CATEGORY_ORDER.map((cat) => {
+                  const items = groupAchievementsByCategory(inProgressAchievements)[cat];
+                  if (!items || items.length === 0) return null;
+                  return (
+                    <React.Fragment key={`progress-${cat}`}>
+                      <SectionHeader label={CATEGORY_LABEL[cat]} count={items.length} amberDot />
+                      <Grid items={items} onTap={openDetail} />
+                    </React.Fragment>
+                  );
+                })}
+              </>
             ) : (
               <EmptyState message="Nothing in progress right now." />
             )
@@ -414,9 +431,18 @@ export const TrophyRoomSheet: React.FC<Props> = ({ userId, viewerUserId }) => {
 
           {!isLoading && tab === 'locked' && (
             lockedAchievements.length > 0 ? (
-              <div style={{ marginTop: 16 }}>
-                <Grid items={lockedAchievements} onTap={openDetail} />
-              </div>
+              <>
+                {CATEGORY_ORDER.map((cat) => {
+                  const items = groupAchievementsByCategory(lockedAchievements)[cat];
+                  if (!items || items.length === 0) return null;
+                  return (
+                    <React.Fragment key={`locked-${cat}`}>
+                      <SectionHeader label={CATEGORY_LABEL[cat]} count={items.length} amberDot />
+                      <Grid items={items} onTap={openDetail} />
+                    </React.Fragment>
+                  );
+                })}
+              </>
             ) : (
               <EmptyState message="No locked achievements." />
             )
