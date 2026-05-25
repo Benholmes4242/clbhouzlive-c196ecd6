@@ -479,12 +479,47 @@ function ProfileHubSheet({
                     coursesPlayed={stats.coursesPlayed}
                   />
 
+                  {/* View handicap link (data state only) */}
+                  {stripVariant === 'full' && (
+                    <div
+                      style={{
+                        display: 'flex',
+                        justifyContent: 'flex-end',
+                        paddingTop: 10,
+                        paddingBottom: 4,
+                      }}
+                    >
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleNav('/handicap');
+                        }}
+                        style={{
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: 2,
+                          background: 'transparent',
+                          border: 'none',
+                          cursor: 'pointer',
+                          padding: 0,
+                          fontSize: 12,
+                          fontWeight: 700,
+                          color: AMBER,
+                        }}
+                      >
+                        View handicap
+                        <ChevronRight size={13} color={AMBER} strokeWidth={2.4} />
+                      </button>
+                    </div>
+                  )}
+
                   {/* ── 4. Quick action icon row ── */}
                   <div
                     style={{
                       display: 'flex',
                       gap: 8,
-                      padding: '18px 32px',
+                      padding: '16px 32px',
                       borderBottom: `0.5px solid ${HAIRLINE}`,
                       marginLeft: -16,
                       marginRight: -16,
@@ -557,21 +592,8 @@ function ProfileHubSheet({
                     </QuickActionTile>
                   </div>
 
-                  {/* ── 5. Account section ── */}
-                  <div>
-                    <div style={{ paddingTop: 18, paddingBottom: 6 }}>
-                      <span
-                        style={{
-                          fontSize: 10,
-                          fontWeight: 700,
-                          color: INK_FAINT,
-                          letterSpacing: '0.12em',
-                          textTransform: 'uppercase' as const,
-                        }}
-                      >
-                        Account
-                      </span>
-                    </div>
+                  {/* ── 5. Account section (no eyebrow) ── */}
+                  <div style={{ paddingTop: 6 }}>
                     <AccountRow
                       Icon={UserCog}
                       label="Profile & businesses"
