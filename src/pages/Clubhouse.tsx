@@ -358,6 +358,53 @@ const ClubhouseContent = () => {
         hidden={isTournamentCardActive}
       />
 
+      {/* Friends sub-mode chip row — All / Live now (visible only on Friends tab) */}
+      {activeTab === 'friends' && !isTournamentCardActive && (
+        <div
+          className="fixed flex justify-center pointer-events-none"
+          style={{
+            top: 'calc(max(env(safe-area-inset-top, 0px), 47px) + 44px)',
+            left: 0,
+            right: 0,
+            zIndex: 9028,
+          }}
+        >
+          <div
+            className="pointer-events-auto flex items-center gap-1"
+            style={{
+              background: 'rgba(0,0,0,0.55)',
+              backdropFilter: 'blur(12px)',
+              borderRadius: 999,
+              padding: 3,
+              border: '0.5px solid rgba(255,255,255,0.10)',
+            }}
+          >
+            {(['all', 'live_now'] as const).map((m) => {
+              const active = friendsMode === m;
+              return (
+                <button
+                  key={m}
+                  onClick={() => setFriendsMode(m)}
+                  style={{
+                    fontSize: 11,
+                    fontWeight: 700,
+                    letterSpacing: '0.02em',
+                    padding: '5px 12px',
+                    borderRadius: 999,
+                    border: 'none',
+                    background: active ? '#FFFFFF' : 'transparent',
+                    color: active ? '#0F172A' : 'rgba(255,255,255,0.75)',
+                    cursor: 'pointer',
+                  }}
+                >
+                  {m === 'all' ? 'All' : 'Live now'}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
       {/* Offline indicator — hidden on editorial cards */}
       {!isOnline && !isTournamentCardActive && (
         <div style={{
