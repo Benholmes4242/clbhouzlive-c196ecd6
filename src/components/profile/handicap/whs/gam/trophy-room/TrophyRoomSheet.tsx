@@ -52,7 +52,7 @@ interface Props {
   viewerUserId?: string;
 }
 
-type Tab = 'earned' | 'progress' | 'locked';
+type Tab = 'all' | 'earned' | 'locked';
 
 interface DetailContext {
   items: TrophyItem[];
@@ -60,8 +60,8 @@ interface DetailContext {
 }
 
 const TAB_LABEL: Record<Tab, string> = {
+  all: 'All',
   earned: 'Earned',
-  progress: 'In progress',
   locked: 'Locked',
 };
 
