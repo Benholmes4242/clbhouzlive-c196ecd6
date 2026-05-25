@@ -16,8 +16,11 @@ import {
   FONT_MONO,
 } from '../HybridHero.constants';
 
-const LEADER_TINT_LIVE = 'rgba(251,188,46,0.07)';
-const LEADER_TINT_RESULTS = 'rgba(251,188,46,0.10)';
+// B4: subtle amber gradient from left where the eye starts reading
+const LEADER_TINT_LIVE =
+  'linear-gradient(90deg, rgba(247,147,30,0.10) 0%, rgba(247,147,30,0.04) 60%, rgba(251,188,46,0.05) 100%)';
+const LEADER_TINT_RESULTS =
+  'linear-gradient(90deg, rgba(247,147,30,0.12) 0%, rgba(247,147,30,0.04) 60%, rgba(251,188,46,0.07) 100%)';
 
 function PlayerHead({ size = 36, src, ring }: { size?: number; src?: string | null; ring?: boolean }) {
   return (
