@@ -87,7 +87,7 @@ export const TourHubShellTabs: React.FC = () => {
           display: 'flex',
           justifyContent: 'flex-start',
           gap: 8,
-          padding: '8px 16px',
+          padding: '6px 16px',
           overflowX: 'auto',
           overflowY: 'hidden',
           WebkitOverflowScrolling: 'touch',
