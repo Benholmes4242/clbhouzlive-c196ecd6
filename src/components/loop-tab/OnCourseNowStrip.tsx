@@ -5,9 +5,11 @@ import { useNetworkActivity, type NetworkFriend } from '@/hooks/useNetworkActivi
 
 interface OnCourseNowStripProps {
   userId: string | undefined;
+  /** When true, suppresses the internal header row (used by Home wrapper that supplies its own eyebrow). */
+  hideHeader?: boolean;
 }
 
-export function OnCourseNowStrip({ userId }: OnCourseNowStripProps) {
+export function OnCourseNowStrip({ userId, hideHeader = false }: OnCourseNowStripProps) {
   const navigate = useNavigate();
   const { data, isLoading } = useNetworkActivity(userId);
 
