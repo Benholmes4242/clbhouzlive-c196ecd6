@@ -30,7 +30,7 @@ const REGION_CAP_PAGE_SIZE = 10;
 const DECAY_LAMBDA = 0.035;
 const ENTROPY_FLOOR = 0.82;
 const ENTROPY_RANGE = 0.32;
-const EDITORIAL_BASE_SCORE = 180;
+// EDITORIAL_BASE_SCORE removed in Phase 3 — editorial cards no longer enter the feed.
 const REVIEW_POST_BONUS = 1.6;       // increased — reviews are high-value content
 const MIN_EDITORIAL_GAP = 5;
 const VIDEO_TARGET_RATIO = 0.80;
