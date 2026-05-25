@@ -95,7 +95,23 @@ export const FriendSheet: React.FC<FriendSheetProps> = ({
   }, [isWhsOnlyMode, whsOnlyEntry, snapshot, rivalry]);
 
 
-
+  // ─── Handlers ─────────────────────────────────────────────────────
+  const handleViewProfile = () => {
+    onClose();
+    const handle = snapshot?.profile.username ?? targetUserId;
+    if (handle) navigate(`/profile/${handle}`);
+  };
+  const handleMessage = () => handleViewProfile();
+  const handleSeeRivalry = () => {
+    if (!targetUserId) return;
+    onClose();
+    navigate(`/handicap/rivalry/${targetUserId}`);
+  };
+  const handleSeeHandicap = () => {
+    if (!targetUserId) return;
+    onClose();
+    navigate(`/handicap/${targetUserId}`);
+  };
   const handleInvite = async () => {
     const url = `${window.location.origin}/invite?ref=${viewerUserId}`;
     if (typeof navigator !== 'undefined' && navigator.share) {
@@ -114,17 +130,23 @@ export const FriendSheet: React.FC<FriendSheetProps> = ({
     navigate(`/post/${postId}`);
   };
 
+  // Compute firstName for the active state (used by stubs + invite button label).
+  const friendFirstName =
+    state?.kind === 'whs_only'
+      ? getFirstName(state.entry.friend_name)
+      : '';
+
   // ─── Footer actions per state ────────────────────────────────────
   const footer = state
-    ? buildFooter(state.kind, {
+    ? buildFooter(state, {
         handleMessage,
         handleViewProfile,
         handleSeeRivalry,
         handleSeeHandicap,
-        handlePinRival,
         handleInvite,
-      })
+      }, friendFirstName)
     : { actions: [] as FooterAction[], layout: 'horizontal' as const };
+
 
   // ─── Header props per state ──────────────────────────────────────
   const headerProps = (() => {
