@@ -465,9 +465,7 @@ const ClubhouseContent = () => {
             isOpen={commentsOpen}
             onClose={closeComments}
             postId={
-              activePost.postType === 'pga_card'
-                ? (activePost as unknown as PGACardFeedPost).cardData.postId
-                : activePost.postType === 'course_of_week_card'
+              activePost.postType === 'course_of_week_card'
                 ? (activePost as any).cardData.cardId
                 : activePost.id
             }
