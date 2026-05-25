@@ -1,8 +1,8 @@
 import React from 'react';
 import {
-  Activity, ArrowUp, CircleDot, Crosshair, Crown, Feather, Flag, Flame, Flower, Gauge,
+  Activity, ArrowUp, Bird, CircleDot, Crosshair, Crown, Feather, Flag, Flame, Flower, Gauge, Globe,
   ListChecks, Map, MapPin, Medal, Minus, Scissors, Shield, Sparkles, Star, Swords, Target,
-  TrendingDown, Trophy,
+  TrendingDown, Trophy, Zap,
   type LucideIcon,
 } from 'lucide-react';
 
@@ -13,6 +13,7 @@ import {
 export const BADGE_ICON_MAP: Record<string, LucideIcon> = {
   activity: Activity,
   'arrow-up': ArrowUp,
+  bird: Bird,
   'circle-dot': CircleDot,
   crosshair: Crosshair,
   crown: Crown,
@@ -21,6 +22,7 @@ export const BADGE_ICON_MAP: Record<string, LucideIcon> = {
   flame: Flame,
   flower: Flower,
   gauge: Gauge,
+  globe: Globe,
   'list-checks': ListChecks,
   map: Map,
   'map-pin': MapPin,
@@ -34,6 +36,7 @@ export const BADGE_ICON_MAP: Record<string, LucideIcon> = {
   target: Target,
   'trending-down': TrendingDown,
   trophy: Trophy,
+  zap: Zap,
 };
 
 export function renderBadgeIcon(name: string | null | undefined, size = 22, color = 'currentColor'): React.ReactNode {

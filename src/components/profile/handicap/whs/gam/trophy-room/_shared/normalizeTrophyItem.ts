@@ -46,7 +46,7 @@ function categoryToIconKey(c: LegendCategory): string {
   switch (c) {
     case 'most_birdies_90d':
     case 'most_birdies_all_time':
-      return 'feather';
+      return 'bird';
     case 'lowest_gross_90d':
     case 'lowest_gross_all_time':
       return 'trophy';
@@ -58,10 +58,10 @@ function categoryToIconKey(c: LegendCategory): string {
       return 'target';
     case 'most_eagles_90d':
     case 'most_eagles_all_time':
-      return 'award';
+      return 'feather';
     case 'most_aces_90d':
     case 'most_aces_all_time':
-      return 'sparkles';
+      return 'target';
   }
 }
 
