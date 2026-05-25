@@ -4,7 +4,7 @@ import { renderBadgeIcon } from '../badgeIcons';
 import { GAM } from '../tokens';
 import { RARITY_PALETTE, LEGEND_PALETTE, LOCKED_PALETTE, type RarityPalette } from './_shared/rarityPalette';
 import type { TrophyItem } from './_shared/normalizeTrophyItem';
-import { isShowpiece } from './_shared/showpieces';
+import { isShowpiece, isTop100Achievement } from './_shared/showpieces';
 import type { BadgeRarity } from '@/lib/gam/types';
 
 interface Props {
@@ -112,6 +112,13 @@ export const TrophyCard: React.FC<Props> = ({ item, onTap }) => {
     isShowpiece(item.badgeId) &&
     item.currentValue != null &&
     item.currentValue > 0;
+
+  // Lifetime showpieces (not Top 100) with a counter showing — caption acts as
+  // the card identifier, so the title block can be suppressed.
+  const isLifetimeShowpieceWithCounter =
+    showpieceWithCounter &&
+    item.kind === 'achievement' &&
+    !isTop100Achievement(item.badgeId);
 
   return (
     <button
@@ -274,24 +281,26 @@ export const TrophyCard: React.FC<Props> = ({ item, onTap }) => {
 
       {/* Bottom: name + meta */}
       <div style={{ position: 'relative', zIndex: 1, flexShrink: 0 }}>
+        {!isLifetimeShowpieceWithCounter && (
+          <div
+            style={{
+              fontSize: showpieceWithCounter ? 12.5 : 13,
+              fontWeight: showpieceWithCounter ? 600 : 700,
+              lineHeight: 1.2,
+              color: showpieceWithCounter ? 'var(--hcp-t-80)' : 'var(--hcp-t-100)',
+              letterSpacing: '-0.015em',
+              display: '-webkit-box',
+              WebkitLineClamp: 2,
+              WebkitBoxOrient: 'vertical',
+              overflow: 'hidden',
+            }}
+          >
+            {item.kind === 'legend' ? item.courseName : item.name}
+          </div>
+        )}
         <div
           style={{
-            fontSize: showpieceWithCounter ? 12.5 : 13,
-            fontWeight: showpieceWithCounter ? 600 : 700,
-            lineHeight: 1.2,
-            color: showpieceWithCounter ? 'var(--hcp-t-80)' : 'var(--hcp-t-100)',
-            letterSpacing: '-0.015em',
-            display: '-webkit-box',
-            WebkitLineClamp: 2,
-            WebkitBoxOrient: 'vertical',
-            overflow: 'hidden',
-          }}
-        >
-          {item.kind === 'legend' ? item.courseName : item.name}
-        </div>
-        <div
-          style={{
-            marginTop: 4,
+            marginTop: isLifetimeShowpieceWithCounter ? 0 : 4,
             fontSize: 9.5,
             fontWeight: 700,
             color: palette.metaColor,
