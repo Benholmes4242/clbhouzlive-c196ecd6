@@ -38,10 +38,16 @@ function showpieceDisplayRarity(reachedTier: number, totalTiers: number): BadgeR
 // give the number a category. Presentation only; unknown IDs fail-safe.
 // ─────────────────────────────────────────────────────────────────────────────
 const SHOWPIECE_COUNTER_LABEL: Record<string, string> = {
+  // Lifetime accumulation — caption answers "22 of what?"
   first_birdie: 'Lifetime birdies',
   first_eagle: 'Lifetime eagles',
   first_albatross: 'Lifetime albatrosses',
   hole_in_one: 'Lifetime aces',
+  // Bounded-set — caption answers "22 of how many?"
+  top_100_worldwide: 'of 100 played',
+  top_100_usa: 'of 100 played',
+  top_100_gbni: 'of 100 played',
+  top_100_europe: 'of 100 played',
 };
 
 function paletteFor(item: TrophyItem): RarityPalette {
