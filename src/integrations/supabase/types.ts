@@ -5357,6 +5357,21 @@ export type Database = {
         }
         Relationships: []
       }
+      gam_badge_catalogue_icons_backup_2026_05_25: {
+        Row: {
+          icon_name: string | null
+          id: string | null
+        }
+        Insert: {
+          icon_name?: string | null
+          id?: string | null
+        }
+        Update: {
+          icon_name?: string | null
+          id?: string | null
+        }
+        Relationships: []
+      }
       gam_course_legends: {
         Row: {
           attained_at: string
