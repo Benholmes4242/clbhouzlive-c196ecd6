@@ -726,7 +726,7 @@ async function checkStreakBadges(userId: string, streakType: string, count: numb
     .eq("id", badgeId).maybeSingle();
   if (!badge?.counter_tiers) return;
   const tier = computeTier(count, badge.counter_tiers);
-  if (tier >= 0) await upsertBadgeTiered(userId, badgeId, count, tier, null);
+  if (tier > 0) await upsertBadgeTiered(userId, badgeId, count, tier, null);
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -853,7 +853,7 @@ async function recomputeLegend(courseId: string, cfg: LegendCfg) {
       .eq("id", "legend_at_course").maybeSingle();
     if (badge?.counter_tiers) {
       const tier = computeTier(count ?? 0, badge.counter_tiers);
-      if (tier >= 0) await upsertBadgeTiered(newTopUser, "legend_at_course", count ?? 0, tier, null);
+      if (tier > 0) await upsertBadgeTiered(newTopUser, "legend_at_course", count ?? 0, tier, null);
     }
   }
 }
