@@ -248,7 +248,7 @@ export function LeaderboardYourStatus({
           <span>History</span>
         </motion.button>
         <motion.button
-          onClick={() => navigate('/discover?tab=explore')}
+          onClick={() => navigate('/courses?tab=discover')}
           whileTap={{ scale: 0.98 }}
           whileHover={{ backgroundColor: 'rgba(0,0,0,0.03)' }}
           className="flex-1 flex items-center justify-center gap-2 py-3.5 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"

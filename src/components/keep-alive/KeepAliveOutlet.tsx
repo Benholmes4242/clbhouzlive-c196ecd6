@@ -45,8 +45,7 @@ export function KeepAliveOutlet({ keepAliveRoutes, maxCached = 3 }: KeepAliveOut
   const containerRef = useRef<HTMLDivElement>(null);
   const [cachedPaths, setCachedPaths] = useState<Set<string>>(() => {
     const initial = new Set<string>();
-    const rawInitialPath = window.location.pathname;
-    const initialPath = rawInitialPath === '/clubhouse' ? '/' : rawInitialPath;
+    const initialPath = window.location.pathname;
     const isKeepAlive = keepAliveRoutes.some(r => r.path === initialPath);
     if (isKeepAlive) {
       initial.add(initialPath);
@@ -55,19 +54,11 @@ export function KeepAliveOutlet({ keepAliveRoutes, maxCached = 3 }: KeepAliveOut
   });
   const mountedRef = useRef<Map<string, HTMLDivElement>>(new Map());
 
-  // Normalise Clubhouse alias — '/clubhouse' and '/' are the same keep-alive slot
-  const rawPath = location.pathname;
-  const currentPath = rawPath === '/clubhouse' ? '/' : rawPath;
-  
-  // Check if current path matches any keep-alive route (exact or prefix match)
-  const matchedRoute = keepAliveRoutes.find(r => {
-    // Exact match
-    if (r.path === currentPath) return true;
-    // Prefix match for routes like "/" matching "/clubhouse"
-    if (r.path === '/' && currentPath === '/') return true;
-    return false;
-  });
-  
+  const currentPath = location.pathname;
+
+  // Check if current path matches any keep-alive route (exact match)
+  const matchedRoute = keepAliveRoutes.find(r => r.path === currentPath);
+
   const isKeepAlivePath = !!matchedRoute;
 
   // Cache management - add new paths, evict oldest when over max

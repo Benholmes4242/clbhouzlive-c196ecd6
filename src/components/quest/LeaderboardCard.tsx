@@ -106,7 +106,7 @@ export const LeaderboardCard: React.FC<LeaderboardCardProps> = ({ userId, totalP
             Connect with other golfers to track their Top 100 journey alongside yours
           </p>
           <button
-            onClick={() => navigate('/discover')}
+            onClick={() => navigate('/watch')}
             className="inline-flex items-center gap-2 px-4 min-h-[44px] rounded-full text-sm font-semibold bg-[#334E3D] text-white hover:bg-[#2a4033] transition-colors active:scale-[0.98]"
           >
             <Users className="w-4 h-4" />

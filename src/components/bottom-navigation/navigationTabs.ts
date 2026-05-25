@@ -3,13 +3,13 @@ import {
   HomeIcon,
   CameraIcon,
   MapPinIcon,
-  TrophyIcon,
+  PlayCircleIcon,
 } from '@heroicons/react/24/outline';
 
 export const navigationTabs = [
-  { id: 'clubhouse', label: 'Home',     icon: HomeIcon,         path: '/clubhouse' },
-  { id: 'discover',  label: 'Discover', icon: IoCompassOutline, path: '/discover' },
-  { id: 'post',      label: 'Share',    icon: CameraIcon,       path: null, isAction: true },
-  { id: 'courses',   label: 'Courses',  icon: MapPinIcon,       path: '/courses' },
-  { id: 'tourhub',   label: 'Tour',     icon: TrophyIcon,       path: '/tourhub' },
+  { id: 'home',      label: 'Home',      icon: HomeIcon,         path: '/' },
+  { id: 'watch',     label: 'Watch',     icon: PlayCircleIcon,   path: '/watch' },
+  { id: 'post',      label: 'Share',     icon: CameraIcon,       path: null, isAction: true },
+  { id: 'courses',   label: 'Courses',   icon: MapPinIcon,       path: '/courses' },
+  { id: 'clubhouse', label: 'Clubhouse', icon: IoCompassOutline, path: '/clubhouse' },
 ];

@@ -164,7 +164,7 @@ const Top100NetworkPage: React.FC = () => {
             </p>
           </div>
           <button
-            onClick={() => navigate('/discover')}
+            onClick={() => navigate('/watch')}
             className="h-11 px-6 text-sm font-semibold text-white rounded-full active:scale-[0.97] transition-all"
             style={{ background: '#F7931E' }}
           >
