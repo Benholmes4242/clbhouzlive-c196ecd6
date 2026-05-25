@@ -581,7 +581,7 @@ async function upsertBadgeTiered(userId: string, badgeId: string, counterValue: 
     .from("gam_user_badges")
     .select("counter_tier, seen_by_user")
     .eq("user_id", userId).eq("badge_id", badgeId).maybeSingle();
-  const isNewTier = !existing || (existing.counter_tier ?? -1) < tier;
+  const isNewTier = !existing || (existing.counter_tier ?? 0) < tier;
   await supabase.from("gam_user_badges").upsert(
     {
       user_id: userId,
