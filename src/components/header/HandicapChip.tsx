@@ -122,10 +122,7 @@ export function HandicapChip() {
   const arrowColor = direction === 'improving' ? SEASON_GREEN : CRIMSON;
   const ArrowIcon = direction === 'improving' ? TrendingDown : TrendingUp;
 
-  const formattedIndex =
-    typeof indexValue === 'number'
-      ? indexValue.toFixed(1)
-      : Number(indexValue).toFixed(1);
+  const formattedIndex = Number(indexValue).toFixed(1);
 
   return (
     <button
