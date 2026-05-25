@@ -15,6 +15,8 @@ export interface SheetHeaderProps {
     lastSeenRelativeTime: string | null;
   } | null;
   pill: { label: string; tone: 'friends' | 'whs' } | null;
+  /** Tap avatar/name to navigate (clbhouz users only) */
+  onClick?: (() => void) | null;
 }
 
 export const SheetHeader: React.FC<SheetHeaderProps> = ({
