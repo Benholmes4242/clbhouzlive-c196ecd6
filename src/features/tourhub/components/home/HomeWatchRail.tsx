@@ -93,15 +93,14 @@ export function HomeWatchRail() {
         }}
       >
         {top4.map((post, i) => (
-          <div key={post.id} style={{ width: tileWidth, flexShrink: 0 }}>
-            <WatchRailTile
-              post={post}
-              index={i}
-              allPosts={top4}
-              viewedPostIds={viewedPostIds}
-              width={Number.NaN /* unused: parent wrapper controls width */}
-            />
-          </div>
+          <WatchRailTile
+            key={post.id}
+            post={post}
+            index={i}
+            allPosts={top4}
+            viewedPostIds={viewedPostIds}
+            width="100%"
+          />
         ))}
       </div>
     </section>
