@@ -531,7 +531,7 @@ async function applyBadges(userId: string, stats: any, whsScoreId: string): Prom
 
       if (Array.isArray(tiers) && tiers.length > 0) {
         const tier = computeTier(lifetime, tiers);
-        if (tier >= 0 && (!existing || (existing.counter_tier ?? -1) < tier)) {
+        if (tier > 0 && (!existing || (existing.counter_tier ?? 0) < tier)) {
           await upsertBadgeTiered(userId, badge.id, lifetime, tier, whsScoreId);
           earned.push(badge.id);
         } else if (existing) {
