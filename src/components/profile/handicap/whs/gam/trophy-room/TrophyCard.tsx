@@ -271,7 +271,9 @@ export const TrophyCard: React.FC<Props> = ({ item, onTap }) => {
                 color: 'var(--hcp-t-60)',
                 letterSpacing: '0.16em',
                 textTransform: 'uppercase',
-                whiteSpace: 'nowrap',
+                textAlign: 'center',
+                lineHeight: 1.35,
+                maxWidth: '95%',
               }}
             >
               {SHOWPIECE_COUNTER_LABEL[item.badgeId]}
@@ -299,23 +301,25 @@ export const TrophyCard: React.FC<Props> = ({ item, onTap }) => {
             {item.kind === 'legend' ? item.courseName : item.name}
           </div>
         )}
-        <div
-          style={{
-            marginTop: isShowpieceWithCounterRendered ? 0 : 4,
-            fontSize: 9.5,
-            fontWeight: 700,
-            color: palette.metaColor,
-            letterSpacing: '0.12em',
-            textTransform: 'uppercase',
-            whiteSpace: 'nowrap',
-            overflow: 'hidden',
-            textOverflow: 'ellipsis',
-            opacity: dimmed ? 0.7 : 0.95,
-            ...GAM.TABULAR,
-          }}
-        >
-          {item.kind === 'legend' ? item.name : metaLine(item)}
-        </div>
+        {!isShowpieceWithCounterRendered && (
+          <div
+            style={{
+              marginTop: 4,
+              fontSize: 9.5,
+              fontWeight: 700,
+              color: palette.metaColor,
+              letterSpacing: '0.12em',
+              textTransform: 'uppercase',
+              whiteSpace: 'nowrap',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              opacity: dimmed ? 0.7 : 0.95,
+              ...GAM.TABULAR,
+            }}
+          >
+            {item.kind === 'legend' ? item.name : metaLine(item)}
+          </div>
+        )}
       </div>
     </button>
   );
