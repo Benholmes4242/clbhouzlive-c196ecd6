@@ -289,7 +289,7 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
               size="icon"
               className={cn(
                 "p-0 flex items-center justify-center rounded-full active:scale-[0.94] transition-all",
-                "h-11 w-11 text-white",
+                isTourRoute ? "h-9 w-9 text-white" : "h-11 w-11 text-white",
                 !isDarkChrome && !useLightTheme && "hover:bg-[hsl(var(--clubhouse-active-bg))]"
               )}
               style={{
@@ -299,7 +299,7 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
               onClick={handleSearchClick}
               aria-label="Search"
             >
-              <Search className="h-5 w-5" />
+              <Search className={isTourRoute ? "h-4 w-4" : "h-5 w-5"} />
             </Button>
 
             {/* Handicap chip — dark chrome only (Phase 1: dark headers) */}
