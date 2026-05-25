@@ -79,28 +79,27 @@ export function HomeWatchRail() {
     );
   }
 
-  // Compute tile width for 4-up grid: viewport - 32 (page padding) - 3*8 (gaps) / 4
-  const tileWidth = `calc((100vw - 32px - 24px) / 4)`;
-
   return (
     <section>
       {Eyebrow}
       <div
         style={{
-          display: 'flex',
+          display: 'grid',
+          gridTemplateColumns: `repeat(${top4.length}, 1fr)`,
           gap: 8,
           padding: '0 16px',
         }}
       >
         {top4.map((post, i) => (
-          <WatchRailTile
-            key={post.id}
-            post={post}
-            index={i}
-            allPosts={top4}
-            viewedPostIds={viewedPostIds}
-            width="100%"
-          />
+          <div key={post.id} style={{ minWidth: 0 }}>
+            <WatchRailTile
+              post={post}
+              index={i}
+              allPosts={top4}
+              viewedPostIds={viewedPostIds}
+              width="100%"
+            />
+          </div>
         ))}
       </div>
     </section>
