@@ -215,11 +215,14 @@ html.lightbox-open {
      consume the slot offset their main scroll container with paddingTop: var(--chrome-total-h). */
   --shell-extra-h: 0px;
 
+  /* CompactHeader content height. Defaults to 55px; tour routes override to 48px. */
+  --header-h: 55px;
+
   /* Total fixed chrome height above any page body that uses ShellSlot.
-     Composes CompactHeader (55px content + safe-area top) plus the
+     Composes CompactHeader (--header-h + safe-area top) plus the
      ShellSlot's own measured height. Pages consume this via
      paddingTop: var(--chrome-total-h). */
-  --chrome-total-h: calc(55px + var(--sat, 0px) + var(--shell-extra-h, 0px));
+  --chrome-total-h: calc(var(--header-h, 55px) + var(--sat, 0px) + var(--shell-extra-h, 0px));
 
   /* Back-compat aliases (used by useChromeAnchors) */
   --safe-top: env(safe-area-inset-top, 0px);

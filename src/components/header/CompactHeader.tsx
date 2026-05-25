@@ -184,8 +184,17 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
     setMenuOpen(v => !v);
   };
 
-  // Standardized header height: 55px content
-  const contentHeight = 55;
+  // Header height: 48px on tour routes (compact), 55px elsewhere.
+  const contentHeight = isTourRoute ? 48 : 55;
+
+  // Publish header height as a CSS variable so ShellSlot + --chrome-total-h
+  // can adapt without each consumer needing to know about tour-specific sizing.
+  React.useEffect(() => {
+    document.documentElement.style.setProperty('--header-h', `${contentHeight}px`);
+    return () => {
+      document.documentElement.style.setProperty('--header-h', '55px');
+    };
+  }, [contentHeight]);
   
   return (
     <>
@@ -228,7 +237,7 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
                 <img
                   src="/lovable-uploads/29e83040-b5c5-48e4-84d7-3f99640e4a80.png"
                   alt="clbhouz"
-                  className="object-contain h-9 w-9"
+                  className={cn("object-contain", isTourRoute ? "h-7 w-7" : "h-9 w-9")}
                 />
               )}
             </button>
@@ -280,7 +289,7 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
               size="icon"
               className={cn(
                 "p-0 flex items-center justify-center rounded-full active:scale-[0.94] transition-all",
-                "h-11 w-11 text-white",
+                isTourRoute ? "h-9 w-9 text-white" : "h-11 w-11 text-white",
                 !isDarkChrome && !useLightTheme && "hover:bg-[hsl(var(--clubhouse-active-bg))]"
               )}
               style={{
@@ -290,7 +299,7 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
               onClick={handleSearchClick}
               aria-label="Search"
             >
-              <Search className="h-5 w-5" />
+              <Search className={isTourRoute ? "h-4 w-4" : "h-5 w-5"} />
             </Button>
 
             {/* Handicap chip — dark chrome only (Phase 1: dark headers) */}
