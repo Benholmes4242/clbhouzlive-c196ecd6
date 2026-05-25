@@ -3,6 +3,12 @@ import { useGamRpc } from './_useGamRpc';
 export interface CourseMeta {
   available: boolean;
   reason?: string;
+  // Course identity (added so route-driven pages can render header from courseId alone)
+  course_name: string | null;
+  course_region: string | null;
+  course_country: string | null;
+  course_type: string | null;
+  // Stats
   friend_rounds: number;
   your_rounds: number;
   your_best: number | null;
