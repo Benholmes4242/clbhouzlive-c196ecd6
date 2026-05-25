@@ -19930,6 +19930,23 @@ export type Database = {
           username: string
         }[]
       }
+      get_top100_list_progress: {
+        Args: {
+          p_list_slug: string
+          p_owner_user_id: string
+          p_viewer_user_id: string
+        }
+        Returns: {
+          country: string
+          course_id: string
+          course_name: string
+          is_owner_played: boolean
+          is_viewer_played: boolean
+          rank: number
+          region: string
+          thumbnail_image: string
+        }[]
+      }
       get_top100_lists_with_hero_courses: {
         Args: { target_user_id?: string }
         Returns: {

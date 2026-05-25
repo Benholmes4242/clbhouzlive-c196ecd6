@@ -454,6 +454,7 @@ export const TrophyRoomSheet: React.FC<Props> = ({ userId, viewerUserId }) => {
         <TrophyDetailSheet
           items={detailCtx.items}
           initialIndex={detailCtx.index}
+          ownerUserId={userId}
           viewerUserId={effectiveViewerId}
           onClose={() => setDetailCtx(null)}
         />

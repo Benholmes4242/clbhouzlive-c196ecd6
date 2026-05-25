@@ -5,11 +5,16 @@ import { DetailHero } from './parts/DetailHero';
 import { AchievementBody } from './parts/AchievementBody';
 import { LegendBody } from './parts/LegendBody';
 import { DetailFooter } from './parts/DetailFooter';
+import { Top100Body } from './parts/Top100Body';
+import { isTop100Achievement } from './_shared/showpieces';
 import type { TrophyItem } from './_shared/normalizeTrophyItem';
 
 interface Props {
   items: TrophyItem[];
   initialIndex: number;
+  /** The user whose Trophy Room is open (collection owner) */
+  ownerUserId: string;
+  /** The currently-logged-in user (may equal ownerUserId for self-view) */
   viewerUserId: string;
   onClose: () => void;
 }
@@ -18,7 +23,7 @@ interface Props {
  * Stacked detail sheet — opens on top of TrophyRoomSheet.
  * Horizontal swipe paginates through the same-group `items`.
  */
-export const TrophyDetailSheet: React.FC<Props> = ({ items, initialIndex, viewerUserId, onClose }) => {
+export const TrophyDetailSheet: React.FC<Props> = ({ items, initialIndex, ownerUserId, viewerUserId, onClose }) => {
   const navigate = useNavigate();
   const [index, setIndex] = useState(Math.max(0, Math.min(initialIndex, items.length - 1)));
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -88,7 +93,16 @@ export const TrophyDetailSheet: React.FC<Props> = ({ items, initialIndex, viewer
         style={{ flex: 1, minHeight: 0, overflowY: 'auto', willChange: 'transform' }}
       >
         {current.kind === 'achievement' ? (
-          <AchievementBody item={current} viewerUserId={viewerUserId} />
+          isTop100Achievement(current.badgeId) ? (
+            <Top100Body
+              item={current}
+              ownerUserId={ownerUserId}
+              viewerUserId={viewerUserId}
+              onClose={onClose}
+            />
+          ) : (
+            <AchievementBody item={current} viewerUserId={viewerUserId} />
+          )
         ) : (
           <LegendBody item={current} viewerUserId={viewerUserId} onNavigateClose={onClose} />
         )}
