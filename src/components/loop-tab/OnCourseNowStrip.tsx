@@ -5,20 +5,24 @@ import { useNetworkActivity, type NetworkFriend } from '@/hooks/useNetworkActivi
 
 interface OnCourseNowStripProps {
   userId: string | undefined;
+  /** When true, suppresses the internal header row (used by Home wrapper that supplies its own eyebrow). */
+  hideHeader?: boolean;
 }
 
-export function OnCourseNowStrip({ userId }: OnCourseNowStripProps) {
+export function OnCourseNowStrip({ userId, hideHeader = false }: OnCourseNowStripProps) {
   const navigate = useNavigate();
   const { data, isLoading } = useNetworkActivity(userId);
 
   // ── Loading skeleton ──
   if (isLoading) {
     return (
-      <div style={{ padding: '12px 16px' }}>
-        <div className="flex items-center gap-2" style={{ marginBottom: 10 }}>
-          <div className="h-4 w-28 bg-muted animate-pulse rounded" />
-          <div className="h-5 w-16 bg-muted animate-pulse rounded-full" />
-        </div>
+      <div style={{ padding: hideHeader ? '0 16px' : '12px 16px' }}>
+        {!hideHeader && (
+          <div className="flex items-center gap-2" style={{ marginBottom: 10 }}>
+            <div className="h-4 w-28 bg-muted animate-pulse rounded" />
+            <div className="h-5 w-16 bg-muted animate-pulse rounded-full" />
+          </div>
+        )}
         <div
           className="flex gap-2 overflow-hidden"
           style={{ scrollbarWidth: 'none' }}
@@ -41,51 +45,53 @@ export function OnCourseNowStrip({ userId }: OnCourseNowStripProps) {
   const onlineCount = visibleFriends.filter(f => f.is_active_recently).length;
 
   return (
-    <div style={{ borderTop: '1px solid hsl(var(--border) / 0.08)' }}>
-      {/* Header */}
-      <div
-        className="flex items-center justify-between"
-        style={{ padding: '10px 16px 8px' }}
-      >
-        <div className="flex items-center gap-2">
-          <span style={{ fontSize: 18, fontWeight: 800, color: '#0F172A', letterSpacing: '-0.015em' }}>
-            Recently active
-          </span>
-          {onlineCount > 0 && (
-            <span
-              style={{
-                fontSize: 11,
-                fontWeight: 600,
-                color: '#15803D',
-                background: 'rgba(21,128,61,0.08)',
-                borderRadius: 10,
-                padding: '2px 8px',
-              }}
-            >
-              {onlineCount} this week
-            </span>
-          )}
-        </div>
-        <button
-          onClick={() => navigate('/golferstofollow')}
-          style={{
-            fontSize: 11,
-            fontWeight: 800,
-            color: '#0F172A',
-            letterSpacing: '-0.005em',
-            background: 'none',
-            border: 'none',
-            cursor: 'pointer',
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: 2,
-            padding: 0,
-          }}
+    <div style={{ borderTop: hideHeader ? 'none' : '1px solid hsl(var(--border) / 0.08)' }}>
+      {/* Header — suppressed when wrapper provides its own eyebrow */}
+      {!hideHeader && (
+        <div
+          className="flex items-center justify-between"
+          style={{ padding: '10px 16px 8px' }}
         >
-          See all
-          <ChevronRight size={12} strokeWidth={2.4} color="#0F172A" />
-        </button>
-      </div>
+          <div className="flex items-center gap-2">
+            <span style={{ fontSize: 18, fontWeight: 800, color: '#0F172A', letterSpacing: '-0.015em' }}>
+              Recently active
+            </span>
+            {onlineCount > 0 && (
+              <span
+                style={{
+                  fontSize: 11,
+                  fontWeight: 600,
+                  color: '#15803D',
+                  background: 'rgba(21,128,61,0.08)',
+                  borderRadius: 10,
+                  padding: '2px 8px',
+                }}
+              >
+                {onlineCount} this week
+              </span>
+            )}
+          </div>
+          <button
+            onClick={() => navigate('/golferstofollow')}
+            style={{
+              fontSize: 11,
+              fontWeight: 800,
+              color: '#0F172A',
+              letterSpacing: '-0.005em',
+              background: 'none',
+              border: 'none',
+              cursor: 'pointer',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 2,
+              padding: 0,
+            }}
+          >
+            See all
+            <ChevronRight size={12} strokeWidth={2.4} color="#0F172A" />
+          </button>
+        </div>
+      )}
 
       {/* Pill cards — horizontal scroll */}
       <div

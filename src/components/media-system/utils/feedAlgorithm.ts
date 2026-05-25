@@ -619,7 +619,8 @@ export function injectCourseOfWeekCard(feedPosts: FeedPost[], card: FeedPost | n
 }
 
 // ── Combined Orbit pipeline — posts + editorial cards scored together ──────
-// Called from Clubhouse.tsx where both data sources are available simultaneously.
+// @deprecated Editorial cards moved to Home (Phase 2). Use buildSuggestedFeed directly.
+// Kept temporarily — Phase 3 cleanup will remove.
 export function buildSuggestedFeedWithEditorials(
   rawPosts: FeedPost[],
   editorialCards: (FeedPost | null)[]

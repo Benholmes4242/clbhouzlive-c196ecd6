@@ -27,6 +27,10 @@ import { AllToursTicker } from '../AllToursTicker';
 import { IntelligenceHero } from '../IntelligenceHero';
 import { WorldRankingsHero } from '../WorldRankingsHero';
 import { StatOfTheWeek } from '../StatOfTheWeek';
+import { HomeOnCourseStrip } from '../home/HomeOnCourseStrip';
+import { HomePGAModule } from '../home/HomePGAModule';
+import { HomeCourseOfWeekModule } from '../home/HomeCourseOfWeekModule';
+import { HomeWatchRail } from '../home/HomeWatchRail';
 import { useNetworkStatus } from '@/hooks/useNetworkStatus';
 import { HERO_STYLES } from '../../constants/heroStyles';
 import { WifiOff } from 'lucide-react';
@@ -118,11 +122,23 @@ export function OverviewPageV3() {
           className="relative z-10"
         >
           <div className="bg-background" style={{ display: 'flex', flexDirection: 'column', gap: 40, paddingTop: 40, paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 80px)' }}>
+            <LazySection minHeight={120}>
+              <HomeOnCourseStrip />
+            </LazySection>
+            <LazySection minHeight={280}>
+              <HomePGAModule />
+            </LazySection>
             <LazySection minHeight={500}>
               <IntelligenceHero />
             </LazySection>
             <LazySection minHeight={400}>
               <ComingUpCalendar />
+            </LazySection>
+            <LazySection minHeight={260}>
+              <HomeCourseOfWeekModule />
+            </LazySection>
+            <LazySection minHeight={240}>
+              <HomeWatchRail />
             </LazySection>
             <LazySection minHeight={400}>
               <WorldRankingsHero />

@@ -34,10 +34,7 @@ import { useClubhouseStore } from '@/store/clubhouseStore';
 // ── Data hooks ──
 import { useSuggestedFeed } from '@/components/media-system/hooks/useSuggestedFeed';
 import { useFriendsFeed } from '@/components/media-system/hooks/useFriendsFeed';
-import { usePGACard } from '@/components/media-system/hooks/usePGACard';
-import { useEditorialCards } from '@/components/media-system/hooks/useEditorialCards';
-import { buildSuggestedFeedWithEditorials } from '@/components/media-system/utils/feedAlgorithm';
-import type { FeedPost, PGACardFeedPost, CourseOfWeekCardFeedPost } from '@/components/media-system/types/media';
+import type { FeedPost } from '@/components/media-system/types/media';
 // buildSuggestedFeed/buildFriendsFeed are called inside the feed hooks — not here
 
 // ── Clubhouse UI overlays ──
@@ -168,31 +165,13 @@ const ClubhouseContent = () => {
 
 
   // ── Feed hooks ──
+  // Editorial cards (PGA This Week, Course of the Week) moved to Home in Phase 2.
+  // Clubhouse feed is now purely social posts + algorithmic suggestions.
   const suggestedFeed = useSuggestedFeed(user?.id);
   const friendsFeed = useFriendsFeed(user?.id);
-  const { pgaCard } = usePGACard(user?.id);
-  const { courseOfWeekCard } = useEditorialCards(user?.id);
   const activeFeed = activeTab === 'foryou' ? suggestedFeed : friendsFeed;
-  
-  const posts = useMemo(() => {
-    if (activeTab === 'foryou') {
-      return buildSuggestedFeedWithEditorials(
-        activeFeed.posts,
-        [
-          // PGA card temporarily hidden (Zurich Classic team-event week — re-enable after 2026-04-28)
-          null,
-          courseOfWeekCard as FeedPost | null,
-        ]
-      );
-    }
-    return activeFeed.posts;
-  }, [
-    activeFeed.posts,
-    activeTab,
-    pgaCard,
-    courseOfWeekCard,
-    user?.id,
-  ]);
+
+  const posts = useMemo(() => activeFeed.posts, [activeFeed.posts]);
 
   const isLoading = activeFeed.isLoading;
   const hasNextPage = activeFeed.hasNextPage ?? false;
@@ -486,9 +465,7 @@ const ClubhouseContent = () => {
             isOpen={commentsOpen}
             onClose={closeComments}
             postId={
-              activePost.postType === 'pga_card'
-                ? (activePost as unknown as PGACardFeedPost).cardData.postId
-                : activePost.postType === 'course_of_week_card'
+              activePost.postType === 'course_of_week_card'
                 ? (activePost as any).cardData.cardId
                 : activePost.id
             }

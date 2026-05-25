@@ -14,8 +14,8 @@ interface WatchRailTileProps {
   allPosts: FeedPost[];
   /** When provided, renders a large outlined rank number bottom-left. */
   rank?: number;
-  /** Tile width in px. Defaults to 200. */
-  width?: number;
+  /** Tile width. Defaults to 200. Accepts a CSS length string for responsive layouts. */
+  width?: number | string;
   /**
    * Set of post IDs the current user has already watched.
    * When provided, the NEW badge is suppressed for posts in this set.
