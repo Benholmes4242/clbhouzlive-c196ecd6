@@ -347,29 +347,33 @@ export function LeaderboardBand({
       </div>
       {/* rows */}
       <div style={{ borderTop: `0.5px solid ${INK_15}` }}>{body}</div>
-      {/* Quiet inline CTA (slab removed per Brief 07 A2) */}
-      {onCtaTap && (
-        <div style={{ display: 'flex', justifyContent: 'flex-end', padding: '10px 20px 14px' }}>
-          <button
-            onClick={onCtaTap}
-            type="button"
-            style={{
-              background: 'transparent',
-              border: 'none',
-              cursor: 'pointer',
-              fontFamily: 'inherit',
-              fontSize: 12,
-              fontWeight: 700,
-              letterSpacing: '0.08em',
-              textTransform: 'uppercase',
-              color: INK,
-              padding: 0,
-            }}
-          >
-            {ctaLabel(state)} <span style={{ opacity: 0.55 }}>›</span>
-          </button>
-        </div>
-      )}
+      {/* CTA */}
+      <button
+        onClick={onCtaTap}
+        type="button"
+        style={{
+          margin: '18px 20px',
+          padding: '14px 20px',
+          background: INK,
+          color: 'white',
+          borderRadius: 14,
+          textAlign: 'center',
+          fontSize: 12,
+          fontWeight: 700,
+          letterSpacing: '0.12em',
+          textTransform: 'uppercase',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          gap: 8,
+          width: 'calc(100% - 40px)',
+          border: 'none',
+          cursor: 'pointer',
+          fontFamily: 'inherit',
+        }}
+      >
+        {ctaLabel(state)} <span style={{ opacity: 0.7 }}>›</span>
+      </button>
     </div>
   );
 }

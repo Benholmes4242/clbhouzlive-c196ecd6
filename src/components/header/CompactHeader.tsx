@@ -185,7 +185,7 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
   };
 
   // Standardized header height: 55px content
-  const contentHeight = 48;
+  const contentHeight = 55;
   
   return (
     <>
@@ -228,7 +228,7 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
                 <img
                   src="/lovable-uploads/29e83040-b5c5-48e4-84d7-3f99640e4a80.png"
                   alt="clbhouz"
-                  className="object-contain h-8 w-8"
+                  className="object-contain h-9 w-9"
                 />
               )}
             </button>
@@ -296,8 +296,8 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
             {/* Handicap chip — dark chrome only (Phase 1: dark headers) */}
             {isDarkChrome && <HandicapChip />}
 
-            {/* Identity pill (mobile only) — extra 6px ml on dark chrome so chip↔avatar gap = 14px */}
-            <div className="sm:hidden" style={{ marginLeft: isDarkChrome ? 6 : 0 }}>
+            {/* Identity pill (mobile only) */}
+            <div className="sm:hidden">
               {user ? (
                 <PostingAsPill 
                   ref={pillRef}
