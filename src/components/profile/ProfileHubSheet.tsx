@@ -86,20 +86,27 @@ function ProfileHubSheetSkeleton() {
       </div>
       <div style={{ height: '0.5px', background: HAIRLINE, margin: '0 -16px' }} />
 
-      {/* Masthead skeleton */}
-      <div className="pt-5 pb-5">
-        <Skeleton className="h-3 w-40 rounded mb-3" />
-        <div className="grid grid-cols-3 gap-4 items-end">
-          <Skeleton className="h-12 w-12 rounded" />
-          <Skeleton className="h-7 w-16 rounded" />
-          <Skeleton className="h-7 w-20 rounded" />
+      {/* Masthead scorecard skeleton (2-col split) */}
+      <div className="pt-3.5">
+        <div
+          className="rounded-[14px] overflow-hidden grid grid-cols-2"
+          style={{ border: `0.5px solid ${HAIRLINE}`, background: '#FFFFFF' }}
+        >
+          <div style={{ padding: '16px 18px 16px 20px', borderRight: `0.5px solid ${HAIRLINE}` }}>
+            <Skeleton className="h-2.5 w-20 rounded mb-2" />
+            <Skeleton className="h-12 w-16 rounded" />
+          </div>
+          <div className="flex flex-col">
+            <div style={{ padding: '10px 18px', borderBottom: `0.5px solid ${HAIRLINE}` }}>
+              <Skeleton className="h-2.5 w-12 rounded mb-1.5" />
+              <Skeleton className="h-5 w-14 rounded" />
+            </div>
+            <div style={{ padding: '10px 18px' }}>
+              <Skeleton className="h-2.5 w-14 rounded mb-1.5" />
+              <Skeleton className="h-5 w-14 rounded" />
+            </div>
+          </div>
         </div>
-        <div className="grid grid-cols-3 gap-4 mt-2">
-          <Skeleton className="h-2.5 w-12 rounded" />
-          <Skeleton className="h-2.5 w-14 rounded" />
-          <Skeleton className="h-2.5 w-16 rounded" />
-        </div>
-        <div className="mt-4" style={{ height: 2, background: HAIRLINE_SOFT }} />
       </div>
 
       {/* Stat strip skeleton */}
@@ -272,7 +279,7 @@ function ProfileHubSheet({
 
   const handicapSubCopy = (() => {
     if (handicapState === 'connect') return 'No handicap';
-    if (handicapState === 'nodata') return 'England Golf';
+    if (handicapState === 'nodata') return 'WHS connected';
     const v = trend!.current as number;
     const formatted = v < 0 ? `+${Math.abs(v).toFixed(1)}` : v.toFixed(1);
     return `${formatted} HCP`;
@@ -479,12 +486,47 @@ function ProfileHubSheet({
                     coursesPlayed={stats.coursesPlayed}
                   />
 
+                  {/* View handicap link (data state only) */}
+                  {stripVariant === 'full' && (
+                    <div
+                      style={{
+                        display: 'flex',
+                        justifyContent: 'flex-end',
+                        paddingTop: 10,
+                        paddingBottom: 4,
+                      }}
+                    >
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleNav('/handicap');
+                        }}
+                        style={{
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: 2,
+                          background: 'transparent',
+                          border: 'none',
+                          cursor: 'pointer',
+                          padding: 0,
+                          fontSize: 12,
+                          fontWeight: 700,
+                          color: AMBER,
+                        }}
+                      >
+                        View handicap
+                        <ChevronRight size={13} color={AMBER} strokeWidth={2.4} />
+                      </button>
+                    </div>
+                  )}
+
                   {/* ── 4. Quick action icon row ── */}
                   <div
                     style={{
                       display: 'flex',
                       gap: 8,
-                      padding: '18px 32px',
+                      padding: '16px 32px',
                       borderBottom: `0.5px solid ${HAIRLINE}`,
                       marginLeft: -16,
                       marginRight: -16,
@@ -557,21 +599,8 @@ function ProfileHubSheet({
                     </QuickActionTile>
                   </div>
 
-                  {/* ── 5. Account section ── */}
-                  <div>
-                    <div style={{ paddingTop: 18, paddingBottom: 6 }}>
-                      <span
-                        style={{
-                          fontSize: 10,
-                          fontWeight: 700,
-                          color: INK_FAINT,
-                          letterSpacing: '0.12em',
-                          textTransform: 'uppercase' as const,
-                        }}
-                      >
-                        Account
-                      </span>
-                    </div>
+                  {/* ── 5. Account section (no eyebrow) ── */}
+                  <div style={{ paddingTop: 6 }}>
                     <AccountRow
                       Icon={UserCog}
                       label="Profile & businesses"
@@ -591,13 +620,13 @@ function ProfileHubSheet({
                   {isAdmin && (
                     <>
                       <div style={{ height: '0.5px', background: HAIRLINE, margin: '0 -16px' }} />
-                      <div style={{ paddingTop: 14, paddingBottom: 8 }}>
+                      <div style={{ paddingTop: 20, paddingBottom: 10 }}>
                         <span
                           style={{
-                            fontSize: 10,
-                            fontWeight: 700,
+                            fontSize: 10.5,
+                            fontWeight: 800,
                             color: INK_FAINT,
-                            letterSpacing: '0.12em',
+                            letterSpacing: '0.14em',
                             textTransform: 'uppercase' as const,
                           }}
                         >
@@ -630,31 +659,35 @@ function ProfileHubSheet({
                     </>
                   )}
 
-                  {/* ── 7. Sign out ── */}
+                  {/* ── 7. Sign out — crimson outlined button ── */}
                   <div
                     style={{
-                      paddingTop: 26,
+                      paddingTop: 20,
                       paddingBottom: 'max(8px, env(safe-area-inset-bottom, 0px))',
-                      display: 'flex',
-                      justifyContent: 'center',
                     }}
                   >
                     {!showLogoutConfirm ? (
                       <button
                         type="button"
                         onClick={() => setShowLogoutConfirm(true)}
+                        className="active:opacity-90 transition-opacity"
                         style={{
-                          background: 'transparent',
-                          border: 'none',
-                          fontSize: 12,
-                          fontWeight: 500,
-                          color: INK_FAINT,
-                          letterSpacing: '0.02em',
+                          width: '100%',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          gap: 8,
+                          padding: '12px 14px',
+                          borderRadius: 12,
+                          background: '#FEF2F2',
+                          border: '1px solid rgba(159,29,29,0.22)',
                           cursor: 'pointer',
-                          padding: '8px 12px',
                         }}
                       >
-                        Sign out
+                        <LogOut size={15} color="#9F1D1D" strokeWidth={2.2} />
+                        <span style={{ fontSize: 14, fontWeight: 700, color: '#9F1D1D', letterSpacing: '-0.005em' }}>
+                          Sign out
+                        </span>
                       </button>
                     ) : (
                       <div className="flex gap-3 w-full">
@@ -669,7 +702,7 @@ function ProfileHubSheet({
                           type="button"
                           onClick={handleLogout}
                           className="active:opacity-90 transition-opacity"
-                          style={{ flex: 1, minHeight: 50, borderRadius: 25, background: '#DC2626', border: 'none', fontSize: 14, fontWeight: 700, color: '#FFFFFF', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}
+                          style={{ flex: 1, minHeight: 50, borderRadius: 25, background: '#9F1D1D', border: 'none', fontSize: 14, fontWeight: 700, color: '#FFFFFF', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}
                         >
                           <LogOut size={16} />
                           Sign out

@@ -22,6 +22,7 @@ interface Cell {
 export interface ProfileStatStripProps {
   variant: 'full' | 'limited';
   rounds30d: number | null;
+  /** Renamed from "Low Index" → labelled "BEST INDEX" in the strip. */
   lowIndex: number | null;
   reviewsCount: number | null;
   coursesPlayed: number | null;
@@ -43,7 +44,7 @@ export function ProfileStatStrip({
   const cells: Cell[] = variant === 'full'
     ? [
         { label: 'ROUNDS 30D', value: rounds30d },
-        { label: 'LOW INDEX', value: lowIndex, format: (n) => (n < 0 ? `+${Math.abs(n).toFixed(1)}` : n.toFixed(1)) },
+        { label: 'BEST INDEX', value: lowIndex, format: (n) => (n < 0 ? `+${Math.abs(n).toFixed(1)}` : n.toFixed(1)) },
         { label: 'REVIEWS', value: reviewsCount },
         { label: 'COURSES', value: coursesPlayed },
       ]
@@ -55,6 +56,7 @@ export function ProfileStatStrip({
   return (
     <div
       style={{
+        marginTop: 12,
         marginLeft: -16,
         marginRight: -16,
         padding: '14px 16px',
@@ -76,7 +78,7 @@ export function ProfileStatStrip({
           >
             <div
               style={{
-                fontSize: 18,
+                fontSize: 20,
                 fontWeight: 700,
                 color: isNull ? INK_FAINT : INK,
                 lineHeight: 1.1,
