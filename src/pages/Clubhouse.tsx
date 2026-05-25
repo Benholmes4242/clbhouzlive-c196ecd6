@@ -165,31 +165,13 @@ const ClubhouseContent = () => {
 
 
   // ── Feed hooks ──
+  // Editorial cards (PGA This Week, Course of the Week) moved to Home in Phase 2.
+  // Clubhouse feed is now purely social posts + algorithmic suggestions.
   const suggestedFeed = useSuggestedFeed(user?.id);
   const friendsFeed = useFriendsFeed(user?.id);
-  const { pgaCard } = usePGACard(user?.id);
-  const { courseOfWeekCard } = useEditorialCards(user?.id);
   const activeFeed = activeTab === 'foryou' ? suggestedFeed : friendsFeed;
-  
-  const posts = useMemo(() => {
-    if (activeTab === 'foryou') {
-      return buildSuggestedFeedWithEditorials(
-        activeFeed.posts,
-        [
-          // PGA card temporarily hidden (Zurich Classic team-event week — re-enable after 2026-04-28)
-          null,
-          courseOfWeekCard as FeedPost | null,
-        ]
-      );
-    }
-    return activeFeed.posts;
-  }, [
-    activeFeed.posts,
-    activeTab,
-    pgaCard,
-    courseOfWeekCard,
-    user?.id,
-  ]);
+
+  const posts = useMemo(() => activeFeed.posts, [activeFeed.posts]);
 
   const isLoading = activeFeed.isLoading;
   const hasNextPage = activeFeed.hasNextPage ?? false;
