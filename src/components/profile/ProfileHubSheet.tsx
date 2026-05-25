@@ -86,20 +86,27 @@ function ProfileHubSheetSkeleton() {
       </div>
       <div style={{ height: '0.5px', background: HAIRLINE, margin: '0 -16px' }} />
 
-      {/* Masthead skeleton */}
-      <div className="pt-5 pb-5">
-        <Skeleton className="h-3 w-40 rounded mb-3" />
-        <div className="grid grid-cols-3 gap-4 items-end">
-          <Skeleton className="h-12 w-12 rounded" />
-          <Skeleton className="h-7 w-16 rounded" />
-          <Skeleton className="h-7 w-20 rounded" />
+      {/* Masthead scorecard skeleton (2-col split) */}
+      <div className="pt-3.5">
+        <div
+          className="rounded-[14px] overflow-hidden grid grid-cols-2"
+          style={{ border: `0.5px solid ${HAIRLINE}`, background: '#FFFFFF' }}
+        >
+          <div style={{ padding: '16px 18px 16px 20px', borderRight: `0.5px solid ${HAIRLINE}` }}>
+            <Skeleton className="h-2.5 w-20 rounded mb-2" />
+            <Skeleton className="h-12 w-16 rounded" />
+          </div>
+          <div className="flex flex-col">
+            <div style={{ padding: '10px 18px', borderBottom: `0.5px solid ${HAIRLINE}` }}>
+              <Skeleton className="h-2.5 w-12 rounded mb-1.5" />
+              <Skeleton className="h-5 w-14 rounded" />
+            </div>
+            <div style={{ padding: '10px 18px' }}>
+              <Skeleton className="h-2.5 w-14 rounded mb-1.5" />
+              <Skeleton className="h-5 w-14 rounded" />
+            </div>
+          </div>
         </div>
-        <div className="grid grid-cols-3 gap-4 mt-2">
-          <Skeleton className="h-2.5 w-12 rounded" />
-          <Skeleton className="h-2.5 w-14 rounded" />
-          <Skeleton className="h-2.5 w-16 rounded" />
-        </div>
-        <div className="mt-4" style={{ height: 2, background: HAIRLINE_SOFT }} />
       </div>
 
       {/* Stat strip skeleton */}
