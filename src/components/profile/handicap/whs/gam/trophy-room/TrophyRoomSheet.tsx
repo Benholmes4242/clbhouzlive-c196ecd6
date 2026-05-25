@@ -325,9 +325,9 @@ export const TrophyRoomSheet: React.FC<Props> = ({ userId, viewerUserId }) => {
             const active = tab === key;
             const count =
               key === 'all'
-                ? allAchievements.length + allLegends.length
+                ? allAchievements.length
                 : key === 'earned'
-                  ? earnedTotal
+                  ? earnedAchievements.length
                   : lockedAchievements.length;
             return (
               <button
