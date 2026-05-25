@@ -80,7 +80,8 @@ export function useSupabaseSession() {
       mounted = false;
       subscription.unsubscribe();
     };
-  }, [queryClient]);
+  }, [queryClient, hasQueryClient]);
+
 
   return { user, session, loading };
 }
