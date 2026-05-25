@@ -3,6 +3,7 @@ import { useFriendFeaturedRound } from '@/lib/whs/hooks';
 import { fmtHcp, fmtDiff } from '@/lib/whs/format';
 import { reformatFriendName } from '@/lib/whs/utils/nameFormat';
 import { useOpenFriendSheet } from '@/components/friend-sheet/FriendSheetProvider';
+import type { FriendLeaderboardEntry } from '@/lib/whs/types';
 import SectionHeader from '../SectionHeader';
 import BuildYourCircleCTA from './BuildYourCircleCTA';
 
