@@ -188,7 +188,7 @@ export const FullCourseLeaderboardSheet: React.FC<Props> = ({
               }}
             >
               {activeRows.map((row, i) => (
-                <React.Fragment key={`${row.rank}-${row.attained_at}-${i}`}>
+                <div key={`${row.rank}-${row.attained_at}-${i}`}>
                   <CompactLeaderRow row={row} unit={activeDescriptor?.unit ?? ''} />
                   {i < activeRows.length - 1 && (
                     <div
@@ -199,7 +199,7 @@ export const FullCourseLeaderboardSheet: React.FC<Props> = ({
                       }}
                     />
                   )}
-                </React.Fragment>
+                </div>
               ))}
             </div>
           )}

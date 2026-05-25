@@ -113,12 +113,12 @@ export const CategorySection: React.FC<Props> = ({
           }}
         >
           {restVisible.map((row, i) => (
-            <React.Fragment key={`${row.rank}-${i}`}>
+            <div key={`${row.rank}-${i}`}>
               <CompactLeaderRow row={row} unit={unit} />
               {i < restVisible.length - 1 && (
                 <div style={{ height: 1, background: 'var(--hcp-hairline)', margin: '0 10px' }} />
               )}
-            </React.Fragment>
+            </div>
           ))}
         </div>
       )}
