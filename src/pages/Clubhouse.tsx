@@ -435,29 +435,58 @@ const ClubhouseContent = () => {
       {/* ═══ MAIN FEED AREA ═══ */}
       {!isLoading && posts.length === 0 ? (
         activeTab === 'friends' ? (
-          <div
-            className="flex flex-col w-full"
-            style={{ paddingTop: 'calc(max(env(safe-area-inset-top, 0px), 47px) + 72px)' }}
-          >
-            <div className="flex flex-col items-center px-8 text-center pb-6">
+          friendsMode === 'live_now' && !friendsHasZeroFriends ? (
+            <div
+              className="flex flex-col items-center justify-center min-h-screen px-8 text-center"
+              style={{ paddingTop: 'calc(max(env(safe-area-inset-top, 0px), 47px) + 96px)' }}
+            >
               <div className="w-14 h-14 rounded-full bg-white/5 flex items-center justify-center mb-4">
                 <Users className="w-7 h-7 text-white/30" />
               </div>
               <p className="text-[17px] font-semibold text-white mb-1">
-                No posts from friends yet
+                No friends on course right now
               </p>
               <p className="text-[13px] text-white/50 leading-relaxed">
-                Follow golfers below to start building your feed
+                Switch to All to see all friends' recent posts, or check back later.
               </p>
+              <button
+                onClick={() => setFriendsMode('all')}
+                className="mt-5 text-[13px] font-bold text-white/90"
+                style={{
+                  padding: '8px 16px',
+                  borderRadius: 999,
+                  background: 'rgba(255,255,255,0.08)',
+                  border: '0.5px solid rgba(255,255,255,0.16)',
+                }}
+              >
+                Show all friends ›
+              </button>
             </div>
-            <SuggestedCreatorsShelf
-              userId={user?.id}
-              variant="dark"
-              title="Golfers to follow"
-              showViewAll={true}
-              onViewAll={() => navigate('/golfers')}
-            />
-          </div>
+          ) : (
+            <div
+              className="flex flex-col w-full"
+              style={{ paddingTop: 'calc(max(env(safe-area-inset-top, 0px), 47px) + 72px)' }}
+            >
+              <div className="flex flex-col items-center px-8 text-center pb-6">
+                <div className="w-14 h-14 rounded-full bg-white/5 flex items-center justify-center mb-4">
+                  <Users className="w-7 h-7 text-white/30" />
+                </div>
+                <p className="text-[17px] font-semibold text-white mb-1">
+                  No posts from friends yet
+                </p>
+                <p className="text-[13px] text-white/50 leading-relaxed">
+                  Follow golfers below to start building your feed
+                </p>
+              </div>
+              <SuggestedCreatorsShelf
+                userId={user?.id}
+                variant="dark"
+                title="Golfers to follow"
+                showViewAll={true}
+                onViewAll={() => navigate('/golfers')}
+              />
+            </div>
+          )
         ) : (
           <div
             className="flex flex-col items-center justify-center min-h-screen px-8 text-center"
