@@ -340,7 +340,7 @@ function computeRoundStats(score: any, holes: any[], meta: any) {
     }
     stats.longest_par_or_better_run = parOrBetterBest;
     stats.longest_birdie_run = birdieBest;
-    stats.clean_card = stats.double_bogeys === 0 && stats.triple_plus === 0;
+    stats.clean_card = stats.bogeys === 0 && stats.double_bogeys === 0 && stats.triple_plus === 0;
   }
   return stats;
 }
