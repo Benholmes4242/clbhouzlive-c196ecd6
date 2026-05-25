@@ -18,7 +18,6 @@ import {
 import { useFriendHybridSnapshot } from '@/lib/whs/hooks/useFriendHybridSnapshot';
 import {
   useFriendRivalries,
-  useUpsertRivalOverride,
 } from '@/lib/whs/hooks';
 import { Z } from '@/config/zIndex';
 import type { FriendLeaderboardEntry } from '@/lib/whs/types';
@@ -95,48 +94,8 @@ export const FriendSheet: React.FC<FriendSheetProps> = ({
     return null;
   }, [isWhsOnlyMode, whsOnlyEntry, snapshot, rivalry]);
 
-  const upsert = useUpsertRivalOverride();
 
-  // ─── Handlers ─────────────────────────────────────────────────────
-  const handleViewProfile = () => {
-    onClose();
-    const handle = snapshot?.profile.username ?? targetUserId;
-    if (handle) navigate(`/profile/${handle}`);
-  };
-  const handleMessage = () => handleViewProfile(); // v1 fallback
-  const handleSeeRivalry = () => {
-    if (!targetUserId) return;
-    onClose();
-    navigate(`/handicap/rivalry/${targetUserId}`);
-  };
-  const handleSeeHandicap = () => {
-    if (!targetUserId) return;
-    onClose();
-    navigate(`/handicap/${targetUserId}`);
-  };
-  const handlePinRival = async () => {
-    if (!whsOnlyEntry) return;
-    try {
-      const identity = whsOnlyEntry.friend_user_id
-        ? {
-            rival_user_id: whsOnlyEntry.friend_user_id,
-            rival_friend_row_id: null,
-          }
-        : {
-            rival_user_id: null,
-            rival_friend_row_id: whsOnlyEntry.friend_row_id,
-          };
-      await upsert.mutateAsync({
-        userId: viewerUserId,
-        slotIndex: 4,
-        ...identity,
-      });
-      toast.success('Pinned as rival');
-      onClose();
-    } catch (e: any) {
-      toast.error(e?.message ?? 'Could not pin rival');
-    }
-  };
+
   const handleInvite = async () => {
     const url = `${window.location.origin}/invite?ref=${viewerUserId}`;
     if (typeof navigator !== 'undefined' && navigator.share) {
