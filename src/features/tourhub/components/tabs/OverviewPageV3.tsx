@@ -122,36 +122,33 @@ export function OverviewPageV3() {
           id="content-below-hero"
           className="relative z-10"
         >
-          <div className="bg-background" style={{ display: 'flex', flexDirection: 'column', gap: 40, paddingTop: 40, paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 80px)' }}>
-            <LazySection minHeight={160}>
+          <div className="bg-background" style={{ display: 'flex', flexDirection: 'column', paddingTop: 40, paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 80px)' }}>
+            <LazySection minHeight={160} style={{ marginBottom: 24 }}>
               <HomeConnectHandicapModule />
             </LazySection>
-            <LazySection minHeight={120}>
+            <LazySection minHeight={120} style={{ marginBottom: 32 }}>
               <HomeOnCourseStrip />
             </LazySection>
-            <LazySection minHeight={280}>
-              <HomePGAModule />
+            <LazySection minHeight={350} style={{ marginBottom: 56 }}>
+              <CollegeRivalry />
             </LazySection>
-            <LazySection minHeight={500}>
+            <LazySection minHeight={500} style={{ marginBottom: 56 }}>
               <IntelligenceHero />
             </LazySection>
-            <LazySection minHeight={400}>
+            <LazySection minHeight={400} style={{ marginBottom: 32 }}>
               <ComingUpCalendar />
             </LazySection>
-            <LazySection minHeight={260}>
+            <LazySection minHeight={260} style={{ marginBottom: 32 }}>
               <HomeCourseOfWeekModule />
             </LazySection>
-            <LazySection minHeight={240}>
+            <LazySection minHeight={240} style={{ marginBottom: 24 }}>
               <HomeWatchRail />
             </LazySection>
-            <LazySection minHeight={400}>
+            <LazySection minHeight={400} style={{ marginBottom: 56 }}>
               <WorldRankingsHero />
             </LazySection>
             <LazySection minHeight={400}>
               <StatOfTheWeek />
-            </LazySection>
-            <LazySection minHeight={350}>
-              <CollegeRivalry />
             </LazySection>
           </div>
         </div>
