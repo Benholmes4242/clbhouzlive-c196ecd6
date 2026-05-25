@@ -185,7 +185,7 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
   };
 
   // Standardized header height: 55px content
-  const contentHeight = 55;
+  const contentHeight = 48;
   
   return (
     <>
