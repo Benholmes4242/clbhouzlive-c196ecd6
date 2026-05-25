@@ -57,6 +57,7 @@ function MajorBadge() {
 
 function StatusPill({ state }: { state: HeroState }) {
   if (state.kind === 'live') {
+    const label = `LIVE · R${state.round} · ${state.thruLabel}`;
     return (
       <span
         style={{
@@ -65,12 +66,12 @@ function StatusPill({ state }: { state: HeroState }) {
           gap: 6,
           padding: '4px 10px',
           borderRadius: 999,
-          background: 'rgba(22,163,74,0.18)',
-          border: `0.5px solid ${GREEN_LIVE}`,
-          color: '#86EFAC',
-          fontSize: 9,
+          background: GREEN_LIVE,
+          color: '#FFFFFF',
+          fontSize: 10,
           fontWeight: 800,
-          letterSpacing: '0.16em',
+          letterSpacing: '0.14em',
+          boxShadow: '0 1px 3px rgba(0,0,0,0.35)',
         }}
       >
         <span
@@ -79,11 +80,11 @@ function StatusPill({ state }: { state: HeroState }) {
             width: 6,
             height: 6,
             borderRadius: '50%',
-            background: GREEN_LIVE,
+            background: '#FFFFFF',
             display: 'inline-block',
           }}
         />
-        LIVE
+        {label}
       </span>
     );
   }
@@ -97,28 +98,29 @@ function StatusPill({ state }: { state: HeroState }) {
     }
     if (state.variant === 'declared') {
       return (
-        <Pill bg="rgba(247,147,30,0.18)" border={AMBER} color="#FED7AA">
+        <Pill bg="rgba(247,147,30,0.22)" border={AMBER} color="#FED7AA">
           DECLARED · 54 HOLES
         </Pill>
       );
     }
     if (state.variant === 'awaiting-playoff') {
       return (
-        <Pill bg="rgba(251,188,46,0.18)" border={GOLD} color={GOLD}>
-          🏆 PLAYOFF · IN PROGRESS
+        <Pill bg="rgba(251,188,46,0.22)" border={GOLD} color={GOLD}>
+          PLAYOFF · IN PROGRESS
         </Pill>
       );
     }
     return (
-      <Pill bg="rgba(251,188,46,0.18)" border={GOLD} color={GOLD}>
-        🏆 FINAL
+      <Pill bg="rgba(251,188,46,0.22)" border={GOLD} color={GOLD}>
+        FINAL
       </Pill>
     );
   }
-  // Upcoming
+  // Upcoming — neutral pill with date meta when available
+  const upcomingLabel = state.meta ? `UPCOMING · ${state.meta.toUpperCase()}` : 'UPCOMING';
   return (
-    <Pill bg="rgba(247,147,30,0.18)" border={AMBER} color="#FED7AA">
-      ⏱ UPCOMING
+    <Pill bg="rgba(255,255,255,0.14)" border="rgba(255,255,255,0.45)" color="rgba(255,255,255,0.92)">
+      {upcomingLabel}
     </Pill>
   );
 }
