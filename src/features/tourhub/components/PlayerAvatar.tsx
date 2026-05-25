@@ -5,7 +5,7 @@
 import { useState } from 'react';
 import { cn } from '@/lib/utils';
 import { getPlayerHeadshotUrl } from '@/utils/playerHeadshot';
-import { HandicapAvatarFallback } from '@/components/ui/HandicapAvatarFallback';
+import { PlayerSilhouette } from '@/components/ui/PlayerSilhouette';
 
 interface PlayerAvatarProps {
   playerId: string;
@@ -25,7 +25,6 @@ const SIZE_CLASSES = {
 
 const SIZE_PX = { sm: 24, md: 32, lg: 48, xl: 72, '2xl': 96 };
 
-
 export function PlayerAvatar({ 
   playerId, 
   playerName, 
@@ -37,19 +36,19 @@ export function PlayerAvatar({
   const [imgError, setImgError] = useState(false);
   
   return (
-    <div
+    <div 
       className={cn(
-        "flex items-center justify-center shrink-0 overflow-hidden",
+        "bg-muted flex items-center justify-center shrink-0 overflow-hidden",
         SIZE_CLASSES[size],
         className
       )}
-      style={{ borderRadius: '34%', aspectRatio: '1 / 1.05', background: 'var(--hcp-bg-3)' }}
+      style={{ borderRadius: '34%', aspectRatio: '1 / 1.05' }}
     >
       {imgError ? (
-        <HandicapAvatarFallback name={playerName} size={SIZE_PX[size]} contentsOnly />
+        <PlayerSilhouette size={SIZE_PX[size]} />
       ) : (
-        <img
-          src={headshotUrl}
+        <img 
+          src={headshotUrl} 
           alt={playerName}
           className="w-full h-full object-cover object-top"
           loading="lazy"
@@ -58,7 +57,6 @@ export function PlayerAvatar({
       )}
     </div>
   );
-
 }
 
 /**
@@ -75,19 +73,19 @@ export function BatchPlayerAvatar({
   const [imgError, setImgError] = useState(false);
   
   return (
-    <div
+    <div 
       className={cn(
-        "flex items-center justify-center shrink-0 overflow-hidden",
+        "bg-muted flex items-center justify-center shrink-0 overflow-hidden",
         SIZE_CLASSES[size],
         className
       )}
-      style={{ borderRadius: '34%', aspectRatio: '1 / 1.05', background: 'var(--hcp-bg-3)' }}
+      style={{ borderRadius: '34%', aspectRatio: '1 / 1.05' }}
     >
       {imgError ? (
-        <HandicapAvatarFallback name={playerName} size={SIZE_PX[size]} contentsOnly />
+        <PlayerSilhouette size={SIZE_PX[size]} />
       ) : (
-        <img
-          src={headshotUrl}
+        <img 
+          src={headshotUrl} 
           alt={playerName}
           className="w-full h-full object-cover object-top"
           loading="lazy"
@@ -96,5 +94,4 @@ export function BatchPlayerAvatar({
       )}
     </div>
   );
-
 }
