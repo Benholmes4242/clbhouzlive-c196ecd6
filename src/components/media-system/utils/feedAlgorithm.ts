@@ -618,23 +618,8 @@ export function injectCourseOfWeekCard(feedPosts: FeedPost[], card: FeedPost | n
   return ensureEditorialCard(feedPosts, card, 'course_of_week_card', 6); // position 7
 }
 
-// ── Combined Orbit pipeline — posts + editorial cards scored together ──────
-// @deprecated Editorial cards moved to Home (Phase 2). Use buildSuggestedFeed directly.
-// Kept temporarily — Phase 3 cleanup will remove.
-export function buildSuggestedFeedWithEditorials(
-  rawPosts: FeedPost[],
-  editorialCards: (FeedPost | null)[]
-): FeedPost[] {
-  // Merge editorial cards into the pool — filter nulls and stamp each with
-  // EDITORIAL_BASE_SCORE so the single sort inside buildSuggestedFeed places
-  // them at the right relative position alongside server-scored posts.
-  const validEditorials = editorialCards
-    .filter((c): c is FeedPost => c !== null)
-    .map(c => ({ ...c, engagementScore: EDITORIAL_BASE_SCORE }));
-  const combined = [...rawPosts, ...validEditorials];
-  // Run the full Orbit pipeline on the combined set
-  return buildSuggestedFeed(combined);
-}
+// buildSuggestedFeedWithEditorials removed in Phase 3 — editorial cards now render
+// as standalone Home modules (HomePGAModule, HomeCourseOfWeekModule), not feed slides.
 
 // ── Creator diversity (Watch tab — Session 2 of 3) ────────────────────────────
 // Hard guarantee that no two consecutive posts in a list come from the same
