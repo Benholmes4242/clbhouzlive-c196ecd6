@@ -30,11 +30,12 @@ export const SheetActionFooter: React.FC<Props> = ({ actions, layout }) => (
   </div>
 );
 
-const ActionButton: React.FC<FooterAction> = ({
+const ActionButton: React.FC<FooterAction & { layout: 'horizontal' | 'stacked' }> = ({
   label,
   onClick,
   variant,
   icon: Icon,
+  layout,
 }) => {
   if (variant === 'icon' && Icon) {
     return (
