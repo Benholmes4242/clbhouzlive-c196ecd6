@@ -4,12 +4,28 @@
  * As the user crosses counter_tiers thresholds, the card visually evolves from
  * locked → common → uncommon → rare → epic → legendary. This is distinct from
  * the catalogue's `rarity` field, which sets a static chrome for non-showpieces.
+ *
+ * Two subsets:
+ * 1. Lifetime accumulation (first_birdie, first_eagle, first_albatross,
+ *    hole_in_one) — counter is unbounded; can grow indefinitely.
+ * 2. Bounded-set progress (top_100_*) — counter capped at 100; represents
+ *    distinct courses rated from a specific Top 100 list.
+ *
+ * Both subsets render identically (big counter + caption + escalating chrome).
+ * The 6-tier Top 100 thresholds clamp to the 5-rarity scale: tier 5 and tier 6
+ * both render legendary. Accepted limitation.
  */
 export const SHOWPIECE_BADGE_IDS = new Set<string>([
+  // Lifetime accumulation showpieces (counter is unbounded)
   'first_birdie',
   'first_eagle',
   'first_albatross',
   'hole_in_one',
+  // Bounded-set showpieces (counter capped at 100)
+  'top_100_worldwide',
+  'top_100_usa',
+  'top_100_gbni',
+  'top_100_europe',
 ]);
 
 export function isShowpiece(badgeId: string | undefined): boolean {
