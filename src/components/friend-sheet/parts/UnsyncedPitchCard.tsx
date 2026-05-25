@@ -29,7 +29,7 @@ export const UnsyncedPitchCard: React.FC<Props> = ({
   perks = DEFAULT_PERKS,
 }) => {
   return (
-    <div style={{ padding: '6px 20px 14px', fontFamily: FONT }}>
+    <div style={{ padding: '6px 20px 0', fontFamily: FONT }}>
       <div
         style={{
           padding: '22px 22px 20px',

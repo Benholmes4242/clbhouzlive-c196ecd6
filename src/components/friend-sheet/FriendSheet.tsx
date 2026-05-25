@@ -359,7 +359,9 @@ export const FriendSheet: React.FC<FriendSheetProps> = ({
                   </>
                 )}
 
-                <div style={{ height: 8 }} />
+                {state.kind !== 'whs_only' && state.kind !== 'clbhouz_not_synced' && (
+                  <div style={{ height: 8 }} />
+                )}
               </>
             )}
           </div>
@@ -369,7 +371,10 @@ export const FriendSheet: React.FC<FriendSheetProps> = ({
             <div
               style={{
                 flexShrink: 0,
-                padding: '16px 16px 20px',
+                padding:
+                  state.kind === 'whs_only' || state.kind === 'clbhouz_not_synced'
+                    ? '0 16px 20px'
+                    : '16px 16px 20px',
                 paddingBottom: 'max(20px, env(safe-area-inset-bottom))',
                 background: BG_0,
               }}
