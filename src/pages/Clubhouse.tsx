@@ -33,7 +33,9 @@ import { useClubhouseStore } from '@/store/clubhouseStore';
 
 // ── Data hooks ──
 import { useSuggestedFeed } from '@/components/media-system/hooks/useSuggestedFeed';
-import { useFriendsFeed } from '@/components/media-system/hooks/useFriendsFeed';
+import { useFriendsFeed } from '@/components/friends-tab/hooks/useFriendsFeed';
+import { useFriendsFeedMode } from '@/components/friends-tab/hooks/useFriendsFeedMode';
+import { useNetworkActivity } from '@/hooks/useNetworkActivity';
 import type { FeedPost } from '@/components/media-system/types/media';
 // buildSuggestedFeed/buildFriendsFeed are called inside the feed hooks — not here
 
