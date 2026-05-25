@@ -13,6 +13,22 @@ const EVALUATOR_VERSION = parseInt(Deno.env.get("GAM_EVALUATOR_VERSION") ?? "1",
 const BATCH_SIZE = 50;
 const MAX_ATTEMPTS = 5;
 
+// ─────────────────────────────────────────────────────────────────────────────
+// Top 100 list mapping
+// ─────────────────────────────────────────────────────────────────────────────
+// Catalogue counter_metric → top100_lists.slug. The catalogue uses descriptive
+// identifiers; list slugs come from product data. This map bridges them
+// without contaminating either side with the other's quirks.
+const TOP_100_SLUG_BY_METRIC: Record<string, string> = {
+  top_100_worldwide_distinct: 'global',
+  top_100_usa_distinct:       'usa',
+  top_100_gbni_distinct:      'gb-i',
+  top_100_europe_distinct:    'europe',
+};
+const TOP_100_METRIC_BY_SLUG: Record<string, string> = Object.fromEntries(
+  Object.entries(TOP_100_SLUG_BY_METRIC).map(([metric, slug]) => [slug, metric])
+);
+
 const supabase = createClient(
   Deno.env.get("SUPABASE_URL")!,
   Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
@@ -188,6 +204,7 @@ async function processSingle(whsScoreId: string) {
   let earned: string[] = [];
   if (!alreadyAtVersion) {
     await applyMilestones(userId, stats);
+    await recomputeTop100Milestones(userId);
     earned = await applyBadges(userId, stats, whsScoreId);
     await applyStreaks(userId, stats);
     await applyCourseLegends(stats);
