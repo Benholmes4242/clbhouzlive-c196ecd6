@@ -8,7 +8,27 @@ import type { FriendYesterday, FriendsYesterdayResult } from '@/lib/handicap/use
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { HeroCard, MiniCard } from './friends-yesterday';
 import RoundDetailSheet from '@/components/profile/handicap/whs/sections/round-detail/RoundDetailSheet';
-import type { WhsFriendActivityWithImage } from '@/lib/whs/types';
+import type { WhsFriendActivityWithImage, FriendLeaderboardEntry } from '@/lib/whs/types';
+import { useOpenFriendSheet } from '@/components/friend-sheet/FriendSheetProvider';
+
+const toWhsOnlyEntry = (friend: FriendYesterday): FriendLeaderboardEntry => ({
+  is_self: false,
+  friend_user_id: null,
+  friend_connection_id: friend.friend_connection_id,
+  friend_passport_id: friend.friend_passport_id,
+  friend_row_id: friend.last_round_score_id ?? null,
+  friend_name: friend.name,
+  friend_thumbnail_url: friend.thumbnail_url,
+  friend_profile_photo_url: null,
+  friend_handicap_index: friend.friend_handicap_index,
+  friend_home_club: null,
+  last_round_played_at: friend.played_at,
+  last_round_course_name: friend.course_name,
+  is_clbhouz_user: false,
+  handicap_30d_ago: null,
+  handicap_30d_delta: null,
+  rounds_last_30d: 0,
+});
 
 const T = {
   ink: '#0F172A',
