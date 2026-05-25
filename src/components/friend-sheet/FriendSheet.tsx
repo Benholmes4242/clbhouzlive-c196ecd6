@@ -13,7 +13,6 @@ import { toast } from 'sonner';
 import {
   X,
   MessageCircle,
-  Pin,
   UserPlus,
 } from 'lucide-react';
 import { useFriendHybridSnapshot } from '@/lib/whs/hooks/useFriendHybridSnapshot';
@@ -48,6 +47,7 @@ import {
   deriveSheetStateFromWhsEntry,
   type SheetState,
 } from './parts/_shared/deriveSheetState';
+import { formatFriendName, getFirstName } from './parts/_shared/formatName';
 
 export interface FriendSheetProps {
   viewerUserId: string;
