@@ -369,9 +369,8 @@ export const FriendSheet: React.FC<FriendSheetProps> = ({
             <div
               style={{
                 flexShrink: 0,
-                borderTop: `1px solid ${LINE}`,
-                padding: '12px 16px',
-                paddingBottom: 'max(12px, env(safe-area-inset-bottom))',
+                padding: '16px 16px 20px',
+                paddingBottom: 'max(20px, env(safe-area-inset-bottom))',
                 background: BG_0,
               }}
             >
