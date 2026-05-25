@@ -79,17 +79,13 @@ interface SectionRow {
 }
 
 interface Props {
-  /** Course context. Accepts `selection` (preferred) or legacy `state`. */
-  selection?: CourseSelection;
-  /** @deprecated use `selection` */
-  state?: CourseSelection;
-  /** When omitted, the drill-down header hides its back affordance (tab-mount). */
-  onBack?: () => void;
+  /** Course context. */
+  selection: CourseSelection;
 }
 
-export const CourseLegendsDrilldown: React.FC<Props> = ({ selection, state, onBack }) => {
-  const ctx = selection ?? state;
-  if (!ctx) return null;
+export const CourseLegendsDrilldown: React.FC<Props> = ({ selection }) => {
+  const ctx = selection;
+
 
   const { data, isLoading, isError, refetch } = useCourseLegends(ctx.courseId);
   const { data: meta } = useCourseMeta(ctx.courseId);
