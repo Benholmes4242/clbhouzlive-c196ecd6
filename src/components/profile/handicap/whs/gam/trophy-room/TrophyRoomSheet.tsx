@@ -246,7 +246,7 @@ export const TrophyRoomSheet: React.FC<Props> = ({ userId, viewerUserId }) => {
                   color: active ? 'var(--hcp-t-100)' : 'var(--hcp-t-60)',
                   fontSize: 12,
                   fontWeight: active ? 800 : 600,
-                  letterSpacing: '0.02em',
+                  letterSpacing: '0.04em',
                   cursor: 'pointer',
                   fontFamily: GAM.FONT_GEIST,
                   display: 'inline-flex',
