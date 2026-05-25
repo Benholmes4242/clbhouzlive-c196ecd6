@@ -62,7 +62,7 @@ export function ProfileStatStrip({
         borderBottom: `0.5px solid ${HAIRLINE}`,
         display: 'grid',
         gridTemplateColumns: `repeat(${cells.length}, 1fr)`,
-        justifyItems: variant === 'limited' ? 'center' : 'stretch',
+        justifyItems: 'center',
       }}
     >
       {cells.map((cell) => {
@@ -71,7 +71,7 @@ export function ProfileStatStrip({
           <div
             key={cell.label}
             style={{
-              textAlign: variant === 'limited' ? 'center' : 'left',
+              textAlign: 'center',
             }}
           >
             <div
