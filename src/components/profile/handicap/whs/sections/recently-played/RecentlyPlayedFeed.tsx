@@ -5,7 +5,8 @@ import Paged8 from '../_shared/Paged8';
 import FriendRoundCard from './FriendRoundCard';
 import RoundDetailSheet from '../round-detail/RoundDetailSheet';
 import { DarkSectionHeader } from '../_shared/darkAtoms';
-import type { WhsFriendActivityWithImage } from '@/lib/whs/types';
+import type { WhsFriendActivityWithImage, FriendLeaderboardEntry } from '@/lib/whs/types';
+import { useOpenFriendSheet } from '@/components/friend-sheet/FriendSheetProvider';
 
 interface Props {
   ownerUserId: string;
@@ -13,10 +14,38 @@ interface Props {
 
 const INK_MUTE = 'var(--hcp-t-60)';
 
+const toWhsOnlyEntry = (a: WhsFriendActivityWithImage): FriendLeaderboardEntry => ({
+  is_self: false,
+  friend_user_id: null,
+  friend_connection_id: a.friend_connection_id,
+  friend_passport_id: a.friend_passport_id ?? null,
+  friend_row_id: a.friend_row_id ?? null,
+  friend_name: a.friend_name,
+  friend_thumbnail_url: a.friend_thumbnail_url,
+  friend_profile_photo_url: a.friend_profile_photo_url ?? null,
+  friend_handicap_index: a.friend_handicap_index,
+  friend_home_club: null,
+  last_round_played_at: a.last_round_played_at,
+  last_round_course_name: a.last_round_course_name,
+  is_clbhouz_user: false,
+  handicap_30d_ago: null,
+  handicap_30d_delta: null,
+  rounds_last_30d: 0,
+});
+
 export const RecentlyPlayedFeed: React.FC<Props> = ({ ownerUserId }) => {
   const { data, isLoading } = useFriendsActivity(ownerUserId);
   const [sheetActivity, setSheetActivity] =
     useState<WhsFriendActivityWithImage | null>(null);
+  const { open: openFriendSheet } = useOpenFriendSheet();
+
+  const handleOpen = (item: WhsFriendActivityWithImage) => {
+    if (!item.is_clbhouz_user || !item.friend_user_id) {
+      openFriendSheet({ whsOnlyEntry: toWhsOnlyEntry(item), source: 'cinema_friend_card' });
+      return;
+    }
+    setSheetActivity(item);
+  };
 
   // Each item must satisfy { id: string } for Paged8
   const items = (data ?? []).map((d) => ({
@@ -64,7 +93,7 @@ export const RecentlyPlayedFeed: React.FC<Props> = ({ ownerUserId }) => {
           renderItem={(item) => (
             <FriendRoundCard
               activity={item}
-              onClick={() => setSheetActivity(item)}
+              onClick={() => handleOpen(item)}
               onInviteClick={() => {
                 document
                   .getElementById('invite-to-clbhouz-section')
