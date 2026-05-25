@@ -109,15 +109,20 @@ function useUserProfileMini(userId: string | undefined) {
     enabled: !!userId,
     staleTime: 5 * 60_000,
     queryFn: async () => {
-      const { data } = await (supabase as any)
+      const { data, error } = await supabase
         .from('user_profiles')
-        .select('user_id, full_name, profile_photo_url, handicap_index')
-        .eq('user_id', userId)
+        .select('id, display_name, profile_photo_url, eg_handicap_index')
+        .eq('id', userId!)
         .maybeSingle();
+      if (error) {
+        console.error('[useUserProfileMini] query error', error);
+        return null;
+      }
       return data as {
-        full_name: string | null;
+        id: string;
+        display_name: string | null;
         profile_photo_url: string | null;
-        handicap_index: number | null;
+        eg_handicap_index: number | null;
       } | null;
     },
   });
