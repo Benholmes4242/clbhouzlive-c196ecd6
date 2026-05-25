@@ -45,21 +45,21 @@ function resolvePhoto(m: TeamMemberAvatar): string | null {
 function SingleAvatar({
   src,
   alt,
+  fallbackName,
   size,
   borderColor,
   borderWidth,
   radiusPct,
-  silhouetteSize,
   ringColor,
   ringWidth,
 }: {
   src: string | null;
   alt: string;
+  fallbackName: string;
   size: number;
   borderColor?: string;
   borderWidth?: number;
   radiusPct: number;
-  silhouetteSize: number;
   ringColor?: string;
   ringWidth?: number;
 }) {
@@ -77,7 +77,7 @@ function SingleAvatar({
         height: size,
         borderRadius: `${radiusPct}%`,
         overflow: 'hidden',
-        background: 'rgba(255,255,255,0.10)',
+        background: 'var(--hcp-bg-3)',
         border: borderColor ? `${borderWidth ?? 1.5}px solid ${borderColor}` : undefined,
         ...ringStyle,
       }}
@@ -92,11 +92,12 @@ function SingleAvatar({
           style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'top' }}
         />
       ) : (
-        <PlayerSilhouette size={silhouetteSize} />
+        <HandicapAvatarFallback name={fallbackName} size={size} contentsOnly />
       )}
     </div>
   );
 }
+
 
 export function LeaderEntityAvatar({
   player,
