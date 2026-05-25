@@ -15,6 +15,8 @@ export interface SheetHeaderProps {
     lastSeenRelativeTime: string | null;
   } | null;
   pill: { label: string; tone: 'friends' | 'whs' } | null;
+  /** Tap avatar/name to navigate (clbhouz users only) */
+  onClick?: (() => void) | null;
 }
 
 export const SheetHeader: React.FC<SheetHeaderProps> = ({
@@ -24,8 +26,11 @@ export const SheetHeader: React.FC<SheetHeaderProps> = ({
   bio,
   whsContext,
   pill,
-}) => (
-  <div style={{ padding: '12px 20px 14px', fontFamily: FONT }}>
+  onClick,
+}) => {
+  const isTappable = !!onClick;
+
+  const headerContent = (
     <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
       <div
         style={{
@@ -98,20 +103,53 @@ export const SheetHeader: React.FC<SheetHeaderProps> = ({
         )}
       </div>
     </div>
-    {bio && (
-      <p
-        style={{
-          margin: '10px 0 0',
-          fontSize: 14,
-          color: T100,
-          lineHeight: 1.45,
-        }}
-      >
-        {bio}
-      </p>
-    )}
-  </div>
-);
+  );
+
+  return (
+    <div style={{ padding: '12px 20px 14px', fontFamily: FONT }}>
+      {isTappable ? (
+        <button
+          type="button"
+          onClick={onClick}
+          aria-label={`View ${name}'s handicap`}
+          style={{
+            all: 'unset',
+            display: 'block',
+            width: '100%',
+            textAlign: 'left',
+            cursor: 'pointer',
+            transition: 'opacity 120ms ease',
+          }}
+          onPointerDown={(e) => {
+            (e.currentTarget as HTMLElement).style.opacity = '0.7';
+          }}
+          onPointerUp={(e) => {
+            (e.currentTarget as HTMLElement).style.opacity = '1';
+          }}
+          onPointerLeave={(e) => {
+            (e.currentTarget as HTMLElement).style.opacity = '1';
+          }}
+        >
+          {headerContent}
+        </button>
+      ) : (
+        headerContent
+      )}
+      {bio && (
+        <p
+          style={{
+            margin: '10px 0 0',
+            fontSize: 14,
+            color: T100,
+            lineHeight: 1.45,
+          }}
+        >
+          {bio}
+        </p>
+      )}
+    </div>
+  );
+};
 
 const Pill: React.FC<{ label: string; tone: 'friends' | 'whs' }> = ({
   label,

@@ -201,6 +201,11 @@ export const FriendSheet: React.FC<FriendSheetProps> = ({
 
   const titleName = headerProps?.name ?? 'Golfer';
 
+  const isClbhouzUser =
+    state?.kind === 'clbhouz_synced_full' ||
+    state?.kind === 'clbhouz_synced_duelsOnly' ||
+    state?.kind === 'clbhouz_synced_empty';
+
   return (
     <DrawerPrimitive.Root
       open={open}
@@ -306,7 +311,10 @@ export const FriendSheet: React.FC<FriendSheetProps> = ({
 
             {headerProps && state && (
               <>
-                <SheetHeader {...headerProps} />
+                <SheetHeader
+                  {...headerProps}
+                  onClick={isClbhouzUser ? handleSeeHandicap : null}
+                />
 
                 {/* HEAD-TO-HEAD — hidden only for clbhouz_not_synced */}
                 <HeadToHeadCard state={state} />
@@ -426,6 +434,11 @@ function buildFooter(
             variant: 'secondary',
             label: 'View profile',
             onClick: h.handleViewProfile,
+          },
+          {
+            variant: 'secondary',
+            label: 'Handicap',
+            onClick: h.handleSeeHandicap,
           },
           {
             variant: 'primary',
