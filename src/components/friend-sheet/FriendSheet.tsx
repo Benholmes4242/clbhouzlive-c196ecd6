@@ -428,6 +428,11 @@ function buildFooter(
             onClick: h.handleViewProfile,
           },
           {
+            variant: 'secondary',
+            label: 'Handicap',
+            onClick: h.handleSeeHandicap,
+          },
+          {
             variant: 'primary',
             label: 'See rivalry',
             onClick: h.handleSeeRivalry,
