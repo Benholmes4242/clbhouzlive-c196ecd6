@@ -201,6 +201,11 @@ export const FriendSheet: React.FC<FriendSheetProps> = ({
 
   const titleName = headerProps?.name ?? 'Golfer';
 
+  const isClbhouzUser =
+    state?.kind === 'clbhouz_synced_full' ||
+    state?.kind === 'clbhouz_synced_duelsOnly' ||
+    state?.kind === 'clbhouz_synced_empty';
+
   return (
     <DrawerPrimitive.Root
       open={open}
