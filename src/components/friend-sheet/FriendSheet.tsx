@@ -180,7 +180,7 @@ export const FriendSheet: React.FC<FriendSheetProps> = ({
     };
   })();
 
-  const titleName = headerProps?.name ?? 'Golfer';
+  const titleName = formatFriendName(headerProps?.name ?? 'Golfer');
 
   const isClbhouzUser =
     state?.kind === 'clbhouz_synced_full' ||
@@ -341,6 +341,7 @@ export const FriendSheet: React.FC<FriendSheetProps> = ({
                 {state.kind === 'whs_only' && (
                   <>
                     <RecentRoundsStub
+                      firstName={friendFirstName}
                       lastRound={
                         state.entry.last_round_played_at &&
                         state.entry.last_round_course_name
@@ -353,7 +354,7 @@ export const FriendSheet: React.FC<FriendSheetProps> = ({
                           : null
                       }
                     />
-                    <StandoutRoundsStub />
+                    <StandoutRoundsStub firstName={friendFirstName} />
                   </>
                 )}
 
