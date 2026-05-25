@@ -1,0 +1,155 @@
+/**
+ * HandicapChip — dark-header entry point for the user's handicap.
+ *
+ * Four states (per handicap-chip-final_3.jsx, Option C):
+ *   improving    — index number + green TrendingDown (90D delta ≤ -0.3)
+ *   drifting     — index number + crimson TrendingUp  (90D delta ≥ +0.3)
+ *   steady       — index number alone (|delta| < 0.3 or insufficient history)
+ *   disconnected — amber "Connect HCP" label
+ *
+ * Logged-out users render nothing. While the WHS connection resolves we
+ * render a fixed-width skeleton pill to prevent layout shift.
+ */
+import { useLocation, useNavigate } from 'react-router-dom';
+import { TrendingDown, TrendingUp } from 'lucide-react';
+import { useSupabaseSession } from '@/hooks/useSupabaseSession';
+import { useWhsConnection } from '@/lib/whs/hooks';
+import { useHandicapTrend90d, type HandicapTrend90dDirection } from '@/hooks/useHandicapTrend90d';
+import { analyticsEvents } from '@/utils/analyticsEvents';
+
+const WHITE = '#FFFFFF';
+const WHITE_HAIRLINE = 'rgba(255,255,255,0.10)';
+const AMBER = '#F7931E';
+const SEASON_GREEN = '#10B981';
+const CRIMSON = '#EF4444';
+
+const BASE_STYLE = {
+  display: 'inline-flex',
+  alignItems: 'center',
+  padding: '6px 11px',
+  borderRadius: 10,
+  background: 'transparent',
+  border: `1px solid ${WHITE_HAIRLINE}`,
+  cursor: 'pointer',
+  fontFamily: 'Geist, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+  height: 28,
+} as const;
+
+function resolveSource(pathname: string): string {
+  if (pathname === '/') return 'home_header';
+  if (pathname === '/tourhub' || pathname === '/tour') return 'tourhub_header';
+  if (pathname.startsWith('/tourhub/')) return 'tourhub_header';
+  return 'global_header';
+}
+
+export function HandicapChip() {
+  const { user } = useSupabaseSession();
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  const { data: connection, isLoading: whsLoading } = useWhsConnection(user?.id);
+  const trend = useHandicapTrend90d(connection?.id);
+
+  if (!user) return null;
+
+  // Skeleton — reserves space to prevent layout shift on initial load.
+  if (whsLoading) {
+    return (
+      <div
+        aria-hidden
+        style={{
+          ...BASE_STYLE,
+          width: 60,
+          cursor: 'default',
+        }}
+      />
+    );
+  }
+
+  const handleTap = (state: HandicapTrend90dDirection | 'disconnected') => {
+    analyticsEvents.track('header_handicap_chip_tapped', {
+      source: resolveSource(location.pathname),
+      state,
+    });
+    navigate('/handicap');
+  };
+
+  // Disconnected — no WHS connection.
+  if (!connection) {
+    return (
+      <button
+        type="button"
+        onClick={() => handleTap('disconnected')}
+        aria-label="Connect handicap"
+        style={BASE_STYLE}
+        className="active:scale-[0.97] transition-transform"
+      >
+        <span
+          style={{
+            fontSize: 11,
+            fontWeight: 700,
+            color: AMBER,
+            letterSpacing: '0.04em',
+          }}
+        >
+          Connect HCP
+        </span>
+      </button>
+    );
+  }
+
+  const indexValue = connection.current_index;
+  if (indexValue === null || indexValue === undefined) {
+    // Connection exists but no current index — fall back to Connect HCP.
+    return (
+      <button
+        type="button"
+        onClick={() => handleTap('disconnected')}
+        aria-label="Connect handicap"
+        style={BASE_STYLE}
+        className="active:scale-[0.97] transition-transform"
+      >
+        <span style={{ fontSize: 11, fontWeight: 700, color: AMBER, letterSpacing: '0.04em' }}>
+          Connect HCP
+        </span>
+      </button>
+    );
+  }
+
+  const { direction } = trend;
+  const showArrow = direction === 'improving' || direction === 'drifting';
+  const arrowColor = direction === 'improving' ? SEASON_GREEN : CRIMSON;
+  const ArrowIcon = direction === 'improving' ? TrendingDown : TrendingUp;
+
+  const formattedIndex =
+    typeof indexValue === 'number'
+      ? indexValue.toFixed(1)
+      : Number(indexValue).toFixed(1);
+
+  return (
+    <button
+      type="button"
+      onClick={() => handleTap(direction)}
+      aria-label={`Handicap ${formattedIndex}${
+        direction === 'improving' ? ', improving' : direction === 'drifting' ? ', drifting' : ''
+      }`}
+      style={{ ...BASE_STYLE, gap: showArrow ? 6 : 0 }}
+      className="active:scale-[0.97] transition-transform"
+    >
+      <span
+        style={{
+          fontSize: 13,
+          fontWeight: 700,
+          color: WHITE,
+          fontVariantNumeric: 'tabular-nums',
+          letterSpacing: '-0.01em',
+        }}
+      >
+        {formattedIndex}
+      </span>
+      {showArrow && <ArrowIcon size={11} color={arrowColor} strokeWidth={2.4} />}
+    </button>
+  );
+}
+
+export default HandicapChip;
