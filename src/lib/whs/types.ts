@@ -372,6 +372,8 @@ export interface FriendFeaturedRoundHydrated extends FriendFeaturedRound {
   friend_user_id: string | null;
   friend_connection_id: string | null;
   is_clbhouz_user: boolean;
+  friend_passport_id: number | null;
+  friend_home_club: string | null;
   play_date: string;
   course_id: string | null;
   course_name: string | null;
