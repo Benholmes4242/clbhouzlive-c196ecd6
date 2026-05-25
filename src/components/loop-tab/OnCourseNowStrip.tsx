@@ -16,11 +16,13 @@ export function OnCourseNowStrip({ userId, hideHeader = false }: OnCourseNowStri
   // ── Loading skeleton ──
   if (isLoading) {
     return (
-      <div style={{ padding: '12px 16px' }}>
-        <div className="flex items-center gap-2" style={{ marginBottom: 10 }}>
-          <div className="h-4 w-28 bg-muted animate-pulse rounded" />
-          <div className="h-5 w-16 bg-muted animate-pulse rounded-full" />
-        </div>
+      <div style={{ padding: hideHeader ? '0 16px' : '12px 16px' }}>
+        {!hideHeader && (
+          <div className="flex items-center gap-2" style={{ marginBottom: 10 }}>
+            <div className="h-4 w-28 bg-muted animate-pulse rounded" />
+            <div className="h-5 w-16 bg-muted animate-pulse rounded-full" />
+          </div>
+        )}
         <div
           className="flex gap-2 overflow-hidden"
           style={{ scrollbarWidth: 'none' }}
