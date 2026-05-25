@@ -19,6 +19,7 @@ export type TrophyItem =
       description: string;
       iconKey: string;
       rarity: BadgeRarity;
+      category: BadgeCategory;
       earned: boolean;
       earnedAt: string | null;
       currentValue: number | null;
@@ -105,6 +106,7 @@ export function normalizeBadge(b: UserBadge): TrophyItem {
     description: b.description,
     iconKey: b.icon_name,
     rarity: b.rarity,
+    category: b.category,
     earned,
     earnedAt: b.earned_at,
     currentValue: b.counter_value,
