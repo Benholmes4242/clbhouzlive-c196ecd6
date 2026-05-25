@@ -34,10 +34,7 @@ import { useClubhouseStore } from '@/store/clubhouseStore';
 // ── Data hooks ──
 import { useSuggestedFeed } from '@/components/media-system/hooks/useSuggestedFeed';
 import { useFriendsFeed } from '@/components/media-system/hooks/useFriendsFeed';
-import { usePGACard } from '@/components/media-system/hooks/usePGACard';
-import { useEditorialCards } from '@/components/media-system/hooks/useEditorialCards';
-import { buildSuggestedFeedWithEditorials } from '@/components/media-system/utils/feedAlgorithm';
-import type { FeedPost, PGACardFeedPost, CourseOfWeekCardFeedPost } from '@/components/media-system/types/media';
+import type { FeedPost } from '@/components/media-system/types/media';
 // buildSuggestedFeed/buildFriendsFeed are called inside the feed hooks — not here
 
 // ── Clubhouse UI overlays ──
