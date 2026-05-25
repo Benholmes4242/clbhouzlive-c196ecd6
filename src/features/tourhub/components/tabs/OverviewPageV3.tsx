@@ -123,33 +123,31 @@ export function OverviewPageV3() {
           className="relative z-10"
         >
           <div className="bg-background" style={{ display: 'flex', flexDirection: 'column', paddingTop: 40, paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 80px)' }}>
-            <LazySection minHeight={160} style={{ marginBottom: 24 }}>
-              <HomeConnectHandicapModule />
-            </LazySection>
-            <LazySection minHeight={120} style={{ marginBottom: 32 }}>
-              <HomeOnCourseStrip />
-            </LazySection>
-            <LazySection minHeight={350} style={{ marginBottom: 56 }}>
-              <CollegeRivalry />
-            </LazySection>
-            <LazySection minHeight={500} style={{ marginBottom: 56 }}>
-              <IntelligenceHero />
-            </LazySection>
-            <LazySection minHeight={400} style={{ marginBottom: 32 }}>
-              <ComingUpCalendar />
-            </LazySection>
-            <LazySection minHeight={260} style={{ marginBottom: 32 }}>
-              <HomeCourseOfWeekModule />
-            </LazySection>
-            <LazySection minHeight={240} style={{ marginBottom: 24 }}>
-              <HomeWatchRail />
-            </LazySection>
-            <LazySection minHeight={400} style={{ marginBottom: 56 }}>
-              <WorldRankingsHero />
-            </LazySection>
-            <LazySection minHeight={400}>
-              <StatOfTheWeek />
-            </LazySection>
+            <div style={{ marginBottom: 24 }}>
+              <LazySection minHeight={160}><HomeConnectHandicapModule /></LazySection>
+            </div>
+            <div style={{ marginBottom: 32 }}>
+              <LazySection minHeight={120}><HomeOnCourseStrip /></LazySection>
+            </div>
+            <div style={{ marginBottom: 56 }}>
+              <LazySection minHeight={350}><CollegeRivalry /></LazySection>
+            </div>
+            <div style={{ marginBottom: 56 }}>
+              <LazySection minHeight={500}><IntelligenceHero /></LazySection>
+            </div>
+            <div style={{ marginBottom: 32 }}>
+              <LazySection minHeight={400}><ComingUpCalendar /></LazySection>
+            </div>
+            <div style={{ marginBottom: 32 }}>
+              <LazySection minHeight={260}><HomeCourseOfWeekModule /></LazySection>
+            </div>
+            <div style={{ marginBottom: 24 }}>
+              <LazySection minHeight={240}><HomeWatchRail /></LazySection>
+            </div>
+            <div style={{ marginBottom: 56 }}>
+              <LazySection minHeight={400}><WorldRankingsHero /></LazySection>
+            </div>
+            <LazySection minHeight={400}><StatOfTheWeek /></LazySection>
           </div>
         </div>
         <ScrollToTopGlass />
