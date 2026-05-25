@@ -370,3 +370,6 @@ export function LeaderboardBand({
           </button>
         </div>
       )}
+    </div>
+  );
+}
