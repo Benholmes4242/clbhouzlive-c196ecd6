@@ -3,6 +3,7 @@ import { useFriendFeaturedRound } from '@/lib/whs/hooks';
 import { fmtHcp, fmtDiff } from '@/lib/whs/format';
 import { reformatFriendName } from '@/lib/whs/utils/nameFormat';
 import { useOpenFriendSheet } from '@/components/friend-sheet/FriendSheetProvider';
+import type { FriendLeaderboardEntry } from '@/lib/whs/types';
 import SectionHeader from '../SectionHeader';
 import BuildYourCircleCTA from './BuildYourCircleCTA';
 
@@ -78,11 +79,31 @@ export const FeaturedFriendRoundHero: React.FC<Props> = ({ userId }) => {
             type="button"
             onClick={(e) => {
               e.stopPropagation();
-              if (data.friend_user_id) {
+              if (data.friend_user_id && data.is_clbhouz_user) {
                 openHybridSheet({ targetUserId: data.friend_user_id, source: 'featured_friend_round' });
+                return;
               }
+              // Non-synced (WHS-only) friend → open unsynced pitch sheet.
+              const whsEntry: FriendLeaderboardEntry = {
+                is_self: false,
+                friend_user_id: null,
+                friend_connection_id: data.friend_connection_id,
+                friend_passport_id: data.friend_passport_id,
+                friend_row_id: null,
+                friend_name: data.friend_name,
+                friend_thumbnail_url: data.friend_thumbnail_url,
+                friend_profile_photo_url: null,
+                friend_handicap_index: data.friend_handicap_index,
+                friend_home_club: data.friend_home_club,
+                last_round_played_at: data.play_date,
+                last_round_course_name: data.course_name,
+                is_clbhouz_user: false,
+                handicap_30d_ago: null,
+                handicap_30d_delta: null,
+                rounds_last_30d: 0,
+              };
+              openHybridSheet({ whsOnlyEntry: whsEntry, source: 'featured_friend_round' });
             }}
-            disabled={!data.friend_user_id}
             aria-label={`Open ${friendDisplay}'s snapshot`}
             style={{
               position: 'absolute',
@@ -94,7 +115,7 @@ export const FeaturedFriendRoundHero: React.FC<Props> = ({ userId }) => {
               background: 'transparent',
               border: 'none',
               padding: 0,
-              cursor: data.friend_user_id ? 'pointer' : 'default',
+              cursor: 'pointer',
               color: '#fff',
               textAlign: 'left',
             }}

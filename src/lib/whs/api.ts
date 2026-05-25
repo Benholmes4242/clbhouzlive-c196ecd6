@@ -861,7 +861,7 @@ export async function fetchFriendFeaturedRound(
   const { data: friendMatch } = await supabase
     .from('whs_friend_matches' as any)
     .select(
-      'friend_name, friend_thumbnail_url, friend_handicap_index, friend_user_id, friend_connection_id, is_clbhouz_user',
+      'friend_name, friend_thumbnail_url, friend_handicap_index, friend_user_id, friend_connection_id, is_clbhouz_user, friend_passport_id, friend_home_club',
     )
     .eq('owner_user_id', userId)
     .eq('friend_connection_id', (score as any).connection_id)
@@ -888,6 +888,11 @@ export async function fetchFriendFeaturedRound(
     friend_user_id: (friendMatch as any).friend_user_id,
     friend_connection_id: (friendMatch as any).friend_connection_id,
     is_clbhouz_user: !!(friendMatch as any).is_clbhouz_user,
+    friend_passport_id:
+      (friendMatch as any).friend_passport_id != null
+        ? Number((friendMatch as any).friend_passport_id)
+        : null,
+    friend_home_club: (friendMatch as any).friend_home_club ?? null,
     play_date: (score as any).play_date,
     course_id: (score as any).course_id,
     course_name: courseName,
