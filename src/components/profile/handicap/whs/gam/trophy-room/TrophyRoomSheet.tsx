@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState, useCallback } from 'react';
-import { Crown, type LucideIcon } from 'lucide-react';
+import { Crown, ChevronDown, type LucideIcon } from 'lucide-react';
 import { GamSheet } from '../../../gam/_shared/GamSheet';
 import { GAM } from '../tokens';
 import { gamAchievementsBus } from '../events';
@@ -8,6 +8,44 @@ import { useUserTopLegends } from '@/hooks/gam/useUserTopLegends';
 import { TrophyCard } from './TrophyCard';
 import { TrophyDetailSheet } from './TrophyDetailSheet';
 import { normalizeBadge, normalizeLegend, type TrophyItem } from './_shared/normalizeTrophyItem';
+import type { BadgeCategory } from '@/lib/gam/types';
+
+const CATEGORY_ORDER: BadgeCategory[] = [
+  'scoring',
+  'handicap',
+  'consistency',
+  'courses',
+  'community',
+  'seasonal',
+];
+
+const CATEGORY_LABEL: Record<BadgeCategory, string> = {
+  scoring: 'Scoring',
+  handicap: 'Handicap',
+  consistency: 'Consistency',
+  courses: 'Courses',
+  community: 'Community',
+  seasonal: 'Seasonal',
+};
+
+function groupAchievementsByCategory(
+  items: Extract<TrophyItem, { kind: 'achievement' }>[],
+): Record<BadgeCategory, Extract<TrophyItem, { kind: 'achievement' }>[]> {
+  const groups: Record<BadgeCategory, Extract<TrophyItem, { kind: 'achievement' }>[]> = {
+    scoring: [],
+    handicap: [],
+    consistency: [],
+    courses: [],
+    community: [],
+    seasonal: [],
+  };
+  for (const item of items) {
+    if (groups[item.category]) {
+      groups[item.category].push(item);
+    }
+  }
+  return groups;
+}
 
 interface Props {
   userId: string;
@@ -77,6 +115,61 @@ const Grid: React.FC<{ items: TrophyItem[]; onTap: (item: TrophyItem) => void }>
     ))}
   </div>
 );
+
+const CourseLegendsCollapsibleSection: React.FC<{
+  items: TrophyItem[];
+  onTap: (item: TrophyItem) => void;
+}> = ({ items, onTap }) => {
+  const [expanded, setExpanded] = useState(false);
+  return (
+    <>
+      <button
+        type="button"
+        onClick={() => setExpanded((v) => !v)}
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: 6,
+          marginTop: 20,
+          marginBottom: 10,
+          padding: 0,
+          background: 'transparent',
+          border: 'none',
+          width: '100%',
+          textAlign: 'left',
+          cursor: 'pointer',
+          color: 'var(--hcp-t-80)',
+          fontFamily: GAM.FONT_GEIST,
+        }}
+        aria-expanded={expanded}
+        aria-controls="trophy-course-legends-grid"
+      >
+        <Crown size={12} color={GAM.GOLD} strokeWidth={2.4} />
+        <span style={{ fontSize: 10, fontWeight: 800, letterSpacing: '0.18em', textTransform: 'uppercase' }}>
+          Course legends
+        </span>
+        <span style={{ color: 'var(--hcp-t-60)', ...GAM.TABULAR, fontWeight: 700, fontSize: 10, letterSpacing: '0.18em' }}>
+          ({items.length})
+        </span>
+        <ChevronDown
+          size={14}
+          color="var(--hcp-t-60)"
+          strokeWidth={2.4}
+          style={{
+            marginLeft: 'auto',
+            transform: expanded ? 'rotate(180deg)' : 'rotate(0deg)',
+            transition: 'transform 180ms ease',
+          }}
+        />
+      </button>
+      {expanded && (
+        <div id="trophy-course-legends-grid">
+          <Grid items={items} onTap={onTap} />
+        </div>
+      )}
+    </>
+  );
+};
 
 export const TrophyRoomSheet: React.FC<Props> = ({ userId, viewerUserId }) => {
   const [open, setOpen] = useState(false);
