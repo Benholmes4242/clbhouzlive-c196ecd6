@@ -1,6 +1,14 @@
 /**
- * ProfileHubSheet — Account hub bottom sheet for mobile.
- * Full rebuild. Semantic tokens only. framer-motion animations.
+ * ProfileHubSheet — sports-data redesign.
+ *
+ * Sections, top → bottom:
+ *   1. Identity strip (avatar, name, @handle · {hcp} HCP, Switch ⌄)
+ *   2. Handicap masthead (no card chrome, 6-state)
+ *   3. Stat strip (4-col full / 2-col limited)
+ *   4. Quick action icon row (Echo / Messages / Alerts)
+ *   5. Account section (Profile & businesses / Settings)
+ *   6. Admin / Command Center
+ *   7. Sign out (muted text → confirm reveal)
  */
 
 import React, { memo, useState, useEffect, useCallback } from 'react';
@@ -9,25 +17,33 @@ import { createPortal } from 'react-dom';
 import { motion, AnimatePresence, useMotionValue, animate } from 'framer-motion';
 import type { PanInfo } from 'framer-motion';
 import {
-  ChevronRight, LogOut,
-  Shield, Plus, Check,
-  User, MessageCircle, Bell,
-  Pencil, Building2, Settings as SettingsIcon,
+  ChevronRight, ChevronDown, LogOut, Shield,
+  MessageCircle, Bell, Settings as SettingsIcon, UserCog,
 } from 'lucide-react';
-import { cn } from '@/lib/utils';
 import { useUnreadNotifications } from '@/hooks/useUnreadNotifications';
-import GlobalSearchOverlay from '@/components/search/GlobalSearchOverlay';
 import { useMessagingContext } from '@/contexts/MessagingContext';
 import { useNavigate } from 'react-router-dom';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { useLogout } from '@/hooks/useLogout';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useEditProfileRoute } from '@/hooks/useEditProfileRoute';
-import HandicapTile from '@/components/handicap/HandicapTile';
+import { useUserProfile } from '@/hooks/useUserProfile';
+import { useWhsConnection, useHandicapTrend } from '@/lib/whs/hooks';
+import HandicapMasthead from '@/components/profile/HandicapMasthead';
+import ProfileStatStrip from '@/components/profile/ProfileStatStrip';
+import { ProfileSwitcherPopover } from '@/components/profile/ProfileSwitcherPopover';
+import { useProfileSheetStats } from '@/hooks/useProfileSheetStats';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 
-// ── Types ──
+// ── Tokens ──
+const INK = '#0F172A';
+const INK_SOFT = '#475569';
+const INK_FAINT = '#94A3B8';
+const HAIRLINE = 'rgba(15,23,42,0.08)';
+const HAIRLINE_SOFT = 'rgba(15,23,42,0.06)';
+const AMBER = '#F7931E';
 
+// ── Types ──
 interface Profile {
   id: string;
   type: 'personal' | 'business';
@@ -55,75 +71,73 @@ interface ProfileHubSheetProps {
   isLoading?: boolean;
 }
 
-// ── Section Marker (canonical caps eyebrow) ──
-function RuleMarker({ label }: { label: string }) {
-  return (
-    <div style={{ paddingTop: 14, paddingBottom: 8 }}>
-      <span style={{ fontSize: 9, fontWeight: 800, color: '#64748B', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>
-        {label}
-      </span>
-    </div>
-  );
-}
-
 // ── Skeleton ──
-
 function ProfileHubSheetSkeleton() {
   return (
     <div className="px-4">
-      {/* ── Profile row skeleton ── */}
+      {/* Identity strip skeleton */}
       <div className="flex items-center gap-3 pt-2 pb-3">
-        <Skeleton className="w-[52px] h-[52px] rounded-[34%]" />
+        <Skeleton className="w-[40px] h-[40px] rounded-[34%]" />
         <div className="flex-1 min-w-0 space-y-2">
           <Skeleton className="h-4 w-28 rounded-lg" />
-          <Skeleton className="h-3 w-20 rounded-lg" />
+          <Skeleton className="h-3 w-32 rounded-lg" />
         </div>
-        <Skeleton className="w-9 h-9 rounded-full flex-shrink-0" />
+        <Skeleton className="h-7 w-16 rounded-md flex-shrink-0" />
       </div>
-      {/* Echo card skeleton */}
-      <Skeleton className="h-[48px] w-full rounded-[12px] mb-3" />
+      <div style={{ height: '0.5px', background: HAIRLINE, margin: '0 -16px' }} />
 
-      {/* ── Switch Profile skeleton ── */}
-      <div>
-        <div style={{ paddingTop: 14, paddingBottom: 8 }}>
-          <Skeleton className="h-2.5 w-24 rounded" />
+      {/* Masthead skeleton */}
+      <div className="pt-5 pb-5">
+        <Skeleton className="h-3 w-40 rounded mb-3" />
+        <div className="grid grid-cols-3 gap-4 items-end">
+          <Skeleton className="h-12 w-12 rounded" />
+          <Skeleton className="h-7 w-16 rounded" />
+          <Skeleton className="h-7 w-20 rounded" />
         </div>
-        <div className="flex gap-3 overflow-hidden">
-          {[0, 1, 2].map(i => (
-            <div key={i} className="flex flex-col items-center gap-1.5 shrink-0 min-w-[72px]">
-              <Skeleton className="w-[48px] h-[48px] rounded-[34%]" />
-              <Skeleton className="h-3 w-14 rounded-lg" />
-              <Skeleton className="h-2.5 w-10 rounded-lg" />
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* Divider */}
-      <div style={{ height: '0.5px', background: 'rgba(15,23,42,0.07)', margin: '0 -16px' }} />
-
-      {/* ── Quick action tiles skeleton — full-width Handicap + 3-tile row ── */}
-      <div className="py-4 flex flex-col gap-3">
-        <div style={{ height: 110, borderRadius: 14, background: 'rgba(15,23,42,0.04)' }} />
-        <div className="grid grid-cols-3 gap-3">
-          {[0, 1, 2].map(i => (
-            <div key={i} style={{ height: 110, borderRadius: 14, background: 'rgba(15,23,42,0.04)' }} />
-          ))}
-        </div>
-      </div>
-
-      {/* Divider */}
-      <div style={{ height: '0.5px', background: 'rgba(15,23,42,0.07)', margin: '0 -16px' }} />
-
-      {/* ── Account rows skeleton ── */}
-      <div className="py-3 space-y-1">
-        <div style={{ paddingTop: 14, paddingBottom: 8 }}>
+        <div className="grid grid-cols-3 gap-4 mt-2">
+          <Skeleton className="h-2.5 w-12 rounded" />
+          <Skeleton className="h-2.5 w-14 rounded" />
           <Skeleton className="h-2.5 w-16 rounded" />
         </div>
-        {[0, 1, 2].map(i => (
-          <div key={i} className="flex items-center gap-3 min-h-[48px] px-2">
-            <Skeleton className="w-[34px] h-[34px] rounded-[10px]" />
-            <Skeleton className="h-4 w-32 rounded-lg" />
+        <div className="mt-4" style={{ height: 2, background: HAIRLINE_SOFT }} />
+      </div>
+
+      {/* Stat strip skeleton */}
+      <div
+        style={{
+          marginLeft: -16, marginRight: -16, padding: '14px 16px',
+          borderTop: `0.5px solid ${HAIRLINE}`,
+          borderBottom: `0.5px solid ${HAIRLINE}`,
+          display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)',
+        }}
+      >
+        {[0, 1, 2, 3].map((i) => (
+          <div key={i}>
+            <Skeleton className="h-4 w-8 rounded mb-2" />
+            <Skeleton className="h-2.5 w-12 rounded" />
+          </div>
+        ))}
+      </div>
+
+      {/* Quick action row skeleton */}
+      <div className="flex justify-around py-5">
+        {[0, 1, 2].map((i) => (
+          <div key={i} className="flex flex-col items-center gap-2">
+            <Skeleton className="w-10 h-10 rounded-xl" />
+            <Skeleton className="h-2.5 w-10 rounded" />
+          </div>
+        ))}
+      </div>
+
+      {/* Account rows skeleton */}
+      <div className="py-3 space-y-3">
+        {[0, 1].map((i) => (
+          <div key={i} className="flex items-center gap-3 py-3">
+            <Skeleton className="w-4 h-4 rounded" />
+            <div className="flex-1 space-y-1.5">
+              <Skeleton className="h-3.5 w-32 rounded" />
+              <Skeleton className="h-2.5 w-44 rounded" />
+            </div>
           </div>
         ))}
       </div>
@@ -131,87 +145,93 @@ function ProfileHubSheetSkeleton() {
   );
 }
 
-// ── 2×2 grid generic tile (Messages / Notifications) ──
-function GridTile({
-  Icon, iconColor, iconBg, label, sub, badge, onClick,
+// ── Quick action icon tile ──
+function QuickActionTile({
+  label, badge, onClick, children, ariaLabel,
 }: {
-  Icon: React.ComponentType<any>;
-  iconColor: string;
-  iconBg: string;
   label: string;
-  sub: string;
   badge: number;
   onClick: () => void;
+  ariaLabel: string;
+  children: React.ReactNode;
 }) {
   return (
     <button
       type="button"
       onClick={onClick}
-      className="relative flex flex-col justify-between text-left active:scale-[0.97] transition-transform"
-      style={{
-        minHeight: 110,
-        padding: '14px 14px 16px',
-        borderRadius: 14,
-        background: '#ffffff',
-        border: '0.5px solid rgba(15,23,42,0.10)',
-        cursor: 'pointer',
-      }}
-      aria-label={label}
+      className="flex flex-col items-center gap-1.5 active:scale-[0.94] transition-transform"
+      style={{ background: 'transparent', border: 'none', cursor: 'pointer', padding: 0, flex: 1 }}
+      aria-label={ariaLabel}
     >
-      <div className="flex items-center justify-between w-full">
-        <div
-          className="flex items-center justify-center"
-          style={{ width: 36, height: 36, borderRadius: 10, background: iconBg }}
-        >
-          <Icon size={20} color={iconColor} strokeWidth={2.2} />
-        </div>
+      <div style={{ position: 'relative', width: 40, height: 40 }}>
+        {children}
         {badge > 0 && (
           <span
-            className="flex items-center justify-center rounded-full"
             style={{
-              padding: '2px 8px',
-              minWidth: 18,
-              background: '#EF4444',
-              color: '#fff',
-              fontSize: 10,
+              position: 'absolute',
+              top: -3,
+              right: -3,
+              minWidth: 16,
+              height: 16,
+              padding: '0 4px',
+              borderRadius: 8,
+              background: INK,
+              color: '#FFFFFF',
+              fontSize: 9.5,
               fontWeight: 700,
-              lineHeight: 1.2,
+              lineHeight: '16px',
+              textAlign: 'center',
+              fontVariantNumeric: 'tabular-nums',
             }}
           >
             {badge > 99 ? '99+' : badge}
           </span>
         )}
       </div>
-      <div className="w-full" style={{ minWidth: 0 }}>
-        <div
-          style={{
-            fontSize: 15,
-            fontWeight: 700,
-            color: '#0f172a',
-            lineHeight: 1.15,
-            wordBreak: 'break-word',
-            hyphens: 'auto',
-          }}
-        >
-          {label}
-        </div>
-        <div style={{ fontSize: 11, color: '#64748B', marginTop: 2 }}>{sub}</div>
+      <span
+        style={{
+          marginTop: 6,
+          fontSize: 10.5,
+          fontWeight: 600,
+          color: INK_SOFT,
+        }}
+      >
+        {label}
+      </span>
+    </button>
+  );
+}
+
+// ── Account row ──
+function AccountRow({
+  Icon, label, sub, onClick,
+}: {
+  Icon: React.ComponentType<any>;
+  label: string;
+  sub: string;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className="w-full flex items-center gap-3 active:bg-[rgba(15,23,42,0.03)] transition-colors"
+      style={{ padding: '14px 0', background: 'transparent', border: 'none', cursor: 'pointer', textAlign: 'left' }}
+    >
+      <Icon size={16} color={INK_SOFT} strokeWidth={1.8} />
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <div style={{ fontSize: 14, fontWeight: 600, color: INK }}>{label}</div>
+        <div style={{ fontSize: 11.5, fontWeight: 400, color: INK_FAINT, marginTop: 1 }}>{sub}</div>
       </div>
+      <ChevronRight size={13} color="rgba(15,23,42,0.30)" />
     </button>
   );
 }
 
 // ── Component ──
-
 function ProfileHubSheet({
-  open,
-  onClose,
-  currentActor,
-  profiles,
-  onSwitchProfile,
-  onNavigate,
-  isAdmin,
-  isLoading,
+  open, onClose, currentActor, profiles,
+  onSwitchProfile, onNavigate, isAdmin, isLoading,
 }: ProfileHubSheetProps) {
   const navigate = useNavigate();
   const editRoute = useEditProfileRoute();
@@ -219,7 +239,7 @@ function ProfileHubSheet({
   const { unreadCount: unreadNotificationCount } = useUnreadNotifications();
   const { conversations } = useMessagingContext();
   const unreadMessageCount = conversations?.reduce(
-    (sum, conv) => sum + (conv.unread_count || 0), 0
+    (sum, conv) => sum + (conv.unread_count || 0), 0,
   ) || 0;
 
   const sheetY = useMotionValue(0);
@@ -233,12 +253,33 @@ function ProfileHubSheet({
 
   const [localActiveId, setLocalActiveId] = useState(currentActor.id);
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
-  const [searchOpen, setSearchOpen] = useState(false);
+  const [switcherOpen, setSwitcherOpen] = useState(false);
+
+  // ── Profile (for @handle) ──
+  const { data: userProfile } = useUserProfile(localActiveId);
+  const username = userProfile?.username || null;
+
+  // ── Handicap data (for sub-copy + stat strip variant) ──
+  const { data: whsConnection } = useWhsConnection(localActiveId);
+  const { data: trend } = useHandicapTrend(whsConnection?.id);
+  const stats = useProfileSheetStats(localActiveId);
+
+  // Sub-copy & variant inference
+  const hasHandicapRecord =
+    !!whsConnection && !!trend && trend.current !== null && trend.totalRoundsInRecord >= 8;
+  const handicapState: 'connect' | 'nodata' | 'data' =
+    !whsConnection ? 'connect' : (hasHandicapRecord ? 'data' : 'nodata');
+
+  const handicapSubCopy = (() => {
+    if (handicapState === 'connect') return 'No handicap';
+    if (handicapState === 'nodata') return 'England Golf';
+    const v = trend!.current as number;
+    const formatted = v < 0 ? `+${Math.abs(v).toFixed(1)}` : v.toFixed(1);
+    return `${formatted} HCP`;
+  })();
 
   // Sync localActiveId when currentActor changes externally
-  useEffect(() => {
-    setLocalActiveId(currentActor.id);
-  }, [currentActor.id]);
+  useEffect(() => { setLocalActiveId(currentActor.id); }, [currentActor.id]);
 
   // Lock body scroll
   useEffect(() => {
@@ -246,18 +287,23 @@ function ProfileHubSheet({
     return () => { document.body.style.overflow = ''; };
   }, [open]);
 
-  // Reset logout confirm when closing
+  // Reset confirm + switcher when closing
   useEffect(() => {
-    if (!open) setShowLogoutConfirm(false);
+    if (!open) {
+      setShowLogoutConfirm(false);
+      setSwitcherOpen(false);
+    }
   }, [open]);
 
-  // Escape key
+  // Escape closes the sheet (popover handles its own ESC first)
   useEffect(() => {
     if (!open) return;
-    const handler = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
+    const handler = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && !switcherOpen) onClose();
+    };
     document.addEventListener('keydown', handler);
     return () => document.removeEventListener('keydown', handler);
-  }, [open, onClose]);
+  }, [open, onClose, switcherOpen]);
 
   const handleSwitchProfile = useCallback(async (profileId: string) => {
     if (profileId === localActiveId) return;
@@ -275,10 +321,9 @@ function ProfileHubSheet({
     onClose();
   }, [onNavigate, onClose]);
 
-
   const activeProfile = profiles.find(p => p.id === localActiveId) || currentActor;
 
-  // Telemetry: sheet opened (single variant — v2 grid only)
+  // Telemetry: sheet opened
   useEffect(() => {
     if (!open) return;
     analyticsEvents.track('profile_hub_sheet_opened', {
@@ -286,19 +331,24 @@ function ProfileHubSheet({
     });
   }, [open, currentActor.type]);
 
-  const handleHandicapTileTap = useCallback(() => {
+  // Connect-handicap CTA tap (Connect variant)
+  const handleConnectHandicap = useCallback(() => {
     analyticsEvents.track('handicap_tile_tapped', { source: 'profile_hub_sheet' });
     handleNav('/handicap');
   }, [handleNav]);
 
-  const accountRows = [
-    { Icon: User, iconColor: '#3B82F6', label: 'View profile', route: `/profile/${localActiveId}` },
-    { Icon: Pencil, iconColor: '#F7931E', label: 'Edit profile', route: editRoute },
-    { Icon: Building2, iconColor: '#0A5A3C', label: 'Manage business profiles', route: '/businesses/manage' },
-    { Icon: SettingsIcon, iconColor: '#64748B', label: 'Settings', route: '/settings' },
-  ];
+  // Sub-copy line: `@{username} · {hcp/connect/England Golf}`
+  const identitySubLine = (() => {
+    const handlePart = username ? `@${username}` : (activeProfile.subtitle || '');
+    return [handlePart, handicapSubCopy].filter(Boolean).join(' · ');
+  })();
 
-  // ── Portal content ──
+  // Stat strip variant
+  const stripVariant: 'full' | 'limited' =
+    handicapState === 'data' ? 'full' : 'limited';
+
+  // TODO: When the "Profile & businesses" merge brief lands, route to a
+  // unified /account screen. For now, this row routes to the edit-profile flow.
 
   const content = (
     <AnimatePresence>
@@ -314,7 +364,7 @@ function ProfileHubSheet({
             onClick={onClose}
           />
 
-          {/* Panel — #1 bg-[#F8FAFC] */}
+          {/* Panel */}
           <motion.div
             drag="y"
             dragConstraints={{ top: 0, bottom: 0 }}
@@ -322,297 +372,313 @@ function ProfileHubSheet({
             onDragEnd={handleSheetDragEnd}
             style={{
               y: sheetY,
-              maxHeight: '80dvh',
-              minHeight: 'min(60dvh, 480px)',
+              maxHeight: '78dvh',
               paddingBottom: 'env(safe-area-inset-bottom, 0px)',
             }}
             initial={{ y: '100%' }}
             animate={{ y: 0 }}
             exit={{ y: '100%' }}
             transition={{ type: 'tween', duration: 0.25, ease: [0.32, 0.72, 0, 1] }}
-            className="fixed inset-x-0 bottom-0 z-[9999] w-full rounded-t-[24px] bg-[#F8FAFC] flex flex-col md:inset-x-auto md:left-1/2 md:-translate-x-1/2 md:w-full md:max-w-[560px]"
+            className="fixed inset-x-0 bottom-0 z-[9999] w-full rounded-t-[16px] bg-[#F8FAFC] flex flex-col md:inset-x-auto md:left-1/2 md:-translate-x-1/2 md:w-full md:max-w-[560px]"
           >
             {/* Drag handle */}
             <div className="flex justify-center pt-2.5 pb-1 shrink-0 touch-none cursor-grab active:cursor-grabbing">
-              <div style={{ width: 36, height: 4, borderRadius: 2, background: 'rgba(15,23,42,0.12)' }} />
+              <div style={{ width: 36, height: 4, borderRadius: 2, background: HAIRLINE }} />
             </div>
 
             {/* Scrollable content */}
             <div className="flex-1 overflow-y-auto overscroll-contain px-4">
-
               {isLoading ? (
                 <ProfileHubSheetSkeleton />
               ) : (
                 <>
-              {/* ── Profile row — sits on sheet background ── */}
-              <div className="flex items-center gap-3 pt-2 pb-3">
-                <SquircleAvatar
-                  size={52}
-                  src={activeProfile.avatarUrl}
-                  alt={activeProfile.name}
-                  fallback={activeProfile.name?.charAt(0)?.toUpperCase() ?? '?'}
-                  hideRing
-                />
-                <div className="flex-1 min-w-0">
-                  <div className="text-[17px] font-extrabold truncate text-foreground" style={{ letterSpacing: '-0.3px' }}>
-                    {activeProfile.name}
-                  </div>
-                  <p className="text-[12px] truncate text-muted-foreground">
-                    {activeProfile.type === 'business' ? 'Business account' : 'Personal account'}
-                  </p>
-                </div>
-                {/* Search icon pill */}
-                <button
-                  type="button"
-                  onClick={() => setSearchOpen(true)}
-                  className="flex items-center justify-center flex-shrink-0 active:scale-[0.94] transition-transform"
-                  style={{
-                    width: 36, height: 36, borderRadius: '50%',
-                    background: 'rgba(247,147,30,0.12)',
-                    border: '1px solid rgba(247,147,30,0.22)',
-                  }}
-                  aria-label="Search"
-                >
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#F7931E" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-                    <circle cx="11" cy="11" r="8"/>
-                    <path d="m21 21-4.3-4.3"/>
-                  </svg>
-                </button>
-              </div>
-
-              {/* Echo AI banner removed — Echo lives in the 2×2 grid below */}
-
-              {/* ── Switch profile ── */}
-              <div>
-
-                <RuleMarker label="Switch Profile" />
-                <div
-                  className="flex gap-3 overflow-x-auto pb-2 pt-1 no-scrollbar"
-                  style={{
-                    scrollSnapType: 'x mandatory',
-                    WebkitOverflowScrolling: 'touch',
-                  }}
-                >
-                  {profiles.map(profile => {
-                    const isActive = profile.id === localActiveId;
-                    return (
-                      <button
-                        key={profile.id}
-                        type="button"
-                        onClick={() => handleSwitchProfile(profile.id)}
-                        className="flex flex-col items-center gap-1.5 shrink-0 min-w-[64px] min-h-[44px] touch-manipulation"
-                        style={{ scrollSnapAlign: 'start' }}
-                      >
-                        <div className="relative">
-                          <SquircleAvatar
-                            size={48}
-                            src={profile.avatarUrl}
-                            alt={profile.name}
-                            fallback={profile.name?.charAt(0)?.toUpperCase()}
-                            ringColor={isActive ? 'hsl(38,92%,50%)' : undefined}
-                            hideRing={!isActive}
-                            enableGlow={isActive}
-                          />
-                          {/* #7 — amber check badge */}
-                          {isActive && (
-                            <div
-                              className="absolute -bottom-1 -right-1 w-[18px] h-[18px] rounded-full flex items-center justify-center ring-2 ring-[#F8FAFC]"
-                              style={{ background: 'hsl(38,92%,50%)' }}
-                            >
-                              <Check className="w-3 h-3 text-white" />
-                            </div>
-                          )}
+                  {/* ── 1. Identity strip ── */}
+                  <div style={{ position: 'relative' }}>
+                    <div className="flex items-center gap-3 pt-2 pb-3">
+                      <SquircleAvatar
+                        size={40}
+                        src={activeProfile.avatarUrl}
+                        alt={activeProfile.name}
+                        fallback={activeProfile.name?.charAt(0)?.toUpperCase() ?? '?'}
+                        hideRing
+                      />
+                      <div className="flex-1 min-w-0">
+                        <div
+                          style={{
+                            fontSize: 16,
+                            fontWeight: 800,
+                            color: INK,
+                            letterSpacing: '-0.01em',
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis',
+                            whiteSpace: 'nowrap',
+                          }}
+                        >
+                          {activeProfile.name}
                         </div>
-                        <span className="text-[12px] font-medium text-foreground truncate max-w-[68px]">
-                          {profile.name}
-                        </span>
-                        <span className="text-[10px] text-muted-foreground -mt-1">
-                          {profile.type === 'business' ? 'Business' : 'Personal'}
-                        </span>
-                      </button>
-                    );
-                  })}
-
-                  {/* Add business */}
-                  <button
-                    type="button"
-                    onClick={() => handleNav('/businesses/manage')}
-                    className="flex flex-col items-center gap-1.5 shrink-0 min-w-[64px] min-h-[44px] touch-manipulation"
-                    style={{ scrollSnapAlign: 'start' }}
-                  >
-                    <div className="w-[52px] h-[52px] rounded-[34%] border-2 border-dashed border-border flex items-center justify-center">
-                      <Plus className="w-5 h-5 text-muted-foreground" />
-                    </div>
-                    <span className="text-[12px] font-medium text-muted-foreground">
-                      Add business
-                    </span>
-                  </button>
-                </div>
-              </div>
-
-              {/* ── Divider ── */}
-              <div style={{ height: '0.5px', background: 'rgba(15,23,42,0.07)', margin: '0 -16px' }} />
-
-              {/* ── Quick actions: full-width Handicap + 3-tile action row ── */}
-              <div className="py-4 flex flex-col gap-3">
-                {/* Handicap (full width, primary) */}
-                <HandicapTile userId={currentActor.id} onClick={handleHandicapTileTap} />
-
-                {/* Action row: Echo / Messages / Notifications */}
-                <div className="grid grid-cols-3 gap-3">
-                  {/* Echo */}
-                  <button
-                    type="button"
-                    onClick={() => handleNav('/echo')}
-                    className="relative flex flex-col justify-between text-left active:scale-[0.97] transition-transform"
-                    style={{
-                      minHeight: 110,
-                      padding: '14px 14px 16px',
-                      borderRadius: 14,
-                      background: '#ffffff',
-                      border: '0.5px solid rgba(15,23,42,0.10)',
-                    }}
-                    aria-label="Echo"
-                  >
-                    <div className="flex items-center justify-between w-full">
-                      <div
-                        className="flex items-center justify-center"
-                        style={{ width: 36, height: 36, borderRadius: 10, background: 'transparent' }}
-                      >
-                        <div style={{
-                          width: 28, height: 28, borderRadius: '50%',
-                          background: 'linear-gradient(135deg, #F7931E, #E8920A)',
-                          display: 'flex', alignItems: 'center', justifyContent: 'center',
-                          boxShadow: '0 2px 6px rgba(247,147,30,0.30)',
-                        }}>
-                          <AnimatedEchoWave size={14} color="#ffffff" active={true} />
+                        <div
+                          style={{
+                            fontSize: 12,
+                            fontWeight: 500,
+                            color: INK_SOFT,
+                            marginTop: 2,
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis',
+                            whiteSpace: 'nowrap',
+                            fontVariantNumeric: 'tabular-nums',
+                          }}
+                        >
+                          {identitySubLine}
                         </div>
                       </div>
+                      <button
+                        type="button"
+                        onClick={() => setSwitcherOpen((v) => !v)}
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: 2,
+                          padding: '6px 8px',
+                          background: '#FFFFFF',
+                          border: `0.5px solid ${HAIRLINE}`,
+                          borderRadius: 8,
+                          cursor: 'pointer',
+                          flexShrink: 0,
+                        }}
+                        aria-haspopup="menu"
+                        aria-expanded={switcherOpen}
+                      >
+                        <span style={{ fontSize: 11, fontWeight: 700, color: INK_SOFT, letterSpacing: '0.02em' }}>
+                          Switch
+                        </span>
+                        <ChevronDown size={12} color={INK_SOFT} strokeWidth={2} />
+                      </button>
                     </div>
-                    <div className="w-full" style={{ minWidth: 0 }}>
+
+                    <ProfileSwitcherPopover
+                      open={switcherOpen}
+                      onClose={() => setSwitcherOpen(false)}
+                      profiles={profiles}
+                      activeId={localActiveId}
+                      onSelectProfile={handleSwitchProfile}
+                      onAddBusiness={() => handleNav('/businesses/manage')}
+                    />
+                  </div>
+
+                  <div style={{ height: '0.5px', background: HAIRLINE, margin: '0 -16px' }} />
+
+                  {/* ── 2. Handicap masthead (inline, no card) ── */}
+                  <HandicapMasthead userId={localActiveId} onConnectTap={handleConnectHandicap} />
+
+                  {/* ── 3. Stat strip ── */}
+                  <ProfileStatStrip
+                    variant={stripVariant}
+                    rounds30d={stats.rounds30d}
+                    lowIndex={stats.lowIndex}
+                    reviewsCount={stats.reviewsCount}
+                    coursesPlayed={stats.coursesPlayed}
+                  />
+
+                  {/* ── 4. Quick action icon row ── */}
+                  <div
+                    style={{
+                      display: 'flex',
+                      gap: 8,
+                      padding: '18px 32px',
+                      borderBottom: `0.5px solid ${HAIRLINE}`,
+                      marginLeft: -16,
+                      marginRight: -16,
+                    }}
+                  >
+                    <QuickActionTile
+                      label="Echo"
+                      badge={0}
+                      onClick={() => handleNav('/echo')}
+                      ariaLabel="Open Echo"
+                    >
                       <div
                         style={{
-                          fontSize: 15,
-                          fontWeight: 700,
-                          color: '#0f172a',
-                          lineHeight: 1.15,
-                          wordBreak: 'break-word',
-                          hyphens: 'auto',
+                          width: 40,
+                          height: 40,
+                          borderRadius: 12,
+                          background: `linear-gradient(135deg, ${AMBER}, #E8920A)`,
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          boxShadow: '0 2px 8px rgba(247,147,30,0.30)',
                         }}
                       >
-                        Echo
+                        <AnimatedEchoWave size={16} color="#FFFFFF" active={true} />
                       </div>
-                      <div style={{ fontSize: 11, color: '#64748B', marginTop: 2 }}>Ask anything</div>
-                    </div>
-                  </button>
+                    </QuickActionTile>
 
-                  {/* Messages */}
-                  <GridTile
-                    Icon={MessageCircle}
-                    iconColor="#059669"
-                    iconBg="rgba(5,150,105,0.10)"
-                    label="Messages"
-                    sub={unreadMessageCount > 0 ? `${unreadMessageCount} unread` : 'No new'}
-                    badge={unreadMessageCount}
-                    onClick={() => handleNav('/messages')}
-                  />
-
-                  {/* Notifications */}
-                  <GridTile
-                    Icon={Bell}
-                    iconColor="#0f172a"
-                    iconBg="rgba(15,23,42,0.06)"
-                    label="Notifications"
-                    sub={unreadNotificationCount > 0 ? `${unreadNotificationCount} new` : 'No new'}
-                    badge={unreadNotificationCount}
-                    onClick={() => handleNav('/notificationmessages')}
-                  />
-                </div>
-              </div>
-
-              {/* ── Divider ── */}
-              <div style={{ height: '0.5px', background: 'rgba(15,23,42,0.07)', margin: '0 -16px' }} />
-
-              {/* ── Account section ── */}
-              <div>
-                <RuleMarker label="Account" />
-                {accountRows.map(({ Icon, iconColor, label, route }, index) => (
-                  <div key={label}>
-                    {index > 0 && <div style={{ height: '0.5px', background: 'rgba(15,23,42,0.06)', marginLeft: 46 }} />}
-                    <button
-                      type="button"
-                      onClick={() => handleNav(route)}
-                      className="w-full flex items-center gap-3 min-h-[48px] rounded-xl active:bg-[rgba(15,23,42,0.03)] transition-colors duration-150"
+                    <QuickActionTile
+                      label="Messages"
+                      badge={unreadMessageCount}
+                      onClick={() => handleNav('/messages')}
+                      ariaLabel="Open Messages"
                     >
                       <div
-                        className="flex items-center justify-center rounded-[10px]"
-                        style={{ width: 34, height: 34, background: `${iconColor}14` }}
+                        style={{
+                          width: 40,
+                          height: 40,
+                          borderRadius: 12,
+                          background: 'transparent',
+                          border: `1px solid ${HAIRLINE}`,
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                        }}
                       >
-                        <Icon size={17} color={iconColor} strokeWidth={2.2} />
+                        <MessageCircle size={17} color={INK_SOFT} strokeWidth={1.8} />
                       </div>
-                      <span className="flex-1 text-left text-[14px] font-medium text-foreground">{label}</span>
-                      <ChevronRight className="w-[13px] h-[13px] text-muted-foreground/30" />
-                    </button>
-                  </div>
-                ))}
-              </div>
+                    </QuickActionTile>
 
-              {/* ── Admin section ── */}
-              {isAdmin && (
-                <>
-                  <div style={{ height: '0.5px', background: 'rgba(15,23,42,0.07)', margin: '0 -16px' }} />
+                    <QuickActionTile
+                      label="Alerts"
+                      badge={unreadNotificationCount}
+                      onClick={() => handleNav('/notificationmessages')}
+                      ariaLabel="Open Alerts"
+                    >
+                      <div
+                        style={{
+                          width: 40,
+                          height: 40,
+                          borderRadius: 12,
+                          background: 'transparent',
+                          border: `1px solid ${HAIRLINE}`,
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                        }}
+                      >
+                        <Bell size={17} color={INK_SOFT} strokeWidth={1.8} />
+                      </div>
+                    </QuickActionTile>
+                  </div>
+
+                  {/* ── 5. Account section ── */}
                   <div>
-                    <RuleMarker label="Admin" />
-                    <button
-                      type="button"
-                      onClick={() => handleNav('/admin/command-center')}
-                      style={{ width: '100%', display: 'flex', alignItems: 'center', gap: 12, minHeight: 48, background: 'rgba(247,147,30,0.06)', border: '1px solid rgba(247,147,30,0.18)', borderRadius: 12, padding: '0 14px', cursor: 'pointer' }}
-                    >
-                      <Shield className="w-5 h-5" style={{ color: '#F7931E' }} />
-                      <div className="flex-1 text-left">
-                        <div style={{ fontSize: 14, fontWeight: 700, color: '#F7931E' }}>Command Center</div>
-                        <div style={{ fontSize: 11, color: 'rgba(247,147,30,0.55)' }}>Manage site settings</div>
+                    <div style={{ paddingTop: 18, paddingBottom: 6 }}>
+                      <span
+                        style={{
+                          fontSize: 10,
+                          fontWeight: 700,
+                          color: INK_FAINT,
+                          letterSpacing: '0.12em',
+                          textTransform: 'uppercase' as const,
+                        }}
+                      >
+                        Account
+                      </span>
+                    </div>
+                    <AccountRow
+                      Icon={UserCog}
+                      label="Profile & businesses"
+                      sub="Edit profile, manage clbhouz"
+                      onClick={() => handleNav(editRoute)}
+                    />
+                    <div style={{ height: '0.5px', background: HAIRLINE_SOFT }} />
+                    <AccountRow
+                      Icon={SettingsIcon}
+                      label="Settings"
+                      sub="Privacy, notifications, preferences"
+                      onClick={() => handleNav('/settings')}
+                    />
+                  </div>
+
+                  {/* ── 6. Admin / Command Center (unchanged) ── */}
+                  {isAdmin && (
+                    <>
+                      <div style={{ height: '0.5px', background: HAIRLINE, margin: '0 -16px' }} />
+                      <div style={{ paddingTop: 14, paddingBottom: 8 }}>
+                        <span
+                          style={{
+                            fontSize: 10,
+                            fontWeight: 700,
+                            color: INK_FAINT,
+                            letterSpacing: '0.12em',
+                            textTransform: 'uppercase' as const,
+                          }}
+                        >
+                          Admin
+                        </span>
                       </div>
-                      <ChevronRight className="w-4 h-4" style={{ color: 'rgba(247,147,30,0.40)' }} />
-                    </button>
-                  </div>
-                </>
-              )}
+                      <button
+                        type="button"
+                        onClick={() => handleNav('/admin/command-center')}
+                        style={{
+                          width: '100%',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: 12,
+                          minHeight: 48,
+                          background: 'rgba(247,147,30,0.06)',
+                          border: '1px solid rgba(247,147,30,0.18)',
+                          borderRadius: 12,
+                          padding: '0 14px',
+                          cursor: 'pointer',
+                        }}
+                      >
+                        <Shield className="w-5 h-5" style={{ color: AMBER }} />
+                        <div className="flex-1 text-left">
+                          <div style={{ fontSize: 14, fontWeight: 700, color: AMBER }}>Command Center</div>
+                          <div style={{ fontSize: 11, color: 'rgba(247,147,30,0.55)' }}>Manage site settings</div>
+                        </div>
+                        <ChevronRight className="w-4 h-4" style={{ color: 'rgba(247,147,30,0.40)' }} />
+                      </button>
+                    </>
+                  )}
 
-              {/* ── Logout — #6 pill buttons ── */}
-              <div className="py-3" style={{ paddingBottom: 'max(24px, env(safe-area-inset-bottom, 0px))' }}>
-                {!showLogoutConfirm ? (
-                  <button
-                    type="button"
-                    onClick={() => setShowLogoutConfirm(true)}
-                    className="w-full flex items-center gap-3 min-h-[48px] rounded-xl px-2 -mx-2 hover:bg-destructive/5 active:bg-destructive/10 transition-colors duration-150"
+                  {/* ── 7. Sign out ── */}
+                  <div
+                    style={{
+                      paddingTop: 26,
+                      paddingBottom: 'max(8px, env(safe-area-inset-bottom, 0px))',
+                      display: 'flex',
+                      justifyContent: 'center',
+                    }}
                   >
-                    <LogOut className="w-[18px] h-[18px] text-destructive" />
-                    <span className="text-[14px] font-medium text-destructive">Sign out</span>
-                  </button>
-                ) : (
-                  <div className="flex gap-3">
-                    <button
-                      type="button"
-                      onClick={() => setShowLogoutConfirm(false)}
-                      style={{ flex: 1, minHeight: 50, borderRadius: 25, background: 'rgba(15,23,42,0.04)', border: '0.5px solid rgba(15,23,42,0.12)', fontSize: 14, fontWeight: 600, color: '#64748B', cursor: 'pointer' }}
-                    >
-                      Cancel
-                    </button>
-                    <button
-                      type="button"
-                      onClick={handleLogout}
-                      className="active:opacity-90 transition-opacity"
-                      style={{ flex: 1, minHeight: 50, borderRadius: 25, background: '#DC2626', border: 'none', fontSize: 14, fontWeight: 700, color: '#ffffff', cursor: 'pointer' }}
-                    >
-                      Sign out
-                    </button>
+                    {!showLogoutConfirm ? (
+                      <button
+                        type="button"
+                        onClick={() => setShowLogoutConfirm(true)}
+                        style={{
+                          background: 'transparent',
+                          border: 'none',
+                          fontSize: 12,
+                          fontWeight: 500,
+                          color: INK_FAINT,
+                          letterSpacing: '0.02em',
+                          cursor: 'pointer',
+                          padding: '8px 12px',
+                        }}
+                      >
+                        Sign out
+                      </button>
+                    ) : (
+                      <div className="flex gap-3 w-full">
+                        <button
+                          type="button"
+                          onClick={() => setShowLogoutConfirm(false)}
+                          style={{ flex: 1, minHeight: 50, borderRadius: 25, background: 'rgba(15,23,42,0.04)', border: '0.5px solid rgba(15,23,42,0.12)', fontSize: 14, fontWeight: 600, color: INK_SOFT, cursor: 'pointer' }}
+                        >
+                          Cancel
+                        </button>
+                        <button
+                          type="button"
+                          onClick={handleLogout}
+                          className="active:opacity-90 transition-opacity"
+                          style={{ flex: 1, minHeight: 50, borderRadius: 25, background: '#DC2626', border: 'none', fontSize: 14, fontWeight: 700, color: '#FFFFFF', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}
+                        >
+                          <LogOut size={16} />
+                          Sign out
+                        </button>
+                      </div>
+                    )}
                   </div>
-                )}
-              </div>
                 </>
               )}
-
             </div>
           </motion.div>
         </>
@@ -620,13 +686,9 @@ function ProfileHubSheet({
     </AnimatePresence>
   );
 
-  return typeof window !== 'undefined' ? createPortal(
-    <>
-      {content}
-      <GlobalSearchOverlay isOpen={searchOpen} onClose={() => setSearchOpen(false)} />
-    </>,
-    document.body
-  ) : null;
+  return typeof window !== 'undefined'
+    ? createPortal(content, document.body)
+    : null;
 }
 
 export { ProfileHubSheet };
