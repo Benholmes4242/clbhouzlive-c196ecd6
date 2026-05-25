@@ -1,4 +1,4 @@
-import type { UserBadge, BadgeRarity, LegendCategory } from '@/lib/gam/types';
+import type { UserBadge, BadgeRarity, BadgeCategory, LegendCategory } from '@/lib/gam/types';
 import type { TopLegendRow } from '@/hooks/gam/useUserTopLegends';
 import { legendCategoryLabel, formatLegendValue } from '@/lib/gam/visuals';
 
