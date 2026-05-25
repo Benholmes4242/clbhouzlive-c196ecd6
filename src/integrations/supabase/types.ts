@@ -6024,6 +6024,48 @@ export type Database = {
           },
         ]
       }
+      gam_user_badges_backup_2026_05_25_replay: {
+        Row: {
+          badge_id: string | null
+          counter_tier: number | null
+          counter_value: number | null
+          created_at: string | null
+          earned_at: string | null
+          id: string | null
+          is_visible: boolean | null
+          seen_by_user: boolean | null
+          trigger_whs_score_id: string | null
+          updated_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          badge_id?: string | null
+          counter_tier?: number | null
+          counter_value?: number | null
+          created_at?: string | null
+          earned_at?: string | null
+          id?: string | null
+          is_visible?: boolean | null
+          seen_by_user?: boolean | null
+          trigger_whs_score_id?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          badge_id?: string | null
+          counter_tier?: number | null
+          counter_value?: number | null
+          created_at?: string | null
+          earned_at?: string | null
+          id?: string | null
+          is_visible?: boolean | null
+          seen_by_user?: boolean | null
+          trigger_whs_score_id?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       gam_user_milestones: {
         Row: {
           count: number
@@ -6079,6 +6121,33 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      gam_user_milestones_backup_2026_05_25_replay: {
+        Row: {
+          count: number | null
+          first_at: string | null
+          last_at: string | null
+          metric: string | null
+          updated_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          count?: number | null
+          first_at?: string | null
+          last_at?: string | null
+          metric?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          count?: number | null
+          first_at?: string | null
+          last_at?: string | null
+          metric?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
       }
       game_join_requests: {
         Row: {
