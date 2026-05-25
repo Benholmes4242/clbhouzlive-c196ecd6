@@ -47,7 +47,7 @@ export const SheetHeader: React.FC<SheetHeaderProps> = ({
         {avatarUrl ? (
           <img
             src={avatarUrl}
-            alt={name}
+            alt={formatFriendName(name)}
             style={{ width: '100%', height: '100%', objectFit: 'cover' }}
           />
         ) : (
@@ -74,7 +74,7 @@ export const SheetHeader: React.FC<SheetHeaderProps> = ({
               fontFamily: FONT,
             }}
           >
-            {name}
+            {formatFriendName(name)}
           </h2>
           {pill && <Pill label={pill.label} tone={pill.tone} />}
         </div>
