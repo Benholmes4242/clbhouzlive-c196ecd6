@@ -37,19 +37,19 @@ export function PlayerAvatar({
   const [imgError, setImgError] = useState(false);
   
   return (
-    <div 
+    <div
       className={cn(
-        "bg-muted flex items-center justify-center shrink-0 overflow-hidden",
+        "flex items-center justify-center shrink-0 overflow-hidden",
         SIZE_CLASSES[size],
         className
       )}
-      style={{ borderRadius: '34%', aspectRatio: '1 / 1.05' }}
+      style={{ borderRadius: '34%', aspectRatio: '1 / 1.05', background: 'var(--hcp-bg-3)' }}
     >
       {imgError ? (
-        <PlayerSilhouette size={SIZE_PX[size]} />
+        <HandicapAvatarFallback name={playerName} size={SIZE_PX[size]} contentsOnly />
       ) : (
-        <img 
-          src={headshotUrl} 
+        <img
+          src={headshotUrl}
           alt={playerName}
           className="w-full h-full object-cover object-top"
           loading="lazy"
@@ -58,6 +58,7 @@ export function PlayerAvatar({
       )}
     </div>
   );
+
 }
 
 /**
