@@ -105,14 +105,14 @@ export const TourHubShellTabs: React.FC = () => {
               onClick={(e) => handleTap(tab.id, e.currentTarget)}
               style={{
                 flex: '0 0 auto',
-                height: 22,
-                padding: '0 9px',
-                borderRadius: 11,
+                height: 28,
+                padding: '0 11px',
+                borderRadius: 14,
                 border: isActive ? '1px solid rgba(255,255,255,0.55)' : '1px solid transparent',
                 background: isActive ? 'rgba(255,255,255,0.10)' : 'transparent',
                 color: isActive ? '#FFFFFF' : 'var(--hcp-t-60)',
                 fontFamily: 'inherit',
-                fontSize: 12,
+                fontSize: 13,
                 fontWeight: isActive ? 700 : 500,
                 letterSpacing: '-0.01em',
                 whiteSpace: 'nowrap',
@@ -136,7 +136,7 @@ export const TourHubShellTabs: React.FC = () => {
             top: 0,
             right: 0,
             bottom: 0,
-            width: 28,
+            width: 34,
             pointerEvents: 'none',
             background: 'linear-gradient(to right, rgba(10,14,20,0), #0A0E14)',
           }}
