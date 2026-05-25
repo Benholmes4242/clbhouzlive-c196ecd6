@@ -49,31 +49,34 @@ export const CategorySection: React.FC<Props> = ({
           display: 'flex',
           alignItems: 'center',
           gap: 10,
-          marginBottom: 12,
+          marginBottom: 14,
           fontFamily: FONT,
         }}
       >
         <div
           style={{
-            width: 30,
-            height: 30,
-            borderRadius: 8,
-            background: 'var(--hcp-bg-3)',
+            width: 32,
+            height: 32,
+            borderRadius: 9,
+            background:
+              'linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.01))',
+            border: '1px solid var(--hcp-line)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
             color: 'var(--hcp-t-80)',
             flexShrink: 0,
+            boxShadow: 'inset 0 1px 1px rgba(0,0,0,0.30)',
           }}
         >
-          <CatIcon size={15} strokeWidth={2.4} />
+          <CatIcon size={15} strokeWidth={2.0} />
         </div>
         <div
           style={{
-            fontSize: 15,
-            fontWeight: 800,
+            fontSize: 16,
+            fontWeight: 700,
             color: 'var(--hcp-t-100)',
-            letterSpacing: '-0.01em',
+            letterSpacing: '-0.015em',
             flex: 1,
           }}
         >
@@ -84,7 +87,7 @@ export const CategorySection: React.FC<Props> = ({
             fontSize: 10,
             color: 'var(--hcp-t-40)',
             fontWeight: 700,
-            letterSpacing: '0.10em',
+            letterSpacing: '0.14em',
             textTransform: 'uppercase',
           }}
         >
@@ -98,19 +101,21 @@ export const CategorySection: React.FC<Props> = ({
         <div
           style={{
             marginTop: 8,
-            background: 'var(--hcp-bg-1)',
+            background:
+              'linear-gradient(180deg, rgba(255,255,255,0.025), rgba(255,255,255,0.008))',
             border: '1px solid var(--hcp-line)',
             borderRadius: 12,
-            padding: 4,
+            padding: 5,
             display: 'flex',
             flexDirection: 'column',
+            boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.02)',
           }}
         >
           {restVisible.map((row, i) => (
             <React.Fragment key={`${row.rank}-${i}`}>
               <CompactLeaderRow row={row} unit={unit} />
               {i < restVisible.length - 1 && (
-                <div style={{ height: 1, background: 'var(--hcp-line)', margin: '0 8px' }} />
+                <div style={{ height: 1, background: 'var(--hcp-hairline)', margin: '0 10px' }} />
               )}
             </React.Fragment>
           ))}

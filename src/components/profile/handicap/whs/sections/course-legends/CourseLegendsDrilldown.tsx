@@ -1,4 +1,5 @@
-import React, { useMemo, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { lookupCourseMetaV2 } from '@/lib/whs/courseNameMatcher';
 import { Crown } from 'lucide-react';
 import { useCourseLegends } from '@/hooks/gam/useCourseLegends';
 import { useCourseMeta } from '@/hooks/gam/useCourseMeta';
@@ -93,6 +94,24 @@ export const CourseLegendsDrilldown: React.FC<Props> = ({ selection, state, onBa
   const { data, isLoading, isError, refetch } = useCourseLegends(ctx.courseId);
   const { data: meta } = useCourseMeta(ctx.courseId);
   const [window, setWindow] = useState<LegendWindow>('90d');
+  const [courseHeaderImage, setCourseHeaderImage] = useState<string | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const m = await lookupCourseMetaV2(ctx.courseName);
+        if (!cancelled) {
+          setCourseHeaderImage(m?.thumbnail_image ?? null);
+        }
+      } catch {
+        if (!cancelled) setCourseHeaderImage(null);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [ctx.courseName]);
 
   const visibleCategories = window === '90d' ? CATEGORIES_ORDER_90D : CATEGORIES_ORDER_ALL_TIME;
 
@@ -156,6 +175,7 @@ export const CourseLegendsDrilldown: React.FC<Props> = ({ selection, state, onBa
         onBack={onBack}
         youOwnedCount={youOwnedCount}
         totalCategories={visibleCategories.length}
+        courseHeaderImage={courseHeaderImage}
       />
 
       <div style={{ padding: '14px 16px 4px', display: 'flex', justifyContent: 'flex-start' }}>

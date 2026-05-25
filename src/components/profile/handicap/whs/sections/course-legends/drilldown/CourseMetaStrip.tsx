@@ -22,23 +22,23 @@ const MetaCell: React.FC<{
         alignItems: 'center',
         gap: 5,
         fontSize: 9,
-        fontWeight: 800,
+        fontWeight: 700,
         color: 'var(--hcp-t-40)',
-        letterSpacing: '0.14em',
+        letterSpacing: '0.18em',
         textTransform: 'uppercase',
-        marginBottom: 4,
+        marginBottom: 8,
       }}
     >
-      <Icon size={10} strokeWidth={2.5} />
+      <Icon size={9.5} strokeWidth={2.2} />
       {label}
     </div>
     <div
       style={{
-        fontSize: 20,
-        fontWeight: 900,
+        fontSize: 26,
+        fontWeight: 200,
         color: highlight ? '#F7931E' : 'var(--hcp-t-100)',
-        letterSpacing: '-0.02em',
-        lineHeight: 1,
+        letterSpacing: '-0.04em',
+        lineHeight: 0.95,
         fontVariantNumeric: 'tabular-nums',
       }}
     >
@@ -49,8 +49,9 @@ const MetaCell: React.FC<{
         style={{
           fontSize: 10,
           color: 'var(--hcp-t-60)',
-          marginTop: 3,
+          marginTop: 5,
           fontVariantNumeric: 'tabular-nums',
+          letterSpacing: '0.01em',
         }}
       >
         {sub}
@@ -78,20 +79,22 @@ export const CourseMetaStrip: React.FC<Props> = ({ meta }) => {
     <div
       style={{
         margin: '16px 16px 0',
-        background: 'var(--hcp-bg-1)',
+        background:
+          'linear-gradient(180deg, rgba(255,255,255,0.030) 0%, rgba(255,255,255,0.010) 100%), var(--hcp-bg-1)',
         border: '1px solid var(--hcp-line)',
         borderRadius: 14,
-        padding: '12px 14px',
+        padding: '14px 16px',
         fontFamily: FONT,
+        boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.025)',
       }}
     >
       <div
         style={{
           display: 'flex',
           alignItems: 'stretch',
-          borderBottom: '1px solid var(--hcp-line)',
-          paddingBottom: 12,
-          marginBottom: 12,
+          borderBottom: '1px solid var(--hcp-hairline)',
+          paddingBottom: 14,
+          marginBottom: 14,
         }}
       >
         <MetaCell icon={Users} label="Friend rounds" value={friendRounds} sub="across community" />

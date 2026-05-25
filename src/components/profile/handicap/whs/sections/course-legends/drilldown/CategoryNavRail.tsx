@@ -26,8 +26,8 @@ export const CategoryNavRail: React.FC<Props> = ({ categories, onSelect }) => (
       background: 'var(--hcp-bg-0)',
       borderTop: '1px solid var(--hcp-line)',
       borderBottom: '1px solid var(--hcp-line)',
-      padding: '10px 12px',
-      marginTop: 18,
+      padding: '12px 12px',
+      marginTop: 22,
     }}
   >
     <div
@@ -53,17 +53,22 @@ export const CategoryNavRail: React.FC<Props> = ({ categories, onSelect }) => (
               flexShrink: 0,
               display: 'inline-flex',
               alignItems: 'center',
-              gap: 5,
-              padding: '6px 10px',
-              borderRadius: 8,
-              background: 'var(--hcp-bg-1)',
-              border: '1px solid var(--hcp-line)',
+              gap: 6,
+              padding: '7px 12px',
+              borderRadius: 9,
+              background: isHeld
+                ? 'linear-gradient(180deg, rgba(251,188,46,0.12), rgba(251,188,46,0.03))'
+                : 'rgba(255,255,255,0.025)',
+              border: isHeld
+                ? '1px solid rgba(251,188,46,0.30)'
+                : '1px solid rgba(255,255,255,0.04)',
               color: isHeld ? '#FBBC2E' : 'var(--hcp-t-80)',
               fontSize: 11,
               fontWeight: 700,
               fontFamily: FONT,
               cursor: 'pointer',
               whiteSpace: 'nowrap',
+              letterSpacing: '0.01em',
             }}
           >
             <CatIcon size={11} strokeWidth={2.4} />
@@ -75,6 +80,7 @@ export const CategoryNavRail: React.FC<Props> = ({ categories, onSelect }) => (
                   fontWeight: 800,
                   color: isHeld ? '#FBBC2E' : tier?.color ?? 'var(--hcp-t-60)',
                   fontVariantNumeric: 'tabular-nums',
+                  letterSpacing: '-0.01em',
                 }}
               >
                 #{r}
