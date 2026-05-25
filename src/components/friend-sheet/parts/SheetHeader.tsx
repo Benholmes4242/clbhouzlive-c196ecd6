@@ -1,6 +1,7 @@
 import React from 'react';
 import { MapPin } from 'lucide-react';
 import { BG_2, T60, T100, GREEN, LINE_2, FONT } from './_shared/tokens';
+import { formatFriendName } from './_shared/formatName';
 
 export interface SheetHeaderProps {
   avatarUrl: string | null;
@@ -46,7 +47,7 @@ export const SheetHeader: React.FC<SheetHeaderProps> = ({
         {avatarUrl ? (
           <img
             src={avatarUrl}
-            alt={name}
+            alt={formatFriendName(name)}
             style={{ width: '100%', height: '100%', objectFit: 'cover' }}
           />
         ) : (
@@ -73,7 +74,7 @@ export const SheetHeader: React.FC<SheetHeaderProps> = ({
               fontFamily: FONT,
             }}
           >
-            {name}
+            {formatFriendName(name)}
           </h2>
           {pill && <Pill label={pill.label} tone={pill.tone} />}
         </div>
@@ -111,7 +112,7 @@ export const SheetHeader: React.FC<SheetHeaderProps> = ({
         <button
           type="button"
           onClick={onClick}
-          aria-label={`View ${name}'s handicap`}
+          aria-label={`View ${formatFriendName(name)}'s handicap`}
           style={{
             all: 'unset',
             display: 'block',

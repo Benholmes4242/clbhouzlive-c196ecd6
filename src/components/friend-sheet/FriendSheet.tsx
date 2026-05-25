@@ -13,13 +13,11 @@ import { toast } from 'sonner';
 import {
   X,
   MessageCircle,
-  Pin,
   UserPlus,
 } from 'lucide-react';
 import { useFriendHybridSnapshot } from '@/lib/whs/hooks/useFriendHybridSnapshot';
 import {
   useFriendRivalries,
-  useUpsertRivalOverride,
 } from '@/lib/whs/hooks';
 import { Z } from '@/config/zIndex';
 import type { FriendLeaderboardEntry } from '@/lib/whs/types';
@@ -48,6 +46,7 @@ import {
   deriveSheetStateFromWhsEntry,
   type SheetState,
 } from './parts/_shared/deriveSheetState';
+import { formatFriendName, getFirstName } from './parts/_shared/formatName';
 
 export interface FriendSheetProps {
   viewerUserId: string;
@@ -95,7 +94,6 @@ export const FriendSheet: React.FC<FriendSheetProps> = ({
     return null;
   }, [isWhsOnlyMode, whsOnlyEntry, snapshot, rivalry]);
 
-  const upsert = useUpsertRivalOverride();
 
   // ─── Handlers ─────────────────────────────────────────────────────
   const handleViewProfile = () => {
@@ -103,7 +101,7 @@ export const FriendSheet: React.FC<FriendSheetProps> = ({
     const handle = snapshot?.profile.username ?? targetUserId;
     if (handle) navigate(`/profile/${handle}`);
   };
-  const handleMessage = () => handleViewProfile(); // v1 fallback
+  const handleMessage = () => handleViewProfile();
   const handleSeeRivalry = () => {
     if (!targetUserId) return;
     onClose();
@@ -113,29 +111,6 @@ export const FriendSheet: React.FC<FriendSheetProps> = ({
     if (!targetUserId) return;
     onClose();
     navigate(`/handicap/${targetUserId}`);
-  };
-  const handlePinRival = async () => {
-    if (!whsOnlyEntry) return;
-    try {
-      const identity = whsOnlyEntry.friend_user_id
-        ? {
-            rival_user_id: whsOnlyEntry.friend_user_id,
-            rival_friend_row_id: null,
-          }
-        : {
-            rival_user_id: null,
-            rival_friend_row_id: whsOnlyEntry.friend_row_id,
-          };
-      await upsert.mutateAsync({
-        userId: viewerUserId,
-        slotIndex: 4,
-        ...identity,
-      });
-      toast.success('Pinned as rival');
-      onClose();
-    } catch (e: any) {
-      toast.error(e?.message ?? 'Could not pin rival');
-    }
   };
   const handleInvite = async () => {
     const url = `${window.location.origin}/invite?ref=${viewerUserId}`;
@@ -155,17 +130,23 @@ export const FriendSheet: React.FC<FriendSheetProps> = ({
     navigate(`/post/${postId}`);
   };
 
+  // Compute firstName for the active state (used by stubs + invite button label).
+  const friendFirstName =
+    state?.kind === 'whs_only'
+      ? getFirstName(state.entry.friend_name)
+      : '';
+
   // ─── Footer actions per state ────────────────────────────────────
   const footer = state
-    ? buildFooter(state.kind, {
+    ? buildFooter(state, {
         handleMessage,
         handleViewProfile,
         handleSeeRivalry,
         handleSeeHandicap,
-        handlePinRival,
         handleInvite,
-      })
+      }, friendFirstName)
     : { actions: [] as FooterAction[], layout: 'horizontal' as const };
+
 
   // ─── Header props per state ──────────────────────────────────────
   const headerProps = (() => {
@@ -199,7 +180,7 @@ export const FriendSheet: React.FC<FriendSheetProps> = ({
     };
   })();
 
-  const titleName = headerProps?.name ?? 'Golfer';
+  const titleName = formatFriendName(headerProps?.name ?? 'Golfer');
 
   const isClbhouzUser =
     state?.kind === 'clbhouz_synced_full' ||
@@ -360,6 +341,7 @@ export const FriendSheet: React.FC<FriendSheetProps> = ({
                 {state.kind === 'whs_only' && (
                   <>
                     <RecentRoundsStub
+                      firstName={friendFirstName}
                       lastRound={
                         state.entry.last_round_played_at &&
                         state.entry.last_round_course_name
@@ -372,7 +354,7 @@ export const FriendSheet: React.FC<FriendSheetProps> = ({
                           : null
                       }
                     />
-                    <StandoutRoundsStub />
+                    <StandoutRoundsStub firstName={friendFirstName} />
                   </>
                 )}
 
