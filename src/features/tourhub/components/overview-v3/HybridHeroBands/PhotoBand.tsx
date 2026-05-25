@@ -221,7 +221,7 @@ export function PhotoBand({
       <div aria-hidden="true" style={{ position: 'absolute', inset: 0, background: COURSE_SCRIMS, zIndex: 2 }} />
       <div aria-hidden="true" style={{ position: 'absolute', inset: 0, background: LEGIBILITY_SCRIM, zIndex: 2 }} />
 
-      {/* eyebrow row */}
+      {/* B1: eyebrow row — left tour chip only, no right metadata */}
       <div
         style={{
           position: 'absolute',
@@ -230,44 +230,28 @@ export function PhotoBand({
           right: 20,
           display: 'flex',
           alignItems: 'center',
-          justifyContent: 'space-between',
+          gap: 10,
           zIndex: 3,
         }}
       >
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-          {isMajor ? (
-            <MajorBadge />
-          ) : (
-            <span
-              style={{
-                fontSize: 10,
-                fontWeight: 800,
-                letterSpacing: '0.18em',
-                color: 'rgba(255,255,255,0.85)',
-                textShadow: '0 1px 3px rgba(0,0,0,0.4)',
-              }}
-            >
-              {tourLabel}
-            </span>
-          )}
-          <StatusPill state={state} />
-        </div>
-        <span
-          style={{
-            fontFamily: FONT_MONO,
-            fontSize: 11,
-            fontWeight: 700,
-            letterSpacing: '0.08em',
-            color: 'rgba(255,255,255,0.85)',
-            textShadow: '0 1px 3px rgba(0,0,0,0.4)',
-            whiteSpace: 'nowrap',
-          }}
-        >
-          {rightTimestamp(state)}
-        </span>
+        {isMajor ? (
+          <MajorBadge />
+        ) : (
+          <span
+            style={{
+              fontSize: 10,
+              fontWeight: 800,
+              letterSpacing: '0.18em',
+              color: 'rgba(255,255,255,0.85)',
+              textShadow: '0 1px 3px rgba(0,0,0,0.4)',
+            }}
+          >
+            {tourLabel}
+          </span>
+        )}
       </div>
 
-      {/* title block */}
+      {/* B1 + B2: title block with state pill above + MapPin venue line */}
       <div
         style={{
           position: 'absolute',
@@ -277,20 +261,30 @@ export function PhotoBand({
           zIndex: 3,
         }}
       >
+        {/* State pill — directly above the tournament title */}
+        <div style={{ marginBottom: 10 }}>
+          <StatusPill state={state} />
+        </div>
         <h1 className="hybrid-hero-title">{title}</h1>
         {venueName && (
           <div
             style={{
-              fontSize: 12,
+              display: 'flex',
+              alignItems: 'center',
+              gap: 6,
+              fontSize: 15,
               fontWeight: 600,
-              color: 'rgba(255,255,255,0.80)',
+              color: 'rgba(255,255,255,0.86)',
               marginTop: 10,
               textShadow: '0 1px 3px rgba(0,0,0,0.45)',
-              letterSpacing: '0.02em',
+              letterSpacing: '0.01em',
             }}
           >
-            📍 {venueName}
-            {venueCity ? ` · ${venueCity}` : ''}
+            <MapPin size={14} strokeWidth={2.2} color="rgba(255,255,255,0.7)" />
+            <span>
+              {venueName}
+              {venueCity ? ` · ${venueCity}` : ''}
+            </span>
           </div>
         )}
       </div>
