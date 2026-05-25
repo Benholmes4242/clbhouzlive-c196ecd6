@@ -8,9 +8,8 @@
  */
 
 import { useState, useEffect } from 'react';
-import { HandicapAvatarFallback } from '@/components/ui/HandicapAvatarFallback';
+import { PlayerSilhouette } from '@/components/ui/PlayerSilhouette';
 import { getPlayerHeadshotUrl } from '@/utils/playerHeadshot';
-
 
 export interface TeamMemberAvatar {
   fullName: string;
@@ -45,21 +44,21 @@ function resolvePhoto(m: TeamMemberAvatar): string | null {
 function SingleAvatar({
   src,
   alt,
-  fallbackName,
   size,
   borderColor,
   borderWidth,
   radiusPct,
+  silhouetteSize,
   ringColor,
   ringWidth,
 }: {
   src: string | null;
   alt: string;
-  fallbackName: string;
   size: number;
   borderColor?: string;
   borderWidth?: number;
   radiusPct: number;
+  silhouetteSize: number;
   ringColor?: string;
   ringWidth?: number;
 }) {
@@ -77,7 +76,7 @@ function SingleAvatar({
         height: size,
         borderRadius: `${radiusPct}%`,
         overflow: 'hidden',
-        background: 'var(--hcp-bg-3)',
+        background: 'rgba(255,255,255,0.10)',
         border: borderColor ? `${borderWidth ?? 1.5}px solid ${borderColor}` : undefined,
         ...ringStyle,
       }}
@@ -92,12 +91,11 @@ function SingleAvatar({
           style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'top' }}
         />
       ) : (
-        <HandicapAvatarFallback name={fallbackName} size={size} contentsOnly />
+        <PlayerSilhouette size={silhouetteSize} />
       )}
     </div>
   );
 }
-
 
 export function LeaderEntityAvatar({
   player,
@@ -119,13 +117,12 @@ export function LeaderEntityAvatar({
         <SingleAvatar
           src={p ? resolvePhoto(p) : null}
           alt={p?.fullName ?? ''}
-          fallbackName={p?.fullName ?? ''}
           size={size}
           borderColor={borderColor}
           borderWidth={borderWidth}
           radiusPct={radiusPct}
+          silhouetteSize={Math.round(size * 0.6)}
         />
-
       </div>
     );
   }
@@ -154,11 +151,11 @@ export function LeaderEntityAvatar({
         <SingleAvatar
           src={resolvePhoto(m2)}
           alt={m2.fullName}
-          fallbackName={m2.fullName}
           size={inner}
           borderColor={borderColor}
           borderWidth={borderWidth}
           radiusPct={radiusPct}
+          silhouetteSize={Math.round(inner * 0.6)}
         />
       </div>
 
@@ -167,16 +164,15 @@ export function LeaderEntityAvatar({
         <SingleAvatar
           src={resolvePhoto(m1)}
           alt={m1.fullName}
-          fallbackName={m1.fullName}
           size={inner}
           borderColor={borderColor}
           borderWidth={borderWidth}
           radiusPct={radiusPct}
+          silhouetteSize={Math.round(inner * 0.6)}
           ringColor={ringColor}
           ringWidth={ringWidth}
         />
       </div>
-
     </div>
   );
 }

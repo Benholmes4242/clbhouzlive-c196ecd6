@@ -9,7 +9,7 @@ import type { WinnerSeasonStats } from '../../hooks/useWinnerSeasonStats';
 import { SCORE_COLORS } from '../../utils/scoreColors';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { getPlayerHeadshotUrl, PLAYER_SILHOUETTE_URL } from '@/utils/playerHeadshot';
-// PlayerSilhouette no longer used — fallbacks now render initials (handicap style)
+import { PlayerSilhouette } from '@/components/ui/PlayerSilhouette';
 import type { TournamentFinisher } from '../../hooks/useTournamentLeadersWinners';
 import { useCountdown } from '@/hooks/useCountdown';
 
@@ -157,21 +157,16 @@ function FrostedAvatar({ src, fallbackSrc, displayName, size }: { src: string | 
     <div style={{
       width: size, height: size, borderRadius: '34%', overflow: 'hidden', flexShrink: 0,
       border: '1.5px solid rgba(255,255,255,0.18)',
-      background: 'var(--hcp-bg-3)',
+      background: 'rgba(255,255,255,0.06)',
       display: 'flex', alignItems: 'center', justifyContent: 'center',
-      color: 'var(--hcp-t-soft)',
-      fontWeight: 800,
-      fontSize: Math.max(10, Math.round(size * 0.36)),
-      letterSpacing: '-0.01em',
     }}>
       {currentSrc && !imgError ? (
         <img src={currentSrc} alt={displayName} onLoad={handleLoad} onError={handleError} style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'top' }} />
       ) : (
-        <span>{initials}</span>
+        <PlayerSilhouette size={Math.round(size * 0.75)} />
       )}
     </div>
   );
-
 }
 
 /** Squircle avatar matching the global SDS spec (34% radius, 1:1.05 aspect) */
