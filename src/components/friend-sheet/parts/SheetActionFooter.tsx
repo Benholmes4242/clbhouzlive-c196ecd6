@@ -25,7 +25,7 @@ export const SheetActionFooter: React.FC<Props> = ({ actions, layout }) => (
     }}
   >
     {actions.map((action, i) => (
-      <ActionButton key={i} {...action} />
+      <ActionButton key={i} {...action} layout={layout} />
     ))}
   </div>
 );
