@@ -58,7 +58,7 @@ const SectionHeader: React.FC<{
       marginBottom: 10,
       fontSize: 10,
       fontWeight: 800,
-      letterSpacing: '0.14em',
+      letterSpacing: '0.18em',
       textTransform: 'uppercase',
       color: 'var(--hcp-t-80)',
     }}
@@ -155,7 +155,7 @@ export const TrophyRoomSheet: React.FC<Props> = ({ userId, viewerUserId }) => {
         {/* Header */}
         <div
           style={{
-            padding: '14px 20px 12px',
+            padding: '16px 20px 14px',
             borderBottom: '0.5px solid var(--hcp-line)',
             flexShrink: 0,
             fontFamily: GAM.FONT_GEIST,
@@ -164,19 +164,52 @@ export const TrophyRoomSheet: React.FC<Props> = ({ userId, viewerUserId }) => {
           <Eyebrow />
           <div
             style={{
-              fontSize: 24,
-              fontWeight: 900,
-              letterSpacing: '-0.025em',
+              fontSize: 42,
+              fontWeight: 200,
+              letterSpacing: '-0.045em',
               color: 'var(--hcp-t-100)',
               marginTop: 6,
+              lineHeight: 0.95,
               ...GAM.TABULAR,
             }}
           >
-            {earnedTotal} earned
+            {earnedTotal}
+            <span
+              style={{
+                fontSize: 17,
+                fontWeight: 600,
+                color: 'var(--hcp-t-60)',
+                letterSpacing: '0.02em',
+                marginLeft: 6,
+              }}
+            >
+              earned
+            </span>
           </div>
-          <div style={{ fontSize: 12, color: 'var(--hcp-t-60)', marginTop: 4, ...GAM.TABULAR }}>
-            {earnedAchievements.length} {earnedAchievements.length === 1 ? 'achievement' : 'achievements'} ·{' '}
-            {allLegends.length} course {allLegends.length === 1 ? 'legend' : 'legends'}
+          <div
+            style={{
+              fontSize: 12,
+              color: 'var(--hcp-t-60)',
+              marginTop: 8,
+              display: 'flex',
+              gap: 12,
+              flexWrap: 'wrap',
+              ...GAM.TABULAR,
+            }}
+          >
+            <span>
+              <span style={{ color: 'var(--hcp-t-100)', fontWeight: 700 }}>
+                {earnedAchievements.length}
+              </span>{' '}
+              {earnedAchievements.length === 1 ? 'achievement' : 'achievements'}
+            </span>
+            <span style={{ color: 'var(--hcp-t-40)' }} aria-hidden>·</span>
+            <span>
+              <span style={{ color: 'var(--hcp-t-100)', fontWeight: 700 }}>
+                {allLegends.length}
+              </span>{' '}
+              course {allLegends.length === 1 ? 'legend' : 'legends'}
+            </span>
           </div>
         </div>
 
@@ -213,7 +246,7 @@ export const TrophyRoomSheet: React.FC<Props> = ({ userId, viewerUserId }) => {
                   color: active ? 'var(--hcp-t-100)' : 'var(--hcp-t-60)',
                   fontSize: 12,
                   fontWeight: active ? 800 : 600,
-                  letterSpacing: '0.02em',
+                  letterSpacing: '0.04em',
                   cursor: 'pointer',
                   fontFamily: GAM.FONT_GEIST,
                   display: 'inline-flex',
