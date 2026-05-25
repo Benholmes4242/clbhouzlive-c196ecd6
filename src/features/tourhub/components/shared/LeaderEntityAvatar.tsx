@@ -8,8 +8,9 @@
  */
 
 import { useState, useEffect } from 'react';
-import { PlayerSilhouette } from '@/components/ui/PlayerSilhouette';
+import { HandicapAvatarFallback } from '@/components/ui/HandicapAvatarFallback';
 import { getPlayerHeadshotUrl } from '@/utils/playerHeadshot';
+
 
 export interface TeamMemberAvatar {
   fullName: string;
