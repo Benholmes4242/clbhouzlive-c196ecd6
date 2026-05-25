@@ -275,6 +275,7 @@ export function HybridHero({ slide }: HybridHeroProps) {
         courseStats={courseStats}
         teamWinner={teamWinner}
       />
+      <HeroContextLine state={state} champion={champion} onTap={onCtaTap} />
       <LeaderboardBand
         state={state}
         leaderboard={safeLeaderboard}
