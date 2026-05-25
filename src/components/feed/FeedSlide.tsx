@@ -68,33 +68,9 @@ export const FeedSlide = memo(function FeedSlide({
   }, [isActive, resetZoom]);
 
   // ── Content routing ──
+  // Phase 3: PGA / Course-of-Week editorial card branches were removed; those
+  // cards now render as standalone Home modules (HomePGAModule, HomeCourseOfWeekModule).
   const renderContent = () => {
-    // PGA tournament card
-    if (post.postType === 'pga_card') {
-      return (
-        <PGACard
-          post={post as unknown as PGACardFeedPost}
-          onComment={() => onComment?.()}
-          onLike={() => onLike?.(post)}
-          getLikeState={getLikeState}
-          getCommentCount={getCommentCount}
-        />
-      );
-    }
-
-    // Course of the week editorial card
-    if (post.postType === 'course_of_week_card') {
-      return (
-        <CourseOfWeekCard
-          post={post as unknown as CourseOfWeekCardFeedPost}
-          onComment={() => onComment?.()}
-          onLike={() => onLike?.(post)}
-          getLikeState={getLikeState}
-          getCommentCount={getCommentCount}
-          currentUserId={user?.id}
-        />
-      );
-    }
 
     // Multi-media (any mix of video + image) → FeedImageCarousel
     if (media && media.length > 1) {
