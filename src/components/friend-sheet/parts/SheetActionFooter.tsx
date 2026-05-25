@@ -67,12 +67,14 @@ const ActionButton: React.FC<FooterAction> = ({
       onClick={onClick}
       style={{
         flex: 1,
-        height: 52,
-        borderRadius: 14,
+        width: '100%',
+        minHeight: 60,
+        height: 60,
+        borderRadius: 16,
         border: isPrimary ? 'none' : `1px solid ${LINE_2}`,
         background: isPrimary ? AMBER : 'transparent',
         color: isPrimary ? '#0A0E14' : T100,
-        fontSize: 15,
+        fontSize: 16,
         fontWeight: isPrimary ? 800 : 700,
         cursor: 'pointer',
         fontFamily: FONT,
@@ -80,9 +82,11 @@ const ActionButton: React.FC<FooterAction> = ({
         alignItems: 'center',
         justifyContent: 'center',
         gap: 8,
+        padding: '0 20px',
+        lineHeight: 1,
       }}
     >
-      {Icon && <Icon size={16} strokeWidth={2.2} />}
+      {Icon && <Icon size={18} strokeWidth={2.2} />}
       {label}
     </button>
   );
