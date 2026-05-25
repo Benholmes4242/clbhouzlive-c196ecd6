@@ -454,11 +454,20 @@ async function recomputeTop100Milestones(userId: string) {
 // ─────────────────────────────────────────────────────────────────────────────
 // apply_badges
 // ─────────────────────────────────────────────────────────────────────────────
+/**
+ * Returns the number of tiers the user has reached given their lifetime value
+ * and the catalogue's tier thresholds.
+ *
+ * Semantics: 0 = no tier reached, 1 = first tier reached, ..., N = all tiers reached.
+ *
+ * Example: tiers [1, 10, 20, 50, 75, 100], value 22 → returns 3
+ * (the user has crossed 3 thresholds: 1, 10, 20).
+ */
 function computeTier(value: number, tiers: any): number {
-  if (!Array.isArray(tiers)) return -1;
-  let highest = -1;
-  for (let i = 0; i < tiers.length; i++) if (value >= Number(tiers[i])) highest = i;
-  return highest;
+  if (!Array.isArray(tiers)) return 0;
+  let reached = 0;
+  for (let i = 0; i < tiers.length; i++) if (value >= Number(tiers[i])) reached = i + 1;
+  return reached;
 }
 
 function compare(value: number, op: string, target: number): boolean {
@@ -522,7 +531,7 @@ async function applyBadges(userId: string, stats: any, whsScoreId: string): Prom
 
       if (Array.isArray(tiers) && tiers.length > 0) {
         const tier = computeTier(lifetime, tiers);
-        if (tier >= 0 && (!existing || (existing.counter_tier ?? -1) < tier)) {
+        if (tier > 0 && (!existing || (existing.counter_tier ?? 0) < tier)) {
           await upsertBadgeTiered(userId, badge.id, lifetime, tier, whsScoreId);
           earned.push(badge.id);
         } else if (existing) {
@@ -572,7 +581,7 @@ async function upsertBadgeTiered(userId: string, badgeId: string, counterValue: 
     .from("gam_user_badges")
     .select("counter_tier, seen_by_user")
     .eq("user_id", userId).eq("badge_id", badgeId).maybeSingle();
-  const isNewTier = !existing || (existing.counter_tier ?? -1) < tier;
+  const isNewTier = !existing || (existing.counter_tier ?? 0) < tier;
   await supabase.from("gam_user_badges").upsert(
     {
       user_id: userId,
