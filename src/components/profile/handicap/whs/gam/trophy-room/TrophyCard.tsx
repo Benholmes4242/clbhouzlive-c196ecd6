@@ -57,9 +57,9 @@ export const TrophyCard: React.FC<Props> = ({ item, onTap }) => {
         aspectRatio: '1 / 1.18',
         borderRadius: 14,
         border: `1px solid ${palette.border}`,
-        background: `linear-gradient(160deg, ${palette.tint} 0%, var(--hcp-bg-1) 70%)`,
+        background: palette.cardSweep,
         overflow: 'hidden',
-        padding: 10,
+        padding: 11,
         cursor: 'pointer',
         textAlign: 'left',
         opacity: dimmed ? 0.62 : 1,
@@ -70,19 +70,38 @@ export const TrophyCard: React.FC<Props> = ({ item, onTap }) => {
         flexDirection: 'column',
         justifyContent: 'space-between',
         color: 'var(--hcp-t-100)',
+        boxShadow: palette.outerGlow
+          ? `inset 0 1px 0 rgba(255,255,255,0.05), ${palette.outerGlow}`
+          : 'inset 0 1px 0 rgba(255,255,255,0.04)',
       }}
     >
+      {/* Legendary top stripe — present only when token defines one */}
+      {palette.topStripe && (
+        <div
+          aria-hidden
+          style={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            height: 2,
+            background: palette.topStripe,
+            pointerEvents: 'none',
+          }}
+        />
+      )}
+
       {/* Watermark */}
       <div
         aria-hidden
         style={{
           position: 'absolute',
-          right: -28,
-          bottom: -32,
-          width: 120,
-          height: 120,
-          transform: 'rotate(-8deg)',
-          opacity: dimmed ? 0.05 : 0.12,
+          right: -22,
+          bottom: -28,
+          width: 130,
+          height: 130,
+          transform: 'rotate(-6deg)',
+          opacity: dimmed ? 0.05 : 0.10,
           color: palette.color,
           pointerEvents: 'none',
           display: 'flex',
@@ -90,7 +109,7 @@ export const TrophyCard: React.FC<Props> = ({ item, onTap }) => {
           justifyContent: 'center',
         }}
       >
-        {renderBadgeIcon(item.iconKey, 120, 'currentColor')}
+        {renderBadgeIcon(item.iconKey, 130, 'currentColor')}
       </div>
 
       {/* Top row: icon tile + pill */}
@@ -105,30 +124,36 @@ export const TrophyCard: React.FC<Props> = ({ item, onTap }) => {
       >
         <div
           style={{
-            width: 28,
-            height: 28,
-            borderRadius: 8,
-            background: palette.tint,
+            width: 30,
+            height: 30,
+            borderRadius: 9,
+            background: `linear-gradient(180deg, ${palette.tint}, rgba(255,255,255,0.01))`,
             border: `1px solid ${palette.border}`,
+            boxShadow: 'inset 0 1px 1px rgba(0,0,0,0.30)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
             color: palette.color,
           }}
         >
-          {locked ? <Lock size={14} /> : renderBadgeIcon(item.iconKey, 14, 'currentColor')}
+          {locked ? (
+            <Lock size={14} strokeWidth={2.0} />
+          ) : (
+            renderBadgeIcon(item.iconKey, 14, 'currentColor')
+          )}
         </div>
         {pill && (
           <span
             style={{
-              padding: '3px 7px',
+              padding: '3px 8px',
               fontSize: 9,
               fontWeight: 800,
-              letterSpacing: '0.06em',
+              letterSpacing: '0.10em',
               color: palette.color,
-              background: palette.tint,
+              background: `linear-gradient(180deg, ${palette.tint}, rgba(255,255,255,0.01))`,
               border: `1px solid ${palette.border}`,
-              borderRadius: 6,
+              borderRadius: 7,
+              boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.06)',
               ...GAM.TABULAR,
             }}
           >
@@ -141,11 +166,11 @@ export const TrophyCard: React.FC<Props> = ({ item, onTap }) => {
       <div style={{ position: 'relative', zIndex: 1 }}>
         <div
           style={{
-            fontSize: 12.5,
-            fontWeight: 800,
+            fontSize: 13,
+            fontWeight: 700,
             lineHeight: 1.2,
             color: 'var(--hcp-t-100)',
-            letterSpacing: '-0.01em',
+            letterSpacing: '-0.015em',
             display: '-webkit-box',
             WebkitLineClamp: 2,
             WebkitBoxOrient: 'vertical',
@@ -156,12 +181,16 @@ export const TrophyCard: React.FC<Props> = ({ item, onTap }) => {
         </div>
         <div
           style={{
-            marginTop: 3,
+            marginTop: 4,
             fontSize: 9.5,
-            color: 'var(--hcp-t-60)',
+            fontWeight: 700,
+            color: palette.metaColor,
+            letterSpacing: '0.12em',
+            textTransform: 'uppercase',
             whiteSpace: 'nowrap',
             overflow: 'hidden',
             textOverflow: 'ellipsis',
+            opacity: dimmed ? 0.7 : 0.95,
             ...GAM.TABULAR,
           }}
         >
