@@ -236,9 +236,9 @@ export const TrophyCard: React.FC<Props> = ({ item, onTap }) => {
             flexDirection: 'column',
             alignItems: 'center',
             justifyContent: 'center',
-            padding: '4px 0',
+            padding: '8px 0 12px',
             minHeight: 0,
-            gap: 2,
+            gap: 4,
           }}
         >
           <span
@@ -263,7 +263,7 @@ export const TrophyCard: React.FC<Props> = ({ item, onTap }) => {
                 color: 'var(--hcp-t-60)',
                 letterSpacing: '0.16em',
                 textTransform: 'uppercase',
-                marginTop: 2,
+                whiteSpace: 'nowrap',
               }}
             >
               {SHOWPIECE_COUNTER_LABEL[item.badgeId]}
@@ -273,7 +273,7 @@ export const TrophyCard: React.FC<Props> = ({ item, onTap }) => {
       )}
 
       {/* Bottom: name + meta */}
-      <div style={{ position: 'relative', zIndex: 1 }}>
+      <div style={{ position: 'relative', zIndex: 1, flexShrink: 0 }}>
         <div
           style={{
             fontSize: showpieceWithCounter ? 12.5 : 13,
