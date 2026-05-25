@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { type LucideIcon } from 'lucide-react';
 import { ChampionCard } from './ChampionCard';
 import { CompactLeaderRow } from './CompactLeaderRow';
@@ -20,6 +20,8 @@ interface Props {
   unit: string;
   rows: SectionRow[];
   totalCount: number;
+  /** Called when "See full leaderboard" is tapped. Parent opens the sheet. */
+  onSeeFull: () => void;
 }
 
 const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
@@ -31,14 +33,13 @@ export const CategorySection: React.FC<Props> = ({
   unit,
   rows,
   totalCount,
+  onSeeFull,
 }) => {
-  const [expanded, setExpanded] = useState(false);
-
   if (rows.length === 0) return null;
 
   const champion = rows[0];
   const restAll = rows.slice(1);
-  const restVisible = expanded ? restAll : restAll.slice(0, DEFAULT_VISIBLE - 1);
+  const restVisible = restAll.slice(0, DEFAULT_VISIBLE - 1);
   const visibleCount = 1 + restVisible.length;
   const hiddenCount = totalCount - visibleCount;
 
@@ -122,7 +123,7 @@ export const CategorySection: React.FC<Props> = ({
         </div>
       )}
 
-      <SeeFullFooter hiddenCount={hiddenCount} onClick={() => setExpanded(true)} />
+      <SeeFullFooter hiddenCount={hiddenCount} onClick={onSeeFull} />
     </div>
   );
 };
