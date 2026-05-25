@@ -455,18 +455,13 @@ function buildFooter(
       };
     case 'clbhouz_not_synced':
       return {
-        layout: 'horizontal',
+        layout: 'stacked',
         actions: [
           {
-            variant: 'icon',
-            label: 'Message',
-            onClick: h.handleMessage,
-            icon: MessageCircle,
-          },
-          {
             variant: 'primary',
-            label: 'View profile',
-            onClick: h.handleViewProfile,
+            label: firstName ? `Nudge ${firstName} to sync` : 'Nudge to sync',
+            onClick: h.handleNudgeSync,
+            icon: UserPlus,
           },
         ],
       };
@@ -476,7 +471,7 @@ function buildFooter(
         actions: [
           {
             variant: 'primary',
-            label: firstName ? `Invite ${firstName}` : 'Invite to clbhouz',
+            label: firstName ? `Invite ${firstName} to clbhouz` : 'Invite to clbhouz',
             onClick: h.handleInvite,
             icon: UserPlus,
           },
