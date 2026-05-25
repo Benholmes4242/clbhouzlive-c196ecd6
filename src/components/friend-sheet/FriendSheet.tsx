@@ -394,6 +394,7 @@ interface Handlers {
   handleSeeRivalry: () => void;
   handleSeeHandicap: () => void;
   handleInvite: () => void;
+  handleNudgeSync: () => void;
 }
 
 function buildFooter(
