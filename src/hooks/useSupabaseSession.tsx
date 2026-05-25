@@ -13,21 +13,18 @@ export function useSupabaseSession() {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
-
-  // If somehow used outside provider, fail gracefully
-  if (!hasQueryClient) {
-    return {
-      user: null,
-      session: null,
-      loading: false,
-    };
-  }
-
   const sessionStartLogged = useRef(false);
-  
+
   useEffect(() => {
+    // If used outside provider, bail out of the effect but keep hook order stable.
+    if (!hasQueryClient) {
+      setLoading(false);
+      return;
+    }
+
     let mounted = true;
     let initialSessionChecked = false;
+
 
     const applySession = (nextSession: Session | null) => {
       if (!mounted) return;
@@ -83,7 +80,8 @@ export function useSupabaseSession() {
       mounted = false;
       subscription.unsubscribe();
     };
-  }, [queryClient]);
+  }, [queryClient, hasQueryClient]);
+
 
   return { user, session, loading };
 }
