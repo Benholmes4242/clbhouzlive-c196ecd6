@@ -1,11 +1,10 @@
 import React from 'react';
-import { ChevronLeft, Crown } from 'lucide-react';
+import { Crown } from 'lucide-react';
 import { CourseEyebrow } from '../_shared/CourseEyebrow';
 import type { CourseSelection } from '../types';
 
 interface Props {
   state: CourseSelection;
-  onBack?: () => void;
   youOwnedCount: number;
   totalCategories?: number;
   /** Course header photo. Null/undefined → renders gradient fallback. */
@@ -16,7 +15,6 @@ const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
 
 export const DrilldownHeader: React.FC<Props> = ({
   state,
-  onBack,
   youOwnedCount,
   totalCategories = 6,
   courseHeaderImage,
@@ -78,41 +76,12 @@ export const DrilldownHeader: React.FC<Props> = ({
       style={{
         position: 'absolute',
         top: 16,
-        left: 16,
         right: 16,
         display: 'flex',
-        justifyContent: 'space-between',
+        justifyContent: 'flex-end',
         alignItems: 'center',
-        gap: 12,
       }}
     >
-      {onBack ? (
-        <button
-          onClick={onBack}
-          style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: 4,
-            padding: '5px 11px 5px 8px',
-            background: 'rgba(0,0,0,0.45)',
-            border: '1px solid rgba(255,255,255,0.10)',
-            borderRadius: 999,
-            backdropFilter: 'blur(8px)',
-            WebkitBackdropFilter: 'blur(8px)',
-            color: '#FFFFFF',
-            fontFamily: FONT,
-            fontSize: 12,
-            fontWeight: 600,
-            cursor: 'pointer',
-          }}
-        >
-          <ChevronLeft size={14} strokeWidth={2.2} />
-          All courses
-        </button>
-      ) : (
-        <div />
-      )}
-
       <div
         style={{
           display: 'inline-flex',

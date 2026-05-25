@@ -114,6 +114,7 @@ const QuickEditProfilePage = lazy(() => import("./pages/QuickEditProfilePage"));
 // ProfileHandicapView removed — /profile/handicap now redirects to /handicap (fix brief §2.1)
 const HandicapPage = lazy(() => import("./pages/HandicapPage"));
 const RivalryPage = lazy(() => import("./pages/RivalryPage"));
+const CourseLegendsPage = lazy(() => import("./pages/CourseLegendsPage"));
 
 const ProfileQuestView = lazy(() => import("./pages/ProfileQuestView"));
 const QuestIndexView = lazy(() => import("./pages/QuestIndexView"));
@@ -313,9 +314,12 @@ function AppRoutes() {
         <Route path="/profile" element={<ProfileWrapped />} />
         <Route path="/profile/handicap" element={<Navigate to="/handicap" replace />} />
         <Route path="/handicap" element={<Suspense fallback={<ProfileSkeleton />}><HandicapPage /></Suspense>} />
-        <Route path="/handicap/:userId" element={<Suspense fallback={<ProfileSkeleton />}><HandicapPage /></Suspense>} />
+        <Route path="/handicap/legends" element={<Navigate to="/handicap?subtab=compete" replace />} />
+        <Route path="/handicap/legends/courses/:courseId" element={<Suspense fallback={<ProfileSkeleton />}><CourseLegendsPage /></Suspense>} />
         <Route path="/handicap/rivalry/:rivalUserId" element={<Suspense fallback={<ProfileSkeleton />}><RivalryPage /></Suspense>} />
+        <Route path="/handicap/:userId" element={<Suspense fallback={<ProfileSkeleton />}><HandicapPage /></Suspense>} />
         <Route path="/handicap/:friendUserId/rivalry/:rivalUserId" element={<Suspense fallback={<ProfileSkeleton />}><RivalryPage /></Suspense>} />
+
         
         <Route path="/profile/quest" element={<Suspense fallback={<ProfileSkeleton />}><ProfileQuestView /></Suspense>} />
         <Route path="/profile/quest/index" element={<Suspense fallback={<ProfileSkeleton />}><QuestIndexView /></Suspense>} />
