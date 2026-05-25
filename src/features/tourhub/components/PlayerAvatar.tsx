@@ -5,7 +5,7 @@
 import { useState } from 'react';
 import { cn } from '@/lib/utils';
 import { getPlayerHeadshotUrl } from '@/utils/playerHeadshot';
-import { PlayerSilhouette } from '@/components/ui/PlayerSilhouette';
+import { HandicapAvatarFallback } from '@/components/ui/HandicapAvatarFallback';
 
 interface PlayerAvatarProps {
   playerId: string;
@@ -24,6 +24,7 @@ const SIZE_CLASSES = {
 };
 
 const SIZE_PX = { sm: 24, md: 32, lg: 48, xl: 72, '2xl': 96 };
+
 
 export function PlayerAvatar({ 
   playerId, 
