@@ -369,7 +369,7 @@ export const FriendSheet: React.FC<FriendSheetProps> = ({
             <div
               style={{
                 flexShrink: 0,
-                padding: '16px 16px 20px',
+                padding: '6px 16px 20px',
                 paddingBottom: 'max(20px, env(safe-area-inset-bottom))',
                 background: BG_0,
               }}
