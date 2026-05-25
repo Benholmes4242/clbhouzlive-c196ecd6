@@ -272,7 +272,7 @@ function ProfileHubSheet({
 
   const handicapSubCopy = (() => {
     if (handicapState === 'connect') return 'No handicap';
-    if (handicapState === 'nodata') return 'England Golf';
+    if (handicapState === 'nodata') return 'WHS connected';
     const v = trend!.current as number;
     const formatted = v < 0 ? `+${Math.abs(v).toFixed(1)}` : v.toFixed(1);
     return `${formatted} HCP`;
