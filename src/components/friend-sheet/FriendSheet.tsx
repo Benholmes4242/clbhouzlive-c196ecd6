@@ -313,67 +313,53 @@ export const FriendSheet: React.FC<FriendSheetProps> = ({
               <>
                 <SheetHeader
                   {...headerProps}
-                  onClick={isClbhouzUser ? handleSeeHandicap : null}
+                  onClick={
+                    isClbhouzUser && state.kind !== 'clbhouz_not_synced'
+                      ? handleSeeHandicap
+                      : null
+                  }
                 />
 
-                {/* HEAD-TO-HEAD — hidden only for clbhouz_not_synced */}
-                <HeadToHeadCard state={state} />
-
-                {/* THEIR FORM — synced clbhouz users + whs_only */}
-                {state.kind === 'clbhouz_synced_full' && snapshot?.handicap && (
-                  <TheirFormSection handicap={snapshot.handicap} />
-                )}
-                {state.kind === 'clbhouz_synced_duelsOnly' &&
-                  snapshot?.handicap && (
-                    <TheirFormSection handicap={snapshot.handicap} />
-                  )}
-                {state.kind === 'clbhouz_synced_empty' && snapshot?.handicap && (
-                  <TheirFormSection handicap={snapshot.handicap} />
-                )}
+                {/* ─── UNSYNCED states: single hero pitch card ─────────────── */}
                 {state.kind === 'whs_only' && (
-                  <TheirFormSection
-                    handicap={{
-                      handicap_index: state.entry.friend_handicap_index,
-                      trend_delta: state.entry.handicap_30d_delta,
-                      badges_earned: 0,
-                      active_streaks: 0,
-                      last_round: state.entry.last_round_played_at
-                        ? {
-                            course_name: state.entry.last_round_course_name,
-                            adjusted_gross: null,
-                            play_date: state.entry.last_round_played_at,
-                          }
-                        : null,
-                    }}
+                  <UnsyncedPitchCard
+                    firstName={friendFirstName}
+                    eyebrow="Not on clbhouz yet"
+                    headline={`Get ${friendFirstName || 'them'} on clbhouz`}
+                    subCopy={`Once ${friendFirstName || 'they'} ${friendFirstName ? 'joins' : 'join'} and syncs their handicap, every stat below comes alive between you two.`}
+                  />
+                )}
+                {state.kind === 'clbhouz_not_synced' && (
+                  <UnsyncedPitchCard
+                    firstName={state.firstName}
+                    eyebrow="Handicap not synced"
+                    headline={`${state.firstName} hasn't synced yet`}
+                    subCopy={`${state.firstName} is on clbhouz but hasn't connected their official handicap. Nudge them to unlock head-to-heads and shared stats.`}
                   />
                 )}
 
-                {/* LATEST POST — clbhouz users only, when post exists */}
-                {state.kind !== 'whs_only' && snapshot?.recent_post && (
-                  <LatestPostCard
-                    post={snapshot.recent_post}
-                    onTap={() => handleOpenPost(snapshot.recent_post!.id)}
-                  />
-                )}
-
-                {/* WHS-only stubs */}
-                {state.kind === 'whs_only' && (
+                {/* ─── SYNCED states: existing cascade ──────────── */}
+                {state.kind !== 'whs_only' && state.kind !== 'clbhouz_not_synced' && (
                   <>
-                    <RecentRoundsStub
-                      firstName={friendFirstName}
-                      lastRound={
-                        state.entry.last_round_played_at &&
-                        state.entry.last_round_course_name
-                          ? {
-                              courseName: state.entry.last_round_course_name,
-                              relativeTime: fmtRelative(
-                                state.entry.last_round_played_at,
-                              ),
-                            }
-                          : null
-                      }
-                    />
-                    <StandoutRoundsStub firstName={friendFirstName} />
+                    <HeadToHeadCard state={state} />
+
+                    {state.kind === 'clbhouz_synced_full' && snapshot?.handicap && (
+                      <TheirFormSection handicap={snapshot.handicap} />
+                    )}
+                    {state.kind === 'clbhouz_synced_duelsOnly' &&
+                      snapshot?.handicap && (
+                        <TheirFormSection handicap={snapshot.handicap} />
+                      )}
+                    {state.kind === 'clbhouz_synced_empty' && snapshot?.handicap && (
+                      <TheirFormSection handicap={snapshot.handicap} />
+                    )}
+
+                    {snapshot?.recent_post && (
+                      <LatestPostCard
+                        post={snapshot.recent_post}
+                        onTap={() => handleOpenPost(snapshot.recent_post!.id)}
+                      />
+                    )}
                   </>
                 )}
 
