@@ -313,11 +313,7 @@ export const FriendSheet: React.FC<FriendSheetProps> = ({
               <>
                 <SheetHeader
                   {...headerProps}
-                  onClick={
-                    isClbhouzUser && state.kind !== 'clbhouz_not_synced'
-                      ? handleSeeHandicap
-                      : null
-                  }
+                  onClick={isClbhouzUser ? handleSeeHandicap : null}
                 />
 
                 {/* ─── UNSYNCED states: single hero pitch card ─────────────── */}
