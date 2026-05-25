@@ -9,6 +9,7 @@ import { PostingAsPill } from './PostingAsPill';
 import { PostingAsMenu } from './PostingAsMenu';
 import GlobalSearchOverlay from '@/components/search/GlobalSearchOverlay';
 import { ActingAsIndicator } from './ActingAsIndicator';
+import { HandicapChip } from './HandicapChip';
 import { cn } from '@/lib/utils';
 import { haptic } from '@/utils/haptics';
 import { safeGoBack } from '@/utils/navigation';
@@ -289,7 +290,10 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
             >
               <Search className="h-5 w-5" />
             </Button>
-            
+
+            {/* Handicap chip — dark chrome only (Phase 1: dark headers) */}
+            {isDarkChrome && <HandicapChip />}
+
             {/* Identity pill (mobile only) */}
             <div className="sm:hidden">
               {user ? (
