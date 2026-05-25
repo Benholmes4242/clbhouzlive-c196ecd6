@@ -16,6 +16,7 @@ import { DrilldownHeader } from './drilldown/DrilldownHeader';
 import { CourseMetaStrip } from './drilldown/CourseMetaStrip';
 import { CategoryNavRail } from './drilldown/CategoryNavRail';
 import { CategorySection } from './drilldown/CategorySection';
+import { FullCourseLeaderboardSheet } from './drilldown/FullCourseLeaderboardSheet';
 import { WindowToggle } from './CourseLegendsSection';
 
 const AMBER = '#F7931E';
@@ -91,6 +92,8 @@ export const CourseLegendsDrilldown: React.FC<Props> = ({ selection }) => {
   const { data: meta } = useCourseMeta(ctx.courseId);
   const [window, setWindow] = useState<LegendWindow>('90d');
   const [courseHeaderImage, setCourseHeaderImage] = useState<string | null>(null);
+  const [fullLeaderboardCategory, setFullLeaderboardCategory] =
+    useState<LegendCategory | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -164,6 +167,18 @@ export const CourseLegendsDrilldown: React.FC<Props> = ({ selection }) => {
     el?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   };
 
+  const sheetCategoryDescriptors = useMemo(
+    () =>
+      visibleCategories.map((cat) => ({
+        key: cat,
+        label: legendCategoryLabel[cat],
+        short: SHORT_LABELS[cat],
+        icon: legendCategoryIcon[cat],
+        unit: UNITS[cat],
+      })),
+    [visibleCategories],
+  );
+
   return (
     <div ref={containerRef}>
       <DrilldownHeader
@@ -224,6 +239,7 @@ export const CourseLegendsDrilldown: React.FC<Props> = ({ selection }) => {
                     unit={UNITS[cat]}
                     rows={entry.rows}
                     totalCount={entry.total}
+                    onSeeFull={() => setFullLeaderboardCategory(cat)}
                   />
                 </div>
               );
@@ -231,6 +247,16 @@ export const CourseLegendsDrilldown: React.FC<Props> = ({ selection }) => {
           </div>
         </>
       )}
+
+      <FullCourseLeaderboardSheet
+        open={fullLeaderboardCategory !== null}
+        onClose={() => setFullLeaderboardCategory(null)}
+        courseName={ctx.courseName}
+        groupedRows={groupedWithTotals}
+        visibleCategories={sheetCategoryDescriptors}
+        initialCategory={fullLeaderboardCategory ?? visibleCategories[0]}
+        window={window}
+      />
     </div>
   );
 };
