@@ -309,12 +309,17 @@ export const TrophyRoomSheet: React.FC<Props> = ({ userId, viewerUserId }) => {
         <div
           style={{
             display: 'flex',
-            gap: 4,
+            gap: 8,
             padding: '10px 16px',
             borderBottom: '0.5px solid var(--hcp-line)',
             flexShrink: 0,
             fontFamily: GAM.FONT_GEIST,
+            overflowX: 'auto',
+            scrollbarWidth: 'none',
+            msOverflowStyle: 'none',
           }}
+          className="hcp-tab-row"
+          role="tablist"
         >
           {(['all', 'earned', 'locked'] as Tab[]).map((key) => {
             const active = tab === key;
@@ -329,30 +334,45 @@ export const TrophyRoomSheet: React.FC<Props> = ({ userId, viewerUserId }) => {
                 key={key}
                 type="button"
                 onClick={() => setTab(key)}
+                role="tab"
+                aria-selected={active}
                 style={{
-                  flex: 1,
-                  padding: '8px 6px',
-                  background: 'transparent',
-                  border: 'none',
-                  borderBottom: active ? `2px solid ${GAM.AMBER}` : '2px solid transparent',
-                  color: active ? 'var(--hcp-t-100)' : 'var(--hcp-t-60)',
-                  fontSize: 12,
-                  fontWeight: active ? 800 : 600,
-                  letterSpacing: '0.04em',
+                  flex: '0 0 auto',
+                  height: 32,
+                  padding: '0 10px',
+                  borderRadius: 8,
+                  border: active ? '1px solid rgba(255,255,255,0.55)' : '1px solid transparent',
+                  background: active ? 'rgba(255,255,255,0.10)' : 'transparent',
+                  color: active ? '#FFFFFF' : 'var(--hcp-t-60)',
+                  fontFamily: 'inherit',
+                  fontSize: 14,
+                  fontWeight: active ? 700 : 500,
+                  letterSpacing: '-0.01em',
+                  whiteSpace: 'nowrap',
                   cursor: 'pointer',
-                  fontFamily: GAM.FONT_GEIST,
                   display: 'inline-flex',
                   alignItems: 'center',
-                  justifyContent: 'center',
                   gap: 6,
+                  transition: 'all 0.15s',
                 }}
               >
                 {TAB_LABEL[key]}
-                <span style={{ ...GAM.TABULAR, fontWeight: 600, color: 'var(--hcp-t-60)' }}>{count}</span>
+                <span
+                  style={{
+                    ...GAM.TABULAR,
+                    fontWeight: 600,
+                    fontSize: 12,
+                    color: active ? 'rgba(255,255,255,0.7)' : 'var(--hcp-t-60)',
+                  }}
+                >
+                  {count}
+                </span>
               </button>
             );
           })}
+          <style>{`.hcp-tab-row::-webkit-scrollbar { display: none; }`}</style>
         </div>
+
 
         {/* Body */}
         <div
