@@ -112,7 +112,7 @@ export const SheetHeader: React.FC<SheetHeaderProps> = ({
         <button
           type="button"
           onClick={onClick}
-          aria-label={`View ${name}'s handicap`}
+          aria-label={`View ${formatFriendName(name)}'s handicap`}
           style={{
             all: 'unset',
             display: 'block',
