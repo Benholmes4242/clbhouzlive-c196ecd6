@@ -30,7 +30,7 @@ const REGION_CAP_PAGE_SIZE = 10;
 const DECAY_LAMBDA = 0.035;
 const ENTROPY_FLOOR = 0.82;
 const ENTROPY_RANGE = 0.32;
-const EDITORIAL_BASE_SCORE = 180;
+// EDITORIAL_BASE_SCORE removed in Phase 3 — editorial cards no longer enter the feed.
 const REVIEW_POST_BONUS = 1.6;       // increased — reviews are high-value content
 const MIN_EDITORIAL_GAP = 5;
 const VIDEO_TARGET_RATIO = 0.80;
@@ -618,23 +618,8 @@ export function injectCourseOfWeekCard(feedPosts: FeedPost[], card: FeedPost | n
   return ensureEditorialCard(feedPosts, card, 'course_of_week_card', 6); // position 7
 }
 
-// ── Combined Orbit pipeline — posts + editorial cards scored together ──────
-// @deprecated Editorial cards moved to Home (Phase 2). Use buildSuggestedFeed directly.
-// Kept temporarily — Phase 3 cleanup will remove.
-export function buildSuggestedFeedWithEditorials(
-  rawPosts: FeedPost[],
-  editorialCards: (FeedPost | null)[]
-): FeedPost[] {
-  // Merge editorial cards into the pool — filter nulls and stamp each with
-  // EDITORIAL_BASE_SCORE so the single sort inside buildSuggestedFeed places
-  // them at the right relative position alongside server-scored posts.
-  const validEditorials = editorialCards
-    .filter((c): c is FeedPost => c !== null)
-    .map(c => ({ ...c, engagementScore: EDITORIAL_BASE_SCORE }));
-  const combined = [...rawPosts, ...validEditorials];
-  // Run the full Orbit pipeline on the combined set
-  return buildSuggestedFeed(combined);
-}
+// buildSuggestedFeedWithEditorials removed in Phase 3 — editorial cards now render
+// as standalone Home modules (HomePGAModule, HomeCourseOfWeekModule), not feed slides.
 
 // ── Creator diversity (Watch tab — Session 2 of 3) ────────────────────────────
 // Hard guarantee that no two consecutive posts in a list come from the same

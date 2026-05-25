@@ -1,12 +1,9 @@
-import { lazy, Suspense } from 'react';
-import { FriendsFeedSkeleton } from '@/components/friends-tab/FriendsFeedSkeleton';
+import { Navigate } from 'react-router-dom';
 
-const LoopTabContent = lazy(() => import('@/components/loop-tab/LoopTabContent'));
-
+/**
+ * Phase 3: Loop content folded into Clubhouse Friends tab.
+ * Direct hits to this orphan surface are redirected.
+ */
 export default function NewLoopTab() {
-  return (
-    <Suspense fallback={<FriendsFeedSkeleton />}>
-      <LoopTabContent embedded />
-    </Suspense>
-  );
+  return <Navigate to="/clubhouse?tab=friends" replace />;
 }

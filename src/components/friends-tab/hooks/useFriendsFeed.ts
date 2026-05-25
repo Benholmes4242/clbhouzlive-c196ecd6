@@ -1,32 +1,44 @@
 /**
- * Friends feed for the card-style Friends tab UI.
- * NOTE: A separate useFriendsFeed exists at src/components/media-system/hooks/useFriendsFeed.ts
- * for the Clubhouse fullscreen vertical feed.
- * Keep both in sync if the RPC interface changes.
+ * Canonical Friends feed hook.
+ *
+ * Phase 3: consolidated from the former `media-system/hooks/useFriendsFeed`.
+ * Supports both card-style surfaces (friends-tab) and the Clubhouse snap-feed
+ * (via the optional `interleave` flag, which runs `buildFriendsFeed`).
  */
 import { useInfiniteQuery, keepPreviousData } from '@tanstack/react-query';
 import { useCallback, useMemo, useRef } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { mapRowToFeedPost, groupMultiMedia } from '@/components/media-system/utils/feedMapper';
-import { deduplicatePosts } from '@/components/media-system/utils/feedAlgorithm';
+import { buildFriendsFeed, deduplicatePosts } from '@/components/media-system/utils/feedAlgorithm';
 import type { FeedPost, FeedRpcRow } from '@/components/media-system/types/media';
 
 export type FriendsMode = 'latest' | 'popular';
 
-const PAGE_SIZE = 15;
+const PAGE_SIZE_DEFAULT = 15;
 
 interface UseFriendsFeedParams {
   userId: string | undefined;
   mode: FriendsMode;
   searchQuery?: string;
   enabled?: boolean;
+  /** When true, run `buildFriendsFeed` interleave on the returned posts (Clubhouse snap-feed). */
+  interleave?: boolean;
+  /** Override page size (Clubhouse historically used 10; default 15). */
+  pageSize?: number;
 }
 
-export function useFriendsFeed({ userId, mode, searchQuery, enabled: externalEnabled = true }: UseFriendsFeedParams) {
+export function useFriendsFeed({
+  userId,
+  mode,
+  searchQuery,
+  enabled: externalEnabled = true,
+  interleave = false,
+  pageSize = PAGE_SIZE_DEFAULT,
+}: UseFriendsFeedParams) {
   const seenPostIds = useRef<string[]>([]);
 
   const query = useInfiniteQuery({
-    queryKey: ['friends-feed', mode, searchQuery, userId],
+    queryKey: ['friends-feed', mode, searchQuery, userId, interleave, pageSize],
     queryFn: async ({ pageParam }) => {
       if (!userId) return { posts: [] as FeedPost[], nextCursor: undefined as string | undefined };
 
@@ -37,7 +49,7 @@ export function useFriendsFeed({ userId, mode, searchQuery, enabled: externalEna
       const params: Record<string, unknown> = {
         p_user_id: userId,
         p_mode: mode,
-        p_page_size: PAGE_SIZE,
+        p_page_size: pageSize,
       };
 
       if (!searchQuery) params.p_seen_post_ids = seenPostIds.current;
@@ -57,20 +69,21 @@ export function useFriendsFeed({ userId, mode, searchQuery, enabled: externalEna
       }
 
       const rows = (data as unknown as FeedRpcRow[]);
-      const posts = groupMultiMedia(rows.map(mapRowToFeedPost));
+      const mapped = groupMultiMedia(rows.map(mapRowToFeedPost));
+      const posts = interleave ? buildFriendsFeed(mapped) : mapped;
 
       for (const post of posts) {
         if (!seenPostIds.current.includes(post.id)) {
           seenPostIds.current.push(post.id);
         }
       }
-      // Prevent unbounded growth — cap at last 200
+      // Cap to last 200 to prevent unbounded growth
       if (seenPostIds.current.length > 200) {
         seenPostIds.current = seenPostIds.current.slice(-200);
       }
 
       const lastRow = rows[rows.length - 1];
-      const nextCursor = rows.length >= PAGE_SIZE ? lastRow.post_created_at : undefined;
+      const nextCursor = rows.length >= pageSize ? lastRow.post_created_at : undefined;
 
       return { posts, nextCursor };
     },
@@ -95,6 +108,7 @@ export function useFriendsFeed({ userId, mode, searchQuery, enabled: externalEna
     posts: allPosts,
     isLoading: query.isLoading,
     isError: query.isError,
+    isRefetching: query.isRefetching,
     hasNextPage: query.hasNextPage,
     isFetchingNextPage: query.isFetchingNextPage,
     fetchNextPage: query.fetchNextPage,

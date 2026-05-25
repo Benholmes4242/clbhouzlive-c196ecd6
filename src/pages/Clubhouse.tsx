@@ -33,7 +33,9 @@ import { useClubhouseStore } from '@/store/clubhouseStore';
 
 // ── Data hooks ──
 import { useSuggestedFeed } from '@/components/media-system/hooks/useSuggestedFeed';
-import { useFriendsFeed } from '@/components/media-system/hooks/useFriendsFeed';
+import { useFriendsFeed } from '@/components/friends-tab/hooks/useFriendsFeed';
+import { useFriendsFeedMode } from '@/components/friends-tab/hooks/useFriendsFeedMode';
+import { useNetworkActivity } from '@/hooks/useNetworkActivity';
 import type { FeedPost } from '@/components/media-system/types/media';
 // buildSuggestedFeed/buildFriendsFeed are called inside the feed hooks — not here
 
@@ -168,13 +170,39 @@ const ClubhouseContent = () => {
   // Editorial cards (PGA This Week, Course of the Week) moved to Home in Phase 2.
   // Clubhouse feed is now purely social posts + algorithmic suggestions.
   const suggestedFeed = useSuggestedFeed(user?.id);
-  const friendsFeed = useFriendsFeed(user?.id);
+  const friendsFeed = useFriendsFeed({
+    userId: user?.id,
+    mode: 'latest',
+    interleave: true,
+    pageSize: 10,
+    enabled: activeTab === 'friends',
+  });
   const activeFeed = activeTab === 'foryou' ? suggestedFeed : friendsFeed;
 
-  const posts = useMemo(() => activeFeed.posts, [activeFeed.posts]);
+  // ── Friends sub-mode (All / Live now) — URL-backed, gated to Friends tab ──
+  const { mode: friendsMode, setMode: setFriendsMode } = useFriendsFeedMode();
+  const { data: networkActivity } = useNetworkActivity(
+    activeTab === 'friends' ? user?.id : undefined
+  );
+  const activeAuthorIds = useMemo(() => {
+    if (activeTab !== 'friends' || friendsMode !== 'live_now') return null;
+    return new Set(
+      (networkActivity?.friends ?? [])
+        .filter(f => f.is_active_recently)
+        .map(f => f.id)
+    );
+  }, [activeTab, friendsMode, networkActivity]);
+
+  const posts = useMemo(() => {
+    if (!activeAuthorIds) return activeFeed.posts;
+    return activeFeed.posts.filter(p => activeAuthorIds.has(p.userId));
+  }, [activeFeed.posts, activeAuthorIds]);
+
+  const friendsHasZeroFriends =
+    activeTab === 'friends' && (networkActivity?.friends?.length ?? 0) === 0;
 
   const isLoading = activeFeed.isLoading;
-  const hasNextPage = activeFeed.hasNextPage ?? false;
+  const hasNextPage = friendsMode === 'live_now' ? false : (activeFeed.hasNextPage ?? false);
   
   // Skeleton timing
   const { 
@@ -330,6 +358,53 @@ const ClubhouseContent = () => {
         hidden={isTournamentCardActive}
       />
 
+      {/* Friends sub-mode chip row — All / Live now (visible only on Friends tab) */}
+      {activeTab === 'friends' && !isTournamentCardActive && (
+        <div
+          className="fixed flex justify-center pointer-events-none"
+          style={{
+            top: 'calc(max(env(safe-area-inset-top, 0px), 47px) + 44px)',
+            left: 0,
+            right: 0,
+            zIndex: 9028,
+          }}
+        >
+          <div
+            className="pointer-events-auto flex items-center gap-1"
+            style={{
+              background: 'rgba(0,0,0,0.55)',
+              backdropFilter: 'blur(12px)',
+              borderRadius: 999,
+              padding: 3,
+              border: '0.5px solid rgba(255,255,255,0.10)',
+            }}
+          >
+            {(['all', 'live_now'] as const).map((m) => {
+              const active = friendsMode === m;
+              return (
+                <button
+                  key={m}
+                  onClick={() => setFriendsMode(m)}
+                  style={{
+                    fontSize: 11,
+                    fontWeight: 700,
+                    letterSpacing: '0.02em',
+                    padding: '5px 12px',
+                    borderRadius: 999,
+                    border: 'none',
+                    background: active ? '#FFFFFF' : 'transparent',
+                    color: active ? '#0F172A' : 'rgba(255,255,255,0.75)',
+                    cursor: 'pointer',
+                  }}
+                >
+                  {m === 'all' ? 'All' : 'Live now'}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
       {/* Offline indicator — hidden on editorial cards */}
       {!isOnline && !isTournamentCardActive && (
         <div style={{
@@ -360,29 +435,58 @@ const ClubhouseContent = () => {
       {/* ═══ MAIN FEED AREA ═══ */}
       {!isLoading && posts.length === 0 ? (
         activeTab === 'friends' ? (
-          <div
-            className="flex flex-col w-full"
-            style={{ paddingTop: 'calc(max(env(safe-area-inset-top, 0px), 47px) + 72px)' }}
-          >
-            <div className="flex flex-col items-center px-8 text-center pb-6">
+          friendsMode === 'live_now' && !friendsHasZeroFriends ? (
+            <div
+              className="flex flex-col items-center justify-center min-h-screen px-8 text-center"
+              style={{ paddingTop: 'calc(max(env(safe-area-inset-top, 0px), 47px) + 96px)' }}
+            >
               <div className="w-14 h-14 rounded-full bg-white/5 flex items-center justify-center mb-4">
                 <Users className="w-7 h-7 text-white/30" />
               </div>
               <p className="text-[17px] font-semibold text-white mb-1">
-                No posts from friends yet
+                No friends on course right now
               </p>
               <p className="text-[13px] text-white/50 leading-relaxed">
-                Follow golfers below to start building your feed
+                Switch to All to see all friends' recent posts, or check back later.
               </p>
+              <button
+                onClick={() => setFriendsMode('all')}
+                className="mt-5 text-[13px] font-bold text-white/90"
+                style={{
+                  padding: '8px 16px',
+                  borderRadius: 999,
+                  background: 'rgba(255,255,255,0.08)',
+                  border: '0.5px solid rgba(255,255,255,0.16)',
+                }}
+              >
+                Show all friends ›
+              </button>
             </div>
-            <SuggestedCreatorsShelf
-              userId={user?.id}
-              variant="dark"
-              title="Golfers to follow"
-              showViewAll={true}
-              onViewAll={() => navigate('/golfers')}
-            />
-          </div>
+          ) : (
+            <div
+              className="flex flex-col w-full"
+              style={{ paddingTop: 'calc(max(env(safe-area-inset-top, 0px), 47px) + 72px)' }}
+            >
+              <div className="flex flex-col items-center px-8 text-center pb-6">
+                <div className="w-14 h-14 rounded-full bg-white/5 flex items-center justify-center mb-4">
+                  <Users className="w-7 h-7 text-white/30" />
+                </div>
+                <p className="text-[17px] font-semibold text-white mb-1">
+                  No posts from friends yet
+                </p>
+                <p className="text-[13px] text-white/50 leading-relaxed">
+                  Follow golfers below to start building your feed
+                </p>
+              </div>
+              <SuggestedCreatorsShelf
+                userId={user?.id}
+                variant="dark"
+                title="Golfers to follow"
+                showViewAll={true}
+                onViewAll={() => navigate('/golfers')}
+              />
+            </div>
+          )
         ) : (
           <div
             className="flex flex-col items-center justify-center min-h-screen px-8 text-center"
