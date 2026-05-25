@@ -227,10 +227,12 @@ export const TrophyCard: React.FC<Props> = ({ item, onTap }) => {
             zIndex: 1,
             flex: 1,
             display: 'flex',
+            flexDirection: 'column',
             alignItems: 'center',
             justifyContent: 'center',
             padding: '4px 0',
             minHeight: 0,
+            gap: 2,
           }}
         >
           <span
@@ -247,6 +249,20 @@ export const TrophyCard: React.FC<Props> = ({ item, onTap }) => {
           >
             {(item.kind === 'achievement' ? item.currentValue ?? 0 : 0).toLocaleString()}
           </span>
+          {item.kind === 'achievement' && SHOWPIECE_COUNTER_LABEL[item.badgeId] && (
+            <span
+              style={{
+                fontSize: 9,
+                fontWeight: 800,
+                color: 'var(--hcp-t-60)',
+                letterSpacing: '0.16em',
+                textTransform: 'uppercase',
+                marginTop: 2,
+              }}
+            >
+              {SHOWPIECE_COUNTER_LABEL[item.badgeId]}
+            </span>
+          )}
         </div>
       )}
 
