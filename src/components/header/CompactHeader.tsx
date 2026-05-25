@@ -184,8 +184,17 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
     setMenuOpen(v => !v);
   };
 
-  // Standardized header height: 55px content
-  const contentHeight = 55;
+  // Header height: 48px on tour routes (compact), 55px elsewhere.
+  const contentHeight = isTourRoute ? 48 : 55;
+
+  // Publish header height as a CSS variable so ShellSlot + --chrome-total-h
+  // can adapt without each consumer needing to know about tour-specific sizing.
+  React.useEffect(() => {
+    document.documentElement.style.setProperty('--header-h', `${contentHeight}px`);
+    return () => {
+      document.documentElement.style.setProperty('--header-h', '55px');
+    };
+  }, [contentHeight]);
   
   return (
     <>
