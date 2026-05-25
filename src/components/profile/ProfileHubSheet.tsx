@@ -613,13 +613,13 @@ function ProfileHubSheet({
                   {isAdmin && (
                     <>
                       <div style={{ height: '0.5px', background: HAIRLINE, margin: '0 -16px' }} />
-                      <div style={{ paddingTop: 14, paddingBottom: 8 }}>
+                      <div style={{ paddingTop: 20, paddingBottom: 10 }}>
                         <span
                           style={{
-                            fontSize: 10,
-                            fontWeight: 700,
+                            fontSize: 10.5,
+                            fontWeight: 800,
                             color: INK_FAINT,
-                            letterSpacing: '0.12em',
+                            letterSpacing: '0.14em',
                             textTransform: 'uppercase' as const,
                           }}
                         >
@@ -652,31 +652,35 @@ function ProfileHubSheet({
                     </>
                   )}
 
-                  {/* ── 7. Sign out ── */}
+                  {/* ── 7. Sign out — crimson outlined button ── */}
                   <div
                     style={{
-                      paddingTop: 26,
+                      paddingTop: 20,
                       paddingBottom: 'max(8px, env(safe-area-inset-bottom, 0px))',
-                      display: 'flex',
-                      justifyContent: 'center',
                     }}
                   >
                     {!showLogoutConfirm ? (
                       <button
                         type="button"
                         onClick={() => setShowLogoutConfirm(true)}
+                        className="active:opacity-90 transition-opacity"
                         style={{
-                          background: 'transparent',
-                          border: 'none',
-                          fontSize: 12,
-                          fontWeight: 500,
-                          color: INK_FAINT,
-                          letterSpacing: '0.02em',
+                          width: '100%',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          gap: 8,
+                          padding: '12px 14px',
+                          borderRadius: 12,
+                          background: '#FEF2F2',
+                          border: '1px solid rgba(159,29,29,0.22)',
                           cursor: 'pointer',
-                          padding: '8px 12px',
                         }}
                       >
-                        Sign out
+                        <LogOut size={15} color="#9F1D1D" strokeWidth={2.2} />
+                        <span style={{ fontSize: 14, fontWeight: 700, color: '#9F1D1D', letterSpacing: '-0.005em' }}>
+                          Sign out
+                        </span>
                       </button>
                     ) : (
                       <div className="flex gap-3 w-full">
@@ -691,7 +695,7 @@ function ProfileHubSheet({
                           type="button"
                           onClick={handleLogout}
                           className="active:opacity-90 transition-opacity"
-                          style={{ flex: 1, minHeight: 50, borderRadius: 25, background: '#DC2626', border: 'none', fontSize: 14, fontWeight: 700, color: '#FFFFFF', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}
+                          style={{ flex: 1, minHeight: 50, borderRadius: 25, background: '#9F1D1D', border: 'none', fontSize: 14, fontWeight: 700, color: '#FFFFFF', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}
                         >
                           <LogOut size={16} />
                           Sign out
