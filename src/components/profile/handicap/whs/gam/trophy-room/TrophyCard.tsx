@@ -142,25 +142,20 @@ export const TrophyCard: React.FC<Props> = ({ item, onTap }) => {
         />
       )}
 
-      {/* Watermark — fades back when a big counter is present */}
+      {/* Watermark — sized to flood the card body like StreaksCard */}
       <div
         aria-hidden
         style={{
           position: 'absolute',
-          right: -22,
-          bottom: -28,
-          width: 130,
-          height: 130,
-          transform: 'rotate(-6deg)',
-          opacity: dimmed ? 0.05 : showpieceWithCounter ? 0.06 : 0.10,
+          right: -10,
+          bottom: 8,
+          transform: 'rotate(-12deg)',
+          opacity: dimmed ? 0.04 : showpieceWithCounter ? 0.06 : 0.08,
           color: palette.color,
           pointerEvents: 'none',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
         }}
       >
-        {renderBadgeIcon(item.iconKey, 130, 'currentColor')}
+        {renderBadgeIcon(item.iconKey, 140, 'currentColor')}
       </div>
 
       {/* Top row: icon tile + pill */}
