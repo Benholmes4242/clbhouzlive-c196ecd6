@@ -96,6 +96,7 @@ const toSheetActivity = (friend: FriendYesterday): WhsFriendActivityWithImage =>
 const FriendsYesterdayCard: React.FC<Props> = ({ data, userId }) => {
   const { friends, count, absenceReason } = data;
   const [sheetActivity, setSheetActivity] = React.useState<WhsFriendActivityWithImage | null>(null);
+  const { open: openFriendSheet } = useOpenFriendSheet();
 
   const handleTap = (friend: FriendYesterday) => {
     analyticsEvents.track('morning_moment_friends_tapped', {
@@ -103,6 +104,11 @@ const FriendsYesterdayCard: React.FC<Props> = ({ data, userId }) => {
       friends_count: count,
       score_id: friend.last_round_score_id,
     });
+    // Non-synced (WHS-only) friends → open unified FriendSheet pitch card.
+    if (!friend.is_clbhouz_user || !friend.user_id) {
+      openFriendSheet({ whsOnlyEntry: toWhsOnlyEntry(friend), source: 'morning_moment' });
+      return;
+    }
     setSheetActivity(toSheetActivity(friend));
   };
 
