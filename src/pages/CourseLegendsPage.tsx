@@ -3,7 +3,6 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useCourseMeta } from '@/hooks/gam/useCourseMeta';
 import { CourseLegendsDrilldown } from '@/components/profile/handicap/whs/sections/course-legends/CourseLegendsDrilldown';
 import { PageRoot } from '@/components/layout/PageRoot';
-import { ShellSlot } from '@/components/header/ShellSlot';
 import { ProfileSkeleton } from '@/components/skeletons/ProfileSkeleton';
 import type { CourseSelection } from '@/components/profile/handicap/whs/sections/course-legends/types';
 
@@ -11,9 +10,9 @@ import type { CourseSelection } from '@/components/profile/handicap/whs/sections
  * Standalone page for a single course's legends.
  * URL: /handicap/legends/courses/:courseId
  *
- * Replaces the in-state drilldown that previously lived inside LegendsView.
- * The header back chevron handles navigation back to the Compete tab via
- * the standard CompactHeader handicap-route logic (safeGoBack → /handicap).
+ * NOTE: Does NOT use ShellSlot. ShellSlot is for tab nav / pinned chrome
+ * below the CompactHeader. This page has no tab nav. The CompactHeader still
+ * renders automatically because GlobalHeader is mounted at the App level.
  */
 export const CourseLegendsPage: React.FC = () => {
   const { courseId } = useParams<{ courseId: string }>();
@@ -27,11 +26,11 @@ export const CourseLegendsPage: React.FC = () => {
 
   if (metaLoading || !meta) {
     return (
-      <ShellSlot dark>
-        <PageRoot dark style={{ background: 'var(--hcp-bg-0)' }}>
+      <PageRoot dark style={{ background: 'var(--hcp-bg-0)' }}>
+        <main style={{ paddingTop: 'var(--chrome-total-h, 0px)' }}>
           <ProfileSkeleton />
-        </PageRoot>
-      </ShellSlot>
+        </main>
+      </PageRoot>
     );
   }
 
@@ -44,11 +43,11 @@ export const CourseLegendsPage: React.FC = () => {
   };
 
   return (
-    <ShellSlot dark>
-      <PageRoot dark style={{ background: 'var(--hcp-bg-0)' }}>
+    <PageRoot dark style={{ background: 'var(--hcp-bg-0)' }}>
+      <main style={{ paddingTop: 'var(--chrome-total-h, 0px)' }}>
         <CourseLegendsDrilldown selection={selection} />
-      </PageRoot>
-    </ShellSlot>
+      </main>
+    </PageRoot>
   );
 };
 
