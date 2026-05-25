@@ -392,15 +392,15 @@ interface Handlers {
   handleViewProfile: () => void;
   handleSeeRivalry: () => void;
   handleSeeHandicap: () => void;
-  handlePinRival: () => void;
   handleInvite: () => void;
 }
 
 function buildFooter(
-  kind: SheetState['kind'],
+  state: SheetState,
   h: Handlers,
+  firstName: string,
 ): { actions: FooterAction[]; layout: 'horizontal' | 'stacked' } {
-  switch (kind) {
+  switch (state.kind) {
     case 'clbhouz_synced_full':
     case 'clbhouz_synced_duelsOnly':
       return {
@@ -474,13 +474,7 @@ function buildFooter(
         actions: [
           {
             variant: 'primary',
-            label: 'Pin as rival',
-            onClick: h.handlePinRival,
-            icon: Pin,
-          },
-          {
-            variant: 'secondary',
-            label: 'Invite to clbhouz',
+            label: firstName ? `Invite ${firstName}` : 'Invite to clbhouz',
             onClick: h.handleInvite,
             icon: UserPlus,
           },
@@ -488,6 +482,7 @@ function buildFooter(
       };
   }
 }
+
 
 const SkeletonBody: React.FC = () => (
   <div style={{ padding: '0 20px 20px' }}>
