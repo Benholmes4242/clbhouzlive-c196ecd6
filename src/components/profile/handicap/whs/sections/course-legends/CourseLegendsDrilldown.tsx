@@ -168,7 +168,6 @@ export const CourseLegendsDrilldown: React.FC<Props> = ({ selection }) => {
     <div ref={containerRef}>
       <DrilldownHeader
         state={ctx}
-        onBack={onBack}
         youOwnedCount={youOwnedCount}
         totalCategories={visibleCategories.length}
         courseHeaderImage={courseHeaderImage}
