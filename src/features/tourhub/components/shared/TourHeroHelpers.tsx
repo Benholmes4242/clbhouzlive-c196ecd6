@@ -157,16 +157,21 @@ function FrostedAvatar({ src, fallbackSrc, displayName, size }: { src: string | 
     <div style={{
       width: size, height: size, borderRadius: '34%', overflow: 'hidden', flexShrink: 0,
       border: '1.5px solid rgba(255,255,255,0.18)',
-      background: 'rgba(255,255,255,0.06)',
+      background: 'var(--hcp-bg-3)',
       display: 'flex', alignItems: 'center', justifyContent: 'center',
+      color: 'var(--hcp-t-soft)',
+      fontWeight: 800,
+      fontSize: Math.max(10, Math.round(size * 0.36)),
+      letterSpacing: '-0.01em',
     }}>
       {currentSrc && !imgError ? (
         <img src={currentSrc} alt={displayName} onLoad={handleLoad} onError={handleError} style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'top' }} />
       ) : (
-        <PlayerSilhouette size={Math.round(size * 0.75)} />
+        <span>{initials}</span>
       )}
     </div>
   );
+
 }
 
 /** Squircle avatar matching the global SDS spec (34% radius, 1:1.05 aspect) */
