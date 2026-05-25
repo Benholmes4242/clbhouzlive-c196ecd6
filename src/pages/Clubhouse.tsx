@@ -170,13 +170,39 @@ const ClubhouseContent = () => {
   // Editorial cards (PGA This Week, Course of the Week) moved to Home in Phase 2.
   // Clubhouse feed is now purely social posts + algorithmic suggestions.
   const suggestedFeed = useSuggestedFeed(user?.id);
-  const friendsFeed = useFriendsFeed(user?.id);
+  const friendsFeed = useFriendsFeed({
+    userId: user?.id,
+    mode: 'latest',
+    interleave: true,
+    pageSize: 10,
+    enabled: activeTab === 'friends',
+  });
   const activeFeed = activeTab === 'foryou' ? suggestedFeed : friendsFeed;
 
-  const posts = useMemo(() => activeFeed.posts, [activeFeed.posts]);
+  // ── Friends sub-mode (All / Live now) — URL-backed, gated to Friends tab ──
+  const { mode: friendsMode, setMode: setFriendsMode } = useFriendsFeedMode();
+  const { data: networkActivity } = useNetworkActivity(
+    activeTab === 'friends' ? user?.id : undefined
+  );
+  const activeAuthorIds = useMemo(() => {
+    if (activeTab !== 'friends' || friendsMode !== 'live_now') return null;
+    return new Set(
+      (networkActivity?.friends ?? [])
+        .filter(f => f.is_active_recently)
+        .map(f => f.id)
+    );
+  }, [activeTab, friendsMode, networkActivity]);
+
+  const posts = useMemo(() => {
+    if (!activeAuthorIds) return activeFeed.posts;
+    return activeFeed.posts.filter(p => activeAuthorIds.has(p.userId));
+  }, [activeFeed.posts, activeAuthorIds]);
+
+  const friendsHasZeroFriends =
+    activeTab === 'friends' && (networkActivity?.friends?.length ?? 0) === 0;
 
   const isLoading = activeFeed.isLoading;
-  const hasNextPage = activeFeed.hasNextPage ?? false;
+  const hasNextPage = friendsMode === 'live_now' ? false : (activeFeed.hasNextPage ?? false);
   
   // Skeleton timing
   const { 
