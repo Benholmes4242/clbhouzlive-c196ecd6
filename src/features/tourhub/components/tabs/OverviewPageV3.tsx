@@ -31,6 +31,7 @@ import { HomeOnCourseStrip } from '../home/HomeOnCourseStrip';
 import { HomePGAModule } from '../home/HomePGAModule';
 import { HomeCourseOfWeekModule } from '../home/HomeCourseOfWeekModule';
 import { HomeWatchRail } from '../home/HomeWatchRail';
+import { HomeConnectHandicapModule } from '../home/HomeConnectHandicapModule';
 import { useNetworkStatus } from '@/hooks/useNetworkStatus';
 import { HERO_STYLES } from '../../constants/heroStyles';
 import { WifiOff } from 'lucide-react';
@@ -122,6 +123,9 @@ export function OverviewPageV3() {
           className="relative z-10"
         >
           <div className="bg-background" style={{ display: 'flex', flexDirection: 'column', gap: 40, paddingTop: 40, paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 80px)' }}>
+            <LazySection minHeight={160}>
+              <HomeConnectHandicapModule />
+            </LazySection>
             <LazySection minHeight={120}>
               <HomeOnCourseStrip />
             </LazySection>
