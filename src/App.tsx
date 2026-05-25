@@ -104,6 +104,8 @@ const Signup = lazy(() => import("./pages/Signup"));
 const CheckEmailPage = lazy(() => import("./pages/auth/CheckEmailPage"));
 const Clubhouse = lazy(() => import("./pages/Clubhouse"));
 const WatchPage = lazy(() => import("./pages/WatchPage"));
+const HomeLanding = lazy(() => import("./pages/HomeLanding"));
+const WatchHub = lazy(() => import("./pages/WatchHub"));
 const ClipsSubpageWrapped = lazy(() => import("./components/watch/ClipsSubpage"));
 const VideosSubpageWrapped = lazy(() => import("./components/watch/VideosSubpage"));
 const AccountTypeOnboarding = lazy(() => import("./pages/onboarding/AccountTypeOnboarding"));
@@ -286,7 +288,8 @@ function AppRoutes() {
 
   // Keep-alive routes configuration - these routes stay mounted when navigating away
   const keepAliveRoutes = useMemo(() => [
-    { path: '/', element: <ClubhouseWrapped /> },
+    { path: '/', element: <Suspense fallback={<GenericPageSkeleton />}><HomeLanding /></Suspense> },
+    { path: '/clubhouse', element: <ClubhouseWrapped /> },
   ], []);
 
   return (
@@ -300,7 +303,7 @@ function AppRoutes() {
       <Routes location={routesLocation}>
         {/* Keep-alive routes - rendered by KeepAliveOutlet, but need placeholder for Router */}
         <Route path="/" element={null} />
-        <Route path="/clubhouse" element={<Navigate to="/" replace />} />
+        <Route path="/clubhouse" element={null} />
         
         <Route path="/auth" element={<AuthWrapped />} />
         <Route path="/auth/callback" element={<Suspense fallback={<GenericPageSkeleton />}><AuthCallback /></Suspense>} />
@@ -332,9 +335,8 @@ function AppRoutes() {
         <Route path="/profile/:username/reviews" element={<Suspense fallback={<ProfileSkeleton />}><UserReviewsPage /></Suspense>} />
         <Route path="/settings" element={<SettingsWrapped />} />
         <Route path="/settings/watch-preferences" element={<Suspense fallback={<GenericPageSkeleton />}><WatchPreferencesPage /></Suspense>} />
-        <Route path="/discover" element={<Suspense fallback={<DiscoverSkeleton />}><DiscoverWrapped /></Suspense>} />
-        <Route path="/watch" element={<Suspense fallback={<GenericPageSkeleton />}><DiscoverWrapped /></Suspense>} />
-        <Route path="/videos" element={<Suspense fallback={<DiscoverSkeleton />}><DiscoverWrapped /></Suspense>} />
+        <Route path="/watch" element={<Suspense fallback={<WatchGridSkeleton />}><WatchHub /></Suspense>} />
+        <Route path="/videos" element={<Navigate to="/watch" replace />} />
         <Route path="/watch/clips" element={<Suspense fallback={<GenericPageSkeleton />}><ClipsSubpageWrapped /></Suspense>} />
         <Route path="/watch/videos" element={<Suspense fallback={<GenericPageSkeleton />}><VideosSubpageWrapped /></Suspense>} />
         <Route path="/explore" element={<Suspense fallback={<DiscoverSkeleton />}><DiscoverWrapped /></Suspense>} />
