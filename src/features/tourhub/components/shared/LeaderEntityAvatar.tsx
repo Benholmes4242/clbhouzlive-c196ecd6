@@ -154,11 +154,11 @@ export function LeaderEntityAvatar({
         <SingleAvatar
           src={resolvePhoto(m2)}
           alt={m2.fullName}
+          fallbackName={m2.fullName}
           size={inner}
           borderColor={borderColor}
           borderWidth={borderWidth}
           radiusPct={radiusPct}
-          silhouetteSize={Math.round(inner * 0.6)}
         />
       </div>
 
@@ -167,15 +167,16 @@ export function LeaderEntityAvatar({
         <SingleAvatar
           src={resolvePhoto(m1)}
           alt={m1.fullName}
+          fallbackName={m1.fullName}
           size={inner}
           borderColor={borderColor}
           borderWidth={borderWidth}
           radiusPct={radiusPct}
-          silhouetteSize={Math.round(inner * 0.6)}
           ringColor={ringColor}
           ringWidth={ringWidth}
         />
       </div>
+
     </div>
   );
 }
