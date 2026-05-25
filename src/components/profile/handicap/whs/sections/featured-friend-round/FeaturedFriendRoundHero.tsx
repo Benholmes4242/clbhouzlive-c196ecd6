@@ -115,7 +115,7 @@ export const FeaturedFriendRoundHero: React.FC<Props> = ({ userId }) => {
               background: 'transparent',
               border: 'none',
               padding: 0,
-              cursor: data.friend_user_id ? 'pointer' : 'default',
+              cursor: 'pointer',
               color: '#fff',
               textAlign: 'left',
             }}
