@@ -58,7 +58,7 @@ const SectionHeader: React.FC<{
       marginBottom: 10,
       fontSize: 10,
       fontWeight: 800,
-      letterSpacing: '0.14em',
+      letterSpacing: '0.18em',
       textTransform: 'uppercase',
       color: 'var(--hcp-t-80)',
     }}
