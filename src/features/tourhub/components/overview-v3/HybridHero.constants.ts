@@ -42,5 +42,19 @@ export const LEGIBILITY_SCRIM =
 export const MARQUEE_DURATION_SECONDS = 40;
 
 // Type fonts
-export const FONT_MONO = "'Geist Mono', ui-monospace, SFMono-Regular, Menlo, monospace";
 export const FONT_SANS = "'Geist', -apple-system, BlinkMacSystemFont, sans-serif";
+
+/**
+ * Numeric column styling — Geist with tabular-nums for column alignment.
+ * Use `...NUMERIC_STYLE` instead of the old `fontFamily: FONT_MONO`.
+ * `"zero" 0` explicitly disables the slashed-zero glyph (Ben prefers unslashed).
+ */
+export const NUMERIC_STYLE = {
+  fontFamily: "'Geist', -apple-system, BlinkMacSystemFont, sans-serif",
+  fontVariantNumeric: 'tabular-nums lining-nums' as const,
+  fontFeatureSettings: '"zero" 0',
+};
+
+/** @deprecated Pass 4: kept as an alias to NUMERIC_STYLE.fontFamily for any
+ * straggler imports. New code should spread NUMERIC_STYLE instead. */
+export const FONT_MONO = NUMERIC_STYLE.fontFamily;
