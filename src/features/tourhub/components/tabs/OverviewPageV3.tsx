@@ -22,7 +22,6 @@ import {
 import { ComingUpCalendar } from '../ComingUpCalendar';
 import { CollegeRivalry } from '../CollegeRivalry';
 import { LazySection } from '../overview-v3/LazySection';
-import { AllToursTicker } from '../AllToursTicker';
 
 import { IntelligenceHero } from '../IntelligenceHero';
 import { WorldRankingsHero } from '../WorldRankingsHero';

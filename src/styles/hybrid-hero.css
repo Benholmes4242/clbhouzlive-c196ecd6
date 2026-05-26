@@ -49,3 +49,6 @@
 
 /* AllToursTicker — hide scrollbar on the cards rail (Pass 4). */
 .th-cards-rail::-webkit-scrollbar { display: none; }
+
+/* Pass 5: TourSwitcherOverlay scroll rail. */
+.tour-switcher-rail::-webkit-scrollbar { display: none; }
