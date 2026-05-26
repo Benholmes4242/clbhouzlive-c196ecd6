@@ -68,6 +68,9 @@ export const CinemaFriendGlass: React.FC<Props> = ({
   stableford,
   differential,
   isCounter = false,
+  nonEnriched = false,
+  onInviteClick,
+  inviteLabel = 'Invite',
 }) => {
   const meta = [
     par != null ? `PAR ${par}` : null,
@@ -124,7 +127,7 @@ export const CinemaFriendGlass: React.FC<Props> = ({
         style={{
           display: 'flex',
           justifyContent: 'space-between',
-          alignItems: 'baseline',
+          alignItems: nonEnriched ? 'flex-end' : 'baseline',
         }}
       >
         <div style={{ textAlign: 'left' }}>
@@ -140,16 +143,49 @@ export const CinemaFriendGlass: React.FC<Props> = ({
             />
           </div>
         </div>
-        <div style={{ textAlign: 'center' }}>
-          <div style={labelStyle}>STABLEFORD</div>
-          <div style={valueStyle('#FFFFFF')}>{stableford != null ? stableford : EM_DASH}</div>
-        </div>
-        <div style={{ textAlign: 'right' }}>
-          <div style={labelStyle}>SCORE DIFF</div>
-          <div style={valueStyle(differential != null ? AMBER : '#FFFFFF')}>
-            {fmtDiff(differential)}
-          </div>
-        </div>
+        {nonEnriched ? (
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              onInviteClick?.();
+            }}
+            style={{
+              pointerEvents: 'auto',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 3,
+              padding: '7px 13px',
+              borderRadius: 999,
+              background: 'rgba(247,147,30,0.18)',
+              border: '0.5px solid rgba(247,147,30,0.45)',
+              color: AMBER,
+              fontSize: 11,
+              fontWeight: 800,
+              letterSpacing: '0.06em',
+              cursor: 'pointer',
+              fontFamily: FONT_GEIST,
+              textTransform: 'uppercase',
+              lineHeight: 1,
+            }}
+          >
+            {inviteLabel}
+            <ChevronRight size={12} strokeWidth={2.2} />
+          </button>
+        ) : (
+          <>
+            <div style={{ textAlign: 'center' }}>
+              <div style={labelStyle}>STABLEFORD</div>
+              <div style={valueStyle('#FFFFFF')}>{stableford != null ? stableford : EM_DASH}</div>
+            </div>
+            <div style={{ textAlign: 'right' }}>
+              <div style={labelStyle}>SCORE DIFF</div>
+              <div style={valueStyle(differential != null ? AMBER : '#FFFFFF')}>
+                {fmtDiff(differential)}
+              </div>
+            </div>
+          </>
+        )}
       </div>
     </div>
   );
