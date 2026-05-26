@@ -4,12 +4,12 @@
  */
 
 // Layout
-export const PHOTO_BAND_HEIGHT = 310;
+export const PHOTO_BAND_HEIGHT = 280;
 export const TICKER_HEIGHT = 40;
 export const STRIP_HEIGHT = 62;
 export const ROW_HEIGHT_LEADER = 64;
-export const ROW_HEIGHT_CHASER = 48;
-export const TOTAL_HERO_HEIGHT_TARGET = 640;
+export const ROW_HEIGHT_CHASER = 40;
+export const TOTAL_HERO_HEIGHT_TARGET = 534;
 
 // Colours (clbhouz Dispatch palette)
 export const INK = '#0F172A';

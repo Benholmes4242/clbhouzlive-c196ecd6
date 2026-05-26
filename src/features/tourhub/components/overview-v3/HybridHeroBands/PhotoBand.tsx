@@ -163,7 +163,8 @@ function rightTimestamp(state: HeroState): string {
     if (state.variant === 'cancelled') return `${state.finishDate ? state.meta : ''} · CANCELLED`;
     if (state.variant === 'awaiting-playoff') return 'R4 · PLAYOFF';
     if (state.variant === 'declared') return `3 OF 4 · WEATHER`;
-    return state.meta ? `4 ROUNDS · ${state.meta}` : '4 ROUNDS';
+    // Pass 1: date range MMM D – MMM D (state.meta is built upstream in deriveHeroState)
+    return state.meta || '';
   }
   return state.countdown;
 }

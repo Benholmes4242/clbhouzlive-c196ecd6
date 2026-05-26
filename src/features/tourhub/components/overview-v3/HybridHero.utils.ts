@@ -137,7 +137,9 @@ export function deriveHeroState(
       kind: 'results',
       variant: 'standard',
       finishDate: tournament.endDate || '',
-      meta: end ? `${format(end, 'MMM d').toUpperCase()}` : '',
+      meta: start && end
+        ? `${format(start, 'MMM d').toUpperCase()} – ${format(end, 'MMM d').toUpperCase()}`
+        : end ? format(end, 'MMM d').toUpperCase() : '',
     };
   }
 
@@ -167,4 +169,33 @@ export function deriveTickerRows(leaderboard: any[]): TickerRow[] {
       score: entry.score ?? 0,
     };
   });
+}
+
+// ---------- Leaderboard slot allocation (tie-collapse) ---------------------
+
+export type ChaserSlot =
+  | { kind: 'solo'; entry: any }
+  | { kind: 'tie'; rank: string; count: number; score: number; members: any[] };
+
+export function buildLeaderboardSlots(chasers: any[], maxSlots = 4): ChaserSlot[] {
+  const slots: ChaserSlot[] = [];
+  let i = 0;
+  while (i < chasers.length && slots.length < maxSlots) {
+    const scoreOf = (e: any) => (e?.score ?? e?.total ?? 0);
+    const groupScore = scoreOf(chasers[i]);
+    let j = i;
+    while (j < chasers.length && scoreOf(chasers[j]) === groupScore) j++;
+    const group = chasers.slice(i, j);
+    const remaining = maxSlots - slots.length;
+    if (group.length <= remaining) {
+      for (const entry of group) slots.push({ kind: 'solo', entry });
+    } else if (group.length >= 2) {
+      const rank = chasers[i]?.position != null ? `T${chasers[i].position}` : 'T—';
+      slots.push({ kind: 'tie', rank, count: group.length, score: groupScore, members: group });
+    } else {
+      slots.push({ kind: 'solo', entry: group[0] });
+    }
+    i = j;
+  }
+  return slots;
 }
