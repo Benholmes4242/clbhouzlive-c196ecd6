@@ -34,24 +34,51 @@ const T = {
 interface Props {
   connectionId: string;
   currentHandicap: number | null;
+  viewMode?: 'owner' | 'friend';
+  ownerFirstName?: string | null;
 }
 
-const ForecastCard: React.FC<Props> = ({ connectionId, currentHandicap: passedHcp }) => {
+const ForecastCard: React.FC<Props> = ({
+  connectionId,
+  currentHandicap: passedHcp,
+  viewMode = 'owner',
+  ownerFirstName = null,
+}) => {
   const { data: allScores, isLoading: scoresLoading } = useAllScores(connectionId);
   const { data: trend } = useHandicapTrend(connectionId);
   const currentHandicap = passedHcp ?? trend?.current ?? null;
 
-  if (scoresLoading) return <ForecastSkeleton />;
+  const possessiveCap = viewMode === 'friend'
+    ? (ownerFirstName ? `${ownerFirstName}'s` : 'Their')
+    : 'Your';
+  const possessiveLower = viewMode === 'friend'
+    ? (ownerFirstName ? `${ownerFirstName}'s` : 'their')
+    : 'your';
+  const subjectCap = viewMode === 'friend' ? (ownerFirstName ?? 'They') : 'You';
+  const subjectLower = viewMode === 'friend' ? (ownerFirstName ?? 'they') : 'you';
+  const hasVerb = viewMode === 'friend' && ownerFirstName ? 'has' : 'have';
+  const needsVerb = viewMode === 'friend' && ownerFirstName ? 'needs' : 'need';
+
+  if (scoresLoading) return <ForecastSkeleton eyebrow={`${possessiveCap} form`} />;
 
   const forecast = buildForecast(allScores ?? [], currentHandicap, 7);
 
   return (
     <section style={{ marginTop: 32, fontFamily: FONT }}>
-      <DarkSectionHeader eyebrow="Your form" />
-      {renderStateCard(forecast)}
+      <DarkSectionHeader eyebrow={`${possessiveCap} form`} />
+      {renderStateCard(forecast, { possessiveLower, subjectCap, subjectLower, hasVerb, needsVerb, viewMode })}
     </section>
   );
 };
+
+interface CopyCtx {
+  possessiveLower: string;
+  subjectCap: string;
+  subjectLower: string;
+  hasVerb: string;
+  needsVerb: string;
+  viewMode: 'owner' | 'friend';
+}
 
 function renderStateCard(f: Forecast) {
   switch (f.state) {
