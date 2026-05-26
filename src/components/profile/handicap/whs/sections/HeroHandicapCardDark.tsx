@@ -225,7 +225,8 @@ const HeroHandicapCardDark: React.FC<Props> = ({ connection }) => {
               stroke="rgba(255,255,255,0.06)"
               strokeWidth={STROKE_W}
             />
-            {/* Progress arc */}
+            {/* Progress arc — clockwise for improvement, counterclockwise for regression.
+                The SVG container is already rotated -90deg so 12 o'clock is the start. */}
             <circle
               cx={RING_BOX / 2}
               cy={RING_BOX / 2}
@@ -238,6 +239,9 @@ const HeroHandicapCardDark: React.FC<Props> = ({ connection }) => {
               strokeDashoffset={animatedHcp == null ? CIRCUMFERENCE : dashOffset}
               style={{
                 transition: 'stroke-dashoffset 700ms cubic-bezier(0.22,0.61,0.36,1)',
+                transform: verdict === 'bad' ? 'scaleX(-1)' : undefined,
+                transformOrigin: 'center',
+                transformBox: 'fill-box',
               }}
             />
           </svg>
