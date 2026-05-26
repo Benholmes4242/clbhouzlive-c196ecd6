@@ -7,6 +7,7 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { TourId, TOUR_CONFIG } from './useOverviewData';
 import { useTournamentsCache, type CachedTournament, type TournamentsCache } from '@/hooks/useTournamentsCache';
+import { getPlayerHeadshotUrl } from '@/utils/playerHeadshot';
 
 // ============================================================================
 // Types
@@ -1170,6 +1171,10 @@ export interface TickerCellData {
   scoreDisplay: string | null;
   /** Days until start (upcoming only). */
   daysUntilStart: number | null;
+  /** Pass 4.5: R2 headshot URL for solo leader. Null for tied/upcoming. */
+  personPhotoUrl: string | null;
+  /** Pass 4.5: venue name for course image lookup via useBatchCourseImages. */
+  venueName: string | null;
 }
 
 export interface TickerData {
@@ -1224,13 +1229,25 @@ export function useAllToursTickerData() {
       ): TickerCellData => {
         const leaderEntry = leaderMap[t.id] || null;
         const tied = leaderEntry && leaderCountMap[t.id] > 1;
+        const fullName = leaderEntry && !tied
+          ? `${(leaderEntry.player as any).first_name} ${(leaderEntry.player as any).last_name}`.trim()
+          : null;
         const personName = leaderEntry
           ? tied
             ? `${leaderCountMap[t.id]} tied`
-            : `${(leaderEntry.player as any).first_name} ${(leaderEntry.player as any).last_name}`.trim()
+            : fullName
           : null;
         const country = leaderEntry && !tied ? ((leaderEntry.player as any).country ?? null) : null;
         const scoreDisplay = leaderEntry ? formatScore(leaderEntry.score) : null;
+        const tourSlug = mapTourSlug(t.season.tour_name);
+        let personPhotoUrl: string | null = null;
+        if (fullName && !tied) {
+          try {
+            personPhotoUrl = getPlayerHeadshotUrl(fullName, tourSlug);
+          } catch {
+            personPhotoUrl = null;
+          }
+        }
 
         return {
           id: t.id,
@@ -1238,11 +1255,13 @@ export function useAllToursTickerData() {
           status,
           startDate: t.start_date,
           endDate: t.end_date,
-          tourSlug: mapTourSlug(t.season.tour_name),
+          tourSlug,
           personName,
           country,
           scoreDisplay,
           daysUntilStart: null,
+          personPhotoUrl,
+          venueName: t.venue_name,
         };
       };
 
@@ -1261,6 +1280,8 @@ export function useAllToursTickerData() {
           country: t.venue_country,
           scoreDisplay: null,
           daysUntilStart,
+          personPhotoUrl: null,
+          venueName: t.venue_name,
         };
       };
 
