@@ -118,7 +118,13 @@ export function ChampionStrip({
           {name}
         </div>
       </div>
+      {rounds && rounds.length >= 2 && par ? (
+        <div style={{ marginRight: 10, position: 'relative', display: 'flex', alignItems: 'center' }}>
+          <TrajectorySparkline rounds={rounds} par={par} variant="champion" totalRounds={4} />
+        </div>
+      ) : null}
       <div style={{ textAlign: 'right', position: 'relative' }}>
+
         <div
           style={{
             fontFamily: FONT_MONO,
