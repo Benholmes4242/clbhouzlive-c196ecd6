@@ -84,7 +84,7 @@ export function normalizeBadge(b: UserBadge): TrophyItem {
     ? thresholds.map((t, idx) => ({
         tier: idx + 1,
         threshold: t,
-        name: `${b.title} ${romanize(idx + 1)}`,
+        name: `Tier ${idx + 1}`,
         earned: idx < reached,
         earnedAt: idx < reached && idx === reached - 1 ? b.earned_at : null,
       }))
@@ -133,7 +133,3 @@ export function normalizeLegend(l: TopLegendRow): TrophyItem {
   };
 }
 
-function romanize(n: number): string {
-  const map: Record<number, string> = { 1: 'I', 2: 'II', 3: 'III', 4: 'IV', 5: 'V', 6: 'VI', 7: 'VII', 8: 'VIII' };
-  return map[n] ?? String(n);
-}
