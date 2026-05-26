@@ -178,24 +178,41 @@ export const PersonalBests: React.FC<Props> = ({ connectionId, currentHandicap, 
                 padding: '9px 14px',
                 borderBottom: i < 4 ? '1px solid rgba(255,255,255,0.04)' : 'none',
                 position: 'relative',
+                overflow: 'hidden',
               }}
             >
               {!isLoading && (t as Tile).value !== '—' && (
-                <div
-                  aria-hidden
-                  style={{
-                    position: 'absolute',
-                    top: 0,
-                    left: 0,
-                    bottom: 0,
-                    width: 2,
-                    background: 'linear-gradient(180deg, #F7931E 0%, #BA6E12 100%)',
-                    opacity: 0.6,
-                  }}
-                />
+                <>
+                  <div
+                    aria-hidden
+                    style={{
+                      position: 'absolute',
+                      top: 0,
+                      left: 0,
+                      bottom: 0,
+                      width: 2,
+                      background: 'linear-gradient(180deg, #F7931E 0%, #BA6E12 100%)',
+                      opacity: 0.6,
+                    }}
+                  />
+                  <div
+                    aria-hidden
+                    style={{
+                      position: 'absolute',
+                      right: -18,
+                      bottom: -22,
+                      opacity: 0.13,
+                      color: GOLD,
+                      transform: 'rotate(-8deg)',
+                      pointerEvents: 'none',
+                    }}
+                  >
+                    <Crown size={72} strokeWidth={1.4} />
+                  </div>
+                </>
               )}
 
-              <div style={{ flex: 1, minWidth: 0 }}>
+              <div style={{ flex: 1, minWidth: 0, position: 'relative', zIndex: 1 }}>
                 {isLoading ? (
                   <>
                     <div style={{ height: 13, width: '50%', background: D_BG3, borderRadius: 2, marginBottom: 4 }} />
