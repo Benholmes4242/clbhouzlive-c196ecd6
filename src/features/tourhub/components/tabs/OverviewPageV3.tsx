@@ -103,11 +103,11 @@ export function OverviewPageV3() {
           // HeroCarousel's root is h-full and its descendants use position: absolute;
           // inset: 0. CSS percentage-height resolution requires this parent to have a
           // definite height — min-height alone does not qualify, regardless of flex
-          // context. Definite height it is. 540 = results target 534 + 6px slack.
-          // Trade-off: this is a hard ceiling. Upcoming state (untouched by Pass 1)
-          // currently fits in the old 720 box but is not verified against 540. If
-          // upcoming clips when it goes through this code path, raise as a separate task
-          // and we'll either lift this number or refactor the position chain.
+          // context. Definite height it is. Read from TOTAL_HERO_HEIGHT_TARGET
+          // (currently 528: 506 base + 22px slack for the optional ChampionStrip
+          // narrative line per Pass 5.5). This is a hard ceiling: Upcoming state
+          // should fit, but if it ever clips, raise as a separate task and we'll
+          // either lift this number or refactor the position chain.
           style={{
             ...heroContainerStyle,
             maxWidth: 960,
