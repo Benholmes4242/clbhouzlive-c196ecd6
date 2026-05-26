@@ -20,6 +20,8 @@ interface ChampionStripProps {
   rounds?: number[];
   /** Pass 3: course par used to render the sparkline. */
   par?: number;
+  /** Pass 5.5: italic editorial narrative beneath the name. */
+  narrative?: string | null;
 }
 
 
