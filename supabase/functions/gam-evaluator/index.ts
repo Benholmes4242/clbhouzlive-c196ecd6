@@ -319,10 +319,14 @@ function computeRoundStats(score: any, holes: any[], meta: any) {
   if (holes.length > 0) {
     let parOrBetterRun = 0, parOrBetterBest = 0;
     let birdieRun = 0, birdieBest = 0;
+    let scoredHoles = 0;
+    let playedHoles = 0;
     for (const h of holes) {
       if (!h.played) { parOrBetterRun = 0; birdieRun = 0; continue; }
+      playedHoles++;
       const hs = h.adjusted_gross ?? h.actual_gross;
       if (hs == null || h.par == null) continue;
+      scoredHoles++;
       const d = hs - h.par;
       if (d === -3) stats.albatrosses++;
       else if (d === -2) stats.eagles++;
@@ -340,7 +344,12 @@ function computeRoundStats(score: any, holes: any[], meta: any) {
     }
     stats.longest_par_or_better_run = parOrBetterBest;
     stats.longest_birdie_run = birdieBest;
-    stats.clean_card = stats.bogeys === 0 && stats.double_bogeys === 0 && stats.triple_plus === 0;
+    stats.clean_card =
+      scoredHoles === playedHoles &&
+      playedHoles >= 18 &&
+      stats.bogeys === 0 &&
+      stats.double_bogeys === 0 &&
+      stats.triple_plus === 0;
   }
   return stats;
 }
@@ -492,7 +501,7 @@ function matchesBinary(badge: any, stats: any): boolean {
     case "first_eagle": return stats.eagles > 0;
     case "first_albatross": return stats.albatrosses > 0;
     case "five_birdie_round": return stats.birdies >= 5;
-    case "clean_card": return stats.clean_card && stats.holes_played === 18;
+    case "clean_card": return stats.clean_card;
     case "spring_2026_active": return stats.is_counter;
     case "beat_par": return stats.beat_par;
     default: return false;
