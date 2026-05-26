@@ -101,18 +101,18 @@ export function OverviewPageV3() {
         {/* 1. Hero Carousel — capped at 960px on wide screens, full-bleed on mobile */}
         <motion.div 
           className="relative w-full z-0 mx-auto"
-          // The HeroCarousel chain below uses h-full and `position: absolute; inset: 0`.
-          // Both need a definite height from this parent. A flex column with minHeight
-          // gives percentage-height children a basis to resolve against without locking a
-          // hard ceiling — taller intrinsic states (upcoming) can grow past 540, then the
-          // glass card's `overflow: hidden` clips at whatever the wrapper ends up. This is
-          // the "soft floor" Pass 1 intended.
+          // HeroCarousel's root is h-full and its descendants use position: absolute;
+          // inset: 0. CSS percentage-height resolution requires this parent to have a
+          // definite height — min-height alone does not qualify, regardless of flex
+          // context. Definite height it is. 540 = results target 534 + 6px slack.
+          // Trade-off: this is a hard ceiling. Upcoming state (untouched by Pass 1)
+          // currently fits in the old 720 box but is not verified against 540. If
+          // upcoming clips when it goes through this code path, raise as a separate task
+          // and we'll either lift this number or refactor the position chain.
           style={{
             ...heroContainerStyle,
             maxWidth: 960,
-            minHeight: TOTAL_HERO_HEIGHT_TARGET + 6, // 540: results target 534 + 6px slack
-            display: 'flex',
-            flexDirection: 'column',
+            height: TOTAL_HERO_HEIGHT_TARGET + 6,
             opacity: heroOpacity,
             scale: heroScale,
           }}
