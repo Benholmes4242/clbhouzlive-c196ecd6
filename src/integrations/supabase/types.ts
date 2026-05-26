@@ -5838,6 +5838,132 @@ export type Database = {
           },
         ]
       }
+      gam_round_stats_sub_x_flag_backup_2026_05_26: {
+        Row: {
+          _backup_taken_at: string | null
+          albatrosses: number | null
+          beat_par: boolean | null
+          birdies: number | null
+          bogeys: number | null
+          clean_card: boolean | null
+          course_id: string | null
+          course_name: string | null
+          course_par: number | null
+          course_rating: number | null
+          created_at: string | null
+          delta_index: number | null
+          double_bogeys: number | null
+          eagles: number | null
+          evaluator_version: number | null
+          gross_score: number | null
+          hcp_at_time: number | null
+          holes_in_one: number | null
+          holes_played: number | null
+          is_competition: boolean | null
+          is_counter: boolean | null
+          longest_birdie_run: number | null
+          longest_par_or_better_run: number | null
+          nett_score: number | null
+          pars: number | null
+          pcc: number | null
+          play_date: string | null
+          score_diff: number | null
+          slope_rating: number | null
+          stableford_points: number | null
+          sub_100: boolean | null
+          sub_70: boolean | null
+          sub_80: boolean | null
+          sub_90: boolean | null
+          tee_marker: string | null
+          triple_plus: number | null
+          updated_at: string | null
+          user_id: string | null
+          whs_score_id: string | null
+        }
+        Insert: {
+          _backup_taken_at?: string | null
+          albatrosses?: number | null
+          beat_par?: boolean | null
+          birdies?: number | null
+          bogeys?: number | null
+          clean_card?: boolean | null
+          course_id?: string | null
+          course_name?: string | null
+          course_par?: number | null
+          course_rating?: number | null
+          created_at?: string | null
+          delta_index?: number | null
+          double_bogeys?: number | null
+          eagles?: number | null
+          evaluator_version?: number | null
+          gross_score?: number | null
+          hcp_at_time?: number | null
+          holes_in_one?: number | null
+          holes_played?: number | null
+          is_competition?: boolean | null
+          is_counter?: boolean | null
+          longest_birdie_run?: number | null
+          longest_par_or_better_run?: number | null
+          nett_score?: number | null
+          pars?: number | null
+          pcc?: number | null
+          play_date?: string | null
+          score_diff?: number | null
+          slope_rating?: number | null
+          stableford_points?: number | null
+          sub_100?: boolean | null
+          sub_70?: boolean | null
+          sub_80?: boolean | null
+          sub_90?: boolean | null
+          tee_marker?: string | null
+          triple_plus?: number | null
+          updated_at?: string | null
+          user_id?: string | null
+          whs_score_id?: string | null
+        }
+        Update: {
+          _backup_taken_at?: string | null
+          albatrosses?: number | null
+          beat_par?: boolean | null
+          birdies?: number | null
+          bogeys?: number | null
+          clean_card?: boolean | null
+          course_id?: string | null
+          course_name?: string | null
+          course_par?: number | null
+          course_rating?: number | null
+          created_at?: string | null
+          delta_index?: number | null
+          double_bogeys?: number | null
+          eagles?: number | null
+          evaluator_version?: number | null
+          gross_score?: number | null
+          hcp_at_time?: number | null
+          holes_in_one?: number | null
+          holes_played?: number | null
+          is_competition?: boolean | null
+          is_counter?: boolean | null
+          longest_birdie_run?: number | null
+          longest_par_or_better_run?: number | null
+          nett_score?: number | null
+          pars?: number | null
+          pcc?: number | null
+          play_date?: string | null
+          score_diff?: number | null
+          slope_rating?: number | null
+          stableford_points?: number | null
+          sub_100?: boolean | null
+          sub_70?: boolean | null
+          sub_80?: boolean | null
+          sub_90?: boolean | null
+          tee_marker?: string | null
+          triple_plus?: number | null
+          updated_at?: string | null
+          user_id?: string | null
+          whs_score_id?: string | null
+        }
+        Relationships: []
+      }
       gam_streaks: {
         Row: {
           best_count: number
@@ -6094,6 +6220,51 @@ export type Database = {
           user_id?: string | null
         }
         Update: {
+          badge_id?: string | null
+          counter_tier?: number | null
+          counter_value?: number | null
+          created_at?: string | null
+          earned_at?: string | null
+          id?: string | null
+          is_visible?: boolean | null
+          seen_by_user?: boolean | null
+          trigger_whs_score_id?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      gam_user_badges_break_70_revoke_backup_2026_05_26: {
+        Row: {
+          _backup_taken_at: string | null
+          badge_id: string | null
+          counter_tier: number | null
+          counter_value: number | null
+          created_at: string | null
+          earned_at: string | null
+          id: string | null
+          is_visible: boolean | null
+          seen_by_user: boolean | null
+          trigger_whs_score_id: string | null
+          updated_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          _backup_taken_at?: string | null
+          badge_id?: string | null
+          counter_tier?: number | null
+          counter_value?: number | null
+          created_at?: string | null
+          earned_at?: string | null
+          id?: string | null
+          is_visible?: boolean | null
+          seen_by_user?: boolean | null
+          trigger_whs_score_id?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          _backup_taken_at?: string | null
           badge_id?: string | null
           counter_tier?: number | null
           counter_value?: number | null
