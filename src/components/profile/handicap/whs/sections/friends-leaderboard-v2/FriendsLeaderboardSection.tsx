@@ -97,7 +97,11 @@ export const FriendsLeaderboardSection: React.FC<Props> = ({ userId, viewMode = 
     <section style={{ marginTop: 32 }}>
       <DarkSectionHeader
         eyebrow="LEADERBOARD"
-        title={isFriend ? `${possessive} circle` : 'You vs your circle'}
+        title={
+          isFriend
+            ? (ownerFirstName ? `${ownerFirstName} vs their circle` : 'Vs their circle')
+            : 'You vs your circle'
+        }
         sub={subLine}
       />
 
