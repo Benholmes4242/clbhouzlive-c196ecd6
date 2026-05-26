@@ -7,6 +7,12 @@ interface Props {
   onClose: () => void;
 }
 
+/**
+ * Educational copy note: "your" in this sheet refers to the reader
+ * (the person viewing the sheet), not the profile owner. These sheets
+ * explain WHS mechanics; do not friend-prefix or change to third-person.
+ */
+
 // Mirrors palette from HeroHandicapCard so the dots in the sheet match
 // the actual ring colours on the page.
 const T = {

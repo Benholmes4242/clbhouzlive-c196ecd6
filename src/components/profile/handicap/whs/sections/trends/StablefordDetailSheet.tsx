@@ -9,6 +9,12 @@ interface Props {
   dist: StablefordDistribution;
 }
 
+/**
+ * Educational copy note: "your" in this sheet refers to the reader
+ * (the person viewing the sheet), not the profile owner. These sheets
+ * explain WHS mechanics; do not friend-prefix or change to third-person.
+ */
+
 const T = {
   ink: 'var(--hcp-t-100)',
   inkMute: 'var(--hcp-t-60)',
