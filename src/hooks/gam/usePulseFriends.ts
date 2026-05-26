@@ -8,10 +8,34 @@ export interface PulseFriend {
   profile_photo_url: string | null;
   handicap_index: number | null;
   delta90: number | null;
+  hcp_series: number[]; // 90D points, oldest → newest
   last_played: string; // ISO date
-  last_5_scores: number[]; // most recent first
-  last_5_pars: number[];
   hot: boolean;
+}
+
+type HcpPoint = { ts: number; value: number };
+
+const TARGET_DAYS = 90;
+const MIN_HISTORY_DAYS = 80;
+const DAY_MS = 86_400_000;
+
+function computeDelta(series: HcpPoint[], currentHcp: number | null): number | null {
+  if (currentHcp == null || series.length === 0) return null;
+  const now = Date.now();
+  const earliestTs = series[0].ts;
+  if (now - earliestTs < MIN_HISTORY_DAYS * DAY_MS) return null;
+  const targetTs = now - TARGET_DAYS * DAY_MS;
+  let closest = series[0];
+  let closestDiff = Math.abs(closest.ts - targetTs);
+  for (const pt of series) {
+    const diff = Math.abs(pt.ts - targetTs);
+    if (diff < closestDiff) {
+      closest = pt;
+      closestDiff = diff;
+    }
+  }
+  const raw = currentHcp - closest.value;
+  return Math.round(raw * 10) / 10;
 }
 
 export function usePulseFriends(userId: string | undefined) {
@@ -45,9 +69,9 @@ export function usePulseFriends(userId: string | undefined) {
 
       if (!profiles) return [];
 
-      // 3. Last 14 days of rounds
-      const sevenDaysAgo = new Date(Date.now() - 7 * 86_400_000).toISOString().slice(0, 10);
-      const fourteenDaysAgo = new Date(Date.now() - 14 * 86_400_000).toISOString().slice(0, 10);
+      // 3. Last 14 days of rounds (for hot detection)
+      const sevenDaysAgo = new Date(Date.now() - 7 * DAY_MS).toISOString().slice(0, 10);
+      const fourteenDaysAgo = new Date(Date.now() - 14 * DAY_MS).toISOString().slice(0, 10);
 
       const { data: rounds } = await supabase
         .from('gam_round_stats' as any)
@@ -59,7 +83,7 @@ export function usePulseFriends(userId: string | undefined) {
 
       if (!rounds) return [];
 
-      // 4. Current handicap via whs_connections → whs_handicap_snapshots
+      // 4. Connections
       const { data: connections } = await supabase
         .from('whs_connections')
         .select('id, user_id')
@@ -69,8 +93,12 @@ export function usePulseFriends(userId: string | undefined) {
       const connToUser = new Map<string, string>(
         (connections ?? []).map((c: any) => [c.id, c.user_id]),
       );
+      const userToConnection = new Map<string, string>(
+        (connections ?? []).map((c: any) => [c.user_id, c.id]),
+      );
       const connectionIds = (connections ?? []).map((c: any) => c.id);
 
+      // 5. Current handicap (latest snapshot per user)
       const handicapByUser = new Map<string, number>();
       if (connectionIds.length > 0) {
         const { data: snaps } = await supabase
@@ -86,7 +114,50 @@ export function usePulseFriends(userId: string | undefined) {
         }
       }
 
-      // 5. Group rounds by friend
+      // 6. Build 90D hcp series per connection (snapshots ∪ score-derived points)
+      const sinceIso = new Date(Date.now() - TARGET_DAYS * DAY_MS).toISOString();
+      const sinceDate = sinceIso.split('T')[0];
+      const seriesByConnection = new Map<string, HcpPoint[]>();
+
+      if (connectionIds.length > 0) {
+        const [{ data: snapshots }, { data: scoreHcps }] = await Promise.all([
+          supabase
+            .from('whs_handicap_snapshots' as any)
+            .select('connection_id, observed_at, handicap_index')
+            .in('connection_id', connectionIds)
+            .gte('observed_at', sinceIso)
+            .order('observed_at', { ascending: true }),
+          supabase
+            .from('whs_scores' as any)
+            .select('connection_id, play_date, handicap_index_at_time')
+            .in('connection_id', connectionIds)
+            .not('handicap_index_at_time', 'is', null)
+            .gte('play_date', sinceDate)
+            .order('play_date', { ascending: true }),
+        ]);
+
+        for (const s of (snapshots ?? []) as any[]) {
+          const list = seriesByConnection.get(s.connection_id) ?? [];
+          list.push({ ts: new Date(s.observed_at).getTime(), value: Number(s.handicap_index) });
+          seriesByConnection.set(s.connection_id, list);
+        }
+
+        for (const sc of (scoreHcps ?? []) as any[]) {
+          const list = seriesByConnection.get(sc.connection_id) ?? [];
+          const dayMs = new Date(sc.play_date + 'T00:00:00Z').getTime();
+          const sameDay = list.find((p) => Math.abs(p.ts - dayMs) < DAY_MS / 2);
+          if (!sameDay) {
+            list.push({ ts: dayMs, value: Number(sc.handicap_index_at_time) });
+          }
+          seriesByConnection.set(sc.connection_id, list);
+        }
+
+        for (const [, list] of seriesByConnection) {
+          list.sort((a, b) => a.ts - b.ts);
+        }
+      }
+
+      // 7. Group rounds by friend
       const roundsByFriend = new Map<string, any[]>();
       for (const r of rounds as any[]) {
         const list = roundsByFriend.get(r.user_id) ?? [];
@@ -115,16 +186,20 @@ export function usePulseFriends(userId: string | undefined) {
         const displayName: string = profile.display_name ?? 'Player';
         const firstName = displayName.split(' ')[0] || null;
 
+        const connId = userToConnection.get(profile.id);
+        const series = connId ? (seriesByConnection.get(connId) ?? []) : [];
+        const currentHcp = handicapByUser.get(profile.id) ?? null;
+        const delta90 = computeDelta(series, currentHcp);
+
         result.push({
           user_id: profile.id,
           display_name: displayName,
           first_name: firstName,
           profile_photo_url: profile.profile_photo_url,
-          handicap_index: handicapByUser.get(profile.id) ?? null,
-          delta90: null, // V1
+          handicap_index: currentHcp,
+          delta90,
+          hcp_series: series.map((p) => p.value),
           last_played: lastPlayed,
-          last_5_scores: lastFive.map((r) => r.gross_score).filter((s: any): s is number => s != null),
-          last_5_pars: lastFive.map((r) => r.course_par).filter((p: any): p is number => p != null),
           hot,
         });
       }

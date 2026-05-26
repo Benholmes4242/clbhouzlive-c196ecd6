@@ -27,42 +27,25 @@ function colorFromUserId(id: string): string {
   return palette[Math.abs(hash) % palette.length];
 }
 
-const Sparkline: React.FC<{ scores: number[]; pars: number[]; color: string }> = ({
-  scores,
-  pars,
-  color,
-}) => {
-  if (scores.length < 2) {
-    return <div style={{ height: 18 }} />;
+const HcpSparkline: React.FC<{ series: number[]; color: string }> = ({ series, color }) => {
+  const h = 18;
+  if (series.length < 2) {
+    return <div style={{ height: h }} />;
   }
   const w = 110;
-  const h = 18;
-  const avgPar = pars.length > 0 ? pars.reduce((a, b) => a + b, 0) / pars.length : 72;
-  const allVals = [...scores, avgPar];
-  const min = Math.min(...allVals);
-  const max = Math.max(...allVals);
-  const range = Math.max(1, max - min);
-  const ordered = [...scores].reverse(); // oldest left → newest right
-  const points = ordered.map((s, i) => [
-    ordered.length === 1 ? w / 2 : (i / (ordered.length - 1)) * w,
-    h - ((s - min) / range) * h,
+  const min = Math.min(...series);
+  const max = Math.max(...series);
+  const range = Math.max(0.1, max - min);
+  const points = series.map((v, i) => [
+    (i / (series.length - 1)) * w,
+    h - ((v - min) / range) * h,
   ]);
   const path = points
     .map(([x, y], i) => `${i === 0 ? 'M' : 'L'} ${x.toFixed(1)} ${y.toFixed(1)}`)
     .join(' ');
-  const parY = h - ((avgPar - min) / range) * h;
   const lastPoint = points[points.length - 1];
   return (
     <svg width="100%" height={h} viewBox={`0 0 ${w} ${h}`} preserveAspectRatio="none">
-      <line
-        x1={0}
-        x2={w}
-        y1={parY}
-        y2={parY}
-        stroke="var(--hcp-t-40)"
-        strokeWidth={0.6}
-        strokeDasharray="2 2"
-      />
       <path d={path} fill="none" stroke={color} strokeWidth={1.6} strokeLinejoin="round" strokeLinecap="round" />
       <circle cx={lastPoint[0]} cy={lastPoint[1]} r={2} fill={color} />
     </svg>
@@ -71,18 +54,21 @@ const Sparkline: React.FC<{ scores: number[]; pars: number[]; color: string }> =
 
 export const PulseCard: React.FC<Props> = ({ friend }) => {
   const navigate = useNavigate();
-  const isUp = (friend.delta90 ?? 0) > 0.05;
-  const isDown = (friend.delta90 ?? 0) < -0.05;
+  const isUp = (friend.delta90 ?? 0) >= 0.3;
+  const isDown = (friend.delta90 ?? 0) <= -0.3;
+  const isFlat = friend.delta90 != null && !isUp && !isDown;
   const deltaColor = isUp
     ? 'var(--hcp-bad, #EF4444)'
     : isDown
       ? 'var(--hcp-good, #10B981)'
       : 'var(--hcp-t-40)';
   const lineColor = friend.hot
-    ? '#FBBC2E'
+    ? 'var(--hcp-amber-bold, #FBBC2E)'
     : isDown
       ? 'var(--hcp-good, #10B981)'
-      : 'var(--hcp-t-60)';
+      : isUp
+        ? 'var(--hcp-bad, #EF4444)'
+        : 'var(--hcp-t-60)';
   const lastPlayedLabel = relativeDay(friend.last_played);
   const nameForInitial = friend.first_name ?? friend.display_name;
   const initial = (nameForInitial || '?').charAt(0).toUpperCase();
@@ -183,13 +169,13 @@ export const PulseCard: React.FC<Props> = ({ friend }) => {
       </div>
 
       <div style={{ marginTop: 2 }}>
-        <Sparkline scores={friend.last_5_scores} pars={friend.last_5_pars} color={lineColor} />
+        <HcpSparkline series={friend.hcp_series} color={lineColor} />
       </div>
 
       <div
         style={{
           display: 'flex',
-          alignItems: 'baseline',
+          alignItems: 'flex-end',
           justifyContent: 'space-between',
           gap: 6,
           marginTop: 2,
@@ -209,18 +195,38 @@ export const PulseCard: React.FC<Props> = ({ friend }) => {
         {friend.delta90 != null && (
           <div
             style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: 2,
-              fontSize: 10,
-              fontWeight: 700,
-              color: deltaColor,
-              fontVariantNumeric: 'tabular-nums',
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'flex-end',
+              gap: 1,
+              lineHeight: 1,
             }}
           >
-            {isUp && <ArrowUp size={9} strokeWidth={2.5} />}
-            {isDown && <ArrowDown size={9} strokeWidth={2.5} />}
-            {friend.delta90 === 0 ? '—' : Math.abs(friend.delta90).toFixed(1)}
+            <span
+              style={{
+                fontSize: 11,
+                fontWeight: 800,
+                color: deltaColor,
+                fontVariantNumeric: 'tabular-nums',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 2,
+              }}
+            >
+              {isUp && <ArrowUp size={9} strokeWidth={3} />}
+              {isDown && <ArrowDown size={9} strokeWidth={3} />}
+              {isFlat ? '—' : Math.abs(friend.delta90).toFixed(1)}
+            </span>
+            <span
+              style={{
+                fontSize: 8,
+                fontWeight: 700,
+                color: 'var(--hcp-t-60)',
+                letterSpacing: '0.10em',
+              }}
+            >
+              90D
+            </span>
           </div>
         )}
       </div>
