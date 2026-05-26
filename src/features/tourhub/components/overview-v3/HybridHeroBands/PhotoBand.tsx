@@ -15,7 +15,7 @@ import {
   AMBER,
   GREEN_LIVE,
   RED,
-  FONT_MONO,
+  NUMERIC_STYLE,
 } from '../HybridHero.constants';
 import type { HeroState } from '../HybridHero.utils';
 
@@ -250,7 +250,7 @@ export function PhotoBand({
         </div>
         <span
           style={{
-            fontFamily: FONT_MONO,
+            ...NUMERIC_STYLE,
             fontSize: 11,
             fontWeight: 700,
             letterSpacing: '0.08em',

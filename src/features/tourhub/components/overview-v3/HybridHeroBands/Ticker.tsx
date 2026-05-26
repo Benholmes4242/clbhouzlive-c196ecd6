@@ -9,7 +9,7 @@ import {
   INK,
   GREEN_LIGHT,
   RED_LIGHT,
-  FONT_MONO,
+  NUMERIC_STYLE,
 } from '../HybridHero.constants';
 import type { TickerRow } from '../HybridHero.utils';
 import { fmtScore } from '../HybridHero.utils';
@@ -80,7 +80,7 @@ export function Ticker({ rows }: TickerProps) {
           style={{
             display: 'inline-flex',
             alignItems: 'baseline',
-            fontFamily: FONT_MONO,
+            ...NUMERIC_STYLE,
             fontSize: 12,
             paddingLeft: 16,
             whiteSpace: 'nowrap',

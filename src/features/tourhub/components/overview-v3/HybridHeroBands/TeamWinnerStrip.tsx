@@ -5,7 +5,7 @@
  */
 
 import React from 'react';
-import { INK, GOLD, FONT_MONO, STRIP_HEIGHT } from '../HybridHero.constants';
+import { INK, GOLD, NUMERIC_STYLE, STRIP_HEIGHT } from '../HybridHero.constants';
 
 export interface TeamWinnerStripProps {
   teamName: string;
@@ -65,7 +65,7 @@ function TeamCrestTile({
         alignItems: 'center',
         justifyContent: 'center',
         color: 'white',
-        fontFamily: FONT_MONO,
+        ...NUMERIC_STYLE,
         fontWeight: 800,
         fontSize: 18,
         letterSpacing: '-0.02em',
@@ -161,7 +161,7 @@ export function TeamWinnerStrip({
       <div style={{ textAlign: 'right', position: 'relative' }}>
         <div
           style={{
-            fontFamily: FONT_MONO,
+            ...NUMERIC_STYLE,
             fontSize: 26,
             fontWeight: 300,
             color: GOLD,

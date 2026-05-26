@@ -5,7 +5,7 @@
  */
 
 import React from 'react';
-import { INK, GOLD, FONT_MONO, STRIP_HEIGHT } from '../HybridHero.constants';
+import { INK, GOLD, NUMERIC_STYLE, STRIP_HEIGHT } from '../HybridHero.constants';
 import { TrajectorySparkline } from './TrajectorySparkline';
 
 interface ChampionStripProps {
@@ -127,7 +127,7 @@ export function ChampionStrip({
 
         <div
           style={{
-            fontFamily: FONT_MONO,
+            ...NUMERIC_STYLE,
             fontSize: 26,
             fontWeight: 300,
             color: GOLD,
@@ -248,7 +248,7 @@ export function PlayoffStrip({ count, score }: PlayoffStripProps) {
       <div style={{ textAlign: 'right' }}>
         <div
           style={{
-            fontFamily: FONT_MONO,
+            ...NUMERIC_STYLE,
             fontSize: 26,
             fontWeight: 300,
             color: GOLD,

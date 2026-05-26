@@ -9,7 +9,7 @@ import {
   INK_15,
   INK_45,
   AMBER,
-  FONT_MONO,
+  NUMERIC_STYLE,
 } from '../HybridHero.constants';
 
 interface TeeTimeRowProps {
@@ -36,7 +36,7 @@ export function TeeTimeRow({ time, holeStart, players, isMarquee, isLast }: TeeT
       <div>
         <div
           style={{
-            fontFamily: FONT_MONO,
+            ...NUMERIC_STYLE,
             fontSize: 14,
             fontWeight: 700,
             color: isMarquee ? AMBER : INK,

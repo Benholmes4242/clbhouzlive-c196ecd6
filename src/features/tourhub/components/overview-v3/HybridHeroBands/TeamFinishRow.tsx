@@ -5,7 +5,7 @@
  */
 
 import React from 'react';
-import { INK, INK_45, INK_15, GOLD_DARK, FONT_MONO } from '../HybridHero.constants';
+import { INK, INK_45, INK_15, GOLD_DARK, NUMERIC_STYLE } from '../HybridHero.constants';
 
 export interface TeamFinishRowProps {
   rank: string;                    // "1" / "T2" / etc
@@ -71,7 +71,7 @@ function TeamCrestTile({
         alignItems: 'center',
         justifyContent: 'center',
         color: 'white',
-        fontFamily: FONT_MONO,
+        ...NUMERIC_STYLE,
         fontWeight: 800,
         fontSize: Math.round(size * 0.5),
         letterSpacing: '-0.02em',
@@ -131,7 +131,7 @@ export function TeamFinishRow({
       <div
         style={{
           width: 22,
-          fontFamily: FONT_MONO,
+          ...NUMERIC_STYLE,
           fontSize: isChampion ? 12 : 11,
           fontWeight: 700,
           color: INK_45,
@@ -191,7 +191,7 @@ export function TeamFinishRow({
       {/* Score */}
       <div
         style={{
-          fontFamily: FONT_MONO,
+          ...NUMERIC_STYLE,
           fontSize: isChampion ? 18 : 15,
           fontWeight: isChampion ? 700 : 600,
           color: isChampion ? GOLD_DARK : INK,
@@ -207,7 +207,7 @@ export function TeamFinishRow({
       {/* Thru */}
       <div
         style={{
-          fontFamily: FONT_MONO,
+          ...NUMERIC_STYLE,
           fontSize: 11,
           fontWeight: 600,
           color: INK_45,
