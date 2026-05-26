@@ -2,35 +2,13 @@ import React from 'react';
 import { Lock } from 'lucide-react';
 import { renderBadgeIcon } from '../badgeIcons';
 import { GAM } from '../tokens';
-import { RARITY_PALETTE, LEGEND_PALETTE, LOCKED_PALETTE, type RarityPalette } from './_shared/rarityPalette';
+import { LEGEND_PALETTE, LOCKED_PALETTE, PLATINUM_PALETTE, type RarityPalette } from './_shared/rarityPalette';
 import type { TrophyItem } from './_shared/normalizeTrophyItem';
 import { isShowpiece } from './_shared/showpieces';
-import type { BadgeRarity } from '@/lib/gam/types';
 
 interface Props {
   item: TrophyItem;
   onTap: (item: TrophyItem) => void;
-}
-
-/**
- * For showpiece achievements, derive a "display rarity" from the user's reached
- * tier and the achievement's total tier count. Returns null if locked.
- */
-function showpieceDisplayRarity(reachedTier: number, totalTiers: number): BadgeRarity | null {
-  if (reachedTier <= 0) return null;
-  if (totalTiers <= 0) return null;
-
-  const scales: Record<number, BadgeRarity[]> = {
-    1: ['legendary'],
-    2: ['epic', 'legendary'],
-    3: ['rare', 'epic', 'legendary'],
-    4: ['common', 'rare', 'epic', 'legendary'],
-    5: ['common', 'uncommon', 'rare', 'epic', 'legendary'],
-  };
-
-  const scale = scales[Math.min(totalTiers, 5)] ?? scales[5];
-  const idx = Math.min(Math.max(reachedTier, 1), scale.length) - 1;
-  return scale[idx];
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -52,21 +30,14 @@ const SHOWPIECE_COUNTER_LABEL: Record<string, string> = {
 };
 
 function paletteFor(item: TrophyItem): RarityPalette {
+  // Course Legends: gold.
   if (item.kind === 'legend') return LEGEND_PALETTE;
 
-  if (item.kind === 'achievement' && isShowpiece(item.badgeId)) {
-    if (!item.earned && (item.currentValue == null || item.currentValue === 0)) {
-      return LOCKED_PALETTE;
-    }
-    const displayRarity = showpieceDisplayRarity(item.reachedTier, item.tiers.length);
-    if (displayRarity) return RARITY_PALETTE[displayRarity];
-    return RARITY_PALETTE[item.rarity];
-  }
-
-  if (!item.earned && (item.currentValue == null || item.currentValue === 0)) {
-    return LOCKED_PALETTE;
-  }
-  return RARITY_PALETTE[item.rarity];
+  // Achievements: locked, platinum (showpiece), or gold (everything else).
+  const hasProgress = item.earned || (item.currentValue != null && item.currentValue > 0);
+  if (!hasProgress) return LOCKED_PALETTE;
+  if (isShowpiece(item.badgeId)) return PLATINUM_PALETTE;
+  return LEGEND_PALETTE;
 }
 
 function metaLine(item: TrophyItem): string {
