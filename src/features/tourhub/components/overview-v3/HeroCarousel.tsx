@@ -624,6 +624,8 @@ export function HeroCarousel({
             onCardTouchStart={handleTouchStart}
             onCardTouchMove={handleTouchMove}
             onCardTouchEnd={handleTouchEnd}
+            activeTournamentId={activeTournamentId}
+            onTourSelect={onTourSelect}
           />
         ))}
       </AnimatePresence>
