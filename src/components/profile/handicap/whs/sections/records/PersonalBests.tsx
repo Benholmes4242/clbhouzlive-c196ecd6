@@ -54,23 +54,23 @@ export const PersonalBests: React.FC<Props> = ({ connectionId, currentHandicap, 
 
     if (list.length === 0) {
       return [
-        empty('BEST GROSS'),
-        empty('BEST DIFF'),
-        empty('BEST STABLEFORD'),
-        empty('BEST VS HCP'),
-        empty('BUSIEST MONTH'),
+        empty('Best Gross'),
+        empty('Best Diff'),
+        empty('Best Stableford'),
+        empty('Best vs Hcp'),
+        empty('Busiest Month'),
       ];
     }
 
     // #1 Lowest gross (sanity-filtered to exclude impossible rounds)
     const grossList = list.filter(isReasonableGross);
-    let bestGross: Tile = empty('BEST GROSS');
+    let bestGross: Tile = empty('Best Gross');
     if (grossList.length) {
       const best = grossList.reduce((a, b) =>
         (a.adjusted_gross as number) <= (b.adjusted_gross as number) ? a : b,
       );
       bestGross = {
-        eyebrow: 'BEST GROSS',
+        eyebrow: 'Best Gross',
         value: String(best.adjusted_gross),
         caption: fmtCourseDate(best),
       };
@@ -78,13 +78,13 @@ export const PersonalBests: React.FC<Props> = ({ connectionId, currentHandicap, 
 
     // #2 Lowest differential (sanity-filtered to exclude impossible rounds)
     const diffList = list.filter(isReasonableDiff);
-    let bestDiff: Tile = empty('BEST DIFF');
+    let bestDiff: Tile = empty('Best Diff');
     if (diffList.length) {
       const best = diffList.reduce((a, b) =>
         (a.handicap_differential as number) <= (b.handicap_differential as number) ? a : b,
       );
       bestDiff = {
-        eyebrow: 'BEST DIFF',
+        eyebrow: 'Best Diff',
         value: fmtDiff(best.handicap_differential as number),
         caption: fmtCourseDate(best),
       };
@@ -92,13 +92,13 @@ export const PersonalBests: React.FC<Props> = ({ connectionId, currentHandicap, 
 
     // #3 Best Stableford
     const stableList = list.filter((s) => s.stableford_points != null);
-    let bestSF: Tile = empty('BEST STABLEFORD');
+    let bestSF: Tile = empty('Best Stableford');
     if (stableList.length) {
       const best = stableList.reduce((a, b) =>
         (a.stableford_points as number) >= (b.stableford_points as number) ? a : b,
       );
       bestSF = {
-        eyebrow: 'BEST STABLEFORD',
+        eyebrow: 'Best Stableford',
         value: String(best.stableford_points),
         unit: 'pts',
         caption: fmtCourseDate(best),
@@ -106,7 +106,7 @@ export const PersonalBests: React.FC<Props> = ({ connectionId, currentHandicap, 
     }
 
     // #4 Best vs handicap
-    let bestVsHcp: Tile = empty('BEST VS HCP');
+    let bestVsHcp: Tile = empty('Best vs Hcp');
     if (currentHandicap != null && grossList.length) {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const scored = grossList.map((s) => {
@@ -118,14 +118,14 @@ export const PersonalBests: React.FC<Props> = ({ connectionId, currentHandicap, 
       const best = scored.reduce((a, b) => (a.vsHcp <= b.vsHcp ? a : b));
       const sign = best.vsHcp <= 0 ? '' : '+';
       bestVsHcp = {
-        eyebrow: 'BEST VS HCP',
+        eyebrow: 'Best vs Hcp',
         value: `${sign}${best.vsHcp.toFixed(1)}`,
         caption: fmtCourseDate(best.s),
       };
     }
 
     // #5 Most rounds in a month
-    let mostMonth: Tile = empty('BUSIEST MONTH');
+    let mostMonth: Tile = empty('Busiest Month');
     const monthCounts = new Map<string, number>();
     for (const s of list) {
       if (!s.play_date) continue;
@@ -142,7 +142,7 @@ export const PersonalBests: React.FC<Props> = ({ connectionId, currentHandicap, 
         }
       }
       mostMonth = {
-        eyebrow: 'BUSIEST MONTH',
+        eyebrow: 'Busiest Month',
         value: String(topCount),
         unit: 'rounds',
         caption: monthLabel(topKey),
