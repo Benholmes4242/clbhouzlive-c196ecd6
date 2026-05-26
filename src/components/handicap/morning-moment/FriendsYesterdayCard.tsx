@@ -7,6 +7,7 @@ import React from 'react';
 import type { FriendYesterday, FriendsYesterdayResult } from '@/lib/handicap/useFriendsYesterday';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { HeroCard, MiniCard } from './friends-yesterday';
+import FriendRoundCardV2 from '@/components/profile/handicap/whs/sections/recently-played/FriendRoundCardV2';
 import RoundDetailSheet from '@/components/profile/handicap/whs/sections/round-detail/RoundDetailSheet';
 import type { WhsFriendActivityWithImage, FriendLeaderboardEntry } from '@/lib/whs/types';
 import { useOpenFriendSheet } from '@/components/friend-sheet/FriendSheetProvider';
@@ -29,6 +30,26 @@ const toWhsOnlyEntry = (friend: FriendYesterday): FriendLeaderboardEntry => ({
   handicap_30d_delta: null,
   rounds_last_30d: 0,
 });
+
+/**
+ * Friends-Yesterday card variant gate. Renders the cinematic hero/mini card
+ * when we have a fully enriched, synced clbhouz friend with computed stats.
+ * Otherwise the slim FriendRoundCardV2 invite card is used.
+ */
+const isEnrichedFriend = (f: FriendYesterday): boolean => {
+  const isSyncedClbhouzUser =
+    f.is_clbhouz_user && !!f.user_id && !!f.friend_connection_id;
+  const hasStats = f.stableford !== null && f.differential !== null;
+  return isSyncedClbhouzUser && hasStats;
+};
+
+const variantFor = (
+  f: FriendYesterday,
+): 'clbhouz-synced' | 'clbhouz-not-synced' | 'eg-only' => {
+  if (f.is_clbhouz_user && f.friend_connection_id) return 'clbhouz-synced';
+  if (f.is_clbhouz_user) return 'clbhouz-not-synced';
+  return 'eg-only';
+};
 
 const T = {
   ink: '#0F172A',
@@ -117,8 +138,13 @@ const FriendsYesterdayCard: React.FC<Props> = ({ data, userId }) => {
   }
   if (friends.length === 0) return null;
 
-  const best = friends[0];
-  const others = friends.slice(1);
+  // Enriched first (hero + mini scroller), unsynced second (slim invite stack).
+  // Preserves order from data.friends within each group.
+  const enrichedFriends = friends.filter(isEnrichedFriend);
+  const unsyncedFriends = friends.filter((f) => !isEnrichedFriend(f));
+
+  const best = enrichedFriends[0] ?? null;
+  const others = enrichedFriends.slice(1);
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', fontFamily: FONT }}>
@@ -147,8 +173,14 @@ const FriendsYesterdayCard: React.FC<Props> = ({ data, userId }) => {
         </span>
       </div>
 
-      {/* Hero */}
-      <HeroCard friend={best} onClick={() => handleTap(best)} showLowestRound={friends.length > 1} />
+      {/* Hero — only when an enriched/synced friend exists */}
+      {best && (
+        <HeroCard
+          friend={best}
+          onClick={() => handleTap(best)}
+          showLowestRound={enrichedFriends.length > 1}
+        />
+      )}
 
       {others.length > 0 && (
         <>
@@ -174,6 +206,32 @@ const FriendsYesterdayCard: React.FC<Props> = ({ data, userId }) => {
                 friend={f}
                 rank={i + 2}
                 onClick={() => handleTap(f)}
+              />
+            ))}
+          </div>
+        </>
+      )}
+
+      {/* Unsynced — slim invite stack via FriendRoundCardV2 (no EG badge,
+          course above date — Friends Yesterday context tweaks) */}
+      {unsyncedFriends.length > 0 && (
+        <>
+          <div style={{ height: enrichedFriends.length > 0 ? 12 : 0 }} />
+          <div>
+            {unsyncedFriends.map((f, i) => (
+              <FriendRoundCardV2
+                key={`unsynced-${f.user_id ?? f.friend_passport_id ?? i}`}
+                activity={toSheetActivity(f)}
+                variant={variantFor(f)}
+                hideEgBadge
+                courseAboveDate
+                onClick={() => handleTap(f)}
+                onInviteClick={() =>
+                  openFriendSheet({
+                    whsOnlyEntry: toWhsOnlyEntry(f),
+                    source: 'morning_moment',
+                  })
+                }
               />
             ))}
           </div>

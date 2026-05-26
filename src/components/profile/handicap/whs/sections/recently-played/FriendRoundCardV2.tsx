@@ -15,6 +15,16 @@ interface Props {
   variant: Variant;
   onClick: () => void;
   onInviteClick?: () => void;
+  /**
+   * Suppress the "England Golf" pill for non-synced variants.
+   * Default: false (badge renders as today). Used by Friends Yesterday.
+   */
+  hideEgBadge?: boolean;
+  /**
+   * Reorder the text stack to: name → course name → date.
+   * Default: false (Recently Played order preserved).
+   */
+  courseAboveDate?: boolean;
 }
 
 const FONT = 'Geist, system-ui, -apple-system, BlinkMacSystemFont, sans-serif';
@@ -27,6 +37,8 @@ export const FriendRoundCardV2: React.FC<Props> = ({
   variant,
   onClick,
   onInviteClick,
+  hideEgBadge = false,
+  courseAboveDate = false,
 }) => {
   const isSynced = variant === 'clbhouz-synced';
 
@@ -186,20 +198,55 @@ export const FriendRoundCardV2: React.FC<Props> = ({
             >
               {displayName(activity.friend_name)}
             </div>
-            <div
-              style={{
-                fontSize: 10.5,
-                fontWeight: 600,
-                color: 'var(--hcp-t-60)',
-                marginTop: 2,
-                lineHeight: 1.15,
-                whiteSpace: 'nowrap',
-                overflow: 'hidden',
-                textOverflow: 'ellipsis',
-              }}
-            >
-              {playedDate}
-            </div>
+            {!courseAboveDate && (
+              <div
+                style={{
+                  fontSize: 10.5,
+                  fontWeight: 600,
+                  color: 'var(--hcp-t-60)',
+                  marginTop: 2,
+                  lineHeight: 1.15,
+                  whiteSpace: 'nowrap',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                }}
+              >
+                {playedDate}
+              </div>
+            )}
+            {courseAboveDate && (
+              <>
+                <div
+                  style={{
+                    fontSize: 11.5,
+                    fontWeight: 700,
+                    color: 'var(--hcp-t-100)',
+                    letterSpacing: '-0.005em',
+                    lineHeight: 1.2,
+                    marginTop: 2,
+                    whiteSpace: 'nowrap',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                  }}
+                >
+                  {courseName}
+                </div>
+                <div
+                  style={{
+                    fontSize: 10.5,
+                    fontWeight: 600,
+                    color: 'var(--hcp-t-60)',
+                    marginTop: 1,
+                    lineHeight: 1.15,
+                    whiteSpace: 'nowrap',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                  }}
+                >
+                  {playedDate}
+                </div>
+              </>
+            )}
           </div>
 
           {isSynced && hcpDelta !== null && Math.abs(hcpDelta) >= 0.05 ? (
@@ -239,7 +286,7 @@ export const FriendRoundCardV2: React.FC<Props> = ({
                 </span>
               )}
             </div>
-          ) : !isSynced ? (
+          ) : !isSynced && !hideEgBadge ? (
             <div
               style={{
                 display: 'inline-flex',
@@ -262,36 +309,38 @@ export const FriendRoundCardV2: React.FC<Props> = ({
           ) : null}
         </div>
 
-        <div
-          style={{
-            fontSize: 11.5,
-            fontWeight: 700,
-            color: 'var(--hcp-t-80, rgba(255,255,255,0.85))',
-            letterSpacing: '-0.005em',
-            lineHeight: 1.2,
-            whiteSpace: 'nowrap',
-            overflow: 'hidden',
-            textOverflow: 'ellipsis',
-          }}
-        >
-          {courseName}
-          {(par != null || slope != null) && (
-            <span
-              style={{
-                marginLeft: 6,
-                fontSize: 9.5,
-                fontWeight: 700,
-                color: 'var(--hcp-t-60)',
-                letterSpacing: '0.08em',
-                textTransform: 'uppercase',
-              }}
-            >
-              {par != null && <>· PAR {par}</>}
-              {par != null && slope != null && <> · SL {slope}</>}
-              {par == null && slope != null && <>· SL {slope}</>}
-            </span>
-          )}
-        </div>
+        {!courseAboveDate && (
+          <div
+            style={{
+              fontSize: 11.5,
+              fontWeight: 700,
+              color: 'var(--hcp-t-80, rgba(255,255,255,0.85))',
+              letterSpacing: '-0.005em',
+              lineHeight: 1.2,
+              whiteSpace: 'nowrap',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+            }}
+          >
+            {courseName}
+            {(par != null || slope != null) && (
+              <span
+                style={{
+                  marginLeft: 6,
+                  fontSize: 9.5,
+                  fontWeight: 700,
+                  color: 'var(--hcp-t-60)',
+                  letterSpacing: '0.08em',
+                  textTransform: 'uppercase',
+                }}
+              >
+                {par != null && <>· PAR {par}</>}
+                {par != null && slope != null && <> · SL {slope}</>}
+                {par == null && slope != null && <>· SL {slope}</>}
+              </span>
+            )}
+          </div>
+        )}
 
         {isSynced ? (
           <div
