@@ -542,16 +542,16 @@ const CourseRow: React.FC<{
   );
 };
 
-const CourseList: React.FC<{ courses: CourseForm[]; view: ViewKey }> = ({ courses, view }) => {
+const CourseList: React.FC<{ courses: CourseForm[]; view: ViewKey; emptyCopy?: string }> = ({ courses, view, emptyCopy }) => {
   if (courses.length === 0) {
-    const emptyCopy =
+    const fallback =
       view === 'toughest'
         ? `Need at least ${MIN_ROUNDS_FOR_TOUGHEST} rounds at a course to identify your toughest. Play a few more.`
         : 'Add a few rounds to see this view.';
     return (
       <div style={{ padding: '24px 16px 28px', textAlign: 'center' }}>
         <p style={{ margin: 0, fontSize: 12, color: T.inkMute, lineHeight: 1.55, fontFamily: FONT }}>
-          {emptyCopy}
+          {emptyCopy ?? fallback}
         </p>
       </div>
     );
