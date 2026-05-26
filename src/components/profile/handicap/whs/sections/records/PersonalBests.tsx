@@ -248,18 +248,6 @@ export const PersonalBests: React.FC<Props> = ({ connectionId, currentHandicap, 
                     >
                       {(t as Tile).value}
                     </span>
-                    {(t as Tile).unit && (
-                      <span
-                        style={{
-                          fontSize: 11,
-                          fontWeight: 700,
-                          color: 'rgba(255,255,255,0.4)',
-                          letterSpacing: '-0.01em',
-                        }}
-                      >
-                        {(t as Tile).unit}
-                      </span>
-                    )}
                   </>
                 )}
               </div>
