@@ -177,6 +177,15 @@ export type ChaserSlot =
   | { kind: 'solo'; entry: any }
   | { kind: 'tie'; rank: string; count: number; score: number; members: any[] };
 
+/**
+ * Threshold at which a tie group collapses into a single TiedChasersRow even
+ * when it would technically fit as individual rows. Rationale: 3+ identical
+ * scores stacked dominate the snapshot and crowd out field depth. Collapsing
+ * frees slots to show positions further down the leaderboard. Groups of 1 or
+ * 2 always render individually.
+ */
+const COLLAPSE_THRESHOLD = 3;
+
 export function buildLeaderboardSlots(chasers: any[], maxSlots = 4): ChaserSlot[] {
   const slots: ChaserSlot[] = [];
   let i = 0;
@@ -187,10 +196,16 @@ export function buildLeaderboardSlots(chasers: any[], maxSlots = 4): ChaserSlot[
     while (j < chasers.length && scoreOf(chasers[j]) === groupScore) j++;
     const group = chasers.slice(i, j);
     const remaining = maxSlots - slots.length;
-    if (group.length <= remaining) {
+    const rank = chasers[i]?.position != null ? `T${chasers[i].position}` : 'T—';
+
+    if (group.length >= COLLAPSE_THRESHOLD) {
+      // 3+ tie: collapse, whether or not it fits.
+      slots.push({ kind: 'tie', rank, count: group.length, score: groupScore, members: group });
+    } else if (group.length <= remaining) {
+      // 1 or 2 entries that fit: render individually.
       for (const entry of group) slots.push({ kind: 'solo', entry });
     } else if (group.length >= 2) {
-      const rank = chasers[i]?.position != null ? `T${chasers[i].position}` : 'T—';
+      // 2-way that doesn't fit (edge case at slot boundary): collapse.
       slots.push({ kind: 'tie', rank, count: group.length, score: groupScore, members: group });
     } else {
       slots.push({ kind: 'solo', entry: group[0] });
@@ -199,3 +214,4 @@ export function buildLeaderboardSlots(chasers: any[], maxSlots = 4): ChaserSlot[
   }
   return slots;
 }
+
