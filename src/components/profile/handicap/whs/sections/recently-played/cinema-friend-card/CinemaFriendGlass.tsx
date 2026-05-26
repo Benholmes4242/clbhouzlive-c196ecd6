@@ -1,4 +1,5 @@
 import React from 'react';
+import { ChevronRight } from 'lucide-react';
 import type { WhsScoreHole } from '@/lib/whs/types';
 import { GlassGrossRing } from '../../shared/GrossCounterRing';
 
@@ -16,6 +17,10 @@ interface Props {
   differential: number | null;
   holes: WhsScoreHole[] | null;
   isCounter?: boolean;
+  /** Hide stableford & score diff columns; show invite pill bottom-right. */
+  nonEnriched?: boolean;
+  onInviteClick?: () => void;
+  inviteLabel?: string;
 }
 
 const HAIR: React.CSSProperties = {
