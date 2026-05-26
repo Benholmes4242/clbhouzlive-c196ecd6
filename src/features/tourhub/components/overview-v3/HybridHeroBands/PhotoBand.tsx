@@ -109,11 +109,8 @@ function StatusPill({ state }: { state: HeroState }) {
         </Pill>
       );
     }
-    return (
-      <Pill bg="rgba(251,188,46,0.18)" border={GOLD} color={GOLD}>
-        🏆 FINAL
-      </Pill>
-    );
+    return null;
+
   }
   // Upcoming
   return (
