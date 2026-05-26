@@ -109,12 +109,14 @@ const HeroHandicapCardDark: React.FC<Props> = ({ connection }) => {
     return () => clearTimeout(t);
   }, [handicap]);
 
-  // Ring fill = improvement over 90d vs tier-specific target (0-1 clamped).
+  // Ring fill = magnitude vs tier-specific target (0-1 clamped).
+  // Green progress (improving) and red regression (declining) use the same
+  // denominator. Direction is encoded by `verdict` and applied at render time.
   const fillFraction = useMemo(() => {
     if (delta90 == null || tier == null) return 0;
-    const improvement = -delta90; // delta is negative when improving
-    if (improvement <= 0) return 0;
-    return Math.min(improvement / TIER_TARGET[tier], 1);
+    const magnitude = Math.abs(delta90);
+    if (magnitude === 0) return 0;
+    return Math.min(magnitude / TIER_TARGET[tier], 1);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [delta90, tier]);
 
@@ -223,7 +225,8 @@ const HeroHandicapCardDark: React.FC<Props> = ({ connection }) => {
               stroke="rgba(255,255,255,0.06)"
               strokeWidth={STROKE_W}
             />
-            {/* Progress arc */}
+            {/* Progress arc — clockwise for improvement, counterclockwise for regression.
+                The SVG container is already rotated -90deg so 12 o'clock is the start. */}
             <circle
               cx={RING_BOX / 2}
               cy={RING_BOX / 2}
@@ -236,6 +239,9 @@ const HeroHandicapCardDark: React.FC<Props> = ({ connection }) => {
               strokeDashoffset={animatedHcp == null ? CIRCUMFERENCE : dashOffset}
               style={{
                 transition: 'stroke-dashoffset 700ms cubic-bezier(0.22,0.61,0.36,1)',
+                transform: verdict === 'bad' ? 'scaleX(-1)' : undefined,
+                transformOrigin: 'center',
+                transformBox: 'fill-box',
               }}
             />
           </svg>
