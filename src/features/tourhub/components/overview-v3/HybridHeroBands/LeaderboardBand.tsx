@@ -337,62 +337,99 @@ export function LeaderboardBand({
     }
   }
 
+  const isResultsCompact =
+    state.kind === 'results' &&
+    (state.variant === 'standard' || state.variant === 'declared' || state.variant === 'team' || state.variant === 'playoff');
+  const showSectionHeader = !isResultsCompact;
+  const useInlineCta = isResultsCompact;
+
   return (
     <div style={{ background: '#F8FAFC' }}>
-      {/* section header */}
-      <div
-        style={{
-          padding: '14px 20px 12px',
-          display: 'flex',
-          alignItems: 'baseline',
-          justifyContent: 'space-between',
-          gap: 12,
-        }}
-      >
-        <span
+      {showSectionHeader && (
+        <div
           style={{
-            fontSize: 11,
-            fontWeight: 800,
-            letterSpacing: '0.16em',
-            color: AMBER,
-            textTransform: 'uppercase',
+            padding: '14px 20px 12px',
+            display: 'flex',
+            alignItems: 'baseline',
+            justifyContent: 'space-between',
+            gap: 12,
           }}
         >
-          {h.left}
-        </span>
-        {h.right && (
-          <span style={{ fontSize: 11, fontWeight: 600, color: 'rgba(15,23,42,0.45)' }}>{h.right}</span>
-        )}
-      </div>
+          <span
+            style={{
+              fontSize: 11,
+              fontWeight: 800,
+              letterSpacing: '0.16em',
+              color: AMBER,
+              textTransform: 'uppercase',
+            }}
+          >
+            {h.left}
+          </span>
+          {h.right && (
+            <span style={{ fontSize: 11, fontWeight: 600, color: 'rgba(15,23,42,0.45)' }}>{h.right}</span>
+          )}
+        </div>
+      )}
       {/* rows */}
       <div style={{ borderTop: `0.5px solid ${INK_15}` }}>{body}</div>
       {/* CTA */}
-      <button
-        onClick={onCtaTap}
-        type="button"
-        style={{
-          margin: '18px 20px',
-          padding: '14px 20px',
-          background: INK,
-          color: 'white',
-          borderRadius: 14,
-          textAlign: 'center',
-          fontSize: 12,
-          fontWeight: 700,
-          letterSpacing: '0.12em',
-          textTransform: 'uppercase',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          gap: 8,
-          width: 'calc(100% - 40px)',
-          border: 'none',
-          cursor: 'pointer',
-          fontFamily: 'inherit',
-        }}
-      >
-        {ctaLabel(state)} <span style={{ opacity: 0.7 }}>›</span>
-      </button>
+      {useInlineCta ? (
+        <div
+          onClick={onCtaTap}
+          role="button"
+          tabIndex={0}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' || e.key === ' ') onCtaTap?.();
+          }}
+          style={{
+            height: 32,
+            padding: '0 20px',
+            display: 'flex',
+            justifyContent: 'flex-end',
+            alignItems: 'center',
+            borderTop: `0.5px solid rgba(15,23,42,0.08)`,
+            cursor: 'pointer',
+          }}
+        >
+          <span style={{
+            color: AMBER,
+            fontSize: 11,
+            fontWeight: 800,
+            letterSpacing: '0.10em',
+            textTransform: 'uppercase',
+          }}>
+            {ctaLabel(state)} ›
+          </span>
+        </div>
+      ) : (
+        <button
+          onClick={onCtaTap}
+          type="button"
+          style={{
+            margin: '18px 20px',
+            padding: '14px 20px',
+            background: INK,
+            color: 'white',
+            borderRadius: 14,
+            textAlign: 'center',
+            fontSize: 12,
+            fontWeight: 700,
+            letterSpacing: '0.12em',
+            textTransform: 'uppercase',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: 8,
+            width: 'calc(100% - 40px)',
+            border: 'none',
+            cursor: 'pointer',
+            fontFamily: 'inherit',
+          }}
+        >
+          {ctaLabel(state)} <span style={{ opacity: 0.7 }}>›</span>
+        </button>
+      )}
     </div>
   );
 }
