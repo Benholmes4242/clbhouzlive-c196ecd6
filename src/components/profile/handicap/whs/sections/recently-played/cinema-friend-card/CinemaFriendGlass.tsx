@@ -157,7 +157,7 @@ export const CinemaFriendGlass: React.FC<Props> = ({
         <div style={{ textAlign: 'right' }}>
           <div style={labelStyle}>SCORE DIFF</div>
           {nonEnriched ? (
-            <div style={{ ...valueStyle('rgba(255,255,255,0.55)'), display: 'flex', justifyContent: 'flex-end', alignItems: 'center', height: 30 }}>
+            <div style={{ ...valueStyle('rgba(255,255,255,0.55)'), display: 'flex', justifyContent: 'center', alignItems: 'center', height: 30 }}>
               <Lock size={18} strokeWidth={2} />
             </div>
           ) : (
