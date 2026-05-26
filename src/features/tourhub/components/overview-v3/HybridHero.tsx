@@ -24,6 +24,10 @@ import { getPlayerHeadshotUrl } from '@/utils/playerHeadshot';
 import { PhotoBand } from './HybridHeroBands/PhotoBand';
 import { MiddleBand } from './HybridHeroBands/MiddleBand';
 import { LeaderboardBand } from './HybridHeroBands/LeaderboardBand';
+import { ResultBand } from './HybridHeroBands/ResultBand';
+import { TopThreePeek, type TopThreePeekRow } from './HybridHeroBands/TopThreePeek';
+import { SignatureFooter } from './HybridHeroBands/SignatureFooter';
+import { format } from 'date-fns';
 import {
   deriveHeroState,
   detectTopTie,
