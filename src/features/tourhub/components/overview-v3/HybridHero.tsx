@@ -29,8 +29,10 @@ import {
   detectTopTie,
   deriveTickerRows,
   fmtScore,
+  extractRounds,
 } from './HybridHero.utils';
 import { BG, INK_15 } from './HybridHero.constants';
+
 
 // ---------- Skeleton -------------------------------------------------------
 
@@ -273,6 +275,8 @@ export function HybridHero({ slide }: HybridHeroProps) {
         fieldStrength={fieldStrength}
         courseStats={courseStats}
         teamWinner={teamWinner}
+        championRounds={state.kind === 'results' ? extractRounds(safeLeaderboard[0]) : undefined}
+        par={tournament.venuePar ?? undefined}
       />
       <LeaderboardBand
         state={state}
@@ -283,8 +287,10 @@ export function HybridHero({ slide }: HybridHeroProps) {
         lastYearFinishers={lastYearFinishers}
         firstYearEvent={showFirstYearPlaceholder}
         tourSlug={tournament.tourSlug}
+        par={tournament.venuePar ?? undefined}
         onCtaTap={onCtaTap}
       />
+
     </div>
   );
 }

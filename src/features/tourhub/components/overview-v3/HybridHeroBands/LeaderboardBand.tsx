@@ -5,7 +5,7 @@
 
 import React from 'react';
 import type { HeroState, TopTie } from '../HybridHero.utils';
-import { fmtScore, formatRank, buildLeaderboardSlots } from '../HybridHero.utils';
+import { fmtScore, formatRank, buildLeaderboardSlots, extractRounds } from '../HybridHero.utils';
 import { SoloLeaderRow, TiedLeadersRow, ChampionRow, TiedChasersRow } from './LeaderRow';
 import { ChaserRow } from './ChaserRow';
 import { LastYearRow } from './LastYearRow';
@@ -16,6 +16,7 @@ import { PlayoffPendingPanel } from './PlayoffPendingPanel';
 import { INK, INK_15, AMBER } from '../HybridHero.constants';
 import type { TeeTimeGroup } from '../../../hooks/useTournamentTeeTimes';
 import { getPlayerHeadshotUrl } from '@/utils/playerHeadshot';
+
 
 export interface LeaderboardBandProps {
   state: HeroState;
@@ -30,8 +31,11 @@ export interface LeaderboardBandProps {
   cancelReason?: string;
   /** Tour code used to resolve R2 player headshot URLs. */
   tourSlug?: string;
+  /** Pass 3: course par for trajectory sparklines. */
+  par?: number;
   onCtaTap?: () => void;
 }
+
 
 function ctaLabel(state: HeroState): string {
   if (state.kind === 'live') return 'OPEN LIVE LEADERBOARD';
@@ -96,10 +100,13 @@ export function LeaderboardBand({
   firstYearEvent,
   cancelReason,
   tourSlug,
+  par,
   onCtaTap,
 }: LeaderboardBandProps) {
   const h = header(state, leaderboard, tiedLeaders);
   const entryAvatar = (entry: any) => resolveAvatar(entry, tourSlug);
+  const sparklinePar = par ?? 0;
+
 
   // Body rows by state
   let body: React.ReactNode = null;
@@ -254,7 +261,11 @@ export function LeaderboardBand({
                   count={slot.count}
                   score={fmtScore(slot.score)}
                   thru="F"
-                  players={slot.members.map((m: any) => ({ avatarUrl: entryAvatar(m) }))}
+                  players={slot.members.map((m: any) => ({
+                    avatarUrl: entryAvatar(m),
+                    rounds: extractRounds(m),
+                  }))}
+                  par={sparklinePar}
                   isLast={isLast}
                   onTap={onCtaTap}
                 />
@@ -269,10 +280,13 @@ export function LeaderboardBand({
                 score={fmtScore(slot.entry.score)}
                 thru="F"
                 avatarUrl={entryAvatar(slot.entry)}
+                rounds={extractRounds(slot.entry)}
+                par={sparklinePar}
                 isResults
                 isLast={isLast}
               />
             );
+
           })}
         </>
       );

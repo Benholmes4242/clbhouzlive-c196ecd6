@@ -34,7 +34,12 @@ interface MiddleBandProps {
   cancelReason?: string;
   fallbackPreview?: { eyebrow: string; body: string };
   teamWinner?: TeamWinner | null;
+  /** Pass 3: winner's per-round scores (results state, leaderboard[0]). */
+  championRounds?: number[];
+  /** Pass 3: course par for sparkline math. */
+  par?: number;
 }
+
 
 export function MiddleBand({
   state,
@@ -47,7 +52,10 @@ export function MiddleBand({
   cancelReason,
   fallbackPreview,
   teamWinner,
+  championRounds,
+  par,
 }: MiddleBandProps) {
+
   if (state.kind === 'live') {
     return <Ticker rows={top10 ?? []} />;
   }
@@ -80,9 +88,12 @@ export function MiddleBand({
           score={champion.score}
           eyebrow={eyebrow}
           avatarUrl={champion.avatarUrl}
+          rounds={championRounds}
+          par={par}
         />
       );
     }
+
     return <ChampionStrip name="Result pending" score="—" eyebrow="🏆 CHAMPION" />;
   }
 

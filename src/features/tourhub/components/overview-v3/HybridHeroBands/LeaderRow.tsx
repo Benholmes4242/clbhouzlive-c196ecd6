@@ -15,6 +15,8 @@ import {
   GREEN_LIVE,
   FONT_MONO,
 } from '../HybridHero.constants';
+import { TrajectorySparkline } from './TrajectorySparkline';
+
 
 const LEADER_TINT_LIVE = 'rgba(251,188,46,0.07)';
 const LEADER_TINT_RESULTS = 'rgba(251,188,46,0.10)';
@@ -187,9 +189,24 @@ interface TiedChasersRowProps {
   count: number;
   score: string;
   thru: string;
-  players: { avatarUrl?: string | null }[];
+  players: { avatarUrl?: string | null; rounds?: number[] }[];
+  par?: number;
   isLast?: boolean;
   onTap?: () => void;
+}
+
+function averageRounds(players: { rounds?: number[] }[]): number[] {
+  if (!players.length) return [];
+  const allRounds = players.map(p => p.rounds ?? []).filter(r => r.length > 0);
+  if (allRounds.length === 0) return [];
+  const minLen = Math.min(...allRounds.map(r => r.length));
+  if (minLen < 2) return [];
+  const avgs: number[] = [];
+  for (let i = 0; i < minLen; i++) {
+    const sum = allRounds.reduce((a, r) => a + r[i], 0);
+    avgs.push(sum / allRounds.length);
+  }
+  return avgs;
 }
 
 export function TiedChasersRow({
@@ -198,15 +215,17 @@ export function TiedChasersRow({
   score,
   thru,
   players,
+  par,
   isLast = false,
   onTap,
 }: TiedChasersRowProps) {
+  const avgRounds = averageRounds(players);
   return (
     <div
       onClick={onTap}
       style={{
         display: 'grid',
-        gridTemplateColumns: '32px 1fr auto 42px',
+        gridTemplateColumns: '32px 1fr 36px auto 42px',
         gap: 12,
         padding: '8px 20px',
         height: 40,
@@ -215,17 +234,26 @@ export function TiedChasersRow({
         borderBottom: isLast ? 'none' : `0.5px solid ${INK_15}`,
         cursor: onTap ? 'pointer' : 'default',
       }}
-      aria-label={`${count} players tied at ${rank} with score ${score}`}
+      aria-label={`${count} players tied at ${rank} with score ${score}, average trajectory`}
     >
       <span style={{ fontFamily: FONT_MONO, fontSize: 13, fontWeight: 700, color: INK_45 }}>
         {rank}
       </span>
       <div style={{ display: 'flex', alignItems: 'center', gap: 10, minWidth: 0 }}>
         <StackedAvatars players={players} size={22} variant="chaser" />
-        <span style={{ fontSize: 14, fontWeight: 700, color: INK, whiteSpace: 'nowrap' }}>
+        <span style={{ fontSize: 14, fontWeight: 700, color: INK, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', minWidth: 0 }}>
           {count} tied at {rank}
           <span style={{ marginLeft: 4, color: INK_45 }}>›</span>
         </span>
+      </div>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-start' }}>
+        <TrajectorySparkline
+          rounds={avgRounds}
+          par={par ?? 0}
+          variant="tied"
+          totalRounds={4}
+          ariaHidden
+        />
       </div>
       <span
         style={{
@@ -244,6 +272,7 @@ export function TiedChasersRow({
     </div>
   );
 }
+
 
 interface TiedLeadersRowProps {
   count: number;
