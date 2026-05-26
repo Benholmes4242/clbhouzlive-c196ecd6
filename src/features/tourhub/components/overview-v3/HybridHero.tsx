@@ -243,6 +243,41 @@ export function HybridHero({ slide, activeTournamentId, onSelectTour }: HybridHe
   };
 
 
+  // Pass 7: dates string for PhotoBand title row + tour label for top eyebrow.
+  const startD = tournament.startDate ? new Date(tournament.startDate) : null;
+  const endD = tournament.endDate ? new Date(tournament.endDate) : null;
+  const datesString =
+    startD && endD
+      ? `${format(startD, 'MMM d').toUpperCase()} – ${format(endD, 'd').toUpperCase()}`
+      : endD
+        ? format(endD, 'MMM d').toUpperCase()
+        : null;
+  const tourLabel = tournament.tourName || tournament.tourSlug?.toUpperCase() || null;
+
+  // Pass 7: results-state TopThreePeek rows (positions 2..4)
+  const topThreeRows: TopThreePeekRow[] =
+    state.kind === 'results' && state.variant === 'standard'
+      ? safeLeaderboard.slice(1, 4).map((e: any) => {
+          const player = e?.player;
+          const name =
+            player?.full_name ||
+            `${player?.first_name ?? ''} ${player?.last_name ?? ''}`.trim() ||
+            '—';
+          const country = player?.country_code || player?.country || null;
+          const rank = e?.position != null
+            ? (e?.position_tied ? `T${e.position}` : String(e.position))
+            : '—';
+          let photoUrl: string | null = player?.photo_url ?? null;
+          if (!photoUrl && name && tournament.tourSlug) {
+            try { photoUrl = getPlayerHeadshotUrl(name, tournament.tourSlug); } catch { photoUrl = null; }
+          }
+          return { rank, name, country, photoUrl, score: fmtScore(e?.score) };
+        })
+      : [];
+
+  const useBroadcastResults =
+    state.kind === 'results' && state.variant === 'standard' && !!champion;
+
   return (
     <div
       style={{
@@ -259,35 +294,57 @@ export function HybridHero({ slide, activeTournamentId, onSelectTour }: HybridHe
         venueCity={tournament.venueCity}
         venueImageUrl={venueImageUrl}
         state={state}
-        activeTournamentId={activeTournamentId}
-        onSelectTour={onSelectTour}
-      />
-      <MiddleBand
-        state={state}
-        top10={top10}
-        champion={champion}
-        tiedLeaders={tiedLeaders}
-        defendingChamp={defendingChamp}
-        fieldStrength={fieldStrength}
-        courseStats={courseStats}
-        teamWinner={teamWinner}
-        championRounds={state.kind === 'results' ? extractRounds(safeLeaderboard[0]) : undefined}
-        par={tournament.venuePar ?? undefined}
-        championNarrative={tournament.championNarrative}
-      />
-      <LeaderboardBand
-        state={state}
-        leaderboard={safeLeaderboard}
-        tiedLeaders={tiedLeaders}
-        champion={champion}
-        teeTimes={teeTimes}
-        lastYearFinishers={lastYearFinishers}
-        firstYearEvent={showFirstYearPlaceholder}
-        tourSlug={tournament.tourSlug}
-        par={tournament.venuePar ?? undefined}
-        onCtaTap={onCtaTap}
+        tourLabel={tourLabel}
+        winnerName={tournament.winnerName}
+        isMajor={tournament.isMajor}
+        isSignature={tournament.isSignature}
+        datesString={datesString}
       />
 
+      {useBroadcastResults ? (
+        <>
+          <ResultBand
+            winnerName={champion!.name}
+            winnerPhotoUrl={champion!.avatarUrl ?? null}
+            winnerScore={champion!.score}
+            winnerCountry={champion!.country}
+            narrative={tournament.championNarrative}
+            purse={tournament.purse}
+            currency={tournament.currency}
+            defendingChampion={tournament.defendingChampion}
+          />
+          <TopThreePeek rows={topThreeRows} onFullLeaderboardTap={onCtaTap} />
+          <SignatureFooter state={state} />
+        </>
+      ) : (
+        <>
+          <MiddleBand
+            state={state}
+            top10={top10}
+            champion={champion}
+            tiedLeaders={tiedLeaders}
+            defendingChamp={defendingChamp}
+            fieldStrength={fieldStrength}
+            courseStats={courseStats}
+            teamWinner={teamWinner}
+            championRounds={state.kind === 'results' ? extractRounds(safeLeaderboard[0]) : undefined}
+            par={tournament.venuePar ?? undefined}
+            championNarrative={tournament.championNarrative}
+          />
+          <LeaderboardBand
+            state={state}
+            leaderboard={safeLeaderboard}
+            tiedLeaders={tiedLeaders}
+            champion={champion}
+            teeTimes={teeTimes}
+            lastYearFinishers={lastYearFinishers}
+            firstYearEvent={showFirstYearPlaceholder}
+            tourSlug={tournament.tourSlug}
+            par={tournament.venuePar ?? undefined}
+            onCtaTap={onCtaTap}
+          />
+        </>
+      )}
     </div>
   );
 }
