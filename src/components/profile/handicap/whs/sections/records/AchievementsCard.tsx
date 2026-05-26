@@ -7,8 +7,8 @@ import { SectionHeader } from '../_shared/atoms';
 
 interface Props {
   userId: string;
-  /** When viewing a friend's profile, this is the viewer's id. Defaults to userId. */
-  viewerUserId?: string;
+  viewMode?: 'owner' | 'friend';
+  ownerFirstName?: string | null;
 }
 
 const FONT = 'Geist, system-ui, -apple-system, BlinkMacSystemFont, sans-serif';
@@ -26,7 +26,7 @@ const RARITY_POINTS: Record<string, number> = {
   legendary: 100,
 };
 
-export const AchievementsCard: React.FC<Props> = ({ userId }) => {
+export const AchievementsCard: React.FC<Props> = ({ userId, viewMode = 'owner', ownerFirstName = null }) => {
   const { data: achievements, isLoading } = useUserAchievements(userId);
 
   const list = achievements ?? [];
@@ -53,12 +53,20 @@ export const AchievementsCard: React.FC<Props> = ({ userId }) => {
     }
   };
 
+  const isFriend = viewMode === 'friend';
+  const possessive = ownerFirstName ? `${ownerFirstName}'s` : 'Their';
+  const hasContraction = ownerFirstName ? `${ownerFirstName} has` : 'they have';
+
   return (
     <section style={{ marginTop: 32 }}>
       <SectionHeader
         eyebrow="ACHIEVEMENTS"
-        title="Your trophy cabinet"
-        sub="Tap to see everything you've unlocked"
+        title={isFriend ? `${possessive} trophy cabinet` : 'Your trophy cabinet'}
+        sub={
+          isFriend
+            ? `Tap to see everything ${hasContraction} unlocked`
+            : "Tap to see everything you've unlocked"
+        }
       />
       <div style={{ padding: '0 16px' }}>
         <div
@@ -141,7 +149,9 @@ export const AchievementsCard: React.FC<Props> = ({ userId }) => {
           <div style={{ flex: 1, minWidth: 0 }}>
             {unlockedCount === 0 && !isLoading ? (
               <div style={{ fontSize: 13, color: D_T60, fontWeight: 600 }}>
-                No achievements unlocked yet
+                {isFriend
+                  ? `${ownerFirstName ?? 'They'} ${ownerFirstName ? 'hasn\'t' : "haven't"} unlocked any achievements yet`
+                  : 'No achievements unlocked yet'}
               </div>
             ) : (
               <>

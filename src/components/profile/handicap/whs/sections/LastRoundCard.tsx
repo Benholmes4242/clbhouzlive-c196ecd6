@@ -84,6 +84,8 @@ export const LastRoundCard: React.FC<Props> = ({
           round={lastRound}
           timeAgo={timeAgo}
           onClick={() => setSheetOpen(true)}
+          viewMode={viewMode}
+          ownerFirstName={ownerFirstName}
         />
       </section>
 

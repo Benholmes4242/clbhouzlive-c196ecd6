@@ -33,7 +33,11 @@ export const LegendsView: React.FC<Props> = ({
       style={{ paddingTop: 16 }}
     >
       {/* 1. Friends Leaderboard */}
-      <FriendsLeaderboardSection userId={userId} />
+      <FriendsLeaderboardSection
+        userId={userId}
+        viewMode={readOnly ? 'friend' : 'owner'}
+        ownerFirstName={ownerFirstName}
+      />
       {/* 2. Streaks — owner only */}
       {!readOnly && <StreaksCard userId={userId} readOnly={readOnly} />}
       {/* 3. Rivalries */}

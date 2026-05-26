@@ -79,6 +79,7 @@ export const HandicapDashboard: React.FC<Props> = ({ connection, userId, readOnl
             userId={userId}
             currentHandicap={currentHandicap}
             readOnly={readOnly}
+            ownerFirstName={ownerFirstName}
           />
         )}
         {activeSubtab === 'friends' && (
@@ -90,7 +91,7 @@ export const HandicapDashboard: React.FC<Props> = ({ connection, userId, readOnl
           />
         )}
         {activeSubtab === 'legends' && (
-          <LegendsView userId={userId} readOnly={readOnly} />
+          <LegendsView userId={userId} readOnly={readOnly} ownerFirstName={ownerFirstName} />
         )}
       </div>
 

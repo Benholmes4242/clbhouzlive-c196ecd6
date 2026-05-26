@@ -17,6 +17,8 @@ import type { FriendLeaderboardEntry } from '@/lib/whs/types';
 
 interface Props {
   userId: string;
+  viewMode?: 'owner' | 'friend';
+  ownerFirstName?: string | null;
 }
 
 const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
@@ -30,7 +32,7 @@ const LABEL_STYLE: React.CSSProperties = {
   letterSpacing: '0.16em',
 };
 
-export const FriendsLeaderboardSection: React.FC<Props> = ({ userId }) => {
+export const FriendsLeaderboardSection: React.FC<Props> = ({ userId, viewMode = 'owner', ownerFirstName = null }) => {
   const { data, isLoading } = useFriendLeaderboard(userId);
   const percentileQuery = useHandicapPercentile(userId);
   const { data: deltasData } = useFriendLeaderboardRankDeltas(userId, 7);
@@ -63,10 +65,16 @@ export const FriendsLeaderboardSection: React.FC<Props> = ({ userId }) => {
     cohorts.totalInactive > 0 ? `, ${cohorts.totalInactive} inactive` : ''
   }`;
 
+  const isFriend = viewMode === 'friend';
+  const possessive = ownerFirstName ? `${ownerFirstName}'s` : 'Their';
+  const subjectIs = ownerFirstName ? `${ownerFirstName} is` : 'They are';
+
   const subLine = isLoading
     ? 'Loading…'
     : circlePercentile != null
-      ? `You're top ${circlePercentile}% of your circle · ${tail}`
+      ? isFriend
+        ? `${subjectIs} top ${circlePercentile}% of ${ownerFirstName ? `${ownerFirstName}'s` : 'their'} circle · ${tail}`
+        : `You're top ${circlePercentile}% of your circle · ${tail}`
       : `Ranked by current handicap · ${tail}`;
 
 
@@ -89,7 +97,7 @@ export const FriendsLeaderboardSection: React.FC<Props> = ({ userId }) => {
     <section style={{ marginTop: 32 }}>
       <DarkSectionHeader
         eyebrow="LEADERBOARD"
-        title="You vs your circle"
+        title={isFriend ? `${possessive} circle` : 'You vs your circle'}
         sub={subLine}
       />
 
@@ -121,6 +129,8 @@ export const FriendsLeaderboardSection: React.FC<Props> = ({ userId }) => {
           totalActive={cohorts.totalActive}
           expanded={heroExpanded}
           onToggleExpand={() => setHeroExpanded((v) => !v)}
+          viewMode={viewMode}
+          ownerFirstName={ownerFirstName}
         />
       )}
 
@@ -261,6 +271,8 @@ export const FriendsLeaderboardSection: React.FC<Props> = ({ userId }) => {
           setFullLeaderboardOpen(false);
           handleRowClick(entry);
         }}
+        viewMode={viewMode}
+        ownerFirstName={ownerFirstName}
       />
     </section>
   );

@@ -9,14 +9,18 @@ interface Props {
   currentHandicap: number | null;
   /** When true, hides personal-only sections. */
   readOnly?: boolean;
+  /** First name of the profile owner — used for friend-view copy. */
+  ownerFirstName?: string | null;
 }
 
 export const RecordsView: React.FC<Props> = ({
   connectionId,
   userId,
   currentHandicap,
-  readOnly: _readOnly = false,
+  readOnly = false,
+  ownerFirstName = null,
 }) => {
+  const viewMode: 'owner' | 'friend' = readOnly ? 'friend' : 'owner';
   return (
     <div
       role="tabpanel"
@@ -25,13 +29,26 @@ export const RecordsView: React.FC<Props> = ({
       style={{ paddingTop: 16 }}
     >
       {/* 1. Personal Bests */}
-      <PersonalBests connectionId={connectionId} currentHandicap={currentHandicap} />
+      <PersonalBests
+        connectionId={connectionId}
+        currentHandicap={currentHandicap}
+        viewMode={viewMode}
+        ownerFirstName={ownerFirstName}
+      />
 
       {/* 2. Recent Rounds (existing archive list also covers monthly history) */}
-      <RecentRoundsCard connectionId={connectionId} />
+      <RecentRoundsCard
+        connectionId={connectionId}
+        viewMode={viewMode}
+        ownerFirstName={ownerFirstName}
+      />
 
       {/* 3. Achievements */}
-      <AchievementsCard userId={userId} viewerUserId={userId} />
+      <AchievementsCard
+        userId={userId}
+        viewMode={viewMode}
+        ownerFirstName={ownerFirstName}
+      />
     </div>
   );
 };

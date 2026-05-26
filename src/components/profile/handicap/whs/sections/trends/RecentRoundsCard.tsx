@@ -11,6 +11,8 @@ import { fmtAbsoluteDate } from '@/lib/whs/utils/nameFormat';
 
 interface Props {
   connectionId: string;
+  viewMode?: 'owner' | 'friend';
+  ownerFirstName?: string | null;
 }
 
 const T = {
@@ -117,7 +119,7 @@ const fmtMonth = (iso: string): string => {
 
 type FilterKey = 'all' | 'counters' | string;
 
-export const RecentRoundsCard: React.FC<Props> = ({ connectionId }) => {
+export const RecentRoundsCard: React.FC<Props> = ({ connectionId, viewMode = 'owner', ownerFirstName = null }) => {
   const { data: allRounds, isLoading } = useAllScores(connectionId);
   const { data: trend } = useHandicapTrend(connectionId);
   const [openScoreId, setOpenScoreId] = useState<string | null>(null);
@@ -185,7 +187,11 @@ export const RecentRoundsCard: React.FC<Props> = ({ connectionId }) => {
       <SectionHeader
         eyebrow="RECENT ROUNDS"
         title={`${rounds.length} ${rounds.length === 1 ? 'round' : 'rounds'} tracked`}
-        sub="Your full posted history."
+        sub={
+          viewMode === 'friend'
+            ? `${ownerFirstName ? `${ownerFirstName}'s` : 'Their'} full posted history.`
+            : 'Your full posted history.'
+        }
         right={counterCount > 0 ? <CounterBadge count={counterCount} /> : undefined}
       />
 
