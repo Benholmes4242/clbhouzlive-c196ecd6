@@ -267,10 +267,12 @@ export function LeaderboardBand({
                   }))}
                   par={sparklinePar}
                   isLast={isLast}
+                  isResults
                   onTap={onCtaTap}
                 />
               );
             }
+
             return (
               <ChaserRow
                 key={`solo-${i}`}
