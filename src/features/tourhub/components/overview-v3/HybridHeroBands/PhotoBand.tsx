@@ -25,15 +25,10 @@ interface PhotoBandProps {
   venueCity: string | null;
   venueImageUrl: string | null;
   state: HeroState;
-  tourLabel: string;
-  isMajor?: boolean;
   // Pass 5
   activeTournamentId: string | null;
   onSelectTour: (tournamentId: string) => void;
 }
-
-// Pass 5: MajorBadge removed — tour pills now occupy top-left.
-// Intentional trade-off documented in HERO_PASS_5_BRIEF §6.
 
 function StatusPill({ state }: { state: HeroState }) {
   if (state.kind === 'live') {
@@ -167,8 +162,6 @@ export function PhotoBand({
   venueCity,
   venueImageUrl,
   state,
-  tourLabel: _tourLabel,
-  isMajor: _isMajor = false,
   activeTournamentId,
   onSelectTour,
 }: PhotoBandProps) {

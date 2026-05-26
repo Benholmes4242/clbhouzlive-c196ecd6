@@ -63,16 +63,6 @@ export function HybridHeroSkeleton() {
   );
 }
 
-// ---------- Tour label helper ----------------------------------------------
-
-const TOUR_LABELS: Record<string, string> = {
-  pga: 'PGA TOUR',
-  liv: 'LIV GOLF',
-  euro: 'DP WORLD',
-  lpga: 'LPGA',
-  champ: 'CHAMPIONS',
-  pgad: 'KORN FERRY',
-};
 
 // ---------- Component ------------------------------------------------------
 
@@ -248,8 +238,6 @@ export function HybridHero({ slide, activeTournamentId, onSelectTour }: HybridHe
     navigate(target.to, { state: target.state });
   };
 
-  // Tour label
-  const tourLabel = TOUR_LABELS[tournament.tourSlug] || tournament.tourSlug.toUpperCase();
 
   return (
     <div
@@ -267,8 +255,6 @@ export function HybridHero({ slide, activeTournamentId, onSelectTour }: HybridHe
         venueCity={tournament.venueCity}
         venueImageUrl={venueImageUrl}
         state={state}
-        tourLabel={tourLabel}
-        isMajor={tournament.isMajor}
         activeTournamentId={activeTournamentId}
         onSelectTour={onSelectTour}
       />
