@@ -6108,6 +6108,69 @@ export type Database = {
         }
         Relationships: []
       }
+      gam_user_badges_clean_card_revoke_backup_2026_05_26: {
+        Row: {
+          _backup_api_total_holes: number | null
+          _backup_bogey_count: number | null
+          _backup_hole_by_hole_fetched: boolean | null
+          _backup_play_date: string | null
+          _backup_played_holes: number | null
+          _backup_scored_holes: number | null
+          _backup_taken_at: string | null
+          badge_id: string | null
+          counter_tier: number | null
+          counter_value: number | null
+          created_at: string | null
+          earned_at: string | null
+          id: string | null
+          is_visible: boolean | null
+          seen_by_user: boolean | null
+          trigger_whs_score_id: string | null
+          updated_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          _backup_api_total_holes?: number | null
+          _backup_bogey_count?: number | null
+          _backup_hole_by_hole_fetched?: boolean | null
+          _backup_play_date?: string | null
+          _backup_played_holes?: number | null
+          _backup_scored_holes?: number | null
+          _backup_taken_at?: string | null
+          badge_id?: string | null
+          counter_tier?: number | null
+          counter_value?: number | null
+          created_at?: string | null
+          earned_at?: string | null
+          id?: string | null
+          is_visible?: boolean | null
+          seen_by_user?: boolean | null
+          trigger_whs_score_id?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          _backup_api_total_holes?: number | null
+          _backup_bogey_count?: number | null
+          _backup_hole_by_hole_fetched?: boolean | null
+          _backup_play_date?: string | null
+          _backup_played_holes?: number | null
+          _backup_scored_holes?: number | null
+          _backup_taken_at?: string | null
+          badge_id?: string | null
+          counter_tier?: number | null
+          counter_value?: number | null
+          created_at?: string | null
+          earned_at?: string | null
+          id?: string | null
+          is_visible?: boolean | null
+          seen_by_user?: boolean | null
+          trigger_whs_score_id?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       gam_user_milestones: {
         Row: {
           count: number
