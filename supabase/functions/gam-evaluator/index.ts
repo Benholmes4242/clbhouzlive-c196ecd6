@@ -277,6 +277,8 @@ function computeRoundStats(score: any, holes: any[], meta: any) {
     }
   }
 
+  const is18 = score.total_holes === 18;
+
   const stats: any = {
     whs_score_id: score.id,
     user_id: meta.user_id,
@@ -305,11 +307,11 @@ function computeRoundStats(score: any, holes: any[], meta: any) {
     triple_plus: 0,
     longest_par_or_better_run: 0,
     longest_birdie_run: 0,
-    beat_par: grossScore != null && par != null ? grossScore < par : false,
-    sub_70: grossScore != null ? grossScore < 70 : false,
-    sub_80: grossScore != null ? grossScore < 80 : false,
-    sub_90: grossScore != null ? grossScore < 90 : false,
-    sub_100: grossScore != null ? grossScore < 100 : false,
+    beat_par: is18 && grossScore != null && par != null ? grossScore < par : false,
+    sub_70: is18 && grossScore != null ? grossScore < 70 : false,
+    sub_80: is18 && grossScore != null ? grossScore < 80 : false,
+    sub_90: is18 && grossScore != null ? grossScore < 90 : false,
+    sub_100: is18 && grossScore != null ? grossScore < 100 : false,
     clean_card: false,
     is_counter: score.is_counter ?? false,
     delta_index: null,
@@ -492,6 +494,11 @@ function compare(value: number, op: string, target: number): boolean {
 
 function matchesBinary(badge: any, stats: any): boolean {
   if (badge.threshold_field && badge.threshold_op && badge.threshold_value != null) {
+    // Gross-score badges (break_70/80/90/100) only fire on full 18-hole rounds.
+    // Without this guard, a 9-hole 34 would trip all four break_X badges.
+    if (badge.threshold_field === 'gross_score' && stats.holes_played !== 18) {
+      return false;
+    }
     const v = stats[badge.threshold_field];
     if (v == null) return false;
     return compare(Number(v), badge.threshold_op, Number(badge.threshold_value));
