@@ -425,7 +425,7 @@ const HandicapPage: React.FC = () => {
           <WhsHandicapTab userId={ownerUserId} ownerFirstName={displayName} />
         )}
       </main>
-      <GamMount ownerUserId={ownerUserId} viewerUserId={user.id} readOnly={isFriendView} />
+      <GamMount ownerUserId={ownerUserId} viewerUserId={user.id} ownerFirstName={displayName} readOnly={isFriendView} />
     </PageRoot>
   );
 };
