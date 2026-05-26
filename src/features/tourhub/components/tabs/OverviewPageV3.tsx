@@ -22,7 +22,6 @@ import {
 import { ComingUpCalendar } from '../ComingUpCalendar';
 import { CollegeRivalry } from '../CollegeRivalry';
 import { LazySection } from '../overview-v3/LazySection';
-import { AllToursTicker } from '../AllToursTicker';
 
 import { IntelligenceHero } from '../IntelligenceHero';
 import { WorldRankingsHero } from '../WorldRankingsHero';
@@ -122,15 +121,11 @@ export function OverviewPageV3() {
             mode="overview"
             activeTournamentId={activeTournamentId}
             onActiveChange={handleHeroActiveChange}
+            onTourSelect={handleTickerSelect}
             autoRotate={autoRotate}
           />
         </motion.div>
 
-        {/* All Tours Ticker — flush below the hero, no top gap. Now drives the Hero (tap to switch). */}
-        <AllToursTicker
-          activeId={activeTournamentId}
-          onSelect={handleTickerSelect}
-        />
 
         {/* Content sections */}
         <div 

@@ -75,6 +75,9 @@ interface HeroSlideProps {
   onCardTouchStart: (e: React.TouchEvent) => void;
   onCardTouchMove: (e: React.TouchEvent) => void;
   onCardTouchEnd: (e: React.TouchEvent) => void;
+  /** Pass 5: forwarded to HybridHero for the tour switcher overlay. */
+  activeTournamentId?: string | null;
+  onTourSelect?: (tournamentId: string) => void;
 }
 
 function getDefendingChampionSubtext(tournament: {
@@ -105,7 +108,7 @@ function getDefendingChampionSubtext(tournament: {
   return tourFallbacks[tourSlug] ?? 'The defending champion';
 }
 
-function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, leadersWinnersMap, isExpanded, onToggleExpand, onInteraction, onCardTouchStart, onCardTouchMove, onCardTouchEnd }: HeroSlideProps) {
+function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, leadersWinnersMap, isExpanded, onToggleExpand, onInteraction, onCardTouchStart, onCardTouchMove, onCardTouchEnd, activeTournamentId, onTourSelect }: HeroSlideProps) {
   const { tournament, type } = slide;
   const navigate = useNavigate();
   
@@ -347,7 +350,12 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
                 {(isLive || isCompleted) && isLoadingFull && fullLeaderboard.length === 0 ? (
                   <HybridHeroSkeleton />
                 ) : (
-                  <HybridHero slide={slide} />
+                  <HybridHero
+                    slide={slide}
+                    activeTournamentId={activeTournamentId ?? null}
+                    onSelectTour={onTourSelect ?? (() => {})}
+                  />
+
                 )}
               </motion.div>
 
@@ -384,6 +392,8 @@ interface HeroCarouselProps {
   onActiveChange?: (tournamentId: string) => void;
   /** When false, auto-rotation is disabled entirely. Default true. */
   autoRotate?: boolean;
+  /** Pass 5: tour switcher tap handler — forwarded to HybridHero. */
+  onTourSelect?: (tournamentId: string) => void;
 }
 
 export function HeroCarousel({
@@ -393,6 +403,7 @@ export function HeroCarousel({
   activeTournamentId,
   onActiveChange,
   autoRotate = true,
+  onTourSelect,
 }: HeroCarouselProps) {
   const { data: slides = [], isLoading } = useHeroCarouselData();
   const rawSlides = Array.isArray(slides) ? slides : [];
@@ -613,6 +624,8 @@ export function HeroCarousel({
             onCardTouchStart={handleTouchStart}
             onCardTouchMove={handleTouchMove}
             onCardTouchEnd={handleTouchEnd}
+            activeTournamentId={activeTournamentId}
+            onTourSelect={onTourSelect}
           />
         ))}
       </AnimatePresence>
