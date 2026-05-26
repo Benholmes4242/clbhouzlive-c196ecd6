@@ -98,9 +98,8 @@ export const PersonalBests: React.FC<Props> = ({ connectionId, currentHandicap, 
         (a.stableford_points as number) >= (b.stableford_points as number) ? a : b,
       );
       bestSF = {
-        eyebrow: 'Best Stableford',
+        eyebrow: 'Best Stableford Score',
         value: String(best.stableford_points),
-        unit: 'pts',
         caption: fmtCourseDate(best),
       };
     }
