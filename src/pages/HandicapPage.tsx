@@ -321,7 +321,8 @@ const HandicapPage: React.FC = () => {
   const rawSubtab = searchParams.get('subtab');
   // Graceful redirect: legacy ?subtab=overview bookmarks resolve to 'today'.
   const normalisedSubtab = rawSubtab === 'overview' ? 'today' : rawSubtab;
-  const activeTab: HandicapSubtab = isHandicapSubtab(normalisedSubtab) ? normalisedSubtab : 'today';
+  const candidate: HandicapSubtab = isHandicapSubtab(normalisedSubtab) ? normalisedSubtab : 'today';
+  const activeTab: HandicapSubtab = isFriendView && candidate === 'friends' ? 'today' : candidate;
 
   const handleTabChange = useCallback((next: HandicapSubtab) => {
     const params = new URLSearchParams(searchParams);
