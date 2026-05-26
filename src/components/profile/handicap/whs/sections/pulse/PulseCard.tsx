@@ -54,18 +54,21 @@ const HcpSparkline: React.FC<{ series: number[]; color: string }> = ({ series, c
 
 export const PulseCard: React.FC<Props> = ({ friend }) => {
   const navigate = useNavigate();
-  const isUp = (friend.delta90 ?? 0) > 0.05;
-  const isDown = (friend.delta90 ?? 0) < -0.05;
+  const isUp = (friend.delta90 ?? 0) >= 0.3;
+  const isDown = (friend.delta90 ?? 0) <= -0.3;
+  const isFlat = friend.delta90 != null && !isUp && !isDown;
   const deltaColor = isUp
     ? 'var(--hcp-bad, #EF4444)'
     : isDown
       ? 'var(--hcp-good, #10B981)'
       : 'var(--hcp-t-40)';
   const lineColor = friend.hot
-    ? '#FBBC2E'
+    ? 'var(--hcp-amber-bold, #FBBC2E)'
     : isDown
       ? 'var(--hcp-good, #10B981)'
-      : 'var(--hcp-t-60)';
+      : isUp
+        ? 'var(--hcp-bad, #EF4444)'
+        : 'var(--hcp-t-60)';
   const lastPlayedLabel = relativeDay(friend.last_played);
   const nameForInitial = friend.first_name ?? friend.display_name;
   const initial = (nameForInitial || '?').charAt(0).toUpperCase();
