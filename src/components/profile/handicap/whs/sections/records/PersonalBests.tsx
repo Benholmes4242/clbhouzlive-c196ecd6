@@ -89,7 +89,7 @@ export const PersonalBests: React.FC<Props> = ({ connectionId, currentHandicap, 
 
     // #3 Best Stableford
     const stableList = list.filter((s) => s.stableford_points != null);
-    let bestSF: Tile = empty('Best Stableford');
+    let bestSF: Tile = empty('Best Stableford Score');
     if (stableList.length) {
       const best = stableList.reduce((a, b) =>
         (a.stableford_points as number) >= (b.stableford_points as number) ? a : b,
