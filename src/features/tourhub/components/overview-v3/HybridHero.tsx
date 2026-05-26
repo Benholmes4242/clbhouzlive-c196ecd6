@@ -78,9 +78,12 @@ const TOUR_LABELS: Record<string, string> = {
 
 export interface HybridHeroProps {
   slide: HeroSlide;
+  // Pass 5
+  activeTournamentId: string | null;
+  onSelectTour: (tournamentId: string) => void;
 }
 
-export function HybridHero({ slide }: HybridHeroProps) {
+export function HybridHero({ slide, activeTournamentId, onSelectTour }: HybridHeroProps) {
   const { tournament } = slide;
   const navigate = useNavigate();
 
@@ -266,6 +269,8 @@ export function HybridHero({ slide }: HybridHeroProps) {
         state={state}
         tourLabel={tourLabel}
         isMajor={tournament.isMajor}
+        activeTournamentId={activeTournamentId}
+        onSelectTour={onSelectTour}
       />
       <MiddleBand
         state={state}
@@ -278,6 +283,7 @@ export function HybridHero({ slide }: HybridHeroProps) {
         teamWinner={teamWinner}
         championRounds={state.kind === 'results' ? extractRounds(safeLeaderboard[0]) : undefined}
         par={tournament.venuePar ?? undefined}
+        championNarrative={tournament.championNarrative}
       />
       <LeaderboardBand
         state={state}
