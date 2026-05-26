@@ -10,6 +10,8 @@ interface Props {
   currentHandicap: number | null | undefined;
   /** Override the canonical top margin. Pass 0 for the first card on the tab. */
   topMargin?: number;
+  viewMode?: 'owner' | 'friend';
+  ownerFirstName?: string | null;
 }
 
 const T = {
