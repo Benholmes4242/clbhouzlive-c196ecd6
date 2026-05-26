@@ -80,15 +80,15 @@ interface CopyCtx {
   viewMode: 'owner' | 'friend';
 }
 
-function renderStateCard(f: Forecast) {
+function renderStateCard(f: Forecast, ctx: CopyCtx) {
   switch (f.state) {
-    case 'sharp-drop': return <SharpDropCard f={f} />;
-    case 'sharp-rise': return <SharpRiseCard f={f} />;
-    case 'improving': return <NormalCard f={f} tone="good" />;
-    case 'worsening': return <NormalCard f={f} tone="amber" />;
-    case 'steady': return <NormalCard f={f} tone="neutral" />;
-    case 'building': return <BuildingCard f={f} />;
-    case 'brand-new': return <BrandNewCard />;
+    case 'sharp-drop': return <SharpDropCard f={f} ctx={ctx} />;
+    case 'sharp-rise': return <SharpRiseCard f={f} ctx={ctx} />;
+    case 'improving': return <NormalCard f={f} tone="good" ctx={ctx} />;
+    case 'worsening': return <NormalCard f={f} tone="amber" ctx={ctx} />;
+    case 'steady': return <NormalCard f={f} tone="neutral" ctx={ctx} />;
+    case 'building': return <BuildingCard f={f} ctx={ctx} />;
+    case 'brand-new': return <BrandNewCard ctx={ctx} />;
   }
 }
 
