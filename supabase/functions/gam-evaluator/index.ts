@@ -893,7 +893,7 @@ async function applyRivalryResults(userId: string, stats: any, whsScoreId: strin
   if (!stats.course_id || !stats.play_date) return;
   const { data: shared } = await supabase
     .from("gam_round_stats")
-    .select("user_id, whs_score_id, stableford_points, gross_score")
+    .select("user_id, whs_score_id, stableford_points, gross_score, whs_scores!inner(handicap_index_at_time)")
     .eq("course_id", stats.course_id).eq("play_date", stats.play_date)
     .neq("user_id", userId);
   if (!shared || shared.length === 0) return;
@@ -905,7 +905,15 @@ async function applyRivalryResults(userId: string, stats: any, whsScoreId: strin
       .eq("user_id", userId).eq("rival_user_id", rival.user_id).maybeSingle();
     if (!rivalry) continue;
 
-    const sb = compareOutcome(stats.stableford_points, rival.stableford_points, true);
+    // Pending-handicap rounds inflate stableford via the 54-handicap temp ceiling.
+    // Skip the stableford comparison when either side is pending; gross is unaffected.
+    const currentPending = stats.hcp_at_time === null;
+    const rivalPending = (rival as any).whs_scores?.handicap_index_at_time === null;
+    const eitherPending = currentPending || rivalPending;
+
+    const sb = eitherPending
+      ? null
+      : compareOutcome(stats.stableford_points, rival.stableford_points, true);
     const gr = compareOutcome(stats.gross_score, rival.gross_score, false);
     const entry = {
       play_date: stats.play_date,
@@ -913,8 +921,8 @@ async function applyRivalryResults(userId: string, stats: any, whsScoreId: strin
       course_name: stats.course_name,
       user_score_id: whsScoreId,
       rival_score_id: rival.whs_score_id,
-      user_stableford: stats.stableford_points,
-      rival_stableford: rival.stableford_points,
+      user_stableford: eitherPending ? null : stats.stableford_points,
+      rival_stableford: eitherPending ? null : rival.stableford_points,
       stableford_outcome: sb,
       user_gross: stats.gross_score,
       rival_gross: rival.gross_score,
