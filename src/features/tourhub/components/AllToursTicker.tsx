@@ -1,31 +1,33 @@
 /**
  * AllToursTicker — Persistent rail beneath the Hero on Tour Hub Overview.
  *
- * Renders in four states (always visible — never returns null):
+ * Pass 4 redesign: cinematic editorial micro-cards (168×74) with
+ * tour-branded gradient backgrounds. Flush with the hero (no border seams).
  *
- *   1. ALL LIVE        eyebrow "LIVE · ALL TOURS",           green pulsing dot
- *   2. MIXED           eyebrow "LIVE & RESULTS · ALL TOURS", green pulsing dot
- *   3. ALL RESULTS     eyebrow "RESULTS · ALL TOURS",        static slate dot
- *   4. DEEP OFF-SEASON eyebrow "UP NEXT · ALL TOURS",        muted amber dot
+ * Renders in four states (always visible — never returns null):
+ *   1. ALL LIVE        eyebrow "LIVE · ALL TOURS"
+ *   2. MIXED           eyebrow "LIVE & RESULTS · ALL TOURS"
+ *   3. ALL RESULTS     eyebrow "RESULTS · ALL TOURS"
+ *   4. DEEP OFF-SEASON eyebrow "UP NEXT · ALL TOURS"
+ *
+ * Architectural note (locked): this component stays separate from HybridHero.
+ * It owns its own state machine and is reused by the Schedule tab. The merge
+ * with the hero is visual only — do not fold this into HybridHero.
  */
 
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import {
   useAllToursTickerData,
   type TickerCellData,
   type TickerCellStatus,
 } from '../hooks/useOverviewModules';
-import CountryFlag from '@/components/ui/country-flag';
 import { TOUR_MAP } from '../constants/tourMap';
+import { NUMERIC_STYLE } from '../components/overview-v3/HybridHero.constants';
 
 const GREEN = '#10B981';
-const INK = '#0F172A';
-const SLATE_400 = '#94A3B8';
 const SLATE_500 = '#64748B';
-const SLATE_200 = '#E2E8F0';
 const PAGE_BG = '#F8FAFC';
 const AMBER = '#F7931E';
-const GOLD = '#FFB800';
 
 type RailState = 'all-live' | 'mixed' | 'all-results' | 'deep-empty';
 
@@ -85,6 +87,36 @@ function formatStartDate(iso: string): string {
   return `${month} ${day}`;
 }
 
+/**
+ * Card background gradient — derives from the tour's brand colours.
+ * Upcoming uses a muted slate. Course photography is future work (Pass 5).
+ */
+function getCardGradient(
+  tourSlug: string | null | undefined,
+  isUpcoming: boolean,
+): string {
+  if (isUpcoming) {
+    return 'linear-gradient(160deg, #1e293b 0%, #475569 100%)';
+  }
+  const s = (tourSlug ?? '').toLowerCase();
+  switch (s) {
+    case 'pga':
+      return 'linear-gradient(160deg, #0a2540 0%, #1e3a5f 60%, #3a5b8a 100%)';
+    case 'euro':
+      return 'linear-gradient(160deg, #1a3a2a 0%, #2d5a3d 50%, #4a7a5d 100%)';
+    case 'liv':
+      return 'linear-gradient(160deg, #1a1a1a 0%, #2d2d2d 50%, #4a4a4a 100%)';
+    case 'lpga':
+      return 'linear-gradient(160deg, #5b1a3a 0%, #8a2d5b 50%, #b03a73 100%)';
+    case 'pgad':
+      return 'linear-gradient(160deg, #1a3a3a 0%, #2d5a5a 50%, #4a7a7a 100%)';
+    case 'champ':
+      return 'linear-gradient(160deg, #3a2a1a 0%, #5a3d2d 50%, #7a5d4a 100%)';
+    default:
+      return 'linear-gradient(160deg, #1e293b 0%, #475569 100%)';
+  }
+}
+
 const MastheadDot: React.FC<{ kind: MastheadConfig['dot'] }> = ({ kind }) => {
   if (kind === 'live') {
     return <span className="th-live-dot" aria-hidden />;
@@ -99,9 +131,11 @@ const MastheadDot: React.FC<{ kind: MastheadConfig['dot'] }> = ({ kind }) => {
   );
 };
 
+const CARD_WIDTH = 168;
+const CARD_HEIGHT = 74;
+
 interface TickerCellProps {
   cell: TickerCellData;
-  isLast: boolean;
   isActive: boolean;
   onSelect: (id: string) => void;
 }
@@ -111,172 +145,211 @@ const TickerCell: React.FC<TickerCellProps> = ({ cell, isActive, onSelect }) => 
   const isCompleted = cell.status === 'completed';
   const isUpcoming = cell.status === 'upcoming';
 
-  const activeBorderColor = isLive ? GREEN
-    : isCompleted ? GOLD
-    : isUpcoming ? AMBER
-    : INK;
-  const activeBackground = isLive ? 'rgba(16,185,129,0.10)'
-    : isCompleted ? 'rgba(255,184,0,0.10)'
-    : isUpcoming ? 'rgba(247,147,30,0.10)'
-    : 'rgba(15,23,42,0.04)';
-
-  const brand = tourPillBrand(cell.tourSlug);
+  const tourPill = tourPillBrand(cell.tourSlug);
+  const tourLabel = tourPillLabel(cell.tourSlug);
+  const bgGradient = getCardGradient(cell.tourSlug, isUpcoming);
 
   return (
     <button
       type="button"
       onClick={() => onSelect(cell.id)}
-      className="active:opacity-80"
+      aria-label={`Switch to ${cell.name}`}
+      aria-current={isActive ? 'true' : undefined}
       style={{
         flexShrink: 0,
-        minWidth: 220,
-        padding: '7px 14px',
-        borderRight: 'none',
-        textAlign: 'left',
-        background: isActive ? activeBackground : '#FFFFFF',
-        border: isActive ? `1.5px solid ${activeBorderColor}` : `1px solid ${SLATE_200}`,
-        borderRadius: 12,
-        color: 'inherit',
-        cursor: 'pointer',
-        transition: 'background 0.25s ease, border-color 0.25s ease',
+        width: CARD_WIDTH,
+        height: CARD_HEIGHT,
         position: 'relative',
-        marginRight: 8,
+        overflow: 'hidden',
+        borderRadius: 12,
+        background: bgGradient,
+        border: 'none',
+        padding: 0,
+        cursor: 'pointer',
+        boxShadow: isActive
+          ? '0 0 0 1.5px #F7931E, 0 2px 8px rgba(247,147,30,0.20)'
+          : '0 1px 3px rgba(15, 23, 42, 0.10)',
+        opacity: isUpcoming ? 0.55 : 1,
+        transition: 'box-shadow 180ms ease, opacity 180ms ease',
       }}
-      aria-pressed={isActive}
     >
-      {/* Tour pill + tournament name */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
-        <span
+      {/* legibility scrim */}
+      <div
+        aria-hidden
+        style={{
+          position: 'absolute',
+          inset: 0,
+          background: 'linear-gradient(180deg, transparent 25%, rgba(0,0,0,0.62) 100%)',
+          pointerEvents: 'none',
+        }}
+      />
+
+      {/* tour pill — top left */}
+      <div
+        style={{
+          position: 'absolute',
+          top: 8,
+          left: 8,
+          background: tourPill.bg,
+          color: tourPill.fg,
+          fontFamily: "'Geist', sans-serif",
+          fontSize: 9,
+          fontWeight: 800,
+          letterSpacing: '0.06em',
+          padding: '2px 6px',
+          borderRadius: 3,
+          textTransform: 'uppercase',
+          lineHeight: 1.2,
+        }}
+      >
+        {tourLabel}
+      </div>
+
+      {/* active badge — top right */}
+      {isActive && (
+        <div
           style={{
-            display: 'inline-block',
-            padding: '2px 7px',
-            background: brand.bg,
-            borderRadius: 4,
-            fontSize: 9,
+            position: 'absolute',
+            top: 8,
+            right: 8,
+            background: 'rgba(247, 147, 30, 0.92)',
+            color: 'white',
+            fontFamily: "'Geist', sans-serif",
+            fontSize: 8,
             fontWeight: 900,
-            letterSpacing: '0.1em',
-            color: brand.fg,
-            textTransform: 'uppercase',
+            letterSpacing: '0.14em',
+            padding: '2px 6px',
+            borderRadius: 3,
             lineHeight: 1.2,
           }}
         >
-          {tourPillLabel(cell.tourSlug)}
-        </span>
+          VIEWING
+        </div>
+      )}
+
+      {/* live dot when live, not active */}
+      {isLive && !isActive && (
         <span
+          className="th-live-dot"
           style={{
+            position: 'absolute',
+            top: 12,
+            right: 10,
+            width: 6,
+            height: 6,
+          }}
+          aria-hidden
+        />
+      )}
+
+      {/* bottom content block */}
+      <div
+        style={{
+          position: 'absolute',
+          left: 10,
+          right: 10,
+          bottom: 8,
+        }}
+      >
+        <div
+          style={{
+            fontFamily: "'Geist', sans-serif",
+            color: 'white',
             fontSize: 12,
             fontWeight: 700,
-            color: INK,
             letterSpacing: '-0.01em',
+            lineHeight: 1.15,
+            marginBottom: 3,
             overflow: 'hidden',
             textOverflow: 'ellipsis',
             whiteSpace: 'nowrap',
-            maxWidth: 160,
           }}
         >
           {cell.name}
-        </span>
-      </div>
+        </div>
 
-      {/* Detail row */}
-      {(isLive || isCompleted) && cell.personName && (
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          {cell.country && <CountryFlag country={cell.country} size="sm" />}
-          <span
+        {(isLive || isCompleted) && cell.personName && (
+          <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+            <div
+              aria-hidden
+              style={{
+                width: 14,
+                height: 14,
+                borderRadius: '34%',
+                background: cell.personPhotoUrl
+                  ? `center 18% / cover no-repeat url(${cell.personPhotoUrl})`
+                  : 'linear-gradient(135deg, #CBD5E1 0%, #94A3B8 100%)',
+                flexShrink: 0,
+                boxShadow: '0 0 0 1px rgba(255,255,255,0.20)',
+              }}
+            />
+            <span
+              style={{
+                fontFamily: "'Geist', sans-serif",
+                color: 'rgba(255, 255, 255, 0.88)',
+                fontSize: 10,
+                fontWeight: 600,
+                flex: 1,
+                minWidth: 0,
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                whiteSpace: 'nowrap',
+              }}
+            >
+              {abbreviateName(cell.personName)}
+            </span>
+            {cell.scoreDisplay && (
+              <span
+                style={{
+                  ...NUMERIC_STYLE,
+                  color: 'white',
+                  fontSize: 12,
+                  fontWeight: 800,
+                  letterSpacing: '-0.02em',
+                }}
+              >
+                {cell.scoreDisplay}
+              </span>
+            )}
+          </div>
+        )}
+
+        {(isLive || isCompleted) && !cell.personName && (
+          <div
             style={{
-              fontSize: 12,
+              fontFamily: "'Geist', sans-serif",
+              color: 'rgba(255, 255, 255, 0.75)',
+              fontSize: 10,
               fontWeight: 600,
-              color: SLATE_500,
-              letterSpacing: '-0.005em',
-              overflow: 'hidden',
-              textOverflow: 'ellipsis',
-              whiteSpace: 'nowrap',
-              maxWidth: 110,
             }}
           >
-            {abbreviateName(cell.personName)}
-          </span>
-          {cell.scoreDisplay && (
-            <span
-              style={{
-                fontSize: 13,
-                fontWeight: 900,
-                color: isLive ? GREEN : INK,
-                letterSpacing: '-0.02em',
-                fontVariantNumeric: 'tabular-nums',
-                fontFeatureSettings: '"kern" 1, "liga" 1',
-              }}
-            >
-              {cell.scoreDisplay}
-            </span>
-          )}
-          {isLive ? (
-            <span className="th-live-dot" style={{ width: 6, height: 6, marginLeft: 2 }} aria-hidden />
-          ) : (
-            <span
-              style={{
-                fontSize: 8,
-                fontWeight: 900,
-                color: SLATE_500,
-                letterSpacing: '0.14em',
-                textTransform: 'uppercase',
-                marginLeft: 2,
-                padding: '2px 5px',
-                borderRadius: 3,
-                background: 'rgba(15,23,42,0.06)',
-              }}
-            >
-              Final
-            </span>
-          )}
-        </div>
-      )}
+            {isLive ? 'Starting soon' : 'Final'}
+          </div>
+        )}
 
-      {(isLive || isCompleted) && !cell.personName && (
-        <div style={{ fontSize: 11, color: SLATE_400 }}>
-          {isLive ? 'Starting soon' : 'Final'}
-        </div>
-      )}
-
-      {isUpcoming && (
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          {cell.country && <CountryFlag country={cell.country} size="sm" />}
-          <span
+        {isUpcoming && (
+          <div
             style={{
-              fontSize: 12,
+              ...NUMERIC_STYLE,
+              color: 'rgba(255, 255, 255, 0.75)',
+              fontSize: 10,
               fontWeight: 600,
-              color: SLATE_500,
-              letterSpacing: '-0.005em',
-              whiteSpace: 'nowrap',
             }}
           >
             {formatStartDate(cell.startDate)}
-          </span>
-          {cell.daysUntilStart != null && (
-            <span
-              style={{
-                fontSize: 11,
-                fontWeight: 700,
-                color: AMBER,
-                letterSpacing: '-0.005em',
-                fontVariantNumeric: 'tabular-nums',
-              }}
-            >
-              {cell.daysUntilStart === 0 ? 'today' : `${cell.daysUntilStart}d`}
-            </span>
-          )}
-        </div>
-      )}
+            {cell.daysUntilStart != null && (
+              <span style={{ color: '#FBBC2E', marginLeft: 5, fontWeight: 700 }}>
+                {cell.daysUntilStart === 0 ? 'today' : `${cell.daysUntilStart}d`}
+              </span>
+            )}
+          </div>
+        )}
+      </div>
     </button>
   );
 };
 
 const Masthead: React.FC<{ config: MastheadConfig }> = ({ config }) => {
-  const eyebrowColor =
-    config.dot === 'live' ? GREEN
-    : config.dot === 'muted-amber' ? AMBER
-    : SLATE_500;
-
   return (
     <div
       style={{
@@ -284,31 +357,32 @@ const Masthead: React.FC<{ config: MastheadConfig }> = ({ config }) => {
         alignItems: 'center',
         justifyContent: 'space-between',
         padding: '0 20px',
-        marginBottom: 6,
+        marginBottom: 10,
       }}
     >
       <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
         <MastheadDot kind={config.dot} />
         <span
           style={{
-            fontSize: 9,
-            fontWeight: 900,
-            color: eyebrowColor,
+            fontFamily: "'Geist', sans-serif",
+            fontSize: 10,
+            fontWeight: 800,
+            color: AMBER,
             letterSpacing: '0.18em',
             textTransform: 'uppercase',
           }}
         >
-          {config.eyebrow}
+          ↔ {config.eyebrow}
         </span>
       </div>
       <span
         style={{
-          fontSize: 9,
-          fontWeight: 700,
-          color: SLATE_400,
-          letterSpacing: '0.16em',
+          ...NUMERIC_STYLE,
+          fontSize: 10,
+          fontWeight: 600,
+          color: 'rgba(15, 23, 42, 0.55)',
+          letterSpacing: '0.14em',
           textTransform: 'uppercase',
-          fontVariantNumeric: 'tabular-nums',
         }}
       >
         {config.hint}
@@ -325,6 +399,7 @@ interface AllToursTickerProps {
 export function AllToursTicker({ activeId, onSelect }: AllToursTickerProps = {}) {
   const { data, isLoading } = useAllToursTickerData();
   const handleSelect = onSelect ?? (() => {});
+  const railRef = useRef<HTMLDivElement>(null);
 
   const live = data?.live ?? [];
   const completed = data?.completed ?? [];
@@ -348,31 +423,38 @@ export function AllToursTicker({ activeId, onSelect }: AllToursTickerProps = {})
 
   const config = resolveMasthead(state, live.length, completed.length, upcoming.length);
 
+  // When activeId changes from outside, scroll the matching card into view.
+  useEffect(() => {
+    if (!activeId || !railRef.current) return;
+    const card = railRef.current.querySelector(`[data-cell-id="${activeId}"]`);
+    if (card && typeof (card as HTMLElement).scrollIntoView === 'function') {
+      (card as HTMLElement).scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'start' });
+    }
+  }, [activeId]);
+
   return (
     <section
       aria-label="Tournaments across all tours"
       style={{
         background: PAGE_BG,
         position: 'relative',
-        paddingTop: 10,
-        paddingBottom: 10,
-        borderTop: `1px solid ${SLATE_200}`,
-        borderBottom: `1px solid ${SLATE_200}`,
+        paddingTop: 14,
+        paddingBottom: 16,
       }}
     >
-
+      <Masthead config={config} />
 
       {isLoading && cells.length === 0 ? (
-        <div style={{ display: 'flex', gap: 12, padding: '0 20px', overflowX: 'hidden' }}>
+        <div style={{ display: 'flex', gap: 8, padding: '0 16px', overflowX: 'hidden' }}>
           {[0, 1, 2].map((i) => (
             <div
               key={i}
               style={{
                 flexShrink: 0,
-                width: 220,
-                height: 56,
-                borderRadius: 8,
-                background: 'rgba(15,23,42,0.04)',
+                width: CARD_WIDTH,
+                height: CARD_HEIGHT,
+                borderRadius: 12,
+                background: 'rgba(15,23,42,0.06)',
               }}
             />
           ))}
@@ -382,7 +464,7 @@ export function AllToursTicker({ activeId, onSelect }: AllToursTickerProps = {})
           style={{
             padding: '14px 20px',
             fontSize: 11,
-            color: SLATE_400,
+            color: SLATE_500,
             letterSpacing: '0.04em',
           }}
         >
@@ -390,24 +472,34 @@ export function AllToursTicker({ activeId, onSelect }: AllToursTickerProps = {})
         </div>
       ) : (
         <div
-          className="[&::-webkit-scrollbar]:hidden"
+          ref={railRef}
+          className="th-cards-rail"
           style={{
             display: 'flex',
-            overflowX: 'auto',
-            scrollbarWidth: 'none',
-            WebkitOverflowScrolling: 'touch' as any,
-            willChange: 'transform',
+            gap: 8,
             padding: '0 16px',
+            overflowX: 'auto',
+            overflowY: 'hidden',
+            scrollbarWidth: 'none',
+            msOverflowStyle: 'none' as any,
+            WebkitOverflowScrolling: 'touch',
+            scrollSnapType: 'x mandatory',
+            scrollPaddingLeft: 16,
+            willChange: 'transform',
           }}
         >
-          {cells.map((c, i) => (
-            <TickerCell
-              key={c.id}
-              cell={c}
-              isLast={i === cells.length - 1}
-              isActive={activeId === c.id}
-              onSelect={handleSelect}
-            />
+          {cells.map((cell) => (
+            <div
+              key={cell.id}
+              data-cell-id={cell.id}
+              style={{ scrollSnapAlign: 'start' }}
+            >
+              <TickerCell
+                cell={cell}
+                isActive={cell.id === activeId}
+                onSelect={handleSelect}
+              />
+            </div>
           ))}
         </div>
       )}
