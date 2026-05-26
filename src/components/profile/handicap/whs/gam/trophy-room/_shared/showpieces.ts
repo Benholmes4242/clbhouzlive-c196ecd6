@@ -1,19 +1,8 @@
 /**
- * Showpiece achievements get special tier-escalating chrome in TrophyCard.
- *
- * As the user crosses counter_tiers thresholds, the card visually evolves from
- * locked → common → uncommon → rare → epic → legendary. This is distinct from
- * the catalogue's `rarity` field, which sets a static chrome for non-showpieces.
- *
- * Two subsets:
- * 1. Lifetime accumulation (first_birdie, first_eagle, first_albatross,
- *    hole_in_one) — counter is unbounded; can grow indefinitely.
- * 2. Bounded-set progress (top_100_*) — counter capped at 100; represents
- *    distinct courses rated from a specific Top 100 list.
- *
- * Both subsets render identically (big counter + caption + escalating chrome).
- * The 6-tier Top 100 thresholds clamp to the 5-rarity scale: tier 5 and tier 6
- * both render legendary. Accepted limitation.
+ * Showpiece achievements get the Option B card treatment in the Trophy Room:
+ * big hero counter, animated progress bar to next tier, inline next-tier
+ * signpost. Rendered in a dedicated "Lifetime" section above the categorised
+ * achievements.
  */
 export const SHOWPIECE_BADGE_IDS = new Set<string>([
   // Lifetime accumulation showpieces (counter is unbounded)
@@ -32,6 +21,51 @@ export function isShowpiece(badgeId: string | undefined): boolean {
   if (!badgeId) return false;
   return SHOWPIECE_BADGE_IDS.has(badgeId);
 }
+
+/** Fixed render order for the Lifetime section. */
+export const LIFETIME_ORDER: string[] = [
+  'first_birdie',
+  'first_eagle',
+  'first_albatross',
+  'hole_in_one',
+  'top_100_worldwide',
+  'top_100_gbni',
+  'top_100_europe',
+  'top_100_usa',
+];
+
+/**
+ * Caption answers "<number> of what?". Auto-shortened by
+ * `shortenShowpieceCaption` for the grid card.
+ */
+export const SHOWPIECE_COUNTER_LABEL: Record<string, string> = {
+  first_birdie: 'Lifetime birdies',
+  first_eagle: 'Lifetime eagles',
+  first_albatross: 'Lifetime albatrosses',
+  hole_in_one: 'Lifetime aces',
+  top_100_worldwide: 'of World Top 100 played',
+  top_100_usa:       'of USA Top 100 played',
+  top_100_gbni:      'of GB&I Top 100 played',
+  top_100_europe:    'of Europe Top 100 played',
+};
+
+export function shortenShowpieceCaption(caption: string): string {
+  return caption
+    .replace(/^Lifetime /i, '')
+    .replace(/^of /i, '')
+    .replace(/ played$/i, '');
+}
+
+export const SHOWPIECE_LOCKED_HINT: Record<string, string> = {
+  first_birdie: 'First birdie unlocks this',
+  first_eagle: 'First eagle unlocks this',
+  first_albatross: 'First albatross unlocks this',
+  hole_in_one: 'First ace unlocks this',
+  top_100_worldwide: 'Play your first World Top 100 course',
+  top_100_usa: 'Play your first USA Top 100 course',
+  top_100_gbni: 'Play your first GB&I Top 100 course',
+  top_100_europe: 'Play your first Europe Top 100 course',
+};
 
 /**
  * Regional Top 100 achievements get a purpose-built detail sheet showing
