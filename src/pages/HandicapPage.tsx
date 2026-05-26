@@ -193,16 +193,16 @@ const HandicapPageHeader: React.FC<HeaderProps> = ({
       : `${greeting} · ${dateStr}`;
   }, [greeting, displayName]);
 
-  const tabs = useMemo(
-    () => [
+  const tabs = useMemo(() => {
+    const all = [
       { id: 'today', label: 'Today' },
       { id: 'trends', label: 'Form' },
       { id: 'records', label: 'Records' },
       { id: 'friends', label: 'Friends' },
       { id: 'legends', label: 'Compete' },
-    ],
-    [],
-  );
+    ];
+    return readOnly ? all.filter(t => t.id !== 'friends') : all;
+  }, [readOnly]);
 
   return (
     <ShellSlot dark>
