@@ -34,6 +34,7 @@ import { HomeWatchRail } from '../home/HomeWatchRail';
 import { HomeConnectHandicapModule } from '../home/HomeConnectHandicapModule';
 import { useNetworkStatus } from '@/hooks/useNetworkStatus';
 import { HERO_STYLES } from '../../constants/heroStyles';
+import { TOTAL_HERO_HEIGHT_TARGET } from '../overview-v3/HybridHero.constants';
 import { WifiOff } from 'lucide-react';
 import ScrollToTopGlass from '@/components/common/ScrollToTopGlass';
 
