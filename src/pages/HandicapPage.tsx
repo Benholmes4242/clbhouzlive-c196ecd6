@@ -153,7 +153,7 @@ const FriendTitleRow: React.FC<{
               fontFamily: FONT_GEIST,
               fontSize: 22,
               fontWeight: 700,
-              color: INK,
+              color: 'var(--hcp-t-100)',
               lineHeight: 1.15,
               letterSpacing: '-0.01em',
               overflow: 'hidden',
@@ -164,7 +164,7 @@ const FriendTitleRow: React.FC<{
           >
             {displayName ?? 'Player'}
           </span>
-          <ChevronRight size={18} strokeWidth={2.2} color={INK_55} style={{ flexShrink: 0 }} />
+          <ChevronRight size={18} strokeWidth={2.2} color="var(--hcp-t-60)" style={{ flexShrink: 0 }} />
         </div>
       </div>
     </button>
@@ -193,16 +193,16 @@ const HandicapPageHeader: React.FC<HeaderProps> = ({
       : `${greeting} · ${dateStr}`;
   }, [greeting, displayName]);
 
-  const tabs = useMemo(
-    () => [
+  const tabs = useMemo(() => {
+    const all = [
       { id: 'today', label: 'Today' },
       { id: 'trends', label: 'Form' },
       { id: 'records', label: 'Records' },
       { id: 'friends', label: 'Friends' },
       { id: 'legends', label: 'Compete' },
-    ],
-    [],
-  );
+    ];
+    return readOnly ? all.filter(t => t.id !== 'friends') : all;
+  }, [readOnly]);
 
   return (
     <ShellSlot dark>
@@ -321,7 +321,8 @@ const HandicapPage: React.FC = () => {
   const rawSubtab = searchParams.get('subtab');
   // Graceful redirect: legacy ?subtab=overview bookmarks resolve to 'today'.
   const normalisedSubtab = rawSubtab === 'overview' ? 'today' : rawSubtab;
-  const activeTab: HandicapSubtab = isHandicapSubtab(normalisedSubtab) ? normalisedSubtab : 'today';
+  const candidate: HandicapSubtab = isHandicapSubtab(normalisedSubtab) ? normalisedSubtab : 'today';
+  const activeTab: HandicapSubtab = isFriendView && candidate === 'friends' ? 'today' : candidate;
 
   const handleTabChange = useCallback((next: HandicapSubtab) => {
     const params = new URLSearchParams(searchParams);
@@ -424,7 +425,7 @@ const HandicapPage: React.FC = () => {
           <WhsHandicapTab userId={ownerUserId} ownerFirstName={displayName} />
         )}
       </main>
-      <GamMount ownerUserId={ownerUserId} viewerUserId={user.id} readOnly={isFriendView} />
+      <GamMount ownerUserId={ownerUserId} viewerUserId={user.id} ownerFirstName={displayName} readOnly={isFriendView} />
     </PageRoot>
   );
 };

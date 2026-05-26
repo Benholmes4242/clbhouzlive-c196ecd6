@@ -11,13 +11,14 @@ import { TrophyRoomSheet } from './trophy-room/TrophyRoomSheet';
 interface Props {
   ownerUserId: string;
   viewerUserId?: string;
+  ownerFirstName?: string | null;
   readOnly?: boolean;
 }
 
-const GamMount: React.FC<Props> = ({ ownerUserId, viewerUserId, readOnly }) => {
+const GamMount: React.FC<Props> = ({ ownerUserId, viewerUserId, ownerFirstName, readOnly }) => {
   return (
     <>
-      <TrophyRoomSheet userId={ownerUserId} viewerUserId={viewerUserId} />
+      <TrophyRoomSheet userId={ownerUserId} viewerUserId={viewerUserId} ownerFirstName={ownerFirstName ?? null} />
       {!readOnly && <NotificationsSheet userId={ownerUserId} />}
     </>
   );
