@@ -2,6 +2,12 @@ import React, { useEffect } from 'react';
 import SheetHeader from '@/components/ui/SheetHeader';
 import { fmtDiff } from '@/lib/whs/format';
 
+/**
+ * Educational copy note: "your" in this sheet refers to the reader
+ * (the person viewing the sheet), not the profile owner. These sheets
+ * explain WHS mechanics; do not friend-prefix or change to third-person.
+ */
+
 const INK = 'var(--hcp-t-100)';
 const INK_70 = 'var(--hcp-t-80)';
 const INK_55 = 'var(--hcp-t-60)';
