@@ -62,7 +62,6 @@ export const TodayView: React.FC<Props> = ({
       <div
         style={{
           background: 'var(--hcp-bg-0)',
-          borderBottom: '1px solid var(--hcp-line)',
         }}
       >
         {!readOnly && <TodayGreeting connectionId={connectionId} userId={userId} />}
