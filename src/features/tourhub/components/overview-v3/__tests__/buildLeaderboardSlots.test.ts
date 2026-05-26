@@ -12,22 +12,33 @@ describe('buildLeaderboardSlots', () => {
     expect(slots.map(s => (s as any).entry.position)).toEqual([2, 3, 4, 5]);
   });
 
-  it('3-way tie at T2 fits (group of 3 + 1 solo)', () => {
-    const chasers = [e(2, -7), e(2, -7), e(2, -7), e(5, -5)];
+  it('2-way tie at T2 fits exactly → both render individually (below collapse threshold)', () => {
+    const chasers = [e(2, -7), e(2, -7), e(4, -6), e(5, -5)];
     const slots = buildLeaderboardSlots(chasers);
     expect(slots).toHaveLength(4);
-    expect(slots.map(s => s.kind)).toEqual(['solo', 'solo', 'solo', 'solo']);
-    expect((slots[3] as any).entry.position).toBe(5);
+    expect(slots.every(s => s.kind === 'solo')).toBe(true);
+    expect(slots.map(s => (s as any).entry.position)).toEqual([2, 2, 4, 5]);
   });
 
-  it('4-way tie at T2 collapses to a single tie slot', () => {
+  it('3-way tie at T2 collapses (threshold ≥3), frees a slot for position 6', () => {
+    const chasers = [e(2, -7), e(2, -7), e(2, -7), e(5, -5), e(6, -4)];
+    const slots = buildLeaderboardSlots(chasers);
+    expect(slots).toHaveLength(3);
+    expect(slots[0]).toMatchObject({ kind: 'tie', rank: 'T2', count: 3, score: -7 });
+    expect(slots[1]).toMatchObject({ kind: 'solo' });
+    expect(slots[2]).toMatchObject({ kind: 'solo' });
+    expect((slots[1] as any).entry.position).toBe(5);
+    expect((slots[2] as any).entry.position).toBe(6);
+  });
+
+  it('4-way tie at T2 collapses (threshold ≥3)', () => {
     const chasers = [e(2, -7), e(2, -7), e(2, -7), e(2, -7)];
     const slots = buildLeaderboardSlots(chasers);
     expect(slots).toHaveLength(1);
     expect(slots[0]).toMatchObject({ kind: 'tie', rank: 'T2', count: 4, score: -7 });
   });
 
-  it('2-way at T2 (fits) + 3-way at T4 (collapses, no room left)', () => {
+  it('2-way at T2 (individual) + 3-way at T4 (collapses)', () => {
     const chasers = [e(2, -7), e(2, -7), e(4, -5), e(4, -5), e(4, -5)];
     const slots = buildLeaderboardSlots(chasers);
     expect(slots).toHaveLength(3);
