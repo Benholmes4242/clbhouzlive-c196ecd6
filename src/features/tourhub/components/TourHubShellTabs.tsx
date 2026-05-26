@@ -78,73 +78,219 @@ export const TourHubShellTabs: React.FC = () => {
       className="relative"
       style={{
         background: '#0A0E14',
+        display: 'flex',
+        alignItems: 'stretch',
       }}
     >
-      <div
-        ref={scrollerRef}
-        className="segmented-scroller"
-        role="tablist"
-        aria-label="Tour Hub navigation"
-        style={{
-          display: 'flex',
-          justifyContent: 'flex-start',
-          gap: 6,
-          padding: '3px 16px',
-          overflowX: 'auto',
-          overflowY: 'hidden',
-          WebkitOverflowScrolling: 'touch',
-          scrollbarWidth: 'none',
-          fontFamily: 'Geist, system-ui, -apple-system, BlinkMacSystemFont, sans-serif',
-        }}
-      >
-        {TABS.map((tab) => {
-          const isActive = active === tab.id;
-          return (
-            <button
-              key={tab.id}
-              role="tab"
-              aria-selected={isActive}
-              onClick={(e) => handleTap(tab.id, e.currentTarget)}
-              style={{
-                flex: '0 0 auto',
-                height: 30,
-                padding: '0 12px',
-                borderRadius: 15,
-                border: isActive ? '1px solid rgba(255,255,255,0.55)' : '1px solid transparent',
-                background: isActive ? 'rgba(255,255,255,0.10)' : 'transparent',
-                color: isActive ? '#FFFFFF' : 'var(--hcp-t-60)',
-                fontFamily: 'inherit',
-                fontSize: 13,
-                fontWeight: isActive ? 700 : 500,
-                letterSpacing: '-0.01em',
-                whiteSpace: 'nowrap',
-                cursor: 'pointer',
-                display: 'inline-flex',
-                alignItems: 'center',
-                transition: 'all 0.15s',
-              }}
-            >
-              {tab.label}
-            </button>
-          );
-        })}
+      <div style={{ position: 'relative', flex: 1, minWidth: 0 }}>
+        <div
+          ref={scrollerRef}
+          className="segmented-scroller"
+          role="tablist"
+          aria-label="Tour Hub navigation"
+          style={{
+            display: 'flex',
+            justifyContent: 'flex-start',
+            gap: 6,
+            padding: '3px 16px',
+            overflowX: 'auto',
+            overflowY: 'hidden',
+            WebkitOverflowScrolling: 'touch',
+            scrollbarWidth: 'none',
+            fontFamily: 'Geist, system-ui, -apple-system, BlinkMacSystemFont, sans-serif',
+          }}
+        >
+          {TABS.map((tab) => {
+            const isActive = active === tab.id;
+            return (
+              <button
+                key={tab.id}
+                role="tab"
+                aria-selected={isActive}
+                onClick={(e) => handleTap(tab.id, e.currentTarget)}
+                style={{
+                  flex: '0 0 auto',
+                  height: 30,
+                  padding: '0 12px',
+                  borderRadius: 15,
+                  border: isActive ? '1px solid rgba(255,255,255,0.55)' : '1px solid transparent',
+                  background: isActive ? 'rgba(255,255,255,0.10)' : 'transparent',
+                  color: isActive ? '#FFFFFF' : 'var(--hcp-t-60)',
+                  fontFamily: 'inherit',
+                  fontSize: 13,
+                  fontWeight: isActive ? 700 : 500,
+                  letterSpacing: '-0.01em',
+                  whiteSpace: 'nowrap',
+                  cursor: 'pointer',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  transition: 'all 0.15s',
+                }}
+              >
+                {tab.label}
+              </button>
+            );
+          })}
+        </div>
+
+        {overflowing && (
+          <div
+            aria-hidden
+            style={{
+              position: 'absolute',
+              top: 0,
+              right: 40,
+              bottom: 0,
+              width: 34,
+              pointerEvents: 'none',
+              background: 'linear-gradient(to right, rgba(10,14,20,0), #0A0E14)',
+            }}
+          />
+        )}
       </div>
 
-      {overflowing && (
-        <div
-          aria-hidden
+      <TourSwitcherAffordance />
+    </section>
+  );
+};
+
+/**
+ * TourSwitcherAffordance — discreet tour-switch button in the page chrome.
+ * Pass 7: visual scaffold only. Tour switching itself is a Pass 7.1 task.
+ */
+const TOUR_LABEL: Record<string, string> = {
+  pga: 'PGA',
+  euro: 'DPWT',
+  liv: 'LIV',
+  lpga: 'LPGA',
+  pgad: 'KORN FERRY',
+  champ: 'CHAMPIONS',
+};
+
+const TourSwitcherAffordance: React.FC = () => {
+  const { data } = useAllToursTickerData();
+  const [open, setOpen] = useState(false);
+
+  // TODO Pass 7.1: derive from app state once tour filtering is wired.
+  const activeTourSlug = 'pga';
+
+  return (
+    <Sheet open={open} onOpenChange={setOpen}>
+      <SheetTrigger asChild>
+        <button
+          type="button"
+          aria-label="Switch tour"
           style={{
-            position: 'absolute',
-            top: 0,
-            right: 0,
-            bottom: 0,
-            width: 34,
-            pointerEvents: 'none',
-            background: 'linear-gradient(to right, rgba(10,14,20,0), #0A0E14)',
+            flexShrink: 0,
+            display: 'flex',
+            alignItems: 'center',
+            gap: 5,
+            padding: '0 14px 0 10px',
+            background: 'transparent',
+            border: 'none',
+            color: 'rgba(255,255,255,0.55)',
+            cursor: 'pointer',
+            fontFamily: 'Geist, system-ui, sans-serif',
+            fontSize: 11,
+            fontWeight: 700,
+            letterSpacing: '0.04em',
+            textTransform: 'uppercase',
+            height: 36,
+          }}
+        >
+          <span>{TOUR_LABEL[activeTourSlug]}</span>
+          <span aria-hidden="true">↔</span>
+        </button>
+      </SheetTrigger>
+      <SheetContent
+        side="bottom"
+        style={{
+          background: '#0A0E14',
+          border: 'none',
+          padding: 0,
+          maxHeight: '70vh',
+        }}
+      >
+        <div
+          aria-hidden="true"
+          style={{
+            margin: '10px auto 4px',
+            width: 36,
+            height: 4,
+            borderRadius: 2,
+            background: 'rgba(255,255,255,0.20)',
           }}
         />
-      )}
-    </section>
+        <div
+          style={{
+            padding: '14px 18px 8px',
+            color: 'rgba(255,255,255,0.55)',
+            fontSize: 11,
+            fontWeight: 800,
+            letterSpacing: '0.16em',
+            textTransform: 'uppercase',
+            fontFamily: 'Geist, system-ui, sans-serif',
+          }}
+        >
+          ↔ Switch Tour
+        </div>
+        <div style={{ display: 'flex', flexDirection: 'column' }}>
+          {Object.entries(TOUR_LABEL).map(([slug, label]) => {
+            const isActive = slug === activeTourSlug;
+            const liveCount = data?.live.filter((c) => c.tourSlug === slug).length ?? 0;
+            return (
+              <button
+                key={slug}
+                type="button"
+                onClick={() => {
+                  // TODO Pass 7.1: implement tour filtering in HeroCarousel.
+                  setOpen(false);
+                }}
+                style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  padding: '14px 18px',
+                  background: isActive ? 'rgba(255,255,255,0.06)' : 'transparent',
+                  border: 'none',
+                  color: isActive ? 'white' : 'rgba(255,255,255,0.70)',
+                  fontFamily: 'Geist, system-ui, sans-serif',
+                  fontSize: 16,
+                  fontWeight: isActive ? 700 : 500,
+                  textAlign: 'left',
+                  cursor: 'pointer',
+                }}
+              >
+                <span>{label}</span>
+                {liveCount > 0 && (
+                  <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+                    <span
+                      style={{
+                        width: 6,
+                        height: 6,
+                        borderRadius: '50%',
+                        background: '#10B981',
+                        display: 'inline-block',
+                      }}
+                    />
+                    <span
+                      style={{
+                        fontSize: 10,
+                        fontWeight: 800,
+                        letterSpacing: '0.16em',
+                        color: '#10B981',
+                      }}
+                    >
+                      LIVE
+                    </span>
+                  </span>
+                )}
+              </button>
+            );
+          })}
+        </div>
+      </SheetContent>
+    </Sheet>
   );
 };
 
