@@ -284,7 +284,7 @@ export const TrophyRoomSheet: React.FC<Props> = ({ userId, viewerUserId, ownerFi
             fontFamily: GAM.FONT_GEIST,
           }}
         >
-          <Eyebrow />
+          <Eyebrow ownerFirstName={ownerFirstName} isFriendView={isFriendView} />
           <div
             style={{
               fontSize: 42,
