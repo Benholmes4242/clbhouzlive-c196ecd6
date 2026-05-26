@@ -23,9 +23,6 @@ const AMBER = '#F59E0B';
 interface Tile {
   eyebrow: string;
   value: string;
-  /** Optional unit suffix rendered at smaller size next to the value
-   *  in the trophy ribbon (e.g. "pts", "rounds", "in a row"). */
-  unit?: string;
   caption: string | null;
 }
 
@@ -56,9 +53,9 @@ export const PersonalBests: React.FC<Props> = ({ connectionId, currentHandicap, 
       return [
         empty('Best Gross'),
         empty('Best Diff'),
-        empty('Best Stableford'),
-        empty('Best vs Hcp'),
-        empty('Busiest Month'),
+        empty('Best Stableford Score'),
+        empty('Best vs HCP'),
+        empty('Most Rounds in a Month'),
       ];
     }
 
@@ -92,21 +89,20 @@ export const PersonalBests: React.FC<Props> = ({ connectionId, currentHandicap, 
 
     // #3 Best Stableford
     const stableList = list.filter((s) => s.stableford_points != null);
-    let bestSF: Tile = empty('Best Stableford');
+    let bestSF: Tile = empty('Best Stableford Score');
     if (stableList.length) {
       const best = stableList.reduce((a, b) =>
         (a.stableford_points as number) >= (b.stableford_points as number) ? a : b,
       );
       bestSF = {
-        eyebrow: 'Best Stableford',
+        eyebrow: 'Best Stableford Score',
         value: String(best.stableford_points),
-        unit: 'pts',
         caption: fmtCourseDate(best),
       };
     }
 
     // #4 Best vs handicap
-    let bestVsHcp: Tile = empty('Best vs Hcp');
+    let bestVsHcp: Tile = empty('Best vs HCP');
     if (currentHandicap != null && grossList.length) {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const scored = grossList.map((s) => {
@@ -118,14 +114,14 @@ export const PersonalBests: React.FC<Props> = ({ connectionId, currentHandicap, 
       const best = scored.reduce((a, b) => (a.vsHcp <= b.vsHcp ? a : b));
       const sign = best.vsHcp <= 0 ? '' : '+';
       bestVsHcp = {
-        eyebrow: 'Best vs Hcp',
+        eyebrow: 'Best vs HCP',
         value: `${sign}${best.vsHcp.toFixed(1)}`,
         caption: fmtCourseDate(best.s),
       };
     }
 
     // #5 Most rounds in a month
-    let mostMonth: Tile = empty('Busiest Month');
+    let mostMonth: Tile = empty('Most Rounds in a Month');
     const monthCounts = new Map<string, number>();
     for (const s of list) {
       if (!s.play_date) continue;
@@ -142,9 +138,8 @@ export const PersonalBests: React.FC<Props> = ({ connectionId, currentHandicap, 
         }
       }
       mostMonth = {
-        eyebrow: 'Busiest Month',
+        eyebrow: 'Most Rounds in a Month',
         value: String(topCount),
-        unit: 'rounds',
         caption: monthLabel(topKey),
       };
     }
@@ -253,18 +248,6 @@ export const PersonalBests: React.FC<Props> = ({ connectionId, currentHandicap, 
                     >
                       {(t as Tile).value}
                     </span>
-                    {(t as Tile).unit && (
-                      <span
-                        style={{
-                          fontSize: 11,
-                          fontWeight: 700,
-                          color: 'rgba(255,255,255,0.4)',
-                          letterSpacing: '-0.01em',
-                        }}
-                      >
-                        {(t as Tile).unit}
-                      </span>
-                    )}
                   </>
                 )}
               </div>
