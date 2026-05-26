@@ -1,4 +1,5 @@
 import React from 'react';
+import { Lock } from 'lucide-react';
 import type { FriendYesterday } from '@/lib/handicap/useFriendsYesterday';
 import { fmtDiff } from '@/lib/whs/format';
 import { MiniGrossRing } from '@/components/profile/handicap/whs/sections/shared/GrossCounterRing';
@@ -103,13 +104,23 @@ export const MiniGlass: React.FC<Props> = ({ friend }) => {
         </div>
         <div style={{ textAlign: 'center', flex: 1 }}>
           <div style={labelStyle}>STABLEFORD</div>
-          <div style={valueStyle('#FFFFFF')}>{friend.stableford != null ? friend.stableford : EM_DASH}</div>
+          {friend.stableford != null ? (
+            <div style={valueStyle('#FFFFFF')}>{friend.stableford}</div>
+          ) : (
+            <div style={{ ...valueStyle('rgba(255,255,255,0.55)'), display: 'flex', justifyContent: 'center', alignItems: 'center', height: 18 }}>
+              <Lock size={12} strokeWidth={2} />
+            </div>
+          )}
         </div>
         <div style={{ textAlign: 'center', flex: 1 }}>
           <div style={labelStyle}>SCORE DIFF</div>
-          <div style={valueStyle(friend.differential != null ? AMBER : '#FFFFFF')}>
-            {friend.differential != null ? fmtDiff(friend.differential, { plus: true }) : EM_DASH}
-          </div>
+          {friend.differential != null ? (
+            <div style={valueStyle(AMBER)}>{fmtDiff(friend.differential, { plus: true })}</div>
+          ) : (
+            <div style={{ ...valueStyle('rgba(255,255,255,0.55)'), display: 'flex', justifyContent: 'center', alignItems: 'center', height: 18 }}>
+              <Lock size={12} strokeWidth={2} />
+            </div>
+          )}
         </div>
       </div>
     </div>
