@@ -286,7 +286,7 @@ export const FriendRoundCardV2: React.FC<Props> = ({
                 </span>
               )}
             </div>
-          ) : !isSynced ? (
+          ) : !isSynced && !hideEgBadge ? (
             <div
               style={{
                 display: 'inline-flex',
