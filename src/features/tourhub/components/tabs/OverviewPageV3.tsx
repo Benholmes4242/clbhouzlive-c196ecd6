@@ -122,15 +122,11 @@ export function OverviewPageV3() {
             mode="overview"
             activeTournamentId={activeTournamentId}
             onActiveChange={handleHeroActiveChange}
+            onTourSelect={handleTickerSelect}
             autoRotate={autoRotate}
           />
         </motion.div>
 
-        {/* All Tours Ticker — flush below the hero, no top gap. Now drives the Hero (tap to switch). */}
-        <AllToursTicker
-          activeId={activeTournamentId}
-          onSelect={handleTickerSelect}
-        />
 
         {/* Content sections */}
         <div 
