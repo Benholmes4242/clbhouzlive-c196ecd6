@@ -309,36 +309,38 @@ export const FriendRoundCardV2: React.FC<Props> = ({
           ) : null}
         </div>
 
-        <div
-          style={{
-            fontSize: 11.5,
-            fontWeight: 700,
-            color: 'var(--hcp-t-80, rgba(255,255,255,0.85))',
-            letterSpacing: '-0.005em',
-            lineHeight: 1.2,
-            whiteSpace: 'nowrap',
-            overflow: 'hidden',
-            textOverflow: 'ellipsis',
-          }}
-        >
-          {courseName}
-          {(par != null || slope != null) && (
-            <span
-              style={{
-                marginLeft: 6,
-                fontSize: 9.5,
-                fontWeight: 700,
-                color: 'var(--hcp-t-60)',
-                letterSpacing: '0.08em',
-                textTransform: 'uppercase',
-              }}
-            >
-              {par != null && <>· PAR {par}</>}
-              {par != null && slope != null && <> · SL {slope}</>}
-              {par == null && slope != null && <>· SL {slope}</>}
-            </span>
-          )}
-        </div>
+        {!courseAboveDate && (
+          <div
+            style={{
+              fontSize: 11.5,
+              fontWeight: 700,
+              color: 'var(--hcp-t-80, rgba(255,255,255,0.85))',
+              letterSpacing: '-0.005em',
+              lineHeight: 1.2,
+              whiteSpace: 'nowrap',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+            }}
+          >
+            {courseName}
+            {(par != null || slope != null) && (
+              <span
+                style={{
+                  marginLeft: 6,
+                  fontSize: 9.5,
+                  fontWeight: 700,
+                  color: 'var(--hcp-t-60)',
+                  letterSpacing: '0.08em',
+                  textTransform: 'uppercase',
+                }}
+              >
+                {par != null && <>· PAR {par}</>}
+                {par != null && slope != null && <> · SL {slope}</>}
+                {par == null && slope != null && <>· SL {slope}</>}
+              </span>
+            )}
+          </div>
+        )}
 
         {isSynced ? (
           <div
