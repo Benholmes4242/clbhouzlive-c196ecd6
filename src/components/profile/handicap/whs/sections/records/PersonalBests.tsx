@@ -56,9 +56,9 @@ export const PersonalBests: React.FC<Props> = ({ connectionId, currentHandicap, 
       return [
         empty('Best Gross'),
         empty('Best Diff'),
-        empty('Best Stableford'),
-        empty('Best vs Hcp'),
-        empty('Busiest Month'),
+        empty('Best Stableford Score'),
+        empty('Best vs HCP'),
+        empty('Most Rounds in a Month'),
       ];
     }
 
