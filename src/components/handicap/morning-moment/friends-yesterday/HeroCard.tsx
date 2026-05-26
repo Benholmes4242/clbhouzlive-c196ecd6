@@ -123,6 +123,9 @@ export const HeroCard: React.FC<Props> = ({ friend, onClick, showLowestRound }) 
             differential={friend.differential}
             holes={showShape ? detail!.holes : null}
             isCounter={!!friend.is_counter}
+            nonEnriched={friend.stableford == null || friend.differential == null}
+            onInviteClick={onClick}
+            inviteLabel={friend.is_clbhouz_user && friend.user_id ? 'Ask to sync' : 'Invite'}
           />
         </div>
       </div>

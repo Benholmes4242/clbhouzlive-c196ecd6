@@ -70,27 +70,6 @@ export const MiniGlass: React.FC<Props> = ({ friend }) => {
         >
           {title}
         </div>
-        <span
-          style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: 3,
-            padding: '2px 5px',
-            borderRadius: 999,
-            background: 'rgba(255,255,255,0.10)',
-            border: '0.5px solid rgba(255,255,255,0.25)',
-            fontSize: 8,
-            fontWeight: 700,
-            letterSpacing: '0.10em',
-            color: '#FFFFFF',
-            textTransform: 'uppercase',
-            flexShrink: 0,
-            marginTop: 1,
-          }}
-        >
-          SCORECARD
-          <span style={{ fontSize: 8, opacity: 0.7 }}>{'\u203A'}</span>
-        </span>
       </div>
       {meta && (
         <div
