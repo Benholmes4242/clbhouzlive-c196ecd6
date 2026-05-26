@@ -34,34 +34,61 @@ const T = {
 interface Props {
   connectionId: string;
   currentHandicap: number | null;
+  viewMode?: 'owner' | 'friend';
+  ownerFirstName?: string | null;
 }
 
-const ForecastCard: React.FC<Props> = ({ connectionId, currentHandicap: passedHcp }) => {
+const ForecastCard: React.FC<Props> = ({
+  connectionId,
+  currentHandicap: passedHcp,
+  viewMode = 'owner',
+  ownerFirstName = null,
+}) => {
   const { data: allScores, isLoading: scoresLoading } = useAllScores(connectionId);
   const { data: trend } = useHandicapTrend(connectionId);
   const currentHandicap = passedHcp ?? trend?.current ?? null;
 
-  if (scoresLoading) return <ForecastSkeleton />;
+  const possessiveCap = viewMode === 'friend'
+    ? (ownerFirstName ? `${ownerFirstName}'s` : 'Their')
+    : 'Your';
+  const possessiveLower = viewMode === 'friend'
+    ? (ownerFirstName ? `${ownerFirstName}'s` : 'their')
+    : 'your';
+  const subjectCap = viewMode === 'friend' ? (ownerFirstName ?? 'They') : 'You';
+  const subjectLower = viewMode === 'friend' ? (ownerFirstName ?? 'they') : 'you';
+  const hasVerb = viewMode === 'friend' && ownerFirstName ? 'has' : 'have';
+  const needsVerb = viewMode === 'friend' && ownerFirstName ? 'needs' : 'need';
+
+  if (scoresLoading) return <ForecastSkeleton eyebrow={`${possessiveCap} form`} />;
 
   const forecast = buildForecast(allScores ?? [], currentHandicap, 7);
 
   return (
     <section style={{ marginTop: 32, fontFamily: FONT }}>
-      <DarkSectionHeader eyebrow="Your form" />
-      {renderStateCard(forecast)}
+      <DarkSectionHeader eyebrow={`${possessiveCap} form`} />
+      {renderStateCard(forecast, { possessiveLower, subjectCap, subjectLower, hasVerb, needsVerb, viewMode })}
     </section>
   );
 };
 
-function renderStateCard(f: Forecast) {
+interface CopyCtx {
+  possessiveLower: string;
+  subjectCap: string;
+  subjectLower: string;
+  hasVerb: string;
+  needsVerb: string;
+  viewMode: 'owner' | 'friend';
+}
+
+function renderStateCard(f: Forecast, ctx: CopyCtx) {
   switch (f.state) {
-    case 'sharp-drop': return <SharpDropCard f={f} />;
-    case 'sharp-rise': return <SharpRiseCard f={f} />;
-    case 'improving': return <NormalCard f={f} tone="good" />;
-    case 'worsening': return <NormalCard f={f} tone="amber" />;
-    case 'steady': return <NormalCard f={f} tone="neutral" />;
-    case 'building': return <BuildingCard f={f} />;
-    case 'brand-new': return <BrandNewCard />;
+    case 'sharp-drop': return <SharpDropCard f={f} ctx={ctx} />;
+    case 'sharp-rise': return <SharpRiseCard f={f} ctx={ctx} />;
+    case 'improving': return <NormalCard f={f} tone="good" ctx={ctx} />;
+    case 'worsening': return <NormalCard f={f} tone="amber" ctx={ctx} />;
+    case 'steady': return <NormalCard f={f} tone="neutral" ctx={ctx} />;
+    case 'building': return <BuildingCard f={f} ctx={ctx} />;
+    case 'brand-new': return <BrandNewCard ctx={ctx} />;
   }
 }
 
@@ -434,7 +461,7 @@ const ActionFooter: React.FC<{
 
 // ── State: Normal (worsening / improving / steady) ──────────────────
 
-const NormalCard: React.FC<{ f: Forecast; tone: 'good' | 'amber' | 'neutral' }> = ({ f, tone }) => {
+const NormalCard: React.FC<{ f: Forecast; tone: 'good' | 'amber' | 'neutral'; ctx: CopyCtx }> = ({ f, tone, ctx }) => {
   const isImproving = tone === 'good';
   const isWorsening = tone === 'amber';
 
@@ -449,7 +476,7 @@ const NormalCard: React.FC<{ f: Forecast; tone: 'good' | 'amber' | 'neutral' }> 
       <>
         Heading{' '}
         <strong style={{ color: T.good, fontWeight: 700 }}>down to ~{(f.projected ?? 0).toFixed(1)}</strong>{' '}
-        over your next <strong style={{ color: T.textHi, fontWeight: 700 }}>{f.roundsOut} rounds</strong>
+        over {ctx.possessiveLower} next <strong style={{ color: T.textHi, fontWeight: 700 }}>{f.roundsOut} rounds</strong>
       </>
     );
   } else if (isWorsening) {
@@ -459,7 +486,7 @@ const NormalCard: React.FC<{ f: Forecast; tone: 'good' | 'amber' | 'neutral' }> 
       <>
         Heading{' '}
         <strong style={{ color: T.amber, fontWeight: 700 }}>up to ~{(f.projected ?? 0).toFixed(1)}</strong>{' '}
-        over your next <strong style={{ color: T.textHi, fontWeight: 700 }}>{f.roundsOut} rounds</strong>
+        over {ctx.possessiveLower} next <strong style={{ color: T.textHi, fontWeight: 700 }}>{f.roundsOut} rounds</strong>
       </>
     );
   } else {
@@ -468,8 +495,8 @@ const NormalCard: React.FC<{ f: Forecast; tone: 'good' | 'amber' | 'neutral' }> 
     prose = (
       <>
         <strong style={{ color: T.textHi, fontWeight: 700 }}>Holding steady</strong> around{' '}
-        <strong style={{ color: T.textHi, fontWeight: 700 }}>{(f.current ?? 0).toFixed(1)}</strong> over
-        your next <strong style={{ color: T.textHi, fontWeight: 700 }}>{f.roundsOut} rounds</strong>
+        <strong style={{ color: T.textHi, fontWeight: 700 }}>{(f.current ?? 0).toFixed(1)}</strong> over{' '}
+        {ctx.possessiveLower} next <strong style={{ color: T.textHi, fontWeight: 700 }}>{f.roundsOut} rounds</strong>
       </>
     );
   }
@@ -543,7 +570,7 @@ const NormalCard: React.FC<{ f: Forecast; tone: 'good' | 'amber' | 'neutral' }> 
 
 // ── State: Sharp drop ───────────────────────────────────────────────
 
-const SharpDropCard: React.FC<{ f: Forecast }> = ({ f }) => (
+const SharpDropCard: React.FC<{ f: Forecast; ctx: CopyCtx }> = ({ f, ctx }) => (
   <CardShell borderColor={T.goodBorder} bgTint={T.goodBgTint}>
     <EyebrowRow left="🔥 On a tear" right={f.whenLabel ?? undefined} color={T.good} />
     <Headline
@@ -553,8 +580,8 @@ const SharpDropCard: React.FC<{ f: Forecast }> = ({ f }) => (
         <>
           On track for a{' '}
           <strong style={{ color: T.good, fontWeight: 700 }}>{Math.abs(f.delta ?? 0).toFixed(1)} drop</strong>{' '}
-          to <strong style={{ color: T.good, fontWeight: 700 }}>~{(f.projected ?? 0).toFixed(1)}</strong> over
-          your next <strong style={{ color: T.textHi, fontWeight: 700 }}>{f.roundsOut} rounds</strong>
+          to <strong style={{ color: T.good, fontWeight: 700 }}>~{(f.projected ?? 0).toFixed(1)}</strong> over{' '}
+          {ctx.possessiveLower} next <strong style={{ color: T.textHi, fontWeight: 700 }}>{f.roundsOut} rounds</strong>
         </>
       }
     />
@@ -567,7 +594,9 @@ const SharpDropCard: React.FC<{ f: Forecast }> = ({ f }) => (
       footerBg={T.goodBgTint}
       prose={
         <>
-          Keep playing at your last 5 level —{' '}
+          {ctx.viewMode === 'friend'
+            ? <>{ctx.subjectCap} just {ctx.needsVerb} to keep playing at {ctx.possessiveLower} last 5 level — </>
+            : <>Keep playing at {ctx.possessiveLower} last 5 level — </>}
           <strong style={{ color: T.textHi, fontWeight: 700 }}>{f.newCount} new counter{f.newCount === 1 ? '' : 's'}</strong>{' '}
           locking in a new low.
         </>
@@ -578,7 +607,7 @@ const SharpDropCard: React.FC<{ f: Forecast }> = ({ f }) => (
 
 // ── State: Sharp rise ───────────────────────────────────────────────
 
-const SharpRiseCard: React.FC<{ f: Forecast }> = ({ f }) => {
+const SharpRiseCard: React.FC<{ f: Forecast; ctx: CopyCtx }> = ({ f, ctx }) => {
   const cutTarget = f.cutTarget;
   return (
     <CardShell borderColor={T.badBorder} bgTint={T.badBgTint}>
@@ -590,8 +619,8 @@ const SharpRiseCard: React.FC<{ f: Forecast }> = ({ f }) => {
           <>
             On track for a{' '}
             <strong style={{ color: T.bad, fontWeight: 700 }}>{(f.delta ?? 0).toFixed(1)} rise</strong> to{' '}
-            <strong style={{ color: T.bad, fontWeight: 700 }}>~{(f.projected ?? 0).toFixed(1)}</strong> over
-            your next <strong style={{ color: T.textHi, fontWeight: 700 }}>{f.roundsOut} rounds</strong>
+            <strong style={{ color: T.bad, fontWeight: 700 }}>~{(f.projected ?? 0).toFixed(1)}</strong> over{' '}
+            {ctx.possessiveLower} next <strong style={{ color: T.textHi, fontWeight: 700 }}>{f.roundsOut} rounds</strong>
           </>
         }
       />
@@ -616,7 +645,7 @@ const SharpRiseCard: React.FC<{ f: Forecast }> = ({ f }) => {
 
 // ── State: Building ─────────────────────────────────────────────────
 
-const BuildingCard: React.FC<{ f: Forecast }> = ({ f }) => {
+const BuildingCard: React.FC<{ f: Forecast; ctx: CopyCtx }> = ({ f, ctx }) => {
   const need = 8;
   const have = f.validRoundCount;
   return (
@@ -632,7 +661,7 @@ const BuildingCard: React.FC<{ f: Forecast }> = ({ f }) => {
             marginBottom: 8,
           }}
         >
-          Building your trend
+          Building {ctx.possessiveLower} trend
         </div>
         <p
           style={{
@@ -642,8 +671,8 @@ const BuildingCard: React.FC<{ f: Forecast }> = ({ f }) => {
             color: T.textMid,
           }}
         >
-          We need at least <strong style={{ color: T.textHi, fontWeight: 700 }}>8 rounds</strong> in your
-          last 20. You have{' '}
+          We need at least <strong style={{ color: T.textHi, fontWeight: 700 }}>8 rounds</strong> in{' '}
+          {ctx.possessiveLower} last 20. {ctx.subjectCap} {ctx.hasVerb}{' '}
           <strong style={{ color: T.textHi, fontWeight: 700 }}>{have}</strong> so far — keep playing.
         </p>
         <div style={{ display: 'flex', gap: 6, marginTop: 14 }}>
@@ -666,7 +695,7 @@ const BuildingCard: React.FC<{ f: Forecast }> = ({ f }) => {
 
 // ── State: Brand new ────────────────────────────────────────────────
 
-const BrandNewCard: React.FC = () => (
+const BrandNewCard: React.FC<{ ctx: CopyCtx }> = ({ ctx }) => (
   <CardShell>
     <div style={{ padding: '18px 18px 20px' }}>
       <div
@@ -679,7 +708,9 @@ const BrandNewCard: React.FC = () => (
           marginBottom: 8,
         }}
       >
-        Play a round to start your trend
+        {ctx.viewMode === 'friend'
+          ? `${ctx.subjectCap} ${ctx.needsVerb} a round to start ${ctx.possessiveLower} trend`
+          : `Play a round to start ${ctx.possessiveLower} trend`}
       </div>
       <p
         style={{
@@ -689,8 +720,9 @@ const BrandNewCard: React.FC = () => (
           color: T.textMid,
         }}
       >
-        Once you've posted a few rounds, we'll project where your handicap is heading and tell you what
-        to shoot to drop.
+        {ctx.viewMode === 'friend'
+          ? <>Once {ctx.subjectLower} {ctx.hasVerb} posted a few rounds, we'll project where {ctx.possessiveLower} handicap is heading and tell {ctx.subjectLower} what to shoot to drop.</>
+          : <>Once you've posted a few rounds, we'll project where your handicap is heading and tell you what to shoot to drop.</>}
       </p>
     </div>
   </CardShell>
@@ -698,9 +730,9 @@ const BrandNewCard: React.FC = () => (
 
 // ── Skeleton ────────────────────────────────────────────────────────
 
-const ForecastSkeleton: React.FC = () => (
+const ForecastSkeleton: React.FC<{ eyebrow?: string }> = ({ eyebrow = 'Your form' }) => (
   <section style={{ marginTop: 32, fontFamily: FONT }}>
-    <DarkSectionHeader eyebrow="Your form" />
+    <DarkSectionHeader eyebrow={eyebrow} />
     <div
       style={{
         margin: '0 16px',
