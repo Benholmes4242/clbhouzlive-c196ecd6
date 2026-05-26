@@ -11,6 +11,7 @@ import Pattern14Card from '../sections/Pattern14Card';
 
 import RecentUnlocksStrip from '../gam/RecentUnlocksStrip';
 import { LaunchSheetMount } from '../../gam/launch/LaunchSheetMount';
+import { PulseSection } from '../sections/PulseSection';
 
 interface Props {
   connection: WhsConnection;
