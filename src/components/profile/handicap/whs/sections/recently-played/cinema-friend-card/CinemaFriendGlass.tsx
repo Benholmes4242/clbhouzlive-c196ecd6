@@ -1,5 +1,5 @@
 import React from 'react';
-import { ChevronRight, Lock } from 'lucide-react';
+import { Lock } from 'lucide-react';
 
 import type { WhsScoreHole } from '@/lib/whs/types';
 import { GlassGrossRing } from '../../shared/GrossCounterRing';
