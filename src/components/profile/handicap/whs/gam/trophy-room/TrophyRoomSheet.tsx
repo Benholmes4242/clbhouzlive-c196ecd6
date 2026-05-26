@@ -440,6 +440,7 @@ export const TrophyRoomSheet: React.FC<Props> = ({ userId, viewerUserId, ownerFi
           )}
 
           {!isLoading && tab === 'earned' && (() => {
+            const lifetime = selectLifetime(earnedAchievements);
             const earnedGroups = groupAchievementsByCategory(earnedAchievements);
             const anyEarnedAchievements = earnedAchievements.length > 0;
             const anyLegends = allLegends.length > 0;
@@ -450,6 +451,12 @@ export const TrophyRoomSheet: React.FC<Props> = ({ userId, viewerUserId, ownerFi
             }
             return (
               <>
+                {lifetime.length > 0 && (
+                  <>
+                    <SectionHeader label="Lifetime" count={lifetime.length} amberDot />
+                    <Grid items={lifetime} onTap={openDetail} />
+                  </>
+                )}
                 {CATEGORY_ORDER.map((cat) => {
                   const items = earnedGroups[cat];
                   if (!items || items.length === 0) return null;
@@ -468,6 +475,7 @@ export const TrophyRoomSheet: React.FC<Props> = ({ userId, viewerUserId, ownerFi
           })()}
 
           {!isLoading && tab === 'all' && (() => {
+            const lifetime = selectLifetime(allAchievements);
             const allGroups = groupAchievementsByCategory(allAchievements);
             const anyAchievements = allAchievements.length > 0;
             const anyLegends = allLegends.length > 0;
@@ -478,6 +486,12 @@ export const TrophyRoomSheet: React.FC<Props> = ({ userId, viewerUserId, ownerFi
             }
             return (
               <>
+                {lifetime.length > 0 && (
+                  <>
+                    <SectionHeader label="Lifetime" count={lifetime.length} amberDot />
+                    <Grid items={lifetime} onTap={openDetail} />
+                  </>
+                )}
                 {CATEGORY_ORDER.map((cat) => {
                   const items = allGroups[cat];
                   if (!items || items.length === 0) return null;
@@ -495,11 +509,22 @@ export const TrophyRoomSheet: React.FC<Props> = ({ userId, viewerUserId, ownerFi
             );
           })()}
 
-          {!isLoading && tab === 'locked' && (
-            lockedAchievements.length > 0 ? (
+          {!isLoading && tab === 'locked' && (() => {
+            const lifetime = selectLifetime(lockedAchievements);
+            const lockedGroups = groupAchievementsByCategory(lockedAchievements);
+            if (lockedAchievements.length === 0) {
+              return <EmptyState message="No locked achievements." />;
+            }
+            return (
               <>
+                {lifetime.length > 0 && (
+                  <>
+                    <SectionHeader label="Lifetime" count={lifetime.length} amberDot />
+                    <Grid items={lifetime} onTap={openDetail} />
+                  </>
+                )}
                 {CATEGORY_ORDER.map((cat) => {
-                  const items = groupAchievementsByCategory(lockedAchievements)[cat];
+                  const items = lockedGroups[cat];
                   if (!items || items.length === 0) return null;
                   return (
                     <React.Fragment key={`locked-${cat}`}>
@@ -509,10 +534,8 @@ export const TrophyRoomSheet: React.FC<Props> = ({ userId, viewerUserId, ownerFi
                   );
                 })}
               </>
-            ) : (
-              <EmptyState message="No locked achievements." />
-            )
-          )}
+            );
+          })()}
         </div>
       </GamSheet>
 
