@@ -364,34 +364,70 @@ function computeRoundStats(score: any, holes: any[], meta: any) {
 // ─────────────────────────────────────────────────────────────────────────────
 // apply_milestones
 // ─────────────────────────────────────────────────────────────────────────────
-async function applyMilestones(userId: string, stats: any) {
-  const updates: Array<{ metric: string; inc: number }> = [];
-  if (stats.birdies > 0) updates.push({ metric: "birdies", inc: stats.birdies });
-  if (stats.eagles > 0) updates.push({ metric: "eagles", inc: stats.eagles });
-  if (stats.albatrosses > 0) updates.push({ metric: "albatrosses", inc: stats.albatrosses });
-  if (stats.holes_in_one > 0) updates.push({ metric: "holes_in_one", inc: stats.holes_in_one });
-  if (stats.sub_80) updates.push({ metric: "sub_80", inc: 1 });
-  if (stats.sub_70) updates.push({ metric: "sub_70", inc: 1 });
-  if (stats.beat_par) updates.push({ metric: "sub_par", inc: 1 });
-  updates.push({ metric: "rounds", inc: 1 });
+async function applyMilestones(userId: string, _stats: any) {
+  // _stats is no longer consulted — we recompute from gam_round_stats directly.
+  // This eliminates drift from double-processing, corrections, and deletions.
 
-  for (const u of updates) {
-    // Increment via RPC-like upsert. Use raw select+update for atomicity.
-    const { data: existing } = await supabase
-      .from("gam_user_milestones")
-      .select("count")
-      .eq("user_id", userId)
-      .eq("metric", u.metric)
-      .maybeSingle();
-    const newCount = (existing?.count ?? 0) + u.inc;
+  const { data: rounds, error } = await supabase
+    .from("gam_round_stats")
+    .select("birdies, eagles, albatrosses, holes_in_one, sub_80, sub_70, beat_par, play_date")
+    .eq("user_id", userId);
+
+  if (error) {
+    console.error("[applyMilestones] failed to read gam_round_stats:", error);
+    return;
+  }
+
+  let birdies = 0, eagles = 0, albatrosses = 0, holes_in_one = 0;
+  let sub_80 = 0, sub_70 = 0, sub_par = 0;
+  let firstAt: string | null = null;
+  let lastAt: string | null = null;
+
+  for (const r of rounds ?? []) {
+    birdies      += r.birdies ?? 0;
+    eagles       += r.eagles ?? 0;
+    albatrosses  += r.albatrosses ?? 0;
+    holes_in_one += r.holes_in_one ?? 0;
+    if (r.sub_80)  sub_80++;
+    if (r.sub_70)  sub_70++;
+    if (r.beat_par) sub_par++;
+    if (r.play_date) {
+      if (firstAt === null || r.play_date < firstAt) firstAt = r.play_date;
+      if (lastAt === null || r.play_date > lastAt)  lastAt  = r.play_date;
+    }
+  }
+
+  const totalRounds = rounds?.length ?? 0;
+  const nowIso = new Date().toISOString();
+  const metrics: Array<{ metric: string; count: number }> = [
+    { metric: "birdies",      count: birdies },
+    { metric: "eagles",       count: eagles },
+    { metric: "albatrosses",  count: albatrosses },
+    { metric: "holes_in_one", count: holes_in_one },
+    { metric: "sub_80",       count: sub_80 },
+    { metric: "sub_70",       count: sub_70 },
+    { metric: "sub_par",      count: sub_par },
+    { metric: "rounds",       count: totalRounds },
+  ];
+
+  for (const m of metrics) {
+    if (m.count === 0) {
+      await supabase
+        .from("gam_user_milestones")
+        .update({ count: 0, last_at: lastAt, updated_at: nowIso })
+        .eq("user_id", userId)
+        .eq("metric", m.metric);
+      continue;
+    }
+
     await supabase.from("gam_user_milestones").upsert(
       {
         user_id: userId,
-        metric: u.metric,
-        count: newCount,
-        first_at: existing ? undefined : new Date().toISOString(),
-        last_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
+        metric: m.metric,
+        count: m.count,
+        first_at: firstAt,
+        last_at: lastAt,
+        updated_at: nowIso,
       },
       { onConflict: "user_id,metric" }
     );
