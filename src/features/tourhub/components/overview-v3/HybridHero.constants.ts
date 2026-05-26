@@ -8,7 +8,7 @@
 // Pass 5.5: +22px for optional ChampionStrip narrative line → 528.
 // Total = 252 (photo) + 62 (strip) + 4×40 (rows) + 32 (CTA) + 22 (narrative slack) = 528.
 export const PHOTO_BAND_HEIGHT = 252;
-export const TICKER_HEIGHT = 40;
+
 export const STRIP_HEIGHT = 62;
 export const ROW_HEIGHT_LEADER = 64;
 export const ROW_HEIGHT_CHASER = 40;
