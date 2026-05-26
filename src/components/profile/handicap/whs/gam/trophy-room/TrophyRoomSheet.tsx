@@ -8,6 +8,7 @@ import { useUserTopLegends } from '@/hooks/gam/useUserTopLegends';
 import { TrophyCard } from './TrophyCard';
 import { TrophyDetailSheet } from './TrophyDetailSheet';
 import { normalizeBadge, normalizeLegend, type TrophyItem } from './_shared/normalizeTrophyItem';
+import { isShowpiece, LIFETIME_ORDER } from './_shared/showpieces';
 import type { BadgeCategory } from '@/lib/gam/types';
 
 const CATEGORY_ORDER: BadgeCategory[] = [
@@ -28,17 +29,8 @@ const CATEGORY_LABEL: Record<BadgeCategory, string> = {
   seasonal: 'Seasonal',
 };
 
-// Within-category badge ordering. Items not listed retain insertion order
-// after listed ones. Currently only `courses` needs explicit ordering;
-// extend per-category as needed.
 const COURSES_ORDER: string[] = [
-  'top_100_worldwide',
-  'top_100_usa',
-  'top_100_gbni',
-  'top_100_europe',
   'rounds_played',
-  // legend_at_course (Course Legend) is rendered separately as a
-  // collapsible section under the Courses group — not part of this list.
 ];
 
 function groupAchievementsByCategory(
@@ -53,13 +45,13 @@ function groupAchievementsByCategory(
     seasonal: [],
   };
   for (const item of items) {
+    // Showpieces render in their own Lifetime section, not in catalogue category groups.
+    if (isShowpiece(item.badgeId)) continue;
     if (groups[item.category]) {
       groups[item.category].push(item);
     }
   }
 
-  // Apply explicit ordering to courses. Listed badges come first in
-  // declared order; any unlisted badge falls to the end in insertion order.
   groups.courses.sort((a, b) => {
     const aIdx = COURSES_ORDER.indexOf(a.badgeId);
     const bIdx = COURSES_ORDER.indexOf(b.badgeId);
@@ -70,6 +62,21 @@ function groupAchievementsByCategory(
   });
 
   return groups;
+}
+
+function selectLifetime(
+  items: Extract<TrophyItem, { kind: 'achievement' }>[],
+): Extract<TrophyItem, { kind: 'achievement' }>[] {
+  const showpieces = items.filter((a) => isShowpiece(a.badgeId));
+  showpieces.sort((a, b) => {
+    const aIdx = LIFETIME_ORDER.indexOf(a.badgeId);
+    const bIdx = LIFETIME_ORDER.indexOf(b.badgeId);
+    if (aIdx === -1 && bIdx === -1) return 0;
+    if (aIdx === -1) return 1;
+    if (bIdx === -1) return -1;
+    return aIdx - bIdx;
+  });
+  return showpieces;
 }
 
 interface Props {
