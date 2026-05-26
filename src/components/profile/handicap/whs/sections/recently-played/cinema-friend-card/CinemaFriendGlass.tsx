@@ -128,12 +128,10 @@ export const CinemaFriendGlass: React.FC<Props> = ({
         style={{
           display: 'flex',
           justifyContent: 'space-between',
-          alignItems: nonEnriched ? 'center' : 'baseline',
-          flexWrap: 'nowrap',
-          gap: 8,
+          alignItems: 'baseline',
         }}
       >
-        <div style={{ textAlign: 'left', flexShrink: 0 }}>
+        <div style={{ textAlign: 'left' }}>
           <div style={labelStyle}>GROSS</div>
           <div
             style={{ marginTop: 4 }}
@@ -146,66 +144,28 @@ export const CinemaFriendGlass: React.FC<Props> = ({
             />
           </div>
         </div>
-        {nonEnriched ? (
-          <>
-            <div style={{ textAlign: 'center', flexShrink: 1, minWidth: 0 }}>
-              <div style={labelStyle}>STBLFD</div>
-              <div style={{ ...valueStyle('rgba(255,255,255,0.55)'), display: 'flex', justifyContent: 'center', alignItems: 'center', height: 30 }}>
-                <Lock size={16} strokeWidth={2} />
-              </div>
+        <div style={{ textAlign: 'center' }}>
+          <div style={labelStyle}>STABLEFORD</div>
+          {nonEnriched ? (
+            <div style={{ ...valueStyle('rgba(255,255,255,0.55)'), display: 'flex', justifyContent: 'center', alignItems: 'center', height: 30 }}>
+              <Lock size={18} strokeWidth={2} />
             </div>
-            <div style={{ textAlign: 'center', flexShrink: 1, minWidth: 0 }}>
-              <div style={labelStyle}>DIFF</div>
-              <div style={{ ...valueStyle('rgba(255,255,255,0.55)'), display: 'flex', justifyContent: 'center', alignItems: 'center', height: 30 }}>
-                <Lock size={16} strokeWidth={2} />
-              </div>
+          ) : (
+            <div style={valueStyle('#FFFFFF')}>{stableford != null ? stableford : EM_DASH}</div>
+          )}
+        </div>
+        <div style={{ textAlign: 'right' }}>
+          <div style={labelStyle}>SCORE DIFF</div>
+          {nonEnriched ? (
+            <div style={{ ...valueStyle('rgba(255,255,255,0.55)'), display: 'flex', justifyContent: 'flex-end', alignItems: 'center', height: 30 }}>
+              <Lock size={18} strokeWidth={2} />
             </div>
-            <button
-              type="button"
-              onClick={(e) => {
-                e.stopPropagation();
-                onInviteClick?.();
-              }}
-              style={{
-                flexShrink: 0,
-                pointerEvents: 'auto',
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: 2,
-                padding: '6px 10px',
-                borderRadius: 999,
-                background: 'rgba(247,147,30,0.18)',
-                border: '0.5px solid rgba(247,147,30,0.45)',
-                color: AMBER,
-                fontSize: 10,
-                fontWeight: 800,
-                letterSpacing: '0.04em',
-                cursor: 'pointer',
-                fontFamily: FONT_GEIST,
-                textTransform: 'uppercase',
-                lineHeight: 1,
-                whiteSpace: 'nowrap',
-              }}
-            >
-              {inviteLabel}
-              <ChevronRight size={11} strokeWidth={2.2} />
-            </button>
-          </>
-        ) : (
-          <>
-            <div style={{ textAlign: 'center' }}>
-              <div style={labelStyle}>STABLEFORD</div>
-              <div style={valueStyle('#FFFFFF')}>{stableford != null ? stableford : EM_DASH}</div>
+          ) : (
+            <div style={valueStyle(differential != null ? AMBER : '#FFFFFF')}>
+              {fmtDiff(differential)}
             </div>
-            <div style={{ textAlign: 'right' }}>
-              <div style={labelStyle}>SCORE DIFF</div>
-              <div style={valueStyle(differential != null ? AMBER : '#FFFFFF')}>
-                {fmtDiff(differential)}
-              </div>
-            </div>
-          </>
-        )}
-
+          )}
+        </div>
       </div>
     </div>
   );
