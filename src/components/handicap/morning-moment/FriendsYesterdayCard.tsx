@@ -217,7 +217,7 @@ const FriendsYesterdayCard: React.FC<Props> = ({ data, userId }) => {
       {unsyncedFriends.length > 0 && (
         <>
           <div style={{ height: enrichedFriends.length > 0 ? 12 : 0 }} />
-          <div style={{ marginLeft: -16, marginRight: -16 }}>
+          <div>
             {unsyncedFriends.map((f, i) => (
               <FriendRoundCardV2
                 key={`unsynced-${f.user_id ?? f.friend_passport_id ?? i}`}
