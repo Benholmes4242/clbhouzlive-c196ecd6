@@ -108,7 +108,7 @@ function getDefendingChampionSubtext(tournament: {
   return tourFallbacks[tourSlug] ?? 'The defending champion';
 }
 
-function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, leadersWinnersMap, isExpanded, onToggleExpand, onInteraction, onCardTouchStart, onCardTouchMove, onCardTouchEnd }: HeroSlideProps) {
+function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, leadersWinnersMap, isExpanded, onToggleExpand, onInteraction, onCardTouchStart, onCardTouchMove, onCardTouchEnd, activeTournamentId, onTourSelect }: HeroSlideProps) {
   const { tournament, type } = slide;
   const navigate = useNavigate();
   
