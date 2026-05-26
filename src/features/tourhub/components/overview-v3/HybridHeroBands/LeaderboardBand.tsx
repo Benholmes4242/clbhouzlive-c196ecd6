@@ -404,7 +404,6 @@ export function LeaderboardBand({
             display: 'flex',
             justifyContent: 'flex-end',
             alignItems: 'center',
-            borderTop: `0.5px solid rgba(15,23,42,0.08)`,
             cursor: 'pointer',
           }}
         >
