@@ -80,18 +80,76 @@ export const RARITY_PALETTE: Record<BadgeRarity, RarityPalette> = {
 /** Legend titles always render with the legendary treatment. */
 export const LEGEND_PALETTE = RARITY_PALETTE.legendary;
 
-/** Palette used for earned showpiece achievements (lifetime counters + Top 100). */
-export const PLATINUM_PALETTE: RarityPalette = {
-  color: '#E5E7EB',
-  tint: 'rgba(229,231,235,0.12)',
-  border: 'rgba(229,231,235,0.32)',
-  label: 'SHOWPIECE',
-  heroGradient: 'linear-gradient(160deg, rgba(229,231,235,0.26) 0%, rgba(203,213,225,0.14) 40%, var(--hcp-bg-1) 80%)',
-  cardSweep: RARITY_DARK.platinum.cardSweep,
-  topStripe: RARITY_DARK.platinum.topStripe,
-  outerGlow: RARITY_DARK.platinum.outerGlow,
-  metaColor: RARITY_DARK.platinum.labelFg,
+/**
+ * Material Tier palettes for lifetime showpieces. Keyed by reachedTier (1–5).
+ * T1 Bronze · T2 Silver · T3 Emerald · T4 Diamond · T5 Obsidian.
+ */
+export const MATERIAL_PALETTES: Record<1 | 2 | 3 | 4 | 5, RarityPalette> = {
+  1: {
+    color: '#CD7F32',
+    tint: 'rgba(205,127,50,0.16)',
+    border: 'rgba(205,127,50,0.42)',
+    label: 'BRONZE',
+    heroGradient: 'linear-gradient(160deg, rgba(205,127,50,0.32) 0%, rgba(139,90,43,0.16) 40%, var(--hcp-bg-1) 80%)',
+    cardSweep: RARITY_DARK.bronze.cardSweep,
+    topStripe: RARITY_DARK.bronze.topStripe,
+    outerGlow: RARITY_DARK.bronze.outerGlow,
+    metaColor: RARITY_DARK.bronze.labelFg,
+  },
+  2: {
+    color: '#C0C0C8',
+    tint: 'rgba(192,192,200,0.16)',
+    border: 'rgba(192,192,200,0.45)',
+    label: 'SILVER',
+    heroGradient: 'linear-gradient(160deg, rgba(192,192,200,0.30) 0%, rgba(148,163,184,0.14) 40%, var(--hcp-bg-1) 80%)',
+    cardSweep: RARITY_DARK.silver.cardSweep,
+    topStripe: RARITY_DARK.silver.topStripe,
+    outerGlow: RARITY_DARK.silver.outerGlow,
+    metaColor: RARITY_DARK.silver.labelFg,
+  },
+  3: {
+    color: '#10B981',
+    tint: 'rgba(16,185,129,0.16)',
+    border: 'rgba(16,185,129,0.48)',
+    label: 'EMERALD',
+    heroGradient: 'linear-gradient(160deg, rgba(16,185,129,0.34) 0%, rgba(4,120,87,0.16) 40%, var(--hcp-bg-1) 80%)',
+    cardSweep: RARITY_DARK.emerald.cardSweep,
+    topStripe: RARITY_DARK.emerald.topStripe,
+    outerGlow: RARITY_DARK.emerald.outerGlow,
+    metaColor: RARITY_DARK.emerald.labelFg,
+  },
+  4: {
+    color: '#7DD3FC',
+    tint: 'rgba(125,211,252,0.16)',
+    border: 'rgba(125,211,252,0.50)',
+    label: 'DIAMOND',
+    heroGradient: 'linear-gradient(160deg, rgba(125,211,252,0.36) 0%, rgba(59,130,246,0.18) 40%, var(--hcp-bg-1) 80%)',
+    cardSweep: RARITY_DARK.diamond.cardSweep,
+    topStripe: RARITY_DARK.diamond.topStripe,
+    outerGlow: RARITY_DARK.diamond.outerGlow,
+    metaColor: RARITY_DARK.diamond.labelFg,
+  },
+  5: {
+    color: '#FBBC2E',
+    tint: 'rgba(247,147,30,0.14)',
+    border: 'rgba(247,147,30,0.55)',
+    label: 'OBSIDIAN',
+    heroGradient: 'linear-gradient(160deg, rgba(247,147,30,0.40) 0%, #1A0E00 50%, #000000 100%)',
+    cardSweep: RARITY_DARK.obsidian.cardSweep,
+    topStripe: RARITY_DARK.obsidian.topStripe,
+    outerGlow: RARITY_DARK.obsidian.outerGlow,
+    metaColor: RARITY_DARK.obsidian.labelFg,
+  },
 };
+
+/**
+ * Returns the material-tier palette for a showpiece based on the user's
+ * reachedTier. Tier 0 (no progress) is handled by the LOCKED_PALETTE caller-side.
+ */
+export function paletteForShowpiece(reachedTier: number): RarityPalette {
+  const clamped = Math.max(1, Math.min(5, reachedTier || 1)) as 1 | 2 | 3 | 4 | 5;
+  return MATERIAL_PALETTES[clamped];
+}
 
 /** Palette used when a card is locked. */
 export const LOCKED_PALETTE: RarityPalette = {
