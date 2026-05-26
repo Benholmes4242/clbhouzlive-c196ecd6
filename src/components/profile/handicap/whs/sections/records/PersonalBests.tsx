@@ -1,9 +1,11 @@
 import React, { useMemo } from 'react';
+import { Crown } from 'lucide-react';
 import { useAllScores } from '@/lib/whs/hooks';
 import { fmtDiff } from '@/lib/whs/format';
 import { isReasonableGross, isReasonableDiff } from '@/lib/whs/handicapMath';
 import { SectionHeader } from '../_shared/atoms';
 import type { WhsScore } from '@/lib/whs/types';
+const GOLD = '#F7931E';
 
 interface Props {
   connectionId: string;
