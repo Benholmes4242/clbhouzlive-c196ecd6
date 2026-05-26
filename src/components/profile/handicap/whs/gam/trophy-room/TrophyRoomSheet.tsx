@@ -429,9 +429,9 @@ export const TrophyRoomSheet: React.FC<Props> = ({ userId, viewerUserId, ownerFi
                 <div
                   key={i}
                   style={{
-                    aspectRatio: '1 / 1.18',
+                    aspectRatio: '1 / 1.22',
                     background: 'var(--hcp-line)',
-                    borderRadius: 14,
+                    borderRadius: 12,
                     animation: 'gamPulse 1.6s ease-in-out infinite',
                   }}
                 />
