@@ -2,7 +2,7 @@ import React from 'react';
 import { X, Crown, ChevronLeft, ChevronRight, Lock } from 'lucide-react';
 import { renderBadgeIcon } from '../../badgeIcons';
 import { GAM } from '../../tokens';
-import { LEGEND_PALETTE, LOCKED_PALETTE, PLATINUM_PALETTE } from '../_shared/rarityPalette';
+import { LEGEND_PALETTE, LOCKED_PALETTE, paletteForShowpiece } from '../_shared/rarityPalette';
 import type { TrophyItem } from '../_shared/normalizeTrophyItem';
 import { isShowpiece } from '../_shared/showpieces';
 
@@ -19,7 +19,7 @@ function paletteFor(item: TrophyItem) {
   if (item.kind === 'legend') return LEGEND_PALETTE;
   const hasProgress = item.earned || (item.currentValue != null && item.currentValue > 0);
   if (!hasProgress) return LOCKED_PALETTE;
-  if (isShowpiece(item.badgeId)) return PLATINUM_PALETTE;
+  if (isShowpiece(item.badgeId)) return paletteForShowpiece(item.reachedTier);
   return LEGEND_PALETTE;
 }
 

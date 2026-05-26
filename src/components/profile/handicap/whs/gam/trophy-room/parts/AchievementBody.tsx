@@ -4,6 +4,7 @@ import { GAM } from '../../tokens';
 import { relativeTime } from '@/lib/gam/visuals';
 import { TierRow } from './TierRow';
 import { FriendsBlock } from './FriendsBlock';
+import { isShowpiece } from '../_shared/showpieces';
 import type { TrophyItem } from '../_shared/normalizeTrophyItem';
 
 interface Props {
@@ -111,7 +112,7 @@ export const AchievementBody: React.FC<Props> = ({ item, viewerUserId }) => {
           <Eyebrow>TIERS</Eyebrow>
           <div>
             {item.tiers.map((t) => (
-              <TierRow key={t.tier} tier={t} metric={item.counterMetric} />
+              <TierRow key={t.tier} tier={t} metric={item.counterMetric} isShowpiece={isShowpiece(item.badgeId)} />
             ))}
           </div>
         </div>

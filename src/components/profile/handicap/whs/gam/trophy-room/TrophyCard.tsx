@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Lock } from 'lucide-react';
 import { renderBadgeIcon } from '../badgeIcons';
 import { GAM } from '../tokens';
-import { LEGEND_PALETTE, LOCKED_PALETTE, PLATINUM_PALETTE, type RarityPalette } from './_shared/rarityPalette';
+import { LEGEND_PALETTE, LOCKED_PALETTE, paletteForShowpiece, type RarityPalette } from './_shared/rarityPalette';
 import type { TrophyItem } from './_shared/normalizeTrophyItem';
 import {
   isShowpiece,
@@ -20,7 +20,7 @@ function paletteFor(item: TrophyItem): RarityPalette {
   if (item.kind === 'legend') return LEGEND_PALETTE;
   const hasProgress = item.earned || (item.currentValue != null && item.currentValue > 0);
   if (!hasProgress) return LOCKED_PALETTE;
-  if (isShowpiece(item.badgeId)) return PLATINUM_PALETTE;
+  if (isShowpiece(item.badgeId)) return paletteForShowpiece(item.reachedTier);
   return LEGEND_PALETTE;
 }
 
@@ -216,7 +216,7 @@ const ShowpieceCard: React.FC<Props> = ({ item, onTap }) => {
 
   const currentValue = item.currentValue ?? 0;
   const locked = !item.earned && currentValue === 0;
-  const palette = locked ? LOCKED_PALETTE : PLATINUM_PALETTE;
+  const palette = locked ? LOCKED_PALETTE : paletteForShowpiece(item.reachedTier);
 
   const totalTiers = item.tiers.length;
   const atMax = !locked && item.reachedTier >= totalTiers && totalTiers > 0;

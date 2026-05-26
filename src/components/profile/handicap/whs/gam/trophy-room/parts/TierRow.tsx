@@ -2,15 +2,25 @@ import React from 'react';
 import { Check } from 'lucide-react';
 import { GAM } from '../../tokens';
 import { relativeTime } from '@/lib/gam/visuals';
+import { MATERIAL_PALETTES } from '../_shared/rarityPalette';
 import type { TrophyTier } from '../_shared/normalizeTrophyItem';
 
 interface Props {
   tier: TrophyTier;
   metric: string | null;
+  /** When true, render the earned state in this tier's material colour. */
+  isShowpiece?: boolean;
 }
 
-export const TierRow: React.FC<Props> = ({ tier, metric }) => {
+export const TierRow: React.FC<Props> = ({ tier, metric, isShowpiece = false }) => {
   const earned = tier.earned;
+  const tierIndex = Math.max(1, Math.min(5, tier.tier)) as 1 | 2 | 3 | 4 | 5;
+  const materialPalette = isShowpiece ? MATERIAL_PALETTES[tierIndex] : null;
+
+  const earnedBg = materialPalette ? materialPalette.tint : GAM.AMBER_14;
+  const earnedFg = materialPalette ? materialPalette.color : GAM.AMBER;
+  const earnedBorder = materialPalette ? `1px solid ${materialPalette.border}` : 'none';
+
   return (
     <div
       style={{
@@ -28,8 +38,9 @@ export const TierRow: React.FC<Props> = ({ tier, metric }) => {
           width: 28,
           height: 28,
           borderRadius: 8,
-          background: earned ? GAM.AMBER_14 : 'var(--hcp-bg-2)',
-          color: earned ? GAM.AMBER : 'var(--hcp-t-60)',
+          background: earned ? earnedBg : 'var(--hcp-bg-2)',
+          color: earned ? earnedFg : 'var(--hcp-t-60)',
+          border: earned ? earnedBorder : 'none',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
@@ -53,7 +64,7 @@ export const TierRow: React.FC<Props> = ({ tier, metric }) => {
           fontWeight: 700,
           letterSpacing: '0.06em',
           textTransform: 'uppercase',
-          color: earned ? GAM.AMBER : 'var(--hcp-t-40)',
+          color: earned ? earnedFg : 'var(--hcp-t-40)',
         }}
       >
         {earned
