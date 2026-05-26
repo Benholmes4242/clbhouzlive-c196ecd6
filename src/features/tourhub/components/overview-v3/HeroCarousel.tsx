@@ -389,6 +389,8 @@ interface HeroCarouselProps {
   onActiveChange?: (tournamentId: string) => void;
   /** When false, auto-rotation is disabled entirely. Default true. */
   autoRotate?: boolean;
+  /** Pass 5: tour switcher tap handler — forwarded to HybridHero. */
+  onTourSelect?: (tournamentId: string) => void;
 }
 
 export function HeroCarousel({
@@ -398,6 +400,7 @@ export function HeroCarousel({
   activeTournamentId,
   onActiveChange,
   autoRotate = true,
+  onTourSelect,
 }: HeroCarouselProps) {
   const { data: slides = [], isLoading } = useHeroCarouselData();
   const rawSlides = Array.isArray(slides) ? slides : [];
