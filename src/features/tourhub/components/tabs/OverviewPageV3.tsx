@@ -112,7 +112,7 @@ export function OverviewPageV3() {
           style={{
             ...heroContainerStyle,
             maxWidth: 960,
-            height: TOTAL_HERO_HEIGHT_TARGET + 6,
+            height: TOTAL_HERO_HEIGHT_TARGET,
             opacity: heroOpacity,
             scale: heroScale,
           }}
