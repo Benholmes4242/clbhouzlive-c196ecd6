@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { ChevronRight, Flame, Snowflake } from 'lucide-react';
+import { ChevronRight, Flame } from 'lucide-react';
 import { DarkSectionHeader } from '../../whs/sections/_shared/darkAtoms';
 import { Skeleton } from '../_shared/GamAtoms';
 import { useUserStreaks } from '@/hooks/gam/useUserStreaks';
@@ -325,7 +325,6 @@ const StreakHeroCard: React.FC<StreakHeroCardProps> = ({ entry, row }) => {
       <div style={{ display: 'flex', gap: 14, alignItems: 'flex-start', position: 'relative', zIndex: 1 }}>
         <div
           style={{
-            position: 'relative',
             width: 56,
             height: 56,
             borderRadius: 14,
@@ -341,28 +340,6 @@ const StreakHeroCard: React.FC<StreakHeroCardProps> = ({ entry, row }) => {
           }}
         >
           <entry.Icon size={28} strokeWidth={2} />
-          {(row?.freeze_credits ?? 0) > 0 && (
-            <span
-              aria-label="Freeze available"
-              title="Freeze available — keeps streak alive if you miss a week"
-              style={{
-                position: 'absolute',
-                top: -5,
-                right: -5,
-                width: 20,
-                height: 20,
-                borderRadius: '50%',
-                background: '#DBEAFE',
-                border: '2px solid var(--hcp-bg-1)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                boxShadow: '0 0 10px rgba(96,165,250,0.45)',
-              }}
-            >
-              <Snowflake size={10} color="#1D4ED8" strokeWidth={3} />
-            </span>
-          )}
         </div>
         <div style={{ minWidth: 0, flex: 1 }}>
           <div

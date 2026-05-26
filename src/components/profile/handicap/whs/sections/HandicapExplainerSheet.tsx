@@ -1,4 +1,3 @@
-// Generic educational copy — 'your' refers to the reader, not the profile owner. Do not friend-prefix.
 import React, { useEffect } from 'react';
 import SheetHeader from '@/components/ui/SheetHeader';
 import { fmtDiff } from '@/lib/whs/format';

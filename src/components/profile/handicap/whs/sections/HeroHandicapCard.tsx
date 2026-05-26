@@ -411,7 +411,7 @@ const HeroHandicapCard: React.FC<Props> = ({ connection }) => {
           </div>
         </div>
         <p style={{ fontSize: 14, color: INK_55, fontStyle: 'italic', lineHeight: 1.5, margin: 0, padding: '0 4px' }}>
-          Handicap index will appear after the first 8 rounds.
+          Your handicap will appear after your first 8 rounds.
         </p>
         <style>{keyframes}</style>
       </section>

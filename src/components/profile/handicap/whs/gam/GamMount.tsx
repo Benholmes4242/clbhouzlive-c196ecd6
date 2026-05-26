@@ -7,7 +7,6 @@
 import React from 'react';
 import NotificationsSheet from './NotificationsSheet';
 import { TrophyRoomSheet } from './trophy-room/TrophyRoomSheet';
-import LeaguesSheet from '../../gam/leagues/LeaguesSheet';
 
 interface Props {
   ownerUserId: string;
@@ -20,7 +19,6 @@ const GamMount: React.FC<Props> = ({ ownerUserId, viewerUserId, readOnly }) => {
     <>
       <TrophyRoomSheet userId={ownerUserId} viewerUserId={viewerUserId} />
       {!readOnly && <NotificationsSheet userId={ownerUserId} />}
-      {!readOnly && <LeaguesSheet />}
     </>
   );
 };
