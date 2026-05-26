@@ -153,7 +153,7 @@ const FriendTitleRow: React.FC<{
               fontFamily: FONT_GEIST,
               fontSize: 22,
               fontWeight: 700,
-              color: INK,
+              color: 'var(--hcp-t-100)',
               lineHeight: 1.15,
               letterSpacing: '-0.01em',
               overflow: 'hidden',
@@ -164,7 +164,7 @@ const FriendTitleRow: React.FC<{
           >
             {displayName ?? 'Player'}
           </span>
-          <ChevronRight size={18} strokeWidth={2.2} color={INK_55} style={{ flexShrink: 0 }} />
+          <ChevronRight size={18} strokeWidth={2.2} color="var(--hcp-t-60)" style={{ flexShrink: 0 }} />
         </div>
       </div>
     </button>
