@@ -347,7 +347,12 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
                 {(isLive || isCompleted) && isLoadingFull && fullLeaderboard.length === 0 ? (
                   <HybridHeroSkeleton />
                 ) : (
-                  <HybridHero slide={slide} />
+                  <HybridHero
+                    slide={slide}
+                    activeTournamentId={activeTournamentId ?? null}
+                    onSelectTour={onTourSelect ?? (() => {})}
+                  />
+
                 )}
               </motion.div>
 
