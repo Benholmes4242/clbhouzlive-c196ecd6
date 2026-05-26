@@ -46,7 +46,7 @@ export const FONT_SANS = "'Geist', -apple-system, BlinkMacSystemFont, sans-serif
 
 /**
  * Numeric column styling — Geist with tabular-nums for column alignment.
- * Use `...NUMERIC_STYLE` instead of the old `fontFamily: NUMERIC_STYLE`.
+ * Use `...NUMERIC_STYLE` for any numeric span (scores, par, pos, etc.).
  * `"zero" 0` explicitly disables the slashed-zero glyph (Ben prefers unslashed).
  */
 export const NUMERIC_STYLE = {
@@ -54,7 +54,3 @@ export const NUMERIC_STYLE = {
   fontVariantNumeric: 'tabular-nums lining-nums' as const,
   fontFeatureSettings: '"zero" 0',
 };
-
-/** @deprecated Pass 4: kept as an alias to NUMERIC_STYLE.fontFamily for any
- * straggler imports. New code should spread NUMERIC_STYLE instead. */
-export const NUMERIC_STYLE = NUMERIC_STYLE.fontFamily;
