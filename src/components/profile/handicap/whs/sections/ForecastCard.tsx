@@ -570,7 +570,7 @@ const NormalCard: React.FC<{ f: Forecast; tone: 'good' | 'amber' | 'neutral'; ct
 
 // ── State: Sharp drop ───────────────────────────────────────────────
 
-const SharpDropCard: React.FC<{ f: Forecast }> = ({ f }) => (
+const SharpDropCard: React.FC<{ f: Forecast; ctx: CopyCtx }> = ({ f, ctx }) => (
   <CardShell borderColor={T.goodBorder} bgTint={T.goodBgTint}>
     <EyebrowRow left="🔥 On a tear" right={f.whenLabel ?? undefined} color={T.good} />
     <Headline
@@ -580,8 +580,8 @@ const SharpDropCard: React.FC<{ f: Forecast }> = ({ f }) => (
         <>
           On track for a{' '}
           <strong style={{ color: T.good, fontWeight: 700 }}>{Math.abs(f.delta ?? 0).toFixed(1)} drop</strong>{' '}
-          to <strong style={{ color: T.good, fontWeight: 700 }}>~{(f.projected ?? 0).toFixed(1)}</strong> over
-          your next <strong style={{ color: T.textHi, fontWeight: 700 }}>{f.roundsOut} rounds</strong>
+          to <strong style={{ color: T.good, fontWeight: 700 }}>~{(f.projected ?? 0).toFixed(1)}</strong> over{' '}
+          {ctx.possessiveLower} next <strong style={{ color: T.textHi, fontWeight: 700 }}>{f.roundsOut} rounds</strong>
         </>
       }
     />
@@ -594,7 +594,9 @@ const SharpDropCard: React.FC<{ f: Forecast }> = ({ f }) => (
       footerBg={T.goodBgTint}
       prose={
         <>
-          Keep playing at your last 5 level —{' '}
+          {ctx.viewMode === 'friend'
+            ? <>{ctx.subjectCap} just {ctx.needsVerb} to keep playing at {ctx.possessiveLower} last 5 level — </>
+            : <>Keep playing at {ctx.possessiveLower} last 5 level — </>}
           <strong style={{ color: T.textHi, fontWeight: 700 }}>{f.newCount} new counter{f.newCount === 1 ? '' : 's'}</strong>{' '}
           locking in a new low.
         </>
