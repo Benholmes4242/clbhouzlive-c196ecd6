@@ -8,6 +8,8 @@ import type { WhsScore } from '@/lib/whs/types';
 interface Props {
   connectionId: string;
   currentHandicap: number | null;
+  viewMode?: 'owner' | 'friend';
+  ownerFirstName?: string | null;
 }
 
 const FONT = 'Geist, system-ui, -apple-system, BlinkMacSystemFont, sans-serif';
@@ -43,7 +45,7 @@ function monthLabel(yyyyMm: string): string {
   return d.toLocaleDateString('en-GB', { month: 'long', year: 'numeric' });
 }
 
-export const PersonalBests: React.FC<Props> = ({ connectionId, currentHandicap }) => {
+export const PersonalBests: React.FC<Props> = ({ connectionId, currentHandicap, viewMode = 'owner', ownerFirstName = null }) => {
   const { data: scores, isLoading } = useAllScores(connectionId);
 
   const tiles: Tile[] = useMemo(() => {
@@ -202,7 +204,11 @@ export const PersonalBests: React.FC<Props> = ({ connectionId, currentHandicap }
     <section style={{ marginTop: 32, fontFamily: FONT }}>
       <SectionHeader
         eyebrow="PERSONAL BESTS"
-        title="Records to break"
+        title={
+          viewMode === 'friend'
+            ? `${ownerFirstName ? `${ownerFirstName}'s` : 'Their'} records to chase`
+            : 'Records to break'
+        }
       />
       <div style={{ padding: '0 16px 8px' }}>
         <div

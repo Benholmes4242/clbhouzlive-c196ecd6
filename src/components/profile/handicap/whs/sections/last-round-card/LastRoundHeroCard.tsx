@@ -14,14 +14,22 @@ interface Verdict {
 
 /**
  * Map handicap_delta into a verdict for the bottom prose line.
- * - delta < 0  → good: "↓ 0.2 off your index"
- * - delta > 0  → bad:  "↑ +0.2 to your index"
- * - delta === 0 → neutral: "No change to your index"
- * - delta === null → none: "Your first round on record"
  */
-function verdictFromDelta(handicapDelta: number | null): Verdict {
+function verdictFromDelta(
+  handicapDelta: number | null,
+  viewMode: 'owner' | 'friend',
+  ownerFirstName: string | null,
+): Verdict {
+  const possessive =
+    viewMode === 'friend'
+      ? ownerFirstName ? `${ownerFirstName}'s` : 'their'
+      : 'your';
+  const possessiveCap =
+    viewMode === 'friend'
+      ? ownerFirstName ? `${ownerFirstName}'s` : 'Their'
+      : 'Your';
   if (handicapDelta == null) {
-    return { tint: 'none', label: <>Your first round on record</> };
+    return { tint: 'none', label: <>{possessiveCap} first round on record</> };
   }
   if (handicapDelta < 0) {
     return {
@@ -31,7 +39,7 @@ function verdictFromDelta(handicapDelta: number | null): Verdict {
           <span style={{ color: 'var(--hcp-good-2)', fontWeight: 800 }}>
             ↓ {Math.abs(handicapDelta).toFixed(1)}
           </span>{' '}
-          off your index
+          off {possessive} index
         </>
       ),
     };
@@ -44,12 +52,12 @@ function verdictFromDelta(handicapDelta: number | null): Verdict {
           <span style={{ color: 'var(--hcp-bad-2)', fontWeight: 800 }}>
             ↑ +{handicapDelta.toFixed(1)}
           </span>{' '}
-          to your index
+          to {possessive} index
         </>
       ),
     };
   }
-  return { tint: 'neutral', label: <>No change to your index</> };
+  return { tint: 'neutral', label: <>No change to {possessive} index</> };
 }
 
 /**
@@ -89,9 +97,11 @@ interface Props {
   timeAgo: string;
   /** Callback when the card is tapped (opens RoundDetailSheet). */
   onClick: () => void;
+  viewMode?: 'owner' | 'friend';
+  ownerFirstName?: string | null;
 }
 
-const LastRoundHeroCard: React.FC<Props> = ({ round, timeAgo, onClick }) => {
+const LastRoundHeroCard: React.FC<Props> = ({ round, timeAgo, onClick, viewMode = 'owner', ownerFirstName = null }) => {
   const courseName = round.course?.name ?? 'Unknown course';
   // Fetch hole-by-hole detail to compute par (mirrors CinemaFriendCard's approach).
   const { data: detail } = useFriendRoundDetail(round.id);
@@ -110,7 +120,7 @@ const LastRoundHeroCard: React.FC<Props> = ({ round, timeAgo, onClick }) => {
   const isWorse = diff != null && diff > 0;
   const isBetter = diff != null && diff < 0;
 
-  const verdict = verdictFromDelta(round.handicap_delta);
+  const verdict = verdictFromDelta(round.handicap_delta, viewMode, ownerFirstName);
 
   const diffDisplay = diff == null ? '—' : `${diff > 0 ? '+' : ''}${diff.toFixed(1)}`;
   const diffColor = isWorse

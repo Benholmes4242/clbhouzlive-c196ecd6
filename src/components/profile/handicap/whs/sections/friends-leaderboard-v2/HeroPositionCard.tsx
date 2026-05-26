@@ -20,6 +20,8 @@ interface Props {
   expanded?: boolean;
   /** Phase 3: tap handler for the catch-strip. */
   onToggleExpand?: () => void;
+  viewMode?: 'owner' | 'friend';
+  ownerFirstName?: string | null;
 }
 
 const T = {
@@ -48,6 +50,8 @@ export const HeroPositionCard: React.FC<Props> = ({
   totalActive,
   expanded = false,
   onToggleExpand,
+  viewMode = 'owner',
+  ownerFirstName = null,
 }) => {
   // Always called — never short-circuit a hook with `if (!selfRow) return null`.
   const userId = selfRow?.friend_user_id ?? undefined;
@@ -155,7 +159,9 @@ export const HeroPositionCard: React.FC<Props> = ({
               textTransform: 'uppercase',
             }}
           >
-            YOUR POSITION
+            {viewMode === 'friend'
+              ? `${ownerFirstName ? `${ownerFirstName.toUpperCase()}'S` : 'THEIR'} POSITION`
+              : 'YOUR POSITION'}
           </p>
           <div
             style={{

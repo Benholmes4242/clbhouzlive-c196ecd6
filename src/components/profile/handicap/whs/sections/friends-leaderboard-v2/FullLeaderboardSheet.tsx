@@ -13,6 +13,8 @@ interface FullLeaderboardSheetProps {
   cohorts: ReturnType<typeof buildLeaderboardCohorts>;
   deltasData: ReturnType<typeof useFriendLeaderboardRankDeltas>['data'];
   onRowClick: (entry: FriendLeaderboardEntry) => void;
+  viewMode?: 'owner' | 'friend';
+  ownerFirstName?: string | null;
 }
 
 const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
@@ -31,8 +33,12 @@ export const FullLeaderboardSheet: React.FC<FullLeaderboardSheetProps> = ({
   cohorts,
   deltasData,
   onRowClick,
+  viewMode = 'owner',
+  ownerFirstName = null,
 }) => {
   const [showInactive, setShowInactive] = useState(false);
+  const isFriend = viewMode === 'friend';
+  const possessive = ownerFirstName ? `${ownerFirstName}'s` : 'Their';
 
   return (
     <BottomSheet
@@ -50,7 +56,7 @@ export const FullLeaderboardSheet: React.FC<FullLeaderboardSheetProps> = ({
       <SheetHeader
         dark
         eyebrow="LEADERBOARD"
-        title={<span id="full-leaderboard-title">Your circle</span>}
+        title={<span id="full-leaderboard-title">{isFriend ? `${possessive} circle` : 'Your circle'}</span>}
         sub={
           <span>
             {cohorts.totalActive} active
