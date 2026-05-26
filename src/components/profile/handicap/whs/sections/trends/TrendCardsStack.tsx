@@ -17,6 +17,8 @@ interface Props {
    * 'rest' = StablefordCard.
    * undefined (default) = whole stack (backwards-compatible). */
   splitAt?: 'hero-only' | 'rest';
+  viewMode?: 'owner' | 'friend';
+  ownerFirstName?: string | null;
 }
 
 const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
@@ -25,7 +27,13 @@ const INK_55 = 'var(--hcp-t-60)';
 const HOT_RED = '#DC2626';
 const COLD_BLUE = '#0EA5E9';
 const SLATE = 'var(--hcp-t-80)';
-export const TrendCardsStack: React.FC<Props> = ({ connectionId, userId, currentHandicap, splitAt }) => {
+export const TrendCardsStack: React.FC<Props> = ({ connectionId, userId, currentHandicap, splitAt, viewMode = 'owner', ownerFirstName = null }) => {
+  const possessiveCap = viewMode === 'friend'
+    ? (ownerFirstName ? `${ownerFirstName}'s` : 'Their')
+    : 'Your';
+  const possessiveLower = viewMode === 'friend'
+    ? (ownerFirstName ? `${ownerFirstName}'s` : 'their')
+    : 'your';
 
   const { data: scores, isLoading } = useAllScores(connectionId);
   const prediction = predictHandicap(scores ?? []);
