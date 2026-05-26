@@ -13,7 +13,7 @@ import {
   GOLD_DARK,
   AMBER,
   GREEN_LIVE,
-  FONT_MONO,
+  NUMERIC_STYLE,
 } from '../HybridHero.constants';
 import { TrajectorySparkline } from './TrajectorySparkline';
 
@@ -85,7 +85,7 @@ export function SoloLeaderRow({
     >
       <span
         style={{
-          fontFamily: FONT_MONO,
+          ...NUMERIC_STYLE,
           fontSize: 16,
           fontWeight: 800,
           color: GOLD_DARK,
@@ -115,7 +115,7 @@ export function SoloLeaderRow({
       </div>
       <span
         style={{
-          fontFamily: FONT_MONO,
+          ...NUMERIC_STYLE,
           fontSize: 22,
           fontWeight: 700,
           color: isResults ? GOLD_DARK : liveScoreColour(score),
@@ -127,7 +127,7 @@ export function SoloLeaderRow({
       </span>
       <span
         style={{
-          fontFamily: FONT_MONO,
+          ...NUMERIC_STYLE,
           fontSize: 11,
           fontWeight: 700,
           color: INK_45,
@@ -239,7 +239,7 @@ export function TiedChasersRow({
       }}
       aria-label={`${count} players tied at ${rank} with score ${score}, average trajectory`}
     >
-      <span style={{ fontFamily: FONT_MONO, fontSize: 13, fontWeight: 700, color: INK_45 }}>
+      <span style={{ ...NUMERIC_STYLE, fontSize: 13, fontWeight: 700, color: INK_45 }}>
         {rank}
       </span>
       <div style={{ display: 'flex', alignItems: 'center', gap: 10, minWidth: 0 }}>
@@ -260,7 +260,7 @@ export function TiedChasersRow({
       </div>
       <span
         style={{
-          fontFamily: FONT_MONO,
+          ...NUMERIC_STYLE,
           fontSize: 16,
           fontWeight: 700,
           color: INK,
@@ -271,7 +271,7 @@ export function TiedChasersRow({
         {score}
       </span>
       {!hideThru && (
-        <span style={{ fontFamily: FONT_MONO, fontSize: 11, fontWeight: 700, color: INK_45, textAlign: 'right' }}>
+        <span style={{ ...NUMERIC_STYLE, fontSize: 11, fontWeight: 700, color: INK_45, textAlign: 'right' }}>
           {thru}
         </span>
       )}
@@ -305,7 +305,7 @@ export function TiedLeadersRow({ count, score, players, isLast = false }: TiedLe
     >
       <span
         style={{
-          fontFamily: FONT_MONO,
+          ...NUMERIC_STYLE,
           fontSize: 16,
           fontWeight: 800,
           color: GOLD_DARK,
@@ -332,7 +332,7 @@ export function TiedLeadersRow({ count, score, players, isLast = false }: TiedLe
       </div>
       <span
         style={{
-          fontFamily: FONT_MONO,
+          ...NUMERIC_STYLE,
           fontSize: 22,
           fontWeight: 700,
           color: liveScoreColour(score),
@@ -418,7 +418,7 @@ export function ChampionRow({
       </div>
       <span
         style={{
-          fontFamily: FONT_MONO,
+          ...NUMERIC_STYLE,
           fontSize: 22,
           fontWeight: 700,
           color: GOLD_DARK,
@@ -429,7 +429,7 @@ export function ChampionRow({
       </span>
       <span
         style={{
-          fontFamily: FONT_MONO,
+          ...NUMERIC_STYLE,
           fontSize: 11,
           fontWeight: 700,
           color: INK_45,

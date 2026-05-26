@@ -11,7 +11,7 @@ import {
   INK_15,
   INK_45,
   GOLD_DARK,
-  FONT_MONO,
+  NUMERIC_STYLE,
 } from '../HybridHero.constants';
 
 function PlayerHead({ size = 28, src }: { size?: number; src?: string | null }) {
@@ -75,7 +75,7 @@ export function LastYearRow({
           <path d="M7 4h10v3a5 5 0 0 1-10 0V4z M9 13h6l-1 4h-4z M8 19h8v2H8z" />
         </svg>
       ) : (
-        <span style={{ fontFamily: FONT_MONO, fontSize: 13, fontWeight: 700, color: INK_45 }}>
+        <span style={{ ...NUMERIC_STYLE, fontSize: 13, fontWeight: 700, color: INK_45 }}>
           {rank}
         </span>
       )}
@@ -100,7 +100,7 @@ export function LastYearRow({
       </div>
       <span
         style={{
-          fontFamily: FONT_MONO,
+          ...NUMERIC_STYLE,
           fontSize: isWinner ? 22 : 16,
           fontWeight: 700,
           color: isWinner ? GOLD_DARK : INK,
@@ -111,7 +111,7 @@ export function LastYearRow({
       </span>
       <span
         style={{
-          fontFamily: FONT_MONO,
+          ...NUMERIC_STYLE,
           fontSize: 10,
           fontWeight: 700,
           color: INK_45,

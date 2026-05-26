@@ -12,7 +12,7 @@ import {
   INK_45,
   AMBER,
   GREEN_LIVE,
-  FONT_MONO,
+  NUMERIC_STYLE,
 } from '../HybridHero.constants';
 import { TrajectorySparkline } from './TrajectorySparkline';
 
@@ -89,7 +89,7 @@ export function ChaserRow({
     >
       <span
         style={{
-          fontFamily: FONT_MONO,
+          ...NUMERIC_STYLE,
           fontSize: 13,
           fontWeight: 700,
           color: INK_45,
@@ -122,7 +122,7 @@ export function ChaserRow({
       </div>
       <span
         style={{
-          fontFamily: FONT_MONO,
+          ...NUMERIC_STYLE,
           fontSize: 16,
           fontWeight: 700,
           color: isResults ? INK : liveScoreColour(score),
@@ -136,7 +136,7 @@ export function ChaserRow({
       {!hideThru && (
         <span
           style={{
-            fontFamily: FONT_MONO,
+            ...NUMERIC_STYLE,
             fontSize: 11,
             fontWeight: 700,
             color: INK_45,
