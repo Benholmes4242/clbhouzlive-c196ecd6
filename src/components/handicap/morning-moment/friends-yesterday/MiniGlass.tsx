@@ -1,4 +1,5 @@
 import React from 'react';
+import { Lock } from 'lucide-react';
 import type { FriendYesterday } from '@/lib/handicap/useFriendsYesterday';
 import { fmtDiff } from '@/lib/whs/format';
 import { MiniGrossRing } from '@/components/profile/handicap/whs/sections/shared/GrossCounterRing';
