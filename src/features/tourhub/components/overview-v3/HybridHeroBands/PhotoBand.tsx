@@ -1,6 +1,7 @@
 /**
- * PhotoBand — universal 310px photo + scrims + state-coloured eyebrow + title.
- * §4 of HYBRID_HERO_IMPLEMENTATION_BRIEF.
+ * PhotoBand — Pass 7. 360px hero photo with broadcast title block:
+ * top eyebrow (status tag + tour meta), bottom title block with lede,
+ * 2-line title split, and venue · dates row. TourSwitcherOverlay removed.
  */
 
 import React from 'react';
@@ -9,15 +10,12 @@ import {
   COURSE_GRADIENT,
   COURSE_GRADIENT_DUSK,
   COURSE_SCRIMS,
-  LEGIBILITY_SCRIM,
   GOLD,
   AMBER,
   GREEN_LIVE,
-  RED,
   NUMERIC_STYLE,
 } from '../HybridHero.constants';
 import type { HeroState } from '../HybridHero.utils';
-import { TourSwitcherOverlay } from './TourSwitcherOverlay';
 
 interface PhotoBandProps {
   title: string;
@@ -25,135 +23,67 @@ interface PhotoBandProps {
   venueCity: string | null;
   venueImageUrl: string | null;
   state: HeroState;
-  // Pass 5
-  activeTournamentId: string | null;
-  onSelectTour: (tournamentId: string) => void;
+  tourLabel?: string | null;
+  winnerName?: string | null;
+  isMajor?: boolean;
+  isSignature?: boolean;
+  datesString?: string | null;
 }
 
-function StatusPill({ state }: { state: HeroState }) {
-  if (state.kind === 'live') {
-    return (
-      <span
-        style={{
-          display: 'inline-flex',
-          alignItems: 'center',
-          gap: 6,
-          padding: '4px 10px',
-          borderRadius: 999,
-          background: 'rgba(22,163,74,0.18)',
-          border: `0.5px solid ${GREEN_LIVE}`,
-          color: '#86EFAC',
-          fontSize: 9,
-          fontWeight: 800,
-          letterSpacing: '0.16em',
-        }}
-      >
-        <span
-          className="hybrid-live-pulse"
-          style={{
-            width: 6,
-            height: 6,
-            borderRadius: '50%',
-            background: GREEN_LIVE,
-            display: 'inline-block',
-          }}
-        />
-        LIVE
-      </span>
-    );
-  }
-  if (state.kind === 'results') {
-    if (state.variant === 'cancelled') {
-      return (
-        <Pill bg="rgba(220,38,38,0.18)" border={RED} color="#FCA5A5">
-          CANCELLED
-        </Pill>
-      );
-    }
-    if (state.variant === 'declared') {
-      return (
-        <Pill bg="rgba(247,147,30,0.18)" border={AMBER} color="#FED7AA">
-          DECLARED · 54 HOLES
-        </Pill>
-      );
-    }
-    if (state.variant === 'awaiting-playoff') {
-      return (
-        <Pill bg="rgba(251,188,46,0.18)" border={GOLD} color={GOLD}>
-          🏆 PLAYOFF · IN PROGRESS
-        </Pill>
-      );
-    }
-    return null;
+function StatusTag({ state }: { state: HeroState }) {
+  const isLive = state.kind === 'live';
+  const isResults = state.kind === 'results';
+  const dotColor = isLive ? '#10B981' : isResults ? AMBER : AMBER;
+  let label = isLive ? 'LIVE' : isResults ? 'FINAL' : 'UPCOMING';
+  if (isResults && state.variant === 'cancelled') label = 'CANCELLED';
+  else if (isResults && state.variant === 'awaiting-playoff') label = 'PLAYOFF';
+  else if (isResults && state.variant === 'declared') label = 'DECLARED';
 
-  }
-  // Upcoming
-  return (
-    <Pill bg="rgba(247,147,30,0.18)" border={AMBER} color="#FED7AA">
-      ⏱ UPCOMING
-    </Pill>
-  );
-}
-
-function Pill({
-  children,
-  bg,
-  border,
-  color,
-}: {
-  children: React.ReactNode;
-  bg: string;
-  border: string;
-  color: string;
-}) {
   return (
     <span
       style={{
         display: 'inline-flex',
         alignItems: 'center',
-        gap: 4,
+        gap: 6,
         padding: '4px 10px',
         borderRadius: 999,
-        background: bg,
-        border: `0.5px solid ${border}`,
-        color,
+        background: 'rgba(0,0,0,0.45)',
+        border: `0.5px solid rgba(255,255,255,0.25)`,
+        backdropFilter: 'blur(4px)',
+        color: 'white',
         fontSize: 9,
         fontWeight: 800,
-        letterSpacing: '0.16em',
+        letterSpacing: '0.18em',
       }}
     >
-      {children}
+      <span
+        className={isLive ? 'hybrid-live-pulse' : undefined}
+        style={{
+          width: 6,
+          height: 6,
+          borderRadius: '50%',
+          background: dotColor,
+          display: 'inline-block',
+        }}
+      />
+      {label}
     </span>
   );
 }
 
-function rightTimestamp(state: HeroState): string {
+function ledeLine(state: HeroState, winnerName?: string | null): string | null {
+  if (state.kind === 'results' && winnerName) return `Won by ${winnerName}`;
   if (state.kind === 'live') {
-    return `R${state.round} OF ${state.totalRounds} · ${state.thruLabel}`;
+    return state.thruLabel ? `Round ${state.round} · ${state.thruLabel}` : null;
   }
-  if (state.kind === 'results') {
-    if (state.variant === 'cancelled') return `${state.finishDate ? state.meta : ''} · CANCELLED`;
-    if (state.variant === 'awaiting-playoff') return 'R4 · PLAYOFF';
-    if (state.variant === 'declared') return `3 OF 4 · WEATHER`;
-    // Pass 5: normal results date moved to title block; this path unreachable.
-    return '';
-  }
-  return state.countdown;
+  if (state.kind === 'upcoming') return state.countdown || null;
+  return null;
 }
 
-function shouldShowTopRightStatus(state: HeroState): boolean {
-  if (state.kind === 'live') return true;
-  if (state.kind === 'upcoming') return true;
-  if (state.kind === 'results') {
-    return state.variant === 'cancelled'
-      || state.variant === 'awaiting-playoff'
-      || state.variant === 'declared';
-  }
-  return false;
-}
-
-function shouldShowDatesUnderVenue(state: HeroState): boolean {
-  return state.kind === 'results' && state.variant === 'standard';
+function splitTitle(title: string): { main: string; sub: string } {
+  const m = title.match(/^(.+?(?:CUP|OPEN|CHAMPIONSHIP|INVITATIONAL|CLASSIC))\s+(.+)$/i);
+  if (m) return { main: m[1], sub: m[2] };
+  return { main: title, sub: '' };
 }
 
 export function PhotoBand({
@@ -162,10 +92,17 @@ export function PhotoBand({
   venueCity,
   venueImageUrl,
   state,
-  activeTournamentId,
-  onSelectTour,
+  tourLabel,
+  winnerName,
+  isMajor,
+  isSignature,
+  datesString,
 }: PhotoBandProps) {
-  const useDusk = state.kind === 'results' && (state.variant === 'declared' || state.variant === 'cancelled');
+  const useDusk =
+    state.kind === 'results' && (state.variant === 'declared' || state.variant === 'cancelled');
+  const lede = ledeLine(state, winnerName);
+  const titleSplit = splitTitle(title);
+
   return (
     <div
       style={{
@@ -202,38 +139,70 @@ export function PhotoBand({
         />
       )}
       <div aria-hidden="true" style={{ position: 'absolute', inset: 0, background: COURSE_SCRIMS, zIndex: 2 }} />
-      <div aria-hidden="true" style={{ position: 'absolute', inset: 0, background: LEGIBILITY_SCRIM, zIndex: 2 }} />
 
-      {/* Pass 5: tour switcher overlay replaces the old eyebrow row */}
-      <TourSwitcherOverlay
-        activeTournamentId={activeTournamentId}
-        onSelectTour={onSelectTour}
+      {/* Lighter top scrim — Pass 7 */}
+      <div
+        aria-hidden="true"
+        style={{
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          right: 0,
+          height: 70,
+          background: 'linear-gradient(180deg, rgba(0,0,0,0.40) 0%, rgba(0,0,0,0) 100%)',
+          zIndex: 2,
+        }}
       />
 
-      {/* Right-side status indicator (live + special variants only) */}
-      {shouldShowTopRightStatus(state) && (
-        <div style={{ position: 'absolute', top: 18, right: 20, zIndex: 4 }}>
-          {state.kind === 'live' ? (
-            <StatusPill state={state} />
-          ) : (
-            <span
-              style={{
-                ...NUMERIC_STYLE,
-                fontSize: 11,
-                fontWeight: 700,
-                letterSpacing: '0.08em',
-                color: 'rgba(255,255,255,0.85)',
-                textShadow: '0 1px 3px rgba(0,0,0,0.4)',
-                whiteSpace: 'nowrap',
-              }}
-            >
-              {rightTimestamp(state)}
-            </span>
-          )}
-        </div>
-      )}
+      {/* Heavier bottom scrim — Pass 7 */}
+      <div
+        aria-hidden="true"
+        style={{
+          position: 'absolute',
+          left: 0,
+          right: 0,
+          bottom: 0,
+          height: 220,
+          background:
+            'linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0.45) 35%, rgba(0,0,0,0.78) 75%, rgba(0,0,0,0.88) 100%)',
+          zIndex: 2,
+        }}
+      />
 
-      {/* title block */}
+      {/* Top eyebrow row — status tag left, tour meta right */}
+      <div
+        style={{
+          position: 'absolute',
+          top: 16,
+          left: 20,
+          right: 20,
+          zIndex: 4,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          gap: 12,
+        }}
+      >
+        <StatusTag state={state} />
+        {tourLabel && (
+          <span
+            style={{
+              ...NUMERIC_STYLE,
+              fontSize: 10,
+              fontWeight: 700,
+              letterSpacing: '0.16em',
+              color: 'rgba(255,255,255,0.75)',
+              textShadow: '0 1px 3px rgba(0,0,0,0.45)',
+              textTransform: 'uppercase',
+              whiteSpace: 'nowrap',
+            }}
+          >
+            {tourLabel}
+          </span>
+        )}
+      </div>
+
+      {/* Bottom title block */}
       <div
         style={{
           position: 'absolute',
@@ -241,41 +210,107 @@ export function PhotoBand({
           right: 20,
           bottom: 20,
           zIndex: 3,
+          display: 'flex',
+          flexDirection: 'column',
+          gap: 8,
         }}
       >
-        <h1 className="hybrid-hero-title">{title}</h1>
-        {venueName && (
+        {(lede || isMajor || isSignature) && (
           <div
             style={{
-              fontSize: 12,
-              fontWeight: 600,
-              color: 'rgba(255,255,255,0.80)',
-              marginTop: 10,
+              display: 'flex',
+              alignItems: 'center',
+              gap: 8,
+              fontSize: 11,
+              fontWeight: 700,
+              letterSpacing: '0.14em',
+              color: 'rgba(255,255,255,0.85)',
+              textTransform: 'uppercase',
               textShadow: '0 1px 3px rgba(0,0,0,0.45)',
-              letterSpacing: '0.02em',
             }}
           >
-            {venueName}
-            {venueCity ? ` · ${venueCity}` : ''}
+            {lede && <span>{lede}</span>}
+            {isMajor && (
+              <span style={{ color: GOLD, fontSize: 12, letterSpacing: 0 }}>★</span>
+            )}
+            {isSignature && (
+              <span style={{ color: AMBER, fontSize: 9, letterSpacing: '0.18em' }}>
+                SIGNATURE EVENT
+              </span>
+            )}
           </div>
         )}
-        {shouldShowDatesUnderVenue(state) && state.kind === 'results' && state.meta && (
+
+        <h1
+          style={{
+            margin: 0,
+            color: 'white',
+            fontFamily: "'Geist', -apple-system, BlinkMacSystemFont, sans-serif",
+            fontSize: 36,
+            fontWeight: 800,
+            lineHeight: 0.95,
+            letterSpacing: '-0.02em',
+            textShadow: '0 2px 12px rgba(0,0,0,0.55)',
+          }}
+        >
+          <span>{titleSplit.main}</span>
+          {titleSplit.sub && (
+            <>
+              <br />
+              <span style={{ color: 'rgba(255,255,255,0.75)', fontWeight: 600 }}>
+                {titleSplit.sub}
+              </span>
+            </>
+          )}
+        </h1>
+
+        {(venueName || datesString) && (
           <div
             style={{
-              ...NUMERIC_STYLE,
+              display: 'flex',
+              alignItems: 'center',
+              gap: 8,
               fontSize: 11,
               fontWeight: 600,
-              color: 'rgba(255,255,255,0.65)',
-              marginTop: 4,
+              color: 'rgba(255,255,255,0.75)',
               textShadow: '0 1px 3px rgba(0,0,0,0.45)',
-              letterSpacing: '0.06em',
+              letterSpacing: '0.04em',
+              textTransform: 'uppercase',
             }}
           >
-            {state.meta}
+            {venueName && (
+              <span
+                style={{
+                  whiteSpace: 'nowrap',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  minWidth: 0,
+                }}
+              >
+                {venueName}
+                {venueCity ? ` · ${venueCity}` : ''}
+              </span>
+            )}
+            {venueName && datesString && (
+              <span
+                aria-hidden="true"
+                style={{
+                  width: 3,
+                  height: 3,
+                  borderRadius: '50%',
+                  background: 'rgba(255,255,255,0.55)',
+                  flexShrink: 0,
+                }}
+              />
+            )}
+            {datesString && (
+              <span style={{ ...NUMERIC_STYLE, whiteSpace: 'nowrap', flexShrink: 0 }}>
+                {datesString}
+              </span>
+            )}
           </div>
         )}
       </div>
     </div>
   );
 }
-
