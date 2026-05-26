@@ -1,3 +1,4 @@
+// Generic educational copy — 'your' refers to the reader, not the profile owner. Do not friend-prefix.
 import React from 'react';
 import { Target, X } from 'lucide-react';
 import { BottomSheet } from '@/components/ui/BottomSheet';
