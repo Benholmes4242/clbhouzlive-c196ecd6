@@ -18,9 +18,10 @@ const LEGIBILITY_SCRIM =
 interface Props {
   friend: FriendYesterday;
   onClick: () => void;
+  showLowestRound?: boolean;
 }
 
-export const HeroCard: React.FC<Props> = ({ friend, onClick }) => {
+export const HeroCard: React.FC<Props> = ({ friend, onClick, showLowestRound }) => {
   const { data: detail } = useFriendRoundDetail(
     friend.last_round_score_id,
     !!friend.last_round_score_id,
