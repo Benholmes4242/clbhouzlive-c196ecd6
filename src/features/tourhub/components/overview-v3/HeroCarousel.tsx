@@ -75,6 +75,9 @@ interface HeroSlideProps {
   onCardTouchStart: (e: React.TouchEvent) => void;
   onCardTouchMove: (e: React.TouchEvent) => void;
   onCardTouchEnd: (e: React.TouchEvent) => void;
+  /** Pass 5: forwarded to HybridHero for the tour switcher overlay. */
+  activeTournamentId?: string | null;
+  onTourSelect?: (tournamentId: string) => void;
 }
 
 function getDefendingChampionSubtext(tournament: {
