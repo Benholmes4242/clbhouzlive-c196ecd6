@@ -216,7 +216,7 @@ const ShowpieceCard: React.FC<Props> = ({ item, onTap }) => {
 
   const currentValue = item.currentValue ?? 0;
   const locked = !item.earned && currentValue === 0;
-  const palette = locked ? LOCKED_PALETTE : PLATINUM_PALETTE;
+  const palette = locked ? LOCKED_PALETTE : paletteForShowpiece(item.reachedTier);
 
   const totalTiers = item.tiers.length;
   const atMax = !locked && item.reachedTier >= totalTiers && totalTiers > 0;
