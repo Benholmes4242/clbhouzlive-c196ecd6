@@ -276,9 +276,7 @@ const TickerCell: React.FC<TickerCellProps> = ({ cell, isActive, onSelect }) => 
                 width: 14,
                 height: 14,
                 borderRadius: '34%',
-                background: cell.personPhotoUrl
-                  ? `center 18% / cover no-repeat url(${cell.personPhotoUrl})`
-                  : 'linear-gradient(135deg, #CBD5E1 0%, #94A3B8 100%)',
+                background: 'linear-gradient(135deg, #CBD5E1 0%, #94A3B8 100%)',
                 flexShrink: 0,
                 boxShadow: '0 0 0 1px rgba(255,255,255,0.20)',
               }}
