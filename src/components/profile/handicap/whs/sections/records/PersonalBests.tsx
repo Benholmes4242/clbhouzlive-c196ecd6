@@ -105,7 +105,7 @@ export const PersonalBests: React.FC<Props> = ({ connectionId, currentHandicap, 
     }
 
     // #4 Best vs handicap
-    let bestVsHcp: Tile = empty('Best vs Hcp');
+    let bestVsHcp: Tile = empty('Best vs HCP');
     if (currentHandicap != null && grossList.length) {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const scored = grossList.map((s) => {
@@ -117,7 +117,7 @@ export const PersonalBests: React.FC<Props> = ({ connectionId, currentHandicap, 
       const best = scored.reduce((a, b) => (a.vsHcp <= b.vsHcp ? a : b));
       const sign = best.vsHcp <= 0 ? '' : '+';
       bestVsHcp = {
-        eyebrow: 'Best vs Hcp',
+        eyebrow: 'Best vs HCP',
         value: `${sign}${best.vsHcp.toFixed(1)}`,
         caption: fmtCourseDate(best.s),
       };
