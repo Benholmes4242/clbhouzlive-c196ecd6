@@ -35,7 +35,12 @@ export const TrendsView: React.FC<Props> = ({
       style={{ paddingTop: 16 }}
     >
       {/* 1. Forecast */}
-      <ForecastCard connectionId={connectionId} currentHandicap={currentHandicap} />
+      <ForecastCard
+        connectionId={connectionId}
+        currentHandicap={currentHandicap}
+        viewMode={viewMode}
+        ownerFirstName={ownerFirstName}
+      />
 
 
       {/* 2. Where You Stand — owner only */}
@@ -58,11 +63,18 @@ export const TrendsView: React.FC<Props> = ({
         userId={userId}
         currentHandicap={currentHandicap}
         splitAt="rest"
+        viewMode={viewMode}
+        ownerFirstName={ownerFirstName}
       />
 
 
       {/* 6. Course Form */}
-      <CourseFormCard connectionId={connectionId} currentHandicap={currentHandicap ?? undefined} />
+      <CourseFormCard
+        connectionId={connectionId}
+        currentHandicap={currentHandicap ?? undefined}
+        viewMode={viewMode}
+        ownerFirstName={ownerFirstName}
+      />
 
       {/* 7. Echo Insights — owner only */}
       {!readOnly && <EchoInsightsCard connectionId={connectionId} />}
