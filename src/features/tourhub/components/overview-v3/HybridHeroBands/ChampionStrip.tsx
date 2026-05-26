@@ -138,17 +138,6 @@ export function ChampionStrip({
         >
           {score}
         </div>
-        <div
-          style={{
-            fontSize: 8,
-            fontWeight: 700,
-            color: 'rgba(255,255,255,0.50)',
-            letterSpacing: '0.16em',
-            marginTop: 2,
-          }}
-        >
-          {scoreLabel}
-        </div>
       </div>
     </div>
   );

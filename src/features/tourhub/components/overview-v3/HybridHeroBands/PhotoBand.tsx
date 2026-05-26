@@ -285,7 +285,7 @@ export function PhotoBand({
               letterSpacing: '0.02em',
             }}
           >
-            📍 {venueName}
+            {venueName}
             {venueCity ? ` · ${venueCity}` : ''}
           </div>
         )}
