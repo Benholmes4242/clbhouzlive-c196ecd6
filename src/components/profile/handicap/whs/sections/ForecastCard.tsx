@@ -607,7 +607,7 @@ const SharpDropCard: React.FC<{ f: Forecast; ctx: CopyCtx }> = ({ f, ctx }) => (
 
 // ── State: Sharp rise ───────────────────────────────────────────────
 
-const SharpRiseCard: React.FC<{ f: Forecast }> = ({ f }) => {
+const SharpRiseCard: React.FC<{ f: Forecast; ctx: CopyCtx }> = ({ f, ctx }) => {
   const cutTarget = f.cutTarget;
   return (
     <CardShell borderColor={T.badBorder} bgTint={T.badBgTint}>
@@ -619,8 +619,8 @@ const SharpRiseCard: React.FC<{ f: Forecast }> = ({ f }) => {
           <>
             On track for a{' '}
             <strong style={{ color: T.bad, fontWeight: 700 }}>{(f.delta ?? 0).toFixed(1)} rise</strong> to{' '}
-            <strong style={{ color: T.bad, fontWeight: 700 }}>~{(f.projected ?? 0).toFixed(1)}</strong> over
-            your next <strong style={{ color: T.textHi, fontWeight: 700 }}>{f.roundsOut} rounds</strong>
+            <strong style={{ color: T.bad, fontWeight: 700 }}>~{(f.projected ?? 0).toFixed(1)}</strong> over{' '}
+            {ctx.possessiveLower} next <strong style={{ color: T.textHi, fontWeight: 700 }}>{f.roundsOut} rounds</strong>
           </>
         }
       />
@@ -645,7 +645,7 @@ const SharpRiseCard: React.FC<{ f: Forecast }> = ({ f }) => {
 
 // ── State: Building ─────────────────────────────────────────────────
 
-const BuildingCard: React.FC<{ f: Forecast }> = ({ f }) => {
+const BuildingCard: React.FC<{ f: Forecast; ctx: CopyCtx }> = ({ f, ctx }) => {
   const need = 8;
   const have = f.validRoundCount;
   return (
@@ -661,7 +661,7 @@ const BuildingCard: React.FC<{ f: Forecast }> = ({ f }) => {
             marginBottom: 8,
           }}
         >
-          Building your trend
+          Building {ctx.possessiveLower} trend
         </div>
         <p
           style={{
@@ -671,8 +671,8 @@ const BuildingCard: React.FC<{ f: Forecast }> = ({ f }) => {
             color: T.textMid,
           }}
         >
-          We need at least <strong style={{ color: T.textHi, fontWeight: 700 }}>8 rounds</strong> in your
-          last 20. You have{' '}
+          We need at least <strong style={{ color: T.textHi, fontWeight: 700 }}>8 rounds</strong> in{' '}
+          {ctx.possessiveLower} last 20. {ctx.subjectCap} {ctx.hasVerb}{' '}
           <strong style={{ color: T.textHi, fontWeight: 700 }}>{have}</strong> so far — keep playing.
         </p>
         <div style={{ display: 'flex', gap: 6, marginTop: 14 }}>
@@ -695,7 +695,7 @@ const BuildingCard: React.FC<{ f: Forecast }> = ({ f }) => {
 
 // ── State: Brand new ────────────────────────────────────────────────
 
-const BrandNewCard: React.FC = () => (
+const BrandNewCard: React.FC<{ ctx: CopyCtx }> = ({ ctx }) => (
   <CardShell>
     <div style={{ padding: '18px 18px 20px' }}>
       <div
@@ -708,7 +708,9 @@ const BrandNewCard: React.FC = () => (
           marginBottom: 8,
         }}
       >
-        Play a round to start your trend
+        {ctx.viewMode === 'friend'
+          ? `${ctx.subjectCap} ${ctx.needsVerb} a round to start ${ctx.possessiveLower} trend`
+          : `Play a round to start ${ctx.possessiveLower} trend`}
       </div>
       <p
         style={{
@@ -718,8 +720,9 @@ const BrandNewCard: React.FC = () => (
           color: T.textMid,
         }}
       >
-        Once you've posted a few rounds, we'll project where your handicap is heading and tell you what
-        to shoot to drop.
+        {ctx.viewMode === 'friend'
+          ? <>Once {ctx.subjectLower} {ctx.hasVerb} posted a few rounds, we'll project where {ctx.possessiveLower} handicap is heading and tell {ctx.subjectLower} what to shoot to drop.</>
+          : <>Once you've posted a few rounds, we'll project where your handicap is heading and tell you what to shoot to drop.</>}
       </p>
     </div>
   </CardShell>
@@ -727,9 +730,9 @@ const BrandNewCard: React.FC = () => (
 
 // ── Skeleton ────────────────────────────────────────────────────────
 
-const ForecastSkeleton: React.FC = () => (
+const ForecastSkeleton: React.FC<{ eyebrow?: string }> = ({ eyebrow = 'Your form' }) => (
   <section style={{ marginTop: 32, fontFamily: FONT }}>
-    <DarkSectionHeader eyebrow="Your form" />
+    <DarkSectionHeader eyebrow={eyebrow} />
     <div
       style={{
         margin: '0 16px',
