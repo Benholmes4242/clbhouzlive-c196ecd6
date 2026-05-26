@@ -250,7 +250,7 @@ export const PersonalBests: React.FC<Props> = ({ connectionId, currentHandicap, 
                 )}
               </div>
 
-              <div style={{ display: 'flex', alignItems: 'baseline', gap: 4, flexShrink: 0 }}>
+              <div style={{ display: 'flex', alignItems: 'baseline', gap: 4, flexShrink: 0, position: 'relative', zIndex: 1 }}>
                 {isLoading ? (
                   <div style={{ height: 22, width: 48, background: D_BG3, borderRadius: 4 }} />
                 ) : (
