@@ -71,7 +71,7 @@ export function ChaserRow({
         display: 'grid',
         gridTemplateColumns: '32px 1fr auto 42px',
         gap: 12,
-        padding: '12px 20px',
+        padding: '8px 20px',
         alignItems: 'center',
         background: 'transparent',
         borderBottom: isLast ? 'none' : `0.5px solid ${INK_15}`,

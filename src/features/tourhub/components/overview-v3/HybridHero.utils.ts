@@ -137,7 +137,9 @@ export function deriveHeroState(
       kind: 'results',
       variant: 'standard',
       finishDate: tournament.endDate || '',
-      meta: end ? `${format(end, 'MMM d').toUpperCase()}` : '',
+      meta: start && end
+        ? `${format(start, 'MMM d').toUpperCase()} – ${format(end, 'MMM d').toUpperCase()}`
+        : end ? format(end, 'MMM d').toUpperCase() : '',
     };
   }
 

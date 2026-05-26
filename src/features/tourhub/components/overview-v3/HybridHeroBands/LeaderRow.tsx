@@ -138,15 +138,21 @@ export function SoloLeaderRow({
   );
 }
 
-function StackedAvatars({
+export function StackedAvatars({
   players,
   size = 34,
+  variant = 'leader',
 }: {
   players: { avatarUrl?: string | null }[];
   size?: number;
+  variant?: 'leader' | 'chaser';
 }) {
-  const visible = players.slice(0, 3);
+  const maxVisible = variant === 'chaser' ? 4 : 3;
+  const visible = players.slice(0, maxVisible);
   const total = players.length;
+  const ring = variant === 'leader'
+    ? '0 0 0 2px rgba(251,188,46,0.55)'
+    : '0 0 0 1.5px #F8FAFC';
   return (
     <div style={{ display: 'flex', alignItems: 'center' }}>
       {visible.map((p, i) => (
@@ -159,19 +165,82 @@ function StackedAvatars({
             if (t.src !== PLAYER_SILHOUETTE_URL) t.src = PLAYER_SILHOUETTE_URL;
           }}
           style={{
-            marginLeft: i === 0 ? 0 : -10,
+            marginLeft: i === 0 ? 0 : -8,
             zIndex: visible.length - i,
-            opacity: total > 3 && i === visible.length - 1 ? 0.85 : 1,
+            opacity: total > maxVisible && i === visible.length - 1 ? 0.85 : 1,
             width: size,
             height: size,
             borderRadius: '34%',
             objectFit: 'cover',
             objectPosition: 'center 18%',
             background: 'linear-gradient(135deg, #CBD5E1 0%, #94A3B8 100%)',
-            boxShadow: '0 0 0 2px rgba(251,188,46,0.55)',
+            boxShadow: ring,
           }}
         />
       ))}
+    </div>
+  );
+}
+
+interface TiedChasersRowProps {
+  rank: string;
+  count: number;
+  score: string;
+  thru: string;
+  players: { avatarUrl?: string | null }[];
+  isLast?: boolean;
+  onTap?: () => void;
+}
+
+export function TiedChasersRow({
+  rank,
+  count,
+  score,
+  thru,
+  players,
+  isLast = false,
+  onTap,
+}: TiedChasersRowProps) {
+  return (
+    <div
+      onClick={onTap}
+      style={{
+        display: 'grid',
+        gridTemplateColumns: '32px 1fr auto 42px',
+        gap: 12,
+        padding: '8px 20px',
+        height: 40,
+        alignItems: 'center',
+        background: 'rgba(247,147,30,0.04)',
+        borderBottom: isLast ? 'none' : `0.5px solid ${INK_15}`,
+        cursor: onTap ? 'pointer' : 'default',
+      }}
+      aria-label={`${count} players tied at ${rank} with score ${score}`}
+    >
+      <span style={{ fontFamily: FONT_MONO, fontSize: 13, fontWeight: 700, color: INK_45 }}>
+        {rank}
+      </span>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 10, minWidth: 0 }}>
+        <StackedAvatars players={players} size={22} variant="chaser" />
+        <span style={{ fontSize: 14, fontWeight: 700, color: INK, whiteSpace: 'nowrap' }}>
+          {count} tied at {rank}
+          <span style={{ marginLeft: 4, color: INK_45 }}>›</span>
+        </span>
+      </div>
+      <span
+        style={{
+          fontFamily: FONT_MONO,
+          fontSize: 16,
+          fontWeight: 700,
+          color: INK,
+          letterSpacing: '-0.01em',
+        }}
+      >
+        {score}
+      </span>
+      <span style={{ fontFamily: FONT_MONO, fontSize: 11, fontWeight: 700, color: INK_45, textAlign: 'right' }}>
+        {thru}
+      </span>
     </div>
   );
 }

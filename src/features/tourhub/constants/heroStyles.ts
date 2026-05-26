@@ -45,17 +45,11 @@ export const HERO_STYLES = {
     height: `calc(${HERO_HEIGHT_EDITORIAL} + env(safe-area-inset-top, 0px))`,
     minHeight: `calc(${HERO_MIN_HEIGHT}px + env(safe-area-inset-top, 0px))`,
   },
-  /**
-   * Hero container — sits cleanly below the compact header. No bleed.
-   * Height sized to fit the full HybridHero (PhotoBand 310 + MiddleBand ~56
-   * + LeaderboardBand header + 4 rows + CTA ≈ 700px). Uses max() so larger
-   * viewports can still breathe with 70dvh, while iPhone SE / 14 / 15 Pro Max
-   * always get the room needed to render the "Open Live Leaderboard" CTA.
-   */
   containerBelowHeader: {
     marginTop: 0,
-    height: 'max(720px, 70dvh)',
-    minHeight: 720,
+    // Pass 1: let content determine height. No min/max lock.
+    // The bands inside HybridHero own their own heights (PhotoBand 280px,
+    // ChampionStrip 62px, 4 × ChaserRow 40px, CTA row 32px). Total ≈ 534px.
   },
   /** Content inside hero should use this to stay below notch */
   content: {
