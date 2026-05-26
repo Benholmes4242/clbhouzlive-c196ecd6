@@ -4,7 +4,6 @@
  */
 
 import React from 'react';
-import { Star } from 'lucide-react';
 import {
   PHOTO_BAND_HEIGHT,
   COURSE_GRADIENT,
@@ -18,6 +17,7 @@ import {
   NUMERIC_STYLE,
 } from '../HybridHero.constants';
 import type { HeroState } from '../HybridHero.utils';
+import { TourSwitcherOverlay } from './TourSwitcherOverlay';
 
 interface PhotoBandProps {
   title: string;
@@ -27,33 +27,13 @@ interface PhotoBandProps {
   state: HeroState;
   tourLabel: string;
   isMajor?: boolean;
+  // Pass 5
+  activeTournamentId: string | null;
+  onSelectTour: (tournamentId: string) => void;
 }
 
-function MajorBadge() {
-  return (
-    <span
-      style={{
-        display: 'inline-flex',
-        alignItems: 'center',
-        gap: 4,
-        padding: '4px 9px 4px 7px',
-        borderRadius: 999,
-        background: 'rgba(255,184,0,0.22)',
-        border: '1px solid rgba(255,184,0,0.45)',
-        backdropFilter: 'blur(20px)',
-        WebkitBackdropFilter: 'blur(20px)',
-        color: '#FFB800',
-        fontSize: 10,
-        fontWeight: 800,
-        letterSpacing: '0.14em',
-        textShadow: '0 1px 3px rgba(0,0,0,0.4)',
-      }}
-    >
-      <Star size={10} fill="#FFB800" stroke="#FFB800" strokeWidth={1} />
-      MAJOR
-    </span>
-  );
-}
+// Pass 5: MajorBadge removed — tour pills now occupy top-left.
+// Intentional trade-off documented in HERO_PASS_5_BRIEF §6.
 
 function StatusPill({ state }: { state: HeroState }) {
   if (state.kind === 'live') {
@@ -160,10 +140,25 @@ function rightTimestamp(state: HeroState): string {
     if (state.variant === 'cancelled') return `${state.finishDate ? state.meta : ''} · CANCELLED`;
     if (state.variant === 'awaiting-playoff') return 'R4 · PLAYOFF';
     if (state.variant === 'declared') return `3 OF 4 · WEATHER`;
-    // Pass 1: date range MMM D – MMM D (state.meta is built upstream in deriveHeroState)
-    return state.meta || '';
+    // Pass 5: normal results date moved to title block; this path unreachable.
+    return '';
   }
   return state.countdown;
+}
+
+function shouldShowTopRightStatus(state: HeroState): boolean {
+  if (state.kind === 'live') return true;
+  if (state.kind === 'upcoming') return true;
+  if (state.kind === 'results') {
+    return state.variant === 'cancelled'
+      || state.variant === 'awaiting-playoff'
+      || state.variant === 'declared';
+  }
+  return false;
+}
+
+function shouldShowDatesUnderVenue(state: HeroState): boolean {
+  return state.kind === 'results' && state.variant === 'standard';
 }
 
 export function PhotoBand({
@@ -172,8 +167,10 @@ export function PhotoBand({
   venueCity,
   venueImageUrl,
   state,
-  tourLabel,
-  isMajor = false,
+  tourLabel: _tourLabel,
+  isMajor: _isMajor = false,
+  activeTournamentId,
+  onSelectTour,
 }: PhotoBandProps) {
   const useDusk = state.kind === 'results' && (state.variant === 'declared' || state.variant === 'cancelled');
   return (
@@ -186,7 +183,6 @@ export function PhotoBand({
         flexShrink: 0,
       }}
     >
-      {/* gradient base */}
       <div
         aria-hidden="true"
         style={{
@@ -196,7 +192,6 @@ export function PhotoBand({
           zIndex: 0,
         }}
       />
-      {/* image */}
       {venueImageUrl && (
         <img
           src={venueImageUrl}
@@ -213,55 +208,37 @@ export function PhotoBand({
           }}
         />
       )}
-      {/* scrims */}
       <div aria-hidden="true" style={{ position: 'absolute', inset: 0, background: COURSE_SCRIMS, zIndex: 2 }} />
       <div aria-hidden="true" style={{ position: 'absolute', inset: 0, background: LEGIBILITY_SCRIM, zIndex: 2 }} />
 
-      {/* eyebrow row */}
-      <div
-        style={{
-          position: 'absolute',
-          top: 18,
-          left: 20,
-          right: 20,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          zIndex: 3,
-        }}
-      >
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-          {isMajor ? (
-            <MajorBadge />
+      {/* Pass 5: tour switcher overlay replaces the old eyebrow row */}
+      <TourSwitcherOverlay
+        activeTournamentId={activeTournamentId}
+        onSelectTour={onSelectTour}
+      />
+
+      {/* Right-side status indicator (live + special variants only) */}
+      {shouldShowTopRightStatus(state) && (
+        <div style={{ position: 'absolute', top: 18, right: 20, zIndex: 4 }}>
+          {state.kind === 'live' ? (
+            <StatusPill state={state} />
           ) : (
             <span
               style={{
-                fontSize: 10,
-                fontWeight: 800,
-                letterSpacing: '0.18em',
+                ...NUMERIC_STYLE,
+                fontSize: 11,
+                fontWeight: 700,
+                letterSpacing: '0.08em',
                 color: 'rgba(255,255,255,0.85)',
                 textShadow: '0 1px 3px rgba(0,0,0,0.4)',
+                whiteSpace: 'nowrap',
               }}
             >
-              {tourLabel}
+              {rightTimestamp(state)}
             </span>
           )}
-          <StatusPill state={state} />
         </div>
-        <span
-          style={{
-            ...NUMERIC_STYLE,
-            fontSize: 11,
-            fontWeight: 700,
-            letterSpacing: '0.08em',
-            color: 'rgba(255,255,255,0.85)',
-            textShadow: '0 1px 3px rgba(0,0,0,0.4)',
-            whiteSpace: 'nowrap',
-          }}
-        >
-          {rightTimestamp(state)}
-        </span>
-      </div>
+      )}
 
       {/* title block */}
       <div
@@ -289,7 +266,23 @@ export function PhotoBand({
             {venueCity ? ` · ${venueCity}` : ''}
           </div>
         )}
+        {shouldShowDatesUnderVenue(state) && state.kind === 'results' && state.meta && (
+          <div
+            style={{
+              ...NUMERIC_STYLE,
+              fontSize: 11,
+              fontWeight: 600,
+              color: 'rgba(255,255,255,0.65)',
+              marginTop: 4,
+              textShadow: '0 1px 3px rgba(0,0,0,0.45)',
+              letterSpacing: '0.06em',
+            }}
+          >
+            {state.meta}
+          </div>
+        )}
       </div>
     </div>
   );
 }
+

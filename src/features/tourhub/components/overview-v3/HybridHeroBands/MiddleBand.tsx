@@ -34,10 +34,10 @@ interface MiddleBandProps {
   cancelReason?: string;
   fallbackPreview?: { eyebrow: string; body: string };
   teamWinner?: TeamWinner | null;
-  /** Pass 3: winner's per-round scores (results state, leaderboard[0]). */
   championRounds?: number[];
-  /** Pass 3: course par for sparkline math. */
   par?: number;
+  /** Pass 5.5: italic narrative line under the champion's name. */
+  championNarrative?: string | null;
 }
 
 
@@ -54,6 +54,7 @@ export function MiddleBand({
   teamWinner,
   championRounds,
   par,
+  championNarrative,
 }: MiddleBandProps) {
 
   if (state.kind === 'live') {
@@ -90,6 +91,7 @@ export function MiddleBand({
           avatarUrl={champion.avatarUrl}
           rounds={championRounds}
           par={par}
+          narrative={championNarrative}
         />
       );
     }
