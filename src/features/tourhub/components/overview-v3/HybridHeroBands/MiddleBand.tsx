@@ -91,6 +91,7 @@ export function MiddleBand({
           avatarUrl={champion.avatarUrl}
           rounds={championRounds}
           par={par}
+          narrative={championNarrative}
         />
       );
     }
