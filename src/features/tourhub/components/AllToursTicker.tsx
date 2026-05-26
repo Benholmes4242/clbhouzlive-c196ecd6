@@ -22,7 +22,7 @@ import {
   type TickerCellStatus,
 } from '../hooks/useOverviewModules';
 import { TOUR_MAP } from '../constants/tourMap';
-import { NUMERIC_STYLE } from '../components/overview-v3/HybridHero.constants';
+import { NUMERIC_STYLE } from './overview-v3/HybridHero.constants';
 
 const GREEN = '#10B981';
 const SLATE_500 = '#64748B';
