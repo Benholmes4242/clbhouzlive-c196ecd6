@@ -101,17 +101,18 @@ export function OverviewPageV3() {
         {/* 1. Hero Carousel — capped at 960px on wide screens, full-bleed on mobile */}
         <motion.div 
           className="relative w-full z-0 mx-auto"
-          // HeroCarousel's glass card is `position: absolute; inset: 0` inside this wrapper,
-          // so the wrapper's height IS the hero's rendered height. HybridHero's bands size
-          // intrinsically to the results-state target (534px). Without an explicit minHeight
-          // here, the wrapper collapses to 0 and the entire hero is invisible.
-          // +6px slack absorbs sub-pixel rendering; results state shows the slack as transparent
-          // background below the CTA. Live (~530) fits with ~10px slack. Upcoming is unaudited —
-          // if it clips, follow-up patch (out of scope here).
+          // The HeroCarousel chain below uses h-full and `position: absolute; inset: 0`.
+          // Both need a definite height from this parent. A flex column with minHeight
+          // gives percentage-height children a basis to resolve against without locking a
+          // hard ceiling — taller intrinsic states (upcoming) can grow past 540, then the
+          // glass card's `overflow: hidden` clips at whatever the wrapper ends up. This is
+          // the "soft floor" Pass 1 intended.
           style={{
             ...heroContainerStyle,
             maxWidth: 960,
-            minHeight: TOTAL_HERO_HEIGHT_TARGET + 6,
+            minHeight: TOTAL_HERO_HEIGHT_TARGET + 6, // 540: results target 534 + 6px slack
+            display: 'flex',
+            flexDirection: 'column',
             opacity: heroOpacity,
             scale: heroScale,
           }}
