@@ -11,6 +11,7 @@ import Pattern14Card from '../sections/Pattern14Card';
 
 import RecentUnlocksStrip from '../gam/RecentUnlocksStrip';
 import { LaunchSheetMount } from '../../gam/launch/LaunchSheetMount';
+import { PulseSection } from '../sections/PulseSection';
 
 interface Props {
   connection: WhsConnection;
@@ -70,7 +71,10 @@ export const TodayView: React.FC<Props> = ({
       </div>
 
 
-      {/* 2. Recent Unlocks */}
+      {/* 2. Find a player + Pulse — owner only */}
+      {!readOnly && <PulseSection userId={userId} />}
+
+      {/* 3. Recent Unlocks */}
       <RecentUnlocksStrip userId={userId} readOnly={readOnly} />
 
       {/* 3. Next Round Watch — owner only */}
