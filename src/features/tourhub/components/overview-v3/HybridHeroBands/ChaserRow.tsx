@@ -71,10 +71,12 @@ export function ChaserRow({
         display: 'grid',
         gridTemplateColumns: '32px 1fr auto 42px',
         gap: 12,
+        height: 40,
         padding: '8px 20px',
         alignItems: 'center',
         background: 'transparent',
         borderBottom: isLast ? 'none' : `0.5px solid ${INK_15}`,
+        boxSizing: 'border-box',
       }}
     >
       <span
@@ -88,7 +90,7 @@ export function ChaserRow({
         {rank}
       </span>
       <div style={{ display: 'flex', gap: 12, alignItems: 'center', minWidth: 0 }}>
-        <PlayerHead size={28} src={avatarUrl} />
+        <PlayerHead size={24} src={avatarUrl} />
         <div style={{ display: 'flex', alignItems: 'center', gap: 6, minWidth: 0 }}>
           <span
             style={{
