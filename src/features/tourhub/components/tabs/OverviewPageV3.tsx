@@ -13,7 +13,7 @@
  * 7. College Golf Rankings
  */
 
-import { useRef, useState, useEffect, useCallback } from 'react';
+import { useRef, useState, useEffect, useCallback, useMemo } from 'react';
 import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion';
 import {
   HeroCarousel,
@@ -31,6 +31,9 @@ import { HomePGAModule } from '../home/HomePGAModule';
 import { HomeCourseOfWeekModule } from '../home/HomeCourseOfWeekModule';
 import { HomeWatchRail } from '../home/HomeWatchRail';
 import { HomeConnectHandicapModule } from '../home/HomeConnectHandicapModule';
+import { DispatchModule } from '../overview-v3/DispatchModule';
+import { AcrossTheToursModule } from '../overview-v3/AcrossTheToursModule';
+import { useAllToursTickerData } from '../../hooks/useOverviewModules';
 import { useNetworkStatus } from '@/hooks/useNetworkStatus';
 import { HERO_STYLES } from '../../constants/heroStyles';
 import { TOTAL_HERO_HEIGHT_TARGET } from '../overview-v3/HybridHero.constants';
@@ -67,6 +70,14 @@ export function OverviewPageV3() {
   }, []);
 
   const heroContainerStyle = HERO_STYLES.containerBelowHeader;
+
+  // Pass 6: derive the active tour's slug so AcrossTheToursModule can exclude it.
+  const { data: tickerData } = useAllToursTickerData();
+  const activeTourSlug = useMemo(() => {
+    if (!activeTournamentId || !tickerData) return null;
+    const all = [...tickerData.live, ...tickerData.completed, ...tickerData.upcoming];
+    return all.find(c => c.id === activeTournamentId)?.tourSlug ?? null;
+  }, [activeTournamentId, tickerData]);
 
 
   return (
@@ -125,6 +136,14 @@ export function OverviewPageV3() {
             autoRotate={autoRotate}
           />
         </motion.div>
+
+
+        {/* Pass 6: editorial content tier — sits directly below the hero CTA.
+            Gap stack is intentional: hero → 24px (Dispatch top pad) → Dispatch
+            → 26px (Across top pad) → Across the Tours → 40px (content gap) →
+            handicap card. Don't unify into a single gap. */}
+        <DispatchModule />
+        <AcrossTheToursModule activeTourSlug={activeTourSlug} />
 
 
         {/* Content sections */}

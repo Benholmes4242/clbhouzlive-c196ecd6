@@ -12473,6 +12473,62 @@ export type Database = {
         }
         Relationships: []
       }
+      tour_hub_dispatch_moments: {
+        Row: {
+          caption: string | null
+          created_at: string
+          duration_seconds: number | null
+          expires_at: string | null
+          headline: string
+          id: string
+          poster_url: string | null
+          priority: number
+          published_at: string
+          status: string
+          stream_id: string | null
+          tournament_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          caption?: string | null
+          created_at?: string
+          duration_seconds?: number | null
+          expires_at?: string | null
+          headline: string
+          id?: string
+          poster_url?: string | null
+          priority?: number
+          published_at?: string
+          status?: string
+          stream_id?: string | null
+          tournament_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          caption?: string | null
+          created_at?: string
+          duration_seconds?: number | null
+          expires_at?: string | null
+          headline?: string
+          id?: string
+          poster_url?: string | null
+          priority?: number
+          published_at?: string
+          status?: string
+          stream_id?: string | null
+          tournament_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tour_hub_dispatch_moments_tournament_id_fkey"
+            columns: ["tournament_id"]
+            isOneToOne: false
+            referencedRelation: "sr_tournaments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       tour_season_rankings: {
         Row: {
           country: string | null
