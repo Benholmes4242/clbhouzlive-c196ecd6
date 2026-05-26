@@ -15,6 +15,16 @@ interface Props {
   variant: Variant;
   onClick: () => void;
   onInviteClick?: () => void;
+  /**
+   * Suppress the "England Golf" pill for non-synced variants.
+   * Default: false (badge renders as today). Used by Friends Yesterday.
+   */
+  hideEgBadge?: boolean;
+  /**
+   * Reorder the text stack to: name → course name → date.
+   * Default: false (Recently Played order preserved).
+   */
+  courseAboveDate?: boolean;
 }
 
 const FONT = 'Geist, system-ui, -apple-system, BlinkMacSystemFont, sans-serif';
@@ -27,6 +37,8 @@ export const FriendRoundCardV2: React.FC<Props> = ({
   variant,
   onClick,
   onInviteClick,
+  hideEgBadge = false,
+  courseAboveDate = false,
 }) => {
   const isSynced = variant === 'clbhouz-synced';
 
