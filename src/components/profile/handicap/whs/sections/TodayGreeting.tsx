@@ -9,13 +9,10 @@
  */
 import React, { useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { Trophy, ChevronRight } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAllScores } from '@/lib/whs/hooks';
 import { useUserProfile } from '@/hooks/useUserProfile';
 import { useTodayWeather } from '@/lib/whs/useTodayWeather';
-import { openGamAchievements } from '@/components/profile/handicap/whs/gam/events';
-import { useUserAchievements } from '@/hooks/gam/useUserAchievements';
 
 const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
 
@@ -146,22 +143,6 @@ const TodayGreeting: React.FC<Props> = ({ connectionId, userId }) => {
 
   const { data: weather } = useTodayWeather(coords?.lat ?? null, coords?.lng ?? null);
 
-  const { data: achievements } = useUserAchievements(userId);
-
-  const { weeklyCount, lifetimeCount } = React.useMemo(() => {
-    if (!achievements) return { weeklyCount: 0, lifetimeCount: 0 };
-    const cutoff = Date.now() - 7 * 24 * 60 * 60 * 1000;
-    let weekly = 0;
-    let lifetime = 0;
-    for (const b of achievements) {
-      if (!b.is_earned) continue;
-      lifetime++;
-      if (b.earned_at && new Date(b.earned_at).getTime() > cutoff) {
-        weekly++;
-      }
-    }
-    return { weeklyCount: weekly, lifetimeCount: lifetime };
-  }, [achievements]);
 
   const showMeta = !!homeCourseName;
 
