@@ -34,6 +34,7 @@ import { HomeWatchRail } from '../home/HomeWatchRail';
 import { HomeConnectHandicapModule } from '../home/HomeConnectHandicapModule';
 import { useNetworkStatus } from '@/hooks/useNetworkStatus';
 import { HERO_STYLES } from '../../constants/heroStyles';
+import { TOTAL_HERO_HEIGHT_TARGET } from '../overview-v3/HybridHero.constants';
 import { WifiOff } from 'lucide-react';
 import ScrollToTopGlass from '@/components/common/ScrollToTopGlass';
 
@@ -100,7 +101,20 @@ export function OverviewPageV3() {
         {/* 1. Hero Carousel — capped at 960px on wide screens, full-bleed on mobile */}
         <motion.div 
           className="relative w-full z-0 mx-auto"
-          style={{ ...heroContainerStyle, maxWidth: 960, opacity: heroOpacity, scale: heroScale }}
+          // HeroCarousel's glass card is `position: absolute; inset: 0` inside this wrapper,
+          // so the wrapper's height IS the hero's rendered height. HybridHero's bands size
+          // intrinsically to the results-state target (534px). Without an explicit minHeight
+          // here, the wrapper collapses to 0 and the entire hero is invisible.
+          // +6px slack absorbs sub-pixel rendering; results state shows the slack as transparent
+          // background below the CTA. Live (~530) fits with ~10px slack. Upcoming is unaudited —
+          // if it clips, follow-up patch (out of scope here).
+          style={{
+            ...heroContainerStyle,
+            maxWidth: 960,
+            minHeight: TOTAL_HERO_HEIGHT_TARGET + 6,
+            opacity: heroOpacity,
+            scale: heroScale,
+          }}
         >
           <HeroCarousel
             hasHeader={true}
