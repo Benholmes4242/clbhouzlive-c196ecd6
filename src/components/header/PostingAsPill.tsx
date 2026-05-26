@@ -13,6 +13,7 @@ interface PostingAsPillProps {
   useLightTheme?: boolean;
   useGlassTheme?: boolean; // Clubhouse frosted-glass treatment
   useBareTheme?: boolean; // No background, no chevron — TikTok-style floating avatar
+  compact?: boolean; // One-size-smaller for tour routes
 }
 
 /**
@@ -20,7 +21,7 @@ interface PostingAsPillProps {
  * Uses forwardRef to allow parent to get anchor position for desktop popover
  */
 export const PostingAsPill = forwardRef<HTMLButtonElement, PostingAsPillProps>(
-  ({ onClick, isOpen, hasUnreadNotifications = false, notificationCount = 0, useLightTheme = false, useGlassTheme = false, useBareTheme = false }, ref) => {
+  ({ onClick, isOpen, hasUnreadNotifications = false, notificationCount = 0, useLightTheme = false, useGlassTheme = false, useBareTheme = false, compact = false }, ref) => {
     const { activeActor, isLoading } = useActiveActor();
     
     // Get unread messages count from messaging system
@@ -148,7 +149,8 @@ export const PostingAsPill = forwardRef<HTMLButtonElement, PostingAsPillProps>(
         ref={ref}
         onClick={onClick}
           className={cn(
-            "flex items-center p-1.5 h-11",
+            "flex items-center",
+            compact ? "p-1 h-9" : "p-1.5 h-11",
             "rounded-xl transition-all duration-500",
             "max-w-[160px] min-w-0",
             "active:scale-[0.97]",
@@ -163,7 +165,7 @@ export const PostingAsPill = forwardRef<HTMLButtonElement, PostingAsPillProps>(
         {/* Squircle Avatar with notification dot */}
         <div className="relative flex-shrink-0 flex items-center">
           <SquircleAvatar
-            size={28}
+            size={compact ? 24 : 28}
             src={activeActor.avatarUrl}
             alt={activeActor.name}
             userId={activeActor.id}
@@ -207,7 +209,8 @@ export const PostingAsPill = forwardRef<HTMLButtonElement, PostingAsPillProps>(
         {/* Chevron */}
         <ChevronDown 
           className={cn(
-            "h-3 w-3 flex-shrink-0 transition-transform duration-200",
+            "flex-shrink-0 transition-transform duration-200",
+            compact ? "h-2.5 w-2.5" : "h-3 w-3",
             (useLightTheme && !useGlassTheme) ? "text-muted-foreground" : "text-white/70",
             isOpen && "rotate-180"
           )} 

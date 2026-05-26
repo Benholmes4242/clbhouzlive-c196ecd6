@@ -237,7 +237,7 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
                 <img
                   src="/lovable-uploads/29e83040-b5c5-48e4-84d7-3f99640e4a80.png"
                   alt="clbhouz"
-                  className={cn("object-contain", isTourRoute ? "h-7 w-7" : "h-9 w-9")}
+                  className={cn("object-contain", isTourRoute ? "h-8 w-8" : "h-9 w-9")}
                 />
               )}
             </button>
@@ -315,6 +315,7 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
                   hasUnreadNotifications={hasUnread}
                   notificationCount={unreadCount}
                   useLightTheme={useLightTheme}
+                  compact={isTourRoute}
                 />
               ) : (
                 /* Skeleton placeholder while auth resolves — prevents layout shift */

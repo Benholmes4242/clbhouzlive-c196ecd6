@@ -105,9 +105,9 @@ export const TourHubShellTabs: React.FC = () => {
               onClick={(e) => handleTap(tab.id, e.currentTarget)}
               style={{
                 flex: '0 0 auto',
-                height: 28,
-                padding: '0 11px',
-                borderRadius: 14,
+                height: 30,
+                padding: '0 12px',
+                borderRadius: 15,
                 border: isActive ? '1px solid rgba(255,255,255,0.55)' : '1px solid transparent',
                 background: isActive ? 'rgba(255,255,255,0.10)' : 'transparent',
                 color: isActive ? '#FFFFFF' : 'var(--hcp-t-60)',
