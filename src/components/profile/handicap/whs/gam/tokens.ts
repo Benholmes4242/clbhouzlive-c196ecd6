@@ -33,7 +33,7 @@ export const RARITY_PILL: Record<string, { bg: string; fg: string; label: string
  * Dark-mode rarity tokens for surfaces rendered on var(--hcp-bg-0).
  */
 export const RARITY_DARK: Record<
-  'common' | 'uncommon' | 'rare' | 'epic' | 'legendary',
+  'common' | 'uncommon' | 'rare' | 'epic' | 'legendary' | 'platinum',
   {
     iconBg: string;
     iconRing: string;
@@ -117,7 +117,21 @@ export const RARITY_DARK: Record<
       'linear-gradient(135deg, var(--hcp-bg-1) 0%, #151B23 50%, rgba(247,147,30,0.18) 100%)',
     topStripe: 'linear-gradient(90deg, #F7931E 0%, #FBBC2E 50%, #F7931E 100%)',
     glow: 'inset 0 0 0 1px rgba(251,188,46,0.15)',
-    outerGlow: '0 0 40px -8px rgba(247,147,30,0.55)',
+    outerGlow: '0 0 28px -10px rgba(247,147,30,0.32)',
+  },
+  platinum: {
+    iconBg: 'rgba(203,213,225,0.18)',
+    iconRing: 'rgba(229,231,235,0.55)',
+    labelFg: '#E5E7EB',
+    labelBg: 'linear-gradient(90deg, rgba(229,231,235,0.22) 0%, rgba(203,213,225,0.22) 100%)',
+    pillBorder: 'rgba(229,231,235,0.42)',
+    cardBorder: 'rgba(203,213,225,0.38)',
+    cardBg: 'var(--hcp-bg-1)',
+    cardSweep:
+      'linear-gradient(135deg, var(--hcp-bg-1) 0%, #151B23 50%, rgba(229,231,235,0.14) 100%)',
+    topStripe: 'linear-gradient(90deg, #CBD5E1 0%, #F1F5F9 50%, #CBD5E1 100%)',
+    glow: 'inset 0 0 0 1px rgba(229,231,235,0.14)',
+    outerGlow: '0 0 28px -10px rgba(229,231,235,0.30)',
   },
 };
 

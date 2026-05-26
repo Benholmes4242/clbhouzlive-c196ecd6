@@ -80,6 +80,19 @@ export const RARITY_PALETTE: Record<BadgeRarity, RarityPalette> = {
 /** Legend titles always render with the legendary treatment. */
 export const LEGEND_PALETTE = RARITY_PALETTE.legendary;
 
+/** Palette used for earned showpiece achievements (lifetime counters + Top 100). */
+export const PLATINUM_PALETTE: RarityPalette = {
+  color: '#E5E7EB',
+  tint: 'rgba(229,231,235,0.12)',
+  border: 'rgba(229,231,235,0.32)',
+  label: 'SHOWPIECE',
+  heroGradient: 'linear-gradient(160deg, rgba(229,231,235,0.26) 0%, rgba(203,213,225,0.14) 40%, var(--hcp-bg-1) 80%)',
+  cardSweep: RARITY_DARK.platinum.cardSweep,
+  topStripe: RARITY_DARK.platinum.topStripe,
+  outerGlow: RARITY_DARK.platinum.outerGlow,
+  metaColor: RARITY_DARK.platinum.labelFg,
+};
+
 /** Palette used when a card is locked. */
 export const LOCKED_PALETTE: RarityPalette = {
   color: 'rgba(148,163,184,0.55)',
