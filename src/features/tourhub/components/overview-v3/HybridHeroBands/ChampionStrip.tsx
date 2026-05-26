@@ -52,17 +52,19 @@ export function ChampionStrip({
   avatarUrl,
   rounds,
   par,
+  narrative,
 }: ChampionStripProps) {
+  const hasNarrative = !!(narrative && narrative.trim().length > 0);
 
   return (
     <div
       style={{
         background: INK,
-        padding: '10px 20px',
-        minHeight: STRIP_HEIGHT,
+        padding: hasNarrative ? '12px 20px 14px' : '10px 20px',
+        minHeight: hasNarrative ? undefined : STRIP_HEIGHT,
         display: 'flex',
-        alignItems: 'center',
-        gap: 14,
+        flexDirection: 'column',
+        gap: hasNarrative ? 8 : 0,
         borderTop: '0.5px solid rgba(255,255,255,0.06)',
         position: 'relative',
         overflow: 'hidden',
@@ -78,69 +80,88 @@ export function ChampionStrip({
           pointerEvents: 'none',
         }}
       />
-      <PlayerHead size={42} src={avatarUrl} />
-      <div style={{ flex: 1, minWidth: 0, position: 'relative' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 2 }}>
-          <span
-            style={{
-              fontSize: 9,
-              fontWeight: 800,
-              letterSpacing: '0.18em',
-              color: GOLD,
-              textTransform: 'uppercase',
-            }}
-          >
-            {eyebrow}
-          </span>
-          {country && (
+      <div style={{ display: 'flex', alignItems: 'center', gap: 14, position: 'relative' }}>
+        <PlayerHead size={42} src={avatarUrl} />
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 2 }}>
             <span
               style={{
                 fontSize: 9,
-                fontWeight: 600,
-                color: 'rgba(255,255,255,0.50)',
-                letterSpacing: '0.04em',
+                fontWeight: 800,
+                letterSpacing: '0.18em',
+                color: GOLD,
+                textTransform: 'uppercase',
               }}
             >
-              · {country}
+              {eyebrow}
             </span>
-          )}
+            {country && (
+              <span
+                style={{
+                  fontSize: 9,
+                  fontWeight: 600,
+                  color: 'rgba(255,255,255,0.50)',
+                  letterSpacing: '0.04em',
+                }}
+              >
+                · {country}
+              </span>
+            )}
+          </div>
+          <div
+            style={{
+              fontSize: 17,
+              fontWeight: 800,
+              color: 'white',
+              letterSpacing: '-0.01em',
+              whiteSpace: 'nowrap',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              lineHeight: 1.1,
+            }}
+          >
+            {name}
+          </div>
         </div>
-        <div
-          style={{
-            fontSize: 17,
-            fontWeight: 800,
-            color: 'white',
-            letterSpacing: '-0.01em',
-            whiteSpace: 'nowrap',
-            overflow: 'hidden',
-            textOverflow: 'ellipsis',
-            lineHeight: 1.1,
-          }}
-        >
-          {name}
+        {rounds && rounds.length >= 2 && par ? (
+          <div style={{ marginRight: 10, display: 'flex', alignItems: 'center' }}>
+            <TrajectorySparkline rounds={rounds} par={par} variant="champion" totalRounds={4} />
+          </div>
+        ) : null}
+        <div style={{ textAlign: 'right' }}>
+          <div
+            style={{
+              ...NUMERIC_STYLE,
+              fontSize: 26,
+              fontWeight: 300,
+              color: GOLD,
+              letterSpacing: '-0.03em',
+              lineHeight: 1,
+              fontFeatureSettings: '"tnum" 1, "kern" 1',
+            }}
+          >
+            {score}
+          </div>
         </div>
       </div>
-      {rounds && rounds.length >= 2 && par ? (
-        <div style={{ marginRight: 10, position: 'relative', display: 'flex', alignItems: 'center' }}>
-          <TrajectorySparkline rounds={rounds} par={par} variant="champion" totalRounds={4} />
-        </div>
-      ) : null}
-      <div style={{ textAlign: 'right', position: 'relative' }}>
 
+      {hasNarrative && (
         <div
+          aria-label="Tournament narrative"
           style={{
-            ...NUMERIC_STYLE,
-            fontSize: 26,
-            fontWeight: 300,
-            color: GOLD,
-            letterSpacing: '-0.03em',
-            lineHeight: 1,
-            fontFeatureSettings: '"tnum" 1, "kern" 1',
+            position: 'relative',
+            color: 'rgba(255,255,255,0.65)',
+            fontSize: 12,
+            fontWeight: 400,
+            fontStyle: 'italic',
+            lineHeight: 1.4,
+            letterSpacing: '-0.005em',
+            fontFamily: "'Geist', sans-serif",
           }}
         >
-          {score}
+          {narrative}
         </div>
-      </div>
+      )}
     </div>
   );
 }
