@@ -75,6 +75,7 @@ function groupAchievementsByCategory(
 interface Props {
   userId: string;
   viewerUserId?: string;
+  ownerFirstName?: string | null;
 }
 
 type Tab = 'all' | 'earned' | 'locked';
@@ -90,7 +91,10 @@ const TAB_LABEL: Record<Tab, string> = {
   locked: 'Locked',
 };
 
-const Eyebrow: React.FC = () => (
+const Eyebrow: React.FC<{ ownerFirstName?: string | null; isFriendView?: boolean }> = ({
+  ownerFirstName,
+  isFriendView,
+}) => (
   <div
     style={{
       fontSize: 11,
@@ -101,7 +105,9 @@ const Eyebrow: React.FC = () => (
     }}
   >
     <span style={{ color: GAM.AMBER, marginRight: 6 }}>•</span>
-    TROPHY ROOM
+    {isFriendView && ownerFirstName
+      ? `${ownerFirstName.toUpperCase()}'S TROPHY ROOM`
+      : 'TROPHY ROOM'}
   </div>
 );
 
