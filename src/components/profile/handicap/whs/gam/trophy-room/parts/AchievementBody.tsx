@@ -112,7 +112,7 @@ export const AchievementBody: React.FC<Props> = ({ item, viewerUserId }) => {
           <Eyebrow>TIERS</Eyebrow>
           <div>
             {item.tiers.map((t) => (
-              <TierRow key={t.tier} tier={t} metric={item.counterMetric} />
+              <TierRow key={t.tier} tier={t} metric={item.counterMetric} isShowpiece={isShowpiece(item.badgeId)} />
             ))}
           </div>
         </div>
