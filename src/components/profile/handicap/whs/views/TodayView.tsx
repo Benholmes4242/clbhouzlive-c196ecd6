@@ -66,6 +66,7 @@ export const TodayView: React.FC<Props> = ({
       >
         {!readOnly && <TodayGreeting connectionId={connectionId} userId={userId} />}
         <HeroHandicapCardDark connection={connection} />
+        <TrophyRoomEntryRow userId={userId} viewMode={viewMode} ownerFirstName={ownerFirstName} />
       </div>
 
 
