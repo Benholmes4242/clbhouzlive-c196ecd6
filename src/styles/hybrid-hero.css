@@ -46,3 +46,6 @@
   .hybrid-marquee-track,
   .hybrid-live-pulse { animation: none; }
 }
+
+/* AllToursTicker — hide scrollbar on the cards rail (Pass 4). */
+.th-cards-rail::-webkit-scrollbar { display: none; }
