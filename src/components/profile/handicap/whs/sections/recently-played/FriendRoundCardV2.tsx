@@ -198,20 +198,55 @@ export const FriendRoundCardV2: React.FC<Props> = ({
             >
               {displayName(activity.friend_name)}
             </div>
-            <div
-              style={{
-                fontSize: 10.5,
-                fontWeight: 600,
-                color: 'var(--hcp-t-60)',
-                marginTop: 2,
-                lineHeight: 1.15,
-                whiteSpace: 'nowrap',
-                overflow: 'hidden',
-                textOverflow: 'ellipsis',
-              }}
-            >
-              {playedDate}
-            </div>
+            {!courseAboveDate && (
+              <div
+                style={{
+                  fontSize: 10.5,
+                  fontWeight: 600,
+                  color: 'var(--hcp-t-60)',
+                  marginTop: 2,
+                  lineHeight: 1.15,
+                  whiteSpace: 'nowrap',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                }}
+              >
+                {playedDate}
+              </div>
+            )}
+            {courseAboveDate && (
+              <>
+                <div
+                  style={{
+                    fontSize: 11.5,
+                    fontWeight: 700,
+                    color: 'var(--hcp-t-100)',
+                    letterSpacing: '-0.005em',
+                    lineHeight: 1.2,
+                    marginTop: 2,
+                    whiteSpace: 'nowrap',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                  }}
+                >
+                  {courseName}
+                </div>
+                <div
+                  style={{
+                    fontSize: 10.5,
+                    fontWeight: 600,
+                    color: 'var(--hcp-t-60)',
+                    marginTop: 1,
+                    lineHeight: 1.15,
+                    whiteSpace: 'nowrap',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                  }}
+                >
+                  {playedDate}
+                </div>
+              </>
+            )}
           </div>
 
           {isSynced && hcpDelta !== null && Math.abs(hcpDelta) >= 0.05 ? (
