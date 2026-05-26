@@ -81,7 +81,8 @@ const SectionHero: React.FC<{
   titleCount: number;
   window: LegendWindow;
   setWindow: (w: LegendWindow) => void;
-}> = ({ titleCount, window, setWindow }) => (
+  friendName?: string | null;
+}> = ({ titleCount, window, setWindow, friendName = null }) => (
   <div
     style={{
       margin: '0 16px 20px',
@@ -136,8 +137,10 @@ const SectionHero: React.FC<{
         }}
       >
         {titleCount === 0
-          ? 'Your legend starts here'
-          : `You hold ${titleCount} title${titleCount === 1 ? '' : 's'}`}
+          ? (friendName ? `${friendName}'s legend starts here` : 'Your legend starts here')
+          : (friendName
+              ? `${friendName} holds ${titleCount} title${titleCount === 1 ? '' : 's'}`
+              : `You hold ${titleCount} title${titleCount === 1 ? '' : 's'}`)}
       </div>
 
       <div
@@ -149,7 +152,9 @@ const SectionHero: React.FC<{
         }}
       >
         {titleCount === 0
-          ? 'Top the leaderboard at any course to earn your first title'
+          ? (friendName
+              ? `${friendName} needs to top a leaderboard at any course to earn their first title`
+              : 'Top the leaderboard at any course to earn your first title')
           : window === '90d'
             ? 'across rolling 90-day leaderboards'
             : 'across all-time course records'}
@@ -228,7 +233,7 @@ export const CourseLegendsSection: React.FC<Props> = ({
 
   return (
     <section style={{ marginTop: 32 }}>
-      <SectionHero titleCount={titleCount} window={window} setWindow={setWindow} />
+      <SectionHero titleCount={titleCount} window={window} setWindow={setWindow} friendName={friendName} />
 
       {showSearchResults ? (
         <>

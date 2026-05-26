@@ -82,7 +82,7 @@ export const TrendCardsStack: React.FC<Props> = ({ connectionId, userId, current
                   fontFamily: FONT,
                 }}
               >
-                Your Form
+                {possessiveCap} Form
               </span>
             </div>
             <button
@@ -191,7 +191,7 @@ export const TrendCardsStack: React.FC<Props> = ({ connectionId, userId, current
               lineHeight: 1.4,
             }}
           >
-            Your last 5 rounds suggest where your handicap is heading.
+            {possessiveCap} last 5 rounds suggest where {possessiveLower} handicap is heading.
           </p>
 
           {showInfo && (
@@ -230,9 +230,9 @@ export const TrendCardsStack: React.FC<Props> = ({ connectionId, userId, current
         </div>
       ) : (
         <SectionHeader
-          eyebrow="Your Form"
-          title="The numbers behind your handicap"
-          sub="Three signals that explain your trajectory"
+          eyebrow={`${possessiveCap} Form`}
+          title={`The numbers behind ${possessiveLower} handicap`}
+          sub={`Three signals that explain ${possessiveLower} trajectory`}
         />
       ))}
 
