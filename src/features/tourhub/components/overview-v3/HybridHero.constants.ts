@@ -4,15 +4,16 @@
  */
 
 // Layout
-// Pass 4: photo band trimmed 280 → 252 (-10%).
-// Pass 5.5: +22px for optional ChampionStrip narrative line → 528.
-// Total = 252 (photo) + 62 (strip) + 4×40 (rows) + 32 (CTA) + 22 (narrative slack) = 528.
-export const PHOTO_BAND_HEIGHT = 252;
+// Pass 7 — broadcast hero rebuild (results state).
+//   Photo 360 + ResultBand ~180 + TopThreePeek ~155 + SignatureFooter ~36 = 731.
+// Live/upcoming states still flow through the legacy MiddleBand + LeaderboardBand
+// and may need their own height pass later.
+export const PHOTO_BAND_HEIGHT = 360;
 
 export const STRIP_HEIGHT = 62;
 export const ROW_HEIGHT_LEADER = 64;
 export const ROW_HEIGHT_CHASER = 40;
-export const TOTAL_HERO_HEIGHT_TARGET = 528;
+export const TOTAL_HERO_HEIGHT_TARGET = 731;
 
 // Colours (clbhouz Dispatch palette)
 export const INK = '#0F172A';
