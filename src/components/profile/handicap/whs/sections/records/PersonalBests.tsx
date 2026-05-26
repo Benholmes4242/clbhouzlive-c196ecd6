@@ -59,7 +59,6 @@ export const PersonalBests: React.FC<Props> = ({ connectionId, currentHandicap, 
         empty('BEST STABLEFORD'),
         empty('BEST VS HCP'),
         empty('BUSIEST MONTH'),
-        empty('COUNTER STREAK'),
       ];
     }
 
@@ -150,54 +149,7 @@ export const PersonalBests: React.FC<Props> = ({ connectionId, currentHandicap, 
       };
     }
 
-    // #6 Longest counter streak
-    let longestStreak: Tile = empty('COUNTER STREAK');
-    const chrono = [...list].sort(
-      (a, b) => new Date(a.play_date).getTime() - new Date(b.play_date).getTime(),
-    );
-    let bestRun = 0;
-    let bestStartIdx = -1;
-    let bestEndIdx = -1;
-    let curRun = 0;
-    let curStartIdx = -1;
-    for (let i = 0; i < chrono.length; i++) {
-      if (chrono[i].is_counter) {
-        if (curRun === 0) curStartIdx = i;
-        curRun++;
-        if (curRun > bestRun) {
-          bestRun = curRun;
-          bestStartIdx = curStartIdx;
-          bestEndIdx = i;
-        }
-      } else {
-        curRun = 0;
-      }
-    }
-    if (bestRun > 0) {
-      const startDateObj = new Date(chrono[bestStartIdx].play_date);
-      const endDateObj = new Date(chrono[bestEndIdx].play_date);
-      const sameYear = startDateObj.getFullYear() === endDateObj.getFullYear();
-      const fmtWithYear = (d: Date) =>
-        d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
-      const fmtNoYear = (d: Date) =>
-        d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short' });
-      let caption: string;
-      if (bestStartIdx === bestEndIdx) {
-        caption = fmtWithYear(startDateObj);
-      } else if (sameYear) {
-        caption = `${fmtNoYear(startDateObj)} – ${fmtWithYear(endDateObj)}`;
-      } else {
-        caption = `${fmtWithYear(startDateObj)} – ${fmtWithYear(endDateObj)}`;
-      }
-      longestStreak = {
-        eyebrow: 'COUNTER STREAK',
-        value: String(bestRun),
-        unit: 'in a row',
-        caption,
-      };
-    }
-
-    return [bestDiff, bestGross, bestSF, bestVsHcp, mostMonth, longestStreak];
+    return [bestDiff, bestGross, bestSF, bestVsHcp, mostMonth];
   }, [scores, currentHandicap]);
 
   return (
