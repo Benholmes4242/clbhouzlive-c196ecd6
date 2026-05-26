@@ -261,7 +261,11 @@ export function LeaderboardBand({
                   count={slot.count}
                   score={fmtScore(slot.score)}
                   thru="F"
-                  players={slot.members.map((m: any) => ({ avatarUrl: entryAvatar(m) }))}
+                  players={slot.members.map((m: any) => ({
+                    avatarUrl: entryAvatar(m),
+                    rounds: extractRounds(m),
+                  }))}
+                  par={sparklinePar}
                   isLast={isLast}
                   onTap={onCtaTap}
                 />
@@ -276,10 +280,13 @@ export function LeaderboardBand({
                 score={fmtScore(slot.entry.score)}
                 thru="F"
                 avatarUrl={entryAvatar(slot.entry)}
+                rounds={extractRounds(slot.entry)}
+                par={sparklinePar}
                 isResults
                 isLast={isLast}
               />
             );
+
           })}
         </>
       );
