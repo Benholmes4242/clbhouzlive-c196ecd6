@@ -209,7 +209,8 @@ export const PostingAsPill = forwardRef<HTMLButtonElement, PostingAsPillProps>(
         {/* Chevron */}
         <ChevronDown 
           className={cn(
-            "h-3 w-3 flex-shrink-0 transition-transform duration-200",
+            "flex-shrink-0 transition-transform duration-200",
+            compact ? "h-2.5 w-2.5" : "h-3 w-3",
             (useLightTheme && !useGlassTheme) ? "text-muted-foreground" : "text-white/70",
             isOpen && "rotate-180"
           )} 
