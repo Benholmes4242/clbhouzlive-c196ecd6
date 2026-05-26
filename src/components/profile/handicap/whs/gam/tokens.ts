@@ -33,7 +33,7 @@ export const RARITY_PILL: Record<string, { bg: string; fg: string; label: string
  * Dark-mode rarity tokens for surfaces rendered on var(--hcp-bg-0).
  */
 export const RARITY_DARK: Record<
-  'common' | 'uncommon' | 'rare' | 'epic' | 'legendary' | 'platinum',
+  'common' | 'uncommon' | 'rare' | 'epic' | 'legendary' | 'bronze' | 'silver' | 'emerald' | 'diamond' | 'obsidian',
   {
     iconBg: string;
     iconRing: string;
