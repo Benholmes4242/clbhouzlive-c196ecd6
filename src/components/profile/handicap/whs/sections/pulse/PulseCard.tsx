@@ -27,42 +27,25 @@ function colorFromUserId(id: string): string {
   return palette[Math.abs(hash) % palette.length];
 }
 
-const Sparkline: React.FC<{ scores: number[]; pars: number[]; color: string }> = ({
-  scores,
-  pars,
-  color,
-}) => {
-  if (scores.length < 2) {
-    return <div style={{ height: 18 }} />;
+const HcpSparkline: React.FC<{ series: number[]; color: string }> = ({ series, color }) => {
+  const h = 18;
+  if (series.length < 2) {
+    return <div style={{ height: h }} />;
   }
   const w = 110;
-  const h = 18;
-  const avgPar = pars.length > 0 ? pars.reduce((a, b) => a + b, 0) / pars.length : 72;
-  const allVals = [...scores, avgPar];
-  const min = Math.min(...allVals);
-  const max = Math.max(...allVals);
-  const range = Math.max(1, max - min);
-  const ordered = [...scores].reverse(); // oldest left → newest right
-  const points = ordered.map((s, i) => [
-    ordered.length === 1 ? w / 2 : (i / (ordered.length - 1)) * w,
-    h - ((s - min) / range) * h,
+  const min = Math.min(...series);
+  const max = Math.max(...series);
+  const range = Math.max(0.1, max - min);
+  const points = series.map((v, i) => [
+    (i / (series.length - 1)) * w,
+    h - ((v - min) / range) * h,
   ]);
   const path = points
     .map(([x, y], i) => `${i === 0 ? 'M' : 'L'} ${x.toFixed(1)} ${y.toFixed(1)}`)
     .join(' ');
-  const parY = h - ((avgPar - min) / range) * h;
   const lastPoint = points[points.length - 1];
   return (
     <svg width="100%" height={h} viewBox={`0 0 ${w} ${h}`} preserveAspectRatio="none">
-      <line
-        x1={0}
-        x2={w}
-        y1={parY}
-        y2={parY}
-        stroke="var(--hcp-t-40)"
-        strokeWidth={0.6}
-        strokeDasharray="2 2"
-      />
       <path d={path} fill="none" stroke={color} strokeWidth={1.6} strokeLinejoin="round" strokeLinecap="round" />
       <circle cx={lastPoint[0]} cy={lastPoint[1]} r={2} fill={color} />
     </svg>
