@@ -1,5 +1,7 @@
 import React, { useRef, useEffect, useState } from 'react';
 import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
+import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
+import { useAllToursTickerData } from '../hooks/useOverviewModules';
 import type { TourHubTab } from './types';
 
 type TabId = TourHubTab | 'college';
