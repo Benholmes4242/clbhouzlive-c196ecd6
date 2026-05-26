@@ -31,6 +31,26 @@ const toWhsOnlyEntry = (friend: FriendYesterday): FriendLeaderboardEntry => ({
   rounds_last_30d: 0,
 });
 
+/**
+ * Friends-Yesterday card variant gate. Renders the cinematic hero/mini card
+ * when we have a fully enriched, synced clbhouz friend with computed stats.
+ * Otherwise the slim FriendRoundCardV2 invite card is used.
+ */
+const isEnrichedFriend = (f: FriendYesterday): boolean => {
+  const isSyncedClbhouzUser =
+    f.is_clbhouz_user && !!f.user_id && !!f.friend_connection_id;
+  const hasStats = f.stableford !== null && f.differential !== null;
+  return isSyncedClbhouzUser && hasStats;
+};
+
+const variantFor = (
+  f: FriendYesterday,
+): 'clbhouz-synced' | 'clbhouz-not-synced' | 'eg-only' => {
+  if (f.is_clbhouz_user && f.friend_connection_id) return 'clbhouz-synced';
+  if (f.is_clbhouz_user) return 'clbhouz-not-synced';
+  return 'eg-only';
+};
+
 const T = {
   ink: '#0F172A',
   ink55: 'rgba(15,23,42,0.55)',
