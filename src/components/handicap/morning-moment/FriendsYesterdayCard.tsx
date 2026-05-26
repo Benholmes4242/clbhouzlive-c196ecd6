@@ -148,7 +148,7 @@ const FriendsYesterdayCard: React.FC<Props> = ({ data, userId }) => {
       </div>
 
       {/* Hero */}
-      <HeroCard friend={best} onClick={() => handleTap(best)} />
+      <HeroCard friend={best} onClick={() => handleTap(best)} showLowestRound={friends.length > 1} />
 
       {others.length > 0 && (
         <>
