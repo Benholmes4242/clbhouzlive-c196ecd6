@@ -12,6 +12,8 @@ import RecentUnlocksStrip from '../gam/RecentUnlocksStrip';
 import LegendStatusCard from '../../gam/legends/LegendStatusCard';
 import LegendStatusSheetMount from '../../gam/legends/LegendStatusSheetMount';
 import LeaguesCard from '../../gam/leagues/LeaguesCard';
+import StreaksCard from '../../gam/streaks/StreaksCard';
+import { StreaksSheetMount } from '../../gam/streaks/StreaksSheetMount';
 import { LaunchSheetMount } from '../../gam/launch/LaunchSheetMount';
 
 interface Props {
@@ -96,7 +98,11 @@ export const TodayView: React.FC<Props> = ({
       {/* 7. Leagues */}
       {!readOnly && <LeaguesCard />}
 
+      {/* 8. Streaks */}
+      <StreaksCard userId={userId} readOnly={readOnly} />
+
       <LegendStatusSheetMount />
+      {!readOnly && <StreaksSheetMount />}
       <LaunchSheetMount userId={userId} />
     </div>
   );
