@@ -4,6 +4,7 @@ import { GAM } from '../../tokens';
 import { relativeTime } from '@/lib/gam/visuals';
 import { TierRow } from './TierRow';
 import { FriendsBlock } from './FriendsBlock';
+import { isShowpiece } from '../_shared/showpieces';
 import type { TrophyItem } from '../_shared/normalizeTrophyItem';
 
 interface Props {
