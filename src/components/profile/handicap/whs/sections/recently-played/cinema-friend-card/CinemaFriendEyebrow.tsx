@@ -9,9 +9,10 @@ const FONT_GEIST = 'Geist, system-ui, -apple-system, BlinkMacSystemFont, sans-se
 
 interface Props {
   activity: WhsFriendActivityWithImage;
+  showLowestRound?: boolean;
 }
 
-export const CinemaFriendEyebrow: React.FC<Props> = ({ activity }) => {
+export const CinemaFriendEyebrow: React.FC<Props> = ({ activity, showLowestRound }) => {
   const impactDelta =
     activity.is_counter &&
     activity.handicap_index_at_time !== null &&
