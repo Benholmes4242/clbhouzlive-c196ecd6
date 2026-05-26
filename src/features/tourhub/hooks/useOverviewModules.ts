@@ -1171,6 +1171,10 @@ export interface TickerCellData {
   scoreDisplay: string | null;
   /** Days until start (upcoming only). */
   daysUntilStart: number | null;
+  /** Pass 4.5: R2 headshot URL for solo leader. Null for tied/upcoming. */
+  personPhotoUrl: string | null;
+  /** Pass 4.5: venue name for course image lookup via useBatchCourseImages. */
+  venueName: string | null;
 }
 
 export interface TickerData {
