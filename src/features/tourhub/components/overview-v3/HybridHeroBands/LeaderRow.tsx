@@ -192,6 +192,7 @@ interface TiedChasersRowProps {
   players: { avatarUrl?: string | null; rounds?: number[] }[];
   par?: number;
   isLast?: boolean;
+  isResults?: boolean;
   onTap?: () => void;
 }
 
@@ -217,15 +218,17 @@ export function TiedChasersRow({
   players,
   par,
   isLast = false,
+  isResults = false,
   onTap,
 }: TiedChasersRowProps) {
   const avgRounds = averageRounds(players);
+  const hideThru = isResults;
   return (
     <div
       onClick={onTap}
       style={{
         display: 'grid',
-        gridTemplateColumns: '32px 1fr 36px auto 42px',
+        gridTemplateColumns: hideThru ? '32px 1fr 36px auto' : '32px 1fr 36px auto 42px',
         gap: 12,
         padding: '8px 20px',
         height: 40,
@@ -262,16 +265,20 @@ export function TiedChasersRow({
           fontWeight: 700,
           color: INK,
           letterSpacing: '-0.01em',
+          textAlign: 'right',
         }}
       >
         {score}
       </span>
-      <span style={{ fontFamily: FONT_MONO, fontSize: 11, fontWeight: 700, color: INK_45, textAlign: 'right' }}>
-        {thru}
-      </span>
+      {!hideThru && (
+        <span style={{ fontFamily: FONT_MONO, fontSize: 11, fontWeight: 700, color: INK_45, textAlign: 'right' }}>
+          {thru}
+        </span>
+      )}
     </div>
   );
 }
+
 
 
 interface TiedLeadersRowProps {

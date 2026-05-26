@@ -72,11 +72,12 @@ export function ChaserRow({
   rounds,
   par,
 }: ChaserRowProps) {
+  const hideThru = isResults;
   return (
     <div
       style={{
         display: 'grid',
-        gridTemplateColumns: '32px 1fr 36px auto 42px',
+        gridTemplateColumns: hideThru ? '32px 1fr 36px auto' : '32px 1fr 36px auto 42px',
         gap: 12,
         height: 40,
         padding: '8px 20px',
@@ -127,22 +128,26 @@ export function ChaserRow({
           color: isResults ? INK : liveScoreColour(score),
           letterSpacing: '-0.01em',
           fontFeatureSettings: '"tnum" 1, "kern" 1',
+          textAlign: 'right',
         }}
       >
         {score}
       </span>
-      <span
-        style={{
-          fontFamily: FONT_MONO,
-          fontSize: 11,
-          fontWeight: 700,
-          color: INK_45,
-          textAlign: 'right',
-        }}
-      >
-        {thru}
-      </span>
+      {!hideThru && (
+        <span
+          style={{
+            fontFamily: FONT_MONO,
+            fontSize: 11,
+            fontWeight: 700,
+            color: INK_45,
+            textAlign: 'right',
+          }}
+        >
+          {thru}
+        </span>
+      )}
     </div>
   );
 }
+
 
