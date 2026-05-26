@@ -6,6 +6,7 @@
 
 import React from 'react';
 import { INK, GOLD, FONT_MONO, STRIP_HEIGHT } from '../HybridHero.constants';
+import { TrajectorySparkline } from './TrajectorySparkline';
 
 interface ChampionStripProps {
   name: string;
@@ -15,7 +16,12 @@ interface ChampionStripProps {
   eyebrow?: string;
   /** Optional avatar URL — when missing, render a gradient placeholder */
   avatarUrl?: string | null;
+  /** Pass 3: per-round scores for the winner's trajectory sparkline. */
+  rounds?: number[];
+  /** Pass 3: course par used to render the sparkline. */
+  par?: number;
 }
+
 
 function PlayerHead({ size = 42, src }: { size?: number; src?: string | null }) {
   return (
@@ -42,7 +48,10 @@ export function ChampionStrip({
   scoreLabel = 'TO PAR',
   eyebrow = '🏆 CHAMPION',
   avatarUrl,
+  rounds,
+  par,
 }: ChampionStripProps) {
+
   return (
     <div
       style={{

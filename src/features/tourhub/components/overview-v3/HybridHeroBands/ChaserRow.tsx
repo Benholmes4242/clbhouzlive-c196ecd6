@@ -14,6 +14,8 @@ import {
   GREEN_LIVE,
   FONT_MONO,
 } from '../HybridHero.constants';
+import { TrajectorySparkline } from './TrajectorySparkline';
+
 
 function PlayerHead({ size = 28, src }: { size?: number; src?: string | null }) {
   return (
@@ -53,6 +55,9 @@ interface ChaserRowProps {
   avatarUrl?: string | null;
   isResults?: boolean;
   isLast?: boolean;
+  // Pass 3 additions:
+  rounds?: number[];
+  par?: number;
 }
 
 export function ChaserRow({
@@ -64,12 +69,14 @@ export function ChaserRow({
   avatarUrl,
   isResults = false,
   isLast = false,
+  rounds,
+  par,
 }: ChaserRowProps) {
   return (
     <div
       style={{
         display: 'grid',
-        gridTemplateColumns: '32px 1fr auto 42px',
+        gridTemplateColumns: '32px 1fr 36px auto 42px',
         gap: 12,
         height: 40,
         padding: '8px 20px',
@@ -101,12 +108,16 @@ export function ChaserRow({
               whiteSpace: 'nowrap',
               overflow: 'hidden',
               textOverflow: 'ellipsis',
+              minWidth: 0,
             }}
           >
             {name}
           </span>
           {country && <CountryFlag country={country} size="sm" />}
         </div>
+      </div>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-start' }}>
+        <TrajectorySparkline rounds={rounds ?? []} par={par ?? 0} variant="solo" totalRounds={4} />
       </div>
       <span
         style={{
@@ -134,3 +145,4 @@ export function ChaserRow({
     </div>
   );
 }
+
