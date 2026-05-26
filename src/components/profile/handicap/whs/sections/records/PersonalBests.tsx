@@ -124,7 +124,7 @@ export const PersonalBests: React.FC<Props> = ({ connectionId, currentHandicap, 
     }
 
     // #5 Most rounds in a month
-    let mostMonth: Tile = empty('Busiest Month');
+    let mostMonth: Tile = empty('Most Rounds in a Month');
     const monthCounts = new Map<string, number>();
     for (const s of list) {
       if (!s.play_date) continue;
@@ -141,9 +141,8 @@ export const PersonalBests: React.FC<Props> = ({ connectionId, currentHandicap, 
         }
       }
       mostMonth = {
-        eyebrow: 'Busiest Month',
+        eyebrow: 'Most Rounds in a Month',
         value: String(topCount),
-        unit: 'rounds',
         caption: monthLabel(topKey),
       };
     }
