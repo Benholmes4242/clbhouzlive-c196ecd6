@@ -171,7 +171,7 @@ export const PersonalBests: React.FC<Props> = ({ connectionId, currentHandicap, 
             overflow: 'hidden',
           }}
         >
-          {(isLoading ? Array.from({ length: 6 }) : tiles).map((t, i) => (
+          {(isLoading ? Array.from({ length: 5 }) : tiles).map((t, i) => (
             <div
               key={i}
               style={{
@@ -179,7 +179,7 @@ export const PersonalBests: React.FC<Props> = ({ connectionId, currentHandicap, 
                 alignItems: 'center',
                 gap: 12,
                 padding: '9px 14px',
-                borderBottom: i < 5 ? '1px solid rgba(255,255,255,0.04)' : 'none',
+                borderBottom: i < 4 ? '1px solid rgba(255,255,255,0.04)' : 'none',
                 position: 'relative',
               }}
             >
@@ -201,17 +201,16 @@ export const PersonalBests: React.FC<Props> = ({ connectionId, currentHandicap, 
               <div style={{ flex: 1, minWidth: 0 }}>
                 {isLoading ? (
                   <>
-                    <div style={{ height: 9, width: '50%', background: D_BG3, borderRadius: 2, marginBottom: 4 }} />
-                    <div style={{ height: 10, width: '75%', background: D_BG3, borderRadius: 2 }} />
+                    <div style={{ height: 13, width: '50%', background: D_BG3, borderRadius: 2, marginBottom: 4 }} />
+                    <div style={{ height: 10.5, width: '75%', background: D_BG3, borderRadius: 2 }} />
                   </>
                 ) : (
                   <>
                     <div
                       style={{
-                        fontSize: 10,
+                        fontSize: 13,
                         fontWeight: 800,
-                        letterSpacing: '0.14em',
-                        textTransform: 'uppercase',
+                        letterSpacing: '-0.005em',
                         color: 'rgba(247,147,30,0.85)',
                       }}
                     >
