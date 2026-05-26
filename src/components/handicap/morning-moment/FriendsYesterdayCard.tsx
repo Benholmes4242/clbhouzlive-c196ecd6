@@ -7,6 +7,7 @@ import React from 'react';
 import type { FriendYesterday, FriendsYesterdayResult } from '@/lib/handicap/useFriendsYesterday';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { HeroCard, MiniCard } from './friends-yesterday';
+import FriendRoundCardV2 from '@/components/profile/handicap/whs/sections/recently-played/FriendRoundCardV2';
 import RoundDetailSheet from '@/components/profile/handicap/whs/sections/round-detail/RoundDetailSheet';
 import type { WhsFriendActivityWithImage, FriendLeaderboardEntry } from '@/lib/whs/types';
 import { useOpenFriendSheet } from '@/components/friend-sheet/FriendSheetProvider';
