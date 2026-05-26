@@ -461,7 +461,7 @@ const ActionFooter: React.FC<{
 
 // ── State: Normal (worsening / improving / steady) ──────────────────
 
-const NormalCard: React.FC<{ f: Forecast; tone: 'good' | 'amber' | 'neutral' }> = ({ f, tone }) => {
+const NormalCard: React.FC<{ f: Forecast; tone: 'good' | 'amber' | 'neutral'; ctx: CopyCtx }> = ({ f, tone, ctx }) => {
   const isImproving = tone === 'good';
   const isWorsening = tone === 'amber';
 
@@ -476,7 +476,7 @@ const NormalCard: React.FC<{ f: Forecast; tone: 'good' | 'amber' | 'neutral' }> 
       <>
         Heading{' '}
         <strong style={{ color: T.good, fontWeight: 700 }}>down to ~{(f.projected ?? 0).toFixed(1)}</strong>{' '}
-        over your next <strong style={{ color: T.textHi, fontWeight: 700 }}>{f.roundsOut} rounds</strong>
+        over {ctx.possessiveLower} next <strong style={{ color: T.textHi, fontWeight: 700 }}>{f.roundsOut} rounds</strong>
       </>
     );
   } else if (isWorsening) {
@@ -486,7 +486,7 @@ const NormalCard: React.FC<{ f: Forecast; tone: 'good' | 'amber' | 'neutral' }> 
       <>
         Heading{' '}
         <strong style={{ color: T.amber, fontWeight: 700 }}>up to ~{(f.projected ?? 0).toFixed(1)}</strong>{' '}
-        over your next <strong style={{ color: T.textHi, fontWeight: 700 }}>{f.roundsOut} rounds</strong>
+        over {ctx.possessiveLower} next <strong style={{ color: T.textHi, fontWeight: 700 }}>{f.roundsOut} rounds</strong>
       </>
     );
   } else {
@@ -495,8 +495,8 @@ const NormalCard: React.FC<{ f: Forecast; tone: 'good' | 'amber' | 'neutral' }> 
     prose = (
       <>
         <strong style={{ color: T.textHi, fontWeight: 700 }}>Holding steady</strong> around{' '}
-        <strong style={{ color: T.textHi, fontWeight: 700 }}>{(f.current ?? 0).toFixed(1)}</strong> over
-        your next <strong style={{ color: T.textHi, fontWeight: 700 }}>{f.roundsOut} rounds</strong>
+        <strong style={{ color: T.textHi, fontWeight: 700 }}>{(f.current ?? 0).toFixed(1)}</strong> over{' '}
+        {ctx.possessiveLower} next <strong style={{ color: T.textHi, fontWeight: 700 }}>{f.roundsOut} rounds</strong>
       </>
     );
   }
