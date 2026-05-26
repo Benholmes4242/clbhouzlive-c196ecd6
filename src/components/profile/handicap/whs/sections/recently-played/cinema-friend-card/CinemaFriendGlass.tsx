@@ -1,5 +1,6 @@
 import React from 'react';
-import { ChevronRight } from 'lucide-react';
+import { ChevronRight, Lock } from 'lucide-react';
+
 import type { WhsScoreHole } from '@/lib/whs/types';
 import { GlassGrossRing } from '../../shared/GrossCounterRing';
 
@@ -144,34 +145,49 @@ export const CinemaFriendGlass: React.FC<Props> = ({
           </div>
         </div>
         {nonEnriched ? (
-          <button
-            type="button"
-            onClick={(e) => {
-              e.stopPropagation();
-              onInviteClick?.();
-            }}
-            style={{
-              pointerEvents: 'auto',
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: 3,
-              padding: '7px 13px',
-              borderRadius: 999,
-              background: 'rgba(247,147,30,0.18)',
-              border: '0.5px solid rgba(247,147,30,0.45)',
-              color: AMBER,
-              fontSize: 11,
-              fontWeight: 800,
-              letterSpacing: '0.06em',
-              cursor: 'pointer',
-              fontFamily: FONT_GEIST,
-              textTransform: 'uppercase',
-              lineHeight: 1,
-            }}
-          >
-            {inviteLabel}
-            <ChevronRight size={12} strokeWidth={2.2} />
-          </button>
+          <>
+            <div style={{ textAlign: 'center' }}>
+              <div style={labelStyle}>STABLEFORD</div>
+              <div style={{ ...valueStyle('rgba(255,255,255,0.55)'), display: 'flex', justifyContent: 'center', alignItems: 'center', height: 30 }}>
+                <Lock size={18} strokeWidth={2} />
+              </div>
+            </div>
+            <div style={{ textAlign: 'right', display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
+              <div style={labelStyle}>SCORE DIFF</div>
+              <div style={{ ...valueStyle('rgba(255,255,255,0.55)'), display: 'flex', alignItems: 'center', height: 30 }}>
+                <Lock size={18} strokeWidth={2} />
+              </div>
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onInviteClick?.();
+                }}
+                style={{
+                  pointerEvents: 'auto',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 3,
+                  marginTop: 8,
+                  padding: '7px 13px',
+                  borderRadius: 999,
+                  background: 'rgba(247,147,30,0.18)',
+                  border: '0.5px solid rgba(247,147,30,0.45)',
+                  color: AMBER,
+                  fontSize: 11,
+                  fontWeight: 800,
+                  letterSpacing: '0.06em',
+                  cursor: 'pointer',
+                  fontFamily: FONT_GEIST,
+                  textTransform: 'uppercase',
+                  lineHeight: 1,
+                }}
+              >
+                {inviteLabel}
+                <ChevronRight size={12} strokeWidth={2.2} />
+              </button>
+            </div>
+          </>
         ) : (
           <>
             <div style={{ textAlign: 'center' }}>
@@ -186,6 +202,7 @@ export const CinemaFriendGlass: React.FC<Props> = ({
             </div>
           </>
         )}
+
       </div>
     </div>
   );
