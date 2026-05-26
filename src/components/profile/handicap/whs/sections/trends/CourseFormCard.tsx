@@ -609,9 +609,27 @@ const CourseList: React.FC<{ courses: CourseForm[]; view: ViewKey; emptyCopy?: s
   );
 };
 
-export const CourseFormCard: React.FC<Props> = ({ connectionId, currentHandicap, topMargin }) => {
+export const CourseFormCard: React.FC<Props> = ({
+  connectionId,
+  currentHandicap,
+  topMargin,
+  viewMode = 'owner',
+  ownerFirstName = null,
+}) => {
   const { data, isLoading } = useCourseForm(connectionId, currentHandicap);
   const [activeView, setActiveView] = useState<ViewKey>('best');
+
+  const possessiveCap = viewMode === 'friend'
+    ? (ownerFirstName ? `${ownerFirstName}'s` : 'Their')
+    : 'Your';
+  const possessiveLower = viewMode === 'friend'
+    ? (ownerFirstName ? `${ownerFirstName}'s` : 'their')
+    : 'your';
+  const courseTitle = `${possessiveCap} courses ranked`;
+
+  const toughestEmptyCopy = viewMode === 'friend'
+    ? `Need at least ${MIN_ROUNDS_FOR_TOUGHEST} rounds at a course to identify ${possessiveLower} toughest. ${ownerFirstName ?? 'They'} needs to play a few more.`
+    : `Need at least ${MIN_ROUNDS_FOR_TOUGHEST} rounds at a course to identify ${possessiveLower} toughest. Play a few more.`;
 
   const view = VIEWS[activeView];
   const courses = useMemo(() => (data ? view.select(data) : []), [data, view]);
@@ -622,7 +640,7 @@ export const CourseFormCard: React.FC<Props> = ({ connectionId, currentHandicap,
   if (isLoading) {
     return (
       <section style={sectionStyle}>
-        <SectionHeader eyebrow="COURSE FORM" title="Your courses ranked" />
+        <SectionHeader eyebrow="COURSE FORM" title={courseTitle} />
         <div style={{ padding: '0 20px' }}>
           <div
             className="animate-pulse"
@@ -658,7 +676,7 @@ export const CourseFormCard: React.FC<Props> = ({ connectionId, currentHandicap,
       <section style={sectionStyle}>
         <SectionHeader
           eyebrow="COURSE FORM"
-          title="Your courses ranked"
+          title={courseTitle}
         />
         <div style={{ padding: '24px 20px 28px', textAlign: 'center' }}>
           <p style={{ margin: 0, fontSize: 13, fontWeight: 700, color: T.ink, fontFamily: FONT }}>
@@ -674,10 +692,14 @@ export const CourseFormCard: React.FC<Props> = ({ connectionId, currentHandicap,
 
   return (
     <section style={sectionStyle}>
-      <SectionHeader eyebrow="COURSE FORM" title="Your courses ranked" />
+      <SectionHeader eyebrow="COURSE FORM" title={courseTitle} />
       <div style={{ padding: '0 20px' }}>
         <ViewToggle activeView={activeView} onChange={setActiveView} />
-        <CourseList courses={courses} view={activeView} />
+        <CourseList
+          courses={courses}
+          view={activeView}
+          emptyCopy={activeView === 'toughest' ? toughestEmptyCopy : undefined}
+        />
         {courses.length > 0 && (() => {
           const top = courses[0];
           const sign = top.delta < 0 ? 'under' : 'over';
@@ -692,11 +714,15 @@ export const CourseFormCard: React.FC<Props> = ({ connectionId, currentHandicap,
           const verbAndAfter = lowConfidence ? (
             <>
               {' '}leads on a single round — small sample.{' '}
-              <span style={{ color: T.inkMute }}>Play it again to confirm.</span>
+              <span style={{ color: T.inkMute }}>
+                {viewMode === 'friend'
+                  ? `${ownerFirstName ? `${ownerFirstName} needs to play` : 'They need to play'} it again to confirm.`
+                  : 'Play it again to confirm.'}
+              </span>
             </>
           ) : (
             <>
-              {' '}is your {role}.{' '}
+              {' '}is {possessiveLower} {role}.{' '}
               <span style={{ fontVariantNumeric: 'tabular-nums' }}>
                 {sign === 'over' ? '+' : '\u2212'}{deltaAbs}
               </span>{' '}
