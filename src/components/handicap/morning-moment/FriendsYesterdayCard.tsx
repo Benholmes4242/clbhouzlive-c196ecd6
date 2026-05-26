@@ -138,8 +138,13 @@ const FriendsYesterdayCard: React.FC<Props> = ({ data, userId }) => {
   }
   if (friends.length === 0) return null;
 
-  const best = friends[0];
-  const others = friends.slice(1);
+  // Enriched first (hero + mini scroller), unsynced second (slim invite stack).
+  // Preserves order from data.friends within each group.
+  const enrichedFriends = friends.filter(isEnrichedFriend);
+  const unsyncedFriends = friends.filter((f) => !isEnrichedFriend(f));
+
+  const best = enrichedFriends[0] ?? null;
+  const others = enrichedFriends.slice(1);
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', fontFamily: FONT }}>
@@ -168,8 +173,14 @@ const FriendsYesterdayCard: React.FC<Props> = ({ data, userId }) => {
         </span>
       </div>
 
-      {/* Hero */}
-      <HeroCard friend={best} onClick={() => handleTap(best)} showLowestRound={friends.length > 1} />
+      {/* Hero — only when an enriched/synced friend exists */}
+      {best && (
+        <HeroCard
+          friend={best}
+          onClick={() => handleTap(best)}
+          showLowestRound={enrichedFriends.length > 1}
+        />
+      )}
 
       {others.length > 0 && (
         <>
@@ -195,6 +206,32 @@ const FriendsYesterdayCard: React.FC<Props> = ({ data, userId }) => {
                 friend={f}
                 rank={i + 2}
                 onClick={() => handleTap(f)}
+              />
+            ))}
+          </div>
+        </>
+      )}
+
+      {/* Unsynced — slim invite stack via FriendRoundCardV2 (no EG badge,
+          course above date — Friends Yesterday context tweaks) */}
+      {unsyncedFriends.length > 0 && (
+        <>
+          <div style={{ height: enrichedFriends.length > 0 ? 12 : 0 }} />
+          <div style={{ marginLeft: -16, marginRight: -16 }}>
+            {unsyncedFriends.map((f, i) => (
+              <FriendRoundCardV2
+                key={`unsynced-${f.user_id ?? f.friend_passport_id ?? i}`}
+                activity={toSheetActivity(f)}
+                variant={variantFor(f)}
+                hideEgBadge
+                courseAboveDate
+                onClick={() => handleTap(f)}
+                onInviteClick={() =>
+                  openFriendSheet({
+                    whsOnlyEntry: toWhsOnlyEntry(f),
+                    source: 'morning_moment',
+                  })
+                }
               />
             ))}
           </div>
