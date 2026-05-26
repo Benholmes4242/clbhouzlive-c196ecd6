@@ -210,7 +210,7 @@ export const RecentRoundsCard: React.FC<Props> = ({ connectionId, viewMode = 'ow
       {isLoading ? (
         <SkeletonStack />
       ) : rounds.length === 0 ? (
-        <EmptyState />
+        <EmptyState viewMode={viewMode} ownerFirstName={ownerFirstName} />
       ) : visibleRounds.length === 0 ? (
         <FilteredEmptyState />
       ) : (
@@ -737,23 +737,31 @@ const SkeletonStack: React.FC = () => (
 );
 
 // ─── Empty states ───────────────────────────────────────────────────
-const EmptyState: React.FC = () => (
-  <div
-    style={{
-      marginTop: 24,
-      padding: '28px 16px',
-      textAlign: 'center',
-    }}
-  >
-    <div style={{ fontSize: 14, fontWeight: 800, color: T.ink, marginBottom: 6 }}>
-      No rounds yet
+const EmptyState: React.FC<{ viewMode?: 'owner' | 'friend'; ownerFirstName?: string | null }> = ({
+  viewMode = 'owner',
+  ownerFirstName = null,
+}) => {
+  const isFriend = viewMode === 'friend';
+  const body = isFriend
+    ? `${ownerFirstName ? `${ownerFirstName}'s` : 'Their'} rounds will appear here once they sync from England Golf.`
+    : 'Your rounds will appear here as soon as they sync from your handicap provider.';
+  return (
+    <div
+      style={{
+        marginTop: 24,
+        padding: '28px 16px',
+        textAlign: 'center',
+      }}
+    >
+      <div style={{ fontSize: 14, fontWeight: 800, color: T.ink, marginBottom: 6 }}>
+        No rounds yet
+      </div>
+      <div style={{ fontSize: 12, color: T.inkMute, lineHeight: 1.5 }}>
+        {body}
+      </div>
     </div>
-    <div style={{ fontSize: 12, color: T.inkMute, lineHeight: 1.5 }}>
-      Your rounds will appear here as soon as they sync from your handicap
-      provider.
-    </div>
-  </div>
-);
+  );
+};
 
 const FilteredEmptyState: React.FC = () => (
   <div

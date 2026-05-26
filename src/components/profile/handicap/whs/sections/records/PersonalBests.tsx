@@ -206,7 +206,7 @@ export const PersonalBests: React.FC<Props> = ({ connectionId, currentHandicap, 
         eyebrow="PERSONAL BESTS"
         title={
           viewMode === 'friend'
-            ? `${ownerFirstName ? `${ownerFirstName}'s` : 'Their'} records to chase`
+            ? `${ownerFirstName ? `${ownerFirstName}'s` : 'Their'} records to break`
             : 'Records to break'
         }
       />
