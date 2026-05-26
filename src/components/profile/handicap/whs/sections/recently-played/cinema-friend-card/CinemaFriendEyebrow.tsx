@@ -105,7 +105,32 @@ export const CinemaFriendEyebrow: React.FC<Props> = ({ activity, showLowestRound
         </div>
       </div>
 
-      <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexShrink: 0 }}>
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 4, flexShrink: 0 }}>
+        {showLowestRound && (
+          <span
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 4,
+              padding: '4px 9px',
+              borderRadius: 999,
+              fontSize: 11,
+              fontWeight: 700,
+              letterSpacing: '0.08em',
+              textTransform: 'uppercase',
+              backdropFilter: 'blur(20px)',
+              WebkitBackdropFilter: 'blur(20px)',
+              background: 'rgba(247,147,30,0.20)',
+              border: '0.5px solid rgba(247,147,30,0.55)',
+              color: '#FDBA74',
+              flexShrink: 0,
+              textShadow: '0 1px 2px rgba(0,0,0,0.3)',
+            }}
+          >
+            <span style={{ fontSize: 9, fontWeight: 700, letterSpacing: '0.10em' }}>★</span>
+            Lowest Round
+          </span>
+        )}
         {showImpact && (
           <span
             style={{
