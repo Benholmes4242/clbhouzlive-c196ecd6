@@ -22,7 +22,9 @@ function bus<T = void>() {
 export const allStreaksBus = bus<void>();
 export const notificationsBus = bus<void>();
 export const gamAchievementsBus = bus<{ badgeId?: string } | undefined>();
+export const leaguesSheetBus = bus<void>();
 
 export const openAllStreaks = () => allStreaksBus.emit();
 export const openNotifications = () => notificationsBus.emit();
 export const openGamAchievements = (badgeId?: string) => gamAchievementsBus.emit(badgeId ? { badgeId } : undefined);
+export const openLeaguesSheet = () => leaguesSheetBus.emit();
