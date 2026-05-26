@@ -215,3 +215,44 @@ export function buildLeaderboardSlots(chasers: any[], maxSlots = 4): ChaserSlot[
   return slots;
 }
 
+// ---------- Trajectory sparkline helpers (Pass 3) --------------------------
+
+/**
+ * Extract clean round scores from a leaderboard entry.
+ * Returns only completed rounds (non-null, > 0).
+ */
+export function extractRounds(entry: any): number[] {
+  const r1 = entry?.round_1;
+  const r2 = entry?.round_2;
+  const r3 = entry?.round_3;
+  const r4 = entry?.round_4;
+  return [r1, r2, r3, r4].filter((v): v is number => typeof v === 'number' && v > 0);
+}
+
+/**
+ * Classify a player's tournament arc for sparkline colour selection.
+ *
+ * - 'climbed': finished better than the trend predicted (late-tournament surge)
+ * - 'faded':   finished worse than the trend predicted (Sunday collapse)
+ * - 'steady':  finished close to the trend (no story)
+ *
+ * Method: compare final round to mean of prior rounds, both relative to par.
+ * Threshold: ±1.5 strokes from trend.
+ */
+export function classifyTrajectory(
+  rounds: number[],
+  par: number
+): 'climbed' | 'steady' | 'faded' {
+  if (rounds.length < 3 || !par) return 'steady';
+  const rel = rounds.map(r => r - par);
+  const n = rel.length;
+  const finalRound = rel[n - 1];
+  const priorRounds = rel.slice(0, n - 1);
+  const priorAvg = priorRounds.reduce((a, b) => a + b, 0) / priorRounds.length;
+  const delta = finalRound - priorAvg;
+  if (delta <= -1.5) return 'climbed';
+  if (delta >= 1.5) return 'faded';
+  return 'steady';
+}
+
+
