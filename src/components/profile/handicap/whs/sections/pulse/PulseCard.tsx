@@ -169,13 +169,13 @@ export const PulseCard: React.FC<Props> = ({ friend }) => {
       </div>
 
       <div style={{ marginTop: 2 }}>
-        <Sparkline scores={friend.last_5_scores} pars={friend.last_5_pars} color={lineColor} />
+        <HcpSparkline series={friend.hcp_series} color={lineColor} />
       </div>
 
       <div
         style={{
           display: 'flex',
-          alignItems: 'baseline',
+          alignItems: 'flex-end',
           justifyContent: 'space-between',
           gap: 6,
           marginTop: 2,
@@ -195,18 +195,38 @@ export const PulseCard: React.FC<Props> = ({ friend }) => {
         {friend.delta90 != null && (
           <div
             style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: 2,
-              fontSize: 10,
-              fontWeight: 700,
-              color: deltaColor,
-              fontVariantNumeric: 'tabular-nums',
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'flex-end',
+              gap: 1,
+              lineHeight: 1,
             }}
           >
-            {isUp && <ArrowUp size={9} strokeWidth={2.5} />}
-            {isDown && <ArrowDown size={9} strokeWidth={2.5} />}
-            {friend.delta90 === 0 ? '—' : Math.abs(friend.delta90).toFixed(1)}
+            <span
+              style={{
+                fontSize: 11,
+                fontWeight: 800,
+                color: deltaColor,
+                fontVariantNumeric: 'tabular-nums',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 2,
+              }}
+            >
+              {isUp && <ArrowUp size={9} strokeWidth={3} />}
+              {isDown && <ArrowDown size={9} strokeWidth={3} />}
+              {isFlat ? '—' : Math.abs(friend.delta90).toFixed(1)}
+            </span>
+            <span
+              style={{
+                fontSize: 8,
+                fontWeight: 700,
+                color: 'var(--hcp-t-60)',
+                letterSpacing: '0.10em',
+              }}
+            >
+              90D
+            </span>
           </div>
         )}
       </div>
