@@ -182,36 +182,32 @@ export function useHeadToHeadStats(
       const meGam = gam.filter((r) => r.user_id === viewerId);
       const themGam = gam.filter((r) => r.user_id === rivalUserId);
 
-      // 4. Handicap snapshots for both connections (single query)
-      const connIds = [viewerConnectionId, rivalConnectionId].filter(
-        Boolean,
-      ) as string[];
-      const { data: snapRows } = await supabase
-        .from('whs_handicap_snapshots' as any)
-        .select('connection_id, observed_at, handicap_index')
-        .in('connection_id', connIds)
-        .order('observed_at', { ascending: true });
-      const snaps = (snapRows as unknown as SnapRow[]) ?? [];
+      // 4. Handicap history (snapshots ∪ score-derived) for both connections
+      const [meHistory, themHistory] = await Promise.all([
+        fetchHandicapHistory(viewerConnectionId, 'all'),
+        rivalConnectionId
+          ? fetchHandicapHistory(rivalConnectionId, 'all')
+          : Promise.resolve([] as Awaited<ReturnType<typeof fetchHandicapHistory>>),
+      ]);
 
-      const latestForConn = (id: string | undefined): number | null => {
-        if (!id) return null;
-        const filtered = snaps.filter((r) => r.connection_id === id);
-        if (filtered.length === 0) return null;
-        const v = Number(filtered[filtered.length - 1].handicap_index);
-        return Number.isFinite(v) ? v : null;
-      };
+      const meCurrent =
+        meHistory.length > 0
+          ? (() => {
+              const v = Number(meHistory[meHistory.length - 1].handicap_index);
+              return Number.isFinite(v) ? v : null;
+            })()
+          : null;
+      const themCurrent =
+        themHistory.length > 0
+          ? (() => {
+              const v = Number(themHistory[themHistory.length - 1].handicap_index);
+              return Number.isFinite(v) ? v : null;
+            })()
+          : null;
 
-      const meCurrent = latestForConn(viewerConnectionId);
-      const themCurrent = latestForConn(rivalConnectionId);
+      const meDelta = compute90dDeltaFromHistory(meHistory, meCurrent);
+      const themDelta = compute90dDeltaFromHistory(themHistory, themCurrent);
 
-      const meDelta = compute90dDelta(
-        snaps.filter((r) => r.connection_id === viewerConnectionId),
-        meCurrent,
-      );
-      const themDelta = compute90dDelta(
-        snaps.filter((r) => r.connection_id === rivalConnectionId),
-        themCurrent,
-      );
 
       // ── Compose ─────────────────────────────────────────────────────
       const me: PlayerStats = emptyPlayer();
