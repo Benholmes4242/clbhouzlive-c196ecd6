@@ -80,15 +80,20 @@ export const RivalryHeroCard: React.FC<Props> = ({
 
   const tierLabel = TIER_BADGE_LABEL[tier];
 
-  const handleCardClick = (e: React.MouseEvent) => {
-    // Allow inner controls to stopPropagation
-    if (e.defaultPrevented) return;
-    onTap();
-  };
+  const tappable = typeof onTap === 'function';
+  const handleCardClick = tappable
+    ? (e: React.MouseEvent) => {
+        // Allow inner controls to stopPropagation
+        if (e.defaultPrevented) return;
+        onTap!();
+      }
+    : undefined;
+
+  const Tag: any = tappable ? 'button' : 'div';
 
   return (
-    <button
-      type="button"
+    <Tag
+      {...(tappable ? { type: 'button' as const } : {})}
       onClick={handleCardClick}
       style={{
         flex: '0 0 100%',
@@ -104,19 +109,20 @@ export const RivalryHeroCard: React.FC<Props> = ({
         color: 'var(--hcp-t-100)',
         padding: 0,
         textAlign: 'left',
-        cursor: 'pointer',
+        cursor: tappable ? 'pointer' : 'default',
         transition: 'transform 140ms cubic-bezier(0.4, 0, 0.2, 1)',
       }}
-      onMouseDown={(e) => {
-        (e.currentTarget as HTMLButtonElement).style.transform = 'scale(0.98)';
-      }}
-      onMouseUp={(e) => {
-        (e.currentTarget as HTMLButtonElement).style.transform = 'scale(1)';
-      }}
-      onMouseLeave={(e) => {
-        (e.currentTarget as HTMLButtonElement).style.transform = 'scale(1)';
-      }}
+      onMouseDown={tappable ? (e: React.MouseEvent) => {
+        (e.currentTarget as HTMLElement).style.transform = 'scale(0.98)';
+      } : undefined}
+      onMouseUp={tappable ? (e: React.MouseEvent) => {
+        (e.currentTarget as HTMLElement).style.transform = 'scale(1)';
+      } : undefined}
+      onMouseLeave={tappable ? (e: React.MouseEvent) => {
+        (e.currentTarget as HTMLElement).style.transform = 'scale(1)';
+      } : undefined}
     >
+
       {/* Hero portrait */}
       <div style={{ position: 'relative' }}>
         <HeroPortrait
