@@ -143,6 +143,7 @@ const FriendViewRivalries: React.FC<{
 }> = ({ viewerUserId, ownerUserId }) => {
   const { data, isLoading } = useFriendViewRivalriesForProfile(viewerUserId, ownerUserId);
   const { data: ownerLeaderboard } = useFriendLeaderboard(ownerUserId);
+  const { data: viewerRivalries = [] } = useFriendRivalries(viewerUserId);
 
   const ownerRow = useMemo(
     () => ownerLeaderboard?.find((e) => e.is_self) ?? null,
@@ -163,6 +164,27 @@ const FriendViewRivalries: React.FC<{
   const { hero, compact } = useMemo(
     () => splitByTier(all, tiers),
     [all, tiers],
+  );
+
+  const primaryKey = primary ? rivalKey(primary) : null;
+
+  const viewerKnownRivalKeys = useMemo(() => {
+    const s = new Set<string>();
+    for (const r of viewerRivalries) {
+      const k = rivalKey(r);
+      if (k && (r.shared_rounds_count ?? 0) > 0) s.add(k);
+    }
+    return s;
+  }, [viewerRivalries]);
+
+  const isTapDisabled = useCallback(
+    (r: FriendRivalryHydrated) => {
+      const k = rivalKey(r);
+      if (!k) return true;
+      if (primaryKey && k === primaryKey) return false; // primary always tappable
+      return !viewerKnownRivalKeys.has(k);
+    },
+    [primaryKey, viewerKnownRivalKeys],
   );
 
   const ownerFirst = useMemo(() => {
@@ -194,11 +216,13 @@ const FriendViewRivalries: React.FC<{
           hero={hero}
           compact={compact}
           friendViewOwnerId={ownerUserId}
+          isTapDisabled={isTapDisabled}
         />
       )}
     </section>
   );
 };
+
 
 // ─── Tier-aware renderer (hero pager + slim list) ──────────────────────────
 const TieredRivalries: React.FC<{
