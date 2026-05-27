@@ -73,9 +73,9 @@ export function PlayerProfilePage() {
   if (playerLoading) {
     return (
       <TourHubShell>
-        <ShellSlot>
+        <ShellSlot dark>
           <div style={SHELL_SLOT_BG}>
-            <Kicker>Player</Kicker>
+            <Kicker color="amber">Player</Kicker>
             <Skeleton className="h-5 w-40" style={{ background: 'rgba(15,23,42,0.06)' }} />
           </div>
         </ShellSlot>
