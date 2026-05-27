@@ -46,7 +46,7 @@ function CollegeShellRowInner() {
         role="tablist"
         aria-label="College Franchise metric"
         className="flex justify-center gap-1.5"
-        style={{ padding: '8.5px 16px' }}
+        style={{ padding: '7px 16px' }}
       >
         {METRICS.map((m) => {
           const isActive = activeMetric === m.id;
