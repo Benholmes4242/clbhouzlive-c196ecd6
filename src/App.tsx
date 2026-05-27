@@ -289,8 +289,8 @@ function AppRoutes() {
 
   // Keep-alive routes configuration - these routes stay mounted when navigating away
   const keepAliveRoutes = useMemo(() => [
-    { path: '/', element: <Suspense fallback={<GenericPageSkeleton />}><HomeLanding /></Suspense> },
-    { path: '/clubhouse', element: <ClubhouseWrapped /> },
+    { path: '/', element: <ClubhouseWrapped /> },
+    { path: '/clubhouse', element: <Navigate to="/" replace /> },
   ], []);
 
   return (
