@@ -25,7 +25,7 @@ export const SeeFullFooter: React.FC<Props> = ({ hiddenCount, onClick }) => {
         border: '1px solid var(--hcp-line)',
         borderRadius: 12,
         cursor: 'pointer',
-        color: '#F7931E',
+        color: 'var(--hcp-accent-util)',
         fontSize: 11.5,
         fontWeight: 700,
         letterSpacing: '0.04em',
