@@ -15,7 +15,7 @@ import { PostingAsPill } from '@/components/header/PostingAsPill';
 import { PostingAsMenu } from '@/components/header/PostingAsMenu';
 import GlobalSearchOverlay from '@/components/search/GlobalSearchOverlay';
 import { ClubhouseTabToggle, type ClubhouseTab } from '@/components/clubhouse/ClubhouseTabToggle';
-import { HandicapPill } from '@/components/clubhouse/HandicapPill';
+import { HandicapChip } from '@/components/header/HandicapChip';
 import { useUnreadNotifications } from '@/hooks/useUnreadNotifications';
 import type { User } from '@supabase/supabase-js';
 
@@ -129,9 +129,7 @@ export const ClubhouseTopBar: React.FC<ClubhouseTopBarProps> = ({
               </button>
             )}
 
-            {!hideProfilePill && user && (
-              <HandicapPill onTap={() => navigate('/handicap')} />
-            )}
+            {!hideProfilePill && user && <HandicapChip />}
 
             {!hideProfilePill && user && (
               <PostingAsPill
