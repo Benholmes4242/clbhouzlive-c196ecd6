@@ -20,9 +20,9 @@ export const useNavigationHandlers = () => {
     const currentTab = navigationTabs.find(tab => tab.path === location.pathname);
     if (currentTab) {
       setActiveTab(currentTab.id);
-    } else if (location.pathname === '/' || location.pathname === '/clubhouse') {
+    } else if (location.pathname === '/clubhouse') {
       setActiveTab('clubhouse');
-    } else if (location.pathname.startsWith('/tourhub')) {
+    } else if (location.pathname === '/' || location.pathname.startsWith('/tourhub')) {
       setActiveTab('tourhub');
     } else if (location.pathname === '/map' || location.pathname.startsWith('/courses')) {
   setActiveTab('courses');
