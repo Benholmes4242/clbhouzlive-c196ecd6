@@ -71,6 +71,38 @@ const UNITS: Record<LegendCategory, string> = {
   most_aces_all_time:       '',
 };
 
+const UNIT_LABELS: Record<LegendCategory, string> = {
+  best_score_diff_90d:      'vs hcp',
+  best_score_diff_all_time: 'vs hcp',
+  lowest_gross_90d:         'Gross',
+  lowest_gross_all_time:    'Gross',
+  most_birdies_90d:         'Birdies',
+  most_birdies_all_time:    'Birdies',
+  best_stableford_90d:      'Pts',
+  best_stableford_all_time: 'Pts',
+  most_eagles_90d:          'Eagles',
+  most_eagles_all_time:     'Eagles',
+  most_aces_90d:            'Aces',
+  most_aces_all_time:       'Aces',
+};
+
+function formatHeldDuration(attainedAtIso: string): string {
+  const attainedAt = new Date(attainedAtIso);
+  if (isNaN(attainedAt.getTime())) return '—';
+  const diffMs = Date.now() - attainedAt.getTime();
+  if (diffMs < 0) return '—';
+  const days = Math.floor(diffMs / 86400000);
+  if (days === 0) return 'today';
+  if (days === 1) return '1d';
+  if (days < 7) return `${days}d`;
+  const weeks = Math.floor(days / 7);
+  if (weeks < 5) return `${weeks}w`;
+  const months = Math.floor(days / 30);
+  if (months < 12) return `${months}mo`;
+  const years = Math.floor(days / 365);
+  return `${years}y`;
+}
+
 interface SectionRow {
   rank: number;
   name: string;
