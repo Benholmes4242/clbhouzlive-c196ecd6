@@ -57,10 +57,12 @@ export const RivalryCompactCard: React.FC<Props> = ({ rivalry, tier, onTap }) =>
 
   const stripeColor = state === 'winning' ? '#F7931E' : state === 'losing' ? '#EF4444' : null;
 
+  const tappable = typeof onTap === 'function';
+  const Tag: any = tappable ? 'button' : 'div';
+
   return (
-    <button
-      type="button"
-      onClick={onTap}
+    <Tag
+      {...(tappable ? { type: 'button' as const, onClick: onTap } : {})}
       style={{
         position: 'relative',
         display: 'block',
@@ -72,9 +74,10 @@ export const RivalryCompactCard: React.FC<Props> = ({ rivalry, tier, onTap }) =>
         background: 'var(--hcp-bg-1)',
         fontFamily: FONT_GEIST,
         padding: 0,
-        cursor: 'pointer',
+        cursor: tappable ? 'pointer' : 'default',
       }}
     >
+
       {stripeColor && (
         <div
           aria-hidden
