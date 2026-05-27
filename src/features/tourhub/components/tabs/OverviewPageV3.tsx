@@ -29,6 +29,7 @@ import { StatOfTheWeek } from '../StatOfTheWeek';
 import { HomeCourseOfWeekModule } from '../home/HomeCourseOfWeekModule';
 import { HomeWatchRail } from '../home/HomeWatchRail';
 import { HomeConnectHandicapModule } from '../home/HomeConnectHandicapModule';
+import { DispatchModule } from '../overview-v3/DispatchModule';
 import { AcrossTheToursModule } from '../overview-v3/AcrossTheToursModule';
 import { useAllToursTickerData } from '../../hooks/useOverviewModules';
 import { useNetworkStatus } from '@/hooks/useNetworkStatus';
