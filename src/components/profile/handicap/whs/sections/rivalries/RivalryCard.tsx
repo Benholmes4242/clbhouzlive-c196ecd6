@@ -17,6 +17,8 @@ interface Props {
   portraitVariant?: 'hero' | 'mixed';
   dimension?: RivalryDimension;
   friendViewOwnerId?: string;
+  /** When true, the card renders as an informational tile with no tap affordance. */
+  disableTap?: boolean;
   /** Legacy/unused props preserved for compatibility with section callers. */
   userName?: string | null;
   userThumbnailUrl?: string | null;
@@ -26,15 +28,17 @@ interface Props {
 
 export const RivalryCard: React.FC<Props> = (props) => {
   const navigate = useNavigate();
-  const handleNavigate = () => {
-    const key = rivalKey(props.rivalry);
-    if (!key) return;
-    if (props.friendViewOwnerId) {
-      navigate(`/handicap/${props.friendViewOwnerId}/rivalry/${key}`);
-    } else {
-      navigate(`/handicap/rivalry/${key}`);
-    }
-  };
+  const handleNavigate = props.disableTap
+    ? undefined
+    : () => {
+        const key = rivalKey(props.rivalry);
+        if (!key) return;
+        if (props.friendViewOwnerId) {
+          navigate(`/handicap/${props.friendViewOwnerId}/rivalry/${key}`);
+        } else {
+          navigate(`/handicap/rivalry/${key}`);
+        }
+      };
 
   switch (props.variant) {
     case 'hero':
@@ -59,5 +63,6 @@ export const RivalryCard: React.FC<Props> = (props) => {
       );
   }
 };
+
 
 export default RivalryCard;
