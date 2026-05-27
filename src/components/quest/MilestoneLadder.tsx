@@ -426,7 +426,7 @@ export const MilestoneLadder: React.FC<MilestoneLadderProps> = ({
         description="Log your first Top 100 course to start climbing the milestone ladder"
         action={{
           label: "Explore Courses",
-          onClick: () => navigate('/top100'),
+          onClick: () => navigate('/courses?tab=top100'),
         }}
       />
     );

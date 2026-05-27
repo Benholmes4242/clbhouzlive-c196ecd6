@@ -40,7 +40,7 @@ export function ClosestGoalsCarousel({
       icon: Trophy,
       label: `${coursesNeeded} more to ${nextClub.tierName}`,
       progress: `${totalPlayed}/${nextClub.threshold}`,
-      action: () => navigate('/top100?tab=my-progress'),
+      action: () => navigate('/courses?tab=top100'),
     });
   }
 
@@ -64,7 +64,7 @@ export function ClosestGoalsCarousel({
       icon: Globe,
       label: `${remaining} more ${regionProgress.region} courses`,
       progress: `${regionProgress.current}/${regionProgress.total}`,
-      action: () => navigate(`/top100?tab=courses&list=${regionProgress.region.toLowerCase()}`),
+      action: () => navigate(`/top100/${regionProgress.region.toLowerCase()}`),
     });
   }
 

@@ -16,7 +16,7 @@ const FriendsCourses = () => {
         <p className="text-muted-foreground mb-6">
           Discover the world's greatest golf courses and follow the community's journey through the Top 100.
         </p>
-          <Button onClick={() => navigate('/top100')} className="w-full">
+          <Button onClick={() => navigate('/courses?tab=top100')} className="w-full">
             <Globe className="h-4 w-4 mr-2" />
             Visit Global Top 100
         </Button>

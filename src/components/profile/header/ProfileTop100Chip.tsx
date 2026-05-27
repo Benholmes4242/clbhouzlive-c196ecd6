@@ -52,7 +52,7 @@ const ProfileTop100Chip: React.FC<ProfileTop100ChipProps> = ({
     <section className="mt-8 flex flex-col items-center">
       <button
         type="button"
-        onClick={() => navigate('/top100?tab=my-progress')}
+        onClick={() => navigate('/courses?tab=top100')}
         className={cn(
           'relative flex items-center justify-center',
           'transition-all duration-200 ease-out',

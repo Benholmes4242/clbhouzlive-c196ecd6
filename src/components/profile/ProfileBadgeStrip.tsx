@@ -126,7 +126,7 @@ const ProfileBadgeStrip: React.FC<ProfileBadgeStripProps> = ({
 
   const handleBadgeClick = (badge: any) => {
     if (badge.type === 'milestone' || badge.type === 'xp') {
-      navigate('/top100?tab=my-progress');
+      navigate('/courses?tab=top100');
     } else if (badge.type === 'regional' && badge.slug) {
       navigate(`/top100/${badge.slug}`);
     }

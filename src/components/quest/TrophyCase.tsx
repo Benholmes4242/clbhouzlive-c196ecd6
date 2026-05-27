@@ -180,7 +180,7 @@ export const TrophyCase: React.FC<TrophyCaseProps> = ({
               description="Play Top 100 courses to unlock achievement badges"
               action={{
                 label: "Explore Courses",
-                onClick: () => navigate('/top100'),
+                onClick: () => navigate('/courses?tab=top100'),
               }}
             />
           ) : (

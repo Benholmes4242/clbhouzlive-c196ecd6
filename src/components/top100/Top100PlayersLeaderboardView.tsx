@@ -285,7 +285,7 @@ export function Top100PlayersLeaderboardView({ filters }: Top100PlayersLeaderboa
       {me && (
         <button
           type="button"
-          onClick={() => navigate('/top100?tab=my-progress')}
+          onClick={() => navigate('/courses?tab=top100')}
           className="w-full px-4 py-4 flex items-center justify-between gap-3 active:scale-[0.99] transition-all"
         >
           <div className="flex items-center gap-3">

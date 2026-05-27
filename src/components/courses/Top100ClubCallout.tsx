@@ -19,9 +19,9 @@ const Top100ClubCallout: React.FC = () => {
 
   const handleClick = () => {
     if (session) {
-      navigate('/top100?tab=my-progress');
+      navigate('/courses?tab=top100');
     } else {
-      navigate('/auth?redirect=/top100?tab=my-progress');
+      navigate('/auth?redirect=/courses?tab=top100');
     }
   };
 

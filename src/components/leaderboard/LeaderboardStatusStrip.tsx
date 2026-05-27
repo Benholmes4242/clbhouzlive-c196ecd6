@@ -60,7 +60,7 @@ export function LeaderboardStatusStrip({ user }: LeaderboardStatusStripProps) {
       {/* Full-width strip with subtle tonal background */}
       <button
         type="button"
-        onClick={() => navigate('/top100?tab=my-progress')}
+        onClick={() => navigate('/courses?tab=top100')}
         className="w-full bg-primary/[0.04] px-4 py-4 active:bg-primary/[0.08] transition-colors"
       >
         {/* Row 1: Identity row */}
@@ -124,7 +124,7 @@ export function LeaderboardStatusStrip({ user }: LeaderboardStatusStripProps) {
           type="button"
           onClick={(e) => {
             e.stopPropagation();
-            navigate('/top100?tab=my-progress');
+            navigate('/courses?tab=top100');
           }}
           className="text-xs text-muted-foreground hover:text-foreground transition-colors"
         >
