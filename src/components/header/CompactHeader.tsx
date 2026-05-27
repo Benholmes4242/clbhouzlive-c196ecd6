@@ -86,18 +86,18 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
   // clbhouz logo on the left — they're top-level hubs, not back-arrow pages.
   const isTourRoute = location.pathname === '/tourhub' || location.pathname.startsWith('/tourhub/');
   const isCoursesLandingRoute = location.pathname === '/courses';
+  // Course detail: /courses/:courseId (exactly 3 segments — excludes /reviews, /rate, /share-review subroutes)
+  const isCourseDetailRoute = location.pathname.startsWith('/courses/')
+    && location.pathname.split('/').length === 3;
   // Editorial-geometry chrome (52px / 30px logo / 38px search) applies to
   // tab-landing surfaces. Tour-specific behaviors (compact avatar pill,
   // back-arrow) stay gated on isTourRoute.
-  const isEditorialChromeRoute = isTourRoute || isCoursesLandingRoute;
+  const isEditorialChromeRoute = isTourRoute || isCoursesLandingRoute || isCourseDetailRoute;
   // Routes that keep the light Dispatch chrome (clubhouse feed + profile pages).
   // NOTE: '/' is the Tour Hub landing — it must use dark chrome like /tourhub.
   // Do not re-add '/' here.
   const isClubhouseChromeRoute = location.pathname === '/clubhouse';
   const isProfileChromeRoute = location.pathname === '/profile' || location.pathname.startsWith('/profile/');
-  // Course detail: /courses/:courseId (exactly 3 segments — excludes /reviews, /rate, /share-review subroutes)
-  const isCourseDetailRoute = location.pathname.startsWith('/courses/')
-    && location.pathname.split('/').length === 3;
 
 
   // Discover sub-page detection:
