@@ -29,17 +29,6 @@ const SectionHeader: React.FC<{ count: number | null }> = ({ count }) => (
         </span>
       )}
     </div>
-    <span
-      style={{
-        fontSize: 10,
-        fontWeight: 700,
-        letterSpacing: '0.12em',
-        textTransform: 'uppercase',
-        color: 'var(--hcp-t-60)',
-      }}
-    >
-      Last 30 days
-    </span>
   </div>
 );
 
@@ -93,7 +82,7 @@ export const PulseRail: React.FC<Props> = ({ userId, onOpenSearch }) => {
           marginBottom: 10,
         }}
       >
-        Friends who've played this week
+        Friends who've played recently
       </div>
       <div
         style={{
