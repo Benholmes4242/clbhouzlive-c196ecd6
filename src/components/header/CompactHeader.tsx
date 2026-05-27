@@ -184,7 +184,7 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
   };
 
   // Header height: 52px on tour routes (compact), 55px elsewhere.
-  const contentHeight = isTourRoute ? 52 : 55;
+  const contentHeight = isEditorialChromeRoute ? 52 : 55;
 
   // Publish header height as a CSS variable so ShellSlot + --chrome-total-h
   // can adapt without each consumer needing to know about tour-specific sizing.
