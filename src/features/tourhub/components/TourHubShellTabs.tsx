@@ -128,11 +128,29 @@ export const TourHubShellTabs: React.FC = () => {
                   display: 'inline-flex',
                   alignItems: 'center',
                   position: 'relative',
-                  boxShadow: isActive ? 'inset 0 -2px 0 0 #FFFFFF' : 'none',
-                  transition: 'color 0.15s, box-shadow 0.15s',
+                  transition: 'color 0.15s',
                 }}
               >
-                {tab.label}
+                <span
+                  style={{
+                    display: 'inline-flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    gap: 3,
+                  }}
+                >
+                  {tab.label}
+                  {isActive && (
+                    <span
+                      style={{
+                        width: 18,
+                        height: 2,
+                        borderRadius: 1,
+                        background: '#FFFFFF',
+                      }}
+                    />
+                  )}
+                </span>
               </button>
             );
           })}
