@@ -12,7 +12,7 @@ import {
   FONT,
   T60,
 } from '@/pages/rivalry-page/_shared/tokens';
-import { useHeadToHeadStats } from './_shared/useHeadToHeadStats';
+import { useHeadToHeadStats } from './h2h/_shared/useHeadToHeadStats';
 import {
   LIFETIME_STATS,
   PERSONAL_BESTS,
@@ -20,10 +20,10 @@ import {
   ALL_STAT_DEFS,
   valueFor,
   type H2HStatDef,
-} from './_shared/h2hStats';
-import { whoLeads } from './_shared/whoLeads';
-import { H2HScoreBanner } from './H2HScoreBanner';
-import { StatsGroup, type StatItem } from './StatsGroup';
+} from './h2h/_shared/h2hStats';
+import { whoLeads } from './h2h/_shared/whoLeads';
+import { H2HScoreBanner } from './h2h/H2HScoreBanner';
+import { StatsGroup, type StatItem } from './h2h/StatsGroup';
 
 interface Props {
   viewerId: string | undefined;
