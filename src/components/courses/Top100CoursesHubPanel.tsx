@@ -58,6 +58,20 @@ const Top100CoursesHubPanel = () => {
   const { data: listSummaries = [] } = useTop100ListSummaries(user?.id);
   const { data: lists = [] } = useTop100Lists();
 
+  // Cross-list progress — only counts lists the user has actually started
+  // (at least 1 played). Mirrors the original framing the previous panel had.
+  const crossListProgress = React.useMemo(() => {
+    const started = listSummaries.filter(s => s.played_count > 0);
+    if (started.length === 0) return null;
+    const totalRated = started.reduce((acc, s) => acc + s.played_count, 0);
+    const totalInStartedLists = started.reduce((acc, s) => acc + s.total_courses, 0);
+    return {
+      totalRated,
+      totalInStartedLists,
+      listsStarted: started.length,
+    };
+  }, [listSummaries]);
+
   // Debounce search
   useEffect(() => {
     const timer = setTimeout(() => setDebouncedSearch(searchTerm), 300);
@@ -197,12 +211,37 @@ const Top100CoursesHubPanel = () => {
 
   return (
     <div className="space-y-4">
-      {/* Editorial header — eyebrow + title only */}
+      {/* Editorial header — eyebrow + title + optional progress sub-line */}
       <div className="px-4 pt-1">
         <SectionEyebrow label="Official World Ranking" color="amber" className="mb-[3px]" />
         <h2 style={{ fontSize: 22, fontWeight: 800, color: '#0F172A', letterSpacing: '-0.025em', margin: 0, lineHeight: 1.1 }}>
           The world's best
         </h2>
+        {crossListProgress && (
+          <p
+            style={{
+              fontSize: 13,
+              fontWeight: 500,
+              color: '#475569',
+              margin: '8px 0 0',
+              letterSpacing: '-0.005em',
+              fontFamily: "'Geist', sans-serif",
+            }}
+          >
+            You've rated{' '}
+            <span
+              style={{
+                color: '#F7931E',
+                fontWeight: 700,
+                fontVariantNumeric: 'tabular-nums',
+                fontFeatureSettings: '"zero" 0',
+              }}
+            >
+              {crossListProgress.totalRated} of {crossListProgress.totalInStartedLists}
+            </span>{' '}
+            across {crossListProgress.listsStarted} {crossListProgress.listsStarted === 1 ? 'list' : 'lists'}
+          </p>
+        )}
       </div>
 
       {/* List filter — horizontal pill row, scrollable on overflow */}
