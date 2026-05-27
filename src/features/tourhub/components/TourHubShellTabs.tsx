@@ -94,7 +94,7 @@ export const TourHubShellTabs: React.FC = () => {
           style={{
             display: 'flex',
             justifyContent: 'flex-start',
-            gap: 2,
+            gap: 8,
             padding: '0 16px',
             overflowX: 'auto',
             overflowY: 'hidden',
@@ -113,16 +113,16 @@ export const TourHubShellTabs: React.FC = () => {
                 onClick={(e) => handleTap(tab.id, e.currentTarget)}
                 style={{
                   flex: '0 0 auto',
-                  height: 40,
-                  padding: '0 10px',
+                  height: 44,
+                  padding: '0 4px',
                   borderRadius: 0,
                   border: 'none',
                   background: 'transparent',
                   color: isActive ? '#FFFFFF' : 'var(--hcp-t-60)',
                   fontFamily: 'inherit',
-                  fontSize: 13,
-                  fontWeight: isActive ? 700 : 500,
-                  letterSpacing: '-0.01em',
+                  fontSize: 14,
+                  fontWeight: isActive ? 700 : 600,
+                  letterSpacing: '-0.005em',
                   whiteSpace: 'nowrap',
                   cursor: 'pointer',
                   display: 'inline-flex',
@@ -133,23 +133,12 @@ export const TourHubShellTabs: React.FC = () => {
               >
                 <span
                   style={{
-                    display: 'inline-flex',
-                    flexDirection: 'column',
-                    alignItems: 'center',
-                    gap: 3,
+                    display: 'inline-block',
+                    paddingBottom: 4,
+                    borderBottom: isActive ? '1.5px solid #FFFFFF' : '1.5px solid transparent',
                   }}
                 >
                   {tab.label}
-                  {isActive && (
-                    <span
-                      style={{
-                        width: 44,
-                        height: 2,
-                        borderRadius: 1,
-                        background: '#FFFFFF',
-                      }}
-                    />
-                  )}
                 </span>
               </button>
             );
