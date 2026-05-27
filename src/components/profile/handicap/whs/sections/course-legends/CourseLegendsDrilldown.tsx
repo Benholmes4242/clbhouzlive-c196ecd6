@@ -256,36 +256,63 @@ export const CourseLegendsDrilldown: React.FC<Props> = ({ selection, hideHeader 
       {!isLoading && !isError && (data ?? []).length > 0 && (
         <>
           <ChampionsCoursePulsePanel meta={meta} />
+
+          <ChampionsYourStandingCard
+            displayName="You"
+            photoUrl={null}
+            titlesHeld={youOwnedCount}
+            totalCategories={visibleCategories.length}
+            bestRank={(() => {
+              const ranks = Object.values(yourRanks).filter((r): r is number => r != null);
+              return ranks.length === 0 ? null : Math.min(...ranks);
+            })()}
+            yourRounds={meta?.your_rounds ?? 0}
+            yourBest={meta?.your_best ?? null}
+          />
+
           <CategoryNavRail categories={navCategories} onSelect={handleNavSelect} />
+
           <div style={{ paddingBottom: 32 }}>
           {visibleCategories.map((cat) => {
             const entry = groupedWithTotals.get(cat);
             if (!entry || entry.rows.length === 0) return null;
             const champion = entry.rows[0];
-            const fieldRows = entry.rows.slice(1).map((r) => ({
+            const heldDuration = formatHeldDuration(champion.attained_at);
+            const holdDurationDisplay = `Held ${heldDuration}`;
+
+            const isLowerBetter =
+              cat === 'best_score_diff_90d' ||
+              cat === 'best_score_diff_all_time' ||
+              cat === 'lowest_gross_90d' ||
+              cat === 'lowest_gross_all_time';
+
+            const formatGap = (rowValue: number): string => {
+              const diff = rowValue - champion.value;
+              if (isLowerBetter) {
+                const v = diff.toFixed(1).replace(/\.0$/, '');
+                return diff > 0 ? `+${v}` : v;
+              }
+              return diff < 0 ? `${diff}` : `+${diff}`;
+            };
+
+            const sectionRows = entry.rows.map((r) => ({
               rank: r.rank,
-              name: r.name,
+              name: r.isSelf ? 'You' : r.name,
               photoUrl: r.photoUrl,
               valueDisplay: r.valueDisplay,
               isSelf: r.isSelf,
+              gapToChampion: r.rank === champion.rank ? null : formatGap(r.value),
             }));
-            const heldDuration = formatHeldDuration(champion.attained_at);
-            const heldMeta = `Held ${heldDuration} · ${entry.total} ${entry.total === 1 ? 'entry' : 'entries'}`;
+
             return (
-              <div key={cat} data-category={cat} style={{ marginBottom: 16 }}>
-                <ChampionsResultBand
+              <div key={cat} data-category={cat}>
+                <ChampionsCategorySection
                   categoryLabel={legendCategoryLabel[cat]}
                   categoryIcon={legendCategoryIcon[cat]}
-                  championName={champion.isSelf ? 'You' : champion.name}
-                  championPhotoUrl={champion.photoUrl}
-                  valueDisplay={champion.valueDisplay}
-                  unitLabel={UNIT_LABELS[cat]}
-                  isSelf={champion.isSelf}
-                  heldMeta={heldMeta}
-                />
-                <ChampionsField
-                  rows={fieldRows}
+                  unitLabel={UNIT_LABELS[cat] || ''}
                   totalCount={entry.total}
+                  holdDuration={holdDurationDisplay}
+                  rows={sectionRows}
                   onFullLeaderboardTap={() => setFullLeaderboardCategory(cat)}
                 />
               </div>
