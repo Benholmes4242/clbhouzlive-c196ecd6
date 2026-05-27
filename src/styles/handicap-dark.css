@@ -52,6 +52,11 @@
   --hcp-accent-celebrate:       #FBBC2E;
   --hcp-accent-celebrate-tint:  rgba(251, 188, 46, 0.14);
 
+  /* Champion wash — cream highlight on hero / champion rows */
+  --hcp-champ-wash:               rgba(247, 147, 30, 0.08);
+  --hcp-champ-wash-border:        rgba(247, 147, 30, 0.30);
+  --hcp-champ-wash-border-light:  rgba(247, 147, 30, 0.18);
+
   /* ── Verdict palette ─────────────────────────────────────────────
    * SEMANTIC ONLY. Never used decoratively.
    *   good = improvement  (under handicap, downward index movement)
