@@ -18,8 +18,9 @@ const FONT_GEIST = 'Geist, system-ui, -apple-system, BlinkMacSystemFont, sans-se
 interface Props {
   rivalry: FriendRivalryHydrated;
   tier: RivalryTier;
-  onTap: () => void;
+  onTap?: () => void;
 }
+
 
 function truncate(s: string, max = 15): string {
   return s.length > max ? `${s.slice(0, max - 1).trimEnd()}…` : s;
