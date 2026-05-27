@@ -32,7 +32,7 @@ const BASE_STYLE = {
   border: `1px solid ${WHITE_HAIRLINE}`,
   cursor: 'pointer',
   fontFamily: 'Geist, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
-  height: 28,
+  height: 26,
 } as const;
 
 function resolveSource(pathname: string): string {
@@ -136,7 +136,7 @@ export function HandicapChip() {
     >
       <span
         style={{
-          fontSize: 13,
+          fontSize: 12,
           fontWeight: 700,
           color: WHITE,
           fontVariantNumeric: 'tabular-nums',
