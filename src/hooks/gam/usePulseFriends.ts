@@ -69,15 +69,14 @@ export function usePulseFriends(userId: string | undefined) {
 
       if (!profiles) return [];
 
-      // 3. Last 14 days of rounds (for hot detection)
+      // Last 30 days of rounds (used both for hot-streak detection from last 5 and the 30-day inclusion filter)
       const thirtyDaysAgo = new Date(Date.now() - 30 * DAY_MS).toISOString().slice(0, 10);
-      const fourteenDaysAgo = new Date(Date.now() - 14 * DAY_MS).toISOString().slice(0, 10);
 
       const { data: rounds } = await supabase
         .from('gam_round_stats' as any)
         .select('user_id, play_date, gross_score, course_par, hcp_at_time')
         .in('user_id', friendIds)
-        .gte('play_date', fourteenDaysAgo)
+        .gte('play_date', thirtyDaysAgo)
         .eq('holes_played', 18)
         .order('play_date', { ascending: false });
 
