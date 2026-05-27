@@ -14,7 +14,7 @@ import { useQuery } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { supabase } from '@/integrations/supabase/client';
-import { useFriendRivalries } from '@/lib/whs/hooks';
+import { useFriendRivalries, useWhsConnection } from '@/lib/whs/hooks';
 import type { FriendRivalryHydrated } from '@/lib/whs/types';
 import { PageRoot } from '@/components/layout/PageRoot';
 import { useRivalryDimension } from '@/lib/whs/utils/useRivalryDimension';
@@ -27,7 +27,12 @@ import { ActionRail } from './rivalry-page/ActionRail';
 import { InsightsGrid } from './rivalry-page/InsightsGrid';
 import { CoursesPlayedSection } from './rivalry-page/CoursesPlayedSection';
 import { RoundByRoundSection } from './rivalry-page/RoundByRoundSection';
-import { computeInsights } from './rivalry-page/_shared/insights';
+import { HeadToHeadSection } from './rivalry-page/HeadToHeadSection';
+import {
+  computeInsights,
+  computeYourBestMargin,
+  computeTheirBestMargin,
+} from './rivalry-page/_shared/insights';
 import { firstName } from './rivalry-page/_shared/helpers';
 import {
   FONT,
