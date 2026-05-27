@@ -8,8 +8,8 @@ interface Props {
 }
 
 const OPTS: { v: RivalryDimension; label: string }[] = [
-  { v: 'stableford', label: 'Stableford' },
   { v: 'gross', label: 'Gross' },
+  { v: 'stableford', label: 'Stableford' },
 ];
 
 export const DimensionToggle: React.FC<Props> = ({ value, onChange }) => (
