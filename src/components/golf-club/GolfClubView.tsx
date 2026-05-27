@@ -11,7 +11,7 @@ import CourseMediaTabNew from '@/components/course-media-tab/CourseMediaTabNew';
 import CourseRankBadges from '@/components/courses/CourseRankBadges';
 import { CourseTabs } from '@/components/courses/course-detail/CourseTabs';
 import ShellSlot from '@/components/header/ShellSlot';
-import SegmentedControl from '@/components/discover/SegmentedControl';
+import CourseDetailShellTabs from '@/features/courses/components/CourseDetailShellTabs';
 import { formatCourseLocation } from '@/utils/courseLocation';
 import { CourseDetailSkeleton } from '@/components/skeletons/CourseDetailSkeleton';
 import { useCourseRatingAggregates } from '@/hooks/useCourseRatingAggregates';
@@ -217,13 +217,6 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
     </div>
   );
 
-  const segmentedTabs = [
-    { id: 'about', label: 'About' },
-    { id: 'reviews', label: 'Reviews' },
-    { id: 'media', label: 'Media' },
-    { id: 'legends', label: 'Legends' },
-  ];
-
   if (isInModal) {
     return (
       <div className="w-full">
@@ -245,11 +238,10 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
       className="min-h-screen w-full bg-background"
       style={{ paddingBottom: 'calc(var(--sab, env(safe-area-inset-bottom, 0px)) + 80px)' }}
     >
-      <ShellSlot>
-        <SegmentedControl
-          tabs={segmentedTabs}
-          activeTab={activeTab}
-          onTabChange={handleTabChange}
+      <ShellSlot dark>
+        <CourseDetailShellTabs
+          activeTab={activeTab as any}
+          onTabChange={handleTabChange as any}
         />
       </ShellSlot>
       <div style={{ paddingTop: 'var(--chrome-total-h, 0px)' }}>

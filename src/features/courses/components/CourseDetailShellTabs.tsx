@@ -1,0 +1,104 @@
+import React, { useRef, useEffect, useState } from 'react';
+
+type CourseDetailTab = 'about' | 'reviews' | 'media' | 'legends';
+
+interface TabDef {
+  id: CourseDetailTab;
+  label: string;
+}
+
+const TABS: TabDef[] = [
+  { id: 'about', label: 'About' },
+  { id: 'reviews', label: 'Reviews' },
+  { id: 'media', label: 'Media' },
+  { id: 'legends', label: 'Legends' },
+];
+
+interface CourseDetailShellTabsProps {
+  activeTab: CourseDetailTab;
+  onTabChange: (tab: CourseDetailTab) => void;
+}
+
+/**
+ * CourseDetailShellTabs — Canonical 4-tab strip for /courses/:courseId.
+ * Mirrors TourHubShellTabs / CoursesShellTabs spec: dark #0A0E14 surface,
+ * 44px tall, 14px Geist text, weight 600/700, label-width 1.5px white
+ * underline, tabs distributed evenly across the row.
+ */
+export const CourseDetailShellTabs: React.FC<CourseDetailShellTabsProps> = ({
+  activeTab,
+  onTabChange,
+}) => {
+  const scrollerRef = useRef<HTMLDivElement | null>(null);
+  const [, setOverflowing] = useState(false);
+
+  useEffect(() => {
+    const el = scrollerRef.current;
+    if (!el) return;
+    const check = () => setOverflowing(el.scrollWidth > el.clientWidth + 1);
+    check();
+    const ro = new ResizeObserver(check);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
+
+  return (
+    <>
+      <style>{`[data-course-detail-tabs]::-webkit-scrollbar { display: none; }`}</style>
+      <div
+        ref={scrollerRef}
+        data-course-detail-tabs
+        role="tablist"
+        aria-label="Course Detail Sections"
+        style={{
+          display: 'flex',
+          justifyContent: 'space-evenly',
+          background: '#0A0E14',
+          borderBottom: '0.5px solid rgba(255,255,255,0.06)',
+          overflowY: 'hidden',
+          fontFamily: 'Geist, system-ui, -apple-system, BlinkMacSystemFont, sans-serif',
+        }}
+      >
+        {TABS.map((tab) => {
+          const isActive = activeTab === tab.id;
+          return (
+            <button
+              key={tab.id}
+              role="tab"
+              aria-selected={isActive}
+              onClick={() => onTabChange(tab.id)}
+              className="active:opacity-70 transition-opacity"
+              style={{
+                flex: '0 0 auto',
+                height: 44,
+                padding: '0 4px',
+                fontSize: 14,
+                fontWeight: isActive ? 700 : 600,
+                color: isActive ? '#FFFFFF' : 'rgba(255,255,255,0.55)',
+                background: 'transparent',
+                border: 'none',
+                letterSpacing: '-0.005em',
+                cursor: 'pointer',
+                whiteSpace: 'nowrap',
+                display: 'inline-flex',
+                alignItems: 'center',
+              }}
+            >
+              <span
+                style={{
+                  display: 'inline-block',
+                  paddingBottom: 4,
+                  borderBottom: isActive ? '1.5px solid #FFFFFF' : '1.5px solid transparent',
+                }}
+              >
+                {tab.label}
+              </span>
+            </button>
+          );
+        })}
+      </div>
+    </>
+  );
+};
+
+export default CourseDetailShellTabs;
