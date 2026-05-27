@@ -84,7 +84,7 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
   // Tour Hub overview + sub-tabs share the handicap dark chrome treatment
   // (dark header background, white controls, dark identity pill) but keep the
   // clbhouz logo on the left — they're top-level hubs, not back-arrow pages.
-  const isTourRoute = location.pathname === '/tourhub' || location.pathname === '/tour';
+  const isTourRoute = location.pathname === '/tourhub' || location.pathname.startsWith('/tourhub/');
   // Routes that keep the light Dispatch chrome (clubhouse feed + profile pages).
   // NOTE: '/' is the Tour Hub landing — it must use dark chrome like /tourhub.
   // Do not re-add '/' here.
