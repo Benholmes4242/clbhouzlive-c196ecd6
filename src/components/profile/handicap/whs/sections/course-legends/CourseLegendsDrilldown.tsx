@@ -13,11 +13,10 @@ import type { LegendCategory, LegendWindow } from '@/lib/gam/types';
 import type { CourseSelection } from './types';
 
 import { DrilldownHeader } from './drilldown/DrilldownHeader';
-import { CourseMetaStrip } from './drilldown/CourseMetaStrip';
+import { ChampionsCoursePulsePanel } from './drilldown/ChampionsCoursePulsePanel';
 import { CategoryNavRail } from './drilldown/CategoryNavRail';
 import { ChampionsResultBand } from './drilldown/ChampionsResultBand';
 import { ChampionsField } from './drilldown/ChampionsField';
-import { ChampionsSignatureFooter } from './drilldown/ChampionsSignatureFooter';
 import { FullCourseLeaderboardSheet } from './drilldown/FullCourseLeaderboardSheet';
 import { WindowToggle } from './CourseLegendsSection';
 
@@ -256,7 +255,7 @@ export const CourseLegendsDrilldown: React.FC<Props> = ({ selection, hideHeader 
 
       {!isLoading && !isError && (data ?? []).length > 0 && (
         <>
-          <CourseMetaStrip meta={meta} />
+          <ChampionsCoursePulsePanel meta={meta} />
           <CategoryNavRail categories={navCategories} onSelect={handleNavSelect} />
           <div style={{ paddingBottom: 32 }}>
           {visibleCategories.map((cat) => {
@@ -271,6 +270,7 @@ export const CourseLegendsDrilldown: React.FC<Props> = ({ selection, hideHeader 
               isSelf: r.isSelf,
             }));
             const heldDuration = formatHeldDuration(champion.attained_at);
+            const heldMeta = `Held ${heldDuration} · ${entry.total} ${entry.total === 1 ? 'entry' : 'entries'}`;
             return (
               <div key={cat} data-category={cat} style={{ marginBottom: 16 }}>
                 <ChampionsResultBand
@@ -281,16 +281,12 @@ export const CourseLegendsDrilldown: React.FC<Props> = ({ selection, hideHeader 
                   valueDisplay={champion.valueDisplay}
                   unitLabel={UNIT_LABELS[cat]}
                   isSelf={champion.isSelf}
+                  heldMeta={heldMeta}
                 />
                 <ChampionsField
                   rows={fieldRows}
                   totalCount={entry.total}
                   onFullLeaderboardTap={() => setFullLeaderboardCategory(cat)}
-                />
-                <ChampionsSignatureFooter
-                  windowLabel={window === '90d' ? '90D' : 'All time'}
-                  heldDuration={heldDuration}
-                  entryCount={entry.total}
                 />
               </div>
             );
