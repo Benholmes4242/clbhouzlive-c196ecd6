@@ -138,7 +138,7 @@ export function OverviewPageV3() {
 
         {/* Editorial content tier — sits directly below the hero CTA. */}
         <AcrossTheToursModule activeTourSlug={activeTourSlug} />
-
+        <DispatchModule />
 
         {/* Content sections */}
         <div 
