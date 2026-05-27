@@ -486,8 +486,8 @@ const DimToggle: React.FC<{
         background: 'rgba(0,0,0,0.30)',
       }}
     >
-      {opt('STBL', 'stableford')}
       {opt('GROSS', 'gross')}
+      {opt('STBL', 'stableford')}
     </div>
   );
 };
