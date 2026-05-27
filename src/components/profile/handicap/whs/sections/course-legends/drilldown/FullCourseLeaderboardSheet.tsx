@@ -131,12 +131,12 @@ export const FullCourseLeaderboardSheet: React.FC<Props> = ({
                   padding: '7px 12px',
                   borderRadius: 9,
                   background: isActive
-                    ? 'linear-gradient(180deg, rgba(247,147,30,0.18), rgba(247,147,30,0.06))'
+                    ? 'linear-gradient(180deg, var(--hcp-accent-util-tint), var(--hcp-accent-util-tint-2))'
                     : 'rgba(255,255,255,0.025)',
                   border: isActive
-                    ? '1px solid rgba(247,147,30,0.35)'
+                    ? '1px solid var(--hcp-accent-util-border)'
                     : '1px solid rgba(255,255,255,0.04)',
-                  color: isActive ? '#F7931E' : 'var(--hcp-t-80)',
+                  color: isActive ? 'var(--hcp-accent-util)' : 'var(--hcp-t-80)',
                   fontSize: 11,
                   fontWeight: 700,
                   fontFamily: FONT,

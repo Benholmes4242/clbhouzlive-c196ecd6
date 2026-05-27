@@ -36,7 +36,7 @@ const MetaCell: React.FC<{
       style={{
         fontSize: 26,
         fontWeight: 200,
-        color: highlight ? '#F7931E' : 'var(--hcp-t-100)',
+        color: highlight ? 'var(--hcp-accent-util)' : 'var(--hcp-t-100)',
         letterSpacing: '-0.04em',
         lineHeight: 0.95,
         fontVariantNumeric: 'tabular-nums',

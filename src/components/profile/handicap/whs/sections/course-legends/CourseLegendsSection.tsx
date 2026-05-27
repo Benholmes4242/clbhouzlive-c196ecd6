@@ -58,8 +58,8 @@ export const WindowToggle: React.FC<{
           style={{
             padding: '6px 14px',
             borderRadius: 999,
-            background: active ? AMBER : 'transparent',
-            color: active ? '#1A1300' : 'var(--hcp-t-60)',
+            background: active ? 'var(--hcp-accent-util)' : 'transparent',
+            color: active ? '#FFFFFF' : 'var(--hcp-t-60)',
             border: 'none',
             fontFamily: FONT,
             fontSize: 11.5,
