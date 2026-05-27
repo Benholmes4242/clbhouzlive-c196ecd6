@@ -217,39 +217,15 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
     </div>
   );
 
-  const segmentedTabs = [
-    { id: 'about', label: 'About' },
-    { id: 'reviews', label: 'Reviews' },
-    { id: 'media', label: 'Media' },
-    { id: 'legends', label: 'Legends' },
-  ];
-
-  if (isInModal) {
-    return (
-      <div className="w-full">
-        {heroBlock}
-        {/* Modal mode: legacy sticky underline tabs (no CompactHeader present) */}
-        <div
-          className="sticky bg-background"
-          style={{ top: 0, zIndex: 20, paddingTop: 'env(safe-area-inset-top, 0px)' }}
-        >
-          <CourseTabs activeTab={activeTab as any} onChange={handleTabChange as any} />
-        </div>
-        {tabContent}
-      </div>
-    );
-  }
-
   return (
     <div
       className="min-h-screen w-full bg-background"
       style={{ paddingBottom: 'calc(var(--sab, env(safe-area-inset-bottom, 0px)) + 80px)' }}
     >
-      <ShellSlot>
-        <SegmentedControl
-          tabs={segmentedTabs}
-          activeTab={activeTab}
-          onTabChange={handleTabChange}
+      <ShellSlot dark>
+        <CourseDetailShellTabs
+          activeTab={activeTab as any}
+          onTabChange={handleTabChange as any}
         />
       </ShellSlot>
       <div style={{ paddingTop: 'var(--chrome-total-h, 0px)' }}>
