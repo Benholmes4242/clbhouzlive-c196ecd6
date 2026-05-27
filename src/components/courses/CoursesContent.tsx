@@ -15,7 +15,7 @@ import { useNavigate, useSearchParams, useLocation } from 'react-router-dom';
 import ScrollToTopGlass from '@/components/common/ScrollToTopGlass';
 import CoursesErrorBoundary from './CoursesErrorBoundary';
 import { Search, X, Star, ChevronRight } from 'lucide-react';
-import SegmentedControl from '@/components/discover/SegmentedControl';
+import CoursesShellTabs from '@/features/courses/components/CoursesShellTabs';
 import { supabase } from '@/integrations/supabase/client';
 import { useQuery } from '@tanstack/react-query';
 import { SectionEyebrow } from '@/components/ui/SectionEyebrow';
@@ -292,20 +292,11 @@ const CoursesContent: React.FC<CoursesContentProps> = ({ username, displayName }
       ) : (
         /* Main courses page - show Explore, Global Top 100, and Friends' Courses */
         <>
-          <ShellSlot>
-            <div>
-              <SegmentedControl
-                tabs={[
-                  { id: 'explore', label: 'Explore' },
-                  { id: 'top100', label: 'Top 100' },
-                  { id: 'discover', label: 'Discover' },
-                ]}
-                activeTab={activeTab}
-                onTabChange={handleTabChange}
-                variant="slate"
-                align="center"
-              />
-            </div>
+          <ShellSlot dark>
+            <CoursesShellTabs
+              activeTab={activeTab as 'explore' | 'top100' | 'discover'}
+              onTabChange={handleTabChange}
+            />
           </ShellSlot>
 
           <div className="px-4" style={{ paddingTop: 'var(--chrome-total-h, 0px)' }}>
