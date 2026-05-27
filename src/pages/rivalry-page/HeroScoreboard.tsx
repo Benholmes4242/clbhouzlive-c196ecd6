@@ -15,6 +15,7 @@ import {
   LINE_2,
 } from './_shared/tokens';
 import { firstName, formatMonthYear } from './_shared/helpers';
+import { reformatFriendName } from '@/lib/whs/utils/nameFormat';
 import type { FriendRivalryHydrated } from '@/lib/whs/types';
 import type { RivalryDimension } from '@/lib/whs/utils/useRivalryDimension';
 
@@ -53,8 +54,8 @@ export const HeroScoreboard: React.FC<Props> = ({
   const yourPct = decided > 0 ? Math.round((wins / decided) * 100) : null;
   const theirPct = decided > 0 ? Math.round((losses / decided) * 100) : null;
 
-  const rivalFull = rivalry.rival_name ?? 'Rival';
-  const rivalFirst = firstName(rivalry.rival_name);
+  const rivalFull = reformatFriendName(rivalry.rival_name) || 'Rival';
+  const rivalFirst = firstName(rivalFull);
   const leftLabel = ownerView ? 'You' : firstName(yourFullName);
   const titleLeft = ownerView ? 'You' : firstName(yourFullName);
 

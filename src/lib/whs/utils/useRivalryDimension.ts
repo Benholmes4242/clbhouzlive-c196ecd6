@@ -2,7 +2,7 @@
  * Per-rivalry scoring-dimension preference.
  * Persisted as a JSON map in localStorage under `hcp-rivalry-dimension-map`,
  * keyed by rivalId (rival_user_id or rival_friend_row_id). Falls back to
- * 'stableford' when a key has no stored value.
+ * 'gross' when a key has no stored value.
  *
  * Used by both the Rivalries section cards and the deep-view page so the
  * user's per-rival choice sticks across surfaces and reloads.
@@ -28,9 +28,9 @@ function readMap(): DimensionMap {
 }
 
 function readOne(key: string | null | undefined): RivalryDimension {
-  if (!key) return 'stableford';
+  if (!key) return 'gross';
   const v = readMap()[key];
-  return v === 'gross' ? 'gross' : 'stableford';
+  return v === 'stableford' ? 'stableford' : 'gross';
 }
 
 export function useRivalryDimension(
