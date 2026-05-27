@@ -36,7 +36,7 @@ export const Top100FriendsStrip: React.FC = () => {
   }
 
   const handleClick = () => {
-    navigate('/top100?tab=friends-progress');
+    navigate('/courses?tab=top100');
   };
 
   return (

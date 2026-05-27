@@ -144,7 +144,7 @@ export const HomeClubSubsection: React.FC<Props> = ({
 
   // Brand-new user: no home club set and no rounds — show discovery framing.
   if (!homeClubName && courses.length === 0) {
-    return <DiscoveryFramingCard onTap={() => navigate('/top100')} />;
+    return <DiscoveryFramingCard onTap={() => navigate('/courses?tab=top100')} />;
   }
 
   // Data integrity: home club set but no matching courses — keep the stub.

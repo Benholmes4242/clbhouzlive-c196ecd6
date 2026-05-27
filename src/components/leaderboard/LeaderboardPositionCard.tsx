@@ -89,7 +89,7 @@ export function LeaderboardPositionCard({ user, variant = 'full' }: LeaderboardP
   return (
     <button
       type="button"
-      onClick={() => navigate('/top100?tab=my-progress')}
+      onClick={() => navigate('/courses?tab=top100')}
       className="w-full px-4 py-4 active:scale-[0.99] transition-all"
     >
       {/* 3-column layout: Avatar (fixed) + Main text (flex, truncates) + Next goal (fixed width) */}

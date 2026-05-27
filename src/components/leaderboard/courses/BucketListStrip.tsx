@@ -38,7 +38,7 @@ export const BucketListStrip: React.FC<BucketListStripProps> = ({ onCourseClick 
           </p>
         </div>
         <button
-          onClick={() => navigate('/top100?tab=explore')}
+          onClick={() => navigate('/courses?tab=top100')}
           style={{ fontSize: 12, fontWeight: 600, color: '#F7931E', background: 'none', border: 'none', cursor: 'pointer' }}
         >
           See all ({courses.length}) →

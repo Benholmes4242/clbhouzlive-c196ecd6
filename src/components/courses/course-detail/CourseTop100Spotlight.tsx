@@ -44,7 +44,7 @@ export const CourseTop100Spotlight: React.FC<CourseTop100SpotlightProps> = ({
   }
 
   const handleChipTap = (listSlug: string) => {
-    navigate(`/top100?list=${listSlug}`);
+    navigate('/courses?tab=top100');
   };
 
   const listCount = data.list_memberships.length;

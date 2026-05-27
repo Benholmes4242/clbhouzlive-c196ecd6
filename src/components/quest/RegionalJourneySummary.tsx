@@ -159,7 +159,7 @@ export const RegionalJourneySummary: React.FC<RegionalJourneySummaryProps> = ({
           description="Track your progress across GB&I, Europe, USA and worldwide Top 100 lists"
           action={{
             label: "View Top 100 Lists",
-            onClick: () => navigate('/top100'),
+            onClick: () => navigate('/courses?tab=top100'),
           }}
         />
       </section>

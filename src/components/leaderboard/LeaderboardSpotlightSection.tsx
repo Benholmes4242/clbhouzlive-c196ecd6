@@ -129,7 +129,7 @@ export function LeaderboardSpotlightSection() {
       <div className="flex justify-center py-2.5">
         <button
           type="button"
-          onClick={() => navigate('/top100?tab=leaderboard&view=courses')}
+          onClick={() => navigate('/courses?tab=top100')}
           className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors"
         >
           View qualifying courses
