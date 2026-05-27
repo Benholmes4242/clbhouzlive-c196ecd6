@@ -314,7 +314,7 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
                   hasUnreadNotifications={hasUnread}
                   notificationCount={unreadCount}
                   useLightTheme={useLightTheme}
-                  compact={isTourRoute}
+                  compact={isEditorialChromeRoute}
                 />
               ) : (
                 /* Skeleton placeholder while auth resolves — prevents layout shift */
