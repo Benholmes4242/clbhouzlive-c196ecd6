@@ -49,18 +49,26 @@ export const HeroScoreboard: React.FC<Props> = ({
   const total = wins + losses + ties;
   const youLead = wins > losses;
   const themLead = losses > wins;
+  const decided = wins + losses;
+  const yourPct = decided > 0 ? Math.round((wins / decided) * 100) : null;
+  const theirPct = decided > 0 ? Math.round((losses / decided) * 100) : null;
 
   const rivalFull = rivalry.rival_name ?? 'Rival';
   const rivalFirst = firstName(rivalry.rival_name);
   const leftLabel = ownerView ? 'You' : firstName(yourFullName);
   const titleLeft = ownerView ? 'You' : firstName(yourFullName);
 
-  // Gradient: gold-tinted when you lead, red-tinted when they lead, neutral on tie
   const gradient = youLead
-    ? 'linear-gradient(135deg, rgba(251,188,46,0.16) 0%, rgba(247,147,30,0.06) 50%, rgba(255,255,255,0.02) 100%)'
+    ? 'linear-gradient(180deg, rgba(247,147,30,0.08) 0%, rgba(247,147,30,0.02) 50%, rgba(15,23,42,0.6) 100%)'
     : themLead
-      ? 'linear-gradient(135deg, rgba(239,68,68,0.14) 0%, rgba(239,68,68,0.04) 50%, rgba(255,255,255,0.02) 100%)'
-      : 'linear-gradient(135deg, rgba(255,255,255,0.04) 0%, rgba(255,255,255,0.01) 100%)';
+      ? 'linear-gradient(180deg, rgba(239,68,68,0.10) 0%, rgba(239,68,68,0.02) 50%, rgba(15,23,42,0.6) 100%)'
+      : 'linear-gradient(180deg, rgba(255,255,255,0.04) 0%, rgba(255,255,255,0.01) 100%)';
+
+  const streakColor = currentStreak.side === 'you' ? GREEN : RED;
+  const streakTint =
+    currentStreak.side === 'you'
+      ? 'rgba(34,197,94,0.10)'
+      : 'rgba(239,68,68,0.10)';
 
   return (
     <div style={{ padding: '0 16px' }}>
@@ -91,10 +99,13 @@ export const HeroScoreboard: React.FC<Props> = ({
         </div>
         <div
           style={{
-            color: T60,
-            fontSize: 11,
-            fontWeight: 700,
-            letterSpacing: '0.08em',
+            padding: '3px 8px',
+            border: `1px solid rgba(247,147,30,0.25)`,
+            borderRadius: 999,
+            color: AMBER,
+            fontSize: 10,
+            fontWeight: 800,
+            letterSpacing: '0.14em',
             textTransform: 'uppercase',
             fontFamily: FONT,
             ...TAB,
@@ -136,113 +147,147 @@ export const HeroScoreboard: React.FC<Props> = ({
         style={{
           position: 'relative',
           marginTop: 16,
-          padding: '24px 20px 18px',
           background: BG_1,
           backgroundImage: gradient,
-          border: `1px solid ${LINE_2}`,
+          border: `1px solid rgba(247,147,30,0.20)`,
           borderRadius: 16,
           overflow: 'hidden',
         }}
       >
-        {/* Watermark */}
+        {/* Crossed-swords watermark */}
         <div
           aria-hidden
           style={{
             position: 'absolute',
-            right: -10,
-            bottom: -20,
-            opacity: 0.06,
-            transform: 'rotate(-12deg)',
+            right: -16,
+            bottom: -28,
+            opacity: 0.04,
+            transform: 'rotate(15deg)',
             color: T100,
             pointerEvents: 'none',
           }}
         >
-          <Swords size={130} strokeWidth={1.5} />
+          <Swords size={160} strokeWidth={1.5} />
         </div>
 
-        {/* Top row: avatars + scores */}
-        <div
-          style={{
-            position: 'relative',
-            display: 'grid',
-            gridTemplateColumns: '1fr auto 1fr',
-            alignItems: 'center',
-            gap: 12,
-          }}
-        >
-          <Side
-            avatarUrl={yourAvatarUrl}
-            fallbackChar={(leftLabel[0] ?? '?').toUpperCase()}
-            label={leftLabel.toUpperCase()}
-            labelColor={AMBER}
-            score={wins}
-            isWinning={wins > losses}
-            handicap={yourHandicap}
-            alignRight={false}
-          />
+        {/* Body */}
+        <div style={{ position: 'relative', padding: '22px 18px 16px' }}>
+          {/* Top row: avatars + scores with centre VS column */}
           <div
             style={{
-              color: T40,
-              fontSize: 36,
-              fontWeight: 700,
-              lineHeight: 1,
+              display: 'grid',
+              gridTemplateColumns: '1fr auto 1fr',
+              alignItems: 'center',
+              gap: 12,
+            }}
+          >
+            <Side
+              avatarUrl={yourAvatarUrl}
+              fallbackChar={(leftLabel[0] ?? '?').toUpperCase()}
+              label={leftLabel.toUpperCase()}
+              labelColor={AMBER}
+              score={wins}
+              isWinning={youLead}
+              isLosing={themLead}
+              handicap={yourHandicap}
+              winPct={yourPct}
+              alignRight={false}
+            />
+
+            <CentreDivider ties={ties} />
+
+            <Side
+              avatarUrl={rivalry.rival_thumbnail_url}
+              fallbackChar={(rivalFirst[0] ?? '?').toUpperCase()}
+              label={rivalFirst.toUpperCase()}
+              labelColor={T100}
+              score={losses}
+              isWinning={themLead}
+              isLosing={youLead}
+              handicap={rivalry.rival_handicap}
+              winPct={theirPct}
+              alignRight
+            />
+          </div>
+        </div>
+
+        {/* Streak banner (separate strip) */}
+        {currentStreak.side && currentStreak.count > 0 && (
+          <div
+            style={{
+              position: 'relative',
+              padding: '10px 16px',
+              borderTop: `1px solid ${LINE}`,
+              background: streakTint,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: 8,
+              color: streakColor,
+              fontSize: 11,
+              fontWeight: 800,
+              letterSpacing: '0.1em',
+              textTransform: 'uppercase',
+              fontFamily: FONT,
               ...TAB,
             }}
           >
-            —
+            <Flame size={13} strokeWidth={2.4} />
+            {currentStreak.side === 'you' ? 'You' : rivalFirst} ·{' '}
+            {currentStreak.count} round win streak
           </div>
-          <Side
-            avatarUrl={rivalry.rival_thumbnail_url}
-            fallbackChar={(rivalFirst[0] ?? '?').toUpperCase()}
-            label={rivalFirst.toUpperCase()}
-            labelColor={T100}
-            score={losses}
-            isWinning={losses > wins}
-            handicap={rivalry.rival_handicap}
-            alignRight
-          />
-        </div>
-
-        {/* Bottom strip */}
-        <div
-          style={{
-            position: 'relative',
-            marginTop: 18,
-            paddingTop: 14,
-            borderTop: `1px solid ${LINE}`,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            color: T60,
-            fontSize: 12,
-            fontWeight: 600,
-            fontFamily: FONT,
-            ...TAB,
-          }}
-        >
-          <span>
-            {ties} {ties === 1 ? 'tie' : 'ties'}
-          </span>
-          {currentStreak.side && currentStreak.count > 0 && (
-            <span
-              style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: 6,
-                color: currentStreak.side === 'you' ? GREEN : RED,
-                fontWeight: 700,
-              }}
-            >
-              <Flame size={12} strokeWidth={2.4} />
-              {currentStreak.side === 'you' ? 'You' : rivalFirst} ·{' '}
-              {currentStreak.count} streak
-            </span>
-          )}
-        </div>
+        )}
       </div>
     </div>
   );
 };
+
+const CentreDivider: React.FC<{ ties: number }> = ({ ties }) => (
+  <div
+    style={{
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center',
+      gap: 6,
+      minWidth: 36,
+    }}
+  >
+    <div
+      style={{
+        color: T40,
+        fontSize: 10,
+        fontWeight: 700,
+        letterSpacing: '0.18em',
+        textTransform: 'uppercase',
+        fontFamily: FONT,
+      }}
+    >
+      VS
+    </div>
+    <div
+      aria-hidden
+      style={{
+        width: 1,
+        height: 80,
+        background:
+          'linear-gradient(180deg, rgba(247,147,30,0) 0%, rgba(247,147,30,0.55) 50%, rgba(247,147,30,0) 100%)',
+      }}
+    />
+    <div
+      style={{
+        color: T40,
+        fontSize: 9,
+        fontWeight: 700,
+        letterSpacing: '0.16em',
+        textTransform: 'uppercase',
+        fontFamily: FONT,
+        ...TAB,
+      }}
+    >
+      {ties} {ties === 1 ? 'tie' : 'ties'}
+    </div>
+  </div>
+);
 
 interface SideProps {
   avatarUrl: string | null;
@@ -251,7 +296,9 @@ interface SideProps {
   labelColor: string;
   score: number;
   isWinning: boolean;
+  isLosing: boolean;
   handicap: number | null;
+  winPct: number | null;
   alignRight: boolean;
 }
 
@@ -262,7 +309,9 @@ const Side: React.FC<SideProps> = ({
   labelColor,
   score,
   isWinning,
+  isLosing,
   handicap,
+  winPct,
   alignRight,
 }) => (
   <div
@@ -277,11 +326,18 @@ const Side: React.FC<SideProps> = ({
       style={{
         width: 56,
         height: 56,
-        borderRadius: '34%',
+        borderRadius: 14,
         background: avatarUrl
           ? `url(${avatarUrl}) center/cover`
           : 'rgba(255,255,255,0.06)',
-        border: isWinning ? `2px solid ${GOLD}` : `1px solid ${LINE_2}`,
+        border: isWinning
+          ? `2px solid ${GOLD}`
+          : isLosing
+            ? `2px solid rgba(255,255,255,0.20)`
+            : `1px solid ${LINE_2}`,
+        boxShadow: isWinning
+          ? '0 0 24px -8px rgba(247,147,30,0.45)'
+          : 'none',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
@@ -319,9 +375,12 @@ const Side: React.FC<SideProps> = ({
     >
       {score}
     </div>
-    {handicap != null && (
+    {(handicap != null || winPct != null) && (
       <div
         style={{
+          display: 'inline-flex',
+          alignItems: 'center',
+          gap: 6,
           color: T60,
           fontSize: 11,
           fontWeight: 600,
@@ -329,7 +388,13 @@ const Side: React.FC<SideProps> = ({
           ...TAB,
         }}
       >
-        hcp {handicap.toFixed(1)}
+        {handicap != null && <span>hcp {handicap.toFixed(1)}</span>}
+        {handicap != null && winPct != null && <span style={{ color: T40 }}>·</span>}
+        {winPct != null && (
+          <span style={{ color: isWinning ? AMBER : T60, fontWeight: 700 }}>
+            {winPct}%
+          </span>
+        )}
       </div>
     )}
   </div>

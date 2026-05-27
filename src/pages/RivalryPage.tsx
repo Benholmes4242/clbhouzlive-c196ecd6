@@ -14,7 +14,7 @@ import { useQuery } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { supabase } from '@/integrations/supabase/client';
-import { useFriendRivalries } from '@/lib/whs/hooks';
+import { useFriendRivalries, useWhsConnection } from '@/lib/whs/hooks';
 import type { FriendRivalryHydrated } from '@/lib/whs/types';
 import { PageRoot } from '@/components/layout/PageRoot';
 import { useRivalryDimension } from '@/lib/whs/utils/useRivalryDimension';
@@ -27,6 +27,7 @@ import { ActionRail } from './rivalry-page/ActionRail';
 import { InsightsGrid } from './rivalry-page/InsightsGrid';
 import { CoursesPlayedSection } from './rivalry-page/CoursesPlayedSection';
 import { RoundByRoundSection } from './rivalry-page/RoundByRoundSection';
+import { HeadToHeadSection } from './rivalry-page/HeadToHeadSection';
 import { computeInsights } from './rivalry-page/_shared/insights';
 import { firstName } from './rivalry-page/_shared/helpers';
 import {
@@ -245,6 +246,27 @@ const RivalryPage: React.FC = () => {
   const rivalIsClbhouzUser =
     !!rivalUserId && UUID_RE.test(rivalUserId);
 
+  // Viewer's WHS connection (for H2H trophy aggregates fetch)
+  const { data: viewerConn } = useWhsConnection(
+    !isFriendView ? viewerId : undefined,
+  );
+  const viewerConnectionId = (viewerConn as any)?.id ?? undefined;
+
+  // H2H best gross margins from shared_round_results
+  const bestMargins = useMemo(() => {
+    const rounds = row?.shared_round_results ?? [];
+    let me: number | null = null;
+    let them: number | null = null;
+    for (const r of rounds) {
+      if (r.user_gross == null || r.rival_gross == null) continue;
+      const d = r.rival_gross - r.user_gross;
+      if (d > 0 && (me == null || d > me)) me = d;
+      if (d < 0 && (them == null || -d > them)) them = -d;
+    }
+    return { me, them };
+  }, [row]);
+
+
   const handleProfile = () => {
     if (rivalIsClbhouzUser && rivalUserId) {
       openHybridSheet({
@@ -382,7 +404,18 @@ const RivalryPage: React.FC = () => {
             />
           </div>
 
+          {!isFriendView && rivalIsClbhouzUser && (
+            <HeadToHeadSection
+              viewerId={viewerId}
+              viewerConnectionId={viewerConnectionId}
+              rivalUserId={rivalUserId}
+              rivalFirstName={rivalFirst}
+              bestMargins={bestMargins}
+            />
+          )}
+
           <InsightsGrid insights={insights} />
+
 
           <CoursesPlayedSection
             row={row}
