@@ -37,7 +37,7 @@ export function getH2HTier(
   if (w >= 13) {
     return {
       index: 7,
-      eyebrow: 'TOTAL DOMINATION',
+      eyebrow: '⚡ TOTAL DOMINATION',
       subcopy: "It's not close",
       accent: GREEN,
       gradient:
@@ -92,7 +92,7 @@ export function getH2HTier(
   if (w >= 3) {
     return {
       index: 2,
-      eyebrow: 'BEING DEMOLISHED',
+      eyebrow: '💀 BEING DEMOLISHED',
       subcopy: "It's not close",
       accent: RED,
       gradient:
@@ -102,7 +102,7 @@ export function getH2HTier(
   }
   return {
     index: 1,
-    eyebrow: 'OBLITERATED',
+    eyebrow: '☠️ OBLITERATED',
     subcopy: `${rivalFirstName} owns you`,
     accent: RED,
     gradient:
