@@ -70,7 +70,7 @@ export function usePulseFriends(userId: string | undefined) {
       if (!profiles) return [];
 
       // 3. Last 14 days of rounds (for hot detection)
-      const sevenDaysAgo = new Date(Date.now() - 7 * DAY_MS).toISOString().slice(0, 10);
+      const thirtyDaysAgo = new Date(Date.now() - 30 * DAY_MS).toISOString().slice(0, 10);
       const fourteenDaysAgo = new Date(Date.now() - 14 * DAY_MS).toISOString().slice(0, 10);
 
       const { data: rounds } = await supabase
@@ -171,7 +171,7 @@ export function usePulseFriends(userId: string | undefined) {
         if (friendRounds.length === 0) continue;
 
         const lastPlayed = friendRounds[0].play_date;
-        if (lastPlayed < sevenDaysAgo) continue;
+        if (lastPlayed < thirtyDaysAgo) continue;
 
         const lastFive = friendRounds.slice(0, 5);
         let strongRounds = 0;
