@@ -202,7 +202,7 @@ const TourSwitcherAffordance: React.FC = () => {
           fontWeight: 700,
           letterSpacing: '0.04em',
           textTransform: 'uppercase',
-          height: 36,
+          height: 40,
         }}
       >
         <span>{TOUR_LABEL[activeTourSlug]}</span>
