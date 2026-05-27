@@ -120,6 +120,14 @@
   --hcp-amber-tint:    rgba(247, 147, 30, 0.12);
   --hcp-amber-tint-2:  rgba(247, 147, 30, 0.06);
 
+  /* Accents — utility flips to slate; celebration stays amber (darkened for AA). */
+  --hcp-accent-util:        #0F172A;
+  --hcp-accent-util-tint:   rgba(15, 23, 42, 0.05);
+  --hcp-accent-util-tint-2: rgba(15, 23, 42, 0.02);
+  --hcp-accent-util-border: rgba(15, 23, 42, 0.18);
+  --hcp-accent-celebrate:       #C97211;
+  --hcp-accent-celebrate-tint:  rgba(251, 188, 46, 0.12);
+
   /* Verdict palette — darkened for white-surface contrast */
   --hcp-good:       #16A34A;
   --hcp-good-2:     #15803D;
