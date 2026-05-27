@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
-import { useTop100ProgressForUser } from '@/hooks/useTop100ProgressForUser';
+
 import { useTop100ListSummaries } from '@/hooks/useTop100ListSummaries';
 import { useGolfCoursesInfinite, type SearchedCourseWithRating } from '@/hooks/useGolfCoursesInfinite';
 import { useTop100Lists } from '@/hooks/useTop100Lists';
