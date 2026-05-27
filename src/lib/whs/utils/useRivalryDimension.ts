@@ -1,7 +1,8 @@
 /**
  * Per-rivalry scoring-dimension preference.
  * Persisted as a JSON map in localStorage under `hcp-rivalry-dimension-map`,
- * keyed by rivalId (rival_user_id or rival_friend_row_id). Always returns 'gross' — per-rivalry preference is intentionally not honoured.
+ * keyed by rivalId (rival_user_id or rival_friend_row_id). Falls back to
+ * 'gross' when a key has no stored value.
  *
  * Used by both the Rivalries section cards and the deep-view page so the
  * user's per-rival choice sticks across surfaces and reloads.
