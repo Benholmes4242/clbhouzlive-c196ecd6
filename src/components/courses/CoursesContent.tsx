@@ -15,7 +15,7 @@ import { useNavigate, useSearchParams, useLocation } from 'react-router-dom';
 import ScrollToTopGlass from '@/components/common/ScrollToTopGlass';
 import CoursesErrorBoundary from './CoursesErrorBoundary';
 import { Search, X, Star, ChevronRight } from 'lucide-react';
-import SegmentedControl from '@/components/discover/SegmentedControl';
+import CoursesShellTabs from '@/features/courses/components/CoursesShellTabs';
 import { supabase } from '@/integrations/supabase/client';
 import { useQuery } from '@tanstack/react-query';
 import { SectionEyebrow } from '@/components/ui/SectionEyebrow';
