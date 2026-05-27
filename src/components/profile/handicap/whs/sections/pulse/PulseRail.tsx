@@ -38,7 +38,7 @@ const SectionHeader: React.FC<{ count: number | null }> = ({ count }) => (
         color: 'var(--hcp-t-60)',
       }}
     >
-      Last 7 days
+      Last 30 days
     </span>
   </div>
 );
