@@ -82,9 +82,11 @@ interface SectionRow {
 interface Props {
   /** Course context. */
   selection: CourseSelection;
+  /** When true, suppresses the DrilldownHeader — for embedded contexts (e.g. Course Detail Legends tab) where the parent already renders a course hero. */
+  hideHeader?: boolean;
 }
 
-export const CourseLegendsDrilldown: React.FC<Props> = ({ selection }) => {
+export const CourseLegendsDrilldown: React.FC<Props> = ({ selection, hideHeader = false }) => {
   const ctx = selection;
 
 
@@ -181,12 +183,14 @@ export const CourseLegendsDrilldown: React.FC<Props> = ({ selection }) => {
 
   return (
     <div ref={containerRef}>
-      <DrilldownHeader
-        state={ctx}
-        youOwnedCount={youOwnedCount}
-        totalCategories={visibleCategories.length}
-        courseHeaderImage={courseHeaderImage}
-      />
+      {!hideHeader && (
+        <DrilldownHeader
+          state={ctx}
+          youOwnedCount={youOwnedCount}
+          totalCategories={visibleCategories.length}
+          courseHeaderImage={courseHeaderImage}
+        />
+      )}
 
       <div style={{ padding: '14px 16px 4px', display: 'flex', justifyContent: 'flex-start' }}>
         <WindowToggle window={window} setWindow={setWindow} />
