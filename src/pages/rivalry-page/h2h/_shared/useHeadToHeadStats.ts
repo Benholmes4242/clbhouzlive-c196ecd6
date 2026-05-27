@@ -6,11 +6,11 @@
  */
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { fetchTrophyAggregates } from '@/lib/whs/api';
+import { fetchTrophyAggregates, fetchHandicapHistory } from '@/lib/whs/api';
 import type { HeadToHeadStats, PlayerStats } from '@/pages/rivalry-page/h2h/_shared/h2hStats';
 
 const MS_PER_DAY = 86_400_000;
-const NINETY_DAYS = 90 * MS_PER_DAY;
+const TARGET_DAYS = 90;
 const MIN_HISTORY_DAYS = 80;
 
 interface GamRow {
@@ -24,12 +24,6 @@ interface GamRow {
   course_par: number | null;
   hcp_at_time: number | null;
   holes_played?: number | null;
-}
-
-interface SnapRow {
-  connection_id: string;
-  observed_at: string;
-  handicap_index: number | null;
 }
 
 function emptyPlayer(): PlayerStats {
@@ -52,28 +46,33 @@ function emptyPlayer(): PlayerStats {
   };
 }
 
-function compute90dDelta(rows: SnapRow[], current: number | null): number | null {
-  if (current == null || rows.length === 0) return null;
-  const sorted = [...rows].sort(
-    (a, b) => new Date(a.observed_at).getTime() - new Date(b.observed_at).getTime(),
-  );
+function compute90dDeltaFromHistory(
+  history: { observed_at: string; handicap_index: number | null }[],
+  current: number | null,
+): number | null {
+  if (current === null || history.length === 0) return null;
+
   const now = Date.now();
-  const earliest = new Date(sorted[0].observed_at).getTime();
-  if (now - earliest < MIN_HISTORY_DAYS * MS_PER_DAY) return null;
-  const target = now - NINETY_DAYS;
-  let closest = sorted[0];
-  let bestDiff = Math.abs(new Date(closest.observed_at).getTime() - target);
-  for (const r of sorted) {
-    const d = Math.abs(new Date(r.observed_at).getTime() - target);
-    if (d < bestDiff) {
-      bestDiff = d;
-      closest = r;
+  const earliestTs = new Date(history[0].observed_at).getTime();
+  if (now - earliestTs < MIN_HISTORY_DAYS * MS_PER_DAY) return null;
+
+  const targetTs = now - TARGET_DAYS * MS_PER_DAY;
+  let closest = history[0];
+  let closestDiff = Math.abs(new Date(closest.observed_at).getTime() - targetTs);
+  for (const pt of history) {
+    const diff = Math.abs(new Date(pt.observed_at).getTime() - targetTs);
+    if (diff < closestDiff) {
+      closest = pt;
+      closestDiff = diff;
     }
   }
+
   const past = Number(closest.handicap_index);
   if (!Number.isFinite(past)) return null;
+
   return Math.round((current - past) * 10) / 10;
 }
+
 
 function summariseGam(rows: GamRow[]): {
   sub80_rounds: number;
