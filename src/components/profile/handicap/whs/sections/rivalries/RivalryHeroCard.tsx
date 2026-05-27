@@ -381,9 +381,12 @@ export const RivalryHeroCard: React.FC<Props> = ({
         <span>
           {sharedRounds} rounds{sinceYears > 0 ? ` · ${sinceYears}y rivalry` : ''}
         </span>
-        <span style={{ color: '#F7931E', fontWeight: 800 }}>FULL HISTORY ›</span>
+        {tappable && (
+          <span style={{ color: '#F7931E', fontWeight: 800 }}>FULL HISTORY ›</span>
+        )}
       </div>
-    </button>
+    </Tag>
+
   );
 };
 
