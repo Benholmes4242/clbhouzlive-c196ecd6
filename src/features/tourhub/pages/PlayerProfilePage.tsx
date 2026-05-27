@@ -37,7 +37,7 @@ function getTourBadgeText(tourCode: string | null | undefined): string {
 }
 
 const SHELL_SLOT_BG: React.CSSProperties = {
-  background: '#F8FAFC',
+  background: '#0A0E14',
   padding: '14px 16px 12px',
 };
 
@@ -45,7 +45,7 @@ const SHELL_H1_STYLE: React.CSSProperties = {
   fontSize: 22,
   fontWeight: 800,
   letterSpacing: '-0.025em',
-  color: '#0F172A',
+  color: '#FFFFFF',
   lineHeight: 1.05,
   margin: 0,
 };
@@ -73,9 +73,9 @@ export function PlayerProfilePage() {
   if (playerLoading) {
     return (
       <TourHubShell>
-        <ShellSlot>
+        <ShellSlot dark>
           <div style={SHELL_SLOT_BG}>
-            <Kicker>Player</Kicker>
+            <Kicker color="amber">Player</Kicker>
             <Skeleton className="h-5 w-40" style={{ background: 'rgba(15,23,42,0.06)' }} />
           </div>
         </ShellSlot>
@@ -95,9 +95,9 @@ export function PlayerProfilePage() {
   if (!player) {
     return (
       <TourHubShell>
-        <ShellSlot>
+        <ShellSlot dark>
           <div style={SHELL_SLOT_BG}>
-            <Kicker>Player</Kicker>
+            <Kicker color="amber">Player</Kicker>
             <h1 style={SHELL_H1_STYLE}>Player Profile</h1>
           </div>
         </ShellSlot>
@@ -128,9 +128,9 @@ export function PlayerProfilePage() {
 
   return (
     <TourHubShell>
-      <ShellSlot>
+      <ShellSlot dark>
         <div style={SHELL_SLOT_BG}>
-          <Kicker>{tourBadge}</Kicker>
+          <Kicker color="amber">{tourBadge}</Kicker>
           <h1 style={SHELL_H1_STYLE}>{player.full_name}</h1>
         </div>
       </ShellSlot>

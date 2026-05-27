@@ -311,7 +311,7 @@ export function TournamentDetailPage() {
   
   return (
     <TourHubShell immersive={true}>
-      <ShellSlot>
+      <ShellSlot dark>
         <TournamentTabsShellRow
           activeTab={activeTab}
           onChange={handleTabChange}

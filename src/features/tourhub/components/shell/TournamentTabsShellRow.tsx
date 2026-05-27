@@ -29,43 +29,64 @@ interface Props {
  */
 function TournamentTabsShellRowInner({ activeTab, onChange }: Props) {
   return (
-    <div
-      role="tablist"
-      aria-label="Tournament Sections"
-      style={{
-        display: 'flex',
-        background: '#0A0E14',
-        borderBottom: '0.5px solid rgba(255,255,255,0.06)',
-      }}
-    >
-      {TABS.map((tab) => {
-        const isActive = activeTab === tab.value;
-        return (
-          <button
-            key={tab.value}
-            role="tab"
-            aria-selected={isActive}
-            onClick={() => onChange(tab.value)}
-            className="active:opacity-70 transition-opacity"
-            style={{
-              flex: 1,
-              padding: '12px 0',
-              fontSize: 12,
-              fontWeight: isActive ? 800 : 600,
-              color: isActive ? '#FFFFFF' : 'rgba(255,255,255,0.55)',
-              background: 'transparent',
-              border: 'none',
-              borderBottom: isActive ? '2px solid #F7931E' : '2px solid transparent',
-              cursor: 'pointer',
-              whiteSpace: 'nowrap' as const,
-              textAlign: 'center' as const,
-            }}
-          >
-            {tab.label}
-          </button>
-        );
-      })}
-    </div>
+    <>
+      <style>{`[data-tournament-tabs]::-webkit-scrollbar { display: none; }`}</style>
+      <div
+        data-tournament-tabs
+        role="tablist"
+        aria-label="Tournament Sections"
+        style={{
+          display: 'flex',
+          gap: 8,
+          padding: '0 16px',
+          background: '#0A0E14',
+          borderBottom: '0.5px solid rgba(255,255,255,0.06)',
+          overflowX: 'auto',
+          overflowY: 'hidden',
+          WebkitOverflowScrolling: 'touch',
+          scrollbarWidth: 'none',
+          fontFamily: 'Geist, system-ui, -apple-system, BlinkMacSystemFont, sans-serif',
+        }}
+      >
+        {TABS.map((tab) => {
+          const isActive = activeTab === tab.value;
+          return (
+            <button
+              key={tab.value}
+              role="tab"
+              aria-selected={isActive}
+              onClick={() => onChange(tab.value)}
+              className="active:opacity-70 transition-opacity"
+              style={{
+                flex: '0 0 auto',
+                height: 44,
+                padding: '0 4px',
+                fontSize: 14,
+                fontWeight: isActive ? 700 : 600,
+                color: isActive ? '#FFFFFF' : 'rgba(255,255,255,0.55)',
+                background: 'transparent',
+                border: 'none',
+                letterSpacing: '-0.005em',
+                cursor: 'pointer',
+                whiteSpace: 'nowrap',
+                display: 'inline-flex',
+                alignItems: 'center',
+              }}
+            >
+              <span
+                style={{
+                  display: 'inline-block',
+                  paddingBottom: 4,
+                  borderBottom: isActive ? '1.5px solid #FFFFFF' : '1.5px solid transparent',
+                }}
+              >
+                {tab.label}
+              </span>
+            </button>
+          );
+        })}
+      </div>
+    </>
   );
 }
 
