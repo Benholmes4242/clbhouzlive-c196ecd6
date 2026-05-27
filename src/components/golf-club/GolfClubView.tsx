@@ -200,16 +200,18 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
             value="legends"
             className={`mt-0 transition-opacity duration-200 ${activeTab === 'legends' ? 'opacity-100' : 'hidden'}`}
           >
-            <CourseLegendsDrilldown
-              selection={{
-                courseId: course.id,
-                courseName: course.name,
-                courseRegion: (course as any).region ?? null,
-                courseCountry: (course as any).country ?? null,
-                courseType: (course as any).course_type ?? null,
-              }}
-              hideHeader
-            />
+            <div className="hcp-dark" style={{ background: 'var(--hcp-bg-0)' }}>
+              <CourseLegendsDrilldown
+                selection={{
+                  courseId: course.id,
+                  courseName: course.name,
+                  courseRegion: (course as any).region ?? null,
+                  courseCountry: (course as any).country ?? null,
+                  courseType: (course as any).course_type ?? null,
+                }}
+                hideHeader
+              />
+            </div>
           </TabsContent>
         )}
       </Tabs>

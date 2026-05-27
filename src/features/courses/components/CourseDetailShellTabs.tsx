@@ -11,7 +11,7 @@ const TABS: TabDef[] = [
   { id: 'about', label: 'About' },
   { id: 'reviews', label: 'Reviews' },
   { id: 'media', label: 'Media' },
-  { id: 'legends', label: 'Legends' },
+  { id: 'legends', label: 'Champions' },
 ];
 
 interface CourseDetailShellTabsProps {
