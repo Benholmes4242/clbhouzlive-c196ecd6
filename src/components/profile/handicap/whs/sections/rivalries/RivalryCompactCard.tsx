@@ -18,8 +18,9 @@ const FONT_GEIST = 'Geist, system-ui, -apple-system, BlinkMacSystemFont, sans-se
 interface Props {
   rivalry: FriendRivalryHydrated;
   tier: RivalryTier;
-  onTap: () => void;
+  onTap?: () => void;
 }
+
 
 function truncate(s: string, max = 15): string {
   return s.length > max ? `${s.slice(0, max - 1).trimEnd()}…` : s;
@@ -56,10 +57,12 @@ export const RivalryCompactCard: React.FC<Props> = ({ rivalry, tier, onTap }) =>
 
   const stripeColor = state === 'winning' ? '#F7931E' : state === 'losing' ? '#EF4444' : null;
 
+  const tappable = typeof onTap === 'function';
+  const Tag: any = tappable ? 'button' : 'div';
+
   return (
-    <button
-      type="button"
-      onClick={onTap}
+    <Tag
+      {...(tappable ? { type: 'button' as const, onClick: onTap } : {})}
       style={{
         position: 'relative',
         display: 'block',
@@ -71,9 +74,10 @@ export const RivalryCompactCard: React.FC<Props> = ({ rivalry, tier, onTap }) =>
         background: 'var(--hcp-bg-1)',
         fontFamily: FONT_GEIST,
         padding: 0,
-        cursor: 'pointer',
+        cursor: tappable ? 'pointer' : 'default',
       }}
     >
+
       {stripeColor && (
         <div
           aria-hidden
@@ -248,7 +252,7 @@ export const RivalryCompactCard: React.FC<Props> = ({ rivalry, tier, onTap }) =>
           </div>
         </div>
       </div>
-    </button>
+    </Tag>
   );
 };
 
