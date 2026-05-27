@@ -12,7 +12,6 @@ const REGION_FULL_NAMES: Record<string, string> = {
 
 interface Top100HeroShellProps {
   list: Top100ListSummary;
-  /** @deprecated unused after Phase B */
   playedCount?: number;
   totalCount?: number;
   listDisplayName?: string;
@@ -22,7 +21,7 @@ interface Top100HeroShellProps {
  * Top100HeroShell — Inline 200px hero card, sits below CompactHeader (no notch bleed).
  * CompactHeader supplies the back arrow for /top100/:slug.
  */
-export const Top100HeroShell: React.FC<Top100HeroShellProps> = ({ list }) => {
+export const Top100HeroShell: React.FC<Top100HeroShellProps> = ({ list, playedCount, totalCount }) => {
   const [imageLoaded, setImageLoaded] = useState(false);
   const hero = list.hero_course;
   const listSlug = list.slug as 'global' | 'gb-i' | 'usa' | 'europe';
@@ -96,6 +95,27 @@ export const Top100HeroShell: React.FC<Top100HeroShellProps> = ({ list }) => {
         >
           {displayLabel}
         </h1>
+        {typeof totalCount === 'number' && totalCount > 0 && (
+          <p
+            className="text-white/85"
+            style={{
+              fontSize: 10,
+              fontWeight: 600,
+              letterSpacing: '0.14em',
+              textTransform: 'uppercase',
+              marginTop: 6,
+              textShadow: '0 1px 2px rgba(0,0,0,0.5)',
+            }}
+          >
+            {totalCount} Courses
+            {typeof playedCount === 'number' && playedCount > 0 && (
+              <>
+                <span className="text-white/55"> · </span>
+                You {playedCount}
+              </>
+            )}
+          </p>
+        )}
       </motion.div>
     </div>
   );
