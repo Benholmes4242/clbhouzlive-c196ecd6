@@ -138,11 +138,7 @@ export function OverviewPageV3() {
         </motion.div>
 
 
-        {/* Pass 6: editorial content tier — sits directly below the hero CTA.
-            Gap stack is intentional: hero → 24px (Dispatch top pad) → Dispatch
-            → 26px (Across top pad) → Across the Tours → 40px (content gap) →
-            handicap card. Don't unify into a single gap. */}
-        <DispatchModule />
+        {/* Editorial content tier — sits directly below the hero CTA. */}
         <AcrossTheToursModule activeTourSlug={activeTourSlug} />
 
 
@@ -154,12 +150,6 @@ export function OverviewPageV3() {
           <div className="bg-background" style={{ display: 'flex', flexDirection: 'column', gap: 40, paddingTop: 40, paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 80px)' }}>
             <LazySection minHeight={160}>
               <HomeConnectHandicapModule />
-            </LazySection>
-            <LazySection minHeight={120}>
-              <HomeOnCourseStrip />
-            </LazySection>
-            <LazySection minHeight={280}>
-              <HomePGAModule />
             </LazySection>
             <LazySection minHeight={500}>
               <IntelligenceHero />
