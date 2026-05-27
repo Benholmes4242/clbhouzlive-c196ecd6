@@ -277,22 +277,10 @@ const UnifiedCourseCardImpl: React.FC<UnifiedCourseCardProps> = ({
             <Star size={10} fill="white" color="white" />
             <span style={{ fontSize: 10, fontWeight: 700, color: 'white' }}>Rate</span>
           </button>
-        ) : showPlayedStatus && isPlayed !== undefined ? (
-          <div
-            className={`absolute top-3 right-3 flex items-center gap-1 px-2 py-0.5 rounded-sq-pill text-[9px] font-medium shadow-sm ${
-              isPlayed
-                ? 'bg-emerald-500/90 text-white'
-                : 'bg-black/50 text-white/90'
-            }`}
-          >
-            {isPlayed ? (
-              <>
-                <Check className="w-2.5 h-2.5" />
-                <span>Played</span>
-              </>
-            ) : (
-              <span>Unplayed</span>
-            )}
+        ) : showPlayedStatus && isPlayed ? (
+          <div className="absolute top-3 right-3 flex items-center gap-1 px-2 py-0.5 rounded-sq-pill text-[9px] font-medium shadow-sm bg-emerald-500/90 text-white">
+            <Check className="w-2.5 h-2.5" />
+            <span>Played</span>
           </div>
         ) : null}
 

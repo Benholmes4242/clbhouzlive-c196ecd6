@@ -151,7 +151,7 @@ const Top100Courses = () => {
                         course={fromGolfCourse(course as unknown as GolfCourseRaw)}
                         showRankBadges={true}
                         showRating={true}
-                        showPlayedStatus={false}
+                        showPlayedStatus={true}
                         activeListSlug="global"
                       />
                     </div>
@@ -227,7 +227,7 @@ const Top100Courses = () => {
                           course={fromGolfCourse(course as unknown as GolfCourseRaw)}
                           showRankBadges={true}
                           showRating={true}
-                          showPlayedStatus={false}
+                          showPlayedStatus={true}
                           activeListSlug={selectedRegion === 'USA' ? 'usa' : selectedRegion === 'Britain & Ireland' ? 'gb-i' : 'europe'}
                         />
                       </div>
