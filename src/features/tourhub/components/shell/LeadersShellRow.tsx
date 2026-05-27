@@ -58,7 +58,7 @@ function LeadersShellRowInner() {
         role="tablist"
         aria-label="Stat category"
         className="flex justify-center gap-1.5"
-        style={{ padding: '8.5px 16px' }}
+        style={{ padding: '7px 16px' }}
       >
         {CHIPS.map((c) => {
           const isActive = categoryKey === c.categoryKey;
