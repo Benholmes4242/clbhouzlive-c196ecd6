@@ -1,6 +1,9 @@
 import React, { useRef, useEffect, useState } from 'react';
 import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
-import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
+import { Globe } from 'lucide-react';
+import { BottomSheet } from '@/components/ui/BottomSheet';
+import SheetHeader from '@/components/ui/SheetHeader';
+import { getTourLogo } from '../utils/tourLogos';
 import { useAllToursTickerData } from '../hooks/useOverviewModules';
 import type { TourHubTab } from './types';
 
