@@ -156,7 +156,7 @@ const Top100PublicJourneyPanel: React.FC<Top100PublicJourneyPanelProps> = ({
           <div className="pt-2">
             <Button
               variant="outline"
-              onClick={() => navigate(`/top100`)}
+              onClick={() => navigate('/courses?tab=top100')}
               className="w-full"
             >
               Explore Top 100 lists
@@ -173,7 +173,7 @@ const Top100PublicJourneyPanel: React.FC<Top100PublicJourneyPanelProps> = ({
           <Button
             variant="outline"
             size="sm"
-            onClick={() => navigate(`/top100`)}
+            onClick={() => navigate('/courses?tab=top100')}
           >
             Explore Top 100 lists
           </Button>
