@@ -15,7 +15,9 @@ import type { CourseSelection } from './types';
 import { DrilldownHeader } from './drilldown/DrilldownHeader';
 import { CourseMetaStrip } from './drilldown/CourseMetaStrip';
 import { CategoryNavRail } from './drilldown/CategoryNavRail';
-import { CategorySection } from './drilldown/CategorySection';
+import { ChampionsResultBand } from './drilldown/ChampionsResultBand';
+import { ChampionsField } from './drilldown/ChampionsField';
+import { ChampionsSignatureFooter } from './drilldown/ChampionsSignatureFooter';
 import { FullCourseLeaderboardSheet } from './drilldown/FullCourseLeaderboardSheet';
 import { WindowToggle } from './CourseLegendsSection';
 
@@ -68,6 +70,38 @@ const UNITS: Record<LegendCategory, string> = {
   most_aces_90d:            '',
   most_aces_all_time:       '',
 };
+
+const UNIT_LABELS: Record<LegendCategory, string> = {
+  best_score_diff_90d:      'vs hcp',
+  best_score_diff_all_time: 'vs hcp',
+  lowest_gross_90d:         'Gross',
+  lowest_gross_all_time:    'Gross',
+  most_birdies_90d:         'Birdies',
+  most_birdies_all_time:    'Birdies',
+  best_stableford_90d:      'Pts',
+  best_stableford_all_time: 'Pts',
+  most_eagles_90d:          'Eagles',
+  most_eagles_all_time:     'Eagles',
+  most_aces_90d:            'Aces',
+  most_aces_all_time:       'Aces',
+};
+
+function formatHeldDuration(attainedAtIso: string): string {
+  const attainedAt = new Date(attainedAtIso);
+  if (isNaN(attainedAt.getTime())) return '—';
+  const diffMs = Date.now() - attainedAt.getTime();
+  if (diffMs < 0) return '—';
+  const days = Math.floor(diffMs / 86400000);
+  if (days === 0) return 'today';
+  if (days === 1) return '1d';
+  if (days < 7) return `${days}d`;
+  const weeks = Math.floor(days / 7);
+  if (weeks < 5) return `${weeks}w`;
+  const months = Math.floor(days / 30);
+  if (months < 12) return `${months}mo`;
+  const years = Math.floor(days / 365);
+  return `${years}y`;
+}
 
 interface SectionRow {
   rank: number;
@@ -224,30 +258,43 @@ export const CourseLegendsDrilldown: React.FC<Props> = ({ selection, hideHeader 
         <>
           <CourseMetaStrip meta={meta} />
           <CategoryNavRail categories={navCategories} onSelect={handleNavSelect} />
-          <div
-            style={{
-              padding: '20px 16px 32px',
-              display: 'flex',
-              flexDirection: 'column',
-              gap: 28,
-            }}
-          >
-            {visibleCategories.map((cat) => {
-              const entry = groupedWithTotals.get(cat);
-              if (!entry || entry.rows.length === 0) return null;
-              return (
-                <div key={cat} data-category={cat}>
-                  <CategorySection
-                    categoryLabel={legendCategoryLabel[cat]}
-                    categoryIcon={legendCategoryIcon[cat]}
-                    unit={UNITS[cat]}
-                    rows={entry.rows}
-                    totalCount={entry.total}
-                    onSeeFull={() => setFullLeaderboardCategory(cat)}
-                  />
-                </div>
-              );
-            })}
+          <div style={{ paddingBottom: 32 }}>
+          {visibleCategories.map((cat) => {
+            const entry = groupedWithTotals.get(cat);
+            if (!entry || entry.rows.length === 0) return null;
+            const champion = entry.rows[0];
+            const fieldRows = entry.rows.slice(1).map((r) => ({
+              rank: r.rank,
+              name: r.name,
+              photoUrl: r.photoUrl,
+              valueDisplay: r.valueDisplay,
+              isSelf: r.isSelf,
+            }));
+            const heldDuration = formatHeldDuration(champion.attained_at);
+            return (
+              <div key={cat} data-category={cat} style={{ marginBottom: 16 }}>
+                <ChampionsResultBand
+                  categoryLabel={legendCategoryLabel[cat]}
+                  categoryIcon={legendCategoryIcon[cat]}
+                  championName={champion.isSelf ? 'You' : champion.name}
+                  championPhotoUrl={champion.photoUrl}
+                  valueDisplay={champion.valueDisplay}
+                  unitLabel={UNIT_LABELS[cat]}
+                  isSelf={champion.isSelf}
+                />
+                <ChampionsField
+                  rows={fieldRows}
+                  totalCount={entry.total}
+                  onFullLeaderboardTap={() => setFullLeaderboardCategory(cat)}
+                />
+                <ChampionsSignatureFooter
+                  windowLabel={window === '90d' ? '90D' : 'All time'}
+                  heldDuration={heldDuration}
+                  entryCount={entry.total}
+                />
+              </div>
+            );
+          })}
           </div>
         </>
       )}
