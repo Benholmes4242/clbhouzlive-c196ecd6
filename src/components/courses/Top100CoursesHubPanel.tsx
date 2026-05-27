@@ -58,6 +58,20 @@ const Top100CoursesHubPanel = () => {
   const { data: listSummaries = [] } = useTop100ListSummaries(user?.id);
   const { data: lists = [] } = useTop100Lists();
 
+  // Cross-list progress — only counts lists the user has actually started
+  // (at least 1 played). Mirrors the original framing the previous panel had.
+  const crossListProgress = React.useMemo(() => {
+    const started = listSummaries.filter(s => s.played_count > 0);
+    if (started.length === 0) return null;
+    const totalRated = started.reduce((acc, s) => acc + s.played_count, 0);
+    const totalInStartedLists = started.reduce((acc, s) => acc + s.total_courses, 0);
+    return {
+      totalRated,
+      totalInStartedLists,
+      listsStarted: started.length,
+    };
+  }, [listSummaries]);
+
   // Debounce search
   useEffect(() => {
     const timer = setTimeout(() => setDebouncedSearch(searchTerm), 300);
