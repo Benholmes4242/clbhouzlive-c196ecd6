@@ -252,7 +252,7 @@ export const RivalryCompactCard: React.FC<Props> = ({ rivalry, tier, onTap }) =>
           </div>
         </div>
       </div>
-    </button>
+    </Tag>
   );
 };
 
