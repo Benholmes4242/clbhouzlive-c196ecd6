@@ -85,6 +85,11 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
   // (dark header background, white controls, dark identity pill) but keep the
   // clbhouz logo on the left — they're top-level hubs, not back-arrow pages.
   const isTourRoute = location.pathname === '/tourhub' || location.pathname.startsWith('/tourhub/');
+  const isCoursesLandingRoute = location.pathname === '/courses';
+  // Editorial-geometry chrome (52px / 30px logo / 38px search) applies to
+  // tab-landing surfaces. Tour-specific behaviors (compact avatar pill,
+  // back-arrow) stay gated on isTourRoute.
+  const isEditorialChromeRoute = isTourRoute || isCoursesLandingRoute;
   // Routes that keep the light Dispatch chrome (clubhouse feed + profile pages).
   // NOTE: '/' is the Tour Hub landing — it must use dark chrome like /tourhub.
   // Do not re-add '/' here.
