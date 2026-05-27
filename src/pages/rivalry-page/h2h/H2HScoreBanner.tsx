@@ -11,8 +11,8 @@ import {
   T80,
   GREEN,
   RED,
-  AMBER,
 } from '@/pages/rivalry-page/_shared/tokens';
+import { getH2HTier } from './_shared/tiers';
 
 interface Props {
   myWins: number;
@@ -29,23 +29,10 @@ export const H2HScoreBanner: React.FC<Props> = ({
   total,
   rivalFirstName,
 }) => {
-  const youLead = myWins > theirWins;
-  const themLead = theirWins > myWins;
-  const tied = !youLead && !themLead;
-
-  const accent = youLead ? GREEN : themLead ? RED : AMBER;
-  const eyebrow = youLead
-    ? 'You dominate'
-    : themLead
-      ? `${rivalFirstName} dominates`
-      : 'Neck and neck';
+  const tier = getH2HTier(myWins, theirWins, total, rivalFirstName);
+  const { eyebrow, subcopy, accent, gradient } = tier;
+  const tied = myWins === theirWins;
   const leaderWins = Math.max(myWins, theirWins);
-
-  const gradient = youLead
-    ? 'linear-gradient(135deg, rgba(34,197,94,0.14), rgba(34,197,94,0.02))'
-    : themLead
-      ? 'linear-gradient(135deg, rgba(239,68,68,0.14), rgba(239,68,68,0.02))'
-      : 'linear-gradient(135deg, rgba(247,147,30,0.12), rgba(247,147,30,0.02))';
 
   const safeTotal = Math.max(total, 1);
   const mePct = (myWins / safeTotal) * 100;
@@ -94,7 +81,19 @@ export const H2HScoreBanner: React.FC<Props> = ({
 
         <div
           style={{
-            marginTop: 10,
+            marginTop: 4,
+            color: T60,
+            fontSize: 12,
+            fontWeight: 500,
+            fontFamily: FONT,
+          }}
+        >
+          {subcopy}
+        </div>
+
+        <div
+          style={{
+            marginTop: 12,
             display: 'flex',
             height: 6,
             borderRadius: 999,
