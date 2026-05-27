@@ -81,7 +81,19 @@ export const H2HScoreBanner: React.FC<Props> = ({
 
         <div
           style={{
-            marginTop: 10,
+            marginTop: 4,
+            color: T60,
+            fontSize: 12,
+            fontWeight: 500,
+            fontFamily: FONT,
+          }}
+        >
+          {subcopy}
+        </div>
+
+        <div
+          style={{
+            marginTop: 12,
             display: 'flex',
             height: 6,
             borderRadius: 999,
