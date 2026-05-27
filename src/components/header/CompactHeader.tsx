@@ -298,7 +298,7 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
               onClick={handleSearchClick}
               aria-label="Search"
             >
-              <Search className={isTourRoute ? "h-[18px] w-[18px]" : "h-5 w-5"} />
+              <Search className={isEditorialChromeRoute ? "h-[18px] w-[18px]" : "h-5 w-5"} />
             </Button>
 
             {/* Handicap chip — dark chrome only (Phase 1: dark headers) */}
