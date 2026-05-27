@@ -211,8 +211,9 @@ const Top100CoursesHubPanel = () => {
 
   return (
     <div className="space-y-4">
-      {/* Editorial header — eyebrow + title + optional progress sub-line */}
-      <div className="px-4 pt-1">
+      {/* Editorial header — eyebrow + title + optional progress sub-line.
+          Parent already supplies px-4 — don't double-pad. */}
+      <div className="pt-1">
         <SectionEyebrow label="Official World Ranking" color="amber" className="mb-[3px]" />
         <h2 style={{ fontSize: 22, fontWeight: 800, color: '#0F172A', letterSpacing: '-0.025em', margin: 0, lineHeight: 1.1 }}>
           The world's best
