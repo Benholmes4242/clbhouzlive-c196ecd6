@@ -26,6 +26,8 @@ import WhsHandicapTab from '@/components/profile/handicap/whs/WhsHandicapTab';
 import HandicapDashboard from '@/components/profile/handicap/whs/HandicapDashboard';
 import ShellSlot from '@/components/header/ShellSlot';
 import SegmentedControl from '@/components/discover/SegmentedControl';
+import { RivalryCTA } from '@/components/profile/handicap/whs/sections/header/RivalryCTA';
+import { firstName } from '@/pages/rivalry-page/_shared/helpers';
 
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { isHandicapSubtab, type HandicapSubtab } from '@/components/profile/handicap/whs/types';
@@ -217,6 +219,13 @@ const HandicapPageHeader: React.FC<HeaderProps> = ({
           />
         </div>
       ) : null}
+
+      {readOnly && ownerUserId && viewerUserId && (
+        <RivalryCTA
+          rivalUserId={ownerUserId}
+          rivalFirstName={firstName(displayName)}
+        />
+      )}
 
       {(readOnly || hasConnection) && (
         <div
