@@ -404,7 +404,18 @@ const RivalryPage: React.FC = () => {
             />
           </div>
 
+          {!isFriendView && rivalIsClbhouzUser && (
+            <HeadToHeadSection
+              viewerId={viewerId}
+              viewerConnectionId={viewerConnectionId}
+              rivalUserId={rivalUserId}
+              rivalFirstName={rivalFirst}
+              bestMargins={bestMargins}
+            />
+          )}
+
           <InsightsGrid insights={insights} />
+
 
           <CoursesPlayedSection
             row={row}
