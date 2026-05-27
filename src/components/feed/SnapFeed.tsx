@@ -13,9 +13,17 @@ import { useWatchProgressTracker } from '@/components/watch/hooks/useWatchProgre
 
 const NEAR_END_THRESHOLD = 3;
 const ACTIVE_SLIDE_RATIO = 0.5;
-const INTERSECTION_THRESHOLDS = [0.5];
+// Multiple thresholds let the observer fire during transitions, not just
+// at the 50% boundary crossing. Sub-thresholds catch slow drift and give
+// the active-index update path earlier signals.
+const INTERSECTION_THRESHOLDS = [0.25, 0.5, 0.75];
 const PTR_DISTANCE = 80;
-const VIRTUAL_WINDOW = 3; // render activeIndex ± 3 slides
+// Widened from 3 to 5 to bridge rapid flick scrolls that previously
+// outran the virtualization window. 11-slide buffer.
+const VIRTUAL_WINDOW = 5;
+// Tightened from 80ms to 20ms so the virtualization window slides nearly
+// in real time with the scroll position, preventing brief black placeholders.
+const ACTIVE_INDEX_DEBOUNCE_MS = 20;
 
 interface SnapFeedProps {
   posts: FeedPost[];
@@ -176,7 +184,7 @@ export function SnapFeed({
               }
               pendingIndexRef.current = null;
             }
-          }, 80);
+          }, ACTIVE_INDEX_DEBOUNCE_MS);
         }
       }
     }, { threshold: INTERSECTION_THRESHOLDS });
@@ -427,19 +435,36 @@ export function SnapFeed({
         const isInWindow = distance <= VIRTUAL_WINDOW;
 
         if (!isInWindow) {
+          // Content-aware placeholder: render the post's thumbnail behind a
+          // dark scrim so a briefly-visible placeholder reads as "loading"
+          // rather than a black flicker. Lazy via CSS background-image.
+          const thumbnail = post.mediaItems?.[0]?.thumbnailUrl;
           return (
             <div
               key={post.id}
               ref={(el) => setSlideRef(idx, el)}
               data-index={idx}
+              data-placeholder="virtual"
               className="relative w-full flex-shrink-0"
               style={{
                 height: '100dvh',
                 scrollSnapAlign: 'start',
                 scrollSnapStop: 'always',
-                background: '#000',
+                background: thumbnail
+                  ? `#000 url(${thumbnail}) center / cover no-repeat`
+                  : '#000',
               }}
-            />
+            >
+              <div
+                aria-hidden
+                style={{
+                  position: 'absolute',
+                  inset: 0,
+                  background: 'rgba(0, 0, 0, 0.65)',
+                  pointerEvents: 'none',
+                }}
+              />
+            </div>
           );
         }
 
