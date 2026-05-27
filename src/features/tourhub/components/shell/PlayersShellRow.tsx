@@ -56,7 +56,7 @@ function PlayersShellRowInner() {
       >
         <div
           className="flex items-center justify-end"
-          style={{ padding: '8.5px 16px' }}
+          style={{ padding: '7px 16px' }}
         >
           {(() => {
             const isActive = activeTour !== 'pga';
