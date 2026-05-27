@@ -11,7 +11,7 @@ import CourseMediaTabNew from '@/components/course-media-tab/CourseMediaTabNew';
 import CourseRankBadges from '@/components/courses/CourseRankBadges';
 import { CourseTabs } from '@/components/courses/course-detail/CourseTabs';
 import ShellSlot from '@/components/header/ShellSlot';
-import SegmentedControl from '@/components/discover/SegmentedControl';
+import CourseDetailShellTabs from '@/features/courses/components/CourseDetailShellTabs';
 import { formatCourseLocation } from '@/utils/courseLocation';
 import { CourseDetailSkeleton } from '@/components/skeletons/CourseDetailSkeleton';
 import { useCourseRatingAggregates } from '@/hooks/useCourseRatingAggregates';
