@@ -288,7 +288,7 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
               size="icon"
               className={cn(
                 "p-0 flex items-center justify-center rounded-full active:scale-[0.94] transition-all",
-                isTourRoute ? "h-[38px] w-[38px] text-white" : "h-11 w-11 text-white",
+                isEditorialChromeRoute ? "h-[38px] w-[38px] text-white" : "h-11 w-11 text-white",
                 !isDarkChrome && !useLightTheme && "hover:bg-[hsl(var(--clubhouse-active-bg))]"
               )}
               style={{
