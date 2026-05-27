@@ -258,14 +258,7 @@ export const CourseLegendsDrilldown: React.FC<Props> = ({ selection, hideHeader 
         <>
           <CourseMetaStrip meta={meta} />
           <CategoryNavRail categories={navCategories} onSelect={handleNavSelect} />
-          <div
-            style={{
-              padding: '20px 16px 32px',
-              display: 'flex',
-              flexDirection: 'column',
-              gap: 28,
-            }}
-          >
+          <div style={{ paddingBottom: 32 }}>
           {visibleCategories.map((cat) => {
             const entry = groupedWithTotals.get(cat);
             if (!entry || entry.rows.length === 0) return null;
