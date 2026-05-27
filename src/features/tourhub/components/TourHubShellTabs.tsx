@@ -82,7 +82,7 @@ export const TourHubShellTabs: React.FC = () => {
         alignItems: 'stretch',
       }}
     >
-      <div style={{ position: 'relative', flex: 1, minWidth: 0 }}>
+      <div style={{ position: 'relative', minWidth: 0, flexShrink: 1 }}>
         <div
           ref={scrollerRef}
           className="segmented-scroller"
@@ -139,7 +139,7 @@ export const TourHubShellTabs: React.FC = () => {
             style={{
               position: 'absolute',
               top: 0,
-              right: 40,
+              right: 0,
               bottom: 0,
               width: 34,
               pointerEvents: 'none',
