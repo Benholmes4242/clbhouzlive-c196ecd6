@@ -28,11 +28,7 @@ import { InsightsGrid } from './rivalry-page/InsightsGrid';
 import { CoursesPlayedSection } from './rivalry-page/CoursesPlayedSection';
 import { RoundByRoundSection } from './rivalry-page/RoundByRoundSection';
 import { HeadToHeadSection } from './rivalry-page/HeadToHeadSection';
-import {
-  computeInsights,
-  computeYourBestMargin,
-  computeTheirBestMargin,
-} from './rivalry-page/_shared/insights';
+import { computeInsights } from './rivalry-page/_shared/insights';
 import { firstName } from './rivalry-page/_shared/helpers';
 import {
   FONT,
