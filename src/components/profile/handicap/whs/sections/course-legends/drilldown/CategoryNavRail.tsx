@@ -78,7 +78,7 @@ export const CategoryNavRail: React.FC<Props> = ({ categories, onSelect }) => (
                 style={{
                   marginLeft: 1,
                   fontWeight: 800,
-                  color: isHeld ? '#FBBC2E' : tier?.color ?? 'var(--hcp-t-60)',
+                  color: isHeld ? 'var(--hcp-accent-util)' : tier?.color ?? 'var(--hcp-t-60)',
                   fontVariantNumeric: 'tabular-nums',
                   letterSpacing: '-0.01em',
                 }}
