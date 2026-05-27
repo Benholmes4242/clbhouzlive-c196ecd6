@@ -165,7 +165,7 @@ export const PostingAsPill = forwardRef<HTMLButtonElement, PostingAsPillProps>(
         {/* Squircle Avatar with notification dot */}
         <div className="relative flex-shrink-0 flex items-center">
           <SquircleAvatar
-            size={compact ? 24 : 28}
+            size={compact ? 22 : 28}
             src={activeActor.avatarUrl}
             alt={activeActor.name}
             userId={activeActor.id}
