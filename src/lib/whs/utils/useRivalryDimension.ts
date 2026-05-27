@@ -27,8 +27,10 @@ function readMap(): DimensionMap {
   }
 }
 
-function readOne(_key: string | null | undefined): RivalryDimension {
-  return 'gross';
+function readOne(key: string | null | undefined): RivalryDimension {
+  if (!key) return 'gross';
+  const v = readMap()[key];
+  return v === 'stableford' ? 'stableford' : 'gross';
 }
 
 export function useRivalryDimension(
