@@ -26,7 +26,6 @@ export const GLOBAL_HEADER_EXCLUDED_PREFIXES = [
   '/admin',
   '/hub',
   '/echo', // Echo AI page - immersive full-screen experience
-  '/courses/', // Course detail pages - has its own back navigation
   '/messages/', // Chat view has its own header
   '/profile/', // User profile pages - immersive full-bleed hero
   '/top100/', // Individual region top 100 pages - immersive layout
@@ -56,6 +55,14 @@ export function isConditionallyExcluded(pathname: string, searchParams: URLSearc
 
   // All other sub-pages under /tourhub/... or /tour/... stay immersive.
   if (pathname.startsWith('/tourhub/') || pathname.startsWith('/tour/')) {
+    return true;
+  }
+
+  // Course detail: /courses/:courseId (exactly 3 segments) shows the header.
+  // Immersive sub-flows (/rate, /reviews, /share-review) stay excluded.
+  if (pathname.startsWith('/courses/')) {
+    const segments = pathname.split('/');
+    if (segments.length === 3) return false;
     return true;
   }
 
