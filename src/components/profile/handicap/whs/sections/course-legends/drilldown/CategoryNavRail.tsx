@@ -57,12 +57,12 @@ export const CategoryNavRail: React.FC<Props> = ({ categories, onSelect }) => (
               padding: '7px 12px',
               borderRadius: 9,
               background: isHeld
-                ? 'linear-gradient(180deg, rgba(251,188,46,0.12), rgba(251,188,46,0.03))'
+                ? 'linear-gradient(180deg, var(--hcp-accent-util-tint), var(--hcp-accent-util-tint-2))'
                 : 'rgba(255,255,255,0.025)',
               border: isHeld
-                ? '1px solid rgba(251,188,46,0.30)'
+                ? '1px solid var(--hcp-accent-util-border)'
                 : '1px solid rgba(255,255,255,0.04)',
-              color: isHeld ? '#FBBC2E' : 'var(--hcp-t-80)',
+              color: isHeld ? 'var(--hcp-accent-util)' : 'var(--hcp-t-80)',
               fontSize: 11,
               fontWeight: 700,
               fontFamily: FONT,
