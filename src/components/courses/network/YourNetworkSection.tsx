@@ -1,11 +1,7 @@
 import React from 'react';
-import { useSearchParams } from 'react-router-dom';
-import { ChevronRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useNetworkActivity } from '@/hooks/useNetworkActivity';
-import { NetworkAvatarStrip } from './NetworkAvatarStrip';
-// NetworkPulseCopy intentionally not imported — replaced by inline meta byline (deferred dead code; file retained for follow-up cleanup)
 import { NetworkHighlightCarousel } from './NetworkHighlightCarousel';
 import { SectionEyebrow } from '@/components/ui/SectionEyebrow';
 
@@ -14,97 +10,47 @@ interface YourNetworkSectionProps {
 }
 
 /**
- * Your Network Section - Social-discovery surface
- * 
- * Sits directly on page background (no card wrapper) with:
- * - Header row with title, "Last 30 days" label, and "View all" action (slate, not orange)
- * - Avatar strip (conditional: >= 3 friends, no colored rings)
- * - Network pulse copy (dynamic insights)
- * - Network highlight carousel (landscape tiles)
+ * Played by your network — course-discovery row driven by friend-played signal.
+ *
+ * Sits on the Courses Explore tab. Friends are treated as a discovery signal
+ * for courses, not as a destination. No avatar strip, no rounds-this-month
+ * stat, no "View all" entry into a friend-activity destination — those framings
+ * elevated the social layer above the product layer.
+ *
+ * Renders nothing when the user has no friends or no network-played highlights.
  */
 export const YourNetworkSection: React.FC<YourNetworkSectionProps> = ({ className }) => {
-  const [searchParams, setSearchParams] = useSearchParams();
   const { user } = useSupabaseSession();
   const { data, isLoading } = useNetworkActivity(user?.id);
 
-  // Don't show loading state to prevent layout shift
   if (!user || isLoading) return null;
-
-  // Empty state: No friends at all - hide entire section
   if (!data?.hasFriends) return null;
-
-  const { friends, highlights, pulse, hasActivity } = data;
-
-  const handleViewAll = () => {
-    const params = new URLSearchParams(searchParams);
-    params.set('network', 'open');
-    // push (not replace) so the OS back button closes the sheet
-    setSearchParams(params, { replace: false });
-  };
-
-  // Edge case: Friends but no recent activity
-  const showEmptyActivityState = !hasActivity && friends.length > 0;
+  if (!data?.highlights || data.highlights.length === 0) return null;
 
   return (
-    <section 
+    <section
       className={cn(
         'mb-5 max-w-xl mx-auto animate-in fade-in slide-in-from-bottom-2 duration-300',
-        className
+        className,
       )}
     >
-      {/* Header Row */}
-      <div className="flex items-center justify-between mb-2">
-        <div>
-          <SectionEyebrow label="Your Network" color="amber" className="mb-[3px]" />
-          {showEmptyActivityState ? (
-            <h2 style={{ fontSize: 22, fontWeight: 800, color: '#0F172A', letterSpacing: '-0.025em', margin: 0, lineHeight: 1.1 }}>
-              Your Network
-            </h2>
-          ) : (
-            <h2 style={{ fontSize: 22, fontWeight: 800, color: '#0F172A', letterSpacing: '-0.025em', margin: 0, lineHeight: 1.1 }}>
-              {pulse.total_rounds} {pulse.total_rounds === 1 ? 'round' : 'rounds'} this month
-            </h2>
-          )}
-        </div>
-        <button
-          onClick={handleViewAll}
-          className="py-2.5 px-1 text-[13px] text-muted-foreground font-medium active:scale-[0.97] active:opacity-70 transition-all flex items-center gap-0.5"
+      <div className="mb-2">
+        <SectionEyebrow label="Your network plays" color="amber" className="mb-[3px]" />
+        <h2
+          style={{
+            fontSize: 22,
+            fontWeight: 800,
+            color: '#0F172A',
+            letterSpacing: '-0.025em',
+            margin: 0,
+            lineHeight: 1.1,
+          }}
         >
-          View all
-          <ChevronRight size={14} />
-        </button>
+          Courses played by friends
+        </h2>
       </div>
 
-      {/* Avatar Strip (conditional: >= 3 friends) */}
-      <NetworkAvatarStrip friends={friends} />
-
-      {/* Meta byline (replaces NetworkPulseCopy — orphaned, kept for future cleanup) */}
-      {!showEmptyActivityState ? (
-        <p style={{
-          fontSize: 11, color: '#64748B', margin: '10px 0 0',
-          fontWeight: 600, letterSpacing: '0.16em', textTransform: 'uppercase',
-        }}>
-          {pulse.active_friends} ACTIVE · {pulse.new_courses_discovered} COURSES · LAST 30 DAYS
-        </p>
-      ) : (
-        <p className="mt-1.5 text-sm text-muted-foreground">
-          Your network is quiet this month
-        </p>
-      )}
-
-      {/* Network Highlight Carousel */}
-      {highlights.length > 0 ? (
-        <NetworkHighlightCarousel highlights={highlights} />
-      ) : (
-        // Fallback for no highlights: Show subtle CTA
-        friends.length < 3 && (
-          <div className="mt-3 p-3 rounded-xl bg-card border border-border/50 text-center">
-            <p className="text-sm text-muted-foreground">
-              Add friends to see their activity
-            </p>
-          </div>
-        )
-      )}
+      <NetworkHighlightCarousel highlights={data.highlights} />
     </section>
   );
 };

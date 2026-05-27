@@ -3,13 +3,11 @@ import { Navigate } from 'react-router-dom';
 
 /**
  * /friends-activity is preserved as a redirect for legacy deep links.
- *
- * The Friends Activity surface was migrated to NetworkCoursesSheet — a
- * bottom sheet that opens from the Your Network section on Courses › Explore.
- * Direct visits to /friends-activity teleport users to the sheet's open state.
+ * The dedicated friend-activity destination was removed; legacy visits now
+ * land on the Courses Explore tab.
  */
 const FriendsActivityPage: React.FC = () => {
-  return <Navigate to="/courses?network=open" replace />;
+  return <Navigate to="/courses" replace />;
 };
 
 export default FriendsActivityPage;
