@@ -266,22 +266,42 @@ export const CourseLegendsDrilldown: React.FC<Props> = ({ selection, hideHeader 
               gap: 28,
             }}
           >
-            {visibleCategories.map((cat) => {
-              const entry = groupedWithTotals.get(cat);
-              if (!entry || entry.rows.length === 0) return null;
-              return (
-                <div key={cat} data-category={cat}>
-                  <CategorySection
-                    categoryLabel={legendCategoryLabel[cat]}
-                    categoryIcon={legendCategoryIcon[cat]}
-                    unit={UNITS[cat]}
-                    rows={entry.rows}
-                    totalCount={entry.total}
-                    onSeeFull={() => setFullLeaderboardCategory(cat)}
-                  />
-                </div>
-              );
-            })}
+          {visibleCategories.map((cat) => {
+            const entry = groupedWithTotals.get(cat);
+            if (!entry || entry.rows.length === 0) return null;
+            const champion = entry.rows[0];
+            const fieldRows = entry.rows.slice(1).map((r) => ({
+              rank: r.rank,
+              name: r.name,
+              photoUrl: r.photoUrl,
+              valueDisplay: r.valueDisplay,
+              isSelf: r.isSelf,
+            }));
+            const heldDuration = formatHeldDuration(champion.attained_at);
+            return (
+              <div key={cat} data-category={cat} style={{ marginBottom: 16 }}>
+                <ChampionsResultBand
+                  categoryLabel={legendCategoryLabel[cat]}
+                  categoryIcon={legendCategoryIcon[cat]}
+                  championName={champion.isSelf ? 'You' : champion.name}
+                  championPhotoUrl={champion.photoUrl}
+                  valueDisplay={champion.valueDisplay}
+                  unitLabel={UNIT_LABELS[cat]}
+                  isSelf={champion.isSelf}
+                />
+                <ChampionsField
+                  rows={fieldRows}
+                  totalCount={entry.total}
+                  onFullLeaderboardTap={() => setFullLeaderboardCategory(cat)}
+                />
+                <ChampionsSignatureFooter
+                  windowLabel={window === '90d' ? '90D' : 'All time'}
+                  heldDuration={heldDuration}
+                  entryCount={entry.total}
+                />
+              </div>
+            );
+          })}
           </div>
         </>
       )}
