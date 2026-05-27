@@ -38,7 +38,7 @@ interface Props {
   portraitVariant?: 'hero' | 'mixed';
   /** Controlled dimension. When omitted, card owns its own per-rival preference. */
   dimension?: RivalryDimension;
-  onTap: () => void;
+  onTap?: () => void;
 }
 
 export const RivalryHeroCard: React.FC<Props> = ({
