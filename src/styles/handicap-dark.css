@@ -52,6 +52,11 @@
   --hcp-accent-celebrate:       #FBBC2E;
   --hcp-accent-celebrate-tint:  rgba(251, 188, 46, 0.14);
 
+  /* Champion wash — cream highlight on hero / champion rows */
+  --hcp-champ-wash:               rgba(247, 147, 30, 0.08);
+  --hcp-champ-wash-border:        rgba(247, 147, 30, 0.30);
+  --hcp-champ-wash-border-light:  rgba(247, 147, 30, 0.18);
+
   /* ── Verdict palette ─────────────────────────────────────────────
    * SEMANTIC ONLY. Never used decoratively.
    *   good = improvement  (under handicap, downward index movement)
@@ -127,6 +132,11 @@
   --hcp-accent-util-border: rgba(15, 23, 42, 0.18);
   --hcp-accent-celebrate:       #C97211;
   --hcp-accent-celebrate-tint:  rgba(251, 188, 46, 0.12);
+
+  /* Champion wash — cream highlight on hero / champion rows */
+  --hcp-champ-wash:               #FFF8EA;
+  --hcp-champ-wash-border:        rgba(247, 147, 30, 0.30);
+  --hcp-champ-wash-border-light:  rgba(247, 147, 30, 0.20);
 
   /* Verdict palette — darkened for white-surface contrast */
   --hcp-good:       #16A34A;
