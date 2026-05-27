@@ -15,7 +15,7 @@ interface CellProps {
 }
 
 const Cell: React.FC<CellProps> = ({ label, value, sub }) => (
-  <div style={{ display: 'flex', flexDirection: 'column', gap: 4, minWidth: 0 }}>
+  <div style={{ display: 'flex', flexDirection: 'column', gap: 4, minWidth: 0, alignItems: 'center', textAlign: 'center' }}>
     <div
       style={{
         fontSize: 10,
