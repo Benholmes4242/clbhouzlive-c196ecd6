@@ -118,7 +118,7 @@ export const ChampionsField: React.FC<ChampionsFieldProps> = ({
             style={{
               width: 36,
               height: 36,
-              borderRadius: 10,
+              borderRadius: '34%',
               background: row.photoUrl
                 ? `url(${row.photoUrl}) center/cover`
                 : 'linear-gradient(135deg, #cbd5e1 0%, #64748b 100%)',
