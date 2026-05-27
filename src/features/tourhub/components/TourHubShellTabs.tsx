@@ -94,8 +94,8 @@ export const TourHubShellTabs: React.FC = () => {
           style={{
             display: 'flex',
             justifyContent: 'flex-start',
-            gap: 6,
-            padding: '3px 16px',
+            gap: 2,
+            padding: '0 16px',
             overflowX: 'auto',
             overflowY: 'hidden',
             WebkitOverflowScrolling: 'touch',
@@ -113,11 +113,11 @@ export const TourHubShellTabs: React.FC = () => {
                 onClick={(e) => handleTap(tab.id, e.currentTarget)}
                 style={{
                   flex: '0 0 auto',
-                  height: 30,
-                  padding: '0 12px',
-                  borderRadius: 15,
-                  border: isActive ? '1px solid rgba(255,255,255,0.55)' : '1px solid transparent',
-                  background: isActive ? 'rgba(255,255,255,0.10)' : 'transparent',
+                  height: 40,
+                  padding: '0 10px',
+                  borderRadius: 0,
+                  border: 'none',
+                  background: 'transparent',
                   color: isActive ? '#FFFFFF' : 'var(--hcp-t-60)',
                   fontFamily: 'inherit',
                   fontSize: 13,
@@ -127,7 +127,9 @@ export const TourHubShellTabs: React.FC = () => {
                   cursor: 'pointer',
                   display: 'inline-flex',
                   alignItems: 'center',
-                  transition: 'all 0.15s',
+                  position: 'relative',
+                  boxShadow: isActive ? 'inset 0 -2px 0 0 #FFFFFF' : 'none',
+                  transition: 'color 0.15s, box-shadow 0.15s',
                 }}
               >
                 {tab.label}
@@ -200,7 +202,7 @@ const TourSwitcherAffordance: React.FC = () => {
           fontWeight: 700,
           letterSpacing: '0.04em',
           textTransform: 'uppercase',
-          height: 36,
+          height: 40,
         }}
       >
         <span>{TOUR_LABEL[activeTourSlug]}</span>
