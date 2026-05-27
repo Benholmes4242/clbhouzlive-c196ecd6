@@ -150,7 +150,7 @@ export const PostingAsPill = forwardRef<HTMLButtonElement, PostingAsPillProps>(
         onClick={onClick}
           className={cn(
             "flex items-center",
-            compact ? "p-1 h-9" : "p-1.5 h-11",
+            compact ? "p-1 h-8" : "p-1.5 h-11",
             "rounded-xl transition-all duration-500",
             "max-w-[160px] min-w-0",
             "active:scale-[0.97]",
