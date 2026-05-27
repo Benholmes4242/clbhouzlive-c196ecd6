@@ -2,8 +2,8 @@
 // IMPORTANT: Keep this in sync with layout expectations (PageRoot offset, etc.)
 
 export const GLOBAL_HEADER_EXCLUDED_ROUTES = [
-  // NOTE: '/' is the Tour Hub landing — it MUST render CompactHeader (logo,
-  // search, handicap chip, avatar) just like /tourhub. Do not re-add '/' here.
+  // '/' is the Clubhouse/Watch landing — immersive, no CompactHeader.
+  '/',
   '/clubhouse',
   '/auth',
   '/auth/callback',
