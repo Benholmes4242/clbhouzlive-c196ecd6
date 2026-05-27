@@ -314,7 +314,12 @@ export function HybridHero({ slide, activeTournamentId, onSelectTour }: HybridHe
             defendingChampion={tournament.defendingChampion}
           />
           <TopThreePeek rows={topThreeRows} onFullLeaderboardTap={onCtaTap} />
-          <SignatureFooter state={state} />
+          <SignatureFooter
+            state={state}
+            endDate={tournament.endDate}
+            venuePar={tournament.venuePar}
+            venueYardage={tournament.venueYardage}
+          />
         </>
       ) : (
         <>

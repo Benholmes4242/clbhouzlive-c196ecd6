@@ -4,16 +4,18 @@
  */
 
 // Layout
-// Pass 7 — broadcast hero rebuild (results state).
-//   Photo 360 + ResultBand ~180 + TopThreePeek ~155 + SignatureFooter ~36 = 731.
-// Live/upcoming states still flow through the legacy MiddleBand + LeaderboardBand
-// and may need their own height pass later.
-export const PHOTO_BAND_HEIGHT = 360;
+/**
+ * Pass 7 + 7.0.2: results state hero composition.
+ *   photo 306 + resultBand max 180 + topThree 155 + signature 36 = 677.
+ * If upcoming state ever clips, raise this number — don't tear down the
+ * load-bearing definite-height contract for HeroCarousel descendants.
+ */
+export const PHOTO_BAND_HEIGHT = 306;   // was 360 — Pass 7.0.2 trim
 
 export const STRIP_HEIGHT = 62;
 export const ROW_HEIGHT_LEADER = 64;
 export const ROW_HEIGHT_CHASER = 40;
-export const TOTAL_HERO_HEIGHT_TARGET = 731;
+export const TOTAL_HERO_HEIGHT_TARGET = 677;  // was 731 — Pass 7.0.2: PHOTO_BAND_HEIGHT 360→306 (−54)
 
 // Colours (clbhouz Dispatch palette)
 export const INK = '#0F172A';
