@@ -143,7 +143,7 @@ export const TourHubShellTabs: React.FC = () => {
                   {isActive && (
                     <span
                       style={{
-                        width: 18,
+                        width: 32,
                         height: 2,
                         borderRadius: 1,
                         background: '#FFFFFF',
