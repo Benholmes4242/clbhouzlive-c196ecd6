@@ -151,7 +151,7 @@ const FriendsActivityPage = lazy(() => import("./pages/FriendsActivityPage"));
 const CreateProfileRedirect = lazy(() => import("./components/redirects/CreateProfileRedirect"));
 
 
-const Top100Hub = lazy(() => import("./pages/Top100Hub"));
+
 const Top100List = lazy(() => import("./pages/Top100List"));
 
 const AchievementsHubPage = lazy(() => import("./pages/AchievementsHubPage"));
@@ -403,7 +403,7 @@ function AppRoutes() {
         <Route path="/business/:idOrSlug/followers" element={<Suspense fallback={<GenericPageSkeleton />}><BusinessFollowersPage /></Suspense>} />
         <Route path="/business/:idOrSlug" element={<Suspense fallback={<GenericPageSkeleton />}><BusinessProfilePage /></Suspense>} />
         
-        <Route path="/top100" element={<Suspense fallback={<CoursesListSkeleton />}><Top100Hub /></Suspense>} />
+        
         <Route path="/top100/:slug" element={<Suspense fallback={<CoursesListSkeleton />}><Top100List /></Suspense>} />
         <Route path="/achievementshub" element={<Navigate to="/profile" replace />} />
         <Route path="/achievements" element={<Navigate to="/profile" replace />} />

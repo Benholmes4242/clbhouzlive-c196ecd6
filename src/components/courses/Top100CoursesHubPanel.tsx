@@ -4,8 +4,7 @@ import { useTop100ProgressForUser } from '@/hooks/useTop100ProgressForUser';
 import { useTop100ListSummaries } from '@/hooks/useTop100ListSummaries';
 import { useGolfCoursesInfinite, type SearchedCourseWithRating } from '@/hooks/useGolfCoursesInfinite';
 import { useTop100Lists } from '@/hooks/useTop100Lists';
-import { Search, Award, X, ChevronRight } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { Search, Award, X } from 'lucide-react';
 
 import { Input } from '@/components/ui/input';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -31,7 +30,6 @@ function readSavedFilters(): { list?: string; sort?: string; searchTerm?: string
 
 const Top100CoursesHubPanel = () => {
   const { user } = useSupabaseSession();
-  const navigate = useNavigate();
   
   // State — initialised from sessionStorage when available
   const [selectedList, setSelectedList] = useState(() => {
@@ -57,15 +55,8 @@ const Top100CoursesHubPanel = () => {
 
 
   // Fetch data
-  const { data: progress } = useTop100ProgressForUser(user?.id);
   const { data: listSummaries = [] } = useTop100ListSummaries(user?.id);
   const { data: lists = [] } = useTop100Lists();
-
-  // Progress calculations
-  const totalRated = progress?.total_top100_rated ?? progress?.total_played_top100 ?? 0;
-  const startedLists = listSummaries.filter(list => list.played_count > 0);
-  const listsCount = startedLists.length;
-  const totalCoursesInStartedLists = startedLists.reduce((sum, list) => sum + list.total_courses, 0);
 
   // Debounce search
   useEffect(() => {
@@ -206,43 +197,12 @@ const Top100CoursesHubPanel = () => {
 
   return (
     <div className="space-y-4">
-      {/* Editorial header — left-aligned, mirrors Explore's Your Network pattern */}
+      {/* Editorial header — eyebrow + title only */}
       <div className="px-4 pt-1">
-        <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', gap: 16 }}>
-          <div style={{ flex: 1, minWidth: 0 }}>
-            <SectionEyebrow label="Official World Ranking" color="amber" className="mb-[3px]" />
-            <h2 style={{ fontSize: 22, fontWeight: 800, color: '#0F172A', letterSpacing: '-0.025em', margin: 0, lineHeight: 1.1 }}>
-              The world's best
-            </h2>
-            {user && totalCoursesInStartedLists > 0 && (
-              <p style={{
-                fontSize: 11, color: '#64748B', margin: '6px 0 0',
-                fontWeight: 600, letterSpacing: '0.16em', textTransform: 'uppercase' as const,
-              }}>
-                <span style={{ color: '#F7931E' }}>
-                  {totalRated} of {totalCoursesInStartedLists}
-                </span>
-                {' '}COMPLETED · {listsCount} {listsCount === 1 ? 'LIST' : 'LISTS'}
-              </p>
-            )}
-          </div>
-          {user && (
-            <button
-              type="button"
-              onClick={() => navigate('/top100?tab=my-progress')}
-              style={{
-                display: 'flex', alignItems: 'center', gap: 2,
-                fontSize: 12, fontWeight: 600, color: '#c97a10',
-                background: 'transparent', border: 'none',
-                cursor: 'pointer', padding: '6px 0 8px', flexShrink: 0,
-                letterSpacing: '-0.005em',
-              }}
-              className="active:opacity-70 transition-opacity"
-            >
-              Your journey <ChevronRight size={13} strokeWidth={2.5} />
-            </button>
-          )}
-        </div>
+        <SectionEyebrow label="Official World Ranking" color="amber" className="mb-[3px]" />
+        <h2 style={{ fontSize: 22, fontWeight: 800, color: '#0F172A', letterSpacing: '-0.025em', margin: 0, lineHeight: 1.1 }}>
+          The world's best
+        </h2>
       </div>
 
       {/* List filter — horizontal pill row, scrollable on overflow */}

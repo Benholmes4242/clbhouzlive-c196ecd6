@@ -12,4 +12,4 @@ export { Top100ListCourseCard } from './Top100ListCourseCard';
 export { Top100ListProgressHero } from './Top100ListProgressHero';
 export { Top100ListProgressCard } from './Top100ListProgressCard';
 export { JourneyInsightCard, generateJourneyInsights } from './JourneyInsightCard';
-export { FloatingJourneyButton } from './FloatingJourneyButton';
+

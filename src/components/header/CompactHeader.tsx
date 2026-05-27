@@ -106,12 +106,10 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
   );
   
   // Top 100 page detection:
-  // - Hub page: /top100 (navigates back to /courses?tab=top100)
-  // - List detail pages: /top100/:slug (navigates back to /top100?tab=courses)
-  const isTop100HubPage = location.pathname === '/top100';
-  const isTop100SubPage = location.pathname.startsWith('/top100/') && 
+  // - List detail pages: /top100/:slug (back goes to Courses → Top 100 tab)
+  const isTop100SubPage = location.pathname.startsWith('/top100/') &&
     location.pathname.split('/').length > 2;
-  const isTop100Route = isTop100HubPage || isTop100SubPage;
+  const isTop100Route = isTop100SubPage;
   
   // Routes that should show back arrow instead of logo
   const isBackArrowRoute = isDiscoverSubPage || isTop100Route || isCourseDetailRoute || isEditProfileRoute || isFriendsActivityRoute || isAchievementsRoute || isMessagesRoute || isHandicapRoute || isWatchSubpageRoute;
@@ -169,11 +167,7 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
   };
 
   const handleTop100Back = () => {
-    if (isTop100HubPage) {
-      navigate('/courses?tab=top100');
-    } else {
-      navigate('/top100?tab=courses');
-    }
+    navigate('/courses?tab=top100');
   };
   
   const handleSearchClick = () => {
