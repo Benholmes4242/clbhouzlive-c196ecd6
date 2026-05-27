@@ -1,6 +1,9 @@
 import React, { useRef, useEffect, useState } from 'react';
 import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
-import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
+import { Globe } from 'lucide-react';
+import { BottomSheet } from '@/components/ui/BottomSheet';
+import SheetHeader from '@/components/ui/SheetHeader';
+import { getTourLogo } from '../utils/tourLogos';
 import { useAllToursTickerData } from '../hooks/useOverviewModules';
 import type { TourHubTab } from './types';
 
@@ -175,69 +178,51 @@ const TourSwitcherAffordance: React.FC = () => {
   const activeTourSlug = 'pga';
 
   return (
-    <Sheet open={open} onOpenChange={setOpen}>
-      <SheetTrigger asChild>
-        <button
-          type="button"
-          aria-label="Switch tour"
-          style={{
-            flexShrink: 0,
-            display: 'flex',
-            alignItems: 'center',
-            gap: 5,
-            padding: '0 14px 0 10px',
-            background: 'transparent',
-            border: 'none',
-            color: 'rgba(255,255,255,0.55)',
-            cursor: 'pointer',
-            fontFamily: 'Geist, system-ui, sans-serif',
-            fontSize: 11,
-            fontWeight: 700,
-            letterSpacing: '0.04em',
-            textTransform: 'uppercase',
-            height: 36,
-          }}
-        >
-          <span>{TOUR_LABEL[activeTourSlug]}</span>
-          <span aria-hidden="true">↔</span>
-        </button>
-      </SheetTrigger>
-      <SheetContent
-        side="bottom"
+    <>
+      <button
+        type="button"
+        onClick={() => setOpen(true)}
+        aria-label="Switch tour"
+        aria-haspopup="dialog"
+        aria-expanded={open}
         style={{
-          background: '#0A0E14',
+          flexShrink: 0,
+          display: 'flex',
+          alignItems: 'center',
+          gap: 5,
+          padding: '0 14px 0 10px',
+          background: 'transparent',
           border: 'none',
-          padding: 0,
-          maxHeight: '70vh',
+          color: 'rgba(255,255,255,0.55)',
+          cursor: 'pointer',
+          fontFamily: 'Geist, system-ui, sans-serif',
+          fontSize: 11,
+          fontWeight: 700,
+          letterSpacing: '0.04em',
+          textTransform: 'uppercase',
+          height: 36,
         }}
       >
-        <div
-          aria-hidden="true"
-          style={{
-            margin: '10px auto 4px',
-            width: 36,
-            height: 4,
-            borderRadius: 2,
-            background: 'rgba(255,255,255,0.20)',
-          }}
+        <span>{TOUR_LABEL[activeTourSlug]}</span>
+        <span aria-hidden="true">↔</span>
+      </button>
+
+      <BottomSheet
+        open={open}
+        onClose={() => setOpen(false)}
+        ariaLabelledBy="tour-switcher-sheet-title"
+      >
+        <SheetHeader
+          eyebrow="SWITCH TOUR"
+          title={<span id="tour-switcher-sheet-title">Select tour</span>}
+          onClose={() => setOpen(false)}
         />
-        <div
-          style={{
-            padding: '14px 18px 8px',
-            color: 'rgba(255,255,255,0.55)',
-            fontSize: 11,
-            fontWeight: 800,
-            letterSpacing: '0.16em',
-            textTransform: 'uppercase',
-            fontFamily: 'Geist, system-ui, sans-serif',
-          }}
-        >
-          ↔ Switch Tour
-        </div>
-        <div style={{ display: 'flex', flexDirection: 'column' }}>
+
+        <div>
           {Object.entries(TOUR_LABEL).map(([slug, label]) => {
             const isActive = slug === activeTourSlug;
             const liveCount = data?.live.filter((c) => c.tourSlug === slug).length ?? 0;
+
             return (
               <button
                 key={slug}
@@ -246,24 +231,54 @@ const TourSwitcherAffordance: React.FC = () => {
                   // TODO Pass 7.1: implement tour filtering in HeroCarousel.
                   setOpen(false);
                 }}
+                aria-pressed={isActive}
                 style={{
+                  width: '100%',
                   display: 'flex',
-                  justifyContent: 'space-between',
                   alignItems: 'center',
-                  padding: '14px 18px',
-                  background: isActive ? 'rgba(255,255,255,0.06)' : 'transparent',
+                  gap: 12,
+                  padding: '14px 16px',
+                  background: isActive ? 'rgba(247,147,30,0.04)' : 'transparent',
                   border: 'none',
-                  color: isActive ? 'white' : 'rgba(255,255,255,0.70)',
-                  fontFamily: 'Geist, system-ui, sans-serif',
-                  fontSize: 16,
-                  fontWeight: isActive ? 700 : 500,
-                  textAlign: 'left',
+                  borderLeft: isActive ? '3px solid #F7931E' : '3px solid transparent',
+                  borderBottom: '0.5px solid rgba(15,23,42,0.07)',
                   cursor: 'pointer',
+                  textAlign: 'left',
                 }}
               >
-                <span>{label}</span>
+                <div
+                  style={{
+                    width: 36,
+                    height: 22,
+                    borderRadius: 4,
+                    background: 'rgba(15,23,42,0.06)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    flexShrink: 0,
+                  }}
+                >
+                  <img
+                    src={getTourLogo(slug)}
+                    alt=""
+                    style={{ width: 28, height: 18, objectFit: 'contain' }}
+                  />
+                </div>
+
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div
+                    style={{
+                      fontSize: 15,
+                      fontWeight: isActive ? 700 : 500,
+                      color: '#0F172A',
+                    }}
+                  >
+                    {label}
+                  </div>
+                </div>
+
                 {liveCount > 0 && (
-                  <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+                  <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, flexShrink: 0 }}>
                     <span
                       style={{
                         width: 6,
@@ -285,12 +300,26 @@ const TourSwitcherAffordance: React.FC = () => {
                     </span>
                   </span>
                 )}
+
+                {isActive && (
+                  <div
+                    style={{
+                      width: 6,
+                      height: 6,
+                      borderRadius: '50%',
+                      background: '#F7931E',
+                      flexShrink: 0,
+                    }}
+                  />
+                )}
               </button>
             );
           })}
         </div>
-      </SheetContent>
-    </Sheet>
+
+        <div style={{ paddingBottom: 'calc(var(--sab, env(safe-area-inset-bottom, 0px)) + 8px)' }} />
+      </BottomSheet>
+    </>
   );
 };
 
