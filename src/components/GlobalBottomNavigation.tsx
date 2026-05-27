@@ -136,7 +136,7 @@ const GlobalBottomNavigation: React.FC<GlobalBottomNavigationProps> = ({ chromeS
       const current = localStorage.getItem('CLBHOUZ_VIDEO_DEBUG') === 'true';
       localStorage.setItem('CLBHOUZ_VIDEO_DEBUG', current ? 'false' : 'true');
       window.dispatchEvent(new CustomEvent('clbhouz-debug-toggle'));
-    } else if (tab.id === 'clubhouse' && location.pathname === '/clubhouse') {
+    } else if (tab.id === 'clubhouse' && location.pathname === '/') {
       // Already on Clubhouse — scroll feed to top
       const feedContainer = document.querySelector('[data-snap-feed]');
       if (feedContainer) {
