@@ -246,6 +246,27 @@ const RivalryPage: React.FC = () => {
   const rivalIsClbhouzUser =
     !!rivalUserId && UUID_RE.test(rivalUserId);
 
+  // Viewer's WHS connection (for H2H trophy aggregates fetch)
+  const { data: viewerConn } = useWhsConnection(
+    !isFriendView ? viewerId : undefined,
+  );
+  const viewerConnectionId = (viewerConn as any)?.id ?? undefined;
+
+  // H2H best gross margins from shared_round_results
+  const bestMargins = useMemo(() => {
+    const rounds = row?.shared_round_results ?? [];
+    let me: number | null = null;
+    let them: number | null = null;
+    for (const r of rounds) {
+      if (r.user_gross == null || r.rival_gross == null) continue;
+      const d = r.rival_gross - r.user_gross;
+      if (d > 0 && (me == null || d > me)) me = d;
+      if (d < 0 && (them == null || -d > them)) them = -d;
+    }
+    return { me, them };
+  }, [row]);
+
+
   const handleProfile = () => {
     if (rivalIsClbhouzUser && rivalUserId) {
       openHybridSheet({
