@@ -102,6 +102,7 @@ const HeroCard: React.FC<{
             style={{
               fontSize: 11, fontWeight: 800, letterSpacing: '0.14em',
               color: 'rgba(255,255,255,0.65)', marginBottom: 6, textTransform: 'uppercase',
+              textShadow: '0 1px 2px rgba(0,0,0,0.5)',
             }}
           >
             {[course.country, course.region].filter(Boolean).join(' · ')}
