@@ -153,8 +153,8 @@ export const DetailHero: React.FC<Props> = ({ item, index, total, onPrev, onNext
       >
         <div
           style={{
-            width: 64,
-            height: 64,
+            width: 56,
+            height: 56,
             borderRadius: 14,
             background: palette.tint,
             border: `1px solid ${palette.border}`,
@@ -165,7 +165,7 @@ export const DetailHero: React.FC<Props> = ({ item, index, total, onPrev, onNext
             boxShadow: '0 6px 20px -8px rgba(0,0,0,0.4)',
           }}
         >
-          {locked ? <Lock size={28} /> : renderBadgeIcon(item.iconKey, 32, 'currentColor')}
+          {locked ? <Lock size={26} /> : renderBadgeIcon(item.iconKey, 28, 'currentColor')}
         </div>
 
         <span
