@@ -348,7 +348,7 @@ const RangePills: React.FC<{
 }> = ({ value, onChange }) => {
   const options: Range[] = ['1M', '3M', '1Y'];
   return (
-    <div style={{ display: 'inline-flex', gap: 4 }}>
+    <div style={{ display: 'inline-flex', gap: 4, padding: 3, background: 'var(--hcp-bg-2)', borderRadius: 999 }}>
       {options.map((opt) => {
         const active = opt === value;
         return (
