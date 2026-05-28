@@ -303,9 +303,9 @@ const HeroHandicapCardDark: React.FC<Props> = ({ connection }) => {
                 </span>
                 <span
                   style={{
-                    fontSize: 52,
-                    fontWeight: 800,
-                    letterSpacing: '-0.04em',
+                    fontSize: 60,
+                    fontWeight: 700,
+                    letterSpacing: '-0.045em',
                     lineHeight: 1,
                     color: 'var(--hcp-t-100)',
                     fontVariantNumeric: 'tabular-nums',
@@ -319,7 +319,7 @@ const HeroHandicapCardDark: React.FC<Props> = ({ connection }) => {
                     fontWeight: 800,
                     letterSpacing: '0.18em',
                     textTransform: 'uppercase',
-                    color: 'var(--hcp-t-60)',
+                    color: 'var(--hcp-t-40)',
                     marginTop: 10,
                   }}
                 >
