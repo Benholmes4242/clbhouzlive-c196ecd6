@@ -3,6 +3,7 @@ import { lookupCourseMetaV2 } from '@/lib/whs/courseNameMatcher';
 import { Crown } from 'lucide-react';
 import { useCourseLegends } from '@/hooks/gam/useCourseLegends';
 import { useCourseMeta } from '@/hooks/gam/useCourseMeta';
+import { useActiveActor } from '@/context/ActiveActorContext';
 import { Skeleton, EmptyStub, RetryStub } from '../../../gam/_shared/GamAtoms';
 import {
   legendCategoryLabel,
@@ -125,6 +126,7 @@ export const CourseLegendsDrilldown: React.FC<Props> = ({ selection, hideHeader 
 
   const { data, isLoading, isError, refetch } = useCourseLegends(ctx.courseId);
   const { data: meta } = useCourseMeta(ctx.courseId);
+  const { activeActor } = useActiveActor();
   const [window, setWindow] = useState<LegendWindow>('90d');
   const [courseHeaderImage, setCourseHeaderImage] = useState<string | null>(null);
   const [fullLeaderboardCategory, setFullLeaderboardCategory] =
@@ -259,7 +261,7 @@ export const CourseLegendsDrilldown: React.FC<Props> = ({ selection, hideHeader 
 
           <ChampionsYourStandingCard
             displayName="You"
-            photoUrl={null}
+            photoUrl={activeActor?.avatarUrl ?? null}
             titlesHeld={youOwnedCount}
             totalCategories={visibleCategories.length}
             bestRank={(() => {
