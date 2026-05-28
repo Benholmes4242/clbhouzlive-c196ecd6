@@ -218,7 +218,14 @@ const HeroHandicapCardDark: React.FC<Props> = ({ connection }) => {
             aria-hidden
           >
             <defs>
-              <linearGradient id="hcp-arc-grad" x1="0%" y1="0%" x2="100%" y2="0%">
+              <linearGradient
+                id="hcp-arc-grad"
+                gradientUnits="userSpaceOnUse"
+                x1="0"
+                y1="0"
+                x2={RING_BOX}
+                y2={RING_BOX}
+              >
                 <stop offset="0%" stopColor={grad.from} />
                 <stop offset="100%" stopColor={grad.to} />
               </linearGradient>
@@ -229,7 +236,7 @@ const HeroHandicapCardDark: React.FC<Props> = ({ connection }) => {
               cy={RING_BOX / 2}
               r={CIRC_R}
               fill="none"
-              stroke="rgba(255,255,255,0.06)"
+              stroke="rgba(255,255,255,0.10)"
               strokeWidth={STROKE_W}
             />
             {/* Progress arc — clockwise for improvement, counterclockwise for regression.
@@ -249,6 +256,7 @@ const HeroHandicapCardDark: React.FC<Props> = ({ connection }) => {
                 transform: verdict === 'bad' ? 'scaleX(-1)' : undefined,
                 transformOrigin: 'center',
                 transformBox: 'fill-box',
+                filter: `drop-shadow(0 0 6px ${glowColor})`,
               }}
             />
           </svg>
