@@ -34,16 +34,16 @@ const RIGHT_CATEGORIES: LegendCategory[] = [
 const CATEGORY_TILE_PALETTE: Record<LegendCategory, { bg: string; border: string; icon: string }> = {
   most_aces_90d:            { bg: 'rgba(217,70,239,0.10)', border: 'rgba(217,70,239,0.18)', icon: '#D946EF' },
   most_aces_all_time:       { bg: 'rgba(217,70,239,0.10)', border: 'rgba(217,70,239,0.18)', icon: '#D946EF' },
-  most_eagles_90d:          { bg: 'rgba(34,197,94,0.10)', border: 'rgba(34,197,94,0.20)', icon: '#22C55E' },
-  most_eagles_all_time:     { bg: 'rgba(34,197,94,0.10)', border: 'rgba(34,197,94,0.20)', icon: '#22C55E' },
+  most_eagles_90d:          { bg: 'rgba(5,150,105,0.14)', border: 'rgba(5,150,105,0.26)', icon: '#059669' },
+  most_eagles_all_time:     { bg: 'rgba(5,150,105,0.14)', border: 'rgba(5,150,105,0.26)', icon: '#059669' },
   most_birdies_90d:         { bg: 'rgba(251,188,46,0.12)', border: 'rgba(251,188,46,0.22)', icon: '#FBBC2E' },
   most_birdies_all_time:    { bg: 'rgba(251,188,46,0.12)', border: 'rgba(251,188,46,0.22)', icon: '#FBBC2E' },
   lowest_gross_90d:         { bg: 'rgba(255,255,255,0.05)', border: 'rgba(255,255,255,0.08)', icon: 'var(--hcp-t-60)' },
   lowest_gross_all_time:    { bg: 'rgba(255,255,255,0.05)', border: 'rgba(255,255,255,0.08)', icon: 'var(--hcp-t-60)' },
   best_stableford_90d:      { bg: 'rgba(56,189,248,0.10)', border: 'rgba(56,189,248,0.18)', icon: '#38BDF8' },
   best_stableford_all_time: { bg: 'rgba(56,189,248,0.10)', border: 'rgba(56,189,248,0.18)', icon: '#38BDF8' },
-  best_score_diff_90d:      { bg: 'rgba(239,68,68,0.10)', border: 'rgba(239,68,68,0.20)', icon: '#EF4444' },
-  best_score_diff_all_time: { bg: 'rgba(239,68,68,0.10)', border: 'rgba(239,68,68,0.20)', icon: '#EF4444' },
+  best_score_diff_90d:      { bg: 'rgba(159,29,29,0.14)', border: 'rgba(159,29,29,0.26)', icon: '#9F1D1D' },
+  best_score_diff_all_time: { bg: 'rgba(159,29,29,0.14)', border: 'rgba(159,29,29,0.26)', icon: '#9F1D1D' },
 };
 
 const CAT_SHORT: Record<LegendCategory, string> = {

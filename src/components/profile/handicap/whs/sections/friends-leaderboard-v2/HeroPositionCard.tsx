@@ -36,9 +36,9 @@ const T = {
   line2: 'var(--hcp-line-2)',
   amber: '#F7931E',
   amberSoft: 'rgba(247,147,30,0.14)',
-  green: '#22C55E',
+  green: '#059669',
   greenDeep: '#16A34A',
-  red: '#EF4444',
+  red: '#9F1D1D',
 };
 const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
 
@@ -230,9 +230,6 @@ export const HeroPositionCard: React.FC<Props> = ({
                 fontWeight: 700,
                 color: yourIsPlus ? T.amber : T.ink,
                 fontVariantNumeric: 'tabular-nums',
-                textShadow: yourIsPlus
-                  ? '0 0 6px rgba(247,147,30,0.30), 0 0 2px rgba(247,147,30,0.20)'
-                  : 'none',
               }}
             >
               {fmtHcp(yourHcp)}
@@ -368,8 +365,6 @@ export const HeroPositionCard: React.FC<Props> = ({
                   color: T.green,
                   fontVariantNumeric: 'tabular-nums',
                   letterSpacing: '-0.02em',
-                  textShadow:
-                    '0 0 6px rgba(34,197,94,0.40), 0 0 2px rgba(34,197,94,0.25)',
                   lineHeight: 1,
                 }}
               >

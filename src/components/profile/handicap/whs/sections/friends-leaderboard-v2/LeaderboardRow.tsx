@@ -105,7 +105,7 @@ const RankDeltaChip: React.FC<RankDeltaChipProps> = ({ delta, isNew, isStale }) 
       style={{
         fontSize: 11,
         fontWeight: 800,
-        color: climbed ? '#22C55E' : '#EF4444',
+        color: climbed ? '#059669' : '#9F1D1D',
         fontVariantNumeric: 'tabular-nums',
         letterSpacing: '-0.01em',
         display: 'inline-flex',
@@ -301,9 +301,6 @@ export const LeaderboardRow: React.FC<Props> = ({ entry, rank, isStaleRow, onCli
             color: isPlusHandicap ? T.amber : T.ink,
             fontVariantNumeric: 'tabular-nums',
             letterSpacing: '-0.01em',
-            textShadow: isPlusHandicap
-              ? '0 0 6px rgba(247,147,30,0.30), 0 0 2px rgba(247,147,30,0.20)'
-              : 'none',
           }}
         >
           {fmtHcp(hcp)}

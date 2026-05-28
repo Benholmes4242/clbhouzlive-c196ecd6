@@ -35,7 +35,7 @@ const T = {
   ink55: 'rgba(15,23,42,0.55)',
   ink40: 'rgba(15,23,42,0.40)',
   ink10: 'rgba(15,23,42,0.10)',
-  green: '#22C55E',
+  green: '#059669',
 };
 const FONT = 'Geist, system-ui, -apple-system, BlinkMacSystemFont, sans-serif';
 
@@ -131,7 +131,6 @@ const FriendsYesterdayCard: React.FC<Props> = ({ data, userId }) => {
             borderRadius: '50%',
             background: T.green,
             display: 'inline-block',
-            boxShadow: '0 0 6px rgba(34,197,94,0.4)',
           }}
         />
         <span
