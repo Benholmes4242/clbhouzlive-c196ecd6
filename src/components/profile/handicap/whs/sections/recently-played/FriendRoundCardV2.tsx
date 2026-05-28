@@ -64,13 +64,13 @@ export const FriendRoundCardV2: React.FC<Props> = ({
 
   const diffColor =
     diff != null && diff > 0
-      ? 'var(--hcp-amber, #F7931E)'
+      ? 'var(--hcp-bad-deep)'
       : diff != null && diff < 0
-        ? 'var(--hcp-good, #22C55E)'
+        ? 'var(--hcp-good-deep)'
         : 'var(--hcp-t-100)';
 
   const ringColor = isCounter
-    ? 'rgba(34,197,94,0.45)'
+    ? 'rgba(5,150,105,0.55)'
     : 'rgba(255,255,255,0.18)';
 
   return (
