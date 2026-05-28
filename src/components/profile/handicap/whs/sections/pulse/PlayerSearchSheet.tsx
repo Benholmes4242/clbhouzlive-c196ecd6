@@ -117,6 +117,11 @@ export const PlayerSearchSheet: React.FC<Props> = ({ open, onClose }) => {
 
   return (
     <GamSheet open={open} onClose={onClose}>
+      {/* Drag handle */}
+      <div style={{ display: 'flex', justifyContent: 'center', paddingTop: 8, flexShrink: 0 }}>
+        <div style={{ width: 36, height: 4, borderRadius: 2, background: 'var(--hcp-line-2)' }} />
+      </div>
+
       {/* Sticky header */}
       <div
         style={{
@@ -124,7 +129,7 @@ export const PlayerSearchSheet: React.FC<Props> = ({ open, onClose }) => {
           alignItems: 'center',
           justifyContent: 'space-between',
           padding: '14px 20px 10px',
-          borderBottom: '1px solid var(--hcp-line)',
+          borderBottom: '0.5px solid var(--hcp-line)',
           fontFamily: FONT,
         }}
       >
