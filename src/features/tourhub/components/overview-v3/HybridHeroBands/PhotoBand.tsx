@@ -44,28 +44,42 @@ function StatusTag({ state }: { state: HeroState }) {
       style={{
         display: 'inline-flex',
         alignItems: 'center',
-        gap: 6,
-        padding: '4px 10px',
+        gap: 7,
+        padding: '5px 11px',
         borderRadius: 999,
-        background: 'rgba(0,0,0,0.45)',
-        border: `0.5px solid rgba(255,255,255,0.25)`,
-        backdropFilter: 'blur(4px)',
+        background: 'rgba(255,255,255,0.12)',
+        backdropFilter: 'blur(16px) saturate(160%)',
+        WebkitBackdropFilter: 'blur(16px) saturate(160%)',
+        border: '0.5px solid rgba(255,255,255,0.35)',
+        boxShadow: 'inset 0 0.5px 0 rgba(255,255,255,0.40), 0 2px 12px rgba(0,0,0,0.25)',
         color: 'white',
-        fontSize: 9,
+        fontSize: 9.5,
         fontWeight: 800,
-        letterSpacing: '0.18em',
+        letterSpacing: '0.16em',
       }}
     >
-      <span
-        className={isLive ? 'hybrid-live-pulse' : undefined}
-        style={{
-          width: 6,
-          height: 6,
-          borderRadius: '50%',
-          background: dotColor,
-          display: 'inline-block',
-        }}
-      />
+      <span style={{ position: 'relative', width: 6, height: 6, display: 'inline-block' }}>
+        <span
+          aria-hidden="true"
+          style={{
+            position: 'absolute',
+            inset: -3,
+            borderRadius: '50%',
+            background: dotColor,
+            opacity: 0.3,
+            filter: 'blur(2px)',
+          }}
+        />
+        <span
+          className={isLive ? 'hybrid-live-pulse' : undefined}
+          style={{
+            position: 'absolute',
+            inset: 0,
+            borderRadius: '50%',
+            background: dotColor,
+          }}
+        />
+      </span>
       {label}
     </span>
   );
@@ -74,7 +88,7 @@ function StatusTag({ state }: { state: HeroState }) {
 function ledeLine(state: HeroState, winnerName?: string | null): string | null {
   if (state.kind === 'results' && winnerName) return `Won by ${winnerName}`;
   if (state.kind === 'live') {
-    return state.thruLabel ? `Round ${state.round} · ${state.thruLabel}` : null;
+    return `Round ${state.round}${state.totalRounds ? ` of ${state.totalRounds}` : ''}`;
   }
   if (state.kind === 'upcoming') return state.countdown || null;
   return null;
@@ -190,8 +204,8 @@ export function PhotoBand({
               ...NUMERIC_STYLE,
               fontSize: 10,
               fontWeight: 700,
-              letterSpacing: '0.16em',
-              color: 'rgba(255,255,255,0.75)',
+              letterSpacing: '0.10em',
+              color: 'rgba(255,255,255,0.90)',
               textShadow: '0 1px 3px rgba(0,0,0,0.45)',
               textTransform: 'uppercase',
               whiteSpace: 'nowrap',
