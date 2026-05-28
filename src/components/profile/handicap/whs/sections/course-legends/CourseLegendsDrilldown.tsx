@@ -145,7 +145,7 @@ export const CourseLegendsDrilldown: React.FC<Props> = ({ selection, hideHeader 
     [data],
   );
   const activeWindowHasData = window === '90d' ? has90d : hasAllTime;
-  const otherWindowHasData = window === '90d' ? hasAllTime : has90d;
+  
 
   useEffect(() => {
     if (autoSwitchedRef.current) return;
