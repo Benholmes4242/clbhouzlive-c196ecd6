@@ -30,8 +30,8 @@ export const SheetFooterDark: React.FC<Props> = ({
     <div
       style={{
         borderTop: '1px solid var(--hcp-line)',
-        padding: '14px 16px',
-        paddingBottom: 'calc(14px + env(safe-area-inset-bottom, 0px))',
+        padding: '12px 14px',
+        paddingBottom: 'calc(12px + env(safe-area-inset-bottom, 0px))',
         display: 'flex',
         alignItems: 'center',
         justifyContent: hasIndex ? 'space-between' : 'flex-end',
