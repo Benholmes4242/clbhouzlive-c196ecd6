@@ -232,8 +232,7 @@ const TourSwitcherAffordance: React.FC = () => {
             const isActive = slug === activeTourSlug;
             const liveCell = data?.live.find((c) => c.tourSlug === slug) ?? null;
             const completedCell = data?.completed.find((c) => c.tourSlug === slug) ?? null;
-            const upcomingCell = data?.upcoming.find((c) => c.tourSlug === slug) ?? null;
-            const resolvedId = liveCell?.id ?? completedCell?.id ?? upcomingCell?.id ?? null;
+            const resolvedId = liveCell?.id ?? completedCell?.id ?? null;
             const isLive = !!liveCell;
             const disabled = resolvedId === null;
 

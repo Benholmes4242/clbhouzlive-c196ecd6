@@ -85,7 +85,7 @@ export function OverviewPageV3() {
     if (!tourParam || !tickerData) return null;
     const pick = (arr: typeof tickerData.live) =>
       arr.find((c) => c.tourSlug === tourParam)?.id ?? null;
-    return pick(tickerData.live) ?? pick(tickerData.completed) ?? pick(tickerData.upcoming) ?? null;
+    return pick(tickerData.live) ?? pick(tickerData.completed) ?? null;
   }, [tourParam, tickerData]);
 
   const lastAppliedParamRef = useRef<string | null>(null);
