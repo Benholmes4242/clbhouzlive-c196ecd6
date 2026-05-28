@@ -123,7 +123,7 @@ const StreakRowView: React.FC<{ type: StreakType; row: StreakRow | null }> = ({
         alignItems: 'flex-start',
         gap: 14,
         padding: '14px 16px',
-        borderBottom: '1px solid var(--hcp-hairline)',
+        borderBottom: '0.5px solid var(--hcp-hairline)',
         fontFamily: FONT,
         background: isActive
           ? 'linear-gradient(90deg, rgba(247,147,30,0.06) 0%, rgba(247,147,30,0.01) 100%)'
@@ -341,11 +341,12 @@ export const StreaksSheet: React.FC<StreaksSheetProps> = ({ open, onClose }) => 
         <Eyebrow />
         <div
           style={{
-            fontSize: 22,
-            fontWeight: 900,
-            letterSpacing: '-0.025em',
+            fontSize: 34,
+            fontWeight: 200,
+            letterSpacing: '-0.045em',
             color: 'var(--hcp-t-100)',
             marginTop: 4,
+            lineHeight: 0.95,
             fontVariantNumeric: 'tabular-nums',
           }}
         >
