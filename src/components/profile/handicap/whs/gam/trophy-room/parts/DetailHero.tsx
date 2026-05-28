@@ -70,7 +70,7 @@ export const DetailHero: React.FC<Props> = ({ item, index, total, onPrev, onNext
     <div
       style={{
         position: 'relative',
-        height: 220,
+        height: 180,
         flexShrink: 0,
         background: palette.heroGradient,
         overflow: 'hidden',
