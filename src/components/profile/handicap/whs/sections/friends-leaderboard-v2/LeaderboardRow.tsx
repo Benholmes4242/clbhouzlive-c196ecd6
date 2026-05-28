@@ -301,9 +301,6 @@ export const LeaderboardRow: React.FC<Props> = ({ entry, rank, isStaleRow, onCli
             color: isPlusHandicap ? T.amber : T.ink,
             fontVariantNumeric: 'tabular-nums',
             letterSpacing: '-0.01em',
-            textShadow: isPlusHandicap
-              ? '0 0 6px rgba(247,147,30,0.30), 0 0 2px rgba(247,147,30,0.20)'
-              : 'none',
           }}
         >
           {fmtHcp(hcp)}
