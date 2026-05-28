@@ -297,7 +297,8 @@ const LastRoundHeroCard: React.FC<Props> = ({ round, timeAgo, onClick, viewMode 
               fontWeight: 700,
               letterSpacing: '0.1em',
               textTransform: 'uppercase',
-              color: 'var(--hcp-t-60)',
+              color: 'rgba(255,255,255,0.78)',
+              textShadow: '0 1px 3px rgba(0,0,0,0.6)',
             }}
           >
             {par != null && <>PAR {par}</>}
