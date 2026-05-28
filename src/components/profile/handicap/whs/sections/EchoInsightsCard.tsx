@@ -182,6 +182,7 @@ const MiniCard: React.FC<{
         style={{
           fontSize: 14, fontWeight: 800, color: '#F8FAFC',
           lineHeight: 1.15, letterSpacing: '-0.01em',
+          textShadow: '0 1px 3px rgba(0,0,0,0.6)',
         }}
       >
         {course.name || '—'}
