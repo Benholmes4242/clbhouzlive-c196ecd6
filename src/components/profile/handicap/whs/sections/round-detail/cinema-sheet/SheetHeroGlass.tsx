@@ -80,13 +80,13 @@ const labelStyle: React.CSSProperties = {
 };
 
 const valueStyle = (color: string): React.CSSProperties => ({
-  fontSize: 36,
+  fontSize: 30,
   fontWeight: 300,
   color,
   fontFamily: FONT_MONO,
   letterSpacing: '-0.03em',
   lineHeight: 1,
-  marginTop: 4,
+  marginTop: 3,
   fontVariantNumeric: 'tabular-nums',
 });
 
