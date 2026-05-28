@@ -226,8 +226,8 @@ const TodayGreeting: React.FC<Props> = ({ connectionId, userId }) => {
             <>
               <span style={{ opacity: 0.4 }}>·</span>
               <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5 }}>
-                <span style={{ color: '#F7931E', fontSize: 13, lineHeight: 1 }}>
-                  {weatherGlyph(weather.code)}
+                <span style={{ color: '#F7931E', display: 'inline-flex', lineHeight: 0 }}>
+                  <WeatherGlyph code={weather.code} />
                 </span>
                 <span>Now</span>
                 <span
