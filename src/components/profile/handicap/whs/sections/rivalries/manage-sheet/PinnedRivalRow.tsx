@@ -23,7 +23,7 @@ export const PinnedRivalRow: React.FC<Props> = ({ rivalry, onRemove, busy }) => 
       alignItems: 'center',
       gap: 12,
       padding: '10px 8px',
-      borderBottom: '1px solid var(--hcp-line-2)',
+      borderBottom: '0.5px solid var(--hcp-line-2)',
       fontFamily: FONT,
     }}
   >
@@ -93,7 +93,7 @@ export const PinnedRivalRow: React.FC<Props> = ({ rivalry, onRemove, busy }) => 
         border: 'none',
         borderRadius: 8,
         cursor: busy ? 'wait' : 'pointer',
-        color: 'var(--hcp-bad)',
+        color: 'var(--hcp-bad-deep)',
         opacity: busy ? 0.4 : 1,
       }}
     >
