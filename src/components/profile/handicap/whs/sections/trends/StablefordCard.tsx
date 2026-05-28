@@ -552,7 +552,7 @@ const ScoringRangeBlock: React.FC<{
       <div
         style={{
           position: 'relative',
-          height: 8,
+          height: 5,
           borderRadius: 99,
           background: 'rgba(15,23,42,0.06)',
           overflow: 'visible',
