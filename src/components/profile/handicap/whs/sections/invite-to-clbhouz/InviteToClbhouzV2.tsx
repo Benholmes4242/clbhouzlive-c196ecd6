@@ -18,10 +18,8 @@ const T = {
   inkMute: 'var(--hcp-t-60)',
   hairline: 'var(--hcp-line-2)',
   amber: '#F7931E',
-  green: '#22C55E',
-  greenDeep: '#15803D',
-  greenSoft: 'rgba(34,197,94,0.12)',
-  greenText: 'rgba(167,239,178,1)',
+  greenSoft: 'rgba(5,150,105,0.16)',
+  greenText: '#34D399',
   cardBg: 'var(--hcp-bg-1)',
 };
 const FONT = '"Geist", system-ui, sans-serif';
@@ -37,7 +35,7 @@ const SentBadge: React.FC<{ count: number; onClick: () => void }> = ({ count, on
       padding: '4px 10px',
       borderRadius: 999,
       background: T.greenSoft,
-      border: '1px solid rgba(34,197,94,0.20)',
+      border: '1px solid rgba(5,150,105,0.30)',
       color: T.greenText,
       fontFamily: FONT,
       fontSize: 10.5,
