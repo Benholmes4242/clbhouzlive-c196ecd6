@@ -346,13 +346,14 @@ const LastRoundHeroCard: React.FC<Props> = ({ round, timeAgo, onClick, viewMode 
                 lineHeight: 1,
                 color: diffColor,
                 fontFeatureSettings: '"tnum" 1',
+                textShadow: '0 2px 8px rgba(0,0,0,0.5)',
               }}
             >
               {diffDisplay}
             </span>
           </div>
 
-          <div style={{ display: 'flex', alignItems: 'flex-end', gap: 16 }}>
+          <div style={{ display: 'flex', alignItems: 'flex-end', gap: 16, paddingBottom: 4 }}>
             {gross != null && <SecondaryStat label="Gross" value={String(gross)} />}
             {stableford != null && (
               <SecondaryStat label="Stbl" value={String(stableford)} />
