@@ -230,9 +230,6 @@ export const HeroPositionCard: React.FC<Props> = ({
                 fontWeight: 700,
                 color: yourIsPlus ? T.amber : T.ink,
                 fontVariantNumeric: 'tabular-nums',
-                textShadow: yourIsPlus
-                  ? '0 0 6px rgba(247,147,30,0.30), 0 0 2px rgba(247,147,30,0.20)'
-                  : 'none',
               }}
             >
               {fmtHcp(yourHcp)}
