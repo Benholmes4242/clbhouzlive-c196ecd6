@@ -43,8 +43,8 @@ export const RIVALRY_STATE_TOKENS: Record<RivalryState, RivalryStateToken> = {
   },
   losing: {
     cardSweep: `linear-gradient(180deg, #1A0000 0%, var(--hcp-bg-1) 75%, var(--hcp-bg-1) 100%)`,
-    cardBorder: 'rgba(239,68,68,0.32)',
-    outerGlow: '0 8px 28px -8px rgba(239,68,68,0.18)',
+    cardBorder: 'rgba(159,29,29,0.40)',
+    outerGlow: '0 8px 28px -8px rgba(159,29,29,0.30)',
     selfNumColor: 'rgba(255,255,255,0.40)',
     rivalNumColor: GOLD,
     pillWinGradient: PILL_WIN,
