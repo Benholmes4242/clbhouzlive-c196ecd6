@@ -332,7 +332,7 @@ export const StreaksSheet: React.FC<StreaksSheetProps> = ({ open, onClose }) => 
 
       <div
         style={{
-          padding: '14px 20px 12px',
+          padding: '12px 20px 10px',
           borderBottom: '0.5px solid var(--hcp-line)',
           flexShrink: 0,
           fontFamily: FONT,
@@ -341,11 +341,11 @@ export const StreaksSheet: React.FC<StreaksSheetProps> = ({ open, onClose }) => 
         <Eyebrow />
         <div
           style={{
-            fontSize: 24,
+            fontSize: 22,
             fontWeight: 900,
             letterSpacing: '-0.025em',
             color: 'var(--hcp-t-100)',
-            marginTop: 6,
+            marginTop: 4,
             fontVariantNumeric: 'tabular-nums',
           }}
         >
