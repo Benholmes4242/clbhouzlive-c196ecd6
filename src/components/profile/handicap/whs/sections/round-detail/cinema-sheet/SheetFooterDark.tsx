@@ -30,8 +30,8 @@ export const SheetFooterDark: React.FC<Props> = ({
     <div
       style={{
         borderTop: '1px solid var(--hcp-line)',
-        padding: '14px 16px',
-        paddingBottom: 'calc(14px + env(safe-area-inset-bottom, 0px))',
+        padding: '12px 14px',
+        paddingBottom: 'calc(12px + env(safe-area-inset-bottom, 0px))',
         display: 'flex',
         alignItems: 'center',
         justifyContent: hasIndex ? 'space-between' : 'flex-end',
@@ -66,7 +66,7 @@ export const SheetFooterDark: React.FC<Props> = ({
           >
             <span
               style={{
-                fontSize: 18,
+                fontSize: 16,
                 fontWeight: 800,
                 color: 'var(--hcp-t-100)',
                 letterSpacing: '-0.01em',
@@ -96,13 +96,13 @@ export const SheetFooterDark: React.FC<Props> = ({
           target="_blank"
           rel="noopener noreferrer"
           style={{
-            padding: '11px 18px',
+            padding: '9px 16px',
             borderRadius: 999,
             background: AMBER,
             border: 'none',
             color: '#1A1300',
             fontWeight: 800,
-            fontSize: 13,
+            fontSize: 12,
             display: 'inline-flex',
             alignItems: 'center',
             gap: 6,

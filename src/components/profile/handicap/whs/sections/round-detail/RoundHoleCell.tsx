@@ -177,7 +177,7 @@ export const RoundHoleCell: React.FC<Props> = ({ hole, showPar = true }) => {
         style={{
           position: 'relative',
           width: '100%',
-          maxWidth: 44,
+          maxWidth: 38,
           aspectRatio: '1 / 1',
           display: 'flex',
           alignItems: 'center',
@@ -225,7 +225,7 @@ export const RoundHoleCell: React.FC<Props> = ({ hole, showPar = true }) => {
         <span
           style={{
             position: 'relative',
-            fontSize: 'clamp(14px, 3.8vw, 17px)',
+            fontSize: 'clamp(12px, 3.4vw, 15px)',
             fontWeight: 700,
             color: strokes == null ? INK_40 : INK,
             lineHeight: 1,

@@ -25,10 +25,10 @@ const AMBER = '#F7931E';
 
 const SheetSkeleton: React.FC = () => (
   <div className="animate-pulse">
-    <div style={{ width: '100%', height: 340, background: 'var(--hcp-bg-3)' }} />
-    <div style={{ padding: 18 }}>
-      <div style={{ height: 180, background: 'var(--hcp-bg-2)', borderRadius: 8, marginBottom: 12 }} />
-      <div style={{ height: 60, background: 'var(--hcp-bg-2)', borderRadius: 8 }} />
+    <div style={{ width: '100%', height: 280, background: 'var(--hcp-bg-3)' }} />
+    <div style={{ padding: 14 }}>
+      <div style={{ height: 150, background: 'var(--hcp-bg-2)', borderRadius: 8, marginBottom: 10 }} />
+      <div style={{ height: 50, background: 'var(--hcp-bg-2)', borderRadius: 8 }} />
     </div>
   </div>
 );
@@ -160,7 +160,7 @@ export const RoundDetailSheet: React.FC<Props> = ({
           className="hcp-dark fixed inset-x-0 bottom-0 z-[10002] flex flex-col rounded-t-[20px] outline-none"
           style={{
             background: PAGE_BG,
-            height: '90dvh',
+            height: '75dvh',
             minHeight: 0,
             overflow: 'hidden',
             boxShadow: '0 -10px 40px -10px rgba(0,0,0,0.5)',

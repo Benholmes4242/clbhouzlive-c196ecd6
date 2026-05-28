@@ -80,13 +80,13 @@ const labelStyle: React.CSSProperties = {
 };
 
 const valueStyle = (color: string): React.CSSProperties => ({
-  fontSize: 36,
+  fontSize: 30,
   fontWeight: 300,
   color,
   fontFamily: FONT_MONO,
   letterSpacing: '-0.03em',
   lineHeight: 1,
-  marginTop: 4,
+  marginTop: 3,
   fontVariantNumeric: 'tabular-nums',
 });
 
@@ -145,9 +145,9 @@ export const SheetHeroGlass: React.FC<Props> = ({
         position: 'absolute',
         left: 14,
         right: 14,
-        bottom: 16,
+        bottom: 14,
         zIndex: 3,
-        padding: '16px 18px',
+        padding: '14px 16px',
         borderRadius: 16,
         background: 'rgba(255,255,255,0.08)',
         border: '0.5px solid rgba(255,255,255,0.18)',
@@ -159,7 +159,7 @@ export const SheetHeroGlass: React.FC<Props> = ({
       <div>
         <div
           style={{
-            fontSize: 20,
+            fontSize: 18,
             fontWeight: 700,
             color: '#FFFFFF',
             letterSpacing: '-0.025em',
@@ -173,7 +173,7 @@ export const SheetHeroGlass: React.FC<Props> = ({
           <div
             style={{
               marginTop: 3,
-              fontSize: 11,
+              fontSize: 10,
               fontWeight: 600,
               color: 'rgba(255,255,255,0.60)',
               letterSpacing: '0.06em',
@@ -185,7 +185,7 @@ export const SheetHeroGlass: React.FC<Props> = ({
         )}
       </div>
 
-      <div style={{ ...HAIR, margin: '14px 0' }} />
+      <div style={{ ...HAIR, margin: '12px 0' }} />
 
       <div
         style={
@@ -208,7 +208,7 @@ export const SheetHeroGlass: React.FC<Props> = ({
             <GlassGrossRing
               value={gross != null ? gross : EM_DASH}
               isCounter={isCounter}
-              numeralSize={32}
+              numeralSize={28}
             />
           </div>
         </div>
