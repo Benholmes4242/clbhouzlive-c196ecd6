@@ -131,6 +131,39 @@ export const CourseLegendsDrilldown: React.FC<Props> = ({ selection, hideHeader 
   const [courseHeaderImage, setCourseHeaderImage] = useState<string | null>(null);
   const [fullLeaderboardCategory, setFullLeaderboardCategory] =
     useState<LegendCategory | null>(null);
+  const autoSwitchedRef = useRef(false);
+  const [autoSwitchedToAllTime, setAutoSwitchedToAllTime] = useState(false);
+
+  const has90d = useMemo(
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    () => (data ?? []).some((r: any) => String(r.category).endsWith('_90d')),
+    [data],
+  );
+  const hasAllTime = useMemo(
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    () => (data ?? []).some((r: any) => String(r.category).endsWith('_all_time')),
+    [data],
+  );
+  const activeWindowHasData = window === '90d' ? has90d : hasAllTime;
+  const otherWindowHasData = window === '90d' ? hasAllTime : has90d;
+
+  useEffect(() => {
+    if (autoSwitchedRef.current) return;
+    if (isLoading || isError) return;
+    if ((data ?? []).length === 0) return;
+    if (!has90d && hasAllTime && window === '90d') {
+      autoSwitchedRef.current = true;
+      setWindow('all_time');
+      setAutoSwitchedToAllTime(true);
+    } else {
+      autoSwitchedRef.current = true;
+    }
+  }, [data, has90d, hasAllTime, isLoading, isError, window]);
+
+  const handleWindowChange = (w: LegendWindow) => {
+    setAutoSwitchedToAllTime(false);
+    setWindow(w);
+  };
 
   useEffect(() => {
     let cancelled = false;
