@@ -1,6 +1,6 @@
 import React, { useRef, useEffect, useState } from 'react';
 
-type CourseDetailTab = 'about' | 'reviews' | 'media' | 'legends';
+type CourseDetailTab = 'about' | 'reviews' | 'media' | 'holes' | 'legends';
 
 interface TabDef {
   id: CourseDetailTab;
@@ -11,6 +11,7 @@ const TABS: TabDef[] = [
   { id: 'about', label: 'About' },
   { id: 'reviews', label: 'Reviews' },
   { id: 'media', label: 'Media' },
+  { id: 'holes', label: 'Holes' },
   { id: 'legends', label: 'Champions' },
 ];
 

@@ -16,6 +16,7 @@ import { formatCourseLocation } from '@/utils/courseLocation';
 import { CourseDetailSkeleton } from '@/components/skeletons/CourseDetailSkeleton';
 import { useCourseRatingAggregates } from '@/hooks/useCourseRatingAggregates';
 import { CourseLegendsDrilldown } from '@/components/profile/handicap/whs/sections/course-legends/CourseLegendsDrilldown';
+import CourseHolesTab from '@/features/courses/components/holes/CourseHolesTab';
 
 
 interface GolfClubViewProps {
@@ -194,6 +195,15 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
             <CourseMediaTabNew courseId={course.id} courseName={course.name} />
           </TabsContent>
         )}
+        {visitedTabs.has('holes') && (
+          <TabsContent
+            value="holes"
+            className={`mt-0 transition-opacity duration-200 ${activeTab === 'holes' ? 'opacity-100' : 'hidden'}`}
+          >
+            <CourseHolesTab courseId={course.id} />
+          </TabsContent>
+        )}
+
 
         {visitedTabs.has('legends') && (
           <TabsContent
