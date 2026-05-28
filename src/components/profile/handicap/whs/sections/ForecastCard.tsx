@@ -573,7 +573,7 @@ const NormalCard: React.FC<{ f: Forecast; tone: 'good' | 'amber' | 'neutral'; ct
 
 const SharpDropCard: React.FC<{ f: Forecast; ctx: CopyCtx }> = ({ f, ctx }) => (
   <CardShell borderColor={T.goodBorder} bgTint={T.goodBgTint}>
-    <EyebrowRow left="🔥 On a tear" right={f.whenLabel ?? undefined} color={T.good} />
+    <EyebrowRow left={<span style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}><Flame size={12} strokeWidth={2.5} /> On a tear</span>} right={f.whenLabel ?? undefined} color={T.good} />
     <Headline
       numberValue={(f.projected ?? 0).toFixed(1)}
       numberColor={T.good}
