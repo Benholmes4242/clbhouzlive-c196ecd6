@@ -261,8 +261,16 @@ export const CourseLegendsDrilldown: React.FC<Props> = ({ selection, hideHeader 
       )}
 
       <div style={{ padding: '14px 16px 4px', display: 'flex', justifyContent: 'flex-start' }}>
-        <WindowToggle window={window} setWindow={setWindow} />
+        <WindowToggle window={window} setWindow={handleWindowChange} />
       </div>
+
+      {autoSwitchedToAllTime && window === 'all_time' && (
+        <div style={{ padding: '0 16px 8px' }}>
+          <span style={{ fontFamily: 'Geist, system-ui, sans-serif', fontSize: 11.5, fontWeight: 600, color: 'var(--hcp-t-60, #64748b)', letterSpacing: '-0.005em' }}>
+            No rounds in the last 90 days — showing all-time legends.
+          </span>
+        </div>
+      )}
 
       {isLoading && (
         <div style={{ padding: '20px 16px', display: 'flex', flexDirection: 'column', gap: 12 }}>
