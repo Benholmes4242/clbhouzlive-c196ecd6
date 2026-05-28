@@ -36,18 +36,18 @@ export const AchievementBody: React.FC<Props> = ({ item, viewerUserId }) => {
   return (
     <div
       style={{
-        padding: '20px 20px 24px',
+        padding: '16px 20px 18px',
         fontFamily: GAM.FONT_GEIST,
         color: 'var(--hcp-t-100)',
         display: 'flex',
         flexDirection: 'column',
-        gap: 20,
+        gap: 16,
       }}
     >
       <div>
         <h2
           style={{
-            fontSize: 24,
+            fontSize: 21,
             fontWeight: 900,
             letterSpacing: '-0.025em',
             lineHeight: 1.15,

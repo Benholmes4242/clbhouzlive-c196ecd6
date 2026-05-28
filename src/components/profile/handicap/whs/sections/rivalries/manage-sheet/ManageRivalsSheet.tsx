@@ -142,7 +142,8 @@ export const ManageRivalsSheet: React.FC<Props> = ({ userId, open, onClose }) =>
               background: 'var(--hcp-bg-1)',
               borderTopLeftRadius: 20,
               borderTopRightRadius: 20,
-              maxHeight: '85vh',
+              height: '75dvh',
+              maxHeight: '75dvh',
               minHeight: 0,
               display: 'flex',
               flexDirection: 'column',
@@ -171,7 +172,7 @@ export const ManageRivalsSheet: React.FC<Props> = ({ userId, open, onClose }) =>
               dark
             />
 
-            <div style={{ padding: '12px 16px 12px', flexShrink: 0 }}>
+            <div style={{ padding: '10px 16px 10px', flexShrink: 0 }}>
               <SearchField value={query} onChange={setQuery} />
             </div>
 
@@ -244,7 +245,7 @@ export const ManageRivalsSheet: React.FC<Props> = ({ userId, open, onClose }) =>
 };
 
 const Section: React.FC<{ title: string; children: React.ReactNode }> = ({ title, children }) => (
-  <div style={{ marginTop: 16 }}>
+  <div style={{ marginTop: 12 }}>
     <p
       style={{
         margin: '0 0 8px',
