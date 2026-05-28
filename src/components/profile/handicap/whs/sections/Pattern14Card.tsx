@@ -244,7 +244,7 @@ const Pattern14Card: React.FC<Props> = ({ connectionId }) => {
                   display: 'flex',
                   alignItems: 'flex-end',
                   gap: 3,
-                  height: 28,
+                  height: 22,
                 }}
               >
                 {olderRounds.map((r) => (
