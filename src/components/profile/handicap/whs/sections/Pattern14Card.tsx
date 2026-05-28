@@ -313,7 +313,7 @@ const PatternBar: React.FC<{
     display: 'flex',
     flexDirection: 'column',
     justifyContent: 'flex-end',
-    opacity: faded ? 0.55 : 1,
+    opacity: faded ? 0.45 : 1,
   };
 
   if (onClick) {
