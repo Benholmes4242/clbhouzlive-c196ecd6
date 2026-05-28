@@ -1,7 +1,6 @@
 import React from 'react';
 
-const COUNTER_GREEN = '#10B981';
-const COUNTER_GREEN_GLOW = 'rgba(16,185,129,0.20)';
+const COUNTER_GREEN = '#059669';
 const FONT_MONO = "Geist, system-ui, -apple-system, BlinkMacSystemFont, sans-serif";
 
 interface GlassGrossRingProps {
