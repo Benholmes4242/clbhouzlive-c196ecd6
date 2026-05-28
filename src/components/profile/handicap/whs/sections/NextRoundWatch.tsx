@@ -128,8 +128,8 @@ const NextRoundWatch: React.FC<Props> = ({ connectionId, currentHandicap }) => {
             <span
               style={{
                 fontSize: 72,
-                fontWeight: 800,
-                letterSpacing: '-0.05em',
+                fontWeight: 700,
+                letterSpacing: '-0.045em',
                 lineHeight: 0.95,
                 color: 'var(--hcp-good)',
                 fontVariantNumeric: 'tabular-nums',
