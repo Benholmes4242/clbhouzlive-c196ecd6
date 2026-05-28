@@ -130,7 +130,7 @@ const LastRoundHeroCard: React.FC<Props> = ({ round, timeAgo, onClick, viewMode 
       : 'var(--hcp-t-100)';
 
   const verdictTintGradient = isWorse
-    ? 'linear-gradient(180deg, transparent 0%, rgba(220, 38, 38, 0.22) 70%, rgba(220, 38, 38, 0.34) 100%)'
+    ? 'linear-gradient(180deg, transparent 0%, rgba(180, 50, 30, 0.22) 70%, rgba(180, 50, 30, 0.34) 100%)'
     : isBetter
       ? 'linear-gradient(180deg, transparent 0%, rgba(34, 197, 94, 0.22) 70%, rgba(34, 197, 94, 0.32) 100%)'
       : 'none';
