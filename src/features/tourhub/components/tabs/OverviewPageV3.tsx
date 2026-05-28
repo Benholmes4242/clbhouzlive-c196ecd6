@@ -114,6 +114,40 @@ export function OverviewPageV3() {
     setAutoRotate(false);
   }, [paramTournamentId]);
 
+  // ── Random default — only matters if no ?tour= is set ──
+  const randomSlugRef = useRef<string | null>(null);
+  const randomTournamentId = useMemo(() => {
+    if (tourParam) return null;   // user has explicit selection; skip random
+    if (!tickerData) return null; // wait for data
+    // Build the list of selectable slugs (live or completed — match switcher rule)
+    const availableSlugs = Array.from(
+      new Set([
+        ...tickerData.live.map((c) => c.tourSlug),
+        ...tickerData.completed.map((c) => c.tourSlug),
+      ]),
+    );
+    // Lock the random pick on first resolution so it doesn't reroll on re-renders
+    if (randomSlugRef.current === null) {
+      randomSlugRef.current = pickRandomTourSlug(availableSlugs);
+    }
+    const slug = randomSlugRef.current;
+    if (!slug) return null;
+    const live = tickerData.live.find((c) => c.tourSlug === slug)?.id;
+    const completed = tickerData.completed.find((c) => c.tourSlug === slug)?.id;
+    return live ?? completed ?? null;
+  }, [tourParam, tickerData]);
+
+  const lastAppliedRandomRef = useRef<string | null>(null);
+  useEffect(() => {
+    if (!randomTournamentId) return;
+    if (lastAppliedRandomRef.current === randomTournamentId) return;
+    // Don't apply if param effect already pinned something
+    if (activeTournamentId) return;
+    lastAppliedRandomRef.current = randomTournamentId;
+    setActiveTournamentId(randomTournamentId);
+    setAutoRotate(false); // PIN — locked decision
+  }, [randomTournamentId, activeTournamentId]);
+
 
   return (
     <>
