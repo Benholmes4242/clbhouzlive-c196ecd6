@@ -35,8 +35,8 @@ export const SheetHeader: React.FC<SheetHeaderProps> = ({
     <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
       <div
         style={{
-          width: 64,
-          height: 64,
+          width: 56,
+          height: 56,
           borderRadius: '34%',
           overflow: 'hidden',
           background: BG_2,
