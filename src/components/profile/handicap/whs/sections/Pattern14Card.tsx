@@ -295,14 +295,6 @@ const PatternBar: React.FC<{
         ? 'linear-gradient(180deg, var(--hcp-bad) 0%, rgba(239, 68, 68, 0.5) 100%)'
         : 'var(--hcp-bg-3)';
 
-  const isBlowUp = delta != null && Math.abs(delta) >= 5;
-  const glow =
-    isBlowUp && bucket === 'worse'
-      ? '0 0 8px rgba(239, 68, 68, 0.45)'
-      : isBlowUp && bucket === 'better'
-        ? '0 0 8px rgba(34, 197, 94, 0.45)'
-        : undefined;
-
   const inner = (
     <div
       style={{
@@ -310,7 +302,6 @@ const PatternBar: React.FC<{
         height: `${heightPct * 100}%`,
         background: fill,
         borderRadius: '3px 3px 0 0',
-        boxShadow: glow,
         transition: 'transform 120ms ease',
       }}
     />
