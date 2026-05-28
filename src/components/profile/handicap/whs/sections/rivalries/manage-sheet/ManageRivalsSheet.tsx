@@ -245,7 +245,7 @@ export const ManageRivalsSheet: React.FC<Props> = ({ userId, open, onClose }) =>
 };
 
 const Section: React.FC<{ title: string; children: React.ReactNode }> = ({ title, children }) => (
-  <div style={{ marginTop: 16 }}>
+  <div style={{ marginTop: 12 }}>
     <p
       style={{
         margin: '0 0 8px',
