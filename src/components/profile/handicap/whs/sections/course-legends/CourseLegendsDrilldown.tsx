@@ -131,6 +131,39 @@ export const CourseLegendsDrilldown: React.FC<Props> = ({ selection, hideHeader 
   const [courseHeaderImage, setCourseHeaderImage] = useState<string | null>(null);
   const [fullLeaderboardCategory, setFullLeaderboardCategory] =
     useState<LegendCategory | null>(null);
+  const autoSwitchedRef = useRef(false);
+  const [autoSwitchedToAllTime, setAutoSwitchedToAllTime] = useState(false);
+
+  const has90d = useMemo(
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    () => (data ?? []).some((r: any) => String(r.category).endsWith('_90d')),
+    [data],
+  );
+  const hasAllTime = useMemo(
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    () => (data ?? []).some((r: any) => String(r.category).endsWith('_all_time')),
+    [data],
+  );
+  const activeWindowHasData = window === '90d' ? has90d : hasAllTime;
+  const otherWindowHasData = window === '90d' ? hasAllTime : has90d;
+
+  useEffect(() => {
+    if (autoSwitchedRef.current) return;
+    if (isLoading || isError) return;
+    if ((data ?? []).length === 0) return;
+    if (!has90d && hasAllTime && window === '90d') {
+      autoSwitchedRef.current = true;
+      setWindow('all_time');
+      setAutoSwitchedToAllTime(true);
+    } else {
+      autoSwitchedRef.current = true;
+    }
+  }, [data, has90d, hasAllTime, isLoading, isError, window]);
+
+  const handleWindowChange = (w: LegendWindow) => {
+    setAutoSwitchedToAllTime(false);
+    setWindow(w);
+  };
 
   useEffect(() => {
     let cancelled = false;
@@ -228,8 +261,16 @@ export const CourseLegendsDrilldown: React.FC<Props> = ({ selection, hideHeader 
       )}
 
       <div style={{ padding: '14px 16px 4px', display: 'flex', justifyContent: 'flex-start' }}>
-        <WindowToggle window={window} setWindow={setWindow} />
+        <WindowToggle window={window} setWindow={handleWindowChange} />
       </div>
+
+      {autoSwitchedToAllTime && window === 'all_time' && (
+        <div style={{ padding: '0 16px 8px' }}>
+          <span style={{ fontFamily: 'Geist, system-ui, sans-serif', fontSize: 11.5, fontWeight: 600, color: 'var(--hcp-t-60, #64748b)', letterSpacing: '-0.005em' }}>
+            No rounds in the last 90 days — showing all-time legends.
+          </span>
+        </div>
+      )}
 
       {isLoading && (
         <div style={{ padding: '20px 16px', display: 'flex', flexDirection: 'column', gap: 12 }}>
@@ -255,7 +296,31 @@ export const CourseLegendsDrilldown: React.FC<Props> = ({ selection, hideHeader 
         </div>
       )}
 
-      {!isLoading && !isError && (data ?? []).length > 0 && (
+      {!isLoading && !isError && (data ?? []).length > 0 && !activeWindowHasData && (
+        <div style={{ padding: '20px 16px' }}>
+          <EmptyStub
+            icon={<Crown size={44} color={AMBER} style={{ opacity: 0.5 }} />}
+            title={window === '90d' ? 'No legends in the last 90 days' : 'No all-time legends yet'}
+            body={
+              otherWindowHasData
+                ? (window === '90d'
+                    ? 'No rounds posted here recently. View all-time legends instead.'
+                    : 'Nothing in this window yet.')
+                : 'Once anyone posts a round here, the leaderboards spin up.'
+            }
+            cta={
+              otherWindowHasData
+                ? {
+                    label: window === '90d' ? 'View all-time' : 'View last 90 days',
+                    onClick: () => handleWindowChange(window === '90d' ? 'all_time' : '90d'),
+                  }
+                : undefined
+            }
+          />
+        </div>
+      )}
+
+      {!isLoading && !isError && (data ?? []).length > 0 && activeWindowHasData && (
         <>
           <ChampionsCoursePulsePanel meta={meta} />
 
