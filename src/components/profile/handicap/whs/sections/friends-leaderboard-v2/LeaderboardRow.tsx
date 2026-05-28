@@ -105,7 +105,7 @@ const RankDeltaChip: React.FC<RankDeltaChipProps> = ({ delta, isNew, isStale }) 
       style={{
         fontSize: 11,
         fontWeight: 800,
-        color: climbed ? '#22C55E' : '#EF4444',
+        color: climbed ? '#059669' : '#9F1D1D',
         fontVariantNumeric: 'tabular-nums',
         letterSpacing: '-0.01em',
         display: 'inline-flex',
