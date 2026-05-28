@@ -29,12 +29,12 @@ const T = {
   amberDeep: '#C97211',
   amberTint: 'rgba(247,147,30,0.10)',
   amberInk: '#854F0B',
-  green: '#22C55E',
+  green: 'var(--hcp-good-deep)',
   greenInk: '#15803D',
-  greenSoft: 'rgba(34,197,94,0.12)',
-  red: '#DC2626',
+  greenSoft: 'rgba(5,150,105,0.14)',
+  red: 'var(--hcp-bad-deep)',
   redInk: '#991B1B',
-  redSoft: 'rgba(220,38,38,0.10)',
+  redSoft: 'rgba(159,29,29,0.12)',
   ringTrack: 'var(--hcp-bg-3)',
 };
 const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
