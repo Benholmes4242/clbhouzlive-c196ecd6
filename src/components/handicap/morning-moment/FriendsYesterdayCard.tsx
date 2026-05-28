@@ -35,7 +35,7 @@ const T = {
   ink55: 'rgba(15,23,42,0.55)',
   ink40: 'rgba(15,23,42,0.40)',
   ink10: 'rgba(15,23,42,0.10)',
-  green: '#22C55E',
+  green: '#059669',
 };
 const FONT = 'Geist, system-ui, -apple-system, BlinkMacSystemFont, sans-serif';
 
