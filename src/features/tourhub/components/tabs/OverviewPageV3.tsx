@@ -39,7 +39,6 @@ import { TOTAL_HERO_HEIGHT_TARGET } from '../overview-v3/HybridHero.constants';
 import { WifiOff } from 'lucide-react';
 import ScrollToTopGlass from '@/components/common/ScrollToTopGlass';
 
-const TOUR_SLUGS = ['pga', 'dpwt', 'liv', 'lpga', 'korn_ferry', 'champions'] as const;
 const LAST_TOUR_KEY = 'tourhub:last-random-tour';
 
 function pickRandomTourSlug(availableSlugs: string[]): string | null {
