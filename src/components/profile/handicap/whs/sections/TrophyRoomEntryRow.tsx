@@ -136,7 +136,7 @@ const TrophyRoomEntryRow: React.FC<Props> = ({ userId, viewMode = 'owner', owner
         <ChevronRight
           size={16}
           strokeWidth={2.4}
-          color={weeklyCount > 0 ? '#FBBC2E' : 'rgba(251,188,46,0.6)'}
+          color={weeklyCount > 0 ? 'var(--hcp-t-40)' : 'rgba(251,188,46,0.6)'}
           style={{ flexShrink: 0 }}
         />
       </button>
