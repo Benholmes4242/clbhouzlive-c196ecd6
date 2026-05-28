@@ -1,5 +1,5 @@
 import React from 'react';
-import { ArrowDown, ArrowUp } from 'lucide-react';
+import { ArrowDown, ArrowUp, Flame } from 'lucide-react';
 import { initials, displayName } from '@/lib/whs/utils/initials';
 import { pickAvatarSrc } from '@/lib/whs/utils/avatarSrc';
 import { fmtRelative } from '@/lib/whs/utils/nameFormat';
@@ -147,12 +147,12 @@ export const CinemaFriendEyebrow: React.FC<Props> = ({ activity, showLowestRound
               backdropFilter: 'blur(20px)',
               WebkitBackdropFilter: 'blur(20px)',
               background: impactIsImprovement
-                ? 'rgba(34,197,94,0.18)'
-                : 'rgba(239,68,68,0.18)',
+                ? 'rgba(5,150,105,0.22)'
+                : 'rgba(159,29,29,0.22)',
               border: impactIsImprovement
-                ? '0.5px solid rgba(34,197,94,0.5)'
-                : '0.5px solid rgba(239,68,68,0.5)',
-              color: impactIsImprovement ? '#86EFAC' : '#FCA5A5',
+                ? '0.5px solid rgba(5,150,105,0.55)'
+                : '0.5px solid rgba(159,29,29,0.55)',
+              color: impactIsImprovement ? '#34D399' : '#F87171',
               flexShrink: 0,
             }}
           >
@@ -164,18 +164,17 @@ export const CinemaFriendEyebrow: React.FC<Props> = ({ activity, showLowestRound
             )}
             {Math.abs(impactDelta!).toFixed(1)}
             {showHotFlame && (
-              <span
+              <Flame
+                size={11}
+                strokeWidth={2.4}
                 aria-label="Hot round — handicap cut"
                 style={{
-                  fontSize: 12,
-                  lineHeight: 1,
                   marginLeft: 2,
+                  color: '#F7931E',
                   filter:
                     'drop-shadow(0 0 4px rgba(247,147,30,0.50)) drop-shadow(0 1px 2px rgba(0,0,0,0.4))',
                 }}
-              >
-                🔥
-              </span>
+              />
             )}
           </span>
         )}
