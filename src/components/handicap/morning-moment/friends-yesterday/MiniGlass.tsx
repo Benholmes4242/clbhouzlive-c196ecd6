@@ -6,7 +6,14 @@ import { MiniGrossRing } from '@/components/profile/handicap/whs/sections/shared
 import { splitCourseName } from '@/components/profile/handicap/whs/sections/last-round-card/splitCourseName';
 
 const FONT_GEIST = 'Geist, system-ui, -apple-system, BlinkMacSystemFont, sans-serif';
-const AMBER = '#F7931E';
+const GOOD = '#34D399';
+const BAD = '#F87171';
+function diffOnPhotoColor(d: number | null): string {
+  if (d == null) return '#FFFFFF';
+  if (d > 0) return BAD;
+  if (d < 0) return GOOD;
+  return '#FFFFFF';
+}
 const EM_DASH = '\u2014';
 
 const HAIR: React.CSSProperties = {
@@ -115,7 +122,7 @@ export const MiniGlass: React.FC<Props> = ({ friend }) => {
         <div style={{ textAlign: 'center', flex: 1 }}>
           <div style={labelStyle}>SCORE DIFF</div>
           {friend.differential != null ? (
-            <div style={valueStyle(AMBER)}>{fmtDiff(friend.differential, { plus: true })}</div>
+            <div style={valueStyle(diffOnPhotoColor(friend.differential))}>{fmtDiff(friend.differential, { plus: true })}</div>
           ) : (
             <div style={{ ...valueStyle('rgba(255,255,255,0.55)'), display: 'flex', justifyContent: 'center', alignItems: 'center', height: 18 }}>
               <Lock size={12} strokeWidth={2} />
