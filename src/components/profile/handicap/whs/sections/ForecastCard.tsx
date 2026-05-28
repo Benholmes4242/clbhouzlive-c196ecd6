@@ -1,4 +1,5 @@
 import React from 'react';
+import { AlertTriangle, Flame } from 'lucide-react';
 import { useAllScores } from '@/lib/whs/hooks';
 import { useHandicapTrend } from '@/lib/whs/hooks';
 import { buildForecast, type Forecast, type CounterCell } from '@/lib/whs/forecast';
