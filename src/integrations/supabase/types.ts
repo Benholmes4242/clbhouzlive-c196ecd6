@@ -19296,6 +19296,7 @@ export type Database = {
           thumbnail_url: string
         }[]
       }
+      get_course_hole_analysis: { Args: { p_course_id: string }; Returns: Json }
       get_course_leaderboard: {
         Args: {
           p_country: string
