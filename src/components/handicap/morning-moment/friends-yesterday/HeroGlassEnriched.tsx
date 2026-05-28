@@ -7,7 +7,14 @@ import CinemaCardShapeStrip from '@/components/profile/handicap/whs/sections/las
 import { GlassGrossRing } from '@/components/profile/handicap/whs/sections/shared/GrossCounterRing';
 import { GlassShell, CourseHeader, HAIR, labelStyle, valueStyle } from './glassPrimitives';
 
-const AMBER = '#F7931E';
+const GOOD = '#34D399';
+const BAD = '#F87171';
+function diffOnPhotoColor(d: number | null): string {
+  if (d == null) return '#FFFFFF';
+  if (d > 0) return BAD;
+  if (d < 0) return GOOD;
+  return '#FFFFFF';
+}
 const EM_DASH = '\u2014';
 
 interface Props {
@@ -55,7 +62,7 @@ export const HeroGlassEnriched: React.FC<Props> = ({ friend, par, slope, holes }
         </div>
         <div style={{ textAlign: 'right' }}>
           <div style={labelStyle}>SCORE DIFF</div>
-          <div style={valueStyle(friend.differential != null ? AMBER : '#FFFFFF')}>
+          <div style={valueStyle(diffOnPhotoColor(friend.differential))}>
             {friend.differential != null ? fmtDiff(friend.differential, { plus: true }) : EM_DASH}
           </div>
         </div>
