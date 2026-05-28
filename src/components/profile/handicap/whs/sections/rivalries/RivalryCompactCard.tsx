@@ -227,7 +227,7 @@ export const RivalryCompactCard: React.FC<Props> = ({ rivalry, tier, onTap }) =>
                   fontSize: 10,
                   fontWeight: 800,
                   letterSpacing: '0.10em',
-                  color: streak.who === 'you' ? '#FBBC2E' : '#EF4444',
+                  color: streak.who === 'you' ? '#FBBC2E' : '#9F1D1D',
                   whiteSpace: 'nowrap',
                 }}
               >
