@@ -78,6 +78,25 @@ export function OverviewPageV3() {
     return all.find(c => c.id === activeTournamentId)?.tourSlug ?? null;
   }, [activeTournamentId, tickerData]);
 
+  // ── Shell tour-switcher sheet → hero pin (one-way: ?tour= → state) ──
+  const [searchParams] = useSearchParams();
+  const tourParam = searchParams.get('tour');
+  const paramTournamentId = useMemo(() => {
+    if (!tourParam || !tickerData) return null;
+    const pick = (arr: typeof tickerData.live) =>
+      arr.find((c) => c.tourSlug === tourParam)?.id ?? null;
+    return pick(tickerData.live) ?? pick(tickerData.completed) ?? pick(tickerData.upcoming) ?? null;
+  }, [tourParam, tickerData]);
+
+  const lastAppliedParamRef = useRef<string | null>(null);
+  useEffect(() => {
+    if (!paramTournamentId) return;
+    if (lastAppliedParamRef.current === paramTournamentId) return;
+    lastAppliedParamRef.current = paramTournamentId;
+    setActiveTournamentId(paramTournamentId);
+    setAutoRotate(false);
+  }, [paramTournamentId]);
+
 
   return (
     <>
