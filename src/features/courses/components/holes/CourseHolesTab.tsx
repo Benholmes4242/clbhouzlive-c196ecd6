@@ -1,9 +1,11 @@
 import React, { useMemo, useState } from 'react';
 import { useCourseHoleAnalysis, type CourseHole } from '@/hooks/gam/useCourseHoleAnalysis';
+import { useCourseMeta } from '@/hooks/gam/useCourseMeta';
 import { HolesCredibilityHeader } from './HolesCredibilityHeader';
 import { HoleFeatureCards } from './HoleFeatureCards';
 import { HoleRow } from './HoleRow';
 import { HolesScoringKey } from './HolesScoringKey';
+import { HolesEmptyState } from './HolesEmptyState';
 import { AMBER, FONT, INK } from './_constants';
 
 interface Props {
@@ -12,6 +14,7 @@ interface Props {
 
 export const CourseHolesTab: React.FC<Props> = ({ courseId }) => {
   const { data, isLoading, isError } = useCourseHoleAnalysis(courseId);
+  const { data: meta } = useCourseMeta(courseId);
   const [sort, setSort] = useState<'hole' | 'difficulty'>('hole');
 
   const holes = data?.holes ?? [];
