@@ -176,7 +176,7 @@ const Headline: React.FC<{
     <span
       style={{
         fontSize: 56,
-        fontWeight: 800,
+        fontWeight: 700,
         letterSpacing: '-0.045em',
         lineHeight: 0.95,
         color: numberColor,
