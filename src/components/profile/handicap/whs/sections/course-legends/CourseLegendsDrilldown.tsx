@@ -296,7 +296,31 @@ export const CourseLegendsDrilldown: React.FC<Props> = ({ selection, hideHeader 
         </div>
       )}
 
-      {!isLoading && !isError && (data ?? []).length > 0 && (
+      {!isLoading && !isError && (data ?? []).length > 0 && !activeWindowHasData && (
+        <div style={{ padding: '20px 16px' }}>
+          <EmptyStub
+            icon={<Crown size={44} color={AMBER} style={{ opacity: 0.5 }} />}
+            title={window === '90d' ? 'No legends in the last 90 days' : 'No all-time legends yet'}
+            body={
+              otherWindowHasData
+                ? (window === '90d'
+                    ? 'No rounds posted here recently. View all-time legends instead.'
+                    : 'Nothing in this window yet.')
+                : 'Once anyone posts a round here, the leaderboards spin up.'
+            }
+            cta={
+              otherWindowHasData
+                ? {
+                    label: window === '90d' ? 'View all-time' : 'View last 90 days',
+                    onClick: () => handleWindowChange(window === '90d' ? 'all_time' : '90d'),
+                  }
+                : undefined
+            }
+          />
+        </div>
+      )}
+
+      {!isLoading && !isError && (data ?? []).length > 0 && activeWindowHasData && (
         <>
           <ChampionsCoursePulsePanel meta={meta} />
 
