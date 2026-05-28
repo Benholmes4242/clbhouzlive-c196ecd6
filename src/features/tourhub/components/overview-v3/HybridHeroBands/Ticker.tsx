@@ -3,7 +3,7 @@
  * §5.1 of HYBRID_HERO_IMPLEMENTATION_BRIEF.
  */
 
-import React from 'react';
+import React, { useState } from 'react';
 import {
   INK,
   GREEN_LIGHT,
@@ -41,13 +41,19 @@ function TickerEntry({ row }: { row: TickerRow }) {
 }
 
 export function Ticker({ rows }: TickerProps) {
+  const [paused, setPaused] = useState(false);
+
   if (!rows || rows.length === 0) {
     return <div style={{ height: TICKER_HEIGHT, background: INK }} aria-hidden="true" />;
   }
   const doubled = [...rows, ...rows];
   return (
     <div
-      aria-hidden="true"
+      role="button"
+      tabIndex={0}
+      aria-label={paused ? 'Resume leaderboard ticker' : 'Pause leaderboard ticker'}
+      onClick={() => setPaused(p => !p)}
+      onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setPaused(p => !p); } }}
       style={{
         height: TICKER_HEIGHT,
         background: INK,
@@ -56,6 +62,7 @@ export function Ticker({ rows }: TickerProps) {
         alignItems: 'center',
         overflow: 'hidden',
         borderTop: '0.5px solid rgba(255,255,255,0.06)',
+        cursor: 'pointer',
       }}
     >
       {/* Fixed left label */}
@@ -80,6 +87,7 @@ export function Ticker({ rows }: TickerProps) {
       <div style={{ flex: 1, overflow: 'hidden', position: 'relative' }}>
         <div
           className="hybrid-marquee-track"
+          aria-hidden="true"
           style={{
             display: 'inline-flex',
             alignItems: 'baseline',
@@ -87,6 +95,7 @@ export function Ticker({ rows }: TickerProps) {
             fontSize: 12,
             paddingLeft: 16,
             whiteSpace: 'nowrap',
+            animationPlayState: paused ? 'paused' : 'running',
           }}
         >
           {doubled.map((r, i) => (

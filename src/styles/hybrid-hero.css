@@ -15,10 +15,6 @@
   animation: hybrid-marquee 40s linear infinite;
   will-change: transform;
 }
-.hybrid-marquee-track:hover,
-.hybrid-marquee-track:active {
-  animation-play-state: paused;
-}
 
 .hybrid-hero-title {
   margin: 0;
