@@ -145,9 +145,9 @@ export const SheetHeroGlass: React.FC<Props> = ({
         position: 'absolute',
         left: 14,
         right: 14,
-        bottom: 16,
+        bottom: 14,
         zIndex: 3,
-        padding: '16px 18px',
+        padding: '14px 16px',
         borderRadius: 16,
         background: 'rgba(255,255,255,0.08)',
         border: '0.5px solid rgba(255,255,255,0.18)',
@@ -159,7 +159,7 @@ export const SheetHeroGlass: React.FC<Props> = ({
       <div>
         <div
           style={{
-            fontSize: 20,
+            fontSize: 18,
             fontWeight: 700,
             color: '#FFFFFF',
             letterSpacing: '-0.025em',
@@ -173,7 +173,7 @@ export const SheetHeroGlass: React.FC<Props> = ({
           <div
             style={{
               marginTop: 3,
-              fontSize: 11,
+              fontSize: 10,
               fontWeight: 600,
               color: 'rgba(255,255,255,0.60)',
               letterSpacing: '0.06em',
