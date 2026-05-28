@@ -230,19 +230,27 @@ const TourSwitcherAffordance: React.FC = () => {
         <div>
           {Object.entries(TOUR_LABEL).map(([slug, label]) => {
             const isActive = slug === activeTourSlug;
-            const liveCount = data?.live.filter((c) => c.tourSlug === slug).length ?? 0;
+            const liveCell = data?.live.find((c) => c.tourSlug === slug) ?? null;
+            const completedCell = data?.completed.find((c) => c.tourSlug === slug) ?? null;
+            const upcomingCell = data?.upcoming.find((c) => c.tourSlug === slug) ?? null;
+            const resolvedId = liveCell?.id ?? completedCell?.id ?? upcomingCell?.id ?? null;
+            const isLive = !!liveCell;
+            const disabled = resolvedId === null;
 
             return (
               <button
                 key={slug}
                 type="button"
+                disabled={disabled}
                 onClick={() => {
+                  if (disabled) return;
                   const next = new URLSearchParams(searchParams);
                   next.set('tour', slug);
                   setSearchParams(next, { replace: false });
                   setOpen(false);
                 }}
                 aria-pressed={isActive}
+                aria-disabled={disabled}
                 style={{
                   width: '100%',
                   display: 'flex',
@@ -253,8 +261,9 @@ const TourSwitcherAffordance: React.FC = () => {
                   border: 'none',
                   borderLeft: isActive ? '3px solid #F7931E' : '3px solid transparent',
                   borderBottom: '0.5px solid rgba(15,23,42,0.07)',
-                  cursor: 'pointer',
+                  cursor: disabled ? 'default' : 'pointer',
                   textAlign: 'left',
+                  opacity: disabled ? 0.45 : 1,
                 }}
               >
                 <div
@@ -272,7 +281,12 @@ const TourSwitcherAffordance: React.FC = () => {
                   <img
                     src={getTourLogo(slug)}
                     alt=""
-                    style={{ width: 28, height: 18, objectFit: 'contain' }}
+                    style={{
+                      width: 28,
+                      height: 18,
+                      objectFit: 'contain',
+                      filter: disabled ? 'grayscale(1)' : undefined,
+                    }}
                   />
                 </div>
 
@@ -288,7 +302,7 @@ const TourSwitcherAffordance: React.FC = () => {
                   </div>
                 </div>
 
-                {liveCount > 0 && (
+                {isLive ? (
                   <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, flexShrink: 0 }}>
                     <span
                       style={{
@@ -310,9 +324,22 @@ const TourSwitcherAffordance: React.FC = () => {
                       LIVE
                     </span>
                   </span>
-                )}
+                ) : disabled ? (
+                  <span
+                    style={{
+                      fontSize: 10,
+                      fontWeight: 800,
+                      letterSpacing: '0.12em',
+                      color: 'var(--hcp-t-40, #94A3B8)',
+                      textTransform: 'uppercase',
+                      flexShrink: 0,
+                    }}
+                  >
+                    No event
+                  </span>
+                ) : null}
 
-                {isActive && (
+                {isActive && !disabled && (
                   <div
                     style={{
                       width: 6,
