@@ -318,20 +318,6 @@ const SectionHeader: React.FC<{ page: number; total: number }> = ({ page, total 
       <span style={{ color: '#F7931E', marginRight: 6 }}>•</span>
       RECENT UNLOCKS
     </div>
-    {total > 1 && (
-      <div
-        style={{
-          fontSize: 11,
-          fontWeight: 700,
-          letterSpacing: '0.08em',
-          color: 'var(--hcp-t-40)',
-          fontVariantNumeric: 'tabular-nums',
-          fontFeatureSettings: '"kern" 1, "liga" 1',
-        }}
-      >
-        {page + 1} / {total}
-      </div>
-    )}
   </div>
 );
 
