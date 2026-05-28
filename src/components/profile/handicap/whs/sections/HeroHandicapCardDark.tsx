@@ -371,20 +371,23 @@ const HeroHandicapCardDark: React.FC<Props> = ({ connection }) => {
                 gap: 6,
                 padding: '5px 12px',
                 borderRadius: 999,
-                background:
-                  verdict === 'good' ? 'rgba(34, 197, 94, 0.14)' :
-                  verdict === 'bad'  ? 'rgba(239, 68, 68, 0.14)' :
-                  'rgba(247, 147, 30, 0.14)',
-                border:
-                  verdict === 'good' ? '1px solid rgba(34, 197, 94, 0.25)' :
-                  verdict === 'bad'  ? '1px solid rgba(239, 68, 68, 0.25)' :
-                  '1px solid rgba(247, 147, 30, 0.25)',
+                background: isMarginal
+                  ? 'rgba(255,255,255,0.04)'
+                  : verdict === 'good' ? 'rgba(34, 197, 94, 0.14)'
+                  : verdict === 'bad'  ? 'rgba(239, 68, 68, 0.14)'
+                  : 'rgba(247, 147, 30, 0.14)',
+                border: isMarginal
+                  ? '1px solid rgba(255,255,255,0.10)'
+                  : verdict === 'good' ? '1px solid rgba(34, 197, 94, 0.25)'
+                  : verdict === 'bad'  ? '1px solid rgba(239, 68, 68, 0.25)'
+                  : '1px solid rgba(247, 147, 30, 0.25)',
                 fontSize: 12,
                 fontWeight: 700,
-                color:
-                  verdict === 'good' ? '#4ADE80' :
-                  verdict === 'bad'  ? '#F87171' :
-                  '#F7931E',
+                color: isMarginal
+                  ? 'var(--hcp-t-80)'
+                  : verdict === 'good' ? '#4ADE80'
+                  : verdict === 'bad'  ? '#F87171'
+                  : '#F7931E',
                 letterSpacing: '0.02em',
                 fontVariantNumeric: 'tabular-nums',
               }}
@@ -394,7 +397,7 @@ const HeroHandicapCardDark: React.FC<Props> = ({ connection }) => {
                 height="11"
                 viewBox="0 0 24 24"
                 fill="none"
-                stroke="currentColor"
+                stroke={isMarginal ? 'var(--hcp-t-60)' : 'currentColor'}
                 strokeWidth="3"
                 strokeLinecap="round"
                 aria-hidden
@@ -414,7 +417,7 @@ const HeroHandicapCardDark: React.FC<Props> = ({ connection }) => {
                 )}
               </svg>
               {Math.abs(delta90).toFixed(1)} over 90 days
-              {verdict === 'good' && (
+              {verdict === 'good' && !isMarginal && (
                 <span style={{ fontSize: 13, lineHeight: 1, marginLeft: 2 }}>🔥</span>
               )}
             </span>
