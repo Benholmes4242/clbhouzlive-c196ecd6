@@ -162,7 +162,6 @@ export const DetailHero: React.FC<Props> = ({ item, index, total, onPrev, onNext
             alignItems: 'center',
             justifyContent: 'center',
             color: palette.color,
-            boxShadow: '0 6px 20px -8px rgba(0,0,0,0.4)',
           }}
         >
           {locked ? <Lock size={26} /> : renderBadgeIcon(item.iconKey, 28, 'currentColor')}
