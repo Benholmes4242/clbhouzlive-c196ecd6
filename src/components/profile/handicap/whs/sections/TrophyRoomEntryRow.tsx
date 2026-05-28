@@ -98,7 +98,7 @@ const TrophyRoomEntryRow: React.FC<Props> = ({ userId, viewMode = 'owner', owner
                 style={{
                   fontSize: 13,
                   fontWeight: 700,
-                  color: '#FBBC2E',
+                  color: 'var(--hcp-t-100)',
                   letterSpacing: '-0.01em',
                   lineHeight: 1.2,
                 }}
