@@ -237,7 +237,7 @@ const NextRoundWatch: React.FC<Props> = ({ connectionId, currentHandicap }) => {
               <div
                 style={{
                   position: 'relative',
-                  height: 6,
+                  height: 4,
                   background: 'var(--hcp-bg-3)',
                   borderRadius: 999,
                 }}
@@ -267,7 +267,7 @@ const NextRoundWatch: React.FC<Props> = ({ connectionId, currentHandicap }) => {
                     borderRadius: '50%',
                     background: 'var(--hcp-good)',
                     border: '2px solid var(--hcp-bg-1)',
-                    boxShadow: '0 0 0 1px var(--hcp-good)',
+                    boxShadow: '0 0 0 1px var(--hcp-good), 0 1px 3px rgba(0,0,0,0.4)',
                     transform: 'translate(-50%, -50%)',
                     zIndex: 2,
                   }}
@@ -284,7 +284,7 @@ const NextRoundWatch: React.FC<Props> = ({ connectionId, currentHandicap }) => {
                     borderRadius: '50%',
                     background: verdictColor,
                     border: '2px solid var(--hcp-bg-1)',
-                    boxShadow: `0 0 0 1px ${verdictColor}`,
+                    boxShadow: `0 0 0 1px ${verdictColor}, 0 1px 3px rgba(0,0,0,0.4)`,
                     transform: 'translate(-50%, -50%)',
                     zIndex: 3,
                   }}
