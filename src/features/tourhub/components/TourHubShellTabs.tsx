@@ -182,9 +182,9 @@ const TOUR_LABEL: Record<string, string> = {
 const TourSwitcherAffordance: React.FC = () => {
   const { data } = useAllToursTickerData();
   const [open, setOpen] = useState(false);
+  const [searchParams, setSearchParams] = useSearchParams();
 
-  // TODO Pass 7.1: derive from app state once tour filtering is wired.
-  const activeTourSlug = 'pga';
+  const activeTourSlug = searchParams.get('tour') ?? 'pga';
 
   return (
     <>
@@ -237,7 +237,9 @@ const TourSwitcherAffordance: React.FC = () => {
                 key={slug}
                 type="button"
                 onClick={() => {
-                  // TODO Pass 7.1: implement tour filtering in HeroCarousel.
+                  const next = new URLSearchParams(searchParams);
+                  next.set('tour', slug);
+                  setSearchParams(next, { replace: false });
                   setOpen(false);
                 }}
                 aria-pressed={isActive}
