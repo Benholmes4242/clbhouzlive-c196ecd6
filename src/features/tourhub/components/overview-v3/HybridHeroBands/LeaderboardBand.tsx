@@ -13,7 +13,7 @@ import { TeeTimeRow } from './TeeTimeRow';
 import { TeamFinishRow } from './TeamFinishRow';
 import { CancelledPanel } from './CancelledPanel';
 import { PlayoffPendingPanel } from './PlayoffPendingPanel';
-import { INK, INK_15, AMBER } from '../HybridHero.constants';
+import { INK, INK_15, HEADER_BG } from '../HybridHero.constants';
 import type { TeeTimeGroup } from '../../../hooks/useTournamentTeeTimes';
 import { getPlayerHeadshotUrl } from '@/utils/playerHeadshot';
 
@@ -376,7 +376,7 @@ export function LeaderboardBand({
               fontSize: 11,
               fontWeight: 800,
               letterSpacing: '0.16em',
-              color: AMBER,
+              color: '#64748B',
               textTransform: 'uppercase',
             }}
           >
@@ -409,7 +409,7 @@ export function LeaderboardBand({
           }}
         >
           <span style={{
-            color: AMBER,
+            color: '#64748B',
             fontSize: 11,
             fontWeight: 800,
             letterSpacing: '0.10em',
@@ -425,7 +425,7 @@ export function LeaderboardBand({
           style={{
             margin: '18px 20px',
             padding: '14px 20px',
-            background: INK,
+            background: HEADER_BG,
             color: 'white',
             borderRadius: 14,
             textAlign: 'center',

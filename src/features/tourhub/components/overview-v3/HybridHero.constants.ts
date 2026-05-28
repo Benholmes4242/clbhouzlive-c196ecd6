@@ -18,7 +18,8 @@ export const ROW_HEIGHT_CHASER = 40;
 export const TOTAL_HERO_HEIGHT_TARGET = 677;  // was 731 — Pass 7.0.2: PHOTO_BAND_HEIGHT 360→306 (−54)
 
 // Colours (clbhouz Dispatch palette)
-export const INK = '#0F172A';
+export const INK = '#0F172A';           // text / borders / dividers
+export const HEADER_BG = '#0A0E14';     // matches CompactHeader.tsx line 209; hero chrome dark
 export const INK_60 = 'rgba(15,23,42,0.60)';
 export const INK_45 = 'rgba(15,23,42,0.45)';
 export const INK_15 = 'rgba(15,23,42,0.15)';

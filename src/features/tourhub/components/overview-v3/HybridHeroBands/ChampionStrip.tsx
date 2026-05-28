@@ -5,7 +5,7 @@
  */
 
 import React from 'react';
-import { INK, GOLD, NUMERIC_STYLE, STRIP_HEIGHT } from '../HybridHero.constants';
+import { INK, HEADER_BG, GOLD, NUMERIC_STYLE, STRIP_HEIGHT } from '../HybridHero.constants';
 import { TrajectorySparkline } from './TrajectorySparkline';
 
 interface ChampionStripProps {
@@ -59,7 +59,7 @@ export function ChampionStrip({
   return (
     <div
       style={{
-        background: INK,
+        background: HEADER_BG,
         padding: hasNarrative ? '12px 20px 14px' : '10px 20px',
         minHeight: hasNarrative ? undefined : STRIP_HEIGHT,
         display: 'flex',
@@ -170,7 +170,7 @@ export function CancelledStrip({ reason }: { reason: string }) {
   return (
     <div
       style={{
-        background: INK,
+        background: HEADER_BG,
         padding: '14px 20px',
         minHeight: STRIP_HEIGHT,
         display: 'flex',
@@ -222,7 +222,7 @@ export function PlayoffStrip({ count, score }: PlayoffStripProps) {
   return (
     <div
       style={{
-        background: INK,
+        background: HEADER_BG,
         padding: '10px 20px',
         minHeight: STRIP_HEIGHT,
         display: 'flex',
