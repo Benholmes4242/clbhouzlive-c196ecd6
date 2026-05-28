@@ -239,7 +239,7 @@ const TodayGreeting: React.FC<Props> = ({ connectionId, userId }) => {
                   {Math.round(weather.tempNow)}°
                 </span>
               </span>
-              {weather.tempMax != null && (
+              {weather.tempMax != null && Math.round(weather.tempMax) - Math.round(weather.tempNow) >= 2 && (
                 <>
                   <span style={{ opacity: 0.4 }}>·</span>
                   <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5 }}>
