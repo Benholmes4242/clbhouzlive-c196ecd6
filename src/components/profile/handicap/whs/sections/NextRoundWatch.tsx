@@ -365,7 +365,9 @@ const NextRoundWatch: React.FC<Props> = ({ connectionId, currentHandicap }) => {
             eyebrow="If you don't"
             eyebrowColor="var(--hcp-t-60)"
             value={settle.toFixed(1)}
-            valueColor="var(--hcp-t-100)"
+            valueColor="var(--hcp-t-80)"
+            valueSize={26}
+            valueWeight={700}
             prose={
               <>
                 Any score above{' '}
