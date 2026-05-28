@@ -365,8 +365,6 @@ export const HeroPositionCard: React.FC<Props> = ({
                   color: T.green,
                   fontVariantNumeric: 'tabular-nums',
                   letterSpacing: '-0.02em',
-                  textShadow:
-                    '0 0 6px rgba(34,197,94,0.40), 0 0 2px rgba(34,197,94,0.25)',
                   lineHeight: 1,
                 }}
               >
