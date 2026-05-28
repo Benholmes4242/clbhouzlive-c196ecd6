@@ -55,7 +55,7 @@ export const RivalryCompactCard: React.FC<Props> = ({ rivalry, tier, onTap }) =>
   const pad: (typeof sorted[number] | null)[] = [...sorted];
   while (pad.length < 5) pad.push(null);
 
-  const stripeColor = state === 'winning' ? '#F7931E' : state === 'losing' ? '#EF4444' : null;
+  const stripeColor = state === 'winning' ? '#F7931E' : state === 'losing' ? '#9F1D1D' : null;
 
   const tappable = typeof onTap === 'function';
   const Tag: any = tappable ? 'button' : 'div';
