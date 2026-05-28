@@ -1,10 +1,10 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { lookupCourseMetaV2 } from '@/lib/whs/courseNameMatcher';
-import { Crown } from 'lucide-react';
 import { useCourseLegends } from '@/hooks/gam/useCourseLegends';
 import { useCourseMeta } from '@/hooks/gam/useCourseMeta';
 import { useActiveActor } from '@/context/ActiveActorContext';
-import { Skeleton, EmptyStub, RetryStub } from '../../../gam/_shared/GamAtoms';
+import { Skeleton, RetryStub } from '../../../gam/_shared/GamAtoms';
+import { ChampionsEmptyState, ChampionsWindowEmptyState } from './drilldown/ChampionsEmptyState';
 import {
   legendCategoryLabel,
   legendCategoryIcon,
