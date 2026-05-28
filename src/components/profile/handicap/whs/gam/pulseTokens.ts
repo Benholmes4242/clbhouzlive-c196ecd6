@@ -22,15 +22,15 @@ export interface PulseRarity {
 
 export const PULSE_DARK: Record<PulseKind, PulseRarity> = {
   threat: {
-    iconBg: 'rgba(239,68,68,0.14)',
-    iconRing: 'rgba(239,68,68,0.45)',
-    labelFg: '#FCA5A5',
-    labelBg: 'rgba(239,68,68,0.14)',
-    pillBorder: 'rgba(239,68,68,0.40)',
-    cardBorder: 'rgba(239,68,68,0.30)',
+    iconBg: 'rgba(159,29,29,0.18)',
+    iconRing: 'rgba(159,29,29,0.55)',
+    labelFg: '#F87171',
+    labelBg: 'rgba(159,29,29,0.18)',
+    pillBorder: 'rgba(159,29,29,0.50)',
+    cardBorder: 'rgba(159,29,29,0.40)',
     cardSweep:
-      'linear-gradient(135deg, var(--hcp-bg-1) 0%, #151B23 50%, rgba(239,68,68,0.10) 100%)',
-    outerGlow: '0 0 28px -10px rgba(239,68,68,0.35)',
+      'linear-gradient(135deg, var(--hcp-bg-1) 0%, #151B23 50%, rgba(159,29,29,0.14) 100%)',
+    outerGlow: '0 0 28px -10px rgba(159,29,29,0.45)',
     Icon: Swords,
     label: 'At risk',
   },
