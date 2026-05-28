@@ -572,11 +572,11 @@ const ScoringRangeBlock: React.FC<{
         <div
           style={{
             position: 'absolute',
-            top: -3,
+            top: -4,
             left: `${markerPct}%`,
             transform: 'translateX(-50%)',
             width: 4,
-            height: 14,
+            height: 13,
             borderRadius: 2,
             background: '#FFFFFF',
             boxShadow: '0 1px 3px rgba(15,23,42,0.35)',
