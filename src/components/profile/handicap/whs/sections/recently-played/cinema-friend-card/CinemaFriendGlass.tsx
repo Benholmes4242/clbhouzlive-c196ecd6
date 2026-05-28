@@ -168,7 +168,7 @@ export const CinemaFriendGlass: React.FC<Props> = ({
               <Lock size={18} strokeWidth={2} />
             </div>
           ) : (
-            <div style={valueStyle(differential != null ? AMBER : '#FFFFFF')}>
+            <div style={valueStyle(diffOnPhotoColor(differential))}>
               {fmtDiff(differential)}
             </div>
           )}
