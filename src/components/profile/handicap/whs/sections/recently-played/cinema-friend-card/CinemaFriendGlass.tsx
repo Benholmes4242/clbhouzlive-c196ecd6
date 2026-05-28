@@ -5,7 +5,14 @@ import type { WhsScoreHole } from '@/lib/whs/types';
 import { GlassGrossRing } from '../../shared/GrossCounterRing';
 
 const FONT_GEIST = 'Geist, system-ui, -apple-system, BlinkMacSystemFont, sans-serif';
-const AMBER = '#F7931E';
+const GOOD = '#34D399';
+const BAD = '#F87171';
+function diffOnPhotoColor(d: number | null): string {
+  if (d == null) return '#FFFFFF';
+  if (d > 0) return BAD;
+  if (d < 0) return GOOD;
+  return '#FFFFFF';
+}
 const MINUS = '\u2212';
 const EM_DASH = '\u2014';
 
@@ -161,7 +168,7 @@ export const CinemaFriendGlass: React.FC<Props> = ({
               <Lock size={18} strokeWidth={2} />
             </div>
           ) : (
-            <div style={valueStyle(differential != null ? AMBER : '#FFFFFF')}>
+            <div style={valueStyle(diffOnPhotoColor(differential))}>
               {fmtDiff(differential)}
             </div>
           )}
