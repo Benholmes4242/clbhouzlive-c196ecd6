@@ -36,11 +36,16 @@ function formatToday(): string {
 }
 
 function arcGradient(verdict: Verdict): { from: string; to: string } {
-  // Solid colour at both stops — eliminates the visible seam where the
-  // linear gradient wraps around the top/bottom of the ring (T8).
-  if (verdict === 'good') return { from: '#22C55E', to: '#22C55E' };
-  if (verdict === 'bad') return { from: '#EF4444', to: '#EF4444' };
-  return { from: '#F7931E', to: '#F7931E' };
+  // True two-stop ramp along the arc sweep.
+  if (verdict === 'good') return { from: '#22C55E', to: '#4ADE80' };
+  if (verdict === 'bad') return { from: '#EF4444', to: '#F87171' };
+  return { from: '#F7931E', to: '#FFB45A' };
+}
+
+function arcGlowColor(verdict: Verdict): string {
+  if (verdict === 'good') return 'rgba(34,197,94,0.35)';
+  if (verdict === 'bad') return 'rgba(239,68,68,0.35)';
+  return 'rgba(247,147,30,0.35)';
 }
 
 // Form temperature label removed — replaced by the ForecastCard below the hero.
