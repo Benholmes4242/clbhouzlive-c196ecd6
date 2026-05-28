@@ -5,7 +5,7 @@
 
 import React, { useState } from 'react';
 import {
-  INK,
+  HEADER_BG,
   GREEN_LIGHT,
   RED_LIGHT,
   NUMERIC_STYLE,
@@ -44,7 +44,7 @@ export function Ticker({ rows }: TickerProps) {
   const [paused, setPaused] = useState(false);
 
   if (!rows || rows.length === 0) {
-    return <div style={{ height: TICKER_HEIGHT, background: INK }} aria-hidden="true" />;
+    return <div style={{ height: TICKER_HEIGHT, background: HEADER_BG }} aria-hidden="true" />;
   }
   const doubled = [...rows, ...rows];
   return (
@@ -56,7 +56,7 @@ export function Ticker({ rows }: TickerProps) {
       onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setPaused(p => !p); } }}
       style={{
         height: TICKER_HEIGHT,
-        background: INK,
+        background: HEADER_BG,
         position: 'relative',
         display: 'flex',
         alignItems: 'center',
@@ -75,7 +75,7 @@ export function Ticker({ rows }: TickerProps) {
           color: 'rgba(255,255,255,0.50)',
           flexShrink: 0,
           zIndex: 2,
-          background: INK,
+          background: HEADER_BG,
           height: '100%',
           display: 'flex',
           alignItems: 'center',
@@ -110,7 +110,7 @@ export function Ticker({ rows }: TickerProps) {
             right: 0,
             width: 40,
             height: '100%',
-            background: `linear-gradient(90deg, transparent 0%, ${INK} 100%)`,
+            background: `linear-gradient(90deg, transparent 0%, ${HEADER_BG} 100%)`,
             pointerEvents: 'none',
           }}
         />
