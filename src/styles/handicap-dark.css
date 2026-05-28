@@ -33,9 +33,18 @@
   /* ── Text hierarchy ─────────────────────────────────────────────── */
   --hcp-t-100: rgba(255, 255, 255, 0.96);   /* primary */
   --hcp-t-80:  rgba(255, 255, 255, 0.72);   /* body */
+  --hcp-t-70:  rgba(255, 255, 255, 0.62);
   --hcp-t-60:  rgba(255, 255, 255, 0.55);   /* secondary / meta */
+  --hcp-t-50:  rgba(255, 255, 255, 0.46);
   --hcp-t-40:  rgba(255, 255, 255, 0.38);   /* tertiary / disabled */
+  --hcp-t-30:  rgba(255, 255, 255, 0.30);
   --hcp-t-20:  rgba(255, 255, 255, 0.20);   /* hairline-text */
+
+  /* Champions refinement tokens (dark variants) */
+  --hcp-champ-card-bg:      linear-gradient(135deg, rgba(247,147,30,0.10), rgba(247,147,30,0.04));
+  --hcp-pill-border:        rgba(255,255,255,0.12);
+  --hcp-pill-rank-bg:       rgba(255,255,255,0.08);
+  --hcp-pill-rank-held-bg:  #F7931E;
 
   /* ── Brand (unchanged from app-wide) ────────────────────────────── */
   --hcp-amber:      #F7931E;
@@ -114,9 +123,18 @@
   /* Text hierarchy */
   --hcp-t-100: #0F172A;
   --hcp-t-80:  #334155;
+  --hcp-t-70:  #5a6573;
   --hcp-t-60:  #64748B;
+  --hcp-t-50:  #9aa6b2;
   --hcp-t-40:  #94A3B8;
+  --hcp-t-30:  #b3bdca;
   --hcp-t-20:  #CBD5E1;
+
+  /* Champions refinement tokens */
+  --hcp-champ-card-bg:      linear-gradient(135deg, #FFFAEF, #FFF6E3);
+  --hcp-pill-border:        rgba(15,23,42,0.12);
+  --hcp-pill-rank-bg:       rgba(15,23,42,0.05);
+  --hcp-pill-rank-held-bg:  #0F172A;
 
   /* Brand */
   --hcp-amber:      #F7931E;

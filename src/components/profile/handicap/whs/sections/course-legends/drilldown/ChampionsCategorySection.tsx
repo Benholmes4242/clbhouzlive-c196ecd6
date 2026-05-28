@@ -40,7 +40,7 @@ export const ChampionsCategorySection: React.FC<ChampionsCategorySectionProps> =
   const Eyebrow = (
     <div
       style={{
-        padding: '22px 16px 8px',
+        padding: '20px 18px 6px',
         display: 'flex',
         justifyContent: 'space-between',
         alignItems: 'baseline',
@@ -48,14 +48,14 @@ export const ChampionsCategorySection: React.FC<ChampionsCategorySectionProps> =
     >
       <div
         style={{
-          fontSize: 11,
+          fontSize: 10.5,
           fontWeight: 800,
           color: '#F7931E',
-          letterSpacing: '0.14em',
+          letterSpacing: '0.16em',
           textTransform: 'uppercase',
           display: 'inline-flex',
           alignItems: 'center',
-          gap: 5,
+          gap: 6,
         }}
       >
         <CatIcon size={11} strokeWidth={2.4} />
@@ -63,15 +63,15 @@ export const ChampionsCategorySection: React.FC<ChampionsCategorySectionProps> =
       </div>
       <div
         style={{
-          fontSize: 11,
+          fontSize: 10,
           fontWeight: 700,
-          color: 'var(--hcp-t-40, #94a3b8)',
-          letterSpacing: '0.04em',
+          color: '#aab4c0',
+          letterSpacing: '0.08em',
           textTransform: 'uppercase',
           fontVariantNumeric: 'tabular-nums',
         }}
       >
-        {totalCount} {totalCount === 1 ? 'entry' : 'entries'} · {holdDuration}
+        {totalCount} · {holdDuration}
       </div>
     </div>
   );
@@ -93,7 +93,7 @@ export const ChampionsCategorySection: React.FC<ChampionsCategorySectionProps> =
         />
         <div
           style={{
-            padding: '10px 16px 14px',
+            padding: '12px 18px 16px',
             fontSize: 11,
             color: 'var(--hcp-t-60, #94a3b8)',
             textAlign: 'center',
@@ -125,29 +125,26 @@ export const ChampionsCategorySection: React.FC<ChampionsCategorySectionProps> =
         />
       ))}
       {hiddenCount > 0 && (
-        <div
-          style={{
-            padding: '10px 16px 14px',
-            display: 'flex',
-            justifyContent: 'flex-end',
-          }}
-        >
+        <div style={{ padding: '12px 18px 16px', display: 'flex', justifyContent: 'flex-end' }}>
           <button
             type="button"
             onClick={onFullLeaderboardTap}
             style={{
-              fontSize: 10.5,
+              fontSize: 10,
               fontWeight: 800,
-              color: 'var(--hcp-accent-celebrate, #C97211)',
-              letterSpacing: '0.04em',
+              color: 'var(--hcp-accent-celebrate, #B26818)',
+              letterSpacing: '0.10em',
               textTransform: 'uppercase',
               background: 'none',
               border: 'none',
               cursor: 'pointer',
               padding: 0,
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 4,
             }}
           >
-            Full leaderboard ›
+            Full leaderboard <span style={{ fontSize: 12 }}>›</span>
           </button>
         </div>
       )}

@@ -1,10 +1,11 @@
 import React from 'react';
 
 const AMBER = '#F7931E';
+const DEEP_AMBER = '#B26818';
+const INK = '#0F172A';
 
 const SQUIRCLE_MASK_URL =
   "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath d='M40 0h20c22.091 0 40 17.909 40 40v20c0 22.091-17.909 40-40 40H40C17.909 100 0 82.091 0 60V40C0 17.909 17.909 0 40 0z'/%3E%3C/svg%3E\")";
-
 const squircleMaskStyle: React.CSSProperties = {
   WebkitMaskImage: SQUIRCLE_MASK_URL,
   maskImage: SQUIRCLE_MASK_URL,
@@ -34,138 +35,103 @@ export const ChampionsYourStandingCard: React.FC<ChampionsYourStandingCardProps>
   yourBest,
 }) => {
   const metaParts: string[] = [];
-  metaParts.push(`${titlesHeld} of ${totalCategories} titles`);
   if (yourRounds > 0) metaParts.push(`${yourRounds} rounds`);
-  if (yourBest != null) metaParts.push(`Best ${yourBest}`);
+  if (yourBest != null) metaParts.push(`Best gross ${yourBest}`);
   const meta = metaParts.join(' · ');
-
-  const cardBg = 'var(--hcp-champ-wash, #FFF8EA)';
-  const cardBorder = 'var(--hcp-champ-wash-border, rgba(247,147,30,0.30))';
 
   return (
     <div
       style={{
-        margin: '14px 16px 16px',
-        background: cardBg,
-        border: `1px solid ${cardBorder}`,
-        borderRadius: 14,
-        padding: 16,
-        display: 'flex',
-        alignItems: 'center',
-        gap: 14,
+        margin: '16px 18px',
+        background: 'var(--hcp-champ-card-bg, linear-gradient(135deg, #FFFAEF, #FFF6E3))',
+        border: '1px solid var(--hcp-champ-wash-border, rgba(247,147,30,0.22))',
+        borderRadius: 16,
+        padding: 18,
         position: 'relative',
+        overflow: 'hidden',
       }}
     >
-      <div style={{ width: 80, height: 80, position: 'relative', flexShrink: 0 }}>
-        <div style={{ position: 'absolute', inset: 0, background: AMBER, ...squircleMaskStyle }} aria-hidden />
-        <div
-          style={{
-            position: 'absolute',
-            inset: 1.5,
-            background: photoUrl
-              ? `url(${photoUrl}) center/cover`
-              : 'linear-gradient(135deg, #6b7280 0%, #94a3b8 100%)',
-            ...squircleMaskStyle,
-          }}
-          aria-hidden
-        />
-        <div
-          style={{
-            position: 'absolute',
-            bottom: -4,
-            right: -4,
-            minWidth: 28,
-            height: 22,
-            padding: '0 6px',
-            background: 'linear-gradient(135deg, #FBBC2E 0%, #F7931E 100%)',
-            border: `2px solid ${cardBg}`,
-            borderRadius: 11,
-            display: 'inline-flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            fontSize: 11,
-            fontWeight: 800,
-            color: '#1A1300',
-            fontFamily: 'Geist Mono, monospace',
-            letterSpacing: '-0.02em',
-            zIndex: 2,
-          }}
-        >
-          {titlesHeld}/{totalCategories}
-        </div>
-      </div>
-
-      <div style={{ flex: 1, minWidth: 0 }}>
-        <div
-          style={{
-            fontSize: 10.5,
-            fontWeight: 800,
-            color: 'var(--hcp-accent-celebrate, #C97211)',
-            letterSpacing: '0.14em',
-            textTransform: 'uppercase',
-            marginBottom: 4,
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: 5,
-          }}
-        >
-          👤 Your standing
-        </div>
-        <div
-          style={{
-            fontSize: 22,
-            fontWeight: 800,
-            color: 'var(--hcp-accent-celebrate, #C97211)',
-            letterSpacing: '-0.025em',
-            lineHeight: 1.05,
-            marginBottom: 4,
-            whiteSpace: 'nowrap',
-            overflow: 'hidden',
-            textOverflow: 'ellipsis',
-          }}
-        >
-          {displayName}
-        </div>
-        <div
-          style={{
-            fontSize: 12,
-            color: 'var(--hcp-t-60, #64748b)',
-            fontWeight: 600,
-            letterSpacing: '-0.005em',
-          }}
-        >
-          {meta}
-        </div>
-      </div>
-
-      {bestRank != null && (
-        <div style={{ flexShrink: 0, textAlign: 'right' }}>
+      <div
+        aria-hidden
+        style={{
+          position: 'absolute',
+          top: -40,
+          right: -40,
+          width: 140,
+          height: 140,
+          borderRadius: '50%',
+          background: 'radial-gradient(circle, rgba(247,147,30,0.10), transparent 70%)',
+          pointerEvents: 'none',
+        }}
+      />
+      <div style={{ display: 'flex', alignItems: 'center', gap: 14, position: 'relative' }}>
+        <div style={{ width: 64, height: 64, position: 'relative', flexShrink: 0 }} aria-hidden>
+          <div style={{ position: 'absolute', inset: 0, background: AMBER, ...squircleMaskStyle }} />
           <div
             style={{
-              fontSize: 28,
-              fontWeight: 200,
-              color: 'var(--hcp-accent-celebrate, #C97211)',
-              letterSpacing: '-0.030em',
-              lineHeight: 1,
-              fontVariantNumeric: 'tabular-nums',
+              position: 'absolute',
+              inset: 1.5,
+              background: photoUrl
+                ? `url(${photoUrl}) center/cover`
+                : 'linear-gradient(135deg, #6b7280 0%, #94a3b8 100%)',
+              ...squircleMaskStyle,
             }}
-          >
-            #{bestRank}
-          </div>
+          />
+        </div>
+
+        <div style={{ flex: 1, minWidth: 0 }}>
           <div
             style={{
-              fontSize: 9.5,
-              color: 'var(--hcp-t-60, #94a3b8)',
-              letterSpacing: '0.14em',
-              textTransform: 'uppercase',
+              fontSize: 10,
               fontWeight: 800,
-              marginTop: 4,
+              color: DEEP_AMBER,
+              letterSpacing: '0.16em',
+              textTransform: 'uppercase',
+              marginBottom: 5,
             }}
           >
-            Best rank
+            Your standing
           </div>
+          <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, marginBottom: 5, minWidth: 0 }}>
+            <span
+              style={{
+                fontSize: 21,
+                fontWeight: 800,
+                color: 'var(--hcp-t-100, ' + INK + ')',
+                letterSpacing: '-0.025em',
+                lineHeight: 1,
+                whiteSpace: 'nowrap',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+              }}
+            >
+              {displayName}
+            </span>
+            <span style={{ fontSize: 11, fontWeight: 700, color: DEEP_AMBER, fontVariantNumeric: 'tabular-nums', flexShrink: 0 }}>
+              {titlesHeld} of {totalCategories} titles
+            </span>
+          </div>
+          {meta && (
+            <div style={{ fontSize: 11.5, color: 'var(--hcp-t-50, #8a96a3)', fontWeight: 500, letterSpacing: '-0.003em', fontVariantNumeric: 'tabular-nums' }}>
+              {meta}
+            </div>
+          )}
         </div>
-      )}
+
+        {bestRank != null && (
+          <div style={{ flexShrink: 0, textAlign: 'right', paddingLeft: 8 }}>
+            <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'flex-end' }}>
+              <span style={{ fontSize: 16, fontWeight: 600, color: DEEP_AMBER, marginTop: 4, letterSpacing: '-0.02em' }}>#</span>
+              <span style={{ fontSize: 38, fontWeight: 250, color: DEEP_AMBER, letterSpacing: '-0.04em', lineHeight: 0.85, fontVariantNumeric: 'tabular-nums' }}>
+                {bestRank}
+              </span>
+            </div>
+            <div style={{ fontSize: 8.5, color: '#a89878', letterSpacing: '0.16em', textTransform: 'uppercase', fontWeight: 800, marginTop: 2 }}>
+              Best rank
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   );
 };
