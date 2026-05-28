@@ -65,13 +65,7 @@ export const CourseHolesTab: React.FC<Props> = ({ courseId }) => {
   }
 
   if (!data?.available || holes.length === 0) {
-    return (
-      <div style={{ padding: '40px 18px', textAlign: 'center', fontFamily: FONT }}>
-        <div style={{ fontSize: 14, fontWeight: 600, color: '#64748b', lineHeight: 1.5 }}>
-          No hole-by-hole data yet for this course. Once rounds with hole scores are posted here, this fills in automatically.
-        </div>
-      </div>
-    );
+    return <HolesEmptyState courseName={meta?.course_name ?? null} />;
   }
 
   return (
