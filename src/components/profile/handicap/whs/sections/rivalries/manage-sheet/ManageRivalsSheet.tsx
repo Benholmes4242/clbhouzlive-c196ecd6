@@ -161,7 +161,7 @@ export const ManageRivalsSheet: React.FC<Props> = ({ userId, open, onClose }) =>
                 flexShrink: 0,
               }}
             >
-              <div style={{ width: 36, height: 4, borderRadius: 2, background: 'var(--hcp-t-20)' }} />
+              <div style={{ width: 36, height: 4, borderRadius: 2, background: 'var(--hcp-line-2)' }} />
             </div>
 
             <SheetHeader
