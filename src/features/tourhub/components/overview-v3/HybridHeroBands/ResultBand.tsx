@@ -5,7 +5,7 @@
  */
 
 import React from 'react';
-import { INK, AMBER, NUMERIC_STYLE } from '../HybridHero.constants';
+import { HEADER_BG, AMBER, NUMERIC_STYLE } from '../HybridHero.constants';
 import { getFlagCode } from '@/utils/countryFlags';
 
 const GOLD = '#FBBC2E';
@@ -120,7 +120,7 @@ export function ResultBand({
     <div
       style={{
         position: 'relative',
-        background: INK,
+        background: HEADER_BG,
         padding: '14px 20px 14px',
         display: 'flex',
         flexDirection: 'column',
