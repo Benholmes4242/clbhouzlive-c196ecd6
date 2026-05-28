@@ -131,7 +131,6 @@ const FriendsYesterdayCard: React.FC<Props> = ({ data, userId }) => {
             borderRadius: '50%',
             background: T.green,
             display: 'inline-block',
-            boxShadow: '0 0 6px rgba(34,197,94,0.4)',
           }}
         />
         <span
