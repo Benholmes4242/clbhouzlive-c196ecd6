@@ -414,7 +414,7 @@ const PointsBody: React.FC<PointsBodyProps> = ({ dist, scope, scoringRange }) =>
             borderRadius: 12,
             overflow: 'hidden',
             background: T.ink04,
-            boxShadow: '0 2px 4px rgba(15,23,42,0.04)',
+            
           }}
           role="img"
           aria-label={`Distribution: ${dist.inZoneCount} in zone, ${dist.solidCount} solid, ${dist.offDayCount} off`}
