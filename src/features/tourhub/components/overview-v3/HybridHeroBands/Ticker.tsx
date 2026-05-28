@@ -74,7 +74,7 @@ export function Ticker({ rows }: TickerProps) {
           alignItems: 'center',
         }}
       >
-        ↻ TOP 10
+        TOP 20
       </div>
       {/* Marquee track */}
       <div style={{ flex: 1, overflow: 'hidden', position: 'relative' }}>
