@@ -31,7 +31,7 @@ export const CourseDetailShellTabs: React.FC<CourseDetailShellTabsProps> = ({
   onTabChange,
 }) => {
   const scrollerRef = useRef<HTMLDivElement | null>(null);
-  const [, setOverflowing] = useState(false);
+  const [overflowing, setOverflowing] = useState(false);
 
   useEffect(() => {
     const el = scrollerRef.current;
@@ -53,10 +53,15 @@ export const CourseDetailShellTabs: React.FC<CourseDetailShellTabsProps> = ({
         aria-label="Course Detail Sections"
         style={{
           display: 'flex',
-          justifyContent: 'space-evenly',
+          justifyContent: overflowing ? 'flex-start' : 'space-evenly',
+          gap: overflowing ? 8 : 0,
+          padding: overflowing ? '0 16px' : 0,
           background: '#0A0E14',
           borderBottom: '0.5px solid rgba(255,255,255,0.06)',
+          overflowX: 'auto',
           overflowY: 'hidden',
+          WebkitOverflowScrolling: 'touch',
+          scrollbarWidth: 'none',
           fontFamily: 'Geist, system-ui, -apple-system, BlinkMacSystemFont, sans-serif',
         }}
       >
@@ -67,7 +72,10 @@ export const CourseDetailShellTabs: React.FC<CourseDetailShellTabsProps> = ({
               key={tab.id}
               role="tab"
               aria-selected={isActive}
-              onClick={() => onTabChange(tab.id)}
+              onClick={(e) => {
+                onTabChange(tab.id);
+                e.currentTarget.scrollIntoView({ block: 'nearest', inline: 'center', behavior: 'smooth' });
+              }}
               className="active:opacity-70 transition-opacity"
               style={{
                 flex: '0 0 auto',
