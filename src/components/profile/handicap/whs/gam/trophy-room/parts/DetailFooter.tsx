@@ -11,7 +11,7 @@ interface Props {
 
 const baseBtn: React.CSSProperties = {
   flex: 1,
-  height: 44,
+  height: 40,
   borderRadius: 12,
   fontFamily: GAM.FONT_GEIST,
   fontSize: 13,
