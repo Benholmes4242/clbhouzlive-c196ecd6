@@ -83,6 +83,10 @@
   --hcp-bad:        #EF4444;
   --hcp-bad-2:      #FCA5A5;
   --hcp-bad-tint:   rgba(239, 68, 68, 0.14);
+  --hcp-good-deep:  #059669;
+  --hcp-good-deep-tint: rgba(5,150,105,0.14);
+  --hcp-bad-deep:   #9F1D1D;
+  --hcp-bad-deep-tint:  rgba(159,29,29,0.14);
 
   /* ── Form temperature ────────────────────────────────────────────
    * Only used in the Trends tab Form Hero, where "cold/warm/hot" is
