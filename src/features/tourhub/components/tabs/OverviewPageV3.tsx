@@ -39,6 +39,23 @@ import { TOTAL_HERO_HEIGHT_TARGET } from '../overview-v3/HybridHero.constants';
 import { WifiOff } from 'lucide-react';
 import ScrollToTopGlass from '@/components/common/ScrollToTopGlass';
 
+const LAST_TOUR_KEY = 'tourhub:last-random-tour';
+
+function pickRandomTourSlug(availableSlugs: string[]): string | null {
+  if (availableSlugs.length === 0) return null;
+  if (availableSlugs.length === 1) return availableSlugs[0]; // can't avoid repeat
+  const last = sessionStorage.getItem(LAST_TOUR_KEY);
+  const candidates = availableSlugs.filter((s) => s !== last);
+  const pool = candidates.length > 0 ? candidates : availableSlugs; // fallback if filter empties
+  const pick = pool[Math.floor(Math.random() * pool.length)];
+  try {
+    sessionStorage.setItem(LAST_TOUR_KEY, pick);
+  } catch {
+    // private mode safe
+  }
+  return pick;
+}
+
 export function OverviewPageV3() {
   const { isOnline } = useNetworkStatus();
 
@@ -96,6 +113,40 @@ export function OverviewPageV3() {
     setActiveTournamentId(paramTournamentId);
     setAutoRotate(false);
   }, [paramTournamentId]);
+
+  // ── Random default — only matters if no ?tour= is set ──
+  const randomSlugRef = useRef<string | null>(null);
+  const randomTournamentId = useMemo(() => {
+    if (tourParam) return null;   // user has explicit selection; skip random
+    if (!tickerData) return null; // wait for data
+    // Build the list of selectable slugs (live or completed — match switcher rule)
+    const availableSlugs = Array.from(
+      new Set([
+        ...tickerData.live.map((c) => c.tourSlug),
+        ...tickerData.completed.map((c) => c.tourSlug),
+      ]),
+    );
+    // Lock the random pick on first resolution so it doesn't reroll on re-renders
+    if (randomSlugRef.current === null) {
+      randomSlugRef.current = pickRandomTourSlug(availableSlugs);
+    }
+    const slug = randomSlugRef.current;
+    if (!slug) return null;
+    const live = tickerData.live.find((c) => c.tourSlug === slug)?.id;
+    const completed = tickerData.completed.find((c) => c.tourSlug === slug)?.id;
+    return live ?? completed ?? null;
+  }, [tourParam, tickerData]);
+
+  const lastAppliedRandomRef = useRef<string | null>(null);
+  useEffect(() => {
+    if (!randomTournamentId) return;
+    if (lastAppliedRandomRef.current === randomTournamentId) return;
+    // Don't apply if param effect already pinned something
+    if (activeTournamentId) return;
+    lastAppliedRandomRef.current = randomTournamentId;
+    setActiveTournamentId(randomTournamentId);
+    setAutoRotate(false); // PIN — locked decision
+  }, [randomTournamentId, activeTournamentId]);
 
 
   return (
