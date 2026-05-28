@@ -117,7 +117,7 @@ export const SheetHeroGlass: React.FC<Props> = ({
     handicapDelta != null && Math.abs(handicapDelta) >= 0.05;
   const impactColor = hasImpact
     ? handicapDelta! < 0
-      ? '#22C55E'
+      ? '#34D399'
       : AMBER
     : '#FFFFFF';
   const fmtImpact = (d: number): string => {
