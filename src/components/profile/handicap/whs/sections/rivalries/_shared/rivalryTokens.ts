@@ -18,10 +18,10 @@ export interface RivalryStateToken {
 
 const AMBER = '#F7931E';
 const GOLD = '#FBBC2E';
-const RED = '#EF4444';
+const RED = '#9F1D1D';
 
 const PILL_WIN = `linear-gradient(180deg, ${GOLD} 0%, ${AMBER} 100%)`;
-const PILL_LOSS = 'rgba(239,68,68,0.85)';
+const PILL_LOSS = 'rgba(159,29,29,0.85)';
 const PILL_TIE = 'rgba(148,163,184,0.20)';
 const PILL_EMPTY = 'rgba(255,255,255,0.05)';
 
