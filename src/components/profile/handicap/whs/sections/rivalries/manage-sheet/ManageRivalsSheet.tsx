@@ -172,7 +172,7 @@ export const ManageRivalsSheet: React.FC<Props> = ({ userId, open, onClose }) =>
               dark
             />
 
-            <div style={{ padding: '12px 16px 12px', flexShrink: 0 }}>
+            <div style={{ padding: '10px 16px 10px', flexShrink: 0 }}>
               <SearchField value={query} onChange={setQuery} />
             </div>
 
