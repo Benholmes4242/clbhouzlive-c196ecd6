@@ -84,20 +84,6 @@ function deltaColor(d: number): string {
   return T.inkMute;
 }
 
-/**
- * Text-shadow halo to lift the score value off the dark canvas.
- * Matches the value's color so the glow reads as the value emitting light.
- * Neutral (delta = 0) returns 'none' — no halo on grey.
- */
-function glowFor(d: number): string {
-  if (d < 0) {
-    return '0 0 8px rgba(34,197,94,0.28), 0 0 3px rgba(34,197,94,0.18)';
-  }
-  if (d > 0) {
-    return '0 0 8px rgba(239,68,68,0.28), 0 0 3px rgba(239,68,68,0.18)';
-  }
-  return 'none';
-}
 
 
 const SECTION_STYLE: React.CSSProperties = {
