@@ -1,7 +1,7 @@
 export const AMBER = '#F7931E';
 export const INK = '#0F172A';
-export const C_BIRDIE = 'var(--hcp-good, #22C55E)';
-export const C_PAR = 'var(--hcp-t-100, #0F172A)';
-export const C_BOGEY = '#F7931E';
-export const C_DOUBLE = 'var(--hcp-bad, #EF4444)';
+export const C_BIRDIE = '#F7931E';                    // amber — birdie-or-better celebrated
+export const C_PAR    = 'var(--hcp-t-40, #94A3B8)';   // muted slate — neutral
+export const C_BOGEY  = 'var(--hcp-bad, #EF4444)';    // red — damage begins
+export const C_DOUBLE = '#991B1B';                    // maroon — deep damage
 export const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
