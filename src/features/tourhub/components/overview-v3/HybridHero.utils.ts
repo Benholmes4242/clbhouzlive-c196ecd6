@@ -125,9 +125,9 @@ export function deriveHeroState(
   if (status === 'inprogress' || status === 'inplayoff' || status === 'delayed') {
     return {
       kind: 'live',
-      round: 1,
-      totalRounds: 4,
-      thruLabel: 'F THRU',
+      round: tournament.currentRound ?? 1,
+      totalRounds: tournament.totalRounds ?? 4,
+      thruLabel: '',
     };
   }
 
