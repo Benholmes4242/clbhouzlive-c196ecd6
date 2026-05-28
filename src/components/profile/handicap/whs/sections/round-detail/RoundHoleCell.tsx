@@ -177,7 +177,7 @@ export const RoundHoleCell: React.FC<Props> = ({ hole, showPar = true }) => {
         style={{
           position: 'relative',
           width: '100%',
-          maxWidth: 44,
+          maxWidth: 38,
           aspectRatio: '1 / 1',
           display: 'flex',
           alignItems: 'center',
