@@ -1,7 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import { ChevronDown } from 'lucide-react';
 import { format } from 'date-fns';
-import { CourseImageFallback } from '@/components/whs/CourseImageFallback';
+
 import { useAllScores, useHandicapTrend } from '@/lib/whs/hooks';
 import { computeRoundDeltas, type RoundWithDelta } from './computeRoundDeltas';
 import RoundDetailSheet from '../round-detail/RoundDetailSheet';
@@ -29,10 +29,6 @@ const T = {
   amber: '#F7931E',
   gold: '#FBBC2E',
   amberInk: '#854F0B',
-  greenInk: '#15803D',
-  redInk: '#991B1B',
-  tileFrom: '#0F4D2E',
-  tileTo: '#103E25',
 };
 const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
 
@@ -49,17 +45,9 @@ const fmtDiff = (d: number | null | undefined): string => {
 
 const diffColor = (d: number | null | undefined): string => {
   if (d === null || d === undefined) return T.inkMute;
-  if (d < 0) return 'var(--hcp-good)';
-  if (d > 0) return 'var(--hcp-bad)';
+  if (d < 0) return 'var(--hcp-good-deep)';
+  if (d > 0) return 'var(--hcp-bad-deep)';
   return T.inkSoft;
-};
-
-/** Text-shadow halo to lift coloured delta values off the dark canvas. */
-const diffGlow = (d: number | null | undefined): string => {
-  if (d === null || d === undefined) return 'none';
-  if (d < 0) return '0 0 8px rgba(34,197,94,0.40), 0 0 3px rgba(34,197,94,0.25)';
-  if (d > 0) return '0 0 8px rgba(239,68,68,0.40), 0 0 3px rgba(239,68,68,0.25)';
-  return 'none';
 };
 
 /**
@@ -84,15 +72,15 @@ const fmtHcpDelta = (n: number | null): HcpDeltaInfo | null => {
     return {
       sign: '\u2193',
       value: Math.abs(n).toFixed(1),
-      color: 'var(--hcp-good)',
-      glow: '0 0 8px rgba(34,197,94,0.40), 0 0 3px rgba(34,197,94,0.25)',
+      color: 'var(--hcp-good-deep)',
+      glow: 'none',
     };
   }
   return {
     sign: '\u2191',
     value: n.toFixed(1),
-    color: 'var(--hcp-bad)',
-    glow: '0 0 8px rgba(239,68,68,0.40), 0 0 3px rgba(239,68,68,0.25)',
+    color: 'var(--hcp-bad-deep)',
+    glow: 'none',
   };
 };
 
@@ -464,90 +452,6 @@ const MonthDivider: React.FC<{ month: string; count: number }> = ({
   </div>
 );
 
-// ─── Date tile ──────────────────────────────────────────────────────
-interface DateTileProps {
-  dateString: string;
-  thumbnailUrl: string | null;
-}
-
-const DateTile: React.FC<DateTileProps> = ({ dateString, thumbnailUrl }) => {
-  const d = new Date(dateString);
-  const dayOfMonth = d.getDate();
-  const weekday = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'][d.getDay()];
-  return (
-    <div
-      style={{
-        position: 'relative',
-        width: 88,
-        flexShrink: 0,
-        background: `linear-gradient(150deg, ${T.tileFrom}, ${T.tileTo})`,
-        color: '#FFFFFF',
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center',
-        padding: '14px 8px',
-        overflow: 'hidden',
-      }}
-    >
-      {thumbnailUrl ? (
-        <>
-          <img
-            src={thumbnailUrl}
-            alt=""
-            aria-hidden
-            loading="lazy"
-            style={{
-              position: 'absolute',
-              inset: 0,
-              width: '100%',
-              height: '100%',
-              objectFit: 'cover',
-              opacity: 1,
-              pointerEvents: 'none',
-            }}
-          />
-          <span
-            aria-hidden
-            style={{
-              position: 'absolute', inset: 0,
-              background:
-                'linear-gradient(180deg, rgba(5,8,16,0.55) 0%, rgba(5,8,16,0.20) 60%, rgba(5,8,16,0.30) 100%)',
-              pointerEvents: 'none',
-            }}
-          />
-        </>
-      ) : (
-        <CourseImageFallback flagOpacity={0.18} gradientAngle={150} />
-      )}
-      <span
-        style={{
-          fontSize: 9,
-          fontWeight: 800,
-          letterSpacing: '0.16em',
-          opacity: 0.82,
-          marginBottom: 2,
-          position: 'relative',
-        }}
-      >
-        {weekday}
-      </span>
-      <span
-        style={{
-          fontSize: 28,
-          fontWeight: 800,
-          lineHeight: 1,
-          letterSpacing: '-0.02em',
-          position: 'relative',
-          fontVariantNumeric: 'tabular-nums',
-        }}
-      >
-        {dayOfMonth}
-      </span>
-
-    </div>
-  );
-};
 
 // ─── Feed card ──────────────────────────────────────────────────────
 interface FeedCardProps {
@@ -681,7 +585,7 @@ const FeedCard: React.FC<FeedCardProps> = ({ round, onTap }) => {
               padding: '6px 12px',
               borderRadius: 999,
               border: round.is_counter
-                ? '1.5px solid #22C55E'
+                ? '1.5px solid var(--hcp-good-deep)'
                 : '1.5px solid transparent',
               boxSizing: 'border-box',
               minWidth: 56,
@@ -703,11 +607,11 @@ const FeedCard: React.FC<FeedCardProps> = ({ round, onTap }) => {
         </span>
         <div
           style={{
-            fontSize: 11,
+            fontSize: 12,
             fontWeight: 700,
             color: diffColor(round.handicap_differential),
             fontVariantNumeric: 'tabular-nums',
-            textShadow: diffGlow(round.handicap_differential),
+            textShadow: 'none',
             minWidth: 36,
             textAlign: 'right',
           }}
