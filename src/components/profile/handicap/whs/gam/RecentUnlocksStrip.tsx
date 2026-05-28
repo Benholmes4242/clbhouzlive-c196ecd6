@@ -101,7 +101,7 @@ const UnlockHeroCard: React.FC<{
           position: 'absolute',
           right: -20,
           bottom: -30,
-          opacity: 0.08,
+          opacity: 0.05,
           transform: 'rotate(-12deg)',
           color: rarity.labelFg,
           pointerEvents: 'none',
