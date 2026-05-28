@@ -35,8 +35,8 @@ export const SheetHeader: React.FC<SheetHeaderProps> = ({
     <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
       <div
         style={{
-          width: 64,
-          height: 64,
+          width: 56,
+          height: 56,
           borderRadius: '34%',
           overflow: 'hidden',
           background: BG_2,
@@ -66,7 +66,7 @@ export const SheetHeader: React.FC<SheetHeaderProps> = ({
           <h2
             style={{
               margin: 0,
-              fontSize: 24,
+              fontSize: 21,
               fontWeight: 900,
               color: T100,
               letterSpacing: '-0.03em',
@@ -107,7 +107,7 @@ export const SheetHeader: React.FC<SheetHeaderProps> = ({
   );
 
   return (
-    <div style={{ padding: '12px 20px 14px', fontFamily: FONT }}>
+    <div style={{ padding: '10px 20px 12px', fontFamily: FONT }}>
       {isTappable ? (
         <button
           type="button"
@@ -139,10 +139,10 @@ export const SheetHeader: React.FC<SheetHeaderProps> = ({
       {bio && (
         <p
           style={{
-            margin: '10px 0 0',
-            fontSize: 14,
+            margin: '8px 0 0',
+            fontSize: 13,
             color: T100,
-            lineHeight: 1.45,
+            lineHeight: 1.4,
           }}
         >
           {bio}

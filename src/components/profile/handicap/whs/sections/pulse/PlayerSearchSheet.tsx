@@ -123,7 +123,7 @@ export const PlayerSearchSheet: React.FC<Props> = ({ open, onClose }) => {
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
-          padding: '16px 20px 12px',
+          padding: '14px 20px 10px',
           borderBottom: '1px solid var(--hcp-line)',
           fontFamily: FONT,
         }}

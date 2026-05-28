@@ -285,7 +285,7 @@ export const TrophyRoomSheet: React.FC<Props> = ({ userId, viewerUserId, ownerFi
         {/* Header */}
         <div
           style={{
-            padding: '16px 20px 14px',
+            padding: '12px 20px 10px',
             borderBottom: '0.5px solid var(--hcp-line)',
             flexShrink: 0,
             fontFamily: GAM.FONT_GEIST,
@@ -294,11 +294,11 @@ export const TrophyRoomSheet: React.FC<Props> = ({ userId, viewerUserId, ownerFi
           <Eyebrow ownerFirstName={ownerFirstName} isFriendView={isFriendView} />
           <div
             style={{
-              fontSize: 42,
+              fontSize: 34,
               fontWeight: 200,
               letterSpacing: '-0.045em',
               color: 'var(--hcp-t-100)',
-              marginTop: 6,
+              marginTop: 4,
               lineHeight: 0.95,
               ...GAM.TABULAR,
             }}
@@ -306,7 +306,7 @@ export const TrophyRoomSheet: React.FC<Props> = ({ userId, viewerUserId, ownerFi
             {earnedTotal}
             <span
               style={{
-                fontSize: 17,
+                fontSize: 15,
                 fontWeight: 600,
                 color: 'var(--hcp-t-60)',
                 letterSpacing: '0.02em',
@@ -320,7 +320,7 @@ export const TrophyRoomSheet: React.FC<Props> = ({ userId, viewerUserId, ownerFi
             style={{
               fontSize: 12,
               color: 'var(--hcp-t-60)',
-              marginTop: 8,
+              marginTop: 6,
               display: 'flex',
               gap: 12,
               flexWrap: 'wrap',
