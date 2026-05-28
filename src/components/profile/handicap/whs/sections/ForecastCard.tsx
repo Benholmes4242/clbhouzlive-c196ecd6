@@ -612,7 +612,7 @@ const SharpRiseCard: React.FC<{ f: Forecast; ctx: CopyCtx }> = ({ f, ctx }) => {
   const cutTarget = f.cutTarget;
   return (
     <CardShell borderColor={T.badBorder} bgTint={T.badBgTint}>
-      <EyebrowRow left="⚠ Form alert" right={f.whenLabel ?? undefined} color={T.bad} />
+      <EyebrowRow left={<span style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}><AlertTriangle size={12} strokeWidth={2.5} /> Form alert</span>} right={f.whenLabel ?? undefined} color={T.bad} />
       <Headline
         numberValue={(f.projected ?? 0).toFixed(1)}
         numberColor={T.bad}
