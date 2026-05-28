@@ -96,13 +96,13 @@ export const SheetFooterDark: React.FC<Props> = ({
           target="_blank"
           rel="noopener noreferrer"
           style={{
-            padding: '11px 18px',
+            padding: '9px 16px',
             borderRadius: 999,
             background: AMBER,
             border: 'none',
             color: '#1A1300',
             fontWeight: 800,
-            fontSize: 13,
+            fontSize: 12,
             display: 'inline-flex',
             alignItems: 'center',
             gap: 6,
