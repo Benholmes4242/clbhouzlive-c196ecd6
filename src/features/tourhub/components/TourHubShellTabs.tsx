@@ -237,7 +237,9 @@ const TourSwitcherAffordance: React.FC = () => {
                 key={slug}
                 type="button"
                 onClick={() => {
-                  // TODO Pass 7.1: implement tour filtering in HeroCarousel.
+                  const next = new URLSearchParams(searchParams);
+                  next.set('tour', slug);
+                  setSearchParams(next, { replace: false });
                   setOpen(false);
                 }}
                 aria-pressed={isActive}
