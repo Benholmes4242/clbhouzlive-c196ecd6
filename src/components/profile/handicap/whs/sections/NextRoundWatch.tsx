@@ -393,7 +393,9 @@ const PathCell: React.FC<{
   valueColor: string;
   prose: React.ReactNode;
   borderRight?: boolean;
-}> = ({ eyebrow, eyebrowColor, value, valueColor, prose, borderRight }) => (
+  valueSize?: number;
+  valueWeight?: number;
+}> = ({ eyebrow, eyebrowColor, value, valueColor, prose, borderRight, valueSize = 30, valueWeight = 800 }) => (
   <div
     style={{
       display: 'flex',
@@ -406,8 +408,8 @@ const PathCell: React.FC<{
   >
     <span
       style={{
-        fontSize: 30,
-        fontWeight: 800,
+        fontSize: valueSize,
+        fontWeight: valueWeight,
         letterSpacing: '-0.03em',
         lineHeight: 1,
         color: valueColor,
