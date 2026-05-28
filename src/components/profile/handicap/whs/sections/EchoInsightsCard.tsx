@@ -188,7 +188,7 @@ const MiniCard: React.FC<{
         {course.name || '—'}
       </div>
       {(course.country || course.region) && (
-        <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.7)', marginTop: 2 }}>
+        <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.7)', marginTop: 2, textShadow: '0 1px 2px rgba(0,0,0,0.5)' }}>
           {[course.country, course.region].filter(Boolean).join(' · ')}
         </div>
       )}
