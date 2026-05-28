@@ -214,29 +214,25 @@ export const FriendRoundCardV2: React.FC<Props> = ({
                 fontWeight: 800,
                 fontVariantNumeric: 'tabular-nums',
                 letterSpacing: '0.02em',
-                color: hcpDelta < 0 ? '#86EFAC' : '#FCA5A5',
+                color: hcpDelta < 0 ? '#34D399' : '#F87171',
                 background:
-                  hcpDelta < 0 ? 'rgba(34,197,94,0.18)' : 'rgba(239,68,68,0.18)',
+                  hcpDelta < 0 ? 'rgba(5,150,105,0.22)' : 'rgba(159,29,29,0.22)',
                 border:
                   hcpDelta < 0
-                    ? '0.5px solid rgba(34,197,94,0.5)'
-                    : '0.5px solid rgba(239,68,68,0.5)',
+                    ? '0.5px solid rgba(5,150,105,0.55)'
+                    : '0.5px solid rgba(159,29,29,0.55)',
                 flexShrink: 0,
                 lineHeight: 1,
               }}
             >
               HCP {hcpDelta < 0 ? '↓' : '↑'} {Math.abs(hcpDelta).toFixed(1)}
               {showHotFlame && (
-                <span
+                <Flame
+                  size={11}
+                  strokeWidth={2.4}
                   aria-label="Hot streak"
-                  style={{
-                    fontSize: 11,
-                    marginLeft: 2,
-                    lineHeight: 1,
-                  }}
-                >
-                  🔥
-                </span>
+                  style={{ marginLeft: 2, color: '#34D399' }}
+                />
               )}
             </div>
           ) : !isSynced ? (
