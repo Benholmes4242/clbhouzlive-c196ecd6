@@ -182,9 +182,9 @@ const TOUR_LABEL: Record<string, string> = {
 const TourSwitcherAffordance: React.FC = () => {
   const { data } = useAllToursTickerData();
   const [open, setOpen] = useState(false);
+  const [searchParams, setSearchParams] = useSearchParams();
 
-  // TODO Pass 7.1: derive from app state once tour filtering is wired.
-  const activeTourSlug = 'pga';
+  const activeTourSlug = searchParams.get('tour') ?? 'pga';
 
   return (
     <>
