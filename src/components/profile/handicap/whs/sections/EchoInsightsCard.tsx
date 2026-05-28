@@ -112,6 +112,7 @@ const HeroCard: React.FC<{
           style={{
             fontSize: 26, fontWeight: 800, letterSpacing: '-0.02em',
             lineHeight: 1.1, color: '#F8FAFC',
+            textShadow: '0 1px 3px rgba(0,0,0,0.6)',
           }}
         >
           {course.name || '—'}
