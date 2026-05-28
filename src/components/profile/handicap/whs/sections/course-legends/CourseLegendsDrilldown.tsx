@@ -1,10 +1,10 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { lookupCourseMetaV2 } from '@/lib/whs/courseNameMatcher';
-import { Crown } from 'lucide-react';
 import { useCourseLegends } from '@/hooks/gam/useCourseLegends';
 import { useCourseMeta } from '@/hooks/gam/useCourseMeta';
 import { useActiveActor } from '@/context/ActiveActorContext';
-import { Skeleton, EmptyStub, RetryStub } from '../../../gam/_shared/GamAtoms';
+import { Skeleton, RetryStub } from '../../../gam/_shared/GamAtoms';
+import { ChampionsEmptyState, ChampionsWindowEmptyState } from './drilldown/ChampionsEmptyState';
 import {
   legendCategoryLabel,
   legendCategoryIcon,
@@ -145,7 +145,7 @@ export const CourseLegendsDrilldown: React.FC<Props> = ({ selection, hideHeader 
     [data],
   );
   const activeWindowHasData = window === '90d' ? has90d : hasAllTime;
-  const otherWindowHasData = window === '90d' ? hasAllTime : has90d;
+  
 
   useEffect(() => {
     if (autoSwitchedRef.current) return;
@@ -287,37 +287,14 @@ export const CourseLegendsDrilldown: React.FC<Props> = ({ selection, hideHeader 
       )}
 
       {!isLoading && !isError && (data ?? []).length === 0 && (
-        <div style={{ padding: '20px 16px' }}>
-          <EmptyStub
-            icon={<Crown size={48} color={AMBER} style={{ opacity: 0.5 }} />}
-            title="No legends yet"
-            body="Once anyone posts a round here, the leaderboards spin up."
-          />
-        </div>
+        <ChampionsEmptyState courseName={ctx.courseName} />
       )}
 
       {!isLoading && !isError && (data ?? []).length > 0 && !activeWindowHasData && (
-        <div style={{ padding: '20px 16px' }}>
-          <EmptyStub
-            icon={<Crown size={44} color={AMBER} style={{ opacity: 0.5 }} />}
-            title={window === '90d' ? 'No legends in the last 90 days' : 'No all-time legends yet'}
-            body={
-              otherWindowHasData
-                ? (window === '90d'
-                    ? 'No rounds posted here recently. View all-time legends instead.'
-                    : 'Nothing in this window yet.')
-                : 'Once anyone posts a round here, the leaderboards spin up.'
-            }
-            cta={
-              otherWindowHasData
-                ? {
-                    label: window === '90d' ? 'View all-time' : 'View last 90 days',
-                    onClick: () => handleWindowChange(window === '90d' ? 'all_time' : '90d'),
-                  }
-                : undefined
-            }
-          />
-        </div>
+        <ChampionsWindowEmptyState
+          window={window}
+          onSwitch={() => handleWindowChange(window === '90d' ? 'all_time' : '90d')}
+        />
       )}
 
       {!isLoading && !isError && (data ?? []).length > 0 && activeWindowHasData && (

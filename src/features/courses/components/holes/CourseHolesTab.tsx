@@ -1,9 +1,11 @@
 import React, { useMemo, useState } from 'react';
 import { useCourseHoleAnalysis, type CourseHole } from '@/hooks/gam/useCourseHoleAnalysis';
+import { useCourseMeta } from '@/hooks/gam/useCourseMeta';
 import { HolesCredibilityHeader } from './HolesCredibilityHeader';
 import { HoleFeatureCards } from './HoleFeatureCards';
 import { HoleRow } from './HoleRow';
 import { HolesScoringKey } from './HolesScoringKey';
+import { HolesEmptyState } from './HolesEmptyState';
 import { AMBER, FONT, INK } from './_constants';
 
 interface Props {
@@ -12,6 +14,7 @@ interface Props {
 
 export const CourseHolesTab: React.FC<Props> = ({ courseId }) => {
   const { data, isLoading, isError } = useCourseHoleAnalysis(courseId);
+  const { data: meta } = useCourseMeta(courseId);
   const [sort, setSort] = useState<'hole' | 'difficulty'>('hole');
 
   const holes = data?.holes ?? [];
@@ -62,13 +65,7 @@ export const CourseHolesTab: React.FC<Props> = ({ courseId }) => {
   }
 
   if (!data?.available || holes.length === 0) {
-    return (
-      <div style={{ padding: '40px 18px', textAlign: 'center', fontFamily: FONT }}>
-        <div style={{ fontSize: 14, fontWeight: 600, color: '#64748b', lineHeight: 1.5 }}>
-          No hole-by-hole data yet for this course. Once rounds with hole scores are posted here, this fills in automatically.
-        </div>
-      </div>
-    );
+    return <HolesEmptyState courseName={meta?.course_name ?? null} />;
   }
 
   return (
