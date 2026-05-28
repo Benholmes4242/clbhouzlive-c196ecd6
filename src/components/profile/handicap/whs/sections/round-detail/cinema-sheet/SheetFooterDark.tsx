@@ -66,7 +66,7 @@ export const SheetFooterDark: React.FC<Props> = ({
           >
             <span
               style={{
-                fontSize: 18,
+                fontSize: 16,
                 fontWeight: 800,
                 color: 'var(--hcp-t-100)',
                 letterSpacing: '-0.01em',
