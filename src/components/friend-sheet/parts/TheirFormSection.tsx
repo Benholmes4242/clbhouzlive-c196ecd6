@@ -5,8 +5,6 @@ import {
   T100,
   T60,
   T40,
-  GOOD,
-  GOOD_TINT,
   AMBER,
   AMBER_TINT,
   BG_2,
@@ -38,8 +36,8 @@ export const TheirFormSection: React.FC<Props> = ({ handicap }) => {
   const isDeclining = !noData && (delta as number) > 0.3;
   const isFlat = !noData && !isImproving && !isDeclining;
 
-  const chipBg = isImproving ? GOOD_TINT : isDeclining ? AMBER_TINT : BG_2;
-  const chipColor = isImproving ? GOOD : isDeclining ? AMBER : T60;
+  const chipBg = isImproving ? 'var(--hcp-good-deep-tint)' : isDeclining ? AMBER_TINT : BG_2;
+  const chipColor = isImproving ? 'var(--hcp-good-deep)' : isDeclining ? AMBER : T60;
 
   return (
     <div style={{ padding: '4px 20px 14px', fontFamily: FONT }}>
