@@ -353,7 +353,7 @@ export const RivalryHeroCard: React.FC<Props> = ({
               Avg edge{' '}
               <strong
                 style={{
-                  color: tale.averageEdge < 0 ? tokens.edgeColor : '#EF4444',
+                  color: tale.averageEdge < 0 ? tokens.edgeColor : '#9F1D1D',
                 }}
               >
                 {tale.averageEdge < 0 ? MINUS : '+'}
