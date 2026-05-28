@@ -85,7 +85,7 @@ export const PulseCard: React.FC<Props> = ({ friend }) => {
         background: friend.hot
           ? 'linear-gradient(160deg, rgba(247,147,30,0.10) 0%, rgba(247,147,30,0.02) 50%, var(--hcp-bg-1) 100%)'
           : 'var(--hcp-bg-1)',
-        border: friend.hot ? '1px solid rgba(247,147,30,0.32)' : '1px solid var(--hcp-line)',
+        border: friend.hot ? '1px solid rgba(247,147,30,0.32)' : '1px solid rgba(255,255,255,0.04)',
         borderRadius: 13,
         cursor: 'pointer',
         boxShadow: friend.hot ? '0 0 24px -10px rgba(247,147,30,0.45)' : 'none',

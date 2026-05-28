@@ -66,14 +66,8 @@ const TrophyRoomEntryRow: React.FC<Props> = ({ userId, viewMode = 'owner', owner
           width: '100%',
           fontFamily: FONT,
           textAlign: 'left',
-          background:
-            weeklyCount > 0
-              ? 'linear-gradient(135deg, rgba(247,147,30,0.12) 0%, rgba(251,188,46,0.05) 100%)'
-              : 'linear-gradient(135deg, rgba(247,147,30,0.06) 0%, rgba(251,188,46,0.02) 100%)',
-          border:
-            weeklyCount > 0
-              ? '1px solid rgba(247,147,30,0.30)'
-              : '1px solid rgba(247,147,30,0.20)',
+          background: 'var(--hcp-bg-1)',
+          border: '1px solid var(--hcp-line)',
         }}
       >
         <div
@@ -104,7 +98,7 @@ const TrophyRoomEntryRow: React.FC<Props> = ({ userId, viewMode = 'owner', owner
                 style={{
                   fontSize: 13,
                   fontWeight: 700,
-                  color: '#FBBC2E',
+                  color: 'var(--hcp-t-100)',
                   letterSpacing: '-0.01em',
                   lineHeight: 1.2,
                 }}
@@ -142,7 +136,7 @@ const TrophyRoomEntryRow: React.FC<Props> = ({ userId, viewMode = 'owner', owner
         <ChevronRight
           size={16}
           strokeWidth={2.4}
-          color={weeklyCount > 0 ? '#FBBC2E' : 'rgba(251,188,46,0.6)'}
+          color={weeklyCount > 0 ? 'var(--hcp-t-40)' : 'rgba(251,188,46,0.6)'}
           style={{ flexShrink: 0 }}
         />
       </button>

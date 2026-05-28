@@ -36,11 +36,16 @@ function formatToday(): string {
 }
 
 function arcGradient(verdict: Verdict): { from: string; to: string } {
-  // Solid colour at both stops — eliminates the visible seam where the
-  // linear gradient wraps around the top/bottom of the ring (T8).
-  if (verdict === 'good') return { from: '#22C55E', to: '#22C55E' };
-  if (verdict === 'bad') return { from: '#EF4444', to: '#EF4444' };
-  return { from: '#F7931E', to: '#F7931E' };
+  // True two-stop ramp along the arc sweep.
+  if (verdict === 'good') return { from: '#22C55E', to: '#4ADE80' };
+  if (verdict === 'bad') return { from: '#EF4444', to: '#F87171' };
+  return { from: '#F7931E', to: '#FFB45A' };
+}
+
+function arcGlowColor(verdict: Verdict): string {
+  if (verdict === 'good') return 'rgba(34,197,94,0.35)';
+  if (verdict === 'bad') return 'rgba(239,68,68,0.35)';
+  return 'rgba(247,147,30,0.35)';
 }
 
 // Form temperature label removed — replaced by the ForecastCard below the hero.
@@ -123,6 +128,8 @@ const HeroHandicapCardDark: React.FC<Props> = ({ connection }) => {
   const dashOffset = CIRCUMFERENCE * (1 - fillFraction);
 
   const grad = arcGradient(verdict);
+  const glowColor = arcGlowColor(verdict);
+  const isMarginal = delta90 != null && Math.abs(delta90) < 0.3;
 
   // Scratch zone: half-step below current displayed value (e.g. 1.8 → 1.6).
   const scratchZone = useMemo(() => {
@@ -211,7 +218,14 @@ const HeroHandicapCardDark: React.FC<Props> = ({ connection }) => {
             aria-hidden
           >
             <defs>
-              <linearGradient id="hcp-arc-grad" x1="0%" y1="0%" x2="100%" y2="0%">
+              <linearGradient
+                id="hcp-arc-grad"
+                gradientUnits="userSpaceOnUse"
+                x1="0"
+                y1="0"
+                x2={RING_BOX}
+                y2={RING_BOX}
+              >
                 <stop offset="0%" stopColor={grad.from} />
                 <stop offset="100%" stopColor={grad.to} />
               </linearGradient>
@@ -222,7 +236,7 @@ const HeroHandicapCardDark: React.FC<Props> = ({ connection }) => {
               cy={RING_BOX / 2}
               r={CIRC_R}
               fill="none"
-              stroke="rgba(255,255,255,0.06)"
+              stroke="rgba(255,255,255,0.10)"
               strokeWidth={STROKE_W}
             />
             {/* Progress arc — clockwise for improvement, counterclockwise for regression.
@@ -242,6 +256,7 @@ const HeroHandicapCardDark: React.FC<Props> = ({ connection }) => {
                 transform: verdict === 'bad' ? 'scaleX(-1)' : undefined,
                 transformOrigin: 'center',
                 transformBox: 'fill-box',
+                filter: `drop-shadow(0 0 6px ${glowColor})`,
               }}
             />
           </svg>
@@ -288,9 +303,9 @@ const HeroHandicapCardDark: React.FC<Props> = ({ connection }) => {
                 </span>
                 <span
                   style={{
-                    fontSize: 52,
-                    fontWeight: 800,
-                    letterSpacing: '-0.04em',
+                    fontSize: 60,
+                    fontWeight: 700,
+                    letterSpacing: '-0.045em',
                     lineHeight: 1,
                     color: 'var(--hcp-t-100)',
                     fontVariantNumeric: 'tabular-nums',
@@ -304,7 +319,7 @@ const HeroHandicapCardDark: React.FC<Props> = ({ connection }) => {
                     fontWeight: 800,
                     letterSpacing: '0.18em',
                     textTransform: 'uppercase',
-                    color: 'var(--hcp-t-60)',
+                    color: 'var(--hcp-t-40)',
                     marginTop: 10,
                   }}
                 >
@@ -356,20 +371,23 @@ const HeroHandicapCardDark: React.FC<Props> = ({ connection }) => {
                 gap: 6,
                 padding: '5px 12px',
                 borderRadius: 999,
-                background:
-                  verdict === 'good' ? 'rgba(34, 197, 94, 0.14)' :
-                  verdict === 'bad'  ? 'rgba(239, 68, 68, 0.14)' :
-                  'rgba(247, 147, 30, 0.14)',
-                border:
-                  verdict === 'good' ? '1px solid rgba(34, 197, 94, 0.25)' :
-                  verdict === 'bad'  ? '1px solid rgba(239, 68, 68, 0.25)' :
-                  '1px solid rgba(247, 147, 30, 0.25)',
+                background: isMarginal
+                  ? 'rgba(255,255,255,0.04)'
+                  : verdict === 'good' ? 'rgba(34, 197, 94, 0.14)'
+                  : verdict === 'bad'  ? 'rgba(239, 68, 68, 0.14)'
+                  : 'rgba(247, 147, 30, 0.14)',
+                border: isMarginal
+                  ? '1px solid rgba(255,255,255,0.10)'
+                  : verdict === 'good' ? '1px solid rgba(34, 197, 94, 0.25)'
+                  : verdict === 'bad'  ? '1px solid rgba(239, 68, 68, 0.25)'
+                  : '1px solid rgba(247, 147, 30, 0.25)',
                 fontSize: 12,
                 fontWeight: 700,
-                color:
-                  verdict === 'good' ? '#4ADE80' :
-                  verdict === 'bad'  ? '#F87171' :
-                  '#F7931E',
+                color: isMarginal
+                  ? 'var(--hcp-t-80)'
+                  : verdict === 'good' ? '#4ADE80'
+                  : verdict === 'bad'  ? '#F87171'
+                  : '#F7931E',
                 letterSpacing: '0.02em',
                 fontVariantNumeric: 'tabular-nums',
               }}
@@ -379,7 +397,7 @@ const HeroHandicapCardDark: React.FC<Props> = ({ connection }) => {
                 height="11"
                 viewBox="0 0 24 24"
                 fill="none"
-                stroke="currentColor"
+                stroke={isMarginal ? 'var(--hcp-t-60)' : 'currentColor'}
                 strokeWidth="3"
                 strokeLinecap="round"
                 aria-hidden
@@ -399,7 +417,7 @@ const HeroHandicapCardDark: React.FC<Props> = ({ connection }) => {
                 )}
               </svg>
               {Math.abs(delta90).toFixed(1)} over 90 days
-              {verdict === 'good' && (
+              {verdict === 'good' && !isMarginal && (
                 <span style={{ fontSize: 13, lineHeight: 1, marginLeft: 2 }}>🔥</span>
               )}
             </span>

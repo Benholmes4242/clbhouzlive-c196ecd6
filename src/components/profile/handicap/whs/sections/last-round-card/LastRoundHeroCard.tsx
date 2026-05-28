@@ -130,7 +130,7 @@ const LastRoundHeroCard: React.FC<Props> = ({ round, timeAgo, onClick, viewMode 
       : 'var(--hcp-t-100)';
 
   const verdictTintGradient = isWorse
-    ? 'linear-gradient(180deg, transparent 0%, rgba(220, 38, 38, 0.22) 70%, rgba(220, 38, 38, 0.34) 100%)'
+    ? 'linear-gradient(180deg, transparent 0%, rgba(180, 50, 30, 0.22) 70%, rgba(180, 50, 30, 0.34) 100%)'
     : isBetter
       ? 'linear-gradient(180deg, transparent 0%, rgba(34, 197, 94, 0.22) 70%, rgba(34, 197, 94, 0.32) 100%)'
       : 'none';
@@ -297,7 +297,8 @@ const LastRoundHeroCard: React.FC<Props> = ({ round, timeAgo, onClick, viewMode 
               fontWeight: 700,
               letterSpacing: '0.1em',
               textTransform: 'uppercase',
-              color: 'var(--hcp-t-60)',
+              color: 'rgba(255,255,255,0.78)',
+              textShadow: '0 1px 3px rgba(0,0,0,0.6)',
             }}
           >
             {par != null && <>PAR {par}</>}
@@ -345,13 +346,14 @@ const LastRoundHeroCard: React.FC<Props> = ({ round, timeAgo, onClick, viewMode 
                 lineHeight: 1,
                 color: diffColor,
                 fontFeatureSettings: '"tnum" 1',
+                textShadow: '0 2px 8px rgba(0,0,0,0.5)',
               }}
             >
               {diffDisplay}
             </span>
           </div>
 
-          <div style={{ display: 'flex', alignItems: 'flex-end', gap: 16 }}>
+          <div style={{ display: 'flex', alignItems: 'flex-end', gap: 16, paddingBottom: 4 }}>
             {gross != null && <SecondaryStat label="Gross" value={String(gross)} />}
             {stableford != null && (
               <SecondaryStat label="Stbl" value={String(stableford)} />

@@ -47,6 +47,41 @@ function weatherGlyph(code: number | null | undefined): string {
   return '☀';
 }
 
+/**
+ * Custom inline-SVG weather glyph. Replaces emoji for the clear (0) and
+ * partly-cloudy (1–2) cases; falls back to the emoji string for every
+ * other code so we don't lose coverage.
+ */
+const WeatherGlyph: React.FC<{ code: number | null | undefined }> = ({ code }) => {
+  if (code == null) return null;
+  if (code === 0 || code <= 2) {
+    // Sun — filled circle r≈4 + 8 short rays in a 16x16 viewBox.
+    return (
+      <svg
+        width={13}
+        height={13}
+        viewBox="0 0 16 16"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth={1.4}
+        strokeLinecap="round"
+        aria-hidden
+      >
+        <circle cx="8" cy="8" r="3.2" fill="currentColor" stroke="none" />
+        <line x1="8" y1="1.2" x2="8" y2="3" />
+        <line x1="8" y1="13" x2="8" y2="14.8" />
+        <line x1="1.2" y1="8" x2="3" y2="8" />
+        <line x1="13" y1="8" x2="14.8" y2="8" />
+        <line x1="3.2" y1="3.2" x2="4.5" y2="4.5" />
+        <line x1="11.5" y1="11.5" x2="12.8" y2="12.8" />
+        <line x1="12.8" y1="3.2" x2="11.5" y2="4.5" />
+        <line x1="4.5" y1="11.5" x2="3.2" y2="12.8" />
+      </svg>
+    );
+  }
+  return <>{weatherGlyph(code)}</>;
+};
+
 function normaliseCourseName(raw: string): string {
   return raw
     .toLowerCase()
@@ -156,10 +191,10 @@ const TodayGreeting: React.FC<Props> = ({ connectionId, userId }) => {
     >
       <div
         style={{
-          fontSize: 22,
-          fontWeight: 800,
-          letterSpacing: '-0.01em',
-          lineHeight: 1.15,
+          fontSize: 26,
+          fontWeight: 700,
+          letterSpacing: '-0.02em',
+          lineHeight: 1.12,
           color: 'var(--hcp-t-100)',
         }}
       >
@@ -191,8 +226,8 @@ const TodayGreeting: React.FC<Props> = ({ connectionId, userId }) => {
             <>
               <span style={{ opacity: 0.4 }}>·</span>
               <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5 }}>
-                <span style={{ color: '#F7931E', fontSize: 13, lineHeight: 1 }}>
-                  {weatherGlyph(weather.code)}
+                <span style={{ color: '#F7931E', display: 'inline-flex', lineHeight: 0 }}>
+                  <WeatherGlyph code={weather.code} />
                 </span>
                 <span>Now</span>
                 <span
@@ -204,7 +239,7 @@ const TodayGreeting: React.FC<Props> = ({ connectionId, userId }) => {
                   {Math.round(weather.tempNow)}°
                 </span>
               </span>
-              {weather.tempMax != null && (
+              {weather.tempMax != null && Math.round(weather.tempMax) - Math.round(weather.tempNow) >= 2 && (
                 <>
                   <span style={{ opacity: 0.4 }}>·</span>
                   <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5 }}>

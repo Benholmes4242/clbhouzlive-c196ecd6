@@ -128,8 +128,8 @@ const NextRoundWatch: React.FC<Props> = ({ connectionId, currentHandicap }) => {
             <span
               style={{
                 fontSize: 72,
-                fontWeight: 800,
-                letterSpacing: '-0.05em',
+                fontWeight: 700,
+                letterSpacing: '-0.045em',
                 lineHeight: 0.95,
                 color: 'var(--hcp-good)',
                 fontVariantNumeric: 'tabular-nums',
@@ -237,7 +237,7 @@ const NextRoundWatch: React.FC<Props> = ({ connectionId, currentHandicap }) => {
               <div
                 style={{
                   position: 'relative',
-                  height: 6,
+                  height: 4,
                   background: 'var(--hcp-bg-3)',
                   borderRadius: 999,
                 }}
@@ -267,7 +267,7 @@ const NextRoundWatch: React.FC<Props> = ({ connectionId, currentHandicap }) => {
                     borderRadius: '50%',
                     background: 'var(--hcp-good)',
                     border: '2px solid var(--hcp-bg-1)',
-                    boxShadow: '0 0 0 1px var(--hcp-good)',
+                    boxShadow: '0 0 0 1px var(--hcp-good), 0 1px 3px rgba(0,0,0,0.4)',
                     transform: 'translate(-50%, -50%)',
                     zIndex: 2,
                   }}
@@ -284,7 +284,7 @@ const NextRoundWatch: React.FC<Props> = ({ connectionId, currentHandicap }) => {
                     borderRadius: '50%',
                     background: verdictColor,
                     border: '2px solid var(--hcp-bg-1)',
-                    boxShadow: `0 0 0 1px ${verdictColor}`,
+                    boxShadow: `0 0 0 1px ${verdictColor}, 0 1px 3px rgba(0,0,0,0.4)`,
                     transform: 'translate(-50%, -50%)',
                     zIndex: 3,
                   }}
@@ -365,7 +365,9 @@ const NextRoundWatch: React.FC<Props> = ({ connectionId, currentHandicap }) => {
             eyebrow="If you don't"
             eyebrowColor="var(--hcp-t-60)"
             value={settle.toFixed(1)}
-            valueColor="var(--hcp-t-100)"
+            valueColor="var(--hcp-t-80)"
+            valueSize={26}
+            valueWeight={700}
             prose={
               <>
                 Any score above{' '}
@@ -391,7 +393,9 @@ const PathCell: React.FC<{
   valueColor: string;
   prose: React.ReactNode;
   borderRight?: boolean;
-}> = ({ eyebrow, eyebrowColor, value, valueColor, prose, borderRight }) => (
+  valueSize?: number;
+  valueWeight?: number;
+}> = ({ eyebrow, eyebrowColor, value, valueColor, prose, borderRight, valueSize = 30, valueWeight = 800 }) => (
   <div
     style={{
       display: 'flex',
@@ -404,8 +408,8 @@ const PathCell: React.FC<{
   >
     <span
       style={{
-        fontSize: 30,
-        fontWeight: 800,
+        fontSize: valueSize,
+        fontWeight: valueWeight,
         letterSpacing: '-0.03em',
         lineHeight: 1,
         color: valueColor,

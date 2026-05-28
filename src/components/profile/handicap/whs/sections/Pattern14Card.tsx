@@ -147,6 +147,7 @@ const Pattern14Card: React.FC<Props> = ({ connectionId }) => {
           <div style={{ padding: '20px 16px 14px' }}>
             <div
               style={{
+                position: 'relative',
                 display: 'flex',
                 alignItems: 'flex-end',
                 gap: 4,
@@ -173,6 +174,17 @@ const Pattern14Card: React.FC<Props> = ({ connectionId }) => {
                   />
                 );
               })}
+              <div
+                aria-hidden
+                style={{
+                  position: 'absolute',
+                  bottom: 0,
+                  left: 0,
+                  right: 0,
+                  height: 1,
+                  background: 'var(--hcp-line-2)',
+                }}
+              />
             </div>
             <div
               style={{
@@ -232,7 +244,7 @@ const Pattern14Card: React.FC<Props> = ({ connectionId }) => {
                   display: 'flex',
                   alignItems: 'flex-end',
                   gap: 3,
-                  height: 28,
+                  height: 22,
                 }}
               >
                 {olderRounds.map((r) => (
@@ -283,14 +295,6 @@ const PatternBar: React.FC<{
         ? 'linear-gradient(180deg, var(--hcp-bad) 0%, rgba(239, 68, 68, 0.5) 100%)'
         : 'var(--hcp-bg-3)';
 
-  const isBlowUp = delta != null && Math.abs(delta) >= 5;
-  const glow =
-    isBlowUp && bucket === 'worse'
-      ? '0 0 8px rgba(239, 68, 68, 0.45)'
-      : isBlowUp && bucket === 'better'
-        ? '0 0 8px rgba(34, 197, 94, 0.45)'
-        : undefined;
-
   const inner = (
     <div
       style={{
@@ -298,7 +302,6 @@ const PatternBar: React.FC<{
         height: `${heightPct * 100}%`,
         background: fill,
         borderRadius: '3px 3px 0 0',
-        boxShadow: glow,
         transition: 'transform 120ms ease',
       }}
     />
@@ -310,7 +313,7 @@ const PatternBar: React.FC<{
     display: 'flex',
     flexDirection: 'column',
     justifyContent: 'flex-end',
-    opacity: faded ? 0.55 : 1,
+    opacity: faded ? 0.45 : 1,
   };
 
   if (onClick) {
