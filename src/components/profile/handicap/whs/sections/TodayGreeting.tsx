@@ -191,10 +191,10 @@ const TodayGreeting: React.FC<Props> = ({ connectionId, userId }) => {
     >
       <div
         style={{
-          fontSize: 22,
-          fontWeight: 800,
-          letterSpacing: '-0.01em',
-          lineHeight: 1.15,
+          fontSize: 26,
+          fontWeight: 700,
+          letterSpacing: '-0.02em',
+          lineHeight: 1.12,
           color: 'var(--hcp-t-100)',
         }}
       >
