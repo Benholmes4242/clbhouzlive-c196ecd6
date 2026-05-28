@@ -370,8 +370,8 @@ const CourseRow: React.FC<{
             width: `${magFrac * 100}%`,
             background:
               course.delta < 0
-                ? 'linear-gradient(90deg, rgba(34,197,94,0.14) 0%, transparent 100%)'
-                : 'linear-gradient(90deg, rgba(239,68,68,0.14) 0%, transparent 100%)',
+                ? 'linear-gradient(90deg, rgba(5,150,105,0.16) 0%, transparent 100%)'
+                : 'linear-gradient(90deg, rgba(159,29,29,0.16) 0%, transparent 100%)',
             opacity: 0.5,
             pointerEvents: 'none',
             zIndex: 0,
@@ -437,12 +437,12 @@ const CourseRow: React.FC<{
             <Pill
               label={`Best ${fmtDelta(course.best_differential - course.expected_differential)}`}
               color={T.greenInk}
-              bg="rgba(34,197,94,0.10)"
+              bg="rgba(5,150,105,0.12)"
             />
             <Pill
               label={`Worst ${fmtDelta(course.worst_differential - course.expected_differential)}`}
               color={T.redInk}
-              bg="rgba(220,38,38,0.10)"
+              bg="rgba(159,29,29,0.12)"
             />
           </div>
         ) : (
