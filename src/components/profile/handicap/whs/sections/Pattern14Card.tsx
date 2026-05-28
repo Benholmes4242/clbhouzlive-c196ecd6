@@ -147,6 +147,7 @@ const Pattern14Card: React.FC<Props> = ({ connectionId }) => {
           <div style={{ padding: '20px 16px 14px' }}>
             <div
               style={{
+                position: 'relative',
                 display: 'flex',
                 alignItems: 'flex-end',
                 gap: 4,
@@ -173,6 +174,17 @@ const Pattern14Card: React.FC<Props> = ({ connectionId }) => {
                   />
                 );
               })}
+              <div
+                aria-hidden
+                style={{
+                  position: 'absolute',
+                  bottom: 0,
+                  left: 0,
+                  right: 0,
+                  height: 1,
+                  background: 'var(--hcp-line-2)',
+                }}
+              />
             </div>
             <div
               style={{
