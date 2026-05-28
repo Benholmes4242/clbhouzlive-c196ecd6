@@ -320,7 +320,7 @@ export const TrophyRoomSheet: React.FC<Props> = ({ userId, viewerUserId, ownerFi
             style={{
               fontSize: 12,
               color: 'var(--hcp-t-60)',
-              marginTop: 8,
+              marginTop: 6,
               display: 'flex',
               gap: 12,
               flexWrap: 'wrap',
