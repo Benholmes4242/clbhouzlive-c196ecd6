@@ -1,4 +1,5 @@
 import React from 'react';
+import { ArrowLeftRight, TrendingUp, Trophy, Star } from 'lucide-react';
 import { AMBER, BG_1, T100, T60, LINE, FONT } from './_shared/tokens';
 
 interface Perk {
@@ -16,10 +17,10 @@ interface Props {
 }
 
 const DEFAULT_PERKS: Perk[] = [
-  { icon: <ArrowsExchangeIcon />, title: 'Head-to-heads', sub: 'Compare on shared rounds' },
-  { icon: <TrendUpIcon />, title: 'Form & trends', sub: 'Handicaps side by side' },
-  { icon: <TrophyIcon />, title: 'Course records', sub: 'Who holds what, where' },
-  { icon: <StarIcon />, title: 'Birdies & streaks', sub: 'Yearly tallies vs theirs' },
+  { icon: <ArrowLeftRight size={16} strokeWidth={2.2} />, title: 'Head-to-heads', sub: 'Compare on shared rounds' },
+  { icon: <TrendingUp size={16} strokeWidth={2.2} />, title: 'Form & trends', sub: 'Handicaps side by side' },
+  { icon: <Trophy size={16} strokeWidth={2.2} />, title: 'Course records', sub: 'Who holds what, where' },
+  { icon: <Star size={16} strokeWidth={2.2} />, title: 'Birdies & streaks', sub: 'Yearly tallies vs theirs' },
 ];
 
 export const UnsyncedPitchCard: React.FC<Props> = ({
@@ -149,33 +150,3 @@ const PerkTile: React.FC<Perk> = ({ icon, title, sub }) => (
   </div>
 );
 
-function ArrowsExchangeIcon() {
-  return (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M8 21V9l-4 4M16 3v12l4-4" />
-    </svg>
-  );
-}
-function TrendUpIcon() {
-  return (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M3 18l5-6 4 3 7-9" />
-      <path d="M14 6h6v6" />
-    </svg>
-  );
-}
-function TrophyIcon() {
-  return (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-      <circle cx="12" cy="9" r="5" />
-      <path d="M9 14l-1 7 4-3 4 3-1-7" />
-    </svg>
-  );
-}
-function StarIcon() {
-  return (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M12 3l2 5 5 .5-4 3.5 1.5 5L12 14l-4.5 3 1.5-5-4-3.5 5-.5z" />
-    </svg>
-  );
-}
