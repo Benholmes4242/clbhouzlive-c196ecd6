@@ -27,7 +27,7 @@ export const TierRow: React.FC<Props> = ({ tier, metric, isShowpiece = false }) 
         display: 'flex',
         alignItems: 'center',
         gap: 12,
-        padding: '10px 0',
+        padding: '8px 0',
         borderBottom: '0.5px solid var(--hcp-line)',
         opacity: earned ? 1 : 0.55,
         fontFamily: GAM.FONT_GEIST,
