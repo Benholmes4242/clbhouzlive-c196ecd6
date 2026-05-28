@@ -233,7 +233,7 @@ export const FriendSheet: React.FC<FriendSheetProps> = ({
             background: BG_0,
             borderTopLeftRadius: 20,
             borderTopRightRadius: 20,
-            maxHeight: '88vh',
+            maxHeight: '75dvh',
             minHeight: 0,
             overflow: 'hidden',
             display: 'flex',
