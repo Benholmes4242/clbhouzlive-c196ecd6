@@ -139,10 +139,10 @@ export const SheetHeader: React.FC<SheetHeaderProps> = ({
       {bio && (
         <p
           style={{
-            margin: '10px 0 0',
-            fontSize: 14,
+            margin: '8px 0 0',
+            fontSize: 13,
             color: T100,
-            lineHeight: 1.45,
+            lineHeight: 1.4,
           }}
         >
           {bio}
