@@ -155,11 +155,11 @@ export function deriveHeroState(
   };
 }
 
-// ---------- Top-10 ticker ---------------------------------------------------
+// ---------- Top-20 ticker ---------------------------------------------------
 
 export function deriveTickerRows(leaderboard: any[]): TickerRow[] {
   if (!leaderboard) return [];
-  return leaderboard.slice(0, 10).map(entry => {
+  return leaderboard.slice(0, 20).map(entry => {
     const player = entry.player;
     const last = player?.last_name;
     const full = player?.full_name || `${player?.first_name ?? ''} ${player?.last_name ?? ''}`.trim();

@@ -1,5 +1,5 @@
 /**
- * Ticker — Live state auto-scrolling top-10 marquee.
+ * Ticker — Live state auto-scrolling top-20 marquee.
  * §5.1 of HYBRID_HERO_IMPLEMENTATION_BRIEF.
  */
 
@@ -14,7 +14,7 @@ import type { TickerRow } from '../HybridHero.utils';
 import { fmtScore } from '../HybridHero.utils';
 
 // Pass 5.7: localized — was a shared constant with only this consumer.
-// Height of the live-state top-10 ticker band rendered inside MiddleBand.
+// Height of the live-state top-20 ticker band rendered inside MiddleBand.
 const TICKER_HEIGHT = 40;
 
 interface TickerProps {
@@ -74,7 +74,7 @@ export function Ticker({ rows }: TickerProps) {
           alignItems: 'center',
         }}
       >
-        ↻ TOP 10
+        TOP 20
       </div>
       {/* Marquee track */}
       <div style={{ flex: 1, overflow: 'hidden', position: 'relative' }}>
