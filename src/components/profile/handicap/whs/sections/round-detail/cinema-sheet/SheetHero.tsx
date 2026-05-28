@@ -18,8 +18,8 @@ export const SheetHero: React.FC<Props> = ({ imageUrl, onClose, topEyebrow, topR
     style={{
       position: 'relative',
       width: '100%',
-      minHeight: 340,
-      flex: '1 0 340px',
+      minHeight: 280,
+      flex: '1 0 280px',
       background: FALLBACK,
       overflow: 'hidden',
     }}
