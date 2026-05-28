@@ -169,9 +169,7 @@ const MiniCard: React.FC<{
           position: 'absolute', top: 10, right: 10,
           padding: '3px 7px', borderRadius: 6,
           fontSize: 11, fontWeight: 800, letterSpacing: '-0.01em',
-          background: 'rgba(5,8,16,0.75)',
-          backdropFilter: 'blur(8px)',
-          WebkitBackdropFilter: 'blur(8px)',
+          background: 'rgba(5,8,16,0.82)',
           color: accent,
           fontVariantNumeric: 'tabular-nums',
         }}
