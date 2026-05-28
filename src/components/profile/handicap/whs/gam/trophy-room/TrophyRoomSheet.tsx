@@ -379,7 +379,7 @@ export const TrophyRoomSheet: React.FC<Props> = ({ userId, viewerUserId, ownerFi
                   height: 32,
                   padding: '0 10px',
                   borderRadius: 8,
-                  border: active ? '1px solid rgba(255,255,255,0.55)' : '1px solid transparent',
+                  border: active ? '1px solid rgba(255,255,255,0.30)' : '1px solid transparent',
                   background: active ? 'rgba(255,255,255,0.10)' : 'transparent',
                   color: active ? '#FFFFFF' : 'var(--hcp-t-60)',
                   fontFamily: 'inherit',
