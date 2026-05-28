@@ -1,6 +1,5 @@
 import React from 'react';
 import { type LucideIcon } from 'lucide-react';
-import { rankTier } from './_shared/helpers';
 import type { LegendCategory } from '@/lib/gam/types';
 
 interface NavCategory {
@@ -26,24 +25,15 @@ export const CategoryNavRail: React.FC<Props> = ({ categories, onSelect }) => (
       background: 'var(--hcp-bg-0)',
       borderTop: '1px solid var(--hcp-line)',
       borderBottom: '1px solid var(--hcp-line)',
-      padding: '12px 12px',
+      padding: '12px 14px',
       marginTop: 22,
     }}
   >
-    <div
-      style={{
-        display: 'flex',
-        gap: 6,
-        overflowX: 'auto',
-        scrollbarWidth: 'none',
-        WebkitOverflowScrolling: 'touch',
-      }}
-    >
+    <div style={{ display: 'flex', gap: 7, overflowX: 'auto', scrollbarWidth: 'none', WebkitOverflowScrolling: 'touch' }}>
       {categories.map((cat) => {
         const CatIcon = cat.icon;
         const r = cat.yourRank;
-        const isHeld = r === 1;
-        const tier = r != null ? rankTier(r) : null;
+        const held = r === 1;
 
         return (
           <button
@@ -53,37 +43,50 @@ export const CategoryNavRail: React.FC<Props> = ({ categories, onSelect }) => (
               flexShrink: 0,
               display: 'inline-flex',
               alignItems: 'center',
-              gap: 6,
-              padding: '7px 12px',
-              borderRadius: 9,
-              background: isHeld
-                ? 'linear-gradient(180deg, var(--hcp-accent-util-tint), var(--hcp-accent-util-tint-2))'
-                : 'rgba(255,255,255,0.025)',
-              border: isHeld
-                ? '1px solid var(--hcp-accent-util-border)'
-                : '1px solid rgba(255,255,255,0.04)',
-              color: isHeld ? 'var(--hcp-accent-util)' : 'var(--hcp-t-80)',
-              fontSize: 11,
-              fontWeight: 700,
-              fontFamily: FONT,
+              gap: 7,
+              padding: '6px 7px 6px 11px',
+              borderRadius: 999,
+              background: 'transparent',
+              border: '1px solid var(--hcp-pill-border, rgba(15,23,42,0.12))',
               cursor: 'pointer',
               whiteSpace: 'nowrap',
-              letterSpacing: '0.01em',
             }}
           >
-            <CatIcon size={11} strokeWidth={2.4} />
-            {cat.short}
+            <span
+              style={{
+                fontSize: 11,
+                fontWeight: 700,
+                color: 'var(--hcp-t-70, #5a6573)',
+                fontFamily: FONT,
+                letterSpacing: '0.01em',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 5,
+              }}
+            >
+              <CatIcon size={11} strokeWidth={2.4} />
+              {cat.short}
+            </span>
             {r != null && (
               <span
                 style={{
-                  marginLeft: 1,
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  minWidth: 20,
+                  height: 20,
+                  padding: '0 5px',
+                  borderRadius: 999,
+                  background: held ? 'var(--hcp-pill-rank-held-bg, #0F172A)' : 'var(--hcp-pill-rank-bg, rgba(15,23,42,0.05))',
+                  color: held ? '#fff' : 'var(--hcp-t-60, #5a6573)',
+                  fontSize: 11,
                   fontWeight: 800,
-                  color: isHeld ? 'var(--hcp-accent-util)' : tier?.color ?? 'var(--hcp-t-60)',
+                  fontFamily: 'Geist Mono, monospace',
                   fontVariantNumeric: 'tabular-nums',
-                  letterSpacing: '-0.01em',
+                  letterSpacing: '-0.02em',
                 }}
               >
-                #{r}
+                {r}
               </span>
             )}
           </button>
@@ -92,3 +95,5 @@ export const CategoryNavRail: React.FC<Props> = ({ categories, onSelect }) => (
     </div>
   </div>
 );
+
+export default CategoryNavRail;

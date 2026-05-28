@@ -12,45 +12,22 @@ interface CellProps {
   label: string;
   value: string;
   sub?: string;
+  showDivider?: boolean;
 }
 
-const Cell: React.FC<CellProps> = ({ label, value, sub }) => (
-  <div style={{ display: 'flex', flexDirection: 'column', gap: 4, minWidth: 0, alignItems: 'center', textAlign: 'center' }}>
-    <div
-      style={{
-        fontSize: 10,
-        fontWeight: 700,
-        color: 'var(--hcp-t-40)',
-        letterSpacing: '0.12em',
-        textTransform: 'uppercase',
-        fontFamily: FONT,
-      }}
-    >
+const Cell: React.FC<CellProps> = ({ label, value, sub, showDivider }) => (
+  <div style={{ display: 'flex', flexDirection: 'column', gap: 6, minWidth: 0, alignItems: 'center', textAlign: 'center', position: 'relative', padding: '0 4px' }}>
+    {showDivider && (
+      <div aria-hidden style={{ position: 'absolute', left: 0, top: '10%', height: '80%', width: 1, background: 'rgba(15,23,42,0.07)' }} />
+    )}
+    <div style={{ fontSize: 9.5, fontWeight: 700, color: '#aab4c0', letterSpacing: '0.14em', textTransform: 'uppercase', fontFamily: FONT }}>
       {label}
     </div>
-    <div
-      style={{
-        fontSize: 22,
-        fontWeight: 700,
-        color: 'var(--hcp-t-100)',
-        letterSpacing: '-0.02em',
-        lineHeight: 1,
-        fontVariantNumeric: 'tabular-nums',
-        fontFamily: FONT,
-      }}
-    >
+    <div style={{ fontSize: 25, fontWeight: 300, color: 'var(--hcp-t-100)', letterSpacing: '-0.03em', lineHeight: 1, fontVariantNumeric: 'tabular-nums', fontFamily: FONT }}>
       {value}
     </div>
     {sub && (
-      <div
-        style={{
-          fontSize: 10.5,
-          fontWeight: 600,
-          color: 'var(--hcp-t-60)',
-          letterSpacing: '0.04em',
-          fontFamily: FONT,
-        }}
-      >
+      <div style={{ fontSize: 10, fontWeight: 500, color: '#9aa6b2', letterSpacing: '0.01em', fontFamily: FONT }}>
         {sub}
       </div>
     )}
@@ -82,34 +59,40 @@ export const ChampionsCoursePulsePanel: React.FC<Props> = ({ meta }) => {
       : '—';
   const avgSub = 'over par';
 
+  const cells: CellProps[] = [
+    { label: 'CR', value: crValue, sub: crSub },
+    { label: 'Slope', value: slopeValue, sub: slopeSub },
+    { label: 'Hardest', value: hardestValue, sub: hardestSub },
+    { label: 'Avg', value: avgValue, sub: avgSub },
+  ];
+
   return (
     <div style={{ background: 'var(--hcp-bg-0)' }}>
       <div style={{ height: 1, background: AMBER }} aria-hidden />
       <div
         style={{
-          padding: '10px 16px 0',
+          padding: '10px 18px 0',
           fontSize: 10,
           fontWeight: 800,
           color: AMBER,
-          letterSpacing: '0.14em',
+          letterSpacing: '0.18em',
           textTransform: 'uppercase',
           fontFamily: FONT,
         }}
       >
-        ↘ Course pulse
+        Course pulse
       </div>
       <div
         style={{
-          padding: '12px 16px 16px',
+          padding: '12px 18px 16px',
           display: 'grid',
           gridTemplateColumns: 'repeat(4, 1fr)',
           gap: 10,
         }}
       >
-        <Cell label="CR" value={crValue} sub={crSub} />
-        <Cell label="Slope" value={slopeValue} sub={slopeSub} />
-        <Cell label="Hardest" value={hardestValue} sub={hardestSub} />
-        <Cell label="Avg" value={avgValue} sub={avgSub} />
+        {cells.map((c, i) => (
+          <Cell key={c.label} {...c} showDivider={i > 0} />
+        ))}
       </div>
     </div>
   );
