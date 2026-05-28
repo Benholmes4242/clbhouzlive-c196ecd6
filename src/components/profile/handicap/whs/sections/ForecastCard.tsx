@@ -1,4 +1,5 @@
 import React from 'react';
+import { AlertTriangle, Flame } from 'lucide-react';
 import { useAllScores } from '@/lib/whs/hooks';
 import { useHandicapTrend } from '@/lib/whs/hooks';
 import { buildForecast, type Forecast, type CounterCell } from '@/lib/whs/forecast';
@@ -14,16 +15,16 @@ const T = {
   textHi: 'var(--hcp-t-100)',
   textMid: 'var(--hcp-t-60)',
   textLow: 'var(--hcp-t-40)',
-  good: '#22C55E',
-  goodBgTint: 'rgba(34,197,94,0.06)',
-  goodBorder: 'rgba(34,197,94,0.30)',
-  goodPill: 'rgba(34,197,94,0.14)',
-  goodFill: 'rgba(34,197,94,0.30)',
-  goodFillBorder: 'rgba(34,197,94,0.50)',
-  bad: '#EF4444',
-  badBgTint: 'rgba(239,68,68,0.06)',
-  badBorder: 'rgba(239,68,68,0.30)',
-  badPill: 'rgba(239,68,68,0.14)',
+  good: 'var(--hcp-good-deep)',
+  goodBgTint: 'rgba(5,150,105,0.08)',
+  goodBorder: 'rgba(5,150,105,0.35)',
+  goodPill: 'rgba(5,150,105,0.16)',
+  goodFill: 'rgba(5,150,105,0.32)',
+  goodFillBorder: 'rgba(5,150,105,0.55)',
+  bad: 'var(--hcp-bad-deep)',
+  badBgTint: 'rgba(159,29,29,0.10)',
+  badBorder: 'rgba(159,29,29,0.40)',
+  badPill: 'rgba(159,29,29,0.18)',
   amber: '#F7931E',
   amberFill: 'rgba(247,147,30,0.30)',
   amberFillBorder: 'rgba(247,147,30,0.50)',
@@ -175,7 +176,7 @@ const Headline: React.FC<{
     <span
       style={{
         fontSize: 56,
-        fontWeight: 800,
+        fontWeight: 700,
         letterSpacing: '-0.045em',
         lineHeight: 0.95,
         color: numberColor,
@@ -572,7 +573,7 @@ const NormalCard: React.FC<{ f: Forecast; tone: 'good' | 'amber' | 'neutral'; ct
 
 const SharpDropCard: React.FC<{ f: Forecast; ctx: CopyCtx }> = ({ f, ctx }) => (
   <CardShell borderColor={T.goodBorder} bgTint={T.goodBgTint}>
-    <EyebrowRow left="🔥 On a tear" right={f.whenLabel ?? undefined} color={T.good} />
+    <EyebrowRow left={<span style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}><Flame size={12} strokeWidth={2.5} /> On a tear</span>} right={f.whenLabel ?? undefined} color={T.good} />
     <Headline
       numberValue={(f.projected ?? 0).toFixed(1)}
       numberColor={T.good}
@@ -611,7 +612,7 @@ const SharpRiseCard: React.FC<{ f: Forecast; ctx: CopyCtx }> = ({ f, ctx }) => {
   const cutTarget = f.cutTarget;
   return (
     <CardShell borderColor={T.badBorder} bgTint={T.badBgTint}>
-      <EyebrowRow left="⚠ Form alert" right={f.whenLabel ?? undefined} color={T.bad} />
+      <EyebrowRow left={<span style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}><AlertTriangle size={12} strokeWidth={2.5} /> Form alert</span>} right={f.whenLabel ?? undefined} color={T.bad} />
       <Headline
         numberValue={(f.projected ?? 0).toFixed(1)}
         numberColor={T.bad}

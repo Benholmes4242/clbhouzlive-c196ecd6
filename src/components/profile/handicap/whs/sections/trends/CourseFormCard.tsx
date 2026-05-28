@@ -24,8 +24,8 @@ const T = {
   amberDeep: '#C97211',
   amberTint: 'rgba(247,147,30,0.10)',
   amberInk: '#854F0B',
-  greenInk: '#065F46',
-  redInk: '#991B1B',
+  greenInk: 'var(--hcp-good-deep)',
+  redInk: 'var(--hcp-bad-deep)',
   slateTint: 'var(--hcp-bg-2)',
   ink04: 'var(--hcp-bg-2)',
   ink08: 'var(--hcp-line-2)',
@@ -84,20 +84,6 @@ function deltaColor(d: number): string {
   return T.inkMute;
 }
 
-/**
- * Text-shadow halo to lift the score value off the dark canvas.
- * Matches the value's color so the glow reads as the value emitting light.
- * Neutral (delta = 0) returns 'none' — no halo on grey.
- */
-function glowFor(d: number): string {
-  if (d < 0) {
-    return '0 0 8px rgba(34,197,94,0.28), 0 0 3px rgba(34,197,94,0.18)';
-  }
-  if (d > 0) {
-    return '0 0 8px rgba(239,68,68,0.28), 0 0 3px rgba(239,68,68,0.18)';
-  }
-  return 'none';
-}
 
 
 const SECTION_STYLE: React.CSSProperties = {
@@ -308,7 +294,7 @@ const CourseRow: React.FC<{
             fontVariantNumeric: 'tabular-nums',
             minWidth: 52,
             textAlign: 'right',
-            textShadow: view === 'most_played' ? 'none' : glowFor(course.delta),
+            textShadow: 'none',
             flexShrink: 0,
             letterSpacing: '-0.02em',
           }}

@@ -102,6 +102,7 @@ const HeroCard: React.FC<{
             style={{
               fontSize: 11, fontWeight: 800, letterSpacing: '0.14em',
               color: 'rgba(255,255,255,0.65)', marginBottom: 6, textTransform: 'uppercase',
+              textShadow: '0 1px 2px rgba(0,0,0,0.5)',
             }}
           >
             {[course.country, course.region].filter(Boolean).join(' · ')}
@@ -111,6 +112,7 @@ const HeroCard: React.FC<{
           style={{
             fontSize: 26, fontWeight: 800, letterSpacing: '-0.02em',
             lineHeight: 1.1, color: '#F8FAFC',
+            textShadow: '0 1px 3px rgba(0,0,0,0.6)',
           }}
         >
           {course.name || '—'}
@@ -167,9 +169,7 @@ const MiniCard: React.FC<{
           position: 'absolute', top: 10, right: 10,
           padding: '3px 7px', borderRadius: 6,
           fontSize: 11, fontWeight: 800, letterSpacing: '-0.01em',
-          background: 'rgba(5,8,16,0.75)',
-          backdropFilter: 'blur(8px)',
-          WebkitBackdropFilter: 'blur(8px)',
+          background: 'rgba(5,8,16,0.82)',
           color: accent,
           fontVariantNumeric: 'tabular-nums',
         }}
@@ -182,12 +182,13 @@ const MiniCard: React.FC<{
         style={{
           fontSize: 14, fontWeight: 800, color: '#F8FAFC',
           lineHeight: 1.15, letterSpacing: '-0.01em',
+          textShadow: '0 1px 3px rgba(0,0,0,0.6)',
         }}
       >
         {course.name || '—'}
       </div>
       {(course.country || course.region) && (
-        <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.7)', marginTop: 2 }}>
+        <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.7)', marginTop: 2, textShadow: '0 1px 2px rgba(0,0,0,0.5)' }}>
           {[course.country, course.region].filter(Boolean).join(' · ')}
         </div>
       )}

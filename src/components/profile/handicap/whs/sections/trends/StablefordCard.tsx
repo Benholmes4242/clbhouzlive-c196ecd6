@@ -29,12 +29,12 @@ const T = {
   amberDeep: '#C97211',
   amberTint: 'rgba(247,147,30,0.10)',
   amberInk: '#854F0B',
-  green: '#22C55E',
+  green: 'var(--hcp-good-deep)',
   greenInk: '#15803D',
-  greenSoft: 'rgba(34,197,94,0.12)',
-  red: '#DC2626',
+  greenSoft: 'rgba(5,150,105,0.14)',
+  red: 'var(--hcp-bad-deep)',
   redInk: '#991B1B',
-  redSoft: 'rgba(220,38,38,0.10)',
+  redSoft: 'rgba(159,29,29,0.12)',
   ringTrack: 'var(--hcp-bg-3)',
 };
 const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
@@ -414,7 +414,7 @@ const PointsBody: React.FC<PointsBodyProps> = ({ dist, scope, scoringRange }) =>
             borderRadius: 12,
             overflow: 'hidden',
             background: T.ink04,
-            boxShadow: '0 2px 4px rgba(15,23,42,0.04)',
+            
           }}
           role="img"
           aria-label={`Distribution: ${dist.inZoneCount} in zone, ${dist.solidCount} solid, ${dist.offDayCount} off`}
@@ -552,7 +552,7 @@ const ScoringRangeBlock: React.FC<{
       <div
         style={{
           position: 'relative',
-          height: 8,
+          height: 5,
           borderRadius: 99,
           background: 'rgba(15,23,42,0.06)',
           overflow: 'visible',
@@ -572,11 +572,11 @@ const ScoringRangeBlock: React.FC<{
         <div
           style={{
             position: 'absolute',
-            top: -3,
+            top: -4,
             left: `${markerPct}%`,
             transform: 'translateX(-50%)',
             width: 4,
-            height: 14,
+            height: 13,
             borderRadius: 2,
             background: '#FFFFFF',
             boxShadow: '0 1px 3px rgba(15,23,42,0.35)',

@@ -125,7 +125,7 @@ const IndexHistoryCard: React.FC<Props> = ({ connectionId }) => {
 
   const isImproving = netDelta < -0.05;
   const isWorsening = netDelta > 0.05;
-  const lineColorHex = isImproving ? '#22C55E' : isWorsening ? '#EF4444' : '#F7931E';
+  const lineColorHex = isImproving ? '#059669' : isWorsening ? '#9F1D1D' : '#F7931E';
 
   const gradientId = `idx-fade-${connectionId.slice(0, 8)}`;
 
@@ -348,7 +348,7 @@ const RangePills: React.FC<{
 }> = ({ value, onChange }) => {
   const options: Range[] = ['1M', '3M', '1Y'];
   return (
-    <div style={{ display: 'inline-flex', gap: 4 }}>
+    <div style={{ display: 'inline-flex', gap: 4, padding: 3, background: 'var(--hcp-bg-2)', borderRadius: 999 }}>
       {options.map((opt) => {
         const active = opt === value;
         return (
