@@ -107,7 +107,7 @@ export const SheetHeader: React.FC<SheetHeaderProps> = ({
   );
 
   return (
-    <div style={{ padding: '12px 20px 14px', fontFamily: FONT }}>
+    <div style={{ padding: '10px 20px 12px', fontFamily: FONT }}>
       {isTappable ? (
         <button
           type="button"
