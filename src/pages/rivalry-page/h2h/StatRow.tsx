@@ -59,7 +59,7 @@ export const StatRow: React.FC<Props> = ({
         alignItems: 'center',
         gap: 12,
         padding: '14px 12px',
-        borderBottom: showDivider ? `1px solid ${LINE}` : 'none',
+        borderBottom: showDivider ? `0.5px solid ${LINE}` : 'none',
         fontFamily: FONT,
       }}
     >
