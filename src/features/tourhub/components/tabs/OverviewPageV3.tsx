@@ -57,8 +57,6 @@ export function OverviewPageV3() {
         <OverviewHero />
 
 
-        {/* Editorial content tier */}
-        <DispatchModule />
 
         <div
           id="content-below-hero"
