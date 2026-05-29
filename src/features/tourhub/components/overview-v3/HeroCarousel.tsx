@@ -448,7 +448,7 @@ export function HeroCarousel({
     lastEmittedRef.current = id;
     onActiveChange(id);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentIndex, safeSlides.length, activeTournamentId]);
+  }, [currentIndex, safeSlides, activeTournamentId, onActiveChange]);
 
   const handleToggleExpand = useCallback(() => {
     setIsExpanded(prev => !prev);
