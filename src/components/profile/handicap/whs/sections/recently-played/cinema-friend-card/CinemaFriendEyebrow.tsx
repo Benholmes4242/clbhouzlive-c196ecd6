@@ -12,16 +12,6 @@ interface Props {
 }
 
 export const CinemaFriendEyebrow: React.FC<Props> = ({ activity, showLowestRound }) => {
-  const impactDelta =
-    activity.is_counter &&
-    activity.handicap_index_at_time !== null &&
-    activity.friend_handicap_index !== null
-      ? activity.friend_handicap_index - activity.handicap_index_at_time
-      : null;
-  const showImpact = impactDelta !== null && Math.abs(impactDelta) >= 0.05;
-  const impactIsImprovement = (impactDelta ?? 0) < 0;
-  const showHotFlame = showImpact && impactIsImprovement;
-
   const time = fmtRelative(activity.last_round_played_at, { compact: false });
 
   return (
