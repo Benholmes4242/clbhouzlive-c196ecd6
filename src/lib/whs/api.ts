@@ -498,33 +498,65 @@ export async function fetchFriendsActivity(
     bests.map((b) => `${b.friend_connection_id}:${b.best_score_id}`),
   );
 
-  // Reaction enrichment — only for rounds with a score_id (synced friends).
-  const scoreIdsForReactions = Object.values(scoresByKey)
-    .map((s: any) => s?.id)
-    .filter((id: any): id is string => !!id);
+  // Reaction enrichment — only for the matched score per friend that will
+  // actually render. Avoids blowing past PostgREST's URL length limit.
+  const matchedScoresByFriend = new Map<string, any>();
+  for (const f of friends) {
+    if (!f.last_round_played_at) continue;
+    const key = `${f.friend_connection_id}::${f.last_round_played_at}`;
+    const matched = scoresByKey[key];
+    if (matched) {
+      matchedScoresByFriend.set(f.friend_row_id, matched);
+    }
+  }
+
+  const scoreIdsForReactions = Array.from(matchedScoresByFriend.values())
+    .map((s) => s?.id)
+    .filter((id): id is string => !!id);
 
   let viewerReactedSet = new Set<string>();
   const reactionCounts: Record<string, number> = {};
 
-  if (scoreIdsForReactions.length > 0) {
-    const userResp = await supabase.auth.getUser();
-    const viewerId = userResp.data.user?.id;
-    if (viewerId) {
-      const { data: vRows } = await supabase
-        .from('whs_round_reactions' as any)
-        .select('score_id')
-        .eq('user_id', viewerId)
-        .in('score_id', scoreIdsForReactions);
-      viewerReactedSet = new Set(((vRows as any[]) ?? []).map((r) => r.score_id as string));
+  // Defensive cap: even if matched-score logic somehow returns too many,
+  // don't exceed PostgREST's URL parameter limit.
+  const REACTION_LOOKUP_CAP = 100;
+  const boundedScoreIds = scoreIdsForReactions.slice(0, REACTION_LOOKUP_CAP);
+
+  if (boundedScoreIds.length > 0) {
+    try {
+      const userResp = await supabase.auth.getUser();
+      const viewerId = userResp.data.user?.id;
+      if (viewerId) {
+        const { data: vRows, error: vErr } = await supabase
+          .from('whs_round_reactions' as any)
+          .select('score_id')
+          .eq('user_id', viewerId)
+          .in('score_id', boundedScoreIds);
+        if (!vErr) {
+          viewerReactedSet = new Set(((vRows as any[]) ?? []).map((r) => r.score_id as string));
+        } else {
+          console.warn('[whs] viewer reactions lookup failed (non-fatal):', vErr);
+        }
+      }
+    } catch (e) {
+      console.warn('[whs] viewer reactions lookup threw (non-fatal):', e);
     }
 
-    const { data: countRows } = await supabase
-      .from('whs_round_reactions' as any)
-      .select('score_id')
-      .in('score_id', scoreIdsForReactions);
-    for (const row of ((countRows as any[]) ?? [])) {
-      const sid = row.score_id as string;
-      reactionCounts[sid] = (reactionCounts[sid] ?? 0) + 1;
+    try {
+      const { data: countRows, error: cErr } = await supabase
+        .from('whs_round_reactions' as any)
+        .select('score_id')
+        .in('score_id', boundedScoreIds);
+      if (!cErr) {
+        for (const row of ((countRows as any[]) ?? [])) {
+          const sid = row.score_id as string;
+          reactionCounts[sid] = (reactionCounts[sid] ?? 0) + 1;
+        }
+      } else {
+        console.warn('[whs] reaction counts lookup failed (non-fatal):', cErr);
+      }
+    } catch (e) {
+      console.warn('[whs] reaction counts lookup threw (non-fatal):', e);
     }
   }
 
