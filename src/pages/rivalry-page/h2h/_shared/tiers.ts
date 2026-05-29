@@ -1,9 +1,13 @@
+import type { LucideIcon } from 'lucide-react';
+import { Flame, Zap, Skull } from 'lucide-react';
 import { GREEN, RED, AMBER } from '@/pages/rivalry-page/_shared/tokens';
 
 export interface H2HTier {
   /** Tier index 1-8 for analytics / debugging. 8 = BEAST MODE, 1 = OBLITERATED. */
   index: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8;
-  /** Top-line eyebrow in caps. May include emoji. */
+  /** Optional icon rendered before the eyebrow label. */
+  icon?: LucideIcon;
+  /** Top-line eyebrow in caps. */
   eyebrow: string;
   /** Small line of context beneath the big number. */
   subcopy: string;
@@ -26,22 +30,24 @@ export function getH2HTier(
   if (w >= 15) {
     return {
       index: 8,
-      eyebrow: '🔥 BEAST MODE',
+      icon: Flame,
+      eyebrow: 'BEAST MODE',
       subcopy: 'Untouchable',
       accent: GREEN,
       gradient:
-        'linear-gradient(135deg, rgba(34,197,94,0.28), rgba(34,197,94,0.04))',
+        'linear-gradient(135deg, rgba(5,150,105,0.28), rgba(5,150,105,0.04))',
       intensity: 'high',
     };
   }
   if (w >= 13) {
     return {
       index: 7,
-      eyebrow: '⚡ TOTAL DOMINATION',
+      icon: Zap,
+      eyebrow: 'TOTAL DOMINATION',
       subcopy: "It's not close",
       accent: GREEN,
       gradient:
-        'linear-gradient(135deg, rgba(34,197,94,0.20), rgba(34,197,94,0.03))',
+        'linear-gradient(135deg, rgba(5,150,105,0.20), rgba(5,150,105,0.03))',
       intensity: 'high',
     };
   }
@@ -52,7 +58,7 @@ export function getH2HTier(
       subcopy: "You're winning this rivalry",
       accent: GREEN,
       gradient:
-        'linear-gradient(135deg, rgba(34,197,94,0.14), rgba(34,197,94,0.02))',
+        'linear-gradient(135deg, rgba(5,150,105,0.14), rgba(5,150,105,0.02))',
       intensity: 'mid',
     };
   }
@@ -74,7 +80,7 @@ export function getH2HTier(
       subcopy: "They've got the edge",
       accent: RED,
       gradient:
-        'linear-gradient(135deg, rgba(239,68,68,0.10), rgba(239,68,68,0.02))',
+        'linear-gradient(135deg, rgba(159,29,29,0.10), rgba(159,29,29,0.02))',
       intensity: 'low',
     };
   }
@@ -85,28 +91,30 @@ export function getH2HTier(
       subcopy: "You're being outplayed",
       accent: RED,
       gradient:
-        'linear-gradient(135deg, rgba(239,68,68,0.14), rgba(239,68,68,0.02))',
+        'linear-gradient(135deg, rgba(159,29,29,0.14), rgba(159,29,29,0.02))',
       intensity: 'mid',
     };
   }
   if (w >= 3) {
     return {
       index: 2,
-      eyebrow: '💀 BEING DEMOLISHED',
+      icon: Skull,
+      eyebrow: 'BEING DEMOLISHED',
       subcopy: "It's not close",
       accent: RED,
       gradient:
-        'linear-gradient(135deg, rgba(239,68,68,0.20), rgba(239,68,68,0.03))',
+        'linear-gradient(135deg, rgba(159,29,29,0.20), rgba(159,29,29,0.03))',
       intensity: 'high',
     };
   }
   return {
     index: 1,
-    eyebrow: '☠️ OBLITERATED',
+    icon: Skull,
+    eyebrow: 'OBLITERATED',
     subcopy: `${rivalFirstName} owns you`,
     accent: RED,
     gradient:
-      'linear-gradient(135deg, rgba(239,68,68,0.28), rgba(239,68,68,0.04))',
+      'linear-gradient(135deg, rgba(159,29,29,0.28), rgba(159,29,29,0.04))',
     intensity: 'high',
   };
 }
