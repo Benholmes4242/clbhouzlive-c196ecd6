@@ -199,7 +199,7 @@ export const SheetHeroGlass: React.FC<Props> = ({
             : { display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }
         }
       >
-        <div style={{ textAlign: 'left' }}>
+        <div style={{ textAlign: 'center' }}>
           <div style={labelStyle}>GROSS</div>
           <div
             style={{ marginTop: 4 }}
@@ -213,17 +213,17 @@ export const SheetHeroGlass: React.FC<Props> = ({
           </div>
         </div>
         {lockMissingStats ? (
-          <LockedTile label="STABLEFORD" align={hasImpact ? 'right' : 'center'} />
+          <LockedTile label="STABLEFORD" align="center" />
         ) : (
-          <div style={{ textAlign: hasImpact ? 'right' : 'center' }}>
+          <div style={{ textAlign: 'center' }}>
             <div style={labelStyle}>STABLEFORD</div>
             <div style={valueStyle('#FFFFFF')}>{stableford != null ? stableford : EM_DASH}</div>
           </div>
         )}
         {lockMissingStats ? (
-          <LockedTile label="SCORE DIFF" align={hasImpact ? 'left' : 'right'} />
+          <LockedTile label="SCORE DIFF" align="center" />
         ) : (
-          <div style={{ textAlign: hasImpact ? 'left' : 'right' }}>
+          <div style={{ textAlign: 'center' }}>
             <div style={labelStyle}>SCORE DIFF</div>
             <div style={valueStyle(differential != null ? AMBER : '#FFFFFF')}>
               {fmtDiffLocal(differential)}
@@ -232,7 +232,7 @@ export const SheetHeroGlass: React.FC<Props> = ({
         )}
 
         {hasImpact && (
-          <div style={{ textAlign: 'right' }}>
+          <div style={{ textAlign: 'center' }}>
             <div style={labelStyle}>HCP IMPACT</div>
             <div style={valueStyle(impactColor)}>{fmtImpact(handicapDelta!)}</div>
           </div>
