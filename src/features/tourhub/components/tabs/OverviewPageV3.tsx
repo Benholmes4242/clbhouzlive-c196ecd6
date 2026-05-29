@@ -15,7 +15,7 @@
 
 import { useRef, useState, useEffect, useCallback, useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import {
   HeroCarousel,
   LiveRightNow,
@@ -59,10 +59,9 @@ function pickRandomTourSlug(availableSlugs: string[]): string | null {
 export function OverviewPageV3() {
   const { isOnline } = useNetworkStatus();
 
-  // Parallax scale + fade on hero as user scrolls past
-  const { scrollY } = useScroll();
-  const heroOpacity = useTransform(scrollY, [0, 120], [1, 0.85]);
-  const heroScale = useTransform(scrollY, [0, 120], [1, 0.97]);
+  // Parallax removed (May 2026): scroll-driven opacity/scale on the hero created a
+  // console-silent feedback flash in WebView (scale transform nudged layout → scrollY
+  // → transform re-ran). Hero is now static; fade-in on the page wrapper is retained.
 
 
   // ── Phase A: Hero ↔ Ticker shared active-tournament state ──
@@ -192,8 +191,6 @@ export function OverviewPageV3() {
             ...heroContainerStyle,
             maxWidth: 960,
             height: TOTAL_HERO_HEIGHT_TARGET,
-            opacity: heroOpacity,
-            scale: heroScale,
           }}
         >
           <HeroCarousel
