@@ -26,8 +26,8 @@ interface Props {
 
 const GOOD = GREEN;
 const BAD = RED;
-const GOOD_TINT = 'rgba(34,197,94,0.14)';
-const BAD_TINT = 'rgba(239,68,68,0.14)';
+const GOOD_TINT = 'rgba(5,150,105,0.14)';
+const BAD_TINT = 'rgba(159,29,29,0.14)';
 const NEUTRAL_TINT = 'rgba(255,255,255,0.05)';
 
 export const StatRow: React.FC<Props> = ({
