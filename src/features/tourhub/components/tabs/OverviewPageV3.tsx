@@ -52,10 +52,10 @@ export function OverviewPageV3() {
         animate={{ opacity: 1 }}
         transition={{ duration: 0.3 }}
       >
-        {/* Hero placeholder — rebuild pending */}
-        <div style={{ height: 200, display: 'flex', alignItems: 'center', justifyContent: 'center', opacity: 0.4 }}>
-          Hero rebuild pending
-        </div>
+        {/* Tour Hub hero — self-contained carousel (single-owner index, random
+            landing slide, all three states eligible). See OverviewHero.tsx. */}
+        <OverviewHero />
+
 
         {/* Editorial content tier */}
         <DispatchModule />
