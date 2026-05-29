@@ -1,6 +1,7 @@
 import React, { useRef, useEffect, useState } from 'react';
 import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import type { TourHubTab } from './types';
+import { TourSwitcherAffordance } from './TourSwitcherAffordance';
 
 type TabId = TourHubTab | 'college';
 
