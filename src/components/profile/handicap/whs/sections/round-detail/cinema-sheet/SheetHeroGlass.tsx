@@ -80,7 +80,7 @@ const labelStyle: React.CSSProperties = {
 };
 
 const valueStyle = (color: string): React.CSSProperties => ({
-  fontSize: 24,
+  fontSize: 22,
   fontWeight: 300,
   color,
   fontFamily: FONT_MONO,
