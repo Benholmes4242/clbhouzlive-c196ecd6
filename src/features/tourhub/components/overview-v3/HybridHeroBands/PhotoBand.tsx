@@ -74,7 +74,7 @@ function StatusTag({ state }: { state: HeroState }) {
 function ledeLine(state: HeroState, winnerName?: string | null): string | null {
   if (state.kind === 'results' && winnerName) return `Won by ${winnerName}`;
   if (state.kind === 'live') {
-    return state.thruLabel ? `Round ${state.round} · ${state.thruLabel}` : null;
+    return `Round ${state.round}`;
   }
   if (state.kind === 'upcoming') return state.countdown || null;
   return null;
