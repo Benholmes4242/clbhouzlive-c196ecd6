@@ -147,8 +147,8 @@ export const SheetHeroGlass: React.FC<Props> = ({
         right: 14,
         bottom: 14,
         zIndex: 3,
-        padding: '14px 16px',
-        borderRadius: 16,
+        padding: '11px 13px',
+        borderRadius: 13,
         background: 'rgba(255,255,255,0.08)',
         border: '0.5px solid rgba(255,255,255,0.18)',
         backdropFilter: 'blur(40px) saturate(180%)',
@@ -159,7 +159,7 @@ export const SheetHeroGlass: React.FC<Props> = ({
       <div>
         <div
           style={{
-            fontSize: 18,
+            fontSize: 14,
             fontWeight: 700,
             color: '#FFFFFF',
             letterSpacing: '-0.025em',
@@ -172,8 +172,8 @@ export const SheetHeroGlass: React.FC<Props> = ({
         {meta && (
           <div
             style={{
-              marginTop: 3,
-              fontSize: 10,
+              marginTop: 2,
+              fontSize: 8,
               fontWeight: 600,
               color: 'rgba(255,255,255,0.60)',
               letterSpacing: '0.06em',
@@ -185,7 +185,7 @@ export const SheetHeroGlass: React.FC<Props> = ({
         )}
       </div>
 
-      <div style={{ ...HAIR, margin: '12px 0' }} />
+      <div style={{ ...HAIR, margin: '10px 0' }} />
 
       <div
         style={
@@ -193,8 +193,8 @@ export const SheetHeroGlass: React.FC<Props> = ({
             ? {
                 display: 'grid',
                 gridTemplateColumns: '1fr 1fr',
-                rowGap: 14,
-                columnGap: 12,
+                rowGap: 11,
+                columnGap: 10,
               }
             : { display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }
         }
