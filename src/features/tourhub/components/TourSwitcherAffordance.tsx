@@ -32,12 +32,11 @@ export const TourSwitcherAffordance: React.FC = () => {
   // Pill reflects the manually-selected tour, defaulting to PGA before any pick.
   const activeTourSlug = selectedTourSlug ?? 'pga';
 
-  // A tour is selectable only if it has a live or completed event (a hero
-  // slide exists for it). Upcoming-only / no-event tours render disabled.
-  const hasEvent = (slug: string): boolean => {
-    const live = data?.live.some((c) => c.tourSlug === slug) ?? false;
+  const tourStatus = (slug: string): 'live' | 'upcoming' | 'none' => {
+    if (data?.live.some((c) => c.tourSlug === slug)) return 'live';
     const completed = data?.completed.some((c) => c.tourSlug === slug) ?? false;
-    return live || completed;
+    const upcoming = data?.upcoming.some((c) => c.tourSlug === slug) ?? false;
+    return completed || upcoming ? 'upcoming' : 'none';
   };
 
   return (
@@ -84,8 +83,8 @@ export const TourSwitcherAffordance: React.FC = () => {
         <div style={{ display: 'flex', flexDirection: 'column' }}>
           {Object.entries(TOUR_LABEL).map(([slug, label]) => {
             const isActive = slug === activeTourSlug;
-            const liveCount = data?.live.filter((c) => c.tourSlug === slug).length ?? 0;
-            const selectable = hasEvent(slug);
+            const status = tourStatus(slug);
+            const selectable = status !== 'none';
 
             return (
               <button
@@ -145,44 +144,19 @@ export const TourSwitcherAffordance: React.FC = () => {
                   </div>
                 </div>
 
-                {liveCount > 0 ? (
-                  <span
-                    style={{
-                      display: 'inline-flex',
-                      alignItems: 'center',
-                      gap: 6,
-                      flexShrink: 0,
-                      padding: '3px 9px',
-                      borderRadius: 999,
-                      background: 'rgba(16,185,129,0.12)',
-                    }}
-                  >
-                    <span
-                      style={{
-                        width: 6,
-                        height: 6,
-                        borderRadius: '50%',
-                        background: '#10B981',
-                        display: 'inline-block',
-                      }}
-                    />
-                    <span
-                      style={{
-                        fontSize: 10,
-                        fontWeight: 800,
-                        letterSpacing: '0.16em',
-                        color: '#10B981',
-                      }}
-                    >
-                      LIVE
-                    </span>
+                {status === 'live' ? (
+                  <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, flexShrink: 0 }}>
+                    <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#10B981', display: 'inline-block' }} />
+                    <span style={{ fontSize: 10, fontWeight: 800, letterSpacing: '0.16em', color: '#10B981' }}>LIVE</span>
+                  </span>
+                ) : status === 'upcoming' ? (
+                  <span style={{ flexShrink: 0, fontSize: 10, fontWeight: 800, letterSpacing: '0.16em', color: 'rgba(15,23,42,0.45)' }}>
+                    UPCOMING
                   </span>
                 ) : (
-                  !selectable && (
-                    <span style={{ fontSize: 10, fontWeight: 800, letterSpacing: '0.16em', color: 'rgba(15,23,42,0.35)' }}>
-                      NO EVENT
-                    </span>
-                  )
+                  <span style={{ fontSize: 10, fontWeight: 800, letterSpacing: '0.16em', color: 'rgba(15,23,42,0.30)' }}>
+                    NO EVENT
+                  </span>
                 )}
 
                 {isActive && (
