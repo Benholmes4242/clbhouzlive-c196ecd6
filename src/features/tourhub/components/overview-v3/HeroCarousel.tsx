@@ -181,27 +181,24 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
   };
   const bgGradient = tourFallbacks[tournament.tourSlug] || 'from-emerald-800 via-green-700 to-emerald-900';
 
+  // Flash fix (May 2026): all framer-motion `layout`, AnimatePresence and Ken
+  // Burns animations have been stripped from the slide. Previously, the glass
+  // card's `layout` prop ran a spring on every leaderboard refetch / clock tick
+  // (HybridHero re-renders every minute via the `now` interval, plus on every
+  // realtime leaderboard push), causing a visible pulse. The inner Ken Burns
+  // motion.div + nested AnimatePresence compounded the projection work. Slide
+  // crossfade is now a plain CSS opacity transition.
   return (
-    <motion.div
+    <div
       className="absolute inset-0"
-      initial={{ opacity: 0 }}
-      animate={{ opacity: isActive ? 1 : 0 }}
-      exit={{ opacity: 0 }}
-      transition={{ duration: 0.5, ease: [0.4, 0, 0.2, 1] }}
+      style={{
+        opacity: isActive ? 1 : 0,
+        transition: 'opacity 500ms cubic-bezier(0.4, 0, 0.2, 1)',
+        pointerEvents: isActive ? 'auto' : 'none',
+      }}
     >
-      {/* Background with Ken Burns - fills ENTIRE container including safe area */}
-      <motion.div
-        className="absolute inset-0 w-full h-full"
-        initial={{ scale: 1.03, opacity: 0 }}
-        animate={{ 
-          scale: isActive ? 1 : 1.03, 
-          opacity: isActive ? 1 : 0 
-        }}
-        transition={{ 
-          opacity: { duration: 0.8, ease: [0.16, 1, 0.3, 1] },
-          scale: { duration: 5, ease: 'linear' }
-        }}
-      >
+      {/* Static background — fills entire container including safe area */}
+      <div className="absolute inset-0 w-full h-full">
         {hasRealImage && !isLive && !isCompleted ? (
           <img
             src={backgroundImage}
@@ -212,9 +209,7 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
           <div
             className="absolute inset-0 w-full h-full"
             style={{
-              background: isLive || isCompleted
-                ? '#141d2e'
-                : undefined,
+              background: isLive || isCompleted ? '#141d2e' : undefined,
             }}
           >
             {!isLive && !isCompleted && (
@@ -222,7 +217,7 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
             )}
           </div>
         )}
-      </motion.div>
+      </div>
 
 
       {/* Legibility gradient overlay */}
@@ -260,11 +255,7 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
       )}
 
       {isExpanded && !isLive && !isCompleted && (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.3 }}
+        <div
           onClick={() => onToggleExpand()}
           style={{
             position: 'absolute',
@@ -276,96 +267,70 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
         />
       )}
 
-      {/* Glass Card - Bottom Left — canonical Creator Capsule glass + animation spec */}
-      <AnimatePresence mode="wait">
-        {isActive && (
-          <motion.div
-            layout
-            transition={{ type: 'spring', damping: 28, stiffness: 300 }}
-            onTouchStart={(e) => { onCardTouchStart(e); }}
-            onTouchMove={(e) => { onCardTouchMove(e); }}
-            onTouchEnd={(e) => { onCardTouchEnd(e); }}
-            style={(isLive || isUpcoming || isCompleted) ? {
-              position: 'absolute',
-              top: 0, left: 0, right: 0, bottom: 0,
-              borderRadius: 0,
-              background: 'transparent',
-              border: 'none',
-              backdropFilter: 'none',
-              WebkitBackdropFilter: 'none',
-              boxShadow: 'none',
-              padding: 0,
-              overflow: 'hidden',
-              zIndex: 20,
-              pointerEvents: 'auto' as const,
-              display: 'flex',
-              flexDirection: 'column' as const,
-            } : {
-              position: 'absolute',
-              bottom: isExpanded ? 16 : 90,
-              left: isExpanded ? 12 : 16,
-              ...(isExpanded
-                ? { right: 12, top: 'calc(env(safe-area-inset-top, 20px) + 120px)' }
-                : {
-                    maxWidth: 'min(350px, calc(100% - 32px))',
-                  }
-              ),
-              minWidth: isExpanded ? undefined : '280px',
-              borderRadius: isExpanded ? 16 : 12,
-              background: isExpanded ? 'rgba(0, 0, 0, 0.45)' : 'rgba(0, 0, 0, 0.35)',
-              backdropFilter: isExpanded ? 'blur(24px)' : 'blur(20px)',
-              WebkitBackdropFilter: isExpanded ? 'blur(24px)' : 'blur(20px)',
-              boxShadow: isExpanded ? '0 8px 32px rgba(0, 0, 0, 0.35)' : '0 4px 16px rgba(0, 0, 0, 0.25)',
-              padding: isExpanded ? '20px 0 8px 0' : '20px 20px 14px 20px',
-              border: tournament.isMajor
-                ? '1px solid rgba(250, 204, 21, 0.35)'
-                : tournament.isSignature
-                ? '1px solid rgba(16, 185, 129, 0.25)'
-                : '1px solid rgba(255, 255, 255, 0.10)',
-              overflow: 'hidden',
-              zIndex: isExpanded ? 20 : 10,
-              pointerEvents: 'auto' as const,
-              display: isExpanded ? 'flex' : 'block',
-              flexDirection: isExpanded ? 'column' as const : undefined,
-            }}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 20 }}
-          >
-
-            {/* ─── Upcoming renders its own editorial hero (no chrome). ─── */}
-
-            {/* ─── State-specific content — each section uses Capsule spring easing ─── */}
-            <AnimatePresence mode="popLayout">
-
-              {/* HYBRID HERO — single component handles live / completed / upcoming */}
-              <motion.div
-                key="hybrid-hero-content"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.22, ease: [0.19, 1, 0.22, 1] }}
-                style={{ overflow: 'hidden', flex: 1, height: '100%', minHeight: 0, display: 'flex', flexDirection: 'column' as const }}
-              >
-                {(isLive || isCompleted) && isLoadingFull && fullLeaderboard.length === 0 ? (
-                  <HybridHeroSkeleton />
-                ) : (
-                  <HybridHero
-                    slide={slide}
-                    activeTournamentId={activeTournamentId ?? null}
-                    onSelectTour={onTourSelect ?? (() => {})}
-                  />
-
-                )}
-              </motion.div>
-
-            </AnimatePresence>
-
-            {/* Dots moved outside glass card */}
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </motion.div>
+      {/* Glass Card / full-bleed content host — plain div, no layout animation */}
+      {isActive && (
+        <div
+          onTouchStart={(e) => { onCardTouchStart(e); }}
+          onTouchMove={(e) => { onCardTouchMove(e); }}
+          onTouchEnd={(e) => { onCardTouchEnd(e); }}
+          style={(isLive || isUpcoming || isCompleted) ? {
+            position: 'absolute',
+            top: 0, left: 0, right: 0, bottom: 0,
+            borderRadius: 0,
+            background: 'transparent',
+            border: 'none',
+            backdropFilter: 'none',
+            WebkitBackdropFilter: 'none',
+            boxShadow: 'none',
+            padding: 0,
+            overflow: 'hidden',
+            zIndex: 20,
+            pointerEvents: 'auto' as const,
+            display: 'flex',
+            flexDirection: 'column' as const,
+          } : {
+            position: 'absolute',
+            bottom: isExpanded ? 16 : 90,
+            left: isExpanded ? 12 : 16,
+            ...(isExpanded
+              ? { right: 12, top: 'calc(env(safe-area-inset-top, 20px) + 120px)' }
+              : {
+                  maxWidth: 'min(350px, calc(100% - 32px))',
+                }
+            ),
+            minWidth: isExpanded ? undefined : '280px',
+            borderRadius: isExpanded ? 16 : 12,
+            background: isExpanded ? 'rgba(0, 0, 0, 0.45)' : 'rgba(0, 0, 0, 0.35)',
+            backdropFilter: isExpanded ? 'blur(24px)' : 'blur(20px)',
+            WebkitBackdropFilter: isExpanded ? 'blur(24px)' : 'blur(20px)',
+            boxShadow: isExpanded ? '0 8px 32px rgba(0, 0, 0, 0.35)' : '0 4px 16px rgba(0, 0, 0, 0.25)',
+            padding: isExpanded ? '20px 0 8px 0' : '20px 20px 14px 20px',
+            border: tournament.isMajor
+              ? '1px solid rgba(250, 204, 21, 0.35)'
+              : tournament.isSignature
+              ? '1px solid rgba(16, 185, 129, 0.25)'
+              : '1px solid rgba(255, 255, 255, 0.10)',
+            overflow: 'hidden',
+            zIndex: isExpanded ? 20 : 10,
+            pointerEvents: 'auto' as const,
+            display: isExpanded ? 'flex' : 'block',
+            flexDirection: isExpanded ? 'column' as const : undefined,
+          }}
+        >
+          <div style={{ overflow: 'hidden', flex: 1, height: '100%', minHeight: 0, display: 'flex', flexDirection: 'column' as const }}>
+            {(isLive || isCompleted) && isLoadingFull && fullLeaderboard.length === 0 ? (
+              <HybridHeroSkeleton />
+            ) : (
+              <HybridHero
+                slide={slide}
+                activeTournamentId={activeTournamentId ?? null}
+                onSelectTour={onTourSelect ?? (() => {})}
+              />
+            )}
+          </div>
+        </div>
+      )}
+    </div>
   );
 }
 
