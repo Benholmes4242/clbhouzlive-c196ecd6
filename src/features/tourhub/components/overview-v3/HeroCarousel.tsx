@@ -407,8 +407,14 @@ export function HeroCarousel({
 }: HeroCarouselProps) {
   const { data: slides = [], isLoading } = useHeroCarouselData();
   const rawSlides = Array.isArray(slides) ? slides : [];
-  // Referentially stable: only rebuild when slide ids / mode actually change.
-  const slideSignature = rawSlides.map((s) => `${s.type}:${s.tournament.id}`).join('|');
+  // Referentially stable: only rebuild when the SET of slide ids / mode actually
+  // changes. Sorting the signature means live-data reorders (leaderboard shuffles)
+  // do NOT invalidate safeSlides — which previously re-fired the emit effect and
+  // caused the hero↔parent tour-switch deadlock.
+  const slideSignature = rawSlides
+    .map((s) => `${s.type}:${s.tournament.id}`)
+    .sort()
+    .join('|');
   const safeSlides = React.useMemo(
     () => (mode === 'overview' ? rawSlides.filter((s) => s.type !== 'upcoming') : rawSlides),
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -420,6 +426,10 @@ export function HeroCarousel({
   const resetAutoAdvance = () => setAutoAdvanceKey(k => k + 1);
   const [isExpanded, setIsExpanded] = useState(false);
   const lastEmittedRef = React.useRef<string | null>(null);
+  // Hold a live ref to safeSlides so the emit effect can read the current list
+  // without depending on its identity (reorders must not re-fire the emit).
+  const safeSlidesRef = React.useRef(safeSlides);
+  safeSlidesRef.current = safeSlides;
 
   // Phase A — sync external activeTournamentId → internal currentIndex (one-way, parent-driven).
   useEffect(() => {
@@ -436,12 +446,14 @@ export function HeroCarousel({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeTournamentId, safeSlides]);
 
-  // Phase A — emit currentIndex changes upward (so the Ticker's "NOW SHOWING" follows auto-rotate / swipe).
-  // lastEmittedRef prevents the parent↔child echo loop: we only emit an id we have not
-  // already emitted, and never re-emit the value the parent just handed us back.
+  // Phase A — emit currentIndex changes upward (Ticker "NOW SHOWING" follows swipe / tap).
+  // Deps deliberately EXCLUDE safeSlides: when live data reorders the array, the slide
+  // sitting at currentIndex changes identity even though the user hasn't moved. Re-emitting
+  // that "new" id back up was the source of the tour-switch deadlock — the parent would
+  // overwrite its own selection within the same frame, looping until React bailed out.
   useEffect(() => {
     if (!onActiveChange) return;
-    const slide = safeSlides[currentIndex];
+    const slide = safeSlidesRef.current[currentIndex];
     if (!slide) return;
     const id = slide.tournament.id;
     if (id === lastEmittedRef.current) return; // already emitted this one
@@ -452,7 +464,7 @@ export function HeroCarousel({
     lastEmittedRef.current = id;
     onActiveChange(id);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentIndex, safeSlides, activeTournamentId, onActiveChange]);
+  }, [currentIndex, activeTournamentId, onActiveChange]);
 
   const handleToggleExpand = useCallback(() => {
     setIsExpanded(prev => !prev);
