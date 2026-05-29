@@ -12,13 +12,13 @@ const MINUS = '\u2212';
 const EM_DASH = '\u2014';
 
 const lockedLabelStyle: React.CSSProperties = {
-  fontSize: 10,
+  fontSize: 8,
   fontWeight: 700,
   color: 'rgba(255,255,255,0.40)',
   letterSpacing: '0.16em',
   textTransform: 'uppercase',
   fontFamily: FONT_GEIST,
-  marginBottom: 4,
+  marginBottom: 3,
 };
 
 const LockedTile: React.FC<{ label: string; align?: 'left' | 'right' | 'center' }> = ({
@@ -29,10 +29,10 @@ const LockedTile: React.FC<{ label: string; align?: 'left' | 'right' | 'center' 
     <div style={lockedLabelStyle}>{label}</div>
     <div
       style={{
-        marginTop: 4,
-        width: 36,
-        height: 36,
-        borderRadius: 8,
+        marginTop: 3,
+        width: 29,
+        height: 29,
+        borderRadius: 6,
         border: '1px dashed rgba(255,255,255,0.20)',
         background: 'rgba(255,255,255,0.06)',
         display: 'inline-flex',
@@ -40,7 +40,7 @@ const LockedTile: React.FC<{ label: string; align?: 'left' | 'right' | 'center' 
         justifyContent: 'center',
       }}
     >
-      <Lock size={14} color="rgba(255,255,255,0.45)" strokeWidth={2} />
+      <Lock size={11} color="rgba(255,255,255,0.45)" strokeWidth={2} />
     </div>
   </div>
 );
