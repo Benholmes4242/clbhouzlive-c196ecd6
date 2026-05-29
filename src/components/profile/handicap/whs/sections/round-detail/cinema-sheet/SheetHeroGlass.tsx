@@ -70,13 +70,13 @@ const HAIR: React.CSSProperties = {
 };
 
 const labelStyle: React.CSSProperties = {
-  fontSize: 10,
+  fontSize: 8,
   fontWeight: 700,
   color: 'rgba(255,255,255,0.55)',
   letterSpacing: '0.16em',
   textTransform: 'uppercase',
   fontFamily: FONT_GEIST,
-  marginBottom: 4,
+  marginBottom: 3,
 };
 
 const valueStyle = (color: string): React.CSSProperties => ({
