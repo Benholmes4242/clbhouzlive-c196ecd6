@@ -375,7 +375,7 @@ const HeroHandicapCardDark: React.FC<Props> = ({ connection }) => {
                   : verdict === 'good' ? 'rgba(34, 197, 94, 0.14)'
                   : verdict === 'bad'  ? 'rgba(239, 68, 68, 0.14)'
                   : 'rgba(247, 147, 30, 0.14)',
-                border: isMarginal
+                border: isFlat
                   ? '1px solid rgba(255,255,255,0.10)'
                   : verdict === 'good' ? '1px solid rgba(34, 197, 94, 0.25)'
                   : verdict === 'bad'  ? '1px solid rgba(239, 68, 68, 0.25)'
