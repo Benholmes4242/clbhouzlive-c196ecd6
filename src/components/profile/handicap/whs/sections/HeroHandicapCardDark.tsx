@@ -396,7 +396,7 @@ const HeroHandicapCardDark: React.FC<Props> = ({ connection }) => {
                 height="11"
                 viewBox="0 0 24 24"
                 fill="none"
-                stroke={isMarginal ? 'var(--hcp-t-60)' : 'currentColor'}
+                stroke={isFlat ? 'var(--hcp-t-60)' : 'currentColor'}
                 strokeWidth="3"
                 strokeLinecap="round"
                 aria-hidden
