@@ -529,10 +529,21 @@ export async function fetchFriendsActivity(
   }
 
   return friends.map((f): WhsFriendActivityWithImage => {
-    const score = scoresByConn[f.friend_connection_id];
+    // ONLY use a score row if it matches the exact round the friend record
+    // describes. If the friend's connection sync is stale and the most-recent
+    // score is for a different round, treat score-derived fields as null so
+    // the UI falls back to friend-only data.
+    const scoreKey = f.last_round_played_at
+      ? `${f.friend_connection_id}::${f.last_round_played_at}`
+      : null;
+    const matchedScore = scoreKey ? scoresByKey[scoreKey] : null;
+
+    const latestScore = latestScoreByConn[f.friend_connection_id];
     const courseNameKey = (f.last_round_course_name ?? '').toLowerCase();
-    const scoreCourseKey = (score?.course?.name ?? '').toLowerCase();
-    const scoreId: string | null = score?.id ?? null;
+    const fallbackCourseKey = (latestScore?.course?.name ?? '').toLowerCase();
+
+    const matchedScoreId: string | null = matchedScore?.id ?? null;
+
     return {
       friend_row_id: f.friend_row_id,
       friend_passport_id: f.friend_passport_id,
@@ -545,19 +556,19 @@ export async function fetchFriendsActivity(
       last_round_played_at: f.last_round_played_at,
       last_round_course_name: f.last_round_course_name,
       last_round_adjusted_gross: f.last_round_adjusted_gross,
-      last_round_stableford: score?.stableford_points ?? null,
-      last_round_differential: score?.handicap_differential ?? null,
-      last_round_score_id: scoreId,
+      last_round_stableford: matchedScore?.stableford_points ?? null,
+      last_round_differential: matchedScore?.handicap_differential ?? null,
+      last_round_score_id: matchedScoreId,
       course_thumbnail_image:
-        thumbsByName[courseNameKey] ?? thumbsByName[scoreCourseKey] ?? null,
-      is_course_best: score
-        ? bestKeyed.has(`${f.friend_connection_id}:${score.id}`)
+        thumbsByName[courseNameKey] ?? thumbsByName[fallbackCourseKey] ?? null,
+      is_course_best: matchedScore
+        ? bestKeyed.has(`${f.friend_connection_id}:${matchedScore.id}`)
         : false,
       friend_handicap_index: f.friend_handicap_index ?? null,
-      is_counter: !!score?.is_counter,
-      handicap_index_at_time: score?.handicap_index_at_time ?? null,
-      viewer_has_reacted: scoreId ? viewerReactedSet.has(scoreId) : false,
-      reaction_count: scoreId ? reactionCounts[scoreId] ?? 0 : 0,
+      is_counter: !!matchedScore?.is_counter,
+      handicap_index_at_time: matchedScore?.handicap_index_at_time ?? null,
+      viewer_has_reacted: matchedScoreId ? viewerReactedSet.has(matchedScoreId) : false,
+      reaction_count: matchedScoreId ? reactionCounts[matchedScoreId] ?? 0 : 0,
     };
   });
 }
