@@ -4,7 +4,10 @@
  *   - 'recapNext' → HybridRecapNext (next event headline + results recap w/ top 3)
  * Owns its index internally. Tour switcher writes a slug via context; we read it
  * and jump our own index. Random landing, fixed (no auto-rotate), swipe + dots.
+ *
+ * ALL hooks run unconditionally before any early return (React #310 safety).
  */
+
 import React, { useMemo, useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useHeroSlidesHybrid, type HybridHeroSlide } from '../../hooks/useHeroSlidesHybrid';
@@ -53,6 +56,7 @@ export function OverviewHero({ height = 528 }: OverviewHeroProps) {
   const count = slides.length;
 
   const { selectedTourSlug, selectionNonce, setViewingTourSlug } = useTourSelection();
+
   useEffect(() => {
     if (!selectedTourSlug || count === 0) return;
     const idx = slides.findIndex((s) => s.tourSlug === selectedTourSlug);
@@ -66,6 +70,16 @@ export function OverviewHero({ height = 528 }: OverviewHeroProps) {
   useEffect(() => {
     setActiveIndex(0);
   }, [idSignature]);
+
+  // DISPLAY-ONLY: report the tour currently in view so the switcher label can
+  // track it (random landing, swipe, dots, tap-jump). Computed inline (not from
+  // the post-return `active`) and placed with the other hooks so hook ORDER is
+  // unconditional — every render runs the same hooks (fixes React #310). The
+  // hero NEVER reads viewingTourSlug back; one-way, dead end.
+  const viewingSlug = count > 0 ? slides[Math.min(activeIndex, count - 1)]?.tourSlug : undefined;
+  useEffect(() => {
+    if (viewingSlug) setViewingTourSlug(viewingSlug);
+  }, [viewingSlug, setViewingTourSlug]);
 
   const goTo = useCallback((i: number) => setActiveIndex(i), []);
 
@@ -90,13 +104,6 @@ export function OverviewHero({ height = 528 }: OverviewHeroProps) {
   }
 
   const active = slides[Math.min(activeIndex, count - 1)];
-
-  // DISPLAY-ONLY: report the tour currently in view so the switcher label can
-  // track it (random landing, swipe, dots, tap-jump). The hero NEVER reads this
-  // back — doing so would re-create the parent<->hero loop. One-way, dead end.
-  useEffect(() => {
-    if (active?.tourSlug) setViewingTourSlug(active.tourSlug);
-  }, [active?.tourSlug, setViewingTourSlug]);
 
   return (
     <div style={{ position: 'relative', width: '100%' }} onTouchStart={onTouchStart} onTouchMove={onTouchMove} onTouchEnd={onTouchEnd}>
