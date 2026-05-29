@@ -208,7 +208,7 @@ export const SheetHeroGlass: React.FC<Props> = ({
             <GlassGrossRing
               value={gross != null ? gross : EM_DASH}
               isCounter={isCounter}
-              numeralSize={28}
+              numeralSize={22}
             />
           </div>
         </div>
