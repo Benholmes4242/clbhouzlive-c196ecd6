@@ -151,6 +151,7 @@ export const TourHubShellTabs: React.FC = () => {
           />
         )}
       </div>
+      <TourSwitcherAffordance />
     </section>
   );
 };
