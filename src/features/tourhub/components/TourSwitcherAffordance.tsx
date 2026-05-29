@@ -146,14 +146,15 @@ export const TourSwitcherAffordance: React.FC = () => {
                 </div>
 
                 {liveCount > 0 ? (
-                  <div
+                  <span
                     style={{
                       display: 'inline-flex',
                       alignItems: 'center',
-                      gap: 5,
-                      padding: '3px 7px',
-                      background: 'rgba(239,68,68,0.1)',
-                      borderRadius: 4,
+                      gap: 6,
+                      flexShrink: 0,
+                      padding: '3px 9px',
+                      borderRadius: 999,
+                      background: 'rgba(16,185,129,0.12)',
                     }}
                   >
                     <span
@@ -161,30 +162,24 @@ export const TourSwitcherAffordance: React.FC = () => {
                         width: 6,
                         height: 6,
                         borderRadius: '50%',
-                        background: '#EF4444',
+                        background: '#10B981',
+                        display: 'inline-block',
                       }}
                     />
                     <span
                       style={{
-                        fontSize: 9,
+                        fontSize: 10,
                         fontWeight: 800,
-                        color: '#EF4444',
-                        letterSpacing: '0.12em',
+                        letterSpacing: '0.16em',
+                        color: '#10B981',
                       }}
                     >
                       LIVE
                     </span>
-                  </div>
+                  </span>
                 ) : (
                   !selectable && (
-                    <span
-                      style={{
-                        fontSize: 9,
-                        fontWeight: 700,
-                        color: '#94A3B8',
-                        letterSpacing: '0.12em',
-                      }}
-                    >
+                    <span style={{ fontSize: 10, fontWeight: 800, letterSpacing: '0.16em', color: 'rgba(15,23,42,0.35)' }}>
                       NO EVENT
                     </span>
                   )
