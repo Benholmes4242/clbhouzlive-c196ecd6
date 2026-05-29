@@ -58,15 +58,17 @@ export function TourHubMainPage() {
   };
 
   return (
-    <TourHubShell>
-      <ShellSlot dark>
-        <TourHubShellTabs />
-        {renderShellRow()}
-      </ShellSlot>
+    <TourSelectionProvider>
+      <TourHubShell>
+        <ShellSlot dark>
+          <TourHubShellTabs />
+          {renderShellRow()}
+        </ShellSlot>
 
-      <div style={{ paddingTop: 'var(--chrome-total-h, 0px)' }}>
-        {renderTab()}
-      </div>
-    </TourHubShell>
+        <div style={{ paddingTop: 'var(--chrome-total-h, 0px)' }}>
+          {renderTab()}
+        </div>
+      </TourHubShell>
+    </TourSelectionProvider>
   );
 }
