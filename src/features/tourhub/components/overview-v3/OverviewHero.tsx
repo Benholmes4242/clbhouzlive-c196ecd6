@@ -52,7 +52,7 @@ export function OverviewHero({ height = 528 }: OverviewHeroProps) {
   const [activeIndex, setActiveIndex] = useState(0);
   const count = slides.length;
 
-  const { selectedTourSlug, selectionNonce } = useTourSelection();
+  const { selectedTourSlug, selectionNonce, setViewingTourSlug } = useTourSelection();
   useEffect(() => {
     if (!selectedTourSlug || count === 0) return;
     const idx = slides.findIndex((s) => s.tourSlug === selectedTourSlug);
@@ -90,6 +90,13 @@ export function OverviewHero({ height = 528 }: OverviewHeroProps) {
   }
 
   const active = slides[Math.min(activeIndex, count - 1)];
+
+  // DISPLAY-ONLY: report the tour currently in view so the switcher label can
+  // track it (random landing, swipe, dots, tap-jump). The hero NEVER reads this
+  // back — doing so would re-create the parent<->hero loop. One-way, dead end.
+  useEffect(() => {
+    if (active?.tourSlug) setViewingTourSlug(active.tourSlug);
+  }, [active?.tourSlug, setViewingTourSlug]);
 
   return (
     <div style={{ position: 'relative', width: '100%' }} onTouchStart={onTouchStart} onTouchMove={onTouchMove} onTouchEnd={onTouchEnd}>

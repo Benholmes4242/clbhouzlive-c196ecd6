@@ -27,10 +27,12 @@ const TOUR_LABEL: Record<string, string> = {
 export const TourSwitcherAffordance: React.FC = () => {
   const { data } = useAllToursTickerData();
   const [open, setOpen] = useState(false);
-  const { selectedTourSlug, selectTour } = useTourSelection();
+  const { selectedTourSlug, selectTour, viewingTourSlug } = useTourSelection();
 
-  // Pill reflects the manually-selected tour, defaulting to PGA before any pick.
-  const activeTourSlug = selectedTourSlug ?? 'pga';
+  // Pill + active-row reflect the tour CURRENTLY IN VIEW on the hero (updates on
+  // random landing, swipe, dots, and taps). Fall back to the user's explicit
+  // pick, then PGA before the hero has reported anything.
+  const activeTourSlug = viewingTourSlug ?? selectedTourSlug ?? 'pga';
 
   const tourStatus = (slug: string): 'live' | 'upcoming' | 'none' => {
     if (data?.live.some((c) => c.tourSlug === slug)) return 'live';
