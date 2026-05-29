@@ -407,9 +407,13 @@ export function HeroCarousel({
 }: HeroCarouselProps) {
   const { data: slides = [], isLoading } = useHeroCarouselData();
   const rawSlides = Array.isArray(slides) ? slides : [];
-  const safeSlides = mode === 'overview'
-    ? rawSlides.filter((s) => s.type !== 'upcoming')
-    : rawSlides;
+  // Referentially stable: only rebuild when slide ids / mode actually change.
+  const slideSignature = rawSlides.map((s) => `${s.type}:${s.tournament.id}`).join('|');
+  const safeSlides = React.useMemo(
+    () => (mode === 'overview' ? rawSlides.filter((s) => s.type !== 'upcoming') : rawSlides),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [slideSignature, mode],
+  );
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
   const [autoAdvanceKey, setAutoAdvanceKey] = useState(0);
@@ -444,7 +448,7 @@ export function HeroCarousel({
     lastEmittedRef.current = id;
     onActiveChange(id);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentIndex, safeSlides.length, activeTournamentId]);
+  }, [currentIndex, safeSlides, activeTournamentId, onActiveChange]);
 
   const handleToggleExpand = useCallback(() => {
     setIsExpanded(prev => !prev);
@@ -480,19 +484,9 @@ export function HeroCarousel({
     };
   }, []);
 
-  // Auto-advance every 12 seconds, resets on user interaction.
-  // Phase A — `autoRotate` prop allows the parent (OverviewPageV3) to terminally pause
-  // rotation when the user explicitly picks a tournament from the Ticker.
-  useEffect(() => {
-    if (!autoRotate || safeSlides.length <= 1 || isPaused || isExpanded) return;
-
-    const interval = setInterval(() => {
-      if (isScorecardOpenRef.current) return;
-      setCurrentIndex(prev => (prev + 1) % safeSlides.length);
-    }, 12000);
-
-    return () => clearInterval(interval);
-  }, [safeSlides.length, isPaused, isExpanded, autoAdvanceKey, autoRotate]);
+  // Auto-rotation removed (May 2026). Slides change ONLY via user swipe, dot tap,
+  // or the parent tour-switcher. isPaused / autoAdvanceKey / scheduleResume remain
+  // as inert bookkeeping for the swipe handlers and never drive an auto-advance.
 
   // Pause auto-advance when app is backgrounded
   useEffect(() => {
