@@ -15,6 +15,7 @@ import React, { useMemo, useState, useEffect, useRef, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion';
 import { useHeroCarouselData, type HeroSlide } from '../../hooks/useHeroCarouselData';
 import { HybridHero } from './HybridHero';
+import { useTourSelection } from '../../context/TourSelectionContext';
 
 function shuffle<T>(input: T[]): T[] {
   const a = [...input];
