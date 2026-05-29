@@ -12,13 +12,13 @@ const MINUS = '\u2212';
 const EM_DASH = '\u2014';
 
 const lockedLabelStyle: React.CSSProperties = {
-  fontSize: 10,
+  fontSize: 8,
   fontWeight: 700,
   color: 'rgba(255,255,255,0.40)',
   letterSpacing: '0.16em',
   textTransform: 'uppercase',
   fontFamily: FONT_GEIST,
-  marginBottom: 4,
+  marginBottom: 3,
 };
 
 const LockedTile: React.FC<{ label: string; align?: 'left' | 'right' | 'center' }> = ({
@@ -29,10 +29,10 @@ const LockedTile: React.FC<{ label: string; align?: 'left' | 'right' | 'center' 
     <div style={lockedLabelStyle}>{label}</div>
     <div
       style={{
-        marginTop: 4,
-        width: 36,
-        height: 36,
-        borderRadius: 8,
+        marginTop: 3,
+        width: 29,
+        height: 29,
+        borderRadius: 6,
         border: '1px dashed rgba(255,255,255,0.20)',
         background: 'rgba(255,255,255,0.06)',
         display: 'inline-flex',
@@ -40,7 +40,7 @@ const LockedTile: React.FC<{ label: string; align?: 'left' | 'right' | 'center' 
         justifyContent: 'center',
       }}
     >
-      <Lock size={14} color="rgba(255,255,255,0.45)" strokeWidth={2} />
+      <Lock size={11} color="rgba(255,255,255,0.45)" strokeWidth={2} />
     </div>
   </div>
 );
@@ -70,23 +70,23 @@ const HAIR: React.CSSProperties = {
 };
 
 const labelStyle: React.CSSProperties = {
-  fontSize: 10,
+  fontSize: 8,
   fontWeight: 700,
   color: 'rgba(255,255,255,0.55)',
   letterSpacing: '0.16em',
   textTransform: 'uppercase',
   fontFamily: FONT_GEIST,
-  marginBottom: 4,
+  marginBottom: 3,
 };
 
 const valueStyle = (color: string): React.CSSProperties => ({
-  fontSize: 30,
+  fontSize: 24,
   fontWeight: 300,
   color,
   fontFamily: FONT_MONO,
   letterSpacing: '-0.03em',
   lineHeight: 1,
-  marginTop: 3,
+  marginTop: 2,
   fontVariantNumeric: 'tabular-nums',
 });
 
@@ -147,8 +147,8 @@ export const SheetHeroGlass: React.FC<Props> = ({
         right: 14,
         bottom: 14,
         zIndex: 3,
-        padding: '14px 16px',
-        borderRadius: 16,
+        padding: '11px 13px',
+        borderRadius: 13,
         background: 'rgba(255,255,255,0.08)',
         border: '0.5px solid rgba(255,255,255,0.18)',
         backdropFilter: 'blur(40px) saturate(180%)',
@@ -159,7 +159,7 @@ export const SheetHeroGlass: React.FC<Props> = ({
       <div>
         <div
           style={{
-            fontSize: 18,
+            fontSize: 14,
             fontWeight: 700,
             color: '#FFFFFF',
             letterSpacing: '-0.025em',
@@ -172,8 +172,8 @@ export const SheetHeroGlass: React.FC<Props> = ({
         {meta && (
           <div
             style={{
-              marginTop: 3,
-              fontSize: 10,
+              marginTop: 2,
+              fontSize: 8,
               fontWeight: 600,
               color: 'rgba(255,255,255,0.60)',
               letterSpacing: '0.06em',
@@ -185,7 +185,7 @@ export const SheetHeroGlass: React.FC<Props> = ({
         )}
       </div>
 
-      <div style={{ ...HAIR, margin: '12px 0' }} />
+      <div style={{ ...HAIR, margin: '10px 0' }} />
 
       <div
         style={
@@ -193,8 +193,8 @@ export const SheetHeroGlass: React.FC<Props> = ({
             ? {
                 display: 'grid',
                 gridTemplateColumns: '1fr 1fr',
-                rowGap: 14,
-                columnGap: 12,
+                rowGap: 11,
+                columnGap: 10,
               }
             : { display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }
         }
@@ -208,7 +208,7 @@ export const SheetHeroGlass: React.FC<Props> = ({
             <GlassGrossRing
               value={gross != null ? gross : EM_DASH}
               isCounter={isCounter}
-              numeralSize={28}
+              numeralSize={22}
             />
           </div>
         </div>
