@@ -1,5 +1,4 @@
 import React from 'react';
-import { ArrowDown, ArrowUp, Flame } from 'lucide-react';
 import { initials, displayName } from '@/lib/whs/utils/initials';
 import { pickAvatarSrc } from '@/lib/whs/utils/avatarSrc';
 import { fmtRelative } from '@/lib/whs/utils/nameFormat';
