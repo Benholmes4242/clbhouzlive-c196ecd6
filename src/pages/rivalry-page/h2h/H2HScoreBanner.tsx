@@ -58,8 +58,12 @@ export const H2HScoreBanner: React.FC<Props> = ({
             fontWeight: 800,
             letterSpacing: '0.14em',
             textTransform: 'uppercase',
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: 6,
           }}
         >
+          {TierIcon && <TierIcon size={12} strokeWidth={2.5} />}
           {eyebrow}
         </div>
         <div
