@@ -63,7 +63,9 @@ export function OverviewHero({ height = 528 }: OverviewHeroProps) {
 
   useEffect(() => {
     // TEMP: UI inspection only — revert after screenshot
-    const idx = slides.findIndex((s) => s.tournament.tourSlug === 'champ' && s.type === 'completed');
+    const champIdx = slides.findIndex((s) => s.tournament.tourSlug === 'champ' && s.type === 'completed');
+    const anyCompletedIdx = slides.findIndex((s) => s.type === 'completed');
+    const idx = champIdx >= 0 ? champIdx : anyCompletedIdx;
     setActiveIndex(idx >= 0 ? idx : 0);
   }, [idSignature]);
 
