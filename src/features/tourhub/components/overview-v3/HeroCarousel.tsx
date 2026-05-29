@@ -407,9 +407,13 @@ export function HeroCarousel({
 }: HeroCarouselProps) {
   const { data: slides = [], isLoading } = useHeroCarouselData();
   const rawSlides = Array.isArray(slides) ? slides : [];
-  const safeSlides = mode === 'overview'
-    ? rawSlides.filter((s) => s.type !== 'upcoming')
-    : rawSlides;
+  // Referentially stable: only rebuild when slide ids / mode actually change.
+  const slideSignature = rawSlides.map((s) => `${s.type}:${s.tournament.id}`).join('|');
+  const safeSlides = React.useMemo(
+    () => (mode === 'overview' ? rawSlides.filter((s) => s.type !== 'upcoming') : rawSlides),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [slideSignature, mode],
+  );
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
   const [autoAdvanceKey, setAutoAdvanceKey] = useState(0);
