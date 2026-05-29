@@ -9,6 +9,7 @@ import { ScheduleShellRow } from '../components/shell/ScheduleShellRow';
 import { PlayersShellRow } from '../components/shell/PlayersShellRow';
 import { LeadersShellRow } from '../components/shell/LeadersShellRow';
 import { useTournamentStatusRealtime } from '../hooks/useTournamentStatusRealtime';
+import { TourSelectionProvider } from '../context/TourSelectionContext';
 
 export function TourHubMainPage() {
   const [searchParams, setSearchParams] = useSearchParams();
