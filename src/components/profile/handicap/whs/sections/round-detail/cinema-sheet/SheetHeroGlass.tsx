@@ -221,7 +221,7 @@ export const SheetHeroGlass: React.FC<Props> = ({
           </div>
         )}
         {lockMissingStats ? (
-          <LockedTile label="SCORE DIFF" align={hasImpact ? 'left' : 'right'} />
+          <LockedTile label="SCORE DIFF" align="center" />
         ) : (
           <div style={{ textAlign: hasImpact ? 'left' : 'right' }}>
             <div style={labelStyle}>SCORE DIFF</div>
