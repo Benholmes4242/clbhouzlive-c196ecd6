@@ -9,6 +9,7 @@ import { ScheduleShellRow } from '../components/shell/ScheduleShellRow';
 import { PlayersShellRow } from '../components/shell/PlayersShellRow';
 import { LeadersShellRow } from '../components/shell/LeadersShellRow';
 import { useTournamentStatusRealtime } from '../hooks/useTournamentStatusRealtime';
+import { TourSelectionProvider } from '../context/TourSelectionContext';
 
 export function TourHubMainPage() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -57,15 +58,17 @@ export function TourHubMainPage() {
   };
 
   return (
-    <TourHubShell>
-      <ShellSlot dark>
-        <TourHubShellTabs />
-        {renderShellRow()}
-      </ShellSlot>
+    <TourSelectionProvider>
+      <TourHubShell>
+        <ShellSlot dark>
+          <TourHubShellTabs />
+          {renderShellRow()}
+        </ShellSlot>
 
-      <div style={{ paddingTop: 'var(--chrome-total-h, 0px)' }}>
-        {renderTab()}
-      </div>
-    </TourHubShell>
+        <div style={{ paddingTop: 'var(--chrome-total-h, 0px)' }}>
+          {renderTab()}
+        </div>
+      </TourHubShell>
+    </TourSelectionProvider>
   );
 }
