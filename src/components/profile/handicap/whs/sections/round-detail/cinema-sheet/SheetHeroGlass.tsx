@@ -232,7 +232,7 @@ export const SheetHeroGlass: React.FC<Props> = ({
         )}
 
         {hasImpact && (
-          <div style={{ textAlign: 'right' }}>
+          <div style={{ textAlign: 'center' }}>
             <div style={labelStyle}>HCP IMPACT</div>
             <div style={valueStyle(impactColor)}>{fmtImpact(handicapDelta!)}</div>
           </div>
