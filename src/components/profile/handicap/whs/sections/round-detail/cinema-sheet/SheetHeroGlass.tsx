@@ -199,7 +199,7 @@ export const SheetHeroGlass: React.FC<Props> = ({
             : { display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }
         }
       >
-        <div style={{ textAlign: 'left' }}>
+        <div style={{ textAlign: 'center' }}>
           <div style={labelStyle}>GROSS</div>
           <div
             style={{ marginTop: 4 }}
