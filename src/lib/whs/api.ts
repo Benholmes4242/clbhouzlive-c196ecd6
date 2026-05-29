@@ -442,7 +442,15 @@ export async function fetchFriendsActivity(
   const friendConnIds = friends
     .map((f) => f.friend_connection_id)
     .filter(Boolean);
-  const scoresByConn: Record<string, any> = {};
+  // Key by `connection_id::play_date` so we can match the EXACT round the
+  // friend record describes (not "most recent score for this connection",
+  // which silently splices wrong-round data when the friend's own sync is
+  // stale).
+  const scoresByKey: Record<string, any> = {};
+  // Also keep the "most recent per connection" map so we can still surface
+  // a course thumbnail when the friend record happens not to match.
+  const latestScoreByConn: Record<string, any> = {};
+
   if (friendConnIds.length > 0) {
     const { data: scoreRows } = await supabase
       .from('whs_scores' as any)
@@ -461,9 +469,9 @@ export async function fetchFriendsActivity(
       .in('connection_id', friendConnIds)
       .order('play_date', { ascending: false });
     for (const s of ((scoreRows as any[]) ?? [])) {
-      if (!scoresByConn[s.connection_id]) {
-        scoresByConn[s.connection_id] = s;
-      }
+      const key = `${s.connection_id}::${s.play_date}`;
+      if (!scoresByKey[key]) scoresByKey[key] = s;
+      if (!latestScoreByConn[s.connection_id]) latestScoreByConn[s.connection_id] = s;
     }
   }
 
