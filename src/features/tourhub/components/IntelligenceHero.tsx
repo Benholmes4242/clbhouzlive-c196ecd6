@@ -1388,6 +1388,15 @@ export const IntelligenceHero = memo(function IntelligenceHero() {
     ).length;
     const hitRatePct =
       totalResolved > 0 ? Math.round((topFives / totalResolved) * 100) : 0;
+    // TEMP AUDIT LOG — remove after diagnosis
+    // eslint-disable-next-line no-console
+    console.log('[IntelHero stats]', {
+      totalResolved,
+      wins,
+      topFives,
+      hitRatePct,
+      outcomes: tournaments.map((t) => ({ name: t.name, outcome: t.outcome })),
+    });
     return { wins, topFives, hitRatePct };
   }, [tournaments]);
 
