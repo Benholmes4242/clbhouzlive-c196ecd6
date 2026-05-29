@@ -8,7 +8,7 @@
 
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { fmtScore } from '../components/overview-v3/HybridHero.utils';
+import { fmtScore } from '../utils/fmtScore';
 
 export interface LastYearFinisher {
   rank: string;       // "1", "T2" — preserves tie notation

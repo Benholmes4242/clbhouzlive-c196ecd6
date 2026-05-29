@@ -35,7 +35,6 @@ import {
 } from '../schedule';
 
 import { useLiveRightNow } from '../../hooks/useOverviewModules';
-import { LiveRightNow } from '../overview-v3/LiveRightNow';
 
 // B45 FIX 1: Helper for completed status check
 const isCompleted = (t: TourTournament) => t.status === 'closed' || t.status === 'complete';
@@ -427,12 +426,7 @@ export function ScheduleTab() {
         />
       )}
 
-      {/* Live Now — All tab only, below Next Up */}
-      {!search && filter === 'all' && (
-        <div style={{ padding: '0 16px 12px' }}>
-          <LiveRightNow />
-        </div>
-      )}
+      {/* LiveRightNow removed during Tour Overview hero nuke; rebuild pending. */}
 
 
       <div style={{ background: '#ffffff', marginTop: '8px' }}>
