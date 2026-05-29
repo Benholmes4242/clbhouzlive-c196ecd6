@@ -223,7 +223,7 @@ export const SheetHeroGlass: React.FC<Props> = ({
         {lockMissingStats ? (
           <LockedTile label="SCORE DIFF" align="center" />
         ) : (
-          <div style={{ textAlign: hasImpact ? 'left' : 'right' }}>
+          <div style={{ textAlign: 'center' }}>
             <div style={labelStyle}>SCORE DIFF</div>
             <div style={valueStyle(differential != null ? AMBER : '#FFFFFF')}>
               {fmtDiffLocal(differential)}
