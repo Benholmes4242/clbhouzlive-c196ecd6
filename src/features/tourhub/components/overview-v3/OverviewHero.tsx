@@ -1,9 +1,14 @@
 /**
- * OverviewHero — self-contained hero carousel for the Tour Hub Overview tab.
- * Keeps the ORIGINAL HybridHero visuals but owns its index INTERNALLY.
- * No activeTournamentId flows up, no onActiveChange, no ?tour= coupling, no
- * tour selector. All three states (live/completed/upcoming) eligible to lead;
- * order shuffled once per data load so the landing tournament differs each visit.
+ * OverviewHero — self-contained hero for the Tour Hub Overview tab.
+ *
+ * Keeps the original HybridHero visuals and owns its index INTERNALLY.
+ * Contract — do not reintroduce parent sync:
+ *  - No activeTournamentId flows up, no onActiveChange, no ?tour= coupling,
+ *    no tour selector. One owner = no loop.
+ *  - All three states (live/completed/upcoming) are eligible to lead. On each
+ *    data load the slide order is shuffled once and the FIRST slide is shown.
+ *  - NO auto-rotation: the user lands on a random tournament and it stays
+ *    fixed for the session. Slides change ONLY via swipe or dot tap.
  */
 
 import React, { useMemo, useState, useEffect, useRef, useCallback } from 'react';
@@ -45,40 +50,14 @@ export function OverviewHero({ height = 528 }: OverviewHeroProps) {
 
   const touchStartRef = useRef(0);
   const touchDeltaRef = useRef(0);
-  const pausedRef = useRef(false);
-  const autoRef = useRef<ReturnType<typeof setInterval>>();
 
   useEffect(() => {
     setActiveIndex(0);
   }, [idSignature]);
 
-  const startAuto = useCallback(() => {
-    if (autoRef.current) clearInterval(autoRef.current);
-    if (count <= 1) return;
-    autoRef.current = setInterval(() => {
-      if (!pausedRef.current) setActiveIndex((p) => (p + 1) % count);
-    }, 7000);
-  }, [count]);
-
-  useEffect(() => {
-    startAuto();
-    return () => {
-      if (autoRef.current) clearInterval(autoRef.current);
-    };
-  }, [startAuto]);
-
-  useEffect(() => {
-    const onVis = () => {
-      pausedRef.current = document.hidden;
-    };
-    document.addEventListener('visibilitychange', onVis);
-    return () => document.removeEventListener('visibilitychange', onVis);
-  }, []);
-
   const goTo = useCallback((i: number) => setActiveIndex(i), []);
 
   const onTouchStart = (e: React.TouchEvent) => {
-    pausedRef.current = true;
     touchStartRef.current = e.touches[0].clientX;
     touchDeltaRef.current = 0;
   };
@@ -90,9 +69,6 @@ export function OverviewHero({ height = 528 }: OverviewHeroProps) {
     if (Math.abs(d) > 50 && count > 1) {
       setActiveIndex((p) => (d < 0 ? (p + 1) % count : (p - 1 + count) % count));
     }
-    window.setTimeout(() => {
-      pausedRef.current = document.hidden;
-    }, 5000);
   };
 
   if (isLoading || count === 0) {
