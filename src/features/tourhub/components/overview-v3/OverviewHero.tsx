@@ -49,6 +49,15 @@ export function OverviewHero({ height = 528 }: OverviewHeroProps) {
   const [activeIndex, setActiveIndex] = useState(0);
   const count = slides.length;
 
+  // Manual tour switcher (one-way): jump to the first slide for the picked tour.
+  const { selectedTourSlug, selectionNonce } = useTourSelection();
+  useEffect(() => {
+    if (!selectedTourSlug || count === 0) return;
+    const idx = slides.findIndex((s) => s.tournament.tourSlug === selectedTourSlug);
+    if (idx >= 0) setActiveIndex(idx);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectionNonce]);
+
   const touchStartRef = useRef(0);
   const touchDeltaRef = useRef(0);
 
