@@ -416,7 +416,7 @@ const HeroHandicapCardDark: React.FC<Props> = ({ connection }) => {
                 )}
               </svg>
               {Math.abs(delta90).toFixed(1)} over 90 days
-              {verdict === 'good' && !isMarginal && (
+              {verdict === 'good' && !isFlat && (
                 <span style={{ fontSize: 13, lineHeight: 1, marginLeft: 2 }}>🔥</span>
               )}
             </span>
