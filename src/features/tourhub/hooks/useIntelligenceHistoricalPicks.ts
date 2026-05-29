@@ -143,10 +143,26 @@ export function useIntelligenceHistoricalPicks() {
       const tournamentIds = predRows.map(r => r.tournament_id);
 
       // Step 2: batched leaderboard fetch keyed by tournament + sr_id/name.
-      const { data: leaderboardData } = await supabase
-        .from('sr_leaderboards')
-        .select('tournament_id, player_id, position, position_tied, status, score, sr_players!inner(sr_id, full_name)')
-        .in('tournament_id', tournamentIds);
+      // Leaderboard can exceed PostgREST's default 1000-row cap (≈18 tournaments
+      // × ~150 players ≈ 2,800 rows). Without pagination the response is silently
+      // truncated, so later tournaments' picks never match and show "—". Page
+      // through in 1000-row windows until exhausted.
+      const leaderboardData: any[] = [];
+      const PAGE = 1000;
+      for (let from = 0; ; from += PAGE) {
+        const { data: page, error: lbErr } = await supabase
+          .from('sr_leaderboards')
+          .select('tournament_id, player_id, position, position_tied, status, score, sr_players!inner(sr_id, full_name)')
+          .in('tournament_id', tournamentIds)
+          .range(from, from + PAGE - 1);
+        if (lbErr) {
+          console.error('useIntelligenceHistoricalPicks leaderboard error:', lbErr);
+          break;
+        }
+        if (!page?.length) break;
+        leaderboardData.push(...page);
+        if (page.length < PAGE) break;
+      }
 
       type LBEntry = { position: number | null; tied: boolean; status: string | null; score: number | null };
       const lbByTournament = new Map<string, { byPlayerId: Map<string, LBEntry>; bySrId: Map<string, LBEntry>; byName: Map<string, LBEntry> }>();
