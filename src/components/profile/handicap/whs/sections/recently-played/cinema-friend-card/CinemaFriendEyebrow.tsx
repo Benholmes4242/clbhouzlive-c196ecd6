@@ -120,53 +120,6 @@ export const CinemaFriendEyebrow: React.FC<Props> = ({ activity, showLowestRound
             Lowest Round
           </span>
         )}
-        {showImpact && (
-          <span
-            style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: 4,
-              padding: '4px 9px',
-              borderRadius: 999,
-              fontSize: 11,
-              fontWeight: 700,
-              fontVariantNumeric: 'tabular-nums',
-              letterSpacing: '0.02em',
-              textTransform: 'uppercase',
-              backdropFilter: 'blur(20px)',
-              WebkitBackdropFilter: 'blur(20px)',
-              background: impactIsImprovement
-                ? 'rgba(5,150,105,0.22)'
-                : 'rgba(159,29,29,0.22)',
-              border: impactIsImprovement
-                ? '0.5px solid rgba(5,150,105,0.55)'
-                : '0.5px solid rgba(159,29,29,0.55)',
-              color: impactIsImprovement ? '#34D399' : '#F87171',
-              flexShrink: 0,
-            }}
-          >
-            <span style={{ fontSize: 9, fontWeight: 700, letterSpacing: '0.10em' }}>HCP</span>
-            {impactIsImprovement ? (
-              <ArrowDown size={10} strokeWidth={1.6} />
-            ) : (
-              <ArrowUp size={10} strokeWidth={1.6} />
-            )}
-            {Math.abs(impactDelta!).toFixed(1)}
-            {showHotFlame && (
-              <Flame
-                size={11}
-                strokeWidth={2.4}
-                aria-label="Hot round — handicap cut"
-                style={{
-                  marginLeft: 2,
-                  color: '#F7931E',
-                  filter:
-                    'drop-shadow(0 0 4px rgba(247,147,30,0.50)) drop-shadow(0 1px 2px rgba(0,0,0,0.4))',
-                }}
-              />
-            )}
-          </span>
-        )}
       </div>
     </div>
   );
