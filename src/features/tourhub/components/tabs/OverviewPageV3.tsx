@@ -16,7 +16,7 @@ import { StatOfTheWeek } from '../StatOfTheWeek';
 import { HomeCourseOfWeekModule } from '../home/HomeCourseOfWeekModule';
 import { HomeWatchRail } from '../home/HomeWatchRail';
 import { HomeConnectHandicapModule } from '../home/HomeConnectHandicapModule';
-import { DispatchModule } from '../overview-v3/DispatchModule';
+
 import { OverviewHero } from '../overview-v3/OverviewHero';
 import { useNetworkStatus } from '@/hooks/useNetworkStatus';
 import { WifiOff } from 'lucide-react';
@@ -57,8 +57,6 @@ export function OverviewPageV3() {
         <OverviewHero />
 
 
-        {/* Editorial content tier */}
-        <DispatchModule />
 
         <div
           id="content-below-hero"
