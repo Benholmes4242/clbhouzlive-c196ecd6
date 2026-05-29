@@ -17,6 +17,7 @@ import { HomeCourseOfWeekModule } from '../home/HomeCourseOfWeekModule';
 import { HomeWatchRail } from '../home/HomeWatchRail';
 import { HomeConnectHandicapModule } from '../home/HomeConnectHandicapModule';
 import { DispatchModule } from '../overview-v3/DispatchModule';
+import { OverviewHero } from '../overview-v3/OverviewHero';
 import { useNetworkStatus } from '@/hooks/useNetworkStatus';
 import { WifiOff } from 'lucide-react';
 import ScrollToTopGlass from '@/components/common/ScrollToTopGlass';
@@ -51,10 +52,10 @@ export function OverviewPageV3() {
         animate={{ opacity: 1 }}
         transition={{ duration: 0.3 }}
       >
-        {/* Hero placeholder — rebuild pending */}
-        <div style={{ height: 200, display: 'flex', alignItems: 'center', justifyContent: 'center', opacity: 0.4 }}>
-          Hero rebuild pending
-        </div>
+        {/* Tour Hub hero — self-contained carousel (single-owner index, random
+            landing slide, all three states eligible). See OverviewHero.tsx. */}
+        <OverviewHero />
+
 
         {/* Editorial content tier */}
         <DispatchModule />
