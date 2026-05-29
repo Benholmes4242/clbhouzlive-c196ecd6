@@ -128,7 +128,7 @@ const HeroHandicapCardDark: React.FC<Props> = ({ connection }) => {
 
   const grad = arcGradient(verdict);
   const glowColor = arcGlowColor(verdict);
-  const isMarginal = delta90 != null && Math.abs(delta90) < 0.3;
+  const isFlat = delta90 != null && delta90 === 0;
 
   // Scratch zone: half-step below current displayed value (e.g. 1.8 → 1.6).
   const scratchZone = useMemo(() => {
