@@ -476,7 +476,7 @@ export async function fetchFriendsActivity(
   }
 
   const courseNames = new Set<string>();
-  Object.values(scoresByConn).forEach((s: any) => {
+  Object.values(latestScoreByConn).forEach((s: any) => {
     if (s.course?.name) courseNames.add(s.course.name);
   });
   // Also include course names from friend match rows so non-Clbhouz friends
@@ -499,7 +499,7 @@ export async function fetchFriendsActivity(
   );
 
   // Reaction enrichment — only for rounds with a score_id (synced friends).
-  const scoreIdsForReactions = Object.values(scoresByConn)
+  const scoreIdsForReactions = Object.values(scoresByKey)
     .map((s: any) => s?.id)
     .filter((id: any): id is string => !!id);
 
