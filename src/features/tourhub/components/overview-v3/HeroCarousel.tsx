@@ -421,16 +421,20 @@ export function HeroCarousel({
   const [isExpanded, setIsExpanded] = useState(false);
   const lastEmittedRef = React.useRef<string | null>(null);
 
-  // Phase A — sync external activeTournamentId → internal currentIndex (one-way, parent-driven)
+  // Phase A — sync external activeTournamentId → internal currentIndex (one-way, parent-driven).
   useEffect(() => {
     if (!activeTournamentId || safeSlides.length === 0) return;
     const idx = safeSlides.findIndex(s => s.tournament.id === activeTournamentId);
-    if (idx >= 0 && idx !== currentIndex) {
+    if (idx < 0) {
+      lastEmittedRef.current = activeTournamentId; // no slide for this id; don't echo
+      return;
+    }
+    if (idx !== currentIndex) {
       lastEmittedRef.current = activeTournamentId; // parent-driven; don't echo back
       setCurrentIndex(idx);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [activeTournamentId, safeSlides.length]);
+  }, [activeTournamentId, safeSlides]);
 
   // Phase A — emit currentIndex changes upward (so the Ticker's "NOW SHOWING" follows auto-rotate / swipe).
   // lastEmittedRef prevents the parent↔child echo loop: we only emit an id we have not
