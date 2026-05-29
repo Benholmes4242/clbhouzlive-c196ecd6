@@ -215,7 +215,7 @@ export const SheetHeroGlass: React.FC<Props> = ({
         {lockMissingStats ? (
           <LockedTile label="STABLEFORD" align="center" />
         ) : (
-          <div style={{ textAlign: hasImpact ? 'right' : 'center' }}>
+          <div style={{ textAlign: 'center' }}>
             <div style={labelStyle}>STABLEFORD</div>
             <div style={valueStyle('#FFFFFF')}>{stableford != null ? stableford : EM_DASH}</div>
           </div>
