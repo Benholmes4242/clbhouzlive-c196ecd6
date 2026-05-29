@@ -198,7 +198,9 @@ export function useIntelligenceHistoricalPicks() {
           const playerId: string = String(pick.playerId || pick.pgaTourId || '');
           if (!playerName) continue;
 
-          const lb = maps.bySrId.get(playerId) ?? maps.byName.get(playerName.toLowerCase());
+          const lb = maps.byPlayerId.get(playerId)
+            ?? maps.bySrId.get(playerId)
+            ?? maps.byName.get(playerName.toLowerCase());
           const actualPosition = lb?.position ?? null;
           const actualPositionTied = lb?.tied ?? false;
           const status = lb?.status ?? null;
