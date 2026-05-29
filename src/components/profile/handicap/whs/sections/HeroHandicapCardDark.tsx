@@ -101,7 +101,6 @@ const HeroHandicapCardDark: React.FC<Props> = ({ connection }) => {
   // Verdict drives ring colour + pill + tag word.
   const verdict: Verdict = useMemo(() => {
     if (delta90 == null) return 'neutral';
-    if (Math.abs(delta90) <= 0.2) return 'mid';
     return verdictForDelta(delta90); // negative = good (handicap going down)
   }, [delta90]);
 
