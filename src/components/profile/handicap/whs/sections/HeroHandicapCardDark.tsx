@@ -382,7 +382,7 @@ const HeroHandicapCardDark: React.FC<Props> = ({ connection }) => {
                   : '1px solid rgba(247, 147, 30, 0.25)',
                 fontSize: 12,
                 fontWeight: 700,
-                color: isMarginal
+                color: isFlat
                   ? 'var(--hcp-t-80)'
                   : verdict === 'good' ? '#4ADE80'
                   : verdict === 'bad'  ? '#F87171'
