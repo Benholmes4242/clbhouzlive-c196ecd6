@@ -145,18 +145,19 @@ export function useIntelligenceHistoricalPicks() {
       // Step 2: batched leaderboard fetch keyed by tournament + sr_id/name.
       const { data: leaderboardData } = await supabase
         .from('sr_leaderboards')
-        .select('tournament_id, position, position_tied, status, score, sr_players!inner(sr_id, full_name)')
+        .select('tournament_id, player_id, position, position_tied, status, score, sr_players!inner(sr_id, full_name)')
         .in('tournament_id', tournamentIds);
 
       type LBEntry = { position: number | null; tied: boolean; status: string | null; score: number | null };
-      const lbByTournament = new Map<string, { bySrId: Map<string, LBEntry>; byName: Map<string, LBEntry> }>();
+      const lbByTournament = new Map<string, { byPlayerId: Map<string, LBEntry>; bySrId: Map<string, LBEntry>; byName: Map<string, LBEntry> }>();
 
       for (const row of (leaderboardData ?? [])) {
         const tid = row.tournament_id;
         if (!lbByTournament.has(tid)) {
-          lbByTournament.set(tid, { bySrId: new Map(), byName: new Map() });
+          lbByTournament.set(tid, { byPlayerId: new Map(), bySrId: new Map(), byName: new Map() });
         }
         const maps = lbByTournament.get(tid)!;
+        const playerId = (row as any).player_id;
         const srId = (row.sr_players as any)?.sr_id;
         const fullName = (row.sr_players as any)?.full_name;
         const entry: LBEntry = {
@@ -165,6 +166,9 @@ export function useIntelligenceHistoricalPicks() {
           status: row.status ?? null,
           score: (row as any).score ?? null,
         };
+        // predictions[].playerId === sr_players.id === sr_leaderboards.player_id (UUID).
+        // UUID match is primary; sr_id + name are fallbacks for older rows.
+        if (playerId) maps.byPlayerId.set(playerId, entry);
         if (srId) maps.bySrId.set(srId, entry);
         if (fullName) maps.byName.set(fullName.toLowerCase(), entry);
       }
@@ -194,7 +198,9 @@ export function useIntelligenceHistoricalPicks() {
           const playerId: string = String(pick.playerId || pick.pgaTourId || '');
           if (!playerName) continue;
 
-          const lb = maps.bySrId.get(playerId) ?? maps.byName.get(playerName.toLowerCase());
+          const lb = maps.byPlayerId.get(playerId)
+            ?? maps.bySrId.get(playerId)
+            ?? maps.byName.get(playerName.toLowerCase());
           const actualPosition = lb?.position ?? null;
           const actualPositionTied = lb?.tied ?? false;
           const status = lb?.status ?? null;
