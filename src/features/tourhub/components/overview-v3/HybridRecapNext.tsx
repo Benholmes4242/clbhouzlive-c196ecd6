@@ -1,16 +1,24 @@
 /**
  * HybridRecapNext — the two-state hero's non-live card (Option A).
- * Leads with the next upcoming event over a course-image background, then a
- * white "RESULTS" recap card for the most recent completed event: winner +
- * 2nd/3rd, and a "View full leaderboard" link. Pure presentation; parent owns index.
+ *
+ * Leads with the tour's NEXT upcoming event (headline, venue·dates, defending
+ * champ, countdown) over a real course-image background, then a white "RESULTS"
+ * recap card for the most recent completed event: winner row + 2nd/3rd, and a
+ * "View full leaderboard" link to that tournament.
+ *
+ * Image: mirrors the live HybridHero — resolves the real venue photo via
+ * useBatchCourseImages keyed on venueName (NOT the id-rotation in
+ * getCourseImage, which is only a last-resort fallback when no venue matches).
  */
-import React from 'react';
+import React, { useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { format } from 'date-fns';
 import { ArrowRight } from 'lucide-react';
 import type { HeroTournament } from '../../hooks/useHeroCarouselData';
 import type { TournamentLeaderWinner, TournamentFinisher } from '../../hooks/useTournamentLeadersWinners';
+import type { TourTournament } from '../../hooks/useTourHubData';
 import { PlayerAvatar, UpcomingCountdown } from '../shared/TourHeroHelpers';
+import { useBatchCourseImages } from '../../hooks/useBatchCourseImages';
 import { getCourseImage } from '../../utils/placeholders';
 import { tournamentRoute } from '../../routes';
 
@@ -50,14 +58,34 @@ export function HybridRecapNext({
   height = 528,
 }: HybridRecapNextProps) {
   const navigate = useNavigate();
+
+  const venueAdapter: TourTournament[] = useMemo(() => {
+    const names = [upcoming?.venueName, completed?.venueName].filter(Boolean) as string[];
+    return names.map((venue_name) => ({ venue_name } as unknown as TourTournament));
+  }, [upcoming?.venueName, completed?.venueName]);
+
+  const { data: imageMap } = useBatchCourseImages(venueAdapter);
+
+  const resolvedVenueImage =
+    (upcoming?.venueName ? imageMap?.get(upcoming.venueName) : null) ??
+    (completed?.venueName ? imageMap?.get(completed.venueName) : null) ??
+    null;
+
   const bgSource = upcoming ?? completed;
-  const imageUrl = getCourseImage({ id: bgSource?.id });
+  const imageUrl = resolvedVenueImage ?? getCourseImage({ id: bgSource?.id });
 
   const goToUpcoming = () => {
-    if (upcoming) navigate(tournamentRoute(upcoming.id).to, { state: tournamentRoute(upcoming.id).state });
+    if (upcoming) {
+      const t = tournamentRoute(upcoming.id, { kind: 'overview' });
+      navigate(t.to, { state: t.state });
+    }
   };
+
   const goToLeaderboard = () => {
-    if (completed) navigate(tournamentRoute(completed.id).to, { state: tournamentRoute(completed.id).state });
+    if (completed) {
+      const t = tournamentRoute(completed.id, { kind: 'overview' });
+      navigate(t.to, { state: t.state });
+    }
   };
 
   const top3: TournamentFinisher[] = completedLeaders?.topFinishers?.slice(0, 3) ?? [];
@@ -82,13 +110,17 @@ export function HybridRecapNext({
 
         {upcoming && (
           <button type="button" onClick={goToUpcoming} style={{ background: 'transparent', border: 'none', textAlign: 'left', padding: '0 16px', cursor: 'pointer' }}>
-            <div style={{ fontSize: 34, lineHeight: 0.98, fontWeight: 800, color: '#fff', letterSpacing: '-0.02em' }}>{upcoming.name}</div>
-            <div style={{ marginTop: 10, fontSize: 13, fontWeight: 600, letterSpacing: '0.04em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.72)' }}>
+            <div style={{ fontSize: 34, lineHeight: 0.98, fontWeight: 800, color: '#fff', letterSpacing: '-0.02em', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+              {upcoming.name}
+            </div>
+            <div style={{ marginTop: 10, fontSize: 13, fontWeight: 600, letterSpacing: '0.04em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.72)', display: '-webkit-box', WebkitLineClamp: 1, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
               {[upcoming.venueName, upcoming.venueCity].filter(Boolean).join(' \u00b7 ')}
               {upcoming.startDate ? `  \u00b7  ${fmtDates(upcoming.startDate, upcoming.endDate)}` : ''}
             </div>
             {upcoming.defendingChampion && (
-              <div style={{ marginTop: 6, fontSize: 12, color: 'rgba(255,255,255,0.6)' }}>Defending champion · {upcoming.defendingChampion}</div>
+              <div style={{ marginTop: 6, fontSize: 12, color: 'rgba(255,255,255,0.6)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                Defending champion · {upcoming.defendingChampion}
+              </div>
             )}
           </button>
         )}
@@ -96,8 +128,10 @@ export function HybridRecapNext({
         {completed && winner && (
           <div style={{ margin: '14px 12px 12px', background: 'rgba(255,255,255,0.97)', borderRadius: 14, overflow: 'hidden' }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 13px 8px' }}>
-              <span style={{ fontSize: 9.5, fontWeight: 600, letterSpacing: '0.16em', textTransform: 'uppercase', color: 'rgba(15,23,42,0.5)' }}>Results · {completed.name}</span>
-              <span style={{ fontSize: 9.5, fontWeight: 600, letterSpacing: '0.12em', color: 'rgba(15,23,42,0.4)' }}>FINAL</span>
+              <span style={{ fontSize: 9.5, fontWeight: 600, letterSpacing: '0.16em', textTransform: 'uppercase', color: 'rgba(15,23,42,0.5)', minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                Results · {completed.name}
+              </span>
+              <span style={{ fontSize: 9.5, fontWeight: 600, letterSpacing: '0.12em', color: 'rgba(15,23,42,0.4)', flexShrink: 0, marginLeft: 8 }}>FINAL</span>
             </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '0 13px 8px' }}>
               <div style={{ boxShadow: '0 0 0 1.5px #F7931E', borderRadius: '34%', flexShrink: 0 }}>
@@ -105,7 +139,7 @@ export function HybridRecapNext({
               </div>
               <div style={{ flex: 1, minWidth: 0 }}>
                 <div style={{ fontSize: 9, fontWeight: 600, letterSpacing: '0.12em', textTransform: 'uppercase', color: AMBER_DARK }}>Winner</div>
-                <div style={{ fontSize: 14, fontWeight: 600, color: '#0F172A', lineHeight: 1.1 }}>{winner.displayName}</div>
+                <div style={{ fontSize: 14, fontWeight: 600, color: '#0F172A', lineHeight: 1.1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{winner.displayName}</div>
               </div>
               <div style={{ fontSize: 17, fontWeight: 600, color: GREEN, flexShrink: 0 }}>{winner.displayScore}</div>
             </div>
@@ -116,7 +150,7 @@ export function HybridRecapNext({
                     <span style={{ width: 18, fontSize: 11, fontWeight: 600, color: 'rgba(15,23,42,0.45)', textAlign: 'center', flexShrink: 0 }}>{posLabel(f)}</span>
                     <PlayerAvatar photoUrl={f.photoUrl} pgaTourId={f.pgaTourId} displayName={f.displayName} fullName={f.fullName} headshotOverride={f.headshotOverride} tourCode={f.tourCode ?? undefined} size={24} />
                     <span style={{ flex: 1, fontSize: 13, color: '#0F172A', minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{f.displayName}</span>
-                    <span style={{ fontSize: 13, fontWeight: 600, color: GREEN }}>{f.displayScore}</span>
+                    <span style={{ fontSize: 13, fontWeight: 600, color: GREEN, flexShrink: 0 }}>{f.displayScore}</span>
                   </div>
                 ))}
               </div>
