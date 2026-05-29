@@ -484,19 +484,9 @@ export function HeroCarousel({
     };
   }, []);
 
-  // Auto-advance every 12 seconds, resets on user interaction.
-  // Phase A — `autoRotate` prop allows the parent (OverviewPageV3) to terminally pause
-  // rotation when the user explicitly picks a tournament from the Ticker.
-  useEffect(() => {
-    if (!autoRotate || safeSlides.length <= 1 || isPaused || isExpanded) return;
-
-    const interval = setInterval(() => {
-      if (isScorecardOpenRef.current) return;
-      setCurrentIndex(prev => (prev + 1) % safeSlides.length);
-    }, 12000);
-
-    return () => clearInterval(interval);
-  }, [safeSlides.length, isPaused, isExpanded, autoAdvanceKey, autoRotate]);
+  // Auto-rotation removed (May 2026). Slides change ONLY via user swipe, dot tap,
+  // or the parent tour-switcher. isPaused / autoAdvanceKey / scheduleResume remain
+  // as inert bookkeeping for the swipe handlers and never drive an auto-advance.
 
   // Pause auto-advance when app is backgrounded
   useEffect(() => {
