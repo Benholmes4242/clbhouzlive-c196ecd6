@@ -101,7 +101,6 @@ const HeroHandicapCardDark: React.FC<Props> = ({ connection }) => {
   // Verdict drives ring colour + pill + tag word.
   const verdict: Verdict = useMemo(() => {
     if (delta90 == null) return 'neutral';
-    if (Math.abs(delta90) <= 0.2) return 'mid';
     return verdictForDelta(delta90); // negative = good (handicap going down)
   }, [delta90]);
 
@@ -129,7 +128,7 @@ const HeroHandicapCardDark: React.FC<Props> = ({ connection }) => {
 
   const grad = arcGradient(verdict);
   const glowColor = arcGlowColor(verdict);
-  const isMarginal = delta90 != null && Math.abs(delta90) < 0.3;
+  const isFlat = delta90 != null && delta90 === 0;
 
   // Scratch zone: half-step below current displayed value (e.g. 1.8 → 1.6).
   const scratchZone = useMemo(() => {
@@ -371,19 +370,19 @@ const HeroHandicapCardDark: React.FC<Props> = ({ connection }) => {
                 gap: 6,
                 padding: '5px 12px',
                 borderRadius: 999,
-                background: isMarginal
+                background: isFlat
                   ? 'rgba(255,255,255,0.04)'
                   : verdict === 'good' ? 'rgba(34, 197, 94, 0.14)'
                   : verdict === 'bad'  ? 'rgba(239, 68, 68, 0.14)'
                   : 'rgba(247, 147, 30, 0.14)',
-                border: isMarginal
+                border: isFlat
                   ? '1px solid rgba(255,255,255,0.10)'
                   : verdict === 'good' ? '1px solid rgba(34, 197, 94, 0.25)'
                   : verdict === 'bad'  ? '1px solid rgba(239, 68, 68, 0.25)'
                   : '1px solid rgba(247, 147, 30, 0.25)',
                 fontSize: 12,
                 fontWeight: 700,
-                color: isMarginal
+                color: isFlat
                   ? 'var(--hcp-t-80)'
                   : verdict === 'good' ? '#4ADE80'
                   : verdict === 'bad'  ? '#F87171'
@@ -397,7 +396,7 @@ const HeroHandicapCardDark: React.FC<Props> = ({ connection }) => {
                 height="11"
                 viewBox="0 0 24 24"
                 fill="none"
-                stroke={isMarginal ? 'var(--hcp-t-60)' : 'currentColor'}
+                stroke={isFlat ? 'var(--hcp-t-60)' : 'currentColor'}
                 strokeWidth="3"
                 strokeLinecap="round"
                 aria-hidden
@@ -417,7 +416,7 @@ const HeroHandicapCardDark: React.FC<Props> = ({ connection }) => {
                 )}
               </svg>
               {Math.abs(delta90).toFixed(1)} over 90 days
-              {verdict === 'good' && !isMarginal && (
+              {verdict === 'good' && !isFlat && (
                 <span style={{ fontSize: 13, lineHeight: 1, marginLeft: 2 }}>🔥</span>
               )}
             </span>
