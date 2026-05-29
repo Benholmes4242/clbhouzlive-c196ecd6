@@ -51,7 +51,7 @@ export interface HeroTournament {
   winnerPgaTourId: string | null;
   winnerScore: string | null;
   currentRound: number | null;
-  totalRounds: number | null;
+  
 }
 
 export interface HeroSlide {
@@ -251,7 +251,7 @@ export function useHeroCarouselData() {
           winnerPgaTourId,
           winnerScore,
           currentRound: (row as any).current_round ?? null,
-          totalRounds: (row as any).total_rounds ?? null,
+          
         };
       };
 

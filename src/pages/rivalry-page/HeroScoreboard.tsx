@@ -62,14 +62,14 @@ export const HeroScoreboard: React.FC<Props> = ({
   const gradient = youLead
     ? 'linear-gradient(180deg, rgba(247,147,30,0.08) 0%, rgba(247,147,30,0.02) 50%, rgba(15,23,42,0.6) 100%)'
     : themLead
-      ? 'linear-gradient(180deg, rgba(239,68,68,0.10) 0%, rgba(239,68,68,0.02) 50%, rgba(15,23,42,0.6) 100%)'
+      ? 'linear-gradient(180deg, rgba(159,29,29,0.10) 0%, rgba(159,29,29,0.02) 50%, rgba(15,23,42,0.6) 100%)'
       : 'linear-gradient(180deg, rgba(255,255,255,0.04) 0%, rgba(255,255,255,0.01) 100%)';
 
   const streakColor = currentStreak.side === 'you' ? GREEN : RED;
   const streakTint =
     currentStreak.side === 'you'
-      ? 'rgba(34,197,94,0.10)'
-      : 'rgba(239,68,68,0.10)';
+      ? 'rgba(5,150,105,0.14)'
+      : 'rgba(159,29,29,0.14)';
 
   return (
     <div style={{ padding: '0 16px' }}>
@@ -218,7 +218,7 @@ export const HeroScoreboard: React.FC<Props> = ({
             style={{
               position: 'relative',
               padding: '10px 16px',
-              borderTop: `1px solid ${LINE}`,
+              borderTop: `0.5px solid ${LINE}`,
               background: streakTint,
               display: 'flex',
               alignItems: 'center',

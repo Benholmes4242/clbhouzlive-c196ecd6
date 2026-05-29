@@ -407,34 +407,48 @@ export function HeroCarousel({
 }: HeroCarouselProps) {
   const { data: slides = [], isLoading } = useHeroCarouselData();
   const rawSlides = Array.isArray(slides) ? slides : [];
-  const safeSlides = mode === 'overview'
-    ? rawSlides.filter((s) => s.type !== 'upcoming')
-    : rawSlides;
+  // Referentially stable: only rebuild when slide ids / mode actually change.
+  const slideSignature = rawSlides.map((s) => `${s.type}:${s.tournament.id}`).join('|');
+  const safeSlides = React.useMemo(
+    () => (mode === 'overview' ? rawSlides.filter((s) => s.type !== 'upcoming') : rawSlides),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [slideSignature, mode],
+  );
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
   const [autoAdvanceKey, setAutoAdvanceKey] = useState(0);
   const resetAutoAdvance = () => setAutoAdvanceKey(k => k + 1);
   const [isExpanded, setIsExpanded] = useState(false);
+  const lastEmittedRef = React.useRef<string | null>(null);
 
   // Phase A — sync external activeTournamentId → internal currentIndex (one-way, parent-driven)
   useEffect(() => {
     if (!activeTournamentId || safeSlides.length === 0) return;
     const idx = safeSlides.findIndex(s => s.tournament.id === activeTournamentId);
     if (idx >= 0 && idx !== currentIndex) {
+      lastEmittedRef.current = activeTournamentId; // parent-driven; don't echo back
       setCurrentIndex(idx);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeTournamentId, safeSlides.length]);
 
-  // Phase A — emit currentIndex changes upward (so the Ticker's "NOW SHOWING" follows auto-rotate / swipe)
+  // Phase A — emit currentIndex changes upward (so the Ticker's "NOW SHOWING" follows auto-rotate / swipe).
+  // lastEmittedRef prevents the parent↔child echo loop: we only emit an id we have not
+  // already emitted, and never re-emit the value the parent just handed us back.
   useEffect(() => {
     if (!onActiveChange) return;
     const slide = safeSlides[currentIndex];
-    if (slide && slide.tournament.id !== activeTournamentId) {
-      onActiveChange(slide.tournament.id);
+    if (!slide) return;
+    const id = slide.tournament.id;
+    if (id === lastEmittedRef.current) return; // already emitted this one
+    if (id === activeTournamentId) {            // parent already in sync; just record it
+      lastEmittedRef.current = id;
+      return;
     }
+    lastEmittedRef.current = id;
+    onActiveChange(id);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentIndex, safeSlides.length]);
+  }, [currentIndex, safeSlides, activeTournamentId, onActiveChange]);
 
   const handleToggleExpand = useCallback(() => {
     setIsExpanded(prev => !prev);
@@ -470,19 +484,9 @@ export function HeroCarousel({
     };
   }, []);
 
-  // Auto-advance every 12 seconds, resets on user interaction.
-  // Phase A — `autoRotate` prop allows the parent (OverviewPageV3) to terminally pause
-  // rotation when the user explicitly picks a tournament from the Ticker.
-  useEffect(() => {
-    if (!autoRotate || safeSlides.length <= 1 || isPaused || isExpanded) return;
-
-    const interval = setInterval(() => {
-      if (isScorecardOpenRef.current) return;
-      setCurrentIndex(prev => (prev + 1) % safeSlides.length);
-    }, 12000);
-
-    return () => clearInterval(interval);
-  }, [safeSlides.length, isPaused, isExpanded, autoAdvanceKey, autoRotate]);
+  // Auto-rotation removed (May 2026). Slides change ONLY via user swipe, dot tap,
+  // or the parent tour-switcher. isPaused / autoAdvanceKey / scheduleResume remain
+  // as inert bookkeeping for the swipe handlers and never drive an auto-advance.
 
   // Pause auto-advance when app is backgrounded
   useEffect(() => {
