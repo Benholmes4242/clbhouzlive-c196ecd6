@@ -78,6 +78,25 @@ export function OverviewPageV3() {
     return all.find(c => c.id === activeTournamentId)?.tourSlug ?? null;
   }, [activeTournamentId, tickerData]);
 
+  // ── Shell tour-switcher sheet → hero pin (one-way: ?tour= → state) ──
+  const [searchParams] = useSearchParams();
+  const tourParam = searchParams.get('tour');
+  const paramTournamentId = useMemo(() => {
+    if (!tourParam || !tickerData) return null;
+    const pick = (arr: typeof tickerData.live) =>
+      arr.find((c) => c.tourSlug === tourParam)?.id ?? null;
+    return pick(tickerData.live) ?? pick(tickerData.completed) ?? null;
+  }, [tourParam, tickerData]);
+
+  const lastAppliedParamRef = useRef<string | null>(null);
+  useEffect(() => {
+    if (!paramTournamentId) return;
+    if (lastAppliedParamRef.current === paramTournamentId) return;
+    lastAppliedParamRef.current = paramTournamentId;
+    setActiveTournamentId(paramTournamentId);
+    setAutoRotate(false);
+  }, [paramTournamentId]);
+
   // ── Default to PGA on landing (deterministic) — only when no ?tour= is set ──
   // Was random per-load, which raced the hero mount-emit and made the landing tour
   // change every visit. Now always PGA; the only thing that changes the active tour
@@ -105,17 +124,6 @@ export function OverviewPageV3() {
     setActiveTournamentId(defaultTournamentId);
     setAutoRotate(false); // PIN — locked default
   }, [defaultTournamentId, activeTournamentId]);
-
-  const lastAppliedRandomRef = useRef<string | null>(null);
-  useEffect(() => {
-    if (!randomTournamentId) return;
-    if (lastAppliedRandomRef.current === randomTournamentId) return;
-    // Don't apply if param effect already pinned something
-    if (activeTournamentId) return;
-    lastAppliedRandomRef.current = randomTournamentId;
-    setActiveTournamentId(randomTournamentId);
-    setAutoRotate(false); // PIN — locked decision
-  }, [randomTournamentId, activeTournamentId]);
 
 
   return (
