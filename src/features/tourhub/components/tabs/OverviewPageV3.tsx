@@ -39,22 +39,6 @@ import { TOTAL_HERO_HEIGHT_TARGET } from '../overview-v3/HybridHero.constants';
 import { WifiOff } from 'lucide-react';
 import ScrollToTopGlass from '@/components/common/ScrollToTopGlass';
 
-const LAST_TOUR_KEY = 'tourhub:last-random-tour';
-
-function pickRandomTourSlug(availableSlugs: string[]): string | null {
-  if (availableSlugs.length === 0) return null;
-  if (availableSlugs.length === 1) return availableSlugs[0]; // can't avoid repeat
-  const last = sessionStorage.getItem(LAST_TOUR_KEY);
-  const candidates = availableSlugs.filter((s) => s !== last);
-  const pool = candidates.length > 0 ? candidates : availableSlugs; // fallback if filter empties
-  const pick = pool[Math.floor(Math.random() * pool.length)];
-  try {
-    sessionStorage.setItem(LAST_TOUR_KEY, pick);
-  } catch {
-    // private mode safe
-  }
-  return pick;
-}
 
 export function OverviewPageV3() {
   const { isOnline } = useNetworkStatus();
