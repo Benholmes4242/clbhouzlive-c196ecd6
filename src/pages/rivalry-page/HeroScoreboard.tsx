@@ -218,7 +218,7 @@ export const HeroScoreboard: React.FC<Props> = ({
             style={{
               position: 'relative',
               padding: '10px 16px',
-              borderTop: `1px solid ${LINE}`,
+              borderTop: `0.5px solid ${LINE}`,
               background: streakTint,
               display: 'flex',
               alignItems: 'center',
