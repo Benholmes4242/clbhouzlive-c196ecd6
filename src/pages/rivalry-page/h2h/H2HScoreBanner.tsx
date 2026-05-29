@@ -30,7 +30,7 @@ export const H2HScoreBanner: React.FC<Props> = ({
   rivalFirstName,
 }) => {
   const tier = getH2HTier(myWins, theirWins, total, rivalFirstName);
-  const { eyebrow, subcopy, accent, gradient } = tier;
+  const { eyebrow, subcopy, accent, gradient, icon: TierIcon } = tier;
   const tied = myWins === theirWins;
   const leaderWins = Math.max(myWins, theirWins);
 
