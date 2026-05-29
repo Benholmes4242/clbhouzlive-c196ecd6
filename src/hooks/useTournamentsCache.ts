@@ -18,7 +18,7 @@ const CACHE_SELECT = `
   id, name, status, start_date, end_date, purse, currency,
   venue_id, venue_name, venue_city, venue_country, venue_par, venue_yardage,
   winner_id, defending_champion, champion_narrative, season_id,
-  current_round,
+  current_round, total_rounds,
   season:sr_seasons!inner(id, tour_id, tour_name, year)
 `;
 
@@ -41,7 +41,7 @@ export interface CachedTournament {
   champion_narrative: string | null;
   season_id: string | null;
   current_round: number | null;
-  
+  total_rounds: number | null;
   season: {
     id: string;
     tour_id: string;

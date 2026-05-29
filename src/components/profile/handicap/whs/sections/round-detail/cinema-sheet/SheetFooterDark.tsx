@@ -29,7 +29,7 @@ export const SheetFooterDark: React.FC<Props> = ({
   return (
     <div
       style={{
-        borderTop: '0.5px solid var(--hcp-line)',
+        borderTop: '1px solid var(--hcp-line)',
         padding: '12px 14px',
         paddingBottom: 'calc(12px + env(safe-area-inset-bottom, 0px))',
         display: 'flex',

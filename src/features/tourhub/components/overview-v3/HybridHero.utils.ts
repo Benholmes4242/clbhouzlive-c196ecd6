@@ -19,7 +19,7 @@ export type ResultsVariant =
 export type UpcomingVariant = 'far' | 'imminent';
 
 export type HeroState =
-  | { kind: 'live'; round: number; thruLabel: string }
+  | { kind: 'live'; round: number; totalRounds: number; thruLabel: string }
   | { kind: 'results'; variant: ResultsVariant; finishDate: string; meta: string }
   | { kind: 'upcoming'; variant: UpcomingVariant; countdown: string; meta: string };
 
@@ -126,7 +126,7 @@ export function deriveHeroState(
     return {
       kind: 'live',
       round: tournament.currentRound ?? 1,
-      
+      totalRounds: tournament.totalRounds ?? 4,
       thruLabel: '',
     };
   }

@@ -22,7 +22,7 @@ export const AutoPickedRow: React.FC<Props> = ({ rivalry, onPin, busy }) => (
       alignItems: 'center',
       gap: 12,
       padding: '10px 8px',
-      borderBottom: '0.5px solid var(--hcp-line-2)',
+      borderBottom: '1px solid var(--hcp-line-2)',
       fontFamily: FONT,
     }}
   >

@@ -12,8 +12,8 @@ export const LINE = 'var(--hcp-line)';
 export const LINE_2 = 'var(--hcp-line-2)';
 export const AMBER = '#F7931E';
 export const GOLD = '#FBBC2E';
-export const GREEN = '#059669';
-export const RED = '#9F1D1D';
+export const GREEN = '#22C55E';
+export const RED = '#EF4444';
 
 export const FONT =
   'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';

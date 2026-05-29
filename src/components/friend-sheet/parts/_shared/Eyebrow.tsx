@@ -8,11 +8,10 @@ export const Eyebrow: React.FC<{ label: string }> = ({ label }) => (
     />
     <span
       style={{
-        fontSize: 10.5,
-        fontWeight: 700,
-        color: 'var(--hcp-t-60)',
-        letterSpacing: '0.16em',
-        textTransform: 'uppercase',
+        fontSize: 13,
+        fontWeight: 800,
+        color: AMBER,
+        letterSpacing: '0.14em',
       }}
     >
       {label}

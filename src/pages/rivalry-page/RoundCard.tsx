@@ -46,9 +46,9 @@ export const RoundCard: React.FC<Props> = ({
   const tied = outcome === 'T';
 
   const chipBg = youWon
-    ? 'rgba(5,150,105,0.14)'
+    ? 'rgba(34,197,94,0.14)'
     : themWon
-      ? 'rgba(159,29,29,0.14)'
+      ? 'rgba(239,68,68,0.14)'
       : 'rgba(255,255,255,0.06)';
   const chipColor = youWon ? GREEN : themWon ? RED : T40;
 

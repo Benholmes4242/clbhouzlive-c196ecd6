@@ -18,9 +18,9 @@ export interface SeverityPalette {
 export function nineSeverityTint(delta: number): SeverityPalette {
   if (delta < 0) {
     return {
-      bgTint: 'rgba(5,150,105,0.14)',
+      bgTint: 'rgba(34,197,94,0.10)',
       numColor: 'var(--hcp-t-100)',
-      deltaColor: '#059669',
+      deltaColor: '#22C55E',
     };
   }
   if (delta <= 4) {
@@ -38,8 +38,8 @@ export function nineSeverityTint(delta: number): SeverityPalette {
     };
   }
   return {
-    bgTint: 'rgba(159,29,29,0.14)',
+    bgTint: 'rgba(239,68,68,0.10)',
     numColor: 'var(--hcp-t-100)',
-    deltaColor: '#9F1D1D',
+    deltaColor: '#EF4444',
   };
 }
