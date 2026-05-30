@@ -8,7 +8,17 @@ import { ChevronDown, ChevronUp, Trophy } from 'lucide-react';
 import { format } from 'date-fns';
 import { usePlayerResults, formatPositionShort, formatScore, formatMoney } from '../../hooks/usePlayerResults';
 import { tournamentRoute } from '../../routes';
-import { INK_TINT_07 } from '../../_shared/tokens';
+import {
+  AMBER,
+  AMBER_SOFT_BG,
+  INK,
+  INK_FAINT,
+  INK_MUTE,
+  INK_TINT_02,
+  INK_TINT_07,
+  SCORE_OVER_PAR_LIGHT,
+  SURFACE,
+} from '../../_shared/tokens';
 
 interface PlayerTournamentHistoryProps {
   playerId: string;
