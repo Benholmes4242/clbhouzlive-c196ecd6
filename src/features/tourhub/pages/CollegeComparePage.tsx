@@ -227,13 +227,13 @@ export function CollegeComparePage() {
 
               {/* Results */}
               {!showPickerResults ? (
-                <div style={{ textAlign: 'center' as const, padding: '32px 16px', fontSize: 13, color: 'rgba(15,23,42,0.45)', fontWeight: 500 }}>
+                <div style={{ textAlign: 'center' as const, padding: '32px 16px', fontSize: 13, color: INK_ALPHA_45, fontWeight: 500 }}>
                   Start typing to find a college
                 </div>
               ) : pickerLoading ? (
                 <div style={{ display: 'flex', flexDirection: 'column' as const, gap: 8 }}>
                   {Array.from({ length: 4 }).map((_, i) => (
-                    <div key={i} className="animate-pulse" style={{ height: 60, borderRadius: 12, background: 'rgba(15,23,42,0.05)' }} />
+                    <div key={i} className="animate-pulse" style={{ height: 60, borderRadius: 12, background: INK_TINT_05 }} />
                   ))}
                 </div>
               ) : pickerResults && pickerResults.length > 0 ? (
