@@ -6,7 +6,7 @@ import { useTourSeason } from '../../hooks/useTourHubData';
 import { playerRoute } from '../../routes';
 import type { CollegeCompareData } from '../../hooks/useCollegeCompare';
 import type { CollegeAlumnus } from '../../hooks/useCollegeAlumni';
-import { AMBER_TINT_08, INK_TINT_06, INK_TINT_07 } from '../../_shared/tokens';
+import { AMBER, AMBER_TINT_08, HAIRLINE_INK_8, HAIRLINE_INK_12, HAIRLINE_INK_18, INK, INK_FAINT, INK_MUTE, INK_TINT_02, INK_TINT_04, INK_TINT_05, INK_TINT_06, INK_TINT_07, SURFACE } from '../../_shared/tokens';
 
 interface CollegeCompareHeroProps {
   data: CollegeCompareData;
@@ -51,8 +51,8 @@ function MetricCompareRow({ label, value1, value2, format = String, lowerIsBette
   // Canonical font weights: value 900 (leader) / 600 (non-leader), label 800
   const value1Weight = isLeading1 ? 900 : 600;
   const value2Weight = isLeading2 ? 900 : 600;
-  const value1Color = isLeading1 ? '#0F172A' : '#94A3B8';
-  const value2Color = isLeading2 ? '#0F172A' : '#94A3B8';
+  const value1Color = isLeading1 ? INK : INK_FAINT;
+  const value2Color = isLeading2 ? INK : INK_FAINT;
 
   return (
     <div style={{ padding: '9px 16px', borderBottom: isLast ? 'none' : `0.5px solid ${INK_TINT_07}` }}>
@@ -62,15 +62,15 @@ function MetricCompareRow({ label, value1, value2, format = String, lowerIsBette
         </span>
         {isTied ? (
           <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', flexShrink: 0 }}>
-            <span style={{ padding: '2px 6px', borderRadius: '4px', background: INK_TINT_06, fontSize: '9px', fontWeight: 800, color: '#0F172A', letterSpacing: '0.14em' }}>
+            <span style={{ padding: '2px 6px', borderRadius: '4px', background: INK_TINT_06, fontSize: '9px', fontWeight: 800, color: INK, letterSpacing: '0.14em' }}>
               TIED
             </span>
-            <span style={{ fontSize: '11px', fontWeight: 800, color: '#94A3B8', letterSpacing: '0.14em', textTransform: 'uppercase' as const, whiteSpace: 'nowrap' as const }}>
+            <span style={{ fontSize: '11px', fontWeight: 800, color: INK_FAINT, letterSpacing: '0.14em', textTransform: 'uppercase' as const, whiteSpace: 'nowrap' as const }}>
               {label}
             </span>
           </span>
         ) : (
-          <span style={{ fontSize: '11px', fontWeight: 800, color: '#94A3B8', letterSpacing: '0.14em', textTransform: 'uppercase' as const, whiteSpace: 'nowrap' as const, flexShrink: 0 }}>
+          <span style={{ fontSize: '11px', fontWeight: 800, color: INK_FAINT, letterSpacing: '0.14em', textTransform: 'uppercase' as const, whiteSpace: 'nowrap' as const, flexShrink: 0 }}>
             {label}
           </span>
         )}
@@ -86,19 +86,19 @@ function MetricCompareRow({ label, value1, value2, format = String, lowerIsBette
               width: `${barPct1}%`,
               height: '100%',
               borderRadius: '2px 0 0 2px',
-              background: isLeading1 ? '#F7931E' : isTied ? 'rgba(15,23,42,0.18)' : 'rgba(15,23,42,0.08)',
+              background: isLeading1 ? AMBER : isTied ? HAIRLINE_INK_18 : HAIRLINE_INK_8,
               transition: 'width 0.4s',
             }}
           />
         </div>
-        <div style={{ width: '1px', height: '100%', background: 'rgba(15,23,42,0.12)', flexShrink: 0 }} />
+        <div style={{ width: '1px', height: '100%', background: HAIRLINE_INK_12, flexShrink: 0 }} />
         <div style={{ flex: 1, display: 'flex', justifyContent: 'flex-start', height: '100%' }}>
           <div
             style={{
               width: `${barPct2}%`,
               height: '100%',
               borderRadius: '0 2px 2px 0',
-              background: isLeading2 ? '#F7931E' : isTied ? 'rgba(15,23,42,0.18)' : 'rgba(15,23,42,0.08)',
+              background: isLeading2 ? AMBER : isTied ? HAIRLINE_INK_18 : HAIRLINE_INK_8,
               transition: 'width 0.4s',
             }}
           />
@@ -131,22 +131,22 @@ function AlumniCompareBlock({ title, alumni1, alumni2, statKey, name1, name2, em
   if (rowCount === 0) return null;
 
   return (
-    <div style={{ background: '#ffffff', borderTop: `1px solid ${INK_TINT_07}`, borderBottom: `1px solid ${INK_TINT_07}`, marginTop: '8px' }}>
+    <div style={{ background: SURFACE, borderTop: `1px solid ${INK_TINT_07}`, borderBottom: `1px solid ${INK_TINT_07}`, marginTop: '8px' }}>
       {/* Section eyebrow — canonical §6 slate-caps */}
       <div style={{ padding: '14px 16px 10px' }}>
-        <span style={{ fontSize: '9px', fontWeight: 800, color: '#64748B', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>
+        <span style={{ fontSize: '9px', fontWeight: 800, color: INK_MUTE, letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>
           {title}
         </span>
       </div>
 
       {/* Column headers */}
-      <div style={{ display: 'flex', alignItems: 'center', padding: '4px 16px', background: 'rgba(15,23,42,0.02)', borderTop: `0.5px solid ${INK_TINT_07}`, borderBottom: `0.5px solid ${INK_TINT_07}` }}>
+      <div style={{ display: 'flex', alignItems: 'center', padding: '4px 16px', background: INK_TINT_02, borderTop: `0.5px solid ${INK_TINT_07}`, borderBottom: `0.5px solid ${INK_TINT_07}` }}>
         <span style={{ width: '18px', flexShrink: 0 }} />
-        <span style={{ flex: 1, fontSize: '9px', fontWeight: 800, color: '#94A3B8', letterSpacing: '0.14em', paddingRight: '8px' }}>
+        <span style={{ flex: 1, fontSize: '9px', fontWeight: 800, color: INK_FAINT, letterSpacing: '0.14em', paddingRight: '8px' }}>
           {name1.toUpperCase()}
         </span>
         <div style={{ width: '1px', height: '12px', background: INK_TINT_07, flexShrink: 0 }} />
-        <span style={{ flex: 1, fontSize: '9px', fontWeight: 800, color: '#94A3B8', letterSpacing: '0.14em', paddingLeft: '8px' }}>
+        <span style={{ flex: 1, fontSize: '9px', fontWeight: 800, color: INK_FAINT, letterSpacing: '0.14em', paddingLeft: '8px' }}>
           {name2.toUpperCase()}
         </span>
       </div>
@@ -159,7 +159,7 @@ function AlumniCompareBlock({ title, alumni1, alumni2, statKey, name1, name2, em
 
         return (
           <div key={i} style={{ display: 'flex', alignItems: 'center', padding: '9px 16px', borderBottom: isLast ? 'none' : `0.5px solid ${INK_TINT_07}` }}>
-            <span style={{ width: '18px', fontSize: '10px', fontWeight: 700, color: 'rgba(15,23,42,0.18)', flexShrink: 0, fontVariantNumeric: 'tabular-nums' }}>
+            <span style={{ width: '18px', fontSize: '10px', fontWeight: 700, color: HAIRLINE_INK_18, flexShrink: 0, fontVariantNumeric: 'tabular-nums' }}>
               {i + 1}
             </span>
 
@@ -180,16 +180,16 @@ function AlumniCompareBlock({ title, alumni1, alumni2, statKey, name1, name2, em
                     />
                   </div>
                   <div style={{ minWidth: 0 }}>
-                    <div style={{ fontSize: '13px', fontWeight: 700, color: '#0F172A', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const }}>
+                    <div style={{ fontSize: '13px', fontWeight: 700, color: INK, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const }}>
                       {a1.last_name}
                     </div>
-                    <div style={{ fontSize: '11px', color: '#F7931E', fontVariantNumeric: 'tabular-nums' }}>
+                    <div style={{ fontSize: '11px', color: AMBER, fontVariantNumeric: 'tabular-nums' }}>
                       {formatStat(a1)}
                     </div>
                   </div>
                 </Link>
               ) : (
-                <span style={{ fontSize: '13px', color: '#94A3B8' }}>{emptyLabel || '—'}</span>
+                <span style={{ fontSize: '13px', color: INK_FAINT }}>{emptyLabel || '—'}</span>
               )}
             </div>
 
@@ -213,16 +213,16 @@ function AlumniCompareBlock({ title, alumni1, alumni2, statKey, name1, name2, em
                     />
                   </div>
                   <div style={{ minWidth: 0 }}>
-                    <div style={{ fontSize: '13px', fontWeight: 700, color: '#0F172A', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const }}>
+                    <div style={{ fontSize: '13px', fontWeight: 700, color: INK, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const }}>
                       {a2.last_name}
                     </div>
-                    <div style={{ fontSize: '11px', color: '#F7931E', fontVariantNumeric: 'tabular-nums' }}>
+                    <div style={{ fontSize: '11px', color: AMBER, fontVariantNumeric: 'tabular-nums' }}>
                       {formatStat(a2)}
                     </div>
                   </div>
                 </Link>
               ) : (
-                <span style={{ fontSize: '13px', color: '#94A3B8' }}>{emptyLabel || '—'}</span>
+                <span style={{ fontSize: '13px', color: INK_FAINT }}>{emptyLabel || '—'}</span>
               )}
             </div>
           </div>
@@ -335,10 +335,10 @@ export function CollegeCompareHero({ data, className }: CollegeCompareHeroProps)
   return (
     <div className={className}>
       {/* ── SEASON VERDICT ── */}
-      <div style={{ background: '#ffffff', borderTop: `1px solid ${INK_TINT_07}`, borderBottom: `1px solid ${INK_TINT_07}`, marginTop: '8px' }}>
+      <div style={{ background: SURFACE, borderTop: `1px solid ${INK_TINT_07}`, borderBottom: `1px solid ${INK_TINT_07}`, marginTop: '8px' }}>
         {/* Section eyebrow — canonical §6 slate-caps */}
         <div style={{ padding: '14px 16px 10px' }}>
-          <span style={{ fontSize: '9px', fontWeight: 800, color: '#64748B', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>
+          <span style={{ fontSize: '9px', fontWeight: 800, color: INK_MUTE, letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>
             Season Verdict · {seasonYear}
           </span>
         </div>
@@ -347,42 +347,42 @@ export function CollegeCompareHero({ data, className }: CollegeCompareHeroProps)
         <div style={{ display: 'flex', alignItems: 'flex-start', padding: '12px 16px 18px', borderTop: `0.5px solid ${INK_TINT_07}` }}>
           {/* College 1 */}
           <div style={{ flex: 1, display: 'flex', flexDirection: 'column' as const, alignItems: 'center', gap: '4px' }}>
-            <div style={{ width: 44, height: 44, borderRadius: 11, overflow: 'hidden', background: 'rgba(15,23,42,0.04)', border: '1px solid rgba(15,23,42,0.08)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <div style={{ width: 44, height: 44, borderRadius: 11, overflow: 'hidden', background: INK_TINT_04, border: `1px solid ${HAIRLINE_INK_8}`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
               {logo1 ? (
                 <img src={logo1} alt={name1} style={{ width: 32, height: 32, objectFit: 'contain' }} onError={e => { e.currentTarget.style.display = 'none'; }} />
               ) : (
                 <span style={{ fontSize: 17, fontWeight: 900, color: 'rgba(15,23,42,0.3)' }}>{name1.charAt(0)}</span>
               )}
             </div>
-            <div style={{ fontSize: 13, fontWeight: 700, color: '#0F172A', textAlign: 'center' as const, maxWidth: 110, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const }}>{name1}</div>
+            <div style={{ fontSize: 13, fontWeight: 700, color: INK, textAlign: 'center' as const, maxWidth: 110, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const }}>{name1}</div>
             <div style={{
               fontSize: 18, fontWeight: 800,
-              color: c1Wins >= c2Wins ? '#0F172A' : '#94A3B8',
+              color: c1Wins >= c2Wins ? INK : INK_FAINT,
               letterSpacing: '-0.02em', lineHeight: 1,
               fontVariantNumeric: 'tabular-nums', marginTop: 2,
             }}>
               {formatEarnings(s1?.earnings_total || 0)}
             </div>
-            <div style={{ fontSize: 11, color: '#94A3B8', fontWeight: 500 }}>
+            <div style={{ fontSize: 11, color: INK_FAINT, fontWeight: 500 }}>
               {s1?.player_count || 0} alumni
             </div>
             <div style={{
               fontSize: 28, fontWeight: 900,
-              color: c1Wins > c2Wins ? '#F7931E' : '#94A3B8',
+              color: c1Wins > c2Wins ? AMBER : INK_FAINT,
               letterSpacing: '-0.04em', lineHeight: 1, marginTop: 6,
               fontVariantNumeric: 'tabular-nums',
             }}>
               {c1Wins}
             </div>
-            <div style={{ fontSize: 11, color: '#94A3B8', fontWeight: 500 }}>categories led</div>
+            <div style={{ fontSize: 11, color: INK_FAINT, fontWeight: 500 }}>categories led</div>
           </div>
 
           {/* Centre — verdict chip */}
           {/* paddingTop: 70 manually aligns the chip with the categories-led row. If logo
               tile size or row spacing changes, recalculate. */}
           <div style={{ flexShrink: 0, display: 'flex', flexDirection: 'column' as const, alignItems: 'center', paddingTop: 70 }}>
-            <div style={{ padding: '4px 10px', borderRadius: 6, background: c1Wins === c2Wins ? 'rgba(15,23,42,0.05)' : AMBER_TINT_08, border: `1px solid ${c1Wins === c2Wins ? 'rgba(15,23,42,0.08)' : 'rgba(247,147,30,0.32)'}` }}>
-              <span style={{ fontSize: 11, fontWeight: 800, color: c1Wins === c2Wins ? '#94A3B8' : '#F7931E', letterSpacing: '0.14em', textTransform: 'uppercase' as const, whiteSpace: 'nowrap' as const }}>
+            <div style={{ padding: '4px 10px', borderRadius: 6, background: c1Wins === c2Wins ? INK_TINT_05 : AMBER_TINT_08, border: `1px solid ${c1Wins === c2Wins ? HAIRLINE_INK_8 : 'rgba(247,147,30,0.32)'}` }}>
+              <span style={{ fontSize: 11, fontWeight: 800, color: c1Wins === c2Wins ? INK_FAINT : AMBER, letterSpacing: '0.14em', textTransform: 'uppercase' as const, whiteSpace: 'nowrap' as const }}>
                 {c1Wins === c2Wins
                   ? 'TIED'
                   : c1Wins > c2Wins
@@ -394,52 +394,52 @@ export function CollegeCompareHero({ data, className }: CollegeCompareHeroProps)
 
           {/* College 2 */}
           <div style={{ flex: 1, display: 'flex', flexDirection: 'column' as const, alignItems: 'center', gap: '4px' }}>
-            <div style={{ width: 44, height: 44, borderRadius: 11, overflow: 'hidden', background: 'rgba(15,23,42,0.04)', border: '1px solid rgba(15,23,42,0.08)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <div style={{ width: 44, height: 44, borderRadius: 11, overflow: 'hidden', background: INK_TINT_04, border: `1px solid ${HAIRLINE_INK_8}`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
               {logo2 ? (
                 <img src={logo2} alt={name2} style={{ width: 32, height: 32, objectFit: 'contain' }} onError={e => { e.currentTarget.style.display = 'none'; }} />
               ) : (
                 <span style={{ fontSize: 17, fontWeight: 900, color: 'rgba(15,23,42,0.3)' }}>{name2.charAt(0)}</span>
               )}
             </div>
-            <div style={{ fontSize: 13, fontWeight: 700, color: '#0F172A', textAlign: 'center' as const, maxWidth: 110, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const }}>{name2}</div>
+            <div style={{ fontSize: 13, fontWeight: 700, color: INK, textAlign: 'center' as const, maxWidth: 110, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const }}>{name2}</div>
             <div style={{
               fontSize: 18, fontWeight: 800,
-              color: c2Wins >= c1Wins ? '#0F172A' : '#94A3B8',
+              color: c2Wins >= c1Wins ? INK : INK_FAINT,
               letterSpacing: '-0.02em', lineHeight: 1,
               fontVariantNumeric: 'tabular-nums', marginTop: 2,
             }}>
               {formatEarnings(s2?.earnings_total || 0)}
             </div>
-            <div style={{ fontSize: 11, color: '#94A3B8', fontWeight: 500 }}>
+            <div style={{ fontSize: 11, color: INK_FAINT, fontWeight: 500 }}>
               {s2?.player_count || 0} alumni
             </div>
             <div style={{
               fontSize: 28, fontWeight: 900,
-              color: c2Wins > c1Wins ? '#F7931E' : '#94A3B8',
+              color: c2Wins > c1Wins ? AMBER : INK_FAINT,
               letterSpacing: '-0.04em', lineHeight: 1, marginTop: 6,
               fontVariantNumeric: 'tabular-nums',
             }}>
               {c2Wins}
             </div>
-            <div style={{ fontSize: 11, color: '#94A3B8', fontWeight: 500 }}>categories led</div>
+            <div style={{ fontSize: 11, color: INK_FAINT, fontWeight: 500 }}>categories led</div>
           </div>
         </div>
       </div>
 
       {/* ── SEASON OVERVIEW ── */}
-      <div style={{ background: '#ffffff', borderTop: `1px solid ${INK_TINT_07}`, borderBottom: `1px solid ${INK_TINT_07}`, marginTop: '8px' }}>
+      <div style={{ background: SURFACE, borderTop: `1px solid ${INK_TINT_07}`, borderBottom: `1px solid ${INK_TINT_07}`, marginTop: '8px' }}>
         {/* Mini logo column headers */}
         <div style={{ display: 'flex', alignItems: 'center', padding: '12px 16px 0' }}>
           <div style={{ flex: 1, display: 'flex', alignItems: 'center', gap: '5px' }}>
-            <div style={{ width: '18px', height: '18px', borderRadius: '4px', overflow: 'hidden', background: 'rgba(15,23,42,0.04)', border: '1px solid rgba(15,23,42,0.08)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+            <div style={{ width: '18px', height: '18px', borderRadius: '4px', overflow: 'hidden', background: INK_TINT_04, border: `1px solid ${HAIRLINE_INK_8}`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
               {logo1 ? <img src={logo1} alt={name1} style={{ width: '13px', height: '13px', objectFit: 'contain' }} onError={e => { e.currentTarget.style.display = 'none'; }} /> : null}
             </div>
-            <span style={{ fontSize: '13px', fontWeight: 800, color: '#64748B' }}>{name1}</span>
+            <span style={{ fontSize: '13px', fontWeight: 800, color: INK_MUTE }}>{name1}</span>
           </div>
-          <span style={{ fontSize: '9px', fontWeight: 800, color: '#64748B', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>Season Overview</span>
+          <span style={{ fontSize: '9px', fontWeight: 800, color: INK_MUTE, letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>Season Overview</span>
           <div style={{ flex: 1, display: 'flex', alignItems: 'center', gap: '5px', justifyContent: 'flex-end' }}>
-            <span style={{ fontSize: '13px', fontWeight: 800, color: '#64748B' }}>{name2}</span>
-            <div style={{ width: '18px', height: '18px', borderRadius: '4px', overflow: 'hidden', background: 'rgba(15,23,42,0.04)', border: '1px solid rgba(15,23,42,0.08)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+            <span style={{ fontSize: '13px', fontWeight: 800, color: INK_MUTE }}>{name2}</span>
+            <div style={{ width: '18px', height: '18px', borderRadius: '4px', overflow: 'hidden', background: INK_TINT_04, border: `1px solid ${HAIRLINE_INK_8}`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
               {logo2 ? <img src={logo2} alt={name2} style={{ width: '13px', height: '13px', objectFit: 'contain' }} onError={e => { e.currentTarget.style.display = 'none'; }} /> : null}
             </div>
           </div>
@@ -457,9 +457,9 @@ export function CollegeCompareHero({ data, className }: CollegeCompareHeroProps)
 
       {/* ── PERFORMANCE STATS ── */}
       {hasPerformanceData && (
-        <div style={{ background: '#ffffff', borderTop: `1px solid ${INK_TINT_07}`, borderBottom: `1px solid ${INK_TINT_07}`, marginTop: '8px' }}>
+        <div style={{ background: SURFACE, borderTop: `1px solid ${INK_TINT_07}`, borderBottom: `1px solid ${INK_TINT_07}`, marginTop: '8px' }}>
           <div style={{ padding: '14px 16px 10px' }}>
-            <span style={{ fontSize: '9px', fontWeight: 800, color: '#64748B', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>Performance Stats</span>
+            <span style={{ fontSize: '9px', fontWeight: 800, color: INK_MUTE, letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>Performance Stats</span>
           </div>
           <div style={{ borderTop: `0.5px solid ${INK_TINT_07}` }}>
             <MetricCompareRow label="Avg Scoring" value1={s1?.avg_scoring || 0} value2={s2?.avg_scoring || 0} format={formatAvg} lowerIsBetter />
@@ -472,9 +472,9 @@ export function CollegeCompareHero({ data, className }: CollegeCompareHeroProps)
 
       {/* ── BALL STRIKING ── */}
       {hasBallStrikingData && (
-        <div style={{ background: '#ffffff', borderTop: `1px solid ${INK_TINT_07}`, borderBottom: `1px solid ${INK_TINT_07}`, marginTop: '8px' }}>
+        <div style={{ background: SURFACE, borderTop: `1px solid ${INK_TINT_07}`, borderBottom: `1px solid ${INK_TINT_07}`, marginTop: '8px' }}>
           <div style={{ padding: '14px 16px 10px' }}>
-            <span style={{ fontSize: '9px', fontWeight: 800, color: '#64748B', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>Ball Striking</span>
+            <span style={{ fontSize: '9px', fontWeight: 800, color: INK_MUTE, letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>Ball Striking</span>
           </div>
           <div style={{ borderTop: `0.5px solid ${INK_TINT_07}` }}>
             <MetricCompareRow label="Driving Distance" value1={s1?.avg_driving_distance || 0} value2={s2?.avg_driving_distance || 0} format={formatDist} />

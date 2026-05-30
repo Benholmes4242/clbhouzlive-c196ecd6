@@ -14,7 +14,7 @@ import { useDebouncedValue } from '@/hooks/useDebouncedValue';
 import { getCollegeLogoUrl } from '@/utils/collegeLogo';
 import { formatCurrency } from '@/lib/utils/formatCurrency';
 import { PlayerInitialAvatar } from '../components/shared/PlayerInitialAvatar';
-import { INK_TINT_06, INK_TINT_07, WHITE_ALPHA_55 } from '../_shared/tokens';
+import { AMBER, HAIRLINE_INK_8, INK, INK_ALPHA_45, INK_FAINT, INK_TINT_05, INK_TINT_06, INK_TINT_07, SHELL_BG, SLATE_50, SURFACE, WHITE_ALPHA_55 } from '../_shared/tokens';
 
 /**
  * Convert "northwestern" or "wake-forest" → "Northwestern" / "Wake Forest"
@@ -100,7 +100,7 @@ export function CollegeComparePage() {
           onClick={() => navigate('/tourhub/college-golf')}
           aria-label="Head-to-Head — open College Franchise"
           style={{
-            background: '#0A0E14',
+            background: SHELL_BG,
             border: 'none',
             padding: '14px 16px 12px',
             cursor: 'pointer',
@@ -110,17 +110,17 @@ export function CollegeComparePage() {
           }}
         >
           <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, marginBottom: 4 }}>
-            <ArrowLeftRight size={11} strokeWidth={2.5} color="#F7931E" style={{ marginTop: -4 }} />
+            <ArrowLeftRight size={11} strokeWidth={2.5} color={AMBER} style={{ marginTop: -4 }} />
             <Kicker color="amber">Head-to-head</Kicker>
-            <ChevronRight size={11} strokeWidth={2.5} color="#F7931E" style={{ marginTop: -4 }} />
+            <ChevronRight size={11} strokeWidth={2.5} color={AMBER} style={{ marginTop: -4 }} />
           </div>
           <h1
             style={{
               fontSize: 22,
               fontWeight: 800,
-              color: '#FFFFFF',
+              color: SURFACE,
               letterSpacing: '-0.025em',
-              lineHeight: 1.05,
+              lineHeight: 1.15,
               margin: 0,
               overflow: 'hidden',
               textOverflow: 'ellipsis',
@@ -150,11 +150,11 @@ export function CollegeComparePage() {
 
       <div
         className="relative min-h-screen"
-        style={{ paddingTop: 'var(--chrome-total-h, 0px)', background: '#F8FAFC' }}
+        style={{ paddingTop: 'var(--chrome-total-h, 0px)', background: SLATE_50 }}
       >
         {/* Season caps row — stays in body, no longer cropped under chrome */}
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', padding: '9px 16px' }}>
-          <span style={{ fontSize: 9, color: '#94A3B8', fontWeight: 800, letterSpacing: '0.14em', textTransform: 'uppercase' }}>
+          <span style={{ fontSize: 9, color: INK_FAINT, fontWeight: 800, letterSpacing: '0.14em', textTransform: 'uppercase' }}>
             {seasonCaps}
           </span>
         </div>
@@ -179,10 +179,10 @@ export function CollegeComparePage() {
             <div style={{ padding: '20px' }}>
               {/* Heading */}
               <div style={{ marginBottom: 14 }}>
-                <div style={{ fontSize: 11, fontWeight: 900, color: '#F7931E', letterSpacing: '0.14em', textTransform: 'uppercase' as const, marginBottom: 6 }}>
+                <div style={{ fontSize: 11, fontWeight: 900, color: AMBER, letterSpacing: '0.14em', textTransform: 'uppercase' as const, marginBottom: 6 }}>
                   Step {c1 ? '2' : '1'} of 2
                 </div>
-                <div style={{ fontSize: 17, fontWeight: 800, color: '#0F172A', letterSpacing: '-0.02em', lineHeight: 1.25 }}>
+                <div style={{ fontSize: 17, fontWeight: 800, color: INK, letterSpacing: '-0.02em', lineHeight: 1.25 }}>
                   {c1
                     ? `Pick a college to compare against ${c1DisplayName}`
                     : 'Pick two colleges to compare'}
@@ -203,8 +203,8 @@ export function CollegeComparePage() {
                   autoFocus
                   style={{
                     width: '100%', height: 48, padding: '0 40px 0 44px',
-                    background: '#fff', border: '1px solid rgba(15,23,42,0.08)',
-                    borderRadius: 12, fontSize: 15, fontWeight: 500, color: '#0F172A',
+                    background: SURFACE, border: `1px solid ${HAIRLINE_INK_8}`,
+                    borderRadius: 12, fontSize: 15, fontWeight: 500, color: INK,
                     outline: 'none',
                   }}
                 />
@@ -220,20 +220,20 @@ export function CollegeComparePage() {
                     }}
                     aria-label="Clear search"
                   >
-                    <X size={14} color="#0F172A" />
+                    <X size={14} color={INK} />
                   </button>
                 )}
               </div>
 
               {/* Results */}
               {!showPickerResults ? (
-                <div style={{ textAlign: 'center' as const, padding: '32px 16px', fontSize: 13, color: 'rgba(15,23,42,0.45)', fontWeight: 500 }}>
+                <div style={{ textAlign: 'center' as const, padding: '32px 16px', fontSize: 13, color: INK_ALPHA_45, fontWeight: 500 }}>
                   Start typing to find a college
                 </div>
               ) : pickerLoading ? (
                 <div style={{ display: 'flex', flexDirection: 'column' as const, gap: 8 }}>
                   {Array.from({ length: 4 }).map((_, i) => (
-                    <div key={i} className="animate-pulse" style={{ height: 60, borderRadius: 12, background: 'rgba(15,23,42,0.05)' }} />
+                    <div key={i} className="animate-pulse" style={{ height: 60, borderRadius: 12, background: INK_TINT_05 }} />
                   ))}
                 </div>
               ) : pickerResults && pickerResults.length > 0 ? (
@@ -252,7 +252,7 @@ export function CollegeComparePage() {
                           style={{
                             display: 'flex', alignItems: 'center', gap: 12,
                             width: '100%', padding: 12,
-                            background: '#fff', border: '1px solid rgba(15,23,42,0.08)',
+                            background: SURFACE, border: `1px solid ${HAIRLINE_INK_8}`,
                             borderRadius: 12, cursor: 'pointer', textAlign: 'left' as const,
                           }}
                           className="active:scale-[0.98] transition-transform"
@@ -266,7 +266,7 @@ export function CollegeComparePage() {
                             imageScale={0.78}
                           />
                           <div style={{ minWidth: 0, flex: 1 }}>
-                            <div style={{ fontSize: 15, fontWeight: 700, color: '#0F172A', letterSpacing: '-0.01em', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const }}>
+                            <div style={{ fontSize: 15, fontWeight: 700, color: INK, letterSpacing: '-0.01em', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const }}>
                               {displayName}
                             </div>
                             {earnings > 0 && (
@@ -282,14 +282,14 @@ export function CollegeComparePage() {
                     })}
                 </div>
               ) : (
-                <div style={{ textAlign: 'center' as const, padding: '32px 16px', fontSize: 13, color: 'rgba(15,23,42,0.45)', fontWeight: 500 }}>
+                <div style={{ textAlign: 'center' as const, padding: '32px 16px', fontSize: 13, color: INK_ALPHA_45, fontWeight: 500 }}>
                   No colleges found matching "{debouncedPickerInput}"
                 </div>
               )}
             </div>
           ) : isLoading ? (
             <div style={{ marginTop: '8px' }}>
-              <div style={{ background: '#fff', borderTop: `1px solid ${INK_TINT_07}`, borderBottom: `1px solid ${INK_TINT_07}`, marginTop: '8px' }}>
+              <div style={{ background: SURFACE, borderTop: `1px solid ${INK_TINT_07}`, borderBottom: `1px solid ${INK_TINT_07}`, marginTop: '8px' }}>
                 {Array.from({ length: 6 }).map((_, i) => (
                   <div key={i} className="animate-pulse" style={{ display: 'flex', alignItems: 'center', padding: '10px 20px', borderBottom: `0.5px solid ${INK_TINT_07}`, height: '48px' }}>
                     <div style={{ flex: 1, height: '13px', borderRadius: '4px', background: INK_TINT_06 }} />
@@ -301,7 +301,7 @@ export function CollegeComparePage() {
             </div>
           ) : error ? (
             <div style={{ textAlign: 'center' as const, padding: '48px 20px' }}>
-              <p style={{ fontSize: '15px', color: '#94A3B8' }}>Failed to load comparison data</p>
+              <p style={{ fontSize: '15px', color: INK_FAINT }}>Failed to load comparison data</p>
             </div>
           ) : data ? (
             <CollegeCompareHero data={data} />

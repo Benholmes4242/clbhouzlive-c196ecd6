@@ -53,6 +53,7 @@ export const HAIRLINE_INK_8 = 'rgba(15,23,42,0.08)';         // hairline/faint b
 export const HAIRLINE_INK_10 = 'rgba(15,23,42,0.10)';
 export const HAIRLINE_INK_12 = 'rgba(15,23,42,0.12)';        // cut-line / section divider hairline — 7 cross-app files
 export const HAIRLINE_INK_15 = 'rgba(15,23,42,0.15)';        // section divider on light bg with stronger emphasis
+export const HAIRLINE_INK_18 = 'rgba(15,23,42,0.18)';        // hairline at strongest emphasis — TIED-state bar bg, faint row-number digits — 4 cross-app files
 
 // ============================================================================
 // INK_ALPHA (text/scrim overlays on light bg where alpha-based muting is needed)
@@ -89,6 +90,7 @@ export const WHITE_ALPHA_65 = 'rgba(255,255,255,0.65)';      // secondary text o
 // Use for: faint placeholder backgrounds, hairline borders on light surfaces.
 // Phase 10 will sweep all cross-app sites.
 export const INK_TINT_02 = 'rgba(15,23,42,0.02)';            // ultra-faint ink tint — column-header strip bg — 11 cross-app files
+export const INK_TINT_04 = 'rgba(15,23,42,0.04)';            // very-faint ink tint — logo-tile bg, mini-header bg — 9 cross-app files
 export const INK_TINT_05 = 'rgba(15,23,42,0.05)';            // ultra-faint inline pill/skeleton bg — 11 cross-app files
 export const INK_TINT_06 = 'rgba(15,23,42,0.06)';            // light slate bg — placeholder containers, faint surfaces
 export const INK_TINT_07 = 'rgba(15,23,42,0.07)';            // light slate border — hairline dividers on light bg
