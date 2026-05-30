@@ -22,7 +22,7 @@ import { LeadersCategorySheet } from '../leaders/LeadersCategorySheet';
 import { LeadersMasthead } from '../leaders/LeadersMasthead';
 import { PlayerCardV2 } from '../players/PlayerCardV2';
 import { LeadersEmptyState } from '../leaders/LeadersEmptyState';
-import { INK_TINT_06, INK_TINT_07 } from '../../_shared/tokens';
+import { AMBER, GOLD_TINT_10, HAIRLINE_INK_10, INK, INK_FAINT, INK_MUTE, INK_TINT_06, INK_TINT_07, SLATE_50, SLATE_150, SURFACE } from '../../_shared/tokens';
 
 interface RankedItem {
   player: {
@@ -224,6 +224,14 @@ export function LeadersTab() {
     const higher = category.higherIsBetter !== false;
     const diff = higher ? a - b : b - a;
     if (diff <= 0) return null;
+    // For currency-like categories (earnings), use the category's own format
+    // so the margin renders as "$278,300" or "$1.20M" — consistent with how
+    // the headline leader value is displayed. Apple-finish: numbers always formatted.
+    const sampleFormatted = category.format(diff);
+    const isCurrencyLike = sampleFormatted.startsWith('$');
+    if (isCurrencyLike) {
+      return `MARGIN +${sampleFormatted}`;
+    }
     const rounded = Math.abs(diff) >= 10 ? Math.round(diff) : Math.round(diff * 10) / 10;
     const unit = category.unit ? ` ${category.unit.toUpperCase()}` : '';
     return `MARGIN +${rounded}${unit}`;
