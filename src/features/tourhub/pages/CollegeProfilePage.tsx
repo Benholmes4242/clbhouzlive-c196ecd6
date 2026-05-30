@@ -318,16 +318,16 @@ export function CollegeProfilePage() {
 
         {/* Alumni on Tour header */}
         {stats && (
-          <div style={{ background: '#fff', borderTop: `1px solid ${INK_TINT_07}`, borderBottom: `1px solid ${INK_TINT_07}`, marginTop: 16, padding: '14px 16px 10px' }}>
+          <div style={{ background: SURFACE, borderTop: `1px solid ${INK_TINT_07}`, borderBottom: `1px solid ${INK_TINT_07}`, marginTop: 16, padding: '14px 16px 10px' }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, marginBottom: 4 }}>
-              <span style={{ fontSize: 9, fontWeight: 800, color: '#64748B', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>
+              <span style={{ fontSize: 9, fontWeight: 800, color: INK_MUTE, letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>
                 Alumni on Tour
               </span>
-              <span style={{ fontSize: 9, fontWeight: 800, color: '#94A3B8', letterSpacing: '0.14em', textTransform: 'uppercase' as const }}>
-                <span style={{ color: '#0F172A' }}>{stats.player_count}</span> PLAYERS
+              <span style={{ fontSize: 9, fontWeight: 800, color: INK_FAINT, letterSpacing: '0.14em', textTransform: 'uppercase' as const }}>
+                <span style={{ color: INK }}>{stats.player_count}</span> PLAYERS
               </span>
             </div>
-            <div style={{ fontSize: 13, fontWeight: 500, color: '#64748B' }}>Every pro from this program</div>
+            <div style={{ fontSize: 13, fontWeight: 500, color: INK_MUTE }}>Every pro from this program</div>
           </div>
         )}
 
