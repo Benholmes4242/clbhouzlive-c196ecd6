@@ -159,22 +159,22 @@ function HeroChampion({ champion, runnerUp, champStats, champPhotoUrl, sort, act
     >
       {/* Caption row */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 12 }}>
-        <Crown size={13} strokeWidth={2.5} fill="#FFB800" style={{ color: '#D97706', flexShrink: 0 }} />
-        <span style={{ fontSize: 10.5, fontWeight: 800, letterSpacing: '0.14em', color: '#0F172A' }}>
+        <Crown size={13} strokeWidth={2.5} fill={GOLD} style={{ color: GOLD_DEEP, flexShrink: 0 }} />
+        <span style={{ fontSize: 10.5, fontWeight: 800, letterSpacing: '0.14em', color: INK }}>
           {rankLabel}
         </span>
         {showStreak && (
           <>
-            <span style={{ color: '#94A3B8', fontSize: 10.5, fontWeight: 800 }}>·</span>
-            <span style={{ fontSize: 10.5, fontWeight: 800, letterSpacing: '0.14em', color: '#64748B' }}>
+            <span style={{ color: INK_MUTE, fontSize: 10.5, fontWeight: 800 }}>·</span>
+            <span style={{ fontSize: 10.5, fontWeight: 800, letterSpacing: '0.14em', color: INK_MUTE }}>
               {streakWeeks} CONSECUTIVE WEEKS
             </span>
           </>
         )}
         {marginPts != null && (
           <>
-            <span style={{ color: '#94A3B8', fontSize: 10.5, fontWeight: 800 }}>·</span>
-            <span style={{ fontSize: 10.5, fontWeight: 800, letterSpacing: '0.14em', color: '#64748B' }}>
+            <span style={{ color: INK_MUTE, fontSize: 10.5, fontWeight: 800 }}>·</span>
+            <span style={{ fontSize: 10.5, fontWeight: 800, letterSpacing: '0.14em', color: INK_MUTE }}>
               MARGIN +{marginPts.toFixed(0)} PTS
             </span>
           </>
