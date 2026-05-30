@@ -66,6 +66,7 @@ import {
   STATUS_LIVE,
   SURFACE,
 } from '../_shared/tokens';
+import { getScoreColor } from '../_shared/scoreColor';
 
 // ─── Helpers ────────────────────────────────────────────────────────────────
 function getInitials(fullName: string): string {
