@@ -160,7 +160,7 @@ export function PlayerHero({ player, playerStats }: PlayerHeroProps) {
     <div
       style={{
         position: 'relative',
-        background: '#F8FAFC',
+        background: SLATE_50,
         padding: 'max(env(safe-area-inset-top, 0px), 47px) 0 14px',
       }}
     >
