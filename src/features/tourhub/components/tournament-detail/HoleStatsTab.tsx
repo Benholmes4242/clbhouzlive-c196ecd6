@@ -238,9 +238,14 @@ function HoleStatsBody({
   const easiest = easiestHoles[0];
   const showFeatureCards = hasRoundData && hardest && easiest && hardest.holeNumber !== easiest.holeNumber;
 
-  const maxAvg = useMemo(() => {
-    if (processedHoles.length === 0) return 0.01;
-    return Math.max(0.01, ...processedHoles.map(h => Math.abs(h.avgDiff)));
+  const avgRange = useMemo(() => {
+    if (processedHoles.length === 0) return { min: 0, max: 0.01 };
+    const diffs = processedHoles.map(h => h.avgDiff);
+    const min = Math.min(...diffs);
+    // Anchor the top at >= 0 so genuinely over-par holes still read as hard,
+    // and guarantee a non-zero span so we never divide by zero.
+    const max = Math.max(0.01, ...diffs);
+    return { min, max };
   }, [processedHoles]);
 
   const hardestNumber = hardest?.holeNumber;
@@ -303,18 +308,18 @@ function HoleStatsBody({
         <>
           {frontNine.length > 0 && <NineHeader label="Front Nine" />}
           {frontNine.map(h => (
-            <HoleStatRow key={h.holeNumber} hole={h} maxAvg={maxAvg} hardestNumber={hardestNumber} easiestNumber={easiestNumber} />
+            <HoleStatRow key={h.holeNumber} hole={h} avgRange={avgRange} hardestNumber={hardestNumber} easiestNumber={easiestNumber} />
           ))}
           {backNine.length > 0 && <NineHeader label="Back Nine" />}
           {backNine.map(h => (
-            <HoleStatRow key={h.holeNumber} hole={h} maxAvg={maxAvg} hardestNumber={hardestNumber} easiestNumber={easiestNumber} />
+            <HoleStatRow key={h.holeNumber} hole={h} avgRange={avgRange} hardestNumber={hardestNumber} easiestNumber={easiestNumber} />
           ))}
         </>
       ) : (
         [...processedHoles]
           .sort((a, b) => b.avgDiff - a.avgDiff)
           .map(h => (
-            <HoleStatRow key={h.holeNumber} hole={h} maxAvg={maxAvg} hardestNumber={hardestNumber} easiestNumber={easiestNumber} />
+            <HoleStatRow key={h.holeNumber} hole={h} avgRange={avgRange} hardestNumber={hardestNumber} easiestNumber={easiestNumber} />
           ))
       )}
 
@@ -407,10 +412,11 @@ function FeatureCard({ kind, hole }: { kind: 'hardest' | 'easiest'; hole: Proces
 }
 
 function HoleStatRow({
-  hole, maxAvg, hardestNumber, easiestNumber,
-}: { hole: ProcessedHole; maxAvg: number; hardestNumber?: number; easiestNumber?: number }) {
+  hole, avgRange, hardestNumber, easiestNumber,
+}: { hole: ProcessedHole; avgRange: { min: number; max: number }; hardestNumber?: number; easiestNumber?: number }) {
   const dist = computeDist(hole);
-  const pct = Math.min(1, Math.max(0, hole.avgDiff / maxAvg));
+  const span = Math.max(0.01, avgRange.max - avgRange.min);
+  const pct = Math.min(1, Math.max(0, (hole.avgDiff - avgRange.min) / span));
   const ramp = avgColor(pct);
   const avgLabel = hole.avgDiff > 0 ? `+${hole.avgDiff.toFixed(2)}` : hole.avgDiff.toFixed(2);
   const tag =
