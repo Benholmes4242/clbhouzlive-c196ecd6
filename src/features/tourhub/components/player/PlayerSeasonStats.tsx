@@ -126,7 +126,7 @@ function SGBar({ label, value }: SGBarProps) {
 function SubSectionLabel({ label, style }: { label: string; style?: React.CSSProperties }) {
   return (
     <p style={{
-      fontSize: 9, fontWeight: 800, color: '#94A3B8',
+      fontSize: 9, fontWeight: 800, color: INK_FAINT,
       letterSpacing: '0.14em', textTransform: 'uppercase' as const,
       padding: '14px 0 6px', margin: 0,
       ...style,
