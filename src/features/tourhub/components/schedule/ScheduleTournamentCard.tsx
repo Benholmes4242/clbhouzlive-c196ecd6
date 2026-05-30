@@ -311,7 +311,7 @@ export function ScheduleTournamentCard({
               gap: 4,
               fontSize: 11,
               fontWeight: 600,
-              color: '#64748B',
+              color: INK_MUTE,
               margin: 0,
             }}
           >
