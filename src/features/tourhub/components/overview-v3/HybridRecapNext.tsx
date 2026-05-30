@@ -138,7 +138,7 @@ export function HybridRecapNext({
               </div>
               <div style={{ flex: 1, minWidth: 0 }}>
                 <div style={{ fontSize: 9, fontWeight: 600, letterSpacing: '0.12em', textTransform: 'uppercase', color: AMBER_INK_DARK }}>Winner</div>
-                <div style={{ fontSize: 14, fontWeight: 600, color: '#0F172A', lineHeight: 1.1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{winner.displayName}</div>
+                <div style={{ fontSize: 14, fontWeight: 600, color: INK, lineHeight: 1.1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{winner.displayName}</div>
               </div>
               <div style={{ fontSize: 17, fontWeight: 600, color: RECAP_VICTORY_GREEN, flexShrink: 0 }}>{winner.displayScore}</div>
             </div>
@@ -148,7 +148,7 @@ export function HybridRecapNext({
                   <div key={f.playerId ?? f.displayName} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '7px 13px' }}>
                     <span style={{ width: 18, fontSize: 11, fontWeight: 600, color: 'rgba(15,23,42,0.45)', textAlign: 'center', flexShrink: 0 }}>{posLabel(f)}</span>
                     <PlayerAvatar photoUrl={f.photoUrl} pgaTourId={f.pgaTourId} displayName={f.displayName} fullName={f.fullName} headshotOverride={f.headshotOverride} tourCode={f.tourCode ?? undefined} size={24} />
-                    <span style={{ flex: 1, fontSize: 13, color: '#0F172A', minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{f.displayName}</span>
+                    <span style={{ flex: 1, fontSize: 13, color: INK, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{f.displayName}</span>
                     <span style={{ fontSize: 13, fontWeight: 600, color: RECAP_VICTORY_GREEN, flexShrink: 0 }}>{f.displayScore}</span>
                   </div>
                 ))}
