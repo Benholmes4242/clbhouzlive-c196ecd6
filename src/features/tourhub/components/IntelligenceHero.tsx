@@ -47,21 +47,21 @@ import {
 } from '@/utils/playerHeadshot';
 
 // ─── Tokens (mirrors the mock) ──────────────────────────────────────────────
-const ink = '#0F172A';
-const inkSoft = '#475569';
-const inkFaint = '#94A3B8';
-const surface = '#FFFFFF';
-const amber = '#F7931E';
-const amberDeep = '#D97706';
-const amberSoft = '#FEF3E7';
-const seasonGreen = '#006747';
-const greenLight = '#10B981';
-const danger = '#DC2626';
-const gold = '#FFB800';
-const goldDeep = '#D97706';
-const hairline = '#E2E8F0';
-const hairlineSoft = '#EDF1F5';
-const headlineFont =
+const INK = '#0F172A';
+const INK_SOFT = '#475569';
+const INK_FAINT = '#94A3B8';
+const SURFACE = '#FFFFFF';
+const AMBER = '#F7931E';
+const AMBER_INK = '#D97706';
+const AMBER_SOFT_BG = '#FEF3E7';
+const PGA_GREEN = '#006747';
+const STATUS_LIVE = '#10B981';
+const DANGER = '#DC2626';
+const GOLD = '#FFB800';
+const GOLD_DEEP = '#D97706';
+const SLATE_200 = '#E2E8F0';
+const SLATE_150 = '#EDF1F5';
+const FONT =
   '"Geist", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
 
 // ─── Helpers ────────────────────────────────────────────────────────────────
@@ -142,7 +142,7 @@ function PlayerHeadshot({
       style={{
         width: '100%',
         height: '100%',
-        background: `linear-gradient(135deg, #1E293B, ${ink})`,
+        background: `linear-gradient(135deg, #1E293B, ${INK})`,
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
@@ -151,7 +151,7 @@ function PlayerHeadshot({
       {failed ? (
         <span
           style={{
-            fontFamily: headlineFont,
+            fontFamily: FONT,
             fontSize: 56,
             fontWeight: 800,
             color: 'rgba(255,255,255,0.35)',
@@ -206,27 +206,27 @@ function SectionHeader({
           border: 'none',
           padding: 0,
           cursor: 'pointer',
-          fontFamily: headlineFont,
+          fontFamily: FONT,
           display: 'inline-flex',
           alignItems: 'center',
           gap: 6,
           marginBottom: 8,
         }}
       >
-        <Brain size={13} color={amber} strokeWidth={2.5} />
+        <Brain size={13} color={AMBER} strokeWidth={2.5} />
         <span
           style={{
             fontSize: 10.5,
             fontWeight: 700,
             letterSpacing: '0.14em',
-            color: amber,
+            color: AMBER,
           }}
         >
           TOURNAMENT INTELLIGENCE
         </span>
         <ChevronRight
           size={11}
-          color={amber}
+          color={AMBER}
           strokeWidth={2.5}
           style={{ marginTop: 1 }}
         />
@@ -234,10 +234,10 @@ function SectionHeader({
 
       <div
         style={{
-          fontFamily: headlineFont,
+          fontFamily: FONT,
           fontSize: 18,
           fontWeight: 800,
-          color: ink,
+          color: INK,
           letterSpacing: '-0.015em',
           lineHeight: 1.2,
         }}
@@ -246,7 +246,7 @@ function SectionHeader({
         {tournamentName && (
           <>
             {' '}
-            <span style={{ color: amber }}>{tournamentName}</span>
+            <span style={{ color: AMBER }}>{tournamentName}</span>
           </>
         )}
         {courseName && (
@@ -259,10 +259,10 @@ function SectionHeader({
         <div
           style={{
             marginTop: 6,
-            fontFamily: headlineFont,
+            fontFamily: FONT,
             fontSize: 13,
             fontWeight: 700,
-            color: ink,
+            color: INK,
             lineHeight: 1.25,
             letterSpacing: '-0.005em',
           }}
@@ -301,14 +301,14 @@ function CardMetaTray({
           alignItems: 'flex-start',
           gap: 8,
           cursor: 'pointer',
-          fontFamily: headlineFont,
+          fontFamily: FONT,
           // (size to content; 2-line clamp keeps cards consistent)
         }}
       >
         <div
           style={{
             fontSize: 18,
-            color: amber,
+            color: AMBER,
             fontWeight: 800,
             lineHeight: 0.6,
             marginTop: 4,
@@ -319,7 +319,7 @@ function CardMetaTray({
         <div
           style={{
             fontSize: 12,
-            color: inkSoft,
+            color: INK_SOFT,
             lineHeight: 1.45,
             fontStyle: 'italic',
             flex: 1,
@@ -333,7 +333,7 @@ function CardMetaTray({
         >
           {insight}
           <span style={{
-            color: amber,
+            color: AMBER,
             fontWeight: 800,
             fontStyle: 'normal',
             fontSize: 18,
@@ -344,7 +344,7 @@ function CardMetaTray({
         </div>
         <ChevronUp
           size={14}
-          color={inkFaint}
+          color={INK_FAINT}
           strokeWidth={2.5}
           style={{
             flexShrink: 0,
@@ -365,17 +365,17 @@ function CardMetaTray({
         <div
           style={{
             padding: '0 14px 14px',
-            borderTop: `1px solid ${hairlineSoft}`,
+            borderTop: `1px solid ${SLATE_150}`,
             marginTop: -1,
           }}
         >
           <div
             style={{
-              fontFamily: headlineFont,
+              fontFamily: FONT,
               fontSize: 9.5,
               fontWeight: 700,
               letterSpacing: '0.12em',
-              color: inkFaint,
+              color: INK_FAINT,
               padding: '10px 0 6px',
             }}
           >
@@ -389,7 +389,7 @@ function CardMetaTray({
                 alignItems: 'flex-start',
                 gap: 8,
                 padding: '6px 0',
-                borderTop: i > 0 ? `1px solid ${hairlineSoft}` : 'none',
+                borderTop: i > 0 ? `1px solid ${SLATE_150}` : 'none',
               }}
             >
               <div
@@ -398,14 +398,14 @@ function CardMetaTray({
                   width: 18,
                   height: 18,
                   borderRadius: '50%',
-                  background: amberSoft,
-                  color: amberDeep,
+                  background: AMBER_SOFT_BG,
+                  color: AMBER_INK,
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
                   fontSize: 10,
                   fontWeight: 800,
-                  fontFamily: headlineFont,
+                  fontFamily: FONT,
                 }}
               >
                 {i + 1}
@@ -413,10 +413,10 @@ function CardMetaTray({
               <div
                 style={{
                   fontSize: 11.5,
-                  color: inkSoft,
+                  color: INK_SOFT,
                   lineHeight: 1.45,
                   flex: 1,
-                  fontFamily: headlineFont,
+                  fontFamily: FONT,
                 }}
               >
                 {r}
@@ -446,10 +446,10 @@ function CardShell({
         flexShrink: 0,
         width: 280,
         scrollSnapAlign: 'start',
-        background: surface,
+        background: SURFACE,
         borderRadius: 18,
         overflow: 'hidden',
-        border: isWinner ? `1.5px solid ${gold}` : `1px solid ${hairline}`,
+        border: isWinner ? `1.5px solid ${GOLD}` : `1px solid ${SLATE_200}`,
         boxShadow: isWinner ? undefined : '0 1px 3px rgba(15,23,42,0.04)',
         position: 'relative',
       }}
@@ -484,7 +484,7 @@ function CardHero({
   children: React.ReactNode;
 }) {
   return (
-    <div style={{ position: 'relative', height: 220, background: ink }}>
+    <div style={{ position: 'relative', height: 220, background: INK }}>
       <PlayerHeadshot name={name} desaturate={desaturate} />
       <div
         style={{
@@ -527,7 +527,7 @@ function CardHero({
               pointerEvents: 'none',
             }}
           >
-            <Trophy size={130} color={gold} strokeWidth={1.4} />
+            <Trophy size={130} color={GOLD} strokeWidth={1.4} />
           </div>
         </>
       )}
@@ -577,7 +577,7 @@ function UpcomingCard({
             display: 'inline-flex',
             alignItems: 'center',
             gap: 4,
-            fontFamily: headlineFont,
+            fontFamily: FONT,
           }}
         >
           <Clock size={9} strokeWidth={3} /> Upcoming
@@ -589,7 +589,7 @@ function UpcomingCard({
             left: 14,
             right: 14,
             color: '#fff',
-            fontFamily: headlineFont,
+            fontFamily: FONT,
           }}
         >
           <div
@@ -634,7 +634,7 @@ function UpcomingCard({
                   style={{
                     width: `${Math.max(0, Math.min(100, pick.courseFit))}%`,
                     height: '100%',
-                    background: amber,
+                    background: AMBER,
                   }}
                 />
               </div>
@@ -642,7 +642,7 @@ function UpcomingCard({
                 style={{
                   fontSize: 12,
                   fontWeight: 800,
-                  color: amber,
+                  color: AMBER,
                   fontVariantNumeric: 'tabular-nums',
                 }}
               >
@@ -681,10 +681,10 @@ function LiveCard({
 }) {
   const moveColor =
     pick.moveDir === 'up'
-      ? greenLight
+      ? STATUS_LIVE
       : pick.moveDir === 'down'
-      ? danger
-      : inkFaint;
+      ? DANGER
+      : INK_FAINT;
   const moveSymbol =
     pick.moveDir === 'up' ? '▲' : pick.moveDir === 'down' ? '▼' : '—';
 
@@ -696,7 +696,7 @@ function LiveCard({
             position: 'absolute',
             top: 12,
             right: 12,
-            background: pick.finished ? 'rgba(0,0,0,0.55)' : seasonGreen,
+            background: pick.finished ? 'rgba(0,0,0,0.55)' : PGA_GREEN,
             padding: '5px 10px',
             borderRadius: 8,
             fontSize: 9.5,
@@ -706,7 +706,7 @@ function LiveCard({
             display: 'flex',
             alignItems: 'center',
             gap: 5,
-            fontFamily: headlineFont,
+            fontFamily: FONT,
           }}
         >
           {!pick.finished && (
@@ -730,7 +730,7 @@ function LiveCard({
             left: 14,
             right: 14,
             color: '#fff',
-            fontFamily: headlineFont,
+            fontFamily: FONT,
           }}
         >
           <div
@@ -793,7 +793,7 @@ function LiveCard({
                 style={{
                   fontSize: 18,
                   fontWeight: 800,
-                  color: amber,
+                  color: AMBER,
                   letterSpacing: '-0.01em',
                   lineHeight: 1.1,
                   fontVariantNumeric: 'tabular-nums',
@@ -843,7 +843,7 @@ function LiveCard({
                   color: moveColor,
                   fontSize: 13,
                   fontWeight: 700,
-                  fontFamily: headlineFont,
+                  fontFamily: FONT,
                   fontVariantNumeric: 'tabular-nums',
                 }}
               >
@@ -881,19 +881,19 @@ function ResultsCard({
   const isWinner = pick.outcome === 'win';
   const outcomeConfig = {
     win: {
-      bg: gold,
+      bg: GOLD,
       label: 'WE CALLED IT',
-      color: ink,
+      color: INK,
       weight: 800 as const,
     },
     top5: {
-      bg: seasonGreen,
+      bg: PGA_GREEN,
       label: `✓ TOP 5 · ${pick.finished}`,
       color: '#fff',
       weight: 700 as const,
     },
     top10: {
-      bg: greenLight,
+      bg: STATUS_LIVE,
       label: `TOP 10 · ${pick.finished}`,
       color: '#fff',
       weight: 700 as const,
@@ -933,10 +933,10 @@ function ResultsCard({
             boxShadow: isWinner
               ? '0 4px 12px rgba(255,184,0,0.4)'
               : undefined,
-            fontFamily: headlineFont,
+            fontFamily: FONT,
           }}
         >
-          {isWinner && <Trophy size={11} strokeWidth={3} color={ink} />}
+          {isWinner && <Trophy size={11} strokeWidth={3} color={INK} />}
           {cfg.label}
         </div>
 
@@ -947,7 +947,7 @@ function ResultsCard({
             left: 14,
             right: 14,
             color: '#fff',
-            fontFamily: headlineFont,
+            fontFamily: FONT,
           }}
         >
           <div
@@ -972,7 +972,7 @@ function ResultsCard({
           >
             <span>
               Final:{' '}
-              <strong style={{ color: isWinner ? gold : '#fff' }}>
+              <strong style={{ color: isWinner ? GOLD : '#fff' }}>
                 {pick.finished}
               </strong>
             </span>
@@ -1004,7 +1004,7 @@ function ReceiptsTailCard({
   hasWinner: boolean;
   onClick: () => void;
 }) {
-  const accent = hasWinner ? goldDeep : amberDeep;
+  const accent = hasWinner ? GOLD_DEEP : AMBER_INK;
   return (
     <button
       onClick={onClick}
@@ -1020,11 +1020,11 @@ function ReceiptsTailCard({
         background: hasWinner
           ? 'linear-gradient(160deg, rgba(255,184,0,0.18), rgba(247,147,30,0.08))'
           : 'linear-gradient(160deg, rgba(247,147,30,0.10), rgba(247,147,30,0.02))',
-        border: hasWinner ? `1.5px solid ${gold}` : `1px solid ${amber}30`,
+        border: hasWinner ? `1.5px solid ${GOLD}` : `1px solid ${AMBER}30`,
         display: 'flex',
         flexDirection: 'column',
         textAlign: 'left',
-        fontFamily: headlineFont,
+        fontFamily: FONT,
         position: 'relative',
       }}
     >
@@ -1038,9 +1038,9 @@ function ReceiptsTailCard({
         }}
       >
         {hasWinner ? (
-          <Trophy size={140} color={gold} strokeWidth={1.4} />
+          <Trophy size={140} color={GOLD} strokeWidth={1.4} />
         ) : (
-          <Award size={140} color={amber} strokeWidth={1.4} />
+          <Award size={140} color={AMBER} strokeWidth={1.4} />
         )}
       </div>
 
@@ -1053,16 +1053,16 @@ function ReceiptsTailCard({
         }}
       >
         {hasWinner ? (
-          <Trophy size={11} color={goldDeep} strokeWidth={2.5} />
+          <Trophy size={11} color={GOLD_DEEP} strokeWidth={2.5} />
         ) : (
-          <Award size={11} color={amberDeep} strokeWidth={2.5} />
+          <Award size={11} color={AMBER_INK} strokeWidth={2.5} />
         )}
         <span
           style={{
             fontSize: 9.5,
             fontWeight: 700,
             letterSpacing: '0.14em',
-            color: hasWinner ? goldDeep : amberDeep,
+            color: hasWinner ? GOLD_DEEP : AMBER_INK,
           }}
         >
           {hasWinner ? 'ANOTHER WINNER' : 'BACKED BY RESULTS'}
@@ -1074,7 +1074,7 @@ function ReceiptsTailCard({
           padding: '10px 16px 0',
           fontSize: 18,
           fontWeight: 800,
-          color: ink,
+          color: INK,
           lineHeight: 1.15,
           letterSpacing: '-0.015em',
           position: 'relative',
@@ -1090,7 +1090,7 @@ function ReceiptsTailCard({
         style={{
           padding: '6px 16px 0',
           fontSize: 11,
-          color: inkSoft,
+          color: INK_SOFT,
           fontWeight: 500,
           position: 'relative',
           zIndex: 1,
@@ -1125,7 +1125,7 @@ function ReceiptsTailCard({
               fontSize: 10,
               fontWeight: 700,
               letterSpacing: '0.1em',
-              color: inkSoft,
+              color: INK_SOFT,
             }}
           >
             TOP-5 HIT RATE
@@ -1158,7 +1158,7 @@ function DotsRail({
   stats: ReceiptsStats;
   hasWinner: boolean;
 }) {
-  const accent = amber;
+  const accent = AMBER;
   return (
     <div
       style={{
@@ -1177,7 +1177,7 @@ function DotsRail({
           display: 'flex',
           alignItems: 'center',
           gap: 7,
-          fontFamily: headlineFont,
+          fontFamily: FONT,
           minWidth: 0,
           fontVariantNumeric: 'tabular-nums',
         }}
@@ -1185,7 +1185,7 @@ function DotsRail({
         {hasWinner && (
           <Trophy
             size={11}
-            color={goldDeep}
+            color={GOLD_DEEP}
             strokeWidth={2.5}
             style={{ flexShrink: 0 }}
           />
@@ -1199,13 +1199,13 @@ function DotsRail({
           }}
         >
           <span style={{ color: accent, fontWeight: 800 }}>{stats.wins}</span>
-          <span style={{ color: inkSoft, fontWeight: 600 }}> WINS</span>
-          <span style={{ color: inkFaint, margin: '0 4px' }}>·</span>
+          <span style={{ color: INK_SOFT, fontWeight: 600 }}> WINS</span>
+          <span style={{ color: INK_FAINT, margin: '0 4px' }}>·</span>
           <span style={{ color: accent, fontWeight: 800 }}>{stats.topFives}</span>
-          <span style={{ color: inkSoft, fontWeight: 600 }}> TOP-5s</span>
-          <span style={{ color: inkFaint, margin: '0 4px' }}>·</span>
+          <span style={{ color: INK_SOFT, fontWeight: 600 }}> TOP-5s</span>
+          <span style={{ color: INK_FAINT, margin: '0 4px' }}>·</span>
           <span style={{ color: accent, fontWeight: 800 }}>{stats.hitRatePct}%</span>
-          <span style={{ color: inkSoft, fontWeight: 600, marginLeft: 2 }}>IN T5</span>
+          <span style={{ color: INK_SOFT, fontWeight: 600, marginLeft: 2 }}>IN T5</span>
         </span>
       </div>
     </div>
@@ -1344,9 +1344,9 @@ function StateMessage({ label }: { label: string }) {
     <div
       style={{
         padding: '24px 16px',
-        fontFamily: headlineFont,
+        fontFamily: FONT,
         fontSize: 13,
-        color: inkSoft,
+        color: INK_SOFT,
         textAlign: 'center',
       }}
     >
@@ -1471,7 +1471,7 @@ export const IntelligenceHero = memo(function IntelligenceHero() {
   return (
     <section
       aria-label="Tournament Intelligence"
-      style={{ padding: '0', fontFamily: headlineFont }}
+      style={{ padding: '0', fontFamily: FONT }}
     >
       <style>{`
         @keyframes ti-pulse {
@@ -1479,8 +1479,8 @@ export const IntelligenceHero = memo(function IntelligenceHero() {
           50% { opacity: 0.4; transform: scale(1.4); }
         }
         @keyframes ti-goldGlow {
-          0%, 100% { box-shadow: 0 0 0 1px ${gold}, 0 8px 24px rgba(255,184,0,0.25); }
-          50% { box-shadow: 0 0 0 1px ${gold}, 0 12px 32px rgba(255,184,0,0.45); }
+          0%, 100% { box-shadow: 0 0 0 1px ${GOLD}, 0 8px 24px rgba(255,184,0,0.25); }
+          50% { box-shadow: 0 0 0 1px ${GOLD}, 0 12px 32px rgba(255,184,0,0.45); }
         }
         @keyframes ti-goldShine {
           0% { transform: translateX(-100%) skewX(-20deg); }
@@ -1498,7 +1498,7 @@ export const IntelligenceHero = memo(function IntelligenceHero() {
         .ti-trophy-glow { animation: ti-goldGlow 2.5s ease-in-out infinite; }
         .ti-called-it { animation: ti-calledItIn 400ms cubic-bezier(0.4, 0, 0.2, 1); }
         .ti-live-stripe {
-          background: linear-gradient(90deg, transparent, ${greenLight}, transparent);
+          background: linear-gradient(90deg, transparent, ${STATUS_LIVE}, transparent);
           background-size: 200% 100%;
           animation: ti-shimmer 2s linear infinite;
         }
