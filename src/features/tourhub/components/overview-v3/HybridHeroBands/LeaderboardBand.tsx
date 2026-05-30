@@ -4,6 +4,7 @@
  */
 
 import React from 'react';
+import { ChevronRight } from 'lucide-react';
 import type { HeroState, TopTie } from '../HybridHero.utils';
 import { fmtScore, formatRank, buildLeaderboardSlots, extractRounds } from '../HybridHero.utils';
 import { SoloLeaderRow, TiedLeadersRow, ChampionRow, TiedChasersRow } from './LeaderRow';
@@ -14,6 +15,7 @@ import { TeamFinishRow } from './TeamFinishRow';
 import { CancelledPanel } from './CancelledPanel';
 import { PlayoffPendingPanel } from './PlayoffPendingPanel';
 import { INK, INK_15, AMBER } from '../HybridHero.constants';
+import { INK_ALPHA_45, FONT } from '../../../_shared/tokens';
 import type { TeeTimeGroup } from '../../../hooks/useTournamentTeeTimes';
 import { getPlayerHeadshotUrl } from '@/utils/playerHeadshot';
 
@@ -339,7 +341,7 @@ export function LeaderboardBand({
           style={{
             padding: '32px 20px',
             textAlign: 'center',
-            color: 'rgba(15,23,42,0.45)',
+            color: INK_ALPHA_45,
             fontSize: firstYearEvent ? 11 : 13,
             fontWeight: firstYearEvent ? 800 : 600,
             letterSpacing: firstYearEvent ? '0.16em' : 'normal',
@@ -383,7 +385,7 @@ export function LeaderboardBand({
             {h.left}
           </span>
           {h.right && (
-            <span style={{ fontSize: 11, fontWeight: 600, color: 'rgba(15,23,42,0.45)' }}>{h.right}</span>
+            <span style={{ fontSize: 11, fontWeight: 600, color: INK_ALPHA_45 }}>{h.right}</span>
           )}
         </div>
       )}
@@ -414,8 +416,12 @@ export function LeaderboardBand({
             fontWeight: 800,
             letterSpacing: '0.10em',
             textTransform: 'uppercase',
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: 4,
           }}>
-            {ctaLabel(state)} ›
+            {ctaLabel(state)}
+            <ChevronRight size={11} strokeWidth={2.5} color={AMBER} />
           </span>
         </div>
       ) : (
@@ -440,10 +446,11 @@ export function LeaderboardBand({
             width: 'calc(100% - 40px)',
             border: 'none',
             cursor: 'pointer',
-            fontFamily: 'inherit',
+            fontFamily: FONT,
           }}
         >
-          {ctaLabel(state)} <span style={{ opacity: 0.7 }}>›</span>
+          {ctaLabel(state)}
+          <ChevronRight size={12} strokeWidth={2.5} color="white" style={{ opacity: 0.7 }} />
         </button>
       )}
     </div>

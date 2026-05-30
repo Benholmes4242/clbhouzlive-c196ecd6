@@ -5,6 +5,7 @@
  */
 
 import React from 'react';
+import { Star } from 'lucide-react';
 import {
   PHOTO_BAND_HEIGHT,
   COURSE_GRADIENT,
@@ -15,7 +16,7 @@ import {
   GREEN_LIVE,
   NUMERIC_STYLE,
 } from '../HybridHero.constants';
-import { STATUS_LIVE } from '../../../_shared/tokens';
+import { STATUS_LIVE, FONT } from '../../../_shared/tokens';
 import type { HeroState } from '../HybridHero.utils';
 
 interface PhotoBandProps {
@@ -232,7 +233,7 @@ export function PhotoBand({
           >
             {lede && <span>{lede}</span>}
             {isMajor && (
-              <span style={{ color: GOLD, fontSize: 12, letterSpacing: 0 }}>★</span>
+              <Star size={12} fill={GOLD} color={GOLD} strokeWidth={0} style={{ flexShrink: 0 }} />
             )}
             {isSignature && (
               <span style={{ color: AMBER, fontSize: 9, letterSpacing: '0.18em' }}>
@@ -246,7 +247,7 @@ export function PhotoBand({
           style={{
             margin: 0,
             color: 'white',
-            fontFamily: "'Geist', -apple-system, BlinkMacSystemFont, sans-serif",
+            fontFamily: FONT,
             fontSize: 36,
             fontWeight: 800,
             lineHeight: 0.95,
