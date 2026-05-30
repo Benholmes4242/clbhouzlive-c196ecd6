@@ -49,10 +49,10 @@ interface InfoFieldProps {
 function InfoField({ label, value }: InfoFieldProps) {
   return (
     <div style={{ paddingBottom: '10px', borderBottom: `0.5px solid ${INK_TINT_06}` }}>
-      <p style={{ fontSize: 9, fontWeight: 800, color: '#94A3B8', letterSpacing: '0.14em', textTransform: 'uppercase' as const, margin: '0 0 3px' }}>
+      <p style={{ fontSize: 9, fontWeight: 800, color: INK_FAINT, letterSpacing: '0.14em', textTransform: 'uppercase' as const, margin: '0 0 3px' }}>
         {label}
       </p>
-      <div style={{ fontSize: '12px', fontWeight: 600, color: '#0F172A' }}>{value}</div>
+      <div style={{ fontSize: '12px', fontWeight: 600, color: INK }}>{value}</div>
     </div>
   );
 }
