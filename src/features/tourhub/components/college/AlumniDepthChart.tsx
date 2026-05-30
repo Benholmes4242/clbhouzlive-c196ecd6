@@ -307,7 +307,15 @@ export function AlumniDepthChart({ normalizedName, className }: AlumniDepthChart
   }
 
   return (
-    <div className={cn('', className)}>
+    <div
+      className={cn('', className)}
+      style={{
+        background: '#ffffff',
+        borderTop: '0.5px solid rgba(15,23,42,0.07)',
+        borderBottom: '0.5px solid rgba(15,23,42,0.07)',
+        marginTop: '8px',
+      }}
+    >
       <Section tier="stars"    alumni={tiers.stars}    defaultExpanded />
       <Section tier="regulars" alumni={tiers.regulars} defaultExpanded={tiers.regulars.length <= 5} />
       <Section tier="rising"   alumni={tiers.rising}   defaultExpanded={false} />
