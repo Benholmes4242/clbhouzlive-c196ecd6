@@ -28,6 +28,7 @@ import { WinnerPill } from '../shared/WinnerPill';
 import { TournamentMeta } from '../shared/TournamentMeta';
 import { deriveFieldStrength } from '../../utils/deriveFieldStrength';
 import type { DefendingChampionEntry } from '../../hooks/useScheduleDefendingChampionPhotos';
+import { AMBER_SOFT_BG, INK, INK_MUTE, LIVE_INK, STATUS_LIVE } from '../../_shared/tokens';
 
 // SeasonTournament has no tour_code; derive from its display tourName.
 // TOUR_NAME_TO_SLUG returns lowercase slugs (pga, liv, euro, etc.) — translate
