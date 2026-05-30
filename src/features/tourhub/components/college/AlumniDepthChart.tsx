@@ -199,11 +199,11 @@ function Section({ tier, alumni, defaultExpanded = true, legacyMap }: SectionPro
         <span style={{ fontSize: 12, fontWeight: 800, color: tierColor, letterSpacing: '1.2px', textTransform: 'uppercase' as const }}>
           {TIER_LABELS[tier].toUpperCase()}
         </span>
-        <span style={{ fontSize: 10, fontWeight: 500, color: '#94A3B8', letterSpacing: '0.2px', flex: 1 }}>
+        <span style={{ fontSize: 10, fontWeight: 500, color: INK_FAINT, letterSpacing: '0.2px', flex: 1 }}>
           {TIER_SUBTITLES[tier]}
         </span>
-        <span style={{ fontSize: 11, color: '#94A3B8' }}>{alumni.length}</span>
-        <span style={{ fontSize: 11, color: '#94A3B8' }}>{isExpanded ? '▾' : '▸'}</span>
+        <span style={{ fontSize: 11, color: INK_FAINT }}>{alumni.length}</span>
+        <span style={{ fontSize: 11, color: INK_FAINT }}>{isExpanded ? '▾' : '▸'}</span>
       </button>
 
       {isExpanded && (
