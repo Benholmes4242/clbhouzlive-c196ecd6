@@ -38,7 +38,7 @@ function getTourBadgeText(tourCode: string | null | undefined): string {
 }
 
 const SHELL_SLOT_BG: React.CSSProperties = {
-  background: '#0A0E14',
+  background: SHELL_BG,
   padding: '14px 16px 12px',
 };
 
@@ -46,8 +46,8 @@ const SHELL_H1_STYLE: React.CSSProperties = {
   fontSize: 22,
   fontWeight: 800,
   letterSpacing: '-0.025em',
-  color: '#FFFFFF',
-  lineHeight: 1.05,
+  color: SURFACE,
+  lineHeight: 1.15,
   margin: 0,
 };
 
