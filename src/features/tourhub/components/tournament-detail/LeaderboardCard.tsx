@@ -103,15 +103,15 @@ export function LeaderboardCard({
       )}
 
       {/* Column headers */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '4px', padding: '5px 20px', background: 'rgba(15,23,42,0.02)', borderTop: `0.5px solid ${INK_TINT_07}`, borderBottom: `0.5px solid ${INK_TINT_07}` }}>
-        <span style={{ width: '36px', fontSize: '9px', fontWeight: 800, color: '#64748B', letterSpacing: '0.14em', flexShrink: 0 }}>POS</span>
-        <span style={{ flex: 1, fontSize: '9px', fontWeight: 800, color: '#64748B', letterSpacing: '0.14em' }}>PLAYER</span>
-        <span style={{ width: '36px', textAlign: 'center' as const, fontSize: '9px', fontWeight: 800, color: '#64748B', letterSpacing: '0.14em', flexShrink: 0 }}>THRU</span>
-        <span style={{ width: '44px', textAlign: 'center' as const, fontSize: '9px', fontWeight: 800, color: '#64748B', letterSpacing: '0.14em', flexShrink: 0 }}>SCORE</span>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '4px', padding: '5px 20px', background: INK_TINT_02, borderTop: `0.5px solid ${INK_TINT_07}`, borderBottom: `0.5px solid ${INK_TINT_07}` }}>
+        <span style={{ width: '36px', fontSize: '9px', fontWeight: 800, color: INK_MUTE, letterSpacing: '0.14em', flexShrink: 0 }}>POS</span>
+        <span style={{ flex: 1, fontSize: '9px', fontWeight: 800, color: INK_MUTE, letterSpacing: '0.14em' }}>PLAYER</span>
+        <span style={{ width: '36px', textAlign: 'center' as const, fontSize: '9px', fontWeight: 800, color: INK_MUTE, letterSpacing: '0.14em', flexShrink: 0 }}>THRU</span>
+        <span style={{ width: '44px', textAlign: 'center' as const, fontSize: '9px', fontWeight: 800, color: INK_MUTE, letterSpacing: '0.14em', flexShrink: 0 }}>SCORE</span>
       </div>
 
       {/* Rows */}
-      <div style={{ background: '#ffffff', borderBottom: `1px solid ${INK_TINT_07}` }}>
+      <div style={{ background: SURFACE, borderBottom: `1px solid ${INK_TINT_07}` }}>
         {displayEntries.map((entry, index) => {
           const isMissedCut = entry.status === 'MC' || entry.status === 'CUT';
 
