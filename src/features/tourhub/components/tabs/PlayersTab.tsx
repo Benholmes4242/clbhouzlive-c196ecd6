@@ -920,7 +920,7 @@ export function PlayersTab() {
 
         {totalCount > 0 && (
           <div style={{ padding: '8px 16px 32px', textAlign: 'center' as const }}>
-            <span style={{ fontSize: '10px', color: '#94A3B8' }}>
+            <span style={{ fontSize: '10px', color: INK_FAINT }}>
               Showing {Math.min(visibleCount, totalCount)} of {totalCount}
             </span>
           </div>
