@@ -1,7 +1,7 @@
 import { memo } from 'react';
 import { useSearchParams } from 'react-router-dom';
 
-import { WHITE_ALPHA_10, WHITE_ALPHA_55 } from '../../_shared/tokens';
+import { SHELL_BG, SURFACE, WHITE_ALPHA_06, WHITE_ALPHA_18, WHITE_ALPHA_55, WHITE_ALPHA_65 } from '../../_shared/tokens';
 
 type MetricTab = 'earnings' | 'wins' | 'top10s' | 'movers';
 const VALID_METRICS = new Set<string>(['earnings', 'wins', 'top10s', 'movers']);
