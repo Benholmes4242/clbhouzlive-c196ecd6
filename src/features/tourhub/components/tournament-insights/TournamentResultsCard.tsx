@@ -4,6 +4,7 @@
  */
 
 import React, { useMemo } from 'react';
+import { INK_SOFT } from '../../_shared/tokens';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { useEventWinner } from '../../hooks/useEventWinner';
@@ -231,7 +232,7 @@ export function TournamentResultsCard({
         {/* Narrative — centred pull quote */}
         {narrative && (
           <div style={{ padding: '12px 20px', borderTop: '0.5px solid rgba(15,23,42,0.07)' }}>
-            <p style={{ fontSize: 12, fontWeight: 500, color: '#475569', margin: 0, lineHeight: 1.6, fontStyle: 'italic', textAlign: 'center' }}>
+            <p style={{ fontSize: 12, fontWeight: 500, color: INK_SOFT, margin: 0, lineHeight: 1.6, fontStyle: 'italic', textAlign: 'center' }}>
               "{narrative}"
             </p>
           </div>

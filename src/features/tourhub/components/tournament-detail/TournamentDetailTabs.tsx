@@ -4,6 +4,7 @@
  */
 
 import { cn } from '@/lib/utils';
+import { SLATE_600 } from '../../_shared/tokens';
 
 export type TournamentTab = 'overview' | 'leaderboard' | 'summary' | 'tee-times' | 'hole-stats';
 
@@ -61,7 +62,7 @@ export function TournamentDetailTabs({ activeTab, onTabChange, className, tourna
               )}
               style={{
                 borderRadius: 20,
-                backgroundColor: isActive ? '#475569' : 'transparent',
+                backgroundColor: isActive ? SLATE_600 : 'transparent',
                 color: isActive ? '#fff' : undefined,
               }}
             >

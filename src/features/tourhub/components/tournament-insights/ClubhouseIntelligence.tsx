@@ -3,6 +3,7 @@
  */
 
 import { memo, useState } from 'react';
+import { INK_SOFT } from '../../_shared/tokens';
 import { motion } from 'framer-motion';
 import { ChevronDown } from 'lucide-react';
 
@@ -43,7 +44,7 @@ export const ClubhouseIntelligence = memo(function ClubhouseIntelligence({
 
       <div style={{ display: 'flex', gap: 10 }}>
         <div>
-          <p style={{ fontSize: 13, color: '#475569', margin: 0, lineHeight: 1.6 }}>
+          <p style={{ fontSize: 13, color: INK_SOFT, margin: 0, lineHeight: 1.6 }}>
             {insight.primaryText}
             {isExpanded && insight.expandedText && (
               <><br /><br />{insight.expandedText}</>

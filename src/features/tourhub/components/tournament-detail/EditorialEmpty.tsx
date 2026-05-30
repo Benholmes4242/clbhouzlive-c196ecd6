@@ -12,6 +12,7 @@
  */
 
 import { motion } from 'framer-motion';
+import { INK_SOFT } from '../../_shared/tokens';
 
 export interface EditorialEmptyProps {
   eyebrow: string;
@@ -63,7 +64,7 @@ export function EditorialEmpty({ eyebrow, title, body, accent }: EditorialEmptyP
         style={{
           fontSize: '13px',
           fontWeight: 500,
-          color: '#475569',
+          color: INK_SOFT,
           lineHeight: 1.45,
           margin: 0,
         }}

@@ -4,6 +4,7 @@
  */
 
 import { useState, useCallback, useEffect } from 'react';
+import { AMBER, INK_SOFT } from '../../_shared/tokens';
 import { BottomSheet } from '@/components/ui/BottomSheet';
 import SheetHeader from '@/components/ui/SheetHeader';
 import type { LeaderCategory } from './constants';
@@ -139,7 +140,7 @@ export function LeadersCategorySheet({
                       cursor: 'pointer', textAlign: 'left' as const,
                     }}
                   >
-                    <RowIcon size={16} strokeWidth={2.2} color={isActive ? '#F7931E' : '#475569'} style={{ flexShrink: 0 }} />
+                    <RowIcon size={16} strokeWidth={2.2} color={isActive ? AMBER : INK_SOFT} style={{ flexShrink: 0 }} />
                     <div style={{ flex: 1, minWidth: 0 }}>
                       <div style={{ fontSize: '14px', fontWeight: isActive ? 800 : 600, color: '#0F172A' }}>
                         {cat.shortLabel}

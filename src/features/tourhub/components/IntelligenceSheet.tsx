@@ -39,7 +39,7 @@ const AMBER_SOFT = '#FEF3E7';
 const GOLD = '#FFB800';
 const GOLD_DEEP = '#D97706';
 const SLATE_900 = '#0F172A';
-const SLATE_600 = '#475569';
+import { SLATE_600 } from '../_shared/tokens';
 const SLATE_500 = '#64748B';
 const SLATE_400 = '#94A3B8';
 const SLATE_200 = '#E2E8F0';

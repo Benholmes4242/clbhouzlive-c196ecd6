@@ -11,6 +11,7 @@
  */
 
 import { useState, useMemo } from 'react';
+import { SURFACE, INK_SOFT } from '../../_shared/tokens';
 import { motion, AnimatePresence } from 'framer-motion';
 import { TrendingUp, TrendingDown } from 'lucide-react';
 import { useCollegeWeeklyMovers } from '../../hooks/useCollegeMovers';
@@ -92,7 +93,7 @@ export function FranchiseMovers({ limit = 8, className }: FranchiseMoversProps) 
                   fontSize: 13,
                   fontWeight: isSelected ? 800 : 600,
                   letterSpacing: '-0.1px',
-                  color: isSelected ? '#ffffff' : '#475569',
+                  color: isSelected ? SURFACE : INK_SOFT,
                   background: isSelected ? '#0F172A' : '#ffffff',
                   border: isSelected ? 'none' : '1px solid rgba(15,23,42,0.12)',
                   cursor: 'pointer', transition: 'all 0.15s',

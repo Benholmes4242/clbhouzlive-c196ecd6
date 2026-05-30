@@ -19,9 +19,7 @@
 
 import type { ReactNode } from 'react';
 
-const INK = '#0F172A';
-const AMBER = '#F7931E';
-const SLATE_600 = '#475569';
+import { INK, AMBER, SLATE_600 } from '../../_shared/tokens';
 
 export interface SectionHeaderProps {
   eyebrow: string;
