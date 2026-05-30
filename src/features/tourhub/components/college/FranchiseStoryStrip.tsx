@@ -22,7 +22,7 @@ export function FranchiseStoryStrip({ normalizedName, className }: FranchiseStor
 
   if (isLoading) {
     return (
-      <div style={{ background: '#ffffff', borderTop: `1px solid ${INK_TINT_07}`, borderBottom: `1px solid ${INK_TINT_07}`, marginTop: '8px' }}>
+      <div style={{ background: SURFACE, borderTop: `1px solid ${INK_TINT_07}`, borderBottom: `1px solid ${INK_TINT_07}`, marginTop: '8px' }}>
         <div style={{ padding: '12px 20px 0' }}>
           <div className="animate-pulse" style={{ width: '140px', height: '9px', borderRadius: '4px', background: INK_TINT_06, marginBottom: '10px' }} />
         </div>
