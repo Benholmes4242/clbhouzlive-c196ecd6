@@ -286,8 +286,8 @@ function HoleStatsBody({
                   fontWeight: 700,
                   letterSpacing: '-0.005em',
                   cursor: 'pointer',
-                  background: active ? '#0F172A' : 'transparent',
-                  color: active ? '#ffffff' : INK_MUTE,
+                  background: active ? INK : 'transparent',
+                  color: active ? SURFACE : INK_MUTE,
                   transition: 'background 200ms ease, color 200ms ease',
                 }}
               >
