@@ -75,9 +75,6 @@ export function OverviewPageV3() {
             <LazySection minHeight={260}>
               <HomeCourseOfWeekModule />
             </LazySection>
-            <LazySection minHeight={240}>
-              <HomeWatchRail />
-            </LazySection>
             <LazySection minHeight={400}>
               <WorldRankingsHero />
             </LazySection>
