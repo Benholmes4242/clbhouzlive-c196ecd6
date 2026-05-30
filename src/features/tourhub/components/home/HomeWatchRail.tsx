@@ -9,8 +9,7 @@ import { useWatchFeed } from '@/components/watch/hooks/useWatchFeed';
 import { useViewedPostIds } from '@/components/watch/hooks/useViewedPostIds';
 import WatchRailTile from '@/components/watch/WatchRailTile';
 
-const AMBER = '#F7931E';
-const INK_MUTE = 'rgba(15,23,42,0.55)';
+import { AMBER, INK_MUTE } from '../../_shared/tokens';
 
 export function HomeWatchRail() {
   const navigate = useNavigate();

@@ -22,15 +22,17 @@ import { PlayerAvatar } from './PlayerAvatar';
 import { Shimmer } from './shared/Shimmer';
 import CountryFlag from '@/components/ui/country-flag';
 
-const AMBER = '#F7931E';
-const AMBER_TINT_10 = 'rgba(247,147,30,0.10)';
-const INK = '#0F172A';
-const GOLD = '#FFB800';
-const INK_FAINT = '#94A3B8';
-const INK_MUTE = '#64748B';
-const INK_SOFT = '#475569';
-const HAIRLINE_INK_10 = 'rgba(15,23,42,0.10)';
-const SLATE_150 = '#EDF1F5';
+import {
+  AMBER,
+  AMBER_TINT_10,
+  GOLD,
+  HAIRLINE_INK_10,
+  INK,
+  INK_FAINT,
+  INK_MUTE,
+  INK_SOFT,
+  SLATE_150,
+} from '../_shared/tokens';
 
 // ── Random per-session default ──
 function pickRandomCategoryKey(): string {

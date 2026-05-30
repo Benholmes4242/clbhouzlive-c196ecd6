@@ -32,18 +32,19 @@ import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { COLLEGE_RIVALRY_FALLBACK } from '../utils/editorialFallbacks';
 import { Shimmer } from './shared/Shimmer';
 
-const AMBER = '#F7931E';
-const AMBER_INK = '#D97706';
-const AMBER_TINT_8 = 'rgba(247,147,30,0.08)';
-const AMBER_BORDER = 'rgba(247,147,30,0.30)';
-const INK = '#0F172A';
-const INK_FAINT = '#94A3B8';
-const INK_MUTE = '#64748B';
-const INK_SOFT = '#334155';
-const INK_LIGHT = '#CBD5E1';
-const SLATE_150 = '#EDF1F5';
-const HAIRLINE_INK_7 = 'rgba(15,23,42,0.08)';
-const HAIRLINE_INK_7 = 'rgba(15,23,42,0.07)';
+import {
+  AMBER,
+  AMBER_BORDER,
+  AMBER_INK,
+  AMBER_TINT_8,
+  HAIRLINE_INK_7,
+  INK,
+  INK_FAINT,
+  INK_LIGHT,
+  INK_MUTE,
+  INK_SOFT,
+  SLATE_150,
+} from '../_shared/tokens';
 
 function displayName(stats: CollegeSeasonStats, media: CollegeMedia | undefined): string {
   return media?.short_name || media?.college_name || stats.normalized_name;

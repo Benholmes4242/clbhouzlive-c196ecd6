@@ -36,22 +36,24 @@ import { Shimmer } from './shared/Shimmer';
 import { TOUR_MAP, type TourCode } from '../constants/tourMap';
 
 // ─── Tokens ─────────────────────────────────────────────────────────────────
-const INK = '#0F172A';
-const INK_SOFT = '#334155';
-const INK_MUTE = '#64748B';
-const INK_FAINT = '#94A3B8';
-const INK_LIGHT = '#CBD5E1';
-const SLATE_200 = '#E2E8F0';
-const SLATE_150 = '#EDF1F5';
-const AMBER = '#F7931E';
-const TREND_UP = '#16A34A';
-const TREND_DOWN = '#DC2626';
-const GOLD = '#FFB800';
-const GOLD_BORDER = 'rgba(255,184,0,0.32)';
-const GOLD_GLOW = '0 0 24px rgba(255,184,0,0.10), 0 1px 3px rgba(0,0,0,0.04)';
-const GOLD_TINT = 'rgba(255,184,0,0.04)';
-const TREND_UP_TINT = 'rgba(22,163,74,0.10)';
-const TREND_DOWN_TINT = 'rgba(220,38,38,0.10)';
+import {
+  AMBER,
+  GOLD,
+  GOLD_BORDER,
+  GOLD_GLOW,
+  GOLD_TINT,
+  INK,
+  INK_FAINT,
+  INK_LIGHT,
+  INK_MUTE,
+  INK_SOFT,
+  SLATE_150,
+  SLATE_200,
+  TREND_DOWN,
+  TREND_DOWN_TINT,
+  TREND_UP,
+  TREND_UP_TINT,
+} from '../_shared/tokens';
 
 // ─── Tour selector options ──────────────────────────────────────────────────
 const RANKING_TOUR_OPTIONS = [
