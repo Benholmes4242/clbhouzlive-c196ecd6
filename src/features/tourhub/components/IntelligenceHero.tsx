@@ -668,6 +668,7 @@ interface LivePick {
   reasons: string[];
   position: string;
   score: string;
+  scoreNumeric: number | null;
   thru: string;
   moveDir: 'up' | 'down' | 'flat';
   moveSpots: number;
