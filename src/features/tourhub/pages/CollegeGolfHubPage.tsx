@@ -225,7 +225,7 @@ export function CollegeGolfHubPage() {
 
         {/* Search results */}
         {showSearchResults && (
-          <div style={{ background: '#ffffff', borderBottom: `1px solid ${INK_TINT_07}`, marginTop: '8px' }}>
+          <div style={{ background: SURFACE, borderBottom: `1px solid ${INK_TINT_07}`, marginTop: '8px' }}>
             {searchLoading ? (
               Array.from({ length: 3 }).map((_, i) => (
                 <div key={i} style={{ height: '52px', borderBottom: `0.5px solid ${INK_TINT_07}` }} className="animate-pulse" />
