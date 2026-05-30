@@ -385,7 +385,7 @@ export function LeaderboardBand({
             {h.left}
           </span>
           {h.right && (
-            <span style={{ fontSize: 11, fontWeight: 600, color: 'rgba(15,23,42,0.45)' }}>{h.right}</span>
+            <span style={{ fontSize: 11, fontWeight: 600, color: INK_ALPHA_45 }}>{h.right}</span>
           )}
         </div>
       )}
