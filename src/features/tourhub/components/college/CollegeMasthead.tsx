@@ -24,6 +24,18 @@ import {
   captainShortName,
   formatCaptainEarnings,
 } from '../../utils/captainAnchor';
+import {
+  AMBER,
+  GOLD,
+  GOLD_BORDER,
+  GOLD_DEEP,
+  GOLD_TINT,
+  GOLD_TINT_10,
+  INK,
+  INK_MUTE,
+  SLATE_50,
+  SURFACE,
+} from '../../_shared/tokens';
 
 type ActiveMetric = 'earnings' | 'wins' | 'top10s' | 'movers';
 
@@ -155,7 +167,7 @@ export function CollegeMasthead({
         exit={{ opacity: 0 }}
         transition={{ duration: 0.3 }}
         style={{
-          background: '#F8FAFC',
+          background: SLATE_50,
           padding: '16px 16px 14px',
         }}
       >
@@ -176,35 +188,35 @@ export function CollegeMasthead({
               marginBottom: 6,
             }}
           >
-            <GraduationCap size={13} strokeWidth={2.5} style={{ color: '#F7931E' }} />
+            <GraduationCap size={13} strokeWidth={2.5} style={{ color: AMBER }} />
             <span style={{
               fontSize: 10.5,
               fontWeight: 700,
               letterSpacing: '0.14em',
-              color: '#F7931E',
+              color: AMBER,
               textTransform: 'uppercase' as const,
             }}>
               COLLEGE FRANCHISE
             </span>
-            <ChevronRight size={11} strokeWidth={2.5} style={{ color: '#F7931E', marginTop: 1 }} />
+            <ChevronRight size={11} strokeWidth={2.5} style={{ color: AMBER, marginTop: 1 }} />
           </button>
           <h1 style={{
-            fontSize: 18,
+            fontSize: 24,
             fontWeight: 800,
-            color: '#0F172A',
-            letterSpacing: '-0.015em',
-            lineHeight: 1.2,
+            color: INK,
+            letterSpacing: '-0.025em',
+            lineHeight: 1.15,
             margin: 0,
           }}>
             College Franchise
           </h1>
           <div style={{
             fontSize: 13,
-            fontWeight: 500,
-            color: '#64748B',
+            fontWeight: 700,
+            color: INK,
             letterSpacing: '-0.005em',
             lineHeight: 1.25,
-            margin: '6px 0 0',
+            margin: '8px 0 0',
           }}>
             Season 2025–26 · {subline}
           </div>
@@ -217,8 +229,8 @@ export function CollegeMasthead({
           className="active:opacity-90 transition-opacity"
         >
           <div style={{
-            background: 'linear-gradient(180deg, rgba(255,184,0,0.10) 0%, rgba(255,184,0,0.04) 100%)',
-            border: '1px solid rgba(255,184,0,0.32)',
+            background: `linear-gradient(180deg, ${GOLD_TINT_10} 0%, ${GOLD_TINT} 100%)`,
+            border: `1px solid ${GOLD_BORDER}`,
             borderRadius: 14,
             padding: 14,
           }}>
@@ -230,24 +242,24 @@ export function CollegeMasthead({
               marginBottom: 12,
               flexWrap: 'wrap' as const,
             }}>
-              <Crown size={13} strokeWidth={2.5} fill="#FFB800" style={{ color: '#D97706', flexShrink: 0 }} />
+              <Crown size={13} strokeWidth={2.5} fill={GOLD} style={{ color: GOLD_DEEP, flexShrink: 0 }} />
               <span style={{
                 fontSize: 10.5,
                 fontWeight: 800,
                 letterSpacing: '0.14em',
-                color: '#0F172A',
+                color: INK,
                 textTransform: 'uppercase' as const,
               }}>
                 SEASON LEADER
               </span>
               {captionMetadata.map((part, i) => (
                 <Fragment key={`${part}-${i}`}>
-                  <span style={{ color: '#94A3B8', fontSize: 10.5, fontWeight: 800 }}>·</span>
+                  <span style={{ color: INK_MUTE, fontSize: 10.5, fontWeight: 800 }}>·</span>
                   <span style={{
                     fontSize: 10.5,
                     fontWeight: 800,
                     letterSpacing: '0.14em',
-                    color: '#64748B',
+                    color: INK_MUTE,
                     textTransform: 'uppercase' as const,
                   }}>
                     {part}
@@ -264,8 +276,8 @@ export function CollegeMasthead({
                   height: 80,
                   borderRadius: '34%',
                   overflow: 'hidden',
-                  background: '#FFFFFF',
-                  border: '2.5px solid #FFB800',
+                  background: SURFACE,
+                  border: `2.5px solid ${GOLD}`,
                   boxShadow: '0 4px 12px rgba(255,184,0,0.20)',
                   display: 'flex',
                   alignItems: 'center',
@@ -292,14 +304,14 @@ export function CollegeMasthead({
                   width: 24,
                   height: 24,
                   borderRadius: '50%',
-                  background: '#FFB800',
-                  color: '#0F172A',
+                  background: GOLD,
+                  color: INK,
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
                   fontSize: 11,
                   fontWeight: 900,
-                  border: '2.5px solid #ffffff',
+                  border: `2.5px solid ${SURFACE}`,
                   boxShadow: '0 1px 3px rgba(15,23,42,0.15)',
                   fontVariantNumeric: 'tabular-nums',
                 }}>
@@ -319,7 +331,7 @@ export function CollegeMasthead({
                   <div style={{
                     fontSize: 22,
                     fontWeight: 800,
-                    color: '#0F172A',
+                    color: INK,
                     letterSpacing: '-0.025em',
                     lineHeight: 1.1,
                     whiteSpace: 'nowrap' as const,
@@ -333,20 +345,20 @@ export function CollegeMasthead({
                   <div style={{
                     fontSize: 22,
                     fontWeight: 800,
-                    color: '#0F172A',
+                    color: INK,
                     letterSpacing: '-0.025em',
                     lineHeight: 1,
                     fontVariantNumeric: 'tabular-nums',
                   }}>
                     {primaryInteger}
-                    {primaryDecimal && <span style={{ color: '#F7931E' }}>{primaryDecimal}</span>}
-                    {primarySuffix && <span style={{ color: '#0F172A' }}>{primarySuffix}</span>}
+                    {primaryDecimal && <span style={{ color: AMBER }}>{primaryDecimal}</span>}
+                    {primarySuffix && <span style={{ color: INK }}>{primarySuffix}</span>}
                   </div>
                   <div style={{
                     fontSize: 9,
                     fontWeight: 800,
                     letterSpacing: '0.16em',
-                    color: '#64748B',
+                    color: INK_MUTE,
                     textTransform: 'uppercase' as const,
                     marginTop: 4,
                   }}>

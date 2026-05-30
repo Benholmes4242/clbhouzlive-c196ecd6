@@ -15,7 +15,7 @@ import { useCollegeMediaMap } from '../hooks/useCollegeMedia';
 import { useHeroAlumni } from '../hooks/useBatchCollegeAlumni';
 import { useFranchiseCaptains } from '../hooks/useFranchiseCaptains';
 import { useCollegeWeeklyMovers } from '../hooks/useCollegeMovers';
-import { INK_TINT_06, INK_TINT_07 } from '../_shared/tokens';
+import { AMBER, AMBER_SOFT_BG, INK, INK_FAINT, INK_TINT_06, INK_TINT_07, SLATE_50, SLATE_150, SURFACE } from '../_shared/tokens';
 
 type MetricTab = 'earnings' | 'wins' | 'top10s' | 'movers';
 const VALID_METRICS = new Set<string>(['earnings', 'wins', 'top10s', 'movers']);
@@ -143,11 +143,11 @@ export function CollegeGolfHubPage() {
 
       <div
         className="pb-24"
-        style={{ paddingTop: 'var(--chrome-total-h, 0px)', background: '#F8FAFC' }}
+        style={{ paddingTop: 'var(--chrome-total-h, 0px)', background: SLATE_50 }}
       >
         {/* Masthead */}
         {statsLoading ? (
-          <div style={{ background: '#F8FAFC', padding: '16px 16px 0' }}>
+          <div style={{ background: SLATE_50, padding: '16px 16px 0' }}>
             <div style={{ height: '14px', width: '200px', background: INK_TINT_06, borderRadius: '4px', marginBottom: '12px' }} className="animate-pulse" />
             <div style={{ height: '24px', width: '180px', background: INK_TINT_06, borderRadius: '4px', marginBottom: '16px' }} className="animate-pulse" />
             <div style={{ height: '100px', background: 'rgba(15,23,42,0.04)', borderRadius: '8px', marginBottom: '12px' }} className="animate-pulse" />
@@ -180,12 +180,12 @@ export function CollegeGolfHubPage() {
               style={{
                 width: '32px', height: '32px', borderRadius: '8px',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
-                background: searchExpanded ? '#FEF3E7' : '#EDF1F5',
+                background: searchExpanded ? AMBER_SOFT_BG : SLATE_150,
                 border: 'none', cursor: 'pointer',
               }}
               aria-label="Search franchises"
             >
-              <Search className="w-4 h-4" style={{ color: searchExpanded ? '#F7931E' : '#0F172A' }} strokeWidth={2.5} />
+              <Search className="w-4 h-4" style={{ color: searchExpanded ? AMBER : INK }} strokeWidth={2.5} />
             </button>
           </div>
 
@@ -225,7 +225,7 @@ export function CollegeGolfHubPage() {
 
         {/* Search results */}
         {showSearchResults && (
-          <div style={{ background: '#ffffff', borderBottom: `1px solid ${INK_TINT_07}`, marginTop: '8px' }}>
+          <div style={{ background: SURFACE, borderBottom: `1px solid ${INK_TINT_07}`, marginTop: '8px' }}>
             {searchLoading ? (
               Array.from({ length: 3 }).map((_, i) => (
                 <div key={i} style={{ height: '52px', borderBottom: `0.5px solid ${INK_TINT_07}` }} className="animate-pulse" />
@@ -249,7 +249,7 @@ export function CollegeGolfHubPage() {
                 );
               })
             ) : (
-              <div style={{ padding: '32px 16px', textAlign: 'center' as const, fontSize: '13px', color: '#94A3B8' }}>
+              <div style={{ padding: '32px 16px', textAlign: 'center' as const, fontSize: '13px', color: INK_FAINT }}>
                 No colleges found matching "{debouncedSearch}"
               </div>
             )}
