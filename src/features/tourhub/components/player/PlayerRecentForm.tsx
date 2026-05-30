@@ -267,7 +267,7 @@ export function FormSection({ playerId }: FormSectionProps) {
           <div
             style={{
               fontSize: 11,
-              color: '#94A3B8',
+              color: INK_FAINT,
               fontWeight: 600,
               marginTop: 4,
               fontVariantNumeric: 'tabular-nums',
