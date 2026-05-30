@@ -266,7 +266,7 @@ export function CollegeComparePage() {
                             imageScale={0.78}
                           />
                           <div style={{ minWidth: 0, flex: 1 }}>
-                            <div style={{ fontSize: 15, fontWeight: 700, color: '#0F172A', letterSpacing: '-0.01em', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const }}>
+                            <div style={{ fontSize: 15, fontWeight: 700, color: INK, letterSpacing: '-0.01em', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const }}>
                               {displayName}
                             </div>
                             {earnings > 0 && (
