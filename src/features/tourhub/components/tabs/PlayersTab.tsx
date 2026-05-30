@@ -22,7 +22,23 @@ import { PlayersEmptyState } from '../players/PlayersEmptyState';
 import { getPlayerHeadshotUrl, PLAYER_SILHOUETTE_URL } from '@/utils/playerHeadshot';
 import { titleCaseCountry } from '../../utils/countryFlags';
 import CountryFlag from '@/components/ui/country-flag';
-import { INK_TINT_06, INK_TINT_07 } from '../../_shared/tokens';
+import {
+  AMBER,
+  GOLD,
+  GOLD_DEEP,
+  GOLD_BORDER,
+  GOLD_TINT,
+  GOLD_TINT_10,
+  HAIRLINE_INK_10,
+  INK,
+  INK_FAINT,
+  INK_MUTE,
+  INK_TINT_06,
+  INK_TINT_07,
+  SLATE_50,
+  SLATE_150,
+  SURFACE,
+} from '../../_shared/tokens';
 
 // Inline sort label resolver
 function getSortShortLabel(sort: PlayerSortType, activeTour: string): string {
@@ -134,8 +150,8 @@ function HeroChampion({ champion, runnerUp, champStats, champPhotoUrl, sort, act
       onClick={onClick}
       className="cursor-pointer active:opacity-80 transition-opacity"
       style={{
-        background: 'linear-gradient(180deg, rgba(255,184,0,0.10) 0%, rgba(255,184,0,0.04) 100%)',
-        border: '1px solid rgba(255,184,0,0.32)',
+        background: `linear-gradient(180deg, ${GOLD_TINT_10} 0%, ${GOLD_TINT} 100%)`,
+        border: `1px solid ${GOLD_BORDER}`,
         borderRadius: 14,
         padding: 14,
         marginBottom: 14,
@@ -143,22 +159,22 @@ function HeroChampion({ champion, runnerUp, champStats, champPhotoUrl, sort, act
     >
       {/* Caption row */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 12 }}>
-        <Crown size={13} strokeWidth={2.5} fill="#FFB800" style={{ color: '#D97706', flexShrink: 0 }} />
-        <span style={{ fontSize: 10.5, fontWeight: 800, letterSpacing: '0.14em', color: '#0F172A' }}>
+        <Crown size={13} strokeWidth={2.5} fill={GOLD} style={{ color: GOLD_DEEP, flexShrink: 0 }} />
+        <span style={{ fontSize: 10.5, fontWeight: 800, letterSpacing: '0.14em', color: INK }}>
           {rankLabel}
         </span>
         {showStreak && (
           <>
-            <span style={{ color: '#94A3B8', fontSize: 10.5, fontWeight: 800 }}>·</span>
-            <span style={{ fontSize: 10.5, fontWeight: 800, letterSpacing: '0.14em', color: '#64748B' }}>
+            <span style={{ color: INK_MUTE, fontSize: 10.5, fontWeight: 800 }}>·</span>
+            <span style={{ fontSize: 10.5, fontWeight: 800, letterSpacing: '0.14em', color: INK_MUTE }}>
               {streakWeeks} CONSECUTIVE WEEKS
             </span>
           </>
         )}
         {marginPts != null && (
           <>
-            <span style={{ color: '#94A3B8', fontSize: 10.5, fontWeight: 800 }}>·</span>
-            <span style={{ fontSize: 10.5, fontWeight: 800, letterSpacing: '0.14em', color: '#64748B' }}>
+            <span style={{ color: INK_MUTE, fontSize: 10.5, fontWeight: 800 }}>·</span>
+            <span style={{ fontSize: 10.5, fontWeight: 800, letterSpacing: '0.14em', color: INK_MUTE }}>
               MARGIN +{marginPts.toFixed(0)} PTS
             </span>
           </>
@@ -169,7 +185,7 @@ function HeroChampion({ champion, runnerUp, champStats, champPhotoUrl, sort, act
       <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
         {/* Photo + "1" badge */}
         <div style={{ position: 'relative', flexShrink: 0 }}>
-          <div style={{ width: 80, height: 80, borderRadius: '34%', overflow: 'hidden', background: INK_TINT_06, border: '2.5px solid #FFB800', boxShadow: '0 4px 12px rgba(255,184,0,0.20)' }}>
+          <div style={{ width: 80, height: 80, borderRadius: '34%', overflow: 'hidden', background: INK_TINT_06, border: `2.5px solid ${GOLD}`, boxShadow: '0 4px 12px rgba(255,184,0,0.20)' }}>
             <img
               src={champPhotoUrl}
               alt={champion.playerName}
@@ -181,10 +197,10 @@ function HeroChampion({ champion, runnerUp, champStats, champPhotoUrl, sort, act
             style={{
               position: 'absolute', bottom: -4, right: -4,
               width: 22, height: 22, borderRadius: '50%',
-              background: '#FFB800', color: '#0F172A',
+              background: GOLD, color: INK,
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               fontSize: 11, fontWeight: 900,
-              border: '2.5px solid #ffffff',
+              border: `2.5px solid ${SURFACE}`,
               boxShadow: '0 1px 3px rgba(15,23,42,0.15)',
               fontVariantNumeric: 'tabular-nums',
             }}
@@ -196,21 +212,21 @@ function HeroChampion({ champion, runnerUp, champStats, champPhotoUrl, sort, act
         {/* Info */}
         <div style={{ flex: 1, minWidth: 0, display: 'flex', alignItems: 'center', gap: 10 }}>
           <div style={{ flex: 1, minWidth: 0 }}>
-            <div style={{ fontSize: 22, fontWeight: 800, color: '#0F172A', letterSpacing: '-0.025em', lineHeight: 1.1, marginBottom: 4, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+            <div style={{ fontSize: 22, fontWeight: 800, color: INK, letterSpacing: '-0.025em', lineHeight: 1.1, marginBottom: 4, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
               {champion.playerName}
             </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
               <CountryFlag country={champion.country} size="sm" />
-              <span style={{ fontSize: 12, fontWeight: 600, color: '#64748B' }}>{titleCaseCountry(champion.country)}</span>
+              <span style={{ fontSize: 12, fontWeight: 600, color: INK_MUTE }}>{titleCaseCountry(champion.country)}</span>
             </div>
           </div>
 
           {primary && (
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', flexShrink: 0 }}>
-              <div style={{ fontSize: 22, fontWeight: 800, color: '#0F172A', letterSpacing: '-0.025em', lineHeight: 1, fontVariantNumeric: 'tabular-nums' }}>
+              <div style={{ fontSize: 22, fontWeight: 800, color: INK, letterSpacing: '-0.025em', lineHeight: 1, fontVariantNumeric: 'tabular-nums' }}>
                 {primary.value}
               </div>
-              <div style={{ fontSize: 9, fontWeight: 800, letterSpacing: '0.16em', color: '#64748B', marginTop: 4, textTransform: 'uppercase' as const }}>
+              <div style={{ fontSize: 9, fontWeight: 800, letterSpacing: '0.16em', color: INK_MUTE, marginTop: 4, textTransform: 'uppercase' as const }}>
                 {primary.label}
               </div>
             </div>
@@ -636,7 +652,7 @@ export function PlayersTab() {
   }
 
   return (
-    <div style={{ background: '#F8FAFC' }}>
+    <div style={{ background: SLATE_50 }}>
 
       {/* ── EDITORIAL OPENING — Masthead + No.1 Cover Story + Movers Grid ── */}
       {!debouncedSearch && elitePlayers && elitePlayers.length > 0 && (() => {
@@ -648,7 +664,7 @@ export function PlayersTab() {
         const champPhotoUrl = getPlayerHeadshotUrl(champion.playerName, champion.tourCode ?? 'pga');
 
         return (
-          <div style={{ padding: '16px 16px 0', background: '#F8FAFC' }}>
+          <div style={{ padding: '16px 16px 0', background: SLATE_50 }}>
             {/* ── MASTHEAD ── */}
             {(() => {
               const tourLabel = activeTour === 'pga' ? 'PGA Tour'
@@ -676,20 +692,20 @@ export function PlayersTab() {
                       marginBottom: 6,
                     }}
                   >
-                    <Users size={13} strokeWidth={2.5} style={{ color: '#F7931E' }} />
-                    <span style={{ fontSize: 10.5, fontWeight: 700, letterSpacing: '0.14em', color: '#F7931E', textTransform: 'uppercase' as const }}>
+                    <Users size={13} strokeWidth={2.5} style={{ color: AMBER }} />
+                    <span style={{ fontSize: 10.5, fontWeight: 700, letterSpacing: '0.14em', color: AMBER, textTransform: 'uppercase' as const }}>
                       PLAYERS
                     </span>
-                    <ChevronRight size={11} strokeWidth={2.5} style={{ color: '#F7931E', marginTop: 1 }} />
+                    <ChevronRight size={11} strokeWidth={2.5} style={{ color: AMBER, marginTop: 1 }} />
                   </button>
-                  <h1 style={{ fontSize: 18, fontWeight: 800, color: '#0F172A', letterSpacing: '-0.015em', margin: 0, lineHeight: 1.2 }}>
+                  <h1 style={{ fontSize: 24, fontWeight: 800, color: INK, letterSpacing: '-0.025em', margin: 0, lineHeight: 1.15 }}>
                     Players
                   </h1>
-                  <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 8, marginTop: 4 }}>
-                    <span style={{ fontSize: 13, fontWeight: 600, color: '#64748B' }}>
+                  <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 8, marginTop: 8 }}>
+                    <span style={{ fontSize: 13, fontWeight: 700, color: INK, letterSpacing: '-0.005em' }}>
                       {seasonLabel}
                     </span>
-                    <span style={{ fontSize: 13, fontWeight: 700, color: '#0F172A', fontVariantNumeric: 'tabular-nums' }}>
+                    <span style={{ fontSize: 13, fontWeight: 600, color: INK_FAINT, fontVariantNumeric: 'tabular-nums' }}>
                       {totalCount.toLocaleString()} players
                     </span>
                   </div>
@@ -723,19 +739,19 @@ export function PlayersTab() {
               style={{
                 display: 'flex', alignItems: 'center', gap: 5,
                 padding: '6px 11px', borderRadius: 8,
-                background: '#EDF1F5',
+                background: SLATE_150,
                 border: 'none', cursor: 'pointer',
               }}
               aria-label="Search players"
             >
-              <Search className="w-3 h-3" style={{ color: '#0F172A' }} strokeWidth={2.5} />
-              <span style={{ fontSize: 12, fontWeight: 700, color: '#0F172A' }}>Search</span>
+              <Search className="w-3 h-3" style={{ color: INK }} strokeWidth={2.5} />
+              <span style={{ fontSize: 12, fontWeight: 700, color: INK }}>Search</span>
             </button>
           )}
         </div>
 
         {/* Underline tour-specific tabs (A-Z removed Phase 1 fix.1.6) */}
-        <div style={{ display: 'flex', borderBottom: '1px solid rgba(15,23,42,0.1)', marginTop: '6px' }}>
+        <div style={{ display: 'flex', borderBottom: `1px solid ${HAIRLINE_INK_10}`, marginTop: '6px' }}>
           {(() => {
             // Per-tour tab config — single source of truth.
             const tabs: { value: PlayerSortType; label: string }[] =
@@ -761,9 +777,9 @@ export function PlayersTab() {
                   style={{
                     flex: 1, padding: '12px 0',
                     fontSize: '12px', fontWeight: isActive ? 800 : 600,
-                    color: isActive ? '#0F172A' : '#94A3B8',
+                    color: isActive ? INK : INK_FAINT,
                     background: 'transparent', border: 'none',
-                    borderBottom: `2px solid ${isActive ? '#F7931E' : 'transparent'}`,
+                    borderBottom: `2px solid ${isActive ? AMBER : 'transparent'}`,
                     cursor: 'pointer', transition: 'all 0.15s',
                   }}
                 >
@@ -777,17 +793,17 @@ export function PlayersTab() {
         {/* Count+sort bar OR search input — mutually exclusive (Phase 1 fix.1.7) */}
         {!searchExpanded ? (
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '8px 16px', gap: 8 }}>
-            <span style={{ fontSize: 9, fontWeight: 800, color: '#0F172A', letterSpacing: '0.16em', fontVariantNumeric: 'tabular-nums' }}>
+            <span style={{ fontSize: 9, fontWeight: 800, color: INK, letterSpacing: '0.16em', fontVariantNumeric: 'tabular-nums' }}>
               {totalCount.toLocaleString()} {totalCount === 1 ? 'PLAYER' : 'PLAYERS'}
             </span>
-            <span style={{ fontSize: 9, fontWeight: 800, color: '#64748B', letterSpacing: '0.14em' }}>
+            <span style={{ fontSize: 9, fontWeight: 800, color: INK_MUTE, letterSpacing: '0.14em' }}>
               SORTED BY {getSortShortLabel(sort, activeTour).toUpperCase()}
             </span>
           </div>
         ) : (
           <div style={{ padding: '6px 16px 8px' }}>
             <div style={{ position: 'relative' }}>
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 z-10 w-4 h-4" style={{ color: '#F7931E' }} strokeWidth={2.5} />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 z-10 w-4 h-4" style={{ color: AMBER }} strokeWidth={2.5} />
               <input
                 type="text"
                 autoFocus
@@ -795,7 +811,7 @@ export function PlayersTab() {
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 className="w-full h-9 pl-9 pr-9 rounded-lg text-[13px] font-semibold text-foreground placeholder:text-muted-foreground/70 focus:outline-none"
-                style={{ background: '#ffffff', border: '1px solid rgba(15,23,42,0.09)' }}
+                style={{ background: SURFACE, border: `1px solid ${HAIRLINE_INK_10}` }}
               />
               <button
                 onClick={() => { setSearch(''); setSearchExpanded(false); }}
@@ -803,7 +819,7 @@ export function PlayersTab() {
                 className="absolute right-2 top-1/2 -translate-y-1/2 p-1 rounded-full active:scale-90"
                 style={{ background: INK_TINT_06 }}
               >
-                <X className="w-3 h-3" style={{ color: '#0F172A' }} strokeWidth={2.5} />
+                <X className="w-3 h-3" style={{ color: INK }} strokeWidth={2.5} />
               </button>
             </div>
           </div>
@@ -815,7 +831,7 @@ export function PlayersTab() {
       {/* Tour filter bottom sheet — moved to PlayersShellRow */}
 
       {/* Content — white surface */}
-      <div style={{ background: '#ffffff', borderTop: `1px solid ${INK_TINT_07}`, marginTop: '8px' }}>
+      <div style={{ background: SURFACE, borderTop: `1px solid ${INK_TINT_07}`, marginTop: '8px' }}>
         <AnimatePresence mode="wait">
           <motion.div
             key={contentKey}
@@ -828,8 +844,8 @@ export function PlayersTab() {
             {displayRows.length > 0 ? (
               <>
                 {!debouncedSearch && sort === 'world-rank-desc' && (
-                  <div style={{ padding: '12px 16px 6px', background: '#ffffff' }}>
-                    <span style={{ fontSize: 9, fontWeight: 800, color: '#64748B', letterSpacing: '0.16em' }}>
+                  <div style={{ padding: '12px 16px 6px', background: SURFACE }}>
+                    <span style={{ fontSize: 9, fontWeight: 800, color: INK_MUTE, letterSpacing: '0.16em' }}>
                       CHASING
                     </span>
                   </div>
@@ -897,14 +913,14 @@ export function PlayersTab() {
         {/* Sentinel — triggers auto-load when scrolled into view */}
         {hasMore && (
           <div ref={sentinelRef} style={{ padding: '20px 16px', textAlign: 'center' as const }}>
-            <div style={{ width: 20, height: 20, margin: '0 auto', border: '2px solid rgba(15,23,42,0.12)', borderTopColor: '#F7931E', borderRadius: '50%', animation: 'spin 0.8s linear infinite' }} />
+            <div style={{ width: 20, height: 20, margin: '0 auto', border: '2px solid rgba(15,23,42,0.12)', borderTopColor: AMBER, borderRadius: '50%', animation: 'spin 0.8s linear infinite' }} />
           </div>
         )}
         <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
 
         {totalCount > 0 && (
           <div style={{ padding: '8px 16px 32px', textAlign: 'center' as const }}>
-            <span style={{ fontSize: '10px', color: '#94A3B8' }}>
+            <span style={{ fontSize: '10px', color: INK_FAINT }}>
               Showing {Math.min(visibleCount, totalCount)} of {totalCount}
             </span>
           </div>

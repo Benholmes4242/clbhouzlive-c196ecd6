@@ -11,7 +11,7 @@ import { MovementIndicator } from '../shared/MovementIndicator';
 import { RecentResultPill } from '../shared/RecentResultPill';
 import type { PlayerSortType } from './PlayerSortControl';
 import type { RecentResult } from '../../hooks/useRecentPlayerResults';
-import { INK_TINT_06, INK_TINT_07 } from '../../_shared/tokens';
+import { AMBER, AMBER_SOFT_BG, INK, INK_FAINT, INK_MUTE, INK_TINT_06, INK_TINT_07, LIVE_INK } from '../../_shared/tokens';
 
 interface PlayerCardV2Props {
   player: {
@@ -145,8 +145,8 @@ export function PlayerCardV2({
   const photoSize = tierAccent ? 38 : 34;
   const nameWeight = tierAccent ? 800 : 700;
   const nameSize = 14;
-  const rankSize = tierAccent ? 16 : 18;
-  const rankColor = tierAccent ? '#F7931E' : 'rgba(15,23,42,0.10)';
+  const rankSize = 18;
+  const rankColor = tierAccent ? AMBER : 'rgba(15,23,42,0.10)';
   const rowPaddingY = tierAccent ? 14 : 12;
 
   return (
@@ -165,7 +165,7 @@ export function PlayerCardV2({
           gap: 0,
           borderBottom: `0.5px solid ${INK_TINT_07}`,
           borderLeft: '2px solid transparent',
-          background: tierAccent ? '#FEF3E7' : 'transparent',
+          background: tierAccent ? AMBER_SOFT_BG : 'transparent',
           textDecoration: 'none',
         }}
         className="active:bg-black/[0.02] transition-colors"
@@ -202,7 +202,7 @@ export function PlayerCardV2({
         <div style={{ flex: 1, minWidth: 0, padding: `${rowPaddingY}px 0` }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 6, minWidth: 0 }}>
             <span style={{
-              fontSize: `${nameSize}px`, fontWeight: nameWeight, color: '#0F172A', letterSpacing: tierAccent ? '-0.01em' : 0,
+              fontSize: `${nameSize}px`, fontWeight: nameWeight, color: INK, letterSpacing: tierAccent ? '-0.01em' : 0,
               overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const, minWidth: 0, flex: '0 1 auto',
             }}>
               {player.fullName}
@@ -213,10 +213,10 @@ export function PlayerCardV2({
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '4px', marginTop: '2px' }}>
             <CountryFlag country={player.country} size="sm" />
-            <span style={{ fontSize: '11px', fontWeight: 600, color: '#64748B' }}>{countryName}</span>
+            <span style={{ fontSize: '11px', fontWeight: 600, color: INK_MUTE }}>{countryName}</span>
             {/* OWGR secondary for tour-specific pages */}
             {isTourRanking && !isLPGA && owgr != null && owgr > 0 && (
-              <span style={{ fontSize: '11px', fontWeight: 600, color: '#94A3B8', marginLeft: '4px' }}>· #{owgr} OWGR</span>
+              <span style={{ fontSize: '11px', fontWeight: 600, color: INK_FAINT, marginLeft: '4px' }}>· #{owgr} OWGR</span>
             )}
           </div>
         </div>
@@ -226,28 +226,28 @@ export function PlayerCardV2({
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 2, padding: `${rowPaddingY}px 14px ${rowPaddingY}px 0`, flexShrink: 0 }}>
             {displayValue ? (
               // Tour Hub standard override (Stat Watch, etc.) — bypasses sort-mode selection.
-              <span style={{ fontSize: '13px', fontWeight: 800, color: '#0F172A', fontVariantNumeric: 'tabular-nums' }}>
+              <span style={{ fontSize: '13px', fontWeight: 800, color: INK, fontVariantNumeric: 'tabular-nums' }}>
                 {displayValue.main}
               </span>
             ) : (
               <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                 {!isTourRanking && !isPgaEarnings && !isPgaFedex && totalPoints != null && totalPoints > 0 && activeSort !== 'most-wins' && (
-                  <span style={{ fontSize: '13px', fontWeight: 800, color: '#0F172A', fontVariantNumeric: 'tabular-nums' }}>
+                  <span style={{ fontSize: '13px', fontWeight: 800, color: INK, fontVariantNumeric: 'tabular-nums' }}>
                     {totalPoints.toLocaleString(undefined, { maximumFractionDigits: 1 })}
                   </span>
                 )}
                 {rightValue && (
-                  <span style={{ fontSize: '13px', fontWeight: 800, color: '#0F172A', fontVariantNumeric: 'tabular-nums' }}>
+                  <span style={{ fontSize: '13px', fontWeight: 800, color: INK, fontVariantNumeric: 'tabular-nums' }}>
                     {rightValue.main}
                     {rightValue.label && activeSort === 'most-wins' && (
-                      <span style={{ fontSize: '11px', fontWeight: 700, color: '#64748B', marginLeft: 3 }}>
+                      <span style={{ fontSize: '11px', fontWeight: 700, color: INK_MUTE, marginLeft: 3 }}>
                         {rightValue.label}
                       </span>
                     )}
                   </span>
                 )}
                 {!isTourRanking && !isPgaOwgr && !isPgaEarnings && !isPgaFedex && winCount > 0 && activeSort !== 'most-wins' && (
-                  <span style={{ fontSize: '12px', fontWeight: 800, color: '#047857', fontVariantNumeric: 'tabular-nums' }}>
+                  <span style={{ fontSize: '12px', fontWeight: 800, color: LIVE_INK, fontVariantNumeric: 'tabular-nums' }}>
                     {winCount} {winCount === 1 ? 'win' : 'wins'}
                   </span>
                 )}

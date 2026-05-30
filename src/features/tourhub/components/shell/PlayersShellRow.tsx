@@ -4,7 +4,19 @@ import { ChevronDown, Globe } from 'lucide-react';
 import { BottomSheet } from '@/components/ui/BottomSheet';
 import SheetHeader from '@/components/ui/SheetHeader';
 import { getTourLogo, hasTourLogo } from '../../utils/tourLogos';
-import { AMBER_TINT_04, INK_TINT_06, INK_TINT_07, WHITE_ALPHA_10, WHITE_ALPHA_55 } from '../../_shared/tokens';
+import {
+  AMBER,
+  AMBER_TINT_04,
+  INK,
+  INK_FAINT,
+  INK_TINT_06,
+  INK_TINT_07,
+  SHELL_BG,
+  SURFACE,
+  WHITE_ALPHA_06,
+  WHITE_ALPHA_10,
+  WHITE_ALPHA_55,
+} from '../../_shared/tokens';
 
 type PlayerTourCode = 'pga' | 'EURO' | 'LPGA' | 'CHAMP' | 'PGAD' | 'LIV';
 
@@ -51,8 +63,8 @@ function PlayersShellRowInner() {
       <div
         className="relative"
         style={{
-          background: '#0A0E14',
-          borderBottom: '0.5px solid rgba(255,255,255,0.06)',
+          background: SHELL_BG,
+          borderBottom: `0.5px solid ${WHITE_ALPHA_06}`,
         }}
       >
         <div
@@ -117,7 +129,7 @@ function PlayersShellRowInner() {
                 padding: '14px 16px',
                 background: isSelected ? AMBER_TINT_04 : 'transparent',
                 border: 'none',
-                borderLeft: isSelected ? '3px solid #F7931E' : '3px solid transparent',
+                borderLeft: isSelected ? `3px solid ${AMBER}` : '3px solid transparent',
                 borderBottom: `0.5px solid ${INK_TINT_07}`,
                 cursor: 'pointer',
                 textAlign: 'left',
@@ -129,10 +141,10 @@ function PlayersShellRowInner() {
                   : null}
               </div>
               <div style={{ flex: 1, minWidth: 0 }}>
-                <div style={{ fontSize: 15, fontWeight: isSelected ? 700 : 500, color: '#0F172A' }}>{TOUR_LABELS[code]}</div>
-                <div style={{ fontSize: 12, color: '#94A3B8', marginTop: 2 }}>{TOUR_DESCRIPTIONS[code]}</div>
+                <div style={{ fontSize: 15, fontWeight: isSelected ? 700 : 500, color: INK }}>{TOUR_LABELS[code]}</div>
+                <div style={{ fontSize: 12, color: INK_FAINT, marginTop: 2 }}>{TOUR_DESCRIPTIONS[code]}</div>
               </div>
-              {isSelected && <div style={{ width: 6, height: 6, borderRadius: '50%', background: '#F7931E', flexShrink: 0 }} />}
+              {isSelected && <div style={{ width: 6, height: 6, borderRadius: '50%', background: AMBER, flexShrink: 0 }} />}
             </button>
           );
         })}
