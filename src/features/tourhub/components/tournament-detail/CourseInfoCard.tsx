@@ -56,13 +56,13 @@ export function CourseInfoCard({ tournament, courseImage, courseId }: CourseInfo
       {/* Flat ruled rows */}
       {items.map((item) => (
         <div key={item.label} style={{ display: 'flex', alignItems: 'center', padding: '10px 16px', borderTop: `0.5px solid ${INK_TINT_07}` }}>
-          <span style={{ fontSize: 9, fontWeight: 800, color: '#94A3B8', letterSpacing: '0.14em', textTransform: 'uppercase' as const, width: '88px', flexShrink: 0 }}>{item.label}</span>
+          <span style={{ fontSize: 9, fontWeight: 800, color: INK_FAINT, letterSpacing: '0.14em', textTransform: 'uppercase' as const, width: '88px', flexShrink: 0 }}>{item.label}</span>
           {item.link ? (
-            <Link to={item.link} style={{ fontSize: 14, fontWeight: 700, color: '#F7931E', textDecoration: 'none', flex: 1 }} className="active:opacity-70 transition-opacity">
+            <Link to={item.link} style={{ fontSize: 14, fontWeight: 700, color: AMBER, textDecoration: 'none', flex: 1 }} className="active:opacity-70 transition-opacity">
               {item.value}
             </Link>
           ) : (
-            <span style={{ fontSize: 14, fontWeight: 600, color: '#0F172A', flex: 1 }}>{item.value}</span>
+            <span style={{ fontSize: 14, fontWeight: 600, color: INK, flex: 1 }}>{item.value}</span>
           )}
         </div>
       ))}
