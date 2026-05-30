@@ -4,7 +4,19 @@ import { ChevronDown, Globe } from 'lucide-react';
 import { BottomSheet } from '@/components/ui/BottomSheet';
 import SheetHeader from '@/components/ui/SheetHeader';
 import { getTourLogo, hasTourLogo } from '../../utils/tourLogos';
-import { AMBER_TINT_04, INK_TINT_06, INK_TINT_07, WHITE_ALPHA_10, WHITE_ALPHA_55 } from '../../_shared/tokens';
+import {
+  AMBER,
+  AMBER_TINT_04,
+  INK,
+  INK_FAINT,
+  INK_TINT_06,
+  INK_TINT_07,
+  SHELL_BG,
+  SURFACE,
+  WHITE_ALPHA_06,
+  WHITE_ALPHA_10,
+  WHITE_ALPHA_55,
+} from '../../_shared/tokens';
 
 type PlayerTourCode = 'pga' | 'EURO' | 'LPGA' | 'CHAMP' | 'PGAD' | 'LIV';
 
