@@ -247,7 +247,7 @@ export function PhotoBand({
           style={{
             margin: 0,
             color: 'white',
-            fontFamily: "'Geist', -apple-system, BlinkMacSystemFont, sans-serif",
+            fontFamily: FONT,
             fontSize: 36,
             fontWeight: 800,
             lineHeight: 0.95,
