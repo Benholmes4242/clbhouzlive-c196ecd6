@@ -1,18 +1,16 @@
 import React, { useState, useMemo, useRef, useCallback, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Settings2 } from 'lucide-react';
 import { DarkSectionHeader } from '../_shared/darkAtoms';
-import RivalryCard from './RivalryCard';
+import RivalFightCard from './RivalFightCard';
 import ManageRivalsSheet from './manage-sheet/ManageRivalsSheet';
 import { useFriendRivalries, useFriendLeaderboard } from '@/lib/whs/hooks';
 import { useFriendViewRivalriesForProfile } from '@/lib/whs/friendViewRivalries';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
+import { useRivalCrowns } from '@/lib/whs/hooks/useRivalCrowns';
 import { reformatFriendName } from '@/lib/whs/utils/nameFormat';
 import type { FriendRivalryHydrated } from '@/lib/whs/types';
-import {
-  assignRivalryTiers,
-  rivalKey,
-  type RivalryTier,
-} from '@/lib/whs/utils/rivalryTiering';
+import { rivalKey, rivalryScore } from '@/lib/whs/utils/rivalryTiering';
 
 interface Props {
   userId: string;
@@ -31,56 +29,21 @@ export const RivalriesSection: React.FC<Props> = ({ userId }) => {
 };
 export default RivalriesSection;
 
-// ─── Tier-aware splitting ──────────────────────────────────────────────────
-function splitByTier(
-  rivalries: FriendRivalryHydrated[],
-  tiers: Map<string, RivalryTier>,
-) {
-  const hero: Array<{ r: FriendRivalryHydrated; tier: RivalryTier }> = [];
-  const compact: Array<{ r: FriendRivalryHydrated; tier: RivalryTier }> = [];
-  for (const r of rivalries) {
-    const k = rivalKey(r);
-    if (!k) continue;
-    const t = tiers.get(k);
-    if (t === 'archrival' || t === 'rival') hero.push({ r, tier: t });
-    else if (t === 'recent') compact.push({ r, tier: t });
-    // undefined tier (no shared rounds) — silently dropped
-  }
-  // Hero pager order: archrival first, then rival
-  hero.sort((a, b) => {
-    if (a.tier === b.tier) return 0;
-    return a.tier === 'archrival' ? -1 : 1;
-  });
-  return { hero, compact };
-}
-
 // ─── Owner view ───────────────────────────────────────────────────────────
 const OwnerViewRivalries: React.FC<{ userId: string }> = ({ userId }) => {
   const { data, isLoading } = useFriendRivalries(userId);
-  const { data: leaderboard } = useFriendLeaderboard(userId);
-  const selfRow = useMemo(
-    () => leaderboard?.find((e) => e.is_self) ?? null,
-    [leaderboard],
-  );
-
+  useFriendLeaderboard(userId); // kept for caching parity with prior behavior
+  const { data: crownsByKey } = useRivalCrowns(userId);
   const [manageOpen, setManageOpen] = useState(false);
 
-  const filledRivalries = useMemo(
-    () => (data ?? []).slice().sort((a, b) => a.slot_index - b.slot_index),
-    [data],
-  );
+  const filledRivalries = useMemo(() => {
+    const rows = (data ?? []).filter((r) => (r.shared_rounds_count ?? 0) > 0);
+    // rivalryScore drives ordering: most-played + recently active first.
+    return rows.sort((a, b) => rivalryScore(b) - rivalryScore(a));
+  }, [data]);
 
-  const tiers = useMemo(() => assignRivalryTiers(filledRivalries), [filledRivalries]);
-  const { hero, compact } = useMemo(
-    () => splitByTier(filledRivalries, tiers),
-    [filledRivalries, tiers],
-  );
-
-  const activeCount = useMemo(
-    () => filledRivalries.filter((r) => (r.shared_rounds_count ?? 0) > 0).length,
-    [filledRivalries],
-  );
-  const hasFilled = filledRivalries.length > 0;
+  const activeCount = filledRivalries.length;
+  const hasFilled = activeCount > 0;
   const eyebrow = activeCount > 0 ? `RIVALRIES · ${activeCount} ACTIVE` : 'RIVALRIES';
 
   return (
@@ -124,7 +87,7 @@ const OwnerViewRivalries: React.FC<{ userId: string }> = ({ userId }) => {
           {Array.from({ length: 2 }).map((_, i) => <RivalrySkeleton key={i} />)}
         </div>
       ) : !hasFilled ? null : (
-        <TieredRivalries hero={hero} compact={compact} />
+        <RivalCarousel rivalries={filledRivalries} crownsByKey={crownsByKey} />
       )}
 
       <ManageRivalsSheet
@@ -136,7 +99,7 @@ const OwnerViewRivalries: React.FC<{ userId: string }> = ({ userId }) => {
   );
 };
 
-// ─── Friend view (file 13) ─────────────────────────────────────────────────
+// ─── Friend view ──────────────────────────────────────────────────────────
 const FriendViewRivalries: React.FC<{
   viewerUserId: string;
   ownerUserId: string;
@@ -144,6 +107,7 @@ const FriendViewRivalries: React.FC<{
   const { data, isLoading } = useFriendViewRivalriesForProfile(viewerUserId, ownerUserId);
   const { data: ownerLeaderboard } = useFriendLeaderboard(ownerUserId);
   const { data: viewerRivalries = [] } = useFriendRivalries(viewerUserId);
+  const { data: crownsByKey } = useRivalCrowns(ownerUserId);
 
   const ownerRow = useMemo(
     () => ownerLeaderboard?.find((e) => e.is_self) ?? null,
@@ -157,14 +121,10 @@ const FriendViewRivalries: React.FC<{
     const arr: FriendRivalryHydrated[] = [];
     if (primary) arr.push(primary);
     arr.push(...secondary);
-    return arr;
+    return arr
+      .filter((r) => (r.shared_rounds_count ?? 0) > 0)
+      .sort((a, b) => rivalryScore(b) - rivalryScore(a));
   }, [primary, secondary]);
-
-  const tiers = useMemo(() => assignRivalryTiers(all), [all]);
-  const { hero, compact } = useMemo(
-    () => splitByTier(all, tiers),
-    [all, tiers],
-  );
 
   const primaryKey = primary ? rivalKey(primary) : null;
 
@@ -181,7 +141,7 @@ const FriendViewRivalries: React.FC<{
     (r: FriendRivalryHydrated) => {
       const k = rivalKey(r);
       if (!k) return true;
-      if (primaryKey && k === primaryKey) return false; // primary always tappable
+      if (primaryKey && k === primaryKey) return false;
       return !viewerKnownRivalKeys.has(k);
     },
     [primaryKey, viewerKnownRivalKeys],
@@ -212,9 +172,9 @@ const FriendViewRivalries: React.FC<{
           {Array.from({ length: 2 }).map((_, i) => <RivalrySkeleton key={i} />)}
         </div>
       ) : !hasAnything ? null : (
-        <TieredRivalries
-          hero={hero}
-          compact={compact}
+        <RivalCarousel
+          rivalries={all}
+          crownsByKey={crownsByKey}
           friendViewOwnerId={ownerUserId}
           isTapDisabled={isTapDisabled}
         />
@@ -223,19 +183,17 @@ const FriendViewRivalries: React.FC<{
   );
 };
 
-
-// ─── Tier-aware renderer (hero pager + slim list) ──────────────────────────
-const TieredRivalries: React.FC<{
-  hero: Array<{ r: FriendRivalryHydrated; tier: RivalryTier }>;
-  compact: Array<{ r: FriendRivalryHydrated; tier: RivalryTier }>;
+// ─── Carousel ─────────────────────────────────────────────────────────────
+const RivalCarousel: React.FC<{
+  rivalries: FriendRivalryHydrated[];
+  crownsByKey?: Map<string, import('@/lib/whs/hooks/useRivalCrowns').RivalCrowns>;
   friendViewOwnerId?: string;
   isTapDisabled?: (r: FriendRivalryHydrated) => boolean;
-}> = ({ hero, compact, friendViewOwnerId, isTapDisabled }) => {
+}> = ({ rivalries, crownsByKey, friendViewOwnerId, isTapDisabled }) => {
+  const navigate = useNavigate();
   const railRef = useRef<HTMLDivElement | null>(null);
   const [page, setPage] = useState(0);
-  const total = hero.length;
-  const hasMixedTiers = hero.some((h) => h.tier === 'archrival') && hero.some((h) => h.tier === 'rival');
-  const portraitVariant: 'hero' | 'mixed' = hasMixedTiers ? 'mixed' : 'hero';
+  const total = rivalries.length;
 
   const onScroll = useCallback(() => {
     const el = railRef.current;
@@ -251,68 +209,45 @@ const TieredRivalries: React.FC<{
 
   return (
     <>
-      {hero.length > 0 && (
-        <>
-          <div ref={railRef} onScroll={onScroll} style={heroRailStyle}>
-            {hero.map(({ r, tier }, idx) => {
-              const key = rivalKey(r) ?? `hero-${idx}`;
-              return (
-                <div
-                  key={key}
-                  style={{
-                    flex: '0 0 92%',
-                    scrollSnapAlign: 'center',
-                    minWidth: 0,
-                  }}
-                >
-                  <RivalryCard
-                    rivalry={r}
-                    tier={tier}
-                    rank={idx + 1}
-                    total={total}
-                    variant="hero"
-                    portraitVariant={portraitVariant}
-                    friendViewOwnerId={friendViewOwnerId}
-                    disableTap={isTapDisabled ? isTapDisabled(r) : false}
-                  />
-                </div>
-              );
-            })}
-          </div>
-          {hero.length > 1 && <DotPager count={hero.length} active={page} />}
-        </>
-      )}
-
-      {compact.length > 0 && (
-        <div
-          style={{
-            display: 'flex',
-            flexDirection: 'column',
-            gap: 10,
-            padding: '14px 16px 8px',
-          }}
-        >
-          {compact.map(({ r, tier }, idx) => {
-            const key = rivalKey(r) ?? `compact-${idx}`;
-            return (
-              <RivalryCard
-                key={key}
+      <div ref={railRef} onScroll={onScroll} style={heroRailStyle}>
+        {rivalries.map((r, idx) => {
+          const key = rivalKey(r) ?? `rival-${idx}`;
+          const disabled = isTapDisabled ? isTapDisabled(r) : false;
+          const onTap = disabled
+            ? undefined
+            : () => {
+                const k = rivalKey(r);
+                if (!k) return;
+                if (friendViewOwnerId) {
+                  navigate(`/handicap/${friendViewOwnerId}/rivalry/${k}`);
+                } else {
+                  navigate(`/handicap/rivalry/${k}`);
+                }
+              };
+          return (
+            <div
+              key={key}
+              style={{
+                flex: '0 0 92%',
+                scrollSnapAlign: 'center',
+                minWidth: 0,
+              }}
+            >
+              <RivalFightCard
                 rivalry={r}
-                tier={tier}
-                rank={hero.length + idx + 1}
-                total={hero.length + compact.length}
-                variant="compact"
-                friendViewOwnerId={friendViewOwnerId}
-                disableTap={isTapDisabled ? isTapDisabled(r) : false}
+                crowns={crownsByKey?.get(key)}
+                rank={idx + 1}
+                total={total}
+                onTap={onTap}
               />
-            );
-          })}
-        </div>
-      )}
+            </div>
+          );
+        })}
+      </div>
+      {total > 1 && <DotPager count={total} active={page} />}
     </>
   );
 };
-
 
 const DotPager: React.FC<{ count: number; active: number }> = ({ count, active }) => (
   <div
@@ -344,7 +279,7 @@ const DotPager: React.FC<{ count: number; active: number }> = ({ count, active }
   </div>
 );
 
-// ─── Shared atoms ──────────────────────────────────────────────────────────
+// ─── Shared atoms ─────────────────────────────────────────────────────────
 const railStyle: React.CSSProperties = {
   display: 'flex',
   gap: 12,
@@ -381,7 +316,7 @@ const RivalrySkeleton: React.FC = () => (
     className="animate-pulse"
     style={{
       flex: '0 0 100%',
-      height: 460,
+      height: 380,
       borderRadius: 18,
       background: 'var(--hcp-bg-3)',
     }}
