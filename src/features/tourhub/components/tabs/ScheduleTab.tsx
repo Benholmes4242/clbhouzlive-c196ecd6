@@ -497,7 +497,7 @@ export function ScheduleTab() {
                    </div>
                     {/* Heavier rule between date groups */}
                     {groupIndex < monthGroups.length - 1 && (
-                      <div style={{ height: '1px', background: 'rgba(15,23,42,0.1)' }} />
+                      <div style={{ height: '1px', background: HAIRLINE_INK_10 }} />
                     )}
                 </div>
                 );
