@@ -150,8 +150,8 @@ function HeroChampion({ champion, runnerUp, champStats, champPhotoUrl, sort, act
       onClick={onClick}
       className="cursor-pointer active:opacity-80 transition-opacity"
       style={{
-        background: 'linear-gradient(180deg, rgba(255,184,0,0.10) 0%, rgba(255,184,0,0.04) 100%)',
-        border: '1px solid rgba(255,184,0,0.32)',
+        background: `linear-gradient(180deg, ${GOLD_TINT_10} 0%, ${GOLD_TINT} 100%)`,
+        border: `1px solid ${GOLD_BORDER}`,
         borderRadius: 14,
         padding: 14,
         marginBottom: 14,
