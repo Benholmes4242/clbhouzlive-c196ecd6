@@ -35,7 +35,7 @@ import {
 } from '../schedule';
 
 import { useLiveRightNow } from '../../hooks/useOverviewModules';
-import { AMBER, INK, INK_MUTE, INK_TINT_07, HAIRLINE_INK_10, SLATE_50, SURFACE } from '../../_shared/tokens';
+import { AMBER, INK, INK_MUTE, INK_FAINT, INK_TINT_07, HAIRLINE_INK_10, SLATE_50, SURFACE } from '../../_shared/tokens';
 
 // B45 FIX 1: Helper for completed status check
 const isCompleted = (t: TourTournament) => t.status === 'closed' || t.status === 'complete';
@@ -386,11 +386,11 @@ export function ScheduleTab() {
             </button>
 
             <h1 style={{
-              fontSize: 18,
+              fontSize: 24,
               fontWeight: 800,
               color: INK,
-              letterSpacing: '-0.015em',
-              lineHeight: 1.2,
+              letterSpacing: '-0.025em',
+              lineHeight: 1.15,
               margin: 0,
             }}>
               Tour schedule
@@ -405,11 +405,11 @@ export function ScheduleTab() {
               color: INK,
               letterSpacing: '-0.005em',
               lineHeight: 1.25,
-              margin: '6px 0 0',
+              margin: '8px 0 0',
               paddingBottom: 12,
             }}>
               <span>{seasonLabel}</span>
-              <span style={{ fontWeight: 600, color: INK_MUTE }}>
+              <span style={{ fontWeight: 600, color: INK_FAINT }}>
                 {(tournaments ?? []).length} events across {tourCount} tour{tourCount !== 1 ? 's' : ''}
               </span>
             </div>

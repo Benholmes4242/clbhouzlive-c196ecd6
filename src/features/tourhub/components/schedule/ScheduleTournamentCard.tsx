@@ -28,7 +28,7 @@ import { WinnerPill } from '../shared/WinnerPill';
 import { TournamentMeta } from '../shared/TournamentMeta';
 import { deriveFieldStrength } from '../../utils/deriveFieldStrength';
 import type { DefendingChampionEntry } from '../../hooks/useScheduleDefendingChampionPhotos';
-import { AMBER_SOFT_BG, INK, INK_MUTE, LIVE_INK, STATUS_LIVE } from '../../_shared/tokens';
+import { AMBER_SOFT_BG, INK, INK_MUTE, LIVE_INK, STATUS_LIVE, STATUS_LIVE_BORDER, STATUS_LIVE_TINT_10 } from '../../_shared/tokens';
 
 // SeasonTournament has no tour_code; derive from its display tourName.
 // TOUR_NAME_TO_SLUG returns lowercase slugs (pga, liv, euro, etc.) — translate
@@ -170,11 +170,11 @@ export function ScheduleTournamentCard({
         </p>
         <p
           style={{
-            fontSize: 20,
+            fontSize: 22,
             fontWeight: 800,
             color: INK,
             lineHeight: 1,
-            letterSpacing: '-0.025em',
+            letterSpacing: '-0.03em',
             margin: '4px 0 0',
             fontVariantNumeric: 'tabular-nums',
           }}
@@ -197,8 +197,8 @@ export function ScheduleTournamentCard({
                 gap: 3,
                 padding: '3px 6px',
                 borderRadius: 4,
-                background: 'rgba(16,185,129,0.10)',
-                border: '1px solid rgba(16,185,129,0.32)',
+                background: STATUS_LIVE_TINT_10,
+                border: `1px solid ${STATUS_LIVE_BORDER}`,
                 color: LIVE_INK,
                 fontSize: 9,
                 fontWeight: 900,
@@ -226,7 +226,7 @@ export function ScheduleTournamentCard({
         {/* Tournament name — visual anchor */}
         <p
           style={{
-            fontSize: 16,
+            fontSize: 17,
             fontWeight: 800,
             color: INK,
             letterSpacing: '-0.015em',

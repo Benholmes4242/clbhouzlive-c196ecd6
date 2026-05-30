@@ -5,6 +5,7 @@
  * to recover ~80px of vertical space. Tap → navigate to tournament detail.
  */
 import { useNavigate } from 'react-router-dom';
+import { Clock } from 'lucide-react';
 import { TourPill } from './TourPill';
 import { AMBER, AMBER_BORDER, INK } from '../../_shared/tokens';
 
@@ -66,6 +67,9 @@ export function CompactNextUp({ tournamentId, tourCode, name, daysUntil }: Compa
       </span>
       <span
         style={{
+          display: 'inline-flex',
+          alignItems: 'center',
+          gap: 4,
           fontSize: 11,
           fontWeight: 800,
           color: AMBER,
@@ -73,6 +77,7 @@ export function CompactNextUp({ tournamentId, tourCode, name, daysUntil }: Compa
           flexShrink: 0,
         }}
       >
+        <Clock size={10} strokeWidth={2.4} color={AMBER} aria-hidden />
         {daysUntil === 0 ? 'today' : `${daysUntil} ${daysUntil === 1 ? 'day' : 'days'}`}
       </span>
     </button>

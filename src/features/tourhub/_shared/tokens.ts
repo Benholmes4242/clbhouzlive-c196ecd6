@@ -151,6 +151,8 @@ export const RECAP_VICTORY_GREEN = '#0F6E56';                // deep teal-green 
 // ============================================================================
 export const STATUS_LIVE = '#10B981';
 export const LIVE_INK = '#047857';                           // readable LIVE green text on light bg (emerald-700) — high-contrast counterpart to STATUS_LIVE — 7 cross-app files
+export const STATUS_LIVE_TINT_10 = 'rgba(16,185,129,0.10)';  // LIVE pill faint green fill — 3 cross-app sites
+export const STATUS_LIVE_BORDER = 'rgba(16,185,129,0.32)';   // LIVE pill border — 2 cross-app sites
 
 
 // ============================================================================
