@@ -390,7 +390,7 @@ export function PlayerSeasonStats({ playerStats }: PlayerSeasonStatsProps) {
               <SGBar label="SG: Tee to Green" value={playerStats.strokes_gained_tee_green} />
               <SGBar label="SG: Around Green" value={playerStats.strokes_gained} />
               {!playerStats.strokes_gained_total && !playerStats.strokes_gained_tee_green && !playerStats.strokes_gained && (
-                <p style={{ fontSize: 14, padding: '24px 0', textAlign: 'center', color: '#94A3B8' }}>
+                <p style={{ fontSize: 14, padding: '24px 0', textAlign: 'center', color: INK_FAINT }}>
                   Strokes Gained data unavailable for this player.
                 </p>
               )}
