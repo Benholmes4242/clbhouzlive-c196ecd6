@@ -32,7 +32,7 @@ import {
   type TournamentTab,
 } from '../components/tournament-detail';
 import { TournamentEmptyState } from '../components/tournament-detail/TournamentEmptyState';
-import { INK_TINT_06, INK_TINT_07, WHITE_ALPHA_10 } from '../_shared/tokens';
+import { HAIRLINE_INK_10, INK_TINT_06, INK_TINT_07, SHELL_BG, SLATE_50, SURFACE, WHITE_ALPHA_08, WHITE_ALPHA_10 } from '../_shared/tokens';
 
 const VALID_TABS: TournamentTab[] = ['overview', 'leaderboard', 'summary', 'tee-times', 'hole-stats'];
 
