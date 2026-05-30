@@ -24,6 +24,7 @@ import CountryFlag from '@/components/ui/country-flag';
 
 import {
   AMBER,
+  AMBER_TINT_8,
   AMBER_TINT_10,
   GOLD,
   HAIRLINE_INK_10,
@@ -32,6 +33,7 @@ import {
   INK_MUTE,
   INK_SOFT,
   SLATE_150,
+  SURFACE,
 } from '../_shared/tokens';
 
 // ── Random per-session default ──
