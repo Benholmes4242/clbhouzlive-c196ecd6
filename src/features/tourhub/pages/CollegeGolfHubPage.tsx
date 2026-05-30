@@ -142,18 +142,18 @@ export function CollegeGolfHubPage() {
 
       <div
         className="pb-24"
-        style={{ paddingTop: 'var(--chrome-total-h, 0px)' }}
+        style={{ paddingTop: 'var(--chrome-total-h, 0px)', background: '#F8FAFC' }}
       >
         {/* Masthead */}
         {statsLoading ? (
-          <div style={{ background: '#0F172A', padding: '16px 16px 0' }}>
-            <div style={{ height: '14px', width: '200px', background: 'rgba(255,255,255,0.06)', borderRadius: '4px', marginBottom: '12px' }} className="animate-pulse" />
-            <div style={{ height: '24px', width: '180px', background: 'rgba(255,255,255,0.06)', borderRadius: '4px', marginBottom: '16px' }} className="animate-pulse" />
-            <div style={{ height: '100px', background: 'rgba(255,255,255,0.04)', borderRadius: '8px', marginBottom: '12px' }} className="animate-pulse" />
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '1px', borderTop: '0.5px solid rgba(255,255,255,0.08)' }}>
+          <div style={{ background: '#F8FAFC', padding: '16px 16px 0' }}>
+            <div style={{ height: '14px', width: '200px', background: 'rgba(15,23,42,0.06)', borderRadius: '4px', marginBottom: '12px' }} className="animate-pulse" />
+            <div style={{ height: '24px', width: '180px', background: 'rgba(15,23,42,0.06)', borderRadius: '4px', marginBottom: '16px' }} className="animate-pulse" />
+            <div style={{ height: '100px', background: 'rgba(15,23,42,0.04)', borderRadius: '8px', marginBottom: '12px' }} className="animate-pulse" />
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '1px', borderTop: '0.5px solid rgba(15,23,42,0.08)' }}>
               {[1, 2, 3, 4].map(i => (
                 <div key={i} style={{ padding: '12px 0', display: 'flex', justifyContent: 'center' }}>
-                  <div style={{ height: '14px', width: '40px', background: 'rgba(255,255,255,0.06)', borderRadius: '4px' }} className="animate-pulse" />
+                  <div style={{ height: '14px', width: '40px', background: 'rgba(15,23,42,0.06)', borderRadius: '4px' }} className="animate-pulse" />
                 </div>
               ))}
             </div>
