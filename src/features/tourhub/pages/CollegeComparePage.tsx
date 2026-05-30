@@ -220,7 +220,7 @@ export function CollegeComparePage() {
                     }}
                     aria-label="Clear search"
                   >
-                    <X size={14} color="#0F172A" />
+                    <X size={14} color={INK} />
                   </button>
                 )}
               </div>
