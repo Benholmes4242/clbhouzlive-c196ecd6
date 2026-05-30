@@ -309,7 +309,7 @@ export function PlayerSeasonStats({ playerStats }: PlayerSeasonStatsProps) {
           {activeTab === 'Short Game' && (
             <>
               {!playerStats.putting_average && !playerStats.sand_saves && !playerStats.scrambling ? (
-                <p style={{ fontSize: 14, padding: '24px 0', textAlign: 'center', color: '#94A3B8' }}>
+                <p style={{ fontSize: 14, padding: '24px 0', textAlign: 'center', color: INK_FAINT }}>
                   Short game stats unavailable for this player.
                 </p>
               ) : (
