@@ -36,7 +36,7 @@ import {
   AMBER,
   AMBER_BORDER,
   AMBER_INK,
-  AMBER_TINT_8,
+  AMBER_TINT_08,
   AMBER_TINT_12,
   HAIRLINE_INK_7,
   INK,
@@ -568,7 +568,7 @@ export function CollegeRivalry() {
                 onClick={() => navigate(`/tourhub/college-golf/${stats.normalized_name}`)}
                 style={{
                   width: '100%',
-                  background: isLeader ? AMBER_TINT_8 : 'transparent',
+                  background: isLeader ? AMBER_TINT_08 : 'transparent',
                   border: 'none',
                   borderLeft: isLeader ? `3px solid ${AMBER}` : '3px solid transparent',
                   borderBottom: i < top5.length - 1 ? `1px solid ${SLATE_150}` : 'none',
@@ -628,7 +628,7 @@ export function CollegeRivalry() {
                   {isRival && (
                     <span style={{
                       padding: '2px 6px',
-                      background: AMBER_TINT_8,
+                      background: AMBER_TINT_08,
                       border: `1px solid ${AMBER_BORDER}`,
                       borderRadius: 4,
                       fontSize: 8,
