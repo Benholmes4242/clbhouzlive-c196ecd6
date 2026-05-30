@@ -41,13 +41,13 @@ function TournamentTabsShellRowInner({ activeTab, onChange }: Props) {
           display: 'flex',
           gap: 8,
           padding: '0 16px',
-          background: '#0A0E14',
-          borderBottom: '0.5px solid rgba(255,255,255,0.06)',
+          background: SHELL_BG,
+          borderBottom: `0.5px solid ${WHITE_ALPHA_06}`,
           overflowX: 'auto',
           overflowY: 'hidden',
           WebkitOverflowScrolling: 'touch',
           scrollbarWidth: 'none',
-          fontFamily: 'Geist, system-ui, -apple-system, BlinkMacSystemFont, sans-serif',
+          fontFamily: FONT,
         }}
       >
         {TABS.map((tab) => {
