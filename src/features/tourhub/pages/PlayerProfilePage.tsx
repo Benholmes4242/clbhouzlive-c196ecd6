@@ -135,7 +135,7 @@ export function PlayerProfilePage() {
         </div>
       </ShellSlot>
 
-      <div style={{ paddingTop: 'var(--chrome-total-h, 0px)' }}>
+      <div style={{ paddingTop: 'var(--chrome-total-h, 0px)', background: '#F8FAFC' }}>
         {/* Hero */}
         <PlayerHero player={player} playerStats={playerStats ?? null} />
 
