@@ -24,7 +24,7 @@ import {
   captainShortName,
 } from '../utils/captainAnchor';
 import { collegeHubRoute } from '../routes';
-import { INK_TINT_06, INK_TINT_07, WHITE_ALPHA_55 } from '../_shared/tokens';
+import { AMBER, GOLD, GOLD_DEEP, GOLD_GLOW_DROP, GOLD_TINT_10, INK, INK_MUTE, INK_FAINT, INK_TINT_06, INK_TINT_07, SHELL_BG, SLATE_50, SURFACE, WHITE_ALPHA_55 } from '../_shared/tokens';
 
 /* ─── Hero subtitle: cross-tour roll-up ────────────────────────────────── */
 
