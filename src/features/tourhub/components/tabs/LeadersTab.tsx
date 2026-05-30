@@ -265,7 +265,7 @@ export function LeadersTab() {
 
 
   return (
-    <div>
+    <div style={{ background: '#F8FAFC' }}>
       {/* Unified editorial masthead */}
       <LeadersMasthead
         leader={leader}
