@@ -4,6 +4,7 @@
  */
 
 import React from 'react';
+import { RotateCw } from 'lucide-react';
 import {
   INK,
   NUMERIC_STYLE,
