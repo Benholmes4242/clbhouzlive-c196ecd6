@@ -145,5 +145,5 @@ export function MiddleBand({
       />
     );
   }
-  return <ChampionStrip name="Tournament Preview" score="›" scoreLabel="" eyebrow="📍 PREVIEW" />;
+  return <ChampionStrip name="Tournament Preview" score="›" scoreLabel="" eyebrow="PREVIEW" eyebrowIcon={MapPin} />;
 }
