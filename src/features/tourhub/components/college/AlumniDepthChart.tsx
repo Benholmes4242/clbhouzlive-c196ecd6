@@ -43,10 +43,10 @@ interface AlumniDepthChartProps {
 type TierKey = 'stars' | 'regulars' | 'rising' | 'legacy';
 
 const TIER_COLORS: Record<TierKey, string> = {
-  stars:    '#F7931E', // amber
+  stars:    AMBER, // amber
   regulars: SLATE_600, // slate-600 (replaces off-brand iOS blue)
-  rising:   '#16A34A', // green
-  legacy:   '#7C3AED', // purple (NEW)
+  rising:   TREND_UP, // green
+  legacy:   '#7C3AED', // purple (NEW) — editorial single-site
 };
 
 const TIER_LABELS: Record<TierKey, string> = {
