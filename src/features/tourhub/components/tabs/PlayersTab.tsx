@@ -739,13 +739,13 @@ export function PlayersTab() {
               style={{
                 display: 'flex', alignItems: 'center', gap: 5,
                 padding: '6px 11px', borderRadius: 8,
-                background: '#EDF1F5',
+                background: SLATE_150,
                 border: 'none', cursor: 'pointer',
               }}
               aria-label="Search players"
             >
-              <Search className="w-3 h-3" style={{ color: '#0F172A' }} strokeWidth={2.5} />
-              <span style={{ fontSize: 12, fontWeight: 700, color: '#0F172A' }}>Search</span>
+              <Search className="w-3 h-3" style={{ color: INK }} strokeWidth={2.5} />
+              <span style={{ fontSize: 12, fontWeight: 700, color: INK }}>Search</span>
             </button>
           )}
         </div>
