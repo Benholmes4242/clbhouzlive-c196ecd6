@@ -340,7 +340,7 @@ export function PlayerHero({ player, playerStats }: PlayerHeroProps) {
                 style={{
                   fontSize: 22,
                   fontWeight: 800,
-                  color: '#0F172A',
+                  color: INK,
                   letterSpacing: '-0.02em',
                   lineHeight: 1,
                   fontVariantNumeric: 'tabular-nums',
@@ -348,7 +348,7 @@ export function PlayerHero({ player, playerStats }: PlayerHeroProps) {
                 }}
               >
                 {heroStatInteger}
-                {heroStatDecimal && <span style={{ color: '#F7931E' }}>{heroStatDecimal}</span>}
+                {heroStatDecimal && <span style={{ color: AMBER }}>{heroStatDecimal}</span>}
                 {heroStatSuffix}
               </div>
               <div
@@ -356,7 +356,7 @@ export function PlayerHero({ player, playerStats }: PlayerHeroProps) {
                   marginTop: 4,
                   fontSize: 9,
                   fontWeight: 800,
-                  color: '#64748B',
+                  color: INK_MUTE,
                   letterSpacing: '0.16em',
                   textTransform: 'uppercase',
                 }}
