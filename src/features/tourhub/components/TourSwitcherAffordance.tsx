@@ -8,13 +8,22 @@
  */
 
 import React, { useState } from 'react';
-import { Check } from 'lucide-react';
+import { ArrowLeftRight, Check } from 'lucide-react';
 import { BottomSheet } from '@/components/ui/BottomSheet';
 import { SheetHeader } from '@/components/ui/SheetHeader';
 import { getTourLogo } from '../utils/tourLogos';
 import { useAllToursTickerData } from '../hooks/useOverviewModules';
 import { useTourSelection } from '../context/TourSelectionContext';
-import { AMBER_TINT_04, INK_TINT_07, WHITE_ALPHA_55 } from '../_shared/tokens';
+import {
+  AMBER,
+  AMBER_TINT_04,
+  FONT,
+  INK,
+  INK_ALPHA_45,
+  INK_TINT_07,
+  STATUS_LIVE,
+  SURFACE,
+} from '../_shared/tokens';
 
 const TOUR_LABEL: Record<string, string> = {
   pga: 'PGA',
