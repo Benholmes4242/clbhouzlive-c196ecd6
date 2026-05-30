@@ -254,19 +254,16 @@ export function PlayerHero({ player, playerStats }: PlayerHeroProps) {
             <div style={{ minWidth: 0, flex: 1 }}>
               <div
                 style={{
-                  fontSize: 22,
+                  fontSize: 25,
                   fontWeight: 800,
                   color: INK,
-                  letterSpacing: '-0.025em',
-                  lineHeight: 1.1,
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis',
-                  whiteSpace: 'nowrap',
+                  letterSpacing: '-0.03em',
+                  lineHeight: 1.05,
                 }}
               >
                 {player.full_name}
               </div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 5, marginTop: 4 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 5, marginTop: 6 }}>
                 <CountryFlag country={player.country_code || player.country} size="sm" />
                 {countryDisplay && (
                   <span style={{ fontSize: 12, fontWeight: 600, color: INK_MUTE }}>{countryDisplay}</span>
