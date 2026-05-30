@@ -226,28 +226,28 @@ export function PlayerCardV2({
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 2, padding: `${rowPaddingY}px 14px ${rowPaddingY}px 0`, flexShrink: 0 }}>
             {displayValue ? (
               // Tour Hub standard override (Stat Watch, etc.) — bypasses sort-mode selection.
-              <span style={{ fontSize: '13px', fontWeight: 800, color: '#0F172A', fontVariantNumeric: 'tabular-nums' }}>
+              <span style={{ fontSize: '13px', fontWeight: 800, color: INK, fontVariantNumeric: 'tabular-nums' }}>
                 {displayValue.main}
               </span>
             ) : (
               <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                 {!isTourRanking && !isPgaEarnings && !isPgaFedex && totalPoints != null && totalPoints > 0 && activeSort !== 'most-wins' && (
-                  <span style={{ fontSize: '13px', fontWeight: 800, color: '#0F172A', fontVariantNumeric: 'tabular-nums' }}>
+                  <span style={{ fontSize: '13px', fontWeight: 800, color: INK, fontVariantNumeric: 'tabular-nums' }}>
                     {totalPoints.toLocaleString(undefined, { maximumFractionDigits: 1 })}
                   </span>
                 )}
                 {rightValue && (
-                  <span style={{ fontSize: '13px', fontWeight: 800, color: '#0F172A', fontVariantNumeric: 'tabular-nums' }}>
+                  <span style={{ fontSize: '13px', fontWeight: 800, color: INK, fontVariantNumeric: 'tabular-nums' }}>
                     {rightValue.main}
                     {rightValue.label && activeSort === 'most-wins' && (
-                      <span style={{ fontSize: '11px', fontWeight: 700, color: '#64748B', marginLeft: 3 }}>
+                      <span style={{ fontSize: '11px', fontWeight: 700, color: INK_MUTE, marginLeft: 3 }}>
                         {rightValue.label}
                       </span>
                     )}
                   </span>
                 )}
                 {!isTourRanking && !isPgaOwgr && !isPgaEarnings && !isPgaFedex && winCount > 0 && activeSort !== 'most-wins' && (
-                  <span style={{ fontSize: '12px', fontWeight: 800, color: '#047857', fontVariantNumeric: 'tabular-nums' }}>
+                  <span style={{ fontSize: '12px', fontWeight: 800, color: LIVE_INK, fontVariantNumeric: 'tabular-nums' }}>
                     {winCount} {winCount === 1 ? 'win' : 'wins'}
                   </span>
                 )}
