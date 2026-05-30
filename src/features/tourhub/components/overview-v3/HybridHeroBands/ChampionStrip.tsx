@@ -5,6 +5,8 @@
  */
 
 import React from 'react';
+import { Trophy } from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
 import { INK, GOLD, NUMERIC_STYLE, STRIP_HEIGHT } from '../HybridHero.constants';
 import { TrajectorySparkline } from './TrajectorySparkline';
 
@@ -14,6 +16,7 @@ interface ChampionStripProps {
   score: string;
   scoreLabel?: string;
   eyebrow?: string;
+  eyebrowIcon?: LucideIcon;
   /** Optional avatar URL — when missing, render a gradient placeholder */
   avatarUrl?: string | null;
   /** Pass 3: per-round scores for the winner's trajectory sparkline. */
