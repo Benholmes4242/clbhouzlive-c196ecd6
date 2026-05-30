@@ -100,7 +100,7 @@ export function HybridRecapNext({
 
       <div style={{ position: 'relative', zIndex: 1, display: 'flex', flexDirection: 'column', height: '100%', justifyContent: 'space-between' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', padding: 16 }}>
-          <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: 'rgba(247,147,30,0.16)', border: '1px solid rgba(247,147,30,0.5)', padding: '6px 11px', borderRadius: 999, fontSize: 11, fontWeight: 600, letterSpacing: '0.08em', color: '#FBBC2E', textTransform: 'uppercase' }}>
+          <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: 'rgba(247,147,30,0.16)', border: '1px solid rgba(247,147,30,0.5)', padding: '6px 11px', borderRadius: 999, fontSize: 11, fontWeight: 600, letterSpacing: '0.08em', color: LEADER_GOLD, textTransform: 'uppercase' }}>
             Upcoming
             {upcoming?.startDate ? <UpcomingCountdown startDate={upcoming.startDate} /> : null}
           </span>
@@ -137,10 +137,10 @@ export function HybridRecapNext({
                 <PlayerAvatar photoUrl={winner.photoUrl} pgaTourId={winner.pgaTourId} displayName={winner.displayName} fullName={winner.fullName} headshotOverride={winner.headshotOverride} tourCode={winner.tourCode ?? undefined} size={36} />
               </div>
               <div style={{ flex: 1, minWidth: 0 }}>
-                <div style={{ fontSize: 9, fontWeight: 600, letterSpacing: '0.12em', textTransform: 'uppercase', color: AMBER_DARK }}>Winner</div>
+                <div style={{ fontSize: 9, fontWeight: 600, letterSpacing: '0.12em', textTransform: 'uppercase', color: AMBER_INK_DARK }}>Winner</div>
                 <div style={{ fontSize: 14, fontWeight: 600, color: '#0F172A', lineHeight: 1.1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{winner.displayName}</div>
               </div>
-              <div style={{ fontSize: 17, fontWeight: 600, color: GREEN, flexShrink: 0 }}>{winner.displayScore}</div>
+              <div style={{ fontSize: 17, fontWeight: 600, color: RECAP_VICTORY_GREEN, flexShrink: 0 }}>{winner.displayScore}</div>
             </div>
             {runners.length > 0 && (
               <div style={{ borderTop: '0.5px solid rgba(15,23,42,0.08)' }}>
@@ -149,14 +149,14 @@ export function HybridRecapNext({
                     <span style={{ width: 18, fontSize: 11, fontWeight: 600, color: 'rgba(15,23,42,0.45)', textAlign: 'center', flexShrink: 0 }}>{posLabel(f)}</span>
                     <PlayerAvatar photoUrl={f.photoUrl} pgaTourId={f.pgaTourId} displayName={f.displayName} fullName={f.fullName} headshotOverride={f.headshotOverride} tourCode={f.tourCode ?? undefined} size={24} />
                     <span style={{ flex: 1, fontSize: 13, color: '#0F172A', minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{f.displayName}</span>
-                    <span style={{ fontSize: 13, fontWeight: 600, color: GREEN, flexShrink: 0 }}>{f.displayScore}</span>
+                    <span style={{ fontSize: 13, fontWeight: 600, color: RECAP_VICTORY_GREEN, flexShrink: 0 }}>{f.displayScore}</span>
                   </div>
                 ))}
               </div>
             )}
             <button type="button" onClick={goToLeaderboard} style={{ width: '100%', border: 'none', borderTop: '0.5px solid rgba(15,23,42,0.08)', background: 'transparent', padding: '10px 13px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, cursor: 'pointer' }}>
-              <span style={{ fontSize: 11, fontWeight: 600, letterSpacing: '0.06em', textTransform: 'uppercase', color: AMBER_DARK }}>View full leaderboard</span>
-              <ArrowRight size={14} color={AMBER_DARK} />
+              <span style={{ fontSize: 11, fontWeight: 600, letterSpacing: '0.06em', textTransform: 'uppercase', color: AMBER_INK_DARK }}>View full leaderboard</span>
+              <ArrowRight size={14} color={AMBER_INK_DARK} />
             </button>
           </div>
         )}
