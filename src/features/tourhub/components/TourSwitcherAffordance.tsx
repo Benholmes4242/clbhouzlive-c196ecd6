@@ -181,11 +181,11 @@ export const TourSwitcherAffordance: React.FC = () => {
 
                 {status === 'live' ? (
                   <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, flexShrink: 0 }}>
-                    <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#10B981', display: 'inline-block' }} />
-                    <span style={{ fontSize: 10, fontWeight: 800, letterSpacing: '0.16em', color: '#10B981' }}>LIVE</span>
+                    <span style={{ width: 6, height: 6, borderRadius: '50%', background: STATUS_LIVE, display: 'inline-block' }} />
+                    <span style={{ fontSize: 10, fontWeight: 800, letterSpacing: '0.16em', color: STATUS_LIVE }}>LIVE</span>
                   </span>
                 ) : status === 'upcoming' ? (
-                  <span style={{ flexShrink: 0, fontSize: 10, fontWeight: 800, letterSpacing: '0.16em', color: 'rgba(15,23,42,0.45)' }}>
+                  <span style={{ flexShrink: 0, fontSize: 10, fontWeight: 800, letterSpacing: '0.16em', color: INK_ALPHA_45 }}>
                     UPCOMING
                   </span>
                 ) : (
@@ -195,7 +195,7 @@ export const TourSwitcherAffordance: React.FC = () => {
                 )}
 
                 {isActive && (
-                  <Check size={16} strokeWidth={2.5} color="#F7931E" />
+                  <Check size={16} strokeWidth={2.5} color={AMBER} />
                 )}
               </button>
             );
