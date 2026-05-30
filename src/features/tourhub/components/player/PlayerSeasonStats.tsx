@@ -383,7 +383,7 @@ export function PlayerSeasonStats({ playerStats }: PlayerSeasonStatsProps) {
           {activeTab === 'Shots Gained' && (
             <div>
               <SubSectionLabel label="STROKES GAINED" style={{ marginTop: 0 }} />
-              <p style={{ fontSize: 12, color: '#94A3B8', marginBottom: 16 }}>
+              <p style={{ fontSize: 12, color: INK_FAINT, marginBottom: 16 }}>
                 Strokes gained vs. tour average per round
               </p>
               <SGBar label="SG: Total" value={playerStats.strokes_gained_total} />
