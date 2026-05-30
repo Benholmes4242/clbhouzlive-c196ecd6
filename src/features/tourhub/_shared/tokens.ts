@@ -61,6 +61,7 @@ export const INK_ALPHA_60 = 'rgba(15,23,42,0.60)';           // heavier ink-alph
 // ============================================================================
 export const AMBER = '#F7931E';
 export const AMBER_INK = '#D97706';
+export const AMBER_INK_DARK = '#BA7517';                     // darker AMBER_INK for high-contrast small text on light bg (was `AMBER_DARK` in HybridRecapNext)
 export const AMBER_TINT_8 = 'rgba(247,147,30,0.08)';
 export const AMBER_TINT_10 = 'rgba(247,147,30,0.10)';
 export const AMBER_TINT_16 = 'rgba(247,147,30,0.16)';
@@ -101,6 +102,16 @@ export const SCORE_OVER_PAR_DARK = '#F87171';
 // the standard DARK variants don't lift enough. Tailwind green-300 / red-300.
 export const SCORE_UNDER_PAR_DARK_PALE = '#86EFAC';          // Tailwind green-300 — pale under-par on heavy-dark bg
 export const SCORE_OVER_PAR_DARK_PALE = '#FCA5A5';           // Tailwind red-300 — pale over-par on heavy-dark bg
+
+// ============================================================================
+// EDITORIAL VICTORY (post-tournament recap displays)
+// ============================================================================
+// Distinct from SCORE_UNDER_PAR_LIGHT (#059669 — pure green for live leaderboards)
+// and PGA_GREEN (#006747 — PGA brand forest). RECAP_VICTORY_GREEN sits between
+// them tonally — a deep teal-green used for editorial "this player won" score
+// displays in the HybridRecapNext between-events composer.
+export const RECAP_VICTORY_GREEN = '#0F6E56';                // deep teal-green for editorial victory scores
+
 
 // ============================================================================
 // STATUS (live indicator dot — NOT a verdict)

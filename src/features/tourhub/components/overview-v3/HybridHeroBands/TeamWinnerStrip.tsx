@@ -5,6 +5,8 @@
  */
 
 import React from 'react';
+import { Trophy } from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
 import { INK, GOLD, NUMERIC_STYLE, STRIP_HEIGHT } from '../HybridHero.constants';
 
 export interface TeamWinnerStripProps {
@@ -13,6 +15,7 @@ export interface TeamWinnerStripProps {
   score: string;
   scoreLabel?: string;
   eyebrow?: string;
+  eyebrowIcon?: LucideIcon;
   teamColor?: string;
   teamCrestUrl?: string | null;
 }
@@ -83,7 +86,8 @@ export function TeamWinnerStrip({
   members,
   score,
   scoreLabel,
-  eyebrow = '🏆 TEAM WINNER',
+  eyebrow = 'TEAM WINNER',
+  eyebrowIcon: EyebrowIcon = Trophy,
   teamColor,
   teamCrestUrl,
 }: TeamWinnerStripProps) {
@@ -124,7 +128,8 @@ export function TeamWinnerStrip({
       />
       <TeamCrestTile teamName={teamName} teamColor={teamColor} teamCrestUrl={teamCrestUrl} />
       <div style={{ flex: 1, minWidth: 0, position: 'relative' }}>
-        <div style={{ fontSize: 9, fontWeight: 800, letterSpacing: '0.18em', color: GOLD, marginBottom: 2 }}>
+        <div style={{ fontSize: 9, fontWeight: 800, letterSpacing: '0.18em', color: GOLD, marginBottom: 2, display: 'inline-flex', alignItems: 'center', gap: 5 }}>
+          <EyebrowIcon size={10} color={GOLD} strokeWidth={2.5} />
           {eyebrow}
         </div>
         <div
