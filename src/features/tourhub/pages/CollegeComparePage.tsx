@@ -252,7 +252,7 @@ export function CollegeComparePage() {
                           style={{
                             display: 'flex', alignItems: 'center', gap: 12,
                             width: '100%', padding: 12,
-                            background: '#fff', border: '1px solid rgba(15,23,42,0.08)',
+                            background: SURFACE, border: `1px solid ${HAIRLINE_INK_8}`,
                             borderRadius: 12, cursor: 'pointer', textAlign: 'left' as const,
                           }}
                           className="active:scale-[0.98] transition-transform"
