@@ -105,17 +105,17 @@ export function PlayerInfoCard({ player }: PlayerInfoCardProps) {
   }
 
   return (
-    <div style={{ background: '#ffffff', borderBottom: `1px solid ${INK_TINT_07}`, marginTop: '8px', padding: '14px 16px 16px' }}>
+    <div style={{ background: SURFACE, borderBottom: `1px solid ${INK_TINT_07}`, marginTop: '8px', padding: '14px 16px 16px' }}>
       {/* Section eyebrow — canonical §6 slate-caps */}
       <div style={{ marginBottom: '16px' }}>
-        <span style={{ fontSize: '9px', fontWeight: 800, color: '#64748B', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>
+        <span style={{ fontSize: '9px', fontWeight: 800, color: INK_MUTE, letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>
           Player Info
         </span>
       </div>
 
       {personalFields.length > 0 && (
         <div>
-          <p style={{ fontSize: 9, fontWeight: 800, color: '#94A3B8', letterSpacing: '0.14em', textTransform: 'uppercase' as const, margin: '0 0 10px' }}>
+          <p style={{ fontSize: 9, fontWeight: 800, color: INK_FAINT, letterSpacing: '0.14em', textTransform: 'uppercase' as const, margin: '0 0 10px' }}>
             Personal
           </p>
           <div className="grid grid-cols-2" style={{ gap: '16px' }}>
