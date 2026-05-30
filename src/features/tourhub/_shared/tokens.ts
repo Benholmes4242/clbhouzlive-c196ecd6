@@ -177,6 +177,13 @@ export const DANGER = '#DC2626';
 export const NAVY_HIGH = '#15203A';
 
 // ============================================================================
+// SHELL CHROME (Tour Hub navigation chrome — darker than INK or NAVY_HIGH)
+// ============================================================================
+export const SHELL_BG = '#0A0E14';                           // Tour Hub shell/chrome dark bg — 11 cross-app files (5 shell rows + tabs + pages)
+
+
+
+// ============================================================================
 // TYPOGRAPHY
 // ============================================================================
 export const FONT =
