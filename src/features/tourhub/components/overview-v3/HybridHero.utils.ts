@@ -5,6 +5,7 @@
 
 import { format } from 'date-fns';
 import type { HeroTournament } from '../../hooks/useHeroCarouselData';
+import { getScoreColor } from '../../_shared/scoreColor';
 
 // ---------- Types -----------------------------------------------------------
 
