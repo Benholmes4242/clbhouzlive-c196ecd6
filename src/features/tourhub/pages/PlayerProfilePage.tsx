@@ -18,7 +18,7 @@ import {
   FormSection,
 } from '../components/player';
 import { useTourPlayer, useSinglePlayerStatistics } from '../hooks/useTourHubData';
-import { INK_TINT_06 } from '../_shared/tokens';
+import { GOLD_TINT_10, INK_TINT_06, SHELL_BG, SLATE_50, SURFACE } from '../_shared/tokens';
 
 const sectionVariants = {
   hidden: { opacity: 0, y: 24 },
