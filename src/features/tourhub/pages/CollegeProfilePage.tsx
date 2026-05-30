@@ -145,7 +145,7 @@ export function CollegeProfilePage() {
           onClick={() => navigate(collegeHubRoute())}
           aria-label="College Profile — open College Franchise"
           style={{
-            background: '#0A0E14',
+            background: SHELL_BG,
             border: 'none',
             padding: '14px 16px 12px',
             cursor: 'pointer',
@@ -156,9 +156,9 @@ export function CollegeProfilePage() {
         >
           <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, marginBottom: 4 }}>
             <Kicker color="amber">College Franchise</Kicker>
-            <ChevronRight size={11} strokeWidth={2.5} style={{ color: '#F7931E', marginTop: -4 }} />
+            <ChevronRight size={11} strokeWidth={2.5} style={{ color: AMBER, marginTop: -4 }} />
           </div>
-          <h1 style={{ fontSize: 22, fontWeight: 800, letterSpacing: '-0.025em', lineHeight: 1.05, color: '#FFFFFF', margin: 0 }}>
+          <h1 style={{ fontSize: 22, fontWeight: 800, letterSpacing: '-0.025em', lineHeight: 1.15, color: SURFACE, margin: 0 }}>
             {displayName}
           </h1>
           {sectionMetaSubtitle && (
