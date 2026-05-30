@@ -330,7 +330,7 @@ export function PlayerHero({ player, playerStats }: PlayerHeroProps) {
               <div style={{ display: 'flex', alignItems: 'center', gap: 5, marginTop: 4 }}>
                 <CountryFlag country={player.country_code || player.country} size="sm" />
                 {countryDisplay && (
-                  <span style={{ fontSize: 12, fontWeight: 600, color: '#64748B' }}>{countryDisplay}</span>
+                  <span style={{ fontSize: 12, fontWeight: 600, color: INK_MUTE }}>{countryDisplay}</span>
                 )}
               </div>
             </div>
