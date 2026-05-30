@@ -199,7 +199,7 @@ export function ScheduleTournamentCard({
                 borderRadius: 4,
                 background: 'rgba(16,185,129,0.10)',
                 border: '1px solid rgba(16,185,129,0.32)',
-                color: '#047857',
+                color: LIVE_INK,
                 fontSize: 9,
                 fontWeight: 900,
                 letterSpacing: 0.6,
