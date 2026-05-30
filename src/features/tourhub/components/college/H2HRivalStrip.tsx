@@ -117,14 +117,14 @@ export function H2HRivalStrip({ normalizedName, className }: H2HRivalStripProps)
             gap: 6,
             padding: '12px 14px',
             borderRadius: 12,
-            background: '#fff',
+            background: SURFACE,
             border: '1px dashed rgba(15,23,42,0.18)',
             textDecoration: 'none',
           }}
           className="active:scale-[0.98] transition-transform"
         >
-          <span style={{ fontSize: 12, fontWeight: 700, color: '#0F172A' }}>Browse all</span>
-          <ChevronRight size={14} strokeWidth={2.5} style={{ color: '#94A3B8' }} />
+          <span style={{ fontSize: 12, fontWeight: 700, color: INK }}>Browse all</span>
+          <ChevronRight size={14} strokeWidth={2.5} style={{ color: INK_FAINT }} />
         </Link>
       </div>
     </div>
