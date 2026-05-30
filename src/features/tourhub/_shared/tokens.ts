@@ -73,6 +73,16 @@ export const WHITE_ALPHA_55 = 'rgba(255,255,255,0.55)';      // tertiary/disable
 export const WHITE_ALPHA_65 = 'rgba(255,255,255,0.65)';      // secondary text on dark bg
 
 // ============================================================================
+// INK TINTS (faint backgrounds + borders on light bg — parallel to WHITE_ALPHA)
+// ============================================================================
+// Cross-app frequency (pre-Phase 6):
+//   _07: 47 files (borders) | _06: 30 files (placeholder bgs)
+// Use for: faint placeholder backgrounds, hairline borders on light surfaces.
+// Phase 10 will sweep all cross-app sites.
+export const INK_TINT_06 = 'rgba(15,23,42,0.06)';            // light slate bg — placeholder containers, faint surfaces
+export const INK_TINT_07 = 'rgba(15,23,42,0.07)';            // light slate border — hairline dividers on light bg
+
+// ============================================================================
 // AMBER (brand)
 // ============================================================================
 export const AMBER = '#F7931E';
@@ -81,6 +91,7 @@ export const AMBER_INK_DARK = '#BA7517';                     // darker AMBER_INK
 export const AMBER_TINT_8 = 'rgba(247,147,30,0.08)';
 export const AMBER_TINT_10 = 'rgba(247,147,30,0.10)';
 export const AMBER_TINT_16 = 'rgba(247,147,30,0.16)';
+export const AMBER_TINT_04 = 'rgba(247,147,30,0.04)';        // very faint amber — selection state bg, 8 cross-app files
 export const AMBER_BORDER = 'rgba(247,147,30,0.30)';
 export const AMBER_SOFT_BG = '#FEF3E7';
 

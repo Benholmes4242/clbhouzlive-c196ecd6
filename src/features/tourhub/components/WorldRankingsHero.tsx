@@ -38,6 +38,7 @@ import { TOUR_MAP, type TourCode } from '../constants/tourMap';
 // ─── Tokens ─────────────────────────────────────────────────────────────────
 import {
   AMBER,
+  AMBER_TINT_04,
   GOLD,
   GOLD_BORDER,
   GOLD_GLOW,
@@ -47,8 +48,12 @@ import {
   INK_LIGHT,
   INK_MUTE,
   INK_SOFT,
+  INK_TINT_06,
+  INK_TINT_07,
   SLATE_150,
   SLATE_200,
+  SLATE_600,
+  SURFACE,
   TREND_DOWN,
   TREND_DOWN_TINT,
   TREND_UP,
