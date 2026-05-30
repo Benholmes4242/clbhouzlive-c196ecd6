@@ -372,23 +372,23 @@ export function ScheduleTab() {
                 marginBottom: 6,
               }}
             >
-              <Calendar size={13} color="#F7931E" strokeWidth={2.5} />
+              <Calendar size={13} color={AMBER} strokeWidth={2.5} />
               <span style={{
                 fontSize: 10.5,
                 fontWeight: 700,
                 letterSpacing: '0.14em',
-                color: '#F7931E',
+                color: AMBER,
                 textTransform: 'uppercase' as const,
               }}>
                 SCHEDULE
               </span>
-              <ChevronRight size={11} color="#F7931E" strokeWidth={2.5} style={{ marginTop: 1 }} />
+              <ChevronRight size={11} color={AMBER} strokeWidth={2.5} style={{ marginTop: 1 }} />
             </button>
 
             <h1 style={{
               fontSize: 18,
               fontWeight: 800,
-              color: '#0F172A',
+              color: INK,
               letterSpacing: '-0.015em',
               lineHeight: 1.2,
               margin: 0,
@@ -402,14 +402,14 @@ export function ScheduleTab() {
               justifyContent: 'space-between',
               fontSize: 13,
               fontWeight: 700,
-              color: '#0F172A',
+              color: INK,
               letterSpacing: '-0.005em',
               lineHeight: 1.25,
               margin: '6px 0 0',
               paddingBottom: 12,
             }}>
               <span>{seasonLabel}</span>
-              <span style={{ fontWeight: 600, color: '#64748B' }}>
+              <span style={{ fontWeight: 600, color: INK_MUTE }}>
                 {(tournaments ?? []).length} events across {tourCount} tour{tourCount !== 1 ? 's' : ''}
               </span>
             </div>
