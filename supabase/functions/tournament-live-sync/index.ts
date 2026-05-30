@@ -326,7 +326,7 @@ async function syncTournament(
   let syncError: string | undefined;
 
   try {
-    const result = await syncLeaderboard(supabase, sportradarApiKey, tour, year, tournament.sr_id, tournament.id);
+    const result = await syncLeaderboard(supabase, sportradarApiKey, tour, year, tournament.sr_id, tournament.id, tournament);
     leaderboardRecords = result.records;
     sportradarStatus = result.sportradarStatus;
     currentRound = result.currentRound;
@@ -857,9 +857,23 @@ interface LeaderboardSyncResult {
   currentRound?: number;
 }
 
+function inferMaxRoundFromLeaderboard(leaderboard: any[]): number {
+  let max = 0;
+  for (const entry of leaderboard) {
+    const rounds = entry?.rounds || entry?.player?.rounds || [];
+    for (const r of rounds) {
+      const seq = typeof r?.sequence === 'number' ? r.sequence : 0;
+      const hasScore = r?.score != null || r?.strokes != null;
+      if (hasScore && seq > max) max = seq;
+    }
+  }
+  return max;
+}
+
 async function syncLeaderboard(
   supabase: any, apiKey: string, tour: string, year: number,
-  tournamentSrId: string, tournamentDbId: string
+  tournamentSrId: string, tournamentDbId: string,
+  tournament: { id: string; name: string; start_date: string; timezone: string | null }
 ): Promise<LeaderboardSyncResult> {
   const url = `${getTourBaseUrl(tour)}/${year}/tournaments/${tournamentSrId}/leaderboard.json`;
   const data = await fetchSportradar(url, apiKey, 'Leaderboard');
@@ -873,7 +887,26 @@ async function syncLeaderboard(
     typeof data.round === 'number' ? data.round :
     typeof data.current_round === 'number' ? data.current_round :
     undefined;
-  const currentRound: number | undefined = rawRound !== undefined ? rawRound + 1 : undefined;
+  let currentRound: number | undefined = rawRound !== undefined ? rawRound + 1 : undefined;
+
+  // Venue-timezone date-math fallback when Sportradar omits the round
+  if (currentRound === undefined && tournament.start_date && tournament.timezone) {
+    try {
+      const todayAtVenue = new Date().toLocaleDateString('en-CA', { timeZone: tournament.timezone });
+      const start = new Date(tournament.start_date + 'T00:00:00Z');
+      const today = new Date(todayAtVenue + 'T00:00:00Z');
+      const daysSinceStart = Math.floor((today.getTime() - start.getTime()) / 86_400_000);
+
+      if (daysSinceStart >= 0) {
+        const maxObservedRound = inferMaxRoundFromLeaderboard(leaderboard);
+        const cap = maxObservedRound > 0 ? Math.max(maxObservedRound, daysSinceStart + 1) : 4;
+        currentRound = Math.min(daysSinceStart + 1, cap);
+        console.log(`[LiveSync] Fallback round for ${tournament.name}: R${currentRound} (day ${daysSinceStart + 1} venue-local in ${tournament.timezone})`);
+      }
+    } catch (err) {
+      console.warn(`[LiveSync] Round fallback failed for ${tournament.name}:`, err);
+    }
+  }
 
   let records = 0;
 
