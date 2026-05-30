@@ -140,7 +140,7 @@ export function TournamentDetailPage() {
           ))}
         </div>
         {/* Content row skeletons */}
-        <div style={{ background: '#ffffff', borderTop: `1px solid ${INK_TINT_07}`, borderBottom: `1px solid ${INK_TINT_07}`, marginTop: '8px' }}>
+        <div style={{ background: SURFACE, borderTop: `1px solid ${INK_TINT_07}`, borderBottom: `1px solid ${INK_TINT_07}`, marginTop: '8px' }}>
           {Array.from({ length: 5 }).map((_, i) => (
             <div key={i} className="animate-pulse" style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '11px 20px', borderBottom: i < 4 ? `0.5px solid ${INK_TINT_07}` : 'none' }}>
               <div style={{ width: '36px', height: '13px', background: INK_TINT_06, borderRadius: '4px' }} />
