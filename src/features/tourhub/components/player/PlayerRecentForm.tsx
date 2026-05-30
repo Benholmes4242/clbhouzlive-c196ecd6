@@ -18,7 +18,7 @@
 
 import { ArrowDownRight, ArrowRight, ArrowUpRight } from 'lucide-react';
 import { usePlayerResults, type PlayerTournamentResult } from '../../hooks/usePlayerResults';
-import { INK_TINT_07 } from '../../_shared/tokens';
+import { AMBER, INK_FAINT, INK_LIGHT, INK_MUTE, INK_TINT_07, SURFACE, TREND_DOWN } from '../../_shared/tokens';
 
 interface FormSectionProps {
   playerId: string;
@@ -33,24 +33,24 @@ interface FormVerdict {
 
 function deriveVerdict(avgPos: number, mostRecentPos: number): FormVerdict {
   if (avgPos <= 10 && mostRecentPos <= 3) {
-    return { label: 'Heating up', textColor: '#F7931E', Arrow: ArrowUpRight, arrowColor: '#F7931E' };
+    return { label: 'Heating up', textColor: AMBER, Arrow: ArrowUpRight, arrowColor: AMBER };
   }
   if (avgPos <= 20) {
-    return { label: 'In form', textColor: '#F7931E', Arrow: ArrowUpRight, arrowColor: '#F7931E' };
+    return { label: 'In form', textColor: AMBER, Arrow: ArrowUpRight, arrowColor: AMBER };
   }
   if (avgPos <= 50) {
-    return { label: 'Steady', textColor: '#94A3B8', Arrow: ArrowRight, arrowColor: '#94A3B8' };
+    return { label: 'Steady', textColor: INK_FAINT, Arrow: ArrowRight, arrowColor: INK_FAINT };
   }
-  return { label: 'Out of form', textColor: '#EF4444', Arrow: ArrowDownRight, arrowColor: '#EF4444' };
+  return { label: 'Out of form', textColor: TREND_DOWN, Arrow: ArrowDownRight, arrowColor: TREND_DOWN };
 }
 
 function dotColorForPosition(pos: number, status: string | null): string {
   const s = status?.toUpperCase();
-  if (s === 'CUT' || s === 'WD' || s === 'DQ' || s === 'MC') return '#EF4444';
-  if (pos <= 10) return '#F7931E';
-  if (pos <= 30) return '#94A3B8';
-  if (pos <= 70) return '#CBD5E1';
-  return '#EF4444';
+  if (s === 'CUT' || s === 'WD' || s === 'DQ' || s === 'MC') return TREND_DOWN;
+  if (pos <= 10) return AMBER;
+  if (pos <= 30) return INK_FAINT;
+  if (pos <= 70) return INK_LIGHT;
+  return TREND_DOWN;
 }
 
 interface SparklineProps {
@@ -89,7 +89,7 @@ function Sparkline({ positions }: SparklineProps) {
       <path
         d={path}
         fill="none"
-        stroke="#F7931E"
+        stroke={AMBER}
         strokeWidth={2.5}
         vectorEffect="non-scaling-stroke"
         strokeLinecap="round"
@@ -149,7 +149,7 @@ function DotStrip({ events, showTourCodes }: DotStripProps) {
                 style={{
                   fontSize: '7.5px',
                   fontWeight: 700,
-                  color: '#94A3B8',
+                  color: INK_FAINT,
                   letterSpacing: '0.08em',
                   textTransform: 'uppercase' as const,
                 }}
@@ -190,7 +190,7 @@ export function FormSection({ playerId }: FormSectionProps) {
     return (
       <div
         style={{
-          background: '#ffffff',
+          background: SURFACE,
           borderBottom: `1px solid ${INK_TINT_07}`,
           marginTop: 8,
           padding: '14px 16px 16px',
@@ -201,7 +201,7 @@ export function FormSection({ playerId }: FormSectionProps) {
             style={{
               fontSize: 9,
               fontWeight: 800,
-              color: '#64748B',
+              color: INK_MUTE,
               letterSpacing: '0.16em',
               textTransform: 'uppercase' as const,
             }}
@@ -226,7 +226,7 @@ export function FormSection({ playerId }: FormSectionProps) {
   return (
     <div
       style={{
-        background: '#ffffff',
+        background: SURFACE,
         borderBottom: `1px solid ${INK_TINT_07}`,
         marginTop: 8,
         padding: '14px 16px 16px',
@@ -238,7 +238,7 @@ export function FormSection({ playerId }: FormSectionProps) {
           style={{
             fontSize: 9,
             fontWeight: 800,
-            color: '#64748B',
+            color: INK_MUTE,
             letterSpacing: '0.16em',
             textTransform: 'uppercase' as const,
           }}
@@ -267,7 +267,7 @@ export function FormSection({ playerId }: FormSectionProps) {
           <div
             style={{
               fontSize: 11,
-              color: '#94A3B8',
+              color: INK_FAINT,
               fontWeight: 600,
               marginTop: 4,
               fontVariantNumeric: 'tabular-nums',

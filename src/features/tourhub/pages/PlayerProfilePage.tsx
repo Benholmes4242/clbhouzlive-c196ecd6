@@ -18,7 +18,7 @@ import {
   FormSection,
 } from '../components/player';
 import { useTourPlayer, useSinglePlayerStatistics } from '../hooks/useTourHubData';
-import { INK_TINT_06 } from '../_shared/tokens';
+import { GOLD_TINT_10, INK_TINT_06, SHELL_BG, SLATE_50, SURFACE } from '../_shared/tokens';
 
 const sectionVariants = {
   hidden: { opacity: 0, y: 24 },
@@ -38,7 +38,7 @@ function getTourBadgeText(tourCode: string | null | undefined): string {
 }
 
 const SHELL_SLOT_BG: React.CSSProperties = {
-  background: '#0A0E14',
+  background: SHELL_BG,
   padding: '14px 16px 12px',
 };
 
@@ -46,8 +46,8 @@ const SHELL_H1_STYLE: React.CSSProperties = {
   fontSize: 22,
   fontWeight: 800,
   letterSpacing: '-0.025em',
-  color: '#FFFFFF',
-  lineHeight: 1.05,
+  color: SURFACE,
+  lineHeight: 1.15,
   margin: 0,
 };
 
@@ -81,8 +81,8 @@ export function PlayerProfilePage() {
           </div>
         </ShellSlot>
         <div style={{ paddingTop: 'var(--chrome-total-h, 0px)' }}>
-          <div style={{ background: '#F8FAFC', padding: '16px' }}>
-            <Skeleton className="h-24 w-full rounded-xl" style={{ background: 'rgba(255,184,0,0.10)' }} />
+          <div style={{ background: SLATE_50, padding: '16px' }}>
+            <Skeleton className="h-24 w-full rounded-xl" style={{ background: GOLD_TINT_10 }} />
           </div>
           <div style={{ padding: '16px', marginTop: 8 }}>
             <Skeleton className="h-48 rounded-lg" style={{ background: INK_TINT_06 }} />
@@ -136,7 +136,7 @@ export function PlayerProfilePage() {
         </div>
       </ShellSlot>
 
-      <div style={{ paddingTop: 'var(--chrome-total-h, 0px)', background: '#F8FAFC' }}>
+      <div style={{ paddingTop: 'var(--chrome-total-h, 0px)', background: SLATE_50 }}>
         {/* Hero */}
         <PlayerHero player={player} playerStats={playerStats ?? null} />
 

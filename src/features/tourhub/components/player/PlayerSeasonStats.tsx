@@ -5,7 +5,7 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import type { TourPlayerStatistics } from '../../hooks/useTourHubData';
-import { INK_TINT_07 } from '../../_shared/tokens';
+import { AMBER, HAIRLINE_INK_8, HAIRLINE_INK_15, INK, INK_FAINT, INK_MUTE, INK_TINT_05, INK_TINT_07, SLATE_100, SURFACE } from '../../_shared/tokens';
 
 const STAT_TABS = ['Overview', 'Ball Striking', 'Short Game', 'Shots Gained'] as const;
 type StatTab = (typeof STAT_TABS)[number];
@@ -55,23 +55,23 @@ function StatRow({ label, value, trend, barPercent, barIndex = 0 }: StatRowProps
 
   return (
     <div style={{ display: 'flex', alignItems: 'center', padding: '11px 0', borderBottom: `0.5px solid ${INK_TINT_07}` }}>
-      <span style={{ flex: 1, fontSize: '13px', fontWeight: 500, color: '#0F172A' }}>{label}</span>
+      <span style={{ flex: 1, fontSize: '13px', fontWeight: 500, color: INK }}>{label}</span>
       <div style={{ textAlign: 'right' as const }}>
         <span style={{
           fontSize: '13px', fontWeight: 800, fontVariantNumeric: 'tabular-nums',
           color: hasValue
-            ? (trend === 'positive' ? '#F7931E' : trend === 'negative' ? '#94A3B8' : '#0F172A')
-            : '#94A3B8',
+            ? (trend === 'positive' ? AMBER : trend === 'negative' ? INK_FAINT : INK)
+            : INK_FAINT,
         }}>
           {mainValue}
-          {unitSuffix && <span style={{ fontSize: '10px', fontWeight: 500, color: '#94A3B8' }}> {unitSuffix}</span>}
+          {unitSuffix && <span style={{ fontSize: '10px', fontWeight: 500, color: INK_FAINT }}> {unitSuffix}</span>}
         </span>
         {barPercent !== undefined && hasValue && (
-          <div style={{ marginTop: '4px', width: '100px', height: '3px', borderRadius: '2px', background: 'rgba(15,23,42,0.08)', overflow: 'hidden' }}>
+          <div style={{ marginTop: '4px', width: '100px', height: '3px', borderRadius: '2px', background: HAIRLINE_INK_8, overflow: 'hidden' }}>
             <motion.div
               style={{
                 height: '100%', borderRadius: '2px',
-                background: '#F7931E',
+                background: AMBER,
                 originX: 0,
               }}
               initial={{ width: 0 }}
@@ -100,18 +100,18 @@ function SGBar({ label, value }: SGBarProps) {
   return (
     <div style={{ padding: '11px 0', borderBottom: `0.5px solid ${INK_TINT_07}` }}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '6px' }}>
-        <span style={{ fontSize: '13px', fontWeight: 500, color: '#0F172A' }}>{label}</span>
-        <span style={{ fontSize: '13px', fontWeight: 900, fontVariantNumeric: 'tabular-nums', color: isPositive ? '#F7931E' : '#94A3B8' }}>
+        <span style={{ fontSize: '13px', fontWeight: 500, color: INK }}>{label}</span>
+        <span style={{ fontSize: '13px', fontWeight: 900, fontVariantNumeric: 'tabular-nums', color: isPositive ? AMBER : INK_FAINT }}>
           {formatted}
         </span>
       </div>
       {/* Centred diverging bar */}
-      <div style={{ position: 'relative', height: '4px', borderRadius: '2px', background: 'rgba(15,23,42,0.08)' }}>
-        <div style={{ position: 'absolute', left: '50%', top: 0, bottom: 0, width: '1px', background: 'rgba(15,23,42,0.15)' }} />
+      <div style={{ position: 'relative', height: '4px', borderRadius: '2px', background: HAIRLINE_INK_8 }}>
+        <div style={{ position: 'absolute', left: '50%', top: 0, bottom: 0, width: '1px', background: HAIRLINE_INK_15 }} />
         <motion.div
           style={{
             position: 'absolute', top: 0, bottom: 0, borderRadius: '2px',
-            background: isPositive ? '#F7931E' : '#94A3B8',
+            background: isPositive ? AMBER : INK_FAINT,
             left: isPositive ? '50%' : `${50 - barPct}%`,
           }}
           initial={{ width: 0 }}
@@ -126,7 +126,7 @@ function SGBar({ label, value }: SGBarProps) {
 function SubSectionLabel({ label, style }: { label: string; style?: React.CSSProperties }) {
   return (
     <p style={{
-      fontSize: 9, fontWeight: 800, color: '#94A3B8',
+      fontSize: 9, fontWeight: 800, color: INK_FAINT,
       letterSpacing: '0.14em', textTransform: 'uppercase' as const,
       padding: '14px 0 6px', margin: 0,
       ...style,
@@ -149,11 +149,11 @@ export function PlayerSeasonStats({ playerStats }: PlayerSeasonStatsProps) {
     ? (playerStats.top_25s / playerStats.events_played) * 100 : undefined;
 
   return (
-    <div style={{ background: '#ffffff', borderBottom: `1px solid ${INK_TINT_07}` }}>
+    <div style={{ background: SURFACE, borderBottom: `1px solid ${INK_TINT_07}` }}>
       {/* Dispatch section header */}
       <div style={{ padding: '14px 16px 0' }}>
         <div style={{ marginBottom: '12px' }}>
-          <span style={{ fontSize: '9px', fontWeight: 800, color: '#64748B', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>
+          <span style={{ fontSize: '9px', fontWeight: 800, color: INK_MUTE, letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>
             STATS · {activeTab}
           </span>
         </div>
@@ -166,7 +166,7 @@ export function PlayerSeasonStats({ playerStats }: PlayerSeasonStatsProps) {
             display: 'flex',
             gap: 2,
             padding: 3,
-            background: '#F1F5F9',
+            background: SLATE_100,
             borderRadius: 10,
             marginBottom: 12,
           }}
@@ -182,16 +182,17 @@ export function PlayerSeasonStats({ playerStats }: PlayerSeasonStatsProps) {
                 className="active:opacity-80 transition-opacity"
                 style={{
                   flex: 1,
-                  padding: '7px 4px',
+                  padding: '8px 4px',
                   fontSize: 12,
-                  fontWeight: isActive ? 800 : 600,
-                  color: isActive ? '#0F172A' : '#94A3B8',
-                  background: isActive ? '#FFFFFF' : 'transparent',
+                  fontWeight: isActive ? 700 : 600,
+                  lineHeight: 1,
+                  color: isActive ? INK : INK_FAINT,
+                  background: isActive ? SURFACE : 'transparent',
                   border: 'none',
                   borderRadius: 7,
                   cursor: 'pointer',
                   whiteSpace: 'nowrap' as const,
-                  boxShadow: isActive ? '0 1px 2px rgba(15,23,42,0.05)' : 'none',
+                  boxShadow: isActive ? `0 1px 2px ${INK_TINT_05}` : 'none',
                   transition: 'background 0.15s ease, color 0.15s ease',
                 }}
               >
@@ -308,7 +309,7 @@ export function PlayerSeasonStats({ playerStats }: PlayerSeasonStatsProps) {
           {activeTab === 'Short Game' && (
             <>
               {!playerStats.putting_average && !playerStats.sand_saves && !playerStats.scrambling ? (
-                <p style={{ fontSize: 14, padding: '24px 0', textAlign: 'center', color: '#94A3B8' }}>
+                <p style={{ fontSize: 14, padding: '24px 0', textAlign: 'center', color: INK_FAINT }}>
                   Short game stats unavailable for this player.
                 </p>
               ) : (
@@ -382,14 +383,14 @@ export function PlayerSeasonStats({ playerStats }: PlayerSeasonStatsProps) {
           {activeTab === 'Shots Gained' && (
             <div>
               <SubSectionLabel label="STROKES GAINED" style={{ marginTop: 0 }} />
-              <p style={{ fontSize: 12, color: '#94A3B8', marginBottom: 16 }}>
+              <p style={{ fontSize: 12, color: INK_FAINT, marginBottom: 16 }}>
                 Strokes gained vs. tour average per round
               </p>
               <SGBar label="SG: Total" value={playerStats.strokes_gained_total} />
               <SGBar label="SG: Tee to Green" value={playerStats.strokes_gained_tee_green} />
               <SGBar label="SG: Around Green" value={playerStats.strokes_gained} />
               {!playerStats.strokes_gained_total && !playerStats.strokes_gained_tee_green && !playerStats.strokes_gained && (
-                <p style={{ fontSize: 14, padding: '24px 0', textAlign: 'center', color: '#94A3B8' }}>
+                <p style={{ fontSize: 14, padding: '24px 0', textAlign: 'center', color: INK_FAINT }}>
                   Strokes Gained data unavailable for this player.
                 </p>
               )}

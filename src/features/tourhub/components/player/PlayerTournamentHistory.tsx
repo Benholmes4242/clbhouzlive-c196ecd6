@@ -8,7 +8,17 @@ import { ChevronDown, ChevronUp, Trophy } from 'lucide-react';
 import { format } from 'date-fns';
 import { usePlayerResults, formatPositionShort, formatScore, formatMoney } from '../../hooks/usePlayerResults';
 import { tournamentRoute } from '../../routes';
-import { INK_TINT_07 } from '../../_shared/tokens';
+import {
+  AMBER,
+  AMBER_SOFT_BG,
+  INK,
+  INK_FAINT,
+  INK_MUTE,
+  INK_TINT_02,
+  INK_TINT_07,
+  SCORE_OVER_PAR_LIGHT,
+  SURFACE,
+} from '../../_shared/tokens';
 
 interface PlayerTournamentHistoryProps {
   playerId: string;
@@ -30,10 +40,10 @@ export function PlayerTournamentHistory({ playerId, playerName }: PlayerTourname
   }
 
   return (
-    <div style={{ background: '#ffffff', borderBottom: `1px solid ${INK_TINT_07}`, marginTop: '8px' }}>
+    <div style={{ background: SURFACE, borderBottom: `1px solid ${INK_TINT_07}`, marginTop: '8px' }}>
       {/* Section eyebrow — canonical §6 slate-caps */}
       <div style={{ padding: '14px 16px 8px' }}>
-        <span style={{ fontSize: '9px', fontWeight: 800, color: '#64748B', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>
+        <span style={{ fontSize: '9px', fontWeight: 800, color: INK_MUTE, letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>
           Recent Tournaments
         </span>
       </div>
@@ -47,11 +57,11 @@ export function PlayerTournamentHistory({ playerId, playerName }: PlayerTourname
       ) : results && results.length > 0 ? (
         <>
           {/* Column headers */}
-          <div style={{ display: 'flex', alignItems: 'center', padding: '6px 16px', borderBottom: `0.5px solid ${INK_TINT_07}`, borderTop: `0.5px solid ${INK_TINT_07}`, background: 'rgba(15,23,42,0.02)' }}>
-            <span style={{ fontSize: 9, fontWeight: 800, color: '#94A3B8', letterSpacing: '0.14em', width: '44px', flexShrink: 0 }}>POS</span>
-            <span style={{ flex: 1, fontSize: 9, fontWeight: 800, color: '#94A3B8', letterSpacing: '0.14em' }}>TOURNAMENT</span>
-            <span style={{ fontSize: 9, fontWeight: 800, color: '#94A3B8', letterSpacing: '0.14em', width: '40px', textAlign: 'right' as const, flexShrink: 0 }}>DATE</span>
-            <span style={{ fontSize: 9, fontWeight: 800, color: '#94A3B8', letterSpacing: '0.14em', width: '36px', textAlign: 'right' as const, flexShrink: 0 }}>SCORE</span>
+          <div style={{ display: 'flex', alignItems: 'center', padding: '6px 16px', borderBottom: `0.5px solid ${INK_TINT_07}`, borderTop: `0.5px solid ${INK_TINT_07}`, background: INK_TINT_02 }}>
+            <span style={{ fontSize: 9, fontWeight: 800, color: INK_FAINT, letterSpacing: '0.14em', width: '44px', flexShrink: 0 }}>POS</span>
+            <span style={{ flex: 1, fontSize: 9, fontWeight: 800, color: INK_FAINT, letterSpacing: '0.14em' }}>TOURNAMENT</span>
+            <span style={{ fontSize: 9, fontWeight: 800, color: INK_FAINT, letterSpacing: '0.14em', width: '40px', textAlign: 'right' as const, flexShrink: 0 }}>DATE</span>
+            <span style={{ fontSize: 9, fontWeight: 800, color: INK_FAINT, letterSpacing: '0.14em', width: '36px', textAlign: 'right' as const, flexShrink: 0 }}>SCORE</span>
           </div>
 
           <div>
@@ -66,10 +76,10 @@ export function PlayerTournamentHistory({ playerId, playerName }: PlayerTourname
               const scoreStr = formatScore(score);
               const displayScore = isMissed ? '—' : scoreStr;
               const scoreColor = isMissed
-                ? '#94A3B8'
-                : score !== null && score < 0 ? '#F7931E'
-                : score !== null && score > 0 ? '#DC2626'
-                : '#94A3B8';
+                ? INK_FAINT
+                : score !== null && score < 0 ? AMBER
+                : score !== null && score > 0 ? SCORE_OVER_PAR_LIGHT
+                : INK_FAINT;
 
               const navTarget = tournamentRoute(result.tournament_id, {
                 kind: 'player',
@@ -85,14 +95,14 @@ export function PlayerTournamentHistory({ playerId, playerName }: PlayerTourname
                     display: 'flex', alignItems: 'center',
                     padding: '11px 16px',
                     borderBottom: `0.5px solid ${INK_TINT_07}`,
-                    background: isWin ? '#FEF3E7' : 'transparent',
+                    background: isWin ? AMBER_SOFT_BG : 'transparent',
                     textDecoration: 'none',
                   }}
                   className="active:bg-black/[0.02] transition-colors"
                 >
                   {/* Position */}
-                  <span style={{ width: '44px', flexShrink: 0, fontSize: '12px', fontWeight: 900, color: isWin ? '#F7931E' : '#64748B', display: 'flex', alignItems: 'center' }}>
-                    {isWin ? <Trophy style={{ width: 14, height: 14, color: '#F7931E' }} /> : pos}
+                  <span style={{ width: '44px', flexShrink: 0, fontSize: '12px', fontWeight: 900, color: isWin ? AMBER : INK_MUTE, display: 'flex', alignItems: 'center' }}>
+                    {isWin ? <Trophy style={{ width: 14, height: 14, color: AMBER }} /> : pos}
                   </span>
 
                   {/* Tournament name */}
@@ -100,14 +110,14 @@ export function PlayerTournamentHistory({ playerId, playerName }: PlayerTourname
                     flex: 1, fontSize: '13px',
                     fontWeight: isWin ? 800 : 600,
                     letterSpacing: isWin ? '-0.01em' : 'normal',
-                    color: '#0F172A',
+                    color: INK,
                     overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const,
                   }}>
                     {result.tournament_name}
                   </span>
 
                   {/* Date */}
-                  <span style={{ fontSize: '10px', color: '#94A3B8', width: '40px', textAlign: 'right' as const, flexShrink: 0 }}>
+                  <span style={{ fontSize: '10px', color: INK_FAINT, width: '40px', textAlign: 'right' as const, flexShrink: 0 }}>
                     {result.tournament_end_date
                       ? format(new Date(result.tournament_end_date), 'MMM d')
                       : '—'}
@@ -129,7 +139,7 @@ export function PlayerTournamentHistory({ playerId, playerName }: PlayerTourname
           {hasMore && (
             <button
               onClick={() => setShowAll(prev => !prev)}
-              style={{ width: '100%', padding: '12px 0', fontSize: '12px', fontWeight: 700, color: '#0F172A', background: 'transparent', border: 'none', borderTop: `0.5px solid ${INK_TINT_07}`, cursor: 'pointer' }}
+              style={{ width: '100%', padding: '12px 0', fontSize: '12px', fontWeight: 700, color: INK, background: 'transparent', border: 'none', borderTop: `0.5px solid ${INK_TINT_07}`, cursor: 'pointer' }}
               className="active:opacity-70 transition-opacity"
             >
               {showAll ? 'Show Less' : 'View All Results ›'}

@@ -4,7 +4,7 @@
 
 import { Link } from 'react-router-dom';
 import type { TourPlayer } from '../../hooks/useTourHubData';
-import { INK_TINT_06, INK_TINT_07 } from '../../_shared/tokens';
+import { INK, INK_FAINT, INK_MUTE, INK_TINT_06, INK_TINT_07, SURFACE } from '../../_shared/tokens';
 
 function formatHeight(inches: string | number | null | undefined): string | null {
   if (!inches) return null;
@@ -49,10 +49,10 @@ interface InfoFieldProps {
 function InfoField({ label, value }: InfoFieldProps) {
   return (
     <div style={{ paddingBottom: '10px', borderBottom: `0.5px solid ${INK_TINT_06}` }}>
-      <p style={{ fontSize: 9, fontWeight: 800, color: '#94A3B8', letterSpacing: '0.14em', textTransform: 'uppercase' as const, margin: '0 0 3px' }}>
+      <p style={{ fontSize: 9, fontWeight: 800, color: INK_FAINT, letterSpacing: '0.14em', textTransform: 'uppercase' as const, margin: '0 0 3px' }}>
         {label}
       </p>
-      <div style={{ fontSize: '12px', fontWeight: 600, color: '#0F172A' }}>{value}</div>
+      <div style={{ fontSize: '12px', fontWeight: 600, color: INK }}>{value}</div>
     </div>
   );
 }
@@ -105,17 +105,17 @@ export function PlayerInfoCard({ player }: PlayerInfoCardProps) {
   }
 
   return (
-    <div style={{ background: '#ffffff', borderBottom: `1px solid ${INK_TINT_07}`, marginTop: '8px', padding: '14px 16px 16px' }}>
+    <div style={{ background: SURFACE, borderBottom: `1px solid ${INK_TINT_07}`, marginTop: '8px', padding: '14px 16px 16px' }}>
       {/* Section eyebrow — canonical §6 slate-caps */}
       <div style={{ marginBottom: '16px' }}>
-        <span style={{ fontSize: '9px', fontWeight: 800, color: '#64748B', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>
+        <span style={{ fontSize: '9px', fontWeight: 800, color: INK_MUTE, letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>
           Player Info
         </span>
       </div>
 
       {personalFields.length > 0 && (
         <div>
-          <p style={{ fontSize: 9, fontWeight: 800, color: '#94A3B8', letterSpacing: '0.14em', textTransform: 'uppercase' as const, margin: '0 0 10px' }}>
+          <p style={{ fontSize: 9, fontWeight: 800, color: INK_FAINT, letterSpacing: '0.14em', textTransform: 'uppercase' as const, margin: '0 0 10px' }}>
             Personal
           </p>
           <div className="grid grid-cols-2" style={{ gap: '16px' }}>
@@ -132,7 +132,7 @@ export function PlayerInfoCard({ player }: PlayerInfoCardProps) {
 
       {careerFields.length > 0 && (
         <div>
-          <p style={{ fontSize: 9, fontWeight: 800, color: '#94A3B8', letterSpacing: '0.14em', textTransform: 'uppercase' as const, margin: '14px 0 10px' }}>
+          <p style={{ fontSize: 9, fontWeight: 800, color: INK_FAINT, letterSpacing: '0.14em', textTransform: 'uppercase' as const, margin: '14px 0 10px' }}>
             Golf Career
           </p>
           <div className="grid grid-cols-2" style={{ gap: '16px' }}>

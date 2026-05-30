@@ -19,6 +19,16 @@ import type { TourPlayer, TourPlayerStatistics } from '../../hooks/useTourHubDat
 import { usePlayerState } from '../../hooks/usePlayerState';
 import { truncateName } from '../../utils/truncateName';
 import { splitStatValue } from '../../utils/splitStatValue';
+import {
+  AMBER,
+  GOLD,
+  GOLD_DEEP,
+  INK,
+  INK_MUTE,
+  SLATE_100,
+  SLATE_50,
+  SURFACE,
+} from '../../_shared/tokens';
 
 interface PlayerHeroProps {
   player: TourPlayer;
@@ -52,10 +62,10 @@ function chooseHeroStat(
   }
 
   // 2. Recent finish (within 14 days, per usePlayerState window)
+  // Big-stat slot is for SHORT scalar values only. Context already lives in
+  // the caption row above, so we don't repeat it here — prevents overflow.
   if (playerState.state === 'recent' && playerState.recentData) {
-    const rd = playerState.recentData;
-    const ctx = rd.context ? ` at ${truncateName(rd.context, 18)}` : '';
-    return { primary: `${rd.label}${ctx}` };
+    return { primary: playerState.recentData.label };
   }
 
   // 3. Season earnings
@@ -150,7 +160,7 @@ export function PlayerHero({ player, playerStats }: PlayerHeroProps) {
     <div
       style={{
         position: 'relative',
-        background: '#F8FAFC',
+        background: SLATE_50,
         padding: 'max(env(safe-area-inset-top, 0px), 47px) 0 14px',
       }}
     >
@@ -171,28 +181,28 @@ export function PlayerHero({ player, playerStats }: PlayerHeroProps) {
             marginBottom: 6,
           }}
         >
-          <UserCircle size={13} strokeWidth={2.5} color="#F7931E" />
+          <UserCircle size={13} strokeWidth={2.5} color={AMBER} />
           <span
             style={{
               fontSize: 10.5,
               fontWeight: 700,
-              color: '#F7931E',
+              color: AMBER,
               letterSpacing: '0.14em',
               textTransform: 'uppercase',
             }}
           >
             PLAYER
           </span>
-          <ChevronRight size={11} strokeWidth={2.5} color="#F7931E" />
+          <ChevronRight size={11} strokeWidth={2.5} color={AMBER} />
         </button>
 
         <h1
           style={{
-            fontSize: 18,
+            fontSize: 24,
             fontWeight: 800,
-            color: '#0F172A',
-            letterSpacing: '-0.015em',
-            lineHeight: 1.05,
+            color: INK,
+            letterSpacing: '-0.025em',
+            lineHeight: 1.15,
             margin: 0,
           }}
         >
@@ -201,10 +211,11 @@ export function PlayerHero({ player, playerStats }: PlayerHeroProps) {
 
         <div
           style={{
-            marginTop: 4,
+            marginTop: 8,
             fontSize: 13,
-            fontWeight: 500,
-            color: '#64748B',
+            fontWeight: 700,
+            color: INK,
+            letterSpacing: '-0.005em',
             lineHeight: 1.3,
           }}
         >
@@ -229,17 +240,17 @@ export function PlayerHero({ player, playerStats }: PlayerHeroProps) {
             flexWrap: 'wrap',
           }}
         >
-          <Crown size={13} strokeWidth={2.5} fill="#FFB800" color="#D97706" />
+          <Crown size={13} strokeWidth={2.5} fill={GOLD} color={GOLD_DEEP} />
           {captionMetadata.map((part, i) => (
             <Fragment key={i}>
               {i > 0 && (
-                <span style={{ fontSize: 9, fontWeight: 800, color: '#CBD5E1', letterSpacing: '0.16em' }}>·</span>
+                <span style={{ fontSize: 9, fontWeight: 800, color: INK_MUTE, letterSpacing: '0.16em' }}>·</span>
               )}
               <span
                 style={{
                   fontSize: 9,
                   fontWeight: 800,
-                  color: i === 0 ? '#0F172A' : '#64748B',
+                  color: i === 0 ? INK : INK_MUTE,
                   letterSpacing: '0.16em',
                   textTransform: 'uppercase',
                 }}
@@ -260,8 +271,8 @@ export function PlayerHero({ player, playerStats }: PlayerHeroProps) {
                 height: 80,
                 borderRadius: '34%',
                 overflow: 'hidden',
-                background: '#F1F5F9',
-                border: '2.5px solid #FFB800',
+                background: SLATE_100,
+                border: `2.5px solid ${GOLD}`,
                 boxShadow: '0 4px 12px rgba(255,184,0,0.20)',
               }}
             >
@@ -283,14 +294,14 @@ export function PlayerHero({ player, playerStats }: PlayerHeroProps) {
                   width: 24,
                   height: 24,
                   borderRadius: '50%',
-                  background: '#FFB800',
-                  border: '2.5px solid #FFFFFF',
+                  background: GOLD,
+                  border: `2.5px solid ${SURFACE}`,
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
                   fontSize: 11,
                   fontWeight: 800,
-                  color: '#0F172A',
+                  color: INK,
                   fontVariantNumeric: 'tabular-nums',
                 }}
               >
@@ -306,7 +317,7 @@ export function PlayerHero({ player, playerStats }: PlayerHeroProps) {
                 style={{
                   fontSize: 22,
                   fontWeight: 800,
-                  color: '#0F172A',
+                  color: INK,
                   letterSpacing: '-0.025em',
                   lineHeight: 1.1,
                   overflow: 'hidden',
@@ -319,7 +330,7 @@ export function PlayerHero({ player, playerStats }: PlayerHeroProps) {
               <div style={{ display: 'flex', alignItems: 'center', gap: 5, marginTop: 4 }}>
                 <CountryFlag country={player.country_code || player.country} size="sm" />
                 {countryDisplay && (
-                  <span style={{ fontSize: 12, fontWeight: 600, color: '#64748B' }}>{countryDisplay}</span>
+                  <span style={{ fontSize: 12, fontWeight: 600, color: INK_MUTE }}>{countryDisplay}</span>
                 )}
               </div>
             </div>
@@ -329,7 +340,7 @@ export function PlayerHero({ player, playerStats }: PlayerHeroProps) {
                 style={{
                   fontSize: 22,
                   fontWeight: 800,
-                  color: '#0F172A',
+                  color: INK,
                   letterSpacing: '-0.02em',
                   lineHeight: 1,
                   fontVariantNumeric: 'tabular-nums',
@@ -337,7 +348,7 @@ export function PlayerHero({ player, playerStats }: PlayerHeroProps) {
                 }}
               >
                 {heroStatInteger}
-                {heroStatDecimal && <span style={{ color: '#F7931E' }}>{heroStatDecimal}</span>}
+                {heroStatDecimal && <span style={{ color: AMBER }}>{heroStatDecimal}</span>}
                 {heroStatSuffix}
               </div>
               <div
@@ -345,7 +356,7 @@ export function PlayerHero({ player, playerStats }: PlayerHeroProps) {
                   marginTop: 4,
                   fontSize: 9,
                   fontWeight: 800,
-                  color: '#64748B',
+                  color: INK_MUTE,
                   letterSpacing: '0.16em',
                   textTransform: 'uppercase',
                 }}

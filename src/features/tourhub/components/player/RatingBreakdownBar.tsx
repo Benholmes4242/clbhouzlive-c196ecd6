@@ -1,4 +1,5 @@
 import type { PlayerRatingBreakdown } from '../../hooks/usePlayerRating';
+import { TREND_DOWN, TREND_UP } from '../../_shared/tokens';
 
 interface Props {
   breakdown: PlayerRatingBreakdown;
@@ -22,7 +23,7 @@ export function RatingBreakdownBar({ breakdown }: Props) {
           <span style={{
             fontSize: 11,
             fontWeight: 600,
-            color: form > 0 ? '#22C55E' : '#EF4444',
+            color: form > 0 ? TREND_UP : TREND_DOWN,
           }}>
             {form > 0 ? '+' : ''}{form} form
           </span>

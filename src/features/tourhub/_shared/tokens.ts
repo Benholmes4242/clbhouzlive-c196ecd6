@@ -38,6 +38,7 @@ export const SURFACE = '#FFFFFF';
 // SLATE (neutrals on light surface)
 // ============================================================================
 export const SLATE_50 = '#F8FAFC';
+export const SLATE_100 = '#F1F5F9';                          // slate-100 — segmented-control trough, photo bg — 7 cross-app files
 export const SLATE_150 = '#EDF1F5';
 export const SLATE_200 = '#E2E8F0';
 export const SLATE_600 = '#475569';                          // Tailwind slate-600 — used as fallback bg/stripe when no brand color is available (22 files)

@@ -1,5 +1,6 @@
 import { PlayerRating, TIER_CONFIG } from '../../hooks/usePlayerRating';
 import { TrendingUp, TrendingDown } from 'lucide-react';
+import { TREND_DOWN, TREND_UP } from '../../_shared/tokens';
 
 interface Props {
   rating: PlayerRating;
@@ -57,14 +58,14 @@ export function ClbhouzRatingBadge({ rating }: Props) {
       {delta !== 0 && (
         <div className="flex items-center gap-1">
           {delta > 0 ? (
-            <TrendingUp className="w-3 h-3" style={{ color: '#22C55E' }} />
+            <TrendingUp className="w-3 h-3" style={{ color: TREND_UP }} />
           ) : (
-            <TrendingDown className="w-3 h-3" style={{ color: '#EF4444' }} />
+            <TrendingDown className="w-3 h-3" style={{ color: TREND_DOWN }} />
           )}
           <span style={{
             fontSize: 11,
             fontWeight: 600,
-            color: delta > 0 ? '#22C55E' : '#EF4444',
+            color: delta > 0 ? TREND_UP : TREND_DOWN,
           }}>
             {delta > 0 ? '+' : ''}{delta} this week
           </span>
