@@ -575,7 +575,7 @@ function UpcomingCard({
             padding: '3px 8px',
             fontSize: 9,
             fontWeight: 800,
-            color: '#FFFFFF',
+            color: SURFACE,
             letterSpacing: '0.12em',
             textTransform: 'uppercase',
             display: 'inline-flex',
