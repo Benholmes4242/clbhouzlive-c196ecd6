@@ -95,8 +95,12 @@ export function ChampionStrip({
                 letterSpacing: '0.18em',
                 color: GOLD,
                 textTransform: 'uppercase',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 5,
               }}
             >
+              <EyebrowIcon size={10} color={GOLD} strokeWidth={2.5} />
               {eyebrow}
             </span>
             {country && (
