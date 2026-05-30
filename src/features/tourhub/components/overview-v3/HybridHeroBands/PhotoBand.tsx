@@ -5,6 +5,7 @@
  */
 
 import React from 'react';
+import { Star } from 'lucide-react';
 import {
   PHOTO_BAND_HEIGHT,
   COURSE_GRADIENT,
@@ -15,7 +16,7 @@ import {
   GREEN_LIVE,
   NUMERIC_STYLE,
 } from '../HybridHero.constants';
-import { STATUS_LIVE } from '../../../_shared/tokens';
+import { STATUS_LIVE, FONT } from '../../../_shared/tokens';
 import type { HeroState } from '../HybridHero.utils';
 
 interface PhotoBandProps {
