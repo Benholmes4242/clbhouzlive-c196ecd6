@@ -21,6 +21,8 @@
 import React, { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   Brain,
+  Check,
+  ChevronDown,
   ChevronRight,
   ChevronUp,
   Trophy,
