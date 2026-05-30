@@ -223,7 +223,7 @@ function Section({ tier, alumni, defaultExpanded = true, legacyMap }: SectionPro
               onClick={() => setIsExpanded(!isExpanded)}
               style={{
                 width: '100%', padding: '10px 0', fontSize: 12, fontWeight: 700,
-                color: '#0F172A', background: 'transparent', border: 'none',
+                color: INK, background: 'transparent', border: 'none',
                 borderTop: `0.5px solid ${INK_TINT_07}`, cursor: 'pointer',
               }}
             >
