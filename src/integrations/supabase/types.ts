@@ -20186,6 +20186,20 @@ export type Database = {
           member_since: string
         }[]
       }
+      get_rival_crowns: {
+        Args: { p_user_id: string }
+        Returns: {
+          aces_them: number
+          aces_you: number
+          birdies_them: number
+          birdies_you: number
+          eagles_them: number
+          eagles_you: number
+          lowest_gross_them: number
+          lowest_gross_you: number
+          rival_key: string
+        }[]
+      }
       get_rivalry_breakdown: {
         Args: { p_rival_user_id: string }
         Returns: {
