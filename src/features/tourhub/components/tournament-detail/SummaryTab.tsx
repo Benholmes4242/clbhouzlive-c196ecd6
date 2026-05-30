@@ -273,7 +273,7 @@ export function SummaryTab({
                       display: 'flex', alignItems: 'center',
                       padding: '10px 20px',
                       borderBottom: `0.5px solid ${INK_TINT_07}`,
-                      borderLeft: isWinner ? '3px solid #F7931E' : '3px solid transparent',
+                      borderLeft: isWinner ? `3px solid ${AMBER}` : '3px solid transparent',
                       background: isWinner ? 'rgba(247,147,30,0.025)' : 'transparent',
                       textDecoration: 'none',
                     }}
