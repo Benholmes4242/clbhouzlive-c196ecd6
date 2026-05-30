@@ -777,9 +777,9 @@ export function PlayersTab() {
                   style={{
                     flex: 1, padding: '12px 0',
                     fontSize: '12px', fontWeight: isActive ? 800 : 600,
-                    color: isActive ? '#0F172A' : '#94A3B8',
+                    color: isActive ? INK : INK_FAINT,
                     background: 'transparent', border: 'none',
-                    borderBottom: `2px solid ${isActive ? '#F7931E' : 'transparent'}`,
+                    borderBottom: `2px solid ${isActive ? AMBER : 'transparent'}`,
                     cursor: 'pointer', transition: 'all 0.15s',
                   }}
                 >
