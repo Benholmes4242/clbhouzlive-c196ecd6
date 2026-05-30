@@ -276,7 +276,7 @@ export function FullLeaderboard({
                 </div>
 
                 <div style={{ flex: 1, minWidth: 0 }}>
-                  <p style={{ fontSize: '13px', fontWeight: 600, color: '#0F172A', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const, letterSpacing: '-0.2px' }}>
+                  <p style={{ fontSize: '13px', fontWeight: 600, color: INK, margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const, letterSpacing: '-0.015em' }}>
                     {abbrevName(entry.player?.full_name || 'Unknown')}
                   </p>
                 </div>
