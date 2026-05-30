@@ -6,6 +6,7 @@
  */
 import { useNavigate } from 'react-router-dom';
 import { TourPill } from './TourPill';
+import { AMBER, AMBER_BORDER, INK } from '../../_shared/tokens';
 
 interface CompactNextUpProps {
   tournamentId: string;
@@ -30,7 +31,7 @@ export function CompactNextUp({ tournamentId, tourCode, name, daysUntil }: Compa
         margin: '8px 16px 12px',
         width: 'calc(100% - 32px)',
         background: 'rgba(247,147,30,0.06)',
-        border: '1px solid rgba(247,147,30,0.30)',
+        border: `1px solid ${AMBER_BORDER}`,
         borderRadius: 8,
         cursor: 'pointer',
         textAlign: 'left',
@@ -40,7 +41,7 @@ export function CompactNextUp({ tournamentId, tourCode, name, daysUntil }: Compa
         style={{
           fontSize: 9,
           fontWeight: 800,
-          color: '#F7931E',
+          color: AMBER,
           letterSpacing: '0.16em',
           flexShrink: 0,
         }}
@@ -54,7 +55,7 @@ export function CompactNextUp({ tournamentId, tourCode, name, daysUntil }: Compa
           minWidth: 0,
           fontSize: 12,
           fontWeight: 800,
-          color: '#0F172A',
+          color: INK,
           overflow: 'hidden',
           textOverflow: 'ellipsis',
           whiteSpace: 'nowrap',
@@ -67,7 +68,7 @@ export function CompactNextUp({ tournamentId, tourCode, name, daysUntil }: Compa
         style={{
           fontSize: 11,
           fontWeight: 800,
-          color: '#F7931E',
+          color: AMBER,
           fontVariantNumeric: 'tabular-nums',
           flexShrink: 0,
         }}

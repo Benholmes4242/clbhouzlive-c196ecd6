@@ -35,7 +35,7 @@ import {
 } from '../schedule';
 
 import { useLiveRightNow } from '../../hooks/useOverviewModules';
-import { INK_TINT_07 } from '../../_shared/tokens';
+import { AMBER, INK, INK_MUTE, INK_TINT_07, HAIRLINE_INK_10, SLATE_50, SURFACE } from '../../_shared/tokens';
 
 // B45 FIX 1: Helper for completed status check
 const isCompleted = (t: TourTournament) => t.status === 'closed' || t.status === 'complete';
@@ -348,7 +348,7 @@ export function ScheduleTab() {
   }
   
   return (
-    <div className="min-h-screen -mx-5" style={{ background: '#F8FAFC' }}>
+    <div className="min-h-screen -mx-5" style={{ background: SLATE_50 }}>
 
       {/* ── SCHEDULE MASTHEAD — canonical section header on all tabs ── */}
       {!search && (() => {
@@ -357,7 +357,7 @@ export function ScheduleTab() {
         ).size;
         const seasonLabel = season?.name ?? (season?.year ? `${season.year} Season` : 'Season');
         return (
-          <div style={{ padding: '16px 16px 0', background: '#F8FAFC' }}>
+          <div style={{ padding: '16px 16px 0', background: SLATE_50 }}>
             <button
               onClick={() => navigate('/tourhub?tab=overview', { replace: true })}
               aria-label="Schedule — open Tour Overview"
@@ -372,23 +372,23 @@ export function ScheduleTab() {
                 marginBottom: 6,
               }}
             >
-              <Calendar size={13} color="#F7931E" strokeWidth={2.5} />
+              <Calendar size={13} color={AMBER} strokeWidth={2.5} />
               <span style={{
                 fontSize: 10.5,
                 fontWeight: 700,
                 letterSpacing: '0.14em',
-                color: '#F7931E',
+                color: AMBER,
                 textTransform: 'uppercase' as const,
               }}>
                 SCHEDULE
               </span>
-              <ChevronRight size={11} color="#F7931E" strokeWidth={2.5} style={{ marginTop: 1 }} />
+              <ChevronRight size={11} color={AMBER} strokeWidth={2.5} style={{ marginTop: 1 }} />
             </button>
 
             <h1 style={{
               fontSize: 18,
               fontWeight: 800,
-              color: '#0F172A',
+              color: INK,
               letterSpacing: '-0.015em',
               lineHeight: 1.2,
               margin: 0,
@@ -402,14 +402,14 @@ export function ScheduleTab() {
               justifyContent: 'space-between',
               fontSize: 13,
               fontWeight: 700,
-              color: '#0F172A',
+              color: INK,
               letterSpacing: '-0.005em',
               lineHeight: 1.25,
               margin: '6px 0 0',
               paddingBottom: 12,
             }}>
               <span>{seasonLabel}</span>
-              <span style={{ fontWeight: 600, color: '#64748B' }}>
+              <span style={{ fontWeight: 600, color: INK_MUTE }}>
                 {(tournaments ?? []).length} events across {tourCount} tour{tourCount !== 1 ? 's' : ''}
               </span>
             </div>
@@ -430,7 +430,7 @@ export function ScheduleTab() {
       {/* LiveRightNow removed during Tour Overview hero nuke; rebuild pending. */}
 
 
-      <div style={{ background: '#ffffff', marginTop: '8px' }}>
+      <div style={{ background: SURFACE, marginTop: '8px' }}>
 
         {/* No Live Message — premium empty state SC-02 */}
         {filter === 'live' && filterStats.live === 0 && (
@@ -497,7 +497,7 @@ export function ScheduleTab() {
                    </div>
                     {/* Heavier rule between date groups */}
                     {groupIndex < monthGroups.length - 1 && (
-                      <div style={{ height: '1px', background: 'rgba(15,23,42,0.1)' }} />
+                      <div style={{ height: '1px', background: HAIRLINE_INK_10 }} />
                     )}
                 </div>
                 );

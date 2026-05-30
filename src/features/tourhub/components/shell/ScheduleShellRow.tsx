@@ -7,7 +7,21 @@ import { useTourSeason, useTourTournaments } from '../../hooks/useTourHubData';
 import { getTourLogo, hasTourLogo } from '../../utils/tourLogos';
 import { getTourMeta } from '../../constants/tourMap';
 import type { ScheduleFilterType, TourFilterCode } from '../schedule';
-import { AMBER_TINT_04, INK_TINT_06, INK_TINT_07, WHITE_ALPHA_10, WHITE_ALPHA_55, WHITE_ALPHA_65 } from '../../_shared/tokens';
+import {
+  AMBER,
+  AMBER_TINT_04,
+  INK,
+  INK_FAINT,
+  INK_TINT_06,
+  INK_TINT_07,
+  SHELL_BG,
+  SURFACE,
+  WHITE_ALPHA_06,
+  WHITE_ALPHA_10,
+  WHITE_ALPHA_18,
+  WHITE_ALPHA_55,
+  WHITE_ALPHA_65,
+} from '../../_shared/tokens';
 
 interface ChipDef {
   id: ScheduleFilterType;
@@ -74,8 +88,8 @@ function ScheduleShellRowInner() {
       <div
         className="relative"
         style={{
-          background: '#0A0E14',
-          borderBottom: '0.5px solid rgba(255,255,255,0.06)',
+          background: SHELL_BG,
+          borderBottom: `0.5px solid ${WHITE_ALPHA_06}`,
         }}
       >
         <div
@@ -102,8 +116,8 @@ function ScheduleShellRowInner() {
                     fontWeight: 600,
                     borderRadius: 15,
                     background: isActive ? WHITE_ALPHA_10 : 'transparent',
-                    border: isActive ? `1px solid ${WHITE_ALPHA_55}` : '1px solid rgba(255,255,255,0.18)',
-                    color: isActive ? '#FFFFFF' : WHITE_ALPHA_65,
+                    border: `1px solid ${isActive ? WHITE_ALPHA_55 : WHITE_ALPHA_18}`,
+                    color: isActive ? SURFACE : WHITE_ALPHA_65,
                     letterSpacing: '-0.01em',
                     whiteSpace: 'nowrap',
                   }}
@@ -126,8 +140,8 @@ function ScheduleShellRowInner() {
               fontWeight: 600,
               borderRadius: 15,
               background: activeTour !== 'all' ? WHITE_ALPHA_10 : 'transparent',
-              border: activeTour !== 'all' ? `1px solid ${WHITE_ALPHA_55}` : '1px solid rgba(255,255,255,0.18)',
-              color: activeTour !== 'all' ? '#FFFFFF' : WHITE_ALPHA_65,
+              border: `1px solid ${activeTour !== 'all' ? WHITE_ALPHA_55 : WHITE_ALPHA_18}`,
+              color: activeTour !== 'all' ? SURFACE : WHITE_ALPHA_65,
               gap: 5,
               whiteSpace: 'nowrap',
             }}
@@ -174,7 +188,7 @@ function ScheduleShellRowInner() {
                   padding: '14px 16px',
                   background: isSelected ? AMBER_TINT_04 : 'transparent',
                   border: 'none',
-                  borderLeft: isSelected ? '3px solid #F7931E' : '3px solid transparent',
+                  borderLeft: isSelected ? `3px solid ${AMBER}` : '3px solid transparent',
                   borderBottom: `0.5px solid ${INK_TINT_07}`,
                   cursor: 'pointer',
                   textAlign: 'left',
@@ -182,17 +196,17 @@ function ScheduleShellRowInner() {
               >
                 <div style={{ width: 36, height: 22, borderRadius: 4, background: INK_TINT_06, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                   {code === 'all' ? (
-                    <Globe className="w-4 h-4" style={{ color: '#94A3B8' }} />
+                    <Globe className="w-4 h-4" style={{ color: INK_FAINT }} />
                   ) : hasTourLogo(code.toLowerCase()) ? (
                     <img src={getTourLogo(code.toLowerCase())} alt="" aria-hidden="true" style={{ width: 28, height: 18, objectFit: 'contain' }} />
                   ) : null}
                 </div>
                 <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ fontSize: 15, fontWeight: isSelected ? 700 : 500, color: '#0F172A' }}>{label}</div>
-                  <div style={{ fontSize: 12, color: '#94A3B8', marginTop: 2 }}>{description}</div>
+                  <div style={{ fontSize: 15, fontWeight: isSelected ? 700 : 500, color: INK }}>{label}</div>
+                  <div style={{ fontSize: 12, color: INK_FAINT, marginTop: 2 }}>{description}</div>
                 </div>
-                <span style={{ fontSize: 13, color: '#94A3B8', fontVariantNumeric: 'tabular-nums', flexShrink: 0 }}>{count}</span>
-                {isSelected && <div style={{ width: 6, height: 6, borderRadius: '50%', background: '#F7931E', flexShrink: 0 }} />}
+                <span style={{ fontSize: 13, color: INK_FAINT, fontVariantNumeric: 'tabular-nums', flexShrink: 0 }}>{count}</span>
+                {isSelected && <div style={{ width: 6, height: 6, borderRadius: '50%', background: AMBER, flexShrink: 0 }} />}
               </button>
             );
           })}

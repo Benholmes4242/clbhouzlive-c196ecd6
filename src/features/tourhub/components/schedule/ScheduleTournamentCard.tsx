@@ -28,6 +28,7 @@ import { WinnerPill } from '../shared/WinnerPill';
 import { TournamentMeta } from '../shared/TournamentMeta';
 import { deriveFieldStrength } from '../../utils/deriveFieldStrength';
 import type { DefendingChampionEntry } from '../../hooks/useScheduleDefendingChampionPhotos';
+import { AMBER_SOFT_BG, INK, INK_MUTE, LIVE_INK, STATUS_LIVE } from '../../_shared/tokens';
 
 // SeasonTournament has no tour_code; derive from its display tourName.
 // TOUR_NAME_TO_SLUG returns lowercase slugs (pga, liv, euro, etc.) — translate
@@ -127,7 +128,7 @@ export function ScheduleTournamentCard({
   };
 
   // Major rows get amber-soft bg tint; tier signalling otherwise via EventTag/TourPill.
-  const rowBg = isMajor ? '#FEF3E7' : 'transparent';
+  const rowBg = isMajor ? AMBER_SOFT_BG : 'transparent';
 
   const ariaLabel = [
     tournament.name,
@@ -158,7 +159,7 @@ export function ScheduleTournamentCard({
           style={{
             fontSize: 9,
             fontWeight: 800,
-            color: '#64748B',
+            color: INK_MUTE,
             letterSpacing: '0.10em',
             textTransform: 'uppercase',
             lineHeight: 1,
@@ -171,7 +172,7 @@ export function ScheduleTournamentCard({
           style={{
             fontSize: 20,
             fontWeight: 800,
-            color: '#0F172A',
+            color: INK,
             lineHeight: 1,
             letterSpacing: '-0.025em',
             margin: '4px 0 0',
@@ -198,14 +199,14 @@ export function ScheduleTournamentCard({
                 borderRadius: 4,
                 background: 'rgba(16,185,129,0.10)',
                 border: '1px solid rgba(16,185,129,0.32)',
-                color: '#047857',
+                color: LIVE_INK,
                 fontSize: 9,
                 fontWeight: 900,
                 letterSpacing: 0.6,
                 lineHeight: 1,
               }}
             >
-              <span style={{ width: 5, height: 5, borderRadius: '50%', background: '#10B981' }} />
+              <span style={{ width: 5, height: 5, borderRadius: '50%', background: STATUS_LIVE }} />
               LIVE
               {leaderWinner?.round1 !== undefined && (() => {
                 const roundInfo = getCurrentRound(
@@ -227,7 +228,7 @@ export function ScheduleTournamentCard({
           style={{
             fontSize: 16,
             fontWeight: 800,
-            color: '#0F172A',
+            color: INK,
             letterSpacing: '-0.015em',
             lineHeight: 1.2,
             margin: '0 0 5px',
@@ -246,7 +247,7 @@ export function ScheduleTournamentCard({
               display: 'flex',
               alignItems: 'center',
               gap: 4,
-              color: '#047857',
+              color: LIVE_INK,
             }}
           >
             Leader:{' '}
@@ -297,7 +298,7 @@ export function ScheduleTournamentCard({
             purse && formatPurse(purse),
           ].filter(Boolean);
           return parts.length > 0 ? (
-            <p style={{ fontSize: 11, fontWeight: 600, color: '#64748B', margin: '0 0 3px' }}>{parts.join(' · ')}</p>
+            <p style={{ fontSize: 11, fontWeight: 600, color: INK_MUTE, margin: '0 0 3px' }}>{parts.join(' · ')}</p>
           ) : null;
         })()}
 
@@ -310,7 +311,7 @@ export function ScheduleTournamentCard({
               gap: 4,
               fontSize: 11,
               fontWeight: 600,
-              color: '#64748B',
+              color: INK_MUTE,
               margin: 0,
             }}
           >
