@@ -169,12 +169,12 @@ export function CollegeProfilePage() {
         </button>
       </ShellSlot>
 
-      <div style={{ paddingTop: 'var(--chrome-total-h, 0px)', background: '#F8FAFC' }}>
+      <div style={{ paddingTop: 'var(--chrome-total-h, 0px)', background: SLATE_50 }}>
 
       {/* ── HERO MASTHEAD ── canonical light pattern */}
       <div style={{
         position: 'relative',
-        background: '#F8FAFC',
+        background: SLATE_50,
         paddingTop: 0,
         paddingLeft: 16,
         paddingRight: 16,
