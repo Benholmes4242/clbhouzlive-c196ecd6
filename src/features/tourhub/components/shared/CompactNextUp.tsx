@@ -6,6 +6,7 @@
  */
 import { useNavigate } from 'react-router-dom';
 import { TourPill } from './TourPill';
+import { AMBER, AMBER_BORDER, INK } from '../../_shared/tokens';
 
 interface CompactNextUpProps {
   tournamentId: string;
