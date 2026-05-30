@@ -14,7 +14,7 @@
  */
 
 import { Link } from 'react-router-dom';
-import { INK_SOFT, INK_TINT_07 } from '../../_shared/tokens';
+import { AMBER, AMBER_SOFT_BG, GOLD_DEEP, INK, INK_FAINT, INK_MUTE, INK_SOFT, INK_TINT_07, LIVE_INK, TREND_DOWN } from '../../_shared/tokens';
 import { motion } from 'framer-motion';
 import { getCollegeLogoUrl } from '@/utils/collegeLogo';
 import type { CollegeSeasonStats } from '../../hooks/useCollegeStats';
