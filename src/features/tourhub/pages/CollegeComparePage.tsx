@@ -150,11 +150,11 @@ export function CollegeComparePage() {
 
       <div
         className="relative min-h-screen"
-        style={{ paddingTop: 'var(--chrome-total-h, 0px)', background: '#F8FAFC' }}
+        style={{ paddingTop: 'var(--chrome-total-h, 0px)', background: SLATE_50 }}
       >
         {/* Season caps row — stays in body, no longer cropped under chrome */}
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', padding: '9px 16px' }}>
-          <span style={{ fontSize: 9, color: '#94A3B8', fontWeight: 800, letterSpacing: '0.14em', textTransform: 'uppercase' }}>
+          <span style={{ fontSize: 9, color: INK_FAINT, fontWeight: 800, letterSpacing: '0.14em', textTransform: 'uppercase' }}>
             {seasonCaps}
           </span>
         </div>
