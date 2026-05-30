@@ -116,7 +116,7 @@ function CutContextCard({
               style={{
                 fontSize: 9,
                 fontWeight: 800,
-                color: '#64748B',
+                color: INK_MUTE,
                 letterSpacing: '0.14em',
                 marginBottom: 4,
               }}
