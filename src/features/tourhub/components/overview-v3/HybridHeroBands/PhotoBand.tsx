@@ -233,7 +233,7 @@ export function PhotoBand({
           >
             {lede && <span>{lede}</span>}
             {isMajor && (
-              <span style={{ color: GOLD, fontSize: 12, letterSpacing: 0 }}>★</span>
+              <Star size={12} fill={GOLD} color={GOLD} strokeWidth={0} style={{ flexShrink: 0 }} />
             )}
             {isSignature && (
               <span style={{ color: AMBER, fontSize: 9, letterSpacing: '0.18em' }}>
