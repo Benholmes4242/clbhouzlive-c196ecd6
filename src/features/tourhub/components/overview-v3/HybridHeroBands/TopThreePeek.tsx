@@ -89,10 +89,13 @@ export function TopThreePeek({ rows, onFullLeaderboardTap }: TopThreePeekProps) 
             textTransform: 'uppercase',
             cursor: 'pointer',
             padding: 0,
-            fontFamily: 'inherit',
+            fontFamily: FONT,
           }}
         >
-          FULL LEADERBOARD ›
+          <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+            FULL LEADERBOARD
+            <ChevronRight size={11} strokeWidth={2.5} color="currentColor" />
+          </span>
         </button>
       </div>
 
