@@ -335,10 +335,10 @@ export function CollegeCompareHero({ data, className }: CollegeCompareHeroProps)
   return (
     <div className={className}>
       {/* ── SEASON VERDICT ── */}
-      <div style={{ background: '#ffffff', borderTop: `1px solid ${INK_TINT_07}`, borderBottom: `1px solid ${INK_TINT_07}`, marginTop: '8px' }}>
+      <div style={{ background: SURFACE, borderTop: `1px solid ${INK_TINT_07}`, borderBottom: `1px solid ${INK_TINT_07}`, marginTop: '8px' }}>
         {/* Section eyebrow — canonical §6 slate-caps */}
         <div style={{ padding: '14px 16px 10px' }}>
-          <span style={{ fontSize: '9px', fontWeight: 800, color: '#64748B', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>
+          <span style={{ fontSize: '9px', fontWeight: 800, color: INK_MUTE, letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>
             Season Verdict · {seasonYear}
           </span>
         </div>
@@ -347,34 +347,34 @@ export function CollegeCompareHero({ data, className }: CollegeCompareHeroProps)
         <div style={{ display: 'flex', alignItems: 'flex-start', padding: '12px 16px 18px', borderTop: `0.5px solid ${INK_TINT_07}` }}>
           {/* College 1 */}
           <div style={{ flex: 1, display: 'flex', flexDirection: 'column' as const, alignItems: 'center', gap: '4px' }}>
-            <div style={{ width: 44, height: 44, borderRadius: 11, overflow: 'hidden', background: 'rgba(15,23,42,0.04)', border: '1px solid rgba(15,23,42,0.08)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <div style={{ width: 44, height: 44, borderRadius: 11, overflow: 'hidden', background: INK_TINT_04, border: `1px solid ${HAIRLINE_INK_8}`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
               {logo1 ? (
                 <img src={logo1} alt={name1} style={{ width: 32, height: 32, objectFit: 'contain' }} onError={e => { e.currentTarget.style.display = 'none'; }} />
               ) : (
                 <span style={{ fontSize: 17, fontWeight: 900, color: 'rgba(15,23,42,0.3)' }}>{name1.charAt(0)}</span>
               )}
             </div>
-            <div style={{ fontSize: 13, fontWeight: 700, color: '#0F172A', textAlign: 'center' as const, maxWidth: 110, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const }}>{name1}</div>
+            <div style={{ fontSize: 13, fontWeight: 700, color: INK, textAlign: 'center' as const, maxWidth: 110, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const }}>{name1}</div>
             <div style={{
               fontSize: 18, fontWeight: 800,
-              color: c1Wins >= c2Wins ? '#0F172A' : '#94A3B8',
+              color: c1Wins >= c2Wins ? INK : INK_FAINT,
               letterSpacing: '-0.02em', lineHeight: 1,
               fontVariantNumeric: 'tabular-nums', marginTop: 2,
             }}>
               {formatEarnings(s1?.earnings_total || 0)}
             </div>
-            <div style={{ fontSize: 11, color: '#94A3B8', fontWeight: 500 }}>
+            <div style={{ fontSize: 11, color: INK_FAINT, fontWeight: 500 }}>
               {s1?.player_count || 0} alumni
             </div>
             <div style={{
               fontSize: 28, fontWeight: 900,
-              color: c1Wins > c2Wins ? '#F7931E' : '#94A3B8',
+              color: c1Wins > c2Wins ? AMBER : INK_FAINT,
               letterSpacing: '-0.04em', lineHeight: 1, marginTop: 6,
               fontVariantNumeric: 'tabular-nums',
             }}>
               {c1Wins}
             </div>
-            <div style={{ fontSize: 11, color: '#94A3B8', fontWeight: 500 }}>categories led</div>
+            <div style={{ fontSize: 11, color: INK_FAINT, fontWeight: 500 }}>categories led</div>
           </div>
 
           {/* Centre — verdict chip */}
