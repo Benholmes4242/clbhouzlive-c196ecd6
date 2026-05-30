@@ -811,7 +811,7 @@ export function PlayersTab() {
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 className="w-full h-9 pl-9 pr-9 rounded-lg text-[13px] font-semibold text-foreground placeholder:text-muted-foreground/70 focus:outline-none"
-                style={{ background: '#ffffff', border: '1px solid rgba(15,23,42,0.09)' }}
+                style={{ background: SURFACE, border: `1px solid ${HAIRLINE_INK_10}` }}
               />
               <button
                 onClick={() => { setSearch(''); setSearchExpanded(false); }}
@@ -819,7 +819,7 @@ export function PlayersTab() {
                 className="absolute right-2 top-1/2 -translate-y-1/2 p-1 rounded-full active:scale-90"
                 style={{ background: INK_TINT_06 }}
               >
-                <X className="w-3 h-3" style={{ color: '#0F172A' }} strokeWidth={2.5} />
+                <X className="w-3 h-3" style={{ color: INK }} strokeWidth={2.5} />
               </button>
             </div>
           </div>
