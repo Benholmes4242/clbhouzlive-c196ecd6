@@ -430,7 +430,7 @@ export function ScheduleTab() {
       {/* LiveRightNow removed during Tour Overview hero nuke; rebuild pending. */}
 
 
-      <div style={{ background: '#ffffff', marginTop: '8px' }}>
+      <div style={{ background: SURFACE, marginTop: '8px' }}>
 
         {/* No Live Message — premium empty state SC-02 */}
         {filter === 'live' && filterStats.live === 0 && (
