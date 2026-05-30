@@ -55,7 +55,7 @@ export function CompactNextUp({ tournamentId, tourCode, name, daysUntil }: Compa
           minWidth: 0,
           fontSize: 12,
           fontWeight: 800,
-          color: '#0F172A',
+          color: INK,
           overflow: 'hidden',
           textOverflow: 'ellipsis',
           whiteSpace: 'nowrap',
