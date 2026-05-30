@@ -690,8 +690,8 @@ function LiveCard({
       : pick.moveDir === 'down'
       ? DANGER
       : INK_FAINT;
-  const moveSymbol =
-    pick.moveDir === 'up' ? '▲' : pick.moveDir === 'down' ? '▼' : '—';
+  const MoveIcon =
+    pick.moveDir === 'up' ? ChevronUp : pick.moveDir === 'down' ? ChevronDown : null;
 
   return (
     <CardShell isLive={!pick.finished}>
