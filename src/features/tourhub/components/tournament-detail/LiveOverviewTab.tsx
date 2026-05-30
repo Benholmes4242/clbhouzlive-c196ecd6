@@ -30,12 +30,12 @@ interface LiveOverviewTabProps {
 }
 
 const sectionRule = (label: string) => (
-  <div style={{ padding: '14px 20px 8px', background: '#F8FAFC' }}>
+  <div style={{ padding: '14px 20px 8px', background: SLATE_50 }}>
     <span
       style={{
         fontSize: 9,
         fontWeight: 800,
-        color: '#64748B',
+        color: INK_MUTE,
         letterSpacing: '0.16em',
         textTransform: 'uppercase' as const,
       }}
