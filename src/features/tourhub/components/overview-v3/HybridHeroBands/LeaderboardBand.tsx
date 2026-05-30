@@ -416,8 +416,12 @@ export function LeaderboardBand({
             fontWeight: 800,
             letterSpacing: '0.10em',
             textTransform: 'uppercase',
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: 4,
           }}>
-            {ctaLabel(state)} ›
+            {ctaLabel(state)}
+            <ChevronRight size={11} strokeWidth={2.5} color={AMBER} />
           </span>
         </div>
       ) : (
