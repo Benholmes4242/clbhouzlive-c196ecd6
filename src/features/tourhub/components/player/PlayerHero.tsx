@@ -135,8 +135,8 @@ export function PlayerHero({ player, playerStats }: PlayerHeroProps) {
         padding: 'max(env(safe-area-inset-top, 0px), 47px) 0 14px',
       }}
     >
-      {/* Section header (canonical §2) */}
-      <div style={{ padding: '0 16px 14px' }}>
+      {/* Section header (canonical §2) — eyebrow only */}
+      <div style={{ padding: '0 16px 8px' }}>
         <button
           type="button"
           onClick={() => navigate('/tourhub?tab=players', { replace: true })}
@@ -149,7 +149,6 @@ export function PlayerHero({ player, playerStats }: PlayerHeroProps) {
             display: 'inline-flex',
             alignItems: 'center',
             gap: 6,
-            marginBottom: 6,
           }}
         >
           <UserCircle size={13} strokeWidth={2.5} color={AMBER} />
@@ -166,37 +165,6 @@ export function PlayerHero({ player, playerStats }: PlayerHeroProps) {
           </span>
           <ChevronRight size={11} strokeWidth={2.5} color={AMBER} />
         </button>
-
-        <h1
-          style={{
-            fontSize: 24,
-            fontWeight: 800,
-            color: INK,
-            letterSpacing: '-0.025em',
-            lineHeight: 1.15,
-            margin: 0,
-          }}
-        >
-          Player Profile
-        </h1>
-
-        <div
-          style={{
-            marginTop: 8,
-            fontSize: 13,
-            fontWeight: 700,
-            color: INK,
-            letterSpacing: '-0.005em',
-            lineHeight: 1.3,
-          }}
-        >
-          {[
-            player.tour_codes && player.tour_codes.length > 0
-              ? `Tours ${player.tour_codes.map(c => c.toUpperCase()).join(' · ')}`
-              : null,
-            countryDisplay,
-          ].filter(Boolean).join(' · ')}
-        </div>
       </div>
 
       {/* Player champion card */}
