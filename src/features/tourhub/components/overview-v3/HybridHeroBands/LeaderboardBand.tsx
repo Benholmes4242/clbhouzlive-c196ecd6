@@ -341,7 +341,7 @@ export function LeaderboardBand({
           style={{
             padding: '32px 20px',
             textAlign: 'center',
-            color: 'rgba(15,23,42,0.45)',
+            color: INK_ALPHA_45,
             fontSize: firstYearEvent ? 11 : 13,
             fontWeight: firstYearEvent ? 800 : 600,
             letterSpacing: firstYearEvent ? '0.16em' : 'normal',
