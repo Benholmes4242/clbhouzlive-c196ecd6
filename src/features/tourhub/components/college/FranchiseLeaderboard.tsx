@@ -176,20 +176,20 @@ export function FranchiseLeaderboard({
                     );
                   })}
                   <div style={{ padding: '12px 16px', borderTop: `0.5px solid ${INK_TINT_07}` }}>
-                    <p style={{ fontSize: 9, fontWeight: 800, color: '#94A3B8', letterSpacing: '0.14em', textTransform: 'uppercase' as const, textAlign: 'center' as const, margin: 0 }}>
+                    <p style={{ fontSize: 9, fontWeight: 800, color: INK_FAINT, letterSpacing: '0.14em', textTransform: 'uppercase' as const, textAlign: 'center' as const, margin: 0 }}>
                       COLLEGE FRANCHISE RANKINGS · 2025–26 SEASON
                     </p>
                   </div>
                 </>
               ) : activeMetric === 'wins' ? (
                 <div style={{ padding: '48px 16px', textAlign: 'center' as const }}>
-                  <p style={{ fontSize: 15, fontWeight: 600, color: '#0F172A', margin: '0 0 4px' }}>No wins yet this season</p>
-                  <p style={{ fontSize: 13, color: '#94A3B8', margin: 0 }}>Check back as the season progresses.</p>
+                  <p style={{ fontSize: 15, fontWeight: 600, color: INK, margin: '0 0 4px' }}>No wins yet this season</p>
+                  <p style={{ fontSize: 13, color: INK_FAINT, margin: 0 }}>Check back as the season progresses.</p>
                 </div>
               ) : (
                 <div style={{ padding: '48px 16px', textAlign: 'center' as const }}>
-                  <p style={{ fontSize: 15, fontWeight: 600, color: '#0F172A', margin: '0 0 4px' }}>No data available</p>
-                  <p style={{ fontSize: 13, color: '#94A3B8', margin: 0 }}>Season stats are being calculated. Check back soon.</p>
+                  <p style={{ fontSize: 15, fontWeight: 600, color: INK, margin: '0 0 4px' }}>No data available</p>
+                  <p style={{ fontSize: 13, color: INK_FAINT, margin: 0 }}>Season stats are being calculated. Check back soon.</p>
                 </div>
               )}
             </motion.div>
