@@ -226,7 +226,7 @@ export function ScheduleTournamentCard({
         {/* Tournament name — visual anchor */}
         <p
           style={{
-            fontSize: 16,
+            fontSize: 17,
             fontWeight: 800,
             color: INK,
             letterSpacing: '-0.015em',
