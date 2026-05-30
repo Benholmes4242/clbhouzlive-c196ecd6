@@ -190,7 +190,7 @@ export function FormSection({ playerId }: FormSectionProps) {
     return (
       <div
         style={{
-          background: '#ffffff',
+          background: SURFACE,
           borderBottom: `1px solid ${INK_TINT_07}`,
           marginTop: 8,
           padding: '14px 16px 16px',
