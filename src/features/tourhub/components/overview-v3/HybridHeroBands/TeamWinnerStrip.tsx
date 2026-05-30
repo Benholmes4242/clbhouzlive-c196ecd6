@@ -128,7 +128,8 @@ export function TeamWinnerStrip({
       />
       <TeamCrestTile teamName={teamName} teamColor={teamColor} teamCrestUrl={teamCrestUrl} />
       <div style={{ flex: 1, minWidth: 0, position: 'relative' }}>
-        <div style={{ fontSize: 9, fontWeight: 800, letterSpacing: '0.18em', color: GOLD, marginBottom: 2 }}>
+        <div style={{ fontSize: 9, fontWeight: 800, letterSpacing: '0.18em', color: GOLD, marginBottom: 2, display: 'inline-flex', alignItems: 'center', gap: 5 }}>
+          <EyebrowIcon size={10} color={GOLD} strokeWidth={2.5} />
           {eyebrow}
         </div>
         <div
