@@ -433,33 +433,63 @@ export function LeaderboardBand({
           </span>
         </div>
       ) : (
-        <button
-          onClick={onCtaTap}
-          type="button"
-          style={{
-            margin: '18px 20px',
-            padding: '14px 20px',
-            background: INK,
-            color: 'white',
-            borderRadius: 14,
-            textAlign: 'center',
-            fontSize: 12,
-            fontWeight: 700,
-            letterSpacing: '0.12em',
-            textTransform: 'uppercase',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            gap: 8,
-            width: 'calc(100% - 40px)',
-            border: 'none',
-            cursor: 'pointer',
-            fontFamily: FONT,
-          }}
-        >
-          {ctaLabel(state)}
-          <ChevronRight size={12} strokeWidth={2.5} color="white" style={{ opacity: 0.7 }} />
-        </button>
+        <>
+          <button
+            onClick={onCtaTap}
+            type="button"
+            style={{
+              margin: showFooterStrip ? '18px 20px 12px' : '18px 20px',
+              padding: '14px 20px',
+              background: INK,
+              color: 'white',
+              borderRadius: 14,
+              textAlign: 'center',
+              fontSize: 12,
+              fontWeight: 700,
+              letterSpacing: '0.12em',
+              textTransform: 'uppercase',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: 8,
+              width: 'calc(100% - 40px)',
+              border: 'none',
+              cursor: 'pointer',
+              fontFamily: FONT,
+            }}
+          >
+            {ctaLabel(state)}
+            <ChevronRight size={12} strokeWidth={2.5} color="white" style={{ opacity: 0.7 }} />
+          </button>
+          {showFooterStrip && (
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'stretch',
+                borderTop: `0.5px solid ${INK_15}`,
+                margin: 0,
+              }}
+            >
+              <div style={{ flex: 1, padding: '12px 20px', minWidth: 0 }}>
+                <div style={{ fontSize: 9.5, fontWeight: 800, letterSpacing: '0.14em', color: INK_ALPHA_45, textTransform: 'uppercase' }}>
+                  Defending Champion
+                </div>
+                <div style={{ marginTop: 3, fontSize: 13, fontWeight: 700, color: INK, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                  {defendingChampion || '—'}
+                </div>
+              </div>
+              <div style={{ width: '0.5px', background: INK_15, alignSelf: 'stretch' }} />
+              <div style={{ padding: '12px 20px', textAlign: 'right' as const, flexShrink: 0 }}>
+                <div style={{ fontSize: 9.5, fontWeight: 800, letterSpacing: '0.14em', color: INK_ALPHA_45, textTransform: 'uppercase' }}>
+                  Field
+                </div>
+                <div style={{ marginTop: 3, fontSize: 13, fontWeight: 700, color: INK, fontVariantNumeric: 'tabular-nums' }}>
+                  {(fieldSize ?? 0).toLocaleString()}<span style={{ fontSize: 11, fontWeight: 600, color: INK_ALPHA_45 }}> players</span>
+                </div>
+              </div>
+            </div>
+          )}
+        </>
       )}
     </div>
   );
