@@ -127,7 +127,7 @@ function CutContextCard({
               style={{
                 fontSize: 18,
                 fontWeight: 800,
-                color: '#0F172A',
+                color: INK,
                 letterSpacing: '-0.02em',
                 fontVariantNumeric: 'tabular-nums',
               }}
