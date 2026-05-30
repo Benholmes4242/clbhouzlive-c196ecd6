@@ -20,6 +20,7 @@ import { useIntelligenceHistoricalPicks, type IntelligenceHistoricalTournament }
 import { createPortal } from 'react-dom';
 import { getPlayerHeadshotUrl, PLAYER_SILHOUETTE_URL } from '@/utils/playerHeadshot';
 import { useNavigate } from 'react-router-dom';
+import { INK_TINT_06, INK_TINT_07 } from '../../_shared/tokens';
 
 type IntelligenceTab = 'courseDNA' | 'predictions';
 
@@ -86,11 +87,11 @@ function PickRecordRail() {
 
   if (isLoading) {
     return (
-      <div style={{ background: '#ffffff', borderTop: '1px solid rgba(15,23,42,0.07)', borderBottom: '1px solid rgba(15,23,42,0.07)', padding: '12px 16px' }}>
-        <div style={{ height: 12, width: 160, borderRadius: 6, background: 'rgba(15,23,42,0.06)', marginBottom: 10 }} />
+      <div style={{ background: '#ffffff', borderTop: `1px solid ${INK_TINT_07}`, borderBottom: `1px solid ${INK_TINT_07}`, padding: '12px 16px' }}>
+        <div style={{ height: 12, width: 160, borderRadius: 6, background: INK_TINT_06, marginBottom: 10 }} />
         <div style={{ display: 'flex', gap: 8 }}>
           {[1,2,3,4].map(i => (
-            <div key={i} className="animate-pulse" style={{ width: 90, height: 88, borderRadius: 10, background: 'rgba(15,23,42,0.06)', flexShrink: 0 }} />
+            <div key={i} className="animate-pulse" style={{ width: 90, height: 88, borderRadius: 10, background: INK_TINT_06, flexShrink: 0 }} />
           ))}
         </div>
       </div>
@@ -106,8 +107,8 @@ function PickRecordRail() {
     <>
       <div style={{
         background: '#ffffff',
-        borderTop: '1px solid rgba(15,23,42,0.07)',
-        borderBottom: '1px solid rgba(15,23,42,0.07)',
+        borderTop: `1px solid ${INK_TINT_07}`,
+        borderBottom: `1px solid ${INK_TINT_07}`,
         padding: '12px 16px',
       }}>
         {/* Header row */}
@@ -479,8 +480,8 @@ export const TournamentInsights = memo(function TournamentInsights() {
               {/* Course DNA toggle — dispatch style */}
               <div style={{
                 background: '#ffffff',
-                borderTop: '1px solid rgba(15,23,42,0.07)',
-                borderBottom: '1px solid rgba(15,23,42,0.07)',
+                borderTop: `1px solid ${INK_TINT_07}`,
+                borderBottom: `1px solid ${INK_TINT_07}`,
                 marginTop: 12,
               }}>
                 <button

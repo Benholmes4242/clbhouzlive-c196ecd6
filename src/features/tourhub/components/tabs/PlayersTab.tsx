@@ -22,6 +22,7 @@ import { PlayersEmptyState } from '../players/PlayersEmptyState';
 import { getPlayerHeadshotUrl, PLAYER_SILHOUETTE_URL } from '@/utils/playerHeadshot';
 import { titleCaseCountry } from '../../utils/countryFlags';
 import CountryFlag from '@/components/ui/country-flag';
+import { INK_TINT_06, INK_TINT_07 } from '../../_shared/tokens';
 
 // Inline sort label resolver
 function getSortShortLabel(sort: PlayerSortType, activeTour: string): string {
@@ -168,7 +169,7 @@ function HeroChampion({ champion, runnerUp, champStats, champPhotoUrl, sort, act
       <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
         {/* Photo + "1" badge */}
         <div style={{ position: 'relative', flexShrink: 0 }}>
-          <div style={{ width: 80, height: 80, borderRadius: '34%', overflow: 'hidden', background: 'rgba(15,23,42,0.06)', border: '2.5px solid #FFB800', boxShadow: '0 4px 12px rgba(255,184,0,0.20)' }}>
+          <div style={{ width: 80, height: 80, borderRadius: '34%', overflow: 'hidden', background: INK_TINT_06, border: '2.5px solid #FFB800', boxShadow: '0 4px 12px rgba(255,184,0,0.20)' }}>
             <img
               src={champPhotoUrl}
               alt={champion.playerName}
@@ -800,7 +801,7 @@ export function PlayersTab() {
                 onClick={() => { setSearch(''); setSearchExpanded(false); }}
                 aria-label="Close search"
                 className="absolute right-2 top-1/2 -translate-y-1/2 p-1 rounded-full active:scale-90"
-                style={{ background: 'rgba(15,23,42,0.06)' }}
+                style={{ background: INK_TINT_06 }}
               >
                 <X className="w-3 h-3" style={{ color: '#0F172A' }} strokeWidth={2.5} />
               </button>
@@ -814,7 +815,7 @@ export function PlayersTab() {
       {/* Tour filter bottom sheet — moved to PlayersShellRow */}
 
       {/* Content — white surface */}
-      <div style={{ background: '#ffffff', borderTop: '1px solid rgba(15,23,42,0.07)', marginTop: '8px' }}>
+      <div style={{ background: '#ffffff', borderTop: `1px solid ${INK_TINT_07}`, marginTop: '8px' }}>
         <AnimatePresence mode="wait">
           <motion.div
             key={contentKey}

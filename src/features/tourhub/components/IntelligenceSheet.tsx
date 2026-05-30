@@ -39,7 +39,7 @@ const AMBER_SOFT = '#FEF3E7';
 const GOLD = '#FFB800';
 const GOLD_DEEP = '#D97706';
 const SLATE_900 = '#0F172A';
-import { SLATE_600 } from '../_shared/tokens';
+import { SLATE_600, INK_TINT_06 } from '../_shared/tokens';
 const SLATE_500 = '#64748B';
 const SLATE_400 = '#94A3B8';
 const SLATE_200 = '#E2E8F0';
@@ -201,7 +201,7 @@ function TabStrip({ tab, onChange }: { tab: Tab; onChange: (t: Tab) => void }) {
                 fontSize: 12,
                 fontWeight: 700,
                 cursor: 'pointer',
-                boxShadow: active ? '0 1px 2px rgba(15,23,42,0.06)' : 'none',
+                boxShadow: active ? `0 1px 2px ${INK_TINT_06}` : 'none',
                 transition: 'all 150ms',
               }}
             >

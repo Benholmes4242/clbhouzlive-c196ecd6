@@ -11,6 +11,7 @@ import { titleCaseCountry } from '../../utils/countryFlags';
 import CountryFlag from '@/components/ui/country-flag';
 import { useTournamentScoringStats } from '../../hooks/useTourHubData';
 import { playerRoute } from '../../routes';
+import { INK_TINT_06, INK_TINT_07 } from '../../_shared/tokens';
 
 interface SummaryTabProps {
   tournamentId: string;
@@ -26,28 +27,28 @@ function SummarySkeleton() {
   return (
     <div>
       {/* Champion block skeleton */}
-      <div style={{ background: '#ffffff', borderTop: '1px solid rgba(15,23,42,0.07)', borderBottom: '1px solid rgba(15,23,42,0.07)', marginTop: '8px', padding: '14px 20px 14px' }}>
+      <div style={{ background: '#ffffff', borderTop: `1px solid ${INK_TINT_07}`, borderBottom: `1px solid ${INK_TINT_07}`, marginTop: '8px', padding: '14px 20px 14px' }}>
         <div className="animate-pulse" style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', gap: '12px' }}>
           <div style={{ flex: 1 }}>
-            <div style={{ height: '8px', width: '100px', background: 'rgba(15,23,42,0.06)', borderRadius: '4px', marginBottom: '8px' }} />
-            <div style={{ height: '22px', width: '160px', background: 'rgba(15,23,42,0.06)', borderRadius: '4px', marginBottom: '6px' }} />
-            <div style={{ height: '10px', width: '120px', background: 'rgba(15,23,42,0.06)', borderRadius: '4px' }} />
+            <div style={{ height: '8px', width: '100px', background: INK_TINT_06, borderRadius: '4px', marginBottom: '8px' }} />
+            <div style={{ height: '22px', width: '160px', background: INK_TINT_06, borderRadius: '4px', marginBottom: '6px' }} />
+            <div style={{ height: '10px', width: '120px', background: INK_TINT_06, borderRadius: '4px' }} />
           </div>
-          <div style={{ width: '52px', height: '52px', borderRadius: '34%', background: 'rgba(15,23,42,0.06)' }} />
+          <div style={{ width: '52px', height: '52px', borderRadius: '34%', background: INK_TINT_06 }} />
           <div style={{ width: '60px' }}>
-            <div style={{ height: '32px', background: 'rgba(15,23,42,0.06)', borderRadius: '4px', marginBottom: '4px' }} />
-            <div style={{ height: '8px', background: 'rgba(15,23,42,0.06)', borderRadius: '4px' }} />
+            <div style={{ height: '32px', background: INK_TINT_06, borderRadius: '4px', marginBottom: '4px' }} />
+            <div style={{ height: '8px', background: INK_TINT_06, borderRadius: '4px' }} />
           </div>
         </div>
       </div>
       {/* Row skeletons */}
-      <div style={{ background: '#ffffff', borderTop: '1px solid rgba(15,23,42,0.07)', borderBottom: '1px solid rgba(15,23,42,0.07)', marginTop: '8px' }}>
+      <div style={{ background: '#ffffff', borderTop: `1px solid ${INK_TINT_07}`, borderBottom: `1px solid ${INK_TINT_07}`, marginTop: '8px' }}>
         {Array.from({ length: 4 }).map((_, i) => (
-          <div key={i} className="animate-pulse" style={{ display: 'flex', alignItems: 'center', padding: '10px 20px', borderBottom: i < 3 ? '0.5px solid rgba(15,23,42,0.07)' : 'none', gap: '12px' }}>
-            <div style={{ width: '36px', height: '14px', background: 'rgba(15,23,42,0.06)', borderRadius: '4px' }} />
-            <div style={{ width: '28px', height: '28px', borderRadius: '34%', background: 'rgba(15,23,42,0.06)' }} />
-            <div style={{ flex: 1, height: '13px', background: 'rgba(15,23,42,0.06)', borderRadius: '4px' }} />
-            <div style={{ width: '44px', height: '13px', background: 'rgba(15,23,42,0.06)', borderRadius: '4px' }} />
+          <div key={i} className="animate-pulse" style={{ display: 'flex', alignItems: 'center', padding: '10px 20px', borderBottom: i < 3 ? `0.5px solid ${INK_TINT_07}` : 'none', gap: '12px' }}>
+            <div style={{ width: '36px', height: '14px', background: INK_TINT_06, borderRadius: '4px' }} />
+            <div style={{ width: '28px', height: '28px', borderRadius: '34%', background: INK_TINT_06 }} />
+            <div style={{ flex: 1, height: '13px', background: INK_TINT_06, borderRadius: '4px' }} />
+            <div style={{ width: '44px', height: '13px', background: INK_TINT_06, borderRadius: '4px' }} />
           </div>
         ))}
       </div>
@@ -93,16 +94,16 @@ function WinnerCard({ winner, runnerUp, headshotMap, tournamentName }: { winner:
   return (
     <motion.div style={{ marginTop: '8px' }} {...sectionEntrance}>
       {/* Section eyebrow */}
-      <div style={{ padding: '14px 20px 0', background: '#ffffff', borderTop: '1px solid rgba(15,23,42,0.07)' }}>
+      <div style={{ padding: '14px 20px 0', background: '#ffffff', borderTop: `1px solid ${INK_TINT_07}` }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '10px' }}>
           <span style={{ fontSize: '9px', fontWeight: 800, color: '#64748B', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>Tournament Champion</span>
         </div>
       </div>
 
       {/* Winner hero row */}
-      <div style={{ background: '#ffffff', borderBottom: '1px solid rgba(15,23,42,0.07)' }}>
+      <div style={{ background: '#ffffff', borderBottom: `1px solid ${INK_TINT_07}` }}>
         <Link {...playerRoute(winner.player?.id ?? '', tournamentName ? { kind: 'tournament', tournamentName } : undefined)} style={{ display: 'block', textDecoration: 'none' }} className="active:opacity-80 transition-opacity">
-          <div style={{ padding: '12px 20px 14px', borderLeft: '3px solid #F7931E', background: 'rgba(247,147,30,0.025)', borderTop: '0.5px solid rgba(15,23,42,0.07)' }}>
+          <div style={{ padding: '12px 20px 14px', borderLeft: '3px solid #F7931E', background: 'rgba(247,147,30,0.025)', borderTop: `0.5px solid ${INK_TINT_07}` }}>
             <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', gap: '12px' }}>
               <div style={{ flex: 1, minWidth: 0 }}>
                 <div style={{ fontSize: '9px', fontWeight: 800, color: '#F7931E', letterSpacing: '0.14em', textTransform: 'uppercase' as const, marginBottom: '4px' }}>Winner</div>
@@ -116,7 +117,7 @@ function WinnerCard({ winner, runnerUp, headshotMap, tournamentName }: { winner:
               </div>
 
               {/* Squircle headshot */}
-              <div style={{ width: '50px', height: '50px', borderRadius: '34%', overflow: 'hidden', flexShrink: 0, background: 'rgba(15,23,42,0.06)' }}>
+              <div style={{ width: '50px', height: '50px', borderRadius: '34%', overflow: 'hidden', flexShrink: 0, background: INK_TINT_06 }}>
                 <BatchPlayerAvatar playerId={winner.player?.id || ''} playerName={winner.player?.full_name || ''} size="md" />
               </div>
 
@@ -170,22 +171,22 @@ export function SummaryTab({
       {/* Round-by-round scoring */}
       {scoringStats && scoringStats.rounds.length > 0 && (
         <motion.div style={{ marginTop: '8px' }} {...sectionEntrance}>
-          <div style={{ padding: '14px 20px 0', background: '#ffffff', borderTop: '1px solid rgba(15,23,42,0.07)' }}>
+          <div style={{ padding: '14px 20px 0', background: '#ffffff', borderTop: `1px solid ${INK_TINT_07}` }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '10px' }}>
               <span style={{ fontSize: '9px', fontWeight: 800, color: '#64748B', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>Round Scoring</span>
             </div>
           </div>
 
           {/* Column headers */}
-          <div style={{ display: 'flex', alignItems: 'center', padding: '5px 20px', background: 'rgba(15,23,42,0.02)', borderBottom: '0.5px solid rgba(15,23,42,0.07)', borderTop: '0.5px solid rgba(15,23,42,0.07)' }}>
+          <div style={{ display: 'flex', alignItems: 'center', padding: '5px 20px', background: 'rgba(15,23,42,0.02)', borderBottom: `0.5px solid ${INK_TINT_07}`, borderTop: `0.5px solid ${INK_TINT_07}` }}>
             {['ROUND', 'LOW', 'AVG', 'BIRDIES', 'BOGEYS'].map((h, i) => (
               <span key={h} style={{ fontSize: '9px', fontWeight: 800, color: '#64748B', letterSpacing: '0.14em', flex: i === 0 ? '0 0 52px' : '1', textAlign: i > 0 ? 'center' as const : 'left' as const }}>{h}</span>
             ))}
           </div>
 
-          <div style={{ background: '#ffffff', borderBottom: '1px solid rgba(15,23,42,0.07)' }}>
+          <div style={{ background: '#ffffff', borderBottom: `1px solid ${INK_TINT_07}` }}>
             {scoringStats.rounds.map((round: any) => (
-              <div key={round.round} style={{ display: 'flex', alignItems: 'center', padding: '10px 20px', borderBottom: '0.5px solid rgba(15,23,42,0.07)', fontVariantNumeric: 'tabular-nums' }}>
+              <div key={round.round} style={{ display: 'flex', alignItems: 'center', padding: '10px 20px', borderBottom: `0.5px solid ${INK_TINT_07}`, fontVariantNumeric: 'tabular-nums' }}>
                 <span style={{ fontSize: '14px', fontWeight: 700, color: '#0F172A', flex: '0 0 52px' }}>R{round.round}</span>
                 <span style={{ fontSize: '14px', fontWeight: 700, color: '#F7931E', flex: 1, textAlign: 'center' as const }}>{round.lowScore}</span>
                 <span style={{ fontSize: '14px', color: '#64748B', flex: 1, textAlign: 'center' as const }}>{round.avgScore.toFixed(1)}</span>
@@ -213,12 +214,12 @@ export function SummaryTab({
 
         return (
           <motion.div style={{ marginTop: '8px' }} {...sectionEntrance}>
-            <div style={{ padding: '14px 20px 0', background: '#ffffff', borderTop: '1px solid rgba(15,23,42,0.07)' }}>
+            <div style={{ padding: '14px 20px 0', background: '#ffffff', borderTop: `1px solid ${INK_TINT_07}` }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '10px' }}>
                 <span style={{ fontSize: '9px', fontWeight: 800, color: '#64748B', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>Field Statistics</span>
               </div>
             </div>
-            <div style={{ background: '#ffffff', borderTop: '0.5px solid rgba(15,23,42,0.07)', borderBottom: '1px solid rgba(15,23,42,0.07)', padding: '12px 20px 16px' }}>
+            <div style={{ background: '#ffffff', borderTop: `0.5px solid ${INK_TINT_07}`, borderBottom: `1px solid ${INK_TINT_07}`, padding: '12px 20px 16px' }}>
               <div style={{ display: 'flex', height: '6px', borderRadius: '3px', overflow: 'hidden', marginBottom: '10px' }}>
                 {segments.filter(s => s.count > 0).map((seg, i) => (
                   <div key={i} style={{ width: `${(seg.count / total) * 100}%`, background: seg.color }} />
@@ -240,20 +241,20 @@ export function SummaryTab({
       {/* Final Top 10 */}
       {isCompleted && top10.length > 0 && (
         <motion.div style={{ marginTop: '8px' }} {...sectionEntrance}>
-          <div style={{ padding: '14px 20px 0', background: '#ffffff', borderTop: '1px solid rgba(15,23,42,0.07)' }}>
+          <div style={{ padding: '14px 20px 0', background: '#ffffff', borderTop: `1px solid ${INK_TINT_07}` }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '10px' }}>
               <span style={{ fontSize: '9px', fontWeight: 800, color: '#64748B', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>Top Finishers</span>
             </div>
           </div>
 
           {/* Column headers */}
-          <div style={{ display: 'flex', alignItems: 'center', padding: '5px 20px', background: 'rgba(15,23,42,0.02)', borderTop: '0.5px solid rgba(15,23,42,0.07)', borderBottom: '0.5px solid rgba(15,23,42,0.07)' }}>
+          <div style={{ display: 'flex', alignItems: 'center', padding: '5px 20px', background: 'rgba(15,23,42,0.02)', borderTop: `0.5px solid ${INK_TINT_07}`, borderBottom: `0.5px solid ${INK_TINT_07}` }}>
             <span style={{ width: '36px', fontSize: '9px', fontWeight: 800, color: '#64748B', letterSpacing: '0.14em', flexShrink: 0 }}>POS</span>
             <span style={{ flex: 1, fontSize: '9px', fontWeight: 800, color: '#64748B', letterSpacing: '0.14em' }}>PLAYER</span>
             <span style={{ width: '44px', textAlign: 'right' as const, fontSize: '9px', fontWeight: 800, color: '#64748B', letterSpacing: '0.14em', flexShrink: 0 }}>SCORE</span>
           </div>
 
-          <div style={{ background: '#ffffff', borderBottom: '1px solid rgba(15,23,42,0.07)' }}>
+          <div style={{ background: '#ffffff', borderBottom: `1px solid ${INK_TINT_07}` }}>
             {top10.map((entry: any, idx: number) => {
               const isWinner = entry.position === 1;
               const scoreToPar = entry.score !== null ? (entry.score === 0 ? 'E' : entry.score < 0 ? String(entry.score) : `+${entry.score}`) : '—';
@@ -271,7 +272,7 @@ export function SummaryTab({
                     style={{
                       display: 'flex', alignItems: 'center',
                       padding: '10px 20px',
-                      borderBottom: '0.5px solid rgba(15,23,42,0.07)',
+                      borderBottom: `0.5px solid ${INK_TINT_07}`,
                       borderLeft: isWinner ? '3px solid #F7931E' : '3px solid transparent',
                       background: isWinner ? 'rgba(247,147,30,0.025)' : 'transparent',
                       textDecoration: 'none',
@@ -303,7 +304,7 @@ export function SummaryTab({
         const latestRound = scoringStats.rounds[scoringStats.rounds.length - 1];
         return (
           <motion.div style={{ marginTop: '8px' }} {...sectionEntrance}>
-            <div style={{ background: '#ffffff', borderTop: '1px solid rgba(15,23,42,0.07)', borderBottom: '1px solid rgba(15,23,42,0.07)' }}>
+            <div style={{ background: '#ffffff', borderTop: `1px solid ${INK_TINT_07}`, borderBottom: `1px solid ${INK_TINT_07}` }}>
               <div style={{ padding: '14px 20px 0' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '10px' }}>
                   <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#22C55E', display: 'inline-block', flexShrink: 0 }} />

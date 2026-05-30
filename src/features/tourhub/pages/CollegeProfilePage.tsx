@@ -24,6 +24,7 @@ import {
   captainShortName,
 } from '../utils/captainAnchor';
 import { collegeHubRoute } from '../routes';
+import { INK_TINT_06, INK_TINT_07 } from '../_shared/tokens';
 
 /* ─── Hero subtitle: cross-tour roll-up ────────────────────────────────── */
 
@@ -293,14 +294,14 @@ export function CollegeProfilePage() {
         {/* Loading skeleton — light surface */}
         {isLoading && (
           <div>
-            <Skeleton style={{ height: 12, width: 120, marginBottom: 8, background: 'rgba(15,23,42,0.06)' }} />
-            <Skeleton style={{ height: 22, width: '50%', marginBottom: 6, background: 'rgba(15,23,42,0.06)' }} />
-            <Skeleton style={{ height: 14, width: '70%', marginBottom: 16, background: 'rgba(15,23,42,0.06)' }} />
+            <Skeleton style={{ height: 12, width: 120, marginBottom: 8, background: INK_TINT_06 }} />
+            <Skeleton style={{ height: 22, width: '50%', marginBottom: 6, background: INK_TINT_06 }} />
+            <Skeleton style={{ height: 14, width: '70%', marginBottom: 16, background: INK_TINT_06 }} />
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 14 }}>
               <Skeleton style={{ width: 80, height: 80, borderRadius: 27, background: 'rgba(255,184,0,0.10)' }} />
               <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 6 }}>
-                <Skeleton style={{ height: 22, width: 90, background: 'rgba(15,23,42,0.06)' }} />
-                <Skeleton style={{ height: 10, width: 60, background: 'rgba(15,23,42,0.06)' }} />
+                <Skeleton style={{ height: 22, width: 90, background: INK_TINT_06 }} />
+                <Skeleton style={{ height: 10, width: 60, background: INK_TINT_06 }} />
               </div>
             </div>
           </div>
@@ -317,7 +318,7 @@ export function CollegeProfilePage() {
 
         {/* Alumni on Tour header */}
         {stats && (
-          <div style={{ background: '#fff', borderTop: '1px solid rgba(15,23,42,0.07)', borderBottom: '1px solid rgba(15,23,42,0.07)', marginTop: 16, padding: '14px 16px 10px' }}>
+          <div style={{ background: '#fff', borderTop: `1px solid ${INK_TINT_07}`, borderBottom: `1px solid ${INK_TINT_07}`, marginTop: 16, padding: '14px 16px 10px' }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, marginBottom: 4 }}>
               <span style={{ fontSize: 9, fontWeight: 800, color: '#64748B', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>
                 Alumni on Tour

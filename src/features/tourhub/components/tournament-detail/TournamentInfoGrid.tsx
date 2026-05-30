@@ -6,6 +6,7 @@ import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { format, isSameMonth } from 'date-fns';
 import type { TourTournament } from '../../hooks/useTourHubData';
+import { INK_TINT_07 } from '../../_shared/tokens';
 
 interface TournamentInfoGridProps {
   tournament: TourTournament;
@@ -64,7 +65,7 @@ export function TournamentInfoGrid({ tournament, fieldSize }: TournamentInfoGrid
   
   return (
     <motion.div
-      style={{ background: '#ffffff', borderTop: '1px solid rgba(15,23,42,0.07)', borderBottom: '1px solid rgba(15,23,42,0.07)', marginTop: '8px' }}
+      style={{ background: '#ffffff', borderTop: `1px solid ${INK_TINT_07}`, borderBottom: `1px solid ${INK_TINT_07}`, marginTop: '8px' }}
       initial={{ opacity: 0, y: 20 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: '-40px' }}
@@ -83,7 +84,7 @@ export function TournamentInfoGrid({ tournament, fieldSize }: TournamentInfoGrid
       </div>
 
       {items.map((item) => (
-        <div key={item.label} style={{ display: 'flex', alignItems: 'center', padding: '10px 16px', borderTop: '0.5px solid rgba(15,23,42,0.07)' }}>
+        <div key={item.label} style={{ display: 'flex', alignItems: 'center', padding: '10px 16px', borderTop: `0.5px solid ${INK_TINT_07}` }}>
           <span style={{ fontSize: 9, fontWeight: 800, color: '#94A3B8', letterSpacing: '0.14em', textTransform: 'uppercase' as const, width: '88px', flexShrink: 0 }}>{item.label}</span>
           {item.link ? (
             <Link to={item.link} style={{ fontSize: 14, fontWeight: 700, color: '#F7931E', textDecoration: 'none', flex: 1 }}>

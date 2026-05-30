@@ -22,6 +22,7 @@ import { LeadersCategorySheet } from '../leaders/LeadersCategorySheet';
 import { LeadersMasthead } from '../leaders/LeadersMasthead';
 import { PlayerCardV2 } from '../players/PlayerCardV2';
 import { LeadersEmptyState } from '../leaders/LeadersEmptyState';
+import { INK_TINT_06, INK_TINT_07 } from '../../_shared/tokens';
 
 interface RankedItem {
   player: {
@@ -235,11 +236,11 @@ export function LeadersTab() {
         {/* Masthead skeleton */}
         <div style={{ background: '#F8FAFC', padding: '16px 16px 14px' }}>
           {/* Eyebrow line (10.5px / 700) */}
-          <Skeleton className="h-3 w-24 mb-2" style={{ background: 'rgba(15,23,42,0.06)' }} />
+          <Skeleton className="h-3 w-24 mb-2" style={{ background: INK_TINT_06 }} />
           {/* h1 (18px / 800) */}
-          <Skeleton className="h-5 w-40 mb-2" style={{ background: 'rgba(15,23,42,0.06)' }} />
+          <Skeleton className="h-5 w-40 mb-2" style={{ background: INK_TINT_06 }} />
           {/* Subhead (13px) */}
-          <Skeleton className="h-3 w-56 mb-3" style={{ background: 'rgba(15,23,42,0.06)' }} />
+          <Skeleton className="h-3 w-56 mb-3" style={{ background: INK_TINT_06 }} />
           {/* Leader card */}
           <Skeleton className="h-28 w-full rounded-[14px]" style={{ background: 'rgba(255,184,0,0.10)' }} />
         </div>
@@ -248,9 +249,9 @@ export function LeadersTab() {
           <Skeleton className="h-8 w-full rounded-lg" />
         </div>
         {/* Row skeletons */}
-        <div style={{ background: '#ffffff', borderTop: '1px solid rgba(15,23,42,0.07)' }}>
+        <div style={{ background: '#ffffff', borderTop: `1px solid ${INK_TINT_07}` }}>
           {Array.from({ length: 8 }).map((_, i) => (
-            <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '12px 16px', borderBottom: '0.5px solid rgba(15,23,42,0.07)' }}>
+            <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '12px 16px', borderBottom: `0.5px solid ${INK_TINT_07}` }}>
               <Skeleton className="h-5 w-8" />
               <Skeleton className="h-8 w-8 rounded-lg" />
               <Skeleton className="h-4 flex-1" />
@@ -326,7 +327,7 @@ export function LeadersTab() {
                 onClick={() => { setSearch(''); setSearchExpanded(false); }}
                 aria-label="Close search"
                 className="absolute right-2 top-1/2 -translate-y-1/2 p-1 rounded-full active:scale-90"
-                style={{ background: 'rgba(15,23,42,0.06)' }}
+                style={{ background: INK_TINT_06 }}
               >
                 <X className="w-3 h-3" style={{ color: '#0F172A' }} strokeWidth={2.5} />
               </button>
@@ -338,7 +339,7 @@ export function LeadersTab() {
       {/* Content area */}
       <div style={{ paddingBottom: 'calc(var(--sab, env(safe-area-inset-bottom, 0px)) + 80px)' }}>
         {/* Rankings list — white surface (column header removed Phase 1 fix.1.3) */}
-        <div style={{ background: '#ffffff', borderTop: '1px solid rgba(15,23,42,0.07)', marginTop: '8px' }}>
+        <div style={{ background: '#ffffff', borderTop: `1px solid ${INK_TINT_07}`, marginTop: '8px' }}>
           <AnimatePresence mode="wait">
             <motion.div
               key={category.key}
@@ -388,7 +389,7 @@ export function LeadersTab() {
                     );
                   })}
                   {/* Footer */}
-                  <div style={{ padding: '12px 16px', textAlign: 'center', borderTop: '0.5px solid rgba(15,23,42,0.07)' }}>
+                  <div style={{ padding: '12px 16px', textAlign: 'center', borderTop: `0.5px solid ${INK_TINT_07}` }}>
                     <span style={{ fontSize: 9, fontWeight: 800, color: '#94A3B8', letterSpacing: '0.14em', textTransform: 'uppercase' as const }}>
                       SEASON LEADERS · AVAILABLE TOURNAMENT DATA
                     </span>

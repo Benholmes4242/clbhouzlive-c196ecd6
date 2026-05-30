@@ -35,6 +35,7 @@ import {
 } from '../schedule';
 
 import { useLiveRightNow } from '../../hooks/useOverviewModules';
+import { INK_TINT_07 } from '../../_shared/tokens';
 
 // B45 FIX 1: Helper for completed status check
 const isCompleted = (t: TourTournament) => t.status === 'closed' || t.status === 'complete';
@@ -483,7 +484,7 @@ export function ScheduleTab() {
                           <ThisWeekAnchor ref={thisWeekAnchorRef} label={currentWeek.label} />
                         )}
                         <InViewCard>
-                          <div style={{ borderBottom: idx < group.tournaments.length - 1 ? '0.5px solid rgba(15,23,42,0.07)' : 'none' }}>
+                          <div style={{ borderBottom: idx < group.tournaments.length - 1 ? `0.5px solid ${INK_TINT_07}` : 'none' }}>
                             <ScheduleTournamentCard
                               tournament={tournament}
                               leaderWinner={leadersWinnersMap?.get(tournament.id)}

@@ -6,7 +6,7 @@
  */
 
 import React, { useState } from 'react';
-import { INK_SOFT } from '../../_shared/tokens';
+import { INK_SOFT, INK_TINT_07 } from '../../_shared/tokens';
 import { motion } from 'framer-motion';
 import { getPlayerHeadshotUrl, PLAYER_SILHOUETTE_URL } from '@/utils/playerHeadshot';
 
@@ -66,7 +66,7 @@ export const PredictionScorecardRow: React.FC<PredictionScorecardRowProps> = ({
       }}
       style={{
         opacity: isWD ? 0.5 : isCut ? 0.6 : 1,
-        borderBottom: isLast ? 'none' : '0.5px solid rgba(15,23,42,0.07)',
+        borderBottom: isLast ? 'none' : `0.5px solid ${INK_TINT_07}`,
         borderLeft: (!isCompleted && isLeader) ? '3px solid #F7931E' : '3px solid transparent',
         background: (!isCompleted && isLeader) ? 'rgba(247,147,30,0.03)' : 'transparent',
         transition: 'background-color 100ms ease',
@@ -138,7 +138,7 @@ export const PredictionScorecardRow: React.FC<PredictionScorecardRowProps> = ({
               width: 40,
               height: 42,
               borderRadius: '34%',
-              border: '2px solid rgba(15,23,42,0.07)',
+              border: `2px solid ${INK_TINT_07}`,
             }}
           >
             {avatarUrl ? (

@@ -14,6 +14,7 @@ import { useDebouncedValue } from '@/hooks/useDebouncedValue';
 import { getCollegeLogoUrl } from '@/utils/collegeLogo';
 import { formatCurrency } from '@/lib/utils/formatCurrency';
 import { PlayerInitialAvatar } from '../components/shared/PlayerInitialAvatar';
+import { INK_TINT_06, INK_TINT_07 } from '../_shared/tokens';
 
 /**
  * Convert "northwestern" or "wake-forest" → "Northwestern" / "Wake Forest"
@@ -169,7 +170,7 @@ export function CollegeComparePage() {
                   height: 10,
                   width: 180,
                   borderRadius: 4,
-                  background: 'rgba(15,23,42,0.06)',
+                  background: INK_TINT_06,
                 }}
               />
             </div>
@@ -213,7 +214,7 @@ export function CollegeComparePage() {
                     style={{
                       position: 'absolute' as const, right: 10, top: '50%', transform: 'translateY(-50%)',
                       width: 28, height: 28, borderRadius: '50%',
-                      background: 'rgba(15,23,42,0.06)', border: 'none',
+                      background: INK_TINT_06, border: 'none',
                       display: 'flex', alignItems: 'center', justifyContent: 'center',
                       cursor: 'pointer',
                     }}
@@ -288,12 +289,12 @@ export function CollegeComparePage() {
             </div>
           ) : isLoading ? (
             <div style={{ marginTop: '8px' }}>
-              <div style={{ background: '#fff', borderTop: '1px solid rgba(15,23,42,0.07)', borderBottom: '1px solid rgba(15,23,42,0.07)', marginTop: '8px' }}>
+              <div style={{ background: '#fff', borderTop: `1px solid ${INK_TINT_07}`, borderBottom: `1px solid ${INK_TINT_07}`, marginTop: '8px' }}>
                 {Array.from({ length: 6 }).map((_, i) => (
-                  <div key={i} className="animate-pulse" style={{ display: 'flex', alignItems: 'center', padding: '10px 20px', borderBottom: '0.5px solid rgba(15,23,42,0.07)', height: '48px' }}>
-                    <div style={{ flex: 1, height: '13px', borderRadius: '4px', background: 'rgba(15,23,42,0.06)' }} />
-                    <div style={{ width: '80px', height: '3px', borderRadius: '2px', background: 'rgba(15,23,42,0.06)', margin: '0 8px' }} />
-                    <div style={{ flex: 1, height: '13px', borderRadius: '4px', background: 'rgba(15,23,42,0.06)' }} />
+                  <div key={i} className="animate-pulse" style={{ display: 'flex', alignItems: 'center', padding: '10px 20px', borderBottom: `0.5px solid ${INK_TINT_07}`, height: '48px' }}>
+                    <div style={{ flex: 1, height: '13px', borderRadius: '4px', background: INK_TINT_06 }} />
+                    <div style={{ width: '80px', height: '3px', borderRadius: '2px', background: INK_TINT_06, margin: '0 8px' }} />
+                    <div style={{ flex: 1, height: '13px', borderRadius: '4px', background: INK_TINT_06 }} />
                   </div>
                 ))}
               </div>

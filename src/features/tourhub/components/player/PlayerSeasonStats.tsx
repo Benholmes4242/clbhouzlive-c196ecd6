@@ -5,6 +5,7 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import type { TourPlayerStatistics } from '../../hooks/useTourHubData';
+import { INK_TINT_07 } from '../../_shared/tokens';
 
 const STAT_TABS = ['Overview', 'Ball Striking', 'Short Game', 'Shots Gained'] as const;
 type StatTab = (typeof STAT_TABS)[number];
@@ -53,7 +54,7 @@ function StatRow({ label, value, trend, barPercent, barIndex = 0 }: StatRowProps
   const unitSuffix = unitMatch ? unitMatch[2] : null;
 
   return (
-    <div style={{ display: 'flex', alignItems: 'center', padding: '11px 0', borderBottom: '0.5px solid rgba(15,23,42,0.07)' }}>
+    <div style={{ display: 'flex', alignItems: 'center', padding: '11px 0', borderBottom: `0.5px solid ${INK_TINT_07}` }}>
       <span style={{ flex: 1, fontSize: '13px', fontWeight: 500, color: '#0F172A' }}>{label}</span>
       <div style={{ textAlign: 'right' as const }}>
         <span style={{
@@ -97,7 +98,7 @@ function SGBar({ label, value }: SGBarProps) {
   const formatted = value === 0 ? '0.00' : value > 0 ? `+${value.toFixed(2)}` : value.toFixed(2);
 
   return (
-    <div style={{ padding: '11px 0', borderBottom: '0.5px solid rgba(15,23,42,0.07)' }}>
+    <div style={{ padding: '11px 0', borderBottom: `0.5px solid ${INK_TINT_07}` }}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '6px' }}>
         <span style={{ fontSize: '13px', fontWeight: 500, color: '#0F172A' }}>{label}</span>
         <span style={{ fontSize: '13px', fontWeight: 900, fontVariantNumeric: 'tabular-nums', color: isPositive ? '#F7931E' : '#94A3B8' }}>
@@ -148,7 +149,7 @@ export function PlayerSeasonStats({ playerStats }: PlayerSeasonStatsProps) {
     ? (playerStats.top_25s / playerStats.events_played) * 100 : undefined;
 
   return (
-    <div style={{ background: '#ffffff', borderBottom: '1px solid rgba(15,23,42,0.07)' }}>
+    <div style={{ background: '#ffffff', borderBottom: `1px solid ${INK_TINT_07}` }}>
       {/* Dispatch section header */}
       <div style={{ padding: '14px 16px 0' }}>
         <div style={{ marginBottom: '12px' }}>

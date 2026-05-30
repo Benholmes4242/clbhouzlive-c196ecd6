@@ -14,6 +14,7 @@ import { useCollegeMediaMap } from '../../hooks/useCollegeMedia';
 import { useFollowedColleges, useFollowCollegeMutations } from '../../hooks/useCollegeMovers';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useCollegeMediaSearch } from '@/hooks/useCollegeMediaSearch';
+import { INK_TINT_07 } from '../../_shared/tokens';
 
 interface PickFranchiseSheetProps {
   open: boolean;
@@ -81,7 +82,7 @@ function CollegeRow({
   isFollowed: boolean;
 }) {
   return (
-    <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '11px 20px', borderBottom: '0.5px solid rgba(15,23,42,0.07)' }}>
+    <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '11px 20px', borderBottom: `0.5px solid ${INK_TINT_07}` }}>
       {/* Logo chip */}
       <div style={{ width: 30, height: 30, borderRadius: 8, overflow: 'hidden', background: 'rgba(15,23,42,0.05)', border: '1px solid rgba(15,23,42,0.08)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
         {logoUrl
@@ -144,7 +145,7 @@ export function PickFranchiseSheet({ open, onOpenChange }: PickFranchiseSheetPro
         />
 
         {/* Search input */}
-        <div style={{ margin: '12px 16px 10px', display: 'flex', alignItems: 'center', gap: 8, background: 'rgba(15,23,42,0.04)', borderRadius: 10, padding: '0 12px', height: 40, border: '0.5px solid rgba(15,23,42,0.07)' }}>
+        <div style={{ margin: '12px 16px 10px', display: 'flex', alignItems: 'center', gap: 8, background: 'rgba(15,23,42,0.04)', borderRadius: 10, padding: '0 12px', height: 40, border: `0.5px solid ${INK_TINT_07}` }}>
           <Search className="w-4 h-4" style={{ color: '#94A3B8', flexShrink: 0 }} />
           <input
             type="text"
@@ -206,7 +207,7 @@ export function PickFranchiseSheet({ open, onOpenChange }: PickFranchiseSheetPro
         {/* View All link */}
         <button
           onClick={() => { onOpenChange(false); navigate('/tourhub/college-golf'); }}
-          style={{ width: '100%', padding: '14px 0', background: 'transparent', border: 'none', borderTop: '0.5px solid rgba(15,23,42,0.07)', fontSize: 12, fontWeight: 700, color: '#F7931E', cursor: 'pointer', marginTop: 4 }}
+          style={{ width: '100%', padding: '14px 0', background: 'transparent', border: 'none', borderTop: `0.5px solid ${INK_TINT_07}`, fontSize: 12, fontWeight: 700, color: '#F7931E', cursor: 'pointer', marginTop: 4 }}
         >
           View All Franchises →
         </button>

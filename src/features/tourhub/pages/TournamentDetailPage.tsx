@@ -32,6 +32,7 @@ import {
   type TournamentTab,
 } from '../components/tournament-detail';
 import { TournamentEmptyState } from '../components/tournament-detail/TournamentEmptyState';
+import { INK_TINT_06, INK_TINT_07 } from '../_shared/tokens';
 
 const VALID_TABS: TournamentTab[] = ['overview', 'leaderboard', 'summary', 'tee-times', 'hole-stats'];
 
@@ -135,17 +136,17 @@ export function TournamentDetailPage() {
         {/* Tab bar skeleton */}
         <div style={{ background: 'rgba(248,250,252,0.97)', padding: '10px 16px 8px', display: 'flex', gap: '8px' }} className="animate-pulse">
           {['Overview','Leaderboard','Tee Times','Holes'].map(tab => (
-            <div key={tab} style={{ height: '11px', width: `${tab.length * 7}px`, background: 'rgba(15,23,42,0.06)', borderRadius: '4px' }} />
+            <div key={tab} style={{ height: '11px', width: `${tab.length * 7}px`, background: INK_TINT_06, borderRadius: '4px' }} />
           ))}
         </div>
         {/* Content row skeletons */}
-        <div style={{ background: '#ffffff', borderTop: '1px solid rgba(15,23,42,0.07)', borderBottom: '1px solid rgba(15,23,42,0.07)', marginTop: '8px' }}>
+        <div style={{ background: '#ffffff', borderTop: `1px solid ${INK_TINT_07}`, borderBottom: `1px solid ${INK_TINT_07}`, marginTop: '8px' }}>
           {Array.from({ length: 5 }).map((_, i) => (
-            <div key={i} className="animate-pulse" style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '11px 20px', borderBottom: i < 4 ? '0.5px solid rgba(15,23,42,0.07)' : 'none' }}>
-              <div style={{ width: '36px', height: '13px', background: 'rgba(15,23,42,0.06)', borderRadius: '4px' }} />
-              <div style={{ width: '28px', height: '28px', borderRadius: '34%', background: 'rgba(15,23,42,0.06)' }} />
-              <div style={{ flex: 1, height: '13px', background: 'rgba(15,23,42,0.06)', borderRadius: '4px' }} />
-              <div style={{ width: '44px', height: '13px', background: 'rgba(15,23,42,0.06)', borderRadius: '4px' }} />
+            <div key={i} className="animate-pulse" style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '11px 20px', borderBottom: i < 4 ? `0.5px solid ${INK_TINT_07}` : 'none' }}>
+              <div style={{ width: '36px', height: '13px', background: INK_TINT_06, borderRadius: '4px' }} />
+              <div style={{ width: '28px', height: '28px', borderRadius: '34%', background: INK_TINT_06 }} />
+              <div style={{ flex: 1, height: '13px', background: INK_TINT_06, borderRadius: '4px' }} />
+              <div style={{ width: '44px', height: '13px', background: INK_TINT_06, borderRadius: '4px' }} />
             </div>
           ))}
         </div>

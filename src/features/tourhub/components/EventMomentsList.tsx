@@ -6,6 +6,7 @@ import { Link } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { useEventMoments, MOMENT_TYPE_CONFIG, type MomentType } from '../hooks/useEventMoments';
 import { PlayerAvatar } from './PlayerAvatar';
+import { INK_TINT_06, INK_TINT_07 } from '../_shared/tokens';
 
 interface EventMomentsListProps {
   tournamentId: string;
@@ -18,15 +19,15 @@ export function EventMomentsList({ tournamentId, className, limit }: EventMoment
   
   if (isLoading) {
     return (
-      <div className={cn("", className)} style={{ background: '#ffffff', borderTop: '1px solid rgba(15,23,42,0.07)', borderBottom: '1px solid rgba(15,23,42,0.07)', marginTop: '8px' }}>
+      <div className={cn("", className)} style={{ background: '#ffffff', borderTop: `1px solid ${INK_TINT_07}`, borderBottom: `1px solid ${INK_TINT_07}`, marginTop: '8px' }}>
         <div className="animate-pulse" style={{ padding: '14px 20px 0' }}>
-          <div style={{ height: '9px', width: '100px', background: 'rgba(15,23,42,0.06)', borderRadius: '4px', marginBottom: '10px' }} />
+          <div style={{ height: '9px', width: '100px', background: INK_TINT_06, borderRadius: '4px', marginBottom: '10px' }} />
         </div>
         {[1, 2, 3].map(i => (
-          <div key={i} className="animate-pulse" style={{ display: 'flex', alignItems: 'flex-start', gap: '10px', padding: '11px 20px', borderBottom: i < 3 ? '0.5px solid rgba(15,23,42,0.07)' : 'none' }}>
-            <div style={{ width: '28px', height: '28px', borderRadius: '8px', background: 'rgba(15,23,42,0.06)', flexShrink: 0 }} />
+          <div key={i} className="animate-pulse" style={{ display: 'flex', alignItems: 'flex-start', gap: '10px', padding: '11px 20px', borderBottom: i < 3 ? `0.5px solid ${INK_TINT_07}` : 'none' }}>
+            <div style={{ width: '28px', height: '28px', borderRadius: '8px', background: INK_TINT_06, flexShrink: 0 }} />
             <div style={{ flex: 1 }}>
-              <div style={{ height: '12px', width: '120px', background: 'rgba(15,23,42,0.06)', borderRadius: '4px', marginBottom: '5px' }} />
+              <div style={{ height: '12px', width: '120px', background: INK_TINT_06, borderRadius: '4px', marginBottom: '5px' }} />
               <div style={{ height: '10px', width: '180px', background: 'rgba(15,23,42,0.05)', borderRadius: '4px' }} />
             </div>
           </div>
@@ -53,7 +54,7 @@ export function EventMomentsList({ tournamentId, className, limit }: EventMoment
         </div>
       </div>
 
-      <div style={{ background: '#ffffff', borderTop: '1px solid rgba(15,23,42,0.07)', borderBottom: '1px solid rgba(15,23,42,0.07)' }}>
+      <div style={{ background: '#ffffff', borderTop: `1px solid ${INK_TINT_07}`, borderBottom: `1px solid ${INK_TINT_07}` }}>
         {displayMoments.map((moment, index) => {
           const config = MOMENT_TYPE_CONFIG[moment.moment_type as MomentType] || MOMENT_TYPE_CONFIG.highlight;
           const isLast = index === displayMoments.length - 1;
@@ -64,7 +65,7 @@ export function EventMomentsList({ tournamentId, className, limit }: EventMoment
               style={{
                 display: 'flex', alignItems: 'flex-start', gap: '10px',
                 padding: '11px 20px',
-                borderBottom: isLast ? 'none' : '0.5px solid rgba(15,23,42,0.07)',
+                borderBottom: isLast ? 'none' : `0.5px solid ${INK_TINT_07}`,
               }}
             >
               {/* Type icon — small rounded square */}

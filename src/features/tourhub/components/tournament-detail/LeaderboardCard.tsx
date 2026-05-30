@@ -8,6 +8,7 @@ import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { BatchPlayerAvatar } from '../PlayerAvatar';
 import { playerRoute } from '../../routes';
+import { INK_TINT_07 } from '../../_shared/tokens';
 
 interface LeaderboardEntry {
   id: string;
@@ -101,7 +102,7 @@ export function LeaderboardCard({
       )}
 
       {/* Column headers */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '4px', padding: '5px 20px', background: 'rgba(15,23,42,0.02)', borderTop: '0.5px solid rgba(15,23,42,0.07)', borderBottom: '0.5px solid rgba(15,23,42,0.07)' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '4px', padding: '5px 20px', background: 'rgba(15,23,42,0.02)', borderTop: `0.5px solid ${INK_TINT_07}`, borderBottom: `0.5px solid ${INK_TINT_07}` }}>
         <span style={{ width: '36px', fontSize: '9px', fontWeight: 800, color: '#64748B', letterSpacing: '0.14em', flexShrink: 0 }}>POS</span>
         <span style={{ flex: 1, fontSize: '9px', fontWeight: 800, color: '#64748B', letterSpacing: '0.14em' }}>PLAYER</span>
         <span style={{ width: '36px', textAlign: 'center' as const, fontSize: '9px', fontWeight: 800, color: '#64748B', letterSpacing: '0.14em', flexShrink: 0 }}>THRU</span>
@@ -109,7 +110,7 @@ export function LeaderboardCard({
       </div>
 
       {/* Rows */}
-      <div style={{ background: '#ffffff', borderBottom: '1px solid rgba(15,23,42,0.07)' }}>
+      <div style={{ background: '#ffffff', borderBottom: `1px solid ${INK_TINT_07}` }}>
         {displayEntries.map((entry, index) => {
           const isMissedCut = entry.status === 'MC' || entry.status === 'CUT';
 
@@ -125,7 +126,7 @@ export function LeaderboardCard({
                 style={{
                   display: 'flex', alignItems: 'center', gap: '4px',
                   padding: '10px 20px',
-                  borderBottom: '0.5px solid rgba(15,23,42,0.07)',
+                  borderBottom: `0.5px solid ${INK_TINT_07}`,
                   borderLeft: entry.position === 1 ? '3px solid #F7931E' : '3px solid transparent',
                   background: entry.position === 1 ? 'rgba(247,147,30,0.025)' : 'transparent',
                   textDecoration: 'none',
@@ -165,7 +166,7 @@ export function LeaderboardCard({
       {onViewAll && hasMore && (
         <button
           onClick={onViewAll}
-          style={{ width: '100%', padding: '12px 0', fontSize: '11px', fontWeight: 800, color: '#0F172A', background: 'transparent', border: 'none', borderTop: '0.5px solid rgba(15,23,42,0.07)', cursor: 'pointer', letterSpacing: '-0.005em', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 2 }}
+          style={{ width: '100%', padding: '12px 0', fontSize: '11px', fontWeight: 800, color: '#0F172A', background: 'transparent', border: 'none', borderTop: `0.5px solid ${INK_TINT_07}`, cursor: 'pointer', letterSpacing: '-0.005em', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 2 }}
           className="active:opacity-70 transition-opacity"
         >
           Full Leaderboard

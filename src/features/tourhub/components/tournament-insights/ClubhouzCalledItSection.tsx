@@ -5,6 +5,7 @@
 
 import React from 'react';
 import type { TrackedPrediction } from './types';
+import { INK_TINT_07 } from '../../_shared/tokens';
 
 // ─── Props ───────────────────────────────────────────────────────────────────
 
@@ -66,12 +67,12 @@ export const ClubhouzCalledItSection: React.FC<ClubhouzCalledItSectionProps> = (
     <div>
 
       {/* Best pick highlight — white ruled block */}
-      <div style={{ background: '#ffffff', borderTop: '1px solid rgba(15,23,42,0.07)', borderBottom: '1px solid rgba(15,23,42,0.07)' }}>
+      <div style={{ background: '#ffffff', borderTop: `1px solid ${INK_TINT_07}`, borderBottom: `1px solid ${INK_TINT_07}` }}>
         <div style={{
           padding: '14px 16px',
           borderLeft: '3px solid #F7931E',
           background: 'rgba(247,147,30,0.03)',
-          borderBottom: '0.5px solid rgba(15,23,42,0.07)',
+          borderBottom: `0.5px solid ${INK_TINT_07}`,
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8 }}>
             {isWinner && (
@@ -111,7 +112,7 @@ export const ClubhouzCalledItSection: React.FC<ClubhouzCalledItSectionProps> = (
         </div>
 
         {/* All picks table */}
-        <div style={{ padding: '20px 16px 8px', borderBottom: '0.5px solid rgba(15,23,42,0.07)', background: 'rgba(15,23,42,0.02)' }}>
+        <div style={{ padding: '20px 16px 8px', borderBottom: `0.5px solid ${INK_TINT_07}`, background: 'rgba(15,23,42,0.02)' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
             <div style={{ width: 3, height: 12, background: '#0F172A', borderRadius: 1 }} />
             <span style={{ fontSize: 9, fontWeight: 900, color: '#0F172A', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>
@@ -129,7 +130,7 @@ export const ClubhouzCalledItSection: React.FC<ClubhouzCalledItSectionProps> = (
               key={pick.playerId}
               style={{
                 display: 'flex', alignItems: 'center', padding: '11px 16px',
-                borderBottom: idx < sorted.length - 1 ? '0.5px solid rgba(15,23,42,0.07)' : 'none',
+                borderBottom: idx < sorted.length - 1 ? `0.5px solid ${INK_TINT_07}` : 'none',
                 borderLeft: pickIsWinner ? '3px solid #F7931E' : '3px solid transparent',
                 background: pickIsWinner ? 'rgba(247,147,30,0.03)' : 'transparent',
               }}

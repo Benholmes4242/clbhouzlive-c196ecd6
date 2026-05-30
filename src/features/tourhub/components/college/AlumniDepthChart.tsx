@@ -22,7 +22,7 @@
  */
 
 import { useState, useMemo } from 'react';
-import { SLATE_600 } from '../../_shared/tokens';
+import { SLATE_600, INK_TINT_06, INK_TINT_07 } from '../../_shared/tokens';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
@@ -94,7 +94,7 @@ function AlumniRow({ alumnus, index, tier, legacyContextLabel }: AlumniRowProps)
         style={{
           display: 'flex', alignItems: 'center',
           padding: '10px 16px',
-          borderBottom: '0.5px solid rgba(15,23,42,0.07)',
+          borderBottom: `0.5px solid ${INK_TINT_07}`,
           borderLeft: `3px solid ${TIER_COLORS[tier]}`,
           textDecoration: 'none',
         }}
@@ -192,7 +192,7 @@ function Section({ tier, alumni, defaultExpanded = true, legacyMap }: SectionPro
           width: '100%', display: 'flex', alignItems: 'baseline', gap: 10,
           padding: '12px 16px 8px', background: 'none', border: 'none', cursor: 'pointer',
           textAlign: 'left' as const,
-          borderTop: '0.5px solid rgba(15,23,42,0.07)',
+          borderTop: `0.5px solid ${INK_TINT_07}`,
         }}
       >
         <div style={{ width: 3, height: 12, background: tierColor, borderRadius: 1, flexShrink: 0, alignSelf: 'center' }} />
@@ -224,7 +224,7 @@ function Section({ tier, alumni, defaultExpanded = true, legacyMap }: SectionPro
               style={{
                 width: '100%', padding: '10px 0', fontSize: 12, fontWeight: 700,
                 color: '#0F172A', background: 'transparent', border: 'none',
-                borderTop: '0.5px solid rgba(15,23,42,0.07)', cursor: 'pointer',
+                borderTop: `0.5px solid ${INK_TINT_07}`, cursor: 'pointer',
               }}
             >
               {isExpanded ? `View all ${alumni.length} ▾` : 'Show less ▴'}
@@ -289,10 +289,10 @@ export function AlumniDepthChart({ normalizedName, className }: AlumniDepthChart
     return (
       <div className={cn('', className)}>
         {Array.from({ length: 5 }).map((_, i) => (
-          <div key={i} className="animate-pulse" style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 16px', borderBottom: '0.5px solid rgba(15,23,42,0.07)' }}>
-            <div style={{ width: 32, height: 32, borderRadius: 11, background: 'rgba(15,23,42,0.06)', flexShrink: 0 }} />
-            <div style={{ flex: 1, height: 13, borderRadius: 4, background: 'rgba(15,23,42,0.06)' }} />
-            <div style={{ width: 56, height: 12, borderRadius: 4, background: 'rgba(15,23,42,0.06)' }} />
+          <div key={i} className="animate-pulse" style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 16px', borderBottom: `0.5px solid ${INK_TINT_07}` }}>
+            <div style={{ width: 32, height: 32, borderRadius: 11, background: INK_TINT_06, flexShrink: 0 }} />
+            <div style={{ flex: 1, height: 13, borderRadius: 4, background: INK_TINT_06 }} />
+            <div style={{ width: 56, height: 12, borderRadius: 4, background: INK_TINT_06 }} />
           </div>
         ))}
       </div>
@@ -312,8 +312,8 @@ export function AlumniDepthChart({ normalizedName, className }: AlumniDepthChart
       className={cn('', className)}
       style={{
         background: '#ffffff',
-        borderTop: '0.5px solid rgba(15,23,42,0.07)',
-        borderBottom: '0.5px solid rgba(15,23,42,0.07)',
+        borderTop: `0.5px solid ${INK_TINT_07}`,
+        borderBottom: `0.5px solid ${INK_TINT_07}`,
         marginTop: '8px',
       }}
     >
