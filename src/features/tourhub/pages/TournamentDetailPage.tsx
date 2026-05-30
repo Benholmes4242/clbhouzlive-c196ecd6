@@ -124,7 +124,7 @@ export function TournamentDetailPage() {
           {/* Subhead */}
           <div style={{ height: 13, width: '55%', background: WHITE_ALPHA_10, borderRadius: 4, marginBottom: 16 }} />
           {/* 3-col stat strip */}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', borderTop: '0.5px solid rgba(255,255,255,0.08)' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', borderTop: `0.5px solid ${WHITE_ALPHA_08}` }}>
             {[0, 1, 2].map(i => (
               <div key={i} style={{ padding: '9px 0 11px', textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
                 <div style={{ height: 8, width: 40, background: WHITE_ALPHA_10, borderRadius: 4 }} />
