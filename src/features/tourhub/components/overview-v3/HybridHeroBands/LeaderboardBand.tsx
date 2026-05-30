@@ -35,6 +35,10 @@ export interface LeaderboardBandProps {
   tourSlug?: string;
   /** Pass 3: course par for trajectory sparklines. */
   par?: number;
+  /** Defending champion name for the live-state footer strip. */
+  defendingChampion?: string | null;
+  /** Field size (player count) for the live-state footer strip. */
+  fieldSize?: number;
   onCtaTap?: () => void;
 }
 
