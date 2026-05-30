@@ -243,7 +243,7 @@ export function TiedChasersRow({
         <StackedAvatars players={players} size={22} variant="chaser" />
         <span style={{ fontSize: 14, fontWeight: 700, color: INK, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', minWidth: 0 }}>
           {count} tied at {rank}
-          <span style={{ marginLeft: 4, color: INK_45 }}>›</span>
+          <ChevronRight size={11} strokeWidth={2.5} color={INK_45} style={{ marginLeft: 4, flexShrink: 0 }} />
         </span>
       </div>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-start' }}>
