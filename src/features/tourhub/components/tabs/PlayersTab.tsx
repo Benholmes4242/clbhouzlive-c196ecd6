@@ -913,7 +913,7 @@ export function PlayersTab() {
         {/* Sentinel — triggers auto-load when scrolled into view */}
         {hasMore && (
           <div ref={sentinelRef} style={{ padding: '20px 16px', textAlign: 'center' as const }}>
-            <div style={{ width: 20, height: 20, margin: '0 auto', border: '2px solid rgba(15,23,42,0.12)', borderTopColor: '#F7931E', borderRadius: '50%', animation: 'spin 0.8s linear infinite' }} />
+            <div style={{ width: 20, height: 20, margin: '0 auto', border: '2px solid rgba(15,23,42,0.12)', borderTopColor: AMBER, borderRadius: '50%', animation: 'spin 0.8s linear infinite' }} />
           </div>
         )}
         <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
