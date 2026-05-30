@@ -139,7 +139,7 @@ export function PlayerTournamentHistory({ playerId, playerName }: PlayerTourname
           {hasMore && (
             <button
               onClick={() => setShowAll(prev => !prev)}
-              style={{ width: '100%', padding: '12px 0', fontSize: '12px', fontWeight: 700, color: '#0F172A', background: 'transparent', border: 'none', borderTop: `0.5px solid ${INK_TINT_07}`, cursor: 'pointer' }}
+              style={{ width: '100%', padding: '12px 0', fontSize: '12px', fontWeight: 700, color: INK, background: 'transparent', border: 'none', borderTop: `0.5px solid ${INK_TINT_07}`, cursor: 'pointer' }}
               className="active:opacity-70 transition-opacity"
             >
               {showAll ? 'Show Less' : 'View All Results ›'}
