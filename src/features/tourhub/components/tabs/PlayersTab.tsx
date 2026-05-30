@@ -22,7 +22,23 @@ import { PlayersEmptyState } from '../players/PlayersEmptyState';
 import { getPlayerHeadshotUrl, PLAYER_SILHOUETTE_URL } from '@/utils/playerHeadshot';
 import { titleCaseCountry } from '../../utils/countryFlags';
 import CountryFlag from '@/components/ui/country-flag';
-import { INK_TINT_06, INK_TINT_07 } from '../../_shared/tokens';
+import {
+  AMBER,
+  GOLD,
+  GOLD_DEEP,
+  GOLD_BORDER,
+  GOLD_TINT,
+  GOLD_TINT_10,
+  HAIRLINE_INK_10,
+  INK,
+  INK_FAINT,
+  INK_MUTE,
+  INK_TINT_06,
+  INK_TINT_07,
+  SLATE_50,
+  SLATE_150,
+  SURFACE,
+} from '../../_shared/tokens';
 
 // Inline sort label resolver
 function getSortShortLabel(sort: PlayerSortType, activeTour: string): string {
