@@ -54,11 +54,11 @@ export function FranchiseStoryStrip({ normalizedName, className }: FranchiseStor
   ].filter(Boolean).join(' · ');
 
   return (
-    <div className={className} style={{ background: '#ffffff', borderTop: `1px solid ${INK_TINT_07}`, borderBottom: `1px solid ${INK_TINT_07}`, marginTop: '8px' }}>
+    <div className={className} style={{ background: SURFACE, borderTop: `1px solid ${INK_TINT_07}`, borderBottom: `1px solid ${INK_TINT_07}`, marginTop: '8px' }}>
       {/* Section eyebrow — canonical §6 slate-caps */}
       <div style={{ padding: '12px 16px 0' }}>
         <div style={{ marginBottom: '10px' }}>
-          <span style={{ fontSize: '9px', fontWeight: 800, color: '#64748B', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>
+          <span style={{ fontSize: '9px', fontWeight: 800, color: INK_MUTE, letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>
             Franchise Dispatch
           </span>
         </div>
@@ -68,30 +68,30 @@ export function FranchiseStoryStrip({ normalizedName, className }: FranchiseStor
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr' }}>
         {/* This Week */}
         <div style={{ padding: '10px 16px 14px', borderRight: `0.5px solid ${INK_TINT_07}` }}>
-          <div style={{ fontSize: '9px', fontWeight: 800, color: '#94A3B8', letterSpacing: '0.14em', textTransform: 'uppercase' as const, marginBottom: '6px' }}>
+          <div style={{ fontSize: '9px', fontWeight: 800, color: INK_FAINT, letterSpacing: '0.14em', textTransform: 'uppercase' as const, marginBottom: '6px' }}>
             This Week
           </div>
           {hasWeekActivity ? (
             <>
               {weekEarnings !== 0 && (
-                <div style={{ fontSize: '18px', fontWeight: 900, letterSpacing: '-0.03em', lineHeight: 1, color: weekEarnings > 0 ? '#047857' : '#DC2626', marginBottom: '3px' }}>
+                <div style={{ fontSize: '18px', fontWeight: 900, letterSpacing: '-0.03em', lineHeight: 1, color: weekEarnings > 0 ? LIVE_INK : TREND_DOWN, marginBottom: '3px' }}>
                   {weekEarnings > 0 ? '+' : ''}{formatCurrency(weekEarnings)}
                 </div>
               )}
               {secondaryWeekParts && (
-                <div style={{ fontSize: '10px', color: '#64748B', marginTop: '2px' }}>
+                <div style={{ fontSize: '10px', color: INK_MUTE, marginTop: '2px' }}>
                   {secondaryWeekParts}
                 </div>
               )}
             </>
           ) : (
-            <div style={{ fontSize: '13px', color: '#94A3B8' }}>No activity</div>
+            <div style={{ fontSize: '13px', color: INK_FAINT }}>No activity</div>
           )}
         </div>
 
         {/* Top Performer */}
         <div style={{ padding: '10px 16px 14px' }}>
-          <div style={{ fontSize: '9px', fontWeight: 800, color: '#94A3B8', letterSpacing: '0.14em', textTransform: 'uppercase' as const, marginBottom: '6px' }}>
+          <div style={{ fontSize: '9px', fontWeight: 800, color: INK_FAINT, letterSpacing: '0.14em', textTransform: 'uppercase' as const, marginBottom: '6px' }}>
             {alumni && alumni.length === 1 ? 'Alumni' : 'Top Performer'}
           </div>
           {topAlumnus ? (
@@ -100,15 +100,15 @@ export function FranchiseStoryStrip({ normalizedName, className }: FranchiseStor
               style={{ display: 'block', textDecoration: 'none' }}
               className="active:opacity-70 transition-opacity"
             >
-              <div style={{ fontSize: '14px', fontWeight: 800, color: '#0F172A', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const, marginBottom: '2px' }}>
+              <div style={{ fontSize: '14px', fontWeight: 800, color: INK, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const, marginBottom: '2px' }}>
                 {topAlumnus.first_name} {topAlumnus.last_name}
               </div>
               {topAlumnus.earnings ? (
-                <div style={{ fontSize: '13px', fontWeight: 800, color: '#F7931E', marginBottom: '2px', fontVariantNumeric: 'tabular-nums' }}>
+                <div style={{ fontSize: '13px', fontWeight: 800, color: AMBER, marginBottom: '2px', fontVariantNumeric: 'tabular-nums' }}>
                   {formatCurrency(topAlumnus.earnings)}
                 </div>
               ) : null}
-              <div style={{ fontSize: '11px', color: '#94A3B8' }}>
+              <div style={{ fontSize: '11px', color: INK_FAINT }}>
                 {[
                   (topAlumnus.wins ?? 0) > 0 ? `${topAlumnus.wins} ${topAlumnus.wins === 1 ? 'win' : 'wins'}` : null,
                   topAlumnus.world_ranking && topAlumnus.world_ranking < 500 ? `#${topAlumnus.world_ranking} OWGR` : null,
@@ -116,7 +116,7 @@ export function FranchiseStoryStrip({ normalizedName, className }: FranchiseStor
               </div>
             </Link>
           ) : (
-            <div style={{ fontSize: '13px', color: '#94A3B8' }}>No data</div>
+            <div style={{ fontSize: '13px', color: INK_FAINT }}>No data</div>
           )}
         </div>
       </div>
