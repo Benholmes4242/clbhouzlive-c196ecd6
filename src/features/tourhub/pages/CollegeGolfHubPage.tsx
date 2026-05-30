@@ -180,12 +180,12 @@ export function CollegeGolfHubPage() {
               style={{
                 width: '32px', height: '32px', borderRadius: '8px',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
-                background: searchExpanded ? '#FEF3E7' : '#EDF1F5',
+                background: searchExpanded ? AMBER_SOFT_BG : SLATE_150,
                 border: 'none', cursor: 'pointer',
               }}
               aria-label="Search franchises"
             >
-              <Search className="w-4 h-4" style={{ color: searchExpanded ? '#F7931E' : '#0F172A' }} strokeWidth={2.5} />
+              <Search className="w-4 h-4" style={{ color: searchExpanded ? AMBER : INK }} strokeWidth={2.5} />
             </button>
           </div>
 
