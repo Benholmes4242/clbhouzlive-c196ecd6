@@ -20,6 +20,7 @@ import { PillView, type MastheadPill } from '../leaders/LeadersMasthead';
 import { LivePulse } from '../shared/LivePulse';
 import { computeMarginOfVictory } from '../../utils/computeMarginOfVictory';
 import type { TourTournament } from '../../hooks/useTourHubData';
+import { SHELL_BG, SURFACE, WHITE_ALPHA_06, WHITE_ALPHA_08 } from '../../_shared/tokens';
 
 const COUNTRY_NAMES: Record<string, string> = {
   USA: 'United States', ENG: 'England', SCO: 'Scotland', WAL: 'Wales', IRL: 'Ireland',
