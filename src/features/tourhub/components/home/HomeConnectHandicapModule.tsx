@@ -16,7 +16,7 @@ import { useWhsConnection, useHandicapTrend } from '@/lib/whs/hooks';
 
 // ── Design tokens (Dispatch) ─────────────────────────────────────────────
 const INK = '#0F172A';
-const INK_SOFT = '#475569';
+import { INK_SOFT } from '../../_shared/tokens';
 const INK_FAINT = '#94A3B8';
 const AMBER = '#F7931E';
 const AMBER_DEEP = '#D97706';
