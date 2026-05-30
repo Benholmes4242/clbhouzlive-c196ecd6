@@ -1,4 +1,5 @@
 import type { PlayerRatingBreakdown } from '../../hooks/usePlayerRating';
+import { TREND_DOWN, TREND_UP } from '../../_shared/tokens';
 
 interface Props {
   breakdown: PlayerRatingBreakdown;
