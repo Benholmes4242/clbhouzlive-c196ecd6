@@ -22,6 +22,7 @@
  */
 
 import { useState, useMemo } from 'react';
+import { SLATE_600 } from '../../_shared/tokens';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
@@ -43,7 +44,7 @@ type TierKey = 'stars' | 'regulars' | 'rising' | 'legacy';
 
 const TIER_COLORS: Record<TierKey, string> = {
   stars:    '#F7931E', // amber
-  regulars: '#475569', // slate-600 (replaces off-brand iOS blue)
+  regulars: SLATE_600, // slate-600 (replaces off-brand iOS blue)
   rising:   '#16A34A', // green
   legacy:   '#7C3AED', // purple (NEW)
 };

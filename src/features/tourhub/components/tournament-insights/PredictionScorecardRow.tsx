@@ -6,6 +6,7 @@
  */
 
 import React, { useState } from 'react';
+import { INK_SOFT } from '../../_shared/tokens';
 import { motion } from 'framer-motion';
 import { getPlayerHeadshotUrl, PLAYER_SILHOUETTE_URL } from '@/utils/playerHeadshot';
 
@@ -279,7 +280,7 @@ export const PredictionScorecardRow: React.FC<PredictionScorecardRowProps> = ({
               }}
             >
               <div style={{ width: 3, height: 3, borderRadius: '50%', background: '#F7931E', flexShrink: 0 }} />
-              <span style={{ fontSize: 11, color: '#475569', lineHeight: 1.4 }}>{b}</span>
+              <span style={{ fontSize: 11, color: INK_SOFT, lineHeight: 1.4 }}>{b}</span>
             </div>
           ))}
         </div>

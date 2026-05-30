@@ -4,6 +4,7 @@
  */
 
 import React, { useState } from 'react';
+import { INK_SOFT } from '../../_shared/tokens';
 import { getPlayerHeadshotUrl, PLAYER_SILHOUETTE_URL } from '@/utils/playerHeadshot';
 import type { WinnerProfile, ContenderCard, ConfidenceTier } from './types';
 
@@ -129,7 +130,7 @@ function PickRow({
           {bullets.map((b, bi) => (
             <div key={bi} style={{ display: 'flex', alignItems: 'center', gap: 9, padding: '7px 16px', borderBottom: bi < bullets.length - 1 ? '0.5px solid rgba(15,23,42,0.05)' : 'none' }}>
               <div style={{ width: 3, height: 3, borderRadius: '50%', background: color, flexShrink: 0 }} />
-              <span style={{ fontSize: 11, color: '#475569' }}>{b}</span>
+              <span style={{ fontSize: 11, color: INK_SOFT }}>{b}</span>
             </div>
           ))}
         </div>

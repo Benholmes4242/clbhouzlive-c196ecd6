@@ -14,6 +14,7 @@
  */
 
 import { Link } from 'react-router-dom';
+import { INK_SOFT } from '../../_shared/tokens';
 import { motion } from 'framer-motion';
 import { getCollegeLogoUrl } from '@/utils/collegeLogo';
 import type { CollegeSeasonStats } from '../../hooks/useCollegeStats';

@@ -3,6 +3,7 @@
  */
 
 import { Link } from 'react-router-dom';
+import { INK_SOFT } from '../../_shared/tokens';
 import { Calendar, Flag, Trophy, Clock } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
@@ -63,7 +64,7 @@ export function ScheduleEmptyMessage({
         {teesOffLine && (
           <p
             className="text-center max-w-[300px]"
-            style={{ fontSize: 13, fontWeight: 500, color: '#475569', marginTop: 12, lineHeight: 1.5 }}
+            style={{ fontSize: 13, fontWeight: 500, color: INK_SOFT, marginTop: 12, lineHeight: 1.5 }}
           >
             {teesOffLine}
           </p>
@@ -82,7 +83,7 @@ export function ScheduleEmptyMessage({
         )}
 
         {!nextTournamentName && (
-          <p className="max-w-[280px]" style={{ fontSize: 13, fontWeight: 500, marginTop: 12, color: '#475569' }}>
+          <p className="max-w-[280px]" style={{ fontSize: 13, fontWeight: 500, marginTop: 12, color: INK_SOFT }}>
             No tournaments are in progress. Check back soon!
           </p>
         )}

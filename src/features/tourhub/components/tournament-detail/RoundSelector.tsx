@@ -4,6 +4,7 @@
  */
 
 import { cn } from '@/lib/utils';
+import { SLATE_600 } from '../../_shared/tokens';
 
 interface RoundSelectorProps {
   rounds: string[];
@@ -35,7 +36,7 @@ export function RoundSelector({ rounds, activeRound, onRoundChange, className }:
             )}
             style={{
               borderRadius: 20,
-              backgroundColor: isActive ? '#475569' : 'transparent',
+              backgroundColor: isActive ? SLATE_600 : 'transparent',
             }}
           >
             {round}
