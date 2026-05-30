@@ -149,11 +149,11 @@ export function PlayerSeasonStats({ playerStats }: PlayerSeasonStatsProps) {
     ? (playerStats.top_25s / playerStats.events_played) * 100 : undefined;
 
   return (
-    <div style={{ background: '#ffffff', borderBottom: `1px solid ${INK_TINT_07}` }}>
+    <div style={{ background: SURFACE, borderBottom: `1px solid ${INK_TINT_07}` }}>
       {/* Dispatch section header */}
       <div style={{ padding: '14px 16px 0' }}>
         <div style={{ marginBottom: '12px' }}>
-          <span style={{ fontSize: '9px', fontWeight: 800, color: '#64748B', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>
+          <span style={{ fontSize: '9px', fontWeight: 800, color: INK_MUTE, letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>
             STATS · {activeTab}
           </span>
         </div>
@@ -166,7 +166,7 @@ export function PlayerSeasonStats({ playerStats }: PlayerSeasonStatsProps) {
             display: 'flex',
             gap: 2,
             padding: 3,
-            background: '#F1F5F9',
+            background: SLATE_100,
             borderRadius: 10,
             marginBottom: 12,
           }}
@@ -182,16 +182,17 @@ export function PlayerSeasonStats({ playerStats }: PlayerSeasonStatsProps) {
                 className="active:opacity-80 transition-opacity"
                 style={{
                   flex: 1,
-                  padding: '7px 4px',
+                  padding: '8px 4px',
                   fontSize: 12,
-                  fontWeight: isActive ? 800 : 600,
-                  color: isActive ? '#0F172A' : '#94A3B8',
-                  background: isActive ? '#FFFFFF' : 'transparent',
+                  fontWeight: isActive ? 700 : 600,
+                  lineHeight: 1,
+                  color: isActive ? INK : INK_FAINT,
+                  background: isActive ? SURFACE : 'transparent',
                   border: 'none',
                   borderRadius: 7,
                   cursor: 'pointer',
                   whiteSpace: 'nowrap' as const,
-                  boxShadow: isActive ? '0 1px 2px rgba(15,23,42,0.05)' : 'none',
+                  boxShadow: isActive ? `0 1px 2px ${INK_TINT_05}` : 'none',
                   transition: 'background 0.15s ease, color 0.15s ease',
                 }}
               >
