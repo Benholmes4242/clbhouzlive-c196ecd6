@@ -5,6 +5,7 @@
  * to recover ~80px of vertical space. Tap → navigate to tournament detail.
  */
 import { useNavigate } from 'react-router-dom';
+import { Clock } from 'lucide-react';
 import { TourPill } from './TourPill';
 import { AMBER, AMBER_BORDER, INK } from '../../_shared/tokens';
 
