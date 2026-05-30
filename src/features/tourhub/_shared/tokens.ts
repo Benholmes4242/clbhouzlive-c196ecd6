@@ -61,6 +61,7 @@ export const INK_ALPHA_60 = 'rgba(15,23,42,0.60)';           // heavier ink-alph
 // ============================================================================
 export const AMBER = '#F7931E';
 export const AMBER_INK = '#D97706';
+export const AMBER_INK_DARK = '#BA7517';                     // darker AMBER_INK for high-contrast small text on light bg (was `AMBER_DARK` in HybridRecapNext)
 export const AMBER_TINT_8 = 'rgba(247,147,30,0.08)';
 export const AMBER_TINT_10 = 'rgba(247,147,30,0.10)';
 export const AMBER_TINT_16 = 'rgba(247,147,30,0.16)';
