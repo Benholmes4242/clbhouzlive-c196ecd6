@@ -45,7 +45,7 @@ export function CourseInfoCard({ tournament, courseImage, courseId }: CourseInfo
         <span style={{
           fontSize: 9,
           fontWeight: 800,
-          color: '#64748B',
+          color: INK_MUTE,
           letterSpacing: '0.16em',
           textTransform: 'uppercase' as const,
         }}>
