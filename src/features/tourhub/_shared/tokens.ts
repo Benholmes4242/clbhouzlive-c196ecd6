@@ -116,6 +116,7 @@ export const GOLD_TINT = 'rgba(255,184,0,0.04)';
 export const GOLD_BORDER = 'rgba(255,184,0,0.32)';
 export const GOLD_TINT_10 = 'rgba(255,184,0,0.10)';          // medium gold tint — 7 cross-app files (hero card gradients, leader pills)
 export const GOLD_GLOW = '0 0 24px rgba(255,184,0,0.10), 0 1px 3px rgba(0,0,0,0.04)';
+export const GOLD_GLOW_DROP = '0 4px 12px rgba(255,184,0,0.20)';  // tighter gold drop shadow — champion-treatment photo/logo tiles — 4 cross-app surfaces
 
 // ============================================================================
 // LEADER_GOLD (hero leaderboard #1 row tint — distinct from celebratory GOLD)
