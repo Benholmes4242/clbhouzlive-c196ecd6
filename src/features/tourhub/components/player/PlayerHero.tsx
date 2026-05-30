@@ -17,7 +17,7 @@ import { titleCaseCountry } from '../../utils/countryFlags';
 import CountryFlag from '@/components/ui/country-flag';
 import type { TourPlayer, TourPlayerStatistics } from '../../hooks/useTourHubData';
 import { usePlayerState } from '../../hooks/usePlayerState';
-import { truncateName } from '../../utils/truncateName';
+
 import { splitStatValue } from '../../utils/splitStatValue';
 import {
   AMBER,
