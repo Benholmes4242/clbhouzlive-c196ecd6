@@ -8,6 +8,7 @@ import React from 'react';
 import { Trophy } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { INK, GOLD, NUMERIC_STYLE, STRIP_HEIGHT } from '../HybridHero.constants';
+import { SCORE_OVER_PAR_DARK_PALE } from '../../../_shared/tokens';
 import { TrajectorySparkline } from './TrajectorySparkline';
 
 interface ChampionStripProps {
