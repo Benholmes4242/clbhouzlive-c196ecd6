@@ -298,7 +298,7 @@ export function ScheduleTournamentCard({
             purse && formatPurse(purse),
           ].filter(Boolean);
           return parts.length > 0 ? (
-            <p style={{ fontSize: 11, fontWeight: 600, color: '#64748B', margin: '0 0 3px' }}>{parts.join(' · ')}</p>
+            <p style={{ fontSize: 11, fontWeight: 600, color: INK_MUTE, margin: '0 0 3px' }}>{parts.join(' · ')}</p>
           ) : null;
         })()}
 
