@@ -41,6 +41,8 @@ export const SLATE_50 = '#F8FAFC';
 export const SLATE_150 = '#EDF1F5';
 export const SLATE_200 = '#E2E8F0';
 export const SLATE_600 = '#475569';                          // Tailwind slate-600 — used as fallback bg/stripe when no brand color is available (22 files)
+export const SLATE_700 = '#334155';                          // Tailwind slate-700 — avatar fallback gradient endpoint, 6 cross-app files
+export const SLATE_800 = '#1e293b';                          // Tailwind slate-800 — avatar fallback gradient endpoint, 8 cross-app files
 
 // ============================================================================
 // HAIRLINE (divider variants)
