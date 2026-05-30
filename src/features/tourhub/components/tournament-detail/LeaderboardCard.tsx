@@ -8,7 +8,13 @@ import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { BatchPlayerAvatar } from '../PlayerAvatar';
 import { playerRoute } from '../../routes';
-import { INK_TINT_07 } from '../../_shared/tokens';
+import { INK_TINT_07, SCORE_UNDER_PAR_LIGHT, SCORE_OVER_PAR_LIGHT, INK_FAINT, INK_MUTE, LEADER_GOLD_TINT_10, AMBER } from '../../_shared/tokens';
+
+function abbrevName(full: string): string {
+  const parts = full.trim().split(/\s+/);
+  if (parts.length === 1) return parts[0];
+  return `${parts[0][0].toUpperCase()}. ${parts[parts.length - 1]}`;
+}
 
 interface LeaderboardEntry {
   id: string;
@@ -37,16 +43,11 @@ interface LeaderboardCardProps {
 }
 
 function ScoreToPar({ score, className }: { score: number | null; className?: string }) {
-  if (score === null) return <span className={cn("", className)} style={{ color: '#94A3B8' }}>—</span>;
+  if (score === null) return <span className={cn(className)} style={{ color: INK_FAINT }}>—</span>;
   const formatted = score === 0 ? 'E' : score > 0 ? `+${score}` : String(score);
+  const color = score < 0 ? SCORE_UNDER_PAR_LIGHT : score > 0 ? SCORE_OVER_PAR_LIGHT : INK_FAINT;
   return (
-    <span
-      className={cn("font-bold", className)}
-      style={{
-        fontVariantNumeric: 'tabular-nums',
-        color: score < 0 ? '#F7931E' : score > 0 ? '#EF4444' : '#94A3B8',
-      }}
-    >
+    <span className={cn("font-bold", className)} style={{ fontVariantNumeric: 'tabular-nums', color, letterSpacing: '-0.01em' }}>
       {formatted}
     </span>
   );
@@ -55,7 +56,7 @@ function ScoreToPar({ score, className }: { score: number | null; className?: st
 function ThruDisplay({ thru }: { thru: number | null }) {
   if (thru === null || thru === 0) return null;
   if (thru >= 18) {
-    return <span style={{ fontSize: '10px', fontWeight: 600, color: '#F7931E' }}>F</span>;
+    return <span style={{ fontSize: '10px', fontWeight: 700, color: INK_MUTE, background: 'rgba(15,23,42,0.05)', padding: '2px 5px', borderRadius: 5 }}>F</span>;
   }
   return (
     <span style={{ fontSize: '10px', color: '#94A3B8', fontVariantNumeric: 'tabular-nums' }}>
@@ -127,15 +128,15 @@ export function LeaderboardCard({
                   display: 'flex', alignItems: 'center', gap: '4px',
                   padding: '10px 20px',
                   borderBottom: `0.5px solid ${INK_TINT_07}`,
-                  borderLeft: entry.position === 1 ? '3px solid #F7931E' : '3px solid transparent',
-                  background: entry.position === 1 ? 'rgba(247,147,30,0.025)' : 'transparent',
+                  borderLeft: entry.position === 1 ? `3px solid ${AMBER}` : '3px solid transparent',
+                  background: entry.position === 1 ? LEADER_GOLD_TINT_10 : 'transparent',
                   textDecoration: 'none',
                   opacity: isMissedCut ? 0.5 : 1,
                 }}
                 className="active:bg-black/[0.02] transition-colors"
               >
                 {/* Position */}
-                <span style={{ width: '36px', fontSize: '14px', fontWeight: 800, color: entry.position === 1 ? '#F7931E' : '#94A3B8', flexShrink: 0, fontVariantNumeric: 'tabular-nums' }}>
+                <span style={{ width: '36px', fontSize: '14px', fontWeight: 800, color: entry.position === 1 ? AMBER : '#94A3B8', flexShrink: 0, fontVariantNumeric: 'tabular-nums' }}>
                   {isMissedCut ? 'MC' : entry.status === 'WD' ? 'WD' : entry.position_tied ? `T${entry.position}` : String(entry.position)}
                 </span>
 
@@ -143,7 +144,7 @@ export function LeaderboardCard({
                 <div style={{ flex: 1, display: 'flex', alignItems: 'center', gap: '8px', minWidth: 0 }}>
                   <BatchPlayerAvatar playerId={entry.player?.id || ''} playerName={entry.player?.full_name || 'Unknown'} size="sm" />
                   <p style={{ fontSize: '14px', fontWeight: entry.position === 1 ? 800 : 600, color: '#0F172A', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const }}>
-                    {entry.player?.full_name}
+                    {abbrevName(entry.player?.full_name || 'Unknown')}
                   </p>
                 </div>
 

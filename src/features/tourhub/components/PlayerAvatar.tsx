@@ -11,11 +11,12 @@ interface PlayerAvatarProps {
   playerId: string;
   playerName: string;
   tourCode?: string;
-  size?: 'sm' | 'md' | 'lg' | 'xl' | '2xl';
+  size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl';
   className?: string;
 }
 
 const SIZE_CLASSES = {
+  xs: 'w-[26px] h-[26px] text-[10px]',
   sm: 'w-8 h-8 text-xs',
   md: 'w-11 h-11 text-sm',
   lg: 'w-16 h-16 text-lg',
@@ -23,7 +24,7 @@ const SIZE_CLASSES = {
   '2xl': 'w-32 h-32 text-4xl',
 };
 
-const SIZE_PX = { sm: 24, md: 32, lg: 48, xl: 72, '2xl': 96 };
+const SIZE_PX = { xs: 26, sm: 24, md: 32, lg: 48, xl: 72, '2xl': 96 };
 
 export function PlayerAvatar({ 
   playerId, 

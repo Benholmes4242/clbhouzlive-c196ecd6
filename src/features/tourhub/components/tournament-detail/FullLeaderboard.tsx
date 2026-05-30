@@ -11,7 +11,7 @@ import { BatchPlayerAvatar } from '../PlayerAvatar';
 import { RoundSelector } from './RoundSelector';
 import { formatThruDisplay } from '../../utils/formatThruDisplay';
 import { playerRoute } from '../../routes';
-import { INK_TINT_07 } from '../../_shared/tokens';
+import { INK_TINT_07, SCORE_UNDER_PAR_LIGHT, SCORE_OVER_PAR_LIGHT, INK_FAINT, INK_LIGHT, INK_MUTE, LEADER_GOLD_TINT_10, AMBER } from '../../_shared/tokens';
 
 interface RawRoundData {
   thru?: number;
@@ -62,14 +62,27 @@ interface FullLeaderboardProps {
   onPlayerTap?: () => void;
 }
 
-function ScoreToPar({ score, className }: { score: number | null; className?: string }) {
-  if (score === null) return <span className={cn("", className)} style={{ fontVariantNumeric: 'tabular-nums', color: '#94A3B8' }}>—</span>;
+function ScoreToPar({ score, className, emphasis, size }: { score: number | null; className?: string; emphasis?: boolean; size?: number }) {
+  if (score === null) return <span className={cn(className)} style={{ fontVariantNumeric: 'tabular-nums', color: INK_FAINT }}>—</span>;
   const formatted = score === 0 ? 'E' : score > 0 ? `+${score}` : String(score);
+  const color = score < 0 ? SCORE_UNDER_PAR_LIGHT : score > 0 ? SCORE_OVER_PAR_LIGHT : INK_FAINT;
   return (
-    <span className={cn("font-bold", className)} style={{ fontVariantNumeric: 'tabular-nums', color: score < 0 ? '#F7931E' : score > 0 ? '#EF4444' : '#94A3B8' }}>
+    <span className={cn(className)} style={{
+      fontVariantNumeric: 'tabular-nums',
+      color,
+      fontWeight: emphasis ? 800 : 700,
+      fontSize: size ? `${size}px` : undefined,
+      letterSpacing: emphasis ? '-0.01em' : undefined,
+    }}>
       {formatted}
     </span>
   );
+}
+
+function abbrevName(full: string): string {
+  const parts = full.trim().split(/\s+/);
+  if (parts.length === 1) return parts[0];
+  return `${parts[0][0].toUpperCase()}. ${parts[parts.length - 1]}`;
 }
 
 function ScoreCell({ score, className }: { score: number | null; className?: string }) {
@@ -202,21 +215,21 @@ export function FullLeaderboard({
       </div>
 
       {/* Column headers */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '4px', padding: '5px 20px', background: 'rgba(15,23,42,0.02)', borderTop: `0.5px solid ${INK_TINT_07}`, borderBottom: `0.5px solid ${INK_TINT_07}` }}>
-        <span style={{ width: '34px', fontSize: '9px', fontWeight: 800, color: '#64748B', letterSpacing: '0.14em', flexShrink: 0 }}>POS</span>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '3px', padding: '5px 16px', background: 'rgba(15,23,42,0.02)', borderTop: `0.5px solid ${INK_TINT_07}`, borderBottom: `0.5px solid ${INK_TINT_07}` }}>
+        <span style={{ width: '24px', fontSize: '9px', fontWeight: 800, color: '#64748B', letterSpacing: '0.14em', flexShrink: 0 }}>POS</span>
         <span style={{ flex: 1, fontSize: '9px', fontWeight: 800, color: '#64748B', letterSpacing: '0.14em' }}>PLAYER</span>
         {showRoundColumns && (
           <>
-            <span style={{ width: '26px', textAlign: 'center' as const, fontSize: '9px', fontWeight: 800, color: '#64748B', letterSpacing: '0.14em', flexShrink: 0 }}>R1</span>
-            <span style={{ width: '26px', textAlign: 'center' as const, fontSize: '9px', fontWeight: 800, color: '#64748B', letterSpacing: '0.14em', flexShrink: 0 }}>R2</span>
-            <span style={{ width: '26px', textAlign: 'center' as const, fontSize: '9px', fontWeight: 800, color: '#64748B', letterSpacing: '0.14em', flexShrink: 0 }}>R3</span>
-            <span style={{ width: '26px', textAlign: 'center' as const, fontSize: '9px', fontWeight: 800, color: '#64748B', letterSpacing: '0.14em', flexShrink: 0 }}>R4</span>
+            <span style={{ width: '19px', textAlign: 'center' as const, fontSize: '9px', fontWeight: 800, color: '#64748B', letterSpacing: '0.14em', flexShrink: 0 }}>R1</span>
+            <span style={{ width: '19px', textAlign: 'center' as const, fontSize: '9px', fontWeight: 800, color: '#64748B', letterSpacing: '0.14em', flexShrink: 0 }}>R2</span>
+            <span style={{ width: '19px', textAlign: 'center' as const, fontSize: '9px', fontWeight: 800, color: '#64748B', letterSpacing: '0.14em', flexShrink: 0 }}>R3</span>
+            <span style={{ width: '19px', textAlign: 'center' as const, fontSize: '9px', fontWeight: 800, color: '#64748B', letterSpacing: '0.14em', flexShrink: 0 }}>R4</span>
           </>
         )}
-        <span style={{ width: '44px', textAlign: 'center' as const, fontSize: '9px', fontWeight: 800, color: '#64748B', letterSpacing: '0.14em', flexShrink: 0 }}>
+        <span style={{ width: '34px', textAlign: 'center' as const, fontSize: '9px', fontWeight: 800, color: '#64748B', letterSpacing: '0.14em', flexShrink: 0 }}>
           {selectedRound === 'Overall' ? 'TOT' : 'SCORE'}
         </span>
-        <span style={{ width: '44px', textAlign: 'center' as const, fontSize: '9px', fontWeight: 800, color: '#64748B', letterSpacing: '0.14em', flexShrink: 0 }}>THRU</span>
+        <span style={{ width: '30px', textAlign: 'center' as const, fontSize: '9px', fontWeight: 800, color: '#64748B', letterSpacing: '0.14em', flexShrink: 0 }}>THRU</span>
       </div>
 
       {/* Player rows */}
@@ -243,44 +256,44 @@ export function FullLeaderboard({
                 onClick={onPlayerTap}
                 aria-label={`Position ${entry.position_tied ? `T${entry.position}` : entry.position}, ${entry.player?.full_name || 'Unknown'}`}
                 style={{
-                  display: 'flex', alignItems: 'center', gap: '4px',
-                  padding: '9px 20px',
+                  display: 'flex', alignItems: 'center', gap: '3px',
+                  padding: '9px 16px',
                   borderBottom: `0.5px solid ${INK_TINT_07}`,
-                  borderLeft: entry.position === 1 && !isMissedCut && !isWD ? '3px solid #F7931E' : '3px solid transparent',
-                  background: entry.position === 1 && !isMissedCut && !isWD ? 'rgba(247,147,30,0.025)' : 'transparent',
+                  borderLeft: entry.position === 1 && !isMissedCut && !isWD ? `3px solid ${AMBER}` : '3px solid transparent',
+                  background: entry.position === 1 && !isMissedCut && !isWD ? LEADER_GOLD_TINT_10 : 'transparent',
                   opacity: isWD ? 0.4 : isMissedCut ? 0.55 : 1,
                   textDecoration: 'none',
                 }}
                 className="active:bg-black/[0.02] transition-colors"
               >
                 {/* Position */}
-                <span style={{ width: '34px', fontSize: '12px', fontWeight: 800, color: displayPosition === 1 ? '#F7931E' : '#94A3B8', flexShrink: 0, fontVariantNumeric: 'tabular-nums' }}>
+                <span style={{ width: '24px', fontSize: '11px', fontWeight: 800, color: displayPosition === 1 ? AMBER : '#94A3B8', flexShrink: 0, fontVariantNumeric: 'tabular-nums' }}>
                   {isMissedCut ? 'MC' : isWD ? 'WD' : (!isRoundView && entry.position_tied) ? `T${displayPosition}` : String(displayPosition)}
                 </span>
 
-                <div className="shrink-0" style={{ marginRight: '8px' }}>
-                  <BatchPlayerAvatar playerId={entry.player?.id || ''} playerName={entry.player?.full_name || 'Unknown'} size="sm" />
+                <div className="shrink-0" style={{ marginRight: '7px' }}>
+                  <BatchPlayerAvatar playerId={entry.player?.id || ''} playerName={entry.player?.full_name || 'Unknown'} size="xs" />
                 </div>
 
                 <div style={{ flex: 1, minWidth: 0 }}>
-                  <p style={{ fontSize: '14px', fontWeight: 600, color: '#0F172A', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const, letterSpacing: '-0.2px' }}>
-                    {entry.player?.full_name || 'Unknown'}
+                  <p style={{ fontSize: '13px', fontWeight: 600, color: '#0F172A', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const, letterSpacing: '-0.2px' }}>
+                    {abbrevName(entry.player?.full_name || 'Unknown')}
                   </p>
                 </div>
 
                 {showRoundColumns && (
                   <>
                     {[entry.round_1, entry.round_2, entry.round_3, entry.round_4].map((score, ri) => (
-                      <span key={ri} style={{ width: '26px', textAlign: 'center' as const, fontSize: '12px', fontWeight: 600, color: '#64748B', flexShrink: 0, fontVariantNumeric: 'tabular-nums' }}>
+                      <span key={ri} style={{ width: '19px', textAlign: 'center' as const, fontSize: '11px', fontWeight: 500, color: score != null ? INK_FAINT : INK_LIGHT, flexShrink: 0, fontVariantNumeric: 'tabular-nums' }}>
                         {score != null ? score : '—'}
                       </span>
                     ))}
                   </>
                 )}
 
-                <div style={{ width: '44px', textAlign: 'center' as const, flexShrink: 0 }}>
+                <div style={{ width: '34px', textAlign: 'center' as const, flexShrink: 0 }}>
                   {selectedRound === 'Overall' ? (
-                    <ScoreToPar score={entry.score} className="text-sm" />
+                    <ScoreToPar score={entry.score} emphasis size={14} />
                   ) : completedRoundScore != null ? (
                     <ScoreCell score={completedRoundScore} className="text-sm" />
                   ) : liveRoundScore != null ? (
@@ -290,26 +303,27 @@ export function FullLeaderboard({
                   )}
                 </div>
 
-                <div style={{ width: '44px', textAlign: 'center' as const, flexShrink: 0 }}>
+                <div style={{ width: '30px', textAlign: 'center' as const, flexShrink: 0 }}>
                   {(() => {
+                    const finishedPill = <span style={{ fontSize: '9.5px', fontWeight: 700, color: INK_MUTE, background: 'rgba(15,23,42,0.05)', padding: '2px 5px', borderRadius: 5 }}>F</span>;
                     if (isRoundView && liveRoundThru != null && liveRoundThru > 0) {
-                      if (liveRoundThru >= 18) return <span style={{ fontSize: '10px', fontWeight: 600, color: '#F7931E' }}>F</span>;
-                      return <span style={{ fontSize: '10px', color: '#94A3B8', fontVariantNumeric: 'tabular-nums' }}>Thru {liveRoundThru}</span>;
+                      if (liveRoundThru >= 18) return finishedPill;
+                      return <span style={{ fontSize: '9.5px', color: '#94A3B8', fontVariantNumeric: 'tabular-nums' }}>Thru {liveRoundThru}</span>;
                     }
                     if (isRoundView && completedRoundScore != null) {
-                      return <span style={{ fontSize: '10px', fontWeight: 600, color: '#F7931E' }}>F</span>;
+                      return finishedPill;
                     }
                     if (isLive) {
                       const display = formatThruDisplay(entry.thru, entry.round_1, entry.round_2, entry.round_3, entry.round_4, entry.status, entry.thru_updated_at, tournamentTimezone);
-                      if (!display) return <span style={{ fontSize: '10px', color: '#94A3B8' }}>—</span>;
-                      if (['MC', 'WD', 'DQ', 'MDF', 'DNS'].includes(display)) return <span style={{ fontSize: '10px', color: '#94A3B8', fontWeight: 600 }}>{display}</span>;
-                      if (display === 'F') return <span style={{ fontSize: '10px', fontWeight: 600, color: '#F7931E' }}>F</span>;
-                      return <span style={{ fontSize: '10px', color: '#94A3B8', fontVariantNumeric: 'tabular-nums' }}>Thru {display}</span>;
+                      if (!display) return <span style={{ fontSize: '9.5px', color: '#94A3B8' }}>—</span>;
+                      if (['MC', 'WD', 'DQ', 'MDF', 'DNS'].includes(display)) return <span style={{ fontSize: '9.5px', color: '#94A3B8', fontWeight: 600 }}>{display}</span>;
+                      if (display === 'F') return finishedPill;
+                      return <span style={{ fontSize: '9.5px', color: '#94A3B8', fontVariantNumeric: 'tabular-nums' }}>Thru {display}</span>;
                     }
-                    if (isMissedCut) return <span style={{ fontSize: '10px', color: '#94A3B8', fontWeight: 600 }}>MC</span>;
-                    if (isWD) return <span style={{ fontSize: '10px', color: '#94A3B8', fontWeight: 600 }}>WD</span>;
-                    if (entry.strokes) return <span style={{ fontSize: '10px', fontWeight: 600, color: '#F7931E' }}>F</span>;
-                    return <span style={{ fontSize: '10px', color: '#94A3B8' }}>—</span>;
+                    if (isMissedCut) return <span style={{ fontSize: '9.5px', color: '#94A3B8', fontWeight: 600 }}>MC</span>;
+                    if (isWD) return <span style={{ fontSize: '9.5px', color: '#94A3B8', fontWeight: 600 }}>WD</span>;
+                    if (entry.strokes) return finishedPill;
+                    return <span style={{ fontSize: '9.5px', color: '#94A3B8' }}>—</span>;
                   })()}
                 </div>
               </Link>
