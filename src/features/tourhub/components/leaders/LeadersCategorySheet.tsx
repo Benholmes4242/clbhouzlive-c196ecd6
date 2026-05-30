@@ -55,7 +55,7 @@ export function LeadersCategorySheet({
   }, [onExternalClose]);
 
   const activeCategory = categories.find((c) => c.key === activeKey) || categories[0];
-  const activeEmoji = (activeCategory as any).emoji;
+  const ActiveIcon = activeCategory.icon;
 
   const groups: CategoryGroup[] = CATEGORY_GROUPS.map((g) => ({
     label: g.label,
@@ -89,7 +89,7 @@ export function LeadersCategorySheet({
           aria-expanded={open}
         >
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <span style={{ fontSize: '16px' }}>{activeEmoji}</span>
+            <ActiveIcon size={16} strokeWidth={2.2} color="#0F172A" />
             <span style={{ fontSize: '14px', fontWeight: 700, color: '#0F172A' }}>{activeCategory.shortLabel}</span>
           </div>
           <span style={{ fontSize: '11px', color: '#94A3B8' }}>▾</span>
@@ -124,7 +124,7 @@ export function LeadersCategorySheet({
               {group.categories.map((cat) => {
                 const isActive = activeKey === cat.key;
                 const leaderData = categoryLeaderValues?.[cat.key];
-                const emoji = (cat as any).emoji;
+                const RowIcon = cat.icon;
                 return (
                   <button
                     key={cat.key}
@@ -139,7 +139,7 @@ export function LeadersCategorySheet({
                       cursor: 'pointer', textAlign: 'left' as const,
                     }}
                   >
-                    <span style={{ fontSize: '16px', flexShrink: 0 }}>{emoji}</span>
+                    <RowIcon size={16} strokeWidth={2.2} color={isActive ? '#F7931E' : '#475569'} style={{ flexShrink: 0 }} />
                     <div style={{ flex: 1, minWidth: 0 }}>
                       <div style={{ fontSize: '14px', fontWeight: isActive ? 800 : 600, color: '#0F172A' }}>
                         {cat.shortLabel}
