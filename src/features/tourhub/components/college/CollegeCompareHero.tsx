@@ -86,19 +86,19 @@ function MetricCompareRow({ label, value1, value2, format = String, lowerIsBette
               width: `${barPct1}%`,
               height: '100%',
               borderRadius: '2px 0 0 2px',
-              background: isLeading1 ? '#F7931E' : isTied ? 'rgba(15,23,42,0.18)' : 'rgba(15,23,42,0.08)',
+              background: isLeading1 ? AMBER : isTied ? HAIRLINE_INK_18 : HAIRLINE_INK_8,
               transition: 'width 0.4s',
             }}
           />
         </div>
-        <div style={{ width: '1px', height: '100%', background: 'rgba(15,23,42,0.12)', flexShrink: 0 }} />
+        <div style={{ width: '1px', height: '100%', background: HAIRLINE_INK_12, flexShrink: 0 }} />
         <div style={{ flex: 1, display: 'flex', justifyContent: 'flex-start', height: '100%' }}>
           <div
             style={{
               width: `${barPct2}%`,
               height: '100%',
               borderRadius: '0 2px 2px 0',
-              background: isLeading2 ? '#F7931E' : isTied ? 'rgba(15,23,42,0.18)' : 'rgba(15,23,42,0.08)',
+              background: isLeading2 ? AMBER : isTied ? HAIRLINE_INK_18 : HAIRLINE_INK_8,
               transition: 'width 0.4s',
             }}
           />
