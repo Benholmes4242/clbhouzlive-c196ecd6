@@ -247,7 +247,7 @@ export function ScheduleTournamentCard({
               display: 'flex',
               alignItems: 'center',
               gap: 4,
-              color: '#047857',
+              color: LIVE_INK,
             }}
           >
             Leader:{' '}
