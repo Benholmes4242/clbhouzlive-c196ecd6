@@ -154,9 +154,13 @@ export function ResultBand({
               color: GOLD,
               textTransform: 'uppercase',
               marginBottom: 4,
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 5,
             }}
           >
-            🏆 CHAMPION
+            <Trophy size={10} color={GOLD} strokeWidth={2.5} />
+            CHAMPION
           </div>
           <div
             style={{
