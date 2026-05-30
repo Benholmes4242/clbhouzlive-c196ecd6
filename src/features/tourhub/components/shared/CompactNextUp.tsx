@@ -31,7 +31,7 @@ export function CompactNextUp({ tournamentId, tourCode, name, daysUntil }: Compa
         margin: '8px 16px 12px',
         width: 'calc(100% - 32px)',
         background: 'rgba(247,147,30,0.06)',
-        border: '1px solid rgba(247,147,30,0.30)',
+        border: `1px solid ${AMBER_BORDER}`,
         borderRadius: 8,
         cursor: 'pointer',
         textAlign: 'left',
