@@ -99,7 +99,7 @@ export function CollegeComparePage() {
           onClick={() => navigate('/tourhub/college-golf')}
           aria-label="Head-to-Head — open College Franchise"
           style={{
-            background: '#F8FAFC',
+            background: '#0A0E14',
             border: 'none',
             padding: '14px 16px 12px',
             cursor: 'pointer',
@@ -117,7 +117,7 @@ export function CollegeComparePage() {
             style={{
               fontSize: 22,
               fontWeight: 800,
-              color: '#0F172A',
+              color: '#FFFFFF',
               letterSpacing: '-0.025em',
               lineHeight: 1.05,
               margin: 0,
@@ -133,7 +133,7 @@ export function CollegeComparePage() {
               style={{
                 fontSize: 13,
                 fontWeight: 500,
-                color: '#64748B',
+                color: 'rgba(255,255,255,0.55)',
                 lineHeight: 1.4,
                 marginTop: 4,
                 overflow: 'hidden',
@@ -146,7 +146,6 @@ export function CollegeComparePage() {
           )}
         </button>
       </ShellSlot>
-
 
       <div
         className="relative min-h-screen bg-background"

@@ -31,13 +31,14 @@ export function TourHubShell({ children, immersive = false }: TourHubShellProps)
     );
   }
 
-  // Light editorial canvas across all Tour Hub pages. #F8FAFC is the
-  // canonical Tour Hub surface — no dark slate patches.
+  // Match handicap page: dark PageRoot canvas + default (non-immersive)
+  // status bar so the safe-area notch renders as the same dark band as the
+  // header chrome. PageRoot dark adds .hcp-dark and pads for the bottom nav.
   return (
     <PageRoot
-      dark={false}
-      className="min-h-screen w-full hcp-light"
-      style={{ background: '#F8FAFC' }}
+      dark
+      className="min-h-screen w-full"
+      style={{ background: 'var(--hcp-bg-0)' }}
     >
       {children}
     </PageRoot>
