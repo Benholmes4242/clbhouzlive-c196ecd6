@@ -240,17 +240,17 @@ export function PlayerHero({ player, playerStats }: PlayerHeroProps) {
             flexWrap: 'wrap',
           }}
         >
-          <Crown size={13} strokeWidth={2.5} fill="#FFB800" color="#D97706" />
+          <Crown size={13} strokeWidth={2.5} fill={GOLD} color={GOLD_DEEP} />
           {captionMetadata.map((part, i) => (
             <Fragment key={i}>
               {i > 0 && (
-                <span style={{ fontSize: 9, fontWeight: 800, color: '#CBD5E1', letterSpacing: '0.16em' }}>·</span>
+                <span style={{ fontSize: 9, fontWeight: 800, color: INK_MUTE, letterSpacing: '0.16em' }}>·</span>
               )}
               <span
                 style={{
                   fontSize: 9,
                   fontWeight: 800,
-                  color: i === 0 ? '#0F172A' : '#64748B',
+                  color: i === 0 ? INK : INK_MUTE,
                   letterSpacing: '0.16em',
                   textTransform: 'uppercase',
                 }}
