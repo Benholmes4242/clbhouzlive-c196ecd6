@@ -4,29 +4,32 @@ import { initials } from '@/lib/whs/utils/initials';
 import { pickAvatarSrc } from '@/lib/whs/utils/avatarSrc';
 import { fmtHcp } from '@/lib/whs/format';
 import type { FriendRivalryHydrated } from '@/lib/whs/types';
-import type { RivalryTier } from '@/lib/whs/utils/rivalryTiering';
-import { rivalKey } from '@/lib/whs/utils/rivalryTiering';
 import { useRivalryDimension } from '@/lib/whs/utils/useRivalryDimension';
+import { rivalKey } from '@/lib/whs/utils/rivalryTiering';
 import {
   RIVALRY_STATE_TOKENS,
   rivalryStateFor,
 } from './_shared/rivalryTokens';
 import { computeStreak, fmtDaysAgo } from './_shared/streakUtils';
 
-const FONT_GEIST = 'Geist, system-ui, -apple-system, BlinkMacSystemFont, sans-serif';
+const FONT_GEIST =
+  'Geist, system-ui, -apple-system, BlinkMacSystemFont, sans-serif';
 
 interface Props {
   rivalry: FriendRivalryHydrated;
-  tier: RivalryTier;
   onTap?: () => void;
 }
-
 
 function truncate(s: string, max = 15): string {
   return s.length > max ? `${s.slice(0, max - 1).trimEnd()}…` : s;
 }
 
-export const RivalryCompactCard: React.FC<Props> = ({ rivalry, tier, onTap }) => {
+/**
+ * Compact list row used by the Manage Rivals sheet. Every rival shares
+ * the universal "RIVAL" eyebrow — tier badges (ARCHRIVAL/RECENT) were
+ * retired with the Fight Card redesign.
+ */
+export const RivalListRow: React.FC<Props> = ({ rivalry, onTap }) => {
   const key = rivalKey(rivalry);
   const [dimension] = useRivalryDimension(key);
   const record =
@@ -48,7 +51,6 @@ export const RivalryCompactCard: React.FC<Props> = ({ rivalry, tier, onTap }) =>
     )[0];
   }, [results]);
 
-  const eyebrow = tier === 'rival' ? '★ RIVAL' : 'RECENT';
   const sorted = [...results]
     .sort((a, b) => new Date(b.play_date).getTime() - new Date(a.play_date).getTime())
     .slice(0, 5);
@@ -77,7 +79,6 @@ export const RivalryCompactCard: React.FC<Props> = ({ rivalry, tier, onTap }) =>
         cursor: tappable ? 'pointer' : 'default',
       }}
     >
-
       {stripeColor && (
         <div
           aria-hidden
@@ -94,14 +95,16 @@ export const RivalryCompactCard: React.FC<Props> = ({ rivalry, tier, onTap }) =>
 
       <div style={{ padding: '12px 14px 10px 16px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-          {/* Avatar */}
           <div
             style={{
               width: 44,
               height: 44,
               borderRadius: '50%',
               background: (() => {
-                const src = pickAvatarSrc(rivalry.rival_thumbnail_url, rivalry.rival_profile_photo_url);
+                const src = pickAvatarSrc(
+                  rivalry.rival_thumbnail_url,
+                  rivalry.rival_profile_photo_url,
+                );
                 return src ? `url(${src}) center/cover no-repeat` : 'rgba(255,255,255,0.08)';
               })(),
               display: 'flex',
@@ -113,21 +116,21 @@ export const RivalryCompactCard: React.FC<Props> = ({ rivalry, tier, onTap }) =>
               flexShrink: 0,
             }}
           >
-            {!pickAvatarSrc(rivalry.rival_thumbnail_url, rivalry.rival_profile_photo_url) && initials(rivalDisplayName)}
+            {!pickAvatarSrc(rivalry.rival_thumbnail_url, rivalry.rival_profile_photo_url) &&
+              initials(rivalDisplayName)}
           </div>
 
-          {/* Name block */}
           <div style={{ minWidth: 0, flex: 1 }}>
             <div
               style={{
                 fontSize: 9,
                 fontWeight: 800,
                 letterSpacing: '0.14em',
-                color: tokens.tierBadgeColor,
+                color: 'var(--hcp-t-60)',
                 marginBottom: 2,
               }}
             >
-              {eyebrow}
+              ★ RIVAL
             </div>
             <div
               style={{
@@ -152,7 +155,6 @@ export const RivalryCompactCard: React.FC<Props> = ({ rivalry, tier, onTap }) =>
             </div>
           </div>
 
-          {/* Score */}
           <div
             style={{
               display: 'flex',
@@ -170,7 +172,6 @@ export const RivalryCompactCard: React.FC<Props> = ({ rivalry, tier, onTap }) =>
           </div>
         </div>
 
-        {/* Bottom row: form + streak + meta */}
         <div
           style={{
             display: 'flex',
@@ -256,4 +257,4 @@ export const RivalryCompactCard: React.FC<Props> = ({ rivalry, tier, onTap }) =>
   );
 };
 
-export default RivalryCompactCard;
+export default RivalListRow;
