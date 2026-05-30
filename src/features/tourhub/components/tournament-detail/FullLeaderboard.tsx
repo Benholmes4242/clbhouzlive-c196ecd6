@@ -11,7 +11,7 @@ import { BatchPlayerAvatar } from '../PlayerAvatar';
 import { RoundSelector } from './RoundSelector';
 import { formatThruDisplay } from '../../utils/formatThruDisplay';
 import { playerRoute } from '../../routes';
-import { INK_TINT_07 } from '../../_shared/tokens';
+import { INK_TINT_07, SCORE_UNDER_PAR_LIGHT, SCORE_OVER_PAR_LIGHT, INK_FAINT, INK_LIGHT, INK_MUTE, LEADER_GOLD_TINT_10, AMBER } from '../../_shared/tokens';
 
 interface RawRoundData {
   thru?: number;
