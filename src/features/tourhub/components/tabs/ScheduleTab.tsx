@@ -357,7 +357,7 @@ export function ScheduleTab() {
         ).size;
         const seasonLabel = season?.name ?? (season?.year ? `${season.year} Season` : 'Season');
         return (
-          <div style={{ padding: '16px 16px 0', background: '#F8FAFC' }}>
+          <div style={{ padding: '16px 16px 0', background: SLATE_50 }}>
             <button
               onClick={() => navigate('/tourhub?tab=overview', { replace: true })}
               aria-label="Schedule — open Tour Overview"
