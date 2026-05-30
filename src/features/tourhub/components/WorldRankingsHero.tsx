@@ -38,6 +38,7 @@ import { TOUR_MAP, type TourCode } from '../constants/tourMap';
 // ─── Tokens ─────────────────────────────────────────────────────────────────
 import {
   AMBER,
+  AMBER_TINT_04,
   GOLD,
   GOLD_BORDER,
   GOLD_GLOW,
@@ -47,8 +48,12 @@ import {
   INK_LIGHT,
   INK_MUTE,
   INK_SOFT,
+  INK_TINT_06,
+  INK_TINT_07,
   SLATE_150,
   SLATE_200,
+  SLATE_600,
+  SURFACE,
   TREND_DOWN,
   TREND_DOWN_TINT,
   TREND_UP,
@@ -134,7 +139,7 @@ function TourDropdownTrigger({ activeTour, onClick }: {
         alignItems: 'center',
         gap: 8,
         padding: '8px 12px',
-        background: '#fff',
+        background: SURFACE,
         border: `1px solid ${SLATE_200}`,
         borderRadius: 10,
         cursor: 'pointer',
@@ -147,8 +152,8 @@ function TourDropdownTrigger({ activeTour, onClick }: {
         style={{
           padding: '3px 7px',
           borderRadius: 4,
-          background: meta?.bg ?? '#475569',
-          color: meta?.fg ?? '#fff',
+          background: meta?.bg ?? SLATE_600,
+          color: meta?.fg ?? SURFACE,
           fontSize: 9,
           fontWeight: 900,
           letterSpacing: '0.10em',
@@ -219,7 +224,7 @@ function NumberOneCard({
         width: '100%',
         padding: 0,
         marginBottom: 18,
-        background: '#fff',
+        background: SURFACE,
         borderRadius: 16,
         border: `1px solid ${GOLD_BORDER}`,
         boxShadow: GOLD_GLOW,
@@ -306,7 +311,7 @@ function NumberOneCard({
                   height: '100%',
                   borderRadius: '34%',
                   overflow: 'hidden',
-                  background: '#fff',
+                  background: SURFACE,
                 }}
               >
                 <PlayerAvatar
@@ -331,7 +336,7 @@ function NumberOneCard({
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                border: '2px solid #fff',
+                border: `2px solid ${SURFACE}`,
                 fontSize: 11,
                 fontWeight: 800,
               }}
@@ -631,7 +636,7 @@ function WorldRankingsSkeleton() {
       <div
         style={{
           marginBottom: 18,
-          background: '#fff',
+          background: SURFACE,
           borderRadius: 16,
           border: `1px solid ${SLATE_200}`,
           padding: '18px 18px 16px',
@@ -679,7 +684,7 @@ function WorldRankingsSkeleton() {
             <div
               key={col}
               style={{
-                background: '#fff',
+                background: SURFACE,
                 borderRadius: 12,
                 border: `1px solid ${SLATE_200}`,
                 overflow: 'hidden',
@@ -862,10 +867,10 @@ export const WorldRankingsHero = memo(function WorldRankingsHero() {
                   alignItems: 'center',
                   gap: 12,
                   padding: '12px 16px',
-                  background: isActive ? 'rgba(247,147,30,0.04)' : 'transparent',
+                  background: isActive ? AMBER_TINT_04 : 'transparent',
                   border: 'none',
                   borderLeft: isActive ? `3px solid ${AMBER}` : '3px solid transparent',
-                  borderBottom: '0.5px solid rgba(15,23,42,0.07)',
+                  borderBottom: `0.5px solid ${INK_TINT_07}`,
                   cursor: 'pointer',
                   textAlign: 'left' as const,
                 }}
@@ -875,7 +880,7 @@ export const WorldRankingsHero = memo(function WorldRankingsHero() {
                     width: 36,
                     height: 22,
                     borderRadius: 4,
-                    background: 'rgba(15,23,42,0.06)',
+                    background: INK_TINT_06,
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
@@ -961,7 +966,7 @@ export const WorldRankingsHero = memo(function WorldRankingsHero() {
             {/* Risers */}
             <div
               style={{
-                background: '#fff',
+                background: SURFACE,
                 borderRadius: 12,
                 border: `1px solid ${SLATE_200}`,
                 overflow: 'hidden',
@@ -1007,7 +1012,7 @@ export const WorldRankingsHero = memo(function WorldRankingsHero() {
             {/* Fallers */}
             <div
               style={{
-                background: '#fff',
+                background: SURFACE,
                 borderRadius: 12,
                 border: `1px solid ${SLATE_200}`,
                 overflow: 'hidden',
