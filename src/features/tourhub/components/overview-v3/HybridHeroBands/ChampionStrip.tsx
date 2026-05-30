@@ -269,8 +269,18 @@ export function PlayoffStrip({ count, score }: PlayoffStripProps) {
         ))}
       </div>
       <div style={{ flex: 1, minWidth: 0, position: 'relative' }}>
-        <div style={{ fontSize: 9, fontWeight: 800, letterSpacing: '0.18em', color: GOLD, marginBottom: 2 }}>
-          🏆 AWAITING PLAYOFF
+        <div style={{
+          fontSize: 9,
+          fontWeight: 800,
+          letterSpacing: '0.18em',
+          color: GOLD,
+          marginBottom: 2,
+          display: 'inline-flex',
+          alignItems: 'center',
+          gap: 5,
+        }}>
+          <Trophy size={10} color={GOLD} strokeWidth={2.5} />
+          AWAITING PLAYOFF
         </div>
         <div style={{ fontSize: 17, fontWeight: 800, color: 'white', letterSpacing: '-0.01em' }}>
           {count} tied at the top
