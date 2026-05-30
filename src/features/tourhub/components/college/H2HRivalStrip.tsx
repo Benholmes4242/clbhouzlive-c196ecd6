@@ -135,11 +135,11 @@ function SectionHeader() {
   return (
     <div style={{ padding: SECTION_PADDING }}>
       <div style={{ display: 'flex', alignItems: 'center', marginBottom: 6 }}>
-        <span style={{ fontSize: 9, fontWeight: 800, color: '#64748B', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>
+        <span style={{ fontSize: 9, fontWeight: 800, color: INK_MUTE, letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>
           Head-to-Head
         </span>
       </div>
-      <div style={{ fontSize: 13, fontWeight: 500, color: '#64748B', marginBottom: 10 }}>
+      <div style={{ fontSize: 13, fontWeight: 500, color: INK_MUTE, marginBottom: 10 }}>
         Compare with another program
       </div>
     </div>
