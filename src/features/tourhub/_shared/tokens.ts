@@ -30,6 +30,11 @@ export const INK_FAINT = '#94A3B8';
 export const INK_LIGHT = '#CBD5E1';
 
 // ============================================================================
+// SURFACE (background fills for cards on light theme)
+// ============================================================================
+export const SURFACE = '#FFFFFF';
+
+// ============================================================================
 // SLATE (neutrals on light surface)
 // ============================================================================
 export const SLATE_50 = '#F8FAFC';
@@ -78,12 +83,22 @@ export const SCORE_OVER_PAR_DARK = '#F87171';
 export const STATUS_LIVE = '#10B981';
 
 // ============================================================================
+// TOUR_BRAND (tour-specific brand colours)
+// ============================================================================
+export const PGA_GREEN = '#006747';
+
+// ============================================================================
 // TREND (ranking movement chips — risers / fallers; distinct from SCORE_*)
 // ============================================================================
 export const TREND_UP = '#16A34A';
 export const TREND_UP_TINT = 'rgba(22,163,74,0.10)';
 export const TREND_DOWN = '#DC2626';
 export const TREND_DOWN_TINT = 'rgba(220,38,38,0.10)';
+
+// ============================================================================
+// SEMANTIC ALIASES
+// ============================================================================
+export const DANGER = '#DC2626';
 
 // ============================================================================
 // NAVY (dark theatrical accents)
