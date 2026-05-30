@@ -301,7 +301,7 @@ export function CollegeComparePage() {
             </div>
           ) : error ? (
             <div style={{ textAlign: 'center' as const, padding: '48px 20px' }}>
-              <p style={{ fontSize: '15px', color: '#94A3B8' }}>Failed to load comparison data</p>
+              <p style={{ fontSize: '15px', color: INK_FAINT }}>Failed to load comparison data</p>
             </div>
           ) : data ? (
             <CollegeCompareHero data={data} />
