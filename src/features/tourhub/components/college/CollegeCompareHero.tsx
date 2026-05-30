@@ -213,16 +213,16 @@ function AlumniCompareBlock({ title, alumni1, alumni2, statKey, name1, name2, em
                     />
                   </div>
                   <div style={{ minWidth: 0 }}>
-                    <div style={{ fontSize: '13px', fontWeight: 700, color: '#0F172A', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const }}>
+                    <div style={{ fontSize: '13px', fontWeight: 700, color: INK, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const }}>
                       {a2.last_name}
                     </div>
-                    <div style={{ fontSize: '11px', color: '#F7931E', fontVariantNumeric: 'tabular-nums' }}>
+                    <div style={{ fontSize: '11px', color: AMBER, fontVariantNumeric: 'tabular-nums' }}>
                       {formatStat(a2)}
                     </div>
                   </div>
                 </Link>
               ) : (
-                <span style={{ fontSize: '13px', color: '#94A3B8' }}>{emptyLabel || '—'}</span>
+                <span style={{ fontSize: '13px', color: INK_FAINT }}>{emptyLabel || '—'}</span>
               )}
             </div>
           </div>
