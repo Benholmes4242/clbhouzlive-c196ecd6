@@ -62,12 +62,6 @@ function getDayNum(dateStr: string): string {
   return String(d.getUTCDate());
 }
 
-function getScoreColor(score: number | null): string {
-  if (score === null || score === undefined) return '#94A3B8';
-  if (score < 0) return '#0F172A';
-  if (score > 0) return '#F87171';
-  return '#94A3B8';
-}
 
 /**
  * Resolve EventTag variant from the classification label.
