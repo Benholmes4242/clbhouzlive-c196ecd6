@@ -9,6 +9,7 @@
 
 import React from 'react';
 import { classifyTrajectory } from '../HybridHero.utils';
+import { TREND_UP, TREND_DOWN } from '../../../_shared/tokens';
 
 interface TrajectorySparklineProps {
   /** Per-round scores, e.g. [66, 63, 65, 60]. 2+ entries required to render. */
