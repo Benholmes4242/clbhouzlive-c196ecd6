@@ -145,8 +145,8 @@ export function PlayerCardV2({
   const photoSize = tierAccent ? 38 : 34;
   const nameWeight = tierAccent ? 800 : 700;
   const nameSize = 14;
-  const rankSize = tierAccent ? 16 : 18;
-  const rankColor = tierAccent ? '#F7931E' : 'rgba(15,23,42,0.10)';
+  const rankSize = 18;
+  const rankColor = tierAccent ? AMBER : 'rgba(15,23,42,0.10)';
   const rowPaddingY = tierAccent ? 14 : 12;
 
   return (
