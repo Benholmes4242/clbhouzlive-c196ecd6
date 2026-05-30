@@ -280,7 +280,7 @@ export function FormSection({ playerId }: FormSectionProps) {
           </div>
         </div>
         <div style={{ flex: 1, minWidth: 80, maxWidth: 160 }}>
-          <Sparkline positions={positions} />
+          <Sparkline positions={positions.slice().reverse()} />
         </div>
       </div>
 
