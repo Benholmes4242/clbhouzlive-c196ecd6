@@ -170,7 +170,7 @@ export const TourSwitcherAffordance: React.FC = () => {
                     style={{
                       fontSize: 13,
                       fontWeight: 700,
-                      color: '#0F172A',
+                      color: INK,
                       letterSpacing: '0.04em',
                       textTransform: 'uppercase',
                     }}
