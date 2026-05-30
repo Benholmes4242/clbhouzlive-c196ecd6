@@ -282,14 +282,14 @@ export function CollegeComparePage() {
                     })}
                 </div>
               ) : (
-                <div style={{ textAlign: 'center' as const, padding: '32px 16px', fontSize: 13, color: 'rgba(15,23,42,0.45)', fontWeight: 500 }}>
+                <div style={{ textAlign: 'center' as const, padding: '32px 16px', fontSize: 13, color: INK_ALPHA_45, fontWeight: 500 }}>
                   No colleges found matching "{debouncedPickerInput}"
                 </div>
               )}
             </div>
           ) : isLoading ? (
             <div style={{ marginTop: '8px' }}>
-              <div style={{ background: '#fff', borderTop: `1px solid ${INK_TINT_07}`, borderBottom: `1px solid ${INK_TINT_07}`, marginTop: '8px' }}>
+              <div style={{ background: SURFACE, borderTop: `1px solid ${INK_TINT_07}`, borderBottom: `1px solid ${INK_TINT_07}`, marginTop: '8px' }}>
                 {Array.from({ length: 6 }).map((_, i) => (
                   <div key={i} className="animate-pulse" style={{ display: 'flex', alignItems: 'center', padding: '10px 20px', borderBottom: `0.5px solid ${INK_TINT_07}`, height: '48px' }}>
                     <div style={{ flex: 1, height: '13px', borderRadius: '4px', background: INK_TINT_06 }} />
