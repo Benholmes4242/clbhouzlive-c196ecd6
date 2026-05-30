@@ -5,6 +5,8 @@
  */
 
 import React from 'react';
+import { Trophy } from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
 import { INK, GOLD, NUMERIC_STYLE, STRIP_HEIGHT } from '../HybridHero.constants';
 
 export interface TeamWinnerStripProps {
@@ -13,6 +15,7 @@ export interface TeamWinnerStripProps {
   score: string;
   scoreLabel?: string;
   eyebrow?: string;
+  eyebrowIcon?: LucideIcon;
   teamColor?: string;
   teamCrestUrl?: string | null;
 }
