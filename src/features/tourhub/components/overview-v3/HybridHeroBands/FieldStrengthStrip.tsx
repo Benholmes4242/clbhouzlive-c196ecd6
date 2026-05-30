@@ -92,9 +92,13 @@ export function FieldStrengthStrip({
             color: GOLD,
             textTransform: 'uppercase',
             marginBottom: 2,
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: 5,
           }}
         >
-          📊 FIELD
+          <Users size={10} color={GOLD} strokeWidth={2.5} />
+          FIELD
         </div>
         <div
           style={{
