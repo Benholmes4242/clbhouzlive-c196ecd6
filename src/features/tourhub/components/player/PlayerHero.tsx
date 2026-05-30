@@ -19,6 +19,16 @@ import type { TourPlayer, TourPlayerStatistics } from '../../hooks/useTourHubDat
 import { usePlayerState } from '../../hooks/usePlayerState';
 import { truncateName } from '../../utils/truncateName';
 import { splitStatValue } from '../../utils/splitStatValue';
+import {
+  AMBER,
+  GOLD,
+  GOLD_DEEP,
+  INK,
+  INK_MUTE,
+  SLATE_100,
+  SLATE_50,
+  SURFACE,
+} from '../../_shared/tokens';
 
 interface PlayerHeroProps {
   player: TourPlayer;
