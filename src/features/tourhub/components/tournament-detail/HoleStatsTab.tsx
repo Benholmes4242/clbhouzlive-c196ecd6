@@ -238,9 +238,14 @@ function HoleStatsBody({
   const easiest = easiestHoles[0];
   const showFeatureCards = hasRoundData && hardest && easiest && hardest.holeNumber !== easiest.holeNumber;
 
-  const maxAvg = useMemo(() => {
-    if (processedHoles.length === 0) return 0.01;
-    return Math.max(0.01, ...processedHoles.map(h => Math.abs(h.avgDiff)));
+  const avgRange = useMemo(() => {
+    if (processedHoles.length === 0) return { min: 0, max: 0.01 };
+    const diffs = processedHoles.map(h => h.avgDiff);
+    const min = Math.min(...diffs);
+    // Anchor the top at >= 0 so genuinely over-par holes still read as hard,
+    // and guarantee a non-zero span so we never divide by zero.
+    const max = Math.max(0.01, ...diffs);
+    return { min, max };
   }, [processedHoles]);
 
   const hardestNumber = hardest?.holeNumber;
