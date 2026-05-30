@@ -277,7 +277,7 @@ export function PlayerHero({ player, playerStats }: PlayerHeroProps) {
                   fontSize: 30,
                   fontWeight: 800,
                   color: INK,
-                  letterSpacing: '-0.02em',
+                  letterSpacing: '-0.03em',
                   lineHeight: 1,
                   fontVariantNumeric: 'tabular-nums',
                   whiteSpace: 'nowrap',
