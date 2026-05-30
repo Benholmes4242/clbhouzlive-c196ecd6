@@ -144,7 +144,7 @@ export function CollegeProfilePage() {
           onClick={() => navigate(collegeHubRoute())}
           aria-label="College Profile — open College Franchise"
           style={{
-            background: '#0A0E14',
+            background: '#F8FAFC',
             border: 'none',
             padding: '14px 16px 12px',
             cursor: 'pointer',
@@ -157,16 +157,17 @@ export function CollegeProfilePage() {
             <Kicker color="amber">College Franchise</Kicker>
             <ChevronRight size={11} strokeWidth={2.5} style={{ color: '#F7931E', marginTop: -4 }} />
           </div>
-          <h1 style={{ fontSize: 22, fontWeight: 800, letterSpacing: '-0.025em', lineHeight: 1.05, color: '#FFFFFF', margin: 0 }}>
+          <h1 style={{ fontSize: 22, fontWeight: 800, letterSpacing: '-0.025em', lineHeight: 1.05, color: '#0F172A', margin: 0 }}>
             {displayName}
           </h1>
           {sectionMetaSubtitle && (
-            <div style={{ fontSize: 13, fontWeight: 500, color: 'rgba(255,255,255,0.55)', marginTop: 4 }}>
+            <div style={{ fontSize: 13, fontWeight: 500, color: '#64748B', marginTop: 4 }}>
               {sectionMetaSubtitle}
             </div>
           )}
         </button>
       </ShellSlot>
+
 
       <div style={{ paddingTop: 'var(--chrome-total-h, 0px)' }}>
 

@@ -73,8 +73,8 @@ function ScheduleShellRowInner() {
       <div
         className="relative"
         style={{
-          background: '#0A0E14',
-          borderBottom: '0.5px solid rgba(255,255,255,0.06)',
+          background: '#F8FAFC',
+          borderBottom: '0.5px solid rgba(15,23,42,0.07)',
         }}
       >
         <div
@@ -100,9 +100,9 @@ function ScheduleShellRowInner() {
                     fontSize: 12,
                     fontWeight: 600,
                     borderRadius: 15,
-                    background: isActive ? 'rgba(255,255,255,0.10)' : 'transparent',
-                    border: isActive ? '1px solid rgba(255,255,255,0.55)' : '1px solid rgba(255,255,255,0.18)',
-                    color: isActive ? '#FFFFFF' : 'rgba(255,255,255,0.65)',
+                    background: isActive ? 'rgba(15,23,42,0.06)' : 'transparent',
+                    border: isActive ? '1px solid rgba(15,23,42,0.55)' : '1px solid rgba(15,23,42,0.14)',
+                    color: isActive ? '#0F172A' : '#64748B',
                     letterSpacing: '-0.01em',
                     whiteSpace: 'nowrap',
                   }}
@@ -124,9 +124,9 @@ function ScheduleShellRowInner() {
               fontSize: 12,
               fontWeight: 600,
               borderRadius: 15,
-              background: activeTour !== 'all' ? 'rgba(255,255,255,0.10)' : 'transparent',
-              border: activeTour !== 'all' ? '1px solid rgba(255,255,255,0.55)' : '1px solid rgba(255,255,255,0.18)',
-              color: activeTour !== 'all' ? '#FFFFFF' : 'rgba(255,255,255,0.65)',
+              background: activeTour !== 'all' ? 'rgba(15,23,42,0.06)' : 'transparent',
+              border: activeTour !== 'all' ? '1px solid rgba(15,23,42,0.55)' : '1px solid rgba(15,23,42,0.14)',
+              color: activeTour !== 'all' ? '#0F172A' : '#64748B',
               gap: 5,
               whiteSpace: 'nowrap',
             }}
@@ -140,6 +140,7 @@ function ScheduleShellRowInner() {
           </button>
         </div>
       </div>
+
 
       <BottomSheet
         open={tourSheetOpen}

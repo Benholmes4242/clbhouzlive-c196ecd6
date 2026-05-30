@@ -50,8 +50,8 @@ function PlayersShellRowInner() {
       <div
         className="relative"
         style={{
-          background: '#0A0E14',
-          borderBottom: '0.5px solid rgba(255,255,255,0.06)',
+          background: '#F8FAFC',
+          borderBottom: '0.5px solid rgba(15,23,42,0.07)',
         }}
       >
         <div
@@ -72,9 +72,9 @@ function PlayersShellRowInner() {
                   fontSize: 12,
                   fontWeight: 600,
                   borderRadius: 15,
-                  background: isActive ? 'rgba(255,255,255,0.10)' : 'transparent',
-                  border: isActive ? '1px solid rgba(255,255,255,0.55)' : '1.5px solid rgba(255,255,255,0.10)',
-                  color: isActive ? '#FFFFFF' : 'rgba(255,255,255,0.85)',
+                  background: isActive ? 'rgba(15,23,42,0.06)' : 'transparent',
+                  border: isActive ? '1px solid rgba(15,23,42,0.55)' : '1.5px solid rgba(15,23,42,0.10)',
+                  color: isActive ? '#0F172A' : '#475569',
                   gap: 5,
                   whiteSpace: 'nowrap',
                 }}
@@ -90,6 +90,7 @@ function PlayersShellRowInner() {
           })()}
         </div>
       </div>
+
 
       <BottomSheet
         open={tourSheetOpen}

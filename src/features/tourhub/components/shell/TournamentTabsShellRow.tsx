@@ -39,8 +39,8 @@ function TournamentTabsShellRowInner({ activeTab, onChange }: Props) {
           display: 'flex',
           gap: 8,
           padding: '0 16px',
-          background: '#0A0E14',
-          borderBottom: '0.5px solid rgba(255,255,255,0.06)',
+          background: '#F8FAFC',
+          borderBottom: '0.5px solid rgba(15,23,42,0.07)',
           overflowX: 'auto',
           overflowY: 'hidden',
           WebkitOverflowScrolling: 'touch',
@@ -63,7 +63,7 @@ function TournamentTabsShellRowInner({ activeTab, onChange }: Props) {
                 padding: '0 4px',
                 fontSize: 14,
                 fontWeight: isActive ? 700 : 600,
-                color: isActive ? '#FFFFFF' : 'rgba(255,255,255,0.55)',
+                color: isActive ? '#0F172A' : '#64748B',
                 background: 'transparent',
                 border: 'none',
                 letterSpacing: '-0.005em',
@@ -77,7 +77,7 @@ function TournamentTabsShellRowInner({ activeTab, onChange }: Props) {
                 style={{
                   display: 'inline-block',
                   paddingBottom: 4,
-                  borderBottom: isActive ? '1.5px solid #FFFFFF' : '1.5px solid transparent',
+                  borderBottom: isActive ? '1.5px solid #0F172A' : '1.5px solid transparent',
                 }}
               >
                 {tab.label}
@@ -86,6 +86,7 @@ function TournamentTabsShellRowInner({ activeTab, onChange }: Props) {
           );
         })}
       </div>
+
     </>
   );
 }
