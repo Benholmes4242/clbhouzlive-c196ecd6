@@ -54,28 +54,27 @@ function chooseHeroStat(
   playerStats: TourPlayerStatistics | null,
   playerState: ReturnType<typeof usePlayerState>,
 ): { primary: string } {
-  // 1. Live tournament
+  // 1. Live tournament score (genuinely "right now", not a duplicate of form)
   if (playerState.state === 'live' && playerState.liveData) {
     const ld = playerState.liveData;
     const round = ld.currentRound ? ` · R${ld.currentRound}` : '';
     return { primary: `${ld.scoreText}${round}` };
   }
 
-  // 2. Recent finish (within 14 days, per usePlayerState window)
-  // Big-stat slot is for SHORT scalar values only. Context already lives in
-  // the caption row above, so we don't repeat it here — prevents overflow.
-  if (playerState.state === 'recent' && playerState.recentData) {
-    return { primary: playerState.recentData.label };
-  }
-
-  // 3. Season earnings
-  if (playerStats?.earnings && playerStats.earnings > 0) {
-    return { primary: `${formatEarnings(playerStats.earnings)} earned` };
-  }
-
-  // 4. World rank fallback
+  // 2. World rank — stable, identifying, never wraps
   if (playerStats?.world_rank && playerStats.world_rank > 0) {
-    return { primary: `World #${playerStats.world_rank}` };
+    return { primary: `#${playerStats.world_rank}` };
+  }
+
+  // 3. SG: total (season form, scalar)
+  if (playerStats?.strokes_gained_total != null) {
+    const v = playerStats.strokes_gained_total;
+    return { primary: `${v > 0 ? '+' : ''}${v.toFixed(2)}` };
+  }
+
+  // 4. Season earnings
+  if (playerStats?.earnings && playerStats.earnings > 0) {
+    return { primary: formatEarnings(playerStats.earnings) };
   }
 
   // 5. Age fallback
