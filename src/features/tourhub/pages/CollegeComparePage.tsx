@@ -179,10 +179,10 @@ export function CollegeComparePage() {
             <div style={{ padding: '20px' }}>
               {/* Heading */}
               <div style={{ marginBottom: 14 }}>
-                <div style={{ fontSize: 11, fontWeight: 900, color: '#F7931E', letterSpacing: '0.14em', textTransform: 'uppercase' as const, marginBottom: 6 }}>
+                <div style={{ fontSize: 11, fontWeight: 900, color: AMBER, letterSpacing: '0.14em', textTransform: 'uppercase' as const, marginBottom: 6 }}>
                   Step {c1 ? '2' : '1'} of 2
                 </div>
-                <div style={{ fontSize: 17, fontWeight: 800, color: '#0F172A', letterSpacing: '-0.02em', lineHeight: 1.25 }}>
+                <div style={{ fontSize: 17, fontWeight: 800, color: INK, letterSpacing: '-0.02em', lineHeight: 1.25 }}>
                   {c1
                     ? `Pick a college to compare against ${c1DisplayName}`
                     : 'Pick two colleges to compare'}
@@ -203,8 +203,8 @@ export function CollegeComparePage() {
                   autoFocus
                   style={{
                     width: '100%', height: 48, padding: '0 40px 0 44px',
-                    background: '#fff', border: '1px solid rgba(15,23,42,0.08)',
-                    borderRadius: 12, fontSize: 15, fontWeight: 500, color: '#0F172A',
+                    background: SURFACE, border: `1px solid ${HAIRLINE_INK_8}`,
+                    borderRadius: 12, fontSize: 15, fontWeight: 500, color: INK,
                     outline: 'none',
                   }}
                 />
