@@ -118,9 +118,9 @@ export function FranchiseCard({
   // Tier-driven row metrics
   const logoSize = isTopThree ? 38 : 34;
   const nameWeight = isTopThree ? 800 : 700;
-  const primaryValueColor = isTopThree ? '#F7931E' : '#0F172A';
+  const primaryValueColor = isTopThree ? AMBER : INK;
   const rowPaddingY = isTopThree ? 12 : 11;
-  const rankNumberColor = isTopThree ? '#D97706' : 'rgba(15,23,42,0.10)';
+  const rankNumberColor = isTopThree ? GOLD_DEEP : 'rgba(15,23,42,0.10)';
 
   // Data layer and component conventions agree: positive earnings_rank_change
   // = rank improved (e.g. #8 → #5 = +3), MovementIndicator positive = improved.
@@ -147,7 +147,7 @@ export function FranchiseCard({
               ? 'rgba(16,185,129,0.04)'
               : 'rgba(220,38,38,0.02)',
           } : isTopThree ? {
-            background: '#FEF3E7',
+            background: AMBER_SOFT_BG,
           } : {
             background: 'transparent',
           }),
@@ -158,11 +158,11 @@ export function FranchiseCard({
         {rank !== undefined && !isDelta && (
           <div style={{ width: '32px', flexShrink: 0, textAlign: 'center' as const }}>
             <span style={{
-              fontSize: isTopThree ? '16px' : '18px',
+              fontSize: '18px',
               fontWeight: 900,
               color: rankNumberColor,
               fontVariantNumeric: 'tabular-nums',
-              letterSpacing: '-0.02em',
+              letterSpacing: '-0.03em',
             }}>
               {rank}
             </span>
