@@ -87,9 +87,9 @@ function abbrevName(full: string): string {
 
 function ScoreCell({ score, className }: { score: number | null; className?: string }) {
   if (score === null || score === undefined || score <= 0) {
-    return <span className={cn("", className)} style={{ fontVariantNumeric: 'tabular-nums', color: '#CBD5E1' }}>—</span>;
+    return <span className={cn("", className)} style={{ fontVariantNumeric: 'tabular-nums', color: INK_LIGHT }}>—</span>;
   }
-  return <span className={cn("font-semibold", className)} style={{ fontVariantNumeric: 'tabular-nums', color: '#0F172A' }}>{score}</span>;
+  return <span className={cn("font-semibold", className)} style={{ fontVariantNumeric: 'tabular-nums', color: INK }}>{score}</span>;
 }
 
 function getThruAriaLabel(entry: FullLeaderboardEntry, isMissedCut: boolean, isWD: boolean, isLive: boolean): string {
