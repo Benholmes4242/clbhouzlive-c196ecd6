@@ -68,7 +68,7 @@ export function CompactNextUp({ tournamentId, tourCode, name, daysUntil }: Compa
         style={{
           fontSize: 11,
           fontWeight: 800,
-          color: '#F7931E',
+          color: AMBER,
           fontVariantNumeric: 'tabular-nums',
           flexShrink: 0,
         }}
