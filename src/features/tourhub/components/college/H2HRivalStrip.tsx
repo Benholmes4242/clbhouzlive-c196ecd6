@@ -81,8 +81,8 @@ export function H2HRivalStrip({ normalizedName, className }: H2HRivalStripProps)
                 width: 200,
                 padding: '12px 12px',
                 borderRadius: 12,
-                background: '#F8FAFC',
-                border: '1px solid rgba(15,23,42,0.08)',
+                background: SLATE_50,
+                border: `1px solid ${HAIRLINE_INK_8}`,
                 textDecoration: 'none',
               }}
               className="active:scale-[0.98] transition-transform"
@@ -95,14 +95,14 @@ export function H2HRivalStrip({ normalizedName, className }: H2HRivalStripProps)
                 imageScale={0.78}
               />
               <div style={{ flex: 1, minWidth: 0 }}>
-                <div style={{ fontSize: 13, fontWeight: 800, color: '#0F172A', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', letterSpacing: '-0.2px' }}>
+                <div style={{ fontSize: 13, fontWeight: 800, color: INK, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', letterSpacing: '-0.015em' }}>
                   {displayName}
                 </div>
-                <div style={{ fontSize: 10, fontWeight: 500, color: '#64748B', marginTop: 1 }}>
+                <div style={{ fontSize: 10, fontWeight: 500, color: INK_MUTE, marginTop: 1 }}>
                   {subtitle}
                 </div>
               </div>
-              <ArrowLeftRight size={13} strokeWidth={2.5} style={{ color: '#F7931E', flexShrink: 0 }} />
+              <ArrowLeftRight size={13} strokeWidth={2.5} style={{ color: AMBER, flexShrink: 0 }} />
             </Link>
           );
         })}
