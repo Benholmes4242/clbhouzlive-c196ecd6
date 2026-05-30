@@ -133,7 +133,7 @@ export function TopThreePeek({ rows, onFullLeaderboardTap }: TopThreePeekProps) 
                   minWidth: 0,
                   fontSize: 13,
                   fontWeight: 600,
-                  color: '#0F172A',
+                  color: INK,
                   whiteSpace: 'nowrap',
                   overflow: 'hidden',
                   textOverflow: 'ellipsis',
