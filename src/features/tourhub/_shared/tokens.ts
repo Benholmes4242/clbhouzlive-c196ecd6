@@ -104,6 +104,16 @@ export const SCORE_UNDER_PAR_DARK_PALE = '#86EFAC';          // Tailwind green-3
 export const SCORE_OVER_PAR_DARK_PALE = '#FCA5A5';           // Tailwind red-300 — pale over-par on heavy-dark bg
 
 // ============================================================================
+// EDITORIAL VICTORY (post-tournament recap displays)
+// ============================================================================
+// Distinct from SCORE_UNDER_PAR_LIGHT (#059669 — pure green for live leaderboards)
+// and PGA_GREEN (#006747 — PGA brand forest). RECAP_VICTORY_GREEN sits between
+// them tonally — a deep teal-green used for editorial "this player won" score
+// displays in the HybridRecapNext between-events composer.
+export const RECAP_VICTORY_GREEN = '#0F6E56';                // deep teal-green for editorial victory scores
+
+
+// ============================================================================
 // STATUS (live indicator dot — NOT a verdict)
 // ============================================================================
 export const STATUS_LIVE = '#10B981';
