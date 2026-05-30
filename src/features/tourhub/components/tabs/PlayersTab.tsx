@@ -652,7 +652,7 @@ export function PlayersTab() {
   }
 
   return (
-    <div style={{ background: '#F8FAFC' }}>
+    <div style={{ background: SLATE_50 }}>
 
       {/* ── EDITORIAL OPENING — Masthead + No.1 Cover Story + Movers Grid ── */}
       {!debouncedSearch && elitePlayers && elitePlayers.length > 0 && (() => {
