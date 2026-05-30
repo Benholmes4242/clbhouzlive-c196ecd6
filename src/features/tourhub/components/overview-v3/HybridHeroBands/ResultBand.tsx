@@ -5,10 +5,10 @@
  */
 
 import React from 'react';
+import { Trophy } from 'lucide-react';
 import { INK, AMBER, NUMERIC_STYLE } from '../HybridHero.constants';
+import { LEADER_GOLD as GOLD } from '../../../_shared/tokens';
 import { getFlagCode } from '@/utils/countryFlags';
-
-const GOLD = '#FBBC2E';
 
 function countryToFlag(country: string | null | undefined): string {
   const code = getFlagCode(country ?? undefined);
