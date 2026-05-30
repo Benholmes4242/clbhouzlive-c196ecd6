@@ -247,14 +247,14 @@ export function CollegeProfilePage() {
                     width: 24,
                     height: 24,
                     borderRadius: '50%',
-                    background: '#FFB800',
-                    border: '2.5px solid #FFFFFF',
+                    background: GOLD,
+                    border: `2.5px solid ${SURFACE}`,
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
                     fontSize: 11,
                     fontWeight: 900,
-                    color: '#0F172A',
+                    color: INK,
                     fontVariantNumeric: 'tabular-nums',
                   }}>
                     {collegeRank}
