@@ -297,13 +297,13 @@ export function LeadersTab() {
               style={{
                 display: 'flex', alignItems: 'center', gap: 5,
                 padding: '6px 10px', borderRadius: 8,
-                background: '#EDF1F5',
+                background: SLATE_150,
                 border: 'none', cursor: 'pointer',
               }}
               aria-label="Search players"
             >
-              <Search className="w-3 h-3" style={{ color: '#0F172A' }} strokeWidth={2.5} />
-              <span style={{ fontSize: 12, fontWeight: 700, color: '#0F172A' }}>Search</span>
+              <Search className="w-3 h-3" style={{ color: INK }} strokeWidth={2.5} />
+              <span style={{ fontSize: 12, fontWeight: 700, color: INK }}>Search</span>
             </button>
           )}
         </div>
@@ -311,17 +311,17 @@ export function LeadersTab() {
         {/* Count bar OR search input — mutually exclusive */}
         {!searchExpanded ? (
           <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, padding: '6px 16px 8px' }}>
-            <span style={{ fontSize: 9, fontWeight: 800, color: '#0F172A', letterSpacing: '0.14em', textTransform: 'uppercase' as const, fontVariantNumeric: 'tabular-nums' }}>
+            <span style={{ fontSize: 9, fontWeight: 800, color: INK, letterSpacing: '0.14em', textTransform: 'uppercase' as const, fontVariantNumeric: 'tabular-nums' }}>
               {listPlayers.length.toLocaleString()} {listPlayers.length === 1 ? 'PLAYER' : 'PLAYERS'}
             </span>
-            <span style={{ fontSize: 9, fontWeight: 800, color: '#64748B', letterSpacing: '0.14em', textTransform: 'uppercase' as const }}>
-              RANKED BY <span style={{ color: '#0F172A' }}>{category.shortLabel.toUpperCase()}</span>
+            <span style={{ fontSize: 9, fontWeight: 800, color: INK_MUTE, letterSpacing: '0.14em', textTransform: 'uppercase' as const }}>
+              RANKED BY <span style={{ color: INK }}>{category.shortLabel.toUpperCase()}</span>
             </span>
           </div>
         ) : (
           <div style={{ padding: '6px 16px 8px' }}>
             <div style={{ position: 'relative' }}>
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 z-10 w-4 h-4" style={{ color: '#F7931E' }} strokeWidth={2.5} />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 z-10 w-4 h-4" style={{ color: AMBER }} strokeWidth={2.5} />
               <input
                 type="text"
                 autoFocus
@@ -329,7 +329,7 @@ export function LeadersTab() {
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 className="w-full h-9 pl-9 pr-9 rounded-lg text-[13px] font-semibold text-foreground placeholder:text-muted-foreground/70 focus:outline-none"
-                style={{ background: '#ffffff', border: '1px solid rgba(15,23,42,0.09)' }}
+                style={{ background: SURFACE, border: `1px solid ${HAIRLINE_INK_10}` }}
               />
               <button
                 onClick={() => { setSearch(''); setSearchExpanded(false); }}
@@ -337,7 +337,7 @@ export function LeadersTab() {
                 className="absolute right-2 top-1/2 -translate-y-1/2 p-1 rounded-full active:scale-90"
                 style={{ background: INK_TINT_06 }}
               >
-                <X className="w-3 h-3" style={{ color: '#0F172A' }} strokeWidth={2.5} />
+                <X className="w-3 h-3" style={{ color: INK }} strokeWidth={2.5} />
               </button>
             </div>
           </div>
