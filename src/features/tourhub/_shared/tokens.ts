@@ -48,7 +48,9 @@ export const SLATE_800 = '#1e293b';                          // Tailwind slate-8
 // HAIRLINE (divider variants)
 // ============================================================================
 export const HAIRLINE_INK_7 = 'rgba(15,23,42,0.07)';
+export const HAIRLINE_INK_8 = 'rgba(15,23,42,0.08)';         // hairline/faint bg fill — 15 cross-app files
 export const HAIRLINE_INK_10 = 'rgba(15,23,42,0.10)';
+export const HAIRLINE_INK_12 = 'rgba(15,23,42,0.12)';        // cut-line / section divider hairline — 7 cross-app files
 export const HAIRLINE_INK_15 = 'rgba(15,23,42,0.15)';        // section divider on light bg with stronger emphasis
 
 // ============================================================================
