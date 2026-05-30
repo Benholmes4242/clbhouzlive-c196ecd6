@@ -167,7 +167,7 @@ export function LeaderboardCard({
       {onViewAll && hasMore && (
         <button
           onClick={onViewAll}
-          style={{ width: '100%', padding: '12px 0', fontSize: '11px', fontWeight: 800, color: '#0F172A', background: 'transparent', border: 'none', borderTop: `0.5px solid ${INK_TINT_07}`, cursor: 'pointer', letterSpacing: '-0.005em', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 2 }}
+          style={{ width: '100%', padding: '12px 0', fontSize: '11px', fontWeight: 800, color: INK, background: 'transparent', border: 'none', borderTop: `0.5px solid ${INK_TINT_07}`, cursor: 'pointer', letterSpacing: '-0.005em', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 2 }}
           className="active:opacity-70 transition-opacity"
         >
           Full Leaderboard
