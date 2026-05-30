@@ -944,6 +944,7 @@ function ResultsCard({
           }}
         >
           {isWinner && <Trophy size={11} strokeWidth={3} color={INK} />}
+          {pick.outcome === 'top5' && <Check size={11} strokeWidth={3} color="#fff" />}
           {cfg.label}
         </div>
 
