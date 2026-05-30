@@ -246,7 +246,7 @@ export function FormSection({ playerId }: FormSectionProps) {
             textTransform: 'uppercase' as const,
           }}
         >
-          Form · last {visible.length} events
+          Form · last {Math.min(10, trend.length)} events
         </span>
       </div>
 
