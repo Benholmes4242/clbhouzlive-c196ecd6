@@ -22,7 +22,7 @@
  */
 
 import { useState, useMemo } from 'react';
-import { SLATE_600, INK_TINT_06, INK_TINT_07 } from '../../_shared/tokens';
+import { AMBER, INK, INK_FAINT, INK_TINT_06, INK_TINT_07, SLATE_600, SURFACE, TREND_UP } from '../../_shared/tokens';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
