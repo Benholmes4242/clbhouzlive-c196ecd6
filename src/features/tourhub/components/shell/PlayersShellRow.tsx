@@ -141,10 +141,10 @@ function PlayersShellRowInner() {
                   : null}
               </div>
               <div style={{ flex: 1, minWidth: 0 }}>
-                <div style={{ fontSize: 15, fontWeight: isSelected ? 700 : 500, color: '#0F172A' }}>{TOUR_LABELS[code]}</div>
-                <div style={{ fontSize: 12, color: '#94A3B8', marginTop: 2 }}>{TOUR_DESCRIPTIONS[code]}</div>
+                <div style={{ fontSize: 15, fontWeight: isSelected ? 700 : 500, color: INK }}>{TOUR_LABELS[code]}</div>
+                <div style={{ fontSize: 12, color: INK_FAINT, marginTop: 2 }}>{TOUR_DESCRIPTIONS[code]}</div>
               </div>
-              {isSelected && <div style={{ width: 6, height: 6, borderRadius: '50%', background: '#F7931E', flexShrink: 0 }} />}
+              {isSelected && <div style={{ width: 6, height: 6, borderRadius: '50%', background: AMBER, flexShrink: 0 }} />}
             </button>
           );
         })}
