@@ -197,10 +197,10 @@ function HeroChampion({ champion, runnerUp, champStats, champPhotoUrl, sort, act
             style={{
               position: 'absolute', bottom: -4, right: -4,
               width: 22, height: 22, borderRadius: '50%',
-              background: '#FFB800', color: '#0F172A',
+              background: GOLD, color: INK,
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               fontSize: 11, fontWeight: 900,
-              border: '2.5px solid #ffffff',
+              border: `2.5px solid ${SURFACE}`,
               boxShadow: '0 1px 3px rgba(15,23,42,0.15)',
               fontVariantNumeric: 'tabular-nums',
             }}
