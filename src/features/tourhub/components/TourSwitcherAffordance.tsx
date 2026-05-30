@@ -140,12 +140,12 @@ export const TourSwitcherAffordance: React.FC = () => {
                   padding: '14px 16px',
                   background: isActive ? AMBER_TINT_04 : 'transparent',
                   border: 'none',
-                  borderLeft: isActive ? '3px solid #F7931E' : '3px solid transparent',
+                  borderLeft: isActive ? `3px solid ${AMBER}` : '3px solid transparent',
                   borderBottom: `0.5px solid ${INK_TINT_07}`,
                   cursor: selectable ? 'pointer' : 'default',
                   opacity: selectable ? 1 : 0.4,
                   textAlign: 'left',
-                  fontFamily: 'Geist, system-ui, sans-serif',
+                  fontFamily: FONT,
                 }}
               >
                 <div
