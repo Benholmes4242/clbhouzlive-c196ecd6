@@ -35,7 +35,7 @@ import {
 } from '../schedule';
 
 import { useLiveRightNow } from '../../hooks/useOverviewModules';
-import { AMBER, INK, INK_MUTE, INK_TINT_07, HAIRLINE_INK_10, SLATE_50, SURFACE } from '../../_shared/tokens';
+import { AMBER, INK, INK_MUTE, INK_FAINT, INK_TINT_07, HAIRLINE_INK_10, SLATE_50, SURFACE } from '../../_shared/tokens';
 
 // B45 FIX 1: Helper for completed status check
 const isCompleted = (t: TourTournament) => t.status === 'closed' || t.status === 'complete';
