@@ -86,7 +86,8 @@ export function TeamWinnerStrip({
   members,
   score,
   scoreLabel,
-  eyebrow = '🏆 TEAM WINNER',
+  eyebrow = 'TEAM WINNER',
+  eyebrowIcon: EyebrowIcon = Trophy,
   teamColor,
   teamCrestUrl,
 }: TeamWinnerStripProps) {
