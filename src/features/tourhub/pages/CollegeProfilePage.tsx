@@ -215,13 +215,13 @@ export function CollegeProfilePage() {
                   width: 80,
                   height: 80,
                   borderRadius: '27px',
-                  background: '#FFFFFF',
+                  background: SURFACE,
                   padding: 10,
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  border: '2.5px solid #FFB800',
-                  boxShadow: '0 4px 12px rgba(255,184,0,0.20)',
+                  border: `2.5px solid ${GOLD}`,
+                  boxShadow: GOLD_GLOW_DROP,
                   overflow: 'hidden',
                 }}>
                   {logoUrl && !heroImgError ? (
@@ -232,7 +232,7 @@ export function CollegeProfilePage() {
                       onError={() => setHeroImgError(true)}
                     />
                   ) : (
-                    <span style={{ fontSize: 28, fontWeight: 900, color: '#0F172A' }}>
+                    <span style={{ fontSize: 28, fontWeight: 900, color: INK }}>
                       {displayName?.charAt(0)?.toUpperCase() ?? '?'}
                     </span>
                   )}
