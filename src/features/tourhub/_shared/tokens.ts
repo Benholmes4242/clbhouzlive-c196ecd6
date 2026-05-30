@@ -46,6 +46,15 @@ export const SLATE_200 = '#E2E8F0';
 // ============================================================================
 export const HAIRLINE_INK_7 = 'rgba(15,23,42,0.07)';
 export const HAIRLINE_INK_10 = 'rgba(15,23,42,0.10)';
+export const HAIRLINE_INK_15 = 'rgba(15,23,42,0.15)';        // section divider on light bg with stronger emphasis
+
+// ============================================================================
+// INK_ALPHA (text/scrim overlays on light bg where alpha-based muting is needed)
+// ============================================================================
+// Used primarily by hero PhotoBand for legibility scrims and ink-alpha caption text.
+// Distinct from INK_* which are solid Tailwind slate values.
+export const INK_ALPHA_45 = 'rgba(15,23,42,0.45)';           // medium ink-alpha (caption / secondary on light)
+export const INK_ALPHA_60 = 'rgba(15,23,42,0.60)';           // heavier ink-alpha (subhead-equivalent on light)
 
 // ============================================================================
 // AMBER (brand)
