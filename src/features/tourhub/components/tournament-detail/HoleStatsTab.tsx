@@ -412,10 +412,11 @@ function FeatureCard({ kind, hole }: { kind: 'hardest' | 'easiest'; hole: Proces
 }
 
 function HoleStatRow({
-  hole, maxAvg, hardestNumber, easiestNumber,
-}: { hole: ProcessedHole; maxAvg: number; hardestNumber?: number; easiestNumber?: number }) {
+  hole, avgRange, hardestNumber, easiestNumber,
+}: { hole: ProcessedHole; avgRange: { min: number; max: number }; hardestNumber?: number; easiestNumber?: number }) {
   const dist = computeDist(hole);
-  const pct = Math.min(1, Math.max(0, hole.avgDiff / maxAvg));
+  const span = Math.max(0.01, avgRange.max - avgRange.min);
+  const pct = Math.min(1, Math.max(0, (hole.avgDiff - avgRange.min) / span));
   const ramp = avgColor(pct);
   const avgLabel = hole.avgDiff > 0 ? `+${hole.avgDiff.toFixed(2)}` : hole.avgDiff.toFixed(2);
   const tag =
