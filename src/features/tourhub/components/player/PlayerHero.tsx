@@ -271,8 +271,8 @@ export function PlayerHero({ player, playerStats }: PlayerHeroProps) {
                 height: 80,
                 borderRadius: '34%',
                 overflow: 'hidden',
-                background: '#F1F5F9',
-                border: '2.5px solid #FFB800',
+                background: SLATE_100,
+                border: `2.5px solid ${GOLD}`,
                 boxShadow: '0 4px 12px rgba(255,184,0,0.20)',
               }}
             >
