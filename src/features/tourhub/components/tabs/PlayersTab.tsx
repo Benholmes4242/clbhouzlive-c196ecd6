@@ -692,20 +692,20 @@ export function PlayersTab() {
                       marginBottom: 6,
                     }}
                   >
-                    <Users size={13} strokeWidth={2.5} style={{ color: '#F7931E' }} />
-                    <span style={{ fontSize: 10.5, fontWeight: 700, letterSpacing: '0.14em', color: '#F7931E', textTransform: 'uppercase' as const }}>
+                    <Users size={13} strokeWidth={2.5} style={{ color: AMBER }} />
+                    <span style={{ fontSize: 10.5, fontWeight: 700, letterSpacing: '0.14em', color: AMBER, textTransform: 'uppercase' as const }}>
                       PLAYERS
                     </span>
-                    <ChevronRight size={11} strokeWidth={2.5} style={{ color: '#F7931E', marginTop: 1 }} />
+                    <ChevronRight size={11} strokeWidth={2.5} style={{ color: AMBER, marginTop: 1 }} />
                   </button>
-                  <h1 style={{ fontSize: 18, fontWeight: 800, color: '#0F172A', letterSpacing: '-0.015em', margin: 0, lineHeight: 1.2 }}>
+                  <h1 style={{ fontSize: 24, fontWeight: 800, color: INK, letterSpacing: '-0.025em', margin: 0, lineHeight: 1.15 }}>
                     Players
                   </h1>
-                  <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 8, marginTop: 4 }}>
-                    <span style={{ fontSize: 13, fontWeight: 600, color: '#64748B' }}>
+                  <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 8, marginTop: 8 }}>
+                    <span style={{ fontSize: 13, fontWeight: 700, color: INK, letterSpacing: '-0.005em' }}>
                       {seasonLabel}
                     </span>
-                    <span style={{ fontSize: 13, fontWeight: 700, color: '#0F172A', fontVariantNumeric: 'tabular-nums' }}>
+                    <span style={{ fontSize: 13, fontWeight: 600, color: INK_FAINT, fontVariantNumeric: 'tabular-nums' }}>
                       {totalCount.toLocaleString()} players
                     </span>
                   </div>
