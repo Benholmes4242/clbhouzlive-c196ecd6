@@ -8,7 +8,13 @@ import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { BatchPlayerAvatar } from '../PlayerAvatar';
 import { playerRoute } from '../../routes';
-import { INK_TINT_07 } from '../../_shared/tokens';
+import { INK_TINT_07, SCORE_UNDER_PAR_LIGHT, SCORE_OVER_PAR_LIGHT, INK_FAINT, INK_MUTE, LEADER_GOLD_TINT_10, AMBER } from '../../_shared/tokens';
+
+function abbrevName(full: string): string {
+  const parts = full.trim().split(/\s+/);
+  if (parts.length === 1) return parts[0];
+  return `${parts[0][0].toUpperCase()}. ${parts[parts.length - 1]}`;
+}
 
 interface LeaderboardEntry {
   id: string;
