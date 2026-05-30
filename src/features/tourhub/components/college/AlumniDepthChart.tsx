@@ -140,9 +140,9 @@ function AlumniRow({ alumnus, index, tier, legacyContextLabel }: AlumniRowProps)
 
         {/* EARN */}
         <div style={{ width: 56, textAlign: 'right' as const, flexShrink: 0 }}>
-          <div style={{ fontSize: 10, fontWeight: 500, color: '#94A3B8', letterSpacing: '0.04em' }}>EARN</div>
+          <div style={{ fontSize: 10, fontWeight: 500, color: INK_FAINT, letterSpacing: '0.04em' }}>EARN</div>
           <div style={{
-            fontSize: 13, fontWeight: 800, color: hasEarnings ? '#F7931E' : '#94A3B8',
+            fontSize: 13, fontWeight: 800, color: hasEarnings ? AMBER : INK_FAINT,
             fontVariantNumeric: 'tabular-nums',
           }}>
             {hasEarnings ? formatCurrency(alumnus.earnings ?? 0) : '—'}
@@ -151,10 +151,10 @@ function AlumniRow({ alumnus, index, tier, legacyContextLabel }: AlumniRowProps)
 
         {/* W */}
         <div style={{ width: 36, textAlign: 'right' as const, flexShrink: 0, marginLeft: 8 }}>
-          <div style={{ fontSize: 10, fontWeight: 500, color: '#94A3B8', letterSpacing: '0.04em' }}>W</div>
+          <div style={{ fontSize: 10, fontWeight: 500, color: INK_FAINT, letterSpacing: '0.04em' }}>W</div>
           <div style={{
             fontSize: 13, fontWeight: 800,
-            color: hasWins ? '#0F172A' : '#94A3B8',
+            color: hasWins ? INK : INK_FAINT,
             fontVariantNumeric: 'tabular-nums',
           }}>
             {hasWins ? alumnus.wins : '—'}
