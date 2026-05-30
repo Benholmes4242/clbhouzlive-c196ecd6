@@ -240,24 +240,24 @@ export function LeadersTab() {
   // ─── Loading skeleton ───
   if (isLoading) {
     return (
-      <div style={{ background: '#F8FAFC' }}>
+      <div style={{ background: SLATE_50 }}>
         {/* Masthead skeleton */}
-        <div style={{ background: '#F8FAFC', padding: '16px 16px 14px' }}>
+        <div style={{ background: SLATE_50, padding: '16px 16px 14px' }}>
           {/* Eyebrow line (10.5px / 700) */}
           <Skeleton className="h-3 w-24 mb-2" style={{ background: INK_TINT_06 }} />
-          {/* h1 (18px / 800) */}
-          <Skeleton className="h-5 w-40 mb-2" style={{ background: INK_TINT_06 }} />
+          {/* h1 (24px / 800) */}
+          <Skeleton className="h-7 w-40 mb-2" style={{ background: INK_TINT_06 }} />
           {/* Subhead (13px) */}
           <Skeleton className="h-3 w-56 mb-3" style={{ background: INK_TINT_06 }} />
           {/* Leader card */}
-          <Skeleton className="h-28 w-full rounded-[14px]" style={{ background: 'rgba(255,184,0,0.10)' }} />
+          <Skeleton className="h-28 w-full rounded-[14px]" style={{ background: GOLD_TINT_10 }} />
         </div>
         {/* Sticky header skeleton */}
         <div style={{ padding: '12px 16px' }}>
           <Skeleton className="h-8 w-full rounded-lg" />
         </div>
         {/* Row skeletons */}
-        <div style={{ background: '#ffffff', borderTop: `1px solid ${INK_TINT_07}` }}>
+        <div style={{ background: SURFACE, borderTop: `1px solid ${INK_TINT_07}` }}>
           {Array.from({ length: 8 }).map((_, i) => (
             <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '12px 16px', borderBottom: `0.5px solid ${INK_TINT_07}` }}>
               <Skeleton className="h-5 w-8" />
@@ -274,7 +274,7 @@ export function LeadersTab() {
 
 
   return (
-    <div style={{ background: '#F8FAFC' }}>
+    <div style={{ background: SLATE_50 }}>
       {/* Unified editorial masthead */}
       <LeadersMasthead
         leader={leader}
