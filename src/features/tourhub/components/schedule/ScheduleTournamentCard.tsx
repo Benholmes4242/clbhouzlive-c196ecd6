@@ -206,7 +206,7 @@ export function ScheduleTournamentCard({
                 lineHeight: 1,
               }}
             >
-              <span style={{ width: 5, height: 5, borderRadius: '50%', background: '#10B981' }} />
+              <span style={{ width: 5, height: 5, borderRadius: '50%', background: STATUS_LIVE }} />
               LIVE
               {leaderWinner?.round1 !== undefined && (() => {
                 const roundInfo = getCurrentRound(
