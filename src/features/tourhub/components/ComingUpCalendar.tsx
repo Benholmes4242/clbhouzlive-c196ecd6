@@ -29,6 +29,14 @@ import {
   NAVY_HIGH,
   SLATE_150,
   SLATE_200,
+  SLATE_600,
+  SURFACE,
+  WHITE_ALPHA_04,
+  WHITE_ALPHA_10,
+  WHITE_ALPHA_12,
+  WHITE_ALPHA_30,
+  WHITE_ALPHA_55,
+  WHITE_ALPHA_65,
 } from '../_shared/tokens';
 
 // ── Date helpers ────────────────────────────────────────────────────────────
@@ -90,7 +98,7 @@ function classifyTier(t: SeasonTournament): Tier {
 function getTourBrand(tourName: string | null | undefined): {
   bg: string; fg: string; label: string; stripe: string;
 } {
-  const fallback = { bg: '#475569', fg: '#FFFFFF', label: 'TOUR', stripe: '#475569' };
+  const fallback = { bg: SLATE_600, fg: SURFACE, label: 'TOUR', stripe: SLATE_600 };
   if (!tourName) return fallback;
 
   const slug = TOUR_NAME_TO_SLUG[tourName];
@@ -207,13 +215,13 @@ function HeadlineCard({ tournament }: { tournament: SeasonTournament }) {
           background: 'rgba(0, 0, 0, 0.28)',
           backdropFilter: 'blur(22px) saturate(180%)',
           WebkitBackdropFilter: 'blur(22px) saturate(180%)',
-          border: '1px solid rgba(255, 255, 255, 0.12)',
+          border: `1px solid ${WHITE_ALPHA_12}`,
           boxShadow: '0 2px 8px rgba(0, 0, 0, 0.25)',
           borderRadius: 4,
           padding: '3px 8px',
           fontSize: 9,
           fontWeight: 800,
-          color: '#FFFFFF',
+          color: SURFACE,
           letterSpacing: '0.12em',
           textTransform: 'uppercase',
           display: 'inline-flex',
@@ -228,7 +236,7 @@ function HeadlineCard({ tournament }: { tournament: SeasonTournament }) {
       <div style={{ padding: '14px 16px 16px' }}>
         <div style={{
           fontSize: 19, fontWeight: 800, letterSpacing: '-0.025em',
-          color: '#fff', lineHeight: 1.15, marginBottom: 5,
+          color: SURFACE, lineHeight: 1.15, marginBottom: 5,
         }}>{tournament.name}</div>
 
         {tournament.venueName && (() => {
@@ -236,7 +244,7 @@ function HeadlineCard({ tournament }: { tournament: SeasonTournament }) {
           const hasMore = hasStats || !!tournament.defendingChampion;
           return (
             <div style={{
-              fontSize: 12, color: 'rgba(255,255,255,0.65)',
+              fontSize: 12, color: WHITE_ALPHA_65,
               display: 'flex', alignItems: 'center', gap: 4,
               marginBottom: hasMore ? 10 : 0,
               minWidth: 0,
@@ -261,14 +269,14 @@ function HeadlineCard({ tournament }: { tournament: SeasonTournament }) {
 
           return (
             <div style={{
-              paddingTop: 11, borderTop: '1px solid rgba(255,255,255,0.10)',
+              paddingTop: 11, borderTop: `1px solid ${WHITE_ALPHA_10}`,
               display: 'flex', alignItems: 'center', gap: 12,
               fontSize: 11,
             }}>
               {hasDefending && (
                 <div style={{
                   display: 'flex', alignItems: 'center', gap: 6,
-                  color: 'rgba(255,255,255,0.55)',
+                  color: WHITE_ALPHA_55,
                   flex: 1, minWidth: 0,
                 }}>
                   {(() => {
@@ -285,7 +293,7 @@ function HeadlineCard({ tournament }: { tournament: SeasonTournament }) {
                           }}>{prevYear}</span>
                         )}
                         <span style={{
-                          color: '#fff', fontWeight: 600,
+                          color: SURFACE, fontWeight: 600,
                           overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
                         }}>{tournament.defendingChampion}</span>
                       </>
@@ -304,7 +312,7 @@ function HeadlineCard({ tournament }: { tournament: SeasonTournament }) {
                   {chips.map((c, i) => (
                     <span key={i} style={{ display: 'inline-flex', alignItems: 'center' }}>
                       {i > 0 && (
-                        <span style={{ margin: '0 6px', color: 'rgba(255,255,255,0.30)' }}>·</span>
+                        <span style={{ margin: '0 6px', color: WHITE_ALPHA_30 }}>·</span>
                       )}
                       {c}
                     </span>
@@ -407,7 +415,7 @@ function CalendarSkeleton() {
         background: INK,
         borderRadius: 16, overflow: 'hidden',
       }}>
-        <div style={{ aspectRatio: '16 / 9', background: 'rgba(255,255,255,0.04)' }} />
+        <div style={{ aspectRatio: '16 / 9', background: WHITE_ALPHA_04 }} />
         <div style={{ padding: '14px 16px 16px' }}>
           <Shimmer width="75%" height={19} radius={4} style={{ marginBottom: 7 }} />
           <Shimmer width="55%" height={12} radius={3} />

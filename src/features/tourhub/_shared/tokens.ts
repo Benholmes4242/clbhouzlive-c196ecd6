@@ -40,6 +40,7 @@ export const SURFACE = '#FFFFFF';
 export const SLATE_50 = '#F8FAFC';
 export const SLATE_150 = '#EDF1F5';
 export const SLATE_200 = '#E2E8F0';
+export const SLATE_600 = '#475569';                          // Tailwind slate-600 — used as fallback bg/stripe when no brand color is available (22 files)
 
 // ============================================================================
 // HAIRLINE (divider variants)
@@ -55,6 +56,21 @@ export const HAIRLINE_INK_15 = 'rgba(15,23,42,0.15)';        // section divider 
 // Distinct from INK_* which are solid Tailwind slate values.
 export const INK_ALPHA_45 = 'rgba(15,23,42,0.45)';           // medium ink-alpha (caption / secondary on light)
 export const INK_ALPHA_60 = 'rgba(15,23,42,0.60)';           // heavier ink-alpha (subhead-equivalent on light)
+
+// ============================================================================
+// WHITE ALPHAS (text + borders on dark bg — parallel to INK_ALPHA family)
+// ============================================================================
+// Cross-app frequency (pre-Phase 5):
+//   _55: 16 files | _10: 11 files | _65: 7 files | _04: 6 files
+//   _12: 4 files  | _30: 3 files
+// Use for: text colors on dark/photo bg, hairline borders, image placeholders,
+// glass overlays, separator dots. Phase 10 will sweep all cross-app sites.
+export const WHITE_ALPHA_04 = 'rgba(255,255,255,0.04)';      // image placeholder bg
+export const WHITE_ALPHA_10 = 'rgba(255,255,255,0.10)';      // hairline border on dark bg
+export const WHITE_ALPHA_12 = 'rgba(255,255,255,0.12)';      // glass overlay border
+export const WHITE_ALPHA_30 = 'rgba(255,255,255,0.30)';      // separator dots, fine details
+export const WHITE_ALPHA_55 = 'rgba(255,255,255,0.55)';      // tertiary/disabled text on dark bg
+export const WHITE_ALPHA_65 = 'rgba(255,255,255,0.65)';      // secondary text on dark bg
 
 // ============================================================================
 // AMBER (brand)
