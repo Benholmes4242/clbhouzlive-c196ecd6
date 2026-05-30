@@ -186,18 +186,18 @@ export function CollegeProfilePage() {
           <div>
             {/* Caption row */}
             <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 10, flexWrap: 'wrap' }}>
-              <Crown size={13} strokeWidth={2.5} fill="#FFB800" style={{ color: '#D97706' }} />
+              <Crown size={13} strokeWidth={2.5} fill={GOLD} style={{ color: GOLD_DEEP }} />
               {captionMetadata.map((part, i) => (
                 <Fragment key={i}>
                   {i > 0 && (
-                    <span style={{ fontSize: 10, color: '#CBD5E1' }}>·</span>
+                    <span style={{ fontSize: 10, color: INK_MUTE }}>·</span>
                   )}
                   <span style={{
                     fontSize: 10,
                     fontWeight: 800,
                     letterSpacing: '0.14em',
                     textTransform: 'uppercase' as const,
-                    color: i === 0 ? '#0F172A' : '#64748B',
+                    color: i === 0 ? INK : INK_MUTE,
                   }}>
                     {part}
                   </span>
