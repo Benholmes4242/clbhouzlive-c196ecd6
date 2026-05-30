@@ -131,22 +131,22 @@ function AlumniCompareBlock({ title, alumni1, alumni2, statKey, name1, name2, em
   if (rowCount === 0) return null;
 
   return (
-    <div style={{ background: '#ffffff', borderTop: `1px solid ${INK_TINT_07}`, borderBottom: `1px solid ${INK_TINT_07}`, marginTop: '8px' }}>
+    <div style={{ background: SURFACE, borderTop: `1px solid ${INK_TINT_07}`, borderBottom: `1px solid ${INK_TINT_07}`, marginTop: '8px' }}>
       {/* Section eyebrow — canonical §6 slate-caps */}
       <div style={{ padding: '14px 16px 10px' }}>
-        <span style={{ fontSize: '9px', fontWeight: 800, color: '#64748B', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>
+        <span style={{ fontSize: '9px', fontWeight: 800, color: INK_MUTE, letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>
           {title}
         </span>
       </div>
 
       {/* Column headers */}
-      <div style={{ display: 'flex', alignItems: 'center', padding: '4px 16px', background: 'rgba(15,23,42,0.02)', borderTop: `0.5px solid ${INK_TINT_07}`, borderBottom: `0.5px solid ${INK_TINT_07}` }}>
+      <div style={{ display: 'flex', alignItems: 'center', padding: '4px 16px', background: INK_TINT_02, borderTop: `0.5px solid ${INK_TINT_07}`, borderBottom: `0.5px solid ${INK_TINT_07}` }}>
         <span style={{ width: '18px', flexShrink: 0 }} />
-        <span style={{ flex: 1, fontSize: '9px', fontWeight: 800, color: '#94A3B8', letterSpacing: '0.14em', paddingRight: '8px' }}>
+        <span style={{ flex: 1, fontSize: '9px', fontWeight: 800, color: INK_FAINT, letterSpacing: '0.14em', paddingRight: '8px' }}>
           {name1.toUpperCase()}
         </span>
         <div style={{ width: '1px', height: '12px', background: INK_TINT_07, flexShrink: 0 }} />
-        <span style={{ flex: 1, fontSize: '9px', fontWeight: 800, color: '#94A3B8', letterSpacing: '0.14em', paddingLeft: '8px' }}>
+        <span style={{ flex: 1, fontSize: '9px', fontWeight: 800, color: INK_FAINT, letterSpacing: '0.14em', paddingLeft: '8px' }}>
           {name2.toUpperCase()}
         </span>
       </div>
