@@ -250,7 +250,7 @@ export function TournamentHero({ tournament, imageUrl, leader, leaderboard }: To
 
         {/* Bottom — location + tournament name */}
         <div style={{ position: 'absolute', bottom: 0, left: 16, right: 16, paddingBottom: 14 }}>
-          <h1 style={{ fontSize: 22, fontWeight: 800, color: '#ffffff', letterSpacing: '-0.025em', lineHeight: 1.1, margin: '0 0 6px' }}>
+          <h1 style={{ fontSize: 22, fontWeight: 800, color: SURFACE, letterSpacing: '-0.025em', lineHeight: 1.15, margin: '0 0 6px' }}>
             {tournament.name}
           </h1>
           {(tournament.venue_city || tournament.venue_country || dateRange) && (
