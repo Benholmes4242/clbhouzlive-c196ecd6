@@ -6,7 +6,7 @@
  */
 
 import { getTourMeta } from '../../constants/tourMap';
-import { INK_TINT_07 } from '../../_shared/tokens';
+import { AMBER, AMBER_BORDER, AMBER_SOFT_BG, INK, INK_MUTE, INK_TINT_07 } from '../../_shared/tokens';
 
 interface ScheduleMonthHeaderProps {
   monthLabel: string;
