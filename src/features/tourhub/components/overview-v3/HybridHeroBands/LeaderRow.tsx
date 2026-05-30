@@ -11,8 +11,6 @@ import {
   INK_15,
   INK_45,
   GOLD_DARK,
-  AMBER,
-  GREEN_LIVE,
   NUMERIC_STYLE,
 } from '../HybridHero.constants';
 import { getScoreColor } from '../../../_shared/scoreColor';
