@@ -21,6 +21,7 @@ import { getContextLabel, TOUR_NAME_TO_SLUG } from '../../utils/tournamentClassi
 
 import { getCurrentRound } from '../../utils/formatThruDisplay';
 import { formatPurse } from '../shared/TourHeroHelpers';
+import { getScoreColor } from '../../_shared/scoreColor';
 import { TourPill } from '../shared/TourPill';
 import { EventTag, type EventTagKind } from '../shared/EventTag';
 import { WinnerPill } from '../shared/WinnerPill';
@@ -62,12 +63,6 @@ function getDayNum(dateStr: string): string {
   return String(d.getUTCDate());
 }
 
-function getScoreColor(score: number | null): string {
-  if (score === null || score === undefined) return '#94A3B8';
-  if (score < 0) return '#0F172A';
-  if (score > 0) return '#F87171';
-  return '#94A3B8';
-}
 
 /**
  * Resolve EventTag variant from the classification label.
@@ -267,7 +262,7 @@ export function ScheduleTournamentCard({
               style={{
                 fontWeight: 800,
                 marginLeft: 2,
-                color: getScoreColor(leaderWinner!.score),
+                color: getScoreColor(leaderWinner!.score, 'light', 'standard'),
                 fontVariantNumeric: 'tabular-nums',
               }}
             >

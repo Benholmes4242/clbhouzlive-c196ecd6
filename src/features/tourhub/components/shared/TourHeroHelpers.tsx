@@ -12,19 +12,7 @@ import { getPlayerHeadshotUrl, PLAYER_SILHOUETTE_URL } from '@/utils/playerHeads
 import { PlayerSilhouette } from '@/components/ui/PlayerSilhouette';
 import type { TournamentFinisher } from '../../hooks/useTournamentLeadersWinners';
 import { useCountdown } from '@/hooks/useCountdown';
-
-/** Score color — amber for under par, red for over, grey for even */
-export function getScoreColor(score: number | null): string {
-  if (score === null || score === undefined) return 'rgba(255,255,255,0.55)';
-  if (score < 0) return '#F7931E';
-  if (score > 0) return '#EF4444';
-  return 'rgba(255,255,255,0.55)';
-}
-
-/** Score color for FINISHED state — same palette */
-export function getFinishedScoreColor(score: number | null): string {
-  return getScoreColor(score);
-}
+import { getScoreColor as getScoreColorCanonical } from '../../_shared/scoreColor';
 
 export function formatPurse(purse: number | null): string {
   if (!purse) return '';
@@ -371,7 +359,7 @@ export function PodiumRunnerRow({
         style={{
           fontSize: isSingle ? 14 : 13,
           fontWeight: isSingle ? 700 : 600,
-          color: getFinishedScoreColor(row.sharedScore),
+          color: getScoreColorCanonical(row.sharedScore, 'dark', 'standard'),
           flexShrink: 0,
         }}
       >

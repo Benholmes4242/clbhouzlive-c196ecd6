@@ -33,19 +33,10 @@ export interface LeaderboardEntryWithPlayer extends SrLeaderboardRow {
   team?: TeamJoined | null;
 }
 
-function getScoreColor(toPar: number | null): string {
-  if (toPar === null || toPar === undefined) return 'rgba(255,255,255,0.45)';
-  if (toPar < 0) return '#ffffff';
-  if (toPar === 0) return 'rgba(255,255,255,0.45)';
-  return '#f87171';
-}
+import { getScoreColor as getScoreColorCanonical } from '../../_shared/scoreColor';
 
-function getTodayScoreColor(toPar: number | null): string {
-  if (toPar === null || toPar === undefined) return 'rgba(255,255,255,0.45)';
-  if (toPar < 0) return '#4ade80';
-  if (toPar === 0) return 'rgba(255,255,255,0.45)';
-  return '#f87171';
-}
+const getScoreColor = (toPar: number | null) => getScoreColorCanonical(toPar, 'dark', 'leader');
+const getTodayScoreColor = (toPar: number | null) => getScoreColorCanonical(toPar, 'dark', 'standard');
 
 function formatScore(toPar: number | null): string {
   if (toPar === null || toPar === undefined) return '-';
