@@ -347,7 +347,7 @@ export function LeadersTab() {
       {/* Content area */}
       <div style={{ paddingBottom: 'calc(var(--sab, env(safe-area-inset-bottom, 0px)) + 80px)' }}>
         {/* Rankings list — white surface (column header removed Phase 1 fix.1.3) */}
-        <div style={{ background: '#ffffff', borderTop: `1px solid ${INK_TINT_07}`, marginTop: '8px' }}>
+        <div style={{ background: SURFACE, borderTop: `1px solid ${INK_TINT_07}`, marginTop: '8px' }}>
           <AnimatePresence mode="wait">
             <motion.div
               key={category.key}
@@ -360,7 +360,7 @@ export function LeadersTab() {
                 <>
                   {!search && (
                     <div style={{ padding: '12px 16px 6px' }}>
-                      <span style={{ fontSize: 9, fontWeight: 800, color: '#64748B', letterSpacing: '0.14em', textTransform: 'uppercase' as const }}>
+                      <span style={{ fontSize: 9, fontWeight: 800, color: INK_MUTE, letterSpacing: '0.14em', textTransform: 'uppercase' as const }}>
                         CHASING
                       </span>
                     </div>
@@ -398,7 +398,7 @@ export function LeadersTab() {
                   })}
                   {/* Footer */}
                   <div style={{ padding: '12px 16px', textAlign: 'center', borderTop: `0.5px solid ${INK_TINT_07}` }}>
-                    <span style={{ fontSize: 9, fontWeight: 800, color: '#94A3B8', letterSpacing: '0.14em', textTransform: 'uppercase' as const }}>
+                    <span style={{ fontSize: 9, fontWeight: 800, color: INK_FAINT, letterSpacing: '0.14em', textTransform: 'uppercase' as const }}>
                       SEASON LEADERS · AVAILABLE TOURNAMENT DATA
                     </span>
                   </div>
