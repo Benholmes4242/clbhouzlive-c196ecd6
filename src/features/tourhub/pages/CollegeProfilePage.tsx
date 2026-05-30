@@ -298,7 +298,7 @@ export function CollegeProfilePage() {
             <Skeleton style={{ height: 22, width: '50%', marginBottom: 6, background: INK_TINT_06 }} />
             <Skeleton style={{ height: 14, width: '70%', marginBottom: 16, background: INK_TINT_06 }} />
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 14 }}>
-              <Skeleton style={{ width: 80, height: 80, borderRadius: 27, background: 'rgba(255,184,0,0.10)' }} />
+              <Skeleton style={{ width: 80, height: 80, borderRadius: 27, background: GOLD_TINT_10 }} />
               <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 6 }}>
                 <Skeleton style={{ height: 22, width: 90, background: INK_TINT_06 }} />
                 <Skeleton style={{ height: 10, width: 60, background: INK_TINT_06 }} />
