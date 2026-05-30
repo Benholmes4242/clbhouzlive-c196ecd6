@@ -317,7 +317,7 @@ export function PlayerHero({ player, playerStats }: PlayerHeroProps) {
                 style={{
                   fontSize: 22,
                   fontWeight: 800,
-                  color: '#0F172A',
+                  color: INK,
                   letterSpacing: '-0.025em',
                   lineHeight: 1.1,
                   overflow: 'hidden',
