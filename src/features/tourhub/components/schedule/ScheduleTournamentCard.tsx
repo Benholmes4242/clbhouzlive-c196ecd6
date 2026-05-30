@@ -170,11 +170,11 @@ export function ScheduleTournamentCard({
         </p>
         <p
           style={{
-            fontSize: 20,
+            fontSize: 22,
             fontWeight: 800,
             color: INK,
             lineHeight: 1,
-            letterSpacing: '-0.025em',
+            letterSpacing: '-0.03em',
             margin: '4px 0 0',
             fontVariantNumeric: 'tabular-nums',
           }}
