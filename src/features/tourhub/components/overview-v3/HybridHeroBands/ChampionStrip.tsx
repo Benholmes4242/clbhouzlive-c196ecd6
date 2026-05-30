@@ -189,8 +189,8 @@ export function CancelledStrip({ reason }: { reason: string }) {
       }}
     >
       <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true">
-        <circle cx="10" cy="10" r="9" stroke="#FCA5A5" strokeWidth="1.5" />
-        <path d="M6 6L14 14M14 6L6 14" stroke="#FCA5A5" strokeWidth="1.5" strokeLinecap="round" />
+        <circle cx="10" cy="10" r="9" stroke={SCORE_OVER_PAR_DARK_PALE} strokeWidth="1.5" />
+        <path d="M6 6L14 14M14 6L6 14" stroke={SCORE_OVER_PAR_DARK_PALE} strokeWidth="1.5" strokeLinecap="round" />
       </svg>
       <div style={{ flex: 1, minWidth: 0 }}>
         <div
@@ -198,7 +198,7 @@ export function CancelledStrip({ reason }: { reason: string }) {
             fontSize: 9,
             fontWeight: 800,
             letterSpacing: '0.18em',
-            color: '#FCA5A5',
+            color: SCORE_OVER_PAR_DARK_PALE,
             textTransform: 'uppercase',
             marginBottom: 2,
           }}
