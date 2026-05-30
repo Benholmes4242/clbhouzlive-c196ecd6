@@ -22,15 +22,17 @@ import { PlayerAvatar } from './PlayerAvatar';
 import { Shimmer } from './shared/Shimmer';
 import CountryFlag from '@/components/ui/country-flag';
 
-const AMBER = '#F7931E';
-const AMBER_SOFT = 'rgba(247,147,30,0.10)';
-const INK = '#0F172A';
-const GOLD = '#FFB800';
-const SLATE_400 = '#94A3B8';
-const SLATE_500 = '#64748B';
-const SLATE_600 = '#475569';
-const SLATE_200 = 'rgba(15,23,42,0.10)';
-const SLATE_150 = '#EDF1F5';
+import {
+  AMBER,
+  AMBER_TINT_10,
+  GOLD,
+  HAIRLINE_INK_10,
+  INK,
+  INK_FAINT,
+  INK_MUTE,
+  INK_SOFT,
+  SLATE_150,
+} from '../_shared/tokens';
 
 // ── Random per-session default ──
 function pickRandomCategoryKey(): string {
@@ -99,7 +101,7 @@ function StatWatchSkeleton({ scopeLabel }: { scopeLabel: string }) {
           style={{
             fontSize: 10,
             fontWeight: 700,
-            color: SLATE_400,
+            color: INK_FAINT,
             letterSpacing: '0.1em',
             textTransform: 'uppercase',
           }}
@@ -111,7 +113,7 @@ function StatWatchSkeleton({ scopeLabel }: { scopeLabel: string }) {
         style={{
           background: '#fff',
           borderRadius: 16,
-          border: `1px solid ${SLATE_200}`,
+          border: `1px solid ${HAIRLINE_INK_10}`,
           padding: '16px 18px 18px',
         }}
       >
@@ -135,7 +137,7 @@ function StatWatchSkeleton({ scopeLabel }: { scopeLabel: string }) {
               key={i}
               style={{
                 background: '#fff',
-                border: `1px solid ${SLATE_200}`,
+                border: `1px solid ${HAIRLINE_INK_10}`,
                 borderRadius: 10,
                 padding: 10,
               }}
@@ -276,7 +278,7 @@ export const StatOfTheWeek = memo(function StatOfTheWeek() {
           style={{
             background: '#fff',
             borderRadius: 16,
-            border: `1px solid ${SLATE_200}`,
+            border: `1px solid ${HAIRLINE_INK_10}`,
             boxShadow: '0 1px 0 rgba(0,0,0,0.02)',
             padding: '16px 18px 18px',
           }}
@@ -291,7 +293,7 @@ export const StatOfTheWeek = memo(function StatOfTheWeek() {
               alignItems: 'center',
               gap: 8,
               padding: '7px 12px',
-              background: AMBER_SOFT,
+              background: AMBER_TINT_10,
               border: `1px solid ${AMBER}33`,
               borderRadius: 10,
               cursor: 'pointer',
@@ -396,7 +398,7 @@ export const StatOfTheWeek = memo(function StatOfTheWeek() {
                   style={{
                     fontSize: 10,
                     fontWeight: 700,
-                    color: SLATE_500,
+                    color: INK_MUTE,
                     letterSpacing: '0.12em',
                     textTransform: 'uppercase',
                     marginBottom: 4,
@@ -497,7 +499,7 @@ export const StatOfTheWeek = memo(function StatOfTheWeek() {
               style={{
                 fontSize: 13,
                 fontWeight: 500,
-                color: SLATE_600,
+                color: INK_SOFT,
                 lineHeight: 1.5,
                 marginBottom: 16,
               }}
@@ -513,7 +515,7 @@ export const StatOfTheWeek = memo(function StatOfTheWeek() {
                 style={{
                   fontSize: 9,
                   fontWeight: 800,
-                  color: SLATE_500,
+                  color: INK_MUTE,
                   letterSpacing: '0.16em',
                   marginBottom: 8,
                 }}
@@ -532,7 +534,7 @@ export const StatOfTheWeek = memo(function StatOfTheWeek() {
                     key={`${p.playerId}-${idx}`}
                     style={{
                       background: '#fff',
-                      border: `1px solid ${SLATE_200}`,
+                      border: `1px solid ${HAIRLINE_INK_10}`,
                       borderRadius: 10,
                       padding: 10,
                       display: 'flex',
@@ -545,7 +547,7 @@ export const StatOfTheWeek = memo(function StatOfTheWeek() {
                       style={{
                         fontSize: 9,
                         fontWeight: 900,
-                        color: SLATE_400,
+                        color: INK_FAINT,
                         letterSpacing: '0.08em',
                         alignSelf: 'flex-start',
                       }}
@@ -576,7 +578,7 @@ export const StatOfTheWeek = memo(function StatOfTheWeek() {
                       style={{
                         fontSize: 12,
                         fontWeight: 700,
-                        color: SLATE_600,
+                        color: INK_SOFT,
                         fontVariantNumeric: 'tabular-nums',
                       }}
                     >
@@ -638,7 +640,7 @@ export const StatOfTheWeek = memo(function StatOfTheWeek() {
                   style={{
                     fontSize: 9,
                     fontWeight: 800,
-                    color: SLATE_500,
+                    color: INK_MUTE,
                     letterSpacing: '0.16em',
                     textTransform: 'uppercase' as const,
                     marginBottom: 8,
@@ -666,7 +668,7 @@ export const StatOfTheWeek = memo(function StatOfTheWeek() {
                           borderRadius: 10,
                           border: isActive
                             ? `1.5px solid ${AMBER}`
-                            : `1px solid ${SLATE_200}`,
+                            : `1px solid ${HAIRLINE_INK_10}`,
                           background: isActive ? 'rgba(247,147,30,0.08)' : '#ffffff',
                           cursor: 'pointer',
                           textAlign: 'left',
@@ -675,7 +677,7 @@ export const StatOfTheWeek = memo(function StatOfTheWeek() {
                       >
                         <CatIcon
                           size={14}
-                          color={isActive ? AMBER : SLATE_500}
+                          color={isActive ? AMBER : INK_MUTE}
                           strokeWidth={2.5}
                         />
                         <div style={{ flex: 1, minWidth: 0 }}>
@@ -693,7 +695,7 @@ export const StatOfTheWeek = memo(function StatOfTheWeek() {
                             style={{
                               fontSize: 11,
                               fontWeight: 500,
-                              color: SLATE_500,
+                              color: INK_MUTE,
                               marginTop: 1,
                             }}
                           >

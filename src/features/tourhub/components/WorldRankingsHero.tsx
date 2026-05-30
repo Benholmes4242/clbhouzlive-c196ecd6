@@ -36,22 +36,24 @@ import { Shimmer } from './shared/Shimmer';
 import { TOUR_MAP, type TourCode } from '../constants/tourMap';
 
 // ─── Tokens ─────────────────────────────────────────────────────────────────
-const INK = '#0F172A';
-const SLATE_700 = '#334155';
-const SLATE_500 = '#64748B';
-const SLATE_400 = '#94A3B8';
-const SLATE_300 = '#CBD5E1';
-const SLATE_200 = '#E2E8F0';
-const SLATE_150 = '#EDF1F5';
-const AMBER = '#F7931E';
-const GREEN = '#16A34A';
-const RED = '#DC2626';
-const GOLD = '#FFB800';
-const GOLD_BORDER = 'rgba(255,184,0,0.32)';
-const GOLD_GLOW = '0 0 24px rgba(255,184,0,0.10), 0 1px 3px rgba(0,0,0,0.04)';
-const GOLD_TINT = 'rgba(255,184,0,0.04)';
-const GREEN_SOFT = 'rgba(22,163,74,0.10)';
-const RED_SOFT = 'rgba(220,38,38,0.10)';
+import {
+  AMBER,
+  GOLD,
+  GOLD_BORDER,
+  GOLD_GLOW,
+  GOLD_TINT,
+  INK,
+  INK_FAINT,
+  INK_LIGHT,
+  INK_MUTE,
+  INK_SOFT,
+  SLATE_150,
+  SLATE_200,
+  TREND_DOWN,
+  TREND_DOWN_TINT,
+  TREND_UP,
+  TREND_UP_TINT,
+} from '../_shared/tokens';
 
 // ─── Tour selector options ──────────────────────────────────────────────────
 const RANKING_TOUR_OPTIONS = [
@@ -165,7 +167,7 @@ function TourDropdownTrigger({ activeTour, onClick }: {
       >
         {meta?.label ?? 'Select tour'}
       </span>
-      <ChevronDown size={14} color={SLATE_500} strokeWidth={2.4} />
+      <ChevronDown size={14} color={INK_MUTE} strokeWidth={2.4} />
     </button>
   );
 }
@@ -182,7 +184,7 @@ function MovementChip({ change }: { change: number | null | undefined }) {
         gap: 2,
         fontSize: 11,
         fontWeight: 800,
-        color: isUp ? GREEN : RED,
+        color: isUp ? TREND_UP : TREND_DOWN,
         fontVariantNumeric: 'tabular-nums',
       }}
     >
@@ -270,12 +272,12 @@ function NumberOneCard({
           </span>
           {weeksAtNumberOne != null && weeksAtNumberOne > 0 && (
             <>
-              <span style={{ fontSize: 9, color: SLATE_300 }}>·</span>
+              <span style={{ fontSize: 9, color: INK_LIGHT }}>·</span>
               <span
                 style={{
                   fontSize: 9,
                   fontWeight: 700,
-                  color: SLATE_500,
+                  color: INK_MUTE,
                   letterSpacing: '0.12em',
                 }}
               >
@@ -357,7 +359,7 @@ function NumberOneCard({
             <div
               style={{
                 fontSize: 11,
-                color: SLATE_500,
+                color: INK_MUTE,
                 display: 'flex',
                 alignItems: 'center',
                 gap: 5,
@@ -385,7 +387,7 @@ function NumberOneCard({
               style={{
                 fontSize: 9,
                 fontWeight: 700,
-                color: SLATE_400,
+                color: INK_FAINT,
                 letterSpacing: '0.12em',
                 marginTop: 4,
               }}
@@ -476,7 +478,7 @@ function ChaserRow({
         <div
           style={{
             fontSize: 11,
-            color: SLATE_500,
+            color: INK_MUTE,
             overflow: 'hidden',
             textOverflow: 'ellipsis',
             whiteSpace: 'nowrap',
@@ -566,7 +568,7 @@ function MoverRow({ mover, direction, isLast }: MoverRowProps) {
         <div
           style={{
             fontSize: 10,
-            color: SLATE_500,
+            color: INK_MUTE,
             display: 'flex',
             alignItems: 'center',
             gap: 4,
@@ -583,8 +585,8 @@ function MoverRow({ mover, direction, isLast }: MoverRowProps) {
           gap: 2,
           padding: '3px 6px',
           borderRadius: 4,
-          background: isUp ? GREEN_SOFT : RED_SOFT,
-          color: isUp ? GREEN : RED,
+          background: isUp ? TREND_UP_TINT : TREND_DOWN_TINT,
+          color: isUp ? TREND_UP : TREND_DOWN,
           fontSize: 11,
           fontWeight: 800,
           fontVariantNumeric: 'tabular-nums',
@@ -890,7 +892,7 @@ export const WorldRankingsHero = memo(function WorldRankingsHero() {
                   <div style={{ fontSize: 14, fontWeight: isActive ? 800 : 500, color: INK }}>
                     {tour.label}
                   </div>
-                  <div style={{ fontSize: 11, color: SLATE_400, marginTop: 2 }}>
+                  <div style={{ fontSize: 11, color: INK_FAINT, marginTop: 2 }}>
                     {tour.description}
                   </div>
                 </div>
@@ -924,7 +926,7 @@ export const WorldRankingsHero = memo(function WorldRankingsHero() {
             style={{
               fontSize: 10,
               fontWeight: 800,
-              color: SLATE_500,
+              color: INK_MUTE,
               letterSpacing: '0.16em',
               marginBottom: 4,
             }}
@@ -948,7 +950,7 @@ export const WorldRankingsHero = memo(function WorldRankingsHero() {
             style={{
               fontSize: 10,
               fontWeight: 800,
-              color: SLATE_500,
+              color: INK_MUTE,
               letterSpacing: '0.16em',
               marginBottom: 10,
             }}
@@ -974,12 +976,12 @@ export const WorldRankingsHero = memo(function WorldRankingsHero() {
                   gap: 5,
                 }}
               >
-                <TrendingUp size={11} color={GREEN} strokeWidth={2.5} />
+                <TrendingUp size={11} color={TREND_UP} strokeWidth={2.5} />
                 <span
                   style={{
                     fontSize: 9,
                     fontWeight: 800,
-                    color: GREEN,
+                    color: TREND_UP,
                     letterSpacing: '0.14em',
                   }}
                 >
@@ -987,7 +989,7 @@ export const WorldRankingsHero = memo(function WorldRankingsHero() {
                 </span>
               </div>
               {topRisers.length === 0 ? (
-                <div style={{ padding: '14px 12px', fontSize: 11, color: SLATE_400 }}>
+                <div style={{ padding: '14px 12px', fontSize: 11, color: INK_FAINT }}>
                   None this week
                 </div>
               ) : (
@@ -1020,12 +1022,12 @@ export const WorldRankingsHero = memo(function WorldRankingsHero() {
                   gap: 5,
                 }}
               >
-                <TrendingDown size={11} color={RED} strokeWidth={2.5} />
+                <TrendingDown size={11} color={TREND_DOWN} strokeWidth={2.5} />
                 <span
                   style={{
                     fontSize: 9,
                     fontWeight: 800,
-                    color: RED,
+                    color: TREND_DOWN,
                     letterSpacing: '0.14em',
                   }}
                 >
@@ -1033,7 +1035,7 @@ export const WorldRankingsHero = memo(function WorldRankingsHero() {
                 </span>
               </div>
               {topFallers.length === 0 ? (
-                <div style={{ padding: '14px 12px', fontSize: 11, color: SLATE_400 }}>
+                <div style={{ padding: '14px 12px', fontSize: 11, color: INK_FAINT }}>
                   None this week
                 </div>
               ) : (
