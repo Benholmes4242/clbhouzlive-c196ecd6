@@ -20,14 +20,16 @@ import { TOUR_MAP, type TourCode } from '../constants/tourMap';
 import type { SeasonTournament } from '../hooks/useSeasonTournaments';
 
 // ── Tokens ──────────────────────────────────────────────────────────────────
-const INK = '#0F172A';
-const SLATE_500 = '#64748B';
-const SLATE_400 = '#94A3B8';
-const SLATE_200 = '#E2E8F0';
-const SLATE_150 = '#EDF1F5';
-const AMBER = '#F7931E';
-const GOLD = '#FFB800';
-const NAVY_HIGH = '#15203A';
+import {
+  AMBER,
+  GOLD,
+  INK,
+  INK_FAINT,
+  INK_MUTE,
+  NAVY_HIGH,
+  SLATE_150,
+  SLATE_200,
+} from '../_shared/tokens';
 
 // ── Date helpers ────────────────────────────────────────────────────────────
 function parseUTC(dateStr: string): Date {
