@@ -319,7 +319,7 @@ export function TournamentDetailPage() {
         />
       </ShellSlot>
 
-      <div style={{ paddingTop: 'var(--chrome-total-h, 0px)', background: '#F8FAFC' }}>
+      <div style={{ paddingTop: 'var(--chrome-total-h, 0px)', background: SLATE_50 }}>
         <TournamentHero
           tournament={tournament}
           imageUrl={heroImageUrl}
