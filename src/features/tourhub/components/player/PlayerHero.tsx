@@ -62,10 +62,10 @@ function chooseHeroStat(
   }
 
   // 2. Recent finish (within 14 days, per usePlayerState window)
+  // Big-stat slot is for SHORT scalar values only. Context already lives in
+  // the caption row above, so we don't repeat it here — prevents overflow.
   if (playerState.state === 'recent' && playerState.recentData) {
-    const rd = playerState.recentData;
-    const ctx = rd.context ? ` at ${truncateName(rd.context, 18)}` : '';
-    return { primary: `${rd.label}${ctx}` };
+    return { primary: playerState.recentData.label };
   }
 
   // 3. Season earnings
