@@ -1,5 +1,6 @@
 import { PlayerRating, TIER_CONFIG } from '../../hooks/usePlayerRating';
 import { TrendingUp, TrendingDown } from 'lucide-react';
+import { TREND_DOWN, TREND_UP } from '../../_shared/tokens';
 
 interface Props {
   rating: PlayerRating;
