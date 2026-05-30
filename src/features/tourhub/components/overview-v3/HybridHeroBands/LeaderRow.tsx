@@ -43,9 +43,9 @@ function PlayerHead({ size = 36, src, ring }: { size?: number; src?: string | nu
 }
 
 function liveScoreColour(s: string): string {
-  if (s.startsWith('\u2212') || s.startsWith('-')) return GREEN_LIVE;
-  if (s.startsWith('+')) return AMBER;
-  return INK;
+  if (s.startsWith('\u2212') || s.startsWith('-')) return getScoreColor(-1, 'light', 'standard');
+  if (s.startsWith('+')) return getScoreColor(1, 'light', 'standard');
+  return getScoreColor(0, 'light', 'standard');
 }
 
 interface SoloLeaderRowProps {
