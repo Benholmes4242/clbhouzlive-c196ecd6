@@ -143,7 +143,7 @@ function HeadlineCard({ tournament }: { tournament: SeasonTournament }) {
   const tier = classifyTier(tournament);
   const isMajor = tier === 'major';
   const isSig = tier === 'signature';
-  const accent = isMajor ? GOLD : isSig ? AMBER : SLATE_500;
+  const accent = isMajor ? GOLD : isSig ? AMBER : INK_MUTE;
   const tour = getTourBrand(tournament.tourName);
 
   return (
@@ -345,7 +345,7 @@ function CompactRow({ tournament }: { tournament: SeasonTournament }) {
       {showDate && (
         <div style={{ width: 30, flexShrink: 0 }}>
           <div style={{
-            fontSize: 9, fontWeight: 800, color: SLATE_500,
+            fontSize: 9, fontWeight: 800, color: INK_MUTE,
             letterSpacing: '0.06em', lineHeight: 1,
           }}>{getMonthAbbr(parseUTC(tournament.startDate))}</div>
           <div style={{
@@ -375,12 +375,12 @@ function CompactRow({ tournament }: { tournament: SeasonTournament }) {
           overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
         }}>{tournament.name}</div>
         <div style={{
-          fontSize: 11, color: SLATE_500, fontWeight: 500,
+          fontSize: 11, color: INK_MUTE, fontWeight: 500,
           overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
         }}>{tournament.venueName}{tournament.venueCity ? ` · ${tournament.venueCity}` : ''}</div>
       </div>
 
-      <ChevronRight size={14} color={SLATE_400} strokeWidth={2.4} style={{ flexShrink: 0 }} />
+      <ChevronRight size={14} color={INK_FAINT} strokeWidth={2.4} style={{ flexShrink: 0 }} />
     </button>
   );
 }
@@ -583,7 +583,7 @@ export function ComingUpCalendar() {
           }}>
             {formatWeekRange(displayWeek.monday)}
           </span>
-          <span style={{ fontSize: 11, fontWeight: 600, color: SLATE_400 }}>
+          <span style={{ fontSize: 11, fontWeight: 600, color: INK_FAINT }}>
             {displayWeek.events.length} {displayWeek.events.length === 1 ? 'event' : 'events'}
           </span>
         </div>
@@ -593,7 +593,7 @@ export function ComingUpCalendar() {
       {displayWeek.events.length === 0 && (
         <div style={{
           margin: '0 16px', padding: '16px',
-          fontSize: 12, color: SLATE_500, textAlign: 'center',
+          fontSize: 12, color: INK_MUTE, textAlign: 'center',
         }}>
           No upcoming tournaments scheduled.
         </div>
