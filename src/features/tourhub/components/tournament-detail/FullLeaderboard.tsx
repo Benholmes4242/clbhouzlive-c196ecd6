@@ -62,14 +62,27 @@ interface FullLeaderboardProps {
   onPlayerTap?: () => void;
 }
 
-function ScoreToPar({ score, className }: { score: number | null; className?: string }) {
-  if (score === null) return <span className={cn("", className)} style={{ fontVariantNumeric: 'tabular-nums', color: '#94A3B8' }}>—</span>;
+function ScoreToPar({ score, className, emphasis, size }: { score: number | null; className?: string; emphasis?: boolean; size?: number }) {
+  if (score === null) return <span className={cn(className)} style={{ fontVariantNumeric: 'tabular-nums', color: INK_FAINT }}>—</span>;
   const formatted = score === 0 ? 'E' : score > 0 ? `+${score}` : String(score);
+  const color = score < 0 ? SCORE_UNDER_PAR_LIGHT : score > 0 ? SCORE_OVER_PAR_LIGHT : INK_FAINT;
   return (
-    <span className={cn("font-bold", className)} style={{ fontVariantNumeric: 'tabular-nums', color: score < 0 ? '#F7931E' : score > 0 ? '#EF4444' : '#94A3B8' }}>
+    <span className={cn(className)} style={{
+      fontVariantNumeric: 'tabular-nums',
+      color,
+      fontWeight: emphasis ? 800 : 700,
+      fontSize: size ? `${size}px` : undefined,
+      letterSpacing: emphasis ? '-0.01em' : undefined,
+    }}>
       {formatted}
     </span>
   );
+}
+
+function abbrevName(full: string): string {
+  const parts = full.trim().split(/\s+/);
+  if (parts.length === 1) return parts[0];
+  return `${parts[0][0].toUpperCase()}. ${parts[parts.length - 1]}`;
 }
 
 function ScoreCell({ score, className }: { score: number | null; className?: string }) {
