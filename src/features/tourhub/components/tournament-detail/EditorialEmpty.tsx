@@ -12,7 +12,7 @@
  */
 
 import { motion } from 'framer-motion';
-import { INK_SOFT, INK_TINT_07 } from '../../_shared/tokens';
+import { AMBER_TINT_10, INK_SOFT, INK_TINT_07 } from '../../_shared/tokens';
 
 export interface EditorialEmptyProps {
   eyebrow: string;
@@ -78,7 +78,7 @@ export function EditorialEmpty({ eyebrow, title, body, accent }: EditorialEmptyP
               display: 'inline-block',
               padding: '4px 10px',
               borderRadius: 6,
-              background: 'rgba(247,147,30,0.10)',
+              background: AMBER_TINT_10,
               border: '1px solid rgba(247,147,30,0.28)',
               fontSize: 11,
               fontWeight: 700,

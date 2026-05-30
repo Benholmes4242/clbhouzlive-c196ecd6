@@ -6,7 +6,7 @@
 
 import React from 'react';
 import { INK } from '../HybridHero.constants';
-import { STATUS_LIVE, AMBER } from '../../../_shared/tokens';
+import { AMBER, STATUS_LIVE, WHITE_ALPHA_65 } from '../../../_shared/tokens';
 import type { HeroState } from '../HybridHero.utils';
 
 interface SignatureFooterProps {
@@ -124,7 +124,7 @@ export function SignatureFooter({
         />
         <span
           style={{
-            color: 'rgba(255,255,255,0.65)',
+            color: WHITE_ALPHA_65,
             fontSize: 9.5,
             fontWeight: 700,
             letterSpacing: '0.14em',

@@ -6,6 +6,8 @@
  */
 import { Trophy } from 'lucide-react';
 
+import { AMBER_TINT_12 } from '../../_shared/tokens';
+
 interface WinnerPillProps {
   name: string;
   photoUrl?: string | null;
@@ -33,7 +35,7 @@ export function WinnerPill({ name, photoUrl, score, onPlayerTap }: WinnerPillPro
         strokeWidth={2.5}
         style={{
           color: '#F7931E',
-          fill: 'rgba(247,147,30,0.12)',
+          fill: AMBER_TINT_12,
           flexShrink: 0,
         }}
       />

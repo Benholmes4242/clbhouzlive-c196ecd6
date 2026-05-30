@@ -35,6 +35,8 @@ export interface LeaderboardEntryWithPlayer extends SrLeaderboardRow {
 
 import { getScoreColor as getScoreColorCanonical } from '../../_shared/scoreColor';
 
+import { WHITE_ALPHA_04, WHITE_ALPHA_10, WHITE_ALPHA_12, WHITE_ALPHA_30 } from '../../_shared/tokens';
+
 const getScoreColor = (toPar: number | null) => getScoreColorCanonical(toPar, 'dark', 'leader');
 const getTodayScoreColor = (toPar: number | null) => getScoreColorCanonical(toPar, 'dark', 'standard');
 
@@ -59,10 +61,10 @@ export function ExpandedLeaderboardSkeleton() {
   return (
     <div style={{ flex: 1, padding: '0 16px' }}>
       {/* Leader strip skeleton */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: 12, padding: '10px 12px', marginBottom: 8 }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: WHITE_ALPHA_04, border: '1px solid rgba(255,255,255,0.07)', borderRadius: 12, padding: '10px 12px', marginBottom: 8 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
           <div style={{ width: 18, height: 12, borderRadius: 4, background: 'rgba(255,255,255,0.08)' }} />
-          <div style={{ width: 36, height: 38, borderRadius: '34%', background: 'rgba(255,255,255,0.08)', animation: 'clb-shimmer 1.8s ease-in-out infinite', backgroundSize: '200% 100%', backgroundImage: 'linear-gradient(90deg, rgba(255,255,255,0.04) 25%, rgba(255,255,255,0.10) 50%, rgba(255,255,255,0.04) 75%)' }} />
+          <div style={{ width: 36, height: 38, borderRadius: '34%', background: 'rgba(255,255,255,0.08)', animation: 'clb-shimmer 1.8s ease-in-out infinite', backgroundSize: '200% 100%', backgroundImage: `linear-gradient(90deg, ${WHITE_ALPHA_04} 25%, ${WHITE_ALPHA_10} 50%, ${WHITE_ALPHA_04} 75%)` }} />
           <div>
             <div style={{ height: 13, width: 100, borderRadius: 5, background: 'rgba(255,255,255,0.08)', marginBottom: 6 }} />
             <div style={{ height: 9, width: 50, borderRadius: 4, background: 'rgba(255,255,255,0.05)' }} />
@@ -111,7 +113,7 @@ export function ExpandedLeaderboardError({ onRetry }: { onRetry: () => void }) {
         style={{
           fontSize: 13, fontWeight: 600, color: 'rgba(255,255,255,0.9)',
           padding: '8px 16px', borderRadius: 8,
-          background: 'rgba(255,255,255,0.12)', border: 'none',
+          background: WHITE_ALPHA_12, border: 'none',
         }}
       >
         Tap to retry
@@ -377,7 +379,7 @@ const ExpandedLeaderboardRow = React.memo(function ExpandedLeaderboardRow({
       <div className="flex items-center gap-2 flex-1 min-w-0" style={{ paddingLeft: 4 }}>
         <div
           className="overflow-hidden flex-shrink-0"
-          style={{ width: 32, height: 33, borderRadius: '34%', border: '1.5px solid rgba(255,255,255,0.18)', background: 'rgba(255,255,255,0.12)' }}
+          style={{ width: 32, height: 33, borderRadius: '34%', border: '1.5px solid rgba(255,255,255,0.18)', background: WHITE_ALPHA_12 }}
         >
           {photoUrl && !imgError ? (
             <img
@@ -489,11 +491,11 @@ export function ExpandedLeaderboardList({ entries, tourCode, tournamentId, defen
         borderBottom: '1px solid rgba(255,255,255,0.06)',
         marginBottom: 2,
       }}>
-        <span style={{ width: 22, fontSize: 9, color: 'rgba(255,255,255,0.30)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: 2 }}></span>
-        <span style={{ flex: 1, fontSize: 9, color: 'rgba(255,255,255,0.30)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: 2, paddingLeft: 44 }}>PLAYER</span>
-        <span style={{ width: 46, fontSize: 9, color: 'rgba(255,255,255,0.30)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: 2, textAlign: 'right' }}>TOTAL</span>
-        <span style={{ width: 46, fontSize: 9, color: 'rgba(255,255,255,0.30)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: 2, textAlign: 'right' }}>TODAY</span>
-        <span style={{ width: 40, fontSize: 9, color: 'rgba(255,255,255,0.30)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: 2, textAlign: 'right' }}>THRU</span>
+        <span style={{ width: 22, fontSize: 9, color: WHITE_ALPHA_30, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 2 }}></span>
+        <span style={{ flex: 1, fontSize: 9, color: WHITE_ALPHA_30, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 2, paddingLeft: 44 }}>PLAYER</span>
+        <span style={{ width: 46, fontSize: 9, color: WHITE_ALPHA_30, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 2, textAlign: 'right' }}>TOTAL</span>
+        <span style={{ width: 46, fontSize: 9, color: WHITE_ALPHA_30, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 2, textAlign: 'right' }}>TODAY</span>
+        <span style={{ width: 40, fontSize: 9, color: WHITE_ALPHA_30, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 2, textAlign: 'right' }}>THRU</span>
       </div>
       <div
         role="list"

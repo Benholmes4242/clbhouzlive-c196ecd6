@@ -21,7 +21,7 @@ import { PlayerAvatar, UpcomingCountdown } from '../shared/TourHeroHelpers';
 import { useBatchCourseImages } from '../../hooks/useBatchCourseImages';
 import { getCourseImage } from '../../utils/placeholders';
 import { tournamentRoute } from '../../routes';
-import { AMBER_INK_DARK, RECAP_VICTORY_GREEN, LEADER_GOLD, INK, SURFACE } from '../../_shared/tokens';
+import { AMBER_INK_DARK, AMBER_TINT_16, INK, LEADER_GOLD, RECAP_VICTORY_GREEN, SURFACE } from '../../_shared/tokens';
 
 
 function fmtDates(start?: string, end?: string): string {
@@ -100,7 +100,7 @@ export function HybridRecapNext({
 
       <div style={{ position: 'relative', zIndex: 1, display: 'flex', flexDirection: 'column', height: '100%', justifyContent: 'space-between' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', padding: 16 }}>
-          <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: 'rgba(247,147,30,0.16)', border: '1px solid rgba(247,147,30,0.5)', padding: '6px 11px', borderRadius: 999, fontSize: 11, fontWeight: 600, letterSpacing: '0.08em', color: LEADER_GOLD, textTransform: 'uppercase' }}>
+          <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: AMBER_TINT_16, border: '1px solid rgba(247,147,30,0.5)', padding: '6px 11px', borderRadius: 999, fontSize: 11, fontWeight: 600, letterSpacing: '0.08em', color: LEADER_GOLD, textTransform: 'uppercase' }}>
             Upcoming
             {upcoming?.startDate ? <UpcomingCountdown startDate={upcoming.startDate} /> : null}
           </span>

@@ -8,7 +8,7 @@ import React from 'react';
 import { Trophy } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { INK, GOLD, NUMERIC_STYLE, STRIP_HEIGHT } from '../HybridHero.constants';
-import { SCORE_OVER_PAR_DARK_PALE } from '../../../_shared/tokens';
+import { SCORE_OVER_PAR_DARK_PALE, SLATE_800, WHITE_ALPHA_65 } from '../../../_shared/tokens';
 import { TrajectorySparkline } from './TrajectorySparkline';
 
 interface ChampionStripProps {
@@ -38,7 +38,7 @@ function PlayerHead({ size = 42, src }: { size?: number; src?: string | null }) 
         borderRadius: '34%',
         background: src
           ? `url(${src}) center/cover`
-          : 'linear-gradient(135deg, #475569 0%, #1e293b 100%)',
+          : `linear-gradient(135deg, #475569 0%, ${SLATE_800} 100%)`,
         boxShadow: '0 0 0 2px rgba(251,188,46,0.55)',
         flexShrink: 0,
       }}
@@ -159,7 +159,7 @@ export function ChampionStrip({
           aria-label="Tournament narrative"
           style={{
             position: 'relative',
-            color: 'rgba(255,255,255,0.65)',
+            color: WHITE_ALPHA_65,
             fontSize: 12,
             fontWeight: 400,
             fontStyle: 'italic',
@@ -261,7 +261,7 @@ export function PlayoffStrip({ count, score }: PlayoffStripProps) {
               height: 36,
               borderRadius: '34%',
               marginLeft: i === 0 ? 0 : -10,
-              background: 'linear-gradient(135deg, #475569 0%, #1e293b 100%)',
+              background: `linear-gradient(135deg, #475569 0%, ${SLATE_800} 100%)`,
               boxShadow: '0 0 0 2px rgba(251,188,46,0.55)',
               zIndex: 3 - i,
               opacity: count > 3 && i === 2 ? 0.85 : 1,

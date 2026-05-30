@@ -7,12 +7,14 @@ import { ChevronRight, MapPin, Star } from 'lucide-react';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useEditorialCards } from '@/components/media-system/hooks/useEditorialCards';
 
+import { AMBER_TINT_12 } from '../../_shared/tokens';
+
 const AMBER = '#F7931E';
 const INK = '#0F172A';
 const INK_SOFT = 'rgba(15,23,42,0.62)';
 const INK_FAINT = 'rgba(15,23,42,0.45)';
 const HAIRLINE = 'rgba(15,23,42,0.10)';
-const AMBER_SOFT = 'rgba(247,147,30,0.12)';
+const AMBER_SOFT = AMBER_TINT_12;
 
 export function HomeCourseOfWeekModule() {
   const navigate = useNavigate();

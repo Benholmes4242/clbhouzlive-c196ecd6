@@ -7,7 +7,7 @@ import { useTourSeason, useTourTournaments } from '../../hooks/useTourHubData';
 import { getTourLogo, hasTourLogo } from '../../utils/tourLogos';
 import { getTourMeta } from '../../constants/tourMap';
 import type { ScheduleFilterType, TourFilterCode } from '../schedule';
-import { INK_TINT_06, INK_TINT_07 } from '../../_shared/tokens';
+import { AMBER_TINT_04, INK_TINT_06, INK_TINT_07, WHITE_ALPHA_10, WHITE_ALPHA_55, WHITE_ALPHA_65 } from '../../_shared/tokens';
 
 interface ChipDef {
   id: ScheduleFilterType;
@@ -101,9 +101,9 @@ function ScheduleShellRowInner() {
                     fontSize: 12,
                     fontWeight: 600,
                     borderRadius: 15,
-                    background: isActive ? 'rgba(255,255,255,0.10)' : 'transparent',
-                    border: isActive ? '1px solid rgba(255,255,255,0.55)' : '1px solid rgba(255,255,255,0.18)',
-                    color: isActive ? '#FFFFFF' : 'rgba(255,255,255,0.65)',
+                    background: isActive ? WHITE_ALPHA_10 : 'transparent',
+                    border: isActive ? `1px solid ${WHITE_ALPHA_55}` : '1px solid rgba(255,255,255,0.18)',
+                    color: isActive ? '#FFFFFF' : WHITE_ALPHA_65,
                     letterSpacing: '-0.01em',
                     whiteSpace: 'nowrap',
                   }}
@@ -125,9 +125,9 @@ function ScheduleShellRowInner() {
               fontSize: 12,
               fontWeight: 600,
               borderRadius: 15,
-              background: activeTour !== 'all' ? 'rgba(255,255,255,0.10)' : 'transparent',
-              border: activeTour !== 'all' ? '1px solid rgba(255,255,255,0.55)' : '1px solid rgba(255,255,255,0.18)',
-              color: activeTour !== 'all' ? '#FFFFFF' : 'rgba(255,255,255,0.65)',
+              background: activeTour !== 'all' ? WHITE_ALPHA_10 : 'transparent',
+              border: activeTour !== 'all' ? `1px solid ${WHITE_ALPHA_55}` : '1px solid rgba(255,255,255,0.18)',
+              color: activeTour !== 'all' ? '#FFFFFF' : WHITE_ALPHA_65,
               gap: 5,
               whiteSpace: 'nowrap',
             }}
@@ -172,7 +172,7 @@ function ScheduleShellRowInner() {
                   alignItems: 'center',
                   gap: 12,
                   padding: '14px 16px',
-                  background: isSelected ? 'rgba(247,147,30,0.04)' : 'transparent',
+                  background: isSelected ? AMBER_TINT_04 : 'transparent',
                   border: 'none',
                   borderLeft: isSelected ? '3px solid #F7931E' : '3px solid transparent',
                   borderBottom: `0.5px solid ${INK_TINT_07}`,

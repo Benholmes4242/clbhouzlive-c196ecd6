@@ -7,6 +7,8 @@ import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useNetworkActivity } from '@/hooks/useNetworkActivity';
 import { OnCourseNowStrip } from '@/components/loop-tab/OnCourseNowStrip';
 
+import { AMBER_TINT_10 } from '../../_shared/tokens';
+
 const AMBER = '#F7931E';
 const INK_FAINT = 'rgba(15,23,42,0.55)';
 
@@ -55,7 +57,7 @@ export function HomeOnCourseStrip() {
               fontSize: 11,
               fontWeight: 700,
               color: AMBER,
-              background: 'rgba(247,147,30,0.10)',
+              background: AMBER_TINT_10,
               borderRadius: 999,
               padding: '2px 8px',
             }}

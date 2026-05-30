@@ -9,6 +9,8 @@ import { Trophy } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { INK, GOLD, NUMERIC_STYLE, STRIP_HEIGHT } from '../HybridHero.constants';
 
+import { SLATE_800, WHITE_ALPHA_55 } from '../../../_shared/tokens';
+
 export interface TeamWinnerStripProps {
   teamName: string;
   members: { fullName: string; photoUrl: string | null }[];
@@ -42,7 +44,7 @@ function TeamCrestTile({
           width: size,
           height: size,
           borderRadius: 10,
-          background: `url(${teamCrestUrl}) center/cover, ${teamColor || '#1e293b'}`,
+          background: `url(${teamCrestUrl}) center/cover, ${teamColor || SLATE_800}`,
           boxShadow: '0 0 0 2px rgba(251,188,46,0.55)',
           flexShrink: 0,
         }}
@@ -151,7 +153,7 @@ export function TeamWinnerStrip({
             style={{
               fontSize: 10,
               fontWeight: 600,
-              color: 'rgba(255,255,255,0.55)',
+              color: WHITE_ALPHA_55,
               letterSpacing: '0.02em',
               marginTop: 2,
               whiteSpace: 'nowrap',

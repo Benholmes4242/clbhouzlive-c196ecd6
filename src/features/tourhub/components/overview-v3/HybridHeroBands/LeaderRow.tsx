@@ -15,7 +15,7 @@ import {
   NUMERIC_STYLE,
 } from '../HybridHero.constants';
 import { getScoreColor } from '../../../_shared/scoreColor';
-import { LEADER_GOLD_TINT_7, LEADER_GOLD_TINT_10 } from '../../../_shared/tokens';
+import { AMBER_TINT_04, LEADER_GOLD_TINT_10, LEADER_GOLD_TINT_7 } from '../../../_shared/tokens';
 import { TrajectorySparkline } from './TrajectorySparkline';
 
 function PlayerHead({ size = 36, src, ring }: { size?: number; src?: string | null; ring?: boolean }) {
@@ -230,7 +230,7 @@ export function TiedChasersRow({
         padding: '8px 20px',
         height: 40,
         alignItems: 'center',
-        background: 'rgba(247,147,30,0.04)',
+        background: AMBER_TINT_04,
         borderBottom: isLast ? 'none' : `0.5px solid ${INK_15}`,
         cursor: onTap ? 'pointer' : 'default',
       }}

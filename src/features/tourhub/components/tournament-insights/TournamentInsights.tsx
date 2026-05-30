@@ -20,7 +20,7 @@ import { useIntelligenceHistoricalPicks, type IntelligenceHistoricalTournament }
 import { createPortal } from 'react-dom';
 import { getPlayerHeadshotUrl, PLAYER_SILHOUETTE_URL } from '@/utils/playerHeadshot';
 import { useNavigate } from 'react-router-dom';
-import { INK_TINT_06, INK_TINT_07 } from '../../_shared/tokens';
+import { AMBER_TINT_08, INK_TINT_06, INK_TINT_07 } from '../../_shared/tokens';
 
 type IntelligenceTab = 'courseDNA' | 'predictions';
 
@@ -306,7 +306,7 @@ function PickRecordBadge() {
         <div style={{
           display: 'flex', alignItems: 'center', justifyContent: 'center', textAlign: 'center', gap: 4,
           padding: '3px 8px', borderRadius: 6,
-          background: 'rgba(247,147,30,0.08)',
+          background: AMBER_TINT_08,
           border: '0.5px solid rgba(247,147,30,0.25)',
         }}>
           <span style={{ fontSize: 10 }}>🏆</span>

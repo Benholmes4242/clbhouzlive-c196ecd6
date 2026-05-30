@@ -7,7 +7,7 @@
 import React from 'react';
 import { Trophy } from 'lucide-react';
 import { INK, AMBER, NUMERIC_STYLE } from '../HybridHero.constants';
-import { LEADER_GOLD as GOLD } from '../../../_shared/tokens';
+import { LEADER_GOLD as GOLD, SLATE_800, WHITE_ALPHA_10, WHITE_ALPHA_65 } from '../../../_shared/tokens';
 import { getFlagCode } from '@/utils/countryFlags';
 
 function countryToFlag(country: string | null | undefined): string {
@@ -50,7 +50,7 @@ function PlayerHead({ src, size = 56 }: { src?: string | null; size?: number }) 
         borderRadius: '34%',
         background: src
           ? `url(${src}) center/cover`
-          : 'linear-gradient(135deg, #475569 0%, #1e293b 100%)',
+          : `linear-gradient(135deg, #475569 0%, ${SLATE_800} 100%)`,
         boxShadow: '0 0 0 1.5px #F7931E, 0 6px 20px rgba(247,147,30,0.18)',
         flexShrink: 0,
       }}
@@ -212,7 +212,7 @@ export function ResultBand({
         <div
           aria-label="Tournament narrative"
           style={{
-            color: 'rgba(255,255,255,0.65)',
+            color: WHITE_ALPHA_65,
             fontSize: 12,
             fontWeight: 400,
             fontStyle: 'italic',
@@ -231,7 +231,7 @@ export function ResultBand({
             display: 'flex',
             gap: 16,
             paddingTop: 10,
-            borderTop: '0.5px solid rgba(255,255,255,0.10)',
+            borderTop: `0.5px solid ${WHITE_ALPHA_10}`,
           }}
         >
           {hasPurse && (

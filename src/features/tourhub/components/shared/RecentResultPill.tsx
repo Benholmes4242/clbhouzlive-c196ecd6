@@ -1,3 +1,4 @@
+import { AMBER_TINT_12, SLATE_700 } from '../../_shared/tokens';
 /**
  * RecentResultPill — shows a player's most recent notable finish (last 4 weeks).
  *
@@ -45,7 +46,7 @@ export function RecentResultPill({ position, tied }: RecentResultPillProps) {
   let border: string;
   let color: string;
   if (position === 1) {
-    bg = 'rgba(247,147,30,0.12)';
+    bg = AMBER_TINT_12;
     border = 'rgba(247,147,30,0.45)';
     color = '#B45309';
   } else if (position === 2) {
@@ -55,7 +56,7 @@ export function RecentResultPill({ position, tied }: RecentResultPillProps) {
   } else {
     bg = '#F1F5F9'; // slate-100
     border = '#E2E8F0'; // slate-200
-    color = '#334155'; // slate-700
+    color = SLATE_700; // slate-700
   }
 
   return (

@@ -14,7 +14,7 @@ import { SheetHeader } from '@/components/ui/SheetHeader';
 import { getTourLogo } from '../utils/tourLogos';
 import { useAllToursTickerData } from '../hooks/useOverviewModules';
 import { useTourSelection } from '../context/TourSelectionContext';
-import { INK_TINT_07 } from '../_shared/tokens';
+import { AMBER_TINT_04, INK_TINT_07, WHITE_ALPHA_55 } from '../_shared/tokens';
 
 const TOUR_LABEL: Record<string, string> = {
   pga: 'PGA',
@@ -58,7 +58,7 @@ export const TourSwitcherAffordance: React.FC = () => {
           padding: '0 14px 0 10px',
           background: 'transparent',
           border: 'none',
-          color: 'rgba(255,255,255,0.55)',
+          color: WHITE_ALPHA_55,
           cursor: 'pointer',
           fontFamily: 'Geist, system-ui, sans-serif',
           fontSize: 11,
@@ -106,7 +106,7 @@ export const TourSwitcherAffordance: React.FC = () => {
                   alignItems: 'center',
                   gap: 12,
                   padding: '14px 16px',
-                  background: isActive ? 'rgba(247,147,30,0.04)' : 'transparent',
+                  background: isActive ? AMBER_TINT_04 : 'transparent',
                   border: 'none',
                   borderLeft: isActive ? '3px solid #F7931E' : '3px solid transparent',
                   borderBottom: `0.5px solid ${INK_TINT_07}`,

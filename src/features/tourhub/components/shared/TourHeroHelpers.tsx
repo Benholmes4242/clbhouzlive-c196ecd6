@@ -14,6 +14,8 @@ import type { TournamentFinisher } from '../../hooks/useTournamentLeadersWinners
 import { useCountdown } from '@/hooks/useCountdown';
 import { getScoreColor as getScoreColorCanonical } from '../../_shared/scoreColor';
 
+import { WHITE_ALPHA_12, WHITE_ALPHA_30 } from '../../_shared/tokens';
+
 export function formatPurse(purse: number | null): string {
   if (!purse) return '';
   return purse >= 1_000_000
@@ -85,7 +87,7 @@ export function UpcomingCountdown({ startDate }: { startDate: string }) {
             </span>
             <span style={{
               fontSize: 9, fontWeight: 700,
-              color: 'rgba(255,255,255,0.30)',
+              color: WHITE_ALPHA_30,
               textTransform: 'uppercase',
               letterSpacing: '1.5px',
               marginTop: 'clamp(3px, 0.6vh, 6px)',
@@ -319,7 +321,7 @@ export function PodiumRunnerRow({
               width: 22,
               height: 22,
               borderRadius: '34%',
-              background: 'rgba(255,255,255,0.12)',
+              background: WHITE_ALPHA_12,
               border: '1.5px solid rgba(255,255,255,0.18)',
               display: 'flex',
               alignItems: 'center',

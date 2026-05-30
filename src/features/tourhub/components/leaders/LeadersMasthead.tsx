@@ -14,6 +14,8 @@ import { playerRoute } from '../../routes';
 import type { LeaderCategory } from './constants';
 import { splitStatValue } from '../../utils/splitStatValue';
 
+import { AMBER_TINT_12, WHITE_ALPHA_10 } from '../../_shared/tokens';
+
 // ─────────────────────────────────────────────────────────────────────────────
 // MastheadPill / PillView — kept for cross-surface compatibility.
 // Used by TournamentHero, PlayerHero, CollegeMasthead, CollegeProfilePage.
@@ -32,7 +34,7 @@ export function PillView({ pill }: { pill: MastheadPill }) {
   const isLive = pill.variant === 'live';
   const isAmberToned = isHighlight || isLive;
 
-  const bg = isAmberToned ? 'rgba(247,147,30,0.12)' : 'rgba(255,255,255,0.10)';
+  const bg = isAmberToned ? AMBER_TINT_12 : WHITE_ALPHA_10;
   const border = isLive
     ? 'rgba(247,147,30,0.55)'
     : isHighlight

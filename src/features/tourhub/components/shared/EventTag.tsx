@@ -6,6 +6,8 @@
  */
 import { Star } from 'lucide-react';
 
+import { AMBER_TINT_08 } from '../../_shared/tokens';
+
 export type EventTagKind = 'major' | 'signature' | 'rolex' | 'playoff';
 
 interface EventTagProps {
@@ -16,7 +18,7 @@ interface EventTagProps {
 
 const VARIANTS: Record<EventTagKind, { bg: string; border: string; color: string; label: string; abbr?: string; icon?: boolean }> = {
   major: {
-    bg: 'rgba(247,147,30,0.08)',
+    bg: AMBER_TINT_08,
     border: 'rgba(247,147,30,0.30)',
     color: '#F7931E',
     label: 'MAJOR',

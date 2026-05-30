@@ -1,3 +1,4 @@
+import { SLATE_700 } from '../_shared/tokens';
 /**
  * Shared "editorial broadcast" tokens + atmosphere utilities for the
  * Tour Hero (live + results) and Player Scorecard surfaces.
@@ -79,6 +80,6 @@ export const slate200     = '#E2E8F0';
 export const slate300     = '#CBD5E1';
 export const slate400     = '#94A3B8';
 export const slate500     = '#64748B';
-export const slate700     = '#334155';
+export const slate700     = SLATE_700;
 export const blue         = '#3B82F6';
 
