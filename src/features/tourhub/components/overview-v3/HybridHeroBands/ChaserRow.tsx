@@ -10,10 +10,9 @@ import {
   INK,
   INK_15,
   INK_45,
-  AMBER,
-  GREEN_LIVE,
   NUMERIC_STYLE,
 } from '../HybridHero.constants';
+import { getScoreColor } from '../../../_shared/scoreColor';
 import { TrajectorySparkline } from './TrajectorySparkline';
 
 
