@@ -1302,6 +1302,7 @@ function buildLivePicks(
       reasons: c.reasons ?? [],
       position: t ? formatPositionString(t) : '—',
       score: formatScore(t?.score ?? null),
+      scoreNumeric: t?.score ?? null,
       thru: formatThru(t?.thru ?? null, t?.currentRound ?? null),
       moveDir: t?.moveDir ?? 'flat',
       moveSpots: t?.moveSpots ?? 0,
