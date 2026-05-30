@@ -8,7 +8,15 @@ import { motion } from 'framer-motion';
 import { RoundSelector } from './RoundSelector';
 import { EditorialEmpty } from './EditorialEmpty';
 import { useTourHoleStats } from '../../hooks/useTourHubData';
-import { INK_TINT_06, INK_TINT_07 } from '../../_shared/tokens';
+import { FONT, INK_TINT_06, INK_TINT_07 } from '../../_shared/tokens';
+
+// Local hole-distribution ramp (mirrors src/features/courses/components/holes/_constants.ts).
+// Duplicated intentionally to keep tourhub self-contained — no cross-feature import.
+const C_BIRDIE = '#F7931E';  // amber — birdie or better
+const C_PAR    = '#94A3B8';  // slate — par
+const C_BOGEY  = '#EF4444';  // red — bogey
+const C_DOUBLE = '#991B1B';  // maroon — double or worse
+const INK_HOLE = '#0F172A';
 
 interface HoleStatsTabProps {
   tournamentId: string;
