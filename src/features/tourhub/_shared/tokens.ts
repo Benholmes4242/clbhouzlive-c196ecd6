@@ -92,6 +92,7 @@ export const AMBER_TINT_8 = 'rgba(247,147,30,0.08)';
 export const AMBER_TINT_10 = 'rgba(247,147,30,0.10)';
 export const AMBER_TINT_16 = 'rgba(247,147,30,0.16)';
 export const AMBER_TINT_04 = 'rgba(247,147,30,0.04)';        // very faint amber — selection state bg, 8 cross-app files
+export const AMBER_TINT_12 = 'rgba(247,147,30,0.12)';        // VS divider bg, pill treatment — 6 cross-app files
 export const AMBER_BORDER = 'rgba(247,147,30,0.30)';
 export const AMBER_SOFT_BG = '#FEF3E7';
 

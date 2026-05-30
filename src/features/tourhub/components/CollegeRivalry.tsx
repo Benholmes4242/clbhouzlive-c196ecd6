@@ -37,6 +37,7 @@ import {
   AMBER_BORDER,
   AMBER_INK,
   AMBER_TINT_8,
+  AMBER_TINT_12,
   HAIRLINE_INK_7,
   INK,
   INK_FAINT,
@@ -44,6 +45,7 @@ import {
   INK_MUTE,
   INK_SOFT,
   SLATE_150,
+  SURFACE,
 } from '../_shared/tokens';
 
 function displayName(stats: CollegeSeasonStats, media: CollegeMedia | undefined): string {
@@ -79,7 +81,7 @@ function CollegeRivalrySkeleton() {
       {/* Matchup card */}
       <div style={{ padding: '0 16px' }}>
         <div style={{
-          background: '#fff',
+          background: SURFACE,
           border: `1px solid ${HAIRLINE_INK_7}`,
           borderRadius: 18,
           overflow: 'hidden',
@@ -296,7 +298,7 @@ export function CollegeRivalry() {
       <div style={{ padding: '0 16px', marginBottom: 24 }}>
         <div
           style={{
-            background: '#fff',
+            background: SURFACE,
             border: `1px solid ${HAIRLINE_INK_7}`,
             borderRadius: 18,
             overflow: 'hidden',
@@ -374,7 +376,7 @@ export function CollegeRivalry() {
                 VS
               </div>
               <div style={{
-                background: 'rgba(247,147,30,0.12)',
+                background: AMBER_TINT_12,
                 color: AMBER_INK,
                 fontSize: 10, fontWeight: 900,
                 padding: '4px 8px',
