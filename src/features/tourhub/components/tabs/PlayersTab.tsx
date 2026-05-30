@@ -751,7 +751,7 @@ export function PlayersTab() {
         </div>
 
         {/* Underline tour-specific tabs (A-Z removed Phase 1 fix.1.6) */}
-        <div style={{ display: 'flex', borderBottom: '1px solid rgba(15,23,42,0.1)', marginTop: '6px' }}>
+        <div style={{ display: 'flex', borderBottom: `1px solid ${HAIRLINE_INK_10}`, marginTop: '6px' }}>
           {(() => {
             // Per-tour tab config — single source of truth.
             const tabs: { value: PlayerSortType; label: string }[] =
