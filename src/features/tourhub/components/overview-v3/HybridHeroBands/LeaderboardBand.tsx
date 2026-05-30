@@ -446,10 +446,11 @@ export function LeaderboardBand({
             width: 'calc(100% - 40px)',
             border: 'none',
             cursor: 'pointer',
-            fontFamily: 'inherit',
+            fontFamily: FONT,
           }}
         >
-          {ctaLabel(state)} <span style={{ opacity: 0.7 }}>›</span>
+          {ctaLabel(state)}
+          <ChevronRight size={12} strokeWidth={2.5} color="white" style={{ opacity: 0.7 }} />
         </button>
       )}
     </div>
