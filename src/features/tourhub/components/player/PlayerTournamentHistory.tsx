@@ -40,10 +40,10 @@ export function PlayerTournamentHistory({ playerId, playerName }: PlayerTourname
   }
 
   return (
-    <div style={{ background: '#ffffff', borderBottom: `1px solid ${INK_TINT_07}`, marginTop: '8px' }}>
+    <div style={{ background: SURFACE, borderBottom: `1px solid ${INK_TINT_07}`, marginTop: '8px' }}>
       {/* Section eyebrow — canonical §6 slate-caps */}
       <div style={{ padding: '14px 16px 8px' }}>
-        <span style={{ fontSize: '9px', fontWeight: 800, color: '#64748B', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>
+        <span style={{ fontSize: '9px', fontWeight: 800, color: INK_MUTE, letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>
           Recent Tournaments
         </span>
       </div>
@@ -57,11 +57,11 @@ export function PlayerTournamentHistory({ playerId, playerName }: PlayerTourname
       ) : results && results.length > 0 ? (
         <>
           {/* Column headers */}
-          <div style={{ display: 'flex', alignItems: 'center', padding: '6px 16px', borderBottom: `0.5px solid ${INK_TINT_07}`, borderTop: `0.5px solid ${INK_TINT_07}`, background: 'rgba(15,23,42,0.02)' }}>
-            <span style={{ fontSize: 9, fontWeight: 800, color: '#94A3B8', letterSpacing: '0.14em', width: '44px', flexShrink: 0 }}>POS</span>
-            <span style={{ flex: 1, fontSize: 9, fontWeight: 800, color: '#94A3B8', letterSpacing: '0.14em' }}>TOURNAMENT</span>
-            <span style={{ fontSize: 9, fontWeight: 800, color: '#94A3B8', letterSpacing: '0.14em', width: '40px', textAlign: 'right' as const, flexShrink: 0 }}>DATE</span>
-            <span style={{ fontSize: 9, fontWeight: 800, color: '#94A3B8', letterSpacing: '0.14em', width: '36px', textAlign: 'right' as const, flexShrink: 0 }}>SCORE</span>
+          <div style={{ display: 'flex', alignItems: 'center', padding: '6px 16px', borderBottom: `0.5px solid ${INK_TINT_07}`, borderTop: `0.5px solid ${INK_TINT_07}`, background: INK_TINT_02 }}>
+            <span style={{ fontSize: 9, fontWeight: 800, color: INK_FAINT, letterSpacing: '0.14em', width: '44px', flexShrink: 0 }}>POS</span>
+            <span style={{ flex: 1, fontSize: 9, fontWeight: 800, color: INK_FAINT, letterSpacing: '0.14em' }}>TOURNAMENT</span>
+            <span style={{ fontSize: 9, fontWeight: 800, color: INK_FAINT, letterSpacing: '0.14em', width: '40px', textAlign: 'right' as const, flexShrink: 0 }}>DATE</span>
+            <span style={{ fontSize: 9, fontWeight: 800, color: INK_FAINT, letterSpacing: '0.14em', width: '36px', textAlign: 'right' as const, flexShrink: 0 }}>SCORE</span>
           </div>
 
           <div>
