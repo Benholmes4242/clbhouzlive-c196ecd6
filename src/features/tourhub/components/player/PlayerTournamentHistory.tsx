@@ -95,14 +95,14 @@ export function PlayerTournamentHistory({ playerId, playerName }: PlayerTourname
                     display: 'flex', alignItems: 'center',
                     padding: '11px 16px',
                     borderBottom: `0.5px solid ${INK_TINT_07}`,
-                    background: isWin ? '#FEF3E7' : 'transparent',
+                    background: isWin ? AMBER_SOFT_BG : 'transparent',
                     textDecoration: 'none',
                   }}
                   className="active:bg-black/[0.02] transition-colors"
                 >
                   {/* Position */}
-                  <span style={{ width: '44px', flexShrink: 0, fontSize: '12px', fontWeight: 900, color: isWin ? '#F7931E' : '#64748B', display: 'flex', alignItems: 'center' }}>
-                    {isWin ? <Trophy style={{ width: 14, height: 14, color: '#F7931E' }} /> : pos}
+                  <span style={{ width: '44px', flexShrink: 0, fontSize: '12px', fontWeight: 900, color: isWin ? AMBER : INK_MUTE, display: 'flex', alignItems: 'center' }}>
+                    {isWin ? <Trophy style={{ width: 14, height: 14, color: AMBER }} /> : pos}
                   </span>
 
                   {/* Tournament name */}
@@ -110,14 +110,14 @@ export function PlayerTournamentHistory({ playerId, playerName }: PlayerTourname
                     flex: 1, fontSize: '13px',
                     fontWeight: isWin ? 800 : 600,
                     letterSpacing: isWin ? '-0.01em' : 'normal',
-                    color: '#0F172A',
+                    color: INK,
                     overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const,
                   }}>
                     {result.tournament_name}
                   </span>
 
                   {/* Date */}
-                  <span style={{ fontSize: '10px', color: '#94A3B8', width: '40px', textAlign: 'right' as const, flexShrink: 0 }}>
+                  <span style={{ fontSize: '10px', color: INK_FAINT, width: '40px', textAlign: 'right' as const, flexShrink: 0 }}>
                     {result.tournament_end_date
                       ? format(new Date(result.tournament_end_date), 'MMM d')
                       : '—'}
