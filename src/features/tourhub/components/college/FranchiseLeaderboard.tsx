@@ -89,13 +89,13 @@ export function FranchiseLeaderboard({
   return (
     <div className={className}>
       {activeMetric !== 'movers' && (
-        <div style={{ background: '#ffffff', borderTop: `1px solid ${INK_TINT_07}`, borderBottom: `1px solid ${INK_TINT_07}`, marginTop: 8 }}>
+        <div style={{ background: SURFACE, borderTop: `1px solid ${INK_TINT_07}`, borderBottom: `1px solid ${INK_TINT_07}`, marginTop: 8 }}>
           {/* Section eyebrow — canonical §6 slate-caps */}
           <div style={{ padding: '14px 16px 6px' }}>
             <div style={{
               fontSize: 9,
               fontWeight: 800,
-              color: '#64748B',
+              color: INK_MUTE,
               letterSpacing: '0.16em',
               textTransform: 'uppercase' as const,
             }}>
@@ -103,7 +103,7 @@ export function FranchiseLeaderboard({
             </div>
             {isTiedAtOne && (
               <div style={{
-                fontSize: 11, fontWeight: 500, color: '#94A3B8', marginTop: 4,
+                fontSize: 11, fontWeight: 500, color: INK_FAINT, marginTop: 4,
               }}>
                 {tiebreakerNote}
               </div>
@@ -111,12 +111,12 @@ export function FranchiseLeaderboard({
           </div>
 
           {/* Column headers */}
-          <div style={{ display: 'flex', alignItems: 'center', padding: '5px 16px', background: 'rgba(15,23,42,0.02)', borderTop: `0.5px solid ${INK_TINT_07}`, borderBottom: `0.5px solid ${INK_TINT_07}` }}>
-            <span style={{ width: 32, fontSize: 10, fontWeight: 900, color: '#94A3B8', letterSpacing: '0.1em', flexShrink: 0, textAlign: 'center' as const }}>RK</span>
-            <span style={{ flex: 1, fontSize: 10, fontWeight: 900, color: '#94A3B8', letterSpacing: '0.1em' }}>FRANCHISE</span>
-            <span style={{ width: 28, textAlign: 'center' as const, fontSize: 10, fontWeight: 900, color: '#94A3B8', letterSpacing: '0.1em', flexShrink: 0 }}>WIN</span>
-            <span style={{ width: 28, textAlign: 'center' as const, fontSize: 10, fontWeight: 900, color: '#94A3B8', letterSpacing: '0.1em', flexShrink: 0 }}>T10</span>
-            <span style={{ width: 72, textAlign: 'right' as const, fontSize: 10, fontWeight: 900, color: '#94A3B8', letterSpacing: '0.1em', flexShrink: 0 }}>
+          <div style={{ display: 'flex', alignItems: 'center', padding: '5px 16px', background: INK_TINT_02, borderTop: `0.5px solid ${INK_TINT_07}`, borderBottom: `0.5px solid ${INK_TINT_07}` }}>
+            <span style={{ width: 32, fontSize: 10, fontWeight: 900, color: INK_FAINT, letterSpacing: '0.1em', flexShrink: 0, textAlign: 'center' as const }}>RK</span>
+            <span style={{ flex: 1, fontSize: 10, fontWeight: 900, color: INK_FAINT, letterSpacing: '0.1em' }}>FRANCHISE</span>
+            <span style={{ width: 28, textAlign: 'center' as const, fontSize: 10, fontWeight: 900, color: INK_FAINT, letterSpacing: '0.1em', flexShrink: 0 }}>WIN</span>
+            <span style={{ width: 28, textAlign: 'center' as const, fontSize: 10, fontWeight: 900, color: INK_FAINT, letterSpacing: '0.1em', flexShrink: 0 }}>T10</span>
+            <span style={{ width: 72, textAlign: 'right' as const, fontSize: 10, fontWeight: 900, color: INK_FAINT, letterSpacing: '0.1em', flexShrink: 0 }}>
               {activeMetric === 'wins' ? 'WINS' : activeMetric === 'top10s' ? 'TOP 10s' : 'EARNINGS'}
             </span>
           </div>
