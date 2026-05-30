@@ -14,7 +14,7 @@ import { IntelligenceHero } from '../IntelligenceHero';
 import { WorldRankingsHero } from '../WorldRankingsHero';
 import { StatOfTheWeek } from '../StatOfTheWeek';
 import { HomeCourseOfWeekModule } from '../home/HomeCourseOfWeekModule';
-import { HomeWatchRail } from '../home/HomeWatchRail';
+
 import { HomeConnectHandicapModule } from '../home/HomeConnectHandicapModule';
 
 import { OverviewHero } from '../overview-v3/OverviewHero';
@@ -74,9 +74,6 @@ export function OverviewPageV3() {
             </LazySection>
             <LazySection minHeight={260}>
               <HomeCourseOfWeekModule />
-            </LazySection>
-            <LazySection minHeight={240}>
-              <HomeWatchRail />
             </LazySection>
             <LazySection minHeight={400}>
               <WorldRankingsHero />
