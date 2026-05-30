@@ -8,13 +8,22 @@
  */
 
 import React, { useState } from 'react';
-import { Check } from 'lucide-react';
+import { ArrowLeftRight, Check } from 'lucide-react';
 import { BottomSheet } from '@/components/ui/BottomSheet';
 import { SheetHeader } from '@/components/ui/SheetHeader';
 import { getTourLogo } from '../utils/tourLogos';
 import { useAllToursTickerData } from '../hooks/useOverviewModules';
 import { useTourSelection } from '../context/TourSelectionContext';
-import { AMBER_TINT_04, INK_TINT_07, WHITE_ALPHA_55 } from '../_shared/tokens';
+import {
+  AMBER,
+  AMBER_TINT_04,
+  FONT,
+  INK,
+  INK_ALPHA_45,
+  INK_TINT_07,
+  STATUS_LIVE,
+  SURFACE,
+} from '../_shared/tokens';
 
 const TOUR_LABEL: Record<string, string> = {
   pga: 'PGA',
@@ -52,24 +61,47 @@ export const TourSwitcherAffordance: React.FC = () => {
         aria-expanded={open}
         style={{
           flexShrink: 0,
-          display: 'flex',
-          alignItems: 'center',
-          gap: 5,
+          display: 'inline-flex',
+          flexDirection: 'column',
+          alignItems: 'flex-start',
+          justifyContent: 'center',
+          gap: 2,
           padding: '0 14px 0 10px',
           background: 'transparent',
           border: 'none',
-          color: WHITE_ALPHA_55,
           cursor: 'pointer',
-          fontFamily: 'Geist, system-ui, sans-serif',
-          fontSize: 11,
-          fontWeight: 700,
-          letterSpacing: '0.04em',
-          textTransform: 'uppercase',
+          fontFamily: FONT,
           height: 36,
         }}
       >
-        <span>{TOUR_LABEL[activeTourSlug] ?? 'PGA'}</span>
-        <span aria-hidden style={{ fontSize: 12, opacity: 0.7 }}>↔</span>
+        <span
+          style={{
+            fontSize: 8,
+            fontWeight: 800,
+            letterSpacing: '0.14em',
+            color: AMBER,
+            textTransform: 'uppercase',
+            lineHeight: 1,
+          }}
+        >
+          Tour
+        </span>
+        <span
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: 5,
+            fontSize: 11,
+            fontWeight: 700,
+            letterSpacing: '0.04em',
+            color: SURFACE,
+            textTransform: 'uppercase',
+            lineHeight: 1,
+          }}
+        >
+          {TOUR_LABEL[activeTourSlug] ?? 'PGA'}
+          <ArrowLeftRight size={11} strokeWidth={2.2} color={SURFACE} aria-hidden />
+        </span>
       </button>
 
       <BottomSheet
@@ -108,12 +140,12 @@ export const TourSwitcherAffordance: React.FC = () => {
                   padding: '14px 16px',
                   background: isActive ? AMBER_TINT_04 : 'transparent',
                   border: 'none',
-                  borderLeft: isActive ? '3px solid #F7931E' : '3px solid transparent',
+                  borderLeft: isActive ? `3px solid ${AMBER}` : '3px solid transparent',
                   borderBottom: `0.5px solid ${INK_TINT_07}`,
                   cursor: selectable ? 'pointer' : 'default',
                   opacity: selectable ? 1 : 0.4,
                   textAlign: 'left',
-                  fontFamily: 'Geist, system-ui, sans-serif',
+                  fontFamily: FONT,
                 }}
               >
                 <div
@@ -138,7 +170,7 @@ export const TourSwitcherAffordance: React.FC = () => {
                     style={{
                       fontSize: 13,
                       fontWeight: 700,
-                      color: '#0F172A',
+                      color: INK,
                       letterSpacing: '0.04em',
                       textTransform: 'uppercase',
                     }}
@@ -149,11 +181,11 @@ export const TourSwitcherAffordance: React.FC = () => {
 
                 {status === 'live' ? (
                   <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, flexShrink: 0 }}>
-                    <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#10B981', display: 'inline-block' }} />
-                    <span style={{ fontSize: 10, fontWeight: 800, letterSpacing: '0.16em', color: '#10B981' }}>LIVE</span>
+                    <span style={{ width: 6, height: 6, borderRadius: '50%', background: STATUS_LIVE, display: 'inline-block' }} />
+                    <span style={{ fontSize: 10, fontWeight: 800, letterSpacing: '0.16em', color: STATUS_LIVE }}>LIVE</span>
                   </span>
                 ) : status === 'upcoming' ? (
-                  <span style={{ flexShrink: 0, fontSize: 10, fontWeight: 800, letterSpacing: '0.16em', color: 'rgba(15,23,42,0.45)' }}>
+                  <span style={{ flexShrink: 0, fontSize: 10, fontWeight: 800, letterSpacing: '0.16em', color: INK_ALPHA_45 }}>
                     UPCOMING
                   </span>
                 ) : (
@@ -163,7 +195,7 @@ export const TourSwitcherAffordance: React.FC = () => {
                 )}
 
                 {isActive && (
-                  <Check size={16} strokeWidth={2.5} color="#F7931E" />
+                  <Check size={16} strokeWidth={2.5} color={AMBER} />
                 )}
               </button>
             );
