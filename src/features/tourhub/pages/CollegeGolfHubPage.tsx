@@ -249,7 +249,7 @@ export function CollegeGolfHubPage() {
                 );
               })
             ) : (
-              <div style={{ padding: '32px 16px', textAlign: 'center' as const, fontSize: '13px', color: '#94A3B8' }}>
+              <div style={{ padding: '32px 16px', textAlign: 'center' as const, fontSize: '13px', color: INK_FAINT }}>
                 No colleges found matching "{debouncedSearch}"
               </div>
             )}
