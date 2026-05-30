@@ -38,6 +38,8 @@ import {
 import { BG, INK_15 } from './HybridHero.constants';
 
 
+import { SLATE_700, SLATE_800 } from '../../_shared/tokens';
+
 // ---------- Skeleton -------------------------------------------------------
 
 export function HybridHeroSkeleton() {
@@ -46,7 +48,7 @@ export function HybridHeroSkeleton() {
       <div
         style={{
           height: 310,
-          background: 'linear-gradient(180deg, #1e293b 0%, #334155 100%)',
+          background: `linear-gradient(180deg, ${SLATE_800} 0%, ${SLATE_700} 100%)`,
           opacity: 0.6,
         }}
       />

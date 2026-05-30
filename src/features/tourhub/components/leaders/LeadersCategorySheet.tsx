@@ -4,7 +4,7 @@
  */
 
 import { useState, useCallback, useEffect } from 'react';
-import { AMBER, INK_SOFT } from '../../_shared/tokens';
+import { AMBER, AMBER_TINT_04, INK_SOFT } from '../../_shared/tokens';
 import { BottomSheet } from '@/components/ui/BottomSheet';
 import SheetHeader from '@/components/ui/SheetHeader';
 import type { LeaderCategory } from './constants';
@@ -134,7 +134,7 @@ export function LeadersCategorySheet({
                     style={{
                       width: '100%', display: 'flex', alignItems: 'center', gap: '12px',
                       padding: '11px 16px',
-                      background: isActive ? 'rgba(247,147,30,0.04)' : 'transparent',
+                      background: isActive ? AMBER_TINT_04 : 'transparent',
                       border: 'none',
                       borderLeft: isActive ? '3px solid #F7931E' : '3px solid transparent',
                       cursor: 'pointer', textAlign: 'left' as const,

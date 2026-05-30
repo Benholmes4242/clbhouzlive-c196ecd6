@@ -8,6 +8,8 @@ import React from 'react';
 import { Users } from 'lucide-react';
 import { INK, GOLD, NUMERIC_STYLE, STRIP_HEIGHT } from '../HybridHero.constants';
 
+import { SLATE_800, WHITE_ALPHA_55 } from '../../../_shared/tokens';
+
 export interface FieldStrengthStripProps {
   totalPlayers: number;
   topRanked?: number | null;
@@ -24,7 +26,7 @@ function StackedHeads({ photos }: { photos: string[] }) {
           width: 42,
           height: 42,
           borderRadius: '34%',
-          background: 'linear-gradient(135deg, #475569 0%, #1e293b 100%)',
+          background: `linear-gradient(135deg, #475569 0%, ${SLATE_800} 100%)`,
           boxShadow: '0 0 0 2px rgba(251,188,46,0.55)',
         }}
         aria-hidden="true"
@@ -41,7 +43,7 @@ function StackedHeads({ photos }: { photos: string[] }) {
             height: 32,
             borderRadius: '34%',
             marginLeft: i === 0 ? 0 : -10,
-            background: `url(${url}) center/cover, linear-gradient(135deg, #475569 0%, #1e293b 100%)`,
+            background: `url(${url}) center/cover, linear-gradient(135deg, #475569 0%, ${SLATE_800} 100%)`,
             boxShadow: '0 0 0 2px rgba(251,188,46,0.55)',
             zIndex: 3 - i,
           }}
@@ -116,7 +118,7 @@ export function FieldStrengthStrip({
             style={{
               fontSize: 10,
               fontWeight: 600,
-              color: 'rgba(255,255,255,0.55)',
+              color: WHITE_ALPHA_55,
               marginTop: 1,
             }}
           >

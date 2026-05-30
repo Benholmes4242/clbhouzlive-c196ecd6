@@ -39,7 +39,7 @@ const AMBER_SOFT = '#FEF3E7';
 const GOLD = '#FFB800';
 const GOLD_DEEP = '#D97706';
 const SLATE_900 = '#0F172A';
-import { SLATE_600, INK_TINT_06 } from '../_shared/tokens';
+import { AMBER_TINT_08, AMBER_TINT_12, INK_TINT_06, SLATE_600 } from '../_shared/tokens';
 const SLATE_500 = '#64748B';
 const SLATE_400 = '#94A3B8';
 const SLATE_200 = '#E2E8F0';
@@ -529,7 +529,7 @@ function PicksHistoryBody({ onClose }: { onClose: () => void }) {
                 padding: '6px 12px',
                 borderRadius: 999,
                 border: active ? `1px solid ${AMBER}` : `1px solid ${SLATE_200}`,
-                background: active ? 'rgba(247,147,30,0.08)' : '#ffffff',
+                background: active ? AMBER_TINT_08 : '#ffffff',
                 color: active ? AMBER : SLATE_500,
                 fontSize: 12,
                 fontWeight: 700,
@@ -778,7 +778,7 @@ function EmptyState({ onClose }: { onClose: () => void }) {
           width: 56,
           height: 56,
           borderRadius: '50%',
-          background: 'rgba(247,147,30,0.12)',
+          background: AMBER_TINT_12,
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',

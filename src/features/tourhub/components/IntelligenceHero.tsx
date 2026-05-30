@@ -49,23 +49,7 @@ import {
 } from '@/utils/playerHeadshot';
 
 // ─── Tokens (mirrors the mock) ──────────────────────────────────────────────
-import {
-  AMBER,
-  AMBER_INK,
-  AMBER_SOFT_BG,
-  DANGER,
-  FONT,
-  GOLD,
-  GOLD_DEEP,
-  INK,
-  INK_FAINT,
-  INK_SOFT,
-  PGA_GREEN,
-  SLATE_150,
-  SLATE_200,
-  STATUS_LIVE,
-  SURFACE,
-} from '../_shared/tokens';
+import { AMBER, AMBER_INK, AMBER_SOFT_BG, AMBER_TINT_08, AMBER_TINT_10, DANGER, FONT, GOLD, GOLD_DEEP, INK, INK_FAINT, INK_SOFT, PGA_GREEN, SLATE_150, SLATE_200, SLATE_800, STATUS_LIVE, SURFACE, WHITE_ALPHA_55, WHITE_ALPHA_65 } from '../_shared/tokens';
 import { getScoreColor } from '../_shared/scoreColor';
 
 // ─── Helpers ────────────────────────────────────────────────────────────────
@@ -146,7 +130,7 @@ function PlayerHeadshot({
       style={{
         width: '100%',
         height: '100%',
-        background: `linear-gradient(135deg, #1E293B, ${INK})`,
+        background: `linear-gradient(135deg, ${SLATE_800}, ${INK})`,
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
@@ -618,7 +602,7 @@ function UpcomingCard({
               <span
                 style={{
                   fontSize: 10,
-                  color: 'rgba(255,255,255,0.65)',
+                  color: WHITE_ALPHA_65,
                   fontWeight: 600,
                   letterSpacing: '0.06em',
                 }}
@@ -755,7 +739,7 @@ function LiveCard({
                 style={{
                   fontSize: 9,
                   fontWeight: 700,
-                  color: 'rgba(255,255,255,0.55)',
+                  color: WHITE_ALPHA_55,
                   letterSpacing: '0.1em',
                   marginBottom: -2,
                 }}
@@ -787,7 +771,7 @@ function LiveCard({
                 style={{
                   fontSize: 9,
                   fontWeight: 700,
-                  color: 'rgba(255,255,255,0.55)',
+                  color: WHITE_ALPHA_55,
                   letterSpacing: '0.1em',
                   marginBottom: -2,
                 }}
@@ -819,7 +803,7 @@ function LiveCard({
                 style={{
                   fontSize: 9,
                   fontWeight: 700,
-                  color: 'rgba(255,255,255,0.55)',
+                  color: WHITE_ALPHA_55,
                   letterSpacing: '0.1em',
                   marginBottom: -2,
                 }}
@@ -1026,8 +1010,8 @@ function ReceiptsTailCard({
         padding: 0,
         cursor: 'pointer',
         background: hasWinner
-          ? 'linear-gradient(160deg, rgba(255,184,0,0.18), rgba(247,147,30,0.08))'
-          : 'linear-gradient(160deg, rgba(247,147,30,0.10), rgba(247,147,30,0.02))',
+          ? `linear-gradient(160deg, rgba(255,184,0,0.18), ${AMBER_TINT_08})`
+          : `linear-gradient(160deg, ${AMBER_TINT_10}, rgba(247,147,30,0.02))`,
         border: hasWinner ? `1.5px solid ${GOLD}` : `1px solid ${AMBER}30`,
         display: 'flex',
         flexDirection: 'column',

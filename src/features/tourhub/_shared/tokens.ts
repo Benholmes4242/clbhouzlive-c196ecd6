@@ -41,6 +41,8 @@ export const SLATE_50 = '#F8FAFC';
 export const SLATE_150 = '#EDF1F5';
 export const SLATE_200 = '#E2E8F0';
 export const SLATE_600 = '#475569';                          // Tailwind slate-600 — used as fallback bg/stripe when no brand color is available (22 files)
+export const SLATE_700 = '#334155';                          // Tailwind slate-700 — avatar fallback gradient endpoint, 6 cross-app files
+export const SLATE_800 = '#1e293b';                          // Tailwind slate-800 — avatar fallback gradient endpoint, 8 cross-app files
 
 // ============================================================================
 // HAIRLINE (divider variants)
@@ -88,7 +90,7 @@ export const INK_TINT_07 = 'rgba(15,23,42,0.07)';            // light slate bord
 export const AMBER = '#F7931E';
 export const AMBER_INK = '#D97706';
 export const AMBER_INK_DARK = '#BA7517';                     // darker AMBER_INK for high-contrast small text on light bg (was `AMBER_DARK` in HybridRecapNext)
-export const AMBER_TINT_8 = 'rgba(247,147,30,0.08)';
+export const AMBER_TINT_08 = 'rgba(247,147,30,0.08)';        // faint amber selection/tint (canonical zero-padded name)
 export const AMBER_TINT_10 = 'rgba(247,147,30,0.10)';
 export const AMBER_TINT_16 = 'rgba(247,147,30,0.16)';
 export const AMBER_TINT_04 = 'rgba(247,147,30,0.04)';        // very faint amber — selection state bg, 8 cross-app files

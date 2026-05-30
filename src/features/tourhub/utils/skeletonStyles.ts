@@ -4,12 +4,14 @@
  */
 import type { CSSProperties } from 'react';
 
+import { WHITE_ALPHA_04 } from '../_shared/tokens';
+
 export const SHIMMER_BG = `
   linear-gradient(
     90deg,
-    rgba(255,255,255,0.04) 0%,
+    ${WHITE_ALPHA_04} 0%,
     rgba(255,255,255,0.08) 50%,
-    rgba(255,255,255,0.04) 100%
+    ${WHITE_ALPHA_04} 100%
   )
 `;
 

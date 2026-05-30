@@ -32,7 +32,7 @@ import {
   type TournamentTab,
 } from '../components/tournament-detail';
 import { TournamentEmptyState } from '../components/tournament-detail/TournamentEmptyState';
-import { INK_TINT_06, INK_TINT_07 } from '../_shared/tokens';
+import { INK_TINT_06, INK_TINT_07, WHITE_ALPHA_10 } from '../_shared/tokens';
 
 const VALID_TABS: TournamentTab[] = ['overview', 'leaderboard', 'summary', 'tee-times', 'hole-stats'];
 
@@ -116,19 +116,19 @@ export function TournamentDetailPage() {
         <div style={{ background: '#0A0E14', padding: '16px 16px 0' }} className="animate-pulse">
           {/* Pills row */}
           <div style={{ display: 'flex', gap: 6, marginBottom: 60 }}>
-            <div style={{ height: 22, width: 88, background: 'rgba(255,255,255,0.10)', borderRadius: 6 }} />
-            <div style={{ height: 22, width: 140, background: 'rgba(255,255,255,0.10)', borderRadius: 6 }} />
+            <div style={{ height: 22, width: 88, background: WHITE_ALPHA_10, borderRadius: 6 }} />
+            <div style={{ height: 22, width: 140, background: WHITE_ALPHA_10, borderRadius: 6 }} />
           </div>
           {/* h1 */}
-          <div style={{ height: 22, width: '65%', background: 'rgba(255,255,255,0.10)', borderRadius: 4, marginBottom: 8 }} />
+          <div style={{ height: 22, width: '65%', background: WHITE_ALPHA_10, borderRadius: 4, marginBottom: 8 }} />
           {/* Subhead */}
-          <div style={{ height: 13, width: '55%', background: 'rgba(255,255,255,0.10)', borderRadius: 4, marginBottom: 16 }} />
+          <div style={{ height: 13, width: '55%', background: WHITE_ALPHA_10, borderRadius: 4, marginBottom: 16 }} />
           {/* 3-col stat strip */}
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', borderTop: '0.5px solid rgba(255,255,255,0.08)' }}>
             {[0, 1, 2].map(i => (
               <div key={i} style={{ padding: '9px 0 11px', textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
-                <div style={{ height: 8, width: 40, background: 'rgba(255,255,255,0.10)', borderRadius: 4 }} />
-                <div style={{ height: 13, width: 50, background: 'rgba(255,255,255,0.10)', borderRadius: 4 }} />
+                <div style={{ height: 8, width: 40, background: WHITE_ALPHA_10, borderRadius: 4 }} />
+                <div style={{ height: 13, width: 50, background: WHITE_ALPHA_10, borderRadius: 4 }} />
               </div>
             ))}
           </div>

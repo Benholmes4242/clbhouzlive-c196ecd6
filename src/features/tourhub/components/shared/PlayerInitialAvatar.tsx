@@ -16,7 +16,7 @@
  */
 
 import { useState } from 'react';
-import { INK_TINT_06 } from '../../_shared/tokens';
+import { INK_TINT_06, SLATE_700 } from '../../_shared/tokens';
 
 const FALLBACK_PALETTE = [
   { bg: '#FEF3C7', fg: '#92400E' }, // amber
@@ -26,7 +26,7 @@ const FALLBACK_PALETTE = [
   { bg: '#EDE9FE', fg: '#6D28D9' }, // purple
   { bg: '#FEE2E2', fg: '#B91C1C' }, // red
   { bg: '#CFFAFE', fg: '#155E75' }, // cyan
-  { bg: '#F1F5F9', fg: '#334155' }, // slate
+  { bg: '#F1F5F9', fg: SLATE_700 }, // slate
 ] as const;
 
 function pickPalette(seed: string) {

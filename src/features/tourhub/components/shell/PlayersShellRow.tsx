@@ -4,7 +4,7 @@ import { ChevronDown, Globe } from 'lucide-react';
 import { BottomSheet } from '@/components/ui/BottomSheet';
 import SheetHeader from '@/components/ui/SheetHeader';
 import { getTourLogo, hasTourLogo } from '../../utils/tourLogos';
-import { INK_TINT_06, INK_TINT_07 } from '../../_shared/tokens';
+import { AMBER_TINT_04, INK_TINT_06, INK_TINT_07, WHITE_ALPHA_10, WHITE_ALPHA_55 } from '../../_shared/tokens';
 
 type PlayerTourCode = 'pga' | 'EURO' | 'LPGA' | 'CHAMP' | 'PGAD' | 'LIV';
 
@@ -73,8 +73,8 @@ function PlayersShellRowInner() {
                   fontSize: 12,
                   fontWeight: 600,
                   borderRadius: 15,
-                  background: isActive ? 'rgba(255,255,255,0.10)' : 'transparent',
-                  border: isActive ? '1px solid rgba(255,255,255,0.55)' : '1.5px solid rgba(255,255,255,0.10)',
+                  background: isActive ? WHITE_ALPHA_10 : 'transparent',
+                  border: isActive ? `1px solid ${WHITE_ALPHA_55}` : `1.5px solid ${WHITE_ALPHA_10}`,
                   color: isActive ? '#FFFFFF' : 'rgba(255,255,255,0.85)',
                   gap: 5,
                   whiteSpace: 'nowrap',
@@ -115,7 +115,7 @@ function PlayersShellRowInner() {
                 alignItems: 'center',
                 gap: 12,
                 padding: '14px 16px',
-                background: isSelected ? 'rgba(247,147,30,0.04)' : 'transparent',
+                background: isSelected ? AMBER_TINT_04 : 'transparent',
                 border: 'none',
                 borderLeft: isSelected ? '3px solid #F7931E' : '3px solid transparent',
                 borderBottom: `0.5px solid ${INK_TINT_07}`,

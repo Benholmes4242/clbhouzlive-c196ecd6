@@ -16,7 +16,7 @@ import {
   GREEN_LIVE,
   NUMERIC_STYLE,
 } from '../HybridHero.constants';
-import { STATUS_LIVE, FONT } from '../../../_shared/tokens';
+import { FONT, STATUS_LIVE, WHITE_ALPHA_55 } from '../../../_shared/tokens';
 import type { HeroState } from '../HybridHero.utils';
 
 interface PhotoBandProps {
@@ -300,7 +300,7 @@ export function PhotoBand({
                   width: 3,
                   height: 3,
                   borderRadius: '50%',
-                  background: 'rgba(255,255,255,0.55)',
+                  background: WHITE_ALPHA_55,
                   flexShrink: 0,
                 }}
               />

@@ -12,7 +12,7 @@
  * Per Schedule Polish Phase 2 brief.
  */
 import { TrendingUp } from 'lucide-react';
-import { INK_TINT_06 } from '../../_shared/tokens';
+import { INK_TINT_06, SLATE_700 } from '../../_shared/tokens';
 
 interface TournamentMetaProps {
   defendingChampion?: { name: string; photoUrl?: string | null } | null;
@@ -81,7 +81,7 @@ export function TournamentMeta({ defendingChampion, fieldStrengthLabel }: Tourna
             }}
           >
             <span style={{ color: '#64748B' }}>Defending: </span>
-            <span style={{ color: '#334155' }}>{defendingChampion!.name}</span>
+            <span style={{ color: SLATE_700 }}>{defendingChampion!.name}</span>
           </span>
         </div>
       )}
@@ -93,7 +93,7 @@ export function TournamentMeta({ defendingChampion, fieldStrengthLabel }: Tourna
       {hasField && (
         <div style={{ display: 'inline-flex', alignItems: 'center', gap: 4, flexShrink: 0 }}>
           <TrendingUp size={11} strokeWidth={2.5} style={{ color: '#F7931E' }} />
-          <span style={{ fontSize: 10, fontWeight: 800, color: '#334155', letterSpacing: 0.1 }}>
+          <span style={{ fontSize: 10, fontWeight: 800, color: SLATE_700, letterSpacing: 0.1 }}>
             Field: {fieldStrengthLabel}
           </span>
         </div>

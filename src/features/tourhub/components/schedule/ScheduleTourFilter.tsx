@@ -9,7 +9,7 @@ import { cn } from '@/lib/utils';
 import { BottomSheet } from '@/components/ui/BottomSheet';
 import SheetHeader from '@/components/ui/SheetHeader';
 import { getTourLogo, hasTourLogo } from '../../utils/tourLogos';
-import { INK_TINT_06, INK_TINT_07 } from '../../_shared/tokens';
+import { AMBER_TINT_04, INK_TINT_06, INK_TINT_07 } from '../../_shared/tokens';
 
 export type TourFilterCode = 'all' | 'pga' | 'EURO' | 'LPGA' | 'CHAMP' | 'PGAD' | 'LIV';
 
@@ -118,7 +118,7 @@ export function ScheduleTourFilter({
                 style={{
                   width: '100%', display: 'flex', alignItems: 'center', gap: 12,
                   padding: '14px 16px',
-                  background: isActive ? 'rgba(247,147,30,0.04)' : 'transparent',
+                  background: isActive ? AMBER_TINT_04 : 'transparent',
                   border: 'none',
                   borderLeft: isActive ? '3px solid #F7931E' : '3px solid transparent',
                   borderBottom: `0.5px solid ${INK_TINT_07}`,

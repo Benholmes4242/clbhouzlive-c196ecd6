@@ -6,6 +6,8 @@
  */
 import { forwardRef } from 'react';
 
+import { AMBER_TINT_08 } from '../../_shared/tokens';
+
 interface ThisWeekAnchorProps {
   label: string; // e.g. "APR 28 – MAY 4"
 }
@@ -20,7 +22,7 @@ export const ThisWeekAnchor = forwardRef<HTMLDivElement, ThisWeekAnchorProps>(
           alignItems: 'center',
           gap: 8,
           padding: '8px 18px',
-          background: 'linear-gradient(90deg, rgba(247,147,30,0.08) 0%, rgba(247,147,30,0) 80%)',
+          background: `linear-gradient(90deg, ${AMBER_TINT_08} 0%, rgba(247,147,30,0) 80%)`,
           borderTop: '1px solid rgba(247,147,30,0.30)',
           borderBottom: '1px solid rgba(247,147,30,0.30)',
         }}

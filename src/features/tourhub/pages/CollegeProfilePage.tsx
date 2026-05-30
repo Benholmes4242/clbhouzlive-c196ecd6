@@ -24,7 +24,7 @@ import {
   captainShortName,
 } from '../utils/captainAnchor';
 import { collegeHubRoute } from '../routes';
-import { INK_TINT_06, INK_TINT_07 } from '../_shared/tokens';
+import { INK_TINT_06, INK_TINT_07, WHITE_ALPHA_55 } from '../_shared/tokens';
 
 /* ─── Hero subtitle: cross-tour roll-up ────────────────────────────────── */
 
@@ -162,7 +162,7 @@ export function CollegeProfilePage() {
             {displayName}
           </h1>
           {sectionMetaSubtitle && (
-            <div style={{ fontSize: 13, fontWeight: 500, color: 'rgba(255,255,255,0.55)', marginTop: 4 }}>
+            <div style={{ fontSize: 13, fontWeight: 500, color: WHITE_ALPHA_55, marginTop: 4 }}>
               {sectionMetaSubtitle}
             </div>
           )}

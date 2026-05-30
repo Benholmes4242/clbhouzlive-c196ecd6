@@ -24,7 +24,7 @@ import CountryFlag from '@/components/ui/country-flag';
 
 import {
   AMBER,
-  AMBER_TINT_8,
+  AMBER_TINT_08,
   AMBER_TINT_10,
   GOLD,
   HAIRLINE_INK_10,
@@ -671,7 +671,7 @@ export const StatOfTheWeek = memo(function StatOfTheWeek() {
                           border: isActive
                             ? `1.5px solid ${AMBER}`
                             : `1px solid ${HAIRLINE_INK_10}`,
-                          background: isActive ? AMBER_TINT_8 : SURFACE,
+                          background: isActive ? AMBER_TINT_08 : SURFACE,
                           cursor: 'pointer',
                           textAlign: 'left',
                           width: '100%',

@@ -14,7 +14,7 @@ import { useDebouncedValue } from '@/hooks/useDebouncedValue';
 import { getCollegeLogoUrl } from '@/utils/collegeLogo';
 import { formatCurrency } from '@/lib/utils/formatCurrency';
 import { PlayerInitialAvatar } from '../components/shared/PlayerInitialAvatar';
-import { INK_TINT_06, INK_TINT_07 } from '../_shared/tokens';
+import { INK_TINT_06, INK_TINT_07, WHITE_ALPHA_55 } from '../_shared/tokens';
 
 /**
  * Convert "northwestern" or "wake-forest" → "Northwestern" / "Wake Forest"
@@ -134,7 +134,7 @@ export function CollegeComparePage() {
               style={{
                 fontSize: 13,
                 fontWeight: 500,
-                color: 'rgba(255,255,255,0.55)',
+                color: WHITE_ALPHA_55,
                 lineHeight: 1.4,
                 marginTop: 4,
                 overflow: 'hidden',

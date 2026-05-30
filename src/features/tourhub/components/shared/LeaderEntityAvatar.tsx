@@ -11,6 +11,8 @@ import { useState, useEffect } from 'react';
 import { PlayerSilhouette } from '@/components/ui/PlayerSilhouette';
 import { getPlayerHeadshotUrl } from '@/utils/playerHeadshot';
 
+import { WHITE_ALPHA_10 } from '../../_shared/tokens';
+
 export interface TeamMemberAvatar {
   fullName: string;
   photoUrl?: string | null;
@@ -76,7 +78,7 @@ function SingleAvatar({
         height: size,
         borderRadius: `${radiusPct}%`,
         overflow: 'hidden',
-        background: 'rgba(255,255,255,0.10)',
+        background: WHITE_ALPHA_10,
         border: borderColor ? `${borderWidth ?? 1.5}px solid ${borderColor}` : undefined,
         ...ringStyle,
       }}

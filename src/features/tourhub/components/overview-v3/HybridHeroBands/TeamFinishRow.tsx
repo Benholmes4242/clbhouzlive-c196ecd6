@@ -7,6 +7,8 @@
 import React from 'react';
 import { INK, INK_45, INK_15, GOLD_DARK, NUMERIC_STYLE } from '../HybridHero.constants';
 
+import { SLATE_700, SLATE_800 } from '../../../_shared/tokens';
+
 export interface TeamFinishRowProps {
   rank: string;                    // "1" / "T2" / etc
   teamName: string;
@@ -45,7 +47,7 @@ function TeamCrestTile({
           width: size,
           height: size,
           borderRadius: radius,
-          background: `url(${teamCrestUrl}) center/cover, ${teamColor || '#1e293b'}`,
+          background: `url(${teamCrestUrl}) center/cover, ${teamColor || SLATE_800}`,
           boxShadow: isChampion ? '0 0 0 1.5px rgba(212,160,23,0.45)' : 'inset 0 0 0 0.5px rgba(15,23,42,0.10)',
           flexShrink: 0,
         }}
@@ -57,7 +59,7 @@ function TeamCrestTile({
   const initial = (teamName.charAt(0) || '·').toUpperCase();
   const bg = teamColor
     ? `linear-gradient(135deg, ${teamColor} 0%, ${teamColor} 100%)`
-    : 'linear-gradient(135deg, #475569 0%, #334155 100%)';
+    : `linear-gradient(135deg, #475569 0%, ${SLATE_700} 100%)`;
 
   return (
     <div

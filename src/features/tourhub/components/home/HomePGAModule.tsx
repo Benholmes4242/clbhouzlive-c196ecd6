@@ -8,6 +8,8 @@ import { ChevronRight } from 'lucide-react';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { usePGACard } from '@/components/media-system/hooks/usePGACard';
 
+import { AMBER_TINT_10 } from '../../_shared/tokens';
+
 const AMBER = '#F7931E';
 const INK = '#0F172A';
 const INK_SOFT = 'rgba(15,23,42,0.62)';
@@ -108,7 +110,7 @@ export function HomePGAModule() {
               display: 'inline-block',
               padding: '4px 8px',
               borderRadius: 6,
-              background: 'rgba(247,147,30,0.10)',
+              background: AMBER_TINT_10,
               fontSize: 11,
               fontWeight: 800,
               color: AMBER,

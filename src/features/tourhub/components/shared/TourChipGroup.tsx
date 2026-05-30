@@ -1,3 +1,4 @@
+import { WHITE_ALPHA_55 } from '../../_shared/tokens';
 /**
  * TourChipGroup — uppercase-normalized tour codes joined with " · ".
  *
@@ -20,7 +21,7 @@ interface TourChipGroupProps {
 
 export function TourChipGroup({
   codes,
-  color = 'rgba(255,255,255,0.55)',
+  color = WHITE_ALPHA_55,
   fontSize = 11,
 }: TourChipGroupProps) {
   if (!codes || codes.length === 0) return null;

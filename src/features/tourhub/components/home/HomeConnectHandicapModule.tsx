@@ -16,7 +16,7 @@ import { useWhsConnection, useHandicapTrend } from '@/lib/whs/hooks';
 
 // ── Design tokens (Dispatch) ─────────────────────────────────────────────
 const INK = '#0F172A';
-import { INK_SOFT } from '../../_shared/tokens';
+import { INK_SOFT, WHITE_ALPHA_04, WHITE_ALPHA_65 } from '../../_shared/tokens';
 const INK_FAINT = '#94A3B8';
 const AMBER = '#F7931E';
 const AMBER_DEEP = '#D97706';
@@ -135,7 +135,7 @@ const DisconnectedCard: React.FC<{ userId: string; onTap: () => void }> = ({ use
             position: 'absolute',
             inset: 0,
             backgroundImage:
-              'linear-gradient(rgba(255,255,255,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.04) 1px, transparent 1px)',
+              `linear-gradient(${WHITE_ALPHA_04} 1px, transparent 1px), linear-gradient(90deg, ${WHITE_ALPHA_04} 1px, transparent 1px)`,
             backgroundSize: '24px 24px',
             pointerEvents: 'none',
           }}
@@ -186,7 +186,7 @@ const DisconnectedCard: React.FC<{ userId: string; onTap: () => void }> = ({ use
               fontSize: 13,
               fontWeight: 500,
               lineHeight: 1.4,
-              color: 'rgba(255,255,255,0.65)',
+              color: WHITE_ALPHA_65,
               maxWidth: 320,
               marginBottom: 16,
             }}

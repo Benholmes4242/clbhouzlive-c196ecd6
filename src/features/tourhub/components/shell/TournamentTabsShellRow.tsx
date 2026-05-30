@@ -1,6 +1,8 @@
 import { memo } from 'react';
 import type { TournamentTab } from '../tournament-detail';
 
+import { WHITE_ALPHA_55 } from '../../_shared/tokens';
+
 interface TabDef {
   value: TournamentTab;
   label: string;
@@ -63,7 +65,7 @@ function TournamentTabsShellRowInner({ activeTab, onChange }: Props) {
                 padding: '0 4px',
                 fontSize: 14,
                 fontWeight: isActive ? 700 : 600,
-                color: isActive ? '#FFFFFF' : 'rgba(255,255,255,0.55)',
+                color: isActive ? '#FFFFFF' : WHITE_ALPHA_55,
                 background: 'transparent',
                 border: 'none',
                 letterSpacing: '-0.005em',

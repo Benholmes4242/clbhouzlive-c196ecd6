@@ -13,6 +13,8 @@ import { useVenueImage, getFallbackCourseImage } from '../../hooks/useVenueImage
 
 import { PLAYER_SILHOUETTE_URL } from '@/utils/playerHeadshot';
 
+import { WHITE_ALPHA_04 } from '../../_shared/tokens';
+
 interface LikelyWinnersCarouselProps {
   featured: WinnerProfile;
   cards: ContenderCard[];
@@ -176,7 +178,7 @@ export const LikelyWinnersCarousel = memo(function LikelyWinnersCarousel({
                   <div
                     className="w-full h-full flex items-center justify-center"
                     style={{
-                      background: 'linear-gradient(135deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.04) 100%)',
+                      background: `linear-gradient(135deg, rgba(255,255,255,0.08) 0%, ${WHITE_ALPHA_04} 100%)`,
                       borderRadius: '16px 16px 0 0',
                     }}
                   >

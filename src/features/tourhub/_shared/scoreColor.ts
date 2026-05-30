@@ -1,3 +1,4 @@
+import { WHITE_ALPHA_55 } from './tokens';
 /**
  * Canonical round-level score-to-par colour helper.
  *
@@ -43,7 +44,7 @@ export function getScoreColor(
   emphasis: ScoreEmphasis = 'standard',
 ): string {
   if (score == null || score === 0) {
-    return theme === 'light' ? INK_FAINT : 'rgba(255,255,255,0.55)';
+    return theme === 'light' ? INK_FAINT : WHITE_ALPHA_55;
   }
   if (score < 0) {
     if (emphasis === 'leader') {
