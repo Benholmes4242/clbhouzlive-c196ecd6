@@ -112,7 +112,7 @@ export function TournamentDetailPage() {
     return (
       <TourHubShell immersive={true}>
         {/* Slate masthead skeleton */}
-        <div style={{ background: '#0F172A', padding: '16px 16px 0' }} className="animate-pulse">
+        <div style={{ background: '#0A0E14', padding: '16px 16px 0' }} className="animate-pulse">
           {/* Pills row */}
           <div style={{ display: 'flex', gap: 6, marginBottom: 60 }}>
             <div style={{ height: 22, width: 88, background: 'rgba(255,255,255,0.10)', borderRadius: 6 }} />
@@ -318,7 +318,7 @@ export function TournamentDetailPage() {
         />
       </ShellSlot>
 
-      <div style={{ paddingTop: 'var(--chrome-total-h, 0px)' }}>
+      <div style={{ paddingTop: 'var(--chrome-total-h, 0px)', background: '#F8FAFC' }}>
         <TournamentHero
           tournament={tournament}
           imageUrl={heroImageUrl}
