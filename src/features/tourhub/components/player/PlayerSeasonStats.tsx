@@ -55,23 +55,23 @@ function StatRow({ label, value, trend, barPercent, barIndex = 0 }: StatRowProps
 
   return (
     <div style={{ display: 'flex', alignItems: 'center', padding: '11px 0', borderBottom: `0.5px solid ${INK_TINT_07}` }}>
-      <span style={{ flex: 1, fontSize: '13px', fontWeight: 500, color: '#0F172A' }}>{label}</span>
+      <span style={{ flex: 1, fontSize: '13px', fontWeight: 500, color: INK }}>{label}</span>
       <div style={{ textAlign: 'right' as const }}>
         <span style={{
           fontSize: '13px', fontWeight: 800, fontVariantNumeric: 'tabular-nums',
           color: hasValue
-            ? (trend === 'positive' ? '#F7931E' : trend === 'negative' ? '#94A3B8' : '#0F172A')
-            : '#94A3B8',
+            ? (trend === 'positive' ? AMBER : trend === 'negative' ? INK_FAINT : INK)
+            : INK_FAINT,
         }}>
           {mainValue}
-          {unitSuffix && <span style={{ fontSize: '10px', fontWeight: 500, color: '#94A3B8' }}> {unitSuffix}</span>}
+          {unitSuffix && <span style={{ fontSize: '10px', fontWeight: 500, color: INK_FAINT }}> {unitSuffix}</span>}
         </span>
         {barPercent !== undefined && hasValue && (
-          <div style={{ marginTop: '4px', width: '100px', height: '3px', borderRadius: '2px', background: 'rgba(15,23,42,0.08)', overflow: 'hidden' }}>
+          <div style={{ marginTop: '4px', width: '100px', height: '3px', borderRadius: '2px', background: HAIRLINE_INK_8, overflow: 'hidden' }}>
             <motion.div
               style={{
                 height: '100%', borderRadius: '2px',
-                background: '#F7931E',
+                background: AMBER,
                 originX: 0,
               }}
               initial={{ width: 0 }}
