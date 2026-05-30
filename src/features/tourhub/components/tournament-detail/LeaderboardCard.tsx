@@ -128,15 +128,15 @@ export function LeaderboardCard({
                   display: 'flex', alignItems: 'center', gap: '4px',
                   padding: '10px 20px',
                   borderBottom: `0.5px solid ${INK_TINT_07}`,
-                  borderLeft: entry.position === 1 ? '3px solid #F7931E' : '3px solid transparent',
-                  background: entry.position === 1 ? 'rgba(247,147,30,0.025)' : 'transparent',
+                  borderLeft: entry.position === 1 ? `3px solid ${AMBER}` : '3px solid transparent',
+                  background: entry.position === 1 ? LEADER_GOLD_TINT_10 : 'transparent',
                   textDecoration: 'none',
                   opacity: isMissedCut ? 0.5 : 1,
                 }}
                 className="active:bg-black/[0.02] transition-colors"
               >
                 {/* Position */}
-                <span style={{ width: '36px', fontSize: '14px', fontWeight: 800, color: entry.position === 1 ? '#F7931E' : '#94A3B8', flexShrink: 0, fontVariantNumeric: 'tabular-nums' }}>
+                <span style={{ width: '36px', fontSize: '14px', fontWeight: 800, color: entry.position === 1 ? AMBER : '#94A3B8', flexShrink: 0, fontVariantNumeric: 'tabular-nums' }}>
                   {isMissedCut ? 'MC' : entry.status === 'WD' ? 'WD' : entry.position_tied ? `T${entry.position}` : String(entry.position)}
                 </span>
 
@@ -144,7 +144,7 @@ export function LeaderboardCard({
                 <div style={{ flex: 1, display: 'flex', alignItems: 'center', gap: '8px', minWidth: 0 }}>
                   <BatchPlayerAvatar playerId={entry.player?.id || ''} playerName={entry.player?.full_name || 'Unknown'} size="sm" />
                   <p style={{ fontSize: '14px', fontWeight: entry.position === 1 ? 800 : 600, color: '#0F172A', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const }}>
-                    {entry.player?.full_name}
+                    {abbrevName(entry.player?.full_name || 'Unknown')}
                   </p>
                 </div>
 
