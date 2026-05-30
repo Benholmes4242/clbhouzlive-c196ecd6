@@ -148,8 +148,8 @@ export function CollegeComparePage() {
       </ShellSlot>
 
       <div
-        className="relative min-h-screen bg-background"
-        style={{ paddingTop: 'var(--chrome-total-h, 0px)' }}
+        className="relative min-h-screen"
+        style={{ paddingTop: 'var(--chrome-total-h, 0px)', background: '#F8FAFC' }}
       >
         {/* Season caps row — stays in body, no longer cropped under chrome */}
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', padding: '9px 16px' }}>
