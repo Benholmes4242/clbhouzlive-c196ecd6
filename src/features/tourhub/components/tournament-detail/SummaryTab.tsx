@@ -11,7 +11,7 @@ import { titleCaseCountry } from '../../utils/countryFlags';
 import CountryFlag from '@/components/ui/country-flag';
 import { useTournamentScoringStats } from '../../hooks/useTourHubData';
 import { playerRoute } from '../../routes';
-import { INK_TINT_06, INK_TINT_07 } from '../../_shared/tokens';
+import { AMBER, HAIRLINE_INK_15, INK, INK_FAINT, INK_MUTE, INK_TINT_02, INK_TINT_06, INK_TINT_07, LIVE_DOT, LIVE_INK, SCORE_OVER_PAR_LIGHT, SURFACE, TREND_DOWN, TREND_UP } from '../../_shared/tokens';
 
 interface SummaryTabProps {
   tournamentId: string;
@@ -27,7 +27,7 @@ function SummarySkeleton() {
   return (
     <div>
       {/* Champion block skeleton */}
-      <div style={{ background: '#ffffff', borderTop: `1px solid ${INK_TINT_07}`, borderBottom: `1px solid ${INK_TINT_07}`, marginTop: '8px', padding: '14px 20px 14px' }}>
+      <div style={{ background: SURFACE, borderTop: `1px solid ${INK_TINT_07}`, borderBottom: `1px solid ${INK_TINT_07}`, marginTop: '8px', padding: '14px 20px 14px' }}>
         <div className="animate-pulse" style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', gap: '12px' }}>
           <div style={{ flex: 1 }}>
             <div style={{ height: '8px', width: '100px', background: INK_TINT_06, borderRadius: '4px', marginBottom: '8px' }} />
@@ -42,7 +42,7 @@ function SummarySkeleton() {
         </div>
       </div>
       {/* Row skeletons */}
-      <div style={{ background: '#ffffff', borderTop: `1px solid ${INK_TINT_07}`, borderBottom: `1px solid ${INK_TINT_07}`, marginTop: '8px' }}>
+      <div style={{ background: SURFACE, borderTop: `1px solid ${INK_TINT_07}`, borderBottom: `1px solid ${INK_TINT_07}`, marginTop: '8px' }}>
         {Array.from({ length: 4 }).map((_, i) => (
           <div key={i} className="animate-pulse" style={{ display: 'flex', alignItems: 'center', padding: '10px 20px', borderBottom: i < 3 ? `0.5px solid ${INK_TINT_07}` : 'none', gap: '12px' }}>
             <div style={{ width: '36px', height: '14px', background: INK_TINT_06, borderRadius: '4px' }} />
@@ -94,25 +94,25 @@ function WinnerCard({ winner, runnerUp, headshotMap, tournamentName }: { winner:
   return (
     <motion.div style={{ marginTop: '8px' }} {...sectionEntrance}>
       {/* Section eyebrow */}
-      <div style={{ padding: '14px 20px 0', background: '#ffffff', borderTop: `1px solid ${INK_TINT_07}` }}>
+      <div style={{ padding: '14px 20px 0', background: SURFACE, borderTop: `1px solid ${INK_TINT_07}` }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '10px' }}>
-          <span style={{ fontSize: '9px', fontWeight: 800, color: '#64748B', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>Tournament Champion</span>
+          <span style={{ fontSize: '9px', fontWeight: 800, color: INK_MUTE, letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>Tournament Champion</span>
         </div>
       </div>
 
       {/* Winner hero row */}
-      <div style={{ background: '#ffffff', borderBottom: `1px solid ${INK_TINT_07}` }}>
+      <div style={{ background: SURFACE, borderBottom: `1px solid ${INK_TINT_07}` }}>
         <Link {...playerRoute(winner.player?.id ?? '', tournamentName ? { kind: 'tournament', tournamentName } : undefined)} style={{ display: 'block', textDecoration: 'none' }} className="active:opacity-80 transition-opacity">
-          <div style={{ padding: '12px 20px 14px', borderLeft: '3px solid #F7931E', background: 'rgba(247,147,30,0.025)', borderTop: `0.5px solid ${INK_TINT_07}` }}>
+          <div style={{ padding: '12px 20px 14px', borderLeft: `3px solid ${AMBER}`, background: 'rgba(247,147,30,0.025)', borderTop: `0.5px solid ${INK_TINT_07}` }}>
             <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', gap: '12px' }}>
               <div style={{ flex: 1, minWidth: 0 }}>
-                <div style={{ fontSize: '9px', fontWeight: 800, color: '#F7931E', letterSpacing: '0.14em', textTransform: 'uppercase' as const, marginBottom: '4px' }}>Winner</div>
-                <div style={{ fontSize: '24px', fontWeight: 900, color: '#0F172A', letterSpacing: '-0.03em', lineHeight: 1.1, marginBottom: '4px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const }}>
+                <div style={{ fontSize: '9px', fontWeight: 800, color: AMBER, letterSpacing: '0.14em', textTransform: 'uppercase' as const, marginBottom: '4px' }}>Winner</div>
+                <div style={{ fontSize: '24px', fontWeight: 900, color: INK, letterSpacing: '-0.03em', lineHeight: 1.1, marginBottom: '4px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const }}>
                   {winner.player?.full_name ?? 'Unknown'}
                 </div>
                 <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' as const }}>
-                  {marginOfVictory !== null && marginOfVictory > 0 && <span style={{ fontSize: '11px', color: '#64748B' }}>Won by {marginOfVictory} stroke{marginOfVictory !== 1 ? 's' : ''}</span>}
-                  {earnings && <span style={{ fontSize: '11px', fontWeight: 700, color: '#16A34A' }}>{earnings}</span>}
+                  {marginOfVictory !== null && marginOfVictory > 0 && <span style={{ fontSize: '11px', color: INK_MUTE }}>Won by {marginOfVictory} stroke{marginOfVictory !== 1 ? 's' : ''}</span>}
+                  {earnings && <span style={{ fontSize: '11px', fontWeight: 700, color: TREND_UP }}>{earnings}</span>}
                 </div>
               </div>
 
@@ -122,8 +122,8 @@ function WinnerCard({ winner, runnerUp, headshotMap, tournamentName }: { winner:
               </div>
 
               <div style={{ textAlign: 'right' as const, flexShrink: 0 }}>
-                <div style={{ fontSize: '32px', fontWeight: 900, color: '#F7931E', letterSpacing: '-0.05em', lineHeight: 1 }}>{scoreToPar}</div>
-                <div style={{ fontSize: '9px', fontWeight: 800, color: '#94A3B8', letterSpacing: '0.14em' }}>TO PAR</div>
+                <div style={{ fontSize: '32px', fontWeight: 900, color: AMBER, letterSpacing: '-0.05em', lineHeight: 1 }}>{scoreToPar}</div>
+                <div style={{ fontSize: '9px', fontWeight: 800, color: INK_FAINT, letterSpacing: '0.14em' }}>TO PAR</div>
               </div>
             </div>
           </div>
@@ -171,27 +171,27 @@ export function SummaryTab({
       {/* Round-by-round scoring */}
       {scoringStats && scoringStats.rounds.length > 0 && (
         <motion.div style={{ marginTop: '8px' }} {...sectionEntrance}>
-          <div style={{ padding: '14px 20px 0', background: '#ffffff', borderTop: `1px solid ${INK_TINT_07}` }}>
+          <div style={{ padding: '14px 20px 0', background: SURFACE, borderTop: `1px solid ${INK_TINT_07}` }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '10px' }}>
-              <span style={{ fontSize: '9px', fontWeight: 800, color: '#64748B', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>Round Scoring</span>
+              <span style={{ fontSize: '9px', fontWeight: 800, color: INK_MUTE, letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>Round Scoring</span>
             </div>
           </div>
 
           {/* Column headers */}
-          <div style={{ display: 'flex', alignItems: 'center', padding: '5px 20px', background: 'rgba(15,23,42,0.02)', borderBottom: `0.5px solid ${INK_TINT_07}`, borderTop: `0.5px solid ${INK_TINT_07}` }}>
+          <div style={{ display: 'flex', alignItems: 'center', padding: '5px 20px', background: INK_TINT_02, borderBottom: `0.5px solid ${INK_TINT_07}`, borderTop: `0.5px solid ${INK_TINT_07}` }}>
             {['ROUND', 'LOW', 'AVG', 'BIRDIES', 'BOGEYS'].map((h, i) => (
-              <span key={h} style={{ fontSize: '9px', fontWeight: 800, color: '#64748B', letterSpacing: '0.14em', flex: i === 0 ? '0 0 52px' : '1', textAlign: i > 0 ? 'center' as const : 'left' as const }}>{h}</span>
+              <span key={h} style={{ fontSize: '9px', fontWeight: 800, color: INK_MUTE, letterSpacing: '0.14em', flex: i === 0 ? '0 0 52px' : '1', textAlign: i > 0 ? 'center' as const : 'left' as const }}>{h}</span>
             ))}
           </div>
 
-          <div style={{ background: '#ffffff', borderBottom: `1px solid ${INK_TINT_07}` }}>
+          <div style={{ background: SURFACE, borderBottom: `1px solid ${INK_TINT_07}` }}>
             {scoringStats.rounds.map((round: any) => (
               <div key={round.round} style={{ display: 'flex', alignItems: 'center', padding: '10px 20px', borderBottom: `0.5px solid ${INK_TINT_07}`, fontVariantNumeric: 'tabular-nums' }}>
-                <span style={{ fontSize: '14px', fontWeight: 700, color: '#0F172A', flex: '0 0 52px' }}>R{round.round}</span>
-                <span style={{ fontSize: '14px', fontWeight: 700, color: '#F7931E', flex: 1, textAlign: 'center' as const }}>{round.lowScore}</span>
-                <span style={{ fontSize: '14px', color: '#64748B', flex: 1, textAlign: 'center' as const }}>{round.avgScore.toFixed(1)}</span>
-                <span style={{ fontSize: '14px', color: '#16A34A', fontWeight: 600, flex: 1, textAlign: 'center' as const }}>{round.totalBirdies}</span>
-                <span style={{ fontSize: '14px', color: '#DC2626', fontWeight: 600, flex: 1, textAlign: 'center' as const }}>{round.totalBogeys}</span>
+                <span style={{ fontSize: '14px', fontWeight: 700, color: INK, flex: '0 0 52px' }}>R{round.round}</span>
+                <span style={{ fontSize: '14px', fontWeight: 700, color: AMBER, flex: 1, textAlign: 'center' as const }}>{round.lowScore}</span>
+                <span style={{ fontSize: '14px', color: INK_MUTE, flex: 1, textAlign: 'center' as const }}>{round.avgScore.toFixed(1)}</span>
+                <span style={{ fontSize: '14px', color: TREND_UP, fontWeight: 600, flex: 1, textAlign: 'center' as const }}>{round.totalBirdies}</span>
+                <span style={{ fontSize: '14px', color: TREND_DOWN, fontWeight: 600, flex: 1, textAlign: 'center' as const }}>{round.totalBogeys}</span>
               </div>
             ))}
           </div>
@@ -205,21 +205,21 @@ export function SummaryTab({
         if (total === 0) return null;
 
         const segments = [
-          { label: 'Eagles', count: t.eagles, color: '#F7931E', pct: (t.eagles / total * 100).toFixed(1) },
-          { label: 'Birdies', count: t.birdies, color: '#16A34A', pct: (t.birdies / total * 100).toFixed(1) },
-          { label: 'Pars', count: t.pars, color: 'rgba(15,23,42,0.15)', pct: (t.pars / total * 100).toFixed(1) },
-          { label: 'Bogeys', count: t.bogeys, color: '#DC2626', pct: (t.bogeys / total * 100).toFixed(1) },
+          { label: 'Eagles', count: t.eagles, color: AMBER, pct: (t.eagles / total * 100).toFixed(1) },
+          { label: 'Birdies', count: t.birdies, color: TREND_UP, pct: (t.birdies / total * 100).toFixed(1) },
+          { label: 'Pars', count: t.pars, color: HAIRLINE_INK_15, pct: (t.pars / total * 100).toFixed(1) },
+          { label: 'Bogeys', count: t.bogeys, color: TREND_DOWN, pct: (t.bogeys / total * 100).toFixed(1) },
           { label: 'Double+', count: t.doubleBogeys, color: '#7F1D1D', pct: (t.doubleBogeys / total * 100).toFixed(1) },
         ];
 
         return (
           <motion.div style={{ marginTop: '8px' }} {...sectionEntrance}>
-            <div style={{ padding: '14px 20px 0', background: '#ffffff', borderTop: `1px solid ${INK_TINT_07}` }}>
+            <div style={{ padding: '14px 20px 0', background: SURFACE, borderTop: `1px solid ${INK_TINT_07}` }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '10px' }}>
-                <span style={{ fontSize: '9px', fontWeight: 800, color: '#64748B', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>Field Statistics</span>
+                <span style={{ fontSize: '9px', fontWeight: 800, color: INK_MUTE, letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>Field Statistics</span>
               </div>
             </div>
-            <div style={{ background: '#ffffff', borderTop: `0.5px solid ${INK_TINT_07}`, borderBottom: `1px solid ${INK_TINT_07}`, padding: '12px 20px 16px' }}>
+            <div style={{ background: SURFACE, borderTop: `0.5px solid ${INK_TINT_07}`, borderBottom: `1px solid ${INK_TINT_07}`, padding: '12px 20px 16px' }}>
               <div style={{ display: 'flex', height: '6px', borderRadius: '3px', overflow: 'hidden', marginBottom: '10px' }}>
                 {segments.filter(s => s.count > 0).map((seg, i) => (
                   <div key={i} style={{ width: `${(seg.count / total) * 100}%`, background: seg.color }} />
@@ -228,8 +228,8 @@ export function SummaryTab({
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '4px', textAlign: 'center' as const }}>
                 {segments.map((seg) => (
                   <div key={seg.label}>
-                    <div style={{ fontSize: '14px', fontWeight: 800, color: '#0F172A', fontVariantNumeric: 'tabular-nums' }}>{seg.count}</div>
-                    <div style={{ fontSize: '9px', fontWeight: 800, color: '#64748B', letterSpacing: '0.14em', textTransform: 'uppercase' as const }}>{seg.label}</div>
+                    <div style={{ fontSize: '14px', fontWeight: 800, color: INK, fontVariantNumeric: 'tabular-nums' }}>{seg.count}</div>
+                    <div style={{ fontSize: '9px', fontWeight: 800, color: INK_MUTE, letterSpacing: '0.14em', textTransform: 'uppercase' as const }}>{seg.label}</div>
                   </div>
                 ))}
               </div>
@@ -241,24 +241,24 @@ export function SummaryTab({
       {/* Final Top 10 */}
       {isCompleted && top10.length > 0 && (
         <motion.div style={{ marginTop: '8px' }} {...sectionEntrance}>
-          <div style={{ padding: '14px 20px 0', background: '#ffffff', borderTop: `1px solid ${INK_TINT_07}` }}>
+          <div style={{ padding: '14px 20px 0', background: SURFACE, borderTop: `1px solid ${INK_TINT_07}` }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '10px' }}>
-              <span style={{ fontSize: '9px', fontWeight: 800, color: '#64748B', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>Top Finishers</span>
+              <span style={{ fontSize: '9px', fontWeight: 800, color: INK_MUTE, letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>Top Finishers</span>
             </div>
           </div>
 
           {/* Column headers */}
-          <div style={{ display: 'flex', alignItems: 'center', padding: '5px 20px', background: 'rgba(15,23,42,0.02)', borderTop: `0.5px solid ${INK_TINT_07}`, borderBottom: `0.5px solid ${INK_TINT_07}` }}>
-            <span style={{ width: '36px', fontSize: '9px', fontWeight: 800, color: '#64748B', letterSpacing: '0.14em', flexShrink: 0 }}>POS</span>
-            <span style={{ flex: 1, fontSize: '9px', fontWeight: 800, color: '#64748B', letterSpacing: '0.14em' }}>PLAYER</span>
-            <span style={{ width: '44px', textAlign: 'right' as const, fontSize: '9px', fontWeight: 800, color: '#64748B', letterSpacing: '0.14em', flexShrink: 0 }}>SCORE</span>
+          <div style={{ display: 'flex', alignItems: 'center', padding: '5px 20px', background: INK_TINT_02, borderTop: `0.5px solid ${INK_TINT_07}`, borderBottom: `0.5px solid ${INK_TINT_07}` }}>
+            <span style={{ width: '36px', fontSize: '9px', fontWeight: 800, color: INK_MUTE, letterSpacing: '0.14em', flexShrink: 0 }}>POS</span>
+            <span style={{ flex: 1, fontSize: '9px', fontWeight: 800, color: INK_MUTE, letterSpacing: '0.14em' }}>PLAYER</span>
+            <span style={{ width: '44px', textAlign: 'right' as const, fontSize: '9px', fontWeight: 800, color: INK_MUTE, letterSpacing: '0.14em', flexShrink: 0 }}>SCORE</span>
           </div>
 
-          <div style={{ background: '#ffffff', borderBottom: `1px solid ${INK_TINT_07}` }}>
+          <div style={{ background: SURFACE, borderBottom: `1px solid ${INK_TINT_07}` }}>
             {top10.map((entry: any, idx: number) => {
               const isWinner = entry.position === 1;
               const scoreToPar = entry.score !== null ? (entry.score === 0 ? 'E' : entry.score < 0 ? String(entry.score) : `+${entry.score}`) : '—';
-              const scoreColor = entry.score !== null && entry.score < 0 ? '#F7931E' : entry.score !== null && entry.score > 0 ? '#EF4444' : '#94A3B8';
+              const scoreColor = entry.score !== null && entry.score < 0 ? AMBER : entry.score !== null && entry.score > 0 ? SCORE_OVER_PAR_LIGHT : INK_FAINT;
 
               return (
                 <motion.div
@@ -279,12 +279,12 @@ export function SummaryTab({
                     }}
                     className="active:bg-black/[0.02] transition-colors"
                   >
-                    <span style={{ width: '36px', fontSize: '14px', fontWeight: 800, color: isWinner ? '#F7931E' : '#94A3B8', flexShrink: 0, fontVariantNumeric: 'tabular-nums' }}>
+                    <span style={{ width: '36px', fontSize: '14px', fontWeight: 800, color: isWinner ? AMBER : INK_FAINT, flexShrink: 0, fontVariantNumeric: 'tabular-nums' }}>
                       {entry.position_tied ? `T${entry.position}` : entry.position}
                     </span>
                     <div style={{ flex: 1, display: 'flex', alignItems: 'center', gap: '8px', minWidth: 0 }}>
                       <BatchPlayerAvatar playerId={entry.player?.id || ''} playerName={entry.player?.full_name || 'Unknown'} size="sm" />
-                      <span style={{ fontSize: '14px', fontWeight: isWinner ? 800 : 600, color: '#0F172A', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const }}>
+                      <span style={{ fontSize: '14px', fontWeight: isWinner ? 800 : 600, color: INK, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const }}>
                         {entry.player?.full_name || 'Unknown'}
                       </span>
                     </div>
@@ -304,25 +304,25 @@ export function SummaryTab({
         const latestRound = scoringStats.rounds[scoringStats.rounds.length - 1];
         return (
           <motion.div style={{ marginTop: '8px' }} {...sectionEntrance}>
-            <div style={{ background: '#ffffff', borderTop: `1px solid ${INK_TINT_07}`, borderBottom: `1px solid ${INK_TINT_07}` }}>
+            <div style={{ background: SURFACE, borderTop: `1px solid ${INK_TINT_07}`, borderBottom: `1px solid ${INK_TINT_07}` }}>
               <div style={{ padding: '14px 20px 0' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '10px' }}>
-                  <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#22C55E', display: 'inline-block', flexShrink: 0 }} />
-                  <span style={{ fontSize: '9px', fontWeight: 800, color: '#15803D', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>Live Round Summary</span>
+                  <span style={{ width: 6, height: 6, borderRadius: '50%', background: LIVE_DOT, display: 'inline-block', flexShrink: 0 }} />
+                  <span style={{ fontSize: '9px', fontWeight: 800, color: LIVE_INK, letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>Live Round Summary</span>
                 </div>
               </div>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', textAlign: 'center' as const, padding: '0 20px 14px' }}>
                 <div>
-                  <div style={{ fontSize: '9px', fontWeight: 800, color: '#64748B', letterSpacing: '0.14em', marginBottom: '3px' }}>LOW ROUND</div>
-                  <div style={{ fontSize: '18px', fontWeight: 800, color: '#0F172A', fontVariantNumeric: 'tabular-nums' }}>{latestRound.lowScore}</div>
+                  <div style={{ fontSize: '9px', fontWeight: 800, color: INK_MUTE, letterSpacing: '0.14em', marginBottom: '3px' }}>LOW ROUND</div>
+                  <div style={{ fontSize: '18px', fontWeight: 800, color: INK, fontVariantNumeric: 'tabular-nums' }}>{latestRound.lowScore}</div>
                 </div>
                 <div>
-                  <div style={{ fontSize: '9px', fontWeight: 800, color: '#64748B', letterSpacing: '0.14em', marginBottom: '3px' }}>SCORING AVG</div>
-                  <div style={{ fontSize: '18px', fontWeight: 800, color: '#0F172A', fontVariantNumeric: 'tabular-nums' }}>{latestRound.avgScore.toFixed(1)}</div>
+                  <div style={{ fontSize: '9px', fontWeight: 800, color: INK_MUTE, letterSpacing: '0.14em', marginBottom: '3px' }}>SCORING AVG</div>
+                  <div style={{ fontSize: '18px', fontWeight: 800, color: INK, fontVariantNumeric: 'tabular-nums' }}>{latestRound.avgScore.toFixed(1)}</div>
                 </div>
                 <div>
-                  <div style={{ fontSize: '9px', fontWeight: 800, color: '#64748B', letterSpacing: '0.14em', marginBottom: '3px' }}>FIELD</div>
-                  <div style={{ fontSize: '18px', fontWeight: 800, color: '#0F172A', fontVariantNumeric: 'tabular-nums' }}>{latestRound.playerCount}</div>
+                  <div style={{ fontSize: '9px', fontWeight: 800, color: INK_MUTE, letterSpacing: '0.14em', marginBottom: '3px' }}>FIELD</div>
+                  <div style={{ fontSize: '18px', fontWeight: 800, color: INK, fontVariantNumeric: 'tabular-nums' }}>{latestRound.playerCount}</div>
                 </div>
               </div>
             </div>
