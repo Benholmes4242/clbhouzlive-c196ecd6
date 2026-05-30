@@ -15,6 +15,7 @@ import {
   GREEN_LIVE,
   NUMERIC_STYLE,
 } from '../HybridHero.constants';
+import { STATUS_LIVE } from '../../../_shared/tokens';
 import type { HeroState } from '../HybridHero.utils';
 
 interface PhotoBandProps {
