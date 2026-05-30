@@ -77,7 +77,7 @@ export function SoloLeaderRow({
         gap: 12,
         padding: '14px 20px',
         alignItems: 'center',
-        background: isResults ? LEADER_TINT_RESULTS : LEADER_TINT_LIVE,
+        background: isResults ? LEADER_GOLD_TINT_10 : LEADER_GOLD_TINT_7,
         borderBottom: isLast ? 'none' : `0.5px solid ${INK_15}`,
       }}
     >
@@ -296,7 +296,7 @@ export function TiedLeadersRow({ count, score, players, isLast = false }: TiedLe
         gap: 12,
         padding: '14px 20px',
         alignItems: 'center',
-        background: LEADER_TINT_LIVE,
+        background: LEADER_GOLD_TINT_7,
         borderBottom: isLast ? 'none' : `0.5px solid ${INK_15}`,
       }}
       aria-label={`${count} players tied at the top with score ${score}`}
@@ -369,7 +369,7 @@ export function ChampionRow({
         gap: 12,
         padding: '14px 20px',
         alignItems: 'center',
-        background: LEADER_TINT_RESULTS,
+        background: LEADER_GOLD_TINT_10,
         borderBottom: isLast ? 'none' : `0.5px solid ${INK_15}`,
       }}
     >
