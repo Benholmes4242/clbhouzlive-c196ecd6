@@ -381,8 +381,8 @@ export function CollegeCompareHero({ data, className }: CollegeCompareHeroProps)
           {/* paddingTop: 70 manually aligns the chip with the categories-led row. If logo
               tile size or row spacing changes, recalculate. */}
           <div style={{ flexShrink: 0, display: 'flex', flexDirection: 'column' as const, alignItems: 'center', paddingTop: 70 }}>
-            <div style={{ padding: '4px 10px', borderRadius: 6, background: c1Wins === c2Wins ? 'rgba(15,23,42,0.05)' : AMBER_TINT_08, border: `1px solid ${c1Wins === c2Wins ? 'rgba(15,23,42,0.08)' : 'rgba(247,147,30,0.32)'}` }}>
-              <span style={{ fontSize: 11, fontWeight: 800, color: c1Wins === c2Wins ? '#94A3B8' : '#F7931E', letterSpacing: '0.14em', textTransform: 'uppercase' as const, whiteSpace: 'nowrap' as const }}>
+            <div style={{ padding: '4px 10px', borderRadius: 6, background: c1Wins === c2Wins ? INK_TINT_05 : AMBER_TINT_08, border: `1px solid ${c1Wins === c2Wins ? HAIRLINE_INK_8 : 'rgba(247,147,30,0.32)'}` }}>
+              <span style={{ fontSize: 11, fontWeight: 800, color: c1Wins === c2Wins ? INK_FAINT : AMBER, letterSpacing: '0.14em', textTransform: 'uppercase' as const, whiteSpace: 'nowrap' as const }}>
                 {c1Wins === c2Wins
                   ? 'TIED'
                   : c1Wins > c2Wins
