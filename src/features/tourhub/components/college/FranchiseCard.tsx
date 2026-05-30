@@ -208,7 +208,7 @@ export function FranchiseCard({
             <p style={{
               fontSize: 11,
               fontWeight: (showCaptain || (isDelta && driverText)) ? 600 : 500,
-              color: (showCaptain || (isDelta && driverText)) ? '#475569' : '#94A3B8',
+              color: (showCaptain || (isDelta && driverText)) ? INK_SOFT : '#94A3B8',
               margin: 0,
               overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const,
             }}>
