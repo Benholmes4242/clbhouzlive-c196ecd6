@@ -348,7 +348,7 @@ export function ScheduleTab() {
   }
   
   return (
-    <div className="min-h-screen -mx-5" style={{ background: '#F8FAFC' }}>
+    <div className="min-h-screen -mx-5" style={{ background: SLATE_50 }}>
 
       {/* ── SCHEDULE MASTHEAD — canonical section header on all tabs ── */}
       {!search && (() => {
