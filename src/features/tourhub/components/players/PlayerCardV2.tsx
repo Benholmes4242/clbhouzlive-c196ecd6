@@ -202,7 +202,7 @@ export function PlayerCardV2({
         <div style={{ flex: 1, minWidth: 0, padding: `${rowPaddingY}px 0` }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 6, minWidth: 0 }}>
             <span style={{
-              fontSize: `${nameSize}px`, fontWeight: nameWeight, color: '#0F172A', letterSpacing: tierAccent ? '-0.01em' : 0,
+              fontSize: `${nameSize}px`, fontWeight: nameWeight, color: INK, letterSpacing: tierAccent ? '-0.01em' : 0,
               overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const, minWidth: 0, flex: '0 1 auto',
             }}>
               {player.fullName}
@@ -213,10 +213,10 @@ export function PlayerCardV2({
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '4px', marginTop: '2px' }}>
             <CountryFlag country={player.country} size="sm" />
-            <span style={{ fontSize: '11px', fontWeight: 600, color: '#64748B' }}>{countryName}</span>
+            <span style={{ fontSize: '11px', fontWeight: 600, color: INK_MUTE }}>{countryName}</span>
             {/* OWGR secondary for tour-specific pages */}
             {isTourRanking && !isLPGA && owgr != null && owgr > 0 && (
-              <span style={{ fontSize: '11px', fontWeight: 600, color: '#94A3B8', marginLeft: '4px' }}>· #{owgr} OWGR</span>
+              <span style={{ fontSize: '11px', fontWeight: 600, color: INK_FAINT, marginLeft: '4px' }}>· #{owgr} OWGR</span>
             )}
           </div>
         </div>
