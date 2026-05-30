@@ -165,7 +165,7 @@ export function PlayerCardV2({
           gap: 0,
           borderBottom: `0.5px solid ${INK_TINT_07}`,
           borderLeft: '2px solid transparent',
-          background: tierAccent ? '#FEF3E7' : 'transparent',
+          background: tierAccent ? AMBER_SOFT_BG : 'transparent',
           textDecoration: 'none',
         }}
         className="active:bg-black/[0.02] transition-colors"
