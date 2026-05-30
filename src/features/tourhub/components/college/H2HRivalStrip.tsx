@@ -20,7 +20,7 @@ import { getCollegeLogoUrl } from '@/utils/collegeLogo';
 import { useCollegeRivalries } from '../../hooks/useCollegeMovers';
 import { collegeH2HRoute } from '../../routes';
 import { PlayerInitialAvatar } from '../shared/PlayerInitialAvatar';
-import { INK_TINT_06, INK_TINT_07 } from '../../_shared/tokens';
+import { AMBER, HAIRLINE_INK_8, INK, INK_FAINT, INK_MUTE, INK_TINT_06, INK_TINT_07, SLATE_50, SURFACE } from '../../_shared/tokens';
 
 interface H2HRivalStripProps {
   normalizedName: string;
@@ -34,7 +34,7 @@ export function H2HRivalStrip({ normalizedName, className }: H2HRivalStripProps)
 
   if (isLoading) {
     return (
-      <div className={className} style={{ background: '#fff', borderTop: `1px solid ${INK_TINT_07}`, borderBottom: `1px solid ${INK_TINT_07}`, marginTop: 8 }}>
+      <div className={className} style={{ background: SURFACE, borderTop: `1px solid ${INK_TINT_07}`, borderBottom: `1px solid ${INK_TINT_07}`, marginTop: 8 }}>
         <SectionHeader />
         <div style={{ display: 'flex', gap: 10, padding: '4px 16px 16px', overflowX: 'auto' }}>
           {[1, 2, 3].map(i => (
@@ -49,7 +49,7 @@ export function H2HRivalStrip({ normalizedName, className }: H2HRivalStripProps)
   if (rivals.length === 0) return null;
 
   return (
-    <div className={className} style={{ background: '#fff', borderTop: `1px solid ${INK_TINT_07}`, borderBottom: `1px solid ${INK_TINT_07}`, marginTop: 8 }}>
+    <div className={className} style={{ background: SURFACE, borderTop: `1px solid ${INK_TINT_07}`, borderBottom: `1px solid ${INK_TINT_07}`, marginTop: 8 }}>
       <SectionHeader />
       <div
         style={{
@@ -81,8 +81,8 @@ export function H2HRivalStrip({ normalizedName, className }: H2HRivalStripProps)
                 width: 200,
                 padding: '12px 12px',
                 borderRadius: 12,
-                background: '#F8FAFC',
-                border: '1px solid rgba(15,23,42,0.08)',
+                background: SLATE_50,
+                border: `1px solid ${HAIRLINE_INK_8}`,
                 textDecoration: 'none',
               }}
               className="active:scale-[0.98] transition-transform"
@@ -95,14 +95,14 @@ export function H2HRivalStrip({ normalizedName, className }: H2HRivalStripProps)
                 imageScale={0.78}
               />
               <div style={{ flex: 1, minWidth: 0 }}>
-                <div style={{ fontSize: 13, fontWeight: 800, color: '#0F172A', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', letterSpacing: '-0.2px' }}>
+                <div style={{ fontSize: 13, fontWeight: 800, color: INK, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', letterSpacing: '-0.015em' }}>
                   {displayName}
                 </div>
-                <div style={{ fontSize: 10, fontWeight: 500, color: '#64748B', marginTop: 1 }}>
+                <div style={{ fontSize: 10, fontWeight: 500, color: INK_MUTE, marginTop: 1 }}>
                   {subtitle}
                 </div>
               </div>
-              <ArrowLeftRight size={13} strokeWidth={2.5} style={{ color: '#F7931E', flexShrink: 0 }} />
+              <ArrowLeftRight size={13} strokeWidth={2.5} style={{ color: AMBER, flexShrink: 0 }} />
             </Link>
           );
         })}
@@ -117,14 +117,14 @@ export function H2HRivalStrip({ normalizedName, className }: H2HRivalStripProps)
             gap: 6,
             padding: '12px 14px',
             borderRadius: 12,
-            background: '#fff',
+            background: SURFACE,
             border: '1px dashed rgba(15,23,42,0.18)',
             textDecoration: 'none',
           }}
           className="active:scale-[0.98] transition-transform"
         >
-          <span style={{ fontSize: 12, fontWeight: 700, color: '#0F172A' }}>Browse all</span>
-          <ChevronRight size={14} strokeWidth={2.5} style={{ color: '#94A3B8' }} />
+          <span style={{ fontSize: 12, fontWeight: 700, color: INK }}>Browse all</span>
+          <ChevronRight size={14} strokeWidth={2.5} style={{ color: INK_FAINT }} />
         </Link>
       </div>
     </div>
@@ -135,11 +135,11 @@ function SectionHeader() {
   return (
     <div style={{ padding: SECTION_PADDING }}>
       <div style={{ display: 'flex', alignItems: 'center', marginBottom: 6 }}>
-        <span style={{ fontSize: 9, fontWeight: 800, color: '#64748B', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>
+        <span style={{ fontSize: 9, fontWeight: 800, color: INK_MUTE, letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>
           Head-to-Head
         </span>
       </div>
-      <div style={{ fontSize: 13, fontWeight: 500, color: '#64748B', marginBottom: 10 }}>
+      <div style={{ fontSize: 13, fontWeight: 500, color: INK_MUTE, marginBottom: 10 }}>
         Compare with another program
       </div>
     </div>

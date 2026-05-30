@@ -22,7 +22,7 @@
  */
 
 import { useState, useMemo } from 'react';
-import { SLATE_600, INK_TINT_06, INK_TINT_07 } from '../../_shared/tokens';
+import { AMBER, INK, INK_FAINT, INK_TINT_06, INK_TINT_07, SLATE_600, SURFACE, TREND_UP } from '../../_shared/tokens';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
@@ -43,10 +43,10 @@ interface AlumniDepthChartProps {
 type TierKey = 'stars' | 'regulars' | 'rising' | 'legacy';
 
 const TIER_COLORS: Record<TierKey, string> = {
-  stars:    '#F7931E', // amber
+  stars:    AMBER, // amber
   regulars: SLATE_600, // slate-600 (replaces off-brand iOS blue)
-  rising:   '#16A34A', // green
-  legacy:   '#7C3AED', // purple (NEW)
+  rising:   TREND_UP, // green
+  legacy:   '#7C3AED', // purple (NEW) — editorial single-site
 };
 
 const TIER_LABELS: Record<TierKey, string> = {
@@ -113,9 +113,9 @@ function AlumniRow({ alumnus, index, tier, legacyContextLabel }: AlumniRowProps)
           <div style={{ minWidth: 0 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 6, minWidth: 0 }}>
               <div style={{
-                fontSize: 14, fontWeight: 800, color: '#0F172A',
+                fontSize: 14, fontWeight: 800, color: INK,
                 overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
-                letterSpacing: '-0.3px',
+                letterSpacing: '-0.02em',
               }}>
                 {fullName}
               </div>
@@ -131,7 +131,7 @@ function AlumniRow({ alumnus, index, tier, legacyContextLabel }: AlumniRowProps)
               )}
             </div>
             {subline && (
-              <div style={{ fontSize: 10, fontWeight: 500, color: '#94A3B8', marginTop: 1 }}>
+              <div style={{ fontSize: 10, fontWeight: 500, color: INK_FAINT, marginTop: 1 }}>
                 {subline}
               </div>
             )}
@@ -140,9 +140,9 @@ function AlumniRow({ alumnus, index, tier, legacyContextLabel }: AlumniRowProps)
 
         {/* EARN */}
         <div style={{ width: 56, textAlign: 'right' as const, flexShrink: 0 }}>
-          <div style={{ fontSize: 10, fontWeight: 500, color: '#94A3B8', letterSpacing: '0.04em' }}>EARN</div>
+          <div style={{ fontSize: 10, fontWeight: 500, color: INK_FAINT, letterSpacing: '0.04em' }}>EARN</div>
           <div style={{
-            fontSize: 13, fontWeight: 800, color: hasEarnings ? '#F7931E' : '#94A3B8',
+            fontSize: 13, fontWeight: 800, color: hasEarnings ? AMBER : INK_FAINT,
             fontVariantNumeric: 'tabular-nums',
           }}>
             {hasEarnings ? formatCurrency(alumnus.earnings ?? 0) : '—'}
@@ -151,10 +151,10 @@ function AlumniRow({ alumnus, index, tier, legacyContextLabel }: AlumniRowProps)
 
         {/* W */}
         <div style={{ width: 36, textAlign: 'right' as const, flexShrink: 0, marginLeft: 8 }}>
-          <div style={{ fontSize: 10, fontWeight: 500, color: '#94A3B8', letterSpacing: '0.04em' }}>W</div>
+          <div style={{ fontSize: 10, fontWeight: 500, color: INK_FAINT, letterSpacing: '0.04em' }}>W</div>
           <div style={{
             fontSize: 13, fontWeight: 800,
-            color: hasWins ? '#0F172A' : '#94A3B8',
+            color: hasWins ? INK : INK_FAINT,
             fontVariantNumeric: 'tabular-nums',
           }}>
             {hasWins ? alumnus.wins : '—'}
@@ -199,11 +199,11 @@ function Section({ tier, alumni, defaultExpanded = true, legacyMap }: SectionPro
         <span style={{ fontSize: 12, fontWeight: 800, color: tierColor, letterSpacing: '1.2px', textTransform: 'uppercase' as const }}>
           {TIER_LABELS[tier].toUpperCase()}
         </span>
-        <span style={{ fontSize: 10, fontWeight: 500, color: '#94A3B8', letterSpacing: '0.2px', flex: 1 }}>
+        <span style={{ fontSize: 10, fontWeight: 500, color: INK_FAINT, letterSpacing: '0.2px', flex: 1 }}>
           {TIER_SUBTITLES[tier]}
         </span>
-        <span style={{ fontSize: 11, color: '#94A3B8' }}>{alumni.length}</span>
-        <span style={{ fontSize: 11, color: '#94A3B8' }}>{isExpanded ? '▾' : '▸'}</span>
+        <span style={{ fontSize: 11, color: INK_FAINT }}>{alumni.length}</span>
+        <span style={{ fontSize: 11, color: INK_FAINT }}>{isExpanded ? '▾' : '▸'}</span>
       </button>
 
       {isExpanded && (
@@ -223,7 +223,7 @@ function Section({ tier, alumni, defaultExpanded = true, legacyMap }: SectionPro
               onClick={() => setIsExpanded(!isExpanded)}
               style={{
                 width: '100%', padding: '10px 0', fontSize: 12, fontWeight: 700,
-                color: '#0F172A', background: 'transparent', border: 'none',
+                color: INK, background: 'transparent', border: 'none',
                 borderTop: `0.5px solid ${INK_TINT_07}`, cursor: 'pointer',
               }}
             >
@@ -311,7 +311,7 @@ export function AlumniDepthChart({ normalizedName, className }: AlumniDepthChart
     <div
       className={cn('', className)}
       style={{
-        background: '#ffffff',
+        background: SURFACE,
         borderTop: `0.5px solid ${INK_TINT_07}`,
         borderBottom: `0.5px solid ${INK_TINT_07}`,
         marginTop: '8px',

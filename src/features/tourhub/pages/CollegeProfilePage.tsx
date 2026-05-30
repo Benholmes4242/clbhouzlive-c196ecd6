@@ -24,7 +24,7 @@ import {
   captainShortName,
 } from '../utils/captainAnchor';
 import { collegeHubRoute } from '../routes';
-import { INK_TINT_06, INK_TINT_07, WHITE_ALPHA_55 } from '../_shared/tokens';
+import { AMBER, GOLD, GOLD_DEEP, GOLD_GLOW_DROP, GOLD_TINT_10, INK, INK_MUTE, INK_FAINT, INK_TINT_06, INK_TINT_07, SHELL_BG, SLATE_50, SURFACE, WHITE_ALPHA_55 } from '../_shared/tokens';
 
 /* ─── Hero subtitle: cross-tour roll-up ────────────────────────────────── */
 
@@ -145,7 +145,7 @@ export function CollegeProfilePage() {
           onClick={() => navigate(collegeHubRoute())}
           aria-label="College Profile — open College Franchise"
           style={{
-            background: '#0A0E14',
+            background: SHELL_BG,
             border: 'none',
             padding: '14px 16px 12px',
             cursor: 'pointer',
@@ -156,9 +156,9 @@ export function CollegeProfilePage() {
         >
           <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, marginBottom: 4 }}>
             <Kicker color="amber">College Franchise</Kicker>
-            <ChevronRight size={11} strokeWidth={2.5} style={{ color: '#F7931E', marginTop: -4 }} />
+            <ChevronRight size={11} strokeWidth={2.5} style={{ color: AMBER, marginTop: -4 }} />
           </div>
-          <h1 style={{ fontSize: 22, fontWeight: 800, letterSpacing: '-0.025em', lineHeight: 1.05, color: '#FFFFFF', margin: 0 }}>
+          <h1 style={{ fontSize: 22, fontWeight: 800, letterSpacing: '-0.025em', lineHeight: 1.15, color: SURFACE, margin: 0 }}>
             {displayName}
           </h1>
           {sectionMetaSubtitle && (
@@ -169,12 +169,12 @@ export function CollegeProfilePage() {
         </button>
       </ShellSlot>
 
-      <div style={{ paddingTop: 'var(--chrome-total-h, 0px)', background: '#F8FAFC' }}>
+      <div style={{ paddingTop: 'var(--chrome-total-h, 0px)', background: SLATE_50 }}>
 
       {/* ── HERO MASTHEAD ── canonical light pattern */}
       <div style={{
         position: 'relative',
-        background: '#F8FAFC',
+        background: SLATE_50,
         paddingTop: 0,
         paddingLeft: 16,
         paddingRight: 16,
@@ -186,18 +186,18 @@ export function CollegeProfilePage() {
           <div>
             {/* Caption row */}
             <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 10, flexWrap: 'wrap' }}>
-              <Crown size={13} strokeWidth={2.5} fill="#FFB800" style={{ color: '#D97706' }} />
+              <Crown size={13} strokeWidth={2.5} fill={GOLD} style={{ color: GOLD_DEEP }} />
               {captionMetadata.map((part, i) => (
                 <Fragment key={i}>
                   {i > 0 && (
-                    <span style={{ fontSize: 10, color: '#CBD5E1' }}>·</span>
+                    <span style={{ fontSize: 10, color: INK_MUTE }}>·</span>
                   )}
                   <span style={{
                     fontSize: 10,
                     fontWeight: 800,
                     letterSpacing: '0.14em',
                     textTransform: 'uppercase' as const,
-                    color: i === 0 ? '#0F172A' : '#64748B',
+                    color: i === 0 ? INK : INK_MUTE,
                   }}>
                     {part}
                   </span>
@@ -215,13 +215,13 @@ export function CollegeProfilePage() {
                   width: 80,
                   height: 80,
                   borderRadius: '27px',
-                  background: '#FFFFFF',
+                  background: SURFACE,
                   padding: 10,
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  border: '2.5px solid #FFB800',
-                  boxShadow: '0 4px 12px rgba(255,184,0,0.20)',
+                  border: `2.5px solid ${GOLD}`,
+                  boxShadow: GOLD_GLOW_DROP,
                   overflow: 'hidden',
                 }}>
                   {logoUrl && !heroImgError ? (
@@ -232,7 +232,7 @@ export function CollegeProfilePage() {
                       onError={() => setHeroImgError(true)}
                     />
                   ) : (
-                    <span style={{ fontSize: 28, fontWeight: 900, color: '#0F172A' }}>
+                    <span style={{ fontSize: 28, fontWeight: 900, color: INK }}>
                       {displayName?.charAt(0)?.toUpperCase() ?? '?'}
                     </span>
                   )}
@@ -247,14 +247,14 @@ export function CollegeProfilePage() {
                     width: 24,
                     height: 24,
                     borderRadius: '50%',
-                    background: '#FFB800',
-                    border: '2.5px solid #FFFFFF',
+                    background: GOLD,
+                    border: `2.5px solid ${SURFACE}`,
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
                     fontSize: 11,
                     fontWeight: 900,
-                    color: '#0F172A',
+                    color: INK,
                     fontVariantNumeric: 'tabular-nums',
                   }}>
                     {collegeRank}
@@ -269,17 +269,17 @@ export function CollegeProfilePage() {
                   fontWeight: 800,
                   letterSpacing: '-0.025em',
                   lineHeight: 1,
-                  color: '#0F172A',
+                  color: INK,
                   fontVariantNumeric: 'tabular-nums',
                 }}>
                   {primaryInteger}
-                  {primaryDecimal && <span style={{ color: '#F7931E' }}>{primaryDecimal}</span>}
+                  {primaryDecimal && <span style={{ color: AMBER }}>{primaryDecimal}</span>}
                   {primarySuffix}
                 </div>
                 <div style={{
                   fontSize: 9,
                   fontWeight: 800,
-                  color: '#64748B',
+                  color: INK_MUTE,
                   letterSpacing: '0.16em',
                   textTransform: 'uppercase' as const,
                   marginTop: 5,
@@ -298,7 +298,7 @@ export function CollegeProfilePage() {
             <Skeleton style={{ height: 22, width: '50%', marginBottom: 6, background: INK_TINT_06 }} />
             <Skeleton style={{ height: 14, width: '70%', marginBottom: 16, background: INK_TINT_06 }} />
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 14 }}>
-              <Skeleton style={{ width: 80, height: 80, borderRadius: 27, background: 'rgba(255,184,0,0.10)' }} />
+              <Skeleton style={{ width: 80, height: 80, borderRadius: 27, background: GOLD_TINT_10 }} />
               <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 6 }}>
                 <Skeleton style={{ height: 22, width: 90, background: INK_TINT_06 }} />
                 <Skeleton style={{ height: 10, width: 60, background: INK_TINT_06 }} />
@@ -318,16 +318,16 @@ export function CollegeProfilePage() {
 
         {/* Alumni on Tour header */}
         {stats && (
-          <div style={{ background: '#fff', borderTop: `1px solid ${INK_TINT_07}`, borderBottom: `1px solid ${INK_TINT_07}`, marginTop: 16, padding: '14px 16px 10px' }}>
+          <div style={{ background: SURFACE, borderTop: `1px solid ${INK_TINT_07}`, borderBottom: `1px solid ${INK_TINT_07}`, marginTop: 16, padding: '14px 16px 10px' }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, marginBottom: 4 }}>
-              <span style={{ fontSize: 9, fontWeight: 800, color: '#64748B', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>
+              <span style={{ fontSize: 9, fontWeight: 800, color: INK_MUTE, letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>
                 Alumni on Tour
               </span>
-              <span style={{ fontSize: 9, fontWeight: 800, color: '#94A3B8', letterSpacing: '0.14em', textTransform: 'uppercase' as const }}>
-                <span style={{ color: '#0F172A' }}>{stats.player_count}</span> PLAYERS
+              <span style={{ fontSize: 9, fontWeight: 800, color: INK_FAINT, letterSpacing: '0.14em', textTransform: 'uppercase' as const }}>
+                <span style={{ color: INK }}>{stats.player_count}</span> PLAYERS
               </span>
             </div>
-            <div style={{ fontSize: 13, fontWeight: 500, color: '#64748B' }}>Every pro from this program</div>
+            <div style={{ fontSize: 13, fontWeight: 500, color: INK_MUTE }}>Every pro from this program</div>
           </div>
         )}
 
