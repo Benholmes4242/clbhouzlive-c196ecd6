@@ -43,16 +43,11 @@ interface LeaderboardCardProps {
 }
 
 function ScoreToPar({ score, className }: { score: number | null; className?: string }) {
-  if (score === null) return <span className={cn("", className)} style={{ color: '#94A3B8' }}>—</span>;
+  if (score === null) return <span className={cn(className)} style={{ color: INK_FAINT }}>—</span>;
   const formatted = score === 0 ? 'E' : score > 0 ? `+${score}` : String(score);
+  const color = score < 0 ? SCORE_UNDER_PAR_LIGHT : score > 0 ? SCORE_OVER_PAR_LIGHT : INK_FAINT;
   return (
-    <span
-      className={cn("font-bold", className)}
-      style={{
-        fontVariantNumeric: 'tabular-nums',
-        color: score < 0 ? '#F7931E' : score > 0 ? '#EF4444' : '#94A3B8',
-      }}
-    >
+    <span className={cn("font-bold", className)} style={{ fontVariantNumeric: 'tabular-nums', color, letterSpacing: '-0.01em' }}>
       {formatted}
     </span>
   );
@@ -61,7 +56,7 @@ function ScoreToPar({ score, className }: { score: number | null; className?: st
 function ThruDisplay({ thru }: { thru: number | null }) {
   if (thru === null || thru === 0) return null;
   if (thru >= 18) {
-    return <span style={{ fontSize: '10px', fontWeight: 600, color: '#F7931E' }}>F</span>;
+    return <span style={{ fontSize: '10px', fontWeight: 700, color: INK_MUTE, background: 'rgba(15,23,42,0.05)', padding: '2px 5px', borderRadius: 5 }}>F</span>;
   }
   return (
     <span style={{ fontSize: '10px', color: '#94A3B8', fontVariantNumeric: 'tabular-nums' }}>
