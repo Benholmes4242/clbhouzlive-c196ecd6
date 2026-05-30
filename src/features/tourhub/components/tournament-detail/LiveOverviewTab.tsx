@@ -88,7 +88,7 @@ function CutContextCard({
   return (
     <div
       style={{
-        background: '#ffffff',
+        background: SURFACE,
         borderTop: `1px solid ${INK_TINT_07}`,
         borderBottom: `1px solid ${INK_TINT_07}`,
       }}
