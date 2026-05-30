@@ -14,7 +14,21 @@ import { playerRoute } from '../../routes';
 import type { LeaderCategory } from './constants';
 import { splitStatValue } from '../../utils/splitStatValue';
 
-import { AMBER_TINT_12, WHITE_ALPHA_10 } from '../../_shared/tokens';
+import {
+  AMBER,
+  AMBER_TINT_12,
+  GOLD,
+  GOLD_BORDER,
+  GOLD_TINT,
+  GOLD_TINT_10,
+  INK,
+  INK_FAINT,
+  INK_MUTE,
+  SLATE_50,
+  SLATE_150,
+  SURFACE,
+  WHITE_ALPHA_10,
+} from '../../_shared/tokens';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // MastheadPill / PillView — kept for cross-surface compatibility.

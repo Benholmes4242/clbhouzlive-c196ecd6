@@ -1,7 +1,7 @@
 import { memo } from 'react';
 import { useSearchParams } from 'react-router-dom';
 
-import { WHITE_ALPHA_10, WHITE_ALPHA_55 } from '../../_shared/tokens';
+import { SHELL_BG, SURFACE, WHITE_ALPHA_06, WHITE_ALPHA_10, WHITE_ALPHA_18, WHITE_ALPHA_55, WHITE_ALPHA_65 } from '../../_shared/tokens';
 
 interface ChipDef {
   id: string;
@@ -52,8 +52,8 @@ function LeadersShellRowInner() {
     <div
       className="relative"
       style={{
-        background: '#0A0E14',
-        borderBottom: '0.5px solid rgba(255,255,255,0.06)',
+        background: SHELL_BG,
+        borderBottom: `0.5px solid ${WHITE_ALPHA_06}`,
       }}
     >
       <div
@@ -78,9 +78,9 @@ function LeadersShellRowInner() {
                 fontSize: 12,
                 fontWeight: 600,
                 borderRadius: 15,
-                background: isActive ? WHITE_ALPHA_10 : 'transparent',
-                border: isActive ? `1px solid ${WHITE_ALPHA_55}` : `1.5px solid ${WHITE_ALPHA_10}`,
-                color: isActive ? '#FFFFFF' : WHITE_ALPHA_55,
+                background: isActive ? WHITE_ALPHA_18 : 'transparent',
+                border: `1px solid ${isActive ? WHITE_ALPHA_55 : WHITE_ALPHA_18}`,
+                color: isActive ? SURFACE : WHITE_ALPHA_65,
                 letterSpacing: '-0.01em',
                 whiteSpace: 'nowrap',
               }}
