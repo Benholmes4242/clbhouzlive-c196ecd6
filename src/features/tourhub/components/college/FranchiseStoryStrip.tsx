@@ -7,7 +7,7 @@ import { useCollegeWeeklyMovers } from '../../hooks/useCollegeMovers';
 import { useCollegeAlumni } from '../../hooks/useCollegeAlumni';
 import { formatCurrency } from '@/lib/utils/formatCurrency';
 import { playerRoute } from '../../routes';
-import { INK_TINT_06, INK_TINT_07 } from '../../_shared/tokens';
+import { AMBER, INK, INK_FAINT, INK_MUTE, INK_TINT_06, INK_TINT_07, LIVE_INK, SURFACE, TREND_DOWN } from '../../_shared/tokens';
 
 interface FranchiseStoryStripProps {
   normalizedName: string;
