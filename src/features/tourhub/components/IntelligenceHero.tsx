@@ -895,7 +895,7 @@ function ResultsCard({
     },
     top5: {
       bg: PGA_GREEN,
-      label: `✓ TOP 5 · ${pick.finished}`,
+      label: `TOP 5 · ${pick.finished}`,
       color: '#fff',
       weight: 700 as const,
     },
