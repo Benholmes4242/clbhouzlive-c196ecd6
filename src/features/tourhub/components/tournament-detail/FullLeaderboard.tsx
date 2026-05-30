@@ -342,7 +342,7 @@ export function FullLeaderboard({
 
       {/* Results count */}
       <div style={{ padding: '10px 20px', textAlign: 'center' as const }}>
-        <span style={{ fontSize: '10px', color: '#94A3B8' }}>
+        <span style={{ fontSize: '10px', color: INK_FAINT }}>
           {sortedEntries.length} player{sortedEntries.length !== 1 ? 's' : ''}
           {searchQuery && ` matching "${searchQuery}"`}
         </span>
