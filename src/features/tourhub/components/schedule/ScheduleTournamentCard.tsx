@@ -21,6 +21,7 @@ import { getContextLabel, TOUR_NAME_TO_SLUG } from '../../utils/tournamentClassi
 
 import { getCurrentRound } from '../../utils/formatThruDisplay';
 import { formatPurse } from '../shared/TourHeroHelpers';
+import { getScoreColor } from '../../_shared/scoreColor';
 import { TourPill } from '../shared/TourPill';
 import { EventTag, type EventTagKind } from '../shared/EventTag';
 import { WinnerPill } from '../shared/WinnerPill';
