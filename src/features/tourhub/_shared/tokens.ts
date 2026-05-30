@@ -53,6 +53,7 @@ export const HAIRLINE_INK_8 = 'rgba(15,23,42,0.08)';         // hairline/faint b
 export const HAIRLINE_INK_10 = 'rgba(15,23,42,0.10)';
 export const HAIRLINE_INK_12 = 'rgba(15,23,42,0.12)';        // cut-line / section divider hairline — 7 cross-app files
 export const HAIRLINE_INK_15 = 'rgba(15,23,42,0.15)';        // section divider on light bg with stronger emphasis
+export const HAIRLINE_INK_18 = 'rgba(15,23,42,0.18)';        // hairline at strongest emphasis — TIED-state bar bg, faint row-number digits — 4 cross-app files
 
 // ============================================================================
 // INK_ALPHA (text/scrim overlays on light bg where alpha-based muting is needed)
