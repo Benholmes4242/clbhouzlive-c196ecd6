@@ -106,53 +106,25 @@ export function PlayerHero({ player, playerStats }: PlayerHeroProps) {
   const heroStat = chooseHeroStat(player, playerStats, playerState);
   const { integer: heroStatInteger, decimal: heroStatDecimal, suffix: heroStatSuffix } = splitStatValue(heroStat.primary);
 
-  // Stat label per state (Q3 decision).
+  // Stat label per state (matches chooseHeroStat chain).
   const heroStatLabel = (() => {
     switch (playerState.state) {
       case 'live': return 'LIVE SCORE';
-      case 'recent': return 'LAST FINISH';
-      case 'inform':
-      case 'inactive':
-        if (playerStats?.earnings && playerStats.earnings > 0) {
-          return `EARNED ${new Date().getFullYear()}`;
-        }
-        if (worldRank) return 'WORLD RANKING';
+      default:
+        if (worldRank) return 'WORLD RANK';
+        if (playerStats?.strokes_gained_total != null) return 'SG: TOTAL';
+        if (playerStats?.earnings && playerStats.earnings > 0) return `EARNED ${new Date().getFullYear()}`;
         if (age) return 'AGE';
         return 'PROFILE';
     }
   })();
 
-  // Caption row composition (3 items max).
-  // Priority: WORLD #N (rank) → AGE NN → state-specific 3rd item.
+  // Caption row composition — two stable identifiers only.
   const captionMetadata: string[] = (() => {
     const items: string[] = [];
-
     items.push(worldRank ? `WORLD #${worldRank}` : 'PLAYER');
-
     if (age) items.push(`AGE ${age}`);
-
-    switch (playerState.state) {
-      case 'live': {
-        const ld = playerState.liveData!;
-        items.push(`LIVE · ${ld.scoreText} AT ${truncateName(ld.tournamentName, 18).toUpperCase()}`);
-        break;
-      }
-      case 'recent': {
-        const rd = playerState.recentData!;
-        items.push(rd.context ? `${rd.label.toUpperCase()} · ${truncateName(rd.context, 18).toUpperCase()}` : rd.label.toUpperCase());
-        break;
-      }
-      case 'inform': {
-        items.push(`${playerState.eventsLast12mo} STARTS LAST 12 MO`);
-        break;
-      }
-      case 'inactive': {
-        items.push(`LAST PLAYED ${playerState.inactiveData!.lastEventLabel.toUpperCase()}`);
-        break;
-      }
-    }
-
-    return items.slice(0, 3);
+    return items;
   })();
 
   return (
