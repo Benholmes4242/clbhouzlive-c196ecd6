@@ -61,24 +61,47 @@ export const TourSwitcherAffordance: React.FC = () => {
         aria-expanded={open}
         style={{
           flexShrink: 0,
-          display: 'flex',
-          alignItems: 'center',
-          gap: 5,
+          display: 'inline-flex',
+          flexDirection: 'column',
+          alignItems: 'flex-start',
+          justifyContent: 'center',
+          gap: 2,
           padding: '0 14px 0 10px',
           background: 'transparent',
           border: 'none',
-          color: WHITE_ALPHA_55,
           cursor: 'pointer',
-          fontFamily: 'Geist, system-ui, sans-serif',
-          fontSize: 11,
-          fontWeight: 700,
-          letterSpacing: '0.04em',
-          textTransform: 'uppercase',
+          fontFamily: FONT,
           height: 36,
         }}
       >
-        <span>{TOUR_LABEL[activeTourSlug] ?? 'PGA'}</span>
-        <span aria-hidden style={{ fontSize: 12, opacity: 0.7 }}>↔</span>
+        <span
+          style={{
+            fontSize: 8,
+            fontWeight: 800,
+            letterSpacing: '0.14em',
+            color: AMBER,
+            textTransform: 'uppercase',
+            lineHeight: 1,
+          }}
+        >
+          Tour
+        </span>
+        <span
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: 5,
+            fontSize: 11,
+            fontWeight: 700,
+            letterSpacing: '0.04em',
+            color: SURFACE,
+            textTransform: 'uppercase',
+            lineHeight: 1,
+          }}
+        >
+          {TOUR_LABEL[activeTourSlug] ?? 'PGA'}
+          <ArrowLeftRight size={11} strokeWidth={2.2} color={SURFACE} aria-hidden />
+        </span>
       </button>
 
       <BottomSheet
