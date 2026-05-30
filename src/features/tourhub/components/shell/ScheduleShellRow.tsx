@@ -7,7 +7,21 @@ import { useTourSeason, useTourTournaments } from '../../hooks/useTourHubData';
 import { getTourLogo, hasTourLogo } from '../../utils/tourLogos';
 import { getTourMeta } from '../../constants/tourMap';
 import type { ScheduleFilterType, TourFilterCode } from '../schedule';
-import { AMBER_TINT_04, INK_TINT_06, INK_TINT_07, WHITE_ALPHA_10, WHITE_ALPHA_55, WHITE_ALPHA_65 } from '../../_shared/tokens';
+import {
+  AMBER,
+  AMBER_TINT_04,
+  INK,
+  INK_FAINT,
+  INK_TINT_06,
+  INK_TINT_07,
+  SHELL_BG,
+  SURFACE,
+  WHITE_ALPHA_06,
+  WHITE_ALPHA_10,
+  WHITE_ALPHA_18,
+  WHITE_ALPHA_55,
+  WHITE_ALPHA_65,
+} from '../../_shared/tokens';
 
 interface ChipDef {
   id: ScheduleFilterType;
