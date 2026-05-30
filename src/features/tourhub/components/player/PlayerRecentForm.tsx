@@ -217,8 +217,8 @@ export function FormSection({ playerId }: FormSectionProps) {
     );
   }
 
-  // Branch 2 — ≥3 finished events: full card.
-  const positions = finishedRows.map((r) => r.position!);
+  // Branch 2 — ≥3 finished events: full card. Trend uses up to 10 events.
+  const positions = trendFinishes.map((r) => r.position!);
   const avgPos = Math.round(
     positions.reduce((sum, p) => sum + p, 0) / positions.length,
   );
