@@ -21,9 +21,8 @@ import { PlayerAvatar, UpcomingCountdown } from '../shared/TourHeroHelpers';
 import { useBatchCourseImages } from '../../hooks/useBatchCourseImages';
 import { getCourseImage } from '../../utils/placeholders';
 import { tournamentRoute } from '../../routes';
+import { AMBER_INK_DARK, RECAP_VICTORY_GREEN, LEADER_GOLD, INK } from '../../_shared/tokens';
 
-const AMBER_DARK = '#BA7517';
-const GREEN = '#0F6E56';
 
 function fmtDates(start?: string, end?: string): string {
   if (!start) return '';
