@@ -107,8 +107,12 @@ export function LeaderboardBand({
   cancelReason,
   tourSlug,
   par,
+  defendingChampion,
+  fieldSize,
   onCtaTap,
 }: LeaderboardBandProps) {
+  const showFooterStrip =
+    state.kind === 'live' && (!!defendingChampion || (fieldSize ?? 0) > 0);
   const h = header(state, leaderboard, tiedLeaders);
   const entryAvatar = (entry: any) => resolveAvatar(entry, tourSlug);
   const sparklinePar = par ?? 0;
