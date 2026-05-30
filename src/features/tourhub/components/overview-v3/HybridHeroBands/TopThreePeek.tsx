@@ -150,7 +150,7 @@ export function TopThreePeek({ rows, onFullLeaderboardTap }: TopThreePeekProps) 
                   ...NUMERIC_STYLE,
                   fontSize: 14,
                   fontWeight: 700,
-                  color: '#0F172A',
+                  color: INK,
                   flexShrink: 0,
                 }}
               >
