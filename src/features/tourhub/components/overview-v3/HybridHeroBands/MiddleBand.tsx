@@ -82,7 +82,7 @@ export function MiddleBand({
       );
     }
     if (champion) {
-      const eyebrow = state.variant === 'playoff' ? '🏆 CHAMPION · PLAYOFF' : '🏆 CHAMPION';
+      const eyebrow = state.variant === 'playoff' ? 'CHAMPION · PLAYOFF' : 'CHAMPION';
       return (
         <ChampionStrip
           name={champion.name}
