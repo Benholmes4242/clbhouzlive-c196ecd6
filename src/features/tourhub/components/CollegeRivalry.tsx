@@ -34,16 +34,16 @@ import { Shimmer } from './shared/Shimmer';
 
 const AMBER = '#F7931E';
 const AMBER_INK = '#D97706';
-const AMBER_SOFT_BG = 'rgba(247,147,30,0.08)';
-const AMBER_SOFT_BORDER = 'rgba(247,147,30,0.30)';
+const AMBER_TINT_8 = 'rgba(247,147,30,0.08)';
+const AMBER_BORDER = 'rgba(247,147,30,0.30)';
 const INK = '#0F172A';
-const SLATE = '#94A3B8';
-const SLATE_500 = '#64748B';
-const SLATE_700 = '#334155';
-const SLATE_LIGHT = '#CBD5E1';
+const INK_FAINT = '#94A3B8';
+const INK_MUTE = '#64748B';
+const INK_SOFT = '#334155';
+const INK_LIGHT = '#CBD5E1';
 const SLATE_150 = '#EDF1F5';
-const SLATE_ALPHA = 'rgba(15,23,42,0.08)';
-const HAIRLINE = 'rgba(15,23,42,0.07)';
+const HAIRLINE_INK_7 = 'rgba(15,23,42,0.08)';
+const HAIRLINE_INK_7 = 'rgba(15,23,42,0.07)';
 
 function displayName(stats: CollegeSeasonStats, media: CollegeMedia | undefined): string {
   return media?.short_name || media?.college_name || stats.normalized_name;
@@ -79,7 +79,7 @@ function CollegeRivalrySkeleton() {
       <div style={{ padding: '0 16px' }}>
         <div style={{
           background: '#fff',
-          border: `1px solid ${SLATE_ALPHA}`,
+          border: `1px solid ${HAIRLINE_INK_7}`,
           borderRadius: 18,
           overflow: 'hidden',
         }}>
@@ -296,7 +296,7 @@ export function CollegeRivalry() {
         <div
           style={{
             background: '#fff',
-            border: `1px solid ${SLATE_ALPHA}`,
+            border: `1px solid ${HAIRLINE_INK_7}`,
             borderRadius: 18,
             overflow: 'hidden',
             boxShadow: '0 2px 16px -8px rgba(15,23,42,0.08)',
@@ -359,7 +359,7 @@ export function CollegeRivalry() {
               <div style={{ fontSize: 20, fontWeight: 900, color: AMBER_INK, fontVariantNumeric: 'tabular-nums', letterSpacing: '-0.4px' }}>
                 {formatCurrency(leader.earnings_total)}
               </div>
-              <div style={{ fontSize: 9, fontWeight: 800, color: SLATE, letterSpacing: '0.1em', textTransform: 'uppercase' }}>
+              <div style={{ fontSize: 9, fontWeight: 800, color: INK_FAINT, letterSpacing: '0.1em', textTransform: 'uppercase' }}>
                 {leader.wins_total} {leader.wins_total === 1 ? 'WIN' : 'WINS'} · {leader.player_count} ON TOUR
               </div>
             </button>
@@ -367,7 +367,7 @@ export function CollegeRivalry() {
             {/* VS divider */}
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6 }}>
               <div style={{
-                fontSize: 11, fontWeight: 900, color: SLATE_LIGHT,
+                fontSize: 11, fontWeight: 900, color: INK_LIGHT,
                 letterSpacing: '0.16em', textTransform: 'uppercase',
               }}>
                 VS
@@ -410,7 +410,7 @@ export function CollegeRivalry() {
                 <div style={{ fontSize: 20, fontWeight: 900, color: INK, fontVariantNumeric: 'tabular-nums', letterSpacing: '-0.4px' }}>
                   {formatCurrency(chaser.earnings_total)}
                 </div>
-                <div style={{ fontSize: 9, fontWeight: 800, color: SLATE, letterSpacing: '0.1em', textTransform: 'uppercase' }}>
+                <div style={{ fontSize: 9, fontWeight: 800, color: INK_FAINT, letterSpacing: '0.1em', textTransform: 'uppercase' }}>
                   {chaser.wins_total} {chaser.wins_total === 1 ? 'WIN' : 'WINS'} · {chaser.player_count} ON TOUR
                 </div>
               </button>
@@ -451,7 +451,7 @@ export function CollegeRivalry() {
                 />
                 <div style={{ minWidth: 0 }}>
                   <div style={{
-                    fontSize: 9, fontWeight: 800, color: SLATE_500,
+                    fontSize: 9, fontWeight: 800, color: INK_MUTE,
                     letterSpacing: '0.08em', textTransform: 'uppercase',
                   }}>
                     {leaderShort} CAPTAIN
@@ -465,7 +465,7 @@ export function CollegeRivalry() {
                   </div>
                   {leaderCaptain && (
                     <div style={{
-                      fontSize: 10, fontWeight: 600, color: SLATE_500,
+                      fontSize: 10, fontWeight: 600, color: INK_MUTE,
                       fontVariantNumeric: 'tabular-nums',
                       overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
                       marginTop: 2,
@@ -497,7 +497,7 @@ export function CollegeRivalry() {
                 />
                 <div style={{ minWidth: 0, textAlign: 'right' }}>
                   <div style={{
-                    fontSize: 9, fontWeight: 800, color: SLATE_500,
+                    fontSize: 9, fontWeight: 800, color: INK_MUTE,
                     letterSpacing: '0.08em', textTransform: 'uppercase',
                   }}>
                     {chaserShort} CAPTAIN
@@ -511,7 +511,7 @@ export function CollegeRivalry() {
                   </div>
                   {chaserCaptain && (
                     <div style={{
-                      fontSize: 10, fontWeight: 600, color: SLATE_500,
+                      fontSize: 10, fontWeight: 600, color: INK_MUTE,
                       fontVariantNumeric: 'tabular-nums',
                       overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
                       marginTop: 2,
@@ -538,13 +538,13 @@ export function CollegeRivalry() {
             padding: '0 4px',
           }}>
             <span style={{
-              fontSize: 10, fontWeight: 900, color: SLATE_500,
+              fontSize: 10, fontWeight: 900, color: INK_MUTE,
               letterSpacing: '0.12em', textTransform: 'uppercase',
             }}>
               Standings
             </span>
             <span style={{
-              fontSize: 10, fontWeight: 700, color: SLATE_500,
+              fontSize: 10, fontWeight: 700, color: INK_MUTE,
               letterSpacing: '0.06em', textTransform: 'uppercase',
             }}>
               Top 5 · Earnings on Tour
@@ -565,7 +565,7 @@ export function CollegeRivalry() {
                 onClick={() => navigate(`/tourhub/college-golf/${stats.normalized_name}`)}
                 style={{
                   width: '100%',
-                  background: isLeader ? AMBER_SOFT_BG : 'transparent',
+                  background: isLeader ? AMBER_TINT_8 : 'transparent',
                   border: 'none',
                   borderLeft: isLeader ? `3px solid ${AMBER}` : '3px solid transparent',
                   borderBottom: i < top5.length - 1 ? `1px solid ${SLATE_150}` : 'none',
@@ -583,7 +583,7 @@ export function CollegeRivalry() {
                     width: 24,
                     fontSize: 16,
                     fontWeight: 900,
-                    color: isLeader ? AMBER : SLATE,
+                    color: isLeader ? AMBER : INK_FAINT,
                     letterSpacing: '-0.4px',
                     fontVariantNumeric: 'tabular-nums',
                     flexShrink: 0,
@@ -625,8 +625,8 @@ export function CollegeRivalry() {
                   {isRival && (
                     <span style={{
                       padding: '2px 6px',
-                      background: AMBER_SOFT_BG,
-                      border: `1px solid ${AMBER_SOFT_BORDER}`,
+                      background: AMBER_TINT_8,
+                      border: `1px solid ${AMBER_BORDER}`,
                       borderRadius: 4,
                       fontSize: 8,
                       fontWeight: 900,
@@ -644,7 +644,7 @@ export function CollegeRivalry() {
                   style={{
                     fontSize: 14,
                     fontWeight: 800,
-                    color: isLeader ? AMBER_INK : SLATE_700,
+                    color: isLeader ? AMBER_INK : INK_SOFT,
                     fontVariantNumeric: 'tabular-nums',
                     letterSpacing: '-0.2px',
                     flexShrink: 0,

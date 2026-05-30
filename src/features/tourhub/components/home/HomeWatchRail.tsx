@@ -10,7 +10,7 @@ import { useViewedPostIds } from '@/components/watch/hooks/useViewedPostIds';
 import WatchRailTile from '@/components/watch/WatchRailTile';
 
 const AMBER = '#F7931E';
-const INK_FAINT = 'rgba(15,23,42,0.55)';
+const INK_MUTE = 'rgba(15,23,42,0.55)';
 
 export function HomeWatchRail() {
   const navigate = useNavigate();
@@ -72,7 +72,7 @@ export function HomeWatchRail() {
     return (
       <section>
         {Eyebrow}
-        <div style={{ padding: '0 16px', fontSize: 12, color: INK_FAINT, fontWeight: 500 }}>
+        <div style={{ padding: '0 16px', fontSize: 12, color: INK_MUTE, fontWeight: 500 }}>
           No trending content yet — check back later.
         </div>
       </section>
