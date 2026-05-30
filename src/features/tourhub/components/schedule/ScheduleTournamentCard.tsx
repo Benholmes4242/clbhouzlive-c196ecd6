@@ -128,7 +128,7 @@ export function ScheduleTournamentCard({
   };
 
   // Major rows get amber-soft bg tint; tier signalling otherwise via EventTag/TourPill.
-  const rowBg = isMajor ? '#FEF3E7' : 'transparent';
+  const rowBg = isMajor ? AMBER_SOFT_BG : 'transparent';
 
   const ariaLabel = [
     tournament.name,
