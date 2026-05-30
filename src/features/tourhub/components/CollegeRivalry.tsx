@@ -14,8 +14,8 @@
  *   overrides computed copy when available.
  *
  * Eyebrow rules (when no DB editorial override present):
- * - gap < $5M  → "🥊 CLOSEST RACE THIS WEEK"
- * - gap >= $5M → "🥊 TIGHTEST AT THE TOP"
+ * - gap < $5M  → "CLOSEST RACE THIS WEEK"
+ * - gap >= $5M → "TIGHTEST AT THE TOP"
  */
 
 import { useMemo } from 'react';

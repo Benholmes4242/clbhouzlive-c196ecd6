@@ -16,7 +16,7 @@
 
 export const STAT_OF_WEEK_FALLBACK = {
   category: 'DRIVING DISTANCE',
-  categoryIcon: '💪',
+  
   bigNumber: '325',
   decimal: '.2',
   unit: 'yds',
@@ -43,7 +43,7 @@ export const STAT_OF_WEEK_FALLBACK = {
  * — they are intentionally obvious as placeholders, not fictional content.
  */
 export const COLLEGE_RIVALRY_FALLBACK = {
-  eyebrow: "🥊 THIS WEEK'S RIVALRY",
+  eyebrow: "THIS WEEK'S RIVALRY",
   headlineLine1: 'Loading rivalry…',
   headlineLine2: null as string | null,
   leftCollege: '—',
