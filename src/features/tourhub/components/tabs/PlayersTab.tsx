@@ -185,7 +185,7 @@ function HeroChampion({ champion, runnerUp, champStats, champPhotoUrl, sort, act
       <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
         {/* Photo + "1" badge */}
         <div style={{ position: 'relative', flexShrink: 0 }}>
-          <div style={{ width: 80, height: 80, borderRadius: '34%', overflow: 'hidden', background: INK_TINT_06, border: '2.5px solid #FFB800', boxShadow: '0 4px 12px rgba(255,184,0,0.20)' }}>
+          <div style={{ width: 80, height: 80, borderRadius: '34%', overflow: 'hidden', background: INK_TINT_06, border: `2.5px solid ${GOLD}`, boxShadow: '0 4px 12px rgba(255,184,0,0.20)' }}>
             <img
               src={champPhotoUrl}
               alt={champion.playerName}
