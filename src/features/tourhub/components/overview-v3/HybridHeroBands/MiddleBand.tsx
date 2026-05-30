@@ -4,6 +4,7 @@
  */
 
 import React from 'react';
+import { MapPin } from 'lucide-react';
 import type { HeroState, TickerRow, TopTie } from '../HybridHero.utils';
 import { Ticker } from './Ticker';
 import { ChampionStrip, CancelledStrip, PlayoffStrip } from './ChampionStrip';
