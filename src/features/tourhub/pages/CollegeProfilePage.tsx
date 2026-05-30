@@ -269,17 +269,17 @@ export function CollegeProfilePage() {
                   fontWeight: 800,
                   letterSpacing: '-0.025em',
                   lineHeight: 1,
-                  color: '#0F172A',
+                  color: INK,
                   fontVariantNumeric: 'tabular-nums',
                 }}>
                   {primaryInteger}
-                  {primaryDecimal && <span style={{ color: '#F7931E' }}>{primaryDecimal}</span>}
+                  {primaryDecimal && <span style={{ color: AMBER }}>{primaryDecimal}</span>}
                   {primarySuffix}
                 </div>
                 <div style={{
                   fontSize: 9,
                   fontWeight: 800,
-                  color: '#64748B',
+                  color: INK_MUTE,
                   letterSpacing: '0.16em',
                   textTransform: 'uppercase' as const,
                   marginTop: 5,
