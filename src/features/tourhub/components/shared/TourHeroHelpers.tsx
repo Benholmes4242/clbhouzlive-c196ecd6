@@ -359,7 +359,7 @@ export function PodiumRunnerRow({
         style={{
           fontSize: isSingle ? 14 : 13,
           fontWeight: isSingle ? 700 : 600,
-          color: getFinishedScoreColor(row.sharedScore),
+          color: getScoreColorCanonical(row.sharedScore, 'dark', 'standard'),
           flexShrink: 0,
         }}
       >
