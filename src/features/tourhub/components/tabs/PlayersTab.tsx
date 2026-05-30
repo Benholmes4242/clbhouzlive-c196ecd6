@@ -664,7 +664,7 @@ export function PlayersTab() {
         const champPhotoUrl = getPlayerHeadshotUrl(champion.playerName, champion.tourCode ?? 'pga');
 
         return (
-          <div style={{ padding: '16px 16px 0', background: '#F8FAFC' }}>
+          <div style={{ padding: '16px 16px 0', background: SLATE_50 }}>
             {/* ── MASTHEAD ── */}
             {(() => {
               const tourLabel = activeTour === 'pga' ? 'PGA Tour'
