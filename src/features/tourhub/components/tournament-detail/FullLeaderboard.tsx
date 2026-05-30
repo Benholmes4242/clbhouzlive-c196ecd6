@@ -215,25 +215,25 @@ export function FullLeaderboard({
       </div>
 
       {/* Column headers */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '3px', padding: '5px 16px', background: 'rgba(15,23,42,0.02)', borderTop: `0.5px solid ${INK_TINT_07}`, borderBottom: `0.5px solid ${INK_TINT_07}` }}>
-        <span style={{ width: '24px', fontSize: '9px', fontWeight: 800, color: '#64748B', letterSpacing: '0.14em', flexShrink: 0 }}>POS</span>
-        <span style={{ flex: 1, fontSize: '9px', fontWeight: 800, color: '#64748B', letterSpacing: '0.14em' }}>PLAYER</span>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '3px', padding: '5px 16px', background: INK_TINT_02, borderTop: `0.5px solid ${INK_TINT_07}`, borderBottom: `0.5px solid ${INK_TINT_07}` }}>
+        <span style={{ width: '24px', fontSize: '9px', fontWeight: 800, color: INK_MUTE, letterSpacing: '0.14em', flexShrink: 0 }}>POS</span>
+        <span style={{ flex: 1, fontSize: '9px', fontWeight: 800, color: INK_MUTE, letterSpacing: '0.14em' }}>PLAYER</span>
         {showRoundColumns && (
           <>
-            <span style={{ width: '19px', textAlign: 'center' as const, fontSize: '9px', fontWeight: 800, color: '#64748B', letterSpacing: '0.14em', flexShrink: 0 }}>R1</span>
-            <span style={{ width: '19px', textAlign: 'center' as const, fontSize: '9px', fontWeight: 800, color: '#64748B', letterSpacing: '0.14em', flexShrink: 0 }}>R2</span>
-            <span style={{ width: '19px', textAlign: 'center' as const, fontSize: '9px', fontWeight: 800, color: '#64748B', letterSpacing: '0.14em', flexShrink: 0 }}>R3</span>
-            <span style={{ width: '19px', textAlign: 'center' as const, fontSize: '9px', fontWeight: 800, color: '#64748B', letterSpacing: '0.14em', flexShrink: 0 }}>R4</span>
+            <span style={{ width: '19px', textAlign: 'center' as const, fontSize: '9px', fontWeight: 800, color: INK_MUTE, letterSpacing: '0.14em', flexShrink: 0 }}>R1</span>
+            <span style={{ width: '19px', textAlign: 'center' as const, fontSize: '9px', fontWeight: 800, color: INK_MUTE, letterSpacing: '0.14em', flexShrink: 0 }}>R2</span>
+            <span style={{ width: '19px', textAlign: 'center' as const, fontSize: '9px', fontWeight: 800, color: INK_MUTE, letterSpacing: '0.14em', flexShrink: 0 }}>R3</span>
+            <span style={{ width: '19px', textAlign: 'center' as const, fontSize: '9px', fontWeight: 800, color: INK_MUTE, letterSpacing: '0.14em', flexShrink: 0 }}>R4</span>
           </>
         )}
-        <span style={{ width: '34px', textAlign: 'center' as const, fontSize: '9px', fontWeight: 800, color: '#64748B', letterSpacing: '0.14em', flexShrink: 0 }}>
+        <span style={{ width: '34px', textAlign: 'center' as const, fontSize: '9px', fontWeight: 800, color: INK_MUTE, letterSpacing: '0.14em', flexShrink: 0 }}>
           {selectedRound === 'Overall' ? 'TOT' : 'SCORE'}
         </span>
-        <span style={{ width: '30px', textAlign: 'center' as const, fontSize: '9px', fontWeight: 800, color: '#64748B', letterSpacing: '0.14em', flexShrink: 0 }}>THRU</span>
+        <span style={{ width: '30px', textAlign: 'center' as const, fontSize: '9px', fontWeight: 800, color: INK_MUTE, letterSpacing: '0.14em', flexShrink: 0 }}>THRU</span>
       </div>
 
       {/* Player rows */}
-      <div style={{ background: '#ffffff', borderBottom: `1px solid ${INK_TINT_07}` }}>
+      <div style={{ background: SURFACE, borderBottom: `1px solid ${INK_TINT_07}` }}>
         {sortedEntries.map((entry, index) => {
           const isMissedCut = entry.status === 'MC' || entry.status === 'CUT';
           const isWD = entry.status === 'WD';
