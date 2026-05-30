@@ -51,8 +51,8 @@ function MetricCompareRow({ label, value1, value2, format = String, lowerIsBette
   // Canonical font weights: value 900 (leader) / 600 (non-leader), label 800
   const value1Weight = isLeading1 ? 900 : 600;
   const value2Weight = isLeading2 ? 900 : 600;
-  const value1Color = isLeading1 ? '#0F172A' : '#94A3B8';
-  const value2Color = isLeading2 ? '#0F172A' : '#94A3B8';
+  const value1Color = isLeading1 ? INK : INK_FAINT;
+  const value2Color = isLeading2 ? INK : INK_FAINT;
 
   return (
     <div style={{ padding: '9px 16px', borderBottom: isLast ? 'none' : `0.5px solid ${INK_TINT_07}` }}>
