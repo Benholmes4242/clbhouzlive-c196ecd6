@@ -228,7 +228,7 @@ export function ScheduleTournamentCard({
           style={{
             fontSize: 16,
             fontWeight: 800,
-            color: '#0F172A',
+            color: INK,
             letterSpacing: '-0.015em',
             lineHeight: 1.2,
             margin: '0 0 5px',
