@@ -831,7 +831,7 @@ export function PlayersTab() {
       {/* Tour filter bottom sheet — moved to PlayersShellRow */}
 
       {/* Content — white surface */}
-      <div style={{ background: '#ffffff', borderTop: `1px solid ${INK_TINT_07}`, marginTop: '8px' }}>
+      <div style={{ background: SURFACE, borderTop: `1px solid ${INK_TINT_07}`, marginTop: '8px' }}>
         <AnimatePresence mode="wait">
           <motion.div
             key={contentKey}
@@ -844,8 +844,8 @@ export function PlayersTab() {
             {displayRows.length > 0 ? (
               <>
                 {!debouncedSearch && sort === 'world-rank-desc' && (
-                  <div style={{ padding: '12px 16px 6px', background: '#ffffff' }}>
-                    <span style={{ fontSize: 9, fontWeight: 800, color: '#64748B', letterSpacing: '0.16em' }}>
+                  <div style={{ padding: '12px 16px 6px', background: SURFACE }}>
+                    <span style={{ fontSize: 9, fontWeight: 800, color: INK_MUTE, letterSpacing: '0.16em' }}>
                       CHASING
                     </span>
                   </div>
