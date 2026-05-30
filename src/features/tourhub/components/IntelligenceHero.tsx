@@ -852,7 +852,9 @@ function LiveCard({
                   fontVariantNumeric: 'tabular-nums',
                 }}
               >
-                <span style={{ fontSize: 10 }}>{moveSymbol}</span>
+                <span style={{ display: 'inline-flex', alignItems: 'center' }}>
+                  {MoveIcon ? <MoveIcon size={11} strokeWidth={3} color={moveColor} /> : <span style={{ fontSize: 10 }}>—</span>}
+                </span>
                 {pick.moveSpots}
               </div>
             )}
