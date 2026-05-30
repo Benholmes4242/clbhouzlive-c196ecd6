@@ -15,11 +15,9 @@ import {
   GREEN_LIVE,
   NUMERIC_STYLE,
 } from '../HybridHero.constants';
+import { getScoreColor } from '../../../_shared/scoreColor';
+import { LEADER_GOLD_TINT_7, LEADER_GOLD_TINT_10 } from '../../../_shared/tokens';
 import { TrajectorySparkline } from './TrajectorySparkline';
-
-
-const LEADER_TINT_LIVE = 'rgba(251,188,46,0.07)';
-const LEADER_TINT_RESULTS = 'rgba(251,188,46,0.10)';
 
 function PlayerHead({ size = 36, src, ring }: { size?: number; src?: string | null; ring?: boolean }) {
   return (
