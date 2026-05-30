@@ -798,7 +798,7 @@ function LiveCard({
                 style={{
                   fontSize: 18,
                   fontWeight: 800,
-                  color: AMBER,
+                  color: getScoreColor(pick.scoreNumeric, 'dark', 'standard'),
                   letterSpacing: '-0.01em',
                   lineHeight: 1.1,
                   fontVariantNumeric: 'tabular-nums',
