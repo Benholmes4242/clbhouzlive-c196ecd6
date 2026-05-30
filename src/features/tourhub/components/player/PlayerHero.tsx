@@ -274,7 +274,7 @@ export function PlayerHero({ player, playerStats }: PlayerHeroProps) {
             <div style={{ flexShrink: 0, textAlign: 'right' as const }}>
               <div
                 style={{
-                  fontSize: 22,
+                  fontSize: 30,
                   fontWeight: 800,
                   color: INK,
                   letterSpacing: '-0.02em',
