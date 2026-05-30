@@ -41,7 +41,7 @@ export function ScheduleMonthHeader({
         <span style={{
           fontSize: 9,
           fontWeight: 800,
-          color: '#64748B',
+          color: INK_MUTE,
           letterSpacing: '0.16em',
           textTransform: 'uppercase' as const,
         }}>
@@ -50,12 +50,12 @@ export function ScheduleMonthHeader({
         {isCurrentMonth && (
           <span style={{
             padding: '2px 6px',
-            background: '#FEF3E7',
-            border: '1px solid rgba(247,147,30,0.32)',
+            background: AMBER_SOFT_BG,
+            border: `1px solid ${AMBER_BORDER}`,
             borderRadius: 3,
             fontSize: 9,
             fontWeight: 800,
-            color: '#F7931E',
+            color: AMBER,
             letterSpacing: '0.10em',
             lineHeight: 1,
           }}>
@@ -66,7 +66,7 @@ export function ScheduleMonthHeader({
           marginLeft: 'auto',
           fontSize: 13,
           fontWeight: 700,
-          color: '#0F172A',
+          color: INK,
           letterSpacing: '-0.005em',
         }}>
           {eventCount} event{eventCount !== 1 ? 's' : ''}
@@ -76,7 +76,7 @@ export function ScheduleMonthHeader({
         <p style={{
           fontSize: 12,
           fontWeight: 500,
-          color: '#64748B',
+          color: INK_MUTE,
           margin: '4px 0 0',
           lineHeight: 1.4,
         }}>
