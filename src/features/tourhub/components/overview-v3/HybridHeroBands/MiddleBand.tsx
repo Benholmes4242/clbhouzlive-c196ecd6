@@ -97,7 +97,7 @@ export function MiddleBand({
       );
     }
 
-    return <ChampionStrip name="Result pending" score="—" eyebrow="🏆 CHAMPION" />;
+    return <ChampionStrip name="Result pending" score="—" eyebrow="CHAMPION" />;
   }
 
   // Upcoming — 4-level fallback chain (Polish Patch §4.5)
