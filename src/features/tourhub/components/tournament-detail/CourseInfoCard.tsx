@@ -5,7 +5,7 @@
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import type { TourTournament } from '../../hooks/useTourHubData';
-import { INK_TINT_07 } from '../../_shared/tokens';
+import { AMBER, INK, INK_FAINT, INK_MUTE, INK_TINT_07, SURFACE } from '../../_shared/tokens';
 
 interface CourseInfoCardProps {
   tournament: TourTournament;
