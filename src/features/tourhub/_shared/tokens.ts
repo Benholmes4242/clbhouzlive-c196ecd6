@@ -97,6 +97,10 @@ export const SCORE_OVER_PAR_LIGHT = '#9F1D1D';
 export const SCORE_OVER_PAR_LIGHT_TINT = 'rgba(159,29,29,0.14)';
 export const SCORE_UNDER_PAR_DARK = '#4ADE80';
 export const SCORE_OVER_PAR_DARK = '#F87171';
+// Pale variants for use on heavier-dark backgrounds (e.g. ticker marquee) where
+// the standard DARK variants don't lift enough. Tailwind green-300 / red-300.
+export const SCORE_UNDER_PAR_DARK_PALE = '#86EFAC';          // Tailwind green-300 — pale under-par on heavy-dark bg
+export const SCORE_OVER_PAR_DARK_PALE = '#FCA5A5';           // Tailwind red-300 — pale over-par on heavy-dark bg
 
 // ============================================================================
 // STATUS (live indicator dot — NOT a verdict)
