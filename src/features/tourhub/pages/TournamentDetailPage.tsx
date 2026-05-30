@@ -113,7 +113,7 @@ export function TournamentDetailPage() {
     return (
       <TourHubShell immersive={true}>
         {/* Slate masthead skeleton */}
-        <div style={{ background: '#0A0E14', padding: '16px 16px 0' }} className="animate-pulse">
+        <div style={{ background: SHELL_BG, padding: '16px 16px 0' }} className="animate-pulse">
           {/* Pills row */}
           <div style={{ display: 'flex', gap: 6, marginBottom: 60 }}>
             <div style={{ height: 22, width: 88, background: WHITE_ALPHA_10, borderRadius: 6 }} />
