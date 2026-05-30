@@ -77,6 +77,18 @@ export const GOLD_BORDER = 'rgba(255,184,0,0.32)';
 export const GOLD_GLOW = '0 0 24px rgba(255,184,0,0.10), 0 1px 3px rgba(0,0,0,0.04)';
 
 // ============================================================================
+// LEADER_GOLD (hero leaderboard #1 row tint — distinct from celebratory GOLD)
+// ============================================================================
+// More yellow-toned than canonical GOLD (#FFB800). Used specifically for the #1
+// leader row tinting in HybridHero — gold-on-dark visual lift without competing
+// with finished-event GOLD trophy moments. Reserved for leaderboard row tinting;
+// not a general-purpose gold.
+export const LEADER_GOLD = '#FBBC2E';                        // hero leader-row tint base
+export const LEADER_GOLD_DARK = '#D4A017';                   // text/icon-readable variant
+export const LEADER_GOLD_TINT_7 = 'rgba(251,188,46,0.07)';   // soft leader tint (live state)
+export const LEADER_GOLD_TINT_10 = 'rgba(251,188,46,0.10)';  // medium leader tint (results state)
+
+// ============================================================================
 // SCORE (verdict — under/over par; theme-aware)
 // ============================================================================
 export const SCORE_UNDER_PAR_LIGHT = '#059669';
