@@ -6,6 +6,7 @@
 
 import React from 'react';
 import { INK } from '../HybridHero.constants';
+import { STATUS_LIVE, AMBER } from '../../../_shared/tokens';
 import type { HeroState } from '../HybridHero.utils';
 
 interface SignatureFooterProps {
