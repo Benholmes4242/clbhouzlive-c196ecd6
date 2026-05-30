@@ -62,15 +62,15 @@ function MetricCompareRow({ label, value1, value2, format = String, lowerIsBette
         </span>
         {isTied ? (
           <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', flexShrink: 0 }}>
-            <span style={{ padding: '2px 6px', borderRadius: '4px', background: INK_TINT_06, fontSize: '9px', fontWeight: 800, color: '#0F172A', letterSpacing: '0.14em' }}>
+            <span style={{ padding: '2px 6px', borderRadius: '4px', background: INK_TINT_06, fontSize: '9px', fontWeight: 800, color: INK, letterSpacing: '0.14em' }}>
               TIED
             </span>
-            <span style={{ fontSize: '11px', fontWeight: 800, color: '#94A3B8', letterSpacing: '0.14em', textTransform: 'uppercase' as const, whiteSpace: 'nowrap' as const }}>
+            <span style={{ fontSize: '11px', fontWeight: 800, color: INK_FAINT, letterSpacing: '0.14em', textTransform: 'uppercase' as const, whiteSpace: 'nowrap' as const }}>
               {label}
             </span>
           </span>
         ) : (
-          <span style={{ fontSize: '11px', fontWeight: 800, color: '#94A3B8', letterSpacing: '0.14em', textTransform: 'uppercase' as const, whiteSpace: 'nowrap' as const, flexShrink: 0 }}>
+          <span style={{ fontSize: '11px', fontWeight: 800, color: INK_FAINT, letterSpacing: '0.14em', textTransform: 'uppercase' as const, whiteSpace: 'nowrap' as const, flexShrink: 0 }}>
             {label}
           </span>
         )}
