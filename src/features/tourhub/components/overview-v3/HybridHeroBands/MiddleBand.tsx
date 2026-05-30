@@ -4,6 +4,7 @@
  */
 
 import React from 'react';
+import { MapPin } from 'lucide-react';
 import type { HeroState, TickerRow, TopTie } from '../HybridHero.utils';
 import { Ticker } from './Ticker';
 import { ChampionStrip, CancelledStrip, PlayoffStrip } from './ChampionStrip';
@@ -81,7 +82,7 @@ export function MiddleBand({
       );
     }
     if (champion) {
-      const eyebrow = state.variant === 'playoff' ? '🏆 CHAMPION · PLAYOFF' : '🏆 CHAMPION';
+      const eyebrow = state.variant === 'playoff' ? 'CHAMPION · PLAYOFF' : 'CHAMPION';
       return (
         <ChampionStrip
           name={champion.name}
@@ -96,7 +97,7 @@ export function MiddleBand({
       );
     }
 
-    return <ChampionStrip name="Result pending" score="—" eyebrow="🏆 CHAMPION" />;
+    return <ChampionStrip name="Result pending" score="—" eyebrow="CHAMPION" />;
   }
 
   // Upcoming — 4-level fallback chain (Polish Patch §4.5)
@@ -108,7 +109,7 @@ export function MiddleBand({
         country={defendingChamp.country}
         score={defendingChamp.score}
         scoreLabel={defendingChamp.year}
-        eyebrow="🏆 DEFENDING"
+        eyebrow="DEFENDING"
       />
     );
   }
@@ -144,5 +145,5 @@ export function MiddleBand({
       />
     );
   }
-  return <ChampionStrip name="Tournament Preview" score="›" scoreLabel="" eyebrow="📍 PREVIEW" />;
+  return <ChampionStrip name="Tournament Preview" score="›" scoreLabel="" eyebrow="PREVIEW" eyebrowIcon={MapPin} />;
 }

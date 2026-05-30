@@ -5,6 +5,8 @@
  */
 
 import React from 'react';
+import { Trophy } from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
 import { INK, GOLD, NUMERIC_STYLE, STRIP_HEIGHT } from '../HybridHero.constants';
 import { TrajectorySparkline } from './TrajectorySparkline';
 
@@ -14,6 +16,7 @@ interface ChampionStripProps {
   score: string;
   scoreLabel?: string;
   eyebrow?: string;
+  eyebrowIcon?: LucideIcon;
   /** Optional avatar URL — when missing, render a gradient placeholder */
   avatarUrl?: string | null;
   /** Pass 3: per-round scores for the winner's trajectory sparkline. */
@@ -48,7 +51,8 @@ export function ChampionStrip({
   country,
   score,
   scoreLabel = 'TO PAR',
-  eyebrow = '🏆 CHAMPION',
+  eyebrow = 'CHAMPION',
+  eyebrowIcon: EyebrowIcon = Trophy,
   avatarUrl,
   rounds,
   par,
@@ -91,8 +95,12 @@ export function ChampionStrip({
                 letterSpacing: '0.18em',
                 color: GOLD,
                 textTransform: 'uppercase',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 5,
               }}
             >
+              <EyebrowIcon size={10} color={GOLD} strokeWidth={2.5} />
               {eyebrow}
             </span>
             {country && (
@@ -261,8 +269,18 @@ export function PlayoffStrip({ count, score }: PlayoffStripProps) {
         ))}
       </div>
       <div style={{ flex: 1, minWidth: 0, position: 'relative' }}>
-        <div style={{ fontSize: 9, fontWeight: 800, letterSpacing: '0.18em', color: GOLD, marginBottom: 2 }}>
-          🏆 AWAITING PLAYOFF
+        <div style={{
+          fontSize: 9,
+          fontWeight: 800,
+          letterSpacing: '0.18em',
+          color: GOLD,
+          marginBottom: 2,
+          display: 'inline-flex',
+          alignItems: 'center',
+          gap: 5,
+        }}>
+          <Trophy size={10} color={GOLD} strokeWidth={2.5} />
+          AWAITING PLAYOFF
         </div>
         <div style={{ fontSize: 17, fontWeight: 800, color: 'white', letterSpacing: '-0.01em' }}>
           {count} tied at the top

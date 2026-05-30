@@ -5,10 +5,10 @@
  */
 
 import React from 'react';
+import { Trophy } from 'lucide-react';
 import { INK, AMBER, NUMERIC_STYLE } from '../HybridHero.constants';
+import { LEADER_GOLD as GOLD } from '../../../_shared/tokens';
 import { getFlagCode } from '@/utils/countryFlags';
-
-const GOLD = '#FBBC2E';
 
 function countryToFlag(country: string | null | undefined): string {
   const code = getFlagCode(country ?? undefined);
@@ -154,9 +154,13 @@ export function ResultBand({
               color: GOLD,
               textTransform: 'uppercase',
               marginBottom: 4,
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 5,
             }}
           >
-            🏆 CHAMPION
+            <Trophy size={10} color={GOLD} strokeWidth={2.5} />
+            CHAMPION
           </div>
           <div
             style={{

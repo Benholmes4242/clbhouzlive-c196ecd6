@@ -4,7 +4,9 @@
  */
 
 import React from 'react';
+import { ChevronRight } from 'lucide-react';
 import { INK_15, AMBER, NUMERIC_STYLE } from '../HybridHero.constants';
+import { SLATE_50, INK, FONT } from '../../../_shared/tokens';
 import { getFlagCode } from '@/utils/countryFlags';
 
 function countryToFlag(country: string | null | undefined): string {
@@ -53,7 +55,7 @@ export function TopThreePeek({ rows, onFullLeaderboardTap }: TopThreePeekProps) 
   const peek = rows.slice(0, 3);
 
   return (
-    <div style={{ background: '#F8FAFC' }}>
+    <div style={{ background: SLATE_50 }}>
       <div
         style={{
           padding: '14px 20px 8px',
@@ -87,10 +89,13 @@ export function TopThreePeek({ rows, onFullLeaderboardTap }: TopThreePeekProps) 
             textTransform: 'uppercase',
             cursor: 'pointer',
             padding: 0,
-            fontFamily: 'inherit',
+            fontFamily: FONT,
           }}
         >
-          FULL LEADERBOARD ›
+          <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+            FULL LEADERBOARD
+            <ChevronRight size={11} strokeWidth={2.5} color="currentColor" />
+          </span>
         </button>
       </div>
 
@@ -128,7 +133,7 @@ export function TopThreePeek({ rows, onFullLeaderboardTap }: TopThreePeekProps) 
                   minWidth: 0,
                   fontSize: 13,
                   fontWeight: 600,
-                  color: '#0F172A',
+                  color: INK,
                   whiteSpace: 'nowrap',
                   overflow: 'hidden',
                   textOverflow: 'ellipsis',
@@ -145,7 +150,7 @@ export function TopThreePeek({ rows, onFullLeaderboardTap }: TopThreePeekProps) 
                   ...NUMERIC_STYLE,
                   fontSize: 14,
                   fontWeight: 700,
-                  color: '#0F172A',
+                  color: INK,
                   flexShrink: 0,
                 }}
               >
