@@ -25,9 +25,9 @@ interface TrajectorySparklineProps {
 }
 
 const COLOURS = {
-  climbed: '#10B981',
+  climbed: TREND_UP,        // green — ascending trajectory over rounds
   steady: 'rgba(15,23,42,0.5)',
-  faded: '#DC2626',
+  faded: TREND_DOWN,        // red — descending trajectory over rounds
 } as const;
 
 const SIZING = {
