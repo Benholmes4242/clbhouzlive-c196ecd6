@@ -65,7 +65,7 @@ function TournamentTabsShellRowInner({ activeTab, onChange }: Props) {
                 padding: '0 4px',
                 fontSize: 14,
                 fontWeight: isActive ? 700 : 600,
-                color: isActive ? '#FFFFFF' : WHITE_ALPHA_55,
+                color: isActive ? SURFACE : WHITE_ALPHA_55,
                 background: 'transparent',
                 border: 'none',
                 letterSpacing: '-0.005em',
