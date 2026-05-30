@@ -11,7 +11,7 @@ import { MovementIndicator } from '../shared/MovementIndicator';
 import { RecentResultPill } from '../shared/RecentResultPill';
 import type { PlayerSortType } from './PlayerSortControl';
 import type { RecentResult } from '../../hooks/useRecentPlayerResults';
-import { INK_TINT_06, INK_TINT_07 } from '../../_shared/tokens';
+import { AMBER, AMBER_SOFT_BG, INK, INK_FAINT, INK_MUTE, INK_TINT_06, INK_TINT_07, LIVE_INK } from '../../_shared/tokens';
 
 interface PlayerCardV2Props {
   player: {
