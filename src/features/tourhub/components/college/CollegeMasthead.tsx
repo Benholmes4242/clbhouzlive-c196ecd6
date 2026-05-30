@@ -24,6 +24,18 @@ import {
   captainShortName,
   formatCaptainEarnings,
 } from '../../utils/captainAnchor';
+import {
+  AMBER,
+  GOLD,
+  GOLD_BORDER,
+  GOLD_DEEP,
+  GOLD_TINT,
+  GOLD_TINT_10,
+  INK,
+  INK_MUTE,
+  SLATE_50,
+  SURFACE,
+} from '../../_shared/tokens';
 
 type ActiveMetric = 'earnings' | 'wins' | 'top10s' | 'movers';
 
