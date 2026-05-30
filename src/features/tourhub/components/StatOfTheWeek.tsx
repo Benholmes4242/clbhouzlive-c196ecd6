@@ -113,7 +113,7 @@ function StatWatchSkeleton({ scopeLabel }: { scopeLabel: string }) {
       </div>
       <div
         style={{
-          background: '#fff',
+          background: SURFACE,
           borderRadius: 16,
           border: `1px solid ${HAIRLINE_INK_10}`,
           padding: '16px 18px 18px',
@@ -138,7 +138,7 @@ function StatWatchSkeleton({ scopeLabel }: { scopeLabel: string }) {
             <div
               key={i}
               style={{
-                background: '#fff',
+                background: SURFACE,
                 border: `1px solid ${HAIRLINE_INK_10}`,
                 borderRadius: 10,
                 padding: 10,
@@ -278,7 +278,7 @@ export const StatOfTheWeek = memo(function StatOfTheWeek() {
 
         <div
           style={{
-            background: '#fff',
+            background: SURFACE,
             borderRadius: 16,
             border: `1px solid ${HAIRLINE_INK_10}`,
             boxShadow: '0 1px 0 rgba(0,0,0,0.02)',
@@ -308,13 +308,13 @@ export const StatOfTheWeek = memo(function StatOfTheWeek() {
                 height: 18,
                 borderRadius: 4,
                 background: AMBER,
-                color: '#fff',
+                color: SURFACE,
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
               }}
             >
-              <Icon size={11} color="#fff" strokeWidth={2.5} />
+              <Icon size={11} color={SURFACE} strokeWidth={2.5} />
             </span>
             <span
               style={{
@@ -535,7 +535,7 @@ export const StatOfTheWeek = memo(function StatOfTheWeek() {
                   <div
                     key={`${p.playerId}-${idx}`}
                     style={{
-                      background: '#fff',
+                      background: SURFACE,
                       border: `1px solid ${HAIRLINE_INK_10}`,
                       borderRadius: 10,
                       padding: 10,
@@ -671,7 +671,7 @@ export const StatOfTheWeek = memo(function StatOfTheWeek() {
                           border: isActive
                             ? `1.5px solid ${AMBER}`
                             : `1px solid ${HAIRLINE_INK_10}`,
-                          background: isActive ? 'rgba(247,147,30,0.08)' : '#ffffff',
+                          background: isActive ? AMBER_TINT_8 : SURFACE,
                           cursor: 'pointer',
                           textAlign: 'left',
                           width: '100%',
