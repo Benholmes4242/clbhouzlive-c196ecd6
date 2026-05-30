@@ -17,7 +17,7 @@ import { titleCaseCountry } from '../../utils/countryFlags';
 import CountryFlag from '@/components/ui/country-flag';
 import type { TourPlayer, TourPlayerStatistics } from '../../hooks/useTourHubData';
 import { usePlayerState } from '../../hooks/usePlayerState';
-import { truncateName } from '../../utils/truncateName';
+
 import { splitStatValue } from '../../utils/splitStatValue';
 import {
   AMBER,
@@ -54,28 +54,27 @@ function chooseHeroStat(
   playerStats: TourPlayerStatistics | null,
   playerState: ReturnType<typeof usePlayerState>,
 ): { primary: string } {
-  // 1. Live tournament
+  // 1. Live tournament score (genuinely "right now", not a duplicate of form)
   if (playerState.state === 'live' && playerState.liveData) {
     const ld = playerState.liveData;
     const round = ld.currentRound ? ` · R${ld.currentRound}` : '';
     return { primary: `${ld.scoreText}${round}` };
   }
 
-  // 2. Recent finish (within 14 days, per usePlayerState window)
-  // Big-stat slot is for SHORT scalar values only. Context already lives in
-  // the caption row above, so we don't repeat it here — prevents overflow.
-  if (playerState.state === 'recent' && playerState.recentData) {
-    return { primary: playerState.recentData.label };
-  }
-
-  // 3. Season earnings
-  if (playerStats?.earnings && playerStats.earnings > 0) {
-    return { primary: `${formatEarnings(playerStats.earnings)} earned` };
-  }
-
-  // 4. World rank fallback
+  // 2. World rank — stable, identifying, never wraps
   if (playerStats?.world_rank && playerStats.world_rank > 0) {
-    return { primary: `World #${playerStats.world_rank}` };
+    return { primary: `#${playerStats.world_rank}` };
+  }
+
+  // 3. SG: total (season form, scalar)
+  if (playerStats?.strokes_gained_total != null) {
+    const v = playerStats.strokes_gained_total;
+    return { primary: `${v > 0 ? '+' : ''}${v.toFixed(2)}` };
+  }
+
+  // 4. Season earnings
+  if (playerStats?.earnings && playerStats.earnings > 0) {
+    return { primary: formatEarnings(playerStats.earnings) };
   }
 
   // 5. Age fallback
@@ -107,53 +106,25 @@ export function PlayerHero({ player, playerStats }: PlayerHeroProps) {
   const heroStat = chooseHeroStat(player, playerStats, playerState);
   const { integer: heroStatInteger, decimal: heroStatDecimal, suffix: heroStatSuffix } = splitStatValue(heroStat.primary);
 
-  // Stat label per state (Q3 decision).
+  // Stat label per state (matches chooseHeroStat chain).
   const heroStatLabel = (() => {
     switch (playerState.state) {
       case 'live': return 'LIVE SCORE';
-      case 'recent': return 'LAST FINISH';
-      case 'inform':
-      case 'inactive':
-        if (playerStats?.earnings && playerStats.earnings > 0) {
-          return `EARNED ${new Date().getFullYear()}`;
-        }
-        if (worldRank) return 'WORLD RANKING';
+      default:
+        if (worldRank) return 'WORLD RANK';
+        if (playerStats?.strokes_gained_total != null) return 'SG: TOTAL';
+        if (playerStats?.earnings && playerStats.earnings > 0) return `EARNED ${new Date().getFullYear()}`;
         if (age) return 'AGE';
         return 'PROFILE';
     }
   })();
 
-  // Caption row composition (3 items max).
-  // Priority: WORLD #N (rank) → AGE NN → state-specific 3rd item.
+  // Caption row composition — two stable identifiers only.
   const captionMetadata: string[] = (() => {
     const items: string[] = [];
-
     items.push(worldRank ? `WORLD #${worldRank}` : 'PLAYER');
-
     if (age) items.push(`AGE ${age}`);
-
-    switch (playerState.state) {
-      case 'live': {
-        const ld = playerState.liveData!;
-        items.push(`LIVE · ${ld.scoreText} AT ${truncateName(ld.tournamentName, 18).toUpperCase()}`);
-        break;
-      }
-      case 'recent': {
-        const rd = playerState.recentData!;
-        items.push(rd.context ? `${rd.label.toUpperCase()} · ${truncateName(rd.context, 18).toUpperCase()}` : rd.label.toUpperCase());
-        break;
-      }
-      case 'inform': {
-        items.push(`${playerState.eventsLast12mo} STARTS LAST 12 MO`);
-        break;
-      }
-      case 'inactive': {
-        items.push(`LAST PLAYED ${playerState.inactiveData!.lastEventLabel.toUpperCase()}`);
-        break;
-      }
-    }
-
-    return items.slice(0, 3);
+    return items;
   })();
 
   return (
@@ -164,8 +135,8 @@ export function PlayerHero({ player, playerStats }: PlayerHeroProps) {
         padding: 'max(env(safe-area-inset-top, 0px), 47px) 0 14px',
       }}
     >
-      {/* Section header (canonical §2) */}
-      <div style={{ padding: '0 16px 14px' }}>
+      {/* Section header (canonical §2) — eyebrow only */}
+      <div style={{ padding: '0 16px 8px' }}>
         <button
           type="button"
           onClick={() => navigate('/tourhub?tab=players', { replace: true })}
@@ -178,7 +149,6 @@ export function PlayerHero({ player, playerStats }: PlayerHeroProps) {
             display: 'inline-flex',
             alignItems: 'center',
             gap: 6,
-            marginBottom: 6,
           }}
         >
           <UserCircle size={13} strokeWidth={2.5} color={AMBER} />
@@ -195,37 +165,6 @@ export function PlayerHero({ player, playerStats }: PlayerHeroProps) {
           </span>
           <ChevronRight size={11} strokeWidth={2.5} color={AMBER} />
         </button>
-
-        <h1
-          style={{
-            fontSize: 24,
-            fontWeight: 800,
-            color: INK,
-            letterSpacing: '-0.025em',
-            lineHeight: 1.15,
-            margin: 0,
-          }}
-        >
-          Player Profile
-        </h1>
-
-        <div
-          style={{
-            marginTop: 8,
-            fontSize: 13,
-            fontWeight: 700,
-            color: INK,
-            letterSpacing: '-0.005em',
-            lineHeight: 1.3,
-          }}
-        >
-          {[
-            player.tour_codes && player.tour_codes.length > 0
-              ? `Tours ${player.tour_codes.map(c => c.toUpperCase()).join(' · ')}`
-              : null,
-            countryDisplay,
-          ].filter(Boolean).join(' · ')}
-        </div>
       </div>
 
       {/* Player champion card */}
@@ -267,8 +206,8 @@ export function PlayerHero({ player, playerStats }: PlayerHeroProps) {
           <div style={{ position: 'relative', flexShrink: 0 }}>
             <div
               style={{
-                width: 80,
-                height: 80,
+                width: 84,
+                height: 84,
                 borderRadius: '34%',
                 overflow: 'hidden',
                 background: SLATE_100,
@@ -315,19 +254,16 @@ export function PlayerHero({ player, playerStats }: PlayerHeroProps) {
             <div style={{ minWidth: 0, flex: 1 }}>
               <div
                 style={{
-                  fontSize: 22,
+                  fontSize: 25,
                   fontWeight: 800,
                   color: INK,
-                  letterSpacing: '-0.025em',
-                  lineHeight: 1.1,
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis',
-                  whiteSpace: 'nowrap',
+                  letterSpacing: '-0.03em',
+                  lineHeight: 1.05,
                 }}
               >
                 {player.full_name}
               </div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 5, marginTop: 4 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 5, marginTop: 6 }}>
                 <CountryFlag country={player.country_code || player.country} size="sm" />
                 {countryDisplay && (
                   <span style={{ fontSize: 12, fontWeight: 600, color: INK_MUTE }}>{countryDisplay}</span>
@@ -338,10 +274,10 @@ export function PlayerHero({ player, playerStats }: PlayerHeroProps) {
             <div style={{ flexShrink: 0, textAlign: 'right' as const }}>
               <div
                 style={{
-                  fontSize: 22,
+                  fontSize: 30,
                   fontWeight: 800,
                   color: INK,
-                  letterSpacing: '-0.02em',
+                  letterSpacing: '-0.03em',
                   lineHeight: 1,
                   fontVariantNumeric: 'tabular-nums',
                   whiteSpace: 'nowrap',

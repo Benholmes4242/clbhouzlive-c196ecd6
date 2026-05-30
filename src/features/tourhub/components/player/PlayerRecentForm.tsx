@@ -171,18 +171,21 @@ export function FormSection({ playerId }: FormSectionProps) {
 
   if (isLoading) return null;
 
-  // Slice to the most recent 4 (D17).
+  // Slice to the most recent 4 for the labelled dot strip (D17).
   const visible = (results ?? []).slice(0, 4);
+  // Widen trend window to last 10 for sparkline + verdict + avg.
+  const trend = (results ?? []).slice(0, 10);
 
   // Branch 0 — 0 events: render nothing (D9). Career Highlights deferred.
   if (visible.length === 0) return null;
 
-  // For the trend label and sparkline, use only "real finishes" (exclude
-  // CUT/WD/DQ/MC where position is meaningless).
-  const finishedRows = visible.filter((r) => {
+  // Shared "real finish" predicate (exclude CUT/WD/DQ/MC).
+  const isFinished = (r: PlayerTournamentResult) => {
     const s = r.status?.toUpperCase();
     return r.position !== null && s !== 'CUT' && s !== 'WD' && s !== 'DQ' && s !== 'MC';
-  });
+  };
+  const finishedRows = visible.filter(isFinished);     // gates the 1–2 event fallback
+  const trendFinishes = trend.filter(isFinished);      // drives sparkline/verdict/avg
 
   // Branch 1 — 1-2 events: dot strip only, no sparkline, no label.
   // This branch also handles "all 4 were missed cuts" by treating it as 1-2 quality data.
@@ -214,8 +217,8 @@ export function FormSection({ playerId }: FormSectionProps) {
     );
   }
 
-  // Branch 2 — ≥3 finished events: full card.
-  const positions = finishedRows.map((r) => r.position!);
+  // Branch 2 — ≥3 finished events: full card. Trend uses up to 10 events.
+  const positions = trendFinishes.map((r) => r.position!);
   const avgPos = Math.round(
     positions.reduce((sum, p) => sum + p, 0) / positions.length,
   );
@@ -243,7 +246,7 @@ export function FormSection({ playerId }: FormSectionProps) {
             textTransform: 'uppercase' as const,
           }}
         >
-          Form · last {visible.length} events
+          Form · last {Math.min(10, trend.length)} events
         </span>
       </div>
 
@@ -277,7 +280,7 @@ export function FormSection({ playerId }: FormSectionProps) {
           </div>
         </div>
         <div style={{ flex: 1, minWidth: 80, maxWidth: 160 }}>
-          <Sparkline positions={positions} />
+          <Sparkline positions={positions.slice().reverse()} />
         </div>
       </div>
 
