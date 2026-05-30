@@ -793,10 +793,10 @@ export function PlayersTab() {
         {/* Count+sort bar OR search input — mutually exclusive (Phase 1 fix.1.7) */}
         {!searchExpanded ? (
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '8px 16px', gap: 8 }}>
-            <span style={{ fontSize: 9, fontWeight: 800, color: '#0F172A', letterSpacing: '0.16em', fontVariantNumeric: 'tabular-nums' }}>
+            <span style={{ fontSize: 9, fontWeight: 800, color: INK, letterSpacing: '0.16em', fontVariantNumeric: 'tabular-nums' }}>
               {totalCount.toLocaleString()} {totalCount === 1 ? 'PLAYER' : 'PLAYERS'}
             </span>
-            <span style={{ fontSize: 9, fontWeight: 800, color: '#64748B', letterSpacing: '0.14em' }}>
+            <span style={{ fontSize: 9, fontWeight: 800, color: INK_MUTE, letterSpacing: '0.14em' }}>
               SORTED BY {getSortShortLabel(sort, activeTour).toUpperCase()}
             </span>
           </div>
