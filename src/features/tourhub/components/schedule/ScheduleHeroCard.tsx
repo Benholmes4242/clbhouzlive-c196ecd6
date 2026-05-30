@@ -199,7 +199,7 @@ export function ScheduleHeroCard({ tournament, type, leaderWinner, currentIndex 
                       </button>
                       <span
                         className="score-mono"
-                        style={{ fontSize: '17px', fontWeight: 700, color: getFinishedScoreColor(winner.score), flexShrink: 0 }}
+                        style={{ fontSize: '17px', fontWeight: 700, color: getScoreColor(winner.score, 'dark', 'standard'), flexShrink: 0 }}
                       >
                         {winner.displayScore}
                       </span>
@@ -366,7 +366,7 @@ export function ScheduleHeroCard({ tournament, type, leaderWinner, currentIndex 
                         {/* B44 FIX 5: score color */}
                         <span
                           className="score-mono"
-                          style={{ fontSize: '18px', fontWeight: 800, color: getFinishedScoreColor(leaderWinner.score), flexShrink: 0 }}
+                          style={{ fontSize: '18px', fontWeight: 800, color: getScoreColor(leaderWinner.score, 'dark', 'standard'), flexShrink: 0 }}
                         >
                           {leaderWinner.displayScore}
                         </span>
@@ -387,7 +387,7 @@ export function ScheduleHeroCard({ tournament, type, leaderWinner, currentIndex 
                     <span style={{ fontSize: '12px', fontWeight: 500, color: 'rgba(255,255,255,0.5)' }}>
                       T{leaderWinner.topFinishers[0].position} {leaderWinner.topFinishers[0].displayName}
                     </span>
-                    <span style={{ fontSize: '12px', fontWeight: 700, color: getFinishedScoreColor(leaderWinner.topFinishers[0].score) }}>
+                    <span style={{ fontSize: '12px', fontWeight: 700, color: getScoreColor(leaderWinner.topFinishers[0].score, 'dark', 'standard') }}>
                       {leaderWinner.topFinishers[0].displayScore}
                     </span>
                   </div>
