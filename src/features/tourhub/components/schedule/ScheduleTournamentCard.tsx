@@ -262,7 +262,7 @@ export function ScheduleTournamentCard({
               style={{
                 fontWeight: 800,
                 marginLeft: 2,
-                color: getScoreColor(leaderWinner!.score),
+                color: getScoreColor(leaderWinner!.score, 'light', 'standard'),
                 fontVariantNumeric: 'tabular-nums',
               }}
             >
