@@ -308,18 +308,18 @@ function HoleStatsBody({
         <>
           {frontNine.length > 0 && <NineHeader label="Front Nine" />}
           {frontNine.map(h => (
-            <HoleStatRow key={h.holeNumber} hole={h} maxAvg={maxAvg} hardestNumber={hardestNumber} easiestNumber={easiestNumber} />
+            <HoleStatRow key={h.holeNumber} hole={h} avgRange={avgRange} hardestNumber={hardestNumber} easiestNumber={easiestNumber} />
           ))}
           {backNine.length > 0 && <NineHeader label="Back Nine" />}
           {backNine.map(h => (
-            <HoleStatRow key={h.holeNumber} hole={h} maxAvg={maxAvg} hardestNumber={hardestNumber} easiestNumber={easiestNumber} />
+            <HoleStatRow key={h.holeNumber} hole={h} avgRange={avgRange} hardestNumber={hardestNumber} easiestNumber={easiestNumber} />
           ))}
         </>
       ) : (
         [...processedHoles]
           .sort((a, b) => b.avgDiff - a.avgDiff)
           .map(h => (
-            <HoleStatRow key={h.holeNumber} hole={h} maxAvg={maxAvg} hardestNumber={hardestNumber} easiestNumber={easiestNumber} />
+            <HoleStatRow key={h.holeNumber} hole={h} avgRange={avgRange} hardestNumber={hardestNumber} easiestNumber={easiestNumber} />
           ))
       )}
 
