@@ -48,7 +48,9 @@ export const SLATE_800 = '#1e293b';                          // Tailwind slate-8
 // HAIRLINE (divider variants)
 // ============================================================================
 export const HAIRLINE_INK_7 = 'rgba(15,23,42,0.07)';
+export const HAIRLINE_INK_8 = 'rgba(15,23,42,0.08)';         // hairline/faint bg fill — 15 cross-app files
 export const HAIRLINE_INK_10 = 'rgba(15,23,42,0.10)';
+export const HAIRLINE_INK_12 = 'rgba(15,23,42,0.12)';        // cut-line / section divider hairline — 7 cross-app files
 export const HAIRLINE_INK_15 = 'rgba(15,23,42,0.15)';        // section divider on light bg with stronger emphasis
 
 // ============================================================================
@@ -86,6 +88,7 @@ export const WHITE_ALPHA_65 = 'rgba(255,255,255,0.65)';      // secondary text o
 // Use for: faint placeholder backgrounds, hairline borders on light surfaces.
 // Phase 10 will sweep all cross-app sites.
 export const INK_TINT_02 = 'rgba(15,23,42,0.02)';            // ultra-faint ink tint — column-header strip bg — 11 cross-app files
+export const INK_TINT_05 = 'rgba(15,23,42,0.05)';            // ultra-faint inline pill/skeleton bg — 11 cross-app files
 export const INK_TINT_06 = 'rgba(15,23,42,0.06)';            // light slate bg — placeholder containers, faint surfaces
 export const INK_TINT_07 = 'rgba(15,23,42,0.07)';            // light slate border — hairline dividers on light bg
 
@@ -156,6 +159,7 @@ export const STATUS_LIVE = '#10B981';
 export const LIVE_INK = '#047857';                           // readable LIVE green text on light bg (emerald-700) — high-contrast counterpart to STATUS_LIVE — 7 cross-app files
 export const STATUS_LIVE_TINT_10 = 'rgba(16,185,129,0.10)';  // LIVE pill faint green fill — 3 cross-app sites
 export const STATUS_LIVE_BORDER = 'rgba(16,185,129,0.32)';   // LIVE pill border — 2 cross-app sites
+export const LIVE_DOT = '#22C55E';                            // bright pulse-dot green (green-500) — animated LIVE indicators on light bg — 7 cross-app files
 
 
 // ============================================================================

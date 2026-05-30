@@ -8,7 +8,7 @@ import { motion } from 'framer-motion';
 import { RoundSelector } from './RoundSelector';
 import { EditorialEmpty } from './EditorialEmpty';
 import { useTourHoleStats } from '../../hooks/useTourHubData';
-import { FONT, INK_TINT_06, INK_TINT_07 } from '../../_shared/tokens';
+import { AMBER, FONT, HAIRLINE_INK_8, HAIRLINE_INK_10, INK, INK_FAINT, INK_MUTE, INK_TINT_02, INK_TINT_06, INK_TINT_07, SURFACE, TREND_DOWN } from '../../_shared/tokens';
 
 // Local hole-distribution ramp (mirrors src/features/courses/components/holes/_constants.ts).
 // Duplicated intentionally to keep tourhub self-contained — no cross-feature import.
@@ -47,7 +47,7 @@ interface ProcessedHole {
 
 function HoleStatsSkeleton() {
   return (
-    <div style={{ background: '#ffffff', borderTop: `1px solid ${INK_TINT_07}`, borderBottom: `1px solid ${INK_TINT_07}`, marginTop: '8px' }}>
+    <div style={{ background: SURFACE, borderTop: `1px solid ${INK_TINT_07}`, borderBottom: `1px solid ${INK_TINT_07}`, marginTop: '8px' }}>
       {/* Section rule skeleton */}
       <div className="animate-pulse" style={{ padding: '14px 20px 10px' }}>
         <div style={{ height: '9px', width: '180px', background: INK_TINT_06, borderRadius: '4px' }} />
@@ -62,7 +62,7 @@ function HoleStatsSkeleton() {
         ))}
       </div>
       {/* Column header skeleton */}
-      <div style={{ height: '28px', background: 'rgba(15,23,42,0.02)', borderBottom: `0.5px solid ${INK_TINT_07}` }} />
+      <div style={{ height: '28px', background: INK_TINT_02, borderBottom: `0.5px solid ${INK_TINT_07}` }} />
       {/* Hole rows */}
       {Array.from({ length: 9 }).map((_, i) => (
         <div key={i} className="animate-pulse" style={{ display: 'flex', alignItems: 'center', padding: '10px 20px', borderBottom: i < 8 ? `0.5px solid ${INK_TINT_07}` : 'none', gap: '8px' }}>
@@ -247,7 +247,7 @@ function HoleStatsBody({
   const easiestNumber = easiest?.holeNumber;
 
   return (
-    <div style={{ background: '#ffffff', borderTop: `1px solid ${INK_TINT_07}`, borderBottom: `1px solid ${INK_TINT_07}`, marginTop: 8, fontFamily: FONT }}>
+    <div style={{ background: SURFACE, borderTop: `1px solid ${INK_TINT_07}`, borderBottom: `1px solid ${INK_TINT_07}`, marginTop: 8, fontFamily: FONT }}>
       {/* Hardest / Easiest feature cards */}
       {showFeatureCards && (
         <div style={{ display: 'flex', gap: 10, padding: '14px 20px 6px' }}>
@@ -258,14 +258,14 @@ function HoleStatsBody({
 
       {/* Field-avg caption — preserves the FIELD AVG datum */}
       {hasRoundData && roundScoringAvg !== null && (
-        <div style={{ padding: showFeatureCards ? '0 20px 14px' : '14px 20px', fontSize: 11.5, fontWeight: 600, color: '#64748B' }}>
+        <div style={{ padding: showFeatureCards ? '0 20px 14px' : '14px 20px', fontSize: 11.5, fontWeight: 600, color: INK_MUTE }}>
           Field average {roundScoringAvg > 0 ? '+' : ''}{roundScoringAvg.toFixed(1)} vs par
         </div>
       )}
 
       {/* ALL HOLES header + sort toggle */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '8px 20px 10px', borderTop: `0.5px solid ${INK_TINT_07}` }}>
-        <span style={{ fontSize: 10.5, fontWeight: 800, color: '#F7931E', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>
+        <span style={{ fontSize: 10.5, fontWeight: 800, color: AMBER, letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>
           All Holes
         </span>
         <div style={{ display: 'inline-flex', alignItems: 'center', background: '#F1F5F9', border: '1px solid rgba(15,23,42,0.08)', borderRadius: 999, padding: 2 }}>
@@ -286,8 +286,8 @@ function HoleStatsBody({
                   fontWeight: 700,
                   letterSpacing: '-0.005em',
                   cursor: 'pointer',
-                  background: active ? '#0F172A' : 'transparent',
-                  color: active ? '#ffffff' : '#64748B',
+                  background: active ? INK : 'transparent',
+                  color: active ? SURFACE : INK_MUTE,
                   transition: 'background 200ms ease, color 200ms ease',
                 }}
               >
@@ -320,7 +320,7 @@ function HoleStatsBody({
 
       {/* Scoring key */}
       <div style={{ padding: '16px 20px 18px', borderTop: `0.5px solid ${INK_TINT_07}` }}>
-        <div style={{ fontSize: 10, fontWeight: 800, color: '#F7931E', letterSpacing: '0.16em', textTransform: 'uppercase' as const, marginBottom: 10 }}>
+        <div style={{ fontSize: 10, fontWeight: 800, color: AMBER, letterSpacing: '0.16em', textTransform: 'uppercase' as const, marginBottom: 10 }}>
           Scoring Key
         </div>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', rowGap: 8, columnGap: 16 }}>
@@ -343,8 +343,8 @@ function HoleStatsBody({
 
 function NineHeader({ label }: { label: string }) {
   return (
-    <div style={{ padding: '8px 20px', borderTop: `0.5px solid ${INK_TINT_07}`, background: 'rgba(15,23,42,0.02)' }}>
-      <span style={{ fontSize: 9, fontWeight: 800, color: '#64748B', letterSpacing: '0.14em', textTransform: 'uppercase' as const }}>
+    <div style={{ padding: '8px 20px', borderTop: `0.5px solid ${INK_TINT_07}`, background: INK_TINT_02 }}>
+      <span style={{ fontSize: 9, fontWeight: 800, color: INK_MUTE, letterSpacing: '0.14em', textTransform: 'uppercase' as const }}>
         {label}
       </span>
     </div>
@@ -388,7 +388,7 @@ function FeatureCard({ kind, hole }: { kind: 'hardest' | 'easiest'; hole: Proces
   const isHardest = kind === 'hardest';
   const tint   = isHardest ? 'rgba(153,27,27,0.06)' : 'rgba(247,147,30,0.07)';
   const border = isHardest ? 'rgba(153,27,27,0.18)' : 'rgba(247,147,30,0.22)';
-  const eyebrowColor = isHardest ? '#991B1B' : '#F7931E';
+  const eyebrowColor = isHardest ? '#991B1B' : AMBER;
   const playsTo = (hole.par + hole.avgDiff).toFixed(1);
   return (
     <div style={{ flex: 1, background: tint, border: `1px solid ${border}`, borderRadius: 12, padding: '12px 14px 14px' }}>
@@ -398,7 +398,7 @@ function FeatureCard({ kind, hole }: { kind: 'hardest' | 'easiest'; hole: Proces
       <div style={{ fontSize: 40, fontWeight: 300, letterSpacing: '-0.02em', color: INK_HOLE, lineHeight: 1, fontVariantNumeric: 'tabular-nums' }}>
         {hole.holeNumber}
       </div>
-      <div style={{ fontSize: 11.5, fontWeight: 600, color: '#64748B', marginTop: 4, marginBottom: 10 }}>
+      <div style={{ fontSize: 11.5, fontWeight: 600, color: INK_MUTE, marginTop: 4, marginBottom: 10 }}>
         Plays to {playsTo}
       </div>
       <DistributionBar dist={computeDist(hole)} />
@@ -415,19 +415,19 @@ function HoleStatRow({
   const avgLabel = hole.avgDiff > 0 ? `+${hole.avgDiff.toFixed(2)}` : hole.avgDiff.toFixed(2);
   const tag =
     hole.holeNumber === hardestNumber ? { l: 'Hardest', c: '#991B1B' as const } :
-    hole.holeNumber === easiestNumber ? { l: 'Easiest', c: '#F7931E' as const } :
+    hole.holeNumber === easiestNumber ? { l: 'Easiest', c: AMBER } :
     null;
   const rounds = hole.totalPlayers;
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column' as const, gap: 10, padding: '14px 20px', borderTop: `1px solid rgba(15,23,42,0.06)` }}>
+    <div style={{ display: 'flex', flexDirection: 'column' as const, gap: 10, padding: '14px 20px', borderTop: `1px solid ${INK_TINT_06}` }}>
       {/* Top line: squircle + meta + big avg */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
         <div style={{ width: 38, height: 38, borderRadius: '34%', background: '#F1F5F9', border: '1px solid rgba(15,23,42,0.08)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
           <span style={{ fontSize: 15, fontWeight: 700, color: INK_HOLE, fontVariantNumeric: 'tabular-nums' }}>{hole.holeNumber}</span>
         </div>
         <div style={{ flex: 1, minWidth: 0 }}>
-          <div style={{ fontSize: 11.5, fontWeight: 600, color: '#64748B' }}>
+          <div style={{ fontSize: 11.5, fontWeight: 600, color: INK_MUTE }}>
             Par {hole.par}
           </div>
           {tag && (
@@ -458,7 +458,7 @@ function HoleStatRow({
           <span style={{ color: C_DOUBLE }}>{dist.double_worse}%</span>
         </div>
         {rounds > 0 && (
-          <span style={{ fontSize: 11, color: '#64748B', fontWeight: 600 }}>
+          <span style={{ fontSize: 11, color: INK_MUTE, fontWeight: 600 }}>
             {rounds.toLocaleString()} round{rounds === 1 ? '' : 's'}
           </span>
         )}
