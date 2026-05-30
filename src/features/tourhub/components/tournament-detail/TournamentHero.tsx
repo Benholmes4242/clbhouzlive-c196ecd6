@@ -180,7 +180,7 @@ export function TournamentHero({ tournament, imageUrl, leader, leaderboard }: To
   );
 
   return (
-    <div style={{ background: '#0A0E14' }}>
+    <div style={{ background: SHELL_BG }}>
       {/* Full-bleed hero image with gradient */}
       <div
         style={{
