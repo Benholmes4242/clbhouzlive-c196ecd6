@@ -72,9 +72,11 @@ export function Ticker({ rows }: TickerProps) {
           height: '100%',
           display: 'flex',
           alignItems: 'center',
+          gap: 5,
         }}
       >
-        ↻ TOP 10
+        <RotateCw size={10} strokeWidth={2.5} color="rgba(255,255,255,0.50)" />
+        TOP 10
       </div>
       {/* Marquee track */}
       <div style={{ flex: 1, overflow: 'hidden', position: 'relative' }}>
