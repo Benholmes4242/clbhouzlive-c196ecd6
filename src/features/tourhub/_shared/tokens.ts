@@ -69,6 +69,7 @@ export const INK_ALPHA_60 = 'rgba(15,23,42,0.60)';           // heavier ink-alph
 // glass overlays, separator dots. Phase 10 will sweep all cross-app sites.
 export const WHITE_ALPHA_04 = 'rgba(255,255,255,0.04)';      // image placeholder bg
 export const WHITE_ALPHA_06 = 'rgba(255,255,255,0.06)';      // very faint divider/border on dark bg — 16 cross-app files
+export const WHITE_ALPHA_08 = 'rgba(255,255,255,0.08)';      // faint border on dark bg — 8 cross-app files
 export const WHITE_ALPHA_10 = 'rgba(255,255,255,0.10)';      // hairline border on dark bg
 export const WHITE_ALPHA_12 = 'rgba(255,255,255,0.12)';      // glass overlay border
 export const WHITE_ALPHA_18 = 'rgba(255,255,255,0.18)';      // inactive pill border on dark bg — 4 cross-app files
