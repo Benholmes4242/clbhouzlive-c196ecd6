@@ -49,7 +49,7 @@ export function H2HRivalStrip({ normalizedName, className }: H2HRivalStripProps)
   if (rivals.length === 0) return null;
 
   return (
-    <div className={className} style={{ background: '#fff', borderTop: `1px solid ${INK_TINT_07}`, borderBottom: `1px solid ${INK_TINT_07}`, marginTop: 8 }}>
+    <div className={className} style={{ background: SURFACE, borderTop: `1px solid ${INK_TINT_07}`, borderBottom: `1px solid ${INK_TINT_07}`, marginTop: 8 }}>
       <SectionHeader />
       <div
         style={{
