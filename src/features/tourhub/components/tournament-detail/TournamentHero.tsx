@@ -270,15 +270,15 @@ export function TournamentHero({ tournament, imageUrl, leader, leaderboard }: To
       </div>
 
       {/* 3-col stat grid on slate */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', borderTop: '0.5px solid rgba(255,255,255,0.08)' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', borderTop: `0.5px solid ${WHITE_ALPHA_08}` }}>
         {[
           { label: 'PURSE', value: formattedPurse ?? '—' },
           { label: 'PAR', value: tournament.venue_par ? `Par ${tournament.venue_par}` : '—' },
           { label: 'YARDS', value: tournament.venue_yardage ? `${tournament.venue_yardage.toLocaleString()}` : '—' },
         ].map((s, i) => (
-          <div key={s.label} style={{ padding: '9px 0 11px', textAlign: 'center' as const, borderRight: i < 2 ? '0.5px solid rgba(255,255,255,0.06)' : 'none' }}>
+          <div key={s.label} style={{ padding: '9px 0 11px', textAlign: 'center' as const, borderRight: i < 2 ? `0.5px solid ${WHITE_ALPHA_06}` : 'none' }}>
             <div style={{ fontSize: 9, fontWeight: 800, color: 'rgba(255,255,255,0.40)', letterSpacing: '0.16em', marginBottom: '3px' }}>{s.label}</div>
-            <div style={{ fontSize: 14, fontWeight: 800, color: '#ffffff', letterSpacing: '-0.025em', fontVariantNumeric: 'tabular-nums' }}>{s.value}</div>
+            <div style={{ fontSize: 14, fontWeight: 800, color: SURFACE, letterSpacing: '-0.025em', fontVariantNumeric: 'tabular-nums' }}>{s.value}</div>
           </div>
         ))}
       </div>
