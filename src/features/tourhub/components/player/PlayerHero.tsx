@@ -206,8 +206,8 @@ export function PlayerHero({ player, playerStats }: PlayerHeroProps) {
           <div style={{ position: 'relative', flexShrink: 0 }}>
             <div
               style={{
-                width: 80,
-                height: 80,
+                width: 84,
+                height: 84,
                 borderRadius: '34%',
                 overflow: 'hidden',
                 background: SLATE_100,
