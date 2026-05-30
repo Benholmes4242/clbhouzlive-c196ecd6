@@ -16,7 +16,6 @@ export interface CourseProfile {
   archetype: CourseArchetype;
   label: string;
   description: string;
-  icon: string;
   statWeights: {
     distance: number;
     accuracy: number;
@@ -27,7 +26,6 @@ export interface CourseProfile {
 }
 
 export interface PredictionReason {
-  icon: string;
   text: string;
   statKey?: string;
   statValue?: string;
@@ -62,7 +60,6 @@ export interface PlayerPrediction {
 export interface DarkHorse {
   player: PlayerPrediction;
   reason: string;
-  icon: string;
 }
 
 export interface TournamentPrediction {
@@ -140,7 +137,6 @@ export function classifyCourse(yardage: number, par: number, tournamentName: str
       archetype: 'major',
       label: 'Major Championship',
       description: 'Demands excellence in every facet of the game',
-      icon: '🏆',
       statWeights: { distance: 0.20, accuracy: 0.20, scrambling: 0.20, putting: 0.20, sgTotal: 0.20 }
     };
   }
@@ -151,7 +147,6 @@ export function classifyCourse(yardage: number, par: number, tournamentName: str
       archetype: 'bomber',
       label: "Bomber's Paradise",
       description: 'Long hitters have a significant advantage here',
-      icon: '💪',
       statWeights: { distance: 0.40, accuracy: 0.15, scrambling: 0.10, putting: 0.15, sgTotal: 0.20 }
     };
   }
@@ -162,7 +157,6 @@ export function classifyCourse(yardage: number, par: number, tournamentName: str
       archetype: 'precision',
       label: 'Precision Track',
       description: 'Tight fairways and small greens reward accuracy',
-      icon: '🎯',
       statWeights: { distance: 0.10, accuracy: 0.35, scrambling: 0.20, putting: 0.15, sgTotal: 0.20 }
     };
   }
@@ -173,7 +167,6 @@ export function classifyCourse(yardage: number, par: number, tournamentName: str
       archetype: 'scrambler',
       label: "Scrambler's Test",
       description: 'Short game wizardry wins here',
-      icon: '🛡️',
       statWeights: { distance: 0.10, accuracy: 0.20, scrambling: 0.35, putting: 0.20, sgTotal: 0.15 }
     };
   }
@@ -183,7 +176,6 @@ export function classifyCourse(yardage: number, par: number, tournamentName: str
     archetype: 'balanced',
     label: 'All-Around Test',
     description: 'Rewards well-rounded players',
-    icon: '⚖️',
     statWeights: { distance: 0.20, accuracy: 0.20, scrambling: 0.15, putting: 0.20, sgTotal: 0.25 }
   };
 }
@@ -377,12 +369,10 @@ function generateReasons(
   // World rank reason
   if (player.worldRank <= 5) {
     reasons.push({
-      icon: '👑',
       text: `World #${player.worldRank} - Elite tier player`,
     });
   } else if (player.worldRank <= 20) {
     reasons.push({
-      icon: '🏆',
       text: `World #${player.worldRank} - Championship caliber`,
     });
   }
@@ -390,7 +380,6 @@ function generateReasons(
   // Momentum reason - lowered threshold from 10 to 5
   if (player.momentum >= 5) {
     reasons.push({
-      icon: '🔥',
       text: `Hot form - up ${player.momentum} spots this week`,
     });
   }
@@ -398,7 +387,6 @@ function generateReasons(
   // Course fit reasons - lowered thresholds
   if (weights.distance >= 0.2 && (fieldRanks.drivingDistance[player.playerId] || 999) <= 10) {
     reasons.push({
-      icon: '💪',
       text: `#${fieldRanks.drivingDistance[player.playerId]} in driving distance`,
       statKey: 'drive_avg',
       statValue: `${player.stats.drivingDistance.toFixed(1)} yds`,
@@ -408,7 +396,6 @@ function generateReasons(
   
   if (weights.accuracy >= 0.2 && (fieldRanks.drivingAccuracy[player.playerId] || 999) <= 10) {
     reasons.push({
-      icon: '🎯',
       text: `#${fieldRanks.drivingAccuracy[player.playerId]} in driving accuracy`,
       statKey: 'drive_acc',
       statValue: `${player.stats.drivingAccuracy.toFixed(1)}%`,
@@ -418,7 +405,6 @@ function generateReasons(
   
   if (weights.scrambling >= 0.15 && (fieldRanks.scrambling[player.playerId] || 999) <= 10) {
     reasons.push({
-      icon: '🛡️',
       text: `#${fieldRanks.scrambling[player.playerId]} in scrambling`,
       statKey: 'scrambling_pct',
       statValue: `${player.stats.scrambling.toFixed(1)}%`,
@@ -428,7 +414,6 @@ function generateReasons(
   
   if ((fieldRanks.sgTotal[player.playerId] || 999) <= 5) {
     reasons.push({
-      icon: '📊',
       text: `#${fieldRanks.sgTotal[player.playerId]} in Strokes Gained Total`,
       statKey: 'strokes_gained_total',
       statValue: player.stats.sgTotal > 0 ? `+${player.stats.sgTotal.toFixed(2)}` : player.stats.sgTotal.toFixed(2),
@@ -442,7 +427,6 @@ function generateReasons(
   // SG Total fallback (if not already added and player has good SG)
   if (player.stats.sgTotal > 0.5 && !reasons.some(r => r.statKey === 'strokes_gained_total')) {
     fallbackReasons.push({
-      icon: '📊',
       text: `+${player.stats.sgTotal.toFixed(1)} strokes gained per round`,
     });
   }
@@ -450,7 +434,6 @@ function generateReasons(
   // Top 20 fallback (if not already covered by world rank)
   if (player.worldRank > 20 && player.worldRank <= 50 && !reasons.some(r => r.text.includes('World'))) {
     fallbackReasons.push({
-      icon: '🌍',
       text: `World #${player.worldRank} - Top 50 player`,
     });
   }
@@ -458,7 +441,6 @@ function generateReasons(
   // Putting fallback
   if ((fieldRanks.putting[player.playerId] || 999) <= 15) {
     fallbackReasons.push({
-      icon: '🎯',
       text: `#${fieldRanks.putting[player.playerId]} in putting this field`,
     });
   }
@@ -466,7 +448,6 @@ function generateReasons(
   // Strong scrambling fallback (lower threshold)
   if ((fieldRanks.scrambling[player.playerId] || 999) <= 20 && !reasons.some(r => r.statKey === 'scrambling_pct')) {
     fallbackReasons.push({
-      icon: '🛡️',
       text: `Top 20 scrambler in this field`,
     });
   }
@@ -474,7 +455,6 @@ function generateReasons(
   // Good distance fallback
   if ((fieldRanks.drivingDistance[player.playerId] || 999) <= 20 && !reasons.some(r => r.statKey === 'drive_avg')) {
     fallbackReasons.push({
-      icon: '💪',
       text: `Top 20 in driving distance`,
     });
   }
@@ -586,7 +566,6 @@ function selectDarkHorses(
     darkHorses.push({
       player: biggestMover,
       reason: `Biggest mover: up ${biggestMover.momentum} spots`,
-      icon: '🚀'
     });
   }
   
@@ -597,7 +576,6 @@ function selectDarkHorses(
     darkHorses.push({
       player: bestFitOutsider,
       reason: `Perfect course fit (${bestFitOutsider.courseFitScore}/100)`,
-      icon: '🎯'
     });
   }
   
@@ -609,7 +587,6 @@ function selectDarkHorses(
     darkHorses.push({
       player: hotFormOutsider,
       reason: 'Playing well above ranking',
-      icon: '🔥'
     });
   }
   
