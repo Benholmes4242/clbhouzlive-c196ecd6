@@ -47,22 +47,23 @@ import {
 } from '@/utils/playerHeadshot';
 
 // ─── Tokens (mirrors the mock) ──────────────────────────────────────────────
-const INK = '#0F172A';
-const INK_SOFT = '#475569';
-const INK_FAINT = '#94A3B8';
-const SURFACE = '#FFFFFF';
-const AMBER = '#F7931E';
-const AMBER_INK = '#D97706';
-const AMBER_SOFT_BG = '#FEF3E7';
-const PGA_GREEN = '#006747';
-const STATUS_LIVE = '#10B981';
-const DANGER = '#DC2626';
-const GOLD = '#FFB800';
-const GOLD_DEEP = '#D97706';
-const SLATE_200 = '#E2E8F0';
-const SLATE_150 = '#EDF1F5';
-const FONT =
-  '"Geist", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+import {
+  AMBER,
+  AMBER_INK,
+  AMBER_SOFT_BG,
+  DANGER,
+  FONT,
+  GOLD,
+  GOLD_DEEP,
+  INK,
+  INK_FAINT,
+  INK_SOFT,
+  PGA_GREEN,
+  SLATE_150,
+  SLATE_200,
+  STATUS_LIVE,
+  SURFACE,
+} from '../_shared/tokens';
 
 // ─── Helpers ────────────────────────────────────────────────────────────────
 function getInitials(fullName: string): string {
