@@ -100,18 +100,18 @@ function SGBar({ label, value }: SGBarProps) {
   return (
     <div style={{ padding: '11px 0', borderBottom: `0.5px solid ${INK_TINT_07}` }}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '6px' }}>
-        <span style={{ fontSize: '13px', fontWeight: 500, color: '#0F172A' }}>{label}</span>
-        <span style={{ fontSize: '13px', fontWeight: 900, fontVariantNumeric: 'tabular-nums', color: isPositive ? '#F7931E' : '#94A3B8' }}>
+        <span style={{ fontSize: '13px', fontWeight: 500, color: INK }}>{label}</span>
+        <span style={{ fontSize: '13px', fontWeight: 900, fontVariantNumeric: 'tabular-nums', color: isPositive ? AMBER : INK_FAINT }}>
           {formatted}
         </span>
       </div>
       {/* Centred diverging bar */}
-      <div style={{ position: 'relative', height: '4px', borderRadius: '2px', background: 'rgba(15,23,42,0.08)' }}>
-        <div style={{ position: 'absolute', left: '50%', top: 0, bottom: 0, width: '1px', background: 'rgba(15,23,42,0.15)' }} />
+      <div style={{ position: 'relative', height: '4px', borderRadius: '2px', background: HAIRLINE_INK_8 }}>
+        <div style={{ position: 'absolute', left: '50%', top: 0, bottom: 0, width: '1px', background: HAIRLINE_INK_15 }} />
         <motion.div
           style={{
             position: 'absolute', top: 0, bottom: 0, borderRadius: '2px',
-            background: isPositive ? '#F7931E' : '#94A3B8',
+            background: isPositive ? AMBER : INK_FAINT,
             left: isPositive ? '50%' : `${50 - barPct}%`,
           }}
           initial={{ width: 0 }}
