@@ -167,7 +167,7 @@ export function CollegeMasthead({
         exit={{ opacity: 0 }}
         transition={{ duration: 0.3 }}
         style={{
-          background: '#F8FAFC',
+          background: SLATE_50,
           padding: '16px 16px 14px',
         }}
       >
@@ -188,35 +188,35 @@ export function CollegeMasthead({
               marginBottom: 6,
             }}
           >
-            <GraduationCap size={13} strokeWidth={2.5} style={{ color: '#F7931E' }} />
+            <GraduationCap size={13} strokeWidth={2.5} style={{ color: AMBER }} />
             <span style={{
               fontSize: 10.5,
               fontWeight: 700,
               letterSpacing: '0.14em',
-              color: '#F7931E',
+              color: AMBER,
               textTransform: 'uppercase' as const,
             }}>
               COLLEGE FRANCHISE
             </span>
-            <ChevronRight size={11} strokeWidth={2.5} style={{ color: '#F7931E', marginTop: 1 }} />
+            <ChevronRight size={11} strokeWidth={2.5} style={{ color: AMBER, marginTop: 1 }} />
           </button>
           <h1 style={{
-            fontSize: 18,
+            fontSize: 24,
             fontWeight: 800,
-            color: '#0F172A',
-            letterSpacing: '-0.015em',
-            lineHeight: 1.2,
+            color: INK,
+            letterSpacing: '-0.025em',
+            lineHeight: 1.15,
             margin: 0,
           }}>
             College Franchise
           </h1>
           <div style={{
             fontSize: 13,
-            fontWeight: 500,
-            color: '#64748B',
+            fontWeight: 700,
+            color: INK,
             letterSpacing: '-0.005em',
             lineHeight: 1.25,
-            margin: '6px 0 0',
+            margin: '8px 0 0',
           }}>
             Season 2025–26 · {subline}
           </div>
@@ -229,8 +229,8 @@ export function CollegeMasthead({
           className="active:opacity-90 transition-opacity"
         >
           <div style={{
-            background: 'linear-gradient(180deg, rgba(255,184,0,0.10) 0%, rgba(255,184,0,0.04) 100%)',
-            border: '1px solid rgba(255,184,0,0.32)',
+            background: `linear-gradient(180deg, ${GOLD_TINT_10} 0%, ${GOLD_TINT} 100%)`,
+            border: `1px solid ${GOLD_BORDER}`,
             borderRadius: 14,
             padding: 14,
           }}>
