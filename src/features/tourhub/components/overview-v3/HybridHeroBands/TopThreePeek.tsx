@@ -55,7 +55,7 @@ export function TopThreePeek({ rows, onFullLeaderboardTap }: TopThreePeekProps) 
   const peek = rows.slice(0, 3);
 
   return (
-    <div style={{ background: '#F8FAFC' }}>
+    <div style={{ background: SLATE_50 }}>
       <div
         style={{
           padding: '14px 20px 8px',
