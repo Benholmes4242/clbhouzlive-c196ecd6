@@ -18,7 +18,7 @@
 
 import { ArrowDownRight, ArrowRight, ArrowUpRight } from 'lucide-react';
 import { usePlayerResults, type PlayerTournamentResult } from '../../hooks/usePlayerResults';
-import { INK_TINT_07 } from '../../_shared/tokens';
+import { AMBER, INK_FAINT, INK_LIGHT, INK_MUTE, INK_TINT_07, SURFACE, TREND_DOWN } from '../../_shared/tokens';
 
 interface FormSectionProps {
   playerId: string;
