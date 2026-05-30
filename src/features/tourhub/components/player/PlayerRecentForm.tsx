@@ -149,7 +149,7 @@ function DotStrip({ events, showTourCodes }: DotStripProps) {
                 style={{
                   fontSize: '7.5px',
                   fontWeight: 700,
-                  color: '#94A3B8',
+                  color: INK_FAINT,
                   letterSpacing: '0.08em',
                   textTransform: 'uppercase' as const,
                 }}
