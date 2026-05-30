@@ -267,7 +267,7 @@ export function FullLeaderboard({
                 className="active:bg-black/[0.02] transition-colors"
               >
                 {/* Position */}
-                <span style={{ width: '24px', fontSize: '11px', fontWeight: 800, color: displayPosition === 1 ? AMBER : '#94A3B8', flexShrink: 0, fontVariantNumeric: 'tabular-nums' }}>
+                <span style={{ width: '24px', fontSize: '11px', fontWeight: 800, color: displayPosition === 1 ? AMBER : INK_FAINT, flexShrink: 0, fontVariantNumeric: 'tabular-nums' }}>
                   {isMissedCut ? 'MC' : isWD ? 'WD' : (!isRoundView && entry.position_tied) ? `T${displayPosition}` : String(displayPosition)}
                 </span>
 
