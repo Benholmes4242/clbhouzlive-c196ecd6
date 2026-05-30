@@ -19,7 +19,7 @@ import { LeaderboardCard } from './LeaderboardCard';
 import { CourseInfoCard } from './CourseInfoCard';
 import { EditorialEmpty } from './EditorialEmpty';
 import type { TourTournament } from '../../hooks/useTourHubData';
-import { INK_TINT_07 } from '../../_shared/tokens';
+import { INK, INK_MUTE, INK_TINT_07, SLATE_50, SURFACE } from '../../_shared/tokens';
 
 interface LiveOverviewTabProps {
   tournament: TourTournament;
