@@ -159,7 +159,7 @@ function AlumniCompareBlock({ title, alumni1, alumni2, statKey, name1, name2, em
 
         return (
           <div key={i} style={{ display: 'flex', alignItems: 'center', padding: '9px 16px', borderBottom: isLast ? 'none' : `0.5px solid ${INK_TINT_07}` }}>
-            <span style={{ width: '18px', fontSize: '10px', fontWeight: 700, color: 'rgba(15,23,42,0.18)', flexShrink: 0, fontVariantNumeric: 'tabular-nums' }}>
+            <span style={{ width: '18px', fontSize: '10px', fontWeight: 700, color: HAIRLINE_INK_18, flexShrink: 0, fontVariantNumeric: 'tabular-nums' }}>
               {i + 1}
             </span>
 
