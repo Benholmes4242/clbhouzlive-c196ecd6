@@ -46,6 +46,15 @@ export const SLATE_200 = '#E2E8F0';
 // ============================================================================
 export const HAIRLINE_INK_7 = 'rgba(15,23,42,0.07)';
 export const HAIRLINE_INK_10 = 'rgba(15,23,42,0.10)';
+export const HAIRLINE_INK_15 = 'rgba(15,23,42,0.15)';        // section divider on light bg with stronger emphasis
+
+// ============================================================================
+// INK_ALPHA (text/scrim overlays on light bg where alpha-based muting is needed)
+// ============================================================================
+// Used primarily by hero PhotoBand for legibility scrims and ink-alpha caption text.
+// Distinct from INK_* which are solid Tailwind slate values.
+export const INK_ALPHA_45 = 'rgba(15,23,42,0.45)';           // medium ink-alpha (caption / secondary on light)
+export const INK_ALPHA_60 = 'rgba(15,23,42,0.60)';           // heavier ink-alpha (subhead-equivalent on light)
 
 // ============================================================================
 // AMBER (brand)
@@ -68,6 +77,18 @@ export const GOLD_BORDER = 'rgba(255,184,0,0.32)';
 export const GOLD_GLOW = '0 0 24px rgba(255,184,0,0.10), 0 1px 3px rgba(0,0,0,0.04)';
 
 // ============================================================================
+// LEADER_GOLD (hero leaderboard #1 row tint — distinct from celebratory GOLD)
+// ============================================================================
+// More yellow-toned than canonical GOLD (#FFB800). Used specifically for the #1
+// leader row tinting in HybridHero — gold-on-dark visual lift without competing
+// with finished-event GOLD trophy moments. Reserved for leaderboard row tinting;
+// not a general-purpose gold.
+export const LEADER_GOLD = '#FBBC2E';                        // hero leader-row tint base
+export const LEADER_GOLD_DARK = '#D4A017';                   // text/icon-readable variant
+export const LEADER_GOLD_TINT_7 = 'rgba(251,188,46,0.07)';   // soft leader tint (live state)
+export const LEADER_GOLD_TINT_10 = 'rgba(251,188,46,0.10)';  // medium leader tint (results state)
+
+// ============================================================================
 // SCORE (verdict — under/over par; theme-aware)
 // ============================================================================
 export const SCORE_UNDER_PAR_LIGHT = '#059669';
@@ -76,6 +97,10 @@ export const SCORE_OVER_PAR_LIGHT = '#9F1D1D';
 export const SCORE_OVER_PAR_LIGHT_TINT = 'rgba(159,29,29,0.14)';
 export const SCORE_UNDER_PAR_DARK = '#4ADE80';
 export const SCORE_OVER_PAR_DARK = '#F87171';
+// Pale variants for use on heavier-dark backgrounds (e.g. ticker marquee) where
+// the standard DARK variants don't lift enough. Tailwind green-300 / red-300.
+export const SCORE_UNDER_PAR_DARK_PALE = '#86EFAC';          // Tailwind green-300 — pale under-par on heavy-dark bg
+export const SCORE_OVER_PAR_DARK_PALE = '#FCA5A5';           // Tailwind red-300 — pale over-par on heavy-dark bg
 
 // ============================================================================
 // STATUS (live indicator dot — NOT a verdict)

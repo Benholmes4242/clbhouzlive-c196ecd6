@@ -6,6 +6,7 @@
 
 import React from 'react';
 import { INK } from '../HybridHero.constants';
+import { STATUS_LIVE, AMBER } from '../../../_shared/tokens';
 import type { HeroState } from '../HybridHero.utils';
 
 interface SignatureFooterProps {
@@ -67,7 +68,7 @@ export function SignatureFooter({
   const isUpcoming = state.kind === 'upcoming';
 
   const stateLabel = isLive ? 'LIVE' : isResults ? 'FINAL' : 'UPCOMING';
-  const dotColor = isLive ? '#10B981' : '#F7931E';
+  const dotColor = isLive ? STATUS_LIVE : AMBER;
   const dotHaloColor = isLive ? 'rgba(16,185,129,0.22)' : 'rgba(247,147,30,0.22)';
 
   let leftSecondary: string | null = null;

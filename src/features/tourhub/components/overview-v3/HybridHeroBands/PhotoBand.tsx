@@ -15,6 +15,7 @@ import {
   GREEN_LIVE,
   NUMERIC_STYLE,
 } from '../HybridHero.constants';
+import { STATUS_LIVE } from '../../../_shared/tokens';
 import type { HeroState } from '../HybridHero.utils';
 
 interface PhotoBandProps {
@@ -33,7 +34,7 @@ interface PhotoBandProps {
 function StatusTag({ state }: { state: HeroState }) {
   const isLive = state.kind === 'live';
   const isResults = state.kind === 'results';
-  const dotColor = isLive ? '#10B981' : isResults ? AMBER : AMBER;
+  const dotColor = isLive ? STATUS_LIVE : AMBER;
   let label = isLive ? 'LIVE' : isResults ? 'FINAL' : 'UPCOMING';
   if (isResults && state.variant === 'cancelled') label = 'CANCELLED';
   else if (isResults && state.variant === 'awaiting-playoff') label = 'PLAYOFF';

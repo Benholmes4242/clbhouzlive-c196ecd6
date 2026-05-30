@@ -1,6 +1,9 @@
 /**
- * HybridHero design tokens — locked per §8 of HYBRID_HERO_IMPLEMENTATION_BRIEF.
- * Mobile-first, light theme. Do not introduce new tokens without updating the brief.
+ * HybridHero design tokens — hero-specific layout, gradients, animation, and typography.
+ * Colours re-exported from _shared/tokens.ts as the canonical source.
+ * Mobile-first, light theme. Layout/gradient/animation constants are locked
+ * per §8 of HYBRID_HERO_IMPLEMENTATION_BRIEF — do not introduce new layout
+ * tokens without updating the brief.
  */
 
 // Layout
@@ -17,20 +20,24 @@ export const ROW_HEIGHT_LEADER = 64;
 export const ROW_HEIGHT_CHASER = 40;
 export const TOTAL_HERO_HEIGHT_TARGET = 677;  // was 731 — Pass 7.0.2: PHOTO_BAND_HEIGHT 360→306 (−54)
 
-// Colours (clbhouz Dispatch palette)
-export const INK = '#0F172A';
-export const INK_60 = 'rgba(15,23,42,0.60)';
-export const INK_45 = 'rgba(15,23,42,0.45)';
-export const INK_15 = 'rgba(15,23,42,0.15)';
-export const BG = '#F8FAFC';
-export const AMBER = '#F7931E';
-export const GOLD = '#FBBC2E';
-export const GOLD_DARK = '#D4A017';
-export const GREEN_LIVE = '#16A34A';
-export const GREEN_LIGHT = '#86EFAC';
-export const RED = '#DC2626';
-export const RED_LIGHT = '#FCA5A5';
-export const SLATE_500 = '#64748B';
+// Colours — re-exported from _shared/tokens.ts for hero-internal use.
+// These re-exports preserve existing band-file imports (`import { INK, AMBER, ... } from '../HybridHero.constants'`)
+// while ensuring single source of truth. NEW band files should import directly from `_shared/tokens`.
+export {
+  INK,
+  HAIRLINE_INK_15 as INK_15,
+  INK_ALPHA_45 as INK_45,
+  INK_ALPHA_60 as INK_60,
+  SLATE_50 as BG,
+  AMBER,
+  TREND_UP as GREEN_LIVE,
+  DANGER as RED,
+  INK_MUTE as SLATE_500,
+  LEADER_GOLD as GOLD,
+  LEADER_GOLD_DARK as GOLD_DARK,
+  SCORE_UNDER_PAR_DARK_PALE as GREEN_LIGHT,
+  SCORE_OVER_PAR_DARK_PALE as RED_LIGHT,
+} from '../../_shared/tokens';
 
 // Gradients
 export const COURSE_GRADIENT =

@@ -11,15 +11,11 @@ import {
   INK_15,
   INK_45,
   GOLD_DARK,
-  AMBER,
-  GREEN_LIVE,
   NUMERIC_STYLE,
 } from '../HybridHero.constants';
+import { getScoreColor } from '../../../_shared/scoreColor';
+import { LEADER_GOLD_TINT_7, LEADER_GOLD_TINT_10 } from '../../../_shared/tokens';
 import { TrajectorySparkline } from './TrajectorySparkline';
-
-
-const LEADER_TINT_LIVE = 'rgba(251,188,46,0.07)';
-const LEADER_TINT_RESULTS = 'rgba(251,188,46,0.10)';
 
 function PlayerHead({ size = 36, src, ring }: { size?: number; src?: string | null; ring?: boolean }) {
   return (
@@ -45,9 +41,9 @@ function PlayerHead({ size = 36, src, ring }: { size?: number; src?: string | nu
 }
 
 function liveScoreColour(s: string): string {
-  if (s.startsWith('\u2212') || s.startsWith('-')) return GREEN_LIVE;
-  if (s.startsWith('+')) return AMBER;
-  return INK;
+  if (s.startsWith('\u2212') || s.startsWith('-')) return getScoreColor(-1, 'light', 'standard');
+  if (s.startsWith('+')) return getScoreColor(1, 'light', 'standard');
+  return getScoreColor(0, 'light', 'standard');
 }
 
 interface SoloLeaderRowProps {
@@ -79,7 +75,7 @@ export function SoloLeaderRow({
         gap: 12,
         padding: '14px 20px',
         alignItems: 'center',
-        background: isResults ? LEADER_TINT_RESULTS : LEADER_TINT_LIVE,
+        background: isResults ? LEADER_GOLD_TINT_10 : LEADER_GOLD_TINT_7,
         borderBottom: isLast ? 'none' : `0.5px solid ${INK_15}`,
       }}
     >
@@ -298,7 +294,7 @@ export function TiedLeadersRow({ count, score, players, isLast = false }: TiedLe
         gap: 12,
         padding: '14px 20px',
         alignItems: 'center',
-        background: LEADER_TINT_LIVE,
+        background: LEADER_GOLD_TINT_7,
         borderBottom: isLast ? 'none' : `0.5px solid ${INK_15}`,
       }}
       aria-label={`${count} players tied at the top with score ${score}`}
@@ -371,7 +367,7 @@ export function ChampionRow({
         gap: 12,
         padding: '14px 20px',
         alignItems: 'center',
-        background: LEADER_TINT_RESULTS,
+        background: LEADER_GOLD_TINT_10,
         borderBottom: isLast ? 'none' : `0.5px solid ${INK_15}`,
       }}
     >

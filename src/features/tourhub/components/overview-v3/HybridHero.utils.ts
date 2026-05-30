@@ -5,6 +5,7 @@
 
 import { format } from 'date-fns';
 import type { HeroTournament } from '../../hooks/useHeroCarouselData';
+import { getScoreColor } from '../../_shared/scoreColor';
 
 // ---------- Types -----------------------------------------------------------
 
@@ -45,11 +46,12 @@ export function fmtScore(n: number | null | undefined): string {
   return `+${n}`;
 }
 
+/**
+ * Round-level score-to-par colour for hero leaderboard contexts.
+ * Wraps canonical `getScoreColor` from _shared/scoreColor for hero-family call sites.
+ */
 export function scoreColour(n: number, opts?: { resultsMode?: boolean }) {
-  if (opts?.resultsMode) return '#0F172A';
-  if (n < 0) return '#16A34A';
-  if (n > 0) return '#F7931E';
-  return '#0F172A';
+  return getScoreColor(n, 'light', opts?.resultsMode ? 'leader' : 'standard');
 }
 
 // ---------- Name shortening -------------------------------------------------

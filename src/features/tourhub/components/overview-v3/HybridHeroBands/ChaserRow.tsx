@@ -10,10 +10,9 @@ import {
   INK,
   INK_15,
   INK_45,
-  AMBER,
-  GREEN_LIVE,
   NUMERIC_STYLE,
 } from '../HybridHero.constants';
+import { getScoreColor } from '../../../_shared/scoreColor';
 import { TrajectorySparkline } from './TrajectorySparkline';
 
 
@@ -41,9 +40,9 @@ function PlayerHead({ size = 28, src }: { size?: number; src?: string | null }) 
 }
 
 function liveScoreColour(s: string): string {
-  if (s.startsWith('\u2212') || s.startsWith('-')) return GREEN_LIVE;
-  if (s.startsWith('+')) return AMBER;
-  return INK;
+  if (s.startsWith('\u2212') || s.startsWith('-')) return getScoreColor(-1, 'light', 'standard');
+  if (s.startsWith('+')) return getScoreColor(1, 'light', 'standard');
+  return getScoreColor(0, 'light', 'standard');
 }
 
 interface ChaserRowProps {
