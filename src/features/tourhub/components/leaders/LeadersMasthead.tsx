@@ -14,7 +14,21 @@ import { playerRoute } from '../../routes';
 import type { LeaderCategory } from './constants';
 import { splitStatValue } from '../../utils/splitStatValue';
 
-import { AMBER_TINT_12, WHITE_ALPHA_10 } from '../../_shared/tokens';
+import {
+  AMBER,
+  AMBER_TINT_12,
+  GOLD,
+  GOLD_BORDER,
+  GOLD_TINT,
+  GOLD_TINT_10,
+  INK,
+  INK_FAINT,
+  INK_MUTE,
+  SLATE_50,
+  SLATE_150,
+  SURFACE,
+  WHITE_ALPHA_10,
+} from '../../_shared/tokens';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // MastheadPill / PillView — kept for cross-surface compatibility.
@@ -140,7 +154,7 @@ export function LeadersMasthead({
         exit={{ opacity: 0 }}
         transition={{ duration: 0.3 }}
         style={{
-          background: '#F8FAFC',
+          background: SLATE_50,
           padding: '16px 16px 14px',
         }}
       >
@@ -161,12 +175,12 @@ export function LeadersMasthead({
               cursor: onEyebrowTap ? 'pointer' : 'default',
             }}
           >
-            <Activity size={13} strokeWidth={2.5} style={{ color: '#F7931E' }} />
+            <Activity size={13} strokeWidth={2.5} style={{ color: AMBER }} />
             <span
               style={{
                 fontSize: 10.5,
                 fontWeight: 700,
-                color: '#F7931E',
+                color: AMBER,
                 letterSpacing: '0.14em',
                 textTransform: 'uppercase',
               }}
@@ -177,18 +191,18 @@ export function LeadersMasthead({
               <ChevronRight
                 size={11}
                 strokeWidth={2.5}
-                style={{ color: '#F7931E', marginTop: 1 }}
+                style={{ color: AMBER, marginTop: 1 }}
               />
             )}
           </button>
 
           <h1
             style={{
-              fontSize: 18,
+              fontSize: 24,
               fontWeight: 800,
-              color: '#0F172A',
-              letterSpacing: '-0.015em',
-              lineHeight: 1.2,
+              color: INK,
+              letterSpacing: '-0.025em',
+              lineHeight: 1.15,
               margin: 0,
             }}
           >
@@ -201,18 +215,18 @@ export function LeadersMasthead({
               alignItems: 'baseline',
               justifyContent: 'space-between',
               gap: 8,
-              marginTop: 4,
+              marginTop: 8,
             }}
           >
-            <span style={{ fontSize: 13, fontWeight: 500, color: '#64748B' }}>
+            <span style={{ fontSize: 13, fontWeight: 700, color: INK, letterSpacing: '-0.005em' }}>
               {year} Season · {tourLabel}
             </span>
             {showTourAvg && (
-              <span style={{ fontSize: 13, fontWeight: 500, color: '#64748B' }}>
+              <span style={{ fontSize: 13, fontWeight: 600, color: INK_FAINT }}>
                 Tour avg{' '}
                 <span
                   style={{
-                    color: '#0F172A',
+                    color: INK,
                     fontWeight: 700,
                     fontVariantNumeric: 'tabular-nums',
                   }}
@@ -232,8 +246,8 @@ export function LeadersMasthead({
         >
           <div
             style={{
-              background: 'linear-gradient(135deg, rgba(255,184,0,0.10) 0%, rgba(255,184,0,0.04) 100%)',
-              border: '1px solid rgba(255,184,0,0.32)',
+              background: `linear-gradient(135deg, ${GOLD_TINT_10} 0%, ${GOLD_TINT} 100%)`,
+              border: `1px solid ${GOLD_BORDER}`,
               borderRadius: 14,
               padding: 14,
             }}
@@ -248,12 +262,12 @@ export function LeadersMasthead({
                 flexWrap: 'wrap',
               }}
             >
-              <Crown size={13} strokeWidth={2.5} fill="#FFB800" style={{ color: '#FFB800' }} />
+              <Crown size={13} strokeWidth={2.5} fill={GOLD} style={{ color: GOLD }} />
               <span
                 style={{
                   fontSize: 10.5,
                   fontWeight: 800,
-                  color: '#0F172A',
+                  color: INK,
                   letterSpacing: '0.14em',
                   textTransform: 'uppercase',
                 }}
@@ -262,12 +276,12 @@ export function LeadersMasthead({
               </span>
               {streakLabel && (
                 <>
-                  <span style={{ fontSize: 10.5, fontWeight: 800, color: '#94A3B8' }}>·</span>
+                  <span style={{ fontSize: 10.5, fontWeight: 800, color: INK_MUTE }}>·</span>
                   <span
                     style={{
                       fontSize: 10.5,
                       fontWeight: 800,
-                      color: '#64748B',
+                      color: INK_MUTE,
                       letterSpacing: '0.14em',
                       textTransform: 'uppercase',
                     }}
@@ -278,12 +292,12 @@ export function LeadersMasthead({
               )}
               {marginLabel && (
                 <>
-                  <span style={{ fontSize: 10.5, fontWeight: 800, color: '#94A3B8' }}>·</span>
+                  <span style={{ fontSize: 10.5, fontWeight: 800, color: INK_MUTE }}>·</span>
                   <span
                     style={{
                       fontSize: 10.5,
                       fontWeight: 800,
-                      color: '#64748B',
+                      color: INK_MUTE,
                       letterSpacing: '0.14em',
                       textTransform: 'uppercase',
                     }}
@@ -304,8 +318,8 @@ export function LeadersMasthead({
                     height: 80,
                     borderRadius: '34%',
                     overflow: 'hidden',
-                    background: '#EDF1F5',
-                    border: '2.5px solid #FFB800',
+                    background: SLATE_150,
+                    border: `2.5px solid ${GOLD}`,
                   }}
                 >
                   <img
@@ -325,14 +339,14 @@ export function LeadersMasthead({
                     width: 24,
                     height: 24,
                     borderRadius: '50%',
-                    background: '#FFB800',
-                    border: '2.5px solid #ffffff',
+                    background: GOLD,
+                    border: `2.5px solid ${SURFACE}`,
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
                     fontSize: 11,
                     fontWeight: 900,
-                    color: '#0F172A',
+                    color: INK,
                   }}
                 >
                   1
@@ -355,7 +369,7 @@ export function LeadersMasthead({
                     style={{
                       fontSize: 22,
                       fontWeight: 800,
-                      color: '#0F172A',
+                      color: INK,
                       letterSpacing: '-0.025em',
                       lineHeight: 1.1,
                       overflow: 'hidden',
@@ -375,7 +389,7 @@ export function LeadersMasthead({
                   >
                     <CountryFlag country={leader.player.country_code || leader.player.country} size="sm" />
                     {countryName && (
-                      <span style={{ fontSize: 11, fontWeight: 600, color: '#64748B' }}>
+                      <span style={{ fontSize: 11, fontWeight: 600, color: INK_MUTE }}>
                         {countryName}
                       </span>
                     )}
@@ -387,21 +401,21 @@ export function LeadersMasthead({
                     style={{
                       fontSize: 22,
                       fontWeight: 800,
-                      color: '#0F172A',
+                      color: INK,
                       letterSpacing: '-0.025em',
                       lineHeight: 1.1,
                       fontVariantNumeric: 'tabular-nums',
                     }}
                   >
                     {integer}
-                    {decimal && <span style={{ color: '#F7931E' }}>{decimal}</span>}
-                    {suffix && <span style={{ color: '#0F172A' }}>{suffix}</span>}
+                    {decimal && <span style={{ color: AMBER }}>{decimal}</span>}
+                    {suffix && <span style={{ color: INK }}>{suffix}</span>}
                   </div>
                   <div
                     style={{
                       fontSize: 9,
                       fontWeight: 800,
-                      color: '#64748B',
+                      color: INK_MUTE,
                       letterSpacing: '0.16em',
                       textTransform: 'uppercase',
                       marginTop: 4,

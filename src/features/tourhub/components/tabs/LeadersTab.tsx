@@ -22,7 +22,7 @@ import { LeadersCategorySheet } from '../leaders/LeadersCategorySheet';
 import { LeadersMasthead } from '../leaders/LeadersMasthead';
 import { PlayerCardV2 } from '../players/PlayerCardV2';
 import { LeadersEmptyState } from '../leaders/LeadersEmptyState';
-import { INK_TINT_06, INK_TINT_07 } from '../../_shared/tokens';
+import { AMBER, GOLD_TINT_10, HAIRLINE_INK_10, INK, INK_FAINT, INK_MUTE, INK_TINT_06, INK_TINT_07, SLATE_50, SLATE_150, SURFACE } from '../../_shared/tokens';
 
 interface RankedItem {
   player: {
@@ -224,6 +224,14 @@ export function LeadersTab() {
     const higher = category.higherIsBetter !== false;
     const diff = higher ? a - b : b - a;
     if (diff <= 0) return null;
+    // For currency-like categories (earnings), use the category's own format
+    // so the margin renders as "$278,300" or "$1.20M" — consistent with how
+    // the headline leader value is displayed. Apple-finish: numbers always formatted.
+    const sampleFormatted = category.format(diff);
+    const isCurrencyLike = sampleFormatted.startsWith('$');
+    if (isCurrencyLike) {
+      return `MARGIN +${sampleFormatted}`;
+    }
     const rounded = Math.abs(diff) >= 10 ? Math.round(diff) : Math.round(diff * 10) / 10;
     const unit = category.unit ? ` ${category.unit.toUpperCase()}` : '';
     return `MARGIN +${rounded}${unit}`;
@@ -232,24 +240,24 @@ export function LeadersTab() {
   // ─── Loading skeleton ───
   if (isLoading) {
     return (
-      <div style={{ background: '#F8FAFC' }}>
+      <div style={{ background: SLATE_50 }}>
         {/* Masthead skeleton */}
-        <div style={{ background: '#F8FAFC', padding: '16px 16px 14px' }}>
+        <div style={{ background: SLATE_50, padding: '16px 16px 14px' }}>
           {/* Eyebrow line (10.5px / 700) */}
           <Skeleton className="h-3 w-24 mb-2" style={{ background: INK_TINT_06 }} />
-          {/* h1 (18px / 800) */}
-          <Skeleton className="h-5 w-40 mb-2" style={{ background: INK_TINT_06 }} />
+          {/* h1 (24px / 800) */}
+          <Skeleton className="h-7 w-40 mb-2" style={{ background: INK_TINT_06 }} />
           {/* Subhead (13px) */}
           <Skeleton className="h-3 w-56 mb-3" style={{ background: INK_TINT_06 }} />
           {/* Leader card */}
-          <Skeleton className="h-28 w-full rounded-[14px]" style={{ background: 'rgba(255,184,0,0.10)' }} />
+          <Skeleton className="h-28 w-full rounded-[14px]" style={{ background: GOLD_TINT_10 }} />
         </div>
         {/* Sticky header skeleton */}
         <div style={{ padding: '12px 16px' }}>
           <Skeleton className="h-8 w-full rounded-lg" />
         </div>
         {/* Row skeletons */}
-        <div style={{ background: '#ffffff', borderTop: `1px solid ${INK_TINT_07}` }}>
+        <div style={{ background: SURFACE, borderTop: `1px solid ${INK_TINT_07}` }}>
           {Array.from({ length: 8 }).map((_, i) => (
             <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '12px 16px', borderBottom: `0.5px solid ${INK_TINT_07}` }}>
               <Skeleton className="h-5 w-8" />
@@ -266,7 +274,7 @@ export function LeadersTab() {
 
 
   return (
-    <div style={{ background: '#F8FAFC' }}>
+    <div style={{ background: SLATE_50 }}>
       {/* Unified editorial masthead */}
       <LeadersMasthead
         leader={leader}
@@ -289,13 +297,13 @@ export function LeadersTab() {
               style={{
                 display: 'flex', alignItems: 'center', gap: 5,
                 padding: '6px 10px', borderRadius: 8,
-                background: '#EDF1F5',
+                background: SLATE_150,
                 border: 'none', cursor: 'pointer',
               }}
               aria-label="Search players"
             >
-              <Search className="w-3 h-3" style={{ color: '#0F172A' }} strokeWidth={2.5} />
-              <span style={{ fontSize: 12, fontWeight: 700, color: '#0F172A' }}>Search</span>
+              <Search className="w-3 h-3" style={{ color: INK }} strokeWidth={2.5} />
+              <span style={{ fontSize: 12, fontWeight: 700, color: INK }}>Search</span>
             </button>
           )}
         </div>
@@ -303,17 +311,17 @@ export function LeadersTab() {
         {/* Count bar OR search input — mutually exclusive */}
         {!searchExpanded ? (
           <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, padding: '6px 16px 8px' }}>
-            <span style={{ fontSize: 9, fontWeight: 800, color: '#0F172A', letterSpacing: '0.14em', textTransform: 'uppercase' as const, fontVariantNumeric: 'tabular-nums' }}>
+            <span style={{ fontSize: 9, fontWeight: 800, color: INK, letterSpacing: '0.14em', textTransform: 'uppercase' as const, fontVariantNumeric: 'tabular-nums' }}>
               {listPlayers.length.toLocaleString()} {listPlayers.length === 1 ? 'PLAYER' : 'PLAYERS'}
             </span>
-            <span style={{ fontSize: 9, fontWeight: 800, color: '#64748B', letterSpacing: '0.14em', textTransform: 'uppercase' as const }}>
-              RANKED BY <span style={{ color: '#0F172A' }}>{category.shortLabel.toUpperCase()}</span>
+            <span style={{ fontSize: 9, fontWeight: 800, color: INK_MUTE, letterSpacing: '0.14em', textTransform: 'uppercase' as const }}>
+              RANKED BY <span style={{ color: INK }}>{category.shortLabel.toUpperCase()}</span>
             </span>
           </div>
         ) : (
           <div style={{ padding: '6px 16px 8px' }}>
             <div style={{ position: 'relative' }}>
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 z-10 w-4 h-4" style={{ color: '#F7931E' }} strokeWidth={2.5} />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 z-10 w-4 h-4" style={{ color: AMBER }} strokeWidth={2.5} />
               <input
                 type="text"
                 autoFocus
@@ -321,7 +329,7 @@ export function LeadersTab() {
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 className="w-full h-9 pl-9 pr-9 rounded-lg text-[13px] font-semibold text-foreground placeholder:text-muted-foreground/70 focus:outline-none"
-                style={{ background: '#ffffff', border: '1px solid rgba(15,23,42,0.09)' }}
+                style={{ background: SURFACE, border: `1px solid ${HAIRLINE_INK_10}` }}
               />
               <button
                 onClick={() => { setSearch(''); setSearchExpanded(false); }}
@@ -329,7 +337,7 @@ export function LeadersTab() {
                 className="absolute right-2 top-1/2 -translate-y-1/2 p-1 rounded-full active:scale-90"
                 style={{ background: INK_TINT_06 }}
               >
-                <X className="w-3 h-3" style={{ color: '#0F172A' }} strokeWidth={2.5} />
+                <X className="w-3 h-3" style={{ color: INK }} strokeWidth={2.5} />
               </button>
             </div>
           </div>
@@ -339,7 +347,7 @@ export function LeadersTab() {
       {/* Content area */}
       <div style={{ paddingBottom: 'calc(var(--sab, env(safe-area-inset-bottom, 0px)) + 80px)' }}>
         {/* Rankings list — white surface (column header removed Phase 1 fix.1.3) */}
-        <div style={{ background: '#ffffff', borderTop: `1px solid ${INK_TINT_07}`, marginTop: '8px' }}>
+        <div style={{ background: SURFACE, borderTop: `1px solid ${INK_TINT_07}`, marginTop: '8px' }}>
           <AnimatePresence mode="wait">
             <motion.div
               key={category.key}
@@ -352,7 +360,7 @@ export function LeadersTab() {
                 <>
                   {!search && (
                     <div style={{ padding: '12px 16px 6px' }}>
-                      <span style={{ fontSize: 9, fontWeight: 800, color: '#64748B', letterSpacing: '0.14em', textTransform: 'uppercase' as const }}>
+                      <span style={{ fontSize: 9, fontWeight: 800, color: INK_MUTE, letterSpacing: '0.14em', textTransform: 'uppercase' as const }}>
                         CHASING
                       </span>
                     </div>
@@ -390,7 +398,7 @@ export function LeadersTab() {
                   })}
                   {/* Footer */}
                   <div style={{ padding: '12px 16px', textAlign: 'center', borderTop: `0.5px solid ${INK_TINT_07}` }}>
-                    <span style={{ fontSize: 9, fontWeight: 800, color: '#94A3B8', letterSpacing: '0.14em', textTransform: 'uppercase' as const }}>
+                    <span style={{ fontSize: 9, fontWeight: 800, color: INK_FAINT, letterSpacing: '0.14em', textTransform: 'uppercase' as const }}>
                       SEASON LEADERS · AVAILABLE TOURNAMENT DATA
                     </span>
                   </div>
