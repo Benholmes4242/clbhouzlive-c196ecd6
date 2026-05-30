@@ -21,8 +21,8 @@ interface TickerProps {
 }
 
 function entryScoreColour(score: number): string {
-  if (score < 0) return GREEN_LIGHT;
-  if (score > 0) return RED_LIGHT;
+  if (score < 0) return SCORE_UNDER_PAR_DARK_PALE;
+  if (score > 0) return SCORE_OVER_PAR_DARK_PALE;
   return 'white';
 }
 
