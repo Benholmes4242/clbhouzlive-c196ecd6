@@ -20,7 +20,7 @@ import { getCollegeLogoUrl } from '@/utils/collegeLogo';
 import { useCollegeRivalries } from '../../hooks/useCollegeMovers';
 import { collegeH2HRoute } from '../../routes';
 import { PlayerInitialAvatar } from '../shared/PlayerInitialAvatar';
-import { INK_TINT_06, INK_TINT_07 } from '../../_shared/tokens';
+import { AMBER, HAIRLINE_INK_8, INK, INK_FAINT, INK_MUTE, INK_TINT_06, INK_TINT_07, SLATE_50, SURFACE } from '../../_shared/tokens';
 
 interface H2HRivalStripProps {
   normalizedName: string;
