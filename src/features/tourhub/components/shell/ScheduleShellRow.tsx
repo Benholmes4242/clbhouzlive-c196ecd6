@@ -140,8 +140,8 @@ function ScheduleShellRowInner() {
               fontWeight: 600,
               borderRadius: 15,
               background: activeTour !== 'all' ? WHITE_ALPHA_10 : 'transparent',
-              border: activeTour !== 'all' ? `1px solid ${WHITE_ALPHA_55}` : '1px solid rgba(255,255,255,0.18)',
-              color: activeTour !== 'all' ? '#FFFFFF' : WHITE_ALPHA_65,
+              border: `1px solid ${activeTour !== 'all' ? WHITE_ALPHA_55 : WHITE_ALPHA_18}`,
+              color: activeTour !== 'all' ? SURFACE : WHITE_ALPHA_65,
               gap: 5,
               whiteSpace: 'nowrap',
             }}
