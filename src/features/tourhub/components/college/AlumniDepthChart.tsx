@@ -113,9 +113,9 @@ function AlumniRow({ alumnus, index, tier, legacyContextLabel }: AlumniRowProps)
           <div style={{ minWidth: 0 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 6, minWidth: 0 }}>
               <div style={{
-                fontSize: 14, fontWeight: 800, color: '#0F172A',
+                fontSize: 14, fontWeight: 800, color: INK,
                 overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
-                letterSpacing: '-0.3px',
+                letterSpacing: '-0.02em',
               }}>
                 {fullName}
               </div>
@@ -131,7 +131,7 @@ function AlumniRow({ alumnus, index, tier, legacyContextLabel }: AlumniRowProps)
               )}
             </div>
             {subline && (
-              <div style={{ fontSize: 10, fontWeight: 500, color: '#94A3B8', marginTop: 1 }}>
+              <div style={{ fontSize: 10, fontWeight: 500, color: INK_FAINT, marginTop: 1 }}>
                 {subline}
               </div>
             )}
