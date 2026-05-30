@@ -89,7 +89,7 @@ function Sparkline({ positions }: SparklineProps) {
       <path
         d={path}
         fill="none"
-        stroke="#F7931E"
+        stroke={AMBER}
         strokeWidth={2.5}
         vectorEffect="non-scaling-stroke"
         strokeLinecap="round"
