@@ -311,7 +311,7 @@ export function AlumniDepthChart({ normalizedName, className }: AlumniDepthChart
     <div
       className={cn('', className)}
       style={{
-        background: '#ffffff',
+        background: SURFACE,
         borderTop: `0.5px solid ${INK_TINT_07}`,
         borderBottom: `0.5px solid ${INK_TINT_07}`,
         marginTop: '8px',
