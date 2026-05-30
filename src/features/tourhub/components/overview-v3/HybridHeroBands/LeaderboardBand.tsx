@@ -4,6 +4,7 @@
  */
 
 import React from 'react';
+import { ChevronRight } from 'lucide-react';
 import type { HeroState, TopTie } from '../HybridHero.utils';
 import { fmtScore, formatRank, buildLeaderboardSlots, extractRounds } from '../HybridHero.utils';
 import { SoloLeaderRow, TiedLeadersRow, ChampionRow, TiedChasersRow } from './LeaderRow';
@@ -14,6 +15,7 @@ import { TeamFinishRow } from './TeamFinishRow';
 import { CancelledPanel } from './CancelledPanel';
 import { PlayoffPendingPanel } from './PlayoffPendingPanel';
 import { INK, INK_15, AMBER } from '../HybridHero.constants';
+import { INK_ALPHA_45, FONT } from '../../../_shared/tokens';
 import type { TeeTimeGroup } from '../../../hooks/useTournamentTeeTimes';
 import { getPlayerHeadshotUrl } from '@/utils/playerHeadshot';
 
