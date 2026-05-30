@@ -4,6 +4,7 @@
  */
 
 import React from 'react';
+import { ChevronRight } from 'lucide-react';
 import CountryFlag from '@/components/ui/country-flag';
 import { PLAYER_SILHOUETTE_URL } from '@/utils/playerHeadshot';
 import {
