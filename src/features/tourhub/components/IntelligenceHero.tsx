@@ -21,6 +21,8 @@
 import React, { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   Brain,
+  Check,
+  ChevronDown,
   ChevronRight,
   ChevronUp,
   Trophy,
@@ -64,6 +66,7 @@ import {
   STATUS_LIVE,
   SURFACE,
 } from '../_shared/tokens';
+import { getScoreColor } from '../_shared/scoreColor';
 
 // ─── Helpers ────────────────────────────────────────────────────────────────
 function getInitials(fullName: string): string {
@@ -572,7 +575,7 @@ function UpcomingCard({
             padding: '3px 8px',
             fontSize: 9,
             fontWeight: 800,
-            color: '#FFFFFF',
+            color: SURFACE,
             letterSpacing: '0.12em',
             textTransform: 'uppercase',
             display: 'inline-flex',
@@ -665,6 +668,7 @@ interface LivePick {
   reasons: string[];
   position: string;
   score: string;
+  scoreNumeric: number | null;
   thru: string;
   moveDir: 'up' | 'down' | 'flat';
   moveSpots: number;
@@ -686,8 +690,8 @@ function LiveCard({
       : pick.moveDir === 'down'
       ? DANGER
       : INK_FAINT;
-  const moveSymbol =
-    pick.moveDir === 'up' ? '▲' : pick.moveDir === 'down' ? '▼' : '—';
+  const MoveIcon =
+    pick.moveDir === 'up' ? ChevronUp : pick.moveDir === 'down' ? ChevronDown : null;
 
   return (
     <CardShell isLive={!pick.finished}>
@@ -794,7 +798,7 @@ function LiveCard({
                 style={{
                   fontSize: 18,
                   fontWeight: 800,
-                  color: AMBER,
+                  color: getScoreColor(pick.scoreNumeric, 'dark', 'standard'),
                   letterSpacing: '-0.01em',
                   lineHeight: 1.1,
                   fontVariantNumeric: 'tabular-nums',
@@ -848,7 +852,9 @@ function LiveCard({
                   fontVariantNumeric: 'tabular-nums',
                 }}
               >
-                <span style={{ fontSize: 10 }}>{moveSymbol}</span>
+                <span style={{ display: 'inline-flex', alignItems: 'center' }}>
+                  {MoveIcon ? <MoveIcon size={11} strokeWidth={3} color={moveColor} /> : <span style={{ fontSize: 10 }}>—</span>}
+                </span>
                 {pick.moveSpots}
               </div>
             )}
@@ -889,7 +895,7 @@ function ResultsCard({
     },
     top5: {
       bg: PGA_GREEN,
-      label: `✓ TOP 5 · ${pick.finished}`,
+      label: `TOP 5 · ${pick.finished}`,
       color: '#fff',
       weight: 700 as const,
     },
@@ -938,6 +944,7 @@ function ResultsCard({
           }}
         >
           {isWinner && <Trophy size={11} strokeWidth={3} color={INK} />}
+          {pick.outcome === 'top5' && <Check size={11} strokeWidth={3} color="#fff" />}
           {cfg.label}
         </div>
 
@@ -1298,6 +1305,7 @@ function buildLivePicks(
       reasons: c.reasons ?? [],
       position: t ? formatPositionString(t) : '—',
       score: formatScore(t?.score ?? null),
+      scoreNumeric: t?.score ?? null,
       thru: formatThru(t?.thru ?? null, t?.currentRound ?? null),
       moveDir: t?.moveDir ?? 'flat',
       moveSpots: t?.moveSpots ?? 0,
