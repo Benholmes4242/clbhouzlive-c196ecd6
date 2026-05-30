@@ -1,7 +1,7 @@
 import { memo } from 'react';
 import type { TournamentTab } from '../tournament-detail';
 
-import { WHITE_ALPHA_55 } from '../../_shared/tokens';
+import { FONT, SHELL_BG, SURFACE, WHITE_ALPHA_06, WHITE_ALPHA_55 } from '../../_shared/tokens';
 
 interface TabDef {
   value: TournamentTab;
@@ -41,13 +41,13 @@ function TournamentTabsShellRowInner({ activeTab, onChange }: Props) {
           display: 'flex',
           gap: 8,
           padding: '0 16px',
-          background: '#0A0E14',
-          borderBottom: '0.5px solid rgba(255,255,255,0.06)',
+          background: SHELL_BG,
+          borderBottom: `0.5px solid ${WHITE_ALPHA_06}`,
           overflowX: 'auto',
           overflowY: 'hidden',
           WebkitOverflowScrolling: 'touch',
           scrollbarWidth: 'none',
-          fontFamily: 'Geist, system-ui, -apple-system, BlinkMacSystemFont, sans-serif',
+          fontFamily: FONT,
         }}
       >
         {TABS.map((tab) => {
@@ -65,7 +65,7 @@ function TournamentTabsShellRowInner({ activeTab, onChange }: Props) {
                 padding: '0 4px',
                 fontSize: 14,
                 fontWeight: isActive ? 700 : 600,
-                color: isActive ? '#FFFFFF' : WHITE_ALPHA_55,
+                color: isActive ? SURFACE : WHITE_ALPHA_55,
                 background: 'transparent',
                 border: 'none',
                 letterSpacing: '-0.005em',
@@ -79,7 +79,7 @@ function TournamentTabsShellRowInner({ activeTab, onChange }: Props) {
                 style={{
                   display: 'inline-block',
                   paddingBottom: 4,
-                  borderBottom: isActive ? '1.5px solid #FFFFFF' : '1.5px solid transparent',
+                  borderBottom: `1.5px solid ${isActive ? SURFACE : 'transparent'}`,
                 }}
               >
                 {tab.label}

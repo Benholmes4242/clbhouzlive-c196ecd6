@@ -32,7 +32,7 @@ import {
   type TournamentTab,
 } from '../components/tournament-detail';
 import { TournamentEmptyState } from '../components/tournament-detail/TournamentEmptyState';
-import { INK_TINT_06, INK_TINT_07, WHITE_ALPHA_10 } from '../_shared/tokens';
+import { HAIRLINE_INK_10, INK_TINT_06, INK_TINT_07, SHELL_BG, SLATE_50, SURFACE, WHITE_ALPHA_08, WHITE_ALPHA_10 } from '../_shared/tokens';
 
 const VALID_TABS: TournamentTab[] = ['overview', 'leaderboard', 'summary', 'tee-times', 'hole-stats'];
 
@@ -113,7 +113,7 @@ export function TournamentDetailPage() {
     return (
       <TourHubShell immersive={true}>
         {/* Slate masthead skeleton */}
-        <div style={{ background: '#0A0E14', padding: '16px 16px 0' }} className="animate-pulse">
+        <div style={{ background: SHELL_BG, padding: '16px 16px 0' }} className="animate-pulse">
           {/* Pills row */}
           <div style={{ display: 'flex', gap: 6, marginBottom: 60 }}>
             <div style={{ height: 22, width: 88, background: WHITE_ALPHA_10, borderRadius: 6 }} />
@@ -124,7 +124,7 @@ export function TournamentDetailPage() {
           {/* Subhead */}
           <div style={{ height: 13, width: '55%', background: WHITE_ALPHA_10, borderRadius: 4, marginBottom: 16 }} />
           {/* 3-col stat strip */}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', borderTop: '0.5px solid rgba(255,255,255,0.08)' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', borderTop: `0.5px solid ${WHITE_ALPHA_08}` }}>
             {[0, 1, 2].map(i => (
               <div key={i} style={{ padding: '9px 0 11px', textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
                 <div style={{ height: 8, width: 40, background: WHITE_ALPHA_10, borderRadius: 4 }} />
@@ -140,7 +140,7 @@ export function TournamentDetailPage() {
           ))}
         </div>
         {/* Content row skeletons */}
-        <div style={{ background: '#ffffff', borderTop: `1px solid ${INK_TINT_07}`, borderBottom: `1px solid ${INK_TINT_07}`, marginTop: '8px' }}>
+        <div style={{ background: SURFACE, borderTop: `1px solid ${INK_TINT_07}`, borderBottom: `1px solid ${INK_TINT_07}`, marginTop: '8px' }}>
           {Array.from({ length: 5 }).map((_, i) => (
             <div key={i} className="animate-pulse" style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '11px 20px', borderBottom: i < 4 ? `0.5px solid ${INK_TINT_07}` : 'none' }}>
               <div style={{ width: '36px', height: '13px', background: INK_TINT_06, borderRadius: '4px' }} />
@@ -319,7 +319,7 @@ export function TournamentDetailPage() {
         />
       </ShellSlot>
 
-      <div style={{ paddingTop: 'var(--chrome-total-h, 0px)', background: '#F8FAFC' }}>
+      <div style={{ paddingTop: 'var(--chrome-total-h, 0px)', background: SLATE_50 }}>
         <TournamentHero
           tournament={tournament}
           imageUrl={heroImageUrl}

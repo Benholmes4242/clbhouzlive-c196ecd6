@@ -5,7 +5,7 @@
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import type { TourTournament } from '../../hooks/useTourHubData';
-import { INK_TINT_07 } from '../../_shared/tokens';
+import { AMBER, INK, INK_FAINT, INK_MUTE, INK_TINT_07, SURFACE } from '../../_shared/tokens';
 
 interface CourseInfoCardProps {
   tournament: TourTournament;
@@ -34,7 +34,7 @@ export function CourseInfoCard({ tournament, courseImage, courseId }: CourseInfo
 
   return (
     <motion.div
-      style={{ background: '#ffffff', borderTop: `1px solid ${INK_TINT_07}`, borderBottom: `1px solid ${INK_TINT_07}`, marginTop: '8px' }}
+      style={{ background: SURFACE, borderTop: `1px solid ${INK_TINT_07}`, borderBottom: `1px solid ${INK_TINT_07}`, marginTop: '8px' }}
       initial={{ opacity: 0, y: 20 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: '-40px' }}
@@ -45,7 +45,7 @@ export function CourseInfoCard({ tournament, courseImage, courseId }: CourseInfo
         <span style={{
           fontSize: 9,
           fontWeight: 800,
-          color: '#64748B',
+          color: INK_MUTE,
           letterSpacing: '0.16em',
           textTransform: 'uppercase' as const,
         }}>
@@ -56,13 +56,13 @@ export function CourseInfoCard({ tournament, courseImage, courseId }: CourseInfo
       {/* Flat ruled rows */}
       {items.map((item) => (
         <div key={item.label} style={{ display: 'flex', alignItems: 'center', padding: '10px 16px', borderTop: `0.5px solid ${INK_TINT_07}` }}>
-          <span style={{ fontSize: 9, fontWeight: 800, color: '#94A3B8', letterSpacing: '0.14em', textTransform: 'uppercase' as const, width: '88px', flexShrink: 0 }}>{item.label}</span>
+          <span style={{ fontSize: 9, fontWeight: 800, color: INK_FAINT, letterSpacing: '0.14em', textTransform: 'uppercase' as const, width: '88px', flexShrink: 0 }}>{item.label}</span>
           {item.link ? (
-            <Link to={item.link} style={{ fontSize: 14, fontWeight: 700, color: '#F7931E', textDecoration: 'none', flex: 1 }} className="active:opacity-70 transition-opacity">
+            <Link to={item.link} style={{ fontSize: 14, fontWeight: 700, color: AMBER, textDecoration: 'none', flex: 1 }} className="active:opacity-70 transition-opacity">
               {item.value}
             </Link>
           ) : (
-            <span style={{ fontSize: 14, fontWeight: 600, color: '#0F172A', flex: 1 }}>{item.value}</span>
+            <span style={{ fontSize: 14, fontWeight: 600, color: INK, flex: 1 }}>{item.value}</span>
           )}
         </div>
       ))}

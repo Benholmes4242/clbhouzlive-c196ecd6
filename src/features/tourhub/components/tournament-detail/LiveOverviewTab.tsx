@@ -19,7 +19,7 @@ import { LeaderboardCard } from './LeaderboardCard';
 import { CourseInfoCard } from './CourseInfoCard';
 import { EditorialEmpty } from './EditorialEmpty';
 import type { TourTournament } from '../../hooks/useTourHubData';
-import { INK_TINT_07 } from '../../_shared/tokens';
+import { INK, INK_MUTE, INK_TINT_07, SLATE_50, SURFACE } from '../../_shared/tokens';
 
 interface LiveOverviewTabProps {
   tournament: TourTournament;
@@ -30,12 +30,12 @@ interface LiveOverviewTabProps {
 }
 
 const sectionRule = (label: string) => (
-  <div style={{ padding: '14px 20px 8px', background: '#F8FAFC' }}>
+  <div style={{ padding: '14px 20px 8px', background: SLATE_50 }}>
     <span
       style={{
         fontSize: 9,
         fontWeight: 800,
-        color: '#64748B',
+        color: INK_MUTE,
         letterSpacing: '0.16em',
         textTransform: 'uppercase' as const,
       }}
@@ -88,7 +88,7 @@ function CutContextCard({
   return (
     <div
       style={{
-        background: '#ffffff',
+        background: SURFACE,
         borderTop: `1px solid ${INK_TINT_07}`,
         borderBottom: `1px solid ${INK_TINT_07}`,
       }}
@@ -116,7 +116,7 @@ function CutContextCard({
               style={{
                 fontSize: 9,
                 fontWeight: 800,
-                color: '#64748B',
+                color: INK_MUTE,
                 letterSpacing: '0.14em',
                 marginBottom: 4,
               }}
@@ -127,7 +127,7 @@ function CutContextCard({
               style={{
                 fontSize: 18,
                 fontWeight: 800,
-                color: '#0F172A',
+                color: INK,
                 letterSpacing: '-0.02em',
                 fontVariantNumeric: 'tabular-nums',
               }}

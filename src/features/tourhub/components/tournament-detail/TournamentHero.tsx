@@ -20,6 +20,7 @@ import { PillView, type MastheadPill } from '../leaders/LeadersMasthead';
 import { LivePulse } from '../shared/LivePulse';
 import { computeMarginOfVictory } from '../../utils/computeMarginOfVictory';
 import type { TourTournament } from '../../hooks/useTourHubData';
+import { SHELL_BG, SURFACE, WHITE_ALPHA_06, WHITE_ALPHA_08 } from '../../_shared/tokens';
 
 const COUNTRY_NAMES: Record<string, string> = {
   USA: 'United States', ENG: 'England', SCO: 'Scotland', WAL: 'Wales', IRL: 'Ireland',
@@ -179,7 +180,7 @@ export function TournamentHero({ tournament, imageUrl, leader, leaderboard }: To
   );
 
   return (
-    <div style={{ background: '#0A0E14' }}>
+    <div style={{ background: SHELL_BG }}>
       {/* Full-bleed hero image with gradient */}
       <div
         style={{
@@ -249,7 +250,7 @@ export function TournamentHero({ tournament, imageUrl, leader, leaderboard }: To
 
         {/* Bottom — location + tournament name */}
         <div style={{ position: 'absolute', bottom: 0, left: 16, right: 16, paddingBottom: 14 }}>
-          <h1 style={{ fontSize: 22, fontWeight: 800, color: '#ffffff', letterSpacing: '-0.025em', lineHeight: 1.1, margin: '0 0 6px' }}>
+          <h1 style={{ fontSize: 22, fontWeight: 800, color: SURFACE, letterSpacing: '-0.025em', lineHeight: 1.15, margin: '0 0 6px' }}>
             {tournament.name}
           </h1>
           {(tournament.venue_city || tournament.venue_country || dateRange) && (
@@ -269,15 +270,15 @@ export function TournamentHero({ tournament, imageUrl, leader, leaderboard }: To
       </div>
 
       {/* 3-col stat grid on slate */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', borderTop: '0.5px solid rgba(255,255,255,0.08)' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', borderTop: `0.5px solid ${WHITE_ALPHA_08}` }}>
         {[
           { label: 'PURSE', value: formattedPurse ?? '—' },
           { label: 'PAR', value: tournament.venue_par ? `Par ${tournament.venue_par}` : '—' },
           { label: 'YARDS', value: tournament.venue_yardage ? `${tournament.venue_yardage.toLocaleString()}` : '—' },
         ].map((s, i) => (
-          <div key={s.label} style={{ padding: '9px 0 11px', textAlign: 'center' as const, borderRight: i < 2 ? '0.5px solid rgba(255,255,255,0.06)' : 'none' }}>
+          <div key={s.label} style={{ padding: '9px 0 11px', textAlign: 'center' as const, borderRight: i < 2 ? `0.5px solid ${WHITE_ALPHA_06}` : 'none' }}>
             <div style={{ fontSize: 9, fontWeight: 800, color: 'rgba(255,255,255,0.40)', letterSpacing: '0.16em', marginBottom: '3px' }}>{s.label}</div>
-            <div style={{ fontSize: 14, fontWeight: 800, color: '#ffffff', letterSpacing: '-0.025em', fontVariantNumeric: 'tabular-nums' }}>{s.value}</div>
+            <div style={{ fontSize: 14, fontWeight: 800, color: SURFACE, letterSpacing: '-0.025em', fontVariantNumeric: 'tabular-nums' }}>{s.value}</div>
           </div>
         ))}
       </div>

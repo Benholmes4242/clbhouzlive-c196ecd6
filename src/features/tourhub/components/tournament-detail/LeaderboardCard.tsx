@@ -8,7 +8,7 @@ import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { BatchPlayerAvatar } from '../PlayerAvatar';
 import { playerRoute } from '../../routes';
-import { INK_TINT_07, SCORE_UNDER_PAR_LIGHT, SCORE_OVER_PAR_LIGHT, INK_FAINT, INK_MUTE, LEADER_GOLD_TINT_10, AMBER } from '../../_shared/tokens';
+import { AMBER, INK, INK_FAINT, INK_MUTE, INK_TINT_02, INK_TINT_07, LEADER_GOLD_TINT_10, SCORE_OVER_PAR_LIGHT, SCORE_UNDER_PAR_LIGHT, SURFACE } from '../../_shared/tokens';
 
 function abbrevName(full: string): string {
   const parts = full.trim().split(/\s+/);
@@ -59,7 +59,7 @@ function ThruDisplay({ thru }: { thru: number | null }) {
     return <span style={{ fontSize: '10px', fontWeight: 700, color: INK_MUTE, background: 'rgba(15,23,42,0.05)', padding: '2px 5px', borderRadius: 5 }}>F</span>;
   }
   return (
-    <span style={{ fontSize: '10px', color: '#94A3B8', fontVariantNumeric: 'tabular-nums' }}>
+    <span style={{ fontSize: '10px', color: INK_FAINT, fontVariantNumeric: 'tabular-nums' }}>
       Thru {thru}
     </span>
   );
@@ -89,11 +89,11 @@ export function LeaderboardCard({
       {showHeader && (
         <div style={{ padding: '0 20px 0' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '10px' }}>
-            <span style={{ fontSize: '9px', fontWeight: 800, color: '#64748B', letterSpacing: '0.16em', textTransform: 'uppercase' as const, flex: 1 }}>
+            <span style={{ fontSize: '9px', fontWeight: 800, color: INK_MUTE, letterSpacing: '0.16em', textTransform: 'uppercase' as const, flex: 1 }}>
               {title}
             </span>
             {onViewAll && (
-              <button onClick={onViewAll} style={{ fontSize: '11px', fontWeight: 800, color: '#0F172A', background: 'none', border: 'none', cursor: 'pointer', padding: 0, letterSpacing: '-0.005em', display: 'inline-flex', alignItems: 'center', gap: 2 }}>
+              <button onClick={onViewAll} style={{ fontSize: '11px', fontWeight: 800, color: INK, background: 'none', border: 'none', cursor: 'pointer', padding: 0, letterSpacing: '-0.005em', display: 'inline-flex', alignItems: 'center', gap: 2 }}>
                 View all
                 <ChevronRight size={14} strokeWidth={2.25} />
               </button>
@@ -103,15 +103,15 @@ export function LeaderboardCard({
       )}
 
       {/* Column headers */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '4px', padding: '5px 20px', background: 'rgba(15,23,42,0.02)', borderTop: `0.5px solid ${INK_TINT_07}`, borderBottom: `0.5px solid ${INK_TINT_07}` }}>
-        <span style={{ width: '36px', fontSize: '9px', fontWeight: 800, color: '#64748B', letterSpacing: '0.14em', flexShrink: 0 }}>POS</span>
-        <span style={{ flex: 1, fontSize: '9px', fontWeight: 800, color: '#64748B', letterSpacing: '0.14em' }}>PLAYER</span>
-        <span style={{ width: '36px', textAlign: 'center' as const, fontSize: '9px', fontWeight: 800, color: '#64748B', letterSpacing: '0.14em', flexShrink: 0 }}>THRU</span>
-        <span style={{ width: '44px', textAlign: 'center' as const, fontSize: '9px', fontWeight: 800, color: '#64748B', letterSpacing: '0.14em', flexShrink: 0 }}>SCORE</span>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '4px', padding: '5px 20px', background: INK_TINT_02, borderTop: `0.5px solid ${INK_TINT_07}`, borderBottom: `0.5px solid ${INK_TINT_07}` }}>
+        <span style={{ width: '36px', fontSize: '9px', fontWeight: 800, color: INK_MUTE, letterSpacing: '0.14em', flexShrink: 0 }}>POS</span>
+        <span style={{ flex: 1, fontSize: '9px', fontWeight: 800, color: INK_MUTE, letterSpacing: '0.14em' }}>PLAYER</span>
+        <span style={{ width: '36px', textAlign: 'center' as const, fontSize: '9px', fontWeight: 800, color: INK_MUTE, letterSpacing: '0.14em', flexShrink: 0 }}>THRU</span>
+        <span style={{ width: '44px', textAlign: 'center' as const, fontSize: '9px', fontWeight: 800, color: INK_MUTE, letterSpacing: '0.14em', flexShrink: 0 }}>SCORE</span>
       </div>
 
       {/* Rows */}
-      <div style={{ background: '#ffffff', borderBottom: `1px solid ${INK_TINT_07}` }}>
+      <div style={{ background: SURFACE, borderBottom: `1px solid ${INK_TINT_07}` }}>
         {displayEntries.map((entry, index) => {
           const isMissedCut = entry.status === 'MC' || entry.status === 'CUT';
 
@@ -136,14 +136,14 @@ export function LeaderboardCard({
                 className="active:bg-black/[0.02] transition-colors"
               >
                 {/* Position */}
-                <span style={{ width: '36px', fontSize: '14px', fontWeight: 800, color: entry.position === 1 ? AMBER : '#94A3B8', flexShrink: 0, fontVariantNumeric: 'tabular-nums' }}>
+                <span style={{ width: '36px', fontSize: '14px', fontWeight: 800, color: entry.position === 1 ? AMBER : INK_FAINT, flexShrink: 0, fontVariantNumeric: 'tabular-nums' }}>
                   {isMissedCut ? 'MC' : entry.status === 'WD' ? 'WD' : entry.position_tied ? `T${entry.position}` : String(entry.position)}
                 </span>
 
                 {/* Avatar + name */}
                 <div style={{ flex: 1, display: 'flex', alignItems: 'center', gap: '8px', minWidth: 0 }}>
                   <BatchPlayerAvatar playerId={entry.player?.id || ''} playerName={entry.player?.full_name || 'Unknown'} size="sm" />
-                  <p style={{ fontSize: '14px', fontWeight: entry.position === 1 ? 800 : 600, color: '#0F172A', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const }}>
+                  <p style={{ fontSize: '14px', fontWeight: entry.position === 1 ? 800 : 600, color: INK, margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const }}>
                     {abbrevName(entry.player?.full_name || 'Unknown')}
                   </p>
                 </div>
@@ -167,7 +167,7 @@ export function LeaderboardCard({
       {onViewAll && hasMore && (
         <button
           onClick={onViewAll}
-          style={{ width: '100%', padding: '12px 0', fontSize: '11px', fontWeight: 800, color: '#0F172A', background: 'transparent', border: 'none', borderTop: `0.5px solid ${INK_TINT_07}`, cursor: 'pointer', letterSpacing: '-0.005em', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 2 }}
+          style={{ width: '100%', padding: '12px 0', fontSize: '11px', fontWeight: 800, color: INK, background: 'transparent', border: 'none', borderTop: `0.5px solid ${INK_TINT_07}`, cursor: 'pointer', letterSpacing: '-0.005em', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 2 }}
           className="active:opacity-70 transition-opacity"
         >
           Full Leaderboard
