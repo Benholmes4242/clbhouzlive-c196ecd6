@@ -427,19 +427,19 @@ export function CollegeCompareHero({ data, className }: CollegeCompareHeroProps)
       </div>
 
       {/* ── SEASON OVERVIEW ── */}
-      <div style={{ background: '#ffffff', borderTop: `1px solid ${INK_TINT_07}`, borderBottom: `1px solid ${INK_TINT_07}`, marginTop: '8px' }}>
+      <div style={{ background: SURFACE, borderTop: `1px solid ${INK_TINT_07}`, borderBottom: `1px solid ${INK_TINT_07}`, marginTop: '8px' }}>
         {/* Mini logo column headers */}
         <div style={{ display: 'flex', alignItems: 'center', padding: '12px 16px 0' }}>
           <div style={{ flex: 1, display: 'flex', alignItems: 'center', gap: '5px' }}>
-            <div style={{ width: '18px', height: '18px', borderRadius: '4px', overflow: 'hidden', background: 'rgba(15,23,42,0.04)', border: '1px solid rgba(15,23,42,0.08)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+            <div style={{ width: '18px', height: '18px', borderRadius: '4px', overflow: 'hidden', background: INK_TINT_04, border: `1px solid ${HAIRLINE_INK_8}`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
               {logo1 ? <img src={logo1} alt={name1} style={{ width: '13px', height: '13px', objectFit: 'contain' }} onError={e => { e.currentTarget.style.display = 'none'; }} /> : null}
             </div>
-            <span style={{ fontSize: '13px', fontWeight: 800, color: '#64748B' }}>{name1}</span>
+            <span style={{ fontSize: '13px', fontWeight: 800, color: INK_MUTE }}>{name1}</span>
           </div>
-          <span style={{ fontSize: '9px', fontWeight: 800, color: '#64748B', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>Season Overview</span>
+          <span style={{ fontSize: '9px', fontWeight: 800, color: INK_MUTE, letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>Season Overview</span>
           <div style={{ flex: 1, display: 'flex', alignItems: 'center', gap: '5px', justifyContent: 'flex-end' }}>
-            <span style={{ fontSize: '13px', fontWeight: 800, color: '#64748B' }}>{name2}</span>
-            <div style={{ width: '18px', height: '18px', borderRadius: '4px', overflow: 'hidden', background: 'rgba(15,23,42,0.04)', border: '1px solid rgba(15,23,42,0.08)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+            <span style={{ fontSize: '13px', fontWeight: 800, color: INK_MUTE }}>{name2}</span>
+            <div style={{ width: '18px', height: '18px', borderRadius: '4px', overflow: 'hidden', background: INK_TINT_04, border: `1px solid ${HAIRLINE_INK_8}`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
               {logo2 ? <img src={logo2} alt={name2} style={{ width: '13px', height: '13px', objectFit: 'contain' }} onError={e => { e.currentTarget.style.display = 'none'; }} /> : null}
             </div>
           </div>
