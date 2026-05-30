@@ -329,10 +329,10 @@ export function FullLeaderboard({
               </Link>
 
               {showCutLine && (
-                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '6px 20px', background: 'rgba(15,23,42,0.02)', borderBottom: `0.5px solid ${INK_TINT_07}` }}>
-                  <div style={{ flex: 1, height: '0.5px', background: 'rgba(15,23,42,0.12)' }} />
-                  <span style={{ fontSize: '9px', fontWeight: 800, color: '#64748B', letterSpacing: '0.14em' }}>MISSED CUT</span>
-                  <div style={{ flex: 1, height: '0.5px', background: 'rgba(15,23,42,0.12)' }} />
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '6px 20px', background: INK_TINT_02, borderBottom: `0.5px solid ${INK_TINT_07}` }}>
+                  <div style={{ flex: 1, height: '0.5px', background: HAIRLINE_INK_12 }} />
+                  <span style={{ fontSize: '9px', fontWeight: 800, color: INK_MUTE, letterSpacing: '0.14em' }}>MISSED CUT</span>
+                  <div style={{ flex: 1, height: '0.5px', background: HAIRLINE_INK_12 }} />
                 </div>
               )}
             </motion.div>
