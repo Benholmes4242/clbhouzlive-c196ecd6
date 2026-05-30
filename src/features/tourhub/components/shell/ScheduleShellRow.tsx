@@ -188,7 +188,7 @@ function ScheduleShellRowInner() {
                   padding: '14px 16px',
                   background: isSelected ? AMBER_TINT_04 : 'transparent',
                   border: 'none',
-                  borderLeft: isSelected ? '3px solid #F7931E' : '3px solid transparent',
+                  borderLeft: isSelected ? `3px solid ${AMBER}` : '3px solid transparent',
                   borderBottom: `0.5px solid ${INK_TINT_07}`,
                   cursor: 'pointer',
                   textAlign: 'left',
@@ -196,17 +196,17 @@ function ScheduleShellRowInner() {
               >
                 <div style={{ width: 36, height: 22, borderRadius: 4, background: INK_TINT_06, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                   {code === 'all' ? (
-                    <Globe className="w-4 h-4" style={{ color: '#94A3B8' }} />
+                    <Globe className="w-4 h-4" style={{ color: INK_FAINT }} />
                   ) : hasTourLogo(code.toLowerCase()) ? (
                     <img src={getTourLogo(code.toLowerCase())} alt="" aria-hidden="true" style={{ width: 28, height: 18, objectFit: 'contain' }} />
                   ) : null}
                 </div>
                 <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ fontSize: 15, fontWeight: isSelected ? 700 : 500, color: '#0F172A' }}>{label}</div>
-                  <div style={{ fontSize: 12, color: '#94A3B8', marginTop: 2 }}>{description}</div>
+                  <div style={{ fontSize: 15, fontWeight: isSelected ? 700 : 500, color: INK }}>{label}</div>
+                  <div style={{ fontSize: 12, color: INK_FAINT, marginTop: 2 }}>{description}</div>
                 </div>
-                <span style={{ fontSize: 13, color: '#94A3B8', fontVariantNumeric: 'tabular-nums', flexShrink: 0 }}>{count}</span>
-                {isSelected && <div style={{ width: 6, height: 6, borderRadius: '50%', background: '#F7931E', flexShrink: 0 }} />}
+                <span style={{ fontSize: 13, color: INK_FAINT, fontVariantNumeric: 'tabular-nums', flexShrink: 0 }}>{count}</span>
+                {isSelected && <div style={{ width: 6, height: 6, borderRadius: '50%', background: AMBER, flexShrink: 0 }} />}
               </button>
             );
           })}
