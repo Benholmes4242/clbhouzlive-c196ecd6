@@ -181,28 +181,28 @@ export function PlayerHero({ player, playerStats }: PlayerHeroProps) {
             marginBottom: 6,
           }}
         >
-          <UserCircle size={13} strokeWidth={2.5} color="#F7931E" />
+          <UserCircle size={13} strokeWidth={2.5} color={AMBER} />
           <span
             style={{
               fontSize: 10.5,
               fontWeight: 700,
-              color: '#F7931E',
+              color: AMBER,
               letterSpacing: '0.14em',
               textTransform: 'uppercase',
             }}
           >
             PLAYER
           </span>
-          <ChevronRight size={11} strokeWidth={2.5} color="#F7931E" />
+          <ChevronRight size={11} strokeWidth={2.5} color={AMBER} />
         </button>
 
         <h1
           style={{
-            fontSize: 18,
+            fontSize: 24,
             fontWeight: 800,
-            color: '#0F172A',
-            letterSpacing: '-0.015em',
-            lineHeight: 1.05,
+            color: INK,
+            letterSpacing: '-0.025em',
+            lineHeight: 1.15,
             margin: 0,
           }}
         >
@@ -211,10 +211,11 @@ export function PlayerHero({ player, playerStats }: PlayerHeroProps) {
 
         <div
           style={{
-            marginTop: 4,
+            marginTop: 8,
             fontSize: 13,
-            fontWeight: 500,
-            color: '#64748B',
+            fontWeight: 700,
+            color: INK,
+            letterSpacing: '-0.005em',
             lineHeight: 1.3,
           }}
         >
