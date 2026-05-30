@@ -592,7 +592,7 @@ function UpcomingCard({
             bottom: 12,
             left: 14,
             right: 14,
-            color: '#fff',
+            color: SURFACE,
             fontFamily: FONT,
           }}
         >
@@ -707,7 +707,7 @@ function LiveCard({
             fontSize: 9.5,
             fontWeight: 700,
             letterSpacing: '0.08em',
-            color: '#fff',
+            color: SURFACE,
             display: 'flex',
             alignItems: 'center',
             gap: 5,
@@ -720,7 +720,7 @@ function LiveCard({
                 width: 5,
                 height: 5,
                 borderRadius: '50%',
-                background: '#fff',
+                background: SURFACE,
                 animation: 'ti-pulse 1.4s ease-in-out infinite',
               }}
             />
@@ -734,7 +734,7 @@ function LiveCard({
             bottom: 12,
             left: 14,
             right: 14,
-            color: '#fff',
+            color: SURFACE,
             fontFamily: FONT,
           }}
         >
@@ -766,7 +766,7 @@ function LiveCard({
                 style={{
                   fontSize: 24,
                   fontWeight: 800,
-                  color: '#fff',
+                  color: SURFACE,
                   letterSpacing: '-0.02em',
                   lineHeight: 1,
                   fontVariantNumeric: 'tabular-nums',
@@ -830,7 +830,7 @@ function LiveCard({
                 style={{
                   fontSize: 14,
                   fontWeight: 700,
-                  color: '#fff',
+                  color: SURFACE,
                   lineHeight: 1.4,
                   fontVariantNumeric: 'tabular-nums',
                 }}
@@ -896,19 +896,19 @@ function ResultsCard({
     top5: {
       bg: PGA_GREEN,
       label: `TOP 5 · ${pick.finished}`,
-      color: '#fff',
+      color: SURFACE,
       weight: 700 as const,
     },
     top10: {
       bg: STATUS_LIVE,
       label: `TOP 10 · ${pick.finished}`,
-      color: '#fff',
+      color: SURFACE,
       weight: 700 as const,
     },
     miss: {
       bg: 'rgba(0,0,0,0.55)',
       label: `FINISHED ${pick.finished}`,
-      color: '#fff',
+      color: SURFACE,
       weight: 700 as const,
     },
   } as const;
@@ -954,7 +954,7 @@ function ResultsCard({
             bottom: 12,
             left: 14,
             right: 14,
-            color: '#fff',
+            color: SURFACE,
             fontFamily: FONT,
           }}
         >
@@ -980,7 +980,7 @@ function ResultsCard({
           >
             <span>
               Final:{' '}
-              <strong style={{ color: isWinner ? GOLD : '#fff' }}>
+              <strong style={{ color: isWinner ? GOLD : SURFACE }}>
                 {pick.finished}
               </strong>
             </span>

@@ -109,7 +109,7 @@ export function HybridRecapNext({
 
         {upcoming && (
           <button type="button" onClick={goToUpcoming} style={{ background: 'transparent', border: 'none', textAlign: 'left', padding: '0 16px', cursor: 'pointer' }}>
-            <div style={{ fontSize: 34, lineHeight: 0.98, fontWeight: 800, color: '#fff', letterSpacing: '-0.02em', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+            <div style={{ fontSize: 34, lineHeight: 0.98, fontWeight: 800, color: SURFACE, letterSpacing: '-0.02em', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
               {upcoming.name}
             </div>
             <div style={{ marginTop: 10, fontSize: 13, fontWeight: 600, letterSpacing: '0.04em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.72)', display: '-webkit-box', WebkitLineClamp: 1, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
