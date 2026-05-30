@@ -15,6 +15,7 @@ import { useCollegeMediaMap } from '../hooks/useCollegeMedia';
 import { useHeroAlumni } from '../hooks/useBatchCollegeAlumni';
 import { useFranchiseCaptains } from '../hooks/useFranchiseCaptains';
 import { useCollegeWeeklyMovers } from '../hooks/useCollegeMovers';
+import { INK_TINT_06, INK_TINT_07 } from '../_shared/tokens';
 
 type MetricTab = 'earnings' | 'wins' | 'top10s' | 'movers';
 const VALID_METRICS = new Set<string>(['earnings', 'wins', 'top10s', 'movers']);
@@ -147,13 +148,13 @@ export function CollegeGolfHubPage() {
         {/* Masthead */}
         {statsLoading ? (
           <div style={{ background: '#F8FAFC', padding: '16px 16px 0' }}>
-            <div style={{ height: '14px', width: '200px', background: 'rgba(15,23,42,0.06)', borderRadius: '4px', marginBottom: '12px' }} className="animate-pulse" />
-            <div style={{ height: '24px', width: '180px', background: 'rgba(15,23,42,0.06)', borderRadius: '4px', marginBottom: '16px' }} className="animate-pulse" />
+            <div style={{ height: '14px', width: '200px', background: INK_TINT_06, borderRadius: '4px', marginBottom: '12px' }} className="animate-pulse" />
+            <div style={{ height: '24px', width: '180px', background: INK_TINT_06, borderRadius: '4px', marginBottom: '16px' }} className="animate-pulse" />
             <div style={{ height: '100px', background: 'rgba(15,23,42,0.04)', borderRadius: '8px', marginBottom: '12px' }} className="animate-pulse" />
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '1px', borderTop: '0.5px solid rgba(15,23,42,0.08)' }}>
               {[1, 2, 3, 4].map(i => (
                 <div key={i} style={{ padding: '12px 0', display: 'flex', justifyContent: 'center' }}>
-                  <div style={{ height: '14px', width: '40px', background: 'rgba(15,23,42,0.06)', borderRadius: '4px' }} className="animate-pulse" />
+                  <div style={{ height: '14px', width: '40px', background: INK_TINT_06, borderRadius: '4px' }} className="animate-pulse" />
                 </div>
               ))}
             </div>
@@ -224,10 +225,10 @@ export function CollegeGolfHubPage() {
 
         {/* Search results */}
         {showSearchResults && (
-          <div style={{ background: '#ffffff', borderBottom: '1px solid rgba(15,23,42,0.07)', marginTop: '8px' }}>
+          <div style={{ background: '#ffffff', borderBottom: `1px solid ${INK_TINT_07}`, marginTop: '8px' }}>
             {searchLoading ? (
               Array.from({ length: 3 }).map((_, i) => (
-                <div key={i} style={{ height: '52px', borderBottom: '0.5px solid rgba(15,23,42,0.07)' }} className="animate-pulse" />
+                <div key={i} style={{ height: '52px', borderBottom: `0.5px solid ${INK_TINT_07}` }} className="animate-pulse" />
               ))
             ) : searchResults && searchResults.length > 0 ? (
               searchResults.map((stats, index) => {

@@ -4,7 +4,7 @@
  */
 
 import React, { useMemo } from 'react';
-import { INK_SOFT } from '../../_shared/tokens';
+import { INK_SOFT, INK_TINT_06, INK_TINT_07 } from '../../_shared/tokens';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { useEventWinner } from '../../hooks/useEventWinner';
@@ -162,9 +162,9 @@ export function TournamentResultsCard({
       </div>
 
       {/* ── WINNER BLOCK ── */}
-      <div style={{ background: '#ffffff', borderTop: '1px solid rgba(15,23,42,0.07)', borderBottom: '1px solid rgba(15,23,42,0.07)' }}>
+      <div style={{ background: '#ffffff', borderTop: `1px solid ${INK_TINT_07}`, borderBottom: `1px solid ${INK_TINT_07}` }}>
         {/* Hero row */}
-        <div style={{ padding: '15px 16px 13px', borderBottom: '0.5px solid rgba(15,23,42,0.07)', borderLeft: '3px solid #F7931E' }}>
+        <div style={{ padding: '15px 16px 13px', borderBottom: `0.5px solid ${INK_TINT_07}`, borderLeft: '3px solid #F7931E' }}>
           <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 12 }}>
             <div style={{ flex: 1 }}>
               <div style={{ fontSize: 9, fontWeight: 900, color: '#F7931E', letterSpacing: '0.16em', textTransform: 'uppercase' as const, marginBottom: 4 }}>
@@ -180,7 +180,7 @@ export function TournamentResultsCard({
             </div>
 
             {/* Headshot — contained squircle */}
-            <div style={{ width: 72, height: 72, borderRadius: '34%', overflow: 'hidden', flexShrink: 0, background: 'rgba(15,23,42,0.06)' }}>
+            <div style={{ width: 72, height: 72, borderRadius: '34%', overflow: 'hidden', flexShrink: 0, background: INK_TINT_06 }}>
               <img
                 src={winnerPhoto}
                 alt={winnerName}
@@ -202,8 +202,8 @@ export function TournamentResultsCard({
             ] as const).map((s, i) => (
               <div key={s.label} style={{
                 padding: '10px 16px',
-                borderRight: i % 2 === 0 ? '0.5px solid rgba(15,23,42,0.07)' : 'none',
-                borderBottom: i < 2 ? '0.5px solid rgba(15,23,42,0.07)' : 'none',
+                borderRight: i % 2 === 0 ? `0.5px solid ${INK_TINT_07}` : 'none',
+                borderBottom: i < 2 ? `0.5px solid ${INK_TINT_07}` : 'none',
                 display: 'flex', alignItems: 'center', gap: 10,
               }}>
                 <span style={{ fontSize: 20, fontWeight: 900, color: s.color, minWidth: 26 }}>{s.v ?? 0}</span>
@@ -215,13 +215,13 @@ export function TournamentResultsCard({
 
         {/* Season stats — 3-col */}
         {sStats && (sStats.drivingDistance || sStats.greensInReg || sStats.puttingAverage) && (
-          <div style={{ display: 'flex', borderTop: '0.5px solid rgba(15,23,42,0.07)' }}>
+          <div style={{ display: 'flex', borderTop: `0.5px solid ${INK_TINT_07}` }}>
             {[
               sStats.drivingDistance ? { label: 'Driver',     value: `${Math.round(sStats.drivingDistance)}yds` } : null,
               sStats.greensInReg     ? { label: 'GIR',        value: `${Math.round(sStats.greensInReg)}%`       } : null,
               sStats.puttingAverage  ? { label: 'Putts/Hole', value: sStats.puttingAverage.toFixed(2)           } : null,
             ].filter(Boolean).map((s, i, arr) => (
-              <div key={s!.label} style={{ flex: 1, padding: '9px 16px', borderRight: i < arr.length - 1 ? '0.5px solid rgba(15,23,42,0.07)' : 'none' }}>
+              <div key={s!.label} style={{ flex: 1, padding: '9px 16px', borderRight: i < arr.length - 1 ? `0.5px solid ${INK_TINT_07}` : 'none' }}>
                 <div style={{ fontSize: 13, fontWeight: 800, color: '#0F172A' }}>{s!.value}</div>
                 <div style={{ fontSize: 8.5, fontWeight: 700, color: '#94A3B8', letterSpacing: '0.1em', textTransform: 'uppercase' as const, marginTop: 2 }}>{s!.label}</div>
               </div>
@@ -231,7 +231,7 @@ export function TournamentResultsCard({
 
         {/* Narrative — centred pull quote */}
         {narrative && (
-          <div style={{ padding: '12px 20px', borderTop: '0.5px solid rgba(15,23,42,0.07)' }}>
+          <div style={{ padding: '12px 20px', borderTop: `0.5px solid ${INK_TINT_07}` }}>
             <p style={{ fontSize: 12, fontWeight: 500, color: INK_SOFT, margin: 0, lineHeight: 1.6, fontStyle: 'italic', textAlign: 'center' }}>
               "{narrative}"
             </p>

@@ -12,6 +12,7 @@
  * Per Schedule Polish Phase 2 brief.
  */
 import { TrendingUp } from 'lucide-react';
+import { INK_TINT_06 } from '../../_shared/tokens';
 
 interface TournamentMetaProps {
   defendingChampion?: { name: string; photoUrl?: string | null } | null;
@@ -48,7 +49,7 @@ export function TournamentMeta({ defendingChampion, fieldStrengthLabel }: Tourna
               height: 16,
               borderRadius: '34%',
               overflow: 'hidden',
-              background: 'rgba(15,23,42,0.06)',
+              background: INK_TINT_06,
               display: 'inline-flex',
               alignItems: 'center',
               justifyContent: 'center',

@@ -12,7 +12,7 @@
  */
 
 import { motion } from 'framer-motion';
-import { INK_SOFT } from '../../_shared/tokens';
+import { INK_SOFT, INK_TINT_07 } from '../../_shared/tokens';
 
 export interface EditorialEmptyProps {
   eyebrow: string;
@@ -29,8 +29,8 @@ export function EditorialEmpty({ eyebrow, title, body, accent }: EditorialEmptyP
       transition={{ duration: 0.3 }}
       style={{
         background: '#ffffff',
-        borderTop: '1px solid rgba(15,23,42,0.07)',
-        borderBottom: '1px solid rgba(15,23,42,0.07)',
+        borderTop: `1px solid ${INK_TINT_07}`,
+        borderBottom: `1px solid ${INK_TINT_07}`,
         marginTop: '8px',
         padding: '18px 20px 20px',
         borderLeft: '3px solid #F7931E',

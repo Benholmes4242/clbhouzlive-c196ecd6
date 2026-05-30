@@ -6,6 +6,7 @@
  */
 
 import { getTourMeta } from '../../constants/tourMap';
+import { INK_TINT_07 } from '../../_shared/tokens';
 
 interface ScheduleMonthHeaderProps {
   monthLabel: string;
@@ -32,7 +33,7 @@ export function ScheduleMonthHeader({
     <div
       style={{
         padding: '14px 16px 8px',
-        borderBottom: '0.5px solid rgba(15,23,42,0.07)',
+        borderBottom: `0.5px solid ${INK_TINT_07}`,
         background: 'transparent',
       }}
     >

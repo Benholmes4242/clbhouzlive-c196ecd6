@@ -6,6 +6,7 @@ import { getPlayerHeadshotUrl, PLAYER_SILHOUETTE_URL } from '@/utils/playerHeads
 import type { CollegeSeasonStats } from '../../hooks/useCollegeStats';
 import type { CollegeMedia } from '../../hooks/useCollegeMedia';
 import type { AlumniFace } from '../../hooks/useBatchCollegeAlumni';
+import { INK_TINT_07 } from '../../_shared/tokens';
 
 interface CollegeCardProps {
   stats: CollegeSeasonStats;
@@ -29,7 +30,7 @@ export function CollegeCard({ stats, college, rank, alumni, className }: College
       style={{
         display: 'flex', alignItems: 'center', gap: '10px',
         padding: '10px 16px',
-        borderBottom: '0.5px solid rgba(15,23,42,0.07)',
+        borderBottom: `0.5px solid ${INK_TINT_07}`,
         textDecoration: 'none',
       }}
       className={cn('active:bg-black/[0.02] transition-colors', className)}

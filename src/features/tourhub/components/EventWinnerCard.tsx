@@ -7,6 +7,7 @@ import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { useEventWinner } from '../hooks/useEventWinner';
 import { PlayerAvatar } from './PlayerAvatar';
+import { INK_TINT_06, INK_TINT_07 } from '../_shared/tokens';
 
 interface EventWinnerCardProps {
   tournamentId: string;
@@ -25,17 +26,17 @@ export function EventWinnerCard({ tournamentId, className }: EventWinnerCardProp
   
   if (isLoading) {
     return (
-      <div className={cn("", className)} style={{ background: '#ffffff', borderTop: '1px solid rgba(15,23,42,0.07)', borderBottom: '1px solid rgba(15,23,42,0.07)', marginTop: '8px', padding: '14px 20px 14px' }}>
+      <div className={cn("", className)} style={{ background: '#ffffff', borderTop: `1px solid ${INK_TINT_07}`, borderBottom: `1px solid ${INK_TINT_07}`, marginTop: '8px', padding: '14px 20px 14px' }}>
         <div className="animate-pulse" style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', gap: '12px' }}>
           <div style={{ flex: 1 }}>
-            <div style={{ height: '8px', width: '80px', background: 'rgba(15,23,42,0.06)', borderRadius: '4px', marginBottom: '8px' }} />
-            <div style={{ height: '20px', width: '150px', background: 'rgba(15,23,42,0.06)', borderRadius: '4px', marginBottom: '6px' }} />
-            <div style={{ height: '10px', width: '100px', background: 'rgba(15,23,42,0.06)', borderRadius: '4px' }} />
+            <div style={{ height: '8px', width: '80px', background: INK_TINT_06, borderRadius: '4px', marginBottom: '8px' }} />
+            <div style={{ height: '20px', width: '150px', background: INK_TINT_06, borderRadius: '4px', marginBottom: '6px' }} />
+            <div style={{ height: '10px', width: '100px', background: INK_TINT_06, borderRadius: '4px' }} />
           </div>
-          <div style={{ width: '48px', height: '48px', borderRadius: '34%', background: 'rgba(15,23,42,0.06)' }} />
+          <div style={{ width: '48px', height: '48px', borderRadius: '34%', background: INK_TINT_06 }} />
           <div style={{ width: '52px' }}>
-            <div style={{ height: '28px', background: 'rgba(15,23,42,0.06)', borderRadius: '4px', marginBottom: '4px' }} />
-            <div style={{ height: '8px', background: 'rgba(15,23,42,0.06)', borderRadius: '4px' }} />
+            <div style={{ height: '28px', background: INK_TINT_06, borderRadius: '4px', marginBottom: '4px' }} />
+            <div style={{ height: '8px', background: INK_TINT_06, borderRadius: '4px' }} />
           </div>
         </div>
       </div>
@@ -51,7 +52,7 @@ export function EventWinnerCard({ tournamentId, className }: EventWinnerCardProp
             <span style={{ fontSize: '9px', fontWeight: 900, color: '#F7931E', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>Champion</span>
           </div>
         </div>
-        <div style={{ background: '#ffffff', borderTop: '1px solid rgba(15,23,42,0.07)', borderBottom: '1px solid rgba(15,23,42,0.07)', padding: '16px 20px' }}>
+        <div style={{ background: '#ffffff', borderTop: `1px solid ${INK_TINT_07}`, borderBottom: `1px solid ${INK_TINT_07}`, padding: '16px 20px' }}>
           <p style={{ fontSize: '13px', color: '#64748B', margin: 0 }}>Champion unlocking soon — official results will appear once the event concludes.</p>
         </div>
       </motion.div>
@@ -67,7 +68,7 @@ export function EventWinnerCard({ tournamentId, className }: EventWinnerCardProp
             <span style={{ fontSize: '9px', fontWeight: 900, color: '#F7931E', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>Champion</span>
           </div>
         </div>
-        <div style={{ background: '#ffffff', borderTop: '1px solid rgba(15,23,42,0.07)', borderBottom: '1px solid rgba(15,23,42,0.07)', padding: '14px 20px' }}>
+        <div style={{ background: '#ffffff', borderTop: `1px solid ${INK_TINT_07}`, borderBottom: `1px solid ${INK_TINT_07}`, padding: '14px 20px' }}>
           <p style={{ fontSize: '14px', fontWeight: 700, color: '#0F172A', margin: '0 0 4px' }}>{winner.headline || 'Champion crowned'}</p>
           {winner.narrative && <p style={{ fontSize: '12px', color: '#64748B', margin: 0 }}>{winner.narrative}</p>}
         </div>
@@ -86,7 +87,7 @@ export function EventWinnerCard({ tournamentId, className }: EventWinnerCardProp
       </div>
 
       {/* Winner block */}
-      <div style={{ background: '#ffffff', borderTop: '1px solid rgba(15,23,42,0.07)', borderBottom: '1px solid rgba(15,23,42,0.07)' }}>
+      <div style={{ background: '#ffffff', borderTop: `1px solid ${INK_TINT_07}`, borderBottom: `1px solid ${INK_TINT_07}` }}>
         <Link
           to={`/tourhub/player/${winner.player.id}`}
           style={{ display: 'block', textDecoration: 'none' }}
@@ -109,7 +110,7 @@ export function EventWinnerCard({ tournamentId, className }: EventWinnerCardProp
               </div>
 
               {/* Contained squircle headshot */}
-              <div style={{ width: '52px', height: '52px', borderRadius: '34%', overflow: 'hidden', flexShrink: 0, background: 'rgba(15,23,42,0.06)' }}>
+              <div style={{ width: '52px', height: '52px', borderRadius: '34%', overflow: 'hidden', flexShrink: 0, background: INK_TINT_06 }}>
                 <PlayerAvatar playerId={winner.player.id} playerName={winner.player.full_name} size="md" />
               </div>
 

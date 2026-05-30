@@ -14,7 +14,7 @@
  */
 
 import { Link } from 'react-router-dom';
-import { INK_SOFT } from '../../_shared/tokens';
+import { INK_SOFT, INK_TINT_07 } from '../../_shared/tokens';
 import { motion } from 'framer-motion';
 import { getCollegeLogoUrl } from '@/utils/collegeLogo';
 import type { CollegeSeasonStats } from '../../hooks/useCollegeStats';
@@ -140,7 +140,7 @@ export function FranchiseCard({
         style={{
           display: 'flex', alignItems: 'center',
           padding: `${rowPaddingY}px 16px`,
-          borderBottom: '0.5px solid rgba(15,23,42,0.07)',
+          borderBottom: `0.5px solid ${INK_TINT_07}`,
           textDecoration: 'none',
           ...(isDelta && deltas ? {
             background: deltas.earnings_delta >= 0

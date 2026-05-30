@@ -11,7 +11,7 @@
  */
 
 import { useState, useMemo } from 'react';
-import { SURFACE, INK_SOFT } from '../../_shared/tokens';
+import { SURFACE, INK_SOFT, INK_TINT_07 } from '../../_shared/tokens';
 import { motion, AnimatePresence } from 'framer-motion';
 import { TrendingUp, TrendingDown } from 'lucide-react';
 import { useCollegeWeeklyMovers } from '../../hooks/useCollegeMovers';
@@ -65,7 +65,7 @@ export function FranchiseMovers({ limit = 8, className }: FranchiseMoversProps) 
   return (
     <div className={className}>
       {/* Section header */}
-      <div style={{ background: '#ffffff', borderTop: '1px solid rgba(15,23,42,0.07)', padding: '14px 16px 6px' }}>
+      <div style={{ background: '#ffffff', borderTop: `1px solid ${INK_TINT_07}`, padding: '14px 16px 6px' }}>
         <SectionHeader eyebrow="Weekly Franchise Movers" />
         {weekLabel && (
           <p style={{ fontSize: 11, fontWeight: 500, color: '#94A3B8', margin: '-10px 0 6px 13px' }}>
@@ -108,9 +108,9 @@ export function FranchiseMovers({ limit = 8, className }: FranchiseMoversProps) 
       </div>
 
       {/* Movers table */}
-      <div style={{ background: '#ffffff', borderBottom: '1px solid rgba(15,23,42,0.07)' }}>
+      <div style={{ background: '#ffffff', borderBottom: `1px solid ${INK_TINT_07}` }}>
         {/* Column headers */}
-        <div style={{ display: 'flex', alignItems: 'center', padding: '5px 16px', background: 'rgba(15,23,42,0.02)', borderTop: '0.5px solid rgba(15,23,42,0.07)', borderBottom: '0.5px solid rgba(15,23,42,0.07)' }}>
+        <div style={{ display: 'flex', alignItems: 'center', padding: '5px 16px', background: 'rgba(15,23,42,0.02)', borderTop: `0.5px solid ${INK_TINT_07}`, borderBottom: `0.5px solid ${INK_TINT_07}` }}>
           <span style={{ flex: 1, fontSize: 8.5, fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.1em' }}>FRANCHISE</span>
           <span style={{ width: 40, textAlign: 'center' as const, fontSize: 8.5, fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.1em', flexShrink: 0 }}>MOVE</span>
           <span style={{ width: 72, textAlign: 'right' as const, fontSize: 8.5, fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.1em', flexShrink: 0 }}>
@@ -128,7 +128,7 @@ export function FranchiseMovers({ limit = 8, className }: FranchiseMoversProps) 
           >
             {isLoading ? (
               Array.from({ length: 5 }).map((_, i) => (
-                <div key={i} style={{ height: 44, borderBottom: '0.5px solid rgba(15,23,42,0.07)' }} className="animate-pulse" />
+                <div key={i} style={{ height: 44, borderBottom: `0.5px solid ${INK_TINT_07}` }} className="animate-pulse" />
               ))
             ) : enrichedMovers.length > 0 ? (
               enrichedMovers.map((mover, idx) => {
@@ -172,7 +172,7 @@ export function FranchiseMovers({ limit = 8, className }: FranchiseMoversProps) 
         </AnimatePresence>
 
         {/* Footer */}
-        <div style={{ padding: '10px 16px', borderTop: '0.5px solid rgba(15,23,42,0.07)' }}>
+        <div style={{ padding: '10px 16px', borderTop: `0.5px solid ${INK_TINT_07}` }}>
           <p style={{ fontSize: 8.5, fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.12em', textTransform: 'uppercase' as const, textAlign: 'center' as const, margin: 0 }}>
             WEEKLY EARNINGS CHANGE · {weekLabel?.toUpperCase() ?? 'CURRENT WEEK'}
           </p>

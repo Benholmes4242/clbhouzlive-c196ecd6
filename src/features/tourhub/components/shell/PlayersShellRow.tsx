@@ -4,6 +4,7 @@ import { ChevronDown, Globe } from 'lucide-react';
 import { BottomSheet } from '@/components/ui/BottomSheet';
 import SheetHeader from '@/components/ui/SheetHeader';
 import { getTourLogo, hasTourLogo } from '../../utils/tourLogos';
+import { INK_TINT_06, INK_TINT_07 } from '../../_shared/tokens';
 
 type PlayerTourCode = 'pga' | 'EURO' | 'LPGA' | 'CHAMP' | 'PGAD' | 'LIV';
 
@@ -117,12 +118,12 @@ function PlayersShellRowInner() {
                 background: isSelected ? 'rgba(247,147,30,0.04)' : 'transparent',
                 border: 'none',
                 borderLeft: isSelected ? '3px solid #F7931E' : '3px solid transparent',
-                borderBottom: '0.5px solid rgba(15,23,42,0.07)',
+                borderBottom: `0.5px solid ${INK_TINT_07}`,
                 cursor: 'pointer',
                 textAlign: 'left',
               }}
             >
-              <div style={{ width: 36, height: 22, borderRadius: 4, background: 'rgba(15,23,42,0.06)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+              <div style={{ width: 36, height: 22, borderRadius: 4, background: INK_TINT_06, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                 {hasTourLogo(code.toLowerCase())
                   ? <img src={getTourLogo(code.toLowerCase())} alt="" aria-hidden="true" style={{ width: 28, height: 18, objectFit: 'contain' }} />
                   : null}

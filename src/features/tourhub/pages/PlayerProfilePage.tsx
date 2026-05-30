@@ -18,6 +18,7 @@ import {
   FormSection,
 } from '../components/player';
 import { useTourPlayer, useSinglePlayerStatistics } from '../hooks/useTourHubData';
+import { INK_TINT_06 } from '../_shared/tokens';
 
 const sectionVariants = {
   hidden: { opacity: 0, y: 24 },
@@ -76,7 +77,7 @@ export function PlayerProfilePage() {
         <ShellSlot dark>
           <div style={SHELL_SLOT_BG}>
             <Kicker color="amber">Player</Kicker>
-            <Skeleton className="h-5 w-40" style={{ background: 'rgba(15,23,42,0.06)' }} />
+            <Skeleton className="h-5 w-40" style={{ background: INK_TINT_06 }} />
           </div>
         </ShellSlot>
         <div style={{ paddingTop: 'var(--chrome-total-h, 0px)' }}>
@@ -84,8 +85,8 @@ export function PlayerProfilePage() {
             <Skeleton className="h-24 w-full rounded-xl" style={{ background: 'rgba(255,184,0,0.10)' }} />
           </div>
           <div style={{ padding: '16px', marginTop: 8 }}>
-            <Skeleton className="h-48 rounded-lg" style={{ background: 'rgba(15,23,42,0.06)' }} />
-            <Skeleton className="h-64 rounded-lg mt-4" style={{ background: 'rgba(15,23,42,0.06)' }} />
+            <Skeleton className="h-48 rounded-lg" style={{ background: INK_TINT_06 }} />
+            <Skeleton className="h-64 rounded-lg mt-4" style={{ background: INK_TINT_06 }} />
           </div>
         </div>
       </TourHubShell>

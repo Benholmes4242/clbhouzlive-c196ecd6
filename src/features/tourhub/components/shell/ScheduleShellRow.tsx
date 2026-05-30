@@ -7,6 +7,7 @@ import { useTourSeason, useTourTournaments } from '../../hooks/useTourHubData';
 import { getTourLogo, hasTourLogo } from '../../utils/tourLogos';
 import { getTourMeta } from '../../constants/tourMap';
 import type { ScheduleFilterType, TourFilterCode } from '../schedule';
+import { INK_TINT_06, INK_TINT_07 } from '../../_shared/tokens';
 
 interface ChipDef {
   id: ScheduleFilterType;
@@ -174,12 +175,12 @@ function ScheduleShellRowInner() {
                   background: isSelected ? 'rgba(247,147,30,0.04)' : 'transparent',
                   border: 'none',
                   borderLeft: isSelected ? '3px solid #F7931E' : '3px solid transparent',
-                  borderBottom: '0.5px solid rgba(15,23,42,0.07)',
+                  borderBottom: `0.5px solid ${INK_TINT_07}`,
                   cursor: 'pointer',
                   textAlign: 'left',
                 }}
               >
-                <div style={{ width: 36, height: 22, borderRadius: 4, background: 'rgba(15,23,42,0.06)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                <div style={{ width: 36, height: 22, borderRadius: 4, background: INK_TINT_06, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                   {code === 'all' ? (
                     <Globe className="w-4 h-4" style={{ color: '#94A3B8' }} />
                   ) : hasTourLogo(code.toLowerCase()) ? (

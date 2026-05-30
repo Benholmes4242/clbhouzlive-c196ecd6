@@ -11,6 +11,7 @@ import { BatchPlayerAvatar } from '../PlayerAvatar';
 import { RoundSelector } from './RoundSelector';
 import { formatThruDisplay } from '../../utils/formatThruDisplay';
 import { playerRoute } from '../../routes';
+import { INK_TINT_07 } from '../../_shared/tokens';
 
 interface RawRoundData {
   thru?: number;
@@ -201,7 +202,7 @@ export function FullLeaderboard({
       </div>
 
       {/* Column headers */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '4px', padding: '5px 20px', background: 'rgba(15,23,42,0.02)', borderTop: '0.5px solid rgba(15,23,42,0.07)', borderBottom: '0.5px solid rgba(15,23,42,0.07)' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '4px', padding: '5px 20px', background: 'rgba(15,23,42,0.02)', borderTop: `0.5px solid ${INK_TINT_07}`, borderBottom: `0.5px solid ${INK_TINT_07}` }}>
         <span style={{ width: '34px', fontSize: '9px', fontWeight: 800, color: '#64748B', letterSpacing: '0.14em', flexShrink: 0 }}>POS</span>
         <span style={{ flex: 1, fontSize: '9px', fontWeight: 800, color: '#64748B', letterSpacing: '0.14em' }}>PLAYER</span>
         {showRoundColumns && (
@@ -219,7 +220,7 @@ export function FullLeaderboard({
       </div>
 
       {/* Player rows */}
-      <div style={{ background: '#ffffff', borderBottom: '1px solid rgba(15,23,42,0.07)' }}>
+      <div style={{ background: '#ffffff', borderBottom: `1px solid ${INK_TINT_07}` }}>
         {sortedEntries.map((entry, index) => {
           const isMissedCut = entry.status === 'MC' || entry.status === 'CUT';
           const isWD = entry.status === 'WD';
@@ -244,7 +245,7 @@ export function FullLeaderboard({
                 style={{
                   display: 'flex', alignItems: 'center', gap: '4px',
                   padding: '9px 20px',
-                  borderBottom: '0.5px solid rgba(15,23,42,0.07)',
+                  borderBottom: `0.5px solid ${INK_TINT_07}`,
                   borderLeft: entry.position === 1 && !isMissedCut && !isWD ? '3px solid #F7931E' : '3px solid transparent',
                   background: entry.position === 1 && !isMissedCut && !isWD ? 'rgba(247,147,30,0.025)' : 'transparent',
                   opacity: isWD ? 0.4 : isMissedCut ? 0.55 : 1,
@@ -314,7 +315,7 @@ export function FullLeaderboard({
               </Link>
 
               {showCutLine && (
-                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '6px 20px', background: 'rgba(15,23,42,0.02)', borderBottom: '0.5px solid rgba(15,23,42,0.07)' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '6px 20px', background: 'rgba(15,23,42,0.02)', borderBottom: `0.5px solid ${INK_TINT_07}` }}>
                   <div style={{ flex: 1, height: '0.5px', background: 'rgba(15,23,42,0.12)' }} />
                   <span style={{ fontSize: '9px', fontWeight: 800, color: '#64748B', letterSpacing: '0.14em' }}>MISSED CUT</span>
                   <div style={{ flex: 1, height: '0.5px', background: 'rgba(15,23,42,0.12)' }} />

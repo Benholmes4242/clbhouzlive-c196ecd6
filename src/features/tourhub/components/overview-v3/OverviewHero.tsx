@@ -16,6 +16,7 @@ import type { HeroSlide } from '../../hooks/useHeroCarouselData';
 import { HybridHero } from './HybridHero';
 import { HybridRecapNext } from './HybridRecapNext';
 import { useTourSelection } from '../../context/TourSelectionContext';
+import { INK_TINT_06 } from '../../_shared/tokens';
 
 function shuffle<T>(input: T[]): T[] {
   const a = [...input];
@@ -99,7 +100,7 @@ export function OverviewHero({ height = 528 }: OverviewHeroProps) {
 
   if (isLoading || count === 0) {
     return (
-      <div style={{ height, borderRadius: 20, background: 'linear-gradient(135deg, rgba(15,23,42,0.06), rgba(15,23,42,0.02))' }} aria-busy={isLoading} />
+      <div style={{ height, borderRadius: 20, background: `linear-gradient(135deg, ${INK_TINT_06}, rgba(15,23,42,0.02))` }} aria-busy={isLoading} />
     );
   }
 

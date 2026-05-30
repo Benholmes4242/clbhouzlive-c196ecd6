@@ -11,6 +11,7 @@ import { MovementIndicator } from '../shared/MovementIndicator';
 import { RecentResultPill } from '../shared/RecentResultPill';
 import type { PlayerSortType } from './PlayerSortControl';
 import type { RecentResult } from '../../hooks/useRecentPlayerResults';
+import { INK_TINT_06, INK_TINT_07 } from '../../_shared/tokens';
 
 interface PlayerCardV2Props {
   player: {
@@ -162,7 +163,7 @@ export function PlayerCardV2({
           display: 'flex',
           alignItems: 'center',
           gap: 0,
-          borderBottom: '0.5px solid rgba(15,23,42,0.07)',
+          borderBottom: `0.5px solid ${INK_TINT_07}`,
           borderLeft: '2px solid transparent',
           background: tierAccent ? '#FEF3E7' : 'transparent',
           textDecoration: 'none',
@@ -187,7 +188,7 @@ export function PlayerCardV2({
         )}
 
         {/* Avatar */}
-        <div style={{ width: `${photoSize}px`, height: `${photoSize}px`, borderRadius: '34%', overflow: 'hidden', flexShrink: 0, background: 'rgba(15,23,42,0.06)', marginLeft: isAlpha ? '14px' : '0', marginRight: '10px' }}>
+        <div style={{ width: `${photoSize}px`, height: `${photoSize}px`, borderRadius: '34%', overflow: 'hidden', flexShrink: 0, background: INK_TINT_06, marginLeft: isAlpha ? '14px' : '0', marginRight: '10px' }}>
           <img
             src={photoUrl}
             alt={player.fullName}

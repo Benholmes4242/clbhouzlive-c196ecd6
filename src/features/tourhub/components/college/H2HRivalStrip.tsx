@@ -20,6 +20,7 @@ import { getCollegeLogoUrl } from '@/utils/collegeLogo';
 import { useCollegeRivalries } from '../../hooks/useCollegeMovers';
 import { collegeH2HRoute } from '../../routes';
 import { PlayerInitialAvatar } from '../shared/PlayerInitialAvatar';
+import { INK_TINT_06, INK_TINT_07 } from '../../_shared/tokens';
 
 interface H2HRivalStripProps {
   normalizedName: string;
@@ -33,11 +34,11 @@ export function H2HRivalStrip({ normalizedName, className }: H2HRivalStripProps)
 
   if (isLoading) {
     return (
-      <div className={className} style={{ background: '#fff', borderTop: '1px solid rgba(15,23,42,0.07)', borderBottom: '1px solid rgba(15,23,42,0.07)', marginTop: 8 }}>
+      <div className={className} style={{ background: '#fff', borderTop: `1px solid ${INK_TINT_07}`, borderBottom: `1px solid ${INK_TINT_07}`, marginTop: 8 }}>
         <SectionHeader />
         <div style={{ display: 'flex', gap: 10, padding: '4px 16px 16px', overflowX: 'auto' }}>
           {[1, 2, 3].map(i => (
-            <div key={i} className="animate-pulse" style={{ flexShrink: 0, width: 168, height: 78, borderRadius: 12, background: 'rgba(15,23,42,0.06)' }} />
+            <div key={i} className="animate-pulse" style={{ flexShrink: 0, width: 168, height: 78, borderRadius: 12, background: INK_TINT_06 }} />
           ))}
         </div>
       </div>
@@ -48,7 +49,7 @@ export function H2HRivalStrip({ normalizedName, className }: H2HRivalStripProps)
   if (rivals.length === 0) return null;
 
   return (
-    <div className={className} style={{ background: '#fff', borderTop: '1px solid rgba(15,23,42,0.07)', borderBottom: '1px solid rgba(15,23,42,0.07)', marginTop: 8 }}>
+    <div className={className} style={{ background: '#fff', borderTop: `1px solid ${INK_TINT_07}`, borderBottom: `1px solid ${INK_TINT_07}`, marginTop: 8 }}>
       <SectionHeader />
       <div
         style={{

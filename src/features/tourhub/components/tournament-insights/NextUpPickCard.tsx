@@ -4,7 +4,7 @@
  */
 
 import React, { useState } from 'react';
-import { INK_SOFT } from '../../_shared/tokens';
+import { INK_SOFT, INK_TINT_07 } from '../../_shared/tokens';
 import { getPlayerHeadshotUrl, PLAYER_SILHOUETTE_URL } from '@/utils/playerHeadshot';
 import type { WinnerProfile, ContenderCard, ConfidenceTier } from './types';
 
@@ -54,7 +54,7 @@ function PickRow({
           padding: '0', background: isTop ? 'rgba(247,147,30,0.02)' : 'transparent',
           border: 'none',
           borderLeft: isTop ? '3px solid #F7931E' : '3px solid transparent',
-          borderBottom: '0.5px solid rgba(15,23,42,0.07)',
+          borderBottom: `0.5px solid ${INK_TINT_07}`,
           cursor: 'pointer', textAlign: 'left' as const,
           opacity: isWithdrawn ? 0.5 : 1,
         }}
@@ -73,7 +73,7 @@ function PickRow({
           {/* Player row — avatar + name/bar + world rank */}
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
             {/* Avatar */}
-            <div style={{ width: isTop ? 36 : 30, height: isTop ? 36 : 30, borderRadius: '34%', background: 'rgba(15,23,42,0.07)', flexShrink: 0, overflow: 'hidden' }}>
+            <div style={{ width: isTop ? 36 : 30, height: isTop ? 36 : 30, borderRadius: '34%', background: INK_TINT_07, flexShrink: 0, overflow: 'hidden' }}>
               <img
                 src={getPlayerHeadshotUrl(item.name, 'pga') || PLAYER_SILHOUETTE_URL}
                 alt={item.name}
@@ -126,7 +126,7 @@ function PickRow({
 
       {/* Expanded bullets */}
       {open && bullets.length > 0 && (
-        <div style={{ background: 'rgba(15,23,42,0.01)', borderBottom: '0.5px solid rgba(15,23,42,0.07)' }}>
+        <div style={{ background: 'rgba(15,23,42,0.01)', borderBottom: `0.5px solid ${INK_TINT_07}` }}>
           {bullets.map((b, bi) => (
             <div key={bi} style={{ display: 'flex', alignItems: 'center', gap: 9, padding: '7px 16px', borderBottom: bi < bullets.length - 1 ? '0.5px solid rgba(15,23,42,0.05)' : 'none' }}>
               <div style={{ width: 3, height: 3, borderRadius: '50%', background: color, flexShrink: 0 }} />
@@ -161,7 +161,7 @@ export function NextUpPickCard({
         </div>
       </div>
 
-      <div style={{ background: '#ffffff', borderTop: '1px solid rgba(15,23,42,0.07)', borderBottom: '1px solid rgba(15,23,42,0.07)' }}>
+      <div style={{ background: '#ffffff', borderTop: `1px solid ${INK_TINT_07}`, borderBottom: `1px solid ${INK_TINT_07}` }}>
         {allItems.map((item, i) => (
           <PickRow
             key={item.id}

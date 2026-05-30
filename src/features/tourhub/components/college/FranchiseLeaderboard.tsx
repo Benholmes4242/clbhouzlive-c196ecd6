@@ -18,6 +18,7 @@ import { useFranchiseCaptains } from '../../hooks/useFranchiseCaptains';
 
 import { FranchiseCard } from './FranchiseCard';
 import { FranchiseMovers } from './FranchiseMovers';
+import { INK_TINT_06, INK_TINT_07 } from '../../_shared/tokens';
 
 type MetricTab = 'earnings' | 'wins' | 'top10s' | 'movers';
 
@@ -88,7 +89,7 @@ export function FranchiseLeaderboard({
   return (
     <div className={className}>
       {activeMetric !== 'movers' && (
-        <div style={{ background: '#ffffff', borderTop: '1px solid rgba(15,23,42,0.07)', borderBottom: '1px solid rgba(15,23,42,0.07)', marginTop: 8 }}>
+        <div style={{ background: '#ffffff', borderTop: `1px solid ${INK_TINT_07}`, borderBottom: `1px solid ${INK_TINT_07}`, marginTop: 8 }}>
           {/* Section eyebrow — canonical §6 slate-caps */}
           <div style={{ padding: '14px 16px 6px' }}>
             <div style={{
@@ -110,7 +111,7 @@ export function FranchiseLeaderboard({
           </div>
 
           {/* Column headers */}
-          <div style={{ display: 'flex', alignItems: 'center', padding: '5px 16px', background: 'rgba(15,23,42,0.02)', borderTop: '0.5px solid rgba(15,23,42,0.07)', borderBottom: '0.5px solid rgba(15,23,42,0.07)' }}>
+          <div style={{ display: 'flex', alignItems: 'center', padding: '5px 16px', background: 'rgba(15,23,42,0.02)', borderTop: `0.5px solid ${INK_TINT_07}`, borderBottom: `0.5px solid ${INK_TINT_07}` }}>
             <span style={{ width: 32, fontSize: 10, fontWeight: 900, color: '#94A3B8', letterSpacing: '0.1em', flexShrink: 0, textAlign: 'center' as const }}>RK</span>
             <span style={{ flex: 1, fontSize: 10, fontWeight: 900, color: '#94A3B8', letterSpacing: '0.1em' }}>FRANCHISE</span>
             <span style={{ width: 28, textAlign: 'center' as const, fontSize: 10, fontWeight: 900, color: '#94A3B8', letterSpacing: '0.1em', flexShrink: 0 }}>WIN</span>
@@ -130,11 +131,11 @@ export function FranchiseLeaderboard({
             >
               {isLoading ? (
                 Array.from({ length: 8 }).map((_, i) => (
-                  <div key={i} style={{ display: 'flex', alignItems: 'center', padding: '12px 16px', borderBottom: '0.5px solid rgba(15,23,42,0.07)', gap: 10 }}>
-                    <div style={{ width: 32, height: 14, background: 'rgba(15,23,42,0.06)', borderRadius: 4 }} className="animate-pulse" />
-                    <div style={{ width: 34, height: 34, borderRadius: 8, background: 'rgba(15,23,42,0.06)' }} className="animate-pulse" />
-                    <div style={{ flex: 1, height: 14, background: 'rgba(15,23,42,0.06)', borderRadius: 4 }} className="animate-pulse" />
-                    <div style={{ width: 60, height: 14, background: 'rgba(15,23,42,0.06)', borderRadius: 4 }} className="animate-pulse" />
+                  <div key={i} style={{ display: 'flex', alignItems: 'center', padding: '12px 16px', borderBottom: `0.5px solid ${INK_TINT_07}`, gap: 10 }}>
+                    <div style={{ width: 32, height: 14, background: INK_TINT_06, borderRadius: 4 }} className="animate-pulse" />
+                    <div style={{ width: 34, height: 34, borderRadius: 8, background: INK_TINT_06 }} className="animate-pulse" />
+                    <div style={{ flex: 1, height: 14, background: INK_TINT_06, borderRadius: 4 }} className="animate-pulse" />
+                    <div style={{ width: 60, height: 14, background: INK_TINT_06, borderRadius: 4 }} className="animate-pulse" />
                   </div>
                 ))
               ) : sortedStats.length > 0 ? (
@@ -174,7 +175,7 @@ export function FranchiseLeaderboard({
                       />
                     );
                   })}
-                  <div style={{ padding: '12px 16px', borderTop: '0.5px solid rgba(15,23,42,0.07)' }}>
+                  <div style={{ padding: '12px 16px', borderTop: `0.5px solid ${INK_TINT_07}` }}>
                     <p style={{ fontSize: 9, fontWeight: 800, color: '#94A3B8', letterSpacing: '0.14em', textTransform: 'uppercase' as const, textAlign: 'center' as const, margin: 0 }}>
                       COLLEGE FRANCHISE RANKINGS · 2025–26 SEASON
                     </p>

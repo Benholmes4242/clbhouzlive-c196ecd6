@@ -19,6 +19,7 @@ import { LeaderboardCard } from './LeaderboardCard';
 import { CourseInfoCard } from './CourseInfoCard';
 import { EditorialEmpty } from './EditorialEmpty';
 import type { TourTournament } from '../../hooks/useTourHubData';
+import { INK_TINT_07 } from '../../_shared/tokens';
 
 interface LiveOverviewTabProps {
   tournament: TourTournament;
@@ -88,8 +89,8 @@ function CutContextCard({
     <div
       style={{
         background: '#ffffff',
-        borderTop: '1px solid rgba(15,23,42,0.07)',
-        borderBottom: '1px solid rgba(15,23,42,0.07)',
+        borderTop: `1px solid ${INK_TINT_07}`,
+        borderBottom: `1px solid ${INK_TINT_07}`,
       }}
     >
       <div
@@ -108,7 +109,7 @@ function CutContextCard({
             style={{
               padding: '14px 0 14px',
               textAlign: 'center' as const,
-              borderRight: i < 2 ? '0.5px solid rgba(15,23,42,0.07)' : 'none',
+              borderRight: i < 2 ? `0.5px solid ${INK_TINT_07}` : 'none',
             }}
           >
             <div

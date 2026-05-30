@@ -5,6 +5,7 @@
 
 import { memo } from 'react';
 import type { CourseDNAItem, ImportanceTier } from './types';
+import { INK_TINT_07 } from '../../_shared/tokens';
 
 interface CourseDNACardProps {
   items: CourseDNAItem[];
@@ -34,7 +35,7 @@ export const CourseDNACard = memo(function CourseDNACard({ items, inline, course
   if (items.length === 0) return null;
 
   return (
-    <div style={{ background: '#ffffff', borderTop: '1px solid rgba(15,23,42,0.07)', borderBottom: '1px solid rgba(15,23,42,0.07)' }}>
+    <div style={{ background: '#ffffff', borderTop: `1px solid ${INK_TINT_07}`, borderBottom: `1px solid ${INK_TINT_07}` }}>
       {items.map((item, i) => {
         const hexColor = tierToHexColor[item.tier];
         const fillPercent = tierToFill[item.tier];
@@ -44,7 +45,7 @@ export const CourseDNACard = memo(function CourseDNACard({ items, inline, course
             key={item.id}
             style={{
               display: 'flex', alignItems: 'center', padding: '10px 16px',
-              borderBottom: i < items.length - 1 ? '0.5px solid rgba(15,23,42,0.07)' : 'none',
+              borderBottom: i < items.length - 1 ? `0.5px solid ${INK_TINT_07}` : 'none',
             }}
           >
             <span style={{ fontSize: 8.5, fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.1em', textTransform: 'uppercase' as const, width: 96, flexShrink: 0 }}>

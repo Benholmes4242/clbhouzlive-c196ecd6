@@ -18,6 +18,7 @@
 
 import { ArrowDownRight, ArrowRight, ArrowUpRight } from 'lucide-react';
 import { usePlayerResults, type PlayerTournamentResult } from '../../hooks/usePlayerResults';
+import { INK_TINT_07 } from '../../_shared/tokens';
 
 interface FormSectionProps {
   playerId: string;
@@ -190,7 +191,7 @@ export function FormSection({ playerId }: FormSectionProps) {
       <div
         style={{
           background: '#ffffff',
-          borderBottom: '1px solid rgba(15,23,42,0.07)',
+          borderBottom: `1px solid ${INK_TINT_07}`,
           marginTop: 8,
           padding: '14px 16px 16px',
         }}
@@ -226,7 +227,7 @@ export function FormSection({ playerId }: FormSectionProps) {
     <div
       style={{
         background: '#ffffff',
-        borderBottom: '1px solid rgba(15,23,42,0.07)',
+        borderBottom: `1px solid ${INK_TINT_07}`,
         marginTop: 8,
         padding: '14px 16px 16px',
       }}

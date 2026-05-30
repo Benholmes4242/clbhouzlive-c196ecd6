@@ -4,6 +4,7 @@
 
 import { Link } from 'react-router-dom';
 import type { TourPlayer } from '../../hooks/useTourHubData';
+import { INK_TINT_06, INK_TINT_07 } from '../../_shared/tokens';
 
 function formatHeight(inches: string | number | null | undefined): string | null {
   if (!inches) return null;
@@ -47,7 +48,7 @@ interface InfoFieldProps {
 
 function InfoField({ label, value }: InfoFieldProps) {
   return (
-    <div style={{ paddingBottom: '10px', borderBottom: '0.5px solid rgba(15,23,42,0.06)' }}>
+    <div style={{ paddingBottom: '10px', borderBottom: `0.5px solid ${INK_TINT_06}` }}>
       <p style={{ fontSize: 9, fontWeight: 800, color: '#94A3B8', letterSpacing: '0.14em', textTransform: 'uppercase' as const, margin: '0 0 3px' }}>
         {label}
       </p>
@@ -104,7 +105,7 @@ export function PlayerInfoCard({ player }: PlayerInfoCardProps) {
   }
 
   return (
-    <div style={{ background: '#ffffff', borderBottom: '1px solid rgba(15,23,42,0.07)', marginTop: '8px', padding: '14px 16px 16px' }}>
+    <div style={{ background: '#ffffff', borderBottom: `1px solid ${INK_TINT_07}`, marginTop: '8px', padding: '14px 16px 16px' }}>
       {/* Section eyebrow — canonical §6 slate-caps */}
       <div style={{ marginBottom: '16px' }}>
         <span style={{ fontSize: '9px', fontWeight: 800, color: '#64748B', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>
@@ -126,7 +127,7 @@ export function PlayerInfoCard({ player }: PlayerInfoCardProps) {
       )}
 
       {personalFields.length > 0 && careerFields.length > 0 && (
-        <div style={{ height: '0.5px', background: 'rgba(15,23,42,0.07)', margin: '8px 0' }} />
+        <div style={{ height: '0.5px', background: INK_TINT_07, margin: '8px 0' }} />
       )}
 
       {careerFields.length > 0 && (

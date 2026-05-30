@@ -16,6 +16,7 @@
  */
 
 import { useState } from 'react';
+import { INK_TINT_06 } from '../../_shared/tokens';
 
 const FALLBACK_PALETTE = [
   { bg: '#FEF3C7', fg: '#92400E' }, // amber
@@ -79,7 +80,7 @@ export function PlayerInitialAvatar({
         borderRadius: radius,
         overflow: 'hidden',
         flexShrink: 0,
-        background: showImage ? 'rgba(15,23,42,0.06)' : palette.bg,
+        background: showImage ? INK_TINT_06 : palette.bg,
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
