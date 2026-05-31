@@ -12,6 +12,7 @@ import { cn } from '@/lib/utils';
 import VirtualizedCourseList from './VirtualizedCourseList';
 import { AppSelect, type AppSelectOption } from '@/components/ui/AppSelect';
 import { SectionEyebrow } from '@/components/ui/SectionEyebrow';
+import { AMBER, HAIRLINE_INK_7, HAIRLINE_INK_10, INK, INK_FAINT, INK_MUTE, SLATE_600, SURFACE } from '@/features/courses/_shared/tokens';
 
 type Top100SortOption = 'official' | 'user_rating';
 
@@ -215,7 +216,7 @@ const Top100CoursesHubPanel = () => {
           Parent already supplies px-4 — don't double-pad. */}
       <div className="pt-1">
         <SectionEyebrow label="Official World Ranking" color="amber" className="mb-[3px]" />
-        <h2 style={{ fontSize: 22, fontWeight: 800, color: '#0F172A', letterSpacing: '-0.025em', margin: 0, lineHeight: 1.1 }}>
+        <h2 style={{ fontSize: 22, fontWeight: 800, color: INK, letterSpacing: '-0.025em', margin: 0, lineHeight: 1.15 }}>
           The world's best
         </h2>
         {crossListProgress && (
@@ -223,7 +224,7 @@ const Top100CoursesHubPanel = () => {
             style={{
               fontSize: 13,
               fontWeight: 500,
-              color: '#475569',
+              color: SLATE_600,
               margin: '8px 0 0',
               letterSpacing: '-0.005em',
               fontFamily: "'Geist', sans-serif",
@@ -232,7 +233,7 @@ const Top100CoursesHubPanel = () => {
             You've rated{' '}
             <span
               style={{
-                color: '#F7931E',
+                color: AMBER,
                 fontWeight: 700,
                 fontVariantNumeric: 'tabular-nums',
                 fontFeatureSettings: '"zero" 0',
@@ -265,7 +266,7 @@ const Top100CoursesHubPanel = () => {
                   border: 'none',
                   fontSize: 13,
                   fontWeight: isActive ? 800 : 500,
-                  color: isActive ? '#0F172A' : '#94A3B8',
+                  color: isActive ? INK : INK_FAINT,
                   cursor: 'pointer',
                   transition: 'color 150ms',
                   letterSpacing: isActive ? '-0.01em' : 0,
@@ -291,7 +292,7 @@ const Top100CoursesHubPanel = () => {
             placeholder={`Search the ${activeListShortLabel} Top 100`}
             aria-label="Search within Top 100 list"
             className="pl-10 pr-10 h-12 rounded-2xl text-base focus-visible:ring-2 focus-visible:ring-[#F7931E]/30 focus-visible:outline-none"
-            style={{ background: '#ffffff', border: '1px solid rgba(15,23,42,0.10)' }}
+            style={{ background: SURFACE, border: `1px solid ${HAIRLINE_INK_10}` }}
           />
           {searchTerm && (
             <button
@@ -310,7 +311,7 @@ const Top100CoursesHubPanel = () => {
       {!isLoading && allCourses.length > 0 && (
         <div className="flex items-center justify-between gap-3 pt-2 px-4">
           <span style={{
-            fontSize: 11, color: '#64748B', flex: 1,
+            fontSize: 11, color: INK_MUTE, flex: 1,
             fontWeight: 600, letterSpacing: '0.16em', textTransform: 'uppercase',
           }}>
             {searchTerm ? (
@@ -334,7 +335,7 @@ const Top100CoursesHubPanel = () => {
       {isLoading ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 animate-fade-in">
           {[1, 2, 3, 4, 5, 6].map((i) => (
-            <div key={i} className="space-y-3 rounded-2xl overflow-hidden" style={{ background: '#ffffff', border: '1px solid rgba(15,23,42,0.07)' }}>
+            <div key={i} className="space-y-3 rounded-2xl overflow-hidden" style={{ background: SURFACE, border: `1px solid ${HAIRLINE_INK_7}` }}>
               <Skeleton className="h-40 w-full rounded-xl" />
               <div className="space-y-2">
                 <Skeleton className="h-5 w-3/4" />
@@ -370,7 +371,8 @@ const Top100CoursesHubPanel = () => {
             <button
               onClick={() => setSearchTerm('')}
               className="mt-2 inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-sm font-medium active:scale-[0.97] transition-transform"
-              style={{ background: '#ffffff', border: '1px solid rgba(15,23,42,0.10)', color: '#0F172A' }}
+              style={{ background: SURFACE, border: `1px solid ${HAIRLINE_INK_10}`, color: INK }}
+
             >
               <X className="h-3.5 w-3.5" />
               Clear search
@@ -379,7 +381,7 @@ const Top100CoursesHubPanel = () => {
             <button
               onClick={handleResetFilters}
               className="mt-2 inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-sm font-medium active:scale-[0.97] transition-transform"
-              style={{ background: '#ffffff', border: '1px solid rgba(15,23,42,0.10)', color: '#0F172A' }}
+              style={{ background: SURFACE, border: `1px solid ${HAIRLINE_INK_10}`, color: INK }}
             >
               Reset filters
             </button>
