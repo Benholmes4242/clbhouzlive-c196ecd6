@@ -58,7 +58,7 @@ export const CourseHolesTab: React.FC<Props> = ({ courseId }) => {
   if (isError) {
     return (
       <div style={{ padding: '40px 18px', textAlign: 'center', fontFamily: FONT }}>
-        <div style={{ fontSize: 14, fontWeight: 600, color: '#64748b' }}>
+        <div style={{ fontSize: 14, fontWeight: 600, color: INK_MUTE }}>
           Couldn't load hole analysis.
         </div>
       </div>
