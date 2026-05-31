@@ -4,7 +4,8 @@ import { useTourLeaderboard } from '../../hooks/useTourHubData';
 import { FullLeaderboard } from '../tournament-detail/FullLeaderboard';
 import { EditorialEmpty } from '../tournament-detail/EditorialEmpty';
 import { INK, INK_MUTE, INK_TINT_07, SURFACE, SHELL_BG, STATUS_LIVE, WHITE_ALPHA_06, WHITE_ALPHA_18, WHITE_ALPHA_55, WHITE_ALPHA_65 } from '../../_shared/tokens';
-import { tourPriorityIndex } from '../../_shared/tourOrder';
+import { tourPriorityIndex, TOUR_LABEL, shortTournamentToken } from '../../_shared/tourOrder';
+import type { LiveTournamentLite } from '../../hooks/useLiveTournaments';
 
 
 /**
@@ -41,8 +42,23 @@ export function LiveLeaderboardTab() {
     [liveTournaments, selectedId],
   );
 
+  // Count live events per tour to know when to disambiguate same-tour pills.
+  const tourCounts = useMemo(() => {
+    const m = new Map<string, number>();
+    for (const t of liveTournaments) m.set(t.tourSlug, (m.get(t.tourSlug) ?? 0) + 1);
+    return m;
+  }, [liveTournaments]);
+
+  const pillLabel = (t: LiveTournamentLite): string => {
+    const base = TOUR_LABEL[t.tourSlug] ?? (t.tour_name ?? 'Tour');
+    if ((tourCounts.get(t.tourSlug) ?? 0) > 1) {
+      return `${base} · ${shortTournamentToken(t.name)}`;
+    }
+    return base;
+  };
 
   const { data: leaderboard, isLoading: isLoadingBoard } = useTourLeaderboard(selected?.id ?? '');
+
 
   if (isLoading && liveTournaments.length === 0) {
     return <LiveLeaderboardSkeleton />;
@@ -117,7 +133,7 @@ export function LiveLeaderboardTab() {
                     }}
                   />
                 )}
-                {t.name}
+                {pillLabel(t)}
               </button>
             );
           })}
