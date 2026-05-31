@@ -94,11 +94,15 @@ interface TeeTimeGroup {
   }>;
 }
 
-function TeeTimeGroupCard({ group, index, searchQuery, tournamentName }: { group: TeeTimeGroup; index: number; searchQuery: string; tournamentName?: string }) {
+function TeeTimeGroupCard({ group, searchQuery, tournamentName, scoreByPlayer, showScores, isFeatured }: { group: TeeTimeGroup; index: number; searchQuery: string; tournamentName?: string; scoreByPlayer: Map<string, ScoreInfo>; showScores: boolean; isFeatured?: boolean }) {
   const hasMatchingPlayer = searchQuery.trim() && group.players.some(p => p.name.toLowerCase().includes(searchQuery.toLowerCase()));
-
+  const accent = hasMatchingPlayer || isFeatured;
   return (
-    <div style={{ borderBottom: `0.5px solid ${INK_TINT_07}`, background: hasMatchingPlayer ? 'rgba(247,147,30,0.03)' : 'transparent' }}>
+    <div style={{
+      borderBottom: `0.5px solid ${INK_TINT_07}`,
+      borderLeft: accent ? `3px solid ${AMBER}` : '3px solid transparent',
+      background: accent ? 'rgba(247,147,30,0.03)' : 'transparent',
+    }}>
       {/* Time + hole row */}
       <div style={{ display: 'flex', alignItems: 'center', padding: '11px 20px 5px' }}>
         <span style={{ fontSize: '14px', fontWeight: 800, color: INK, width: '72px', flexShrink: 0, fontVariantNumeric: 'tabular-nums' }}>
@@ -108,21 +112,43 @@ function TeeTimeGroupCard({ group, index, searchQuery, tournamentName }: { group
           Hole {group.startingHole}
         </span>
         {group.backNine && <span style={{ fontSize: '10px', color: INK_FAINT, marginLeft: '6px' }}>Back 9</span>}
+        {isFeatured && !hasMatchingPlayer && (
+          <span style={{ marginLeft: '8px', fontSize: '9px', fontWeight: 800, color: AMBER, letterSpacing: '0.14em', textTransform: 'uppercase' as const }}>Featured</span>
+        )}
       </div>
       {/* Players */}
       <div style={{ padding: '0 20px 10px 72px' }}>
-        {group.players.map((player, playerIdx) => (
-          <Link
-            key={player.id || playerIdx}
-            {...playerRoute(player.playerId || player.id || '', tournamentName ? { kind: 'tournament', tournamentName } : undefined)}
-            style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '4px 0', textDecoration: 'none' }}
-            className="active:opacity-70 transition-opacity"
-          >
-            <BatchPlayerAvatar playerId={player.playerId || player.id || ''} playerName={player.name} size="sm" />
-            <span style={{ fontSize: '14px', fontWeight: 600, color: INK }}>{player.name}</span>
-            {player.country && <CountryFlag country={player.country} size="sm" />}
-          </Link>
-        ))}
+        {group.players.map((player, playerIdx) => {
+          const pid = player.playerId || player.id || '';
+          const s = showScores ? scoreByPlayer.get(pid) : undefined;
+          return (
+            <Link
+              key={player.id || playerIdx}
+              {...playerRoute(pid, tournamentName ? { kind: 'tournament', tournamentName } : undefined)}
+              style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '4px 0', textDecoration: 'none' }}
+              className="active:opacity-70 transition-opacity"
+            >
+              <BatchPlayerAvatar playerId={pid} playerName={player.name} size="sm" />
+              <span style={{ fontSize: '14px', fontWeight: 600, color: INK, flex: 1, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const }}>{player.name}</span>
+              {player.country && <CountryFlag country={player.country} size="sm" />}
+              {s && (() => {
+                const isMissed = s.status === 'CUT' || s.status === 'WD' || s.status === 'DQ' || s.status === 'MC';
+                if (isMissed) {
+                  return <span style={{ fontSize: '12px', fontWeight: 700, color: INK_FAINT, width: '64px', textAlign: 'right' as const, flexShrink: 0 }}>{s.status === 'CUT' || s.status === 'MC' ? 'MC' : s.status}</span>;
+                }
+                const val = s.score == null ? '—' : s.score === 0 ? 'E' : s.score < 0 ? String(s.score) : `+${s.score}`;
+                const color = s.score == null ? INK_FAINT : s.score < 0 ? SCORE_UNDER_PAR_LIGHT : s.score > 0 ? SCORE_OVER_PAR_LIGHT : INK_FAINT;
+                const posStr = s.position == null ? '' : `${s.tied ? 'T' : ''}${s.position}`;
+                return (
+                  <span style={{ display: 'inline-flex', alignItems: 'baseline', gap: 6, width: '64px', justifyContent: 'flex-end', flexShrink: 0 }}>
+                    {posStr && <span style={{ fontSize: '10px', fontWeight: 700, color: INK_FAINT, fontVariantNumeric: 'tabular-nums' }}>{posStr}</span>}
+                    <span style={{ fontSize: '14px', fontWeight: 800, color, fontVariantNumeric: 'tabular-nums' }}>{val}</span>
+                  </span>
+                );
+              })()}
+            </Link>
+          );
+        })}
       </div>
     </div>
   );
