@@ -44,6 +44,21 @@ export const TourHubShellTabs: React.FC = () => {
 
   const active = computeActiveTab(location.pathname, searchParams);
 
+  const { data: liveTournaments } = useLiveTournaments();
+  const showLive = (liveTournaments?.length ?? 0) > 0;
+
+  const tabs = useMemo<TabDef[]>(() => {
+    const base: TabDef[] = [{ id: 'overview', label: 'Overview' }];
+    if (showLive) base.push({ id: 'live', label: 'Leaderboard' });
+    base.push(
+      { id: 'schedule', label: 'Schedule' },
+      { id: 'players', label: 'Players' },
+      { id: 'leaderboards', label: 'Leaders' },
+      { id: 'college', label: 'College' },
+    );
+    return base;
+  }, [showLive]);
+
   const handleTap = (id: TabId, btn: HTMLButtonElement | null) => {
     if (id === 'college') {
       navigate('/tourhub/college-golf');
