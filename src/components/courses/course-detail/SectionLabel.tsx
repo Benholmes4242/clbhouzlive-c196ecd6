@@ -14,12 +14,12 @@ interface SectionLabelProps {
  */
 export const SectionLabel: React.FC<SectionLabelProps> = ({ text, accent = false }) => (
   <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '0 16px', marginBottom: 14 }}>
-    <div style={{ width: 3, height: 13, background: accent ? '#F7931E' : '#0F172A', borderRadius: 1 }} />
+    <div style={{ width: 3, height: 13, background: accent ? AMBER : INK, borderRadius: 1 }} />
     <span
       style={{
         fontSize: 9,
         fontWeight: 900,
-        color: accent ? '#F7931E' : '#0F172A',
+        color: accent ? AMBER : INK,
         letterSpacing: '0.18em',
         textTransform: 'uppercase' as const,
       }}
