@@ -264,6 +264,10 @@ export const CourseLegendsDrilldown: React.FC<Props> = ({ selection, hideHeader 
         />
       )}
 
+      {/* In-tab course search — always shown (synced + non-synced). Includes
+          a small connect-WHS cue beneath for non-synced users. */}
+      <ChampionsCourseSearch currentCourseId={ctx.courseId} />
+
       <div style={{ padding: '14px 16px 4px', display: 'flex', justifyContent: 'flex-start' }}>
         <WindowToggle window={window} setWindow={handleWindowChange} />
       </div>
