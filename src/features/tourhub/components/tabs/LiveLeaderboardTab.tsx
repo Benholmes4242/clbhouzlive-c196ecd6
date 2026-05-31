@@ -61,8 +61,8 @@ export function LiveLeaderboardTab() {
             overflowY: 'hidden',
             WebkitOverflowScrolling: 'touch',
             scrollbarWidth: 'none',
-            background: '#FFFFFF',
-            borderBottom: `0.5px solid ${INK_TINT_07}`,
+            background: SHELL_BG,
+            borderBottom: `0.5px solid ${WHITE_ALPHA_06}`,
           }}
         >
           {liveTournaments.map((t) => {
@@ -75,12 +75,12 @@ export function LiveLeaderboardTab() {
                 onClick={() => setSelectedId(t.id)}
                 style={{
                   flex: '0 0 auto',
-                  height: 32,
-                  padding: '0 14px',
-                  borderRadius: 999,
-                  border: `0.5px solid ${isActive ? INK : INK_TINT_07}`,
-                  background: isActive ? INK : '#FFFFFF',
-                  color: isActive ? '#FFFFFF' : INK_MUTE,
+                  height: 30,
+                  padding: '0 11px',
+                  borderRadius: 15,
+                  background: isActive ? WHITE_ALPHA_18 : 'transparent',
+                  border: `1px solid ${isActive ? WHITE_ALPHA_55 : WHITE_ALPHA_18}`,
+                  color: isActive ? SURFACE : WHITE_ALPHA_65,
                   fontFamily: 'Geist, system-ui, -apple-system, BlinkMacSystemFont, sans-serif',
                   fontSize: 12,
                   fontWeight: isActive ? 700 : 600,
@@ -99,8 +99,8 @@ export function LiveLeaderboardTab() {
                       width: 6,
                       height: 6,
                       borderRadius: '50%',
-                      background: '#EF4444',
-                      boxShadow: isActive ? '0 0 0 2px rgba(239,68,68,0.25)' : 'none',
+                      background: STATUS_LIVE,
+                      boxShadow: isActive ? '0 0 0 2px rgba(16,185,129,0.30)' : 'none',
                     }}
                   />
                 )}
