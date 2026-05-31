@@ -139,8 +139,8 @@ const VirtualizedCourseList: React.FC<VirtualizedCourseListProps> = ({
     const rafId = requestAnimationFrame(() => {
       if (!sampleCardRef.current) return;
       const height = sampleCardRef.current.offsetHeight;
-      // Tailwind: gap-3 (12px) on mobile, gap-6 (24px) at sm+
-      const gap = window.innerWidth >= 640 ? 24 : 12;
+      // Tailwind: gap-2 (8px) on mobile, gap-6 (24px) at sm+
+      const gap = window.innerWidth >= 640 ? 24 : 8;
       const measured = height + gap;
       if (measured > 0 && Math.abs(measured - rowHeight) > 4) {
         setRowHeight(measured);
