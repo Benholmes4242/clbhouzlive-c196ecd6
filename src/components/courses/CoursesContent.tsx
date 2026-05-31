@@ -8,6 +8,7 @@ import UserCoursesContent from './UserCoursesContent';
 import Top100CoursesHubPanel from './Top100CoursesHubPanel';
 import Top100LeaderboardPanel from './Top100LeaderboardPanel';
 import ExploreTabContent from '@/components/explore-tab-new/ExploreTabContent';
+import ConnectHandicapCue from '@/components/courses/course-detail/ConnectHandicapCue';
 
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { Button } from '@/components/ui/button';
