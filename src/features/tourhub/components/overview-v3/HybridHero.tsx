@@ -27,6 +27,7 @@ import { LeaderboardBand } from './HybridHeroBands/LeaderboardBand';
 import { ResultBand } from './HybridHeroBands/ResultBand';
 import { TopThreePeek, type TopThreePeekRow } from './HybridHeroBands/TopThreePeek';
 import { SignatureFooter } from './HybridHeroBands/SignatureFooter';
+import { CinematicFrame } from './HybridHeroBands/CinematicFrame';
 import { format } from 'date-fns';
 import {
   deriveHeroState,
