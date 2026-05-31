@@ -12,6 +12,10 @@
 
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import {
+  RESULTS_WINDOW_HOURS,
+  UPCOMING_WINDOW_DAYS,
+} from '@/features/tourhub/components/overview-v3/HybridHero.utils';
 
 // Union of all fields needed by any consumer hook
 const CACHE_SELECT = `
