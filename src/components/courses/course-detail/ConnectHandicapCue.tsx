@@ -12,7 +12,15 @@ import {
   HAIRLINE_INK_8,
 } from '@/features/courses/_shared/tokens';
 
-type CueVariant = 'about' | 'holes' | 'champions' | 'progress' | 'leaderboard' | 'discover';
+type CueVariant =
+  | 'about'
+  | 'holes'
+  | 'champions'
+  | 'progress'
+  | 'leaderboard'
+  | 'discover'
+  | 'tour-venue'
+  | 'tour-holes';
 
 const FONT = 'Geist, system-ui, sans-serif';
 
@@ -49,6 +57,16 @@ const COPY: Record<
     Icon: Map,
     benefit: () => 'See which of these you’ve played',
     sub: () => 'Connect your handicap to see how you scored at every course.',
+  },
+  'tour-venue': {
+    Icon: Trophy,
+    benefit: (n) => `See how you'd score at ${n}`,
+    sub: () => 'Connect your WHS handicap to compare your game to this week’s venue.',
+  },
+  'tour-holes': {
+    Icon: LayoutGrid,
+    benefit: () => 'See your scoring on these holes vs the field',
+    sub: () => 'Connect your WHS handicap to measure your game against the pros’, hole by hole.',
   },
 };
 

@@ -9,6 +9,7 @@ import { RoundSelector } from './RoundSelector';
 import { EditorialEmpty } from './EditorialEmpty';
 import { useTourHoleStats } from '../../hooks/useTourHubData';
 import { AMBER, FONT, HAIRLINE_INK_8, HAIRLINE_INK_10, INK, INK_FAINT, INK_MUTE, INK_TINT_02, INK_TINT_06, INK_TINT_07, SURFACE, TREND_DOWN } from '../../_shared/tokens';
+import { ConnectHandicapCue } from '@/components/courses/course-detail/ConnectHandicapCue';
 
 // Local hole-distribution ramp (mirrors src/features/courses/components/holes/_constants.ts).
 // Duplicated intentionally to keep tourhub self-contained — no cross-feature import.
@@ -23,6 +24,8 @@ interface HoleStatsTabProps {
   tournamentSrId: string | null;
   isLive: boolean;
   isCompleted?: boolean;
+  courseId?: string | null;
+  courseName?: string | null;
 }
 
 interface ProcessedHole {
@@ -105,7 +108,7 @@ function HoleStatsEmpty({ isCompleted, roundLabel }: { isCompleted?: boolean; ro
   );
 }
 
-export function HoleStatsTab({ tournamentId, isCompleted }: HoleStatsTabProps) {
+export function HoleStatsTab({ tournamentId, isCompleted, courseId, courseName }: HoleStatsTabProps) {
   const [selectedRound, setSelectedRound] = useState('Overall');
   const [sort, setSort] = useState<'hole' | 'difficulty'>('hole');
   const { data: rawHoleStats, isLoading } = useTourHoleStats(tournamentId);
@@ -182,6 +185,9 @@ export function HoleStatsTab({ tournamentId, isCompleted }: HoleStatsTabProps) {
 
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.3 }}>
+      {courseId && (
+        <ConnectHandicapCue variant="tour-holes" courseName={courseName ?? ''} />
+      )}
       {/* Round selector */}
       {availableRounds.length > 1 && (
         <div style={{ padding: '8px 20px' }}>

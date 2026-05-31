@@ -302,6 +302,8 @@ export function TournamentDetailPage() {
             tournamentSrId={tournament.sr_id}
             isLive={isLive}
             isCompleted={isCompleted}
+            courseId={courseMatch?.golfCourseId}
+            courseName={tournament.venue_course_name}
           />
         );
       
