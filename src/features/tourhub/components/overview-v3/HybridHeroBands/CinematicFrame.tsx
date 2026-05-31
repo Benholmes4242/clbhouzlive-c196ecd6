@@ -1029,12 +1029,11 @@ export function CinematicFrame({
               fontFamily: "'Geist', -apple-system, BlinkMacSystemFont, sans-serif",
             }}
           >
-            <span>
-              Full leaderboard{fieldSize > 0 ? ` · ${fieldSize} players` : ''}
-            </span>
+            <span>{capsuleFooter}</span>
             <ChevronRight size={14} strokeWidth={2.5} />
           </button>
         </div>
+        )}
       </div>
     </div>
   );
