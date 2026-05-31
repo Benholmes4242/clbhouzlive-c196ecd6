@@ -182,10 +182,10 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
           <div style={{ marginTop: 24, padding: '0 16px' }}>
             <SectionLabel text="About" />
             <div>
-              <div style={{ fontSize: 14, color: '#475569', lineHeight: 1.7, position: 'relative' }}>
+              <div style={{ fontSize: 14, color: SLATE_600, lineHeight: 1.7, position: 'relative' }}>
                 {formatDescription(displayDescription)}
                 {!showFullDescription && shouldShowReadMore && (
-                  <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: 40, background: 'linear-gradient(to top, #F8FAFC, transparent)', pointerEvents: 'none' }} />
+                  <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: 40, background: `linear-gradient(to top, ${SLATE_50}, transparent)`, pointerEvents: 'none' }} />
                 )}
               </div>
               {shouldShowReadMore && (
