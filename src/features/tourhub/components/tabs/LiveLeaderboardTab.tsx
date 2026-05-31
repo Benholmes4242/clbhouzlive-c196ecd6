@@ -13,10 +13,20 @@ import { tourPriorityIndex } from '../../_shared/tourOrder';
  * from the tournament detail page.
  */
 export function LiveLeaderboardTab() {
-  const { data: liveTournaments = [], isLoading } = useLiveTournaments();
+  const { data: rawLiveTournaments = [], isLoading } = useLiveTournaments();
   const [selectedId, setSelectedId] = useState<string | null>(null);
 
-  // Default-select the first (highest-purse) tournament once data loads.
+  // Canonical tour-priority order, with purse as the within-tour tiebreaker.
+  const liveTournaments = useMemo(() => {
+    return [...rawLiveTournaments].sort((a, b) => {
+      const ai = tourPriorityIndex(a.tourSlug);
+      const bi = tourPriorityIndex(b.tourSlug);
+      if (ai !== bi) return ai - bi;
+      return (b.purse ?? 0) - (a.purse ?? 0);
+    });
+  }, [rawLiveTournaments]);
+
+  // Default-select the first (canonical-order) tournament once data loads.
   useEffect(() => {
     if (!selectedId && liveTournaments.length > 0) {
       setSelectedId(liveTournaments[0].id);
@@ -30,6 +40,7 @@ export function LiveLeaderboardTab() {
     () => liveTournaments.find(t => t.id === selectedId) ?? liveTournaments[0] ?? null,
     [liveTournaments, selectedId],
   );
+
 
   const { data: leaderboard, isLoading: isLoadingBoard } = useTourLeaderboard(selected?.id ?? '');
 
