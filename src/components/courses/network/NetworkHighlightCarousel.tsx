@@ -48,7 +48,7 @@ export const NetworkHighlightCarousel: React.FC<NetworkHighlightCarouselProps> =
   return (
     <div className={cn('mt-3', className)}>
       <div 
-        className="flex gap-2.5 overflow-x-auto scrollbar-hide"
+        className="flex gap-2.5 overflow-x-auto scrollbar-hide -mx-4 px-4"
         style={{ 
           scrollSnapType: 'x mandatory',
           scrollbarWidth: 'none', 
