@@ -135,7 +135,15 @@ export function SummaryTab({
   }, [leaderboard]);
 
 
-  if (!isLive && !isCompleted) return <SummaryEmpty />;
+  if (!isLive && !isCompleted)
+    return (
+      <EditorialEmpty
+        icon={<Trophy size={28} strokeWidth={1.8} color={AMBER} />}
+        eyebrow="Summary"
+        title="Summary arrives after the final putt"
+        body="Once the tournament wraps, you'll get the winner, the runner-up, margin of victory, and earnings — the whole story in one place."
+      />
+    );
   if (isLoading) return <SummarySkeleton />;
 
   return (
