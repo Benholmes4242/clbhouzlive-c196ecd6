@@ -5,7 +5,7 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import type { TourPlayerStatistics } from '../../hooks/useTourHubData';
-import { AMBER, HAIRLINE_INK_8, HAIRLINE_INK_15, INK, INK_FAINT, INK_MUTE, INK_TINT_07, SLATE_600, SURFACE } from '../../_shared/tokens';
+import { AMBER, HAIRLINE_INK_8, HAIRLINE_INK_15, INK, INK_FAINT, INK_MUTE, INK_TINT_07, SURFACE } from '../../_shared/tokens';
 
 const STAT_TABS = ['Overview', 'Ball Striking', 'Short Game', 'Shots Gained'] as const;
 type StatTab = (typeof STAT_TABS)[number];
