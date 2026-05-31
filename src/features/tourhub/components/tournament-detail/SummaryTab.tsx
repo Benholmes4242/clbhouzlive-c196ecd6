@@ -202,11 +202,11 @@ export function SummaryTab({
         if (total === 0) return null;
 
         const segments = [
-          { label: 'Eagles', count: t.eagles, color: GOLD, pct: (t.eagles / total * 100).toFixed(1) },
-          { label: 'Birdies', count: t.birdies, color: TREND_UP, pct: (t.birdies / total * 100).toFixed(1) },
-          { label: 'Pars', count: t.pars, color: HAIRLINE_INK_15, pct: (t.pars / total * 100).toFixed(1) },
-          { label: 'Bogeys', count: t.bogeys, color: TREND_DOWN, pct: (t.bogeys / total * 100).toFixed(1) },
-          { label: 'Double+', count: t.doubleBogeys, color: '#7F1D1D', pct: (t.doubleBogeys / total * 100).toFixed(1) },
+          { label: 'Eagles', count: t.eagles, color: '#F7931E', pct: (t.eagles / total * 100).toFixed(1) },
+          { label: 'Birdies', count: t.birdies, color: '#F7931E', pct: (t.birdies / total * 100).toFixed(1) },
+          { label: 'Pars', count: t.pars, color: '#94A3B8', pct: (t.pars / total * 100).toFixed(1) },
+          { label: 'Bogeys', count: t.bogeys, color: '#EF4444', pct: (t.bogeys / total * 100).toFixed(1) },
+          { label: 'Double+', count: t.doubleBogeys, color: '#991B1B', pct: (t.doubleBogeys / total * 100).toFixed(1) },
         ];
 
         return (
