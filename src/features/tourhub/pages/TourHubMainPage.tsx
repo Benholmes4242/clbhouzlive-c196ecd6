@@ -4,11 +4,12 @@ import { TourHubShell } from '../components/TourHubShell';
 import { TourHubShellTabs } from '../components/TourHubShellTabs';
 import { ShellSlot } from '@/components/header/ShellSlot';
 import type { TourHubTab } from '../components/types';
-import { OverviewTab, ScheduleTab, PlayersTab, LeadersTab } from '../components/tabs';
+import { OverviewTab, ScheduleTab, PlayersTab, LeadersTab, LiveLeaderboardTab } from '../components/tabs';
 import { ScheduleShellRow } from '../components/shell/ScheduleShellRow';
 import { PlayersShellRow } from '../components/shell/PlayersShellRow';
 import { LeadersShellRow } from '../components/shell/LeadersShellRow';
 import { useTournamentStatusRealtime } from '../hooks/useTournamentStatusRealtime';
+import { useLiveTournaments } from '../hooks/useLiveTournaments';
 import { TourSelectionProvider } from '../context/TourSelectionContext';
 
 export function TourHubMainPage() {
@@ -18,6 +19,9 @@ export function TourHubMainPage() {
 
   // Subscribe to tournament status changes (live/completed transitions)
   useTournamentStatusRealtime();
+
+  const { data: liveTournaments, isFetched: liveFetched } = useLiveTournaments();
+  const showLive = (liveTournaments?.length ?? 0) > 0;
 
   // Sync tab with URL + redirect legacy player-stats to leaderboards
   useEffect(() => {
@@ -33,10 +37,20 @@ export function TourHubMainPage() {
     }
   }, [tabParam]);
 
+  // Dead-tab guard: if the user lands on `?tab=live` but no events are live, bounce to overview.
+  useEffect(() => {
+    if (activeTab === 'live' && liveFetched && !showLive) {
+      setSearchParams({ tab: 'overview' }, { replace: true });
+      setActiveTab('overview');
+    }
+  }, [activeTab, liveFetched, showLive, setSearchParams]);
+
   const renderTab = () => {
     switch (activeTab) {
       case 'overview':
         return <OverviewTab />;
+      case 'live':
+        return <LiveLeaderboardTab />;
       case 'schedule':
         return <ScheduleTab />;
       case 'players':
