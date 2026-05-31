@@ -16,7 +16,7 @@ import {
   NUMERIC_STYLE,
 } from '../HybridHero.constants';
 import { FONT } from '../../../_shared/tokens';
-import type { HeroState } from '../HybridHero.utils';
+import { type HeroState, roundLabel } from '../HybridHero.utils';
 
 interface PhotoBandProps {
   title: string;
@@ -34,7 +34,7 @@ interface PhotoBandProps {
 function ledeLine(state: HeroState, winnerName?: string | null): string | null {
   if (state.kind === 'results' && winnerName) return `Won by ${winnerName}`;
   if (state.kind === 'live') {
-    return `Round ${state.round}`;
+    return roundLabel(state.round, state.totalRounds);
   }
   if (state.kind === 'upcoming') return state.countdown || null;
   return null;

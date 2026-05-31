@@ -24,7 +24,7 @@ import {
   NUMERIC_STYLE,
 } from '../HybridHero.constants';
 import type { HeroState, TopTie } from '../HybridHero.utils';
-import { fmtScore, formatRank, buildLeaderboardSlots } from '../HybridHero.utils';
+import { fmtScore, formatRank, buildLeaderboardSlots, roundLabel } from '../HybridHero.utils';
 import { getPlayerHeadshotUrl } from '@/utils/playerHeadshot';
 
 // ---- helpers --------------------------------------------------------------
@@ -358,9 +358,9 @@ export function CinematicFrame({
 
   // Top meta: LIVE · ROUND N (live) or FINAL (results)
   const isLive = state.kind === 'live';
-  const roundLabel =
+  const roundLabel_ =
     state.kind === 'live'
-      ? `LIVE · ROUND ${state.round}`
+      ? `LIVE · ${roundLabel(state.round, state.totalRounds).toUpperCase()}`
       : state.kind === 'results'
         ? 'FINAL'
         : null;
@@ -528,7 +528,7 @@ export function CinematicFrame({
             padding: '0 4px',
           }}
         >
-          {roundLabel ? (
+          {roundLabel_ ? (
             <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
               {isLive && (
                 <span
@@ -555,7 +555,7 @@ export function CinematicFrame({
                   textShadow: '0 1px 3px rgba(0,0,0,0.45)',
                 }}
               >
-                {roundLabel}
+                {roundLabel_}
               </span>
             </div>
           ) : <span />}
