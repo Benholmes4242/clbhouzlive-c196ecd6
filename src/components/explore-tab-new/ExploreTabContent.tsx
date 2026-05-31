@@ -12,8 +12,7 @@ import { TestYourGame } from './TestYourGame';
 import { WhereYoudRank } from './WhereYoudRank';
 
 
-import { BucketListStrip } from './BucketListStrip';
-import { ReviewsOfTheWeekStrip } from './ReviewsOfTheWeekStrip';
+import { CommunityShelf } from './CommunityShelf';
 import ExploreGrid from './ExploreGrid';
 import ExploreAutoplay from './ExploreAutoplay';
 import { ExploreSectionHeader } from './ExploreSectionHeader';
