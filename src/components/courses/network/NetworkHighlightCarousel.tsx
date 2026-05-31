@@ -50,9 +50,7 @@ export const NetworkHighlightCarousel: React.FC<NetworkHighlightCarouselProps> =
       <div
         className="flex gap-2.5 overflow-x-auto scrollbar-hide"
         style={{
-          marginLeft: 'calc(50% - 50vw)',
           marginRight: 'calc(50% - 50vw)',
-          paddingLeft: 16,
           paddingRight: 16,
           scrollSnapType: 'x mandatory',
           scrollbarWidth: 'none',
