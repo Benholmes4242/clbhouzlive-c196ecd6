@@ -422,8 +422,8 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
           <div style={{ width: 64, height: 64, borderRadius: '50%', background: 'rgba(247,147,30,0.07)', border: '1.5px solid rgba(247,147,30,0.18)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px', fontSize: 28 }}>
             ⭐
           </div>
-          <div style={{ fontSize: 19, fontWeight: 900, color: '#0F172A', letterSpacing: '-0.03em', marginBottom: 6 }}>No reviews yet</div>
-          <p style={{ fontSize: 13, color: '#94A3B8', lineHeight: 1.6, maxWidth: 260, margin: '0 auto 22px' }}>
+          <div style={{ fontSize: 19, fontWeight: 900, color: INK, letterSpacing: '-0.03em', marginBottom: 6 }}>No reviews yet</div>
+          <p style={{ fontSize: 13, color: INK_FAINT, lineHeight: 1.6, maxWidth: 260, margin: '0 auto 22px' }}>
             Be the first to share your experience at {courseName}.
           </p>
           <button
