@@ -113,6 +113,7 @@ interface SectionRow {
   valueDisplay: string;
   attained_at: string;
   isSelf: boolean;
+  userId: string | null;
 }
 
 interface Props {
