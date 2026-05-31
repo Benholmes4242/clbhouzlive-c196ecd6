@@ -5,6 +5,10 @@
  *
  * Upcoming state is unchanged — HybridHero still routes upcoming to the
  * original three-band path.
+ *
+ * IMPORTANT: the capsule renders SLOTS via the same `buildLeaderboardSlots`
+ * + `tiedLeaders` machinery the white LeaderboardBand uses. It must NOT
+ * render raw `slice(0, 3)` rows — that would break tie handling.
  */
 
 import React from 'react';
@@ -19,8 +23,8 @@ import {
   GOLD,
   NUMERIC_STYLE,
 } from '../HybridHero.constants';
-import type { HeroState } from '../HybridHero.utils';
-import { fmtScore } from '../HybridHero.utils';
+import type { HeroState, TopTie } from '../HybridHero.utils';
+import { fmtScore, formatRank, buildLeaderboardSlots } from '../HybridHero.utils';
 import { getPlayerHeadshotUrl } from '@/utils/playerHeadshot';
 
 // ---- helpers --------------------------------------------------------------
@@ -34,15 +38,262 @@ function entryThru(e: any): string {
   if (e?.thru == null) return '—';
   return String(e.thru);
 }
-function entryPos(e: any, fallback: number): string {
-  if (e?.position == null) return String(fallback);
-  return e?.position_tied ? `T${e.position}` : String(e.position);
+function resolveAvatar(e: any, tourSlug?: string | null): string | null {
+  const direct = e?.player?.photo_url ?? null;
+  if (direct) return direct;
+  const name = entryName(e);
+  if (!name || name === '—' || !tourSlug) return null;
+  try { return getPlayerHeadshotUrl(name, tourSlug); } catch { return null; }
 }
 function scoreColor(score: number | null | undefined): string {
   if (score == null || Number.isNaN(score)) return 'rgba(255,255,255,0.85)';
   if (score < 0) return '#34D399';   // under par
   if (score > 0) return '#FCA5A5';   // over par
   return 'rgba(255,255,255,0.85)';   // even
+}
+
+// ---- dark-surface row primitives -----------------------------------------
+
+const ROW_BORDER = '0.5px solid rgba(255,255,255,0.08)';
+
+function StackedAvatarsDark({
+  urls,
+  size = 22,
+}: {
+  urls: (string | null)[];
+  size?: number;
+}) {
+  const visible = urls.slice(0, 4);
+  return (
+    <div style={{ display: 'flex', alignItems: 'center', flexShrink: 0 }}>
+      {visible.map((url, i) => (
+        <div
+          key={i}
+          style={{
+            width: size,
+            height: size,
+            borderRadius: '50%',
+            marginLeft: i === 0 ? 0 : -8,
+            border: '1.5px solid rgba(255,255,255,0.9)',
+            background: 'rgba(255,255,255,0.08)',
+            overflow: 'hidden',
+            flexShrink: 0,
+            zIndex: visible.length - i,
+            position: 'relative',
+          }}
+        >
+          {url && (
+            <img
+              src={url}
+              alt=""
+              loading="lazy"
+              style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+            />
+          )}
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function SoloRowDark({
+  entry,
+  rank,
+  avatarUrl,
+  isLeader,
+  isLast,
+  isResultsLeader,
+}: {
+  entry: any;
+  rank: string;
+  avatarUrl: string | null;
+  isLeader: boolean;
+  isLast: boolean;
+  isResultsLeader: boolean;
+}) {
+  const name = entryName(entry);
+  const score = entry?.score;
+  return (
+    <div
+      style={{
+        display: 'flex',
+        alignItems: 'center',
+        gap: 10,
+        padding: '10px 10px',
+        borderBottom: isLast ? 'none' : ROW_BORDER,
+      }}
+    >
+      <span
+        style={{
+          ...NUMERIC_STYLE,
+          width: 22,
+          fontSize: 12,
+          fontWeight: 700,
+          color: isLeader ? AMBER : 'rgba(255,255,255,0.5)',
+          textAlign: 'left',
+          flexShrink: 0,
+        }}
+      >
+        {rank}
+      </span>
+      {avatarUrl ? (
+        <img
+          src={avatarUrl}
+          alt=""
+          loading="lazy"
+          style={{
+            width: 26, height: 26, borderRadius: '50%', objectFit: 'cover',
+            flexShrink: 0, background: 'rgba(255,255,255,0.08)',
+          }}
+        />
+      ) : (
+        <div
+          style={{
+            width: 26, height: 26, borderRadius: '50%',
+            background: 'rgba(255,255,255,0.08)', flexShrink: 0,
+          }}
+        />
+      )}
+      <span
+        style={{
+          flex: 1, minWidth: 0, fontSize: 15, fontWeight: 600, color: 'white',
+          whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
+          display: 'flex', alignItems: 'center', gap: 6,
+        }}
+      >
+        {name}
+        {isResultsLeader && (
+          <Crown size={12} color={GOLD} fill={GOLD} strokeWidth={0} />
+        )}
+      </span>
+      <span
+        style={{
+          ...NUMERIC_STYLE,
+          fontSize: 16, fontWeight: 800, letterSpacing: '-0.02em',
+          color: scoreColor(score), flexShrink: 0,
+        }}
+      >
+        {fmtScore(score)}
+      </span>
+      <span
+        style={{
+          ...NUMERIC_STYLE,
+          width: 18, fontSize: 11, fontWeight: 600,
+          color: 'rgba(255,255,255,0.4)', textAlign: 'right', flexShrink: 0,
+        }}
+      >
+        {entryThru(entry)}
+      </span>
+    </div>
+  );
+}
+
+function TiedLeadersRowDark({
+  count,
+  score,
+  avatars,
+  isLast,
+}: {
+  count: number;
+  score: string;
+  avatars: (string | null)[];
+  isLast: boolean;
+}) {
+  return (
+    <div
+      style={{
+        display: 'flex', alignItems: 'center', gap: 10,
+        padding: '10px 10px',
+        borderBottom: isLast ? 'none' : ROW_BORDER,
+      }}
+    >
+      <span
+        style={{
+          ...NUMERIC_STYLE,
+          width: 22, fontSize: 12, fontWeight: 700,
+          color: AMBER, textAlign: 'left', flexShrink: 0,
+        }}
+      >
+        T1
+      </span>
+      <StackedAvatarsDark urls={avatars} size={26} />
+      <span
+        style={{
+          flex: 1, minWidth: 0, fontSize: 14, fontWeight: 700, color: 'white',
+          whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
+        }}
+      >
+        {count} tied for the lead
+      </span>
+      <span
+        style={{
+          ...NUMERIC_STYLE,
+          fontSize: 16, fontWeight: 800, letterSpacing: '-0.02em',
+          color: '#34D399', flexShrink: 0,
+        }}
+      >
+        {score}
+      </span>
+      <span style={{ width: 18, flexShrink: 0 }} />
+    </div>
+  );
+}
+
+function TiedChasersRowDark({
+  rank,
+  count,
+  score,
+  avatars,
+  isLast,
+  onTap,
+}: {
+  rank: string;
+  count: number;
+  score: number;
+  avatars: (string | null)[];
+  isLast: boolean;
+  onTap?: () => void;
+}) {
+  return (
+    <div
+      onClick={onTap}
+      style={{
+        display: 'flex', alignItems: 'center', gap: 10,
+        padding: '10px 10px',
+        borderBottom: isLast ? 'none' : ROW_BORDER,
+        cursor: onTap ? 'pointer' : 'default',
+      }}
+    >
+      <span
+        style={{
+          ...NUMERIC_STYLE,
+          width: 22, fontSize: 12, fontWeight: 700,
+          color: 'rgba(255,255,255,0.5)', textAlign: 'left', flexShrink: 0,
+        }}
+      >
+        {rank}
+      </span>
+      <StackedAvatarsDark urls={avatars} size={26} />
+      <span
+        style={{
+          flex: 1, minWidth: 0, fontSize: 14, fontWeight: 600, color: 'white',
+          whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
+        }}
+      >
+        {count} players
+      </span>
+      <span
+        style={{
+          ...NUMERIC_STYLE,
+          fontSize: 16, fontWeight: 800, letterSpacing: '-0.02em',
+          color: scoreColor(score), flexShrink: 0,
+        }}
+      >
+        {fmtScore(score)}
+      </span>
+      <span style={{ width: 18, flexShrink: 0 }} />
+    </div>
+  );
 }
 
 // ---- props ----------------------------------------------------------------
@@ -59,6 +310,7 @@ export interface CinematicFrameProps {
   startDate?: string | null;
   endDate?: string | null;
   leaderboard: any[];
+  tiedLeaders: TopTie | null;
   fieldSize: number;
   tourSlug?: string | null;
   onCtaTap?: () => void;
@@ -78,6 +330,7 @@ export function CinematicFrame({
   startDate,
   endDate,
   leaderboard,
+  tiedLeaders,
   fieldSize,
   tourSlug,
   onCtaTap,
@@ -103,7 +356,7 @@ export function CinematicFrame({
   const metaParts = [dateRange, venueLine].filter(Boolean);
   const metaLine = metaParts.length ? metaParts.join(' · ') : null;
 
-  // Top meta: LIVE · ROUND N (live only) or ROUND N (results) — keep simple
+  // Top meta: LIVE · ROUND N (live) or FINAL (results)
   const isLive = state.kind === 'live';
   const roundLabel =
     state.kind === 'live'
@@ -112,8 +365,112 @@ export function CinematicFrame({
         ? 'FINAL'
         : null;
 
-  // Top 3 rows for capsule
-  const top3 = (Array.isArray(leaderboard) ? leaderboard : []).slice(0, 3);
+  // ---- Capsule slot construction (mirrors LeaderboardBand live-state) ----
+  const safe = Array.isArray(leaderboard) ? leaderboard : [];
+  const avatar = (e: any) => resolveAvatar(e, tourSlug);
+
+  type SlotNode = React.ReactNode;
+  const slotNodes: SlotNode[] = [];
+
+  if (safe.length > 0) {
+    if (tiedLeaders) {
+      // Find first chaser (first entry whose score differs from the leader's)
+      const topScore = safe[0]?.score ?? safe[0]?.total;
+      const firstChaser = safe.findIndex(e => (e?.score ?? e?.total) !== topScore);
+      const chasers =
+        firstChaser >= 0
+          ? safe.slice(firstChaser)
+          : safe.slice(tiedLeaders.count);
+
+      const tiedAvatars = safe
+        .filter(e => (e?.score ?? e?.total) === topScore)
+        .slice(0, Math.min(tiedLeaders.count, 4))
+        .map(e => avatar(e));
+
+      slotNodes.push(
+        <TiedLeadersRowDark
+          key="tied-leaders"
+          count={tiedLeaders.count}
+          score={tiedLeaders.score}
+          avatars={tiedAvatars}
+          isLast={false}
+        />
+      );
+
+      const chaserSlots = buildLeaderboardSlots(chasers, 2);
+      chaserSlots.forEach((slot, i) => {
+        const isLast = i === chaserSlots.length - 1;
+        if (slot.kind === 'tie') {
+          slotNodes.push(
+            <TiedChasersRowDark
+              key={`c-tie-${i}`}
+              rank={slot.rank}
+              count={slot.count}
+              score={slot.score}
+              avatars={slot.members.map((m: any) => avatar(m))}
+              isLast={isLast}
+              onTap={onCtaTap}
+            />
+          );
+        } else {
+          slotNodes.push(
+            <SoloRowDark
+              key={`c-solo-${i}`}
+              entry={slot.entry}
+              rank={formatRank(slot.entry)}
+              avatarUrl={avatar(slot.entry)}
+              isLeader={false}
+              isLast={isLast}
+              isResultsLeader={false}
+            />
+          );
+        }
+      });
+    } else {
+      const leader = safe[0];
+      slotNodes.push(
+        <SoloRowDark
+          key="leader"
+          entry={leader}
+          rank={String(leader.position ?? 1)}
+          avatarUrl={avatar(leader)}
+          isLeader={true}
+          isLast={false}
+          isResultsLeader={state.kind === 'results'}
+        />
+      );
+
+      const chaserSlots = buildLeaderboardSlots(safe.slice(1), 2);
+      chaserSlots.forEach((slot, i) => {
+        const isLast = i === chaserSlots.length - 1;
+        if (slot.kind === 'tie') {
+          slotNodes.push(
+            <TiedChasersRowDark
+              key={`c-tie-${i}`}
+              rank={slot.rank}
+              count={slot.count}
+              score={slot.score}
+              avatars={slot.members.map((m: any) => avatar(m))}
+              isLast={isLast}
+              onTap={onCtaTap}
+            />
+          );
+        } else {
+          slotNodes.push(
+            <SoloRowDark
+              key={`c-solo-${i}`}
+              entry={slot.entry}
+              rank={formatRank(slot.entry)}
+              avatarUrl={avatar(slot.entry)}
+              isLeader={false}
+              isLast={isLast}
+              isResultsLeader={false}
+            />
+          );
+        }
+      });
+    }
+  }
 
   return (
     <div
@@ -219,7 +576,7 @@ export function CinematicFrame({
           position: 'absolute',
           left: 20,
           right: 20,
-          bottom: 150,
+          bottom: 200,
           zIndex: 3,
           display: 'flex',
           flexDirection: 'column',
@@ -308,116 +665,8 @@ export function CinematicFrame({
           boxShadow: '0 8px 40px rgba(0,0,0,0.4)',
         }}
       >
-        {top3.length > 0 ? (
-          <>
-            {top3.map((e, i) => {
-              const name = entryName(e);
-              const score = e?.score;
-              const isLeader = i === 0;
-              const avatarUrl =
-                e?.player?.photo_url ??
-                (name && tourSlug ? safeHeadshot(name, tourSlug) : null);
-              return (
-                <div
-                  key={i}
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: 10,
-                    padding: '10px 10px',
-                    borderBottom:
-                      i < top3.length - 1
-                        ? '0.5px solid rgba(255,255,255,0.08)'
-                        : 'none',
-                  }}
-                >
-                  <span
-                    style={{
-                      ...NUMERIC_STYLE,
-                      width: 22,
-                      fontSize: 12,
-                      fontWeight: 700,
-                      color: isLeader ? AMBER : 'rgba(255,255,255,0.5)',
-                      textAlign: 'left',
-                      flexShrink: 0,
-                    }}
-                  >
-                    {entryPos(e, i + 1)}
-                  </span>
-                  {avatarUrl ? (
-                    <img
-                      src={avatarUrl}
-                      alt=""
-                      loading="lazy"
-                      style={{
-                        width: 26,
-                        height: 26,
-                        borderRadius: '50%',
-                        objectFit: 'cover',
-                        flexShrink: 0,
-                        background: 'rgba(255,255,255,0.08)',
-                      }}
-                    />
-                  ) : (
-                    <div
-                      style={{
-                        width: 26,
-                        height: 26,
-                        borderRadius: '50%',
-                        background: 'rgba(255,255,255,0.08)',
-                        flexShrink: 0,
-                      }}
-                    />
-                  )}
-                  <span
-                    style={{
-                      flex: 1,
-                      minWidth: 0,
-                      fontSize: 15,
-                      fontWeight: 600,
-                      color: 'white',
-                      whiteSpace: 'nowrap',
-                      overflow: 'hidden',
-                      textOverflow: 'ellipsis',
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: 6,
-                    }}
-                  >
-                    {name}
-                    {isLeader && state.kind === 'results' && (
-                      <Crown size={12} color={GOLD} fill={GOLD} strokeWidth={0} />
-                    )}
-                  </span>
-                  <span
-                    style={{
-                      ...NUMERIC_STYLE,
-                      fontSize: 16,
-                      fontWeight: 800,
-                      letterSpacing: '-0.02em',
-                      color: scoreColor(score),
-                      flexShrink: 0,
-                    }}
-                  >
-                    {fmtScore(score)}
-                  </span>
-                  <span
-                    style={{
-                      ...NUMERIC_STYLE,
-                      width: 18,
-                      fontSize: 11,
-                      fontWeight: 600,
-                      color: 'rgba(255,255,255,0.4)',
-                      textAlign: 'right',
-                      flexShrink: 0,
-                    }}
-                  >
-                    {entryThru(e)}
-                  </span>
-                </div>
-              );
-            })}
-          </>
+        {slotNodes.length > 0 ? (
+          <>{slotNodes}</>
         ) : (
           <div
             style={{
@@ -464,12 +713,4 @@ export function CinematicFrame({
       </div>
     </div>
   );
-}
-
-function safeHeadshot(name: string, tourSlug: string): string | null {
-  try {
-    return getPlayerHeadshotUrl(name, tourSlug);
-  } catch {
-    return null;
-  }
 }
