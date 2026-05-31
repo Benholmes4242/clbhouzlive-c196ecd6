@@ -171,7 +171,7 @@ export function PhotoBand({
         }}
       />
 
-      {/* Top eyebrow row — status tag left, tour meta right */}
+      {/* Top eyebrow row — tour name left, dates right */}
       <div
         style={{
           position: 'absolute',
@@ -185,7 +185,6 @@ export function PhotoBand({
           gap: 12,
         }}
       >
-        <StatusTag state={state} />
         {tourLabel && (
           <span
             style={{
@@ -202,7 +201,24 @@ export function PhotoBand({
             {tourLabel}
           </span>
         )}
+        {datesString && (
+          <span
+            style={{
+              ...NUMERIC_STYLE,
+              fontSize: 10,
+              fontWeight: 700,
+              letterSpacing: '0.16em',
+              color: 'rgba(255,255,255,0.75)',
+              textShadow: '0 1px 3px rgba(0,0,0,0.45)',
+              textTransform: 'uppercase',
+              whiteSpace: 'nowrap',
+            }}
+          >
+            {datesString}
+          </span>
+        )}
       </div>
+
 
       {/* Bottom title block */}
       <div
