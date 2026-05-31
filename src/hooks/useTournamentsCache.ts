@@ -64,10 +64,14 @@ export interface TournamentsCache {
 
 async function fetchTournamentsCache(): Promise<TournamentsCache> {
   const today = new Date().toISOString().split('T')[0];
-  // Rail + Hero results window — 3d covers Sun→Tue/Wed viewing rhythm.
-  // Single consumer of cache.completed (useHeroCarouselData) is robust to a
-  // wider window: it picks most-recent-per-tour and caps at 6 slides.
-  const resultsWindowAgo = new Date(Date.now() - 3 * 86400000).toISOString();
+  // Rail + Hero results window — shared with deriveHeroState so the bucket
+  // and the visual state agree (prevents badge/card drift).
+  const resultsWindowAgo = new Date(
+    Date.now() - RESULTS_WINDOW_HOURS * 3_600_000
+  ).toISOString();
+  const upcomingHorizon = new Date(
+    Date.now() + UPCOMING_WINDOW_DAYS * 86_400_000
+  ).toISOString();
 
   const [liveRes, completedRes, upcomingRes] = await Promise.all([
     // Live + starting soon
