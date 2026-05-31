@@ -67,14 +67,6 @@ function DotStrip({ events }: DotStripProps) {
   return (
     <div style={{ display: 'flex', alignItems: 'flex-end', gap: 12 }}>
       {events.map((evt, i) => {
-        const status = evt.status?.toUpperCase();
-        const isMissed = status === 'CUT' || status === 'WD' || status === 'DQ' || status === 'MC';
-        const pos = evt.position;
-        const color = dotColorForPosition(pos ?? 999, evt.status);
-function DotStrip({ events }: DotStripProps) {
-  return (
-    <div style={{ display: 'flex', alignItems: 'flex-end', gap: 12 }}>
-      {events.map((evt, i) => {
         const pos = evt.position;
         const color = dotColorForPosition(pos ?? 999, evt.status);
         const label = formatFinishLabel(evt);
