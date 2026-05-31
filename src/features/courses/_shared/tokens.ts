@@ -15,6 +15,10 @@
 /* ── Ink scale (text + foreground) ──────────────────────────────────── */
 export const INK = '#0F172A';                               // canonical foreground
 export const INK_MUTE = '#64748B';                          // muted/supporting text (slate-500)
+export const INK_FAINT = '#94A3B8';                         // fainter supporting text (slate-400) — inactive pill text, captions
+
+/* ── Slate scale ────────────────────────────────────────────────────── */
+export const SLATE_600 = '#475569';                         // slate-600 — sub-body text, progress sub-line
 
 /* ── Surfaces ───────────────────────────────────────────────────────── */
 export const SURFACE = '#FFFFFF';                           // canonical white surface
