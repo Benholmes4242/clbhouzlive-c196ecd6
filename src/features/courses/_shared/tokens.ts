@@ -19,6 +19,7 @@ export const INK_FAINT = '#94A3B8';                         // fainter supportin
 
 /* ── Slate scale ────────────────────────────────────────────────────── */
 export const SLATE_600 = '#475569';                         // slate-600 — sub-body text, progress sub-line
+export const INK_ALPHA_60 = 'rgba(15,23,42,0.60)';          // supporting text on light — RecCard location subline
 
 /* ── Surfaces ───────────────────────────────────────────────────────── */
 export const SURFACE = '#FFFFFF';                           // canonical white surface
