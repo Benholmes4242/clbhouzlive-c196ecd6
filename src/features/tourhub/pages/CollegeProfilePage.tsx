@@ -175,7 +175,7 @@ export function CollegeProfilePage() {
       <div style={{
         position: 'relative',
         background: SLATE_50,
-        paddingTop: 0,
+        paddingTop: 16,
         paddingLeft: 16,
         paddingRight: 16,
         paddingBottom: 16,
