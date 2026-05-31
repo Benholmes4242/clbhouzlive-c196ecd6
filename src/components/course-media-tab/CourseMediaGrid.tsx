@@ -216,38 +216,29 @@ export const CourseMediaGrid = forwardRef<HTMLDivElement, CourseMediaGridProps>(
         </div>
       )}
 
-      {/* Rest of posts — 2-col grid, landscape cards span full width */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 2, gridAutoFlow: 'dense' }}>
-        {restPosts.map((post) => {
+      {/* Square mosaic — uniform 3-col, periodic 2×2 feature */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 2, gridAutoFlow: 'dense' }}>
+        {restPosts.map((post, i) => {
           const mediaKey = post.mediaItems[0]?.id || post.id;
-          if (isLandscape(post)) {
-            const idx = tileIndex++;
-            return (
-              <div key={mediaKey} style={{ gridColumn: '1 / -1' }}>
-                <CourseMediaLandscapeCard
-                  post={post}
-                  index={idx}
-                  allPosts={posts}
-                  fetchNextPage={fetchNextPage}
-                  hasNextPage={hasNextPage}
-                  isFetchingNextPage={isFetchingNextPage}
-                  onOpenFullscreen={handleOpenFullscreen}
-                />
-              </div>
-            );
-          }
           const idx = tileIndex++;
+          // Every 7th tile (starting after the first row) becomes a 2×2 feature for rhythm.
+          const isFeature = i > 2 && i % 7 === 0;
           return (
-            <CourseMediaTile
+            <div
               key={mediaKey}
-              post={post}
-              index={idx}
-              allPosts={posts}
-              fetchNextPage={fetchNextPage}
-              hasNextPage={hasNextPage}
-              isFetchingNextPage={isFetchingNextPage}
-              onOpenFullscreen={handleOpenFullscreen}
-            />
+              style={isFeature ? { gridColumn: 'span 2', gridRow: 'span 2' } : undefined}
+            >
+              <CourseMediaTile
+                post={post}
+                index={idx}
+                feature={isFeature}
+                allPosts={posts}
+                fetchNextPage={fetchNextPage}
+                hasNextPage={hasNextPage}
+                isFetchingNextPage={isFetchingNextPage}
+                onOpenFullscreen={handleOpenFullscreen}
+              />
+            </div>
           );
         })}
 
@@ -261,6 +252,7 @@ export const CourseMediaGrid = forwardRef<HTMLDivElement, CourseMediaGridProps>(
           </div>
         )}
       </div>
+
     </div>
   );
 });
