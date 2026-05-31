@@ -447,11 +447,11 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
             { icon: '🏠', label: 'Facilities', sub: 'Clubhouse, practice areas, service' },
             { icon: '💰', label: 'Value', sub: 'Was it worth the green fee?' },
           ].map(({ icon, label, sub }) => (
-            <div key={label} style={{ display: 'flex', alignItems: 'flex-start', gap: 12, marginBottom: 10, padding: '12px 14px', borderRadius: 12, background: 'rgba(15,23,42,0.02)', border: '0.5px solid rgba(15,23,42,0.06)' }}>
+            <div key={label} style={{ display: 'flex', alignItems: 'flex-start', gap: 12, marginBottom: 10, padding: '12px 14px', borderRadius: 12, background: INK_TINT_02, border: `0.5px solid ${INK_TINT_06}` }}>
               <span style={{ fontSize: 20, flexShrink: 0, marginTop: 1 }}>{icon}</span>
               <div>
-                <div style={{ fontSize: 13, fontWeight: 700, color: '#0F172A', marginBottom: 2 }}>{label}</div>
-                <div style={{ fontSize: 11, color: '#94A3B8' }}>{sub}</div>
+                <div style={{ fontSize: 13, fontWeight: 700, color: INK, marginBottom: 2 }}>{label}</div>
+                <div style={{ fontSize: 11, color: INK_FAINT }}>{sub}</div>
               </div>
             </div>
           ))}
