@@ -29,6 +29,7 @@ import { useBusinessClaimForCourse } from '@/hooks/useBusinessClaimForCourse';
 import SuggestEditModal from './SuggestEditModal';
 import ClaimCourseCTA from './ClaimCourseCTA';
 import { SectionLabel } from './SectionLabel';
+import { AMBER, HAIRLINE_INK_7, HAIRLINE_INK_8, INK_FAINT, SLATE_50, SLATE_600 } from '@/features/courses/_shared/tokens';
 
 interface Course {
   id: string;
@@ -67,7 +68,7 @@ const formatDescription = (description: string) => {
 };
 
 const Divider = () => (
-  <div style={{ height: '0.5px', background: 'rgba(15,23,42,0.07)', margin: '0 16px' }} />
+  <div style={{ height: '0.5px', background: HAIRLINE_INK_7, margin: '0 16px' }} />
 );
 
 const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
@@ -121,7 +122,7 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
   };
 
   return (
-    <div className="animate-in fade-in duration-200" style={{ paddingBottom: 80, background: '#F8FAFC' }}>
+    <div className="animate-in fade-in duration-200" style={{ paddingBottom: 80, background: SLATE_50 }}>
       {/* 1. Location breadcrumb pills */}
       <CourseLocationPills course={course} />
 
@@ -181,16 +182,16 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
           <div style={{ marginTop: 24, padding: '0 16px' }}>
             <SectionLabel text="About" />
             <div>
-              <div style={{ fontSize: 14, color: '#475569', lineHeight: 1.7, position: 'relative' }}>
+              <div style={{ fontSize: 14, color: SLATE_600, lineHeight: 1.7, position: 'relative' }}>
                 {formatDescription(displayDescription)}
                 {!showFullDescription && shouldShowReadMore && (
-                  <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: 40, background: 'linear-gradient(to top, #F8FAFC, transparent)', pointerEvents: 'none' }} />
+                  <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: 40, background: `linear-gradient(to top, ${SLATE_50}, transparent)`, pointerEvents: 'none' }} />
                 )}
               </div>
               {shouldShowReadMore && (
                 <button
                   onClick={() => setShowFullDescription(!showFullDescription)}
-                  style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 12, fontWeight: 600, color: '#94A3B8', padding: '8px 0 0', display: 'flex', alignItems: 'center', gap: 4 }}
+                  style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 12, fontWeight: 600, color: INK_FAINT, padding: '8px 0 0', display: 'flex', alignItems: 'center', gap: 4 }}
                 >
                   {showFullDescription ? 'Show less ↑' : 'Read more ↓'}
                 </button>
@@ -199,7 +200,7 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
                 <button
                   type="button"
                   onClick={() => setShowSuggestEdit(true)}
-                  style={{ display: 'flex', alignItems: 'center', gap: 4, marginTop: 8, background: 'none', border: 'none', cursor: 'pointer', fontSize: 11, color: '#94A3B8' }}
+                  style={{ display: 'flex', alignItems: 'center', gap: 4, marginTop: 8, background: 'none', border: 'none', cursor: 'pointer', fontSize: 11, color: INK_FAINT }}
                 >
                   <Pencil className="h-3 w-3" />
                   Suggest an edit
@@ -247,9 +248,9 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
               <SectionLabel text="Course Details" />
               <div style={{ display: 'grid', gridTemplateColumns: `repeat(${Math.min(stats.length, 4)}, 1fr)`, padding: '0 8px' }}>
                 {stats.slice(0, 4).map((s, i, arr) => (
-                  <div key={s.label} style={{ textAlign: 'center', padding: '4px 0', borderRight: i < arr.length - 1 ? '0.5px solid rgba(15,23,42,0.08)' : 'none' }}>
-                    <div style={{ fontSize: 22, fontWeight: 900, color: '#F7931E', letterSpacing: '-0.04em' }}>{s.value}</div>
-                    <div style={{ fontSize: 8, fontWeight: 700, color: '#94A3B8', letterSpacing: '0.08em', textTransform: 'uppercase' as const, marginTop: 3 }}>{s.label}</div>
+                  <div key={s.label} style={{ textAlign: 'center', padding: '4px 0', borderRight: i < arr.length - 1 ? `0.5px solid ${HAIRLINE_INK_8}` : 'none' }}>
+                    <div style={{ fontSize: 22, fontWeight: 900, color: AMBER, letterSpacing: '-0.04em' }}>{s.value}</div>
+                    <div style={{ fontSize: 8, fontWeight: 700, color: INK_FAINT, letterSpacing: '0.08em', textTransform: 'uppercase' as const, marginTop: 3 }}>{s.label}</div>
                   </div>
                 ))}
               </div>
@@ -273,7 +274,7 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
           />
         )}
         {!coords && !coordsLoading && (
-          <p style={{ fontSize: 13, color: '#94A3B8', padding: '0 16px' }}>Location data isn't available yet.</p>
+          <p style={{ fontSize: 13, color: INK_FAINT, padding: '0 16px' }}>Location data isn't available yet.</p>
         )}
       </section>
 
@@ -302,7 +303,7 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
         <div style={{ padding: '12px 16px 4px' }}>
           <button
             onClick={handleWebsiteClick}
-            style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, padding: '12px 0', borderRadius: 12, background: 'rgba(247,147,30,0.06)', border: '1.5px solid rgba(247,147,30,0.2)', fontSize: 13, fontWeight: 700, color: '#F7931E', cursor: 'pointer' }}
+            style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, padding: '12px 0', borderRadius: 12, background: 'rgba(247,147,30,0.06)', border: '1.5px solid rgba(247,147,30,0.2)', fontSize: 13, fontWeight: 700, color: AMBER, cursor: 'pointer' }}
           >
             <ExternalLink className="h-4 w-4" />
             Official Course Website

@@ -1,5 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import { HAIRLINE_INK_8, INK_LIGHT, INK_MUTE, SURFACE } from '@/features/courses/_shared/tokens';
 import {
   PRIMARY_REGION_LABELS,
   dbValueToRegionKey,
@@ -24,9 +25,9 @@ interface CourseLocationPillsProps {
 const pillStyle: React.CSSProperties = {
   fontSize: 12,
   fontWeight: 600,
-  color: '#64748B',
-  background: '#ffffff',
-  border: '1px solid rgba(15,23,42,0.08)',
+  color: INK_MUTE,
+  background: SURFACE,
+  border: `1px solid ${HAIRLINE_INK_8}`,
   borderRadius: 20,
   padding: '3px 10px',
   cursor: 'pointer',
@@ -36,7 +37,7 @@ const pillStyle: React.CSSProperties = {
 
 const sepStyle: React.CSSProperties = {
   fontSize: 10,
-  color: '#CBD5E1',
+  color: INK_LIGHT,
 };
 
 const CourseLocationPills: React.FC<CourseLocationPillsProps> = ({ course }) => {

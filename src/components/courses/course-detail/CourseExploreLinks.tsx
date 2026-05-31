@@ -1,5 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import { HAIRLINE_INK_7, INK, INK_LIGHT } from '@/features/courses/_shared/tokens';
 import {
   dbValueToRegionKey,
   normalizeLabel,
@@ -107,10 +108,10 @@ const CourseExploreLinks: React.FC<CourseExploreLinksProps> = ({ course }) => {
               textAlign: 'left',
             }}
           >
-            <span style={{ fontSize: 13, fontWeight: 600, color: '#0F172A' }}>{l.label}</span>
-            <span style={{ fontSize: 16, color: '#CBD5E1' }}>›</span>
+            <span style={{ fontSize: 13, fontWeight: 600, color: INK }}>{l.label}</span>
+            <span style={{ fontSize: 16, color: INK_LIGHT }}>›</span>
           </button>
-          <div style={{ height: '0.5px', background: 'rgba(15,23,42,0.07)', margin: '0 16px' }} />
+          <div style={{ height: '0.5px', background: HAIRLINE_INK_7, margin: '0 16px' }} />
         </div>
       ))}
     </div>

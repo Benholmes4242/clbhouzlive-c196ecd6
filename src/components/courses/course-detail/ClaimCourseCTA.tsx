@@ -1,5 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import { AMBER, INK, INK_FAINT } from '@/features/courses/_shared/tokens';
 
 interface ClaimCourseCTAProps {
   clubId: string;
@@ -21,10 +22,10 @@ const ClaimCourseCTA: React.FC<ClaimCourseCTAProps> = ({ clubId, clubName }) => 
   return (
     <div style={{ padding: '8px 16px', textAlign: 'center' }}>
       <div style={{ fontSize: 20, marginBottom: 8 }}>🏌️</div>
-      <div style={{ fontSize: 13, fontWeight: 800, color: '#0F172A', marginBottom: 4 }}>
+      <div style={{ fontSize: 13, fontWeight: 800, color: INK, marginBottom: 4 }}>
         Own or manage this course?
       </div>
-      <p style={{ fontSize: 12, color: '#94A3B8', margin: '0 0 14px', lineHeight: 1.5 }}>
+      <p style={{ fontSize: 12, color: INK_FAINT, margin: '0 0 14px', lineHeight: 1.5 }}>
         Claim this listing to respond to reviews and update information.
       </p>
       <button
@@ -37,10 +38,10 @@ const ClaimCourseCTA: React.FC<ClaimCourseCTAProps> = ({ clubId, clubName }) => 
           padding: '10px 22px',
           borderRadius: 20,
           background: 'transparent',
-          border: '1.5px solid #F7931E',
+          border: `1.5px solid ${AMBER}`,
           fontSize: 13,
           fontWeight: 700,
-          color: '#F7931E',
+          color: AMBER,
           cursor: 'pointer',
         }}
       >
