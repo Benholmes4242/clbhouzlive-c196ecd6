@@ -34,6 +34,7 @@ export const HAIRLINE_INK_7 = 'rgba(15,23,42,0.07)';        // faint divider
 export const HAIRLINE_INK_10 = 'rgba(15,23,42,0.10)';       // input/dropdown border
 export const HAIRLINE_INK_12 = 'rgba(15,23,42,0.12)';       // drag-handle / strong hairline
 export const INK_TINT_05 = 'rgba(15,23,42,0.05)';           // ultra-faint surface (sheet close button bg)
+export const INK_TINT_06 = 'rgba(15,23,42,0.06)';           // loading skeleton bg, faint surfaces
 
 /* ── White-alpha (on dark shell) ────────────────────────────────────── */
 export const WHITE_ALPHA_06 = 'rgba(255,255,255,0.06)';     // tab strip bottom hairline
