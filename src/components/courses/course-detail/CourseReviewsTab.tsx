@@ -497,7 +497,7 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
             placeholder="Search reviews…"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            style={{ width: '100%', height: 40, paddingLeft: 36, paddingRight: searchQuery ? 36 : 16, borderRadius: 10, border: '1px solid rgba(15,23,42,0.1)', background: 'rgba(15,23,42,0.02)', fontSize: 13, color: '#0F172A', outline: 'none', boxSizing: 'border-box' as const }}
+            style={{ width: '100%', height: 40, paddingLeft: 36, paddingRight: searchQuery ? 36 : 16, borderRadius: 10, border: `1px solid ${HAIRLINE_INK_10}`, background: INK_TINT_02, fontSize: 13, color: INK, outline: 'none', boxSizing: 'border-box' as const }}
           />
           {searchQuery && (
             <button type="button" onClick={handleClearSearch} style={{ position: 'absolute', right: 10, top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', padding: 4 }}>
