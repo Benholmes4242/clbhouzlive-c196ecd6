@@ -67,7 +67,7 @@ export const HolesEmptyState: React.FC<{ courseName: string | null }> = ({ cours
               flexShrink: 0,
             }}
           />
-          <div style={{ flex: 1, height: 6, borderRadius: 3, background: 'rgba(15,23,42,0.06)' }} />
+          <div style={{ flex: 1, height: 6, borderRadius: 3, background: INK_TINT_06 }} />
         </div>
       ))}
     </div>
