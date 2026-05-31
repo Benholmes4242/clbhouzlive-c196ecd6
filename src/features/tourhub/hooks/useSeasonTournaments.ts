@@ -35,7 +35,6 @@ export interface SeasonTournament {
   winnerPhotoUrl: string | null;
   defendingChampion?: string | null;
   winner_score?: number | string | null;
-  winner_score?: number | string | null;
   currentRound: number | null;
 }
 
