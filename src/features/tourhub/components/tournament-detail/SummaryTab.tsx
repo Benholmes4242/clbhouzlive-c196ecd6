@@ -11,7 +11,7 @@ import { titleCaseCountry } from '../../utils/countryFlags';
 import CountryFlag from '@/components/ui/country-flag';
 import { useTournamentScoringStats } from '../../hooks/useTourHubData';
 import { playerRoute } from '../../routes';
-import { AMBER, HAIRLINE_INK_15, INK, INK_FAINT, INK_MUTE, INK_TINT_02, INK_TINT_06, INK_TINT_07, LIVE_DOT, LIVE_INK, SCORE_OVER_PAR_LIGHT, SURFACE, TREND_DOWN, TREND_UP } from '../../_shared/tokens';
+import { AMBER, GOLD, HAIRLINE_INK_15, INK, INK_FAINT, INK_MUTE, INK_TINT_02, INK_TINT_06, INK_TINT_07, LIVE_DOT, LIVE_INK, SCORE_UNDER_PAR_LIGHT, SURFACE, TREND_DOWN, TREND_UP } from '../../_shared/tokens';
 
 interface SummaryTabProps {
   tournamentId: string;
