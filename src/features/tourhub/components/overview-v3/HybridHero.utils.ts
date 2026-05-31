@@ -35,6 +35,22 @@ export interface TopTie {
   score: string;
 }
 
+// ---------- Changeover windows (single source of truth) -------------------
+
+/**
+ * How long a finished tournament continues to show as the RESULTS card
+ * before handing over to the next event's UPCOMING card. 72h covers the
+ * Sun-finish → Wed-viewing rhythm. Used by both useTournamentsCache (bucket
+ * query window) and deriveHeroState (visual-state guard).
+ */
+export const RESULTS_WINDOW_HOURS = 72;
+
+/**
+ * How far in advance the next event begins showing as UPCOMING. Used by
+ * useTournamentsCache (bucket query window).
+ */
+export const UPCOMING_WINDOW_DAYS = 14;
+
 // ---------- Score formatting -----------------------------------------------
 
 const UNICODE_MINUS = '\u2212';
