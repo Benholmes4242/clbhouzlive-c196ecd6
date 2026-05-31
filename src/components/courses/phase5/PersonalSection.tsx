@@ -9,6 +9,7 @@ import CourseStatusToggle from './CourseStatusToggle';
 import PersonalReviewCard from './PersonalReviewCard';
 import CourseMoments from './CourseMoments';
 import { SectionLabel } from '@/components/courses/course-detail/SectionLabel';
+import { Flag } from 'lucide-react';
 
 interface PersonalSectionProps {
   courseId: string;
