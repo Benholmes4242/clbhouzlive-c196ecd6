@@ -410,22 +410,22 @@ export function LeaderboardBand({
             margin: 0,
           }}
         >
-          <div style={{ flex: 1, padding: '12px 20px', minWidth: 0 }}>
-            <div style={{ fontSize: 9.5, fontWeight: 800, letterSpacing: '0.14em', color: INK_ALPHA_45, textTransform: 'uppercase' }}>
-              Defending Champion
-            </div>
-            <div style={{ marginTop: 3, fontSize: 13, fontWeight: 700, color: INK, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+          <div style={{ flex: 1, padding: '14px 20px 12px', minWidth: 0, display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 8 }}>
+            <span style={{ fontSize: 11, fontWeight: 800, letterSpacing: '0.16em', color: INK_ALPHA_45, textTransform: 'uppercase', flexShrink: 0 }}>
+              Defending
+            </span>
+            <span style={{ fontSize: 11, fontWeight: 700, color: INK, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', minWidth: 0 }}>
               {defendingChampion || '—'}
-            </div>
+            </span>
           </div>
           <div style={{ width: '0.5px', background: INK_15, alignSelf: 'stretch' }} />
-          <div style={{ padding: '12px 20px', textAlign: 'right' as const, flexShrink: 0 }}>
-            <div style={{ fontSize: 9.5, fontWeight: 800, letterSpacing: '0.14em', color: INK_ALPHA_45, textTransform: 'uppercase' }}>
+          <div style={{ padding: '14px 20px 12px', flexShrink: 0, display: 'flex', alignItems: 'baseline', gap: 8 }}>
+            <span style={{ fontSize: 11, fontWeight: 800, letterSpacing: '0.16em', color: INK_ALPHA_45, textTransform: 'uppercase' }}>
               Field
-            </div>
-            <div style={{ marginTop: 3, fontSize: 13, fontWeight: 700, color: INK, fontVariantNumeric: 'tabular-nums' }}>
-              {(fieldSize ?? 0).toLocaleString()}<span style={{ fontSize: 11, fontWeight: 600, color: INK_ALPHA_45 }}> players</span>
-            </div>
+            </span>
+            <span style={{ fontSize: 11, fontWeight: 700, color: INK, fontVariantNumeric: 'tabular-nums' }}>
+              {(fieldSize ?? 0).toLocaleString()}<span style={{ fontWeight: 600, color: INK_ALPHA_45 }}> players</span>
+            </span>
           </div>
         </div>
       )}
