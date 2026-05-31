@@ -2,7 +2,7 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useWhsConnection } from '@/lib/whs/hooks';
-import { Users, Trophy, LayoutGrid } from 'lucide-react';
+import { Users, Trophy, LayoutGrid, type LucideIcon } from 'lucide-react';
 import {
   AMBER,
   INK,
