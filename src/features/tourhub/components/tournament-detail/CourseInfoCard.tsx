@@ -68,9 +68,7 @@ export function CourseInfoCard({ tournament, courseImage, courseId }: CourseInfo
         </div>
       ))}
       {courseId && tournament.venue_course_name && (
-        <div style={{ padding: '4px 16px 0' }}>
-          <ConnectHandicapCue variant="tour-venue" courseName={tournament.venue_course_name} />
-        </div>
+        <ConnectHandicapCue variant="tour-venue" courseName={tournament.venue_course_name} />
       )}
       <div style={{ height: '6px' }} />
     </motion.div>
