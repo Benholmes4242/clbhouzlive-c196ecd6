@@ -631,8 +631,8 @@ async function syncTournament(
   } else {
     // Update last_live_sync timestamp and current_round
     const updatePayload: any = { last_live_sync: new Date().toISOString() };
-    if (currentRound !== undefined) {
-      updatePayload.current_round = currentRound;
+    if (roundToWrite !== undefined) {
+      updatePayload.current_round = roundToWrite;
     }
     await supabase
       .from('sr_tournaments')
