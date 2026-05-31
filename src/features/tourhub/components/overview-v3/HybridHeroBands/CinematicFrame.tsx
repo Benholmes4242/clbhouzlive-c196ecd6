@@ -13,7 +13,7 @@
 
 import React from 'react';
 import { format } from 'date-fns';
-import { ChevronRight, Crown, Star } from 'lucide-react';
+import { ChevronRight, Crown, Star, Trophy } from 'lucide-react';
 import {
   CINEMATIC_FRAME_HEIGHT,
   CINEMATIC_SCRIM,
@@ -23,9 +23,12 @@ import {
   GOLD,
   NUMERIC_STYLE,
 } from '../HybridHero.constants';
+import { AMBER_INK, AMBER_TINT_12 } from '../../../_shared/tokens';
 import type { HeroState, TopTie } from '../HybridHero.utils';
 import { fmtScore, formatRank, buildLeaderboardSlots, roundLabel } from '../HybridHero.utils';
 import { getPlayerHeadshotUrl } from '@/utils/playerHeadshot';
+import type { DefendingChampData } from '../../../hooks/useTournamentDefendingChamp';
+import type { FieldStrength } from '../../../hooks/useTournamentFieldStrength';
 
 // ---- helpers --------------------------------------------------------------
 
@@ -296,7 +299,207 @@ function TiedChasersRowDark({
   );
 }
 
-// ---- props ----------------------------------------------------------------
+// ---- results: champion hero row (gold-ringed, CHAMPION eyebrow) ----------
+
+function ChampionRowDark({
+  entry,
+  avatarUrl,
+  isLast,
+}: {
+  entry: any;
+  avatarUrl: string | null;
+  isLast: boolean;
+}) {
+  const name = entryName(entry);
+  const score = entry?.score;
+  return (
+    <div
+      style={{
+        display: 'flex',
+        alignItems: 'center',
+        gap: 12,
+        padding: '12px 10px 14px',
+        borderBottom: isLast ? 'none' : ROW_BORDER,
+      }}
+    >
+      <span style={{ width: 22, display: 'flex', justifyContent: 'center', flexShrink: 0 }}>
+        <Trophy size={14} color={GOLD} fill={GOLD} strokeWidth={0} />
+      </span>
+      {avatarUrl ? (
+        <img
+          src={avatarUrl}
+          alt=""
+          loading="lazy"
+          style={{
+            width: 38, height: 38, borderRadius: '34%', objectFit: 'cover',
+            flexShrink: 0, background: 'rgba(255,255,255,0.08)',
+            border: `1.5px solid ${GOLD}`,
+            boxShadow: `0 0 0 1px rgba(0,0,0,0.4)`,
+          }}
+        />
+      ) : (
+        <div
+          style={{
+            width: 38, height: 38, borderRadius: '34%',
+            background: 'rgba(255,255,255,0.08)', flexShrink: 0,
+            border: `1.5px solid ${GOLD}`,
+          }}
+        />
+      )}
+      <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 2 }}>
+        <span
+          style={{
+            ...NUMERIC_STYLE,
+            fontSize: 9.5,
+            fontWeight: 800,
+            letterSpacing: '0.14em',
+            color: GOLD,
+            textTransform: 'uppercase',
+          }}
+        >
+          Champion
+        </span>
+        <span
+          style={{
+            fontSize: 17, fontWeight: 800, color: 'white',
+            whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
+            letterSpacing: '-0.01em',
+          }}
+        >
+          {name}
+        </span>
+      </div>
+      <span
+        style={{
+          ...NUMERIC_STYLE,
+          fontSize: 19, fontWeight: 900, letterSpacing: '-0.02em',
+          color: scoreColor(score), flexShrink: 0,
+        }}
+      >
+        {fmtScore(score)}
+      </span>
+    </div>
+  );
+}
+
+// ---- upcoming: defending champion hero row -------------------------------
+
+function DefendingChampionRowDark({
+  data,
+  avatarUrl,
+}: {
+  data: DefendingChampData;
+  avatarUrl: string | null;
+}) {
+  return (
+    <div
+      style={{
+        display: 'flex',
+        alignItems: 'center',
+        gap: 12,
+        padding: '14px 10px',
+      }}
+    >
+      {avatarUrl ? (
+        <img
+          src={avatarUrl}
+          alt=""
+          loading="lazy"
+          style={{
+            width: 40, height: 40, borderRadius: '34%', objectFit: 'cover',
+            flexShrink: 0, background: 'rgba(255,255,255,0.08)',
+            border: `1.5px solid ${GOLD}`,
+            boxShadow: `0 0 0 1px rgba(0,0,0,0.4)`,
+          }}
+        />
+      ) : (
+        <div
+          style={{
+            width: 40, height: 40, borderRadius: '34%',
+            background: 'rgba(255,255,255,0.08)', flexShrink: 0,
+            border: `1.5px solid ${GOLD}`,
+          }}
+        />
+      )}
+      <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 3 }}>
+        <span
+          style={{
+            ...NUMERIC_STYLE,
+            fontSize: 9.5,
+            fontWeight: 800,
+            letterSpacing: '0.14em',
+            color: GOLD,
+            textTransform: 'uppercase',
+          }}
+        >
+          Defending Champion
+        </span>
+        <span
+          style={{
+            fontSize: 18, fontWeight: 800, color: 'white',
+            whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
+            letterSpacing: '-0.01em',
+          }}
+        >
+          {data.name}
+        </span>
+        <span
+          style={{
+            ...NUMERIC_STYLE,
+            fontSize: 11.5,
+            fontWeight: 600,
+            color: 'rgba(255,255,255,0.5)',
+          }}
+        >
+          Won {data.year} · {data.score}
+        </span>
+      </div>
+      <Trophy size={16} color={GOLD} fill={GOLD} strokeWidth={0} style={{ flexShrink: 0, opacity: 0.8 }} />
+    </div>
+  );
+}
+
+// ---- upcoming: field-strength fallback row -------------------------------
+
+function FieldStrengthRowDark({ data }: { data: FieldStrength }) {
+  return (
+    <div
+      style={{
+        display: 'flex',
+        alignItems: 'center',
+        gap: 12,
+        padding: '14px 10px',
+      }}
+    >
+      <StackedAvatarsDark urls={data.headshots.slice(0, 4)} size={30} />
+      <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 2 }}>
+        <span
+          style={{
+            ...NUMERIC_STYLE,
+            fontSize: 9.5,
+            fontWeight: 800,
+            letterSpacing: '0.14em',
+            color: AMBER,
+            textTransform: 'uppercase',
+          }}
+        >
+          Field Strength
+        </span>
+        <span
+          style={{
+            fontSize: 15, fontWeight: 700, color: 'white',
+            whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
+          }}
+        >
+          {data.totalPlayers} players
+          {data.topRanked != null ? ` · #${data.topRanked} world` : ''}
+        </span>
+      </div>
+    </div>
+  );
+}
+
+
 
 export interface CinematicFrameProps {
   title: string;
@@ -313,6 +516,8 @@ export interface CinematicFrameProps {
   tiedLeaders: TopTie | null;
   fieldSize: number;
   tourSlug?: string | null;
+  defendingChamp?: DefendingChampData | null;
+  fieldStrength?: FieldStrength | null;
   onCtaTap?: () => void;
 }
 
@@ -333,6 +538,8 @@ export function CinematicFrame({
   tiedLeaders,
   fieldSize,
   tourSlug,
+  defendingChamp = null,
+  fieldStrength = null,
   onCtaTap,
 }: CinematicFrameProps) {
   const useDusk =
@@ -356,13 +563,15 @@ export function CinematicFrame({
   const metaParts = [dateRange, venueLine].filter(Boolean);
   const metaLine = metaParts.length ? metaParts.join(' · ') : null;
 
-  // Top meta: LIVE · ROUND N (live) or FINAL (results)
+  // Top meta: LIVE · ROUND N (live), FINAL RESULT (results), UPCOMING pill (upcoming)
   const isLive = state.kind === 'live';
+  const isResults = state.kind === 'results';
+  const isUpcoming = state.kind === 'upcoming';
   const roundLabel_ =
     state.kind === 'live'
       ? `LIVE · ${roundLabel(state.round, state.totalRounds).toUpperCase()}`
-      : state.kind === 'results'
-        ? 'FINAL'
+      : isResults
+        ? 'FINAL RESULT'
         : null;
 
   // ---- Capsule slot construction (mirrors LeaderboardBand live-state) ----
@@ -372,7 +581,7 @@ export function CinematicFrame({
   type SlotNode = React.ReactNode;
   const slotNodes: SlotNode[] = [];
 
-  if (safe.length > 0) {
+  if (!isUpcoming && safe.length > 0) {
     if (tiedLeaders) {
       // Find first chaser (first entry whose score differs from the leader's)
       const topScore = safe[0]?.score ?? safe[0]?.total;
@@ -428,17 +637,30 @@ export function CinematicFrame({
       });
     } else {
       const leader = safe[0];
-      slotNodes.push(
-        <SoloRowDark
-          key="leader"
-          entry={leader}
-          rank={String(leader.position ?? 1)}
-          avatarUrl={avatar(leader)}
-          isLeader={true}
-          isLast={false}
-          isResultsLeader={state.kind === 'results'}
-        />
-      );
+      // Results: champion hero row (gold-ringed, CHAMPION eyebrow, trophy marker).
+      // Live: standard solo row with amber leader rank.
+      if (isResults) {
+        slotNodes.push(
+          <ChampionRowDark
+            key="champion"
+            entry={leader}
+            avatarUrl={avatar(leader)}
+            isLast={false}
+          />
+        );
+      } else {
+        slotNodes.push(
+          <SoloRowDark
+            key="leader"
+            entry={leader}
+            rank={String(leader.position ?? 1)}
+            avatarUrl={avatar(leader)}
+            isLeader={true}
+            isLast={false}
+            isResultsLeader={false}
+          />
+        );
+      }
 
       const chaserSlots = buildLeaderboardSlots(safe.slice(1), 2);
       chaserSlots.forEach((slot, i) => {
@@ -471,6 +693,39 @@ export function CinematicFrame({
       });
     }
   }
+
+  // ---- Upcoming capsule: defending champion → field strength → no capsule ---
+  let upcomingCapsule: React.ReactNode = null;
+  let upcomingFooter: string | null = null;
+  if (isUpcoming) {
+    if (defendingChamp) {
+      const headshot = (() => {
+        if (!tourSlug || !defendingChamp.name) return null;
+        try { return getPlayerHeadshotUrl(defendingChamp.name, tourSlug); }
+        catch { return null; }
+      })();
+      upcomingCapsule = (
+        <DefendingChampionRowDark data={defendingChamp} avatarUrl={headshot} />
+      );
+      upcomingFooter = 'View tournament';
+    } else if (fieldStrength && fieldStrength.totalPlayers > 0) {
+      upcomingCapsule = <FieldStrengthRowDark data={fieldStrength} />;
+      upcomingFooter = 'View tournament';
+    }
+    // else: no capsule — countdown chip carries the frame.
+  }
+
+  // Countdown chip (upcoming only) — uses state.countdown when present.
+  const countdownText = isUpcoming
+    ? ((state as any).countdown as string | undefined) || null
+    : null;
+
+  // Render decisions
+  const hasCapsule = isUpcoming ? upcomingCapsule !== null : true;
+  const capsuleFooter = isUpcoming
+    ? upcomingFooter
+    : `Full leaderboard${fieldSize > 0 ? ` · ${fieldSize} players` : ''}`;
+
 
   return (
     <div
@@ -528,7 +783,28 @@ export function CinematicFrame({
             padding: '0 4px',
           }}
         >
-          {roundLabel_ ? (
+          {isUpcoming ? (
+            <span
+              style={{
+                ...NUMERIC_STYLE,
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 6,
+                padding: '4px 9px',
+                borderRadius: 999,
+                background: AMBER_TINT_12,
+                border: `1px solid ${AMBER}`,
+                color: AMBER,
+                fontSize: 10.5,
+                fontWeight: 800,
+                letterSpacing: '0.16em',
+                textTransform: 'uppercase',
+                whiteSpace: 'nowrap',
+              }}
+            >
+              Upcoming
+            </span>
+          ) : roundLabel_ ? (
             <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
               {isLive && (
                 <span
@@ -545,13 +821,22 @@ export function CinematicFrame({
                   }}
                 />
               )}
+              {isResults && (
+                <Trophy
+                  size={12}
+                  color={GOLD}
+                  fill={GOLD}
+                  strokeWidth={0}
+                  style={{ flexShrink: 0 }}
+                />
+              )}
               <span
                 style={{
                   ...NUMERIC_STYLE,
                   fontSize: 11,
                   fontWeight: 700,
                   letterSpacing: '0.14em',
-                  color: 'white',
+                  color: isResults ? GOLD : 'white',
                   textShadow: '0 1px 3px rgba(0,0,0,0.45)',
                 }}
               >
@@ -652,9 +937,44 @@ export function CinematicFrame({
           >
             {title}
           </h1>
+          {countdownText && (
+            <div
+              style={{
+                marginTop: 4,
+                display: 'inline-flex',
+                alignSelf: 'flex-start',
+                alignItems: 'center',
+                gap: 8,
+                padding: '7px 12px',
+                borderRadius: 999,
+                background: 'rgba(255,255,255,0.12)',
+                WebkitBackdropFilter: 'blur(12px)',
+                backdropFilter: 'blur(12px)',
+                border: '1px solid rgba(255,255,255,0.18)',
+              }}
+            >
+              <span
+                aria-hidden="true"
+                style={{
+                  width: 6, height: 6, borderRadius: '50%',
+                  background: AMBER, flexShrink: 0,
+                }}
+              />
+              <span
+                style={{
+                  ...NUMERIC_STYLE,
+                  fontSize: 12, fontWeight: 700, color: 'white',
+                  letterSpacing: '0.04em', textTransform: 'uppercase',
+                }}
+              >
+                {countdownText}
+              </span>
+            </div>
+          )}
         </div>
 
         {/* Floating glass capsule */}
+        {hasCapsule && (
         <div
           className="cinematic-capsule"
           style={{
@@ -667,7 +987,9 @@ export function CinematicFrame({
             boxShadow: '0 8px 40px rgba(0,0,0,0.4)',
           }}
         >
-          {slotNodes.length > 0 ? (
+          {isUpcoming ? (
+            upcomingCapsule
+          ) : slotNodes.length > 0 ? (
             <>{slotNodes}</>
           ) : (
             <div
@@ -707,12 +1029,11 @@ export function CinematicFrame({
               fontFamily: "'Geist', -apple-system, BlinkMacSystemFont, sans-serif",
             }}
           >
-            <span>
-              Full leaderboard{fieldSize > 0 ? ` · ${fieldSize} players` : ''}
-            </span>
+            <span>{capsuleFooter}</span>
             <ChevronRight size={14} strokeWidth={2.5} />
           </button>
         </div>
+        )}
       </div>
     </div>
   );

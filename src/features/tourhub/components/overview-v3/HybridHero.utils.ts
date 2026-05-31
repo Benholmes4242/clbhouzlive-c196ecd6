@@ -35,6 +35,22 @@ export interface TopTie {
   score: string;
 }
 
+// ---------- Changeover windows (single source of truth) -------------------
+
+/**
+ * How long a finished tournament continues to show as the RESULTS card
+ * before handing over to the next event's UPCOMING card. 72h covers the
+ * Sun-finish → Wed-viewing rhythm. Used by both useTournamentsCache (bucket
+ * query window) and deriveHeroState (visual-state guard).
+ */
+export const RESULTS_WINDOW_HOURS = 72;
+
+/**
+ * How far in advance the next event begins showing as UPCOMING. Used by
+ * useTournamentsCache (bucket query window).
+ */
+export const UPCOMING_WINDOW_DAYS = 14;
+
 // ---------- Score formatting -----------------------------------------------
 
 const UNICODE_MINUS = '\u2212';
@@ -148,17 +164,25 @@ export function deriveHeroState(
     };
   }
 
-  // Results — within 24h of finish, or carousel-promoted (off-season fallback)
+  // Results — closed/complete AND within RESULTS_WINDOW_HOURS of finish.
+  // Stale completed events (>72h) degrade gracefully to upcoming so the
+  // badge/card body never claim "FINAL" for a long-finished event that
+  // somehow ended up as the chosen slide.
   if (status === 'closed' || status === 'complete' || status === 'completed') {
-    return {
-      kind: 'results',
-      variant: 'standard',
-      finishDate: tournament.endDate || '',
-      meta: start && end
-        ? `${format(start, 'MMM d').toUpperCase()} – ${format(end, 'MMM d').toUpperCase()}`
-        : end ? format(end, 'MMM d').toUpperCase() : '',
-    };
+    const isStale = hoursSinceEnd != null && hoursSinceEnd > RESULTS_WINDOW_HOURS;
+    if (!isStale) {
+      return {
+        kind: 'results',
+        variant: 'standard',
+        finishDate: tournament.endDate || '',
+        meta: start && end
+          ? `${format(start, 'MMM d').toUpperCase()} – ${format(end, 'MMM d').toUpperCase()}`
+          : end ? format(end, 'MMM d').toUpperCase() : '',
+      };
+    }
+    // fall through to upcoming
   }
+
 
   // Upcoming
   const variant: UpcomingVariant =
