@@ -8,7 +8,14 @@ export interface LiveTournamentLite {
   name: string;
   status: string;
   start_date: string;
+  end_date: string | null;
+  venue_name: string | null;
+  venue_course_name: string | null;
+  venue_city: string | null;
+  venue_country: string | null;
+  venue_yardage: number | null;
   venue_par: number | null;
+  defending_champion: string | null;
   tour_name: string | null;
   tourSlug: TourId;
   purse: number | null;
@@ -29,7 +36,9 @@ export function useLiveTournaments() {
 
       const { data, error } = await supabase
         .from('sr_tournaments')
-        .select('id, name, status, start_date, venue_par, purse, season:sr_seasons(tour_name)')
+        .select(
+          'id, name, status, start_date, end_date, venue_name, venue_course_name, venue_city, venue_country, venue_yardage, venue_par, defending_champion, purse, season:sr_seasons(tour_name)'
+        )
         .or(`status.eq.inprogress,and(status.in.(scheduled,created),start_date.eq.${todayStr})`)
         .order('purse', { ascending: false, nullsFirst: false });
 
@@ -42,7 +51,14 @@ export function useLiveTournaments() {
         name: t.name,
         status: t.status,
         start_date: t.start_date,
+        end_date: t.end_date ?? null,
+        venue_name: t.venue_name ?? null,
+        venue_course_name: t.venue_course_name ?? null,
+        venue_city: t.venue_city ?? null,
+        venue_country: t.venue_country ?? null,
+        venue_yardage: t.venue_yardage ?? null,
         venue_par: t.venue_par ?? null,
+        defending_champion: t.defending_champion ?? null,
         tour_name: t.season?.tour_name ?? null,
         tourSlug: mapTourSlug(t.season?.tour_name ?? ''),
         purse: t.purse ?? null,

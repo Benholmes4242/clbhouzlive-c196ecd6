@@ -1,11 +1,37 @@
 import { useEffect, useMemo, useState } from 'react';
+import { format, isSameMonth } from 'date-fns';
 import { useLiveTournaments } from '../../hooks/useLiveTournaments';
 import { useTourLeaderboard } from '../../hooks/useTourHubData';
 import { FullLeaderboard } from '../tournament-detail/FullLeaderboard';
 import { EditorialEmpty } from '../tournament-detail/EditorialEmpty';
-import { INK, INK_MUTE, INK_TINT_07, SURFACE, SHELL_BG, STATUS_LIVE, WHITE_ALPHA_06, WHITE_ALPHA_18, WHITE_ALPHA_55, WHITE_ALPHA_65 } from '../../_shared/tokens';
+import { INK, INK_MUTE, INK_FAINT, INK_TINT_07, SURFACE, SHELL_BG, STATUS_LIVE, WHITE_ALPHA_06, WHITE_ALPHA_18, WHITE_ALPHA_55, WHITE_ALPHA_65 } from '../../_shared/tokens';
 import { tourPriorityIndex, TOUR_LABEL, shortTournamentToken } from '../../_shared/tourOrder';
+import { TOUR_CONFIG } from '../../hooks/useOverviewData';
 import type { LiveTournamentLite } from '../../hooks/useLiveTournaments';
+
+const COUNTRY_NAMES: Record<string, string> = {
+  USA: 'USA', GBR: 'Great Britain', SCO: 'Scotland', ENG: 'England', WAL: 'Wales',
+  NIR: 'Northern Ireland', IRL: 'Ireland', AUS: 'Australia', CAN: 'Canada',
+  JPN: 'Japan', KOR: 'South Korea', RSA: 'South Africa', ESP: 'Spain',
+  FRA: 'France', GER: 'Germany', ITA: 'Italy', SWE: 'Sweden', NOR: 'Norway',
+  DEN: 'Denmark', NED: 'Netherlands', BEL: 'Belgium', AUT: 'Austria',
+  MEX: 'Mexico', ARG: 'Argentina', CHI: 'Chile', COL: 'Colombia',
+  CHN: 'China', THA: 'Thailand', IND: 'India', NZL: 'New Zealand',
+  UAE: 'United Arab Emirates', KSA: 'Saudi Arabia',
+};
+function expandCountry(code: string | null | undefined): string | null {
+  if (!code) return null;
+  return COUNTRY_NAMES[code.toUpperCase()] ?? code;
+}
+function formatDateRange(startDate: string, endDate: string): string {
+  const start = new Date(startDate);
+  const end = new Date(endDate);
+  if (isSameMonth(start, end)) {
+    return `${format(start, 'MMM d')} – ${format(end, 'd, yyyy')}`;
+  }
+  return `${format(start, 'MMM d')} – ${format(end, 'MMM d, yyyy')}`;
+}
+
 
 
 /**
@@ -141,60 +167,134 @@ export function LiveLeaderboardTab() {
       )}
 
       {/* Header above the leaderboard */}
-      <div
-        style={{
-          padding: '14px 20px 10px',
-          background: '#FFFFFF',
-          borderBottom: `0.5px solid ${INK_TINT_07}`,
-        }}
-      >
-        <div
-          style={{
-            fontFamily: 'Geist, system-ui, sans-serif',
-            fontSize: 10.5,
-            fontWeight: 800,
-            letterSpacing: '0.14em',
-            textTransform: 'uppercase',
-            color: isLive ? STATUS_LIVE : '#F7931E',
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: 6,
-          }}
-        >
-          {isLive && (
-            <span
-              aria-hidden
-              style={{ width: 6, height: 6, borderRadius: '50%', background: STATUS_LIVE }}
-            />
-          )}
-          {isLive ? 'Live' : 'Tees Off Today'}
-        </div>
-        <div
-          style={{
-            marginTop: 4,
-            fontFamily: 'Geist, system-ui, sans-serif',
-            fontSize: 18,
-            fontWeight: 800,
-            color: INK,
-            letterSpacing: '-0.01em',
-          }}
-        >
-          {selected.name}
-        </div>
-        {selected.tour_name && (
+      {(() => {
+        const tourFullName = TOUR_CONFIG[selected.tourSlug]?.name ?? selected.tour_name ?? '';
+        const courseName = selected.venue_course_name || selected.venue_name || null;
+        const location = [selected.venue_city, expandCountry(selected.venue_country)]
+          .filter(Boolean)
+          .join(', ');
+        const venueLine = [courseName, location || null].filter(Boolean).join(' · ');
+        const dates =
+          selected.end_date ? formatDateRange(selected.start_date, selected.end_date) : null;
+        const metaParts = [
+          dates,
+          selected.venue_par != null ? `Par ${selected.venue_par}` : null,
+          selected.venue_yardage != null ? `${selected.venue_yardage.toLocaleString()} yds` : null,
+        ].filter(Boolean);
+
+        return (
           <div
             style={{
-              marginTop: 2,
-              fontFamily: 'Geist, system-ui, sans-serif',
-              fontSize: 11.5,
-              fontWeight: 600,
-              color: INK_MUTE,
+              padding: '14px 20px 12px',
+              background: '#FFFFFF',
+              borderBottom: `0.5px solid ${INK_TINT_07}`,
             }}
           >
-            {selected.tour_name}
+            {/* Live / Tees Off Today status */}
+            <div
+              style={{
+                fontFamily: 'Geist, system-ui, sans-serif',
+                fontSize: 10.5,
+                fontWeight: 800,
+                letterSpacing: '0.14em',
+                textTransform: 'uppercase',
+                color: isLive ? STATUS_LIVE : '#F7931E',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 6,
+              }}
+            >
+              {isLive && (
+                <span
+                  aria-hidden
+                  style={{ width: 6, height: 6, borderRadius: '50%', background: STATUS_LIVE }}
+                />
+              )}
+              {isLive ? 'Live' : 'Tees Off Today'}
+            </div>
+
+            {/* Tour eyebrow (proper full name) */}
+            {tourFullName && (
+              <div
+                style={{
+                  marginTop: 6,
+                  fontFamily: 'Geist, system-ui, sans-serif',
+                  fontSize: 10,
+                  fontWeight: 800,
+                  letterSpacing: '0.14em',
+                  textTransform: 'uppercase',
+                  color: INK_MUTE,
+                }}
+              >
+                {tourFullName}
+              </div>
+            )}
+
+            {/* Tournament name */}
+            <div
+              style={{
+                marginTop: 3,
+                fontFamily: 'Geist, system-ui, sans-serif',
+                fontSize: 18,
+                fontWeight: 800,
+                color: INK,
+                letterSpacing: '-0.01em',
+                lineHeight: 1.2,
+              }}
+            >
+              {selected.name}
+            </div>
+
+            {/* Venue · location */}
+            {venueLine && (
+              <div
+                style={{
+                  marginTop: 4,
+                  fontFamily: 'Geist, system-ui, sans-serif',
+                  fontSize: 12.5,
+                  fontWeight: 600,
+                  color: INK_MUTE,
+                }}
+              >
+                {venueLine}
+              </div>
+            )}
+
+            {/* Dates · par · yardage */}
+            {metaParts.length > 0 && (
+              <div
+                style={{
+                  marginTop: 2,
+                  fontFamily: 'Geist, system-ui, sans-serif',
+                  fontSize: 11.5,
+                  fontWeight: 500,
+                  color: INK_FAINT,
+                  fontVariantNumeric: 'tabular-nums',
+                }}
+              >
+                {metaParts.join(' · ')}
+              </div>
+            )}
+
+            {/* Defending champion */}
+            {selected.defending_champion && (
+              <div
+                style={{
+                  marginTop: 2,
+                  fontFamily: 'Geist, system-ui, sans-serif',
+                  fontSize: 11.5,
+                  fontWeight: 500,
+                  color: INK_FAINT,
+                }}
+              >
+                Defending · {selected.defending_champion}
+              </div>
+            )}
           </div>
-        )}
-      </div>
+        );
+      })()}
+
+
 
       {isLoadingBoard && (!leaderboard || (leaderboard as any[]).length === 0) ? (
         <LiveLeaderboardSkeleton />
