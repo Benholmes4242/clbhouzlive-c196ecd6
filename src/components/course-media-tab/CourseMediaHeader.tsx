@@ -30,10 +30,11 @@ export const CourseMediaHeader: React.FC<CourseMediaHeaderProps> = ({
   const navigate = useNavigate();
 
   return (
-    <div style={{ padding: '12px 16px 10px', display: 'flex', flexDirection: 'column', gap: 10 }}>
+    <div style={{ padding: '14px 0 10px', display: 'flex', flexDirection: 'column', gap: 10 }}>
+      <SectionLabel text="Gallery" icon={Camera} />
       {/* Count row + Add media */}
       {(mediaCounts.photos > 0 || mediaCounts.videos > 0) && (
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 16px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, color: INK_MUTE }}>
             <Camera className="w-3.5 h-3.5" />
             <span>
