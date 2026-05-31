@@ -276,6 +276,30 @@ Deno.serve(async (req) => {
 // FIX 1: Gated tournaments stamp last_live_sync so round-robin advances.
 // FIX 2: Called for ALL tournaments per invocation, not just the stalest.
 
+async function deriveActiveRound(supabase: any, tournamentId: string): Promise<number | undefined> {
+  const { data: roundCheck } = await supabase
+    .from('sr_leaderboards')
+    .select('round_1, round_2, round_3, round_4')
+    .eq('tournament_id', tournamentId)
+    .not('strokes', 'is', null)
+    .limit(5);
+  if (!roundCheck?.length) return undefined;
+  let completedRound = 0;
+  for (let r = 4; r >= 1; r--) {
+    if (roundCheck.some((e: any) => e[`round_${r}`] != null)) { completedRound = r; break; }
+  }
+  const { data: thruCheck } = await supabase
+    .from('sr_leaderboards')
+    .select('thru')
+    .eq('tournament_id', tournamentId)
+    .not('thru', 'is', null)
+    .gt('thru', 0)
+    .lt('thru', 18)
+    .limit(1);
+  const midRound = (thruCheck?.length ?? 0) > 0;
+  return midRound ? Math.min(completedRound + 1, 4) : Math.max(completedRound, 1);
+}
+
 async function syncTournament(
   supabase: any,
   sportradarApiKey: string,
@@ -334,6 +358,12 @@ async function syncTournament(
     syncError = error.message;
     console.error(`[LiveSync] Leaderboard error for ${tournament.name}:`, error.message);
   }
+
+  // Derive accurate active round from leaderboard data (source of truth).
+  // Falls back to Sportradar's round field if no leaderboard data exists yet.
+  const derivedRound = await deriveActiveRound(supabase, tournament.id);
+  const roundToWrite = derivedRound ?? currentRound;
+
 
   // ── Round-completion detection ────────────────────────────────────
   let roundCompleteTriggered = false;
@@ -409,39 +439,7 @@ async function syncTournament(
 
   if (shouldSyncScorecards) {
     try {
-      // Derive active round from leaderboard data: check round columns 4→1
-      let activeRound = 1;
-      const { data: roundCheck } = await supabase
-        .from('sr_leaderboards')
-        .select('round_1, round_2, round_3, round_4')
-        .eq('tournament_id', tournament.id)
-        .not('strokes', 'is', null)
-        .limit(5);
-
-      if (roundCheck?.length) {
-        // First check completed rounds (non-null round score)
-        let completedRound = 0;
-        for (let r = 4; r >= 1; r--) {
-          const key = `round_${r}`;
-          if (roundCheck.some((entry: any) => entry[key] !== null && entry[key] !== undefined)) {
-            completedRound = r;
-            break;
-          }
-        }
-        // Also check thru values — if any player has thru 1-17, a round is in progress
-        const { data: thruCheck } = await supabase
-          .from('sr_leaderboards')
-          .select('thru')
-          .eq('tournament_id', tournament.id)
-          .not('thru', 'is', null)
-          .gt('thru', 0)
-          .lt('thru', 18)
-          .limit(1);
-        const midRound = (thruCheck?.length ?? 0) > 0;
-        // If players are mid-round, the active round is one ahead of the last completed
-        activeRound = midRound ? Math.min(completedRound + 1, 4) : Math.max(completedRound, 1);
-      }
-
+      const activeRound = roundToWrite ?? 1;
       console.log(`[LiveSync] Triggering scorecards sync for ${tournament.name}, round ${activeRound}`);
 
       const syncUrl = `${Deno.env.get('SUPABASE_URL')}/functions/v1/sportradar-sync`;
@@ -492,7 +490,7 @@ async function syncTournament(
 
     const updatePayload: any = { status: 'closed', last_live_sync: new Date().toISOString() };
     if (winnerId) updatePayload.winner_id = winnerId;
-    if (currentRound !== undefined) updatePayload.current_round = currentRound;
+    if (roundToWrite !== undefined) updatePayload.current_round = roundToWrite;
 
     const { error: closeError } = await supabase
       .from('sr_tournaments')
@@ -601,8 +599,8 @@ async function syncTournament(
   } else {
     // Update last_live_sync timestamp and current_round
     const updatePayload: any = { last_live_sync: new Date().toISOString() };
-    if (currentRound !== undefined) {
-      updatePayload.current_round = currentRound;
+    if (roundToWrite !== undefined) {
+      updatePayload.current_round = roundToWrite;
     }
     await supabase
       .from('sr_tournaments')
