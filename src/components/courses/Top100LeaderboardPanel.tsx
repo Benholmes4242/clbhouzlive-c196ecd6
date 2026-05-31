@@ -5,6 +5,7 @@ import { cn } from '@/lib/utils';
 import { ChampionshipLeaderboardView } from '@/components/championship';
 import { CoursesLeaderboardView } from '@/components/leaderboard/CoursesLeaderboardView';
 import { ExplorationTab } from '@/components/leaderboards';
+import ConnectHandicapCue from '@/components/courses/course-detail/ConnectHandicapCue';
 
 type LeaderboardView = 'championship' | 'courses' | 'exploration';
 
