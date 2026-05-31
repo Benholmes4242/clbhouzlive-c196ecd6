@@ -201,6 +201,7 @@ export function HoleStatsTab({ tournamentId, isCompleted, courseId, courseName }
 
       {!hasRoundData && selectedRound !== 'Overall' ? (
         <EditorialEmpty
+          icon={<BarChart3 size={28} strokeWidth={1.8} color={AMBER} />}
           eyebrow={selectedRound}
           title={`${selectedRound} hasn't started yet`}
           body="Hole-by-hole stats will appear once play begins in this round."
