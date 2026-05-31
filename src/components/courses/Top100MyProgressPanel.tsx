@@ -10,6 +10,7 @@ import { useTop100FriendsSnapshot } from '@/hooks/useTop100FriendsSnapshot';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { Skeleton } from '@/components/ui/skeleton';
 import { buildStreakSummary } from '@/lib/top100StreakSummary';
+import ConnectHandicapCue from '@/components/courses/course-detail/ConnectHandicapCue';
 
 // ----- Phase D cleanup: legacy imports retained for reference, no longer rendered -----
 // import { Top100ProgressHero } from '@/components/top100/Top100ProgressHero';
