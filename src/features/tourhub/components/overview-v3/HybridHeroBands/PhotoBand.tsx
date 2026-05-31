@@ -34,7 +34,7 @@ interface PhotoBandProps {
 function ledeLine(state: HeroState, winnerName?: string | null): string | null {
   if (state.kind === 'results' && winnerName) return `Won by ${winnerName}`;
   if (state.kind === 'live') {
-    return `Round ${state.round}`;
+    return roundLabel(state.round, state.totalRounds);
   }
   if (state.kind === 'upcoming') return state.countdown || null;
   return null;
