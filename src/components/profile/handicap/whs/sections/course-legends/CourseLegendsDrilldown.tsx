@@ -1,3 +1,4 @@
+import { GAM } from '../../gam/tokens';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { lookupCourseMetaV2 } from '@/lib/whs/courseNameMatcher';
 import { useCourseLegends } from '@/hooks/gam/useCourseLegends';
@@ -21,7 +22,6 @@ import { CategoryNavRail } from './drilldown/CategoryNavRail';
 import { FullCourseLeaderboardSheet } from './drilldown/FullCourseLeaderboardSheet';
 import { WindowToggle } from './CourseLegendsSection';
 
-const AMBER = '#F7931E';
 
 const CATEGORIES_ORDER_90D: LegendCategory[] = [
   'best_score_diff_90d',

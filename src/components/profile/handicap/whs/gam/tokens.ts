@@ -3,6 +3,7 @@ export const GAM = {
   AMBER: '#F7931E',
   AMBER_14: 'rgba(247,147,30,0.14)',
   AMBER_06: 'rgba(247,147,30,0.06)',
+  DEEP_AMBER: '#B26818',
   GOLD: '#FBBC2E',
   INK: '#0F172A',
   INK_70: '#475569',

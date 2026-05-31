@@ -1,24 +1,22 @@
+import { GAM } from '../../../gam/tokens';
 import React from 'react';
 import { Crown } from 'lucide-react';
 import { EmptyStateTile } from '@/components/profile/handicap/gam/_shared/EmptyStateTile';
 
-const AMBER = '#F7931E';
-const DEEP_AMBER = '#B26818';
 const INK = 'var(--hcp-t-100, #0F172A)';
 const SLATE = 'var(--hcp-t-60, #64748b)';
-const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
 
 /** No legends in ANY window — the true empty. */
 export const ChampionsEmptyState: React.FC<{ courseName: string | null }> = ({ courseName }) => (
-  <div style={{ padding: '44px 28px 48px', textAlign: 'center', fontFamily: FONT }}>
+  <div style={{ padding: '44px 28px 48px', textAlign: 'center', fontFamily: GAM.FONT_GEIST }}>
     <EmptyStateTile tint="amber">
-      <Crown size={30} color={AMBER} strokeWidth={1.8} />
+      <Crown size={30} color={GAM.AMBER} strokeWidth={1.8} />
     </EmptyStateTile>
     <div
       style={{
         fontSize: 10.5,
         fontWeight: 800,
-        color: DEEP_AMBER,
+        color: GAM.DEEP_AMBER,
         letterSpacing: '0.16em',
         textTransform: 'uppercase',
         marginBottom: 8,
@@ -51,7 +49,7 @@ export const ChampionsWindowEmptyState: React.FC<{
   window: '90d' | 'all_time';
   onSwitch: () => void;
 }> = ({ window, onSwitch }) => (
-  <div style={{ padding: '40px 28px 44px', textAlign: 'center', fontFamily: FONT }}>
+  <div style={{ padding: '40px 28px 44px', textAlign: 'center', fontFamily: GAM.FONT_GEIST }}>
     <EmptyStateTile tint="slate">
       <Crown size={30} color="#64748b" strokeWidth={1.8} />
     </EmptyStateTile>
@@ -87,7 +85,7 @@ export const ChampionsWindowEmptyState: React.FC<{
         fontWeight: 800,
         letterSpacing: '0.02em',
         cursor: 'pointer',
-        fontFamily: FONT,
+        fontFamily: GAM.FONT_GEIST,
       }}
     >
       {window === '90d' ? 'View all-time' : 'View last 90 days'}{' '}

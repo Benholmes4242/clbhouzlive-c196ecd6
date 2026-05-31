@@ -1,3 +1,4 @@
+import { GAM } from '../../../gam/tokens';
 import React from 'react';
 
 interface ChampionsListRowProps {
@@ -12,10 +13,6 @@ interface ChampionsListRowProps {
   holdDuration: string | null;
 }
 
-const AMBER = '#F7931E';
-const GOLD = '#FBBC2E';
-const DEEP_AMBER = '#B26818';
-const INK = '#0F172A';
 
 const SQUIRCLE_MASK_URL =
   "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath d='M40 0h20c22.091 0 40 17.909 40 40v20c0 22.091-17.909 40-40 40H40C17.909 100 0 82.091 0 60V40C0 17.909 17.909 0 40 0z'/%3E%3C/svg%3E\")";
@@ -87,7 +84,7 @@ export const ChampionsListRow: React.FC<ChampionsListRowProps> = ({
           fontSize: 15,
           fontWeight: 700,
           fontVariantNumeric: 'tabular-nums',
-          color: rank === 1 ? AMBER : 'var(--hcp-t-30, #b3bdca)',
+          color: rank === 1 ? GAM.AMBER : 'var(--hcp-t-30, #b3bdca)',
           lineHeight: 1,
           textAlign: 'right',
         }}
@@ -102,7 +99,7 @@ export const ChampionsListRow: React.FC<ChampionsListRowProps> = ({
           style={{
             fontSize: 15,
             fontWeight: isChampion ? 800 : 700,
-            color: isSelf ? DEEP_AMBER : 'var(--hcp-t-100, ' + INK + ')',
+            color: isSelf ? GAM.DEEP_AMBER : 'var(--hcp-t-100, ' + GAM.INK + ')',
             letterSpacing: '-0.014em',
             lineHeight: 1.25,
             marginBottom: 1,
@@ -123,7 +120,7 @@ export const ChampionsListRow: React.FC<ChampionsListRowProps> = ({
                   textTransform: 'uppercase',
                   borderRadius: 4,
                   fontFamily: 'Geist Mono, monospace',
-                  background: `linear-gradient(135deg, ${GOLD}, ${AMBER})`,
+                  background: `linear-gradient(135deg, ${GAM.GOLD}, ${GAM.AMBER})`,
                   color: '#1A1300',
                   lineHeight: 1,
                   flexShrink: 0,
@@ -142,7 +139,7 @@ export const ChampionsListRow: React.FC<ChampionsListRowProps> = ({
                   borderRadius: 4,
                   fontFamily: 'Geist Mono, monospace',
                   background: 'transparent',
-                  color: DEEP_AMBER,
+                  color: GAM.DEEP_AMBER,
                   border: `1px solid rgba(178,104,24,0.35)`,
                   lineHeight: 1,
                   flexShrink: 0,
@@ -170,7 +167,7 @@ export const ChampionsListRow: React.FC<ChampionsListRowProps> = ({
           style={{
             fontSize: 16,
             fontWeight: 700,
-            color: isSelf || isChampion ? DEEP_AMBER : 'var(--hcp-t-100, ' + INK + ')',
+            color: isSelf || isChampion ? GAM.DEEP_AMBER : 'var(--hcp-t-100, ' + GAM.INK + ')',
             letterSpacing: '-0.02em',
             fontVariantNumeric: 'tabular-nums',
             lineHeight: 1,

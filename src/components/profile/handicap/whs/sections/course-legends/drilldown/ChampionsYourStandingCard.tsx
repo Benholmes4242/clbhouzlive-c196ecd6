@@ -1,8 +1,6 @@
+import { GAM } from '../../../gam/tokens';
 import React from 'react';
 
-const AMBER = '#F7931E';
-const DEEP_AMBER = '#B26818';
-const INK = '#0F172A';
 
 const SQUIRCLE_MASK_URL =
   "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath d='M40 0h20c22.091 0 40 17.909 40 40v20c0 22.091-17.909 40-40 40H40C17.909 100 0 82.091 0 60V40C0 17.909 17.909 0 40 0z'/%3E%3C/svg%3E\")";
@@ -66,7 +64,7 @@ export const ChampionsYourStandingCard: React.FC<ChampionsYourStandingCardProps>
       />
       <div style={{ display: 'flex', alignItems: 'center', gap: 14, position: 'relative' }}>
         <div style={{ width: 64, height: 64, position: 'relative', flexShrink: 0 }} aria-hidden>
-          <div style={{ position: 'absolute', inset: 0, background: AMBER, ...squircleMaskStyle }} />
+          <div style={{ position: 'absolute', inset: 0, background: GAM.AMBER, ...squircleMaskStyle }} />
           <div
             style={{
               position: 'absolute',
@@ -84,7 +82,7 @@ export const ChampionsYourStandingCard: React.FC<ChampionsYourStandingCardProps>
             style={{
               fontSize: 10,
               fontWeight: 800,
-              color: DEEP_AMBER,
+              color: GAM.DEEP_AMBER,
               letterSpacing: '0.16em',
               textTransform: 'uppercase',
               marginBottom: 5,
@@ -97,7 +95,7 @@ export const ChampionsYourStandingCard: React.FC<ChampionsYourStandingCardProps>
               style={{
                 fontSize: 21,
                 fontWeight: 800,
-                color: 'var(--hcp-t-100, ' + INK + ')',
+                color: 'var(--hcp-t-100, ' + GAM.INK + ')',
                 letterSpacing: '-0.025em',
                 lineHeight: 1,
                 whiteSpace: 'nowrap',
@@ -107,7 +105,7 @@ export const ChampionsYourStandingCard: React.FC<ChampionsYourStandingCardProps>
             >
               {displayName}
             </span>
-            <span style={{ fontSize: 11, fontWeight: 700, color: DEEP_AMBER, fontVariantNumeric: 'tabular-nums', flexShrink: 0 }}>
+            <span style={{ fontSize: 11, fontWeight: 700, color: GAM.DEEP_AMBER, fontVariantNumeric: 'tabular-nums', flexShrink: 0 }}>
               {titlesHeld} of {totalCategories} titles
             </span>
           </div>
@@ -121,8 +119,8 @@ export const ChampionsYourStandingCard: React.FC<ChampionsYourStandingCardProps>
         {bestRank != null && (
           <div style={{ flexShrink: 0, textAlign: 'right', paddingLeft: 8 }}>
             <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'flex-end' }}>
-              <span style={{ fontSize: 16, fontWeight: 600, color: DEEP_AMBER, marginTop: 4, letterSpacing: '-0.02em' }}>#</span>
-              <span style={{ fontSize: 38, fontWeight: 250, color: DEEP_AMBER, letterSpacing: '-0.04em', lineHeight: 0.85, fontVariantNumeric: 'tabular-nums' }}>
+              <span style={{ fontSize: 16, fontWeight: 600, color: GAM.DEEP_AMBER, marginTop: 4, letterSpacing: '-0.02em' }}>#</span>
+              <span style={{ fontSize: 38, fontWeight: 250, color: GAM.DEEP_AMBER, letterSpacing: '-0.04em', lineHeight: 0.85, fontVariantNumeric: 'tabular-nums' }}>
                 {bestRank}
               </span>
             </div>
