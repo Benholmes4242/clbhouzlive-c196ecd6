@@ -165,18 +165,18 @@ function TabStrip({ tab, onChange }: { tab: Tab; onChange: (t: Tab) => void }) {
   return (
     <div
       style={{
-        padding: '0 18px 14px',
+        padding: '0 18px',
         borderBottom: `1px solid ${SLATE_200}`,
         flexShrink: 0,
       }}
     >
       <div
+        role="tablist"
+        aria-label="Intelligence view"
         style={{
           display: 'flex',
-          background: SLATE_50,
-          borderRadius: 10,
-          padding: 4,
-          gap: 4,
+          gap: 20,
+          fontFamily: 'Geist, system-ui, -apple-system, BlinkMacSystemFont, sans-serif',
         }}
       >
         {(
@@ -190,22 +190,36 @@ function TabStrip({ tab, onChange }: { tab: Tab; onChange: (t: Tab) => void }) {
             <button
               key={t.key}
               type="button"
+              role="tab"
+              aria-selected={active}
               onClick={() => onChange(t.key)}
               style={{
-                flex: 1,
-                padding: '8px 12px',
-                borderRadius: 7,
+                flex: '0 0 auto',
+                height: 44,
+                padding: '0 2px',
                 border: 'none',
-                background: active ? '#fff' : 'transparent',
-                color: active ? SLATE_900 : SLATE_500,
-                fontSize: 12,
-                fontWeight: 700,
+                background: 'transparent',
+                color: active ? SLATE_900 : SLATE_400,
+                fontFamily: 'inherit',
+                fontSize: 14,
+                fontWeight: active ? 700 : 600,
+                letterSpacing: '-0.005em',
                 cursor: 'pointer',
-                boxShadow: active ? `0 1px 2px ${INK_TINT_06}` : 'none',
-                transition: 'all 150ms',
+                display: 'inline-flex',
+                alignItems: 'center',
+                position: 'relative' as const,
+                transition: 'color 0.15s',
               }}
             >
-              {t.label}
+              <span
+                style={{
+                  display: 'inline-block',
+                  paddingBottom: 4,
+                  borderBottom: active ? `1.5px solid ${SLATE_900}` : '1.5px solid transparent',
+                }}
+              >
+                {t.label}
+              </span>
             </button>
           );
         })}
