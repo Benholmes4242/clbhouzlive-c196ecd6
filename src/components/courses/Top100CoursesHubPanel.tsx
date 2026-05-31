@@ -381,7 +381,7 @@ const Top100CoursesHubPanel = () => {
             <button
               onClick={handleResetFilters}
               className="mt-2 inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-sm font-medium active:scale-[0.97] transition-transform"
-              style={{ background: '#ffffff', border: '1px solid rgba(15,23,42,0.10)', color: '#0F172A' }}
+              style={{ background: SURFACE, border: `1px solid ${HAIRLINE_INK_10}`, color: INK }}
             >
               Reset filters
             </button>
