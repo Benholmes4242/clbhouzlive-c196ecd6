@@ -311,7 +311,7 @@ const Top100CoursesHubPanel = () => {
       {!isLoading && allCourses.length > 0 && (
         <div className="flex items-center justify-between gap-3 pt-2 px-4">
           <span style={{
-            fontSize: 11, color: '#64748B', flex: 1,
+            fontSize: 11, color: INK_MUTE, flex: 1,
             fontWeight: 600, letterSpacing: '0.16em', textTransform: 'uppercase',
           }}>
             {searchTerm ? (
