@@ -86,11 +86,10 @@ export function ScheduleHeroCard({ tournament, type, leaderWinner, currentIndex 
   // B45 FIX 8: use tour_full_name directly instead of getTourLabel
   const tourLabel = (tournament.tour_full_name || tournament.tour_code || 'TOUR').toUpperCase();
 
-  // B44 FIX 4C: round label for live card
-  const roundInfo = (isLive && leaderWinner)
-    ? getCurrentRound(leaderWinner.round1, leaderWinner.round2, leaderWinner.round3, leaderWinner.round4)
+  // Round label sourced from sr_tournaments.current_round (single source of truth)
+  const roundLabel = (isLive && tournament.current_round != null)
+    ? `Round ${tournament.current_round}`
     : null;
-  const roundLabel = roundInfo ? `Round ${roundInfo.currentRound}` : null;
 
   return (
     <div
