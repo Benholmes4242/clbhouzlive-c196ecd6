@@ -7,11 +7,11 @@
  *   0 events    → returns null
  */
 
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { format } from 'date-fns';
 import { ArrowDownRight, ArrowRight, ArrowUpRight } from 'lucide-react';
 import { usePlayerResults, formatPositionShort, formatScore, type PlayerTournamentResult } from '../../hooks/usePlayerResults';
-import { AMBER, INK, INK_FAINT, INK_LIGHT, INK_MUTE, INK_TINT_07, SURFACE, TREND_DOWN } from '../../_shared/tokens';
+import { AMBER, INK, INK_FAINT, INK_MUTE, INK_TINT_07, SCORE_UNDER_PAR_LIGHT, SURFACE, TREND_DOWN } from '../../_shared/tokens';
 
 interface FormSectionProps {
   playerId: string;
@@ -40,11 +40,24 @@ function deriveVerdict(avgPos: number, mostRecentPos: number): FormVerdict {
 function dotColorForPosition(pos: number, status: string | null): string {
   const s = status?.toUpperCase();
   if (s === 'CUT' || s === 'WD' || s === 'DQ' || s === 'MC') return TREND_DOWN;
-  if (pos <= 10) return AMBER;
-  if (pos <= 30) return INK_FAINT;
-  if (pos <= 70) return INK_LIGHT;
+  if (pos <= 10) return SCORE_UNDER_PAR_LIGHT;
+  if (pos <= 40) return AMBER;
   return TREND_DOWN;
 }
+
+function formatFinishLabel(evt: PlayerTournamentResult): string {
+  const s = evt.status?.toUpperCase();
+  if (s === 'CUT' || s === 'MC') return 'MC';
+  if (s === 'WD' || s === 'DQ') return s;
+  const pos = evt.position;
+  if (pos == null) return '—';
+  if (pos === 1) return '1';
+  return evt.position_tied ? `T${pos}` : `${pos}`;
+}
+
+const prefersReducedMotion = () =>
+  typeof window !== 'undefined' &&
+  window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
 
 interface DotStripProps {
   events: PlayerTournamentResult[];
@@ -54,11 +67,9 @@ function DotStrip({ events }: DotStripProps) {
   return (
     <div style={{ display: 'flex', alignItems: 'flex-end', gap: 12 }}>
       {events.map((evt, i) => {
-        const status = evt.status?.toUpperCase();
-        const isMissed = status === 'CUT' || status === 'WD' || status === 'DQ' || status === 'MC';
         const pos = evt.position;
         const color = dotColorForPosition(pos ?? 999, evt.status);
-        const label = isMissed ? status : pos === null ? '—' : pos === 1 ? '1' : `T${pos}`;
+        const label = formatFinishLabel(evt);
         return (
           <div
             key={evt.id ?? i}
@@ -93,6 +104,23 @@ interface InteractiveSparklineProps {
 
 function InteractiveSparkline({ events, positions, activeIdx, setActiveIdx }: InteractiveSparklineProps) {
   const wrapperRef = useRef<HTMLDivElement>(null);
+  const lineRef = useRef<SVGPolylineElement>(null);
+  const pathLenRef = useRef<number>(0);
+  const [drawn, setDrawn] = useState(false);
+  const reduced = prefersReducedMotion();
+
+  useEffect(() => {
+    if (lineRef.current) {
+      try { pathLenRef.current = lineRef.current.getTotalLength(); } catch { pathLenRef.current = 0; }
+    }
+    if (reduced) {
+      setDrawn(true);
+      return;
+    }
+    const raf = requestAnimationFrame(() => setDrawn(true));
+    return () => cancelAnimationFrame(raf);
+  }, [reduced]);
+
   if (positions.length < 2) return null;
 
   const VB_W = 1000;
@@ -103,14 +131,19 @@ function InteractiveSparkline({ events, positions, activeIdx, setActiveIdx }: In
   const maxPos = Math.max(...positions);
   const range = Math.max(1, maxPos - minPos);
 
+  const yForPos = (p: number) =>
+    ((Math.max(minPos, Math.min(maxPos, p)) - minPos) / range) * (VB_H - 20) + 10;
+  const zoneBottom = yForPos(10);
+
   const coords = positions.map((pos, i) => {
     const x = PAD_X + (i / (positions.length - 1)) * (VB_W - PAD_X * 2);
-    const y = ((pos - minPos) / range) * (VB_H - 20) + 10;
+    const y = yForPos(pos);
     return { x, y };
   });
 
   const polyPoints = coords.map(c => `${c.x.toFixed(1)},${c.y.toFixed(1)}`).join(' ');
   const lastIdx = positions.length - 1;
+  const len = pathLenRef.current;
 
   const updateFromPointer = (clientX: number) => {
     const el = wrapperRef.current;
@@ -126,7 +159,7 @@ function InteractiveSparkline({ events, positions, activeIdx, setActiveIdx }: In
       ref={wrapperRef}
       style={{
         width: '100%',
-        height: 64,
+        height: 78,
         touchAction: 'none',
         cursor: 'pointer',
         position: 'relative',
@@ -147,6 +180,28 @@ function InteractiveSparkline({ events, positions, activeIdx, setActiveIdx }: In
       onPointerCancel={() => setActiveIdx(null)}
       onPointerLeave={() => setActiveIdx(null)}
     >
+      {activeIdx != null && coords[activeIdx] && events[activeIdx] && (
+        <div
+          style={{
+            position: 'absolute',
+            top: -2,
+            left: `${(coords[activeIdx].x / VB_W) * 100}%`,
+            transform: 'translateX(-50%)',
+            background: INK,
+            color: '#fff',
+            fontSize: 10.5,
+            fontWeight: 700,
+            padding: '3px 8px',
+            borderRadius: 7,
+            whiteSpace: 'nowrap',
+            pointerEvents: 'none',
+            zIndex: 2,
+            boxShadow: '0 4px 12px rgba(15,23,42,0.18)',
+          }}
+        >
+          {formatFinishLabel(events[activeIdx])}
+        </div>
+      )}
       <svg
         width="100%"
         height="100%"
@@ -154,6 +209,45 @@ function InteractiveSparkline({ events, positions, activeIdx, setActiveIdx }: In
         preserveAspectRatio="none"
         style={{ display: 'block', overflow: 'visible' }}
       >
+        <defs>
+          <linearGradient id="formFill" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor={AMBER} stopOpacity={0.22} />
+            <stop offset="100%" stopColor={AMBER} stopOpacity={0} />
+          </linearGradient>
+        </defs>
+
+        {/* In-form (top-10) zone */}
+        <rect
+          x={PAD_X}
+          y={2}
+          width={VB_W - PAD_X * 2}
+          height={Math.max(0, zoneBottom - 2)}
+          fill={SCORE_UNDER_PAR_LIGHT}
+          opacity={0.05}
+        />
+        <line
+          x1={PAD_X}
+          x2={VB_W - PAD_X}
+          y1={zoneBottom}
+          y2={zoneBottom}
+          stroke={SCORE_UNDER_PAR_LIGHT}
+          strokeWidth={1}
+          strokeDasharray="2 7"
+          strokeOpacity={0.4}
+          vectorEffect="non-scaling-stroke"
+        />
+
+        {/* Area fade */}
+        <polygon
+          points={`${PAD_X},${VB_H} ${polyPoints} ${VB_W - PAD_X},${VB_H}`}
+          fill="url(#formFill)"
+          style={
+            reduced
+              ? undefined
+              : { opacity: drawn ? 1 : 0, transition: 'opacity 600ms ease 250ms' }
+          }
+        />
+
         {activeIdx != null && coords[activeIdx] && (
           <line
             x1={coords[activeIdx].x}
@@ -168,6 +262,7 @@ function InteractiveSparkline({ events, positions, activeIdx, setActiveIdx }: In
           />
         )}
         <polyline
+          ref={lineRef}
           points={polyPoints}
           fill="none"
           stroke={AMBER}
@@ -175,19 +270,33 @@ function InteractiveSparkline({ events, positions, activeIdx, setActiveIdx }: In
           strokeLinecap="round"
           strokeLinejoin="round"
           vectorEffect="non-scaling-stroke"
+          style={
+            reduced || !len
+              ? undefined
+              : {
+                  strokeDasharray: len,
+                  strokeDashoffset: drawn ? 0 : len,
+                  transition: 'stroke-dashoffset 700ms cubic-bezier(.33,1,.68,1)',
+                }
+          }
         />
         {coords.map((c, i) => {
           const isActive = i === activeIdx;
           const isLatest = i === lastIdx;
+          const c_ = dotColorForPosition(positions[i], events[i]?.status ?? null);
+          const isAmberTier = c_ === AMBER;
+          const groupStyle = reduced
+            ? undefined
+            : { opacity: drawn ? 1 : 0, transition: `opacity 300ms ease ${300 + i * 35}ms` };
           if (isActive) {
             return (
-              <g key={i}>
-                <circle cx={c.x} cy={c.y} r={11} fill={AMBER} fillOpacity={0.18} />
+              <g key={i} style={groupStyle}>
+                <circle cx={c.x} cy={c.y} r={11} fill={c_} fillOpacity={0.16} />
                 <circle
                   cx={c.x}
                   cy={c.y}
                   r={7}
-                  fill={AMBER}
+                  fill={c_}
                   stroke={SURFACE}
                   strokeWidth={2}
                   vectorEffect="non-scaling-stroke"
@@ -197,35 +306,38 @@ function InteractiveSparkline({ events, positions, activeIdx, setActiveIdx }: In
           }
           if (isLatest) {
             return (
-              <circle
-                key={i}
-                cx={c.x}
-                cy={c.y}
-                r={5}
-                fill={AMBER}
-                stroke={SURFACE}
-                strokeWidth={1.5}
-                vectorEffect="non-scaling-stroke"
-              />
+              <g key={i} style={groupStyle}>
+                <circle
+                  cx={c.x}
+                  cy={c.y}
+                  r={5}
+                  fill={c_}
+                  stroke={SURFACE}
+                  strokeWidth={1.5}
+                  vectorEffect="non-scaling-stroke"
+                />
+              </g>
             );
           }
           return (
-            <circle
-              key={i}
-              cx={c.x}
-              cy={c.y}
-              r={3.5}
-              fill={SURFACE}
-              stroke={AMBER}
-              strokeWidth={1.5}
-              vectorEffect="non-scaling-stroke"
-            />
+            <g key={i} style={groupStyle}>
+              <circle
+                cx={c.x}
+                cy={c.y}
+                r={3.5}
+                fill={isAmberTier ? SURFACE : c_}
+                stroke={c_}
+                strokeWidth={1.5}
+                vectorEffect="non-scaling-stroke"
+              />
+            </g>
           );
         })}
       </svg>
     </div>
   );
 }
+
 
 export function FormSection({ playerId }: FormSectionProps) {
   const { data: results, isLoading } = usePlayerResults(playerId, 10);
@@ -399,6 +511,28 @@ export function FormSection({ playerId }: FormSectionProps) {
         activeIdx={activeIdx}
         setActiveIdx={setActiveIdx}
       />
+
+      {/* Legend */}
+      <div
+        style={{
+          display: 'flex',
+          gap: 16,
+          marginTop: 16,
+          paddingTop: 14,
+          borderTop: `0.5px solid ${INK_TINT_07}`,
+        }}
+      >
+        {([
+          ['In form · Top-10', SCORE_UNDER_PAR_LIGHT],
+          ['Solid', AMBER],
+          ['Off week', TREND_DOWN],
+        ] as const).map(([l, c]) => (
+          <div key={l} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+            <span style={{ width: 7, height: 7, borderRadius: '50%', background: c }} />
+            <span style={{ fontSize: 11, fontWeight: 600, color: INK_MUTE }}>{l}</span>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
