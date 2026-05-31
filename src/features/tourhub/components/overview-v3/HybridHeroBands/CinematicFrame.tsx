@@ -581,7 +581,7 @@ export function CinematicFrame({
   type SlotNode = React.ReactNode;
   const slotNodes: SlotNode[] = [];
 
-  if (safe.length > 0) {
+  if (!isUpcoming && safe.length > 0) {
     if (tiedLeaders) {
       // Find first chaser (first entry whose score differs from the leader's)
       const topScore = safe[0]?.score ?? safe[0]?.total;
@@ -637,17 +637,30 @@ export function CinematicFrame({
       });
     } else {
       const leader = safe[0];
-      slotNodes.push(
-        <SoloRowDark
-          key="leader"
-          entry={leader}
-          rank={String(leader.position ?? 1)}
-          avatarUrl={avatar(leader)}
-          isLeader={true}
-          isLast={false}
-          isResultsLeader={state.kind === 'results'}
-        />
-      );
+      // Results: champion hero row (gold-ringed, CHAMPION eyebrow, trophy marker).
+      // Live: standard solo row with amber leader rank.
+      if (isResults) {
+        slotNodes.push(
+          <ChampionRowDark
+            key="champion"
+            entry={leader}
+            avatarUrl={avatar(leader)}
+            isLast={false}
+          />
+        );
+      } else {
+        slotNodes.push(
+          <SoloRowDark
+            key="leader"
+            entry={leader}
+            rank={String(leader.position ?? 1)}
+            avatarUrl={avatar(leader)}
+            isLeader={true}
+            isLast={false}
+            isResultsLeader={false}
+          />
+        );
+      }
 
       const chaserSlots = buildLeaderboardSlots(safe.slice(1), 2);
       chaserSlots.forEach((slot, i) => {
@@ -680,6 +693,39 @@ export function CinematicFrame({
       });
     }
   }
+
+  // ---- Upcoming capsule: defending champion → field strength → no capsule ---
+  let upcomingCapsule: React.ReactNode = null;
+  let upcomingFooter: string | null = null;
+  if (isUpcoming) {
+    if (defendingChamp) {
+      const headshot = (() => {
+        if (!tourSlug || !defendingChamp.name) return null;
+        try { return getPlayerHeadshotUrl(defendingChamp.name, tourSlug); }
+        catch { return null; }
+      })();
+      upcomingCapsule = (
+        <DefendingChampionRowDark data={defendingChamp} avatarUrl={headshot} />
+      );
+      upcomingFooter = 'View tournament';
+    } else if (fieldStrength && fieldStrength.totalPlayers > 0) {
+      upcomingCapsule = <FieldStrengthRowDark data={fieldStrength} />;
+      upcomingFooter = 'View tournament';
+    }
+    // else: no capsule — countdown chip carries the frame.
+  }
+
+  // Countdown chip (upcoming only) — uses state.countdown when present.
+  const countdownText = isUpcoming
+    ? ((state as any).countdown as string | undefined) || null
+    : null;
+
+  // Render decisions
+  const hasCapsule = isUpcoming ? upcomingCapsule !== null : true;
+  const capsuleFooter = isUpcoming
+    ? upcomingFooter
+    : `Full leaderboard${fieldSize > 0 ? ` · ${fieldSize} players` : ''}`;
+
 
   return (
     <div
