@@ -358,9 +358,9 @@ export function CinematicFrame({
 
   // Top meta: LIVE · ROUND N (live) or FINAL (results)
   const isLive = state.kind === 'live';
-  const roundLabel =
+  const roundLabel_ =
     state.kind === 'live'
-      ? `LIVE · ROUND ${state.round}`
+      ? `LIVE · ${roundLabel(state.round, state.totalRounds).toUpperCase()}`
       : state.kind === 'results'
         ? 'FINAL'
         : null;
