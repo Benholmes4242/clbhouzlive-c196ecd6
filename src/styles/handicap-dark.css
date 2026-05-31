@@ -268,3 +268,14 @@
 .hcp-dark [data-chrome="shell-slot"] [role="tab"][aria-selected="true"] {
   color: var(--hcp-t-100) !important;
 }
+
+/* Light-surface tab strips inside the dark shell (e.g. PlayerSeasonStats).
+ * The generic .hcp-dark [role=tab][aria-selected=true] rule above forces white,
+ * which is invisible on white surfaces. Scoped override restores dark INK. */
+.hcp-dark .player-stats-tabs [role="tab"] {
+  color: #94A3B8 !important;
+}
+.hcp-dark .player-stats-tabs [role="tab"][aria-selected="true"] {
+  color: #0F172A !important;
+}
+
