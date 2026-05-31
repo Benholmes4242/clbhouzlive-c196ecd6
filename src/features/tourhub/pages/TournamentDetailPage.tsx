@@ -8,7 +8,6 @@ import { useBottomNavigation } from '@/contexts/BottomNavigationContext';
 import { useParams, useSearchParams, Link } from 'react-router-dom';
 import { Trophy, AlertCircle } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { formatDistanceToNow } from 'date-fns';
 import { TourHubShell } from '../components/TourHubShell';
 import { ShellSlot } from '@/components/header/ShellSlot';
 import { TournamentTabsShellRow } from '../components/shell/TournamentTabsShellRow';
