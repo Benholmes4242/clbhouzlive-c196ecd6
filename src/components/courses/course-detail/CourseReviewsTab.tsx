@@ -32,6 +32,7 @@ import ScrollToTopGlass from '@/components/common/ScrollToTopGlass';
 import { PullToRefreshContainer } from '@/components/ui/pull-to-refresh';
 import { AlertCircle } from 'lucide-react';
 import { getProfilePathById } from '@/lib/profileRoutes';
+import { AMBER, HAIRLINE_INK_7, HAIRLINE_INK_10, INK, INK_FAINT, INK_LIGHT, INK_MUTE, INK_TINT_02, INK_TINT_06, SLATE_50, SURFACE } from '@/features/courses/_shared/tokens';
 
 export type SortOption = ReviewsSortBy;
 
