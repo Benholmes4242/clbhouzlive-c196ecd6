@@ -118,7 +118,7 @@ export const CourseHolesTab: React.FC<Props> = ({ courseId }) => {
                 textTransform: 'uppercase',
                 cursor: 'pointer',
                 background: sort === k ? INK : 'transparent',
-                color: sort === k ? '#fff' : '#64748b',
+                color: sort === k ? SURFACE : INK_MUTE,
                 fontFamily: FONT,
               }}
             >
