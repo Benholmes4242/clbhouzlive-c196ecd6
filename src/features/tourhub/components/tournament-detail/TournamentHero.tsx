@@ -217,7 +217,7 @@ export function TournamentHero({ tournament, imageUrl, leader, leaderboard }: To
         {/* Top — narrative pills (replaces the legacy '⚡ TOUR' eyebrow chip).
             Rendered in the upper-mid overlay where the gradient is faint enough
             for the 'normal' variant to read. */}
-        {pills.length > 0 && (
+        {(pills.length > 0 || dateRange) && (
           <div
             style={{
               position: 'absolute',
@@ -225,13 +225,32 @@ export function TournamentHero({ tournament, imageUrl, leader, leaderboard }: To
               left: 16,
               right: 16,
               display: 'flex',
-              flexWrap: 'wrap',
-              gap: 6,
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              gap: 12,
             }}
           >
-            {pills.map((p, i) => (
-              <PillView key={`${p.variant}-${p.value}-${i}`} pill={p} />
-            ))}
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, minWidth: 0 }}>
+              {pills.map((p, i) => (
+                <PillView key={`${p.variant}-${p.value}-${i}`} pill={p} />
+              ))}
+            </div>
+            {dateRange && (
+              <span
+                style={{
+                  fontSize: 10,
+                  fontWeight: 700,
+                  letterSpacing: '0.16em',
+                  color: 'rgba(255,255,255,0.75)',
+                  textShadow: '0 1px 3px rgba(0,0,0,0.45)',
+                  textTransform: 'uppercase',
+                  whiteSpace: 'nowrap',
+                  fontVariantNumeric: 'tabular-nums',
+                }}
+              >
+                {dateRange}
+              </span>
+            )}
           </div>
         )}
 
@@ -240,17 +259,14 @@ export function TournamentHero({ tournament, imageUrl, leader, leaderboard }: To
           <h1 style={{ fontSize: 22, fontWeight: 800, color: SURFACE, letterSpacing: '-0.025em', lineHeight: 1.15, margin: '0 0 6px' }}>
             {tournament.name}
           </h1>
-          {(tournament.venue_city || tournament.venue_country || dateRange) && (
+          {(tournament.venue_city || tournament.venue_country) && (
             <div style={{
               fontSize: 13,
               fontWeight: 500,
               color: 'rgba(255,255,255,0.70)',
               letterSpacing: '-0.005em',
             }}>
-              {[
-                [tournament.venue_city, expandCountry(tournament.venue_country)].filter(Boolean).join(', '),
-                dateRange,
-              ].filter(Boolean).join(' · ')}
+              {[tournament.venue_city, expandCountry(tournament.venue_country)].filter(Boolean).join(', ')}
             </div>
           )}
         </div>
