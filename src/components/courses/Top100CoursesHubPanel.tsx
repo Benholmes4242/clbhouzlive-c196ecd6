@@ -211,7 +211,7 @@ const Top100CoursesHubPanel = () => {
     listSummaries.find(l => l.slug === selectedList)?.total_courses ?? allCourses.length;
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-[14px]">
       {/* Editorial header — eyebrow + title + optional progress sub-line.
           Parent already supplies px-4 — don't double-pad. */}
       <div className="pt-1">
