@@ -3,6 +3,7 @@ import { Star } from 'lucide-react';
 import { reformatFriendName } from '@/lib/whs/utils/nameFormat';
 import { initials } from '@/lib/whs/utils/initials';
 import { pickAvatarSrc } from '@/lib/whs/utils/avatarSrc';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { fmtHcp } from '@/lib/whs/format';
 import type { FriendRivalryHydrated } from '@/lib/whs/types';
 import { useRivalryDimension } from '@/lib/whs/utils/useRivalryDimension';
