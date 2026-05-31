@@ -6,6 +6,7 @@ import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import type { TourTournament } from '../../hooks/useTourHubData';
 import { AMBER, INK, INK_FAINT, INK_MUTE, INK_TINT_07, SURFACE } from '../../_shared/tokens';
+import { ConnectHandicapCue } from '@/components/courses/course-detail/ConnectHandicapCue';
 
 interface CourseInfoCardProps {
   tournament: TourTournament;
