@@ -19,6 +19,7 @@ export interface LiveTournamentLite {
   tour_name: string | null;
   tourSlug: TourId;
   purse: number | null;
+  currentRound: number | null;
 }
 
 /** Tournaments that are in progress, OR scheduled with start_date === today (local). */
