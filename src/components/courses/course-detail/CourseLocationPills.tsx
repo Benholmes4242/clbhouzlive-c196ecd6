@@ -25,9 +25,9 @@ interface CourseLocationPillsProps {
 const pillStyle: React.CSSProperties = {
   fontSize: 12,
   fontWeight: 600,
-  color: '#64748B',
-  background: '#ffffff',
-  border: '1px solid rgba(15,23,42,0.08)',
+  color: INK_MUTE,
+  background: SURFACE,
+  border: `1px solid ${HAIRLINE_INK_8}`,
   borderRadius: 20,
   padding: '3px 10px',
   cursor: 'pointer',
