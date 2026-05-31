@@ -20069,6 +20069,20 @@ export type Database = {
         Args: { other_user_id: string }
         Returns: string
       }
+      get_player_titles_in_reach: {
+        Args: { p_limit?: number; p_user_id: string; p_window?: string }
+        Returns: {
+          attained_at: string
+          category: string
+          course_id: string
+          course_name: string
+          gap: number
+          hero_image_url: string
+          leader_value: number
+          user_rank: number
+          user_value: number
+        }[]
+      }
       get_podium_all_time: {
         Args: {
           p_club_id?: string
