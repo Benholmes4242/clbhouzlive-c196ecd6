@@ -2,6 +2,7 @@ import React, { useEffect, useRef } from 'react';
 import { useCourseMediaViewerStore } from '@/components/course-media-tab/CourseMediaViewer';
 import { Film } from 'lucide-react';
 import type { FeedPost } from '@/components/media-system/types/media';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { INK_TINT_04, INK_TINT_06, SURFACE } from '@/features/courses/_shared/tokens';
 
 function formatDuration(seconds?: number): string {
@@ -14,6 +15,7 @@ function formatDuration(seconds?: number): string {
 interface CourseMediaTileProps {
   post: FeedPost;
   index: number;
+  feature?: boolean;
   allPosts?: FeedPost[];
   fetchNextPage?: () => void;
   hasNextPage?: boolean;
@@ -24,7 +26,7 @@ interface CourseMediaTileProps {
   onOpenFullscreen?: (posts: FeedPost[], index: number) => void;
 }
 
-export const CourseMediaTile: React.FC<CourseMediaTileProps> = ({ post, index, allPosts, onOpenFullscreen }) => {
+export const CourseMediaTile: React.FC<CourseMediaTileProps> = ({ post, index, feature, allPosts, onOpenFullscreen }) => {
   const media = post.mediaItems[0];
   const isVideo = media?.type === 'video';
   const thumbnailUrl = isVideo ? media?.thumbnailUrl : (media?.imageUrl || media?.thumbnailUrl);
@@ -52,7 +54,6 @@ export const CourseMediaTile: React.FC<CourseMediaTileProps> = ({ post, index, a
       ref={tileRef}
       data-course-media-index={index}
       onClick={() => {
-        // `allPosts` is the per-media array; `index` IS the fullscreen index by construction.
         const perMediaPosts = allPosts ?? [post];
         if (onOpenFullscreen) {
           onOpenFullscreen(perMediaPosts, index);
@@ -62,7 +63,7 @@ export const CourseMediaTile: React.FC<CourseMediaTileProps> = ({ post, index, a
       }}
       style={{
         position: 'relative',
-        aspectRatio: '3/4',
+        aspectRatio: '1',
         overflow: 'hidden',
         cursor: 'pointer',
         transition: 'transform 100ms ease',
@@ -75,7 +76,7 @@ export const CourseMediaTile: React.FC<CourseMediaTileProps> = ({ post, index, a
         <img
           src={thumbnailUrl}
           alt=""
-          style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }}
+          style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center 40%' }}
           loading="lazy"
         />
       ) : (
@@ -102,8 +103,8 @@ export const CourseMediaTile: React.FC<CourseMediaTileProps> = ({ post, index, a
         <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', pointerEvents: 'none' }}>
           <div
             style={{
-              width: 32,
-              height: 32,
+              width: feature ? 44 : 32,
+              height: feature ? 44 : 32,
               borderRadius: '50%',
               background: 'rgba(0,0,0,0.45)',
               backdropFilter: 'blur(4px)',
@@ -112,7 +113,7 @@ export const CourseMediaTile: React.FC<CourseMediaTileProps> = ({ post, index, a
               justifyContent: 'center',
             }}
           >
-            <svg width="12" height="12" viewBox="0 0 12 12" fill="#fff">
+            <svg width={feature ? 16 : 12} height={feature ? 16 : 12} viewBox="0 0 12 12" fill="#fff">
               <path d="M3 1.5 L10 6 L3 10.5 Z" />
             </svg>
           </div>
@@ -140,32 +141,66 @@ export const CourseMediaTile: React.FC<CourseMediaTileProps> = ({ post, index, a
         </div>
       )}
 
+      {/* Author — bottom left */}
+      {post.displayName && (
+        <div
+          style={{
+            position: 'absolute',
+            left: 8,
+            bottom: 6,
+            display: 'flex',
+            alignItems: 'center',
+            gap: 5,
+            zIndex: 2,
+            pointerEvents: 'none',
+            maxWidth: '70%',
+          }}
+        >
+          <SquircleAvatar
+            src={post.avatarUrl}
+            alt={post.displayName}
+            size={feature ? 22 : 16}
+            thinRing
+            fallback={post.displayName.charAt(0).toUpperCase()}
+          />
+          {feature && (
+            <span
+              style={{
+                fontSize: 12,
+                fontWeight: 700,
+                color: SURFACE,
+                textShadow: '0 1px 3px rgba(0,0,0,0.55)',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                whiteSpace: 'nowrap',
+              }}
+            >
+              {post.displayName}
+            </span>
+          )}
+        </div>
+      )}
+
       {/* Likes — bottom right overlay */}
       {post.likeCount > 0 && (
         <div
           style={{
             position: 'absolute',
-            left: 8,
             right: 8,
             bottom: 6,
             display: 'flex',
-            alignItems: 'flex-end',
-            justifyContent: 'flex-end',
-            gap: 6,
+            alignItems: 'center',
+            gap: 3,
             zIndex: 2,
             pointerEvents: 'none',
           }}
         >
-          {post.likeCount > 0 && (
-            <div style={{ display: 'flex', alignItems: 'center', gap: 3, flexShrink: 0 }}>
-              <svg width="11" height="11" viewBox="0 0 24 24" fill="#fff">
-                <path d="M12 21s-7-4.5-9.5-9C1 9 2.5 5 6 5c2 0 3.5 1 4.5 2.5C11.5 6 13 5 15 5c3.5 0 5 4 3.5 7-2.5 4.5-9.5 9-9.5 9z"/>
-              </svg>
-              <span style={{ fontSize: 10, fontWeight: 700, color: SURFACE, textShadow: '0 1px 2px rgba(0,0,0,0.4)' }}>
-                {post.likeCount}
-              </span>
-            </div>
-          )}
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="#fff">
+            <path d="M12 21s-7-4.5-9.5-9C1 9 2.5 5 6 5c2 0 3.5 1 4.5 2.5C11.5 6 13 5 15 5c3.5 0 5 4 3.5 7-2.5 4.5-9.5 9-9.5 9z"/>
+          </svg>
+          <span style={{ fontSize: 10, fontWeight: 700, color: SURFACE, textShadow: '0 1px 2px rgba(0,0,0,0.4)' }}>
+            {post.likeCount}
+          </span>
         </div>
       )}
     </div>
