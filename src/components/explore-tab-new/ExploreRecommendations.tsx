@@ -4,6 +4,7 @@ import { useExploreRecommendations, type ExploreRecRow } from './hooks/useExplor
 import type { ExploreMoodId } from './hooks/useExploreMood';
 import clbhouzLogo from '@/assets/clbhouz-logo.png';
 import { ExploreSectionHeader } from './ExploreSectionHeader';
+import { AMBER, INK, INK_ALPHA_60, INK_TINT_06, SLATE_50, SURFACE } from '@/features/courses/_shared/tokens';
 
 interface ExploreRecommendationsProps {
   userId: string | undefined;
@@ -36,12 +37,12 @@ function RecCard({ rec, onTap }: { rec: ExploreRecRow; onTap: () => void }) {
       style={{
         width: 240,
         flexShrink: 0,
-        background: '#FFFFFF',
+        background: SURFACE,
         borderRadius: 14,
         overflow: 'hidden',
       }}
     >
-      <div style={{ position: 'relative', width: '100%', aspectRatio: '16/9', background: '#F8FAFC' }}>
+      <div style={{ position: 'relative', width: '100%', aspectRatio: '16/9', background: SLATE_50 }}>
         {rec.hero_image_url ? (
           <img
             src={rec.hero_image_url}
@@ -75,7 +76,7 @@ function RecCard({ rec, onTap }: { rec: ExploreRecRow; onTap: () => void }) {
               fontWeight: 800,
               letterSpacing: '0.08em',
               textTransform: 'uppercase',
-              color: '#0F172A',
+              color: INK,
               background: 'rgba(255,255,255,0.95)',
               padding: '3px 7px',
               borderRadius: 4,
@@ -91,7 +92,7 @@ function RecCard({ rec, onTap }: { rec: ExploreRecRow; onTap: () => void }) {
             fontSize: 14,
             fontWeight: 800,
             letterSpacing: '-0.01em',
-            color: '#0F172A',
+            color: INK,
             margin: 0,
             display: '-webkit-box',
             WebkitLineClamp: 1,
@@ -105,7 +106,7 @@ function RecCard({ rec, onTap }: { rec: ExploreRecRow; onTap: () => void }) {
           style={{
             fontSize: 11,
             fontWeight: 500,
-            color: 'rgba(15,23,42,0.6)',
+            color: INK_ALPHA_60,
             margin: '2px 0 8px',
             display: '-webkit-box',
             WebkitLineClamp: 1,
@@ -134,7 +135,7 @@ function RecCard({ rec, onTap }: { rec: ExploreRecRow; onTap: () => void }) {
         {rec.rating_avg != null && (rec.review_count ?? 0) > 0 && (
           <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 10 }}>
             <img src={clbhouzLogo} alt="" style={{ width: 12, height: 12, objectFit: 'contain' }} />
-            <span style={{ fontSize: 12, fontWeight: 800, color: '#F7931E' }}>
+            <span style={{ fontSize: 12, fontWeight: 800, color: AMBER }}>
               {Number(rec.rating_avg).toFixed(1)}
             </span>
             <span style={{ fontSize: 10, color: 'rgba(15,23,42,0.5)' }}>
@@ -160,7 +161,7 @@ function ExploreRecommendationsInner({ userId, mood }: ExploreRecommendationsPro
             <div
               key={i}
               className="animate-pulse"
-              style={{ width: 240, height: 280, flexShrink: 0, background: 'rgba(15,23,42,0.06)', borderRadius: 14 }}
+              style={{ width: 240, height: 280, flexShrink: 0, background: INK_TINT_06, borderRadius: 14 }}
             />
           ))}
         </div>
