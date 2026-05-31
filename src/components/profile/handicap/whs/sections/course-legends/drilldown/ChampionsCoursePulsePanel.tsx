@@ -68,7 +68,6 @@ export const ChampionsCoursePulsePanel: React.FC<Props> = ({ meta }) => {
 
   return (
     <div style={{ background: 'var(--hcp-bg-0)' }}>
-      <div style={{ height: 1, background: GAM.AMBER }} aria-hidden />
       <div
         style={{
           padding: '10px 18px 0',
