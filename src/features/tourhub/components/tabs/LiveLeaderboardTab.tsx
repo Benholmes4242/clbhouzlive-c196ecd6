@@ -4,7 +4,8 @@ import { useTourLeaderboard } from '../../hooks/useTourHubData';
 import { FullLeaderboard } from '../tournament-detail/FullLeaderboard';
 import { EditorialEmpty } from '../tournament-detail/EditorialEmpty';
 import { INK, INK_MUTE, INK_TINT_07, SURFACE, SHELL_BG, STATUS_LIVE, WHITE_ALPHA_06, WHITE_ALPHA_18, WHITE_ALPHA_55, WHITE_ALPHA_65 } from '../../_shared/tokens';
-import { tourPriorityIndex } from '../../_shared/tourOrder';
+import { tourPriorityIndex, TOUR_LABEL, shortTournamentToken } from '../../_shared/tourOrder';
+import type { LiveTournamentLite } from '../../hooks/useLiveTournaments';
 
 
 /**
