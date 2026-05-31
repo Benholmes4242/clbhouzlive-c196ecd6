@@ -1,11 +1,12 @@
 import React, { forwardRef, useCallback, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCourseMediaViewerStore } from '@/components/course-media-tab/CourseMediaViewer';
-import { AlertCircle, Camera, Loader2 } from 'lucide-react';
+import { AlertCircle, Camera, Loader2, Film, ListChecks, Flag, Sunrise, Building2 } from 'lucide-react';
 import type { FeedPost } from '@/components/media-system/types/media';
 import { CourseMediaTile } from './CourseMediaTile';
 import { CourseMediaLandscapeCard } from './CourseMediaLandscapeCard';
 import { CourseMediaGridSkeleton } from './CourseMediaGridSkeleton';
+import { SectionLabel } from '@/components/courses/course-detail/SectionLabel';
 import { AMBER, HAIRLINE_INK_7, HAIRLINE_INK_10, INK, INK_FAINT, INK_TINT_02, INK_TINT_06, SURFACE } from '@/features/courses/_shared/tokens';
 
 interface CourseMediaGridProps {
