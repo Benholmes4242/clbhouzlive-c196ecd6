@@ -133,6 +133,9 @@ export const ChampionsCategorySection: React.FC<ChampionsCategorySectionProps> =
           isChampion={i === 0}
           gapToChampion={i === 0 ? null : row.gapToChampion}
           holdDuration={i === 0 ? holdDuration : null}
+          userId={i === 0 ? row.userId ?? null : undefined}
+          currentCourseId={i === 0 ? currentCourseId : undefined}
+          window={i === 0 ? legendWindow : undefined}
         />
       ))}
       {hiddenCount > 0 && (
