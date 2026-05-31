@@ -5,6 +5,8 @@ import { cn } from '@/lib/utils';
 import type { MediaCounts } from './hooks/useCourseMedia';
 import type { CourseMediaFilter } from './hooks/useCourseMedia';
 import { INK, INK_FAINT, INK_MUTE, INK_TINT_05 } from '@/features/courses/_shared/tokens';
+import { SectionLabel } from '@/components/courses/course-detail/SectionLabel';
+
 
 interface CourseMediaHeaderProps {
   mediaCounts: MediaCounts;
