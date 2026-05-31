@@ -365,8 +365,8 @@ export function LeaderboardBand({
           }}
         >
           <div style={{ flex: 1, padding: '6px 20px', minWidth: 0, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
-            <span style={{ fontSize: 11, fontWeight: 800, letterSpacing: '0.16em', color: INK_ALPHA_45, textTransform: 'uppercase', flexShrink: 0 }}>
-              Defending
+            <span style={{ fontSize: 11, fontWeight: 800, letterSpacing: '0.04em', color: INK_ALPHA_45, fontVariantNumeric: 'tabular-nums', flexShrink: 0 }}>
+              {new Date().getFullYear() - 1}
             </span>
             <span style={{ fontSize: 11, fontWeight: 700, color: INK, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', minWidth: 0, display: 'inline-flex', alignItems: 'center', gap: 5 }}>
               <Crown size={12} strokeWidth={2.5} fill={GOLD} style={{ color: GOLD_DEEP, flexShrink: 0 }} />
