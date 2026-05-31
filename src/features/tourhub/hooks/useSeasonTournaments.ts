@@ -137,6 +137,7 @@ export function useSeasonTournaments(tourKey: string = 'pga') {
           venue_country,
           venue_par,
           venue_yardage,
+          current_round,
           winner_id,
           season:sr_seasons!inner(tour_name, year)
         `)
