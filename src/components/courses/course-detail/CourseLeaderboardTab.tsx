@@ -170,15 +170,62 @@ const CourseLeaderboardTab = ({ courseId }: CourseLeaderboardTabProps) => {
 
   return (
     <div className="space-y-6">
-      {/* Filter Tabs */}
-      <Tabs value={activeFilter} onValueChange={setActiveFilter}>
-        <TabsList className="grid w-full grid-cols-4">
-          <TabsTrigger value="all">All Users</TabsTrigger>
-          <TabsTrigger value="friends">My Friends</TabsTrigger>
-          <TabsTrigger value="media">Most Media</TabsTrigger>
-          <TabsTrigger value="reviews">Most Reviews</TabsTrigger>
-        </TabsList>
-      </Tabs>
+      {/* Filter Tabs — underline style (matches player profile) */}
+      <div
+        role="tablist"
+        aria-label="Leaderboard filter"
+        style={{
+          display: 'flex',
+          gap: 8,
+          overflowX: 'auto',
+          overflowY: 'hidden',
+          WebkitOverflowScrolling: 'touch',
+          scrollbarWidth: 'none',
+          fontFamily: 'Geist, system-ui, -apple-system, BlinkMacSystemFont, sans-serif',
+          padding: '0 16px',
+        }}
+      >
+        {FILTERS.map(({ key, label }) => {
+          const isActive = activeFilter === key;
+          return (
+            <button
+              key={key}
+              role="tab"
+              aria-selected={isActive}
+              onClick={() => setActiveFilter(key)}
+              style={{
+                flex: '0 0 auto',
+                height: 44,
+                padding: '0 4px',
+                borderRadius: 0,
+                border: 'none',
+                background: 'transparent',
+                color: isActive ? INK : INK_FAINT,
+                fontFamily: 'inherit',
+                fontSize: 14,
+                fontWeight: isActive ? 700 : 600,
+                letterSpacing: '-0.005em',
+                whiteSpace: 'nowrap',
+                cursor: 'pointer',
+                display: 'inline-flex',
+                alignItems: 'center',
+                position: 'relative',
+                transition: 'color 0.15s',
+              }}
+            >
+              <span
+                style={{
+                  display: 'inline-block',
+                  paddingBottom: 4,
+                  borderBottom: isActive ? `1.5px solid ${INK}` : '1.5px solid transparent',
+                }}
+              >
+                {label}
+              </span>
+            </button>
+          );
+        })}
+      </div>
 
       {/* Leaderboard */}
       <div className="space-y-3">
