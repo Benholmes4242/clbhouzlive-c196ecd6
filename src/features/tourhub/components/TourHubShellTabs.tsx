@@ -49,7 +49,7 @@ export const TourHubShellTabs: React.FC = () => {
 
   const tabs = useMemo<TabDef[]>(() => {
     const base: TabDef[] = [{ id: 'overview', label: 'Overview' }];
-    if (showLive) base.push({ id: 'live', label: 'Leaderboard' });
+    if (showLive) base.push({ id: 'live', label: 'Leaderboards' });
     base.push(
       { id: 'schedule', label: 'Schedule' },
       { id: 'players', label: 'Players' },
