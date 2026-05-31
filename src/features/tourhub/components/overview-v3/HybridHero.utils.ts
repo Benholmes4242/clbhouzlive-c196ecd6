@@ -141,6 +141,8 @@ export function deriveHeroState(
     return {
       kind: 'live',
       round: tournament.currentRound ?? 1,
+      // TODO: wire to real tournament.num_rounds once exposed on HeroTournament.
+      // 3-round (LPGA 54-hole) events will mislabel "Moving Day" / "Final Round" until then.
       totalRounds: 4,
       thruLabel: 'F THRU',
     };
