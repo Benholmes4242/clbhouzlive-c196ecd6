@@ -555,7 +555,7 @@ export function CinematicFrame({
                   textShadow: '0 1px 3px rgba(0,0,0,0.45)',
                 }}
               >
-                {roundLabel}
+                {roundLabel_}
               </span>
             </div>
           ) : <span />}
