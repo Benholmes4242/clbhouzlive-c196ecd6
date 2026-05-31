@@ -68,7 +68,7 @@ const formatDescription = (description: string) => {
 };
 
 const Divider = () => (
-  <div style={{ height: '0.5px', background: 'rgba(15,23,42,0.07)', margin: '0 16px' }} />
+  <div style={{ height: '0.5px', background: HAIRLINE_INK_7, margin: '0 16px' }} />
 );
 
 const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
