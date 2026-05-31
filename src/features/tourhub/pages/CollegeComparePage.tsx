@@ -111,7 +111,7 @@ export function CollegeComparePage() {
         >
           <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, marginBottom: 4 }}>
             <ArrowLeftRight size={11} strokeWidth={2.5} color={AMBER} style={{ marginTop: -4 }} />
-            <Kicker color="amber">Head-to-head</Kicker>
+            <Kicker color="light">Head-to-head</Kicker>
             <ChevronRight size={11} strokeWidth={2.5} color={AMBER} style={{ marginTop: -4 }} />
           </div>
           <h1
