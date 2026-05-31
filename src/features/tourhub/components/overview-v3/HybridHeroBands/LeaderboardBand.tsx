@@ -53,24 +53,6 @@ function ctaLabel(state: HeroState): string {
   return state.variant === 'imminent' ? 'VIEW ALL TEE TIMES' : 'VIEW TOURNAMENT';
 }
 
-function header(state: HeroState, leaderboard: any[], tiedLeaders: TopTie | null) {
-  if (state.kind === 'live') {
-    const meta = tiedLeaders
-      ? `${leaderboard.length} players · ${tiedLeaders.count} tied at top`
-      : `${leaderboard.length} players`;
-    return { left: 'LEADERBOARD', right: meta };
-  }
-  if (state.kind === 'results') {
-    if (state.variant === 'cancelled') return { left: 'STATUS', right: 'Final · No result' };
-    if (state.variant === 'awaiting-playoff')
-      return { left: 'AWAITING RESOLUTION', right: tiedLeaders ? `${tiedLeaders.count} tied · playoff active` : 'playoff active' };
-    if (state.variant === 'declared') return { left: 'FINAL', right: `${leaderboard.length} players · 54 holes · weather` };
-    if (state.variant === 'team') return { left: 'TEAM FINAL', right: `${leaderboard.length} teams` };
-    return { left: 'FINAL', right: `${leaderboard.length} players` };
-  }
-  if (state.variant === 'imminent') return { left: 'ROUND 1 · MARQUEE GROUPS', right: 'R1 · marquee groups' };
-  return { left: "LAST YEAR'S TOP 4", right: '' };
-}
 
 function entryName(entry: any): string {
   const p = entry?.player;
