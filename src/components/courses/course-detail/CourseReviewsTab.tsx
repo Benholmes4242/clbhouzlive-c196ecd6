@@ -576,7 +576,7 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
           const response = reviewResponses?.find(r => r.review_id === review.id);
           const canReply = businessClaim?.isVerified && !response;
           return (
-            <div key={review.id} style={{ borderBottom: '0.5px solid rgba(15,23,42,0.06)' }}>
+            <div key={review.id} style={{ borderBottom: `0.5px solid ${INK_TINT_06}` }}>
               <div style={{ padding: '2px 16px 0' }}>
                 <ReviewBlockFlat
                   review={transformReview(review, isDeepLinked)}
