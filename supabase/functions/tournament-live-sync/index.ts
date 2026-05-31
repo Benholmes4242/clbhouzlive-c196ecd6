@@ -439,39 +439,7 @@ async function syncTournament(
 
   if (shouldSyncScorecards) {
     try {
-      // Derive active round from leaderboard data: check round columns 4→1
-      let activeRound = 1;
-      const { data: roundCheck } = await supabase
-        .from('sr_leaderboards')
-        .select('round_1, round_2, round_3, round_4')
-        .eq('tournament_id', tournament.id)
-        .not('strokes', 'is', null)
-        .limit(5);
-
-      if (roundCheck?.length) {
-        // First check completed rounds (non-null round score)
-        let completedRound = 0;
-        for (let r = 4; r >= 1; r--) {
-          const key = `round_${r}`;
-          if (roundCheck.some((entry: any) => entry[key] !== null && entry[key] !== undefined)) {
-            completedRound = r;
-            break;
-          }
-        }
-        // Also check thru values — if any player has thru 1-17, a round is in progress
-        const { data: thruCheck } = await supabase
-          .from('sr_leaderboards')
-          .select('thru')
-          .eq('tournament_id', tournament.id)
-          .not('thru', 'is', null)
-          .gt('thru', 0)
-          .lt('thru', 18)
-          .limit(1);
-        const midRound = (thruCheck?.length ?? 0) > 0;
-        // If players are mid-round, the active round is one ahead of the last completed
-        activeRound = midRound ? Math.min(completedRound + 1, 4) : Math.max(completedRound, 1);
-      }
-
+      const activeRound = roundToWrite ?? 1;
       console.log(`[LiveSync] Triggering scorecards sync for ${tournament.name}, round ${activeRound}`);
 
       const syncUrl = `${Deno.env.get('SUPABASE_URL')}/functions/v1/sportradar-sync`;
