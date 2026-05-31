@@ -133,7 +133,7 @@ export function LiveLeaderboardTab() {
                     }}
                   />
                 )}
-                {t.name}
+                {pillLabel(t)}
               </button>
             );
           })}
