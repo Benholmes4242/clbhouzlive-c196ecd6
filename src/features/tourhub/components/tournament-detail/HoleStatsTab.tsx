@@ -3,7 +3,7 @@
  */
 
 import { useState, useMemo } from 'react';
-// Clock icon retired in Phase 1 — empty states use EditorialEmpty's amber rail.
+import { BarChart3 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { RoundSelector } from './RoundSelector';
 import { EditorialEmpty } from './EditorialEmpty';
