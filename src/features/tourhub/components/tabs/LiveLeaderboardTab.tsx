@@ -167,7 +167,7 @@ export function LiveLeaderboardTab() {
         )}
       </div>
 
-      {isLoadingBoard && (!leaderboard || leaderboard.length === 0) ? (
+      {isLoadingBoard && (!leaderboard || (leaderboard as any[]).length === 0) ? (
         <LiveLeaderboardSkeleton />
       ) : (leaderboard?.length ?? 0) === 0 ? (
         <EditorialEmpty
