@@ -1,7 +1,25 @@
 import { memo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useUserPassport } from './hooks/useUserPassport';
+import { TrendingUp } from 'lucide-react';
+import { useUserPassport, type UserPassportRow } from './hooks/useUserPassport';
 import { ExploreSectionHeader } from './ExploreSectionHeader';
+
+function deriveHook(p: UserPassportRow): string | null {
+  if (p.countries_played != null && p.countries_played > 0 && p.countries_played < 20) {
+    return `1 country from your ${p.countries_played + 1}th.`;
+  }
+  if (p.friends_courses_to_try > 0) {
+    return `${p.friends_courses_to_try} courses your friends have played that you haven't.`;
+  }
+  if (p.wishlist_count > 0) {
+    return `${p.wishlist_count} on your bucket list, waiting to be played.`;
+  }
+  if (p.top_100_played != null && p.top_100_played < 100) {
+    return `${100 - p.top_100_played} of the Top 100 still to go.`;
+  }
+  return null;
+}
+
 
 interface ExplorePassportProps {
   userId: string | undefined;
@@ -63,6 +81,10 @@ function ExplorePassportInner({ userId }: ExplorePassportProps) {
       ? `Lifetime · since ${passport.first_play_year}`
       : 'Lifetime totals';
 
+  const hook = deriveHook(passport);
+
+
+
   return (
     <section>
       <ExploreSectionHeader
@@ -115,10 +137,30 @@ function ExplorePassportInner({ userId }: ExplorePassportProps) {
               View profile
             </button>
           </div>
+          {hook && (
+            <div
+              style={{
+                marginTop: 16,
+                padding: '11px 13px',
+                borderRadius: 12,
+                background: 'rgba(255,255,255,0.08)',
+                border: '1px solid rgba(255,255,255,0.12)',
+                display: 'flex',
+                alignItems: 'center',
+                gap: 9,
+              }}
+            >
+              <TrendingUp size={16} color="#FBBC2E" style={{ flexShrink: 0 }} />
+              <span style={{ fontSize: 13, fontWeight: 600, color: '#fff', lineHeight: 1.35 }}>
+                {hook}
+              </span>
+            </div>
+          )}
         </div>
       </div>
     </section>
   );
 }
+
 
 export const ExplorePassport = memo(ExplorePassportInner);
