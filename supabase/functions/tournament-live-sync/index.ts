@@ -276,6 +276,30 @@ Deno.serve(async (req) => {
 // FIX 1: Gated tournaments stamp last_live_sync so round-robin advances.
 // FIX 2: Called for ALL tournaments per invocation, not just the stalest.
 
+async function deriveActiveRound(supabase: any, tournamentId: string): Promise<number | undefined> {
+  const { data: roundCheck } = await supabase
+    .from('sr_leaderboards')
+    .select('round_1, round_2, round_3, round_4')
+    .eq('tournament_id', tournamentId)
+    .not('strokes', 'is', null)
+    .limit(5);
+  if (!roundCheck?.length) return undefined;
+  let completedRound = 0;
+  for (let r = 4; r >= 1; r--) {
+    if (roundCheck.some((e: any) => e[`round_${r}`] != null)) { completedRound = r; break; }
+  }
+  const { data: thruCheck } = await supabase
+    .from('sr_leaderboards')
+    .select('thru')
+    .eq('tournament_id', tournamentId)
+    .not('thru', 'is', null)
+    .gt('thru', 0)
+    .lt('thru', 18)
+    .limit(1);
+  const midRound = (thruCheck?.length ?? 0) > 0;
+  return midRound ? Math.min(completedRound + 1, 4) : Math.max(completedRound, 1);
+}
+
 async function syncTournament(
   supabase: any,
   sportradarApiKey: string,
