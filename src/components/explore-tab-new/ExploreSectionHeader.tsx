@@ -1,5 +1,6 @@
 import { memo } from 'react';
 import { ChevronRight } from 'lucide-react';
+import { AMBER, INK, INK_MUTE } from '@/features/courses/_shared/tokens';
 
 interface ExploreSectionHeaderProps {
   /** Optional uppercase kicker above the title (e.g. "FROM YOUR FRIENDS"). */
