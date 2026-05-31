@@ -299,15 +299,20 @@ export function TeeTimesTab({ tournamentId, tournamentName, isCompleted }: TeeTi
         )}
       </div>
 
-      {/* Column headers */}
-      <div style={{ display: 'flex', alignItems: 'center', padding: '5px 20px', background: INK_TINT_02, borderTop: `0.5px solid ${INK_TINT_07}`, borderBottom: `0.5px solid ${INK_TINT_07}` }}>
-        <span style={{ fontSize: '9px', fontWeight: 800, color: INK_MUTE, letterSpacing: '0.14em', width: '72px', flexShrink: 0 }}>TIME</span>
-        <span style={{ fontSize: '9px', fontWeight: 800, color: INK_MUTE, letterSpacing: '0.14em', width: '52px', flexShrink: 0 }}>HOLE</span>
-        <span style={{ fontSize: '9px', fontWeight: 800, color: INK_MUTE, letterSpacing: '0.14em', flex: 1 }}>PLAYERS</span>
+      {/* Caption: window of tee times */}
+      <div style={{ padding: '8px 20px', display: 'flex', alignItems: 'baseline', justifyContent: 'space-between' }}>
+        <span style={{ fontSize: '9px', fontWeight: 800, color: INK_MUTE, letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>
+          Tee Times · {selectedRound}
+        </span>
+        {firstOff && lastOff && (
+          <span style={{ fontSize: '11px', fontWeight: 600, color: INK_FAINT, fontVariantNumeric: 'tabular-nums' }}>
+            {firstOff} – {lastOff}
+          </span>
+        )}
       </div>
 
       {/* Groups */}
-      <div style={{ background: SURFACE, borderBottom: `1px solid ${INK_TINT_07}` }}>
+      <div style={{ background: SURFACE, borderTop: `0.5px solid ${INK_TINT_07}`, borderBottom: `1px solid ${INK_TINT_07}` }}>
         {filteredGroups.length === 0 && searchQuery && (
           <div style={{ textAlign: 'center' as const, padding: '24px 20px' }}>
             <p style={{ fontSize: '14px', color: INK_FAINT }}>No players matching "{searchQuery}"</p>
@@ -321,13 +326,13 @@ export function TeeTimesTab({ tournamentId, tournamentName, isCompleted }: TeeTi
                 Hole {hole} Start
               </p>
               {holeGroups.map((group, idx) => (
-                <TeeTimeGroupCard key={`${group.teeTime}-${idx}`} group={group} index={idx} searchQuery={searchQuery} tournamentName={tournamentName} />
+                <TeeTimeGroupCard key={`${group.teeTime}-${idx}`} group={group} index={idx} searchQuery={searchQuery} tournamentName={tournamentName} scoreByPlayer={scoreByPlayer} showScores={showScores} isFeatured={group.teeTime === featuredTeeTime} />
               ))}
             </div>
           ))
         ) : (
           filteredGroups.map((group, idx) => (
-            <TeeTimeGroupCard key={`${group.teeTime}-${idx}`} group={group} index={idx} searchQuery={searchQuery} tournamentName={tournamentName} />
+            <TeeTimeGroupCard key={`${group.teeTime}-${idx}`} group={group} index={idx} searchQuery={searchQuery} tournamentName={tournamentName} scoreByPlayer={scoreByPlayer} showScores={showScores} isFeatured={group.teeTime === featuredTeeTime} />
           ))
         )}
       </div>
