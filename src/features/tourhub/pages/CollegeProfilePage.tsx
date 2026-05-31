@@ -155,7 +155,7 @@ export function CollegeProfilePage() {
           }}
         >
           <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, marginBottom: 4 }}>
-            <Kicker color="amber">College Franchise</Kicker>
+            <Kicker color="light">College Franchise</Kicker>
             <ChevronRight size={11} strokeWidth={2.5} style={{ color: AMBER, marginTop: -4 }} />
           </div>
           <h1 style={{ fontSize: 22, fontWeight: 800, letterSpacing: '-0.025em', lineHeight: 1.15, color: SURFACE, margin: 0 }}>
