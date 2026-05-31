@@ -70,7 +70,7 @@ function ReviewsOfTheWeekStripInner({ activeRegion = null, embedded = false }: R
 
   return (
     <section style={{ paddingBottom: 4 }}>
-      <ExploreSectionHeader title="Most loved this month" sub="Top reviews your community shared" />
+      {!embedded && <ExploreSectionHeader title="Most loved this month" sub="Top reviews your community shared" />}
       <div className="flex gap-3 px-4 overflow-x-auto scrollbar-hide">
         {reviews.map((review) => (
           <button
