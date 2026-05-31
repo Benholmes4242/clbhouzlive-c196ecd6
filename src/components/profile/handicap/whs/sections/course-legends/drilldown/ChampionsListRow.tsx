@@ -161,6 +161,46 @@ export const ChampionsListRow: React.FC<ChampionsListRowProps> = ({
         >
           {subText}
         </div>
+        {isChampion && uniqueOtherCourses.length > 0 && (() => {
+          const first = uniqueOtherCourses[0];
+          const extra = uniqueOtherCourses.length - 1;
+          // 1 → "Also champion at X"
+          // 2 → "Also champion at X · +1 more"
+          // 3+ → "Champion at X · +N more"
+          const prefix = uniqueOtherCourses.length >= 3 ? 'Champion at' : 'Also champion at';
+          return (
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                navigate(`/courses/${first.course_id}?tab=legends`);
+              }}
+              style={{
+                marginTop: 3,
+                background: 'transparent',
+                border: 'none',
+                padding: 0,
+                cursor: 'pointer',
+                textAlign: 'left',
+                fontSize: 11,
+                color: 'var(--hcp-t-50, #9aa6b2)',
+                fontWeight: 500,
+                letterSpacing: '-0.003em',
+                display: 'block',
+                maxWidth: '100%',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                whiteSpace: 'nowrap',
+              }}
+            >
+              {prefix}{' '}
+              <span style={{ color: GAM.DEEP_AMBER, fontWeight: 600 }}>{first.course_name}</span>
+              {extra > 0 && (
+                <span> · +{extra} more</span>
+              )}
+            </button>
+          );
+        })()}
       </div>
 
       <div style={{ textAlign: 'right', flexShrink: 0, display: 'flex', alignItems: 'baseline', gap: 5 }}>
