@@ -1,7 +1,8 @@
 import React from 'react';
 import type { CourseHole } from '@/hooks/gam/useCourseHoleAnalysis';
 import { HoleDistributionBar } from './HoleDistributionBar';
-import { FONT, INK, C_BIRDIE, C_PAR, C_BOGEY, C_DOUBLE } from './_constants';
+import { AMBER, C_BIRDIE, C_BOGEY, C_DOUBLE, C_PAR, FONT, INK } from './_constants';
+import { INK_MUTE } from '@/features/courses/_shared/tokens';
 
 interface Props {
   h: CourseHole;
