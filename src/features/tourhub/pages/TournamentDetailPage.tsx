@@ -85,14 +85,6 @@ export function TournamentDetailPage() {
   
   const headshotMap = undefined;
 
-  const countdownText = useMemo(() => {
-    if (!tournament || !isUpcoming) return undefined;
-    try {
-      return `Starts ${formatDistanceToNow(new Date(tournament.start_date), { addSuffix: true })}`;
-    } catch {
-      return undefined;
-    }
-  }, [tournament, isUpcoming]);
 
   const leader = useMemo(() => {
     if (!isLive || !leaderboard?.length) return null;
