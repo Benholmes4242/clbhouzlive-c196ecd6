@@ -32,6 +32,7 @@ import ScrollToTopGlass from '@/components/common/ScrollToTopGlass';
 import { PullToRefreshContainer } from '@/components/ui/pull-to-refresh';
 import { AlertCircle } from 'lucide-react';
 import { getProfilePathById } from '@/lib/profileRoutes';
+import { AMBER, HAIRLINE_INK_7, HAIRLINE_INK_10, INK, INK_FAINT, INK_LIGHT, INK_MUTE, INK_TINT_02, INK_TINT_06, SLATE_50, SURFACE } from '@/features/courses/_shared/tokens';
 
 export type SortOption = ReviewsSortBy;
 
@@ -52,7 +53,7 @@ const getInitials = (name: string) => {
 };
 
 const Divider = () => (
-  <div style={{ height: '0.5px', background: 'rgba(15,23,42,0.07)' }} />
+  <div style={{ height: '0.5px', background: HAIRLINE_INK_7 }} />
 );
 
 const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
@@ -347,7 +348,7 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
 
   if (isLoading) {
     return (
-      <div style={{ background: '#F8FAFC', minHeight: '100%', paddingBottom: 40 }}>
+      <div style={{ background: SLATE_50, minHeight: '100%', paddingBottom: 40 }}>
         {/* Community score skeleton — stacked */}
         <div style={{ padding: '18px 16px 14px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 }}>
           <Skeleton className="h-3 w-28" />
@@ -363,14 +364,14 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
         {/* Compressed control bar skeleton — single row */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '12px 16px 12px' }}>
           <Skeleton className="h-7 w-28 rounded-full" />
-          <div style={{ width: 1, height: 20, background: 'rgba(15,23,42,0.1)' }} />
+          <div style={{ width: 1, height: 20, background: HAIRLINE_INK_10 }} />
           <Skeleton className="h-7 w-24 rounded-full" />
           <Skeleton className="h-7 w-28 rounded-full" />
         </div>
         <Divider />
         {/* Review row skeletons */}
         {[1, 2, 3].map((i) => (
-          <div key={i} style={{ padding: '14px 16px 16px', borderBottom: '0.5px solid rgba(15,23,42,0.06)' }}>
+          <div key={i} style={{ padding: '14px 16px 16px', borderBottom: `0.5px solid ${INK_TINT_06}` }}>
             <div style={{ display: 'flex', alignItems: 'flex-start', gap: 10, marginBottom: 10 }}>
               <Skeleton className="w-10 h-10 rounded-[10px]" />
               <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 6 }}>
@@ -421,14 +422,14 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
           <div style={{ width: 64, height: 64, borderRadius: '50%', background: 'rgba(247,147,30,0.07)', border: '1.5px solid rgba(247,147,30,0.18)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px', fontSize: 28 }}>
             ⭐
           </div>
-          <div style={{ fontSize: 19, fontWeight: 900, color: '#0F172A', letterSpacing: '-0.03em', marginBottom: 6 }}>No reviews yet</div>
-          <p style={{ fontSize: 13, color: '#94A3B8', lineHeight: 1.6, maxWidth: 260, margin: '0 auto 22px' }}>
+          <div style={{ fontSize: 19, fontWeight: 900, color: INK, letterSpacing: '-0.03em', marginBottom: 6 }}>No reviews yet</div>
+          <p style={{ fontSize: 13, color: INK_FAINT, lineHeight: 1.6, maxWidth: 260, margin: '0 auto 22px' }}>
             Be the first to share your experience at {courseName}.
           </p>
           <button
             type="button"
             onClick={handleRateClick}
-            style={{ width: '100%', padding: '13px 0', borderRadius: 12, background: 'linear-gradient(90deg, #F59E0B, #F7931E)', color: '#fff', fontSize: 14, fontWeight: 800, border: 'none', cursor: 'pointer', boxShadow: '0 4px 16px rgba(247,147,30,0.28)' }}
+            style={{ width: '100%', padding: '13px 0', borderRadius: 12, background: 'linear-gradient(90deg, #F59E0B, #F7931E)', color: SURFACE, fontSize: 14, fontWeight: 800, border: 'none', cursor: 'pointer', boxShadow: '0 4px 16px rgba(247,147,30,0.28)' }}
           >
             Write the first review
           </button>
@@ -437,8 +438,8 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
         {/* What to include guide */}
         <div style={{ padding: '20px 16px 0' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14 }}>
-            <div style={{ width: 3, height: 12, background: '#0F172A', borderRadius: 1 }} />
-            <span style={{ fontSize: 9, fontWeight: 900, color: '#0F172A', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>What to include</span>
+            <div style={{ width: 3, height: 12, background: INK, borderRadius: 1 }} />
+            <span style={{ fontSize: 9, fontWeight: 900, color: INK, letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>What to include</span>
           </div>
           {[
             { icon: '⛳', label: 'Course condition', sub: 'Greens, fairways, bunkers, rough' },
@@ -446,11 +447,11 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
             { icon: '🏠', label: 'Facilities', sub: 'Clubhouse, practice areas, service' },
             { icon: '💰', label: 'Value', sub: 'Was it worth the green fee?' },
           ].map(({ icon, label, sub }) => (
-            <div key={label} style={{ display: 'flex', alignItems: 'flex-start', gap: 12, marginBottom: 10, padding: '12px 14px', borderRadius: 12, background: 'rgba(15,23,42,0.02)', border: '0.5px solid rgba(15,23,42,0.06)' }}>
+            <div key={label} style={{ display: 'flex', alignItems: 'flex-start', gap: 12, marginBottom: 10, padding: '12px 14px', borderRadius: 12, background: INK_TINT_02, border: `0.5px solid ${INK_TINT_06}` }}>
               <span style={{ fontSize: 20, flexShrink: 0, marginTop: 1 }}>{icon}</span>
               <div>
-                <div style={{ fontSize: 13, fontWeight: 700, color: '#0F172A', marginBottom: 2 }}>{label}</div>
-                <div style={{ fontSize: 11, color: '#94A3B8' }}>{sub}</div>
+                <div style={{ fontSize: 13, fontWeight: 700, color: INK, marginBottom: 2 }}>{label}</div>
+                <div style={{ fontSize: 11, color: INK_FAINT }}>{sub}</div>
               </div>
             </div>
           ))}
@@ -462,22 +463,22 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
 
   return (
     <PullToRefreshContainer onRefresh={handlePullToRefresh}>
-    <div style={{ paddingBottom: 40, background: '#F8FAFC', minHeight: '100%' }}>
+    <div style={{ paddingBottom: 40, background: SLATE_50, minHeight: '100%' }}>
       {/* Community score header — stacked & centered */}
       <div style={{ padding: '18px 16px 14px', textAlign: 'center' }}>
         
-        <div style={{ fontSize: 56, fontWeight: 900, color: '#0F172A', letterSpacing: '-0.05em', fontVariantNumeric: 'tabular-nums', lineHeight: 1 }}>
+        <div style={{ fontSize: 56, fontWeight: 900, color: INK, letterSpacing: '-0.05em', fontVariantNumeric: 'tabular-nums', lineHeight: 1 }}>
           {communityScore.toFixed(1)}
         </div>
         <div style={{ fontSize: 12, fontWeight: 800, color: '#c97a10', letterSpacing: '0.15em', textTransform: 'uppercase' as const, marginTop: 6 }}>
           {getScoreTier(communityScore).label}
         </div>
-        <div style={{ fontSize: 11, color: '#94A3B8', marginTop: 8 }}>
+        <div style={{ fontSize: 11, color: INK_FAINT, marginTop: 8 }}>
           {ratingCount} {ratingCount === 1 ? 'rating' : 'ratings'}
           {myReview && (
             <>
               {' · '}
-              <button onClick={handleRateClick} style={{ background: 'none', border: 'none', color: '#F7931E', fontSize: 11, fontWeight: 700, cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+              <button onClick={handleRateClick} style={{ background: 'none', border: 'none', color: AMBER, fontSize: 11, fontWeight: 700, cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: 4 }}>
                 <Pencil className="w-3.5 h-3.5" /> Edit yours
               </button>
             </>
@@ -496,7 +497,7 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
             placeholder="Search reviews…"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            style={{ width: '100%', height: 40, paddingLeft: 36, paddingRight: searchQuery ? 36 : 16, borderRadius: 10, border: '1px solid rgba(15,23,42,0.1)', background: 'rgba(15,23,42,0.02)', fontSize: 13, color: '#0F172A', outline: 'none', boxSizing: 'border-box' as const }}
+            style={{ width: '100%', height: 40, paddingLeft: 36, paddingRight: searchQuery ? 36 : 16, borderRadius: 10, border: `1px solid ${HAIRLINE_INK_10}`, background: INK_TINT_02, fontSize: 13, color: INK, outline: 'none', boxSizing: 'border-box' as const }}
           />
           {searchQuery && (
             <button type="button" onClick={handleClearSearch} style={{ position: 'absolute', right: 10, top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', padding: 4 }}>
@@ -535,7 +536,7 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
 
       {/* Your review — pinned first */}
       {filteredMyReview && (
-        <div style={{ padding: '6px 16px 0', borderBottom: '0.5px solid rgba(15,23,42,0.06)' }}>
+        <div style={{ padding: '6px 16px 0', borderBottom: `0.5px solid ${INK_TINT_06}` }}>
           <ReviewBlockFlat
             review={transformReview(filteredMyReview, isJustSubmittedOrUpdated)}
             isMine
@@ -557,11 +558,11 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
 
       {/* Write prompt if no review */}
       {!myReview && (
-        <div style={{ padding: '14px 16px', borderBottom: '0.5px solid rgba(15,23,42,0.06)' }}>
+        <div style={{ padding: '14px 16px', borderBottom: `0.5px solid ${INK_TINT_06}` }}>
           <button
             type="button"
             onClick={handleRateClick}
-            style={{ width: '100%', padding: '12px 0', borderRadius: 12, background: 'rgba(247,147,30,0.06)', border: '1.5px solid rgba(247,147,30,0.2)', fontSize: 13, fontWeight: 700, color: '#F7931E', cursor: 'pointer' }}
+            style={{ width: '100%', padding: '12px 0', borderRadius: 12, background: 'rgba(247,147,30,0.06)', border: '1.5px solid rgba(247,147,30,0.2)', fontSize: 13, fontWeight: 700, color: AMBER, cursor: 'pointer' }}
           >
             ⭐ Write your review
           </button>
@@ -575,7 +576,7 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
           const response = reviewResponses?.find(r => r.review_id === review.id);
           const canReply = businessClaim?.isVerified && !response;
           return (
-            <div key={review.id} style={{ borderBottom: '0.5px solid rgba(15,23,42,0.06)' }}>
+            <div key={review.id} style={{ borderBottom: `0.5px solid ${INK_TINT_06}` }}>
               <div style={{ padding: '2px 16px 0' }}>
                 <ReviewBlockFlat
                   review={transformReview(review, isDeepLinked)}
@@ -606,11 +607,11 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
       {/* No results */}
       {(searchQuery || ratingFilter) && filteredReviews.length === 0 && (
         <div style={{ textAlign: 'center', padding: '32px 16px' }}>
-          <p style={{ fontSize: 13, color: '#94A3B8', marginBottom: 10 }}>No reviews match your criteria.</p>
+          <p style={{ fontSize: 13, color: INK_FAINT, marginBottom: 10 }}>No reviews match your criteria.</p>
           <button
             type="button"
             onClick={() => { setSearchQuery(''); setRatingFilter(null); }}
-            style={{ fontSize: 12, fontWeight: 700, color: '#0F172A', background: 'none', border: 'none', cursor: 'pointer', textDecoration: 'underline' }}
+            style={{ fontSize: 12, fontWeight: 700, color: INK, background: 'none', border: 'none', cursor: 'pointer', textDecoration: 'underline' }}
           >
             Clear filters
           </button>
@@ -620,14 +621,14 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
       {/* End message */}
       {filteredReviews.length > 0 && !searchQuery && !ratingFilter && (
         <div style={{ padding: '20px 16px 0', textAlign: 'center' }}>
-          <p style={{ fontSize: 12, color: '#CBD5E1', marginBottom: 8 }}>
+          <p style={{ fontSize: 12, color: INK_LIGHT, marginBottom: 8 }}>
             You've seen all {filteredReviews.length} {filteredReviews.length === 1 ? 'review' : 'reviews'}.
           </p>
           {!myReview && (
             <button
               type="button"
               onClick={handleRateClick}
-              style={{ fontSize: 12, fontWeight: 700, color: '#64748B', background: 'none', border: 'none', cursor: 'pointer', textDecoration: 'underline' }}
+              style={{ fontSize: 12, fontWeight: 700, color: INK_MUTE, background: 'none', border: 'none', cursor: 'pointer', textDecoration: 'underline' }}
             >
               Share your experience
             </button>
