@@ -128,13 +128,6 @@ export function OverviewHero({ height = 528 }: OverviewHeroProps) {
         </motion.div>
       </AnimatePresence>
 
-      {count > 1 && (
-        <div style={{ display: 'flex', justifyContent: 'center', gap: 6, paddingTop: 12 }}>
-          {slides.map((s, i) => (
-            <button key={s.id} aria-label={`Go to slide ${i + 1}`} onClick={() => goTo(i)} className={i === activeIndex ? 'hero-dot-active' : 'hero-dot-inactive'} style={{ border: 'none', padding: 0, cursor: 'pointer' }} />
-          ))}
-        </div>
-      )}
     </div>
   );
 }
