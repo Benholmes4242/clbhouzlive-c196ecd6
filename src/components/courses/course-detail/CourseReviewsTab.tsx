@@ -455,6 +455,7 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
               </div>
             </div>
           ))}
+          </div>
         </div>
         <ScrollToTopGlass />
       </div>
