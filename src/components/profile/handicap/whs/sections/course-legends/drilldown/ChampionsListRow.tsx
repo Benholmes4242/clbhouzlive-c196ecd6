@@ -1,5 +1,6 @@
 import { GAM } from '../../../gam/tokens';
 import React from 'react';
+import { Crown } from 'lucide-react';
 
 interface ChampionsListRowProps {
   rank: number;
