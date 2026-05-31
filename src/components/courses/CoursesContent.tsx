@@ -328,7 +328,14 @@ const CoursesContent: React.FC<CoursesContentProps> = ({ username, displayName }
 
             {activeTab === 'explore' && <CourseExplorer />}
             {activeTab === 'top100' && <Top100CoursesHubPanel />}
-            {activeTab === 'discover' && <ExploreTabContent embedded />}
+            {activeTab === 'discover' && (
+              <>
+                <div style={{ paddingTop: 8, paddingBottom: 4 }}>
+                  <ConnectHandicapCue variant="discover" />
+                </div>
+                <ExploreTabContent embedded />
+              </>
+            )}
           </div>
         </>
       )}
