@@ -299,7 +299,207 @@ function TiedChasersRowDark({
   );
 }
 
-// ---- props ----------------------------------------------------------------
+// ---- results: champion hero row (gold-ringed, CHAMPION eyebrow) ----------
+
+function ChampionRowDark({
+  entry,
+  avatarUrl,
+  isLast,
+}: {
+  entry: any;
+  avatarUrl: string | null;
+  isLast: boolean;
+}) {
+  const name = entryName(entry);
+  const score = entry?.score;
+  return (
+    <div
+      style={{
+        display: 'flex',
+        alignItems: 'center',
+        gap: 12,
+        padding: '12px 10px 14px',
+        borderBottom: isLast ? 'none' : ROW_BORDER,
+      }}
+    >
+      <span style={{ width: 22, display: 'flex', justifyContent: 'center', flexShrink: 0 }}>
+        <Trophy size={14} color={GOLD} fill={GOLD} strokeWidth={0} />
+      </span>
+      {avatarUrl ? (
+        <img
+          src={avatarUrl}
+          alt=""
+          loading="lazy"
+          style={{
+            width: 38, height: 38, borderRadius: '34%', objectFit: 'cover',
+            flexShrink: 0, background: 'rgba(255,255,255,0.08)',
+            border: `1.5px solid ${GOLD}`,
+            boxShadow: `0 0 0 1px rgba(0,0,0,0.4)`,
+          }}
+        />
+      ) : (
+        <div
+          style={{
+            width: 38, height: 38, borderRadius: '34%',
+            background: 'rgba(255,255,255,0.08)', flexShrink: 0,
+            border: `1.5px solid ${GOLD}`,
+          }}
+        />
+      )}
+      <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 2 }}>
+        <span
+          style={{
+            ...NUMERIC_STYLE,
+            fontSize: 9.5,
+            fontWeight: 800,
+            letterSpacing: '0.14em',
+            color: GOLD,
+            textTransform: 'uppercase',
+          }}
+        >
+          Champion
+        </span>
+        <span
+          style={{
+            fontSize: 17, fontWeight: 800, color: 'white',
+            whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
+            letterSpacing: '-0.01em',
+          }}
+        >
+          {name}
+        </span>
+      </div>
+      <span
+        style={{
+          ...NUMERIC_STYLE,
+          fontSize: 19, fontWeight: 900, letterSpacing: '-0.02em',
+          color: scoreColor(score), flexShrink: 0,
+        }}
+      >
+        {fmtScore(score)}
+      </span>
+    </div>
+  );
+}
+
+// ---- upcoming: defending champion hero row -------------------------------
+
+function DefendingChampionRowDark({
+  data,
+  avatarUrl,
+}: {
+  data: DefendingChampData;
+  avatarUrl: string | null;
+}) {
+  return (
+    <div
+      style={{
+        display: 'flex',
+        alignItems: 'center',
+        gap: 12,
+        padding: '14px 10px',
+      }}
+    >
+      {avatarUrl ? (
+        <img
+          src={avatarUrl}
+          alt=""
+          loading="lazy"
+          style={{
+            width: 40, height: 40, borderRadius: '34%', objectFit: 'cover',
+            flexShrink: 0, background: 'rgba(255,255,255,0.08)',
+            border: `1.5px solid ${GOLD}`,
+            boxShadow: `0 0 0 1px rgba(0,0,0,0.4)`,
+          }}
+        />
+      ) : (
+        <div
+          style={{
+            width: 40, height: 40, borderRadius: '34%',
+            background: 'rgba(255,255,255,0.08)', flexShrink: 0,
+            border: `1.5px solid ${GOLD}`,
+          }}
+        />
+      )}
+      <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 3 }}>
+        <span
+          style={{
+            ...NUMERIC_STYLE,
+            fontSize: 9.5,
+            fontWeight: 800,
+            letterSpacing: '0.14em',
+            color: GOLD,
+            textTransform: 'uppercase',
+          }}
+        >
+          Defending Champion
+        </span>
+        <span
+          style={{
+            fontSize: 18, fontWeight: 800, color: 'white',
+            whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
+            letterSpacing: '-0.01em',
+          }}
+        >
+          {data.name}
+        </span>
+        <span
+          style={{
+            ...NUMERIC_STYLE,
+            fontSize: 11.5,
+            fontWeight: 600,
+            color: 'rgba(255,255,255,0.5)',
+          }}
+        >
+          Won {data.year} · {data.score}
+        </span>
+      </div>
+      <Trophy size={16} color={GOLD} fill={GOLD} strokeWidth={0} style={{ flexShrink: 0, opacity: 0.8 }} />
+    </div>
+  );
+}
+
+// ---- upcoming: field-strength fallback row -------------------------------
+
+function FieldStrengthRowDark({ data }: { data: FieldStrength }) {
+  return (
+    <div
+      style={{
+        display: 'flex',
+        alignItems: 'center',
+        gap: 12,
+        padding: '14px 10px',
+      }}
+    >
+      <StackedAvatarsDark urls={data.headshots.slice(0, 4)} size={30} />
+      <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 2 }}>
+        <span
+          style={{
+            ...NUMERIC_STYLE,
+            fontSize: 9.5,
+            fontWeight: 800,
+            letterSpacing: '0.14em',
+            color: AMBER,
+            textTransform: 'uppercase',
+          }}
+        >
+          Field Strength
+        </span>
+        <span
+          style={{
+            fontSize: 15, fontWeight: 700, color: 'white',
+            whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
+          }}
+        >
+          {data.totalPlayers} players
+          {data.topRanked != null ? ` · #${data.topRanked} world` : ''}
+        </span>
+      </div>
+    </div>
+  );
+}
+
+
 
 export interface CinematicFrameProps {
   title: string;
