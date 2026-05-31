@@ -18,6 +18,7 @@ import {
   AMBER,
   GLASS_BLUR,
   GOLD,
+  GOLD_DEEP,
   GOLD_BORDER,
   GOLD_TINT,
   GOLD_TINT_10,
