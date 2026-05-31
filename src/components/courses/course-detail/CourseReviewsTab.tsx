@@ -463,7 +463,7 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
 
   return (
     <PullToRefreshContainer onRefresh={handlePullToRefresh}>
-    <div style={{ paddingBottom: 40, background: '#F8FAFC', minHeight: '100%' }}>
+    <div style={{ paddingBottom: 40, background: SLATE_50, minHeight: '100%' }}>
       {/* Community score header — stacked & centered */}
       <div style={{ padding: '18px 16px 14px', textAlign: 'center' }}>
         
