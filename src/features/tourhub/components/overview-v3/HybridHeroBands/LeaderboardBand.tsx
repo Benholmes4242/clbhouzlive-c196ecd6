@@ -365,7 +365,6 @@ export function LeaderboardBand({
   const isResultsCompact =
     state.kind === 'results' &&
     (state.variant === 'standard' || state.variant === 'declared' || state.variant === 'team' || state.variant === 'playoff');
-  const showSectionHeader = !isResultsCompact;
   const useInlineCta = isResultsCompact;
 
   return (
