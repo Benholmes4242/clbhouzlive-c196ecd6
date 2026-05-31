@@ -9,13 +9,16 @@ import { useClubMedia } from '@/hooks/useClubMedia';
 import { generateStreamThumbnailUrl } from '@/config/cloudflareStream';
 import { useCourseMediaViewerStore } from '@/components/course-media-tab/CourseMediaViewer';
 import type { FeedPost, MediaItem } from '@/components/media-system/types/media';
-import { AMBER, INK } from '@/features/courses/_shared/tokens';
+import { AMBER } from '@/features/courses/_shared/tokens';
 
 const EYEBROW_STYLE: React.CSSProperties = {
-  fontSize: 9,
-  fontWeight: 900,
-  color: INK,
-  letterSpacing: '0.18em',
+  display: 'inline-flex',
+  alignItems: 'center',
+  gap: 6,
+  fontSize: 10.5,
+  fontWeight: 800,
+  color: AMBER,
+  letterSpacing: '0.14em',
   textTransform: 'uppercase' as const,
 };
 
@@ -39,7 +42,10 @@ const Header: React.FC<{ photoCount: number; videoCount: number; onSeeAll?: () =
     }}
   >
     <div>
-      <div style={EYEBROW_STYLE}>Media</div>
+      <div style={EYEBROW_STYLE}>
+        <Camera size={11} strokeWidth={2.4} />
+        Media
+      </div>
       <div style={{ fontSize: 11, color: '#94A3B8', marginTop: 4 }}>
         {photoCount} {photoCount === 1 ? 'photo' : 'photos'} · {videoCount}{' '}
         {videoCount === 1 ? 'video' : 'videos'}

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useCourseClaim } from '@/hooks/useCourseClaim';
 import { supabase } from '@/integrations/supabase/client';
-import { ExternalLink, Pencil } from 'lucide-react';
+import { ExternalLink, Pencil, BookOpen, BarChart3, MapPin } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import AboutMediaStrip from './AboutMediaStrip';
 import { useCourseCoordinates } from '@/hooks/useCourseCoordinates';
@@ -184,7 +184,7 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
       {course.description && (
         <>
           <div style={{ marginTop: 24 }}>
-            <SectionLabel text="About" />
+            <SectionLabel text="About" icon={BookOpen} />
             <div style={{ padding: '0 16px' }}>
               <div style={{ fontSize: 14, color: SLATE_600, lineHeight: 1.7, position: 'relative' }}>
                 {formatDescription(displayDescription)}
@@ -249,7 +249,7 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
         return (
           <>
             <div>
-              <SectionLabel text="Course Details" />
+              <SectionLabel text="Course Details" icon={BarChart3} />
               <div style={{ display: 'grid', gridTemplateColumns: `repeat(${Math.min(stats.length, 4)}, 1fr)`, padding: '0 16px' }}>
                 {stats.slice(0, 4).map((s, i, arr) => (
                   <div key={s.label} style={{ textAlign: 'center', padding: '4px 0', borderRight: i < arr.length - 1 ? `0.5px solid ${HAIRLINE_INK_8}` : 'none' }}>
@@ -266,7 +266,7 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
 
       {/* 8. Location */}
       <section>
-        <SectionLabel text="Location" />
+        <SectionLabel text="Location" icon={MapPin} />
         <div style={{ padding: '0 16px' }}>
           {coordsLoading && <Skeleton className="w-full h-[180px] rounded-xl" />}
           {coords && (
