@@ -30,8 +30,8 @@ function Stat({ value, label }: { value: string | number; label: string }) {
     <div style={{ flex: 1, minWidth: 0, padding: '10px 4px', overflow: 'hidden', textAlign: 'center' }}>
       <div
         style={{
-          fontSize: 'clamp(18px, 5vw, 22px)',
-          fontWeight: 900,
+          fontSize: 'clamp(16px, 4.5vw, 19px)',
+          fontWeight: 800,
           letterSpacing: '-0.02em',
           color: '#FFFFFF',
           lineHeight: 1,
