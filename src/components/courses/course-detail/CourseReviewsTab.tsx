@@ -14,7 +14,7 @@ import { ResponseDisplay, ReplyForm } from '../review/ReviewResponseBlock';
 import { RatingFilterChips, RatingFilterValue } from '../review/RatingFilterChips';
 import { WriteReviewPrompt } from '../review/WriteReviewPrompt';
 import { SegmentedTabOption } from '@/components/ui/SegmentedTabs';
-import { Search, X, Pencil, ArrowUpDown, ListChecks } from 'lucide-react';
+import { Search, X, Pencil, ArrowUpDown, ListChecks, MessageSquarePlus, Flag, Map, Building2, Tag } from 'lucide-react';
 import { SectionLabel } from './SectionLabel';
 import { AppSelect } from '@/components/ui/AppSelect';
 import { Button } from '@/components/ui/button';
@@ -420,8 +420,8 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
       <div style={{ paddingBottom: 40 }}>
         {/* Hero */}
         <div style={{ padding: '40px 24px 28px', textAlign: 'center' }}>
-          <div style={{ width: 64, height: 64, borderRadius: '50%', background: 'rgba(247,147,30,0.07)', border: '1.5px solid rgba(247,147,30,0.18)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px', fontSize: 28 }}>
-            ⭐
+          <div style={{ width: 64, height: 64, borderRadius: '50%', background: 'rgba(247,147,30,0.07)', border: '1.5px solid rgba(247,147,30,0.18)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px' }}>
+            <MessageSquarePlus size={26} strokeWidth={2} color={AMBER} />
           </div>
           <div style={{ fontSize: 19, fontWeight: 900, color: INK, letterSpacing: '-0.03em', marginBottom: 6 }}>No reviews yet</div>
           <p style={{ fontSize: 13, color: INK_FAINT, lineHeight: 1.6, maxWidth: 260, margin: '0 auto 22px' }}>
@@ -442,13 +442,15 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
           <div style={{ padding: '0 16px' }}>
 
           {[
-            { icon: '⛳', label: 'Course condition', sub: 'Greens, fairways, bunkers, rough' },
-            { icon: '🏔️', label: 'Layout & design', sub: 'Challenge, variety, scenery, routing' },
-            { icon: '🏠', label: 'Facilities', sub: 'Clubhouse, practice areas, service' },
-            { icon: '💰', label: 'Value', sub: 'Was it worth the green fee?' },
-          ].map(({ icon, label, sub }) => (
-            <div key={label} style={{ display: 'flex', alignItems: 'flex-start', gap: 12, marginBottom: 10, padding: '12px 14px', borderRadius: 12, background: INK_TINT_02, border: `0.5px solid ${INK_TINT_06}` }}>
-              <span style={{ fontSize: 20, flexShrink: 0, marginTop: 1 }}>{icon}</span>
+            { Icon: Flag,      label: 'Course condition', sub: 'Greens, fairways, bunkers, rough' },
+            { Icon: Map,       label: 'Layout & design',  sub: 'Challenge, variety, scenery, routing' },
+            { Icon: Building2, label: 'Facilities',       sub: 'Clubhouse, practice areas, service' },
+            { Icon: Tag,       label: 'Value',            sub: 'Was it worth the green fee?' },
+          ].map(({ Icon, label, sub }, i, arr) => (
+            <div key={label} style={{ display: 'flex', alignItems: 'flex-start', gap: 12, marginBottom: i === arr.length - 1 ? 0 : 10, padding: '12px 14px', borderRadius: 12, background: INK_TINT_02, border: `0.5px solid ${INK_TINT_06}` }}>
+              <span style={{ flexShrink: 0, marginTop: 1, width: 22, height: 22, borderRadius: 7, background: 'rgba(247,147,30,0.08)', display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}>
+                <Icon size={13} strokeWidth={2.2} color={AMBER} />
+              </span>
               <div>
                 <div style={{ fontSize: 13, fontWeight: 700, color: INK, marginBottom: 2 }}>{label}</div>
                 <div style={{ fontSize: 11, color: INK_FAINT }}>{sub}</div>
