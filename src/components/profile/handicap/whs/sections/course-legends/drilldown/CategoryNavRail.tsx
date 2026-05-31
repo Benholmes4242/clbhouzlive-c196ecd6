@@ -20,7 +20,7 @@ export const CategoryNavRail: React.FC<Props> = ({ categories, onSelect }) => (
   <div
     style={{
       position: 'sticky',
-      top: 0,
+      top: 'var(--chrome-total-h, 0px)',
       zIndex: 10,
       background: 'var(--hcp-bg-0)',
       borderTop: '1px solid var(--hcp-line)',
