@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { Crown } from 'lucide-react';
+import { Crown, Search } from 'lucide-react';
 import { useUserPlayedCourses } from '@/hooks/gam/useUserPlayedCourses';
 import { useUserHomeClubCourses } from '@/hooks/gam/useUserHomeClubCourses';
 import { useDiscoverCoursesThisWeek } from '@/hooks/gam/useDiscoverCoursesThisWeek';
@@ -11,8 +11,6 @@ import {
 import { useUserLegendTitleCount } from '@/hooks/gam/useUserLegendTitleCount';
 import type { LegendCategory, LegendWindow } from '@/lib/gam/types';
 import { legendCategoryWindow } from '@/lib/gam/visuals';
-import CourseSearch from './_shared/CourseSearch';
-import DiscoverSearchCard from './_shared/DiscoverSearchCard';
 import HomeClubSubsection from './subsections/HomeClubSubsection';
 import YourCoursesSubsection from './subsections/YourCoursesSubsection';
 import DiscoverSubsection from './subsections/DiscoverSubsection';
