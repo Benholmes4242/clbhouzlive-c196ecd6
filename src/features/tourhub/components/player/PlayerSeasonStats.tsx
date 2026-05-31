@@ -99,7 +99,7 @@ function SGBar({ label, value }: SGBarProps) {
     <div style={{ padding: '11px 0', borderBottom: `0.5px solid ${INK_TINT_07}` }}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '6px' }}>
         <span style={{ fontSize: '13px', fontWeight: 500, color: INK }}>{label}</span>
-        <span style={{ fontSize: '13px', fontWeight: 900, fontVariantNumeric: 'tabular-nums', color: isPositive ? AMBER : INK_FAINT }}>
+        <span style={{ fontSize: '13px', fontWeight: 900, fontVariantNumeric: 'tabular-nums', color: INK }}>
           {formatted}
         </span>
       </div>
