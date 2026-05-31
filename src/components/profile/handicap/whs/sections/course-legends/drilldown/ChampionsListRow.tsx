@@ -116,45 +116,6 @@ export const ChampionsListRow: React.FC<ChampionsListRowProps> = ({
           }}
         >
           <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{name}</span>
-          {isChampion &&
-            (isSelf ? (
-              <span
-                style={{
-                  padding: '2px 6px',
-                  fontSize: 8.5,
-                  fontWeight: 800,
-                  letterSpacing: '0.08em',
-                  textTransform: 'uppercase',
-                  borderRadius: 4,
-                  fontFamily: 'Geist Mono, monospace',
-                  background: `linear-gradient(135deg, ${GAM.GOLD}, ${GAM.AMBER})`,
-                  color: '#1A1300',
-                  lineHeight: 1,
-                  flexShrink: 0,
-                }}
-              >
-                You
-              </span>
-            ) : (
-              <span
-                style={{
-                  padding: '2px 6px',
-                  fontSize: 8.5,
-                  fontWeight: 800,
-                  letterSpacing: '0.10em',
-                  textTransform: 'uppercase',
-                  borderRadius: 4,
-                  fontFamily: 'Geist Mono, monospace',
-                  background: 'transparent',
-                  color: GAM.DEEP_AMBER,
-                  border: `1px solid rgba(178,104,24,0.35)`,
-                  lineHeight: 1,
-                  flexShrink: 0,
-                }}
-              >
-                Champ
-              </span>
-            ))}
         </div>
         <div
           style={{
