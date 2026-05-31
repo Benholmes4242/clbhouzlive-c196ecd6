@@ -57,6 +57,8 @@ function TeeTimesEmpty({ isCompleted, roundLabel }: { isCompleted?: boolean; rou
   if (isCompleted) {
     return (
       <EditorialEmpty
+        icon={<Clock size={28} strokeWidth={1.8} color="#64748b" />}
+        tint="slate"
         eyebrow="Tee Times"
         title="Tee times no longer available"
         body="Historical pairing data isn't kept for completed tournaments."
@@ -66,6 +68,7 @@ function TeeTimesEmpty({ isCompleted, roundLabel }: { isCompleted?: boolean; rou
   if (roundLabel) {
     return (
       <EditorialEmpty
+        icon={<Clock size={28} strokeWidth={1.8} color={AMBER} />}
         eyebrow={roundLabel}
         title={`${roundLabel} pairings not yet published`}
         body="Pairings publish after the previous round closes. Check back shortly."
@@ -74,6 +77,7 @@ function TeeTimesEmpty({ isCompleted, roundLabel }: { isCompleted?: boolean; rou
   }
   return (
     <EditorialEmpty
+      icon={<Clock size={28} strokeWidth={1.8} color={AMBER} />}
       eyebrow="Tee Times"
       title="Tee times will be posted closer to the start"
       body="Pairings, groupings, and split-tee starts appear here as soon as the field is set."
