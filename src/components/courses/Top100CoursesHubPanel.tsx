@@ -305,7 +305,7 @@ const Top100CoursesHubPanel = () => {
 
 
       {/* Search bar — scrolls with content (no sticky behaviour) */}
-      <div className="-mx-4 px-4" style={{ paddingTop: 8 }}>
+      <div className="-mx-4 px-4" style={{ marginTop: -8, paddingTop: 0 }}>
         <div className="relative">
           <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
