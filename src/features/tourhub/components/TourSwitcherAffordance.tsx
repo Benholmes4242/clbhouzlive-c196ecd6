@@ -25,14 +25,17 @@ import {
   SURFACE,
 } from '../_shared/tokens';
 
+// Canonical tour priority order — PGA → LPGA → DP World → Korn Ferry → Champions → LIV.
+// Object insertion order is preserved by Object.entries below.
 const TOUR_LABEL: Record<string, string> = {
   pga: 'PGA',
-  euro: 'DPWT',
-  liv: 'LIV',
   lpga: 'LPGA',
+  euro: 'DPWT',
   pgad: 'KORN FERRY',
   champ: 'CHAMPIONS',
+  liv: 'LIV',
 };
+
 
 export const TourSwitcherAffordance: React.FC = () => {
   const { data } = useAllToursTickerData();
