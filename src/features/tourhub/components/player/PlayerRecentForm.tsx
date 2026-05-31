@@ -104,6 +104,23 @@ interface InteractiveSparklineProps {
 
 function InteractiveSparkline({ events, positions, activeIdx, setActiveIdx }: InteractiveSparklineProps) {
   const wrapperRef = useRef<HTMLDivElement>(null);
+  const lineRef = useRef<SVGPolylineElement>(null);
+  const pathLenRef = useRef<number>(0);
+  const [drawn, setDrawn] = useState(false);
+  const reduced = prefersReducedMotion();
+
+  useEffect(() => {
+    if (lineRef.current) {
+      try { pathLenRef.current = lineRef.current.getTotalLength(); } catch { pathLenRef.current = 0; }
+    }
+    if (reduced) {
+      setDrawn(true);
+      return;
+    }
+    const raf = requestAnimationFrame(() => setDrawn(true));
+    return () => cancelAnimationFrame(raf);
+  }, [reduced]);
+
   if (positions.length < 2) return null;
 
   const VB_W = 1000;
@@ -114,14 +131,19 @@ function InteractiveSparkline({ events, positions, activeIdx, setActiveIdx }: In
   const maxPos = Math.max(...positions);
   const range = Math.max(1, maxPos - minPos);
 
+  const yForPos = (p: number) =>
+    ((Math.max(minPos, Math.min(maxPos, p)) - minPos) / range) * (VB_H - 20) + 10;
+  const zoneBottom = yForPos(10);
+
   const coords = positions.map((pos, i) => {
     const x = PAD_X + (i / (positions.length - 1)) * (VB_W - PAD_X * 2);
-    const y = ((pos - minPos) / range) * (VB_H - 20) + 10;
+    const y = yForPos(pos);
     return { x, y };
   });
 
   const polyPoints = coords.map(c => `${c.x.toFixed(1)},${c.y.toFixed(1)}`).join(' ');
   const lastIdx = positions.length - 1;
+  const len = pathLenRef.current;
 
   const updateFromPointer = (clientX: number) => {
     const el = wrapperRef.current;
@@ -137,7 +159,7 @@ function InteractiveSparkline({ events, positions, activeIdx, setActiveIdx }: In
       ref={wrapperRef}
       style={{
         width: '100%',
-        height: 64,
+        height: 78,
         touchAction: 'none',
         cursor: 'pointer',
         position: 'relative',
@@ -158,6 +180,28 @@ function InteractiveSparkline({ events, positions, activeIdx, setActiveIdx }: In
       onPointerCancel={() => setActiveIdx(null)}
       onPointerLeave={() => setActiveIdx(null)}
     >
+      {activeIdx != null && coords[activeIdx] && events[activeIdx] && (
+        <div
+          style={{
+            position: 'absolute',
+            top: -2,
+            left: `${(coords[activeIdx].x / VB_W) * 100}%`,
+            transform: 'translateX(-50%)',
+            background: INK,
+            color: '#fff',
+            fontSize: 10.5,
+            fontWeight: 700,
+            padding: '3px 8px',
+            borderRadius: 7,
+            whiteSpace: 'nowrap',
+            pointerEvents: 'none',
+            zIndex: 2,
+            boxShadow: '0 4px 12px rgba(15,23,42,0.18)',
+          }}
+        >
+          {formatFinishLabel(events[activeIdx])}
+        </div>
+      )}
       <svg
         width="100%"
         height="100%"
@@ -165,6 +209,45 @@ function InteractiveSparkline({ events, positions, activeIdx, setActiveIdx }: In
         preserveAspectRatio="none"
         style={{ display: 'block', overflow: 'visible' }}
       >
+        <defs>
+          <linearGradient id="formFill" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor={AMBER} stopOpacity={0.22} />
+            <stop offset="100%" stopColor={AMBER} stopOpacity={0} />
+          </linearGradient>
+        </defs>
+
+        {/* In-form (top-10) zone */}
+        <rect
+          x={PAD_X}
+          y={2}
+          width={VB_W - PAD_X * 2}
+          height={Math.max(0, zoneBottom - 2)}
+          fill={SCORE_UNDER_PAR_LIGHT}
+          opacity={0.05}
+        />
+        <line
+          x1={PAD_X}
+          x2={VB_W - PAD_X}
+          y1={zoneBottom}
+          y2={zoneBottom}
+          stroke={SCORE_UNDER_PAR_LIGHT}
+          strokeWidth={1}
+          strokeDasharray="2 7"
+          strokeOpacity={0.4}
+          vectorEffect="non-scaling-stroke"
+        />
+
+        {/* Area fade */}
+        <polygon
+          points={`${PAD_X},${VB_H} ${polyPoints} ${VB_W - PAD_X},${VB_H}`}
+          fill="url(#formFill)"
+          style={
+            reduced
+              ? undefined
+              : { opacity: drawn ? 1 : 0, transition: 'opacity 600ms ease 250ms' }
+          }
+        />
+
         {activeIdx != null && coords[activeIdx] && (
           <line
             x1={coords[activeIdx].x}
@@ -179,6 +262,7 @@ function InteractiveSparkline({ events, positions, activeIdx, setActiveIdx }: In
           />
         )}
         <polyline
+          ref={lineRef}
           points={polyPoints}
           fill="none"
           stroke={AMBER}
@@ -186,19 +270,33 @@ function InteractiveSparkline({ events, positions, activeIdx, setActiveIdx }: In
           strokeLinecap="round"
           strokeLinejoin="round"
           vectorEffect="non-scaling-stroke"
+          style={
+            reduced || !len
+              ? undefined
+              : {
+                  strokeDasharray: len,
+                  strokeDashoffset: drawn ? 0 : len,
+                  transition: 'stroke-dashoffset 700ms cubic-bezier(.33,1,.68,1)',
+                }
+          }
         />
         {coords.map((c, i) => {
           const isActive = i === activeIdx;
           const isLatest = i === lastIdx;
+          const c_ = dotColorForPosition(positions[i], events[i]?.status ?? null);
+          const isAmberTier = c_ === AMBER;
+          const groupStyle = reduced
+            ? undefined
+            : { opacity: drawn ? 1 : 0, transition: `opacity 300ms ease ${300 + i * 35}ms` };
           if (isActive) {
             return (
-              <g key={i}>
-                <circle cx={c.x} cy={c.y} r={11} fill={AMBER} fillOpacity={0.18} />
+              <g key={i} style={groupStyle}>
+                <circle cx={c.x} cy={c.y} r={11} fill={c_} fillOpacity={0.16} />
                 <circle
                   cx={c.x}
                   cy={c.y}
                   r={7}
-                  fill={AMBER}
+                  fill={c_}
                   stroke={SURFACE}
                   strokeWidth={2}
                   vectorEffect="non-scaling-stroke"
@@ -208,35 +306,38 @@ function InteractiveSparkline({ events, positions, activeIdx, setActiveIdx }: In
           }
           if (isLatest) {
             return (
-              <circle
-                key={i}
-                cx={c.x}
-                cy={c.y}
-                r={5}
-                fill={AMBER}
-                stroke={SURFACE}
-                strokeWidth={1.5}
-                vectorEffect="non-scaling-stroke"
-              />
+              <g key={i} style={groupStyle}>
+                <circle
+                  cx={c.x}
+                  cy={c.y}
+                  r={5}
+                  fill={c_}
+                  stroke={SURFACE}
+                  strokeWidth={1.5}
+                  vectorEffect="non-scaling-stroke"
+                />
+              </g>
             );
           }
           return (
-            <circle
-              key={i}
-              cx={c.x}
-              cy={c.y}
-              r={3.5}
-              fill={SURFACE}
-              stroke={AMBER}
-              strokeWidth={1.5}
-              vectorEffect="non-scaling-stroke"
-            />
+            <g key={i} style={groupStyle}>
+              <circle
+                cx={c.x}
+                cy={c.y}
+                r={3.5}
+                fill={isAmberTier ? SURFACE : c_}
+                stroke={c_}
+                strokeWidth={1.5}
+                vectorEffect="non-scaling-stroke"
+              />
+            </g>
           );
         })}
       </svg>
     </div>
   );
 }
+
 
 export function FormSection({ playerId }: FormSectionProps) {
   const { data: results, isLoading } = usePlayerResults(playerId, 10);
