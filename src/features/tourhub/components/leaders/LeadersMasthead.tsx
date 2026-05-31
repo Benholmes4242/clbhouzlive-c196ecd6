@@ -18,6 +18,7 @@ import {
   AMBER,
   GLASS_BLUR,
   GOLD,
+  GOLD_DEEP,
   GOLD_BORDER,
   GOLD_TINT,
   GOLD_TINT_10,
@@ -267,7 +268,7 @@ export function LeadersMasthead({
                 flexWrap: 'wrap',
               }}
             >
-              <Crown size={13} strokeWidth={2.5} fill={GOLD} style={{ color: GOLD }} />
+              <Crown size={13} strokeWidth={2.5} fill={GOLD} style={{ color: GOLD_DEEP, flexShrink: 0 }} />
               <span
                 style={{
                   fontSize: 10.5,
