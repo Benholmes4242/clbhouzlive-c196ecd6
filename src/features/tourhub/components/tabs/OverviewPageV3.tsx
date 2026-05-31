@@ -67,7 +67,9 @@ export function OverviewPageV3() {
               <HomeConnectHandicapModule />
             </LazySection>
             <LazySection minHeight={500}>
-              <IntelligenceHero />
+              <div style={{ marginTop: 16 }}>
+                <IntelligenceHero />
+              </div>
             </LazySection>
             <LazySection minHeight={400}>
               <ComingUpCalendar />
