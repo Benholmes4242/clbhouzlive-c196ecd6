@@ -438,8 +438,8 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
         {/* What to include guide */}
         <div style={{ padding: '20px 16px 0' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14 }}>
-            <div style={{ width: 3, height: 12, background: '#0F172A', borderRadius: 1 }} />
-            <span style={{ fontSize: 9, fontWeight: 900, color: '#0F172A', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>What to include</span>
+            <div style={{ width: 3, height: 12, background: INK, borderRadius: 1 }} />
+            <span style={{ fontSize: 9, fontWeight: 900, color: INK, letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>What to include</span>
           </div>
           {[
             { icon: '⛳', label: 'Course condition', sub: 'Greens, fairways, bunkers, rough' },
