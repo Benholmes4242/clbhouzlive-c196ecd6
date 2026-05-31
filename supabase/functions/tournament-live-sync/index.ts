@@ -359,6 +359,12 @@ async function syncTournament(
     console.error(`[LiveSync] Leaderboard error for ${tournament.name}:`, error.message);
   }
 
+  // Derive accurate active round from leaderboard data (source of truth).
+  // Falls back to Sportradar's round field if no leaderboard data exists yet.
+  const derivedRound = await deriveActiveRound(supabase, tournament.id);
+  const roundToWrite = derivedRound ?? currentRound;
+
+
   // ── Round-completion detection ────────────────────────────────────
   let roundCompleteTriggered = false;
   if (leaderboardRecords > 0) {
