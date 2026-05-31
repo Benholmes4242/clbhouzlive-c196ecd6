@@ -164,17 +164,25 @@ export function deriveHeroState(
     };
   }
 
-  // Results — within 24h of finish, or carousel-promoted (off-season fallback)
+  // Results — closed/complete AND within RESULTS_WINDOW_HOURS of finish.
+  // Stale completed events (>72h) degrade gracefully to upcoming so the
+  // badge/card body never claim "FINAL" for a long-finished event that
+  // somehow ended up as the chosen slide.
   if (status === 'closed' || status === 'complete' || status === 'completed') {
-    return {
-      kind: 'results',
-      variant: 'standard',
-      finishDate: tournament.endDate || '',
-      meta: start && end
-        ? `${format(start, 'MMM d').toUpperCase()} – ${format(end, 'MMM d').toUpperCase()}`
-        : end ? format(end, 'MMM d').toUpperCase() : '',
-    };
+    const isStale = hoursSinceEnd != null && hoursSinceEnd > RESULTS_WINDOW_HOURS;
+    if (!isStale) {
+      return {
+        kind: 'results',
+        variant: 'standard',
+        finishDate: tournament.endDate || '',
+        meta: start && end
+          ? `${format(start, 'MMM d').toUpperCase()} – ${format(end, 'MMM d').toUpperCase()}`
+          : end ? format(end, 'MMM d').toUpperCase() : '',
+      };
+    }
+    // fall through to upcoming
   }
+
 
   // Upcoming
   const variant: UpcomingVariant =
