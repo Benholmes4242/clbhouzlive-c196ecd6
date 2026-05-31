@@ -132,7 +132,7 @@ export function PlayerHero({ player, playerStats }: PlayerHeroProps) {
       style={{
         position: 'relative',
         background: SLATE_50,
-        padding: 'max(env(safe-area-inset-top, 0px), 47px) 0 14px',
+        padding: '10px 0 14px',
       }}
     >
       {/* Section header (canonical §2) — eyebrow only */}
