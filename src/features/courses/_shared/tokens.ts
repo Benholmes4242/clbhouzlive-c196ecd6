@@ -32,6 +32,7 @@ export const AMBER = '#F7931E';                             // brand amber accen
 
 /* ── Hairlines / fills on light bg ──────────────────────────────────── */
 export const HAIRLINE_INK_7 = 'rgba(15,23,42,0.07)';        // faint divider
+export const HAIRLINE_INK_8 = 'rgba(15,23,42,0.08)';        // hairline @ 8% — pill borders, table dividers
 export const HAIRLINE_INK_10 = 'rgba(15,23,42,0.10)';       // input/dropdown border
 export const HAIRLINE_INK_12 = 'rgba(15,23,42,0.12)';       // drag-handle / strong hairline
 export const INK_TINT_05 = 'rgba(15,23,42,0.05)';           // ultra-faint surface (sheet close button bg)
