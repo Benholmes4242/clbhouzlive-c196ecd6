@@ -151,10 +151,6 @@ export function SummaryTab({
     return leaderboard.find((e: any) => e.position === 2) || leaderboard[1];
   }, [leaderboard]);
 
-  const top10 = useMemo(() => {
-    if (!leaderboard) return [];
-    return leaderboard.slice(0, 10);
-  }, [leaderboard]);
 
   if (!isLive && !isCompleted) return <SummaryEmpty />;
   if (isLoading) return <SummarySkeleton />;
