@@ -9,6 +9,7 @@ import { ExplorePassport } from './ExplorePassport';
 import { ExploreEchoCTA } from './ExploreEchoCTA';
 import { ExploreDestinations } from './ExploreDestinations';
 import { TestYourGame } from './TestYourGame';
+import { WhereYoudRank } from './WhereYoudRank';
 
 
 import { BucketListStrip } from './BucketListStrip';
@@ -56,7 +57,7 @@ export default function ExploreTabContent({ embedded: _embedded = false }: Explo
       <ExplorePassport userId={userId} />
       <ExploreRecommendations userId={userId} mood={mood} />
 
-      {/* Phase 4 — WhereYoudRank shelf will mount here */}
+      {activeRegion === null && <WhereYoudRank userId={userId} />}
       {activeRegion === null && <TestYourGame />}
 
 
