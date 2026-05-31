@@ -151,7 +151,7 @@ export function LiveOverviewTab({
   const hasLeaderboard = !!leaderboard && leaderboard.length > 0;
 
   return (
-    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.3 }}>
+    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.3 }} style={{ paddingTop: 16 }}>
       {/* 1. LEADERBOARD — header rendered by LeaderboardCard itself (canonical eyebrow + View all action) */}
       {hasLeaderboard ? (
         <LeaderboardCard
