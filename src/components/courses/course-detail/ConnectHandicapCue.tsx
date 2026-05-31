@@ -2,7 +2,7 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useWhsConnection } from '@/lib/whs/hooks';
-import { Users, Trophy, LayoutGrid, type LucideIcon } from 'lucide-react';
+import { Users, Trophy, LayoutGrid, Sparkles, Map, type LucideIcon } from 'lucide-react';
 import {
   AMBER,
   INK,
@@ -12,7 +12,7 @@ import {
   HAIRLINE_INK_8,
 } from '@/features/courses/_shared/tokens';
 
-type CueVariant = 'about' | 'holes' | 'champions';
+type CueVariant = 'about' | 'holes' | 'champions' | 'progress' | 'leaderboard' | 'discover';
 
 const FONT = 'Geist, system-ui, sans-serif';
 
@@ -35,11 +35,26 @@ const COPY: Record<
     benefit: () => 'See where you rank at this course',
     sub: (n) => `Connect your handicap and your rounds join the ${n} leaderboard.`,
   },
+  progress: {
+    Icon: Sparkles,
+    benefit: () => 'Fill in your Top 100 automatically',
+    sub: () => 'Connect your handicap and every round you play counts itself — no manual logging.',
+  },
+  leaderboard: {
+    Icon: Trophy,
+    benefit: () => 'See where you rank worldwide',
+    sub: () => 'Connect your handicap to join the championship and climb the global rankings.',
+  },
+  discover: {
+    Icon: Map,
+    benefit: () => 'See which of these you’ve played',
+    sub: () => 'Connect your handicap to see how you scored at every course.',
+  },
 };
 
 interface Props {
   variant: CueVariant;
-  courseName: string;
+  courseName?: string;
 }
 
 export const ConnectHandicapCue: React.FC<Props> = ({ variant, courseName }) => {
@@ -52,8 +67,11 @@ export const ConnectHandicapCue: React.FC<Props> = ({ variant, courseName }) => 
   const { Icon, benefit, sub } = COPY[variant];
   const go = () => navigate('/handicap');
 
-  // About: lighter inline locked-comparison row
-  if (variant === 'about') {
+  const name = courseName ?? '';
+  const isBanner = variant === 'about' || variant === 'discover';
+
+  // Banner: lighter inline locked-comparison row (about / discover)
+  if (isBanner) {
     return (
       <button
         type="button"
@@ -89,10 +107,10 @@ export const ConnectHandicapCue: React.FC<Props> = ({ variant, courseName }) => 
         </div>
         <div style={{ flex: 1, minWidth: 0 }}>
           <div style={{ fontSize: 13, fontWeight: 700, color: INK, letterSpacing: '-0.01em' }}>
-            {benefit(courseName)}
+            {benefit(name)}
           </div>
           <div style={{ fontSize: 11.5, fontWeight: 500, color: INK_MUTE, marginTop: 2 }}>
-            {sub(courseName)}
+            {sub(name)}
           </div>
         </div>
         <span
@@ -140,10 +158,10 @@ export const ConnectHandicapCue: React.FC<Props> = ({ variant, courseName }) => 
           </div>
           <div style={{ flex: 1, minWidth: 0 }}>
             <div style={{ fontSize: 14, fontWeight: 700, color: INK, letterSpacing: '-0.01em' }}>
-              {benefit(courseName)}
+              {benefit(name)}
             </div>
             <div style={{ fontSize: 12.5, fontWeight: 500, color: INK_MUTE, marginTop: 3, lineHeight: 1.4 }}>
-              {sub(courseName)}
+              {sub(name)}
             </div>
           </div>
         </div>

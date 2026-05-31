@@ -5,6 +5,7 @@ import { cn } from '@/lib/utils';
 import { ChampionshipLeaderboardView } from '@/components/championship';
 import { CoursesLeaderboardView } from '@/components/leaderboard/CoursesLeaderboardView';
 import { ExplorationTab } from '@/components/leaderboards';
+import ConnectHandicapCue from '@/components/courses/course-detail/ConnectHandicapCue';
 
 type LeaderboardView = 'championship' | 'courses' | 'exploration';
 
@@ -96,6 +97,9 @@ const Top100LeaderboardPanel = () => {
         </div>
 
         <TabsContent value="championship" className="mt-0">
+          <div className="px-4" style={{ marginTop: 12, marginBottom: 4 }}>
+            <ConnectHandicapCue variant="leaderboard" />
+          </div>
           <ChampionshipLeaderboardView />
         </TabsContent>
 
