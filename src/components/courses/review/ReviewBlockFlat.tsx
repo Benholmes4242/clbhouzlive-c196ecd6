@@ -333,7 +333,7 @@ export const ReviewBlockFlat: React.FC<ReviewBlockFlatProps> = ({
               opacity: votingDisabled ? 0.5 : 1,
             }}
           >
-            <span aria-hidden>👎</span>{review.unhelpfulCount > 0 && <> {review.unhelpfulCount}</>}
+            <ThumbsDown size={13} strokeWidth={2} />{review.unhelpfulCount > 0 && <span>{review.unhelpfulCount}</span>}
           </button>
         </div>
       )}
