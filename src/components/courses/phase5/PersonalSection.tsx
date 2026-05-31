@@ -42,7 +42,9 @@ export const PersonalSection: React.FC<PersonalSectionProps> = ({
   return (
     <section style={{ padding: '20px 0', display: 'flex', flexDirection: 'column', gap: 20 }}>
       {/* Section header — canonical SectionLabel for cross-page consistency */}
-      <SectionLabel text="Your Journey" />
+      <div style={{ marginBottom: -14 }}>
+        <SectionLabel text="Your Journey" />
+      </div>
 
       {/* Status toggle */}
       <div style={{ padding: '0 16px' }}>

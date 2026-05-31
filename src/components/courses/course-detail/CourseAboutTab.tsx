@@ -123,7 +123,7 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
   return (
     <div
       className="animate-in fade-in duration-200"
-      style={{ paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 32px)', background: SLATE_50 }}
+      style={{ paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 12px)', background: SLATE_50 }}
     >
       {/* 1. Location breadcrumb pills */}
       <CourseLocationPills course={course} />
@@ -183,9 +183,9 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
       {/* 5. About */}
       {course.description && (
         <>
-          <div style={{ marginTop: 24, padding: '0 16px' }}>
+          <div style={{ marginTop: 24 }}>
             <SectionLabel text="About" />
-            <div>
+            <div style={{ padding: '0 16px' }}>
               <div style={{ fontSize: 14, color: SLATE_600, lineHeight: 1.7, position: 'relative' }}>
                 {formatDescription(displayDescription)}
                 {!showFullDescription && shouldShowReadMore && (
@@ -248,9 +248,9 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
 
         return (
           <>
-            <div style={{ padding: '0 16px' }}>
+            <div>
               <SectionLabel text="Course Details" />
-              <div style={{ display: 'grid', gridTemplateColumns: `repeat(${Math.min(stats.length, 4)}, 1fr)`, padding: '0 8px' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: `repeat(${Math.min(stats.length, 4)}, 1fr)`, padding: '0 16px' }}>
                 {stats.slice(0, 4).map((s, i, arr) => (
                   <div key={s.label} style={{ textAlign: 'center', padding: '4px 0', borderRight: i < arr.length - 1 ? `0.5px solid ${HAIRLINE_INK_8}` : 'none' }}>
                     <div style={{ fontSize: 22, fontWeight: 900, color: AMBER, letterSpacing: '-0.04em' }}>{s.value}</div>
@@ -265,21 +265,23 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
       })()}
 
       {/* 8. Location */}
-      <section style={{ padding: '0 16px' }}>
+      <section>
         <SectionLabel text="Location" />
-        {coordsLoading && <Skeleton className="w-full h-[180px] rounded-xl" />}
-        {coords && (
-          <LocationMapCard
-            lat={coords.lat}
-            lng={coords.lng}
-            name={course.name}
-            locationText={formatCourseLocation(course)}
-            colorful
-          />
-        )}
-        {!coords && !coordsLoading && (
-          <p style={{ fontSize: 13, color: INK_FAINT, padding: '0 16px' }}>Location data isn't available yet.</p>
-        )}
+        <div style={{ padding: '0 16px' }}>
+          {coordsLoading && <Skeleton className="w-full h-[180px] rounded-xl" />}
+          {coords && (
+            <LocationMapCard
+              lat={coords.lat}
+              lng={coords.lng}
+              name={course.name}
+              locationText={formatCourseLocation(course)}
+              colorful
+            />
+          )}
+          {!coords && !coordsLoading && (
+            <p style={{ fontSize: 13, color: INK_FAINT }}>Location data isn't available yet.</p>
+          )}
+        </div>
       </section>
 
       <div style={{ margin: '24px 0' }}><Divider /></div>
