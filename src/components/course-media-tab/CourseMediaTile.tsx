@@ -103,8 +103,8 @@ export const CourseMediaTile: React.FC<CourseMediaTileProps> = ({ post, index, f
         <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', pointerEvents: 'none' }}>
           <div
             style={{
-              width: 32,
-              height: 32,
+              width: feature ? 44 : 32,
+              height: feature ? 44 : 32,
               borderRadius: '50%',
               background: 'rgba(0,0,0,0.45)',
               backdropFilter: 'blur(4px)',
@@ -113,7 +113,7 @@ export const CourseMediaTile: React.FC<CourseMediaTileProps> = ({ post, index, f
               justifyContent: 'center',
             }}
           >
-            <svg width="12" height="12" viewBox="0 0 12 12" fill="#fff">
+            <svg width={feature ? 16 : 12} height={feature ? 16 : 12} viewBox="0 0 12 12" fill="#fff">
               <path d="M3 1.5 L10 6 L3 10.5 Z" />
             </svg>
           </div>
