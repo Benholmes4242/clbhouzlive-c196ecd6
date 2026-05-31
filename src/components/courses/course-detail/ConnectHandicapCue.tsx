@@ -18,7 +18,7 @@ const FONT = 'Geist, system-ui, sans-serif';
 
 const COPY: Record<
   CueVariant,
-  { Icon: React.ComponentType<{ size?: number; color?: string; strokeWidth?: number }>; benefit: (n: string) => string; sub: (n: string) => string }
+  { Icon: LucideIcon; benefit: (n: string) => string; sub: (n: string) => string }
 > = {
   about: {
     Icon: Users,
