@@ -2,17 +2,18 @@ import { memo } from 'react';
 
 interface KickerProps {
   children: React.ReactNode;
-  color?: 'amber' | 'emerald' | 'slate';
+  color?: 'amber' | 'emerald' | 'slate' | 'light';
 }
 
 // Canonical kickers default to slate-500. amber + emerald variants kept for
 // intentional tone shifts (e.g. ClipOfTheWeekHero uses emerald to signal
 // curated content). amber kept available for explicit one-off editorial
-// moments — should be rare.
+// moments — should be rare. light is for dark mastheads.
 const COLOR_MAP: Record<NonNullable<KickerProps['color']>, string> = {
   amber: 'hsl(var(--primary))',  // available but no longer default
   emerald: '#006747',
   slate: '#64748B',              // canonical neutral kicker
+  light: 'rgba(255,255,255,0.55)', // light-on-dark eyebrow for dark mastheads
 };
 
 /**
