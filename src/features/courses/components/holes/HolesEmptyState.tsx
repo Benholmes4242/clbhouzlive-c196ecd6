@@ -1,9 +1,9 @@
 import React from 'react';
 import { Flag } from 'lucide-react';
 import { EmptyStateTile } from '@/components/profile/handicap/gam/_shared/EmptyStateTile';
-import { AMBER, INK, FONT } from './_constants';
+import { AMBER, DEEP_AMBER, FONT, INK } from './_constants';
+import { HAIRLINE_INK_8, INK_TINT_06 } from '@/features/courses/_shared/tokens';
 
-const DEEP_AMBER = '#B26818';
 const SLATE = 'var(--hcp-t-60, #64748b)';
 
 export const HolesEmptyState: React.FC<{ courseName: string | null }> = ({ courseName }) => (
