@@ -10,4 +10,4 @@ export { TeeTimesTab } from './TeeTimesTab';
 export { HoleStatsTab } from './HoleStatsTab';
 export { SummaryTab } from './SummaryTab';
 export { LiveOverviewTab } from './LiveOverviewTab';
-export { TournamentEmptyState } from './TournamentEmptyState';
+
