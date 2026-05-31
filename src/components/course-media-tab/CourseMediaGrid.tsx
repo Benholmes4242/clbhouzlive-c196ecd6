@@ -6,6 +6,7 @@ import type { FeedPost } from '@/components/media-system/types/media';
 import { CourseMediaTile } from './CourseMediaTile';
 import { CourseMediaLandscapeCard } from './CourseMediaLandscapeCard';
 import { CourseMediaGridSkeleton } from './CourseMediaGridSkeleton';
+import { AMBER, HAIRLINE_INK_7, HAIRLINE_INK_10, INK, INK_FAINT, INK_TINT_02, INK_TINT_06, SURFACE } from '@/features/courses/_shared/tokens';
 
 interface CourseMediaGridProps {
   posts: FeedPost[];
@@ -121,33 +122,33 @@ export const CourseMediaGrid = forwardRef<HTMLDivElement, CourseMediaGridProps>(
           <div style={{ width: 72, height: 72, borderRadius: 18, background: 'rgba(247,147,30,0.07)', border: '1.5px solid rgba(247,147,30,0.18)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 18px', fontSize: 30 }}>
             📸
           </div>
-          <div style={{ fontSize: 19, fontWeight: 900, color: '#0F172A', letterSpacing: '-0.03em', marginBottom: 6 }}>No media yet</div>
-          <p style={{ fontSize: 13, color: '#94A3B8', lineHeight: 1.6, maxWidth: 270, margin: '0 auto 24px' }}>
+          <div style={{ fontSize: 19, fontWeight: 900, color: INK, letterSpacing: '-0.03em', marginBottom: 6 }}>No media yet</div>
+          <p style={{ fontSize: 13, color: INK_FAINT, lineHeight: 1.6, maxWidth: 270, margin: '0 auto 24px' }}>
             Be the first to capture {courseName || 'this course'} — photos and videos from your round help fellow golfers discover it.
           </p>
           <button
             type="button"
             onClick={() => courseId && navigate(`/courses/${courseId}/rate`)}
-            style={{ width: '100%', padding: '13px 0', borderRadius: 12, background: 'linear-gradient(90deg, #F59E0B, #F7931E)', color: '#fff', fontSize: 14, fontWeight: 800, border: 'none', cursor: 'pointer', boxShadow: '0 4px 16px rgba(247,147,30,0.28)', marginBottom: 10 }}
+            style={{ width: '100%', padding: '13px 0', borderRadius: 12, background: 'linear-gradient(90deg, #F59E0B, #F7931E)', color: SURFACE, fontSize: 14, fontWeight: 800, border: 'none', cursor: 'pointer', boxShadow: '0 4px 16px rgba(247,147,30,0.28)', marginBottom: 10 }}
           >
             📷 Share your experience
           </button>
           <button
             type="button"
             onClick={() => navigate('/share')}
-            style={{ width: '100%', padding: '12px 0', borderRadius: 12, background: 'transparent', color: '#0F172A', fontSize: 13, fontWeight: 700, border: '1.5px solid rgba(15,23,42,0.1)', cursor: 'pointer' }}
+            style={{ width: '100%', padding: '12px 0', borderRadius: 12, background: 'transparent', color: INK, fontSize: 13, fontWeight: 700, border: `1.5px solid ${HAIRLINE_INK_10}`, cursor: 'pointer' }}
           >
             🎬 Upload a video
           </button>
         </div>
 
-        <div style={{ height: '0.5px', background: 'rgba(15,23,42,0.07)', margin: '0 16px 24px' }} />
+        <div style={{ height: '0.5px', background: HAIRLINE_INK_7, margin: '0 16px 24px' }} />
 
         {/* What to share guide */}
         <div style={{ padding: '0 16px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14 }}>
-            <div style={{ width: 3, height: 12, background: '#0F172A', borderRadius: 1 }} />
-            <span style={{ fontSize: 9, fontWeight: 900, color: '#0F172A', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>What to share</span>
+            <div style={{ width: 3, height: 12, background: INK, borderRadius: 1 }} />
+            <span style={{ fontSize: 9, fontWeight: 900, color: INK, letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>What to share</span>
           </div>
           {[
             { icon: '⛳', label: 'Signature holes', sub: 'Show the world what makes this course special' },
@@ -155,11 +156,11 @@ export const CourseMediaGrid = forwardRef<HTMLDivElement, CourseMediaGridProps>(
             { icon: '🌅', label: 'Views & atmosphere', sub: 'Sunsets, landscapes, the feeling of being there' },
             { icon: '🏠', label: 'Clubhouse & facilities', sub: 'Help others know what to expect before they visit' },
           ].map(({ icon, label, sub }) => (
-            <div key={label} style={{ display: 'flex', alignItems: 'flex-start', gap: 12, marginBottom: 10, padding: '12px 14px', borderRadius: 12, background: 'rgba(15,23,42,0.02)', border: '0.5px solid rgba(15,23,42,0.06)' }}>
+            <div key={label} style={{ display: 'flex', alignItems: 'flex-start', gap: 12, marginBottom: 10, padding: '12px 14px', borderRadius: 12, background: INK_TINT_02, border: `0.5px solid ${INK_TINT_06}` }}>
               <span style={{ fontSize: 20, flexShrink: 0, marginTop: 1 }}>{icon}</span>
               <div>
-                <div style={{ fontSize: 13, fontWeight: 700, color: '#0F172A', marginBottom: 2 }}>{label}</div>
-                <div style={{ fontSize: 11, color: '#94A3B8', lineHeight: 1.4 }}>{sub}</div>
+                <div style={{ fontSize: 13, fontWeight: 700, color: INK, marginBottom: 2 }}>{label}</div>
+                <div style={{ fontSize: 11, color: INK_FAINT, lineHeight: 1.4 }}>{sub}</div>
               </div>
             </div>
           ))}
@@ -168,8 +169,8 @@ export const CourseMediaGrid = forwardRef<HTMLDivElement, CourseMediaGridProps>(
         {/* Ghost grid preview */}
         <div style={{ padding: '24px 16px 0' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
-            <div style={{ width: 3, height: 12, background: '#F7931E', borderRadius: 1 }} />
-            <span style={{ fontSize: 9, fontWeight: 900, color: '#F7931E', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>Your gallery awaits</span>
+            <div style={{ width: 3, height: 12, background: AMBER, borderRadius: 1 }} />
+            <span style={{ fontSize: 9, fontWeight: 900, color: AMBER, letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>Your gallery awaits</span>
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 2, opacity: 0.3, pointerEvents: 'none' }}>
             <div style={{ height: 160, borderRadius: 6, background: 'linear-gradient(135deg,#0f172a,#1e293b)' }} />
@@ -214,7 +215,7 @@ export const CourseMediaGrid = forwardRef<HTMLDivElement, CourseMediaGridProps>(
             boxShadow: '0 2px 8px rgba(0, 0, 0, 0.25)',
             borderRadius: 4,
             padding: '4px 10px',
-            fontSize: 10, fontWeight: 800, color: '#FFFFFF',
+            fontSize: 10, fontWeight: 800, color: SURFACE,
             letterSpacing: '0.12em', textTransform: 'uppercase',
             pointerEvents: 'none', zIndex: 2,
             transform: 'rotate(-6deg)', transformOrigin: 'top left',

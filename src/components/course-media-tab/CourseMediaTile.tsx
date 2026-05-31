@@ -2,6 +2,7 @@ import React, { useEffect, useRef } from 'react';
 import { useCourseMediaViewerStore } from '@/components/course-media-tab/CourseMediaViewer';
 import { Film } from 'lucide-react';
 import type { FeedPost } from '@/components/media-system/types/media';
+import { INK_TINT_04, INK_TINT_06, SURFACE } from '@/features/courses/_shared/tokens';
 
 function formatDuration(seconds?: number): string {
   if (!seconds) return '0:00';
@@ -65,7 +66,7 @@ export const CourseMediaTile: React.FC<CourseMediaTileProps> = ({ post, index, a
         overflow: 'hidden',
         cursor: 'pointer',
         transition: 'transform 100ms ease',
-        background: 'rgba(15,23,42,0.04)',
+        background: INK_TINT_04,
       }}
       className="active:scale-[0.97]"
     >
@@ -78,7 +79,7 @@ export const CourseMediaTile: React.FC<CourseMediaTileProps> = ({ post, index, a
           loading="lazy"
         />
       ) : (
-        <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(15,23,42,0.06)' }}>
+        <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', background: INK_TINT_06 }}>
           <Film style={{ width: 28, height: 28, color: 'rgba(15,23,42,0.3)' }} />
         </div>
       )}
@@ -130,7 +131,7 @@ export const CourseMediaTile: React.FC<CourseMediaTileProps> = ({ post, index, a
             padding: '2px 5px',
             fontSize: 10,
             fontWeight: 700,
-            color: '#fff',
+            color: SURFACE,
             letterSpacing: '0.02em',
             zIndex: 2,
           }}
@@ -160,7 +161,7 @@ export const CourseMediaTile: React.FC<CourseMediaTileProps> = ({ post, index, a
               <svg width="11" height="11" viewBox="0 0 24 24" fill="#fff">
                 <path d="M12 21s-7-4.5-9.5-9C1 9 2.5 5 6 5c2 0 3.5 1 4.5 2.5C11.5 6 13 5 15 5c3.5 0 5 4 3.5 7-2.5 4.5-9.5 9-9.5 9z"/>
               </svg>
-              <span style={{ fontSize: 10, fontWeight: 700, color: '#fff', textShadow: '0 1px 2px rgba(0,0,0,0.4)' }}>
+              <span style={{ fontSize: 10, fontWeight: 700, color: SURFACE, textShadow: '0 1px 2px rgba(0,0,0,0.4)' }}>
                 {post.likeCount}
               </span>
             </div>
