@@ -136,7 +136,7 @@ export function useIntelligenceHistoricalPicks() {
           tournament_id,
           predictions,
           sr_tournaments!inner(
-            id, name, status, start_date, end_date, season_id
+            id, name, status, start_date, end_date, season_id, purse
           )
         `)
         .in('sr_tournaments.status', ['closed', 'complete'])
