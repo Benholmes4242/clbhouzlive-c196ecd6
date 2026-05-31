@@ -371,7 +371,7 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
         <Divider />
         {/* Review row skeletons */}
         {[1, 2, 3].map((i) => (
-          <div key={i} style={{ padding: '14px 16px 16px', borderBottom: '0.5px solid rgba(15,23,42,0.06)' }}>
+          <div key={i} style={{ padding: '14px 16px 16px', borderBottom: `0.5px solid ${INK_TINT_06}` }}>
             <div style={{ display: 'flex', alignItems: 'flex-start', gap: 10, marginBottom: 10 }}>
               <Skeleton className="w-10 h-10 rounded-[10px]" />
               <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 6 }}>
