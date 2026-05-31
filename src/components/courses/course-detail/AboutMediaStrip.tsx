@@ -1,5 +1,6 @@
 import React, { useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Camera, Plus } from 'lucide-react';
 import SquareCardMedia from '@/components/explore/media/SquareCardMedia';
 import { CardType } from '@/components/explore/media/CardMediaTypes';
 import { adaptClubMediaArrayToExploreItems } from '@/lib/adapters/clubMediaToExplore';
@@ -8,6 +9,15 @@ import { useClubMedia } from '@/hooks/useClubMedia';
 import { generateStreamThumbnailUrl } from '@/config/cloudflareStream';
 import { useCourseMediaViewerStore } from '@/components/course-media-tab/CourseMediaViewer';
 import type { FeedPost, MediaItem } from '@/components/media-system/types/media';
+import { AMBER, INK } from '@/features/courses/_shared/tokens';
+
+const EYEBROW_STYLE: React.CSSProperties = {
+  fontSize: 9,
+  fontWeight: 900,
+  color: INK,
+  letterSpacing: '0.18em',
+  textTransform: 'uppercase' as const,
+};
 
 interface AboutMediaStripProps {
   clubId: string;
