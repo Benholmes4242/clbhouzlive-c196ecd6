@@ -1,5 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import { AMBER, INK, INK_FAINT } from '@/features/courses/_shared/tokens';
 
 interface ClaimCourseCTAProps {
   clubId: string;
