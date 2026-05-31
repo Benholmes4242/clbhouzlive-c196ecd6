@@ -126,7 +126,7 @@ export const HoleRow: React.FC<Props> = ({ h, maxAvg, isHardest, isEasiest }) =>
           fontSize: 10.5,
           fontWeight: 700,
           letterSpacing: '0.02em',
-          color: '#64748b',
+          color: INK_MUTE,
           fontVariantNumeric: 'tabular-nums',
         }}
       >
