@@ -208,15 +208,10 @@ export function ScheduleTournamentCard({
             >
               <span style={{ width: 5, height: 5, borderRadius: '50%', background: STATUS_LIVE }} />
               LIVE
-              {leaderWinner?.round1 !== undefined && (() => {
-                const roundInfo = getCurrentRound(
-                  leaderWinner!.round1,
-                  leaderWinner!.round2,
-                  leaderWinner!.round3,
-                  leaderWinner!.round4,
-                );
-                return roundInfo ? (
-                  <span style={{ marginLeft: 2, fontWeight: 700, opacity: 0.8 }}>· R{roundInfo.currentRound}</span>
+              {(() => {
+                const cr = (tournament as any).currentRound ?? (tournament as any).current_round;
+                return cr != null ? (
+                  <span style={{ marginLeft: 2, fontWeight: 700, opacity: 0.8 }}>· R{cr}</span>
                 ) : null;
               })()}
             </span>
