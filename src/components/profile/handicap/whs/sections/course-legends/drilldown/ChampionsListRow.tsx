@@ -1,5 +1,6 @@
 import { GAM } from '../../../gam/tokens';
 import React from 'react';
+import { Crown } from 'lucide-react';
 
 interface ChampionsListRowProps {
   rank: number;
@@ -78,19 +79,25 @@ export const ChampionsListRow: React.FC<ChampionsListRowProps> = ({
         boxShadow: 'inset 0 -0.5px 0 rgba(15,23,42,0.07)',
       }}
     >
-      <div
-        style={{
-          fontFamily: 'Geist Mono, monospace',
-          fontSize: 15,
-          fontWeight: 700,
-          fontVariantNumeric: 'tabular-nums',
-          color: rank === 1 ? GAM.AMBER : 'var(--hcp-t-30, #b3bdca)',
-          lineHeight: 1,
-          textAlign: 'right',
-        }}
-      >
-        {rank}
-      </div>
+      {rank === 1 ? (
+        <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', lineHeight: 0 }} aria-label="Champion">
+          <Crown size={15} strokeWidth={2.5} fill={GAM.GOLD} style={{ color: GAM.DEEP_AMBER, flexShrink: 0 }} />
+        </div>
+      ) : (
+        <div
+          style={{
+            fontFamily: 'Geist Mono, monospace',
+            fontSize: 15,
+            fontWeight: 700,
+            fontVariantNumeric: 'tabular-nums',
+            color: 'var(--hcp-t-30, #b3bdca)',
+            lineHeight: 1,
+            textAlign: 'right',
+          }}
+        >
+          {rank}
+        </div>
+      )}
 
       {avatar}
 
@@ -109,45 +116,6 @@ export const ChampionsListRow: React.FC<ChampionsListRowProps> = ({
           }}
         >
           <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{name}</span>
-          {isChampion &&
-            (isSelf ? (
-              <span
-                style={{
-                  padding: '2px 6px',
-                  fontSize: 8.5,
-                  fontWeight: 800,
-                  letterSpacing: '0.08em',
-                  textTransform: 'uppercase',
-                  borderRadius: 4,
-                  fontFamily: 'Geist Mono, monospace',
-                  background: `linear-gradient(135deg, ${GAM.GOLD}, ${GAM.AMBER})`,
-                  color: '#1A1300',
-                  lineHeight: 1,
-                  flexShrink: 0,
-                }}
-              >
-                You
-              </span>
-            ) : (
-              <span
-                style={{
-                  padding: '2px 6px',
-                  fontSize: 8.5,
-                  fontWeight: 800,
-                  letterSpacing: '0.10em',
-                  textTransform: 'uppercase',
-                  borderRadius: 4,
-                  fontFamily: 'Geist Mono, monospace',
-                  background: 'transparent',
-                  color: GAM.DEEP_AMBER,
-                  border: `1px solid rgba(178,104,24,0.35)`,
-                  lineHeight: 1,
-                  flexShrink: 0,
-                }}
-              >
-                Champ
-              </span>
-            ))}
         </div>
         <div
           style={{

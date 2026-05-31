@@ -468,14 +468,14 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
     <PullToRefreshContainer onRefresh={handlePullToRefresh}>
     <div style={{ paddingBottom: 40, background: SLATE_50, minHeight: '100%' }}>
       {/* Community score header — horizontal (matches About Option B) */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 16, padding: '18px 16px 14px' }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 16, padding: '18px 16px 14px' }}>
         <div style={{ display: 'flex', alignItems: 'baseline', gap: 2, flexShrink: 0 }}>
           <span style={{ fontSize: 58, fontWeight: 900, color: INK, letterSpacing: '-0.05em', lineHeight: 1, fontVariantNumeric: 'tabular-nums' }}>
             {communityScore.toFixed(1)}
           </span>
           <span style={{ fontSize: 19, fontWeight: 800, color: 'rgba(15,23,42,0.25)', letterSpacing: '-0.02em' }}>/10</span>
         </div>
-        <div style={{ flex: 1, minWidth: 0 }}>
+        <div style={{ minWidth: 0 }}>
           <div style={{ fontSize: 12, fontWeight: 800, color: AMBER, letterSpacing: '0.14em', textTransform: 'uppercase' as const }}>
             {getScoreTier(communityScore).label}
           </div>
