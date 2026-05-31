@@ -310,7 +310,7 @@ export const ReviewBlockFlat: React.FC<ReviewBlockFlatProps> = ({
               opacity: votingDisabled ? 0.5 : 1,
             }}
           >
-            <span aria-hidden>👍</span>{helpfulCount > 0 && <> {helpfulCount}</>}
+            <ThumbsUp size={13} strokeWidth={2} />{helpfulCount > 0 && <span>{helpfulCount}</span>}
           </button>
           <button
             type="button"
