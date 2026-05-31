@@ -364,7 +364,7 @@ export function LeaderboardBand({
             margin: 0,
           }}
         >
-          <div style={{ flex: 1, padding: '14px 20px 12px', minWidth: 0, display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 8 }}>
+          <div style={{ flex: 1, padding: '6px 20px', minWidth: 0, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
             <span style={{ fontSize: 11, fontWeight: 800, letterSpacing: '0.16em', color: INK_ALPHA_45, textTransform: 'uppercase', flexShrink: 0 }}>
               Defending
             </span>
@@ -374,7 +374,7 @@ export function LeaderboardBand({
             </span>
           </div>
           <div style={{ width: '0.5px', background: INK_15, alignSelf: 'stretch' }} />
-          <div style={{ padding: '14px 20px 12px', flexShrink: 0, display: 'flex', alignItems: 'baseline', gap: 8 }}>
+          <div style={{ padding: '6px 20px', flexShrink: 0, display: 'flex', alignItems: 'center', gap: 8 }}>
             <span style={{ fontSize: 11, fontWeight: 800, letterSpacing: '0.16em', color: INK_ALPHA_45, textTransform: 'uppercase' }}>
               Field
             </span>
