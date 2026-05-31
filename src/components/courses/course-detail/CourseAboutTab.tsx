@@ -122,7 +122,7 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
   };
 
   return (
-    <div className="animate-in fade-in duration-200" style={{ paddingBottom: 80, background: '#F8FAFC' }}>
+    <div className="animate-in fade-in duration-200" style={{ paddingBottom: 80, background: SLATE_50 }}>
       {/* 1. Location breadcrumb pills */}
       <CourseLocationPills course={course} />
 
