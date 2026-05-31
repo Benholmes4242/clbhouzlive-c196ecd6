@@ -248,9 +248,9 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
               <SectionLabel text="Course Details" />
               <div style={{ display: 'grid', gridTemplateColumns: `repeat(${Math.min(stats.length, 4)}, 1fr)`, padding: '0 8px' }}>
                 {stats.slice(0, 4).map((s, i, arr) => (
-                  <div key={s.label} style={{ textAlign: 'center', padding: '4px 0', borderRight: i < arr.length - 1 ? '0.5px solid rgba(15,23,42,0.08)' : 'none' }}>
-                    <div style={{ fontSize: 22, fontWeight: 900, color: '#F7931E', letterSpacing: '-0.04em' }}>{s.value}</div>
-                    <div style={{ fontSize: 8, fontWeight: 700, color: '#94A3B8', letterSpacing: '0.08em', textTransform: 'uppercase' as const, marginTop: 3 }}>{s.label}</div>
+                  <div key={s.label} style={{ textAlign: 'center', padding: '4px 0', borderRight: i < arr.length - 1 ? `0.5px solid ${HAIRLINE_INK_8}` : 'none' }}>
+                    <div style={{ fontSize: 22, fontWeight: 900, color: AMBER, letterSpacing: '-0.04em' }}>{s.value}</div>
+                    <div style={{ fontSize: 8, fontWeight: 700, color: INK_FAINT, letterSpacing: '0.08em', textTransform: 'uppercase' as const, marginTop: 3 }}>{s.label}</div>
                   </div>
                 ))}
               </div>
