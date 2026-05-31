@@ -10,10 +10,12 @@ import { Link } from 'react-router-dom';
 import { BatchPlayerAvatar } from '../PlayerAvatar';
 import { RoundSelector } from './RoundSelector';
 import { EditorialEmpty } from './EditorialEmpty';
-import { useTourTeeTimesEnriched } from '../../hooks/useTourHubData';
+import { useTourTeeTimesEnriched, useTourLeaderboard } from '../../hooks/useTourHubData';
 import CountryFlag from '@/components/ui/country-flag';
 import { playerRoute } from '../../routes';
-import { INK, INK_FAINT, INK_MUTE, INK_TINT_02, INK_TINT_05, INK_TINT_06, INK_TINT_07, SURFACE } from '../../_shared/tokens';
+import { AMBER, INK, INK_FAINT, INK_MUTE, INK_TINT_02, INK_TINT_05, INK_TINT_06, INK_TINT_07, SCORE_OVER_PAR_LIGHT, SCORE_UNDER_PAR_LIGHT, SURFACE } from '../../_shared/tokens';
+
+type ScoreInfo = { score: number | null; position: number | null; tied: boolean; status: string | null };
 
 interface TeeTimesTabProps {
   tournamentId: string;
@@ -92,11 +94,15 @@ interface TeeTimeGroup {
   }>;
 }
 
-function TeeTimeGroupCard({ group, index, searchQuery, tournamentName }: { group: TeeTimeGroup; index: number; searchQuery: string; tournamentName?: string }) {
+function TeeTimeGroupCard({ group, searchQuery, tournamentName, scoreByPlayer, showScores, isFeatured }: { group: TeeTimeGroup; index: number; searchQuery: string; tournamentName?: string; scoreByPlayer: Map<string, ScoreInfo>; showScores: boolean; isFeatured?: boolean }) {
   const hasMatchingPlayer = searchQuery.trim() && group.players.some(p => p.name.toLowerCase().includes(searchQuery.toLowerCase()));
-
+  const accent = hasMatchingPlayer || isFeatured;
   return (
-    <div style={{ borderBottom: `0.5px solid ${INK_TINT_07}`, background: hasMatchingPlayer ? 'rgba(247,147,30,0.03)' : 'transparent' }}>
+    <div style={{
+      borderBottom: `0.5px solid ${INK_TINT_07}`,
+      borderLeft: accent ? `3px solid ${AMBER}` : '3px solid transparent',
+      background: accent ? 'rgba(247,147,30,0.03)' : 'transparent',
+    }}>
       {/* Time + hole row */}
       <div style={{ display: 'flex', alignItems: 'center', padding: '11px 20px 5px' }}>
         <span style={{ fontSize: '14px', fontWeight: 800, color: INK, width: '72px', flexShrink: 0, fontVariantNumeric: 'tabular-nums' }}>
@@ -106,21 +112,43 @@ function TeeTimeGroupCard({ group, index, searchQuery, tournamentName }: { group
           Hole {group.startingHole}
         </span>
         {group.backNine && <span style={{ fontSize: '10px', color: INK_FAINT, marginLeft: '6px' }}>Back 9</span>}
+        {isFeatured && !hasMatchingPlayer && (
+          <span style={{ marginLeft: '8px', fontSize: '9px', fontWeight: 800, color: AMBER, letterSpacing: '0.14em', textTransform: 'uppercase' as const }}>Featured</span>
+        )}
       </div>
       {/* Players */}
       <div style={{ padding: '0 20px 10px 72px' }}>
-        {group.players.map((player, playerIdx) => (
-          <Link
-            key={player.id || playerIdx}
-            {...playerRoute(player.playerId || player.id || '', tournamentName ? { kind: 'tournament', tournamentName } : undefined)}
-            style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '4px 0', textDecoration: 'none' }}
-            className="active:opacity-70 transition-opacity"
-          >
-            <BatchPlayerAvatar playerId={player.playerId || player.id || ''} playerName={player.name} size="sm" />
-            <span style={{ fontSize: '14px', fontWeight: 600, color: INK }}>{player.name}</span>
-            {player.country && <CountryFlag country={player.country} size="sm" />}
-          </Link>
-        ))}
+        {group.players.map((player, playerIdx) => {
+          const pid = player.playerId || player.id || '';
+          const s = showScores ? scoreByPlayer.get(pid) : undefined;
+          return (
+            <Link
+              key={player.id || playerIdx}
+              {...playerRoute(pid, tournamentName ? { kind: 'tournament', tournamentName } : undefined)}
+              style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '4px 0', textDecoration: 'none' }}
+              className="active:opacity-70 transition-opacity"
+            >
+              <BatchPlayerAvatar playerId={pid} playerName={player.name} size="sm" />
+              <span style={{ fontSize: '14px', fontWeight: 600, color: INK, flex: 1, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const }}>{player.name}</span>
+              {player.country && <CountryFlag country={player.country} size="sm" />}
+              {s && (() => {
+                const isMissed = s.status === 'CUT' || s.status === 'WD' || s.status === 'DQ' || s.status === 'MC';
+                if (isMissed) {
+                  return <span style={{ fontSize: '12px', fontWeight: 700, color: INK_FAINT, width: '64px', textAlign: 'right' as const, flexShrink: 0 }}>{s.status === 'CUT' || s.status === 'MC' ? 'MC' : s.status}</span>;
+                }
+                const val = s.score == null ? '—' : s.score === 0 ? 'E' : s.score < 0 ? String(s.score) : `+${s.score}`;
+                const color = s.score == null ? INK_FAINT : s.score < 0 ? SCORE_UNDER_PAR_LIGHT : s.score > 0 ? SCORE_OVER_PAR_LIGHT : INK_FAINT;
+                const posStr = s.position == null ? '' : `${s.tied ? 'T' : ''}${s.position}`;
+                return (
+                  <span style={{ display: 'inline-flex', alignItems: 'baseline', gap: 6, width: '64px', justifyContent: 'flex-end', flexShrink: 0 }}>
+                    {posStr && <span style={{ fontSize: '10px', fontWeight: 700, color: INK_FAINT, fontVariantNumeric: 'tabular-nums' }}>{posStr}</span>}
+                    <span style={{ fontSize: '14px', fontWeight: 800, color, fontVariantNumeric: 'tabular-nums' }}>{val}</span>
+                  </span>
+                );
+              })()}
+            </Link>
+          );
+        })}
       </div>
     </div>
   );
@@ -132,6 +160,21 @@ export function TeeTimesTab({ tournamentId, tournamentName, isCompleted }: TeeTi
   
   const roundNumber = parseInt(selectedRound.replace('R', ''));
   const { data: teeTimes, isLoading } = useTourTeeTimesEnriched(tournamentId, roundNumber);
+  const { data: lb } = useTourLeaderboard(tournamentId);
+  const scoreByPlayer = useMemo(() => {
+    const m = new Map<string, ScoreInfo>();
+    for (const row of (lb ?? [])) {
+      const pid = (row as any).player?.id;
+      if (pid) m.set(pid, {
+        score: (row as any).score ?? null,
+        position: (row as any).position ?? null,
+        tied: (row as any).position_tied ?? false,
+        status: (row as any).status ?? null,
+      });
+    }
+    return m;
+  }, [lb]);
+  const showScores = scoreByPlayer.size > 0;
 
   const { data: allTeeTimes } = useTourTeeTimesEnriched(tournamentId);
   const availableRounds = useMemo(() => {
@@ -201,7 +244,21 @@ export function TeeTimesTab({ tournamentId, tournamentName, isCompleted }: TeeTi
     return <TeeTimesEmpty isCompleted={isCompleted} roundLabel={!availableRounds.includes(selectedRound) ? `Round ${roundNumber}` : undefined} />;
   }
 
+  const featuredTeeTime = useMemo(() => {
+    if (!showScores) return null;
+    let bestPos = Infinity; let bestTime: string | null = null;
+    for (const g of groups) {
+      for (const p of g.players) {
+        const pos = scoreByPlayer.get(p.playerId || p.id || '')?.position ?? Infinity;
+        if (pos != null && pos < bestPos) { bestPos = pos; bestTime = g.teeTime; }
+      }
+    }
+    return bestTime;
+  }, [groups, scoreByPlayer, showScores]);
+
   const teeTimeDate = groups[0]?.teeTime ? format(new Date(groups[0].teeTime), 'EEE, MMM d, yyyy') : null;
+  const firstOff = groups[0]?.teeTime ? format(new Date(groups[0].teeTime), 'h:mm a') : null;
+  const lastOff = groups.length > 0 ? format(new Date(groups[groups.length - 1].teeTime), 'h:mm a') : null;
 
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.3 }}>
@@ -242,15 +299,20 @@ export function TeeTimesTab({ tournamentId, tournamentName, isCompleted }: TeeTi
         )}
       </div>
 
-      {/* Column headers */}
-      <div style={{ display: 'flex', alignItems: 'center', padding: '5px 20px', background: INK_TINT_02, borderTop: `0.5px solid ${INK_TINT_07}`, borderBottom: `0.5px solid ${INK_TINT_07}` }}>
-        <span style={{ fontSize: '9px', fontWeight: 800, color: INK_MUTE, letterSpacing: '0.14em', width: '72px', flexShrink: 0 }}>TIME</span>
-        <span style={{ fontSize: '9px', fontWeight: 800, color: INK_MUTE, letterSpacing: '0.14em', width: '52px', flexShrink: 0 }}>HOLE</span>
-        <span style={{ fontSize: '9px', fontWeight: 800, color: INK_MUTE, letterSpacing: '0.14em', flex: 1 }}>PLAYERS</span>
+      {/* Caption: window of tee times */}
+      <div style={{ padding: '8px 20px', display: 'flex', alignItems: 'baseline', justifyContent: 'space-between' }}>
+        <span style={{ fontSize: '9px', fontWeight: 800, color: INK_MUTE, letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>
+          Tee Times · {selectedRound}
+        </span>
+        {firstOff && lastOff && (
+          <span style={{ fontSize: '11px', fontWeight: 600, color: INK_FAINT, fontVariantNumeric: 'tabular-nums' }}>
+            {firstOff} – {lastOff}
+          </span>
+        )}
       </div>
 
       {/* Groups */}
-      <div style={{ background: SURFACE, borderBottom: `1px solid ${INK_TINT_07}` }}>
+      <div style={{ background: SURFACE, borderTop: `0.5px solid ${INK_TINT_07}`, borderBottom: `1px solid ${INK_TINT_07}` }}>
         {filteredGroups.length === 0 && searchQuery && (
           <div style={{ textAlign: 'center' as const, padding: '24px 20px' }}>
             <p style={{ fontSize: '14px', color: INK_FAINT }}>No players matching "{searchQuery}"</p>
@@ -264,13 +326,13 @@ export function TeeTimesTab({ tournamentId, tournamentName, isCompleted }: TeeTi
                 Hole {hole} Start
               </p>
               {holeGroups.map((group, idx) => (
-                <TeeTimeGroupCard key={`${group.teeTime}-${idx}`} group={group} index={idx} searchQuery={searchQuery} tournamentName={tournamentName} />
+                <TeeTimeGroupCard key={`${group.teeTime}-${idx}`} group={group} index={idx} searchQuery={searchQuery} tournamentName={tournamentName} scoreByPlayer={scoreByPlayer} showScores={showScores} isFeatured={group.teeTime === featuredTeeTime} />
               ))}
             </div>
           ))
         ) : (
           filteredGroups.map((group, idx) => (
-            <TeeTimeGroupCard key={`${group.teeTime}-${idx}`} group={group} index={idx} searchQuery={searchQuery} tournamentName={tournamentName} />
+            <TeeTimeGroupCard key={`${group.teeTime}-${idx}`} group={group} index={idx} searchQuery={searchQuery} tournamentName={tournamentName} scoreByPlayer={scoreByPlayer} showScores={showScores} isFeatured={group.teeTime === featuredTeeTime} />
           ))
         )}
       </div>
