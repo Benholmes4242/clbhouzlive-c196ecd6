@@ -507,210 +507,214 @@ export function CinematicFrame({
         style={{ position: 'absolute', inset: 0, background: CINEMATIC_SCRIM, zIndex: 2 }}
       />
 
-      {/* Top meta row */}
+      {/* Flex content column — top meta, spacer, title, capsule */}
       <div
         style={{
           position: 'absolute',
-          top: 18,
-          left: 18,
-          right: 18,
-          zIndex: 4,
+          inset: 0,
+          zIndex: 3,
           display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          gap: 12,
+          flexDirection: 'column',
+          padding: '18px 14px 16px',
         }}
       >
-        {roundLabel ? (
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            {isLive && (
+        {/* Top meta row */}
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            gap: 12,
+            padding: '0 4px',
+          }}
+        >
+          {roundLabel ? (
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              {isLive && (
+                <span
+                  aria-hidden="true"
+                  className="hybrid-live-pulse"
+                  style={{
+                    width: 7,
+                    height: 7,
+                    borderRadius: '50%',
+                    background: '#22C55E',
+                    boxShadow: '0 0 0 3px rgba(34,197,94,0.25)',
+                    display: 'inline-block',
+                    flexShrink: 0,
+                  }}
+                />
+              )}
               <span
-                aria-hidden="true"
-                className="hybrid-live-pulse"
                 style={{
-                  width: 7,
-                  height: 7,
-                  borderRadius: '50%',
-                  background: '#22C55E',
-                  boxShadow: '0 0 0 3px rgba(34,197,94,0.25)',
-                  display: 'inline-block',
-                  flexShrink: 0,
+                  ...NUMERIC_STYLE,
+                  fontSize: 11,
+                  fontWeight: 700,
+                  letterSpacing: '0.14em',
+                  color: 'white',
+                  textShadow: '0 1px 3px rgba(0,0,0,0.45)',
                 }}
-              />
-            )}
+              >
+                {roundLabel}
+              </span>
+            </div>
+          ) : <span />}
+          {tourLabel && (
             <span
               style={{
                 ...NUMERIC_STYLE,
                 fontSize: 11,
                 fontWeight: 700,
                 letterSpacing: '0.14em',
-                color: 'white',
+                color: 'rgba(255,255,255,0.65)',
                 textShadow: '0 1px 3px rgba(0,0,0,0.45)',
-              }}
-            >
-              {roundLabel}
-            </span>
-          </div>
-        ) : <span />}
-        {tourLabel && (
-          <span
-            style={{
-              ...NUMERIC_STYLE,
-              fontSize: 11,
-              fontWeight: 700,
-              letterSpacing: '0.14em',
-              color: 'rgba(255,255,255,0.65)',
-              textShadow: '0 1px 3px rgba(0,0,0,0.45)',
-              textTransform: 'uppercase',
-              whiteSpace: 'nowrap',
-            }}
-          >
-            {tourLabel.toUpperCase()}
-          </span>
-        )}
-      </div>
-
-      {/* Title block — sits above the capsule */}
-      <div
-        style={{
-          position: 'absolute',
-          left: 20,
-          right: 20,
-          bottom: 200,
-          zIndex: 3,
-          display: 'flex',
-          flexDirection: 'column',
-          gap: 10,
-        }}
-      >
-        {metaLine && (
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: 8,
-              fontSize: 13,
-              fontWeight: 600,
-              color: 'rgba(255,255,255,0.72)',
-              textShadow: '0 1px 3px rgba(0,0,0,0.5)',
-            }}
-          >
-            <span
-              style={{
-                overflow: 'hidden',
-                textOverflow: 'ellipsis',
+                textTransform: 'uppercase',
                 whiteSpace: 'nowrap',
-                minWidth: 0,
               }}
             >
-              {metaLine}
+              {tourLabel.toUpperCase()}
             </span>
-            {isMajor && (
-              <Star
-                size={12}
-                fill={GOLD}
-                color={GOLD}
-                strokeWidth={0}
-                style={{ flexShrink: 0 }}
-              />
-            )}
-            {isSignature && (
+          )}
+        </div>
+
+        {/* Spacer absorbs slack so title+capsule sit at the base */}
+        <div style={{ flex: 1, minHeight: 16 }} />
+
+        {/* Title block */}
+        <div
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 10,
+            padding: '0 6px',
+            marginBottom: 16,
+          }}
+        >
+          {metaLine && (
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 8,
+                fontSize: 13,
+                fontWeight: 600,
+                color: 'rgba(255,255,255,0.72)',
+                textShadow: '0 1px 3px rgba(0,0,0,0.5)',
+              }}
+            >
               <span
                 style={{
-                  color: AMBER,
-                  fontSize: 9,
-                  fontWeight: 700,
-                  letterSpacing: '0.18em',
-                  textTransform: 'uppercase',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  whiteSpace: 'nowrap',
+                  minWidth: 0,
                 }}
               >
-                Signature
+                {metaLine}
               </span>
-            )}
-          </div>
-        )}
-        <h1
-          style={{
-            margin: 0,
-            color: 'white',
-            fontFamily: "'Geist', -apple-system, BlinkMacSystemFont, sans-serif",
-            fontSize: 44,
-            fontWeight: 800,
-            letterSpacing: '-0.03em',
-            lineHeight: 0.98,
-            textShadow: '0 2px 30px rgba(0,0,0,0.40)',
-            textWrap: 'balance' as any,
-            wordBreak: 'break-word',
-          }}
-        >
-          {title}
-        </h1>
-      </div>
-
-      {/* Floating glass capsule */}
-      <div
-        className="cinematic-capsule"
-        style={{
-          position: 'absolute',
-          left: 14,
-          right: 14,
-          bottom: 16,
-          zIndex: 5,
-          borderRadius: 22,
-          padding: 6,
-          background: 'rgba(20,28,40,0.55)',
-          WebkitBackdropFilter: 'blur(20px)',
-          backdropFilter: 'blur(20px)',
-          border: '1px solid rgba(255,255,255,0.12)',
-          boxShadow: '0 8px 40px rgba(0,0,0,0.4)',
-        }}
-      >
-        {slotNodes.length > 0 ? (
-          <>{slotNodes}</>
-        ) : (
-          <div
+              {isMajor && (
+                <Star
+                  size={12}
+                  fill={GOLD}
+                  color={GOLD}
+                  strokeWidth={0}
+                  style={{ flexShrink: 0 }}
+                />
+              )}
+              {isSignature && (
+                <span
+                  style={{
+                    color: AMBER,
+                    fontSize: 9,
+                    fontWeight: 700,
+                    letterSpacing: '0.18em',
+                    textTransform: 'uppercase',
+                  }}
+                >
+                  Signature
+                </span>
+              )}
+            </div>
+          )}
+          <h1
             style={{
-              padding: '14px 12px',
-              fontSize: 13,
-              fontWeight: 600,
-              color: 'rgba(255,255,255,0.7)',
-              textAlign: 'center',
+              margin: 0,
+              color: 'white',
+              fontFamily: "'Geist', -apple-system, BlinkMacSystemFont, sans-serif",
+              fontSize: 44,
+              fontWeight: 800,
+              letterSpacing: '-0.03em',
+              lineHeight: 0.98,
+              textShadow: '0 2px 30px rgba(0,0,0,0.40)',
+              textWrap: 'balance' as any,
+              wordBreak: 'break-word',
             }}
           >
-            Leaderboard updating…
-          </div>
-        )}
+            {title}
+          </h1>
+        </div>
 
-        {/* Footer CTA */}
-        <button
-          type="button"
-          onClick={onCtaTap}
+        {/* Floating glass capsule */}
+        <div
+          className="cinematic-capsule"
           style={{
-            width: '100%',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            gap: 4,
-            padding: '11px 10px 9px',
-            marginTop: 2,
-            background: 'transparent',
-            border: 'none',
-            borderTop: '0.5px solid rgba(255,255,255,0.08)',
-            color: AMBER,
-            fontSize: 12.5,
-            fontWeight: 700,
-            letterSpacing: '0.04em',
-            textTransform: 'uppercase',
-            cursor: 'pointer',
-            fontFamily: "'Geist', -apple-system, BlinkMacSystemFont, sans-serif",
+            borderRadius: 22,
+            padding: 6,
+            background: 'rgba(20,28,40,0.55)',
+            WebkitBackdropFilter: 'blur(20px)',
+            backdropFilter: 'blur(20px)',
+            border: '1px solid rgba(255,255,255,0.12)',
+            boxShadow: '0 8px 40px rgba(0,0,0,0.4)',
           }}
         >
-          <span>
-            Full leaderboard{fieldSize > 0 ? ` · ${fieldSize} players` : ''}
-          </span>
-          <ChevronRight size={14} strokeWidth={2.5} />
-        </button>
+          {slotNodes.length > 0 ? (
+            <>{slotNodes}</>
+          ) : (
+            <div
+              style={{
+                padding: '14px 12px',
+                fontSize: 13,
+                fontWeight: 600,
+                color: 'rgba(255,255,255,0.7)',
+                textAlign: 'center',
+              }}
+            >
+              Leaderboard updating…
+            </div>
+          )}
+
+          {/* Footer CTA */}
+          <button
+            type="button"
+            onClick={onCtaTap}
+            style={{
+              width: '100%',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: 4,
+              padding: '11px 10px 9px',
+              marginTop: 2,
+              background: 'transparent',
+              border: 'none',
+              borderTop: '0.5px solid rgba(255,255,255,0.08)',
+              color: AMBER,
+              fontSize: 12.5,
+              fontWeight: 700,
+              letterSpacing: '0.04em',
+              textTransform: 'uppercase',
+              cursor: 'pointer',
+              fontFamily: "'Geist', -apple-system, BlinkMacSystemFont, sans-serif",
+            }}
+          >
+            <span>
+              Full leaderboard{fieldSize > 0 ? ` · ${fieldSize} players` : ''}
+            </span>
+            <ChevronRight size={14} strokeWidth={2.5} />
+          </button>
+        </div>
       </div>
     </div>
   );
 }
+
