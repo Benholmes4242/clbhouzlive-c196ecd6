@@ -191,7 +191,7 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
               {shouldShowReadMore && (
                 <button
                   onClick={() => setShowFullDescription(!showFullDescription)}
-                  style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 12, fontWeight: 600, color: '#94A3B8', padding: '8px 0 0', display: 'flex', alignItems: 'center', gap: 4 }}
+                  style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 12, fontWeight: 600, color: INK_FAINT, padding: '8px 0 0', display: 'flex', alignItems: 'center', gap: 4 }}
                 >
                   {showFullDescription ? 'Show less ↑' : 'Read more ↓'}
                 </button>
