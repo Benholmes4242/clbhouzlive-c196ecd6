@@ -5,9 +5,6 @@ import { Loader2 } from 'lucide-react';
 import type { FeedPost } from '@/components/media-system/types/media';
 import { ExploreTile } from './ExploreTile';
 import ExploreGridSkeleton from './ExploreGridSkeleton';
-import { TrendingCoursesStrip } from './TrendingCoursesStrip';
-
-const TRENDING_AFTER = 6;
 
 interface ExploreGridProps {
   posts: FeedPost[];
@@ -118,31 +115,24 @@ export default function ExploreGrid({
         {restPosts.map((post, i) => {
           const idx = tileIndex++;
           const isFeature = i > 2 && i % 7 === 0;
-          const showTrendingAfter = idx === TRENDING_AFTER - 1;
           return (
-            <div key={post.mediaItems[0]?.id || post.id} style={{ display: 'contents' }}>
-              <div
-                style={
-                  isFeature
-                    ? { gridColumn: 'span 2', gridRow: 'span 2', position: 'relative', aspectRatio: '1 / 1' }
-                    : { position: 'relative', aspectRatio: '1 / 1' }
-                }
-              >
-                <ExploreTile
-                  post={post}
-                  index={idx}
-                  feature={isFeature}
-                  allPosts={coursePosts}
-                  fetchNextPage={fetchNextPage}
-                  hasNextPage={hasNextPage}
-                  isFetchingNextPage={isFetchingNextPage}
-                />
-              </div>
-              {showTrendingAfter && (
-                <div style={{ gridColumn: '1 / -1' }}>
-                  <TrendingCoursesStrip activeRegion={activeRegion} />
-                </div>
-              )}
+            <div
+              key={post.mediaItems[0]?.id || post.id}
+              style={
+                isFeature
+                  ? { gridColumn: 'span 2', gridRow: 'span 2', position: 'relative', aspectRatio: '1 / 1' }
+                  : { position: 'relative', aspectRatio: '1 / 1' }
+              }
+            >
+              <ExploreTile
+                post={post}
+                index={idx}
+                feature={isFeature}
+                allPosts={coursePosts}
+                fetchNextPage={fetchNextPage}
+                hasNextPage={hasNextPage}
+                isFetchingNextPage={isFetchingNextPage}
+              />
             </div>
           );
         })}

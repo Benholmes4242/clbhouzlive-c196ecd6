@@ -70,19 +70,21 @@ export default function ExploreTabContent({ embedded: _embedded = false }: Explo
 
       <ExploreSectionHeader title="More to explore" sub="The full course feed" />
 
-      <ExploreGrid
-        posts={posts}
-        coursePosts={coursePosts}
-        isLoading={isLoading}
-        isError={isError}
-        hasNextPage={hasNextPage}
-        isFetchingNextPage={isFetchingNextPage}
-        fetchNextPage={fetchNextPage}
-        refetch={refetch}
-        gridRef={gridRef}
-        activeRegion={activeRegion}
-        onRegionChange={handleRegionChange}
-      />
+      <div style={{ marginLeft: -16, marginRight: -16 }}>
+        <ExploreGrid
+          posts={posts}
+          coursePosts={coursePosts}
+          isLoading={isLoading}
+          isError={isError}
+          hasNextPage={hasNextPage}
+          isFetchingNextPage={isFetchingNextPage}
+          fetchNextPage={fetchNextPage}
+          refetch={refetch}
+          gridRef={gridRef}
+          activeRegion={activeRegion}
+          onRegionChange={handleRegionChange}
+        />
+      </div>
 
       <ExploreAutoplay posts={coursePosts} gridRef={gridRef} />
     </div>

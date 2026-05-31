@@ -3,7 +3,7 @@ import { Plus } from 'lucide-react';
 import { useBucketListCourses } from '@/hooks/useBucketListCourses';
 import { ExploreSectionHeader } from './ExploreSectionHeader';
 
-export function BucketListStrip({ embedded = false }: { embedded?: boolean } = {}) {
+export function BucketListStrip({ embedded = false, label }: { embedded?: boolean; label?: string } = {}) {
   const navigate = useNavigate();
   const { data: courses, isLoading } = useBucketListCourses();
 
