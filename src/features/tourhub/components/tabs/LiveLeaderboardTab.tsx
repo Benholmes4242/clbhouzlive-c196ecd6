@@ -169,7 +169,7 @@ export function LiveLeaderboardTab() {
 
       {isLoadingBoard && (!leaderboard || (leaderboard as any[]).length === 0) ? (
         <LiveLeaderboardSkeleton />
-      ) : (leaderboard?.length ?? 0) === 0 ? (
+      ) : ((leaderboard as any[] | undefined)?.length ?? 0) === 0 ? (
         <EditorialEmpty
           eyebrow="Leaderboard"
           title="Scoring not yet posted"
