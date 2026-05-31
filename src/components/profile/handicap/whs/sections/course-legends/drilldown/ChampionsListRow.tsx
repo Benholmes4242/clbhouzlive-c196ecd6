@@ -79,19 +79,25 @@ export const ChampionsListRow: React.FC<ChampionsListRowProps> = ({
         boxShadow: 'inset 0 -0.5px 0 rgba(15,23,42,0.07)',
       }}
     >
-      <div
-        style={{
-          fontFamily: 'Geist Mono, monospace',
-          fontSize: 15,
-          fontWeight: 700,
-          fontVariantNumeric: 'tabular-nums',
-          color: rank === 1 ? GAM.AMBER : 'var(--hcp-t-30, #b3bdca)',
-          lineHeight: 1,
-          textAlign: 'right',
-        }}
-      >
-        {rank}
-      </div>
+      {rank === 1 ? (
+        <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', lineHeight: 0 }} aria-label="Champion">
+          <Crown size={15} strokeWidth={2.5} fill={GAM.GOLD} style={{ color: GAM.DEEP_AMBER, flexShrink: 0 }} />
+        </div>
+      ) : (
+        <div
+          style={{
+            fontFamily: 'Geist Mono, monospace',
+            fontSize: 15,
+            fontWeight: 700,
+            fontVariantNumeric: 'tabular-nums',
+            color: 'var(--hcp-t-30, #b3bdca)',
+            lineHeight: 1,
+            textAlign: 'right',
+          }}
+        >
+          {rank}
+        </div>
+      )}
 
       {avatar}
 
