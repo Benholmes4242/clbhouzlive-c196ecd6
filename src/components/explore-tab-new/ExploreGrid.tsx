@@ -1,6 +1,7 @@
 import { useRef, useEffect, useCallback, type RefObject } from 'react';
 import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
 import { useInView } from 'react-intersection-observer';
+import { Loader2 } from 'lucide-react';
 import type { FeedPost } from '@/components/media-system/types/media';
 import { ExploreTile } from './ExploreTile';
 import ExploreGridSkeleton from './ExploreGridSkeleton';
@@ -94,36 +95,66 @@ export default function ExploreGrid({
     );
   }
 
+  const [heroPost, ...restPosts] = coursePosts;
+  let tileIndex = 0;
+
   return (
-    <>
-      {/* Grid */}
-      <div ref={gridRef} className="grid grid-cols-2 gap-[1px] px-[1px]">
-        {coursePosts.map((post, index) => (
-          <div className="contents" key={post.id}>
-            <ExploreTile
-              post={post}
-              index={index}
-              allPosts={coursePosts}
-              fetchNextPage={fetchNextPage}
-              hasNextPage={hasNextPage}
-              isFetchingNextPage={isFetchingNextPage}
-            />
-
-            {index === TRENDING_AFTER - 1 && (
-              <TrendingCoursesStrip activeRegion={activeRegion} />
-            )}
-          </div>
-        ))}
-      </div>
-
-      {/* Infinite scroll sentinel */}
-      <div ref={sentinelRef} className="h-1" />
-
-      {isFetchingNextPage && (
-        <div className="flex justify-center py-6">
-          <div className="h-5 w-5 rounded-full border-2 border-muted-foreground border-t-transparent animate-spin" />
+    <div ref={gridRef} style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+      {heroPost && (
+        <div style={{ position: 'relative', width: '100%', aspectRatio: '16 / 9', overflow: 'hidden' }}>
+          <ExploreTile
+            post={heroPost}
+            index={tileIndex++}
+            variant="hero"
+            allPosts={coursePosts}
+            fetchNextPage={fetchNextPage}
+            hasNextPage={hasNextPage}
+            isFetchingNextPage={isFetchingNextPage}
+          />
         </div>
       )}
-    </>
+
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 2, gridAutoFlow: 'dense' }}>
+        {restPosts.map((post, i) => {
+          const idx = tileIndex++;
+          const isFeature = i > 2 && i % 7 === 0;
+          const showTrendingAfter = idx === TRENDING_AFTER - 1;
+          return (
+            <div key={post.mediaItems[0]?.id || post.id} style={{ display: 'contents' }}>
+              <div
+                style={
+                  isFeature
+                    ? { gridColumn: 'span 2', gridRow: 'span 2', position: 'relative', aspectRatio: '1 / 1' }
+                    : { position: 'relative', aspectRatio: '1 / 1' }
+                }
+              >
+                <ExploreTile
+                  post={post}
+                  index={idx}
+                  feature={isFeature}
+                  allPosts={coursePosts}
+                  fetchNextPage={fetchNextPage}
+                  hasNextPage={hasNextPage}
+                  isFetchingNextPage={isFetchingNextPage}
+                />
+              </div>
+              {showTrendingAfter && (
+                <div style={{ gridColumn: '1 / -1' }}>
+                  <TrendingCoursesStrip activeRegion={activeRegion} />
+                </div>
+              )}
+            </div>
+          );
+        })}
+
+        <div ref={sentinelRef} style={{ gridColumn: '1 / -1', height: 1 }} />
+
+        {isFetchingNextPage && (
+          <div style={{ gridColumn: '1 / -1', display: 'flex', justifyContent: 'center', padding: '16px 0' }}>
+            <Loader2 className="w-5 h-5 animate-spin text-[#f59e0b]" />
+          </div>
+        )}
+      </div>
+    </div>
   );
 }
