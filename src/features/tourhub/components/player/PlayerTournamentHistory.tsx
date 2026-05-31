@@ -16,7 +16,6 @@ import {
   INK_MUTE,
   INK_TINT_02,
   INK_TINT_07,
-  SCORE_OVER_PAR_LIGHT,
   SURFACE,
 } from '../../_shared/tokens';
 
