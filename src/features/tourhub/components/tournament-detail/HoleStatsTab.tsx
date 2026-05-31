@@ -84,6 +84,8 @@ function HoleStatsEmpty({ isCompleted, roundLabel }: { isCompleted?: boolean; ro
   if (isCompleted) {
     return (
       <EditorialEmpty
+        icon={<BarChart3 size={28} strokeWidth={1.8} color="#64748b" />}
+        tint="slate"
         eyebrow="Holes"
         title="Hole statistics not available"
         body="Detailed hole-by-hole statistics weren't captured for this tournament."
@@ -93,6 +95,7 @@ function HoleStatsEmpty({ isCompleted, roundLabel }: { isCompleted?: boolean; ro
   if (roundLabel) {
     return (
       <EditorialEmpty
+        icon={<BarChart3 size={28} strokeWidth={1.8} color={AMBER} />}
         eyebrow={roundLabel}
         title={`${roundLabel} statistics will appear during play`}
         body="Hole-by-hole numbers populate as players post scores in this round."
@@ -101,6 +104,7 @@ function HoleStatsEmpty({ isCompleted, roundLabel }: { isCompleted?: boolean; ro
   }
   return (
     <EditorialEmpty
+      icon={<BarChart3 size={28} strokeWidth={1.8} color={AMBER} />}
       eyebrow="Holes"
       title="Hole-by-hole stats appear once play begins"
       body="Scoring distributions, hardest and easiest holes, and the field average will populate the moment the first round goes live."
