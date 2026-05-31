@@ -92,12 +92,6 @@ export function LeaderboardCard({
             <span style={{ fontSize: '9px', fontWeight: 800, color: INK_MUTE, letterSpacing: '0.16em', textTransform: 'uppercase' as const, flex: 1 }}>
               {title}
             </span>
-            {onViewAll && (
-              <button onClick={onViewAll} style={{ fontSize: '11px', fontWeight: 800, color: INK, background: 'none', border: 'none', cursor: 'pointer', padding: 0, letterSpacing: '-0.005em', display: 'inline-flex', alignItems: 'center', gap: 2 }}>
-                View all
-                <ChevronRight size={14} strokeWidth={2.25} />
-              </button>
-            )}
           </div>
         </div>
       )}

@@ -120,6 +120,9 @@ export const GOLD_TINT_10 = 'rgba(255,184,0,0.10)';          // medium gold tint
 export const GOLD_GLOW = '0 0 24px rgba(255,184,0,0.10), 0 1px 3px rgba(0,0,0,0.04)';
 export const GOLD_GLOW_DROP = '0 4px 12px rgba(255,184,0,0.20)';  // tighter gold drop shadow — champion-treatment photo/logo tiles — 4 cross-app surfaces
 
+// Liquid-glass backdrop blur for photo-overlay pills (hero, masthead).
+export const GLASS_BLUR = 'blur(14px) saturate(140%)';
+
 // ============================================================================
 // LEADER_GOLD (hero leaderboard #1 row tint — distinct from celebratory GOLD)
 // ============================================================================
