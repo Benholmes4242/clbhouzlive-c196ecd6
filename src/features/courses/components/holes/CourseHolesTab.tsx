@@ -99,7 +99,7 @@ export const CourseHolesTab: React.FC<Props> = ({ courseId }) => {
             display: 'inline-flex',
             gap: 2,
             background: '#F1F5F9',
-            border: '1px solid rgba(15,23,42,0.08)',
+            border: `1px solid ${HAIRLINE_INK_8}`,
             borderRadius: 999,
             padding: 3,
           }}
