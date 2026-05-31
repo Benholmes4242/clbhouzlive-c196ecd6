@@ -467,13 +467,13 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
       {/* Community score header — stacked & centered */}
       <div style={{ padding: '18px 16px 14px', textAlign: 'center' }}>
         
-        <div style={{ fontSize: 56, fontWeight: 900, color: '#0F172A', letterSpacing: '-0.05em', fontVariantNumeric: 'tabular-nums', lineHeight: 1 }}>
+        <div style={{ fontSize: 56, fontWeight: 900, color: INK, letterSpacing: '-0.05em', fontVariantNumeric: 'tabular-nums', lineHeight: 1 }}>
           {communityScore.toFixed(1)}
         </div>
         <div style={{ fontSize: 12, fontWeight: 800, color: '#c97a10', letterSpacing: '0.15em', textTransform: 'uppercase' as const, marginTop: 6 }}>
           {getScoreTier(communityScore).label}
         </div>
-        <div style={{ fontSize: 11, color: '#94A3B8', marginTop: 8 }}>
+        <div style={{ fontSize: 11, color: INK_FAINT, marginTop: 8 }}>
           {ratingCount} {ratingCount === 1 ? 'rating' : 'ratings'}
           {myReview && (
             <>
