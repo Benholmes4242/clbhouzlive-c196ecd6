@@ -242,65 +242,41 @@ export function SummaryTab({
       })()}
 
       {/* Final Top 10 */}
-      {isCompleted && top10.length > 0 && (
-        <motion.div style={{ marginTop: '8px' }} {...sectionEntrance}>
-          <div style={{ padding: '14px 20px 0', background: SURFACE, borderTop: `1px solid ${INK_TINT_07}` }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '10px' }}>
-              <span style={{ fontSize: '9px', fontWeight: 800, color: INK_MUTE, letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>Top Finishers</span>
+      {isCompleted && (() => {
+        let best: { name: string; playerId: string; round: number; score: number } | null = null;
+        for (const e of (leaderboard ?? [])) {
+          for (const r of [1, 2, 3, 4] as const) {
+            const s = (e as any)[`round_${r}`] as number | null;
+            if (s == null) continue;
+            if (!best || s < best.score) {
+              best = { name: e.player?.full_name ?? 'Unknown', playerId: e.player?.id ?? '', round: r, score: s };
+            }
+          }
+        }
+        if (!best) return null;
+        const scoreStr = best.score === 0 ? 'E' : best.score < 0 ? String(best.score) : `+${best.score}`;
+        return (
+          <motion.div style={{ marginTop: '8px' }} {...sectionEntrance}>
+            <div style={{ padding: '14px 20px 0', background: SURFACE, borderTop: `1px solid ${INK_TINT_07}` }}>
+              <div style={{ marginBottom: '10px' }}>
+                <span style={{ fontSize: '9px', fontWeight: 800, color: INK_MUTE, letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>Best Round of the Week</span>
+              </div>
             </div>
-          </div>
-
-          {/* Column headers */}
-          <div style={{ display: 'flex', alignItems: 'center', padding: '5px 20px', background: INK_TINT_02, borderTop: `0.5px solid ${INK_TINT_07}`, borderBottom: `0.5px solid ${INK_TINT_07}` }}>
-            <span style={{ width: '36px', fontSize: '9px', fontWeight: 800, color: INK_MUTE, letterSpacing: '0.14em', flexShrink: 0 }}>POS</span>
-            <span style={{ flex: 1, fontSize: '9px', fontWeight: 800, color: INK_MUTE, letterSpacing: '0.14em' }}>PLAYER</span>
-            <span style={{ width: '44px', textAlign: 'right' as const, fontSize: '9px', fontWeight: 800, color: INK_MUTE, letterSpacing: '0.14em', flexShrink: 0 }}>SCORE</span>
-          </div>
-
-          <div style={{ background: SURFACE, borderBottom: `1px solid ${INK_TINT_07}` }}>
-            {top10.map((entry: any, idx: number) => {
-              const isWinner = entry.position === 1;
-              const scoreToPar = entry.score !== null ? (entry.score === 0 ? 'E' : entry.score < 0 ? String(entry.score) : `+${entry.score}`) : '—';
-              const scoreColor = entry.score !== null && entry.score < 0 ? AMBER : entry.score !== null && entry.score > 0 ? SCORE_OVER_PAR_LIGHT : INK_FAINT;
-
-              return (
-                <motion.div
-                  key={entry.id}
-                  initial={{ opacity: 0, x: -4 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 0.3 + idx * 0.03, duration: 0.25 }}
-                >
-                  <Link
-                    {...playerRoute(entry.player?.id ?? '', tournamentName ? { kind: 'tournament', tournamentName } : undefined)}
-                    style={{
-                      display: 'flex', alignItems: 'center',
-                      padding: '10px 20px',
-                      borderBottom: `0.5px solid ${INK_TINT_07}`,
-                      borderLeft: isWinner ? `3px solid ${AMBER}` : '3px solid transparent',
-                      background: isWinner ? 'rgba(247,147,30,0.025)' : 'transparent',
-                      textDecoration: 'none',
-                    }}
-                    className="active:bg-black/[0.02] transition-colors"
-                  >
-                    <span style={{ width: '36px', fontSize: '14px', fontWeight: 800, color: isWinner ? AMBER : INK_FAINT, flexShrink: 0, fontVariantNumeric: 'tabular-nums' }}>
-                      {entry.position_tied ? `T${entry.position}` : entry.position}
-                    </span>
-                    <div style={{ flex: 1, display: 'flex', alignItems: 'center', gap: '8px', minWidth: 0 }}>
-                      <BatchPlayerAvatar playerId={entry.player?.id || ''} playerName={entry.player?.full_name || 'Unknown'} size="sm" />
-                      <span style={{ fontSize: '14px', fontWeight: isWinner ? 800 : 600, color: INK, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const }}>
-                        {entry.player?.full_name || 'Unknown'}
-                      </span>
-                    </div>
-                    <span style={{ fontSize: '14px', fontWeight: 800, color: scoreColor, fontVariantNumeric: 'tabular-nums', width: '44px', textAlign: 'right' as const, flexShrink: 0 }}>
-                      {scoreToPar}
-                    </span>
-                  </Link>
-                </motion.div>
-              );
-            })}
-          </div>
-        </motion.div>
-      )}
+            <Link
+              {...playerRoute(best.playerId, tournamentName ? { kind: 'tournament', tournamentName } : undefined)}
+              style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '12px 20px 16px', background: SURFACE, borderBottom: `1px solid ${INK_TINT_07}`, textDecoration: 'none' }}
+              className="active:bg-black/[0.02] transition-colors"
+            >
+              <BatchPlayerAvatar playerId={best.playerId} playerName={best.name} size="sm" />
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ fontSize: '15px', fontWeight: 700, color: INK, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const }}>{best.name}</div>
+                <div style={{ fontSize: '11px', fontWeight: 600, color: INK_MUTE, marginTop: '2px' }}>Round {best.round}</div>
+              </div>
+              <span style={{ fontSize: '24px', fontWeight: 900, color: SCORE_UNDER_PAR_LIGHT, letterSpacing: '-0.03em', fontVariantNumeric: 'tabular-nums' }}>{scoreStr}</span>
+            </Link>
+          </motion.div>
+        );
+      })()}
 
       {/* Live round summary */}
       {isLive && !isCompleted && scoringStats && scoringStats.rounds.length > 0 && (() => {
