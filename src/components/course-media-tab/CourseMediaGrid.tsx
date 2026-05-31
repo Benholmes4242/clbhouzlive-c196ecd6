@@ -23,19 +23,6 @@ interface CourseMediaGridProps {
   courseId?: string;
 }
 
-function isLandscape(post: FeedPost): boolean {
-  const firstMedia = post.mediaItems[0];
-  if (!firstMedia) return false;
-  // Treat unknown/zero dimensions as landscape — safer default for the hero + grid layout.
-  // The mapper currently defaults missing dims to 1080x1920 (portrait), which mis-routes
-  // legacy media with NULL width/height in the DB. Detect that fabricated portrait here.
-  const w = firstMedia.width;
-  const h = firstMedia.height;
-  if (!w || !h) return true;
-  // 1080x1920 is the synthetic default from feedMapper for null dims — also treat as unknown.
-  if (w === 1080 && h === 1920) return true;
-  return w > h;
-}
 
 export const CourseMediaGrid = forwardRef<HTMLDivElement, CourseMediaGridProps>(({
   posts,
