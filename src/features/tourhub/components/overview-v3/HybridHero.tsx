@@ -283,6 +283,7 @@ export function HybridHero({ slide, activeTournamentId, onSelectTour }: HybridHe
           startDate={tournament.startDate}
           endDate={tournament.endDate}
           leaderboard={safeLeaderboard}
+          tiedLeaders={tiedLeaders}
           fieldSize={safeLeaderboard.length}
           tourSlug={tournament.tourSlug}
           onCtaTap={onCtaTap}
