@@ -1,11 +1,37 @@
 import { useEffect, useMemo, useState } from 'react';
+import { format, isSameMonth } from 'date-fns';
 import { useLiveTournaments } from '../../hooks/useLiveTournaments';
 import { useTourLeaderboard } from '../../hooks/useTourHubData';
 import { FullLeaderboard } from '../tournament-detail/FullLeaderboard';
 import { EditorialEmpty } from '../tournament-detail/EditorialEmpty';
-import { INK, INK_MUTE, INK_TINT_07, SURFACE, SHELL_BG, STATUS_LIVE, WHITE_ALPHA_06, WHITE_ALPHA_18, WHITE_ALPHA_55, WHITE_ALPHA_65 } from '../../_shared/tokens';
+import { INK, INK_MUTE, INK_FAINT, INK_TINT_07, SURFACE, SHELL_BG, STATUS_LIVE, WHITE_ALPHA_06, WHITE_ALPHA_18, WHITE_ALPHA_55, WHITE_ALPHA_65 } from '../../_shared/tokens';
 import { tourPriorityIndex, TOUR_LABEL, shortTournamentToken } from '../../_shared/tourOrder';
+import { TOUR_CONFIG } from '../../hooks/useOverviewData';
 import type { LiveTournamentLite } from '../../hooks/useLiveTournaments';
+
+const COUNTRY_NAMES: Record<string, string> = {
+  USA: 'USA', GBR: 'Great Britain', SCO: 'Scotland', ENG: 'England', WAL: 'Wales',
+  NIR: 'Northern Ireland', IRL: 'Ireland', AUS: 'Australia', CAN: 'Canada',
+  JPN: 'Japan', KOR: 'South Korea', RSA: 'South Africa', ESP: 'Spain',
+  FRA: 'France', GER: 'Germany', ITA: 'Italy', SWE: 'Sweden', NOR: 'Norway',
+  DEN: 'Denmark', NED: 'Netherlands', BEL: 'Belgium', AUT: 'Austria',
+  MEX: 'Mexico', ARG: 'Argentina', CHI: 'Chile', COL: 'Colombia',
+  CHN: 'China', THA: 'Thailand', IND: 'India', NZL: 'New Zealand',
+  UAE: 'United Arab Emirates', KSA: 'Saudi Arabia',
+};
+function expandCountry(code: string | null | undefined): string | null {
+  if (!code) return null;
+  return COUNTRY_NAMES[code.toUpperCase()] ?? code;
+}
+function formatDateRange(startDate: string, endDate: string): string {
+  const start = new Date(startDate);
+  const end = new Date(endDate);
+  if (isSameMonth(start, end)) {
+    return `${format(start, 'MMM d')} – ${format(end, 'd, yyyy')}`;
+  }
+  return `${format(start, 'MMM d')} – ${format(end, 'MMM d, yyyy')}`;
+}
+
 
 
 /**
