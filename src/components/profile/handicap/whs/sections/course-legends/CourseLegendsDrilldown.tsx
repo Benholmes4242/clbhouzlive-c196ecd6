@@ -201,6 +201,7 @@ export const CourseLegendsDrilldown: React.FC<Props> = ({ selection, hideHeader 
         valueDisplay: formatLegendValue(cat, row.value),
         attained_at: row.attained_at,
         isSelf: row.is_self,
+        userId: row.user_id ?? null,
       });
       entry.total = row.total_count_in_category ?? entry.rows.length;
       m.set(cat, entry);
