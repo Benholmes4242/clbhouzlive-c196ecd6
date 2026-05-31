@@ -563,13 +563,15 @@ export function CinematicFrame({
   const metaParts = [dateRange, venueLine].filter(Boolean);
   const metaLine = metaParts.length ? metaParts.join(' · ') : null;
 
-  // Top meta: LIVE · ROUND N (live) or FINAL (results)
+  // Top meta: LIVE · ROUND N (live), FINAL RESULT (results), UPCOMING pill (upcoming)
   const isLive = state.kind === 'live';
+  const isResults = state.kind === 'results';
+  const isUpcoming = state.kind === 'upcoming';
   const roundLabel_ =
     state.kind === 'live'
       ? `LIVE · ${roundLabel(state.round, state.totalRounds).toUpperCase()}`
-      : state.kind === 'results'
-        ? 'FINAL'
+      : isResults
+        ? 'FINAL RESULT'
         : null;
 
   // ---- Capsule slot construction (mirrors LeaderboardBand live-state) ----
