@@ -60,6 +60,16 @@ export interface IntelligenceHistoricalTournament {
   bestPick: IntelligenceHistoricalPick | null;
   /** ISO year of start_date, for display. */
   year: string;
+  /** @internal Used for same-week dedup; not part of the public contract. */
+  purse?: number | null;
+}
+
+/** Sun→Sat week key (yyyy-MM-dd of the Sunday) for a tournament start date. */
+function weekKey(startDate: string): string {
+  const d = new Date(startDate + (startDate.length === 10 ? 'T12:00:00Z' : ''));
+  const sunday = new Date(d);
+  sunday.setUTCDate(sunday.getUTCDate() - sunday.getUTCDay());
+  return sunday.toISOString().slice(0, 10);
 }
 
 const SKIP_WORDS = new Set([
@@ -126,7 +136,7 @@ export function useIntelligenceHistoricalPicks() {
           tournament_id,
           predictions,
           sr_tournaments!inner(
-            id, name, status, start_date, end_date, season_id
+            id, name, status, start_date, end_date, season_id, purse
           )
         `)
         .in('sr_tournaments.status', ['closed', 'complete'])
@@ -256,10 +266,31 @@ export function useIntelligenceHistoricalPicks() {
           picks,
           bestPick,
           year: new Date(t.start_date).getFullYear().toString(),
+          purse: t.purse ?? null,
         });
       }
 
-      return tournaments;
+      // Same-week dedup: when two PGA events share a Sun→Sat week, only the
+      // highest-purse event's picks were ever shown on Tournament Intelligence.
+      // Keep that one; drop the lower-purse opposite-field event. Cross-tour
+      // majors are always retained.
+      const byWeek = new Map<string, IntelligenceHistoricalTournament>();
+      const keep: IntelligenceHistoricalTournament[] = [];
+      for (const tourn of tournaments) {
+        if (tourn.isMajor) { keep.push(tourn); continue; }
+        const key = `${tourn.tour}::${weekKey(tourn.startDate)}`;
+        const existing = byWeek.get(key);
+        if (!existing) {
+          byWeek.set(key, tourn);
+        } else {
+          const a = tourn.purse ?? -1;
+          const b = existing.purse ?? -1;
+          if (a > b) byWeek.set(key, tourn);
+        }
+      }
+      keep.push(...byWeek.values());
+      keep.sort((a, b) => new Date(b.endDate).getTime() - new Date(a.endDate).getTime());
+      return keep;
     },
   });
 }
