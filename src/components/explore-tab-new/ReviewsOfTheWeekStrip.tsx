@@ -22,6 +22,7 @@ interface ReviewItem {
 
 interface ReviewsOfTheWeekStripProps {
   activeRegion?: string | null;
+  embedded?: boolean;
 }
 
 function formatCourseLocation(location: string | null): string | null {
@@ -29,7 +30,7 @@ function formatCourseLocation(location: string | null): string | null {
   return location.split(',')[0].trim();
 }
 
-function ReviewsOfTheWeekStripInner({ activeRegion = null }: ReviewsOfTheWeekStripProps) {
+function ReviewsOfTheWeekStripInner({ activeRegion = null, embedded = false }: ReviewsOfTheWeekStripProps) {
   const navigate = useNavigate();
 
   const { data: reviews } = useQuery({
@@ -69,7 +70,7 @@ function ReviewsOfTheWeekStripInner({ activeRegion = null }: ReviewsOfTheWeekStr
 
   return (
     <section style={{ paddingBottom: 4 }}>
-      <ExploreSectionHeader title="Most loved this month" sub="Top reviews your community shared" />
+      {!embedded && <ExploreSectionHeader title="Most loved this month" sub="Top reviews your community shared" />}
       <div className="flex gap-3 px-4 overflow-x-auto scrollbar-hide">
         {reviews.map((review) => (
           <button

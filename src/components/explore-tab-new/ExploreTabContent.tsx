@@ -12,8 +12,7 @@ import { TestYourGame } from './TestYourGame';
 import { WhereYoudRank } from './WhereYoudRank';
 
 
-import { BucketListStrip } from './BucketListStrip';
-import { ReviewsOfTheWeekStrip } from './ReviewsOfTheWeekStrip';
+import { CommunityShelf } from './CommunityShelf';
 import ExploreGrid from './ExploreGrid';
 import ExploreAutoplay from './ExploreAutoplay';
 import { ExploreSectionHeader } from './ExploreSectionHeader';
@@ -65,9 +64,8 @@ export default function ExploreTabContent({ embedded: _embedded = false }: Explo
       <ExploreEchoCTA mood={mood} />
       <ExploreDestinations activeRegion={activeRegion} onRegionSelect={handleRegionChange} />
 
-      {/* Phase 2b — CommunityShelf (Bucket + Reviews merged) mounts here */}
-      {activeRegion === null && <BucketListStrip />}
-      <ReviewsOfTheWeekStrip activeRegion={activeRegion} />
+      {/* Phase 2b — CommunityShelf (Bucket + Reviews merged under one header) */}
+      <CommunityShelf activeRegion={activeRegion} />
 
 
       <ExploreSectionHeader title="More to explore" sub="The full course feed" />

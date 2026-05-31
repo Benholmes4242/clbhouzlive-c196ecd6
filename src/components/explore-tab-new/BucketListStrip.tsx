@@ -3,14 +3,14 @@ import { Plus } from 'lucide-react';
 import { useBucketListCourses } from '@/hooks/useBucketListCourses';
 import { ExploreSectionHeader } from './ExploreSectionHeader';
 
-export function BucketListStrip() {
+export function BucketListStrip({ embedded = false }: { embedded?: boolean } = {}) {
   const navigate = useNavigate();
   const { data: courses, isLoading } = useBucketListCourses();
 
   if (isLoading) {
     return (
       <section>
-        <ExploreSectionHeader title="Your bucket list" sub="Places you've saved" />
+        {!embedded && <ExploreSectionHeader title="Your bucket list" sub="Places you've saved" />}
         <div className="flex overflow-x-auto" style={{ padding: '0 16px', gap: 12, scrollbarWidth: 'none' }}>
           {Array.from({ length: 3 }).map((_, i) => (
             <div
@@ -29,7 +29,7 @@ export function BucketListStrip() {
 
   return (
     <section>
-      <ExploreSectionHeader title="Your bucket list" sub="Places you've saved" />
+      {!embedded && <ExploreSectionHeader title="Your bucket list" sub="Places you've saved" />}
 
       <div
         className="flex overflow-x-auto"
