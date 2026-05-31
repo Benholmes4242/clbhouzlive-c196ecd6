@@ -467,27 +467,29 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
   return (
     <PullToRefreshContainer onRefresh={handlePullToRefresh}>
     <div style={{ paddingBottom: 40, background: SLATE_50, minHeight: '100%' }}>
-      {/* Community score header — stacked & centered */}
-      <div style={{ padding: '18px 16px 14px', textAlign: 'center' }}>
-        
-        <div style={{ fontSize: 56, fontWeight: 900, color: INK, letterSpacing: '-0.05em', fontVariantNumeric: 'tabular-nums', lineHeight: 1 }}>
-          {communityScore.toFixed(1)}
+      {/* Community score header — horizontal (matches About Option B) */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 16, padding: '18px 16px 14px' }}>
+        <div style={{ display: 'flex', alignItems: 'baseline', gap: 2, flexShrink: 0 }}>
+          <span style={{ fontSize: 58, fontWeight: 900, color: INK, letterSpacing: '-0.05em', lineHeight: 1, fontVariantNumeric: 'tabular-nums' }}>
+            {communityScore.toFixed(1)}
+          </span>
+          <span style={{ fontSize: 19, fontWeight: 800, color: 'rgba(15,23,42,0.25)', letterSpacing: '-0.02em' }}>/10</span>
         </div>
-        <div style={{ fontSize: 12, fontWeight: 800, color: '#F7931E', letterSpacing: '0.15em', textTransform: 'uppercase' as const, marginTop: 6 }}>
-          {getScoreTier(communityScore).label}
-        </div>
-        <div style={{ fontSize: 11, color: INK_FAINT, marginTop: 8 }}>
-          {ratingCount} {ratingCount === 1 ? 'rating' : 'ratings'}
-          {myReview && (
-            <>
-              {' · '}
-              <button onClick={handleRateClick} style={{ background: 'none', border: 'none', color: AMBER, fontSize: 11, fontWeight: 700, cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <div style={{ fontSize: 12, fontWeight: 800, color: AMBER, letterSpacing: '0.14em', textTransform: 'uppercase' as const }}>
+            {getScoreTier(communityScore).label}
+          </div>
+          <div style={{ fontSize: 11.5, color: INK_FAINT, marginTop: 3, display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
+            <span>{ratingCount} {ratingCount === 1 ? 'rating' : 'ratings'}</span>
+            {myReview && (
+              <button onClick={handleRateClick} style={{ background: 'none', border: 'none', color: AMBER, fontSize: 11, fontWeight: 700, cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: 4, padding: 0 }}>
                 <Pencil className="w-3.5 h-3.5" /> Edit yours
               </button>
-            </>
-          )}
+            )}
+          </div>
         </div>
       </div>
+
 
       <Divider />
 
