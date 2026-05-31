@@ -282,7 +282,7 @@ export function PhotoBand({
           )}
         </h1>
 
-        {(venueName || datesString) && (
+        {venueName && (
           <div
             style={{
               display: 'flex',
@@ -296,36 +296,17 @@ export function PhotoBand({
               textTransform: 'uppercase',
             }}
           >
-            {venueName && (
-              <span
-                style={{
-                  whiteSpace: 'nowrap',
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis',
-                  minWidth: 0,
-                }}
-              >
-                {venueName}
-                {venueCity ? ` · ${venueCity}` : ''}
-              </span>
-            )}
-            {venueName && datesString && (
-              <span
-                aria-hidden="true"
-                style={{
-                  width: 3,
-                  height: 3,
-                  borderRadius: '50%',
-                  background: WHITE_ALPHA_55,
-                  flexShrink: 0,
-                }}
-              />
-            )}
-            {datesString && (
-              <span style={{ ...NUMERIC_STYLE, whiteSpace: 'nowrap', flexShrink: 0 }}>
-                {datesString}
-              </span>
-            )}
+            <span
+              style={{
+                whiteSpace: 'nowrap',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                minWidth: 0,
+              }}
+            >
+              {venueName}
+              {venueCity ? ` · ${venueCity}` : ''}
+            </span>
           </div>
         )}
       </div>
