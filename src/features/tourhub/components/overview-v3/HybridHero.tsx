@@ -285,9 +285,13 @@ export function HybridHero({ slide, activeTournamentId, onSelectTour }: HybridHe
       style={{
         background: BG,
         width: '100%',
-        height: '100%',
         display: 'flex',
         flexDirection: 'column',
+        borderRadius: 20,
+        overflow: 'hidden',
+        border: '1px solid rgba(15,23,42,0.05)',
+        boxShadow: '0 1px 2px rgba(15,23,42,0.04), 0 18px 50px rgba(15,23,42,0.10)',
+        marginBottom: 18,
       }}
     >
       <PhotoBand
