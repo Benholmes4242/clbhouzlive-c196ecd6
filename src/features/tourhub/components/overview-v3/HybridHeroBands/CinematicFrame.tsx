@@ -783,7 +783,28 @@ export function CinematicFrame({
             padding: '0 4px',
           }}
         >
-          {roundLabel_ ? (
+          {isUpcoming ? (
+            <span
+              style={{
+                ...NUMERIC_STYLE,
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 6,
+                padding: '4px 9px',
+                borderRadius: 999,
+                background: AMBER_TINT_12,
+                border: `1px solid ${AMBER}`,
+                color: AMBER,
+                fontSize: 10.5,
+                fontWeight: 800,
+                letterSpacing: '0.16em',
+                textTransform: 'uppercase',
+                whiteSpace: 'nowrap',
+              }}
+            >
+              Upcoming
+            </span>
+          ) : roundLabel_ ? (
             <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
               {isLive && (
                 <span
@@ -800,13 +821,22 @@ export function CinematicFrame({
                   }}
                 />
               )}
+              {isResults && (
+                <Trophy
+                  size={12}
+                  color={GOLD}
+                  fill={GOLD}
+                  strokeWidth={0}
+                  style={{ flexShrink: 0 }}
+                />
+              )}
               <span
                 style={{
                   ...NUMERIC_STYLE,
                   fontSize: 11,
                   fontWeight: 700,
                   letterSpacing: '0.14em',
-                  color: 'white',
+                  color: isResults ? GOLD : 'white',
                   textShadow: '0 1px 3px rgba(0,0,0,0.45)',
                 }}
               >
