@@ -29,6 +29,7 @@ import { useBusinessClaimForCourse } from '@/hooks/useBusinessClaimForCourse';
 import SuggestEditModal from './SuggestEditModal';
 import ClaimCourseCTA from './ClaimCourseCTA';
 import { SectionLabel } from './SectionLabel';
+import { AMBER, HAIRLINE_INK_7, HAIRLINE_INK_8, INK_FAINT, SLATE_50, SLATE_600 } from '@/features/courses/_shared/tokens';
 
 interface Course {
   id: string;
