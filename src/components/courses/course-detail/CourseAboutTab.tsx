@@ -200,7 +200,7 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
                 <button
                   type="button"
                   onClick={() => setShowSuggestEdit(true)}
-                  style={{ display: 'flex', alignItems: 'center', gap: 4, marginTop: 8, background: 'none', border: 'none', cursor: 'pointer', fontSize: 11, color: '#94A3B8' }}
+                  style={{ display: 'flex', alignItems: 'center', gap: 4, marginTop: 8, background: 'none', border: 'none', cursor: 'pointer', fontSize: 11, color: INK_FAINT }}
                 >
                   <Pencil className="h-3 w-3" />
                   Suggest an edit
