@@ -528,7 +528,7 @@ export function CinematicFrame({
             padding: '0 4px',
           }}
         >
-          {roundLabel ? (
+          {roundLabel_ ? (
             <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
               {isLive && (
                 <span
