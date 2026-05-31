@@ -348,7 +348,7 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
 
   if (isLoading) {
     return (
-      <div style={{ background: '#F8FAFC', minHeight: '100%', paddingBottom: 40 }}>
+      <div style={{ background: SLATE_50, minHeight: '100%', paddingBottom: 40 }}>
         {/* Community score skeleton — stacked */}
         <div style={{ padding: '18px 16px 14px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 }}>
           <Skeleton className="h-3 w-28" />
