@@ -191,6 +191,11 @@ export const TourSwitcherAffordance: React.FC = () => {
                     <span style={{ width: 6, height: 6, borderRadius: '50%', background: STATUS_LIVE, display: 'inline-block' }} />
                     <span style={{ fontSize: 10, fontWeight: 800, letterSpacing: '0.16em', color: STATUS_LIVE }}>LIVE</span>
                   </span>
+                ) : status === 'results' ? (
+                  <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, flexShrink: 0 }}>
+                    <Trophy size={11} color={GOLD_DEEP} fill={GOLD_DEEP} strokeWidth={0} aria-hidden />
+                    <span style={{ fontSize: 10, fontWeight: 800, letterSpacing: '0.16em', color: GOLD_DEEP }}>FINAL</span>
+                  </span>
                 ) : status === 'upcoming' ? (
                   <span style={{ flexShrink: 0, fontSize: 10, fontWeight: 800, letterSpacing: '0.16em', color: INK_ALPHA_45 }}>
                     UPCOMING
