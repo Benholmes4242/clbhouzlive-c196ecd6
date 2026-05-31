@@ -292,7 +292,7 @@ const Top100CoursesHubPanel = () => {
             placeholder={`Search the ${activeListShortLabel} Top 100`}
             aria-label="Search within Top 100 list"
             className="pl-10 pr-10 h-12 rounded-2xl text-base focus-visible:ring-2 focus-visible:ring-[#F7931E]/30 focus-visible:outline-none"
-            style={{ background: '#ffffff', border: '1px solid rgba(15,23,42,0.10)' }}
+            style={{ background: SURFACE, border: `1px solid ${HAIRLINE_INK_10}` }}
           />
           {searchTerm && (
             <button
