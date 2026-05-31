@@ -8,7 +8,7 @@ import { ExploreRecommendations } from './ExploreRecommendations';
 import { ExplorePassport } from './ExplorePassport';
 import { ExploreEchoCTA } from './ExploreEchoCTA';
 import { ExploreDestinations } from './ExploreDestinations';
-import { FeaturedCoursesCarousel } from './FeaturedCoursesCarousel';
+
 import { BucketListStrip } from './BucketListStrip';
 import { ReviewsOfTheWeekStrip } from './ReviewsOfTheWeekStrip';
 import ExploreGrid from './ExploreGrid';
@@ -51,14 +51,20 @@ export default function ExploreTabContent({ embedded: _embedded = false }: Explo
   return (
     <div style={{ background: SLATE_50, minHeight: '100vh' }}>
       <ExploreHero userId={userId} mood={mood} />
-      <ExploreRecommendations userId={userId} mood={mood} />
       <ExplorePassport userId={userId} />
+      <ExploreRecommendations userId={userId} mood={mood} />
+
+      {/* Phase 4 — WhereYoudRank shelf will mount here */}
+      {/* Phase 5 — TestYourGame shelf will mount here */}
+
+      {/* Find your next round — Echo + Destinations as one intent block */}
       <ExploreEchoCTA mood={mood} />
       <ExploreDestinations activeRegion={activeRegion} onRegionSelect={handleRegionChange} />
 
-      {activeRegion === null && <FeaturedCoursesCarousel onRegionSelect={handleRegionChange} />}
+      {/* Phase 2b — CommunityShelf (Bucket + Reviews merged) mounts here */}
       {activeRegion === null && <BucketListStrip />}
       <ReviewsOfTheWeekStrip activeRegion={activeRegion} />
+
 
       <ExploreSectionHeader title="More to explore" sub="The full course feed" />
 
