@@ -59,9 +59,7 @@ function StatRow({ label, value, trend, barPercent, barIndex = 0 }: StatRowProps
       <div style={{ textAlign: 'right' as const }}>
         <span style={{
           fontSize: '13px', fontWeight: 800, fontVariantNumeric: 'tabular-nums',
-          color: hasValue
-            ? (trend === 'positive' ? AMBER : trend === 'negative' ? INK_FAINT : INK)
-            : INK_FAINT,
+          color: hasValue ? INK : INK_FAINT,
         }}>
           {mainValue}
           {unitSuffix && <span style={{ fontSize: '10px', fontWeight: 500, color: INK_FAINT }}> {unitSuffix}</span>}
