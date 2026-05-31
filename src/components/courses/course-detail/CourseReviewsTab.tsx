@@ -607,11 +607,11 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
       {/* No results */}
       {(searchQuery || ratingFilter) && filteredReviews.length === 0 && (
         <div style={{ textAlign: 'center', padding: '32px 16px' }}>
-          <p style={{ fontSize: 13, color: '#94A3B8', marginBottom: 10 }}>No reviews match your criteria.</p>
+          <p style={{ fontSize: 13, color: INK_FAINT, marginBottom: 10 }}>No reviews match your criteria.</p>
           <button
             type="button"
             onClick={() => { setSearchQuery(''); setRatingFilter(null); }}
-            style={{ fontSize: 12, fontWeight: 700, color: '#0F172A', background: 'none', border: 'none', cursor: 'pointer', textDecoration: 'underline' }}
+            style={{ fontSize: 12, fontWeight: 700, color: INK, background: 'none', border: 'none', cursor: 'pointer', textDecoration: 'underline' }}
           >
             Clear filters
           </button>
