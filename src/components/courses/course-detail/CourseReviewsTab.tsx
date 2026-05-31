@@ -536,7 +536,7 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
 
       {/* Your review — pinned first */}
       {filteredMyReview && (
-        <div style={{ padding: '6px 16px 0', borderBottom: '0.5px solid rgba(15,23,42,0.06)' }}>
+        <div style={{ padding: '6px 16px 0', borderBottom: `0.5px solid ${INK_TINT_06}` }}>
           <ReviewBlockFlat
             review={transformReview(filteredMyReview, isJustSubmittedOrUpdated)}
             isMine
