@@ -266,10 +266,31 @@ export function useIntelligenceHistoricalPicks() {
           picks,
           bestPick,
           year: new Date(t.start_date).getFullYear().toString(),
+          purse: t.purse ?? null,
         });
       }
 
-      return tournaments;
+      // Same-week dedup: when two PGA events share a Sun→Sat week, only the
+      // highest-purse event's picks were ever shown on Tournament Intelligence.
+      // Keep that one; drop the lower-purse opposite-field event. Cross-tour
+      // majors are always retained.
+      const byWeek = new Map<string, IntelligenceHistoricalTournament>();
+      const keep: IntelligenceHistoricalTournament[] = [];
+      for (const tourn of tournaments) {
+        if (tourn.isMajor) { keep.push(tourn); continue; }
+        const key = `${tourn.tour}::${weekKey(tourn.startDate)}`;
+        const existing = byWeek.get(key);
+        if (!existing) {
+          byWeek.set(key, tourn);
+        } else {
+          const a = tourn.purse ?? -1;
+          const b = existing.purse ?? -1;
+          if (a > b) byWeek.set(key, tourn);
+        }
+      }
+      keep.push(...byWeek.values());
+      keep.sort((a, b) => new Date(b.endDate).getTime() - new Date(a.endDate).getTime());
+      return keep;
     },
   });
 }
