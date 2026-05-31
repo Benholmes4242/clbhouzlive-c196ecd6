@@ -10,8 +10,8 @@ export function CommunityShelf({ activeRegion }: { activeRegion: string | null }
         title="Saved & loved"
         sub="Your bucket list and the month's top reviews"
       />
-      {activeRegion === null && <BucketListStrip embedded />}
-      <ReviewsOfTheWeekStrip embedded activeRegion={activeRegion} />
+      {activeRegion === null && <BucketListStrip embedded label="Your bucket list" />}
+      <ReviewsOfTheWeekStrip embedded label="Most loved this month" activeRegion={activeRegion} />
     </section>
   );
 }

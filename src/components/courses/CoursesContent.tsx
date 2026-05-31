@@ -302,8 +302,8 @@ const CoursesContent: React.FC<CoursesContentProps> = ({ username, displayName }
           </ShellSlot>
 
           <div className="px-4" style={{ paddingTop: 'var(--chrome-total-h, 0px)' }}>
-            {/* Rate a Course CTA — slim row, visible on all tabs */}
-            {user && (
+            {/* Rate a Course CTA — slim row, hidden on Discover */}
+            {user && activeTab !== 'discover' && (
               <button
                 onClick={() => setRateSheetOpen(true)}
                 style={{
