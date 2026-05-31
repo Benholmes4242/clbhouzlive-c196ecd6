@@ -67,8 +67,11 @@ export const ConnectHandicapCue: React.FC<Props> = ({ variant, courseName }) => 
   const { Icon, benefit, sub } = COPY[variant];
   const go = () => navigate('/handicap');
 
-  // About: lighter inline locked-comparison row
-  if (variant === 'about') {
+  const name = courseName ?? '';
+  const isBanner = variant === 'about' || variant === 'discover';
+
+  // Banner: lighter inline locked-comparison row (about / discover)
+  if (isBanner) {
     return (
       <button
         type="button"
