@@ -266,7 +266,7 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
 
       {/* 8. Location */}
       <section>
-        <SectionLabel text="Location" />
+        <SectionLabel text="Location" icon={MapPin} />
         <div style={{ padding: '0 16px' }}>
           {coordsLoading && <Skeleton className="w-full h-[180px] rounded-xl" />}
           {coords && (
