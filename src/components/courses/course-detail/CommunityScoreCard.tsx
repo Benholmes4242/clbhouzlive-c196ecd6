@@ -156,27 +156,21 @@ const CommunityScoreCard: React.FC<CommunityScoreCardProps> = ({
 
     if (absDiff < 0.2) {
       comparisonMessage = (
-        <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 18 }}>
-          <span style={{ ...pillBase, background: 'rgba(15,23,42,0.05)', color: INK_MUTE }}>
-            <CheckCircle2 className="h-3 w-3" /> Matches community consensus
-          </span>
-        </div>
+        <span style={{ ...pillBase, background: 'rgba(15,23,42,0.05)', color: INK_MUTE }}>
+          <CheckCircle2 className="h-3 w-3" /> Matches community consensus
+        </span>
       );
     } else if (diff > 0) {
       comparisonMessage = (
-        <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 18 }}>
-          <span style={{ ...pillBase, background: 'rgba(22,163,74,0.08)', color: '#16A34A' }}>
-            <ArrowUpIcon className="h-3 w-3" /> {absDiff.toFixed(1)} above community avg
-          </span>
-        </div>
+        <span style={{ ...pillBase, background: 'rgba(22,163,74,0.08)', color: '#16A34A' }}>
+          <ArrowUpIcon className="h-3 w-3" /> {absDiff.toFixed(1)} above community avg
+        </span>
       );
     } else {
       comparisonMessage = (
-        <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 18 }}>
-          <span style={{ ...pillBase, background: 'rgba(239,68,68,0.08)', color: '#EF4444' }}>
-            <ArrowDownIcon className="h-3 w-3" /> {absDiff.toFixed(1)} below community avg
-          </span>
-        </div>
+        <span style={{ ...pillBase, background: 'rgba(239,68,68,0.08)', color: '#EF4444' }}>
+          <ArrowDownIcon className="h-3 w-3" /> {absDiff.toFixed(1)} below community avg
+        </span>
       );
     }
   }
@@ -208,12 +202,12 @@ const CommunityScoreCard: React.FC<CommunityScoreCardProps> = ({
         boxShadow: '0 1px 3px rgba(15,23,42,0.04)',
       }}
     >
-      {/* Score block — number /10, tier in amber, count */}
-      <div style={{ textAlign: 'center' as const, marginBottom: 16 }}>
-        <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'center', gap: 3 }}>
+      {/* Score header — number left, tier/count/comparison stacked right */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 18 }}>
+        <div style={{ display: 'flex', alignItems: 'baseline', gap: 2, flexShrink: 0 }}>
           <span
             style={{
-              fontSize: 60,
+              fontSize: 58,
               fontWeight: 900,
               color: INK,
               letterSpacing: '-0.05em',
@@ -223,30 +217,24 @@ const CommunityScoreCard: React.FC<CommunityScoreCardProps> = ({
           >
             {formatScore(communityAverage)}
           </span>
-          <span style={{ fontSize: 20, fontWeight: 800, color: 'rgba(15,23,42,0.25)', letterSpacing: '-0.02em' }}>
+          <span style={{ fontSize: 19, fontWeight: 800, color: 'rgba(15,23,42,0.25)', letterSpacing: '-0.02em' }}>
             /10
           </span>
         </div>
-        <div
-          style={{
-            fontSize: 11.5,
-            fontWeight: 800,
-            color: AMBER,
-            letterSpacing: '0.16em',
-            textTransform: 'uppercase' as const,
-            marginTop: 8,
-          }}
-        >
-          {tierLabel}
-        </div>
-        <div style={{ fontSize: 11.5, color: INK_FAINT, marginTop: 4 }}>
-          Based on {totalRatings} {totalRatings === 1 ? 'rating' : 'ratings'}
-          {onlyUserHasRated ? ' · Only you have rated this course so far.' : ''}
+        <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: 7 }}>
+          <div>
+            <div style={{ fontSize: 12, fontWeight: 800, color: AMBER, letterSpacing: '0.14em', textTransform: 'uppercase' as const }}>
+              {tierLabel}
+            </div>
+            <div style={{ fontSize: 11.5, color: INK_FAINT, marginTop: 2 }}>
+              Based on {totalRatings} {totalRatings === 1 ? 'rating' : 'ratings'}
+              {onlyUserHasRated ? ' · Only you' : ''}
+            </div>
+          </div>
+          {comparisonMessage}
         </div>
       </div>
 
-      {/* User vs community comparison */}
-      {comparisonMessage}
 
       {/* Distribution bars — taller, gradient, zero tiers de-emphasised */}
       <div style={{ marginBottom: 14 }}>
