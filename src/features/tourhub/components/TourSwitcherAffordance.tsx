@@ -8,7 +8,7 @@
  */
 
 import React, { useState } from 'react';
-import { ArrowLeftRight, Check } from 'lucide-react';
+import { ArrowLeftRight, Check, Trophy } from 'lucide-react';
 import { BottomSheet } from '@/components/ui/BottomSheet';
 import { SheetHeader } from '@/components/ui/SheetHeader';
 import { getTourLogo } from '../utils/tourLogos';
@@ -18,6 +18,7 @@ import {
   AMBER,
   AMBER_TINT_04,
   FONT,
+  GOLD_DEEP,
   INK,
   INK_ALPHA_45,
   INK_TINT_07,
@@ -47,11 +48,14 @@ export const TourSwitcherAffordance: React.FC = () => {
   // pick, then PGA before the hero has reported anything.
   const activeTourSlug = viewingTourSlug ?? selectedTourSlug ?? 'pga';
 
-  const tourStatus = (slug: string): 'live' | 'upcoming' | 'none' => {
+  const tourStatus = (slug: string): 'live' | 'results' | 'upcoming' | 'none' => {
+    // Precedence mirrors deriveHeroState: live > results (≤72h) > upcoming > none.
+    // The `completed` bucket is already 72h-bounded (RESULTS_WINDOW_HOURS) at the
+    // cache layer, so presence here == the hero's results state.
     if (data?.live.some((c) => c.tourSlug === slug)) return 'live';
-    const completed = data?.completed.some((c) => c.tourSlug === slug) ?? false;
-    const upcoming = data?.upcoming.some((c) => c.tourSlug === slug) ?? false;
-    return completed || upcoming ? 'upcoming' : 'none';
+    if (data?.completed.some((c) => c.tourSlug === slug)) return 'results';
+    if (data?.upcoming.some((c) => c.tourSlug === slug)) return 'upcoming';
+    return 'none';
   };
 
   return (
@@ -186,6 +190,11 @@ export const TourSwitcherAffordance: React.FC = () => {
                   <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, flexShrink: 0 }}>
                     <span style={{ width: 6, height: 6, borderRadius: '50%', background: STATUS_LIVE, display: 'inline-block' }} />
                     <span style={{ fontSize: 10, fontWeight: 800, letterSpacing: '0.16em', color: STATUS_LIVE }}>LIVE</span>
+                  </span>
+                ) : status === 'results' ? (
+                  <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, flexShrink: 0 }}>
+                    <Trophy size={11} color={GOLD_DEEP} fill={GOLD_DEEP} strokeWidth={0} aria-hidden />
+                    <span style={{ fontSize: 10, fontWeight: 800, letterSpacing: '0.16em', color: GOLD_DEEP }}>FINAL</span>
                   </span>
                 ) : status === 'upcoming' ? (
                   <span style={{ flexShrink: 0, fontSize: 10, fontWeight: 800, letterSpacing: '0.16em', color: INK_ALPHA_45 }}>
