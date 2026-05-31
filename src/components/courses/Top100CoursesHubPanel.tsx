@@ -233,7 +233,7 @@ const Top100CoursesHubPanel = () => {
             You've rated{' '}
             <span
               style={{
-                color: '#F7931E',
+                color: AMBER,
                 fontWeight: 700,
                 fontVariantNumeric: 'tabular-nums',
                 fontFeatureSettings: '"zero" 0',
