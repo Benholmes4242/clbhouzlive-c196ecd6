@@ -24,7 +24,7 @@ import {
   NUMERIC_STYLE,
 } from '../HybridHero.constants';
 import type { HeroState, TopTie } from '../HybridHero.utils';
-import { fmtScore, formatRank, buildLeaderboardSlots } from '../HybridHero.utils';
+import { fmtScore, formatRank, buildLeaderboardSlots, roundLabel } from '../HybridHero.utils';
 import { getPlayerHeadshotUrl } from '@/utils/playerHeadshot';
 
 // ---- helpers --------------------------------------------------------------
