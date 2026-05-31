@@ -107,7 +107,7 @@ function HoleStatsEmpty({ isCompleted, roundLabel }: { isCompleted?: boolean; ro
   );
 }
 
-export function HoleStatsTab({ tournamentId, isCompleted }: HoleStatsTabProps) {
+export function HoleStatsTab({ tournamentId, isCompleted, courseId, courseName }: HoleStatsTabProps) {
   const [selectedRound, setSelectedRound] = useState('Overall');
   const [sort, setSort] = useState<'hole' | 'difficulty'>('hole');
   const { data: rawHoleStats, isLoading } = useTourHoleStats(tournamentId);
