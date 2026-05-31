@@ -175,6 +175,7 @@ function TabStrip({ tab, onChange }: { tab: Tab; onChange: (t: Tab) => void }) {
         aria-label="Intelligence view"
         style={{
           display: 'flex',
+          justifyContent: 'center',
           gap: 20,
           fontFamily: 'Geist, system-ui, -apple-system, BlinkMacSystemFont, sans-serif',
         }}
