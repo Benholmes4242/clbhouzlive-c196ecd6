@@ -89,7 +89,7 @@ function ExploreSectionHeaderInner({
             style={{
               fontSize: 13,
               fontWeight: 500,
-              color: SUB,
+              color: INK_MUTE,
               margin: '3px 0 0',
               lineHeight: 1.35,
             }}
