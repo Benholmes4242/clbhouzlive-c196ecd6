@@ -63,7 +63,7 @@ export const HolesEmptyState: React.FC<{ courseName: string | null }> = ({ cours
               width: 24,
               height: 24,
               borderRadius: '34%',
-              background: 'rgba(15,23,42,0.08)',
+              background: HAIRLINE_INK_8,
               flexShrink: 0,
             }}
           />
