@@ -30,6 +30,14 @@ export function BucketListStrip({ embedded = false, label }: { embedded?: boolea
   return (
     <section>
       {!embedded && <ExploreSectionHeader title="Your bucket list" sub="Places you've saved" />}
+      {embedded && label && (
+        <p style={{
+          fontSize: 11, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase',
+          color: '#64748B', margin: '0 0 8px', padding: '0 16px',
+        }}>
+          {label}
+        </p>
+      )}
 
       <div
         className="flex overflow-x-auto"

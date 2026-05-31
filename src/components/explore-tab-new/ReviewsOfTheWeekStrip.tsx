@@ -23,6 +23,7 @@ interface ReviewItem {
 interface ReviewsOfTheWeekStripProps {
   activeRegion?: string | null;
   embedded?: boolean;
+  label?: string;
 }
 
 function formatCourseLocation(location: string | null): string | null {
@@ -30,7 +31,7 @@ function formatCourseLocation(location: string | null): string | null {
   return location.split(',')[0].trim();
 }
 
-function ReviewsOfTheWeekStripInner({ activeRegion = null, embedded = false }: ReviewsOfTheWeekStripProps) {
+function ReviewsOfTheWeekStripInner({ activeRegion = null, embedded = false, label }: ReviewsOfTheWeekStripProps) {
   const navigate = useNavigate();
 
   const { data: reviews } = useQuery({
@@ -71,6 +72,14 @@ function ReviewsOfTheWeekStripInner({ activeRegion = null, embedded = false }: R
   return (
     <section style={{ paddingBottom: 4 }}>
       {!embedded && <ExploreSectionHeader title="Most loved this month" sub="Top reviews your community shared" />}
+      {embedded && label && (
+        <p style={{
+          fontSize: 11, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase',
+          color: '#64748B', margin: '0 0 8px', padding: '0 16px',
+        }}>
+          {label}
+        </p>
+      )}
       <div className="flex gap-3 px-4 overflow-x-auto scrollbar-hide">
         {reviews.map((review) => (
           <button
