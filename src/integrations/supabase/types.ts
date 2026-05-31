@@ -20050,6 +20050,21 @@ export type Database = {
           thumbnail_image: string
         }[]
       }
+      get_notable_difficult_courses: {
+        Args: { p_limit?: number; p_min_rounds?: number }
+        Returns: {
+          avg_over_par: number
+          course_country: string
+          course_id: string
+          course_name: string
+          course_region: string
+          hardest_avg_to_par: number
+          hardest_hole_no: number
+          hardest_hole_par: number
+          hardest_hole_si: number
+          total_rounds: number
+        }[]
+      }
       get_or_create_dm_conversation: {
         Args: { other_user_id: string }
         Returns: string

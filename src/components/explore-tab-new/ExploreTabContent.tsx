@@ -8,6 +8,8 @@ import { ExploreRecommendations } from './ExploreRecommendations';
 import { ExplorePassport } from './ExplorePassport';
 import { ExploreEchoCTA } from './ExploreEchoCTA';
 import { ExploreDestinations } from './ExploreDestinations';
+import { TestYourGame } from './TestYourGame';
+
 
 import { BucketListStrip } from './BucketListStrip';
 import { ReviewsOfTheWeekStrip } from './ReviewsOfTheWeekStrip';
@@ -55,7 +57,8 @@ export default function ExploreTabContent({ embedded: _embedded = false }: Explo
       <ExploreRecommendations userId={userId} mood={mood} />
 
       {/* Phase 4 — WhereYoudRank shelf will mount here */}
-      {/* Phase 5 — TestYourGame shelf will mount here */}
+      {activeRegion === null && <TestYourGame />}
+
 
       {/* Find your next round — Echo + Destinations as one intent block */}
       <ExploreEchoCTA mood={mood} />
