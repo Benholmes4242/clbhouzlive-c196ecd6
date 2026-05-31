@@ -292,6 +292,12 @@ const Top100MyProgressPanel: React.FC<Top100MyProgressPanelProps> = ({ userId })
         )}
       </div>
 
+      {isOwnProfile && (
+        <div className="px-4" style={{ marginTop: 12 }}>
+          <ConnectHandicapCue variant="progress" />
+        </div>
+      )}
+
       {/* ============ Momentum ============ */}
       <div className="px-4 pt-6">
         <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8 }}>
