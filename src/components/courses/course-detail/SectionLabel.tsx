@@ -1,28 +1,34 @@
 import React from 'react';
-import { AMBER, INK } from '@/features/courses/_shared/tokens';
+import type { LucideIcon } from 'lucide-react';
+import { AMBER } from '@/features/courses/_shared/tokens';
 
 interface SectionLabelProps {
   text: string;
-  /** When true, use brand amber for the label. Defaults to slate ink. */
-  accent?: boolean;
+  /** Lucide icon component rendered before the label (canonical amber eyebrow). */
+  icon?: LucideIcon;
 }
 
 /**
- * Canonical Course Detail section label.
- * 9px / 900-weight uppercase eyebrow with 0.18em tracking.
- * Used across the About tab (ABOUT, YOUR JOURNEY, COURSE DETAILS, LOCATION, MEDIA).
+ * Canonical section eyebrow — matches Tour Hub Overview amber section titles.
+ * 10.5px / 800-weight uppercase, AMBER, 0.14em tracking, icon at 11px before text.
+ * Used across the Course Detail About tab (Your Journey, About, Course Details,
+ * Location, Media) and other surfaces that need a Dispatch-style amber eyebrow.
  */
-export const SectionLabel: React.FC<SectionLabelProps> = ({ text, accent = false }) => (
+export const SectionLabel: React.FC<SectionLabelProps> = ({ text, icon: Icon }) => (
   <div style={{ padding: '0 16px', marginBottom: 14 }}>
     <span
       style={{
-        fontSize: 9,
-        fontWeight: 900,
-        color: accent ? AMBER : INK,
-        letterSpacing: '0.18em',
+        display: 'inline-flex',
+        alignItems: 'center',
+        gap: 6,
+        fontSize: 10.5,
+        fontWeight: 800,
+        color: AMBER,
+        letterSpacing: '0.14em',
         textTransform: 'uppercase' as const,
       }}
     >
+      {Icon && <Icon size={11} strokeWidth={2.4} />}
       {text}
     </span>
   </div>
