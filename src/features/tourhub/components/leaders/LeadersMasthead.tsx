@@ -16,7 +16,7 @@ import { splitStatValue } from '../../utils/splitStatValue';
 
 import {
   AMBER,
-  AMBER_TINT_12,
+  GLASS_BLUR,
   GOLD,
   GOLD_BORDER,
   GOLD_TINT,
@@ -27,7 +27,6 @@ import {
   SLATE_50,
   SLATE_150,
   SURFACE,
-  WHITE_ALPHA_10,
 } from '../../_shared/tokens';
 
 // ─────────────────────────────────────────────────────────────────────────────
