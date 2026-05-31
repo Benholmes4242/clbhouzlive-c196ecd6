@@ -7,11 +7,11 @@
  *   0 events    → returns null
  */
 
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { format } from 'date-fns';
 import { ArrowDownRight, ArrowRight, ArrowUpRight } from 'lucide-react';
 import { usePlayerResults, formatPositionShort, formatScore, type PlayerTournamentResult } from '../../hooks/usePlayerResults';
-import { AMBER, INK, INK_FAINT, INK_LIGHT, INK_MUTE, INK_TINT_07, SURFACE, TREND_DOWN } from '../../_shared/tokens';
+import { AMBER, INK, INK_FAINT, INK_MUTE, INK_TINT_07, SCORE_UNDER_PAR_LIGHT, SURFACE, TREND_DOWN } from '../../_shared/tokens';
 
 interface FormSectionProps {
   playerId: string;
@@ -40,11 +40,24 @@ function deriveVerdict(avgPos: number, mostRecentPos: number): FormVerdict {
 function dotColorForPosition(pos: number, status: string | null): string {
   const s = status?.toUpperCase();
   if (s === 'CUT' || s === 'WD' || s === 'DQ' || s === 'MC') return TREND_DOWN;
-  if (pos <= 10) return AMBER;
-  if (pos <= 30) return INK_FAINT;
-  if (pos <= 70) return INK_LIGHT;
+  if (pos <= 10) return SCORE_UNDER_PAR_LIGHT;
+  if (pos <= 40) return AMBER;
   return TREND_DOWN;
 }
+
+function formatFinishLabel(evt: PlayerTournamentResult): string {
+  const s = evt.status?.toUpperCase();
+  if (s === 'CUT' || s === 'MC') return 'MC';
+  if (s === 'WD' || s === 'DQ') return s;
+  const pos = evt.position;
+  if (pos == null) return '—';
+  if (pos === 1) return '1';
+  return evt.position_tied ? `T${pos}` : `${pos}`;
+}
+
+const prefersReducedMotion = () =>
+  typeof window !== 'undefined' &&
+  window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
 
 interface DotStripProps {
   events: PlayerTournamentResult[];
