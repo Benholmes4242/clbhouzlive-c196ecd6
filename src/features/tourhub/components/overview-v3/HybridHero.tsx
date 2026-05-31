@@ -281,6 +281,41 @@ export function HybridHero({ slide, activeTournamentId, onSelectTour }: HybridHe
   const useBroadcastResults =
     state.kind === 'results' && state.variant === 'standard' && !!champion;
 
+  // Direction A: CinematicFrame replaces the three-band stack for live + results.
+  // Upcoming keeps the original PhotoBand+MiddleBand+LeaderboardBand path.
+  const useCinematicFrame = state.kind === 'live' || state.kind === 'results';
+
+  if (useCinematicFrame) {
+    return (
+      <div
+        style={{
+          background: BG,
+          width: '100%',
+          height: '100%',
+          display: 'flex',
+          flexDirection: 'column',
+        }}
+      >
+        <CinematicFrame
+          title={tournament.name}
+          venueName={tournament.venueName}
+          venueCity={tournament.venueCity}
+          venueImageUrl={venueImageUrl}
+          state={state}
+          tourLabel={tourLabel}
+          isMajor={tournament.isMajor}
+          isSignature={tournament.isSignature}
+          startDate={tournament.startDate}
+          endDate={tournament.endDate}
+          leaderboard={safeLeaderboard}
+          fieldSize={safeLeaderboard.length}
+          tourSlug={tournament.tourSlug}
+          onCtaTap={onCtaTap}
+        />
+      </div>
+    );
+  }
+
   return (
     <div
       style={{
