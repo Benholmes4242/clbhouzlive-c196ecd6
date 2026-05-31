@@ -48,11 +48,14 @@ export const TourSwitcherAffordance: React.FC = () => {
   // pick, then PGA before the hero has reported anything.
   const activeTourSlug = viewingTourSlug ?? selectedTourSlug ?? 'pga';
 
-  const tourStatus = (slug: string): 'live' | 'upcoming' | 'none' => {
+  const tourStatus = (slug: string): 'live' | 'results' | 'upcoming' | 'none' => {
+    // Precedence mirrors deriveHeroState: live > results (≤72h) > upcoming > none.
+    // The `completed` bucket is already 72h-bounded (RESULTS_WINDOW_HOURS) at the
+    // cache layer, so presence here == the hero's results state.
     if (data?.live.some((c) => c.tourSlug === slug)) return 'live';
-    const completed = data?.completed.some((c) => c.tourSlug === slug) ?? false;
-    const upcoming = data?.upcoming.some((c) => c.tourSlug === slug) ?? false;
-    return completed || upcoming ? 'upcoming' : 'none';
+    if (data?.completed.some((c) => c.tourSlug === slug)) return 'results';
+    if (data?.upcoming.some((c) => c.tourSlug === slug)) return 'upcoming';
+    return 'none';
   };
 
   return (
