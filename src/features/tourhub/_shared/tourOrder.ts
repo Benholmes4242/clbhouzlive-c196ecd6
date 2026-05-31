@@ -31,6 +31,9 @@ export function shortTournamentToken(name: string): string {
     if (!SHORT_NAME_SKIP.has(w.toLowerCase()) && w.length > 2) return w;
   }
   return words[0] ?? name;
+}
+
+
 
 /** Normalise a raw `tour_name` string from the DB into a canonical TourId. */
 export function mapTourSlug(tourName: string | null | undefined): TourId {
