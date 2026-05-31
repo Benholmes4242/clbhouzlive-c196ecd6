@@ -7,11 +7,9 @@ import { Trophy } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { BatchPlayerAvatar } from '../PlayerAvatar';
-import { titleCaseCountry } from '../../utils/countryFlags';
-import CountryFlag from '@/components/ui/country-flag';
 import { useTournamentScoringStats } from '../../hooks/useTourHubData';
 import { playerRoute } from '../../routes';
-import { AMBER, HAIRLINE_INK_15, INK, INK_FAINT, INK_MUTE, INK_TINT_02, INK_TINT_06, INK_TINT_07, LIVE_DOT, LIVE_INK, SCORE_OVER_PAR_LIGHT, SURFACE, TREND_DOWN, TREND_UP } from '../../_shared/tokens';
+import { AMBER, GOLD, HAIRLINE_INK_15, INK, INK_FAINT, INK_MUTE, INK_TINT_02, INK_TINT_06, INK_TINT_07, LIVE_DOT, LIVE_INK, SCORE_UNDER_PAR_LIGHT, SURFACE, TREND_DOWN, TREND_UP } from '../../_shared/tokens';
 
 interface SummaryTabProps {
   tournamentId: string;
@@ -153,10 +151,6 @@ export function SummaryTab({
     return leaderboard.find((e: any) => e.position === 2) || leaderboard[1];
   }, [leaderboard]);
 
-  const top10 = useMemo(() => {
-    if (!leaderboard) return [];
-    return leaderboard.slice(0, 10);
-  }, [leaderboard]);
 
   if (!isLive && !isCompleted) return <SummaryEmpty />;
   if (isLoading) return <SummarySkeleton />;
@@ -189,7 +183,10 @@ export function SummaryTab({
               <div key={round.round} style={{ display: 'flex', alignItems: 'center', padding: '10px 20px', borderBottom: `0.5px solid ${INK_TINT_07}`, fontVariantNumeric: 'tabular-nums' }}>
                 <span style={{ fontSize: '14px', fontWeight: 700, color: INK, flex: '0 0 52px' }}>R{round.round}</span>
                 <span style={{ fontSize: '14px', fontWeight: 700, color: AMBER, flex: 1, textAlign: 'center' as const }}>{round.lowScore}</span>
-                <span style={{ fontSize: '14px', color: INK_MUTE, flex: 1, textAlign: 'center' as const }}>{round.avgScore.toFixed(1)}</span>
+                <span style={{
+                  fontSize: '14px', fontWeight: 600, flex: 1, textAlign: 'center' as const,
+                  color: round.avgScore < 0 ? SCORE_UNDER_PAR_LIGHT : round.avgScore > 0 ? TREND_DOWN : INK_MUTE,
+                }}>{round.avgScore > 0 ? `+${round.avgScore.toFixed(1)}` : round.avgScore.toFixed(1)}</span>
                 <span style={{ fontSize: '14px', color: TREND_UP, fontWeight: 600, flex: 1, textAlign: 'center' as const }}>{round.totalBirdies}</span>
                 <span style={{ fontSize: '14px', color: TREND_DOWN, fontWeight: 600, flex: 1, textAlign: 'center' as const }}>{round.totalBogeys}</span>
               </div>
@@ -205,7 +202,7 @@ export function SummaryTab({
         if (total === 0) return null;
 
         const segments = [
-          { label: 'Eagles', count: t.eagles, color: AMBER, pct: (t.eagles / total * 100).toFixed(1) },
+          { label: 'Eagles', count: t.eagles, color: GOLD, pct: (t.eagles / total * 100).toFixed(1) },
           { label: 'Birdies', count: t.birdies, color: TREND_UP, pct: (t.birdies / total * 100).toFixed(1) },
           { label: 'Pars', count: t.pars, color: HAIRLINE_INK_15, pct: (t.pars / total * 100).toFixed(1) },
           { label: 'Bogeys', count: t.bogeys, color: TREND_DOWN, pct: (t.bogeys / total * 100).toFixed(1) },
@@ -239,65 +236,41 @@ export function SummaryTab({
       })()}
 
       {/* Final Top 10 */}
-      {isCompleted && top10.length > 0 && (
-        <motion.div style={{ marginTop: '8px' }} {...sectionEntrance}>
-          <div style={{ padding: '14px 20px 0', background: SURFACE, borderTop: `1px solid ${INK_TINT_07}` }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '10px' }}>
-              <span style={{ fontSize: '9px', fontWeight: 800, color: INK_MUTE, letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>Top Finishers</span>
+      {isCompleted && (() => {
+        let best: { name: string; playerId: string; round: number; score: number } | null = null;
+        for (const e of (leaderboard ?? [])) {
+          for (const r of [1, 2, 3, 4] as const) {
+            const s = (e as any)[`round_${r}`] as number | null;
+            if (s == null) continue;
+            if (!best || s < best.score) {
+              best = { name: e.player?.full_name ?? 'Unknown', playerId: e.player?.id ?? '', round: r, score: s };
+            }
+          }
+        }
+        if (!best) return null;
+        const scoreStr = best.score === 0 ? 'E' : best.score < 0 ? String(best.score) : `+${best.score}`;
+        return (
+          <motion.div style={{ marginTop: '8px' }} {...sectionEntrance}>
+            <div style={{ padding: '14px 20px 0', background: SURFACE, borderTop: `1px solid ${INK_TINT_07}` }}>
+              <div style={{ marginBottom: '10px' }}>
+                <span style={{ fontSize: '9px', fontWeight: 800, color: INK_MUTE, letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>Best Round of the Week</span>
+              </div>
             </div>
-          </div>
-
-          {/* Column headers */}
-          <div style={{ display: 'flex', alignItems: 'center', padding: '5px 20px', background: INK_TINT_02, borderTop: `0.5px solid ${INK_TINT_07}`, borderBottom: `0.5px solid ${INK_TINT_07}` }}>
-            <span style={{ width: '36px', fontSize: '9px', fontWeight: 800, color: INK_MUTE, letterSpacing: '0.14em', flexShrink: 0 }}>POS</span>
-            <span style={{ flex: 1, fontSize: '9px', fontWeight: 800, color: INK_MUTE, letterSpacing: '0.14em' }}>PLAYER</span>
-            <span style={{ width: '44px', textAlign: 'right' as const, fontSize: '9px', fontWeight: 800, color: INK_MUTE, letterSpacing: '0.14em', flexShrink: 0 }}>SCORE</span>
-          </div>
-
-          <div style={{ background: SURFACE, borderBottom: `1px solid ${INK_TINT_07}` }}>
-            {top10.map((entry: any, idx: number) => {
-              const isWinner = entry.position === 1;
-              const scoreToPar = entry.score !== null ? (entry.score === 0 ? 'E' : entry.score < 0 ? String(entry.score) : `+${entry.score}`) : '—';
-              const scoreColor = entry.score !== null && entry.score < 0 ? AMBER : entry.score !== null && entry.score > 0 ? SCORE_OVER_PAR_LIGHT : INK_FAINT;
-
-              return (
-                <motion.div
-                  key={entry.id}
-                  initial={{ opacity: 0, x: -4 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 0.3 + idx * 0.03, duration: 0.25 }}
-                >
-                  <Link
-                    {...playerRoute(entry.player?.id ?? '', tournamentName ? { kind: 'tournament', tournamentName } : undefined)}
-                    style={{
-                      display: 'flex', alignItems: 'center',
-                      padding: '10px 20px',
-                      borderBottom: `0.5px solid ${INK_TINT_07}`,
-                      borderLeft: isWinner ? `3px solid ${AMBER}` : '3px solid transparent',
-                      background: isWinner ? 'rgba(247,147,30,0.025)' : 'transparent',
-                      textDecoration: 'none',
-                    }}
-                    className="active:bg-black/[0.02] transition-colors"
-                  >
-                    <span style={{ width: '36px', fontSize: '14px', fontWeight: 800, color: isWinner ? AMBER : INK_FAINT, flexShrink: 0, fontVariantNumeric: 'tabular-nums' }}>
-                      {entry.position_tied ? `T${entry.position}` : entry.position}
-                    </span>
-                    <div style={{ flex: 1, display: 'flex', alignItems: 'center', gap: '8px', minWidth: 0 }}>
-                      <BatchPlayerAvatar playerId={entry.player?.id || ''} playerName={entry.player?.full_name || 'Unknown'} size="sm" />
-                      <span style={{ fontSize: '14px', fontWeight: isWinner ? 800 : 600, color: INK, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const }}>
-                        {entry.player?.full_name || 'Unknown'}
-                      </span>
-                    </div>
-                    <span style={{ fontSize: '14px', fontWeight: 800, color: scoreColor, fontVariantNumeric: 'tabular-nums', width: '44px', textAlign: 'right' as const, flexShrink: 0 }}>
-                      {scoreToPar}
-                    </span>
-                  </Link>
-                </motion.div>
-              );
-            })}
-          </div>
-        </motion.div>
-      )}
+            <Link
+              {...playerRoute(best.playerId, tournamentName ? { kind: 'tournament', tournamentName } : undefined)}
+              style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '12px 20px 16px', background: SURFACE, borderBottom: `1px solid ${INK_TINT_07}`, textDecoration: 'none' }}
+              className="active:bg-black/[0.02] transition-colors"
+            >
+              <BatchPlayerAvatar playerId={best.playerId} playerName={best.name} size="sm" />
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ fontSize: '15px', fontWeight: 700, color: INK, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const }}>{best.name}</div>
+                <div style={{ fontSize: '11px', fontWeight: 600, color: INK_MUTE, marginTop: '2px' }}>Round {best.round}</div>
+              </div>
+              <span style={{ fontSize: '24px', fontWeight: 900, color: SCORE_UNDER_PAR_LIGHT, letterSpacing: '-0.03em', fontVariantNumeric: 'tabular-nums' }}>{scoreStr}</span>
+            </Link>
+          </motion.div>
+        );
+      })()}
 
       {/* Live round summary */}
       {isLive && !isCompleted && scoringStats && scoringStats.rounds.length > 0 && (() => {
@@ -318,7 +291,10 @@ export function SummaryTab({
                 </div>
                 <div>
                   <div style={{ fontSize: '9px', fontWeight: 800, color: INK_MUTE, letterSpacing: '0.14em', marginBottom: '3px' }}>SCORING AVG</div>
-                  <div style={{ fontSize: '18px', fontWeight: 800, color: INK, fontVariantNumeric: 'tabular-nums' }}>{latestRound.avgScore.toFixed(1)}</div>
+                  <div style={{ fontSize: '18px', fontWeight: 800, fontVariantNumeric: 'tabular-nums',
+                    color: latestRound.avgScore < 0 ? SCORE_UNDER_PAR_LIGHT : latestRound.avgScore > 0 ? TREND_DOWN : INK }}>
+                    {latestRound.avgScore > 0 ? `+${latestRound.avgScore.toFixed(1)}` : latestRound.avgScore.toFixed(1)}
+                  </div>
                 </div>
                 <div>
                   <div style={{ fontSize: '9px', fontWeight: 800, color: INK_MUTE, letterSpacing: '0.14em', marginBottom: '3px' }}>FIELD</div>
