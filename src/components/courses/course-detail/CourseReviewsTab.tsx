@@ -475,7 +475,7 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
           </span>
           <span style={{ fontSize: 19, fontWeight: 800, color: 'rgba(15,23,42,0.25)', letterSpacing: '-0.02em' }}>/10</span>
         </div>
-        <div style={{ flex: 1, minWidth: 0 }}>
+        <div style={{ minWidth: 0 }}>
           <div style={{ fontSize: 12, fontWeight: 800, color: AMBER, letterSpacing: '0.14em', textTransform: 'uppercase' as const }}>
             {getScoreTier(communityScore).label}
           </div>
