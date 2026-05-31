@@ -12,6 +12,7 @@ import { cn } from '@/lib/utils';
 import VirtualizedCourseList from './VirtualizedCourseList';
 import { AppSelect, type AppSelectOption } from '@/components/ui/AppSelect';
 import { SectionEyebrow } from '@/components/ui/SectionEyebrow';
+import { AMBER, HAIRLINE_INK_7, HAIRLINE_INK_10, INK, INK_FAINT, INK_MUTE, SLATE_600, SURFACE } from '@/features/courses/_shared/tokens';
 
 type Top100SortOption = 'official' | 'user_rating';
 
