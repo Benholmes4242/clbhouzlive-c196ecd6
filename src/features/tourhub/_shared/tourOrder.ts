@@ -10,6 +10,28 @@ export function tourPriorityIndex(slug: TourId | string | null | undefined): num
   return i === -1 ? TOUR_PRIORITY.length : i;
 }
 
+/** Short display label for a tour slug — for pills/badges. */
+export const TOUR_LABEL: Record<TourId, string> = {
+  pga: 'PGA',
+  lpga: 'LPGA',
+  euro: 'DP World',
+  pgad: 'Korn Ferry',
+  champ: 'Champions',
+  liv: 'LIV',
+};
+
+/** First distinctive word in a tournament name — used to disambiguate
+ *  same-tour live pills (e.g. "PGA · Memorial"). Skips generic filler. */
+const SHORT_NAME_SKIP = new Set([
+  'open', 'classic', 'invitational', 'championship', 'tournament', 'the', 'at', 'presented', 'by',
+]);
+export function shortTournamentToken(name: string): string {
+  const words = (name ?? '').split(/\s+/).filter(Boolean);
+  for (const w of words) {
+    if (!SHORT_NAME_SKIP.has(w.toLowerCase()) && w.length > 2) return w;
+  }
+  return words[0] ?? name;
+
 /** Normalise a raw `tour_name` string from the DB into a canonical TourId. */
 export function mapTourSlug(tourName: string | null | undefined): TourId {
   const normalized = (tourName ?? '').toLowerCase().trim();
