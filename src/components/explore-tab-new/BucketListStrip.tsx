@@ -10,7 +10,7 @@ export function BucketListStrip({ embedded = false }: { embedded?: boolean } = {
   if (isLoading) {
     return (
       <section>
-        <ExploreSectionHeader title="Your bucket list" sub="Places you've saved" />
+        {!embedded && <ExploreSectionHeader title="Your bucket list" sub="Places you've saved" />}
         <div className="flex overflow-x-auto" style={{ padding: '0 16px', gap: 12, scrollbarWidth: 'none' }}>
           {Array.from({ length: 3 }).map((_, i) => (
             <div
