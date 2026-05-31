@@ -1,4 +1,5 @@
 import React from 'react';
+import { AMBER, INK } from '@/features/courses/_shared/tokens';
 
 interface SectionLabelProps {
   text: string;
