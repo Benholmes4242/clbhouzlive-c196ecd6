@@ -14,6 +14,7 @@ import { ReviewsOfTheWeekStrip } from './ReviewsOfTheWeekStrip';
 import ExploreGrid from './ExploreGrid';
 import ExploreAutoplay from './ExploreAutoplay';
 import { ExploreSectionHeader } from './ExploreSectionHeader';
+import { SLATE_50 } from '@/features/courses/_shared/tokens';
 
 interface ExploreTabContentProps {
   embedded?: boolean;
@@ -48,7 +49,7 @@ export default function ExploreTabContent({ embedded: _embedded = false }: Explo
   }, [setRegion]);
 
   return (
-    <div style={{ background: '#F8FAFC', minHeight: '100vh' }}>
+    <div style={{ background: SLATE_50, minHeight: '100vh' }}>
       <ExploreHero userId={userId} mood={mood} />
       <ExploreRecommendations userId={userId} mood={mood} />
       <ExplorePassport userId={userId} />

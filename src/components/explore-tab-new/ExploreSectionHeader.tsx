@@ -1,5 +1,6 @@
 import { memo } from 'react';
 import { ChevronRight } from 'lucide-react';
+import { AMBER, INK, INK_MUTE } from '@/features/courses/_shared/tokens';
 
 interface ExploreSectionHeaderProps {
   /** Optional uppercase kicker above the title (e.g. "FROM YOUR FRIENDS"). */
@@ -19,13 +20,12 @@ interface ExploreSectionHeaderProps {
 }
 
 const KICKER_COLOR_MAP: Record<NonNullable<ExploreSectionHeaderProps['kickerColor']>, string> = {
-  slate: '#64748B',
-  amber: '#F7931E',
+  slate: INK_MUTE,
+  amber: AMBER,
   emerald: '#006747',
 };
 
-const INK = '#0F172A';
-const SUB = '#64748B';
+
 
 /**
  * Canonical section header for the Explore tab.
@@ -89,7 +89,7 @@ function ExploreSectionHeaderInner({
             style={{
               fontSize: 13,
               fontWeight: 500,
-              color: SUB,
+              color: INK_MUTE,
               margin: '3px 0 0',
               lineHeight: 1.35,
             }}

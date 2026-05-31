@@ -4,6 +4,7 @@ import type { ExploreHeroRow } from './hooks/useExploreHero';
 import { useExploreHero } from './hooks/useExploreHero';
 import type { ExploreMoodId } from './hooks/useExploreMood';
 import clbhouzLogo from '@/assets/clbhouz-logo.png';
+import { AMBER, INK_TINT_06, SLATE_50, SURFACE } from '@/features/courses/_shared/tokens';
 
 interface ExploreHeroProps {
   userId: string | undefined;
@@ -48,7 +49,7 @@ function ExploreHeroInner({ userId, mood }: ExploreHeroProps) {
       <section style={{ padding: '24px 16px 0' }}>
         <div
           className="w-full animate-pulse"
-          style={{ aspectRatio: '4/5', borderRadius: 16, background: 'rgba(15,23,42,0.06)' }}
+          style={{ aspectRatio: '4/5', borderRadius: 16, background: INK_TINT_06 }}
         />
       </section>
     );
@@ -69,7 +70,7 @@ function ExploreHeroInner({ userId, mood }: ExploreHeroProps) {
           borderRadius: 16,
           overflow: 'hidden',
           aspectRatio: '4/5',
-          background: '#F8FAFC',
+          background: SLATE_50,
         }}
       >
         {hero.hero_image_url ? (
@@ -114,7 +115,7 @@ function ExploreHeroInner({ userId, mood }: ExploreHeroProps) {
               fontWeight: 800,
               letterSpacing: '0.14em',
               textTransform: 'uppercase',
-              color: '#FFFFFF',
+              color: SURFACE,
               background: 'rgba(0, 0, 0, 0.28)',
               backdropFilter: 'blur(22px) saturate(180%)',
               WebkitBackdropFilter: 'blur(22px) saturate(180%)',
@@ -134,7 +135,7 @@ function ExploreHeroInner({ userId, mood }: ExploreHeroProps) {
               style={{
                 fontSize: 11,
                 fontWeight: 700,
-                color: '#FFFFFF',
+                color: SURFACE,
                 background: 'rgba(0,0,0,0.55)',
                 backdropFilter: 'blur(6px)',
                 padding: '4px 8px',
@@ -154,7 +155,7 @@ function ExploreHeroInner({ userId, mood }: ExploreHeroProps) {
             left: 0,
             right: 0,
             padding: 20,
-            color: '#FFFFFF',
+            color: SURFACE,
           }}
         >
           {tierLabel && (
@@ -178,7 +179,7 @@ function ExploreHeroInner({ userId, mood }: ExploreHeroProps) {
               letterSpacing: '-0.02em',
               lineHeight: 1.05,
               margin: 0,
-              color: '#FFFFFF',
+              color: SURFACE,
             }}
           >
             {hero.course_name}
@@ -212,7 +213,7 @@ function ExploreHeroInner({ userId, mood }: ExploreHeroProps) {
           {hero.rating_avg != null && (hero.review_count ?? 0) > 0 && (
             <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 12 }}>
               <img src={clbhouzLogo} alt="" style={{ width: 14, height: 14, objectFit: 'contain' }} />
-              <span style={{ fontSize: 13, fontWeight: 800, color: '#F7931E' }}>
+              <span style={{ fontSize: 13, fontWeight: 800, color: AMBER }}>
                 {Number(hero.rating_avg).toFixed(1)}
               </span>
               <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.7)' }}>
