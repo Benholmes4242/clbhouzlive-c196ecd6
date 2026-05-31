@@ -184,6 +184,9 @@ export function HoleStatsTab({ tournamentId, isCompleted, courseId, courseName }
 
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.3 }}>
+      {courseId && (
+        <ConnectHandicapCue variant="tour-holes" courseName={courseName ?? ''} />
+      )}
       {/* Round selector */}
       {availableRounds.length > 1 && (
         <div style={{ padding: '8px 20px' }}>
