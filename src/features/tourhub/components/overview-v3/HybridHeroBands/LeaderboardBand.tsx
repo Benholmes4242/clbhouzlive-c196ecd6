@@ -371,34 +371,8 @@ export function LeaderboardBand({
 
   return (
     <div style={{ background: '#F8FAFC' }}>
-      {showSectionHeader && (
-        <div
-          style={{
-            padding: '14px 20px 12px',
-            display: 'flex',
-            alignItems: 'baseline',
-            justifyContent: 'space-between',
-            gap: 12,
-          }}
-        >
-          <span
-            style={{
-              fontSize: 11,
-              fontWeight: 800,
-              letterSpacing: '0.16em',
-              color: AMBER,
-              textTransform: 'uppercase',
-            }}
-          >
-            {h.left}
-          </span>
-          {h.right && (
-            <span style={{ fontSize: 11, fontWeight: 600, color: INK_ALPHA_45 }}>{h.right}</span>
-          )}
-        </div>
-      )}
       {/* rows */}
-      <div style={{ borderTop: `0.5px solid ${INK_15}` }}>{body}</div>
+      <div>{body}</div>
       {/* Context strip (Defending Champion / Field) sits above the action */}
       {showFooterStrip && (
         <div
