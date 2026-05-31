@@ -82,11 +82,22 @@ export function HybridHero({ slide, activeTournamentId, onSelectTour }: HybridHe
 
   // 1-minute clock tick (suspended for live state — Sportradar polling drives those transitions)
   const [now, setNow] = useState(() => new Date());
+
+  // Preliminary state derive — drives data-fetch gating and tick cadence by
+  // the *visual* state (state.kind), NOT the carousel bucket (slide.type).
+  // This is the fix for the "UPCOMING badge over results card" bug: one
+  // source of truth (deriveHeroState) for everything visible.
+  const preliminaryState = useMemo(
+    () => deriveHeroState(tournament, now),
+    [tournament, now]
+  );
+  const kind = preliminaryState.kind;
+
   useEffect(() => {
-    if (slide.type === 'live') return;
+    if (kind === 'live') return;
     const id = setInterval(() => setNow(new Date()), 60_000);
     return () => clearInterval(id);
-  }, [slide.type]);
+  }, [kind]);
 
   // Course image
   const venueAdapter: TourTournament[] = useMemo(
@@ -101,13 +112,13 @@ export function HybridHero({ slide, activeTournamentId, onSelectTour }: HybridHe
     ? imageMap?.get(tournament.venueName) ?? null
     : null;
 
-  // Leaderboard (used for live + results states, top 4 + ticker)
-  const needsLeaderboard = slide.type !== 'upcoming';
+  // Leaderboard (live + results states, top 4 + ticker)
+  const needsLeaderboard = kind !== 'upcoming';
   const { data: leaderboard = [] } = useTourLeaderboard(needsLeaderboard ? tournament.id : '');
   const safeLeaderboard = Array.isArray(leaderboard) ? leaderboard : [];
 
-  // Defending champion (Upcoming) + last-year top 4 (Upcoming · far) + tee times (Upcoming · imminent)
-  const isUpcoming = slide.type === 'upcoming';
+  // Defending champion (Upcoming) + last-year top 4 + tee times
+  const isUpcoming = kind === 'upcoming';
   const { data: defendingChamp } = useTournamentDefendingChamp(isUpcoming ? tournament.id : null);
   const { data: lastYearTop4 } = useTournamentLastYearTop4(isUpcoming ? tournament.id : null);
 
@@ -116,12 +127,12 @@ export function HybridHero({ slide, activeTournamentId, onSelectTour }: HybridHe
   const teeTimesEnabled = isUpcoming && hoursUntilStart <= 48;
   const { data: teeTimes = [] } = useTournamentTeeTimes(tournament.id, teeTimesEnabled);
 
-  // Upcoming · far fallback chain — only enabled when no defending champion data
+  // Upcoming · far fallback chain
   const fallbackEnabled = isUpcoming && !defendingChamp;
   const { data: fieldStrength } = useTournamentFieldStrength(fallbackEnabled ? tournament.id : null);
   const { data: courseStats } = useTournamentCourseStats(fallbackEnabled ? tournament.id : null);
 
-  // Derive state
+  // Refined state (now we know whether teeTimes are available)
   const baseState = useMemo(
     () => deriveHeroState(tournament, now, { teeTimesAvailable: teeTimes.length > 0 }),
     [tournament, now, teeTimes.length]
@@ -151,10 +162,6 @@ export function HybridHero({ slide, activeTournamentId, onSelectTour }: HybridHe
     const top: any = safeLeaderboard[0];
     const winnerName = tournament.winnerName;
 
-    // Resolve avatar with the same priority leaderboard rows 2+ use:
-    //   1) explicit tournament.winnerPhotoUrl (when sync provides it)
-    //   2) joined leaderboard player photo (always present for ranked rows)
-    //   3) R2 headshot resolved by name + tour
     const resolveWinnerAvatar = (name?: string | null): string | null => {
       if (tournament.winnerPhotoUrl) return tournament.winnerPhotoUrl;
       if (top?.player?.photo_url) return top.player.photo_url;
@@ -188,8 +195,7 @@ export function HybridHero({ slide, activeTournamentId, onSelectTour }: HybridHe
     };
   }, [state, tournament, safeLeaderboard]);
 
-  // Team winner detection — uses synthesized team data on safeLeaderboard[0]
-  // (sr_leaderboards joins sr_teams + sr_team_players for LIV team events).
+  // Team winner detection
   const teamWinner = useMemo(() => {
     if (state.kind !== 'results') return null;
     const top: any = safeLeaderboard[0];
@@ -211,7 +217,7 @@ export function HybridHero({ slide, activeTournamentId, onSelectTour }: HybridHe
     };
   }, [state, safeLeaderboard]);
 
-  // Last year top 4 (Upcoming · far). Null → first-year-event placeholder.
+  // Last year top 4 — kept for cancelled fallback path
   const lastYearFinishers = useMemo(() => {
     if (state.kind !== 'upcoming' || state.variant !== 'far') return undefined;
     if (!lastYearTop4 || lastYearTop4.length === 0) return undefined;
@@ -234,15 +240,14 @@ export function HybridHero({ slide, activeTournamentId, onSelectTour }: HybridHe
   // CTA navigation
   const onCtaTap = () => {
     if (state.kind === 'results' && state.variant === 'cancelled') {
-      navigate('/tour'); // schedule landing
+      navigate('/tour');
       return;
     }
     const target = tournamentRoute(tournament.id);
     navigate(target.to, { state: target.state });
   };
 
-
-  // Pass 7: dates string for PhotoBand title row + tour label for top eyebrow.
+  // Dates string for legacy three-band path
   const startD = tournament.startDate ? new Date(tournament.startDate) : null;
   const endD = tournament.endDate ? new Date(tournament.endDate) : null;
   const datesString =
@@ -253,14 +258,14 @@ export function HybridHero({ slide, activeTournamentId, onSelectTour }: HybridHe
         : null;
   const tourLabel = tournament.tourName || tournament.tourSlug?.toUpperCase() || null;
 
-  // Direction A: CinematicFrame replaces the three-band stack for live + results.
-  // Upcoming keeps the original PhotoBand+MiddleBand+LeaderboardBand path.
+  // Direction A: CinematicFrame is the single hero surface for all three states.
+  // Legacy three-band path is retained only for the cancelled variant.
+  const useCinematicFrame =
+    state.kind === 'live' ||
+    state.kind === 'results' ||
+    state.kind === 'upcoming';
 
-  // Direction A: CinematicFrame replaces the three-band stack for live + results.
-  // Upcoming keeps the original PhotoBand+MiddleBand+LeaderboardBand path.
-  const useCinematicFrame = state.kind === 'live' || state.kind === 'results';
-
-  if (useCinematicFrame) {
+  if (useCinematicFrame && !(state.kind === 'results' && state.variant === 'cancelled')) {
     return (
       <div
         style={{
@@ -286,6 +291,8 @@ export function HybridHero({ slide, activeTournamentId, onSelectTour }: HybridHe
           tiedLeaders={tiedLeaders}
           fieldSize={safeLeaderboard.length}
           tourSlug={tournament.tourSlug}
+          defendingChamp={defendingChamp ?? null}
+          fieldStrength={fieldStrength ?? null}
           onCtaTap={onCtaTap}
         />
       </div>
