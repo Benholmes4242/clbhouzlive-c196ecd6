@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import type { MediaCounts } from './hooks/useCourseMedia';
 import type { CourseMediaFilter } from './hooks/useCourseMedia';
+import { INK, INK_FAINT, INK_MUTE, INK_TINT_05 } from '@/features/courses/_shared/tokens';
 
 interface CourseMediaHeaderProps {
   mediaCounts: MediaCounts;
@@ -31,17 +32,17 @@ export const CourseMediaHeader: React.FC<CourseMediaHeaderProps> = ({
       {/* Count row + Add media */}
       {(mediaCounts.photos > 0 || mediaCounts.videos > 0) && (
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, color: '#64748B' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, color: INK_MUTE }}>
             <Camera className="w-3.5 h-3.5" />
             <span>
-              <b style={{ color: '#0F172A' }}>{mediaCounts.photos}</b> photos
+              <b style={{ color: INK }}>{mediaCounts.photos}</b> photos
               {' · '}
-              <b style={{ color: '#0F172A' }}>{mediaCounts.videos}</b> videos
+              <b style={{ color: INK }}>{mediaCounts.videos}</b> videos
             </span>
           </div>
           <button
             onClick={() => navigate(`/courses/${courseId}/rate`)}
-            style={{ display: 'flex', alignItems: 'center', gap: 5, padding: '6px 12px', borderRadius: 8, background: 'rgba(15,23,42,0.05)', border: 'none', fontSize: 12, fontWeight: 700, color: '#0F172A', cursor: 'pointer' }}
+            style={{ display: 'flex', alignItems: 'center', gap: 5, padding: '6px 12px', borderRadius: 8, background: INK_TINT_05, border: 'none', fontSize: 12, fontWeight: 700, color: INK, cursor: 'pointer' }}
           >
             <Plus className="w-3.5 h-3.5" />
             Add media
@@ -63,7 +64,7 @@ export const CourseMediaHeader: React.FC<CourseMediaHeaderProps> = ({
                 border: 'none',
                 fontSize: 13,
                 fontWeight: isActive ? 800 : 500,
-                color: isActive ? '#0F172A' : '#94A3B8',
+                color: isActive ? INK : INK_FAINT,
                 cursor: 'pointer',
                 minHeight: 34,
                 letterSpacing: isActive ? '-0.01em' : 0,

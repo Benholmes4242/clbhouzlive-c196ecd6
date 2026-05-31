@@ -3,6 +3,7 @@ import { useCourseMediaViewerStore } from '@/components/course-media-tab/CourseM
 import { Film } from 'lucide-react';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import type { FeedPost } from '@/components/media-system/types/media';
+import { AMBER, INK_TINT_04, INK_TINT_06, SURFACE } from '@/features/courses/_shared/tokens';
 
 function formatDuration(seconds?: number): string {
   if (!seconds) return '0:00';
@@ -66,7 +67,7 @@ export const CourseMediaLandscapeCard: React.FC<CourseMediaLandscapeCardProps> =
         overflow: 'hidden',
         cursor: 'pointer',
         gridColumn: '1 / -1',
-        background: 'rgba(15,23,42,0.04)',
+        background: INK_TINT_04,
       }}
       className="active:scale-[0.99] transition-transform"
     >
@@ -78,7 +79,7 @@ export const CourseMediaLandscapeCard: React.FC<CourseMediaLandscapeCardProps> =
           loading="lazy"
         />
       ) : (
-        <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(15,23,42,0.06)' }}>
+        <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', background: INK_TINT_06 }}>
           <Film style={{ width: 36, height: 36, color: 'rgba(15,23,42,0.3)' }} />
         </div>
       )}
@@ -130,7 +131,7 @@ export const CourseMediaLandscapeCard: React.FC<CourseMediaLandscapeCardProps> =
             padding: '3px 6px',
             fontSize: 11,
             fontWeight: 700,
-            color: '#fff',
+            color: SURFACE,
             letterSpacing: '0.02em',
             zIndex: 2,
           }}
@@ -168,7 +169,7 @@ export const CourseMediaLandscapeCard: React.FC<CourseMediaLandscapeCardProps> =
                 style={{
                   fontSize: 13,
                   fontWeight: 600,
-                  color: '#FFFFFF',
+                  color: SURFACE,
                   textShadow: '0 1px 2px rgba(0,0,0,0.5)',
                   overflow: 'hidden',
                   textOverflow: 'ellipsis',
@@ -185,7 +186,7 @@ export const CourseMediaLandscapeCard: React.FC<CourseMediaLandscapeCardProps> =
             <svg width="13" height="13" viewBox="0 0 24 24" fill="#F7931E">
               <path d="M12 21s-7-4.5-9.5-9C1 9 2.5 5 6 5c2 0 3.5 1 4.5 2.5C11.5 6 13 5 15 5c3.5 0 5 4 3.5 7-2.5 4.5-9.5 9-9.5 9z"/>
             </svg>
-            <span style={{ fontSize: 11, fontWeight: 700, color: '#F7931E', textShadow: '0 1px 2px rgba(0,0,0,0.5)' }}>
+            <span style={{ fontSize: 11, fontWeight: 700, color: AMBER, textShadow: '0 1px 2px rgba(0,0,0,0.5)' }}>
               {post.likeCount}
             </span>
           </div>
