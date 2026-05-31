@@ -475,7 +475,7 @@ const CourseExplorer = () => {
       <UnseenReviewsBanner />
 
       {/* Your Network Section - Shows activity from friends */}
-      <YourNetworkSection className="mt-2 px-4" />
+      <YourNetworkSection className="mt-2" />
 
       <div
         className="pb-3 space-y-5 -mx-4 px-4"
