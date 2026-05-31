@@ -112,13 +112,6 @@ function buildPills({
 
   if (isLive) {
     const round = tournament.current_round ?? 1;
-    const cut = tournament.projected_cutline ?? tournament.cutline ?? null;
-    const showCut = round >= 2 && cut != null;
-    const redFigures = countUnderPar(leaderboard);
-
-    const cutOrRed: MastheadPill = showCut
-      ? { variant: 'normal', value: `Cut ${cut}` }
-      : { variant: 'normal', value: `${redFigures} in red figures` };
 
     const pills: MastheadPill[] = [
       { variant: 'live', value: `Round ${round}`, prefix: <LivePulse /> },
@@ -127,9 +120,9 @@ function buildPills({
       const score = leader.score ? ` ${leader.score}` : '';
       pills.push({ variant: 'highlight', value: `${leader.name}${score}` });
     }
-    pills.push(cutOrRed);
     return pills;
   }
+
 
   if (isCompleted) {
     const margin = computeMarginOfVictory(leaderboard ?? []);
