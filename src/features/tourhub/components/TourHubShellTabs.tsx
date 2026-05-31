@@ -103,7 +103,7 @@ export const TourHubShellTabs: React.FC = () => {
             fontFamily: 'Geist, system-ui, -apple-system, BlinkMacSystemFont, sans-serif',
           }}
         >
-          {TABS.map((tab) => {
+          {tabs.map((tab) => {
             const isActive = active === tab.id;
             return (
               <button
