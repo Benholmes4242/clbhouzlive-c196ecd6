@@ -338,6 +338,8 @@ export function CinematicFrame({
   tiedLeaders,
   fieldSize,
   tourSlug,
+  defendingChamp = null,
+  fieldStrength = null,
   onCtaTap,
 }: CinematicFrameProps) {
   const useDusk =
