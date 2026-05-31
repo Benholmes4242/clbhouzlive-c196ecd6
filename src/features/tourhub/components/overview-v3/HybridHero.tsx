@@ -339,57 +339,32 @@ export function HybridHero({ slide, activeTournamentId, onSelectTour }: HybridHe
         datesString={datesString}
       />
 
-      {useBroadcastResults ? (
-        <>
-          <ResultBand
-            winnerName={champion!.name}
-            winnerPhotoUrl={champion!.avatarUrl ?? null}
-            winnerScore={champion!.score}
-            winnerCountry={champion!.country}
-            narrative={tournament.championNarrative}
-            purse={tournament.purse}
-            currency={tournament.currency}
-            defendingChampion={tournament.defendingChampion}
-          />
-          <TopThreePeek rows={topThreeRows} onFullLeaderboardTap={onCtaTap} />
-          <SignatureFooter
-            state={state}
-            endDate={tournament.endDate}
-            venuePar={tournament.venuePar}
-            venueYardage={tournament.venueYardage}
-          />
-        </>
-      ) : (
-        <>
-          <MiddleBand
-            state={state}
-            top10={top10}
-            champion={champion}
-            tiedLeaders={tiedLeaders}
-            defendingChamp={defendingChamp}
-            fieldStrength={fieldStrength}
-            courseStats={courseStats}
-            teamWinner={teamWinner}
-            championRounds={state.kind === 'results' ? extractRounds(safeLeaderboard[0]) : undefined}
-            par={tournament.venuePar ?? undefined}
-            championNarrative={tournament.championNarrative}
-          />
-          <LeaderboardBand
-            state={state}
-            leaderboard={safeLeaderboard}
-            tiedLeaders={tiedLeaders}
-            champion={champion}
-            teeTimes={teeTimes}
-            lastYearFinishers={lastYearFinishers}
-            firstYearEvent={showFirstYearPlaceholder}
-            tourSlug={tournament.tourSlug}
-            par={tournament.venuePar ?? undefined}
-            defendingChampion={tournament.defendingChampion ?? null}
-            fieldSize={safeLeaderboard.length}
-            onCtaTap={onCtaTap}
-          />
-        </>
-      )}
+      <MiddleBand
+        state={state}
+        top10={top10}
+        champion={champion}
+        tiedLeaders={tiedLeaders}
+        defendingChamp={defendingChamp}
+        fieldStrength={fieldStrength}
+        courseStats={courseStats}
+        teamWinner={teamWinner}
+        par={tournament.venuePar ?? undefined}
+        championNarrative={tournament.championNarrative}
+      />
+      <LeaderboardBand
+        state={state}
+        leaderboard={safeLeaderboard}
+        tiedLeaders={tiedLeaders}
+        champion={champion}
+        teeTimes={teeTimes}
+        lastYearFinishers={lastYearFinishers}
+        firstYearEvent={showFirstYearPlaceholder}
+        tourSlug={tournament.tourSlug}
+        par={tournament.venuePar ?? undefined}
+        defendingChampion={tournament.defendingChampion ?? null}
+        fieldSize={safeLeaderboard.length}
+        onCtaTap={onCtaTap}
+      />
     </div>
   );
 }
