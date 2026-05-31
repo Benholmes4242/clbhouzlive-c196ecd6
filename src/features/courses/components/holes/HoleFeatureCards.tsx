@@ -58,7 +58,7 @@ const Card: React.FC<{
         >
           {hole.hole_no}
         </div>
-        <div style={{ fontSize: 11.5, fontWeight: 600, color: '#64748b' }}>
+        <div style={{ fontSize: 11.5, fontWeight: 600, color: INK_MUTE }}>
           Plays to {playsTo}
         </div>
       </div>
