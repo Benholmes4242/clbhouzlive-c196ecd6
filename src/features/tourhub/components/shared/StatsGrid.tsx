@@ -1,8 +1,7 @@
 import React from 'react';
 import {
-  inkSoft, inkFaint, inkGhost,
+  inkFaint, inkGhost,
   hairlineDark,
-  gold, greenLive, danger,
 } from '../../utils/heroAtmosphere';
 
 export interface StatsShape {
@@ -21,14 +20,17 @@ export interface StatsShape {
  * EAGLES/BOGEYS/DOUBLES ghost to `inkGhost` when the value is 0.
  */
 export function StatsGrid({ stats }: { stats: StatsShape }) {
-  const positiveColor = gold; // Birdies are always gold across all states
+  const AMBER = '#F7931E';
+  const SLATE_PAR = '#94A3B8';
+  const RED_BOGEY = '#EF4444';
+  const MAROON_DOUBLE = '#991B1B';
 
   const items = [
-    { v: stats.eagles, label: 'EAGLES', color: stats.eagles > 0 ? '#fff' : inkGhost },
-    { v: stats.birdies, label: 'BIRDIES', color: stats.birdies > 0 ? positiveColor : inkGhost },
-    { v: stats.pars, label: 'PARS', color: inkSoft },
-    { v: stats.bogeys, label: 'BOGEYS', color: stats.bogeys > 0 ? danger : inkGhost },
-    { v: stats.doubleBogeys, label: 'DOUBLES', color: stats.doubleBogeys > 0 ? danger : inkGhost },
+    { v: stats.eagles, label: 'EAGLES', color: stats.eagles > 0 ? AMBER : inkGhost },
+    { v: stats.birdies, label: 'BIRDIES', color: stats.birdies > 0 ? AMBER : inkGhost },
+    { v: stats.pars, label: 'PARS', color: SLATE_PAR },
+    { v: stats.bogeys, label: 'BOGEYS', color: stats.bogeys > 0 ? RED_BOGEY : inkGhost },
+    { v: stats.doubleBogeys, label: 'DOUBLES', color: stats.doubleBogeys > 0 ? MAROON_DOUBLE : inkGhost },
   ];
 
   return (

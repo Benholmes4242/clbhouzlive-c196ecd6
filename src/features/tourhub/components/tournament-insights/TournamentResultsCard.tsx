@@ -196,9 +196,9 @@ export function TournamentResultsCard({
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr' }}>
             {([
               { v: tStats.eagles,  label: 'Eagles',  color: '#F7931E'  },
-              { v: tStats.birdies, label: 'Birdies', color: '#16A34A'  },
-              { v: tStats.pars,    label: 'Pars',    color: '#0F172A'  },
-              { v: tStats.bogeys,  label: 'Bogeys',  color: '#DC2626'  },
+              { v: tStats.birdies, label: 'Birdies', color: '#F7931E'  },
+              { v: tStats.pars,    label: 'Pars',    color: '#94A3B8'  },
+              { v: tStats.bogeys,  label: 'Bogeys',  color: '#EF4444'  },
             ] as const).map((s, i) => (
               <div key={s.label} style={{
                 padding: '10px 16px',

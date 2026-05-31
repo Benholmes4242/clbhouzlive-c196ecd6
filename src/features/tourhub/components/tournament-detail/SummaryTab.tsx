@@ -9,7 +9,7 @@ import { Link } from 'react-router-dom';
 import { BatchPlayerAvatar } from '../PlayerAvatar';
 import { useTournamentScoringStats } from '../../hooks/useTourHubData';
 import { playerRoute } from '../../routes';
-import { AMBER, GOLD, HAIRLINE_INK_15, INK, INK_FAINT, INK_MUTE, INK_TINT_02, INK_TINT_06, INK_TINT_07, LIVE_DOT, LIVE_INK, SCORE_UNDER_PAR_LIGHT, SURFACE, TREND_DOWN, TREND_UP } from '../../_shared/tokens';
+import { AMBER, INK, INK_FAINT, INK_MUTE, INK_TINT_02, INK_TINT_06, INK_TINT_07, LIVE_DOT, LIVE_INK, SCORE_UNDER_PAR_LIGHT, SURFACE, TREND_DOWN, TREND_UP } from '../../_shared/tokens';
 
 interface SummaryTabProps {
   tournamentId: string;
@@ -187,8 +187,8 @@ export function SummaryTab({
                   fontSize: '14px', fontWeight: 600, flex: 1, textAlign: 'center' as const,
                   color: round.avgScore < 0 ? SCORE_UNDER_PAR_LIGHT : round.avgScore > 0 ? TREND_DOWN : INK_MUTE,
                 }}>{round.avgScore > 0 ? `+${round.avgScore.toFixed(1)}` : round.avgScore.toFixed(1)}</span>
-                <span style={{ fontSize: '14px', color: TREND_UP, fontWeight: 600, flex: 1, textAlign: 'center' as const }}>{round.totalBirdies}</span>
-                <span style={{ fontSize: '14px', color: TREND_DOWN, fontWeight: 600, flex: 1, textAlign: 'center' as const }}>{round.totalBogeys}</span>
+                <span style={{ fontSize: '14px', color: '#F7931E', fontWeight: 600, flex: 1, textAlign: 'center' as const }}>{round.totalBirdies}</span>
+                <span style={{ fontSize: '14px', color: '#EF4444', fontWeight: 600, flex: 1, textAlign: 'center' as const }}>{round.totalBogeys}</span>
               </div>
             ))}
           </div>
@@ -202,11 +202,11 @@ export function SummaryTab({
         if (total === 0) return null;
 
         const segments = [
-          { label: 'Eagles', count: t.eagles, color: GOLD, pct: (t.eagles / total * 100).toFixed(1) },
-          { label: 'Birdies', count: t.birdies, color: TREND_UP, pct: (t.birdies / total * 100).toFixed(1) },
-          { label: 'Pars', count: t.pars, color: HAIRLINE_INK_15, pct: (t.pars / total * 100).toFixed(1) },
-          { label: 'Bogeys', count: t.bogeys, color: TREND_DOWN, pct: (t.bogeys / total * 100).toFixed(1) },
-          { label: 'Double+', count: t.doubleBogeys, color: '#7F1D1D', pct: (t.doubleBogeys / total * 100).toFixed(1) },
+          { label: 'Eagles', count: t.eagles, color: '#F7931E', pct: (t.eagles / total * 100).toFixed(1) },
+          { label: 'Birdies', count: t.birdies, color: '#F7931E', pct: (t.birdies / total * 100).toFixed(1) },
+          { label: 'Pars', count: t.pars, color: '#94A3B8', pct: (t.pars / total * 100).toFixed(1) },
+          { label: 'Bogeys', count: t.bogeys, color: '#EF4444', pct: (t.bogeys / total * 100).toFixed(1) },
+          { label: 'Double+', count: t.doubleBogeys, color: '#991B1B', pct: (t.doubleBogeys / total * 100).toFixed(1) },
         ];
 
         return (
