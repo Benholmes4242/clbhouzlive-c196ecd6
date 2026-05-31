@@ -249,7 +249,7 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
         return (
           <>
             <div>
-              <SectionLabel text="Course Details" />
+              <SectionLabel text="Course Details" icon={BarChart3} />
               <div style={{ display: 'grid', gridTemplateColumns: `repeat(${Math.min(stats.length, 4)}, 1fr)`, padding: '0 16px' }}>
                 {stats.slice(0, 4).map((s, i, arr) => (
                   <div key={s.label} style={{ textAlign: 'center', padding: '4px 0', borderRight: i < arr.length - 1 ? `0.5px solid ${HAIRLINE_INK_8}` : 'none' }}>
