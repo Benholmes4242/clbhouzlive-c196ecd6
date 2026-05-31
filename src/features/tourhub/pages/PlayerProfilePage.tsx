@@ -131,7 +131,7 @@ export function PlayerProfilePage() {
     <TourHubShell>
       <ShellSlot dark>
         <div style={SHELL_SLOT_BG}>
-          <Kicker color="amber">{tourBadge}</Kicker>
+          <Kicker color="light">{tourBadge}</Kicker>
           <h1 style={SHELL_H1_STYLE}>{player.full_name}</h1>
         </div>
       </ShellSlot>
