@@ -511,6 +511,28 @@ export function FormSection({ playerId }: FormSectionProps) {
         activeIdx={activeIdx}
         setActiveIdx={setActiveIdx}
       />
+
+      {/* Legend */}
+      <div
+        style={{
+          display: 'flex',
+          gap: 16,
+          marginTop: 16,
+          paddingTop: 14,
+          borderTop: `0.5px solid ${INK_TINT_07}`,
+        }}
+      >
+        {([
+          ['In form · Top-10', SCORE_UNDER_PAR_LIGHT],
+          ['Solid', AMBER],
+          ['Off week', TREND_DOWN],
+        ] as const).map(([l, c]) => (
+          <div key={l} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+            <span style={{ width: 7, height: 7, borderRadius: '50%', background: c }} />
+            <span style={{ fontSize: 11, fontWeight: 600, color: INK_MUTE }}>{l}</span>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
