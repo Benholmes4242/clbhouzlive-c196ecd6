@@ -1,20 +1,17 @@
 /**
- * OverviewHero — self-contained hero for the Tour Hub Overview tab (two-state model).
- *   - 'live'      → HybridHero (unchanged)
- *   - 'recapNext' → HybridRecapNext (next event headline + results recap w/ top 3)
- * Owns its index internally. Tour switcher writes a slug via context; we read it
- * and jump our own index. Random landing, fixed (no auto-rotate), swipe + dots.
+ * OverviewHero — self-contained hero for the Tour Hub Overview tab.
+ * All states (live / results / upcoming / cancelled) route through HybridHero,
+ * which derives the visual state internally via deriveHeroState and renders
+ * the unified CinematicFrame capsule. Random landing, fixed (no auto-rotate),
+ * swipe + dots, tour-switcher tap-jump.
  *
  * ALL hooks run unconditionally before any early return (React #310 safety).
  */
 
 import React, { useMemo, useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useHeroSlidesHybrid, type HybridHeroSlide } from '../../hooks/useHeroSlidesHybrid';
-import { useTournamentLeadersWinners } from '../../hooks/useTournamentLeadersWinners';
-import type { HeroSlide } from '../../hooks/useHeroCarouselData';
+import { useHeroCarouselData, type HeroSlide } from '../../hooks/useHeroCarouselData';
 import { HybridHero } from './HybridHero';
-import { HybridRecapNext } from './HybridRecapNext';
 import { useTourSelection } from '../../context/TourSelectionContext';
 import { INK_TINT_06 } from '../../_shared/tokens';
 
@@ -34,24 +31,18 @@ interface OverviewHeroProps {
 }
 
 export function OverviewHero({ height = 528 }: OverviewHeroProps) {
-  const { slides: rawSlides, isLoading } = useHeroSlidesHybrid();
+  const { data: rawSlides = [], isLoading } = useHeroCarouselData();
 
   const idSignature = useMemo(
-    () => (Array.isArray(rawSlides) ? rawSlides.map((s) => s.id).join('|') : ''),
+    () => (Array.isArray(rawSlides) ? rawSlides.map((s) => s.tournament.id).join('|') : ''),
     [rawSlides],
   );
 
-  const slides = useMemo<HybridHeroSlide[]>(() => {
+  const slides = useMemo<HeroSlide[]>(() => {
     if (!Array.isArray(rawSlides) || rawSlides.length === 0) return [];
     return shuffle(rawSlides);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [idSignature]);
-
-  const completedIds = useMemo(
-    () => slides.filter((s) => s.kind === 'recapNext' && s.completed).map((s) => s.completed!.id),
-    [slides],
-  );
-  const { data: leadersMap } = useTournamentLeadersWinners(completedIds);
 
   const [activeIndex, setActiveIndex] = useState(0);
   const count = slides.length;
@@ -60,7 +51,7 @@ export function OverviewHero({ height = 528 }: OverviewHeroProps) {
 
   useEffect(() => {
     if (!selectedTourSlug || count === 0) return;
-    const idx = slides.findIndex((s) => s.tourSlug === selectedTourSlug);
+    const idx = slides.findIndex((s) => s.tournament.tourSlug === selectedTourSlug);
     if (idx >= 0) setActiveIndex(idx);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectionNonce]);
@@ -72,12 +63,7 @@ export function OverviewHero({ height = 528 }: OverviewHeroProps) {
     setActiveIndex(0);
   }, [idSignature]);
 
-  // DISPLAY-ONLY: report the tour currently in view so the switcher label can
-  // track it (random landing, swipe, dots, tap-jump). Computed inline (not from
-  // the post-return `active`) and placed with the other hooks so hook ORDER is
-  // unconditional — every render runs the same hooks (fixes React #310). The
-  // hero NEVER reads viewingTourSlug back; one-way, dead end.
-  const viewingSlug = count > 0 ? slides[Math.min(activeIndex, count - 1)]?.tourSlug : undefined;
+  const viewingSlug = count > 0 ? slides[Math.min(activeIndex, count - 1)]?.tournament.tourSlug : undefined;
   useEffect(() => {
     if (viewingSlug) setViewingTourSlug(viewingSlug);
   }, [viewingSlug, setViewingTourSlug]);
@@ -109,25 +95,14 @@ export function OverviewHero({ height = 528 }: OverviewHeroProps) {
   return (
     <div style={{ position: 'relative', width: '100%' }} onTouchStart={onTouchStart} onTouchMove={onTouchMove} onTouchEnd={onTouchEnd}>
       <AnimatePresence mode="wait">
-        <motion.div key={active.id} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.25 }}>
-          {active.kind === 'live' && active.live ? (
-            <HybridHero
-              slide={{ tournament: active.live, type: 'live' } as HeroSlide}
-              activeTournamentId={active.live.id}
-              onSelectTour={NOOP}
-            />
-          ) : (
-            <HybridRecapNext
-              tourName={(active.upcoming ?? active.completed)?.tourName ?? ''}
-              completed={active.completed}
-              upcoming={active.upcoming}
-              completedLeaders={active.completed ? leadersMap?.get(active.completed.id) : undefined}
-              height={height}
-            />
-          )}
+        <motion.div key={active.tournament.id} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.25 }}>
+          <HybridHero
+            slide={active}
+            activeTournamentId={active.tournament.id}
+            onSelectTour={NOOP}
+          />
         </motion.div>
       </AnimatePresence>
-
     </div>
   );
 }
