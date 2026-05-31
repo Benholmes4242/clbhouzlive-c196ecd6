@@ -232,14 +232,14 @@ export const ReviewBlockFlat: React.FC<ReviewBlockFlatProps> = ({
               style={{
                 display: 'flex',
                 alignItems: 'center',
-                gap: 4,
-                padding: '3px 8px',
-                borderRadius: 6,
-                background: 'rgba(15,23,42,0.03)',
-                border: '0.5px solid rgba(15,23,42,0.08)',
+                gap: 5,
+                padding: '4px 9px',
+                borderRadius: 7,
+                background: 'rgba(15,23,42,0.025)',
+                border: '0.5px solid rgba(15,23,42,0.07)',
               }}
             >
-              <span style={{ fontSize: 9, fontWeight: 700, color: '#94A3B8', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+              <span style={{ fontSize: 9, fontWeight: 700, color: '#64748B', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
                 {s.label}
               </span>
               <span style={{ fontSize: 11, fontWeight: 800, color: '#0F172A', fontVariantNumeric: 'tabular-nums' }}>
@@ -249,6 +249,7 @@ export const ReviewBlockFlat: React.FC<ReviewBlockFlatProps> = ({
           ))}
         </div>
       )}
+
 
       {/* Review text */}
       {text && text.trim().length > 0 && (
