@@ -30,8 +30,8 @@ function Stat({ value, label }: { value: string | number; label: string }) {
     <div style={{ flex: 1, minWidth: 0, padding: '10px 4px', overflow: 'hidden', textAlign: 'center' }}>
       <div
         style={{
-          fontSize: 'clamp(18px, 5vw, 22px)',
-          fontWeight: 900,
+          fontSize: 'clamp(16px, 4.5vw, 19px)',
+          fontWeight: 800,
           letterSpacing: '-0.02em',
           color: '#FFFFFF',
           lineHeight: 1,
@@ -91,71 +91,63 @@ function ExplorePassportInner({ userId }: ExplorePassportProps) {
         kicker="Your Journey"
         title="Season passport"
         sub={sinceLabel}
+        action={{ label: 'View profile', onClick: () => navigate('/profile') }}
       />
       <div style={{ padding: '0 16px' }}>
         <div
           style={{
             background: 'linear-gradient(135deg, #0F4A3A 0%, #1A6A54 100%)',
-            border: 'none',
-            borderRadius: 14,
-            padding: 18,
+            borderRadius: 16,
+            padding: 20,
             position: 'relative',
           }}
         >
+          {/* HOOK — focal point */}
+          {hook ? (
+            <div style={{ marginBottom: 18 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 7, marginBottom: 8 }}>
+                <TrendingUp size={15} color="#FBBC2E" style={{ flexShrink: 0 }} />
+                <span style={{
+                  fontSize: 10, fontWeight: 800, letterSpacing: '0.14em', textTransform: 'uppercase',
+                  color: '#FBBC2E',
+                }}>
+                  Next milestone
+                </span>
+              </div>
+              <p style={{
+                fontSize: 22, fontWeight: 800, letterSpacing: '-0.02em', lineHeight: 1.2,
+                color: '#FFFFFF', margin: 0,
+              }}>
+                {hook}
+              </p>
+            </div>
+          ) : (
+            <div style={{ marginBottom: 18 }}>
+              <p style={{
+                fontSize: 22, fontWeight: 800, letterSpacing: '-0.02em', lineHeight: 1.2,
+                color: '#FFFFFF', margin: 0,
+              }}>
+                Your golf, mapped.
+              </p>
+            </div>
+          )}
+
+          {/* hairline divider */}
+          <div style={{ height: 1, background: 'rgba(255,255,255,0.14)', margin: '0 0 16px' }} />
+
+          {/* STATS — quieter supporting row */}
           <div style={{ display: 'flex', alignItems: 'stretch' }}>
             <Stat value={passport.courses_played ?? 0} label="Courses" />
-            <div style={{ width: 1, background: 'rgba(255,255,255,0.18)', margin: '8px 0' }} />
+            <div style={{ width: 1, background: 'rgba(255,255,255,0.14)', margin: '4px 0' }} />
             <Stat value={passport.countries_played ?? 0} label="Countries" />
-            <div style={{ width: 1, background: 'rgba(255,255,255,0.18)', margin: '8px 0' }} />
+            <div style={{ width: 1, background: 'rgba(255,255,255,0.14)', margin: '4px 0' }} />
             <Stat value={passport.top_100_played ?? 0} label="Top 100" />
-            <div style={{ width: 1, background: 'rgba(255,255,255,0.18)', margin: '8px 0' }} />
+            <div style={{ width: 1, background: 'rgba(255,255,255,0.14)', margin: '4px 0' }} />
             <Stat
-              value={
-                passport.avg_rating_given != null
-                  ? Number(passport.avg_rating_given).toFixed(1)
-                  : '—'
-              }
+              value={passport.avg_rating_given != null ? Number(passport.avg_rating_given).toFixed(1) : '—'}
               label="Avg given"
             />
           </div>
-          <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 14 }}>
-            <button
-              type="button"
-              onClick={() => navigate('/profile')}
-              className="active:scale-[0.97] transition-transform"
-              style={{
-                fontSize: 11,
-                fontWeight: 700,
-                letterSpacing: '0.02em',
-                color: '#FFFFFF',
-                background: 'rgba(255,255,255,0.14)',
-                border: '1px solid rgba(255,255,255,0.2)',
-                padding: '6px 12px',
-                borderRadius: 999,
-              }}
-            >
-              View profile
-            </button>
-          </div>
-          {hook && (
-            <div
-              style={{
-                marginTop: 16,
-                padding: '11px 13px',
-                borderRadius: 12,
-                background: 'rgba(255,255,255,0.08)',
-                border: '1px solid rgba(255,255,255,0.12)',
-                display: 'flex',
-                alignItems: 'center',
-                gap: 9,
-              }}
-            >
-              <TrendingUp size={16} color="#FBBC2E" style={{ flexShrink: 0 }} />
-              <span style={{ fontSize: 13, fontWeight: 600, color: '#fff', lineHeight: 1.35 }}>
-                {hook}
-              </span>
-            </div>
-          )}
         </div>
       </div>
     </section>
