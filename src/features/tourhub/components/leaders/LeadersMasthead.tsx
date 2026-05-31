@@ -47,14 +47,16 @@ export function PillView({ pill }: { pill: MastheadPill }) {
   const isLive = pill.variant === 'live';
   const isAmberToned = isHighlight || isLive;
 
-  const bg = isAmberToned ? AMBER_TINT_12 : WHITE_ALPHA_10;
+  // Liquid-glass base: dark translucent fallback under the backdrop blur
+  // so the pill stays legible if backdrop-filter is unsupported.
+  const bg = isAmberToned ? 'rgba(15,23,42,0.30)' : 'rgba(15,23,42,0.28)';
   const border = isLive
-    ? 'rgba(247,147,30,0.55)'
+    ? 'rgba(247,147,30,0.65)'
     : isHighlight
-      ? 'rgba(247,147,30,0.30)'
-      : 'rgba(255,255,255,0.18)';
+      ? 'rgba(247,147,30,0.45)'
+      : 'rgba(255,255,255,0.22)';
   const valueColor = isAmberToned ? '#F7931E' : '#ffffff';
-  const labelColor = isAmberToned ? 'rgba(247,147,30,0.75)' : 'rgba(255,255,255,0.45)';
+  const labelColor = isAmberToned ? 'rgba(247,147,30,0.85)' : 'rgba(255,255,255,0.55)';
   const Icon = pill.icon === 'flame' ? Flame : pill.icon === 'trophy' ? Trophy : null;
 
   return (
@@ -64,13 +66,17 @@ export function PillView({ pill }: { pill: MastheadPill }) {
         alignItems: 'center',
         gap: 4,
         padding: '5px 9px',
-        borderRadius: 6,
+        borderRadius: 9,
         background: bg,
-        border: `1px solid ${border}`,
+        border: `0.5px solid ${border}`,
+        backdropFilter: GLASS_BLUR,
+        WebkitBackdropFilter: GLASS_BLUR,
+        boxShadow: 'inset 0 0.5px 0 rgba(255,255,255,0.30), 0 2px 8px rgba(0,0,0,0.18)',
         fontSize: 11,
         lineHeight: 1.2,
         whiteSpace: 'nowrap',
         fontVariantNumeric: 'tabular-nums',
+        textShadow: '0 1px 2px rgba(0,0,0,0.35)',
       }}
     >
       {pill.prefix
