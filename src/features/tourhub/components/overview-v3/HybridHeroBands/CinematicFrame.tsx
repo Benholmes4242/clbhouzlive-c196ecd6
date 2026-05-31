@@ -72,7 +72,7 @@ function StackedAvatarsDark({
           style={{
             width: size,
             height: size,
-            borderRadius: '50%',
+            borderRadius: '34%',
             marginLeft: i === 0 ? 0 : -8,
             border: '1.5px solid rgba(255,255,255,0.9)',
             background: 'rgba(255,255,255,0.08)',
