@@ -7,6 +7,7 @@ import { Trophy } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { BatchPlayerAvatar } from '../PlayerAvatar';
+import { EditorialEmpty } from './EditorialEmpty';
 import { useTournamentScoringStats } from '../../hooks/useTourHubData';
 import { playerRoute } from '../../routes';
 import { AMBER, INK, INK_FAINT, INK_MUTE, INK_TINT_02, INK_TINT_06, INK_TINT_07, LIVE_DOT, LIVE_INK, SCORE_UNDER_PAR_LIGHT, SURFACE, TREND_DOWN, TREND_UP } from '../../_shared/tokens';
@@ -54,24 +55,6 @@ function SummarySkeleton() {
   );
 }
 
-function SummaryEmpty() {
-  return (
-    <motion.div
-      className="flex items-center justify-center py-20"
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.3 }}
-    >
-      <div className="text-center space-y-3">
-        <Trophy className="w-12 h-12 mx-auto text-muted-foreground" />
-        <h3 className="text-lg font-semibold text-foreground">Summary Coming Soon</h3>
-        <p className="text-sm text-muted-foreground max-w-[280px] mx-auto">
-          Tournament summary will be available after completion.
-        </p>
-      </div>
-    </motion.div>
-  );
-}
 
 const sectionEntrance = {
   initial: { opacity: 0, y: 10 } as const,
@@ -152,7 +135,15 @@ export function SummaryTab({
   }, [leaderboard]);
 
 
-  if (!isLive && !isCompleted) return <SummaryEmpty />;
+  if (!isLive && !isCompleted)
+    return (
+      <EditorialEmpty
+        icon={<Trophy size={28} strokeWidth={1.8} color={AMBER} />}
+        eyebrow="Summary"
+        title="Summary arrives after the final putt"
+        body="Once the tournament wraps, you'll get the winner, the runner-up, margin of victory, and earnings — the whole story in one place."
+      />
+    );
   if (isLoading) return <SummarySkeleton />;
 
   return (

@@ -8,7 +8,6 @@ import { useBottomNavigation } from '@/contexts/BottomNavigationContext';
 import { useParams, useSearchParams, Link } from 'react-router-dom';
 import { Trophy, AlertCircle } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { formatDistanceToNow } from 'date-fns';
 import { TourHubShell } from '../components/TourHubShell';
 import { ShellSlot } from '@/components/header/ShellSlot';
 import { TournamentTabsShellRow } from '../components/shell/TournamentTabsShellRow';
@@ -31,7 +30,8 @@ import {
   LiveOverviewTab,
   type TournamentTab,
 } from '../components/tournament-detail';
-import { TournamentEmptyState } from '../components/tournament-detail/TournamentEmptyState';
+import { EditorialEmpty } from '../components/tournament-detail/EditorialEmpty';
+import { AMBER } from '../_shared/tokens';
 import { HAIRLINE_INK_10, INK_TINT_06, INK_TINT_07, SHELL_BG, SLATE_50, SURFACE, WHITE_ALPHA_08, WHITE_ALPHA_10 } from '../_shared/tokens';
 
 const VALID_TABS: TournamentTab[] = ['overview', 'leaderboard', 'summary', 'tee-times', 'hole-stats'];
@@ -85,14 +85,6 @@ export function TournamentDetailPage() {
   
   const headshotMap = undefined;
 
-  const countdownText = useMemo(() => {
-    if (!tournament || !isUpcoming) return undefined;
-    try {
-      return `Starts ${formatDistanceToNow(new Date(tournament.start_date), { addSuffix: true })}`;
-    } catch {
-      return undefined;
-    }
-  }, [tournament, isUpcoming]);
 
   const leader = useMemo(() => {
     if (!isLive || !leaderboard?.length) return null;
@@ -237,11 +229,11 @@ export function TournamentDetailPage() {
       case 'leaderboard':
         if (!hasLeaderboard) {
           return (
-            <TournamentEmptyState
-              icon={<Trophy className="w-16 h-16" />}
-              title="Leaderboard Coming Soon"
-              subtitle="Leaderboard data will appear once the tournament begins."
-              countdown={countdownText}
+            <EditorialEmpty
+              icon={<Trophy size={28} strokeWidth={1.8} color={AMBER} />}
+              eyebrow="Leaderboard"
+              title="The board lights up when play begins"
+              body="Live positions, scores, and movement appear here the moment the first group tees off."
             />
           );
         }

@@ -10,16 +10,17 @@
  * inside TournamentDetailPage. This component is purpose-built for live moments
  * — it stays narrow, story-driven, and avoids duplicating the hero pills.
  *
- * Empty fallbacks use EditorialEmpty (3px amber rail) instead of generic spinners.
+ * Empty fallbacks use EditorialEmpty (centred icon-tile) instead of generic spinners.
  */
 
 import { useMemo } from 'react';
 import { motion } from 'framer-motion';
+import { Scissors, Activity } from 'lucide-react';
 import { LeaderboardCard } from './LeaderboardCard';
 import { CourseInfoCard } from './CourseInfoCard';
 import { EditorialEmpty } from './EditorialEmpty';
 import type { TourTournament } from '../../hooks/useTourHubData';
-import { INK, INK_MUTE, INK_TINT_07, SLATE_50, SURFACE } from '../../_shared/tokens';
+import { AMBER, INK, INK_MUTE, INK_TINT_07, SLATE_50, SURFACE } from '../../_shared/tokens';
 
 interface LiveOverviewTabProps {
   tournament: TourTournament;
@@ -73,6 +74,7 @@ function CutContextCard({
   if (round < 2 || (cut == null && projectedCut == null)) {
     return (
       <EditorialEmpty
+        icon={<Scissors size={28} strokeWidth={1.8} color={AMBER} />}
         eyebrow={`Round ${round}`}
         title="Cut line forms after Round 2"
         body="The cut is set once the second round completes. We'll show projected and official cut lines here as scoring develops."
@@ -161,6 +163,7 @@ export function LiveOverviewTab({
         />
       ) : (
         <EditorialEmpty
+          icon={<Activity size={28} strokeWidth={1.8} color={AMBER} />}
           eyebrow="Live"
           title="Scoring loading"
           body="Live scoring rows will populate here as players post numbers in the current round."
