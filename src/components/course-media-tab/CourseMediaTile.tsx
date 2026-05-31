@@ -76,7 +76,7 @@ export const CourseMediaTile: React.FC<CourseMediaTileProps> = ({ post, index, f
         <img
           src={thumbnailUrl}
           alt=""
-          style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }}
+          style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center 40%' }}
           loading="lazy"
         />
       ) : (
