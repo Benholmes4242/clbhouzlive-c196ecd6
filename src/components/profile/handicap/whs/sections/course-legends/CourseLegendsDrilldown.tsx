@@ -356,6 +356,7 @@ export const CourseLegendsDrilldown: React.FC<Props> = ({ selection, hideHeader 
               valueDisplay: r.valueDisplay,
               isSelf: r.isSelf,
               gapToChampion: r.rank === champion.rank ? null : formatGap(r.value),
+              userId: r.userId,
             }));
 
             return (
@@ -368,6 +369,8 @@ export const CourseLegendsDrilldown: React.FC<Props> = ({ selection, hideHeader 
                   holdDuration={holdDurationDisplay}
                   rows={sectionRows}
                   onFullLeaderboardTap={() => setFullLeaderboardCategory(cat)}
+                  currentCourseId={ctx.courseId}
+                  window={window}
                 />
               </div>
             );
