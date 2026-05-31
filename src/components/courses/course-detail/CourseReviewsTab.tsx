@@ -478,7 +478,7 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
           {myReview && (
             <>
               {' · '}
-              <button onClick={handleRateClick} style={{ background: 'none', border: 'none', color: '#F7931E', fontSize: 11, fontWeight: 700, cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+              <button onClick={handleRateClick} style={{ background: 'none', border: 'none', color: AMBER, fontSize: 11, fontWeight: 700, cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: 4 }}>
                 <Pencil className="w-3.5 h-3.5" /> Edit yours
               </button>
             </>
