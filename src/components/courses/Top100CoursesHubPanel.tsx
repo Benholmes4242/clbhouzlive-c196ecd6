@@ -335,7 +335,7 @@ const Top100CoursesHubPanel = () => {
       {isLoading ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 animate-fade-in">
           {[1, 2, 3, 4, 5, 6].map((i) => (
-            <div key={i} className="space-y-3 rounded-2xl overflow-hidden" style={{ background: '#ffffff', border: '1px solid rgba(15,23,42,0.07)' }}>
+            <div key={i} className="space-y-3 rounded-2xl overflow-hidden" style={{ background: SURFACE, border: `1px solid ${HAIRLINE_INK_7}` }}>
               <Skeleton className="h-40 w-full rounded-xl" />
               <div className="space-y-2">
                 <Skeleton className="h-5 w-3/4" />
