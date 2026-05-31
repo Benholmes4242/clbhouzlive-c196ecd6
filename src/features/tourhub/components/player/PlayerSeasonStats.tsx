@@ -156,14 +156,20 @@ export function PlayerSeasonStats({ playerStats }: PlayerSeasonStatsProps) {
           </span>
         </div>
 
-        {/* Underline tabs — slate-600 active label + underline on light surface */}
+        {/* Underline tabs — matches TourHubShellTabs style (swipable carousel, 14px, underline) */}
         <div
+          className="segmented-scroller player-stats-tabs"
           role="tablist"
           aria-label="Stat category"
           style={{
             display: 'flex',
-            gap: 20,
+            gap: 8,
             marginBottom: 12,
+            overflowX: 'auto',
+            overflowY: 'hidden',
+            WebkitOverflowScrolling: 'touch',
+            scrollbarWidth: 'none',
+            fontFamily: 'Geist, system-ui, -apple-system, BlinkMacSystemFont, sans-serif',
           }}
         >
           {STAT_TABS.map((tab) => {
@@ -173,28 +179,45 @@ export function PlayerSeasonStats({ playerStats }: PlayerSeasonStatsProps) {
                 key={tab}
                 role="tab"
                 aria-selected={isActive}
-                onClick={() => setActiveTab(tab)}
-                className="active:opacity-80 transition-opacity"
+                onClick={(e) => {
+                  setActiveTab(tab);
+                  e.currentTarget.scrollIntoView({ block: 'nearest', inline: 'center', behavior: 'smooth' });
+                }}
                 style={{
-                  padding: '8px 0',
+                  flex: '0 0 auto',
+                  height: 44,
+                  padding: '0 4px',
+                  borderRadius: 0,
+                  border: 'none',
+                  background: 'transparent',
+                  color: isActive ? INK : INK_FAINT,
+                  fontFamily: 'inherit',
                   fontSize: 14,
                   fontWeight: isActive ? 700 : 600,
-                  lineHeight: 1,
-                  color: isActive ? INK : INK_FAINT,
-                  background: 'transparent',
-                  border: 'none',
-                  borderBottom: `1.5px solid ${isActive ? INK : 'transparent'}`,
-                  cursor: 'pointer',
+                  letterSpacing: '-0.005em',
                   whiteSpace: 'nowrap' as const,
-                  transition: 'color 0.15s ease, border-color 0.15s ease',
+                  cursor: 'pointer',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  position: 'relative' as const,
+                  transition: 'color 0.15s',
                 }}
               >
-                {tab}
+                <span
+                  style={{
+                    display: 'inline-block',
+                    paddingBottom: 4,
+                    borderBottom: isActive ? `1.5px solid ${INK}` : '1.5px solid transparent',
+                  }}
+                >
+                  {tab}
+                </span>
               </button>
             );
           })}
         </div>
       </div>
+
 
       {/* Tab content */}
       <AnimatePresence mode="wait">
