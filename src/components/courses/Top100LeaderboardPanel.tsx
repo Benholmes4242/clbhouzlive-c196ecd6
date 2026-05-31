@@ -96,6 +96,9 @@ const Top100LeaderboardPanel = () => {
         </div>
 
         <TabsContent value="championship" className="mt-0">
+          <div className="px-4" style={{ marginTop: 12, marginBottom: 4 }}>
+            <ConnectHandicapCue variant="leaderboard" />
+          </div>
           <ChampionshipLeaderboardView />
         </TabsContent>
 
