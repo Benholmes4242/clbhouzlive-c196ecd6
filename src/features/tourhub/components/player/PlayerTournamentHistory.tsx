@@ -75,11 +75,7 @@ export function PlayerTournamentHistory({ playerId, playerName }: PlayerTourname
               const score = result.score;
               const scoreStr = formatScore(score);
               const displayScore = isMissed ? '—' : scoreStr;
-              const scoreColor = isMissed
-                ? INK_FAINT
-                : score !== null && score < 0 ? AMBER
-                : score !== null && score > 0 ? SCORE_OVER_PAR_LIGHT
-                : INK_FAINT;
+              const scoreColor = isMissed ? INK_FAINT : INK;
 
               const navTarget = tournamentRoute(result.tournament_id, {
                 kind: 'player',
