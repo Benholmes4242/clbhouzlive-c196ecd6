@@ -253,29 +253,8 @@ export function HybridHero({ slide, activeTournamentId, onSelectTour }: HybridHe
         : null;
   const tourLabel = tournament.tourName || tournament.tourSlug?.toUpperCase() || null;
 
-  // Pass 7: results-state TopThreePeek rows (positions 2..4)
-  const topThreeRows: TopThreePeekRow[] =
-    state.kind === 'results' && state.variant === 'standard'
-      ? safeLeaderboard.slice(1, 4).map((e: any) => {
-          const player = e?.player;
-          const name =
-            player?.full_name ||
-            `${player?.first_name ?? ''} ${player?.last_name ?? ''}`.trim() ||
-            '—';
-          const country = player?.country_code || player?.country || null;
-          const rank = e?.position != null
-            ? (e?.position_tied ? `T${e.position}` : String(e.position))
-            : '—';
-          let photoUrl: string | null = player?.photo_url ?? null;
-          if (!photoUrl && name && tournament.tourSlug) {
-            try { photoUrl = getPlayerHeadshotUrl(name, tournament.tourSlug); } catch { photoUrl = null; }
-          }
-          return { rank, name, country, photoUrl, score: fmtScore(e?.score) };
-        })
-      : [];
-
-  const useBroadcastResults =
-    state.kind === 'results' && state.variant === 'standard' && !!champion;
+  // Direction A: CinematicFrame replaces the three-band stack for live + results.
+  // Upcoming keeps the original PhotoBand+MiddleBand+LeaderboardBand path.
 
   // Direction A: CinematicFrame replaces the three-band stack for live + results.
   // Upcoming keeps the original PhotoBand+MiddleBand+LeaderboardBand path.
