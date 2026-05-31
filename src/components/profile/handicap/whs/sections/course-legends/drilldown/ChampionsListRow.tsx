@@ -1,6 +1,9 @@
 import { GAM } from '../../../gam/tokens';
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Crown } from 'lucide-react';
+import { usePlayerOtherTitles } from '@/hooks/gam/usePlayerOtherTitles';
+import type { LegendWindow } from '@/lib/gam/types';
 
 interface ChampionsListRowProps {
   rank: number;
@@ -12,6 +15,12 @@ interface ChampionsListRowProps {
   isChampion: boolean;
   gapToChampion: string | null;
   holdDuration: string | null;
+  /** Champion's user_id — required to look up cross-course titles. */
+  userId?: string | null;
+  /** Current course id, excluded from cross-course title results. */
+  currentCourseId?: string;
+  /** Active window — filters cross-course titles to the same window. */
+  window?: LegendWindow;
 }
 
 
