@@ -15,7 +15,7 @@ import { TeamFinishRow } from './TeamFinishRow';
 import { CancelledPanel } from './CancelledPanel';
 import { PlayoffPendingPanel } from './PlayoffPendingPanel';
 import { INK, INK_15, AMBER } from '../HybridHero.constants';
-import { INK_ALPHA_45, FONT } from '../../../_shared/tokens';
+import { INK_ALPHA_45, FONT, GOLD, GOLD_DEEP } from '../../../_shared/tokens';
 import type { TeeTimeGroup } from '../../../hooks/useTournamentTeeTimes';
 import { getPlayerHeadshotUrl } from '@/utils/playerHeadshot';
 
