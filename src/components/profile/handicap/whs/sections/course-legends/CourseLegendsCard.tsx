@@ -1,94 +1,76 @@
 import React, { useState } from 'react';
-import { ChevronRight } from 'lucide-react';
+import { ChevronRight, Crown } from 'lucide-react';
 import type { LegendCategory } from '@/lib/gam/types';
-import {
-  legendCategoryIcon,
-  formatLegendValueCompact,
-} from '@/lib/gam/visuals';
+import { formatLegendValueCompact } from '@/lib/gam/visuals';
 import type { CourseLegendHolderRow } from '@/hooks/gam/useCourseLegendHolders';
 import { CourseEyebrow } from './_shared/CourseEyebrow';
 import { getFooterCue, FOOTER_INTENT_STYLE } from './footerCue';
+import { CHAMPIONS_ORDER } from './_shared/championsOrder';
+import { GAM } from '../../gam/tokens';
 
-const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
-const GOLD = '#FBBC2E';
-
-/** Left column — achievements (rare events, ascending: ACE rarest) */
-const LEFT_CATEGORIES: LegendCategory[] = [
-  'most_aces_90d', 'most_aces_all_time',
-  'most_eagles_90d', 'most_eagles_all_time',
-  'most_birdies_90d', 'most_birdies_all_time',
-];
-
-/** Right column — scoring (round outcomes) */
-const RIGHT_CATEGORIES: LegendCategory[] = [
-  'lowest_gross_90d', 'lowest_gross_all_time',
-  'best_stableford_90d', 'best_stableford_all_time',
-  'best_score_diff_90d', 'best_score_diff_all_time',
-];
+const FONT = GAM.FONT_GEIST;
 
 /**
- * Tile palette per category. Non-self tiles take a 10-12% tint of the
- * category colour with a matching border. Self/active state overrides
- * with gold (handled in HolderCell).
+ * Canonical category order — Gross → Aces → Eagle → Birdie → Stableford → Score.
+ * The grid receives a window-filtered holder map (90d OR all-time), but the
+ * cell needs to map either window's key to the same display slot. We resolve
+ * by checking both _90d and _all_time variants per slot.
  */
-const CATEGORY_TILE_PALETTE: Record<LegendCategory, { bg: string; border: string; icon: string }> = {
-  most_aces_90d:            { bg: 'rgba(217,70,239,0.10)', border: 'rgba(217,70,239,0.18)', icon: '#D946EF' },
-  most_aces_all_time:       { bg: 'rgba(217,70,239,0.10)', border: 'rgba(217,70,239,0.18)', icon: '#D946EF' },
-  most_eagles_90d:          { bg: 'rgba(5,150,105,0.14)', border: 'rgba(5,150,105,0.26)', icon: '#059669' },
-  most_eagles_all_time:     { bg: 'rgba(5,150,105,0.14)', border: 'rgba(5,150,105,0.26)', icon: '#059669' },
-  most_birdies_90d:         { bg: 'rgba(251,188,46,0.12)', border: 'rgba(251,188,46,0.22)', icon: '#FBBC2E' },
-  most_birdies_all_time:    { bg: 'rgba(251,188,46,0.12)', border: 'rgba(251,188,46,0.22)', icon: '#FBBC2E' },
-  lowest_gross_90d:         { bg: 'rgba(255,255,255,0.05)', border: 'rgba(255,255,255,0.08)', icon: 'var(--hcp-t-60)' },
-  lowest_gross_all_time:    { bg: 'rgba(255,255,255,0.05)', border: 'rgba(255,255,255,0.08)', icon: 'var(--hcp-t-60)' },
-  best_stableford_90d:      { bg: 'rgba(56,189,248,0.10)', border: 'rgba(56,189,248,0.18)', icon: '#38BDF8' },
-  best_stableford_all_time: { bg: 'rgba(56,189,248,0.10)', border: 'rgba(56,189,248,0.18)', icon: '#38BDF8' },
-  best_score_diff_90d:      { bg: 'rgba(159,29,29,0.14)', border: 'rgba(159,29,29,0.26)', icon: '#9F1D1D' },
-  best_score_diff_all_time: { bg: 'rgba(159,29,29,0.14)', border: 'rgba(159,29,29,0.26)', icon: '#9F1D1D' },
-};
+const SLOTS: Array<{ key: LegendCategory; alt: LegendCategory; short: string; unit: string }> = [
+  { key: 'lowest_gross_90d',     alt: 'lowest_gross_all_time',     short: 'GROSS',  unit: 'gross' },
+  { key: 'most_aces_90d',        alt: 'most_aces_all_time',        short: 'ACE',    unit: 'aces' },
+  { key: 'most_eagles_90d',      alt: 'most_eagles_all_time',      short: 'EAGLE',  unit: 'eagles' },
+  { key: 'most_birdies_90d',     alt: 'most_birdies_all_time',     short: 'BIRDIE', unit: 'birdies' },
+  { key: 'best_stableford_90d',  alt: 'best_stableford_all_time',  short: 'STBL',   unit: 'pts' },
+  { key: 'best_score_diff_90d',  alt: 'best_score_diff_all_time',  short: 'SCORE',  unit: 'diff' },
+];
 
-const CAT_SHORT: Record<LegendCategory, string> = {
-  lowest_gross_90d:         'GROSS',
-  lowest_gross_all_time:    'GROSS',
-  most_birdies_90d:         'BIRDIE',
-  most_birdies_all_time:    'BIRDIE',
-  best_stableford_90d:      'STBL',
-  best_stableford_all_time: 'STBL',
-  best_score_diff_90d:      'SCORE',
-  best_score_diff_all_time: 'SCORE',
-  most_eagles_90d:          'EAGLE',
-  most_eagles_all_time:     'EAGLE',
-  most_aces_90d:            'ACE',
-  most_aces_all_time:       'ACE',
-};
-
-function isHideWhenZero(c: LegendCategory): boolean {
-  return (
-    c === 'most_eagles_90d' || c === 'most_eagles_all_time' ||
-    c === 'most_aces_90d' || c === 'most_aces_all_time'
-  );
-}
+// Keep CHAMPIONS_ORDER referenced so the canonical constant is the source of truth.
+void CHAMPIONS_ORDER;
 
 interface HolderCellProps {
-  category: LegendCategory;
-  holder: CourseLegendHolderRow;
+  short: string;
+  unit: string;
+  holder: CourseLegendHolderRow | null;
+  category: LegendCategory | null;
   selfLabel: string;
 }
 
-const HolderCell: React.FC<HolderCellProps> = ({
-  category,
-  holder,
-  selfLabel,
+const SquircleAvatar: React.FC<{ photoUrl: string | null; size?: number; muted?: boolean }> = ({
+  photoUrl,
+  size = 30,
+  muted = false,
 }) => {
-  const Icon = legendCategoryIcon[category];
-  const isSelf = holder.is_self;
+  const bg = photoUrl
+    ? `url(${photoUrl}) center/cover`
+    : muted
+      ? 'rgba(255,255,255,0.05)'
+      : 'linear-gradient(135deg, rgba(148,163,184,0.45) 0%, rgba(100,116,139,0.65) 100%)';
+  return (
+    <div
+      aria-hidden
+      style={{
+        width: size,
+        height: size,
+        borderRadius: '34%',
+        background: bg,
+        boxShadow: muted
+          ? 'inset 0 0 0 1px rgba(255,255,255,0.06)'
+          : 'inset 0 0 0 1px rgba(255,255,255,0.10)',
+        flexShrink: 0,
+      }}
+    />
+  );
+};
 
-  const nameColor = isSelf ? GOLD : 'var(--hcp-t-100)';
-  const labelColor = 'var(--hcp-t-60)';
+const HolderCell: React.FC<HolderCellProps> = ({ short, unit, holder, selfLabel }) => {
+  const isSelf = !!holder?.is_self;
+  const isEmpty = !holder;
+
+  const nameColor = isSelf
+    ? GAM.DEEP_AMBER
+    : `var(--hcp-t-100, ${GAM.INK})`;
   const valueColor = nameColor;
-  const palette = CATEGORY_TILE_PALETTE[category];
-  const iconBg = isSelf ? 'rgba(251,188,46,0.16)' : palette.bg;
-  const iconBorder = isSelf ? 'rgba(251,188,46,0.30)' : palette.border;
-  const iconColor = isSelf ? GOLD : palette.icon;
 
   return (
     <div
@@ -96,76 +78,106 @@ const HolderCell: React.FC<HolderCellProps> = ({
         display: 'flex',
         alignItems: 'center',
         gap: 9,
-        padding: isSelf ? '6px 8px' : '8px 10px',
-        background: isSelf
-          ? 'linear-gradient(180deg, rgba(251,188,46,0.10) 0%, rgba(251,188,46,0.03) 100%)'
-          : 'transparent',
+        padding: '8px 10px',
+        background: isSelf ? 'rgba(247,147,30,0.08)' : 'transparent',
         border: isSelf
-          ? '1px solid rgba(251,188,46,0.22)'
+          ? '1px solid rgba(247,147,30,0.22)'
           : '1px solid transparent',
-        borderRadius: isSelf ? 9 : 10,
+        borderRadius: 10,
         minWidth: 0,
         boxSizing: 'border-box',
+        fontFamily: FONT,
       }}
     >
-      <div
-        style={{
-          width: 22,
-          height: 22,
-          borderRadius: 6,
-          background: iconBg,
-          border: `1px solid ${iconBorder}`,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          flexShrink: 0,
-          color: iconColor,
-          boxSizing: 'border-box',
-        }}
-      >
-        <Icon size={13} strokeWidth={2.2} />
+      {/* Champion squircle with crown badge overlay */}
+      <div style={{ position: 'relative', flexShrink: 0 }}>
+        <SquircleAvatar photoUrl={holder?.photo_url ?? null} size={30} muted={isEmpty} />
+        {!isEmpty && (
+          <div
+            aria-hidden
+            style={{
+              position: 'absolute',
+              top: -4,
+              left: -4,
+              lineHeight: 0,
+            }}
+          >
+            <Crown
+              size={12}
+              strokeWidth={2.2}
+              fill={GAM.GOLD}
+              style={{ color: GAM.DEEP_AMBER, display: 'block' }}
+            />
+          </div>
+        )}
       </div>
+
       <div style={{ flex: 1, minWidth: 0 }}>
         <div
           style={{
-            fontFamily: FONT,
-            fontSize: 9,
-            fontWeight: 700,
-            letterSpacing: '0.12em',
-            color: labelColor,
+            fontSize: 8.5,
+            fontWeight: 800,
+            letterSpacing: '0.14em',
+            color: GAM.AMBER,
             lineHeight: 1.2,
+            textTransform: 'uppercase',
           }}
         >
-          {CAT_SHORT[category]}
+          {short}
         </div>
         <div
           style={{
-            fontFamily: FONT,
-            fontSize: 11,
+            fontSize: 12,
             fontWeight: 700,
-            color: nameColor,
+            color: isEmpty ? `var(--hcp-t-40, ${GAM.INK_40})` : nameColor,
             lineHeight: 1.25,
             marginTop: 1,
             whiteSpace: 'nowrap',
             overflow: 'hidden',
             textOverflow: 'ellipsis',
+            letterSpacing: '-0.01em',
           }}
         >
-          {isSelf ? selfLabel : holder.display_name}
+          {isEmpty ? '—' : (isSelf ? selfLabel : holder!.display_name)}
         </div>
       </div>
+
       <div
         style={{
-          fontFamily: FONT,
-          fontSize: 13,
-          fontWeight: 800,
-          color: valueColor,
-          fontVariantNumeric: 'tabular-nums',
-          letterSpacing: '-0.01em',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'flex-end',
           flexShrink: 0,
+          gap: 1,
         }}
       >
-        {formatLegendValueCompact(category, holder.value)}
+        <div
+          style={{
+            fontSize: 13.5,
+            fontWeight: 800,
+            color: isEmpty ? `var(--hcp-t-40, ${GAM.INK_40})` : valueColor,
+            ...GAM.TABULAR,
+            letterSpacing: '-0.01em',
+            lineHeight: 1,
+          }}
+        >
+          {isEmpty || !holder ? '—' : formatLegendValueCompact(
+            (holder.category as LegendCategory),
+            holder.value,
+          )}
+        </div>
+        <div
+          style={{
+            fontSize: 8,
+            fontWeight: 600,
+            color: `var(--hcp-t-50, ${GAM.INK_55})`,
+            textTransform: 'uppercase',
+            letterSpacing: '0.06em',
+            lineHeight: 1,
+          }}
+        >
+          {unit}
+        </div>
       </div>
     </div>
   );
@@ -198,38 +210,33 @@ export const CourseLegendsCard: React.FC<Props> = ({
 }) => {
   const [pressed, setPressed] = useState(false);
 
-  // Filter per column: drop Eagle/Ace cells when value is 0; only keep
-  // categories with holder data. Each column collapses upward independently.
-  const filterColumn = (categories: LegendCategory[]) => {
-    const result: Array<{ cat: LegendCategory; row: CourseLegendHolderRow }> = [];
-    for (const cat of categories) {
-      const row = holdersByCategory.get(cat);
-      if (!row) continue;
-      if (isHideWhenZero(cat) && (row.value ?? 0) === 0) continue;
-      result.push({ cat, row });
-    }
-    return result;
-  };
-
-  const leftColumn = filterColumn(LEFT_CATEGORIES);
-  const rightColumn = filterColumn(RIGHT_CATEGORIES);
-
-  // Combined map kept for getFooterCue + selfLabel logic that still expects it.
-  const visibleHolders = new Map<LegendCategory, CourseLegendHolderRow>();
-  [...leftColumn, ...rightColumn].forEach(({ cat, row }) => {
-    visibleHolders.set(cat, row);
+  // Resolve each slot to whichever window key has data.
+  const resolved = SLOTS.map((slot) => {
+    const row =
+      holdersByCategory.get(slot.key) ??
+      holdersByCategory.get(slot.alt) ??
+      null;
+    const cat = row ? (holdersByCategory.has(slot.key) ? slot.key : slot.alt) : null;
+    return { slot, row, cat };
   });
 
-  const totalCategories = visibleHolders.size;
-  const youOwnedCount = Array.from(visibleHolders.values()).filter((r) => r.is_self).length;
+  const visibleHolders = new Map<LegendCategory, CourseLegendHolderRow>();
+  resolved.forEach(({ row, cat }) => {
+    if (row && cat) visibleHolders.set(cat, row);
+  });
 
-  // Hide cards entirely when the active window has no data — no skeleton.
-  if (totalCategories === 0) {
-    return null;
-  }
+  const heldCount = Array.from(visibleHolders.values()).filter((r) => r.is_self).length;
+  const totalSlots = SLOTS.length;
+
+  if (visibleHolders.size === 0) return null;
+
   const cue = getFooterCue(visibleHolders);
   const cueStyle = FOOTER_INTENT_STYLE[cue.intent];
   const selfLabel = friendName ? friendName : 'YOU';
+
+  // Row-major split into 2-column grid
+  const left = resolved.filter((_, i) => i % 2 === 0);
+  const right = resolved.filter((_, i) => i % 2 === 1);
 
   return (
     <div
@@ -248,7 +255,7 @@ export const CourseLegendsCard: React.FC<Props> = ({
         fontFamily: FONT,
       }}
     >
-      {/* Hero strip with photo + scrims + overlaid title */}
+      {/* Hero strip with photo + scrims + overlaid title + N/6 titles badge */}
       <div
         style={{
           position: 'relative',
@@ -275,30 +282,49 @@ export const CourseLegendsCard: React.FC<Props> = ({
             }}
           />
         )}
-        {/* TOP SCRIM — matches EchoInsightsCard "Suited to Your Game" exactly */}
         <div
           style={{
             position: 'absolute',
-            top: 0,
-            left: 0,
-            right: 0,
-            height: '40%',
+            top: 0, left: 0, right: 0, height: '40%',
             background: 'linear-gradient(180deg, rgba(5,8,16,0.55) 0%, rgba(5,8,16,0) 100%)',
             pointerEvents: 'none',
           }}
         />
-        {/* BOTTOM SCRIM — matches EchoInsightsCard "Suited to Your Game" exactly */}
         <div
           style={{
             position: 'absolute',
-            bottom: 0,
-            left: 0,
-            right: 0,
-            height: '55%',
+            bottom: 0, left: 0, right: 0, height: '55%',
             background: 'linear-gradient(180deg, rgba(5,8,16,0) 0%, rgba(5,8,16,0.92) 100%)',
             pointerEvents: 'none',
           }}
         />
+
+        {/* N/6 titles badge */}
+        {heldCount > 0 && (
+          <div
+            style={{
+              position: 'absolute',
+              top: 10,
+              right: 10,
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 4,
+              padding: '4px 8px',
+              borderRadius: 999,
+              background: 'rgba(0,0,0,0.45)',
+              border: '1px solid rgba(251,188,46,0.40)',
+              color: GAM.GOLD,
+              fontSize: 10,
+              fontWeight: 800,
+              letterSpacing: '0.04em',
+              ...GAM.TABULAR,
+            }}
+          >
+            <Crown size={10} strokeWidth={2.4} fill={GAM.GOLD} style={{ color: GAM.DEEP_AMBER }} />
+            {heldCount}/{totalSlots} titles
+          </div>
+        )}
+
         {/* Overlaid title block */}
         <div
           style={{
@@ -332,26 +358,29 @@ export const CourseLegendsCard: React.FC<Props> = ({
         </div>
       </div>
 
-      {/* Holder columns — two independent flex columns so filtering in one
-          doesn't shift items into the wrong column of a grid. */}
+      {/* 2-col row-major grid of champion cells */}
       <div style={{ padding: '12px 14px 0' }}>
         <div style={{ display: 'flex', gap: 6, alignItems: 'flex-start' }}>
           <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 6 }}>
-            {leftColumn.map(({ cat, row }) => (
+            {left.map(({ slot, row, cat }) => (
               <HolderCell
-                key={cat}
-                category={cat}
+                key={slot.key}
+                short={slot.short}
+                unit={slot.unit}
                 holder={row}
+                category={cat}
                 selfLabel={selfLabel}
               />
             ))}
           </div>
           <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 6 }}>
-            {rightColumn.map(({ cat, row }) => (
+            {right.map(({ slot, row, cat }) => (
               <HolderCell
-                key={cat}
-                category={cat}
+                key={slot.key}
+                short={slot.short}
+                unit={slot.unit}
                 holder={row}
+                category={cat}
                 selfLabel={selfLabel}
               />
             ))}

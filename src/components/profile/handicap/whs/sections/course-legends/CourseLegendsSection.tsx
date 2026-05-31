@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { Crown } from 'lucide-react';
+import { Crown, Search } from 'lucide-react';
 import { useUserPlayedCourses } from '@/hooks/gam/useUserPlayedCourses';
 import { useUserHomeClubCourses } from '@/hooks/gam/useUserHomeClubCourses';
 import { useDiscoverCoursesThisWeek } from '@/hooks/gam/useDiscoverCoursesThisWeek';
@@ -11,8 +11,6 @@ import {
 import { useUserLegendTitleCount } from '@/hooks/gam/useUserLegendTitleCount';
 import type { LegendCategory, LegendWindow } from '@/lib/gam/types';
 import { legendCategoryWindow } from '@/lib/gam/visuals';
-import CourseSearch from './_shared/CourseSearch';
-import DiscoverSearchCard from './_shared/DiscoverSearchCard';
 import HomeClubSubsection from './subsections/HomeClubSubsection';
 import YourCoursesSubsection from './subsections/YourCoursesSubsection';
 import DiscoverSubsection from './subsections/DiscoverSubsection';
@@ -77,19 +75,22 @@ export const WindowToggle: React.FC<{
   </div>
 );
 
+
 const SectionHero: React.FC<{
   titleCount: number;
   window: LegendWindow;
   setWindow: (w: LegendWindow) => void;
   friendName?: string | null;
-}> = ({ titleCount, window, setWindow, friendName = null }) => (
+  query: string;
+  setQuery: (v: string) => void;
+  searchInputRef?: React.RefObject<HTMLInputElement>;
+}> = ({ titleCount, window, setWindow, friendName = null, query, setQuery, searchInputRef }) => (
   <div
     style={{
       margin: '0 16px 20px',
-      padding: 14,
-      borderRadius: 14,
-      background: `linear-gradient(135deg, ${GOLD_TINT} 0%, var(--hcp-bg-1) 70%)`,
-      border: '1px solid rgba(251,188,46,0.25)',
+      borderRadius: 16,
+      background: `linear-gradient(150deg, ${GOLD_TINT} 0%, var(--hcp-bg-1) 60%)`,
+      border: '1px solid rgba(255,255,255,0.07)',
       position: 'relative',
       overflow: 'hidden',
       fontFamily: FONT,
@@ -99,18 +100,18 @@ const SectionHero: React.FC<{
       aria-hidden
       style={{
         position: 'absolute',
-        right: -22,
-        bottom: -28,
-        opacity: 0.13,
-        color: GOLD,
-        transform: 'rotate(-8deg)',
+        right: -28,
+        top: -22,
+        color: 'rgba(251,188,46,0.08)',
+        transform: 'rotate(-10deg)',
         pointerEvents: 'none',
       }}
     >
-      <Crown size={130} strokeWidth={1.4} />
+      <Crown size={150} strokeWidth={1.4} />
     </div>
 
-    <div style={{ position: 'relative', zIndex: 1 }}>
+    {/* Top half: title + count + toggle */}
+    <div style={{ position: 'relative', zIndex: 1, padding: '18px 18px 16px' }}>
       <div
         style={{
           display: 'flex',
@@ -124,20 +125,20 @@ const SectionHero: React.FC<{
         }}
       >
         <Crown size={11} strokeWidth={2.4} />
-        COURSE LEGENDS
+        COURSE CHAMPIONS
       </div>
 
       <div
         style={{
-          fontSize: 22,
-          fontWeight: 900,
+          fontSize: 24,
+          fontWeight: 800,
           color: 'var(--hcp-t-100)',
           letterSpacing: '-0.025em',
           lineHeight: 1.15,
         }}
       >
         {titleCount === 0
-          ? (friendName ? `${friendName}'s legend starts here` : 'Your legend starts here')
+          ? (friendName ? `${friendName}'s reign starts here` : 'Your reign starts here')
           : (friendName
               ? `${friendName} holds ${titleCount} title${titleCount === 1 ? '' : 's'}`
               : `You hold ${titleCount} title${titleCount === 1 ? '' : 's'}`)}
@@ -161,6 +162,61 @@ const SectionHero: React.FC<{
       </div>
 
       <WindowToggle window={window} setWindow={setWindow} />
+    </div>
+
+    {/* Hairline divider */}
+    <div
+      aria-hidden
+      style={{
+        height: 1,
+        background: 'rgba(255,255,255,0.07)',
+        margin: '0 18px',
+      }}
+    />
+
+    {/* Bottom half: prompt + search field */}
+    <div style={{ position: 'relative', zIndex: 1, padding: '16px 18px 18px' }}>
+      <div
+        style={{
+          fontSize: 13.5,
+          fontWeight: 700,
+          color: 'var(--hcp-t-100)',
+          marginBottom: 10,
+          letterSpacing: '-0.005em',
+        }}
+      >
+        Search any course to see its champions.
+      </div>
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: 10,
+          background: 'rgba(255,255,255,0.05)',
+          border: '1px solid rgba(255,255,255,0.10)',
+          borderRadius: 12,
+          padding: '12px 14px',
+        }}
+      >
+        <Search size={16} color={GOLD} />
+        <input
+          ref={searchInputRef}
+          type="text"
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          placeholder='Try "Augusta" or "Royal Birkdale"…'
+          style={{
+            flex: 1,
+            minWidth: 0,
+            background: 'transparent',
+            border: 'none',
+            outline: 'none',
+            fontFamily: FONT,
+            fontSize: 13,
+            color: 'var(--hcp-t-100)',
+          }}
+        />
+      </div>
     </div>
   </div>
 );
@@ -233,28 +289,27 @@ export const CourseLegendsSection: React.FC<Props> = ({
 
   return (
     <section style={{ marginTop: 32 }}>
-      <SectionHero titleCount={titleCount} window={window} setWindow={setWindow} friendName={friendName} />
+      <div ref={searchWrapperRef} style={{ scrollMarginTop: 12 }}>
+        <SectionHero
+          titleCount={titleCount}
+          window={window}
+          setWindow={setWindow}
+          friendName={friendName}
+          query={query}
+          setQuery={setQuery}
+          searchInputRef={searchInputRef}
+        />
+      </div>
 
       {showSearchResults ? (
-        <>
-          <div ref={searchWrapperRef} style={{ margin: '4px 0 0', scrollMarginTop: 12 }}>
-            <CourseSearch
-              value={query}
-              onChange={setQuery}
-              helper="Find a course — see the legends"
-              inputRef={searchInputRef}
-              autoFocus
-            />
-          </div>
-          <SearchResultsSubsection
-            query={query}
-            results={searchQuery.data ?? []}
-            isLoading={searchQuery.isLoading}
-            isError={searchQuery.isError}
-            onRetry={() => searchQuery.refetch()}
-            onSelectCourse={onSelectCourse}
-          />
-        </>
+        <SearchResultsSubsection
+          query={query}
+          results={searchQuery.data ?? []}
+          isLoading={searchQuery.isLoading}
+          isError={searchQuery.isError}
+          onRetry={() => searchQuery.refetch()}
+          onSelectCourse={onSelectCourse}
+        />
       ) : (
         <>
           <LegendPulseTicker
@@ -268,10 +323,6 @@ export const CourseLegendsSection: React.FC<Props> = ({
             onSelectCourse={onSelectCourse}
             friendName={friendName}
           />
-
-          {/* Discover Prompt Card — engagement-driving search invitation */}
-          <DiscoverSearchCard value={query} onChange={setQuery} />
-
           <YourCoursesSubsection
             courses={playedFiltered}
             isLoading={playedQuery.isLoading}
