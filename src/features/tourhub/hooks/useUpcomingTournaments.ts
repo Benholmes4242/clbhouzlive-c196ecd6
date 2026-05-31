@@ -49,6 +49,7 @@ export function useUpcomingTournaments(limit = 6) {
           winnerLastName: null,
           winnerPhotoUrl: null,
           defendingChampion: t.defending_champion ?? null,
+          currentRound: (t as any).current_round ?? null,
         };
       });
     },
