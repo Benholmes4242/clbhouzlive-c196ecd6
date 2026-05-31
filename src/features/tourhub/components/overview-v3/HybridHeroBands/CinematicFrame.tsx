@@ -13,7 +13,7 @@
 
 import React from 'react';
 import { format } from 'date-fns';
-import { ChevronRight, Crown, Star } from 'lucide-react';
+import { ChevronRight, Crown, Star, Trophy } from 'lucide-react';
 import {
   CINEMATIC_FRAME_HEIGHT,
   CINEMATIC_SCRIM,
@@ -23,9 +23,12 @@ import {
   GOLD,
   NUMERIC_STYLE,
 } from '../HybridHero.constants';
+import { AMBER_INK, AMBER_TINT_12 } from '../../../_shared/tokens';
 import type { HeroState, TopTie } from '../HybridHero.utils';
 import { fmtScore, formatRank, buildLeaderboardSlots, roundLabel } from '../HybridHero.utils';
 import { getPlayerHeadshotUrl } from '@/utils/playerHeadshot';
+import type { DefendingChampData } from '../../../hooks/useTournamentDefendingChamp';
+import type { FieldStrength } from '../../../hooks/useTournamentFieldStrength';
 
 // ---- helpers --------------------------------------------------------------
 
