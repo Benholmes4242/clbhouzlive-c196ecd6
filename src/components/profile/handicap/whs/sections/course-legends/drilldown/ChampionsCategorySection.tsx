@@ -98,6 +98,9 @@ export const ChampionsCategorySection: React.FC<ChampionsCategorySectionProps> =
           isChampion={true}
           gapToChampion={null}
           holdDuration={holdDuration}
+          userId={visible[0].userId ?? null}
+          currentCourseId={currentCourseId}
+          window={legendWindow}
         />
         <div
           style={{
