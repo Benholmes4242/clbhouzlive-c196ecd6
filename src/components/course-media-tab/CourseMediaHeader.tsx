@@ -53,27 +53,54 @@ export const CourseMediaHeader: React.FC<CourseMediaHeaderProps> = ({
         </div>
       )}
 
-      {/* Filter chips — text-only, bold = active */}
-      <div style={{ display: 'flex', gap: 18, justifyContent: 'center' }}>
+      {/* Filter tabs — underline style (matches player profile) */}
+      <div
+        role="tablist"
+        aria-label="Media filter"
+        style={{
+          display: 'flex',
+          gap: 8,
+          justifyContent: 'center',
+          fontFamily: 'Geist, system-ui, -apple-system, BlinkMacSystemFont, sans-serif',
+        }}
+      >
         {FILTERS.map(({ key, label }) => {
           const isActive = activeFilter === key;
           return (
             <button
               key={key}
+              role="tab"
+              aria-selected={isActive}
               onClick={() => onFilterChange(key)}
               style={{
-                padding: '6px 4px',
-                background: 'transparent',
+                flex: '0 0 auto',
+                height: 44,
+                padding: '0 8px',
+                borderRadius: 0,
                 border: 'none',
-                fontSize: 13,
-                fontWeight: isActive ? 800 : 500,
+                background: 'transparent',
                 color: isActive ? INK : INK_FAINT,
+                fontFamily: 'inherit',
+                fontSize: 14,
+                fontWeight: isActive ? 700 : 600,
+                letterSpacing: '-0.005em',
+                whiteSpace: 'nowrap',
                 cursor: 'pointer',
-                minHeight: 34,
-                letterSpacing: isActive ? '-0.01em' : 0,
+                display: 'inline-flex',
+                alignItems: 'center',
+                position: 'relative',
+                transition: 'color 0.15s',
               }}
             >
-              {label}
+              <span
+                style={{
+                  display: 'inline-block',
+                  paddingBottom: 4,
+                  borderBottom: isActive ? `1.5px solid ${INK}` : '1.5px solid transparent',
+                }}
+              >
+                {label}
+              </span>
             </button>
           );
         })}
