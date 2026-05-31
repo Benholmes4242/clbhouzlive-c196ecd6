@@ -3,7 +3,7 @@ import { useLiveTournaments } from '../../hooks/useLiveTournaments';
 import { useTourLeaderboard } from '../../hooks/useTourHubData';
 import { FullLeaderboard } from '../tournament-detail/FullLeaderboard';
 import { EditorialEmpty } from '../tournament-detail/EditorialEmpty';
-import { INK, INK_MUTE, INK_TINT_07, SURFACE } from '../_shared/tokens';
+import { INK, INK_MUTE, INK_TINT_07, SURFACE } from '../../_shared/tokens';
 
 /**
  * LiveLeaderboardTab — surfaces all in-progress (or starting-today) tournaments
