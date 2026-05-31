@@ -16,7 +16,7 @@ import {
   NUMERIC_STYLE,
 } from '../HybridHero.constants';
 import { FONT } from '../../../_shared/tokens';
-import type { HeroState } from '../HybridHero.utils';
+import { type HeroState, roundLabel } from '../HybridHero.utils';
 
 interface PhotoBandProps {
   title: string;
