@@ -7,6 +7,7 @@ import { HoleRow } from './HoleRow';
 import { HolesScoringKey } from './HolesScoringKey';
 import { HolesEmptyState } from './HolesEmptyState';
 import { AMBER, FONT, INK } from './_constants';
+import { HAIRLINE_INK_8, INK_MUTE, SURFACE } from '@/features/courses/_shared/tokens';
 
 interface Props {
   courseId: string | undefined;
@@ -57,7 +58,7 @@ export const CourseHolesTab: React.FC<Props> = ({ courseId }) => {
   if (isError) {
     return (
       <div style={{ padding: '40px 18px', textAlign: 'center', fontFamily: FONT }}>
-        <div style={{ fontSize: 14, fontWeight: 600, color: '#64748b' }}>
+        <div style={{ fontSize: 14, fontWeight: 600, color: INK_MUTE }}>
           Couldn't load hole analysis.
         </div>
       </div>
@@ -98,7 +99,7 @@ export const CourseHolesTab: React.FC<Props> = ({ courseId }) => {
             display: 'inline-flex',
             gap: 2,
             background: '#F1F5F9',
-            border: '1px solid rgba(15,23,42,0.08)',
+            border: `1px solid ${HAIRLINE_INK_8}`,
             borderRadius: 999,
             padding: 3,
           }}
@@ -117,7 +118,7 @@ export const CourseHolesTab: React.FC<Props> = ({ courseId }) => {
                 textTransform: 'uppercase',
                 cursor: 'pointer',
                 background: sort === k ? INK : 'transparent',
-                color: sort === k ? '#fff' : '#64748b',
+                color: sort === k ? SURFACE : INK_MUTE,
                 fontFamily: FONT,
               }}
             >

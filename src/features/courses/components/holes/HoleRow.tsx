@@ -1,7 +1,8 @@
 import React from 'react';
 import type { CourseHole } from '@/hooks/gam/useCourseHoleAnalysis';
 import { HoleDistributionBar } from './HoleDistributionBar';
-import { FONT, INK, C_BIRDIE, C_PAR, C_BOGEY, C_DOUBLE } from './_constants';
+import { AMBER, C_BIRDIE, C_BOGEY, C_DOUBLE, C_PAR, FONT, INK } from './_constants';
+import { INK_MUTE } from '@/features/courses/_shared/tokens';
 
 interface Props {
   h: CourseHole;
@@ -13,8 +14,8 @@ interface Props {
 export const HoleRow: React.FC<Props> = ({ h, maxAvg, isHardest, isEasiest }) => {
   const pct = Math.max(0, Math.min(1, h.avg_to_par / maxAvg));
   // Difficulty ramp — independent of celebrate-amber: slate → red → maroon
-  const avgColor = pct > 0.75 ? '#991B1B' : pct > 0.45 ? 'var(--hcp-bad, #EF4444)' : 'var(--hcp-t-40, #94A3B8)';
-  const tag = isHardest ? { label: 'HARDEST', c: '#991B1B' } : isEasiest ? { label: 'EASIEST', c: '#F7931E' } : null;
+  const avgColor = pct > 0.75 ? C_DOUBLE : pct > 0.45 ? C_BOGEY : C_PAR;
+  const tag = isHardest ? { label: 'HARDEST', c: C_DOUBLE } : isEasiest ? { label: 'EASIEST', c: AMBER } : null;
   const sign = h.avg_to_par > 0 ? '+' : '';
   const avgFmt = `${sign}${h.avg_to_par.toFixed(2).replace(/\.?0+$/, (m) => (m.includes('.') ? '' : m))}`;
 
@@ -58,7 +59,7 @@ export const HoleRow: React.FC<Props> = ({ h, maxAvg, isHardest, isEasiest }) =>
             style={{
               fontSize: 11.5,
               fontWeight: 600,
-              color: '#64748b',
+              color: INK_MUTE,
               letterSpacing: '0.01em',
             }}
           >
@@ -125,7 +126,7 @@ export const HoleRow: React.FC<Props> = ({ h, maxAvg, isHardest, isEasiest }) =>
           fontSize: 10.5,
           fontWeight: 700,
           letterSpacing: '0.02em',
-          color: '#64748b',
+          color: INK_MUTE,
           fontVariantNumeric: 'tabular-nums',
         }}
       >

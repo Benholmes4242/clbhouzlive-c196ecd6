@@ -1,9 +1,9 @@
 import React from 'react';
 import { Flag } from 'lucide-react';
 import { EmptyStateTile } from '@/components/profile/handicap/gam/_shared/EmptyStateTile';
-import { AMBER, INK, FONT } from './_constants';
+import { AMBER, DEEP_AMBER, FONT, INK } from './_constants';
+import { HAIRLINE_INK_8, INK_TINT_06 } from '@/features/courses/_shared/tokens';
 
-const DEEP_AMBER = '#B26818';
 const SLATE = 'var(--hcp-t-60, #64748b)';
 
 export const HolesEmptyState: React.FC<{ courseName: string | null }> = ({ courseName }) => (
@@ -63,11 +63,11 @@ export const HolesEmptyState: React.FC<{ courseName: string | null }> = ({ cours
               width: 24,
               height: 24,
               borderRadius: '34%',
-              background: 'rgba(15,23,42,0.08)',
+              background: HAIRLINE_INK_8,
               flexShrink: 0,
             }}
           />
-          <div style={{ flex: 1, height: 6, borderRadius: 3, background: 'rgba(15,23,42,0.06)' }} />
+          <div style={{ flex: 1, height: 6, borderRadius: 3, background: INK_TINT_06 }} />
         </div>
       ))}
     </div>
