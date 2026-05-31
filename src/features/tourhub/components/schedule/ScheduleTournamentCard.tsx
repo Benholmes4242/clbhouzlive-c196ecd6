@@ -19,7 +19,7 @@ import type { SeasonTournament } from '../../hooks/useSeasonTournaments';
 import type { TournamentLeaderWinner } from '../../hooks/useTournamentLeadersWinners';
 import { getContextLabel, TOUR_NAME_TO_SLUG } from '../../utils/tournamentClassification';
 
-import { getCurrentRound } from '../../utils/formatThruDisplay';
+
 import { formatPurse } from '../shared/TourHeroHelpers';
 import { getScoreColor } from '../../_shared/scoreColor';
 import { TourPill } from '../shared/TourPill';
