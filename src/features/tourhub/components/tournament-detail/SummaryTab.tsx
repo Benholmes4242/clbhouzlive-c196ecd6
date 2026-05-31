@@ -189,7 +189,10 @@ export function SummaryTab({
               <div key={round.round} style={{ display: 'flex', alignItems: 'center', padding: '10px 20px', borderBottom: `0.5px solid ${INK_TINT_07}`, fontVariantNumeric: 'tabular-nums' }}>
                 <span style={{ fontSize: '14px', fontWeight: 700, color: INK, flex: '0 0 52px' }}>R{round.round}</span>
                 <span style={{ fontSize: '14px', fontWeight: 700, color: AMBER, flex: 1, textAlign: 'center' as const }}>{round.lowScore}</span>
-                <span style={{ fontSize: '14px', color: INK_MUTE, flex: 1, textAlign: 'center' as const }}>{round.avgScore.toFixed(1)}</span>
+                <span style={{
+                  fontSize: '14px', fontWeight: 600, flex: 1, textAlign: 'center' as const,
+                  color: round.avgScore < 0 ? SCORE_UNDER_PAR_LIGHT : round.avgScore > 0 ? TREND_DOWN : INK_MUTE,
+                }}>{round.avgScore > 0 ? `+${round.avgScore.toFixed(1)}` : round.avgScore.toFixed(1)}</span>
                 <span style={{ fontSize: '14px', color: TREND_UP, fontWeight: 600, flex: 1, textAlign: 'center' as const }}>{round.totalBirdies}</span>
                 <span style={{ fontSize: '14px', color: TREND_DOWN, fontWeight: 600, flex: 1, textAlign: 'center' as const }}>{round.totalBogeys}</span>
               </div>
