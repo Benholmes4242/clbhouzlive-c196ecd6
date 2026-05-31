@@ -37,7 +37,7 @@ const pillStyle: React.CSSProperties = {
 
 const sepStyle: React.CSSProperties = {
   fontSize: 10,
-  color: '#CBD5E1',
+  color: INK_LIGHT,
 };
 
 const CourseLocationPills: React.FC<CourseLocationPillsProps> = ({ course }) => {
