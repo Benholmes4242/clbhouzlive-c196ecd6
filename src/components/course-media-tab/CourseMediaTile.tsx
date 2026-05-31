@@ -141,32 +141,66 @@ export const CourseMediaTile: React.FC<CourseMediaTileProps> = ({ post, index, f
         </div>
       )}
 
+      {/* Author — bottom left */}
+      {post.displayName && (
+        <div
+          style={{
+            position: 'absolute',
+            left: 8,
+            bottom: 6,
+            display: 'flex',
+            alignItems: 'center',
+            gap: 5,
+            zIndex: 2,
+            pointerEvents: 'none',
+            maxWidth: '70%',
+          }}
+        >
+          <SquircleAvatar
+            src={post.avatarUrl}
+            alt={post.displayName}
+            size={feature ? 22 : 16}
+            thinRing
+            fallback={post.displayName.charAt(0).toUpperCase()}
+          />
+          {feature && (
+            <span
+              style={{
+                fontSize: 12,
+                fontWeight: 700,
+                color: SURFACE,
+                textShadow: '0 1px 3px rgba(0,0,0,0.55)',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                whiteSpace: 'nowrap',
+              }}
+            >
+              {post.displayName}
+            </span>
+          )}
+        </div>
+      )}
+
       {/* Likes — bottom right overlay */}
       {post.likeCount > 0 && (
         <div
           style={{
             position: 'absolute',
-            left: 8,
             right: 8,
             bottom: 6,
             display: 'flex',
-            alignItems: 'flex-end',
-            justifyContent: 'flex-end',
-            gap: 6,
+            alignItems: 'center',
+            gap: 3,
             zIndex: 2,
             pointerEvents: 'none',
           }}
         >
-          {post.likeCount > 0 && (
-            <div style={{ display: 'flex', alignItems: 'center', gap: 3, flexShrink: 0 }}>
-              <svg width="11" height="11" viewBox="0 0 24 24" fill="#fff">
-                <path d="M12 21s-7-4.5-9.5-9C1 9 2.5 5 6 5c2 0 3.5 1 4.5 2.5C11.5 6 13 5 15 5c3.5 0 5 4 3.5 7-2.5 4.5-9.5 9-9.5 9z"/>
-              </svg>
-              <span style={{ fontSize: 10, fontWeight: 700, color: SURFACE, textShadow: '0 1px 2px rgba(0,0,0,0.4)' }}>
-                {post.likeCount}
-              </span>
-            </div>
-          )}
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="#fff">
+            <path d="M12 21s-7-4.5-9.5-9C1 9 2.5 5 6 5c2 0 3.5 1 4.5 2.5C11.5 6 13 5 15 5c3.5 0 5 4 3.5 7-2.5 4.5-9.5 9-9.5 9z"/>
+          </svg>
+          <span style={{ fontSize: 10, fontWeight: 700, color: SURFACE, textShadow: '0 1px 2px rgba(0,0,0,0.4)' }}>
+            {post.likeCount}
+          </span>
         </div>
       )}
     </div>
