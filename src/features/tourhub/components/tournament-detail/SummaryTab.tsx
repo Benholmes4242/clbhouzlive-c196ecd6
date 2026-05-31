@@ -55,24 +55,6 @@ function SummarySkeleton() {
   );
 }
 
-function SummaryEmpty() {
-  return (
-    <motion.div
-      className="flex items-center justify-center py-20"
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.3 }}
-    >
-      <div className="text-center space-y-3">
-        <Trophy className="w-12 h-12 mx-auto text-muted-foreground" />
-        <h3 className="text-lg font-semibold text-foreground">Summary Coming Soon</h3>
-        <p className="text-sm text-muted-foreground max-w-[280px] mx-auto">
-          Tournament summary will be available after completion.
-        </p>
-      </div>
-    </motion.div>
-  );
-}
 
 const sectionEntrance = {
   initial: { opacity: 0, y: 10 } as const,
