@@ -156,16 +156,14 @@ export function PlayerSeasonStats({ playerStats }: PlayerSeasonStatsProps) {
           </span>
         </div>
 
-        {/* Segmented control — slate-100 trough, white pill active state */}
+        {/* Underline tabs — slate-600 active label + underline on light surface */}
         <div
           role="tablist"
           aria-label="Stat category"
           style={{
             display: 'flex',
-            gap: 2,
-            padding: 3,
-            background: SLATE_100,
-            borderRadius: 10,
+            gap: 20,
+            borderBottom: `0.5px solid ${INK_TINT_07}`,
             marginBottom: 12,
           }}
         >
@@ -179,19 +177,17 @@ export function PlayerSeasonStats({ playerStats }: PlayerSeasonStatsProps) {
                 onClick={() => setActiveTab(tab)}
                 className="active:opacity-80 transition-opacity"
                 style={{
-                  flex: 1,
-                  padding: '8px 4px',
-                  fontSize: 12,
+                  padding: '8px 0',
+                  fontSize: 14,
                   fontWeight: isActive ? 700 : 600,
                   lineHeight: 1,
-                  color: isActive ? INK : INK_FAINT,
-                  background: isActive ? SURFACE : 'transparent',
+                  color: isActive ? SLATE_600 : INK_FAINT,
+                  background: 'transparent',
                   border: 'none',
-                  borderRadius: 7,
+                  borderBottom: `1.5px solid ${isActive ? SLATE_600 : 'transparent'}`,
                   cursor: 'pointer',
                   whiteSpace: 'nowrap' as const,
-                  boxShadow: isActive ? `0 1px 2px ${INK_TINT_05}` : 'none',
-                  transition: 'background 0.15s ease, color 0.15s ease',
+                  transition: 'color 0.15s ease, border-color 0.15s ease',
                 }}
               >
                 {tab}
