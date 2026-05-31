@@ -216,7 +216,7 @@ const Top100CoursesHubPanel = () => {
           Parent already supplies px-4 — don't double-pad. */}
       <div className="pt-1">
         <SectionEyebrow label="Official World Ranking" color="amber" className="mb-[3px]" />
-        <h2 style={{ fontSize: 22, fontWeight: 800, color: '#0F172A', letterSpacing: '-0.025em', margin: 0, lineHeight: 1.1 }}>
+        <h2 style={{ fontSize: 22, fontWeight: 800, color: INK, letterSpacing: '-0.025em', margin: 0, lineHeight: 1.15 }}>
           The world's best
         </h2>
         {crossListProgress && (
