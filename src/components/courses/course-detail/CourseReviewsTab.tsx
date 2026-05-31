@@ -621,14 +621,14 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
       {/* End message */}
       {filteredReviews.length > 0 && !searchQuery && !ratingFilter && (
         <div style={{ padding: '20px 16px 0', textAlign: 'center' }}>
-          <p style={{ fontSize: 12, color: '#CBD5E1', marginBottom: 8 }}>
+          <p style={{ fontSize: 12, color: INK_LIGHT, marginBottom: 8 }}>
             You've seen all {filteredReviews.length} {filteredReviews.length === 1 ? 'review' : 'reviews'}.
           </p>
           {!myReview && (
             <button
               type="button"
               onClick={handleRateClick}
-              style={{ fontSize: 12, fontWeight: 700, color: '#64748B', background: 'none', border: 'none', cursor: 'pointer', textDecoration: 'underline' }}
+              style={{ fontSize: 12, fontWeight: 700, color: INK_MUTE, background: 'none', border: 'none', cursor: 'pointer', textDecoration: 'underline' }}
             >
               Share your experience
             </button>
