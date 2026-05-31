@@ -1,27 +1,40 @@
 /**
  * EditorialEmpty — story-driven empty state for tournament detail tabs.
  *
- * Visual: white card with 3px amber rail on the left edge.
- *   - eyebrow  10.5px / 800 / amber-ink uppercase
- *   - title    18px   / 800 / slate-900
- *   - body     13px   / 500 / slate-600
- *   - accent   amber-wash pill below body (optional — omit gracefully)
+ * Visual language matches the course-detail empty states (HolesEmptyState,
+ * ChampionsEmptyState): centred squircle icon-tile → amber dot-eyebrow →
+ * 20px/800 ink headline → slate body → optional amber accent pill.
  *
- * Replaces the generic "Coming Soon" pattern across Upcoming / Live / Completed
- * tabs with editorial copy specific to the moment.
+ * Shared by TeeTimesTab, HoleStatsTab, LiveOverviewTab, SummaryTab, and the
+ * leaderboard empty in TournamentDetailPage.
  */
 
+import React from 'react';
 import { motion } from 'framer-motion';
-import { AMBER_TINT_10, INK_SOFT, INK_TINT_07 } from '../../_shared/tokens';
+import { EmptyStateTile } from '@/components/profile/handicap/gam/_shared/EmptyStateTile';
+import { AMBER_TINT_10, FONT, INK, INK_SOFT } from '../../_shared/tokens';
+
+const DEEP_AMBER = '#B45309';
 
 export interface EditorialEmptyProps {
   eyebrow: string;
   title: string;
   body: string;
   accent?: string;
+  /** lucide icon element, e.g. <Trophy size={28} strokeWidth={1.8} color={AMBER} /> */
+  icon?: React.ReactNode;
+  /** tile tint — amber for active/on-mission, slate for terminal "not available" states */
+  tint?: 'amber' | 'slate';
 }
 
-export function EditorialEmpty({ eyebrow, title, body, accent }: EditorialEmptyProps) {
+export function EditorialEmpty({
+  eyebrow,
+  title,
+  body,
+  accent,
+  icon,
+  tint = 'amber',
+}: EditorialEmptyProps) {
   return (
     <motion.div
       initial={{ opacity: 0, y: 8 }}
@@ -29,50 +42,55 @@ export function EditorialEmpty({ eyebrow, title, body, accent }: EditorialEmptyP
       transition={{ duration: 0.3 }}
       style={{
         background: '#ffffff',
-        borderTop: `1px solid ${INK_TINT_07}`,
-        borderBottom: `1px solid ${INK_TINT_07}`,
-        marginTop: '8px',
-        padding: '18px 20px 20px',
-        borderLeft: '3px solid #F7931E',
+        marginTop: 8,
+        padding: '36px 28px 40px',
+        textAlign: 'center',
+        fontFamily: FONT,
       }}
     >
+      {icon && <EmptyStateTile tint={tint}>{icon}</EmptyStateTile>}
+
       <div
         style={{
-          fontSize: '10.5px',
+          fontSize: 10.5,
           fontWeight: 800,
-          color: '#F7931E',
-          letterSpacing: '0.14em',
+          color: tint === 'slate' ? INK_SOFT : DEEP_AMBER,
+          letterSpacing: '0.16em',
           textTransform: 'uppercase',
-          marginBottom: '8px',
+          marginBottom: 8,
         }}
       >
         {eyebrow}
       </div>
+
       <h3
         style={{
-          fontSize: '18px',
+          fontSize: 20,
           fontWeight: 800,
-          color: '#0F172A',
+          color: INK,
           letterSpacing: '-0.02em',
           lineHeight: 1.2,
-          margin: '0 0 6px',
+          margin: '0 0 8px',
         }}
       >
         {title}
       </h3>
+
       <p
         style={{
-          fontSize: '13px',
+          fontSize: 13.5,
           fontWeight: 500,
           color: INK_SOFT,
-          lineHeight: 1.45,
-          margin: 0,
+          lineHeight: 1.55,
+          margin: '0 auto',
+          maxWidth: 320,
         }}
       >
         {body}
       </p>
+
       {accent && (
-        <div style={{ marginTop: 12 }}>
+        <div style={{ marginTop: 14 }}>
           <span
             style={{
               display: 'inline-block',
@@ -82,7 +100,7 @@ export function EditorialEmpty({ eyebrow, title, body, accent }: EditorialEmptyP
               border: '1px solid rgba(247,147,30,0.28)',
               fontSize: 11,
               fontWeight: 700,
-              color: '#B45309',
+              color: DEEP_AMBER,
               letterSpacing: '0.01em',
             }}
           >
