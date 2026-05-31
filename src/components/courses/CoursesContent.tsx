@@ -19,6 +19,7 @@ import CoursesShellTabs from '@/features/courses/components/CoursesShellTabs';
 import { supabase } from '@/integrations/supabase/client';
 import { useQuery } from '@tanstack/react-query';
 import { SectionEyebrow } from '@/components/ui/SectionEyebrow';
+import { AMBER, HAIRLINE_INK_7, HAIRLINE_INK_10, HAIRLINE_INK_12, INK, INK_MUTE, INK_TINT_05, SLATE_50, SURFACE } from '@/features/courses/_shared/tokens';
 
 /* ─── Rate a Course bottom sheet ─── */
 function RateCourseSheet({ open, onClose }: { open: boolean; onClose: () => void }) {
@@ -60,7 +61,7 @@ function RateCourseSheet({ open, onClose }: { open: boolean; onClose: () => void
       <div
         style={{
           position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 1201,
-          background: '#F8FAFC',
+          background: SLATE_50,
           borderTopLeftRadius: 20, borderTopRightRadius: 20,
           maxHeight: '85vh', display: 'flex', flexDirection: 'column',
           boxShadow: '0 -8px 30px rgba(0,0,0,0.12)',
@@ -68,17 +69,17 @@ function RateCourseSheet({ open, onClose }: { open: boolean; onClose: () => void
       >
         {/* Drag handle */}
         <div style={{ display: 'flex', justifyContent: 'center', paddingTop: 10, paddingBottom: 4 }}>
-          <div style={{ width: 36, height: 4, borderRadius: 2, background: 'rgba(15,23,42,0.12)' }} />
+          <div style={{ width: 36, height: 4, borderRadius: 2, background: HAIRLINE_INK_12 }} />
         </div>
 
         {/* Header */}
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '6px 16px 10px', borderBottom: '0.5px solid rgba(15,23,42,0.07)' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '6px 16px 10px', borderBottom: `0.5px solid ${HAIRLINE_INK_7}` }}>
           <div>
             <SectionEyebrow label="Rate a Course" color="amber" className="mb-0.5" />
-            <p style={{ fontSize: 12, color: '#64748B', margin: 0 }}>Search any course you've played</p>
+            <p style={{ fontSize: 12, color: INK_MUTE, margin: 0 }}>Search any course you've played</p>
           </div>
-          <button onClick={onClose} style={{ width: 32, height: 32, borderRadius: '50%', background: 'rgba(15,23,42,0.05)', border: '0.5px solid rgba(15,23,42,0.10)', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <X size={16} style={{ color: '#64748B' }} />
+          <button onClick={onClose} style={{ width: 32, height: 32, borderRadius: '50%', background: INK_TINT_05, border: `0.5px solid ${HAIRLINE_INK_10}`, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <X size={16} style={{ color: INK_MUTE }} />
           </button>
         </div>
 
@@ -93,10 +94,10 @@ function RateCourseSheet({ open, onClose }: { open: boolean; onClose: () => void
             placeholder="Search courses…"
             style={{
               width: '100%', padding: '9px 12px 9px 36px',
-              borderRadius: 10, border: '1px solid rgba(15,23,42,0.10)',
-              background: '#ffffff',
+              borderRadius: 10, border: `1px solid ${HAIRLINE_INK_10}`,
+              background: SURFACE,
               fontSize: 14, outline: 'none',
-              color: '#0F172A',
+              color: INK,
               boxSizing: 'border-box' as const,
             }}
           />
@@ -125,7 +126,7 @@ function RateCourseSheet({ open, onClose }: { open: boolean; onClose: () => void
                 style={{
                   width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between',
                   padding: '13px 16px',
-                  borderBottom: i < results.length - 1 ? '0.5px solid rgba(15,23,42,0.07)' : 'none',
+                  borderBottom: i < results.length - 1 ? `0.5px solid ${HAIRLINE_INK_7}` : 'none',
                   background: 'none', border: 'none', cursor: 'pointer', textAlign: 'left',
                 }}
                 className="active:bg-muted/50"
@@ -139,7 +140,7 @@ function RateCourseSheet({ open, onClose }: { open: boolean; onClose: () => void
                     {course.global_rank ? ` · #${course.global_rank} World` : ''}
                   </p>
                 </div>
-                <span style={{ fontSize: 12, fontWeight: 600, color: '#F7931E', flexShrink: 0 }}>
+                <span style={{ fontSize: 12, fontWeight: 600, color: AMBER, flexShrink: 0 }}>
                   Rate →
                 </span>
               </button>
@@ -316,8 +317,8 @@ const CoursesContent: React.FC<CoursesContentProps> = ({ username, displayName }
                 className="active:scale-[0.97] transition-all"
               >
                 <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                  <Star size={14} fill="#F7931E" color="#F7931E" strokeWidth={0} />
-                  <span style={{ fontSize: 13, fontWeight: 600, color: '#0F172A' }}>
+                  <Star size={14} fill={AMBER} color={AMBER} strokeWidth={0} />
+                  <span style={{ fontSize: 13, fontWeight: 600, color: INK }}>
                     Rate a course you've played
                   </span>
                 </div>
