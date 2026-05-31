@@ -124,7 +124,7 @@ export function TeamFinishRow({
         gap: 12,
         padding: '0 20px',
         height,
-        borderBottom: isLast ? 'none' : `0.5px solid ${INK_15}`,
+        borderBottom: 'none',
         background: isChampion ? 'rgba(212,160,23,0.05)' : 'transparent',
         position: 'relative',
       }}

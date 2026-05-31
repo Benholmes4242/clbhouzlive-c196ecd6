@@ -67,7 +67,7 @@ export function LastYearRow({
         padding: isWinner ? '14px 20px' : '12px 20px',
         alignItems: 'center',
         background: isWinner ? 'rgba(251,188,46,0.10)' : 'transparent',
-        borderBottom: isLast ? 'none' : `0.5px solid ${INK_15}`,
+        borderBottom: 'none',
       }}
     >
       {isWinner ? (
