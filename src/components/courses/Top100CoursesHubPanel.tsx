@@ -224,7 +224,7 @@ const Top100CoursesHubPanel = () => {
             style={{
               fontSize: 13,
               fontWeight: 500,
-              color: '#475569',
+              color: SLATE_600,
               margin: '8px 0 0',
               letterSpacing: '-0.005em',
               fontFamily: "'Geist', sans-serif",
