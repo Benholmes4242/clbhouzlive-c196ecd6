@@ -137,37 +137,44 @@ const CommunityScoreCard: React.FC<CommunityScoreCardProps> = ({
 
   const onlyUserHasRated = totalRatings === 1 && userRating;
 
-  // Comparison message
+  // Comparison message — soft pill, one line
   let comparisonMessage: React.ReactNode = null;
   if (!onlyUserHasRated && userRating && communityAverage) {
     const diffRaw = userRating.rating - communityAverage;
     const diff = Number(diffRaw.toFixed(1));
     const absDiff = Math.abs(diff);
 
+    const pillBase: React.CSSProperties = {
+      display: 'inline-flex',
+      alignItems: 'center',
+      gap: 5,
+      padding: '5px 11px',
+      borderRadius: 999,
+      fontSize: 11,
+      fontWeight: 600,
+    };
+
     if (absDiff < 0.2) {
       comparisonMessage = (
-        <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 14 }}>
-          <CheckCircle2 className="h-3.5 w-3.5" style={{ color: '#22C55E' }} />
-          <span style={{ fontSize: 11, color: '#22C55E', fontWeight: 600 }}>
-            Your score matches the community consensus.
+        <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 18 }}>
+          <span style={{ ...pillBase, background: 'rgba(15,23,42,0.05)', color: INK_MUTE }}>
+            <CheckCircle2 className="h-3 w-3" /> Matches community consensus
           </span>
         </div>
       );
     } else if (diff > 0) {
       comparisonMessage = (
-        <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 14 }}>
-          <ArrowUpIcon className="h-3.5 w-3.5" style={{ color: '#22C55E' }} />
-          <span style={{ fontSize: 11, color: '#22C55E', fontWeight: 600 }}>
-            You rated this course {absDiff.toFixed(1)} points higher than the community.
+        <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 18 }}>
+          <span style={{ ...pillBase, background: 'rgba(22,163,74,0.08)', color: '#16A34A' }}>
+            <ArrowUpIcon className="h-3 w-3" /> {absDiff.toFixed(1)} above community avg
           </span>
         </div>
       );
     } else {
       comparisonMessage = (
-        <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 14 }}>
-          <ArrowDownIcon className="h-3.5 w-3.5" style={{ color: '#EF4444' }} />
-          <span style={{ fontSize: 11, color: '#EF4444', fontWeight: 600 }}>
-            You rated this course {absDiff.toFixed(1)} points lower than the community.
+        <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 18 }}>
+          <span style={{ ...pillBase, background: 'rgba(239,68,68,0.08)', color: '#EF4444' }}>
+            <ArrowDownIcon className="h-3 w-3" /> {absDiff.toFixed(1)} below community avg
           </span>
         </div>
       );
@@ -192,60 +199,80 @@ const CommunityScoreCard: React.FC<CommunityScoreCardProps> = ({
   const maxCount = Math.max(...Object.values(distCounts), 1);
 
   return (
-    <div>
-      {/* Score block — stacked & centered (number above tier label) */}
-      <div style={{ textAlign: 'center' as const, marginBottom: 6 }}>
-        <div
-          style={{
-            fontSize: 56,
-            fontWeight: 900,
-            color: '#0F172A',
-            letterSpacing: '-0.05em',
-            lineHeight: 1,
-            fontVariantNumeric: 'tabular-nums',
-          }}
-        >
-          {formatScore(communityAverage)}
+    <div
+      style={{
+        background: SURFACE,
+        borderRadius: 20,
+        border: `1px solid ${HAIRLINE_INK_7}`,
+        padding: '24px 20px',
+        boxShadow: '0 1px 3px rgba(15,23,42,0.04)',
+      }}
+    >
+      {/* Score block — number /10, tier in amber, count */}
+      <div style={{ textAlign: 'center' as const, marginBottom: 16 }}>
+        <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'center', gap: 3 }}>
+          <span
+            style={{
+              fontSize: 60,
+              fontWeight: 900,
+              color: INK,
+              letterSpacing: '-0.05em',
+              lineHeight: 1,
+              fontVariantNumeric: 'tabular-nums',
+            }}
+          >
+            {formatScore(communityAverage)}
+          </span>
+          <span style={{ fontSize: 20, fontWeight: 800, color: 'rgba(15,23,42,0.25)', letterSpacing: '-0.02em' }}>
+            /10
+          </span>
         </div>
         <div
           style={{
-            fontSize: 12,
+            fontSize: 11.5,
             fontWeight: 800,
-            color: '#c97a10',
-            letterSpacing: '0.15em',
+            color: AMBER,
+            letterSpacing: '0.16em',
             textTransform: 'uppercase' as const,
-            marginTop: 6,
+            marginTop: 8,
           }}
         >
           {tierLabel}
         </div>
-      </div>
-
-      <div style={{ fontSize: 12, color: '#94A3B8', marginBottom: 14, textAlign: 'center' as const }}>
-        Based on {totalRatings} {totalRatings === 1 ? 'rating' : 'ratings'}
-        {onlyUserHasRated ? ' · Only you have rated this course so far.' : ''}
+        <div style={{ fontSize: 11.5, color: INK_FAINT, marginTop: 4 }}>
+          Based on {totalRatings} {totalRatings === 1 ? 'rating' : 'ratings'}
+          {onlyUserHasRated ? ' · Only you have rated this course so far.' : ''}
+        </div>
       </div>
 
       {/* User vs community comparison */}
       {comparisonMessage}
 
-      {/* Distribution bars */}
+      {/* Distribution bars — taller, gradient, zero tiers de-emphasised */}
       <div style={{ marginBottom: 14 }}>
         {TIERS.map(({ key, label }) => {
           const count = distCounts[key] || 0;
           const pct = (count / maxCount) * 100;
+          const has = count > 0;
           return (
-            <div
-              key={key}
-              style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 5 }}
-            >
-              <span style={{ fontSize: 11, color: '#64748B', width: 90, flexShrink: 0 }}>{label}</span>
+            <div key={key} style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 8 }}>
+              <span
+                style={{
+                  fontSize: 11.5,
+                  color: has ? INK : INK_FAINT,
+                  fontWeight: has ? 600 : 500,
+                  width: 82,
+                  flexShrink: 0,
+                }}
+              >
+                {label}
+              </span>
               <div
                 style={{
                   flex: 1,
-                  height: 4,
-                  borderRadius: 2,
-                  background: 'rgba(15,23,42,0.06)',
+                  height: 7,
+                  borderRadius: 4,
+                  background: 'rgba(15,23,42,0.05)',
                   overflow: 'hidden',
                 }}
               >
@@ -253,13 +280,22 @@ const CommunityScoreCard: React.FC<CommunityScoreCardProps> = ({
                   style={{
                     height: '100%',
                     width: `${pct}%`,
-                    background: '#F7931E',
-                    borderRadius: 2,
-                    transition: 'width 0.4s ease',
+                    background: has ? 'linear-gradient(90deg, #F7931E, #FFB347)' : 'transparent',
+                    borderRadius: 4,
+                    transition: 'width 0.5s ease',
                   }}
                 />
               </div>
-              <span style={{ fontSize: 11, color: '#94A3B8', width: 14, textAlign: 'right' as const }}>
+              <span
+                style={{
+                  fontSize: 12,
+                  color: has ? INK : 'rgba(15,23,42,0.25)',
+                  fontWeight: has ? 800 : 600,
+                  width: 16,
+                  textAlign: 'right' as const,
+                  fontVariantNumeric: 'tabular-nums',
+                }}
+              >
                 {count}
               </span>
             </div>
@@ -270,18 +306,17 @@ const CommunityScoreCard: React.FC<CommunityScoreCardProps> = ({
       {/* Category breakdown — eyebrow + score rings */}
       {categories.length > 0 && (
         <>
-          {/* Eyebrow tying breakdown to histogram */}
           <div
             style={{
               fontSize: 10,
               fontWeight: 700,
-              color: '#94A3B8',
+              color: INK_FAINT,
               letterSpacing: '0.15em',
               textTransform: 'uppercase' as const,
               textAlign: 'center' as const,
               marginTop: 8,
               paddingTop: 16,
-              borderTop: '0.5px solid rgba(15,23,42,0.07)',
+              borderTop: `0.5px solid ${HAIRLINE_INK_7}`,
               marginBottom: 10,
             }}
           >
@@ -301,7 +336,7 @@ const CommunityScoreCard: React.FC<CommunityScoreCardProps> = ({
                   style={{
                     fontSize: 8,
                     fontWeight: 700,
-                    color: '#94A3B8',
+                    color: INK_FAINT,
                     letterSpacing: '0.08em',
                     textTransform: 'uppercase' as const,
                     marginTop: 6,
@@ -327,7 +362,7 @@ const CommunityScoreCard: React.FC<CommunityScoreCardProps> = ({
             border: 'none',
             fontSize: 13,
             fontWeight: 600,
-            color: '#94A3B8',
+            color: INK_FAINT,
             cursor: 'pointer',
           }}
         >
