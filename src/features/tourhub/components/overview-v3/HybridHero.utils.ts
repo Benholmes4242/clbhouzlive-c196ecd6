@@ -157,9 +157,10 @@ export function deriveHeroState(
     return {
       kind: 'live',
       round: tournament.currentRound ?? 1,
-      // TODO: wire to real tournament.num_rounds once exposed on HeroTournament.
-      // 3-round (LPGA 54-hole) events will mislabel "Moving Day" / "Final Round" until then.
-      totalRounds: 4,
+      // INTERIM: no real num_rounds on HeroTournament yet. LPGA events are 54-hole
+      // (3 rounds); everything else defaults to 4. Replace with tournament.num_rounds
+      // when the cache exposes it.
+      totalRounds: tournament.tourSlug === 'lpga' ? 3 : 4,
       thruLabel: 'F THRU',
     };
   }
