@@ -81,6 +81,10 @@ function ExplorePassportInner({ userId }: ExplorePassportProps) {
       ? `Lifetime · since ${passport.first_play_year}`
       : 'Lifetime totals';
 
+  const hook = deriveHook(passport);
+
+
+
   return (
     <section>
       <ExploreSectionHeader
