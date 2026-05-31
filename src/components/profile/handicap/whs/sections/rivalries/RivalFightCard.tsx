@@ -38,7 +38,7 @@ export const RivalFightCard: React.FC<Props> = ({
   onTap,
 }) => {
   const key = rivalKey(rivalry);
-  const [dimension] = useRivalryDimension(key);
+  const [dimension, setDimension] = useRivalryDimension(key);
   const record =
     (dimension === 'gross' ? rivalry.gross_record : rivalry.stableford_record) ?? {
       wins: 0,
@@ -291,25 +291,69 @@ export const RivalFightCard: React.FC<Props> = ({
           </div>
         </div>
 
-        <div
-          style={{
-            display: 'flex',
-            alignItems: 'baseline',
-            gap: 4,
-            fontVariantNumeric: 'tabular-nums',
-            fontFeatureSettings: '"kern" 1, "liga" 1',
-            fontWeight: 800,
-            fontSize: 24,
-            letterSpacing: '-0.02em',
-          }}
-        >
-          <span style={{ color: isWinningOverall ? GOLD : 'rgba(255,255,255,0.45)' }}>
-            {record.wins}
-          </span>
-          <span style={{ color: 'rgba(255,255,255,0.3)', fontSize: 18 }}>–</span>
-          <span style={{ color: !isWinningOverall && record.losses > record.wins ? RED : 'rgba(255,255,255,0.45)' }}>
-            {record.losses}
-          </span>
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 6 }}>
+          {/* Scoring dimension toggle */}
+          <div
+            role="group"
+            aria-label="Scoring dimension"
+            onClick={(e) => e.stopPropagation()}
+            style={{
+              display: 'inline-flex',
+              padding: 2,
+              borderRadius: 999,
+              background: 'rgba(255,255,255,0.06)',
+              border: '1px solid rgba(255,255,255,0.08)',
+            }}
+          >
+            {(['gross', 'stableford'] as const).map((opt) => {
+              const active = dimension === opt;
+              return (
+                <button
+                  key={opt}
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setDimension(opt);
+                  }}
+                  style={{
+                    padding: '3px 9px',
+                    borderRadius: 999,
+                    border: 'none',
+                    cursor: 'pointer',
+                    fontSize: 9.5,
+                    fontWeight: 800,
+                    letterSpacing: '0.08em',
+                    textTransform: 'uppercase',
+                    background: active ? '#FFFFFF' : 'transparent',
+                    color: active ? '#0F172A' : 'rgba(255,255,255,0.6)',
+                  }}
+                >
+                  {opt === 'gross' ? 'Gross' : 'Stbl'}
+                </button>
+              );
+            })}
+          </div>
+
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'baseline',
+              gap: 4,
+              fontVariantNumeric: 'tabular-nums',
+              fontFeatureSettings: '"kern" 1, "liga" 1',
+              fontWeight: 800,
+              fontSize: 24,
+              letterSpacing: '-0.02em',
+            }}
+          >
+            <span style={{ color: isWinningOverall ? GOLD : 'rgba(255,255,255,0.45)' }}>
+              {record.wins}
+            </span>
+            <span style={{ color: 'rgba(255,255,255,0.3)', fontSize: 18 }}>–</span>
+            <span style={{ color: !isWinningOverall && record.losses > record.wins ? RED : 'rgba(255,255,255,0.45)' }}>
+              {record.losses}
+            </span>
+          </div>
         </div>
       </div>
 
