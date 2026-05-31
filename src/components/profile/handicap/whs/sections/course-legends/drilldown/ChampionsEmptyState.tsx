@@ -39,7 +39,7 @@ export const ChampionsEmptyState: React.FC<{ courseName: string | null }> = ({ c
     <div style={{ fontSize: 13.5, color: SLATE, lineHeight: 1.55, maxWidth: 300, margin: '0 auto' }}>
       No one's posted a round at{' '}
       <strong style={{ color: INK, fontWeight: 700 }}>{courseName ?? 'this course'}</strong> yet.
-      Post your first and you'll top every leaderboard — gross, birdies, Stableford — until someone beats you.
+      Post your first and you'll top every leaderboard — gross, birdies, stableford — until someone beats you.
     </div>
   </div>
 );
