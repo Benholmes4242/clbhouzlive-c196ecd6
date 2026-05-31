@@ -316,6 +316,8 @@ export interface CinematicFrameProps {
   tiedLeaders: TopTie | null;
   fieldSize: number;
   tourSlug?: string | null;
+  defendingChamp?: DefendingChampData | null;
+  fieldStrength?: FieldStrength | null;
   onCtaTap?: () => void;
 }
 
