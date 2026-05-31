@@ -937,9 +937,44 @@ export function CinematicFrame({
           >
             {title}
           </h1>
+          {countdownText && (
+            <div
+              style={{
+                marginTop: 4,
+                display: 'inline-flex',
+                alignSelf: 'flex-start',
+                alignItems: 'center',
+                gap: 8,
+                padding: '7px 12px',
+                borderRadius: 999,
+                background: 'rgba(255,255,255,0.12)',
+                WebkitBackdropFilter: 'blur(12px)',
+                backdropFilter: 'blur(12px)',
+                border: '1px solid rgba(255,255,255,0.18)',
+              }}
+            >
+              <span
+                aria-hidden="true"
+                style={{
+                  width: 6, height: 6, borderRadius: '50%',
+                  background: AMBER, flexShrink: 0,
+                }}
+              />
+              <span
+                style={{
+                  ...NUMERIC_STYLE,
+                  fontSize: 12, fontWeight: 700, color: 'white',
+                  letterSpacing: '0.04em', textTransform: 'uppercase',
+                }}
+              >
+                {countdownText}
+              </span>
+            </div>
+          )}
         </div>
 
         {/* Floating glass capsule */}
+        {hasCapsule && (
         <div
           className="cinematic-capsule"
           style={{
@@ -952,7 +987,9 @@ export function CinematicFrame({
             boxShadow: '0 8px 40px rgba(0,0,0,0.4)',
           }}
         >
-          {slotNodes.length > 0 ? (
+          {isUpcoming ? (
+            upcomingCapsule
+          ) : slotNodes.length > 0 ? (
             <>{slotNodes}</>
           ) : (
             <div
