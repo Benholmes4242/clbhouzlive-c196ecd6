@@ -184,7 +184,7 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
       {course.description && (
         <>
           <div style={{ marginTop: 24 }}>
-            <SectionLabel text="About" />
+            <SectionLabel text="About" icon={BookOpen} />
             <div style={{ padding: '0 16px' }}>
               <div style={{ fontSize: 14, color: SLATE_600, lineHeight: 1.7, position: 'relative' }}>
                 {formatDescription(displayDescription)}
