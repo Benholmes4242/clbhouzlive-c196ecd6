@@ -82,7 +82,7 @@ export function ChaserRow({
         padding: '8px 20px',
         alignItems: 'center',
         background: 'transparent',
-        borderBottom: isLast ? 'none' : `0.5px solid ${INK_15}`,
+        borderBottom: 'none',
         boxSizing: 'border-box',
       }}
     >

@@ -77,7 +77,7 @@ export function SoloLeaderRow({
         padding: '14px 20px',
         alignItems: 'center',
         background: isResults ? LEADER_GOLD_TINT_10 : LEADER_GOLD_TINT_7,
-        borderBottom: isLast ? 'none' : `0.5px solid ${INK_15}`,
+        borderBottom: 'none',
       }}
     >
       <span
@@ -231,7 +231,7 @@ export function TiedChasersRow({
         height: 40,
         alignItems: 'center',
         background: AMBER_TINT_04,
-        borderBottom: isLast ? 'none' : `0.5px solid ${INK_15}`,
+        borderBottom: 'none',
         cursor: onTap ? 'pointer' : 'default',
       }}
       aria-label={`${count} players tied at ${rank} with score ${score}, average trajectory`}
@@ -296,7 +296,7 @@ export function TiedLeadersRow({ count, score, players, isLast = false }: TiedLe
         padding: '14px 20px',
         alignItems: 'center',
         background: LEADER_GOLD_TINT_7,
-        borderBottom: isLast ? 'none' : `0.5px solid ${INK_15}`,
+        borderBottom: 'none',
       }}
       aria-label={`${count} players tied at the top with score ${score}`}
     >
@@ -369,7 +369,7 @@ export function ChampionRow({
         padding: '14px 20px',
         alignItems: 'center',
         background: LEADER_GOLD_TINT_10,
-        borderBottom: isLast ? 'none' : `0.5px solid ${INK_15}`,
+        borderBottom: 'none',
       }}
     >
       <span style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}>

@@ -30,7 +30,7 @@ export function TeeTimeRow({ time, holeStart, players, isMarquee, isLast }: TeeT
         padding: '12px 20px',
         alignItems: 'center',
         background: isMarquee ? 'rgba(247,147,30,0.05)' : 'transparent',
-        borderBottom: isLast ? 'none' : `0.5px solid ${INK_15}`,
+        borderBottom: 'none',
       }}
     >
       <div>
