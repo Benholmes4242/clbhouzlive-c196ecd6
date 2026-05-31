@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Pencil, ThumbsUp, ThumbsDown } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { ReviewMediaStrip, ReviewMediaItem } from './ReviewMediaStrip';
