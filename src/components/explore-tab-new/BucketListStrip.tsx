@@ -29,7 +29,7 @@ export function BucketListStrip({ embedded = false }: { embedded?: boolean } = {
 
   return (
     <section>
-      <ExploreSectionHeader title="Your bucket list" sub="Places you've saved" />
+      {!embedded && <ExploreSectionHeader title="Your bucket list" sub="Places you've saved" />}
 
       <div
         className="flex overflow-x-auto"
