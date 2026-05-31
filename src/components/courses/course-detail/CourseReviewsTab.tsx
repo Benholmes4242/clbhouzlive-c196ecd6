@@ -14,7 +14,7 @@ import { ResponseDisplay, ReplyForm } from '../review/ReviewResponseBlock';
 import { RatingFilterChips, RatingFilterValue } from '../review/RatingFilterChips';
 import { WriteReviewPrompt } from '../review/WriteReviewPrompt';
 import { SegmentedTabOption } from '@/components/ui/SegmentedTabs';
-import { Search, X, Pencil, ArrowUpDown, ListChecks } from 'lucide-react';
+import { Search, X, Pencil, ArrowUpDown, ListChecks, MessageSquarePlus, Flag, Map, Building2, Tag } from 'lucide-react';
 import { SectionLabel } from './SectionLabel';
 import { AppSelect } from '@/components/ui/AppSelect';
 import { Button } from '@/components/ui/button';
