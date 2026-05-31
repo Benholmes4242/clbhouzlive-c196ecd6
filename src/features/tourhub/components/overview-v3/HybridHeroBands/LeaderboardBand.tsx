@@ -367,7 +367,7 @@ export function LeaderboardBand({
     state.kind === 'results' &&
     (state.variant === 'standard' || state.variant === 'declared' || state.variant === 'team' || state.variant === 'playoff');
   const showSectionHeader = !isResultsCompact;
-  const useInlineCta = isResultsCompact;
+  
 
   return (
     <div style={{ background: '#F8FAFC' }}>
