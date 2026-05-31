@@ -163,6 +163,7 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
             </button>
           </div>
         )}
+        <ConnectHandicapCue variant="about" courseName={course.name} />
       </div>
 
 
