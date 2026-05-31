@@ -111,7 +111,7 @@ export function CollegeComparePage() {
         >
           <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, marginBottom: 4 }}>
             <ArrowLeftRight size={11} strokeWidth={2.5} color={AMBER} style={{ marginTop: -4 }} />
-            <Kicker color="amber">Head-to-head</Kicker>
+            <Kicker color="light">Head-to-head</Kicker>
             <ChevronRight size={11} strokeWidth={2.5} color={AMBER} style={{ marginTop: -4 }} />
           </div>
           <h1
@@ -153,7 +153,7 @@ export function CollegeComparePage() {
         style={{ paddingTop: 'var(--chrome-total-h, 0px)', background: SLATE_50 }}
       >
         {/* Season caps row — stays in body, no longer cropped under chrome */}
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', padding: '9px 16px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', padding: '16px 16px 9px' }}>
           <span style={{ fontSize: 9, color: INK_FAINT, fontWeight: 800, letterSpacing: '0.14em', textTransform: 'uppercase' }}>
             {seasonCaps}
           </span>
