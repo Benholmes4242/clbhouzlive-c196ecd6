@@ -166,128 +166,62 @@ export function LiveLeaderboardTab() {
         </div>
       )}
 
-      {/* Header above the leaderboard */}
+      {/* Header above the leaderboard — minimal */}
       {(() => {
         const tourFullName = TOUR_CONFIG[selected.tourSlug]?.name ?? selected.tour_name ?? '';
-        const courseName = selected.venue_course_name || selected.venue_name || null;
         const location = [selected.venue_city, expandCountry(selected.venue_country)]
           .filter(Boolean)
           .join(', ');
-        const venueLine = [courseName, location || null].filter(Boolean).join(' · ');
-        const dates =
-          selected.end_date ? formatDateRange(selected.start_date, selected.end_date) : null;
-        const metaParts = [
-          dates,
-          selected.venue_par != null ? `Par ${selected.venue_par}` : null,
-          selected.venue_yardage != null ? `${selected.venue_yardage.toLocaleString()} yds` : null,
-        ].filter(Boolean);
+        const dates = selected.end_date
+          ? formatDateRange(selected.start_date, selected.end_date)
+          : null;
+        const rightMeta = [dates, selected.venue_par != null ? `Par ${selected.venue_par}` : null]
+          .filter(Boolean)
+          .join(' · ');
 
         return (
-          <div
-            style={{
-              padding: '14px 20px 12px',
-              background: '#FFFFFF',
-              borderBottom: `0.5px solid ${INK_TINT_07}`,
-            }}
-          >
-            {/* Live / Tees Off Today status */}
-            <div
-              style={{
+          <div style={{ padding: '16px 20px 16px', background: '#FFFFFF', borderBottom: `0.5px solid ${INK_TINT_07}` }}>
+            {/* Row: tour (+ live dot) · dates·par right */}
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 9 }}>
+              <span style={{
+                display: 'inline-flex', alignItems: 'center', gap: 7,
                 fontFamily: 'Geist, system-ui, sans-serif',
-                fontSize: 10.5,
-                fontWeight: 800,
-                letterSpacing: '0.14em',
-                textTransform: 'uppercase',
-                color: isLive ? STATUS_LIVE : '#F7931E',
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: 6,
-              }}
-            >
-              {isLive && (
-                <span
-                  aria-hidden
-                  style={{ width: 6, height: 6, borderRadius: '50%', background: STATUS_LIVE }}
-                />
+                fontSize: 10.5, fontWeight: 800, letterSpacing: '0.14em',
+                textTransform: 'uppercase', color: INK_MUTE,
+              }}>
+                {isLive && (
+                  <span aria-hidden style={{ width: 6, height: 6, borderRadius: '50%', background: STATUS_LIVE, flexShrink: 0 }} />
+                )}
+                {tourFullName}
+              </span>
+              {rightMeta && (
+                <span style={{
+                  fontFamily: 'Geist, system-ui, sans-serif',
+                  fontSize: 11, fontWeight: 600, color: INK_FAINT,
+                  fontVariantNumeric: 'tabular-nums', whiteSpace: 'nowrap',
+                }}>
+                  {rightMeta}
+                </span>
               )}
-              {isLive ? 'Live' : 'Tees Off Today'}
             </div>
 
-            {/* Tour eyebrow (proper full name) */}
-            {tourFullName && (
-              <div
-                style={{
-                  marginTop: 6,
-                  fontFamily: 'Geist, system-ui, sans-serif',
-                  fontSize: 10,
-                  fontWeight: 800,
-                  letterSpacing: '0.14em',
-                  textTransform: 'uppercase',
-                  color: INK_MUTE,
-                }}
-              >
-                {tourFullName}
-              </div>
-            )}
-
             {/* Tournament name */}
-            <div
-              style={{
-                marginTop: 3,
-                fontFamily: 'Geist, system-ui, sans-serif',
-                fontSize: 18,
-                fontWeight: 800,
-                color: INK,
-                letterSpacing: '-0.01em',
-                lineHeight: 1.2,
-              }}
-            >
+            <div style={{
+              fontFamily: 'Geist, system-ui, sans-serif',
+              fontSize: 20, fontWeight: 800, color: INK,
+              letterSpacing: '-0.02em', lineHeight: 1.16,
+            }}>
               {selected.name}
             </div>
 
-            {/* Venue · location */}
-            {venueLine && (
-              <div
-                style={{
-                  marginTop: 4,
-                  fontFamily: 'Geist, system-ui, sans-serif',
-                  fontSize: 12.5,
-                  fontWeight: 600,
-                  color: INK_MUTE,
-                }}
-              >
-                {venueLine}
-              </div>
-            )}
-
-            {/* Dates · par · yardage */}
-            {metaParts.length > 0 && (
-              <div
-                style={{
-                  marginTop: 2,
-                  fontFamily: 'Geist, system-ui, sans-serif',
-                  fontSize: 11.5,
-                  fontWeight: 500,
-                  color: INK_FAINT,
-                  fontVariantNumeric: 'tabular-nums',
-                }}
-              >
-                {metaParts.join(' · ')}
-              </div>
-            )}
-
-            {/* Defending champion */}
-            {selected.defending_champion && (
-              <div
-                style={{
-                  marginTop: 2,
-                  fontFamily: 'Geist, system-ui, sans-serif',
-                  fontSize: 11.5,
-                  fontWeight: 500,
-                  color: INK_FAINT,
-                }}
-              >
-                Defending · {selected.defending_champion}
+            {/* Location only */}
+            {location && (
+              <div style={{
+                marginTop: 8,
+                fontFamily: 'Geist, system-ui, sans-serif',
+                fontSize: 12.5, fontWeight: 500, color: INK_MUTE,
+              }}>
+                {location}
               </div>
             )}
           </div>
