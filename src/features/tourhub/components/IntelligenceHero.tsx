@@ -1247,7 +1247,7 @@ function Carousel({
       >
         {children}
       </div>
-      <DotsRail idx={idx} stats={stats} hasWinner={hasWinner} />
+      
     </>
   );
 }
