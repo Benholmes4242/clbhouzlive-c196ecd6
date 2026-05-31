@@ -13,10 +13,9 @@ import {
   COURSE_SCRIMS,
   GOLD,
   AMBER,
-  GREEN_LIVE,
   NUMERIC_STYLE,
 } from '../HybridHero.constants';
-import { FONT, STATUS_LIVE, WHITE_ALPHA_55 } from '../../../_shared/tokens';
+import { FONT } from '../../../_shared/tokens';
 import type { HeroState } from '../HybridHero.utils';
 
 interface PhotoBandProps {
@@ -30,47 +29,6 @@ interface PhotoBandProps {
   isMajor?: boolean;
   isSignature?: boolean;
   datesString?: string | null;
-}
-
-function StatusTag({ state }: { state: HeroState }) {
-  const isLive = state.kind === 'live';
-  const isResults = state.kind === 'results';
-  const dotColor = isLive ? STATUS_LIVE : AMBER;
-  let label = isLive ? 'LIVE' : isResults ? 'FINAL' : 'UPCOMING';
-  if (isResults && state.variant === 'cancelled') label = 'CANCELLED';
-  else if (isResults && state.variant === 'awaiting-playoff') label = 'PLAYOFF';
-  else if (isResults && state.variant === 'declared') label = 'DECLARED';
-
-  return (
-    <span
-      style={{
-        display: 'inline-flex',
-        alignItems: 'center',
-        gap: 6,
-        padding: '4px 10px',
-        borderRadius: 999,
-        background: 'rgba(0,0,0,0.45)',
-        border: `0.5px solid rgba(255,255,255,0.25)`,
-        backdropFilter: 'blur(4px)',
-        color: 'white',
-        fontSize: 9,
-        fontWeight: 800,
-        letterSpacing: '0.18em',
-      }}
-    >
-      <span
-        className={isLive ? 'hybrid-live-pulse' : undefined}
-        style={{
-          width: 6,
-          height: 6,
-          borderRadius: '50%',
-          background: dotColor,
-          display: 'inline-block',
-        }}
-      />
-      {label}
-    </span>
-  );
 }
 
 function ledeLine(state: HeroState, winnerName?: string | null): string | null {
@@ -171,7 +129,7 @@ export function PhotoBand({
         }}
       />
 
-      {/* Top eyebrow row — status tag left, tour meta right */}
+      {/* Top eyebrow row — tour name left, dates right */}
       <div
         style={{
           position: 'absolute',
@@ -185,7 +143,6 @@ export function PhotoBand({
           gap: 12,
         }}
       >
-        <StatusTag state={state} />
         {tourLabel && (
           <span
             style={{
@@ -202,7 +159,24 @@ export function PhotoBand({
             {tourLabel}
           </span>
         )}
+        {datesString && (
+          <span
+            style={{
+              ...NUMERIC_STYLE,
+              fontSize: 10,
+              fontWeight: 700,
+              letterSpacing: '0.16em',
+              color: 'rgba(255,255,255,0.75)',
+              textShadow: '0 1px 3px rgba(0,0,0,0.45)',
+              textTransform: 'uppercase',
+              whiteSpace: 'nowrap',
+            }}
+          >
+            {datesString}
+          </span>
+        )}
       </div>
+
 
       {/* Bottom title block */}
       <div
@@ -266,7 +240,7 @@ export function PhotoBand({
           )}
         </h1>
 
-        {(venueName || datesString) && (
+        {venueName && (
           <div
             style={{
               display: 'flex',
@@ -280,36 +254,17 @@ export function PhotoBand({
               textTransform: 'uppercase',
             }}
           >
-            {venueName && (
-              <span
-                style={{
-                  whiteSpace: 'nowrap',
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis',
-                  minWidth: 0,
-                }}
-              >
-                {venueName}
-                {venueCity ? ` · ${venueCity}` : ''}
-              </span>
-            )}
-            {venueName && datesString && (
-              <span
-                aria-hidden="true"
-                style={{
-                  width: 3,
-                  height: 3,
-                  borderRadius: '50%',
-                  background: WHITE_ALPHA_55,
-                  flexShrink: 0,
-                }}
-              />
-            )}
-            {datesString && (
-              <span style={{ ...NUMERIC_STYLE, whiteSpace: 'nowrap', flexShrink: 0 }}>
-                {datesString}
-              </span>
-            )}
+            <span
+              style={{
+                whiteSpace: 'nowrap',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                minWidth: 0,
+              }}
+            >
+              {venueName}
+              {venueCity ? ` · ${venueCity}` : ''}
+            </span>
           </div>
         )}
       </div>

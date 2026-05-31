@@ -53,24 +53,6 @@ function ctaLabel(state: HeroState): string {
   return state.variant === 'imminent' ? 'VIEW ALL TEE TIMES' : 'VIEW TOURNAMENT';
 }
 
-function header(state: HeroState, leaderboard: any[], tiedLeaders: TopTie | null) {
-  if (state.kind === 'live') {
-    const meta = tiedLeaders
-      ? `${leaderboard.length} players · ${tiedLeaders.count} tied at top`
-      : `${leaderboard.length} players`;
-    return { left: 'LEADERBOARD', right: meta };
-  }
-  if (state.kind === 'results') {
-    if (state.variant === 'cancelled') return { left: 'STATUS', right: 'Final · No result' };
-    if (state.variant === 'awaiting-playoff')
-      return { left: 'AWAITING RESOLUTION', right: tiedLeaders ? `${tiedLeaders.count} tied · playoff active` : 'playoff active' };
-    if (state.variant === 'declared') return { left: 'FINAL', right: `${leaderboard.length} players · 54 holes · weather` };
-    if (state.variant === 'team') return { left: 'TEAM FINAL', right: `${leaderboard.length} teams` };
-    return { left: 'FINAL', right: `${leaderboard.length} players` };
-  }
-  if (state.variant === 'imminent') return { left: 'ROUND 1 · MARQUEE GROUPS', right: 'R1 · marquee groups' };
-  return { left: "LAST YEAR'S TOP 4", right: '' };
-}
 
 function entryName(entry: any): string {
   const p = entry?.player;
@@ -113,7 +95,6 @@ export function LeaderboardBand({
 }: LeaderboardBandProps) {
   const showFooterStrip =
     state.kind === 'live' && (!!defendingChampion || (fieldSize ?? 0) > 0);
-  const h = header(state, leaderboard, tiedLeaders);
   const entryAvatar = (entry: any) => resolveAvatar(entry, tourSlug);
   const sparklinePar = par ?? 0;
 
@@ -366,39 +347,12 @@ export function LeaderboardBand({
   const isResultsCompact =
     state.kind === 'results' &&
     (state.variant === 'standard' || state.variant === 'declared' || state.variant === 'team' || state.variant === 'playoff');
-  const showSectionHeader = !isResultsCompact;
   const useInlineCta = isResultsCompact;
 
   return (
     <div style={{ background: '#F8FAFC' }}>
-      {showSectionHeader && (
-        <div
-          style={{
-            padding: '14px 20px 12px',
-            display: 'flex',
-            alignItems: 'baseline',
-            justifyContent: 'space-between',
-            gap: 12,
-          }}
-        >
-          <span
-            style={{
-              fontSize: 11,
-              fontWeight: 800,
-              letterSpacing: '0.16em',
-              color: AMBER,
-              textTransform: 'uppercase',
-            }}
-          >
-            {h.left}
-          </span>
-          {h.right && (
-            <span style={{ fontSize: 11, fontWeight: 600, color: INK_ALPHA_45 }}>{h.right}</span>
-          )}
-        </div>
-      )}
       {/* rows */}
-      <div style={{ borderTop: `0.5px solid ${INK_15}` }}>{body}</div>
+      <div>{body}</div>
       {/* Context strip (Defending Champion / Field) sits above the action */}
       {showFooterStrip && (
         <div
