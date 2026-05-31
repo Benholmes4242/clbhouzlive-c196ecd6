@@ -473,7 +473,7 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
         <div style={{ fontSize: 56, fontWeight: 900, color: INK, letterSpacing: '-0.05em', fontVariantNumeric: 'tabular-nums', lineHeight: 1 }}>
           {communityScore.toFixed(1)}
         </div>
-        <div style={{ fontSize: 12, fontWeight: 800, color: '#c97a10', letterSpacing: '0.15em', textTransform: 'uppercase' as const, marginTop: 6 }}>
+        <div style={{ fontSize: 12, fontWeight: 800, color: '#F7931E', letterSpacing: '0.15em', textTransform: 'uppercase' as const, marginTop: 6 }}>
           {getScoreTier(communityScore).label}
         </div>
         <div style={{ fontSize: 11, color: INK_FAINT, marginTop: 8 }}>

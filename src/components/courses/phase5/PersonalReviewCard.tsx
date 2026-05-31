@@ -201,7 +201,7 @@ export const PersonalReviewCard: React.FC<PersonalReviewCardProps> = ({
                 letterSpacing: '0.04em',
               }}
             >
-              ★ {label}
+              {label}
             </span>
           ))}
         </div>
