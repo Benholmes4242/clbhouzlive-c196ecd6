@@ -5,7 +5,7 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import type { TourPlayerStatistics } from '../../hooks/useTourHubData';
-import { AMBER, HAIRLINE_INK_8, HAIRLINE_INK_15, INK, INK_FAINT, INK_MUTE, INK_TINT_05, INK_TINT_07, SLATE_100, SURFACE } from '../../_shared/tokens';
+import { AMBER, HAIRLINE_INK_8, HAIRLINE_INK_15, INK, INK_FAINT, INK_MUTE, INK_TINT_07, SLATE_600, SURFACE } from '../../_shared/tokens';
 
 const STAT_TABS = ['Overview', 'Ball Striking', 'Short Game', 'Shots Gained'] as const;
 type StatTab = (typeof STAT_TABS)[number];
@@ -59,9 +59,7 @@ function StatRow({ label, value, trend, barPercent, barIndex = 0 }: StatRowProps
       <div style={{ textAlign: 'right' as const }}>
         <span style={{
           fontSize: '13px', fontWeight: 800, fontVariantNumeric: 'tabular-nums',
-          color: hasValue
-            ? (trend === 'positive' ? AMBER : trend === 'negative' ? INK_FAINT : INK)
-            : INK_FAINT,
+          color: hasValue ? INK : INK_FAINT,
         }}>
           {mainValue}
           {unitSuffix && <span style={{ fontSize: '10px', fontWeight: 500, color: INK_FAINT }}> {unitSuffix}</span>}
@@ -101,7 +99,7 @@ function SGBar({ label, value }: SGBarProps) {
     <div style={{ padding: '11px 0', borderBottom: `0.5px solid ${INK_TINT_07}` }}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '6px' }}>
         <span style={{ fontSize: '13px', fontWeight: 500, color: INK }}>{label}</span>
-        <span style={{ fontSize: '13px', fontWeight: 900, fontVariantNumeric: 'tabular-nums', color: isPositive ? AMBER : INK_FAINT }}>
+        <span style={{ fontSize: '13px', fontWeight: 900, fontVariantNumeric: 'tabular-nums', color: INK }}>
           {formatted}
         </span>
       </div>
@@ -158,16 +156,14 @@ export function PlayerSeasonStats({ playerStats }: PlayerSeasonStatsProps) {
           </span>
         </div>
 
-        {/* Segmented control — slate-100 trough, white pill active state */}
+        {/* Underline tabs — slate-600 active label + underline on light surface */}
         <div
           role="tablist"
           aria-label="Stat category"
           style={{
             display: 'flex',
-            gap: 2,
-            padding: 3,
-            background: SLATE_100,
-            borderRadius: 10,
+            gap: 20,
+            borderBottom: `0.5px solid ${INK_TINT_07}`,
             marginBottom: 12,
           }}
         >
@@ -181,19 +177,17 @@ export function PlayerSeasonStats({ playerStats }: PlayerSeasonStatsProps) {
                 onClick={() => setActiveTab(tab)}
                 className="active:opacity-80 transition-opacity"
                 style={{
-                  flex: 1,
-                  padding: '8px 4px',
-                  fontSize: 12,
+                  padding: '8px 0',
+                  fontSize: 14,
                   fontWeight: isActive ? 700 : 600,
                   lineHeight: 1,
-                  color: isActive ? INK : INK_FAINT,
-                  background: isActive ? SURFACE : 'transparent',
+                  color: isActive ? SLATE_600 : INK_FAINT,
+                  background: 'transparent',
                   border: 'none',
-                  borderRadius: 7,
+                  borderBottom: `1.5px solid ${isActive ? SLATE_600 : 'transparent'}`,
                   cursor: 'pointer',
                   whiteSpace: 'nowrap' as const,
-                  boxShadow: isActive ? `0 1px 2px ${INK_TINT_05}` : 'none',
-                  transition: 'background 0.15s ease, color 0.15s ease',
+                  transition: 'color 0.15s ease, border-color 0.15s ease',
                 }}
               >
                 {tab}

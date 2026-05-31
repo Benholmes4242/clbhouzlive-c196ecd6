@@ -16,7 +16,6 @@ import {
   INK_MUTE,
   INK_TINT_02,
   INK_TINT_07,
-  SCORE_OVER_PAR_LIGHT,
   SURFACE,
 } from '../../_shared/tokens';
 
@@ -75,11 +74,7 @@ export function PlayerTournamentHistory({ playerId, playerName }: PlayerTourname
               const score = result.score;
               const scoreStr = formatScore(score);
               const displayScore = isMissed ? '—' : scoreStr;
-              const scoreColor = isMissed
-                ? INK_FAINT
-                : score !== null && score < 0 ? AMBER
-                : score !== null && score > 0 ? SCORE_OVER_PAR_LIGHT
-                : INK_FAINT;
+              const scoreColor = isMissed ? INK_FAINT : INK;
 
               const navTarget = tournamentRoute(result.tournament_id, {
                 kind: 'player',
@@ -101,7 +96,7 @@ export function PlayerTournamentHistory({ playerId, playerName }: PlayerTourname
                   className="active:bg-black/[0.02] transition-colors"
                 >
                   {/* Position */}
-                  <span style={{ width: '44px', flexShrink: 0, fontSize: '12px', fontWeight: 900, color: isWin ? AMBER : INK_MUTE, display: 'flex', alignItems: 'center' }}>
+                  <span style={{ width: '44px', flexShrink: 0, fontSize: '12px', fontWeight: 900, color: isWin ? AMBER : INK, display: 'flex', alignItems: 'center' }}>
                     {isWin ? <Trophy style={{ width: 14, height: 14, color: AMBER }} /> : pos}
                   </span>
 
