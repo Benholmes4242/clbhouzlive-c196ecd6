@@ -142,14 +142,14 @@ function SoloRowDark({
           alt=""
           loading="lazy"
           style={{
-            width: 26, height: 26, borderRadius: '50%', objectFit: 'cover',
+            width: 26, height: 26, borderRadius: '34%', objectFit: 'cover',
             flexShrink: 0, background: 'rgba(255,255,255,0.08)',
           }}
         />
       ) : (
         <div
           style={{
-            width: 26, height: 26, borderRadius: '50%',
+            width: 26, height: 26, borderRadius: '34%',
             background: 'rgba(255,255,255,0.08)', flexShrink: 0,
           }}
         />
