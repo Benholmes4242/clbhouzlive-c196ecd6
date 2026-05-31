@@ -163,7 +163,6 @@ export function PlayerSeasonStats({ playerStats }: PlayerSeasonStatsProps) {
           style={{
             display: 'flex',
             gap: 20,
-            borderBottom: `0.5px solid ${INK_TINT_07}`,
             marginBottom: 12,
           }}
         >
@@ -181,10 +180,10 @@ export function PlayerSeasonStats({ playerStats }: PlayerSeasonStatsProps) {
                   fontSize: 14,
                   fontWeight: isActive ? 700 : 600,
                   lineHeight: 1,
-                  color: isActive ? SLATE_600 : INK_FAINT,
+                  color: isActive ? INK : INK_FAINT,
                   background: 'transparent',
                   border: 'none',
-                  borderBottom: `1.5px solid ${isActive ? SLATE_600 : 'transparent'}`,
+                  borderBottom: `1.5px solid ${isActive ? INK : 'transparent'}`,
                   cursor: 'pointer',
                   whiteSpace: 'nowrap' as const,
                   transition: 'color 0.15s ease, border-color 0.15s ease',
