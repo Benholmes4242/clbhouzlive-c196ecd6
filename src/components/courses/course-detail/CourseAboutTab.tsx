@@ -274,7 +274,7 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
           />
         )}
         {!coords && !coordsLoading && (
-          <p style={{ fontSize: 13, color: '#94A3B8', padding: '0 16px' }}>Location data isn't available yet.</p>
+          <p style={{ fontSize: 13, color: INK_FAINT, padding: '0 16px' }}>Location data isn't available yet.</p>
         )}
       </section>
 
