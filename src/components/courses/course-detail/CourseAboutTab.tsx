@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useCourseClaim } from '@/hooks/useCourseClaim';
 import { supabase } from '@/integrations/supabase/client';
-import { ExternalLink, Pencil } from 'lucide-react';
+import { ExternalLink, Pencil, BookOpen, BarChart3, MapPin } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import AboutMediaStrip from './AboutMediaStrip';
 import { useCourseCoordinates } from '@/hooks/useCourseCoordinates';
