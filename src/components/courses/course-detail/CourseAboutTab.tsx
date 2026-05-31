@@ -303,7 +303,7 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
         <div style={{ padding: '12px 16px 4px' }}>
           <button
             onClick={handleWebsiteClick}
-            style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, padding: '12px 0', borderRadius: 12, background: 'rgba(247,147,30,0.06)', border: '1.5px solid rgba(247,147,30,0.2)', fontSize: 13, fontWeight: 700, color: '#F7931E', cursor: 'pointer' }}
+            style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, padding: '12px 0', borderRadius: 12, background: 'rgba(247,147,30,0.06)', border: '1.5px solid rgba(247,147,30,0.2)', fontSize: 13, fontWeight: 700, color: AMBER, cursor: 'pointer' }}
           >
             <ExternalLink className="h-4 w-4" />
             Official Course Website
