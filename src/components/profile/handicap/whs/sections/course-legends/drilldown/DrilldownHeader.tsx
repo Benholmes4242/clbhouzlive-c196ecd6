@@ -1,3 +1,4 @@
+import { GAM } from '../../../gam/tokens';
 import React from 'react';
 import { Crown } from 'lucide-react';
 import { CourseEyebrow } from '../_shared/CourseEyebrow';
@@ -11,7 +12,6 @@ interface Props {
   courseHeaderImage?: string | null;
 }
 
-const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
 
 export const DrilldownHeader: React.FC<Props> = ({
   state,
@@ -27,7 +27,7 @@ export const DrilldownHeader: React.FC<Props> = ({
         ? 'transparent'
         : 'linear-gradient(180deg, rgba(247,147,30,0.18) 0%, var(--hcp-bg-2) 100%)',
       overflow: 'hidden',
-      fontFamily: FONT,
+      fontFamily: GAM.FONT_GEIST,
     }}
   >
     {courseHeaderImage && (

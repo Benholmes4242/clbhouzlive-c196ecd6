@@ -1,3 +1,4 @@
+import { GAM } from '../../../gam/tokens';
 import React, { useEffect, useMemo, useState } from 'react';
 import { type LucideIcon } from 'lucide-react';
 import { BottomSheet } from '@/components/ui/BottomSheet';
@@ -33,7 +34,6 @@ interface Props {
   window: LegendWindow;
 }
 
-const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
 
 export const FullCourseLeaderboardSheet: React.FC<Props> = ({
   open,
@@ -85,7 +85,7 @@ export const FullCourseLeaderboardSheet: React.FC<Props> = ({
           flexDirection: 'column',
           flex: 1,
           minHeight: 0,
-          fontFamily: FONT,
+          fontFamily: GAM.FONT_GEIST,
           color: 'var(--hcp-t-100)',
         }}
       >
@@ -139,7 +139,7 @@ export const FullCourseLeaderboardSheet: React.FC<Props> = ({
                   color: isActive ? 'var(--hcp-accent-util)' : 'var(--hcp-t-80)',
                   fontSize: 11,
                   fontWeight: 700,
-                  fontFamily: FONT,
+                  fontFamily: GAM.FONT_GEIST,
                   cursor: 'pointer',
                   whiteSpace: 'nowrap',
                   letterSpacing: '0.01em',

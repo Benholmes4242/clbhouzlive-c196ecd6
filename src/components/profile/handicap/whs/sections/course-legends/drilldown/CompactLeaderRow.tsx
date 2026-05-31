@@ -1,3 +1,4 @@
+import { GAM } from '../../../gam/tokens';
 import React from 'react';
 import { rankTier, daysSince, formatAttainedAt, NEW_BADGE_DAYS } from './_shared/helpers';
 
@@ -15,7 +16,6 @@ interface Props {
   unit: string;
 }
 
-const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
 
 export const CompactLeaderRow: React.FC<Props> = ({ row, unit }) => {
   const isYou = row.isSelf;
@@ -29,7 +29,7 @@ export const CompactLeaderRow: React.FC<Props> = ({ row, unit }) => {
         alignItems: 'center',
         gap: 10,
         padding: '10px 11px',
-        fontFamily: FONT,
+        fontFamily: GAM.FONT_GEIST,
         background: isYou
           ? 'linear-gradient(90deg, rgba(251,188,46,0.10), rgba(251,188,46,0.02))'
           : 'transparent',

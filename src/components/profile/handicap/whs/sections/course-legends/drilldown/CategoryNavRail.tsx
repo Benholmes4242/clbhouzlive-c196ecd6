@@ -1,3 +1,4 @@
+import { GAM } from '../../../gam/tokens';
 import React from 'react';
 import { type LucideIcon } from 'lucide-react';
 import type { LegendCategory } from '@/lib/gam/types';
@@ -14,7 +15,6 @@ interface Props {
   onSelect: (key: LegendCategory) => void;
 }
 
-const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
 
 export const CategoryNavRail: React.FC<Props> = ({ categories, onSelect }) => (
   <div
@@ -57,7 +57,7 @@ export const CategoryNavRail: React.FC<Props> = ({ categories, onSelect }) => (
                 fontSize: 11,
                 fontWeight: 700,
                 color: 'var(--hcp-t-70, #5a6573)',
-                fontFamily: FONT,
+                fontFamily: GAM.FONT_GEIST,
                 letterSpacing: '0.01em',
                 display: 'inline-flex',
                 alignItems: 'center',

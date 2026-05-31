@@ -1,3 +1,4 @@
+import { GAM } from '../../../gam/tokens';
 import React from 'react';
 import type { CourseMeta } from '@/hooks/gam/useCourseMeta';
 
@@ -5,7 +6,6 @@ interface Props {
   meta: CourseMeta | undefined;
 }
 
-const AMBER = '#F7931E';
 const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
 
 interface CellProps {
@@ -68,13 +68,13 @@ export const ChampionsCoursePulsePanel: React.FC<Props> = ({ meta }) => {
 
   return (
     <div style={{ background: 'var(--hcp-bg-0)' }}>
-      <div style={{ height: 1, background: AMBER }} aria-hidden />
+      <div style={{ height: 1, background: GAM.AMBER }} aria-hidden />
       <div
         style={{
           padding: '10px 18px 0',
           fontSize: 10,
           fontWeight: 800,
-          color: AMBER,
+          color: GAM.AMBER,
           letterSpacing: '0.18em',
           textTransform: 'uppercase',
           fontFamily: FONT,

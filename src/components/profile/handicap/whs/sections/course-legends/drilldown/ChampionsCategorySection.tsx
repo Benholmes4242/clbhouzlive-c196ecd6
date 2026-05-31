@@ -1,3 +1,4 @@
+import { GAM } from '../../../gam/tokens';
 import React from 'react';
 import { type LucideIcon } from 'lucide-react';
 import { ChampionsListRow } from './ChampionsListRow';
@@ -50,7 +51,7 @@ export const ChampionsCategorySection: React.FC<ChampionsCategorySectionProps> =
         style={{
           fontSize: 10.5,
           fontWeight: 800,
-          color: '#F7931E',
+          color: GAM.AMBER,
           letterSpacing: '0.16em',
           textTransform: 'uppercase',
           display: 'inline-flex',
