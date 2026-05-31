@@ -9,6 +9,7 @@ import { RoundSelector } from './RoundSelector';
 import { EditorialEmpty } from './EditorialEmpty';
 import { useTourHoleStats } from '../../hooks/useTourHubData';
 import { AMBER, FONT, HAIRLINE_INK_8, HAIRLINE_INK_10, INK, INK_FAINT, INK_MUTE, INK_TINT_02, INK_TINT_06, INK_TINT_07, SURFACE, TREND_DOWN } from '../../_shared/tokens';
+import { ConnectHandicapCue } from '@/components/courses/course-detail/ConnectHandicapCue';
 
 // Local hole-distribution ramp (mirrors src/features/courses/components/holes/_constants.ts).
 // Duplicated intentionally to keep tourhub self-contained — no cross-feature import.
