@@ -126,7 +126,7 @@ export function LiveLeaderboardTab() {
             fontWeight: 800,
             letterSpacing: '0.14em',
             textTransform: 'uppercase',
-            color: '#F7931E',
+            color: isLive ? STATUS_LIVE : '#F7931E',
             display: 'inline-flex',
             alignItems: 'center',
             gap: 6,
@@ -135,7 +135,7 @@ export function LiveLeaderboardTab() {
           {isLive && (
             <span
               aria-hidden
-              style={{ width: 6, height: 6, borderRadius: '50%', background: '#EF4444' }}
+              style={{ width: 6, height: 6, borderRadius: '50%', background: STATUS_LIVE }}
             />
           )}
           {isLive ? 'Live' : 'Tees Off Today'}
