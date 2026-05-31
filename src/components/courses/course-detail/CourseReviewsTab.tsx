@@ -364,7 +364,7 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
         {/* Compressed control bar skeleton — single row */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '12px 16px 12px' }}>
           <Skeleton className="h-7 w-28 rounded-full" />
-          <div style={{ width: 1, height: 20, background: 'rgba(15,23,42,0.1)' }} />
+          <div style={{ width: 1, height: 20, background: HAIRLINE_INK_10 }} />
           <Skeleton className="h-7 w-24 rounded-full" />
           <Skeleton className="h-7 w-28 rounded-full" />
         </div>
