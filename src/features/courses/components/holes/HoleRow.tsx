@@ -59,7 +59,7 @@ export const HoleRow: React.FC<Props> = ({ h, maxAvg, isHardest, isEasiest }) =>
             style={{
               fontSize: 11.5,
               fontWeight: 600,
-              color: '#64748b',
+              color: INK_MUTE,
               letterSpacing: '0.01em',
             }}
           >
