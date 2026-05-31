@@ -15,6 +15,7 @@ function formatDuration(seconds?: number): string {
 interface CourseMediaTileProps {
   post: FeedPost;
   index: number;
+  feature?: boolean;
   allPosts?: FeedPost[];
   fetchNextPage?: () => void;
   hasNextPage?: boolean;
@@ -25,7 +26,7 @@ interface CourseMediaTileProps {
   onOpenFullscreen?: (posts: FeedPost[], index: number) => void;
 }
 
-export const CourseMediaTile: React.FC<CourseMediaTileProps> = ({ post, index, allPosts, onOpenFullscreen }) => {
+export const CourseMediaTile: React.FC<CourseMediaTileProps> = ({ post, index, feature, allPosts, onOpenFullscreen }) => {
   const media = post.mediaItems[0];
   const isVideo = media?.type === 'video';
   const thumbnailUrl = isVideo ? media?.thumbnailUrl : (media?.imageUrl || media?.thumbnailUrl);
@@ -53,7 +54,6 @@ export const CourseMediaTile: React.FC<CourseMediaTileProps> = ({ post, index, a
       ref={tileRef}
       data-course-media-index={index}
       onClick={() => {
-        // `allPosts` is the per-media array; `index` IS the fullscreen index by construction.
         const perMediaPosts = allPosts ?? [post];
         if (onOpenFullscreen) {
           onOpenFullscreen(perMediaPosts, index);
@@ -63,7 +63,7 @@ export const CourseMediaTile: React.FC<CourseMediaTileProps> = ({ post, index, a
       }}
       style={{
         position: 'relative',
-        aspectRatio: '3/4',
+        aspectRatio: '1',
         overflow: 'hidden',
         cursor: 'pointer',
         transition: 'transform 100ms ease',
