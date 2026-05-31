@@ -60,6 +60,16 @@ export interface IntelligenceHistoricalTournament {
   bestPick: IntelligenceHistoricalPick | null;
   /** ISO year of start_date, for display. */
   year: string;
+  /** @internal Used for same-week dedup; not part of the public contract. */
+  purse?: number | null;
+}
+
+/** Sun→Sat week key (yyyy-MM-dd of the Sunday) for a tournament start date. */
+function weekKey(startDate: string): string {
+  const d = new Date(startDate + (startDate.length === 10 ? 'T12:00:00Z' : ''));
+  const sunday = new Date(d);
+  sunday.setUTCDate(sunday.getUTCDate() - sunday.getUTCDay());
+  return sunday.toISOString().slice(0, 10);
 }
 
 const SKIP_WORDS = new Set([
