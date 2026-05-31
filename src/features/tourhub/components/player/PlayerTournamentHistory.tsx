@@ -97,7 +97,7 @@ export function PlayerTournamentHistory({ playerId, playerName }: PlayerTourname
                   className="active:bg-black/[0.02] transition-colors"
                 >
                   {/* Position */}
-                  <span style={{ width: '44px', flexShrink: 0, fontSize: '12px', fontWeight: 900, color: isWin ? AMBER : INK_MUTE, display: 'flex', alignItems: 'center' }}>
+                  <span style={{ width: '44px', flexShrink: 0, fontSize: '12px', fontWeight: 900, color: isWin ? AMBER : INK, display: 'flex', alignItems: 'center' }}>
                     {isWin ? <Trophy style={{ width: 14, height: 14, color: AMBER }} /> : pos}
                   </span>
 
