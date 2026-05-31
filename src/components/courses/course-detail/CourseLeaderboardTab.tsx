@@ -5,7 +5,14 @@ import { Trophy, Medal, Award, Users, Camera, Star } from 'lucide-react';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { INK, INK_FAINT } from '@/features/courses/_shared/tokens';
+
+const FILTERS: { key: string; label: string }[] = [
+  { key: 'all', label: 'All Users' },
+  { key: 'friends', label: 'My Friends' },
+  { key: 'media', label: 'Most Media' },
+  { key: 'reviews', label: 'Most Reviews' },
+];
 
 interface CourseLeaderboardTabProps {
   courseId: string;
