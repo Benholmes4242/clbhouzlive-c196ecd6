@@ -163,6 +163,7 @@ export function LiveOverviewTab({
         />
       ) : (
         <EditorialEmpty
+          icon={<Activity size={28} strokeWidth={1.8} color={AMBER} />}
           eyebrow="Live"
           title="Scoring loading"
           body="Live scoring rows will populate here as players post numbers in the current round."
