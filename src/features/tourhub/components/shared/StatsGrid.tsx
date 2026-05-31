@@ -1,8 +1,7 @@
 import React from 'react';
 import {
-  inkSoft, inkFaint, inkGhost,
+  inkFaint, inkGhost,
   hairlineDark,
-  gold, greenLive, danger,
 } from '../../utils/heroAtmosphere';
 
 export interface StatsShape {
