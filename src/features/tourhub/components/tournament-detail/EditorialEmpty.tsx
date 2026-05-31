@@ -41,9 +41,7 @@ export function EditorialEmpty({
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3 }}
       style={{
-        background: '#ffffff',
-        marginTop: 8,
-        padding: '36px 28px 40px',
+        padding: '40px 28px 48px',
         textAlign: 'center',
         fontFamily: FONT,
       }}
