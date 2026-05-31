@@ -45,7 +45,31 @@ export const ChampionsListRow: React.FC<ChampionsListRowProps> = ({
   isChampion,
   gapToChampion,
   holdDuration,
+  userId,
+  currentCourseId,
+  window: legendWindow,
 }) => {
+  const navigate = useNavigate();
+  // Only fetch cross-course titles for the actual champion row (rank 1).
+  const { data: otherTitles } = usePlayerOtherTitles(
+    isChampion ? userId ?? undefined : undefined,
+    isChampion ? currentCourseId : undefined,
+    legendWindow ?? '90d',
+  );
+
+  // Deduplicate by course_id — a player might hold multiple categories at the same course.
+  const uniqueOtherCourses = React.useMemo(() => {
+    if (!otherTitles?.length) return [] as { course_id: string; course_name: string }[];
+    const seen = new Set<string>();
+    const out: { course_id: string; course_name: string }[] = [];
+    for (const t of otherTitles) {
+      if (!t.course_id || seen.has(t.course_id)) continue;
+      seen.add(t.course_id);
+      out.push({ course_id: t.course_id, course_name: t.course_name });
+    }
+    return out;
+  }, [otherTitles]);
+
   const rowBg = isChampion ? 'var(--hcp-champ-wash, #FFF9EC)' : 'var(--hcp-bg-1, #fff)';
   const photoBg = photoUrl
     ? `url(${photoUrl}) center/cover`
