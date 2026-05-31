@@ -74,6 +74,7 @@ function CutContextCard({
   if (round < 2 || (cut == null && projectedCut == null)) {
     return (
       <EditorialEmpty
+        icon={<Scissors size={28} strokeWidth={1.8} color={AMBER} />}
         eyebrow={`Round ${round}`}
         title="Cut line forms after Round 2"
         body="The cut is set once the second round completes. We'll show projected and official cut lines here as scoring develops."
