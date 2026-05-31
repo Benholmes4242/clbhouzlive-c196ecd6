@@ -289,28 +289,27 @@ export const CourseLegendsSection: React.FC<Props> = ({
 
   return (
     <section style={{ marginTop: 32 }}>
-      <SectionHero titleCount={titleCount} window={window} setWindow={setWindow} friendName={friendName} />
+      <div ref={searchWrapperRef} style={{ scrollMarginTop: 12 }}>
+        <SectionHero
+          titleCount={titleCount}
+          window={window}
+          setWindow={setWindow}
+          friendName={friendName}
+          query={query}
+          setQuery={setQuery}
+          searchInputRef={searchInputRef}
+        />
+      </div>
 
       {showSearchResults ? (
-        <>
-          <div ref={searchWrapperRef} style={{ margin: '4px 0 0', scrollMarginTop: 12 }}>
-            <CourseSearch
-              value={query}
-              onChange={setQuery}
-              helper="Find a course — see the legends"
-              inputRef={searchInputRef}
-              autoFocus
-            />
-          </div>
-          <SearchResultsSubsection
-            query={query}
-            results={searchQuery.data ?? []}
-            isLoading={searchQuery.isLoading}
-            isError={searchQuery.isError}
-            onRetry={() => searchQuery.refetch()}
-            onSelectCourse={onSelectCourse}
-          />
-        </>
+        <SearchResultsSubsection
+          query={query}
+          results={searchQuery.data ?? []}
+          isLoading={searchQuery.isLoading}
+          isError={searchQuery.isError}
+          onRetry={() => searchQuery.refetch()}
+          onSelectCourse={onSelectCourse}
+        />
       ) : (
         <>
           <LegendPulseTicker
@@ -324,10 +323,6 @@ export const CourseLegendsSection: React.FC<Props> = ({
             onSelectCourse={onSelectCourse}
             friendName={friendName}
           />
-
-          {/* Discover Prompt Card — engagement-driving search invitation */}
-          <DiscoverSearchCard value={query} onChange={setQuery} />
-
           <YourCoursesSubsection
             courses={playedFiltered}
             isLoading={playedQuery.isLoading}
