@@ -49,6 +49,15 @@ export const COURSE_SCRIMS =
 export const LEGIBILITY_SCRIM =
   'linear-gradient(180deg, rgba(0,0,0,0.18) 0%, rgba(0,0,0,0.04) 30%, rgba(0,0,0,0) 50%, rgba(0,0,0,0.55) 100%)';
 
+/**
+ * CinematicFrame scrim (Direction A) — heavy at base for capsule+title legibility,
+ * lets photo breathe in the upper third.
+ */
+export const CINEMATIC_SCRIM =
+  'linear-gradient(to top, rgba(7,12,20,0.94) 0%, rgba(7,12,20,0.55) 32%, rgba(7,12,20,0.12) 56%, rgba(7,12,20,0.22) 100%)';
+
+export const CINEMATIC_FRAME_HEIGHT = 560;
+
 // Animation
 export const MARQUEE_DURATION_SECONDS = 40;
 

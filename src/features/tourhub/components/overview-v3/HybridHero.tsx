@@ -24,16 +24,13 @@ import { getPlayerHeadshotUrl } from '@/utils/playerHeadshot';
 import { PhotoBand } from './HybridHeroBands/PhotoBand';
 import { MiddleBand } from './HybridHeroBands/MiddleBand';
 import { LeaderboardBand } from './HybridHeroBands/LeaderboardBand';
-import { ResultBand } from './HybridHeroBands/ResultBand';
-import { TopThreePeek, type TopThreePeekRow } from './HybridHeroBands/TopThreePeek';
-import { SignatureFooter } from './HybridHeroBands/SignatureFooter';
+import { CinematicFrame } from './HybridHeroBands/CinematicFrame';
 import { format } from 'date-fns';
 import {
   deriveHeroState,
   detectTopTie,
   deriveTickerRows,
   fmtScore,
-  extractRounds,
 } from './HybridHero.utils';
 import { BG, INK_15 } from './HybridHero.constants';
 
@@ -256,29 +253,43 @@ export function HybridHero({ slide, activeTournamentId, onSelectTour }: HybridHe
         : null;
   const tourLabel = tournament.tourName || tournament.tourSlug?.toUpperCase() || null;
 
-  // Pass 7: results-state TopThreePeek rows (positions 2..4)
-  const topThreeRows: TopThreePeekRow[] =
-    state.kind === 'results' && state.variant === 'standard'
-      ? safeLeaderboard.slice(1, 4).map((e: any) => {
-          const player = e?.player;
-          const name =
-            player?.full_name ||
-            `${player?.first_name ?? ''} ${player?.last_name ?? ''}`.trim() ||
-            '—';
-          const country = player?.country_code || player?.country || null;
-          const rank = e?.position != null
-            ? (e?.position_tied ? `T${e.position}` : String(e.position))
-            : '—';
-          let photoUrl: string | null = player?.photo_url ?? null;
-          if (!photoUrl && name && tournament.tourSlug) {
-            try { photoUrl = getPlayerHeadshotUrl(name, tournament.tourSlug); } catch { photoUrl = null; }
-          }
-          return { rank, name, country, photoUrl, score: fmtScore(e?.score) };
-        })
-      : [];
+  // Direction A: CinematicFrame replaces the three-band stack for live + results.
+  // Upcoming keeps the original PhotoBand+MiddleBand+LeaderboardBand path.
 
-  const useBroadcastResults =
-    state.kind === 'results' && state.variant === 'standard' && !!champion;
+  // Direction A: CinematicFrame replaces the three-band stack for live + results.
+  // Upcoming keeps the original PhotoBand+MiddleBand+LeaderboardBand path.
+  const useCinematicFrame = state.kind === 'live' || state.kind === 'results';
+
+  if (useCinematicFrame) {
+    return (
+      <div
+        style={{
+          background: BG,
+          width: '100%',
+          height: '100%',
+          display: 'flex',
+          flexDirection: 'column',
+        }}
+      >
+        <CinematicFrame
+          title={tournament.name}
+          venueName={tournament.venueName}
+          venueCity={tournament.venueCity}
+          venueImageUrl={venueImageUrl}
+          state={state}
+          tourLabel={tourLabel}
+          isMajor={tournament.isMajor}
+          isSignature={tournament.isSignature}
+          startDate={tournament.startDate}
+          endDate={tournament.endDate}
+          leaderboard={safeLeaderboard}
+          fieldSize={safeLeaderboard.length}
+          tourSlug={tournament.tourSlug}
+          onCtaTap={onCtaTap}
+        />
+      </div>
+    );
+  }
 
   return (
     <div
@@ -303,57 +314,32 @@ export function HybridHero({ slide, activeTournamentId, onSelectTour }: HybridHe
         datesString={datesString}
       />
 
-      {useBroadcastResults ? (
-        <>
-          <ResultBand
-            winnerName={champion!.name}
-            winnerPhotoUrl={champion!.avatarUrl ?? null}
-            winnerScore={champion!.score}
-            winnerCountry={champion!.country}
-            narrative={tournament.championNarrative}
-            purse={tournament.purse}
-            currency={tournament.currency}
-            defendingChampion={tournament.defendingChampion}
-          />
-          <TopThreePeek rows={topThreeRows} onFullLeaderboardTap={onCtaTap} />
-          <SignatureFooter
-            state={state}
-            endDate={tournament.endDate}
-            venuePar={tournament.venuePar}
-            venueYardage={tournament.venueYardage}
-          />
-        </>
-      ) : (
-        <>
-          <MiddleBand
-            state={state}
-            top10={top10}
-            champion={champion}
-            tiedLeaders={tiedLeaders}
-            defendingChamp={defendingChamp}
-            fieldStrength={fieldStrength}
-            courseStats={courseStats}
-            teamWinner={teamWinner}
-            championRounds={state.kind === 'results' ? extractRounds(safeLeaderboard[0]) : undefined}
-            par={tournament.venuePar ?? undefined}
-            championNarrative={tournament.championNarrative}
-          />
-          <LeaderboardBand
-            state={state}
-            leaderboard={safeLeaderboard}
-            tiedLeaders={tiedLeaders}
-            champion={champion}
-            teeTimes={teeTimes}
-            lastYearFinishers={lastYearFinishers}
-            firstYearEvent={showFirstYearPlaceholder}
-            tourSlug={tournament.tourSlug}
-            par={tournament.venuePar ?? undefined}
-            defendingChampion={tournament.defendingChampion ?? null}
-            fieldSize={safeLeaderboard.length}
-            onCtaTap={onCtaTap}
-          />
-        </>
-      )}
+      <MiddleBand
+        state={state}
+        top10={top10}
+        champion={champion}
+        tiedLeaders={tiedLeaders}
+        defendingChamp={defendingChamp}
+        fieldStrength={fieldStrength}
+        courseStats={courseStats}
+        teamWinner={teamWinner}
+        par={tournament.venuePar ?? undefined}
+        championNarrative={tournament.championNarrative}
+      />
+      <LeaderboardBand
+        state={state}
+        leaderboard={safeLeaderboard}
+        tiedLeaders={tiedLeaders}
+        champion={champion}
+        teeTimes={teeTimes}
+        lastYearFinishers={lastYearFinishers}
+        firstYearEvent={showFirstYearPlaceholder}
+        tourSlug={tournament.tourSlug}
+        par={tournament.venuePar ?? undefined}
+        defendingChampion={tournament.defendingChampion ?? null}
+        fieldSize={safeLeaderboard.length}
+        onCtaTap={onCtaTap}
+      />
     </div>
   );
 }
