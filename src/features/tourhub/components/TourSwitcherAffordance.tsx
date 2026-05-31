@@ -8,7 +8,7 @@
  */
 
 import React, { useState } from 'react';
-import { ArrowLeftRight, Check } from 'lucide-react';
+import { ArrowLeftRight, Check, Trophy } from 'lucide-react';
 import { BottomSheet } from '@/components/ui/BottomSheet';
 import { SheetHeader } from '@/components/ui/SheetHeader';
 import { getTourLogo } from '../utils/tourLogos';
@@ -18,6 +18,7 @@ import {
   AMBER,
   AMBER_TINT_04,
   FONT,
+  GOLD_DEEP,
   INK,
   INK_ALPHA_45,
   INK_TINT_07,
