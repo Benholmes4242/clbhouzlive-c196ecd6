@@ -527,6 +527,7 @@ function PicksHistoryBody({ onClose }: { onClose: () => void }) {
         style={{
           padding: '12px 18px 10px',
           display: 'flex',
+          justifyContent: 'center',
           gap: 6,
           overflowX: 'auto',
           WebkitOverflowScrolling: 'touch',
