@@ -250,8 +250,7 @@ export function PhotoBand({
               fontWeight: 600,
               color: 'rgba(255,255,255,0.75)',
               textShadow: '0 1px 3px rgba(0,0,0,0.45)',
-              letterSpacing: '0.04em',
-              textTransform: 'uppercase',
+              letterSpacing: '0.01em',
             }}
           >
             <span
