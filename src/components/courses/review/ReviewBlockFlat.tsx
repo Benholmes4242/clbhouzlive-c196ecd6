@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Pencil, ThumbsUp, ThumbsDown } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { ReviewMediaStrip, ReviewMediaItem } from './ReviewMediaStrip';
@@ -129,11 +130,10 @@ export const ReviewBlockFlat: React.FC<ReviewBlockFlatProps> = ({
       className={cn('transition-all', isHighlighted && 'animate-soft-pulse')}
       style={{ padding: '14px 0 16px' }}
     >
-      {/* "Your Review" pin + Edit (only for own review) */}
+      {/* "Your Review" eyebrow + Edit (only for own review) */}
       {isMine && (
         <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 10 }}>
-          <div style={{ width: 3, height: 11, background: '#F7931E', borderRadius: 1 }} />
-          <span style={{ fontSize: 8.5, fontWeight: 900, color: '#F7931E', letterSpacing: '0.14em', textTransform: 'uppercase' }}>
+          <span style={{ fontSize: 9, fontWeight: 900, color: '#F7931E', letterSpacing: '0.16em', textTransform: 'uppercase' }}>
             Your Review
           </span>
           <div style={{ flex: 1 }} />
@@ -142,7 +142,7 @@ export const ReviewBlockFlat: React.FC<ReviewBlockFlatProps> = ({
               type="button"
               onClick={onEditClick}
               style={{
-                display: 'flex',
+                display: 'inline-flex',
                 alignItems: 'center',
                 gap: 4,
                 background: 'none',
@@ -154,11 +154,12 @@ export const ReviewBlockFlat: React.FC<ReviewBlockFlatProps> = ({
                 padding: 0,
               }}
             >
-              ✏️ Edit
+              <Pencil size={12} strokeWidth={2.2} /> Edit
             </button>
           )}
         </div>
       )}
+
 
       {/* Header row */}
       <div style={{ display: 'flex', alignItems: 'flex-start', gap: 10, marginBottom: 10 }}>
@@ -231,14 +232,14 @@ export const ReviewBlockFlat: React.FC<ReviewBlockFlatProps> = ({
               style={{
                 display: 'flex',
                 alignItems: 'center',
-                gap: 4,
-                padding: '3px 8px',
-                borderRadius: 6,
-                background: 'rgba(15,23,42,0.03)',
-                border: '0.5px solid rgba(15,23,42,0.08)',
+                gap: 5,
+                padding: '4px 9px',
+                borderRadius: 7,
+                background: 'rgba(15,23,42,0.025)',
+                border: '0.5px solid rgba(15,23,42,0.07)',
               }}
             >
-              <span style={{ fontSize: 9, fontWeight: 700, color: '#94A3B8', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+              <span style={{ fontSize: 9, fontWeight: 700, color: '#64748B', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
                 {s.label}
               </span>
               <span style={{ fontSize: 11, fontWeight: 800, color: '#0F172A', fontVariantNumeric: 'tabular-nums' }}>
@@ -248,6 +249,7 @@ export const ReviewBlockFlat: React.FC<ReviewBlockFlatProps> = ({
           ))}
         </div>
       )}
+
 
       {/* Review text */}
       {text && text.trim().length > 0 && (
@@ -308,7 +310,7 @@ export const ReviewBlockFlat: React.FC<ReviewBlockFlatProps> = ({
               opacity: votingDisabled ? 0.5 : 1,
             }}
           >
-            <span aria-hidden>👍</span>{helpfulCount > 0 && <> {helpfulCount}</>}
+            <ThumbsUp size={13} strokeWidth={2} />{helpfulCount > 0 && <span>{helpfulCount}</span>}
           </button>
           <button
             type="button"
@@ -331,7 +333,7 @@ export const ReviewBlockFlat: React.FC<ReviewBlockFlatProps> = ({
               opacity: votingDisabled ? 0.5 : 1,
             }}
           >
-            <span aria-hidden>👎</span>{review.unhelpfulCount > 0 && <> {review.unhelpfulCount}</>}
+            <ThumbsDown size={13} strokeWidth={2} />{review.unhelpfulCount > 0 && <span>{review.unhelpfulCount}</span>}
           </button>
         </div>
       )}
