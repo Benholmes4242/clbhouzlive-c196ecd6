@@ -297,7 +297,10 @@ export function SummaryTab({
                 </div>
                 <div>
                   <div style={{ fontSize: '9px', fontWeight: 800, color: INK_MUTE, letterSpacing: '0.14em', marginBottom: '3px' }}>SCORING AVG</div>
-                  <div style={{ fontSize: '18px', fontWeight: 800, color: INK, fontVariantNumeric: 'tabular-nums' }}>{latestRound.avgScore.toFixed(1)}</div>
+                  <div style={{ fontSize: '18px', fontWeight: 800, fontVariantNumeric: 'tabular-nums',
+                    color: latestRound.avgScore < 0 ? SCORE_UNDER_PAR_LIGHT : latestRound.avgScore > 0 ? TREND_DOWN : INK }}>
+                    {latestRound.avgScore > 0 ? `+${latestRound.avgScore.toFixed(1)}` : latestRound.avgScore.toFixed(1)}
+                  </div>
                 </div>
                 <div>
                   <div style={{ fontSize: '9px', fontWeight: 800, color: INK_MUTE, letterSpacing: '0.14em', marginBottom: '3px' }}>FIELD</div>
