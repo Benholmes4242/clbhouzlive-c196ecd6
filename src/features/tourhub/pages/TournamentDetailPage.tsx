@@ -229,11 +229,11 @@ export function TournamentDetailPage() {
       case 'leaderboard':
         if (!hasLeaderboard) {
           return (
-            <TournamentEmptyState
-              icon={<Trophy className="w-16 h-16" />}
-              title="Leaderboard Coming Soon"
-              subtitle="Leaderboard data will appear once the tournament begins."
-              countdown={countdownText}
+            <EditorialEmpty
+              icon={<Trophy size={28} strokeWidth={1.8} color={AMBER} />}
+              eyebrow="Leaderboard"
+              title="The board lights up when play begins"
+              body="Live positions, scores, and movement appear here the moment the first group tees off."
             />
           );
         }
