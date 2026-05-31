@@ -2,8 +2,7 @@ import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useCourseClaim } from '@/hooks/useCourseClaim';
 import { supabase } from '@/integrations/supabase/client';
-import { ExternalLink, ChevronDown, ChevronUp, Pencil, Star } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { ExternalLink, Pencil } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import AboutMediaStrip from './AboutMediaStrip';
 import { useCourseCoordinates } from '@/hooks/useCourseCoordinates';
@@ -122,44 +121,49 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
   };
 
   return (
-    <div className="animate-in fade-in duration-200" style={{ paddingBottom: 80, background: SLATE_50 }}>
+    <div
+      className="animate-in fade-in duration-200"
+      style={{ paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 32px)', background: SLATE_50 }}
+    >
       {/* 1. Location breadcrumb pills */}
       <CourseLocationPills course={course} />
 
       {/* 2. Community Rating — CommunityScoreCard renders its own header internally, no SectionLabel */}
-      <div style={{ padding: '20px 16px 0' }}>
-        <div>
-          <CommunityScoreCard
-            courseId={course.id}
-            courseName={course.name}
-            ratingAggregates={ratingAggregates}
-            userRating={userRating}
-            distribution={distribution}
-            onRateClick={handleRateClick}
-            onSeeAllReviews={() => onTabChange?.('reviews')}
-          />
-        </div>
-        <div style={{ padding: '12px 16px 0', display: 'flex', justifyContent: 'center' }}>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={handleRateClick}
-            className="h-auto py-1 px-2 text-xs"
-          >
-            {userRating ? (
-              <>
-                <Pencil className="h-3 w-3 mr-1" />
-                Edit Your Rating
-              </>
-            ) : (
-              <>
-                <Star className="h-3 w-3 mr-1" />
-                Rate this course
-              </>
-            )}
-          </Button>
-        </div>
+      <div style={{ padding: '24px 16px 0' }}>
+        <CommunityScoreCard
+          courseId={course.id}
+          courseName={course.name}
+          ratingAggregates={ratingAggregates}
+          userRating={userRating}
+          distribution={distribution}
+          onRateClick={handleRateClick}
+          onSeeAllReviews={() => onTabChange?.('reviews')}
+        />
+        {userRating && (
+          <div style={{ padding: '12px 0 0', display: 'flex', justifyContent: 'center' }}>
+            <button
+              type="button"
+              onClick={handleRateClick}
+              style={{
+                background: 'none',
+                border: 'none',
+                cursor: 'pointer',
+                fontSize: 12,
+                fontWeight: 600,
+                color: INK_FAINT,
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 4,
+                padding: 0,
+              }}
+            >
+              <Pencil className="h-3 w-3" />
+              Edit your rating
+            </button>
+          </div>
+        )}
       </div>
+
 
       <div style={{ margin: '24px 0' }}><Divider /></div>
 
@@ -300,7 +304,7 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
 
       {/* 12. Official Website — amber ghost button, part of the explore section */}
       {course.website_url && (
-        <div style={{ padding: '12px 16px 4px' }}>
+        <div style={{ padding: '12px 16px 8px' }}>
           <button
             onClick={handleWebsiteClick}
             style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, padding: '12px 0', borderRadius: 12, background: 'rgba(247,147,30,0.06)', border: '1.5px solid rgba(247,147,30,0.2)', fontSize: 13, fontWeight: 700, color: AMBER, cursor: 'pointer' }}

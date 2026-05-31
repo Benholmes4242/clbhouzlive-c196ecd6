@@ -1,5 +1,6 @@
 import React, { useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Camera, Plus } from 'lucide-react';
 import SquareCardMedia from '@/components/explore/media/SquareCardMedia';
 import { CardType } from '@/components/explore/media/CardMediaTypes';
 import { adaptClubMediaArrayToExploreItems } from '@/lib/adapters/clubMediaToExplore';
@@ -8,6 +9,15 @@ import { useClubMedia } from '@/hooks/useClubMedia';
 import { generateStreamThumbnailUrl } from '@/config/cloudflareStream';
 import { useCourseMediaViewerStore } from '@/components/course-media-tab/CourseMediaViewer';
 import type { FeedPost, MediaItem } from '@/components/media-system/types/media';
+import { AMBER, INK } from '@/features/courses/_shared/tokens';
+
+const EYEBROW_STYLE: React.CSSProperties = {
+  fontSize: 9,
+  fontWeight: 900,
+  color: INK,
+  letterSpacing: '0.18em',
+  textTransform: 'uppercase' as const,
+};
 
 interface AboutMediaStripProps {
   clubId: string;
@@ -29,8 +39,8 @@ const Header: React.FC<{ photoCount: number; videoCount: number; onSeeAll?: () =
     }}
   >
     <div>
-      <div style={{ fontSize: 13, fontWeight: 800, color: '#0F172A' }}>Media</div>
-      <div style={{ fontSize: 11, color: '#94A3B8', marginTop: 2 }}>
+      <div style={EYEBROW_STYLE}>Media</div>
+      <div style={{ fontSize: 11, color: '#94A3B8', marginTop: 4 }}>
         {photoCount} {photoCount === 1 ? 'photo' : 'photos'} · {videoCount}{' '}
         {videoCount === 1 ? 'video' : 'videos'}
       </div>
@@ -187,12 +197,12 @@ const AboutMediaStrip: React.FC<AboutMediaStripProps> = ({ clubId, onSeeAllClick
     );
   }
 
-  // Empty state — small ghost grid + prompt
+  // Empty state — sibling of ratings empty state
   if (!hasMedia) {
     return (
       <div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '0 16px', marginBottom: 10 }}>
-          <div style={{ fontSize: 13, fontWeight: 800, color: '#0F172A' }}>Media</div>
+        <div style={{ padding: '0 16px', marginBottom: 12 }}>
+          <div style={EYEBROW_STYLE}>Media</div>
         </div>
 
         <div
@@ -201,7 +211,7 @@ const AboutMediaStrip: React.FC<AboutMediaStripProps> = ({ clubId, onSeeAllClick
             gridTemplateColumns: 'repeat(3, 1fr)',
             gap: 6,
             padding: '0 16px',
-            marginBottom: 12,
+            marginBottom: 14,
           }}
         >
           {[0, 1, 2].map((i) => (
@@ -209,25 +219,34 @@ const AboutMediaStrip: React.FC<AboutMediaStripProps> = ({ clubId, onSeeAllClick
               key={i}
               style={{
                 aspectRatio: '1',
-                borderRadius: 10,
-                background: i === 0 ? 'rgba(247,147,30,0.06)' : 'rgba(15,23,42,0.04)',
-                border: i === 0
-                  ? '1.5px dashed rgba(247,147,30,0.35)'
-                  : '1.5px dashed rgba(15,23,42,0.1)',
+                borderRadius: 12,
+                background: 'rgba(15,23,42,0.04)',
+                border: '1.5px dashed rgba(15,23,42,0.10)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                fontSize: 24,
-                color: i === 0 ? '#F7931E' : '#94A3B8',
-                fontWeight: 700,
               }}
             >
-              {i === 0 ? '📸' : '+'}
+              {i === 0 && (
+                <div
+                  style={{
+                    width: 36,
+                    height: 36,
+                    borderRadius: '50%',
+                    background: 'rgba(247,147,30,0.12)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}
+                >
+                  <Plus size={18} strokeWidth={2} color={AMBER} />
+                </div>
+              )}
             </div>
           ))}
         </div>
 
-        <p style={{ fontSize: 12, color: '#94A3B8', margin: '0 16px 14px', lineHeight: 1.5 }}>
+        <p style={{ fontSize: 12, color: '#94A3B8', margin: '0 16px 14px', lineHeight: 1.5, textAlign: 'center' as const }}>
           Help fellow golfers discover this course — share your experience.
         </p>
 
@@ -237,22 +256,29 @@ const AboutMediaStrip: React.FC<AboutMediaStripProps> = ({ clubId, onSeeAllClick
             onClick={() => navigate(`/courses/${clubId}/rate`)}
             style={{
               width: '100%',
-              padding: '12px 0',
-              borderRadius: 12,
-              background: '#0F172A',
+              display: 'inline-flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: 8,
+              padding: '13px 0',
+              borderRadius: 13,
+              background: AMBER,
               color: '#fff',
-              fontSize: 13,
+              fontSize: 14,
               fontWeight: 700,
               border: 'none',
               cursor: 'pointer',
+              boxShadow: '0 2px 8px rgba(247,147,30,0.28)',
             }}
           >
-            📷 Share Your Experience
+            <Camera size={16} strokeWidth={2} />
+            Share your experience
           </button>
         </div>
       </div>
     );
   }
+
 
   return (
     <div>

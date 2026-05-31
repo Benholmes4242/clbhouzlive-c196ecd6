@@ -4,6 +4,7 @@ import { CourseRatingAggregate } from '@/hooks/useCourseRatingAggregates';
 import { UserCourseRating } from '@/hooks/useUserCourseRating';
 import { RatingTierDistributionData } from '@/components/courses/review/RatingTierDistribution';
 import { getRatingTier } from '@/lib/ratingTier';
+import { AMBER, HAIRLINE_INK_7, INK, INK_MUTE, SURFACE } from '@/features/courses/_shared/tokens';
 
 interface CommunityScoreCardProps {
   courseId: string;
@@ -89,13 +90,47 @@ const CommunityScoreCard: React.FC<CommunityScoreCardProps> = ({
   const communityAverage = ratingAggregates?.avg_overall_score || 0;
   const tierLabel = getRatingTier(communityAverage);
 
-  // Empty state — flat copy line, no card
+  // Empty state — invitation card with 0–10 numeric language
   if (totalRatings === 0) {
     return (
-      <div>
-        <p style={{ fontSize: 13, color: '#94A3B8', margin: 0, lineHeight: 1.6, textAlign: 'center' as const }}>
-          No ratings yet — be the first to rate {courseName || 'this course'}.
+      <div
+        style={{
+          background: SURFACE,
+          borderRadius: 20,
+          border: `1px solid ${HAIRLINE_INK_7}`,
+          padding: '28px 24px',
+          textAlign: 'center' as const,
+          boxShadow: '0 1px 3px rgba(15,23,42,0.04)',
+        }}
+      >
+        <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'center', gap: 2, marginBottom: 14 }}>
+          <span style={{ fontSize: 52, fontWeight: 900, letterSpacing: '-0.04em', color: 'rgba(247,147,30,0.30)', lineHeight: 1 }}>–</span>
+          <span style={{ fontSize: 18, fontWeight: 800, color: 'rgba(15,23,42,0.25)', letterSpacing: '-0.02em' }}>/10</span>
+        </div>
+        <div style={{ fontSize: 17, fontWeight: 800, color: INK, letterSpacing: '-0.02em', marginBottom: 5 }}>
+          Be the first to rate this course
+        </div>
+        <p style={{ fontSize: 13, color: INK_MUTE, lineHeight: 1.5, maxWidth: 260, margin: '0 auto 18px' }}>
+          No one's scored {courseName || 'this course'} yet. Give it a 0–10 and help fellow golfers discover it.
         </p>
+        <button
+          type="button"
+          onClick={onRateClick}
+          style={{
+            width: '100%',
+            padding: '13px 0',
+            borderRadius: 13,
+            background: AMBER,
+            border: 'none',
+            color: '#fff',
+            fontSize: 14,
+            fontWeight: 700,
+            cursor: 'pointer',
+            boxShadow: '0 2px 8px rgba(247,147,30,0.28)',
+          }}
+        >
+          Rate this course
+        </button>
       </div>
     );
   }

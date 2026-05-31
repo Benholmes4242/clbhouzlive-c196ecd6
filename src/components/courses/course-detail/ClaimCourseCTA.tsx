@@ -1,5 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import { BadgeCheck } from 'lucide-react';
 import { AMBER, INK, INK_FAINT } from '@/features/courses/_shared/tokens';
 
 interface ClaimCourseCTAProps {
@@ -21,7 +22,20 @@ const ClaimCourseCTA: React.FC<ClaimCourseCTAProps> = ({ clubId, clubName }) => 
 
   return (
     <div style={{ padding: '8px 16px', textAlign: 'center' }}>
-      <div style={{ fontSize: 20, marginBottom: 8 }}>🏌️</div>
+      <div
+        style={{
+          width: 36,
+          height: 36,
+          borderRadius: '50%',
+          background: 'rgba(247,147,30,0.12)',
+          display: 'inline-flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          marginBottom: 10,
+        }}
+      >
+        <BadgeCheck size={20} strokeWidth={2} color={AMBER} />
+      </div>
       <div style={{ fontSize: 13, fontWeight: 800, color: INK, marginBottom: 4 }}>
         Own or manage this course?
       </div>
