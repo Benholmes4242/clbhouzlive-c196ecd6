@@ -1,6 +1,9 @@
 import { GAM } from '../../../gam/tokens';
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Crown } from 'lucide-react';
+import { usePlayerOtherTitles } from '@/hooks/gam/usePlayerOtherTitles';
+import type { LegendWindow } from '@/lib/gam/types';
 
 interface ChampionsListRowProps {
   rank: number;
@@ -12,6 +15,12 @@ interface ChampionsListRowProps {
   isChampion: boolean;
   gapToChampion: string | null;
   holdDuration: string | null;
+  /** Champion's user_id — required to look up cross-course titles. */
+  userId?: string | null;
+  /** Current course id, excluded from cross-course title results. */
+  currentCourseId?: string;
+  /** Active window — filters cross-course titles to the same window. */
+  window?: LegendWindow;
 }
 
 
@@ -36,7 +45,31 @@ export const ChampionsListRow: React.FC<ChampionsListRowProps> = ({
   isChampion,
   gapToChampion,
   holdDuration,
+  userId,
+  currentCourseId,
+  window: legendWindow,
 }) => {
+  const navigate = useNavigate();
+  // Only fetch cross-course titles for the actual champion row (rank 1).
+  const { data: otherTitles } = usePlayerOtherTitles(
+    isChampion ? userId ?? undefined : undefined,
+    isChampion ? currentCourseId : undefined,
+    legendWindow ?? '90d',
+  );
+
+  // Deduplicate by course_id — a player might hold multiple categories at the same course.
+  const uniqueOtherCourses = React.useMemo(() => {
+    if (!otherTitles?.length) return [] as { course_id: string; course_name: string }[];
+    const seen = new Set<string>();
+    const out: { course_id: string; course_name: string }[] = [];
+    for (const t of otherTitles) {
+      if (!t.course_id || seen.has(t.course_id)) continue;
+      seen.add(t.course_id);
+      out.push({ course_id: t.course_id, course_name: t.course_name });
+    }
+    return out;
+  }, [otherTitles]);
+
   const rowBg = isChampion ? 'var(--hcp-champ-wash, #FFF9EC)' : 'var(--hcp-bg-1, #fff)';
   const photoBg = photoUrl
     ? `url(${photoUrl}) center/cover`
@@ -128,6 +161,46 @@ export const ChampionsListRow: React.FC<ChampionsListRowProps> = ({
         >
           {subText}
         </div>
+        {isChampion && uniqueOtherCourses.length > 0 && (() => {
+          const first = uniqueOtherCourses[0];
+          const extra = uniqueOtherCourses.length - 1;
+          // 1 → "Also champion at X"
+          // 2 → "Also champion at X · +1 more"
+          // 3+ → "Champion at X · +N more"
+          const prefix = uniqueOtherCourses.length >= 3 ? 'Champion at' : 'Also champion at';
+          return (
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                navigate(`/courses/${first.course_id}?tab=legends`);
+              }}
+              style={{
+                marginTop: 3,
+                background: 'transparent',
+                border: 'none',
+                padding: 0,
+                cursor: 'pointer',
+                textAlign: 'left',
+                fontSize: 11,
+                color: 'var(--hcp-t-50, #9aa6b2)',
+                fontWeight: 500,
+                letterSpacing: '-0.003em',
+                display: 'block',
+                maxWidth: '100%',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                whiteSpace: 'nowrap',
+              }}
+            >
+              {prefix}{' '}
+              <span style={{ color: GAM.DEEP_AMBER, fontWeight: 600 }}>{first.course_name}</span>
+              {extra > 0 && (
+                <span> · +{extra} more</span>
+              )}
+            </button>
+          );
+        })()}
       </div>
 
       <div style={{ textAlign: 'right', flexShrink: 0, display: 'flex', alignItems: 'baseline', gap: 5 }}>

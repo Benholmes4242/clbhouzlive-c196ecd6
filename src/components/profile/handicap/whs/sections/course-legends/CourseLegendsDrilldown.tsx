@@ -22,6 +22,7 @@ import { CategoryNavRail } from './drilldown/CategoryNavRail';
 import { FullCourseLeaderboardSheet } from './drilldown/FullCourseLeaderboardSheet';
 import { WindowToggle } from './CourseLegendsSection';
 import { ConnectHandicapCue } from '@/components/courses/course-detail/ConnectHandicapCue';
+import { ChampionsCourseSearch } from './drilldown/ChampionsCourseSearch';
 
 
 const CATEGORIES_ORDER_90D: LegendCategory[] = [
@@ -112,6 +113,7 @@ interface SectionRow {
   valueDisplay: string;
   attained_at: string;
   isSelf: boolean;
+  userId: string | null;
 }
 
 interface Props {
@@ -199,6 +201,7 @@ export const CourseLegendsDrilldown: React.FC<Props> = ({ selection, hideHeader 
         valueDisplay: formatLegendValue(cat, row.value),
         attained_at: row.attained_at,
         isSelf: row.is_self,
+        userId: row.user_id ?? null,
       });
       entry.total = row.total_count_in_category ?? entry.rows.length;
       m.set(cat, entry);
@@ -260,6 +263,10 @@ export const CourseLegendsDrilldown: React.FC<Props> = ({ selection, hideHeader 
           courseHeaderImage={courseHeaderImage}
         />
       )}
+
+      {/* In-tab course search — always shown (synced + non-synced). Includes
+          a small connect-WHS cue beneath for non-synced users. */}
+      <ChampionsCourseSearch currentCourseId={ctx.courseId} />
 
       <div style={{ padding: '14px 16px 4px', display: 'flex', justifyContent: 'flex-start' }}>
         <WindowToggle window={window} setWindow={handleWindowChange} />
@@ -349,6 +356,7 @@ export const CourseLegendsDrilldown: React.FC<Props> = ({ selection, hideHeader 
               valueDisplay: r.valueDisplay,
               isSelf: r.isSelf,
               gapToChampion: r.rank === champion.rank ? null : formatGap(r.value),
+              userId: r.userId,
             }));
 
             return (
@@ -361,6 +369,8 @@ export const CourseLegendsDrilldown: React.FC<Props> = ({ selection, hideHeader 
                   holdDuration={holdDurationDisplay}
                   rows={sectionRows}
                   onFullLeaderboardTap={() => setFullLeaderboardCategory(cat)}
+                  currentCourseId={ctx.courseId}
+                  window={window}
                 />
               </div>
             );
