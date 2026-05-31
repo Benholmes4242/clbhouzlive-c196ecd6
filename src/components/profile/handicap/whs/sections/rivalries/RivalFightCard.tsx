@@ -240,32 +240,12 @@ export const RivalFightCard: React.FC<Props> = ({
           padding: '14px 14px 12px',
         }}
       >
-        <div
-          style={{
-            width: 44,
-            height: 44,
-            borderRadius: '50%',
-            flexShrink: 0,
-            background: (() => {
-              const src = pickAvatarSrc(
-                rivalry.rival_thumbnail_url,
-                rivalry.rival_profile_photo_url,
-              );
-              return src
-                ? `url(${src}) center/cover no-repeat`
-                : 'rgba(255,255,255,0.08)';
-            })(),
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            color: 'rgba(255,255,255,0.6)',
-            fontSize: 13,
-            fontWeight: 700,
-          }}
-        >
-          {!pickAvatarSrc(rivalry.rival_thumbnail_url, rivalry.rival_profile_photo_url) &&
-            initials(rivalDisplayName)}
-        </div>
+        <SquircleAvatar
+          size={44}
+          src={pickAvatarSrc(rivalry.rival_thumbnail_url, rivalry.rival_profile_photo_url)}
+          alt={rivalDisplayName}
+          fallback={initials(rivalDisplayName)}
+        />
 
         <div style={{ minWidth: 0, flex: 1 }}>
           <div
