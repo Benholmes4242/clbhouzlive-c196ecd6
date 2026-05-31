@@ -21,6 +21,7 @@ import {
 } from '@/constants/courseRegions';
 import { AppSelect, AppSelectOption } from '@/components/ui/AppSelect';
 import { EXPLORE_PAGE_SIZE } from '@/config/pagination';
+import { HAIRLINE_INK_10, INK, INK_MUTE, SLATE_50, SURFACE } from '@/features/courses/_shared/tokens';
 
 type SortOption = 'official_rating' | 'community_rating' | 'recently_added' | 'name_asc' | 'name_desc';
 
@@ -223,7 +224,7 @@ const ErrorState = ({ onRetry }: { onRetry: () => void }) => (
     <button
       onClick={onRetry}
       className="mt-2 inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-medium active:scale-[0.98] transition-transform"
-      style={{ background: '#ffffff', border: '1px solid rgba(15,23,42,0.10)', color: '#0F172A' }}
+      style={{ background: SURFACE, border: `1px solid ${HAIRLINE_INK_10}`, color: INK }}
     >
       <ChevronDown className="h-4 w-4 rotate-180" />
       Retry
@@ -479,7 +480,7 @@ const CourseExplorer = () => {
       <div
         className="pb-3 space-y-5 -mx-4 px-4"
         style={{
-          background: '#F8FAFC',
+          background: SLATE_50,
           borderBottom: 'none',
           paddingTop: '8px',
         }}
@@ -492,7 +493,7 @@ const CourseExplorer = () => {
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
           className="pl-10 pr-10 h-12 rounded-2xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#F7931E]/30 transition-all duration-150 text-base placeholder:text-[15px]"
-          style={{ background: '#ffffff', border: '1px solid rgba(15,23,42,0.10)' }}
+          style={{ background: SURFACE, border: `1px solid ${HAIRLINE_INK_10}` }}
           aria-label="Search golf courses"
           role="searchbox"
         />
@@ -522,7 +523,7 @@ const CourseExplorer = () => {
           }}>
             <SelectTrigger 
               className="h-11 w-full rounded-2xl justify-between text-base focus:outline-none data-[state=open]:ring-0 transition-all duration-150"
-              style={{ background: '#ffffff', border: '1px solid rgba(15,23,42,0.10)' }}
+              style={{ background: SURFACE, border: `1px solid ${HAIRLINE_INK_10}` }}
               aria-label="Select region"
             >
               <div className="flex items-center">
@@ -549,7 +550,7 @@ const CourseExplorer = () => {
           >
             <SelectTrigger 
               className="h-11 w-full rounded-2xl justify-between text-base focus:outline-none data-[state=open]:ring-0 transition-all duration-150 disabled:opacity-50 disabled:cursor-not-allowed"
-              style={{ background: '#ffffff', border: '1px solid rgba(15,23,42,0.10)' }}
+              style={{ background: SURFACE, border: `1px solid ${HAIRLINE_INK_10}` }}
               aria-label="Select sub-region"
             >
               <SelectValue placeholder={selectedRegion === PRIMARY_REGIONS.ALL ? "Choose a region first" : "All sub-regions"} />
@@ -571,7 +572,7 @@ const CourseExplorer = () => {
       {!isLoading && totalCount > 0 && (
         <div className="flex items-center justify-between gap-3 pt-2 px-4">
           <span style={{
-            fontSize: 11, color: '#64748B', flex: 1,
+            fontSize: 11, color: INK_MUTE, flex: 1,
             fontWeight: 600, letterSpacing: '0.16em', textTransform: 'uppercase',
           }}>
             {hasSearch ? (
@@ -613,7 +614,7 @@ const CourseExplorer = () => {
             <button
               onClick={handleResetFilters}
               className="mt-2 inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-medium active:scale-[0.98] transition-transform"
-              style={{ background: '#ffffff', border: '1px solid rgba(15,23,42,0.10)', color: '#0F172A' }}
+              style={{ background: SURFACE, border: `1px solid ${HAIRLINE_INK_10}`, color: INK }}
             >
               Reset filters
             </button>

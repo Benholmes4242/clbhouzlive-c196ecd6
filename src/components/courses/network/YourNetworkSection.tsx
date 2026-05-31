@@ -1,4 +1,5 @@
 import React from 'react';
+import { INK } from '@/features/courses/_shared/tokens';
 import { cn } from '@/lib/utils';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useNetworkActivity } from '@/hooks/useNetworkActivity';
@@ -40,10 +41,10 @@ export const YourNetworkSection: React.FC<YourNetworkSectionProps> = ({ classNam
           style={{
             fontSize: 22,
             fontWeight: 800,
-            color: '#0F172A',
+            color: INK,
             letterSpacing: '-0.025em',
             margin: 0,
-            lineHeight: 1.1,
+            lineHeight: 1.15,
           }}
         >
           Courses played by friends

@@ -1,4 +1,5 @@
 import React, { useRef, useEffect, useState } from 'react';
+import { SHELL_BG, SURFACE, WHITE_ALPHA_06, WHITE_ALPHA_55 } from '@/features/courses/_shared/tokens';
 
 type CoursesTab = 'explore' | 'top100' | 'discover';
 
@@ -58,8 +59,8 @@ export const CoursesShellTabs: React.FC<CoursesShellTabsProps> = ({
         style={{
           display: 'flex',
           justifyContent: 'space-evenly',
-          background: '#0A0E14',
-          borderBottom: '0.5px solid rgba(255,255,255,0.06)',
+          background: SHELL_BG,
+          borderBottom: `0.5px solid ${WHITE_ALPHA_06}`,
           overflowY: 'hidden',
           fontFamily: 'Geist, system-ui, -apple-system, BlinkMacSystemFont, sans-serif',
         }}
@@ -79,7 +80,7 @@ export const CoursesShellTabs: React.FC<CoursesShellTabsProps> = ({
                 padding: '0 4px',
                 fontSize: 14,
                 fontWeight: isActive ? 700 : 600,
-                color: isActive ? '#FFFFFF' : 'rgba(255,255,255,0.55)',
+                color: isActive ? SURFACE : WHITE_ALPHA_55,
                 background: 'transparent',
                 border: 'none',
                 letterSpacing: '-0.005em',
@@ -93,7 +94,7 @@ export const CoursesShellTabs: React.FC<CoursesShellTabsProps> = ({
                 style={{
                   display: 'inline-block',
                   paddingBottom: 4,
-                  borderBottom: isActive ? '1.5px solid #FFFFFF' : '1.5px solid transparent',
+                  borderBottom: isActive ? `1.5px solid ${SURFACE}` : '1.5px solid transparent',
                 }}
               >
                 {tab.label}
