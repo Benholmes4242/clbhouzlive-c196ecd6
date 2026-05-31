@@ -120,8 +120,8 @@ export const CourseMediaGrid = forwardRef<HTMLDivElement, CourseMediaGridProps>(
       <div style={{ paddingBottom: 40 }}>
         {/* Hero empty */}
         <div style={{ padding: '44px 24px 28px', textAlign: 'center' }}>
-          <div style={{ width: 72, height: 72, borderRadius: 18, background: 'rgba(247,147,30,0.07)', border: '1.5px solid rgba(247,147,30,0.18)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 18px', fontSize: 30 }}>
-            📸
+          <div style={{ width: 72, height: 72, borderRadius: 18, background: 'rgba(247,147,30,0.07)', border: '1.5px solid rgba(247,147,30,0.18)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 18px' }}>
+            <Camera size={30} strokeWidth={1.8} color={AMBER} />
           </div>
           <div style={{ fontSize: 19, fontWeight: 900, color: INK, letterSpacing: '-0.03em', marginBottom: 6 }}>No media yet</div>
           <p style={{ fontSize: 13, color: INK_FAINT, lineHeight: 1.6, maxWidth: 270, margin: '0 auto 24px' }}>
@@ -130,55 +130,43 @@ export const CourseMediaGrid = forwardRef<HTMLDivElement, CourseMediaGridProps>(
           <button
             type="button"
             onClick={() => courseId && navigate(`/courses/${courseId}/rate`)}
-            style={{ width: '100%', padding: '13px 0', borderRadius: 12, background: 'linear-gradient(90deg, #F59E0B, #F7931E)', color: SURFACE, fontSize: 14, fontWeight: 800, border: 'none', cursor: 'pointer', boxShadow: '0 4px 16px rgba(247,147,30,0.28)', marginBottom: 10 }}
+            style={{ width: '100%', padding: '13px 0', borderRadius: 12, background: 'linear-gradient(90deg, #F59E0B, #F7931E)', color: SURFACE, fontSize: 14, fontWeight: 800, border: 'none', cursor: 'pointer', boxShadow: '0 4px 16px rgba(247,147,30,0.28)', marginBottom: 10, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 7 }}
           >
-            📷 Share your experience
+            <Camera size={15} strokeWidth={2} />
+            Share your experience
           </button>
           <button
             type="button"
             onClick={() => navigate('/share')}
-            style={{ width: '100%', padding: '12px 0', borderRadius: 12, background: 'transparent', color: INK, fontSize: 13, fontWeight: 700, border: `1.5px solid ${HAIRLINE_INK_10}`, cursor: 'pointer' }}
+            style={{ width: '100%', padding: '12px 0', borderRadius: 12, background: 'transparent', color: INK, fontSize: 13, fontWeight: 700, border: `1.5px solid ${HAIRLINE_INK_10}`, cursor: 'pointer', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 7 }}
           >
-            🎬 Upload a video
+            <Film size={15} strokeWidth={2} />
+            Upload a video
           </button>
         </div>
 
         <div style={{ height: '0.5px', background: HAIRLINE_INK_7, margin: '0 16px 24px' }} />
 
         {/* What to share guide */}
-        <div style={{ padding: '0 16px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14 }}>
-            <div style={{ width: 3, height: 12, background: INK, borderRadius: 1 }} />
-            <span style={{ fontSize: 9, fontWeight: 900, color: INK, letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>What to share</span>
-          </div>
-          {[
-            { icon: '⛳', label: 'Signature holes', sub: 'Show the world what makes this course special' },
-            { icon: '🎬', label: 'Shots from your round', sub: 'Short clips of your best moments on the course' },
-            { icon: '🌅', label: 'Views & atmosphere', sub: 'Sunsets, landscapes, the feeling of being there' },
-            { icon: '🏠', label: 'Clubhouse & facilities', sub: 'Help others know what to expect before they visit' },
-          ].map(({ icon, label, sub }) => (
-            <div key={label} style={{ display: 'flex', alignItems: 'flex-start', gap: 12, marginBottom: 10, padding: '12px 14px', borderRadius: 12, background: INK_TINT_02, border: `0.5px solid ${INK_TINT_06}` }}>
-              <span style={{ fontSize: 20, flexShrink: 0, marginTop: 1 }}>{icon}</span>
-              <div>
-                <div style={{ fontSize: 13, fontWeight: 700, color: INK, marginBottom: 2 }}>{label}</div>
-                <div style={{ fontSize: 11, color: INK_FAINT, lineHeight: 1.4 }}>{sub}</div>
+        <div>
+          <SectionLabel text="What to share" icon={ListChecks} />
+          <div style={{ padding: '0 16px' }}>
+            {[
+              { Icon: Flag,      label: 'Signature holes',        sub: 'Show the world what makes this course special' },
+              { Icon: Film,      label: 'Shots from your round',  sub: 'Short clips of your best moments on the course' },
+              { Icon: Sunrise,   label: 'Views & atmosphere',     sub: 'Sunsets, landscapes, the feeling of being there' },
+              { Icon: Building2, label: 'Clubhouse & facilities', sub: 'Help others know what to expect before they visit' },
+            ].map(({ Icon, label, sub }, i, arr) => (
+              <div key={label} style={{ display: 'flex', alignItems: 'flex-start', gap: 12, marginBottom: i === arr.length - 1 ? 0 : 10, padding: '12px 14px', borderRadius: 12, background: INK_TINT_02, border: `0.5px solid ${INK_TINT_06}` }}>
+                <span style={{ flexShrink: 0, marginTop: 1, width: 22, height: 22, borderRadius: 7, background: 'rgba(247,147,30,0.08)', display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <Icon size={13} strokeWidth={2.2} color={AMBER} />
+                </span>
+                <div>
+                  <div style={{ fontSize: 13, fontWeight: 700, color: INK, marginBottom: 2 }}>{label}</div>
+                  <div style={{ fontSize: 11, color: INK_FAINT, lineHeight: 1.4 }}>{sub}</div>
+                </div>
               </div>
-            </div>
-          ))}
-        </div>
-
-        {/* Ghost grid preview */}
-        <div style={{ padding: '24px 16px 0' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
-            <div style={{ width: 3, height: 12, background: AMBER, borderRadius: 1 }} />
-            <span style={{ fontSize: 9, fontWeight: 900, color: AMBER, letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>Your gallery awaits</span>
-          </div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 2, opacity: 0.3, pointerEvents: 'none' }}>
-            <div style={{ height: 160, borderRadius: 6, background: 'linear-gradient(135deg,#0f172a,#1e293b)' }} />
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 2 }}>
-              <div style={{ aspectRatio: '3/4', borderRadius: 6, background: 'linear-gradient(135deg,#1e293b,#334155)' }} />
-              <div style={{ aspectRatio: '3/4', borderRadius: 6, background: 'linear-gradient(135deg,#334155,#475569)' }} />
-            </div>
+            ))}
           </div>
         </div>
       </div>
