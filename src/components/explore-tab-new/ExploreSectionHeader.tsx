@@ -20,13 +20,12 @@ interface ExploreSectionHeaderProps {
 }
 
 const KICKER_COLOR_MAP: Record<NonNullable<ExploreSectionHeaderProps['kickerColor']>, string> = {
-  slate: '#64748B',
-  amber: '#F7931E',
+  slate: INK_MUTE,
+  amber: AMBER,
   emerald: '#006747',
 };
 
-const INK = '#0F172A';
-const SUB = '#64748B';
+
 
 /**
  * Canonical section header for the Explore tab.
