@@ -175,13 +175,11 @@ export function LiveLeaderboardTab() {
         const dates = selected.end_date
           ? formatDateRange(selected.start_date, selected.end_date)
           : null;
-        const rightMeta = [dates, selected.venue_par != null ? `Par ${selected.venue_par}` : null]
-          .filter(Boolean)
-          .join(' · ');
+        const rightMeta = dates;
 
         return (
           <div style={{ padding: '16px 20px 16px', background: '#FFFFFF', borderBottom: `0.5px solid ${INK_TINT_07}` }}>
-            {/* Row: tour (+ live dot) · dates·par right */}
+            {/* Row: tour (+ live dot · round) · dates right */}
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 9 }}>
               <span style={{
                 display: 'inline-flex', alignItems: 'center', gap: 7,
@@ -193,6 +191,7 @@ export function LiveLeaderboardTab() {
                   <span aria-hidden style={{ width: 6, height: 6, borderRadius: '50%', background: STATUS_LIVE, flexShrink: 0 }} />
                 )}
                 {tourFullName}
+                {isLive && selected.currentRound != null && ` · Round ${selected.currentRound}`}
               </span>
               {rightMeta && (
                 <span style={{

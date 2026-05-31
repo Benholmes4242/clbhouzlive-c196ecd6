@@ -35,6 +35,7 @@ export interface SeasonTournament {
   winnerPhotoUrl: string | null;
   defendingChampion?: string | null;
   winner_score?: number | string | null;
+  currentRound: number | null;
 }
 
 // Normalized tour key mapping
@@ -136,6 +137,7 @@ export function useSeasonTournaments(tourKey: string = 'pga') {
           venue_country,
           venue_par,
           venue_yardage,
+          current_round,
           winner_id,
           season:sr_seasons!inner(tour_name, year)
         `)
@@ -193,6 +195,7 @@ export function useSeasonTournaments(tourKey: string = 'pga') {
           winnerFirstName: winner?.firstName || null,
           winnerLastName: winner?.lastName || null,
           winnerPhotoUrl: winner?.photoUrl || null,
+          currentRound: t.current_round ?? null,
         };
       });
     },
