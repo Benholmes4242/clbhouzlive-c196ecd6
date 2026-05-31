@@ -20,12 +20,14 @@ interface TourOption {
 }
 
 const TOUR_OPTIONS: TourOption[] = [
-  { code: 'pga', label: 'PGA Tour', description: 'PGA Tour players' },
-  { code: 'EURO', label: 'DP World Tour', description: 'DP World Tour players' },
-  { code: 'LPGA', label: 'LPGA', description: 'LPGA Tour players' },
-  { code: 'PGAD', label: 'Korn Ferry', description: 'Korn Ferry Tour players' },
-  { code: 'LIV', label: 'LIV Golf', description: 'LIV Golf players' },
+  { code: 'pga',   label: 'PGA Tour',      description: 'PGA Tour players' },
+  { code: 'LPGA',  label: 'LPGA',          description: 'LPGA Tour players' },
+  { code: 'EURO',  label: 'DP World Tour', description: 'DP World Tour players' },
+  { code: 'PGAD',  label: 'Korn Ferry',    description: 'Korn Ferry Tour players' },
+  { code: 'CHAMP', label: 'Champions',     description: 'PGA Champions Tour players' },
+  { code: 'LIV',   label: 'LIV Golf',      description: 'LIV Golf players' },
 ];
+
 
 interface PlayersTourFilterSheetProps {
   activeTour: PlayerTourCode;

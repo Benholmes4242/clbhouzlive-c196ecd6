@@ -1,5 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { mapTourSlug } from '../_shared/tourOrder';
+import type { TourId } from './useOverviewData';
 
 export interface LiveTournamentLite {
   id: string;
@@ -8,6 +10,7 @@ export interface LiveTournamentLite {
   start_date: string;
   venue_par: number | null;
   tour_name: string | null;
+  tourSlug: TourId;
   purse: number | null;
 }
 
@@ -41,6 +44,7 @@ export function useLiveTournaments() {
         start_date: t.start_date,
         venue_par: t.venue_par ?? null,
         tour_name: t.season?.tour_name ?? null,
+        tourSlug: mapTourSlug(t.season?.tour_name ?? ''),
         purse: t.purse ?? null,
       }));
     },
