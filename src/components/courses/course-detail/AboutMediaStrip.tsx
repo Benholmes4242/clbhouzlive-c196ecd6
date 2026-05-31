@@ -42,7 +42,10 @@ const Header: React.FC<{ photoCount: number; videoCount: number; onSeeAll?: () =
     }}
   >
     <div>
-      <div style={EYEBROW_STYLE}>Media</div>
+      <div style={EYEBROW_STYLE}>
+        <Camera size={11} strokeWidth={2.4} />
+        Media
+      </div>
       <div style={{ fontSize: 11, color: '#94A3B8', marginTop: 4 }}>
         {photoCount} {photoCount === 1 ? 'photo' : 'photos'} · {videoCount}{' '}
         {videoCount === 1 ? 'video' : 'videos'}
