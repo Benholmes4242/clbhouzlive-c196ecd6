@@ -14,7 +14,8 @@ import { ResponseDisplay, ReplyForm } from '../review/ReviewResponseBlock';
 import { RatingFilterChips, RatingFilterValue } from '../review/RatingFilterChips';
 import { WriteReviewPrompt } from '../review/WriteReviewPrompt';
 import { SegmentedTabOption } from '@/components/ui/SegmentedTabs';
-import { Search, X, Pencil, ArrowUpDown } from 'lucide-react';
+import { Search, X, Pencil, ArrowUpDown, ListChecks } from 'lucide-react';
+import { SectionLabel } from './SectionLabel';
 import { AppSelect } from '@/components/ui/AppSelect';
 import { Button } from '@/components/ui/button';
 import type { ScoreTier } from '@/utils/getScoreTier';
@@ -436,11 +437,10 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
         </div>
         <div style={{ margin: '0 16px' }}><Divider /></div>
         {/* What to include guide */}
-        <div style={{ padding: '20px 16px 0' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14 }}>
-            <div style={{ width: 3, height: 12, background: INK, borderRadius: 1 }} />
-            <span style={{ fontSize: 9, fontWeight: 900, color: INK, letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>What to include</span>
-          </div>
+        <div style={{ padding: '20px 0 0' }}>
+          <SectionLabel text="What to include" icon={ListChecks} />
+          <div style={{ padding: '0 16px' }}>
+
           {[
             { icon: '⛳', label: 'Course condition', sub: 'Greens, fairways, bunkers, rough' },
             { icon: '🏔️', label: 'Layout & design', sub: 'Challenge, variety, scenery, routing' },
@@ -455,6 +455,7 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
               </div>
             </div>
           ))}
+          </div>
         </div>
         <ScrollToTopGlass />
       </div>
