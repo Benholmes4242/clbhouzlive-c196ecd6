@@ -22,6 +22,7 @@ import { CategoryNavRail } from './drilldown/CategoryNavRail';
 import { FullCourseLeaderboardSheet } from './drilldown/FullCourseLeaderboardSheet';
 import { WindowToggle } from './CourseLegendsSection';
 import { ConnectHandicapCue } from '@/components/courses/course-detail/ConnectHandicapCue';
+import { ChampionsCourseSearch } from './drilldown/ChampionsCourseSearch';
 
 
 const CATEGORIES_ORDER_90D: LegendCategory[] = [
