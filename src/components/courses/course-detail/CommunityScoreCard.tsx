@@ -4,7 +4,7 @@ import { CourseRatingAggregate } from '@/hooks/useCourseRatingAggregates';
 import { UserCourseRating } from '@/hooks/useUserCourseRating';
 import { RatingTierDistributionData } from '@/components/courses/review/RatingTierDistribution';
 import { getRatingTier } from '@/lib/ratingTier';
-import { AMBER, HAIRLINE_INK_7, INK, INK_MUTE, SURFACE } from '@/features/courses/_shared/tokens';
+import { AMBER, HAIRLINE_INK_7, INK, INK_FAINT, INK_MUTE, SURFACE } from '@/features/courses/_shared/tokens';
 
 interface CommunityScoreCardProps {
   courseId: string;
