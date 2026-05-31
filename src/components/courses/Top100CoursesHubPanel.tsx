@@ -266,7 +266,7 @@ const Top100CoursesHubPanel = () => {
                   border: 'none',
                   fontSize: 13,
                   fontWeight: isActive ? 800 : 500,
-                  color: isActive ? '#0F172A' : '#94A3B8',
+                  color: isActive ? INK : INK_FAINT,
                   cursor: 'pointer',
                   transition: 'color 150ms',
                   letterSpacing: isActive ? '-0.01em' : 0,
