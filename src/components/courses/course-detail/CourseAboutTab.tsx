@@ -21,6 +21,7 @@ import ScrollToTopGlass from '@/components/common/ScrollToTopGlass';
 import { CourseTop100Summary } from './CourseTop100Summary';
 import { formatCourseLocation } from '@/utils/courseLocation';
 import CommunityScoreCard from './CommunityScoreCard';
+import { ConnectHandicapCue } from './ConnectHandicapCue';
 import { CourseTop100Spotlight } from './CourseTop100Spotlight';
 import { PersonalSection } from '@/components/courses/phase5';
 import { ExternalLinkSheet } from '@/components/shared/ExternalLinkSheet';
