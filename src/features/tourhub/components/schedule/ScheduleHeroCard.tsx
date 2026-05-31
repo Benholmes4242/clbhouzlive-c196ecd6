@@ -20,7 +20,7 @@ import { getCourseImage } from '../../utils/placeholders';
 import { formatPurse, PlayerAvatar, PodiumRunnerRow, buildPodiumRows, UpcomingCountdown } from '../shared/TourHeroHelpers';
 import { getScoreColor } from '../../_shared/scoreColor';
 import { getContextLabel } from '../../utils/tournamentClassification';
-import { getCurrentRound } from '../../utils/formatThruDisplay';
+
 import { TOUR_COLORS } from '../../constants/colors';
 import '@/styles/hero-glass.css';
 
