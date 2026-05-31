@@ -112,15 +112,9 @@ function buildPills({
 
   if (isLive) {
     const round = tournament.current_round ?? 1;
-
-    const pills: MastheadPill[] = [
+    return [
       { variant: 'live', value: `Round ${round}`, prefix: <LivePulse /> },
     ];
-    if (leader?.name) {
-      const score = leader.score ? ` ${leader.score}` : '';
-      pills.push({ variant: 'highlight', value: `${leader.name}${score}` });
-    }
-    return pills;
   }
 
 
