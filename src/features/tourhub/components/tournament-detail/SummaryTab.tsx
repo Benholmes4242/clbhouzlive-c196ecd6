@@ -187,8 +187,8 @@ export function SummaryTab({
                   fontSize: '14px', fontWeight: 600, flex: 1, textAlign: 'center' as const,
                   color: round.avgScore < 0 ? SCORE_UNDER_PAR_LIGHT : round.avgScore > 0 ? TREND_DOWN : INK_MUTE,
                 }}>{round.avgScore > 0 ? `+${round.avgScore.toFixed(1)}` : round.avgScore.toFixed(1)}</span>
-                <span style={{ fontSize: '14px', color: TREND_UP, fontWeight: 600, flex: 1, textAlign: 'center' as const }}>{round.totalBirdies}</span>
-                <span style={{ fontSize: '14px', color: TREND_DOWN, fontWeight: 600, flex: 1, textAlign: 'center' as const }}>{round.totalBogeys}</span>
+                <span style={{ fontSize: '14px', color: '#F7931E', fontWeight: 600, flex: 1, textAlign: 'center' as const }}>{round.totalBirdies}</span>
+                <span style={{ fontSize: '14px', color: '#EF4444', fontWeight: 600, flex: 1, textAlign: 'center' as const }}>{round.totalBogeys}</span>
               </div>
             ))}
           </div>
