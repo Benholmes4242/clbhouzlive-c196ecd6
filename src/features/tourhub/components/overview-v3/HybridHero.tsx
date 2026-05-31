@@ -24,9 +24,6 @@ import { getPlayerHeadshotUrl } from '@/utils/playerHeadshot';
 import { PhotoBand } from './HybridHeroBands/PhotoBand';
 import { MiddleBand } from './HybridHeroBands/MiddleBand';
 import { LeaderboardBand } from './HybridHeroBands/LeaderboardBand';
-import { ResultBand } from './HybridHeroBands/ResultBand';
-import { TopThreePeek, type TopThreePeekRow } from './HybridHeroBands/TopThreePeek';
-import { SignatureFooter } from './HybridHeroBands/SignatureFooter';
 import { CinematicFrame } from './HybridHeroBands/CinematicFrame';
 import { format } from 'date-fns';
 import {
@@ -34,7 +31,6 @@ import {
   detectTopTie,
   deriveTickerRows,
   fmtScore,
-  extractRounds,
 } from './HybridHero.utils';
 import { BG, INK_15 } from './HybridHero.constants';
 
