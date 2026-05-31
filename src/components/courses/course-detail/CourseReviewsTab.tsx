@@ -53,7 +53,7 @@ const getInitials = (name: string) => {
 };
 
 const Divider = () => (
-  <div style={{ height: '0.5px', background: 'rgba(15,23,42,0.07)' }} />
+  <div style={{ height: '0.5px', background: HAIRLINE_INK_7 }} />
 );
 
 const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
