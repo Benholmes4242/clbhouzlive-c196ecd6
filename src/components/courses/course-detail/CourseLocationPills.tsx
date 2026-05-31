@@ -1,5 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import { HAIRLINE_INK_8, INK_LIGHT, INK_MUTE, SURFACE } from '@/features/courses/_shared/tokens';
 import {
   PRIMARY_REGION_LABELS,
   dbValueToRegionKey,
