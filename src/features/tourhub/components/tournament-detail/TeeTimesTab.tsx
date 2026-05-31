@@ -244,7 +244,21 @@ export function TeeTimesTab({ tournamentId, tournamentName, isCompleted }: TeeTi
     return <TeeTimesEmpty isCompleted={isCompleted} roundLabel={!availableRounds.includes(selectedRound) ? `Round ${roundNumber}` : undefined} />;
   }
 
+  const featuredTeeTime = useMemo(() => {
+    if (!showScores) return null;
+    let bestPos = Infinity; let bestTime: string | null = null;
+    for (const g of groups) {
+      for (const p of g.players) {
+        const pos = scoreByPlayer.get(p.playerId || p.id || '')?.position ?? Infinity;
+        if (pos != null && pos < bestPos) { bestPos = pos; bestTime = g.teeTime; }
+      }
+    }
+    return bestTime;
+  }, [groups, scoreByPlayer, showScores]);
+
   const teeTimeDate = groups[0]?.teeTime ? format(new Date(groups[0].teeTime), 'EEE, MMM d, yyyy') : null;
+  const firstOff = groups[0]?.teeTime ? format(new Date(groups[0].teeTime), 'h:mm a') : null;
+  const lastOff = groups.length > 0 ? format(new Date(groups[groups.length - 1].teeTime), 'h:mm a') : null;
 
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.3 }}>
