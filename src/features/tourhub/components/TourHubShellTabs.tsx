@@ -1,7 +1,8 @@
-import React, { useRef, useEffect, useState } from 'react';
+import React, { useRef, useEffect, useMemo, useState } from 'react';
 import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import type { TourHubTab } from './types';
 import { TourSwitcherAffordance } from './TourSwitcherAffordance';
+import { useLiveTournaments } from '../hooks/useLiveTournaments';
 
 type TabId = TourHubTab | 'college';
 
@@ -10,17 +11,10 @@ interface TabDef {
   label: string;
 }
 
-const TABS: TabDef[] = [
-  { id: 'overview',     label: 'Overview' },
-  { id: 'schedule',     label: 'Schedule' },
-  { id: 'players',      label: 'Players' },
-  { id: 'leaderboards', label: 'Leaders' },
-  { id: 'college',      label: 'College' },
-];
-
 function computeActiveTab(pathname: string, searchParams: URLSearchParams): TabId {
   if (pathname.startsWith('/tourhub/college-golf')) return 'college';
   const tab = searchParams.get('tab');
+  if (tab === 'live') return 'live';
   if (tab === 'schedule') return 'schedule';
   if (tab === 'players') return 'players';
   if (tab === 'leaderboards') return 'leaderboards';
