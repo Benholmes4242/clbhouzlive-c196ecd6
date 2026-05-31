@@ -138,9 +138,9 @@ function AlumniRow({ alumnus, index, tier, legacyContextLabel }: AlumniRowProps)
           </div>
         </div>
 
-        {/* EARN */}
-        <div style={{ width: 56, textAlign: 'right' as const, flexShrink: 0 }}>
-          <div style={{ fontSize: 10, fontWeight: 500, color: INK_FAINT, letterSpacing: '0.04em' }}>EARN</div>
+        {/* EARNINGS */}
+        <div style={{ width: 72, textAlign: 'right' as const, flexShrink: 0 }}>
+          <div style={{ fontSize: 10, fontWeight: 500, color: INK_FAINT, letterSpacing: '0.04em' }}>EARNINGS</div>
           <div style={{
             fontSize: 13, fontWeight: 800, color: hasEarnings ? AMBER : INK_FAINT,
             fontVariantNumeric: 'tabular-nums',
