@@ -195,6 +195,7 @@ export function useSeasonTournaments(tourKey: string = 'pga') {
           winnerFirstName: winner?.firstName || null,
           winnerLastName: winner?.lastName || null,
           winnerPhotoUrl: winner?.photoUrl || null,
+          currentRound: t.current_round ?? null,
         };
       });
     },
