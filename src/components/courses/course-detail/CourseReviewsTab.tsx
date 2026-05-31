@@ -558,11 +558,11 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
 
       {/* Write prompt if no review */}
       {!myReview && (
-        <div style={{ padding: '14px 16px', borderBottom: '0.5px solid rgba(15,23,42,0.06)' }}>
+        <div style={{ padding: '14px 16px', borderBottom: `0.5px solid ${INK_TINT_06}` }}>
           <button
             type="button"
             onClick={handleRateClick}
-            style={{ width: '100%', padding: '12px 0', borderRadius: 12, background: 'rgba(247,147,30,0.06)', border: '1.5px solid rgba(247,147,30,0.2)', fontSize: 13, fontWeight: 700, color: '#F7931E', cursor: 'pointer' }}
+            style={{ width: '100%', padding: '12px 0', borderRadius: 12, background: 'rgba(247,147,30,0.06)', border: '1.5px solid rgba(247,147,30,0.2)', fontSize: 13, fontWeight: 700, color: AMBER, cursor: 'pointer' }}
           >
             ⭐ Write your review
           </button>
