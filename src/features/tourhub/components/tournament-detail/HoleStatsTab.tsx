@@ -23,6 +23,8 @@ interface HoleStatsTabProps {
   tournamentSrId: string | null;
   isLive: boolean;
   isCompleted?: boolean;
+  courseId?: string | null;
+  courseName?: string | null;
 }
 
 interface ProcessedHole {
