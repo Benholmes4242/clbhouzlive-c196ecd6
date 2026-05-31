@@ -38,7 +38,7 @@ export function useLiveTournaments() {
       const { data, error } = await supabase
         .from('sr_tournaments')
         .select(
-          'id, name, status, start_date, end_date, venue_name, venue_course_name, venue_city, venue_country, venue_yardage, venue_par, defending_champion, purse, season:sr_seasons(tour_name)'
+          'id, name, status, start_date, end_date, venue_name, venue_course_name, venue_city, venue_country, venue_yardage, venue_par, defending_champion, current_round, purse, season:sr_seasons(tour_name)'
         )
         .or(`status.eq.inprogress,and(status.in.(scheduled,created),start_date.eq.${todayStr})`)
         .order('purse', { ascending: false, nullsFirst: false });
@@ -63,6 +63,7 @@ export function useLiveTournaments() {
         tour_name: t.season?.tour_name ?? null,
         tourSlug: mapTourSlug(t.season?.tour_name ?? ''),
         purse: t.purse ?? null,
+        currentRound: t.current_round ?? null,
       }));
     },
   });
