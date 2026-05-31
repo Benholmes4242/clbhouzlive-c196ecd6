@@ -160,6 +160,21 @@ export function TeeTimesTab({ tournamentId, tournamentName, isCompleted }: TeeTi
   
   const roundNumber = parseInt(selectedRound.replace('R', ''));
   const { data: teeTimes, isLoading } = useTourTeeTimesEnriched(tournamentId, roundNumber);
+  const { data: lb } = useTourLeaderboard(tournamentId);
+  const scoreByPlayer = useMemo(() => {
+    const m = new Map<string, ScoreInfo>();
+    for (const row of (lb ?? [])) {
+      const pid = (row as any).player?.id;
+      if (pid) m.set(pid, {
+        score: (row as any).score ?? null,
+        position: (row as any).position ?? null,
+        tied: (row as any).position_tied ?? false,
+        status: (row as any).status ?? null,
+      });
+    }
+    return m;
+  }, [lb]);
+  const showScores = scoreByPlayer.size > 0;
 
   const { data: allTeeTimes } = useTourTeeTimesEnriched(tournamentId);
   const availableRounds = useMemo(() => {
