@@ -7,6 +7,7 @@ import { HoleRow } from './HoleRow';
 import { HolesScoringKey } from './HolesScoringKey';
 import { HolesEmptyState } from './HolesEmptyState';
 import { AMBER, FONT, INK } from './_constants';
+import { HAIRLINE_INK_8, INK_MUTE, SURFACE } from '@/features/courses/_shared/tokens';
 
 interface Props {
   courseId: string | undefined;
