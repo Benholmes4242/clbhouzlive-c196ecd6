@@ -8,6 +8,7 @@ import { HolesScoringKey } from './HolesScoringKey';
 import { HolesEmptyState } from './HolesEmptyState';
 import { AMBER, FONT, INK } from './_constants';
 import { HAIRLINE_INK_8, INK_MUTE, SURFACE } from '@/features/courses/_shared/tokens';
+import { ConnectHandicapCue } from '@/components/courses/course-detail/ConnectHandicapCue';
 
 interface Props {
   courseId: string | undefined;
@@ -66,11 +67,17 @@ export const CourseHolesTab: React.FC<Props> = ({ courseId }) => {
   }
 
   if (!data?.available || holes.length === 0) {
-    return <HolesEmptyState courseName={meta?.course_name ?? null} />;
+    return (
+      <>
+        <ConnectHandicapCue variant="holes" courseName={meta?.course_name ?? ''} />
+        <HolesEmptyState courseName={meta?.course_name ?? null} />
+      </>
+    );
   }
 
   return (
     <div style={{ background: '#ffffff', fontFamily: FONT }}>
+      <ConnectHandicapCue variant="holes" courseName={meta?.course_name ?? ''} />
       <HolesCredibilityHeader totalRounds={data.total_rounds} />
       {hardest && easiest && hardest.hole_no !== easiest.hole_no && (
         <HoleFeatureCards hardest={hardest} easiest={easiest} />

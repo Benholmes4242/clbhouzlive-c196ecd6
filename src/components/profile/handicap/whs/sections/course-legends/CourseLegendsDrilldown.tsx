@@ -21,6 +21,7 @@ import { ChampionsCategorySection } from './drilldown/ChampionsCategorySection';
 import { CategoryNavRail } from './drilldown/CategoryNavRail';
 import { FullCourseLeaderboardSheet } from './drilldown/FullCourseLeaderboardSheet';
 import { WindowToggle } from './CourseLegendsSection';
+import { ConnectHandicapCue } from '@/components/courses/course-detail/ConnectHandicapCue';
 
 
 const CATEGORIES_ORDER_90D: LegendCategory[] = [
@@ -263,6 +264,8 @@ export const CourseLegendsDrilldown: React.FC<Props> = ({ selection, hideHeader 
       <div style={{ padding: '14px 16px 4px', display: 'flex', justifyContent: 'flex-start' }}>
         <WindowToggle window={window} setWindow={handleWindowChange} />
       </div>
+
+      <ConnectHandicapCue variant="champions" courseName={ctx.courseName} />
 
       {autoSwitchedToAllTime && window === 'all_time' && (
         <div style={{ padding: '0 16px 8px' }}>
