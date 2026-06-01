@@ -154,14 +154,7 @@ export const FavouritesCarousel: React.FC<FavouritesCarouselProps> = ({
         {/* Header */}
         <div className="flex items-center justify-between px-4 mb-4">
           <div className="flex items-center gap-3">
-            <div 
-              className="w-10 h-10 rounded-full flex items-center justify-center"
-              style={{
-                background: 'linear-gradient(135deg, #FEF3C7 0%, #FDE68A 100%)',
-              }}
-            >
-              <Trophy className="w-5 h-5" style={{ color: '#F7931E' }} />
-            </div>
+            <div>
             <div>
               <h2 className="text-lg font-semibold text-foreground">
                 {getTitle()}
