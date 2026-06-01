@@ -12,7 +12,7 @@
  */
 import React, { useState } from 'react';
 import { AnimatePresence } from 'framer-motion';
-import { MapPin } from 'lucide-react';
+import { MapPin, Crown, Flame, Eye, Flag } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { TopTenCourse } from '@/hooks/useUserTopTenCourses';
@@ -57,6 +57,19 @@ export const Top10CourseCard: React.FC<Top10CourseCardProps> = ({
   // Location subtitle
   const heroSubtitle = course.sub_country || course.country;
 
+  const rankStyle: React.CSSProperties =
+    position === 1
+      ? { background: 'rgba(247,147,30,0.92)', boxShadow: '0 2px 10px rgba(247,147,30,0.5)', border: 'none' }
+      : position <= 3
+      ? { background: 'rgba(255,255,255,0.22)', border: '1px solid rgba(255,255,255,0.35)' }
+      : { background: 'rgba(255,255,255,0.15)', border: '1px solid rgba(255,255,255,0.2)' };
+
+  const REACTION_ICON: Record<ReactionType, React.ComponentType<any>> = {
+    agree: Flame,
+    interesting: Eye,
+    want_to_play: Flag,
+  };
+
   return (
     <>
       <motion.div
@@ -67,7 +80,9 @@ export const Top10CourseCard: React.FC<Top10CourseCardProps> = ({
           "relative w-[210px] h-[269px] rounded-[24px] overflow-hidden flex-shrink-0 cursor-pointer",
           className
         )}
-        style={{}}
+        style={{
+          boxShadow: '0 8px 24px -6px rgba(15,23,42,0.28), 0 2px 8px -2px rgba(15,23,42,0.16)',
+        }}
       >
         {/* Background image - full bleed */}
         {course.thumbnail_image ? (
@@ -94,12 +109,12 @@ export const Top10CourseCard: React.FC<Top10CourseCardProps> = ({
         <div 
           className="absolute top-3 left-3 flex items-center gap-1 px-2.5 py-1 rounded-full"
           style={{
-            background: 'rgba(255,255,255,0.15)',
             backdropFilter: 'blur(20px)',
             WebkitBackdropFilter: 'blur(20px)',
-            border: '1px solid rgba(255,255,255,0.2)',
+            ...rankStyle,
           }}
         >
+          {position === 1 && <Crown size={11} color="#fff" fill="#fff" />}
           <span className="text-white font-bold text-[12px]">#{position}</span>
         </div>
 
@@ -129,23 +144,28 @@ export const Top10CourseCard: React.FC<Top10CourseCardProps> = ({
           {rating !== undefined && tierData && (
             <div 
               className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full"
-              style={{
-                background: 'rgba(245, 158, 11, 0.12)',
+              style={tierData.isExceptional ? {
+                background: 'rgba(247,147,30,0.14)',
                 backdropFilter: 'blur(20px)',
                 WebkitBackdropFilter: 'blur(20px)',
-                border: '1px solid rgba(245, 158, 11, 0.35)',
-                boxShadow: '0 0 16px rgba(245, 158, 11, 0.2), inset 0 1px 0 rgba(245, 158, 11, 0.15)',
+                border: '1px solid rgba(247,147,30,0.38)',
+                boxShadow: '0 0 16px rgba(247,147,30,0.22), inset 0 1px 0 rgba(247,147,30,0.16)',
+              } : {
+                background: 'rgba(255,255,255,0.14)',
+                backdropFilter: 'blur(20px)',
+                WebkitBackdropFilter: 'blur(20px)',
+                border: '1px solid rgba(255,255,255,0.28)',
               }}
             >
               <span 
                 className="font-bold text-[13px]"
-                style={{ color: '#f59e0b' }}
+                style={{ color: tierData.isExceptional ? '#F7931E' : '#FFFFFF' }}
               >
                 {rating === 10 ? '10' : rating.toFixed(1)}
               </span>
               <span 
                 className="text-[10px] font-medium tracking-wide uppercase"
-                style={{ color: 'rgba(245, 158, 11, 0.75)' }}
+                style={{ color: tierData.isExceptional ? 'rgba(247,147,30,0.8)' : 'rgba(255,255,255,0.7)' }}
               >
                 {tierData.label}
               </span>
@@ -180,15 +200,27 @@ export const Top10CourseCard: React.FC<Top10CourseCardProps> = ({
                 `}
                 disabled={isOwnProfile || !user}
               >
-                <motion.span
-                  key={isActive ? 'active' : 'inactive'}
-                  initial={{ scale: 1 }}
-                  animate={tappedReaction === type ? { scale: [1, 1.5, 1] } : { scale: 1 }}
-                  transition={{ duration: 0.3, ease: 'easeOut' }}
-                  className="text-[13px] leading-none"
-                >
-                  {config.emoji}
-                </motion.span>
+                {(() => {
+                  const RIcon = REACTION_ICON[type];
+                  const fillActive = type !== 'interesting';
+                  return (
+                    <motion.span
+                      key={isActive ? 'active' : 'inactive'}
+                      initial={{ scale: 1 }}
+                      animate={tappedReaction === type ? { scale: [1, 1.5, 1] } : { scale: 1 }}
+                      transition={{ duration: 0.3, ease: 'easeOut' }}
+                      className="leading-none"
+                      style={{ display: 'inline-flex' }}
+                    >
+                      <RIcon
+                        size={14}
+                        color={isActive ? '#FBBF24' : 'rgba(255,255,255,0.85)'}
+                        strokeWidth={2}
+                        fill={isActive && fillActive ? '#FBBF24' : 'none'}
+                      />
+                    </motion.span>
+                  );
+                })()}
                 {count > 0 && (
                   <span className={`text-[9px] font-bold leading-none ${isActive ? 'text-amber-400' : 'text-white/60'}`}>
                     {count > 99 ? '99+' : count}
