@@ -1,5 +1,4 @@
 import { useCallback, useRef, useMemo } from 'react';
-import { LayoutGrid } from 'lucide-react';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useExploreFeed } from './hooks/useExploreFeed';
 import { useExploreMood } from './hooks/useExploreMood';
@@ -13,8 +12,6 @@ import { ExploreDestinations } from './ExploreDestinations';
 import { TestYourGame } from './TestYourGame';
 import { WhereYoudRank } from './WhereYoudRank';
 
-
-import { CommunityShelf } from './CommunityShelf';
 import ExploreGrid from './ExploreGrid';
 import ExploreAutoplay from './ExploreAutoplay';
 import { ExploreSectionHeader } from './ExploreSectionHeader';
@@ -57,45 +54,40 @@ export default function ExploreTabContent({ embedded: _embedded = false }: Explo
       {/* Hero: flush, full-width, first child — mirrors OverviewHero */}
       <ExploreHero userId={userId} mood={mood} />
 
-      {/* Everything below the hero gets the standard 16px inset */}
-      <div style={{ paddingLeft: 16, paddingRight: 16 }}>
-        <div style={{ paddingTop: 12, paddingBottom: 4 }}>
-          <ConnectHandicapCue variant="discover" />
-        </div>
-        <ExplorePassport userId={userId} />
-        <ExploreRecommendations userId={userId} mood={mood} />
-
-        {activeRegion === null && <WhereYoudRank userId={userId} />}
-        {activeRegion === null && <TestYourGame />}
-
-        {/* Find your next round — Echo + Destinations as one intent block */}
-        <ExploreEchoCTA mood={mood} />
-        <ExploreDestinations activeRegion={activeRegion} onRegionSelect={handleRegionChange} />
-
-        {/* Phase 2b — CommunityShelf (Bucket + Reviews merged under one header) */}
-        <CommunityShelf activeRegion={activeRegion} />
-
-        <ExploreSectionHeader title="More to explore" icon={LayoutGrid} sub="The full course feed" />
-
-        <div style={{ marginLeft: -16, marginRight: -16 }}>
-          <ExploreGrid
-            posts={posts}
-            coursePosts={coursePosts}
-            isLoading={isLoading}
-            isError={isError}
-            hasNextPage={hasNextPage}
-            isFetchingNextPage={isFetchingNextPage}
-            fetchNextPage={fetchNextPage}
-            refetch={refetch}
-            gridRef={gridRef}
-            activeRegion={activeRegion}
-            onRegionChange={handleRegionChange}
-          />
-        </div>
-
-        <ExploreAutoplay posts={coursePosts} gridRef={gridRef} />
+      {/* Connect cue — self-pads; trim its outer wrapper to no h-padding */}
+      <div style={{ paddingTop: 12, paddingBottom: 4 }}>
+        <ConnectHandicapCue variant="discover" />
       </div>
+
+      {/* New order. Each section self-pads 16px (single inset, matches other tabs). */}
+      {activeRegion === null && <WhereYoudRank userId={userId} />}
+      {activeRegion === null && <TestYourGame />}
+
+      <ExplorePassport userId={userId} />
+      <ExploreRecommendations userId={userId} mood={mood} />
+
+      <ExploreEchoCTA mood={mood} />
+      <ExploreDestinations activeRegion={activeRegion} onRegionSelect={handleRegionChange} />
+
+      <ExploreSectionHeader title="More to explore" sub="The full course feed" />
+
+      <div style={{ marginLeft: -16, marginRight: -16 }}>
+        <ExploreGrid
+          posts={posts}
+          coursePosts={coursePosts}
+          isLoading={isLoading}
+          isError={isError}
+          hasNextPage={hasNextPage}
+          isFetchingNextPage={isFetchingNextPage}
+          fetchNextPage={fetchNextPage}
+          refetch={refetch}
+          gridRef={gridRef}
+          activeRegion={activeRegion}
+          onRegionChange={handleRegionChange}
+        />
+      </div>
+
+      <ExploreAutoplay posts={coursePosts} gridRef={gridRef} />
     </div>
   );
 }
-
