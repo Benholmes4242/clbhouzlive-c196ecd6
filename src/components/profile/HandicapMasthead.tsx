@@ -438,7 +438,12 @@ function HandicapMasthead({ userId, onConnectTap, onCardTap }: Props) {
 
   // ── Data scorecard variant (steady / improving / drifting / milestone) ──
   const current = mockTrend?.current ?? null;
-  const delta30 = mockTrend?.delta ?? 0;
+
+  // 90-day delta — oldest vs latest snapshot in the 90d window (same method as ProfileHandicapCard).
+  const delta90 = useMemo<number | null>(() => {
+    if (!history90 || history90.length < 2) return null;
+    return history90[history90.length - 1].handicap_index - history90[0].handicap_index;
+  }, [history90]);
 
   // 12-month color & icon
   const dir = trend12.direction;
