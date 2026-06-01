@@ -79,7 +79,7 @@ export function ProfileStatStrip({
             <div
               style={{
                 fontSize: 20,
-                fontWeight: 700,
+                fontWeight: 800,
                 color: isNull ? INK_FAINT : INK,
                 lineHeight: 1.1,
                 fontVariantNumeric: 'tabular-nums',
