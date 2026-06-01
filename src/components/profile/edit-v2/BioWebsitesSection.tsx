@@ -1,3 +1,4 @@
+import type React from 'react';
 import { Plus, X } from 'lucide-react';
 import { WebsiteEntry, BIO_MAX } from '@/components/profile/profile-wizard/types';
 import { SectionEyebrow } from '@/components/ui/SectionEyebrow';
