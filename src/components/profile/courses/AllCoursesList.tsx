@@ -373,7 +373,7 @@ export const AllCoursesList: React.FC<AllCoursesListProps> = ({
           </div>
         </div>
       ) : (
-        <div className="mt-3">
+        <div className="mt-3 -mx-2.5">
           {(() => {
             const isHighLow = activeSort === 'rating-high-low';
             const isLowHigh = activeSort === 'rating-low-high';
