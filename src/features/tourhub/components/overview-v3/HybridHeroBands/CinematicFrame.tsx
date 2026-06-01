@@ -23,7 +23,7 @@ import {
   GOLD,
   NUMERIC_STYLE,
 } from '../HybridHero.constants';
-import { AMBER_INK, AMBER_TINT_12 } from '../../../_shared/tokens';
+import { AMBER_INK, AMBER_TINT_12, GOLD_DEEP } from '../../../_shared/tokens';
 import type { HeroState, TopTie } from '../HybridHero.utils';
 import { fmtScore, formatRank, buildLeaderboardSlots, roundLabel } from '../HybridHero.utils';
 import { getPlayerHeadshotUrl } from '@/utils/playerHeadshot';
@@ -323,7 +323,7 @@ function ChampionRowDark({
       }}
     >
       <span style={{ width: 22, display: 'flex', justifyContent: 'center', flexShrink: 0 }}>
-        <Trophy size={14} color={GOLD} fill={GOLD} strokeWidth={0} />
+        <Crown size={14} strokeWidth={2.5} fill={GOLD} style={{ color: GOLD_DEEP }} />
       </span>
       {avatarUrl ? (
         <img
