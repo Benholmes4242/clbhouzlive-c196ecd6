@@ -1,4 +1,5 @@
 import { memo } from 'react';
+import { MapPin } from 'lucide-react';
 import { useExploreRegionsWithImages } from './hooks/useExploreRegionsWithImages';
 import { ExploreSectionHeader } from './ExploreSectionHeader';
 
