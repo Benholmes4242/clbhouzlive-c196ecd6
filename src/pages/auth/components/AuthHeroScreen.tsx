@@ -101,7 +101,7 @@ const AuthHeroScreen: React.FC<AuthHeroScreenProps> = ({
       <div 
         className="absolute inset-0"
         style={{
-          background: 'linear-gradient(180deg, #0d0d0d 0%, #111111 100%)',
+          background: 'linear-gradient(180deg, #0A0E14 0%, #0C1119 100%)',
         }}
       />
       
