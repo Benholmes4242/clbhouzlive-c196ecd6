@@ -2,6 +2,8 @@ import { WizardStep } from './types';
 import { Button } from '@/components/ui/button';
 import { Loader2 } from 'lucide-react';
 
+const GEIST = 'Geist, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
+
 interface Props {
   step: WizardStep;
   isSaving: boolean;
@@ -33,7 +35,7 @@ export function WizardNavigation({
               flex: 1, minHeight: 50, borderRadius: 12,
               background: 'transparent',
               border: '0.5px solid rgba(15,23,42,0.12)',
-              fontSize: 15, fontWeight: 600,
+              fontFamily: GEIST, fontSize: 15, fontWeight: 600,
               color: '#0F172A',
               cursor: isSaving ? 'not-allowed' : 'pointer',
             }}

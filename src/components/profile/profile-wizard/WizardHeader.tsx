@@ -1,6 +1,8 @@
 import { X, ChevronLeft } from 'lucide-react';
 import { WizardStep, STEP_TITLES } from './types';
 
+const GEIST = 'Geist, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
+
 interface Props {
   step: WizardStep;
   isFirstStep: boolean;
@@ -14,8 +16,8 @@ export function WizardHeader({ step, isFirstStep, onBack, onClose, onSkip }: Pro
     <div
       className="flex items-center justify-between px-4 bg-background border-b border-border"
       style={{
-        paddingTop: 'max(env(safe-area-inset-top, 0px), 47px)',
-        height: 'calc(max(env(safe-area-inset-top, 0px), 47px) + 56px)',
+        paddingTop: 'calc(max(env(safe-area-inset-top, 0px), 47px) + 8px)',
+        height: 'calc(max(env(safe-area-inset-top, 0px), 47px) + 64px)',
       }}
     >
       {/* Left — hide on first step when Skip is available, show back on subsequent steps */}
@@ -36,7 +38,7 @@ export function WizardHeader({ step, isFirstStep, onBack, onClose, onSkip }: Pro
 
       {/* Centre — title */}
       <div className="text-center">
-        <p style={{ fontSize: 16, fontWeight: 800, color: '#0F172A', letterSpacing: '-0.015em', margin: 0 }}>
+        <p style={{ fontFamily: GEIST, fontSize: 16, fontWeight: 800, color: '#0F172A', letterSpacing: '-0.015em', margin: 0 }}>
           Edit Profile
         </p>
       </div>

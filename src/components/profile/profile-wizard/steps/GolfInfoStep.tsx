@@ -1,4 +1,7 @@
 import { Flag } from 'lucide-react';
+
+const GEIST = 'Geist, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
+
 import { ProfileFormData, ClubEntry } from '../types';
 import { HomeClubCard } from '@/components/profile/edit-v2/HomeClubCard';
 import { AdditionalClubsList } from '@/components/profile/edit-v2/AdditionalClubsList';

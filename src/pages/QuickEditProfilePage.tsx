@@ -17,6 +17,8 @@ import { PhotosIdentityStep } from '@/components/profile/profile-wizard/steps/Ph
 import { GolfInfoStep } from '@/components/profile/profile-wizard/steps/GolfInfoStep';
 import { AboutStep } from '@/components/profile/profile-wizard/steps/AboutStep';
 
+const GEIST = 'Geist, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
+
 export default function QuickEditProfilePage() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
@@ -71,8 +73,8 @@ export default function QuickEditProfilePage() {
       <div
         className="flex items-center justify-between px-4 bg-background border-b border-border"
         style={{
-          paddingTop: 'max(env(safe-area-inset-top, 0px), 47px)',
-          height: 'calc(max(env(safe-area-inset-top, 0px), 47px) + 56px)',
+          paddingTop: 'calc(max(env(safe-area-inset-top, 0px), 47px) + 8px)',
+          height: 'calc(max(env(safe-area-inset-top, 0px), 47px) + 64px)',
         }}
       >
         <button
@@ -90,7 +92,7 @@ export default function QuickEditProfilePage() {
         </button>
 
         <div className="text-center">
-          <p style={{ fontSize: 16, fontWeight: 900, color: '#0F172A', letterSpacing: '-0.02em', margin: 0 }}>
+          <p style={{ fontFamily: GEIST, fontSize: 16, fontWeight: 800, color: '#0F172A', letterSpacing: '-0.02em', margin: 0 }}>
             Edit Profile
           </p>
         </div>
