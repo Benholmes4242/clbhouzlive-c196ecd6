@@ -5,10 +5,10 @@
  */
 
 import React from 'react';
-import { Crown, Trophy } from 'lucide-react';
+import { Trophy } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { INK, GOLD, NUMERIC_STYLE, STRIP_HEIGHT } from '../HybridHero.constants';
-import { GOLD_DEEP, SCORE_OVER_PAR_DARK_PALE, SLATE_800, WHITE_ALPHA_65 } from '../../../_shared/tokens';
+import { SCORE_OVER_PAR_DARK_PALE, SLATE_800, WHITE_ALPHA_65 } from '../../../_shared/tokens';
 import { TrajectorySparkline } from './TrajectorySparkline';
 
 interface ChampionStripProps {
@@ -53,7 +53,7 @@ export function ChampionStrip({
   score,
   scoreLabel = 'TO PAR',
   eyebrow = 'CHAMPION',
-  eyebrowIcon: EyebrowIcon = Crown,
+  eyebrowIcon: EyebrowIcon = Trophy,
   avatarUrl,
   rounds,
   par,
@@ -101,7 +101,7 @@ export function ChampionStrip({
                 gap: 5,
               }}
             >
-              <EyebrowIcon size={11} strokeWidth={2.5} fill={EyebrowIcon === Crown ? GOLD : 'none'} style={{ color: EyebrowIcon === Crown ? GOLD_DEEP : GOLD, flexShrink: 0 }} />
+              <EyebrowIcon size={10} color={GOLD} strokeWidth={2.5} />
               {eyebrow}
             </span>
             {country && (

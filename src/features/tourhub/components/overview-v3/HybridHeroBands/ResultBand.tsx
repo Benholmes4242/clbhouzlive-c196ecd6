@@ -5,9 +5,9 @@
  */
 
 import React from 'react';
-import { Crown } from 'lucide-react';
+import { Trophy } from 'lucide-react';
 import { INK, AMBER, NUMERIC_STYLE } from '../HybridHero.constants';
-import { GOLD_DEEP, LEADER_GOLD as GOLD, SLATE_800, WHITE_ALPHA_10, WHITE_ALPHA_65 } from '../../../_shared/tokens';
+import { LEADER_GOLD as GOLD, SLATE_800, WHITE_ALPHA_10, WHITE_ALPHA_65 } from '../../../_shared/tokens';
 import { getFlagCode } from '@/utils/countryFlags';
 
 function countryToFlag(country: string | null | undefined): string {
@@ -159,7 +159,7 @@ export function ResultBand({
               gap: 5,
             }}
           >
-            <Crown size={11} strokeWidth={2.5} fill={GOLD} style={{ color: GOLD_DEEP, flexShrink: 0 }} />
+            <Trophy size={10} color={GOLD} strokeWidth={2.5} />
             CHAMPION
           </div>
           <div
