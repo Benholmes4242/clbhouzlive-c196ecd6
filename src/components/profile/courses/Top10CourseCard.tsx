@@ -64,11 +64,6 @@ export const Top10CourseCard: React.FC<Top10CourseCardProps> = ({
       ? { background: 'rgba(255,255,255,0.22)', border: '1px solid rgba(255,255,255,0.35)' }
       : { background: 'rgba(255,255,255,0.15)', border: '1px solid rgba(255,255,255,0.2)' };
 
-  const REACTION_ICON: Record<ReactionType, React.ComponentType<any>> = {
-    agree: Flame,
-    interesting: Eye,
-    want_to_play: Flag,
-  };
 
   return (
     <>
