@@ -114,6 +114,7 @@ function HandicapMasthead({ userId, onConnectTap, onCardTap }: Props) {
   const { data: connection } = useWhsConnection(userId);
   const { data: trend } = useHandicapTrend(connection?.id);
   const { data: lastRound } = useLastRound(connection?.id);
+  const { data: history90 } = useHandicapHistory(connection?.id, 90);
   const trend12 = useHandicapTrend12mo(connection?.id);
 
   const realState = useMemo(
