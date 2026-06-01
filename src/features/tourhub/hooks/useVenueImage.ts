@@ -18,6 +18,7 @@ import princeOfWalesCC from '@/assets/courses/prince-of-wales-cc.jpg';
 import missionHillsHaikou from '@/assets/courses/mission-hills-haikou.jpg';
 import theLandingsClub from '@/assets/courses/the-landings-club.jpg';
 import harbourTownGL from '@/assets/harbour-town-upcoming.webp';
+import asiadCountryClub from '@/assets/courses/asiad-country-club.jpg';
 
 /**
  * Static venue image overrides for courses not yet in the database.
