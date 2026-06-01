@@ -176,7 +176,7 @@ export function PersonalProfileWizard() {
 
   return createPortal(
     <>
-      <div className="fixed inset-0 z-[100] flex flex-col bg-background">
+      <div className="fixed inset-0 z-[100] flex flex-col" style={{ background: '#F4F6F9' }}>
         <WizardHeader
           step={step}
           isFirstStep={step === 1}
