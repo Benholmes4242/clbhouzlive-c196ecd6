@@ -14,7 +14,7 @@
 import { memo, useMemo } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { ArrowDownRight, ArrowUpRight, ArrowRight } from 'lucide-react';
-import { useWhsConnection, useHandicapTrend, useLastRound } from '@/lib/whs/hooks';
+import { useWhsConnection, useHandicapTrend, useLastRound, useHandicapHistory } from '@/lib/whs/hooks';
 import { useHandicapTrend12mo } from '@/hooks/useHandicapTrend12mo';
 
 const INK = '#0F172A';
@@ -114,6 +114,7 @@ function HandicapMasthead({ userId, onConnectTap, onCardTap }: Props) {
   const { data: connection } = useWhsConnection(userId);
   const { data: trend } = useHandicapTrend(connection?.id);
   const { data: lastRound } = useLastRound(connection?.id);
+  const { data: history90 } = useHandicapHistory(connection?.id, 90);
   const trend12 = useHandicapTrend12mo(connection?.id);
 
   const realState = useMemo(
@@ -437,7 +438,12 @@ function HandicapMasthead({ userId, onConnectTap, onCardTap }: Props) {
 
   // ── Data scorecard variant (steady / improving / drifting / milestone) ──
   const current = mockTrend?.current ?? null;
-  const delta30 = mockTrend?.delta ?? 0;
+
+  // 90-day delta — oldest vs latest snapshot in the 90d window (same method as ProfileHandicapCard).
+  const delta90 = useMemo<number | null>(() => {
+    if (!history90 || history90.length < 2) return null;
+    return history90[history90.length - 1].handicap_index - history90[0].handicap_index;
+  }, [history90]);
 
   // 12-month color & icon
   const dir = trend12.direction;
@@ -509,7 +515,7 @@ function HandicapMasthead({ userId, onConnectTap, onCardTap }: Props) {
             </div>
           </div>
 
-          {/* Right: 30 DAYS / 12 MONTHS stacked */}
+          {/* Right: 90 DAYS / 12 MONTHS stacked */}
           <div style={{ display: 'flex', flexDirection: 'column' }}>
             <div style={{ padding: '10px 18px', borderBottom: `0.5px solid ${HAIRLINE}` }}>
               <div
@@ -521,7 +527,7 @@ function HandicapMasthead({ userId, onConnectTap, onCardTap }: Props) {
                   textTransform: 'uppercase' as const,
                 }}
               >
-                30 Days
+                90 Days
               </div>
               <div
                 style={{
@@ -532,7 +538,7 @@ function HandicapMasthead({ userId, onConnectTap, onCardTap }: Props) {
                   ...TABULAR,
                 }}
               >
-                {formatDelta(delta30)}
+                {delta90 === null ? '—' : formatDelta(delta90)}
               </div>
             </div>
             <div style={{ padding: '10px 18px' }}>
