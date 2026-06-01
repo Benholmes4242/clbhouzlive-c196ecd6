@@ -33,7 +33,7 @@ const AuthHeroScreen: React.FC<AuthHeroScreenProps> = ({
   submitting,
 }) => {
   // Dark status bar + safe-area shield for Median.co wrapper
-  useMedianStatusBar('dark', '#0d0d0d', true, false);
+  useMedianStatusBar('dark', '#0A0E14', true, false);
 
   const [lastOAuthAttempt, setLastOAuthAttempt] = useState<number>(0);
   const [loginEmail, setLoginEmail] = useState('');
