@@ -173,10 +173,9 @@ export const FriendRequestButtons: React.FC<FriendRequestButtonsProps> = ({
         disabled={state === 'loading'}
         className="disabled:opacity-60"
         style={{
-          padding: '7px 18px', borderRadius: 20,
+          padding: '8px 16px', borderRadius: 10,
           background: '#F7931E', color: '#ffffff',
           fontSize: 13, fontWeight: 700, border: 'none', cursor: 'pointer',
-          boxShadow: '0 2px 8px rgba(247,147,30,0.25)',
         }}
       >
         {state === 'loading' ? '...' : 'Accept'}
@@ -186,9 +185,9 @@ export const FriendRequestButtons: React.FC<FriendRequestButtonsProps> = ({
         disabled={state === 'loading'}
         className="disabled:opacity-60"
         style={{
-          padding: '7px 16px', borderRadius: 20,
-          background: 'rgba(220,38,38,0.08)', border: '1px solid rgba(220,38,38,0.20)',
-          color: '#DC2626', fontSize: 13, fontWeight: 600, cursor: 'pointer',
+          padding: '8px 16px', borderRadius: 10,
+          background: '#F8FAFC', border: '1px solid rgba(15,23,42,0.08)',
+          color: '#64748B', fontSize: 13, fontWeight: 600, cursor: 'pointer',
         }}
       >
         Decline

@@ -157,7 +157,7 @@ export const FeaturedNotificationCard: React.FC<FeaturedNotificationCardProps> =
           }}
         >
           {/* Photo hero */}
-          <div className="relative" style={{ height: 110 }}>
+          <div className="relative" style={{ height: 76 }}>
             <img
               src={courseThumbnail!}
               alt={courseName || 'Course'}
@@ -172,11 +172,11 @@ export const FeaturedNotificationCard: React.FC<FeaturedNotificationCardProps> =
                 <div
                   className="flex items-center gap-1 shrink-0"
                   style={{
-                    background: 'rgba(0,0,0,0.45)',
-                    backdropFilter: 'blur(12px)',
-                    WebkitBackdropFilter: 'blur(12px)',
-                    border: '1px solid rgba(255,255,255,0.15)',
-                    borderRadius: 20,
+                    background: 'rgba(10,14,20,0.52)',
+                    backdropFilter: 'blur(14px) saturate(150%)',
+                    WebkitBackdropFilter: 'blur(14px) saturate(150%)',
+                    border: '1px solid rgba(255,255,255,0.16)',
+                    borderRadius: 999,
                     padding: '3px 9px',
                   }}
                 >
