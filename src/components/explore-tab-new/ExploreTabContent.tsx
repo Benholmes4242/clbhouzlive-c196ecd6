@@ -1,4 +1,5 @@
 import { useCallback, useRef, useMemo } from 'react';
+import { LayoutGrid } from 'lucide-react';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useExploreFeed } from './hooks/useExploreFeed';
 import { useExploreMood } from './hooks/useExploreMood';
