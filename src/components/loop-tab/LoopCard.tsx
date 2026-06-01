@@ -3,6 +3,7 @@ import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
 import { useNavigate } from 'react-router-dom';
 import { formatDistanceToNow } from 'date-fns';
 import { Heart, MessageCircle, Share2, MapPin, X } from 'lucide-react';
+import { getRatingTierLabel } from '@/lib/ratingTier';
 import clbhouzLogo from '@/assets/clbhouz-logo.png';
 import type { FeedPost } from '@/components/media-system/types/media';
 import PostFeedCarousel from '@/components/feed/PostFeedCarousel';
@@ -211,21 +212,23 @@ export const LoopCard = React.memo(function LoopCard({
                 useFullscreenFeedStore.getState().open(allPosts, cardIndex);
               }
             }}
-            topRightOverlay={
+            bottomLeftOverlay={
               post.isReview && post.review?.rating ? (
                 <div
-                  className="flex items-center gap-0.5"
+                  className="flex items-baseline gap-1"
                   style={{
-                    background: 'rgba(0,0,0,0.55)',
-                    backdropFilter: 'blur(8px)',
+                    background: 'rgba(247,147,30,0.92)',
+                    backdropFilter: 'blur(6px)',
                     borderRadius: 6,
-                    padding: '3px 7px',
-                    border: '0.5px solid rgba(255,255,255,0.15)',
+                    padding: '4px 9px',
+                    boxShadow: '0 2px 8px rgba(0,0,0,0.18)',
                   }}
                 >
-                  <img src={clbhouzLogo} alt="" className="h-3 w-3 object-contain" />
-                  <span className="text-[12px] font-semibold text-white">
+                  <span className="text-[13px] font-bold text-white leading-none" style={{ fontFeatureSettings: '"tnum" 1' }}>
                     {post.review.rating.toFixed(1)}
+                  </span>
+                  <span className="text-[10px] font-semibold uppercase text-white/85 leading-none tracking-wide">
+                    {getRatingTierLabel(post.review.rating)}
                   </span>
                 </div>
               ) : null
@@ -275,21 +278,23 @@ export const LoopCard = React.memo(function LoopCard({
               </span>
             )}
 
-            {/* Review rating badge — top right */}
+            {/* Review verdict pill — bottom left */}
             {post.isReview && post.review?.rating && (
               <div
-                className="absolute top-2 right-2 z-10 flex items-center gap-0.5"
+                className="absolute bottom-2 left-2 z-10 flex items-baseline gap-1"
                 style={{
-                  background: 'rgba(0,0,0,0.55)',
-                  backdropFilter: 'blur(8px)',
+                  background: 'rgba(247,147,30,0.92)',
+                  backdropFilter: 'blur(6px)',
                   borderRadius: 6,
-                  padding: '3px 7px',
-                  border: '0.5px solid rgba(255,255,255,0.15)',
+                  padding: '4px 9px',
+                  boxShadow: '0 2px 8px rgba(0,0,0,0.18)',
                 }}
               >
-                <img src={clbhouzLogo} alt="" className="h-3 w-3 object-contain" />
-                <span className="text-[12px] font-semibold text-white">
+                <span className="text-[13px] font-bold text-white leading-none" style={{ fontFeatureSettings: '"tnum" 1' }}>
                   {post.review.rating.toFixed(1)}
+                </span>
+                <span className="text-[10px] font-semibold uppercase text-white/85 leading-none tracking-wide">
+                  {getRatingTierLabel(post.review.rating)}
                 </span>
               </div>
             )}
@@ -382,6 +387,30 @@ export const LoopCard = React.memo(function LoopCard({
                 tags={post.tags || []}
               />
             </ExpandableCaption>
+          </div>
+        )}
+
+        {/* 3.25 REVIEW BODY — snippet + read affordance (reviews only) */}
+        {post.isReview && post.review?.reviewText && (
+          <div className="px-4 pt-2 pb-0">
+            <p
+              className="line-clamp-2 text-[13px]"
+              style={{ color: '#64748B', lineHeight: 1.5 }}
+            >
+              {post.review.reviewText}
+            </p>
+            <button
+              type="button"
+              onClick={() => {
+                if (allPosts && cardIndex != null) {
+                  useFullscreenFeedStore.getState().open(allPosts, cardIndex);
+                }
+              }}
+              className="mt-1.5 text-[11px] font-bold uppercase tracking-wide"
+              style={{ color: '#F7931E', letterSpacing: '0.04em' }}
+            >
+              Read review →
+            </button>
           </div>
         )}
 

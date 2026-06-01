@@ -4,7 +4,6 @@ import { useInView } from 'react-intersection-observer';
 import { Loader2, Film } from 'lucide-react';
 import type { FeedPost } from '@/components/media-system/types/media';
 import { LoopCard } from '@/components/loop-tab/LoopCard';
-import { ReviewCard } from './ReviewCard';
 import { PostsFeedSkeleton } from './PostsFeedSkeleton';
 import { usePostDeletion } from '@/hooks/usePostDeletion';
 import { FriendsAutoplay } from '@/components/friends-tab/FriendsAutoplay';
@@ -22,12 +21,10 @@ interface ProfilePostsFeedProps {
 }
 
 /**
- * Unified profile posts feed. Reuses the Loop tab card pattern (`LoopCard`) for
- * standard posts and the editorial `ReviewCard` for reviews.
- *
- * Comment-sheet ownership: `LoopCard` renders its own internal CommentsSheet.
- * `ReviewCard` does not currently expose a comment trigger, so no parent-owned
- * sheet is mounted here.
+ * Unified profile posts feed. Every item — post or review — renders through
+ * `LoopCard`, which adapts its body region by post type (caption vs review
+ * snippet + verdict pill). LoopCard owns its own CommentsSheet, so no
+ * parent-owned sheet is mounted here.
  */
 export const ProfilePostsFeed: React.FC<ProfilePostsFeedProps> = ({
   posts,
@@ -105,24 +102,10 @@ export const ProfilePostsFeed: React.FC<ProfilePostsFeedProps> = ({
   }
 
   return (
-    <div ref={feedContainerRef} className="flex flex-col pb-4 pt-2" style={{ gap: '8px' }}>
+    <div ref={feedContainerRef} className="flex flex-col pb-4 pt-2">
       <FriendsAutoplay posts={posts} feedRef={feedContainerRef} />
       {posts.map((post, i) => {
         const isOwnPost = isOwnProfile && post.userId === userId;
-
-        if (post.isReview && post.review) {
-          return (
-            <div key={post.id} data-card-index={i}>
-              <ReviewCard
-                post={post}
-                allPosts={posts}
-                postIndex={i}
-                isOwnPost={isOwnPost}
-                onDelete={() => handleDelete(post.id, post.userId)}
-              />
-            </div>
-          );
-        }
 
         return (
           <div key={post.id} data-card-index={i}>

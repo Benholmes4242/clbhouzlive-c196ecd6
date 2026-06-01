@@ -12,6 +12,7 @@ interface PostFeedCarouselProps {
   /** Optional overlays rendered above slides (e.g. duration badge, rating badge). */
   topRightOverlay?: React.ReactNode;
   bottomRightOverlay?: React.ReactNode;
+  bottomLeftOverlay?: React.ReactNode;
   ariaLabel?: string;
 }
 
@@ -33,6 +34,7 @@ export const PostFeedCarousel = memo(function PostFeedCarousel({
   aspectClass = 'aspect-square',
   topRightOverlay,
   bottomRightOverlay,
+  bottomLeftOverlay,
   ariaLabel,
 }: PostFeedCarouselProps) {
   const [currentSlide, setCurrentSlide] = useState(0);
@@ -239,6 +241,11 @@ export const PostFeedCarousel = memo(function PostFeedCarousel({
       {bottomRightOverlay && (
         <div className="absolute bottom-2 right-2 z-10 pointer-events-none">
           {bottomRightOverlay}
+        </div>
+      )}
+      {bottomLeftOverlay && (
+        <div className="absolute bottom-2 left-2 z-10 pointer-events-none">
+          {bottomLeftOverlay}
         </div>
       )}
     </div>
