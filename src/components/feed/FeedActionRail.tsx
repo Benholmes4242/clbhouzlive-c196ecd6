@@ -356,7 +356,7 @@ export const FeedActionRail: React.FC<FeedActionRailProps> = ({
               size={28}
               fill={hasLiked ? '#F7931E' : 'transparent'}
               stroke={hasLiked ? '#F7931E' : '#fff'}
-              strokeWidth={2}
+              strokeWidth={FLOAT_STROKE}
             />
           </ActionButton>
 
@@ -366,17 +366,17 @@ export const FeedActionRail: React.FC<FeedActionRailProps> = ({
             ariaLabel="Comments"
             count={formatCount(commentsCount)}
           >
-            <MessageCircle size={28} stroke="#fff" strokeWidth={2} />
+            <MessageCircle size={28} stroke="#fff" strokeWidth={FLOAT_STROKE} />
           </ActionButton>
 
           {/* Share */}
           <ActionButton onClick={onShare} ariaLabel="Share">
-            <Send size={28} stroke="#fff" strokeWidth={2} />
+            <Send size={28} stroke="#fff" strokeWidth={FLOAT_STROKE} />
           </ActionButton>
 
           {/* More */}
           <ActionButton onClick={onMore} ariaLabel="More options">
-            <MoreHorizontal size={28} stroke="#fff" strokeWidth={2} />
+            <MoreHorizontal size={28} stroke="#fff" strokeWidth={FLOAT_STROKE} />
           </ActionButton>
         </>
       )}
