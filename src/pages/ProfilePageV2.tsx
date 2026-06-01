@@ -1164,7 +1164,7 @@ const ProfilePageV2Content: React.FC = () => {
           }}
         >
           <div 
-            className="flex items-center gap-6 w-full"
+            className="flex items-center justify-center gap-10 w-full"
           >
             {tabs.map((tab) => {
               const isActive = activeSection === tab.id;
