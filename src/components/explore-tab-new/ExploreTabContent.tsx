@@ -53,46 +53,48 @@ export default function ExploreTabContent({ embedded: _embedded = false }: Explo
 
   return (
     <div style={{ background: SLATE_50, minHeight: '100vh' }}>
-      <div style={{ marginLeft: -16, marginRight: -16 }}>
-        <ExploreHero userId={userId} mood={mood} />
+      {/* Hero: flush, full-width, first child — mirrors OverviewHero */}
+      <ExploreHero userId={userId} mood={mood} />
+
+      {/* Everything below the hero gets the standard 16px inset */}
+      <div style={{ paddingLeft: 16, paddingRight: 16 }}>
+        <div style={{ paddingTop: 12, paddingBottom: 4 }}>
+          <ConnectHandicapCue variant="discover" />
+        </div>
+        <ExplorePassport userId={userId} />
+        <ExploreRecommendations userId={userId} mood={mood} />
+
+        {activeRegion === null && <WhereYoudRank userId={userId} />}
+        {activeRegion === null && <TestYourGame />}
+
+        {/* Find your next round — Echo + Destinations as one intent block */}
+        <ExploreEchoCTA mood={mood} />
+        <ExploreDestinations activeRegion={activeRegion} onRegionSelect={handleRegionChange} />
+
+        {/* Phase 2b — CommunityShelf (Bucket + Reviews merged under one header) */}
+        <CommunityShelf activeRegion={activeRegion} />
+
+        <ExploreSectionHeader title="More to explore" sub="The full course feed" />
+
+        <div style={{ marginLeft: -16, marginRight: -16 }}>
+          <ExploreGrid
+            posts={posts}
+            coursePosts={coursePosts}
+            isLoading={isLoading}
+            isError={isError}
+            hasNextPage={hasNextPage}
+            isFetchingNextPage={isFetchingNextPage}
+            fetchNextPage={fetchNextPage}
+            refetch={refetch}
+            gridRef={gridRef}
+            activeRegion={activeRegion}
+            onRegionChange={handleRegionChange}
+          />
+        </div>
+
+        <ExploreAutoplay posts={coursePosts} gridRef={gridRef} />
       </div>
-      <div style={{ paddingTop: 12, paddingBottom: 4 }}>
-        <ConnectHandicapCue variant="discover" />
-      </div>
-      <ExplorePassport userId={userId} />
-      <ExploreRecommendations userId={userId} mood={mood} />
-
-      {activeRegion === null && <WhereYoudRank userId={userId} />}
-      {activeRegion === null && <TestYourGame />}
-
-
-      {/* Find your next round — Echo + Destinations as one intent block */}
-      <ExploreEchoCTA mood={mood} />
-      <ExploreDestinations activeRegion={activeRegion} onRegionSelect={handleRegionChange} />
-
-      {/* Phase 2b — CommunityShelf (Bucket + Reviews merged under one header) */}
-      <CommunityShelf activeRegion={activeRegion} />
-
-
-      <ExploreSectionHeader title="More to explore" sub="The full course feed" />
-
-      <div style={{ marginLeft: -16, marginRight: -16 }}>
-        <ExploreGrid
-          posts={posts}
-          coursePosts={coursePosts}
-          isLoading={isLoading}
-          isError={isError}
-          hasNextPage={hasNextPage}
-          isFetchingNextPage={isFetchingNextPage}
-          fetchNextPage={fetchNextPage}
-          refetch={refetch}
-          gridRef={gridRef}
-          activeRegion={activeRegion}
-          onRegionChange={handleRegionChange}
-        />
-      </div>
-
-      <ExploreAutoplay posts={coursePosts} gridRef={gridRef} />
     </div>
   );
 }
+
