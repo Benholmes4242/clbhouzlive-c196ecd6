@@ -1,5 +1,7 @@
 import { memo } from 'react';
 
+const GEIST = 'Geist, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
+
 interface SectionEyebrowProps {
   /** The caps label text (e.g. "DISPLAY NAME", "ALL FOLLOWERS"). */
   label: string;
@@ -40,6 +42,7 @@ function SectionEyebrowInner({ label, count, color = 'slate', className, require
     >
       <span
         style={{
+          fontFamily: GEIST,
           fontSize: 9,
           fontWeight: 800,
           letterSpacing: '0.16em',
@@ -61,6 +64,7 @@ function SectionEyebrowInner({ label, count, color = 'slate', className, require
       {count != null && (
         <span
           style={{
+            fontFamily: GEIST,
             fontSize: 9,
             fontWeight: 800,
             color: '#94A3B8',
