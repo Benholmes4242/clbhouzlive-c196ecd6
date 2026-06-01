@@ -256,19 +256,13 @@ const AuthHeroScreen: React.FC<AuthHeroScreenProps> = ({
             </button>
             
             
-            {/* OR Divider */}
+            {/* OR SIGN IN divider */}
             <div className="flex items-center gap-3 py-2 auth-button-4">
-              <div className="flex-1 h-px bg-neutral-700" />
-              <span className="text-sm font-medium text-neutral-500">OR</span>
-              <div className="flex-1 h-px bg-neutral-700" />
+              <div className="flex-1 h-px" style={{ background: 'rgba(255,255,255,0.10)' }} />
+              <span style={{ fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,0.35)', letterSpacing: '0.1em' }}>OR SIGN IN</span>
+              <div className="flex-1 h-px" style={{ background: 'rgba(255,255,255,0.10)' }} />
             </div>
 
-            {/* Sign-in eyebrow label */}
-            <div className="auth-button-5 flex items-center justify-center gap-2">
-              <span style={{ fontSize: 9, fontWeight: 900, color: 'rgba(255,255,255,0.45)', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>
-                Already have an account? Sign in below
-              </span>
-            </div>
             
             {/* Email input for login */}
             <div className="auth-button-6 space-y-3">
