@@ -5,6 +5,7 @@ import TrendingThisWeek from './TrendingThisWeek';
 import LatestVideosRail from './LatestVideosRail';
 import WatchAutoplay from './WatchAutoplay';
 import WatchGrid from './WatchGrid';
+import WatchSectionHeader from './WatchSectionHeader';
 // WatchSectionDivider removed in Phase 4 — kicker + h1 already separate
 // sections clearly; dividers fragmented the surface visually.
 import ContinueWatchingRail from './ContinueWatchingRail';
@@ -68,7 +69,12 @@ export default function UnifiedWatchFeed({ embedded = false }: UnifiedWatchFeedP
       {/* ── Section 3: Watch grid ──
           Phase 5g: explicit 24px paddingBottom guarantees clearance from
           the bottom nav even when PageRoot is bypassed. */}
-      <div style={{ paddingBottom: 24 }}>
+      <div style={{ paddingTop: 28, paddingBottom: 24 }}>
+        <WatchSectionHeader
+          eyebrow="Explore"
+          title="Videos to explore"
+          sub="From the golfing community"
+        />
         <WatchAutoplay
           posts={posts}
           gridRef={gridRef as React.RefObject<HTMLDivElement>}

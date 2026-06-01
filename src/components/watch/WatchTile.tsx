@@ -23,6 +23,9 @@ interface WatchTileProps {
   hasNextPage?: boolean;
   isFetchingNextPage?: boolean;
   onLongPress?: (post: FeedPost) => void;
+  /** When rendered inside the mosaic grid: parent controls aspect, tile is flush. */
+  variant?: 'hero' | 'tile';
+  feature?: boolean;
 }
 
 const WatchTile: React.FC<WatchTileProps> = ({
@@ -30,6 +33,7 @@ const WatchTile: React.FC<WatchTileProps> = ({
   index,
   allPosts,
   onLongPress,
+  variant,
 }) => {
   const media = post.mediaItems[0];
   const thumbnailUrl = media?.thumbnailUrl;
@@ -112,11 +116,16 @@ const WatchTile: React.FC<WatchTileProps> = ({
   const creatorLabel = post.displayName || post.username || '';
   const showCreatorChip = !!creatorLabel;
 
+  const mosaic = variant === 'hero' || variant === 'tile';
+  const tileClassName = mosaic
+    ? 'watch-tile relative w-full h-full overflow-hidden cursor-pointer select-none'
+    : 'watch-tile relative aspect-[4/5] overflow-hidden rounded-[12px] cursor-pointer select-none';
+
   return (
     <div
       ref={tileRef}
       data-watch-index={index}
-      className="watch-tile relative aspect-[4/5] overflow-hidden rounded-[12px] cursor-pointer select-none"
+      className={tileClassName}
       onClick={handleClick}
       onPointerDown={handlePointerDown}
       onPointerMove={handlePointerMove}
@@ -146,9 +155,7 @@ const WatchTile: React.FC<WatchTileProps> = ({
             zIndex: 10,
           }}
         >
-          <Pin variant="dark" icon={<span style={{ fontSize: 10, lineHeight: 1 }}>📍</span>}>
-            {post.courseName}
-          </Pin>
+          <Pin variant="dark">{post.courseName}</Pin>
         </div>
       )}
 

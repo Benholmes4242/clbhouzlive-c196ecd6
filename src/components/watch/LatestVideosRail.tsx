@@ -62,7 +62,7 @@ export default function LatestVideosRail() {
 
       {/* Horizontal rail of next 9 */}
       {rail.length > 0 && (
-        <HRail paddingTop={20} paddingBottom={4}>
+        <HRail paddingTop={8} paddingBottom={4}>
           {rail.map((post, i) => (
             <div key={post.id} style={{ scrollSnapAlign: 'start' }}>
               <VideoRailTile
