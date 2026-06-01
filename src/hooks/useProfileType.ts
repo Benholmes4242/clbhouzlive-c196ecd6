@@ -34,7 +34,6 @@ export const getProfileType = (userType: string | null | undefined): ProfileType
 export const PERSONAL_TABS = [
   { id: 'activity', label: 'Posts' },
   { id: 'courses', label: 'Courses' },
-  { id: 'top100', label: 'Top 100' },
   { id: 'stats', label: 'Handicap' }
 ];
 

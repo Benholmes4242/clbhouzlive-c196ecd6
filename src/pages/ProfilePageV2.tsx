@@ -13,7 +13,6 @@ import { useEditProfileRoute } from '@/hooks/useEditProfileRoute';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useOpenFriendSheet } from '@/components/friend-sheet/FriendSheetProvider';
 import { useUserProfile } from '@/hooks/useUserProfile.tsx';
-import { useTop100Overview } from '@/hooks/useTop100Overview';
 import PostsTabContent from '@/components/posts-tab/PostsTabContent';
 import { usePersonalPostsCount } from '@/hooks/usePersonalPostsCount';
 import { usePersonalReviewsCount } from '@/hooks/usePersonalReviewsCount';
@@ -65,7 +64,6 @@ import {
 // Tab content components
 // PostsTabContent imported above
 import { ProfileCoursesTab } from '@/components/profile/ProfileCoursesTab';
-import Top100MyProgressPanel from '@/components/courses/Top100MyProgressPanel';
 import AchievementsPane from '@/components/profile/AchievementsPane';
 import ProfileHandicapCard from '@/components/handicap/ProfileHandicapCard';
 
