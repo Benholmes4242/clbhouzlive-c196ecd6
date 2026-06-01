@@ -66,7 +66,7 @@ export default function QuickEditProfilePage() {
   const isDisabled = !isValid || !isDirty || isSaving;
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC] flex flex-col">
+    <div className="min-h-screen bg-[#F4F6F9] flex flex-col">
       {/* Header */}
       <div
         className="flex items-center justify-between px-4 bg-background border-b border-border"
@@ -143,6 +143,16 @@ export default function QuickEditProfilePage() {
           paddingBottom: 'calc(var(--sab) + 16px)',
         }}
       >
+        {/* gradient fade above the bar */}
+        <div
+          aria-hidden
+          className="pointer-events-none absolute left-0 right-0"
+          style={{
+            bottom: '100%',
+            height: 24,
+            background: 'linear-gradient(to top, rgba(244,246,249,1), rgba(244,246,249,0))',
+          }}
+        />
         <Button
           onClick={handleSave}
           disabled={isDisabled}
