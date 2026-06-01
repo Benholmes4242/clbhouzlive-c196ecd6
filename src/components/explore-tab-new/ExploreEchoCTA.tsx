@@ -1,6 +1,8 @@
 import { memo } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { MessageSquare } from 'lucide-react';
 import { analyticsEvents } from '@/utils/analyticsEvents';
+import { ExploreSectionHeader } from './ExploreSectionHeader';
 import type { ExploreMoodId } from './hooks/useExploreMood';
 
 /** Single source of truth for the Echo concierge amber ink colour. */
