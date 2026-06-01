@@ -5,10 +5,10 @@
  */
 
 import React from 'react';
-import { Trophy } from 'lucide-react';
+import { Crown, Trophy } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { INK, GOLD, NUMERIC_STYLE, STRIP_HEIGHT } from '../HybridHero.constants';
-import { SCORE_OVER_PAR_DARK_PALE, SLATE_800, WHITE_ALPHA_65 } from '../../../_shared/tokens';
+import { GOLD_DEEP, SCORE_OVER_PAR_DARK_PALE, SLATE_800, WHITE_ALPHA_65 } from '../../../_shared/tokens';
 import { TrajectorySparkline } from './TrajectorySparkline';
 
 interface ChampionStripProps {
