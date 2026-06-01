@@ -133,7 +133,7 @@ const HandicapInline: React.FC<{ value: number }> = ({ value }) => (
     <span
       style={{
         fontFamily: FONT_SERIF,
-        fontSize: 12,
+        fontSize: 12.5,
         fontWeight: 700,
         color: INK,
         fontVariantNumeric: 'tabular-nums',
