@@ -301,36 +301,41 @@ const CoursesContent: React.FC<CoursesContentProps> = ({ username, displayName }
             />
           </ShellSlot>
 
-          <div className="px-4" style={{ paddingTop: 'var(--chrome-total-h, 0px)' }}>
-            {/* Rate a Course CTA — slim row, hidden on Discover */}
-            {user && activeTab !== 'discover' && (
-              <button
-                onClick={() => setRateSheetOpen(true)}
-                style={{
-                  width: '100%',
-                  display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-                  padding: '10px 14px', marginTop: 10, marginBottom: 10,
-                  background: 'rgba(247,147,30,0.05)',
-                  border: '1px solid rgba(247,147,30,0.18)',
-                  borderRadius: 12,
-                  cursor: 'pointer',
-                }}
-                className="active:scale-[0.97] transition-all"
-              >
-                <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                  <Star size={14} fill={AMBER} color={AMBER} strokeWidth={0} />
-                  <span style={{ fontSize: 13, fontWeight: 600, color: INK }}>
-                    Rate a course you've played
-                  </span>
-                </div>
-                <ChevronRight size={14} color="#c97a10" strokeWidth={2.5} />
-              </button>
-            )}
+          {activeTab === 'discover' ? (
+            /* Flush hero like Tour Overview — no chrome-offset padding, hero is first child */
+            <ExploreTabContent embedded />
+          ) : (
+            <div className="px-4" style={{ paddingTop: 'var(--chrome-total-h, 0px)' }}>
+              {/* Rate a Course CTA — slim row */}
+              {user && (
+                <button
+                  onClick={() => setRateSheetOpen(true)}
+                  style={{
+                    width: '100%',
+                    display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                    padding: '10px 14px', marginTop: 10, marginBottom: 10,
+                    background: 'rgba(247,147,30,0.05)',
+                    border: '1px solid rgba(247,147,30,0.18)',
+                    borderRadius: 12,
+                    cursor: 'pointer',
+                  }}
+                  className="active:scale-[0.97] transition-all"
+                >
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                    <Star size={14} fill={AMBER} color={AMBER} strokeWidth={0} />
+                    <span style={{ fontSize: 13, fontWeight: 600, color: INK }}>
+                      Rate a course you've played
+                    </span>
+                  </div>
+                  <ChevronRight size={14} color="#c97a10" strokeWidth={2.5} />
+                </button>
+              )}
 
-            {activeTab === 'explore' && <CourseExplorer />}
-            {activeTab === 'top100' && <Top100CoursesHubPanel />}
-            {activeTab === 'discover' && <ExploreTabContent embedded />}
-          </div>
+              {activeTab === 'explore' && <CourseExplorer />}
+              {activeTab === 'top100' && <Top100CoursesHubPanel />}
+            </div>
+          )}
+
         </>
       )}
 
