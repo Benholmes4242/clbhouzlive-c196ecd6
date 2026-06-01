@@ -104,24 +104,10 @@ export const ProfilePostsFeed: React.FC<ProfilePostsFeedProps> = ({
   }
 
   return (
-    <div ref={feedContainerRef} className="flex flex-col pb-4 pt-2" style={{ gap: '8px' }}>
+    <div ref={feedContainerRef} className="flex flex-col pb-4 pt-2">
       <FriendsAutoplay posts={posts} feedRef={feedContainerRef} />
       {posts.map((post, i) => {
         const isOwnPost = isOwnProfile && post.userId === userId;
-
-        if (post.isReview && post.review) {
-          return (
-            <div key={post.id} data-card-index={i}>
-              <ReviewCard
-                post={post}
-                allPosts={posts}
-                postIndex={i}
-                isOwnPost={isOwnPost}
-                onDelete={() => handleDelete(post.id, post.userId)}
-              />
-            </div>
-          );
-        }
 
         return (
           <div key={post.id} data-card-index={i}>
