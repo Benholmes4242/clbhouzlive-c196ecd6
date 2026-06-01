@@ -126,10 +126,10 @@ export const ClubhouseTopBar: React.FC<ClubhouseTopBarProps> = ({
                   padding: 0,
                   cursor: 'pointer',
                   color: '#fff',
-                  filter: 'drop-shadow(0 1px 3px rgba(0,0,0,0.6))',
+                  filter: FLOAT_SHADOW,
                 }}
               >
-                <Search size={22} strokeWidth={2} />
+                <Search size={22} strokeWidth={FLOAT_STROKE} />
               </button>
             )}
 
