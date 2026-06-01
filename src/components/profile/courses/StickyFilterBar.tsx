@@ -78,36 +78,36 @@ export const StickyFilterBar: React.FC<StickyFilterBarProps> = ({
         </button>
       </div>
 
-      {/* Controls: country pills + sort dropdown */}
-      <div className="space-y-2 pt-2">
-        <CourseRegionPills value={activeCountry} onChange={onCountryChange} />
-        <div className="flex justify-end">
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <button
-                className="inline-flex items-center gap-1 rounded-full px-3 py-1.5 text-sm font-medium min-h-[36px] whitespace-nowrap shrink-0"
-                style={{ background: 'rgba(15,23,42,0.05)', border: '1px solid rgba(15,23,42,0.07)', color: '#0F172A' }}
-              >
-                {currentSortLabel}
-                <ChevronDown className="w-3.5 h-3.5 text-muted-foreground" />
-              </button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="min-w-[180px]">
-              {SORT_OPTIONS.map((opt) => (
-                <DropdownMenuItem
-                  key={opt.value}
-                  onClick={() => onSortChange(opt.value)}
-                  className={cn(
-                    "text-sm",
-                    activeSort === opt.value && "font-semibold"
-                  )}
-                >
-                  {opt.label}
-                </DropdownMenuItem>
-              ))}
-            </DropdownMenuContent>
-          </DropdownMenu>
+      {/* Controls: region pills + sort on a single row */}
+      <div className="flex items-center gap-3 pt-2">
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <CourseRegionPills value={activeCountry} onChange={onCountryChange} />
         </div>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <button
+              className="inline-flex items-center gap-1 rounded-full px-2.5 py-1.5 text-[12.5px] font-semibold min-h-[34px] whitespace-nowrap shrink-0"
+              style={{ background: 'rgba(15,23,42,0.04)', border: '0.5px solid rgba(15,23,42,0.08)', color: '#0F172A' }}
+            >
+              {currentSortLabel.replace('Rating: ', '')}
+              <ChevronDown className="w-3.5 h-3.5 text-muted-foreground" />
+            </button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="min-w-[180px]">
+            {SORT_OPTIONS.map((opt) => (
+              <DropdownMenuItem
+                key={opt.value}
+                onClick={() => onSortChange(opt.value)}
+                className={cn(
+                  "text-sm",
+                  activeSort === opt.value && "font-semibold"
+                )}
+              >
+                {opt.label}
+              </DropdownMenuItem>
+            ))}
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
     </div>
   );

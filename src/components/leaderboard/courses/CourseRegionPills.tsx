@@ -22,7 +22,7 @@ export const CourseRegionPills: React.FC<CourseRegionPillsProps> = ({ value, onC
     <div
       style={{
         display: 'flex',
-        gap: 18,
+        gap: 16,
         overflowX: 'auto',
         scrollbarWidth: 'none',
       }}
@@ -38,7 +38,7 @@ export const CourseRegionPills: React.FC<CourseRegionPillsProps> = ({ value, onC
               display: 'flex',
               alignItems: 'center',
               gap: 6,
-              padding: '6px 4px',
+              padding: '4px 2px',
               background: 'transparent',
               border: 'none',
               cursor: 'pointer',

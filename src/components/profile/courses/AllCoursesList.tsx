@@ -304,7 +304,7 @@ export const AllCoursesList: React.FC<AllCoursesListProps> = ({
     <div ref={sectionRef} className="py-4">
       {/* Section header */}
       <div className="mb-3">
-        <h2 className="text-[17px] font-semibold text-foreground">
+        <h2 className="text-[19px] font-bold text-foreground" style={{ letterSpacing: '-0.02em' }}>
           Course History
         </h2>
         <p className="text-[13px] text-muted-foreground mt-0.5">
