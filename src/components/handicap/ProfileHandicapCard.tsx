@@ -115,11 +115,13 @@ const ProfileHandicapCard: React.FC<Props> = ({
     const range = max - min || 1;
     const W = 100;
     const H = 32;
+    const PAD_Y = 3; // keeps the stroke off the top/bottom edges
     const stepX = pts.length > 1 ? W / (pts.length - 1) : 0;
+    const plotH = H - PAD_Y * 2;
     const path = pts
       .map((v, i) => {
         const x = i * stepX;
-        const y = H - ((v - min) / range) * H;
+        const y = PAD_Y + (plotH - ((v - min) / range) * plotH);
         return `${i === 0 ? 'M' : 'L'}${x.toFixed(2)},${y.toFixed(2)}`;
       })
       .join(' ');
