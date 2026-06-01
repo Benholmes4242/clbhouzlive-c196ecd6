@@ -120,6 +120,7 @@ function ExploreTileInner({ post, index, allPosts, variant = 'tile', feature = f
             <span style={{
               fontSize: pinFs, fontWeight: 600, color: '#fff',
               overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+              textShadow: '0 1px 4px rgba(0,0,0,0.55)',
             }}>
               {courseName}
             </span>
