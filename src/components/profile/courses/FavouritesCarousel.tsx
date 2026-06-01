@@ -216,7 +216,6 @@ export const FavouritesCarousel: React.FC<FavouritesCarouselProps> = ({
       <div className="flex items-center justify-between mb-4 px-4">
         <div className="flex items-center gap-3">
           <div>
-          <div>
             <h2 className="text-lg font-semibold text-foreground">
               {getTitle()}
             </h2>
