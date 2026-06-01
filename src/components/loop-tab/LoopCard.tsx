@@ -3,6 +3,7 @@ import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
 import { useNavigate } from 'react-router-dom';
 import { formatDistanceToNow } from 'date-fns';
 import { Heart, MessageCircle, Share2, MapPin, X } from 'lucide-react';
+import { getRatingTierLabel } from '@/lib/ratingTier';
 import clbhouzLogo from '@/assets/clbhouz-logo.png';
 import type { FeedPost } from '@/components/media-system/types/media';
 import PostFeedCarousel from '@/components/feed/PostFeedCarousel';
