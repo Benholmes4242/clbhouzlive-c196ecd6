@@ -12,6 +12,7 @@ interface PostFeedCarouselProps {
   /** Optional overlays rendered above slides (e.g. duration badge, rating badge). */
   topRightOverlay?: React.ReactNode;
   bottomRightOverlay?: React.ReactNode;
+  bottomLeftOverlay?: React.ReactNode;
   ariaLabel?: string;
 }
 
