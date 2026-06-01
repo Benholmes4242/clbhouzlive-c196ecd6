@@ -77,14 +77,19 @@ function ExploreSectionHeaderInner({
         ) : null}
         <h2
           style={{
-            fontSize: 18,
+            fontSize: Icon ? 10.5 : 18,
             fontWeight: 800,
-            letterSpacing: '-0.015em',
+            letterSpacing: Icon ? '0.14em' : '-0.015em',
             lineHeight: 1.2,
-            color: INK,
+            color: Icon ? AMBER : INK,
             margin: `${kicker ? 6 : 0}px 0 0`,
+            textTransform: Icon ? 'uppercase' as const : 'none',
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: 6,
           }}
         >
+          {Icon && <Icon size={11} strokeWidth={2.4} />}
           {title}
         </h2>
         {sub ? (
