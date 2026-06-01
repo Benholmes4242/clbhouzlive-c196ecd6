@@ -32,7 +32,7 @@ function ExploreDestinationsInner({ activeRegion, onRegionSelect }: ExploreDesti
 
   return (
     <section style={{ padding: '0 0 0' }}>
-      <ExploreSectionHeader title="Destinations" sub="Pick a region to filter the feed" />
+      <ExploreSectionHeader title="Destinations" icon={MapPin} sub="Pick a region to filter the feed" />
       <div className="flex gap-3 px-4 overflow-x-auto scrollbar-hide" style={{ paddingBottom: 4 }}>
         {regions.map((r: any) => {
           const slug = r.slug ?? r.id ?? r.region_slug;
