@@ -245,7 +245,7 @@ export const FeedActionRail: React.FC<FeedActionRailProps> = ({
             flexDirection: 'column',
             alignItems: 'center',
             gap: 0,
-            filter: 'drop-shadow(0 1px 4px rgba(0,0,0,0.6))',
+            filter: FLOAT_SHADOW,
           }}
         >
           <button
