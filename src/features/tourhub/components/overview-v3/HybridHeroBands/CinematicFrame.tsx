@@ -323,7 +323,7 @@ function ChampionRowDark({
       }}
     >
       <span style={{ width: 22, display: 'flex', justifyContent: 'center', flexShrink: 0 }}>
-        <Trophy size={14} color={GOLD} fill={GOLD} strokeWidth={0} />
+        <Crown size={14} strokeWidth={2.5} fill={GOLD} style={{ color: GOLD_DEEP }} />
       </span>
       {avatarUrl ? (
         <img
