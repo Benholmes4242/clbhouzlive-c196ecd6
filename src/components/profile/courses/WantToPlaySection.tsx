@@ -189,7 +189,7 @@ export const WantToPlaySection: React.FC<WantToPlaySectionProps> = ({
   if (wantToPlay.length <= 2) {
     return (
       <section className={cn('', className)}>
-        <div className="flex items-center gap-1.5 mb-2 px-4">
+        <div className="flex items-center gap-1.5 mb-2 px-2.5">
           <Trophy size={11} strokeWidth={2.4} color="#F7931E" />
           <span
             style={{
