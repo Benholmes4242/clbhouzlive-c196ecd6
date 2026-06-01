@@ -243,6 +243,11 @@ export const PostFeedCarousel = memo(function PostFeedCarousel({
           {bottomRightOverlay}
         </div>
       )}
+      {bottomLeftOverlay && (
+        <div className="absolute bottom-2 left-2 z-10 pointer-events-none">
+          {bottomLeftOverlay}
+        </div>
+      )}
     </div>
   );
 });
