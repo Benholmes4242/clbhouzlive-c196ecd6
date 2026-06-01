@@ -31,7 +31,7 @@ export function GolfInfoStep({ form, userId: _userId, onFieldChange, onAddClub, 
           onVisibilityChange={(v) => onFieldChange('homeClubVisibility', v)}
         />
         {!form.homeClubName && (
-          <p style={{ fontSize: 12, color: '#F7931E', marginTop: 6, marginLeft: 4, display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+          <p style={{ fontFamily: GEIST, fontSize: 12, color: '#F7931E', marginTop: 6, marginLeft: 4, display: 'inline-flex', alignItems: 'center', gap: 6 }}>
             <Flag size={12} strokeWidth={2.25} />
             <span>Your home club appears on your profile and leaderboards</span>
           </p>
