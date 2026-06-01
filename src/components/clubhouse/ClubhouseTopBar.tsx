@@ -88,7 +88,7 @@ export const ClubhouseTopBar: React.FC<ClubhouseTopBarProps> = ({
             transition: 'opacity 240ms cubic-bezier(0.22, 0.61, 0.36, 1), transform 240ms cubic-bezier(0.22, 0.61, 0.36, 1)',
           }}
         >
-          <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
             {!hideTabs && (
               <ClubhouseTabToggle
                 activeTab={activeTab}
