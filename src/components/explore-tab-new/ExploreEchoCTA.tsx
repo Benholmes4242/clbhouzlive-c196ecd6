@@ -103,6 +103,7 @@ function ExploreEchoCTAInner({ mood }: ExploreEchoCTAProps) {
         paddingTop={24}
       />
 
+      <div style={{ padding: '0 16px' }}>
       {/* Main amber card with sample quote */}
       <button
         type="button"
