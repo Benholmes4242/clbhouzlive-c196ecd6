@@ -8,7 +8,7 @@
  */
 
 import React, { useState } from 'react';
-import { ArrowLeftRight, Check, Trophy } from 'lucide-react';
+import { ArrowLeftRight, Check, Crown } from 'lucide-react';
 import { BottomSheet } from '@/components/ui/BottomSheet';
 import { SheetHeader } from '@/components/ui/SheetHeader';
 import { getTourLogo } from '../utils/tourLogos';
@@ -18,6 +18,7 @@ import {
   AMBER,
   AMBER_TINT_04,
   FONT,
+  GOLD,
   GOLD_DEEP,
   INK,
   INK_ALPHA_45,
@@ -193,9 +194,10 @@ export const TourSwitcherAffordance: React.FC = () => {
                   </span>
                 ) : status === 'results' ? (
                   <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, flexShrink: 0 }}>
-                    <Trophy size={11} color={GOLD_DEEP} fill={GOLD_DEEP} strokeWidth={0} aria-hidden />
-                    <span style={{ fontSize: 10, fontWeight: 800, letterSpacing: '0.16em', color: GOLD_DEEP }}>FINAL</span>
+                    <Crown size={12} strokeWidth={2.5} fill={GOLD} style={{ color: GOLD_DEEP }} aria-hidden />
+                    <span style={{ fontSize: 10, fontWeight: 800, letterSpacing: '0.16em', color: GOLD_DEEP }}>RESULTS</span>
                   </span>
+
                 ) : status === 'upcoming' ? (
                   <span style={{ flexShrink: 0, fontSize: 10, fontWeight: 800, letterSpacing: '0.16em', color: INK_ALPHA_45 }}>
                     UPCOMING
