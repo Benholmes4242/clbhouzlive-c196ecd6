@@ -1164,7 +1164,7 @@ const ProfilePageV2Content: React.FC = () => {
           }}
         >
           <div 
-            className="flex items-center gap-1 w-full"
+            className="flex items-center gap-6 w-full"
           >
             {tabs.map((tab) => {
               const isActive = activeSection === tab.id;
@@ -1173,20 +1173,27 @@ const ProfilePageV2Content: React.FC = () => {
                   key={tab.id}
                   onClick={() => handleTabChange(tab.id)}
                   className={cn(
-                    "relative py-1.5 px-2 text-sm transition-colors duration-200 whitespace-nowrap min-h-[44px] active:scale-[0.98] flex-1",
-                    isActive
-                      ? "font-extrabold"
-                      : "font-medium hover:text-foreground"
+                    "relative text-sm transition-colors duration-200 whitespace-nowrap min-h-[44px] active:scale-[0.98] flex items-center justify-center",
+                    isActive ? "font-bold" : "font-semibold hover:text-foreground"
                   )}
                   style={{
                     touchAction: 'auto',
                     background: 'transparent',
                     border: 'none',
                     color: isActive ? '#0F172A' : '#94A3B8',
-                    letterSpacing: isActive ? '-0.01em' : 0,
+                    letterSpacing: '-0.01em',
+                    padding: '8px 0',
                   }}
                 >
-                  {tab.label}
+                  <span
+                    style={{
+                      display: 'inline-block',
+                      paddingBottom: 6,
+                      borderBottom: isActive ? '1.5px solid #0F172A' : '1.5px solid transparent',
+                    }}
+                  >
+                    {tab.label}
+                  </span>
                 </button>
               );
             })}
