@@ -50,6 +50,10 @@ interface ClubhouseTopBarProps {
 
 const TOP_STRIP_TOP = 'calc(max(env(safe-area-inset-top, 0px), 47px) + 6px)';
 
+// Unified lift for every floating glyph in the immersive feed chrome.
+const FLOAT_SHADOW = 'drop-shadow(0 1px 4px rgba(0,0,0,0.55))';
+const FLOAT_STROKE = 2;
+
 export const ClubhouseTopBar: React.FC<ClubhouseTopBarProps> = ({
   activeTab,
   onTabChange,
@@ -84,7 +88,7 @@ export const ClubhouseTopBar: React.FC<ClubhouseTopBarProps> = ({
             transition: 'opacity 240ms cubic-bezier(0.22, 0.61, 0.36, 1), transform 240ms cubic-bezier(0.22, 0.61, 0.36, 1)',
           }}
         >
-          <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
             {!hideTabs && (
               <ClubhouseTabToggle
                 activeTab={activeTab}
@@ -122,10 +126,10 @@ export const ClubhouseTopBar: React.FC<ClubhouseTopBarProps> = ({
                   padding: 0,
                   cursor: 'pointer',
                   color: '#fff',
-                  filter: 'drop-shadow(0 1px 3px rgba(0,0,0,0.6))',
+                  filter: FLOAT_SHADOW,
                 }}
               >
-                <Search size={22} strokeWidth={2} />
+                <Search size={22} strokeWidth={FLOAT_STROKE} />
               </button>
             )}
 

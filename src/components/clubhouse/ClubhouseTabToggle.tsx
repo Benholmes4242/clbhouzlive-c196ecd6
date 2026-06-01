@@ -65,6 +65,20 @@ export const ClubhouseTabToggle = ({
             }}
           >
             {label}
+            {isActive && (
+              <span
+                aria-hidden
+                style={{
+                  position: 'absolute',
+                  left: 4,
+                  right: 4,
+                  bottom: 0,
+                  height: 2,
+                  background: '#F7931E',
+                  borderRadius: 1,
+                }}
+              />
+            )}
           </button>
         );
       })}

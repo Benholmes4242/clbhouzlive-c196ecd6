@@ -19,6 +19,11 @@ import { Heart, MessageCircle, Send, MoreHorizontal, Volume2, VolumeX, Plus, Che
 import { Z } from '@/config/zIndex';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 
+// Shared lift + stroke for every floating glyph in the immersive feed chrome.
+const FLOAT_SHADOW = 'drop-shadow(0 1px 4px rgba(0,0,0,0.55))';
+const FLOAT_STROKE = 2;
+const COUNT_TEXT_SHADOW = '0 1px 3px rgba(0,0,0,0.6)';
+
 interface FeedActionRailProps {
   creator: {
     id: string;
@@ -96,7 +101,7 @@ const ActionButton: React.FC<ActionButtonProps> = ({
         cursor: 'pointer',
         transform: pressed ? 'scale(0.92)' : 'scale(1)',
         transition: 'transform 0.12s',
-        filter: 'drop-shadow(0 1px 3px rgba(0,0,0,0.55))',
+        filter: FLOAT_SHADOW,
         fontFamily: 'Geist, system-ui, sans-serif',
       }}
     >
@@ -117,6 +122,7 @@ const ActionButton: React.FC<ActionButtonProps> = ({
             color: accentCount ? '#F7931E' : '#fff',
             fontVariantNumeric: 'tabular-nums',
             lineHeight: 1,
+            textShadow: COUNT_TEXT_SHADOW,
           }}
         >
           {count}
@@ -188,13 +194,13 @@ export const FeedActionRail: React.FC<FeedActionRailProps> = ({
         padding: 0,
         color: '#fff',
         cursor: 'pointer',
-        filter: 'drop-shadow(0 1px 3px rgba(0,0,0,0.5))',
+        filter: FLOAT_SHADOW,
       }}
     >
       {isMuted ? (
-        <VolumeX size={28} stroke="#fff" strokeWidth={2} />
+        <VolumeX size={28} stroke="#fff" strokeWidth={FLOAT_STROKE} />
       ) : (
-        <Volume2 size={28} stroke="#fff" strokeWidth={2} />
+        <Volume2 size={28} stroke="#fff" strokeWidth={FLOAT_STROKE} />
       )}
     </button>
   ) : null;
@@ -239,7 +245,7 @@ export const FeedActionRail: React.FC<FeedActionRailProps> = ({
             flexDirection: 'column',
             alignItems: 'center',
             gap: 0,
-            filter: 'drop-shadow(0 1px 4px rgba(0,0,0,0.6))',
+            filter: FLOAT_SHADOW,
           }}
         >
           <button
@@ -350,7 +356,7 @@ export const FeedActionRail: React.FC<FeedActionRailProps> = ({
               size={28}
               fill={hasLiked ? '#F7931E' : 'transparent'}
               stroke={hasLiked ? '#F7931E' : '#fff'}
-              strokeWidth={2}
+              strokeWidth={FLOAT_STROKE}
             />
           </ActionButton>
 
@@ -360,17 +366,17 @@ export const FeedActionRail: React.FC<FeedActionRailProps> = ({
             ariaLabel="Comments"
             count={formatCount(commentsCount)}
           >
-            <MessageCircle size={28} stroke="#fff" strokeWidth={2} />
+            <MessageCircle size={28} stroke="#fff" strokeWidth={FLOAT_STROKE} />
           </ActionButton>
 
           {/* Share */}
           <ActionButton onClick={onShare} ariaLabel="Share">
-            <Send size={28} stroke="#fff" strokeWidth={2} />
+            <Send size={28} stroke="#fff" strokeWidth={FLOAT_STROKE} />
           </ActionButton>
 
           {/* More */}
           <ActionButton onClick={onMore} ariaLabel="More options">
-            <MoreHorizontal size={28} stroke="#fff" strokeWidth={2} />
+            <MoreHorizontal size={28} stroke="#fff" strokeWidth={FLOAT_STROKE} />
           </ActionButton>
         </>
       )}
