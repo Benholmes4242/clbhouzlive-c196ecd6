@@ -317,15 +317,15 @@ export const WantToPlaySection: React.FC<WantToPlaySectionProps> = ({
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'space-between',
-                    padding: '10px 14px',
+                    padding: '10px 12px 10px 14px',
                     background: '#FFFFFF',
                   }}
                 >
                   <span
                     style={{
-                      fontSize: 9,
+                      fontSize: 10.5,
                       fontWeight: 700,
-                      letterSpacing: '0.16em',
+                      letterSpacing: '0.06em',
                       color: '#94A3B8',
                       textTransform: 'uppercase' as const,
                     }}
@@ -359,17 +359,21 @@ export const WantToPlaySection: React.FC<WantToPlaySectionProps> = ({
                           handleRemove(course);
                         }}
                         aria-label="Remove from bucket list"
-                        className="min-h-[36px] min-w-[36px] active:scale-[0.95]"
+                        className="active:scale-[0.95]"
                         style={{
-                          background: 'rgba(15,23,42,0.05)',
-                          borderRadius: 8,
-                          border: 0,
+                          background: 'rgba(15,23,42,0.04)',
+                          borderRadius: 9,
+                          border: '0.5px solid rgba(15,23,42,0.08)',
                           display: 'flex',
                           alignItems: 'center',
                           justifyContent: 'center',
+                          width: 32,
+                          height: 32,
+                          minHeight: 32,
+                          minWidth: 32,
                         }}
                       >
-                        <X className="w-4 h-4 text-muted-foreground" />
+                        <X className="w-3.5 h-3.5" style={{ color: '#64748B' }} />
                       </button>
                     </div>
                   )}
