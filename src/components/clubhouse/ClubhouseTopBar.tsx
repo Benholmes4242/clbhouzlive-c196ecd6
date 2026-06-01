@@ -50,6 +50,10 @@ interface ClubhouseTopBarProps {
 
 const TOP_STRIP_TOP = 'calc(max(env(safe-area-inset-top, 0px), 47px) + 6px)';
 
+// Unified lift for every floating glyph in the immersive feed chrome.
+const FLOAT_SHADOW = 'drop-shadow(0 1px 4px rgba(0,0,0,0.55))';
+const FLOAT_STROKE = 2;
+
 export const ClubhouseTopBar: React.FC<ClubhouseTopBarProps> = ({
   activeTab,
   onTabChange,
