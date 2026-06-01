@@ -12,7 +12,7 @@
  */
 import React, { useState } from 'react';
 import { AnimatePresence } from 'framer-motion';
-import { MapPin, Crown, Flame, Eye, Flag } from 'lucide-react';
+import { MapPin, Crown } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { TopTenCourse } from '@/hooks/useUserTopTenCourses';
