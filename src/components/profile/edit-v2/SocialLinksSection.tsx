@@ -37,7 +37,7 @@ function SocialRow({
   onChange: (v: string) => void;
 }) {
   return (
-    <div className="flex overflow-hidden rounded-[10px] border border-border/60">
+    <div className="flex overflow-hidden rounded-[11px] border border-border/60">
       <div className="w-11 flex-shrink-0 flex items-center justify-center bg-[#F0F4F3] text-muted-foreground border-r border-border/60">
         {icon}
       </div>

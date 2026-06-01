@@ -1,3 +1,4 @@
+import type React from 'react';
 import { Plus, X } from 'lucide-react';
 import { WebsiteEntry, BIO_MAX } from '@/components/profile/profile-wizard/types';
 import { SectionEyebrow } from '@/components/ui/SectionEyebrow';
@@ -40,7 +41,8 @@ export function BioWebsitesSection({
           maxLength={BIO_MAX}
           rows={4}
           placeholder="Tell the clbhouz community about yourself and your golf game…"
-          className="w-full bg-[#F8FAFC] border border-border/60 rounded-[10px] px-3.5 py-2.5 text-[15px] leading-relaxed text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-[hsl(38,92%,50%)]/40 focus:bg-background transition-colors resize-none"
+          className="scrollbar-hide w-full bg-[#F8FAFC] border border-border/60 rounded-[11px] px-3.5 py-2.5 text-[15px] leading-relaxed text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-[hsl(38,92%,50%)]/40 focus:bg-background transition-colors resize-none"
+          style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' } as React.CSSProperties}
         />
         {bioError && <p className="text-[12px] text-destructive mt-1">{bioError}</p>}
       </div>
@@ -56,7 +58,7 @@ export function BioWebsitesSection({
                 value={site.url}
                 onChange={(e) => onUpdateWebsite(site.id, e.target.value)}
                 placeholder="https://yoursite.com"
-                className="flex-1 bg-[#F8FAFC] border border-border/60 rounded-[10px] px-3.5 py-2.5 text-[15px] text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-[hsl(38,92%,50%)]/40 focus:bg-background transition-colors"
+                className="flex-1 bg-[#F8FAFC] border border-border/60 rounded-[11px] px-3.5 py-2.5 text-[15px] text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-[hsl(38,92%,50%)]/40 focus:bg-background transition-colors"
               />
               <button
                 onClick={() => onRemoveWebsite(site.id)}

@@ -1,0 +1,59 @@
+import { Check } from 'lucide-react';
+
+export interface SegOption {
+  value: string;
+  label: string;
+  hint?: string;
+}
+
+interface SegToggleProps {
+  options: SegOption[];
+  value: string;
+  onChange: (v: string) => void;
+  /** true = flex-1 equal widths (handicap), false/undefined = hug content (gender) */
+  fill?: boolean;
+}
+
+export function SegToggle({ options, value, onChange, fill }: SegToggleProps) {
+  return (
+    <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+      {options.map((o) => {
+        const active = value === o.value;
+        return (
+          <button
+            key={o.value}
+            type="button"
+            onClick={() => onChange(o.value)}
+            className="transition-all active:scale-[0.98]"
+            style={{
+              flex: fill ? 1 : '0 0 auto',
+              minHeight: 44,
+              display: 'inline-flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: 6,
+              padding: '9px 14px',
+              borderRadius: 11,
+              cursor: 'pointer',
+              fontSize: 14,
+              fontWeight: active ? 700 : 500,
+              color: active ? '#F7931E' : '#64748B',
+              background: active ? 'rgba(247,147,30,0.10)' : '#F8FAFC',
+              border: active
+                ? '1px solid rgba(247,147,30,0.40)'
+                : '1px solid rgba(15,23,42,0.08)',
+            }}
+          >
+            {active && <Check size={13} strokeWidth={3} />}
+            <span>{o.label}</span>
+            {o.hint && (
+              <span style={{ fontWeight: 500, color: '#94A3B8', fontSize: 12 }}>
+                {o.hint}
+              </span>
+            )}
+          </button>
+        );
+      })}
+    </div>
+  );
+}

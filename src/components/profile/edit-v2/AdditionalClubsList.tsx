@@ -41,7 +41,7 @@ export function AdditionalClubsList({
           {clubs.map((club) => (
             <div
               key={club.id}
-              className="flex items-center justify-between bg-[#F8FAFC] border border-border/60 rounded-[10px] px-4 py-3 min-h-[44px]"
+              className="flex items-center justify-between bg-[#F8FAFC] border border-border/60 rounded-[11px] px-4 py-3 min-h-[44px]"
             >
               <p className="text-[14px] font-medium text-foreground">{club.name}</p>
               <button
@@ -64,7 +64,7 @@ export function AdditionalClubsList({
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Search for a club"
-            className="w-full bg-[#F8FAFC] border border-border/60 rounded-[10px] pl-9 pr-4 py-3 text-[15px] text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-[hsl(38,92%,50%)]/40 focus:bg-background transition-colors"
+            className="w-full bg-[#F8FAFC] border border-border/60 rounded-[11px] pl-9 pr-4 py-3 text-[15px] text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-[hsl(38,92%,50%)]/40 focus:bg-background transition-colors"
           />
           {query.length >= 2 && (
             <div className="absolute top-full left-0 right-0 mt-1 bg-card border border-border rounded-xl shadow-lg z-20 max-h-48 overflow-y-auto">

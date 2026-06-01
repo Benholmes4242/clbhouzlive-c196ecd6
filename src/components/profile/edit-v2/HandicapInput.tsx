@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { Plus } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { SectionEyebrow } from '@/components/ui/SectionEyebrow';
+import { SegToggle } from './SegToggle';
 
 interface Props {
   value: string;
@@ -50,34 +50,16 @@ export function HandicapInput({ value, onChange }: Props) {
       </div>
 
       {/* Standard / Plus toggle */}
-      <div className="flex gap-2 mb-3">
-        <button
-          type="button"
-          onClick={() => handleToggle(false)}
-          className={cn(
-            'flex-1 flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl border-2 transition-all min-h-[44px] active:scale-[0.98]',
-            !isPlusHandicap
-              ? 'border-amber-500 bg-amber-500/5 text-foreground'
-              : 'border-border text-muted-foreground'
-          )}
-        >
-          <span className="text-sm font-semibold">Standard</span>
-          <span className="text-[10px] opacity-60">(0 – 54)</span>
-        </button>
-        <button
-          type="button"
-          onClick={() => handleToggle(true)}
-          className={cn(
-            'flex-1 flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl border-2 transition-all min-h-[44px] active:scale-[0.98]',
-            isPlusHandicap
-              ? 'border-amber-500 bg-amber-500/5 text-foreground'
-              : 'border-border text-muted-foreground'
-          )}
-        >
-          <Plus size={14} />
-          <span className="text-sm font-semibold">Plus</span>
-          <span className="text-[10px] opacity-60">(+0.1 – +10)</span>
-        </button>
+      <div className="mb-3">
+        <SegToggle
+          fill
+          value={isPlusHandicap ? 'plus' : 'standard'}
+          onChange={(v) => handleToggle(v === 'plus')}
+          options={[
+            { value: 'standard', label: 'Standard', hint: '0–54' },
+            { value: 'plus', label: 'Plus', hint: '+0.1–+10' },
+          ]}
+        />
       </div>
 
       {/* Value input */}
@@ -92,7 +74,7 @@ export function HandicapInput({ value, onChange }: Props) {
           onChange={handleChange}
           placeholder={isPlusHandicap ? '1.2' : 'e.g. 8.4'}
           className={cn(
-            'w-full bg-[#F8FAFC] border border-border/60 rounded-[10px] py-3 text-[15px] font-semibold text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-[hsl(38,92%,50%)]/40 focus:bg-background transition-colors',
+            'w-full bg-[#F8FAFC] border border-border/60 rounded-[11px] py-3 text-[15px] font-semibold text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-[hsl(38,92%,50%)]/40 focus:bg-background transition-colors',
             isPlusHandicap ? 'pl-9 pr-4' : 'px-4'
           )}
         />
