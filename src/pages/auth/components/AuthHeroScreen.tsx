@@ -301,16 +301,17 @@ const AuthHeroScreen: React.FC<AuthHeroScreenProps> = ({
                 onClick={handleContinue}
                 disabled={submitting || !loginEmail.trim()}
                 aria-label="Continue to login"
-                className="w-full h-[56px] flex items-center justify-center rounded-full font-bold text-[15px] transition-all duration-150 active:scale-[0.98]"
+                className="w-full h-[54px] flex items-center justify-center gap-2 rounded-[14px] font-bold text-[15px] transition-all duration-150 active:scale-[0.98]"
                 style={{
-                  background: loginEmail.trim() ? '#ffffff' : 'rgba(255,255,255,0.05)',
-                  color: loginEmail.trim() ? '#0F172A' : 'rgba(255,255,255,0.35)',
+                  background: loginEmail.trim() ? '#F7931E' : 'rgba(255,255,255,0.05)',
+                  color: loginEmail.trim() ? '#FFFFFF' : 'rgba(255,255,255,0.35)',
                   border: loginEmail.trim() ? 'none' : '1px solid rgba(255,255,255,0.10)',
                   boxShadow: 'none',
                   cursor: !loginEmail.trim() ? 'not-allowed' : 'pointer',
                 }}
               >
                 Continue
+                {loginEmail.trim() && <ArrowRight size={17} aria-hidden="true" />}
               </button>
             </div>
           </div>
