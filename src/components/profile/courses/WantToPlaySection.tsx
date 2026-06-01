@@ -189,22 +189,22 @@ export const WantToPlaySection: React.FC<WantToPlaySectionProps> = ({
   if (wantToPlay.length <= 2) {
     return (
       <section className={cn('', className)}>
-        <div className="flex items-center gap-1.5 mb-3 px-4">
+        <div className="flex items-center gap-1.5 mb-2 px-4">
           <div
             style={{
               width: 3,
-              height: 8,
+              height: 11,
               background: '#F7931E',
-              borderRadius: 1,
+              borderRadius: 2,
               flexShrink: 0,
             }}
           />
           <span
             style={{
-              fontSize: 9,
-              fontWeight: 900,
+              fontSize: 10.5,
+              fontWeight: 800,
               color: '#F7931E',
-              letterSpacing: '0.16em',
+              letterSpacing: '0.14em',
               textTransform: 'uppercase' as const,
             }}
           >
