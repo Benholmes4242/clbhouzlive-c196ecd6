@@ -18,6 +18,7 @@ import {
   AMBER,
   AMBER_TINT_04,
   FONT,
+  GOLD,
   GOLD_DEEP,
   INK,
   INK_ALPHA_45,
