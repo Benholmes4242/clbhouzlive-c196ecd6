@@ -5,6 +5,7 @@ import { useExploreMood } from './hooks/useExploreMood';
 import { useExploreRegion } from './hooks/useExploreRegion';
 import { ExploreHero } from './ExploreHero';
 import { ExploreRecommendations } from './ExploreRecommendations';
+import ConnectHandicapCue from '@/components/courses/course-detail/ConnectHandicapCue';
 import { ExplorePassport } from './ExplorePassport';
 import { ExploreEchoCTA } from './ExploreEchoCTA';
 import { ExploreDestinations } from './ExploreDestinations';
@@ -54,6 +55,9 @@ export default function ExploreTabContent({ embedded: _embedded = false }: Explo
     <div style={{ background: SLATE_50, minHeight: '100vh' }}>
       <div style={{ marginLeft: -16, marginRight: -16 }}>
         <ExploreHero userId={userId} mood={mood} />
+      </div>
+      <div style={{ paddingTop: 12, paddingBottom: 4 }}>
+        <ConnectHandicapCue variant="discover" />
       </div>
       <ExplorePassport userId={userId} />
       <ExploreRecommendations userId={userId} mood={mood} />

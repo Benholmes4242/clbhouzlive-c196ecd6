@@ -8,7 +8,7 @@ import UserCoursesContent from './UserCoursesContent';
 import Top100CoursesHubPanel from './Top100CoursesHubPanel';
 import Top100LeaderboardPanel from './Top100LeaderboardPanel';
 import ExploreTabContent from '@/components/explore-tab-new/ExploreTabContent';
-import ConnectHandicapCue from '@/components/courses/course-detail/ConnectHandicapCue';
+
 
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { Button } from '@/components/ui/button';
@@ -329,14 +329,7 @@ const CoursesContent: React.FC<CoursesContentProps> = ({ username, displayName }
 
             {activeTab === 'explore' && <CourseExplorer />}
             {activeTab === 'top100' && <Top100CoursesHubPanel />}
-            {activeTab === 'discover' && (
-              <>
-                <div style={{ paddingTop: 8, paddingBottom: 4 }}>
-                  <ConnectHandicapCue variant="discover" />
-                </div>
-                <ExploreTabContent embedded />
-              </>
-            )}
+            {activeTab === 'discover' && <ExploreTabContent embedded />}
           </div>
         </>
       )}

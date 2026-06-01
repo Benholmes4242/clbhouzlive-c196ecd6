@@ -11,6 +11,12 @@ interface ExploreHeroProps {
   mood: ExploreMoodId;
 }
 
+const HERO_HEIGHT = 448; // 560 − 20%
+const CINEMATIC_SCRIM =
+  'linear-gradient(to top, rgba(5,9,15,0.97) 0%, rgba(5,9,15,0.78) 24%, rgba(5,9,15,0.30) 50%, rgba(5,9,15,0.10) 72%, rgba(5,9,15,0.30) 100%)';
+const VIGNETTE =
+  'radial-gradient(120% 90% at 50% 38%, rgba(0,0,0,0) 40%, rgba(0,0,0,0.45) 100%)';
+
 const TIER_LABELS: Record<string, string> = {
   strict: '',
   expanded: 'Broader pick',
@@ -48,7 +54,7 @@ function ExploreHeroInner({ userId, mood }: ExploreHeroProps) {
     return (
       <div
         className="w-full animate-pulse"
-        style={{ height: 560, background: INK_TINT_06 }}
+        style={{ height: HERO_HEIGHT, background: INK_TINT_06 }}
       />
     );
   }
@@ -56,8 +62,6 @@ function ExploreHeroInner({ userId, mood }: ExploreHeroProps) {
   if (!hero) return null;
 
   const tierLabel = hero.filter_tier ? TIER_LABELS[hero.filter_tier] ?? '' : '';
-  const CINEMATIC_SCRIM =
-    'linear-gradient(to top, rgba(7,12,20,0.94) 0%, rgba(7,12,20,0.55) 32%, rgba(7,12,20,0.12) 56%, rgba(7,12,20,0.22) 100%)';
 
   return (
     <button
@@ -67,7 +71,7 @@ function ExploreHeroInner({ userId, mood }: ExploreHeroProps) {
       style={{
         position: 'relative',
         width: '100%',
-        height: 560,
+        height: HERO_HEIGHT,
         overflow: 'hidden',
         background: SLATE_50,
         flexShrink: 0,
@@ -75,18 +79,28 @@ function ExploreHeroInner({ userId, mood }: ExploreHeroProps) {
         padding: 0,
       }}
     >
+      <style>{`
+        @keyframes clbhzHeroZoom { from { transform: scale(1.06); } to { transform: scale(1.16); } }
+        .clbhz-hero-img { animation: clbhzHeroZoom 18s ease-out forwards; transform-origin: center; }
+        @media (prefers-reduced-motion: reduce) {
+          .clbhz-hero-img { animation: none !important; transform: scale(1.04) !important; }
+        }
+      `}</style>
+
       {hero.hero_image_url ? (
         <img
           src={hero.hero_image_url}
           alt={hero.course_name}
           loading="lazy"
-          style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center' }}
+          className="clbhz-hero-img"
+          style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center', willChange: 'transform' }}
         />
       ) : (
         <FallbackImage name={hero.course_name} />
       )}
 
-      <div aria-hidden="true" style={{ position: 'absolute', inset: 0, background: CINEMATIC_SCRIM }} />
+      <div aria-hidden="true" style={{ position: 'absolute', inset: 0, background: VIGNETTE, pointerEvents: 'none' }} />
+      <div aria-hidden="true" style={{ position: 'absolute', inset: 0, background: CINEMATIC_SCRIM, pointerEvents: 'none' }} />
 
       <div
         style={{
@@ -94,7 +108,7 @@ function ExploreHeroInner({ userId, mood }: ExploreHeroProps) {
           inset: 0,
           display: 'flex',
           flexDirection: 'column',
-          padding: '18px 14px 16px',
+          padding: '16px 16px 18px',
           color: SURFACE,
         }}
       >
@@ -102,15 +116,28 @@ function ExploreHeroInner({ userId, mood }: ExploreHeroProps) {
           <span
             style={{
               display: 'inline-flex', alignItems: 'center', gap: 6,
-              fontSize: 12, fontWeight: 800, letterSpacing: '0.14em', textTransform: 'uppercase',
+              fontSize: 12, fontWeight: 800, letterSpacing: '0.16em', textTransform: 'uppercase',
               color: AMBER,
+              textShadow: '0 1px 8px rgba(0,0,0,0.4)',
             }}
           >
             <span style={{ fontSize: 13, lineHeight: 1 }}>🔥</span>
             Featured
           </span>
           {hero.global_rank ? (
-            <span style={{ fontSize: 12, fontWeight: 700, letterSpacing: '0.04em', color: 'rgba(255,255,255,0.65)' }}>
+            <span
+              style={{
+                display: 'inline-flex', alignItems: 'center',
+                fontSize: 11, fontWeight: 800, letterSpacing: '0.08em',
+                color: 'rgba(255,255,255,0.95)',
+                padding: '5px 9px',
+                borderRadius: 999,
+                background: 'rgba(255,255,255,0.12)',
+                backdropFilter: 'blur(12px)',
+                WebkitBackdropFilter: 'blur(12px)',
+                border: '1px solid rgba(255,255,255,0.2)',
+              }}
+            >
               #{hero.global_rank} WORLD
             </span>
           ) : null}
@@ -120,33 +147,50 @@ function ExploreHeroInner({ userId, mood }: ExploreHeroProps) {
 
         {tierLabel && (
           <p style={{
-            fontSize: 10, fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase',
-            color: 'rgba(255,255,255,0.75)', margin: '0 0 6px',
+            fontSize: 10, fontWeight: 800, letterSpacing: '0.16em', textTransform: 'uppercase',
+            color: AMBER, margin: '0 0 8px', textShadow: '0 1px 6px rgba(0,0,0,0.4)',
           }}>
             {tierLabel}
           </p>
         )}
-        <h2 style={{ fontSize: 34, fontWeight: 800, letterSpacing: '-0.02em', lineHeight: 1.0, margin: 0, color: SURFACE }}>
+        <h2
+          style={{
+            fontSize: 40,
+            fontWeight: 900,
+            letterSpacing: '-0.025em',
+            lineHeight: 0.98,
+            margin: 0,
+            color: SURFACE,
+            textShadow: '0 2px 16px rgba(0,0,0,0.55), 0 1px 4px rgba(0,0,0,0.4)',
+          }}
+        >
           {hero.course_name}
         </h2>
-        <p style={{ fontSize: 14, fontWeight: 500, color: 'rgba(255,255,255,0.85)', margin: '8px 0 0' }}>
+        <p style={{
+          fontSize: 14, fontWeight: 600, color: 'rgba(255,255,255,0.88)',
+          margin: '10px 0 0', textShadow: '0 1px 8px rgba(0,0,0,0.4)',
+        }}>
           {[hero.location_primary, hero.location_secondary].filter(Boolean).join(' · ')}
         </p>
-        {hero.why_ai && (
-          <p style={{
-            fontSize: 13, lineHeight: 1.45, color: 'rgba(255,255,255,0.92)', margin: '10px 0 0',
-            display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden',
-          }}>
-            {hero.why_ai}
-          </p>
-        )}
         {hero.rating_avg != null && (hero.review_count ?? 0) > 0 && (
-          <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 12 }}>
+          <div
+            style={{
+              alignSelf: 'flex-start',
+              display: 'inline-flex', alignItems: 'center', gap: 6,
+              marginTop: 14,
+              padding: '6px 10px',
+              borderRadius: 999,
+              background: 'rgba(255,255,255,0.12)',
+              backdropFilter: 'blur(12px)',
+              WebkitBackdropFilter: 'blur(12px)',
+              border: '1px solid rgba(255,255,255,0.2)',
+            }}
+          >
             <img src={clbhouzLogo} alt="" style={{ width: 14, height: 14, objectFit: 'contain' }} />
             <span style={{ fontSize: 13, fontWeight: 800, color: AMBER }}>
               {Number(hero.rating_avg).toFixed(1)}
             </span>
-            <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.7)' }}>
+            <span style={{ fontSize: 11, fontWeight: 600, color: 'rgba(255,255,255,0.78)' }}>
               · {hero.review_count} review{hero.review_count === 1 ? '' : 's'}
             </span>
           </div>
