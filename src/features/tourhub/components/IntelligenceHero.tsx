@@ -1328,20 +1328,33 @@ function buildResultsPicks(
   const trackerByName = new Map(
     tracker.predictions.map((t) => [t.playerName.toLowerCase(), t]),
   );
-  return data.topContenders.slice(0, 3).map((c) => {
-    const t = trackerByName.get(c.playerName.toLowerCase());
-    const finishedStr = t ? formatPositionString(t) : '—';
-    const outcome = classifyPickOutcome(t?.actualPosition ?? null);
-    return {
-      rank: c.rank,
-      name: c.playerName,
-      insight: buildInsight(c),
-      reasons: c.reasons ?? [],
-      finished: finishedStr,
-      score: formatScore(t?.score ?? null),
-      outcome,
-    };
-  });
+  const trackerPos = (name: string): number | null =>
+    trackerByName.get(name.toLowerCase())?.actualPosition ?? null;
+
+  return data.topContenders
+    .slice(0, 3)
+    .map((c) => {
+      const t = trackerByName.get(c.playerName.toLowerCase());
+      const finishedStr = t ? formatPositionString(t) : '—';
+      const outcome = classifyPickOutcome(t?.actualPosition ?? null);
+      return {
+        rank: c.rank,
+        name: c.playerName,
+        insight: buildInsight(c),
+        reasons: c.reasons ?? [],
+        finished: finishedStr,
+        score: formatScore(t?.score ?? null),
+        outcome,
+      };
+    })
+    .sort((a, b) => {
+      const pa = trackerPos(a.name);
+      const pb = trackerPos(b.name);
+      if (pa == null && pb == null) return 0;
+      if (pa == null) return 1;
+      if (pb == null) return -1;
+      return pa - pb;
+    });
 }
 
 // ─── Empty / loading states ────────────────────────────────────────────────
