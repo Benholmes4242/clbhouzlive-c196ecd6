@@ -1,5 +1,6 @@
 import { memo } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Sparkles } from 'lucide-react';
 import { useExploreRecommendations, type ExploreRecRow } from './hooks/useExploreRecommendations';
 import type { ExploreMoodId } from './hooks/useExploreMood';
 import clbhouzLogo from '@/assets/clbhouz-logo.png';
