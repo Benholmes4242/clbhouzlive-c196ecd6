@@ -17,7 +17,7 @@ const INK = '#0F172A';
 const INK_TERTIARY = '#94A3B8';
 const INK_QUATERNARY = '#CBD5E1';
 const AMBER = '#F7931E';
-const AMBER_DEEP = '#C97211';
+const AMBER_DEEP = '#F7931E';
 const HAIRLINE_SOFT = '#EEF2F6';
 
 export interface DossierCardProps {
