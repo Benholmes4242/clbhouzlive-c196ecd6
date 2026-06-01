@@ -390,6 +390,30 @@ export const LoopCard = React.memo(function LoopCard({
           </div>
         )}
 
+        {/* 3.25 REVIEW BODY — snippet + read affordance (reviews only) */}
+        {post.isReview && post.review?.reviewText && (
+          <div className="px-4 pt-2 pb-0">
+            <p
+              className="line-clamp-2 text-[13px]"
+              style={{ color: '#64748B', lineHeight: 1.5 }}
+            >
+              {post.review.reviewText}
+            </p>
+            <button
+              type="button"
+              onClick={() => {
+                if (allPosts && cardIndex != null) {
+                  useFullscreenFeedStore.getState().open(allPosts, cardIndex);
+                }
+              }}
+              className="mt-1.5 text-[11px] font-bold uppercase tracking-wide"
+              style={{ color: '#F7931E', letterSpacing: '0.04em' }}
+            >
+              Read review →
+            </button>
+          </div>
+        )}
+
         {/* 3.5 NETWORK SIGNALS — friend chip + network rating (only when activity present) */}
         {(showFriendChip || showNetworkRating) && (
           <div className="flex items-center gap-2 px-4 pt-2 flex-wrap">
