@@ -242,7 +242,75 @@ function AccountRow({
   );
 }
 
-// ── Component ──
+// ── Grouped list primitives (iOS settings style) ──
+function SheetGroup({
+  label, children, style,
+}: {
+  label?: string;
+  children: React.ReactNode;
+  style?: React.CSSProperties;
+}) {
+  return (
+    <div style={style}>
+      {label && (
+        <div
+          style={{
+            padding: '0 4px 6px',
+            fontSize: 10.5,
+            fontWeight: 800,
+            color: INK_FAINT,
+            letterSpacing: '0.14em',
+            textTransform: 'uppercase' as const,
+          }}
+        >
+          {label}
+        </div>
+      )}
+      <div
+        style={{
+          background: '#FFFFFF',
+          border: `0.5px solid ${HAIRLINE}`,
+          borderRadius: 14,
+          overflow: 'hidden',
+        }}
+      >
+        {children}
+      </div>
+    </div>
+  );
+}
+
+function GroupedRow({
+  Icon, label, onClick, isFirst, isLast,
+}: {
+  Icon: React.ComponentType<any>;
+  label: string;
+  onClick: () => void;
+  isFirst?: boolean;
+  isLast?: boolean;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className="w-full flex items-center gap-3 active:bg-[rgba(15,23,42,0.03)] transition-colors"
+      style={{
+        padding: '14px 14px',
+        background: 'transparent',
+        border: 'none',
+        borderTop: isFirst ? 'none' : `0.5px solid ${HAIRLINE_SOFT}`,
+        cursor: 'pointer',
+        textAlign: 'left',
+      }}
+    >
+      <Icon size={16} color={INK_SOFT} strokeWidth={1.8} />
+      <div style={{ flex: 1, minWidth: 0, fontSize: 14, fontWeight: 600, color: INK }}>{label}</div>
+      <ChevronRight size={13} color="rgba(15,23,42,0.30)" />
+    </button>
+  );
+}
+
+
 function ProfileHubSheet({
   open, onClose, currentActor, profiles,
   onSwitchProfile, onNavigate, isAdmin, isLoading,
