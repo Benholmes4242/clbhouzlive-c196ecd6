@@ -18,10 +18,13 @@ import { useHandicapTrend90d, type HandicapTrend90dDirection } from '@/hooks/use
 import { analyticsEvents } from '@/utils/analyticsEvents';
 
 const WHITE = '#FFFFFF';
-const WHITE_HAIRLINE = 'rgba(255,255,255,0.10)';
+const WHITE_HAIRLINE = 'rgba(255,255,255,0.22)';
 const AMBER = '#F7931E';
 const SEASON_GREEN = '#10B981';
 const CRIMSON = '#EF4444';
+
+// Shared lift with top-bar / rail floating glyphs.
+const FLOAT_SHADOW = 'drop-shadow(0 1px 4px rgba(0,0,0,0.55))';
 
 const BASE_STYLE = {
   display: 'inline-flex',
@@ -33,6 +36,7 @@ const BASE_STYLE = {
   cursor: 'pointer',
   fontFamily: 'Geist, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
   height: 26,
+  filter: FLOAT_SHADOW,
 } as const;
 
 function resolveSource(pathname: string): string {
