@@ -23,6 +23,9 @@ interface WatchTileProps {
   hasNextPage?: boolean;
   isFetchingNextPage?: boolean;
   onLongPress?: (post: FeedPost) => void;
+  /** When rendered inside the mosaic grid: parent controls aspect, tile is flush. */
+  variant?: 'hero' | 'tile';
+  feature?: boolean;
 }
 
 const WatchTile: React.FC<WatchTileProps> = ({
@@ -30,6 +33,7 @@ const WatchTile: React.FC<WatchTileProps> = ({
   index,
   allPosts,
   onLongPress,
+  variant,
 }) => {
   const media = post.mediaItems[0];
   const thumbnailUrl = media?.thumbnailUrl;
