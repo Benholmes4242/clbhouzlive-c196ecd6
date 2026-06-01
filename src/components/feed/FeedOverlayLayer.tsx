@@ -154,6 +154,22 @@ export const FeedOverlayLayer = memo(function FeedOverlayLayer({
         transition: 'opacity 0.18s ease',
       }}
     >
+      {/* Bottom legibility scrim — guarantees caption/rail contrast on bright photos. */}
+      <div
+        aria-hidden
+        style={{
+          position: 'fixed',
+          left: 0,
+          right: 0,
+          bottom: 0,
+          height: '42%',
+          background:
+            'linear-gradient(to top, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.28) 38%, rgba(0,0,0,0) 100%)',
+          pointerEvents: 'none',
+          zIndex: 0,
+        }}
+      />
+
       {/* Mute toggle now lives inside FeedActionRail (top of rail) */}
 
       {/* Inline Review Card — renders in the bottom slot for review posts.
