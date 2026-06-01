@@ -73,7 +73,7 @@ export function PhotosIdentityStep({
               maxLength={DISPLAY_NAME_MAX}
               onChange={(e) => onFieldChange('displayName', e.target.value)}
               placeholder="Your full name"
-              className="w-full bg-[#F8FAFC] border border-border/60 rounded-[10px] px-3.5 py-2.5 text-[15px] text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-[hsl(38,92%,50%)]/40 focus:bg-background transition-colors"
+              className="w-full bg-[#F8FAFC] border border-border/60 rounded-[11px] px-3.5 py-2.5 text-[15px] text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-[hsl(38,92%,50%)]/40 focus:bg-background transition-colors"
             />
             {displayNameError && (
               <p className="text-[12px] text-destructive mt-1">{displayNameError}</p>
@@ -106,7 +106,7 @@ export function PhotosIdentityStep({
                 readOnly={usernameIsLocked}
                 onChange={(e) => !usernameIsLocked && onFieldChange('username', e.target.value)}
                 placeholder="username"
-                className={`w-full bg-[#F8FAFC] border border-border/60 rounded-[10px] pl-8 pr-3.5 py-2.5 text-[15px] text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-[hsl(38,92%,50%)]/40 focus:bg-background transition-colors ${usernameIsLocked ? 'opacity-50 cursor-not-allowed' : ''}`}
+                className={`w-full bg-[#F8FAFC] border border-border/60 rounded-[11px] pl-8 pr-3.5 py-2.5 text-[15px] text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-[hsl(38,92%,50%)]/40 focus:bg-background transition-colors ${usernameIsLocked ? 'opacity-50 cursor-not-allowed' : ''}`}
               />
             </div>
           </div>
