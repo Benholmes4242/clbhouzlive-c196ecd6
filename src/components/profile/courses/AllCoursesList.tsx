@@ -7,7 +7,7 @@ import { TieredCourseCard, CourseCardData } from './TieredCourseCard';
 import { StickyFilterBar, CoursePrimaryTab, CourseSortOption } from './StickyFilterBar';
 import { type QuickRegion } from '@/components/leaderboard/courses/CourseRegionPills';
 import { Button } from '@/components/ui/button';
-import { ChevronDown, ClipboardList } from 'lucide-react';
+import { ChevronDown, ClipboardList, History } from 'lucide-react';
 import { compareOwnRatings } from '@/lib/sortCoursesByRating';
 import DossierCard from './DossierCard';
 import BreakdownsPrompt from './BreakdownsPrompt';
@@ -302,12 +302,15 @@ export const AllCoursesList: React.FC<AllCoursesListProps> = ({
 
   return (
     <div ref={sectionRef} className="py-4">
-      {/* Section header */}
+      {/* Section header — amber eyebrow with icon (matches Courses Discover) */}
       <div className="mb-3">
-        <h2 className="text-[19px] font-bold text-foreground" style={{ letterSpacing: '-0.02em' }}>
-          Course History
-        </h2>
-        <p className="text-[13px] text-muted-foreground mt-0.5">
+        <div className="flex items-center gap-1.5 mb-1.5">
+          <History size={11} strokeWidth={2.4} color="#F7931E" />
+          <span style={{ fontSize: 10.5, fontWeight: 800, color: '#F7931E', letterSpacing: '0.14em', textTransform: 'uppercase' as const }}>
+            Course History
+          </span>
+        </div>
+        <p className="text-[13px] text-muted-foreground">
           {ownerSubtitle}
         </p>
       </div>
