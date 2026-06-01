@@ -191,7 +191,7 @@ export function HybridHero({ slide, activeTournamentId, onSelectTour }: HybridHe
         country: (top?.player?.country_code as string | undefined) ?? undefined,
         score: tournament.winnerScore || (top ? fmtScore(top.score) : '—'),
         avatarUrl: resolveWinnerAvatar(winnerName),
-        playoffWin: state.variant === 'playoff',
+        playoffWin: wasPlayoff,
       };
     }
     if (!top) return undefined;
@@ -203,9 +203,9 @@ export function HybridHero({ slide, activeTournamentId, onSelectTour }: HybridHe
       country: top.player?.country_code,
       score: fmtScore(top.score),
       avatarUrl: resolveWinnerAvatar(topName),
-      playoffWin: state.variant === 'playoff',
+      playoffWin: wasPlayoff,
     };
-  }, [state, tournament, safeLeaderboard]);
+  }, [state, tournament, safeLeaderboard, wasPlayoff]);
 
   // Team winner detection
   const teamWinner = useMemo(() => {
