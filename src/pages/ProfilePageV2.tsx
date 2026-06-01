@@ -1104,9 +1104,14 @@ const ProfilePageV2Content: React.FC = () => {
           </section>
         ) : null}
 
-        {/* Friend handicap hero — shown on others' profiles only */}
-        {isPersonal && profile?.id && !isSelf && user?.id && (
-          <FriendHandicapHero userId={profile.id} viewerUserId={user.id} displayName={displayName} />
+        {/* Handicap summary card — shown on personal profiles (own + friends) */}
+        {isPersonal && profile?.id && user?.id && (
+          <ProfileHandicapCard
+            userId={profile.id}
+            viewerUserId={user.id}
+            isOwnProfile={isSelf}
+            displayName={displayName}
+          />
         )}
 
         {/* Personal Top 10 Carousel */}
