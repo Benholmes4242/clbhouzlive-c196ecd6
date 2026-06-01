@@ -88,8 +88,8 @@ function ExplorePassportInner({ userId }: ExplorePassportProps) {
   return (
     <section>
       <ExploreSectionHeader
-        kicker="Your Journey"
         title="Season passport"
+        icon={Globe}
         sub={sinceLabel}
         action={{ label: 'View profile', onClick: () => navigate('/profile') }}
       />
