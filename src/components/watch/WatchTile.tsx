@@ -146,9 +146,7 @@ const WatchTile: React.FC<WatchTileProps> = ({
             zIndex: 10,
           }}
         >
-          <Pin variant="dark" icon={<span style={{ fontSize: 10, lineHeight: 1 }}>📍</span>}>
-            {post.courseName}
-          </Pin>
+          <Pin variant="dark">{post.courseName}</Pin>
         </div>
       )}
 
