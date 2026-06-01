@@ -5,9 +5,9 @@
  */
 
 import React from 'react';
-import { Trophy } from 'lucide-react';
+import { Crown } from 'lucide-react';
 import { INK, AMBER, NUMERIC_STYLE } from '../HybridHero.constants';
-import { LEADER_GOLD as GOLD, SLATE_800, WHITE_ALPHA_10, WHITE_ALPHA_65 } from '../../../_shared/tokens';
+import { GOLD_DEEP, LEADER_GOLD as GOLD, SLATE_800, WHITE_ALPHA_10, WHITE_ALPHA_65 } from '../../../_shared/tokens';
 import { getFlagCode } from '@/utils/countryFlags';
 
 function countryToFlag(country: string | null | undefined): string {
