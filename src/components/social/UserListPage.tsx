@@ -521,7 +521,7 @@ export const UserListPage: React.FC<UserListPageProps> = ({
                         background: isActive ? INK : 'transparent',
                         color: isActive ? '#FFFFFF' : INK_SOFT,
                         border: isActive ? 'none' : `1px solid ${BORDER}`,
-                        borderRadius: 10,
+                        borderRadius: 12,
                         fontSize: 13,
                         fontWeight: 700,
                         cursor: 'pointer',
