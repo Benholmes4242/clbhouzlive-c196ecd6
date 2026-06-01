@@ -1,5 +1,5 @@
 import { memo } from 'react';
-import { ChevronRight } from 'lucide-react';
+import { ChevronRight, type LucideIcon } from 'lucide-react';
 import { AMBER, INK, INK_MUTE } from '@/features/courses/_shared/tokens';
 
 interface ExploreSectionHeaderProps {
@@ -9,6 +9,8 @@ interface ExploreSectionHeaderProps {
   kickerColor?: 'slate' | 'amber' | 'emerald';
   /** Section title. */
   title: string;
+  /** Optional icon rendered before the title (course-detail SectionLabel style). */
+  icon?: LucideIcon;
   /** Optional second-line subhead. */
   sub?: string;
   /** Optional right-side action affordance ("See all", etc.). */
