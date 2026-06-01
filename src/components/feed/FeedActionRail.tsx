@@ -194,13 +194,13 @@ export const FeedActionRail: React.FC<FeedActionRailProps> = ({
         padding: 0,
         color: '#fff',
         cursor: 'pointer',
-        filter: 'drop-shadow(0 1px 3px rgba(0,0,0,0.5))',
+        filter: FLOAT_SHADOW,
       }}
     >
       {isMuted ? (
-        <VolumeX size={28} stroke="#fff" strokeWidth={2} />
+        <VolumeX size={28} stroke="#fff" strokeWidth={FLOAT_STROKE} />
       ) : (
-        <Volume2 size={28} stroke="#fff" strokeWidth={2} />
+        <Volume2 size={28} stroke="#fff" strokeWidth={FLOAT_STROKE} />
       )}
     </button>
   ) : null;
