@@ -175,8 +175,8 @@ function ExploreRecommendationsInner({ userId, mood }: ExploreRecommendationsPro
       return (
         <section style={{ padding: '0 0 0' }}>
           <ExploreSectionHeader
-            kicker="From your friends"
             title="No friends' rounds yet"
+            icon={Sparkles}
             sub="When the people you follow log a round, you'll see their recent courses here."
           />
         </section>
