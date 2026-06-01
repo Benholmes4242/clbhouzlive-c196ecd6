@@ -34,6 +34,7 @@ const VENUE_IMAGE_OVERRIDES: Record<string, string> = {
   'The Landings Club': theLandingsClub,
   'TPC San Antonio': '/images/venues/tpc-san-antonio.webp',
   'Harbour Town Golf Links': harbourTownGL,
+  'Asiad Country Club': asiadCountryClub,
 };
 
 interface VenueImageResult {
