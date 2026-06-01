@@ -546,14 +546,25 @@ function HandicapMasthead({ userId, onConnectTap, onCardTap }: Props) {
               </div>
               <div
                 style={{
+                  display: 'inline-flex',
+                  alignItems: 'baseline',
+                  gap: 3,
+                  marginTop: 2,
                   fontSize: 22,
                   fontWeight: 300,
-                  color: INK_SOFT,
-                  marginTop: 2,
+                  color: ninetyColorFinal,
                   ...TABULAR,
                 }}
               >
-                {delta90 === null ? '—' : formatDelta(delta90)}
+                <span>{ninetyText}</span>
+                {NinetyIcon && (
+                  <NinetyIcon
+                    size={15}
+                    color={ninetyColorFinal}
+                    strokeWidth={2.4}
+                    style={{ alignSelf: 'center' }}
+                  />
+                )}
               </div>
             </div>
             <div style={{ padding: '10px 18px' }}>
