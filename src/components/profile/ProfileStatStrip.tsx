@@ -12,6 +12,7 @@ import React from 'react';
 const INK = '#0F172A';
 const INK_FAINT = '#94A3B8';
 const HAIRLINE = 'rgba(15,23,42,0.08)';
+const HAIRLINE_SOFT = 'rgba(15,23,42,0.06)';
 
 interface Cell {
   label: string;
@@ -56,30 +57,29 @@ export function ProfileStatStrip({
   return (
     <div
       style={{
-        marginTop: 12,
-        marginLeft: -16,
-        marginRight: -16,
-        padding: '14px 16px',
-        borderTop: `0.5px solid ${HAIRLINE}`,
-        borderBottom: `0.5px solid ${HAIRLINE}`,
+        padding: '14px 8px',
+        background: '#FFFFFF',
+        border: `0.5px solid ${HAIRLINE}`,
+        borderRadius: 14,
         display: 'grid',
         gridTemplateColumns: `repeat(${cells.length}, 1fr)`,
-        justifyItems: 'center',
+        justifyItems: 'stretch',
       }}
     >
-      {cells.map((cell) => {
+      {cells.map((cell, i) => {
         const isNull = cell.value === null || cell.value === undefined;
         return (
           <div
             key={cell.label}
             style={{
               textAlign: 'center',
+              borderRight: i < cells.length - 1 ? `0.5px solid ${HAIRLINE_SOFT}` : 'none',
             }}
           >
             <div
               style={{
                 fontSize: 20,
-                fontWeight: 700,
+                fontWeight: 800,
                 color: isNull ? INK_FAINT : INK,
                 lineHeight: 1.1,
                 fontVariantNumeric: 'tabular-nums',
