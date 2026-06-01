@@ -183,9 +183,8 @@ function WhereYoudRankInner({ userId }: WhereYoudRankProps) {
   return (
     <section style={{ padding: '0 0 0' }}>
       <ExploreSectionHeader
-        kicker="Where you'd rank"
-        kickerColor="amber"
         title="Titles within reach"
+        icon={Trophy}
         sub="Courses you've played — and how close you are"
       />
       <div className="flex gap-3 px-4 overflow-x-auto scrollbar-hide" style={{ paddingBottom: 4 }}>
