@@ -112,18 +112,7 @@ function ExploreHeroInner({ userId, mood }: ExploreHeroProps) {
           color: SURFACE,
         }}
       >
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 8 }}>
-          <span
-            style={{
-              display: 'inline-flex', alignItems: 'center', gap: 6,
-              fontSize: 12, fontWeight: 800, letterSpacing: '0.16em', textTransform: 'uppercase',
-              color: AMBER,
-              textShadow: '0 1px 8px rgba(0,0,0,0.4)',
-            }}
-          >
-            <span style={{ fontSize: 13, lineHeight: 1 }}>🔥</span>
-            Featured
-          </span>
+        <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'flex-start' }}>
           {hero.global_rank ? (
             <span
               style={{
