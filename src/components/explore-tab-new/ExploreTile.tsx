@@ -1,4 +1,5 @@
 import { memo, useEffect, useRef } from 'react';
+import { MapPin } from 'lucide-react';
 import type { FeedPost } from '@/components/media-system/types/media';
 import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
 import clbhouzLogo from '@/assets/clbhouz-logo.png';
@@ -52,7 +53,6 @@ function ExploreTileInner({ post, index, allPosts, variant = 'tile', feature = f
   const ratingPadY = 4 * scale;
   const ratingPadX = 8 * scale;
   const pinFs = 10 * scale;
-  const pinIconFs = 9 * scale;
   const pinPadY = 3 * scale;
   const pinPadX = 7 * scale;
   const pinGap = 4 * scale;
@@ -85,13 +85,14 @@ function ExploreTileInner({ post, index, allPosts, variant = 'tile', feature = f
             top: 8, right: 8, gap: 4 * scale,
             padding: `${ratingPadY}px ${ratingPadX}px`,
             borderRadius: 9999,
-            background: 'rgba(0,0,0,0.55)',
-            backdropFilter: 'blur(8px)',
-            WebkitBackdropFilter: 'blur(8px)',
+            background: 'rgba(10,14,20,0.52)',
+            backdropFilter: 'blur(14px) saturate(150%)',
+            WebkitBackdropFilter: 'blur(14px) saturate(150%)',
+            border: '1px solid rgba(255,255,255,0.16)',
           }}
         >
           <img src={clbhouzLogo} alt="" style={{ width: ratingIcon, height: ratingIcon, objectFit: 'contain' }} />
-          <span style={{ fontSize: ratingFs, fontWeight: 700, color: '#fff' }}>{rating.toFixed(1)}</span>
+          <span style={{ fontSize: ratingFs, fontWeight: 700, color: '#fff', textShadow: '0 1px 4px rgba(0,0,0,0.55)' }}>{rating.toFixed(1)}</span>
         </span>
       )}
 
@@ -106,18 +107,19 @@ function ExploreTileInner({ post, index, allPosts, variant = 'tile', feature = f
           <div
             style={{
               display: 'inline-flex', alignItems: 'center', gap: pinGap,
-              background: 'rgba(0,0,0,0.45)',
-              backdropFilter: 'blur(12px)',
-              WebkitBackdropFilter: 'blur(12px)',
-              border: '1px solid rgba(255,255,255,0.12)',
+              background: 'rgba(10,14,20,0.52)',
+              backdropFilter: 'blur(14px) saturate(150%)',
+              WebkitBackdropFilter: 'blur(14px) saturate(150%)',
+              border: '1px solid rgba(255,255,255,0.16)',
               borderRadius: 9999, padding: `${pinPadY}px ${pinPadX}px`,
               maxWidth: 'calc(100% - 14px)',
             }}
           >
-            <span style={{ fontSize: pinIconFs, flexShrink: 0, lineHeight: 1 }}>📍</span>
+            <MapPin size={11 * scale} color="#fff" strokeWidth={2.5} style={{ flexShrink: 0 }} />
             <span style={{
               fontSize: pinFs, fontWeight: 600, color: '#fff',
               overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+              textShadow: '0 1px 4px rgba(0,0,0,0.55)',
             }}>
               {courseName}
             </span>
