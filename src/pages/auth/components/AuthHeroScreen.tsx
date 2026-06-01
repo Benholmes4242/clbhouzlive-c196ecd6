@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useMedianStatusBar } from '@/hooks/useMedianStatusBar';
-import { Loader2 } from 'lucide-react';
+import { Loader2, Mail, ArrowRight } from 'lucide-react';
 import { toast } from 'sonner';
 import { z } from 'zod';
 import { safeLocalStorage } from '@/utils/safeLocalStorage';
