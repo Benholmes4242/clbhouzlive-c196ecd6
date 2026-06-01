@@ -481,17 +481,21 @@ function ProfileHubSheet({
 
                   <div style={{ height: '0.5px', background: HAIRLINE, margin: '0 -16px' }} />
 
-                  {/* ── 2. Handicap masthead (inline, no card) ── */}
-                  <HandicapMasthead userId={localActiveId} onConnectTap={handleConnectHandicap} />
+                  {/* ── 2. Handicap masthead (UNCHANGED — kept rich) ── */}
+                  <div style={{ marginTop: 18 }}>
+                    <HandicapMasthead userId={localActiveId} onConnectTap={handleConnectHandicap} />
+                  </div>
 
-                  {/* ── 3. Stat strip ── */}
-                  <ProfileStatStrip
-                    variant={stripVariant}
-                    rounds30d={stats.rounds30d}
-                    lowIndex={stats.lowIndex}
-                    reviewsCount={stats.reviewsCount}
-                    coursesPlayed={stats.coursesPlayed}
-                  />
+                  {/* ── 3. Stat strip (now a grouped card) ── */}
+                  <div style={{ marginTop: 18 }}>
+                    <ProfileStatStrip
+                      variant={stripVariant}
+                      rounds30d={stats.rounds30d}
+                      lowIndex={stats.lowIndex}
+                      reviewsCount={stats.reviewsCount}
+                      coursesPlayed={stats.coursesPlayed}
+                    />
+                  </div>
 
                   {/* View handicap link (data state only) */}
                   {stripVariant === 'full' && (
@@ -499,8 +503,7 @@ function ProfileHubSheet({
                       style={{
                         display: 'flex',
                         justifyContent: 'flex-end',
-                        paddingTop: 10,
-                        paddingBottom: 4,
+                        paddingTop: 8,
                       }}
                     >
                       <button
@@ -528,17 +531,8 @@ function ProfileHubSheet({
                     </div>
                   )}
 
-                  {/* ── 4. Quick action icon row ── */}
-                  <div
-                    style={{
-                      display: 'flex',
-                      gap: 8,
-                      padding: '16px 32px',
-                      borderBottom: `0.5px solid ${HAIRLINE}`,
-                      marginLeft: -16,
-                      marginRight: -16,
-                    }}
-                  >
+                  {/* ── 4. Quick action carded row ── */}
+                  <div style={{ display: 'flex', gap: 8, marginTop: 18 }}>
                     <QuickActionTile
                       label="Echo"
                       badge={0}
@@ -606,70 +600,70 @@ function ProfileHubSheet({
                     </QuickActionTile>
                   </div>
 
-                  {/* ── 5. Account section (no eyebrow) ── */}
-                  <div style={{ paddingTop: 6 }}>
-                    <AccountRow
+                  {/* ── 5a. Account group ── */}
+                  <SheetGroup label="Account" style={{ marginTop: 18 }}>
+                    <GroupedRow
                       Icon={UserCog}
-                      label="Profile & businesses"
-                      sub="Edit profile, manage clbhouz"
+                      label="View profile"
+                      onClick={() => handleNav(`/profile/${localActiveId}`)}
+                      isFirst
+                    />
+                    <GroupedRow
+                      Icon={UserCog}
+                      label="Edit profile"
                       onClick={() => handleNav(editRoute)}
                     />
-                    <div style={{ height: '0.5px', background: HAIRLINE_SOFT }} />
-                    <AccountRow
+                    <GroupedRow
                       Icon={SettingsIcon}
                       label="Settings"
-                      sub="Privacy, notifications, preferences"
                       onClick={() => handleNav('/settings')}
+                      isLast
                     />
-                  </div>
+                  </SheetGroup>
 
-                  {/* ── 6. Admin / Command Center (unchanged) ── */}
+                  {/* ── 5b. Businesses group ── */}
+                  <SheetGroup label="Businesses" style={{ marginTop: 18 }}>
+                    <GroupedRow
+                      Icon={Shield}
+                      label="Manage businesses"
+                      onClick={() => handleNav('/businesses/manage')}
+                      isFirst
+                      isLast
+                    />
+                  </SheetGroup>
+
+                  {/* ── 6. Admin / Command Center ── */}
                   {isAdmin && (
-                    <>
-                      <div style={{ height: '0.5px', background: HAIRLINE, margin: '0 -16px' }} />
-                      <div style={{ paddingTop: 20, paddingBottom: 10 }}>
-                        <span
-                          style={{
-                            fontSize: 10.5,
-                            fontWeight: 800,
-                            color: INK_FAINT,
-                            letterSpacing: '0.14em',
-                            textTransform: 'uppercase' as const,
-                          }}
-                        >
-                          Admin
-                        </span>
+                    <button
+                      type="button"
+                      onClick={() => handleNav('/admin/command-center')}
+                      style={{
+                        marginTop: 18,
+                        width: '100%',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 12,
+                        minHeight: 48,
+                        background: 'rgba(247,147,30,0.06)',
+                        border: '1px solid rgba(247,147,30,0.18)',
+                        borderRadius: 14,
+                        padding: '0 14px',
+                        cursor: 'pointer',
+                      }}
+                    >
+                      <Shield className="w-5 h-5" style={{ color: AMBER }} />
+                      <div className="flex-1 text-left">
+                        <div style={{ fontSize: 14, fontWeight: 700, color: AMBER }}>Command Center</div>
+                        <div style={{ fontSize: 11, color: 'rgba(247,147,30,0.55)' }}>Manage site settings</div>
                       </div>
-                      <button
-                        type="button"
-                        onClick={() => handleNav('/admin/command-center')}
-                        style={{
-                          width: '100%',
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: 12,
-                          minHeight: 48,
-                          background: 'rgba(247,147,30,0.06)',
-                          border: '1px solid rgba(247,147,30,0.18)',
-                          borderRadius: 12,
-                          padding: '0 14px',
-                          cursor: 'pointer',
-                        }}
-                      >
-                        <Shield className="w-5 h-5" style={{ color: AMBER }} />
-                        <div className="flex-1 text-left">
-                          <div style={{ fontSize: 14, fontWeight: 700, color: AMBER }}>Command Center</div>
-                          <div style={{ fontSize: 11, color: 'rgba(247,147,30,0.55)' }}>Manage site settings</div>
-                        </div>
-                        <ChevronRight className="w-4 h-4" style={{ color: 'rgba(247,147,30,0.40)' }} />
-                      </button>
-                    </>
+                      <ChevronRight className="w-4 h-4" style={{ color: 'rgba(247,147,30,0.40)' }} />
+                    </button>
                   )}
 
-                  {/* ── 7. Sign out — crimson outlined button ── */}
+                  {/* ── 7. Sign out ── */}
                   <div
                     style={{
-                      paddingTop: 20,
+                      marginTop: 18,
                       paddingBottom: 'max(8px, env(safe-area-inset-bottom, 0px))',
                     }}
                   >
@@ -685,7 +679,7 @@ function ProfileHubSheet({
                           justifyContent: 'center',
                           gap: 8,
                           padding: '12px 14px',
-                          borderRadius: 12,
+                          borderRadius: 14,
                           background: '#FEF2F2',
                           border: '1px solid rgba(159,29,29,0.22)',
                           cursor: 'pointer',
