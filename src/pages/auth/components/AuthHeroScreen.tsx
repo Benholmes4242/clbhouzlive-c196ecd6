@@ -148,7 +148,7 @@ const AuthHeroScreen: React.FC<AuthHeroScreenProps> = ({
             style={{
               width: '160px',
               height: '160px',
-              background: 'radial-gradient(circle, rgba(247, 147, 30, 0.03) 0%, transparent 60%)',
+              background: 'radial-gradient(circle, rgba(247, 147, 30, 0.06) 0%, transparent 60%)',
               filter: 'blur(25px)',
               top: 'calc(16vh - 40px)',
             }}
