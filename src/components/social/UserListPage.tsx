@@ -1102,8 +1102,6 @@ const UserRowFlat: React.FC<UserRowFlatProps> = ({
         )}
       </div>
 
-      {/* Inset divider */}
-      <div className="ml-[72px]" style={{ borderBottom: `0.5px solid ${BORDER}` }} />
 
       {/* Kebab actions sheet */}
       <Sheet open={showKebabSheet} onOpenChange={setShowKebabSheet}>
