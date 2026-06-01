@@ -43,6 +43,7 @@ function ExploreSectionHeaderInner({
   kicker,
   kickerColor = 'slate',
   title,
+  icon: Icon,
   sub,
   action,
   paddingTop = 24,
