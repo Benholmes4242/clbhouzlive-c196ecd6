@@ -362,7 +362,7 @@ const ProfileHandicapCard: React.FC<Props> = ({
               viewBox={`0 0 ${spark.W} ${spark.H}`}
               preserveAspectRatio="none"
               aria-hidden
-              style={{ display: 'block' }}
+              style={{ display: 'block', overflow: 'visible' }}
             >
               <path
                 d={spark.path}
@@ -426,7 +426,7 @@ interface KPIProps {
 }
 
 const KPI: React.FC<KPIProps> = ({ label, value, sub, color }) => (
-  <div style={{ display: 'flex', flexDirection: 'column', gap: 2, minWidth: 0 }}>
+  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2, minWidth: 0, textAlign: 'center' }}>
     <span
       style={{
         fontSize: 9,
