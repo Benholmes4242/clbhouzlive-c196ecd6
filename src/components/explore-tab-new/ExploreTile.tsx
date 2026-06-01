@@ -89,6 +89,8 @@ function ExploreTileInner({ post, index, allPosts, variant = 'tile', feature = f
             backdropFilter: 'blur(14px) saturate(150%)',
             WebkitBackdropFilter: 'blur(14px) saturate(150%)',
             border: '1px solid rgba(255,255,255,0.16)',
+            maxWidth: 'calc(100% - 16px)',
+            overflow: 'hidden',
           }}
         >
           <img src={clbhouzLogo} alt="" style={{ width: ratingIcon, height: ratingIcon, objectFit: 'contain' }} />
@@ -101,6 +103,7 @@ function ExploreTileInner({ post, index, allPosts, variant = 'tile', feature = f
           style={{
             position: 'absolute', bottom: pinBottom, left: 0, right: 0,
             display: 'flex', justifyContent: 'center',
+            paddingLeft: pinBottom, paddingRight: pinBottom,
             pointerEvents: 'none',
           }}
         >
@@ -112,7 +115,7 @@ function ExploreTileInner({ post, index, allPosts, variant = 'tile', feature = f
               WebkitBackdropFilter: 'blur(14px) saturate(150%)',
               border: '1px solid rgba(255,255,255,0.16)',
               borderRadius: 9999, padding: `${pinPadY}px ${pinPadX}px`,
-              maxWidth: 'calc(100% - 14px)',
+              maxWidth: '100%',
             }}
           >
             <MapPin size={11 * scale} color="#fff" strokeWidth={2.5} style={{ flexShrink: 0 }} />
