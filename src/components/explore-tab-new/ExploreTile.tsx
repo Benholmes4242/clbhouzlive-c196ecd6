@@ -89,6 +89,8 @@ function ExploreTileInner({ post, index, allPosts, variant = 'tile', feature = f
             backdropFilter: 'blur(14px) saturate(150%)',
             WebkitBackdropFilter: 'blur(14px) saturate(150%)',
             border: '1px solid rgba(255,255,255,0.16)',
+            maxWidth: 'calc(100% - 16px)',
+            overflow: 'hidden',
           }}
         >
           <img src={clbhouzLogo} alt="" style={{ width: ratingIcon, height: ratingIcon, objectFit: 'contain' }} />
