@@ -19,6 +19,11 @@ import { Heart, MessageCircle, Send, MoreHorizontal, Volume2, VolumeX, Plus, Che
 import { Z } from '@/config/zIndex';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 
+// Shared lift + stroke for every floating glyph in the immersive feed chrome.
+const FLOAT_SHADOW = 'drop-shadow(0 1px 4px rgba(0,0,0,0.55))';
+const FLOAT_STROKE = 2;
+const COUNT_TEXT_SHADOW = '0 1px 3px rgba(0,0,0,0.6)';
+
 interface FeedActionRailProps {
   creator: {
     id: string;
