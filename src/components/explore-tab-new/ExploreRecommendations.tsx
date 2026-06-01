@@ -196,6 +196,7 @@ function ExploreRecommendationsInner({ userId, mood }: ExploreRecommendationsPro
     <section style={{ padding: '0 0 0' }}>
       <ExploreSectionHeader
         title={MOOD_HEADINGS[mood]}
+        icon={Sparkles}
         sub={tierLabel ?? MOOD_SUBHEADS[mood]}
       />
       <div className="flex gap-3 px-4 overflow-x-auto scrollbar-hide" style={{ paddingBottom: 4 }}>
