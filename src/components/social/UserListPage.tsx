@@ -100,14 +100,14 @@ const FriendBadge: React.FC = () => (
     style={{
       display: 'inline-flex',
       alignItems: 'center',
-      padding: '2px 6px',
-      borderRadius: 4,
-      background: AMBER_WASH,
-      border: `1px solid ${AMBER_BORDER}`,
+      padding: '2px 7px',
+      borderRadius: 5,
+      background: 'rgba(247,147,30,0.12)',
+      border: '1px solid rgba(247,147,30,0.28)',
       color: AMBER_DEEP,
-      fontSize: 9,
+      fontSize: 8.5,
       fontWeight: 800,
-      letterSpacing: '0.14em',
+      letterSpacing: '0.12em',
       textTransform: 'uppercase',
       lineHeight: 1,
       flexShrink: 0,
@@ -133,7 +133,7 @@ const HandicapInline: React.FC<{ value: number }> = ({ value }) => (
     <span
       style={{
         fontFamily: FONT_SERIF,
-        fontSize: 12,
+        fontSize: 12.5,
         fontWeight: 700,
         color: INK,
         fontVariantNumeric: 'tabular-nums',
@@ -521,7 +521,7 @@ export const UserListPage: React.FC<UserListPageProps> = ({
                         background: isActive ? INK : 'transparent',
                         color: isActive ? '#FFFFFF' : INK_SOFT,
                         border: isActive ? 'none' : `1px solid ${BORDER}`,
-                        borderRadius: 10,
+                        borderRadius: 12,
                         fontSize: 13,
                         fontWeight: 700,
                         cursor: 'pointer',
@@ -838,7 +838,7 @@ const InfiniteUserList: React.FC<InfiniteUserListProps> = ({
 
   return (
     <>
-      <div>
+      <div className="flex flex-col gap-2.5 px-4 pb-2">
         {users.map((socialUser) => (
           <UserRowFlat
             key={socialUser.id}
@@ -998,13 +998,13 @@ const UserRowFlat: React.FC<UserRowFlatProps> = ({
         onKeyDown={(e) => {
           if (e.key === 'Enter' || e.key === ' ') handleRowClick();
         }}
-        className="w-full flex items-center gap-3 px-5 py-3.5 text-left transition-colors active:bg-[rgba(15,23,42,0.03)] cursor-pointer"
-        style={{ background: '#FFFFFF' }}
+        className="w-full flex items-center gap-3 px-3.5 py-3 text-left transition-colors active:bg-[rgba(15,23,42,0.02)] cursor-pointer"
+        style={{ background: '#FFFFFF', borderRadius: 16, border: `0.5px solid ${BORDER}` }}
       >
         <SquircleAvatar
           src={user.avatarUrl || undefined}
           alt={user.displayName}
-          size={56}
+          size={50}
           fallback={user.displayName?.charAt(0) || '?'}
           hideRing
           className="flex-shrink-0"
@@ -1102,8 +1102,6 @@ const UserRowFlat: React.FC<UserRowFlatProps> = ({
         )}
       </div>
 
-      {/* Inset divider */}
-      <div className="ml-[72px]" style={{ borderBottom: `0.5px solid ${BORDER}` }} />
 
       {/* Kebab actions sheet */}
       <Sheet open={showKebabSheet} onOpenChange={setShowKebabSheet}>
