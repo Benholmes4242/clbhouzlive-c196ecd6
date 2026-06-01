@@ -219,7 +219,7 @@ const AuthHeroScreen: React.FC<AuthHeroScreenProps> = ({
             <button
               disabled={true}
               aria-label="Continue with Google — Coming soon"
-              className="auth-button-2 w-full h-[56px] flex items-center justify-center gap-2.5 rounded-full font-medium text-[15px] transition-all duration-150 cursor-not-allowed"
+              className="auth-button-2 w-full h-[54px] flex items-center justify-center gap-2.5 rounded-[14px] font-medium text-[15px] transition-all duration-150 cursor-not-allowed"
               style={{
                 background: 'rgba(255, 255, 255, 0.05)',
                 border: '1px solid rgba(255, 255, 255, 0.1)',
