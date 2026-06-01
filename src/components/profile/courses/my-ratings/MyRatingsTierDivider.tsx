@@ -43,24 +43,16 @@ const MyRatingsTierDivider: React.FC<MyRatingsTierDividerProps> = ({
             style={{
               display: 'flex',
               alignItems: 'center',
-              gap: 10,
+              gap: 6,
             }}
           >
             <span
               style={{
-                display: 'inline-block',
-                width: 3,
-                height: 13,
-                background: AMBER,
-                borderRadius: 1,
-              }}
-            />
-            <span
-              style={{
-                fontSize: 10,
+                fontSize: 10.5,
                 fontWeight: 800,
-                color: AMBER_DEEP,
-                letterSpacing: '0.18em',
+                color: AMBER,
+                letterSpacing: '0.14em',
+                textTransform: 'uppercase',
               }}
             >
               {tierName}
@@ -78,13 +70,6 @@ const MyRatingsTierDivider: React.FC<MyRatingsTierDividerProps> = ({
             {count}
           </span>
         </div>
-        <div
-          style={{
-            height: 1,
-            background: HAIRLINE,
-            marginTop: 10,
-          }}
-        />
       </div>
     </div>
   );
