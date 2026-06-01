@@ -67,7 +67,7 @@ import {
 import { ProfileCoursesTab } from '@/components/profile/ProfileCoursesTab';
 import Top100MyProgressPanel from '@/components/courses/Top100MyProgressPanel';
 import AchievementsPane from '@/components/profile/AchievementsPane';
-import FriendHandicapHero from '@/components/handicap/FriendHandicapHero';
+import ProfileHandicapCard from '@/components/handicap/ProfileHandicapCard';
 
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import ClubsCard from '@/components/profile/clubs/ClubsCard';
