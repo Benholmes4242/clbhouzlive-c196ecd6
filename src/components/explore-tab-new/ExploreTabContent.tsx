@@ -56,6 +56,9 @@ export default function ExploreTabContent({ embedded: _embedded = false }: Explo
       <div style={{ marginLeft: -16, marginRight: -16 }}>
         <ExploreHero userId={userId} mood={mood} />
       </div>
+      <div style={{ paddingTop: 12, paddingBottom: 4 }}>
+        <ConnectHandicapCue variant="discover" />
+      </div>
       <ExplorePassport userId={userId} />
       <ExploreRecommendations userId={userId} mood={mood} />
 
