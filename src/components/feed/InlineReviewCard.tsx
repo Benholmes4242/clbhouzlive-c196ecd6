@@ -1,34 +1,19 @@
 /**
- * InlineReviewCard — Editorial Frost Panel review tile (PR 7 v2).
+ * InlineReviewCard — caption-style overlay for the immersive feed.
  *
- * Composition (top → bottom):
- *   1. Atmospheric "X.X" watermark (Playfair, 4% opacity, behind content)
- *   2. Prestige rule eyebrow — "REVIEW ────"
- *   3. Title row — Playfair headline + gradient-masked Geist score
- *   4. Location line
- *   5. Compressed breakdown row (single line, abbreviated labels)
- *   6. Italic Georgia excerpt in curly quotes (2-line clamp)
- *   7. Author row — avatar + name + "N rated" + inline `Read review →`
- *
- * Tap → opens unified ReviewBottomSheet via store.
+ * Direction A: no opaque panel. Sits as a light caption over the feed's
+ * bottom scrim with a small glass verdict pill. Heavy detail (sub-scores,
+ * watermark, serif slab) lives on the review detail page.
  */
 
 import React, { useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { ChevronRight } from 'lucide-react';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
-import {
-  FROST,
-  FROST_BLUR,
-  FROST_SCORE_GRADIENT,
-  formatFrostRating,
-  splitCourseName,
-} from '@/lib/frostPanel';
+import { formatFrostRating, splitCourseName } from '@/lib/frostPanel';
 
 const FONTS = {
   geist: "'Geist', -apple-system, BlinkMacSystemFont, system-ui, sans-serif",
-  serifDisplay: "'Playfair Display', Georgia, 'Times New Roman', serif",
-  serifSystem: "Georgia, 'Times New Roman', serif",
 };
 
 export interface InlineReviewCardProps {
@@ -58,14 +43,6 @@ export interface InlineReviewCardProps {
   reviewDate?: string | Date | null;
 }
 
-const BREAKDOWN_KEYS = ['design', 'conditions', 'clubhouse', 'facilities'] as const;
-const TILE_LABELS_SHORT: Record<typeof BREAKDOWN_KEYS[number], string> = {
-  design: 'Des',
-  conditions: 'Cond',
-  clubhouse: 'Club',
-  facilities: 'Fac',
-};
-
 export const InlineReviewCard: React.FC<InlineReviewCardProps> = ({
   courseName,
   rating,
@@ -75,10 +52,8 @@ export const InlineReviewCard: React.FC<InlineReviewCardProps> = ({
   reviewer,
   isVisible,
   onTap,
-  breakdown,
   reviewerStats,
   courseSubtitle,
-  reviewText,
 }) => {
   const initials = useMemo(
     () =>
@@ -97,14 +72,6 @@ export const InlineReviewCard: React.FC<InlineReviewCardProps> = ({
     () => (courseSubtitle ? { name: courseName, subtitle: courseSubtitle } : splitCourseName(courseName)),
     [courseName, courseSubtitle],
   );
-
-  const breakdownEntries = useMemo(() => {
-    if (!breakdown) return [];
-    return BREAKDOWN_KEYS.flatMap((k) => {
-      const v = breakdown[k];
-      return v == null || Number.isNaN(v) ? [] : [{ key: k, value: v }];
-    });
-  }, [breakdown]);
 
   const coursesRated = reviewerStats?.coursesRated ?? null;
 
@@ -128,298 +95,131 @@ export const InlineReviewCard: React.FC<InlineReviewCardProps> = ({
         display: 'block',
         width: '100%',
         textAlign: 'left',
-        padding: '16px 18px 14px',
         margin: 0,
-        borderRadius: 24,
-        background: FROST.glass,
-        backdropFilter: FROST_BLUR.panel,
-        WebkitBackdropFilter: FROST_BLUR.panel,
-        border: `1px solid ${FROST.border}`,
-        boxShadow: `${FROST.dropShadow}, ${FROST.innerHighlight}`,
-        overflow: 'hidden',
-        color: FROST.ink,
+        padding: 0,
+        background: 'transparent',
+        border: 'none',
+        color: '#fff',
         cursor: 'pointer',
         pointerEvents: isVisible ? 'auto' : 'none',
         fontFamily: FONTS.geist,
         WebkitTapHighlightColor: 'transparent',
-        transform: 'translateZ(0)',
-        willChange: 'backdrop-filter',
+        paddingRight: 70,
+        textShadow: '0 1px 8px rgba(0,0,0,0.5)',
       }}
     >
-      {/* Decorative amber glow orb */}
+      {/* Verdict pill */}
       <div
-        aria-hidden
         style={{
-          position: 'absolute',
-          top: -40,
-          right: -30,
-          width: 140,
-          height: 140,
-          borderRadius: '50%',
-          background: FROST.amberGlow,
-          filter: 'blur(10px)',
-          pointerEvents: 'none',
-        }}
-      />
-
-      {/* Atmospheric watermark — Playfair score, top-right, compact */}
-      <div
-        aria-hidden
-        style={{
-          position: 'absolute',
-          right: 6,
-          top: 6,
-          fontFamily: FONTS.serifDisplay,
-          fontSize: 110,
-          fontWeight: 900,
-          lineHeight: 1,
-          color: 'rgba(255,255,255,0.05)',
-          pointerEvents: 'none',
-          letterSpacing: '-3px',
-          userSelect: 'none',
-          fontVariantNumeric: 'lining-nums tabular-nums',
+          display: 'inline-flex',
+          alignItems: 'center',
+          gap: 7,
+          padding: '5px 11px',
+          borderRadius: 999,
+          background: 'rgba(10,14,20,0.52)',
+          backdropFilter: 'blur(14px) saturate(150%)',
+          WebkitBackdropFilter: 'blur(14px) saturate(150%)',
+          border: '1px solid rgba(255,255,255,0.16)',
+          marginBottom: 11,
+          fontFamily: FONTS.geist,
         }}
       >
-        {formattedRating}
+        <span style={{ width: 12, height: 12, borderRadius: '50%', border: '2px solid #F7931E' }} />
+        <span style={{ fontSize: 10, fontWeight: 800, letterSpacing: '0.12em', color: '#fff' }}>REVIEW</span>
+        <span style={{ fontSize: 14, fontWeight: 800, color: '#fff', fontVariantNumeric: 'tabular-nums' }}>
+          {formattedRating}
+          <span style={{ fontSize: 10, opacity: 0.6 }}>/10</span>
+        </span>
       </div>
 
-      {/* === Content (above watermark) === */}
-      <div style={{ position: 'relative', zIndex: 1 }}>
-        {/* Prestige rule eyebrow — "REVIEW ────" */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10 }}>
-          <span
-            style={{
-              fontFamily: FONTS.serifDisplay,
-              fontSize: 10,
-              fontWeight: 700,
-              letterSpacing: '2.5px',
-              textTransform: 'uppercase',
-              color: FROST.amberSoft,
-              flexShrink: 0,
-            }}
-          >
-            Review
-          </span>
-          <div
-            aria-hidden
-            style={{
-              flex: 1,
-              height: 1,
-              background: `linear-gradient(90deg, ${FROST.amberBorder}, transparent)`,
-            }}
-          />
-        </div>
-
-        {/* Row 1 — Title + score */}
-        <div
+      {/* Author row */}
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: 8,
+          minWidth: 0,
+          marginBottom: 8,
+        }}
+      >
+        <SquircleAvatar
+          size={28}
+          src={reviewer.avatar || undefined}
+          alt={reviewer.name}
+          fallback={initials}
+          hideRing
+        />
+        <span
           style={{
-            display: 'flex',
-            alignItems: 'flex-end',
-            justifyContent: 'space-between',
-            gap: 12,
+            fontSize: 14,
+            fontWeight: 700,
+            color: '#fff',
+            lineHeight: 1.2,
+            whiteSpace: 'nowrap',
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
           }}
         >
-          <div style={{ flex: 1, minWidth: 0 }}>
-            <div
-              style={{
-                fontFamily: FONTS.serifDisplay,
-                fontSize: 22,
-                fontWeight: 800,
-                letterSpacing: '-0.4px',
-                lineHeight: 1.05,
-                color: FROST.ink,
-                wordBreak: 'break-word',
-              }}
-            >
-              {titleName}
-              {derivedSubtitle && (
-                <>
-                  <span
-                    style={{
-                      color: FROST.inkMute,
-                      fontWeight: 500,
-                      fontStyle: 'italic',
-                    }}
-                  >
-                    {' — '}{derivedSubtitle}
-                  </span>
-                </>
-              )}
-            </div>
-          </div>
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'baseline',
-              gap: 2,
-              flexShrink: 0,
-              fontVariantNumeric: 'tabular-nums',
-            }}
-          >
-            <span
-              style={{
-                fontSize: 30,
-                fontWeight: 800,
-                lineHeight: 0.85,
-                ...FROST_SCORE_GRADIENT,
-              }}
-            >
-              <span style={{ letterSpacing: '-1.4px' }}>
-                {formattedRating.split('.')[0]}
-              </span>
-              {formattedRating.includes('.') && (
-                <span style={{ letterSpacing: '-0.4px' }}>
-                  <span style={{ fontFamily: '"Apple Color Emoji", "Segoe UI Symbol", system-ui, sans-serif' }}>·</span>
-                  {formattedRating.split('.')[1]}
-                </span>
-              )}
-            </span>
-            <span
-              style={{
-                fontSize: 11,
-                color: FROST.inkFaint,
-                fontWeight: 500,
-                marginLeft: 2,
-                letterSpacing: '-0.2px',
-              }}
-            >
-              /10
-            </span>
-          </div>
-        </div>
-
-        {/* Location line */}
-        {locationStr && (
-          <div
-            style={{
-              marginTop: 4,
-              fontSize: 11,
-              color: FROST.inkMuter,
-              letterSpacing: '0.2px',
-            }}
-          >
-            {locationStr}
-          </div>
-        )}
-
-        {/* Compressed breakdown row — abbreviated labels, evenly spaced */}
-        {breakdownEntries.length > 0 && (
-          <div
-            style={{
-              marginTop: 12,
-              paddingTop: 10,
-              paddingBottom: 10,
-              borderTop: `1px solid ${FROST.borderSoft}`,
-              borderBottom: `1px solid ${FROST.borderSoft}`,
-              marginBottom: 12,
-              display: 'flex',
-              alignItems: 'baseline',
-              justifyContent: 'space-between',
-              gap: 8,
-              fontSize: 11,
-              color: FROST.inkMute,
-              fontVariantNumeric: 'tabular-nums',
-              letterSpacing: '0.3px',
-            }}
-          >
-            {breakdownEntries.map(({ key, value }) => (
-              <span
-                key={key}
-                style={{
-                  display: 'inline-flex',
-                  gap: 5,
-                  alignItems: 'baseline',
-                  flex: 1,
-                  justifyContent: 'center',
-                }}
-              >
-                <span
-                  style={{
-                    fontWeight: 700,
-                    color: FROST.inkMuter,
-                    letterSpacing: '0.5px',
-                    textTransform: 'uppercase',
-                    fontSize: 10,
-                  }}
-                >
-                  {TILE_LABELS_SHORT[key]}
-                </span>
-                <span style={{ fontWeight: 700, color: FROST.ink, fontSize: 12 }}>
-                  {value.toFixed(1)}
-                </span>
-              </span>
-            ))}
-          </div>
-        )}
-
-        {/* Review excerpt removed per design — caption no longer shown on review cards */}
-
-        {/* Author row with inline Read review link */}
-        <div
-          style={{
-            marginTop: breakdownEntries.length > 0 ? 0 : 12,
-            display: 'flex',
-            alignItems: 'center',
-            gap: 6,
-            minWidth: 0,
-          }}
-        >
-          <SquircleAvatar
-            size={22}
-            src={reviewer.avatar || undefined}
-            alt={reviewer.name}
-            fallback={initials}
-            hideRing
-          />
+          {reviewer.name || 'Golfer'}
+        </span>
+        {coursesRated != null && (
           <span
             style={{
               fontSize: 12,
-              fontWeight: 600,
-              color: FROST.ink,
-              lineHeight: 1.2,
+              color: 'rgba(255,255,255,0.70)',
+              fontVariantNumeric: 'tabular-nums',
               whiteSpace: 'nowrap',
-              overflow: 'hidden',
-              textOverflow: 'ellipsis',
-              marginLeft: 2,
             }}
           >
-            {reviewer.name || 'Golfer'}
+            · {coursesRated} rated
           </span>
-          {coursesRated != null && (
-            <>
-              <span style={{ color: FROST.inkFaint, fontSize: 12 }}>·</span>
-              <span
-                style={{
-                  fontSize: 12,
-                  color: FROST.inkMuter,
-                  fontVariantNumeric: 'tabular-nums',
-                  whiteSpace: 'nowrap',
-                }}
-              >
-                {coursesRated} rated
-              </span>
-            </>
-          )}
-          {/* Inline Read review serif link — replaces date AND old amber band */}
+        )}
+      </div>
+
+      {/* Course name caption */}
+      <div
+        style={{
+          fontSize: 19,
+          fontWeight: 700,
+          color: '#fff',
+          letterSpacing: '-0.01em',
+          lineHeight: 1.15,
+        }}
+      >
+        {titleName}
+        {derivedSubtitle && (
+          <span style={{ fontWeight: 500, color: 'rgba(255,255,255,0.85)' }}> — {derivedSubtitle}</span>
+        )}
+      </div>
+
+      {/* Location · Read review */}
+      {locationStr && (
+        <div
+          style={{
+            fontSize: 13,
+            color: 'rgba(255,255,255,0.78)',
+            marginTop: 3,
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: 6,
+            flexWrap: 'wrap',
+          }}
+        >
+          {locationStr}
+          <span style={{ opacity: 0.5 }}>·</span>
           <span
             style={{
-              marginLeft: 'auto',
+              color: '#F7931E',
+              fontWeight: 600,
               display: 'inline-flex',
               alignItems: 'center',
               gap: 2,
-              fontFamily: FONTS.serifDisplay,
-              fontStyle: 'italic',
-              fontSize: 13,
-              fontWeight: 500,
-              color: FROST.amberSoft,
-              flexShrink: 0,
             }}
           >
-            Read review
-            <ChevronRight size={13} color={FROST.amberSoft} strokeWidth={2.25} />
+            Read review <ChevronRight size={13} color="#F7931E" />
           </span>
         </div>
-      </div>
+      )}
     </motion.button>
   );
 };
