@@ -159,7 +159,7 @@ export function ResultBand({
               gap: 5,
             }}
           >
-            <Trophy size={10} color={GOLD} strokeWidth={2.5} />
+            <Crown size={11} strokeWidth={2.5} fill={GOLD} style={{ color: GOLD_DEEP, flexShrink: 0 }} />
             CHAMPION
           </div>
           <div
