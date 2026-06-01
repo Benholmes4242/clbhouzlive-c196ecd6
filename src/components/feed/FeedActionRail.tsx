@@ -101,7 +101,7 @@ const ActionButton: React.FC<ActionButtonProps> = ({
         cursor: 'pointer',
         transform: pressed ? 'scale(0.92)' : 'scale(1)',
         transition: 'transform 0.12s',
-        filter: 'drop-shadow(0 1px 3px rgba(0,0,0,0.55))',
+        filter: FLOAT_SHADOW,
         fontFamily: 'Geist, system-ui, sans-serif',
       }}
     >
@@ -122,6 +122,7 @@ const ActionButton: React.FC<ActionButtonProps> = ({
             color: accentCount ? '#F7931E' : '#fff',
             fontVariantNumeric: 'tabular-nums',
             lineHeight: 1,
+            textShadow: COUNT_TEXT_SHADOW,
           }}
         >
           {count}
