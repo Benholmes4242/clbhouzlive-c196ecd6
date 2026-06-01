@@ -379,7 +379,7 @@ export const LoopCard = React.memo(function LoopCard({
         </div>
 
         {/* 3. CAPTION — two lines by default, expandable inline when overflowing */}
-        {cleanCaption && (
+        {!post.isReview && cleanCaption && (
           <div className="px-4 pt-2 pb-0">
             <ExpandableCaption lines={2} className="text-[14px] text-foreground">
               <PostContentWithTags
