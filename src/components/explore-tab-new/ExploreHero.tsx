@@ -11,6 +11,12 @@ interface ExploreHeroProps {
   mood: ExploreMoodId;
 }
 
+const HERO_HEIGHT = 448; // 560 − 20%
+const CINEMATIC_SCRIM =
+  'linear-gradient(to top, rgba(5,9,15,0.97) 0%, rgba(5,9,15,0.78) 24%, rgba(5,9,15,0.30) 50%, rgba(5,9,15,0.10) 72%, rgba(5,9,15,0.30) 100%)';
+const VIGNETTE =
+  'radial-gradient(120% 90% at 50% 38%, rgba(0,0,0,0) 40%, rgba(0,0,0,0.45) 100%)';
+
 const TIER_LABELS: Record<string, string> = {
   strict: '',
   expanded: 'Broader pick',
