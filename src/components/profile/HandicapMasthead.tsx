@@ -515,7 +515,7 @@ function HandicapMasthead({ userId, onConnectTap, onCardTap }: Props) {
             </div>
           </div>
 
-          {/* Right: 30 DAYS / 12 MONTHS stacked */}
+          {/* Right: 90 DAYS / 12 MONTHS stacked */}
           <div style={{ display: 'flex', flexDirection: 'column' }}>
             <div style={{ padding: '10px 18px', borderBottom: `0.5px solid ${HAIRLINE}` }}>
               <div
@@ -527,7 +527,7 @@ function HandicapMasthead({ userId, onConnectTap, onCardTap }: Props) {
                   textTransform: 'uppercase' as const,
                 }}
               >
-                30 Days
+                90 Days
               </div>
               <div
                 style={{
@@ -538,7 +538,7 @@ function HandicapMasthead({ userId, onConnectTap, onCardTap }: Props) {
                   ...TABULAR,
                 }}
               >
-                {formatDelta(delta30)}
+                {delta90 === null ? '—' : formatDelta(delta90)}
               </div>
             </div>
             <div style={{ padding: '10px 18px' }}>
