@@ -101,7 +101,7 @@ export function ChampionStrip({
                 gap: 5,
               }}
             >
-              <EyebrowIcon size={10} color={GOLD} strokeWidth={2.5} />
+              <EyebrowIcon size={11} strokeWidth={2.5} fill={EyebrowIcon === Crown ? GOLD : 'none'} style={{ color: EyebrowIcon === Crown ? GOLD_DEEP : GOLD, flexShrink: 0 }} />
               {eyebrow}
             </span>
             {country && (
