@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Flag } from 'lucide-react';
 import { useNotableDifficultCourses, type DifficultCourse } from '@/hooks/gam/useNotableDifficultCourses';
 import { ExploreSectionHeader } from './ExploreSectionHeader';
-import { INK } from '@/features/courses/_shared/tokens';
+import { AMBER, INK } from '@/features/courses/_shared/tokens';
 
 const BURNT_ORANGE = '#C2410C';
 
