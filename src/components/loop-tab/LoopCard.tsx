@@ -215,19 +215,16 @@ export const LoopCard = React.memo(function LoopCard({
             bottomLeftOverlay={
               post.isReview && post.review?.rating ? (
                 <div
-                  className="flex items-baseline gap-1"
+                  className="flex items-baseline gap-1 liquid-glass"
                   style={{
-                    background: 'rgba(247,147,30,0.92)',
-                    backdropFilter: 'blur(6px)',
                     borderRadius: 6,
                     padding: '4px 9px',
-                    boxShadow: '0 2px 8px rgba(0,0,0,0.18)',
                   }}
                 >
-                  <span className="text-[13px] font-bold text-white leading-none" style={{ fontFeatureSettings: '"tnum" 1' }}>
+                  <span className="text-[13px] font-bold text-[#F7931E] leading-none" style={{ fontFeatureSettings: '"tnum" 1' }}>
                     {post.review.rating.toFixed(1)}
                   </span>
-                  <span className="text-[10px] font-semibold uppercase text-white/85 leading-none tracking-wide">
+                  <span className="text-[10px] font-semibold uppercase text-[#F7931E]/85 leading-none tracking-wide">
                     {getRatingTierLabel(post.review.rating)}
                   </span>
                 </div>
