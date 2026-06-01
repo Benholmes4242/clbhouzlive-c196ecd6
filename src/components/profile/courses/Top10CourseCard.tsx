@@ -144,23 +144,28 @@ export const Top10CourseCard: React.FC<Top10CourseCardProps> = ({
           {rating !== undefined && tierData && (
             <div 
               className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full"
-              style={{
-                background: 'rgba(245, 158, 11, 0.12)',
+              style={tierData.isExceptional ? {
+                background: 'rgba(247,147,30,0.14)',
                 backdropFilter: 'blur(20px)',
                 WebkitBackdropFilter: 'blur(20px)',
-                border: '1px solid rgba(245, 158, 11, 0.35)',
-                boxShadow: '0 0 16px rgba(245, 158, 11, 0.2), inset 0 1px 0 rgba(245, 158, 11, 0.15)',
+                border: '1px solid rgba(247,147,30,0.38)',
+                boxShadow: '0 0 16px rgba(247,147,30,0.22), inset 0 1px 0 rgba(247,147,30,0.16)',
+              } : {
+                background: 'rgba(255,255,255,0.14)',
+                backdropFilter: 'blur(20px)',
+                WebkitBackdropFilter: 'blur(20px)',
+                border: '1px solid rgba(255,255,255,0.28)',
               }}
             >
               <span 
                 className="font-bold text-[13px]"
-                style={{ color: '#f59e0b' }}
+                style={{ color: tierData.isExceptional ? '#F7931E' : '#FFFFFF' }}
               >
                 {rating === 10 ? '10' : rating.toFixed(1)}
               </span>
               <span 
                 className="text-[10px] font-medium tracking-wide uppercase"
-                style={{ color: 'rgba(245, 158, 11, 0.75)' }}
+                style={{ color: tierData.isExceptional ? 'rgba(247,147,30,0.8)' : 'rgba(255,255,255,0.7)' }}
               >
                 {tierData.label}
               </span>
