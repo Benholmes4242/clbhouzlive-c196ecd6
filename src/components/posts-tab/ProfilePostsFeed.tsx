@@ -4,7 +4,6 @@ import { useInView } from 'react-intersection-observer';
 import { Loader2, Film } from 'lucide-react';
 import type { FeedPost } from '@/components/media-system/types/media';
 import { LoopCard } from '@/components/loop-tab/LoopCard';
-import { ReviewCard } from './ReviewCard';
 import { PostsFeedSkeleton } from './PostsFeedSkeleton';
 import { usePostDeletion } from '@/hooks/usePostDeletion';
 import { FriendsAutoplay } from '@/components/friends-tab/FriendsAutoplay';
