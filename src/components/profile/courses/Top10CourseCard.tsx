@@ -114,7 +114,7 @@ export const Top10CourseCard: React.FC<Top10CourseCardProps> = ({
             ...rankStyle,
           }}
         >
-          {position === 1 && <Crown size={11} color="#fff" fill="#fff" />}
+          {position === 1 && <Crown size={12} strokeWidth={2.5} fill="#FFB800" style={{ color: '#D97706', flexShrink: 0 }} />}
           <span className="text-white font-bold text-[12px]">#{position}</span>
         </div>
 
