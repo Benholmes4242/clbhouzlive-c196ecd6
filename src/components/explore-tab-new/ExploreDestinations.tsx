@@ -14,7 +14,7 @@ function ExploreDestinationsInner({ activeRegion, onRegionSelect }: ExploreDesti
   if (isLoading) {
     return (
       <section style={{ padding: '0 0 0' }}>
-        <ExploreSectionHeader title="Destinations" />
+        <ExploreSectionHeader title="Destinations" icon={MapPin} />
         <div className="flex gap-3 px-4 overflow-x-auto scrollbar-hide">
           {[0, 1, 2, 3].map(i => (
             <div
