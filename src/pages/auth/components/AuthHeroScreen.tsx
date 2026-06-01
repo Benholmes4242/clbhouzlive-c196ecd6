@@ -244,13 +244,14 @@ const AuthHeroScreen: React.FC<AuthHeroScreenProps> = ({
               onClick={onEmailSignUp}
               disabled={submitting}
               aria-label="Create account with Email"
-              className="auth-button-3 w-full h-[56px] flex items-center justify-center gap-2.5 rounded-full font-medium text-[15px] transition-all duration-150 active:scale-[0.98] disabled:opacity-50 hover:bg-white/[0.06]"
+              className="auth-button-3 w-full h-[54px] flex items-center justify-center gap-2.5 rounded-[14px] font-medium text-[15px] transition-all duration-150 active:scale-[0.98] disabled:opacity-50 hover:bg-white/[0.06]"
               style={{
                 background: 'rgba(255, 255, 255, 0.03)',
                 border: '1px solid rgba(255, 255, 255, 0.08)',
                 color: 'rgba(255, 255, 255, 0.88)',
               }}
             >
+              <Mail size={18} style={{ color: 'rgba(255,255,255,0.85)' }} aria-hidden="true" />
               Create account with Email
             </button>
             
