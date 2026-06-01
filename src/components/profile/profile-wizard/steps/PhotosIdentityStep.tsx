@@ -3,6 +3,7 @@ import { ProfileFormData } from '../types';
 import { HeaderPhotoCard } from '@/components/profile/edit-v2/HeaderPhotoCard';
 import { ProfilePhotoCard } from '@/components/profile/edit-v2/ProfilePhotoCard';
 import { SectionCard } from '@/components/profile/edit-v2/SectionCard';
+import { SegToggle } from '@/components/profile/edit-v2/SegToggle';
 import { DISPLAY_NAME_MAX, USERNAME_MAX } from '../types';
 import { SectionEyebrow } from '@/components/ui/SectionEyebrow';
 
@@ -17,7 +18,7 @@ const GENDER_OPTIONS = [
   { value: 'male', label: 'Male' },
   { value: 'female', label: 'Female' },
   { value: 'prefer_not_to_say', label: 'Prefer not to say' },
-] as const;
+];
 
 export function PhotosIdentityStep({
   form, usernameIsLocked, displayNameError, onFieldChange,
@@ -113,30 +114,11 @@ export function PhotosIdentityStep({
           {/* Gender field */}
           <div className="px-4 pt-3 pb-4">
             <div style={{ marginBottom: 8 }}><SectionEyebrow label="Gender" required /></div>
-            <div className="flex gap-2 flex-wrap">
-              {GENDER_OPTIONS.map((opt) => {
-                const isActive = form.gender === opt.value;
-                return (
-                  <button
-                    key={opt.value}
-                    type="button"
-                    onClick={() => onFieldChange('gender', opt.value)}
-                    className="transition-all active:scale-[0.97]"
-                    style={{
-                      padding: '8px 16px',
-                      fontSize: 14,
-                      fontWeight: isActive ? 600 : 400,
-                      borderRadius: 20,
-                      background: isActive ? 'rgba(247,147,30,0.12)' : 'rgba(0,0,0,0.05)',
-                      border: isActive ? '1px solid rgba(247,147,30,0.35)' : '1px solid #e2e8f0',
-                      color: isActive ? '#F7931E' : '#64748b',
-                    }}
-                  >
-                    {opt.label}
-                  </button>
-                );
-              })}
-            </div>
+            <SegToggle
+              value={form.gender}
+              onChange={(v) => onFieldChange('gender', v as ProfileFormData['gender'])}
+              options={GENDER_OPTIONS}
+            />
           </div>
         </div>
       </SectionCard>
