@@ -53,7 +53,7 @@ export function ChampionStrip({
   score,
   scoreLabel = 'TO PAR',
   eyebrow = 'CHAMPION',
-  eyebrowIcon: EyebrowIcon = Trophy,
+  eyebrowIcon: EyebrowIcon = Crown,
   avatarUrl,
   rounds,
   par,
