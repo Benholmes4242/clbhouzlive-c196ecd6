@@ -154,7 +154,19 @@ export function HybridHero({ slide, activeTournamentId, onSelectTour }: HybridHe
 
   // Ticker + tie detection
   const top10 = useMemo(() => deriveTickerRows(safeLeaderboard), [safeLeaderboard]);
-  const tiedLeaders = useMemo(() => detectTopTie(safeLeaderboard), [safeLeaderboard]);
+  const tiedLeaders = useMemo(() => {
+    // Once a tournament is decided (winner known), never show a "tied for the lead"
+    // summary — a playoff/scorecard playoff has already broken the 72-hole tie.
+    if (state.kind === 'results' && tournament.winnerName) return null;
+    return detectTopTie(safeLeaderboard);
+  }, [safeLeaderboard, state.kind, tournament.winnerName]);
+
+  // A playoff happened if the winner's score was tied at the top of regulation.
+  const wasPlayoff = useMemo(() => {
+    if (state.kind !== 'results' || !tournament.winnerName) return false;
+    const tie = detectTopTie(safeLeaderboard);
+    return tie != null && tie.count >= 2;
+  }, [state.kind, tournament.winnerName, safeLeaderboard]);
 
   // Champion data for results
   const champion = useMemo(() => {
