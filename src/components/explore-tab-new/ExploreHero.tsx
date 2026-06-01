@@ -46,184 +46,113 @@ function ExploreHeroInner({ userId, mood }: ExploreHeroProps) {
 
   if (isLoading) {
     return (
-      <section style={{ padding: '24px 16px 0' }}>
-        <div
-          className="w-full animate-pulse"
-          style={{ aspectRatio: '4/5', borderRadius: 16, background: INK_TINT_06 }}
-        />
-      </section>
+      <div
+        className="w-full animate-pulse"
+        style={{ height: 560, background: INK_TINT_06 }}
+      />
     );
   }
 
   if (!hero) return null;
 
   const tierLabel = hero.filter_tier ? TIER_LABELS[hero.filter_tier] ?? '' : '';
+  const CINEMATIC_SCRIM =
+    'linear-gradient(to top, rgba(7,12,20,0.94) 0%, rgba(7,12,20,0.55) 32%, rgba(7,12,20,0.12) 56%, rgba(7,12,20,0.22) 100%)';
 
   return (
-    <section style={{ padding: '24px 16px 0' }}>
-      <button
-        type="button"
-        onClick={() => navigate(`/courses/${hero.course_id}`)}
-        className="block w-full text-left active:scale-[0.99] transition-transform"
+    <button
+      type="button"
+      onClick={() => navigate(`/courses/${hero.course_id}`)}
+      className="block w-full text-left active:scale-[0.99] transition-transform"
+      style={{
+        position: 'relative',
+        width: '100%',
+        height: 560,
+        overflow: 'hidden',
+        background: SLATE_50,
+        flexShrink: 0,
+        border: 'none',
+        padding: 0,
+      }}
+    >
+      {hero.hero_image_url ? (
+        <img
+          src={hero.hero_image_url}
+          alt={hero.course_name}
+          loading="lazy"
+          style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center' }}
+        />
+      ) : (
+        <FallbackImage name={hero.course_name} />
+      )}
+
+      <div aria-hidden="true" style={{ position: 'absolute', inset: 0, background: CINEMATIC_SCRIM }} />
+
+      <div
         style={{
-          position: 'relative',
-          borderRadius: 16,
-          overflow: 'hidden',
-          aspectRatio: '4/5',
-          background: SLATE_50,
+          position: 'absolute',
+          inset: 0,
+          display: 'flex',
+          flexDirection: 'column',
+          padding: '18px 14px 16px',
+          color: SURFACE,
         }}
       >
-        {hero.hero_image_url ? (
-          <img
-            src={hero.hero_image_url}
-            alt={hero.course_name}
-            loading="lazy"
-            style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }}
-          />
-        ) : (
-          <FallbackImage name={hero.course_name} />
-        )}
-
-        {/* Bottom gradient overlay */}
-        <div
-          style={{
-            position: 'absolute',
-            inset: 0,
-            background: 'linear-gradient(180deg, rgba(0,0,0,0) 35%, rgba(0,0,0,0.85) 100%)',
-          }}
-        />
-
-        {/* Top eyebrow */}
-        <div
-          style={{
-            position: 'absolute',
-            top: 16,
-            left: 16,
-            right: 16,
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'flex-start',
-            gap: 8,
-          }}
-        >
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 8 }}>
           <span
             style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: 5,
-              fontSize: 10,
-              fontWeight: 800,
-              letterSpacing: '0.14em',
-              textTransform: 'uppercase',
-              color: SURFACE,
-              background: 'rgba(0, 0, 0, 0.28)',
-              backdropFilter: 'blur(22px) saturate(180%)',
-              WebkitBackdropFilter: 'blur(22px) saturate(180%)',
-              border: '1px solid rgba(255, 255, 255, 0.12)',
-              boxShadow: '0 2px 8px rgba(0, 0, 0, 0.25)',
-              padding: '4px 10px',
-              borderRadius: 4,
-              transform: 'rotate(-6deg)',
-              transformOrigin: 'left center',
+              display: 'inline-flex', alignItems: 'center', gap: 6,
+              fontSize: 12, fontWeight: 800, letterSpacing: '0.14em', textTransform: 'uppercase',
+              color: AMBER,
             }}
           >
-            <span style={{ fontSize: 11, lineHeight: 1 }}>🔥</span>
+            <span style={{ fontSize: 13, lineHeight: 1 }}>🔥</span>
             Featured
           </span>
           {hero.global_rank ? (
-            <span
-              style={{
-                fontSize: 11,
-                fontWeight: 700,
-                color: SURFACE,
-                background: 'rgba(0,0,0,0.55)',
-                backdropFilter: 'blur(6px)',
-                padding: '4px 8px',
-                borderRadius: 12,
-              }}
-            >
-              #{hero.global_rank} World
+            <span style={{ fontSize: 12, fontWeight: 700, letterSpacing: '0.04em', color: 'rgba(255,255,255,0.65)' }}>
+              #{hero.global_rank} WORLD
             </span>
           ) : null}
         </div>
 
-        {/* Bottom content */}
-        <div
-          style={{
-            position: 'absolute',
-            bottom: 0,
-            left: 0,
-            right: 0,
-            padding: 20,
-            color: SURFACE,
-          }}
-        >
-          {tierLabel && (
-            <p
-              style={{
-                fontSize: 10,
-                fontWeight: 700,
-                letterSpacing: '0.14em',
-                textTransform: 'uppercase',
-                color: 'rgba(255,255,255,0.75)',
-                margin: '0 0 6px',
-              }}
-            >
-              {tierLabel}
-            </p>
-          )}
-          <h2
-            style={{
-              fontSize: 28,
-              fontWeight: 800,
-              letterSpacing: '-0.02em',
-              lineHeight: 1.05,
-              margin: 0,
-              color: SURFACE,
-            }}
-          >
-            {hero.course_name}
-          </h2>
-          <p
-            style={{
-              fontSize: 13,
-              fontWeight: 500,
-              color: 'rgba(255,255,255,0.85)',
-              margin: '6px 0 10px',
-            }}
-          >
-            {[hero.location_primary, hero.location_secondary].filter(Boolean).join(' · ')}
+        <div style={{ flex: 1 }} />
+
+        {tierLabel && (
+          <p style={{
+            fontSize: 10, fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase',
+            color: 'rgba(255,255,255,0.75)', margin: '0 0 6px',
+          }}>
+            {tierLabel}
           </p>
-          {hero.why_ai && (
-            <p
-              style={{
-                fontSize: 13,
-                lineHeight: 1.45,
-                color: 'rgba(255,255,255,0.92)',
-                margin: 0,
-                display: '-webkit-box',
-                WebkitLineClamp: 3,
-                WebkitBoxOrient: 'vertical',
-                overflow: 'hidden',
-              }}
-            >
-              {hero.why_ai}
-            </p>
-          )}
-          {hero.rating_avg != null && (hero.review_count ?? 0) > 0 && (
-            <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 12 }}>
-              <img src={clbhouzLogo} alt="" style={{ width: 14, height: 14, objectFit: 'contain' }} />
-              <span style={{ fontSize: 13, fontWeight: 800, color: AMBER }}>
-                {Number(hero.rating_avg).toFixed(1)}
-              </span>
-              <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.7)' }}>
-                · {hero.review_count} review{hero.review_count === 1 ? '' : 's'}
-              </span>
-            </div>
-          )}
-        </div>
-      </button>
-    </section>
+        )}
+        <h2 style={{ fontSize: 34, fontWeight: 800, letterSpacing: '-0.02em', lineHeight: 1.0, margin: 0, color: SURFACE }}>
+          {hero.course_name}
+        </h2>
+        <p style={{ fontSize: 14, fontWeight: 500, color: 'rgba(255,255,255,0.85)', margin: '8px 0 0' }}>
+          {[hero.location_primary, hero.location_secondary].filter(Boolean).join(' · ')}
+        </p>
+        {hero.why_ai && (
+          <p style={{
+            fontSize: 13, lineHeight: 1.45, color: 'rgba(255,255,255,0.92)', margin: '10px 0 0',
+            display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden',
+          }}>
+            {hero.why_ai}
+          </p>
+        )}
+        {hero.rating_avg != null && (hero.review_count ?? 0) > 0 && (
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 12 }}>
+            <img src={clbhouzLogo} alt="" style={{ width: 14, height: 14, objectFit: 'contain' }} />
+            <span style={{ fontSize: 13, fontWeight: 800, color: AMBER }}>
+              {Number(hero.rating_avg).toFixed(1)}
+            </span>
+            <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.7)' }}>
+              · {hero.review_count} review{hero.review_count === 1 ? '' : 's'}
+            </span>
+          </div>
+        )}
+      </div>
+    </button>
   );
 }
 
