@@ -184,6 +184,26 @@ function ExploreHeroInner({ userId, mood }: ExploreHeroProps) {
             </span>
           </div>
         )}
+
+        <span
+          style={{
+            position: 'absolute',
+            bottom: 18,
+            right: 16,
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: 6,
+            fontSize: 12,
+            fontWeight: 800,
+            letterSpacing: '0.16em',
+            textTransform: 'uppercase',
+            color: AMBER,
+            textShadow: '0 1px 8px rgba(0,0,0,0.4)',
+          }}
+        >
+          <span style={{ fontSize: 13, lineHeight: 1 }}>🔥</span>
+          Featured
+        </span>
       </div>
     </button>
   );
