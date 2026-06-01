@@ -303,7 +303,7 @@ export const AllCoursesList: React.FC<AllCoursesListProps> = ({
   return (
     <div ref={sectionRef} className="py-4">
       {/* Section header — amber eyebrow with icon (matches Courses Discover) */}
-      <div className="mb-3">
+      <div className="mb-3 px-2.5">
         <div className="flex items-center gap-1.5 mb-1.5">
           <History size={11} strokeWidth={2.4} color="#F7931E" />
           <span style={{ fontSize: 10.5, fontWeight: 800, color: '#F7931E', letterSpacing: '0.14em', textTransform: 'uppercase' as const }}>
