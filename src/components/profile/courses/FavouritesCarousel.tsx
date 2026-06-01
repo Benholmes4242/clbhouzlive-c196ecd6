@@ -3,7 +3,7 @@
  */
 import React, { useState, useCallback, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Trophy, Plus, Share2, ChevronRight } from 'lucide-react';
+import { Plus, Share2, ChevronRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useUserTopTenCourses, TopTenCourse } from '@/hooks/useUserTopTenCourses';
 import { useQuery } from '@tanstack/react-query';
