@@ -159,7 +159,6 @@ const ProfilePageV2Content: React.FC = () => {
   const profileNotFound = resolvedProfileId?.notFound === true;
   
   const { data: profile, isLoading: profileLoading } = useUserProfile(profileUserId);
-  const { data: top100Overview } = useTop100Overview(profileUserId);
   const { data: postsCount = 0, isLoading: postsCountLoading } = usePersonalPostsCount(profileUserId);
   const { data: reviewsCount = 0, isLoading: reviewsCountLoading } = usePersonalReviewsCount(profileUserId);
   const { data: achievements } = useProfileAchievements(profileUserId);
@@ -235,7 +234,7 @@ const ProfilePageV2Content: React.FC = () => {
   // Per fix brief §5.1 — Handicap is now a top-level page for everyone,
   // hidden from all profile tab strips (own and friend).
   const tabs = useMemo(
-    () => allTabs.filter(t => t.id !== 'stats'),
+    () => allTabs.filter(t => t.id !== 'stats' && t.id !== 'top100'),
     [allTabs]
   );
 
@@ -251,6 +250,15 @@ const ProfilePageV2Content: React.FC = () => {
       navigate(`/handicap/${profile.id}`, { replace: true });
     }
   }, [activeSection, isSelf, profile?.id, navigate]);
+
+  // Legacy ?tab=top100 deep links → Courses tab (Top 100 now lives in the
+  // Courses tab's All/Top 100 toggle). Mirrors the stats-tab retirement.
+  useEffect(() => {
+    if (activeSection === 'top100') {
+      setActiveSection('courses');
+      setSearchParams({ tab: 'courses' }, { replace: true });
+    }
+  }, [activeSection, setSearchParams]);
 
   const { data: socialCounts, isLoading: socialCountsLoading } = useSocialCounts(profileUserId);
   const followersCount = socialCounts?.followers ?? 0;
@@ -460,7 +468,6 @@ const ProfilePageV2Content: React.FC = () => {
   const displayName = profile?.display_name || 'Golfer';
   const username = profile?.username || 'user';
   const heroUrl = profile?.header_photo_url || profile?.profile_photo_url || '';
-  const top100Count = top100Overview?.total_played ?? 0;
   const websites = profile?.websites || [];
 
   const getCurrentContent = () => {
@@ -480,10 +487,6 @@ const ProfilePageV2Content: React.FC = () => {
             isOwnProfile={isSelf}
             displayName={profile?.display_name ?? profile?.username}
           />
-        );
-      case 'top100':
-        return (
-          <Top100MyProgressPanel userId={profile?.id} />
         );
       case 'achievements':
         return (
