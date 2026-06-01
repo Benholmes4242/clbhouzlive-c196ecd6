@@ -998,13 +998,13 @@ const UserRowFlat: React.FC<UserRowFlatProps> = ({
         onKeyDown={(e) => {
           if (e.key === 'Enter' || e.key === ' ') handleRowClick();
         }}
-        className="w-full flex items-center gap-3 px-5 py-3.5 text-left transition-colors active:bg-[rgba(15,23,42,0.03)] cursor-pointer"
-        style={{ background: '#FFFFFF' }}
+        className="w-full flex items-center gap-3 px-3.5 py-3 text-left transition-colors active:bg-[rgba(15,23,42,0.02)] cursor-pointer"
+        style={{ background: '#FFFFFF', borderRadius: 16, border: `0.5px solid ${BORDER}` }}
       >
         <SquircleAvatar
           src={user.avatarUrl || undefined}
           alt={user.displayName}
-          size={56}
+          size={50}
           fallback={user.displayName?.charAt(0) || '?'}
           hideRing
           className="flex-shrink-0"
