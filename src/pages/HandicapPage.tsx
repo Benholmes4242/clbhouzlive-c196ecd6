@@ -112,7 +112,7 @@ const FriendTitleRow: React.FC<{
           src={avatarUrl}
           alt=""
           style={{
-            width: 40, height: 40, borderRadius: '50%',
+            width: 40, height: 40, borderRadius: '34%',
             objectFit: 'cover',
             flexShrink: 0,
           }}
@@ -120,7 +120,7 @@ const FriendTitleRow: React.FC<{
       ) : (
         <div
           style={{
-            width: 40, height: 40, borderRadius: '50%',
+            width: 40, height: 40, borderRadius: '34%',
             background: `linear-gradient(135deg, ${AMBER}, ${AMBER_INK})`,
             display: 'flex', alignItems: 'center', justifyContent: 'center',
             color: '#fff', fontWeight: 700, fontSize: 16,
