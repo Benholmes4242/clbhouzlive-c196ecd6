@@ -838,7 +838,7 @@ const InfiniteUserList: React.FC<InfiniteUserListProps> = ({
 
   return (
     <>
-      <div>
+      <div className="flex flex-col gap-2.5 px-4 pb-2">
         {users.map((socialUser) => (
           <UserRowFlat
             key={socialUser.id}
