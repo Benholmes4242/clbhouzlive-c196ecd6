@@ -44,38 +44,69 @@ export const StickyFilterBar: React.FC<StickyFilterBarProps> = ({
 }) => {
   const currentSortLabel = SORT_OPTIONS.find(s => s.value === activeSort)?.label || 'Sort';
 
+  const TABS: { key: CoursePrimaryTab; label: string; count: number }[] = [
+    { key: 'all', label: 'All', count: allCount },
+    { key: 'top100', label: 'Top 100', count: top100Count },
+  ];
+
   return (
     <div className="space-y-3">
-      {/* Primary tab row */}
-      <div className="flex" style={{ borderBottom: '0.5px solid rgba(15,23,42,0.07)' }}>
-        <button
-          onClick={() => onTabChange('all')}
-          className={cn(
-            "flex-1 pb-2 text-sm transition-colors duration-150 min-h-[44px]",
-            activeTab === 'all'
-              ? "text-foreground font-semibold border-b-2 border-[#F7931E]"
-              : "text-muted-foreground font-medium border-b-2 border-transparent"
-          )}
-        >
-          All
-          {allCount > 0 && (
-            <span className="ml-1 text-xs text-muted-foreground">{allCount}</span>
-          )}
-        </button>
-        <button
-          onClick={() => onTabChange('top100')}
-          className={cn(
-            "flex-1 pb-2 text-sm transition-colors duration-150 min-h-[44px]",
-            activeTab === 'top100'
-              ? "text-foreground font-semibold border-b-2 border-[#F7931E]"
-              : "text-muted-foreground font-medium border-b-2 border-transparent"
-          )}
-        >
-          Top 100
-          {top100Count > 0 && (
-            <span className="ml-1 text-xs text-muted-foreground">{top100Count}</span>
-          )}
-        </button>
+      {/* Primary tab row — dark INK underline (matches course detail media tabs) */}
+      <div
+        role="tablist"
+        aria-label="Course list filter"
+        style={{
+          display: 'flex',
+          gap: 8,
+          justifyContent: 'center',
+          fontFamily: 'Geist, system-ui, -apple-system, BlinkMacSystemFont, sans-serif',
+        }}
+      >
+        {TABS.map(({ key, label, count }) => {
+          const isActive = activeTab === key;
+          return (
+            <button
+              key={key}
+              role="tab"
+              aria-selected={isActive}
+              onClick={() => onTabChange(key)}
+              style={{
+                flex: '0 0 auto',
+                height: 44,
+                padding: '0 8px',
+                borderRadius: 0,
+                border: 'none',
+                background: 'transparent',
+                color: isActive ? '#0F172A' : '#94A3B8',
+                fontFamily: 'inherit',
+                fontSize: 14,
+                fontWeight: isActive ? 700 : 600,
+                letterSpacing: '-0.005em',
+                whiteSpace: 'nowrap',
+                cursor: 'pointer',
+                display: 'inline-flex',
+                alignItems: 'center',
+                position: 'relative',
+                transition: 'color 0.15s',
+              }}
+            >
+              <span
+                style={{
+                  display: 'inline-block',
+                  paddingBottom: 4,
+                  borderBottom: isActive ? '1.5px solid #0F172A' : '1.5px solid transparent',
+                }}
+              >
+                {label}
+                {count > 0 && (
+                  <span style={{ marginLeft: 6, fontSize: 12, fontWeight: 600, color: '#94A3B8' }}>
+                    {count}
+                  </span>
+                )}
+              </span>
+            </button>
+          );
+        })}
       </div>
 
       {/* Controls: region pills + sort on a single row */}

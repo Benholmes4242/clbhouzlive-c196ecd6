@@ -5,7 +5,7 @@
  */
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { MapPin } from 'lucide-react';
+import { MapPin, Trophy } from 'lucide-react';
 import { motion, useReducedMotion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 
@@ -28,17 +28,10 @@ const CARD_STYLE: React.CSSProperties = {
   overflow: 'hidden',
 };
 
+// Canonical amber eyebrow with icon (matches Courses Discover SectionLabel)
 const Eyebrow: React.FC<{ label: string }> = ({ label }) => (
   <div className="flex items-center gap-1.5 mb-2">
-    <div
-      style={{
-        width: 3,
-        height: 11,
-        background: '#F7931E',
-        borderRadius: 2,
-        flexShrink: 0,
-      }}
-    />
+    <Trophy size={11} strokeWidth={2.4} color="#F7931E" />
     <span
       style={{
         fontFamily: FONT_SANS,
