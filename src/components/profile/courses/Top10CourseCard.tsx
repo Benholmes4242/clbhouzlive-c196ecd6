@@ -58,9 +58,7 @@ export const Top10CourseCard: React.FC<Top10CourseCardProps> = ({
   const heroSubtitle = course.sub_country || course.country;
 
   const rankStyle: React.CSSProperties =
-    position === 1
-      ? { background: 'rgba(247,147,30,0.92)', boxShadow: '0 2px 10px rgba(247,147,30,0.5)', border: 'none' }
-      : position <= 3
+    position <= 3
       ? { background: 'rgba(255,255,255,0.22)', border: '1px solid rgba(255,255,255,0.35)' }
       : { background: 'rgba(255,255,255,0.15)', border: '1px solid rgba(255,255,255,0.2)' };
 
