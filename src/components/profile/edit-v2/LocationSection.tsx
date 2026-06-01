@@ -3,6 +3,8 @@ import { MapPin, ChevronDown, Search, X } from 'lucide-react';
 import { MAP_CONFIG } from '@/config/maps';
 import { SectionEyebrow } from '@/components/ui/SectionEyebrow';
 
+const GEIST = 'Geist, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
+
 // ─── Country list ─────────────────────────────────────────────────────────────
 // Golf-primary markets first, then alphabetical.
 // Values match exactly what is stored in golf_clubs.country in the DB.
@@ -115,6 +117,7 @@ function CountryPicker({ value, onChange }: { value: string; onChange: (v: strin
                   style={{
                     background: c === value ? 'rgba(245,159,11,0.08)' : 'transparent',
                     color: c === value ? '#92400E' : '#0F172A',
+                    fontFamily: GEIST,
                     fontWeight: c === value ? 600 : 400,
                   }}
                   onMouseEnter={e => { if (c !== value) (e.currentTarget as HTMLElement).style.background = '#F8FAFC'; }}
