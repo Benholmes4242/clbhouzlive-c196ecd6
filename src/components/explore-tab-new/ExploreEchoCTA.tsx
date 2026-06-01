@@ -192,6 +192,7 @@ function ExploreEchoCTAInner({ mood }: ExploreEchoCTAProps) {
           </button>
         ))}
       </div>
+      </div>
     </section>
   );
 }
