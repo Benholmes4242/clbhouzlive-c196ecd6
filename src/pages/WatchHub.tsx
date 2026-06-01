@@ -27,6 +27,19 @@ export default function WatchHub() {
           className="pb-20 bg-background"
           style={{ paddingTop: 'var(--chrome-total-h, 0px)' }}
         >
+          <p
+            style={{
+              fontSize: 11,
+              fontWeight: 800,
+              letterSpacing: '0.12em',
+              textTransform: 'uppercase',
+              color: '#64748B',
+              padding: '10px 16px 4px',
+              margin: 0,
+            }}
+          >
+            Browse — Find a course, a creator, or a moment
+          </p>
           <Suspense fallback={<WatchGridSkeleton />}>
             <WatchTabContent />
           </Suspense>
