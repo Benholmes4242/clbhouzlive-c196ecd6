@@ -34,6 +34,7 @@ export const PostFeedCarousel = memo(function PostFeedCarousel({
   aspectClass = 'aspect-square',
   topRightOverlay,
   bottomRightOverlay,
+  bottomLeftOverlay,
   ariaLabel,
 }: PostFeedCarouselProps) {
   const [currentSlide, setCurrentSlide] = useState(0);
