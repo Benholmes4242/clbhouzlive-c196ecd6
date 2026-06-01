@@ -1,6 +1,8 @@
 import { memo } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { MessageSquare } from 'lucide-react';
 import { analyticsEvents } from '@/utils/analyticsEvents';
+import { ExploreSectionHeader } from './ExploreSectionHeader';
 import type { ExploreMoodId } from './hooks/useExploreMood';
 
 /** Single source of truth for the Echo concierge amber ink colour. */
@@ -93,45 +95,13 @@ function ExploreEchoCTAInner({ mood }: ExploreEchoCTAProps) {
   };
 
   return (
-    <section style={{ padding: '24px 16px 0' }}>
-      {/* Section heading */}
-      <div style={{ padding: '0 0 12px' }}>
-        <p
-          style={{
-            fontSize: 9,
-            fontWeight: 800,
-            letterSpacing: '0.16em',
-            textTransform: 'uppercase',
-            color: '#64748B',
-            margin: 0,
-            lineHeight: 1,
-          }}
-        >
-          Ask
-        </p>
-        <h2
-          style={{
-            fontSize: 18,
-            fontWeight: 800,
-            letterSpacing: '-0.015em',
-            color: '#0F172A',
-            margin: '6px 0 0',
-            lineHeight: 1.2,
-          }}
-        >
-          Echo, your course concierge
-        </h2>
-        <p
-          style={{
-            fontSize: 12,
-            fontWeight: 500,
-            color: 'rgba(15,23,42,0.55)',
-            margin: '2px 0 0',
-          }}
-        >
-          Describe what you want. She'll find it.
-        </p>
-      </div>
+    <section style={{ padding: '0 16px' }}>
+      <ExploreSectionHeader
+        title="Echo, your course concierge"
+        icon={MessageSquare}
+        sub="Describe what you want. She'll find it."
+        paddingTop={24}
+      />
 
       {/* Main amber card with sample quote */}
       <button

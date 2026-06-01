@@ -1,4 +1,5 @@
 import { memo } from 'react';
+import { MapPin } from 'lucide-react';
 import { useExploreRegionsWithImages } from './hooks/useExploreRegionsWithImages';
 import { ExploreSectionHeader } from './ExploreSectionHeader';
 
@@ -13,7 +14,7 @@ function ExploreDestinationsInner({ activeRegion, onRegionSelect }: ExploreDesti
   if (isLoading) {
     return (
       <section style={{ padding: '0 0 0' }}>
-        <ExploreSectionHeader title="Destinations" />
+        <ExploreSectionHeader title="Destinations" icon={MapPin} />
         <div className="flex gap-3 px-4 overflow-x-auto scrollbar-hide">
           {[0, 1, 2, 3].map(i => (
             <div
@@ -31,7 +32,7 @@ function ExploreDestinationsInner({ activeRegion, onRegionSelect }: ExploreDesti
 
   return (
     <section style={{ padding: '0 0 0' }}>
-      <ExploreSectionHeader title="Destinations" sub="Pick a region to filter the feed" />
+      <ExploreSectionHeader title="Destinations" icon={MapPin} sub="Pick a region to filter the feed" />
       <div className="flex gap-3 px-4 overflow-x-auto scrollbar-hide" style={{ paddingBottom: 4 }}>
         {regions.map((r: any) => {
           const slug = r.slug ?? r.id ?? r.region_slug;

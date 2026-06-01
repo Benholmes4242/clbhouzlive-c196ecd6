@@ -1,5 +1,6 @@
 import { memo } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Sparkles } from 'lucide-react';
 import { useExploreRecommendations, type ExploreRecRow } from './hooks/useExploreRecommendations';
 import type { ExploreMoodId } from './hooks/useExploreMood';
 import clbhouzLogo from '@/assets/clbhouz-logo.png';
@@ -155,7 +156,7 @@ function ExploreRecommendationsInner({ userId, mood }: ExploreRecommendationsPro
   if (isLoading) {
     return (
       <section style={{ padding: '20px 0 0' }}>
-        <ExploreSectionHeader title={MOOD_HEADINGS[mood]} paddingTop={0} />
+        <ExploreSectionHeader title={MOOD_HEADINGS[mood]} icon={Sparkles} paddingTop={0} />
         <div className="flex gap-3 px-4 overflow-x-auto scrollbar-hide">
           {[0, 1, 2].map(i => (
             <div
@@ -174,8 +175,8 @@ function ExploreRecommendationsInner({ userId, mood }: ExploreRecommendationsPro
       return (
         <section style={{ padding: '0 0 0' }}>
           <ExploreSectionHeader
-            kicker="From your friends"
             title="No friends' rounds yet"
+            icon={Sparkles}
             sub="When the people you follow log a round, you'll see their recent courses here."
           />
         </section>
@@ -195,6 +196,7 @@ function ExploreRecommendationsInner({ userId, mood }: ExploreRecommendationsPro
     <section style={{ padding: '0 0 0' }}>
       <ExploreSectionHeader
         title={MOOD_HEADINGS[mood]}
+        icon={Sparkles}
         sub={tierLabel ?? MOOD_SUBHEADS[mood]}
       />
       <div className="flex gap-3 px-4 overflow-x-auto scrollbar-hide" style={{ paddingBottom: 4 }}>

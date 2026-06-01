@@ -1,6 +1,6 @@
 import { memo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { TrendingUp } from 'lucide-react';
+import { TrendingUp, Globe } from 'lucide-react';
 import { useUserPassport, type UserPassportRow } from './hooks/useUserPassport';
 import { ExploreSectionHeader } from './ExploreSectionHeader';
 
@@ -88,8 +88,8 @@ function ExplorePassportInner({ userId }: ExplorePassportProps) {
   return (
     <section>
       <ExploreSectionHeader
-        kicker="Your Journey"
         title="Season passport"
+        icon={Globe}
         sub={sinceLabel}
         action={{ label: 'View profile', onClick: () => navigate('/profile') }}
       />

@@ -119,9 +119,8 @@ function TestYourGameInner() {
   return (
     <section>
       <ExploreSectionHeader
-        kicker="Test your game"
-        kickerColor="amber"
         title="Courses that bite"
+        icon={Flag}
         sub="How hard they really play — from member rounds"
       />
       <div

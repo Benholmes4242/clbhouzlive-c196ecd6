@@ -1,5 +1,5 @@
 import { memo } from 'react';
-import { ChevronRight } from 'lucide-react';
+import { ChevronRight, type LucideIcon } from 'lucide-react';
 import { AMBER, INK, INK_MUTE } from '@/features/courses/_shared/tokens';
 
 interface ExploreSectionHeaderProps {
@@ -9,6 +9,8 @@ interface ExploreSectionHeaderProps {
   kickerColor?: 'slate' | 'amber' | 'emerald';
   /** Section title. */
   title: string;
+  /** Optional icon rendered before the title (course-detail SectionLabel style). */
+  icon?: LucideIcon;
   /** Optional second-line subhead. */
   sub?: string;
   /** Optional right-side action affordance ("See all", etc.). */
@@ -41,6 +43,7 @@ function ExploreSectionHeaderInner({
   kicker,
   kickerColor = 'slate',
   title,
+  icon: Icon,
   sub,
   action,
   paddingTop = 24,
@@ -74,14 +77,19 @@ function ExploreSectionHeaderInner({
         ) : null}
         <h2
           style={{
-            fontSize: 18,
+            fontSize: Icon ? 10.5 : 18,
             fontWeight: 800,
-            letterSpacing: '-0.015em',
+            letterSpacing: Icon ? '0.14em' : '-0.015em',
             lineHeight: 1.2,
-            color: INK,
+            color: Icon ? AMBER : INK,
             margin: `${kicker ? 6 : 0}px 0 0`,
+            textTransform: Icon ? 'uppercase' as const : 'none',
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: 6,
           }}
         >
+          {Icon && <Icon size={11} strokeWidth={2.4} />}
           {title}
         </h2>
         {sub ? (

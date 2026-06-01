@@ -1,4 +1,5 @@
 import { useCallback, useRef, useMemo } from 'react';
+import { LayoutGrid } from 'lucide-react';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useExploreFeed } from './hooks/useExploreFeed';
 import { useExploreMood } from './hooks/useExploreMood';
@@ -74,7 +75,7 @@ export default function ExploreTabContent({ embedded: _embedded = false }: Explo
         {/* Phase 2b — CommunityShelf (Bucket + Reviews merged under one header) */}
         <CommunityShelf activeRegion={activeRegion} />
 
-        <ExploreSectionHeader title="More to explore" sub="The full course feed" />
+        <ExploreSectionHeader title="More to explore" icon={LayoutGrid} sub="The full course feed" />
 
         <div style={{ marginLeft: -16, marginRight: -16 }}>
           <ExploreGrid
