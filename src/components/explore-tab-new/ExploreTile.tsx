@@ -53,7 +53,7 @@ function ExploreTileInner({ post, index, allPosts, variant = 'tile', feature = f
   const ratingPadY = 4 * scale;
   const ratingPadX = 8 * scale;
   const pinFs = 10 * scale;
-  const pinIconFs = 9 * scale;
+  
   const pinPadY = 3 * scale;
   const pinPadX = 7 * scale;
   const pinGap = 4 * scale;
