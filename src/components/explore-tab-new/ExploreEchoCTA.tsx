@@ -96,44 +96,11 @@ function ExploreEchoCTAInner({ mood }: ExploreEchoCTAProps) {
 
   return (
     <section style={{ padding: '24px 16px 0' }}>
-      {/* Section heading */}
-      <div style={{ padding: '0 0 12px' }}>
-        <p
-          style={{
-            fontSize: 9,
-            fontWeight: 800,
-            letterSpacing: '0.16em',
-            textTransform: 'uppercase',
-            color: '#64748B',
-            margin: 0,
-            lineHeight: 1,
-          }}
-        >
-          Ask
-        </p>
-        <h2
-          style={{
-            fontSize: 18,
-            fontWeight: 800,
-            letterSpacing: '-0.015em',
-            color: '#0F172A',
-            margin: '6px 0 0',
-            lineHeight: 1.2,
-          }}
-        >
-          Echo, your course concierge
-        </h2>
-        <p
-          style={{
-            fontSize: 12,
-            fontWeight: 500,
-            color: 'rgba(15,23,42,0.55)',
-            margin: '2px 0 0',
-          }}
-        >
-          Describe what you want. She'll find it.
-        </p>
-      </div>
+      <ExploreSectionHeader
+        title="Echo, your course concierge"
+        icon={MessageSquare}
+        sub="Describe what you want. She'll find it."
+      />
 
       {/* Main amber card with sample quote */}
       <button
