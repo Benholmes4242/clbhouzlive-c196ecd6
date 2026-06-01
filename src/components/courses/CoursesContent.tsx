@@ -329,7 +329,11 @@ const CoursesContent: React.FC<CoursesContentProps> = ({ username, displayName }
 
             {activeTab === 'explore' && <CourseExplorer />}
             {activeTab === 'top100' && <Top100CoursesHubPanel />}
-            {activeTab === 'discover' && <ExploreTabContent embedded />}
+            {activeTab === 'discover' && (
+              <div style={{ marginTop: 'calc(-1 * var(--chrome-total-h, 0px))' }}>
+                <ExploreTabContent embedded />
+              </div>
+            )}
           </div>
         </>
       )}
