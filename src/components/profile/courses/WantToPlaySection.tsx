@@ -189,22 +189,22 @@ export const WantToPlaySection: React.FC<WantToPlaySectionProps> = ({
   if (wantToPlay.length <= 2) {
     return (
       <section className={cn('', className)}>
-        <div className="flex items-center gap-1.5 mb-3 px-4">
+        <div className="flex items-center gap-1.5 mb-2 px-4">
           <div
             style={{
               width: 3,
-              height: 8,
+              height: 11,
               background: '#F7931E',
-              borderRadius: 1,
+              borderRadius: 2,
               flexShrink: 0,
             }}
           />
           <span
             style={{
-              fontSize: 9,
-              fontWeight: 900,
+              fontSize: 10.5,
+              fontWeight: 800,
               color: '#F7931E',
-              letterSpacing: '0.16em',
+              letterSpacing: '0.14em',
               textTransform: 'uppercase' as const,
             }}
           >
@@ -228,9 +228,9 @@ export const WantToPlaySection: React.FC<WantToPlaySectionProps> = ({
                 onClick={() => handleCourseClick(course.course_id)}
                 style={{
                   background: '#FFFFFF',
-                  borderRadius: 12,
+                  borderRadius: 16,
                   overflow: 'hidden',
-                  border: '1px solid rgba(15,23,42,0.07)',
+                  border: '0.5px solid rgba(15,23,42,0.08)',
                   cursor: 'pointer',
                 }}
               >
@@ -264,7 +264,7 @@ export const WantToPlaySection: React.FC<WantToPlaySectionProps> = ({
                         background: '#F7931E',
                         color: '#FFFFFF',
                         fontSize: 9,
-                        fontWeight: 900,
+                        fontWeight: 800,
                         letterSpacing: '0.18em',
                         padding: '4px 8px',
                         borderRadius: 999,
@@ -285,7 +285,7 @@ export const WantToPlaySection: React.FC<WantToPlaySectionProps> = ({
                     <div
                       style={{
                         fontFamily: '"Geist", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
-                        fontWeight: 900,
+                        fontWeight: 800,
                         fontSize: 20,
                         lineHeight: 1.1,
                         letterSpacing: '-0.015em',
