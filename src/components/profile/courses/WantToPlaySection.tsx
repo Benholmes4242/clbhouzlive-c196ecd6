@@ -398,8 +398,8 @@ export const WantToPlaySection: React.FC<WantToPlaySectionProps> = ({
       <div className="flex items-center justify-between mb-3">
         <div>
           <div className="flex items-center gap-1.5 mb-1">
-            <div style={{ width: 3, height: 8, background: '#F7931E', borderRadius: 1, flexShrink: 0 }} />
-            <span style={{ fontSize: 9, fontWeight: 900, color: '#F7931E', letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>Bucket List</span>
+            <Trophy size={11} strokeWidth={2.4} color="#F7931E" />
+            <span style={{ fontSize: 10.5, fontWeight: 800, color: '#F7931E', letterSpacing: '0.14em', textTransform: 'uppercase' as const }}>Bucket List</span>
           </div>
           <h2 className="text-[17px] text-foreground" style={{ fontWeight: 900 }}>
             Courses to Play
