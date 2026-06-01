@@ -228,9 +228,9 @@ export const WantToPlaySection: React.FC<WantToPlaySectionProps> = ({
                 onClick={() => handleCourseClick(course.course_id)}
                 style={{
                   background: '#FFFFFF',
-                  borderRadius: 12,
+                  borderRadius: 16,
                   overflow: 'hidden',
-                  border: '1px solid rgba(15,23,42,0.07)',
+                  border: '0.5px solid rgba(15,23,42,0.08)',
                   cursor: 'pointer',
                 }}
               >
