@@ -99,34 +99,64 @@ const WatchGrid: React.FC<WatchGridProps> = ({
 
   return (
     <>
-      <div
-        ref={gridRef}
-        className="grid grid-cols-2 gap-[3px] pt-1"
-      >
-        {posts.map((post, i) => (
-          <div key={post.id}>
+      <div ref={gridRef} style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+        {posts[0] && (
+          <div style={{ position: 'relative', width: '100%', aspectRatio: '16 / 9', overflow: 'hidden' }}>
             <WatchTile
-              post={post}
-              index={i}
+              post={posts[0]}
+              index={0}
               allPosts={posts}
+              variant="hero"
               fetchNextPage={fetchNextPage}
               hasNextPage={hasNextPage}
               isFetchingNextPage={isFetchingNextPage}
               onLongPress={handleLongPress}
             />
           </div>
-        ))}
+        )}
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(3, 1fr)',
+            gap: 2,
+            gridAutoFlow: 'dense',
+          }}
+        >
+          {posts.slice(1).map((post, i) => {
+            const isFeature = i > 2 && i % 7 === 0;
+            return (
+              <div
+                key={post.id}
+                style={
+                  isFeature
+                    ? { gridColumn: 'span 2', gridRow: 'span 2', position: 'relative', aspectRatio: '1 / 1' }
+                    : { position: 'relative', aspectRatio: '1 / 1' }
+                }
+              >
+                <WatchTile
+                  post={post}
+                  index={i + 1}
+                  allPosts={posts}
+                  variant="tile"
+                  feature={isFeature}
+                  fetchNextPage={fetchNextPage}
+                  hasNextPage={hasNextPage}
+                  isFetchingNextPage={isFetchingNextPage}
+                  onLongPress={handleLongPress}
+                />
+              </div>
+            );
+          })}
+          <div ref={sentinelRef} style={{ gridColumn: '1 / -1', height: 1 }} />
+        </div>
       </div>
 
-      {/* Sentinel for infinite scroll */}
-      <div ref={sentinelRef} className="h-1" />
-
       {isFetchingNextPage && (
-        <div className="grid grid-cols-2 gap-[3px] mt-[3px]">
-          {[0, 1].map((i) => (
+        <div className="grid grid-cols-3 gap-[2px] mt-[2px]">
+          {[0, 1, 2].map((i) => (
             <div
               key={i}
-              className="aspect-[4/5] rounded-[4px] animate-[shimmer_1.5s_infinite]"
+              className="aspect-square animate-[shimmer_1.5s_infinite]"
               style={{
                 background: 'linear-gradient(90deg, hsl(var(--muted)) 25%, hsl(var(--muted)/0.5) 50%, hsl(var(--muted)) 75%)',
                 backgroundSize: '200% 100%',
@@ -135,6 +165,7 @@ const WatchGrid: React.FC<WatchGridProps> = ({
           ))}
         </div>
       )}
+
 
       <WatchActionSheet
         open={!!actionSheetPost}
