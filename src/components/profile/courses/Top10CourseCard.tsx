@@ -57,6 +57,19 @@ export const Top10CourseCard: React.FC<Top10CourseCardProps> = ({
   // Location subtitle
   const heroSubtitle = course.sub_country || course.country;
 
+  const rankStyle: React.CSSProperties =
+    position === 1
+      ? { background: 'rgba(247,147,30,0.92)', boxShadow: '0 2px 10px rgba(247,147,30,0.5)', border: 'none' }
+      : position <= 3
+      ? { background: 'rgba(255,255,255,0.22)', border: '1px solid rgba(255,255,255,0.35)' }
+      : { background: 'rgba(255,255,255,0.15)', border: '1px solid rgba(255,255,255,0.2)' };
+
+  const REACTION_ICON: Record<ReactionType, React.ComponentType<any>> = {
+    agree: Flame,
+    interesting: Eye,
+    want_to_play: Flag,
+  };
+
   return (
     <>
       <motion.div
@@ -67,7 +80,9 @@ export const Top10CourseCard: React.FC<Top10CourseCardProps> = ({
           "relative w-[210px] h-[269px] rounded-[24px] overflow-hidden flex-shrink-0 cursor-pointer",
           className
         )}
-        style={{}}
+        style={{
+          boxShadow: '0 8px 24px -6px rgba(15,23,42,0.28), 0 2px 8px -2px rgba(15,23,42,0.16)',
+        }}
       >
         {/* Background image - full bleed */}
         {course.thumbnail_image ? (
@@ -94,12 +109,12 @@ export const Top10CourseCard: React.FC<Top10CourseCardProps> = ({
         <div 
           className="absolute top-3 left-3 flex items-center gap-1 px-2.5 py-1 rounded-full"
           style={{
-            background: 'rgba(255,255,255,0.15)',
             backdropFilter: 'blur(20px)',
             WebkitBackdropFilter: 'blur(20px)',
-            border: '1px solid rgba(255,255,255,0.2)',
+            ...rankStyle,
           }}
         >
+          {position === 1 && <Crown size={11} color="#fff" fill="#fff" />}
           <span className="text-white font-bold text-[12px]">#{position}</span>
         </div>
 
