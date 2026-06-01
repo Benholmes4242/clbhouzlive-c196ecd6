@@ -21,12 +21,10 @@ interface ProfilePostsFeedProps {
 }
 
 /**
- * Unified profile posts feed. Reuses the Loop tab card pattern (`LoopCard`) for
- * standard posts and the editorial `ReviewCard` for reviews.
- *
- * Comment-sheet ownership: `LoopCard` renders its own internal CommentsSheet.
- * `ReviewCard` does not currently expose a comment trigger, so no parent-owned
- * sheet is mounted here.
+ * Unified profile posts feed. Every item — post or review — renders through
+ * `LoopCard`, which adapts its body region by post type (caption vs review
+ * snippet + verdict pill). LoopCard owns its own CommentsSheet, so no
+ * parent-owned sheet is mounted here.
  */
 export const ProfilePostsFeed: React.FC<ProfilePostsFeedProps> = ({
   posts,
