@@ -12,6 +12,7 @@ import React from 'react';
 const INK = '#0F172A';
 const INK_FAINT = '#94A3B8';
 const HAIRLINE = 'rgba(15,23,42,0.08)';
+const HAIRLINE_SOFT = 'rgba(15,23,42,0.06)';
 
 interface Cell {
   label: string;
