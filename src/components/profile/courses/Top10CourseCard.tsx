@@ -200,15 +200,27 @@ export const Top10CourseCard: React.FC<Top10CourseCardProps> = ({
                 `}
                 disabled={isOwnProfile || !user}
               >
-                <motion.span
-                  key={isActive ? 'active' : 'inactive'}
-                  initial={{ scale: 1 }}
-                  animate={tappedReaction === type ? { scale: [1, 1.5, 1] } : { scale: 1 }}
-                  transition={{ duration: 0.3, ease: 'easeOut' }}
-                  className="text-[13px] leading-none"
-                >
-                  {config.emoji}
-                </motion.span>
+                {(() => {
+                  const RIcon = REACTION_ICON[type];
+                  const fillActive = type !== 'interesting';
+                  return (
+                    <motion.span
+                      key={isActive ? 'active' : 'inactive'}
+                      initial={{ scale: 1 }}
+                      animate={tappedReaction === type ? { scale: [1, 1.5, 1] } : { scale: 1 }}
+                      transition={{ duration: 0.3, ease: 'easeOut' }}
+                      className="leading-none"
+                      style={{ display: 'inline-flex' }}
+                    >
+                      <RIcon
+                        size={14}
+                        color={isActive ? '#FBBF24' : 'rgba(255,255,255,0.85)'}
+                        strokeWidth={2}
+                        fill={isActive && fillActive ? '#FBBF24' : 'none'}
+                      />
+                    </motion.span>
+                  );
+                })()}
                 {count > 0 && (
                   <span className={`text-[9px] font-bold leading-none ${isActive ? 'text-amber-400' : 'text-white/60'}`}>
                     {count > 99 ? '99+' : count}
