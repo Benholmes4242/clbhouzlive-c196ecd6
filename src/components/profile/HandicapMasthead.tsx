@@ -465,6 +465,21 @@ function HandicapMasthead({ userId, onConnectTap, onCardTap }: Props) {
       : formatDelta(delta12);
   const twelveColorFinal = delta12 === null ? INK_FAINT : twelveColor;
 
+  // 90-day color & icon — derived from the sign of delta90 (negative = improved).
+  let ninetyColor = INK_SOFT;
+  let NinetyIcon: typeof ArrowDownRight | null = null;
+  if (delta90 !== null) {
+    if (delta90 < -0.05) {
+      ninetyColor = SEASON_GREEN;
+      NinetyIcon = ArrowDownRight;
+    } else if (delta90 > 0.05) {
+      ninetyColor = CRIMSON;
+      NinetyIcon = ArrowUpRight;
+    }
+  }
+  const ninetyText = delta90 === null ? '—' : formatDelta(delta90);
+  const ninetyColorFinal = delta90 === null ? INK_FAINT : ninetyColor;
+
   return (
     <div style={{ paddingTop: 14 }}>
       <button
@@ -531,14 +546,25 @@ function HandicapMasthead({ userId, onConnectTap, onCardTap }: Props) {
               </div>
               <div
                 style={{
+                  display: 'inline-flex',
+                  alignItems: 'baseline',
+                  gap: 3,
+                  marginTop: 2,
                   fontSize: 22,
                   fontWeight: 300,
-                  color: INK_SOFT,
-                  marginTop: 2,
+                  color: ninetyColorFinal,
                   ...TABULAR,
                 }}
               >
-                {delta90 === null ? '—' : formatDelta(delta90)}
+                <span>{ninetyText}</span>
+                {NinetyIcon && (
+                  <NinetyIcon
+                    size={15}
+                    color={ninetyColorFinal}
+                    strokeWidth={2.4}
+                    style={{ alignSelf: 'center' }}
+                  />
+                )}
               </div>
             </div>
             <div style={{ padding: '10px 18px' }}>
