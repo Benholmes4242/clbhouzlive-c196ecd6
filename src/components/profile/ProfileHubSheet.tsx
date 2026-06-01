@@ -166,8 +166,15 @@ function QuickActionTile({
     <button
       type="button"
       onClick={onClick}
-      className="flex flex-col items-center gap-1.5 active:scale-[0.94] transition-transform"
-      style={{ background: 'transparent', border: 'none', cursor: 'pointer', padding: 0, flex: 1 }}
+      className="flex flex-col items-center gap-1.5 active:scale-[0.98] transition-transform"
+      style={{
+        background: '#FFFFFF',
+        border: `0.5px solid ${HAIRLINE}`,
+        borderRadius: 14,
+        padding: '14px 0',
+        cursor: 'pointer',
+        flex: 1,
+      }}
       aria-label={ariaLabel}
     >
       <div style={{ position: 'relative', width: 40, height: 40 }}>
