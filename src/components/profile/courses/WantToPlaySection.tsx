@@ -264,7 +264,7 @@ export const WantToPlaySection: React.FC<WantToPlaySectionProps> = ({
                         background: '#F7931E',
                         color: '#FFFFFF',
                         fontSize: 9,
-                        fontWeight: 900,
+                        fontWeight: 800,
                         letterSpacing: '0.18em',
                         padding: '4px 8px',
                         borderRadius: 999,
