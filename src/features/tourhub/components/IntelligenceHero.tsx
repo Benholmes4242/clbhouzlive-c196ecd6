@@ -1278,24 +1278,37 @@ function buildLivePicks(
   const trackerByName = new Map(
     tracker.predictions.map((t) => [t.playerName.toLowerCase(), t]),
   );
-  return data.topContenders.slice(0, 3).map((c) => {
-    const t = trackerByName.get(c.playerName.toLowerCase());
-    const finished =
-      t?.thru != null && t.thru >= 18 ? true : t?.performanceStatus === 'cut' || t?.performanceStatus === 'withdrawn';
-    return {
-      rank: c.rank,
-      name: c.playerName,
-      insight: buildInsight(c),
-      reasons: c.reasons ?? [],
-      position: t ? formatPositionString(t) : '—',
-      score: formatScore(t?.score ?? null),
-      scoreNumeric: t?.score ?? null,
-      thru: formatThru(t?.thru ?? null, t?.currentRound ?? null),
-      moveDir: t?.moveDir ?? 'flat',
-      moveSpots: t?.moveSpots ?? 0,
-      finished,
-    };
-  });
+  const trackerPos = (name: string): number | null =>
+    trackerByName.get(name.toLowerCase())?.actualPosition ?? null;
+
+  return data.topContenders
+    .slice(0, 3)
+    .map((c) => {
+      const t = trackerByName.get(c.playerName.toLowerCase());
+      const finished =
+        t?.thru != null && t.thru >= 18 ? true : t?.performanceStatus === 'cut' || t?.performanceStatus === 'withdrawn';
+      return {
+        rank: c.rank,
+        name: c.playerName,
+        insight: buildInsight(c),
+        reasons: c.reasons ?? [],
+        position: t ? formatPositionString(t) : '—',
+        score: formatScore(t?.score ?? null),
+        scoreNumeric: t?.score ?? null,
+        thru: formatThru(t?.thru ?? null, t?.currentRound ?? null),
+        moveDir: t?.moveDir ?? 'flat',
+        moveSpots: t?.moveSpots ?? 0,
+        finished,
+      };
+    })
+    .sort((a, b) => {
+      const pa = trackerPos(a.name);
+      const pb = trackerPos(b.name);
+      if (pa == null && pb == null) return 0;
+      if (pa == null) return 1;
+      if (pb == null) return -1;
+      return pa - pb;
+    });
 }
 
 function classifyPickOutcome(
