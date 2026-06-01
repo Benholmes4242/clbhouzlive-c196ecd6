@@ -217,17 +217,18 @@ export const LoopCard = React.memo(function LoopCard({
                 <div
                   className="flex items-baseline gap-1"
                   style={{
-                    background: 'rgba(247,147,30,0.92)',
-                    backdropFilter: 'blur(6px)',
-                    borderRadius: 6,
+                    background: 'rgba(10,14,20,0.52)',
+                    backdropFilter: 'blur(14px) saturate(150%)',
+                    WebkitBackdropFilter: 'blur(14px) saturate(150%)',
+                    border: '1px solid rgba(255,255,255,0.16)',
+                    borderRadius: 9999,
                     padding: '4px 9px',
-                    boxShadow: '0 2px 8px rgba(0,0,0,0.18)',
                   }}
                 >
-                  <span className="text-[13px] font-bold text-white leading-none" style={{ fontFeatureSettings: '"tnum" 1' }}>
+                  <span className="text-[13px] font-bold text-white leading-none" style={{ fontFeatureSettings: '"tnum" 1', textShadow: '0 1px 4px rgba(0,0,0,0.55)' }}>
                     {post.review.rating.toFixed(1)}
                   </span>
-                  <span className="text-[10px] font-semibold uppercase text-white/85 leading-none tracking-wide">
+                  <span className="text-[10px] font-semibold uppercase text-white/85 leading-none tracking-wide" style={{ textShadow: '0 1px 4px rgba(0,0,0,0.55)' }}>
                     {getRatingTierLabel(post.review.rating)}
                   </span>
                 </div>
@@ -283,17 +284,18 @@ export const LoopCard = React.memo(function LoopCard({
               <div
                 className="absolute bottom-2 left-2 z-10 flex items-baseline gap-1"
                 style={{
-                  background: 'rgba(247,147,30,0.92)',
-                  backdropFilter: 'blur(6px)',
-                  borderRadius: 6,
+                  background: 'rgba(10,14,20,0.52)',
+                  backdropFilter: 'blur(14px) saturate(150%)',
+                  WebkitBackdropFilter: 'blur(14px) saturate(150%)',
+                  border: '1px solid rgba(255,255,255,0.16)',
+                  borderRadius: 9999,
                   padding: '4px 9px',
-                  boxShadow: '0 2px 8px rgba(0,0,0,0.18)',
                 }}
               >
-                <span className="text-[13px] font-bold text-white leading-none" style={{ fontFeatureSettings: '"tnum" 1' }}>
+                <span className="text-[13px] font-bold text-white leading-none" style={{ fontFeatureSettings: '"tnum" 1', textShadow: '0 1px 4px rgba(0,0,0,0.55)' }}>
                   {post.review.rating.toFixed(1)}
                 </span>
-                <span className="text-[10px] font-semibold uppercase text-white/85 leading-none tracking-wide">
+                <span className="text-[10px] font-semibold uppercase text-white/85 leading-none tracking-wide" style={{ textShadow: '0 1px 4px rgba(0,0,0,0.55)' }}>
                   {getRatingTierLabel(post.review.rating)}
                 </span>
               </div>
