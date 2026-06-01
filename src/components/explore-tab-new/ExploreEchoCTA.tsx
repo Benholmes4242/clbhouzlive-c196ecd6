@@ -95,11 +95,12 @@ function ExploreEchoCTAInner({ mood }: ExploreEchoCTAProps) {
   };
 
   return (
-    <section style={{ padding: '24px 16px 0' }}>
+    <section style={{ padding: '0 16px' }}>
       <ExploreSectionHeader
         title="Echo, your course concierge"
         icon={MessageSquare}
         sub="Describe what you want. She'll find it."
+        paddingTop={24}
       />
 
       {/* Main amber card with sample quote */}
