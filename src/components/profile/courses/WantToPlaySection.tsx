@@ -285,7 +285,7 @@ export const WantToPlaySection: React.FC<WantToPlaySectionProps> = ({
                     <div
                       style={{
                         fontFamily: '"Geist", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
-                        fontWeight: 900,
+                        fontWeight: 800,
                         fontSize: 20,
                         lineHeight: 1.1,
                         letterSpacing: '-0.015em',
