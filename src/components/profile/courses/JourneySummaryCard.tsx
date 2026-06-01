@@ -30,7 +30,7 @@ const CARD_STYLE: React.CSSProperties = {
 
 // Canonical amber eyebrow with icon (matches Courses Discover SectionLabel)
 const Eyebrow: React.FC<{ label: string }> = ({ label }) => (
-  <div className="flex items-center gap-1.5 mb-2">
+  <div className="flex items-center gap-1.5 mb-2 px-2.5">
     <Trophy size={11} strokeWidth={2.4} color="#F7931E" />
     <span
       style={{
