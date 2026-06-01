@@ -12,7 +12,7 @@
  */
 import React, { useState } from 'react';
 import { AnimatePresence } from 'framer-motion';
-import { MapPin, Crown, Flame, Eye, Flag } from 'lucide-react';
+import { MapPin, Crown } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { TopTenCourse } from '@/hooks/useUserTopTenCourses';
@@ -64,11 +64,6 @@ export const Top10CourseCard: React.FC<Top10CourseCardProps> = ({
       ? { background: 'rgba(255,255,255,0.22)', border: '1px solid rgba(255,255,255,0.35)' }
       : { background: 'rgba(255,255,255,0.15)', border: '1px solid rgba(255,255,255,0.2)' };
 
-  const REACTION_ICON: Record<ReactionType, React.ComponentType<any>> = {
-    agree: Flame,
-    interesting: Eye,
-    want_to_play: Flag,
-  };
 
   return (
     <>
@@ -114,7 +109,7 @@ export const Top10CourseCard: React.FC<Top10CourseCardProps> = ({
             ...rankStyle,
           }}
         >
-          {position === 1 && <Crown size={11} color="#fff" fill="#fff" />}
+          {position === 1 && <Crown size={12} strokeWidth={2.5} fill="#FFB800" style={{ color: '#D97706', flexShrink: 0 }} />}
           <span className="text-white font-bold text-[12px]">#{position}</span>
         </div>
 
@@ -200,27 +195,15 @@ export const Top10CourseCard: React.FC<Top10CourseCardProps> = ({
                 `}
                 disabled={isOwnProfile || !user}
               >
-                {(() => {
-                  const RIcon = REACTION_ICON[type];
-                  const fillActive = type !== 'interesting';
-                  return (
-                    <motion.span
-                      key={isActive ? 'active' : 'inactive'}
-                      initial={{ scale: 1 }}
-                      animate={tappedReaction === type ? { scale: [1, 1.5, 1] } : { scale: 1 }}
-                      transition={{ duration: 0.3, ease: 'easeOut' }}
-                      className="leading-none"
-                      style={{ display: 'inline-flex' }}
-                    >
-                      <RIcon
-                        size={14}
-                        color={isActive ? '#FBBF24' : 'rgba(255,255,255,0.85)'}
-                        strokeWidth={2}
-                        fill={isActive && fillActive ? '#FBBF24' : 'none'}
-                      />
-                    </motion.span>
-                  );
-                })()}
+                <motion.span
+                  key={isActive ? 'active' : 'inactive'}
+                  initial={{ scale: 1 }}
+                  animate={tappedReaction === type ? { scale: [1, 1.5, 1] } : { scale: 1 }}
+                  transition={{ duration: 0.3, ease: 'easeOut' }}
+                  className="text-[13px] leading-none"
+                >
+                  {config.emoji}
+                </motion.span>
                 {count > 0 && (
                   <span className={`text-[9px] font-bold leading-none ${isActive ? 'text-amber-400' : 'text-white/60'}`}>
                     {count > 99 ? '99+' : count}
