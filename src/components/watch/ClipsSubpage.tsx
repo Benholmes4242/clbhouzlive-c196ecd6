@@ -48,21 +48,6 @@ export default function ClipsSubpage() {
     <WatchActionsProvider>
       <PageRoot className="min-h-screen" hasBottomNav={true} style={{ background: CREAM }}>
         <ShellSlot>
-          <div style={{ background: '#0A0E14', padding: '14px 16px 12px' }}>
-            <Kicker>Short-form</Kicker>
-            <h1
-              style={{
-                fontSize: 22,
-                fontWeight: 800,
-                letterSpacing: '-0.025em',
-                color: '#FFFFFF',
-                lineHeight: 1.05,
-                margin: 0,
-              }}
-            >
-              Clips
-            </h1>
-          </div>
           <ClipsMoodChips active={mood} onChange={setMood} />
         </ShellSlot>
 
