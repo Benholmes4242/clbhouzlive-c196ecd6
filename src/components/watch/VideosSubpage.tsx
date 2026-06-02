@@ -4,7 +4,7 @@ import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import PageRoot from '@/components/layout/PageRoot';
 import ScrollToTopGlass from '@/components/common/ScrollToTopGlass';
 import { WatchActionsProvider } from '@/components/watch/context/WatchActionsContext';
-import { Kicker } from '@/components/watch/proshop/Kicker';
+
 import ShellSlot from '@/components/header/ShellSlot';
 
 import { useVideosMood } from '@/components/watch/videos/hooks/useVideosMood';
