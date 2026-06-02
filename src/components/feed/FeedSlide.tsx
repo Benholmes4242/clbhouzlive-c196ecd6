@@ -113,7 +113,7 @@ export const FeedSlide = memo(function FeedSlide({
       const aspect = (first.height ?? 1) > 0 && (first.width ?? 0) > 0
         ? (first.height as number) / (first.width as number)
         : 1.0;
-      const objectFit: 'cover' | 'contain' = aspect >= 1.5 ? 'cover' : 'contain';
+      const objectFit: 'cover' | 'contain' = isSuggestedFeed ? 'cover' : (aspect >= 1.5 ? 'cover' : 'contain');
       const imgSrc = first.imageUrl || first.thumbnailUrl || '';
       return (
         <div className="absolute inset-0 overflow-hidden">
