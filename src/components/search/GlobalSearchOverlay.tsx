@@ -158,7 +158,7 @@ function TrendingShelfSkeleton() {
           <div key={i} style={{ flexShrink: 0, width: 140 }}>
             <div
               className="clb-shimmer-light"
-              style={{ width: 140, height: 175, borderRadius: 14 }}
+              style={{ width: 140, height: 175, borderRadius: 16 }}
             />
             <div className="h-3 w-28 rounded clb-shimmer-light mt-2" />
             <div className="h-2.5 w-20 rounded clb-shimmer-light mt-1.5" />
