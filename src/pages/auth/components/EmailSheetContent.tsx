@@ -136,8 +136,9 @@ const EmailSheetContent: React.FC<EmailSheetContentProps> = ({
         />
         <style>{`
           input::placeholder {
-            color: rgba(255, 255, 255, 0.35);
-            font-size: 14px;
+            color: rgba(255, 255, 255, 0.55);
+            font-weight: 500;
+            font-size: 15px;
           }
         `}</style>
         
