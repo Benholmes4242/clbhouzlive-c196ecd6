@@ -113,16 +113,7 @@ export interface LivePulseStats {
 // Helpers
 // ============================================================================
 
-function mapTourSlug(tourName: string): TourId {
-  const normalized = tourName?.toLowerCase().trim();
-  if (normalized === 'pga' || normalized === 'pga tour') return 'pga';
-  if (normalized === 'euro' || normalized === 'dp world' || normalized === 'european tour') return 'euro';
-  if (normalized === 'lpga' || normalized === 'lpga tour') return 'lpga';
-  if (normalized === 'liv' || normalized === 'liv golf') return 'liv';
-  if (normalized === 'pgad' || normalized === 'korn ferry') return 'pgad';
-  if (normalized === 'champ' || normalized === 'champions') return 'champ';
-  return 'pga';
-}
+import { mapTourSlug } from '../utils/mapTourSlug';
 
 function formatScore(score: number): string {
   if (score === 0) return 'E';
