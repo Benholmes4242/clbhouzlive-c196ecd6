@@ -14,7 +14,7 @@ import { PageRoot } from '@/components/layout/PageRoot';
 import { useRehydrationSafe } from '@/contexts/RehydrationContext';
 import ScrollToTopGlass from '@/components/common/ScrollToTopGlass';
 import { ActivityPageSkeleton } from '@/components/skeletons/ActivityPageSkeleton';
-import { AlertCircle } from 'lucide-react';
+import { AlertCircle, ChevronLeft } from 'lucide-react';
 import { RateCourseNudge } from '@/components/activity/RateCourseNudge';
 import { toast } from 'sonner';
 import { useUnseenFriendReviews } from '@/hooks/useUnseenFriendReviews';
