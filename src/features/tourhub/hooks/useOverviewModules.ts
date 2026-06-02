@@ -1181,6 +1181,10 @@ export interface TickerData {
   live: TickerCellData[];
   completed: TickerCellData[];
   upcoming: TickerCellData[];
+  /** All tour slugs with ANY upcoming event in cache (not capped to the
+   *  3-cell preview slice). Used by the tour switcher to badge tours like
+   *  Champions as UPCOMING even when their next event isn't in the global top-3. */
+  upcomingTourSlugs: string[];
 }
 
 export function useAllToursTickerData() {
@@ -1189,7 +1193,7 @@ export function useAllToursTickerData() {
   return useQuery({
     queryKey: ['all-tours-ticker', cache ? 'ready' : 'waiting'],
     queryFn: async (): Promise<TickerData> => {
-      if (!cache) return { live: [], completed: [], upcoming: [] };
+      if (!cache) return { live: [], completed: [], upcoming: [], upcomingTourSlugs: [] };
 
       const liveIds = cache.live.map(t => t.id);
       const completedIds = cache.completed.map(t => t.id);
@@ -1307,7 +1311,11 @@ export function useAllToursTickerData() {
         .slice(0, 3)
         .map(buildUpcomingCell);
 
-      return { live, completed, upcoming };
+      const upcomingTourSlugs = Array.from(
+        new Set(cache.upcoming.map(t => mapTourSlug(t.season.tour_name))),
+      );
+
+      return { live, completed, upcoming, upcomingTourSlugs };
     },
     enabled: !cacheLoading,
     staleTime: 30_000,

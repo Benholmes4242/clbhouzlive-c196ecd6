@@ -55,7 +55,7 @@ export const TourSwitcherAffordance: React.FC = () => {
     // cache layer, so presence here == the hero's results state.
     if (data?.live.some((c) => c.tourSlug === slug)) return 'live';
     if (data?.completed.some((c) => c.tourSlug === slug)) return 'results';
-    if (data?.upcoming.some((c) => c.tourSlug === slug)) return 'upcoming';
+    if (data?.upcomingTourSlugs?.includes(slug)) return 'upcoming';
     return 'none';
   };
 
