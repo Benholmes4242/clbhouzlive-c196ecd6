@@ -832,7 +832,6 @@ export function CinematicFrame({
                 <Trophy
                   size={12}
                   strokeWidth={2.5}
-                  fill={GOLD}
                   style={{ color: GOLD_DEEP, flexShrink: 0 }}
                   aria-hidden
                 />
