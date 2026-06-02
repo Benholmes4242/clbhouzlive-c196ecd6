@@ -101,9 +101,9 @@ function ExploreTileInner({ post, index, allPosts, variant = 'tile', feature = f
       {courseName && (
         <div
           style={{
-            position: 'absolute', bottom: pinBottom, left: 0, right: 0,
-            display: 'flex', justifyContent: 'center',
-            paddingLeft: pinBottom, paddingRight: pinBottom,
+            position: 'absolute', bottom: pinBottom,
+            left: '50%', transform: 'translateX(-50%)',
+            maxWidth: 'calc(100% - 16px)',
             pointerEvents: 'none',
           }}
         >
@@ -116,12 +116,14 @@ function ExploreTileInner({ post, index, allPosts, variant = 'tile', feature = f
               border: '1px solid rgba(255,255,255,0.16)',
               borderRadius: 9999, padding: `${pinPadY}px ${pinPadX}px`,
               maxWidth: '100%',
+              overflow: 'hidden',
             }}
           >
             <MapPin size={11 * scale} color="#fff" strokeWidth={2.5} style={{ flexShrink: 0 }} />
             <span style={{
               fontSize: pinFs, fontWeight: 600, color: '#fff',
               overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+              minWidth: 0,
               textShadow: '0 1px 4px rgba(0,0,0,0.55)',
             }}>
               {courseName}
