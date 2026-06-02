@@ -273,7 +273,7 @@ export const FeedActionRail: React.FC<FeedActionRailProps> = ({
               src={creator.avatarUrl}
               alt={creator.displayName}
               fallback={creator.displayName?.[0] ?? '?'}
-              hairlineRing
+              hairlineRing={showJustFollowed}
               ringColor={showJustFollowed ? '#F7931E' : 'rgba(255,255,255,0.95)'}
             />
           </button>
