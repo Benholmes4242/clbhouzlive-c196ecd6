@@ -386,7 +386,7 @@ function GlobalSearchOverlay({ isOpen, onClose }: GlobalSearchOverlayProps) {
                         flexShrink: 0,
                         padding: '6px 14px',
                         borderRadius: 999,
-                        fontSize: 12.5,
+                        fontSize: 12,
                         fontWeight: 600,
                         border: `1px solid ${isActive ? INK : BORDER}`,
                         background: isActive ? INK : '#fff',
