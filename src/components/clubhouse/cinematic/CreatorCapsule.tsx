@@ -559,7 +559,7 @@ export const CreatorCapsule: React.FC<CreatorCapsuleProps> = ({
         className="flex-shrink-0 active:opacity-70 transition-opacity"
         style={{ background: 'transparent', border: 'none', padding: 0, cursor: 'pointer' }}
       >
-        <SquircleAvatar size={40} src={user?.avatar} alt={user?.name ?? 'Creator'} userId={user?.id} hairlineRing ringColor="rgba(255,255,255,0.95)" />
+        <SquircleAvatar size={40} src={user?.avatar} alt={user?.name ?? 'Creator'} userId={user?.id} hideRing />
       </button>
 
       {/* Name + caption + course — fills remaining space, taps toggle */}
