@@ -421,17 +421,17 @@ const SignupSheetContent: React.FC<SignupSheetContentProps> = ({
         )}
       </div>
       
-      {/* Submit button - amber primary */}
+      {/* Submit button - amber primary matching hero */}
       <button
         onClick={onSubmit}
         disabled={isSubmitDisabled}
-        className="w-full h-[54px] flex items-center justify-center rounded-full text-[16px] transition-all duration-200 active:scale-[0.98]"
+        className="w-full h-[54px] flex items-center justify-center rounded-[14px] text-[15px] transition-all duration-200 active:scale-[0.98]"
         style={{
           fontWeight: 700,
-          background: isSubmitDisabled ? 'rgba(255,255,255,0.35)' : '#ffffff',
-          color: isSubmitDisabled ? 'rgba(15,23,42,0.4)' : '#0F172A',
+          background: isSubmitDisabled ? 'rgba(255,255,255,0.05)' : '#F7931E',
+          color: isSubmitDisabled ? 'rgba(255,255,255,0.35)' : '#FFFFFF',
+          border: isSubmitDisabled ? '1px solid rgba(255,255,255,0.10)' : 'none',
           cursor: isSubmitDisabled ? 'not-allowed' : 'pointer',
-          boxShadow: 'none',
         }}
       >
         {submitting ? (
