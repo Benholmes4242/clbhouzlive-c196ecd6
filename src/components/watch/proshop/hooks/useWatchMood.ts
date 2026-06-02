@@ -1,12 +1,13 @@
 import { useCallback } from 'react';
 import { useSearchParams } from 'react-router-dom';
+import { Sparkles, Flag, Users, Flame, Trophy, type LucideIcon } from 'lucide-react';
 
-export const WATCH_MOODS = [
-  { id: 'for_you', label: 'For you', emoji: '✨' },
-  { id: 'played_courses', label: 'Courses played', emoji: '⛳' },
-  { id: 'follows', label: 'Your follows', emoji: '👥' },
-  { id: 'trending', label: 'Trending', emoji: '🔥' },
-  { id: 'tour_week', label: 'Tour week', emoji: '🏆' },
+export const WATCH_MOODS: ReadonlyArray<{ id: string; label: string; icon: LucideIcon }> = [
+  { id: 'for_you', label: 'For you', icon: Sparkles },
+  { id: 'played_courses', label: 'Courses played', icon: Flag },
+  { id: 'follows', label: 'Your follows', icon: Users },
+  { id: 'trending', label: 'Trending', icon: Flame },
+  { id: 'tour_week', label: 'Tour week', icon: Trophy },
 ] as const;
 
 export type WatchMoodId = typeof WATCH_MOODS[number]['id'];

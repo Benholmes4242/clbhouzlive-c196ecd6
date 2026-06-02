@@ -4,7 +4,7 @@ import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import PageRoot from '@/components/layout/PageRoot';
 import ScrollToTopGlass from '@/components/common/ScrollToTopGlass';
 import { WatchActionsProvider } from '@/components/watch/context/WatchActionsContext';
-import { Kicker } from '@/components/watch/proshop/Kicker';
+
 import ShellSlot from '@/components/header/ShellSlot';
 
 import { useVideosMood } from '@/components/watch/videos/hooks/useVideosMood';
@@ -43,21 +43,6 @@ export default function VideosSubpage() {
     <WatchActionsProvider>
       <PageRoot className="min-h-screen" hasBottomNav={true} style={{ background: CREAM }}>
         <ShellSlot>
-          <div style={{ background: '#0A0E14', padding: '14px 16px 12px' }}>
-            <Kicker>Long-form</Kicker>
-            <h1
-              style={{
-                fontSize: 22,
-                fontWeight: 800,
-                letterSpacing: '-0.025em',
-                color: '#FFFFFF',
-                lineHeight: 1.05,
-                margin: 0,
-              }}
-            >
-              Videos
-            </h1>
-          </div>
           <VideosMoodChips active={mood} onChange={setMood} />
         </ShellSlot>
 

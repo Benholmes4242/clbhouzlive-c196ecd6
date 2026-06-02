@@ -48,7 +48,7 @@ function ClipsMoodChipsInner({ active, onChange }: ClipsMoodChipsProps) {
                 whiteSpace: 'nowrap',
               }}
             >
-              <span aria-hidden style={{ fontSize: 13 }}>{m.emoji}</span>
+              {(() => { const Icon = m.icon; return <Icon size={14} strokeWidth={2} aria-hidden style={{ flexShrink: 0 }} />; })()}
               <span>{m.label}</span>
             </button>
           );

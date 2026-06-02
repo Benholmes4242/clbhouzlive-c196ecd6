@@ -1,5 +1,6 @@
 import { useCallback } from 'react';
 import { useSearchParams } from 'react-router-dom';
+import { Sparkles, Clapperboard, GraduationCap, Trophy, Users, type LucideIcon } from 'lucide-react';
 
 /**
  * Videos-specific mood filter. Five chips: For you (default) / Course vlogs /
@@ -18,12 +19,12 @@ import { useSearchParams } from 'react-router-dom';
  *   coaching     → 'tips-coaching'
  *   tournaments  → 'tournament'
  */
-export const VIDEOS_MOODS = [
-  { id: 'for_you',      label: 'For you',      emoji: '✨' },
-  { id: 'course_vlogs', label: 'Course vlogs', emoji: '🎬' },
-  { id: 'coaching',     label: 'Coaching',     emoji: '🎓' },
-  { id: 'tournaments',  label: 'Tournaments',  emoji: '🏆' },
-  { id: 'friends',      label: 'Friends',      emoji: '👥' },
+export const VIDEOS_MOODS: ReadonlyArray<{ id: string; label: string; icon: LucideIcon }> = [
+  { id: 'for_you',      label: 'For you',      icon: Sparkles },
+  { id: 'course_vlogs', label: 'Course vlogs', icon: Clapperboard },
+  { id: 'coaching',     label: 'Coaching',     icon: GraduationCap },
+  { id: 'tournaments',  label: 'Tournaments',  icon: Trophy },
+  { id: 'friends',      label: 'Friends',      icon: Users },
 ] as const;
 
 export type VideosMoodId = typeof VIDEOS_MOODS[number]['id'];

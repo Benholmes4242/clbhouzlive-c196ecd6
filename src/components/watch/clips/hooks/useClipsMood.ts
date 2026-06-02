@@ -1,5 +1,6 @@
 import { useCallback } from 'react';
 import { useSearchParams } from 'react-router-dom';
+import { Sparkles, Zap, Users, MapPin, Flame, type LucideIcon } from 'lucide-react';
 
 /**
  * Clips-specific mood filter. Five chips: For you (default) / Lightning /
@@ -12,12 +13,12 @@ import { useSearchParams } from 'react-router-dom';
  * Intentionally separate from `useWatchMood` (Watch tab) — the chip set is
  * different and we want each surface to own its own URL contract.
  */
-export const CLIPS_MOODS = [
-  { id: 'for_you', label: 'For you', emoji: '✨' },
-  { id: 'lightning', label: 'Lightning', emoji: '⚡' },
-  { id: 'friends', label: 'Friends', emoji: '👥' },
-  { id: 'your_courses', label: 'From your courses', emoji: '📍' },
-  { id: 'trending', label: 'Trending', emoji: '🔥' },
+export const CLIPS_MOODS: ReadonlyArray<{ id: string; label: string; icon: LucideIcon }> = [
+  { id: 'for_you', label: 'For you', icon: Sparkles },
+  { id: 'lightning', label: 'Lightning', icon: Zap },
+  { id: 'friends', label: 'Friends', icon: Users },
+  { id: 'your_courses', label: 'From your courses', icon: MapPin },
+  { id: 'trending', label: 'Trending', icon: Flame },
 ] as const;
 
 export type ClipsMoodId = typeof CLIPS_MOODS[number]['id'];
