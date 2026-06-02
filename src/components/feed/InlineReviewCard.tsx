@@ -124,7 +124,12 @@ export const InlineReviewCard: React.FC<InlineReviewCardProps> = ({
           fontFamily: FONTS.geist,
         }}
       >
-        <span style={{ width: 12, height: 12, borderRadius: '50%', border: '2px solid #F7931E' }} />
+        <img
+          src="/lovable-uploads/2b0e2d79-6b26-4b6b-a27b-8dd5f8cc5aad.png"
+          alt=""
+          style={{ width: 14, height: 14, objectFit: 'contain' }}
+          aria-hidden="true"
+        />
         <span style={{ fontSize: 10, fontWeight: 800, letterSpacing: '0.12em', color: '#fff' }}>REVIEW</span>
         <span style={{ fontSize: 14, fontWeight: 800, color: '#fff', fontVariantNumeric: 'tabular-nums' }}>
           {formattedRating}
