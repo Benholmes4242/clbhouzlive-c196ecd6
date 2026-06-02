@@ -5,6 +5,7 @@
  */
 
 import React from 'react';
+import { Trophy } from 'lucide-react';
 import { INK } from '../HybridHero.constants';
 import { AMBER, STATUS_LIVE, WHITE_ALPHA_65 } from '../../../_shared/tokens';
 import type { HeroState } from '../HybridHero.utils';
