@@ -106,6 +106,7 @@ function SoloRowDark({
   isLeader,
   isLast,
   isResultsLeader,
+  isResults = false,
 }: {
   entry: any;
   rank: string;
@@ -113,6 +114,7 @@ function SoloRowDark({
   isLeader: boolean;
   isLast: boolean;
   isResultsLeader: boolean;
+  isResults?: boolean;
 }) {
   const name = entryName(entry);
   const score = entry?.score;
@@ -178,15 +180,17 @@ function SoloRowDark({
       >
         {fmtScore(score)}
       </span>
-      <span
-        style={{
-          ...NUMERIC_STYLE,
-          width: 18, fontSize: 11, fontWeight: 600,
-          color: 'rgba(255,255,255,0.4)', textAlign: 'right', flexShrink: 0,
-        }}
-      >
-        {entryThru(entry)}
-      </span>
+      {!isResults && (
+        <span
+          style={{
+            ...NUMERIC_STYLE,
+            width: 18, fontSize: 11, fontWeight: 600,
+            color: 'rgba(255,255,255,0.4)', textAlign: 'right', flexShrink: 0,
+          }}
+        >
+          {entryThru(entry)}
+        </span>
+      )}
     </div>
   );
 }
@@ -623,15 +627,16 @@ export function CinematicFrame({
           );
         } else {
           slotNodes.push(
-            <SoloRowDark
-              key={`c-solo-${i}`}
-              entry={slot.entry}
-              rank={formatRank(slot.entry)}
-              avatarUrl={avatar(slot.entry)}
-              isLeader={false}
-              isLast={isLast}
-              isResultsLeader={false}
-            />
+          <SoloRowDark
+            key={`c-solo-${i}`}
+            entry={slot.entry}
+            rank={formatRank(slot.entry)}
+            avatarUrl={avatar(slot.entry)}
+            isLeader={false}
+            isLast={isLast}
+            isResultsLeader={false}
+            isResults={isResults}
+          />
           );
         }
       });
@@ -650,15 +655,16 @@ export function CinematicFrame({
         );
       } else {
         slotNodes.push(
-          <SoloRowDark
-            key="leader"
-            entry={leader}
-            rank={String(leader.position ?? 1)}
-            avatarUrl={avatar(leader)}
-            isLeader={true}
-            isLast={false}
-            isResultsLeader={false}
-          />
+        <SoloRowDark
+          key="leader"
+          entry={leader}
+          rank={String(leader.position ?? 1)}
+          avatarUrl={avatar(leader)}
+          isLeader={true}
+          isLast={false}
+          isResultsLeader={false}
+          isResults={isResults}
+        />
         );
       }
 
@@ -679,15 +685,16 @@ export function CinematicFrame({
           );
         } else {
           slotNodes.push(
-            <SoloRowDark
-              key={`c-solo-${i}`}
-              entry={slot.entry}
-              rank={formatRank(slot.entry)}
-              avatarUrl={avatar(slot.entry)}
-              isLeader={false}
-              isLast={isLast}
-              isResultsLeader={false}
-            />
+          <SoloRowDark
+            key={`c-solo-${i}`}
+            entry={slot.entry}
+            rank={formatRank(slot.entry)}
+            avatarUrl={avatar(slot.entry)}
+            isLeader={false}
+            isLast={isLast}
+            isResultsLeader={false}
+            isResults={isResults}
+          />
           );
         }
       });
