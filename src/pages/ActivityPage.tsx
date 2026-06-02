@@ -217,96 +217,99 @@ const ActivityPage: React.FC = () => {
       <div className="flex flex-col min-h-full" style={{ background: BG_SURFACE }}>
         <div className="max-w-2xl mx-auto w-full flex flex-col flex-1">
 
-          {/* Header — sticky, owns the safe area (matches Followers page) */}
+          {/* Header — sticky, owns the safe area + filters + mark-all (matches Followers page) */}
           <div
-            className="sticky top-0 z-40 backdrop-blur-xl px-5 pb-0 flex items-end justify-between"
+            className="sticky top-0 z-40 backdrop-blur-xl px-5 pb-0 flex flex-col"
             style={{
               paddingTop: 'max(env(safe-area-inset-top, 0px), 47px)',
               background: 'rgba(248,250,252,0.97)',
             }}
           >
-            <div>
-              <div className="flex items-center gap-2 mb-1.5">
-                <span style={{ fontSize: 9, fontWeight: 800, color: '#64748B', letterSpacing: '0.16em', textTransform: 'uppercase' }}>Activity</span>
-              </div>
-              <div className="flex items-baseline gap-2.5">
-                <h1
-                  onClick={handleRefresh}
-                  className={cn(
-                    "leading-none cursor-pointer transition-opacity",
-                    isRefreshing && "opacity-50"
-                  )}
-                  style={{
-                    fontFamily: FONT_SERIF,
-                    fontWeight: 800,
-                    color: INK,
-                    fontSize: 34,
-                    letterSpacing: '-0.025em',
-                  }}
-                  aria-label="Notifications - tap to refresh"
-                >
-                  Notifications
-                </h1>
-                {sessionNewCount && sessionNewCount > 0 ? (
-                  <span style={{ fontSize: 12, fontWeight: 700, color: AMBER }}>
-                    {sessionNewCount} new
-                  </span>
-                ) : null}
+            {/* Title row */}
+            <div className="flex items-end justify-between">
+              <div>
+                <div className="flex items-center gap-2 mb-1.5">
+                  <span style={{ fontSize: 9, fontWeight: 800, color: '#64748B', letterSpacing: '0.16em', textTransform: 'uppercase' }}>Activity</span>
+                </div>
+                <div className="flex items-baseline gap-2.5">
+                  <h1
+                    onClick={handleRefresh}
+                    className={cn(
+                      "leading-none cursor-pointer transition-opacity",
+                      isRefreshing && "opacity-50"
+                    )}
+                    style={{
+                      fontFamily: FONT_SERIF,
+                      fontWeight: 800,
+                      color: INK,
+                      fontSize: 34,
+                      letterSpacing: '-0.025em',
+                    }}
+                    aria-label="Notifications - tap to refresh"
+                  >
+                    Notifications
+                  </h1>
+                  {sessionNewCount && sessionNewCount > 0 ? (
+                    <span style={{ fontSize: 12, fontWeight: 700, color: AMBER }}>
+                      {sessionNewCount} new
+                    </span>
+                  ) : null}
+                </div>
               </div>
             </div>
-          </div>
 
-          {/* Filter chips */}
-          <div className="flex gap-2 px-5 pt-3 pb-2 overflow-x-auto scrollbar-none">
-            {FILTER_CHIPS.map(chip => {
-              const isActive = chipFilter === chip;
-              const count = chip === 'All' ? allItems.length : null;
-              return (
+            {/* Filter chips */}
+            <div className="flex gap-2 pt-3 pb-2 overflow-x-auto scrollbar-none">
+              {FILTER_CHIPS.map(chip => {
+                const isActive = chipFilter === chip;
+                const count = chip === 'All' ? allItems.length : null;
+                return (
+                  <button
+                    key={chip}
+                    onClick={() => setChipFilter(chip)}
+                    className="shrink-0 rounded-full transition-all active:scale-[0.95] inline-flex items-center"
+                    style={{
+                      minHeight: 32,
+                      padding: '6px 14px',
+                      background: isActive ? INK : 'transparent',
+                      color: isActive ? '#FFFFFF' : INK_SOFT,
+                      border: isActive ? '1px solid transparent' : `1px solid ${BORDER}`,
+                      fontSize: 13,
+                      fontWeight: 600,
+                      gap: 6,
+                    }}
+                  >
+                    {chip}
+                    {count != null && count > 0 && (
+                      <span style={{ fontSize: 11, opacity: 0.7, fontWeight: 700 }}>{count}</span>
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* Mark all read */}
+            {showMarkAllRead && (
+              <div className="flex justify-end pb-2">
                 <button
-                  key={chip}
-                  onClick={() => setChipFilter(chip)}
-                  className="shrink-0 rounded-full transition-all active:scale-[0.95] inline-flex items-center"
+                  onClick={handleMarkAllRead}
                   style={{
-                    minHeight: 32,
-                    padding: '6px 14px',
-                    background: isActive ? INK : 'transparent',
-                    color: isActive ? '#FFFFFF' : INK_SOFT,
-                    border: isActive ? '1px solid transparent' : `1px solid ${BORDER}`,
-                    fontSize: 13,
+                    fontSize: 12,
                     fontWeight: 600,
-                    gap: 6,
+                    color: AMBER_DEEP,
+                    textDecoration: 'underline',
+                    textUnderlineOffset: 2,
+                    background: 'transparent',
+                    border: 'none',
+                    cursor: 'pointer',
+                    padding: '4px 0',
                   }}
                 >
-                  {chip}
-                  {count != null && count > 0 && (
-                    <span style={{ fontSize: 11, opacity: 0.7, fontWeight: 700 }}>{count}</span>
-                  )}
+                  Mark all as read
                 </button>
-              );
-            })}
+              </div>
+            )}
           </div>
-
-          {/* Mark all read */}
-          {showMarkAllRead && (
-            <div className="flex justify-end px-5 pt-1 pb-1">
-              <button
-                onClick={handleMarkAllRead}
-                style={{
-                  fontSize: 12,
-                  fontWeight: 600,
-                  color: AMBER_DEEP,
-                  textDecoration: 'underline',
-                  textUnderlineOffset: 2,
-                  background: 'transparent',
-                  border: 'none',
-                  cursor: 'pointer',
-                  padding: '4px 0',
-                }}
-              >
-                Mark all as read
-              </button>
-            </div>
-          )}
 
           {/* Content */}
           <div className="flex-1 mt-1">
