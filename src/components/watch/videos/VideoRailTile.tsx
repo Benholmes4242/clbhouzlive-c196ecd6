@@ -2,7 +2,6 @@ import { memo, useCallback, useMemo, useRef, useState } from 'react';
 
 import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
 import type { FeedPost } from '@/components/media-system/types/media';
-import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { useWatchActions } from '../context/WatchActionsContext';
 import { Pin } from '../proshop/Pin';
 import { haptic } from '@/utils/haptics';
