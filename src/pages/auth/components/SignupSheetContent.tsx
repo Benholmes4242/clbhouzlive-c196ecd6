@@ -235,8 +235,9 @@ const SignupSheetContent: React.FC<SignupSheetContentProps> = ({
           />
           <style>{`
             input::placeholder {
-              color: rgba(255, 255, 255, 0.35);
-              font-size: 14px;
+              color: rgba(255, 255, 255, 0.55);
+              font-weight: 500;
+              font-size: 15px;
             }
           `}</style>
           <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
