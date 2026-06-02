@@ -68,11 +68,12 @@ export function SoloLeaderRow({
   isResults = false,
   isLast = false,
 }: SoloLeaderRowProps) {
+  const hideThru = isResults;
   return (
     <div
       style={{
         display: 'grid',
-        gridTemplateColumns: '32px 1fr auto 42px',
+        gridTemplateColumns: hideThru ? '32px 1fr auto' : '32px 1fr auto 42px',
         gap: 12,
         padding: '14px 20px',
         alignItems: 'center',
@@ -122,17 +123,19 @@ export function SoloLeaderRow({
       >
         {score}
       </span>
-      <span
-        style={{
-          ...NUMERIC_STYLE,
-          fontSize: 11,
-          fontWeight: 700,
-          color: INK_45,
-          textAlign: 'right',
-        }}
-      >
-        {thru}
-      </span>
+      {!hideThru && (
+        <span
+          style={{
+            ...NUMERIC_STYLE,
+            fontSize: 11,
+            fontWeight: 700,
+            color: INK_45,
+            textAlign: 'right',
+          }}
+        >
+          {thru}
+        </span>
+      )}
     </div>
   );
 }

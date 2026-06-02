@@ -17,6 +17,7 @@ export interface TeamFinishRowProps {
   members?: { fullName: string }[];
   score: string;                   // formatted with Unicode minus
   thru?: string;                   // typically "F"
+  isResults?: boolean;
   isLast?: boolean;
   isChampion?: boolean;
 }
@@ -105,9 +106,11 @@ export function TeamFinishRow({
   members,
   score,
   thru = 'F',
+  isResults = true,
   isLast = false,
   isChampion = false,
 }: TeamFinishRowProps) {
+  const hideThru = isResults;
   const memberSubtext =
     members && members.length > 0
       ? members.slice(0, 2).map(m => surnameOnly(m.fullName)).filter(Boolean).join(' · ')
@@ -206,21 +209,22 @@ export function TeamFinishRow({
         {score}
       </div>
 
-      {/* Thru */}
-      <div
-        style={{
-          ...NUMERIC_STYLE,
-          fontSize: 11,
-          fontWeight: 600,
-          color: INK_45,
-          letterSpacing: '0.02em',
-          width: 18,
-          textAlign: 'right',
-          flexShrink: 0,
-        }}
-      >
-        {thru}
-      </div>
+      {!hideThru && (
+        <div
+          style={{
+            ...NUMERIC_STYLE,
+            fontSize: 11,
+            fontWeight: 600,
+            color: INK_45,
+            letterSpacing: '0.02em',
+            width: 18,
+            textAlign: 'right',
+            flexShrink: 0,
+          }}
+        >
+          {thru}
+        </div>
+      )}
     </div>
   );
 }
