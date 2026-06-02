@@ -121,15 +121,14 @@ export const BreathingRoomBottomBar: React.FC<BreathingRoomBottomBarProps> = ({
               alignSelf: 'flex-start',
               display: 'inline-flex',
               alignItems: 'center',
-              gap: 6,
+              gap: 7,
               maxWidth: '100%',
               padding: '5px 11px',
               borderRadius: 999,
-              background: FROST.glass,
-              border: `1px solid ${FROST.border}`,
-              backdropFilter: FROST_BLUR.tile,
-              WebkitBackdropFilter: FROST_BLUR.tile,
-              boxShadow: `${FROST.dropShadow}, ${FROST.innerHighlight}`,
+              background: 'rgba(10,14,20,0.52)',
+              border: '1px solid rgba(255,255,255,0.16)',
+              backdropFilter: 'blur(14px) saturate(150%)',
+              WebkitBackdropFilter: 'blur(14px) saturate(150%)',
               cursor: onCourseTap ? 'pointer' : 'default',
               fontFamily: 'inherit',
             }}
@@ -151,7 +150,7 @@ export const BreathingRoomBottomBar: React.FC<BreathingRoomBottomBarProps> = ({
               style={{
                 fontSize: 11,
                 fontWeight: 700,
-                color: FROST.ink,
+                color: '#fff',
                 whiteSpace: 'nowrap',
                 overflow: 'hidden',
                 textOverflow: 'ellipsis',
@@ -161,6 +160,7 @@ export const BreathingRoomBottomBar: React.FC<BreathingRoomBottomBarProps> = ({
             </span>
           </button>
         )}
+
 
         {/* Author identity row */}
         {author && (
