@@ -505,7 +505,7 @@ function GlobalSearchOverlay({ isOpen, onClose }: GlobalSearchOverlayProps) {
                               position: 'relative',
                               width: 140,
                               height: 175,
-                              borderRadius: 14,
+                              borderRadius: 16,
                               background: '#E2E8F0',
                               overflow: 'hidden',
                               boxShadow: '0 1px 3px rgba(15,23,42,0.08)',
