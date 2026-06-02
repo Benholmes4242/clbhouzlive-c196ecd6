@@ -771,7 +771,7 @@ function GlobalSearchOverlay({ isOpen, onClose }: GlobalSearchOverlayProps) {
                               <p className="text-[14px] font-medium truncate" style={{ color: INK }}>{business.name}</p>
                               {business.verified && <BadgeCheck className="w-3.5 h-3.5 shrink-0" style={{ color: AMBER }} />}
                             </div>
-                            <p className="text-[12px] truncate" style={{ color: INK_SUBTLE }}>
+                            <p className="text-[12px] truncate" style={{ color: INK_SOFT }}>
                               {[business.city, business.country].filter(Boolean).join(', ')}
                             </p>
                           </div>
