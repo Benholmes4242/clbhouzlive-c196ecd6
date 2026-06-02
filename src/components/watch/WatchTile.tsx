@@ -41,7 +41,7 @@ const WatchTile: React.FC<WatchTileProps> = ({
   const tileRef = useRef<HTMLDivElement>(null);
   const hlsUrl = post.mediaItems?.[0]?.hlsUrl;
   const { open } = useFullscreenFeedStore();
-  const navigate = useNavigate();
+  
 
   // Long-press state
   const longPressTimerRef = useRef<number | null>(null);
