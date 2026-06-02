@@ -38,16 +38,8 @@ const ZoomableImageSlide: React.FC<{
 
   return (
     <div className="absolute inset-0 overflow-hidden">
-      {/* Blur-fill background — extends the image visually beyond its native aspect */}
-      <img
-        src={imgSrc}
-        alt=""
-        className="absolute inset-0 w-full h-full object-cover"
-        style={{ filter: 'blur(60px)', transform: 'scale(1.4)', opacity: 0.9 }}
-        draggable={false}
-        aria-hidden="true"
-      />
-      <div className="absolute inset-0 bg-black/25" />
+      {/* Solid matte behind non-filling media — chrome colour, no blur. */}
+      <div className="absolute inset-0" style={{ background: '#0A0E14' }} aria-hidden="true" />
       <div
         ref={ref}
         style={{ ...style, position: 'absolute', inset: 0, zIndex: 1 }}
