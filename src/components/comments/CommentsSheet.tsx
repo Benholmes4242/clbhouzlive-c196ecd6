@@ -792,11 +792,9 @@ function CommentsSheet({
             {/* Post caption — quote block */}
             {activeTab === 'comments' && (cleanCaption || displayCourseName) && (
               <div
-                className="px-4 py-3 shrink-0 flex gap-3"
+                className="px-4 py-3 shrink-0"
                 style={{ borderBottom: `0.5px solid ${BORDER}` }}
               >
-                {/* Vertical amber quote bar */}
-                <div style={{ width: 3, borderRadius: 2, background: 'rgba(247,147,30,0.5)', flexShrink: 0 }} />
                 <div className="flex-1 min-w-0">
                   {cleanCaption && (
                     <div style={{ color: INK_SOFT }}>
