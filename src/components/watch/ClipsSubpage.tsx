@@ -9,7 +9,7 @@ import WatchAutoplay from './WatchAutoplay';
 import WatchGrid from './WatchGrid';
 import { WatchActionsProvider } from './context/WatchActionsContext';
 
-import { Kicker } from './proshop/Kicker';
+
 import { ClipsMoodChips } from './clips/ClipsMoodChips';
 import { useClipsMood } from './clips/hooks/useClipsMood';
 import { ClipOfTheWeekHero } from './clips/ClipOfTheWeekHero';
