@@ -168,7 +168,24 @@ export const FeedOverlayLayer = memo(function FeedOverlayLayer({
           pointerEvents: 'none',
           zIndex: 0,
         }}
-      />
+      >
+        {/* Chrome foot — feathers the scrim base into the opaque #0A0E14 nav so the
+            nav/scrim seam disappears. Height tracks the real nav via the existing
+            --bottom-nav-height var (fallback 88px) plus a short feather above it. */}
+        <div
+          aria-hidden
+          style={{
+            position: 'absolute',
+            left: 0,
+            right: 0,
+            bottom: 0,
+            height: 'calc(var(--bottom-nav-height, 88px) + 36px)',
+            background:
+              'linear-gradient(to top, #0A0E14 0%, #0A0E14 60%, rgba(10,14,20,0) 100%)',
+            pointerEvents: 'none',
+          }}
+        />
+      </div>
 
       {/* Mute toggle now lives inside FeedActionRail (top of rail) */}
 
