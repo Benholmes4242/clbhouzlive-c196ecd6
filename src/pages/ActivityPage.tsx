@@ -50,7 +50,7 @@ const FONT_SERIF = '"Geist", -apple-system, BlinkMacSystemFont, "Segoe UI", Robo
 
 const SectionHeader: React.FC<{ label: string }> = ({ label }) => (
     <div
-    className="sticky top-0 z-10 flex items-center gap-2 px-5 py-2"
+    className="flex items-center gap-2 px-5 py-2 z-10"
     style={{ background: BG_SURFACE }}
   >
     <span style={{ fontSize: 9, fontWeight: 800, color: '#64748B', letterSpacing: '0.16em', textTransform: 'uppercase' }}>
@@ -217,8 +217,14 @@ const ActivityPage: React.FC = () => {
       <div className="flex flex-col min-h-full" style={{ background: BG_SURFACE }}>
         <div className="max-w-2xl mx-auto w-full flex flex-col flex-1">
 
-          {/* Header */}
-          <div className="px-5 pt-4 pb-0 flex items-end justify-between">
+          {/* Header — sticky, owns the safe area (matches Followers page) */}
+          <div
+            className="sticky top-0 z-40 backdrop-blur-xl px-5 pb-0 flex items-end justify-between"
+            style={{
+              paddingTop: 'max(env(safe-area-inset-top, 0px), 47px)',
+              background: 'rgba(248,250,252,0.97)',
+            }}
+          >
             <div>
               <div className="flex items-center gap-2 mb-1.5">
                 <span style={{ fontSize: 9, fontWeight: 800, color: '#64748B', letterSpacing: '0.16em', textTransform: 'uppercase' }}>Activity</span>

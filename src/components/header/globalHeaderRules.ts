@@ -20,6 +20,7 @@ export const GLOBAL_HEADER_EXCLUDED_ROUTES = [
   '/profile',
   '/achievements',
   '/golferstofollow',
+  '/notificationmessages',
 ] as const;
 
 export const GLOBAL_HEADER_EXCLUDED_PREFIXES = [
