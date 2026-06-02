@@ -614,7 +614,7 @@ function GlobalSearchOverlay({ isOpen, onClose }: GlobalSearchOverlayProps) {
                             </div>
                           </button>
                           {/* Secondary actions row */}
-                          <div style={{ display: 'flex', gap: 6, padding: '0 16px 10px 58px' }}>
+                          <div style={{ display: 'flex', gap: 6, padding: '0 16px 10px 70px' }}>
                             {course.user_has_rated ? (
                               <>
                                 <button
@@ -622,8 +622,8 @@ function GlobalSearchOverlay({ isOpen, onClose }: GlobalSearchOverlayProps) {
                                   onClick={() => selectCourse(course)}
                                   style={{
                                     display: 'flex', alignItems: 'center', gap: 4,
-                                    padding: '5px 12px', borderRadius: 7,
-                                    background: 'rgba(0,103,71,0.10)',
+                                    padding: '5px 12px', borderRadius: 999,
+                                    background: 'rgba(0,103,71,0.12)',
                                     border: '1px solid rgba(0,103,71,0.25)',
                                     fontSize: 11, fontWeight: 700,
                                     color: GREEN,
@@ -636,10 +636,10 @@ function GlobalSearchOverlay({ isOpen, onClose }: GlobalSearchOverlayProps) {
                                   type="button"
                                   onClick={() => selectCourse(course)}
                                   style={{
-                                    padding: '5px 12px', borderRadius: 7,
-                                    background: 'rgba(15,23,42,0.04)',
+                                    padding: '5px 12px', borderRadius: 999,
+                                    background: 'rgba(15,23,42,0.06)',
                                     border: '0.5px solid rgba(15,23,42,0.1)',
-                                    fontSize: 11, fontWeight: 500,
+                                    fontSize: 11, fontWeight: 600,
                                     color: INK_SOFT,
                                     cursor: 'pointer',
                                   }}
@@ -653,10 +653,10 @@ function GlobalSearchOverlay({ isOpen, onClose }: GlobalSearchOverlayProps) {
                                   type="button"
                                   onClick={() => selectCourse(course)}
                                   style={{
-                                    padding: '5px 12px', borderRadius: 7,
-                                    background: 'rgba(15,23,42,0.04)',
+                                    padding: '5px 12px', borderRadius: 999,
+                                    background: 'rgba(15,23,42,0.06)',
                                     border: '0.5px solid rgba(15,23,42,0.1)',
-                                    fontSize: 11, fontWeight: 500,
+                                    fontSize: 11, fontWeight: 600,
                                     color: INK_SOFT,
                                     cursor: 'pointer',
                                   }}
@@ -668,8 +668,8 @@ function GlobalSearchOverlay({ isOpen, onClose }: GlobalSearchOverlayProps) {
                                   onClick={() => selectCourseRate(course)}
                                   style={{
                                     display: 'flex', alignItems: 'center', gap: 4,
-                                    padding: '5px 12px', borderRadius: 7,
-                                    background: 'rgba(247,147,30,0.10)',
+                                    padding: '5px 12px', borderRadius: 999,
+                                    background: 'rgba(247,147,30,0.12)',
                                     border: '1px solid rgba(247,147,30,0.30)',
                                     fontSize: 11, fontWeight: 700,
                                     color: AMBER,
