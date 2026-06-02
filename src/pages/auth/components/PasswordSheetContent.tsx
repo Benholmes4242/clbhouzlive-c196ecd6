@@ -121,17 +121,17 @@ const PasswordSheetContent: React.FC<PasswordSheetContentProps> = ({
         )}
       </div>
       
-      {/* Submit button - premium white */}
+      {/* Submit button - amber primary matching hero */}
       <button
         onClick={onSubmit}
         disabled={isDisabled}
-        className="w-full h-[54px] flex items-center justify-center rounded-full text-[16px] transition-all duration-200 active:scale-[0.98]"
+        className="w-full h-[54px] flex items-center justify-center rounded-[14px] text-[15px] transition-all duration-200 active:scale-[0.98]"
         style={{
-          fontWeight: 500,
-          background: isDisabled ? 'rgba(255, 255, 255, 0.5)' : 'white',
-          color: '#0D0F11',
+          fontWeight: 700,
+          background: isDisabled ? 'rgba(255,255,255,0.05)' : '#F7931E',
+          color: isDisabled ? 'rgba(255,255,255,0.35)' : '#FFFFFF',
+          border: isDisabled ? '1px solid rgba(255,255,255,0.10)' : 'none',
           cursor: isDisabled ? 'not-allowed' : 'pointer',
-          opacity: isDisabled ? 0.6 : 1,
         }}
       >
         {submitting ? (
