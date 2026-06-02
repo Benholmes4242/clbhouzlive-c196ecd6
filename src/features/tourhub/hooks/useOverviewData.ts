@@ -113,7 +113,19 @@ export function useWorldRankingsTop(limit: number = 10) {
   });
 }
 
-import { mapTourSlug } from '../utils/mapTourSlug';
+/**
+ * Map tour_name from database to our TourId
+ */
+function mapTourSlug(tourName: string): TourId {
+  const normalized = tourName?.toLowerCase().trim();
+  if (normalized === 'pga' || normalized === 'pga tour') return 'pga';
+  if (normalized === 'euro' || normalized === 'dp world' || normalized === 'european tour') return 'euro';
+  if (normalized === 'lpga' || normalized === 'lpga tour') return 'lpga';
+  if (normalized === 'liv' || normalized === 'liv golf') return 'liv';
+  if (normalized === 'pgad' || normalized === 'korn ferry') return 'pgad';
+  if (normalized === 'champ' || normalized === 'champions') return 'champ';
+  return 'pga';
+}
 
 /**
  * Fetch live tournaments across all tours
