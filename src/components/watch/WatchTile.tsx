@@ -102,17 +102,6 @@ const WatchTile: React.FC<WatchTileProps> = ({
     open(allPosts ?? [post], index);
   };
 
-  const handleCreatorTap = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    if (post.username) {
-      navigate(`/profile/${post.username}`);
-    } else if (post.userId) {
-      navigate(`/profile/${post.userId}`);
-    }
-  };
-
-  const creatorLabel = post.displayName || post.username || '';
-  const showCreatorChip = !!creatorLabel;
 
   const mosaic = variant === 'hero' || variant === 'tile';
   const tileClassName = mosaic
