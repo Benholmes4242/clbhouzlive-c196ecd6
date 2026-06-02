@@ -213,7 +213,7 @@ const ActivityPage: React.FC = () => {
   const showMarkAllRead = (sessionNewCount ?? 0) > 0;
 
   return (
-    <PageRoot>
+    <PageRoot hasBottomNav={true}>
       <div className="flex flex-col min-h-full" style={{ background: BG_SURFACE }}>
         <div className="max-w-2xl mx-auto w-full flex flex-col flex-1">
 
@@ -227,33 +227,42 @@ const ActivityPage: React.FC = () => {
           >
             {/* Title row */}
             <div className="flex items-end justify-between">
-              <div>
-                <div className="flex items-center gap-2 mb-1.5">
-                  <span style={{ fontSize: 9, fontWeight: 800, color: '#64748B', letterSpacing: '0.16em', textTransform: 'uppercase' }}>Activity</span>
-                </div>
-                <div className="flex items-baseline gap-2.5">
-                  <h1
-                    onClick={handleRefresh}
-                    className={cn(
-                      "leading-none cursor-pointer transition-opacity",
-                      isRefreshing && "opacity-50"
-                    )}
-                    style={{
-                      fontFamily: FONT_SERIF,
-                      fontWeight: 800,
-                      color: INK,
-                      fontSize: 34,
-                      letterSpacing: '-0.025em',
-                    }}
-                    aria-label="Notifications - tap to refresh"
-                  >
-                    Notifications
-                  </h1>
-                  {sessionNewCount && sessionNewCount > 0 ? (
-                    <span style={{ fontSize: 12, fontWeight: 700, color: AMBER }}>
-                      {sessionNewCount} new
-                    </span>
-                  ) : null}
+              <div className="flex items-center gap-3">
+                <button
+                  onClick={() => navigate(-1)}
+                  style={{ width: 36, height: 36, borderRadius: '50%', background: 'rgba(15,23,42,0.05)', border: '0.5px solid rgba(15,23,42,0.10)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, cursor: 'pointer' }}
+                  aria-label="Back"
+                >
+                  <ChevronLeft size={20} strokeWidth={2.5} style={{ color: '#64748B' }} />
+                </button>
+                <div>
+                  <div className="flex items-center gap-2 mb-1.5">
+                    <span style={{ fontSize: 9, fontWeight: 800, color: '#64748B', letterSpacing: '0.16em', textTransform: 'uppercase' }}>Activity</span>
+                  </div>
+                  <div className="flex items-baseline gap-2.5">
+                    <h1
+                      onClick={handleRefresh}
+                      className={cn(
+                        "leading-none cursor-pointer transition-opacity",
+                        isRefreshing && "opacity-50"
+                      )}
+                      style={{
+                        fontFamily: FONT_SERIF,
+                        fontWeight: 800,
+                        color: INK,
+                        fontSize: 34,
+                        letterSpacing: '-0.025em',
+                      }}
+                      aria-label="Notifications - tap to refresh"
+                    >
+                      Notifications
+                    </h1>
+                    {sessionNewCount && sessionNewCount > 0 ? (
+                      <span style={{ fontSize: 12, fontWeight: 700, color: AMBER }}>
+                        {sessionNewCount} new
+                      </span>
+                    ) : null}
+                  </div>
                 </div>
               </div>
             </div>
