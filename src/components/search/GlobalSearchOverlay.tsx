@@ -55,10 +55,11 @@ function SectionHeader({
     >
       <span
         style={{
-          fontSize: 13,
-          fontWeight: 600,
-          color: INK,
-          letterSpacing: '-0.01em',
+          fontSize: 9,
+          fontWeight: 800,
+          color: INK_SUBTLE,
+          letterSpacing: '0.16em',
+          textTransform: 'uppercase',
         }}
       >
         {label}
