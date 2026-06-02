@@ -50,15 +50,16 @@ function SectionHeader({
         display: 'flex',
         alignItems: 'baseline',
         justifyContent: 'space-between',
-        padding: '18px 16px 10px',
+        padding: '16px 16px 8px',
       }}
     >
       <span
         style={{
-          fontSize: 13,
-          fontWeight: 600,
-          color: INK,
-          letterSpacing: '-0.01em',
+          fontSize: 9,
+          fontWeight: 800,
+          color: INK_SUBTLE,
+          letterSpacing: '0.16em',
+          textTransform: 'uppercase',
         }}
       >
         {label}
@@ -157,7 +158,7 @@ function TrendingShelfSkeleton() {
           <div key={i} style={{ flexShrink: 0, width: 140 }}>
             <div
               className="clb-shimmer-light"
-              style={{ width: 140, height: 175, borderRadius: 14 }}
+              style={{ width: 140, height: 175, borderRadius: 16 }}
             />
             <div className="h-3 w-28 rounded clb-shimmer-light mt-2" />
             <div className="h-2.5 w-20 rounded clb-shimmer-light mt-1.5" />
@@ -385,7 +386,7 @@ function GlobalSearchOverlay({ isOpen, onClose }: GlobalSearchOverlayProps) {
                         flexShrink: 0,
                         padding: '6px 14px',
                         borderRadius: 999,
-                        fontSize: 12.5,
+                        fontSize: 12,
                         fontWeight: 600,
                         border: `1px solid ${isActive ? INK : BORDER}`,
                         background: isActive ? INK : '#fff',
@@ -437,7 +438,7 @@ function GlobalSearchOverlay({ isOpen, onClose }: GlobalSearchOverlayProps) {
                             borderRadius: 999,
                             background: '#fff',
                             border: `1px solid ${BORDER}`,
-                            fontSize: 12.5,
+                            fontSize: 12,
                             color: INK,
                             fontWeight: 500,
                             display: 'flex',
@@ -504,7 +505,7 @@ function GlobalSearchOverlay({ isOpen, onClose }: GlobalSearchOverlayProps) {
                               position: 'relative',
                               width: 140,
                               height: 175,
-                              borderRadius: 14,
+                              borderRadius: 16,
                               background: '#E2E8F0',
                               overflow: 'hidden',
                               boxShadow: '0 1px 3px rgba(15,23,42,0.08)',
@@ -546,7 +547,7 @@ function GlobalSearchOverlay({ isOpen, onClose }: GlobalSearchOverlayProps) {
                               <div
                                 style={{
                                   fontSize: 11,
-                                  color: INK_SUBTLE,
+                                  color: INK_SOFT,
                                   lineHeight: 1.3,
                                   whiteSpace: 'nowrap',
                                   overflow: 'hidden',
@@ -606,14 +607,14 @@ function GlobalSearchOverlay({ isOpen, onClose }: GlobalSearchOverlayProps) {
                             </div>
                             <div className="flex-1 min-w-0 text-left">
                               <p className="text-[14px] font-medium truncate" style={{ color: INK }}>{course.name}</p>
-                              <p className="text-[12px] truncate" style={{ color: INK_SUBTLE }}>
+                              <p className="text-[12px] truncate" style={{ color: INK_SOFT }}>
                                 {[course.region, course.country].filter(Boolean).join(', ')}
                                 {course.global_rank && ` · #${course.global_rank} World`}
                               </p>
                             </div>
                           </button>
                           {/* Secondary actions row */}
-                          <div style={{ display: 'flex', gap: 6, padding: '0 16px 10px 58px' }}>
+                          <div style={{ display: 'flex', gap: 6, padding: '0 16px 10px 70px' }}>
                             {course.user_has_rated ? (
                               <>
                                 <button
@@ -621,8 +622,8 @@ function GlobalSearchOverlay({ isOpen, onClose }: GlobalSearchOverlayProps) {
                                   onClick={() => selectCourse(course)}
                                   style={{
                                     display: 'flex', alignItems: 'center', gap: 4,
-                                    padding: '5px 12px', borderRadius: 7,
-                                    background: 'rgba(0,103,71,0.10)',
+                                    padding: '5px 12px', borderRadius: 999,
+                                    background: 'rgba(0,103,71,0.12)',
                                     border: '1px solid rgba(0,103,71,0.25)',
                                     fontSize: 11, fontWeight: 700,
                                     color: GREEN,
@@ -635,10 +636,10 @@ function GlobalSearchOverlay({ isOpen, onClose }: GlobalSearchOverlayProps) {
                                   type="button"
                                   onClick={() => selectCourse(course)}
                                   style={{
-                                    padding: '5px 12px', borderRadius: 7,
-                                    background: 'rgba(15,23,42,0.04)',
+                                    padding: '5px 12px', borderRadius: 999,
+                                    background: 'rgba(15,23,42,0.06)',
                                     border: '0.5px solid rgba(15,23,42,0.1)',
-                                    fontSize: 11, fontWeight: 500,
+                                    fontSize: 11, fontWeight: 600,
                                     color: INK_SOFT,
                                     cursor: 'pointer',
                                   }}
@@ -652,10 +653,10 @@ function GlobalSearchOverlay({ isOpen, onClose }: GlobalSearchOverlayProps) {
                                   type="button"
                                   onClick={() => selectCourse(course)}
                                   style={{
-                                    padding: '5px 12px', borderRadius: 7,
-                                    background: 'rgba(15,23,42,0.04)',
+                                    padding: '5px 12px', borderRadius: 999,
+                                    background: 'rgba(15,23,42,0.06)',
                                     border: '0.5px solid rgba(15,23,42,0.1)',
-                                    fontSize: 11, fontWeight: 500,
+                                    fontSize: 11, fontWeight: 600,
                                     color: INK_SOFT,
                                     cursor: 'pointer',
                                   }}
@@ -667,8 +668,8 @@ function GlobalSearchOverlay({ isOpen, onClose }: GlobalSearchOverlayProps) {
                                   onClick={() => selectCourseRate(course)}
                                   style={{
                                     display: 'flex', alignItems: 'center', gap: 4,
-                                    padding: '5px 12px', borderRadius: 7,
-                                    background: 'rgba(247,147,30,0.10)',
+                                    padding: '5px 12px', borderRadius: 999,
+                                    background: 'rgba(247,147,30,0.12)',
                                     border: '1px solid rgba(247,147,30,0.30)',
                                     fontSize: 11, fontWeight: 700,
                                     color: AMBER,
@@ -712,7 +713,7 @@ function GlobalSearchOverlay({ isOpen, onClose }: GlobalSearchOverlayProps) {
                                 {person.verified && <BadgeCheck className="w-3.5 h-3.5 shrink-0" style={{ color: AMBER }} />}
                                 {person.is_public === false && <Lock className="w-3 h-3 shrink-0" style={{ color: INK_SUBTLE }} />}
                               </div>
-                              <p className="text-[12px] truncate" style={{ color: INK_SUBTLE }}>
+                              <p className="text-[12px] truncate" style={{ color: INK_SOFT }}>
                                 {person.username && !person.username.includes('@')
                                   ? `@${person.username}`
                                   : ''}
@@ -770,7 +771,7 @@ function GlobalSearchOverlay({ isOpen, onClose }: GlobalSearchOverlayProps) {
                               <p className="text-[14px] font-medium truncate" style={{ color: INK }}>{business.name}</p>
                               {business.verified && <BadgeCheck className="w-3.5 h-3.5 shrink-0" style={{ color: AMBER }} />}
                             </div>
-                            <p className="text-[12px] truncate" style={{ color: INK_SUBTLE }}>
+                            <p className="text-[12px] truncate" style={{ color: INK_SOFT }}>
                               {[business.city, business.country].filter(Boolean).join(', ')}
                             </p>
                           </div>
