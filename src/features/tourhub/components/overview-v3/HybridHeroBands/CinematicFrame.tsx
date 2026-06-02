@@ -627,15 +627,16 @@ export function CinematicFrame({
           );
         } else {
           slotNodes.push(
-            <SoloRowDark
-              key={`c-solo-${i}`}
-              entry={slot.entry}
-              rank={formatRank(slot.entry)}
-              avatarUrl={avatar(slot.entry)}
-              isLeader={false}
-              isLast={isLast}
-              isResultsLeader={false}
-            />
+          <SoloRowDark
+            key={`c-solo-${i}`}
+            entry={slot.entry}
+            rank={formatRank(slot.entry)}
+            avatarUrl={avatar(slot.entry)}
+            isLeader={false}
+            isLast={isLast}
+            isResultsLeader={false}
+            isResults={isResults}
+          />
           );
         }
       });
@@ -654,15 +655,16 @@ export function CinematicFrame({
         );
       } else {
         slotNodes.push(
-          <SoloRowDark
-            key="leader"
-            entry={leader}
-            rank={String(leader.position ?? 1)}
-            avatarUrl={avatar(leader)}
-            isLeader={true}
-            isLast={false}
-            isResultsLeader={false}
-          />
+        <SoloRowDark
+          key="leader"
+          entry={leader}
+          rank={String(leader.position ?? 1)}
+          avatarUrl={avatar(leader)}
+          isLeader={true}
+          isLast={false}
+          isResultsLeader={false}
+          isResults={isResults}
+        />
         );
       }
 
@@ -683,15 +685,16 @@ export function CinematicFrame({
           );
         } else {
           slotNodes.push(
-            <SoloRowDark
-              key={`c-solo-${i}`}
-              entry={slot.entry}
-              rank={formatRank(slot.entry)}
-              avatarUrl={avatar(slot.entry)}
-              isLeader={false}
-              isLast={isLast}
-              isResultsLeader={false}
-            />
+          <SoloRowDark
+            key={`c-solo-${i}`}
+            entry={slot.entry}
+            rank={formatRank(slot.entry)}
+            avatarUrl={avatar(slot.entry)}
+            isLeader={false}
+            isLast={isLast}
+            isResultsLeader={false}
+            isResults={isResults}
+          />
           );
         }
       });
