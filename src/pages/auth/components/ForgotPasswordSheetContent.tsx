@@ -53,11 +53,11 @@ const ForgotPasswordSheetContent: React.FC<ForgotPasswordSheetContentProps> = ({
         </p>
         <button
           onClick={onBack}
-          className="w-full h-[52px] flex items-center justify-center rounded-full font-medium text-[16px] transition-all active:scale-[0.98] mt-4"
+          className="w-full h-[54px] flex items-center justify-center rounded-[14px] font-medium text-[15px] transition-all active:scale-[0.98] mt-4"
           style={{
-            background: 'rgba(255, 255, 255, 0.08)',
-            border: '1px solid rgba(255, 255, 255, 0.1)',
-            color: 'white',
+            background: 'rgba(255, 255, 255, 0.05)',
+            border: '1px solid rgba(255, 255, 255, 0.10)',
+            color: 'rgba(255,255,255,0.92)',
           }}
         >
           Back to login
