@@ -438,7 +438,7 @@ function GlobalSearchOverlay({ isOpen, onClose }: GlobalSearchOverlayProps) {
                             borderRadius: 999,
                             background: '#fff',
                             border: `1px solid ${BORDER}`,
-                            fontSize: 12.5,
+                            fontSize: 12,
                             color: INK,
                             fontWeight: 500,
                             display: 'flex',
