@@ -1311,7 +1311,11 @@ export function useAllToursTickerData() {
         .slice(0, 3)
         .map(buildUpcomingCell);
 
-      return { live, completed, upcoming };
+      const upcomingTourSlugs = Array.from(
+        new Set(cache.upcoming.map(t => mapTourSlug(t.season.tour_name))),
+      );
+
+      return { live, completed, upcoming, upcomingTourSlugs };
     },
     enabled: !cacheLoading,
     staleTime: 30_000,
