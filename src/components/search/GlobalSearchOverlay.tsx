@@ -547,7 +547,7 @@ function GlobalSearchOverlay({ isOpen, onClose }: GlobalSearchOverlayProps) {
                               <div
                                 style={{
                                   fontSize: 11,
-                                  color: INK_SUBTLE,
+                                  color: INK_SOFT,
                                   lineHeight: 1.3,
                                   whiteSpace: 'nowrap',
                                   overflow: 'hidden',
