@@ -458,7 +458,7 @@ function DefendingChampionRowDark({
           Won {data.year} · {data.score}
         </span>
       </div>
-      <Trophy size={16} color={GOLD} fill={GOLD} strokeWidth={0} style={{ flexShrink: 0, opacity: 0.8 }} />
+      <Trophy size={16} color={GOLD} strokeWidth={1.8} style={{ flexShrink: 0, opacity: 0.8 }} />
     </div>
   );
 }
