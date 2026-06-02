@@ -183,38 +183,6 @@ const WatchTile: React.FC<WatchTileProps> = ({
       />
 
 
-      {/* Creator chip — bottom-left */}
-      {showCreatorChip && (
-        <button
-          type="button"
-          onClick={handleCreatorTap}
-          className="absolute z-10 flex items-center gap-1.5 active:scale-[0.97] transition-transform"
-          style={{
-            bottom: 6, left: 6,
-            background: 'rgba(0,0,0,0.6)',
-            borderRadius: 999, padding: '2px 8px 2px 2px',
-            maxWidth: 'calc(100% - 70px)',
-          }}
-        >
-          <div style={{ flexShrink: 0 }}>
-            <SquircleAvatar
-              src={post.avatarUrl}
-              alt={creatorLabel}
-              size={18}
-              hideRing
-            />
-          </div>
-          <span
-            style={{
-              fontSize: 11, fontWeight: 600, color: 'white',
-              whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
-              maxWidth: 90,
-            }}
-          >
-            {creatorLabel}
-          </span>
-        </button>
-      )}
 
       {/* Engagement stats — bottom-right (likes always, comments if > 0).
           Canonical: Lucide Heart + MessageCircle in brand amber, no pill,
