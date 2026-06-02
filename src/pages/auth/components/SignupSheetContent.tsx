@@ -176,7 +176,7 @@ const SignupSheetContent: React.FC<SignupSheetContentProps> = ({
       if (state === true) return '1px solid #2F9E44';
       if (state === false) return '1px solid #E03131';
     }
-    return '1px solid rgba(255, 255, 255, 0.07)';
+    return '1px solid rgba(255, 255, 255, 0.10)';
   };
 
   return (
@@ -218,7 +218,7 @@ const SignupSheetContent: React.FC<SignupSheetContentProps> = ({
             placeholder="Username"
             maxLength={20}
             disabled={submitting}
-            className="w-full h-[54px] px-4 pr-10 rounded-2xl text-white text-[16px] focus:outline-none transition-all duration-200"
+            className="w-full h-[54px] px-4 pr-10 rounded-[14px] text-white text-[16px] focus:outline-none transition-all duration-200"
             style={{
               background: getInputBackground(usernameFocused),
               border: getInputBorderColor(usernameAvailable, true),
@@ -235,8 +235,9 @@ const SignupSheetContent: React.FC<SignupSheetContentProps> = ({
           />
           <style>{`
             input::placeholder {
-              color: rgba(255, 255, 255, 0.35);
-              font-size: 14px;
+              color: rgba(255, 255, 255, 0.55);
+              font-weight: 500;
+              font-size: 15px;
             }
           `}</style>
           <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
@@ -297,12 +298,12 @@ const SignupSheetContent: React.FC<SignupSheetContentProps> = ({
             onBlur={() => setPasswordFocused(false)}
             placeholder="Create password"
             disabled={isPasswordDisabled}
-            className="w-full h-[54px] px-4 pr-12 rounded-2xl text-white text-[16px] focus:outline-none transition-all duration-200"
+            className="w-full h-[54px] px-4 pr-12 rounded-[14px] text-white text-[16px] focus:outline-none transition-all duration-200"
             style={{
               background: getInputBackground(passwordFocused, isPasswordDisabled),
               border: passwordError 
                 ? '1px solid #E03131' 
-                : '1px solid rgba(255, 255, 255, 0.07)',
+                : '1px solid rgba(255, 255, 255, 0.10)',
               boxShadow: passwordFocused 
                 ? 'inset 0 0 0 1px rgba(255, 255, 255, 0.04)' 
                 : 'none',
@@ -367,14 +368,14 @@ const SignupSheetContent: React.FC<SignupSheetContentProps> = ({
             onBlur={() => setConfirmPasswordFocused(false)}
             placeholder="Confirm password"
             disabled={isConfirmPasswordDisabled}
-            className="w-full h-[54px] px-4 pr-12 rounded-2xl text-white text-[16px] focus:outline-none transition-all duration-200"
+            className="w-full h-[54px] px-4 pr-12 rounded-[14px] text-white text-[16px] focus:outline-none transition-all duration-200"
             style={{
               background: getInputBackground(confirmPasswordFocused, isConfirmPasswordDisabled),
               border: showMismatchError 
                 ? '1px solid #E03131' 
                 : isConfirmPasswordValid
                   ? '1px solid #2F9E44'
-                  : '1px solid rgba(255, 255, 255, 0.07)',
+                  : '1px solid rgba(255, 255, 255, 0.10)',
               boxShadow: confirmPasswordFocused 
                 ? 'inset 0 0 0 1px rgba(255, 255, 255, 0.04)' 
                 : 'none',
@@ -420,17 +421,17 @@ const SignupSheetContent: React.FC<SignupSheetContentProps> = ({
         )}
       </div>
       
-      {/* Submit button - amber primary */}
+      {/* Submit button - amber primary matching hero */}
       <button
         onClick={onSubmit}
         disabled={isSubmitDisabled}
-        className="w-full h-[54px] flex items-center justify-center rounded-full text-[16px] transition-all duration-200 active:scale-[0.98]"
+        className="w-full h-[54px] flex items-center justify-center rounded-[14px] text-[15px] transition-all duration-200 active:scale-[0.98]"
         style={{
           fontWeight: 700,
-          background: isSubmitDisabled ? 'rgba(255,255,255,0.35)' : '#ffffff',
-          color: isSubmitDisabled ? 'rgba(15,23,42,0.4)' : '#0F172A',
+          background: isSubmitDisabled ? 'rgba(255,255,255,0.05)' : '#F7931E',
+          color: isSubmitDisabled ? 'rgba(255,255,255,0.35)' : '#FFFFFF',
+          border: isSubmitDisabled ? '1px solid rgba(255,255,255,0.10)' : 'none',
           cursor: isSubmitDisabled ? 'not-allowed' : 'pointer',
-          boxShadow: 'none',
         }}
       >
         {submitting ? (

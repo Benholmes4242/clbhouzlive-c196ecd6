@@ -78,12 +78,12 @@ const PasswordSheetContent: React.FC<PasswordSheetContentProps> = ({
           onBlur={() => setIsFocused(false)}
           placeholder="Password"
           disabled={submitting}
-          className="w-full h-[54px] px-4 rounded-2xl text-white text-[16px] focus:outline-none transition-all duration-200"
+          className="w-full h-[54px] px-4 rounded-[14px] text-white text-[15px] font-medium focus:outline-none transition-all duration-200"
           style={{
             background: getInputBackground(),
             border: passwordError 
               ? '1px solid #E03131' 
-              : '1px solid rgba(255, 255, 255, 0.07)',
+              : '1px solid rgba(255, 255, 255, 0.10)',
             boxShadow: isFocused 
               ? 'inset 0 0 0 1px rgba(255, 255, 255, 0.04)' 
               : 'none',
@@ -99,8 +99,9 @@ const PasswordSheetContent: React.FC<PasswordSheetContentProps> = ({
         />
         <style>{`
           input::placeholder {
-            color: rgba(255, 255, 255, 0.35);
-            font-size: 14px;
+            color: rgba(255, 255, 255, 0.55);
+            font-weight: 500;
+            font-size: 15px;
           }
         `}</style>
         {passwordError && (
@@ -120,17 +121,17 @@ const PasswordSheetContent: React.FC<PasswordSheetContentProps> = ({
         )}
       </div>
       
-      {/* Submit button - premium white */}
+      {/* Submit button - amber primary matching hero */}
       <button
         onClick={onSubmit}
         disabled={isDisabled}
-        className="w-full h-[54px] flex items-center justify-center rounded-full text-[16px] transition-all duration-200 active:scale-[0.98]"
+        className="w-full h-[54px] flex items-center justify-center rounded-[14px] text-[15px] transition-all duration-200 active:scale-[0.98]"
         style={{
-          fontWeight: 500,
-          background: isDisabled ? 'rgba(255, 255, 255, 0.5)' : 'white',
-          color: '#0D0F11',
+          fontWeight: 700,
+          background: isDisabled ? 'rgba(255,255,255,0.05)' : '#F7931E',
+          color: isDisabled ? 'rgba(255,255,255,0.35)' : '#FFFFFF',
+          border: isDisabled ? '1px solid rgba(255,255,255,0.10)' : 'none',
           cursor: isDisabled ? 'not-allowed' : 'pointer',
-          opacity: isDisabled ? 0.6 : 1,
         }}
       >
         {submitting ? (

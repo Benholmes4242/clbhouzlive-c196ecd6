@@ -52,7 +52,11 @@ export const PasswordBottomSheet: React.FC<PasswordBottomSheetProps> = ({
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.2 }}
-            className="fixed inset-0 bg-black/60 z-50"
+            className="fixed inset-0 z-50"
+            style={{
+              backdropFilter: 'blur(4px)',
+              background: 'rgba(0, 0, 0, 0.45)',
+            }}
             onClick={onClose}
           />
 
@@ -65,51 +69,67 @@ export const PasswordBottomSheet: React.FC<PasswordBottomSheetProps> = ({
             className="fixed bottom-0 inset-x-0 mx-auto z-50 w-full max-w-[480px]"
           >
             <div
-              className="rounded-t-[20px] pb-safe"
+              className="rounded-t-[32px] pb-safe relative"
               style={{
-                background: 'linear-gradient(180deg, #1a1a1a 0%, #111111 100%)',
-                borderTop: '1px solid rgba(255, 255, 255, 0.08)',
+                background: 'linear-gradient(180deg, #0A0E14 0%, #0C1119 100%)',
+                borderTop: '1px solid rgba(255, 255, 255, 0.06)',
+                boxShadow: '0 -12px 40px rgba(0, 0, 0, 0.6), 0 -2px 20px rgba(0, 0, 0, 0.3)',
               }}
             >
-              {/* Drag indicator */}
-              <div className="flex justify-center pt-3">
-                <div className="w-10 h-1 rounded-full bg-neutral-600" />
+              {/* Top edge highlight */}
+              <div
+                className="absolute top-0 left-0 right-0 h-[2px] rounded-t-[32px] pointer-events-none"
+                style={{
+                  background: 'linear-gradient(to bottom, rgba(255, 255, 255, 0.06), transparent)',
+                }}
+              />
+
+              {/* Handle bar */}
+              <div style={{ display: 'flex', justifyContent: 'center', padding: '10px 0 4px' }}>
+                <div style={{ width: 36, height: 4, borderRadius: 2, background: 'rgba(255,255,255,0.15)' }} />
               </div>
 
               {/* Close button */}
               <button
                 onClick={onClose}
-                className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full bg-neutral-800 hover:bg-neutral-700 transition-colors"
+                className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full transition-all active:scale-95"
+                style={{ background: 'rgba(255, 255, 255, 0.06)' }}
                 aria-label="Close"
               >
-                <X className="w-4 h-4 text-neutral-400" />
+                <X className="w-4 h-4 text-white/50" />
               </button>
 
               {/* Content */}
               <div className="px-6 pt-4 pb-8">
                 {/* Header */}
                 <h2
-                  className="text-[22px] font-semibold text-white"
+                  style={{
+                    fontSize: 20,
+                    fontWeight: 900,
+                    color: '#ffffff',
+                    letterSpacing: '-0.03em',
+                    marginBottom: 4,
+                  }}
                 >
                   Enter password
                 </h2>
-                <p
-                  className="text-[16px] text-neutral-400 mt-1"
-                >
+                <p className="text-[14px] text-white/65" style={{ lineHeight: '1.45' }}>
                   Welcome back.
                 </p>
 
-                {/* Email row with back arrow */}
+                {/* Email row with back arrow - breadcrumb */}
                 <button
                   onClick={onClose}
-                  className="flex items-center gap-3 mt-5 w-full group"
+                  className="flex items-center gap-2.5 mt-5 w-full py-2 px-3 rounded-xl -mx-1 transition-all active:scale-[0.99]"
+                  style={{ background: 'rgba(255, 255, 255, 0.03)' }}
                 >
-                  <div className="w-8 h-8 flex items-center justify-center rounded-full bg-neutral-800 group-hover:bg-neutral-700 transition-colors">
-                    <ArrowLeft className="w-4 h-4 text-neutral-400" />
-                  </div>
-                  <span
-                    className="text-[16px] text-neutral-300"
+                  <div
+                    className="w-7 h-7 flex items-center justify-center rounded-full transition-all"
+                    style={{ background: 'rgba(255, 255, 255, 0.08)' }}
                   >
+                    <ArrowLeft className="w-3.5 h-3.5 text-white/60" />
+                  </div>
+                  <span className="text-[13px] text-white/50 truncate">
                     {email}
                   </span>
                 </button>
@@ -126,12 +146,23 @@ export const PasswordBottomSheet: React.FC<PasswordBottomSheetProps> = ({
                       placeholder="Password"
                       disabled={submitting}
                       autoComplete="current-password"
-                      className="w-full h-[56px] px-5 pr-12 rounded-full bg-neutral-900 border border-neutral-700 text-white placeholder:text-neutral-500 text-[16px] focus:outline-none focus:border-neutral-500 focus:ring-1 focus:ring-neutral-500 transition-all disabled:opacity-50"
+                      className="w-full h-[54px] px-4 pr-12 rounded-[14px] text-[15px] font-medium focus:outline-none transition-all disabled:opacity-50"
+                      style={{
+                        background: 'rgba(255, 255, 255, 0.05)',
+                        border: '1px solid rgba(255, 255, 255, 0.10)',
+                        color: 'rgba(255, 255, 255, 0.92)',
+                      }}
                     />
+                    <style>{`
+                      input::placeholder {
+                        color: rgba(255, 255, 255, 0.55);
+                        font-weight: 500;
+                      }
+                    `}</style>
                     <button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-4 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center text-neutral-500 hover:text-neutral-300 transition-colors"
+                      className="absolute right-3 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center text-white/50 hover:text-white/80 transition-colors"
                       aria-label={showPassword ? 'Hide password' : 'Show password'}
                     >
                       {showPassword ? (
@@ -142,20 +173,16 @@ export const PasswordBottomSheet: React.FC<PasswordBottomSheetProps> = ({
                     </button>
                   </div>
 
-                  {/* Submit button - white primary style when password present */}
+                  {/* Submit button - amber primary matching hero */}
                   <button
                     type="submit"
                     disabled={submitting || !password.trim()}
-                    className={`w-full h-[56px] flex items-center justify-center rounded-full font-medium text-[16px] transition-all duration-150 active:scale-[0.98] disabled:opacity-50 ${
-                      password.trim() 
-                        ? 'bg-white text-[#0D0F11] hover:bg-gray-50 active:brightness-95' 
-                        : 'hover:bg-white/[0.08]'
-                    }`}
+                    className="w-full h-[54px] flex items-center justify-center rounded-[14px] font-bold text-[15px] transition-all duration-150 active:scale-[0.98]"
                     style={{
-                      ...(password.trim() 
-                        ? { boxShadow: 'inset 0 1px 0 rgba(255, 255, 255, 0.5), 0 4px 12px rgba(0, 0, 0, 0.2), 0 0 30px rgba(255, 255, 255, 0.08)' }
-                        : { background: 'rgba(255, 255, 255, 0.05)', border: '1px solid rgba(255, 255, 255, 0.1)', color: 'rgba(255, 255, 255, 0.92)' }
-                      ),
+                      background: password.trim() ? '#F7931E' : 'rgba(255,255,255,0.05)',
+                      color: password.trim() ? '#FFFFFF' : 'rgba(255,255,255,0.35)',
+                      border: password.trim() ? 'none' : '1px solid rgba(255,255,255,0.10)',
+                      cursor: (!password.trim() || submitting) ? 'not-allowed' : 'pointer',
                     }}
                   >
                     {submitting ? (
@@ -170,7 +197,7 @@ export const PasswordBottomSheet: React.FC<PasswordBottomSheetProps> = ({
                 <button
                   type="button"
                   onClick={onForgotPassword}
-                  className="w-full text-center mt-4 text-[14px] text-neutral-500 hover:text-neutral-300 transition-colors"
+                  className="w-full text-center mt-4 text-[13px] text-white/40 hover:text-white/60 transition-colors"
                 >
                   Forgot your password?
                 </button>

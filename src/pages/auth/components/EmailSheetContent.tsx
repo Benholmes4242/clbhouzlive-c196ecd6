@@ -118,12 +118,12 @@ const EmailSheetContent: React.FC<EmailSheetContentProps> = ({
           onBlur={() => setIsFocused(false)}
           placeholder="Email"
           disabled={submitting || checkingEmail}
-          className="w-full h-[54px] px-4 rounded-2xl text-white text-[16px] focus:outline-none transition-all duration-200"
+          className="w-full h-[54px] px-4 rounded-[14px] text-white text-[15px] font-medium focus:outline-none transition-all duration-200"
           style={{
             background: getInputBackground(),
             border: (emailError || showEmailExistsError)
               ? '1px solid #E03131' 
-              : '1px solid rgba(255, 255, 255, 0.07)',
+              : '1px solid rgba(255, 255, 255, 0.10)',
             boxShadow: isFocused 
               ? 'inset 0 0 0 1px rgba(255, 255, 255, 0.04)' 
               : 'none',
@@ -136,8 +136,9 @@ const EmailSheetContent: React.FC<EmailSheetContentProps> = ({
         />
         <style>{`
           input::placeholder {
-            color: rgba(255, 255, 255, 0.35);
-            font-size: 14px;
+            color: rgba(255, 255, 255, 0.55);
+            font-weight: 500;
+            font-size: 15px;
           }
         `}</style>
         
@@ -156,12 +157,10 @@ const EmailSheetContent: React.FC<EmailSheetContentProps> = ({
               <button
                 type="button"
                 onClick={handleLoginClick}
-                className="flex-1 h-[44px] rounded-full text-[14px] font-medium transition-all active:scale-[0.98]"
+                className="flex-1 h-[44px] rounded-[14px] text-[14px] font-bold transition-all active:scale-[0.98]"
                 style={{
-                  background: '#ffffff',
-                  color: '#0F172A',
-                  fontWeight: 700,
-                  boxShadow: 'none',
+                  background: '#F7931E',
+                  color: '#FFFFFF',
                 }}
               >
                 Log in
@@ -169,11 +168,11 @@ const EmailSheetContent: React.FC<EmailSheetContentProps> = ({
               <button
                 type="button"
                 onClick={handleDifferentEmailClick}
-                className="flex-1 h-[44px] rounded-full text-[14px] font-medium transition-all active:scale-[0.98]"
+                className="flex-1 h-[44px] rounded-[14px] text-[14px] font-medium transition-all active:scale-[0.98]"
                 style={{
-                  background: 'rgba(255, 255, 255, 0.08)',
-                  color: 'white',
-                  border: '1px solid rgba(255, 255, 255, 0.12)',
+                  background: 'rgba(255, 255, 255, 0.05)',
+                  color: 'rgba(255,255,255,0.92)',
+                  border: '1px solid rgba(255, 255, 255, 0.10)',
                 }}
               >
                 Use different email
@@ -183,18 +182,18 @@ const EmailSheetContent: React.FC<EmailSheetContentProps> = ({
         )}
       </div>
       
-      {/* Continue button - hidden when showing email exists error */}
+      {/* Continue button - amber primary matching hero */}
       {!showEmailExistsError && (
         <button
           onClick={handleContinue}
           disabled={isDisabled}
-          className="w-full h-[54px] flex items-center justify-center rounded-full text-[16px] transition-all duration-200 active:scale-[0.98]"
+          className="w-full h-[54px] flex items-center justify-center rounded-[14px] text-[15px] transition-all duration-200 active:scale-[0.98]"
           style={{
             fontWeight: 700,
-            background: isDisabled ? 'rgba(255,255,255,0.35)' : '#ffffff',
-            color: isDisabled ? 'rgba(15,23,42,0.4)' : '#0F172A',
+            background: isDisabled ? 'rgba(255,255,255,0.05)' : '#F7931E',
+            color: isDisabled ? 'rgba(255,255,255,0.35)' : '#FFFFFF',
+            border: isDisabled ? '1px solid rgba(255,255,255,0.10)' : 'none',
             cursor: isDisabled ? 'not-allowed' : 'pointer',
-            boxShadow: 'none',
           }}
         >
           {(submitting || checkingEmail) ? (
