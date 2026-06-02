@@ -106,7 +106,10 @@ export function SettingsPageV2() {
   return (
     <div className="min-h-screen bg-[#F8FAFC]">
       {/* Header */}
-      <div className="flex items-center gap-3 px-4 pt-1 pb-4">
+      <div
+        className="flex items-center gap-3 px-4 pb-4"
+        style={{ paddingTop: 'max(env(safe-area-inset-top, 0px), 47px)' }}
+      >
         <button
           onClick={() => navigate(-1)}
           style={{ width: 36, height: 36, borderRadius: '50%', background: 'rgba(15,23,42,0.05)', border: '0.5px solid rgba(15,23,42,0.10)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, cursor: 'pointer' }}
