@@ -823,11 +823,11 @@ export function CinematicFrame({
               )}
               {isResults && (
                 <Trophy
-                  size={14}
-                  color={GOLD}
+                  size={12}
+                  strokeWidth={2.5}
                   fill={GOLD}
-                  strokeWidth={1.5}
-                  style={{ flexShrink: 0 }}
+                  style={{ color: GOLD_DEEP, flexShrink: 0 }}
+                  aria-hidden
                 />
               )}
               <span
