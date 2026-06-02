@@ -607,7 +607,7 @@ function GlobalSearchOverlay({ isOpen, onClose }: GlobalSearchOverlayProps) {
                             </div>
                             <div className="flex-1 min-w-0 text-left">
                               <p className="text-[14px] font-medium truncate" style={{ color: INK }}>{course.name}</p>
-                              <p className="text-[12px] truncate" style={{ color: INK_SUBTLE }}>
+                              <p className="text-[12px] truncate" style={{ color: INK_SOFT }}>
                                 {[course.region, course.country].filter(Boolean).join(', ')}
                                 {course.global_rank && ` · #${course.global_rank} World`}
                               </p>
