@@ -105,19 +105,6 @@ const AuthHeroScreen: React.FC<AuthHeroScreenProps> = ({
         }}
       />
       
-      {/* Radial glow behind logo area */}
-      <div 
-        className="absolute left-1/2 -translate-x-1/2 pointer-events-none"
-        style={{
-          top: 'calc(env(safe-area-inset-top, 0px) + 120px)',
-          width: '100%',
-          height: '46%',
-          background: 'radial-gradient(circle at center 42%, rgba(247, 147, 30, 0.06) 0%, transparent 55%)',
-          opacity: 0.5,
-          maskImage: 'linear-gradient(to bottom, transparent 0%, black 22%, black 100%)',
-          WebkitMaskImage: 'linear-gradient(to bottom, transparent 0%, black 22%, black 100%)',
-        }}
-      />
       
       {/* Subtle vignette overlay - darkens edges */}
       <div 
@@ -145,17 +132,6 @@ const AuthHeroScreen: React.FC<AuthHeroScreenProps> = ({
             paddingBottom: '2rem',
           }}
         >
-          {/* Subtle radial glow behind logo */}
-          <div 
-            className="absolute pointer-events-none"
-            style={{
-              width: '160px',
-              height: '160px',
-              background: 'radial-gradient(circle, rgba(247, 147, 30, 0.06) 0%, transparent 60%)',
-              filter: 'blur(25px)',
-              top: 'calc(16vh - 40px)',
-            }}
-          />
           
           {/* Logo - larger for more presence */}
           <img
