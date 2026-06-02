@@ -118,12 +118,12 @@ const EmailSheetContent: React.FC<EmailSheetContentProps> = ({
           onBlur={() => setIsFocused(false)}
           placeholder="Email"
           disabled={submitting || checkingEmail}
-          className="w-full h-[54px] px-4 rounded-2xl text-white text-[16px] focus:outline-none transition-all duration-200"
+          className="w-full h-[54px] px-4 rounded-[14px] text-white text-[15px] font-medium focus:outline-none transition-all duration-200"
           style={{
             background: getInputBackground(),
             border: (emailError || showEmailExistsError)
               ? '1px solid #E03131' 
-              : '1px solid rgba(255, 255, 255, 0.07)',
+              : '1px solid rgba(255, 255, 255, 0.10)',
             boxShadow: isFocused 
               ? 'inset 0 0 0 1px rgba(255, 255, 255, 0.04)' 
               : 'none',
