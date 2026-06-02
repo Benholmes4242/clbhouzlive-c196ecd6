@@ -294,23 +294,11 @@ export const SnapVideoPlayer = memo(function SnapVideoPlayer({
   return (
     <div
       className="absolute inset-0 w-full h-full overflow-hidden"
-      style={{ background: '#111' }}
+      style={{ background: '#0A0E14' }}
       onClick={handleTap}
     >
-      {/* Blur-fill background — extends the image visually beyond its native aspect */}
-      {thumbnailUrl && (
-        <>
-          <img
-            src={thumbnailUrl}
-            alt=""
-            className="absolute inset-0 w-full h-full object-cover"
-            style={{ filter: 'blur(60px)', transform: 'scale(1.4)', opacity: 0.9 }}
-            draggable={false}
-            aria-hidden="true"
-          />
-          <div className="absolute inset-0 bg-black/25" />
-        </>
-      )}
+      {/* Solid matte behind non-filling media — chrome colour, no blur. */}
+      <div className="absolute inset-0" style={{ background: '#0A0E14' }} aria-hidden="true" />
       {/* Poster / thumbnail */}
       {thumbnailUrl && (
         <img
