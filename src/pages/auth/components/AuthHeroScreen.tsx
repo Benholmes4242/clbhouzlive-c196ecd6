@@ -132,17 +132,6 @@ const AuthHeroScreen: React.FC<AuthHeroScreenProps> = ({
             paddingBottom: '2rem',
           }}
         >
-          {/* Subtle radial glow behind logo */}
-          <div 
-            className="absolute pointer-events-none"
-            style={{
-              width: '160px',
-              height: '160px',
-              background: 'radial-gradient(circle, rgba(247, 147, 30, 0.06) 0%, transparent 60%)',
-              filter: 'blur(25px)',
-              top: 'calc(16vh - 40px)',
-            }}
-          />
           
           {/* Logo - larger for more presence */}
           <img
