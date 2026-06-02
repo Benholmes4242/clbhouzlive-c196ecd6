@@ -79,8 +79,7 @@ function VideoRailTileInner({
 
   const courseName = (post as any).courseName ?? null;
   const ageLabel = useMemo(() => formatAge(post.createdAt), [post.createdAt]);
-  const creator = post.displayName || post.username || 'Clbhouz';
-  const metaLine = [creator, ageLabel].filter(Boolean).join(' · ');
+  const metaLine = ageLabel;
 
   // --- Tap vs long-press handling ---------------------------------------
   const longPressTimerRef = useRef<number | null>(null);
@@ -222,59 +221,39 @@ function VideoRailTileInner({
         ) : null}
       </div>
 
-      {/* Meta row — avatar + title/creator·date */}
-      <div
-        style={{
-          marginTop: 10,
-          display: 'flex',
-          flexDirection: 'row',
-          alignItems: 'flex-start',
-          gap: 8,
-        }}
-      >
-        <div style={{ flexShrink: 0 }}>
-          <SquircleAvatar
-            src={post.avatarUrl}
-            alt={creator}
-            userId={post.userId}
-            size={20}
-            hideRing
-          />
+      {/* Meta row — title + date */}
+      <div style={{ marginTop: 10, flex: 1, minWidth: 0 }}>
+        <div
+          style={{
+            fontSize: 13,
+            fontWeight: 700,
+            lineHeight: 1.3,
+            letterSpacing: '-0.01em',
+            color: '#0F172A',
+            display: '-webkit-box',
+            WebkitLineClamp: 2,
+            WebkitBoxOrient: 'vertical',
+            overflow: 'hidden',
+            wordBreak: 'break-word',
+          }}
+        >
+          {post.caption || 'Untitled'}
         </div>
-
-        <div style={{ flex: 1, minWidth: 0 }}>
+        {metaLine && (
           <div
             style={{
-              fontSize: 13,
-              fontWeight: 700,
-              lineHeight: 1.3,
-              letterSpacing: '-0.01em',
-              color: '#0F172A',
-              display: '-webkit-box',
-              WebkitLineClamp: 2,
-              WebkitBoxOrient: 'vertical',
+              fontSize: 11,
+              fontWeight: 500,
+              color: 'rgba(15,23,42,0.55)',
+              marginTop: 2,
               overflow: 'hidden',
-              wordBreak: 'break-word',
+              textOverflow: 'ellipsis',
+              whiteSpace: 'nowrap',
             }}
           >
-            {post.caption || 'Untitled'}
+            {metaLine}
           </div>
-          {metaLine && (
-            <div
-              style={{
-                fontSize: 11,
-                fontWeight: 500,
-                color: 'rgba(15,23,42,0.55)',
-                marginTop: 2,
-                overflow: 'hidden',
-                textOverflow: 'ellipsis',
-                whiteSpace: 'nowrap',
-              }}
-            >
-              {metaLine}
-            </div>
-          )}
-        </div>
+        )}
       </div>
     </div>
   );

@@ -266,43 +266,6 @@ export default function WatchRailTile({
         </span>
       )}
 
-      {/* Creator chip — bottom-left, glass pill + avatar (canonical for portrait overlay tiles). */}
-      {(post.displayName || post.username) && (
-        <div
-          style={{
-            position: 'absolute',
-            bottom: 8,
-            left: 8,
-            zIndex: 2,
-            display: 'flex',
-            alignItems: 'center',
-            gap: 6,
-            background: 'rgba(0,0,0,0.6)',
-            borderRadius: 999,
-            padding: '2px 8px 2px 2px',
-            maxWidth: 'calc(100% - 70px)',
-            pointerEvents: 'none',
-          }}
-        >
-          <div style={{ flexShrink: 0 }}>
-            <SquircleAvatar
-              src={post.avatarUrl}
-              alt={post.displayName || post.username || ''}
-              size={18}
-              hideRing
-            />
-          </div>
-          <span
-            style={{
-              fontSize: 11, fontWeight: 600, color: 'white',
-              whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
-              maxWidth: 110,
-            }}
-          >
-            {post.displayName || post.username}
-          </span>
-        </div>
-      )}
 
       {/* Likes — amber heart, no pill, text-shadow handles legibility */}
       <div
