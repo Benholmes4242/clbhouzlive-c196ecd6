@@ -243,7 +243,8 @@ export const ReviewOfWeekCard: React.FC<ReviewOfWeekCardProps> = ({
                   alt={card.reviewer.displayName}
                   userId={card.reviewer.userId}
                   size={40}
-                  hideRing
+                  hairlineRing
+                  ringColor="rgba(255,255,255,0.95)"
                 />
                 <div>
                   <div className="flex items-center gap-1">
