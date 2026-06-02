@@ -50,7 +50,7 @@ const FONT_SERIF = '"Geist", -apple-system, BlinkMacSystemFont, "Segoe UI", Robo
 
 const SectionHeader: React.FC<{ label: string }> = ({ label }) => (
     <div
-    className="sticky top-0 z-10 flex items-center gap-2 px-5 py-2"
+    className="flex items-center gap-2 px-5 py-2 z-10"
     style={{ background: BG_SURFACE }}
   >
     <span style={{ fontSize: 9, fontWeight: 800, color: '#64748B', letterSpacing: '0.16em', textTransform: 'uppercase' }}>
