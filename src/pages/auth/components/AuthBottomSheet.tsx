@@ -56,11 +56,11 @@ const AuthBottomSheet: React.FC<AuthBottomSheetProps> = ({
         onClick={onClose}
       />
       
-      {/* Sheet - premium glass surface */}
+      {/* Sheet - matches hero navy surface */}
       <div 
         className={cn(
           "fixed bottom-0 inset-x-0 mx-auto z-50 w-full max-w-[480px]",
-          "rounded-t-[32px]", // Softer, more premium corners
+          "rounded-t-[32px]",
           "transition-all duration-[380ms] ease-out",
           "pb-safe",
           isAnimating 
@@ -68,17 +68,18 @@ const AuthBottomSheet: React.FC<AuthBottomSheetProps> = ({
             : "translate-y-full opacity-0"
         )}
         style={{
-          background: 'rgba(18, 18, 20, 0.92)',
+          background: 'linear-gradient(180deg, #0A0E14 0%, #0C1119 100%)',
           backdropFilter: 'blur(28px)',
-          // Softer, wider shadow with lower opacity
-          boxShadow: '0 -8px 50px rgba(0, 0, 0, 0.35), 0 -2px 20px rgba(0, 0, 0, 0.2)',
+          WebkitBackdropFilter: 'blur(28px)',
+          borderTop: '1px solid rgba(255, 255, 255, 0.06)',
+          boxShadow: '0 -12px 40px rgba(0, 0, 0, 0.6), 0 -2px 20px rgba(0, 0, 0, 0.3)',
         }}
       >
         {/* Top edge highlight - subtle premium touch */}
         <div 
-          className="absolute top-0 left-0 right-0 h-[2px] rounded-t-[32px]"
+          className="absolute top-0 left-0 right-0 h-[2px] rounded-t-[32px] pointer-events-none"
           style={{
-            background: 'linear-gradient(to bottom, rgba(255, 255, 255, 0.05), transparent)',
+            background: 'linear-gradient(to bottom, rgba(255, 255, 255, 0.06), transparent)',
           }}
         />
         
