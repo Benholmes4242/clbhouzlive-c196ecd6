@@ -5,6 +5,7 @@
  */
 
 import React from 'react';
+import { Trophy } from 'lucide-react';
 import { INK } from '../HybridHero.constants';
 import { AMBER, STATUS_LIVE, WHITE_ALPHA_65 } from '../../../_shared/tokens';
 import type { HeroState } from '../HybridHero.utils';
@@ -109,19 +110,23 @@ export function SignatureFooter({
     >
       {/* LEFT — state dot + label + secondary */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 8, minWidth: 0 }}>
-        <span
-          aria-hidden="true"
-          className={isLive ? 'hybrid-live-pulse' : undefined}
-          style={{
-            width: 5,
-            height: 5,
-            borderRadius: '50%',
-            background: dotColor,
-            boxShadow: `0 0 0 2.5px ${dotHaloColor}`,
-            flexShrink: 0,
-            display: 'inline-block',
-          }}
-        />
+        {isResults ? (
+          <Trophy size={10} color={dotColor} style={{ flexShrink: 0 }} />
+        ) : (
+          <span
+            aria-hidden="true"
+            className={isLive ? 'hybrid-live-pulse' : undefined}
+            style={{
+              width: 5,
+              height: 5,
+              borderRadius: '50%',
+              background: dotColor,
+              boxShadow: `0 0 0 2.5px ${dotHaloColor}`,
+              flexShrink: 0,
+              display: 'inline-block',
+            }}
+          />
+        )}
         <span
           style={{
             color: WHITE_ALPHA_65,
