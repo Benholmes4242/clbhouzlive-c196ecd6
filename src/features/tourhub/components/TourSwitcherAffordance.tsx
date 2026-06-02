@@ -194,7 +194,7 @@ export const TourSwitcherAffordance: React.FC = () => {
                   </span>
                 ) : status === 'results' ? (
                   <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, flexShrink: 0 }}>
-                    <Crown size={12} strokeWidth={2.5} fill={GOLD} style={{ color: GOLD_DEEP }} aria-hidden />
+                    <Trophy size={12} strokeWidth={2.5} fill={GOLD} style={{ color: GOLD_DEEP }} aria-hidden />
                     <span style={{ fontSize: 10, fontWeight: 800, letterSpacing: '0.16em', color: GOLD_DEEP }}>RESULTS</span>
                   </span>
 
