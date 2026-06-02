@@ -50,7 +50,7 @@ function SectionHeader({
         display: 'flex',
         alignItems: 'baseline',
         justifyContent: 'space-between',
-        padding: '18px 16px 10px',
+        padding: '16px 16px 8px',
       }}
     >
       <span
