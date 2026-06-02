@@ -438,7 +438,7 @@ export function RateStep({
       <div style={{ padding: '16px 16px 0' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
           <div style={{ width: 3, height: 12, background: '#F7931E', borderRadius: 1, flexShrink: 0 }} />
-          <span style={{ fontSize: 8.5, fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.14em', textTransform: 'uppercase' as const }}>Rate each area</span>
+          <span style={{ fontSize: 10.5, fontWeight: 800, color: '#94A3B8', letterSpacing: '0.14em', textTransform: 'uppercase' as const }}>Rate each area</span>
         </div>
         
         {BREAKDOWN_FIELDS.map(({ key, label, description }, index) => {
@@ -467,7 +467,7 @@ export function RateStep({
                       key={score?.toFixed(1)}
                       initial={{ opacity: 0, scale: 0.9 }}
                       animate={{ opacity: 1, scale: 1 }}
-                      style={{ fontSize: 18, fontWeight: 700, fontVariantNumeric: 'tabular-nums', color: '#0F172A', flexShrink: 0, marginLeft: 8 }}
+                      style={{ fontSize: 18, fontWeight: 700, fontVariantNumeric: 'tabular-nums', color: score >= 9.0 ? getScoreTier(score).accent : '#0F172A', flexShrink: 0, marginLeft: 8 }}
                     >
                       {score?.toFixed(1)}
                     </motion.span>

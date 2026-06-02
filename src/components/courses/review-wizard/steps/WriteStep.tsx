@@ -301,7 +301,7 @@ export function WriteStep({
             border: (isTitleFocused || title.length > 0) ? '1.5px solid rgba(247,147,30,0.25)' : '1.5px solid transparent',
           }}
         >
-          <label style={{ fontSize: 8.5, fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.14em', textTransform: 'uppercase' as const }}>
+          <label style={{ fontSize: 10.5, fontWeight: 800, color: '#94A3B8', letterSpacing: '0.14em', textTransform: 'uppercase' as const }}>
             Headline
           </label>
           <input
@@ -350,7 +350,7 @@ export function WriteStep({
           }}
         >
           <div className="p-4 pb-0 flex-1 flex flex-col min-h-0">
-            <label style={{ fontSize: 8.5, fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.14em', textTransform: 'uppercase' as const }}>
+            <label style={{ fontSize: 10.5, fontWeight: 800, color: '#94A3B8', letterSpacing: '0.14em', textTransform: 'uppercase' as const }}>
               Your review
             </label>
             <textarea
@@ -393,7 +393,7 @@ export function WriteStep({
         <div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
             <div style={{ width: 3, height: 12, background: '#F7931E', borderRadius: 1, flexShrink: 0 }} />
-            <span style={{ fontSize: 8.5, fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.14em', textTransform: 'uppercase' as const }}>Write about…</span>
+            <span style={{ fontSize: 10.5, fontWeight: 800, color: '#94A3B8', letterSpacing: '0.14em', textTransform: 'uppercase' as const }}>Write about…</span>
           </div>
           <div className="flex flex-wrap gap-2">
             {CHIPS.map(chip => (
@@ -402,8 +402,8 @@ export function WriteStep({
                 type="button"
                 onClick={() => insertChip(chip.text)}
                 style={{
-                  padding: '6px 12px', borderRadius: 20, fontSize: 12, fontWeight: 600,
-                  color: '#0F172A', background: '#ffffff', border: '0.5px solid rgba(15,23,42,0.12)', cursor: 'pointer',
+                  padding: '6px 12px', borderRadius: 20, fontSize: 13.5, fontWeight: 600,
+                  color: '#0F172A', background: '#ffffff', border: '1px solid rgba(15,23,42,0.08)', cursor: 'pointer',
                 }}
                 className="active:scale-[0.95] transition-all"
               >
