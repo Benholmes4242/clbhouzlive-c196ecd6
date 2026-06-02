@@ -94,29 +94,36 @@ const ForgotPasswordSheetContent: React.FC<ForgotPasswordSheetContentProps> = ({
           onKeyDown={handleKeyDown}
           placeholder="Email address"
           disabled={submitting}
-          className="w-full h-[52px] px-4 rounded-2xl text-white placeholder:text-white/40 text-[16px] focus:outline-none transition-colors"
+          className="w-full h-[54px] px-4 rounded-[14px] text-white text-[15px] font-medium focus:outline-none transition-colors"
           style={{
-            background: 'rgba(255, 255, 255, 0.06)',
-            border: errorMessage ? '1px solid #E03131' : '1px solid rgba(255, 255, 255, 0.08)',
+            background: 'rgba(255, 255, 255, 0.05)',
+            border: errorMessage ? '1px solid #E03131' : '1px solid rgba(255, 255, 255, 0.10)',
           }}
           autoComplete="email"
         />
+        <style>{`
+          input::placeholder {
+            color: rgba(255, 255, 255, 0.55);
+            font-weight: 500;
+            font-size: 15px;
+          }
+        `}</style>
         {errorMessage && (
           <p className="text-[#E03131] text-[13px] mt-2">{errorMessage}</p>
         )}
       </div>
       
-      {/* Submit button - white, black text */}
+      {/* Submit button - amber primary matching hero */}
       <button
         onClick={onSubmit}
         disabled={isDisabled}
-        className="w-full h-[52px] flex items-center justify-center rounded-full text-[16px] transition-all active:scale-[0.98]"
+        className="w-full h-[54px] flex items-center justify-center rounded-[14px] text-[15px] transition-all active:scale-[0.98]"
         style={{
           fontWeight: 700,
-          background: isDisabled ? 'rgba(247,147,30,0.35)' : '#F7931E',
-          color: '#ffffff',
+          background: isDisabled ? 'rgba(255,255,255,0.05)' : '#F7931E',
+          color: isDisabled ? 'rgba(255,255,255,0.35)' : '#FFFFFF',
+          border: isDisabled ? '1px solid rgba(255,255,255,0.10)' : 'none',
           cursor: isDisabled ? 'not-allowed' : 'pointer',
-          boxShadow: isDisabled ? 'none' : '0 4px 20px rgba(247,147,30,0.28)',
         }}
       >
         {submitting ? (
