@@ -161,7 +161,7 @@ export function WizardHeader({
                   <span
                     className="text-[9px] font-semibold tracking-wider"
                     style={{
-                      color: isCompleted || isActive ? '#F7931E' : '#9CA3AF',
+                      color: isCompleted || isActive ? '#F7931E' : '#94A3B8',
                     }}
                   >
                     {label}

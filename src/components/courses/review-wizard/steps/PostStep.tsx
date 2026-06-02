@@ -167,7 +167,7 @@ export function PostStep({
         }}
       >
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 12px 4px' }}>
-          <span style={{ fontSize: 8.5, fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.12em', textTransform: 'uppercase' as const }}>
+          <span style={{ fontSize: 10.5, fontWeight: 800, color: '#94A3B8', letterSpacing: '0.12em', textTransform: 'uppercase' as const }}>
             Photos &amp; Videos · <span style={{ fontWeight: 400, letterSpacing: 'normal', textTransform: 'none' as const }}>optional</span>
           </span>
           {media.length > 0 && media.length < MAX_MEDIA_ITEMS && (
@@ -261,7 +261,7 @@ export function PostStep({
 
       {/* Inline review summary */}
       <div style={{ marginBottom: 20 }}>
-        <div style={{ border: '1px solid rgba(15,23,42,0.07)', borderRadius: 12, overflow: 'hidden' }}>
+        <div style={{ border: '1px solid rgba(15,23,42,0.07)', borderRadius: 16, overflow: 'hidden' }}>
           {/* Course header row */}
           {course && (
             <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 14px', borderBottom: '0.5px solid rgba(15,23,42,0.07)' }}>
@@ -372,7 +372,7 @@ export function PostStep({
             >
               {(Object.entries(breakdowns) as [keyof ReviewBreakdowns, number | null][]).map(([key, value]) => (
                 <div key={key} style={{ background: '#F8FAFC', borderRadius: 8, padding: '8px 4px', textAlign: 'center' as const }}>
-                  <div style={{ fontSize: 9, fontWeight: 700, color: '#94A3B8', textTransform: 'uppercase' as const, letterSpacing: '0.04em', marginBottom: 3 }}>
+                  <div style={{ fontSize: 9.5, fontWeight: 800, color: '#94A3B8', textTransform: 'uppercase' as const, letterSpacing: '0.14em', marginBottom: 3 }}>
                     {BREAKDOWN_LABELS[key]}
                   </div>
                   <div style={{ fontSize: 13, fontWeight: 800, color: value !== null ? '#0F172A' : 'rgba(15,23,42,0.2)', fontVariantNumeric: 'tabular-nums' }}>
