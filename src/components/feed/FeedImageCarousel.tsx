@@ -306,7 +306,7 @@ export const FeedImageCarousel = memo(function FeedImageCarousel({
         const aspect = (item.height ?? 1) > 0 && (item.width ?? 0) > 0
           ? (item.height as number) / (item.width as number)
           : 1.0;
-        const objectFit: 'cover' | 'contain' = aspect >= 1.5 ? 'cover' : 'contain';
+        const objectFit: 'cover' | 'contain' = isSuggestedFeed ? 'cover' : (aspect >= 1.5 ? 'cover' : 'contain');
         const imgSrc = item.imageUrl || item.thumbnailUrl || '';
         return (
           <div key={item.id || idx} className="absolute inset-0" style={slideStyle}>

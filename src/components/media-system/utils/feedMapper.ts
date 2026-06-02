@@ -1,5 +1,6 @@
 import { CLOUDFLARE_STREAM_SUBDOMAIN } from '@/media/constants';
 import type { FeedPost, FeedRpcRow, MediaItem, ReviewData, CreatorRelation, FeedPostTag } from '../types/media';
+import { isPortraitAdmissible } from './mediaOrientation';
 
 const UID_RE = /([0-9a-f]{32})/i;
 
@@ -152,7 +153,11 @@ export function mapRowToFeedPost(row: FeedRpcRow): FeedPost {
  *
  * Always clone arrays before reassigning. Always reassign — never .push.
  */
-export function groupMultiMedia(posts: FeedPost[]): FeedPost[] {
+export function groupMultiMedia(
+  posts: FeedPost[],
+  options?: { portraitOnly?: boolean },
+): FeedPost[] {
+  const portraitOnly = options?.portraitOnly ?? false;
   const map = new Map<string, FeedPost>();
   for (const post of posts) {
     const existing = map.get(post.id);
@@ -169,10 +174,15 @@ export function groupMultiMedia(posts: FeedPost[]): FeedPost[] {
     post.mediaItems.sort((a, b) => (a.displayOrder ?? 0) - (b.displayOrder ?? 0));
     const seenIds = new Set<string>();
     post.mediaItems = post.mediaItems.filter(item => {
-      if (!item.id || seenIds.has(item.id)) return false;
+      if (!item.id || seenIds.has(item.id)) return false;       // dedupe (unchanged)
       seenIds.add(item.id);
+      if (portraitOnly && !isPortraitAdmissible(item)) return false; // NEW: drop landscape
       return true;
     });
   }
-  return Array.from(map.values());
+  const grouped = Array.from(map.values());
+  // NEW: drop posts/reviews left with zero admissible media (only when filtering)
+  return portraitOnly
+    ? grouped.filter(post => post.mediaItems.length > 0)
+    : grouped;
 }

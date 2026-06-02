@@ -41,7 +41,7 @@ export function useSuggestedFeed(userId: string | undefined) {
           };
         }
 
-        const posts = groupMultiMedia(rows.map(mapRowToFeedPost));
+        const posts = groupMultiMedia(rows.map(mapRowToFeedPost), { portraitOnly: true });
 
         // Track ALL fetched post IDs — including ones filtered out —
         // so the RPC doesn't waste candidate slots returning them again
