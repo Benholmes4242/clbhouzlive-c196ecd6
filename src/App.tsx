@@ -215,6 +215,7 @@ const BusinessActivityPage = lazy(() => import("./pages/BusinessActivityPage"));
 // ManageTeamPage removed — now handled via ManageTeamModal bottom sheet
 
 const NotFound = lazy(() => import("./pages/NotFound"));
+const DevEditorHarness = lazy(() => import("./pages/DevEditorHarness"));
 const WatchPreferencesPage = lazy(() => import("./pages/WatchPreferencesPage"));
 // PostsTabTestPage removed — Posts tab now integrated into profiles
 // CreateMomentPage removed — PostStudio is now the sole creation flow
