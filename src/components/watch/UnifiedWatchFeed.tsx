@@ -26,9 +26,11 @@ export default function UnifiedWatchFeed({ embedded = false }: UnifiedWatchFeedP
   const userId = session?.user?.id;
   const gridRef = useRef<HTMLDivElement>(null);
 
-  // NOTE: Mood chips now live in <ShellSlot> inside Discover.tsx. The grid
-  // currently runs on a default trending feed; mood→grid wiring is a follow-up
-  // pending mapping confirmation (see Fixed-Shell brief, section "State plumbing").
+  const { mood } = useWatchMood();
+
+  // Mood pills (in ShellSlot) drive both rails and the grid. useWatchFeed
+  // resolves mood→RPC mode internally and applies client-side narrowing
+  // for 'follows' and 'played_courses'.
   const {
     posts,
     isLoading,
@@ -39,7 +41,7 @@ export default function UnifiedWatchFeed({ embedded = false }: UnifiedWatchFeedP
     refetch,
   } = useWatchFeed({
     userId,
-    filter: 'trending',
+    mood,
     category: undefined,
   });
 
