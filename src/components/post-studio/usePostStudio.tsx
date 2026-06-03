@@ -127,6 +127,17 @@ function postStudioReducer(state: PostStudioState, action: PostStudioAction): Po
         isDirty: true,
       };
 
+    case 'UPDATE_MEDIA_SIMPLE_EDITS':
+      return {
+        ...state,
+        mediaItems: state.mediaItems.map((m) =>
+          m.id === action.payload.id
+            ? { ...m, simpleEdits: action.payload.simpleEdits }
+            : m
+        ),
+        isDirty: true,
+      };
+
     case 'SET_CAPTION':
       return { ...state, caption: action.payload, isDirty: true };
 
