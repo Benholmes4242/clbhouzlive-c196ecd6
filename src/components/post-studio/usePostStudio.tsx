@@ -3,6 +3,7 @@
 
 import React, { createContext, useContext, useReducer, useCallback, useMemo, useRef } from 'react';
 import type { StudioEdits } from '@/types/studio';
+import type { SimpleEdits } from '@/types/studioSimple';
 import type {
   PostStudioState,
   PostStudioAction,
