@@ -446,8 +446,12 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
     const item = state.mediaItems[index];
     if (!item) return;
     setActiveMedia(index);
-    setActiveTool('filter');
-    setShelfOpen(true);
+    if (item.mediaType === 'image') {
+      setEditorOpen(true);
+    } else {
+      setActiveTool('trim');
+      setShelfOpen(true);
+    }
   }, [state.mediaItems, setActiveMedia]);
 
   const handleSetCover = useCallback((index: number) => {
