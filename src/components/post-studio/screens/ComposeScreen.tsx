@@ -482,7 +482,23 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
           ]
         : state.mediaItems;
 
-      const files = orderedMediaItems.map((m) => m.file).filter((f): f is File => !!f);
+      // Bake studio-v2 image edits into flat files before upload.
+      // Failures must not block publish — fall back to original file.
+      const bakedItems = await Promise.all(orderedMediaItems.map(async (item) => {
+        if (item.mediaType === 'image' && hasAnySimpleEdit(item.simpleEdits)) {
+          try {
+            const blob = await bakeImageEdits(item.previewUrl, item.simpleEdits!);
+            const bakedFile = new File([blob], `edit_${item.id}.jpg`, { type: 'image/jpeg' });
+            return { ...item, file: bakedFile, _baked: true as const };
+          } catch (e) {
+            console.error('[ComposeScreen] bake failed; using original', e);
+            return { ...item, _baked: false as const };
+          }
+        }
+        return { ...item, _baked: false as const };
+      }));
+
+      const files = bakedItems.map((m) => m.file).filter((f): f is File => !!f);
       const selectedTags = state.mentions.map((m) => ({
         id: m.entityId, entity_id: m.profileId, entity_type: m.entityType,
         name: m.displayName, username: m.username ?? null,
@@ -492,7 +508,7 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
       const input: UploadJobInput = {
         actorType: state.actorType, actorId: state.actorId ?? user.id, userId: user.id,
         caption: state.caption, files,
-        mediaItems: orderedMediaItems.map((item) => ({
+        mediaItems: bakedItems.map((item) => ({
           id: item.id, file: item.file, type: item.mediaType,
           width: item.width ?? undefined, height: item.height ?? undefined,
           duration: item.duration ?? undefined,
@@ -500,8 +516,9 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
           posterTimestamp: item.posterTimestamp || null,
         })),
         studioEditsByMediaId: Object.fromEntries(
-          state.mediaItems
-            .filter((item) => item.edits && Object.keys(item.edits).length > 0)
+          bakedItems
+            // Omit baked images — edits are flattened into the file itself.
+            .filter((item) => !item._baked && item.edits && Object.keys(item.edits).length > 0)
             .map((item) => [item.id, item.edits!])
         ),
         courseIds: state.taggedCourses.map((c) => c.courseId),
