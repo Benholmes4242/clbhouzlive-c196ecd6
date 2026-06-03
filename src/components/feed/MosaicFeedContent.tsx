@@ -396,23 +396,7 @@ const MosaicFeedContent: React.FC<MosaicFeedContentProps> = ({
             </div>
           </div>
           
-          {/* SoundtrackStrip for music posts */}
-          {activeMusic && (
-            <div className="absolute bottom-3 left-2 z-30 max-w-[140px]">
-              <SoundtrackStrip 
-                music={{
-                  trackId: activeMusic.trackId || '',
-                  title: activeMusic.title || 'Unknown Track',
-                  artist: activeMusic.artist,
-                  r2Key: activeMusic.r2Key,
-                  url: activeMusic.url,
-                  startAt: activeMusic.startAt,
-                  volume: activeMusic.volume
-                }}
-                variant="published"
-              />
-            </div>
-          )}
+          {/* Phase 3e: post-level music retired */}
         </div>
       </div>
     );
