@@ -2,6 +2,7 @@
 // Single source of truth for all Post Studio types
 
 import type { StudioEdits } from '@/types/studio';
+import type { SimpleEdits } from '@/types/studioSimple';
 
 // ============================================================================
 // ENUMS & LITERALS
