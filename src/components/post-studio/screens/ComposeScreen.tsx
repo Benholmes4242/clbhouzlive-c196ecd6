@@ -1138,7 +1138,7 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
         />
       )}
 
-      )}
+
 
       {/* studio-v2 image editor (full-screen overlay) */}
       {editorOpen && activeItem && activeItem.mediaType === 'image' && (
