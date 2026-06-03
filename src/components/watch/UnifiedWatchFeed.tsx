@@ -65,7 +65,7 @@ export default function UnifiedWatchFeed({ embedded = false }: UnifiedWatchFeedP
       <div style={{ paddingTop: 28, paddingBottom: 24 }}>
         <WatchSectionHeader
           eyebrow="Explore"
-          title="Videos to explore"
+          title="Clips to explore"
           sub="From the golfing community"
         />
         <WatchAutoplay
