@@ -1138,6 +1138,21 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
         />
       )}
 
+      )}
+
+      {/* studio-v2 image editor (full-screen overlay) */}
+      {editorOpen && activeItem && activeItem.mediaType === 'image' && (
+        <EditorScreen
+          src={activeItem.previewUrl}
+          initialEdits={activeItem.simpleEdits}
+          onCancel={() => setEditorOpen(false)}
+          onDone={(simpleEdits) => {
+            updateMediaSimpleEdits(activeItem.id, simpleEdits);
+            setEditorOpen(false);
+          }}
+        />
+      )}
+
     </div>
   );
 }
