@@ -70,6 +70,8 @@ export interface StudioMediaItem {
 
   // Studio edits (crop, filter, text, music)
   edits?: StudioEdits;
+  /** studio-v2 image editor edits (baked into file on publish) */
+  simpleEdits?: SimpleEdits;
 }
 
 /** Mention token representing an @mention in the caption */
