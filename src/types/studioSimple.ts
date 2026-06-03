@@ -35,3 +35,15 @@ export function ratioToNumber(ratio: SimpleCropRatio, fallback: number): number 
   if (ratio === '4:5') return 4 / 5;
   return fallback;
 }
+
+export function hasAnySimpleEdit(e?: SimpleEdits): boolean {
+  if (!e) return false;
+  return (
+    (!!e.filter && e.filter !== 'normal') ||
+    !!e.crop ||
+    !!e.rotate ||
+    !!e.flipH ||
+    !!e.flipV ||
+    !!(e.text && e.text.length)
+  );
+}
