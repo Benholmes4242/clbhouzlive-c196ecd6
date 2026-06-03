@@ -30,6 +30,9 @@ const WatchGrid: React.FC<WatchGridProps> = ({
   refetch,
   gridRef,
   userId,
+  emptyEmoji = '⛳',
+  emptyTitle = 'No shorts yet',
+  emptyMessage = 'Check back soon for new content',
 }) => {
   const sentinelRef = useRef<HTMLDivElement>(null);
 
