@@ -100,21 +100,33 @@ export function useWatchFeed({ userId, filter, mood, category, searchQuery, user
   const allPosts = useMemo(() => {
     const posts = query.data?.pages.flatMap((page) => page.posts) ?? [];
     const seen = new Set<string>();
-    const deduped = posts.filter(p => {
+    let deduped = posts.filter(p => {
       if (seen.has(p.id)) return false;
       seen.add(p.id);
       return true;
     });
 
+    // Mood-scoped client-side filtering. RPC already returns the right mode;
+    // these narrow the result set further for follows / played_courses.
+    if (mood === 'follows') {
+      deduped = deduped.filter(p =>
+        p.creatorRelation === 'following' || p.creatorRelation === 'friend' || p.isFollowedByMe
+      );
+    } else if (mood === 'played_courses') {
+      deduped = deduped.filter(p => !!p.courseId && personalSignals.playedCourseIds.has(p.courseId));
+    }
+
     // Personalisation re-rank (lightweight, client-side).
-    // Skip when we have no signals yet (cold start) — preserve trending order.
+    // Skip when we have no signals yet (cold start), or when the user
+    // explicitly picked 'trending' (pure trending order, no personal boost).
     const hasAnySignal =
       personalSignals.playedCourseIds.size > 0 ||
       personalSignals.wantToPlayCourseIds.size > 0 ||
       personalSignals.followingUserIds.size > 0;
+    const applyBoost = mood !== 'trending' && hasAnySignal;
 
     let ordered = deduped;
-    if (hasAnySignal) {
+    if (applyBoost) {
       // Stable sort: tie-break by original index so trending order is
       // preserved when nothing personalises a pair of posts.
       const withIdx = deduped.map((post, idx) => ({
@@ -133,7 +145,7 @@ export function useWatchFeed({ userId, filter, mood, category, searchQuery, user
     // to the final ordering the user actually sees.
     const creatorDiverse = enforceCreatorDiversity(ordered);
     return enforceCourseDiversity(creatorDiverse);
-  }, [query.data, personalSignals]);
+  }, [query.data, personalSignals, mood]);
 
   const resetSeen = useCallback(() => {
     seenPostIds.current = [];
