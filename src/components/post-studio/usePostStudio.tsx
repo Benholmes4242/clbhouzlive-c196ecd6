@@ -315,6 +315,7 @@ export function PostStudioProvider({
       updateTrim,
       updatePoster,
       updateMediaEdits,
+      updateMediaSimpleEdits,
       setCaption,
       setMentions,
       setTaggedCourses,
