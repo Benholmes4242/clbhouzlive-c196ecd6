@@ -313,6 +313,7 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
   const [textareaFocused, setTextareaFocused] = useState(false);
   const [isPublishing, setIsPublishing] = useState(false);
   const [shelfOpen, setShelfOpen] = useState(false);
+  const [editorOpen, setEditorOpen] = useState(false);
   const [activeTool, setActiveTool] = useState<StudioTool>(null);
   const [activeOverlayId, setActiveOverlayId] = useState<string | null>(null);
   // Cover is sourced from reducer state (keyed by media ID, persists across remounts/reorders)
