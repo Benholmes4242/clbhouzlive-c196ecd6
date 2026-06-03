@@ -23,6 +23,8 @@ import {
 import type { StudioMediaItem } from '../types';
 import type { StudioEdits, StudioTool } from '@/types/studio';
 import StudioShelf from '@/components/studio/StudioShelf';
+import { EditorScreen, bakeImageEdits } from '@/components/studio-v2';
+import { hasAnySimpleEdit } from '@/types/studioSimple';
 
 import { getFilterClass } from '@/utils/studioFilters';
 import { enqueuePostUpload } from '@/uploads/uploadPipeline';
