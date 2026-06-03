@@ -215,6 +215,7 @@ const BusinessActivityPage = lazy(() => import("./pages/BusinessActivityPage"));
 // ManageTeamPage removed — now handled via ManageTeamModal bottom sheet
 
 const NotFound = lazy(() => import("./pages/NotFound"));
+const DevEditorHarness = lazy(() => import("./pages/DevEditorHarness"));
 const WatchPreferencesPage = lazy(() => import("./pages/WatchPreferencesPage"));
 // PostsTabTestPage removed — Posts tab now integrated into profiles
 // CreateMomentPage removed — PostStudio is now the sole creation flow
@@ -456,6 +457,9 @@ function AppRoutes() {
         <Route path="/hub/*" element={<Navigate to="/clubhouse" replace />} />
         
         
+        {/* Phase 1 dev harness for studio-v2 — remove in Phase 2 */}
+        <Route path="/dev/editor" element={<Suspense fallback={<GenericPageSkeleton />}><DevEditorHarness /></Suspense>} />
+
         <Route path="*" element={<Suspense fallback={<GenericPageSkeleton />}><NotFound /></Suspense>} />
       </Routes>
 
