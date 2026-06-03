@@ -204,6 +204,7 @@ export type PostStudioAction =
   | { type: 'CLOSE_PANEL' }
   | { type: 'RESET' }
   | { type: 'UPDATE_MEDIA_EDITS'; payload: { id: string; edits: StudioEdits } }
+  | { type: 'UPDATE_MEDIA_SIMPLE_EDITS'; payload: { id: string; simpleEdits: SimpleEdits } }
   | { type: 'SET_MENTION_TRIGGER'; payload: number };
 
 // ============================================================================
