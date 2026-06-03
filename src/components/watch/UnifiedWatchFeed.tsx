@@ -8,14 +8,12 @@ import WatchGrid from './WatchGrid';
 import WatchSectionHeader from './WatchSectionHeader';
 // WatchSectionDivider removed in Phase 4 — kicker + h1 already separate
 // sections clearly; dividers fragmented the surface visually.
-import ContinueWatchingRail from './ContinueWatchingRail';
 import LongPressTipBanner from './LongPressTipBanner';
 import { WatchActionsProvider } from './context/WatchActionsContext';
 import { useWatchFeed } from './hooks/useWatchFeed';
 import ScrollToTopGlass from '@/components/common/ScrollToTopGlass';
 import { WatchOfTheWeekHero } from './proshop/WatchOfTheWeekHero';
 import { CourseAnchoredRail } from './proshop/CourseAnchoredRail';
-import { MostLovedRail } from './proshop/MostLovedRail';
 
 interface UnifiedWatchFeedProps {
   embedded?: boolean;
@@ -52,19 +50,14 @@ export default function UnifiedWatchFeed({ embedded = false }: UnifiedWatchFeedP
       {/* ── Pro Shop: Watch of the Week editorial hero ── */}
       <WatchOfTheWeekHero />
 
-      <ContinueWatchingRail userId={userId} />
-
-      {/* ── Pro Shop: Course-anchored rail (top played course) ── */}
-      <CourseAnchoredRail />
-
-      {/* ── Section 1: Trending clips rail ── */}
-      <TrendingThisWeek />
-
-      {/* ── Section 2: Latest videos — hero + horizontal rail ── */}
+      {/* ── Latest videos — full-width YouTube-style stack ── */}
       <LatestVideosRail />
 
-      {/* ── Pro Shop: Most loved this week ── */}
-      <MostLovedRail />
+      {/* ── Quick clips — portrait shelf ── */}
+      <TrendingThisWeek />
+
+      {/* ── From your courses — single course-anchored rail ── */}
+      <CourseAnchoredRail />
 
       {/* ── Section 3: Watch grid ──
           Phase 5g: explicit 24px paddingBottom guarantees clearance from

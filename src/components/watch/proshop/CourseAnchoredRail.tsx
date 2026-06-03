@@ -49,7 +49,7 @@ function CourseAnchoredRailInner() {
         title={topCourse.course_name}
         sub={`${topCourse.content_count} recent ${
           topCourse.content_count === 1 ? 'post' : 'posts'
-        } from a course you've played`}
+        }`}
         action={{
           label: 'See all',
           onClick: () => navigate(`/courses/${topCourse.course_id}#video`),

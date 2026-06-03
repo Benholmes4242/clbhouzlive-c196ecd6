@@ -4,13 +4,11 @@ import { useVideosFeed } from '@/components/videos-tab/hooks/useVideosFeed';
 import { VideosFeedSkeleton } from '@/components/videos-tab/VideosFeedSkeleton';
 import WatchSectionHeader from './WatchSectionHeader';
 import VideoFeedCard from './videos/VideoFeedCard';
-import { VideoRailTile } from './videos/VideoRailTile';
-import { HRail } from './proshop/HRail';
 
 /**
- * "Latest videos" section — one hero anchor (unified VideoFeedCard
- * treatment: thumbnail + meta row with counts and dropdown menu) +
- * a horizontal rail of the next 9 latest videos as compact tiles.
+ * "Latest videos" section — full-width YouTube-style vertical stack of the
+ * 3 most recent videos. Replaced the prior hero + 200px horizontal rail
+ * after user feedback that the rail tiles felt too small.
  */
 export default function LatestVideosRail() {
   const navigate = useNavigate();
@@ -37,8 +35,7 @@ export default function LatestVideosRail() {
     );
   }
 
-  const hero = posts[0];
-  const rail = posts.slice(1, 10);
+  const stack = posts.slice(0, 3);
 
   return (
     <div>
@@ -50,31 +47,18 @@ export default function LatestVideosRail() {
         seeAllLabel="More videos"
       />
 
-      {/* Hero anchor — unified light-treatment VideoFeedCard. No card
-          chrome; the component supplies its own 16px horizontal padding
-          and 12px thumbnail radius. */}
-      <VideoFeedCard
-        post={hero}
-        index={0}
-        allPosts={posts}
-        userId={userId}
-      />
-
-      {/* Horizontal rail of next 9 */}
-      {rail.length > 0 && (
-        <HRail paddingTop={8} paddingBottom={4}>
-          {rail.map((post, i) => (
-            <div key={post.id} style={{ scrollSnapAlign: 'start' }}>
-              <VideoRailTile
-                post={post}
-                index={i + 1}
-                allPosts={posts}
-                width={200}
-              />
-            </div>
-          ))}
-        </HRail>
-      )}
+      {/* Full-width vertical stack — replaces old hero + 200px rail */}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+        {stack.map((post, i) => (
+          <VideoFeedCard
+            key={post.id}
+            post={post}
+            index={i}
+            allPosts={posts}
+            userId={userId}
+          />
+        ))}
+      </div>
     </div>
   );
 }
