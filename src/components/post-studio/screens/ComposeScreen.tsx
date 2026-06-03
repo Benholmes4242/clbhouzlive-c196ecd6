@@ -290,7 +290,7 @@ function hasActiveFilter(edits?: StudioEdits): boolean {
 export function ComposeScreen({ onClose }: { onClose?: () => void }) {
    const {
     state, setStep, setActiveMedia, setCoverMedia, removeMedia, addMedia,
-    setCaption, openPanel, closePanel, updateMediaEdits, updateTrim,
+    setCaption, openPanel, closePanel, updateMediaEdits, updateMediaSimpleEdits, updateTrim,
     setMentions, setTaggedCourses, setMentionTriggerIndex, reset, onSuccess, schedulePublishRef,
   } = usePostStudioContext();
 
