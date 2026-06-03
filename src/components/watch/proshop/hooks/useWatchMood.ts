@@ -1,23 +1,22 @@
 import { useCallback } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { Sparkles, Flag, Users, Flame, Trophy, type LucideIcon } from 'lucide-react';
+import { LayoutGrid, Flag, Users, Flame, type LucideIcon } from 'lucide-react';
 
 export const WATCH_MOODS: ReadonlyArray<{ id: string; label: string; icon: LucideIcon }> = [
-  { id: 'for_you', label: 'For you', icon: Sparkles },
+  { id: 'all', label: 'All', icon: LayoutGrid },
   { id: 'played_courses', label: 'Courses played', icon: Flag },
   { id: 'follows', label: 'Your follows', icon: Users },
   { id: 'trending', label: 'Trending', icon: Flame },
-  { id: 'tour_week', label: 'Tour week', icon: Trophy },
 ] as const;
 
 export type WatchMoodId = typeof WATCH_MOODS[number]['id'];
 
 const VALID_IDS = WATCH_MOODS.map((m) => m.id) as readonly string[];
-const DEFAULT_MOOD: WatchMoodId = 'for_you';
+const DEFAULT_MOOD: WatchMoodId = 'all';
 
 /**
  * Reads/writes the active Watch tab mood from `?mood=` so refresh and
- * deep-link preserve state. Falls back to 'for_you'. Default mood is
+ * deep-link preserve state. Falls back to 'all'. Default mood is
  * never written to the URL — keeps URLs clean.
  * Uses replace: true so filter toggles don't pollute browser history —
  * tapping back from the subpage returns to the previous page, not through

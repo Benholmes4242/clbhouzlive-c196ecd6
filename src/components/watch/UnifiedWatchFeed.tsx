@@ -88,19 +88,16 @@ export default function UnifiedWatchFeed({ embedded = false }: UnifiedWatchFeedP
           emptyEmoji={
             mood === 'follows' ? '👥'
             : mood === 'played_courses' ? '⛳'
-            : mood === 'tour_week' ? '🏆'
             : '⛳'
           }
           emptyTitle={
             mood === 'follows' ? 'No videos from your follows yet'
             : mood === 'played_courses' ? 'No videos from courses you\u2019ve played'
-            : mood === 'tour_week' ? 'No tour-week videos yet'
             : 'No shorts yet'
           }
           emptyMessage={
             mood === 'follows' ? 'Follow more creators to see their clips here'
             : mood === 'played_courses' ? 'Log a round to start seeing clips from those courses'
-            : mood === 'tour_week' ? 'Check back during tour week'
             : 'Check back soon for new content'
           }
         />

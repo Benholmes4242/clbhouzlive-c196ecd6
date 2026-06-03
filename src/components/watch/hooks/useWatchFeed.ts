@@ -11,11 +11,10 @@ import type { WatchMoodId } from '../proshop/hooks/useWatchMood';
 const PAGE_SIZE = 30;
 
 const MOOD_TO_FILTER: Record<WatchMoodId, WatchFilter> = {
-  for_you: 'trending',
+  all: 'latest',
   trending: 'trending',
   follows: 'latest',
   played_courses: 'latest',
-  tour_week: 'top',
 };
 
 interface UseWatchFeedParams {
@@ -123,7 +122,7 @@ export function useWatchFeed({ userId, filter, mood, category, searchQuery, user
       personalSignals.playedCourseIds.size > 0 ||
       personalSignals.wantToPlayCourseIds.size > 0 ||
       personalSignals.followingUserIds.size > 0;
-    const applyBoost = mood !== 'trending' && hasAnySignal;
+    const applyBoost = mood !== 'trending' && mood !== 'all' && hasAnySignal;
 
     let ordered = deduped;
     if (applyBoost) {
