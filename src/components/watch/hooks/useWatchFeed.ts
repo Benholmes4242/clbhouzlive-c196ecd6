@@ -34,7 +34,7 @@ export function useWatchFeed({ userId, filter, mood, category, searchQuery, user
   const seenPostIds = useRef<string[]>([]);
 
   const query = useInfiniteQuery({
-    queryKey: ['watch-feed', filter, category ?? null, searchQuery, userId],
+    queryKey: ['watch-feed', resolvedFilter, mood ?? null, category ?? null, searchQuery, userId],
     queryFn: async ({ pageParam }) => {
       if (!userId) return { posts: [] as FeedPost[], nextCursor: undefined as string | undefined };
 
@@ -44,7 +44,7 @@ export function useWatchFeed({ userId, filter, mood, category, searchQuery, user
 
       const params: Record<string, any> = {
         p_user_id: userId,
-        p_mode: filter,
+        p_mode: resolvedFilter,
         p_page_size: PAGE_SIZE,
       };
 
@@ -52,7 +52,7 @@ export function useWatchFeed({ userId, filter, mood, category, searchQuery, user
 
       if (cursor) params.p_cursor = cursor;
       if (searchQuery) params.p_search_query = searchQuery;
-      if (filter === 'near' && userLat != null && userLng != null) {
+      if (resolvedFilter === 'near' && userLat != null && userLng != null) {
         params.p_user_lat = userLat;
         params.p_user_lng = userLng;
       }
