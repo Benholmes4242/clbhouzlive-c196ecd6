@@ -457,8 +457,8 @@ function AppRoutes() {
         <Route path="/hub/*" element={<Navigate to="/clubhouse" replace />} />
         
         
-        {/* Phase 1 dev harness for studio-v2 — remove in Phase 2 */}
-        <Route path="/dev/editor" element={<Suspense fallback={<GenericPageSkeleton />}><DevEditorHarness /></Suspense>} />
+
+
 
         <Route path="*" element={<Suspense fallback={<GenericPageSkeleton />}><NotFound /></Suspense>} />
       </Routes>
