@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState, useId, useMemo } from 'react';
+import React, { useEffect, useRef, useState, useId } from 'react';
 import { X, Volume2, VolumeX, Play, Pause } from 'lucide-react';
 import { Button } from './button';
 import EnhancedVideoPlayer from './enhanced-video-player';
@@ -38,19 +38,9 @@ const FullscreenVideoModal: React.FC<FullscreenVideoModalProps> = ({
   const modalRef = useRef<HTMLDivElement>(null);
   const mediaId = useId();
 
-  // Detect if post has music from studioEdit - Option A enforcement
-  const { postHasMusic, activeMusic } = useMemo(() => {
-    const studioEdit = videoData?.studioEdit;
-    const music = (studioEdit as any)?.music ?? null;
-    const hasMusic = !!(music?.url || music?.r2Key);
-    
-    // Debug log only when playable URL exists
-    if (music?.url) {
-      console.log('[FullscreenVideoModal] music detected', { postHasMusic: hasMusic, activeMusic: music });
-    }
-    
-    return { postHasMusic: hasMusic, activeMusic: music };
-  }, [videoData?.studioEdit]);
+  // Phase 3e: post-level music retired.
+  const postHasMusic = false;
+  const activeMusic = null as any;
 
   // Handle ESC key to close modal
   useEffect(() => {

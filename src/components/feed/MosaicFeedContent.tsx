@@ -7,7 +7,7 @@
  * - preload="auto" for instant buffering
  */
 
-import React, { useState, useCallback, useRef, useEffect, useMemo } from 'react';
+import React, { useState, useCallback, useRef, useEffect } from 'react';
 import { ChevronLeft, ChevronRight, Maximize2, Play } from 'lucide-react';
 import { PiHandsClapping, PiShareFat } from 'react-icons/pi';
 import { GoCommentDiscussion } from 'react-icons/go';
@@ -131,17 +131,9 @@ const MosaicFeedContent: React.FC<MosaicFeedContentProps> = ({
     const currentIndex = currentMediaIndex[item.id] || 0;
     const hasMultipleMedia = media.length > 1;
     
-    // Detect music from studioEdits
-    const { postHasMusic, activeMusic } = useMemo(() => {
-      const hasMusic = media.some(m => {
-        const music = (m.studio_edits as any)?.music;
-        return !!(music?.url || music?.r2Key);
-      });
-      const music = media
-        .map(m => (m.studio_edits as any)?.music)
-        .find(m => m?.url || m?.r2Key) ?? null;
-      return { postHasMusic: hasMusic, activeMusic: music };
-    }, [media]);
+    // Phase 3e: post-level music retired.
+    const postHasMusic = false;
+    const activeMusic = null as any;
     
     // Check if this item has video
     const hasVideo = media.some(m => m.media_type === 'video');
