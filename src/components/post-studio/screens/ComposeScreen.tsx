@@ -23,6 +23,8 @@ import {
 import type { StudioMediaItem } from '../types';
 import type { StudioEdits, StudioTool } from '@/types/studio';
 import StudioShelf from '@/components/studio/StudioShelf';
+import { EditorScreen, bakeImageEdits } from '@/components/studio-v2';
+import { hasAnySimpleEdit } from '@/types/studioSimple';
 
 import { getFilterClass } from '@/utils/studioFilters';
 import { enqueuePostUpload } from '@/uploads/uploadPipeline';
@@ -288,7 +290,7 @@ function hasActiveFilter(edits?: StudioEdits): boolean {
 export function ComposeScreen({ onClose }: { onClose?: () => void }) {
    const {
     state, setStep, setActiveMedia, setCoverMedia, removeMedia, addMedia,
-    setCaption, openPanel, closePanel, updateMediaEdits, updateTrim,
+    setCaption, openPanel, closePanel, updateMediaEdits, updateMediaSimpleEdits, updateTrim,
     setMentions, setTaggedCourses, setMentionTriggerIndex, reset, onSuccess, schedulePublishRef,
   } = usePostStudioContext();
 
@@ -311,6 +313,7 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
   const [textareaFocused, setTextareaFocused] = useState(false);
   const [isPublishing, setIsPublishing] = useState(false);
   const [shelfOpen, setShelfOpen] = useState(false);
+  const [editorOpen, setEditorOpen] = useState(false);
   const [activeTool, setActiveTool] = useState<StudioTool>(null);
   const [activeOverlayId, setActiveOverlayId] = useState<string | null>(null);
   // Cover is sourced from reducer state (keyed by media ID, persists across remounts/reorders)
@@ -443,8 +446,12 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
     const item = state.mediaItems[index];
     if (!item) return;
     setActiveMedia(index);
-    setActiveTool('filter');
-    setShelfOpen(true);
+    if (item.mediaType === 'image') {
+      setEditorOpen(true);
+    } else {
+      setActiveTool('trim');
+      setShelfOpen(true);
+    }
   }, [state.mediaItems, setActiveMedia]);
 
   const handleSetCover = useCallback((index: number) => {
@@ -475,7 +482,23 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
           ]
         : state.mediaItems;
 
-      const files = orderedMediaItems.map((m) => m.file).filter((f): f is File => !!f);
+      // Bake studio-v2 image edits into flat files before upload.
+      // Failures must not block publish — fall back to original file.
+      const bakedItems = await Promise.all(orderedMediaItems.map(async (item) => {
+        if (item.mediaType === 'image' && hasAnySimpleEdit(item.simpleEdits)) {
+          try {
+            const blob = await bakeImageEdits(item.previewUrl, item.simpleEdits!);
+            const bakedFile = new File([blob], `edit_${item.id}.jpg`, { type: 'image/jpeg' });
+            return { ...item, file: bakedFile, _baked: true as const };
+          } catch (e) {
+            console.error('[ComposeScreen] bake failed; using original', e);
+            return { ...item, _baked: false as const };
+          }
+        }
+        return { ...item, _baked: false as const };
+      }));
+
+      const files = bakedItems.map((m) => m.file).filter((f): f is File => !!f);
       const selectedTags = state.mentions.map((m) => ({
         id: m.entityId, entity_id: m.profileId, entity_type: m.entityType,
         name: m.displayName, username: m.username ?? null,
@@ -485,7 +508,7 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
       const input: UploadJobInput = {
         actorType: state.actorType, actorId: state.actorId ?? user.id, userId: user.id,
         caption: state.caption, files,
-        mediaItems: orderedMediaItems.map((item) => ({
+        mediaItems: bakedItems.map((item) => ({
           id: item.id, file: item.file, type: item.mediaType,
           width: item.width ?? undefined, height: item.height ?? undefined,
           duration: item.duration ?? undefined,
@@ -493,8 +516,9 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
           posterTimestamp: item.posterTimestamp || null,
         })),
         studioEditsByMediaId: Object.fromEntries(
-          state.mediaItems
-            .filter((item) => item.edits && Object.keys(item.edits).length > 0)
+          bakedItems
+            // Omit baked images — edits are flattened into the file itself.
+            .filter((item) => !item._baked && item.edits && Object.keys(item.edits).length > 0)
             .map((item) => [item.id, item.edits!])
         ),
         courseIds: state.taggedCourses.map((c) => c.courseId),
@@ -1110,6 +1134,21 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
           onTrimChange={(start, end) => {
             const item = state.mediaItems[state.activeMediaIndex];
             if (item) updateTrim(item.id, start, end);
+          }}
+        />
+      )}
+
+
+
+      {/* studio-v2 image editor (full-screen overlay) */}
+      {editorOpen && activeItem && activeItem.mediaType === 'image' && (
+        <EditorScreen
+          src={activeItem.previewUrl}
+          initialEdits={activeItem.simpleEdits}
+          onCancel={() => setEditorOpen(false)}
+          onDone={(simpleEdits) => {
+            updateMediaSimpleEdits(activeItem.id, simpleEdits);
+            setEditorOpen(false);
           }}
         />
       )}

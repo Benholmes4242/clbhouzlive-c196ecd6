@@ -2,6 +2,7 @@
 // Single source of truth for all Post Studio types
 
 import type { StudioEdits } from '@/types/studio';
+import type { SimpleEdits } from '@/types/studioSimple';
 
 // ============================================================================
 // ENUMS & LITERALS
@@ -69,6 +70,8 @@ export interface StudioMediaItem {
 
   // Studio edits (crop, filter, text, music)
   edits?: StudioEdits;
+  /** studio-v2 image editor edits (baked into file on publish) */
+  simpleEdits?: SimpleEdits;
 }
 
 /** Mention token representing an @mention in the caption */
@@ -201,6 +204,7 @@ export type PostStudioAction =
   | { type: 'CLOSE_PANEL' }
   | { type: 'RESET' }
   | { type: 'UPDATE_MEDIA_EDITS'; payload: { id: string; edits: StudioEdits } }
+  | { type: 'UPDATE_MEDIA_SIMPLE_EDITS'; payload: { id: string; simpleEdits: SimpleEdits } }
   | { type: 'SET_MENTION_TRIGGER'; payload: number };
 
 // ============================================================================

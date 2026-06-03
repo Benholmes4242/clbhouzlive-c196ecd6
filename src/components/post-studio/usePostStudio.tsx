@@ -3,6 +3,7 @@
 
 import React, { createContext, useContext, useReducer, useCallback, useMemo, useRef } from 'react';
 import type { StudioEdits } from '@/types/studio';
+import type { SimpleEdits } from '@/types/studioSimple';
 import type {
   PostStudioState,
   PostStudioAction,
@@ -126,6 +127,17 @@ function postStudioReducer(state: PostStudioState, action: PostStudioAction): Po
         isDirty: true,
       };
 
+    case 'UPDATE_MEDIA_SIMPLE_EDITS':
+      return {
+        ...state,
+        mediaItems: state.mediaItems.map((m) =>
+          m.id === action.payload.id
+            ? { ...m, simpleEdits: action.payload.simpleEdits }
+            : m
+        ),
+        isDirty: true,
+      };
+
     case 'SET_CAPTION':
       return { ...state, caption: action.payload, isDirty: true };
 
@@ -211,6 +223,7 @@ interface PostStudioContextValue {
   updateTrim: (id: string, trimStart: number, trimEnd: number) => void;
   updatePoster: (id: string, posterTimestamp: number, posterPreviewUrl: string | null) => void;
   updateMediaEdits: (id: string, edits: StudioEdits) => void;
+  updateMediaSimpleEdits: (id: string, simpleEdits: SimpleEdits) => void;
   setCaption: (text: string) => void;
   setMentions: (mentions: MentionToken[]) => void;
   setTaggedCourses: (courses: TaggedCourse[]) => void;
@@ -269,6 +282,11 @@ export function PostStudioProvider({
       dispatch({ type: 'UPDATE_MEDIA_EDITS', payload: { id, edits } }),
     []
   );
+  const updateMediaSimpleEdits = useCallback(
+    (id: string, simpleEdits: SimpleEdits) =>
+      dispatch({ type: 'UPDATE_MEDIA_SIMPLE_EDITS', payload: { id, simpleEdits } }),
+    []
+  );
   const setCaption = useCallback((text: string) => dispatch({ type: 'SET_CAPTION', payload: text }), []);
   const setMentions = useCallback((mentions: MentionToken[]) => dispatch({ type: 'SET_MENTIONS', payload: mentions }), []);
   const setTaggedCourses = useCallback((courses: TaggedCourse[]) => dispatch({ type: 'SET_TAGGED_COURSES', payload: courses }), []);
@@ -297,6 +315,7 @@ export function PostStudioProvider({
       updateTrim,
       updatePoster,
       updateMediaEdits,
+      updateMediaSimpleEdits,
       setCaption,
       setMentions,
       setTaggedCourses,
@@ -325,6 +344,7 @@ export function PostStudioProvider({
       updateTrim,
       updatePoster,
       updateMediaEdits,
+      updateMediaSimpleEdits,
       setCaption,
       setMentions,
       setTaggedCourses,
