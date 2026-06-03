@@ -14,6 +14,7 @@ import { useWatchFeed } from './hooks/useWatchFeed';
 import ScrollToTopGlass from '@/components/common/ScrollToTopGlass';
 import { WatchOfTheWeekHero } from './proshop/WatchOfTheWeekHero';
 import { CourseAnchoredRail } from './proshop/CourseAnchoredRail';
+import { useWatchMood } from './proshop/hooks/useWatchMood';
 
 interface UnifiedWatchFeedProps {
   embedded?: boolean;
