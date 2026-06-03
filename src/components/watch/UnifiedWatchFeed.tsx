@@ -14,6 +14,7 @@ import { useWatchFeed } from './hooks/useWatchFeed';
 import ScrollToTopGlass from '@/components/common/ScrollToTopGlass';
 import { WatchOfTheWeekHero } from './proshop/WatchOfTheWeekHero';
 import { CourseAnchoredRail } from './proshop/CourseAnchoredRail';
+import { useWatchMood } from './proshop/hooks/useWatchMood';
 
 interface UnifiedWatchFeedProps {
   embedded?: boolean;
@@ -25,9 +26,11 @@ export default function UnifiedWatchFeed({ embedded = false }: UnifiedWatchFeedP
   const userId = session?.user?.id;
   const gridRef = useRef<HTMLDivElement>(null);
 
-  // NOTE: Mood chips now live in <ShellSlot> inside Discover.tsx. The grid
-  // currently runs on a default trending feed; mood→grid wiring is a follow-up
-  // pending mapping confirmation (see Fixed-Shell brief, section "State plumbing").
+  const { mood } = useWatchMood();
+
+  // Mood pills (in ShellSlot) drive both rails and the grid. useWatchFeed
+  // resolves mood→RPC mode internally and applies client-side narrowing
+  // for 'follows' and 'played_courses'.
   const {
     posts,
     isLoading,
@@ -38,7 +41,7 @@ export default function UnifiedWatchFeed({ embedded = false }: UnifiedWatchFeedP
     refetch,
   } = useWatchFeed({
     userId,
-    filter: 'trending',
+    mood,
     category: undefined,
   });
 
@@ -82,6 +85,24 @@ export default function UnifiedWatchFeed({ embedded = false }: UnifiedWatchFeedP
           refetch={refetch}
           gridRef={gridRef as React.RefObject<HTMLDivElement>}
           userId={userId}
+          emptyEmoji={
+            mood === 'follows' ? '👥'
+            : mood === 'played_courses' ? '⛳'
+            : mood === 'tour_week' ? '🏆'
+            : '⛳'
+          }
+          emptyTitle={
+            mood === 'follows' ? 'No videos from your follows yet'
+            : mood === 'played_courses' ? 'No videos from courses you\u2019ve played'
+            : mood === 'tour_week' ? 'No tour-week videos yet'
+            : 'No shorts yet'
+          }
+          emptyMessage={
+            mood === 'follows' ? 'Follow more creators to see their clips here'
+            : mood === 'played_courses' ? 'Log a round to start seeing clips from those courses'
+            : mood === 'tour_week' ? 'Check back during tour week'
+            : 'Check back soon for new content'
+          }
         />
       </div>
 
