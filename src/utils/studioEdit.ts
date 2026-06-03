@@ -1,97 +1,41 @@
 /**
- * Studio Edit utilities for crop and rotate
- * Applied to pixel layer only (text overlays remain unaffected)
+ * Studio Edit utilities — RETIRED SHIMS.
+ *
+ * Phase 3e: render-time crop/rotate/pixel edits are no longer applied.
+ * Edits are baked into pixels at export time by studio-v2. These helpers
+ * return neutral defaults so legacy call sites (~20 consumers) keep
+ * compiling and laying out correctly without surgery.
  */
 
-import { StudioEdits, CropSettings, CropArea } from '@/types/studio';
+import { StudioEdits, CropSettings } from '@/types/studio';
 
 /**
- * Get CSS class for crop wrapper based on ratio
+ * Always returns the neutral default wrapper class.
+ * IMPORTANT: must NOT return '' — consumers rely on this for container sizing.
  */
-export function getCropWrapperClass(crop?: CropSettings): string {
-  if (!crop?.ratio || crop.ratio === 'original') {
-    return 'relative w-full h-full overflow-hidden';
-  }
-  
-  switch (crop.ratio) {
-    case '1:1':
-      return 'relative w-full aspect-square overflow-hidden';
-    case '4:5':
-      return 'relative w-full aspect-[4/5] overflow-hidden';
-    case '16:9':
-      return 'relative w-full aspect-video overflow-hidden';
-    case '9:16':
-      return 'relative w-full aspect-[9/16] overflow-hidden';
-    default:
-      return 'relative w-full h-full overflow-hidden';
-  }
+export function getCropWrapperClass(_crop?: CropSettings): string {
+  return 'relative w-full h-full overflow-hidden';
+}
+
+export function getRotateStyle(_rotate?: number): React.CSSProperties {
+  return {};
+}
+
+export function getCropStyles(_crop?: CropSettings): React.CSSProperties {
+  return {};
+}
+
+export function getPixelLayerStyle(_edits?: StudioEdits): React.CSSProperties {
+  return {};
+}
+
+export function hasEditSettings(_edits?: StudioEdits): boolean {
+  return false;
 }
 
 /**
- * Get inline style for rotation transform
- */
-export function getRotateStyle(rotate?: number): React.CSSProperties {
-  if (!rotate || rotate === 0) {
-    return {};
-  }
-  
-  return {
-    transform: `rotate(${rotate}deg)`,
-    transformOrigin: 'center',
-  };
-}
-
-/**
- * Get CSS styles to apply crop region (for displaying cropped media)
- */
-export function getCropStyles(crop?: CropSettings): React.CSSProperties {
-  if (!crop?.area) {
-    return {};
-  }
-
-  const { x, y, width, height } = crop.area;
-  const zoom = crop.zoom || 1;
-
-  // Calculate the transform to show only the cropped region
-  // Using object-position and transform to achieve the crop effect
-  return {
-    objectFit: 'cover' as const,
-    objectPosition: `${x + width / 2}% ${y + height / 2}%`,
-    transform: `scale(${100 / width * zoom})`,
-    transformOrigin: `${x + width / 2}% ${y + height / 2}%`,
-  };
-}
-
-/**
- * Get combined pixel layer styles (rotation + crop area)
- */
-export function getPixelLayerStyle(edits?: StudioEdits): React.CSSProperties {
-  if (!edits) return {};
-  
-  const rotateStyles = getRotateStyle(edits.rotate);
-  const cropStyles = getCropStyles(edits.crop);
-  
-  return {
-    ...rotateStyles,
-    ...cropStyles,
-  };
-}
-
-/**
- * Check if any edit settings require rendering
- */
-export function hasEditSettings(edits?: StudioEdits): boolean {
-  if (!edits) return false;
-  
-  return !!(
-    (edits.crop?.ratio && edits.crop.ratio !== 'original') ||
-    edits.crop?.area ||
-    edits.rotate
-  );
-}
-
-/**
- * Convert aspect ratio string to numeric value
+ * Convert aspect ratio string to numeric value — retained as a pure utility
+ * still used by the new editor for crop-ratio math.
  */
 export function aspectRatioToNumber(ratio: string): number | undefined {
   switch (ratio) {

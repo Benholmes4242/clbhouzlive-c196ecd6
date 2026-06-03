@@ -63,27 +63,12 @@ export const UserPostMedia: React.FC<UserPostMediaProps> = ({
     return [];
   }, [coursesProp, golfCourse, rawCourseId]);
 
-  // Check if any media in this post has music attached
-  const postHasMusic = useMemo(() => {
-    return media.some(m => {
-      const studioEdits = m.studio_edits as any;
-      return studioEdits?.music?.url || studioEdits?.music?.r2Key;
-    });
-  }, [media]);
-
-  // Get the active music track (from any media item) for display
-  const activeMusic = useMemo(() => {
-    for (const m of media) {
-      const music = (m.studio_edits as any)?.music;
-      if (music?.url || music?.r2Key) {
-        return music;
-      }
-    }
-    return null;
-  }, [media]);
+  // Phase 3e: post-level music retired. Detection forced to inert.
+  const postHasMusic = false;
+  const activeMusic = null as any;
 
   const handleMuteBlocked = () => {
-    toast("Original audio is muted because a track is applied.", { duration: 2000 });
+    // Retired — no-op kept for prop compatibility.
   };
 
   if (!media || media.length === 0) return null;
