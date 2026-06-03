@@ -6,12 +6,22 @@ import { enforceCreatorDiversity, enforceCourseDiversity } from '@/components/me
 import { useWatchPersonalSignals, computePersonalBoost } from './useWatchPersonalSignals';
 import type { FeedPost, FeedRpcRow } from '@/components/media-system/types/media';
 import type { WatchFilter } from '../types';
+import type { WatchMoodId } from '../proshop/hooks/useWatchMood';
 
 const PAGE_SIZE = 30;
 
+const MOOD_TO_FILTER: Record<WatchMoodId, WatchFilter> = {
+  for_you: 'trending',
+  trending: 'trending',
+  follows: 'latest',
+  played_courses: 'latest',
+  tour_week: 'top',
+};
+
 interface UseWatchFeedParams {
   userId: string | undefined;
-  filter: WatchFilter;
+  filter?: WatchFilter;
+  mood?: WatchMoodId;
   category?: string;
   searchQuery?: string;
   userLat?: number | null;
@@ -19,7 +29,8 @@ interface UseWatchFeedParams {
   enabled?: boolean;
 }
 
-export function useWatchFeed({ userId, filter, category, searchQuery, userLat, userLng, enabled = true }: UseWatchFeedParams) {
+export function useWatchFeed({ userId, filter, mood, category, searchQuery, userLat, userLng, enabled = true }: UseWatchFeedParams) {
+  const resolvedFilter: WatchFilter = mood ? MOOD_TO_FILTER[mood] : (filter ?? 'trending');
   const seenPostIds = useRef<string[]>([]);
 
   const query = useInfiniteQuery({
