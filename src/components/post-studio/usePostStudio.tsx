@@ -282,6 +282,11 @@ export function PostStudioProvider({
       dispatch({ type: 'UPDATE_MEDIA_EDITS', payload: { id, edits } }),
     []
   );
+  const updateMediaSimpleEdits = useCallback(
+    (id: string, simpleEdits: SimpleEdits) =>
+      dispatch({ type: 'UPDATE_MEDIA_SIMPLE_EDITS', payload: { id, simpleEdits } }),
+    []
+  );
   const setCaption = useCallback((text: string) => dispatch({ type: 'SET_CAPTION', payload: text }), []);
   const setMentions = useCallback((mentions: MentionToken[]) => dispatch({ type: 'SET_MENTIONS', payload: mentions }), []);
   const setTaggedCourses = useCallback((courses: TaggedCourse[]) => dispatch({ type: 'SET_TAGGED_COURSES', payload: courses }), []);
