@@ -18,7 +18,6 @@ import { useNavigate } from 'react-router-dom';
 import { VideoPost, UserPostWithType } from './types';
 import { useFullscreenVideoModal } from '@/hooks/useFullscreenVideoModal';
 import FullscreenVideoModal from '@/components/ui/fullscreen-video-modal';
-import SoundtrackStrip from '@/components/studio/SoundtrackStrip';
 import TextOverlayRenderer from '@/components/studio/TextOverlayRenderer';
 import Masonry from 'react-masonry-css';
 import { getFilterClass } from '@/utils/studioFilters';

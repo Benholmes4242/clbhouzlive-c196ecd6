@@ -19,7 +19,6 @@ import { removeGolfCourseFromContent } from '@/utils/golfCourseExtractor';
 import { getFilterClass } from '@/utils/studioFilters';
 import { getCropWrapperClass, getPixelLayerStyle } from '@/utils/studioEdit';
 import TextOverlayRenderer from '@/components/studio/TextOverlayRenderer';
-import SoundtrackStrip from '@/components/studio/SoundtrackStrip';
 import { cn } from '@/lib/utils';
 
 
