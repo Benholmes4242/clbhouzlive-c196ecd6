@@ -3,7 +3,6 @@ import { X, Volume2, VolumeX, Play, Pause } from 'lucide-react';
 import { Button } from './button';
 import EnhancedVideoPlayer from './enhanced-video-player';
 import { MediaRuntime } from '@/media/runtime/MediaRuntime';
-import SoundtrackStrip from '@/components/studio/SoundtrackStrip';
 import TextOverlayRenderer from '@/components/studio/TextOverlayRenderer';
 import { getFilterClass } from '@/utils/studioFilters';
 import { getCropWrapperClass, getPixelLayerStyle } from '@/utils/studioEdit';
@@ -210,23 +209,7 @@ const FullscreenVideoModal: React.FC<FullscreenVideoModalProps> = ({
             )}
           </div>
           
-          {/* SoundtrackStrip for music posts - Option A: music controls audio */}
-          {activeMusic && (
-            <div className="absolute bottom-20 left-1/2 -translate-x-1/2 z-50 max-w-[240px]">
-              <SoundtrackStrip 
-                music={{
-                  trackId: activeMusic.trackId || '',
-                  title: activeMusic.title || 'Unknown Track',
-                  artist: activeMusic.artist,
-                  r2Key: activeMusic.r2Key,
-                  url: activeMusic.url,
-                  startAt: activeMusic.startAt,
-                  volume: activeMusic.volume
-                }}
-                variant="published"
-              />
-            </div>
-          )}
+          {/* Phase 3e: post-level music retired */}
         </div>
       </div>
     </div>

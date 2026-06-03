@@ -18,7 +18,6 @@ import { useNavigate } from 'react-router-dom';
 import { VideoPost, UserPostWithType } from './types';
 import { useFullscreenVideoModal } from '@/hooks/useFullscreenVideoModal';
 import FullscreenVideoModal from '@/components/ui/fullscreen-video-modal';
-import SoundtrackStrip from '@/components/studio/SoundtrackStrip';
 import TextOverlayRenderer from '@/components/studio/TextOverlayRenderer';
 import Masonry from 'react-masonry-css';
 import { getFilterClass } from '@/utils/studioFilters';
@@ -396,23 +395,7 @@ const MosaicFeedContent: React.FC<MosaicFeedContentProps> = ({
             </div>
           </div>
           
-          {/* SoundtrackStrip for music posts */}
-          {activeMusic && (
-            <div className="absolute bottom-3 left-2 z-30 max-w-[140px]">
-              <SoundtrackStrip 
-                music={{
-                  trackId: activeMusic.trackId || '',
-                  title: activeMusic.title || 'Unknown Track',
-                  artist: activeMusic.artist,
-                  r2Key: activeMusic.r2Key,
-                  url: activeMusic.url,
-                  startAt: activeMusic.startAt,
-                  volume: activeMusic.volume
-                }}
-                variant="published"
-              />
-            </div>
-          )}
+          {/* Phase 3e: post-level music retired */}
         </div>
       </div>
     );

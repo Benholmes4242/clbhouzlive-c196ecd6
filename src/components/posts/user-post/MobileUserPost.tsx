@@ -19,7 +19,6 @@ import { removeGolfCourseFromContent } from '@/utils/golfCourseExtractor';
 import { getFilterClass } from '@/utils/studioFilters';
 import { getCropWrapperClass, getPixelLayerStyle } from '@/utils/studioEdit';
 import TextOverlayRenderer from '@/components/studio/TextOverlayRenderer';
-import SoundtrackStrip from '@/components/studio/SoundtrackStrip';
 import { cn } from '@/lib/utils';
 
 
@@ -227,15 +226,7 @@ export const MobileUserPost: React.FC<MobileUserPostProps> = ({
           );
         })()}
         
-        {/* Music strip */}
-        {(() => {
-          const musicEdits = (currentMedia as any).studio_edits;
-          return musicEdits?.music && (
-            <div className="absolute bottom-16 left-4 z-20 max-w-[200px]">
-              <SoundtrackStrip music={musicEdits.music} variant="published" />
-            </div>
-          );
-        })()}
+        {/* Phase 3e: post-level music retired */}
 
         {/* User Info Overlay */}
         <div className="absolute top-3 left-2.5 z-20">

@@ -6,7 +6,6 @@ import { PostMedia, GolfCourse } from './types';
 import { getFilterClass } from '@/utils/studioFilters';
 import { getCropWrapperClass, getPixelLayerStyle } from '@/utils/studioEdit';
 import { cn } from '@/lib/utils';
-import SoundtrackStrip from '@/components/studio/SoundtrackStrip';
 import TextOverlayRenderer from '@/components/studio/TextOverlayRenderer';
 import { toast } from 'sonner';
 
@@ -149,23 +148,7 @@ export const UserPostMedia: React.FC<UserPostMediaProps> = ({
           />
         )}
 
-        {/* Soundtrack strip - show on every slide when post has music */}
-        {activeMusic && (
-          <div className="absolute bottom-2 left-2 z-10 max-w-[180px]">
-            <SoundtrackStrip 
-              music={{
-                trackId: activeMusic.trackId,
-                title: activeMusic.title,
-                artist: activeMusic.artist,
-                url: activeMusic.url,
-                r2Key: activeMusic.r2Key,
-                startAt: activeMusic.startAt,
-                volume: activeMusic.volume,
-              }}
-              variant="published"
-            />
-          </div>
-        )}
+        {/* Phase 3e: post-level music retired */}
       </div>
     );
   });
