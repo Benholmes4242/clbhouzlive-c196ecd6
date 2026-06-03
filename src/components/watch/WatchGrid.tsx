@@ -15,6 +15,9 @@ interface WatchGridProps {
   refetch?: () => void;
   gridRef: React.RefObject<HTMLDivElement>;
   userId?: string;
+  emptyEmoji?: string;
+  emptyTitle?: string;
+  emptyMessage?: string;
 }
 
 const WatchGrid: React.FC<WatchGridProps> = ({
