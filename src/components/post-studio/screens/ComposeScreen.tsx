@@ -21,12 +21,10 @@ import {
   COMPOSE_BG, DARK_TEXT, DARK_TEXT2, DARK_TEXT3, DARK_ICON, DARK_BG, DARK_CARD, DARK_BORDER,
 } from '../tokens';
 import type { StudioMediaItem } from '../types';
-import type { StudioEdits, StudioTool } from '@/types/studio';
-import StudioShelf from '@/components/studio/StudioShelf';
+import type { StudioEdits } from '@/types/studio';
 import { EditorScreen, bakeImageEdits } from '@/components/studio-v2';
 import { hasAnySimpleEdit } from '@/types/studioSimple';
 
-import { getFilterClass } from '@/utils/studioFilters';
 import { enqueuePostUpload } from '@/uploads/uploadPipeline';
 import { supabase } from '@/integrations/supabase/client';
 import { analyticsEvents } from '@/utils/analyticsEvents';
@@ -290,7 +288,7 @@ function hasActiveFilter(edits?: StudioEdits): boolean {
 export function ComposeScreen({ onClose }: { onClose?: () => void }) {
    const {
     state, setStep, setActiveMedia, setCoverMedia, removeMedia, addMedia,
-    setCaption, openPanel, closePanel, updateMediaEdits, updateMediaSimpleEdits, updateTrim,
+    setCaption, openPanel, closePanel, updateMediaSimpleEdits, updateTrim,
     setMentions, setTaggedCourses, setMentionTriggerIndex, reset, onSuccess, schedulePublishRef,
   } = usePostStudioContext();
 
@@ -312,10 +310,7 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
   const [isProcessing, setIsProcessing] = useState(false);
   const [textareaFocused, setTextareaFocused] = useState(false);
   const [isPublishing, setIsPublishing] = useState(false);
-  const [shelfOpen, setShelfOpen] = useState(false);
   const [editorOpen, setEditorOpen] = useState(false);
-  const [activeTool, setActiveTool] = useState<StudioTool>(null);
-  const [activeOverlayId, setActiveOverlayId] = useState<string | null>(null);
   // Cover is sourced from reducer state (keyed by media ID, persists across remounts/reorders)
   const coverMediaId = state.coverMediaId;
   const coverIndex = coverMediaId
@@ -432,16 +427,6 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
     return parts;
   }, [state.caption, state.mentions]);
 
-  const handleUpdateEdits = useCallback((patch: Partial<StudioEdits>) => {
-    if (!activeItem) return;
-    updateMediaEdits(activeItem.id, { ...(activeItem.edits ?? {}), ...patch });
-  }, [activeItem, updateMediaEdits]);
-
-  const handleClearEdits = useCallback(() => {
-    if (!activeItem) return;
-    updateMediaEdits(activeItem.id, {});
-  }, [activeItem, updateMediaEdits]);
-
   const handleEdit = useCallback((index: number) => {
     const item = state.mediaItems[index];
     if (!item) return;
@@ -449,10 +434,9 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
     if (item.mediaType === 'image') {
       setEditorOpen(true);
     } else {
-      setActiveTool('trim');
-      setShelfOpen(true);
+      setStep('TRIM');
     }
-  }, [state.mediaItems, setActiveMedia]);
+  }, [state.mediaItems, setActiveMedia, setStep]);
 
   const handleSetCover = useCallback((index: number) => {
     const targetId = state.mediaItems[index]?.id;
@@ -938,11 +922,7 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
               }}
               onEdit={(mediaId) => {
                 const idx = state.mediaItems.findIndex((m) => m.id === mediaId);
-                if (idx >= 0) {
-                  setActiveMedia(idx);
-                  setActiveTool('filter');
-                  setShelfOpen(true);
-                }
+                if (idx >= 0) handleEdit(idx);
               }}
               onAddMore={() => fileInputRef.current?.click()}
             />
@@ -1104,39 +1084,10 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
       </div>
 
 
-      {/* Studio Shelf */}
-      {state.mediaItems[state.activeMediaIndex] && (
-        <StudioShelf
-          open={shelfOpen}
-          onClose={() => setShelfOpen(false)}
-          activeTool={activeTool}
-          setActiveTool={setActiveTool}
-          activeMediaId={state.mediaItems[state.activeMediaIndex].id}
-          activeMediaType={state.mediaItems[state.activeMediaIndex].mediaType}
-          activeMediaPreviewUrl={state.mediaItems[state.activeMediaIndex].previewUrl}
-          activeMediaThumbnailUrl={state.mediaItems[state.activeMediaIndex].thumbnailUrl}
-          edits={state.mediaItems[state.activeMediaIndex].edits ?? {}}
-          updateEdits={handleUpdateEdits}
-          clearEdits={handleClearEdits}
-          activeOverlayId={activeOverlayId}
-          onSelectOverlay={setActiveOverlayId}
-          allMediaItems={state.mediaItems.map(m => ({
-            id: m.id,
-            mediaType: m.mediaType,
-            previewUrl: m.previewUrl,
-            thumbnailUrl: m.thumbnailUrl,
-          }))}
-          activeMediaIndex={state.activeMediaIndex}
-          onNavigateMedia={(index) => setActiveMedia(index)}
-          trimStart={state.mediaItems[state.activeMediaIndex].trimStart || 0}
-          trimEnd={state.mediaItems[state.activeMediaIndex].trimEnd ?? state.mediaItems[state.activeMediaIndex].duration ?? 0}
-          duration={state.mediaItems[state.activeMediaIndex].duration ?? 0}
-          onTrimChange={(start, end) => {
-            const item = state.mediaItems[state.activeMediaIndex];
-            if (item) updateTrim(item.id, start, end);
-          }}
-        />
-      )}
+
+
+
+
 
 
 
