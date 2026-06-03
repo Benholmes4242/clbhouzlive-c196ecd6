@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState, useId, useMemo } from 'react';
+import React, { useEffect, useRef, useState, useId } from 'react';
 import { X, Volume2, VolumeX, Play, Pause } from 'lucide-react';
 import { Button } from './button';
 import EnhancedVideoPlayer from './enhanced-video-player';
