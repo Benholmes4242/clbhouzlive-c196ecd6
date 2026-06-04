@@ -37,9 +37,11 @@ export interface AutoplayVideoCardProps {
   userId?: string;
   /** When true, mount a video and autoplay muted+looped. When false, thumbnail only. */
   active: boolean;
+  /** Card corner radius in px. Defaults to 12. */
+  borderRadius?: number;
 }
 
-function AutoplayVideoCardInner({ post, index, allPosts, userId, active }: AutoplayVideoCardProps) {
+function AutoplayVideoCardInner({ post, index, allPosts, userId, active, borderRadius = 12 }: AutoplayVideoCardProps) {
   const navigate = useNavigate();
   const { openActions } = useWatchActions();
   const longPressTimer = useRef<number | null>(null);
@@ -171,7 +173,7 @@ function AutoplayVideoCardInner({ post, index, allPosts, userId, active }: Autop
           position: 'relative',
           width: '100%',
           aspectRatio: '16/9',
-          borderRadius: 12,
+          borderRadius,
           overflow: 'hidden',
           background: 'transparent',
           border: 'none',

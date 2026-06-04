@@ -68,6 +68,7 @@ export default function LatestVideosRail() {
             allPosts={posts}
             userId={userId}
             active={heroActive}
+            borderRadius={0}
           />
         </div>
 
