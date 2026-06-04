@@ -140,6 +140,7 @@ export function CollegeProfilePage() {
   return (
     <TourHubShell>
       <ShellSlot dark>
+        <TourBackChip />
         <button
           type="button"
           onClick={() => navigate(collegeHubRoute())}
