@@ -93,12 +93,6 @@ export function PlayerProfilePage() {
           </div>
         </ShellSlot>
         <div style={{ paddingTop: 'var(--chrome-total-h, 0px)' }} className="px-5">
-          <button
-            onClick={handleBack}
-            className="text-primary hover:underline flex items-center gap-1 mb-6 text-sm active:opacity-70 transition-opacity"
-          >
-            <ArrowLeft className="w-4 h-4" /> Back to Players
-          </button>
           <div className="text-center py-20 flex flex-col items-center gap-3">
             <AlertCircle className="w-10 h-10 text-muted-foreground" />
             <p className="text-muted-foreground text-lg font-medium">Couldn't load player data</p>
