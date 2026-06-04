@@ -14,6 +14,7 @@ import { useWatchFeed } from './hooks/useWatchFeed';
 import ScrollToTopGlass from '@/components/common/ScrollToTopGlass';
 import { WatchOfTheWeekHero } from './proshop/WatchOfTheWeekHero';
 import { CourseAnchoredRail } from './proshop/CourseAnchoredRail';
+import { WatchMoodChips } from './proshop/WatchMoodChips';
 import { useWatchMood } from './proshop/hooks/useWatchMood';
 
 interface UnifiedWatchFeedProps {
@@ -26,7 +27,7 @@ export default function UnifiedWatchFeed({ embedded = false }: UnifiedWatchFeedP
   const userId = session?.user?.id;
   const gridRef = useRef<HTMLDivElement>(null);
 
-  const { mood } = useWatchMood();
+  const { mood, setMood } = useWatchMood();
 
   // Mood pills (in ShellSlot) drive both rails and the grid. useWatchFeed
   // resolves mood→RPC mode internally and applies client-side narrowing
@@ -62,10 +63,15 @@ export default function UnifiedWatchFeed({ embedded = false }: UnifiedWatchFeedP
       {/* ── From your courses — single course-anchored rail ── */}
       <CourseAnchoredRail />
 
+      {/* ── Mood pills — dark band directly above the grid they control ── */}
+      <div style={{ background: '#0A0E14', paddingBottom: 8 }}>
+        <WatchMoodChips active={mood} onChange={setMood} />
+      </div>
+
       {/* ── Section 3: Watch grid ──
           Phase 5g: explicit 24px paddingBottom guarantees clearance from
           the bottom nav even when PageRoot is bypassed. */}
-      <div style={{ paddingTop: 28, paddingBottom: 24 }}>
+      <div style={{ paddingTop: 16, paddingBottom: 24 }}>
         <WatchSectionHeader
           eyebrow="Explore"
           title="Clips to explore"
