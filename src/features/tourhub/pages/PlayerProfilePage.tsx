@@ -7,7 +7,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { useParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { TrendingUp, AlertCircle } from 'lucide-react';
-import { TourHubShell } from '../components/TourHubShell';
+import { TourHubShell, TourBackChip } from '../components/TourHubShell';
 import { ShellSlot } from '@/components/header/ShellSlot';
 import { Kicker } from '@/components/watch/proshop/Kicker';
 import {
