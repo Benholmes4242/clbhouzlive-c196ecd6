@@ -59,7 +59,7 @@ function ThruDisplay({ thru }: { thru: number | null }) {
     return <span style={{ fontSize: '10px', fontWeight: 700, color: INK_MUTE, background: 'rgba(15,23,42,0.05)', padding: '2px 5px', borderRadius: 5 }}>F</span>;
   }
   return (
-    <span style={{ fontSize: '10px', color: INK_FAINT, fontVariantNumeric: 'tabular-nums' }}>
+    <span style={{ fontSize: '10px', color: INK_FAINT, fontVariantNumeric: 'tabular-nums', whiteSpace: 'nowrap' }}>
       Thru {thru}
     </span>
   );
