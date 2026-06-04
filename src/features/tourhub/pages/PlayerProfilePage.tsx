@@ -53,8 +53,6 @@ const SHELL_H1_STYLE: React.CSSProperties = {
 
 export function PlayerProfilePage() {
   const { playerId } = useParams<{ playerId: string }>();
-  const navigate = useNavigate();
-  const location = useLocation();
 
   const { data: player, isLoading: playerLoading, refetch } = useTourPlayer(playerId || '');
   const { data: playerStats } = useSinglePlayerStatistics(playerId);
@@ -62,14 +60,6 @@ export function PlayerProfilePage() {
   useEffect(() => {
     window.scrollTo(0, 0);
   }, [playerId]);
-
-  const handleBack = () => {
-    if (location.key !== 'default') {
-      navigate(-1);
-    } else {
-      navigate('/tourhub?tab=players');
-    }
-  };
 
   if (playerLoading) {
     return (
