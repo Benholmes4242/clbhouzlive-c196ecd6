@@ -63,10 +63,15 @@ export default function UnifiedWatchFeed({ embedded = false }: UnifiedWatchFeedP
       {/* ── From your courses — single course-anchored rail ── */}
       <CourseAnchoredRail />
 
+      {/* ── Mood pills — dark band directly above the grid they control ── */}
+      <div style={{ background: '#0A0E14', paddingBottom: 8 }}>
+        <WatchMoodChips active={mood} onChange={setMood} />
+      </div>
+
       {/* ── Section 3: Watch grid ──
           Phase 5g: explicit 24px paddingBottom guarantees clearance from
           the bottom nav even when PageRoot is bypassed. */}
-      <div style={{ paddingTop: 28, paddingBottom: 24 }}>
+      <div style={{ paddingTop: 16, paddingBottom: 24 }}>
         <WatchSectionHeader
           eyebrow="Explore"
           title="Clips to explore"
