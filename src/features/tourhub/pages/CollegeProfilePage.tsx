@@ -2,7 +2,7 @@ import { useState, useMemo, Fragment } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { RefreshCw, AlertCircle, ChevronRight, Crown } from 'lucide-react';
 import { getCollegeLogoUrl } from '@/utils/collegeLogo';
-import { TourHubShell } from '../components/TourHubShell';
+import { TourHubShell, TourBackChip } from '../components/TourHubShell';
 import { ShellSlot } from '@/components/header/ShellSlot';
 import { Kicker } from '@/components/watch/proshop/Kicker';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -140,6 +140,7 @@ export function CollegeProfilePage() {
   return (
     <TourHubShell>
       <ShellSlot dark>
+        <TourBackChip />
         <button
           type="button"
           onClick={() => navigate(collegeHubRoute())}
