@@ -7,7 +7,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { useParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { TrendingUp, AlertCircle } from 'lucide-react';
-import { TourHubShell, TourBackChip } from '../components/TourHubShell';
+import { TourHubShell } from '../components/TourHubShell';
 import { ShellSlot } from '@/components/header/ShellSlot';
 import { Kicker } from '@/components/watch/proshop/Kicker';
 import {
@@ -65,7 +65,6 @@ export function PlayerProfilePage() {
     return (
       <TourHubShell>
         <ShellSlot dark>
-          <TourBackChip />
           <div style={SHELL_SLOT_BG}>
             <Kicker color="amber">Player</Kicker>
             <Skeleton className="h-5 w-40" style={{ background: INK_TINT_06 }} />
@@ -88,7 +87,6 @@ export function PlayerProfilePage() {
     return (
       <TourHubShell>
         <ShellSlot dark>
-          <TourBackChip />
           <div style={SHELL_SLOT_BG}>
             <Kicker color="amber">Player</Kicker>
             <h1 style={SHELL_H1_STYLE}>Player Profile</h1>
@@ -116,7 +114,6 @@ export function PlayerProfilePage() {
   return (
     <TourHubShell>
       <ShellSlot dark>
-        <TourBackChip />
         <div style={SHELL_SLOT_BG}>
           <Kicker color="light">{tourBadge}</Kicker>
           <h1 style={SHELL_H1_STYLE}>{player.full_name}</h1>

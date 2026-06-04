@@ -12,40 +12,6 @@ interface TourHubShellProps {
   onBack?: () => void;
 }
 
-/**
- * TourBackChip — inline back affordance for non-immersive detail pages.
- * Render as the FIRST child inside a ShellSlot, above the page masthead block,
- * so it shares the ShellSlot's fixed band (no overlap, no doubled chrome padding).
- */
-export function TourBackChip({ onBack }: { onBack?: () => void }) {
-  const navigate = useNavigate();
-  return (
-    <div style={{ background: '#0F172A', padding: '6px 8px 0' }}>
-      <button
-        type="button"
-        onClick={onBack ?? (() => navigate(-1))}
-        aria-label="Back"
-        style={{
-          display: 'inline-flex',
-          alignItems: 'center',
-          gap: 4,
-          background: 'transparent',
-          border: 'none',
-          cursor: 'pointer',
-          color: 'rgba(255,255,255,0.85)',
-          fontSize: 13,
-          fontWeight: 600,
-          padding: '4px 6px',
-          margin: 0,
-        }}
-      >
-        <ArrowLeft size={16} strokeWidth={2.5} />
-        Back
-      </button>
-    </div>
-  );
-}
-
 export function TourHubShell({ children, immersive = false, showBack = true, onBack }: TourHubShellProps) {
   const { setVariant } = useHeader();
   const navigate = useNavigate();
@@ -55,9 +21,7 @@ export function TourHubShell({ children, immersive = false, showBack = true, onB
     return () => setVariant('solid-light');
   }, [setVariant]);
 
-  // Floating overlay back button — ONLY for immersive pages (Tournament hero).
-  // Non-immersive pages should render <TourBackChip /> inside their ShellSlot.
-  const overlayBackButton = showBack && immersive ? (
+  const backButton = showBack ? (
     <button
       onClick={onBack ?? (() => navigate(-1))}
       aria-label="Back"
@@ -83,6 +47,7 @@ export function TourHubShell({ children, immersive = false, showBack = true, onB
     </button>
   ) : null;
 
+  // Tournament detail pages: immersive negative-margin + max-width container
   if (immersive) {
     return (
       <PageRoot
@@ -90,7 +55,7 @@ export function TourHubShell({ children, immersive = false, showBack = true, onB
         immersive
         immersiveStatusBar
       >
-        {overlayBackButton}
+        {backButton}
         <div className="w-full max-w-5xl mx-auto">
           {children}
         </div>
@@ -98,12 +63,16 @@ export function TourHubShell({ children, immersive = false, showBack = true, onB
     );
   }
 
+  // Match handicap page: dark PageRoot canvas + default (non-immersive)
+  // status bar so the safe-area notch renders as the same dark band as the
+  // header chrome. PageRoot dark adds .hcp-dark and pads for the bottom nav.
   return (
     <PageRoot
       dark
       className="min-h-screen w-full"
       style={{ background: 'var(--hcp-bg-0)' }}
     >
+      {backButton}
       {children}
     </PageRoot>
   );
