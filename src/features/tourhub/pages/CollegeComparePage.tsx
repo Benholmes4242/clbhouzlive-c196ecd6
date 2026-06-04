@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useSearchParams, useNavigate, Link } from 'react-router-dom';
 import { ArrowLeftRight, ChevronRight, Search, X } from 'lucide-react';
-import { TourHubShell } from '../components';
+import { TourHubShell, TourBackChip } from '../components';
 import { ShellSlot } from '@/components/header/ShellSlot';
 import { Kicker } from '@/components/watch/proshop/Kicker';
 
