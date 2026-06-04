@@ -69,7 +69,7 @@ export function TrimScreen() {
       </header>
 
       {/* Full-bleed video preview — stays dark */}
-      <div className="flex-1 relative overflow-hidden" style={{ background: '#111', marginTop: 12 }}>
+      <div className="flex-1 min-h-0 relative overflow-hidden" style={{ background: '#111', marginTop: 12 }}>
         <video
           ref={videoRef}
           src={activeItem.previewUrl}
