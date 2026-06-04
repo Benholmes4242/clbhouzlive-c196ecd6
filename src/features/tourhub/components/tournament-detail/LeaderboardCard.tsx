@@ -59,7 +59,7 @@ function ThruDisplay({ thru }: { thru: number | null }) {
     return <span style={{ fontSize: '10px', fontWeight: 700, color: INK_MUTE, background: 'rgba(15,23,42,0.05)', padding: '2px 5px', borderRadius: 5 }}>F</span>;
   }
   return (
-    <span style={{ fontSize: '10px', color: INK_FAINT, fontVariantNumeric: 'tabular-nums' }}>
+    <span style={{ fontSize: '10px', color: INK_FAINT, fontVariantNumeric: 'tabular-nums', whiteSpace: 'nowrap' }}>
       Thru {thru}
     </span>
   );
@@ -100,7 +100,7 @@ export function LeaderboardCard({
       <div style={{ display: 'flex', alignItems: 'center', gap: '4px', padding: '5px 20px', background: INK_TINT_02, borderTop: `0.5px solid ${INK_TINT_07}`, borderBottom: `0.5px solid ${INK_TINT_07}` }}>
         <span style={{ width: '36px', fontSize: '9px', fontWeight: 800, color: INK_MUTE, letterSpacing: '0.14em', flexShrink: 0 }}>POS</span>
         <span style={{ flex: 1, fontSize: '9px', fontWeight: 800, color: INK_MUTE, letterSpacing: '0.14em' }}>PLAYER</span>
-        <span style={{ width: '36px', textAlign: 'center' as const, fontSize: '9px', fontWeight: 800, color: INK_MUTE, letterSpacing: '0.14em', flexShrink: 0 }}>THRU</span>
+        <span style={{ width: '48px', textAlign: 'center' as const, fontSize: '9px', fontWeight: 800, color: INK_MUTE, letterSpacing: '0.14em', flexShrink: 0 }}>THRU</span>
         <span style={{ width: '44px', textAlign: 'center' as const, fontSize: '9px', fontWeight: 800, color: INK_MUTE, letterSpacing: '0.14em', flexShrink: 0 }}>SCORE</span>
       </div>
 
@@ -143,7 +143,7 @@ export function LeaderboardCard({
                 </div>
 
                 {/* Thru */}
-                <div style={{ width: '36px', textAlign: 'center' as const, flexShrink: 0 }}>
+                <div style={{ width: '48px', textAlign: 'center' as const, flexShrink: 0 }}>
                   <ThruDisplay thru={entry.thru} />
                 </div>
 
