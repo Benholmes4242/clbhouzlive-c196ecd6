@@ -4,9 +4,9 @@
 
 import { useEffect } from 'react';
 import { Skeleton } from '@/components/ui/skeleton';
-import { useParams, useNavigate, useLocation } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { ArrowLeft, TrendingUp, AlertCircle } from 'lucide-react';
+import { TrendingUp, AlertCircle } from 'lucide-react';
 import { TourHubShell } from '../components/TourHubShell';
 import { ShellSlot } from '@/components/header/ShellSlot';
 import { Kicker } from '@/components/watch/proshop/Kicker';
