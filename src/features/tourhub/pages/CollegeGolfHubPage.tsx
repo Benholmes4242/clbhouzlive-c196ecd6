@@ -135,7 +135,7 @@ export function CollegeGolfHubPage() {
   const showSearchResults = searchExpanded && debouncedSearch.length >= 2;
 
   return (
-    <TourHubShell>
+    <TourHubShell showBack={false}>
       <ShellSlot dark>
         <TourHubShellTabs />
         <CollegeShellRow />

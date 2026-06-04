@@ -4,9 +4,9 @@
 
 import { useEffect } from 'react';
 import { Skeleton } from '@/components/ui/skeleton';
-import { useParams, useNavigate, useLocation } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { ArrowLeft, TrendingUp, AlertCircle } from 'lucide-react';
+import { TrendingUp, AlertCircle } from 'lucide-react';
 import { TourHubShell } from '../components/TourHubShell';
 import { ShellSlot } from '@/components/header/ShellSlot';
 import { Kicker } from '@/components/watch/proshop/Kicker';
@@ -53,8 +53,6 @@ const SHELL_H1_STYLE: React.CSSProperties = {
 
 export function PlayerProfilePage() {
   const { playerId } = useParams<{ playerId: string }>();
-  const navigate = useNavigate();
-  const location = useLocation();
 
   const { data: player, isLoading: playerLoading, refetch } = useTourPlayer(playerId || '');
   const { data: playerStats } = useSinglePlayerStatistics(playerId);
@@ -62,14 +60,6 @@ export function PlayerProfilePage() {
   useEffect(() => {
     window.scrollTo(0, 0);
   }, [playerId]);
-
-  const handleBack = () => {
-    if (location.key !== 'default') {
-      navigate(-1);
-    } else {
-      navigate('/tourhub?tab=players');
-    }
-  };
 
   if (playerLoading) {
     return (
@@ -103,12 +93,6 @@ export function PlayerProfilePage() {
           </div>
         </ShellSlot>
         <div style={{ paddingTop: 'var(--chrome-total-h, 0px)' }} className="px-5">
-          <button
-            onClick={handleBack}
-            className="text-primary hover:underline flex items-center gap-1 mb-6 text-sm active:opacity-70 transition-opacity"
-          >
-            <ArrowLeft className="w-4 h-4" /> Back to Players
-          </button>
           <div className="text-center py-20 flex flex-col items-center gap-3">
             <AlertCircle className="w-10 h-10 text-muted-foreground" />
             <p className="text-muted-foreground text-lg font-medium">Couldn't load player data</p>
