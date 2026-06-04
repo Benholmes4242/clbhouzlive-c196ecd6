@@ -87,7 +87,7 @@ export default function EditorScreen({ src, initialEdits, onCancel, onDone }: Ed
       </div>
 
       {/* Preview */}
-      <div className="flex-1 flex items-center justify-center p-4 overflow-hidden">
+      <div className="flex-1 min-h-0 flex items-center justify-center p-4 overflow-hidden">
         <div
           ref={previewRef}
           className="relative"
@@ -158,7 +158,7 @@ export default function EditorScreen({ src, initialEdits, onCancel, onDone }: Ed
       </div>
 
       {/* Tool panel */}
-      <div style={{ borderTop: `1px solid ${BORDER}`, background: '#fff' }}>
+      <div style={{ borderTop: `1px solid ${BORDER}`, background: '#fff', maxHeight: '42vh', overflowY: 'auto', flexShrink: 0 }}>
         {tool === 'crop' && <CropPanel edits={edits} update={update} />}
         {tool === 'filter' && <FilterPanel edits={edits} update={update} previewUrl={src} />}
         {tool === 'text' && (
@@ -172,6 +172,7 @@ export default function EditorScreen({ src, initialEdits, onCancel, onDone }: Ed
         style={{
           borderTop: `1px solid ${BORDER}`,
           background: '#fff',
+          flexShrink: 0,
           paddingBottom: 'env(safe-area-inset-bottom, 0px)',
         }}
       >
