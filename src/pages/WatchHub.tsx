@@ -1,7 +1,6 @@
 import { Suspense, lazy } from 'react';
 import { PageRoot } from '@/components/layout/PageRoot';
 import { FadeInContent } from '@/components/ui/FadeInContent';
-import ShellSlot from '@/components/header/ShellSlot';
 import WatchGridSkeleton from '@/components/watch/WatchGridSkeleton';
 
 const WatchTabContent = lazy(() => import('@/components/watch/WatchTabContent'));
@@ -13,8 +12,6 @@ const WatchTabContent = lazy(() => import('@/components/watch/WatchTabContent'))
 export default function WatchHub() {
   return (
     <PageRoot className="min-h-screen text-foreground bg-background">
-      <ShellSlot />
-
       <FadeInContent>
         <main
           className="pb-20 bg-background"
