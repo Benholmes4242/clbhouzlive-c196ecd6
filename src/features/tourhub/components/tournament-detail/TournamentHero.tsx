@@ -224,6 +224,7 @@ export function TournamentHero({ tournament, imageUrl, leader, leaderboard }: To
               top: '14px',
               left: 16,
               right: 16,
+              paddingLeft: 44, // clearance for the floating back button (36px) + gap
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'space-between',
