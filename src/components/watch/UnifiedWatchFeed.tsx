@@ -27,7 +27,7 @@ export default function UnifiedWatchFeed({ embedded = false }: UnifiedWatchFeedP
   const userId = session?.user?.id;
   const gridRef = useRef<HTMLDivElement>(null);
 
-  const { mood } = useWatchMood();
+  const { mood, setMood } = useWatchMood();
 
   // Mood pills (in ShellSlot) drive both rails and the grid. useWatchFeed
   // resolves mood→RPC mode internally and applies client-side narrowing
