@@ -10,7 +10,7 @@ import { OverviewPageV3 } from '@/features/tourhub/components/tabs/OverviewPageV
  */
 export default function HomeLanding() {
   return (
-    <TourHubShell>
+    <TourHubShell showBack={false}>
       <ShellSlot dark>
         <TourHubShellTabs />
       </ShellSlot>
