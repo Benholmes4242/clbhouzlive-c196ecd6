@@ -65,6 +65,7 @@ export function PlayerProfilePage() {
     return (
       <TourHubShell>
         <ShellSlot dark>
+          <TourBackChip />
           <div style={SHELL_SLOT_BG}>
             <Kicker color="amber">Player</Kicker>
             <Skeleton className="h-5 w-40" style={{ background: INK_TINT_06 }} />
