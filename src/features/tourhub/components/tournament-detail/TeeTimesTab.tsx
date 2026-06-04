@@ -243,11 +243,8 @@ export function TeeTimesTab({ tournamentId, tournamentName, isCompleted }: TeeTi
     return [...map.entries()].sort(([a], [b]) => a - b);
   }, [filteredGroups, hasSplitTees]);
 
-  if (isLoading) return <TeeTimesSkeleton />;
-  if (!teeTimes || teeTimes.length === 0) {
-    return <TeeTimesEmpty isCompleted={isCompleted} roundLabel={!availableRounds.includes(selectedRound) ? `Round ${roundNumber}` : undefined} />;
-  }
-
+  // Hoisted above the state-gated early returns so the hook count is identical
+  // across loading / empty / loaded renders (Rules of Hooks / #310 fix).
   const featuredTeeTime = useMemo(() => {
     if (!showScores) return null;
     let bestPos = Infinity; let bestTime: string | null = null;
@@ -259,6 +256,11 @@ export function TeeTimesTab({ tournamentId, tournamentName, isCompleted }: TeeTi
     }
     return bestTime;
   }, [groups, scoreByPlayer, showScores]);
+
+  if (isLoading) return <TeeTimesSkeleton />;
+  if (!teeTimes || teeTimes.length === 0) {
+    return <TeeTimesEmpty isCompleted={isCompleted} roundLabel={!availableRounds.includes(selectedRound) ? `Round ${roundNumber}` : undefined} />;
+  }
 
   const teeTimeDate = groups[0]?.teeTime ? format(new Date(groups[0].teeTime), 'EEE, MMM d, yyyy') : null;
   const firstOff = groups[0]?.teeTime ? format(new Date(groups[0].teeTime), 'h:mm a') : null;
