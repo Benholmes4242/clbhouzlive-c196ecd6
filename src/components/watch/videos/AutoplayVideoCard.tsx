@@ -173,7 +173,7 @@ function AutoplayVideoCardInner({ post, index, allPosts, userId, active, borderR
           position: 'relative',
           width: '100%',
           aspectRatio: '16/9',
-          borderRadius: 12,
+          borderRadius,
           overflow: 'hidden',
           background: 'transparent',
           border: 'none',
