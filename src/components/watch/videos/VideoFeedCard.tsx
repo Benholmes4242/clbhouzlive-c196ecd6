@@ -105,7 +105,7 @@ function VideoFeedCardInner({ post, index, allPosts, userId }: VideoFeedCardProp
           position: 'relative',
           width: '100%',
           aspectRatio: '16/9',
-          borderRadius: 0,
+          borderRadius: 12,
           overflow: 'hidden',
           background: 'transparent',
           border: 'none',
@@ -139,7 +139,7 @@ function VideoFeedCardInner({ post, index, allPosts, userId }: VideoFeedCardProp
       </button>
 
       {/* Meta row */}
-      <div style={{ display: 'flex', gap: 10, marginTop: 10, alignItems: 'flex-start', padding: '0 16px' }}>
+      <div style={{ display: 'flex', gap: 10, marginTop: 8, alignItems: 'flex-start', padding: '0 16px' }}>
         <button
           type="button"
           onClick={(e) => { e.stopPropagation(); navigate(`/profile/${post.userId}`); }}

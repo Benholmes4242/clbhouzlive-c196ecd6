@@ -60,7 +60,7 @@ export default function LatestVideosRail() {
         seeAllLabel="More videos"
       />
 
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
         <div ref={heroRef}>
           <AutoplayVideoCard
             post={hero}
