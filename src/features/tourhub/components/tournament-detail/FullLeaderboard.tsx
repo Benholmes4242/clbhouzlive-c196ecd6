@@ -209,7 +209,7 @@ export function FullLeaderboard({
         >
           TOT{sortRound == null ? '▾' : ''}
         </button>
-        <span style={{ width: '30px', textAlign: 'center' as const, fontSize: '9px', fontWeight: 800, color: INK_MUTE, letterSpacing: '0.14em', flexShrink: 0 }}>THRU</span>
+        <span style={{ width: '48px', textAlign: 'center' as const, fontSize: '9px', fontWeight: 800, color: INK_MUTE, letterSpacing: '0.14em', flexShrink: 0 }}>THRU</span>
       </div>
 
       {/* Player rows */}
@@ -265,7 +265,7 @@ export function FullLeaderboard({
                   <ScoreToPar score={entry.score} emphasis size={14} />
                 </div>
 
-                <div style={{ width: '30px', textAlign: 'center' as const, flexShrink: 0 }}>
+                <div style={{ width: '48px', textAlign: 'center' as const, flexShrink: 0 }}>
                   {(() => {
                     const finishedPill = <span style={{ fontSize: '9.5px', fontWeight: 700, color: INK_MUTE, background: INK_TINT_05, padding: '2px 5px', borderRadius: 5 }}>F</span>;
                     if (isLive) {
@@ -273,7 +273,7 @@ export function FullLeaderboard({
                       if (!display) return <span style={{ fontSize: '9.5px', color: INK_FAINT }}>—</span>;
                       if (['MC', 'WD', 'DQ', 'MDF', 'DNS'].includes(display)) return <span style={{ fontSize: '9.5px', color: INK_FAINT, fontWeight: 600 }}>{display}</span>;
                       if (display === 'F') return finishedPill;
-                      return <span style={{ fontSize: '9.5px', color: INK_FAINT, fontVariantNumeric: 'tabular-nums' }}>Thru {display}</span>;
+                      return <span style={{ fontSize: '9.5px', color: INK_FAINT, fontVariantNumeric: 'tabular-nums', whiteSpace: 'nowrap' }}>Thru {display}</span>;
                     }
                     if (isMissedCut) return <span style={{ fontSize: '9.5px', color: INK_FAINT, fontWeight: 600 }}>MC</span>;
                     if (isWD) return <span style={{ fontSize: '9.5px', color: INK_FAINT, fontWeight: 600 }}>WD</span>;
