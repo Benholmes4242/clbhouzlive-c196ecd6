@@ -88,6 +88,7 @@ export function PlayerProfilePage() {
     return (
       <TourHubShell>
         <ShellSlot dark>
+          <TourBackChip />
           <div style={SHELL_SLOT_BG}>
             <Kicker color="amber">Player</Kicker>
             <h1 style={SHELL_H1_STYLE}>Player Profile</h1>
