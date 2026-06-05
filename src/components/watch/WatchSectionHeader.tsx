@@ -1,7 +1,7 @@
 import { SectionHeader as ProShopSectionHeader } from './proshop/SectionHeader';
 
 interface WatchSectionHeaderProps {
-  eyebrow: string;
+  eyebrow?: string;
   title: string;
   /** Optional second-line subhead (Pro Shop standard). */
   sub?: string;
