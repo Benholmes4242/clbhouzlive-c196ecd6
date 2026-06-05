@@ -160,7 +160,8 @@ function AutoplayVideoCardInner({ post, index, allPosts, userId, active, borderR
   };
 
   return (
-    <article style={{ padding: '0 0 18px' }}>
+    <article>
+
       <button
         type="button"
         onClick={handleTap}
