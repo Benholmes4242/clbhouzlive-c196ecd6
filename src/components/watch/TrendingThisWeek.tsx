@@ -97,7 +97,7 @@ export default function TrendingThisWeek({ enabled = true }: TrendingThisWeekPro
   return (
     <div style={{ background: 'hsl(var(--background))' }}>
       <WatchSectionHeader
-        paddingTop={16}
+        paddingTop={0}
         title="Quick clips"
         sub="Under 90 seconds, on the green"
         onSeeAll={() => navigate('/watch/clips')}
