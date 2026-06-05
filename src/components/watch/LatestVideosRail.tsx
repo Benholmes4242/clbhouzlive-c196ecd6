@@ -36,6 +36,7 @@ export default function LatestVideosRail() {
     return (
       <div>
         <WatchSectionHeader
+          paddingTop={16}
           title="Latest videos"
           sub="Tournament recaps, coaching, vlogs"
           onSeeAll={() => navigate('/watch/videos')}
@@ -52,6 +53,7 @@ export default function LatestVideosRail() {
   return (
     <div>
       <WatchSectionHeader
+        paddingTop={16}
         title="Latest videos"
         sub="Tournament recaps, coaching, vlogs"
         onSeeAll={() => navigate('/watch/videos')}

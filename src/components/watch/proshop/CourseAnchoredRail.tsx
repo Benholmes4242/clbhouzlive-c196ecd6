@@ -45,6 +45,7 @@ function CourseAnchoredRailInner() {
   return (
     <section style={{ background: 'hsl(var(--background))' }}>
       <SectionHeader
+        paddingTop={16}
         kicker="From your courses"
         title={topCourse.course_name}
         sub={`${topCourse.content_count} recent ${
