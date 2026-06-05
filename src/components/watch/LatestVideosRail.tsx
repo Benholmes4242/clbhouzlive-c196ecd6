@@ -36,7 +36,6 @@ export default function LatestVideosRail() {
     return (
       <div>
         <WatchSectionHeader
-          eyebrow="Videos"
           title="Latest videos"
           sub="Tournament recaps, coaching, vlogs"
           onSeeAll={() => navigate('/watch/videos')}
@@ -53,7 +52,6 @@ export default function LatestVideosRail() {
   return (
     <div>
       <WatchSectionHeader
-        eyebrow="Videos"
         title="Latest videos"
         sub="Tournament recaps, coaching, vlogs"
         onSeeAll={() => navigate('/watch/videos')}

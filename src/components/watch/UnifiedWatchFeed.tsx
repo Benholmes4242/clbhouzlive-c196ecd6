@@ -69,7 +69,6 @@ export default function UnifiedWatchFeed({ embedded = false }: UnifiedWatchFeedP
           the bottom nav even when PageRoot is bypassed. */}
       <div style={{ paddingTop: 16, paddingBottom: 24 }}>
         <WatchSectionHeader
-          eyebrow="Explore"
           title="Clips to explore"
           sub="From the golfing community"
         />
