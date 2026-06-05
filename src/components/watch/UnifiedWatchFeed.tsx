@@ -67,8 +67,9 @@ export default function UnifiedWatchFeed({ embedded = false }: UnifiedWatchFeedP
       {/* ── Section 3: Watch grid ──
           Phase 5g: explicit 24px paddingBottom guarantees clearance from
           the bottom nav even when PageRoot is bypassed. */}
-      <div style={{ paddingTop: 16, paddingBottom: 24 }}>
+      <div style={{ paddingBottom: 24 }}>
         <WatchSectionHeader
+          paddingTop={16}
           title="Clips to explore"
           sub="From the golfing community"
         />
