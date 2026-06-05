@@ -51,10 +51,10 @@ export default function LatestVideosRail() {
   const carousel = posts.slice(1, 6);
 
   return (
-    // Negative bottom margin neutralises the 18px trailing padding baked
-    // into each AutoplayVideoCard `<article>`, so the gap to the next
-    // section header matches the rest of the Watch tab rhythm.
-    <div style={{ marginBottom: -18 }}>
+    // Cancel most of the 18px trailing padding baked into AutoplayVideoCard's
+    // `<article>` so the gap to the next section header (4 + 16 = 20px) matches
+    // the rhythm used by Quick clips → Clips to explore.
+    <div style={{ marginBottom: -14 }}>
       <WatchSectionHeader
         paddingTop={16}
         title="Latest videos"
