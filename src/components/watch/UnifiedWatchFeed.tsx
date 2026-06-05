@@ -63,8 +63,8 @@ export default function UnifiedWatchFeed({ embedded = false }: UnifiedWatchFeedP
       {/* ── From your courses — single course-anchored rail ── */}
       <CourseAnchoredRail />
 
-      {/* ── Mood pills — dark band directly above the grid they control ── */}
-      <div style={{ background: '#0A0E14', paddingBottom: 8 }}>
+      {/* ── Mood pills — sit on the page background, directly above the grid they control ── */}
+      <div style={{ paddingTop: 4, paddingBottom: 4 }}>
         <WatchMoodChips active={mood} onChange={setMood} />
       </div>
 

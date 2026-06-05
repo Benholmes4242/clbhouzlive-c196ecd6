@@ -7,10 +7,10 @@ interface WatchMoodChipsProps {
 }
 
 /**
- * Pro Shop primitive — the row of mood chips at the top of the Watch tab.
- * Visual language matches Explore's MoodChips exactly (amber active state,
- * slate-bordered inactive, right-edge fade). Background is #F8FAFC to
- * match the Watch tab surface.
+ * Pro Shop primitive — the row of mood chips above the "Clips to explore" grid.
+ * Light-surface styling: transparent background so the page #F8FAFC shows through,
+ * ink-filled active pill, white inactive pills with subtle slate borders,
+ * right-edge fade blending to #F8FAFC.
  */
 function WatchMoodChipsInner({ active, onChange }: WatchMoodChipsProps) {
   return (
