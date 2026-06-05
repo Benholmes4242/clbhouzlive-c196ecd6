@@ -51,8 +51,7 @@ export default function LatestVideosRail() {
   const carousel = posts.slice(1, 6);
 
   return (
-    // Match Quick clips → Clips to explore rhythm: 4px wrapper + 16px header = 20px.
-    <div style={{ marginBottom: 4 }}>
+    <div>
 
       <WatchSectionHeader
         paddingTop={16}
