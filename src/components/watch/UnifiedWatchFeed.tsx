@@ -63,10 +63,6 @@ export default function UnifiedWatchFeed({ embedded = false }: UnifiedWatchFeedP
       {/* ── From your courses — single course-anchored rail ── */}
       <CourseAnchoredRail />
 
-      {/* ── Mood pills — sit on the page background, directly above the grid they control ── */}
-      <div style={{ paddingTop: 4, paddingBottom: 4 }}>
-        <WatchMoodChips active={mood} onChange={setMood} />
-      </div>
 
       {/* ── Section 3: Watch grid ──
           Phase 5g: explicit 24px paddingBottom guarantees clearance from
@@ -77,6 +73,10 @@ export default function UnifiedWatchFeed({ embedded = false }: UnifiedWatchFeedP
           title="Clips to explore"
           sub="From the golfing community"
         />
+        {/* ── Mood pills — directly above the grid they control, below the section subhead ── */}
+        <div style={{ paddingTop: 4, paddingBottom: 8 }}>
+          <WatchMoodChips active={mood} onChange={setMood} />
+        </div>
         <WatchAutoplay
           posts={posts}
           gridRef={gridRef as React.RefObject<HTMLDivElement>}
