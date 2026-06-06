@@ -113,8 +113,7 @@ export const RivalFightCard: React.FC<Props> = ({
                 backgroundPosition: 'center',
               }
             : {
-                background:
-                  'radial-gradient(ellipse at 30% 20%, rgba(247,147,30,0.18) 0%, #0F1419 60%, #06080C 100%)',
+                background: 'var(--hcp-bg-2)',
               }),
         }}
       >
