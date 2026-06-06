@@ -13,16 +13,6 @@ interface Props {
 
 const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
 
-// Dark tokens (England-Golf legibility)
-const BG = '#0A0E14';
-const CARD = '#121821';
-const HAIR = 'rgba(255,255,255,0.07)';
-const INK = '#F8FAFC';
-const SOFT = '#94A3B8';
-const FAINT = '#64748B';
-const UP = '#F87171';   // worse (handicap up)
-const DOWN = '#34D399'; // better (handicap down)
-
 type Tier = 'div0' | 'div1' | 'div2' | 'div3';
 
 const TIER_LABEL: Record<Tier, string> = {
@@ -97,21 +87,26 @@ const HeroHandicapCardDark: React.FC<Props> = ({ connection }) => {
   const isLoading = trendLoading || history90Loading;
 
   const trendColor =
-    delta90 == null ? SOFT : delta90 > 0 ? UP : delta90 < 0 ? DOWN : SOFT;
+    delta90 == null
+      ? 'var(--hcp-t-60)'
+      : delta90 > 0
+        ? 'var(--hcp-bad-2)'
+        : delta90 < 0
+          ? 'var(--hcp-good-2)'
+          : 'var(--hcp-t-60)';
   const trendArrow = delta90 == null ? '' : delta90 > 0 ? '↑' : delta90 < 0 ? '↓' : '';
 
   return (
     <section
       style={{
-        background: BG,
         padding: '16px 16px 22px',
         fontFamily: FONT,
       }}
     >
       <div
         style={{
-          background: CARD,
-          border: `1px solid ${HAIR}`,
+          background: 'var(--hcp-bg-1)',
+          border: '1px solid var(--hcp-line)',
           borderRadius: 16,
           padding: 18,
         }}
@@ -123,7 +118,7 @@ const HeroHandicapCardDark: React.FC<Props> = ({ connection }) => {
             fontWeight: 800,
             letterSpacing: '0.14em',
             textTransform: 'uppercase',
-            color: FAINT,
+            color: 'var(--hcp-t-40)',
             marginBottom: 6,
           }}
         >
@@ -147,7 +142,7 @@ const HeroHandicapCardDark: React.FC<Props> = ({ connection }) => {
                 style={{
                   fontSize: 54,
                   fontWeight: 800,
-                  color: INK,
+                  color: 'var(--hcp-t-100)',
                   lineHeight: 0.9,
                   letterSpacing: '-0.03em',
                   fontVariantNumeric: 'tabular-nums',
@@ -157,7 +152,7 @@ const HeroHandicapCardDark: React.FC<Props> = ({ connection }) => {
               </span>
             )}
             {tier && (
-              <span style={{ fontSize: 13, fontWeight: 700, color: SOFT, letterSpacing: '0.06em' }}>
+              <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--hcp-t-60)', letterSpacing: '0.06em' }}>
                 {TIER_LABEL[tier]}
               </span>
             )}
@@ -175,7 +170,7 @@ const HeroHandicapCardDark: React.FC<Props> = ({ connection }) => {
               >
                 {trendArrow} {Math.abs(delta90).toFixed(1)}
               </div>
-              <div style={{ fontSize: 11, color: FAINT, fontWeight: 600 }}>over 90 days</div>
+              <div style={{ fontSize: 11, color: 'var(--hcp-t-40)', fontWeight: 600 }}>over 90 days</div>
             </div>
           )}
         </div>
@@ -184,7 +179,7 @@ const HeroHandicapCardDark: React.FC<Props> = ({ connection }) => {
         <div
           style={{
             display: 'flex',
-            borderTop: `1px solid ${HAIR}`,
+            borderTop: '1px solid var(--hcp-line-2)',
             marginTop: 16,
             paddingTop: 14,
           }}
@@ -193,7 +188,7 @@ const HeroHandicapCardDark: React.FC<Props> = ({ connection }) => {
             <div
               style={{
                 fontSize: 11,
-                color: FAINT,
+                color: 'var(--hcp-t-40)',
                 fontWeight: 700,
                 letterSpacing: '0.06em',
                 marginBottom: 3,
@@ -206,21 +201,21 @@ const HeroHandicapCardDark: React.FC<Props> = ({ connection }) => {
               style={{
                 fontSize: 20,
                 fontWeight: 800,
-                color: INK,
+                color: 'var(--hcp-t-100)',
                 fontVariantNumeric: 'tabular-nums',
               }}
             >
               {scoringAvg != null ? scoringAvg.toFixed(1) : '—'}{' '}
-              <span style={{ fontSize: 11, color: FAINT, fontWeight: 600 }}>
+              <span style={{ fontSize: 11, color: 'var(--hcp-t-40)', fontWeight: 600 }}>
                 · {roundCount} {roundCount === 1 ? 'round' : 'rounds'}
               </span>
             </div>
           </div>
-          <div style={{ flex: 1, borderLeft: `1px solid ${HAIR}`, paddingLeft: 14 }}>
+          <div style={{ flex: 1, borderLeft: '1px solid var(--hcp-line-2)', paddingLeft: 14 }}>
             <div
               style={{
                 fontSize: 11,
-                color: FAINT,
+                color: 'var(--hcp-t-40)',
                 fontWeight: 700,
                 letterSpacing: '0.06em',
                 marginBottom: 3,
@@ -233,7 +228,7 @@ const HeroHandicapCardDark: React.FC<Props> = ({ connection }) => {
               style={{
                 fontSize: 20,
                 fontWeight: 800,
-                color: bestDiff != null && bestDiff < 0 ? DOWN : INK,
+                color: bestDiff != null && bestDiff < 0 ? 'var(--hcp-good-2)' : 'var(--hcp-t-100)',
                 fontVariantNumeric: 'tabular-nums',
               }}
             >
