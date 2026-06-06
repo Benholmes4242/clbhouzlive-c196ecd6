@@ -87,12 +87,11 @@ export const HeroCard: React.FC<Props> = ({ friend, onClick, showLowestRound }) 
         />
       ) : (
         <>
-          <div style={{ position: 'absolute', inset: 0, background: FALLBACK_GRADIENT }} />
+          <div style={{ position: 'absolute', inset: 0, background: FALLBACK_BG }} />
           <FlagSilhouetteOverlay opacity={0.12} />
         </>
       )}
 
-      <div style={{ position: 'absolute', inset: 0, background: ATMOSPHERIC, pointerEvents: 'none' }} />
       <div style={{ position: 'absolute', inset: 0, background: LEGIBILITY_SCRIM, pointerEvents: 'none' }} />
 
       <CinemaFriendEyebrow activity={eyebrowActivity} showLowestRound={showLowestRound} />
