@@ -290,9 +290,9 @@ const PatternBar: React.FC<{
 
   const fill =
     bucket === 'better'
-      ? 'linear-gradient(180deg, var(--hcp-good) 0%, rgba(34, 197, 94, 0.5) 100%)'
+      ? 'var(--hcp-good-2)'
       : bucket === 'worse'
-        ? 'linear-gradient(180deg, var(--hcp-bad) 0%, rgba(239, 68, 68, 0.5) 100%)'
+        ? 'var(--hcp-bad-2)'
         : 'var(--hcp-bg-3)';
 
   const inner = (
