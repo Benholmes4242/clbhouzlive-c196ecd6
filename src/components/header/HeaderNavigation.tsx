@@ -199,8 +199,8 @@ const HeaderNavigation: React.FC<HeaderNavigationProps> = ({ onInteraction, useL
 
   return (
     <div ref={navigationRef} className="flex items-center space-x-1 md:space-x-4">
-      {/* Handicap Pill — persistent across app, left of avatar */}
-      <HandicapPill onTap={() => navigate('/handicap')} />
+
+
 
       {/* Identity Selector - only shown when user has multiple identities */}
       <div className="hidden sm:block">
