@@ -104,7 +104,7 @@ export const FriendRoundCardV2: React.FC<Props> = ({
           width: 92,
           position: 'relative',
           overflow: 'hidden',
-          background: FALLBACK_GRADIENT,
+          background: FALLBACK_BG,
         }}
       >
         {activity.course_thumbnail_image ? (
