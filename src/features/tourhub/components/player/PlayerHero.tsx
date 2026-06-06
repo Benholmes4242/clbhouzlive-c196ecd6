@@ -141,7 +141,7 @@ export function PlayerHero({ player, playerStats }: PlayerHeroProps) {
           {liveText && (
             <div style={{ display: 'flex', alignItems: 'baseline', gap: 6, flexShrink: 0 }}>
               <span style={{ fontSize: 9, fontWeight: 800, color: INK_MUTE, letterSpacing: '0.16em', textTransform: 'uppercase' }}>LIVE</span>
-              <span style={{ fontSize: 15, fontWeight: 800, color: INK, letterSpacing: '-0.02em', fontVariantNumeric: 'tabular-nums', whiteSpace: 'nowrap' }}>
+              <span style={{ fontSize: 9, fontWeight: 800, color: INK, letterSpacing: '0.16em', fontVariantNumeric: 'tabular-nums', whiteSpace: 'nowrap' }}>
                 {liveText}
               </span>
             </div>
