@@ -13,7 +13,7 @@
 
 import React from 'react';
 import { format } from 'date-fns';
-import { ChevronRight, Crown, Star, Trophy } from 'lucide-react';
+import { ChevronRight, Crown, Trophy } from 'lucide-react';
 import {
   CINEMATIC_FRAME_HEIGHT,
   CINEMATIC_SCRIM,
@@ -901,30 +901,8 @@ export function CinematicFrame({
                   minWidth: 0,
                 }}
               >
-                {metaLine}
+              {metaLine}
               </span>
-              {isMajor && (
-                <Star
-                  size={12}
-                  fill={GOLD}
-                  color={GOLD}
-                  strokeWidth={0}
-                  style={{ flexShrink: 0 }}
-                />
-              )}
-              {isSignature && (
-                <span
-                  style={{
-                    color: AMBER,
-                    fontSize: 9,
-                    fontWeight: 700,
-                    letterSpacing: '0.18em',
-                    textTransform: 'uppercase',
-                  }}
-                >
-                  Signature
-                </span>
-              )}
             </div>
           )}
           <h1
