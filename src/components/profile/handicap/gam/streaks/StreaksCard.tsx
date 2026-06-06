@@ -49,10 +49,10 @@ interface StreakStateToken {
 
 const STREAK_STATE_TOKENS: Record<StreakState, StreakStateToken> = {
   atpb: {
-    cardSweep: `linear-gradient(135deg, var(--hcp-bg-1) 0%, #1A1300 50%, rgba(247,147,30,0.22) 100%)`,
-    cardBorder: 'rgba(247,147,30,0.55)',
-    topStripe: `linear-gradient(90deg, transparent, ${GOLD} 50%, transparent)`,
-    outerGlow: '0 0 32px -10px rgba(247,147,30,0.40)',
+    cardSweep: 'var(--hcp-bg-1)',
+    cardBorder: 'var(--hcp-line)',
+    topStripe: null,
+    outerGlow: null,
     iconBg: 'rgba(247,147,30,0.22)',
     iconRing: 'rgba(247,147,30,0.65)',
     iconOpacity: 1,
@@ -62,8 +62,8 @@ const STREAK_STATE_TOKENS: Record<StreakState, StreakStateToken> = {
     chipColor: GOLD,
     chipPulse: true,
     chipLabel: 'AT YOUR PB',
-    heroNumColor: GOLD,
-    heroNumShadow: '0 0 12px rgba(247,147,30,0.45)',
+    heroNumColor: 'var(--hcp-t-100)',
+    heroNumShadow: null,
     progressFill: `linear-gradient(90deg, ${AMBER} 0%, ${GOLD} 100%)`,
     hintColor: GOLD,
     hintFontWeight: 700,
@@ -265,21 +265,8 @@ const StreakHeroCard: React.FC<StreakHeroCardProps> = ({ entry, row }) => {
         />
       )}
 
-      {/* Watermark */}
-      <div
-        aria-hidden
-        style={{
-          position: 'absolute',
-          right: -10,
-          bottom: 8,
-          opacity: 0.06,
-          transform: 'rotate(-12deg)',
-          pointerEvents: 'none',
-          color: 'var(--hcp-t-100)',
-        }}
-      >
-        <entry.Icon size={180} strokeWidth={1.4} />
-      </div>
+      {/* Calm: decorative watermark removed for legibility */}
+
 
       {/* Chip */}
       <div
