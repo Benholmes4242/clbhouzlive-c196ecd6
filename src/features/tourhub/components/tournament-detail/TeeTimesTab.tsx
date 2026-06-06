@@ -321,7 +321,7 @@ export function TeeTimesTab({ tournamentId, tournamentName, isCompleted }: TeeTi
       <div style={{ background: SURFACE, borderTop: `0.5px solid ${INK_TINT_07}`, borderBottom: `1px solid ${INK_TINT_07}` }}>
         {filteredGroups.length === 0 && searchQuery && (
           <div style={{ textAlign: 'center' as const, padding: '24px 20px' }}>
-            <p style={{ fontSize: '14px', color: INK_FAINT }}>No players matching "{searchQuery}"</p>
+            <p style={{ fontSize: '14px', color: INK }}>No players matching "{searchQuery}"</p>
           </div>
         )}
 
