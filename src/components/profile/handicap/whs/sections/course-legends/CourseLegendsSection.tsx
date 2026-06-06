@@ -89,26 +89,13 @@ const SectionHero: React.FC<{
     style={{
       margin: '0 16px 20px',
       borderRadius: 16,
-      background: `linear-gradient(150deg, ${GOLD_TINT} 0%, var(--hcp-bg-1) 60%)`,
-      border: '1px solid rgba(255,255,255,0.07)',
+      background: 'var(--hcp-bg-1)',
+      border: '1px solid var(--hcp-line)',
       position: 'relative',
       overflow: 'hidden',
       fontFamily: FONT,
     }}
   >
-    <div
-      aria-hidden
-      style={{
-        position: 'absolute',
-        right: -28,
-        top: -22,
-        color: 'rgba(251,188,46,0.08)',
-        transform: 'rotate(-10deg)',
-        pointerEvents: 'none',
-      }}
-    >
-      <Crown size={150} strokeWidth={1.4} />
-    </div>
 
     {/* Top half: title + count + toggle */}
     <div style={{ position: 'relative', zIndex: 1, padding: '18px 18px 16px' }}>
