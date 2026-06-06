@@ -137,36 +137,6 @@ export function CollegeProfilePage() {
 
   return (
     <TourHubShell>
-      <ShellSlot dark>
-        <button
-          type="button"
-          onClick={() => navigate(collegeHubRoute())}
-          aria-label="College Profile — open College Franchise"
-          style={{
-            background: SHELL_BG,
-            border: 'none',
-            padding: '14px 16px 12px',
-            cursor: 'pointer',
-            display: 'block',
-            width: '100%',
-            textAlign: 'left' as const,
-          }}
-        >
-          <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, marginBottom: 4 }}>
-            <Kicker color="light">College Franchise</Kicker>
-            <ChevronRight size={11} strokeWidth={2.5} style={{ color: AMBER, marginTop: -4 }} />
-          </div>
-          <h1 style={{ fontSize: 22, fontWeight: 800, letterSpacing: '-0.025em', lineHeight: 1.15, color: SURFACE, margin: 0 }}>
-            {displayName}
-          </h1>
-          {sectionMetaSubtitle && (
-            <div style={{ fontSize: 13, fontWeight: 500, color: WHITE_ALPHA_55, marginTop: 4 }}>
-              {sectionMetaSubtitle}
-            </div>
-          )}
-        </button>
-      </ShellSlot>
-
       <div style={{ paddingTop: 'var(--chrome-total-h, 0px)', background: SLATE_50 }}>
 
       {/* ── HERO MASTHEAD ── canonical light pattern */}
