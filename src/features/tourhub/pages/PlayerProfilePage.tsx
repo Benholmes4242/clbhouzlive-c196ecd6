@@ -11,14 +11,13 @@ import { TourHubShell } from '../components/TourHubShell';
 import { ShellSlot } from '@/components/header/ShellSlot';
 import { Kicker } from '@/components/watch/proshop/Kicker';
 import {
-  PlayerHero,
   PlayerSeasonStats,
   PlayerTournamentHistory,
   PlayerInfoCard,
   FormSection,
 } from '../components/player';
 import { useTourPlayer, useSinglePlayerStatistics } from '../hooks/useTourHubData';
-import { GOLD_TINT_10, INK_TINT_06, SHELL_BG, SLATE_50, SURFACE } from '../_shared/tokens';
+import { INK_TINT_06, SHELL_BG, SURFACE } from '../_shared/tokens';
 
 const sectionVariants = {
   hidden: { opacity: 0, y: 24 },
