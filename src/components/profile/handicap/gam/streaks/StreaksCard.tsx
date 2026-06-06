@@ -265,21 +265,8 @@ const StreakHeroCard: React.FC<StreakHeroCardProps> = ({ entry, row }) => {
         />
       )}
 
-      {/* Watermark */}
-      <div
-        aria-hidden
-        style={{
-          position: 'absolute',
-          right: -10,
-          bottom: 8,
-          opacity: 0.06,
-          transform: 'rotate(-12deg)',
-          pointerEvents: 'none',
-          color: 'var(--hcp-t-100)',
-        }}
-      >
-        <entry.Icon size={180} strokeWidth={1.4} />
-      </div>
+      {/* Calm: decorative watermark removed for legibility */}
+
 
       {/* Chip */}
       <div
