@@ -112,10 +112,10 @@ function TeeTimeGroupCard({ group, searchQuery, tournamentName, scoreByPlayer, s
         <span style={{ fontSize: '14px', fontWeight: 800, color: INK, width: '72px', flexShrink: 0, fontVariantNumeric: 'tabular-nums' }}>
           {format(new Date(group.teeTime), 'h:mm a')}
         </span>
-        <span style={{ fontSize: '12px', fontWeight: 700, color: INK_FAINT, flexShrink: 0 }}>
+        <span style={{ fontSize: '12px', fontWeight: 700, color: INK, flexShrink: 0 }}>
           Hole {group.startingHole}
         </span>
-        {group.backNine && <span style={{ fontSize: '10px', color: INK_FAINT, marginLeft: '6px' }}>Back 9</span>}
+        {group.backNine && <span style={{ fontSize: '10px', color: INK, marginLeft: '6px' }}>Back 9</span>}
         {isFeatured && !hasMatchingPlayer && (
           <span style={{ marginLeft: '8px', fontSize: '9px', fontWeight: 800, color: AMBER, letterSpacing: '0.14em', textTransform: 'uppercase' as const }}>Featured</span>
         )}
