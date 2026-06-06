@@ -385,16 +385,6 @@ export function ScheduleTab() {
               <ChevronRight size={11} color={AMBER} strokeWidth={2.5} style={{ marginTop: 1 }} />
             </button>
 
-            <h1 style={{
-              fontSize: 24,
-              fontWeight: 800,
-              color: INK,
-              letterSpacing: '-0.025em',
-              lineHeight: 1.15,
-              margin: 0,
-            }}>
-              Tour schedule
-            </h1>
 
             <div style={{
               display: 'flex',
