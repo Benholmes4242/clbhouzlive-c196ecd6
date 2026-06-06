@@ -176,8 +176,8 @@ export function FullLeaderboard({
 
       {/* Column headers */}
       <div style={{ display: 'flex', alignItems: 'center', gap: '3px', padding: '5px 16px', background: INK_TINT_02, borderTop: `0.5px solid ${INK_TINT_07}`, borderBottom: `0.5px solid ${INK_TINT_07}` }}>
-        <span style={{ width: '24px', fontSize: '9px', fontWeight: 800, color: INK_MUTE, letterSpacing: '0.14em', flexShrink: 0 }}>POS</span>
-        <span style={{ flex: 1, fontSize: '9px', fontWeight: 800, color: INK_MUTE, letterSpacing: '0.14em' }}>PLAYER</span>
+        <span style={{ width: '24px', fontSize: '9px', fontWeight: 800, color: INK, letterSpacing: '0.14em', flexShrink: 0 }}>POS</span>
+        <span style={{ flex: 1, fontSize: '9px', fontWeight: 800, color: INK, letterSpacing: '0.14em' }}>PLAYER</span>
         {[1, 2, 3, 4].map((r) => {
           const active = sortRound === r;
           return (
@@ -188,7 +188,7 @@ export function FullLeaderboard({
               aria-label={`Sort by round ${r}`}
               style={{
                 width: '19px', textAlign: 'center', fontSize: '9px', fontWeight: 800,
-                color: active ? AMBER : INK_MUTE, letterSpacing: '0.14em', flexShrink: 0,
+                color: active ? AMBER : INK, letterSpacing: '0.14em', flexShrink: 0,
                 background: 'none', border: 'none', padding: 0, cursor: 'pointer',
                 fontVariantNumeric: 'tabular-nums',
               }}
@@ -203,13 +203,13 @@ export function FullLeaderboard({
           aria-label="Sort by total"
           style={{
             width: '34px', textAlign: 'center', fontSize: '9px', fontWeight: 800,
-            color: sortRound == null ? AMBER : INK_MUTE, letterSpacing: '0.14em', flexShrink: 0,
+            color: sortRound == null ? AMBER : INK, letterSpacing: '0.14em', flexShrink: 0,
             background: 'none', border: 'none', padding: 0, cursor: 'pointer',
           }}
         >
           TOT{sortRound == null ? '▾' : ''}
         </button>
-        <span style={{ width: '48px', textAlign: 'center' as const, fontSize: '9px', fontWeight: 800, color: INK_MUTE, letterSpacing: '0.14em', flexShrink: 0 }}>THRU</span>
+        <span style={{ width: '48px', textAlign: 'center' as const, fontSize: '9px', fontWeight: 800, color: INK, letterSpacing: '0.14em', flexShrink: 0 }}>THRU</span>
       </div>
 
       {/* Player rows */}
