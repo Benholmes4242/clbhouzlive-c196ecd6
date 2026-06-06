@@ -202,18 +202,6 @@ export function LeadersMasthead({
             )}
           </button>
 
-          <h1
-            style={{
-              fontSize: 24,
-              fontWeight: 800,
-              color: INK,
-              letterSpacing: '-0.025em',
-              lineHeight: 1.15,
-              margin: 0,
-            }}
-          >
-            {category.label}
-          </h1>
 
           <div
             style={{

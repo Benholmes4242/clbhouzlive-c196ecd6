@@ -200,16 +200,6 @@ export function CollegeMasthead({
             </span>
             <ChevronRight size={11} strokeWidth={2.5} style={{ color: AMBER, marginTop: 1 }} />
           </button>
-          <h1 style={{
-            fontSize: 24,
-            fontWeight: 800,
-            color: INK,
-            letterSpacing: '-0.025em',
-            lineHeight: 1.15,
-            margin: 0,
-          }}>
-            College Franchise
-          </h1>
           <div style={{
             fontSize: 13,
             fontWeight: 700,
