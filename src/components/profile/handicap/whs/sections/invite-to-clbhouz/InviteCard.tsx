@@ -18,7 +18,7 @@ interface Props {
 const INK = 'var(--hcp-t-100)';
 const INK_MUTE = 'var(--hcp-t-60)';
 const HAIRLINE = 'var(--hcp-line-2)';
-const AMBER = '#F7931E';
+
 const FONT_GEIST = '"Geist", system-ui, -apple-system, BlinkMacSystemFont, sans-serif';
 
 const MONO_COLORS = [
