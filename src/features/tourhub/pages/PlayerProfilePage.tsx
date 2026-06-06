@@ -116,10 +116,7 @@ export function PlayerProfilePage() {
         </div>
       </ShellSlot>
 
-      <div style={{ paddingTop: 'var(--chrome-total-h, 0px)', background: SLATE_50 }}>
-        {/* Hero */}
-        <PlayerHero player={player} playerStats={playerStats ?? null} />
-
+      <div style={{ paddingTop: 'var(--chrome-total-h, 0px)' }}>
         {/* Form section */}
         {playerId && <FormSection playerId={playerId} />}
 
