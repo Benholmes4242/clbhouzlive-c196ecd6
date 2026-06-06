@@ -149,6 +149,27 @@ export function CollegeProfilePage() {
         paddingBottom: 16,
       }}>
 
+        {/* Compact identity header — replaces the removed slate masthead */}
+        <button
+          type="button"
+          onClick={() => navigate(collegeHubRoute())}
+          aria-label="Open College Franchise"
+          style={{ background: 'transparent', border: 'none', padding: 0, margin: '0 0 12px', cursor: 'pointer', display: 'block', textAlign: 'left', width: '100%' }}
+        >
+          <div style={{ display: 'inline-flex', alignItems: 'center', gap: 5, marginBottom: 3 }}>
+            <span style={{ fontSize: 9, fontWeight: 800, letterSpacing: '0.16em', textTransform: 'uppercase', color: INK_MUTE }}>College Franchise</span>
+            <ChevronRight size={10} strokeWidth={2.5} style={{ color: AMBER }} />
+          </div>
+          <h1 style={{ fontSize: 20, fontWeight: 800, letterSpacing: '-0.02em', lineHeight: 1.1, color: INK, margin: 0 }}>
+            {displayName}
+          </h1>
+          {sectionMetaSubtitle && (
+            <div style={{ fontSize: 12, fontWeight: 500, color: INK_MUTE, marginTop: 3 }}>
+              {sectionMetaSubtitle}
+            </div>
+          )}
+        </button>
+
         {/* Champion content (no card chrome — Q1 = b) */}
         {stats && !isLoading && (
           <div>
