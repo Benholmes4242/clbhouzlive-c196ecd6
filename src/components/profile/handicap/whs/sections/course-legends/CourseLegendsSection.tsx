@@ -20,8 +20,6 @@ import type { CourseSelection } from './types';
 
 const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
 const GOLD = '#FBBC2E';
-const AMBER = '#F7931E';
-const GOLD_TINT = 'rgba(251,188,46,0.12)';
 
 interface Props {
   userId: string;
