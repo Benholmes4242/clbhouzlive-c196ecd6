@@ -182,9 +182,9 @@ export const InviteCard: React.FC<Props> = ({ friend }) => {
           width: '100%',
           padding: '8px 12px',
           borderRadius: 10,
-          border: '1px solid rgba(247,147,30,0.35)',
-          background: 'rgba(247,147,30,0.10)',
-          color: AMBER,
+          border: `1px solid ${HAIRLINE}`,
+          background: 'transparent',
+          color: INK,
           fontFamily: FONT_GEIST,
           fontSize: 11,
           fontWeight: 800,
@@ -197,7 +197,7 @@ export const InviteCard: React.FC<Props> = ({ friend }) => {
           gap: 5,
         }}
       >
-        <Send size={11} strokeWidth={2.2} />
+        <Send size={11} strokeWidth={2.2} color={INK_MUTE} />
         Invite
       </button>
     </div>
