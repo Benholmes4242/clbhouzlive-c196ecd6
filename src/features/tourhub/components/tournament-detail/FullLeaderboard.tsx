@@ -267,18 +267,18 @@ export function FullLeaderboard({
 
                 <div style={{ width: '48px', textAlign: 'center' as const, flexShrink: 0 }}>
                   {(() => {
-                    const finishedPill = <span style={{ fontSize: '9.5px', fontWeight: 700, color: INK_MUTE, background: INK_TINT_05, padding: '2px 5px', borderRadius: 5 }}>F</span>;
+                    const finishedPill = <span style={{ fontSize: '9.5px', fontWeight: 700, color: INK, background: INK_TINT_05, padding: '2px 5px', borderRadius: 5 }}>F</span>;
                     if (isLive) {
                       const display = formatThruDisplay(entry.thru, entry.round_1, entry.round_2, entry.round_3, entry.round_4, entry.status, entry.thru_updated_at, tournamentTimezone);
-                      if (!display) return <span style={{ fontSize: '9.5px', color: INK_FAINT }}>—</span>;
-                      if (['MC', 'WD', 'DQ', 'MDF', 'DNS'].includes(display)) return <span style={{ fontSize: '9.5px', color: INK_FAINT, fontWeight: 600 }}>{display}</span>;
+                      if (!display) return <span style={{ fontSize: '9.5px', color: INK }}>—</span>;
+                      if (['MC', 'WD', 'DQ', 'MDF', 'DNS'].includes(display)) return <span style={{ fontSize: '9.5px', color: INK, fontWeight: 600 }}>{display}</span>;
                       if (display === 'F') return finishedPill;
-                      return <span style={{ fontSize: '9.5px', color: INK_FAINT, fontVariantNumeric: 'tabular-nums', whiteSpace: 'nowrap' }}>Thru {display}</span>;
+                      return <span style={{ fontSize: '9.5px', color: INK, fontVariantNumeric: 'tabular-nums', whiteSpace: 'nowrap' }}>Thru {display}</span>;
                     }
-                    if (isMissedCut) return <span style={{ fontSize: '9.5px', color: INK_FAINT, fontWeight: 600 }}>MC</span>;
-                    if (isWD) return <span style={{ fontSize: '9.5px', color: INK_FAINT, fontWeight: 600 }}>WD</span>;
+                    if (isMissedCut) return <span style={{ fontSize: '9.5px', color: INK, fontWeight: 600 }}>MC</span>;
+                    if (isWD) return <span style={{ fontSize: '9.5px', color: INK, fontWeight: 600 }}>WD</span>;
                     if (entry.strokes) return finishedPill;
-                    return <span style={{ fontSize: '9.5px', color: INK_FAINT }}>—</span>;
+                    return <span style={{ fontSize: '9.5px', color: INK }}>—</span>;
                   })()}
                 </div>
               </Link>
