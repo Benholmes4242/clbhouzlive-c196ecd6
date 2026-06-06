@@ -123,7 +123,6 @@ export const LeaderboardRow: React.FC<Props> = ({ entry, rank, isStaleRow, onCli
   const isYou = entry.is_self;
   const displayName = isYou ? 'You' : reformatFriendName(entry.friend_name);
   const hcp = entry.friend_handicap_index;
-  const isPlusHandicap = hcp != null && hcp < 0;
   const showFlame =
     !isStaleRow &&
     entry.handicap_30d_delta != null &&
