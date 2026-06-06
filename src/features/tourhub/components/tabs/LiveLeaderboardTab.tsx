@@ -185,7 +185,7 @@ export function LiveLeaderboardTab() {
                 display: 'inline-flex', alignItems: 'center', gap: 7,
                 fontFamily: 'Geist, system-ui, sans-serif',
                 fontSize: 10.5, fontWeight: 800, letterSpacing: '0.14em',
-                textTransform: 'uppercase', color: INK_MUTE,
+                textTransform: 'uppercase', color: INK,
               }}>
                 {isLive && (
                   <span aria-hidden style={{ width: 6, height: 6, borderRadius: '50%', background: STATUS_LIVE, flexShrink: 0 }} />
