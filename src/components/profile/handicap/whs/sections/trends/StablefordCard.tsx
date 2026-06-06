@@ -736,29 +736,29 @@ const ShotsBody: React.FC<ShotsBodyProps> = ({ trophyAgg, shotsLoading, scope })
     {
       key: 'birdiePlus',
       count: birdiesOrBetter,
-      background: 'linear-gradient(135deg, #B86A0E 0%, #F7931E 100%)',
+      background: 'var(--hcp-good-deep)',
       textColor: '#FFFFFF',
     },
     {
       key: 'par',
       count: pars,
-      background: 'rgba(255,255,255,0.10)',
-      border: '1px solid rgba(255,255,255,0.06)',
+      background: 'var(--hcp-bg-3)',
       textColor: 'rgba(255,255,255,0.65)',
     },
     {
       key: 'bogey',
       count: bogey,
-      background: 'linear-gradient(135deg, #B91C1C 0%, #EF4444 100%)',
-      textColor: '#FFFFFF',
+      background: 'var(--hcp-bg-3)',
+      textColor: 'rgba(255,255,255,0.65)',
     },
     {
       key: 'double',
       count: doublePlus,
-      background: 'linear-gradient(135deg, #5C1212 0%, #991B1B 100%)',
-      textColor: '#FECACA',
+      background: 'var(--hcp-bad-deep)',
+      textColor: '#FFFFFF',
     },
   ];
+
   const segments = allSegments.filter((s) => s.count > 0);
   const segTotal = segments.reduce((acc, s) => acc + s.count, 0) || 1;
 
