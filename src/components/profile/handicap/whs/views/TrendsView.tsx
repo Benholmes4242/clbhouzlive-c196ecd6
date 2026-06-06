@@ -76,8 +76,6 @@ export const TrendsView: React.FC<Props> = ({
         ownerFirstName={ownerFirstName}
       />
 
-      {/* 7. Echo Insights — owner only */}
-      {!readOnly && <EchoInsightsCard connectionId={connectionId} />}
     </div>
   );
 };
