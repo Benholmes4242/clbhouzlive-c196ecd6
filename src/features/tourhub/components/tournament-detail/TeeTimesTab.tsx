@@ -307,11 +307,11 @@ export function TeeTimesTab({ tournamentId, tournamentName, isCompleted }: TeeTi
 
       {/* Caption: window of tee times */}
       <div style={{ padding: '8px 20px', display: 'flex', alignItems: 'baseline', justifyContent: 'space-between' }}>
-        <span style={{ fontSize: '9px', fontWeight: 800, color: INK_MUTE, letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>
+        <span style={{ fontSize: '9px', fontWeight: 800, color: INK, letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>
           Tee Times · {selectedRound}
         </span>
         {firstOff && lastOff && (
-          <span style={{ fontSize: '11px', fontWeight: 600, color: INK_FAINT, fontVariantNumeric: 'tabular-nums' }}>
+          <span style={{ fontSize: '11px', fontWeight: 600, color: INK, fontVariantNumeric: 'tabular-nums' }}>
             {firstOff} – {lastOff}
           </span>
         )}
