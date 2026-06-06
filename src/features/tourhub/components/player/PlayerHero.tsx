@@ -197,59 +197,27 @@ export function PlayerHero({ player, playerStats }: PlayerHeroProps) {
             )}
           </div>
 
-          {/* Info: name + flag left, big stat right */}
-          <div style={{ flex: 1, minWidth: 0, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10 }}>
-            <div style={{ minWidth: 0, flex: 1 }}>
-              <div
-                style={{
-                  fontSize: 25,
-                  fontWeight: 800,
-                  color: INK,
-                  letterSpacing: '-0.03em',
-                  lineHeight: 1.05,
-                  whiteSpace: 'nowrap',
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis',
-                }}
-              >
-                {player.full_name}
-              </div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 5, marginTop: 6 }}>
-                <CountryFlag country={player.country_code || player.country} size="sm" />
-                {countryDisplay && (
-                  <span style={{ fontSize: 12, fontWeight: 600, color: INK_MUTE }}>{countryDisplay}</span>
-                )}
-              </div>
+          {/* Info: name + flag — full width now */}
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <div
+              style={{
+                fontSize: 25,
+                fontWeight: 800,
+                color: INK,
+                letterSpacing: '-0.03em',
+                lineHeight: 1.05,
+                whiteSpace: 'nowrap',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+              }}
+            >
+              {player.full_name}
             </div>
-
-            <div style={{ flexShrink: 0, textAlign: 'right' as const }}>
-              <div
-                style={{
-                  fontSize: 30,
-                  fontWeight: 800,
-                  color: INK,
-                  letterSpacing: '-0.03em',
-                  lineHeight: 1,
-                  fontVariantNumeric: 'tabular-nums',
-                  whiteSpace: 'nowrap',
-                }}
-              >
-                {heroStatInteger}
-                {heroStatDecimal && <span style={{ color: AMBER }}>{heroStatDecimal}</span>}
-                {heroStatSuffix}
-              </div>
-              <div
-                style={{
-                  marginTop: 4,
-                  fontSize: 9,
-                  fontWeight: 800,
-                  color: INK_MUTE,
-                  letterSpacing: '0.16em',
-                  textTransform: 'uppercase',
-                }}
-              >
-                {heroStatLabel}
-              </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 5, marginTop: 6 }}>
+              <CountryFlag country={player.country_code || player.country} size="sm" />
+              {countryDisplay && (
+                <span style={{ fontSize: 12, fontWeight: 600, color: INK_MUTE }}>{countryDisplay}</span>
+              )}
             </div>
           </div>
         </div>
