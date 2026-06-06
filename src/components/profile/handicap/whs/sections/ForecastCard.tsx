@@ -1,5 +1,4 @@
 import React from 'react';
-import { AlertTriangle, Flame } from 'lucide-react';
 import { useAllScores } from '@/lib/whs/hooks';
 import { useHandicapTrend } from '@/lib/whs/hooks';
 import { buildForecast, type Forecast, type CounterCell } from '@/lib/whs/forecast';
@@ -16,20 +15,18 @@ const T = {
   textMid: 'var(--hcp-t-60)',
   textLow: 'var(--hcp-t-40)',
   good: 'var(--hcp-good-deep)',
-  goodBgTint: 'rgba(5,150,105,0.08)',
-  goodBorder: 'rgba(5,150,105,0.35)',
+  goodSoft: 'var(--hcp-good-2)',
+  goodFill: 'rgba(74,222,128,0.18)',
   goodPill: 'rgba(5,150,105,0.16)',
-  goodFill: 'rgba(5,150,105,0.32)',
-  goodFillBorder: 'rgba(5,150,105,0.55)',
+  goodBorder: 'rgba(5,150,105,0.35)',
   bad: 'var(--hcp-bad-deep)',
-  badBgTint: 'rgba(159,29,29,0.10)',
-  badBorder: 'rgba(159,29,29,0.40)',
+  badSoft: 'var(--hcp-bad-2)',
   badPill: 'rgba(159,29,29,0.18)',
-  amber: '#F7931E',
-  amberFill: 'rgba(247,147,30,0.30)',
-  amberFillBorder: 'rgba(247,147,30,0.50)',
+  badBorder: 'rgba(159,29,29,0.40)',
+  amber: 'var(--hcp-amber)',
   amberPill: 'rgba(247,147,30,0.14)',
   amberBorder: 'rgba(247,147,30,0.30)',
+  neutralFill: 'var(--hcp-bg-3)',
 };
 
 interface Props {
@@ -228,8 +225,7 @@ const CounterStrip: React.FC<{
         const norm = (cell.differential - minDiff) / range;
         const heightPct = 30 + norm * 62;
         const isLowerHalf = cell.rank < 4;
-        const fill = isLowerHalf ? T.goodFill : T.amberFill;
-        const fillBorder = isLowerHalf ? T.goodFillBorder : T.amberFillBorder;
+        const fill = isLowerHalf ? T.goodFill : T.neutralFill;
         const isSelected = selectedCellId === cell.score.id;
         const shadow = isSelected
           ? `0 0 0 2px rgba(255,255,255,0.95)`
@@ -245,7 +241,7 @@ const CounterStrip: React.FC<{
               flex: 1,
               height: `${heightPct}%`,
               background: fill,
-              border: `1px solid ${fillBorder}`,
+              border: 'none',
               borderRadius: 3,
               boxShadow: shadow,
               position: 'relative',
@@ -259,6 +255,7 @@ const CounterStrip: React.FC<{
               fontFamily: FONT,
             }}
           >
+
             {(cell.isExpiring || cell.isNew) && (
               <span
                 aria-hidden
@@ -460,6 +457,22 @@ const ActionFooter: React.FC<{
   </div>
 );
 
+// ── Calm action line (no pill, no red border) ──────────────────────
+
+const CalmActionLine: React.FC<{ prose: React.ReactNode }> = ({ prose }) => (
+  <div
+    style={{
+      padding: '12px 18px 14px',
+      borderTop: `1px solid ${T.divider}`,
+      fontSize: 12.5,
+      lineHeight: 1.4,
+      color: T.textMid,
+    }}
+  >
+    {prose}
+  </div>
+);
+
 // ── State: Normal (worsening / improving / steady) ──────────────────
 
 const NormalCard: React.FC<{ f: Forecast; tone: 'good' | 'amber' | 'neutral'; ctx: CopyCtx }> = ({ f, tone, ctx }) => {
@@ -472,21 +485,21 @@ const NormalCard: React.FC<{ f: Forecast; tone: 'good' | 'amber' | 'neutral'; ct
 
   if (isImproving) {
     headlineNumber = (f.projected ?? 0).toFixed(1);
-    headlineColor = T.good;
+    headlineColor = T.textHi;
     prose = (
       <>
         Heading{' '}
-        <strong style={{ color: T.good, fontWeight: 700 }}>down to ~{(f.projected ?? 0).toFixed(1)}</strong>{' '}
+        <strong style={{ color: T.goodSoft, fontWeight: 700 }}>↓ down to ~{(f.projected ?? 0).toFixed(1)}</strong>{' '}
         over {ctx.possessiveLower} next <strong style={{ color: T.textHi, fontWeight: 700 }}>{f.roundsOut} rounds</strong>
       </>
     );
   } else if (isWorsening) {
     headlineNumber = (f.projected ?? 0).toFixed(1);
-    headlineColor = T.amber;
+    headlineColor = T.textHi;
     prose = (
       <>
         Heading{' '}
-        <strong style={{ color: T.amber, fontWeight: 700 }}>up to ~{(f.projected ?? 0).toFixed(1)}</strong>{' '}
+        <strong style={{ color: T.badSoft, fontWeight: 700 }}>↑ up to ~{(f.projected ?? 0).toFixed(1)}</strong>{' '}
         over {ctx.possessiveLower} next <strong style={{ color: T.textHi, fontWeight: 700 }}>{f.roundsOut} rounds</strong>
       </>
     );
@@ -572,16 +585,16 @@ const NormalCard: React.FC<{ f: Forecast; tone: 'good' | 'amber' | 'neutral'; ct
 // ── State: Sharp drop ───────────────────────────────────────────────
 
 const SharpDropCard: React.FC<{ f: Forecast; ctx: CopyCtx }> = ({ f, ctx }) => (
-  <CardShell borderColor={T.goodBorder} bgTint={T.goodBgTint}>
-    <EyebrowRow left={<span style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}><Flame size={12} strokeWidth={2.5} /> On a tear</span>} right={f.whenLabel ?? undefined} color={T.good} />
+  <CardShell>
+    <EyebrowRow left="On a tear" right={f.whenLabel ?? undefined} color={T.good} />
     <Headline
       numberValue={(f.projected ?? 0).toFixed(1)}
-      numberColor={T.good}
+      numberColor={T.textHi}
       prose={
         <>
           On track for a{' '}
-          <strong style={{ color: T.good, fontWeight: 700 }}>{Math.abs(f.delta ?? 0).toFixed(1)} drop</strong>{' '}
-          to <strong style={{ color: T.good, fontWeight: 700 }}>~{(f.projected ?? 0).toFixed(1)}</strong> over{' '}
+          <strong style={{ color: T.goodSoft, fontWeight: 700 }}>↓ {Math.abs(f.delta ?? 0).toFixed(1)} drop</strong>{' '}
+          to <strong style={{ color: T.textHi, fontWeight: 700 }}>~{(f.projected ?? 0).toFixed(1)}</strong> over{' '}
           {ctx.possessiveLower} next <strong style={{ color: T.textHi, fontWeight: 700 }}>{f.roundsOut} rounds</strong>
         </>
       }
@@ -592,7 +605,6 @@ const SharpDropCard: React.FC<{ f: Forecast; ctx: CopyCtx }> = ({ f, ctx }) => (
       pillBg={T.goodPill}
       pillBorder={T.goodBorder}
       pillColor={T.good}
-      footerBg={T.goodBgTint}
       prose={
         <>
           {ctx.viewMode === 'friend'
@@ -611,31 +623,28 @@ const SharpDropCard: React.FC<{ f: Forecast; ctx: CopyCtx }> = ({ f, ctx }) => (
 const SharpRiseCard: React.FC<{ f: Forecast; ctx: CopyCtx }> = ({ f, ctx }) => {
   const cutTarget = f.cutTarget;
   return (
-    <CardShell borderColor={T.badBorder} bgTint={T.badBgTint}>
-      <EyebrowRow left={<span style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}><AlertTriangle size={12} strokeWidth={2.5} /> Form alert</span>} right={f.whenLabel ?? undefined} color={T.bad} />
+    <CardShell>
+      <EyebrowRow left="Form alert" right={f.whenLabel ?? undefined} color={T.badSoft} />
       <Headline
         numberValue={(f.projected ?? 0).toFixed(1)}
-        numberColor={T.bad}
+        numberColor={T.textHi}
         prose={
           <>
             On track for a{' '}
-            <strong style={{ color: T.bad, fontWeight: 700 }}>{(f.delta ?? 0).toFixed(1)} rise</strong> to{' '}
-            <strong style={{ color: T.bad, fontWeight: 700 }}>~{(f.projected ?? 0).toFixed(1)}</strong> over{' '}
+            <strong style={{ color: T.badSoft, fontWeight: 700 }}>↑ {(f.delta ?? 0).toFixed(1)} rise</strong> to{' '}
+            <strong style={{ color: T.textHi, fontWeight: 700 }}>~{(f.projected ?? 0).toFixed(1)}</strong> over{' '}
             {ctx.possessiveLower} next <strong style={{ color: T.textHi, fontWeight: 700 }}>{f.roundsOut} rounds</strong>
           </>
         }
       />
       <StripBand f={f} />
       {cutTarget != null && (
-        <ActionFooter
-          pillText={`Shoot ${cutTarget.toFixed(1)}+`}
-          pillBg={T.badPill}
-          pillBorder={T.badBorder}
-          pillColor={T.bad}
-          footerBg={T.badBgTint}
+        <CalmActionLine
           prose={
             <>
-              next round to <strong style={{ color: T.textHi, fontWeight: 700 }}>break the slide</strong>.
+              Shoot{' '}
+              <strong style={{ color: T.goodSoft, fontWeight: 800 }}>{cutTarget.toFixed(1)} or better</strong>{' '}
+              next round to break the slide.
             </>
           }
         />
@@ -643,6 +652,7 @@ const SharpRiseCard: React.FC<{ f: Forecast; ctx: CopyCtx }> = ({ f, ctx }) => {
     </CardShell>
   );
 };
+
 
 // ── State: Building ─────────────────────────────────────────────────
 

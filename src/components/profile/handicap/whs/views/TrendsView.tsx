@@ -4,7 +4,7 @@ import WhereYouStandSection from '../sections/WhereYouStandSection';
 import RoundsThatCountCard from '../sections/RoundsThatCountCard';
 import IndexHistoryCard from '../sections/IndexHistoryCard';
 import CourseFormCard from '../sections/trends/CourseFormCard';
-import EchoInsightsCard from '../sections/EchoInsightsCard';
+
 import TrendCardsStack from '../sections/trends/TrendCardsStack';
 
 
@@ -76,8 +76,6 @@ export const TrendsView: React.FC<Props> = ({
         ownerFirstName={ownerFirstName}
       />
 
-      {/* 7. Echo Insights — owner only */}
-      {!readOnly && <EchoInsightsCard connectionId={connectionId} />}
     </div>
   );
 };

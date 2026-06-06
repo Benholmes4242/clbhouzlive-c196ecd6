@@ -19,18 +19,18 @@ interface Props {
 }
 
 // ── Tokens ────────────────────────────────────────────────────────────────
-const INK = '#0F172A';
-const INK_70 = 'rgba(15,23,42,0.70)';
-const INK_55 = 'rgba(15,23,42,0.55)';
-const INK_40 = 'rgba(15,23,42,0.40)';
-const INK_10 = 'rgba(15,23,42,0.10)';
-const INK_06 = 'rgba(15,23,42,0.06)';
-const AMBER = '#F7931E';
-const AMBER_DEEP = '#C97211';
+const INK = 'var(--hcp-t-100)';
+const INK_70 = 'var(--hcp-t-60)';
+const INK_55 = 'var(--hcp-t-60)';
+const INK_40 = 'var(--hcp-t-40)';
+const INK_10 = 'var(--hcp-line)';
+const INK_06 = 'var(--hcp-line)';
+const AMBER = 'var(--hcp-amber)';
+const AMBER_DEEP = 'var(--hcp-amber)';
 const AMBER_TINT_06 = 'rgba(247,147,30,0.06)';
 const AMBER_TINT_08 = 'rgba(247,147,30,0.08)';
 const AMBER_BORDER = 'rgba(247,147,30,0.30)';
-const AMBER_GOLD_GRAD = 'linear-gradient(135deg, #F59E0B 0%, #FBBF24 100%)';
+const AMBER_GOLD_GRAD = 'var(--hcp-amber)';
 const GREEN = 'var(--hcp-good-deep)';
 const RED = 'var(--hcp-bad-deep)';
 const D_BG    = 'var(--hcp-bg-1)';
