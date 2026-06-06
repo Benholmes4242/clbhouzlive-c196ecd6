@@ -218,7 +218,7 @@ export function LiveLeaderboardTab() {
               <div style={{
                 marginTop: 8,
                 fontFamily: 'Geist, system-ui, sans-serif',
-                fontSize: 12.5, fontWeight: 500, color: INK_MUTE,
+                fontSize: 12.5, fontWeight: 500, color: INK,
               }}>
                 {location}
               </div>
