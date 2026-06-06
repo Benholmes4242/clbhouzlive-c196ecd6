@@ -569,16 +569,16 @@ const NormalCard: React.FC<{ f: Forecast; tone: 'good' | 'amber' | 'neutral'; ct
 // ── State: Sharp drop ───────────────────────────────────────────────
 
 const SharpDropCard: React.FC<{ f: Forecast; ctx: CopyCtx }> = ({ f, ctx }) => (
-  <CardShell borderColor={T.goodBorder} bgTint={T.goodBgTint}>
-    <EyebrowRow left={<span style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}><Flame size={12} strokeWidth={2.5} /> On a tear</span>} right={f.whenLabel ?? undefined} color={T.good} />
+  <CardShell>
+    <EyebrowRow left="On a tear" right={f.whenLabel ?? undefined} color={T.good} />
     <Headline
       numberValue={(f.projected ?? 0).toFixed(1)}
-      numberColor={T.good}
+      numberColor={T.textHi}
       prose={
         <>
           On track for a{' '}
-          <strong style={{ color: T.good, fontWeight: 700 }}>{Math.abs(f.delta ?? 0).toFixed(1)} drop</strong>{' '}
-          to <strong style={{ color: T.good, fontWeight: 700 }}>~{(f.projected ?? 0).toFixed(1)}</strong> over{' '}
+          <strong style={{ color: T.goodSoft, fontWeight: 700 }}>↓ {Math.abs(f.delta ?? 0).toFixed(1)} drop</strong>{' '}
+          to <strong style={{ color: T.textHi, fontWeight: 700 }}>~{(f.projected ?? 0).toFixed(1)}</strong> over{' '}
           {ctx.possessiveLower} next <strong style={{ color: T.textHi, fontWeight: 700 }}>{f.roundsOut} rounds</strong>
         </>
       }
@@ -589,7 +589,6 @@ const SharpDropCard: React.FC<{ f: Forecast; ctx: CopyCtx }> = ({ f, ctx }) => (
       pillBg={T.goodPill}
       pillBorder={T.goodBorder}
       pillColor={T.good}
-      footerBg={T.goodBgTint}
       prose={
         <>
           {ctx.viewMode === 'friend'
@@ -608,31 +607,28 @@ const SharpDropCard: React.FC<{ f: Forecast; ctx: CopyCtx }> = ({ f, ctx }) => (
 const SharpRiseCard: React.FC<{ f: Forecast; ctx: CopyCtx }> = ({ f, ctx }) => {
   const cutTarget = f.cutTarget;
   return (
-    <CardShell borderColor={T.badBorder} bgTint={T.badBgTint}>
-      <EyebrowRow left={<span style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}><AlertTriangle size={12} strokeWidth={2.5} /> Form alert</span>} right={f.whenLabel ?? undefined} color={T.bad} />
+    <CardShell>
+      <EyebrowRow left="Form alert" right={f.whenLabel ?? undefined} color={T.badSoft} />
       <Headline
         numberValue={(f.projected ?? 0).toFixed(1)}
-        numberColor={T.bad}
+        numberColor={T.textHi}
         prose={
           <>
             On track for a{' '}
-            <strong style={{ color: T.bad, fontWeight: 700 }}>{(f.delta ?? 0).toFixed(1)} rise</strong> to{' '}
-            <strong style={{ color: T.bad, fontWeight: 700 }}>~{(f.projected ?? 0).toFixed(1)}</strong> over{' '}
+            <strong style={{ color: T.badSoft, fontWeight: 700 }}>↑ {(f.delta ?? 0).toFixed(1)} rise</strong> to{' '}
+            <strong style={{ color: T.textHi, fontWeight: 700 }}>~{(f.projected ?? 0).toFixed(1)}</strong> over{' '}
             {ctx.possessiveLower} next <strong style={{ color: T.textHi, fontWeight: 700 }}>{f.roundsOut} rounds</strong>
           </>
         }
       />
       <StripBand f={f} />
       {cutTarget != null && (
-        <ActionFooter
-          pillText={`Shoot ${cutTarget.toFixed(1)}+`}
-          pillBg={T.badPill}
-          pillBorder={T.badBorder}
-          pillColor={T.bad}
-          footerBg={T.badBgTint}
+        <CalmActionLine
           prose={
             <>
-              next round to <strong style={{ color: T.textHi, fontWeight: 700 }}>break the slide</strong>.
+              Shoot{' '}
+              <strong style={{ color: T.goodSoft, fontWeight: 800 }}>{cutTarget.toFixed(1)} or better</strong>{' '}
+              next round to break the slide.
             </>
           }
         />
@@ -640,6 +636,7 @@ const SharpRiseCard: React.FC<{ f: Forecast; ctx: CopyCtx }> = ({ f, ctx }) => {
     </CardShell>
   );
 };
+
 
 // ── State: Building ─────────────────────────────────────────────────
 
