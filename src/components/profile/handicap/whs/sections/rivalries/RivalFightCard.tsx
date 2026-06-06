@@ -97,10 +97,7 @@ export const RivalFightCard: React.FC<Props> = ({
         fontFamily: FONT_GEIST,
         cursor: tappable ? 'pointer' : 'default',
         color: '#FFFFFF',
-        boxShadow:
-          isWinningOverall
-            ? '0 12px 36px -16px rgba(247,147,30,0.35)'
-            : '0 12px 28px -16px rgba(0,0,0,0.5)',
+        boxShadow: '0 12px 28px -16px rgba(0,0,0,0.5)',
       }}
     >
       {/* HERO */}
