@@ -13,7 +13,7 @@
 
 import React from 'react';
 import { format } from 'date-fns';
-import { ChevronRight, Crown, Star, Trophy } from 'lucide-react';
+import { ChevronRight, Crown, Trophy } from 'lucide-react';
 import {
   CINEMATIC_FRAME_HEIGHT,
   CINEMATIC_SCRIM,
