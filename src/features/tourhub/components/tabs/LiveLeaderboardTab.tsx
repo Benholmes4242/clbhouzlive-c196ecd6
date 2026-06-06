@@ -185,7 +185,7 @@ export function LiveLeaderboardTab() {
                 display: 'inline-flex', alignItems: 'center', gap: 7,
                 fontFamily: 'Geist, system-ui, sans-serif',
                 fontSize: 10.5, fontWeight: 800, letterSpacing: '0.14em',
-                textTransform: 'uppercase', color: INK_MUTE,
+                textTransform: 'uppercase', color: INK,
               }}>
                 {isLive && (
                   <span aria-hidden style={{ width: 6, height: 6, borderRadius: '50%', background: STATUS_LIVE, flexShrink: 0 }} />
@@ -196,7 +196,7 @@ export function LiveLeaderboardTab() {
               {rightMeta && (
                 <span style={{
                   fontFamily: 'Geist, system-ui, sans-serif',
-                  fontSize: 11, fontWeight: 600, color: INK_FAINT,
+                  fontSize: 11, fontWeight: 600, color: INK,
                   fontVariantNumeric: 'tabular-nums', whiteSpace: 'nowrap',
                 }}>
                   {rightMeta}
@@ -218,7 +218,7 @@ export function LiveLeaderboardTab() {
               <div style={{
                 marginTop: 8,
                 fontFamily: 'Geist, system-ui, sans-serif',
-                fontSize: 12.5, fontWeight: 500, color: INK_MUTE,
+                fontSize: 12.5, fontWeight: 500, color: INK,
               }}>
                 {location}
               </div>
