@@ -77,7 +77,7 @@ function StackedAvatarsDark({
             height: size,
             borderRadius: '34%',
             marginLeft: i === 0 ? 0 : -8,
-            border: '1.5px solid rgba(255,255,255,0.9)',
+            border: '1.5px solid #141C28',
             background: 'rgba(255,255,255,0.08)',
             overflow: 'hidden',
             flexShrink: 0,
