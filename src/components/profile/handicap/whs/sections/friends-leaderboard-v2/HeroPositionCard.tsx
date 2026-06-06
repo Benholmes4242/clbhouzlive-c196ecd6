@@ -92,18 +92,8 @@ export const HeroPositionCard: React.FC<Props> = ({
         fontFamily: FONT,
       }}
     >
-      {/* Radial amber backdrop — the "this is YOU" glow */}
-      <div
-        style={{
-          position: 'absolute',
-          top: '-40%',
-          right: '-20%',
-          width: 260,
-          height: 260,
-          background: `radial-gradient(circle, rgba(247,147,30,0.18) 0%, transparent 70%)`,
-          pointerEvents: 'none',
-        }}
-      />
+      {/* Calm: amber radial glow removed for legibility */}
+
       {/* Top: avatar + position + percentile + hcp + club */}
       <div style={{ position: 'relative', display: 'flex', alignItems: 'center', gap: 14 }}>
         <div
