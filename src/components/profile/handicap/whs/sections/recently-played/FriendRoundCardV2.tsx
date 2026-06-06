@@ -19,8 +19,7 @@ interface Props {
 
 const FONT = 'Geist, system-ui, -apple-system, BlinkMacSystemFont, sans-serif';
 
-const FALLBACK_GRADIENT =
-  'linear-gradient(140deg, #2d3a2d 0%, #4a5d4a 25%, #6b7a5a 50%, #8a9670 72%, #c4a574 88%, #d4956b 100%)';
+const FALLBACK_BG = 'var(--hcp-bg-3)';
 
 export const FriendRoundCardV2: React.FC<Props> = ({
   activity,
@@ -105,7 +104,7 @@ export const FriendRoundCardV2: React.FC<Props> = ({
           width: 92,
           position: 'relative',
           overflow: 'hidden',
-          background: FALLBACK_GRADIENT,
+          background: FALLBACK_BG,
         }}
       >
         {activity.course_thumbnail_image ? (
