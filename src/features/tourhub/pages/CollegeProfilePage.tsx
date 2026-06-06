@@ -3,8 +3,6 @@ import { useParams, Link, useNavigate } from 'react-router-dom';
 import { RefreshCw, AlertCircle, ChevronRight, Crown } from 'lucide-react';
 import { getCollegeLogoUrl } from '@/utils/collegeLogo';
 import { TourHubShell } from '../components/TourHubShell';
-import { ShellSlot } from '@/components/header/ShellSlot';
-import { Kicker } from '@/components/watch/proshop/Kicker';
 import { Skeleton } from '@/components/ui/skeleton';
 import { formatCurrency } from '@/lib/utils/formatCurrency';
 import {
@@ -24,7 +22,7 @@ import {
   captainShortName,
 } from '../utils/captainAnchor';
 import { collegeHubRoute } from '../routes';
-import { AMBER, GOLD, GOLD_DEEP, GOLD_GLOW_DROP, GOLD_TINT_10, INK, INK_MUTE, INK_FAINT, INK_TINT_06, INK_TINT_07, SHELL_BG, SLATE_50, SURFACE, WHITE_ALPHA_55 } from '../_shared/tokens';
+import { AMBER, GOLD, GOLD_DEEP, GOLD_GLOW_DROP, GOLD_TINT_10, INK, INK_MUTE, INK_FAINT, INK_TINT_06, INK_TINT_07, SLATE_50, SURFACE } from '../_shared/tokens';
 
 /* ─── Hero subtitle: cross-tour roll-up ────────────────────────────────── */
 
@@ -139,36 +137,6 @@ export function CollegeProfilePage() {
 
   return (
     <TourHubShell>
-      <ShellSlot dark>
-        <button
-          type="button"
-          onClick={() => navigate(collegeHubRoute())}
-          aria-label="College Profile — open College Franchise"
-          style={{
-            background: SHELL_BG,
-            border: 'none',
-            padding: '14px 16px 12px',
-            cursor: 'pointer',
-            display: 'block',
-            width: '100%',
-            textAlign: 'left' as const,
-          }}
-        >
-          <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, marginBottom: 4 }}>
-            <Kicker color="light">College Franchise</Kicker>
-            <ChevronRight size={11} strokeWidth={2.5} style={{ color: AMBER, marginTop: -4 }} />
-          </div>
-          <h1 style={{ fontSize: 22, fontWeight: 800, letterSpacing: '-0.025em', lineHeight: 1.15, color: SURFACE, margin: 0 }}>
-            {displayName}
-          </h1>
-          {sectionMetaSubtitle && (
-            <div style={{ fontSize: 13, fontWeight: 500, color: WHITE_ALPHA_55, marginTop: 4 }}>
-              {sectionMetaSubtitle}
-            </div>
-          )}
-        </button>
-      </ShellSlot>
-
       <div style={{ paddingTop: 'var(--chrome-total-h, 0px)', background: SLATE_50 }}>
 
       {/* ── HERO MASTHEAD ── canonical light pattern */}
@@ -180,6 +148,27 @@ export function CollegeProfilePage() {
         paddingRight: 16,
         paddingBottom: 16,
       }}>
+
+        {/* Compact identity header — replaces the removed slate masthead */}
+        <button
+          type="button"
+          onClick={() => navigate(collegeHubRoute())}
+          aria-label="Open College Franchise"
+          style={{ background: 'transparent', border: 'none', padding: 0, margin: '0 0 12px', cursor: 'pointer', display: 'block', textAlign: 'left', width: '100%' }}
+        >
+          <div style={{ display: 'inline-flex', alignItems: 'center', gap: 5, marginBottom: 3 }}>
+            <span style={{ fontSize: 9, fontWeight: 800, letterSpacing: '0.16em', textTransform: 'uppercase', color: INK_MUTE }}>College Franchise</span>
+            <ChevronRight size={10} strokeWidth={2.5} style={{ color: AMBER }} />
+          </div>
+          <h1 style={{ fontSize: 20, fontWeight: 800, letterSpacing: '-0.02em', lineHeight: 1.1, color: INK, margin: 0 }}>
+            {displayName}
+          </h1>
+          {sectionMetaSubtitle && (
+            <div style={{ fontSize: 12, fontWeight: 500, color: INK_MUTE, marginTop: 3 }}>
+              {sectionMetaSubtitle}
+            </div>
+          )}
+        </button>
 
         {/* Champion content (no card chrome — Q1 = b) */}
         {stats && !isLoading && (
