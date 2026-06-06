@@ -58,21 +58,10 @@ export function PlayerHero({ player, playerStats }: PlayerHeroProps) {
     : null;
 
   const playerState = usePlayerState(player.id);
-  const heroStat = chooseHeroStat(player, playerStats, playerState);
-  const { integer: heroStatInteger, decimal: heroStatDecimal, suffix: heroStatSuffix } = splitStatValue(heroStat.primary);
-
-  // Stat label per state (matches chooseHeroStat chain).
-  const heroStatLabel = (() => {
-    switch (playerState.state) {
-      case 'live': return 'LIVE SCORE';
-      default:
-        if (worldRank) return 'WORLD RANK';
-        if (playerStats?.strokes_gained_total != null) return 'SG: TOTAL';
-        if (playerStats?.earnings && playerStats.earnings > 0) return `EARNED ${new Date().getFullYear()}`;
-        if (age) return 'AGE';
-        return 'PROFILE';
-    }
-  })();
+  const isLive = playerState.state === 'live' && !!playerState.liveData;
+  const liveText = isLive
+    ? `${playerState.liveData!.scoreText}${playerState.liveData!.currentRound ? ` · R${playerState.liveData!.currentRound}` : ''}`
+    : null;
 
   // Caption row composition — two stable identifiers only.
   const captionMetadata: string[] = (() => {
