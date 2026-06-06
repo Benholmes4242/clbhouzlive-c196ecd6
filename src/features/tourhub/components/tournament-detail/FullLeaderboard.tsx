@@ -286,7 +286,7 @@ export function FullLeaderboard({
               {showCutLine && (
                 <div style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '6px 20px', background: INK_TINT_02, borderBottom: `0.5px solid ${INK_TINT_07}` }}>
                   <div style={{ flex: 1, height: '0.5px', background: HAIRLINE_INK_12 }} />
-                  <span style={{ fontSize: '9px', fontWeight: 800, color: INK_MUTE, letterSpacing: '0.14em' }}>MISSED CUT</span>
+                  <span style={{ fontSize: '9px', fontWeight: 800, color: INK, letterSpacing: '0.14em' }}>MISSED CUT</span>
                   <div style={{ flex: 1, height: '0.5px', background: HAIRLINE_INK_12 }} />
                 </div>
               )}
