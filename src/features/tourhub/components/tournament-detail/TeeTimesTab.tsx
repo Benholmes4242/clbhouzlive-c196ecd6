@@ -345,7 +345,7 @@ export function TeeTimesTab({ tournamentId, tournamentName, isCompleted }: TeeTi
 
       {/* Timezone note */}
       <div style={{ textAlign: 'center' as const, padding: '12px 20px 32px' }}>
-        <span style={{ fontSize: '10px', color: INK_FAINT }}>Times shown in your local timezone</span>
+        <span style={{ fontSize: '10px', color: INK }}>Times shown in your local timezone</span>
       </div>
     </motion.div>
   );
