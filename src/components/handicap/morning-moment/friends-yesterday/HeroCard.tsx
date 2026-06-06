@@ -6,11 +6,8 @@ import CinemaFriendEyebrow from '@/components/profile/handicap/whs/sections/rece
 import CinemaFriendGlass from '@/components/profile/handicap/whs/sections/recently-played/cinema-friend-card/CinemaFriendGlass';
 import type { WhsFriendActivityWithImage } from '@/lib/whs/types';
 
-const FALLBACK_GRADIENT =
-  'linear-gradient(140deg, #2d3a2d 0%, #4a5d4a 25%, #6b7a5a 50%, #8a9670 72%, #c4a574 88%, #d4956b 100%)';
-
-const ATMOSPHERIC =
-  'radial-gradient(ellipse 80% 60% at 50% 90%, rgba(0,0,0,0.55) 0%, transparent 70%), radial-gradient(ellipse 60% 40% at 70% 25%, rgba(255,200,140,0.18) 0%, transparent 60%)';
+const FALLBACK_BG =
+  'linear-gradient(180deg, var(--hcp-bg-2) 0%, var(--hcp-bg-3) 100%)';
 
 const LEGIBILITY_SCRIM =
   'linear-gradient(180deg, rgba(0,0,0,0.40) 0%, rgba(0,0,0,0.05) 22%, rgba(0,0,0,0) 50%, rgba(0,0,0,0.55) 100%)';
