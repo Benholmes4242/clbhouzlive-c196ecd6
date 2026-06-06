@@ -86,20 +86,6 @@ export function TournamentDetailPage() {
   const headshotMap = undefined;
 
 
-  const leader = useMemo(() => {
-    if (!isLive || !leaderboard?.length) return null;
-    const tiedForLead = leaderboard.filter((e: any) => e.position === 1);
-    const first = tiedForLead[0] as any;
-    const score = first?.score;
-    const scoreStr = score === 0 ? 'E' : score < 0 ? String(score) : score > 0 ? `+${score}` : null;
-    
-    if (tiedForLead.length > 1) {
-      return { name: `${tiedForLead.length} tied for the lead`, score: scoreStr };
-    }
-    const name = first?.player?.full_name;
-    if (!name) return null;
-    return { name: `${name} leads`, score: scoreStr };
-  }, [isLive, leaderboard]);
 
   if (isLoading) {
     return (
