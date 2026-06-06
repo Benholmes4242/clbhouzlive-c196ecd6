@@ -70,9 +70,6 @@ export function PlayerProfilePage() {
           </div>
         </ShellSlot>
         <div style={{ paddingTop: 'var(--chrome-total-h, 0px)' }}>
-          <div style={{ background: SLATE_50, padding: '16px' }}>
-            <Skeleton className="h-24 w-full rounded-xl" style={{ background: GOLD_TINT_10 }} />
-          </div>
           <div style={{ padding: '16px', marginTop: 8 }}>
             <Skeleton className="h-48 rounded-lg" style={{ background: INK_TINT_06 }} />
             <Skeleton className="h-64 rounded-lg mt-4" style={{ background: INK_TINT_06 }} />
