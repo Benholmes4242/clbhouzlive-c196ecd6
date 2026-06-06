@@ -151,7 +151,7 @@ export function FullLeaderboard({
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.3 }}>
       {/* Search input */}
       <div style={{ padding: '14px 20px 8px', position: 'relative' }}>
-        <Search className="absolute left-[32px] top-1/2 -translate-y-1/2 w-[16px] h-[16px] z-10" style={{ color: INK_FAINT }} strokeWidth={2.5} />
+        <Search className="absolute left-[32px] top-1/2 -translate-y-1/2 w-[16px] h-[16px] z-10" style={{ color: INK }} strokeWidth={2.5} />
         <input
           type="text"
           placeholder="Search players..."
