@@ -20,7 +20,7 @@ import { CreateBusinessProfileIntroModal } from '@/components/profile/CreateBusi
 import { IdentitySelector } from '@/components/identity/IdentitySelector';
 import { useProfilePrefetch } from '@/hooks/useProfilePrefetch';
 import { useEditProfileRoute } from '@/hooks/useEditProfileRoute';
-import { HandicapPill } from '@/components/clubhouse/HandicapPill';
+
 
 interface HeaderNavigationProps {
   onInteraction?: () => void;
