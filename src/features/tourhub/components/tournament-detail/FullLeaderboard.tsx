@@ -238,7 +238,7 @@ export function FullLeaderboard({
                 className="active:bg-black/[0.02] transition-colors"
               >
                 {/* Position */}
-                <span style={{ width: '24px', fontSize: '11px', fontWeight: 800, color: entry.position === 1 ? AMBER : INK_FAINT, flexShrink: 0, fontVariantNumeric: 'tabular-nums' }}>
+                <span style={{ width: '24px', fontSize: '11px', fontWeight: 800, color: entry.position === 1 ? AMBER : INK, flexShrink: 0, fontVariantNumeric: 'tabular-nums' }}>
                   {isMissedCut ? 'MC' : isWD ? 'WD' : entry.position_tied ? `T${entry.position}` : String(entry.position)}
                 </span>
 
