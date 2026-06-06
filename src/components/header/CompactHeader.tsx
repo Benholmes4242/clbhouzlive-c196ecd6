@@ -89,6 +89,16 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
   // Course detail: /courses/:courseId (exactly 3 segments — excludes /reviews, /rate, /share-review subroutes)
   const isCourseDetailRoute = location.pathname.startsWith('/courses/')
     && location.pathname.split('/').length === 3;
+
+  // Tour deep pages: player, tournament, college profile, college H2H
+  const isTourPlayerRoute = location.pathname.startsWith('/tourhub/player/');
+  const isTourTournamentRoute = location.pathname.startsWith('/tourhub/tournament/');
+  const isTourCollegeCompareRoute = location.pathname === '/tourhub/college-golf/compare';
+  const isTourCollegeProfileRoute = location.pathname.startsWith('/tourhub/college-golf/')
+    && location.pathname !== '/tourhub/college-golf'
+    && location.pathname !== '/tourhub/college-golf/compare';
+  const isTourDeepRoute = isTourPlayerRoute || isTourTournamentRoute
+    || isTourCollegeCompareRoute || isTourCollegeProfileRoute;
   // Editorial-geometry chrome (52px / 30px logo / 38px search) applies to
   // tab-landing surfaces. Tour-specific behaviors (compact avatar pill,
   // back-arrow) stay gated on isTourRoute.
