@@ -225,8 +225,7 @@ const CounterStrip: React.FC<{
         const norm = (cell.differential - minDiff) / range;
         const heightPct = 30 + norm * 62;
         const isLowerHalf = cell.rank < 4;
-        const fill = isLowerHalf ? T.goodFill : T.amberFill;
-        const fillBorder = isLowerHalf ? T.goodFillBorder : T.amberFillBorder;
+        const fill = isLowerHalf ? T.goodFill : T.neutralFill;
         const isSelected = selectedCellId === cell.score.id;
         const shadow = isSelected
           ? `0 0 0 2px rgba(255,255,255,0.95)`
@@ -242,7 +241,7 @@ const CounterStrip: React.FC<{
               flex: 1,
               height: `${heightPct}%`,
               background: fill,
-              border: `1px solid ${fillBorder}`,
+              border: 'none',
               borderRadius: 3,
               boxShadow: shadow,
               position: 'relative',
@@ -256,6 +255,7 @@ const CounterStrip: React.FC<{
               fontFamily: FONT,
             }}
           >
+
             {(cell.isExpiring || cell.isNew) && (
               <span
                 aria-hidden
