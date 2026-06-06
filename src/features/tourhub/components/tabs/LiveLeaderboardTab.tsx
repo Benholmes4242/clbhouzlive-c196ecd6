@@ -196,7 +196,7 @@ export function LiveLeaderboardTab() {
               {rightMeta && (
                 <span style={{
                   fontFamily: 'Geist, system-ui, sans-serif',
-                  fontSize: 11, fontWeight: 600, color: INK_FAINT,
+                  fontSize: 11, fontWeight: 600, color: INK,
                   fontVariantNumeric: 'tabular-nums', whiteSpace: 'nowrap',
                 }}>
                   {rightMeta}
