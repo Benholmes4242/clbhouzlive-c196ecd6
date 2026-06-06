@@ -18,7 +18,7 @@ import CountryFlag from '@/components/ui/country-flag';
 import type { TourPlayer, TourPlayerStatistics } from '../../hooks/useTourHubData';
 import { usePlayerState } from '../../hooks/usePlayerState';
 
-import { splitStatValue } from '../../utils/splitStatValue';
+
 import {
   AMBER,
   GOLD,
@@ -35,59 +35,6 @@ interface PlayerHeroProps {
   playerStats: TourPlayerStatistics | null;
 }
 
-/**
- * Format earnings number as compact currency string ($6.7M / $850K).
- */
-function formatEarnings(value: number): string {
-  if (value >= 1_000_000) return `$${(value / 1_000_000).toFixed(1)}M`;
-  if (value >= 1_000) return `$${Math.round(value / 1_000)}K`;
-  return `$${value}`;
-}
-
-/**
- * Pure helper — pick the single most relevant hero stat for the player.
- * Priority: live score > recent finish > season earnings > world rank > age.
- * Always returns something (never null).
- */
-function chooseHeroStat(
-  player: TourPlayer,
-  playerStats: TourPlayerStatistics | null,
-  playerState: ReturnType<typeof usePlayerState>,
-): { primary: string } {
-  // 1. Live tournament score (genuinely "right now", not a duplicate of form)
-  if (playerState.state === 'live' && playerState.liveData) {
-    const ld = playerState.liveData;
-    const round = ld.currentRound ? ` · R${ld.currentRound}` : '';
-    return { primary: `${ld.scoreText}${round}` };
-  }
-
-  // 2. World rank — stable, identifying, never wraps
-  if (playerStats?.world_rank && playerStats.world_rank > 0) {
-    return { primary: `#${playerStats.world_rank}` };
-  }
-
-  // 3. SG: total (season form, scalar)
-  if (playerStats?.strokes_gained_total != null) {
-    const v = playerStats.strokes_gained_total;
-    return { primary: `${v > 0 ? '+' : ''}${v.toFixed(2)}` };
-  }
-
-  // 4. Season earnings
-  if (playerStats?.earnings && playerStats.earnings > 0) {
-    return { primary: formatEarnings(playerStats.earnings) };
-  }
-
-  // 5. Age fallback
-  if (player.birth_date) {
-    const age = Math.floor(
-      (Date.now() - new Date(player.birth_date).getTime()) /
-        (365.25 * 24 * 60 * 60 * 1000),
-    );
-    if (age > 0) return { primary: `Age ${age}` };
-  }
-
-  return { primary: 'Player profile' };
-}
 
 export function PlayerHero({ player, playerStats }: PlayerHeroProps) {
   const navigate = useNavigate();
@@ -103,21 +50,10 @@ export function PlayerHero({ player, playerStats }: PlayerHeroProps) {
     : null;
 
   const playerState = usePlayerState(player.id);
-  const heroStat = chooseHeroStat(player, playerStats, playerState);
-  const { integer: heroStatInteger, decimal: heroStatDecimal, suffix: heroStatSuffix } = splitStatValue(heroStat.primary);
-
-  // Stat label per state (matches chooseHeroStat chain).
-  const heroStatLabel = (() => {
-    switch (playerState.state) {
-      case 'live': return 'LIVE SCORE';
-      default:
-        if (worldRank) return 'WORLD RANK';
-        if (playerStats?.strokes_gained_total != null) return 'SG: TOTAL';
-        if (playerStats?.earnings && playerStats.earnings > 0) return `EARNED ${new Date().getFullYear()}`;
-        if (age) return 'AGE';
-        return 'PROFILE';
-    }
-  })();
+  const isLive = playerState.state === 'live' && !!playerState.liveData;
+  const liveText = isLive
+    ? `${playerState.liveData!.scoreText}${playerState.liveData!.currentRound ? ` · R${playerState.liveData!.currentRound}` : ''}`
+    : null;
 
   // Caption row composition — two stable identifiers only.
   const captionMetadata: string[] = (() => {
@@ -174,30 +110,42 @@ export function PlayerHero({ player, playerStats }: PlayerHeroProps) {
           style={{
             display: 'flex',
             alignItems: 'center',
-            gap: 5,
+            justifyContent: 'space-between',
+            gap: 8,
             marginBottom: 10,
             flexWrap: 'wrap',
           }}
         >
-          <Crown size={13} strokeWidth={2.5} fill={GOLD} color={GOLD_DEEP} />
-          {captionMetadata.map((part, i) => (
-            <Fragment key={i}>
-              {i > 0 && (
-                <span style={{ fontSize: 9, fontWeight: 800, color: INK_MUTE, letterSpacing: '0.16em' }}>·</span>
-              )}
-              <span
-                style={{
-                  fontSize: 9,
-                  fontWeight: 800,
-                  color: i === 0 ? INK : INK_MUTE,
-                  letterSpacing: '0.16em',
-                  textTransform: 'uppercase',
-                }}
-              >
-                {part}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 5, flexWrap: 'wrap', minWidth: 0 }}>
+            <Crown size={13} strokeWidth={2.5} fill={GOLD} color={GOLD_DEEP} />
+            {captionMetadata.map((part, i) => (
+              <Fragment key={i}>
+                {i > 0 && (
+                  <span style={{ fontSize: 9, fontWeight: 800, color: INK_MUTE, letterSpacing: '0.16em' }}>·</span>
+                )}
+                <span
+                  style={{
+                    fontSize: 9,
+                    fontWeight: 800,
+                    color: i === 0 ? INK : INK_MUTE,
+                    letterSpacing: '0.16em',
+                    textTransform: 'uppercase',
+                  }}
+                >
+                  {part}
+                </span>
+              </Fragment>
+            ))}
+          </div>
+
+          {liveText && (
+            <div style={{ display: 'flex', alignItems: 'baseline', gap: 6, flexShrink: 0 }}>
+              <span style={{ fontSize: 9, fontWeight: 800, color: INK_MUTE, letterSpacing: '0.16em', textTransform: 'uppercase' }}>LIVE</span>
+              <span style={{ fontSize: 15, fontWeight: 800, color: INK, letterSpacing: '-0.02em', fontVariantNumeric: 'tabular-nums', whiteSpace: 'nowrap' }}>
+                {liveText}
               </span>
-            </Fragment>
-          ))}
+            </div>
+          )}
         </div>
 
         {/* Body row */}
@@ -249,59 +197,27 @@ export function PlayerHero({ player, playerStats }: PlayerHeroProps) {
             )}
           </div>
 
-          {/* Info: name + flag left, big stat right */}
-          <div style={{ flex: 1, minWidth: 0, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10 }}>
-            <div style={{ minWidth: 0, flex: 1 }}>
-              <div
-                style={{
-                  fontSize: 25,
-                  fontWeight: 800,
-                  color: INK,
-                  letterSpacing: '-0.03em',
-                  lineHeight: 1.05,
-                  whiteSpace: 'nowrap',
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis',
-                }}
-              >
-                {player.full_name}
-              </div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 5, marginTop: 6 }}>
-                <CountryFlag country={player.country_code || player.country} size="sm" />
-                {countryDisplay && (
-                  <span style={{ fontSize: 12, fontWeight: 600, color: INK_MUTE }}>{countryDisplay}</span>
-                )}
-              </div>
+          {/* Info: name + flag — full width now */}
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <div
+              style={{
+                fontSize: 25,
+                fontWeight: 800,
+                color: INK,
+                letterSpacing: '-0.03em',
+                lineHeight: 1.05,
+                whiteSpace: 'nowrap',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+              }}
+            >
+              {player.full_name}
             </div>
-
-            <div style={{ flexShrink: 0, textAlign: 'right' as const }}>
-              <div
-                style={{
-                  fontSize: 30,
-                  fontWeight: 800,
-                  color: INK,
-                  letterSpacing: '-0.03em',
-                  lineHeight: 1,
-                  fontVariantNumeric: 'tabular-nums',
-                  whiteSpace: 'nowrap',
-                }}
-              >
-                {heroStatInteger}
-                {heroStatDecimal && <span style={{ color: AMBER }}>{heroStatDecimal}</span>}
-                {heroStatSuffix}
-              </div>
-              <div
-                style={{
-                  marginTop: 4,
-                  fontSize: 9,
-                  fontWeight: 800,
-                  color: INK_MUTE,
-                  letterSpacing: '0.16em',
-                  textTransform: 'uppercase',
-                }}
-              >
-                {heroStatLabel}
-              </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 5, marginTop: 6 }}>
+              <CountryFlag country={player.country_code || player.country} size="sm" />
+              {countryDisplay && (
+                <span style={{ fontSize: 12, fontWeight: 600, color: INK_MUTE }}>{countryDisplay}</span>
+              )}
             </div>
           </div>
         </div>
