@@ -44,51 +44,6 @@ function formatEarnings(value: number): string {
   return `$${value}`;
 }
 
-/**
- * Pure helper — pick the single most relevant hero stat for the player.
- * Priority: live score > recent finish > season earnings > world rank > age.
- * Always returns something (never null).
- */
-function chooseHeroStat(
-  player: TourPlayer,
-  playerStats: TourPlayerStatistics | null,
-  playerState: ReturnType<typeof usePlayerState>,
-): { primary: string } {
-  // 1. Live tournament score (genuinely "right now", not a duplicate of form)
-  if (playerState.state === 'live' && playerState.liveData) {
-    const ld = playerState.liveData;
-    const round = ld.currentRound ? ` · R${ld.currentRound}` : '';
-    return { primary: `${ld.scoreText}${round}` };
-  }
-
-  // 2. World rank — stable, identifying, never wraps
-  if (playerStats?.world_rank && playerStats.world_rank > 0) {
-    return { primary: `#${playerStats.world_rank}` };
-  }
-
-  // 3. SG: total (season form, scalar)
-  if (playerStats?.strokes_gained_total != null) {
-    const v = playerStats.strokes_gained_total;
-    return { primary: `${v > 0 ? '+' : ''}${v.toFixed(2)}` };
-  }
-
-  // 4. Season earnings
-  if (playerStats?.earnings && playerStats.earnings > 0) {
-    return { primary: formatEarnings(playerStats.earnings) };
-  }
-
-  // 5. Age fallback
-  if (player.birth_date) {
-    const age = Math.floor(
-      (Date.now() - new Date(player.birth_date).getTime()) /
-        (365.25 * 24 * 60 * 60 * 1000),
-    );
-    if (age > 0) return { primary: `Age ${age}` };
-  }
-
-  return { primary: 'Player profile' };
-}
-
 export function PlayerHero({ player, playerStats }: PlayerHeroProps) {
   const navigate = useNavigate();
   const heroPhotoUrl = getPlayerHeadshotUrl(player.full_name, player.tour_codes?.[0] ?? 'pga');
