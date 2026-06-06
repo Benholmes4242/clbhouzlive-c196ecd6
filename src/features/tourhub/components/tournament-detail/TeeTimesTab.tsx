@@ -112,10 +112,10 @@ function TeeTimeGroupCard({ group, searchQuery, tournamentName, scoreByPlayer, s
         <span style={{ fontSize: '14px', fontWeight: 800, color: INK, width: '72px', flexShrink: 0, fontVariantNumeric: 'tabular-nums' }}>
           {format(new Date(group.teeTime), 'h:mm a')}
         </span>
-        <span style={{ fontSize: '12px', fontWeight: 700, color: INK_FAINT, flexShrink: 0 }}>
+        <span style={{ fontSize: '12px', fontWeight: 700, color: INK, flexShrink: 0 }}>
           Hole {group.startingHole}
         </span>
-        {group.backNine && <span style={{ fontSize: '10px', color: INK_FAINT, marginLeft: '6px' }}>Back 9</span>}
+        {group.backNine && <span style={{ fontSize: '10px', color: INK, marginLeft: '6px' }}>Back 9</span>}
         {isFeatured && !hasMatchingPlayer && (
           <span style={{ marginLeft: '8px', fontSize: '9px', fontWeight: 800, color: AMBER, letterSpacing: '0.14em', textTransform: 'uppercase' as const }}>Featured</span>
         )}
@@ -138,14 +138,14 @@ function TeeTimeGroupCard({ group, searchQuery, tournamentName, scoreByPlayer, s
               {s && (() => {
                 const isMissed = s.status === 'CUT' || s.status === 'WD' || s.status === 'DQ' || s.status === 'MC';
                 if (isMissed) {
-                  return <span style={{ fontSize: '12px', fontWeight: 700, color: INK_FAINT, width: '64px', textAlign: 'right' as const, flexShrink: 0 }}>{s.status === 'CUT' || s.status === 'MC' ? 'MC' : s.status}</span>;
+                  return <span style={{ fontSize: '12px', fontWeight: 700, color: INK, width: '64px', textAlign: 'right' as const, flexShrink: 0 }}>{s.status === 'CUT' || s.status === 'MC' ? 'MC' : s.status}</span>;
                 }
                 const val = s.score == null ? '—' : s.score === 0 ? 'E' : s.score < 0 ? String(s.score) : `+${s.score}`;
-                const color = s.score == null ? INK_FAINT : s.score < 0 ? SCORE_UNDER_PAR_LIGHT : s.score > 0 ? SCORE_OVER_PAR_LIGHT : INK_FAINT;
+                const color = s.score == null ? INK : s.score < 0 ? SCORE_UNDER_PAR_LIGHT : s.score > 0 ? SCORE_OVER_PAR_LIGHT : INK;
                 const posStr = s.position == null ? '' : `${s.tied ? 'T' : ''}${s.position}`;
                 return (
                   <span style={{ display: 'inline-flex', alignItems: 'baseline', gap: 6, width: '64px', justifyContent: 'flex-end', flexShrink: 0 }}>
-                    {posStr && <span style={{ fontSize: '10px', fontWeight: 700, color: INK_FAINT, fontVariantNumeric: 'tabular-nums' }}>{posStr}</span>}
+                    {posStr && <span style={{ fontSize: '10px', fontWeight: 700, color: INK, fontVariantNumeric: 'tabular-nums' }}>{posStr}</span>}
                     <span style={{ fontSize: '14px', fontWeight: 800, color, fontVariantNumeric: 'tabular-nums' }}>{val}</span>
                   </span>
                 );
@@ -278,10 +278,10 @@ export function TeeTimesTab({ tournamentId, tournamentName, isCompleted }: TeeTi
       {/* Section eyebrow */}
       <div style={{ padding: '0 20px 0' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
-          <span style={{ fontSize: '9px', fontWeight: 800, color: INK_MUTE, letterSpacing: '0.16em', textTransform: 'uppercase' as const, flex: 1 }}>
+          <span style={{ fontSize: '9px', fontWeight: 800, color: INK, letterSpacing: '0.16em', textTransform: 'uppercase' as const, flex: 1 }}>
             Tee Times · {teeTimeDate ?? `Round ${roundNumber}`}
           </span>
-          <span style={{ fontSize: '10px', color: INK_FAINT }}>{groups.length} groups</span>
+          <span style={{ fontSize: '10px', color: INK }}>{groups.length} groups</span>
         </div>
       </div>
 
@@ -307,11 +307,11 @@ export function TeeTimesTab({ tournamentId, tournamentName, isCompleted }: TeeTi
 
       {/* Caption: window of tee times */}
       <div style={{ padding: '8px 20px', display: 'flex', alignItems: 'baseline', justifyContent: 'space-between' }}>
-        <span style={{ fontSize: '9px', fontWeight: 800, color: INK_MUTE, letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>
+        <span style={{ fontSize: '9px', fontWeight: 800, color: INK, letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>
           Tee Times · {selectedRound}
         </span>
         {firstOff && lastOff && (
-          <span style={{ fontSize: '11px', fontWeight: 600, color: INK_FAINT, fontVariantNumeric: 'tabular-nums' }}>
+          <span style={{ fontSize: '11px', fontWeight: 600, color: INK, fontVariantNumeric: 'tabular-nums' }}>
             {firstOff} – {lastOff}
           </span>
         )}
@@ -321,14 +321,14 @@ export function TeeTimesTab({ tournamentId, tournamentName, isCompleted }: TeeTi
       <div style={{ background: SURFACE, borderTop: `0.5px solid ${INK_TINT_07}`, borderBottom: `1px solid ${INK_TINT_07}` }}>
         {filteredGroups.length === 0 && searchQuery && (
           <div style={{ textAlign: 'center' as const, padding: '24px 20px' }}>
-            <p style={{ fontSize: '14px', color: INK_FAINT }}>No players matching "{searchQuery}"</p>
+            <p style={{ fontSize: '14px', color: INK }}>No players matching "{searchQuery}"</p>
           </div>
         )}
 
         {hasSplitTees && groupedByHole ? (
           groupedByHole.map(([hole, holeGroups]) => (
             <div key={hole}>
-              <p style={{ fontSize: '9px', fontWeight: 800, color: INK_MUTE, letterSpacing: '0.14em', textTransform: 'uppercase' as const, padding: '10px 20px 4px' }}>
+              <p style={{ fontSize: '9px', fontWeight: 800, color: INK, letterSpacing: '0.14em', textTransform: 'uppercase' as const, padding: '10px 20px 4px' }}>
                 Hole {hole} Start
               </p>
               {holeGroups.map((group, idx) => (
@@ -345,7 +345,7 @@ export function TeeTimesTab({ tournamentId, tournamentName, isCompleted }: TeeTi
 
       {/* Timezone note */}
       <div style={{ textAlign: 'center' as const, padding: '12px 20px 32px' }}>
-        <span style={{ fontSize: '10px', color: INK_FAINT }}>Times shown in your local timezone</span>
+        <span style={{ fontSize: '10px', color: INK }}>Times shown in your local timezone</span>
       </div>
     </motion.div>
   );
