@@ -62,9 +62,9 @@ interface FullLeaderboardProps {
 }
 
 function ScoreToPar({ score, className, emphasis, size }: { score: number | null; className?: string; emphasis?: boolean; size?: number }) {
-  if (score === null) return <span className={cn(className)} style={{ fontVariantNumeric: 'tabular-nums', color: INK_FAINT }}>—</span>;
+  if (score === null) return <span className={cn(className)} style={{ fontVariantNumeric: 'tabular-nums', color: INK }}>—</span>;
   const formatted = score === 0 ? 'E' : score > 0 ? `+${score}` : String(score);
-  const color = score < 0 ? SCORE_UNDER_PAR_LIGHT : score > 0 ? SCORE_OVER_PAR_LIGHT : INK_FAINT;
+  const color = score < 0 ? SCORE_UNDER_PAR_LIGHT : score > 0 ? SCORE_OVER_PAR_LIGHT : INK;
   return (
     <span className={cn(className)} style={{
       fontVariantNumeric: 'tabular-nums',
@@ -151,7 +151,7 @@ export function FullLeaderboard({
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.3 }}>
       {/* Search input */}
       <div style={{ padding: '14px 20px 8px', position: 'relative' }}>
-        <Search className="absolute left-[32px] top-1/2 -translate-y-1/2 w-[16px] h-[16px] z-10" style={{ color: INK_FAINT }} strokeWidth={2.5} />
+        <Search className="absolute left-[32px] top-1/2 -translate-y-1/2 w-[16px] h-[16px] z-10" style={{ color: INK }} strokeWidth={2.5} />
         <input
           type="text"
           placeholder="Search players..."
@@ -176,8 +176,8 @@ export function FullLeaderboard({
 
       {/* Column headers */}
       <div style={{ display: 'flex', alignItems: 'center', gap: '3px', padding: '5px 16px', background: INK_TINT_02, borderTop: `0.5px solid ${INK_TINT_07}`, borderBottom: `0.5px solid ${INK_TINT_07}` }}>
-        <span style={{ width: '24px', fontSize: '9px', fontWeight: 800, color: INK_MUTE, letterSpacing: '0.14em', flexShrink: 0 }}>POS</span>
-        <span style={{ flex: 1, fontSize: '9px', fontWeight: 800, color: INK_MUTE, letterSpacing: '0.14em' }}>PLAYER</span>
+        <span style={{ width: '24px', fontSize: '9px', fontWeight: 800, color: INK, letterSpacing: '0.14em', flexShrink: 0 }}>POS</span>
+        <span style={{ flex: 1, fontSize: '9px', fontWeight: 800, color: INK, letterSpacing: '0.14em' }}>PLAYER</span>
         {[1, 2, 3, 4].map((r) => {
           const active = sortRound === r;
           return (
@@ -188,7 +188,7 @@ export function FullLeaderboard({
               aria-label={`Sort by round ${r}`}
               style={{
                 width: '19px', textAlign: 'center', fontSize: '9px', fontWeight: 800,
-                color: active ? AMBER : INK_MUTE, letterSpacing: '0.14em', flexShrink: 0,
+                color: active ? AMBER : INK, letterSpacing: '0.14em', flexShrink: 0,
                 background: 'none', border: 'none', padding: 0, cursor: 'pointer',
                 fontVariantNumeric: 'tabular-nums',
               }}
@@ -203,13 +203,13 @@ export function FullLeaderboard({
           aria-label="Sort by total"
           style={{
             width: '34px', textAlign: 'center', fontSize: '9px', fontWeight: 800,
-            color: sortRound == null ? AMBER : INK_MUTE, letterSpacing: '0.14em', flexShrink: 0,
+            color: sortRound == null ? AMBER : INK, letterSpacing: '0.14em', flexShrink: 0,
             background: 'none', border: 'none', padding: 0, cursor: 'pointer',
           }}
         >
           TOT{sortRound == null ? '▾' : ''}
         </button>
-        <span style={{ width: '48px', textAlign: 'center' as const, fontSize: '9px', fontWeight: 800, color: INK_MUTE, letterSpacing: '0.14em', flexShrink: 0 }}>THRU</span>
+        <span style={{ width: '48px', textAlign: 'center' as const, fontSize: '9px', fontWeight: 800, color: INK, letterSpacing: '0.14em', flexShrink: 0 }}>THRU</span>
       </div>
 
       {/* Player rows */}
@@ -238,7 +238,7 @@ export function FullLeaderboard({
                 className="active:bg-black/[0.02] transition-colors"
               >
                 {/* Position */}
-                <span style={{ width: '24px', fontSize: '11px', fontWeight: 800, color: entry.position === 1 ? AMBER : INK_FAINT, flexShrink: 0, fontVariantNumeric: 'tabular-nums' }}>
+                <span style={{ width: '24px', fontSize: '11px', fontWeight: 800, color: entry.position === 1 ? AMBER : INK, flexShrink: 0, fontVariantNumeric: 'tabular-nums' }}>
                   {isMissedCut ? 'MC' : isWD ? 'WD' : entry.position_tied ? `T${entry.position}` : String(entry.position)}
                 </span>
 
@@ -255,7 +255,7 @@ export function FullLeaderboard({
                 {roundScores.map((score, ri) => {
                   const isActive = sortRound === ri + 1;
                   return (
-                    <span key={ri} style={{ width: '19px', textAlign: 'center' as const, fontSize: '11px', fontWeight: isActive && score != null ? 600 : 500, color: score != null ? (isActive ? INK : INK_FAINT) : INK_LIGHT, flexShrink: 0, fontVariantNumeric: 'tabular-nums' }}>
+                    <span key={ri} style={{ width: '19px', textAlign: 'center' as const, fontSize: '11px', fontWeight: isActive && score != null ? 600 : 500, color: INK, flexShrink: 0, fontVariantNumeric: 'tabular-nums' }}>
                       {score != null ? score : '—'}
                     </span>
                   );
@@ -267,18 +267,18 @@ export function FullLeaderboard({
 
                 <div style={{ width: '48px', textAlign: 'center' as const, flexShrink: 0 }}>
                   {(() => {
-                    const finishedPill = <span style={{ fontSize: '9.5px', fontWeight: 700, color: INK_MUTE, background: INK_TINT_05, padding: '2px 5px', borderRadius: 5 }}>F</span>;
+                    const finishedPill = <span style={{ fontSize: '9.5px', fontWeight: 700, color: INK, background: INK_TINT_05, padding: '2px 5px', borderRadius: 5 }}>F</span>;
                     if (isLive) {
                       const display = formatThruDisplay(entry.thru, entry.round_1, entry.round_2, entry.round_3, entry.round_4, entry.status, entry.thru_updated_at, tournamentTimezone);
-                      if (!display) return <span style={{ fontSize: '9.5px', color: INK_FAINT }}>—</span>;
-                      if (['MC', 'WD', 'DQ', 'MDF', 'DNS'].includes(display)) return <span style={{ fontSize: '9.5px', color: INK_FAINT, fontWeight: 600 }}>{display}</span>;
+                      if (!display) return <span style={{ fontSize: '9.5px', color: INK }}>—</span>;
+                      if (['MC', 'WD', 'DQ', 'MDF', 'DNS'].includes(display)) return <span style={{ fontSize: '9.5px', color: INK, fontWeight: 600 }}>{display}</span>;
                       if (display === 'F') return finishedPill;
-                      return <span style={{ fontSize: '9.5px', color: INK_FAINT, fontVariantNumeric: 'tabular-nums', whiteSpace: 'nowrap' }}>Thru {display}</span>;
+                      return <span style={{ fontSize: '9.5px', color: INK, fontVariantNumeric: 'tabular-nums', whiteSpace: 'nowrap' }}>Thru {display}</span>;
                     }
-                    if (isMissedCut) return <span style={{ fontSize: '9.5px', color: INK_FAINT, fontWeight: 600 }}>MC</span>;
-                    if (isWD) return <span style={{ fontSize: '9.5px', color: INK_FAINT, fontWeight: 600 }}>WD</span>;
+                    if (isMissedCut) return <span style={{ fontSize: '9.5px', color: INK, fontWeight: 600 }}>MC</span>;
+                    if (isWD) return <span style={{ fontSize: '9.5px', color: INK, fontWeight: 600 }}>WD</span>;
                     if (entry.strokes) return finishedPill;
-                    return <span style={{ fontSize: '9.5px', color: INK_FAINT }}>—</span>;
+                    return <span style={{ fontSize: '9.5px', color: INK }}>—</span>;
                   })()}
                 </div>
               </Link>
@@ -286,7 +286,7 @@ export function FullLeaderboard({
               {showCutLine && (
                 <div style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '6px 20px', background: INK_TINT_02, borderBottom: `0.5px solid ${INK_TINT_07}` }}>
                   <div style={{ flex: 1, height: '0.5px', background: HAIRLINE_INK_12 }} />
-                  <span style={{ fontSize: '9px', fontWeight: 800, color: INK_MUTE, letterSpacing: '0.14em' }}>MISSED CUT</span>
+                  <span style={{ fontSize: '9px', fontWeight: 800, color: INK, letterSpacing: '0.14em' }}>MISSED CUT</span>
                   <div style={{ flex: 1, height: '0.5px', background: HAIRLINE_INK_12 }} />
                 </div>
               )}
@@ -297,7 +297,7 @@ export function FullLeaderboard({
 
       {/* Results count */}
       <div style={{ padding: '10px 20px', textAlign: 'center' as const }}>
-        <span style={{ fontSize: '10px', color: INK_FAINT }}>
+        <span style={{ fontSize: '10px', color: INK }}>
           {sortedEntries.length} player{sortedEntries.length !== 1 ? 's' : ''}
           {searchQuery && ` matching "${searchQuery}"`}
         </span>
