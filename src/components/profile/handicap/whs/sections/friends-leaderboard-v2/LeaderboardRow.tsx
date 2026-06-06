@@ -298,7 +298,7 @@ export const LeaderboardRow: React.FC<Props> = ({ entry, rank, isStaleRow, onCli
           style={{
             fontSize: 15,
             fontWeight: 700,
-            color: isPlusHandicap ? T.amber : T.ink,
+            color: (rank === 1 || isYou) ? T.amber : T.ink,
             fontVariantNumeric: 'tabular-nums',
             letterSpacing: '-0.01em',
           }}
