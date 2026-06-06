@@ -328,7 +328,7 @@ export function TeeTimesTab({ tournamentId, tournamentName, isCompleted }: TeeTi
         {hasSplitTees && groupedByHole ? (
           groupedByHole.map(([hole, holeGroups]) => (
             <div key={hole}>
-              <p style={{ fontSize: '9px', fontWeight: 800, color: INK_MUTE, letterSpacing: '0.14em', textTransform: 'uppercase' as const, padding: '10px 20px 4px' }}>
+              <p style={{ fontSize: '9px', fontWeight: 800, color: INK, letterSpacing: '0.14em', textTransform: 'uppercase' as const, padding: '10px 20px 4px' }}>
                 Hole {hole} Start
               </p>
               {holeGroups.map((group, idx) => (
