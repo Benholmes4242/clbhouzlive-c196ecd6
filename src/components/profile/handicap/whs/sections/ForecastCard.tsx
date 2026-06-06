@@ -485,11 +485,11 @@ const NormalCard: React.FC<{ f: Forecast; tone: 'good' | 'amber' | 'neutral'; ct
 
   if (isImproving) {
     headlineNumber = (f.projected ?? 0).toFixed(1);
-    headlineColor = T.good;
+    headlineColor = T.textHi;
     prose = (
       <>
         Heading{' '}
-        <strong style={{ color: T.good, fontWeight: 700 }}>down to ~{(f.projected ?? 0).toFixed(1)}</strong>{' '}
+        <strong style={{ color: T.goodSoft, fontWeight: 700 }}>↓ down to ~{(f.projected ?? 0).toFixed(1)}</strong>{' '}
         over {ctx.possessiveLower} next <strong style={{ color: T.textHi, fontWeight: 700 }}>{f.roundsOut} rounds</strong>
       </>
     );
