@@ -15,10 +15,6 @@
  */
 
 import { format, isSameMonth } from 'date-fns';
-import { useMemo } from 'react';
-import { PillView, type MastheadPill } from '../leaders/LeadersMasthead';
-import { LivePulse } from '../shared/LivePulse';
-import { computeMarginOfVictory } from '../../utils/computeMarginOfVictory';
 import type { TourTournament } from '../../hooks/useTourHubData';
 import { SHELL_BG, SURFACE, WHITE_ALPHA_06, WHITE_ALPHA_08 } from '../../_shared/tokens';
 
@@ -44,17 +40,6 @@ function expandCountry(code: string | null | undefined): string | null {
 interface TournamentHeroProps {
   tournament: TourTournament;
   imageUrl: string | null;
-  /**
-   * Live leader summary, derived in the page (handles ties + team events).
-   * Pass null for non-live tournaments.
-   */
-  leader?: { name: string; score: string | null } | null;
-  /**
-   * Full leaderboard rows — needed to compute Completed-state pills
-   * (margin of victory, under-par count). Pass null/undefined for
-   * upcoming/live tournaments.
-   */
-  leaderboard?: Array<{ position?: number | null; score?: number | null; status?: string | null }> | null;
 }
 
 function formatDateRange(startDate: string, endDate: string): string {
@@ -66,93 +51,7 @@ function formatDateRange(startDate: string, endDate: string): string {
   return `${format(start, 'MMM d')} – ${format(end, 'MMM d, yyyy')}`;
 }
 
-/**
- * Days until tournament start, rounded up. Returns null for past dates.
- */
-function computeDaysUntil(startDate: string | null | undefined): number | null {
-  if (!startDate) return null;
-  const start = new Date(startDate);
-  if (Number.isNaN(start.getTime())) return null;
-  const now = new Date();
-  const ms = start.getTime() - now.getTime();
-  if (ms <= 0) return null;
-  return Math.ceil(ms / 86_400_000);
-}
-
-/**
- * Count entries with a sub-par total score. Treats null/undefined statuses
- * as participating; excludes WD/DQ. Used for the Completed-state field stat
- * — see audit D3 (universal across cut/no-cut events).
- */
-function countUnderPar(
-  leaderboard: TournamentHeroProps['leaderboard'] | null | undefined,
-): number {
-  if (!leaderboard || leaderboard.length === 0) return 0;
-  let count = 0;
-  for (const e of leaderboard) {
-    if (e.status === 'WD' || e.status === 'DQ') continue;
-    if (typeof e.score === 'number' && e.score < 0) count += 1;
-  }
-  return count;
-}
-
-function buildPills({
-  status,
-  tournament,
-  leader,
-  leaderboard,
-}: {
-  status: string;
-  tournament: TourTournament;
-  leader: TournamentHeroProps['leader'];
-  leaderboard: TournamentHeroProps['leaderboard'];
-}): MastheadPill[] {
-  const isLive = status === 'inprogress';
-  const isCompleted = status === 'closed';
-
-  if (isLive) {
-    const round = tournament.current_round ?? 1;
-    return [
-      { variant: 'live', value: `Round ${round}`, prefix: <LivePulse /> },
-    ];
-  }
-
-
-  if (isCompleted) {
-    const margin = computeMarginOfVictory(leaderboard ?? []);
-    const underPar = countUnderPar(leaderboard);
-    const pills: MastheadPill[] = [];
-    if (margin != null && margin > 0) {
-      pills.push({
-        variant: 'highlight',
-        value: `Won by ${margin} stroke${margin !== 1 ? 's' : ''}`,
-      });
-    }
-    if (underPar > 0) {
-      pills.push({ variant: 'normal', value: `${underPar} finished under par` });
-    }
-    return pills;
-  }
-
-  // Upcoming (status: 'scheduled' | 'created' | other)
-  const days = computeDaysUntil(tournament.start_date);
-  const pills: MastheadPill[] = [];
-  if (days != null) {
-    pills.push({
-      variant: 'normal',
-      value: `${days} day${days === 1 ? '' : 's'} to start`,
-    });
-  }
-  if (tournament.defending_champion) {
-    pills.push({
-      variant: 'highlight',
-      value: `Defending: ${tournament.defending_champion}`,
-    });
-  }
-  return pills;
-}
-
-export function TournamentHero({ tournament, imageUrl, leader, leaderboard }: TournamentHeroProps) {
+export function TournamentHero({ tournament, imageUrl }: TournamentHeroProps) {
   const formattedPurse = tournament.purse
     ? `$${(tournament.purse / 1_000_000).toFixed(1)}M`
     : null;
@@ -160,11 +59,6 @@ export function TournamentHero({ tournament, imageUrl, leader, leaderboard }: To
   const dateRange = tournament.start_date && tournament.end_date
     ? formatDateRange(tournament.start_date, tournament.end_date)
     : null;
-
-  const pills = useMemo(
-    () => buildPills({ status: tournament.status, tournament, leader, leaderboard }),
-    [tournament, leader, leaderboard],
-  );
 
   return (
     <div style={{ background: SHELL_BG }}>
@@ -214,10 +108,8 @@ export function TournamentHero({ tournament, imageUrl, leader, leaderboard }: To
           }}
         />
 
-        {/* Top — narrative pills (replaces the legacy '⚡ TOUR' eyebrow chip).
-            Rendered in the upper-mid overlay where the gradient is faint enough
-            for the 'normal' variant to read. */}
-        {(pills.length > 0 || dateRange) && (
+        {/* Top — date range only (pills removed) */}
+        {dateRange && (
           <div
             style={{
               position: 'absolute',
@@ -226,31 +118,24 @@ export function TournamentHero({ tournament, imageUrl, leader, leaderboard }: To
               right: 16,
               display: 'flex',
               alignItems: 'center',
-              justifyContent: 'space-between',
+              justifyContent: 'flex-end',
               gap: 12,
             }}
           >
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, minWidth: 0 }}>
-              {pills.map((p, i) => (
-                <PillView key={`${p.variant}-${p.value}-${i}`} pill={p} />
-              ))}
-            </div>
-            {dateRange && (
-              <span
-                style={{
-                  fontSize: 10,
-                  fontWeight: 700,
-                  letterSpacing: '0.16em',
-                  color: 'rgba(255,255,255,0.75)',
-                  textShadow: '0 1px 3px rgba(0,0,0,0.45)',
-                  textTransform: 'uppercase',
-                  whiteSpace: 'nowrap',
-                  fontVariantNumeric: 'tabular-nums',
-                }}
-              >
-                {dateRange}
-              </span>
-            )}
+            <span
+              style={{
+                fontSize: 10,
+                fontWeight: 700,
+                letterSpacing: '0.16em',
+                color: 'rgba(255,255,255,0.75)',
+                textShadow: '0 1px 3px rgba(0,0,0,0.45)',
+                textTransform: 'uppercase',
+                whiteSpace: 'nowrap',
+                fontVariantNumeric: 'tabular-nums',
+              }}
+            >
+              {dateRange}
+            </span>
           </div>
         )}
 
