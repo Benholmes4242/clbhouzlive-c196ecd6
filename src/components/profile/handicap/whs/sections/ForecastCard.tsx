@@ -457,6 +457,22 @@ const ActionFooter: React.FC<{
   </div>
 );
 
+// ── Calm action line (no pill, no red border) ──────────────────────
+
+const CalmActionLine: React.FC<{ prose: React.ReactNode }> = ({ prose }) => (
+  <div
+    style={{
+      padding: '12px 18px 14px',
+      borderTop: `1px solid ${T.divider}`,
+      fontSize: 12.5,
+      lineHeight: 1.4,
+      color: T.textMid,
+    }}
+  >
+    {prose}
+  </div>
+);
+
 // ── State: Normal (worsening / improving / steady) ──────────────────
 
 const NormalCard: React.FC<{ f: Forecast; tone: 'good' | 'amber' | 'neutral'; ctx: CopyCtx }> = ({ f, tone, ctx }) => {
