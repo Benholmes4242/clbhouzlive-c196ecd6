@@ -164,6 +164,8 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
         }
       } else if (isWatchSubpageRoute) {
         navigate(-1);
+      } else if (isTourDeepRoute) {
+        navigate(-1);
       }
     } else {
       navigate('/clubhouse');
