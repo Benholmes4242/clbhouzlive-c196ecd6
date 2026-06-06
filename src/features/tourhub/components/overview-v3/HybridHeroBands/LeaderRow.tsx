@@ -153,7 +153,7 @@ export function StackedAvatars({
   const visible = players.slice(0, maxVisible);
   const total = players.length;
   const ring = variant === 'leader'
-    ? '0 0 0 2px rgba(251,188,46,0.55)'
+    ? '0 0 0 2px #F8FAFC'
     : '0 0 0 1.5px #F8FAFC';
   return (
     <div style={{ display: 'flex', alignItems: 'center' }}>
