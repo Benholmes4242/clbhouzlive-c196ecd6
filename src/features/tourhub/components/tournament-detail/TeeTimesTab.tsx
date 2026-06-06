@@ -278,10 +278,10 @@ export function TeeTimesTab({ tournamentId, tournamentName, isCompleted }: TeeTi
       {/* Section eyebrow */}
       <div style={{ padding: '0 20px 0' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
-          <span style={{ fontSize: '9px', fontWeight: 800, color: INK_MUTE, letterSpacing: '0.16em', textTransform: 'uppercase' as const, flex: 1 }}>
+          <span style={{ fontSize: '9px', fontWeight: 800, color: INK, letterSpacing: '0.16em', textTransform: 'uppercase' as const, flex: 1 }}>
             Tee Times · {teeTimeDate ?? `Round ${roundNumber}`}
           </span>
-          <span style={{ fontSize: '10px', color: INK_FAINT }}>{groups.length} groups</span>
+          <span style={{ fontSize: '10px', color: INK }}>{groups.length} groups</span>
         </div>
       </div>
 
