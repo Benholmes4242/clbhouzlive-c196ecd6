@@ -259,6 +259,9 @@ export function PlayerHero({ player, playerStats }: PlayerHeroProps) {
                   color: INK,
                   letterSpacing: '-0.03em',
                   lineHeight: 1.05,
+                  whiteSpace: 'nowrap',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
                 }}
               >
                 {player.full_name}
