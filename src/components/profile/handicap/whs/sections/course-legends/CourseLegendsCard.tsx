@@ -79,9 +79,9 @@ const HolderCell: React.FC<HolderCellProps> = ({ short, unit, holder, selfLabel 
         alignItems: 'center',
         gap: 9,
         padding: '8px 10px',
-        background: isSelf ? 'rgba(247,147,30,0.08)' : 'transparent',
+        background: isSelf ? 'rgba(255,255,255,0.04)' : 'transparent',
         border: isSelf
-          ? '1px solid rgba(247,147,30,0.22)'
+          ? '1px solid var(--hcp-line)'
           : '1px solid transparent',
         borderRadius: 10,
         minWidth: 0,
