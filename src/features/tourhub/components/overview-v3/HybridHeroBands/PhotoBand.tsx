@@ -5,7 +5,7 @@
  */
 
 import React from 'react';
-import { Star } from 'lucide-react';
+
 import {
   PHOTO_BAND_HEIGHT,
   COURSE_GRADIENT,
@@ -191,7 +191,7 @@ export function PhotoBand({
           gap: 8,
         }}
       >
-        {(lede || isMajor || isSignature) && (
+      {lede && (
           <div
             style={{
               display: 'flex',
@@ -205,15 +205,7 @@ export function PhotoBand({
               textShadow: '0 1px 3px rgba(0,0,0,0.45)',
             }}
           >
-            {lede && <span>{lede}</span>}
-            {isMajor && (
-              <Star size={12} fill={GOLD} color={GOLD} strokeWidth={0} style={{ flexShrink: 0 }} />
-            )}
-            {isSignature && (
-              <span style={{ color: AMBER, fontSize: 9, letterSpacing: '0.18em' }}>
-                SIGNATURE EVENT
-              </span>
-            )}
+            <span>{lede}</span>
           </div>
         )}
 
