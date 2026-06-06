@@ -73,12 +73,11 @@ export const MiniCard: React.FC<Props> = ({ friend, rank: _rank, onClick }) => {
         />
       ) : (
         <>
-          <div style={{ position: 'absolute', inset: 0, background: FALLBACK_GRADIENT }} />
+          <div style={{ position: 'absolute', inset: 0, background: FALLBACK_BG }} />
           <FlagSilhouetteOverlay opacity={0.20} />
         </>
       )}
 
-      <div style={{ position: 'absolute', inset: 0, background: ATMOSPHERIC, pointerEvents: 'none' }} />
       <div style={{ position: 'absolute', inset: 0, background: LEGIBILITY_SCRIM, pointerEvents: 'none' }} />
 
       <CinemaFriendEyebrow activity={eyebrowActivity} />
