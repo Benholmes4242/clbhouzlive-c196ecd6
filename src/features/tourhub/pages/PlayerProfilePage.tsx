@@ -11,14 +11,13 @@ import { TourHubShell } from '../components/TourHubShell';
 import { ShellSlot } from '@/components/header/ShellSlot';
 import { Kicker } from '@/components/watch/proshop/Kicker';
 import {
-  PlayerHero,
   PlayerSeasonStats,
   PlayerTournamentHistory,
   PlayerInfoCard,
   FormSection,
 } from '../components/player';
 import { useTourPlayer, useSinglePlayerStatistics } from '../hooks/useTourHubData';
-import { GOLD_TINT_10, INK_TINT_06, SHELL_BG, SLATE_50, SURFACE } from '../_shared/tokens';
+import { INK_TINT_06, SHELL_BG, SURFACE } from '../_shared/tokens';
 
 const sectionVariants = {
   hidden: { opacity: 0, y: 24 },
@@ -71,9 +70,6 @@ export function PlayerProfilePage() {
           </div>
         </ShellSlot>
         <div style={{ paddingTop: 'var(--chrome-total-h, 0px)' }}>
-          <div style={{ background: SLATE_50, padding: '16px' }}>
-            <Skeleton className="h-24 w-full rounded-xl" style={{ background: GOLD_TINT_10 }} />
-          </div>
           <div style={{ padding: '16px', marginTop: 8 }}>
             <Skeleton className="h-48 rounded-lg" style={{ background: INK_TINT_06 }} />
             <Skeleton className="h-64 rounded-lg mt-4" style={{ background: INK_TINT_06 }} />
@@ -120,10 +116,7 @@ export function PlayerProfilePage() {
         </div>
       </ShellSlot>
 
-      <div style={{ paddingTop: 'var(--chrome-total-h, 0px)', background: SLATE_50 }}>
-        {/* Hero */}
-        <PlayerHero player={player} playerStats={playerStats ?? null} />
-
+      <div style={{ paddingTop: 'var(--chrome-total-h, 0px)' }}>
         {/* Form section */}
         {playerId && <FormSection playerId={playerId} />}
 
