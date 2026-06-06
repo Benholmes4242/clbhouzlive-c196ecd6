@@ -109,17 +109,8 @@ export function PlayerProfilePage() {
     );
   }
 
-  const tourBadge = getTourBadgeText(player.tour_codes?.[0]);
-
   return (
     <TourHubShell>
-      <ShellSlot dark>
-        <div style={SHELL_SLOT_BG}>
-          <Kicker color="light">{tourBadge}</Kicker>
-          <h1 style={SHELL_H1_STYLE}>{player.full_name}</h1>
-        </div>
-      </ShellSlot>
-
       <div style={{ paddingTop: 'var(--chrome-total-h, 0px)', background: SLATE_50 }}>
         {/* Hero */}
         <PlayerHero player={player} playerStats={playerStats ?? null} />
