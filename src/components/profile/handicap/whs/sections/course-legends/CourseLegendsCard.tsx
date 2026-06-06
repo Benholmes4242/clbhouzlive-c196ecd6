@@ -263,7 +263,7 @@ export const CourseLegendsCard: React.FC<Props> = ({
           width: '100%',
           background: courseHeaderImage
             ? undefined
-            : 'linear-gradient(180deg, rgba(247,147,30,0.18) 0%, var(--hcp-bg-2) 100%)',
+            : 'var(--hcp-bg-1)',
           overflow: 'hidden',
         }}
       >
