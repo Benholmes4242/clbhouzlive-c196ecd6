@@ -1,11 +1,9 @@
 import React, { useMemo } from 'react';
-import { Crown } from 'lucide-react';
 import { useAllScores } from '@/lib/whs/hooks';
 import { fmtDiff } from '@/lib/whs/format';
 import { isReasonableGross, isReasonableDiff } from '@/lib/whs/handicapMath';
 import { SectionHeader } from '../_shared/atoms';
 import type { WhsScore } from '@/lib/whs/types';
-const GOLD = '#F7931E';
 
 interface Props {
   connectionId: string;
@@ -20,7 +18,6 @@ const D_LINE = 'var(--hcp-line)';
 const D_T100 = 'var(--hcp-t-100)';
 const D_T60 = 'var(--hcp-t-60)';
 const D_BG3 = 'var(--hcp-bg-3)';
-const AMBER = '#F59E0B';
 
 interface Tile {
   eyebrow: string;
