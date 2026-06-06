@@ -303,8 +303,6 @@ export function TournamentDetailPage() {
         <TournamentHero
           tournament={tournament}
           imageUrl={heroImageUrl}
-          leader={leader}
-          leaderboard={leaderboard ?? null}
         />
 
         <div style={{ paddingBottom: 'calc(var(--sab, env(safe-area-inset-bottom, 0px)) + 80px)' }}>
