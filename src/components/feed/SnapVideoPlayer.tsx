@@ -36,6 +36,7 @@ interface SnapVideoPlayerProps {
   isSuggestedFeed: boolean;
   onDoubleTapLike?: () => void;
   onFirstFrameReady?: () => void;
+  isFullscreen?: boolean;
 }
 
 export const SnapVideoPlayer = memo(function SnapVideoPlayer({
@@ -51,6 +52,7 @@ export const SnapVideoPlayer = memo(function SnapVideoPlayer({
   isSuggestedFeed,
   onDoubleTapLike,
   onFirstFrameReady,
+  isFullscreen = false,
 }: SnapVideoPlayerProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const hlsRef = useRef<HlsType | null>(null);
