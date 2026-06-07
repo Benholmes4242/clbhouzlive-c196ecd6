@@ -138,18 +138,32 @@ export function EchoResponseCard({
       {/* Waveform avatar — only on first assistant message in a group */}
       {showAvatar ? (
         <div
-          className="flex-shrink-0 mt-1 flex items-center justify-center"
-          style={{
-            width: 28,
-            height: 28,
-            borderRadius: 9,
-            background: 'linear-gradient(135deg, #F7931E, #e07d0a)',
-          }}
+          className="flex-shrink-0 mt-1 flex items-center justify-center relative"
+          style={{ width: 36, height: 36 }}
         >
-          <AnimatedEchoWave size={14} active={true} />
+          {/* Glow halo */}
+          <div
+            className="absolute inset-0"
+            style={{ background: 'radial-gradient(circle, rgba(247,147,30,0.18) 0%, transparent 70%)' }}
+            aria-hidden="true"
+          />
+          {/* Avatar square */}
+          <div
+            className="flex items-center justify-center"
+            style={{
+              width: 28,
+              height: 28,
+              borderRadius: 10,
+              background: 'linear-gradient(135deg, #F7931E, #e07d0a)',
+              position: 'relative',
+              zIndex: 1,
+            }}
+          >
+            <AnimatedEchoWave size={14} active={true} />
+          </div>
         </div>
       ) : (
-        <div className="flex-shrink-0" style={{ width: 28, height: 28 }} aria-hidden="true" />
+        <div className="flex-shrink-0" style={{ width: 36, height: 36 }} aria-hidden="true" />
       )}
 
       <div className="max-w-[88%]">
@@ -159,7 +173,7 @@ export function EchoResponseCard({
           style={{
             background: '#ffffff',
             border: '1px solid rgba(15,23,42,0.07)',
-            boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
+            boxShadow: '0 2px 8px rgba(15,23,42,0.04)',
             borderRadius: bubbleRadius,
           }}
         >
@@ -244,62 +258,41 @@ export function EchoResponseCard({
           )}
         </div>
 
-        {/* Action row */}
+        {/* Action row — icon-only Apple-style */}
         {!isStreaming && (
-          <div className="flex items-center gap-1.5 mt-2">
+          <div className="flex items-center gap-1 mt-2">
             {/* Copy */}
             <button
               onClick={handleCopy}
-              className="inline-flex items-center gap-1 px-2 py-1.5 rounded-lg text-[12px] font-medium transition-all active:scale-[0.97]"
+              className="inline-flex items-center justify-center w-7 h-7 rounded-lg transition-colors active:scale-[0.95] hover:bg-[rgba(15,23,42,0.04)]"
               style={{
-                background: copied ? 'rgba(247,147,30,0.10)' : 'rgba(15,23,42,0.04)',
-                border: copied ? '0.5px solid rgba(247,147,30,0.30)' : '0.5px solid rgba(15,23,42,0.07)',
                 color: copied ? '#F7931E' : '#94A3B8',
+                background: copied ? 'rgba(247,147,30,0.08)' : 'transparent',
               }}
-              aria-label="Copy response to clipboard"
+              aria-label={copied ? 'Response copied' : 'Copy response to clipboard'}
             >
-              {copied ? (
-                <>
-                  <Check className="w-3.5 h-3.5" style={{ color: '#F7931E' }} />
-                  <span>Copied</span>
-                </>
-              ) : (
-                <>
-                  <Copy className="w-3.5 h-3.5" />
-                  <span>Copy</span>
-                </>
-              )}
+              {copied ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
             </button>
 
             {/* Share */}
             <button
               onClick={handleShare}
-              className="inline-flex items-center gap-1 px-2 py-1.5 rounded-lg text-[12px] font-medium transition-all active:scale-[0.97]"
-              style={{
-                background: 'rgba(15,23,42,0.04)',
-                border: '0.5px solid rgba(15,23,42,0.07)',
-                color: '#94A3B8',
-              }}
+              className="inline-flex items-center justify-center w-7 h-7 rounded-lg transition-colors active:scale-[0.95] hover:bg-[rgba(15,23,42,0.04)]"
+              style={{ color: '#94A3B8' }}
               aria-label="Share response"
             >
               <Share2 className="w-3.5 h-3.5" />
-              <span>Share</span>
             </button>
 
             {/* Regenerate (only on last assistant message) */}
             {isLast && onRegenerate && (
               <button
                 onClick={handleRegenerate}
-                className="inline-flex items-center gap-1 px-2 py-1.5 rounded-lg text-[12px] font-medium transition-all active:scale-[0.97]"
-                style={{
-                  background: 'rgba(15,23,42,0.04)',
-                  border: '0.5px solid rgba(15,23,42,0.07)',
-                  color: '#94A3B8',
-                }}
+                className="inline-flex items-center justify-center w-7 h-7 rounded-lg transition-colors active:scale-[0.95] hover:bg-[rgba(15,23,42,0.04)]"
+                style={{ color: '#94A3B8' }}
                 aria-label="Regenerate response"
               >
                 <RotateCcw className="w-3.5 h-3.5" />
-                <span>Regenerate</span>
               </button>
             )}
 
@@ -308,11 +301,10 @@ export function EchoResponseCard({
             {/* Thumbs up */}
             <button
               onClick={() => handleThumb('up')}
-              className="inline-flex items-center justify-center w-7 h-7 rounded-lg transition-all active:scale-[0.97]"
+              className="inline-flex items-center justify-center w-7 h-7 rounded-lg transition-colors active:scale-[0.95]"
               style={{
-                background: thumbState === 'up' ? 'rgba(16,185,129,0.10)' : 'rgba(15,23,42,0.04)',
-                border: thumbState === 'up' ? '0.5px solid rgba(16,185,129,0.30)' : '0.5px solid rgba(15,23,42,0.07)',
                 color: thumbState === 'up' ? '#10B981' : '#94A3B8',
+                background: thumbState === 'up' ? 'rgba(16,185,129,0.08)' : 'transparent',
               }}
               aria-label="Mark response as helpful"
               aria-pressed={thumbState === 'up'}
@@ -323,11 +315,10 @@ export function EchoResponseCard({
             {/* Thumbs down */}
             <button
               onClick={() => handleThumb('down')}
-              className="inline-flex items-center justify-center w-7 h-7 rounded-lg transition-all active:scale-[0.97]"
+              className="inline-flex items-center justify-center w-7 h-7 rounded-lg transition-colors active:scale-[0.95]"
               style={{
-                background: thumbState === 'down' ? 'rgba(239,68,68,0.08)' : 'rgba(15,23,42,0.04)',
-                border: thumbState === 'down' ? '0.5px solid rgba(239,68,68,0.25)' : '0.5px solid rgba(15,23,42,0.07)',
                 color: thumbState === 'down' ? '#DC2626' : '#94A3B8',
+                background: thumbState === 'down' ? 'rgba(239,68,68,0.08)' : 'transparent',
               }}
               aria-label="Mark response as unhelpful"
               aria-pressed={thumbState === 'down'}
@@ -349,7 +340,7 @@ export function EchoResponseCard({
                 onClick={() => handleFollowUp(chip)}
                 className="flex-shrink-0 inline-flex items-center gap-1 px-3 py-2 rounded-full text-[12px] font-medium active:scale-[0.97] transition-all whitespace-nowrap"
                 style={{
-                  background: '#ffffff',
+                  background: 'rgba(247,147,30,0.06)',
                   border: '1px solid rgba(247,147,30,0.20)',
                   color: '#F7931E',
                 }}
