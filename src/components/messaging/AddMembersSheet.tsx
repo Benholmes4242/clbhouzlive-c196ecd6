@@ -164,9 +164,14 @@ export const AddMembersSheet: React.FC<AddMembersSheetProps> = ({
                   key={user.id}
                   onClick={() => toggleUser(user)}
                   className={cn(
-                    "w-full flex items-center gap-3 p-3 rounded-lg transition-colors active:scale-[0.97]",
-                    isSelected ? "bg-[rgba(247,147,30,0.05)]" : "hover:bg-muted"
+                    "w-full flex items-center gap-3 p-3 rounded-lg transition-colors active:scale-[0.98]",
+                    isSelected ? "" : "hover:bg-muted"
                   )}
+                  style={isSelected ? {
+                    background: 'rgba(247,147,30,0.06)',
+                    borderLeft: `3px solid ${AMBER}`,
+                    paddingLeft: 9,
+                  } : undefined}
                 >
                   <SquircleAvatar
                     src={user.profile_photo_url}
