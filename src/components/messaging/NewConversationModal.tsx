@@ -8,7 +8,7 @@ import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { cn } from '@/lib/utils';
 import { Skeleton } from '@/components/ui/skeleton';
-import { useSuggestedUsers, suggestionReasonLabel, type SuggestedUser } from '@/hooks/useSuggestedUsers';
+import { useSuggestedUsers, type SuggestedUser } from '@/hooks/useSuggestedUsers';
 import { SectionEyebrow } from '@/components/ui/SectionEyebrow';
 
 interface UserProfile {
@@ -330,7 +330,7 @@ export function NewConversationModal({
   // Suggested user row (similar to DM row, with reason chip; no username/home-club chips)
   const renderSuggestedRow = (s: SuggestedUser, index: number, total: number) => {
     const isLoading = creatingDmWith === s.id;
-    const reasonLabel = suggestionReasonLabel(s.reason, s.reason_detail);
+    
 
     return (
       <div key={s.id}>
