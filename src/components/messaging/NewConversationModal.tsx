@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { Search, X, Loader2, Users, MessageCircle, Camera, Check, MapPin } from 'lucide-react';
+import { Search, X, Loader2, Users, MessageCircle, Camera, Check, MapPin, ChevronRight } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useMessagingContext } from '@/contexts/MessagingContext';
@@ -300,17 +300,7 @@ export function NewConversationModal({
           {isLoading ? (
             <Loader2 className="h-4 w-4 animate-spin flex-shrink-0" style={{ color: '#F7931E' }} />
           ) : (
-            <span
-              className="flex-shrink-0"
-              style={{
-                padding: '5px 12px', borderRadius: 99,
-                background: 'rgba(247,147,30,0.10)',
-                border: '1px solid rgba(247,147,30,0.25)',
-                fontSize: 12, fontWeight: 600, color: '#F7931E',
-              }}
-            >
-              Message →
-            </span>
+            <ChevronRight className="w-4 h-4 flex-shrink-0" style={{ color: '#CBD5E1' }} />
           )}
         </button>
         {index < total - 1 && (
@@ -369,19 +359,8 @@ export function NewConversationModal({
               </span>
             </div>
             <div className="flex items-center" style={{ gap: 6, marginTop: 2 }}>
-              {reasonLabel && (
-                <span
-                  className="truncate"
-                  style={{
-                    fontSize: 10, fontWeight: 600, color: '#475569',
-                    background: 'rgba(15,23,42,0.05)',
-                    border: '1px solid rgba(15,23,42,0.10)',
-                    borderRadius: 99, padding: '0 6px',
-                    maxWidth: 180,
-                  }}
-                >
-                  {reasonLabel}
-                </span>
+              {s.username && (
+                <span style={{ fontSize: 12, color: '#94a3b8' }}>@{s.username}</span>
               )}
               {s.eg_handicap_index != null && (
                 <span
@@ -400,17 +379,7 @@ export function NewConversationModal({
           {isLoading ? (
             <Loader2 className="h-4 w-4 animate-spin flex-shrink-0" style={{ color: '#F7931E' }} />
           ) : (
-            <span
-              className="flex-shrink-0"
-              style={{
-                padding: '5px 12px', borderRadius: 99,
-                background: 'rgba(247,147,30,0.10)',
-                border: '1px solid rgba(247,147,30,0.25)',
-                fontSize: 12, fontWeight: 600, color: '#F7931E',
-              }}
-            >
-              Message →
-            </span>
+            <ChevronRight className="w-4 h-4 flex-shrink-0" style={{ color: '#CBD5E1' }} />
           )}
         </button>
         {index < total - 1 && (
