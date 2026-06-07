@@ -686,7 +686,9 @@ const AppInner: React.FC = () => {
                                 <TopTenProvider>
                                   <VideoPlaybackProvider>
                                       <ErrorBoundary>
+                                        <MountSignal />
                                         <AuthWrapper>
+
                                           <MessagingProvider>
                                           <UploadResilienceProvider>
                                           <FriendSheetProvider>
