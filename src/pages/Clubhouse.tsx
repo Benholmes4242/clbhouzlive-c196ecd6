@@ -268,27 +268,31 @@ const ClubhouseContent = () => {
   const isOwnPost = user?.id === activePost?.userId;
 
   // ── Review tap handler ──
-  const handleReviewTap = useCallback(() => {
-    if (!activeReview || !activePost) return;
+  const handleReviewTap = useCallback((post: FeedPost) => {
+    const review = post.review;
+    if (!review) return;
+    const isActiveTapped = activePost?.id === post.id;
     openReviewSheet({
       user: {
-        id: activePost.userId ?? '',
-        name: activePost.displayName ?? '',
-        username: activePost.username,
-        avatar: activePost.avatarUrl,
+        id: post.userId ?? '',
+        name: post.displayName ?? '',
+        username: post.username,
+        avatar: post.avatarUrl,
       },
-      courseId: activeReview.courseId ?? '',
-      courseName: activeReview.courseName ?? '',
-      rating: activeReview.rating ?? 0,
-      reviewId: activeReview.reviewId,
-      courseCountry: activeReview.courseCountry,
-      courseRegion: activeReview.courseRegion,
-      courseSubCountry: activeReview.courseSubCountry,
-      reviewText: activeReview.reviewText,
-      breakdown: activeReview.breakdown ?? null,
-      reviewerStats: reviewerStats ?? null,
+      courseId: review.courseId ?? '',
+      courseName: review.courseName ?? '',
+      rating: review.rating ?? 0,
+      reviewId: review.reviewId,
+      courseCountry: review.courseCountry,
+      courseRegion: review.courseRegion,
+      courseSubCountry: review.courseSubCountry,
+      reviewText: review.reviewText,
+      breakdown: review.breakdown ?? null,
+      // Only pass reviewerStats when the tapped post matches the active post
+      // (stats are fetched for the active reviewer only).
+      reviewerStats: isActiveTapped ? (reviewerStats ?? null) : null,
     });
-  }, [activeReview, activePost, openReviewSheet, reviewerStats]);
+  }, [activePost, openReviewSheet, reviewerStats]);
 
   const showRehydrationSkeleton = isRehydrating;
 
@@ -413,7 +417,7 @@ const ClubhouseContent = () => {
             onComment={openComments}
             onShare={(post) => handleShare(post)}
             onProfile={(post) => navigate(getActorRouteByType(post.actorType, post.actorId))}
-            onReviewTap={() => handleReviewTap()}
+            onReviewTap={(post) => handleReviewTap(post)}
             getLikeState={(post) => {
               const s = getActiveLikeState(post);
               if (!s) return null;

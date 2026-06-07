@@ -1,9 +1,9 @@
 /**
- * ReviewBottomSheet — Editorial Frost Panel sheet (PR 7 v2).
+ * ReviewBottomSheet — Calm dark sheet.
  *
- * Three-zone layout (PR 6) with editorial design (PR 7 v2):
- *   - Pinned header: drag handle + prestige rule + Playfair headline + location + 50px score | 2×2 FULL-label grid
- *   - Scrollable middle: atmospheric "X.X" watermark + body paragraphs with Playfair amber drop cap
+ * Three-zone layout:
+ *   - Pinned header: drag handle + REVIEW eyebrow + Geist headline + location + 50px score | 2×2 labelled breakdown
+ *   - Scrollable middle: plain Geist paragraphs (no drop cap, no watermark)
  *   - Pinned footer: author card + Visit Profile + Full Review CTAs
  *
  * Driven by the unified store via ReviewBottomSheetPortal.
@@ -18,7 +18,6 @@ import { toast } from 'sonner';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import {
   FROST,
-  FROST_BLUR,
   FROST_SCORE_GRADIENT,
   formatFrostRating,
   splitCourseName,
@@ -285,47 +284,16 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
               flexDirection: 'column',
               overflow: 'hidden',
               borderRadius: '28px 28px 0 0',
-              background: FROST.glass,
-              backdropFilter: FROST_BLUR.panel,
-              WebkitBackdropFilter: FROST_BLUR.panel,
-              border: `1px solid ${FROST.border}`,
+              background: '#0F1419',
+              border: '1px solid rgba(255,255,255,0.07)',
               borderBottom: 'none',
               color: FROST.ink,
-              boxShadow: `0 -20px 60px rgba(0,0,0,0.5), ${FROST.innerHighlight}`,
+              boxShadow: '0 -20px 60px rgba(0,0,0,0.5)',
               transform: 'translateZ(0)',
-              willChange: 'backdrop-filter',
-              fontFamily: 'Geist, system-ui, sans-serif',
+              fontFamily: FONTS.geist,
             }}
           >
             {/* Sheet title id is set on the h1 inside the header */}
-
-            {/* Glow orbs — atmospheric */}
-            <div
-              aria-hidden
-              style={{
-                position: 'absolute',
-                top: -60,
-                left: '10%',
-                width: 300,
-                height: 200,
-                background: FROST.amberGlow,
-                filter: 'blur(12px)',
-                pointerEvents: 'none',
-              }}
-            />
-            <div
-              aria-hidden
-              style={{
-                position: 'absolute',
-                top: 120,
-                right: '5%',
-                width: 250,
-                height: 250,
-                background: FROST.blueGlow,
-                filter: 'blur(10px)',
-                pointerEvents: 'none',
-              }}
-            />
 
             {/* ─── PINNED HEADER ─────────────────────────────── */}
             <div
@@ -350,14 +318,14 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
                 />
               </div>
 
-              {/* Prestige rule eyebrow — "REVIEW · APR 2026 ────" */}
+              {/* Eyebrow — "REVIEW · APR 2026 ────" */}
               <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginTop: 12 }}>
                 <span
                   style={{
-                    fontFamily: FONTS.serifDisplay,
+                    fontFamily: FONTS.geist,
                     fontSize: 11,
                     fontWeight: 700,
-                    letterSpacing: '2.5px',
+                    letterSpacing: '0.14em',
                     textTransform: 'uppercase',
                     color: FROST.amberSoft,
                     flexShrink: 0,
@@ -371,16 +339,16 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
                   style={{
                     flex: 1,
                     height: 1,
-                    background: `linear-gradient(90deg, ${FROST.amberBorder}, transparent)`,
+                    background: 'rgba(255,255,255,0.07)',
                   }}
                 />
               </div>
 
-              {/* Title — Playfair headline + italic subtitle */}
+              {/* Title — Geist headline */}
               <h1
                 id="review-sheet-title"
                 style={{
-                  fontFamily: FONTS.serifDisplay,
+                  fontFamily: FONTS.geist,
                   fontSize: isCompact ? 24 : 26,
                   fontWeight: 800,
                   letterSpacing: '-0.6px',
@@ -398,7 +366,6 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
                       style={{
                         color: FROST.inkMute,
                         fontWeight: 500,
-                        fontStyle: 'italic',
                       }}
                     >
                       {' — '}{derivedSubtitle}
@@ -530,7 +497,7 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
               </div>
             </div>
 
-            {/* ─── SCROLLABLE MIDDLE (review body with drop cap + watermark) ──── */}
+            {/* ─── SCROLLABLE MIDDLE (review body) ──── */}
             <div
               style={{
                 flex: '1 1 auto',
@@ -544,36 +511,11 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
                 zIndex: 1,
               }}
             >
-              {/* Atmospheric watermark — Playfair score behind body */}
-              <div
-                aria-hidden
-                style={{
-                  position: 'absolute',
-                  right: -20,
-                  bottom: -40,
-                  fontFamily: FONTS.serifDisplay,
-                  fontSize: 300,
-                  fontWeight: 900,
-                  lineHeight: 0.85,
-                  color: 'rgba(255,255,255,0.035)',
-                  pointerEvents: 'none',
-                  letterSpacing: '-10px',
-                  userSelect: 'none',
-                  zIndex: 0,
-                  fontVariantNumeric: 'lining-nums tabular-nums',
-                }}
-              >
-                {formattedRating}
-              </div>
-
               {paragraphs.length === 0 && (
                 <div
                   style={{
-                    position: 'relative',
-                    zIndex: 1,
-                    fontFamily: FONTS.serifSystem,
+                    fontFamily: FONTS.geist,
                     fontSize: 14,
-                    fontStyle: 'italic',
                     color: FROST.inkFaint,
                     padding: '12px 0',
                   }}
@@ -581,48 +523,22 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
                   No written review — the score speaks for itself.
                 </div>
               )}
-              {paragraphs.map((para, i) => {
-                const isFirst = i === 0;
-                const firstChar = para.charAt(0);
-                const eligibleForDropCap = isFirst && /^[A-Za-z]$/.test(firstChar);
-                return (
-                  <p
-                    key={i}
-                    style={{
-                      position: 'relative',
-                      zIndex: 1,
-                      fontSize: 15,
-                      lineHeight: 1.6,
-                      color: FROST.inkSoft,
-                      letterSpacing: '-0.1px',
-                      margin: 0,
-                      marginBottom: i === paragraphs.length - 1 ? 0 : 14,
-                    }}
-                  >
-                    {eligibleForDropCap ? (
-                      <>
-                        <span
-                          style={{
-                            float: 'left',
-                            fontFamily: FONTS.serifDisplay,
-                            fontSize: 54,
-                            fontWeight: 800,
-                            lineHeight: 0.9,
-                            paddingTop: 4,
-                            paddingRight: 10,
-                            color: FROST.amber,
-                          }}
-                        >
-                          {firstChar}
-                        </span>
-                        {para.slice(1)}
-                      </>
-                    ) : (
-                      para
-                    )}
-                  </p>
-                );
-              })}
+              {paragraphs.map((para, i) => (
+                <p
+                  key={i}
+                  style={{
+                    fontFamily: FONTS.geist,
+                    fontSize: 15,
+                    lineHeight: 1.6,
+                    color: FROST.inkSoft,
+                    letterSpacing: '-0.1px',
+                    margin: 0,
+                    marginBottom: i === paragraphs.length - 1 ? 0 : 14,
+                  }}
+                >
+                  {para}
+                </p>
+              ))}
             </div>
 
             {/* ─── PINNED FOOTER ─────────────────────────────── */}
@@ -630,8 +546,8 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
               style={{
                 flex: '0 0 auto',
                 padding: '14px 22px 20px',
-                background: FROST.glass,
-                borderTop: `1px solid ${FROST.borderSoft}`,
+                background: '#0F1419',
+                borderTop: '1px solid rgba(255,255,255,0.07)',
                 position: 'relative',
                 zIndex: 1,
               }}
@@ -641,8 +557,8 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
                 style={{
                   padding: 14,
                   borderRadius: 16,
-                  background: FROST.glassSoft,
-                  border: `1px solid ${FROST.borderSoft}`,
+                  background: 'rgba(255,255,255,0.03)',
+                  border: '1px solid rgba(255,255,255,0.07)',
                   display: 'flex',
                   alignItems: 'center',
                   gap: 12,
@@ -760,13 +676,12 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
                       flex: 1,
                       padding: 14,
                       borderRadius: 14,
-                      background: `linear-gradient(180deg, ${FROST.amber}, ${FROST.amberDeep})`,
+                      background: FROST.amber,
                       border: 'none',
-                      color: FROST.ink,
+                      color: '#0A0E14',
                       fontSize: 14,
                       fontWeight: 700,
                       cursor: 'pointer',
-                      boxShadow: '0 4px 20px rgba(247,147,30,0.4)',
                       fontFamily: 'inherit',
                       display: 'inline-flex',
                       alignItems: 'center',
