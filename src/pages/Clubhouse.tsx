@@ -417,7 +417,7 @@ const ClubhouseContent = () => {
             onComment={openComments}
             onShare={(post) => handleShare(post)}
             onProfile={(post) => navigate(getActorRouteByType(post.actorType, post.actorId))}
-            onReviewTap={() => handleReviewTap()}
+            onReviewTap={(post) => handleReviewTap(post)}
             getLikeState={(post) => {
               const s = getActiveLikeState(post);
               if (!s) return null;
