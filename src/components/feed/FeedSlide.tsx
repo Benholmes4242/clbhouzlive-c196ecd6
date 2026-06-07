@@ -82,6 +82,7 @@ export const FeedSlide = memo(function FeedSlide({
           isActive={isActive}
           onDoubleTapLike={() => onLike?.(post)}
           onZoomChange={onZoomChange}
+          isFullscreen={isFullscreen}
         />
       );
     }
@@ -103,6 +104,7 @@ export const FeedSlide = memo(function FeedSlide({
           isSuggestedFeed={isSuggestedFeed}
           onDoubleTapLike={() => onLike?.(post)}
           onFirstFrameReady={onFirstFrameReady}
+          isFullscreen={isFullscreen}
         />
       );
     }
