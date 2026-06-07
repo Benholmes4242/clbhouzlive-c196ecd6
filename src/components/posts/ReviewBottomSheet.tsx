@@ -319,14 +319,14 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
                 />
               </div>
 
-              {/* Prestige rule eyebrow — "REVIEW · APR 2026 ────" */}
+              {/* Eyebrow — "REVIEW · APR 2026 ────" */}
               <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginTop: 12 }}>
                 <span
                   style={{
-                    fontFamily: FONTS.serifDisplay,
+                    fontFamily: FONTS.geist,
                     fontSize: 11,
                     fontWeight: 700,
-                    letterSpacing: '2.5px',
+                    letterSpacing: '0.14em',
                     textTransform: 'uppercase',
                     color: FROST.amberSoft,
                     flexShrink: 0,
@@ -340,16 +340,16 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
                   style={{
                     flex: 1,
                     height: 1,
-                    background: `linear-gradient(90deg, ${FROST.amberBorder}, transparent)`,
+                    background: 'rgba(255,255,255,0.07)',
                   }}
                 />
               </div>
 
-              {/* Title — Playfair headline + italic subtitle */}
+              {/* Title — Geist headline */}
               <h1
                 id="review-sheet-title"
                 style={{
-                  fontFamily: FONTS.serifDisplay,
+                  fontFamily: FONTS.geist,
                   fontSize: isCompact ? 24 : 26,
                   fontWeight: 800,
                   letterSpacing: '-0.6px',
@@ -367,7 +367,6 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
                       style={{
                         color: FROST.inkMute,
                         fontWeight: 500,
-                        fontStyle: 'italic',
                       }}
                     >
                       {' — '}{derivedSubtitle}
