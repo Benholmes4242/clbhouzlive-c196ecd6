@@ -108,13 +108,26 @@ export const EchoPageComposer = forwardRef<HTMLInputElement, EchoPageComposerPro
           </div>
         )}
 
-        {/* Pill container */}
+        {/* Live transcript preview while dictating */}
+        {isListening && transcript && (
+          <div className="mb-1 px-3">
+            <p className="text-[12px] italic truncate" style={{ color: '#64748B' }}>
+              “{transcript}”
+            </p>
+          </div>
+        )}
+
+        {/* Pill container — reactive amber ring when listening */}
         <div
           className="flex items-center gap-2 rounded-full pl-4 pr-2 py-2 transition-shadow duration-150"
           style={{
             background: '#ffffff',
             border: '1px solid rgba(15,23,42,0.10)',
-            boxShadow: isFocused ? '0 0 0 3px rgba(247,147,30,0.12)' : 'none',
+            boxShadow: isListening
+              ? `0 0 0 ${4 + Math.round(micLevel * 12)}px rgba(247,147,30,${(0.12 + micLevel * 0.20).toFixed(3)})`
+              : isFocused
+                ? '0 0 0 3px rgba(247,147,30,0.12)'
+                : 'none',
           }}
         >
           <input
