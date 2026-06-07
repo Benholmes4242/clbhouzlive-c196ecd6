@@ -352,3 +352,25 @@ export function MessageInput({
     </div>
   );
 }
+
+function ActionTile({ icon: Icon, label, onClick }: { icon: React.ComponentType<{ size?: number; style?: React.CSSProperties; strokeWidth?: number }>; label: string; onClick: () => void }) {
+  return (
+    <button
+      onClick={onClick}
+      className="flex flex-col items-center active:scale-[0.95] transition-transform"
+      style={{ gap: 6, background: 'none', border: 'none', cursor: 'pointer' }}
+    >
+      <div
+        className="flex items-center justify-center"
+        style={{
+          width: 52, height: 52, borderRadius: 16,
+          background: 'rgba(247,147,30,0.10)',
+          border: '0.5px solid rgba(247,147,30,0.22)',
+        }}
+      >
+        <Icon size={22} style={{ color: '#F7931E' }} strokeWidth={2.2} />
+      </div>
+      <span style={{ fontSize: 11, fontWeight: 500, color: '#64748b' }}>{label}</span>
+    </button>
+  );
+}
