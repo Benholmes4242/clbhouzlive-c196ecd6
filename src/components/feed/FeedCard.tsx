@@ -96,14 +96,10 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
   const isMulti = items.length > 1;
   const media = items[0];
 
-  const { ratio, isContained } = useMemo(() => {
-    if (!media || !media.width || !media.height) {
-      return { ratio: FALLBACK_RATIO, isContained: false };
-    }
+  const ratio = useMemo(() => {
+    if (!media || !media.width || !media.height) return FALLBACK_RATIO;
     const r = media.width / media.height;
-    if (r < RATIO_MIN) return { ratio: RATIO_MIN, isContained: true };
-    if (r > RATIO_MAX) return { ratio: RATIO_MAX, isContained: true };
-    return { ratio: r, isContained: false };
+    return Math.min(RATIO_MAX, Math.max(RATIO_MIN, r));
   }, [media]);
 
   const reviewRating = post.review?.rating ?? null;
