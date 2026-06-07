@@ -1,10 +1,7 @@
 import React, { useMemo } from 'react';
 
-import {
-  useHandicapTrend,
-  useHandicapHistory,
-  useAllScores,
-} from '@/lib/whs/hooks';
+import { useHandicapTrend, useHandicapHistory } from '@/lib/whs/hooks';
+import { useHandicapTrend12mo } from '@/hooks/useHandicapTrend12mo';
 import type { WhsConnection } from '@/lib/whs/types';
 
 interface Props {
@@ -13,19 +10,78 @@ interface Props {
 
 const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
 
-type Tier = 'div0' | 'div1' | 'div2' | 'div3';
+function formatDelta(v: number | null | undefined): string {
+  if (v === null || v === undefined) return '—';
+  const sign = v < 0 ? '-' : '+';
+  return `${sign}${Math.abs(v).toFixed(1)}`;
+}
 
-const TIER_LABEL: Record<Tier, string> = {
-  div0: 'DIV 0',
-  div1: 'DIV 1',
-  div2: 'DIV 2',
-  div3: 'DIV 3',
-};
+interface TrendRowProps {
+  label: string;
+  delta: number | null;
+  borderTop?: boolean;
+  caption: string;
+}
+
+function TrendRow({ label, delta, borderTop, caption }: TrendRowProps) {
+  const improved = delta != null && delta < -0.05;
+  const drifted = delta != null && delta > 0.05;
+  const color = improved
+    ? 'var(--hcp-good-2)'
+    : drifted
+      ? 'var(--hcp-bad-2)'
+      : 'var(--hcp-t-40)';
+  const arrow = improved ? '↓ ' : drifted ? '↑ ' : '';
+  return (
+    <div
+      style={{
+        padding: '10px 0 10px 16px',
+        borderTop: borderTop ? '1px solid var(--hcp-line-2)' : 'none',
+      }}
+    >
+      <div
+        style={{
+          fontSize: 9,
+          fontWeight: 700,
+          letterSpacing: '0.12em',
+          textTransform: 'uppercase',
+          color: 'var(--hcp-t-40)',
+          marginBottom: 4,
+        }}
+      >
+        {label}
+      </div>
+      <div
+        style={{
+          fontSize: 22,
+          fontWeight: 700,
+          color,
+          fontVariantNumeric: 'tabular-nums',
+          letterSpacing: '-0.01em',
+          lineHeight: 1,
+        }}
+      >
+        {arrow}
+        {formatDelta(delta)}
+      </div>
+      <div
+        style={{
+          fontSize: 10,
+          color: 'var(--hcp-t-40)',
+          fontWeight: 600,
+          marginTop: 4,
+        }}
+      >
+        {caption}
+      </div>
+    </div>
+  );
+}
 
 const HeroHandicapCardDark: React.FC<Props> = ({ connection }) => {
   const { data: trend, isLoading: trendLoading } = useHandicapTrend(connection.id);
   const { data: history90, isLoading: history90Loading } = useHandicapHistory(connection.id, 90);
-  const { data: allScores } = useAllScores(connection.id);
+  const trend12 = useHandicapTrend12mo(connection.id);
 
   const handicap = trend?.current ?? null;
 
@@ -34,207 +90,77 @@ const HeroHandicapCardDark: React.FC<Props> = ({ connection }) => {
     return history90[history90.length - 1].handicap_index - history90[0].handicap_index;
   }, [history90]);
 
-  const startingHcp = useMemo<number | null>(() => {
-    if (!history90 || history90.length < 2) return null;
-    return history90[0].handicap_index;
-  }, [history90]);
-
-  const tier = useMemo<Tier | null>(() => {
-    const baseHcp = startingHcp ?? handicap;
-    if (baseHcp == null) return null;
-    if (baseHcp < 0) return 'div0';
-    if (baseHcp <= 10) return 'div1';
-    if (baseHcp <= 20) return 'div2';
-    return 'div3';
-  }, [startingHcp, handicap]);
-
-  // ── Scoring avg (90d) ────────────────────────────────────────────
-  const scores = (allScores ?? []) as any[];
-  const ninetyDaysAgo = Date.now() - 90 * 86_400_000;
-  const recent90 = useMemo(
-    () =>
-      scores.filter((s) => {
-        if (!s?.play_date) return false;
-        const t = new Date(s.play_date).getTime();
-        return Number.isFinite(t) && t >= ninetyDaysAgo;
-      }),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [scores],
-  );
-
-  const scoringAvg = useMemo<number | null>(() => {
-    const vals = recent90
-      .map((s) => s?.adjusted_gross)
-      .filter((v: any): v is number => typeof v === 'number');
-    if (vals.length < 3) return null;
-    return vals.reduce((a, b) => a + b, 0) / vals.length;
-  }, [recent90]);
-
-  const roundCount = recent90.length;
-
-  // ── Best differential ───────────────────────────────────────────
-  const bestDiff = useMemo<number | null>(() => {
-    const counters = scores.filter((s) => s?.is_counter !== false);
-    const withDiff = counters.filter((s) => typeof s?.handicap_differential === 'number');
-    if (withDiff.length === 0) return null;
-    let best = withDiff[0].handicap_differential as number;
-    for (const r of withDiff) {
-      if ((r.handicap_differential as number) < best) best = r.handicap_differential as number;
-    }
-    return best;
-  }, [scores]);
+  const delta12 = trend12.delta;
 
   const isLoading = trendLoading || history90Loading;
 
-  const trendColor =
-    delta90 == null
-      ? 'var(--hcp-t-60)'
-      : delta90 > 0
-        ? 'var(--hcp-bad-2)'
-        : delta90 < 0
-          ? 'var(--hcp-good-2)'
-          : 'var(--hcp-t-60)';
-  const trendArrow = delta90 == null ? '' : delta90 > 0 ? '↑' : delta90 < 0 ? '↓' : '';
-
   return (
-    <section
-      style={{
-        padding: '16px 16px 22px',
-        fontFamily: FONT,
-      }}
-    >
+    <section style={{ padding: '16px 16px 22px', fontFamily: FONT }}>
       <div
         style={{
           background: 'var(--hcp-bg-1)',
           border: '1px solid var(--hcp-line)',
           borderRadius: 16,
           padding: 18,
+          display: 'grid',
+          gridTemplateColumns: '1fr 1fr',
         }}
       >
-        {/* eyebrow */}
+        {/* Left: CURRENT INDEX */}
         <div
           style={{
-            fontSize: 11,
-            fontWeight: 800,
-            letterSpacing: '0.14em',
-            textTransform: 'uppercase',
-            color: 'var(--hcp-t-40)',
-            marginBottom: 6,
+            borderRight: '1px solid var(--hcp-line-2)',
+            paddingRight: 16,
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'center',
           }}
         >
-          WHS Index · 90 days
-        </div>
-
-        {/* big index + tier, trend right */}
-        <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', gap: 12 }}>
-          <div style={{ display: 'flex', alignItems: 'baseline', gap: 10, minWidth: 0 }}>
-            {isLoading ? (
-              <div
-                style={{
-                  width: 96,
-                  height: 48,
-                  borderRadius: 8,
-                  background: 'rgba(255,255,255,0.05)',
-                }}
-              />
-            ) : (
-              <span
-                style={{
-                  fontSize: 54,
-                  fontWeight: 800,
-                  color: 'var(--hcp-t-100)',
-                  lineHeight: 0.9,
-                  letterSpacing: '-0.03em',
-                  fontVariantNumeric: 'tabular-nums',
-                }}
-              >
-                {handicap != null ? handicap.toFixed(1) : '—'}
-              </span>
-            )}
-            {tier && (
-              <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--hcp-t-60)', letterSpacing: '0.06em' }}>
-                {TIER_LABEL[tier]}
-              </span>
-            )}
+          <div
+            style={{
+              fontSize: 9,
+              fontWeight: 700,
+              letterSpacing: '0.12em',
+              textTransform: 'uppercase',
+              color: 'var(--hcp-t-40)',
+              marginBottom: 8,
+            }}
+          >
+            Current Index
           </div>
-
-          {delta90 != null && !isLoading && (
-            <div style={{ textAlign: 'right' }}>
-              <div
-                style={{
-                  fontSize: 15,
-                  fontWeight: 800,
-                  color: trendColor,
-                  fontVariantNumeric: 'tabular-nums',
-                }}
-              >
-                {trendArrow} {Math.abs(delta90).toFixed(1)}
-              </div>
-              <div style={{ fontSize: 11, color: 'var(--hcp-t-40)', fontWeight: 600 }}>over 90 days</div>
+          {isLoading ? (
+            <div
+              style={{
+                width: 96,
+                height: 48,
+                borderRadius: 8,
+                background: 'rgba(255,255,255,0.05)',
+              }}
+            />
+          ) : (
+            <div
+              style={{
+                fontSize: 56,
+                fontWeight: 200,
+                color: 'var(--hcp-t-100)',
+                lineHeight: 0.9,
+                letterSpacing: '-0.03em',
+                fontVariantNumeric: 'tabular-nums',
+              }}
+            >
+              {handicap != null
+                ? handicap < 0
+                  ? `+${Math.abs(handicap).toFixed(1)}`
+                  : handicap.toFixed(1)
+                : '—'}
             </div>
           )}
         </div>
 
-        {/* labelled columns */}
-        <div
-          style={{
-            display: 'flex',
-            borderTop: '1px solid var(--hcp-line-2)',
-            marginTop: 16,
-            paddingTop: 14,
-          }}
-        >
-          <div style={{ flex: 1 }}>
-            <div
-              style={{
-                fontSize: 11,
-                color: 'var(--hcp-t-40)',
-                fontWeight: 700,
-                letterSpacing: '0.06em',
-                marginBottom: 3,
-                textTransform: 'uppercase',
-              }}
-            >
-              Scoring Avg
-            </div>
-            <div
-              style={{
-                fontSize: 20,
-                fontWeight: 800,
-                color: 'var(--hcp-t-100)',
-                fontVariantNumeric: 'tabular-nums',
-              }}
-            >
-              {scoringAvg != null ? scoringAvg.toFixed(1) : '—'}{' '}
-              <span style={{ fontSize: 11, color: 'var(--hcp-t-40)', fontWeight: 600 }}>
-                · {roundCount} {roundCount === 1 ? 'round' : 'rounds'}
-              </span>
-            </div>
-          </div>
-          <div style={{ flex: 1, borderLeft: '1px solid var(--hcp-line-2)', paddingLeft: 14 }}>
-            <div
-              style={{
-                fontSize: 11,
-                color: 'var(--hcp-t-40)',
-                fontWeight: 700,
-                letterSpacing: '0.06em',
-                marginBottom: 3,
-                textTransform: 'uppercase',
-              }}
-            >
-              Best Diff
-            </div>
-            <div
-              style={{
-                fontSize: 20,
-                fontWeight: 800,
-                color: bestDiff != null && bestDiff < 0 ? 'var(--hcp-good-2)' : 'var(--hcp-t-100)',
-                fontVariantNumeric: 'tabular-nums',
-              }}
-            >
-              {bestDiff != null ? (bestDiff > 0 ? '+' : '') + bestDiff.toFixed(1) : '—'}
-            </div>
-          </div>
+        {/* Right: 90 DAYS / 12 MONTHS stacked */}
+        <div style={{ display: 'flex', flexDirection: 'column' }}>
+          <TrendRow label="90 Days" delta={delta90} caption="over 90 days" />
+          <TrendRow label="12 Months" delta={delta12} borderTop caption="over 12 months" />
         </div>
       </div>
     </section>
