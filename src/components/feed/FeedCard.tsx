@@ -208,7 +208,15 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
       </div>
 
       {/* Media */}
-      {media && (
+      {isMulti ? (
+        <MediaCarousel
+          items={items}
+          isCardActive={isActive}
+          initialIndex={initialMediaIndex}
+          onIndexChange={(idx) => onCarouselIndexChange?.(post, idx)}
+          onOpen={(idx) => onOpenMedia(post, idx)}
+        />
+      ) : media ? (
         <button
           type="button"
           onClick={() => onOpenMedia(post, 0)}
@@ -244,7 +252,13 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
                 }}
               />
             )}
-            {mediaUrl && (
+            {media.type === 'video' ? (
+              <InlineVideo
+                item={media}
+                isActive={isActive}
+                objectFit={isContained ? 'contain' : 'cover'}
+              />
+            ) : mediaUrl ? (
               <img
                 src={mediaUrl}
                 alt={post.caption || post.displayName}
@@ -259,46 +273,10 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
                   display: 'block',
                 }}
               />
-            )}
-            {media.type === 'video' && (
-              <div
-                style={{
-                  position: 'absolute',
-                  inset: 0,
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  pointerEvents: 'none',
-                }}
-              >
-                <div
-                  style={{
-                    width: 56,
-                    height: 56,
-                    borderRadius: 999,
-                    background: 'rgba(5,8,16,0.55)',
-                    border: '1px solid rgba(255,255,255,0.18)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                  }}
-                >
-                  <div
-                    style={{
-                      width: 0,
-                      height: 0,
-                      borderTop: '10px solid transparent',
-                      borderBottom: '10px solid transparent',
-                      borderLeft: '16px solid #fff',
-                      marginLeft: 4,
-                    }}
-                  />
-                </div>
-              </div>
-            )}
+            ) : null}
           </div>
         </button>
-      )}
+      ) : null}
 
       {/* Body — caption */}
       {post.caption && (
