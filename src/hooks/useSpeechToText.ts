@@ -100,10 +100,62 @@ interface UseSpeechToTextReturn {
      }
    }, []);
  
-   const stopListening = useCallback(() => {
-     if (!recognitionRef.current) return;
-     recognitionRef.current.stop();
-   }, []);
- 
-   return { isListening, transcript, startListening, stopListening, isSupported, error };
- }
+  const stopListening = useCallback(() => {
+    if (!recognitionRef.current) return;
+    recognitionRef.current.stop();
+  }, []);
+
+  // Track mic amplitude while listening, smoothed to 0–1
+  useEffect(() => {
+    if (!isListening) {
+      setMicLevel(0);
+      return;
+    }
+
+    let rafId = 0;
+    let audioCtx: AudioContext | null = null;
+    let stream: MediaStream | null = null;
+    let cancelled = false;
+
+    navigator.mediaDevices
+      ?.getUserMedia({ audio: true })
+      .then((s) => {
+        if (cancelled) {
+          s.getTracks().forEach((t) => t.stop());
+          return;
+        }
+        stream = s;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const Ctx: typeof AudioContext = (window as any).AudioContext || (window as any).webkitAudioContext;
+        audioCtx = new Ctx();
+        const source = audioCtx.createMediaStreamSource(s);
+        const analyser = audioCtx.createAnalyser();
+        analyser.fftSize = 256;
+        source.connect(analyser);
+        const data = new Uint8Array(analyser.frequencyBinCount);
+
+        const tick = () => {
+          analyser.getByteFrequencyData(data);
+          let sum = 0;
+          for (let i = 0; i < data.length; i++) sum += data[i];
+          const avg = sum / data.length / 255;
+          setMicLevel((prev) => prev * 0.7 + avg * 0.3);
+          rafId = requestAnimationFrame(tick);
+        };
+        tick();
+      })
+      .catch(() => {
+        // Permission denied or unavailable — silently ignore amplitude tracking
+      });
+
+    return () => {
+      cancelled = true;
+      cancelAnimationFrame(rafId);
+      stream?.getTracks().forEach((t) => t.stop());
+      audioCtx?.close().catch(() => {});
+      setMicLevel(0);
+    };
+  }, [isListening]);
+
+  return { isListening, transcript, startListening, stopListening, isSupported, error, micLevel };
+}
