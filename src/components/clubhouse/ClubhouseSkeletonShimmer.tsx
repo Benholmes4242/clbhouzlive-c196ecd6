@@ -23,6 +23,8 @@ interface ClubhouseSkeletonShimmerProps {
   variant?: 'regular' | 'review';
   /** When true, the rail skeleton renders a mute placeholder at the top. */
   isVideo?: boolean;
+  /** 'card' = inline feed card stack; 'fullscreen' = immersive overlay (default). */
+  surface?: 'card' | 'fullscreen';
 }
 
 const SkeletonBlock: React.FC<{
@@ -240,12 +242,101 @@ const ReviewBottomSkeleton: React.FC<{ isStatic?: boolean }> = ({ isStatic }) =>
   </div>
 );
 
+const CARD_BG = '#0F1419';
+const HAIRLINE = 'rgba(255,255,255,0.07)';
+const CANVAS = '#0A0E14';
+
+const CardSkeleton: React.FC<{
+  isStatic?: boolean;
+  variant?: 'regular' | 'review';
+  mediaRatio?: string;
+}> = ({ isStatic = false, variant = 'regular', mediaRatio = '4/5' }) => (
+  <div style={{ background: CARD_BG, overflow: 'hidden' }}>
+    {/* Header */}
+    <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 12px' }}>
+      <SkeletonBlock
+        isStatic={isStatic}
+        style={{ width: 34, height: 34, borderRadius: '34%', flexShrink: 0 }}
+      />
+      <div style={{ minWidth: 0, flex: 1, display: 'flex', flexDirection: 'column', gap: 5 }}>
+        <SkeletonBlock isStatic={isStatic} className="rounded-sm" style={{ width: 120, height: 13 }} />
+        <SkeletonBlock isStatic={isStatic} className="rounded-sm" style={{ width: 80, height: 10 }} />
+      </div>
+      {/* Optional pill */}
+      {variant === 'review' && (
+        <SkeletonBlock
+          isStatic={isStatic}
+          className="rounded-full"
+          style={{ width: 90, height: 24, flexShrink: 0 }}
+        />
+      )}
+    </div>
+
+    {/* Media */}
+    <div style={{ position: 'relative', width: '100%', aspectRatio: mediaRatio, overflow: 'hidden' }}>
+      <SkeletonBlock isStatic={isStatic} className="w-full h-full rounded-none" />
+    </div>
+
+    {/* Caption */}
+    <div style={{ padding: '10px 14px 4px', display: 'flex', flexDirection: 'column', gap: 6 }}>
+      <SkeletonBlock isStatic={isStatic} className="rounded-sm" style={{ width: '70%', height: 16 }} />
+      <SkeletonBlock isStatic={isStatic} className="rounded-sm" style={{ width: '40%', height: 12 }} />
+    </div>
+
+    {/* Footer */}
+    <div
+      style={{
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        padding: '10px 14px 12px',
+        borderTop: `1px solid ${HAIRLINE}`,
+      }}
+    >
+      <SkeletonBlock isStatic={isStatic} className="rounded-sm" style={{ width: 90, height: 12 }} />
+      <div style={{ display: 'flex', alignItems: 'center', gap: 18 }}>
+        <SkeletonBlock isStatic={isStatic} className="rounded-md" style={{ width: 20, height: 20 }} />
+        <SkeletonBlock isStatic={isStatic} className="rounded-md" style={{ width: 20, height: 20 }} />
+        <SkeletonBlock isStatic={isStatic} className="rounded-md" style={{ width: 20, height: 20 }} />
+      </div>
+    </div>
+  </div>
+);
+
+const CardFeedSkeleton: React.FC<{
+  isStatic?: boolean;
+  variant?: 'regular' | 'review';
+}> = ({ isStatic = false, variant = 'regular' }) => {
+  const topPad = 'calc(max(env(safe-area-inset-top, 0px), 47px) + 72px + 12px)';
+  return (
+    <div
+      style={{
+        background: CANVAS,
+        minHeight: '100dvh',
+        width: '100%',
+        overflowY: 'auto',
+        WebkitOverflowScrolling: 'touch',
+        paddingTop: topPad,
+        paddingBottom: 'calc(var(--bottom-nav-height, 88px) + 12px)',
+      }}
+    >
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+        <CardSkeleton isStatic={isStatic} variant={variant} mediaRatio="4/5" />
+        <CardSkeleton isStatic={isStatic} variant={variant} mediaRatio="3/4" />
+        <CardSkeleton isStatic={isStatic} variant={variant} mediaRatio="4/5" />
+        <CardSkeleton isStatic={isStatic} variant={variant} mediaRatio="1/1" />
+      </div>
+    </div>
+  );
+};
+
 export const ClubhouseSkeletonShimmer: React.FC<ClubhouseSkeletonShimmerProps> = ({
   isVisible,
   isStatic = false,
   className,
   variant = 'regular',
   isVideo = false,
+  surface = 'fullscreen',
 }) => {
   const reduceMotion = prefersReducedMotion();
   const effectiveStatic = isStatic || reduceMotion;
@@ -259,51 +350,55 @@ export const ClubhouseSkeletonShimmer: React.FC<ClubhouseSkeletonShimmerProps> =
           exit={{ opacity: 0 }}
           transition={{ duration: 0.2, ease: 'easeOut' }}
         >
-          <div className="relative w-full h-full">
-            {/* Hero media area */}
-            <MediaAreaSkeleton isStatic={effectiveStatic} />
+          {surface === 'card' ? (
+            <CardFeedSkeleton isStatic={effectiveStatic} variant={variant} />
+          ) : (
+            <div className="relative w-full h-full">
+              {/* Hero media area */}
+              <MediaAreaSkeleton isStatic={effectiveStatic} />
 
-            {/* ─── TOP STRIP — centred cluster: tabs · divider · search · profile ─── */}
-            <div
-              className="absolute left-0 right-0 flex items-center justify-center"
-              style={{
-                top: 'calc(max(env(safe-area-inset-top, 0px), 47px) + 6px)',
-                padding: '0 16px',
-                height: 44,
-              }}
-            >
-              <div className="flex items-center" style={{ gap: 16 }}>
-                {/* Tab 1 placeholder */}
-                <SkeletonBlock isStatic={effectiveStatic} className="rounded-sm" style={{ width: 70, height: 16 }} />
-                {/* Tab 2 placeholder */}
-                <SkeletonBlock isStatic={effectiveStatic} className="rounded-sm" style={{ width: 84, height: 16 }} />
-                {/* Divider */}
-                <div
-                  aria-hidden="true"
-                  style={{
-                    width: 1,
-                    height: 18,
-                    background: 'rgba(255,255,255,0.1)',
-                    margin: '0 2px',
-                  }}
-                />
-                {/* Search icon placeholder */}
-                <SkeletonBlock isStatic={effectiveStatic} className="rounded-sm" style={{ width: 20, height: 20 }} />
-                {/* Profile avatar placeholder */}
-                <SkeletonBlock isStatic={effectiveStatic} className="rounded-full" style={{ width: 30, height: 30 }} />
+              {/* ─── TOP STRIP — centred cluster: tabs · divider · search · profile ─── */}
+              <div
+                className="absolute left-0 right-0 flex items-center justify-center"
+                style={{
+                  top: 'calc(max(env(safe-area-inset-top, 0px), 47px) + 6px)',
+                  padding: '0 16px',
+                  height: 44,
+                }}
+              >
+                <div className="flex items-center" style={{ gap: 16 }}>
+                  {/* Tab 1 placeholder */}
+                  <SkeletonBlock isStatic={effectiveStatic} className="rounded-sm" style={{ width: 70, height: 16 }} />
+                  {/* Tab 2 placeholder */}
+                  <SkeletonBlock isStatic={effectiveStatic} className="rounded-sm" style={{ width: 84, height: 16 }} />
+                  {/* Divider */}
+                  <div
+                    aria-hidden="true"
+                    style={{
+                      width: 1,
+                      height: 18,
+                      background: 'rgba(255,255,255,0.1)',
+                      margin: '0 2px',
+                    }}
+                  />
+                  {/* Search icon placeholder */}
+                  <SkeletonBlock isStatic={effectiveStatic} className="rounded-sm" style={{ width: 20, height: 20 }} />
+                  {/* Profile avatar placeholder */}
+                  <SkeletonBlock isStatic={effectiveStatic} className="rounded-full" style={{ width: 30, height: 30 }} />
+                </div>
               </div>
+
+              {/* ─── RIGHT ACTION RAIL ─── */}
+              <ActionRailSkeleton isStatic={effectiveStatic} isVideo={isVideo} />
+
+              {/* ─── BOTTOM CONTENT ─── */}
+              {variant === 'regular' ? (
+                <RegularBottomSkeleton isStatic={effectiveStatic} />
+              ) : (
+                <ReviewBottomSkeleton isStatic={effectiveStatic} />
+              )}
             </div>
-
-            {/* ─── RIGHT ACTION RAIL ─── */}
-            <ActionRailSkeleton isStatic={effectiveStatic} isVideo={isVideo} />
-
-            {/* ─── BOTTOM CONTENT ─── */}
-            {variant === 'regular' ? (
-              <RegularBottomSkeleton isStatic={effectiveStatic} />
-            ) : (
-              <ReviewBottomSkeleton isStatic={effectiveStatic} />
-            )}
-          </div>
+          )}
         </motion.div>
       )}
     </AnimatePresence>

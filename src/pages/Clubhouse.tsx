@@ -298,7 +298,7 @@ const ClubhouseContent = () => {
 
   // Guard: wait for auth to resolve before evaluating feed state
   if (authLoading) {
-    return <ClubhouseSkeletonShimmer isVisible={true} isStatic={false} />;
+    return <ClubhouseSkeletonShimmer isVisible={true} isStatic={false} surface="card" />;
   }
 
   return (
@@ -321,6 +321,7 @@ const ClubhouseContent = () => {
         isStatic={skeletonMode === 'static'} 
         variant={posts[0]?.isReview ? 'review' : 'regular'}
         isVideo={posts[0]?.mediaItems?.[0]?.type === 'video'}
+        surface="card"
       />
 
       {/* Floating top bar — hidden when PGA card active */}
@@ -366,7 +367,7 @@ const ClubhouseContent = () => {
       {!isTournamentCardActive && <ProfileCompleteNudge />}
 
       {/* Rehydration skeleton */}
-      <ClubhouseSkeletonShimmer isVisible={showRehydrationSkeleton} isStatic={false} variant={posts[0]?.isReview ? 'review' : 'regular'} isVideo={posts[0]?.mediaItems?.[0]?.type === 'video'} />
+      <ClubhouseSkeletonShimmer isVisible={showRehydrationSkeleton} isStatic={false} variant={posts[0]?.isReview ? 'review' : 'regular'} isVideo={posts[0]?.mediaItems?.[0]?.type === 'video'} surface="card" />
 
       {/* ═══ MAIN FEED AREA ═══ */}
       {!isLoading && posts.length === 0 ? (
@@ -427,7 +428,7 @@ const ClubhouseContent = () => {
           />
         </>
       ) : (
-        <ClubhouseSkeletonShimmer isVisible={true} isStatic={false} />
+        <ClubhouseSkeletonShimmer isVisible={true} isStatic={false} surface="card" />
       )}
 
       {/* ═══ COMMENTS + MORE OPTIONS ═══ */}
