@@ -120,10 +120,8 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
     <article
       style={{
         background: CARD,
-        borderRadius: 16,
-        border: `0.5px solid ${LINE}`,
         overflow: 'hidden',
-        marginInline: 8,
+        marginInline: 0,
       }}
     >
       {/* Header */}
