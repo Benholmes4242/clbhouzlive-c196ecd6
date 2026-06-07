@@ -76,15 +76,18 @@ export function NotificationPrompt({
           <X style={{ color: INK_MUTE }} className="w-3.5 h-3.5" />
         </button>
 
-        {/* Enable */}
+        {/* Enable — amber gradient with glow */}
         <button
           onClick={handleEnable}
           disabled={isEnabling}
+          className="active:scale-[0.97] transition-transform"
           style={{
-            padding: '5px 12px', borderRadius: 99,
-            background: AMBER, color: SURFACE,
-            fontSize: 12, fontWeight: 600,
+            padding: '6px 14px', borderRadius: 99,
+            background: `linear-gradient(90deg, #F59E0B, ${AMBER})`,
+            color: SURFACE,
+            fontSize: 12, fontWeight: 800, letterSpacing: '-0.01em',
             border: 'none', cursor: 'pointer',
+            boxShadow: '0 4px 14px rgba(247,147,30,0.32)',
           }}
         >
           {isEnabling ? 'Enabling…' : 'Enable'}
