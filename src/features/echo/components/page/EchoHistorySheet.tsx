@@ -24,7 +24,7 @@ interface EchoHistorySheetProps {
 interface EchoConversation {
   id: string;
   title: string | null;
-  preview?: string | null;
+  summary?: string | null;
   last_message_at: string;
   created_at: string;
 }
