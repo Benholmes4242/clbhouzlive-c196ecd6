@@ -10,6 +10,12 @@ import { cn } from '@/lib/utils';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useSuggestedUsers, type SuggestedUser } from '@/hooks/useSuggestedUsers';
 import { SectionEyebrow } from '@/components/ui/SectionEyebrow';
+import {
+  AMBER, AMBER_TINT_06, AMBER_TINT_10, AMBER_TINT_22, AMBER_TINT_25, AMBER_TINT_28,
+  INK, INK_MUTE, INK_FAINT, INK_LIGHT, INK_DEEP, INK_MID, SURFACE, SHELL_BG,
+  HAIRLINE_INK_6, HAIRLINE_INK_7, HAIRLINE_INK_8, HAIRLINE_INK_10, INK_TINT_05,
+  SUNDRIDGE_GREEN, SUNDRIDGE_GREEN_TINT_07, SUNDRIDGE_GREEN_BORDER_18,
+} from './_shared/tokens';
 
 interface UserProfile {
   id: string;
@@ -215,22 +221,22 @@ export function NewConversationModal({
       className="flex items-center"
       style={{
         margin: '0 16px 10px',
-        background: '#f8fafc', borderRadius: 12,
+        background: SHELL_BG, borderRadius: 12,
         padding: '9px 13px', gap: 8,
         border: '1px solid rgba(0,0,0,0.07)',
       }}
     >
-      <Search size={14} style={{ color: '#94a3b8', flexShrink: 0 }} />
+      <Search size={14} style={{ color: INK_FAINT, flexShrink: 0 }} />
       <input
         placeholder={placeholder}
         value={value}
         onChange={(e) => onChange(e.target.value)}
         className="flex-1 bg-transparent outline-none"
-        style={{ fontSize: 14, color: '#1e293b', border: 'none' }}
+        style={{ fontSize: 14, color: INK_DEEP, border: 'none' }}
       />
       {value && (
         <button onClick={() => onChange('')}>
-          <X size={13} style={{ color: '#94a3b8' }} />
+          <X size={13} style={{ color: INK_FAINT }} />
         </button>
       )}
     </div>
@@ -260,18 +266,18 @@ export function NewConversationModal({
           />
           <div className="flex-1 min-w-0">
             <div className="flex items-center" style={{ gap: 6 }}>
-              <span className="truncate" style={{ fontSize: 14, fontWeight: 600, color: '#0f172a' }}>
+              <span className="truncate" style={{ fontSize: 14, fontWeight: 600, color: INK }}>
                 {userProfile.display_name || userProfile.username || 'Unknown User'}
               </span>
             </div>
             <div className="flex items-center" style={{ gap: 6, marginTop: 2 }}>
               {userProfile.username && (
-                <span style={{ fontSize: 12, color: '#94a3b8' }}>@{userProfile.username}</span>
+                <span style={{ fontSize: 12, color: INK_FAINT }}>@{userProfile.username}</span>
               )}
               {userProfile.eg_handicap_index != null && (
                 <span
                   style={{
-                    fontSize: 10, fontWeight: 600, color: '#F7931E',
+                    fontSize: 10, fontWeight: 600, color: AMBER,
                     background: 'rgba(247,147,30,0.08)',
                     border: '1px solid rgba(247,147,30,0.20)',
                     borderRadius: 99, padding: '0 6px',
@@ -284,9 +290,9 @@ export function NewConversationModal({
                 <span
                   className="flex items-center truncate"
                   style={{
-                    fontSize: 10, fontWeight: 600, color: '#006747',
-                    background: 'rgba(0,103,71,0.07)',
-                    border: '1px solid rgba(0,103,71,0.18)',
+                    fontSize: 10, fontWeight: 600, color: SUNDRIDGE_GREEN,
+                    background: SUNDRIDGE_GREEN_TINT_07,
+                    border: `1px solid ${SUNDRIDGE_GREEN_BORDER_18}`,
                     borderRadius: 99, padding: '0 6px',
                     gap: 3, maxWidth: 120,
                   }}
@@ -298,13 +304,13 @@ export function NewConversationModal({
             </div>
           </div>
           {isLoading ? (
-            <Loader2 className="h-4 w-4 animate-spin flex-shrink-0" style={{ color: '#F7931E' }} />
+            <Loader2 className="h-4 w-4 animate-spin flex-shrink-0" style={{ color: AMBER }} />
           ) : (
             <ChevronRight className="w-4 h-4 flex-shrink-0" style={{ color: '#CBD5E1' }} />
           )}
         </button>
         {index < total - 1 && (
-          <div style={{ height: '0.5px', background: 'rgba(15,23,42,0.06)', margin: '0 20px' }} />
+          <div style={{ height: '0.5px', background: HAIRLINE_INK_6, margin: '0 20px' }} />
         )}
       </div>
     );
@@ -322,7 +328,7 @@ export function NewConversationModal({
         <Skeleton style={{ height: 24, width: 86, borderRadius: 99 }} />
       </div>
       {!isLast && (
-        <div style={{ height: '0.5px', background: 'rgba(15,23,42,0.06)', margin: '0 20px' }} />
+        <div style={{ height: '0.5px', background: HAIRLINE_INK_6, margin: '0 20px' }} />
       )}
     </div>
   );
@@ -354,18 +360,18 @@ export function NewConversationModal({
           />
           <div className="flex-1 min-w-0">
             <div className="flex items-center" style={{ gap: 6 }}>
-              <span className="truncate" style={{ fontSize: 14, fontWeight: 600, color: '#0f172a' }}>
+              <span className="truncate" style={{ fontSize: 14, fontWeight: 600, color: INK }}>
                 {s.display_name || s.username || 'Unknown User'}
               </span>
             </div>
             <div className="flex items-center" style={{ gap: 6, marginTop: 2 }}>
               {s.username && (
-                <span style={{ fontSize: 12, color: '#94a3b8' }}>@{s.username}</span>
+                <span style={{ fontSize: 12, color: INK_FAINT }}>@{s.username}</span>
               )}
               {s.eg_handicap_index != null && (
                 <span
                   style={{
-                    fontSize: 10, fontWeight: 600, color: '#F7931E',
+                    fontSize: 10, fontWeight: 600, color: AMBER,
                     background: 'rgba(247,147,30,0.08)',
                     border: '1px solid rgba(247,147,30,0.20)',
                     borderRadius: 99, padding: '0 6px',
@@ -377,13 +383,13 @@ export function NewConversationModal({
             </div>
           </div>
           {isLoading ? (
-            <Loader2 className="h-4 w-4 animate-spin flex-shrink-0" style={{ color: '#F7931E' }} />
+            <Loader2 className="h-4 w-4 animate-spin flex-shrink-0" style={{ color: AMBER }} />
           ) : (
             <ChevronRight className="w-4 h-4 flex-shrink-0" style={{ color: '#CBD5E1' }} />
           )}
         </button>
         {index < total - 1 && (
-          <div style={{ height: '0.5px', background: 'rgba(15,23,42,0.06)', margin: '0 20px' }} />
+          <div style={{ height: '0.5px', background: HAIRLINE_INK_6, margin: '0 20px' }} />
         )}
       </div>
     );
@@ -400,7 +406,7 @@ export function NewConversationModal({
           style={{
             gap: 12, padding: '10px 20px',
             border: 'none', cursor: 'pointer',
-            background: isSelected ? 'rgba(247,147,30,0.06)' : 'transparent',
+            background: isSelected ? AMBER_TINT_06 : 'transparent',
           }}
         >
           {/* Checkbox circle */}
@@ -409,7 +415,7 @@ export function NewConversationModal({
             style={{
               width: 22, height: 22, borderRadius: '50%',
               ...(isSelected
-                ? { background: '#F7931E', border: 'none' }
+                ? { background: AMBER, border: 'none' }
                 : { background: 'transparent', border: '2px solid #cbd5e1' }
               ),
             }}
@@ -427,16 +433,16 @@ export function NewConversationModal({
             hideRing
           />
           <div className="flex-1 min-w-0">
-            <span className="truncate block" style={{ fontSize: 14, fontWeight: 600, color: '#0f172a' }}>
+            <span className="truncate block" style={{ fontSize: 14, fontWeight: 600, color: INK }}>
               {userProfile.display_name || userProfile.username || 'Unknown User'}
             </span>
             {userProfile.username && (
-              <span style={{ fontSize: 12, color: '#94a3b8' }}>@{userProfile.username}</span>
+              <span style={{ fontSize: 12, color: INK_FAINT }}>@{userProfile.username}</span>
             )}
           </div>
         </button>
         {index < total - 1 && (
-          <div style={{ height: '0.5px', background: 'rgba(15,23,42,0.06)', margin: '0 20px' }} />
+          <div style={{ height: '0.5px', background: HAIRLINE_INK_6, margin: '0 20px' }} />
         )}
       </div>
     );
@@ -446,7 +452,7 @@ export function NewConversationModal({
     if (loading) {
       return (
         <div className="flex items-center justify-center py-8">
-          <Loader2 className="h-6 w-6 animate-spin" style={{ color: '#94a3b8' }} />
+          <Loader2 className="h-6 w-6 animate-spin" style={{ color: INK_FAINT }} />
         </div>
       );
     }
@@ -458,22 +464,22 @@ export function NewConversationModal({
             className="flex items-center justify-center mx-auto"
             style={{
               width: 48, height: 48, borderRadius: '50%',
-              background: 'rgba(247,147,30,0.10)',
+              background: AMBER_TINT_10,
               marginBottom: 12,
             }}
           >
-            <Search style={{ color: '#F7931E' }} size={20} />
+            <Search style={{ color: AMBER }} size={20} />
           </div>
-          <p style={{ fontSize: 14, fontWeight: 600, color: '#1e293b', marginBottom: 4 }}>No one found</p>
-          <p style={{ fontSize: 13, color: '#94a3b8' }}>Try a different name or username</p>
+          <p style={{ fontSize: 14, fontWeight: 600, color: INK_DEEP, marginBottom: 4 }}>No one found</p>
+          <p style={{ fontSize: 13, color: INK_FAINT }}>Try a different name or username</p>
         </div>
       );
     }
 
     return (
       <div className="text-center" style={{ padding: '40px 20px' }}>
-        <Search className="mx-auto mb-2" style={{ color: '#94a3b8' }} size={32} />
-        <p style={{ fontSize: 13, color: '#94a3b8' }}>Search for users to start a conversation</p>
+        <Search className="mx-auto mb-2" style={{ color: INK_FAINT }} size={32} />
+        <p style={{ fontSize: 13, color: INK_FAINT }}>Search for users to start a conversation</p>
       </div>
     );
   };
@@ -500,7 +506,7 @@ export function NewConversationModal({
         />
 
         {/* Header */}
-        <div className="relative flex items-center justify-center" style={{ padding: '12px 20px 14px', borderBottom: '0.5px solid rgba(15,23,42,0.07)' }}>
+        <div className="relative flex items-center justify-center" style={{ padding: '12px 20px 14px', borderBottom: `0.5px solid ${HAIRLINE_INK_7}` }}>
           <div id="new-message-title">
             <SectionEyebrow label="New Message" />
           </div>
@@ -510,12 +516,12 @@ export function NewConversationModal({
             style={{
               right: 16,
               width: 30, height: 30, borderRadius: '50%',
-              background: 'rgba(15,23,42,0.05)',
-              border: '0.5px solid rgba(15,23,42,0.10)',
+              background: INK_TINT_05,
+              border: `0.5px solid ${HAIRLINE_INK_10}`,
               cursor: 'pointer',
             }}
           >
-            <X style={{ color: '#64748b' }} size={16} />
+            <X style={{ color: INK_MUTE }} size={16} />
           </button>
         </div>
 
@@ -524,7 +530,7 @@ export function NewConversationModal({
           className="flex"
           style={{
             margin: '0 16px 14px',
-            background: 'rgba(15,23,42,0.05)', borderRadius: 12,
+            background: INK_TINT_05, borderRadius: 12,
             padding: 3, gap: 2,
           }}
         >
@@ -536,12 +542,12 @@ export function NewConversationModal({
               border: 'none', cursor: 'pointer',
               fontSize: 13, fontWeight: 600,
               ...(mode === 'direct'
-                ? { background: '#fff', color: '#0f172a', boxShadow: '0 1px 4px rgba(0,0,0,0.08)' }
-                : { background: 'transparent', color: '#94a3b8' }
+                ? { background: '#fff', color: INK, boxShadow: '0 1px 4px rgba(0,0,0,0.08)' }
+                : { background: 'transparent', color: INK_FAINT }
               ),
             }}
           >
-            <MessageCircle size={16} style={{ color: mode === 'direct' ? '#F7931E' : '#94a3b8' }} />
+            <MessageCircle size={16} style={{ color: mode === 'direct' ? AMBER : INK_FAINT }} />
             Direct Message
           </button>
           <button
@@ -552,12 +558,12 @@ export function NewConversationModal({
               border: 'none', cursor: 'pointer',
               fontSize: 13, fontWeight: 600,
               ...(mode === 'group'
-                ? { background: '#fff', color: '#0f172a', boxShadow: '0 1px 4px rgba(0,0,0,0.08)' }
-                : { background: 'transparent', color: '#94a3b8' }
+                ? { background: '#fff', color: INK, boxShadow: '0 1px 4px rgba(0,0,0,0.08)' }
+                : { background: 'transparent', color: INK_FAINT }
               ),
             }}
           >
-            <Users size={16} style={{ color: mode === 'group' ? '#F7931E' : '#94a3b8' }} />
+            <Users size={16} style={{ color: mode === 'group' ? AMBER : INK_FAINT }} />
             Group Chat
           </button>
         </div>
@@ -611,8 +617,8 @@ export function NewConversationModal({
                   <img src={groupAvatarPreview} alt="Group" className="w-full h-full object-cover" />
                 ) : (
                   <>
-                    <Camera size={16} style={{ color: '#F7931E' }} />
-                    <span style={{ fontSize: 9, color: '#F7931E', marginTop: 1 }}>Photo</span>
+                    <Camera size={16} style={{ color: AMBER }} />
+                    <span style={{ fontSize: 9, color: AMBER, marginTop: 1 }}>Photo</span>
                   </>
                 )}
               </div>
@@ -632,9 +638,9 @@ export function NewConversationModal({
                 className="flex-1 outline-none"
                 style={{
                   height: 44, borderRadius: 12,
-                  background: '#f8fafc',
-                  border: '1px solid rgba(15,23,42,0.10)',
-                  padding: '0 14px', fontSize: 14, color: '#1e293b',
+                  background: SHELL_BG,
+                  border: `1px solid ${HAIRLINE_INK_10}`,
+                  padding: '0 14px', fontSize: 14, color: INK_DEEP,
                 }}
               />
             </div>
@@ -649,7 +655,7 @@ export function NewConversationModal({
                     style={{
                       gap: 6, padding: '4px 10px 4px 5px',
                       background: 'rgba(247,147,30,0.08)',
-                      border: '1px solid rgba(247,147,30,0.22)',
+                      border: `1px solid ${AMBER_TINT_22}`,
                       borderRadius: 99,
                     }}
                   >
@@ -674,7 +680,7 @@ export function NewConversationModal({
                       className="flex items-center justify-center"
                       style={{
                         width: 16, height: 16, borderRadius: '50%',
-                        background: 'rgba(247,147,30,0.25)',
+                        background: AMBER_TINT_25,
                         border: 'none', cursor: 'pointer',
                       }}
                     >
@@ -703,7 +709,7 @@ export function NewConversationModal({
               className="flex-shrink-0"
               style={{
                 padding: '10px 16px 20px',
-                borderTop: '0.5px solid rgba(15,23,42,0.07)',
+                borderTop: `0.5px solid ${HAIRLINE_INK_7}`,
               }}
             >
               {/* Member stack */}
@@ -729,7 +735,7 @@ export function NewConversationModal({
                       </div>
                     ))}
                   </div>
-                  <span style={{ fontSize: 12, color: '#64748b' }}>
+                  <span style={{ fontSize: 12, color: INK_MUTE }}>
                     {selectedUsers.length} member{selectedUsers.length !== 1 ? 's' : ''} selected
                   </span>
                 </div>
@@ -745,15 +751,15 @@ export function NewConversationModal({
                   cursor: isGroupValid && !creatingGroup ? 'pointer' : 'default',
                   ...(isGroupValid
                     ? {
-                        background: '#F7931E',
+                        background: AMBER,
                         border: 'none',
                         color: '#ffffff',
-                        boxShadow: '0 4px 16px rgba(247,147,30,0.28)',
+                        boxShadow: `0 4px 16px ${AMBER_TINT_28}`,
                       }
                     : {
                         background: 'rgba(0,0,0,0.04)',
                         border: '1px solid transparent',
-                        color: '#94a3b8',
+                        color: INK_FAINT,
                       }
                   ),
                 }}

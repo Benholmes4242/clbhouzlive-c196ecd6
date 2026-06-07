@@ -23,6 +23,11 @@ import { DeleteMessageSheet } from './DeleteMessageSheet';
 import { ForwardMessageModal } from './ForwardMessageModal';
 import type { MessageWithSender, ConversationWithDetails, MessageType } from '@/types/messaging';
 import { supabase } from '@/integrations/supabase/client';
+import {
+  AMBER, AMBER_TINT_10, AMBER_TINT_25, INK, INK_MUTE, INK_FAINT, SURFACE, SHELL_BG,
+  HAIRLINE_INK_7, HAIRLINE_INK_10, INK_TINT_05, STATUS_ONLINE, INK_MID, INK_DEEP,
+  HAIRLINE_INK_8,
+} from './_shared/tokens';
 
 interface ChatViewProps {
   conversationId: string;
@@ -94,7 +99,7 @@ function DateSeparator({ date }: { date: string }) {
         style={{
           fontSize: 11,
           fontWeight: 600,
-          color: '#94a3b8',
+          color: INK_FAINT,
           background: 'rgba(0,0,0,0.05)',
           borderRadius: 99,
           padding: '3px 12px',
@@ -439,7 +444,7 @@ export function ChatView({ conversationId, onBack }: ChatViewProps) {
   }, [isGroupChat, conversation, presenceMap, user?.id]);
 
   return (
-    <div className="flex flex-col h-full min-h-0" style={{ background: '#F8FAFC' }}>
+    <div className="flex flex-col h-full min-h-0" style={{ background: SHELL_BG }}>
       {/* Header */}
       <header 
         className="flex-shrink-0 flex items-center"
@@ -448,8 +453,8 @@ export function ChatView({ conversationId, onBack }: ChatViewProps) {
           paddingBottom: 10,
           paddingLeft: 16,
           paddingRight: 16,
-          background: '#F8FAFC',
-          borderBottom: '0.5px solid rgba(15,23,42,0.07)',
+          background: SHELL_BG,
+          borderBottom: `0.5px solid ${HAIRLINE_INK_7}`,
           gap: 10,
         }}
       >
@@ -459,11 +464,11 @@ export function ChatView({ conversationId, onBack }: ChatViewProps) {
           className="flex items-center justify-center active:scale-[0.97] transition-transform flex-shrink-0"
           style={{
             width: 34, height: 34, borderRadius: '50%',
-            background: 'rgba(15,23,42,0.05)',
-            border: '0.5px solid rgba(15,23,42,0.10)',
+            background: INK_TINT_05,
+            border: `0.5px solid ${HAIRLINE_INK_10}`,
           }}
         >
-          <ChevronLeft style={{ color: '#475569' }} strokeWidth={2.5} className="w-5 h-5" />
+          <ChevronLeft style={{ color: INK_MID }} strokeWidth={2.5} className="w-5 h-5" />
         </button>
         
         {/* Avatar + Info */}
@@ -478,7 +483,7 @@ export function ChatView({ conversationId, onBack }: ChatViewProps) {
                 className="flex items-center justify-center"
                 style={{
                   width: 38, height: 38, borderRadius: '50%',
-                  background: 'linear-gradient(135deg, #F7931E, #e07a0d)',
+                  background: `linear-gradient(135deg, ${AMBER}, #e07a0d)`,
                 }}
               >
                 <Users className="w-[18px] h-[18px] text-white" />
@@ -499,8 +504,8 @@ export function ChatView({ conversationId, onBack }: ChatViewProps) {
                 style={{
                   bottom: 0, right: 0,
                   width: 9, height: 9, borderRadius: '50%',
-                  background: '#22c55e',
-                  border: '2.5px solid #F8FAFC',
+                  background: STATUS_ONLINE,
+                  border: `2.5px solid ${SHELL_BG}`,
                 }}
               />
             )}
@@ -511,7 +516,7 @@ export function ChatView({ conversationId, onBack }: ChatViewProps) {
             <div className="flex items-center" style={{ gap: 6 }}>
               <span
                 className="truncate"
-                style={{ fontSize: 15, fontWeight: 800, color: '#0F172A', letterSpacing: '-0.015em' }}
+                style={{ fontSize: 15, fontWeight: 800, color: INK, letterSpacing: '-0.015em' }}
               >
                 {headerInfo.name}
               </span>
@@ -520,26 +525,26 @@ export function ChatView({ conversationId, onBack }: ChatViewProps) {
             <div className="flex items-center" style={{ gap: 6, alignItems: 'center', flexWrap: 'wrap' }}>
               <span style={{ fontSize: 11, fontWeight: 500 }}>
                 {isTyping ? (
-                  <span style={{ color: '#F7931E' }}>typing...</span>
+                  <span style={{ color: AMBER }}>typing...</span>
                 ) : isGroupChat && conversation ? (
                   <>
-                    <span style={{ color: '#22c55e' }}>{onlineCount} online</span>
-                    <span style={{ color: '#94a3b8' }}>{'\u2009·\u2009'}{conversation.participants.length} {conversation.participants.length === 1 ? 'member' : 'members'}</span>
+                    <span style={{ color: STATUS_ONLINE }}>{onlineCount} online</span>
+                    <span style={{ color: INK_FAINT }}>{'\u2009·\u2009'}{conversation.participants.length} {conversation.participants.length === 1 ? 'member' : 'members'}</span>
                   </>
                 ) : otherUserPresence?.status === 'online' ? (
-                  <span style={{ color: '#22c55e' }}>online</span>
+                  <span style={{ color: STATUS_ONLINE }}>online</span>
                 ) : otherUserPresence?.status === 'away' ? (
-                  <span style={{ color: '#94a3b8' }}>away</span>
+                  <span style={{ color: INK_FAINT }}>away</span>
                 ) : otherUserPresence?.last_seen_at ? (
-                  <span style={{ color: '#94a3b8' }}>last seen {formatRelativeTime(otherUserPresence.last_seen_at)}</span>
+                  <span style={{ color: INK_FAINT }}>last seen {formatRelativeTime(otherUserPresence.last_seen_at)}</span>
                 ) : (
-                  <span style={{ color: '#94a3b8' }}>offline</span>
+                  <span style={{ color: INK_FAINT }}>offline</span>
                 )}
               </span>
               {!isGroupChat && otherUser?.profile?.eg_handicap_index != null && (
                 <span style={{
-                  fontSize: 10, fontWeight: 600, color: '#F7931E',
-                  background: 'rgba(247,147,30,0.10)', border: '1px solid rgba(247,147,30,0.25)',
+                  fontSize: 10, fontWeight: 600, color: AMBER,
+                  background: AMBER_TINT_10, border: `1px solid ${AMBER_TINT_25}`,
                   borderRadius: 99, padding: '1px 7px',
                 }}>
                   HCP {otherUser.profile.eg_handicap_index}
@@ -573,7 +578,7 @@ export function ChatView({ conversationId, onBack }: ChatViewProps) {
         <div 
           ref={containerRef}
           className="flex-1 min-h-0 overflow-y-auto"
-          style={{ padding: '8px 14px 12px', background: '#F8FAFC' }}
+          style={{ padding: '8px 14px 12px', background: SHELL_BG }}
           onScroll={handleScroll}
         >
           {/* Load more */}
@@ -585,9 +590,9 @@ export function ChatView({ conversationId, onBack }: ChatViewProps) {
                 className="flex items-center justify-center active:scale-[0.97] transition-transform disabled:opacity-50"
                 style={{
                   padding: '6px 16px', borderRadius: 99,
-                  background: 'rgba(15,23,42,0.05)',
-                  border: '0.5px solid rgba(15,23,42,0.08)',
-                  fontSize: 12, color: '#64748b', fontWeight: 500,
+                  background: INK_TINT_05,
+                  border: `0.5px solid ${HAIRLINE_INK_8}`,
+                  fontSize: 12, color: INK_MUTE, fontWeight: 500,
                   cursor: 'pointer',
                 }}
               >
@@ -659,18 +664,18 @@ export function ChatView({ conversationId, onBack }: ChatViewProps) {
                 bottom: 72, right: 16,
                 width: 36, height: 36, borderRadius: '50%',
                 background: '#ffffff',
-                border: '0.5px solid rgba(15,23,42,0.10)',
+                border: `0.5px solid ${HAIRLINE_INK_10}`,
                 boxShadow: '0 2px 10px rgba(0,0,0,0.12)',
               }}
             >
-              <ChevronDown style={{ color: '#64748b' }} size={14} />
+              <ChevronDown style={{ color: INK_MUTE }} size={14} />
               {unreadBelowCount > 0 && (
                 <span
                   className="absolute flex items-center justify-center"
                   style={{
                     top: -4, right: -4,
                     width: 18, height: 18, borderRadius: '50%',
-                    background: '#F7931E', color: '#fff',
+                    background: AMBER, color: '#fff',
                     fontSize: 9, fontWeight: 700,
                   }}
                 >

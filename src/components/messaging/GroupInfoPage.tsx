@@ -23,6 +23,13 @@ import { AddMembersSheet } from './AddMembersSheet';
 import { ReportSheet } from './ReportSheet';
 import { SharedMediaGallery } from './SharedMediaGallery';
 import { SectionEyebrow } from '@/components/ui/SectionEyebrow';
+import {
+  AMBER, AMBER_TINT_06, AMBER_TINT_10, AMBER_TINT_12, AMBER_TINT_22, AMBER_TINT_25, AMBER_TINT_28,
+  SUNDRIDGE_GREEN, SUNDRIDGE_GREEN_TINT_07, SUNDRIDGE_GREEN_BORDER_18,
+  INK, INK_MUTE, INK_FAINT, INK_LIGHT, INK_DEEP, INK_MID, SURFACE, SHELL_BG,
+  HAIRLINE_INK_6, HAIRLINE_INK_7, HAIRLINE_INK_8, HAIRLINE_INK_10, INK_TINT_05,
+  DESTRUCTIVE, STATUS_ONLINE,
+} from './_shared/tokens';
 
 interface GroupInfoPageProps {
   conversation: ConversationWithDetails;
@@ -234,7 +241,7 @@ export const GroupInfoPage: React.FC<GroupInfoPageProps> = ({
   return (
     <div
       className="fixed inset-0 z-50 flex flex-col"
-      style={{ background: '#F8FAFC' }}
+      style={{ background: SHELL_BG }}
     >
       {/* ── Header ── */}
       <div
@@ -244,19 +251,19 @@ export const GroupInfoPage: React.FC<GroupInfoPageProps> = ({
           paddingBottom: 10,
           paddingLeft: 16,
           paddingRight: 16,
-          background: '#F8FAFC',
-          borderBottom: '0.5px solid rgba(15,23,42,0.07)',
+          background: SHELL_BG,
+          borderBottom: `0.5px solid ${HAIRLINE_INK_7}`,
         }}
       >
         <button
           onClick={onClose}
           className="flex items-center justify-center active:scale-[0.97] transition-transform flex-shrink-0"
-          style={{ width: 34, height: 34, borderRadius: '50%', background: 'rgba(15,23,42,0.05)', border: '0.5px solid rgba(15,23,42,0.10)' }}
+          style={{ width: 34, height: 34, borderRadius: '50%', background: INK_TINT_05, border: `0.5px solid ${HAIRLINE_INK_10}` }}
         >
-          <ChevronLeft size={20} style={{ color: '#475569' }} strokeWidth={2.5} />
+          <ChevronLeft size={20} style={{ color: INK_MID }} strokeWidth={2.5} />
         </button>
         <div className="flex-1 text-center">
-          <span style={{ fontSize: 17, fontWeight: 800, color: '#0F172A', letterSpacing: '-0.015em' }}>Group Info</span>
+          <span style={{ fontSize: 17, fontWeight: 800, color: INK, letterSpacing: '-0.015em' }}>Group Info</span>
         </div>
         <div style={{ width: 34 }} />
       </div>
@@ -268,7 +275,7 @@ export const GroupInfoPage: React.FC<GroupInfoPageProps> = ({
           {/* Avatar */}
           <div className="relative">
             {conversation.avatar_url ? (
-              <div style={{ filter: 'drop-shadow(0 4px 20px rgba(247,147,30,0.28))' }}>
+              <div style={{ filter: `drop-shadow(0 4px 20px ${AMBER_TINT_28})` }}>
                 <SquircleAvatar
                   size={88}
                   src={conversation.avatar_url}
@@ -281,8 +288,8 @@ export const GroupInfoPage: React.FC<GroupInfoPageProps> = ({
                 className="flex items-center justify-center"
                 style={{
                   width: 88, height: 88, borderRadius: '50%',
-                  background: 'linear-gradient(135deg, #F7931E, #e07a0d)',
-                  filter: 'drop-shadow(0 4px 20px rgba(247,147,30,0.28))',
+                  background: `linear-gradient(135deg, ${AMBER}, #e07a0d)`,
+                  filter: `drop-shadow(0 4px 20px ${AMBER_TINT_28})`,
                 }}
               >
                 <Users size={36} style={{ color: '#fff' }} />
@@ -297,7 +304,7 @@ export const GroupInfoPage: React.FC<GroupInfoPageProps> = ({
                   style={{
                     bottom: 2, right: 2,
                     width: 28, height: 28, borderRadius: '50%',
-                    background: '#F7931E', border: '2px solid #F8FAFC',
+                    background: AMBER, border: `2px solid ${SHELL_BG}`,
                   }}
                 >
                   <Camera size={13} style={{ color: '#fff' }} />
@@ -323,7 +330,7 @@ export const GroupInfoPage: React.FC<GroupInfoPageProps> = ({
                   autoFocus
                   className="text-center"
                   style={{
-                    fontSize: 22, fontWeight: 800, color: '#0f172a', letterSpacing: '-0.025em',
+                    fontSize: 22, fontWeight: 800, color: INK, letterSpacing: '-0.025em',
                     background: 'transparent', border: '1px solid rgba(0,0,0,0.1)',
                     borderRadius: 10, padding: '4px 12px', outline: 'none',
                   }}
@@ -332,8 +339,8 @@ export const GroupInfoPage: React.FC<GroupInfoPageProps> = ({
                   onClick={handleUpdateGroupName}
                   style={{
                     padding: '5px 14px', borderRadius: 10,
-                    background: 'rgba(247,147,30,0.10)', border: '1px solid rgba(247,147,30,0.25)',
-                    fontSize: 13, fontWeight: 600, color: '#F7931E', cursor: 'pointer',
+                    background: AMBER_TINT_10, border: `1px solid ${AMBER_TINT_25}`,
+                    fontSize: 13, fontWeight: 600, color: AMBER, cursor: 'pointer',
                   }}
                 >
                   Save
@@ -343,7 +350,7 @@ export const GroupInfoPage: React.FC<GroupInfoPageProps> = ({
                   style={{
                     padding: '5px 14px', borderRadius: 10,
                     background: 'rgba(0,0,0,0.05)', border: 'none',
-                    fontSize: 13, fontWeight: 600, color: '#64748b', cursor: 'pointer',
+                    fontSize: 13, fontWeight: 600, color: INK_MUTE, cursor: 'pointer',
                   }}
                 >
                   Cancel
@@ -351,7 +358,7 @@ export const GroupInfoPage: React.FC<GroupInfoPageProps> = ({
               </div>
             ) : (
               <>
-                <h2 style={{ fontSize: 22, fontWeight: 800, color: '#0f172a', letterSpacing: '-0.025em', margin: 0 }}>
+                <h2 style={{ fontSize: 22, fontWeight: 800, color: INK, letterSpacing: '-0.025em', margin: 0 }}>
                   {conversation.name}
                 </h2>
                 {isAdmin && (
@@ -360,7 +367,7 @@ export const GroupInfoPage: React.FC<GroupInfoPageProps> = ({
                     className="active:scale-[0.95] transition-transform"
                     style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 2 }}
                   >
-                    <Pencil size={14} style={{ color: '#F7931E' }} />
+                    <Pencil size={14} style={{ color: AMBER }} />
                   </button>
                 )}
               </>
@@ -368,7 +375,7 @@ export const GroupInfoPage: React.FC<GroupInfoPageProps> = ({
           </div>
 
           {/* Member count */}
-          <p style={{ fontSize: 13, color: '#64748b', marginTop: 4 }}>
+          <p style={{ fontSize: 13, color: INK_MUTE, marginTop: 4 }}>
             {conversation.participants.length} {conversation.participants.length === 1 ? 'member' : 'members'}
           </p>
 
@@ -381,7 +388,7 @@ export const GroupInfoPage: React.FC<GroupInfoPageProps> = ({
                 placeholder="Add group description..."
                 rows={3}
                 style={{
-                  fontSize: 13, color: '#1e293b', resize: 'none',
+                  fontSize: 13, color: INK_DEEP, resize: 'none',
                   border: '1px solid rgba(0,0,0,0.1)', borderRadius: 10,
                   padding: '8px 12px', outline: 'none', background: '#fff',
                 }}
@@ -392,7 +399,7 @@ export const GroupInfoPage: React.FC<GroupInfoPageProps> = ({
                   style={{
                     padding: '5px 14px', borderRadius: 10,
                     background: 'rgba(0,0,0,0.05)', border: 'none',
-                    fontSize: 13, fontWeight: 600, color: '#64748b', cursor: 'pointer',
+                    fontSize: 13, fontWeight: 600, color: INK_MUTE, cursor: 'pointer',
                   }}
                 >
                   Cancel
@@ -401,8 +408,8 @@ export const GroupInfoPage: React.FC<GroupInfoPageProps> = ({
                   onClick={handleUpdateDescription}
                   style={{
                     padding: '5px 14px', borderRadius: 10,
-                    background: 'rgba(247,147,30,0.10)', border: '1px solid rgba(247,147,30,0.25)',
-                    fontSize: 13, fontWeight: 600, color: '#F7931E', cursor: 'pointer',
+                    background: AMBER_TINT_10, border: `1px solid ${AMBER_TINT_25}`,
+                    fontSize: 13, fontWeight: 600, color: AMBER, cursor: 'pointer',
                   }}
                 >
                   Save
@@ -415,7 +422,7 @@ export const GroupInfoPage: React.FC<GroupInfoPageProps> = ({
               className="w-full text-center active:opacity-70 transition-opacity"
               style={{
                 fontSize: 13,
-                color: '#94a3b8',
+                color: INK_FAINT,
                 fontStyle: description ? 'normal' : 'italic',
                 marginTop: 2, background: 'none', border: 'none', cursor: isAdmin ? 'pointer' : 'default',
                 padding: 4,
@@ -431,7 +438,7 @@ export const GroupInfoPage: React.FC<GroupInfoPageProps> = ({
           className="overflow-hidden"
           style={{
             background: '#fff', borderRadius: 16,
-            border: '1px solid rgba(15,23,42,0.07)',
+            border: `1px solid ${HAIRLINE_INK_7}`,
             marginBottom: 14,
           }}
         >
@@ -446,15 +453,15 @@ export const GroupInfoPage: React.FC<GroupInfoPageProps> = ({
                 className="flex items-center justify-center flex-shrink-0"
                 style={{ width: 34, height: 34, borderRadius: 10, background: 'rgba(15,23,42,0.04)' }}
               >
-                <Image size={17} style={{ color: '#64748b' }} />
+                <Image size={17} style={{ color: INK_MUTE }} />
               </div>
-              <span style={{ fontSize: 14, fontWeight: 500, color: '#0f172a' }}>Shared Media</span>
+              <span style={{ fontSize: 14, fontWeight: 500, color: INK }}>Shared Media</span>
             </div>
             <ChevronRight size={14} style={{ color: '#d1d5db' }} />
           </button>
 
           {/* Hairline */}
-          <div style={{ height: '0.5px', background: 'rgba(15,23,42,0.06)', margin: '0 16px' }} />
+          <div style={{ height: '0.5px', background: HAIRLINE_INK_6, margin: '0 16px' }} />
 
           {/* Notifications row */}
           <div
@@ -466,9 +473,9 @@ export const GroupInfoPage: React.FC<GroupInfoPageProps> = ({
                 className="flex items-center justify-center flex-shrink-0"
                 style={{ width: 34, height: 34, borderRadius: 10, background: 'rgba(15,23,42,0.04)' }}
               >
-                {isMuted ? <BellOff size={17} style={{ color: '#64748b' }} /> : <Bell size={17} style={{ color: '#64748b' }} />}
+                {isMuted ? <BellOff size={17} style={{ color: INK_MUTE }} /> : <Bell size={17} style={{ color: INK_MUTE }} />}
               </div>
-              <span style={{ fontSize: 14, fontWeight: 500, color: '#0f172a' }}>Notifications</span>
+              <span style={{ fontSize: 14, fontWeight: 500, color: INK }}>Notifications</span>
             </div>
             {/* Custom toggle */}
             <button
@@ -476,7 +483,7 @@ export const GroupInfoPage: React.FC<GroupInfoPageProps> = ({
               className="relative"
               style={{
                 width: 46, height: 26, borderRadius: 99,
-                background: !isMuted ? '#F7931E' : '#e2e8f0',
+                background: !isMuted ? AMBER : '#e2e8f0',
                 border: 'none', cursor: 'pointer',
                 transition: 'background 0.2s',
               }}
@@ -504,9 +511,9 @@ export const GroupInfoPage: React.FC<GroupInfoPageProps> = ({
               <button
                 onClick={() => setIsAddMembersOpen(true)}
                 className="flex items-center active:opacity-70 transition-opacity"
-                style={{ gap: 4, fontSize: 13, fontWeight: 600, color: '#F7931E', background: 'none', border: 'none', cursor: 'pointer' }}
+                style={{ gap: 4, fontSize: 13, fontWeight: 600, color: AMBER, background: 'none', border: 'none', cursor: 'pointer' }}
               >
-                <UserPlus size={14} style={{ color: '#F7931E' }} />
+                <UserPlus size={14} style={{ color: AMBER }} />
                 Add
               </button>
             )}
@@ -515,11 +522,11 @@ export const GroupInfoPage: React.FC<GroupInfoPageProps> = ({
           {/* Members container */}
           <div
             className="overflow-hidden"
-             style={{ background: '#fff', borderRadius: 16, border: '1px solid rgba(15,23,42,0.07)' }}
+             style={{ background: '#fff', borderRadius: 16, border: `1px solid ${HAIRLINE_INK_7}` }}
           >
             {conversation.participants.map((participant, idx) => (
               <React.Fragment key={participant.id}>
-                {idx > 0 && <div style={{ height: '0.5px', background: 'rgba(15,23,42,0.06)', margin: '0 16px' }} />}
+                {idx > 0 && <div style={{ height: '0.5px', background: HAIRLINE_INK_6, margin: '0 16px' }} />}
                 <div className="flex items-center" style={{ gap: 12, padding: '10px 16px' }}>
                   {/* Avatar */}
                   <SquircleAvatar
@@ -534,11 +541,11 @@ export const GroupInfoPage: React.FC<GroupInfoPageProps> = ({
                   <div className="flex-1 min-w-0">
                     {/* Row 1: Name + You + Role badge */}
                     <div className="flex items-center" style={{ gap: 6 }}>
-                      <span className="truncate" style={{ fontSize: 14, fontWeight: 600, color: '#0f172a' }}>
+                      <span className="truncate" style={{ fontSize: 14, fontWeight: 600, color: INK }}>
                         {participant.profile?.display_name || participant.profile?.username}
                       </span>
                       {participant.user_id === currentUserId && (
-                        <span style={{ fontSize: 11, color: '#94a3b8' }}>You</span>
+                        <span style={{ fontSize: 11, color: INK_FAINT }}>You</span>
                       )}
                       {getMemberRole(participant) && (
                         <span
@@ -561,8 +568,8 @@ export const GroupInfoPage: React.FC<GroupInfoPageProps> = ({
                       <div className="flex items-center" style={{ gap: 4, marginTop: 2 }}>
                         {participant.profile?.eg_handicap_index != null && (
                           <span style={{
-                            fontSize: 9, fontWeight: 600, color: '#F7931E',
-                            background: 'rgba(247,147,30,0.10)', border: '1px solid rgba(247,147,30,0.25)',
+                            fontSize: 9, fontWeight: 600, color: AMBER,
+                            background: AMBER_TINT_10, border: `1px solid ${AMBER_TINT_25}`,
                             borderRadius: 99, padding: '0px 5px',
                           }}>
                             HCP {participant.profile.eg_handicap_index}
@@ -570,8 +577,8 @@ export const GroupInfoPage: React.FC<GroupInfoPageProps> = ({
                         )}
                         {participant.profile?.home_club && (
                           <span style={{
-                            fontSize: 9, fontWeight: 600, color: '#006747',
-                            background: 'rgba(0,103,71,0.07)', border: '1px solid rgba(0,103,71,0.18)',
+                            fontSize: 9, fontWeight: 600, color: SUNDRIDGE_GREEN,
+                            background: SUNDRIDGE_GREEN_TINT_07, border: `1px solid ${SUNDRIDGE_GREEN_BORDER_18}`,
                             borderRadius: 99, padding: '0px 5px',
                           }}>
                             ⛳ {participant.profile.home_club}
@@ -591,15 +598,15 @@ export const GroupInfoPage: React.FC<GroupInfoPageProps> = ({
                         className="flex items-center justify-center flex-shrink-0 active:scale-[0.97] transition-all disabled:opacity-50"
                         style={{
                           width: 32, height: 32, borderRadius: '50%',
-                          background: 'rgba(247,147,30,0.10)',
-                          border: '1px solid rgba(247,147,30,0.25)',
+                          background: AMBER_TINT_10,
+                          border: `1px solid ${AMBER_TINT_25}`,
                         }}
                         aria-label={`Message ${participant.profile?.display_name || 'member'}`}
                       >
                         {dmStarting === participant.user_id ? (
-                          <Loader2 size={14} style={{ color: '#F7931E' }} className="animate-spin" />
+                          <Loader2 size={14} style={{ color: AMBER }} className="animate-spin" />
                         ) : (
-                          <MessageCircle size={14} style={{ color: '#F7931E' }} />
+                          <MessageCircle size={14} style={{ color: AMBER }} />
                         )}
                       </button>
 
@@ -613,7 +620,7 @@ export const GroupInfoPage: React.FC<GroupInfoPageProps> = ({
                                 background: 'transparent', border: 'none', cursor: 'pointer',
                               }}
                             >
-                              <MoreVertical size={18} style={{ color: '#94a3b8' }} />
+                              <MoreVertical size={18} style={{ color: INK_FAINT }} />
                             </button>
                           </DropdownMenuTrigger>
                           <DropdownMenuContent
@@ -633,11 +640,11 @@ export const GroupInfoPage: React.FC<GroupInfoPageProps> = ({
                               >
                                 <div
                                   className="flex items-center justify-center flex-shrink-0"
-                                  style={{ width: 28, height: 28, borderRadius: 8, background: 'rgba(247,147,30,0.10)' }}
+                                  style={{ width: 28, height: 28, borderRadius: 8, background: AMBER_TINT_10 }}
                                 >
                                   <Shield size={14} style={{ color: '#d97706' }} />
                                 </div>
-                                <span style={{ fontSize: 13, fontWeight: 500, color: '#0f172a' }}>Dismiss as admin</span>
+                                <span style={{ fontSize: 13, fontWeight: 500, color: INK }}>Dismiss as admin</span>
                               </DropdownMenuItem>
                             ) : participant.role !== 'admin' ? (
                               <DropdownMenuItem
@@ -649,12 +656,12 @@ export const GroupInfoPage: React.FC<GroupInfoPageProps> = ({
                                   className="flex items-center justify-center flex-shrink-0"
                                   style={{ width: 28, height: 28, borderRadius: 8, background: 'rgba(245,158,11,0.10)' }}
                                 >
-                                  <ShieldCheck size={14} style={{ color: '#F7931E' }} />
+                                  <ShieldCheck size={14} style={{ color: AMBER }} />
                                 </div>
-                                <span style={{ fontSize: 13, fontWeight: 500, color: '#0f172a' }}>Make group admin</span>
+                                <span style={{ fontSize: 13, fontWeight: 500, color: INK }}>Make group admin</span>
                               </DropdownMenuItem>
                             ) : null}
-                            <div style={{ height: '0.5px', background: 'rgba(15,23,42,0.06)' }} />
+                            <div style={{ height: '0.5px', background: HAIRLINE_INK_6 }} />
                             <DropdownMenuItem
                               onClick={() => participant.user_id && handleRemoveMember(participant.user_id)}
                               className="flex items-center"
@@ -682,7 +689,7 @@ export const GroupInfoPage: React.FC<GroupInfoPageProps> = ({
         {/* ── Neutral actions card (Archive) ── */}
         <div
           className="overflow-hidden"
-          style={{ background: '#fff', borderRadius: 16, border: '1px solid rgba(15,23,42,0.07)' }}
+          style={{ background: '#fff', borderRadius: 16, border: `1px solid ${HAIRLINE_INK_7}` }}
         >
           {/* Archive Chat */}
           <button
@@ -694,22 +701,22 @@ export const GroupInfoPage: React.FC<GroupInfoPageProps> = ({
               className="flex items-center justify-center flex-shrink-0"
               style={{ width: 34, height: 34, borderRadius: 10, background: 'rgba(15,23,42,0.04)' }}
             >
-              <Archive size={17} style={{ color: '#64748b' }} />
+              <Archive size={17} style={{ color: INK_MUTE }} />
             </div>
-            <span style={{ fontSize: 14, fontWeight: 500, color: '#0f172a' }}>Archive Chat</span>
+            <span style={{ fontSize: 14, fontWeight: 500, color: INK }}>Archive Chat</span>
           </button>
         </div>
 
         {/* ── Destructive zone ── */}
         <div style={{ marginTop: 16 }}>
           <div style={{ padding: '0 4px', marginBottom: 8 }}>
-            <span style={{ fontSize: 11, fontWeight: 700, color: '#DC2626', letterSpacing: '0.12em', textTransform: 'uppercase' }}>
+            <span style={{ fontSize: 11, fontWeight: 700, color: DESTRUCTIVE, letterSpacing: '0.12em', textTransform: 'uppercase' }}>
               Danger Zone
             </span>
           </div>
           <div
             className="overflow-hidden"
-            style={{ background: '#fff', borderRadius: 16, border: '1px solid rgba(15,23,42,0.07)' }}
+            style={{ background: '#fff', borderRadius: 16, border: `1px solid ${HAIRLINE_INK_7}` }}
           >
             {/* Exit Group (not if creator) */}
             {!isCreator && (
@@ -720,17 +727,17 @@ export const GroupInfoPage: React.FC<GroupInfoPageProps> = ({
               >
                 <div
                   className="flex items-center justify-center flex-shrink-0"
-                  style={{ width: 34, height: 34, borderRadius: 10, background: 'rgba(15,23,42,0.05)' }}
+                  style={{ width: 34, height: 34, borderRadius: 10, background: INK_TINT_05 }}
                 >
-                  <LogOut size={17} style={{ color: '#DC2626' }} />
+                  <LogOut size={17} style={{ color: DESTRUCTIVE }} />
                 </div>
-                <span style={{ fontSize: 14, fontWeight: 500, color: '#DC2626' }}>Exit Group</span>
+                <span style={{ fontSize: 14, fontWeight: 500, color: DESTRUCTIVE }}>Exit Group</span>
               </button>
             )}
 
             {/* Report Group */}
             {!isCreator && (
-              <div style={{ height: '0.5px', background: 'rgba(15,23,42,0.06)', margin: '0 16px' }} />
+              <div style={{ height: '0.5px', background: HAIRLINE_INK_6, margin: '0 16px' }} />
             )}
             <button
               onClick={() => setIsReportOpen(true)}
@@ -739,17 +746,17 @@ export const GroupInfoPage: React.FC<GroupInfoPageProps> = ({
             >
               <div
                 className="flex items-center justify-center flex-shrink-0"
-                style={{ width: 34, height: 34, borderRadius: 10, background: 'rgba(15,23,42,0.05)' }}
+                style={{ width: 34, height: 34, borderRadius: 10, background: INK_TINT_05 }}
               >
-                <Flag size={17} style={{ color: '#DC2626' }} />
+                <Flag size={17} style={{ color: DESTRUCTIVE }} />
               </div>
-              <span style={{ fontSize: 14, fontWeight: 500, color: '#DC2626' }}>Report Group</span>
+              <span style={{ fontSize: 14, fontWeight: 500, color: DESTRUCTIVE }}>Report Group</span>
             </button>
 
             {/* Delete Group for Everyone (admin only) */}
             {isAdmin && (
               <>
-                <div style={{ height: '0.5px', background: 'rgba(15,23,42,0.06)', margin: '0 16px' }} />
+                <div style={{ height: '0.5px', background: HAIRLINE_INK_6, margin: '0 16px' }} />
                 <button
                   onClick={() => setShowDeleteDialog(true)}
                   className="w-full flex items-center active:opacity-70 transition-opacity"
@@ -757,11 +764,11 @@ export const GroupInfoPage: React.FC<GroupInfoPageProps> = ({
                 >
                   <div
                     className="flex items-center justify-center flex-shrink-0"
-                    style={{ width: 34, height: 34, borderRadius: 10, background: 'rgba(15,23,42,0.05)' }}
+                    style={{ width: 34, height: 34, borderRadius: 10, background: INK_TINT_05 }}
                   >
-                    <Trash2 size={17} style={{ color: '#DC2626' }} />
+                    <Trash2 size={17} style={{ color: DESTRUCTIVE }} />
                   </div>
-                  <span style={{ fontSize: 14, fontWeight: 500, color: '#DC2626' }}>Delete Group for Everyone</span>
+                  <span style={{ fontSize: 14, fontWeight: 500, color: DESTRUCTIVE }}>Delete Group for Everyone</span>
                 </button>
               </>
             )}
@@ -802,8 +809,8 @@ export const GroupInfoPage: React.FC<GroupInfoPageProps> = ({
           }}
         >
           <div style={{ textAlign: 'center' }}>
-            <h3 style={{ fontSize: 16, fontWeight: 800, color: '#0F172A', letterSpacing: '-0.015em', margin: '0 0 8px' }}>Leave group?</h3>
-            <p style={{ fontSize: 14, color: '#64748b', lineHeight: 1.5, margin: 0 }}>
+            <h3 style={{ fontSize: 16, fontWeight: 800, color: INK, letterSpacing: '-0.015em', margin: '0 0 8px' }}>Leave group?</h3>
+            <p style={{ fontSize: 14, color: INK_MUTE, lineHeight: 1.5, margin: 0 }}>
               You'll need to be re-added by a member to rejoin.
             </p>
           </div>
@@ -814,7 +821,7 @@ export const GroupInfoPage: React.FC<GroupInfoPageProps> = ({
               style={{
                 height: 42, borderRadius: 12,
                  border: '0.5px solid rgba(15,23,42,0.12)', background: '#fff',
-                fontSize: 14, fontWeight: 600, color: '#64748b', cursor: 'pointer',
+                fontSize: 14, fontWeight: 600, color: INK_MUTE, cursor: 'pointer',
               }}
             >
               Cancel
@@ -844,8 +851,8 @@ export const GroupInfoPage: React.FC<GroupInfoPageProps> = ({
           }}
         >
           <div style={{ textAlign: 'center' }}>
-            <h3 style={{ fontSize: 16, fontWeight: 800, color: '#0F172A', letterSpacing: '-0.015em', margin: '0 0 8px' }}>Delete group for everyone?</h3>
-            <p style={{ fontSize: 14, color: '#64748b', lineHeight: 1.5, margin: 0 }}>
+            <h3 style={{ fontSize: 16, fontWeight: 800, color: INK, letterSpacing: '-0.015em', margin: '0 0 8px' }}>Delete group for everyone?</h3>
+            <p style={{ fontSize: 14, color: INK_MUTE, lineHeight: 1.5, margin: 0 }}>
               This cannot be undone. All messages and media will be permanently deleted.
             </p>
           </div>
@@ -856,7 +863,7 @@ export const GroupInfoPage: React.FC<GroupInfoPageProps> = ({
               style={{
                 height: 42, borderRadius: 12,
                 border: '0.5px solid rgba(15,23,42,0.12)', background: '#fff',
-                fontSize: 14, fontWeight: 600, color: '#64748b', cursor: 'pointer',
+                fontSize: 14, fontWeight: 600, color: INK_MUTE, cursor: 'pointer',
               }}
             >
               Cancel
