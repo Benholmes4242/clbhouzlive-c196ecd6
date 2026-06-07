@@ -180,7 +180,7 @@ function SwipeableConversationRow({
             className="text-[12px] truncate"
             style={{ color: '#94A3B8' }}
           >
-            {conv.preview || 'Tap to continue conversation'}
+            {conv.summary || 'Tap to continue conversation'}
           </p>
         </div>
 
