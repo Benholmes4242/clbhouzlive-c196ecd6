@@ -547,8 +547,8 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
               style={{
                 flex: '0 0 auto',
                 padding: '14px 22px 20px',
-                background: FROST.glass,
-                borderTop: `1px solid ${FROST.borderSoft}`,
+                background: '#0F1419',
+                borderTop: '1px solid rgba(255,255,255,0.07)',
                 position: 'relative',
                 zIndex: 1,
               }}
@@ -558,8 +558,8 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
                 style={{
                   padding: 14,
                   borderRadius: 16,
-                  background: FROST.glassSoft,
-                  border: `1px solid ${FROST.borderSoft}`,
+                  background: 'rgba(255,255,255,0.03)',
+                  border: '1px solid rgba(255,255,255,0.07)',
                   display: 'flex',
                   alignItems: 'center',
                   gap: 12,
