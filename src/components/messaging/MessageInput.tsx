@@ -353,7 +353,7 @@ export function MessageInput({
   );
 }
 
-function ActionTile({ icon: Icon, label, onClick }: { icon: React.ComponentType<{ size?: number; style?: React.CSSProperties; strokeWidth?: number }>; label: string; onClick: () => void }) {
+function ActionTile({ icon: Icon, label, onClick }: { icon: typeof Plus; label: string; onClick: () => void }) {
   return (
     <button
       onClick={onClick}
