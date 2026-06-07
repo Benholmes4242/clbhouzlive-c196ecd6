@@ -36,6 +36,7 @@ interface SnapVideoPlayerProps {
   isSuggestedFeed: boolean;
   onDoubleTapLike?: () => void;
   onFirstFrameReady?: () => void;
+  isFullscreen?: boolean;
 }
 
 export const SnapVideoPlayer = memo(function SnapVideoPlayer({
@@ -51,6 +52,7 @@ export const SnapVideoPlayer = memo(function SnapVideoPlayer({
   isSuggestedFeed,
   onDoubleTapLike,
   onFirstFrameReady,
+  isFullscreen = false,
 }: SnapVideoPlayerProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const hlsRef = useRef<HlsType | null>(null);
@@ -80,7 +82,9 @@ export const SnapVideoPlayer = memo(function SnapVideoPlayer({
   const aspect = (height ?? 1) > 0 && (width ?? 0) > 0
     ? (height as number) / (width as number)
     : 1.0;
-  const objectFit: 'cover' | 'contain' = isSuggestedFeed ? 'cover' : (aspect >= 1.5 ? 'cover' : 'contain');
+  const objectFit: 'cover' | 'contain' = isFullscreen
+    ? 'contain'
+    : (isSuggestedFeed ? 'cover' : (aspect >= 1.5 ? 'cover' : 'contain'));
 
   // ── Attach/detach HLS ──
   useEffect(() => {
@@ -297,8 +301,15 @@ export const SnapVideoPlayer = memo(function SnapVideoPlayer({
       style={{ background: '#0A0E14' }}
       onClick={handleTap}
     >
-      {/* Solid matte behind non-filling media — chrome colour, no blur. */}
-      <div className="absolute inset-0" style={{ background: '#0A0E14' }} aria-hidden="true" />
+      {/* Backdrop — blurred thumbnail in fullscreen, solid matte otherwise. */}
+      {isFullscreen && thumbnailUrl ? (
+        <div aria-hidden="true" className="absolute inset-0" style={{
+          backgroundImage: `url(${thumbnailUrl})`, backgroundSize: 'cover', backgroundPosition: 'center',
+          filter: 'blur(40px) brightness(0.5) saturate(1.2)', transform: 'scale(1.2)',
+        }} />
+      ) : (
+        <div className="absolute inset-0" style={{ background: '#0A0E14' }} aria-hidden="true" />
+      )}
       {/* Poster / thumbnail */}
       {thumbnailUrl && (
         <img

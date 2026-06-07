@@ -82,6 +82,7 @@ export const FeedSlide = memo(function FeedSlide({
           isActive={isActive}
           onDoubleTapLike={() => onLike?.(post)}
           onZoomChange={onZoomChange}
+          isFullscreen={isFullscreen}
         />
       );
     }
@@ -103,6 +104,7 @@ export const FeedSlide = memo(function FeedSlide({
           isSuggestedFeed={isSuggestedFeed}
           onDoubleTapLike={() => onLike?.(post)}
           onFirstFrameReady={onFirstFrameReady}
+          isFullscreen={isFullscreen}
         />
       );
     }
@@ -113,12 +115,21 @@ export const FeedSlide = memo(function FeedSlide({
       const aspect = (first.height ?? 1) > 0 && (first.width ?? 0) > 0
         ? (first.height as number) / (first.width as number)
         : 1.0;
-      const objectFit: 'cover' | 'contain' = isSuggestedFeed ? 'cover' : (aspect >= 1.5 ? 'cover' : 'contain');
+      const objectFit: 'cover' | 'contain' = isFullscreen
+        ? 'contain'
+        : (isSuggestedFeed ? 'cover' : (aspect >= 1.5 ? 'cover' : 'contain'));
       const imgSrc = first.imageUrl || first.thumbnailUrl || '';
       return (
         <div className="absolute inset-0 overflow-hidden">
-          {/* Solid matte behind non-filling media — chrome colour, intentional cinema matte (no blur). */}
-          <div className="absolute inset-0" style={{ background: '#0A0E14' }} aria-hidden="true" />
+          {/* Backdrop — blurred image in fullscreen, solid matte otherwise. */}
+          {isFullscreen ? (
+            <div aria-hidden="true" className="absolute inset-0" style={{
+              backgroundImage: `url(${imgSrc})`, backgroundSize: 'cover', backgroundPosition: 'center',
+              filter: 'blur(40px) brightness(0.5) saturate(1.2)', transform: 'scale(1.2)',
+            }} />
+          ) : (
+            <div className="absolute inset-0" style={{ background: '#0A0E14' }} aria-hidden="true" />
+          )}
           {/* Main image with pinch zoom */}
           <div
             ref={zoomRef}

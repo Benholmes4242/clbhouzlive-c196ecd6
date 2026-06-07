@@ -13,6 +13,7 @@ interface FeedImageCarouselProps {
   isActive?: boolean;
   onDoubleTapLike?: () => void;
   onZoomChange?: (isZoomed: boolean) => void;
+  isFullscreen?: boolean;
 }
 
 // Inner component for each zoomable image slide
@@ -23,7 +24,8 @@ const ZoomableImageSlide: React.FC<{
   onZoomChange?: (isZoomed: boolean) => void;
   slideIndex: number;
   currentSlide: number;
-}> = memo(({ imgSrc, objectFit, loading, onZoomChange, slideIndex, currentSlide }) => {
+  isFullscreen?: boolean;
+}> = memo(({ imgSrc, objectFit, loading, onZoomChange, slideIndex, currentSlide, isFullscreen }) => {
   const { ref, imgRef, style, scale, reset } = usePinchZoomPointer();
 
   // Reset zoom when this slide is no longer current
@@ -38,8 +40,15 @@ const ZoomableImageSlide: React.FC<{
 
   return (
     <div className="absolute inset-0 overflow-hidden">
-      {/* Solid matte behind non-filling media — chrome colour, no blur. */}
-      <div className="absolute inset-0" style={{ background: '#0A0E14' }} aria-hidden="true" />
+      {/* Backdrop — blurred image in fullscreen, solid matte otherwise. */}
+      {isFullscreen ? (
+        <div aria-hidden="true" className="absolute inset-0" style={{
+          backgroundImage: `url(${imgSrc})`, backgroundSize: 'cover', backgroundPosition: 'center',
+          filter: 'blur(40px) brightness(0.5) saturate(1.2)', transform: 'scale(1.2)',
+        }} />
+      ) : (
+        <div className="absolute inset-0" style={{ background: '#0A0E14' }} aria-hidden="true" />
+      )}
       <div
         ref={ref}
         style={{ ...style, position: 'absolute', inset: 0, zIndex: 1 }}
@@ -66,6 +75,7 @@ export const FeedImageCarousel = memo(function FeedImageCarousel({
   isActive = false,
   onDoubleTapLike,
   onZoomChange,
+  isFullscreen = false,
 }: FeedImageCarouselProps) {
   const activeIndex = useClubhouseStore(s => s.activeIndex);
   const setCarouselPosition = useClubhouseStore(s => s.setCarouselPosition);
@@ -298,6 +308,7 @@ export const FeedImageCarousel = memo(function FeedImageCarousel({
                 feedIndex={feedIndex}
                 isSuggestedFeed={isSuggestedFeed}
                 onDoubleTapLike={onDoubleTapLike}
+                isFullscreen={isFullscreen}
               />
             </div>
           );
@@ -306,7 +317,9 @@ export const FeedImageCarousel = memo(function FeedImageCarousel({
         const aspect = (item.height ?? 1) > 0 && (item.width ?? 0) > 0
           ? (item.height as number) / (item.width as number)
           : 1.0;
-        const objectFit: 'cover' | 'contain' = isSuggestedFeed ? 'cover' : (aspect >= 1.5 ? 'cover' : 'contain');
+        const objectFit: 'cover' | 'contain' = isFullscreen
+          ? 'contain'
+          : (isSuggestedFeed ? 'cover' : (aspect >= 1.5 ? 'cover' : 'contain'));
         const imgSrc = item.imageUrl || item.thumbnailUrl || '';
         return (
           <div key={item.id || idx} className="absolute inset-0" style={slideStyle}>
@@ -317,6 +330,7 @@ export const FeedImageCarousel = memo(function FeedImageCarousel({
               onZoomChange={handleImageZoomChange}
               slideIndex={idx}
               currentSlide={currentSlide}
+              isFullscreen={isFullscreen}
             />
           </div>
         );
