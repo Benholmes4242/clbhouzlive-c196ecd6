@@ -12,7 +12,7 @@ import { usePushNotifications } from '@/hooks/usePushNotifications';
 import { useInAppNotifications } from '@/hooks/useInAppNotifications';
 import { useDebouncedCallback } from '@/hooks/useDebouncedCallback';
 import { useHideBottomNav } from '@/hooks/useBottomNavVisibility';
-import { SectionEyebrow } from '@/components/ui/SectionEyebrow';
+
 
 type ConversationFilterType = 'all' | 'unread' | 'groups';
 
