@@ -234,25 +234,12 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
               background: '#05080F',
             }}
           >
-            {isContained && mediaUrl && (
-              <div
-                aria-hidden
-                style={{
-                  position: 'absolute',
-                  inset: 0,
-                  backgroundImage: `url(${mediaUrl})`,
-                  backgroundSize: 'cover',
-                  backgroundPosition: 'center',
-                  filter: 'blur(26px) brightness(0.5) saturate(1.25)',
-                  transform: 'scale(1.25)',
-                }}
-              />
-            )}
+            {isContained && mediaUrl && null}
             {media.type === 'video' ? (
               <InlineVideo
                 item={media}
                 isActive={isActive}
-                objectFit={isContained ? 'contain' : 'cover'}
+                objectFit="cover"
               />
             ) : mediaUrl ? (
               <img
@@ -262,10 +249,10 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
                 style={{
                   position: 'absolute',
                   inset: 0,
-                  margin: 'auto',
                   width: '100%',
                   height: '100%',
-                  objectFit: isContained ? 'contain' : 'cover',
+                  objectFit: 'cover',
+                  objectPosition: 'center',
                   display: 'block',
                 }}
               />
