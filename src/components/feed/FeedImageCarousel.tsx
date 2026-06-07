@@ -13,6 +13,7 @@ interface FeedImageCarouselProps {
   isActive?: boolean;
   onDoubleTapLike?: () => void;
   onZoomChange?: (isZoomed: boolean) => void;
+  isFullscreen?: boolean;
 }
 
 // Inner component for each zoomable image slide
@@ -23,7 +24,8 @@ const ZoomableImageSlide: React.FC<{
   onZoomChange?: (isZoomed: boolean) => void;
   slideIndex: number;
   currentSlide: number;
-}> = memo(({ imgSrc, objectFit, loading, onZoomChange, slideIndex, currentSlide }) => {
+  isFullscreen?: boolean;
+}> = memo(({ imgSrc, objectFit, loading, onZoomChange, slideIndex, currentSlide, isFullscreen }) => {
   const { ref, imgRef, style, scale, reset } = usePinchZoomPointer();
 
   // Reset zoom when this slide is no longer current
@@ -38,8 +40,15 @@ const ZoomableImageSlide: React.FC<{
 
   return (
     <div className="absolute inset-0 overflow-hidden">
-      {/* Solid matte behind non-filling media — chrome colour, no blur. */}
-      <div className="absolute inset-0" style={{ background: '#0A0E14' }} aria-hidden="true" />
+      {/* Backdrop — blurred image in fullscreen, solid matte otherwise. */}
+      {isFullscreen ? (
+        <div aria-hidden="true" className="absolute inset-0" style={{
+          backgroundImage: `url(${imgSrc})`, backgroundSize: 'cover', backgroundPosition: 'center',
+          filter: 'blur(40px) brightness(0.5) saturate(1.2)', transform: 'scale(1.2)',
+        }} />
+      ) : (
+        <div className="absolute inset-0" style={{ background: '#0A0E14' }} aria-hidden="true" />
+      )}
       <div
         ref={ref}
         style={{ ...style, position: 'absolute', inset: 0, zIndex: 1 }}
