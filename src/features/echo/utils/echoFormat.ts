@@ -109,9 +109,9 @@ export function generateFollowUps(lastResponse: string, recentUserMessages: stri
  * Markdown allowlist for react-markdown
  */
 export const ECHO_ALLOWED_ELEMENTS = [
-  'p', 'ul', 'ol', 'li', 'strong', 'em', 'br', 'span'
+  'p', 'ul', 'ol', 'li', 'strong', 'em', 'br', 'span', 'code', 'blockquote'
 ];
 
 export const ECHO_DISALLOWED_ELEMENTS = [
-  'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'u', 'pre', 'blockquote', 'img', 'table', 'thead', 'tbody', 'tr', 'th', 'td'
+  'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'u', 'pre', 'img', 'table', 'thead', 'tbody', 'tr', 'th', 'td'
 ];
