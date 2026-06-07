@@ -82,7 +82,9 @@ export const SnapVideoPlayer = memo(function SnapVideoPlayer({
   const aspect = (height ?? 1) > 0 && (width ?? 0) > 0
     ? (height as number) / (width as number)
     : 1.0;
-  const objectFit: 'cover' | 'contain' = isSuggestedFeed ? 'cover' : (aspect >= 1.5 ? 'cover' : 'contain');
+  const objectFit: 'cover' | 'contain' = isFullscreen
+    ? 'contain'
+    : (isSuggestedFeed ? 'cover' : (aspect >= 1.5 ? 'cover' : 'contain'));
 
   // ── Attach/detach HLS ──
   useEffect(() => {
