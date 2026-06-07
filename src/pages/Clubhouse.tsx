@@ -416,7 +416,7 @@ const ClubhouseContent = () => {
             getLikeState={(post) => {
               const s = getActiveLikeState(post);
               if (!s) return null;
-              return { liked: s.liked, count: s.count ?? post.likeCount ?? 0 };
+              return { liked: s.isLiked, count: s.count ?? post.likeCount ?? 0 };
             }}
             getCommentCount={(post) => getCommentCount(post)}
           />
