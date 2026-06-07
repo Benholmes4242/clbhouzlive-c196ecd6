@@ -1,9 +1,9 @@
 /**
- * ReviewBottomSheet — Editorial Frost Panel sheet (PR 7 v2).
+ * ReviewBottomSheet — Calm dark sheet.
  *
- * Three-zone layout (PR 6) with editorial design (PR 7 v2):
- *   - Pinned header: drag handle + prestige rule + Playfair headline + location + 50px score | 2×2 FULL-label grid
- *   - Scrollable middle: atmospheric "X.X" watermark + body paragraphs with Playfair amber drop cap
+ * Three-zone layout:
+ *   - Pinned header: drag handle + REVIEW eyebrow + Geist headline + location + 50px score | 2×2 labelled breakdown
+ *   - Scrollable middle: plain Geist paragraphs (no drop cap, no watermark)
  *   - Pinned footer: author card + Visit Profile + Full Review CTAs
  *
  * Driven by the unified store via ReviewBottomSheetPortal.
