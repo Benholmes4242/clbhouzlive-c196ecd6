@@ -739,6 +739,17 @@ const AppInner: React.FC = () => {
 const App: React.FC = () => {
   // Import AppPrefetchProvider dynamically to avoid circular deps
   const AppPrefetchProvider = React.lazy(() => import('@/providers/AppPrefetchProvider'));
+
+  // Signal to index.html watchdog that React has mounted successfully.
+  // Runs once after first commit — clears the boot-deadline timer so we
+  // don't trigger recovery on a healthy boot.
+  useEffect(() => {
+    (window as any).__APP_MOUNTED__ = true;
+    if (typeof (window as any).__cancelMountDeadline === 'function') {
+      (window as any).__cancelMountDeadline();
+    }
+  }, []);
+
   
   return (
     <>
