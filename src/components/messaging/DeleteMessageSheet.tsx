@@ -9,6 +9,7 @@ import {
 } from '@/components/ui/sheet';
 import { haptic } from '@/utils/haptics';
 import { SectionEyebrow } from '@/components/ui/SectionEyebrow';
+import { DESTRUCTIVE, HAIRLINE_INK_7, INK_FAINT, INK_MUTE, INK_TINT_05, SURFACE } from './_shared/tokens';
 
 interface DeleteMessageSheetProps {
   open: boolean;
@@ -44,7 +45,7 @@ export function DeleteMessageSheet({
       <SheetContent
         side="bottom"
         className="!rounded-t-[24px] !p-0"
-        style={{ background: '#fff', padding: '0 16px 32px' }}
+        style={{ background: SURFACE, padding: '0 16px 32px' }}
       >
         {/* Drag handle */}
         <div
@@ -56,7 +57,7 @@ export function DeleteMessageSheet({
         />
 
         {/* Title */}
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '12px 16px', marginBottom: 4, borderBottom: '0.5px solid rgba(15,23,42,0.07)' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '12px 16px', marginBottom: 4, borderBottom: `0.5px solid ${HAIRLINE_INK_7}` }}>
           <SectionEyebrow label="Delete Message" color="danger" />
         </div>
 
@@ -73,13 +74,13 @@ export function DeleteMessageSheet({
           >
             <div
               className="flex items-center justify-center flex-shrink-0"
-              style={{ width: 44, height: 44, borderRadius: '50%', background: 'rgba(15,23,42,0.05)' }}
+              style={{ width: 44, height: 44, borderRadius: '50%', background: INK_TINT_05 }}
             >
-              <User size={18} style={{ color: '#64748b' }} />
+              <User size={18} style={{ color: INK_MUTE }} />
             </div>
             <div>
               <p style={{ fontSize: 14, fontWeight: 600, color: '#1e293b', margin: 0 }}>Delete for me</p>
-              <p style={{ fontSize: 12, color: '#94a3b8', margin: 0 }}>Only removed from your view — others can still see it</p>
+              <p style={{ fontSize: 12, color: INK_FAINT, margin: 0 }}>Only removed from your view — others can still see it</p>
             </div>
           </button>
 
@@ -101,11 +102,11 @@ export function DeleteMessageSheet({
                 className="flex items-center justify-center flex-shrink-0"
                 style={{ width: 44, height: 44, borderRadius: '50%', background: 'rgba(239,68,68,0.08)' }}
               >
-                <Users size={18} style={{ color: '#ef4444' }} />
+                <Users size={18} style={{ color: DESTRUCTIVE }} />
               </div>
               <div>
-                <p style={{ fontSize: 14, fontWeight: 600, color: '#ef4444', margin: 0 }}>Delete for everyone</p>
-                <p style={{ fontSize: 12, color: '#94a3b8', margin: 0 }}>
+                <p style={{ fontSize: 14, fontWeight: 600, color: DESTRUCTIVE, margin: 0 }}>Delete for everyone</p>
+                <p style={{ fontSize: 12, color: INK_FAINT, margin: 0 }}>
                   {canDeleteForEveryone
                     ? 'Permanently removed for all participants'
                     : 'Only available within 1 hour of sending'

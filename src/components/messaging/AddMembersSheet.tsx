@@ -10,6 +10,7 @@ import { useDebounce } from '@/hooks/useDebounce';
 import { cn } from '@/lib/utils';
 import { AppLog } from '@/lib/logger';
 import { SectionEyebrow } from '@/components/ui/SectionEyebrow';
+import { AMBER } from './_shared/tokens';
 
 interface AddMembersSheetProps {
   isOpen: boolean;
@@ -137,7 +138,7 @@ export const AddMembersSheet: React.FC<AddMembersSheetProps> = ({
               <div
                 key={user.id}
                 className="flex items-center gap-2 px-3 py-1 rounded-full text-sm"
-                style={{ background: 'rgba(247,147,30,0.10)', border: '1px solid rgba(247,147,30,0.25)', color: '#F7931E' }}
+                style={{ background: 'rgba(247,147,30,0.10)', border: '1px solid rgba(247,147,30,0.25)', color: AMBER }}
               >
                 <span>{user.display_name || user.username}</span>
                 <button 
@@ -181,7 +182,7 @@ export const AddMembersSheet: React.FC<AddMembersSheetProps> = ({
                     )}
                   </div>
                   {isSelected && (
-                    <div className="w-6 h-6 rounded-full flex items-center justify-center" style={{ background: '#F7931E' }}>
+                    <div className="w-6 h-6 rounded-full flex items-center justify-center" style={{ background: AMBER }}>
                       <Check size={14} className="text-white" />
                     </div>
                   )}

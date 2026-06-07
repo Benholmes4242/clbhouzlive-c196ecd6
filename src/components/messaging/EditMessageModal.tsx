@@ -12,6 +12,7 @@ import {
 } from '@/components/ui/sheet';
 import { haptic } from '@/utils/haptics';
 import { SectionEyebrow } from '@/components/ui/SectionEyebrow';
+import { AMBER, INK_MUTE } from './_shared/tokens';
 
 interface EditMessageModalProps {
   open: boolean;
@@ -67,7 +68,7 @@ export function EditMessageModal({
             value={content}
             onChange={(e) => setContent(e.target.value)}
             placeholder="Edit your message..."
-            className="min-h-[100px] resize-none rounded-2xl border-border focus:border-[#F7931E]/40 focus:ring-[#F7931E]/20"
+            className=`min-h-[100px] resize-none rounded-2xl border-border focus:border-[${AMBER}]/40 focus:ring-[${AMBER}]/20`
             autoFocus
           />
 
@@ -76,7 +77,7 @@ export function EditMessageModal({
               variant="outline"
               onClick={handleCancel}
               className="flex-1 h-12 rounded-full"
-              style={{ border: '0.5px solid rgba(15,23,42,0.12)', background: 'transparent', fontSize: 14, fontWeight: 600, color: '#64748B' }}
+              style={{ border: '0.5px solid rgba(15,23,42,0.12)', background: 'transparent', fontSize: 14, fontWeight: 600, color: INK_MUTE }}
             >
               <X className="w-4 h-4 mr-2" />
               Cancel
@@ -85,7 +86,7 @@ export function EditMessageModal({
               onClick={handleSave}
               disabled={!content.trim() || content === originalContent || saving}
               className="flex-1 h-12 rounded-full text-white border-0 active:scale-[0.97] transition-transform"
-              style={{ background: '#F7931E' }}
+              style={{ background: AMBER }}
             >
               <Check className="w-4 h-4 mr-2" />
               {saving ? 'Saving...' : 'Save'}

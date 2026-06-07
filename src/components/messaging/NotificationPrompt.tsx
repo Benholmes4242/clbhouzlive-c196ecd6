@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Bell, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { AMBER, INK_MUTE, SURFACE } from './_shared/tokens';
 
 interface NotificationPromptProps {
   onEnable: () => Promise<boolean>;
@@ -46,7 +47,7 @@ export function NotificationPrompt({
           background: 'rgba(247,147,30,0.15)',
         }}
       >
-        <Bell style={{ color: '#F7931E' }} className="w-4 h-4" />
+        <Bell style={{ color: AMBER }} className="w-4 h-4" />
       </div>
       
       {/* Text column */}
@@ -54,7 +55,7 @@ export function NotificationPrompt({
         <p style={{ fontSize: 13, fontWeight: 600, color: '#1e293b', margin: 0 }}>
           Enable notifications
         </p>
-        <p style={{ fontSize: 12, color: '#64748b', margin: 0 }}>
+        <p style={{ fontSize: 12, color: INK_MUTE, margin: 0 }}>
           Don't miss a message
         </p>
       </div>
@@ -72,7 +73,7 @@ export function NotificationPrompt({
           }}
           aria-label="Dismiss"
         >
-          <X style={{ color: '#64748b' }} className="w-3.5 h-3.5" />
+          <X style={{ color: INK_MUTE }} className="w-3.5 h-3.5" />
         </button>
 
         {/* Enable */}
@@ -81,7 +82,7 @@ export function NotificationPrompt({
           disabled={isEnabling}
           style={{
             padding: '5px 12px', borderRadius: 99,
-            background: '#F7931E', color: '#fff',
+            background: AMBER, color: SURFACE,
             fontSize: 12, fontWeight: 600,
             border: 'none', cursor: 'pointer',
           }}

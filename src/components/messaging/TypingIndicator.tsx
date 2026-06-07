@@ -1,3 +1,4 @@
+import { SURFACE } from './_shared/tokens';
 /**
  * TypingIndicator - Shows who is typing with bouncing dots
  * Phase 3: Group-aware with sender name strip
@@ -33,7 +34,7 @@ export function TypingIndicator({ typingUsers, className }: TypingIndicatorProps
           style={{
             padding: '9px 16px',
             borderRadius: '16px 16px 16px 4px',
-            background: '#fff',
+            background: SURFACE,
             border: '1px solid rgba(0,0,0,0.07)',
             boxShadow: '0 1px 3px rgba(0,0,0,0.06)',
             display: 'inline-flex',

@@ -8,6 +8,7 @@ import { ChevronLeft, ChevronRight, Image, Link, MapPin, Loader2, ExternalLink, 
 import { supabase } from '@/integrations/supabase/client';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
+import { AMBER, AMBER_TINT_10, AMBER_TINT_25, HAIRLINE_INK_10, HAIRLINE_INK_7, INK, INK_FAINT, INK_MUTE, INK_TINT_05, SHELL_BG, SURFACE } from './_shared/tokens';
 
 interface SharedMediaGalleryProps {
   conversationId: string;
@@ -108,7 +109,7 @@ export function SharedMediaGallery({ conversationId, onClose }: SharedMediaGalle
   }, [conversationId]);
 
   const tabs: { key: TabKey; label: string; count: number; icon: typeof Image; activeColor: string }[] = [
-    { key: 'media', label: 'Media', count: media.length, icon: Image, activeColor: '#0f172a' },
+    { key: 'media', label: 'Media', count: media.length, icon: Image, activeColor: INK },
     { key: 'courses', label: 'Courses', count: courses.length, icon: MapPin, activeColor: '#006747' },
     { key: 'links', label: 'Links', count: links.length, icon: Link, activeColor: '#6366f1' },
   ];
@@ -116,7 +117,7 @@ export function SharedMediaGallery({ conversationId, onClose }: SharedMediaGalle
   return (
     <div
       className="fixed inset-0 z-50 flex flex-col"
-      style={{ background: '#F8FAFC' }}
+      style={{ background: SHELL_BG }}
     >
       {/* Header */}
       <header
@@ -125,18 +126,18 @@ export function SharedMediaGallery({ conversationId, onClose }: SharedMediaGalle
           paddingTop: 'max(env(safe-area-inset-top, 0px), 47px)',
           paddingBottom: 10,
           paddingLeft: 16, paddingRight: 16,
-          background: '#F8FAFC',
-          borderBottom: '0.5px solid rgba(15,23,42,0.07)',
+          background: SHELL_BG,
+          borderBottom: `0.5px solid ${HAIRLINE_INK_7}`,
         }}
       >
         <button
           onClick={onClose}
           className="flex items-center justify-center active:scale-[0.97] transition-transform flex-shrink-0"
-          style={{ width: 34, height: 34, borderRadius: '50%', background: 'rgba(15,23,42,0.05)', border: '0.5px solid rgba(15,23,42,0.10)' }}
+          style={{ width: 34, height: 34, borderRadius: '50%', background: INK_TINT_05, border: `0.5px solid ${HAIRLINE_INK_10}` }}
         >
           <ChevronLeft size={20} style={{ color: '#475569' }} strokeWidth={2.5} />
         </button>
-        <h1 className="flex-1 text-center" style={{ fontSize: 17, fontWeight: 800, color: '#0f172a', letterSpacing: '-0.015em' }}>
+        <h1 className="flex-1 text-center" style={{ fontSize: 17, fontWeight: 800, color: INK, letterSpacing: '-0.015em' }}>
           Shared Media
         </h1>
         <div style={{ width: 34 }} />
@@ -145,13 +146,13 @@ export function SharedMediaGallery({ conversationId, onClose }: SharedMediaGalle
       {/* Tab bar */}
       <div
         className="flex flex-shrink-0"
-        style={{ background: '#fff', borderBottom: '0.5px solid rgba(15,23,42,0.07)' }}
+        style={{ background: SURFACE, borderBottom: `0.5px solid ${HAIRLINE_INK_7}` }}
       >
         {tabs.map(tab => {
           const isActive = activeTab === tab.key;
           const IconComponent = tab.icon;
-          const iconColor = isActive ? tab.activeColor : '#94a3b8';
-          const textColor = isActive ? '#0f172a' : '#94a3b8';
+          const iconColor = isActive ? tab.activeColor : INK_FAINT;
+          const textColor = isActive ? INK : INK_FAINT;
           return (
             <button
               key={tab.key}
@@ -171,7 +172,7 @@ export function SharedMediaGallery({ conversationId, onClose }: SharedMediaGalle
                 style={{
                   position: 'absolute', bottom: 0, left: 0, right: 0,
                   height: 2, borderRadius: '2px 2px 0 0',
-                  background: isActive ? '#F7931E' : 'transparent',
+                  background: isActive ? AMBER : 'transparent',
                 }}
               />
             </button>
@@ -182,7 +183,7 @@ export function SharedMediaGallery({ conversationId, onClose }: SharedMediaGalle
       {/* Content */}
       {loading ? (
         <div className="flex-1 flex items-center justify-center">
-          <Loader2 className="w-8 h-8 animate-spin" style={{ color: '#F7931E' }} />
+          <Loader2 className="w-8 h-8 animate-spin" style={{ color: AMBER }} />
         </div>
       ) : (
         <div className="flex-1 overflow-y-auto">
@@ -191,8 +192,8 @@ export function SharedMediaGallery({ conversationId, onClose }: SharedMediaGalle
             media.length === 0 ? (
               <EmptyState
                 icon={Image}
-                iconColor="#F7931E"
-                iconBg="rgba(247,147,30,0.10)"
+                iconColor=AMBER
+                iconBg=AMBER_TINT_10
                 title="No media shared yet"
                 subtitle="Photos and videos will appear here"
                 cta={{
@@ -249,7 +250,7 @@ export function SharedMediaGallery({ conversationId, onClose }: SharedMediaGalle
                     className="w-full flex items-center text-left active:opacity-80 transition-opacity"
                     style={{
                        gap: 12, padding: '10px 14px', borderRadius: 14,
-                      background: '#fff', border: '1px solid rgba(15,23,42,0.07)',
+                      background: SURFACE, border: `1px solid ${HAIRLINE_INK_7}`,
                       cursor: 'pointer',
                     }}
                   >
@@ -269,18 +270,18 @@ export function SharedMediaGallery({ conversationId, onClose }: SharedMediaGalle
                       </div>
                     )}
                     <div className="flex-1 min-w-0">
-                      <p className="truncate" style={{ fontSize: 14, fontWeight: 600, color: '#0f172a', margin: 0 }}>
+                      <p className="truncate" style={{ fontSize: 14, fontWeight: 600, color: INK, margin: 0 }}>
                         {course.title}
                       </p>
                       {course.location && (
                         <div className="flex items-center" style={{ gap: 4, marginTop: 2 }}>
-                          <MapPin size={11} style={{ color: '#94a3b8' }} />
-                          <span style={{ fontSize: 12, color: '#94a3b8' }}>{course.location}</span>
+                          <MapPin size={11} style={{ color: INK_FAINT }} />
+                          <span style={{ fontSize: 12, color: INK_FAINT }}>{course.location}</span>
                         </div>
                       )}
                     </div>
                     {course.rating && course.rating > 0 && (
-                      <span style={{ fontSize: 13, fontWeight: 700, color: '#F7931E' }}>⭐ {course.rating.toFixed(1)}</span>
+                      <span style={{ fontSize: 13, fontWeight: 700, color: AMBER }}>⭐ {course.rating.toFixed(1)}</span>
                     )}
                     <ChevronRight size={14} style={{ color: '#d1d5db', flexShrink: 0 }} />
                   </button>
@@ -304,7 +305,7 @@ export function SharedMediaGallery({ conversationId, onClose }: SharedMediaGalle
                     className="flex items-center"
                     style={{
                       gap: 12, padding: '10px 14px', borderRadius: 14,
-                      background: '#fff', border: '1px solid rgba(15,23,42,0.07)',
+                      background: SURFACE, border: `1px solid ${HAIRLINE_INK_7}`,
                       textDecoration: 'none',
                     }}
                   >
@@ -318,12 +319,12 @@ export function SharedMediaGallery({ conversationId, onClose }: SharedMediaGalle
                       <Link size={16} style={{ color: '#6366f1' }} />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="truncate" style={{ fontSize: 13, fontWeight: 600, color: '#0f172a', margin: 0 }}>
+                      <p className="truncate" style={{ fontSize: 13, fontWeight: 600, color: INK, margin: 0 }}>
                         {link.url.replace(/https?:\/\/(www\.)?/, '').split('/')[0]}
                       </p>
-                      <p className="truncate" style={{ fontSize: 12, color: '#64748b', margin: '2px 0 0' }}>{link.url}</p>
+                      <p className="truncate" style={{ fontSize: 12, color: INK_MUTE, margin: '2px 0 0' }}>{link.url}</p>
                     </div>
-                    <ExternalLink size={14} style={{ color: '#94a3b8', flexShrink: 0 }} />
+                    <ExternalLink size={14} style={{ color: INK_FAINT, flexShrink: 0 }} />
                   </a>
                 ))}
               </div>
@@ -348,7 +349,7 @@ export function SharedMediaGallery({ conversationId, onClose }: SharedMediaGalle
               background: 'rgba(255,255,255,0.2)', border: 'none', cursor: 'pointer',
             }}
           >
-            <X size={20} style={{ color: '#fff' }} />
+            <X size={20} style={{ color: SURFACE }} />
           </button>
           <img
             src={selectedImage}
@@ -385,8 +386,8 @@ function EmptyState({
       >
         <Icon size={24} style={{ color: iconColor }} />
       </div>
-      <p style={{ fontSize: 15, fontWeight: 700, color: '#0f172a', margin: 0 }}>{title}</p>
-      <p style={{ fontSize: 13, color: '#94a3b8', margin: '4px 0 0' }}>{subtitle}</p>
+      <p style={{ fontSize: 15, fontWeight: 700, color: INK, margin: 0 }}>{title}</p>
+      <p style={{ fontSize: 13, color: INK_FAINT, margin: '4px 0 0' }}>{subtitle}</p>
       {cta && (
         <button
           onClick={cta.onClick}
@@ -395,9 +396,9 @@ function EmptyState({
             marginTop: 16,
             padding: '8px 16px',
             borderRadius: 99,
-            background: 'rgba(247,147,30,0.10)',
-            border: '1px solid rgba(247,147,30,0.25)',
-            color: '#F7931E',
+            background: AMBER_TINT_10,
+            border: `1px solid ${AMBER_TINT_25}`,
+            color: AMBER,
             fontSize: 13,
             fontWeight: 600,
           }}

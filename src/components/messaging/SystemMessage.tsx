@@ -1,6 +1,7 @@
 import React from 'react';
 import { UserPlus, UserMinus, LogOut, Shield, ShieldOff, Edit, Camera, Users } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { INK_FAINT, INK_MUTE } from './_shared/tokens';
 
 export type SystemEventType = 
   | 'user_added'
@@ -40,19 +41,19 @@ export const SystemMessage: React.FC<SystemMessageProps> = ({
       case 'user_added':
         return <UserPlus className={iconClass} style={{ color: 'rgba(15,23,42,0.70)' }} />;
       case 'user_left':
-        return <LogOut className={iconClass} style={{ color: '#94a3b8' }} />;
+        return <LogOut className={iconClass} style={{ color: INK_FAINT }} />;
       case 'user_ejected':
         return <UserMinus className={cn(iconClass, "text-destructive")} />;
       case 'admin_promoted':
-        return <Shield className={iconClass} style={{ color: '#64748b' }} />;
+        return <Shield className={iconClass} style={{ color: INK_MUTE }} />;
       case 'admin_demoted':
-        return <ShieldOff className={iconClass} style={{ color: '#94a3b8' }} />;
+        return <ShieldOff className={iconClass} style={{ color: INK_FAINT }} />;
       case 'group_created':
-        return <Users className={iconClass} style={{ color: '#64748b' }} />;
+        return <Users className={iconClass} style={{ color: INK_MUTE }} />;
       case 'name_changed':
-        return <Edit className={iconClass} style={{ color: '#94a3b8' }} />;
+        return <Edit className={iconClass} style={{ color: INK_FAINT }} />;
       case 'photo_changed':
-        return <Camera className={iconClass} style={{ color: '#94a3b8' }} />;
+        return <Camera className={iconClass} style={{ color: INK_FAINT }} />;
       default:
         return null;
     }
@@ -67,7 +68,7 @@ export const SystemMessage: React.FC<SystemMessageProps> = ({
     <div className="flex justify-center my-3">
       <div
         className="flex items-center gap-1.5 px-4 py-1.5 rounded-full text-[12px]"
-        style={{ background: 'rgba(0,0,0,0.05)', color: '#94a3b8', boxShadow: '0 1px 2px rgba(0,0,0,0.06)' }}
+        style={{ background: 'rgba(0,0,0,0.05)', color: INK_FAINT, boxShadow: '0 1px 2px rgba(0,0,0,0.06)' }}
       >
         {getIcon()}
         <span>{content}</span>

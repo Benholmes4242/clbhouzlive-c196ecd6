@@ -18,6 +18,7 @@ import { AppLog } from '@/lib/logger';
 import { cn } from '@/lib/utils';
 import type { ConversationWithDetails, MessageType } from '@/types/messaging';
 import { SectionEyebrow } from '@/components/ui/SectionEyebrow';
+import { AMBER, HAIRLINE_INK_7, SURFACE } from './_shared/tokens';
 
 interface ForwardMessageModalProps {
   open: boolean;
@@ -108,7 +109,7 @@ export function ForwardMessageModal({
       >
         {/* Drag handle */}
         <div style={{ width: 36, height: 4, borderRadius: 2, background: 'rgba(15,23,42,0.12)', margin: '10px auto 0', flexShrink: 0 }} />
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '10px 16px 14px', borderBottom: '0.5px solid rgba(15,23,42,0.07)' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '10px 16px 14px', borderBottom: `0.5px solid ${HAIRLINE_INK_7}` }}>
           <SectionEyebrow label="Forward Message" />
         </div>
 
@@ -121,7 +122,7 @@ export function ForwardMessageModal({
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search conversations..."
               className="pl-10 h-10 rounded-full"
-              style={{ background: '#ffffff', border: '1px solid rgba(15,23,42,0.10)' }}
+              style={{ background: SURFACE, border: '1px solid rgba(15,23,42,0.10)' }}
             />
           </div>
         </div>
@@ -150,7 +151,7 @@ export function ForwardMessageModal({
                   )}
                 >
                   {display.isGroup ? (
-                    <div className="w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0" style={{ background: 'linear-gradient(135deg, #F7931E, #e07a0d)' }}>
+                    <div className="w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0" style={{ background: `linear-gradient(135deg, ${AMBER}, #e07a0d)` }}>
                       <Users className="w-5 h-5 text-white" />
                     </div>
                   ) : (
@@ -166,7 +167,7 @@ export function ForwardMessageModal({
                     {display.name}
                   </span>
                   {isForwarding && (
-                    <Loader2 className="w-5 h-5 animate-spin" style={{ color: '#F7931E' }} />
+                    <Loader2 className="w-5 h-5 animate-spin" style={{ color: AMBER }} />
                   )}
                 </button>
               );
