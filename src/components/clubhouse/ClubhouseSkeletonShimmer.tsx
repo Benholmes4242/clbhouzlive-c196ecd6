@@ -23,6 +23,8 @@ interface ClubhouseSkeletonShimmerProps {
   variant?: 'regular' | 'review';
   /** When true, the rail skeleton renders a mute placeholder at the top. */
   isVideo?: boolean;
+  /** 'card' = inline feed card stack; 'fullscreen' = immersive overlay (default). */
+  surface?: 'card' | 'fullscreen';
 }
 
 const SkeletonBlock: React.FC<{
