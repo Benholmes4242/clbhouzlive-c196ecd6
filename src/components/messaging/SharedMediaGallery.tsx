@@ -192,8 +192,8 @@ export function SharedMediaGallery({ conversationId, onClose }: SharedMediaGalle
             media.length === 0 ? (
               <EmptyState
                 icon={Image}
-                iconColor=AMBER
-                iconBg=AMBER_TINT_10
+                iconColor={AMBER}
+                iconBg={AMBER_TINT_10}
                 title="No media shared yet"
                 subtitle="Photos and videos will appear here"
                 cta={{

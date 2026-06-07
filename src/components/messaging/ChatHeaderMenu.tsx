@@ -198,7 +198,7 @@ export function ChatHeaderMenu({
                   </>
                 ) : (
                   <>
-                    <IconBox bg=`${SURFACE}7ED`><BellOff size={16} style={{ color: '#F97316' }} /></IconBox>
+                    <IconBox bg={`${SURFACE}7ED`}><BellOff size={16} style={{ color: '#F97316' }} /></IconBox>
                     <span style={{ fontSize: 14, fontWeight: 500, color: INK }}>Mute Notifications</span>
                   </>
                 )}
@@ -239,7 +239,7 @@ export function ChatHeaderMenu({
                   </>
                 ) : (
                   <>
-                    <IconBox bg=`${SURFACE}7ED`><BellOff size={16} style={{ color: '#F97316' }} /></IconBox>
+                    <IconBox bg={`${SURFACE}7ED`}><BellOff size={16} style={{ color: '#F97316' }} /></IconBox>
                     <span style={{ fontSize: 14, fontWeight: 500, color: INK }}>Mute Notifications</span>
                   </>
                 )}
