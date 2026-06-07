@@ -192,8 +192,8 @@ export function SharedMediaGallery({ conversationId, onClose }: SharedMediaGalle
             media.length === 0 ? (
               <EmptyState
                 icon={Image}
-                iconColor=AMBER
-                iconBg=AMBER_TINT_10
+                iconColor={AMBER}
+                iconBg={AMBER_TINT_10}
                 title="No media shared yet"
                 subtitle="Photos and videos will appear here"
                 cta={{
@@ -211,7 +211,7 @@ export function SharedMediaGallery({ conversationId, onClose }: SharedMediaGalle
                     key={item.id}
                     onClick={() => setSelectedImage(item.url)}
                     className="overflow-hidden"
-                    style={{ aspectRatio: '1', borderRadius: 8, background: 'rgba(0,0,0,0.04)', border: 'none', cursor: 'pointer', padding: 0 }}
+                    style={{ aspectRatio: '1', borderRadius: 14, background: 'rgba(0,0,0,0.04)', border: 'none', cursor: 'pointer', padding: 0 }}
                   >
                     {item.type === 'image' ? (
                       <img src={item.url} alt="" className="w-full h-full object-cover" />

@@ -39,7 +39,7 @@ import { haptic } from '@/utils/haptics';
 import { BlockUserDialog } from './BlockUserDialog';
 import { ReportSheet } from './ReportSheet';
 import type { ConversationWithDetails } from '@/types/messaging';
-import { AMBER, DESTRUCTIVE, HAIRLINE_INK_6, HAIRLINE_INK_7, INK, SURFACE } from './_shared/tokens';
+import { AMBER, DESTRUCTIVE, HAIRLINE_INK_6, HAIRLINE_INK_7, INK, INK_TINT_05, SURFACE } from './_shared/tokens';
 
 interface ChatHeaderMenuProps {
   conversation: ConversationWithDetails;
@@ -198,7 +198,7 @@ export function ChatHeaderMenu({
                   </>
                 ) : (
                   <>
-                    <IconBox bg=`${SURFACE}7ED`><BellOff size={16} style={{ color: '#F97316' }} /></IconBox>
+                    <IconBox bg={`${SURFACE}7ED`}><BellOff size={16} style={{ color: '#F97316' }} /></IconBox>
                     <span style={{ fontSize: 14, fontWeight: 500, color: INK }}>Mute Notifications</span>
                   </>
                 )}
@@ -210,12 +210,12 @@ export function ChatHeaderMenu({
               </DropdownMenuItem>
               <Hairline />
               <DropdownMenuItem onClick={() => setShowLeaveGroupDialog(true)} className={itemStyle}>
-                <IconBox bg="rgba(239,68,68,0.08)"><LogOut size={16} style={{ color: DESTRUCTIVE }} /></IconBox>
+                <IconBox bg={INK_TINT_05}><LogOut size={16} style={{ color: DESTRUCTIVE }} /></IconBox>
                 <span style={{ fontSize: 14, fontWeight: 500, color: DESTRUCTIVE }}>Leave Group</span>
               </DropdownMenuItem>
               <Hairline />
               <DropdownMenuItem onClick={handleReport} className={itemStyle}>
-                <IconBox bg="rgba(239,68,68,0.08)"><Flag size={16} style={{ color: DESTRUCTIVE }} /></IconBox>
+                <IconBox bg={INK_TINT_05}><Flag size={16} style={{ color: DESTRUCTIVE }} /></IconBox>
                 <span style={{ fontSize: 14, fontWeight: 500, color: DESTRUCTIVE }}>Report Group</span>
               </DropdownMenuItem>
             </>
@@ -239,7 +239,7 @@ export function ChatHeaderMenu({
                   </>
                 ) : (
                   <>
-                    <IconBox bg=`${SURFACE}7ED`><BellOff size={16} style={{ color: '#F97316' }} /></IconBox>
+                    <IconBox bg={`${SURFACE}7ED`}><BellOff size={16} style={{ color: '#F97316' }} /></IconBox>
                     <span style={{ fontSize: 14, fontWeight: 500, color: INK }}>Mute Notifications</span>
                   </>
                 )}
@@ -256,12 +256,12 @@ export function ChatHeaderMenu({
               </DropdownMenuItem>
               <Hairline />
               <DropdownMenuItem onClick={handleBlockUser} className={itemStyle}>
-                <IconBox bg="rgba(239,68,68,0.08)"><Ban size={16} style={{ color: DESTRUCTIVE }} /></IconBox>
+                <IconBox bg={INK_TINT_05}><Ban size={16} style={{ color: DESTRUCTIVE }} /></IconBox>
                 <span style={{ fontSize: 14, fontWeight: 500, color: DESTRUCTIVE }}>Block User</span>
               </DropdownMenuItem>
               <Hairline />
               <DropdownMenuItem onClick={handleReport} className={itemStyle}>
-                <IconBox bg="rgba(239,68,68,0.08)"><Flag size={16} style={{ color: DESTRUCTIVE }} /></IconBox>
+                <IconBox bg={INK_TINT_05}><Flag size={16} style={{ color: DESTRUCTIVE }} /></IconBox>
                 <span style={{ fontSize: 14, fontWeight: 500, color: DESTRUCTIVE }}>Report</span>
               </DropdownMenuItem>
             </>

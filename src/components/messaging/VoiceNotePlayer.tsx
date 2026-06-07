@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Play, Pause } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { AMBER, AMBER_TINT_10, INK_FAINT } from './_shared/tokens';
+import { AMBER, AMBER_TINT_10, INK_FAINT, INK_LIGHT, SURFACE } from './_shared/tokens';
 
 interface VoiceNotePlayerProps {
   audioUrl: string;
@@ -138,17 +138,19 @@ export const VoiceNotePlayer: React.FC<VoiceNotePlayerProps> = ({
     )}>
       <audio ref={audioRef} src={audioUrl} preload="metadata" />
       
-      {/* Play/Pause button */}
+      {/* Play/Pause button — amber circle with glow */}
       <button
         onClick={togglePlayPause}
-        className="flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center transition-colors"
+        className="flex-shrink-0 w-9 h-9 rounded-full flex items-center justify-center transition-transform active:scale-[0.94]"
         style={{
-          background: isOwn ? 'rgba(255,255,255,0.20)' : AMBER_TINT_10,
-          color: AMBER,
+          background: isOwn ? 'rgba(255,255,255,0.22)' : AMBER,
+          color: isOwn ? SURFACE : SURFACE,
+          boxShadow: isOwn ? 'none' : '0 4px 14px rgba(247,147,30,0.32)',
+          border: 'none',
         }}
         aria-label={isPlaying ? 'Pause' : 'Play'}
       >
-        {isPlaying ? <Pause size={20} /> : <Play size={20} className="ml-0.5" />}
+        {isPlaying ? <Pause size={16} fill="currentColor" /> : <Play size={16} className="ml-0.5" fill="currentColor" />}
       </button>
       
       {/* Waveform with scrubber */}
@@ -164,14 +166,14 @@ export const VoiceNotePlayer: React.FC<VoiceNotePlayerProps> = ({
             <div
               key={index}
               className={cn(
-                "w-[3px] rounded-full transition-all duration-75",
+                "w-[2px] rounded-full transition-all duration-75",
                 "group-hover:scale-y-110"
               )}
               style={{
                 height: `${height * 100}%`,
                 background: index < activeBarIndex
                   ? AMBER
-                  : isOwn ? 'rgba(247,147,30,0.40)' : 'rgba(247,147,30,0.30)',
+                  : isOwn ? 'rgba(255,255,255,0.45)' : INK_LIGHT,
               }}
             />
           ))}
@@ -179,10 +181,10 @@ export const VoiceNotePlayer: React.FC<VoiceNotePlayerProps> = ({
           {/* Scrubber handle */}
           <div 
             className={cn(
-              "absolute top-1/2 -translate-y-1/2 w-3 h-3 rounded-full shadow-md transition-transform",
+              "absolute top-1/2 -translate-y-1/2 w-2.5 h-2.5 rounded-full shadow-md transition-transform",
               isDragging ? "scale-125" : "scale-100 group-hover:scale-110"
             )}
-            style={{ left: `calc(${progress}% - 6px)`, background: AMBER }}
+            style={{ left: `calc(${progress}% - 5px)`, background: AMBER }}
           />
         </div>
         

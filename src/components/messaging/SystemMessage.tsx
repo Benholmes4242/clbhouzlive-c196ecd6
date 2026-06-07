@@ -65,14 +65,22 @@ export const SystemMessage: React.FC<SystemMessageProps> = ({
   };
 
   return (
-    <div className="flex justify-center my-3">
+    <div className="flex justify-center my-2">
       <div
-        className="flex items-center gap-1.5 px-4 py-1.5 rounded-full text-[12px]"
-        style={{ background: 'rgba(0,0,0,0.05)', color: INK_FAINT, boxShadow: '0 1px 2px rgba(0,0,0,0.06)' }}
+        className="flex items-center gap-1.5"
+        style={{
+          background: 'rgba(15,23,42,0.05)',
+          color: INK_MUTE,
+          padding: '4px 12px',
+          borderRadius: 99,
+          fontSize: 11,
+          fontWeight: 600,
+          letterSpacing: '-0.005em',
+        }}
       >
         {getIcon()}
         <span>{content}</span>
-        <span className="ml-1" style={{ color: 'rgba(148,163,184,0.60)' }}>
+        <span style={{ color: INK_FAINT, marginLeft: 2, fontWeight: 500 }}>
           {formatTime(timestamp)}
         </span>
       </div>

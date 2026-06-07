@@ -164,9 +164,14 @@ export const AddMembersSheet: React.FC<AddMembersSheetProps> = ({
                   key={user.id}
                   onClick={() => toggleUser(user)}
                   className={cn(
-                    "w-full flex items-center gap-3 p-3 rounded-lg transition-colors active:scale-[0.97]",
-                    isSelected ? "bg-[rgba(247,147,30,0.05)]" : "hover:bg-muted"
+                    "w-full flex items-center gap-3 p-3 rounded-lg transition-colors active:scale-[0.98]",
+                    isSelected ? "" : "hover:bg-muted"
                   )}
+                  style={isSelected ? {
+                    background: 'rgba(247,147,30,0.06)',
+                    borderLeft: `3px solid ${AMBER}`,
+                    paddingLeft: 9,
+                  } : undefined}
                 >
                   <SquircleAvatar
                     src={user.profile_photo_url}
@@ -200,13 +205,18 @@ export const AddMembersSheet: React.FC<AddMembersSheetProps> = ({
         
         {/* Add Button */}
         {selectedUsers.length > 0 && (
-          <Button 
+          <Button
             onClick={handleAddMembers}
             disabled={isAdding}
-            className="w-full"
+            className="w-full h-12 rounded-full text-white border-0 active:scale-[0.98] transition-transform"
+            style={{
+              background: `linear-gradient(90deg, #F59E0B, ${AMBER})`,
+              boxShadow: '0 4px 14px rgba(247,147,30,0.32)',
+              fontSize: 14, fontWeight: 800, letterSpacing: '-0.01em',
+            }}
           >
             <UserPlus size={18} className="mr-2" />
-            Add {selectedUsers.length} Member{selectedUsers.length !== 1 ? 's' : ''}
+            {isAdding ? 'Adding…' : `Add ${selectedUsers.length} Member${selectedUsers.length !== 1 ? 's' : ''}`}
           </Button>
         )}
       </div>
