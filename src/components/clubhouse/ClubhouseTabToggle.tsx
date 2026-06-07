@@ -11,7 +11,7 @@ interface ClubhouseTabToggleProps {
 }
 
 /**
- * ClubhouseTabToggle — Pinpoint dark-surface main tab (white text, amber gradient underline)
+ * ClubhouseTabToggle — Pinpoint dark-surface main tab (white text, white underline)
  */
 export const ClubhouseTabToggle = ({
   activeTab,
@@ -74,7 +74,7 @@ export const ClubhouseTabToggle = ({
                   right: 4,
                   bottom: 0,
                   height: 2,
-                  background: '#F7931E',
+                  background: '#FFFFFF',
                   borderRadius: 1,
                 }}
               />
