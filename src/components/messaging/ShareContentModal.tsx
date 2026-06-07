@@ -119,7 +119,7 @@ export function ShareContentModal({
         uploadedUrls.push(publicUrl);
       }
       onShare(
-        `Shared ${uploadedUrls.length} photo${uploadedUrls.length > 1 ? 's' : ''} 📸`,
+        '',
         'moment_share',
         { media_urls: uploadedUrls, media_count: uploadedUrls.length, thumbnail_url: uploadedUrls[0] }
       );

@@ -393,8 +393,8 @@ export function MessageBubble({
             />
           )}
 
-          {/* Message text */}
-          {message.content && (
+          {/* Message text — hide auto-generated "Shared N photo(s) 📸" caption */}
+          {message.content && !/^Shared \d+ photos? 📸$/.test(message.content.trim()) && (
             <p style={{ fontSize: 14, color: '#1e293b', lineHeight: 1.45, margin: 0, whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>
               {message.content}
             </p>

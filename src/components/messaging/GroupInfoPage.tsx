@@ -369,7 +369,7 @@ export const GroupInfoPage: React.FC<GroupInfoPageProps> = ({
 
           {/* Member count */}
           <p style={{ fontSize: 13, color: '#64748b', marginTop: 4 }}>
-            {conversation.participants.length} members
+            {conversation.participants.length} {conversation.participants.length === 1 ? 'member' : 'members'}
           </p>
 
           {/* Description */}
@@ -414,12 +414,14 @@ export const GroupInfoPage: React.FC<GroupInfoPageProps> = ({
               onClick={() => isAdmin && setIsEditingDescription(true)}
               className="w-full text-center active:opacity-70 transition-opacity"
               style={{
-                fontSize: 13, color: description ? '#94a3b8' : '#F7931E',
+                fontSize: 13,
+                color: '#94a3b8',
+                fontStyle: description ? 'normal' : 'italic',
                 marginTop: 2, background: 'none', border: 'none', cursor: isAdmin ? 'pointer' : 'default',
                 padding: 4,
               }}
             >
-              {description || (isAdmin ? 'Add group description' : 'No description')}
+              {description || (isAdmin ? 'Tap to add a description' : 'No description')}
             </button>
           )}
         </div>
