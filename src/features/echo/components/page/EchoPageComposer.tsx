@@ -172,11 +172,14 @@ export const EchoPageComposer = forwardRef<HTMLInputElement, EchoPageComposerPro
             <button
               onClick={handleMicClick}
               className={cn(
-                "w-8 h-8 rounded-full flex items-center justify-center transition-all active:scale-[0.97]",
-                isListening && "animate-pulse"
+                "w-8 h-8 rounded-full flex items-center justify-center transition-all active:scale-[0.97]"
               )}
               style={isListening
-                ? { background: '#F7931E', boxShadow: '0 0 0 6px rgba(247,147,30,0.18)' }
+                ? {
+                    background: '#F7931E',
+                    boxShadow: `0 0 0 ${6 + Math.round(micLevel * 10)}px rgba(247,147,30,${(0.14 + micLevel * 0.18).toFixed(3)})`,
+                    transform: `scale(${(1 + micLevel * 0.08).toFixed(3)})`,
+                  }
                 : { background: 'rgba(15,23,42,0.05)', border: '0.5px solid rgba(15,23,42,0.10)' }
               }
               aria-label={isListening ? "Stop listening" : "Voice input"}
