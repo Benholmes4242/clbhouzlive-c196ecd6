@@ -183,9 +183,17 @@ export function EchoResponseCard({
               unwrapDisallowed
               components={{
                 p: ({ children }) => <p className="mb-2 last:mb-0" style={{ color: '#1e293b' }}>{children}</p>,
-                ul: ({ children }) => <ul className="list-disc pl-4 mb-2 space-y-1" style={{ color: '#1e293b' }}>{children}</ul>,
-                ol: ({ children }) => <ol className="list-decimal pl-4 mb-2 space-y-2" style={{ color: '#1e293b' }}>{children}</ol>,
-                li: ({ children }) => <li style={{ color: '#1e293b' }}>{children}</li>,
+                ul: ({ children }) => <ul className="list-disc pl-4 mb-2 space-y-1 marker:text-[#F7931E]" style={{ color: '#1e293b' }}>{children}</ul>,
+                ol: ({ children }) => <ol className="list-decimal pl-4 mb-2 space-y-2 marker:text-[#F7931E] marker:font-semibold" style={{ color: '#1e293b' }}>{children}</ol>,
+                li: ({ children }) => <li className="pl-1" style={{ color: '#1e293b' }}>{children}</li>,
+                blockquote: ({ children }) => (
+                  <blockquote
+                    className="my-2 pl-3 italic"
+                    style={{ borderLeft: '3px solid #F7931E', color: '#334155' }}
+                  >
+                    {children}
+                  </blockquote>
+                ),
                 strong: ({ children }) => <strong className="font-semibold" style={{ color: '#0F172A' }}>{children}</strong>,
                 em: ({ children }) => <em className="italic" style={{ color: '#334155' }}>{children}</em>,
                 text: ({ children }) => {
