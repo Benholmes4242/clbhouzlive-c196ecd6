@@ -13,6 +13,12 @@ import { toast } from 'sonner';
 import { SwipeableConversationItem } from './SwipeableConversationItem';
 import type { ConversationWithDetails } from '@/types/messaging';
 import { SectionEyebrow } from '@/components/ui/SectionEyebrow';
+import {
+  AMBER, AMBER_TINT_06, AMBER_TINT_10, AMBER_TINT_25, AMBER_TINT_28,
+  INK, INK_MUTE, INK_FAINT, INK_LIGHT, INK_DEEP, INK_MID, SURFACE,
+  SHELL_BG, HAIRLINE_INK_6, HAIRLINE_INK_7, HAIRLINE_INK_10, INK_TINT_04, INK_TINT_05,
+  SUNDRIDGE_GREEN, SUNDRIDGE_GREEN_TINT_07, SUNDRIDGE_GREEN_BORDER_18,
+} from './_shared/tokens';
 
 interface ConversationListProps {
   onSelectConversation: (id: string) => void;
@@ -81,12 +87,12 @@ function ConversationTypingOrPreview({ conversationId, preview, isActive }: { co
       : `${typingUsers.length} people typing...`;
     
     return (
-      <span style={{ color: '#F7931E', fontStyle: 'italic' }} className="flex items-center gap-1">
+      <span style={{ color: AMBER, fontStyle: 'italic' }} className="flex items-center gap-1">
         {text}
         <span className="inline-flex gap-0.5">
-          <span className="w-1 h-1 rounded-full animate-bounce" style={{ background: '#F7931E', animationDelay: '0ms' }} />
-          <span className="w-1 h-1 rounded-full animate-bounce" style={{ background: '#F7931E', animationDelay: '150ms' }} />
-          <span className="w-1 h-1 rounded-full animate-bounce" style={{ background: '#F7931E', animationDelay: '300ms' }} />
+          <span className="w-1 h-1 rounded-full animate-bounce" style={{ background: AMBER, animationDelay: '0ms' }} />
+          <span className="w-1 h-1 rounded-full animate-bounce" style={{ background: AMBER, animationDelay: '150ms' }} />
+          <span className="w-1 h-1 rounded-full animate-bounce" style={{ background: AMBER, animationDelay: '300ms' }} />
         </span>
       </span>
     );
@@ -143,17 +149,17 @@ function EmptyState({
   return (
     <div className="flex flex-col items-center justify-center py-20 px-6 text-center">
       <div className="relative flex items-center justify-center mb-4" style={{ width: 80, height: 80 }}>
-        <div className="absolute" style={{ inset: 0, borderRadius: '50%', border: '1.5px solid rgba(247,147,30,0.12)' }} />
+        <div className="absolute" style={{ inset: 0, borderRadius: '50%', border: `1.5px solid ${AMBER_TINT_12}` }} />
         <div className="absolute" style={{ inset: 10, borderRadius: '50%', border: '1.5px solid rgba(247,147,30,0.20)' }} />
         <div
           className="flex items-center justify-center"
-          style={{ width: 40, height: 40, borderRadius: '50%', background: 'rgba(247,147,30,0.10)' }}
+          style={{ width: 40, height: 40, borderRadius: '50%', background: AMBER_TINT_10 }}
         >
-          <Icon style={{ color: '#F7931E' }} className="h-5 w-5" />
+          <Icon style={{ color: AMBER }} className="h-5 w-5" />
         </div>
       </div>
-      <h3 style={{ fontSize: 14, fontWeight: 600, color: '#1e293b', marginBottom: 4 }}>{copy.title}</h3>
-      <p style={{ fontSize: 13, color: '#94a3b8', marginBottom: 20, maxWidth: 240 }}>
+      <h3 style={{ fontSize: 14, fontWeight: 600, color: INK_DEEP, marginBottom: 4 }}>{copy.title}</h3>
+      <p style={{ fontSize: 13, color: INK_FAINT, marginBottom: 20, maxWidth: 240 }}>
         {copy.subtitle}
       </p>
       {copy.cta && onNewConversation && (
@@ -162,9 +168,9 @@ function EmptyState({
           className="flex items-center active:scale-[0.97] transition-transform"
           style={{
             gap: 6, padding: '8px 20px', borderRadius: 99,
-            background: 'rgba(247,147,30,0.10)',
-            border: '1px solid rgba(247,147,30,0.25)',
-            color: '#F7931E', fontSize: 13, fontWeight: 600,
+            background: AMBER_TINT_10,
+            border: `1px solid ${AMBER_TINT_25}`,
+            color: AMBER, fontSize: 13, fontWeight: 600,
           }}
         >
           <Plus className="h-4 w-4" />
@@ -180,12 +186,12 @@ function NoResults({ query }: { query: string }) {
     <div className="flex flex-col items-center justify-center py-16 px-6 text-center">
       <div
         className="flex items-center justify-center mb-3"
-        style={{ width: 48, height: 48, borderRadius: '50%', background: 'rgba(247,147,30,0.10)' }}
+        style={{ width: 48, height: 48, borderRadius: '50%', background: AMBER_TINT_10 }}
       >
-        <Search style={{ color: '#F7931E' }} className="h-5 w-5" />
+        <Search style={{ color: AMBER }} className="h-5 w-5" />
       </div>
-      <h3 style={{ fontSize: 14, fontWeight: 600, color: '#1e293b', marginBottom: 4 }}>No one found</h3>
-      <p style={{ fontSize: 13, color: '#94a3b8' }}>
+      <h3 style={{ fontSize: 14, fontWeight: 600, color: INK_DEEP, marginBottom: 4 }}>No one found</h3>
+      <p style={{ fontSize: 13, color: INK_FAINT }}>
         Try a different name or username
       </p>
     </div>
@@ -200,7 +206,7 @@ function ConversationCard({ children }: { children: React.ReactNode }) {
         margin: '0 16px',
         borderRadius: 16,
         background: '#fff',
-        border: '1px solid rgba(15,23,42,0.07)',
+        border: `1px solid ${HAIRLINE_INK_7}`,
         overflow: 'hidden',
       }}
     >
@@ -360,8 +366,8 @@ export function ConversationList({
               display: 'flex', alignItems: 'center', gap: 12,
               padding: '10px 16px',
               textAlign: 'left' as const, border: 'none', cursor: 'pointer',
-              background: isSelected ? 'rgba(247,147,30,0.06)' : '#fff',
-              borderLeft: isSelected ? '3px solid #F7931E' : '3px solid transparent',
+              background: isSelected ? AMBER_TINT_06 : '#fff',
+              borderLeft: isSelected ? `3px solid ${AMBER}` : '3px solid transparent',
               transition: 'background 0.1s',
               opacity: isArchived ? 0.7 : 1,
             }}
@@ -374,7 +380,7 @@ export function ConversationList({
                   className="flex items-center justify-center"
                   style={{
                     width: 52, height: 52, borderRadius: 12,
-                    background: 'linear-gradient(135deg, #006747, #004d33)',
+                    background: `linear-gradient(135deg, ${SUNDRIDGE_GREEN}, #004d33)`,
                   }}
                 >
                   <Building2 className="w-5 h-5 text-white" />
@@ -384,7 +390,7 @@ export function ConversationList({
                   className="flex items-center justify-center"
                   style={{
                     width: 52, height: 52, borderRadius: '50%',
-                    background: 'linear-gradient(135deg, #F7931E, #e07a0d)',
+                    background: `linear-gradient(135deg, ${AMBER}, #e07a0d)`,
                   }}
                 >
                   <Users className="w-5 h-5 text-white" />
@@ -406,9 +412,9 @@ export function ConversationList({
                   style={{
                     top: -2, right: -2,
                     minWidth: 17, height: 17, borderRadius: 99,
-                    background: '#F7931E', color: '#fff',
+                    background: AMBER, color: '#fff',
                     fontSize: 9, fontWeight: 700,
-                    border: '2px solid #F8FAFC',
+                    border: `2px solid ${SHELL_BG}`,
                     padding: '0 3px',
                   }}
                 >
@@ -427,20 +433,20 @@ export function ConversationList({
                     style={{
                       fontSize: 14,
                       fontWeight: hasUnread ? 700 : 600,
-                      color: hasUnread ? '#0f172a' : '#1e293b',
+                      color: hasUnread ? INK : INK_DEEP,
                     }}
                   >
                     {name}
                   </span>
                   {isMuted && (
-                    <BellOff size={11} style={{ color: '#94a3b8', flexShrink: 0 }} />
+                    <BellOff size={11} style={{ color: INK_FAINT, flexShrink: 0 }} />
                   )}
                 </div>
                 <span
                   className="flex-shrink-0"
                   style={{
                     fontSize: 11, fontWeight: 500,
-                    color: hasUnread ? '#F7931E' : '#94a3b8',
+                    color: hasUnread ? AMBER : INK_FAINT,
                   }}
                 >
                   {formatRelativeTime(conversation.last_message_at)}
@@ -453,7 +459,7 @@ export function ConversationList({
                   className="truncate flex-1"
                   style={{
                     fontSize: 13, margin: 0,
-                    color: hasUnread ? '#334155' : '#94a3b8',
+                    color: hasUnread ? '#334155' : INK_FAINT,
                     fontWeight: hasUnread ? 500 : 400,
                     whiteSpace: 'nowrap' as const,
                   }}
@@ -473,7 +479,7 @@ export function ConversationList({
                 className="flex-shrink-0"
                 style={{
                   width: 3, height: 36, borderRadius: 99,
-                  background: '#F7931E',
+                  background: AMBER,
                 }}
               />
             )}
@@ -481,7 +487,7 @@ export function ConversationList({
           
           {/* Hairline divider */}
           {showDivider && (
-            <div style={{ height: '0.5px', background: 'rgba(15,23,42,0.06)', margin: '0 16px' }} />
+            <div style={{ height: '0.5px', background: HAIRLINE_INK_6, margin: '0 16px' }} />
           )}
         </div>
       </SwipeableConversationItem>
@@ -508,8 +514,8 @@ export function ConversationList({
           style={{
             margin: '4px 16px', padding: '8px 12px', borderRadius: 12,
             background: 'rgba(247,147,30,0.05)',
-            border: '0.5px solid rgba(15,23,42,0.07)',
-            fontSize: 13, color: '#94a3b8', gap: 8,
+            border: `0.5px solid ${HAIRLINE_INK_7}`,
+            fontSize: 13, color: INK_FAINT, gap: 8,
           }}
         >
           <span>← Swipe left to delete</span>
@@ -521,7 +527,7 @@ export function ConversationList({
               try { localStorage.setItem('swipeHintDismissed', 'true'); }
               catch { /* silent */ }
             }}
-            style={{ marginLeft: 8, fontWeight: 600, color: '#F7931E' }}
+            style={{ marginLeft: 8, fontWeight: 600, color: AMBER }}
           >
             Got it
           </button>
@@ -564,18 +570,18 @@ export function ConversationList({
             className="flex items-center justify-between w-full"
             style={{
               padding: '10px 14px', borderRadius: 12,
-              background: 'rgba(15,23,42,0.04)', border: '0.5px solid rgba(15,23,42,0.07)',
+              background: 'rgba(15,23,42,0.04)', border: `0.5px solid ${HAIRLINE_INK_7}`,
               cursor: 'pointer',
             }}
           >
             <div className="flex items-center" style={{ gap: 8 }}>
-              <Archive size={16} style={{ color: '#64748b' }} />
-              <span style={{ fontSize: 13, fontWeight: 600, color: '#64748b' }}>Archived</span>
-              <span style={{ fontSize: 12, color: '#94a3b8' }}>({archivedConversations.length})</span>
+              <Archive size={16} style={{ color: INK_MUTE }} />
+              <span style={{ fontSize: 13, fontWeight: 600, color: INK_MUTE }}>Archived</span>
+              <span style={{ fontSize: 12, color: INK_FAINT }}>({archivedConversations.length})</span>
             </div>
             {showArchived 
-              ? <ChevronDown size={16} style={{ color: '#94a3b8' }} /> 
-              : <ChevronRight size={16} style={{ color: '#94a3b8' }} />
+              ? <ChevronDown size={16} style={{ color: INK_FAINT }} /> 
+              : <ChevronRight size={16} style={{ color: INK_FAINT }} />
             }
           </button>
           

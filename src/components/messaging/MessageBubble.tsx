@@ -20,6 +20,12 @@ import { VoiceNotePlayer } from './VoiceNotePlayer';
 import { SystemMessage, type SystemMessageMetadata } from './SystemMessage';
 import type { MessageWithSender, SharedCourse } from '@/types/messaging';
 import type { Reaction } from '@/hooks/useMessageReactions';
+import {
+  AMBER, AMBER_TINT_10, AMBER_TINT_12, AMBER_TINT_22, AMBER_TINT_25,
+  SUNDRIDGE_GREEN, SUNDRIDGE_GREEN_TINT_07, SUNDRIDGE_GREEN_BORDER_18,
+  INK, INK_MUTE, INK_FAINT, INK_DEEP, INK_MID, SURFACE, INK_TINT_04, INK_TINT_05,
+  HAIRLINE_INK_6, HAIRLINE_INK_7, HAIRLINE_INK_8, HAIRLINE_INK_10, DESTRUCTIVE,
+} from './_shared/tokens';
 
 interface MessageBubbleProps {
   message: MessageWithSender;
@@ -50,9 +56,9 @@ function ReadReceipt({ status }: { status: 'sent' | 'delivered' | 'read' }) {
     return <CheckCheck className="w-3 h-3" style={{ color: 'rgba(247,147,30,0.85)' }} />;
   }
   if (status === 'delivered') {
-    return <CheckCheck className="w-3 h-3" style={{ color: '#94a3b8' }} />;
+    return <CheckCheck className="w-3 h-3" style={{ color: INK_FAINT }} />;
   }
-  return <Check className="w-3 h-3" style={{ color: '#94a3b8' }} />;
+  return <Check className="w-3 h-3" style={{ color: INK_FAINT }} />;
 }
 
 /** Context menu icon box */
@@ -196,8 +202,8 @@ export function MessageBubble({
             <div style={{ padding: '10px 12px' }}>
               {course.location && (
                 <div className="flex items-center" style={{ gap: 4, marginBottom: 8 }}>
-                  <MapPin size={11} style={{ color: '#94a3b8' }} />
-                  <span style={{ fontSize: 11, color: '#64748b' }}>{course.location}</span>
+                  <MapPin size={11} style={{ color: INK_FAINT }} />
+                  <span style={{ fontSize: 11, color: INK_MUTE }}>{course.location}</span>
                 </div>
               )}
               
@@ -207,8 +213,8 @@ export function MessageBubble({
                 style={{
                   gap: 6, padding: '7px 0', borderRadius: 10,
                   background: 'rgba(247,147,30,0.08)',
-                  border: '1px solid rgba(247,147,30,0.22)',
-                  fontSize: 13, fontWeight: 600, color: '#F7931E',
+                  border: `1px solid ${AMBER_TINT_22}`,
+                  fontSize: 13, fontWeight: 600, color: AMBER,
                 }}
               >
                 View Course
@@ -216,7 +222,7 @@ export function MessageBubble({
               </div>
               
               {/* Timestamp */}
-              <div className="flex items-center justify-end" style={{ gap: 3, marginTop: 6, fontSize: 10, color: '#94a3b8' }}>
+              <div className="flex items-center justify-end" style={{ gap: 3, marginTop: 6, fontSize: 10, color: INK_FAINT }}>
                 {message.is_edited && <span style={{ fontStyle: 'italic' }}>edited</span>}
                 <span>{formatMessageTime(message.created_at)}</span>
                 {isOwnMessage && <ReadReceipt status={deliveryStatus} />}
@@ -248,15 +254,15 @@ export function MessageBubble({
             }}
           >
             <ContextMenuItem onClick={onReply} className="flex items-center gap-3 px-4 py-[11px] min-h-[44px]">
-              <CtxIconBox bg="rgba(0,0,0,0.05)"><Reply size={14} style={{ color: '#475569' }} /></CtxIconBox>
-              <span style={{ fontSize: 14, fontWeight: 500, color: '#1e293b' }}>Reply</span>
+              <CtxIconBox bg="rgba(0,0,0,0.05)"><Reply size={14} style={{ color: INK_MID }} /></CtxIconBox>
+              <span style={{ fontSize: 14, fontWeight: 500, color: INK_DEEP }}>Reply</span>
             </ContextMenuItem>
             {isOwnMessage && (
               <>
                 <div style={{ height: 1, background: 'rgba(0,0,0,0.05)', margin: '0 16px' }} />
                 <ContextMenuItem onClick={onEdit} className="flex items-center gap-3 px-4 py-[11px] min-h-[44px]">
-                  <CtxIconBox bg="rgba(0,0,0,0.05)"><Pencil size={14} style={{ color: '#475569' }} /></CtxIconBox>
-                  <span style={{ fontSize: 14, fontWeight: 500, color: '#1e293b' }}>Edit</span>
+                  <CtxIconBox bg="rgba(0,0,0,0.05)"><Pencil size={14} style={{ color: INK_MID }} /></CtxIconBox>
+                  <span style={{ fontSize: 14, fontWeight: 500, color: INK_DEEP }}>Edit</span>
                 </ContextMenuItem>
                 <div style={{ height: 1, background: 'rgba(0,0,0,0.05)', margin: '0 16px' }} />
                 <ContextMenuItem onClick={onDelete} className="flex items-center gap-3 px-4 py-[11px] min-h-[44px]">
@@ -323,8 +329,8 @@ export function MessageBubble({
             </span>
             {message.sender?.eg_handicap_index != null && (
               <span style={{
-                fontSize: 9, fontWeight: 600, color: '#F7931E',
-                background: 'rgba(247,147,30,0.10)', border: '1px solid rgba(247,147,30,0.25)',
+                fontSize: 9, fontWeight: 600, color: AMBER,
+                background: AMBER_TINT_10, border: `1px solid ${AMBER_TINT_25}`,
                 borderRadius: 99, padding: '0px 5px',
               }}>
                 HCP {message.sender.eg_handicap_index}
@@ -340,9 +346,9 @@ export function MessageBubble({
             style={{
               padding: '4px 10px',
               background: 'rgba(0,0,0,0.04)', borderRadius: 10,
-              borderLeft: '2px solid #F7931E',
+              borderLeft: `2px solid ${AMBER}`,
               maxWidth: '70%', marginBottom: 4,
-              fontSize: 11, color: '#94a3b8',
+              fontSize: 11, color: INK_FAINT,
             }}
           >
             <span style={{ fontWeight: 600 }}>{replyToMessage.sender?.display_name || 'You'}</span>
@@ -356,8 +362,8 @@ export function MessageBubble({
             padding: '9px 13px',
             borderRadius: isOwnMessage ? '16px 16px 4px 16px' : '16px 16px 16px 4px',
             ...(isOwnMessage ? {
-              background: 'rgba(247,147,30,0.10)',
-              border: '1px solid rgba(247,147,30,0.22)',
+              background: AMBER_TINT_10,
+              border: `1px solid ${AMBER_TINT_22}`,
             } : {
               background: '#fff',
               border: '1px solid rgba(0,0,0,0.07)',
@@ -395,7 +401,7 @@ export function MessageBubble({
 
           {/* Message text — hide auto-generated "Shared N photo(s) 📸" caption */}
           {message.content && !/^Shared \d+ photos? 📸$/.test(message.content.trim()) && (
-            <p style={{ fontSize: 14, color: '#1e293b', lineHeight: 1.45, margin: 0, whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>
+            <p style={{ fontSize: 14, color: INK_DEEP, lineHeight: 1.45, margin: 0, whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>
               {message.content}
             </p>
           )}
@@ -405,7 +411,7 @@ export function MessageBubble({
         <div className="flex items-center" style={{
           gap: 3, marginTop: 3,
           justifyContent: isOwnMessage ? 'flex-end' : 'flex-start',
-          fontSize: 10, color: '#94a3b8',
+          fontSize: 10, color: INK_FAINT,
         }}>
           {message.is_edited && <span style={{ fontStyle: 'italic' }}>edited</span>}
           <span>{formatMessageTime(message.created_at)}</span>
@@ -426,7 +432,7 @@ export function MessageBubble({
   );
 
   return (
-    <div style={{ borderRadius: 16, transition: 'background 0.3s', background: isHighlighted ? 'rgba(247,147,30,0.12)' : 'transparent' }}>
+    <div style={{ borderRadius: 16, transition: 'background 0.3s', background: isHighlighted ? AMBER_TINT_12 : 'transparent' }}>
     <ContextMenu onOpenChange={(open) => { if (open) fetchSavedState(); }}>
       <ContextMenuTrigger asChild>{bubbleContent}</ContextMenuTrigger>
       <ContextMenuContent
@@ -439,9 +445,9 @@ export function MessageBubble({
       >
         {/* Message preview */}
         <div style={{ padding: '12px 16px 8px', borderBottom: '1px solid rgba(0,0,0,0.05)', textAlign: 'center' as const }}>
-          <div style={{ fontSize: 12, color: '#94a3b8', marginBottom: 4 }}>{formatMessageTime(message.created_at)}</div>
+          <div style={{ fontSize: 12, color: INK_FAINT, marginBottom: 4 }}>{formatMessageTime(message.created_at)}</div>
           {message.content && (
-            <p style={{ fontSize: 14, color: '#1e293b', lineHeight: 1.4, margin: 0 }}>
+            <p style={{ fontSize: 14, color: INK_DEEP, lineHeight: 1.4, margin: 0 }}>
               {message.content.length > 60 ? message.content.slice(0, 60) + '…' : message.content}
             </p>
           )}
@@ -463,23 +469,23 @@ export function MessageBubble({
         
         {/* Actions */}
         <ContextMenuItem onClick={() => { haptic('light'); onReply(); }} className="flex items-center gap-3 px-4 py-[11px] min-h-[44px]">
-          <CtxIconBox bg="rgba(0,0,0,0.05)"><Reply size={14} style={{ color: '#475569' }} /></CtxIconBox>
-          <span style={{ fontSize: 14, fontWeight: 500, color: '#1e293b' }}>Reply</span>
+          <CtxIconBox bg="rgba(0,0,0,0.05)"><Reply size={14} style={{ color: INK_MID }} /></CtxIconBox>
+          <span style={{ fontSize: 14, fontWeight: 500, color: INK_DEEP }}>Reply</span>
         </ContextMenuItem>
         
         <div style={{ height: 1, background: 'rgba(0,0,0,0.05)', margin: '0 16px' }} />
         
         <ContextMenuItem onClick={handleCopy} className="flex items-center gap-3 px-4 py-[11px] min-h-[44px]">
-          <CtxIconBox bg="rgba(0,0,0,0.05)"><Copy size={14} style={{ color: '#475569' }} /></CtxIconBox>
-          <span style={{ fontSize: 14, fontWeight: 500, color: '#1e293b' }}>Copy</span>
+          <CtxIconBox bg="rgba(0,0,0,0.05)"><Copy size={14} style={{ color: INK_MID }} /></CtxIconBox>
+          <span style={{ fontSize: 14, fontWeight: 500, color: INK_DEEP }}>Copy</span>
         </ContextMenuItem>
         
         {onForward && (
           <>
             <div style={{ height: 1, background: 'rgba(0,0,0,0.05)', margin: '0 16px' }} />
             <ContextMenuItem onClick={() => { haptic('light'); onForward(); }} className="flex items-center gap-3 px-4 py-[11px] min-h-[44px]">
-              <CtxIconBox bg="rgba(0,0,0,0.05)"><Forward size={14} style={{ color: '#475569' }} /></CtxIconBox>
-              <span style={{ fontSize: 14, fontWeight: 500, color: '#1e293b' }}>Forward</span>
+              <CtxIconBox bg="rgba(0,0,0,0.05)"><Forward size={14} style={{ color: INK_MID }} /></CtxIconBox>
+              <span style={{ fontSize: 14, fontWeight: 500, color: INK_DEEP }}>Forward</span>
             </ContextMenuItem>
           </>
         )}
@@ -488,17 +494,17 @@ export function MessageBubble({
         
         <ContextMenuItem onClick={handleStar} className="flex items-center gap-3 px-4 py-[11px] min-h-[44px]">
           <CtxIconBox bg="rgba(0,0,0,0.05)">
-            <Star size={14} style={{ color: isSaved ? '#F7931E' : '#475569' }} className={isSaved ? 'fill-current' : ''} />
+            <Star size={14} style={{ color: isSaved ? AMBER : INK_MID }} className={isSaved ? 'fill-current' : ''} />
           </CtxIconBox>
-          <span style={{ fontSize: 14, fontWeight: 500, color: '#1e293b' }}>{isSaved ? "Remove from Picks" : "Save"}</span>
+          <span style={{ fontSize: 14, fontWeight: 500, color: INK_DEEP }}>{isSaved ? "Remove from Picks" : "Save"}</span>
         </ContextMenuItem>
         
         {isOwnMessage && (
           <>
             <div style={{ height: 1, background: 'rgba(0,0,0,0.05)', margin: '0 16px' }} />
             <ContextMenuItem onClick={() => { haptic('light'); onEdit(); }} className="flex items-center gap-3 px-4 py-[11px] min-h-[44px]">
-              <CtxIconBox bg="rgba(0,0,0,0.05)"><Pencil size={14} style={{ color: '#475569' }} /></CtxIconBox>
-              <span style={{ fontSize: 14, fontWeight: 500, color: '#1e293b' }}>Edit</span>
+              <CtxIconBox bg="rgba(0,0,0,0.05)"><Pencil size={14} style={{ color: INK_MID }} /></CtxIconBox>
+              <span style={{ fontSize: 14, fontWeight: 500, color: INK_DEEP }}>Edit</span>
             </ContextMenuItem>
             <div style={{ height: 1, background: 'rgba(0,0,0,0.05)', margin: '0 16px' }} />
             <ContextMenuItem onClick={() => { haptic('medium'); onDelete(); }} className="flex items-center gap-3 px-4 py-[11px] min-h-[44px]">

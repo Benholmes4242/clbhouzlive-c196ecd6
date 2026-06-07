@@ -9,6 +9,11 @@ import { haptic } from '@/utils/haptics';
 import { EmojiPickerPopover } from './EmojiPickerPopover';
 import { toast } from 'sonner';
 import type { MessageWithSender, MessageType } from '@/types/messaging';
+import {
+  AMBER, INK, INK_MUTE, INK_FAINT, INK_DEEP, SURFACE, SHELL_BG,
+  HAIRLINE_INK_7, HAIRLINE_INK_10, INK_TINT_05,
+  AMBER_TINT_10, AMBER_TINT_22,
+} from './_shared/tokens';
 
 interface MessageInputProps {
   onSend: (
@@ -155,8 +160,8 @@ export function MessageInput({
       className="flex-none"
       style={{
         paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 8px)',
-        background: '#F8FAFC',
-        borderTop: '0.5px solid rgba(15,23,42,0.07)',
+        background: SHELL_BG,
+        borderTop: `0.5px solid ${HAIRLINE_INK_7}`,
       }}
     >
       {/* Reply preview strip */}
@@ -166,18 +171,18 @@ export function MessageInput({
           style={{
             margin: '0 12px 6px',
             padding: '8px 12px', borderRadius: 12,
-            background: '#F8FAFC',
-            border: '0.5px solid rgba(15,23,42,0.07)',
+            background: SHELL_BG,
+            border: `0.5px solid ${HAIRLINE_INK_7}`,
             gap: 10,
           }}
         >
           {/* Accent bar */}
-          <div style={{ width: 3, height: 32, borderRadius: 99, background: '#F7931E', flexShrink: 0 }} />
+          <div style={{ width: 3, height: 32, borderRadius: 99, background: AMBER, flexShrink: 0 }} />
           <div className="flex-1 min-w-0">
-            <span style={{ fontSize: 11, fontWeight: 700, color: '#F7931E', display: 'block', marginBottom: 2 }}>
+            <span style={{ fontSize: 11, fontWeight: 700, color: AMBER, display: 'block', marginBottom: 2 }}>
               Replying to {replyToName}
             </span>
-            <p className="truncate" style={{ fontSize: 13, color: '#64748b', margin: 0, whiteSpace: 'nowrap' as const }}>
+            <p className="truncate" style={{ fontSize: 13, color: INK_MUTE, margin: 0, whiteSpace: 'nowrap' as const }}>
               {replyingTo.content}
             </p>
           </div>
@@ -186,7 +191,7 @@ export function MessageInput({
             className="flex items-center justify-center flex-shrink-0"
             style={{ width: 24, height: 24, borderRadius: '50%', background: 'rgba(0,0,0,0.07)', border: 'none' }}
           >
-            <X size={12} style={{ color: '#64748b' }} />
+            <X size={12} style={{ color: INK_MUTE }} />
           </button>
         </div>
       )}
@@ -217,7 +222,7 @@ export function MessageInput({
           className="flex"
           style={{
             gap: 18, padding: '12px 18px 14px',
-            borderTop: '0.5px solid rgba(15,23,42,0.07)',
+            borderTop: `0.5px solid ${HAIRLINE_INK_7}`,
           }}
         >
           <ActionTile
@@ -251,14 +256,14 @@ export function MessageInput({
           className="flex items-center justify-center flex-shrink-0 active:scale-[0.97] transition-all"
           style={{
             width: 36, height: 36, borderRadius: '50%',
-            background: 'rgba(15,23,42,0.05)',
-            border: '0.5px solid rgba(15,23,42,0.10)',
+            background: INK_TINT_05,
+            border: `0.5px solid ${HAIRLINE_INK_10}`,
             transform: actionsOpen ? 'rotate(45deg)' : 'rotate(0deg)',
             transition: 'transform 180ms ease, background 180ms ease',
           }}
           aria-label={actionsOpen ? 'Close actions' : 'More actions'}
         >
-          <Plus size={18} style={{ color: '#64748b' }} strokeWidth={2.2} />
+          <Plus size={18} style={{ color: INK_MUTE }} strokeWidth={2.2} />
         </button>
 
         {/* Text input pill */}
@@ -282,7 +287,7 @@ export function MessageInput({
             disabled={disabled || uploading}
             rows={1}
             className="flex-1 bg-transparent outline-none resize-none max-h-[120px] py-1"
-            style={{ fontSize: 14, color: '#1e293b' }}
+            style={{ fontSize: 14, color: INK_DEEP }}
           />
         </div>
 
@@ -294,7 +299,7 @@ export function MessageInput({
             className="flex items-center justify-center flex-shrink-0 active:scale-[0.97] transition-all disabled:opacity-50"
             style={{
               width: 38, height: 38, borderRadius: '50%',
-              background: '#F7931E',
+              background: AMBER,
               border: 'none',
               boxShadow: '0 4px 14px rgba(247,147,30,0.32), inset 0 0 0 0.5px rgba(255,255,255,0.20)',
             }}
@@ -314,12 +319,12 @@ export function MessageInput({
               className="flex items-center justify-center flex-shrink-0 active:scale-[0.97] transition-transform"
               style={{
                 width: 36, height: 36, borderRadius: '50%',
-                background: 'rgba(15,23,42,0.05)',
-                border: '0.5px solid rgba(15,23,42,0.10)',
+                background: INK_TINT_05,
+                border: `0.5px solid ${HAIRLINE_INK_10}`,
               }}
               aria-label="Camera"
             >
-              <Camera size={16} style={{ color: '#64748b' }} />
+              <Camera size={16} style={{ color: INK_MUTE }} />
             </button>
             {onSendVoiceNote ? (
               <VoiceRecordButton
@@ -331,12 +336,12 @@ export function MessageInput({
                 className="flex items-center justify-center flex-shrink-0"
                 style={{
                   width: 36, height: 36, borderRadius: '50%',
-                  background: 'rgba(15,23,42,0.05)',
-                  border: '0.5px solid rgba(15,23,42,0.10)',
+                  background: INK_TINT_05,
+                  border: `0.5px solid ${HAIRLINE_INK_10}`,
                 }}
                 aria-label="Voice note"
               >
-                <Mic size={16} style={{ color: '#64748b' }} />
+                <Mic size={16} style={{ color: INK_MUTE }} />
               </button>
             )}
           </>
@@ -364,13 +369,13 @@ function ActionTile({ icon: Icon, label, onClick }: { icon: typeof Plus; label: 
         className="flex items-center justify-center"
         style={{
           width: 52, height: 52, borderRadius: 16,
-          background: 'rgba(247,147,30,0.10)',
-          border: '0.5px solid rgba(247,147,30,0.22)',
+          background: AMBER_TINT_10,
+          border: `0.5px solid ${AMBER_TINT_22}`,
         }}
       >
-        <Icon size={22} style={{ color: '#F7931E' }} strokeWidth={2.2} />
+        <Icon size={22} style={{ color: AMBER }} strokeWidth={2.2} />
       </div>
-      <span style={{ fontSize: 11, fontWeight: 500, color: '#64748b' }}>{label}</span>
+      <span style={{ fontSize: 11, fontWeight: 500, color: INK_MUTE }}>{label}</span>
     </button>
   );
 }
