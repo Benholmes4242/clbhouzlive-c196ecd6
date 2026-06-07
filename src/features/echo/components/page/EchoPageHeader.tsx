@@ -3,7 +3,7 @@
  */
 
 import React from 'react';
-import { ChevronLeft, Plus, Clock } from 'lucide-react';
+import { ChevronLeft, Plus, History } from 'lucide-react';
 import { AnimatedEchoWave } from '@/features/echo/components/ui/AnimatedEchoWave';
 
 interface EchoPageHeaderProps {
@@ -28,10 +28,11 @@ export function EchoPageHeader({ onBack, onNew, onHistory, hasMessages }: EchoPa
         style={{
           width: 36, height: 36, borderRadius: '50%',
           background: 'rgba(15,23,42,0.05)',
-          border: '0.5px solid rgba(15,23,42,0.10)',
+          border: '0.5px solid rgba(15,23,42,0.08)',
           display: 'flex', alignItems: 'center', justifyContent: 'center',
           cursor: 'pointer', flexShrink: 0,
         }}
+        className="active:scale-[0.95] transition-transform"
         aria-label="Go back"
       >
         <ChevronLeft className="w-5 h-5" style={{ color: '#64748B' }} strokeWidth={2.5} />
@@ -45,21 +46,35 @@ export function EchoPageHeader({ onBack, onNew, onHistory, hasMessages }: EchoPa
         </span>
       </div>
 
-      {/* Right: History + New */}
-      <div className="flex items-center">
+      {/* Right: History + New (unified circular treatment, New gets amber tint) */}
+      <div className="flex items-center gap-1">
         <button
           onClick={onHistory}
-          className="w-11 h-11 rounded-full flex items-center justify-center active:scale-[0.97] transition-transform"
+          style={{
+            width: 36, height: 36, borderRadius: '50%',
+            background: 'rgba(15,23,42,0.05)',
+            border: '0.5px solid rgba(15,23,42,0.08)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            cursor: 'pointer', flexShrink: 0,
+          }}
+          className="active:scale-[0.95] transition-transform"
           aria-label="View conversation history"
         >
-          <Clock className="w-5 h-5" style={{ color: '#94A3B8' }} />
+          <History className="w-[18px] h-[18px]" style={{ color: '#64748B' }} strokeWidth={2} />
         </button>
         <button
           onClick={onNew}
-          className="w-11 h-11 rounded-full flex items-center justify-center active:scale-[0.97] transition-transform"
+          style={{
+            width: 36, height: 36, borderRadius: '50%',
+            background: 'rgba(247,147,30,0.10)',
+            border: '0.5px solid rgba(247,147,30,0.20)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            cursor: 'pointer', flexShrink: 0,
+          }}
+          className="active:scale-[0.95] transition-transform"
           aria-label="Start new conversation"
         >
-          <Plus className="w-[22px] h-[22px]" style={{ color: '#94A3B8' }} />
+          <Plus className="w-[18px] h-[18px]" style={{ color: '#F7931E' }} strokeWidth={2.5} />
         </button>
       </div>
     </header>

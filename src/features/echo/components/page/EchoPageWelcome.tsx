@@ -3,11 +3,36 @@
  */
 
 import React, { useMemo } from 'react';
-import { ChevronRight } from 'lucide-react';
+import { ChevronRight, Target, BookOpen, MapPin, Settings2, Plane, Sparkles } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { haptic } from '@/utils/haptics';
 import { AnimatedEchoWave } from '@/features/echo/components/ui/AnimatedEchoWave';
 import type { EchoProfile } from '@/features/echo/hooks/useEchoProfile';
+
+function getCategoryIcon(category: CategoryTag) {
+  switch (category) {
+    case 'strategy': return Target;
+    case 'rules': return BookOpen;
+    case 'courses': return MapPin;
+    case 'gear': return Settings2;
+    case 'travel': return Plane;
+    default: return Sparkles;
+  }
+}
+
+function getSubline(): string {
+  const hour = new Date().getHours();
+  const dayOfYear = Math.floor((Date.now() - new Date(new Date().getFullYear(), 0, 0).getTime()) / 86400000);
+  let variants: string[];
+  if (hour >= 5 && hour < 12) {
+    variants = ['Ready when you are.', "Let's get you on the course.", 'Coffee in hand. Ask away.'];
+  } else if (hour >= 12 && hour < 18) {
+    variants = ["What's the plan today?", 'Mid-round questions, course advice — ask away.', 'Pick my brain.'];
+  } else {
+    variants = ['Wrapping up a round, or planning the next?', "Evening rounds, tomorrow's tee time — what's on your mind?", 'Ask me anything.'];
+  }
+  return variants[dayOfYear % variants.length];
+}
 
 interface EchoPageWelcomeProps {
   profile: EchoProfile;
@@ -109,6 +134,7 @@ function deriveRegion(homeClub: string | null, location: string | null): RegionT
 interface SelectedPrompt {
   text: string;
   isPersonalized: boolean;
+  category: CategoryTag;
 }
 
 interface SessionPromptCache {
@@ -180,6 +206,7 @@ function selectPrompts(profile: EchoProfile, count: number = 4): SelectedPrompt[
   return selected.map((p, i) => ({
     text: p.text,
     isPersonalized: i === personalizedIdx && personalizedIdx !== -1,
+    category: p.category,
   }));
 }
 
@@ -228,8 +255,8 @@ export function EchoPageWelcome({ profile, onChipSelect }: EchoPageWelcomeProps)
         {/* Greeting */}
         <div className="text-center mb-2">
           <h1
-            className="text-[28px] font-extrabold tracking-tight"
-            style={{ color: '#0F172A' }}
+            className="text-[30px] font-extrabold"
+            style={{ color: '#0F172A', letterSpacing: '-0.03em', lineHeight: 1.1 }}
           >
             {profile.firstName ? `${greeting}, ${profile.firstName}.` : `${greeting}.`}
           </h1>
@@ -237,59 +264,62 @@ export function EchoPageWelcome({ profile, onChipSelect }: EchoPageWelcomeProps)
             className="text-[15px] mt-1.5"
             style={{ color: '#64748B' }}
           >
-            Your caddie is ready.
+            {getSubline()}
           </p>
         </div>
 
         {/* Divider */}
-        <div className="flex items-center gap-3 my-6 w-full max-w-[340px]">
-          <div className="flex-1 h-px" style={{ background: 'rgba(15,23,42,0.07)' }} />
+        <div className="flex items-center gap-4 mt-7 mb-5 w-full max-w-[340px]">
+          <div className="flex-1 h-px" style={{ background: 'rgba(15,23,42,0.05)' }} />
           <span
-            className="text-[9px] font-extrabold uppercase tracking-[0.16em]"
-            style={{ color: '#64748B' }}
+            className="text-[9px] font-extrabold uppercase"
+            style={{ color: '#94A3B8', letterSpacing: '0.16em' }}
           >
             Try asking
           </span>
-          <div className="flex-1 h-px" style={{ background: 'rgba(15,23,42,0.07)' }} />
+          <div className="flex-1 h-px" style={{ background: 'rgba(15,23,42,0.05)' }} />
         </div>
 
         {/* Prompt chips */}
         <div className="w-full max-w-[340px] flex flex-col gap-[6px]">
-          {prompts.map((prompt, index) => (
-            <button
-              key={index}
-              onClick={() => handleChipClick(prompt.text)}
-              className="px-4 py-[11px] rounded-[13px] text-[13px] font-medium text-left active:scale-[0.98] transition-all duration-150 flex items-center justify-between gap-2"
-              style={{
-                background: prompt.isPersonalized
-                  ? 'linear-gradient(135deg, rgba(247,147,30,0.06), #ffffff)'
-                  : '#ffffff',
-                border: prompt.isPersonalized
-                  ? '1px solid rgba(247,147,30,0.20)'
-                  : '1px solid rgba(15,23,42,0.07)',
-              }}
-              aria-label={`Ask Echo: ${prompt.text}`}
-            >
-              <span className="flex items-center gap-2 min-w-0">
-                {prompt.isPersonalized && (
-                  <span
-                    className="flex-shrink-0 px-1.5 py-0.5 rounded text-[9px] font-extrabold uppercase tracking-[0.14em]"
-                    style={{ background: 'rgba(247,147,30,0.15)', color: '#F7931E' }}
-                  >
-                    For You
-                  </span>
-                )}
-                <span style={{ color: '#0F172A' }} className="truncate">{prompt.text}</span>
-              </span>
-              <ChevronRight className="w-3.5 h-3.5 flex-shrink-0" style={{ color: 'rgba(247,147,30,0.4)' }} />
-            </button>
-          ))}
+          {prompts.map((prompt, index) => {
+            const CategoryIcon = getCategoryIcon(prompt.category);
+            return (
+              <button
+                key={index}
+                onClick={() => handleChipClick(prompt.text)}
+                className="px-4 py-[11px] rounded-[13px] text-[13px] font-medium text-left active:scale-[0.98] transition-all duration-150 flex items-center justify-between gap-2.5"
+                style={{
+                  background: prompt.isPersonalized
+                    ? 'linear-gradient(135deg, rgba(247,147,30,0.06), #ffffff)'
+                    : '#ffffff',
+                  border: prompt.isPersonalized
+                    ? '1px solid rgba(247,147,30,0.20)'
+                    : '1px solid rgba(15,23,42,0.07)',
+                }}
+                aria-label={`Ask Echo: ${prompt.text}`}
+              >
+                <span className="flex items-center gap-2.5 min-w-0">
+                  <CategoryIcon
+                    className="w-4 h-4 flex-shrink-0"
+                    style={{ color: 'rgba(247,147,30,0.65)' }}
+                    strokeWidth={2}
+                  />
+                  {prompt.isPersonalized && (
+                    <span
+                      className="flex-shrink-0 rounded text-[8px] font-extrabold uppercase"
+                      style={{ background: 'rgba(247,147,30,0.15)', color: '#F7931E', padding: '2px 6px', letterSpacing: '0.14em' }}
+                    >
+                      For You
+                    </span>
+                  )}
+                  <span style={{ color: '#0F172A' }} className="truncate">{prompt.text}</span>
+                </span>
+                <ChevronRight className="w-3.5 h-3.5 flex-shrink-0" style={{ color: 'rgba(247,147,30,0.4)' }} />
+              </button>
+            );
+          })}
         </div>
-
-        {/* Hint */}
-        <p className="mt-4 text-[12px] text-center" style={{ color: '#94A3B8' }}>
-          Ask me anything about golf
-        </p>
       </div>
     </div>
   );
