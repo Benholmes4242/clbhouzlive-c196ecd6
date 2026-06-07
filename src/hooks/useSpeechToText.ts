@@ -4,14 +4,15 @@
   */
  import { useState, useCallback, useRef, useEffect } from 'react';
  
- interface UseSpeechToTextReturn {
-   isListening: boolean;
-   transcript: string;
-   startListening: () => void;
-   stopListening: () => void;
-   isSupported: boolean;
-   error: string | null;
- }
+interface UseSpeechToTextReturn {
+  isListening: boolean;
+  transcript: string;
+  startListening: () => void;
+  stopListening: () => void;
+  isSupported: boolean;
+  error: string | null;
+  micLevel: number;
+}
  
  // Type definitions for Web Speech API (not included in standard TS lib)
  interface ISpeechRecognitionEvent extends Event {
