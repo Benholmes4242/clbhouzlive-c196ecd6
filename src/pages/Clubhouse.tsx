@@ -404,61 +404,21 @@ const ClubhouseContent = () => {
         )
       ) : posts.length > 0 ? (
         <>
-          <SnapFeed
+          <CardFeed
             posts={posts}
-            activeTab={activeTab}
             onNearEnd={handleNearEnd}
-            onRefresh={handleRefresh}
-            isRefreshing={activeFeed.isRefetching}
             hasNextPage={hasNextPage}
-            followOverrides={followOverrides}
-            onFollowChange={handleFollowChange}
-            onFirstFrameReady={signalFirstFrameReady}
             onLike={(post) => handleLike(post)}
             onComment={openComments}
             onShare={(post) => handleShare(post)}
-            getLikeState={(post) => getActiveLikeState(post)}
+            onProfile={(post) => navigate(getActorRouteByType(post.actorType, post.actorId))}
+            onReviewTap={() => handleReviewTap()}
+            getLikeState={(post) => {
+              const s = getActiveLikeState(post);
+              if (!s) return null;
+              return { liked: s.liked, count: s.count ?? post.likeCount ?? 0 };
+            }}
             getCommentCount={(post) => getCommentCount(post)}
-            isFullscreen
-          />
-
-          {/* Windowed carousel dots — centred under top chrome */}
-          {!skeletonVisible && (activePost?.mediaItems?.length ?? 0) > 1 && (
-            <div
-              className="fixed pointer-events-none flex justify-center"
-              style={{
-                top: 'calc(max(env(safe-area-inset-top, 0px), 47px) + 56px)',
-                left: 0,
-                right: 0,
-                zIndex: 9029,
-              }}
-            >
-              <CarouselDots
-                count={activePost!.mediaItems!.length}
-                active={currentMediaIndex}
-                variant="windowed"
-              />
-            </div>
-          )}
-
-          {/* Overlay layer — action rail, creator capsule, scrubber, dots */}
-          <FeedOverlayLayer
-            posts={posts}
-            onLike={handleLike}
-            onComment={openComments}
-            onShare={handleShare}
-            onMore={() => setMoreOptionsOpen(true)}
-            getLikeState={getActiveLikeState}
-            getCommentCount={getCommentCount}
-            getFollowState={getFollowState}
-            onFollow={handleFollow}
-            onViewProfile={handleViewProfile}
-            onReviewTap={handleReviewTap}
-            overlayVisible={overlayVisible}
-            isOwnPost={isOwnPost}
-            golfCourse={golfCourse}
-            activeReview={activeReview}
-            isActiveReview={isActiveReview}
           />
         </>
       ) : (
