@@ -498,7 +498,7 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
               </div>
             </div>
 
-            {/* ─── SCROLLABLE MIDDLE (review body with drop cap + watermark) ──── */}
+            {/* ─── SCROLLABLE MIDDLE (review body) ──── */}
             <div
               style={{
                 flex: '1 1 auto',
@@ -512,36 +512,11 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
                 zIndex: 1,
               }}
             >
-              {/* Atmospheric watermark — Playfair score behind body */}
-              <div
-                aria-hidden
-                style={{
-                  position: 'absolute',
-                  right: -20,
-                  bottom: -40,
-                  fontFamily: FONTS.serifDisplay,
-                  fontSize: 300,
-                  fontWeight: 900,
-                  lineHeight: 0.85,
-                  color: 'rgba(255,255,255,0.035)',
-                  pointerEvents: 'none',
-                  letterSpacing: '-10px',
-                  userSelect: 'none',
-                  zIndex: 0,
-                  fontVariantNumeric: 'lining-nums tabular-nums',
-                }}
-              >
-                {formattedRating}
-              </div>
-
               {paragraphs.length === 0 && (
                 <div
                   style={{
-                    position: 'relative',
-                    zIndex: 1,
-                    fontFamily: FONTS.serifSystem,
+                    fontFamily: FONTS.geist,
                     fontSize: 14,
-                    fontStyle: 'italic',
                     color: FROST.inkFaint,
                     padding: '12px 0',
                   }}
@@ -549,48 +524,22 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
                   No written review — the score speaks for itself.
                 </div>
               )}
-              {paragraphs.map((para, i) => {
-                const isFirst = i === 0;
-                const firstChar = para.charAt(0);
-                const eligibleForDropCap = isFirst && /^[A-Za-z]$/.test(firstChar);
-                return (
-                  <p
-                    key={i}
-                    style={{
-                      position: 'relative',
-                      zIndex: 1,
-                      fontSize: 15,
-                      lineHeight: 1.6,
-                      color: FROST.inkSoft,
-                      letterSpacing: '-0.1px',
-                      margin: 0,
-                      marginBottom: i === paragraphs.length - 1 ? 0 : 14,
-                    }}
-                  >
-                    {eligibleForDropCap ? (
-                      <>
-                        <span
-                          style={{
-                            float: 'left',
-                            fontFamily: FONTS.serifDisplay,
-                            fontSize: 54,
-                            fontWeight: 800,
-                            lineHeight: 0.9,
-                            paddingTop: 4,
-                            paddingRight: 10,
-                            color: FROST.amber,
-                          }}
-                        >
-                          {firstChar}
-                        </span>
-                        {para.slice(1)}
-                      </>
-                    ) : (
-                      para
-                    )}
-                  </p>
-                );
-              })}
+              {paragraphs.map((para, i) => (
+                <p
+                  key={i}
+                  style={{
+                    fontFamily: FONTS.geist,
+                    fontSize: 15,
+                    lineHeight: 1.6,
+                    color: FROST.inkSoft,
+                    letterSpacing: '-0.1px',
+                    margin: 0,
+                    marginBottom: i === paragraphs.length - 1 ? 0 : 14,
+                  }}
+                >
+                  {para}
+                </p>
+              ))}
             </div>
 
             {/* ─── PINNED FOOTER ─────────────────────────────── */}
