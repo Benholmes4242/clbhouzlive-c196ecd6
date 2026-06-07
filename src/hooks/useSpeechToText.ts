@@ -40,10 +40,11 @@ interface UseSpeechToTextReturn {
  }
  
  export function useSpeechToText(): UseSpeechToTextReturn {
-   const [isListening, setIsListening] = useState(false);
-   const [transcript, setTranscript] = useState('');
-   const [error, setError] = useState<string | null>(null);
-   const recognitionRef = useRef<ISpeechRecognition | null>(null);
+  const [isListening, setIsListening] = useState(false);
+  const [transcript, setTranscript] = useState('');
+  const [error, setError] = useState<string | null>(null);
+  const [micLevel, setMicLevel] = useState(0);
+  const recognitionRef = useRef<ISpeechRecognition | null>(null);
  
    const isSupported = typeof window !== 'undefined' && 
      ('SpeechRecognition' in window || 'webkitSpeechRecognition' in window);
