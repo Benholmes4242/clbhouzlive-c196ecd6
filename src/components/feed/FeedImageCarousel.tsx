@@ -75,6 +75,7 @@ export const FeedImageCarousel = memo(function FeedImageCarousel({
   isActive = false,
   onDoubleTapLike,
   onZoomChange,
+  isFullscreen = false,
 }: FeedImageCarouselProps) {
   const activeIndex = useClubhouseStore(s => s.activeIndex);
   const setCarouselPosition = useClubhouseStore(s => s.setCarouselPosition);
