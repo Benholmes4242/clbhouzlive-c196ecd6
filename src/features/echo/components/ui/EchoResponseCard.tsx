@@ -238,7 +238,7 @@ export function EchoResponseCard({
                 code: ({ children }) => (
                   <code
                     className="px-1.5 py-0.5 rounded-md text-[0.8125rem] font-mono"
-                    style={{ background: 'rgba(15,23,42,0.06)', color: '#334155' }}
+                    style={{ background: 'rgba(247,147,30,0.08)', color: '#C2410C' }}
                   >
                     {children}
                   </code>
