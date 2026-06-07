@@ -1,23 +1,26 @@
 /**
- * FeedCard — Phase 1
+ * FeedCard — Phases 1 & 2
  *
- * Single post = single card. Adaptive media frame: the frame's aspect-ratio
- * equals the media's own ratio so `object-fit: cover` fills with zero crop
- * and zero letterbox. Extreme ratios are clamped + ambient-filled with a
- * blurred backdrop.
+ * Single post = single card. Header, media block, body, footer.
  *
- * Phase 1 scope:
- *  - Header (avatar / name / sub-line / optional REVIEW pill / DEAL chip)
- *  - Single-media adaptive frame (first mediaItem only)
- *  - Footer (like / comment / share)
- *  - Tap on media → open `useFullscreenFeedStore` at the right post/slide
+ * Media block:
+ *  - Single media → adaptive frame (frame ratio = media's true ratio →
+ *    `object-fit: cover` fills with zero crop and zero letterbox). Extreme
+ *    ratios are clamped + ambient-filled with a blurred backdrop.
+ *  - Multi media → `MediaCarousel`: stable 4:5 frame for all slides
+ *    (height never jumps), per-slide blurred ambient backdrop + contained
+ *    image/video, dots + n/total chip, swipe navigation, persisted index.
  *
- * Phase 2 (later): multi-media carousel with dots, inline video lifecycle.
+ * Inline video lifecycle is driven by the `isActive` prop from `CardFeed`
+ * (most-in-view card). Only one inline video plays at a time across the
+ * whole feed; tapping any media opens the immersive `FullscreenFeedOverlay`.
  */
 import React, { useMemo } from 'react';
 import { Heart, MessageCircle, Share } from 'lucide-react';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import type { FeedPost } from '@/components/media-system/types/media';
+import { InlineVideo } from './InlineVideo';
+import { MediaCarousel } from './MediaCarousel';
 
 const T100 = 'rgba(255,255,255,0.96)';
 const T60 = 'rgba(255,255,255,0.55)';
@@ -66,6 +69,12 @@ export interface FeedCardProps {
   onOpenMedia: (post: FeedPost, mediaIndex: number) => void;
   onProfile: (post: FeedPost) => void;
   onReviewTap?: (post: FeedPost) => void;
+  /** True when this card is the most-in-view → drives inline video autoplay. */
+  isActive?: boolean;
+  /** Initial carousel slide for multi-media posts (from persisted store). */
+  initialMediaIndex?: number;
+  /** Notified when user swipes the multi-media carousel. */
+  onCarouselIndexChange?: (post: FeedPost, idx: number) => void;
 }
 
 const FeedCardImpl: React.FC<FeedCardProps> = ({
@@ -79,8 +88,13 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
   onOpenMedia,
   onProfile,
   onReviewTap,
+  isActive = false,
+  initialMediaIndex = 0,
+  onCarouselIndexChange,
 }) => {
-  const media = post.mediaItems?.[0];
+  const items = post.mediaItems ?? [];
+  const isMulti = items.length > 1;
+  const media = items[0];
 
   const { ratio, isContained } = useMemo(() => {
     if (!media || !media.width || !media.height) {
@@ -194,7 +208,15 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
       </div>
 
       {/* Media */}
-      {media && (
+      {isMulti ? (
+        <MediaCarousel
+          items={items}
+          isCardActive={isActive}
+          initialIndex={initialMediaIndex}
+          onIndexChange={(idx) => onCarouselIndexChange?.(post, idx)}
+          onOpen={(idx) => onOpenMedia(post, idx)}
+        />
+      ) : media ? (
         <button
           type="button"
           onClick={() => onOpenMedia(post, 0)}
@@ -230,7 +252,13 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
                 }}
               />
             )}
-            {mediaUrl && (
+            {media.type === 'video' ? (
+              <InlineVideo
+                item={media}
+                isActive={isActive}
+                objectFit={isContained ? 'contain' : 'cover'}
+              />
+            ) : mediaUrl ? (
               <img
                 src={mediaUrl}
                 alt={post.caption || post.displayName}
@@ -245,46 +273,10 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
                   display: 'block',
                 }}
               />
-            )}
-            {media.type === 'video' && (
-              <div
-                style={{
-                  position: 'absolute',
-                  inset: 0,
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  pointerEvents: 'none',
-                }}
-              >
-                <div
-                  style={{
-                    width: 56,
-                    height: 56,
-                    borderRadius: 999,
-                    background: 'rgba(5,8,16,0.55)',
-                    border: '1px solid rgba(255,255,255,0.18)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                  }}
-                >
-                  <div
-                    style={{
-                      width: 0,
-                      height: 0,
-                      borderTop: '10px solid transparent',
-                      borderBottom: '10px solid transparent',
-                      borderLeft: '16px solid #fff',
-                      marginLeft: 4,
-                    }}
-                  />
-                </div>
-              </div>
-            )}
+            ) : null}
           </div>
         </button>
-      )}
+      ) : null}
 
       {/* Body — caption */}
       {post.caption && (
