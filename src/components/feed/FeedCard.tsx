@@ -360,7 +360,7 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
 };
 
 const FooterButton: React.FC<{
-  icon: React.ComponentType<{ size?: number; color?: string; fill?: string; strokeWidth?: number }>;
+  icon: React.ComponentType<any>;
   label?: string;
   onClick: () => void;
   active?: boolean;
