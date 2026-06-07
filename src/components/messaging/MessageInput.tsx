@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, KeyboardEvent, ChangeEvent } from 'react';
-import { Send, X, Paperclip, Loader2, MapPin, Camera, Mic } from 'lucide-react';
+import { Send, X, Paperclip, Loader2, MapPin, Camera, Mic, Plus } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
@@ -45,6 +45,7 @@ export function MessageInput({
   const [mediaPreview, setMediaPreview] = useState<MediaPreview | null>(null);
   const [uploading, setUploading] = useState(false);
   const [showShareModal, setShowShareModal] = useState(false);
+  const [actionsOpen, setActionsOpen] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const cameraInputRef = useRef<HTMLInputElement>(null);
@@ -210,39 +211,54 @@ export function MessageInput({
         </div>
       )}
 
+      {/* Expandable actions tray */}
+      {actionsOpen && (
+        <div
+          className="flex"
+          style={{
+            gap: 18, padding: '12px 18px 14px',
+            borderTop: '0.5px solid rgba(15,23,42,0.07)',
+          }}
+        >
+          <ActionTile
+            icon={Paperclip}
+            label="Attach"
+            onClick={() => { setActionsOpen(false); fileInputRef.current?.click(); }}
+          />
+          <ActionTile
+            icon={Camera}
+            label="Take photo"
+            onClick={() => { setActionsOpen(false); cameraInputRef.current?.click(); }}
+          />
+          <ActionTile
+            icon={MapPin}
+            label="Share course"
+            onClick={() => { setActionsOpen(false); setShowShareModal(true); }}
+          />
+        </div>
+      )}
+
       {/* Main input row */}
       <div className="flex items-end" style={{ gap: 7, padding: '8px 12px' }}>
         {/* Hidden file inputs */}
         <input ref={fileInputRef} type="file" accept="image/*,video/*" className="hidden" onChange={handleFileSelect} />
         <input ref={cameraInputRef} type="file" accept="image/*" capture="environment" className="hidden" onChange={handleCameraCapture} />
 
-        {/* Attach button */}
+        {/* + expand button */}
         <button
-          onClick={() => fileInputRef.current?.click()}
+          onClick={() => setActionsOpen(v => !v)}
           disabled={disabled || uploading}
-          className="flex items-center justify-center flex-shrink-0 active:scale-[0.97] transition-transform"
+          className="flex items-center justify-center flex-shrink-0 active:scale-[0.97] transition-all"
           style={{
             width: 36, height: 36, borderRadius: '50%',
             background: 'rgba(15,23,42,0.05)',
             border: '0.5px solid rgba(15,23,42,0.10)',
+            transform: actionsOpen ? 'rotate(45deg)' : 'rotate(0deg)',
+            transition: 'transform 180ms ease, background 180ms ease',
           }}
+          aria-label={actionsOpen ? 'Close actions' : 'More actions'}
         >
-          <Paperclip size={15} style={{ color: '#64748b' }} />
-        </button>
-
-        {/* Golf content share button */}
-        <button
-          onClick={() => setShowShareModal(true)}
-          disabled={disabled || uploading}
-          className="flex items-center justify-center flex-shrink-0 active:scale-[0.97] transition-transform"
-          style={{
-            width: 36, height: 36, borderRadius: '50%',
-            background: 'rgba(0,103,71,0.07)',
-            border: '1px solid rgba(0,103,71,0.18)',
-          }}
-          title="Share golf content"
-        >
-          <MapPin size={13} style={{ color: '#006747' }} />
+          <Plus size={18} style={{ color: '#64748b' }} strokeWidth={2.2} />
         </button>
 
         {/* Text input pill */}
@@ -256,7 +272,7 @@ export function MessageInput({
           }}
         >
           <EmojiPickerPopover onEmojiSelect={handleEmojiSelect} />
-          
+
           <textarea
             ref={textareaRef}
             value={content}
@@ -268,52 +284,62 @@ export function MessageInput({
             className="flex-1 bg-transparent outline-none resize-none max-h-[120px] py-1"
             style={{ fontSize: 14, color: '#1e293b' }}
           />
-          
-          {/* Camera button when no text */}
-          {!hasText && !mediaPreview && (
-            <button 
-              onClick={() => cameraInputRef.current?.click()}
-              className="flex items-center justify-center flex-shrink-0"
-              style={{ width: 28, height: 28, borderRadius: '50%', background: 'none', border: 'none' }}
-            >
-              <Camera size={18} style={{ color: '#94a3b8' }} />
-            </button>
-          )}
         </div>
 
-        {/* Send or Voice button */}
+        {/* Right: camera + mic (no text) OR send (has text) */}
         {hasText || mediaPreview ? (
-          <button 
+          <button
             onClick={handleSend}
             disabled={(!hasText && !mediaPreview) || disabled || uploading}
             className="flex items-center justify-center flex-shrink-0 active:scale-[0.97] transition-all disabled:opacity-50"
             style={{
               width: 38, height: 38, borderRadius: '50%',
-              background: 'rgba(247,147,30,0.10)',
-              border: '1px solid rgba(247,147,30,0.30)',
+              background: '#F7931E',
+              border: 'none',
+              boxShadow: '0 4px 14px rgba(247,147,30,0.32), inset 0 0 0 0.5px rgba(255,255,255,0.20)',
             }}
+            aria-label="Send"
           >
             {uploading ? (
-              <Loader2 className="w-4 h-4 animate-spin" style={{ color: '#F7931E' }} />
+              <Loader2 className="w-4 h-4 animate-spin" style={{ color: '#fff' }} />
             ) : (
-              <Send size={15} style={{ color: '#F7931E' }} />
+              <Send size={15} style={{ color: '#fff' }} />
             )}
           </button>
-        ) : onSendVoiceNote ? (
-          <VoiceRecordButton 
-            onSend={onSendVoiceNote}
-            disabled={disabled || uploading}
-          />
         ) : (
-          <button
-            className="flex items-center justify-center flex-shrink-0"
-            style={{
-              width: 38, height: 38, borderRadius: '50%',
-              background: 'rgba(0,0,0,0.05)', border: 'none',
-            }}
-          >
-            <Mic size={16} style={{ color: '#64748b' }} />
-          </button>
+          <>
+            <button
+              onClick={() => cameraInputRef.current?.click()}
+              disabled={disabled || uploading}
+              className="flex items-center justify-center flex-shrink-0 active:scale-[0.97] transition-transform"
+              style={{
+                width: 36, height: 36, borderRadius: '50%',
+                background: 'rgba(15,23,42,0.05)',
+                border: '0.5px solid rgba(15,23,42,0.10)',
+              }}
+              aria-label="Camera"
+            >
+              <Camera size={16} style={{ color: '#64748b' }} />
+            </button>
+            {onSendVoiceNote ? (
+              <VoiceRecordButton
+                onSend={onSendVoiceNote}
+                disabled={disabled || uploading}
+              />
+            ) : (
+              <button
+                className="flex items-center justify-center flex-shrink-0"
+                style={{
+                  width: 36, height: 36, borderRadius: '50%',
+                  background: 'rgba(15,23,42,0.05)',
+                  border: '0.5px solid rgba(15,23,42,0.10)',
+                }}
+                aria-label="Voice note"
+              >
+                <Mic size={16} style={{ color: '#64748b' }} />
+              </button>
+            )}
+          </>
         )}
       </div>
 
