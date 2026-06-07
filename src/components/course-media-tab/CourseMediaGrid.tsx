@@ -7,6 +7,9 @@ import { CourseMediaTile } from './CourseMediaTile';
 import { CourseMediaLandscapeCard } from './CourseMediaLandscapeCard';
 import { CourseMediaGridSkeleton } from './CourseMediaGridSkeleton';
 import { SectionLabel } from '@/components/courses/course-detail/SectionLabel';
+import { PrimaryAmberCTA } from '@/components/ui/PrimaryAmberCTA';
+import { EmptyStateGuide } from '@/components/ui/EmptyStateGuide';
+import { FeaturedPill } from '@/components/ui/FeaturedPill';
 import { AMBER, HAIRLINE_INK_7, HAIRLINE_INK_10, INK, INK_FAINT, INK_TINT_02, INK_TINT_06, SURFACE } from '@/features/courses/_shared/tokens';
 
 interface CourseMediaGridProps {
@@ -114,14 +117,13 @@ export const CourseMediaGrid = forwardRef<HTMLDivElement, CourseMediaGridProps>(
           <p style={{ fontSize: 13, color: INK_FAINT, lineHeight: 1.6, maxWidth: 270, margin: '0 auto 24px' }}>
             Be the first to capture {courseName || 'this course'} — photos and videos from your round help fellow golfers discover it.
           </p>
-          <button
-            type="button"
+          <PrimaryAmberCTA
             onClick={() => courseId && navigate(`/courses/${courseId}/rate`)}
-            style={{ width: '100%', padding: '13px 0', borderRadius: 12, background: 'linear-gradient(90deg, #F59E0B, #F7931E)', color: SURFACE, fontSize: 14, fontWeight: 800, border: 'none', cursor: 'pointer', boxShadow: '0 4px 16px rgba(247,147,30,0.28)', marginBottom: 10, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 7 }}
+            leadingIcon={<Camera size={15} strokeWidth={2} />}
+            style={{ marginBottom: 10 }}
           >
-            <Camera size={15} strokeWidth={2} />
             Share your experience
-          </button>
+          </PrimaryAmberCTA>
           <button
             type="button"
             onClick={() => navigate('/share')}
@@ -135,27 +137,15 @@ export const CourseMediaGrid = forwardRef<HTMLDivElement, CourseMediaGridProps>(
         <div style={{ height: '0.5px', background: HAIRLINE_INK_7, margin: '0 16px 24px' }} />
 
         {/* What to share guide */}
-        <div>
-          <SectionLabel text="What to share" icon={ListChecks} />
-          <div style={{ padding: '0 16px' }}>
-            {[
-              { Icon: Flag,      label: 'Signature holes',        sub: 'Show the world what makes this course special' },
-              { Icon: Film,      label: 'Shots from your round',  sub: 'Short clips of your best moments on the course' },
-              { Icon: Sunrise,   label: 'Views & atmosphere',     sub: 'Sunsets, landscapes, the feeling of being there' },
-              { Icon: Building2, label: 'Clubhouse & facilities', sub: 'Help others know what to expect before they visit' },
-            ].map(({ Icon, label, sub }, i, arr) => (
-              <div key={label} style={{ display: 'flex', alignItems: 'flex-start', gap: 12, marginBottom: i === arr.length - 1 ? 0 : 10, padding: '12px 14px', borderRadius: 12, background: INK_TINT_02, border: `0.5px solid ${INK_TINT_06}` }}>
-                <span style={{ flexShrink: 0, marginTop: 1, width: 22, height: 22, borderRadius: 7, background: 'rgba(247,147,30,0.08)', display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}>
-                  <Icon size={13} strokeWidth={2.2} color={AMBER} />
-                </span>
-                <div>
-                  <div style={{ fontSize: 13, fontWeight: 700, color: INK, marginBottom: 2 }}>{label}</div>
-                  <div style={{ fontSize: 11, color: INK_FAINT, lineHeight: 1.4 }}>{sub}</div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
+        <EmptyStateGuide
+          kicker="What to share"
+          items={[
+            { icon: Flag,      label: 'Signature holes',        sub: 'Show the world what makes this course special' },
+            { icon: Film,      label: 'Shots from your round',  sub: 'Short clips of your best moments on the course' },
+            { icon: Sunrise,   label: 'Views & atmosphere',     sub: 'Sunsets, landscapes, the feeling of being there' },
+            { icon: Building2, label: 'Clubhouse & facilities', sub: 'Help others know what to expect before they visit' },
+          ]}
+        />
       </div>
     );
   }
@@ -182,24 +172,7 @@ export const CourseMediaGrid = forwardRef<HTMLDivElement, CourseMediaGridProps>(
             onOpenFullscreen={handleOpenFullscreen}
           />
           {/* Featured badge — Dispatch glass pill (matches Explore + Hottest) */}
-          <div style={{
-            position: 'absolute', top: 16, left: 16,
-            background: 'rgba(0, 0, 0, 0.28)',
-            backdropFilter: 'blur(22px) saturate(180%)',
-            WebkitBackdropFilter: 'blur(22px) saturate(180%)',
-            border: '1px solid rgba(255, 255, 255, 0.12)',
-            boxShadow: '0 2px 8px rgba(0, 0, 0, 0.25)',
-            borderRadius: 4,
-            padding: '4px 10px',
-            fontSize: 10, fontWeight: 800, color: SURFACE,
-            letterSpacing: '0.12em', textTransform: 'uppercase',
-            pointerEvents: 'none', zIndex: 2,
-            transform: 'rotate(-6deg)', transformOrigin: 'top left',
-            display: 'inline-flex', alignItems: 'center', gap: 5,
-          }}>
-            <span style={{ fontSize: 11, lineHeight: 1 }}>🔥</span>
-            Featured
-          </div>
+          <FeaturedPill style={{ position: 'absolute', top: 16, left: 16 }} />
         </div>
       )}
 
