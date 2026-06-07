@@ -330,15 +330,7 @@ export function MessageBubble({
                 HCP {message.sender.eg_handicap_index}
               </span>
             )}
-            {message.sender?.home_club && (
-              <span style={{
-                fontSize: 9, fontWeight: 600, color: '#006747',
-                background: 'rgba(0,103,71,0.07)', border: '1px solid rgba(0,103,71,0.18)',
-                borderRadius: 99, padding: '0px 5px',
-              }}>
-                ⛳ {message.sender.home_club}
-              </span>
-            )}
+            {/* Course chip removed from in-chat sender row — already shown in chat list */}
           </div>
         )}
 
@@ -365,7 +357,7 @@ export function MessageBubble({
             borderRadius: isOwnMessage ? '16px 16px 4px 16px' : '16px 16px 16px 4px',
             ...(isOwnMessage ? {
               background: 'rgba(247,147,30,0.10)',
-              border: '1px solid rgba(247,147,30,0.25)',
+              border: '1px solid rgba(247,147,30,0.22)',
             } : {
               background: '#fff',
               border: '1px solid rgba(0,0,0,0.07)',
