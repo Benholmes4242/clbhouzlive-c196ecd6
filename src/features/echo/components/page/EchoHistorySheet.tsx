@@ -4,7 +4,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence, useMotionValue, animate, PanInfo } from 'framer-motion';
-import { Clock, ChevronRight, Trash2, X } from 'lucide-react';
+import { ChevronRight, Trash2, X } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useEchoConversations } from '../../hooks/useEchoHistory';
