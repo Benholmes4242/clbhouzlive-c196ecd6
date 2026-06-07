@@ -24,6 +24,7 @@ interface EchoHistorySheetProps {
 interface EchoConversation {
   id: string;
   title: string | null;
+  preview?: string | null;
   last_message_at: string;
   created_at: string;
 }
@@ -129,16 +130,20 @@ function SwipeableConversationRow({
 
   return (
     <div className="relative overflow-hidden">
-      <div className="absolute right-0 top-0 bottom-0 w-20 bg-destructive flex items-center justify-center" role="none">
-        <button 
-          onClick={handleDelete} 
+      <div
+        className="absolute right-0 top-0 w-20 bg-destructive flex items-center justify-center"
+        style={{ bottom: '0.5px' }}
+        role="none"
+      >
+        <button
+          onClick={handleDelete}
           className="w-full h-full flex items-center justify-center"
           aria-label="Delete conversation"
         >
           <Trash2 className="w-5 h-5 text-white" />
         </button>
       </div>
-      
+
       <motion.div
         drag="x"
         dragConstraints={{ left: -80, right: 0 }}
@@ -146,7 +151,7 @@ function SwipeableConversationRow({
         onDragEnd={handleDragEnd}
         style={{ x, background: '#ffffff' }}
         onClick={handleSelect}
-        className="relative px-4 py-3 flex items-center gap-3 active:bg-black/[0.02] transition-colors cursor-pointer"
+        className="relative px-4 py-3.5 flex items-center gap-3 active:bg-black/[0.02] transition-colors cursor-pointer"
         role="listitem"
         aria-label={`Open conversation: ${displayTitle}`}
       >
@@ -156,14 +161,14 @@ function SwipeableConversationRow({
           style={{
             width: 42,
             height: 42,
-            borderRadius: 13,
+            borderRadius: 14,
             background: 'linear-gradient(135deg, rgba(247,147,30,0.22), rgba(247,147,30,0.10))',
             border: '1px solid rgba(247,147,30,0.22)',
           }}
         >
-          <AnimatedEchoWave size={18} color="#F7931E" active={true} />
+          <AnimatedEchoWave size={20} color="#F7931E" active={true} />
         </div>
-        
+
         <div className="flex-1 min-w-0">
           <span
             className="text-[14px] font-semibold truncate block"
@@ -175,7 +180,7 @@ function SwipeableConversationRow({
             className="text-[12px] truncate"
             style={{ color: '#94A3B8' }}
           >
-            Tap to continue conversation
+            {conv.preview || 'Tap to continue conversation'}
           </p>
         </div>
 
@@ -185,10 +190,10 @@ function SwipeableConversationRow({
         >
           {formatRelativeDate(conv.last_message_at || conv.created_at)}
         </span>
-        
-        <ChevronRight className="w-[13px] h-[13px] flex-shrink-0" style={{ color: 'rgba(247,147,30,0.35)' }} />
+
+        <ChevronRight className="w-3 h-3 flex-shrink-0" style={{ color: 'rgba(247,147,30,0.35)' }} />
       </motion.div>
-      
+
       {showDivider && (
         <div style={{ height: '0.5px', marginLeft: 62, background: 'rgba(15,23,42,0.06)' }} />
       )}
@@ -311,17 +316,35 @@ export function EchoHistorySheet({ isOpen, onClose, onSelectConversation }: Echo
               {isLoading ? (
                 <HistorySkeleton />
               ) : !conversations || conversations.length === 0 ? (
-                <div className="flex flex-col items-center justify-center py-8">
-                  <div
-                    className="w-16 h-16 rounded-full flex items-center justify-center mb-4"
-                    style={{ background: 'rgba(15,23,42,0.05)', border: '1px solid rgba(15,23,42,0.07)' }}
-                  >
-                    <Clock className="w-7 h-7" style={{ color: '#94A3B8' }} />
+                <div className="flex flex-col items-center justify-center py-10 px-6">
+                  <div className="w-[72px] h-[72px] rounded-full flex items-center justify-center mb-4 relative">
+                    <div
+                      className="absolute inset-0 rounded-full"
+                      style={{ background: 'radial-gradient(circle, rgba(247,147,30,0.12) 0%, transparent 70%)' }}
+                      aria-hidden="true"
+                    />
+                    <div className="relative z-10">
+                      <AnimatedEchoWave size={32} active={true} />
+                    </div>
                   </div>
-                  <h3 className="text-base font-semibold" style={{ color: '#0F172A' }}>No history yet</h3>
-                  <p className="text-[14px] text-center px-8" style={{ color: '#94A3B8' }}>
-                    Your past conversations will appear here
+                  <h3 className="text-[16px] font-bold mb-1" style={{ color: '#0F172A', letterSpacing: '-0.015em' }}>
+                    No history yet
+                  </h3>
+                  <p className="text-[13px] text-center" style={{ color: '#94A3B8', lineHeight: 1.5 }}>
+                    Your conversations with Echo will appear here.
                   </p>
+                  <button
+                    onClick={onClose}
+                    className="mt-5 px-4 py-2.5 rounded-full text-[13px] font-semibold active:scale-[0.97] transition-all"
+                    style={{
+                      background: 'rgba(247,147,30,0.08)',
+                      border: '1px solid rgba(247,147,30,0.22)',
+                      color: '#F7931E',
+                    }}
+                    aria-label="Start a conversation"
+                  >
+                    Start a conversation
+                  </button>
                 </div>
               ) : (
                 <>
@@ -353,10 +376,10 @@ export function EchoHistorySheet({ isOpen, onClose, onSelectConversation }: Echo
                   </div>
 
                   <p
-                    className="text-center mt-3 text-[12px] pb-4"
+                    className="text-center mt-3 text-[11px] pb-4"
                     style={{ color: '#94A3B8' }}
                   >
-                    Swipe left to delete a conversation
+                    Slide a row to manage.
                   </p>
                 </>
               )}

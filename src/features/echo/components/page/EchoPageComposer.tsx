@@ -28,6 +28,8 @@ export const EchoPageComposer = forwardRef<HTMLInputElement, EchoPageComposerPro
     ref
   ) {
     const { isListening, transcript, startListening, stopListening, isSupported, error } = useSpeechToText();
+    const [isFocused, setIsFocused] = React.useState(false);
+
 
     useEffect(() => {
       if (transcript) {
@@ -108,10 +110,11 @@ export const EchoPageComposer = forwardRef<HTMLInputElement, EchoPageComposerPro
 
         {/* Pill container */}
         <div
-          className="flex items-center gap-2 rounded-full pl-4 pr-2 py-2"
+          className="flex items-center gap-2 rounded-full pl-4 pr-2 py-2 transition-shadow duration-150"
           style={{
             background: '#ffffff',
             border: '1px solid rgba(15,23,42,0.10)',
+            boxShadow: isFocused ? '0 0 0 3px rgba(247,147,30,0.12)' : 'none',
           }}
         >
           <input
@@ -120,6 +123,8 @@ export const EchoPageComposer = forwardRef<HTMLInputElement, EchoPageComposerPro
             value={value}
             onChange={handleChange}
             onKeyDown={handleKeyDown}
+            onFocus={() => setIsFocused(true)}
+            onBlur={() => setIsFocused(false)}
             placeholder={cooldown ? `Wait ${cooldown}s...` : "Ask Echo..."}
             disabled={disabled}
             aria-label="Type a message to Echo"
@@ -142,7 +147,10 @@ export const EchoPageComposer = forwardRef<HTMLInputElement, EchoPageComposerPro
             <button
               onClick={handleButtonClick}
               className="w-8 h-8 rounded-full flex items-center justify-center transition-all active:scale-[0.97]"
-              style={{ background: '#F7931E', boxShadow: '0 2px 10px rgba(247,147,30,0.4)' }}
+              style={{
+                background: '#F7931E',
+                boxShadow: '0 4px 14px rgba(247,147,30,0.32), inset 0 0 0 0.5px rgba(255,255,255,0.20)',
+              }}
               aria-label="Send message"
             >
               <ArrowUp className="w-4 h-4 text-white" />
@@ -152,15 +160,15 @@ export const EchoPageComposer = forwardRef<HTMLInputElement, EchoPageComposerPro
               onClick={handleMicClick}
               className={cn(
                 "w-8 h-8 rounded-full flex items-center justify-center transition-all active:scale-[0.97]",
-                isListening && "animate-pulse bg-destructive border-destructive"
+                isListening && "animate-pulse"
               )}
-              style={!isListening ? {
-                background: 'rgba(15,23,42,0.05)',
-                border: '0.5px solid rgba(15,23,42,0.10)',
-              } : undefined}
+              style={isListening
+                ? { background: '#F7931E', boxShadow: '0 0 0 6px rgba(247,147,30,0.18)' }
+                : { background: 'rgba(15,23,42,0.05)', border: '0.5px solid rgba(15,23,42,0.10)' }
+              }
               aria-label={isListening ? "Stop listening" : "Voice input"}
             >
-              <Mic className={cn("w-4 h-4", isListening ? "text-white" : "")} style={!isListening ? { color: '#94A3B8' } : undefined} />
+              <Mic className="w-4 h-4" style={{ color: isListening ? '#ffffff' : '#94A3B8' }} />
             </button>
           ) : (
             <button
@@ -172,6 +180,7 @@ export const EchoPageComposer = forwardRef<HTMLInputElement, EchoPageComposerPro
             </button>
           )}
         </div>
+
       </div>
     );
   }
