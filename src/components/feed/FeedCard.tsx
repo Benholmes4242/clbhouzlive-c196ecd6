@@ -30,8 +30,8 @@ const LINE = 'rgba(255,255,255,0.07)';
 const AMBER = '#F7931E';
 const GREEN = '#4ADE80';
 
-const RATIO_MIN = 0.5;   // tallest (1:2)
-const RATIO_MAX = 1.91;  // widest (cinematic landscape)
+const RATIO_MIN = 0.8;   // tallest allowed = 4:5 (portrait capped)
+const RATIO_MAX = 1.91;  // widest = ~cinematic landscape
 const FALLBACK_RATIO = 4 / 5;
 
 function formatCount(n: number) {
