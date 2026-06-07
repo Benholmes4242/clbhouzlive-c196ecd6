@@ -66,73 +66,118 @@
     <div id="portal-root"></div>
     <script>
       // Chunk recovery - Must be before main script to catch early errors
-      let triedReload = false;
-      let recoveryAttempts = parseInt(sessionStorage.getItem('chunkRecoveryAttempts') || '0');
-      
-      window.addEventListener('error', (e) => {
-        const msg = String((e && e.message) || '');
-        const isChunkError = 
+      // NOTE: Plain var / function syntax — this inline script runs untranspiled
+      // on iOS WebView and must stay compatible.
+      var triedReload = false;
+      var recoveryAttempts = parseInt(sessionStorage.getItem('chunkRecoveryAttempts') || '0');
+      var BOOT_GRACE_MS = 5000;
+      var SCRIPT_START_TIME = Date.now();
+      var ROOT_RENDER_TIMEOUT_MS = 7000;
+
+      function showFatalRecoveryUI() {
+        sessionStorage.removeItem('chunkRecoveryAttempts');
+        document.body.innerHTML = '<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;padding:2rem;text-align:center;font-family:system-ui,-apple-system,sans-serif;background:#0d0d0d;color:#ffffff;"><h1 style="font-size:1.5rem;font-weight:600;margin-bottom:1rem;">App couldn\'t start</h1><p style="margin-bottom:2rem;color:#999;">Try clearing the app and reopening, or check your connection.</p><button id="__lov_reset_btn" style="background:#3A3F46;color:#fff;border:none;padding:0.75rem 2rem;border-radius:0.5rem;font-size:1rem;font-weight:500;cursor:pointer;">Reset & Reload</button></div>';
+        var btn = document.getElementById('__lov_reset_btn');
+        if (btn) {
+          btn.onclick = function () {
+            (async function () {
+              try {
+                if ('serviceWorker' in navigator) {
+                  var regs = await navigator.serviceWorker.getRegistrations();
+                  await Promise.all(regs.map(function (r) { return r.unregister(); }));
+                }
+                if (window.caches) {
+                  var keys = await caches.keys();
+                  await Promise.all(keys.map(function (k) { return caches.delete(k); }));
+                }
+              } catch (e) {}
+              try { localStorage.clear(); } catch (e) {}
+              try { sessionStorage.clear(); } catch (e) {}
+              location.replace(location.pathname);
+            })();
+          };
+        }
+      }
+
+      function runRecoveryReload() {
+        (async function () {
+          try {
+            if ('serviceWorker' in navigator) {
+              var regs = await navigator.serviceWorker.getRegistrations();
+              await Promise.all(regs.map(function (r) { return r.unregister(); }));
+            }
+            if (window.caches) {
+              var keys = await caches.keys();
+              await Promise.all(keys.map(function (k) { return caches.delete(k); }));
+            }
+          } catch (err) {
+            console.error('[Boot Recovery] Error clearing caches:', err);
+          } finally {
+            var url = new URL(location.href);
+            url.searchParams.set('_cb', Date.now().toString());
+            location.replace(url.toString());
+          }
+        })();
+      }
+
+      function escalateRecovery(reason) {
+        if (triedReload) return;
+        triedReload = true;
+        recoveryAttempts++;
+        sessionStorage.setItem('chunkRecoveryAttempts', recoveryAttempts.toString());
+        console.error('[Boot Recovery]', reason, '- attempt', recoveryAttempts);
+        if (recoveryAttempts >= 3) {
+          showFatalRecoveryUI();
+          return;
+        }
+        runRecoveryReload();
+      }
+
+      window.addEventListener('error', function (e) {
+        var msg = String((e && e.message) || '');
+        var isChunkError =
           msg.includes('ChunkLoadError') ||
           msg.includes('Importing a module script failed') ||
           msg.includes('Failed to fetch dynamically imported module') ||
           msg.includes('Loading chunk');
-          
-        if (!triedReload && isChunkError) {
-          triedReload = true;
-          recoveryAttempts++;
-          sessionStorage.setItem('chunkRecoveryAttempts', recoveryAttempts.toString());
-          
-          // After 3 attempts, show user-friendly message instead of auto-reload
-          if (recoveryAttempts >= 3) {
-            console.error('[Chunk Recovery] Multiple recovery attempts failed. Manual intervention needed.');
-            sessionStorage.removeItem('chunkRecoveryAttempts');
-            
-            // Show user-friendly error
-            document.body.innerHTML = `
-              <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;padding:2rem;text-align:center;font-family:system-ui,-apple-system,sans-serif;background:#0d0d0d;color:#ffffff;">
-                <h1 style="font-size:1.5rem;font-weight:600;margin-bottom:1rem;">Update Available</h1>
-                <p style="margin-bottom:2rem;color:#999;">A new version is available. Please refresh to continue.</p>
-                <button onclick="window.location.reload(true)" style="background:#3A3F46;color:#fff;border:none;padding:0.75rem 2rem;border-radius:0.5rem;font-size:1rem;font-weight:500;cursor:pointer;">Refresh Now</button>
-              </div>
-            `;
-            return;
-          }
-          
-          console.log('[Chunk Recovery] Attempt', recoveryAttempts, '- clearing caches and reloading...');
-          
-          (async () => {
-            try {
-              // Unregister all service workers first
-              if ('serviceWorker' in navigator) {
-                const regs = await navigator.serviceWorker.getRegistrations();
-                await Promise.all(regs.map(r => r.unregister()));
-              }
-              
-              // Clear all caches
-              if (window.caches) {
-                const keys = await caches.keys();
-                await Promise.all(keys.map(k => caches.delete(k)));
-              }
-            } catch (error) {
-              console.error('[Chunk Recovery] Error clearing caches:', error);
-            } finally {
-              // Force hard reload with cache-buster
-              const url = new URL(location.href);
-              url.searchParams.set('_cb', Date.now().toString());
-              location.replace(url.toString());
-            }
-          })();
+        var isBootTime = (Date.now() - SCRIPT_START_TIME) < BOOT_GRACE_MS;
+        var appAlreadyMounted = window.__APP_MOUNTED__ === true;
+
+        if (!triedReload && (isChunkError || (isBootTime && !appAlreadyMounted))) {
+          escalateRecovery(isChunkError ? 'chunk error: ' + msg : 'boot-time error: ' + msg);
         }
       }, true);
-      
-      // Clear recovery attempts on successful load
-      if (document.readyState === 'complete') {
-        sessionStorage.removeItem('chunkRecoveryAttempts');
-      } else {
-        window.addEventListener('load', () => {
+
+      // Catch unhandled promise rejections during boot (e.g. async module init crashes)
+      window.addEventListener('unhandledrejection', function (e) {
+        var isBootTime = (Date.now() - SCRIPT_START_TIME) < BOOT_GRACE_MS;
+        var appAlreadyMounted = window.__APP_MOUNTED__ === true;
+        if (!triedReload && isBootTime && !appAlreadyMounted) {
+          escalateRecovery('unhandled rejection: ' + String((e && e.reason && e.reason.message) || e.reason || ''));
+        }
+      });
+
+      // ============================================================
+      // RENDER-DEADLINE WATCHDOG
+      // If #root is still empty / App not mounted after 7s, force recovery.
+      // App.tsx sets window.__APP_MOUNTED__ = true after first commit and
+      // calls window.__cancelMountDeadline() to clear this timer.
+      // ============================================================
+      var MOUNT_DEADLINE = setTimeout(function () {
+        var root = document.getElementById('root');
+        var hasContent = root && root.children && root.children.length > 0;
+        var didMount = window.__APP_MOUNTED__ === true;
+        if (hasContent && didMount) {
           sessionStorage.removeItem('chunkRecoveryAttempts');
-        });
-      }
+          return;
+        }
+        escalateRecovery('React failed to mount within ' + ROOT_RENDER_TIMEOUT_MS + 'ms');
+      }, ROOT_RENDER_TIMEOUT_MS);
+
+      window.__cancelMountDeadline = function () {
+        clearTimeout(MOUNT_DEADLINE);
+        sessionStorage.removeItem('chunkRecoveryAttempts');
+      };
     </script>
     <script type="module" crossorigin src="/src/main.tsx"></script>
   </body>
