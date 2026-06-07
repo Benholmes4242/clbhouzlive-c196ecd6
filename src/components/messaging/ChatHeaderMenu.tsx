@@ -39,6 +39,7 @@ import { haptic } from '@/utils/haptics';
 import { BlockUserDialog } from './BlockUserDialog';
 import { ReportSheet } from './ReportSheet';
 import type { ConversationWithDetails } from '@/types/messaging';
+import { AMBER, DESTRUCTIVE, HAIRLINE_INK_6, HAIRLINE_INK_7, INK, SURFACE } from './_shared/tokens';
 
 interface ChatHeaderMenuProps {
   conversation: ConversationWithDetails;
@@ -66,7 +67,7 @@ function IconBox({ bg, children }: { bg: string; children: React.ReactNode }) {
 }
 
 function Hairline() {
-  return <div style={{ height: '0.5px', backgroundColor: 'rgba(15,23,42,0.06)' }} />;
+  return <div style={{ height: '0.5px', backgroundColor: HAIRLINE_INK_6 }} />;
 }
 
 export function ChatHeaderMenu({
@@ -171,9 +172,9 @@ export function ChatHeaderMenu({
           className="z-50 overflow-hidden p-0"
           style={{
             width: 224,
-            background: '#ffffff',
+            background: SURFACE,
             borderRadius: 14,
-            border: '1px solid rgba(15,23,42,0.07)',
+            border: `1px solid ${HAIRLINE_INK_7}`,
             boxShadow: '0 8px 32px rgba(0,0,0,0.13), 0 2px 8px rgba(0,0,0,0.07)',
           }}
         >
@@ -181,87 +182,87 @@ export function ChatHeaderMenu({
             <>
               <DropdownMenuItem onClick={onOpenGroupInfo} className={itemStyle}>
                 <IconBox bg="#EFF6FF"><Info size={16} style={{ color: '#3B82F6' }} /></IconBox>
-                <span style={{ fontSize: 14, fontWeight: 500, color: '#0f172a' }}>Group Info</span>
+                <span style={{ fontSize: 14, fontWeight: 500, color: INK }}>Group Info</span>
               </DropdownMenuItem>
               <Hairline />
               <DropdownMenuItem onClick={onSearchInChat} className={itemStyle}>
                 <IconBox bg="#F0FDF4"><Search size={16} style={{ color: '#22C55E' }} /></IconBox>
-                <span style={{ fontSize: 14, fontWeight: 500, color: '#0f172a' }}>Search in Chat</span>
+                <span style={{ fontSize: 14, fontWeight: 500, color: INK }}>Search in Chat</span>
               </DropdownMenuItem>
               <Hairline />
               <DropdownMenuItem onClick={handleToggleMute} className={itemStyle}>
                 {isMuted ? (
                   <>
-                    <IconBox bg="rgba(247,147,30,0.10)"><Bell size={16} style={{ color: '#F7931E' }} /></IconBox>
-                    <span style={{ fontSize: 14, fontWeight: 500, color: '#0f172a' }}>Unmute Notifications</span>
+                    <IconBox bg="rgba(247,147,30,0.10)"><Bell size={16} style={{ color: AMBER }} /></IconBox>
+                    <span style={{ fontSize: 14, fontWeight: 500, color: INK }}>Unmute Notifications</span>
                   </>
                 ) : (
                   <>
-                    <IconBox bg="#FFF7ED"><BellOff size={16} style={{ color: '#F97316' }} /></IconBox>
-                    <span style={{ fontSize: 14, fontWeight: 500, color: '#0f172a' }}>Mute Notifications</span>
+                    <IconBox bg=`${SURFACE}7ED`><BellOff size={16} style={{ color: '#F97316' }} /></IconBox>
+                    <span style={{ fontSize: 14, fontWeight: 500, color: INK }}>Mute Notifications</span>
                   </>
                 )}
               </DropdownMenuItem>
               <Hairline />
               <DropdownMenuItem onClick={onViewSharedMedia} className={itemStyle}>
                 <IconBox bg="#F5F3FF"><Image size={16} style={{ color: '#8B5CF6' }} /></IconBox>
-                <span style={{ fontSize: 14, fontWeight: 500, color: '#0f172a' }}>Shared Media</span>
+                <span style={{ fontSize: 14, fontWeight: 500, color: INK }}>Shared Media</span>
               </DropdownMenuItem>
               <Hairline />
               <DropdownMenuItem onClick={() => setShowLeaveGroupDialog(true)} className={itemStyle}>
-                <IconBox bg="rgba(239,68,68,0.08)"><LogOut size={16} style={{ color: '#ef4444' }} /></IconBox>
-                <span style={{ fontSize: 14, fontWeight: 500, color: '#ef4444' }}>Leave Group</span>
+                <IconBox bg="rgba(239,68,68,0.08)"><LogOut size={16} style={{ color: DESTRUCTIVE }} /></IconBox>
+                <span style={{ fontSize: 14, fontWeight: 500, color: DESTRUCTIVE }}>Leave Group</span>
               </DropdownMenuItem>
               <Hairline />
               <DropdownMenuItem onClick={handleReport} className={itemStyle}>
-                <IconBox bg="rgba(239,68,68,0.08)"><Flag size={16} style={{ color: '#ef4444' }} /></IconBox>
-                <span style={{ fontSize: 14, fontWeight: 500, color: '#ef4444' }}>Report Group</span>
+                <IconBox bg="rgba(239,68,68,0.08)"><Flag size={16} style={{ color: DESTRUCTIVE }} /></IconBox>
+                <span style={{ fontSize: 14, fontWeight: 500, color: DESTRUCTIVE }}>Report Group</span>
               </DropdownMenuItem>
             </>
           ) : (
             <>
               <DropdownMenuItem onClick={handleViewProfile} className={itemStyle}>
                 <IconBox bg="#EFF6FF"><User size={16} style={{ color: '#3B82F6' }} /></IconBox>
-                <span style={{ fontSize: 14, fontWeight: 500, color: '#0f172a' }}>View Profile</span>
+                <span style={{ fontSize: 14, fontWeight: 500, color: INK }}>View Profile</span>
               </DropdownMenuItem>
               <Hairline />
               <DropdownMenuItem onClick={onSearchInChat} className={itemStyle}>
                 <IconBox bg="#F0FDF4"><Search size={16} style={{ color: '#22C55E' }} /></IconBox>
-                <span style={{ fontSize: 14, fontWeight: 500, color: '#0f172a' }}>Search in Chat</span>
+                <span style={{ fontSize: 14, fontWeight: 500, color: INK }}>Search in Chat</span>
               </DropdownMenuItem>
               <Hairline />
               <DropdownMenuItem onClick={handleToggleMute} className={itemStyle}>
                 {isMuted ? (
                   <>
-                    <IconBox bg="rgba(247,147,30,0.10)"><Bell size={16} style={{ color: '#F7931E' }} /></IconBox>
-                    <span style={{ fontSize: 14, fontWeight: 500, color: '#0f172a' }}>Unmute Notifications</span>
+                    <IconBox bg="rgba(247,147,30,0.10)"><Bell size={16} style={{ color: AMBER }} /></IconBox>
+                    <span style={{ fontSize: 14, fontWeight: 500, color: INK }}>Unmute Notifications</span>
                   </>
                 ) : (
                   <>
-                    <IconBox bg="#FFF7ED"><BellOff size={16} style={{ color: '#F97316' }} /></IconBox>
-                    <span style={{ fontSize: 14, fontWeight: 500, color: '#0f172a' }}>Mute Notifications</span>
+                    <IconBox bg=`${SURFACE}7ED`><BellOff size={16} style={{ color: '#F97316' }} /></IconBox>
+                    <span style={{ fontSize: 14, fontWeight: 500, color: INK }}>Mute Notifications</span>
                   </>
                 )}
               </DropdownMenuItem>
               <Hairline />
               <DropdownMenuItem onClick={onViewSharedMedia} className={itemStyle}>
                 <IconBox bg="#F5F3FF"><Image size={16} style={{ color: '#8B5CF6' }} /></IconBox>
-                <span style={{ fontSize: 14, fontWeight: 500, color: '#0f172a' }}>Shared Media</span>
+                <span style={{ fontSize: 14, fontWeight: 500, color: INK }}>Shared Media</span>
               </DropdownMenuItem>
               <Hairline />
               <DropdownMenuItem onClick={() => setShowClearChatDialog(true)} className={itemStyle}>
                 <IconBox bg="rgba(0,0,0,0.05)"><Trash2 size={16} style={{ color: '#1e293b' }} /></IconBox>
-                <span style={{ fontSize: 14, fontWeight: 500, color: '#0f172a' }}>Clear Chat</span>
+                <span style={{ fontSize: 14, fontWeight: 500, color: INK }}>Clear Chat</span>
               </DropdownMenuItem>
               <Hairline />
               <DropdownMenuItem onClick={handleBlockUser} className={itemStyle}>
-                <IconBox bg="rgba(239,68,68,0.08)"><Ban size={16} style={{ color: '#ef4444' }} /></IconBox>
-                <span style={{ fontSize: 14, fontWeight: 500, color: '#ef4444' }}>Block User</span>
+                <IconBox bg="rgba(239,68,68,0.08)"><Ban size={16} style={{ color: DESTRUCTIVE }} /></IconBox>
+                <span style={{ fontSize: 14, fontWeight: 500, color: DESTRUCTIVE }}>Block User</span>
               </DropdownMenuItem>
               <Hairline />
               <DropdownMenuItem onClick={handleReport} className={itemStyle}>
-                <IconBox bg="rgba(239,68,68,0.08)"><Flag size={16} style={{ color: '#ef4444' }} /></IconBox>
-                <span style={{ fontSize: 14, fontWeight: 500, color: '#ef4444' }}>Report</span>
+                <IconBox bg="rgba(239,68,68,0.08)"><Flag size={16} style={{ color: DESTRUCTIVE }} /></IconBox>
+                <span style={{ fontSize: 14, fontWeight: 500, color: DESTRUCTIVE }}>Report</span>
               </DropdownMenuItem>
             </>
           )}

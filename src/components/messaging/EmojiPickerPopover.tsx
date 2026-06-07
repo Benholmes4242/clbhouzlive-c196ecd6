@@ -7,6 +7,7 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { Smile } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { haptic } from '@/utils/haptics';
+import { SURFACE } from './_shared/tokens';
 
 interface EmojiPickerPopoverProps {
   onEmojiSelect: (emoji: string) => void;
@@ -111,7 +112,7 @@ export function EmojiPickerPopover({ onEmojiSelect, className }: EmojiPickerPopo
               className="w-8 h-8 flex items-center justify-center text-lg rounded-lg flex-shrink-0 transition-colors"
               style={
                 activeCategory === key
-                  ? { background: '#F7931E', color: '#fff' }
+                  ? { background: '#F7931E', color: SURFACE }
                   : { background: 'transparent' }
               }
             >

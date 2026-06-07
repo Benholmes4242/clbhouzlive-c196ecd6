@@ -3,6 +3,7 @@ import { Mic, X, Send, Trash2 } from 'lucide-react';
 import { useVoiceRecorder } from '@/hooks/useVoiceRecorder';
 import { AppLog } from '@/lib/logger';
 import { cn } from '@/lib/utils';
+import { AMBER } from './_shared/tokens';
 
 interface VoiceRecordButtonProps {
   onSend: (audioBlob: Blob, duration: number) => void;
@@ -129,7 +130,7 @@ export const VoiceRecordButton: React.FC<VoiceRecordButtonProps> = ({
         <button
           onClick={handleSend}
           className="p-2 text-white rounded-full transition-colors active:scale-[0.97]"
-          style={{ background: '#F7931E' }}
+          style={{ background: AMBER }}
           aria-label="Send voice note"
         >
           <Send size={18} />
@@ -182,7 +183,7 @@ export const VoiceRecordButton: React.FC<VoiceRecordButtonProps> = ({
       className={cn(
         "p-2.5 rounded-full transition-all flex-shrink-0",
         "text-muted-foreground hover:text-foreground hover:bg-muted",
-        "active:scale-[0.97] active:bg-[#F7931E] active:text-white",
+        `active:scale-[0.97] active:bg-[${AMBER}] active:text-white`,
         disabled && "opacity-50 cursor-not-allowed"
       )}
       title="Hold to record voice note"

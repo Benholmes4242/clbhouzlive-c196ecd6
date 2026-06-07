@@ -9,6 +9,7 @@ import { toast } from 'sonner';
 import { useQuery } from '@tanstack/react-query';
 import type { MessageType, SharedCourse } from '@/types/messaging';
 import { SectionEyebrow } from '@/components/ui/SectionEyebrow';
+import { AMBER, AMBER_TINT_10, AMBER_TINT_28, INK, INK_FAINT, INK_MUTE, SHELL_BG, SURFACE } from './_shared/tokens';
 
 interface ShareContentModalProps {
   open: boolean;
@@ -153,14 +154,14 @@ export function ShareContentModal({
       onClose={handleClose}
       zIndexBase={1500}
       className="!rounded-t-[24px]"
-      style={{ background: '#fff' }}
+      style={{ background: SURFACE }}
     >
       <div style={{ height: '72vh', display: 'flex', flexDirection: 'column' }}>
         {/* Header */}
         <div style={{ padding: '12px 20px 0', flexShrink: 0 }}>
           {/* Drag handle */}
           <div style={{ width: 36, height: 4, background: '#e2e8f0', borderRadius: 99, margin: '0 auto 14px' }} />
-          <h2 style={{ fontSize: 17, fontWeight: 700, color: '#0f172a', marginBottom: 14 }}>Share Golf Content</h2>
+          <h2 style={{ fontSize: 17, fontWeight: 700, color: INK, marginBottom: 14 }}>Share Golf Content</h2>
           
           {/* Tab row */}
           <div className="flex" style={{ gap: 8, marginBottom: 14 }}>
@@ -172,8 +173,8 @@ export function ShareContentModal({
                   padding: '7px 14px', borderRadius: 99,
                   fontSize: 13, fontWeight: 600, cursor: 'pointer',
                   ...(activeTab === tab.key
-                    ? { border: '1.5px solid #0f172a', background: '#0f172a', color: '#fff' }
-                    : { border: '1.5px solid #e2e8f0', background: 'transparent', color: '#64748b' }
+                    ? { border: `1.5px solid ${INK}`, background: INK, color: SURFACE }
+                    : { border: '1.5px solid #e2e8f0', background: 'transparent', color: INK_MUTE }
                   ),
                 }}
               >
@@ -190,7 +191,7 @@ export function ShareContentModal({
             <div>
               {/* Search bar */}
               <div className="relative" style={{ marginBottom: 10 }}>
-                <Search className="absolute" style={{ left: 10, top: '50%', transform: 'translateY(-50%)', color: '#94a3b8' }} size={14} />
+                <Search className="absolute" style={{ left: 10, top: '50%', transform: 'translateY(-50%)', color: INK_FAINT }} size={14} />
                 <input
                   placeholder="Search courses…"
                   value={searchQuery}
@@ -198,7 +199,7 @@ export function ShareContentModal({
                   className="w-full outline-none"
                   style={{
                     height: 36, borderRadius: 10,
-                    background: '#f8fafc',
+                    background: SHELL_BG,
                     border: '1px solid rgba(0,0,0,0.08)',
                     paddingLeft: 32, fontSize: 13, color: '#1e293b',
                   }}
@@ -215,7 +216,7 @@ export function ShareContentModal({
                   {[1, 2, 3].map(i => <Skeleton key={i} className="h-16 w-full rounded-lg" />)}
                 </div>
               ) : courses.length === 0 ? (
-                <div className="text-center py-8" style={{ color: '#64748b' }}>No courses found</div>
+                <div className="text-center py-8" style={{ color: INK_MUTE }}>No courses found</div>
               ) : (
                 <div>
                   {courses.map((course, index) => (
@@ -236,11 +237,11 @@ export function ShareContentModal({
                           )}
                         </div>
                         <div className="flex-1 min-w-0">
-                          <p className="truncate" style={{ fontSize: 14, fontWeight: 600, color: '#0f172a', margin: 0 }}>{course.name}</p>
+                          <p className="truncate" style={{ fontSize: 14, fontWeight: 600, color: INK, margin: 0 }}>{course.name}</p>
                           {(course.region || course.country) && (
                             <div className="flex items-center" style={{ gap: 4, marginTop: 2 }}>
-                              <MapPin size={11} style={{ color: '#94a3b8' }} />
-                              <span style={{ fontSize: 12, color: '#94a3b8' }}>
+                              <MapPin size={11} style={{ color: INK_FAINT }} />
+                              <span style={{ fontSize: 12, color: INK_FAINT }}>
                                 {[course.region, course.country].filter(Boolean).join(', ')}
                               </span>
                             </div>
@@ -263,14 +264,14 @@ export function ShareContentModal({
             <div className="flex flex-col items-center justify-center text-center" style={{ padding: '40px 24px' }}>
               <div
                 className="flex items-center justify-center"
-                style={{ width: 56, height: 56, borderRadius: 16, background: 'rgba(247,147,30,0.10)', marginBottom: 12 }}
+                style={{ width: 56, height: 56, borderRadius: 16, background: AMBER_TINT_10, marginBottom: 12 }}
               >
-                <Calendar size={24} style={{ color: '#F7931E' }} />
+                <Calendar size={24} style={{ color: AMBER }} />
               </div>
-              <p style={{ fontSize: 15, fontWeight: 700, color: '#0f172a', marginBottom: 6 }}>
+              <p style={{ fontSize: 15, fontWeight: 700, color: INK, marginBottom: 6 }}>
                 Tee time sharing coming soon
               </p>
-              <p style={{ fontSize: 13, color: '#94a3b8', lineHeight: 1.5 }}>
+              <p style={{ fontSize: 13, color: INK_FAINT, lineHeight: 1.5 }}>
                 You'll be able to share upcoming games directly in chat.
               </p>
             </div>
@@ -293,7 +294,7 @@ export function ShareContentModal({
                         className="absolute flex items-center justify-center"
                         style={{ top: 6, right: 6, padding: 4, borderRadius: '50%', background: 'rgba(0,0,0,0.6)', border: 'none' }}
                       >
-                        <X size={14} style={{ color: '#fff' }} />
+                        <X size={14} style={{ color: SURFACE }} />
                       </button>
                     </div>
                   ))}
@@ -305,7 +306,7 @@ export function ShareContentModal({
                         borderRadius: 12,
                         border: '2px dashed rgba(247,147,30,0.35)',
                         background: 'rgba(247,147,30,0.08)',
-                        color: '#F7931E',
+                        color: AMBER,
                       }}
                     >
                       <Plus size={24} />
@@ -328,12 +329,12 @@ export function ShareContentModal({
                 >
                   <div
                     className="flex items-center justify-center"
-                    style={{ width: 52, height: 52, borderRadius: 14, background: 'rgba(247,147,30,0.10)' }}
+                    style={{ width: 52, height: 52, borderRadius: 14, background: AMBER_TINT_10 }}
                   >
-                    <ImagePlus size={22} style={{ color: '#F7931E' }} />
+                    <ImagePlus size={22} style={{ color: AMBER }} />
                   </div>
-                  <span style={{ fontSize: 15, fontWeight: 700, color: '#0f172a' }}>Select Photos & Videos</span>
-                  <span style={{ fontSize: 12, color: '#94a3b8' }}>Up to {MAX_MEDIA} items</span>
+                  <span style={{ fontSize: 15, fontWeight: 700, color: INK }}>Select Photos & Videos</span>
+                  <span style={{ fontSize: 12, color: INK_FAINT }}>Up to {MAX_MEDIA} items</span>
                 </button>
               )}
               
@@ -354,9 +355,9 @@ export function ShareContentModal({
                   style={{
                     height: 48, borderRadius: 14,
                     fontSize: 14, fontWeight: 700,
-                    background: 'rgba(247,147,30,0.10)',
-                    border: '1px solid rgba(247,147,30,0.28)',
-                    color: '#F7931E',
+                    background: AMBER_TINT_10,
+                    border: `1px solid ${AMBER_TINT_28}`,
+                    color: AMBER,
                     marginTop: 16, gap: 8,
                   }}
                 >

@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Play, Pause } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { AMBER, AMBER_TINT_10, INK_FAINT } from './_shared/tokens';
 
 interface VoiceNotePlayerProps {
   audioUrl: string;
@@ -142,8 +143,8 @@ export const VoiceNotePlayer: React.FC<VoiceNotePlayerProps> = ({
         onClick={togglePlayPause}
         className="flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center transition-colors"
         style={{
-          background: isOwn ? 'rgba(255,255,255,0.20)' : 'rgba(247,147,30,0.10)',
-          color: '#F7931E',
+          background: isOwn ? 'rgba(255,255,255,0.20)' : AMBER_TINT_10,
+          color: AMBER,
         }}
         aria-label={isPlaying ? 'Pause' : 'Play'}
       >
@@ -169,7 +170,7 @@ export const VoiceNotePlayer: React.FC<VoiceNotePlayerProps> = ({
               style={{
                 height: `${height * 100}%`,
                 background: index < activeBarIndex
-                  ? '#F7931E'
+                  ? AMBER
                   : isOwn ? 'rgba(247,147,30,0.40)' : 'rgba(247,147,30,0.30)',
               }}
             />
@@ -181,13 +182,13 @@ export const VoiceNotePlayer: React.FC<VoiceNotePlayerProps> = ({
               "absolute top-1/2 -translate-y-1/2 w-3 h-3 rounded-full shadow-md transition-transform",
               isDragging ? "scale-125" : "scale-100 group-hover:scale-110"
             )}
-            style={{ left: `calc(${progress}% - 6px)`, background: '#F7931E' }}
+            style={{ left: `calc(${progress}% - 6px)`, background: AMBER }}
           />
         </div>
         
         {/* Time display */}
         <div className="flex justify-between text-[10px]"
-          style={{ color: isOwn ? 'rgba(247,147,30,0.70)' : '#94a3b8' }}
+          style={{ color: isOwn ? 'rgba(247,147,30,0.70)' : INK_FAINT }}
         >
           <span>{formatTime(currentTime)}</span>
           <span>{formatTime(duration)}</span>

@@ -1,6 +1,7 @@
 import { useState, useCallback } from 'react';
 import { Search, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { INK_FAINT, SURFACE } from './_shared/tokens';
 
 interface ConversationSearchBarProps {
   value: string;
@@ -28,7 +29,7 @@ export function ConversationSearchBar({
       className={cn("relative", className)}
       style={{
         height: 38, borderRadius: 12,
-        background: '#ffffff',
+        background: SURFACE,
         border: '1px solid rgba(15,23,42,0.08)',
         display: 'flex', alignItems: 'center',
         padding: '0 12px 0 36px',
@@ -37,7 +38,7 @@ export function ConversationSearchBar({
       {/* Search icon */}
       <Search
         className="absolute"
-        style={{ left: 12, top: '50%', transform: 'translateY(-50%)', color: '#94a3b8' }}
+        style={{ left: 12, top: '50%', transform: 'translateY(-50%)', color: INK_FAINT }}
         size={14}
       />
 
@@ -62,7 +63,7 @@ export function ConversationSearchBar({
           className="absolute flex items-center justify-center"
           style={{ right: 12, top: '50%', transform: 'translateY(-50%)' }}
         >
-          <X style={{ color: '#94a3b8' }} size={13} />
+          <X style={{ color: INK_FAINT }} size={13} />
         </button>
       )}
     </div>
