@@ -25,7 +25,7 @@ import { useNetworkStatus } from '@/hooks/useNetworkStatus';
 
 
 // ── New feed components ──
-import { SnapFeed } from '@/components/feed/SnapFeed';
+import { CardFeed } from '@/components/feed/CardFeed';
 import { FeedOverlayLayer } from '@/components/feed/FeedOverlayLayer';
 import { FullscreenCarouselOverlay } from '@/components/media/FullscreenCarouselOverlay';
 import { CarouselDots } from '@/components/media/CarouselDots';
