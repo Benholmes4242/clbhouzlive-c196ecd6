@@ -321,6 +321,7 @@ const ClubhouseContent = () => {
         isStatic={skeletonMode === 'static'} 
         variant={posts[0]?.isReview ? 'review' : 'regular'}
         isVideo={posts[0]?.mediaItems?.[0]?.type === 'video'}
+        surface="card"
       />
 
       {/* Floating top bar — hidden when PGA card active */}
