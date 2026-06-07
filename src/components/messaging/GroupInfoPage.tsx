@@ -679,7 +679,7 @@ export const GroupInfoPage: React.FC<GroupInfoPageProps> = ({
           </div>
         </div>
 
-        {/* ── Actions card ── */}
+        {/* ── Neutral actions card (Archive) ── */}
         <div
           className="overflow-hidden"
           style={{ background: '#fff', borderRadius: 16, border: '1px solid rgba(15,23,42,0.07)' }}
@@ -698,11 +698,21 @@ export const GroupInfoPage: React.FC<GroupInfoPageProps> = ({
             </div>
             <span style={{ fontSize: 14, fontWeight: 500, color: '#0f172a' }}>Archive Chat</span>
           </button>
+        </div>
 
-          {/* Exit Group (not if creator) */}
-          {!isCreator && (
-            <>
-               <div style={{ height: '0.5px', background: 'rgba(15,23,42,0.06)', margin: '0 16px' }} />
+        {/* ── Destructive zone ── */}
+        <div style={{ marginTop: 16 }}>
+          <div style={{ padding: '0 4px', marginBottom: 8 }}>
+            <span style={{ fontSize: 11, fontWeight: 700, color: '#DC2626', letterSpacing: '0.12em', textTransform: 'uppercase' }}>
+              Danger Zone
+            </span>
+          </div>
+          <div
+            className="overflow-hidden"
+            style={{ background: '#fff', borderRadius: 16, border: '1px solid rgba(15,23,42,0.07)' }}
+          >
+            {/* Exit Group (not if creator) */}
+            {!isCreator && (
               <button
                 onClick={() => setShowLeaveDialog(true)}
                 className="w-full flex items-center active:opacity-70 transition-opacity"
@@ -710,50 +720,52 @@ export const GroupInfoPage: React.FC<GroupInfoPageProps> = ({
               >
                 <div
                   className="flex items-center justify-center flex-shrink-0"
-                  style={{ width: 34, height: 34, borderRadius: 10, background: 'rgba(239,68,68,0.08)' }}
+                  style={{ width: 34, height: 34, borderRadius: 10, background: 'rgba(15,23,42,0.05)' }}
                 >
-                  <LogOut size={17} style={{ color: '#ef4444' }} />
+                  <LogOut size={17} style={{ color: '#DC2626' }} />
                 </div>
-                <span style={{ fontSize: 14, fontWeight: 500, color: '#ef4444' }}>Exit Group</span>
+                <span style={{ fontSize: 14, fontWeight: 500, color: '#DC2626' }}>Exit Group</span>
               </button>
-            </>
-          )}
+            )}
 
-          {/* Report Group */}
-          <div style={{ height: '0.5px', background: 'rgba(15,23,42,0.06)', margin: '0 16px' }} />
-          <button
-            onClick={() => setIsReportOpen(true)}
-            className="w-full flex items-center active:opacity-70 transition-opacity"
-            style={{ gap: 12, padding: '13px 16px', background: 'transparent', border: 'none', cursor: 'pointer' }}
-          >
-            <div
-              className="flex items-center justify-center flex-shrink-0"
-              style={{ width: 34, height: 34, borderRadius: 10, background: 'rgba(239,68,68,0.08)' }}
-            >
-              <Flag size={17} style={{ color: '#ef4444' }} />
-            </div>
-            <span style={{ fontSize: 14, fontWeight: 500, color: '#ef4444' }}>Report Group</span>
-          </button>
-
-          {/* Delete Group for Everyone (admin only) */}
-          {isAdmin && (
-            <>
+            {/* Report Group */}
+            {!isCreator && (
               <div style={{ height: '0.5px', background: 'rgba(15,23,42,0.06)', margin: '0 16px' }} />
-              <button
-                onClick={() => setShowDeleteDialog(true)}
-                className="w-full flex items-center active:opacity-70 transition-opacity"
-                style={{ gap: 12, padding: '13px 16px', background: 'transparent', border: 'none', cursor: 'pointer' }}
+            )}
+            <button
+              onClick={() => setIsReportOpen(true)}
+              className="w-full flex items-center active:opacity-70 transition-opacity"
+              style={{ gap: 12, padding: '13px 16px', background: 'transparent', border: 'none', cursor: 'pointer' }}
+            >
+              <div
+                className="flex items-center justify-center flex-shrink-0"
+                style={{ width: 34, height: 34, borderRadius: 10, background: 'rgba(15,23,42,0.05)' }}
               >
-                <div
-                  className="flex items-center justify-center flex-shrink-0"
-                  style={{ width: 34, height: 34, borderRadius: 10, background: 'rgba(239,68,68,0.08)' }}
+                <Flag size={17} style={{ color: '#DC2626' }} />
+              </div>
+              <span style={{ fontSize: 14, fontWeight: 500, color: '#DC2626' }}>Report Group</span>
+            </button>
+
+            {/* Delete Group for Everyone (admin only) */}
+            {isAdmin && (
+              <>
+                <div style={{ height: '0.5px', background: 'rgba(15,23,42,0.06)', margin: '0 16px' }} />
+                <button
+                  onClick={() => setShowDeleteDialog(true)}
+                  className="w-full flex items-center active:opacity-70 transition-opacity"
+                  style={{ gap: 12, padding: '13px 16px', background: 'transparent', border: 'none', cursor: 'pointer' }}
                 >
-                  <Trash2 size={17} style={{ color: '#ef4444' }} />
-                </div>
-                <span style={{ fontSize: 14, fontWeight: 500, color: '#ef4444' }}>Delete Group for Everyone</span>
-              </button>
-            </>
-          )}
+                  <div
+                    className="flex items-center justify-center flex-shrink-0"
+                    style={{ width: 34, height: 34, borderRadius: 10, background: 'rgba(15,23,42,0.05)' }}
+                  >
+                    <Trash2 size={17} style={{ color: '#DC2626' }} />
+                  </div>
+                  <span style={{ fontSize: 14, fontWeight: 500, color: '#DC2626' }}>Delete Group for Everyone</span>
+                </button>
+              </>
+            )}
+          </div>
         </div>
       </div>
 
