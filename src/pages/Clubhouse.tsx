@@ -406,6 +406,7 @@ const ClubhouseContent = () => {
         <>
           <CardFeed
             posts={posts}
+            topPadding={108}
             onNearEnd={handleNearEnd}
             hasNextPage={hasNextPage}
             onLike={(post) => handleLike(post)}

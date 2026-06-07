@@ -30,8 +30,8 @@ const LINE = 'rgba(255,255,255,0.07)';
 const AMBER = '#F7931E';
 const GREEN = '#4ADE80';
 
-const RATIO_MIN = 0.5;   // tallest (1:2)
-const RATIO_MAX = 1.91;  // widest (cinematic landscape)
+const RATIO_MIN = 0.8;   // tallest allowed = 4:5 (portrait capped)
+const RATIO_MAX = 1.91;  // widest = ~cinematic landscape
 const FALLBACK_RATIO = 4 / 5;
 
 function formatCount(n: number) {
@@ -96,14 +96,10 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
   const isMulti = items.length > 1;
   const media = items[0];
 
-  const { ratio, isContained } = useMemo(() => {
-    if (!media || !media.width || !media.height) {
-      return { ratio: FALLBACK_RATIO, isContained: false };
-    }
+  const ratio = useMemo(() => {
+    if (!media || !media.width || !media.height) return FALLBACK_RATIO;
     const r = media.width / media.height;
-    if (r < RATIO_MIN) return { ratio: RATIO_MIN, isContained: true };
-    if (r > RATIO_MAX) return { ratio: RATIO_MAX, isContained: true };
-    return { ratio: r, isContained: false };
+    return Math.min(RATIO_MAX, Math.max(RATIO_MIN, r));
   }, [media]);
 
   const reviewRating = post.review?.rating ?? null;
@@ -238,25 +234,11 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
               background: '#05080F',
             }}
           >
-            {isContained && mediaUrl && (
-              <div
-                aria-hidden
-                style={{
-                  position: 'absolute',
-                  inset: 0,
-                  backgroundImage: `url(${mediaUrl})`,
-                  backgroundSize: 'cover',
-                  backgroundPosition: 'center',
-                  filter: 'blur(26px) brightness(0.5) saturate(1.25)',
-                  transform: 'scale(1.25)',
-                }}
-              />
-            )}
             {media.type === 'video' ? (
               <InlineVideo
                 item={media}
                 isActive={isActive}
-                objectFit={isContained ? 'contain' : 'cover'}
+                objectFit="cover"
               />
             ) : mediaUrl ? (
               <img
@@ -266,10 +248,10 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
                 style={{
                   position: 'absolute',
                   inset: 0,
-                  margin: 'auto',
                   width: '100%',
                   height: '100%',
-                  objectFit: isContained ? 'contain' : 'cover',
+                  objectFit: 'cover',
+                  objectPosition: 'center',
                   display: 'block',
                 }}
               />
