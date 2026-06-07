@@ -69,6 +69,12 @@ export interface FeedCardProps {
   onOpenMedia: (post: FeedPost, mediaIndex: number) => void;
   onProfile: (post: FeedPost) => void;
   onReviewTap?: (post: FeedPost) => void;
+  /** True when this card is the most-in-view → drives inline video autoplay. */
+  isActive?: boolean;
+  /** Initial carousel slide for multi-media posts (from persisted store). */
+  initialMediaIndex?: number;
+  /** Notified when user swipes the multi-media carousel. */
+  onCarouselIndexChange?: (post: FeedPost, idx: number) => void;
 }
 
 const FeedCardImpl: React.FC<FeedCardProps> = ({
@@ -82,8 +88,13 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
   onOpenMedia,
   onProfile,
   onReviewTap,
+  isActive = false,
+  initialMediaIndex = 0,
+  onCarouselIndexChange,
 }) => {
-  const media = post.mediaItems?.[0];
+  const items = post.mediaItems ?? [];
+  const isMulti = items.length > 1;
+  const media = items[0];
 
   const { ratio, isContained } = useMemo(() => {
     if (!media || !media.width || !media.height) {
