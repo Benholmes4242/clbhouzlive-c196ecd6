@@ -14,7 +14,7 @@ import { SwipeableConversationItem } from './SwipeableConversationItem';
 import type { ConversationWithDetails } from '@/types/messaging';
 import { SectionEyebrow } from '@/components/ui/SectionEyebrow';
 import {
-  AMBER, AMBER_TINT_06, AMBER_TINT_10, AMBER_TINT_25, AMBER_TINT_28,
+  AMBER, AMBER_TINT_06, AMBER_TINT_10, AMBER_TINT_12, AMBER_TINT_25, AMBER_TINT_28,
   INK, INK_MUTE, INK_FAINT, INK_LIGHT, INK_DEEP, INK_MID, SURFACE,
   SHELL_BG, HAIRLINE_INK_6, HAIRLINE_INK_7, HAIRLINE_INK_10, INK_TINT_04, INK_TINT_05,
   SUNDRIDGE_GREEN, SUNDRIDGE_GREEN_TINT_07, SUNDRIDGE_GREEN_BORDER_18,
