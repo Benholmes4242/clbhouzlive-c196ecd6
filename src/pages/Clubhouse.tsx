@@ -428,7 +428,7 @@ const ClubhouseContent = () => {
           />
         </>
       ) : (
-        <ClubhouseSkeletonShimmer isVisible={true} isStatic={false} />
+        <ClubhouseSkeletonShimmer isVisible={true} isStatic={false} surface="card" />
       )}
 
       {/* ═══ COMMENTS + MORE OPTIONS ═══ */}
