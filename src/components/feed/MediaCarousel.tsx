@@ -124,22 +124,8 @@ export const MediaCarousel: React.FC<Props> = ({
               }}
               aria-label={`Media ${i + 1} of ${items.length}`}
             >
-              {url && (
-                <div
-                  aria-hidden
-                  style={{
-                    position: 'absolute',
-                    inset: 0,
-                    backgroundImage: `url(${url})`,
-                    backgroundSize: 'cover',
-                    backgroundPosition: 'center',
-                    filter: 'blur(26px) brightness(0.5) saturate(1.25)',
-                    transform: 'scale(1.25)',
-                  }}
-                />
-              )}
               {isVideo ? (
-                <InlineVideo item={m} isActive={isActiveSlide} objectFit="contain" />
+                <InlineVideo item={m} isActive={isActiveSlide} objectFit="cover" />
               ) : url ? (
                 <img
                   src={url}
@@ -148,10 +134,10 @@ export const MediaCarousel: React.FC<Props> = ({
                   style={{
                     position: 'absolute',
                     inset: 0,
-                    margin: 'auto',
                     width: '100%',
                     height: '100%',
-                    objectFit: 'contain',
+                    objectFit: 'cover',
+                    objectPosition: 'center',
                     display: 'block',
                   }}
                 />
