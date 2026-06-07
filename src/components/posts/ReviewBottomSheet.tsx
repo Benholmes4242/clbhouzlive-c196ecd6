@@ -285,47 +285,16 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
               flexDirection: 'column',
               overflow: 'hidden',
               borderRadius: '28px 28px 0 0',
-              background: FROST.glass,
-              backdropFilter: FROST_BLUR.panel,
-              WebkitBackdropFilter: FROST_BLUR.panel,
-              border: `1px solid ${FROST.border}`,
+              background: '#0F1419',
+              border: '1px solid rgba(255,255,255,0.07)',
               borderBottom: 'none',
               color: FROST.ink,
-              boxShadow: `0 -20px 60px rgba(0,0,0,0.5), ${FROST.innerHighlight}`,
+              boxShadow: '0 -20px 60px rgba(0,0,0,0.5)',
               transform: 'translateZ(0)',
-              willChange: 'backdrop-filter',
-              fontFamily: 'Geist, system-ui, sans-serif',
+              fontFamily: FONTS.geist,
             }}
           >
             {/* Sheet title id is set on the h1 inside the header */}
-
-            {/* Glow orbs — atmospheric */}
-            <div
-              aria-hidden
-              style={{
-                position: 'absolute',
-                top: -60,
-                left: '10%',
-                width: 300,
-                height: 200,
-                background: FROST.amberGlow,
-                filter: 'blur(12px)',
-                pointerEvents: 'none',
-              }}
-            />
-            <div
-              aria-hidden
-              style={{
-                position: 'absolute',
-                top: 120,
-                right: '5%',
-                width: 250,
-                height: 250,
-                background: FROST.blueGlow,
-                filter: 'blur(10px)',
-                pointerEvents: 'none',
-              }}
-            />
 
             {/* ─── PINNED HEADER ─────────────────────────────── */}
             <div
