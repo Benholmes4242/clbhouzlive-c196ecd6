@@ -27,7 +27,7 @@ export const EchoPageComposer = forwardRef<HTMLInputElement, EchoPageComposerPro
     { value, onChange, onSend, onAbort, isStreaming, disabled, cooldown },
     ref
   ) {
-    const { isListening, transcript, startListening, stopListening, isSupported, error } = useSpeechToText();
+    const { isListening, transcript, startListening, stopListening, isSupported, error, micLevel } = useSpeechToText();
     const [isFocused, setIsFocused] = React.useState(false);
 
 
@@ -108,13 +108,26 @@ export const EchoPageComposer = forwardRef<HTMLInputElement, EchoPageComposerPro
           </div>
         )}
 
-        {/* Pill container */}
+        {/* Live transcript preview while dictating */}
+        {isListening && transcript && (
+          <div className="mb-1 px-3">
+            <p className="text-[12px] italic truncate" style={{ color: '#64748B' }}>
+              “{transcript}”
+            </p>
+          </div>
+        )}
+
+        {/* Pill container — reactive amber ring when listening */}
         <div
           className="flex items-center gap-2 rounded-full pl-4 pr-2 py-2 transition-shadow duration-150"
           style={{
             background: '#ffffff',
             border: '1px solid rgba(15,23,42,0.10)',
-            boxShadow: isFocused ? '0 0 0 3px rgba(247,147,30,0.12)' : 'none',
+            boxShadow: isListening
+              ? `0 0 0 ${4 + Math.round(micLevel * 12)}px rgba(247,147,30,${(0.12 + micLevel * 0.20).toFixed(3)})`
+              : isFocused
+                ? '0 0 0 3px rgba(247,147,30,0.12)'
+                : 'none',
           }}
         >
           <input
@@ -159,11 +172,14 @@ export const EchoPageComposer = forwardRef<HTMLInputElement, EchoPageComposerPro
             <button
               onClick={handleMicClick}
               className={cn(
-                "w-8 h-8 rounded-full flex items-center justify-center transition-all active:scale-[0.97]",
-                isListening && "animate-pulse"
+                "w-8 h-8 rounded-full flex items-center justify-center transition-all active:scale-[0.97]"
               )}
               style={isListening
-                ? { background: '#F7931E', boxShadow: '0 0 0 6px rgba(247,147,30,0.18)' }
+                ? {
+                    background: '#F7931E',
+                    boxShadow: `0 0 0 ${6 + Math.round(micLevel * 10)}px rgba(247,147,30,${(0.14 + micLevel * 0.18).toFixed(3)})`,
+                    transform: `scale(${(1 + micLevel * 0.08).toFixed(3)})`,
+                  }
                 : { background: 'rgba(15,23,42,0.05)', border: '0.5px solid rgba(15,23,42,0.10)' }
               }
               aria-label={isListening ? "Stop listening" : "Voice input"}

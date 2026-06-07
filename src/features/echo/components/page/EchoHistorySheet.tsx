@@ -24,7 +24,7 @@ interface EchoHistorySheetProps {
 interface EchoConversation {
   id: string;
   title: string | null;
-  preview?: string | null;
+  summary?: string | null;
   last_message_at: string;
   created_at: string;
 }
@@ -180,7 +180,7 @@ function SwipeableConversationRow({
             className="text-[12px] truncate"
             style={{ color: '#94A3B8' }}
           >
-            {conv.preview || 'Tap to continue conversation'}
+            {conv.summary || 'Tap to continue conversation'}
           </p>
         </div>
 

@@ -281,6 +281,16 @@ export async function insertMessage(
     .update({ last_message_at: new Date().toISOString() })
     .eq('id', conversationId);
 
+  // Auto-populate summary from first user message if not already set
+  if (role === 'user') {
+    const summary = content.slice(0, 80);
+    await supabase
+      .from('echo_conversations')
+      .update({ summary })
+      .eq('id', conversationId)
+      .is('summary', null);
+  }
+
   return true;
 }
 
