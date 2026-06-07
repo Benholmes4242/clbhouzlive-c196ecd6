@@ -19,7 +19,7 @@
  */
 
 import React from 'react';
-import { SectionLabel } from '@/components/courses/course-detail/parts/SectionLabel';
+import { SectionLabel } from '@/components/courses/course-detail/SectionLabel';
 import { ListChecks, type LucideIcon } from 'lucide-react';
 
 const INK = '#0F172A';
