@@ -1,23 +1,26 @@
 /**
- * FeedCard — Phase 1
+ * FeedCard — Phases 1 & 2
  *
- * Single post = single card. Adaptive media frame: the frame's aspect-ratio
- * equals the media's own ratio so `object-fit: cover` fills with zero crop
- * and zero letterbox. Extreme ratios are clamped + ambient-filled with a
- * blurred backdrop.
+ * Single post = single card. Header, media block, body, footer.
  *
- * Phase 1 scope:
- *  - Header (avatar / name / sub-line / optional REVIEW pill / DEAL chip)
- *  - Single-media adaptive frame (first mediaItem only)
- *  - Footer (like / comment / share)
- *  - Tap on media → open `useFullscreenFeedStore` at the right post/slide
+ * Media block:
+ *  - Single media → adaptive frame (frame ratio = media's true ratio →
+ *    `object-fit: cover` fills with zero crop and zero letterbox). Extreme
+ *    ratios are clamped + ambient-filled with a blurred backdrop.
+ *  - Multi media → `MediaCarousel`: stable 4:5 frame for all slides
+ *    (height never jumps), per-slide blurred ambient backdrop + contained
+ *    image/video, dots + n/total chip, swipe navigation, persisted index.
  *
- * Phase 2 (later): multi-media carousel with dots, inline video lifecycle.
+ * Inline video lifecycle is driven by the `isActive` prop from `CardFeed`
+ * (most-in-view card). Only one inline video plays at a time across the
+ * whole feed; tapping any media opens the immersive `FullscreenFeedOverlay`.
  */
 import React, { useMemo } from 'react';
 import { Heart, MessageCircle, Share } from 'lucide-react';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import type { FeedPost } from '@/components/media-system/types/media';
+import { InlineVideo } from './InlineVideo';
+import { MediaCarousel } from './MediaCarousel';
 
 const T100 = 'rgba(255,255,255,0.96)';
 const T60 = 'rgba(255,255,255,0.55)';
