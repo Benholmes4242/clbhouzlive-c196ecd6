@@ -737,46 +737,50 @@ const AppInner: React.FC = () => {
   );
 };
 
-// App - Outer wrapper with QueryClientProvider
-const App: React.FC = () => {
-  // Import AppPrefetchProvider dynamically to avoid circular deps
-  const AppPrefetchProvider = React.lazy(() => import('@/providers/AppPrefetchProvider'));
+// Lazy import AppPrefetchProvider at module scope to avoid per-render lazy refs
+const AppPrefetchProvider = React.lazy(() => import('@/providers/AppPrefetchProvider'));
 
-  // Signal to index.html watchdog that React has mounted successfully.
-  // Runs once after first commit — clears the boot-deadline timer so we
-  // don't trigger recovery on a healthy boot.
+// MountSignal — rendered deep inside the provider/Suspense tree so the
+// index.html boot watchdog is only disarmed once real routed UI has mounted.
+const MountSignal: React.FC = () => {
   useEffect(() => {
     (window as any).__APP_MOUNTED__ = true;
     if (typeof (window as any).__cancelMountDeadline === 'function') {
       (window as any).__cancelMountDeadline();
     }
   }, []);
+  return null;
+};
 
-  
+// App - Outer wrapper with QueryClientProvider
+const App: React.FC = () => {
   return (
     <>
       <AppShell>
         <ReviewIslandLoader />
-        <ThemeProvider defaultTheme="dark" storageKey="clbhouz-ui-theme">
-          <Top100DebugProvider>
-            <QueryClientProvider client={queryClient}>
-              <Suspense fallback={null}>
-                <AppPrefetchProvider delay={2000} enabled={true}>
-                  <RehydrationProvider>
-                    <PostEventsBridge>
-                      <UploadToastsBridge />
-                      <UploadProgressBanner />
-                      <AppInner />
-                    </PostEventsBridge>
-                  </RehydrationProvider>
-                </AppPrefetchProvider>
-              </Suspense>
-            </QueryClientProvider>
-          </Top100DebugProvider>
-        </ThemeProvider>
+        <ErrorBoundary>
+          <ThemeProvider defaultTheme="dark" storageKey="clbhouz-ui-theme">
+            <Top100DebugProvider>
+              <QueryClientProvider client={queryClient}>
+                <Suspense fallback={<div style={{ background: '#0A0E14', minHeight: '100dvh' }} />}>
+                  <AppPrefetchProvider delay={2000} enabled={true}>
+                    <RehydrationProvider>
+                      <PostEventsBridge>
+                        <UploadToastsBridge />
+                        <UploadProgressBanner />
+                        <AppInner />
+                      </PostEventsBridge>
+                    </RehydrationProvider>
+                  </AppPrefetchProvider>
+                </Suspense>
+              </QueryClientProvider>
+            </Top100DebugProvider>
+          </ThemeProvider>
+        </ErrorBoundary>
       </AppShell>
     </>
   );
 };
 
 export default App;
+
