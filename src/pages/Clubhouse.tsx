@@ -367,7 +367,7 @@ const ClubhouseContent = () => {
       {!isTournamentCardActive && <ProfileCompleteNudge />}
 
       {/* Rehydration skeleton */}
-      <ClubhouseSkeletonShimmer isVisible={showRehydrationSkeleton} isStatic={false} variant={posts[0]?.isReview ? 'review' : 'regular'} isVideo={posts[0]?.mediaItems?.[0]?.type === 'video'} />
+      <ClubhouseSkeletonShimmer isVisible={showRehydrationSkeleton} isStatic={false} variant={posts[0]?.isReview ? 'review' : 'regular'} isVideo={posts[0]?.mediaItems?.[0]?.type === 'video'} surface="card" />
 
       {/* ═══ MAIN FEED AREA ═══ */}
       {!isLoading && posts.length === 0 ? (
