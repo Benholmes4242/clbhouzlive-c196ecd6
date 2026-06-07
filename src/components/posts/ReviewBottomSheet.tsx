@@ -18,7 +18,6 @@ import { toast } from 'sonner';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import {
   FROST,
-  FROST_BLUR,
   FROST_SCORE_GRADIENT,
   formatFrostRating,
   splitCourseName,
