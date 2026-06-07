@@ -234,7 +234,6 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
               background: '#05080F',
             }}
           >
-            {isContained && mediaUrl && null}
             {media.type === 'video' ? (
               <InlineVideo
                 item={media}
