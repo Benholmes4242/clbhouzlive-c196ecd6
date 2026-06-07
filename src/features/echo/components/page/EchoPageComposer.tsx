@@ -27,7 +27,7 @@ export const EchoPageComposer = forwardRef<HTMLInputElement, EchoPageComposerPro
     { value, onChange, onSend, onAbort, isStreaming, disabled, cooldown },
     ref
   ) {
-    const { isListening, transcript, startListening, stopListening, isSupported, error } = useSpeechToText();
+    const { isListening, transcript, startListening, stopListening, isSupported, error, micLevel } = useSpeechToText();
     const [isFocused, setIsFocused] = React.useState(false);
 
 
