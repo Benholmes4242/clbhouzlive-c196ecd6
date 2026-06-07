@@ -92,7 +92,7 @@ function ConversationTypingOrPreview({ conversationId, preview, isActive }: { co
     );
   }
   
-  return <>{preview || 'No messages yet'}</>;
+  return <>{preview || ''}</>;
 }
 
 function ConversationSkeleton() {

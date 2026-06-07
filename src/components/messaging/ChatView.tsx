@@ -524,7 +524,7 @@ export function ChatView({ conversationId, onBack }: ChatViewProps) {
                 ) : isGroupChat && conversation ? (
                   <>
                     <span style={{ color: '#22c55e' }}>{onlineCount} online</span>
-                    <span style={{ color: '#94a3b8' }}> · {conversation.participants.length} members</span>
+                    <span style={{ color: '#94a3b8' }}>{'\u2009·\u2009'}{conversation.participants.length} {conversation.participants.length === 1 ? 'member' : 'members'}</span>
                   </>
                 ) : otherUserPresence?.status === 'online' ? (
                   <span style={{ color: '#22c55e' }}>online</span>
@@ -545,16 +545,7 @@ export function ChatView({ conversationId, onBack }: ChatViewProps) {
                   HCP {otherUser.profile.eg_handicap_index}
                 </span>
               )}
-              {!isGroupChat && otherUser?.profile?.home_club && (
-                <span className="flex items-center" style={{
-                  gap: 3, fontSize: 10, fontWeight: 600, color: '#006747',
-                  background: 'rgba(0,103,71,0.07)', border: '1px solid rgba(0,103,71,0.18)',
-                  borderRadius: 99, padding: '1px 7px',
-                }}>
-                  <MapPin size={9} />
-                  {otherUser.profile.home_club}
-                </span>
-              )}
+              {/* Course pill removed from 1:1 header — already shown in chat list and profile */}
             </div>
           </div>
         </button>

@@ -12,7 +12,7 @@ import { usePushNotifications } from '@/hooks/usePushNotifications';
 import { useInAppNotifications } from '@/hooks/useInAppNotifications';
 import { useDebouncedCallback } from '@/hooks/useDebouncedCallback';
 import { useHideBottomNav } from '@/hooks/useBottomNavVisibility';
-import { SectionEyebrow } from '@/components/ui/SectionEyebrow';
+
 
 type ConversationFilterType = 'all' | 'unread' | 'groups';
 
@@ -278,12 +278,7 @@ function MessagesPageInner() {
           </div>
         )}
 
-        {/* Section label */}
-        {!searchInput && conversationFilter === 'all' && conversations.length > 0 && (
-          <div style={{ padding: '10px 16px 6px' }}>
-            <SectionEyebrow label="Recent" />
-          </div>
-        )}
+        {/* RECENT eyebrow removed — ConversationList renders its own section organization */}
         
         {/* Conversation list */}
         <div className="flex-1 overflow-y-auto pb-28">
