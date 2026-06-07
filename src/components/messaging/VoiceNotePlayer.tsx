@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Play, Pause } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { AMBER, AMBER_TINT_10, INK_FAINT } from './_shared/tokens';
+import { AMBER, AMBER_TINT_10, INK_FAINT, INK_LIGHT, SURFACE } from './_shared/tokens';
 
 interface VoiceNotePlayerProps {
   audioUrl: string;
