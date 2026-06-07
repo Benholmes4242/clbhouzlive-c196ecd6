@@ -301,8 +301,15 @@ export const SnapVideoPlayer = memo(function SnapVideoPlayer({
       style={{ background: '#0A0E14' }}
       onClick={handleTap}
     >
-      {/* Solid matte behind non-filling media — chrome colour, no blur. */}
-      <div className="absolute inset-0" style={{ background: '#0A0E14' }} aria-hidden="true" />
+      {/* Backdrop — blurred thumbnail in fullscreen, solid matte otherwise. */}
+      {isFullscreen && thumbnailUrl ? (
+        <div aria-hidden="true" className="absolute inset-0" style={{
+          backgroundImage: `url(${thumbnailUrl})`, backgroundSize: 'cover', backgroundPosition: 'center',
+          filter: 'blur(40px) brightness(0.5) saturate(1.2)', transform: 'scale(1.2)',
+        }} />
+      ) : (
+        <div className="absolute inset-0" style={{ background: '#0A0E14' }} aria-hidden="true" />
+      )}
       {/* Poster / thumbnail */}
       {thumbnailUrl && (
         <img
