@@ -200,11 +200,13 @@ function TiedLeadersRowDark({
   score,
   avatars,
   isLast,
+  isResults = false,
 }: {
   count: number;
   score: string;
   avatars: (string | null)[];
   isLast: boolean;
+  isResults?: boolean;
 }) {
   return (
     <div
@@ -241,7 +243,7 @@ function TiedLeadersRowDark({
       >
         {score}
       </span>
-      <span style={{ width: 18, flexShrink: 0 }} />
+      {!isResults && <span style={{ width: 18, flexShrink: 0 }} />}
     </div>
   );
 }
@@ -253,6 +255,7 @@ function TiedChasersRowDark({
   avatars,
   isLast,
   onTap,
+  isResults = false,
 }: {
   rank: string;
   count: number;
@@ -260,6 +263,7 @@ function TiedChasersRowDark({
   avatars: (string | null)[];
   isLast: boolean;
   onTap?: () => void;
+  isResults?: boolean;
 }) {
   return (
     <div
@@ -298,7 +302,7 @@ function TiedChasersRowDark({
       >
         {fmtScore(score)}
       </span>
-      <span style={{ width: 18, flexShrink: 0 }} />
+      {!isResults && <span style={{ width: 18, flexShrink: 0 }} />}
     </div>
   );
 }
@@ -607,6 +611,7 @@ export function CinematicFrame({
           score={tiedLeaders.score}
           avatars={tiedAvatars}
           isLast={false}
+          isResults={isResults}
         />
       );
 
@@ -623,6 +628,7 @@ export function CinematicFrame({
               avatars={slot.members.map((m: any) => avatar(m))}
               isLast={isLast}
               onTap={onCtaTap}
+              isResults={isResults}
             />
           );
         } else {
@@ -681,6 +687,7 @@ export function CinematicFrame({
               avatars={slot.members.map((m: any) => avatar(m))}
               isLast={isLast}
               onTap={onCtaTap}
+              isResults={isResults}
             />
           );
         } else {
