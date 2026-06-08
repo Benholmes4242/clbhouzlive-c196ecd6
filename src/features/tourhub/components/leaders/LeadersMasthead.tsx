@@ -347,51 +347,56 @@ export function LeadersMasthead({
                 </div>
               </div>
 
-              {/* Info: name + country left, big stat right */}
-              <div
-                style={{
-                  flex: 1,
-                  minWidth: 0,
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                  gap: 10,
-                }}
-              >
-                <div style={{ minWidth: 0, flex: 1 }}>
-                  <div
-                    style={{
-                      fontSize: 22,
-                      fontWeight: 800,
-                      color: INK,
-                      letterSpacing: '-0.025em',
-                      lineHeight: 1.1,
-                      overflow: 'hidden',
-                      textOverflow: 'ellipsis',
-                      whiteSpace: 'nowrap',
-                    }}
-                  >
-                    {leader.player.full_name}
-                  </div>
-                  <div
-                    style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: 5,
-                      marginTop: 4,
-                    }}
-                  >
-                    <CountryFlag country={leader.player.country_code || leader.player.country} size="sm" />
-                    {countryName && (
-                      <span style={{ fontSize: 11, fontWeight: 600, color: INK_MUTE }}>
-                        {countryName}
-                      </span>
-                    )}
-                  </div>
+              {/* Info: name, country, then stat stacked underneath */}
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div
+                  style={{
+                    fontSize: 22,
+                    fontWeight: 800,
+                    color: INK,
+                    letterSpacing: '-0.025em',
+                    lineHeight: 1.1,
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    whiteSpace: 'nowrap',
+                  }}
+                >
+                  {leader.player.full_name}
                 </div>
-
-                <div style={{ flexShrink: 0, textAlign: 'right' }}>
-                  <div
+                <div
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 5,
+                    marginTop: 4,
+                    minWidth: 0,
+                  }}
+                >
+                  <CountryFlag country={leader.player.country_code || leader.player.country} size="sm" />
+                  {countryName && (
+                    <span
+                      style={{
+                        fontSize: 11,
+                        fontWeight: 600,
+                        color: INK_MUTE,
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                        whiteSpace: 'nowrap',
+                      }}
+                    >
+                      {countryName}
+                    </span>
+                  )}
+                </div>
+                <div
+                  style={{
+                    display: 'flex',
+                    alignItems: 'baseline',
+                    gap: 8,
+                    marginTop: 10,
+                  }}
+                >
+                  <span
                     style={{
                       fontSize: 22,
                       fontWeight: 800,
@@ -404,19 +409,18 @@ export function LeadersMasthead({
                     {integer}
                     {decimal && <span style={{ color: AMBER }}>{decimal}</span>}
                     {suffix && <span style={{ color: INK }}>{suffix}</span>}
-                  </div>
-                  <div
+                  </span>
+                  <span
                     style={{
                       fontSize: 9,
                       fontWeight: 800,
                       color: INK_MUTE,
                       letterSpacing: '0.16em',
                       textTransform: 'uppercase',
-                      marginTop: 4,
                     }}
                   >
                     {category.label}
-                  </div>
+                  </span>
                 </div>
               </div>
             </div>
