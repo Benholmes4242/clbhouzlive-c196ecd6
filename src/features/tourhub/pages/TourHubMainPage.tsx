@@ -74,7 +74,7 @@ export function TourHubMainPage() {
   return (
     <TourSelectionProvider>
       <TourHubShell showBack={false}>
-        <ShellSlot dark>
+        <ShellSlot>
           <TourHubShellTabs />
           {renderShellRow()}
         </ShellSlot>

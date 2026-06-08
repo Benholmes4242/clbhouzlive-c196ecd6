@@ -94,7 +94,7 @@ export function CollegeComparePage() {
 
   return (
     <TourHubShell>
-      <ShellSlot dark>
+      <ShellSlot>
         <button
           type="button"
           onClick={() => navigate('/tourhub/college-golf')}
