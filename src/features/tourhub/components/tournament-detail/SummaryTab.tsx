@@ -10,7 +10,7 @@ import { BatchPlayerAvatar } from '../PlayerAvatar';
 import { EditorialEmpty } from './EditorialEmpty';
 import { useTournamentScoringStats } from '../../hooks/useTourHubData';
 import { playerRoute } from '../../routes';
-import { AMBER, INK, INK_FAINT, INK_MUTE, INK_TINT_02, INK_TINT_06, INK_TINT_07, LIVE_DOT, LIVE_INK, SCORE_UNDER_PAR_LIGHT, SLATE_50, SURFACE, TREND_DOWN, TREND_UP } from '../../_shared/tokens';
+import { AMBER, INK, INK_FAINT, INK_MUTE, INK_TINT_02, INK_TINT_06, INK_TINT_07, LIVE_DOT, LIVE_INK, SCORE_OVER_PAR_LIGHT, SLATE_50, SURFACE, TREND_DOWN, TREND_UP } from '../../_shared/tokens';
 
 interface SummaryTabProps {
   tournamentId: string;
@@ -173,13 +173,13 @@ export function SummaryTab({
             {scoringStats.rounds.map((round: any) => (
               <div key={round.round} style={{ display: 'flex', alignItems: 'center', padding: '10px 20px', borderBottom: `0.5px solid ${INK_TINT_07}`, fontVariantNumeric: 'tabular-nums' }}>
                 <span style={{ fontSize: '14px', fontWeight: 700, color: INK, flex: '0 0 52px' }}>R{round.round}</span>
-                <span style={{ fontSize: '14px', fontWeight: 700, color: AMBER, flex: 1, textAlign: 'center' as const }}>{round.lowScore}</span>
+                <span style={{ fontSize: '14px', fontWeight: 700, color: SCORE_OVER_PAR_LIGHT, flex: 1, textAlign: 'center' as const }}>{round.lowScore}</span>
                 <span style={{
                   fontSize: '14px', fontWeight: 600, flex: 1, textAlign: 'center' as const,
-                  color: round.avgScore < 0 ? SCORE_UNDER_PAR_LIGHT : round.avgScore > 0 ? TREND_DOWN : INK_MUTE,
+                  color: round.avgScore < 0 ? SCORE_OVER_PAR_LIGHT : round.avgScore > 0 ? INK : INK_MUTE,
                 }}>{round.avgScore > 0 ? `+${round.avgScore.toFixed(1)}` : round.avgScore.toFixed(1)}</span>
-                <span style={{ fontSize: '14px', color: '#F7931E', fontWeight: 600, flex: 1, textAlign: 'center' as const }}>{round.totalBirdies}</span>
-                <span style={{ fontSize: '14px', color: '#EF4444', fontWeight: 600, flex: 1, textAlign: 'center' as const }}>{round.totalBogeys}</span>
+                <span style={{ fontSize: '14px', color: SCORE_OVER_PAR_LIGHT, fontWeight: 600, flex: 1, textAlign: 'center' as const }}>{round.totalBirdies}</span>
+                <span style={{ fontSize: '14px', color: INK, fontWeight: 600, flex: 1, textAlign: 'center' as const }}>{round.totalBogeys}</span>
               </div>
             ))}
           </div>
@@ -193,11 +193,11 @@ export function SummaryTab({
         if (total === 0) return null;
 
         const segments = [
-          { label: 'Eagles', count: t.eagles, color: '#F7931E', pct: (t.eagles / total * 100).toFixed(1) },
-          { label: 'Birdies', count: t.birdies, color: '#F7931E', pct: (t.birdies / total * 100).toFixed(1) },
+          { label: 'Eagles', count: t.eagles, color: SCORE_OVER_PAR_LIGHT, pct: (t.eagles / total * 100).toFixed(1) },
+          { label: 'Birdies', count: t.birdies, color: SCORE_OVER_PAR_LIGHT, pct: (t.birdies / total * 100).toFixed(1) },
           { label: 'Pars', count: t.pars, color: '#94A3B8', pct: (t.pars / total * 100).toFixed(1) },
-          { label: 'Bogeys', count: t.bogeys, color: '#EF4444', pct: (t.bogeys / total * 100).toFixed(1) },
-          { label: 'Double+', count: t.doubleBogeys, color: '#991B1B', pct: (t.doubleBogeys / total * 100).toFixed(1) },
+          { label: 'Bogeys', count: t.bogeys, color: INK, pct: (t.bogeys / total * 100).toFixed(1) },
+          { label: 'Double+', count: t.doubleBogeys, color: INK_MUTE, pct: (t.doubleBogeys / total * 100).toFixed(1) },
         ];
 
         return (
@@ -257,7 +257,7 @@ export function SummaryTab({
                 <div style={{ fontSize: '15px', fontWeight: 700, color: INK, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const }}>{best.name}</div>
                 <div style={{ fontSize: '11px', fontWeight: 600, color: INK_MUTE, marginTop: '2px' }}>Round {best.round}</div>
               </div>
-              <span style={{ fontSize: '24px', fontWeight: 900, color: SCORE_UNDER_PAR_LIGHT, letterSpacing: '-0.03em', fontVariantNumeric: 'tabular-nums' }}>{scoreStr}</span>
+              <span style={{ fontSize: '24px', fontWeight: 900, color: SCORE_OVER_PAR_LIGHT, letterSpacing: '-0.03em', fontVariantNumeric: 'tabular-nums' }}>{scoreStr}</span>
             </Link>
           </motion.div>
         );
@@ -283,7 +283,7 @@ export function SummaryTab({
                 <div>
                   <div style={{ fontSize: '9px', fontWeight: 800, color: INK_MUTE, letterSpacing: '0.14em', marginBottom: '3px' }}>SCORING AVG</div>
                   <div style={{ fontSize: '18px', fontWeight: 800, fontVariantNumeric: 'tabular-nums',
-                    color: latestRound.avgScore < 0 ? SCORE_UNDER_PAR_LIGHT : latestRound.avgScore > 0 ? TREND_DOWN : INK }}>
+                    color: latestRound.avgScore < 0 ? SCORE_OVER_PAR_LIGHT : latestRound.avgScore > 0 ? INK : INK }}>
                     {latestRound.avgScore > 0 ? `+${latestRound.avgScore.toFixed(1)}` : latestRound.avgScore.toFixed(1)}
                   </div>
                 </div>
