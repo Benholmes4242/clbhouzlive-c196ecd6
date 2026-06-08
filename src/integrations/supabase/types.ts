@@ -19559,7 +19559,6 @@ export type Database = {
           context_stats: Json
           course_id: string
           course_name: string
-          filter_tier: string
           global_rank: number
           hero_image_url: string
           location_primary: string
