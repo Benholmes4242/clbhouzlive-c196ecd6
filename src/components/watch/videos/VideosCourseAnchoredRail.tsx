@@ -60,7 +60,7 @@ function VideosCourseAnchoredRailInner({ userId }: VideosCourseAnchoredRailProps
     actor,
   );
 
-  if (coursesLoading || postsLoading) return null;
+  if (coursesLoading || postsLoading) return <RailSkeleton variant="rail-landscape" />;
   if (!topCourse || posts.length === 0) return null;
 
   return (
