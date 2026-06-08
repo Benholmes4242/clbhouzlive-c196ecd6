@@ -13,10 +13,10 @@ import { ConnectHandicapCue } from '@/components/courses/course-detail/ConnectHa
 
 // Local hole-distribution ramp (mirrors src/features/courses/components/holes/_constants.ts).
 // Duplicated intentionally to keep tourhub self-contained — no cross-feature import.
-const C_BIRDIE = '#F7931E';  // amber — birdie or better
+const C_BIRDIE = '#9F1D1D';  // red — birdie or better (good = red)
 const C_PAR    = '#94A3B8';  // slate — par
-const C_BOGEY  = '#EF4444';  // red — bogey
-const C_DOUBLE = '#991B1B';  // maroon — double or worse
+const C_BOGEY  = '#0F172A';  // ink — bogey (over par = dark)
+const C_DOUBLE = '#475569';  // slate-600 — double or worse (muted dark)
 const INK_HOLE = '#0F172A';
 
 interface HoleStatsTabProps {
