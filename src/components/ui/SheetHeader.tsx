@@ -1,6 +1,8 @@
 import React from 'react';
 import { X } from 'lucide-react';
 
+const FONT_SERIF = '"Geist", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
+
 interface SheetHeaderProps {
   /** Caps eyebrow above the title. Optional — omit for sheets with no eyebrow context. */
   eyebrow?: string;

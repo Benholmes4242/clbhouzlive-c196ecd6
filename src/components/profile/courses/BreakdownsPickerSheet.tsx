@@ -85,6 +85,7 @@ const BreakdownsPickerSheet: React.FC<BreakdownsPickerSheetProps> = ({
               </SheetTitle>
               <p
                 style={{
+                  fontFamily: FONT_SERIF,
                   fontSize: 12,
                   color: '#64748B',
                   marginTop: 6,
@@ -213,6 +214,7 @@ const BreakdownsPickerSheet: React.FC<BreakdownsPickerSheetProps> = ({
                   </div>
                   <div
                     style={{
+                      fontFamily: FONT_SERIF,
                       marginTop: 4,
                       fontSize: 10,
                       fontWeight: 700,
