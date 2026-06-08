@@ -66,7 +66,7 @@ export function TournamentHero({ tournament, imageUrl }: TournamentHeroProps) {
       <div
         style={{
           position: 'relative',
-          height: '172px',
+          height: '240px',
           overflow: 'hidden',
         }}
       >
