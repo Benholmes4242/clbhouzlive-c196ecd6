@@ -102,13 +102,13 @@ export const TourSwitcherAffordance: React.FC = () => {
             fontSize: 11,
             fontWeight: 700,
             letterSpacing: '0.04em',
-            color: SURFACE,
+            color: '#0A0E14',
             textTransform: 'uppercase',
             lineHeight: 1,
           }}
         >
           {TOUR_LABEL[activeTourSlug] ?? 'PGA'}
-          <ArrowLeftRight size={11} strokeWidth={2.2} color={SURFACE} aria-hidden />
+          <ArrowLeftRight size={11} strokeWidth={2.2} color="#0A0E14" aria-hidden />
         </span>
       </button>
 
