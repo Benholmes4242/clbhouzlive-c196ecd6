@@ -16,6 +16,7 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Search, X, Star, Plus, Trash2, ChevronUp, ChevronDown, GripVertical, Trophy, RotateCcw } from 'lucide-react';
 import { BottomSheet } from '@/components/ui/BottomSheet';
+import SheetHeader from '@/components/ui/SheetHeader';
 import { toast } from 'sonner';
 import {
   DndContext,
@@ -166,7 +167,7 @@ const SortableManageItem: React.FC<SortableItemProps> = ({
         display: 'flex',
         alignItems: 'center',
         gap: 12,
-        padding: '14px 20px',
+        padding: '14px 16px',
         background: '#FFFFFF',
         borderBottom: `1px solid ${BORDER}`,
         boxShadow: isDragging ? '0 4px 12px rgba(0,0,0,0.08)' : 'none',
@@ -382,7 +383,7 @@ const CourseRow: React.FC<CourseRowProps> = ({
     display: 'flex',
     alignItems: 'center',
     gap: 12,
-    padding: '14px 20px',
+    padding: '14px 16px',
     background: '#FFFFFF',
     borderBottom: `1px solid ${BORDER}`,
     opacity: isAtLimit ? 0.4 : 1,
@@ -486,17 +487,17 @@ const CourseRow: React.FC<CourseRowProps> = ({
 // Reusable section eyebrow with optional amber-bar prefix
 const SectionEyebrow: React.FC<{ label: string; noBar?: boolean }> = ({ label, noBar }) => (
   <div style={{
-    padding: '12px 20px 8px',
+    padding: '14px 16px 8px',
     display: 'flex',
     alignItems: 'center',
     gap: 8,
   }}>
     {!noBar && <div style={{ width: 3, height: 9, background: AMBER }} />}
     <span style={{
-      fontSize: 10,
+      fontSize: 9,
       fontWeight: 800,
-      letterSpacing: '0.22em',
-      color: INK_SUBTLE,
+      letterSpacing: '0.16em',
+      color: '#64748B',
       textTransform: 'uppercase',
     }}>
       {label}
@@ -681,51 +682,20 @@ export const AddCourseModal: React.FC<AddCourseModalProps> = ({
         display: 'flex',
         flexDirection: 'column',
         height: '100%',
-        background: BG_SURFACE,
+        background: '#FFFFFF',
       }}>
-        {/* Header */}
-        <div style={{ padding: '0 20px 16px', position: 'relative' }}>
-          <h2
-            id="add-course-title"
-            style={{
-              fontFamily: FONT_SERIF,
-              fontSize: 26,
-              fontWeight: 900,
-              color: INK,
-              letterSpacing: '-0.02em',
-              margin: 0,
-              lineHeight: 1.1,
-            }}
-          >
-            Your Personal Top 10
-          </h2>
-          <button
-            onClick={onClose}
-            style={{
-              position: 'absolute',
-              top: -4,
-              right: 16,
-              width: 36,
-              height: 36,
-              borderRadius: '50%',
-              background: 'rgba(15,23,42,0.05)',
-              border: 0,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              cursor: 'pointer',
-              color: INK_SOFT,
-            }}
-            aria-label="Close"
-          >
-            <X size={18} strokeWidth={2.25} />
-          </button>
-        </div>
+        {/* Canonical Dispatch sheet header */}
+        <SheetHeader
+          eyebrow="YOUR COURSES"
+          title={<span id="add-course-title">Personal Top 10</span>}
+          onClose={onClose}
+          borderBottom={false}
+        />
 
         {/* 10 / 10 status line */}
         {topTen.length === 10 && (
           <div style={{
-            padding: '8px 20px 12px',
+            padding: '4px 16px 10px',
             display: 'flex',
             alignItems: 'baseline',
             gap: 6,
@@ -743,7 +713,8 @@ export const AddCourseModal: React.FC<AddCourseModalProps> = ({
         <div style={{
           display: 'flex',
           gap: 24,
-          padding: '0 20px',
+          padding: '0 16px',
+          borderBottom: `0.5px solid rgba(15,23,42,0.08)`,
         }}>
           {(['manage', 'add'] as const).map(tab => {
             const isActive = activeTab === tab;
@@ -766,19 +737,20 @@ export const AddCourseModal: React.FC<AddCourseModalProps> = ({
                 }}
               >
                 <span style={{
-                  fontSize: 16,
-                  fontWeight: 800,
+                  fontSize: 14,
+                  fontWeight: isActive ? 800 : 600,
                   color: isActive ? INK : INK_SUBTLE,
                   letterSpacing: '-0.01em',
                   display: 'inline-block',
-                  paddingBottom: 6,
-                  borderBottom: isActive ? '1.5px solid #0F172A' : '1.5px solid transparent',
+                  paddingBottom: 8,
+                  marginBottom: -1,
+                  borderBottom: isActive ? '2px solid #0F172A' : '2px solid transparent',
                 }}>
                   {label}
                 </span>
                 {count !== null && (
                   <span style={{
-                    fontSize: 12,
+                    fontSize: 11,
                     fontWeight: 700,
                     color: isActive ? INK_SOFT : INK_SUBTLE,
                     fontVariantNumeric: 'tabular-nums',
@@ -791,9 +763,10 @@ export const AddCourseModal: React.FC<AddCourseModalProps> = ({
           })}
         </div>
 
+
         {/* Search input — only on Add tab, natural height */}
         {activeTab === 'add' && (
-          <div style={{ padding: '12px 20px 4px' }}>
+          <div style={{ padding: '12px 16px 4px' }}>
             <div style={{ position: 'relative' }}>
               <Search
                 size={16}
@@ -850,7 +823,7 @@ export const AddCourseModal: React.FC<AddCourseModalProps> = ({
             topTen.length === 0 ? (
               <div style={{
                 textAlign: 'center',
-                padding: '40px 20px',
+                padding: '40px 16px',
                 color: INK_SUBTLE,
                 fontSize: 14,
               }}>
@@ -863,7 +836,7 @@ export const AddCourseModal: React.FC<AddCourseModalProps> = ({
                 {topTen.some(c => c.is_pinned) && (
                   showResetConfirm ? (
                     <div style={{
-                      margin: '12px 20px',
+                      margin: '12px 16px',
                       padding: 16,
                       borderRadius: 12,
                       border: `1px solid ${AMBER_BORDER}`,
@@ -939,7 +912,7 @@ export const AddCourseModal: React.FC<AddCourseModalProps> = ({
                       onClick={() => setShowResetConfirm(true)}
                       style={{
                         display: 'flex',
-                        margin: '12px 20px',
+                        margin: '12px 16px',
                         padding: '10px 16px',
                         background: '#FFFFFF',
                         border: `1px solid ${AMBER_BORDER}`,
@@ -993,7 +966,7 @@ export const AddCourseModal: React.FC<AddCourseModalProps> = ({
             isLoading ? (
               <div style={{
                 textAlign: 'center',
-                padding: '40px 20px',
+                padding: '40px 16px',
                 color: INK_SUBTLE,
                 fontSize: 14,
               }}>
@@ -1002,7 +975,7 @@ export const AddCourseModal: React.FC<AddCourseModalProps> = ({
             ) : filteredCourses.length === 0 && !preSelectedCourse ? (
               <div style={{
                 textAlign: 'center',
-                padding: '40px 20px',
+                padding: '40px 16px',
                 color: INK_SUBTLE,
                 fontSize: 14,
               }}>
