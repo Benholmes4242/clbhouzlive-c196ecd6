@@ -210,23 +210,21 @@ function HeroChampion({ champion, runnerUp, champStats, champPhotoUrl, sort, act
         </div>
 
         {/* Info */}
-        <div style={{ flex: 1, minWidth: 0, display: 'flex', alignItems: 'center', gap: 10 }}>
-          <div style={{ flex: 1, minWidth: 0 }}>
-            <div style={{ fontSize: 22, fontWeight: 800, color: INK, letterSpacing: '-0.025em', lineHeight: 1.1, marginBottom: 4, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-              {champion.playerName}
-            </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
-              <CountryFlag country={champion.country} size="sm" />
-              <span style={{ fontSize: 12, fontWeight: 600, color: INK_MUTE }}>{titleCaseCountry(champion.country)}</span>
-            </div>
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <div style={{ fontSize: 22, fontWeight: 800, color: INK, letterSpacing: '-0.025em', lineHeight: 1.1, marginBottom: 4, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+            {champion.playerName}
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 5, minWidth: 0 }}>
+            <CountryFlag country={champion.country} size="sm" />
+            <span style={{ fontSize: 12, fontWeight: 600, color: INK_MUTE, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{titleCaseCountry(champion.country)}</span>
           </div>
 
           {primary && (
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', flexShrink: 0 }}>
+            <div style={{ display: 'flex', alignItems: 'baseline', gap: 6, marginTop: 10 }}>
               <div style={{ fontSize: 22, fontWeight: 800, color: INK, letterSpacing: '-0.025em', lineHeight: 1, fontVariantNumeric: 'tabular-nums' }}>
                 {primary.value}
               </div>
-              <div style={{ fontSize: 9, fontWeight: 800, letterSpacing: '0.16em', color: INK_MUTE, marginTop: 4, textTransform: 'uppercase' as const }}>
+              <div style={{ fontSize: 9, fontWeight: 800, letterSpacing: '0.16em', color: INK_MUTE, textTransform: 'uppercase' as const }}>
                 {primary.label}
               </div>
             </div>
