@@ -249,7 +249,7 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
       className="min-h-screen w-full bg-background"
       style={{ paddingBottom: 'calc(var(--sab, env(safe-area-inset-bottom, 0px)) + 80px)' }}
     >
-      <ShellSlot dark>
+      <ShellSlot>
         <CourseDetailShellTabs
           activeTab={activeTab as any}
           onTabChange={handleTabChange as any}
