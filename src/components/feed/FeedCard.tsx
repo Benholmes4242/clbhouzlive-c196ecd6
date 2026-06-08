@@ -301,9 +301,9 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
                 background: 'transparent',
                 border: 'none',
                 padding: 0,
-                color: AMBER,
-                fontSize: 13,
-                fontWeight: 600,
+                color: T100,
+                fontSize: 14,
+                fontWeight: 700,
                 cursor: 'pointer',
               }}
             >
