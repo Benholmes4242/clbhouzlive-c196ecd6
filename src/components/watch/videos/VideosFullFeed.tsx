@@ -74,6 +74,15 @@ function VideosFullFeedInner({ userId, mood, searchQuery }: VideosFullFeedProps)
   }
 
   if (!isLoading && posts.length === 0) {
+    if (searchQuery) {
+      return (
+        <div style={{ padding: '32px 16px', textAlign: 'center' }}>
+          <p style={{ fontSize: 14, fontWeight: 600, color: '#0F172A', marginBottom: 4 }}>
+            No videos match "{searchQuery}".
+          </p>
+        </div>
+      );
+    }
     if (mood === 'for_you') return null;
     return (
       <div style={{ padding: '32px 16px', textAlign: 'center' }}>
