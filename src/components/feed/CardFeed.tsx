@@ -181,6 +181,7 @@ export const CardFeed: React.FC<CardFeedProps> = ({
                 onShare={onShare}
                 onProfile={onProfile}
                 onReviewTap={onReviewTap}
+                onCourse={onCourse}
                 onOpenMedia={handleOpenMedia}
                 isActive={activeId === post.id}
                 initialMediaIndex={initialSlide}
