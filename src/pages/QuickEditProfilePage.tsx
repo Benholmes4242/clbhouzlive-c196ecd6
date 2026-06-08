@@ -69,44 +69,37 @@ export default function QuickEditProfilePage() {
 
   return (
     <div className="min-h-screen bg-[#F4F6F9] flex flex-col">
-      {/* Header */}
+      {/* Header — Activity layout */}
       <div
-        className="flex items-center justify-between px-4 bg-background border-b border-border"
-        style={{
-          paddingTop: 'calc(max(env(safe-area-inset-top, 0px), 47px) + 8px)',
-          height: 'calc(max(env(safe-area-inset-top, 0px), 47px) + 64px)',
-        }}
+        className="flex items-end px-4 pb-4"
+        style={{ paddingTop: 'max(env(safe-area-inset-top, 0px), 47px)' }}
       >
-        <button
-          onClick={() => navigate(-1)}
-          style={{
-            width: 36, height: 36, borderRadius: '50%',
-            background: 'rgba(15,23,42,0.05)',
-            border: '0.5px solid rgba(15,23,42,0.10)',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            flexShrink: 0, cursor: 'pointer',
-          }}
-          aria-label="Back"
-        >
-          <ChevronLeft size={18} strokeWidth={2.5} />
-        </button>
-
-        <div className="text-center">
-          <p style={{ fontFamily: GEIST, fontSize: 16, fontWeight: 800, color: '#0F172A', letterSpacing: '-0.02em', margin: 0 }}>
-            Edit Profile
-          </p>
+        <div className="flex items-center gap-3">
+          <button
+            onClick={() => navigate(-1)}
+            style={{ width: 36, height: 36, borderRadius: '50%', background: 'rgba(15,23,42,0.05)', border: '0.5px solid rgba(15,23,42,0.10)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, cursor: 'pointer' }}
+            aria-label="Back"
+          >
+            <ChevronLeft size={20} strokeWidth={2.5} style={{ color: '#64748B' }} />
+          </button>
+          <div>
+            <div style={{ marginBottom: 6 }}>
+              <span style={{ fontFamily: GEIST, fontSize: 9, fontWeight: 800, color: '#64748B', letterSpacing: '0.16em', textTransform: 'uppercase' }}>
+                Profile
+              </span>
+            </div>
+            <h1 style={{ fontFamily: GEIST, fontSize: 34, fontWeight: 800, color: '#0F172A', letterSpacing: '-0.025em', lineHeight: 1, margin: 0 }}>
+              Edit Profile
+            </h1>
+          </div>
         </div>
-
-
-        <div className="w-9 h-9 flex-shrink-0" />
       </div>
 
       {/* Stacked sections */}
       <div
         className="flex-1 overflow-y-auto pt-4"
         style={{
-          paddingBottom:
-            'calc(var(--bottom-nav-height, 88px) + var(--sab) + 96px)',
+          paddingBottom: 'calc(var(--bottom-nav-height, 88px) + var(--sab) + 24px)',
         }}
       >
         <div ref={photosRef}>
@@ -135,44 +128,28 @@ export default function QuickEditProfilePage() {
             onUpdateWebsite={updateWebsite}
           />
         </div>
-      </div>
 
-      {/* Sticky save bar */}
-      <div
-        className="fixed inset-x-0 px-4 pt-3 bg-background border-t border-border"
-        style={{
-          bottom: 'var(--bottom-nav-height, 88px)',
-          paddingBottom: 'calc(var(--sab) + 16px)',
-        }}
-      >
-        {/* gradient fade above the bar */}
-        <div
-          aria-hidden
-          className="pointer-events-none absolute left-0 right-0"
-          style={{
-            bottom: '100%',
-            height: 24,
-            background: 'linear-gradient(to top, rgba(244,246,249,1), rgba(244,246,249,0))',
-          }}
-        />
-        <Button
-          onClick={handleSave}
-          disabled={isDisabled}
-          className="w-full min-h-[52px] rounded-[14px] text-[15px] font-bold border-0 active:opacity-90 transition-opacity"
-          style={{
-            background: isDisabled ? 'rgba(15,23,42,0.06)' : '#F7931E',
-            color: isDisabled ? 'rgba(15,23,42,0.45)' : '#ffffff',
-            boxShadow: isDisabled ? 'none' : '0 4px 16px rgba(247,147,30,0.28)',
-          }}
-        >
-          {isSaving ? (
-            <><Loader2 size={18} className="animate-spin mr-2" /> Saving…</>
-          ) : isDirty ? (
-            'Save Profile'
-          ) : (
-            'All Saved'
-          )}
-        </Button>
+        {/* Save bar — inline at end of content */}
+        <div className="px-4 pt-6 pb-2">
+          <Button
+            onClick={handleSave}
+            disabled={isDisabled}
+            className="w-full min-h-[52px] rounded-[14px] text-[15px] font-bold border-0 active:opacity-90 transition-opacity"
+            style={{
+              background: isDisabled ? 'rgba(15,23,42,0.06)' : '#F7931E',
+              color: isDisabled ? 'rgba(15,23,42,0.45)' : '#ffffff',
+              boxShadow: isDisabled ? 'none' : '0 4px 16px rgba(247,147,30,0.28)',
+            }}
+          >
+            {isSaving ? (
+              <><Loader2 size={18} className="animate-spin mr-2" /> Saving…</>
+            ) : isDirty ? (
+              'Save Profile'
+            ) : (
+              'All Saved'
+            )}
+          </Button>
+        </div>
       </div>
     </div>
   );
