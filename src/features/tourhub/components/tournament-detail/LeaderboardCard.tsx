@@ -43,7 +43,7 @@ interface LeaderboardCardProps {
 }
 
 function ScoreToPar({ score, className }: { score: number | null; className?: string }) {
-  if (score === null) return <span className={cn(className)} style={{ color: INK_FAINT }}>—</span>;
+  if (score === null) return <span className={cn(className)} style={{ color: INK_FAINT }}>-</span>;
   const formatted = score === 0 ? 'E' : score > 0 ? `+${score}` : String(score);
   const color = score < 0 ? SCORE_OVER_PAR_LIGHT : INK;
   return (

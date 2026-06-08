@@ -62,14 +62,14 @@ interface FullLeaderboardProps {
 }
 
 function ScoreToPar({ score, className, emphasis, size }: { score: number | null; className?: string; emphasis?: boolean; size?: number }) {
-  if (score === null) return <span className={cn(className)} style={{ fontVariantNumeric: 'tabular-nums', color: INK }}>—</span>;
+  if (score === null) return <span className={cn(className)} style={{ fontVariantNumeric: 'tabular-nums', color: INK }}>-</span>;
   const formatted = score === 0 ? 'E' : score > 0 ? `+${score}` : String(score);
   const color = score < 0 ? SCORE_OVER_PAR_LIGHT : INK;
   return (
     <span className={cn(className)} style={{
       fontVariantNumeric: 'tabular-nums',
       color,
-      fontWeight: emphasis ? 800 : 700,
+      fontWeight: emphasis ? 800 : 500,
       fontSize: size ? `${size}px` : undefined,
       letterSpacing: emphasis ? '-0.01em' : undefined,
     }}>
@@ -257,7 +257,7 @@ export function FullLeaderboard({
                   const cellColor = score != null && score < 0 ? SCORE_OVER_PAR_LIGHT : INK;
                   return (
                     <span key={ri} style={{ width: '19px', textAlign: 'center' as const, fontSize: '11px', fontWeight: isActive && score != null ? 600 : 500, color: cellColor, flexShrink: 0, fontVariantNumeric: 'tabular-nums' }}>
-                      {score != null ? score : '—'}
+                      {score != null ? score : '-'}
                     </span>
                   );
                 })}
