@@ -50,8 +50,8 @@ function resolveAvatar(e: any, tourSlug?: string | null): string | null {
 }
 function scoreColor(score: number | null | undefined): string {
   if (score == null || Number.isNaN(score)) return 'rgba(255,255,255,0.85)';
-  if (score < 0) return '#34D399';   // under par
-  if (score > 0) return '#FCA5A5';   // over par
+  if (score < 0) return '#F87171';   // under par -> red
+  if (score > 0) return 'rgba(255,255,255,0.55)'; // over par -> muted white
   return 'rgba(255,255,255,0.85)';   // even
 }
 
@@ -236,7 +236,7 @@ function TiedLeadersRowDark({
         style={{
           ...NUMERIC_STYLE,
           fontSize: 16, fontWeight: 800, letterSpacing: '-0.02em',
-          color: '#34D399', flexShrink: 0,
+          color: '#F87171', flexShrink: 0,
         }}
       >
         {score}
