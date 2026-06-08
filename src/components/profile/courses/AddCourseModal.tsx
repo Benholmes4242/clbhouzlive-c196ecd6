@@ -682,7 +682,7 @@ export const AddCourseModal: React.FC<AddCourseModalProps> = ({
         display: 'flex',
         flexDirection: 'column',
         height: '100%',
-        background: '#FFFFFF',
+        background: BG_SURFACE,
       }}>
         {/* Canonical Dispatch sheet header */}
         <SheetHeader
