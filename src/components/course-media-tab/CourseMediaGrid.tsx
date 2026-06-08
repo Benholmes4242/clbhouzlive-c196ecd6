@@ -9,7 +9,6 @@ import { CourseMediaGridSkeleton } from './CourseMediaGridSkeleton';
 import { SectionLabel } from '@/components/courses/course-detail/SectionLabel';
 import { PrimaryAmberCTA } from '@/components/ui/PrimaryAmberCTA';
 import { EmptyStateGuide } from '@/components/ui/EmptyStateGuide';
-import { FeaturedPill } from '@/components/ui/FeaturedPill';
 import { AMBER, HAIRLINE_INK_7, HAIRLINE_INK_10, INK, INK_FAINT, INK_TINT_02, INK_TINT_06, SURFACE } from '@/features/courses/_shared/tokens';
 
 interface CourseMediaGridProps {
