@@ -16,7 +16,7 @@
 
 import { format, isSameMonth } from 'date-fns';
 import type { TourTournament } from '../../hooks/useTourHubData';
-import { SHELL_BG, SURFACE, WHITE_ALPHA_06, WHITE_ALPHA_08 } from '../../_shared/tokens';
+import { SHELL_BG, SURFACE } from '../../_shared/tokens';
 
 const COUNTRY_NAMES: Record<string, string> = {
   USA: 'United States', ENG: 'England', SCO: 'Scotland', WAL: 'Wales', IRL: 'Ireland',
