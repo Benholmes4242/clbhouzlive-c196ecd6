@@ -40,7 +40,7 @@ export const PageRoot = React.forwardRef<HTMLDivElement, PageRootProps>(
     // Route-aware default: every page except Clubhouse and Profile inherits
     // the dark handicap chrome (notch + status bar + canvas).
     const location = useLocation();
-    const resolvedDark = dark ?? !isLightChromeRoute(location.pathname);
+    const resolvedDark = dark ?? isDarkChromeRoute(location.pathname);
 
     // Default light chrome for the Clubhouse/Profile pages; dark elsewhere.
     useMedianStatusBar(
