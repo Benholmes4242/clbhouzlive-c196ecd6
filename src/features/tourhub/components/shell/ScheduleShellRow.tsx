@@ -108,9 +108,9 @@ function ScheduleShellRowInner() {
                     fontSize: 12,
                     fontWeight: 600,
                     borderRadius: 15,
-                    background: isActive ? WHITE_ALPHA_18 : 'transparent',
-                    border: `1px solid ${isActive ? WHITE_ALPHA_55 : WHITE_ALPHA_18}`,
-                    color: isActive ? SURFACE : WHITE_ALPHA_65,
+                    background: isActive ? INK_TINT_06 : 'transparent',
+                    border: `1px solid ${isActive ? 'rgba(15,23,42,0.20)' : INK_TINT_07}`,
+                    color: isActive ? '#0A0E14' : '#64748B',
                     letterSpacing: '-0.01em',
                     whiteSpace: 'nowrap',
                   }}
