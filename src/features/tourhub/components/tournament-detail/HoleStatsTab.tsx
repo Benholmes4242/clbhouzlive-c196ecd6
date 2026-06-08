@@ -379,9 +379,9 @@ function computeDist(hole: ProcessedHole) {
 }
 
 function avgColor(pct: number) {
-  if (pct > 0.75) return '#991B1B';
-  if (pct > 0.45) return '#EF4444';
-  return '#94A3B8';
+  if (pct > 0.75) return '#0F172A';  // hardest -> ink (dark)
+  if (pct > 0.45) return '#475569';  // hard -> slate-600 (muted dark)
+  return '#9F1D1D';                   // easiest -> red (good for the player)
 }
 
 function DistributionBar({ dist }: { dist: ReturnType<typeof computeDist> }) {
