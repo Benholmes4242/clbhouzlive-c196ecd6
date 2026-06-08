@@ -47,6 +47,7 @@ export const CardFeed: React.FC<CardFeedProps> = ({
   onShare,
   onProfile,
   onReviewTap,
+  onCourse,
   getLikeState,
   getCommentCount,
   onNearEnd,
