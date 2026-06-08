@@ -11,6 +11,7 @@ import type { ClipsMoodId } from './hooks/useClipsMood';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { useActiveActor } from '@/context/ActiveActorContext';
 import { fetchLikedPostIds } from '@/lib/likedPostIds';
+import { RailSkeleton } from '../shared/RailSkeleton';
 
 interface ClipsMostLovedRailProps {
   userId: string | undefined;
