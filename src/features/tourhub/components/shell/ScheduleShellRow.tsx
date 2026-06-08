@@ -81,8 +81,8 @@ function ScheduleShellRowInner() {
       <div
         className="relative"
         style={{
-          background: SHELL_BG,
-          borderBottom: `0.5px solid ${WHITE_ALPHA_06}`,
+          background: '#F8FAFC',
+          borderBottom: '0.5px solid rgba(15,23,42,0.08)',
         }}
       >
         <div
