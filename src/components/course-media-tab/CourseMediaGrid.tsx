@@ -170,8 +170,6 @@ export const CourseMediaGrid = forwardRef<HTMLDivElement, CourseMediaGridProps>(
             isFetchingNextPage={isFetchingNextPage}
             onOpenFullscreen={handleOpenFullscreen}
           />
-          {/* Featured badge — Dispatch glass pill (matches Explore + Hottest) */}
-          <FeaturedPill style={{ position: 'absolute', top: 16, left: 16 }} />
         </div>
       )}
 
