@@ -1040,7 +1040,7 @@ export const AddCourseModal: React.FC<AddCourseModalProps> = ({
 
                 {ratedCourses.length > 0 && (
                   <>
-                    <SectionEyebrow label="Your Rated Courses" />
+                    <SectionEyebrow label="Your Rated Courses" noBar />
                     {ratedCourses
                       .filter(c => c.id !== preSelectedCourseId)
                       .map((course) => (
