@@ -124,6 +124,17 @@ function ExplorePassportInner({ userId }: ExplorePassportProps) {
   const navigate = useNavigate();
   const { data: passport, isLoading } = useUserPassport(userId);
 
+  // Build every applicable line, pick one at random per mount so the hero rotates
+  // each visit. Seed fixed once per mount so it doesn't flip on re-render.
+  const seedRef = useRef(Math.random());
+  const hook = useMemo<PassportHook | null>(() => {
+    if (!passport) return null;
+    const all = buildHooks(passport);
+    if (all.length === 0) return null;
+    const idx = Math.floor(seedRef.current * all.length) % all.length;
+    return all[idx];
+  }, [passport]);
+
   if (!userId) return null;
 
   if (isLoading) {
@@ -143,8 +154,6 @@ function ExplorePassportInner({ userId }: ExplorePassportProps) {
     passport.first_play_year != null
       ? `Lifetime · since ${passport.first_play_year}`
       : 'Lifetime totals';
-
-  const hook = deriveHook(passport);
 
 
 
@@ -169,19 +178,19 @@ function ExplorePassportInner({ userId }: ExplorePassportProps) {
           {hook ? (
             <div style={{ marginBottom: 18 }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 7, marginBottom: 8 }}>
-                <TrendingUp size={15} color="#FBBC2E" style={{ flexShrink: 0 }} />
+                <TrendingUp size={15} color={HOOK_META[hook.flavour].eyebrowColor} style={{ flexShrink: 0 }} />
                 <span style={{
                   fontSize: 10, fontWeight: 800, letterSpacing: '0.14em', textTransform: 'uppercase',
-                  color: '#FBBC2E',
+                  color: HOOK_META[hook.flavour].eyebrowColor,
                 }}>
-                  Next milestone
+                  {HOOK_META[hook.flavour].eyebrow}
                 </span>
               </div>
               <p style={{
                 fontSize: 22, fontWeight: 800, letterSpacing: '-0.02em', lineHeight: 1.2,
                 color: '#FFFFFF', margin: 0,
               }}>
-                {hook}
+                {hook.text}
               </p>
             </div>
           ) : (
