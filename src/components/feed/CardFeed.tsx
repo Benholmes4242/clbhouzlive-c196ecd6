@@ -31,6 +31,7 @@ export interface CardFeedProps {
   onShare: (post: FeedPost) => void;
   onProfile: (post: FeedPost) => void;
   onReviewTap?: (post: FeedPost) => void;
+  onCourse?: (post: FeedPost) => void;
   getLikeState: (post: FeedPost) => { liked: boolean; count: number } | null | undefined;
   getCommentCount: (post: FeedPost) => number;
   onNearEnd?: () => void;
@@ -46,6 +47,7 @@ export const CardFeed: React.FC<CardFeedProps> = ({
   onShare,
   onProfile,
   onReviewTap,
+  onCourse,
   getLikeState,
   getCommentCount,
   onNearEnd,
@@ -179,6 +181,7 @@ export const CardFeed: React.FC<CardFeedProps> = ({
                 onShare={onShare}
                 onProfile={onProfile}
                 onReviewTap={onReviewTap}
+                onCourse={onCourse}
                 onOpenMedia={handleOpenMedia}
                 isActive={activeId === post.id}
                 initialMediaIndex={initialSlide}
