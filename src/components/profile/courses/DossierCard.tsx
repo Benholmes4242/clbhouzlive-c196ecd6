@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import { Flag, ArrowUpRight, ChevronDown } from 'lucide-react';
 import { format } from 'date-fns';
-import { getTierName, type RatedCourseData } from './my-ratings/myRatingsTiers';
+import { type RatedCourseData } from './my-ratings/myRatingsTiers';
 
 /**
  * DossierCard — Direction B scannable row.
- * Collapsed: 64x64 thumb + name + tier·date + compact rating + chevron.
+ * Collapsed: big rank + 48x48 thumb + name + date + compact rating + chevron.
  * Expanded: 4-bar breakdown + "View course" + "Full review".
  * Tap the row to toggle expand. Navigation only via the explicit CTAs.
  */
@@ -49,7 +49,6 @@ const DossierCard: React.FC<DossierCardProps> = ({
   const [expanded, setExpanded] = useState(false);
   const dateIso = course.review_date ?? course.last_played_at ?? null;
   const dateText = formatEditorialDate(dateIso);
-  const tierName = getTierName(course.rating_value);
   const { int, dec } = splitRating(course.rating_value);
   const reviewText = (course.review ?? '').trim();
   const hasReview = reviewText.length > 0;
@@ -88,12 +87,30 @@ const DossierCard: React.FC<DossierCardProps> = ({
     >
       {/* HEADER (always visible) */}
       <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
-        {/* Thumb 64x64 */}
+        {/* Rank number */}
+        <span
+          style={{
+            fontFamily: FONT_SANS,
+            color: INK,
+            fontSize: 24,
+            fontWeight: 800,
+            letterSpacing: '-0.04em',
+            lineHeight: 1,
+            width: 30,
+            textAlign: 'center',
+            flexShrink: 0,
+            fontVariantNumeric: 'tabular-nums',
+          }}
+        >
+          {rank}
+        </span>
+
+        {/* Thumb 48x48 */}
         <div
           style={{
             position: 'relative',
-            width: 64,
-            height: 64,
+            width: 48,
+            height: 48,
             flexShrink: 0,
             borderRadius: 10,
             overflow: 'hidden',
@@ -119,20 +136,6 @@ const DossierCard: React.FC<DossierCardProps> = ({
               <Flag size={20} />
             </div>
           )}
-          <div
-            style={{
-              position: 'absolute',
-              top: 4,
-              left: 6,
-              color: 'rgba(255,255,255,0.95)',
-              fontSize: 7,
-              fontWeight: 800,
-              letterSpacing: '0.2em',
-              textShadow: '0 1px 2px rgba(0,0,0,0.5)',
-            }}
-          >
-            NO. {rank}
-          </div>
         </div>
 
         {/* Middle */}
@@ -154,21 +157,18 @@ const DossierCard: React.FC<DossierCardProps> = ({
           >
             {course.name}
           </div>
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: 6,
-              fontSize: 9,
-              fontWeight: 700,
-              letterSpacing: '0.15em',
-              flexWrap: 'wrap',
-            }}
-          >
-            <span style={{ color: AMBER_DEEP }}>{tierName}</span>
-            {dateText && <span style={{ color: INK_QUATERNARY }}>·</span>}
-            {dateText && <span style={{ color: INK_TERTIARY }}>{dateText}</span>}
-          </div>
+          {dateText && (
+            <div
+              style={{
+                fontSize: 9,
+                fontWeight: 700,
+                letterSpacing: '0.15em',
+                color: INK_TERTIARY,
+              }}
+            >
+              {dateText}
+            </div>
+          )}
         </div>
 
         {/* Rating */}
@@ -181,7 +181,7 @@ const DossierCard: React.FC<DossierCardProps> = ({
             flexShrink: 0,
           }}
         >
-          <span style={{ fontSize: 22, fontWeight: 800, letterSpacing: '-0.03em', lineHeight: 1 }}>
+          <span style={{ fontSize: 20, fontWeight: 800, letterSpacing: '-0.03em', lineHeight: 1 }}>
             {int}
           </span>
           <span style={{ fontSize: 13, fontWeight: 700, color: INK_TERTIARY, letterSpacing: '-0.02em' }}>
