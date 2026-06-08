@@ -3,13 +3,13 @@
  */
 import React, { useState, useCallback, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Plus, Share2, ChevronRight, Trophy } from 'lucide-react';
+import { Plus, ChevronRight, Trophy } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useUserTopTenCourses, TopTenCourse } from '@/hooks/useUserTopTenCourses';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Top10CourseCard } from './Top10CourseCard';
-import { toast } from 'sonner';
+
 
 interface FavouritesCarouselProps {
   userId: string;
@@ -106,9 +106,6 @@ export const FavouritesCarousel: React.FC<FavouritesCarouselProps> = ({
     }
   }, [handleScroll]);
 
-  const handleShare = () => {
-    toast.info('Coming soon');
-  };
 
   const firstName = displayName?.split(' ')[0] || 'Their';
   const getTitle = () => {
@@ -295,19 +292,6 @@ export const FavouritesCarousel: React.FC<FavouritesCarouselProps> = ({
         </div>
       )}
       
-      {/* Footer - Share CTA */}
-      {isOwnProfile && courseCount >= 3 && (
-        <div className="pt-4 px-4">
-          <button
-            onClick={handleShare}
-            className="w-full py-2.5 text-sm font-semibold rounded-xl transition-colors flex items-center justify-center gap-2 min-h-[44px] active:scale-[0.97]"
-            style={{ color: '#F7931E', background: 'rgba(247,147,30,0.08)', border: '1px solid rgba(247,147,30,0.25)' }}
-          >
-            <Share2 className="w-4 h-4" />
-            Share your Top 10
-          </button>
-        </div>
-      )}
     </section>
   );
 };
