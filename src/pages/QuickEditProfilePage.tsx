@@ -128,44 +128,28 @@ export default function QuickEditProfilePage() {
             onUpdateWebsite={updateWebsite}
           />
         </div>
-      </div>
 
-      {/* Sticky save bar */}
-      <div
-        className="fixed inset-x-0 px-4 pt-3 bg-background border-t border-border"
-        style={{
-          bottom: 'var(--bottom-nav-height, 88px)',
-          paddingBottom: 'calc(var(--sab) + 16px)',
-        }}
-      >
-        {/* gradient fade above the bar */}
-        <div
-          aria-hidden
-          className="pointer-events-none absolute left-0 right-0"
-          style={{
-            bottom: '100%',
-            height: 24,
-            background: 'linear-gradient(to top, rgba(244,246,249,1), rgba(244,246,249,0))',
-          }}
-        />
-        <Button
-          onClick={handleSave}
-          disabled={isDisabled}
-          className="w-full min-h-[52px] rounded-[14px] text-[15px] font-bold border-0 active:opacity-90 transition-opacity"
-          style={{
-            background: isDisabled ? 'rgba(15,23,42,0.06)' : '#F7931E',
-            color: isDisabled ? 'rgba(15,23,42,0.45)' : '#ffffff',
-            boxShadow: isDisabled ? 'none' : '0 4px 16px rgba(247,147,30,0.28)',
-          }}
-        >
-          {isSaving ? (
-            <><Loader2 size={18} className="animate-spin mr-2" /> Saving…</>
-          ) : isDirty ? (
-            'Save Profile'
-          ) : (
-            'All Saved'
-          )}
-        </Button>
+        {/* Save bar — inline at end of content */}
+        <div className="px-4 pt-6 pb-2">
+          <Button
+            onClick={handleSave}
+            disabled={isDisabled}
+            className="w-full min-h-[52px] rounded-[14px] text-[15px] font-bold border-0 active:opacity-90 transition-opacity"
+            style={{
+              background: isDisabled ? 'rgba(15,23,42,0.06)' : '#F7931E',
+              color: isDisabled ? 'rgba(15,23,42,0.45)' : '#ffffff',
+              boxShadow: isDisabled ? 'none' : '0 4px 16px rgba(247,147,30,0.28)',
+            }}
+          >
+            {isSaving ? (
+              <><Loader2 size={18} className="animate-spin mr-2" /> Saving…</>
+            ) : isDirty ? (
+              'Save Profile'
+            ) : (
+              'All Saved'
+            )}
+          </Button>
+        </div>
       </div>
     </div>
   );
