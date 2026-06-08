@@ -1,21 +1,26 @@
 import { memo, useEffect, useRef } from 'react';
 import { useInView } from 'react-intersection-observer';
 import { Loader2 } from 'lucide-react';
-import { useVideosFeed } from '@/components/videos-tab/hooks/useVideosFeed';
+import { useVideosFeed, type VideosFilter } from '@/components/videos-tab/hooks/useVideosFeed';
+import { moodToCategory, type VideosMoodId } from './hooks/useVideosMood';
 import VideoFeedCard from './VideoFeedCard';
 
 interface VideosFullFeedProps {
   userId: string | undefined;
+  mood: VideosMoodId;
 }
 
 /**
- * Bottom vertical "More to watch" feed. Mood-independent — always shows the
- * full personalised long-form firehose. Reuses the existing useVideosFeed
- * hook (latest mode) so we inherit pagination + dedupe + search support.
+ * Bottom vertical "More to watch" feed. Mood-aware: category moods filter by
+ * p_category, Friends switches to following mode, For you is the unfiltered
+ * latest firehose. Reuses useVideosFeed so we inherit pagination + dedupe.
  */
-function VideosFullFeedInner({ userId }: VideosFullFeedProps) {
+function VideosFullFeedInner({ userId, mood }: VideosFullFeedProps) {
   const fetchGuard = useRef(false);
   const { ref: sentinelRef, inView } = useInView({ rootMargin: '400px' });
+
+  const category = moodToCategory(mood);
+  const filter: VideosFilter = mood === 'friends' ? 'following' : 'latest';
 
   const {
     posts,
@@ -25,7 +30,7 @@ function VideosFullFeedInner({ userId }: VideosFullFeedProps) {
     isFetchingNextPage,
     fetchNextPage,
     refetch,
-  } = useVideosFeed({ userId, filter: 'latest' });
+  } = useVideosFeed({ userId, filter, category });
 
   useEffect(() => {
     if (inView && hasNextPage && !isFetchingNextPage && !fetchGuard.current) {
@@ -67,7 +72,16 @@ function VideosFullFeedInner({ userId }: VideosFullFeedProps) {
     );
   }
 
-  if (!isLoading && posts.length === 0) return null;
+  if (!isLoading && posts.length === 0) {
+    if (mood === 'for_you') return null;
+    return (
+      <div style={{ padding: '32px 16px', textAlign: 'center' }}>
+        <p style={{ fontSize: 14, fontWeight: 600, color: '#0F172A', marginBottom: 4 }}>
+          No videos here yet.
+        </p>
+      </div>
+    );
+  }
 
   return (
     <div style={{ paddingTop: 8, paddingBottom: 24 }}>

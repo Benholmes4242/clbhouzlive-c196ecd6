@@ -1,11 +1,28 @@
 import { memo } from 'react';
+import { moodCategoryLabel, type VideosMoodId } from './hooks/useVideosMood';
+
+interface MoreToWatchDividerProps {
+  mood: VideosMoodId;
+}
 
 /**
  * Visual break between the Pro Shop editorial sections (above) and the
- * full vertical videos feed (below). Mirrors the Clips MoreToExploreDivider
- * but with copy tuned for the lean-back long-form surface.
+ * full vertical videos feed (below). Title + sub reflect the active mood
+ * filter so the chips visibly drive the feed below.
  */
-function MoreToWatchDividerInner() {
+function MoreToWatchDividerInner({ mood }: MoreToWatchDividerProps) {
+  const categoryLabel = moodCategoryLabel(mood); // course_vlogs/coaching/tournaments -> label, else null
+
+  let title = 'More to watch';
+  let sub = 'The full videos feed';
+  if (categoryLabel) {
+    title = categoryLabel;
+    sub = `Showing ${categoryLabel.toLowerCase()} videos`;
+  } else if (mood === 'friends') {
+    title = 'From people you follow';
+    sub = 'Long-form videos from your follows';
+  }
+
   return (
     <div
       style={{
@@ -24,7 +41,7 @@ function MoreToWatchDividerInner() {
           margin: 0,
         }}
       >
-        More to watch
+        {title}
       </h2>
       <p
         style={{
@@ -35,7 +52,7 @@ function MoreToWatchDividerInner() {
           lineHeight: 1.35,
         }}
       >
-        The full videos feed
+        {sub}
       </p>
     </div>
   );

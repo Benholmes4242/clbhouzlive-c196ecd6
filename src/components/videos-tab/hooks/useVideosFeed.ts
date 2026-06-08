@@ -12,14 +12,15 @@ interface UseVideosFeedParams {
   userId: string | undefined;
   filter: VideosFilter;
   searchQuery?: string;
+  category?: string | null;
   enabled?: boolean;
 }
 
-export function useVideosFeed({ userId, filter, searchQuery, enabled: externalEnabled = true }: UseVideosFeedParams) {
+export function useVideosFeed({ userId, filter, searchQuery, category = null, enabled: externalEnabled = true }: UseVideosFeedParams) {
   const seenPostIds = useRef<string[]>([]);
 
   const query = useInfiniteQuery({
-    queryKey: ['videos-feed', filter, searchQuery, userId],
+    queryKey: ['videos-feed', filter, category, searchQuery, userId],
     queryFn: async ({ pageParam }) => {
       if (!userId) return { posts: [] as FeedPost[], nextCursor: undefined as string | undefined };
 
@@ -37,6 +38,7 @@ export function useVideosFeed({ userId, filter, searchQuery, enabled: externalEn
 
       if (cursor) params.p_cursor = cursor;
       if (searchQuery) params.p_search_query = searchQuery;
+      if (category) params.p_category = category;
 
       const { data, error } = await supabase.rpc('get_long_form_videos', params as any);
 
