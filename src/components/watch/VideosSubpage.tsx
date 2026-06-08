@@ -1,9 +1,10 @@
 import { useNavigationType } from 'react-router-dom';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import PageRoot from '@/components/layout/PageRoot';
 import ScrollToTopGlass from '@/components/common/ScrollToTopGlass';
 import { WatchActionsProvider } from '@/components/watch/context/WatchActionsContext';
+import { useDebouncedValue } from '@/hooks/useDebouncedValue';
 
 import ShellSlot from '@/components/header/ShellSlot';
 
@@ -19,16 +20,25 @@ import { VideosFullFeed } from '@/components/watch/videos/VideosFullFeed';
 
 const CREAM = '#F8FAFC';
 
-/**
- * Videos subpage — fixed-shell variant. Editorial header (kicker + h1) and
- * mood chips live in <ShellSlot>; body offsets by var(--shell-extra-h).
- * Search is now reached via CompactHeader's magnifier (GlobalSearchOverlay).
- */
 export default function VideosSubpage() {
   const navigationType = useNavigationType();
   const { session } = useSupabaseSession();
   const userId = session?.user?.id;
   const { mood, setMood } = useVideosMood();
+
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [searchRaw, setSearchRaw] = useState('');
+  const searchQuery = useDebouncedValue(searchRaw.trim(), 180);
+  const isSearching = searchQuery.length > 0;
+
+  const handleSearchOpen = () => {
+    setSearchOpen(true);
+    if (mood !== 'for_you') setMood('for_you');
+  };
+  const handleSearchClose = () => {
+    setSearchOpen(false);
+    setSearchRaw('');
+  };
 
   useEffect(() => {
     if (navigationType !== 'POP') {
@@ -43,18 +53,32 @@ export default function VideosSubpage() {
     <WatchActionsProvider>
       <PageRoot className="min-h-screen" hasBottomNav={true} style={{ background: CREAM }}>
         <ShellSlot>
-          <VideosMoodChips active={mood} onChange={setMood} />
+          <VideosMoodChips
+            active={mood}
+            onChange={setMood}
+            searchOpen={searchOpen}
+            searchValue={searchRaw}
+            onSearchOpen={handleSearchOpen}
+            onSearchChange={setSearchRaw}
+            onSearchClose={handleSearchClose}
+          />
         </ShellSlot>
 
         <div style={{ paddingTop: 'var(--chrome-total-h, 0px)' }}>
-          <VideoOfTheWeekHero />
-          <VideosContinueWatchingRail userId={userId} />
-          <VideosCourseAnchoredRail userId={userId} />
-          <VideosCategoryRail userId={userId} mood={mood} />
-          <VideosFollowingRail userId={userId} />
+          {isSearching ? (
+            <VideosFullFeed userId={userId} mood="for_you" searchQuery={searchQuery} />
+          ) : (
+            <>
+              <VideoOfTheWeekHero />
+              <VideosContinueWatchingRail userId={userId} />
+              <VideosCourseAnchoredRail userId={userId} />
+              <VideosCategoryRail userId={userId} mood={mood} />
+              <VideosFollowingRail userId={userId} />
 
-          <MoreToWatchDivider mood={mood} />
-          <VideosFullFeed userId={userId} mood={mood} />
+              <MoreToWatchDivider mood={mood} />
+              <VideosFullFeed userId={userId} mood={mood} />
+            </>
+          )}
         </div>
 
         <ScrollToTopGlass />

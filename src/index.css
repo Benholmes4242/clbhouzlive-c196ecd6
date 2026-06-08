@@ -4477,3 +4477,5 @@ em-emoji-picker input:focus {
 .gam-no-scrollbar::-webkit-scrollbar {
   display: none;
 }
+
+.chip-row-search-input::placeholder { color: rgba(255,255,255,0.45); }

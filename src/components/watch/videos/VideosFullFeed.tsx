@@ -8,6 +8,7 @@ import VideoFeedCard from './VideoFeedCard';
 interface VideosFullFeedProps {
   userId: string | undefined;
   mood: VideosMoodId;
+  searchQuery?: string;
 }
 
 /**
@@ -15,7 +16,7 @@ interface VideosFullFeedProps {
  * p_category, Friends switches to following mode, For you is the unfiltered
  * latest firehose. Reuses useVideosFeed so we inherit pagination + dedupe.
  */
-function VideosFullFeedInner({ userId, mood }: VideosFullFeedProps) {
+function VideosFullFeedInner({ userId, mood, searchQuery }: VideosFullFeedProps) {
   const fetchGuard = useRef(false);
   const { ref: sentinelRef, inView } = useInView({ rootMargin: '400px' });
 
@@ -30,7 +31,7 @@ function VideosFullFeedInner({ userId, mood }: VideosFullFeedProps) {
     isFetchingNextPage,
     fetchNextPage,
     refetch,
-  } = useVideosFeed({ userId, filter, category });
+  } = useVideosFeed({ userId, filter, category, searchQuery });
 
   useEffect(() => {
     if (inView && hasNextPage && !isFetchingNextPage && !fetchGuard.current) {
@@ -73,6 +74,15 @@ function VideosFullFeedInner({ userId, mood }: VideosFullFeedProps) {
   }
 
   if (!isLoading && posts.length === 0) {
+    if (searchQuery) {
+      return (
+        <div style={{ padding: '32px 16px', textAlign: 'center' }}>
+          <p style={{ fontSize: 14, fontWeight: 600, color: '#0F172A', marginBottom: 4 }}>
+            No videos match "{searchQuery}".
+          </p>
+        </div>
+      );
+    }
     if (mood === 'for_you') return null;
     return (
       <div style={{ padding: '32px 16px', textAlign: 'center' }}>
