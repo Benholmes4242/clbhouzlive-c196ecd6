@@ -67,25 +67,6 @@ function ExploreTileInner({ post, index, allPosts, variant = 'tile', feature = f
         />
       )}
 
-      {rating != null && rating > 0 && (
-        <span
-          className="absolute flex items-center leading-none"
-          style={{
-            top: 8, right: 8, gap: 4 * scale,
-            padding: `${ratingPadY}px ${ratingPadX}px`,
-            borderRadius: 9999,
-            background: 'rgba(10,14,20,0.52)',
-            backdropFilter: 'blur(14px) saturate(150%)',
-            WebkitBackdropFilter: 'blur(14px) saturate(150%)',
-            border: '1px solid rgba(255,255,255,0.16)',
-            maxWidth: 'calc(100% - 16px)',
-            overflow: 'hidden',
-          }}
-        >
-          <img src={clbhouzLogo} alt="" style={{ width: ratingIcon, height: ratingIcon, objectFit: 'contain' }} />
-          <span style={{ fontSize: ratingFs, fontWeight: 700, color: '#fff', textShadow: '0 1px 4px rgba(0,0,0,0.55)' }}>{rating.toFixed(1)}</span>
-        </span>
-      )}
 
       {courseName && (
         <div
