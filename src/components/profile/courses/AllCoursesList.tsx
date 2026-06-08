@@ -12,6 +12,7 @@ import { compareOwnRatings } from '@/lib/sortCoursesByRating';
 import DossierCard from './DossierCard';
 import BreakdownsPrompt from './BreakdownsPrompt';
 import BreakdownsPickerSheet from './BreakdownsPickerSheet';
+import { usePlayedUnratedCourses } from '@/hooks/usePlayedUnratedCourses';
 import MyRatingsTierDivider from './my-ratings/MyRatingsTierDivider';
 import {
   getBucket,
@@ -70,6 +71,9 @@ export const AllCoursesList: React.FC<AllCoursesListProps> = ({
   const [displayCount, setDisplayCount] = useState(PAGE_SIZE);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [showBreakdownsPicker, setShowBreakdownsPicker] = useState(false);
+  const [showReviewPicker, setShowReviewPicker] = useState(false);
+
+  const { courses: playedUnrated, count: reviewCount } = usePlayedUnratedCourses(userId);
 
   const handleCourseClick = useCallback(
     (courseId: string, ratingId: string | null) => {
@@ -196,6 +200,21 @@ export const AllCoursesList: React.FC<AllCoursesListProps> = ({
       setShowBreakdownsPicker(true);
     }
   }, [missingBreakdownsCourses, navigate]);
+
+  const handleReviewPromptTap = useCallback(() => {
+    if (reviewCount === 1) {
+      navigate(`/courses/${playedUnrated[0].course_id}/rate`);
+    } else if (reviewCount >= 2) {
+      setShowReviewPicker(true);
+    }
+  }, [reviewCount, playedUnrated, navigate]);
+
+  const promptMode: 'review' | 'breakdowns' | null =
+    reviewCount > 0
+      ? 'review'
+      : missingBreakdownsCourses.length > 0
+        ? 'breakdowns'
+        : null;
 
   // Apply filters and sorting
   const filteredCourses = useMemo(() => {
@@ -339,12 +358,13 @@ export const AllCoursesList: React.FC<AllCoursesListProps> = ({
         top100Count={tabCounts.top100}
       />
 
-      {/* Page-level breakdowns prompt (own profile only) */}
-      {isOwnProfile && missingBreakdownsCourses.length > 0 && (
+      {/* Page-level prompt (own profile only): review first, then breakdowns */}
+      {isOwnProfile && promptMode && (
         <div style={{ padding: '12px 16px 0' }}>
           <BreakdownsPrompt
-            missingCount={missingBreakdownsCourses.length}
-            onTap={handleBreakdownsPromptTap}
+            variant={promptMode}
+            missingCount={promptMode === 'review' ? reviewCount : missingBreakdownsCourses.length}
+            onTap={promptMode === 'review' ? handleReviewPromptTap : handleBreakdownsPromptTap}
           />
         </div>
       )}
@@ -517,6 +537,27 @@ export const AllCoursesList: React.FC<AllCoursesListProps> = ({
           missingCourses={missingBreakdownsCourses}
           onPickCourse={(courseId) => {
             setShowBreakdownsPicker(false);
+            navigate(`/courses/${courseId}/rate`);
+          }}
+        />
+      )}
+
+      {isOwnProfile && (
+        <BreakdownsPickerSheet
+          isOpen={showReviewPicker}
+          onClose={() => setShowReviewPicker(false)}
+          mode="review"
+          missingCourses={playedUnrated.map((c) => ({
+            id: c.course_id,
+            name: c.name,
+            thumbnail_image: c.thumbnail_image,
+            region: c.region,
+            rating_value: 0,
+            review_date: null,
+            last_played_at: c.last_played,
+          } as any))}
+          onPickCourse={(courseId) => {
+            setShowReviewPicker(false);
             navigate(`/courses/${courseId}/rate`);
           }}
         />

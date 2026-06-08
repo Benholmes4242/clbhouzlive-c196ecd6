@@ -1,9 +1,10 @@
 import React from 'react';
-import { Plus, ChevronRight } from 'lucide-react';
+import { Plus, Star, ChevronRight } from 'lucide-react';
 
 interface BreakdownsPromptProps {
   missingCount: number;
   onTap: () => void;
+  variant?: 'breakdowns' | 'review';
 }
 
 /**
@@ -13,8 +14,11 @@ interface BreakdownsPromptProps {
 const BreakdownsPrompt: React.FC<BreakdownsPromptProps> = ({
   missingCount,
   onTap,
+  variant = 'breakdowns',
 }) => {
   if (missingCount === 0) return null;
+
+  const isReview = variant === 'review';
 
   return (
     <button
@@ -45,7 +49,11 @@ const BreakdownsPrompt: React.FC<BreakdownsPromptProps> = ({
           flexShrink: 0,
         }}
       >
-        <Plus size={12} color="#475569" strokeWidth={2.5} />
+        {isReview ? (
+          <Star size={12} color="#475569" strokeWidth={2.5} />
+        ) : (
+          <Plus size={12} color="#475569" strokeWidth={2.5} />
+        )}
       </div>
       <div style={{ flex: 1, minWidth: 0 }}>
         <div
@@ -56,8 +64,16 @@ const BreakdownsPrompt: React.FC<BreakdownsPromptProps> = ({
             letterSpacing: '-0.005em',
           }}
         >
-          Add breakdowns to {missingCount}{' '}
-          {missingCount === 1 ? 'course' : 'courses'}
+          {isReview ? (
+            <>
+              {missingCount} {missingCount === 1 ? 'course' : 'courses'} you still need to review
+            </>
+          ) : (
+            <>
+              Add breakdowns to {missingCount}{' '}
+              {missingCount === 1 ? 'course' : 'courses'}
+            </>
+          )}
         </div>
         <div
           style={{
@@ -66,7 +82,9 @@ const BreakdownsPrompt: React.FC<BreakdownsPromptProps> = ({
             marginTop: 1,
           }}
         >
-          For more detailed ratings on each card
+          {isReview
+            ? 'Courses you have played but not yet rated'
+            : 'For more detailed ratings on each card'}
         </div>
       </div>
       <ChevronRight size={14} color="#CBD5E1" strokeWidth={2} />
