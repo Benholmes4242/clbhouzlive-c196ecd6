@@ -133,7 +133,8 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
   // Profile pages keep the light Dispatch chrome (identity pill, search icon,
   // posting-as menu palette).
   const isDarkChrome = !(isClubhouseChromeRoute || isProfileChromeRoute);
-  const useLightTheme = !isDarkChrome;
+  const useDarkChrome = isDarkChrome && !searchOpen;
+  const useLightTheme = !useDarkChrome;
 
   const handleLogoClick = () => {
     if (isBackArrowRoute) {
