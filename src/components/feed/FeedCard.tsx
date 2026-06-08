@@ -216,6 +216,7 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
           items={items}
           isCardActive={isActive}
           initialIndex={initialMediaIndex}
+          mountVideo={mountVideo}
           onIndexChange={(idx) => onCarouselIndexChange?.(post, idx)}
           onOpen={(idx) => onOpenMedia(post, idx)}
         />
