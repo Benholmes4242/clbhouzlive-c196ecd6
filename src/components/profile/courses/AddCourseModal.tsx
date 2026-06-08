@@ -483,15 +483,15 @@ const CourseRow: React.FC<CourseRowProps> = ({
   </div>
 );
 
-// Reusable section eyebrow with amber-bar prefix
-const SectionEyebrow: React.FC<{ label: string }> = ({ label }) => (
+// Reusable section eyebrow with optional amber-bar prefix
+const SectionEyebrow: React.FC<{ label: string; noBar?: boolean }> = ({ label, noBar }) => (
   <div style={{
     padding: '12px 20px 8px',
     display: 'flex',
     alignItems: 'center',
     gap: 8,
   }}>
-    <div style={{ width: 3, height: 9, background: AMBER }} />
+    {!noBar && <div style={{ width: 3, height: 9, background: AMBER }} />}
     <span style={{
       fontSize: 10,
       fontWeight: 800,
@@ -683,20 +683,8 @@ export const AddCourseModal: React.FC<AddCourseModalProps> = ({
         height: '100%',
         background: BG_SURFACE,
       }}>
-        {/* Header — editorial */}
+        {/* Header */}
         <div style={{ padding: '0 20px 16px', position: 'relative' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
-            <div style={{ width: 3, height: 10, background: AMBER }} />
-            <span style={{
-              fontSize: 10,
-              fontWeight: 800,
-              letterSpacing: '0.25em',
-              color: INK_SUBTLE,
-              textTransform: 'uppercase',
-            }}>
-              The Very Best You've Played
-            </span>
-          </div>
           <h2
             id="add-course-title"
             style={{
@@ -756,7 +744,6 @@ export const AddCourseModal: React.FC<AddCourseModalProps> = ({
           display: 'flex',
           gap: 24,
           padding: '0 20px',
-          borderBottom: `1px solid ${BORDER}`,
         }}>
           {(['manage', 'add'] as const).map(tab => {
             const isActive = activeTab === tab;
@@ -769,7 +756,7 @@ export const AddCourseModal: React.FC<AddCourseModalProps> = ({
                 style={{
                   background: 'transparent',
                   border: 0,
-                  padding: '12px 0 14px',
+                  padding: '8px 0',
                   cursor: 'pointer',
                   position: 'relative',
                   display: 'flex',
@@ -783,6 +770,9 @@ export const AddCourseModal: React.FC<AddCourseModalProps> = ({
                   fontWeight: 800,
                   color: isActive ? INK : INK_SUBTLE,
                   letterSpacing: '-0.01em',
+                  display: 'inline-block',
+                  paddingBottom: 6,
+                  borderBottom: isActive ? '1.5px solid #0F172A' : '1.5px solid transparent',
                 }}>
                   {label}
                 </span>
@@ -795,17 +785,6 @@ export const AddCourseModal: React.FC<AddCourseModalProps> = ({
                   }}>
                     {count}
                   </span>
-                )}
-                {isActive && (
-                  <div style={{
-                    position: 'absolute',
-                    bottom: -1,
-                    left: 0,
-                    width: 24,
-                    height: 2,
-                    background: AMBER,
-                    borderRadius: 1,
-                  }} />
                 )}
               </button>
             );
@@ -1061,7 +1040,7 @@ export const AddCourseModal: React.FC<AddCourseModalProps> = ({
 
                 {ratedCourses.length > 0 && (
                   <>
-                    <SectionEyebrow label="Your Rated Courses" />
+                    <SectionEyebrow label="Your Rated Courses" noBar />
                     {ratedCourses
                       .filter(c => c.id !== preSelectedCourseId)
                       .map((course) => (
