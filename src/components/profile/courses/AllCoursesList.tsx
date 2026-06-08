@@ -541,6 +541,27 @@ export const AllCoursesList: React.FC<AllCoursesListProps> = ({
           }}
         />
       )}
+
+      {isOwnProfile && (
+        <BreakdownsPickerSheet
+          isOpen={showReviewPicker}
+          onClose={() => setShowReviewPicker(false)}
+          mode="review"
+          missingCourses={playedUnrated.map((c) => ({
+            id: c.course_id,
+            name: c.name,
+            thumbnail_image: c.thumbnail_image,
+            region: c.region,
+            rating_value: 0,
+            review_date: null,
+            last_played_at: c.last_played,
+          } as any))}
+          onPickCourse={(courseId) => {
+            setShowReviewPicker(false);
+            navigate(`/courses/${courseId}/rate`);
+          }}
+        />
+      )}
     </div>
   );
 };
