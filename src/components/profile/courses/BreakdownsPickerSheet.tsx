@@ -14,6 +14,7 @@ interface BreakdownsPickerSheetProps {
   onClose: () => void;
   missingCourses: RatedCourseData[];
   onPickCourse: (courseId: string) => void;
+  mode?: 'breakdowns' | 'review';
 }
 
 const FONT_SERIF = '"Geist", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
@@ -36,6 +37,7 @@ const BreakdownsPickerSheet: React.FC<BreakdownsPickerSheetProps> = ({
   onClose,
   missingCourses,
   onPickCourse,
+  mode = 'breakdowns',
 }) => {
   return (
     <Sheet open={isOpen} onOpenChange={(open) => !open && onClose()}>
@@ -78,7 +80,7 @@ const BreakdownsPickerSheet: React.FC<BreakdownsPickerSheetProps> = ({
                   textAlign: 'left',
                 }}
               >
-                Add breakdowns
+                {mode === 'review' ? 'Courses to review' : 'Add breakdowns'}
               </SheetTitle>
               <p
                 style={{
@@ -88,9 +90,18 @@ const BreakdownsPickerSheet: React.FC<BreakdownsPickerSheetProps> = ({
                   textAlign: 'left',
                 }}
               >
-                {missingCourses.length}{' '}
-                {missingCourses.length === 1 ? 'course is' : 'courses are'}{' '}
-                missing breakdown ratings. Tap one to add details.
+                {mode === 'review' ? (
+                  <>
+                    {missingCourses.length}{' '}
+                    {missingCourses.length === 1 ? 'course' : 'courses'} you have played but not rated. Tap one to review.
+                  </>
+                ) : (
+                  <>
+                    {missingCourses.length}{' '}
+                    {missingCourses.length === 1 ? 'course is' : 'courses are'}{' '}
+                    missing breakdown ratings. Tap one to add details.
+                  </>
+                )}
               </p>
             </div>
             <button
