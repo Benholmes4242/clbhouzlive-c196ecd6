@@ -1,4 +1,4 @@
-import { memo } from 'react';
+import { memo, useMemo, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Sparkles } from 'lucide-react';
 import { useExploreRecommendations, type ExploreRecRow } from './hooks/useExploreRecommendations';
