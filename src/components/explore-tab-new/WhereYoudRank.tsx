@@ -177,8 +177,40 @@ function WhereYoudRankInner({ userId }: WhereYoudRankProps) {
   const { data, isLoading } = useTitlesInReach(effectiveUserId);
   const navigate = useNavigate();
 
+  // One random seed per mount → cards stay stable during this visit, but a
+  // fresh visit (remount) re-picks. We pick 3 from the nearest pool, de-duped
+  // by course so the same course doesn't appear twice across categories.
+  const seedRef = useRef(Math.random());
+  const picks = useMemo(() => {
+    if (!data || data.length === 0) return [];
+    // De-dup by course_id, keeping the nearest (data is already rank/gap ordered).
+    const seen = new Set<string>();
+    const unique: TitleInReach[] = [];
+    for (const row of data) {
+      if (seen.has(row.course_id)) continue;
+      seen.add(row.course_id);
+      unique.push(row);
+    }
+    // Deterministic shuffle from the per-mount seed (mulberry32-ish).
+    let s = Math.floor(seedRef.current * 2 ** 32) || 1;
+    const rand = () => {
+      s |= 0;
+      s = (s + 0x6D2B79F5) | 0;
+      let t = Math.imul(s ^ (s >>> 15), 1 | s);
+      t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+    const arr = unique.slice();
+    for (let i = arr.length - 1; i > 0; i--) {
+      const j = Math.floor(rand() * (i + 1));
+      [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+    return arr.slice(0, 3);
+  }, [data]);
+
   if (!effectiveUserId || connLoading || !connection) return null;
-  if (isLoading || !data || data.length === 0) return null;
+  if (isLoading) return null;
+  if (picks.length === 0) return null;
 
   return (
     <section style={{ padding: '0 0 0' }}>
