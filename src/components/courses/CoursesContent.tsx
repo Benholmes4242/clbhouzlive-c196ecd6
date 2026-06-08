@@ -295,7 +295,7 @@ const CoursesContent: React.FC<CoursesContentProps> = ({ username, displayName }
       ) : (
         /* Main courses page - show Explore, Global Top 100, and Friends' Courses */
         <>
-          <ShellSlot dark>
+          <ShellSlot>
             <CoursesShellTabs
               activeTab={activeTab as 'explore' | 'top100' | 'discover'}
               onTabChange={handleTabChange}

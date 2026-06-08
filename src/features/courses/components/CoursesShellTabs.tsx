@@ -1,5 +1,5 @@
 import React, { useRef, useEffect, useState } from 'react';
-import { SHELL_BG, SURFACE, WHITE_ALPHA_06, WHITE_ALPHA_55 } from '@/features/courses/_shared/tokens';
+import { SURFACE } from '@/features/courses/_shared/tokens';
 
 type CoursesTab = 'explore' | 'top100' | 'discover';
 
@@ -21,8 +21,8 @@ interface CoursesShellTabsProps {
 
 /**
  * CoursesShellTabs — Canonical 3-destination tab strip for /courses.
- * Mirrors TourHubShellTabs spec: dark #0A0E14 surface, 44px tall, 14px
- * Geist text, weight 600/700, label-width 1.5px white underline.
+ * Mirrors TourHubShellTabs spec: light #F8FAFC surface, 44px tall, 14px
+ * Geist text, weight 600/700, label-width 1.5px #0A0E14 underline.
  */
 export const CoursesShellTabs: React.FC<CoursesShellTabsProps> = ({
   activeTab,
@@ -59,8 +59,8 @@ export const CoursesShellTabs: React.FC<CoursesShellTabsProps> = ({
         style={{
           display: 'flex',
           justifyContent: 'space-evenly',
-          background: SHELL_BG,
-          borderBottom: `0.5px solid ${WHITE_ALPHA_06}`,
+          background: '#F8FAFC',
+          borderBottom: '0.5px solid rgba(15,23,42,0.08)',
           overflowY: 'hidden',
           fontFamily: 'Geist, system-ui, -apple-system, BlinkMacSystemFont, sans-serif',
         }}
@@ -80,7 +80,7 @@ export const CoursesShellTabs: React.FC<CoursesShellTabsProps> = ({
                 padding: '0 4px',
                 fontSize: 14,
                 fontWeight: isActive ? 700 : 600,
-                color: isActive ? SURFACE : WHITE_ALPHA_55,
+                color: isActive ? '#0A0E14' : '#64748B',
                 background: 'transparent',
                 border: 'none',
                 letterSpacing: '-0.005em',
@@ -94,7 +94,7 @@ export const CoursesShellTabs: React.FC<CoursesShellTabsProps> = ({
                 style={{
                   display: 'inline-block',
                   paddingBottom: 4,
-                  borderBottom: isActive ? `1.5px solid ${SURFACE}` : '1.5px solid transparent',
+                  borderBottom: isActive ? '1.5px solid #0A0E14' : '1.5px solid transparent',
                 }}
               >
                 {tab.label}
