@@ -174,7 +174,7 @@ function WhereYoudRankInner({ userId }: WhereYoudRankProps) {
   const { user } = useSupabaseSession();
   const effectiveUserId = userId ?? user?.id;
   const { data: connection, isLoading: connLoading } = useWhsConnection(effectiveUserId);
-  const { data, isLoading } = useTitlesInReach(effectiveUserId, '90d');
+  const { data, isLoading } = useTitlesInReach(effectiveUserId);
   const navigate = useNavigate();
 
   if (!effectiveUserId || connLoading || !connection) return null;
