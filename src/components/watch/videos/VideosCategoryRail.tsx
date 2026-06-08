@@ -1,4 +1,5 @@
 import { memo } from 'react';
+import { RailSkeleton } from '../shared/RailSkeleton';
 import { useVideosCategoryRail } from './hooks/useVideosCategoryRail';
 import { moodToCategory, moodCategoryLabel, moodCategorySub, type VideosMoodId } from './hooks/useVideosMood';
 import { SectionHeader } from '../proshop/SectionHeader';
