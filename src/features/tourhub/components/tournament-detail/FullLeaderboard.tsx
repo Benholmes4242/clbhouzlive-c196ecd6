@@ -254,8 +254,9 @@ export function FullLeaderboard({
 
                 {roundScores.map((score, ri) => {
                   const isActive = sortRound === ri + 1;
+                  const cellColor = score != null && score < 0 ? SCORE_OVER_PAR_LIGHT : INK;
                   return (
-                    <span key={ri} style={{ width: '19px', textAlign: 'center' as const, fontSize: '11px', fontWeight: isActive && score != null ? 600 : 500, color: INK, flexShrink: 0, fontVariantNumeric: 'tabular-nums' }}>
+                    <span key={ri} style={{ width: '19px', textAlign: 'center' as const, fontSize: '11px', fontWeight: isActive && score != null ? 600 : 500, color: cellColor, flexShrink: 0, fontVariantNumeric: 'tabular-nums' }}>
                       {score != null ? score : '—'}
                     </span>
                   );
