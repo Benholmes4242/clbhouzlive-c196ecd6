@@ -125,7 +125,8 @@ function ClipsMostLovedRailInner({ userId, mood }: ClipsMostLovedRailProps) {
     staleTime: 60_000,
   });
 
-  if (isLoading || rowsRaw.length === 0) return null;
+  if (isLoading) return <RailSkeleton variant="rail-square" />;
+  if (rowsRaw.length === 0) return null;
 
   const allPosts = rows.map((r) => {
     const p = rowToFullscreenPost(r);
