@@ -148,6 +148,11 @@ export function SummaryTab({
 
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.3 }}>
+      {/* Winner card */}
+      {isCompleted && winner && (
+        <WinnerCard winner={winner} runnerUp={runnerUp} headshotMap={headshotMap} tournamentName={tournamentName} />
+      )}
+
 
       {/* Round-by-round scoring */}
       {scoringStats && scoringStats.rounds.length > 0 && (
