@@ -1,7 +1,7 @@
 import { memo } from 'react';
 import type { TournamentTab } from '../tournament-detail';
 
-import { FONT, SHELL_BG, SURFACE, WHITE_ALPHA_06, WHITE_ALPHA_55 } from '../../_shared/tokens';
+import { FONT } from '../../_shared/tokens';
 
 interface TabDef {
   value: TournamentTab;
