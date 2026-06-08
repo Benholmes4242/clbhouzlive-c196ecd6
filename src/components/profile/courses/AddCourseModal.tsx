@@ -744,7 +744,6 @@ export const AddCourseModal: React.FC<AddCourseModalProps> = ({
           display: 'flex',
           gap: 24,
           padding: '0 20px',
-          borderBottom: `1px solid ${BORDER}`,
         }}>
           {(['manage', 'add'] as const).map(tab => {
             const isActive = activeTab === tab;
@@ -757,7 +756,7 @@ export const AddCourseModal: React.FC<AddCourseModalProps> = ({
                 style={{
                   background: 'transparent',
                   border: 0,
-                  padding: '12px 0 14px',
+                  padding: '8px 0',
                   cursor: 'pointer',
                   position: 'relative',
                   display: 'flex',
@@ -771,6 +770,9 @@ export const AddCourseModal: React.FC<AddCourseModalProps> = ({
                   fontWeight: 800,
                   color: isActive ? INK : INK_SUBTLE,
                   letterSpacing: '-0.01em',
+                  display: 'inline-block',
+                  paddingBottom: 6,
+                  borderBottom: isActive ? '1.5px solid #0F172A' : '1.5px solid transparent',
                 }}>
                   {label}
                 </span>
@@ -783,17 +785,6 @@ export const AddCourseModal: React.FC<AddCourseModalProps> = ({
                   }}>
                     {count}
                   </span>
-                )}
-                {isActive && (
-                  <div style={{
-                    position: 'absolute',
-                    bottom: -1,
-                    left: 0,
-                    width: 24,
-                    height: 2,
-                    background: AMBER,
-                    borderRadius: 1,
-                  }} />
                 )}
               </button>
             );
