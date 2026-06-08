@@ -1,24 +1,87 @@
-import { memo } from 'react';
+import { memo, useMemo, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { TrendingUp, Globe } from 'lucide-react';
 import { useUserPassport, type UserPassportRow } from './hooks/useUserPassport';
 import { ExploreSectionHeader } from './ExploreSectionHeader';
 
-function deriveHook(p: UserPassportRow): string | null {
+type HookFlavour = 'milestone' | 'achievement';
+
+interface PassportHook {
+  flavour: HookFlavour;
+  text: string;
+}
+
+function buildHooks(p: UserPassportRow): PassportHook[] {
+  const hooks: PassportHook[] = [];
+
+  // ---- MILESTONES (forward-looking nudges) ----
   if (p.countries_played != null && p.countries_played > 0 && p.countries_played < 20) {
-    return `1 country from your ${p.countries_played + 1}th.`;
+    hooks.push({
+      flavour: 'milestone',
+      text: `1 country from your ${p.countries_played + 1}th.`,
+    });
   }
   if (p.friends_courses_to_try > 0) {
-    return `${p.friends_courses_to_try} courses your friends have played that you haven't.`;
+    hooks.push({
+      flavour: 'milestone',
+      text: `${p.friends_courses_to_try} ${p.friends_courses_to_try === 1 ? 'course' : 'courses'} your friends have played that you haven't.`,
+    });
   }
   if (p.wishlist_count > 0) {
-    return `${p.wishlist_count} on your bucket list, waiting to be played.`;
+    hooks.push({
+      flavour: 'milestone',
+      text: `${p.wishlist_count} on your bucket list, waiting to be played.`,
+    });
   }
-  if (p.top_100_played != null && p.top_100_played < 100) {
-    return `${100 - p.top_100_played} of the Top 100 still to go.`;
+  if (p.top_100_played != null && p.top_100_played > 0 && p.top_100_played < 100) {
+    hooks.push({
+      flavour: 'milestone',
+      text: `${100 - p.top_100_played} of the Top 100 still to go.`,
+    });
   }
-  return null;
+
+  // ---- ACHIEVEMENTS (backward-looking facts) ----
+  if (p.courses_played != null && p.courses_played > 0) {
+    hooks.push({
+      flavour: 'achievement',
+      text:
+        p.first_play_year != null
+          ? `${p.courses_played} courses played since ${p.first_play_year}.`
+          : `${p.courses_played} courses played and counting.`,
+    });
+  }
+  if (p.countries_played != null && p.countries_played > 1) {
+    hooks.push({
+      flavour: 'achievement',
+      text: `Your golf spans ${p.countries_played} countries.`,
+    });
+  }
+  if (p.top_100_played != null && p.top_100_played > 0) {
+    hooks.push({
+      flavour: 'achievement',
+      text: `${p.top_100_played} of the Top 100, in the bag.`,
+    });
+  }
+  if (p.reviews_written != null && p.reviews_written > 0) {
+    hooks.push({
+      flavour: 'achievement',
+      text: `${p.reviews_written} ${p.reviews_written === 1 ? 'review' : 'reviews'} written for the community.`,
+    });
+  }
+  if (p.avg_rating_given != null && p.reviews_written != null && p.reviews_written >= 3) {
+    hooks.push({
+      flavour: 'achievement',
+      text: `You rate courses ${Number(p.avg_rating_given).toFixed(1)} on average.`,
+    });
+  }
+
+  return hooks;
 }
+
+const HOOK_META: Record<HookFlavour, { eyebrow: string; eyebrowColor: string }> = {
+  milestone: { eyebrow: 'Next milestone', eyebrowColor: '#FBBC2E' },
+  achievement: { eyebrow: 'Your season so far', eyebrowColor: '#7DD3A8' },
+};
 
 
 interface ExplorePassportProps {
@@ -61,6 +124,17 @@ function ExplorePassportInner({ userId }: ExplorePassportProps) {
   const navigate = useNavigate();
   const { data: passport, isLoading } = useUserPassport(userId);
 
+  // Build every applicable line, pick one at random per mount so the hero rotates
+  // each visit. Seed fixed once per mount so it doesn't flip on re-render.
+  const seedRef = useRef(Math.random());
+  const hook = useMemo<PassportHook | null>(() => {
+    if (!passport) return null;
+    const all = buildHooks(passport);
+    if (all.length === 0) return null;
+    const idx = Math.floor(seedRef.current * all.length) % all.length;
+    return all[idx];
+  }, [passport]);
+
   if (!userId) return null;
 
   if (isLoading) {
@@ -80,8 +154,6 @@ function ExplorePassportInner({ userId }: ExplorePassportProps) {
     passport.first_play_year != null
       ? `Lifetime · since ${passport.first_play_year}`
       : 'Lifetime totals';
-
-  const hook = deriveHook(passport);
 
 
 
@@ -106,19 +178,19 @@ function ExplorePassportInner({ userId }: ExplorePassportProps) {
           {hook ? (
             <div style={{ marginBottom: 18 }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 7, marginBottom: 8 }}>
-                <TrendingUp size={15} color="#FBBC2E" style={{ flexShrink: 0 }} />
+                <TrendingUp size={15} color={HOOK_META[hook.flavour].eyebrowColor} style={{ flexShrink: 0 }} />
                 <span style={{
                   fontSize: 10, fontWeight: 800, letterSpacing: '0.14em', textTransform: 'uppercase',
-                  color: '#FBBC2E',
+                  color: HOOK_META[hook.flavour].eyebrowColor,
                 }}>
-                  Next milestone
+                  {HOOK_META[hook.flavour].eyebrow}
                 </span>
               </div>
               <p style={{
                 fontSize: 22, fontWeight: 800, letterSpacing: '-0.02em', lineHeight: 1.2,
                 color: '#FFFFFF', margin: 0,
               }}>
-                {hook}
+                {hook.text}
               </p>
             </div>
           ) : (
