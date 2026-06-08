@@ -1,5 +1,4 @@
 import { memo } from 'react';
-import { RailSkeleton } from '../shared/RailSkeleton';
 import { useVideosFollowingRail } from './hooks/useVideosFollowingRail';
 import { SectionHeader } from '../proshop/SectionHeader';
 import { HRail } from '../proshop/HRail';
@@ -16,7 +15,7 @@ interface VideosFollowingRailProps {
 function VideosFollowingRailInner({ userId }: VideosFollowingRailProps) {
   const { data: posts = [], isLoading } = useVideosFollowingRail(userId, 8);
 
-  if (isLoading) return <RailSkeleton variant="rail-landscape" />;
+  if (isLoading) return null;
   if (posts.length === 0) return null;
 
   return (

@@ -1,5 +1,4 @@
 import { memo } from 'react';
-import { RailSkeleton } from '../shared/RailSkeleton';
 import { useLightningRound } from './hooks/useLightningRound';
 import type { ClipsMoodId } from './hooks/useClipsMood';
 import { SectionHeader } from '../proshop/SectionHeader';
@@ -19,7 +18,7 @@ interface LightningRoundRailProps {
 function LightningRoundRailInner({ userId, mood }: LightningRoundRailProps) {
   const { data: posts = [], isLoading } = useLightningRound(userId, mood);
 
-  if (isLoading) return <RailSkeleton variant="rail-portrait" />;
+  if (isLoading) return null;
   if (posts.length === 0) return null;
 
   return (

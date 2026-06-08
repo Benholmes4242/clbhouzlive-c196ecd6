@@ -11,7 +11,6 @@ import type { ClipsMoodId } from './hooks/useClipsMood';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { useActiveActor } from '@/context/ActiveActorContext';
 import { fetchLikedPostIds } from '@/lib/likedPostIds';
-import { RailSkeleton } from '../shared/RailSkeleton';
 
 interface ClipsMostLovedRailProps {
   userId: string | undefined;
@@ -125,8 +124,7 @@ function ClipsMostLovedRailInner({ userId, mood }: ClipsMostLovedRailProps) {
     staleTime: 60_000,
   });
 
-  if (isLoading) return <RailSkeleton variant="rail-square" />;
-  if (rowsRaw.length === 0) return null;
+  if (isLoading || rowsRaw.length === 0) return null;
 
   const allPosts = rows.map((r) => {
     const p = rowToFullscreenPost(r);

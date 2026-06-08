@@ -7,7 +7,6 @@ import { Kicker } from '../proshop/Kicker';
 import { Pin } from '../proshop/Pin';
 import { useActiveActor } from '@/context/ActiveActorContext';
 import { isPostLikedByMe } from '@/lib/likedPostIds';
-import { RailSkeleton } from '../shared/RailSkeleton';
 
 function formatHMS(seconds: number | null): string {
   if (!seconds) return '';
@@ -37,8 +36,7 @@ function VideoOfTheWeekHeroInner() {
     staleTime: 60_000,
   });
 
-  if (isLoading) return <RailSkeleton variant="hero-landscape" />;
-  if (!pick) return null;
+  if (isLoading || !pick) return null;
 
   const handleTap = () => {
     useFullscreenFeedStore.getState().open(
