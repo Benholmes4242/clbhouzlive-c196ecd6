@@ -266,17 +266,6 @@ function HandicapMasthead({ userId, onConnectTap, onCardTap }: Props) {
               <ArrowRight size={14} color="#FFFFFF" strokeWidth={2.4} />
             </span>
 
-            {/* Microcopy */}
-            <div
-              style={{
-                marginTop: 12,
-                fontSize: 10.5,
-                fontWeight: 500,
-                color: 'rgba(255,255,255,0.45)',
-              }}
-            >
-              Takes 30 seconds · We never post on your behalf
-            </div>
           </div>
         </button>
       </div>
