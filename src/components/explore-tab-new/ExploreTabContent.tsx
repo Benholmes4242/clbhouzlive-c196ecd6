@@ -72,7 +72,7 @@ export default function ExploreTabContent({ embedded: _embedded = false }: Explo
 
       <ExploreSectionHeader title="More to explore" icon={LayoutGrid} sub="The full course feed" />
 
-      <div style={{ marginLeft: -16, marginRight: -16 }}>
+      <div style={{ paddingLeft: 16, paddingRight: 16 }}>
         <ExploreGrid
           posts={posts}
           coursePosts={coursePosts}
