@@ -402,9 +402,9 @@ function DistributionBar({ dist }: { dist: ReturnType<typeof computeDist> }) {
 
 function FeatureCard({ kind, hole }: { kind: 'hardest' | 'easiest'; hole: ProcessedHole }) {
   const isHardest = kind === 'hardest';
-  const tint   = isHardest ? 'rgba(153,27,27,0.06)' : 'rgba(247,147,30,0.07)';
-  const border = isHardest ? 'rgba(153,27,27,0.18)' : 'rgba(247,147,30,0.22)';
-  const eyebrowColor = isHardest ? '#991B1B' : AMBER;
+  const tint   = isHardest ? 'rgba(15,23,42,0.05)' : 'rgba(159,29,29,0.06)';
+  const border = isHardest ? 'rgba(15,23,42,0.16)' : 'rgba(159,29,29,0.20)';
+  const eyebrowColor = isHardest ? '#0F172A' : '#9F1D1D';
   const playsTo = (hole.par + hole.avgDiff).toFixed(1);
   return (
     <div style={{ flex: 1, background: tint, border: `1px solid ${border}`, borderRadius: 12, padding: '12px 14px 14px' }}>
