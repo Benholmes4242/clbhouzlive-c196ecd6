@@ -244,7 +244,7 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
               aria-label={isBackArrowRoute ? "Go back" : "Go to home"}
             >
               {isBackArrowRoute ? (
-                <ArrowLeft className={cn("h-6 w-6", isDarkChrome ? "text-white" : "text-foreground")} />
+              <ArrowLeft className={cn("h-6 w-6", useDarkChrome ? "text-white" : "text-foreground")} />
               ) : (
                 <img
                   src="/lovable-uploads/29e83040-b5c5-48e4-84d7-3f99640e4a80.png"
@@ -256,7 +256,7 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
           </div>
 
           {/* Center section */}
-          {isDarkChrome ? (
+          {useDarkChrome ? (
             <div className="flex-1" />
           ) : (
           <div className="hidden lg:flex flex-1 justify-center">
@@ -305,7 +305,7 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
                 !isDarkChrome && !useLightTheme && "hover:bg-[hsl(var(--clubhouse-active-bg))]"
               )}
               style={{
-                color: '#FFFFFF',
+                color: useDarkChrome ? '#FFFFFF' : 'hsl(var(--foreground))',
                 transition: 'all var(--motion-fast) var(--ease-standard)'
               }}
               onClick={handleSearchClick}
@@ -315,7 +315,7 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
             </Button>
 
             {/* Handicap chip — dark chrome only (Phase 1: dark headers) */}
-            {isDarkChrome && <HandicapChip />}
+            {useDarkChrome && <HandicapChip />}
 
             {/* Identity pill (mobile only) */}
             <div className="sm:hidden">
