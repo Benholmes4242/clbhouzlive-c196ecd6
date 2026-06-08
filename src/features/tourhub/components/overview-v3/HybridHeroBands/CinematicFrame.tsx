@@ -243,7 +243,7 @@ function TiedLeadersRowDark({
       >
         {score}
       </span>
-      <span style={{ width: 18, flexShrink: 0 }} />
+      {!isResults && <span style={{ width: 18, flexShrink: 0 }} />}
     </div>
   );
 }
