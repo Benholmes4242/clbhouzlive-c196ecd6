@@ -43,6 +43,7 @@ const BreakdownsPickerSheet: React.FC<BreakdownsPickerSheetProps> = ({
     <Sheet open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <SheetContent
         side="bottom"
+        hideCloseButton
         className="!bg-[#F8FAFC] border-0 p-0 max-h-[85vh] flex flex-col rounded-t-2xl"
       >
         {/* Drag handle */}
