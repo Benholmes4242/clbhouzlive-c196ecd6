@@ -2,7 +2,7 @@ import { memo, useEffect, useRef } from 'react';
 import { Pin } from '@/components/watch/proshop/Pin';
 import type { FeedPost } from '@/components/media-system/types/media';
 import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
-import clbhouzLogo from '@/assets/clbhouz-logo.png';
+
 
 interface ExploreTileProps {
   post: FeedPost;
