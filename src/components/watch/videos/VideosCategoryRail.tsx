@@ -25,7 +25,7 @@ function VideosCategoryRailInner({ userId, mood }: VideosCategoryRailProps) {
   const { data: posts = [], isLoading } = useVideosCategoryRail(userId, category, 8);
 
   if (!category || !label) return null;
-  if (isLoading) return null;
+  if (isLoading) return <RailSkeleton variant="rail-landscape" />;
   if (posts.length === 0) return null;
 
   return (
