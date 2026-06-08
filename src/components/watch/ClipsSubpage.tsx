@@ -11,7 +11,7 @@ import { WatchActionsProvider } from './context/WatchActionsContext';
 
 
 import { ClipsMoodChips } from './clips/ClipsMoodChips';
-import { useClipsMood } from './clips/hooks/useClipsMood';
+import { useClipsMood, clipsMoodToWatchMood, clipsMoodLabel } from './clips/hooks/useClipsMood';
 import { ClipOfTheWeekHero } from './clips/ClipOfTheWeekHero';
 import { LightningRoundRail } from './clips/LightningRoundRail';
 import { ClipsCourseAnchoredRail } from './clips/ClipsCourseAnchoredRail';
