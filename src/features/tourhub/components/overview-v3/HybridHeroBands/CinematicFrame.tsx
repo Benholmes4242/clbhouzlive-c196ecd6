@@ -611,6 +611,7 @@ export function CinematicFrame({
           score={tiedLeaders.score}
           avatars={tiedAvatars}
           isLast={false}
+          isResults={isResults}
         />
       );
 
