@@ -80,7 +80,7 @@ export function roundLabel(round: number, totalRounds: number): string {
  * Wraps canonical `getScoreColor` from _shared/scoreColor for hero-family call sites.
  */
 export function scoreColour(n: number, opts?: { resultsMode?: boolean }) {
-  return getScoreColor(n, 'light', opts?.resultsMode ? 'leader' : 'standard');
+  return getScoreColor(n, 'dark', opts?.resultsMode ? 'leader' : 'standard');
 }
 
 // ---------- Name shortening -------------------------------------------------

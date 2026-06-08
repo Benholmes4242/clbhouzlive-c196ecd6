@@ -85,7 +85,7 @@ export function WinnerPill({ name, photoUrl, score, onPlayerTap }: WinnerPillPro
           style={{
             fontSize: 12,
             fontWeight: 900,
-            color: '#F7931E',
+            color: '#9F1D1D',
             fontVariantNumeric: 'tabular-nums',
             letterSpacing: -0.2,
           }}
