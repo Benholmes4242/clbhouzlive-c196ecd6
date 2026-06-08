@@ -80,9 +80,9 @@ function PlayersShellRowInner() {
                   fontSize: 12,
                   fontWeight: 600,
                   borderRadius: 15,
-                  background: isActive ? WHITE_ALPHA_10 : 'transparent',
-                  border: isActive ? `1px solid ${WHITE_ALPHA_55}` : `1.5px solid ${WHITE_ALPHA_10}`,
-                  color: isActive ? '#FFFFFF' : 'rgba(255,255,255,0.85)',
+                  background: isActive ? INK_TINT_06 : 'transparent',
+                  border: isActive ? `1px solid rgba(15,23,42,0.20)` : `1.5px solid ${INK_TINT_07}`,
+                  color: isActive ? '#0A0E14' : '#64748B',
                   gap: 5,
                   whiteSpace: 'nowrap',
                 }}
