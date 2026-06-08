@@ -21,13 +21,13 @@ export interface DifficultCourse {
  */
 export function useNotableDifficultCourses() {
   return useQuery<DifficultCourse[]>({
-    queryKey: ['gam_rpc', 'get_notable_difficult_courses', { p_min_rounds: 30, p_limit: 8 }],
-    staleTime: 5 * 60_000,
+    queryKey: ['gam_rpc', 'get_notable_difficult_courses', { p_min_rounds: 30, p_limit: 50 }],
+    staleTime: 0,
     queryFn: async () => {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const { data, error } = await (supabase.rpc as any)(
         'get_notable_difficult_courses',
-        { p_min_rounds: 30, p_limit: 8 },
+        { p_min_rounds: 30, p_limit: 50 },
       );
       if (error) throw error;
       const rows = (data ?? []) as Omit<DifficultCourse, 'thumbnail_image'>[];
