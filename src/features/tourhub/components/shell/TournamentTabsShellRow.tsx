@@ -79,7 +79,7 @@ function TournamentTabsShellRowInner({ activeTab, onChange }: Props) {
                 style={{
                   display: 'inline-block',
                   paddingBottom: 4,
-                  borderBottom: `1.5px solid ${isActive ? SURFACE : 'transparent'}`,
+                  borderBottom: `1.5px solid ${isActive ? '#0A0E14' : 'transparent'}`,
                 }}
               >
                 {tab.label}
