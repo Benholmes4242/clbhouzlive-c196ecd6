@@ -56,6 +56,7 @@ export const SheetHeader: React.FC<SheetHeaderProps> = ({
           <div style={{ marginBottom: 6 }}>
             <span
               style={{
+                fontFamily: FONT_SERIF,
                 fontSize: 9,
                 fontWeight: 800,
                 color: eyebrowColor,
@@ -69,6 +70,7 @@ export const SheetHeader: React.FC<SheetHeaderProps> = ({
         )}
         <h2
           style={{
+            fontFamily: FONT_SERIF,
             fontSize: 24,
             fontWeight: 800,
             color: titleColor,
@@ -82,6 +84,7 @@ export const SheetHeader: React.FC<SheetHeaderProps> = ({
         {sub && (
           <p
             style={{
+              fontFamily: FONT_SERIF,
               fontSize: 13,
               fontWeight: 500,
               color: subColor,
