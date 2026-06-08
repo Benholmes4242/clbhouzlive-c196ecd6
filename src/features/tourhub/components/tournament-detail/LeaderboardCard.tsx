@@ -164,7 +164,7 @@ export function LeaderboardCard({
           style={{ width: '100%', padding: '15px 20px', fontSize: 11.5, fontWeight: 800, color: AMBER, background: 'transparent', border: 'none', borderTop: `0.5px solid ${INK_TINT_07}`, cursor: 'pointer', letterSpacing: '0.12em', textTransform: 'uppercase', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}
           className="active:opacity-70 transition-opacity"
         >
-          Open Live Leaderboard
+          Open Leaderboard
           <ChevronRight size={12} strokeWidth={2.5} color={AMBER} />
         </button>
       )}
