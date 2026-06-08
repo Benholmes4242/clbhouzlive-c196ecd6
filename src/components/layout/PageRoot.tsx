@@ -12,6 +12,7 @@ function isLightChromeRoute(pathname: string): boolean {
   if (pathname === '/profile' || pathname.startsWith('/profile/')) return true;
   if (pathname === '/notificationmessages') return true;
   if (pathname === '/settings') return true;
+  if (pathname === '/edit-profile') return true;
   return false;
 }
 
