@@ -103,7 +103,7 @@ function WinnerCard({ winner, runnerUp, headshotMap, tournamentName }: { winner:
               </div>
 
               <div style={{ textAlign: 'right' as const, flexShrink: 0 }}>
-                <div style={{ fontSize: '32px', fontWeight: 900, color: AMBER, letterSpacing: '-0.05em', lineHeight: 1 }}>{scoreToPar}</div>
+                <div style={{ fontSize: '32px', fontWeight: 900, color: (winner.score ?? 0) < 0 ? SCORE_OVER_PAR_LIGHT : INK, letterSpacing: '-0.05em', lineHeight: 1 }}>{scoreToPar}</div>
                 <div style={{ fontSize: '9px', fontWeight: 800, color: INK_FAINT, letterSpacing: '0.14em' }}>TO PAR</div>
               </div>
             </div>
@@ -148,6 +148,11 @@ export function SummaryTab({
 
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.3 }}>
+      {/* Winner card */}
+      {isCompleted && winner && (
+        <WinnerCard winner={winner} runnerUp={runnerUp} headshotMap={headshotMap} tournamentName={tournamentName} />
+      )}
+
 
       {/* Round-by-round scoring */}
       {scoringStats && scoringStats.rounds.length > 0 && (
