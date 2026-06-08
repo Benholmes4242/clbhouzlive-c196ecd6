@@ -8,6 +8,7 @@ import { SectionHeader } from '../proshop/SectionHeader';
 import { HRail } from '../proshop/HRail';
 import { VideoRailTile } from './VideoRailTile';
 import { useActiveActor } from '@/context/ActiveActorContext';
+import { RailSkeleton } from '../shared/RailSkeleton';
 
 interface VideosCourseAnchoredRailProps {
   userId: string | undefined;
@@ -59,7 +60,7 @@ function VideosCourseAnchoredRailInner({ userId }: VideosCourseAnchoredRailProps
     actor,
   );
 
-  if (coursesLoading || postsLoading) return null;
+  if (coursesLoading || postsLoading) return <RailSkeleton variant="rail-landscape" />;
   if (!topCourse || posts.length === 0) return null;
 
   return (

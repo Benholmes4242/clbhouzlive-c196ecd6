@@ -7,6 +7,7 @@ import { Kicker } from '../proshop/Kicker';
 import { Pin } from '../proshop/Pin';
 import { useActiveActor } from '@/context/ActiveActorContext';
 import { isPostLikedByMe } from '@/lib/likedPostIds';
+import { RailSkeleton } from '../shared/RailSkeleton';
 
 function formatDuration(seconds: number | null): string {
   if (!seconds) return '';
@@ -34,7 +35,8 @@ function ClipOfTheWeekHeroInner() {
     staleTime: 60_000,
   });
 
-  if (isLoading || !pick) return null;
+  if (isLoading) return <RailSkeleton variant="hero-portrait" />;
+  if (!pick) return null;
 
   const handleTap = () => {
     useFullscreenFeedStore.getState().open(

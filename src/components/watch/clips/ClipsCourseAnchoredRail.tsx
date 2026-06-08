@@ -9,6 +9,7 @@ import { HRail } from '../proshop/HRail';
 import WatchRailTile from '../WatchRailTile';
 import type { ClipsMoodId } from './hooks/useClipsMood';
 import { useActiveActor } from '@/context/ActiveActorContext';
+import { RailSkeleton } from '../shared/RailSkeleton';
 
 interface ClipsCourseAnchoredRailProps {
   userId: string | undefined;
@@ -73,7 +74,7 @@ function ClipsCourseAnchoredRailInner({ userId, mood }: ClipsCourseAnchoredRailP
     actor,
   );
 
-  if (coursesLoading || postsLoading) return null;
+  if (coursesLoading || postsLoading) return <RailSkeleton variant="rail-portrait" />;
   if (!topCourse || posts.length === 0) return null;
 
   return (

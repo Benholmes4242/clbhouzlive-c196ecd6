@@ -1,4 +1,5 @@
 import { memo } from 'react';
+import { RailSkeleton } from '../shared/RailSkeleton';
 import { useVideosCategoryRail } from './hooks/useVideosCategoryRail';
 import { moodToCategory, moodCategoryLabel, moodCategorySub, type VideosMoodId } from './hooks/useVideosMood';
 import { SectionHeader } from '../proshop/SectionHeader';
@@ -24,7 +25,7 @@ function VideosCategoryRailInner({ userId, mood }: VideosCategoryRailProps) {
   const { data: posts = [], isLoading } = useVideosCategoryRail(userId, category, 8);
 
   if (!category || !label) return null;
-  if (isLoading) return null;
+  if (isLoading) return <RailSkeleton variant="rail-landscape" />;
   if (posts.length === 0) return null;
 
   return (
