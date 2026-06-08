@@ -338,7 +338,9 @@ function ProfileHubSheet({
   const [switcherOpen, setSwitcherOpen] = useState(false);
 
   // ── Profile (for @handle) ──
-  const { data: userProfile } = useUserProfile(localActiveId);
+  const activeProfileType = profiles.find(p => p.id === localActiveId)?.type || currentActor.type;
+  const personalId = activeProfileType === 'personal' ? localActiveId : null;
+  const { data: userProfile } = useUserProfile(personalId);
   const username = userProfile?.username || null;
 
   // ── Handicap data (for sub-copy + stat strip variant) ──

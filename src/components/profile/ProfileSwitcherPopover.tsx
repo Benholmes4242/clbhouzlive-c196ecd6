@@ -87,7 +87,7 @@ export function ProfileSwitcherPopover({
             {profiles.map((profile, index) => {
               const isActive = profile.id === activeId;
               return (
-                <React.Fragment key={profile.id}>
+                <div key={profile.id}>
                   {index > 0 && (
                     <div style={{ height: '0.5px', background: HAIRLINE_SOFT }} />
                   )}
@@ -145,7 +145,7 @@ export function ProfileSwitcherPopover({
                       </div>
                     </div>
                   </button>
-                </React.Fragment>
+                </div>
               );
             })}
 
