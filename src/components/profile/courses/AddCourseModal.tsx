@@ -167,7 +167,7 @@ const SortableManageItem: React.FC<SortableItemProps> = ({
         display: 'flex',
         alignItems: 'center',
         gap: 12,
-        padding: '14px 20px',
+        padding: '14px 16px',
         background: '#FFFFFF',
         borderBottom: `1px solid ${BORDER}`,
         boxShadow: isDragging ? '0 4px 12px rgba(0,0,0,0.08)' : 'none',
@@ -383,7 +383,7 @@ const CourseRow: React.FC<CourseRowProps> = ({
     display: 'flex',
     alignItems: 'center',
     gap: 12,
-    padding: '14px 20px',
+    padding: '14px 16px',
     background: '#FFFFFF',
     borderBottom: `1px solid ${BORDER}`,
     opacity: isAtLimit ? 0.4 : 1,
@@ -487,7 +487,7 @@ const CourseRow: React.FC<CourseRowProps> = ({
 // Reusable section eyebrow with optional amber-bar prefix
 const SectionEyebrow: React.FC<{ label: string; noBar?: boolean }> = ({ label, noBar }) => (
   <div style={{
-    padding: '12px 20px 8px',
+    padding: '14px 16px 8px',
     display: 'flex',
     alignItems: 'center',
     gap: 8,
@@ -766,7 +766,7 @@ export const AddCourseModal: React.FC<AddCourseModalProps> = ({
 
         {/* Search input — only on Add tab, natural height */}
         {activeTab === 'add' && (
-          <div style={{ padding: '12px 20px 4px' }}>
+          <div style={{ padding: '12px 16px 4px' }}>
             <div style={{ position: 'relative' }}>
               <Search
                 size={16}
@@ -823,7 +823,7 @@ export const AddCourseModal: React.FC<AddCourseModalProps> = ({
             topTen.length === 0 ? (
               <div style={{
                 textAlign: 'center',
-                padding: '40px 20px',
+                padding: '40px 16px',
                 color: INK_SUBTLE,
                 fontSize: 14,
               }}>
@@ -836,7 +836,7 @@ export const AddCourseModal: React.FC<AddCourseModalProps> = ({
                 {topTen.some(c => c.is_pinned) && (
                   showResetConfirm ? (
                     <div style={{
-                      margin: '12px 20px',
+                      margin: '12px 16px',
                       padding: 16,
                       borderRadius: 12,
                       border: `1px solid ${AMBER_BORDER}`,
@@ -912,7 +912,7 @@ export const AddCourseModal: React.FC<AddCourseModalProps> = ({
                       onClick={() => setShowResetConfirm(true)}
                       style={{
                         display: 'flex',
-                        margin: '12px 20px',
+                        margin: '12px 16px',
                         padding: '10px 16px',
                         background: '#FFFFFF',
                         border: `1px solid ${AMBER_BORDER}`,
@@ -966,7 +966,7 @@ export const AddCourseModal: React.FC<AddCourseModalProps> = ({
             isLoading ? (
               <div style={{
                 textAlign: 'center',
-                padding: '40px 20px',
+                padding: '40px 16px',
                 color: INK_SUBTLE,
                 fontSize: 14,
               }}>
@@ -975,7 +975,7 @@ export const AddCourseModal: React.FC<AddCourseModalProps> = ({
             ) : filteredCourses.length === 0 && !preSelectedCourse ? (
               <div style={{
                 textAlign: 'center',
-                padding: '40px 20px',
+                padding: '40px 16px',
                 color: INK_SUBTLE,
                 fontSize: 14,
               }}>
