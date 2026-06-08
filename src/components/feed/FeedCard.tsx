@@ -89,6 +89,7 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
   onOpenMedia,
   onProfile,
   onReviewTap,
+  onCourse,
   isActive = false,
   initialMediaIndex = 0,
   onCarouselIndexChange,
