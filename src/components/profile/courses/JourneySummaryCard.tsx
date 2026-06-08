@@ -124,8 +124,13 @@ export const JourneySummaryCard: React.FC<JourneySummaryCardProps> = ({
 
   const showCountries = countriesPlayed > 0;
   const showAvg = avgRating !== null && avgRating > 0;
-  const hasStrip = showCountries || showAvg;
-  const bothCells = showCountries && showAvg;
+  const cellCount = 1 + (showCountries ? 1 : 0) + (showAvg ? 1 : 0);
+
+  const cells = [
+    { label: 'Played', value: String(coursesPlayed), Icon: Trophy, show: true },
+    { label: countriesPlayed === 1 ? 'Country' : 'Countries', value: String(countriesPlayed), Icon: Globe, show: showCountries },
+    { label: 'Avg Rating', value: showAvg ? (avgRating as number).toFixed(1) : '', Icon: Star, show: showAvg },
+  ].filter(c => c.show);
 
   return (
     <motion.div
@@ -137,130 +142,29 @@ export const JourneySummaryCard: React.FC<JourneySummaryCardProps> = ({
       <Eyebrow label={eyebrowLabel} />
 
       <div style={CARD_STYLE}>
-        {/* Big number */}
-        <div
-          style={{
-            padding: '18px 18px 14px',
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            textAlign: 'center',
-          }}
-        >
-          <div
-            style={{
-              fontFamily: FONT_SANS,
-              fontWeight: 800,
-              fontSize: 56,
-              color: '#0F172A',
-              letterSpacing: '-0.04em',
-              lineHeight: 1,
-              fontVariantNumeric: 'tabular-nums',
-            }}
-          >
-            {coursesPlayed}
-          </div>
-          <p
-            style={{
-              fontFamily: FONT_SANS,
-              marginTop: 6,
-              fontSize: 12.5,
-              color: '#64748B',
-              letterSpacing: '-0.005em',
-            }}
-          >
-            {coursesPlayed === 1 ? 'Course Played' : 'Courses Played'}
-          </p>
+        {/* Compact horizontal 3-stat strip */}
+        <div style={{ display: 'grid', gridTemplateColumns: `repeat(${cellCount}, 1fr)` }}>
+          {cells.map((c, i, arr) => (
+            <div
+              key={c.label}
+              style={{
+                padding: '14px 8px',
+                textAlign: 'center',
+                borderRight: i < arr.length - 1 ? '0.5px solid rgba(15,23,42,0.06)' : 'none',
+              }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 5, marginBottom: 5 }}>
+                <c.Icon size={12} strokeWidth={2.4} color="#F7931E" />
+                <span style={{ fontFamily: FONT_SANS, fontSize: 9, fontWeight: 800, letterSpacing: '0.14em', color: '#64748B', textTransform: 'uppercase' }}>
+                  {c.label}
+                </span>
+              </div>
+              <div style={{ fontFamily: FONT_SANS, fontSize: 24, fontWeight: 800, color: '#0F172A', letterSpacing: '-0.02em', lineHeight: 1, fontVariantNumeric: 'tabular-nums' }}>
+                {c.value}
+              </div>
+            </div>
+          ))}
         </div>
-
-        {/* Divided KPI strip */}
-        {hasStrip && (
-          <div
-            style={{
-              display: 'grid',
-              gridTemplateColumns: bothCells ? '1fr 1fr' : '1fr',
-              borderTop: '0.5px solid rgba(15,23,42,0.06)',
-            }}
-          >
-            {showCountries && (
-              <div
-                style={{
-                  padding: '12px 0',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'center',
-                  textAlign: 'center',
-                  borderRight: bothCells
-                    ? '0.5px solid rgba(15,23,42,0.06)'
-                    : 'none',
-                }}
-              >
-                <div
-                  style={{
-                    fontFamily: FONT_SANS,
-                    fontSize: 18,
-                    fontWeight: 800,
-                    color: '#0F172A',
-                    fontVariantNumeric: 'tabular-nums',
-                    lineHeight: 1.1,
-                  }}
-                >
-                  {countriesPlayed}
-                </div>
-                <div
-                  style={{
-                    fontFamily: FONT_SANS,
-                    marginTop: 4,
-                    fontSize: 9.5,
-                    fontWeight: 700,
-                    color: '#94A3B8',
-                    letterSpacing: '0.1em',
-                    textTransform: 'uppercase',
-                  }}
-                >
-                  {countriesPlayed === 1 ? 'Country' : 'Countries'}
-                </div>
-              </div>
-            )}
-            {showAvg && (
-              <div
-                style={{
-                  padding: '12px 0',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'center',
-                  textAlign: 'center',
-                }}
-              >
-                <div
-                  style={{
-                    fontFamily: FONT_SANS,
-                    fontSize: 18,
-                    fontWeight: 800,
-                    color: '#0F172A',
-                    fontVariantNumeric: 'tabular-nums',
-                    lineHeight: 1.1,
-                  }}
-                >
-                  {(avgRating as number).toFixed(1)}
-                </div>
-                <div
-                  style={{
-                    fontFamily: FONT_SANS,
-                    marginTop: 4,
-                    fontSize: 9.5,
-                    fontWeight: 700,
-                    color: '#94A3B8',
-                    letterSpacing: '0.1em',
-                    textTransform: 'uppercase',
-                  }}
-                >
-                  Avg Rating
-                </div>
-              </div>
-            )}
-          </div>
-        )}
       </div>
     </motion.div>
   );
