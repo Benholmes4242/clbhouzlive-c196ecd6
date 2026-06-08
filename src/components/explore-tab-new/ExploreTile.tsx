@@ -47,12 +47,6 @@ function ExploreTileInner({ post, index, allPosts, variant = 'tile', feature = f
     open(allPosts ?? [post], index);
   };
 
-  const scale = feature || variant === 'hero' ? 1.15 : 1;
-  const ratingFs = 12 * scale;
-  const ratingIcon = 12 * scale;
-  const ratingPadY = 4 * scale;
-  const ratingPadX = 8 * scale;
-
   return (
     <button
       ref={tileRef}
