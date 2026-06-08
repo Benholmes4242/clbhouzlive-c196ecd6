@@ -78,6 +78,8 @@ export interface FeedPost {
   /** Top-level course country (region grouping like "Britain & Ireland", "USA"),
    *  populated for both review and generically-tagged posts. */
   courseCountry?: string;
+  courseRegion?: string;
+  courseSubCountry?: string;
   courseThumbnailImage?: string | null;
   courseLatitude?: number | null;
   courseLongitude?: number | null;
