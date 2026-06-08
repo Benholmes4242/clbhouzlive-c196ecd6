@@ -1,4 +1,4 @@
-import { memo } from 'react';
+import { memo, useMemo, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Flag } from 'lucide-react';
 import { useNotableDifficultCourses, type DifficultCourse } from '@/hooks/gam/useNotableDifficultCourses';
@@ -113,8 +113,37 @@ function DifficultCard({ course }: { course: DifficultCourse }) {
 function TestYourGameInner() {
   const { data: courses, isLoading } = useNotableDifficultCourses();
 
+  // One random seed per mount -> cards stay stable during this visit, but a fresh
+  // visit (remount) re-picks 3 at random from the qualifying pool. De-duped by
+  // course id (RPC already returns one row per course; this is insurance).
+  const seedRef = useRef(Math.random());
+  const picks = useMemo(() => {
+    if (!courses || courses.length === 0) return [];
+    const seen = new Set<string>();
+    const unique: DifficultCourse[] = [];
+    for (const c of courses) {
+      if (seen.has(c.course_id)) continue;
+      seen.add(c.course_id);
+      unique.push(c);
+    }
+    let s = Math.floor(seedRef.current * 2 ** 32) || 1;
+    const rand = () => {
+      s |= 0;
+      s = (s + 0x6D2B79F5) | 0;
+      let t = Math.imul(s ^ (s >>> 15), 1 | s);
+      t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+    const arr = unique.slice();
+    for (let i = arr.length - 1; i > 0; i--) {
+      const j = Math.floor(rand() * (i + 1));
+      [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+    return arr.slice(0, 3);
+  }, [courses]);
+
   if (isLoading) return null;
-  if (!courses || courses.length === 0) return null;
+  if (picks.length === 0) return null;
 
   return (
     <section>
@@ -127,7 +156,7 @@ function TestYourGameInner() {
         className="flex gap-3 overflow-x-auto scrollbar-hide"
         style={{ padding: '0 16px 4px', willChange: 'transform' }}
       >
-        {courses.map(c => <DifficultCard key={c.course_id} course={c} />)}
+        {picks.map(c => <DifficultCard key={c.course_id} course={c} />)}
       </div>
     </section>
   );
