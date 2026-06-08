@@ -431,8 +431,8 @@ function HoleStatRow({
   const ramp = avgColor(pct);
   const avgLabel = hole.avgDiff > 0 ? `+${hole.avgDiff.toFixed(2)}` : hole.avgDiff.toFixed(2);
   const tag =
-    hole.holeNumber === hardestNumber ? { l: 'Hardest', c: '#991B1B' as const } :
-    hole.holeNumber === easiestNumber ? { l: 'Easiest', c: AMBER } :
+    hole.holeNumber === hardestNumber ? { l: 'Hardest', c: '#0F172A' as const } :
+    hole.holeNumber === easiestNumber ? { l: 'Easiest', c: '#9F1D1D' as const } :
     null;
   const rounds = hole.totalPlayers;
 
