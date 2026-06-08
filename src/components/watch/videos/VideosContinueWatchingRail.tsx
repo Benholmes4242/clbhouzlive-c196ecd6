@@ -1,4 +1,5 @@
 import { memo } from 'react';
+import { RailSkeleton } from '../shared/RailSkeleton';
 import { useVideosContinueWatching } from './hooks/useVideosContinueWatching';
 import { SectionHeader } from '../proshop/SectionHeader';
 import { HRail } from '../proshop/HRail';
