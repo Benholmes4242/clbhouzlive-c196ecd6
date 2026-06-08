@@ -200,11 +200,13 @@ function TiedLeadersRowDark({
   score,
   avatars,
   isLast,
+  isResults = false,
 }: {
   count: number;
   score: string;
   avatars: (string | null)[];
   isLast: boolean;
+  isResults?: boolean;
 }) {
   return (
     <div
