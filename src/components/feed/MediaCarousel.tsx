@@ -22,6 +22,8 @@ interface Props {
   isCardActive: boolean;
   initialIndex: number;
   frameRatio?: number; // default 4/5
+  /** When false, video slides render their poster only (no <video> element). */
+  mountVideo?: boolean;
   onIndexChange?: (idx: number) => void;
   onOpen: (mediaIndex: number) => void;
 }
@@ -33,6 +35,7 @@ export const MediaCarousel: React.FC<Props> = ({
   isCardActive,
   initialIndex,
   frameRatio = FRAME_DEFAULT,
+  mountVideo = false,
   onIndexChange,
   onOpen,
 }) => {
@@ -125,7 +128,24 @@ export const MediaCarousel: React.FC<Props> = ({
               aria-label={`Media ${i + 1} of ${items.length}`}
             >
               {isVideo ? (
-                <InlineVideo item={m} isActive={isActiveSlide} objectFit="cover" />
+                mountVideo ? (
+                  <InlineVideo item={m} isActive={isActiveSlide} objectFit="cover" />
+                ) : m.thumbnailUrl ? (
+                  <img
+                    src={m.thumbnailUrl}
+                    alt=""
+                    loading={i === 0 ? 'eager' : 'lazy'}
+                    style={{
+                      position: 'absolute',
+                      inset: 0,
+                      width: '100%',
+                      height: '100%',
+                      objectFit: 'cover',
+                      objectPosition: 'center',
+                      display: 'block',
+                    }}
+                  />
+                ) : null
               ) : url ? (
                 <img
                   src={url}
